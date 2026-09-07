@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
+import { TooltipProvider } from "@repo/ui/components/tooltip";
 
 import "@repo/ui/globals.css";
 import { QueryProvider } from "@/components/query-provider";
@@ -34,7 +35,9 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <TooltipProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
