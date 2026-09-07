@@ -1,0 +1,21 @@
+package.json
+  s_f2a9011bbe1813::t_dd8342fdeb52ca 1-27
+packages/eslint-config/package.json
+  s_f2a9011bbe1813::t_85fcdd7e003e08 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c2de0f755a57636f615cd81820c60c7a0317d6e3",
+  "prompts": {},
+  "sessions": {
+    "s_f2a9011bbe1813": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "104336b9-5795-49b0-8ca8-44f3c7efac15",
+        "model": "default"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
