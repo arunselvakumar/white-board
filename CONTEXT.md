@@ -34,14 +34,37 @@ _Avoid_: forget-password, forgot password flow
 **Public Layout**:
 The full-screen split-panel shell used only by the Sign-in, Sign-up, and Password Reset Flows. It has no authenticated chrome.
 
+**Onboarding Layout**:
+The full-screen shell for Workspace Creation and Workspace Selection. A Session is present; there is no app header and no photo panel. A sign-out action is available so a stuck User can leave. Not Clerk's create-organization or choose-organization widgets.
+
 **Auth Gate**:
 The Whiteboard-wide rule that every in-app route requires a Session. Unauthenticated requests are sent to the Sign-in Flow.
 
 **Redirect URL**:
-The `?redirect_url=<path>` query on `/login` when the Auth Gate bounces an unauthenticated User. After Sign-in, they go to that path. Falls back to `/` if absent or invalid.
+The `?redirect_url=<path>` query on `/login` when the Auth Gate bounces an unauthenticated User. After Sign-in, the Workspace Gate runs first. Once an Active Workspace exists, they go to that path if it is an in-app route (not Sign-in, Sign-up, Password Reset, Workspace Creation, or Workspace Selection). Falls back to the In-app Home.
 
 **In-app Home**:
 The Whiteboard screen at `/` a User lands on after a successful auth flow when no Redirect URL is set.
+
+**Workspace**:
+The tenant a User belongs to. Realized as a Clerk Organization. A User may belong to many Workspaces. Identified to people by its name.
+_Avoid_: organization (in product language), company, tenant, org
+
+**Active Workspace**:
+The single Workspace currently in effect for a Session. A User may belong to many Workspaces but has at most one Active Workspace at a time.
+
+**Workspace Gate**:
+The Whiteboard-wide rule that the In-app Home requires an Active Workspace. After the Auth Gate confirms a Session: zero Workspaces → Workspace creation; exactly one Workspace and none active → that Workspace is activated; several Workspaces and none active → Workspace Selection; an Active Workspace already set proceeds.
+
+**Workspace Selection**:
+The screen at `/select-workspace` where a User with a Session and more than one Workspace, but no Active Workspace, chooses which Workspace to activate.
+
+**Workspace Creation**:
+The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name. Not offered once the User already belongs to a Workspace.
+
+**Workspace Owner**:
+The User who created a Workspace. There is exactly one per Workspace. In the product they are the Owner; other members are not Owners even if they later have the same access.
+_Avoid_: admin, org admin, owner role (as a Clerk slug)
 
 **Google Sign-in**:
 A Sign-in / Sign-up method that authenticates a User with their Google account, without a password.
@@ -76,6 +99,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Session** belongs to exactly one **User**
 - The **Marketing Site** never holds a **Session**
 - The **Sign-in Flow**, **Sign-up Flow**, and **Password Reset Flow** all use the **Public Layout**
+- **Workspace Creation** and **Workspace Selection** use the **Onboarding Layout**
 - Completing the **Sign-in Flow** or **Password Reset Flow** produces a **Session**
 - Password **Sign-in Flow** requires **Second-Factor Verification** when Clerk asks for it, before a **Session** exists
 - Completing the **Sign-up Flow** produces a **User** and a **Session**
@@ -87,7 +111,15 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Password Sign-up collects **Username**, **Email**, **Phone**, and a password
 - **Phone** is not a **Sign-in Identifier**
 - The **Auth Gate** sends any unauthenticated Whiteboard request to the **Sign-in Flow**
-- After Sign-in, the **Redirect URL** wins; otherwise the User lands on the **In-app Home**
+- After Sign-in, the **Workspace Gate** runs before any **Redirect URL**
+- After an **Active Workspace** exists, the **Redirect URL** wins; otherwise the User lands on the **In-app Home**
+- A **User** may belong to many **Workspaces**
+- A **Session** has at most one **Active Workspace**
+- The **Workspace Gate** runs after the **Auth Gate** and before the **In-app Home**
+- **Workspace Creation** is only for a User with zero Workspaces
+- **Workspace Selection** is only for a User with more than one Workspace and no Active Workspace
+- A **Workspace** has exactly one **Workspace Owner**
+- The **Workspace Owner** is the User who created that Workspace
 
 ## Example dialogue
 
@@ -103,6 +135,12 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 > **Dev:** "Can `/` stay a public landing with Sign in / Sign up in the header?"
 > **Domain expert:** "No. The Auth Gate owns Whiteboard. No Session means Sign-in. The Marketing Site is the public page."
 
+> **Dev:** "After Sign-in, do we send them to `/discover`?"
+> **Domain expert:** "No. `/` is the In-app Home. They only get there once the Workspace Gate has an Active Workspace."
+
+> **Dev:** "Should we add an `owner` role in Clerk?"
+> **Domain expert:** "No. Workspace Owner is the creator. Clerk already makes them the org admin. Don't invent a second slug."
+
 ## Flagged ambiguities
 
 - "both the apps" was used to mean both products — resolved: **Whiteboard** (authenticated) and **Marketing Site** (public). They share visual identity; only Whiteboard owns authentication.
@@ -111,5 +149,14 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Sign-up “username, phone as well” — resolved: password Sign-up is **Username**, **Email**, **Phone**, password; first/last name are not collected. **Phone** is Sign-up only.
 - Post-submit Sign-up verification — resolved: **Email Verification** only. **Phone Verification** deferred to [issue #2](https://github.com/white-board-io/white-board-v3/issues/2).
 - Sign-in second factor — resolved: **Second-Factor Verification** is part of the Sign-in Flow.
-- Whiteboard `/` is not a public landing — resolved: **Auth Gate**. Post-auth destination is `/` (**In-app Home**), not v2's `/discover`.
+- Whiteboard `/` is not a public landing — resolved: **Auth Gate**. Post-auth destination is `/` (**In-app Home**). In this feature, “/discover” means `/`, not a new route.
 - **Google Sign-in** placement — resolved: below the password submit button, not above the fields.
+- “organization” in product language — resolved: **Workspace**. Clerk Organization is the backing, not the word Users see.
+- “selected workspace” / “log them into that workspace” — resolved: **Active Workspace**. The three-way routing is the **Workspace Gate**.
+- “owner role” — resolved: **Workspace Owner** is the creating User, not a custom Clerk role.
+- Workspace Creation fields — resolved: **name only**. Type, address, and board are not collected in this slice.
+- Creating a second Workspace — resolved: out of scope. **Workspace Creation** is onboarding only (zero Workspaces).
+- Creation / Selection chrome — resolved: **Onboarding Layout** (no header, no photos, sign-out available).
+- Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.
+- Switching Workspaces from the In-app Home — resolved: out of this slice. Tracked in [issue #4](https://github.com/white-board-io/white-board-v3/issues/4).
+- Create / select UI — resolved: our **Workspace Creation** and **Workspace Selection** screens only. No Clerk organization widgets.

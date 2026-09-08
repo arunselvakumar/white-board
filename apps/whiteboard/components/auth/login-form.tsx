@@ -70,7 +70,10 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
     if (error) {
       return;
     }
-    if (signIn.status === "needs_second_factor") {
+    if (
+      signIn.status === "needs_second_factor" ||
+      signIn.status === "needs_client_trust"
+    ) {
       const { error: sendError } = await signIn.mfa.sendEmailCode();
       if (sendError) {
         return;
