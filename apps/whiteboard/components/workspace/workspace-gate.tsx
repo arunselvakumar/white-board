@@ -2,10 +2,15 @@
 
 import { useAuth, useOrganizationList } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Button } from "@repo/ui/components/button";
 
+import { FormAlert } from "@/components/auth/form-alert";
 import { LoadingScreen } from "@/components/auth/loading-screen";
 import { postWorkspacePath } from "@/lib/safe-redirect";
+
+const ACTIVATION_ERROR =
+  "Could not switch to that workspace. Please try again.";
 
 export function WorkspaceGate({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -14,6 +19,8 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
   const { isLoaded, setActive, userMemberships } = useOrganizationList({
     userMemberships: true,
   });
+  const [activationError, setActivationError] = useState<string | undefined>();
+  const [retryNonce, setRetryNonce] = useState(0);
 
   const redirectUrl = postWorkspacePath(pathname);
 
@@ -27,8 +34,27 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
     if (soleOrganizationId === undefined) {
       return;
     }
-    void setActive({ organization: soleOrganizationId });
-  }, [isLoaded, membershipCount, orgId, setActive, soleOrganizationId]);
+    let cancelled = false;
+    void (async () => {
+      try {
+        await setActive({ organization: soleOrganizationId });
+      } catch {
+        if (!cancelled) {
+          setActivationError(ACTIVATION_ERROR);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isLoaded,
+    membershipCount,
+    orgId,
+    retryNonce,
+    setActive,
+    soleOrganizationId,
+  ]);
 
   useEffect(() => {
     if (!isLoaded || userMemberships.isLoading) {
@@ -60,6 +86,23 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
     router,
     userMemberships.isLoading,
   ]);
+
+  if (activationError != null && orgId == null) {
+    return (
+      <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-4 px-6">
+        <FormAlert message={activationError} />
+        <Button
+          type="button"
+          onClick={() => {
+            setActivationError(undefined);
+            setRetryNonce((nonce) => nonce + 1);
+          }}
+        >
+          Try again
+        </Button>
+      </div>
+    );
+  }
 
   if (!isLoaded || userMemberships.isLoading || orgId == null) {
     return <LoadingScreen />;

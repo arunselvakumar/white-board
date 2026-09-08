@@ -55,9 +55,22 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
     if (soleOrganizationId === undefined) {
       return;
     }
-    void setActive({ organization: soleOrganizationId }).then(() => {
-      router.replace(destination);
-    });
+    let cancelled = false;
+    void (async () => {
+      try {
+        await setActive({ organization: soleOrganizationId });
+        if (!cancelled) {
+          router.replace(destination);
+        }
+      } catch {
+        if (!cancelled) {
+          setError("Could not switch to that workspace. Please try again.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [
     destination,
     isLoaded,
@@ -87,7 +100,7 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
     !isLoaded ||
     userMemberships.isLoading ||
     orgId != null ||
-    membershipCount < 2
+    (membershipCount < 2 && error == null && selectingId == null)
   ) {
     return <LoadingScreen />;
   }

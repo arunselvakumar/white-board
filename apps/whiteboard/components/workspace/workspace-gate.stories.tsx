@@ -47,3 +47,23 @@ export const NeedsWorkspace: Story = {
     ).toBeInTheDocument();
   },
 };
+
+export const ActivationFailure: Story = {
+  beforeEach() {
+    clerkMocks.memberships = [
+      { organization: { id: "org_riverside", name: "Riverside School" } },
+    ];
+    clerkMocks.setActive.mockImplementation(() => {
+      throw new Error("activation failed");
+    });
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Could not switch to that workspace. Please try again.",
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Try again" }),
+    ).toBeVisible();
+    await expect(canvas.queryByText("In-app home")).not.toBeInTheDocument();
+  },
+};

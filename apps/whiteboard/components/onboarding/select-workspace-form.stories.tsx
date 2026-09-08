@@ -71,6 +71,25 @@ export const SelectFailure: Story = {
   },
 };
 
+export const AutoActivateFailure: Story = {
+  beforeEach() {
+    clerkMocks.memberships = [
+      { organization: { id: "org_riverside", name: "Riverside School" } },
+    ];
+    clerkMocks.setActive.mockImplementation(() => {
+      throw new Error("activation failed");
+    });
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Could not switch to that workspace. Please try again.",
+    );
+    await expect(
+      canvas.getByRole("button", { name: /Riverside School/ }),
+    ).toBeVisible();
+  },
+};
+
 export const Loading: Story = {
   beforeEach() {
     clerkMocks.membershipsLoading = true;
