@@ -13,14 +13,20 @@ function pickBackground(): string {
   return LOGIN_BACKGROUNDS[index] ?? LOGIN_BACKGROUNDS[0];
 }
 
-export function PublicShell({ children }: { children: ReactNode }) {
-  const background = pickBackground();
+export function PublicShell({
+  children,
+  background,
+}: {
+  children: ReactNode;
+  background?: string;
+}) {
+  const image = background ?? pickBackground();
 
   return (
     <div className="bg-background flex min-h-svh">
       <div className="relative hidden flex-1 overflow-hidden lg:block">
         <Image
-          src={background}
+          src={image}
           alt=""
           fill
           priority
