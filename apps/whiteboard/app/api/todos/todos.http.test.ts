@@ -6,6 +6,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getDocs } from "@/app/api/docs/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import { TodoNotFoundError } from "@/src/todo/application/not-found-error";
+import { TodoId } from "@/src/todo/domain/todo-id";
+import { UserId } from "@/src/todo/domain/user-id";
+import { WorkspaceId } from "@/src/todo/domain/workspace-id";
+import { PrismaTodoRepository } from "@/src/todo/infrastructure/prisma-todo-repository";
 
 import { POST as completeTodo } from "./[id]/complete/route";
 import { DELETE as deleteTodo, GET as getTodo } from "./[id]/route";
@@ -192,6 +197,47 @@ describe("todo HTTP APIs", () => {
     const row = await prisma.todo.findUnique({ where: { id } });
     expect(row?.deletedAt).not.toBeNull();
     expect(row?.deletedByUserId).toBe(userId);
+  });
+
+  it("does not resurrect a todo when complete saves after a concurrent delete", async () => {
+    const created = await json<TodoJson>(
+      await createTodo(
+        new Request("http://localhost/api/todos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: "Race" }),
+        }),
+      ),
+    );
+    const id = created.id;
+    const todos = new PrismaTodoRepository(prisma);
+    const todoId = TodoId.create(id);
+    const workspaceId = WorkspaceId.create(orgId);
+    const toComplete = await todos.findByIdInWorkspace(todoId, workspaceId);
+    const toDelete = await todos.findByIdInWorkspace(todoId, workspaceId);
+    if (toComplete == null || toDelete == null) {
+      throw new Error("expected both snapshots to load");
+    }
+
+    toComplete.complete(new Date("2026-09-09T14:00:00.000Z"));
+    toDelete.delete(
+      UserId.create(userId),
+      new Date("2026-09-09T14:00:01.000Z"),
+    );
+    await todos.save(toDelete);
+    await expect(todos.save(toComplete)).rejects.toBeInstanceOf(
+      TodoNotFoundError,
+    );
+
+    const row = await prisma.todo.findUnique({ where: { id } });
+    expect(row?.deletedAt).not.toBeNull();
+    expect(row?.completedAt).toBeNull();
+
+    const missing = await getTodo(
+      new Request(`http://localhost/api/todos/${id}`),
+      { params: Promise.resolve({ id }) },
+    );
+    expect(missing.status).toBe(404);
   });
 
   it("does not leak todos from another workspace", async () => {

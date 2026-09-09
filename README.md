@@ -32,7 +32,7 @@ bun run dev --filter=marketing
 
 ```sh
 docker compose up -d
-cp .env.example apps/whiteboard/.env
+cp apps/whiteboard/.env.example apps/whiteboard/.env
 cp packages/db/.env.example packages/db/.env
 bun run generate
 bun run --filter @repo/db migrate:deploy

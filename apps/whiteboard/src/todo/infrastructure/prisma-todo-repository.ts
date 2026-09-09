@@ -1,5 +1,6 @@
-import type { Prisma, PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/db";
 
+import { TodoNotFoundError } from "../application/not-found-error";
 import type { Todo } from "../domain/todo";
 import type { TodoId } from "../domain/todo-id";
 import type {
@@ -14,27 +15,46 @@ export class PrismaTodoRepository implements TodoRepository {
   constructor(private readonly db: PrismaClient) {}
 
   async save(todo: Todo): Promise<void> {
-    await this.db.todo.upsert({
-      where: { id: todo.id.value },
-      create: {
-        id: todo.id.value,
-        workspaceId: todo.workspaceId.value,
-        createdByUserId: todo.createdByUserId.value,
-        title: todo.title.value,
-        completedAt: todo.completedAt,
-        createdAt: todo.createdAt,
-        updatedAt: todo.updatedAt,
-        deletedAt: todo.deletedAt,
-        deletedByUserId: todo.deletedByUserId?.value ?? null,
-      },
-      update: {
-        title: todo.title.value,
-        completedAt: todo.completedAt,
-        updatedAt: todo.updatedAt,
-        deletedAt: todo.deletedAt,
-        deletedByUserId: todo.deletedByUserId?.value ?? null,
-      },
+    const mutable = {
+      title: todo.title.value,
+      completedAt: todo.completedAt,
+      updatedAt: todo.updatedAt,
+      deletedAt: todo.deletedAt,
+      deletedByUserId: todo.deletedByUserId?.value ?? null,
+    };
+
+    // Live-row updates only — a later complete must not clear a concurrent tombstone.
+    const updated = await this.db.todo.updateMany({
+      where: { id: todo.id.value, deletedAt: null },
+      data: mutable,
     });
+    if (updated.count > 0) {
+      return;
+    }
+
+    if (todo.deletedAt != null) {
+      throw new TodoNotFoundError();
+    }
+
+    try {
+      await this.db.todo.create({
+        data: {
+          id: todo.id.value,
+          workspaceId: todo.workspaceId.value,
+          createdByUserId: todo.createdByUserId.value,
+          createdAt: todo.createdAt,
+          ...mutable,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new TodoNotFoundError();
+      }
+      throw error;
+    }
   }
 
   async findByIdInWorkspace(
