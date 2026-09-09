@@ -9,11 +9,14 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit",
+    "test": "vitest --project=unit --run",
+    "test:http": "vitest --project=http --run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "vitest --project=storybook --run"
   },
   "dependencies": {
+    "@repo/db": "*",
     "@clerk/nextjs": "^7.9.1",
     "@clerk/ui": "^1.32.2",
     "@hookform/resolvers": "^5.9.1",

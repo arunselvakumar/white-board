@@ -34,18 +34,18 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
     if (soleOrganizationId === undefined) {
       return;
     }
-    let cancelled = false;
+    const cancelled = { current: false };
     void (async () => {
       try {
         await setActive({ organization: soleOrganizationId });
       } catch {
-        if (!cancelled) {
+        if (!cancelled.current) {
           setActivationError(ACTIVATION_ERROR);
         }
       }
     })();
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
   }, [
     isLoaded,

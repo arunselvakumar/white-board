@@ -120,6 +120,8 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Workspace Selection** is only for a User with more than one Workspace and no Active Workspace
 - A **Workspace** has exactly one **Workspace Owner**
 - The **Workspace Owner** is the User who created that Workspace
+- Tenant data is read and written only for the **Active Workspace** on the **Session**. The client does not send which Workspace.
+- **User** and **Workspace** identity live in Clerk. Our database stores resource data and references them by Clerk id; it does not copy User or Workspace rows.
 
 ## Example dialogue
 
@@ -160,3 +162,8 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.
 - Switching Workspaces from the In-app Home — resolved: out of this slice. Tracked in [issue #4](https://github.com/white-board-io/white-board-v3/issues/4).
 - Create / select UI — resolved: our **Workspace Creation** and **Workspace Selection** screens only. No Clerk organization widgets.
+- “Todo” / “TODO APIs” — resolved: not a product concept. Disposable sample resource for reviewing backend architecture. Do not add to Language. When the first real resource ships, Todo is deleted.
+- “todo context” in code — resolved: a sample module under `apps/whiteboard/src/todo` so the modular-monolith template is visible. It is not a product bounded context. Do not add a CONTEXT-MAP.md for it.
+- **Auth Gate** vs APIs — resolved: the Auth Gate sends unauthenticated _browser_ routes to the **Sign-in Flow**. HTTP APIs that need a **Session** do not enter Sign-in; they fail closed. `/api/docs` is the documented unauthenticated exception.
+- “workspace id in the API body” — resolved: tenant is the **Active Workspace** on the **Session**, not a request field. No Session → 401. Session without Active Workspace → 403.
+- “User / Workspace tables in Postgres” — resolved: do not copy them. Resource rows hold Clerk ids. Clerk stays the store for people and tenants.
