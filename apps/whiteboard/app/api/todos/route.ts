@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
 import { createTodoHandlers } from "@/src/todo/infrastructure/create-todo-handlers";
@@ -23,7 +25,9 @@ export async function POST(request: Request): Promise<Response> {
       workspaceId: session.orgId,
       createdByUserId: session.userId,
     });
-    return Response.json(mapTodoResponse(todo), { status: 201 });
+    return Response.json(mapTodoResponse(todo), {
+      status: StatusCodes.CREATED,
+    });
   } catch (error) {
     return mapError(error);
   }

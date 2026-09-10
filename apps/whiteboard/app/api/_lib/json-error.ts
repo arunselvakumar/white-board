@@ -1,3 +1,5 @@
+import type { StatusCodes } from "http-status-codes";
+
 export type ApiErrorBody = {
   code: string;
   message: string;
@@ -5,7 +7,7 @@ export type ApiErrorBody = {
 };
 
 export function jsonError(
-  status: number,
+  status: StatusCodes,
   code: string,
   message: string,
   details?: unknown,

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@repo/db";
+import { StatusCodes } from "http-status-codes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getDocs } from "@/app/api/docs/route";
@@ -67,7 +68,7 @@ describe("todo HTTP APIs", () => {
   it("serves public swagger docs", async () => {
     session(null, null);
     const docs = getDocs();
-    expect(docs.status).toBe(200);
+    expect(docs.status).toBe(StatusCodes.OK);
     expect(docs.headers.get("content-type")).toContain("text/html");
     const spec = await json<SpecJson>(getOpenApi());
     expect(spec.openapi).toBe("3.0.3");
@@ -82,7 +83,7 @@ describe("todo HTTP APIs", () => {
         body: JSON.stringify({ title: "Nope" }),
       }),
     );
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
     expect(await json<ErrorJson>(response)).toMatchObject({
       code: "UNAUTHENTICATED",
     });
@@ -91,7 +92,7 @@ describe("todo HTTP APIs", () => {
   it("returns 403 without an active workspace", async () => {
     session(userId, null);
     const response = await listTodos(new Request("http://localhost/api/todos"));
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json<ErrorJson>(response)).toMatchObject({
       code: "NO_ACTIVE_WORKSPACE",
     });
@@ -105,7 +106,7 @@ describe("todo HTTP APIs", () => {
         body: JSON.stringify({ title: "  " }),
       }),
     );
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json<ErrorJson>(response)).toMatchObject({
       code: "VALIDATION_ERROR",
     });
@@ -119,7 +120,7 @@ describe("todo HTTP APIs", () => {
         body: JSON.stringify({ title: "Buy milk" }),
       }),
     );
-    expect(created.status).toBe(201);
+    expect(created.status).toBe(StatusCodes.CREATED);
     const createdBody = await json<TodoJson>(created);
     const id = createdBody.id;
     expect(createdBody.title).toBe("Buy milk");
@@ -132,12 +133,12 @@ describe("todo HTTP APIs", () => {
         params: Promise.resolve({ id }),
       },
     );
-    expect(fetched.status).toBe(200);
+    expect(fetched.status).toBe(StatusCodes.OK);
     expect((await json<TodoJson>(fetched)).id).toBe(id);
 
     const listed = await listTodos(new Request("http://localhost/api/todos"));
     const listedBody = await json<ListJson>(listed);
-    expect(listed.status).toBe(200);
+    expect(listed.status).toBe(StatusCodes.OK);
     expect(listedBody.total).toBe(1);
     expect(listedBody.items).toHaveLength(1);
 
@@ -147,7 +148,7 @@ describe("todo HTTP APIs", () => {
       }),
       { params: Promise.resolve({ id }) },
     );
-    expect(completed.status).toBe(200);
+    expect(completed.status).toBe(StatusCodes.OK);
     expect((await json<TodoJson>(completed)).completedAt).toEqual(
       expect.any(String),
     );
@@ -158,7 +159,7 @@ describe("todo HTTP APIs", () => {
       }),
       { params: Promise.resolve({ id }) },
     );
-    expect(twice.status).toBe(409);
+    expect(twice.status).toBe(StatusCodes.CONFLICT);
     expect(await json<ErrorJson>(twice)).toMatchObject({
       code: "TODO_ALREADY_COMPLETED",
     });
@@ -167,13 +168,13 @@ describe("todo HTTP APIs", () => {
       new Request(`http://localhost/api/todos/${id}`, { method: "DELETE" }),
       { params: Promise.resolve({ id }) },
     );
-    expect(deleted.status).toBe(204);
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
 
     const missing = await getTodo(
       new Request(`http://localhost/api/todos/${id}`),
       { params: Promise.resolve({ id }) },
     );
-    expect(missing.status).toBe(404);
+    expect(missing.status).toBe(StatusCodes.NOT_FOUND);
 
     const completeDeleted = await completeTodo(
       new Request(`http://localhost/api/todos/${id}/complete`, {
@@ -181,13 +182,13 @@ describe("todo HTTP APIs", () => {
       }),
       { params: Promise.resolve({ id }) },
     );
-    expect(completeDeleted.status).toBe(404);
+    expect(completeDeleted.status).toBe(StatusCodes.NOT_FOUND);
 
     const deleteAgain = await deleteTodo(
       new Request(`http://localhost/api/todos/${id}`, { method: "DELETE" }),
       { params: Promise.resolve({ id }) },
     );
-    expect(deleteAgain.status).toBe(404);
+    expect(deleteAgain.status).toBe(StatusCodes.NOT_FOUND);
 
     const listedAfter = await json<ListJson>(
       await listTodos(new Request("http://localhost/api/todos")),
@@ -237,7 +238,7 @@ describe("todo HTTP APIs", () => {
       new Request(`http://localhost/api/todos/${id}`),
       { params: Promise.resolve({ id }) },
     );
-    expect(missing.status).toBe(404);
+    expect(missing.status).toBe(StatusCodes.NOT_FOUND);
   });
 
   it("does not leak todos from another workspace", async () => {
@@ -256,7 +257,7 @@ describe("todo HTTP APIs", () => {
       new Request(`http://localhost/api/todos/${id}`),
       { params: Promise.resolve({ id }) },
     );
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(StatusCodes.NOT_FOUND);
   });
 
   it("paginates with after, before, and total", async () => {
@@ -268,7 +269,7 @@ describe("todo HTTP APIs", () => {
           body: JSON.stringify({ title }),
         }),
       );
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(StatusCodes.CREATED);
     }
 
     const firstPage = await json<ListJson>(
@@ -301,12 +302,12 @@ describe("todo HTTP APIs", () => {
     const both = await listTodos(
       new Request("http://localhost/api/todos?after=abc&before=def"),
     );
-    expect(both.status).toBe(400);
+    expect(both.status).toBe(StatusCodes.BAD_REQUEST);
 
     const badCursor = await listTodos(
       new Request("http://localhost/api/todos?after=not-valid"),
     );
-    expect(badCursor.status).toBe(400);
+    expect(badCursor.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json<ErrorJson>(badCursor)).toMatchObject({
       code: "INVALID_CURSOR",
     });
