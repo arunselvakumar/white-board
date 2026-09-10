@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 
 type JsonObject = Record<string, unknown>;
@@ -26,10 +27,10 @@ export type OpenApiOperation = {
   params?: z.ZodType;
   query?: z.ZodType;
   body?: z.ZodType;
-  successStatus: number;
+  successStatus: StatusCodes;
   successDescription: string;
   successSchema?: z.ZodType;
-  errors: number[];
+  errors: StatusCodes[];
 };
 
 export type OpenApiDocument = {
@@ -51,13 +52,13 @@ export type OpenApiDocument = {
   paths: Record<string, Record<string, JsonObject>>;
 };
 
-const STATUS_DESCRIPTIONS: Record<number, string> = {
-  400: "Validation failed",
-  401: "Authentication required",
-  403: "Active workspace required",
-  404: "Not found",
-  409: "Domain state conflict",
-  500: "Unexpected error",
+const STATUS_DESCRIPTIONS: Partial<Record<StatusCodes, string>> = {
+  [StatusCodes.BAD_REQUEST]: "Validation failed",
+  [StatusCodes.UNAUTHORIZED]: "Authentication required",
+  [StatusCodes.FORBIDDEN]: "Active workspace required",
+  [StatusCodes.NOT_FOUND]: "Not found",
+  [StatusCodes.CONFLICT]: "Domain state conflict",
+  [StatusCodes.INTERNAL_SERVER_ERROR]: "Unexpected error",
 };
 
 function responsesFor(operation: OpenApiOperation): JsonObject {

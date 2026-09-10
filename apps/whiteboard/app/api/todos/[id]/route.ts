@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
 import { createTodoHandlers } from "@/src/todo/infrastructure/create-todo-handlers";
@@ -51,7 +53,7 @@ export async function DELETE(
       workspaceId: session.orgId,
       deletedByUserId: session.userId,
     });
-    return new Response(null, { status: 204 });
+    return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {
     return mapError(error);
   }

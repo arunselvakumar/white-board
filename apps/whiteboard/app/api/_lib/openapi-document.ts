@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 import { buildOpenApiDocument } from "./openapi";
 import { CompleteTodoRequestModel } from "../todos/complete-todo-request-model";
 import { CompleteTodoResponseModel } from "../todos/complete-todo-response-model";
@@ -16,10 +18,15 @@ export const openApiDocument = buildOpenApiDocument([
     summary: "Create a todo",
     tags: ["Todos"],
     body: CreateTodoRequestModel,
-    successStatus: 201,
+    successStatus: StatusCodes.CREATED,
     successDescription: "Created",
     successSchema: CreateTodoResponseModel,
-    errors: [400, 401, 403, 500],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    ],
   },
   {
     method: "get",
@@ -27,10 +34,15 @@ export const openApiDocument = buildOpenApiDocument([
     summary: "List todos in the active workspace",
     tags: ["Todos"],
     query: ListTodosRequestModel,
-    successStatus: 200,
+    successStatus: StatusCodes.OK,
     successDescription: "Listed",
     successSchema: ListTodosResponseModel,
-    errors: [400, 401, 403, 500],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    ],
   },
   {
     method: "get",
@@ -38,10 +50,16 @@ export const openApiDocument = buildOpenApiDocument([
     summary: "Get a todo",
     tags: ["Todos"],
     params: GetTodoRequestModel,
-    successStatus: 200,
+    successStatus: StatusCodes.OK,
     successDescription: "Found",
     successSchema: GetTodoResponseModel,
-    errors: [400, 401, 403, 404, 500],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    ],
   },
   {
     method: "delete",
@@ -49,9 +67,15 @@ export const openApiDocument = buildOpenApiDocument([
     summary: "Soft-delete a todo",
     tags: ["Todos"],
     params: DeleteTodoRequestModel,
-    successStatus: 204,
+    successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Deleted",
-    errors: [400, 401, 403, 404, 500],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    ],
   },
   {
     method: "post",
@@ -59,9 +83,16 @@ export const openApiDocument = buildOpenApiDocument([
     summary: "Complete a todo",
     tags: ["Todos"],
     params: CompleteTodoRequestModel,
-    successStatus: 200,
+    successStatus: StatusCodes.OK,
     successDescription: "Completed",
     successSchema: CompleteTodoResponseModel,
-    errors: [400, 401, 403, 404, 409, 500],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    ],
   },
 ]);

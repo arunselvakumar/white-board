@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { StatusCodes } from "http-status-codes";
 
 import { jsonError } from "./json-error";
 
@@ -10,11 +11,15 @@ export type ApiSession = {
 export async function requireSession(): Promise<ApiSession | Response> {
   const { userId, orgId } = await auth();
   if (userId == null) {
-    return jsonError(401, "UNAUTHENTICATED", "Authentication required.");
+    return jsonError(
+      StatusCodes.UNAUTHORIZED,
+      "UNAUTHENTICATED",
+      "Authentication required.",
+    );
   }
   if (orgId == null) {
     return jsonError(
-      403,
+      StatusCodes.FORBIDDEN,
       "NO_ACTIVE_WORKSPACE",
       "An active workspace is required.",
     );
