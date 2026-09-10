@@ -55,21 +55,21 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
     if (soleOrganizationId === undefined) {
       return;
     }
-    let cancelled = false;
+    const cancelled = { current: false };
     void (async () => {
       try {
         await setActive({ organization: soleOrganizationId });
-        if (!cancelled) {
+        if (!cancelled.current) {
           router.replace(destination);
         }
       } catch {
-        if (!cancelled) {
+        if (!cancelled.current) {
           setError("Could not switch to that workspace. Please try again.");
         }
       }
     })();
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
   }, [
     destination,

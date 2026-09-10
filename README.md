@@ -4,8 +4,9 @@ Turborepo monorepo for Whiteboard, managed with [Bun](https://bun.com).
 
 ## Apps and packages
 
-- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query
+- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs
 - `apps/marketing` — Next.js marketing site (port 3001)
+- `packages/db` — Prisma schema, migrations, and client
 - `packages/ui` — shared [shadcn/ui](https://ui.shadcn.com) component library (Tailwind CSS v4)
 - `packages/eslint-config` — strict shared ESLint configs (type-aware)
 - `packages/typescript-config` — shared TypeScript configs
@@ -26,6 +27,25 @@ Filter a single app:
 bun run dev --filter=whiteboard
 bun run dev --filter=marketing
 ```
+
+## Postgres
+
+```sh
+docker compose up -d
+cp apps/whiteboard/.env.example apps/whiteboard/.env
+cp packages/db/.env.example packages/db/.env
+bun run generate
+bun run --filter @repo/db migrate:deploy
+```
+
+Whiteboard APIs: [http://localhost:3000/api/docs](http://localhost:3000/api/docs).
+
+```sh
+bun run test
+bun run test:http
+```
+
+HTTP tests use the `whiteboard_test` database on the same Compose instance.
 
 ## Adding shadcn/ui components
 
