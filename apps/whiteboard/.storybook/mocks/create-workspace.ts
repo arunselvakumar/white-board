@@ -1,5 +1,9 @@
 import { fn } from "storybook/test";
 
+import type {
+  CreateWorkspaceFn,
+  CreateWorkspaceResult,
+} from "@/components/onboarding/create-workspace-form";
 import type { InstitutionType } from "@/lib/institution-type";
 
 type CreateWorkspaceInput = {
@@ -8,20 +12,15 @@ type CreateWorkspaceInput = {
   institutionTypeOther?: string;
 };
 
-export const createWorkspace = fn((input: CreateWorkspaceInput) =>
-  Promise.resolve({
-    id: "org_new",
-    name: input.name,
-  }),
-).mockName("createWorkspace");
+const succeed = (_input: CreateWorkspaceInput): Promise<CreateWorkspaceResult> =>
+  Promise.resolve({ ok: true, id: "org_new" });
+
+export const createWorkspace = fn<CreateWorkspaceFn>(succeed).mockName(
+  "createWorkspace",
+);
 
 export function resetCreateWorkspaceMock(): void {
   createWorkspace.mockReset();
   createWorkspace.mockName("createWorkspace");
-  createWorkspace.mockImplementation((input: CreateWorkspaceInput) =>
-    Promise.resolve({
-      id: "org_new",
-      name: input.name,
-    }),
-  );
+  createWorkspace.mockImplementation(succeed);
 }

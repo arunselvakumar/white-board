@@ -38,31 +38,40 @@ const schema = z
     institutionType: z.enum(INSTITUTION_TYPE_VALUES, {
       error: "Select an institution type",
     }),
-    institutionTypeOther: z
-      .string()
-      .trim()
-      .max(100, "Description must be 100 characters or fewer"),
+    institutionTypeOther: z.string().trim(),
   })
   .superRefine((data, ctx) => {
-    if (
-      data.institutionType === "other" &&
-      data.institutionTypeOther.length === 0
-    ) {
+    if (data.institutionType !== "other") {
+      return;
+    }
+    if (data.institutionTypeOther.length === 0) {
       ctx.addIssue({
         code: "custom",
         path: ["institutionTypeOther"],
         message: "Describe the institution type",
+      });
+      return;
+    }
+    if (data.institutionTypeOther.length > 100) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["institutionTypeOther"],
+        message: "Description must be 100 characters or fewer",
       });
     }
   });
 
 type FormValues = z.infer<typeof schema>;
 
+export type CreateWorkspaceResult =
+  | { ok: true; id: string }
+  | { ok: false; message: string };
+
 export type CreateWorkspaceFn = (input: {
   name: string;
   institutionType: InstitutionType;
   institutionTypeOther?: string;
-}) => Promise<{ id: string }>;
+}) => Promise<CreateWorkspaceResult>;
 
 export function CreateWorkspaceForm({
   redirectUrl,
@@ -119,7 +128,7 @@ export function CreateWorkspaceForm({
       return;
     }
     try {
-      const organization = await createWorkspace(
+      const result = await createWorkspace(
         values.institutionType === "other"
           ? {
               name: values.name,
@@ -131,14 +140,16 @@ export function CreateWorkspaceForm({
               institutionType: values.institutionType,
             },
       );
-      await setActive({ organization: organization.id });
+      if (!result.ok) {
+        setError("root", { message: result.message });
+        return;
+      }
+      await setActive({ organization: result.id });
       router.replace(destination);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Could not create your workspace. Please try again.";
-      setError("root", { message });
+    } catch {
+      setError("root", {
+        message: "Could not create your workspace. Please try again.",
+      });
     }
   };
 

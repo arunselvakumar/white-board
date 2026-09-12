@@ -27,6 +27,10 @@ const CreateWorkspaceInput = z
 
 export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceInput>;
 
+export type CreateWorkspaceResult =
+  | { ok: true; id: string }
+  | { ok: false; message: string };
+
 function userFacingMessage(error: unknown): string {
   if (
     typeof error === "object" &&
@@ -49,15 +53,18 @@ function userFacingMessage(error: unknown): string {
 
 export async function createWorkspace(
   raw: CreateWorkspaceInput,
-): Promise<{ id: string }> {
+): Promise<CreateWorkspaceResult> {
   const { userId } = await auth();
   if (userId == null) {
-    throw new Error("Authentication required.");
+    return { ok: false, message: "Authentication required." };
   }
 
   const parsed = CreateWorkspaceInput.safeParse(raw);
   if (!parsed.success) {
-    throw new Error("Check the workspace name and institution type.");
+    return {
+      ok: false,
+      message: "Check the workspace name and institution type.",
+    };
   }
 
   try {
@@ -74,8 +81,8 @@ export async function createWorkspace(
           : {}),
       },
     });
-    return { id: organization.id };
+    return { ok: true, id: organization.id };
   } catch (error) {
-    throw new Error(userFacingMessage(error), { cause: error });
+    return { ok: false, message: userFacingMessage(error) };
   }
 }

@@ -154,11 +154,53 @@ export const SubmitsOther: Story = {
   },
 };
 
+export const SwitchingAwayFromOtherIgnoresDescription: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      canvas.getByLabelText("Workspace name"),
+      "Riverside School",
+    );
+    await userEvent.click(
+      canvas.getByLabelText("What kind of institution is this?"),
+    );
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Other",
+      }),
+    );
+    await userEvent.type(
+      canvas.getByLabelText("Describe the institution type"),
+      "a".repeat(101),
+    );
+    await userEvent.click(
+      canvas.getByLabelText("What kind of institution is this?"),
+    );
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "School",
+      }),
+    );
+    await expect(
+      canvas.queryByLabelText("Describe the institution type"),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await expect(createWorkspace).toHaveBeenCalledWith({
+      name: "Riverside School",
+      institutionType: "school",
+    });
+  },
+};
+
 export const CreateFailure: Story = {
   beforeEach() {
-    createWorkspace.mockImplementation(() => {
-      throw new Error("That workspace name is taken.");
-    });
+    createWorkspace.mockImplementation(() =>
+      Promise.resolve({
+        ok: false as const,
+        message: "That workspace name is taken.",
+      }),
+    );
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.type(
