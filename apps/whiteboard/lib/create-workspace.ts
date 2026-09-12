@@ -3,27 +3,12 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 
-import { INSTITUTION_TYPE_VALUES } from "@/lib/institution-type";
+import { AVAILABLE_INSTITUTION_TYPE_VALUES } from "@/lib/institution-type";
 
-const CreateWorkspaceInput = z
-  .object({
-    name: z.string().trim().min(1).max(100),
-    institutionType: z.enum(INSTITUTION_TYPE_VALUES),
-    institutionTypeOther: z.string().trim().max(100).optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (
-      data.institutionType === "other" &&
-      (data.institutionTypeOther == null ||
-        data.institutionTypeOther.length === 0)
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["institutionTypeOther"],
-        message: "Describe the institution type",
-      });
-    }
-  });
+const CreateWorkspaceInput = z.object({
+  name: z.string().trim().min(1).max(100),
+  institutionType: z.enum(AVAILABLE_INSTITUTION_TYPE_VALUES),
+});
 
 export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceInput>;
 
@@ -74,11 +59,6 @@ export async function createWorkspace(
       createdBy: userId,
       publicMetadata: {
         institutionType: parsed.data.institutionType,
-        ...(parsed.data.institutionType === "other" &&
-        parsed.data.institutionTypeOther != null &&
-        parsed.data.institutionTypeOther.length > 0
-          ? { institutionTypeOther: parsed.data.institutionTypeOther }
-          : {}),
       },
     });
     return { ok: true, id: organization.id };
