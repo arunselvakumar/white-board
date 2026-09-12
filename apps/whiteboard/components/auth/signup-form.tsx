@@ -10,10 +10,6 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@repo/ui/components/native-select";
 
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { AuthHeading } from "@/components/auth/auth-heading";
@@ -25,25 +21,9 @@ import { PasswordField } from "@/components/auth/password-field";
 import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
 import { navigateAfterAuth } from "@/lib/navigate-after-auth";
 
-const COUNTRY_CODES = [
-  { iso: "IN", dial: "91" },
-  { iso: "US", dial: "1" },
-  { iso: "GB", dial: "44" },
-  { iso: "AE", dial: "971" },
-  { iso: "SG", dial: "65" },
-  { iso: "AU", dial: "61" },
-  { iso: "CA", dial: "1" },
-  { iso: "DE", dial: "49" },
-] as const;
-
 const detailsSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.email("Enter a valid email address"),
-  countryDial: z.string().min(1),
-  phone: z
-    .string()
-    .min(6, "Enter a valid phone number")
-    .regex(/^\d+$/, "Enter a valid phone number"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -67,7 +47,6 @@ export function SignupForm() {
 
   const detailsForm = useForm<DetailsValues>({
     resolver: zodResolver(detailsSchema),
-    defaultValues: { countryDial: "91" },
   });
   const verifyForm = useForm<VerifyValues>({
     resolver: zodResolver(verifySchema),
@@ -85,7 +64,6 @@ export function SignupForm() {
     const { error } = await signUp.password({
       username: values.username,
       emailAddress: values.email,
-      phoneNumber: `+${values.countryDial}${values.phone}`,
       password: values.password,
     });
     if (error) {
@@ -190,41 +168,6 @@ export function SignupForm() {
                 message={
                   detailsForm.formState.errors.email?.message ??
                   clerkFieldMessage(errors.fields.emailAddress)
-                }
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
-              <div className="flex gap-2">
-                <NativeSelect
-                  aria-label="Country code"
-                  className="w-[108px] shrink-0 [&_select]:h-10 [&_select]:min-h-10"
-                  {...detailsForm.register("countryDial")}
-                >
-                  {COUNTRY_CODES.map((country) => (
-                    <NativeSelectOption
-                      key={`${country.iso}-${country.dial}`}
-                      value={country.dial}
-                    >
-                      {country.iso} +{country.dial}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-                <Input
-                  id="phone"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel-national"
-                  placeholder="Phone number"
-                  className="h-10"
-                  {...detailsForm.register("phone")}
-                />
-              </div>
-              <FieldError
-                message={
-                  detailsForm.formState.errors.phone?.message ??
-                  clerkFieldMessage(errors.fields.phoneNumber)
                 }
               />
             </div>

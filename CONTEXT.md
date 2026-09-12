@@ -24,7 +24,7 @@ The custom authentication flow at `/login` that produces a Session. Password Sig
 _Avoid_: login, sign-in page, Clerk SignIn
 
 **Sign-up Flow**:
-The custom account-creation flow at `/signup` that produces a User. Password Sign-up is two in-page steps: Username, Email, Phone, and password, then Email Verification — or Google Sign-in.
+The custom account-creation flow at `/signup` that produces a User. Password Sign-up is two in-page steps: Username, Email, and password, then Email Verification — or Google Sign-in.
 _Avoid_: signup, register, Clerk SignUp
 
 **Password Reset Flow**:
@@ -60,7 +60,15 @@ The Whiteboard-wide rule that the In-app Home requires an Active Workspace. Afte
 The screen at `/select-workspace` where a User with a Session and more than one Workspace, but no Active Workspace, chooses which Workspace to activate.
 
 **Workspace Creation**:
-The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name. Not offered once the User already belongs to a Workspace.
+The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. When Institution Type is Other, they also give an **Other Institution Type**. Not offered once the User already belongs to a Workspace.
+
+**Institution Type**:
+The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Stored on the Clerk Organization as public metadata.
+_Avoid_: education type, organization type, workspace type, category
+
+**Other Institution Type**:
+The User's description of the institution when Institution Type is Other. Collected at Workspace Creation. Stored on the Clerk Organization as public metadata.
+_Avoid_: custom type, other type, specify, organization type
 
 **Workspace Owner**:
 The User who created a Workspace. There is exactly one per Workspace. In the product they are the Owner; other members are not Owners even if they later have the same access.
@@ -81,7 +89,7 @@ The single Sign-in field that accepts either an Email or a Username.
 _Avoid_: email(username), login, identifier
 
 **Phone**:
-The User's mobile number. Collected in the Sign-up Flow. Not a Sign-in Identifier.
+The User's mobile number. Optional. Not collected in the current Sign-up Flow. Not a Sign-in Identifier.
 _Avoid_: mobile, cell, phone number as a Sign-in method
 
 **Email Verification**:
@@ -108,8 +116,8 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Google Sign-in** is a method inside both the **Sign-in Flow** and the **Sign-up Flow**, placed after the password submit button
 - The **Sign-in Identifier** is either an **Email** or a **Username**, never both at once
 - A **User** created with **Google Sign-in** may have an **Email** and no **Username** or **Phone**
-- Password Sign-up collects **Username**, **Email**, **Phone**, and a password
-- **Phone** is not a **Sign-in Identifier**
+- Password Sign-up collects **Username**, **Email**, and a password of at least 8 characters
+- **Phone** is optional, is not collected at Sign-up, and is not a **Sign-in Identifier**
 - The **Auth Gate** sends any unauthenticated Whiteboard request to the **Sign-in Flow**
 - After Sign-in, the **Workspace Gate** runs before any **Redirect URL**
 - After an **Active Workspace** exists, the **Redirect URL** wins; otherwise the User lands on the **In-app Home**
@@ -120,6 +128,8 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Workspace Selection** is only for a User with more than one Workspace and no Active Workspace
 - A **Workspace** has exactly one **Workspace Owner**
 - The **Workspace Owner** is the User who created that Workspace
+- A **Workspace** has one **Institution Type**
+- **Other Institution Type** exists only when **Institution Type** is Other
 - Tenant data is read and written only for the **Active Workspace** on the **Session**. The client does not send which Workspace.
 - **User** and **Workspace** identity live in Clerk. Our database stores resource data and references them by Clerk id; it does not copy User or Workspace rows.
 
@@ -148,7 +158,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - "both the apps" was used to mean both products — resolved: **Whiteboard** (authenticated) and **Marketing Site** (public). They share visual identity; only Whiteboard owns authentication.
 - "login / signup / forget-password" were used as screen names — resolved: **Sign-in Flow** (`/login`), **Sign-up Flow** (`/signup`), **Password Reset Flow** (`/forgot-password`).
 - Sign-in is not email-only: **Google Sign-in** is in, and “Email(username)” is the **Sign-in Identifier** — one field that accepts **Email** or **Username**.
-- Sign-up “username, phone as well” — resolved: password Sign-up is **Username**, **Email**, **Phone**, password; first/last name are not collected. **Phone** is Sign-up only.
+- Sign-up “username, phone as well” — resolved: password Sign-up is **Username**, **Email**, and password; first/last name are not collected. **Phone** is optional and not collected in the current Sign-up Flow. **Phone** is not a **Sign-in Identifier**.
 - Post-submit Sign-up verification — resolved: **Email Verification** only. **Phone Verification** deferred to [issue #2](https://github.com/white-board-io/white-board-v3/issues/2).
 - Sign-in second factor — resolved: **Second-Factor Verification** is part of the Sign-in Flow.
 - Whiteboard `/` is not a public landing — resolved: **Auth Gate**. Post-auth destination is `/` (**In-app Home**). In this feature, “/discover” means `/`, not a new route.
@@ -156,7 +166,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - “organization” in product language — resolved: **Workspace**. Clerk Organization is the backing, not the word Users see.
 - “selected workspace” / “log them into that workspace” — resolved: **Active Workspace**. The three-way routing is the **Workspace Gate**.
 - “owner role” — resolved: **Workspace Owner** is the creating User, not a custom Clerk role.
-- Workspace Creation fields — resolved: **name only**. Type, address, and board are not collected in this slice.
+- Workspace Creation fields — resolved: **name** and **Institution Type**. When Institution Type is Other, also **Other Institution Type**. Address and board are not collected in this slice. Institution Type and Other Institution Type are Clerk Organization public metadata, not a Postgres Workspace row.
 - Creating a second Workspace — resolved: out of scope. **Workspace Creation** is onboarding only (zero Workspaces).
 - Creation / Selection chrome — resolved: **Onboarding Layout** (no header, no photos, sign-out available).
 - Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.

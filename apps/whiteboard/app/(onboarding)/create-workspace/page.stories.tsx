@@ -3,6 +3,7 @@ import { expect } from "storybook/test";
 
 import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
 import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
+import { createWorkspace } from "../../../.storybook/mocks/create-workspace";
 
 const meta = {
   title: "Pages/Workspace Creation",
@@ -11,7 +12,7 @@ const meta = {
   },
   render: () => (
     <OnboardingShell>
-      <CreateWorkspaceForm redirectUrl="/" />
+      <CreateWorkspaceForm redirectUrl="/" createWorkspace={createWorkspace} />
     </OnboardingShell>
   ),
 } satisfies Meta;

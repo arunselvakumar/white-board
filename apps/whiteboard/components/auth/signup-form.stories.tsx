@@ -21,7 +21,6 @@ export const Details: Story = {
     ).toBeVisible();
     await expect(canvas.getByLabelText("Username")).toBeVisible();
     await expect(canvas.getByLabelText("Email")).toBeVisible();
-    await expect(canvas.getByLabelText("Phone")).toBeVisible();
     await expect(canvas.getByLabelText("Password")).toBeVisible();
   },
 };
@@ -35,7 +34,6 @@ export const ValidationErrors: Story = {
       canvas.getByText("Username must be at least 3 characters"),
     ).toBeVisible();
     await expect(canvas.getByText("Enter a valid email address")).toBeVisible();
-    await expect(canvas.getByText("Enter a valid phone number")).toBeVisible();
     await expect(
       canvas.getByText("Password must be at least 8 characters"),
     ).toBeVisible();
@@ -52,7 +50,6 @@ export const UsernameTaken: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(canvas.getByLabelText("Username"), "ada");
     await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
-    await userEvent.type(canvas.getByLabelText("Phone"), "9876543210");
     await userEvent.type(canvas.getByLabelText("Password"), "password1");
     await userEvent.click(
       canvas.getByRole("button", { name: "Create account" }),
@@ -67,7 +64,6 @@ export const EmailVerification: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(canvas.getByLabelText("Username"), "ada");
     await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
-    await userEvent.type(canvas.getByLabelText("Phone"), "9876543210");
     await userEvent.type(canvas.getByLabelText("Password"), "password1");
     await userEvent.click(
       canvas.getByRole("button", { name: "Create account" }),
