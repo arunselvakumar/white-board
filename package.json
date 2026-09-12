@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev storybook",
+    "start": "turbo run dev storybook",
     "generate": "turbo run generate",
     "test": "turbo run test",
     "test:http": "turbo run test:http",

@@ -4,12 +4,11 @@ import type {
   CreateWorkspaceFn,
   CreateWorkspaceResult,
 } from "@/components/onboarding/create-workspace-form";
-import type { InstitutionType } from "@/lib/institution-type";
+import type { AvailableInstitutionType } from "@/lib/institution-type";
 
 type CreateWorkspaceInput = {
   name: string;
-  institutionType: InstitutionType;
-  institutionTypeOther?: string;
+  institutionType: AvailableInstitutionType;
 };
 
 const succeed = (_input: CreateWorkspaceInput): Promise<CreateWorkspaceResult> =>

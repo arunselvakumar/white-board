@@ -4,7 +4,7 @@ Turborepo monorepo for Whiteboard, managed with [Bun](https://bun.com).
 
 ## Apps and packages
 
-- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs
+- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs, plus Storybook (port 6006)
 - `apps/marketing` — Next.js marketing site (port 3001)
 - `packages/db` — Prisma schema, migrations, and client
 - `packages/ui` — shared [shadcn/ui](https://ui.shadcn.com) component library (Tailwind CSS v4)
@@ -15,7 +15,7 @@ Turborepo monorepo for Whiteboard, managed with [Bun](https://bun.com).
 
 ```sh
 bun install
-bun run dev
+bun start
 bun run lint
 bun run check-types
 bun run build
