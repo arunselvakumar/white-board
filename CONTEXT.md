@@ -44,7 +44,7 @@ The Whiteboard-wide rule that every in-app route requires a Session. Unauthentic
 The `?redirect_url=<path>` query on `/login` when the Auth Gate bounces an unauthenticated User. After Sign-in, the Workspace Gate runs first. Once an Active Workspace exists, they go to that path if it is an in-app route (not Sign-in, Sign-up, Password Reset, Workspace Creation, or Workspace Selection). Falls back to the In-app Home.
 
 **In-app Home**:
-The Whiteboard screen at `/` a User lands on after a successful auth flow when no Redirect URL is set.
+The Whiteboard screen at `/` a User lands on after a successful auth flow when no Redirect URL is set. For a Training Institute Workspace this is the **Owner Dashboard**.
 
 **Workspace**:
 The tenant a User belongs to. Realized as a Clerk Organization. A User may belong to many Workspaces. Identified to people by its name.
@@ -60,19 +60,66 @@ The Whiteboard-wide rule that the In-app Home requires an Active Workspace. Afte
 The screen at `/select-workspace` where a User with a Session and more than one Workspace, but no Active Workspace, chooses which Workspace to activate.
 
 **Workspace Creation**:
-The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. When Institution Type is Other, they also give an **Other Institution Type**. Not offered once the User already belongs to a Workspace.
+The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. Training Institute is selected by default and is the only type that can be chosen. School, Preschool, College, University, and Other are listed as coming soon and cannot be selected. Not offered once the User already belongs to a Workspace.
 
 **Institution Type**:
-The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Stored on the Clerk Organization as public metadata.
+The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Only **Training Institute** is available today; it is the default. The other values are coming soon and cannot be selected. Stored on the Clerk Organization as public metadata.
 _Avoid_: education type, organization type, workspace type, category
-
-**Other Institution Type**:
-The User's description of the institution when Institution Type is Other. Collected at Workspace Creation. Stored on the Clerk Organization as public metadata.
-_Avoid_: custom type, other type, specify, organization type
 
 **Workspace Owner**:
 The User who created a Workspace. There is exactly one per Workspace. In the product they are the Owner; other members are not Owners even if they later have the same access.
 _Avoid_: admin, org admin, owner role (as a Clerk slug)
+
+**Training Institute**:
+The Institution Type Whiteboard sells today. A Workspace of this type is a computer education centre, home tuition centre, skill centre, or similar — not a School or College.
+_Avoid_: academy (as the type name), coaching (as the type name), institute ERP
+
+**Student**:
+A learner at the Training Institute. A Workspace-scoped record, not a User and not a Clerk identity in P0. Creating a Student is admitting them. Enquiry pipeline is P1.
+_Avoid_: pupil, scholar, user, account, child (as the entity name)
+
+**Guardian**:
+The parent or emergency contact named on a Student. Name and phone live on the Student record. Not a User in P0.
+_Avoid_: parent as a login, family account
+
+**Course**:
+A program the institute offers, such as DCA, Tally, or Python. It has a name, duration, and a default fee. It is not when or where it is taught.
+_Avoid_: subject, class, program (as the stored name), paper
+
+**Batch**:
+A scheduled run of a Course: default Timings, Class Mode, capacity, optional room. Many Students enroll in one Batch.
+_Avoid_: section, period, class (as the entity name)
+
+**Class Mode**:
+How teaching is delivered: Offline, Online, or Hybrid. Set on the Batch; an Enrollment may override it.
+_Avoid_: medium, channel, delivery type
+
+**Timing**:
+When teaching happens. A Batch has default Timings (days of week and clock times). An Enrollment may inherit those or set Student-specific Timings (home tuition).
+_Avoid_: timetable (P1 calendar of sessions), period
+
+**Enrollment**:
+The fact that a Student is taking a Course in a Batch, with Class Mode, Timings, and a Fee Plan. A Student may have many Enrollments.
+_Avoid_: admission (that is creating the Student), registration, mapping
+
+**Fee Plan**:
+What a Student owes for one Enrollment: one-time, monthly, or installments, with amounts and due dates. Copied from the Course default at enroll time and then adjustable.
+_Avoid_: invoice, fee structure, package (as the entity name)
+
+**Fee Payment**:
+Money collected against a Fee Plan. Partial payments are allowed. Method is Cash, UPI, Card, or Other. Recorded by a User in the Active Workspace.
+_Avoid_: transaction, collection (as the entity name)
+
+**Receipt**:
+The numbered document for one Fee Payment. Printable in P0. Not GST-compliant in P0.
+_Avoid_: invoice, bill, voucher
+
+**Owner Dashboard**:
+The In-app Home for a Training Institute: active Student count, outstanding dues, today's Batches, recent Students.
+_Avoid_: analytics, reports, insights (as the screen name)
+
+**P0**:
+The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.
 
 **Google Sign-in**:
 A Sign-in / Sign-up method that authenticates a User with their Google account, without a password.
@@ -129,9 +176,18 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Workspace** has exactly one **Workspace Owner**
 - The **Workspace Owner** is the User who created that Workspace
 - A **Workspace** has one **Institution Type**
-- **Other Institution Type** exists only when **Institution Type** is Other
+- Workspace Creation can only set **Institution Type** to Training Institute; other values are coming soon
 - Tenant data is read and written only for the **Active Workspace** on the **Session**. The client does not send which Workspace.
 - **User** and **Workspace** identity live in Clerk. Our database stores resource data and references them by Clerk id; it does not copy User or Workspace rows.
+- A **Student** belongs to one **Workspace**. A Student is not a **User**.
+- A **Course** belongs to one **Workspace**.
+- A **Batch** belongs to one **Course**.
+- An **Enrollment** joins one **Student** to one **Course** and one **Batch**, and has one **Fee Plan**.
+- A **Student** may have many **Enrollments**.
+- A **Fee Payment** belongs to one **Fee Plan** and produces one **Receipt**.
+- **Class Mode** is set on the **Batch** and may be overridden on the **Enrollment**.
+- **Timing** defaults from the **Batch**; **Enrollment** may set Student-specific Timings.
+- The **Owner Dashboard** is the **In-app Home** for a Training Institute **Workspace**.
 
 ## Example dialogue
 
@@ -153,6 +209,15 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 > **Dev:** "Should we add an `owner` role in Clerk?"
 > **Domain expert:** "No. Workspace Owner is the creator. Clerk already makes them the org admin. Don't invent a second slug."
 
+> **Dev:** "Is a Student a User we create in Clerk?"
+> **Domain expert:** "No. A Student is a Workspace record. They do not sign in in P0. Users are staff who run the institute."
+
+> **Dev:** "Can Course and Batch be the same thing?"
+> **Domain expert:** "No. Course is what is taught. Batch is when, how, and with whom. DCA is a Course; DCA Weekday 9–11 Offline is a Batch."
+
+> **Dev:** "Should fees hang off the Student?"
+> **Domain expert:** "No. A Student can take more than one Course. The Fee Plan belongs to the Enrollment."
+
 ## Flagged ambiguities
 
 - "both the apps" was used to mean both products — resolved: **Whiteboard** (authenticated) and **Marketing Site** (public). They share visual identity; only Whiteboard owns authentication.
@@ -166,7 +231,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - “organization” in product language — resolved: **Workspace**. Clerk Organization is the backing, not the word Users see.
 - “selected workspace” / “log them into that workspace” — resolved: **Active Workspace**. The three-way routing is the **Workspace Gate**.
 - “owner role” — resolved: **Workspace Owner** is the creating User, not a custom Clerk role.
-- Workspace Creation fields — resolved: **name** and **Institution Type**. When Institution Type is Other, also **Other Institution Type**. Address and board are not collected in this slice. Institution Type and Other Institution Type are Clerk Organization public metadata, not a Postgres Workspace row.
+- Workspace Creation fields — resolved: **name** and **Institution Type**. **Training Institute** is the default and the only selectable value. School, Preschool, College, University, and Other are shown as coming soon. Address and board are not collected in this slice. Institution Type is Clerk Organization public metadata, not a Postgres Workspace row.
 - Creating a second Workspace — resolved: out of scope. **Workspace Creation** is onboarding only (zero Workspaces).
 - Creation / Selection chrome — resolved: **Onboarding Layout** (no header, no photos, sign-out available).
 - Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.
@@ -177,3 +242,10 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Auth Gate** vs APIs — resolved: the Auth Gate sends unauthenticated _browser_ routes to the **Sign-in Flow**. HTTP APIs that need a **Session** do not enter Sign-in; they fail closed. `/api/docs` is the documented unauthenticated exception.
 - “workspace id in the API body” — resolved: tenant is the **Active Workspace** on the **Session**, not a request field. No Session → 401. Session without Active Workspace → 403.
 - “User / Workspace tables in Postgres” — resolved: do not copy them. Resource rows hold Clerk ids. Clerk stays the store for people and tenants.
+- First product slice after auth — resolved: **P0** for **Training Institute** only. Replace the paper register: **Student**, **Course**, **Batch**, **Enrollment**, **Fee Plan**, **Fee Payment**, **Receipt**, **Owner Dashboard**. Spec: [docs/prd/training-institute-p0.md](docs/prd/training-institute-p0.md). Tickets: [docs/prd/tasks.md](docs/prd/tasks.md).
+- “Student login” — resolved: a **Student** is not a **User**. No Student or Guardian Session in P0.
+- Course vs class vs batch — resolved: **Course** is the catalog item; **Batch** is the scheduled run; **Enrollment** is the Student in that run.
+- Fees on the Student — resolved: **Fee Plan** is per **Enrollment**. Partial **Fee Payments** allowed. One **Receipt** per payment.
+- Online vs offline — resolved: **Class Mode** on the **Batch**, overridable on the **Enrollment**. Hybrid is a valid mode.
+- Student-specific hours (home tuition) — resolved: **Timing** on the **Enrollment** may inherit the Batch or be Student-specific.
+- Enquiry, attendance, certificates, WhatsApp, GST, live classroom, franchise royalty — resolved: not P0. P1/P2.
