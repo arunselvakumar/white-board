@@ -1,4 +1,5 @@
 import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
+import { createWorkspace } from "@/lib/create-workspace";
 import { postWorkspacePath } from "@/lib/safe-redirect";
 
 type CreateWorkspacePageProps = {
@@ -12,5 +13,10 @@ export default async function CreateWorkspacePage({
   const raw = params.redirect_url;
   const redirectUrl = postWorkspacePath(Array.isArray(raw) ? raw[0] : raw);
 
-  return <CreateWorkspaceForm redirectUrl={redirectUrl} />;
+  return (
+    <CreateWorkspaceForm
+      redirectUrl={redirectUrl}
+      createWorkspace={createWorkspace}
+    />
+  );
 }

@@ -7,6 +7,7 @@ import { TooltipProvider } from "@repo/ui/components/tooltip";
 import "@repo/ui/globals.css";
 import { QueryProvider } from "../components/query-provider";
 import { resetClerkMocks } from "./mocks/clerk";
+import { resetCreateWorkspaceMock } from "./mocks/create-workspace";
 
 const fontSans = Urbanist({
   subsets: ["latin"],
@@ -80,6 +81,7 @@ const preview: Preview = {
   ],
   beforeEach() {
     resetClerkMocks();
+    resetCreateWorkspaceMock();
   },
 };
 
