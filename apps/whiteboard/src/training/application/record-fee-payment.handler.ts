@@ -41,19 +41,21 @@ export class RecordFeePaymentHandler {
     );
     enrollment.feePlan.assertAcceptsPayment(amount, paid);
     const now = new Date();
-    const sequence = await this.payments.nextReceiptSequence(workspaceId);
-    const payment = FeePayment.create({
-      id: FeePaymentId.create(crypto.randomUUID()),
+    const payment = await this.payments.createWithNextReceipt(
       workspaceId,
-      enrollmentId: enrollment.id,
-      recordedByUserId: UserId.create(command.recordedByUserId),
-      amount,
-      method: FeePaymentMethod.create(command.method),
-      paidAt: command.paidAt == null ? now : new Date(command.paidAt),
-      receiptNumber: ReceiptNumber.fromSequence(sequence),
-      now,
-    });
-    await this.payments.save(payment);
+      (sequence) =>
+        FeePayment.create({
+          id: FeePaymentId.create(crypto.randomUUID()),
+          workspaceId,
+          enrollmentId: enrollment.id,
+          recordedByUserId: UserId.create(command.recordedByUserId),
+          amount,
+          method: FeePaymentMethod.create(command.method),
+          paidAt: command.paidAt == null ? now : new Date(command.paidAt),
+          receiptNumber: ReceiptNumber.fromSequence(sequence),
+          now,
+        }),
+    );
     await this.events.dispatch(payment.pullDomainEvents());
     return toFeePaymentReadModel(payment);
   }

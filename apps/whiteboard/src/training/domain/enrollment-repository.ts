@@ -12,6 +12,7 @@ export type EnrollmentListParams = ListParams<EnrollmentId> & {
 
 export type EnrollmentRepository = {
   save(enrollment: Enrollment): Promise<void>;
+  saveGuardingCapacity(enrollment: Enrollment, capacity: number): Promise<void>;
   findByIdInWorkspace(
     id: EnrollmentId,
     workspaceId: WorkspaceId,

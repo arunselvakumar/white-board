@@ -71,13 +71,6 @@ export class EnrollStudentHandler {
         "This Student is already in that Batch.",
       );
     }
-    const occupied = await this.enrollments.countActiveInBatch(
-      batch.id,
-      workspaceId,
-    );
-    if (occupied >= batch.capacity.value) {
-      throw new DomainError("BATCH_AT_CAPACITY", "Batch is at capacity.");
-    }
     const timingSource = TimingSource.create(command.timingSource);
     const now = new Date();
     const enrollment = Enrollment.create({
@@ -98,7 +91,10 @@ export class EnrollStudentHandler {
       feePlan: FeePlan.fromCourseDefault(course.defaultFeeAmount, now),
       now,
     });
-    await this.enrollments.save(enrollment);
+    await this.enrollments.saveGuardingCapacity(
+      enrollment,
+      batch.capacity.value,
+    );
     await this.events.dispatch(enrollment.pullDomainEvents());
     return toEnrollmentReadModel(enrollment, 0);
   }

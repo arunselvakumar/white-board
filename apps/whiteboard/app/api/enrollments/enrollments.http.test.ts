@@ -10,6 +10,7 @@ import { POST as createCourse } from "@/app/api/courses/route";
 import { POST as createStudent } from "@/app/api/students/route";
 
 import { POST as endEnrollment } from "./[id]/end/route";
+import { POST as adjustFeePlan } from "./[id]/fee-plan/route";
 import { POST as overrideMode } from "./[id]/mode/route";
 import { POST as recordPayment } from "./[id]/payments/route";
 import { GET as getEnrollment } from "./[id]/route";
@@ -202,6 +203,21 @@ describe("enrollment HTTP APIs", () => {
       { params: Promise.resolve({ id: body.id }) },
     );
     expect(overpay.status).toBe(StatusCodes.CONFLICT);
+
+    const undercut = await adjustFeePlan(
+      new Request(`http://localhost/api/enrollments/${body.id}/fee-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "one_time",
+          amountPaise: 50000,
+          concessionPaise: 0,
+          dueDates: [{ dueOn: "2026-09-13", amountPaise: 50000 }],
+        }),
+      }),
+      { params: Promise.resolve({ id: body.id }) },
+    );
+    expect(undercut.status).toBe(StatusCodes.CONFLICT);
 
     const ended = await endEnrollment(
       new Request(`http://localhost/api/enrollments/${body.id}/end`, {

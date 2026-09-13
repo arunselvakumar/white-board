@@ -52,16 +52,12 @@ export class MoveEnrollmentHandler {
           "This Student is already in that Batch.",
         );
       }
-      const occupied = await this.enrollments.countActiveInBatch(
-        batch.id,
-        workspaceId,
-      );
-      if (occupied >= batch.capacity.value) {
-        throw new DomainError("BATCH_AT_CAPACITY", "Batch is at capacity.");
-      }
     }
     enrollment.moveTo(batch, new Date());
-    await this.enrollments.save(enrollment);
+    await this.enrollments.saveGuardingCapacity(
+      enrollment,
+      batch.capacity.value,
+    );
     await this.events.dispatch(enrollment.pullDomainEvents());
     const paid = await this.payments.sumAmountPaiseForEnrollment(
       enrollment.id,

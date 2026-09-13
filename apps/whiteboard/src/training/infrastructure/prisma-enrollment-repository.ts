@@ -74,6 +74,86 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     }
   }
 
+  async saveGuardingCapacity(
+    enrollment: Enrollment,
+    capacity: number,
+  ): Promise<void> {
+    await this.db.$transaction(async (tx) => {
+      await tx.$queryRaw`
+        SELECT id FROM batches
+        WHERE id = ${enrollment.batchId.value}::uuid
+          AND workspace_id = ${enrollment.workspaceId.value}
+          AND deleted_at IS NULL
+        FOR UPDATE`;
+      const occupied = await tx.enrollment.count({
+        where: {
+          batchId: enrollment.batchId.value,
+          workspaceId: enrollment.workspaceId.value,
+          deletedAt: null,
+          endedAt: null,
+          id: { not: enrollment.id.value },
+        },
+      });
+      if (occupied >= capacity) {
+        throw new DomainError("BATCH_AT_CAPACITY", "Batch is at capacity.");
+      }
+      const duplicate = await tx.enrollment.findFirst({
+        where: {
+          studentId: enrollment.studentId.value,
+          batchId: enrollment.batchId.value,
+          workspaceId: enrollment.workspaceId.value,
+          deletedAt: null,
+          endedAt: null,
+          id: { not: enrollment.id.value },
+        },
+        select: { id: true },
+      });
+      if (duplicate != null) {
+        throw new DomainError(
+          "STUDENT_ALREADY_ENROLLED",
+          "This Student is already in that Batch.",
+        );
+      }
+      const plan = enrollment.feePlan.toJson();
+      const mutable = {
+        batchId: enrollment.batchId.value,
+        classModeOverride: enrollment.classModeOverride?.value ?? null,
+        timingSource: enrollment.timingSource.value,
+        studentTimings: enrollment.studentTimings
+          ? (enrollment.studentTimings.toJson() as Prisma.InputJsonValue)
+          : Prisma.DbNull,
+        endedAt: enrollment.endedAt,
+        endedByUserId: enrollment.endedByUserId?.value ?? null,
+        feePlanType: plan.type,
+        feePlanAmountPaise: plan.amountPaise,
+        feePlanConcessionPaise: plan.concessionPaise,
+        feePlanInstallmentCount: plan.installmentCount,
+        feePlanDueDates: plan.dueDates as Prisma.InputJsonValue,
+        updatedAt: enrollment.updatedAt,
+        deletedAt: enrollment.deletedAt,
+        deletedByUserId: enrollment.deletedByUserId?.value ?? null,
+      };
+      const updated = await tx.enrollment.updateMany({
+        where: { id: enrollment.id.value, deletedAt: null },
+        data: mutable,
+      });
+      if (updated.count > 0) {
+        return;
+      }
+      await tx.enrollment.create({
+        data: {
+          id: enrollment.id.value,
+          workspaceId: enrollment.workspaceId.value,
+          studentId: enrollment.studentId.value,
+          courseId: enrollment.courseId.value,
+          createdByUserId: enrollment.createdByUserId.value,
+          createdAt: enrollment.createdAt,
+          ...mutable,
+        },
+      });
+    });
+  }
+
   async findActiveByStudentAndBatch(
     studentId: StudentId,
     batchId: BatchId,

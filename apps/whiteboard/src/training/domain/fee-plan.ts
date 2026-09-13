@@ -101,6 +101,15 @@ export class FeePlan {
     return Paise.create(this.amount.value - this.concession.value);
   }
 
+  assertCoversPayments(paidPaise: number): void {
+    if (this.netAmount.value < Paise.create(paidPaise).value) {
+      throw new DomainError(
+        "FEE_PLAN_BELOW_PAYMENTS",
+        "Fee Plan cannot be less than Fee Payments already recorded.",
+      );
+    }
+  }
+
   remainingDues(paidPaise: number): Paise {
     const paid = Paise.create(paidPaise);
     const remaining = this.netAmount.value - paid.value;

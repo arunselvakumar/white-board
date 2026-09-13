@@ -17,6 +17,7 @@ import {
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";
+import { addCalendarMonths } from "@/lib/calendar-date";
 import { paiseToRupeesInput, parseRupeesInput } from "@/lib/money";
 import type { EnrollmentResponse } from "@/src/queries/enrollments";
 
@@ -229,16 +230,9 @@ function dueDatesFor(
   const base = Math.floor(netPaise / n);
   const remainder = netPaise - base * n;
   return Array.from({ length: n }, (_, index) => ({
-    dueOn: addMonths(start, index),
+    dueOn: addCalendarMonths(start, index),
     amountPaise: base + (index === 0 ? remainder : 0),
   }));
 }
 
-function addMonths(isoDate: string, months: number): string {
-  const [yearText, monthText, dayText] = isoDate.split("-");
-  const year = Number(yearText);
-  const month = Number(monthText);
-  const day = Number(dayText);
-  const date = new Date(Date.UTC(year, month - 1 + months, day));
-  return date.toISOString().slice(0, 10);
-}
+

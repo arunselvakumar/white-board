@@ -28,22 +28,21 @@ export class AdjustFeePlanHandler {
     if (enrollment == null) {
       throw new EnrollmentNotFoundError();
     }
-    enrollment.adjustFeePlan(
-      FeePlan.create({
-        type: command.type,
-        amount: Paise.create(command.amountPaise),
-        concession: Paise.create(command.concessionPaise),
-        installmentCount: command.installmentCount ?? null,
-        dueDates: command.dueDates,
-      }),
-      new Date(),
-    );
-    await this.enrollments.save(enrollment);
-    await this.events.dispatch(enrollment.pullDomainEvents());
     const paid = await this.payments.sumAmountPaiseForEnrollment(
       enrollment.id,
       workspaceId,
     );
+    const plan = FeePlan.create({
+      type: command.type,
+      amount: Paise.create(command.amountPaise),
+      concession: Paise.create(command.concessionPaise),
+      installmentCount: command.installmentCount ?? null,
+      dueDates: command.dueDates,
+    });
+    plan.assertCoversPayments(paid);
+    enrollment.adjustFeePlan(plan, new Date());
+    await this.enrollments.save(enrollment);
+    await this.events.dispatch(enrollment.pullDomainEvents());
     return toEnrollmentReadModel(enrollment, paid);
   }
 }

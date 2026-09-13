@@ -26,6 +26,20 @@ describe("FeePlan", () => {
     expect(plan.remainingDues(100000).value).toBe(300000);
   });
 
+  it("rejects a plan below recorded Fee Payments", () => {
+    const plan = FeePlan.create({
+      type: "one_time",
+      amount: Paise.create(200000),
+      concession: Paise.create(0),
+      installmentCount: null,
+      dueDates: [{ dueOn: "2026-09-12", amountPaise: 200000 }],
+    });
+    expect(() => {
+      plan.assertCoversPayments(300000);
+    }).toThrow(DomainError);
+    plan.assertCoversPayments(200000);
+  });
+
   it("rejects an overpay", () => {
     const plan = FeePlan.fromCourseDefault(Paise.create(500000), NOW);
     expect(() => {

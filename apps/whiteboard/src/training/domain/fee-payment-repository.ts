@@ -10,6 +10,10 @@ export type FeePaymentListParams = ListParams<FeePaymentId> & {
 
 export type FeePaymentRepository = {
   save(payment: FeePayment): Promise<void>;
+  createWithNextReceipt(
+    workspaceId: WorkspaceId,
+    build: (sequence: number) => FeePayment,
+  ): Promise<FeePayment>;
   findByIdInWorkspace(
     id: FeePaymentId,
     workspaceId: WorkspaceId,

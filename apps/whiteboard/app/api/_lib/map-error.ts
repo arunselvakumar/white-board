@@ -21,6 +21,7 @@ const CONFLICT_CODES = new Set([
   "ENROLLMENT_ALREADY_ENDED",
   "STUDENT_DROPPED",
   "FEE_OVERPAY",
+  "FEE_PLAN_BELOW_PAYMENTS",
 ]);
 
 function errorCode(error: unknown): string | undefined {

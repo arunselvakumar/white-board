@@ -58,6 +58,36 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
     }
   }
 
+  async createWithNextReceipt(
+    workspaceId: WorkspaceId,
+    build: (sequence: number) => FeePayment,
+  ): Promise<FeePayment> {
+    return this.db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${workspaceId.value}))`;
+      const count = await tx.feePayment.count({
+        where: { workspaceId: workspaceId.value },
+      });
+      const payment = build(count + 1);
+      await tx.feePayment.create({
+        data: {
+          id: payment.id.value,
+          workspaceId: payment.workspaceId.value,
+          enrollmentId: payment.enrollmentId.value,
+          recordedByUserId: payment.recordedByUserId.value,
+          createdAt: payment.createdAt,
+          amountPaise: payment.amount.value,
+          method: payment.method.value,
+          paidAt: payment.paidAt,
+          receiptNumber: payment.receiptNumber.value,
+          updatedAt: payment.updatedAt,
+          deletedAt: payment.deletedAt,
+          deletedByUserId: payment.deletedByUserId?.value ?? null,
+        },
+      });
+      return payment;
+    });
+  }
+
   async findByIdInWorkspace(
     id: FeePaymentId,
     workspaceId: WorkspaceId,
