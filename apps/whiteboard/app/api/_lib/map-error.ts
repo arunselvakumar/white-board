@@ -1,11 +1,38 @@
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 
-import { InvalidCursorError } from "@/src/todo/application/invalid-cursor-error";
-import { TodoNotFoundError } from "@/src/todo/application/not-found-error";
-import { DomainError } from "@/src/todo/domain/errors";
-
 import { jsonError } from "./json-error";
+
+const NOT_FOUND_CODES = new Set([
+  "COURSE_NOT_FOUND",
+  "STUDENT_NOT_FOUND",
+  "BATCH_NOT_FOUND",
+  "ENROLLMENT_NOT_FOUND",
+  "FEE_PAYMENT_NOT_FOUND",
+]);
+const CONFLICT_CODES = new Set([
+  "COURSE_ALREADY_ARCHIVED",
+  "STUDENT_ALREADY_DROPPED",
+  "BATCH_ALREADY_CLOSED",
+  "BATCH_CLOSED",
+  "COURSE_ARCHIVED",
+  "BATCH_AT_CAPACITY",
+  "STUDENT_ALREADY_ENROLLED",
+  "ENROLLMENT_ALREADY_ENDED",
+  "STUDENT_DROPPED",
+  "FEE_OVERPAY",
+]);
+
+function errorCode(error: unknown): string | undefined {
+  if (
+    error instanceof Error &&
+    "code" in error &&
+    typeof (error as { code: unknown }).code === "string"
+  ) {
+    return (error as { code: string }).code;
+  }
+  return undefined;
+}
 
 export function mapError(error: unknown): Response {
   if (error instanceof SyntaxError) {
@@ -23,17 +50,18 @@ export function mapError(error: unknown): Response {
       z.treeifyError(error),
     );
   }
-  if (error instanceof InvalidCursorError) {
-    return jsonError(StatusCodes.BAD_REQUEST, error.code, error.message);
+  const code = errorCode(error);
+  if (code === "INVALID_CURSOR" && error instanceof Error) {
+    return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
   }
-  if (error instanceof TodoNotFoundError) {
-    return jsonError(StatusCodes.NOT_FOUND, error.code, error.message);
+  if (code != null && NOT_FOUND_CODES.has(code) && error instanceof Error) {
+    return jsonError(StatusCodes.NOT_FOUND, code, error.message);
   }
-  if (error instanceof DomainError) {
-    if (error.code === "TODO_ALREADY_COMPLETED") {
-      return jsonError(StatusCodes.CONFLICT, error.code, error.message);
+  if (error instanceof Error && error.name === "DomainError" && code != null) {
+    if (CONFLICT_CODES.has(code)) {
+      return jsonError(StatusCodes.CONFLICT, code, error.message);
     }
-    return jsonError(StatusCodes.BAD_REQUEST, error.code, error.message);
+    return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
   }
   console.error(error);
   return jsonError(

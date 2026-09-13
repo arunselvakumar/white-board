@@ -187,6 +187,16 @@ export function useOrganizationList(_options?: unknown) {
   };
 }
 
+export function useOrganization() {
+  const membership = clerkMocks.memberships.find(
+    (item) => item.organization.id === clerkMocks.orgId,
+  );
+  return {
+    isLoaded: clerkMocks.organizationListLoaded,
+    organization: membership?.organization ?? null,
+  };
+}
+
 export function SignOutButton({ children }: { children: ReactNode }) {
   return children;
 }

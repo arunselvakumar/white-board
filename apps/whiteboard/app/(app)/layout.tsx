@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
 
-import { AuthHeader } from "@/components/auth-header";
+import { AppShell } from "@/components/app-shell/app-shell";
+import { QuerySuspense } from "@/components/query-suspense";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 
 export default async function AppLayout({
@@ -13,10 +14,9 @@ export default async function AppLayout({
 
   return (
     <WorkspaceGate>
-      <div className="flex min-h-svh flex-col">
-        <AuthHeader />
-        {children}
-      </div>
+      <AppShell>
+        <QuerySuspense>{children}</QuerySuspense>
+      </AppShell>
     </WorkspaceGate>
   );
 }

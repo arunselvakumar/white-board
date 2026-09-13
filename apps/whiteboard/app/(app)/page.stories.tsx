@@ -1,44 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
-import { Button } from "@repo/ui/components/button";
 
-import { AuthHeader } from "@/components/auth-header";
-import { QueryStatus } from "@/components/query-status";
+import { AppShell } from "@/components/app-shell/app-shell";
+import { BatchCatalog } from "@/components/batches/batch-catalog";
+import { CourseCatalog } from "@/components/courses/course-catalog";
+import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
+import { FeesCatalog } from "@/components/fees/fees-catalog";
+import { StudentCatalog } from "@/components/students/student-catalog";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 import { clerkMocks } from "../../.storybook/mocks/clerk";
 
 const meta = {
-  title: "Pages/In-app Home",
+  title: "Pages/In-app",
   parameters: {
     layout: "fullscreen",
   },
-  render: () => (
-    <WorkspaceGate>
-      <div className="flex min-h-svh flex-col">
-        <AuthHeader />
-        <main className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-          <div className="flex max-w-md flex-col gap-3 text-center">
-            <p className="text-muted-foreground text-sm font-light tracking-wide uppercase">
-              Riverside School
-            </p>
-            <h1 className="text-3xl tracking-tight">Whiteboard</h1>
-            <p className="text-muted-foreground text-sm leading-relaxed font-light">
-              You&apos;re in this workspace. Shared UI comes from{" "}
-              <code className="font-mono text-xs">@repo/ui</code>.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button>Open board</Button>
-            <QueryStatus />
-          </div>
-        </main>
-      </div>
-    </WorkspaceGate>
-  ),
   beforeEach() {
     clerkMocks.orgId = "org_riverside";
     clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside School" } },
+      {
+        organization: { id: "org_riverside", name: "Riverside Centre" },
+      },
     ];
   },
 } satisfies Meta;
@@ -46,17 +28,144 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const Dashboard: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/" } },
+  },
+  render: () => (
+    <WorkspaceGate>
+      <AppShell>
+        <OwnerDashboard
+          dashboard={{
+            activeStudentCount: 0,
+            outstandingDuesPaise: 0,
+            todayBatches: [],
+            recentStudents: [],
+          }}
+          hasCourses={false}
+          onAddCourse={() => undefined}
+          onOpenBatch={() => undefined}
+          onOpenStudent={() => undefined}
+          onOpenStudents={() => undefined}
+          onOpenFees={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  ),
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole("heading", { name: "Whiteboard" }),
-    ).toBeVisible();
-    await expect(canvas.getByText("Riverside School")).toBeVisible();
-    await expect(
-      canvas.getByRole("button", { name: "Open board" }),
+      canvas.getByRole("heading", { name: "Owner Dashboard" }),
     ).toBeVisible();
     await expect(
-      canvas.getByRole("button", { name: "Open user menu" }),
+      canvas.getByText("Add the first Course this centre teaches."),
+    ).toBeVisible();
+  },
+};
+
+export const Students: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/students" } },
+  },
+  render: () => (
+    <WorkspaceGate>
+      <AppShell>
+        <StudentCatalog
+          students={[]}
+          search=""
+          onSearchChange={() => undefined}
+          onAdd={() => undefined}
+          onEdit={() => undefined}
+          onDrop={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Students" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Add the first Student this centre admits."),
+    ).toBeVisible();
+  },
+};
+
+export const Courses: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/courses" } },
+  },
+  render: () => (
+    <WorkspaceGate>
+      <AppShell>
+        <CourseCatalog
+          courses={[]}
+          onAdd={() => undefined}
+          onEdit={() => undefined}
+          onArchive={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Courses" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Add the first Course this centre teaches."),
+    ).toBeVisible();
+  },
+};
+
+export const Batches: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/batches" } },
+  },
+  render: () => (
+    <WorkspaceGate>
+      <AppShell>
+        <BatchCatalog
+          batches={[]}
+          courses={[]}
+          courseId="all"
+          onCourseIdChange={() => undefined}
+          onAdd={() => undefined}
+          onEdit={() => undefined}
+          onClose={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Batches" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Add a Course before opening a Batch."),
+    ).toBeVisible();
+  },
+};
+
+export const Fees: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/fees" } },
+  },
+  render: () => (
+    <WorkspaceGate>
+      <AppShell>
+        <FeesCatalog
+          dues={[]}
+          onCollect={() => undefined}
+          onOpenStudents={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("heading", { name: "Fees" })).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "Remaining dues will show here after an Enrollment has a Fee Plan.",
+      ),
     ).toBeVisible();
   },
 };

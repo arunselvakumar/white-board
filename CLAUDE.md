@@ -28,21 +28,23 @@ Do not start P1 (attendance, enquiry CRM, certificates, WhatsApp, live classroom
 
 ## Read before coding
 
-| File | Why |
-| --- | --- |
-| `CONTEXT.md` | Words you put on screens and in code comments |
-| `docs/prd/training-institute-p0.md` | What P0 is |
-| `docs/prd/tasks.md` | Which ticket to implement |
-| `docs/adr/` | HTTP, CQRS, tenancy, Prisma, tests |
-| `.grok/skills/frontend-patterns/SKILL.md` | How to build forms and selects |
-| `AGENTS.md` | Architecture don’ts and commands |
+| File                                      | Why                                               |
+| ----------------------------------------- | ------------------------------------------------- |
+| `CONTEXT.md`                              | Words you put on screens and in code comments     |
+| `docs/prd/training-institute-p0.md`       | What P0 is                                        |
+| `docs/prd/tasks.md`                       | Which ticket to implement                         |
+| `docs/adr/`                               | HTTP, CQRS, tenancy, Prisma, tests                |
+| `.grok/skills/frontend-patterns/SKILL.md` | How to build forms, selects, and the in-app shell |
+| `.grok/skills/tanstack-query/SKILL.md`    | Client reads: `queryOptions` + `useSuspenseQuery` |
+| `.grok/skills/modular-monolith/SKILL.md`  | Domain/application/infrastructure layering        |
+| `AGENTS.md`                               | Architecture don’ts and commands                  |
 
 ## Implementation shape
 
 - New domain goes in `apps/whiteboard/src/training/{domain,application,infrastructure}`.
 - HTTP in `apps/whiteboard/app/api/...` with Zod Request/Response models beside the route.
 - Prisma in `packages/db` only.
-- `src/todo` is a sample. Delete it once Student HTTP exists (ticket P0-021).
+- The first real bounded context is `training`. Do not add a sample Todo context.
 - Students are not Clerk Users. Fees belong to the Enrollment, not the Student.
 
 ## Commands

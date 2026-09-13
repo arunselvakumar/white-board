@@ -31,6 +31,9 @@ const config: StorybookConfig = {
           "@clerk/nextjs": path.resolve(configDir, "mocks/clerk.tsx"),
         },
       },
+      optimizeDeps: {
+        include: ["@base-ui/react/checkbox"],
+      },
     });
   },
 };

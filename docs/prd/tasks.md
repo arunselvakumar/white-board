@@ -18,68 +18,68 @@ Update **Status** in the board when you pick up or finish work. Leave **Issue** 
 
 ## Legend
 
-| Status | Meaning |
-| --- | --- |
-| `todo` | Not started |
-| `in_progress` | Someone is implementing it |
-| `blocked` | Cannot proceed; note why in the ticket |
-| `done` | Merged and verified (tests + Storybook/UI where the ticket has UI) |
+| Status        | Meaning                                                            |
+| ------------- | ------------------------------------------------------------------ |
+| `todo`        | Not started                                                        |
+| `in_progress` | Someone is implementing it                                         |
+| `blocked`     | Cannot proceed; note why in the ticket                             |
+| `done`        | Merged and verified (tests + Storybook/UI where the ticket has UI) |
 
-| Area | Meaning |
-| --- | --- |
-| Docs | Language and spec only |
-| Shell | Authenticated chrome |
-| Data | Prisma |
-| Domain | `src/training` aggregates |
-| HTTP | Route Handlers + OpenAPI |
-| UI | Whiteboard screens + Storybook |
+| Area   | Meaning                        |
+| ------ | ------------------------------ |
+| Docs   | Language and spec only         |
+| Shell  | Authenticated chrome           |
+| Data   | Prisma                         |
+| Domain | `src/training` aggregates      |
+| HTTP   | Route Handlers + OpenAPI       |
+| UI     | Whiteboard screens + Storybook |
 
 ## Board
 
-| ID | Seq | Title | Status | Blocked by | Area | Issue |
-| --- | ---: | --- | --- | --- | --- | --- |
-| P0-001 | 1 | Record P0 language in CONTEXT.md | done | — | Docs | |
-| P0-002 | 2 | In-app shell: nav to Dashboard, Students, Courses, Batches, Fees | todo | P0-001 | Shell | |
-| P0-003 | 3 | Prisma schema for Course, Batch, Student, Enrollment, Fee Payment | todo | P0-001 | Data | |
-| P0-004 | 4 | Scaffold `training` context (ports, ids, errors, no HTTP yet) | todo | P0-003 | Domain | |
-| P0-005 | 5 | Course aggregate and commands | todo | P0-004 | Domain | |
-| P0-006 | 6 | Course HTTP APIs + OpenAPI | todo | P0-005 | HTTP | |
-| P0-007 | 7 | Course screens (list, create, edit, archive) | todo | P0-002, P0-006 | UI | |
-| P0-008 | 8 | Student aggregate and commands | todo | P0-004 | Domain | |
-| P0-009 | 9 | Student HTTP APIs + OpenAPI | todo | P0-008 | HTTP | |
-| P0-010 | 10 | Student screens (list, search, create, profile, drop) | todo | P0-002, P0-009 | UI | |
-| P0-011 | 11 | Batch aggregate and commands | todo | P0-005 | Domain | |
-| P0-012 | 12 | Batch HTTP APIs + OpenAPI | todo | P0-006, P0-011 | HTTP | |
-| P0-013 | 13 | Batch screens (list, create, schedule, close) | todo | P0-007, P0-012 | UI | |
-| P0-014 | 14 | Enrollment aggregate (mode, timings, capacity, move, end) | todo | P0-008, P0-011 | Domain | |
-| P0-015 | 15 | Enrollment HTTP APIs + OpenAPI | todo | P0-009, P0-012, P0-014 | HTTP | |
-| P0-016 | 16 | Enrollment screens (enroll, override mode, student timings, move, end) | todo | P0-010, P0-013, P0-015 | UI | |
-| P0-017 | 17 | Fee Plan on Enrollment + Fee Payment + Receipt | todo | P0-014 | Domain | |
-| P0-018 | 18 | Fee HTTP APIs + OpenAPI | todo | P0-015, P0-017 | HTTP | |
-| P0-019 | 19 | Fee screens (plan, collect payment, remaining dues, print Receipt) | todo | P0-016, P0-018 | UI | |
-| P0-020 | 20 | Owner Dashboard (counts, dues, today's Batches, recent Students) | todo | P0-016, P0-018 | HTTP+UI | |
-| P0-021 | 21 | Delete the Todo sample context and `/api/todos` | todo | P0-009 | Domain | |
-| P0-022 | 22 | P0 polish: empty states, nav from dashboard cards, Storybook coverage | todo | P0-019, P0-020 | UI | |
+| ID     | Seq | Title                                                                  | Status      | Blocked by             | Area    | Issue |
+| ------ | --: | ---------------------------------------------------------------------- | ----------- | ---------------------- | ------- | ----- |
+| P0-001 |   1 | Record P0 language in CONTEXT.md                                       | done        | —                      | Docs    |       |
+| P0-002 |   2 | In-app shell: nav to Dashboard, Students, Courses, Batches, Fees       | done        | P0-001                 | Shell   |       |
+| P0-003 |   3 | Prisma schema for Course, Batch, Student, Enrollment, Fee Payment      | done        | P0-001                 | Data    |       |
+| P0-004 |   4 | Scaffold `training` context (ports, ids, errors, no HTTP yet)          | done        | P0-003                 | Domain  |       |
+| P0-005 |   5 | Course aggregate and commands                                          | done        | P0-004                 | Domain  |       |
+| P0-006 |   6 | Course HTTP APIs + OpenAPI                                             | done        | P0-005                 | HTTP    |       |
+| P0-007 |   7 | Course screens (list, create, edit, archive)                           | done        | P0-002, P0-006         | UI      |       |
+| P0-008 |   8 | Student aggregate and commands                                         | done        | P0-004                 | Domain  |       |
+| P0-009 |   9 | Student HTTP APIs + OpenAPI                                            | done        | P0-008                 | HTTP    |       |
+| P0-010 |  10 | Student screens (list, search, create, profile, drop)                  | done        | P0-002, P0-009         | UI      |       |
+| P0-011 |  11 | Batch aggregate and commands                                           | done        | P0-005                 | Domain  |       |
+| P0-012 |  12 | Batch HTTP APIs + OpenAPI                                              | done        | P0-006, P0-011         | HTTP    |       |
+| P0-013 |  13 | Batch screens (list, create, schedule, close)                          | done        | P0-007, P0-012         | UI      |       |
+| P0-014 |  14 | Enrollment aggregate (mode, timings, capacity, move, end)              | done        | P0-008, P0-011         | Domain  |       |
+| P0-015 |  15 | Enrollment HTTP APIs + OpenAPI                                         | done        | P0-009, P0-012, P0-014 | HTTP    |       |
+| P0-016 |  16 | Enrollment screens (enroll, override mode, student timings, move, end) | done        | P0-010, P0-013, P0-015 | UI      |       |
+| P0-017 |  17 | Fee Plan on Enrollment + Fee Payment + Receipt                         | done        | P0-014                 | Domain  |       |
+| P0-018 |  18 | Fee HTTP APIs + OpenAPI                                                | done        | P0-015, P0-017         | HTTP    |       |
+| P0-019 |  19 | Fee screens (plan, collect payment, remaining dues, print Receipt)     | done        | P0-016, P0-018         | UI      |       |
+| P0-020 |  20 | Owner Dashboard (counts, dues, today's Batches, recent Students)       | done        | P0-016, P0-018         | HTTP+UI |       |
+| P0-021 |  21 | Delete the Todo sample context and `/api/todos`                        | done        | P0-009                 | Domain  |       |
+| P0-022 |  22 | P0 polish: empty states, nav from dashboard cards, Storybook coverage  | done        | P0-019, P0-020         | UI      |       |
 
 ## Tickets
 
 ### P0-001 — Record P0 language in CONTEXT.md
 
-| Field | Value |
-| --- | --- |
-| Status | done |
-| Blocked by | — |
-| Area | Docs |
+| Field      | Value |
+| ---------- | ----- |
+| Status     | done  |
+| Blocked by | —     |
+| Area       | Docs  |
 
 **Done when:** CONTEXT.md defines Student, Guardian, Course, Batch, Class Mode, Timing, Enrollment, Fee Plan, Fee Payment, Receipt, Owner Dashboard, P0; relationships and example dialogue match the PRD. Agents must use these words.
 
 ### P0-002 — In-app shell
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-001 |
-| Area | Shell |
+| Area       | Shell  |
 
 Replace the placeholder In-app Home chrome with authenticated navigation: **Dashboard**, **Students**, **Courses**, **Batches**, **Fees**. Dashboard can still be a static empty state. Routes exist and respect Auth Gate + Workspace Gate. `@repo/ui` only. Storybook for the shell.
 
@@ -87,11 +87,11 @@ Replace the placeholder In-app Home chrome with authenticated navigation: **Dash
 
 ### P0-003 — Prisma schema
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-001 |
-| Area | Data |
+| Area       | Data   |
 
 Add tables in `packages/db` for Course, Batch, Student, Enrollment, Fee Payment (and Fee Plan fields on Enrollment unless a separate table is justified). Include `workspaceId`, audit Clerk ids, `deletedAt` / `deletedByUserId`, money as integer paise, INR implied. Indexes for Workspace-scoped lists. Migration. No repositories yet.
 
@@ -99,11 +99,11 @@ Add tables in `packages/db` for Course, Batch, Student, Enrollment, Fee Payment 
 
 ### P0-004 — Scaffold `training` context
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
-| Blocked by | P0-003 |
-| Area | Domain |
+| Field      | Value       |
+| ---------- | ----------- |
+| Status     | done        |
+| Blocked by | P0-003      |
+| Area       | Domain      |
 
 Create `apps/whiteboard/src/training/{domain,application,infrastructure}` with shared `WorkspaceId`, `UserId`, `DomainError`, event dispatcher port, repository ports as interfaces only. Copy the Todo layering, not Todo's product language. Do not expose HTTP.
 
@@ -111,11 +111,11 @@ Create `apps/whiteboard/src/training/{domain,application,infrastructure}` with s
 
 ### P0-005 — Course aggregate and commands
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value       |
+| ---------- | ----------- |
+| Status     | done   |
 | Blocked by | P0-004 |
-| Area | Domain |
+| Area       | Domain |
 
 Course: create, update, archive. Invariants: name required; default fee ≥ 0 paise; archived Course cannot accept new Batches (enforced when Batch exists in P0-011; document the rule now). Domain unit tests. Prisma repository.
 
@@ -123,11 +123,11 @@ Course: create, update, archive. Invariants: name required; default fee ≥ 0 pa
 
 ### P0-006 — Course HTTP APIs + OpenAPI
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-005 |
-| Area | HTTP |
+| Area       | HTTP   |
 
 Named commands as in the PRD. Zod Request/Response models next to routes. 401/403/400/404. List is cursor + total. Appears at `/api/docs`. HTTP tests on Postgres.
 
@@ -135,11 +135,11 @@ Named commands as in the PRD. Zod Request/Response models next to routes. 401/40
 
 ### P0-007 — Course screens
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-002, P0-006 |
-| Area | UI |
+| Area       | UI             |
 
 List, create, edit, archive. Empty state: “Add the first Course this centre teaches.” react-hook-form + zod + `@repo/ui`. Storybook play: validation, create, archive.
 
@@ -147,11 +147,11 @@ List, create, edit, archive. Empty state: “Add the first Course this centre te
 
 ### P0-008 — Student aggregate and commands
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-004 |
-| Area | Domain |
+| Area       | Domain |
 
 Student: create (admit), update profile, drop. Fields per CONTEXT.md. Not a Clerk User. Domain tests for drop vs delete. Prisma repository.
 
@@ -159,11 +159,11 @@ Student: create (admit), update profile, drop. Fields per CONTEXT.md. Not a Cler
 
 ### P0-009 — Student HTTP APIs + OpenAPI
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-008 |
-| Area | HTTP |
+| Area       | HTTP   |
 
 Create, list (`q` on name/phone + cursors), get, update profile, drop. Isolation and envelope tests.
 
@@ -171,11 +171,11 @@ Create, list (`q` on name/phone + cursors), get, update profile, drop. Isolation
 
 ### P0-010 — Student screens
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-002, P0-009 |
-| Area | UI |
+| Area       | UI             |
 
 List with search, create, profile edit, drop. Empty state. Storybook play for validation and search.
 
@@ -183,11 +183,11 @@ List with search, create, profile edit, drop. Empty state. Storybook play for va
 
 ### P0-011 — Batch aggregate and commands
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-005 |
-| Area | Domain |
+| Area       | Domain |
 
 Batch belongs to a Course. Class Mode, capacity, room, join URL, default Timings, open/closed. Cannot create on an archived Course. Domain tests for capacity occupancy (once Enrollment exists, tests can use a fake count or wait for P0-014 — prefer writing capacity as a Batch invariant checked at enroll time in P0-014; here test close and schedule).
 
@@ -195,11 +195,11 @@ Batch belongs to a Course. Class Mode, capacity, room, join URL, default Timings
 
 ### P0-012 — Batch HTTP APIs + OpenAPI
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-006, P0-011 |
-| Area | HTTP |
+| Area       | HTTP           |
 
 Create, list (filter by course), get (enrolled count may be 0 until P0-015), update schedule, close. HTTP tests.
 
@@ -207,11 +207,11 @@ Create, list (filter by course), get (enrolled count may be 0 until P0-015), upd
 
 ### P0-013 — Batch screens
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-007, P0-012 |
-| Area | UI |
+| Area       | UI             |
 
 List (grouped or filterable by Course), create (pick Course, Class Mode, Timings, capacity), edit schedule, close. Storybook.
 
@@ -219,11 +219,11 @@ List (grouped or filterable by Course), create (pick Course, Class Mode, Timings
 
 ### P0-014 — Enrollment aggregate
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-008, P0-011 |
-| Area | Domain |
+| Area       | Domain         |
 
 Enroll, override Class Mode, set Timing source (`batch` | `student`) and Student-specific Timings, move to another Batch of the same Course, end. Capacity 409 at enroll. Closed Batch and archived Course refuse new Enrollments. One Student may have many Active Enrollments. Domain tests for all of the above.
 
@@ -231,11 +231,11 @@ Enroll, override Class Mode, set Timing source (`batch` | `student`) and Student
 
 ### P0-015 — Enrollment HTTP APIs + OpenAPI
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value                  |
+| ---------- | ---------------------- |
+| Status     | done                   |
 | Blocked by | P0-009, P0-012, P0-014 |
-| Area | HTTP |
+| Area       | HTTP                   |
 
 Routes per PRD. Get Student includes Enrollment summaries. Get Batch includes enrolled count of Active Enrollments. HTTP tests including 409 capacity.
 
@@ -243,11 +243,11 @@ Routes per PRD. Get Student includes Enrollment summaries. Get Batch includes en
 
 ### P0-016 — Enrollment screens
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value                  |
+| ---------- | ---------------------- |
+| Status     | done                   |
 | Blocked by | P0-010, P0-013, P0-015 |
-| Area | UI |
+| Area       | UI                     |
 
 Enroll from Student or from Batch. Toggle inherit Batch Timings vs Student-specific. Override Class Mode. Move. End. Show enrollments on the Student profile. Storybook for both timing paths and capacity error.
 
@@ -255,11 +255,11 @@ Enroll from Student or from Batch. Toggle inherit Batch Timings vs Student-speci
 
 ### P0-017 — Fee Plan, Fee Payment, Receipt
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-014 |
-| Area | Domain |
+| Area       | Domain |
 
 On enroll, copy Course default fee into a Fee Plan (one-time | monthly | N installments). Adjust plan. Record payment (partial allowed; overpay is a domain conflict). Mint Receipt number per Workspace. Remaining dues = plan − sum of payments. Domain tests.
 
@@ -267,11 +267,11 @@ On enroll, copy Course default fee into a Fee Plan (one-time | monthly | N insta
 
 ### P0-018 — Fee HTTP APIs + OpenAPI
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-015, P0-017 |
-| Area | HTTP |
+| Area       | HTTP           |
 
 Adjust plan, record payment, list payments, get receipt. HTTP tests for partial payment and overpay 409.
 
@@ -279,11 +279,11 @@ Adjust plan, record payment, list payments, get receipt. HTTP tests for partial 
 
 ### P0-019 — Fee screens
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-016, P0-018 |
-| Area | UI |
+| Area       | UI             |
 
 Fees nav: dues list. On Enrollment: plan summary, collect payment (method + amount), remaining dues, Receipt print/download. Storybook for partial payment and validation.
 
@@ -291,11 +291,11 @@ Fees nav: dues list. On Enrollment: plan summary, collect payment (method + amou
 
 ### P0-020 — Owner Dashboard
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-016, P0-018 |
-| Area | HTTP+UI |
+| Area       | HTTP+UI        |
 
 `GET /api/dashboard`: active Student count, outstanding dues total, today’s Batches (Workspace timezone, weekday match) with enrolled counts, recent Students. In-app Home renders this. Click a Batch to its roster. Empty state if no Courses yet.
 
@@ -303,11 +303,11 @@ Fees nav: dues list. On Enrollment: plan summary, collect payment (method + amou
 
 ### P0-021 — Delete Todo sample
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value  |
+| ---------- | ------ |
+| Status     | done   |
 | Blocked by | P0-009 |
-| Area | Domain |
+| Area       | Domain |
 
 Remove `src/todo`, `/api/todos`, Todo Prisma model (migration), Storybook/tests that exist only for Todo. OpenAPI no longer lists todos. Do this as soon as Student HTTP is the first real resource — do not wait for P0-022.
 
@@ -315,11 +315,11 @@ Remove `src/todo`, `/api/todos`, Todo Prisma model (migration), Storybook/tests 
 
 ### P0-022 — P0 polish
 
-| Field | Value |
-| --- | --- |
-| Status | todo |
+| Field      | Value          |
+| ---------- | -------------- |
+| Status     | done           |
 | Blocked by | P0-019, P0-020 |
-| Area | UI |
+| Area       | UI             |
 
 Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dashboard cards deep-link. Storybook coverage for every P0 form. Copy uses CONTEXT.md words only. No leftover “Open board” / Todo chrome.
 
