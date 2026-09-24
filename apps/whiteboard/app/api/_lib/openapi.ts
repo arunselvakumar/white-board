@@ -177,7 +177,7 @@ export function buildOpenApiDocument(
       title: "Whiteboard API",
       version: "0.0.0",
       description:
-        "Sample HTTP APIs for reviewing backend architecture. Todo is not a product concept.",
+        "Whiteboard HTTP APIs. Training Institute P0 resources plus the sample Todo context.",
     },
     components: {
       securitySchemes: {

@@ -22,7 +22,10 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Whiteboard",
+  title: {
+    default: "Whiteboard",
+    template: "%s · Whiteboard",
+  },
   description: "The Whiteboard application",
 };
 

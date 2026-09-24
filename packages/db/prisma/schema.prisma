@@ -7,17 +7,192 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo {
+enum ClassMode {
+  offline
+  online
+  hybrid
+
+  @@map("class_mode")
+}
+
+enum TimingSource {
+  batch
+  student
+
+  @@map("timing_source")
+}
+
+enum FeePlanType {
+  one_time
+  monthly
+  installments
+
+  @@map("fee_plan_type")
+}
+
+enum FeePaymentMethod {
+  cash
+  upi
+  card
+  other
+
+  @@map("fee_payment_method")
+}
+
+enum CourseDurationKind {
+  fixed
+  flexible
+
+  @@map("course_duration_kind")
+}
+
+enum CourseDurationUnit {
+  days
+  weeks
+  months
+
+  @@map("course_duration_unit")
+}
+
+model Course {
+  id                    String    @id @db.Uuid
+  workspaceId           String    @map("workspace_id")
+  createdByUserId       String    @map("created_by_user_id")
+  name                  String    @db.VarChar(200)
+  durationKind          CourseDurationKind @default(flexible) @map("duration_kind")
+  durationValue         Int?               @map("duration_value")
+  durationUnit          CourseDurationUnit? @map("duration_unit")
+  code                  String?             @db.VarChar(40)
+  category              String?             @db.VarChar(100)
+  totalLearningHours    Int?                @map("total_learning_hours")
+  eligibility           String?             @db.Text
+  learningOutcomes      String[]            @default([]) @map("learning_outcomes")
+  syllabusOutline       String[]            @default([]) @map("syllabus_outline")
+  description           String?   @db.Text
+  defaultFeeAmountPaise Int       @map("default_fee_amount_paise")
+  archivedAt            DateTime? @map("archived_at")
+  archivedByUserId      String?   @map("archived_by_user_id")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  deletedAt             DateTime? @map("deleted_at")
+  deletedByUserId       String?   @map("deleted_by_user_id")
+
+  batches     Batch[]
+  enrollments Enrollment[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@map("courses")
+}
+
+model Batch {
   id              String    @id @db.Uuid
   workspaceId     String    @map("workspace_id")
+  courseId        String    @map("course_id") @db.Uuid
   createdByUserId String    @map("created_by_user_id")
-  title           String    @db.VarChar(200)
-  completedAt     DateTime? @map("completed_at")
+  name            String    @db.VarChar(200)
+  classMode       ClassMode @map("class_mode")
+  capacity        Int
+  room            String?   @db.VarChar(80)
+  joinUrl         String?   @map("join_url") @db.VarChar(2048)
+  /// Weekly slots: { daysOfWeek: number[], startTime: "HH:mm", endTime: "HH:mm" }[]
+  timings         Json
+  timezone        String    @default("Asia/Kolkata") @db.VarChar(64)
+  closedAt        DateTime? @map("closed_at")
+  closedByUserId  String?   @map("closed_by_user_id")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
   deletedAt       DateTime? @map("deleted_at")
   deletedByUserId String?   @map("deleted_by_user_id")
 
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  enrollments Enrollment[]
+
   @@index([workspaceId, deletedAt, createdAt, id])
-  @@map("todos")
+  @@index([courseId, deletedAt])
+  @@map("batches")
+}
+
+model Student {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  createdByUserId String    @map("created_by_user_id")
+  name            String    @db.VarChar(200)
+  phone           String    @db.VarChar(32)
+  email           String?   @db.VarChar(320)
+  photoUrl        String?   @map("photo_url") @db.VarChar(2048)
+  address         String?   @db.Text
+  idProofNote     String?   @map("id_proof_note") @db.Text
+  guardianName    String?   @map("guardian_name") @db.VarChar(200)
+  guardianPhone   String?   @map("guardian_phone") @db.VarChar(32)
+  profileDetails  Json      @default("{}") @map("profile_details")
+  droppedAt       DateTime? @map("dropped_at")
+  droppedByUserId String?   @map("dropped_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  enrollments Enrollment[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([workspaceId, phone])
+  @@index([workspaceId, name])
+  @@map("students")
+}
+
+model Enrollment {
+  id                      String       @id @db.Uuid
+  workspaceId             String       @map("workspace_id")
+  studentId               String       @map("student_id") @db.Uuid
+  courseId                String       @map("course_id") @db.Uuid
+  batchId                 String       @map("batch_id") @db.Uuid
+  createdByUserId         String       @map("created_by_user_id")
+  classModeOverride       ClassMode?   @map("class_mode_override")
+  timingSource            TimingSource @map("timing_source")
+  /// Student-specific slots when timingSource is student. Same shape as Batch.timings.
+  studentTimings          Json?        @map("student_timings")
+  endedAt                 DateTime?    @map("ended_at")
+  endedByUserId           String?      @map("ended_by_user_id")
+  feePlanType             FeePlanType  @map("fee_plan_type")
+  feePlanAmountPaise      Int          @map("fee_plan_amount_paise")
+  feePlanInstallmentCount Int?         @map("fee_plan_installment_count")
+  feePlanConcessionPaise  Int          @default(0) @map("fee_plan_concession_paise")
+  /// [{ dueOn: "YYYY-MM-DD", amountPaise: number }]
+  feePlanDueDates         Json         @map("fee_plan_due_dates")
+  createdAt               DateTime     @default(now()) @map("created_at")
+  updatedAt               DateTime     @updatedAt @map("updated_at")
+  deletedAt               DateTime?    @map("deleted_at")
+  deletedByUserId         String?      @map("deleted_by_user_id")
+
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  batch       Batch        @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  feePayments FeePayment[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([studentId, deletedAt])
+  @@index([batchId, deletedAt, endedAt])
+  @@map("enrollments")
+}
+
+model FeePayment {
+  id               String           @id @db.Uuid
+  workspaceId      String           @map("workspace_id")
+  enrollmentId     String           @map("enrollment_id") @db.Uuid
+  recordedByUserId String           @map("recorded_by_user_id")
+  amountPaise      Int              @map("amount_paise")
+  method           FeePaymentMethod
+  paidAt           DateTime         @map("paid_at")
+  receiptNumber    String           @map("receipt_number") @db.VarChar(32)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  deletedAt        DateTime?        @map("deleted_at")
+  deletedByUserId  String?          @map("deleted_by_user_id")
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, receiptNumber])
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([enrollmentId, deletedAt, paidAt, id])
+  @@map("fee_payments")
 }

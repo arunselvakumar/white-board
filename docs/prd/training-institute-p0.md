@@ -75,12 +75,12 @@ One Workspace is one centre. Students are records, not Users. Fees hang off the 
 ## User Stories
 
 1. As a Workspace Owner, I want Training Institute selected for me at Workspace Creation, so that I am not asked to pick School or College.
-2. As a Workspace Owner, I want to add a Student with name, phone, optional email, photo, address, ID proof note, and Guardian name and phone, so that walk-in admissions leave the paper form.
+2. As a Workspace Owner, I want to add a Student with name, phone, optional salutation, gender, email, photo URL, date of birth, address, education details, father and mother contact details, multiple Guardians with relationships, an emergency phone, and an ID proof note, so that walk-in admissions leave the paper form.
 3. As a Workspace Owner, I want to edit a Student, so that a wrong phone number is fixable.
 4. As a Workspace Owner, I want to list Students with search by name or phone, so that I can find someone at the desk.
 5. As a Workspace Owner, I want to mark a Student Dropped, so that they leave the active register without deleting history.
 6. As a Workspace Owner, I want to import Students from a simple spreadsheet later without blocking P0 typed entry, so that existing centres can migrate — typed create is enough to ship; bulk import is a stretch inside P0 only if it does not delay the loop.
-7. As a Workspace Owner, I want to create a Course with name, duration, description, and a default fee, so that DCA and Tally are catalog items, not batch names.
+7. As a Workspace Owner, I want to create a Course with name, structured expected duration (or Flexible), description, default fee, and optional Course code, category, total learning hours, eligibility, learning outcomes, and syllabus outline, so that DCA and Tally are useful catalog items, not Batch names.
 8. As a Workspace Owner, I want to edit or archive a Course, so that we stop offering a program without erasing past Enrollments.
 9. As a Workspace Owner, I want to list Courses, so that staff can see what we teach.
 10. As a Workspace Owner, I want to create a Batch for a Course with name, Class Mode (Offline, Online, Hybrid), capacity, optional room, optional online join URL, and default Timings (days of week + start and end time), so that “DCA Weekday 9–11 Lab 1” exists.
@@ -116,9 +116,9 @@ One Workspace is one centre. Students are records, not Users. Fees hang off the 
 
 - **First real bounded context is `training`.** Lives at `apps/whiteboard/src/training/{domain,application,infrastructure}` per ADR-0009. HTTP adapters stay in `app/api/`. Prisma stays in `packages/db`. The `todo` context is deleted when Student (or the first training resource) is queryable — ADR-0009.
 - **Aggregates (few, with real invariants — ADR-0022):**
-  - **Course** — name, duration, description, default fee amount, archived flag.
+  - **Course** — name, structured expected duration or Flexible, optional total learning hours, description, default fee amount, optional Course code/category/eligibility/learning outcomes/syllabus outline, archived flag.
   - **Batch** — belongs to one Course; Class Mode; capacity; room; join URL; default Timings; open/closed to enrollment.
-  - **Student** — profile fields; Active or Dropped; Guardian fields on the same record (not a separate aggregate).
+  - **Student** — profile fields; Active or Dropped; father, mother, and repeatable Guardian details on the same record (not separate aggregates).
   - **Enrollment** — one Student, one Course, one Batch; Class Mode (default Batch, optional override); Timing source (`batch` or `student`); Student-specific Timings when source is `student`; status Active or Ended; owns the Fee Plan.
   - **Fee Payment** — amount, method, paid at, recorded-by User id, Receipt number. Fee Plan is part of Enrollment, not its own aggregate, unless splitting it simplifies invariants; do not invent a fifth aggregate without an invariant that needs it.
 - **Money** is integer minor units (paise). Currency is INR for P0. No float. No multi-currency.
@@ -138,7 +138,7 @@ One Workspace is one centre. Students are records, not Users. Fees hang off the 
 - **HTTP** is Next.js Route Handlers in Whiteboard (ADR-0006). Logical CQRS, no bus (ADR-0007). Zod only on Request/Response models (ADR-0016). Models live next to routes (ADR-0021). OpenAPI from those models; a route is not done until it appears at `/api/docs` (ADR-0012). Errors use the JSON envelope (ADR-0017). Tenant is Active Workspace on the Session (ADR-0014): no Session → 401; no Active Workspace → 403; other tenant’s id → 404.
 - **List** uses bidirectional cursor pagination plus total (ADR-0020). Student list additionally supports a `q` search on name and phone (filter on the query, not a second pagination style).
 - **Domain events** in-process after persist (ADR-0008): at least `StudentCreated`, `StudentEnrolled`, `FeePaymentRecorded`. Listeners may be no-ops in P0.
-- **In-app chrome:** replace the placeholder In-app Home with the Owner Dashboard. Add authenticated navigation: Dashboard, Students, Courses, Batches, Fees. Screens use `@repo/ui` (frontend-patterns). Forms are react-hook-form + zod. Storybook play functions for each form and empty state.
+- **In-app chrome:** replace the placeholder In-app Home with the Owner Dashboard. Add authenticated navigation: Dashboard, Students, Courses, Batches, Fees. Screens use `@repo/ui` (frontend-patterns). Forms are react-hook-form + zod. Client reads use TanStack Query `queryOptions` + `useSuspenseQuery` (ADR-0026). Storybook play functions for each form and empty state.
 - **Online class in P0** is a join URL on the Batch (and optional override on Enrollment). Do not build video.
 - **Bulk Excel import** is not required to close P0. Typed create is.
 - **Permissions:** any Workspace member may perform P0 register operations. Role split is not P0.

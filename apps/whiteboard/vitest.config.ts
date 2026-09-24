@@ -17,7 +17,11 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["src/**/*.test.ts", "app/api/**/*.test.ts"],
+          include: [
+            "src/**/*.test.ts",
+            "lib/**/*.test.ts",
+            "app/api/**/*.test.ts",
+          ],
           exclude: ["**/*.http.test.ts"],
         },
       },
@@ -26,7 +30,7 @@ export default defineConfig({
         test: {
           name: "http",
           environment: "node",
-          include: ["app/api/**/*.http.test.ts"],
+          include: ["app/api/**/*.http.test.ts", "src/**/*.http.test.ts"],
           env: {
             DATABASE_URL:
               process.env["DATABASE_URL_TEST"] ??

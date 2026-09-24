@@ -79,11 +79,11 @@ A learner at the Training Institute. A Workspace-scoped record, not a User and n
 _Avoid_: pupil, scholar, user, account, child (as the entity name)
 
 **Guardian**:
-The parent or emergency contact named on a Student. Name and phone live on the Student record. Not a User in P0.
+An additional contact named on a Student, such as a grandparent. A Student may have multiple Guardians, each with a relationship and contact details on the Student record. Father and mother details are also stored on the Student. None of these contacts is a User in P0.
 _Avoid_: parent as a login, family account
 
 **Course**:
-A program the institute offers, such as DCA, Tally, or Python. It has a name, duration, and a default fee. It is not when or where it is taught.
+A program the institute offers, such as DCA, Tally, or Python. It has a name, structured expected duration (a number of days, weeks, or months, or Flexible), an optional total learning hours value, and a default fee. Optional catalog details are Course code, category, eligibility, learning outcomes, and syllabus outline. It is not when or where it is taught.
 _Avoid_: subject, class, program (as the stored name), paper
 
 **Batch**:

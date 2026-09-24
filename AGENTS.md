@@ -26,24 +26,24 @@ P1 (attendance, enquiry CRM, session calendar, certificates, WhatsApp) and Schoo
 
 ## Language (non-negotiable)
 
-| Say | Do not say |
-| --- | --- |
-| Workspace | organization, tenant, org (in UI copy) |
-| User | account, customer |
-| Student | user, pupil (Student is not a User) |
-| Course | class (as the catalog entity) |
-| Batch | section, period |
-| Enrollment | admission (admission is creating the Student) |
-| Class Mode | delivery type |
-| Fee Plan / Fee Payment / Receipt | invoice, bill (in P0) |
-| Owner Dashboard | analytics |
+| Say                              | Do not say                                    |
+| -------------------------------- | --------------------------------------------- |
+| Workspace                        | organization, tenant, org (in UI copy)        |
+| User                             | account, customer                             |
+| Student                          | user, pupil (Student is not a User)           |
+| Course                           | class (as the catalog entity)                 |
+| Batch                            | section, period                               |
+| Enrollment                       | admission (admission is creating the Student) |
+| Class Mode                       | delivery type                                 |
+| Fee Plan / Fee Payment / Receipt | invoice, bill (in P0)                         |
+| Owner Dashboard                  | analytics                                     |
 
 A **Student** is a Workspace record. They do not sign in in P0. Do not create Clerk Users for learners.
 
 ## Architecture
 
-- Context-first modular monolith inside Whiteboard: `apps/whiteboard/src/<context>/{domain,application,infrastructure}` (ADR-0009).
-- First product context is **`training`**. The `todo` folder is a disposable sample. Delete it when the first real resource (Student HTTP) ships (P0-021, unblocked by P0-009).
+- Context-first modular monolith inside Whiteboard: `apps/whiteboard/src/<context>/{domain,application,infrastructure}` (ADR-0009). How-to: [`.grok/skills/modular-monolith/SKILL.md`](./.grok/skills/modular-monolith/SKILL.md).
+- First product context is **`training`**.
 - HTTP is Next.js Route Handlers in `apps/whiteboard/app/api` (ADR-0006). No separate API process.
 - Writes = commands, reads = queries, no bus (ADR-0007). Named operations, not generic PATCH (ADR-0015).
 - Zod only on HTTP Request/Response models next to routes (ADR-0016, ADR-0021). Domain does not import Zod.
@@ -59,7 +59,8 @@ A **Student** is a Workspace record. They do not sign in in P0. Do not create Cl
 - Import from `@repo/ui`. No native `<select>`, `<input>`, `<textarea>`, or raw `<button>` for product chrome.
 - Forms: react-hook-form + zod. Select via `Controller`.
 - Visual tokens: ADR-0002, ADR-0003.
-- Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md).
+- In-app chrome: `AppShell` with nav from `lib/app-nav.ts`. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
+- Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md), [`.grok/skills/tanstack-query/SKILL.md`](./.grok/skills/tanstack-query/SKILL.md).
 - Storybook play functions for every P0 form and empty state. Select options portal to `document.body`.
 
 ## Testing
@@ -90,5 +91,5 @@ Whiteboard APIs: http://localhost:3000/api/docs
 - Treat Students as Clerk Users.
 - Hang fees off the Student instead of the Enrollment.
 - Add attendance, WhatsApp, GST, live video, or franchise royalty in P0.
-- Leave Todo in the tree after Student HTTP exists.
+- Add a sample Todo context back.
 - Add a second process, a CQRS bus, or a Workspace table in Prisma.
