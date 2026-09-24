@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
-import { StudentEditScreen } from "@/components/students/student-edit-screen";
+import { StudentProfileScreen } from "@/components/students/student-profile-view";
 
-export const metadata: Metadata = { title: "Edit Student" };
+export const metadata: Metadata = { title: "View Student" };
 
-export default async function EditStudentPage({
+export default async function ViewStudentPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <StudentEditScreen studentId={id} />;
+  return <StudentProfileScreen studentId={id} />;
 }

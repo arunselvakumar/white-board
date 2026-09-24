@@ -18,7 +18,7 @@ export function CourseCreateScreen() {
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+    <div className="flex w-full max-w-lg flex-col gap-6 p-6">
       <h1 className="text-2xl tracking-tight">Add Course</h1>
       <CourseForm
         submitLabel="Save Course"

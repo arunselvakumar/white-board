@@ -60,7 +60,7 @@ async function seed(orgId: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "DCA",
-          duration: "3 months",
+          duration: { kind: "fixed", value: 3, unit: "months" },
           defaultFeeAmountPaise: 500000,
         }),
       }),
@@ -77,7 +77,11 @@ async function seed(orgId: string) {
           classMode: "offline",
           capacity: 1,
           timings: [
-            { daysOfWeek: [1, 2, 3, 4, 5], startTime: "09:00", endTime: "11:00" },
+            {
+              daysOfWeek: [1, 2, 3, 4, 5],
+              startTime: "09:00",
+              endTime: "11:00",
+            },
           ],
         }),
       }),

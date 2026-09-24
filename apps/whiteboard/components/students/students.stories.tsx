@@ -5,11 +5,40 @@ import { expect } from "storybook/test";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { StudentCatalog } from "@/components/students/student-catalog";
 import { StudentForm } from "@/components/students/student-form";
+import { StudentProfileView } from "@/components/students/student-profile-view";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
-import type { StudentResponse, StudentWriteInput } from "@/src/queries/students";
+import type {
+  StudentDetails,
+  StudentResponse,
+  StudentWriteInput,
+} from "@/src/queries/students";
 import { clerkMocks } from "../../.storybook/mocks/clerk";
 
 const NOW = "2026-09-12T12:00:00.000Z";
+
+const emptyParent = {
+  salutation: null,
+  gender: null,
+  name: null,
+  primaryPhone: null,
+  alternatePhone: null,
+  occupation: null,
+  email: null,
+};
+const emptyDetails: StudentDetails = {
+  salutation: null,
+  gender: null,
+  dateOfBirth: null,
+  educationStatus: null,
+  currentInstitution: null,
+  currentGrade: null,
+  schoolBoard: null,
+  highestQualification: null,
+  father: emptyParent,
+  mother: emptyParent,
+  guardians: [],
+  emergencyPhone: null,
+};
 
 function sampleStudent(
   overrides: Partial<StudentResponse> = {},
@@ -24,6 +53,7 @@ function sampleStudent(
     idProofNote: null,
     guardianName: "Ravi Sharma",
     guardianPhone: "9123456780",
+    details: emptyDetails,
     droppedAt: null,
     createdAt: NOW,
     updatedAt: NOW,
@@ -64,6 +94,7 @@ function StudentWorkspace({
             onAdd={() => {
               setView("create");
             }}
+            onView={() => undefined}
             onEdit={() => undefined}
             onDrop={(student) => {
               setStudents((current) =>
@@ -76,7 +107,7 @@ function StudentWorkspace({
             }}
           />
         ) : (
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
             <h1 className="text-2xl tracking-tight">Add Student</h1>
             <StudentForm
               submitLabel="Save Student"
@@ -93,6 +124,21 @@ function StudentWorkspace({
                     idProofNote: input.idProofNote ?? null,
                     guardianName: input.guardianName ?? null,
                     guardianPhone: input.guardianPhone ?? null,
+                    details: {
+                      ...emptyDetails,
+                      salutation: input.salutation ?? null,
+                      gender: input.gender ?? null,
+                      dateOfBirth: input.dateOfBirth ?? null,
+                      educationStatus: input.educationStatus ?? null,
+                      currentInstitution: input.currentInstitution ?? null,
+                      currentGrade: input.currentGrade ?? null,
+                      schoolBoard: input.schoolBoard ?? null,
+                      highestQualification: input.highestQualification ?? null,
+                      father: input.father ?? emptyParent,
+                      mother: input.mother ?? emptyParent,
+                      guardians: input.guardians ?? [],
+                      emergencyPhone: input.emergencyPhone ?? null,
+                    },
                     droppedAt: null,
                     createdAt: NOW,
                     updatedAt: NOW,
@@ -144,9 +190,52 @@ export const Empty: Story = {
   },
 };
 
+export const Loading: Story = {
+  render: () => (
+    <StudentCatalog
+      students={[]}
+      loading
+      search=""
+      onSearchChange={() => undefined}
+      onAdd={() => undefined}
+      onView={() => undefined}
+      onEdit={() => undefined}
+      onDrop={() => undefined}
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Loading Students…")).toBeVisible();
+    await expect(
+      canvas.getByRole("table", { name: "Loading Students" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByText("Add the first Student this centre admits."),
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const Updating: Story = {
+  render: () => (
+    <StudentCatalog
+      students={[sampleStudent()]}
+      updating
+      search=""
+      onSearchChange={() => undefined}
+      onAdd={() => undefined}
+      onView={() => undefined}
+      onEdit={() => undefined}
+      onDrop={() => undefined}
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Updating Students…")).toBeVisible();
+    await expect(canvas.getByText("Anita Sharma")).toBeVisible();
+  },
+};
+
 export const Validation: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <StudentForm
         submitLabel="Save Student"
         onSubmit={() => Promise.resolve()}
@@ -194,10 +283,68 @@ export const Create: Story = {
       throw new Error("Add Student button missing");
     }
     await userEvent.click(addButton);
-    await userEvent.type(canvas.getByLabelText("Name"), "Anita Sharma");
-    await userEvent.type(canvas.getByLabelText("Phone"), "9876543210");
+    const studentName = canvas.getAllByLabelText("Full name")[0];
+    if (studentName == null) throw new Error("Student name missing");
+    await userEvent.type(studentName, "Anita Sharma");
+    await userEvent.type(
+      canvas.getByLabelText("Phone number", { exact: true }),
+      "9876543210",
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Save Student" }));
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
     await expect(canvas.getByText("9876543210")).toBeVisible();
+  },
+};
+
+export const View: Story = {
+  render: () => (
+    <StudentProfileView
+      student={sampleStudent({
+        details: {
+          ...emptyDetails,
+          salutation: "miss",
+          gender: "female",
+          currentInstitution: "Riverside School",
+          educationStatus: "school",
+          father: {
+            ...emptyParent,
+            salutation: "mr",
+            name: "Ravi Sharma",
+            occupation: "Teacher",
+          },
+          guardians: [
+            {
+              salutation: "mrs",
+              gender: "female",
+              name: "Meera Sharma",
+              relationship: "Grandmother",
+              phone: "9000000001",
+              email: null,
+            },
+            {
+              salutation: "mr",
+              gender: "male",
+              name: "Karan Sharma",
+              relationship: "Grandfather",
+              phone: "9000000002",
+              email: null,
+            },
+          ],
+          emergencyPhone: "9000000003",
+        },
+      })}
+      onBack={() => undefined}
+      onEdit={() => undefined}
+      onEnroll={() => undefined}
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Miss Anita Sharma" }),
+    ).toBeVisible();
+    await expect(canvas.getByText("Riverside School")).toBeVisible();
+    await expect(canvas.getByText("Meera Sharma")).toBeVisible();
+    await expect(canvas.getByText("Karan Sharma")).toBeVisible();
+    await expect(canvas.queryByRole("textbox")).not.toBeInTheDocument();
   },
 };

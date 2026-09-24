@@ -24,6 +24,7 @@ export class PrismaStudentRepository implements StudentRepository {
       idProofNote: student.idProofNote?.value ?? null,
       guardianName: student.guardianName?.value ?? null,
       guardianPhone: student.guardianPhone?.value ?? null,
+      profileDetails: student.details as unknown as Prisma.InputJsonValue,
       droppedAt: student.droppedAt,
       droppedByUserId: student.droppedByUserId?.value ?? null,
       updatedAt: student.updatedAt,
@@ -78,9 +79,7 @@ export class PrismaStudentRepository implements StudentRepository {
     return row == null ? null : toDomainStudent(row);
   }
 
-  async listInWorkspace(
-    params: StudentListParams,
-  ): Promise<ListPage<Student>> {
+  async listInWorkspace(params: StudentListParams): Promise<ListPage<Student>> {
     const q = params.q?.trim();
     const searchWhere: Prisma.StudentWhereInput | undefined =
       q != null && q.length > 0

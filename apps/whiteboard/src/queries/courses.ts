@@ -5,7 +5,13 @@ import { apiJson } from "./http";
 export type CourseResponse = {
   id: string;
   name: string;
-  duration: string;
+  duration: CourseDurationInput;
+  code: string | null;
+  category: string | null;
+  totalLearningHours: number | null;
+  eligibility: string | null;
+  learningOutcomes: string[];
+  syllabusOutline: string[];
   description: string | null;
   defaultFeeAmountPaise: number;
   archivedAt: string | null;
@@ -23,10 +29,20 @@ export type CourseListResponse = {
 
 export type CourseWriteInput = {
   name: string;
-  duration: string;
+  duration: CourseDurationInput;
+  code?: string | null;
+  category?: string | null;
+  totalLearningHours?: number | null;
+  eligibility?: string | null;
+  learningOutcomes?: string[];
+  syllabusOutline?: string[];
   description?: string | null;
   defaultFeeAmountPaise: number;
 };
+
+export type CourseDurationInput =
+  | { kind: "fixed"; value: number; unit: "days" | "weeks" | "months" }
+  | { kind: "flexible" };
 
 const jsonHeaders = { "content-type": "application/json" };
 

@@ -19,6 +19,8 @@ import {
   EmptyHeader,
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
+import { Skeleton } from "@repo/ui/components/skeleton";
+import { Spinner } from "@repo/ui/components/spinner";
 import {
   Table,
   TableBody,
@@ -32,16 +34,26 @@ import type { StudentResponse } from "@/src/queries/students";
 
 export function StudentCatalog({
   students,
+  loading = false,
+  updating = false,
+  loadError = false,
+  onRetry,
   search,
   onSearchChange,
   onAdd,
+  onView,
   onEdit,
   onDrop,
 }: {
   students: StudentResponse[];
+  loading?: boolean;
+  updating?: boolean;
+  loadError?: boolean;
+  onRetry?: () => void;
   search: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  onView: (student: StudentResponse) => void;
   onEdit: (student: StudentResponse) => void;
   onDrop: (student: StudentResponse) => void | Promise<void>;
 }) {
@@ -66,7 +78,70 @@ export function StudentCatalog({
         }}
         aria-label="Search by name or phone"
       />
-      {students.length === 0 ? (
+      {updating ? (
+        <div
+          className="text-muted-foreground flex items-center gap-2 text-sm"
+          role="status"
+        >
+          <Spinner className="size-4" aria-hidden="true" />
+          Updating Students…
+        </div>
+      ) : null}
+      {loading ? (
+        <div className="space-y-3" aria-busy="true">
+          <div
+            className="text-muted-foreground flex items-center gap-2 text-sm"
+            role="status"
+          >
+            <Spinner className="size-4" aria-hidden="true" />
+            Loading Students…
+          </div>
+          <Table aria-label="Loading Students">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Guardian</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[0, 1, 2, 3].map((row) => (
+                <TableRow key={row} aria-hidden="true">
+                  <TableCell>
+                    <Skeleton className="h-4 w-36" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-28" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="ml-auto h-7 w-24" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : loadError ? (
+        <div
+          className="flex flex-col items-start gap-3 rounded-xl border p-6"
+          role="alert"
+        >
+          <p>Could not load Students. Please try again.</p>
+          {onRetry == null ? null : (
+            <Button type="button" variant="outline" onClick={onRetry}>
+              Retry
+            </Button>
+          )}
+        </div>
+      ) : students.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>
             <EmptyDescription>
@@ -98,14 +173,21 @@ export function StudentCatalog({
             {students.map((student) => {
               const dropped = student.droppedAt != null;
               return (
-                <TableRow key={student.id}>
+                <TableRow
+                  key={student.id}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    onView(student);
+                  }}
+                >
                   <TableCell className="font-medium">
                     <Button
                       type="button"
                       variant="link"
                       className="h-auto p-0"
-                      onClick={() => {
-                        onEdit(student);
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onView(student);
                       }}
                     >
                       {student.name}
@@ -126,7 +208,8 @@ export function StudentCatalog({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.stopPropagation();
                           onEdit(student);
                         }}
                       >
@@ -137,7 +220,8 @@ export function StudentCatalog({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
+                          onClick={(event) => {
+                            event.stopPropagation();
                             setPendingDrop(student);
                           }}
                         >

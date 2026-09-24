@@ -45,6 +45,54 @@ describe("Student value objects", () => {
 });
 
 describe("Student", () => {
+  it("keeps parent details and multiple Guardians in the Student profile", () => {
+    const student = Student.create({
+      id: StudentId.create(UUID),
+      workspaceId: WorkspaceId.create("org_1"),
+      createdByUserId: UserId.create("user_1"),
+      profile: StudentProfile.fromRaw({
+        name: "Anita Sharma",
+        phone: "9876543210",
+        salutation: "miss",
+        gender: "female",
+        educationStatus: "school",
+        currentInstitution: "Riverside School",
+        currentGrade: "Class 10",
+        father: {
+          salutation: "mr",
+          name: "Ravi Sharma",
+          primaryPhone: "9123456780",
+          occupation: "Teacher",
+        },
+        guardians: [
+          {
+            salutation: "mrs",
+            name: "Meera Sharma",
+            relationship: "Grandmother",
+            phone: "9000000001",
+          },
+          {
+            salutation: "mr",
+            name: "Karan Sharma",
+            relationship: "Grandfather",
+            phone: "9000000002",
+          },
+        ],
+      }),
+      now: NOW,
+    });
+    expect(student.details.gender).toBe("female");
+    expect(student.details.father.occupation).toBe("Teacher");
+    expect(student.details.guardians).toHaveLength(2);
+    expect(student.guardianName?.value).toBe("Meera Sharma");
+    expect(() =>
+      StudentProfile.fromRaw({
+        name: "Anita",
+        phone: "9876543210",
+        guardians: [{ name: "" }],
+      }),
+    ).toThrow(DomainError);
+  });
   it("admits a Student as a Workspace record, not a User", () => {
     const student = admitStudent();
     expect(student.name.value).toBe("Anita Sharma");

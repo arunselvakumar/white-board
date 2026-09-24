@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { studentDetailsRequestFields } from "./student-details-model";
 
 export const CreateStudentRequestModel = z.object({
+  ...studentDetailsRequestFields,
   name: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(1).max(32),
   email: z.string().trim().max(320).nullish(),

@@ -2,6 +2,15 @@
 
 import { useAuth, useOrganizationList } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Blocks,
+  GraduationCap,
+  Landmark,
+  MonitorPlay,
+  School,
+  Shapes,
+  type LucideIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -9,13 +18,12 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/select";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
 import { FieldError } from "@/components/auth/field-error";
@@ -27,6 +35,7 @@ import {
   INSTITUTION_TYPES,
   isAvailableInstitutionType,
   type AvailableInstitutionType,
+  type InstitutionType,
 } from "@/lib/institution-type";
 import { postWorkspacePath } from "@/lib/safe-redirect";
 
@@ -42,6 +51,25 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+
+const INSTITUTION_TYPE_ICONS: Record<InstitutionType, LucideIcon> = {
+  training_institute: MonitorPlay,
+  school: School,
+  preschool: Blocks,
+  college: GraduationCap,
+  university: Landmark,
+  other: Shapes,
+};
+
+const INSTITUTION_TYPE_TOOLTIPS: Record<InstitutionType, string> = {
+  training_institute:
+    "For computer education centres, home tuition, and skill training.",
+  school: "For primary and secondary education. Coming soon.",
+  preschool: "For early childhood education. Coming soon.",
+  college: "For higher education colleges. Coming soon.",
+  university: "For universities. Coming soon.",
+  other: "For institutions outside these categories. Coming soon.",
+};
 
 export type CreateWorkspaceResult =
   { ok: true; id: string } | { ok: false; message: string };
@@ -153,55 +181,85 @@ export function CreateWorkspaceForm({
           />
           <FieldError message={errors.name?.message} />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="institutionType">
+        <fieldset className="space-y-4">
+          <legend id="institution-type-label" className="text-sm font-medium">
             What kind of institution is this?
-          </Label>
+          </legend>
           <Controller
             name="institutionType"
             control={control}
             render={({ field }) => (
-              <Select
-                items={INSTITUTION_TYPES}
+              <RadioGroup
+                name={field.name}
                 value={field.value}
+                inputRef={field.ref}
+                onBlur={field.onBlur}
                 onValueChange={(value) => {
-                  if (value == null || !isAvailableInstitutionType(value)) {
+                  if (
+                    typeof value !== "string" ||
+                    !isAvailableInstitutionType(value)
+                  ) {
                     return;
                   }
                   field.onChange(value);
                 }}
+                aria-labelledby="institution-type-label"
+                aria-invalid={errors.institutionType != null}
+                className="grid-cols-2 gap-2"
               >
-                <SelectTrigger
-                  id="institutionType"
-                  aria-invalid={errors.institutionType != null}
-                  size="lg"
-                  className="w-full min-w-0"
-                >
-                  <SelectValue placeholder="Select…" />
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  {INSTITUTION_TYPES.map((type) => (
-                    <SelectItem
-                      key={type.value}
-                      value={type.value}
-                      disabled={!type.available}
-                    >
-                      <span className="flex w-full items-center justify-between gap-3">
-                        {type.label}
-                        {type.available ? null : (
-                          <span className="text-muted-foreground text-xs">
-                            Coming soon
-                          </span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {INSTITUTION_TYPES.map((type) => {
+                  const Icon = INSTITUTION_TYPE_ICONS[type.value];
+                  const selected = field.value === type.value;
+                  return (
+                    <div key={type.value} className="relative min-w-0">
+                      <RadioGroupItem
+                        id={`institution-type-${type.value}`}
+                        value={type.value}
+                        disabled={!type.available}
+                        className="peer sr-only"
+                      />
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Label
+                              htmlFor={`institution-type-${type.value}`}
+                              className={`peer-focus-visible:ring-ring/50 flex min-h-28 w-full flex-col items-start justify-between gap-2 rounded-xl border p-3 text-left leading-snug transition-colors peer-focus-visible:ring-3 peer-disabled:pointer-events-auto ${
+                                selected
+                                  ? "border-primary bg-primary/5 text-foreground"
+                                  : "border-border text-muted-foreground"
+                              } ${
+                                type.available
+                                  ? "hover:border-primary/60 cursor-pointer"
+                                  : "cursor-not-allowed opacity-60"
+                              }`}
+                            >
+                              <Icon
+                                aria-hidden="true"
+                                className="size-5 shrink-0"
+                              />
+                              <span className="flex w-full flex-col gap-1">
+                                <span>{type.label}</span>
+                                {type.available ? null : (
+                                  <span className="text-[10px] font-normal whitespace-nowrap">
+                                    Coming soon
+                                  </span>
+                                )}
+                              </span>
+                            </Label>
+                          }
+                        />
+                        <TooltipContent>
+                          {INSTITUTION_TYPE_TOOLTIPS[type.value]}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  );
+                })}
+              </RadioGroup>
             )}
           />
           <FieldError message={errors.institutionType?.message} />
-        </div>
+        </fieldset>
         <FormAlert message={errors.root?.message} />
         <Button
           type="submit"

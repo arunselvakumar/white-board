@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { Course } from "../domain/course";
 import { CourseDescription } from "../domain/course-description";
 import { CourseDuration } from "../domain/course-duration";
+import { CourseDetails } from "../domain/course-details";
 import { CourseId } from "../domain/course-id";
 import { CourseName } from "../domain/course-name";
 import { Paise } from "../domain/paise";
@@ -26,7 +27,12 @@ describe("PrismaCourseRepository", () => {
       workspaceId,
       createdByUserId: UserId.create("user_1"),
       name: CourseName.create("DCA"),
-      duration: CourseDuration.create("3 months"),
+      duration: CourseDuration.create({
+        kind: "fixed",
+        value: 3,
+        unit: "months",
+      }),
+      details: CourseDetails.create({}),
       description: CourseDescription.create("Diploma in Computer Applications"),
       defaultFeeAmount: Paise.create(500000),
       now: NOW,
@@ -38,13 +44,9 @@ describe("PrismaCourseRepository", () => {
     expect(loaded).not.toBeNull();
     expect(loaded?.name.value).toBe("DCA");
     expect(loaded?.defaultFeeAmount.value).toBe(500000);
-    expect(loaded?.description?.value).toBe(
-      "Diploma in Computer Applications",
-    );
+    expect(loaded?.description?.value).toBe("Diploma in Computer Applications");
 
-    expect(
-      await courses.findByIdInWorkspace(id, otherWorkspaceId),
-    ).toBeNull();
+    expect(await courses.findByIdInWorkspace(id, otherWorkspaceId)).toBeNull();
 
     const listed = await courses.listInWorkspace({
       workspaceId,
@@ -55,7 +57,12 @@ describe("PrismaCourseRepository", () => {
 
     loaded?.update({
       name: CourseName.create("Tally"),
-      duration: CourseDuration.create("45 days"),
+      duration: CourseDuration.create({
+        kind: "fixed",
+        value: 45,
+        unit: "days",
+      }),
+      details: CourseDetails.create({}),
       description: null,
       defaultFeeAmount: Paise.create(800000),
       now: new Date("2026-09-12T13:00:00.000Z"),

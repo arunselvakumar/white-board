@@ -82,7 +82,7 @@ function BatchWorkspace({
             }}
           />
         ) : (
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
             <h1 className="text-2xl tracking-tight">
               {view === "create" ? "Add Batch" : "Edit Batch"}
             </h1>
@@ -193,7 +193,7 @@ export const Empty: Story = {
 
 export const Validation: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <BatchForm
         courses={COURSES}
         defaultValues={{ courseId: "", name: "", capacity: "" }}

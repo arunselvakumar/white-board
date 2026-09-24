@@ -39,12 +39,35 @@ enum FeePaymentMethod {
   @@map("fee_payment_method")
 }
 
+enum CourseDurationKind {
+  fixed
+  flexible
+
+  @@map("course_duration_kind")
+}
+
+enum CourseDurationUnit {
+  days
+  weeks
+  months
+
+  @@map("course_duration_unit")
+}
+
 model Course {
   id                    String    @id @db.Uuid
   workspaceId           String    @map("workspace_id")
   createdByUserId       String    @map("created_by_user_id")
   name                  String    @db.VarChar(200)
-  duration              String    @db.VarChar(80)
+  durationKind          CourseDurationKind @default(flexible) @map("duration_kind")
+  durationValue         Int?               @map("duration_value")
+  durationUnit          CourseDurationUnit? @map("duration_unit")
+  code                  String?             @db.VarChar(40)
+  category              String?             @db.VarChar(100)
+  totalLearningHours    Int?                @map("total_learning_hours")
+  eligibility           String?             @db.Text
+  learningOutcomes      String[]            @default([]) @map("learning_outcomes")
+  syllabusOutline       String[]            @default([]) @map("syllabus_outline")
   description           String?   @db.Text
   defaultFeeAmountPaise Int       @map("default_fee_amount_paise")
   archivedAt            DateTime? @map("archived_at")
@@ -101,6 +124,7 @@ model Student {
   idProofNote     String?   @map("id_proof_note") @db.Text
   guardianName    String?   @map("guardian_name") @db.VarChar(200)
   guardianPhone   String?   @map("guardian_phone") @db.VarChar(32)
+  profileDetails  Json      @default("{}") @map("profile_details")
   droppedAt       DateTime? @map("dropped_at")
   droppedByUserId String?   @map("dropped_by_user_id")
   createdAt       DateTime  @default(now()) @map("created_at")

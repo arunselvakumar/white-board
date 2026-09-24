@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, within } from "storybook/test";
+import { expect } from "storybook/test";
 
 import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
@@ -25,14 +25,17 @@ export const Default: Story = {
       canvas.getByRole("heading", { name: "Create your workspace" }),
     ).toBeVisible();
     const nameInput = canvas.getByLabelText("Workspace name");
-    const trigger = canvas.getByLabelText("What kind of institution is this?");
+    const types = canvas.getByRole("radiogroup", {
+      name: "What kind of institution is this?",
+    });
+    const trainingInstitute = canvas.getByRole("radio", {
+      name: "Training Institute",
+    });
     await expect(nameInput).toBeVisible();
-    await expect(trigger).toBeVisible();
-    await expect(nameInput.getBoundingClientRect().height).toBe(
-      trigger.getBoundingClientRect().height,
-    );
-    await expect(trigger).toHaveTextContent("Training Institute");
-    await expect(trigger).not.toHaveTextContent("training_institute");
+    await expect(types).toBeVisible();
+    await expect(trainingInstitute).toHaveAttribute("aria-checked", "true");
+    await expect(types).toHaveTextContent("Training Institute");
+    await expect(types).not.toHaveTextContent("training_institute");
     await expect(
       canvas.queryByLabelText("Describe the institution type"),
     ).not.toBeInTheDocument();
@@ -71,25 +74,24 @@ export const SubmitsName: Story = {
 };
 
 export const ComingSoonTypesAreDisabled: Story = {
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    const trigger = canvas.getByLabelText("What kind of institution is this?");
-    await expect(trigger).toHaveTextContent("Training Institute");
-    await userEvent.click(trigger);
-    const body = within(canvasElement.ownerDocument.body);
-    const school = await body.findByRole("option", { name: /School/ });
+  play: async ({ canvas, userEvent }) => {
+    const school = canvas.getByRole("radio", { name: /School/ });
     await expect(school).toHaveAttribute("aria-disabled", "true");
-    await expect(school).toHaveTextContent("Coming soon");
-    const college = body.getByRole("option", { name: /College/ });
+    await expect(canvas.getByText("School").parentElement).toHaveTextContent(
+      "Coming soon",
+    );
+    const college = canvas.getByRole("radio", { name: /College/ });
     await expect(college).toHaveAttribute("aria-disabled", "true");
-    await expect(college).toHaveTextContent("Coming soon");
-    const trainingInstitute = body.getByRole("option", {
+    const trainingInstitute = canvas.getByRole("radio", {
       name: "Training Institute",
     });
     await expect(trainingInstitute).not.toHaveAttribute(
       "aria-disabled",
       "true",
     );
-    await expect(trigger).toHaveTextContent("Training Institute");
+    await userEvent.click(canvas.getByText("School"));
+    await expect(trainingInstitute).toHaveAttribute("aria-checked", "true");
+    await expect(school).toHaveAttribute("aria-checked", "false");
   },
 };
 

@@ -29,6 +29,18 @@ type StudentJson = {
   email: string | null;
   droppedAt: string | null;
   createdByUserId: string;
+  details: {
+    salutation: string | null;
+    gender: string | null;
+    currentInstitution: string | null;
+    father: { name: string | null; occupation: string | null };
+    guardians: {
+      name: string;
+      relationship: string | null;
+      salutation: string | null;
+    }[];
+    emergencyPhone: string | null;
+  };
 };
 
 type ListJson = {
@@ -112,6 +124,86 @@ describe("student HTTP APIs", () => {
   it("rejects an empty name", async () => {
     const response = await createStudent(admitRequest("  ", "9876543210"));
     expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("round-trips expanded details and multiple Guardians", async () => {
+    const created = await createStudent(
+      new Request("http://localhost/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Anita Sharma",
+          phone: "9876543210",
+          salutation: "miss",
+          gender: "female",
+          educationStatus: "school",
+          currentInstitution: "Riverside School",
+          currentGrade: "Class 10",
+          father: {
+            salutation: "mr",
+            name: "Ravi Sharma",
+            primaryPhone: "9123456780",
+            occupation: "Teacher",
+          },
+          mother: {
+            salutation: "dr",
+            name: "Priya Sharma",
+            email: "priya@example.com",
+          },
+          guardians: [
+            {
+              salutation: "mrs",
+              name: "Meera Sharma",
+              relationship: "Grandmother",
+              phone: "9000000001",
+            },
+            {
+              salutation: "mr",
+              name: "Karan Sharma",
+              relationship: "Grandfather",
+              phone: "9000000002",
+            },
+          ],
+          emergencyPhone: "9000000003",
+        }),
+      }),
+    );
+    expect(created.status).toBe(StatusCodes.CREATED);
+    const body = await json<StudentJson>(created);
+    expect(body.details.salutation).toBe("miss");
+    expect(body.details.father.occupation).toBe("Teacher");
+    expect(
+      body.details.guardians.map((guardian) => guardian.relationship),
+    ).toEqual(["Grandmother", "Grandfather"]);
+
+    const fetched = await json<StudentJson>(
+      await getStudent(
+        new Request(`http://localhost/api/students/${body.id}`),
+        { params: Promise.resolve({ id: body.id }) },
+      ),
+    );
+    expect(fetched.details.guardians).toHaveLength(2);
+
+    const updated = await updateProfile(
+      new Request(`http://localhost/api/students/${body.id}/profile`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: body.name,
+          phone: body.phone,
+          guardians: [{ name: "Meera Sharma", relationship: "Grandmother" }],
+        }),
+      }),
+      { params: Promise.resolve({ id: body.id }) },
+    );
+    expect(updated.status).toBe(StatusCodes.OK);
+    expect((await json<StudentJson>(updated)).details.guardians).toHaveLength(
+      1,
+    );
+    const row = await prisma.student.findUnique({ where: { id: body.id } });
+    expect(row?.profileDetails).toMatchObject({
+      guardians: [{ name: "Meera Sharma" }],
+    });
   });
 
   it("admits, lists, searches, gets, updates, and drops", async () => {

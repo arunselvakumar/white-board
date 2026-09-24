@@ -1,9 +1,11 @@
 import type { Course } from "../domain/course";
+import type { CourseDetailsValue } from "../domain/course-details";
+import type { CourseDurationValue } from "../domain/course-duration";
 
-export type CourseReadModel = {
+export type CourseReadModel = CourseDetailsValue & {
   id: string;
   name: string;
-  duration: string;
+  duration: CourseDurationValue;
   description: string | null;
   defaultFeeAmountPaise: number;
   archivedAt: Date | null;
@@ -17,6 +19,7 @@ export function toCourseReadModel(course: Course): CourseReadModel {
     id: course.id.value,
     name: course.name.value,
     duration: course.duration.value,
+    ...course.details.value,
     description: course.description?.value ?? null,
     defaultFeeAmountPaise: course.defaultFeeAmount.value,
     archivedAt: course.archivedAt,

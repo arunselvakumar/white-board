@@ -93,8 +93,17 @@ export function CourseCatalog({
                     >
                       {course.name}
                     </Button>
+                    {course.code ? (
+                      <span className="text-muted-foreground block text-xs">
+                        {course.code}
+                      </span>
+                    ) : null}
                   </TableCell>
-                  <TableCell>{course.duration}</TableCell>
+                  <TableCell>
+                    {course.duration.kind === "flexible"
+                      ? "Flexible"
+                      : `${course.duration.value} ${course.duration.unit}`}
+                  </TableCell>
                   <TableCell>
                     {formatPaiseAsRupees(course.defaultFeeAmountPaise)}
                   </TableCell>

@@ -74,6 +74,7 @@ export const Students: Story = {
           search=""
           onSearchChange={() => undefined}
           onAdd={() => undefined}
+          onView={() => undefined}
           onEdit={() => undefined}
           onDrop={() => undefined}
         />

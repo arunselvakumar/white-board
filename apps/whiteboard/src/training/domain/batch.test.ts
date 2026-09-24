@@ -7,6 +7,7 @@ import { Capacity } from "./capacity";
 import { ClassMode } from "./class-mode";
 import { Course } from "./course";
 import { CourseDuration } from "./course-duration";
+import { CourseDetails } from "./course-details";
 import { CourseId } from "./course-id";
 import { CourseName } from "./course-name";
 import { DomainError } from "./errors";
@@ -29,7 +30,12 @@ function createCourse() {
     workspaceId: WorkspaceId.create("org_1"),
     createdByUserId: UserId.create("user_1"),
     name: CourseName.create("DCA"),
-    duration: CourseDuration.create("3 months"),
+    duration: CourseDuration.create({
+      kind: "fixed",
+      value: 3,
+      unit: "months",
+    }),
+    details: CourseDetails.create({}),
     description: null,
     defaultFeeAmount: Paise.create(500000),
     now: NOW,

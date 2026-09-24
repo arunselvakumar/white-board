@@ -23,6 +23,12 @@ export async function POST(request: Request): Promise<Response> {
     const course = await handlers.create.execute({
       name: model.name,
       duration: model.duration,
+      code: model.code ?? null,
+      category: model.category ?? null,
+      totalLearningHours: model.totalLearningHours ?? null,
+      eligibility: model.eligibility ?? null,
+      learningOutcomes: model.learningOutcomes ?? [],
+      syllabusOutline: model.syllabusOutline ?? [],
       description: model.description,
       defaultFeeAmountPaise: model.defaultFeeAmountPaise,
       workspaceId: session.orgId,

@@ -40,7 +40,7 @@ export const InheritTimings: Story = {
     return (
       <WorkspaceGate>
         <AppShell>
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
             <h1 className="text-2xl tracking-tight">Enroll Student</h1>
             {saved ? (
               <p>Anita Sharma is in DCA Weekday 9–11 Offline.</p>
@@ -73,7 +73,7 @@ export const InheritTimings: Story = {
 
 export const StudentSpecificTimings: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <EnrollmentForm
         students={STUDENTS}
         batches={BATCHES}
@@ -99,7 +99,7 @@ export const StudentSpecificTimings: Story = {
 
 export const CapacityError: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <EnrollmentForm
         students={STUDENTS}
         batches={BATCHES}
@@ -130,7 +130,7 @@ export const CollectPayment: Story = {
   render: function CollectPaymentStory() {
     const [remaining, setRemaining] = useState(500000);
     return (
-      <div className="mx-auto max-w-lg space-y-4 p-6">
+      <div className="max-w-lg space-y-4 p-6">
         <p>Remaining dues: ₹{remaining / 100}</p>
         {remaining === 400000 ? (
           <p>Receipt R-0001</p>
@@ -156,7 +156,7 @@ export const CollectPayment: Story = {
 
 export const PaymentValidation: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <CollectPaymentForm onSubmit={() => Promise.resolve()} />
     </div>
   ),

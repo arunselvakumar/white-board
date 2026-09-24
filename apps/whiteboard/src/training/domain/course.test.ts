@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { Course } from "./course";
 import { CourseDescription } from "./course-description";
+import { CourseDetails } from "./course-details";
 import { CourseDuration } from "./course-duration";
 import { CourseId } from "./course-id";
 import { CourseName } from "./course-name";
@@ -19,17 +20,62 @@ function createCourse() {
     workspaceId: WorkspaceId.create("org_1"),
     createdByUserId: UserId.create("user_1"),
     name: CourseName.create("  DCA  "),
-    duration: CourseDuration.create("  3 months  "),
-    description: CourseDescription.create("  Diploma in Computer Applications  "),
+    duration: CourseDuration.create({
+      kind: "fixed",
+      value: 3,
+      unit: "months",
+    }),
+    details: CourseDetails.create({}),
+    description: CourseDescription.create(
+      "  Diploma in Computer Applications  ",
+    ),
     defaultFeeAmount: Paise.create(500000),
     now: NOW,
   });
 }
 
 describe("Course value objects", () => {
-  it("trims name and duration", () => {
+  it("normalizes optional catalog details and rejects invalid learning hours", () => {
+    expect(
+      CourseDetails.create({
+        code: " dca-01 ",
+        category: " Computing ",
+        totalLearningHours: 120,
+        eligibility: " Basics ",
+        learningOutcomes: [" Create sheets "],
+        syllabusOutline: [" Spreadsheets "],
+      }).value,
+    ).toEqual({
+      code: "DCA-01",
+      category: "Computing",
+      totalLearningHours: 120,
+      eligibility: "Basics",
+      learningOutcomes: ["Create sheets"],
+      syllabusOutline: ["Spreadsheets"],
+    });
+    expect(() => CourseDetails.create({ totalLearningHours: -2 })).toThrow(
+      DomainError,
+    );
+    expect(() => CourseDetails.create({ code: "bad code" })).toThrow(
+      DomainError,
+    );
+  });
+  it("accepts structured fixed or flexible duration and rejects incomplete fixed duration", () => {
+    expect(
+      CourseDuration.create({ kind: "fixed", value: 3, unit: "months" }).value,
+    ).toEqual({ kind: "fixed", value: 3, unit: "months" });
+    expect(CourseDuration.create({ kind: "flexible" }).value).toEqual({
+      kind: "flexible",
+    });
+    expect(() =>
+      CourseDuration.create({ kind: "fixed", value: 0, unit: "weeks" }),
+    ).toThrow(DomainError);
+    expect(() =>
+      CourseDuration.create({ kind: "fixed", value: 1.5, unit: "weeks" }),
+    ).toThrow(DomainError);
+  });
+  it("trims name", () => {
     expect(CourseName.create("  DCA  ").value).toBe("DCA");
-    expect(CourseDuration.create("  3 months  ").value).toBe("3 months");
   });
 
   it("rejects an empty name", () => {
@@ -43,10 +89,6 @@ describe("Course value objects", () => {
 
   it("rejects a name over 200 characters", () => {
     expect(() => CourseName.create("a".repeat(201))).toThrow(DomainError);
-  });
-
-  it("rejects an empty duration", () => {
-    expect(() => CourseDuration.create("")).toThrow(DomainError);
   });
 
   it("treats blank description as missing", () => {
@@ -73,7 +115,11 @@ describe("Course", () => {
   it("records CourseCreated on create", () => {
     const course = createCourse();
     expect(course.name.value).toBe("DCA");
-    expect(course.duration.value).toBe("3 months");
+    expect(course.duration.value).toEqual({
+      kind: "fixed",
+      value: 3,
+      unit: "months",
+    });
     expect(course.defaultFeeAmount.value).toBe(500000);
     expect(course.archivedAt).toBeNull();
     expect(course.pullDomainEvents()).toEqual([
@@ -92,7 +138,12 @@ describe("Course", () => {
     const later = new Date("2026-09-12T13:00:00.000Z");
     course.update({
       name: CourseName.create("Tally"),
-      duration: CourseDuration.create("45 days"),
+      duration: CourseDuration.create({
+        kind: "fixed",
+        value: 45,
+        unit: "days",
+      }),
+      details: CourseDetails.create({}),
       description: null,
       defaultFeeAmount: Paise.create(800000),
       now: later,

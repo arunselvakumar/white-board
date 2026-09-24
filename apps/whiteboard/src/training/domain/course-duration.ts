@@ -1,24 +1,31 @@
 import { DomainError } from "./errors";
 
+export type CourseDurationValue =
+  | { kind: "fixed"; value: number; unit: "days" | "weeks" | "months" }
+  | { kind: "flexible" };
+
 export class CourseDuration {
-  static readonly MAX_LENGTH = 80;
+  private constructor(readonly value: CourseDurationValue) {}
 
-  private constructor(readonly value: string) {}
-
-  static create(raw: string): CourseDuration {
-    const value = raw.trim();
-    if (value.length === 0) {
+  static create(raw: CourseDurationValue): CourseDuration {
+    if (raw.kind === "flexible") {
+      return new CourseDuration({ kind: "flexible" });
+    }
+    if (
+      !Number.isSafeInteger(raw.value) ||
+      raw.value < 1 ||
+      raw.value > 1000 ||
+      !["days", "weeks", "months"].includes(raw.unit)
+    ) {
       throw new DomainError(
-        "COURSE_DURATION_REQUIRED",
-        "Course duration is required.",
+        "COURSE_DURATION_INVALID",
+        "Expected duration must be a positive whole number with days, weeks, or months.",
       );
     }
-    if (value.length > CourseDuration.MAX_LENGTH) {
-      throw new DomainError(
-        "COURSE_DURATION_TOO_LONG",
-        `Course duration must be at most ${String(CourseDuration.MAX_LENGTH)} characters.`,
-      );
-    }
-    return new CourseDuration(value);
+    return new CourseDuration({
+      kind: "fixed",
+      value: raw.value,
+      unit: raw.unit,
+    });
   }
 }

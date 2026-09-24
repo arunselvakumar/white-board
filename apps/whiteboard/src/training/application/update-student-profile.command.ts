@@ -1,4 +1,6 @@
-export type UpdateStudentProfileCommand = {
+import type { RawStudentDetails } from "../domain/student-details";
+
+export type UpdateStudentProfileCommand = RawStudentDetails & {
   id: string;
   name: string;
   phone: string;

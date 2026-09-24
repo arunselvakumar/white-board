@@ -4,20 +4,27 @@ import { expect, within } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { CourseCatalog } from "@/components/courses/course-catalog";
-import { CourseForm } from "@/components/courses/course-form";
+import {
+  CourseForm,
+  courseToFormValues,
+} from "@/components/courses/course-form";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 import type { CourseResponse, CourseWriteInput } from "@/src/queries/courses";
 import { clerkMocks } from "../../.storybook/mocks/clerk";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 
-function sampleCourse(
-  overrides: Partial<CourseResponse> = {},
-): CourseResponse {
+function sampleCourse(overrides: Partial<CourseResponse> = {}): CourseResponse {
   return {
     id: "550e8400-e29b-41d4-a716-446655440000",
     name: "Tally",
-    duration: "45 days",
+    duration: { kind: "fixed", value: 45, unit: "days" },
+    code: "TALLY",
+    category: "Accounting",
+    totalLearningHours: 80,
+    eligibility: null,
+    learningOutcomes: [],
+    syllabusOutline: [],
     description: null,
     defaultFeeAmountPaise: 800000,
     archivedAt: null,
@@ -64,21 +71,14 @@ function CourseWorkspace({
             }}
           />
         ) : (
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
             <h1 className="text-2xl tracking-tight">
               {view === "create" ? "Add Course" : "Edit Course"}
             </h1>
             <CourseForm
               defaultValues={
                 view === "edit" && editing != null
-                  ? {
-                      name: editing.name,
-                      duration: editing.duration,
-                      description: editing.description ?? "",
-                      defaultFeeRupees: String(
-                        editing.defaultFeeAmountPaise / 100,
-                      ),
-                    }
+                  ? courseToFormValues(editing)
                   : undefined
               }
               submitLabel="Save Course"
@@ -105,6 +105,12 @@ function CourseWorkspace({
                       id: crypto.randomUUID(),
                       ...input,
                       description: input.description ?? null,
+                      code: input.code ?? null,
+                      category: input.category ?? null,
+                      totalLearningHours: input.totalLearningHours ?? null,
+                      eligibility: input.eligibility ?? null,
+                      learningOutcomes: input.learningOutcomes ?? [],
+                      syllabusOutline: input.syllabusOutline ?? [],
                       archivedAt: null,
                       createdAt: NOW,
                       updatedAt: NOW,
@@ -167,7 +173,7 @@ export const List: Story = {
         sampleCourse({
           id: "660e8400-e29b-41d4-a716-446655440000",
           name: "Python",
-          duration: "8 weeks",
+          duration: { kind: "fixed", value: 8, unit: "weeks" },
           defaultFeeAmountPaise: 1200000,
         }),
       ]}
@@ -182,7 +188,7 @@ export const List: Story = {
 
 export const Validation: Story = {
   render: () => (
-    <div className="mx-auto max-w-lg p-6">
+    <div className="max-w-lg p-6">
       <CourseForm
         submitLabel="Save Course"
         onSubmit={() => Promise.resolve()}
@@ -193,7 +199,9 @@ export const Validation: Story = {
     await userEvent.clear(canvas.getByLabelText("Default fee (₹)"));
     await userEvent.click(canvas.getByRole("button", { name: "Save Course" }));
     await expect(canvas.getByText("Course name is required")).toBeVisible();
-    await expect(canvas.getByText("Duration is required")).toBeVisible();
+    await expect(
+      canvas.getByText("Expected duration is required"),
+    ).toBeVisible();
     await expect(canvas.getByText("Default fee is required")).toBeVisible();
   },
 };
@@ -211,14 +219,69 @@ export const Create: Story = {
       canvas.getByRole("heading", { name: "Add Course" }),
     ).toBeVisible();
     await userEvent.type(canvas.getByLabelText("Name"), "DCA");
-    await userEvent.type(canvas.getByLabelText("Duration"), "3 months");
+    await userEvent.type(canvas.getByLabelText("Expected duration"), "3");
+    await userEvent.type(canvas.getByLabelText("Course code"), "DCA");
+    await userEvent.type(canvas.getByLabelText("Category"), "Computing");
+    await userEvent.type(canvas.getByLabelText("Total learning hours"), "120");
+    await userEvent.type(
+      canvas.getByLabelText("Eligibility / prerequisites"),
+      "Basic computer use",
+    );
+    await userEvent.type(
+      canvas.getByLabelText("Learning outcomes"),
+      "Create spreadsheets",
+    );
+    await userEvent.type(
+      canvas.getByLabelText("Syllabus outline"),
+      "Computer basics\nSpreadsheets",
+    );
     await userEvent.clear(canvas.getByLabelText("Default fee (₹)"));
     await userEvent.type(canvas.getByLabelText("Default fee (₹)"), "5000");
     await userEvent.click(canvas.getByRole("button", { name: "Save Course" }));
-    await expect(canvas.getByRole("heading", { name: "Courses" })).toBeVisible();
-    await expect(canvas.getByText("DCA")).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { name: "Courses" }),
+    ).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "DCA" })).toBeVisible();
     await expect(canvas.getByText("3 months")).toBeVisible();
     await expect(canvas.getByText("₹5,000")).toBeVisible();
+  },
+};
+
+export const FlexibleDuration: Story = {
+  render: () => <CourseWorkspace />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const addButton = canvas.getAllByRole("button", { name: "Add Course" })[0];
+    if (addButton == null) throw new Error("Add Course button missing");
+    await userEvent.click(addButton);
+    await userEvent.type(canvas.getByLabelText("Name"), "Personal tuition");
+    await userEvent.click(canvas.getByLabelText("Duration type"));
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Flexible",
+      }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save Course" }));
+    await expect(canvas.getByText("Flexible")).toBeVisible();
+  },
+};
+
+export const EditDetails: Story = {
+  render: () => <CourseWorkspace initialCourses={[sampleCourse()]} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Edit" }));
+    await expect(canvas.getByLabelText("Course code")).toHaveValue("TALLY");
+    await expect(canvas.getByLabelText("Total learning hours")).toHaveValue(
+      "80",
+    );
+    await userEvent.clear(canvas.getByLabelText("Category"));
+    await userEvent.type(
+      canvas.getByLabelText("Category"),
+      "Business software",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save Course" }));
+    await expect(
+      canvas.getByRole("heading", { name: "Courses" }),
+    ).toBeVisible();
   },
 };
 

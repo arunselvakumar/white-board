@@ -25,6 +25,7 @@ export function mapStudentResponse(student: StudentReadModel) {
     idProofNote: student.idProofNote,
     guardianName: student.guardianName,
     guardianPhone: student.guardianPhone,
+    details: student.details,
     droppedAt: student.droppedAt?.toISOString() ?? null,
     createdAt: student.createdAt.toISOString(),
     updatedAt: student.updatedAt.toISOString(),

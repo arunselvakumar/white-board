@@ -32,10 +32,10 @@ export const INSTITUTION_TYPES: readonly {
   label: string;
   available: boolean;
 }[] = [
+  { value: "training_institute", label: "Training Institute", available: true },
   { value: "school", label: "School", available: false },
   { value: "preschool", label: "Preschool", available: false },
   { value: "college", label: "College", available: false },
   { value: "university", label: "University", available: false },
-  { value: "training_institute", label: "Training Institute", available: true },
   { value: "other", label: "Other", available: false },
 ];

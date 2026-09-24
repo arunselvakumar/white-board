@@ -2,6 +2,7 @@ import type { CourseRecord } from "@repo/db";
 
 import { Course } from "../domain/course";
 import { CourseDescription } from "../domain/course-description";
+import { CourseDetails } from "../domain/course-details";
 import { CourseDuration } from "../domain/course-duration";
 import { CourseId } from "../domain/course-id";
 import { CourseName } from "../domain/course-name";
@@ -15,18 +16,38 @@ export function toDomainCourse(row: CourseRecord): Course {
     workspaceId: WorkspaceId.create(row.workspaceId),
     createdByUserId: UserId.create(row.createdByUserId),
     name: CourseName.create(row.name),
-    duration: CourseDuration.create(row.duration),
+    duration: courseDurationFromRow(row),
+    details: CourseDetails.create({
+      code: row.code,
+      category: row.category,
+      totalLearningHours: row.totalLearningHours,
+      eligibility: row.eligibility,
+      learningOutcomes: row.learningOutcomes,
+      syllabusOutline: row.syllabusOutline,
+    }),
     description: CourseDescription.create(row.description),
     defaultFeeAmount: Paise.create(row.defaultFeeAmountPaise),
     archivedAt: row.archivedAt,
     archivedByUserId:
-      row.archivedByUserId == null
-        ? null
-        : UserId.create(row.archivedByUserId),
+      row.archivedByUserId == null ? null : UserId.create(row.archivedByUserId),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     deletedAt: row.deletedAt,
     deletedByUserId:
       row.deletedByUserId == null ? null : UserId.create(row.deletedByUserId),
+  });
+}
+
+function courseDurationFromRow(row: CourseRecord): CourseDuration {
+  if (row.durationKind === "flexible") {
+    return CourseDuration.create({ kind: "flexible" });
+  }
+  if (row.durationValue == null || row.durationUnit == null) {
+    throw new Error("Stored Course duration is incomplete.");
+  }
+  return CourseDuration.create({
+    kind: "fixed",
+    value: row.durationValue,
+    unit: row.durationUnit,
   });
 }

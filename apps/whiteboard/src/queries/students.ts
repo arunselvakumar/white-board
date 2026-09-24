@@ -13,6 +13,43 @@ export type StudentEnrollmentSummary = {
   remainingDuesPaise: number;
 };
 
+export type StudentSalutation =
+  "mr" | "mrs" | "ms" | "miss" | "mx" | "dr" | "prof";
+export type StudentGender =
+  "female" | "male" | "non_binary" | "prefer_not_to_say";
+export type StudentEducationStatus = "school" | "completed" | "other";
+export type StudentParentDetails = {
+  salutation: StudentSalutation | null;
+  gender: StudentGender | null;
+  name: string | null;
+  primaryPhone: string | null;
+  alternatePhone: string | null;
+  occupation: string | null;
+  email: string | null;
+};
+export type StudentGuardianDetails = {
+  salutation: StudentSalutation | null;
+  gender: StudentGender | null;
+  name: string;
+  relationship: string | null;
+  phone: string | null;
+  email: string | null;
+};
+export type StudentDetails = {
+  salutation: StudentSalutation | null;
+  gender: StudentGender | null;
+  dateOfBirth: string | null;
+  educationStatus: StudentEducationStatus | null;
+  currentInstitution: string | null;
+  currentGrade: string | null;
+  schoolBoard: string | null;
+  highestQualification: string | null;
+  father: StudentParentDetails;
+  mother: StudentParentDetails;
+  guardians: StudentGuardianDetails[];
+  emergencyPhone: string | null;
+};
+
 export type StudentResponse = {
   id: string;
   name: string;
@@ -23,6 +60,7 @@ export type StudentResponse = {
   idProofNote: string | null;
   guardianName: string | null;
   guardianPhone: string | null;
+  details: StudentDetails;
   droppedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -46,7 +84,7 @@ export type StudentWriteInput = {
   idProofNote?: string | null;
   guardianName?: string | null;
   guardianPhone?: string | null;
-};
+} & Partial<StudentDetails>;
 
 const jsonHeaders = { "content-type": "application/json" };
 
@@ -64,7 +102,9 @@ export const studentQueries = {
         if (q != null && q.length > 0) {
           params.set("q", q);
         }
-        return apiJson<StudentListResponse>(`/api/students?${params.toString()}`);
+        return apiJson<StudentListResponse>(
+          `/api/students?${params.toString()}`,
+        );
       },
     }),
   detail: (id: string) =>

@@ -27,10 +27,17 @@ export function StudentsScreen() {
       window.clearTimeout(handle);
     };
   }, [search]);
-  const { data } = useQuery({
-    ...studentQueries.list(q),
-    placeholderData: keepPreviousData,
-  });
+  const { data, isPending, isFetching, isPlaceholderData, isError, refetch } =
+    useQuery({
+      ...studentQueries.list(q),
+      placeholderData: keepPreviousData,
+    });
+  const waitingForSearch = search.trim() !== (q ?? "");
+  const loading =
+    isPending ||
+    isPlaceholderData ||
+    waitingForSearch ||
+    (isFetching && (data?.items.length ?? 0) === 0);
   const drop = useMutation({
     mutationFn: (id: string) => dropStudent(id),
     onSuccess: async () => {
@@ -44,13 +51,22 @@ export function StudentsScreen() {
   return (
     <StudentCatalog
       students={data?.items ?? []}
+      loading={loading}
+      updating={isFetching && !loading}
+      loadError={isError && data == null}
+      onRetry={() => {
+        void refetch();
+      }}
       search={search}
       onSearchChange={setSearch}
       onAdd={() => {
         router.push("/students/new");
       }}
-      onEdit={(student) => {
+      onView={(student) => {
         router.push(`/students/${student.id}`);
+      }}
+      onEdit={(student) => {
+        router.push(`/students/${student.id}/edit`);
       }}
       onDrop={(student) => {
         drop.mutate(student.id);

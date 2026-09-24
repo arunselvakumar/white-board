@@ -5,6 +5,11 @@ import { OptionalText } from "./optional-text";
 import { Phone } from "./phone";
 import type { StudentId } from "./student-id";
 import { StudentName } from "./student-name";
+import {
+  studentDetailsFromRaw,
+  type RawStudentDetails,
+  type StudentDetails,
+} from "./student-details";
 import type { UserId } from "./user-id";
 import type { WorkspaceId } from "./workspace-id";
 
@@ -20,6 +25,7 @@ export type StudentProps = {
   idProofNote: OptionalText | null;
   guardianName: OptionalText | null;
   guardianPhone: Phone | null;
+  details: StudentDetails;
   droppedAt: Date | null;
   droppedByUserId: UserId | null;
   createdAt: Date;
@@ -37,9 +43,12 @@ export type StudentProfileInput = {
   idProofNote: OptionalText | null;
   guardianName: OptionalText | null;
   guardianPhone: Phone | null;
+  details: StudentDetails;
 };
 
-export function studentPhotoUrl(raw: string | null | undefined): OptionalText | null {
+export function studentPhotoUrl(
+  raw: string | null | undefined,
+): OptionalText | null {
   return OptionalText.create(
     raw,
     2048,
@@ -48,7 +57,9 @@ export function studentPhotoUrl(raw: string | null | undefined): OptionalText | 
   );
 }
 
-export function studentAddress(raw: string | null | undefined): OptionalText | null {
+export function studentAddress(
+  raw: string | null | undefined,
+): OptionalText | null {
   return OptionalText.create(
     raw,
     4000,
@@ -160,6 +171,10 @@ export class Student {
     return this.props.guardianPhone;
   }
 
+  get details(): StudentDetails {
+    return this.props.details;
+  }
+
   get droppedAt(): Date | null {
     return this.props.droppedAt;
   }
@@ -237,16 +252,20 @@ export class Student {
 }
 
 export const StudentProfile = {
-  fromRaw(raw: {
-    name: string;
-    phone: string;
-    email?: string | null;
-    photoUrl?: string | null;
-    address?: string | null;
-    idProofNote?: string | null;
-    guardianName?: string | null;
-    guardianPhone?: string | null;
-  }): StudentProfileInput {
+  fromRaw(
+    raw: RawStudentDetails & {
+      name: string;
+      phone: string;
+      email?: string | null;
+      photoUrl?: string | null;
+      address?: string | null;
+      idProofNote?: string | null;
+      guardianName?: string | null;
+      guardianPhone?: string | null;
+    },
+  ): StudentProfileInput {
+    const details = studentDetailsFromRaw(raw);
+    const firstGuardian = details.guardians[0];
     return {
       name: StudentName.create(raw.name),
       phone: Phone.create(raw.phone, "STUDENT_PHONE_REQUIRED"),
@@ -254,8 +273,13 @@ export const StudentProfile = {
       photoUrl: studentPhotoUrl(raw.photoUrl),
       address: studentAddress(raw.address),
       idProofNote: studentIdProofNote(raw.idProofNote),
-      guardianName: studentGuardianName(raw.guardianName),
-      guardianPhone: Phone.createOptional(raw.guardianPhone),
+      guardianName: studentGuardianName(
+        firstGuardian?.name ?? raw.guardianName,
+      ),
+      guardianPhone: Phone.createOptional(
+        firstGuardian?.phone ?? raw.guardianPhone,
+      ),
+      details,
     };
   },
 };

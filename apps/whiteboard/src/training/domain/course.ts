@@ -1,4 +1,5 @@
 import type { CourseDescription } from "./course-description";
+import type { CourseDetails } from "./course-details";
 import type { CourseDuration } from "./course-duration";
 import type { CourseId } from "./course-id";
 import type { CourseName } from "./course-name";
@@ -15,6 +16,7 @@ export type CourseProps = {
   name: CourseName;
   duration: CourseDuration;
   description: CourseDescription | null;
+  details: CourseDetails;
   defaultFeeAmount: Paise;
   archivedAt: Date | null;
   archivedByUserId: UserId | null;
@@ -36,6 +38,7 @@ export class Course {
     name: CourseName;
     duration: CourseDuration;
     description: CourseDescription | null;
+    details: CourseDetails;
     defaultFeeAmount: Paise;
     now: Date;
   }): Course {
@@ -46,6 +49,7 @@ export class Course {
       name: input.name,
       duration: input.duration,
       description: input.description,
+      details: input.details,
       defaultFeeAmount: input.defaultFeeAmount,
       archivedAt: null,
       archivedByUserId: null,
@@ -91,6 +95,10 @@ export class Course {
     return this.props.description;
   }
 
+  get details(): CourseDetails {
+    return this.props.details;
+  }
+
   get defaultFeeAmount(): Paise {
     return this.props.defaultFeeAmount;
   }
@@ -123,6 +131,7 @@ export class Course {
     name: CourseName;
     duration: CourseDuration;
     description: CourseDescription | null;
+    details: CourseDetails;
     defaultFeeAmount: Paise;
     now: Date;
   }): void {
@@ -131,6 +140,7 @@ export class Course {
       name: input.name,
       duration: input.duration,
       description: input.description,
+      details: input.details,
       defaultFeeAmount: input.defaultFeeAmount,
       updatedAt: input.now,
     };

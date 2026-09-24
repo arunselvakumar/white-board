@@ -10,6 +10,7 @@ import { Capacity } from "../domain/capacity";
 import { ClassMode } from "../domain/class-mode";
 import { Course } from "../domain/course";
 import { CourseDuration } from "../domain/course-duration";
+import { CourseDetails } from "../domain/course-details";
 import { CourseId } from "../domain/course-id";
 import { CourseName } from "../domain/course-name";
 import { Paise } from "../domain/paise";
@@ -32,7 +33,12 @@ describe("PrismaBatchRepository", () => {
         workspaceId,
         createdByUserId: UserId.create("user_1"),
         name: CourseName.create("DCA"),
-        duration: CourseDuration.create("3 months"),
+        duration: CourseDuration.create({
+          kind: "fixed",
+          value: 3,
+          unit: "months",
+        }),
+        details: CourseDetails.create({}),
         description: null,
         defaultFeeAmount: Paise.create(500000),
         now: NOW,

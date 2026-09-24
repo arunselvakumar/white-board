@@ -81,7 +81,7 @@ describe("batch HTTP APIs", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: "DCA",
-            duration: "3 months",
+            duration: { kind: "fixed", value: 3, unit: "months" },
             defaultFeeAmountPaise: 500000,
           }),
         }),
@@ -115,14 +115,12 @@ describe("batch HTTP APIs", () => {
     expect(createdBody.enrolledCount).toBe(0);
 
     const listed = await listBatches(
-      new Request(
-        `http://localhost/api/batches?courseId=${course.id}`,
-      ),
+      new Request(`http://localhost/api/batches?courseId=${course.id}`),
     );
     expect(listed.status).toBe(StatusCodes.OK);
-    expect((await json<{ items: BatchJson[] }>(listed)).items[0]?.enrolledCount).toBe(
-      0,
-    );
+    expect(
+      (await json<{ items: BatchJson[] }>(listed)).items[0]?.enrolledCount,
+    ).toBe(0);
 
     const fetched = await getBatch(
       new Request(`http://localhost/api/batches/${createdBody.id}`),
@@ -137,7 +135,9 @@ describe("batch HTTP APIs", () => {
       { params: Promise.resolve({ id: createdBody.id }) },
     );
     expect(closed.status).toBe(StatusCodes.OK);
-    expect((await json<BatchJson>(closed)).closedAt).toEqual(expect.any(String));
+    expect((await json<BatchJson>(closed)).closedAt).toEqual(
+      expect.any(String),
+    );
 
     const twice = await closeBatch(
       new Request(`http://localhost/api/batches/${createdBody.id}/close`, {
@@ -156,7 +156,7 @@ describe("batch HTTP APIs", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: "Tally",
-            duration: "2 months",
+            duration: { kind: "fixed", value: 2, unit: "months" },
             defaultFeeAmountPaise: 100000,
           }),
         }),
@@ -173,9 +173,7 @@ describe("batch HTTP APIs", () => {
           capacity: 12,
           room: null,
           joinUrl: null,
-          timings: [
-            { daysOfWeek: [1], startTime: "09:00", endTime: "10:00" },
-          ],
+          timings: [{ daysOfWeek: [1], startTime: "09:00", endTime: "10:00" }],
         }),
       }),
     );
@@ -190,15 +188,14 @@ describe("batch HTTP APIs", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "Old",
-          duration: "1 month",
+          duration: { kind: "fixed", value: 1, unit: "months" },
           defaultFeeAmountPaise: 0,
         }),
       }),
     );
     const course = await json<CourseJson>(courseRes);
-    const { POST: archiveCourse } = await import(
-      "@/app/api/courses/[id]/archive/route"
-    );
+    const { POST: archiveCourse } =
+      await import("@/app/api/courses/[id]/archive/route");
     await archiveCourse(
       new Request(`http://localhost/api/courses/${course.id}/archive`, {
         method: "POST",
@@ -214,9 +211,7 @@ describe("batch HTTP APIs", () => {
           name: "Nope",
           classMode: "offline",
           capacity: 10,
-          timings: [
-            { daysOfWeek: [1], startTime: "09:00", endTime: "10:00" },
-          ],
+          timings: [{ daysOfWeek: [1], startTime: "09:00", endTime: "10:00" }],
         }),
       }),
     );
@@ -231,7 +226,7 @@ describe("batch HTTP APIs", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: "DCA",
-            duration: "3 months",
+            duration: { kind: "fixed", value: 3, unit: "months" },
             defaultFeeAmountPaise: 500000,
           }),
         }),
@@ -269,9 +264,7 @@ describe("batch HTTP APIs", () => {
           name: "Nope",
           classMode: "offline",
           capacity: 10,
-          timings: [
-            { daysOfWeek: [1], startTime: "09:00", endTime: "10:00" },
-          ],
+          timings: [{ daysOfWeek: [1], startTime: "09:00", endTime: "10:00" }],
         }),
       }),
       { params: Promise.resolve({ id: created.id }) },

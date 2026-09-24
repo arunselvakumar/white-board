@@ -27,7 +27,7 @@ export function ReceiptScreen({ paymentId }: { paymentId: string }) {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6 print:p-0">
+    <div className="flex w-full max-w-lg flex-col gap-6 p-6 print:mx-auto print:p-0">
       <div className="space-y-1 print:hidden">
         <h1 className="text-2xl tracking-tight">Receipt</h1>
         <Button

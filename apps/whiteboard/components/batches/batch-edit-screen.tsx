@@ -48,7 +48,7 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+    <div className="flex w-full max-w-lg flex-col gap-6 p-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl tracking-tight">Edit Batch</h1>
         {batch.closedAt == null ? (

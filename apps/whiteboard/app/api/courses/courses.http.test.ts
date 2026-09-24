@@ -25,7 +25,14 @@ function session(userId: string | null, orgId: string | null) {
 type CourseJson = {
   id: string;
   name: string;
-  duration: string;
+  duration:
+    { kind: "fixed"; value: number; unit: string } | { kind: "flexible" };
+  code: string | null;
+  category: string | null;
+  totalLearningHours: number | null;
+  eligibility: string | null;
+  learningOutcomes: string[];
+  syllabusOutline: string[];
   description: string | null;
   defaultFeeAmountPaise: number;
   archivedAt: string | null;
@@ -60,7 +67,13 @@ function createRequest(name = "DCA") {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name,
-      duration: "3 months",
+      duration: { kind: "fixed", value: 3, unit: "months" },
+      code: ` ${name} `,
+      category: "Computing",
+      totalLearningHours: 120,
+      eligibility: "Basic computer use",
+      learningOutcomes: ["Create spreadsheets"],
+      syllabusOutline: ["Computer basics", "Spreadsheets"],
       description: "Diploma in Computer Applications",
       defaultFeeAmountPaise: 500000,
     }),
@@ -113,7 +126,7 @@ describe("course HTTP APIs", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "  ",
-          duration: "3 months",
+          duration: { kind: "fixed", value: 3, unit: "months" },
           defaultFeeAmountPaise: 0,
         }),
       }),
@@ -131,12 +144,38 @@ describe("course HTTP APIs", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "DCA",
-          duration: "3 months",
+          duration: { kind: "fixed", value: 3, unit: "months" },
           defaultFeeAmountPaise: -1,
         }),
       }),
     );
     expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("rejects an invalid structured duration", async () => {
+    const response = await createCourse(
+      new Request("http://localhost/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "DCA",
+          duration: { kind: "fixed", value: 0, unit: "months" },
+          defaultFeeAmountPaise: 0,
+        }),
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("rejects duplicate Course codes within a Workspace", async () => {
+    expect((await createCourse(createRequest("DCA"))).status).toBe(
+      StatusCodes.CREATED,
+    );
+    const duplicate = await createCourse(createRequest("dca"));
+    expect(duplicate.status).toBe(StatusCodes.CONFLICT);
+    expect(await json<ErrorJson>(duplicate)).toMatchObject({
+      code: "COURSE_CODE_IN_USE",
+    });
   });
 
   it("creates, lists, gets, updates, and archives", async () => {
@@ -145,7 +184,17 @@ describe("course HTTP APIs", () => {
     const createdBody = await json<CourseJson>(created);
     const id = createdBody.id;
     expect(createdBody.name).toBe("DCA");
-    expect(createdBody.duration).toBe("3 months");
+    expect(createdBody.duration).toEqual({
+      kind: "fixed",
+      value: 3,
+      unit: "months",
+    });
+    expect(createdBody.code).toBe("DCA");
+    expect(createdBody.totalLearningHours).toBe(120);
+    expect(createdBody.syllabusOutline).toEqual([
+      "Computer basics",
+      "Spreadsheets",
+    ]);
     expect(createdBody.defaultFeeAmountPaise).toBe(500000);
     expect(createdBody.archivedAt).toBeNull();
     expect(createdBody.createdByUserId).toBe(userId);
@@ -155,7 +204,10 @@ describe("course HTTP APIs", () => {
       { params: Promise.resolve({ id }) },
     );
     expect(fetched.status).toBe(StatusCodes.OK);
-    expect((await json<CourseJson>(fetched)).id).toBe(id);
+    const fetchedBody = await json<CourseJson>(fetched);
+    expect(fetchedBody.id).toBe(id);
+    expect(fetchedBody.code).toBe("DCA");
+    expect(fetchedBody.learningOutcomes).toEqual(["Create spreadsheets"]);
 
     const listed = await listCourses(
       new Request("http://localhost/api/courses"),
@@ -164,6 +216,7 @@ describe("course HTTP APIs", () => {
     expect(listed.status).toBe(StatusCodes.OK);
     expect(listedBody.total).toBe(1);
     expect(listedBody.items).toHaveLength(1);
+    expect(listedBody.items[0]?.category).toBe("Computing");
 
     const updated = await updateCourse(
       new Request(`http://localhost/api/courses/${id}/update`, {
@@ -171,7 +224,13 @@ describe("course HTTP APIs", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "Tally",
-          duration: "45 days",
+          duration: { kind: "flexible" },
+          code: null,
+          category: "Accounting",
+          totalLearningHours: null,
+          eligibility: null,
+          learningOutcomes: [],
+          syllabusOutline: [],
           description: null,
           defaultFeeAmountPaise: 800000,
         }),
@@ -181,6 +240,8 @@ describe("course HTTP APIs", () => {
     expect(updated.status).toBe(StatusCodes.OK);
     const updatedBody = await json<CourseJson>(updated);
     expect(updatedBody.name).toBe("Tally");
+    expect(updatedBody.duration).toEqual({ kind: "flexible" });
+    expect(updatedBody.code).toBeNull();
     expect(updatedBody.description).toBeNull();
     expect(updatedBody.defaultFeeAmountPaise).toBe(800000);
 

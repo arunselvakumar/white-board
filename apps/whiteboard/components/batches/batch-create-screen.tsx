@@ -23,7 +23,7 @@ export function BatchCreateScreen() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-6">
+    <div className="flex w-full max-w-lg flex-col gap-6 p-6">
       <h1 className="text-2xl tracking-tight">Add Batch</h1>
       <BatchForm
         courses={activeCourses.map((course) => ({

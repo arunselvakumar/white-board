@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@repo/db";
 
 import { CourseNotFoundError } from "../application/not-found-error";
+import { DomainError } from "../domain/errors";
 import type { Course } from "../domain/course";
 import type { CourseId } from "../domain/course-id";
 import type {
@@ -17,7 +18,21 @@ export class PrismaCourseRepository implements CourseRepository {
   async save(course: Course): Promise<void> {
     const mutable = {
       name: course.name.value,
-      duration: course.duration.value,
+      durationKind: course.duration.value.kind,
+      durationValue:
+        course.duration.value.kind === "fixed"
+          ? course.duration.value.value
+          : null,
+      durationUnit:
+        course.duration.value.kind === "fixed"
+          ? course.duration.value.unit
+          : null,
+      code: course.details.value.code,
+      category: course.details.value.category,
+      totalLearningHours: course.details.value.totalLearningHours,
+      eligibility: course.details.value.eligibility,
+      learningOutcomes: course.details.value.learningOutcomes,
+      syllabusOutline: course.details.value.syllabusOutline,
       description: course.description?.value ?? null,
       defaultFeeAmountPaise: course.defaultFeeAmount.value,
       archivedAt: course.archivedAt,
@@ -27,10 +42,15 @@ export class PrismaCourseRepository implements CourseRepository {
       deletedByUserId: course.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.course.updateMany({
-      where: { id: course.id.value, deletedAt: null },
-      data: mutable,
-    });
+    let updated;
+    try {
+      updated = await this.db.course.updateMany({
+        where: { id: course.id.value, deletedAt: null },
+        data: mutable,
+      });
+    } catch (error) {
+      throw mapCourseWriteError(error);
+    }
     if (updated.count > 0) {
       return;
     }
@@ -54,7 +74,7 @@ export class PrismaCourseRepository implements CourseRepository {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new CourseNotFoundError();
+        throw mapCourseWriteError(error);
       }
       throw error;
     }
@@ -108,6 +128,19 @@ export class PrismaCourseRepository implements CourseRepository {
       hasMore,
     };
   }
+}
+
+function mapCourseWriteError(error: unknown): Error {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return new DomainError(
+      "COURSE_CODE_IN_USE",
+      "Course code is already in use in this Workspace.",
+    );
+  }
+  return error instanceof Error ? error : new Error("Could not save Course.");
 }
 
 function cursorWhere(

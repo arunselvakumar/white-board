@@ -2,6 +2,7 @@ import type { StudentRecord } from "@repo/db";
 
 import { EmailAddress } from "../domain/email-address";
 import { Phone } from "../domain/phone";
+import { studentDetailsFromStored } from "../domain/student-details";
 import {
   Student,
   studentAddress,
@@ -27,6 +28,10 @@ export function toDomainStudent(row: StudentRecord): Student {
     idProofNote: studentIdProofNote(row.idProofNote),
     guardianName: studentGuardianName(row.guardianName),
     guardianPhone: Phone.createOptional(row.guardianPhone),
+    details: studentDetailsFromStored(row.profileDetails, {
+      guardianName: row.guardianName,
+      guardianPhone: row.guardianPhone,
+    }),
     droppedAt: row.droppedAt,
     droppedByUserId:
       row.droppedByUserId == null ? null : UserId.create(row.droppedByUserId),

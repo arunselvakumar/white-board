@@ -1,4 +1,5 @@
 import type { Student } from "../domain/student";
+import type { StudentDetails } from "../domain/student-details";
 import type { EnrollmentReadModel } from "./enrollment-read-model";
 
 export type StudentReadModel = {
@@ -11,6 +12,7 @@ export type StudentReadModel = {
   idProofNote: string | null;
   guardianName: string | null;
   guardianPhone: string | null;
+  details: StudentDetails;
   droppedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -32,6 +34,7 @@ export function toStudentReadModel(
     idProofNote: student.idProofNote?.value ?? null,
     guardianName: student.guardianName?.value ?? null,
     guardianPhone: student.guardianPhone?.value ?? null,
+    details: student.details,
     droppedAt: student.droppedAt,
     createdAt: student.createdAt,
     updatedAt: student.updatedAt,

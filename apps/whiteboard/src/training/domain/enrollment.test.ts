@@ -7,6 +7,7 @@ import { Capacity } from "./capacity";
 import { ClassMode } from "./class-mode";
 import { Course } from "./course";
 import { CourseDuration } from "./course-duration";
+import { CourseDetails } from "./course-details";
 import { CourseId } from "./course-id";
 import { CourseName } from "./course-name";
 import { DomainError } from "./errors";
@@ -41,7 +42,12 @@ function createCourse() {
     workspaceId: WorkspaceId.create("org_1"),
     createdByUserId: UserId.create("user_1"),
     name: CourseName.create("DCA"),
-    duration: CourseDuration.create("3 months"),
+    duration: CourseDuration.create({
+      kind: "fixed",
+      value: 3,
+      unit: "months",
+    }),
+    details: CourseDetails.create({}),
     description: null,
     defaultFeeAmount: Paise.create(500000),
     now: NOW,
@@ -77,12 +83,14 @@ function createStudent() {
   });
 }
 
-function enroll(overrides: Partial<{
-  timingSource: TimingSource;
-  studentTimings: WeeklyTimings | null;
-  classModeOverride: ClassMode | null;
-  batchId: string;
-}> = {}) {
+function enroll(
+  overrides: Partial<{
+    timingSource: TimingSource;
+    studentTimings: WeeklyTimings | null;
+    classModeOverride: ClassMode | null;
+    batchId: string;
+  }> = {},
+) {
   return Enrollment.create({
     id: EnrollmentId.create(ENROLLMENT_ID),
     workspaceId: WorkspaceId.create("org_1"),
@@ -103,7 +111,9 @@ describe("Enrollment", () => {
     const batch = createBatch();
     const enrollment = enroll();
     expect(enrollment.effectiveClassMode(batch).value).toBe("offline");
-    expect(enrollment.effectiveTimings(batch).slots[0]?.startTime).toBe("09:00");
+    expect(enrollment.effectiveTimings(batch).slots[0]?.startTime).toBe(
+      "09:00",
+    );
     expect(enrollment.timingSource.value).toBe("batch");
     expect(enrollment.feePlan.amount.value).toBe(500000);
   });
@@ -120,7 +130,9 @@ describe("Enrollment", () => {
     const enrollment = enroll();
     enrollment.setTimings(TimingSource.create("student"), sundayEvening, NOW);
     expect(enrollment.timingSource.value).toBe("student");
-    expect(enrollment.effectiveTimings(batch).slots[0]?.startTime).toBe("17:00");
+    expect(enrollment.effectiveTimings(batch).slots[0]?.startTime).toBe(
+      "17:00",
+    );
   });
 
   it("requires Student-specific Timings when source is student", () => {
