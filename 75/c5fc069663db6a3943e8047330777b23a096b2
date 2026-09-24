@@ -1,0 +1,179 @@
+apps/whiteboard/app/(app)/students/[id]/edit/page.tsx
+  s_7405b86e0ca473::t_40aeaefbf07349 1-14
+apps/whiteboard/app/api/batches/batches.http.test.ts
+  s_e00ad5ca1a7a94::t_234cc66936c1a2 84,118,121-123,138-140,159,176,191,197-198,214,229,267
+apps/whiteboard/app/api/courses/course-response-fields.ts
+  s_e00ad5ca1a7a94::t_e04f162a04c019 6-19
+apps/whiteboard/app/api/courses/course-write-fields.ts
+  s_e00ad5ca1a7a94::t_c603e366f142b1 1-27
+apps/whiteboard/app/api/enrollments/enrollments.http.test.ts
+  s_e00ad5ca1a7a94::t_06e72fab97f181 63,80-84
+apps/whiteboard/app/api/students/students.http.test.ts
+  s_7405b86e0ca473::t_3e8371d460b6cf 32-43,129-208
+apps/whiteboard/components/batches/batch-create-screen.tsx
+  s_e00ad5ca1a7a94::t_1950b4e8da1d5a 26
+apps/whiteboard/components/batches/batch-edit-screen.tsx
+  s_e00ad5ca1a7a94::t_489c74249a78ce 51
+apps/whiteboard/components/batches/batches.stories.tsx
+  s_e00ad5ca1a7a94::t_1384607170af29 85,196
+apps/whiteboard/components/courses/course-catalog.tsx
+  s_e00ad5ca1a7a94::t_e3e2204dea3e82 96-105
+apps/whiteboard/components/courses/course-create-screen.tsx
+  s_e00ad5ca1a7a94::t_49f0132c28555e 21
+apps/whiteboard/components/courses/course-edit-screen.tsx
+  s_e00ad5ca1a7a94::t_a899eb47d648fe 26
+apps/whiteboard/components/courses/courses.stories.tsx
+  s_e00ad5ca1a7a94::t_4ad0ca238a3e1f 7-10,17,21-27,74,81,108-113,176,191,202-204,222-237,241-244,250-287
+apps/whiteboard/components/enrollments/enrollment-create-screen.tsx
+  s_e00ad5ca1a7a94::t_01f3f9ecfe44bb 71
+apps/whiteboard/components/enrollments/enrollment-detail-screen.tsx
+  s_e00ad5ca1a7a94::t_a6546d11791fef 137
+apps/whiteboard/components/enrollments/enrollments.stories.tsx
+  s_e00ad5ca1a7a94::t_c9c2bfb0b17ebc 43,76,102,133,159
+apps/whiteboard/components/onboarding/create-workspace-form.tsx
+  s_e00ad5ca1a7a94::t_9d72f3708bcb3e 5-13,21,23-26,38,55-73,184-185,187,192-193,195-196,198-201,206-208,210-258,262
+apps/whiteboard/components/students/student-catalog.tsx
+  s_7405b86e0ca473::t_b6c4bb400e491e 22-23,37-40,44,49-52,56,81-144,176-182,188-190,211-212,223-224
+apps/whiteboard/components/students/student-edit-screen.tsx
+  s_e00ad5ca1a7a94::t_31f7fbde86261d 3-7,24,38,44,49,55
+apps/whiteboard/components/students/student-form.tsx
+  s_e00ad5ca1a7a94::t_d9ad5f0fb3d86d 4-11,13,15-19,22-28,34-40,42-57,59-65,67-108,113-169,172,178,180-181,185-186,188-215,223-241,243-246,248-249,251-263,268-348,351,354,357-358,360,364,367,371-379,381-402,407,409,421-709
+apps/whiteboard/components/students/student-profile-view.tsx
+  s_e00ad5ca1a7a94::t_a655e57dd57f85 1-320
+apps/whiteboard/components/students/students.stories.tsx
+  s_e00ad5ca1a7a94::t_32ce88f59d16e3 8,10-14,19-42,56,97,110,127-141,193-235,238,286-292,298-350
+apps/whiteboard/src/training/application/create-course.handler.ts
+  s_e00ad5ca1a7a94::t_8c07ab75cd050c 3,12,29
+apps/whiteboard/src/training/application/update-course.handler.ts
+  s_e00ad5ca1a7a94::t_d278d8ebb5a980 2,9,31
+apps/whiteboard/src/training/domain/batch.test.ts
+  s_e00ad5ca1a7a94::t_4499c7e64a5e2b 10,33-38
+apps/whiteboard/src/training/domain/course-duration.ts
+  s_e00ad5ca1a7a94::t_d17c5b8ecbcbc8 3-5,7-8,10-12,14-19,21-22,25-29
+apps/whiteboard/src/training/domain/course.test.ts
+  s_e00ad5ca1a7a94::t_ceb11db8e8ed29 5,23-31,38-77,118-122,141-146
+apps/whiteboard/src/training/domain/enrollment.test.ts
+  s_e00ad5ca1a7a94::t_d2ec3717bef8d7 10,45-50,86-93,114-116,133-135
+apps/whiteboard/src/training/domain/student-details.ts
+  s_7405b86e0ca473::t_4ac05e81aa7fc1 1-217
+apps/whiteboard/src/training/domain/student.test.ts
+  s_7405b86e0ca473::t_7bb7847e12b3ca 48-95
+apps/whiteboard/src/training/domain/student.ts
+  s_7405b86e0ca473::t_f50013d3350330 8-12,28,46,49-51,60-62,174-177,255-268,276-282
+apps/whiteboard/src/training/infrastructure/prisma-batch-repository.http.test.ts
+  s_e00ad5ca1a7a94::t_f12d50225a7863 13,36-41
+apps/whiteboard/src/training/infrastructure/prisma-course-repository.http.test.ts
+  s_e00ad5ca1a7a94::t_484b3579016b61 9,30-35,47,49,60-65
+apps/whiteboard/src/training/infrastructure/prisma-course-repository.ts
+  s_e00ad5ca1a7a94::t_6d582edfae0805 4,21-35,45-53,77,133-145
+apps/whiteboard/src/training/infrastructure/prisma-student-mapper.ts
+  s_7405b86e0ca473::t_3ed9bbe70c220c 5,31-34
+apps/whiteboard/src/training/infrastructure/prisma-student-repository.ts
+  s_7405b86e0ca473::t_5d40e7bb058467 27,82
+CONTEXT.md
+  s_e00ad5ca1a7a94::t_770ea45135889e 82,86
+apps/whiteboard/app/(app)/page.stories.tsx
+  s_7405b86e0ca473::t_9734dccc3585a4 77
+apps/whiteboard/app/(app)/students/[id]/page.tsx
+  s_7405b86e0ca473::t_945ee27391ca08 3,5,7,13
+apps/whiteboard/app/api/_lib/map-error.ts
+  s_e00ad5ca1a7a94::t_9507315801965c 14
+apps/whiteboard/app/api/courses/[id]/update/route.ts
+  s_e00ad5ca1a7a94::t_bf186af8084165 34-39
+apps/whiteboard/app/api/courses/courses.http.test.ts
+  s_e00ad5ca1a7a94::t_94c3bd4b1f92e7 28-35,70-76,129,147,155-180,187-197,207-210,219,227-233,243-244
+apps/whiteboard/app/api/courses/create-course-request-model.ts
+  s_e00ad5ca1a7a94::t_f4def0300cd00d 2,4
+apps/whiteboard/app/api/courses/map-course-response.ts
+  s_e00ad5ca1a7a94::t_8cc40ad976f07e 8-13
+apps/whiteboard/app/api/courses/route.ts
+  s_e00ad5ca1a7a94::t_d7816b926035b4 26-31
+apps/whiteboard/app/api/courses/update-course-request-model.ts
+  s_e00ad5ca1a7a94::t_eb75496c32260c 2,4
+apps/whiteboard/app/api/students/create-student-request-model.ts
+  s_7405b86e0ca473::t_ec5d47351127f0 2,5
+apps/whiteboard/app/api/students/map-student-response.ts
+  s_7405b86e0ca473::t_5f35c3aee8b4cd 28
+apps/whiteboard/app/api/students/student-details-model.ts
+  s_7405b86e0ca473::t_ace20b2f755334 1-78
+apps/whiteboard/app/api/students/student-response-fields.ts
+  s_7405b86e0ca473::t_34abc68fd8f15a 2,14
+apps/whiteboard/app/api/students/update-student-profile-request-model.ts
+  s_7405b86e0ca473::t_a1f5518c790c93 2,5
+apps/whiteboard/components/courses/course-form.tsx
+  s_e00ad5ca1a7a94::t_412f2a6eb7c825 4,9-15,24-40,43-53,57-105,120-133,143,145-162,180,188-196,202,206,220-348,350-380,382-398,404
+apps/whiteboard/components/enrollments/receipt-screen.tsx
+  s_e00ad5ca1a7a94::t_6cf9e47646d7f7 30
+apps/whiteboard/components/onboarding/create-workspace-form.stories.tsx
+  s_d68fda267a4ae8::t_1477e0710b3344 2,28-33,35-38,77-78,80-83,85,92-94
+apps/whiteboard/components/students/student-create-screen.tsx
+  s_7405b86e0ca473::t_35afe41fa211eb 8-12,19-28,33-35,41-49
+apps/whiteboard/components/students/student-form-preview.stories.tsx
+  s_7405b86e0ca473::t_40b4cf4b010762 1-71
+apps/whiteboard/components/students/students-screen.tsx
+  s_7405b86e0ca473::t_10f82778c08b1e 30-40,54-59,65,68-70
+apps/whiteboard/lib/institution-type.ts
+  s_d68fda267a4ae8::t_9e55dacdd3a08b 35
+apps/whiteboard/src/queries/courses.ts
+  s_e00ad5ca1a7a94::t_947bf1a81db138 8-14,32-38,43-46
+apps/whiteboard/src/queries/students.ts
+  s_7405b86e0ca473::t_35a1d5c8e3e51a 16-52,63,87,105-107
+apps/whiteboard/src/training/application/course-read-model.ts
+  s_e00ad5ca1a7a94::t_9a329ebb8222db 2-3,5,8,22
+apps/whiteboard/src/training/application/create-course.command.ts
+  s_e00ad5ca1a7a94::t_5be8eb7bf20e06 1-4,6
+apps/whiteboard/src/training/application/create-student.command.ts
+  s_7405b86e0ca473::t_26ade2c743f3be 1-3
+apps/whiteboard/src/training/application/student-read-model.ts
+  s_7405b86e0ca473::t_9a2ac87810c98c 2,15,37
+apps/whiteboard/src/training/application/update-course.command.ts
+  s_e00ad5ca1a7a94::t_da8b1c5eec9589 1-4,7
+apps/whiteboard/src/training/application/update-student-profile.command.ts
+  s_7405b86e0ca473::t_163645ea518350 1-3
+apps/whiteboard/src/training/domain/course-details.ts
+  s_e00ad5ca1a7a94::t_f696eafef73da4 1-91
+apps/whiteboard/src/training/domain/course.ts
+  s_e00ad5ca1a7a94::t_b59565a114644a 2,19,41,52,98-101,134,143
+apps/whiteboard/src/training/infrastructure/prisma-course-mapper.ts
+  s_e00ad5ca1a7a94::t_fef3f299982a53 5,19-27,32,40-53
+docs/prd/training-institute-p0.md
+  s_e00ad5ca1a7a94::t_06ff71d4234150 78,83,119,121
+packages/db/prisma/migrations/20260924130000_student_profile_details/migration.sql
+  s_7405b86e0ca473::t_28619a552d46b9 1-15
+packages/db/prisma/migrations/20260924150000_course_catalog_details/migration.sql
+  s_e00ad5ca1a7a94::t_a773feccc52fad 1-23
+packages/db/prisma/schema.prisma
+  s_e00ad5ca1a7a94::t_a40e126274e165 42-56,62-70,127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "75c5fc069663db6a3943e8047330777b23a096b2",
+  "prompts": {},
+  "sessions": {
+    "s_7405b86e0ca473": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d229-1062-7a02-a47d-111235dda3a4",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d68fda267a4ae8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d20f-0a1f-71e2-8950-30b504b05d50",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_e00ad5ca1a7a94": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d2a7-064c-7482-b36e-4921167ea519",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
