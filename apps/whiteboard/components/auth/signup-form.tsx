@@ -20,6 +20,7 @@ import { LoadingScreen } from "@/components/auth/loading-screen";
 import { PasswordField } from "@/components/auth/password-field";
 import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
 import { navigateAfterAuth } from "@/lib/navigate-after-auth";
+import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 const detailsSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -54,7 +55,7 @@ export function SignupForm() {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.replace("/");
+      router.replace(workspaceEntryPath("/"));
     }
   }, [isSignedIn, router]);
 
@@ -71,7 +72,7 @@ export function SignupForm() {
     }
     if (signUp.status === "complete") {
       await signUp.finalize({
-        navigate: navigateAfterAuth(router, "/"),
+        navigate: navigateAfterAuth(router, workspaceEntryPath("/")),
       });
       return;
     }
@@ -93,7 +94,7 @@ export function SignupForm() {
     }
     if (signUp.status === "complete") {
       await signUp.finalize({
-        navigate: navigateAfterAuth(router, "/"),
+        navigate: navigateAfterAuth(router, workspaceEntryPath("/")),
       });
     }
   };
@@ -108,7 +109,7 @@ export function SignupForm() {
   const continueWithGoogle = () => {
     void signUp.sso({
       strategy: "oauth_google",
-      redirectUrl: "/",
+      redirectUrl: workspaceEntryPath("/"),
       redirectCallbackUrl: "/sso-callback",
     });
   };

@@ -75,11 +75,11 @@ The Institution Type Whiteboard sells today. A Workspace of this type is a compu
 _Avoid_: academy (as the type name), coaching (as the type name), institute ERP
 
 **Student**:
-A learner at the Training Institute. A Workspace-scoped record, not a User and not a Clerk identity in P0. Creating a Student is admitting them. Enquiry pipeline is P1.
+A learner at the Training Institute. A Workspace-scoped record, distinct from a Clerk User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `org:student`. Enquiry pipeline is separate.
 _Avoid_: pupil, scholar, user, account, child (as the entity name)
 
 **Guardian**:
-An additional contact named on a Student, such as a grandparent. A Student may have multiple Guardians, each with a relationship and contact details on the Student record. Father and mother details are also stored on the Student. None of these contacts is a User in P0.
+An additional contact named on a Student, such as a grandparent. A Student may have multiple Guardians, each with a relationship and contact details on the Student record. Father and mother details are also stored on the Student. A father, mother, or Guardian with an email address is invited to the Workspace with role `org:parent`.
 _Avoid_: parent as a login, family account
 
 **Course**:
@@ -210,7 +210,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 > **Domain expert:** "No. Workspace Owner is the creator. Clerk already makes them the org admin. Don't invent a second slug."
 
 > **Dev:** "Is a Student a User we create in Clerk?"
-> **Domain expert:** "No. A Student is a Workspace record. They do not sign in in P0. Users are staff who run the institute."
+> **Domain expert:** "A Student remains a Workspace record. If they have an email address, invite them as a User with the Student role. Do not replace the Student record with a Clerk User."
 
 > **Dev:** "Can Course and Batch be the same thing?"
 > **Domain expert:** "No. Course is what is taught. Batch is when, how, and with whom. DCA is a Course; DCA Weekday 9–11 Offline is a Batch."

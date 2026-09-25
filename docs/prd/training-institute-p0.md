@@ -45,6 +45,8 @@ related:
 
 # P0 — Replace the register
 
+> Historical P0 scope. Student and family Workspace invitations, and Owner-only access to the register, supersede the P0 identity and staff-access decisions below. See [ADR-0027](../adr/0027-student-and-parent-workspace-invitations.md).
+
 Whiteboard's first Training Institute slice. School, Preschool, College, University, and Other stay **Coming soon**. Language in this document matches [CONTEXT.md](../../CONTEXT.md). Tickets are [tasks.md](./tasks.md).
 
 ## Problem Statement

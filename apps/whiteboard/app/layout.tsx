@@ -45,8 +45,8 @@ export default function RootLayout({
           appearance={{ theme: shadcn }}
           signInUrl="/login"
           signUpUrl="/signup"
-          signInFallbackRedirectUrl="/"
-          signUpFallbackRedirectUrl="/"
+          signInFallbackRedirectUrl="/select-workspace"
+          signUpFallbackRedirectUrl="/select-workspace"
         >
           <ThemeProvider>
             <TooltipProvider>

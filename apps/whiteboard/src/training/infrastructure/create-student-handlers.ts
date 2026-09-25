@@ -5,8 +5,12 @@ import { DropStudentHandler } from "../application/drop-student.handler";
 import type { EventDispatcher } from "../application/event-dispatcher";
 import { GetStudentHandler } from "../application/get-student.handler";
 import { ListStudentsHandler } from "../application/list-students.handler";
+import { InviteStudentOnCreated } from "../application/invite-student-on-created";
 import { UpdateStudentProfileHandler } from "../application/update-student-profile.handler";
+import { StudentId } from "../domain/student-id";
+import { WorkspaceId } from "../domain/workspace-id";
 import { InProcessEventDispatcher } from "./in-process-event-dispatcher";
+import { ClerkStudentInvitationSender } from "./clerk-student-invitation-sender";
 import { PrismaEnrollmentRepository } from "./prisma-enrollment-repository";
 import { PrismaFeePaymentRepository } from "./prisma-fee-payment-repository";
 import { PrismaStudentRepository } from "./prisma-student-repository";
@@ -27,7 +31,19 @@ export function createStudentHandlers(deps?: {
   const repository = new PrismaStudentRepository(db);
   const enrollments = new PrismaEnrollmentRepository(db);
   const payments = new PrismaFeePaymentRepository(db);
-  const events = deps?.events ?? new InProcessEventDispatcher();
+  const events = deps?.events ?? new InProcessEventDispatcher([
+    new InviteStudentOnCreated(async (studentId, workspaceId) => {
+      const student = await repository.findByIdInWorkspace(
+        StudentId.create(studentId),
+        WorkspaceId.create(workspaceId),
+      );
+      return student == null ? null : {
+        email: student.email?.value ?? null,
+        details: student.details,
+        createdByUserId: student.createdByUserId.value,
+      };
+    }, new ClerkStudentInvitationSender()),
+  ]);
   return {
     create: new CreateStudentHandler(repository, events),
     updateProfile: new UpdateStudentProfileHandler(repository, events),
