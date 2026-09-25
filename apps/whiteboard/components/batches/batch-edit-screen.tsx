@@ -1,6 +1,10 @@
 "use client";
 
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -13,10 +17,8 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
-import {
-  BatchForm,
-  batchToFormValues,
-} from "@/components/batches/batch-form";
+import { PageHeader } from "@/components/app-shell/page-header";
+import { BatchForm, batchToFormValues } from "@/components/batches/batch-form";
 import { batchQueries, updateBatchSchedule } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
 import { enrollmentQueries } from "@/src/queries/enrollments";
@@ -49,19 +51,23 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
 
   return (
     <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl tracking-tight">Edit Batch</h1>
-        {batch.closedAt == null ? (
-          <Button
-            type="button"
-            onClick={() => {
-              router.push(`/batches/${batchId}/enroll`);
-            }}
-          >
-            Enroll Student
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        back={{ href: "/batches", label: "Batches" }}
+        title={batch.name}
+        meta={`${course?.name ?? "Course"} · ${batch.closedAt == null ? "Open" : "Closed"}`}
+        actions={
+          batch.closedAt == null ? (
+            <Button
+              type="button"
+              onClick={() => {
+                router.push(`/batches/${batchId}/enroll`);
+              }}
+            >
+              Enroll Student
+            </Button>
+          ) : null
+        }
+      />
       <section className="space-y-3">
         <h2 className="text-lg tracking-tight">Enrolled Students</h2>
         <p className="text-muted-foreground text-sm">
@@ -109,9 +115,7 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
       </section>
       <BatchForm
         lockCourse
-        courses={
-          course == null ? [] : [{ id: course.id, name: course.name }]
-        }
+        courses={course == null ? [] : [{ id: course.id, name: course.name }]}
         defaultValues={batchToFormValues(batch)}
         submitLabel="Save Batch"
         onCancel={() => {

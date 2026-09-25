@@ -100,3 +100,16 @@ export const Loading: Story = {
     ).toBeInTheDocument();
   },
 };
+
+export const MoreWorkspacesAvailable: Story = {
+  beforeEach() {
+    clerkMocks.memberships = workspaces;
+    clerkMocks.membershipHasNextPage = true;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Show more Workspaces" }),
+    );
+    await expect(clerkMocks.fetchNextMemberships).toHaveBeenCalled();
+  },
+};

@@ -46,12 +46,13 @@ export async function expectAppShell(
     scope = within(dialog);
   }
 
+  const mainNav = within(scope.getByRole("navigation", { name: "Main" }));
   for (const item of APP_NAV) {
-    const link = scope.getByRole("link", { name: item.label });
+    const link = mainNav.getByRole("link", { name: item.label });
     await expect(link).toHaveAttribute("href", item.href);
   }
 
   await expect(
-    scope.getByRole("link", { name: current.label }),
+    mainNav.getByRole("link", { name: current.label }),
   ).toHaveAttribute("aria-current", "page");
 }

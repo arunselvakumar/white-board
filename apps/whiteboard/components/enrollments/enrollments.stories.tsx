@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
 import { EnrollmentForm } from "@/components/enrollments/enrollment-form";
@@ -40,22 +41,27 @@ export const InheritTimings: Story = {
     return (
       <WorkspaceGate>
         <AppShell>
-          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-            <h1 className="text-2xl tracking-tight">Enroll Student</h1>
-            {saved ? (
-              <p>Anita Sharma is in DCA Weekday 9–11 Offline.</p>
-            ) : (
-              <EnrollmentForm
-                students={STUDENTS}
-                batches={BATCHES}
-                defaultValues={{ studentId: STUDENT_ID, batchId: BATCH_ID }}
-                submitLabel="Save Enrollment"
-                onSubmit={() => {
-                  setSaved(true);
-                  return Promise.resolve();
-                }}
+          <div className="w-full p-6">
+            <div className="flex max-w-4xl flex-col gap-6">
+              <PageHeader
+                back={{ label: "Students", onClick: () => undefined }}
+                title="Enroll Student"
               />
-            )}
+              {saved ? (
+                <p>Anita Sharma is in DCA Weekday 9–11 Offline.</p>
+              ) : (
+                <EnrollmentForm
+                  students={STUDENTS}
+                  batches={BATCHES}
+                  defaultValues={{ studentId: STUDENT_ID, batchId: BATCH_ID }}
+                  submitLabel="Save Enrollment"
+                  onSubmit={() => {
+                    setSaved(true);
+                    return Promise.resolve();
+                  }}
+                />
+              )}
+            </div>
           </div>
         </AppShell>
       </WorkspaceGate>

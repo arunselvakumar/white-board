@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { BatchCatalog } from "@/components/batches/batch-catalog";
 import { BatchForm } from "@/components/batches/batch-form";
@@ -82,77 +83,95 @@ function BatchWorkspace({
             }}
           />
         ) : (
-          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-            <h1 className="text-2xl tracking-tight">
-              {view === "create" ? "Add Batch" : "Edit Batch"}
-            </h1>
-            <BatchForm
-              lockCourse={view === "edit"}
-              courses={courses}
-              defaultValues={
-                view === "edit" && editing != null
-                  ? {
-                      courseId: editing.courseId,
-                      name: editing.name,
-                      classMode: editing.classMode,
-                      capacity: String(editing.capacity),
-                      room: editing.room ?? "",
-                      joinUrl: editing.joinUrl ?? "",
-                      timings: editing.timings.map((slot) => ({
-                        daysOfWeek: [...slot.daysOfWeek],
-                        startTime: slot.startTime,
-                        endTime: slot.endTime,
-                      })),
-                    }
-                  : { courseId: courses[0]?.id ?? "" }
-              }
-              submitLabel="Save Batch"
-              onCancel={() => {
-                setView("list");
-                setEditingId(null);
-              }}
-              onSubmit={(input: BatchWriteInput) => {
-                if (view === "edit" && editingId != null) {
-                  setBatches((current) =>
-                    current.map((item) =>
-                      item.id === editingId
-                        ? {
-                            ...item,
-                            ...input,
-                            classMode: input.classMode,
-                            room: input.room ?? null,
-                            joinUrl: input.joinUrl ?? null,
-                            updatedAt: NOW,
-                          }
-                        : item,
-                    ),
-                  );
-                } else {
-                  setBatches((current) => [
-                    {
-                      id: crypto.randomUUID(),
-                      courseId: input.courseId ?? COURSE_ID,
-                      name: input.name,
-                      classMode: input.classMode,
-                      capacity: input.capacity,
-                      room: input.room ?? null,
-                      joinUrl: input.joinUrl ?? null,
-                      timings: input.timings,
-                      timezone: "Asia/Kolkata",
-                      closedAt: null,
-                      enrolledCount: 0,
-                      createdAt: NOW,
-                      updatedAt: NOW,
-                      createdByUserId: "user_1",
-                    },
-                    ...current,
-                  ]);
+          <div className="w-full p-6">
+            <div
+              className={`flex flex-col gap-6 ${view === "create" ? "max-w-4xl" : "max-w-lg"}`}
+            >
+              <PageHeader
+                back={{
+                  label: "Batches",
+                  onClick: () => {
+                    setView("list");
+                    setEditingId(null);
+                  },
+                }}
+                title={
+                  view === "create" ? "Add Batch" : (editing?.name ?? "Batch")
                 }
-                setView("list");
-                setEditingId(null);
-                return Promise.resolve();
-              }}
-            />
+                meta={
+                  view === "edit" && editing != null
+                    ? `${courses.find((course) => course.id === editing.courseId)?.name ?? "Course"} · ${editing.closedAt == null ? "Open" : "Closed"}`
+                    : undefined
+                }
+              />
+              <BatchForm
+                lockCourse={view === "edit"}
+                courses={courses}
+                defaultValues={
+                  view === "edit" && editing != null
+                    ? {
+                        courseId: editing.courseId,
+                        name: editing.name,
+                        classMode: editing.classMode,
+                        capacity: String(editing.capacity),
+                        room: editing.room ?? "",
+                        joinUrl: editing.joinUrl ?? "",
+                        timings: editing.timings.map((slot) => ({
+                          daysOfWeek: [...slot.daysOfWeek],
+                          startTime: slot.startTime,
+                          endTime: slot.endTime,
+                        })),
+                      }
+                    : { courseId: courses[0]?.id ?? "" }
+                }
+                submitLabel="Save Batch"
+                onCancel={() => {
+                  setView("list");
+                  setEditingId(null);
+                }}
+                onSubmit={(input: BatchWriteInput) => {
+                  if (view === "edit" && editingId != null) {
+                    setBatches((current) =>
+                      current.map((item) =>
+                        item.id === editingId
+                          ? {
+                              ...item,
+                              ...input,
+                              classMode: input.classMode,
+                              room: input.room ?? null,
+                              joinUrl: input.joinUrl ?? null,
+                              updatedAt: NOW,
+                            }
+                          : item,
+                      ),
+                    );
+                  } else {
+                    setBatches((current) => [
+                      {
+                        id: crypto.randomUUID(),
+                        courseId: input.courseId ?? COURSE_ID,
+                        name: input.name,
+                        classMode: input.classMode,
+                        capacity: input.capacity,
+                        room: input.room ?? null,
+                        joinUrl: input.joinUrl ?? null,
+                        timings: input.timings,
+                        timezone: "Asia/Kolkata",
+                        closedAt: null,
+                        enrolledCount: 0,
+                        createdAt: NOW,
+                        updatedAt: NOW,
+                        createdByUserId: "user_1",
+                      },
+                      ...current,
+                    ]);
+                  }
+                  setView("list");
+                  setEditingId(null);
+                  return Promise.resolve();
+                }}
+              />
+            </div>
           </div>
         )}
       </AppShell>
@@ -188,6 +207,61 @@ export const Empty: Story = {
     await expect(
       canvas.getByText("Open the first Batch this centre runs."),
     ).toBeVisible();
+  },
+};
+
+function PaginatedBatches() {
+  const [page, setPage] = useState(1);
+  const batches = Array.from({ length: 13 }, (_, index) =>
+    sampleBatch({
+      id: `batch-${index}`,
+      name: `Batch ${index + 1}`,
+      enrolledCount: index,
+    }),
+  );
+  return (
+    <WorkspaceGate>
+      <AppShell>
+        <BatchCatalog
+          batches={batches.slice((page - 1) * 12, page * 12)}
+          courses={COURSES}
+          courseId="all"
+          onCourseIdChange={() => undefined}
+          pagination={{
+            total: batches.length,
+            page,
+            pageSize: 12,
+            hasNext: page < 2,
+            hasPrevious: page > 1,
+            onNext: () => {
+              setPage(2);
+            },
+            onPrevious: () => {
+              setPage(1);
+            },
+          }}
+          onAdd={() => undefined}
+          onEdit={() => undefined}
+          onClose={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  );
+}
+
+export const Pagination: Story = {
+  render: () => <PaginatedBatches />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("Showing 1–12 of 13 Batches")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await expect(canvas.getByText("Showing 13–13 of 13 Batches")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Batch 13" }),
+    ).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Previous page" }),
+    );
+    await expect(canvas.getByText("Showing 1–12 of 13 Batches")).toBeVisible();
   },
 };
 
@@ -241,7 +315,9 @@ export const Create: Story = {
     await userEvent.click(canvas.getByRole("checkbox", { name: "Thu" }));
     await userEvent.click(canvas.getByRole("checkbox", { name: "Fri" }));
     await userEvent.click(canvas.getByRole("button", { name: "Save Batch" }));
-    await expect(canvas.getByRole("heading", { name: "Batches" })).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { name: "Batches" }),
+    ).toBeVisible();
     await expect(canvas.getByText("DCA Weekday 9–11 Offline")).toBeVisible();
     await expect(canvas.getByText("Offline")).toBeVisible();
   },
@@ -259,7 +335,9 @@ export const Close: Story = {
     if (!(dialog instanceof HTMLElement)) {
       throw new Error("Close dialog missing");
     }
-    await userEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Close" }),
+    );
     await expect(await canvas.findByText("Closed")).toBeVisible();
   },
 };

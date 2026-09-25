@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { StudentCatalog } from "@/components/students/student-catalog";
@@ -107,52 +107,55 @@ function StudentWorkspace({
             }}
           />
         ) : (
-          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-            <h1 className="text-2xl tracking-tight">Add Student</h1>
-            <StudentForm
-              submitLabel="Save Student"
-              onCancel={() => {
+          <StudentForm
+            back={{
+              label: "Students",
+              onClick: () => {
                 setView("list");
-              }}
-              onSubmit={(input: StudentWriteInput) => {
-                setStudents((current) => [
-                  {
-                    id: crypto.randomUUID(),
-                    email: input.email ?? null,
-                    photoUrl: input.photoUrl ?? null,
-                    address: input.address ?? null,
-                    idProofNote: input.idProofNote ?? null,
-                    guardianName: input.guardianName ?? null,
-                    guardianPhone: input.guardianPhone ?? null,
-                    details: {
-                      ...emptyDetails,
-                      salutation: input.salutation ?? null,
-                      gender: input.gender ?? null,
-                      dateOfBirth: input.dateOfBirth ?? null,
-                      educationStatus: input.educationStatus ?? null,
-                      currentInstitution: input.currentInstitution ?? null,
-                      currentGrade: input.currentGrade ?? null,
-                      schoolBoard: input.schoolBoard ?? null,
-                      highestQualification: input.highestQualification ?? null,
-                      father: input.father ?? emptyParent,
-                      mother: input.mother ?? emptyParent,
-                      guardians: input.guardians ?? [],
-                      emergencyPhone: input.emergencyPhone ?? null,
-                    },
-                    droppedAt: null,
-                    createdAt: NOW,
-                    updatedAt: NOW,
-                    createdByUserId: "user_1",
-                    name: input.name,
-                    phone: input.phone,
+              },
+            }}
+            submitLabel="Save Student"
+            onCancel={() => {
+              setView("list");
+            }}
+            onSubmit={(input: StudentWriteInput) => {
+              setStudents((current) => [
+                {
+                  id: crypto.randomUUID(),
+                  email: input.email ?? null,
+                  photoUrl: input.photoUrl ?? null,
+                  address: input.address ?? null,
+                  idProofNote: input.idProofNote ?? null,
+                  guardianName: input.guardianName ?? null,
+                  guardianPhone: input.guardianPhone ?? null,
+                  details: {
+                    ...emptyDetails,
+                    salutation: input.salutation ?? null,
+                    gender: input.gender ?? null,
+                    dateOfBirth: input.dateOfBirth ?? null,
+                    educationStatus: input.educationStatus ?? null,
+                    currentInstitution: input.currentInstitution ?? null,
+                    currentGrade: input.currentGrade ?? null,
+                    schoolBoard: input.schoolBoard ?? null,
+                    highestQualification: input.highestQualification ?? null,
+                    father: input.father ?? emptyParent,
+                    mother: input.mother ?? emptyParent,
+                    guardians: input.guardians ?? [],
+                    emergencyPhone: input.emergencyPhone ?? null,
                   },
-                  ...current,
-                ]);
-                setView("list");
-                return Promise.resolve();
-              }}
-            />
-          </div>
+                  droppedAt: null,
+                  createdAt: NOW,
+                  updatedAt: NOW,
+                  createdByUserId: "user_1",
+                  name: input.name,
+                  phone: input.phone,
+                },
+                ...current,
+              ]);
+              setView("list");
+              return Promise.resolve();
+            }}
+          />
         )}
       </AppShell>
     </WorkspaceGate>
@@ -265,12 +268,101 @@ export const Search: Story = {
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
     await expect(canvas.getByText("Rahul")).toBeVisible();
+    const summary = within(
+      canvas.getByRole("region", { name: "Student summary" }),
+    );
+    await expect(summary.getByText("Total Students")).toBeVisible();
+    await expect(canvas.getByText("AS")).toBeVisible();
     await userEvent.type(
       canvas.getByLabelText("Search by name or phone"),
       "9876543210",
     );
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
     await expect(canvas.queryByText("Rahul")).not.toBeInTheDocument();
+  },
+};
+
+function PaginatedStudents() {
+  const [page, setPage] = useState(1);
+  const names = [
+    "Anita Sharma",
+    "Rahul Menon",
+    "Meera Iyer",
+    "Karan Patel",
+    "Nisha Khan",
+    "Dev Rao",
+    "Priya Nair",
+    "Farah Ali",
+    "Kabir Shah",
+    "Sara Fernandes",
+    "Aarav Gupta",
+    "Isha Verma",
+  ];
+  const guardians = [
+    "Ravi Sharma",
+    "Lakshmi Menon",
+    null,
+    "Rakesh Patel",
+    "Samira Khan",
+    "Mohan Rao",
+    "Deepa Nair",
+    "Imran Ali",
+    "Leena Shah",
+    "Maria Fernandes",
+    "Sanjay Gupta",
+    "Kavita Verma",
+  ];
+  const firstPage = Array.from({ length: 12 }, (_, index) =>
+    sampleStudent({
+      id: `student-${index + 1}`,
+      name: names[index] ?? "Student",
+      phone: String(9000000000 + index),
+      guardianName: guardians[index] ?? null,
+      guardianPhone:
+        guardians[index] == null ? null : String(9100000000 + index),
+      droppedAt: index === 3 ? NOW : null,
+    }),
+  );
+  const secondPage = [sampleStudent({ id: "student-13", name: "Rohan Das" })];
+  return (
+    <StudentCatalog
+      students={page === 1 ? firstPage : secondPage}
+      search=""
+      onSearchChange={() => undefined}
+      onAdd={() => undefined}
+      onView={() => undefined}
+      onEdit={() => undefined}
+      onDrop={() => undefined}
+      pagination={{
+        total: 13,
+        page,
+        pageSize: 12,
+        hasNext: page === 1,
+        hasPrevious: page === 2,
+        onNext: () => {
+          setPage(2);
+        },
+        onPrevious: () => {
+          setPage(1);
+        },
+      }}
+    />
+  );
+}
+
+export const Pagination: Story = {
+  render: () => <PaginatedStudents />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("Showing 1–12 of 13 Students")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await expect(canvas.getByText("Rohan Das")).toBeVisible();
+    await expect(
+      canvas.getByText("Showing 13–13 of 13 Students"),
+    ).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Previous page" }),
+    );
+    await expect(canvas.getByText("Anita Sharma")).toBeVisible();
   },
 };
 
@@ -339,6 +431,9 @@ export const View: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("button", { name: "Back to Students" }),
+    ).toBeVisible();
     await expect(
       canvas.getByRole("heading", { name: "Miss Anita Sharma" }),
     ).toBeVisible();

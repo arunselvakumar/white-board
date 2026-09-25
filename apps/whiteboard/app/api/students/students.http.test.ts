@@ -12,14 +12,34 @@ import { POST as updateProfile } from "./[id]/profile/route";
 import { GET as getStudent } from "./[id]/route";
 import { GET as listStudents, POST as createStudent } from "./route";
 
+const mockInvitation = vi.hoisted(() =>
+  vi.fn<
+    (input: {
+      organizationId: string;
+      inviterUserId: string;
+      emailAddress: string;
+      role: string;
+    }) => Promise<void>
+  >(),
+);
+
 vi.mock("@clerk/nextjs/server", () => ({
   auth: vi.fn(),
+  clerkClient: vi.fn(() =>
+    Promise.resolve({
+      organizations: { createOrganizationInvitation: mockInvitation },
+    }),
+  ),
 }));
 
 const mockedAuth = vi.mocked(auth);
 
-function session(userId: string | null, orgId: string | null) {
-  mockedAuth.mockResolvedValue({ userId, orgId } as never);
+function session(
+  userId: string | null,
+  orgId: string | null,
+  orgRole = "org:admin",
+) {
+  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
 }
 
 type StudentJson = {
@@ -76,8 +96,58 @@ describe("student HTTP APIs", () => {
   let orgId: string;
 
   beforeEach(() => {
+    mockInvitation.mockReset();
+    mockInvitation.mockImplementation(() => Promise.resolve());
     orgId = `org_${randomUUID()}`;
     session(userId, orgId);
+  });
+
+  it("invites the Student and family to the Active Workspace with their roles", async () => {
+    const response = await createStudent(
+      new Request("http://localhost/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Anita",
+          phone: "9876543210",
+          email: "anita@example.com",
+          father: { name: "Ravi", email: "ravi@example.com" },
+          mother: { name: "Meera", email: "meera@example.com" },
+          guardians: [{ name: "Asha", email: "asha@example.com" }],
+        }),
+      }),
+    );
+    expect(response.status).toBe(201);
+    expect(mockInvitation.mock.calls.map(([input]) => input)).toEqual([
+      {
+        organizationId: orgId,
+        inviterUserId: userId,
+        emailAddress: "anita@example.com",
+        role: "org:student",
+        redirectUrl: "/accept-invitation",
+      },
+      {
+        organizationId: orgId,
+        inviterUserId: userId,
+        emailAddress: "ravi@example.com",
+        role: "org:parent",
+        redirectUrl: "/accept-invitation",
+      },
+      {
+        organizationId: orgId,
+        inviterUserId: userId,
+        emailAddress: "meera@example.com",
+        role: "org:parent",
+        redirectUrl: "/accept-invitation",
+      },
+      {
+        organizationId: orgId,
+        inviterUserId: userId,
+        emailAddress: "asha@example.com",
+        role: "org:parent",
+        redirectUrl: "/accept-invitation",
+      },
+    ]);
   });
 
   it("documents Student routes on OpenAPI", async () => {
@@ -100,6 +170,17 @@ describe("student HTTP APIs", () => {
     );
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
   });
+
+  it.each(["org:student", "org:parent"])(
+    "returns 403 for %s on the Student register API",
+    async (role) => {
+      session(userId, orgId, role);
+      const response = await listStudents(
+        new Request("http://localhost/api/students"),
+      );
+      expect(response.status).toBe(StatusCodes.FORBIDDEN);
+    },
+  );
 
   it("admits a Student when optional fields are null", async () => {
     const created = await createStudent(

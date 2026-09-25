@@ -42,7 +42,12 @@ export type BatchWriteInput = {
   timings: TimingSlot[];
 };
 
-export type BatchListFilters = { courseId?: string };
+export type BatchListFilters = {
+  courseId?: string;
+  limit?: number;
+  after?: string;
+  before?: string;
+};
 
 const jsonHeaders = { "content-type": "application/json" };
 
@@ -57,8 +62,12 @@ export const batchQueries = {
     queryOptions({
       queryKey: batchQueries.key.list(filters),
       queryFn: () => {
-        const params = new URLSearchParams({ limit: "100" });
+        const params = new URLSearchParams({
+          limit: String(filters?.limit ?? 100),
+        });
         if (filters?.courseId) params.set("courseId", filters.courseId);
+        if (filters?.after) params.set("after", filters.after);
+        if (filters?.before) params.set("before", filters.before);
         return apiJson<BatchListResponse>(`/api/batches?${params.toString()}`);
       },
     }),

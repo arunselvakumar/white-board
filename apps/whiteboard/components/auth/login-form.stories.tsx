@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
@@ -68,7 +68,7 @@ export const GoogleSignIn: Story = {
     );
     await expect(clerkMocks.signIn.sso).toHaveBeenCalledWith({
       strategy: "oauth_google",
-      redirectUrl: "/",
+      redirectUrl: "/select-workspace",
       redirectCallbackUrl: "/sso-callback",
     });
   },
@@ -127,5 +127,31 @@ export const SignedIn: Story = {
     await expect(
       canvasElement.querySelector(".animate-spin"),
     ).toBeInTheDocument();
+  },
+};
+
+export const PasswordSignInSelectsWorkspaceBeforeRequestedPage: Story = {
+  args: { redirectUrl: "/students/new" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(
+      canvas.getByLabelText("Email or username"),
+      "ada@example.com",
+    );
+    await userEvent.type(canvas.getByLabelText("Password"), "password123");
+    await userEvent.click(canvas.getByRole("button", { name: "Sign in" }));
+    await waitFor(() => expect(clerkMocks.signIn.finalize).toHaveBeenCalled());
+    const call = clerkMocks.signIn.finalize.mock.calls.at(-1)?.[0] as {
+      navigate: (input: { decorateUrl: (url: string) => string }) => void;
+    };
+    let destination = "";
+    call.navigate({
+      decorateUrl: (url) => {
+        destination = url;
+        return url;
+      },
+    });
+    await expect(destination).toBe(
+      "/select-workspace?redirect_url=%2Fstudents%2Fnew",
+    );
   },
 };

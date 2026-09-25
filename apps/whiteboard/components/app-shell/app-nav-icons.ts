@@ -4,6 +4,8 @@ import {
   CalendarClock,
   GraduationCap,
   LayoutDashboard,
+  UserRound,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -15,4 +17,6 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/courses": BookOpen,
   "/batches": CalendarClock,
   "/fees": Banknote,
+  "/student": UserRound,
+  "/parent": UsersRound,
 };

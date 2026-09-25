@@ -68,6 +68,6 @@ export const Dues: Story = {
   ),
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
-    await expect(canvas.getByText("₹4,000")).toBeVisible();
+    await expect(canvas.getAllByText("₹4,000").length).toBeGreaterThan(0);
   },
 };

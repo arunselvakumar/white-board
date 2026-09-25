@@ -45,6 +45,8 @@ related:
 
 # P0 — Replace the register
 
+> Historical P0 scope. Student and family Workspace invitations, and Owner-only access to the register, supersede the P0 identity and staff-access decisions below. See [ADR-0027](../adr/0027-student-and-parent-workspace-invitations.md).
+
 Whiteboard's first Training Institute slice. School, Preschool, College, University, and Other stay **Coming soon**. Language in this document matches [CONTEXT.md](../../CONTEXT.md). Tickets are [tasks.md](./tasks.md).
 
 ## Problem Statement
@@ -148,34 +150,34 @@ One Workspace is one centre. Students are records, not Users. Fees hang off the 
 
 Illustrative, not a frozen contract. Adapters map RequestModels to commands.
 
-| Method | Path | Command / query |
-| --- | --- | --- |
-| POST | `/api/students` | CreateStudent |
-| GET | `/api/students` | ListStudents (`q`, cursors) |
-| GET | `/api/students/:id` | GetStudent (includes Enrollments summary) |
-| POST | `/api/students/:id/profile` | UpdateStudentProfile |
-| POST | `/api/students/:id/drop` | DropStudent |
-| POST | `/api/courses` | CreateCourse |
-| GET | `/api/courses` | ListCourses |
-| GET | `/api/courses/:id` | GetCourse |
-| POST | `/api/courses/:id/update` | UpdateCourse |
-| POST | `/api/courses/:id/archive` | ArchiveCourse |
-| POST | `/api/batches` | CreateBatch |
-| GET | `/api/batches` | ListBatches (optional `courseId`) |
-| GET | `/api/batches/:id` | GetBatch (includes enrolled count) |
-| POST | `/api/batches/:id/schedule` | UpdateBatchSchedule |
-| POST | `/api/batches/:id/close` | CloseBatch |
-| POST | `/api/enrollments` | EnrollStudent |
-| GET | `/api/enrollments/:id` | GetEnrollment |
-| POST | `/api/enrollments/:id/mode` | OverrideEnrollmentMode |
-| POST | `/api/enrollments/:id/timings` | SetEnrollmentTimings |
-| POST | `/api/enrollments/:id/move` | MoveEnrollment |
-| POST | `/api/enrollments/:id/end` | EndEnrollment |
-| POST | `/api/enrollments/:id/fee-plan` | AdjustFeePlan |
-| POST | `/api/enrollments/:id/payments` | RecordFeePayment |
-| GET | `/api/enrollments/:id/payments` | ListFeePayments |
-| GET | `/api/payments/:id/receipt` | GetReceipt |
-| GET | `/api/dashboard` | GetOwnerDashboard |
+| Method | Path                            | Command / query                           |
+| ------ | ------------------------------- | ----------------------------------------- |
+| POST   | `/api/students`                 | CreateStudent                             |
+| GET    | `/api/students`                 | ListStudents (`q`, cursors)               |
+| GET    | `/api/students/:id`             | GetStudent (includes Enrollments summary) |
+| POST   | `/api/students/:id/profile`     | UpdateStudentProfile                      |
+| POST   | `/api/students/:id/drop`        | DropStudent                               |
+| POST   | `/api/courses`                  | CreateCourse                              |
+| GET    | `/api/courses`                  | ListCourses                               |
+| GET    | `/api/courses/:id`              | GetCourse                                 |
+| POST   | `/api/courses/:id/update`       | UpdateCourse                              |
+| POST   | `/api/courses/:id/archive`      | ArchiveCourse                             |
+| POST   | `/api/batches`                  | CreateBatch                               |
+| GET    | `/api/batches`                  | ListBatches (optional `courseId`)         |
+| GET    | `/api/batches/:id`              | GetBatch (includes enrolled count)        |
+| POST   | `/api/batches/:id/schedule`     | UpdateBatchSchedule                       |
+| POST   | `/api/batches/:id/close`        | CloseBatch                                |
+| POST   | `/api/enrollments`              | EnrollStudent                             |
+| GET    | `/api/enrollments/:id`          | GetEnrollment                             |
+| POST   | `/api/enrollments/:id/mode`     | OverrideEnrollmentMode                    |
+| POST   | `/api/enrollments/:id/timings`  | SetEnrollmentTimings                      |
+| POST   | `/api/enrollments/:id/move`     | MoveEnrollment                            |
+| POST   | `/api/enrollments/:id/end`      | EndEnrollment                             |
+| POST   | `/api/enrollments/:id/fee-plan` | AdjustFeePlan                             |
+| POST   | `/api/enrollments/:id/payments` | RecordFeePayment                          |
+| GET    | `/api/enrollments/:id/payments` | ListFeePayments                           |
+| GET    | `/api/payments/:id/receipt`     | GetReceipt                                |
+| GET    | `/api/dashboard`                | GetOwnerDashboard                         |
 
 ## Testing Decisions
 

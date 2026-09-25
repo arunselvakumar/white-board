@@ -19,10 +19,13 @@ type AsyncFn = ReturnType<typeof fn>;
 export type ClerkMockState = {
   isSignedIn: boolean;
   orgId: string | null;
+  orgRole: string | null;
   fetchStatus: "idle" | "fetching";
   organizationListLoaded: boolean;
   membershipsLoading: boolean;
   memberships: ClerkMembership[];
+  membershipHasNextPage: boolean;
+  fetchNextMemberships: AsyncFn;
   errors: {
     fields: Record<string, ClerkFieldError | null | undefined>;
     global: ClerkFieldError[] | null;
@@ -30,6 +33,7 @@ export type ClerkMockState = {
   signIn: {
     status: string;
     password: AsyncFn;
+    ticket: AsyncFn;
     create: AsyncFn;
     finalize: AsyncFn;
     sso: AsyncFn;
@@ -46,6 +50,7 @@ export type ClerkMockState = {
   signUp: {
     status: string;
     unverifiedFields: string[];
+    create: AsyncFn;
     password: AsyncFn;
     finalize: AsyncFn;
     sso: AsyncFn;
@@ -66,6 +71,7 @@ function createState(): ClerkMockState {
   const signIn: ClerkMockState["signIn"] = {
     status: "needs_first_factor",
     password: fn().mockName("signIn.password"),
+    ticket: fn(() => ok()).mockName("signIn.ticket"),
     create: fn(() => ok()).mockName("signIn.create"),
     finalize: fn(() => undefined).mockName("signIn.finalize"),
     sso: fn(() => undefined).mockName("signIn.sso"),
@@ -89,6 +95,10 @@ function createState(): ClerkMockState {
     signIn.status = "complete";
     return ok();
   });
+  signIn.ticket.mockImplementation(() => {
+    signIn.status = "complete";
+    return ok();
+  });
   signIn.mfa.verifyEmailCode.mockImplementation(() => {
     signIn.status = "complete";
     return ok();
@@ -101,6 +111,7 @@ function createState(): ClerkMockState {
   const signUp: ClerkMockState["signUp"] = {
     status: "missing_requirements",
     unverifiedFields: ["email_address"],
+    create: fn(() => ok()).mockName("signUp.create"),
     password: fn(() => ok()).mockName("signUp.password"),
     finalize: fn(() => undefined).mockName("signUp.finalize"),
     sso: fn(() => undefined).mockName("signUp.sso"),
@@ -115,14 +126,21 @@ function createState(): ClerkMockState {
     signUp.status = "complete";
     return ok();
   });
+  signUp.create.mockImplementation(() => {
+    signUp.status = "complete";
+    return ok();
+  });
 
   return {
     isSignedIn: false,
     orgId: null,
+    orgRole: "org:admin",
     fetchStatus: "idle",
     organizationListLoaded: true,
     membershipsLoading: false,
     memberships: [],
+    membershipHasNextPage: false,
+    fetchNextMemberships: fn(() => undefined).mockName("fetchNextMemberships"),
     errors: { fields: {}, global: null },
     signIn,
     signUp,
@@ -140,10 +158,13 @@ export function resetClerkMocks(): void {
   const next = createState();
   clerkMocks.isSignedIn = next.isSignedIn;
   clerkMocks.orgId = next.orgId;
+  clerkMocks.orgRole = next.orgRole;
   clerkMocks.fetchStatus = next.fetchStatus;
   clerkMocks.organizationListLoaded = next.organizationListLoaded;
   clerkMocks.membershipsLoading = next.membershipsLoading;
   clerkMocks.memberships = next.memberships;
+  clerkMocks.membershipHasNextPage = next.membershipHasNextPage;
+  clerkMocks.fetchNextMemberships = next.fetchNextMemberships;
   clerkMocks.errors = next.errors;
   clerkMocks.signIn = next.signIn;
   clerkMocks.signUp = next.signUp;
@@ -155,6 +176,7 @@ export function useAuth() {
   return {
     isSignedIn: clerkMocks.isSignedIn,
     orgId: clerkMocks.orgId,
+    orgRole: clerkMocks.orgRole,
   };
 }
 
@@ -183,6 +205,9 @@ export function useOrganizationList(_options?: unknown) {
       count: clerkMocks.memberships.length,
       data: clerkMocks.memberships,
       isLoading: clerkMocks.membershipsLoading,
+      isFetching: false,
+      hasNextPage: clerkMocks.membershipHasNextPage,
+      fetchNext: clerkMocks.fetchNextMemberships,
     },
   };
 }

@@ -18,6 +18,7 @@ import { LoadingScreen } from "@/components/auth/loading-screen";
 import { PasswordField } from "@/components/auth/password-field";
 import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
 import { navigateAfterAuth } from "@/lib/navigate-after-auth";
+import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 const requestSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -50,7 +51,7 @@ export function ForgotPasswordForm() {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.replace("/");
+      router.replace(workspaceEntryPath("/"));
     }
   }, [isSignedIn, router]);
 
@@ -84,7 +85,7 @@ export function ForgotPasswordForm() {
     }
     if (signIn.status === "complete") {
       await signIn.finalize({
-        navigate: navigateAfterAuth(router, "/"),
+        navigate: navigateAfterAuth(router, workspaceEntryPath("/")),
       });
     }
   };
@@ -106,6 +107,7 @@ export function ForgotPasswordForm() {
 
       {step === "request" ? (
         <form
+          key="request"
           onSubmit={(event) => {
             void requestForm.handleSubmit(onSubmitRequest)(event);
           }}
@@ -147,6 +149,7 @@ export function ForgotPasswordForm() {
         </form>
       ) : (
         <form
+          key="reset"
           onSubmit={(event) => {
             void resetForm.handleSubmit(onSubmitReset)(event);
           }}

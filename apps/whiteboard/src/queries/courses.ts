@@ -27,6 +27,12 @@ export type CourseListResponse = {
   total: number;
 };
 
+export type CourseListPage = {
+  limit?: number;
+  after?: string;
+  before?: string;
+};
+
 export type CourseWriteInput = {
   name: string;
   duration: CourseDurationInput;
@@ -49,13 +55,21 @@ const jsonHeaders = { "content-type": "application/json" };
 export const courseQueries = {
   key: {
     all: ["courses"] as const,
-    list: () => [...courseQueries.key.all, "list"] as const,
+    list: (page?: CourseListPage) =>
+      [...courseQueries.key.all, "list", page] as const,
     detail: (id: string) => [...courseQueries.key.all, "detail", id] as const,
   },
-  list: () =>
+  list: (page?: CourseListPage) =>
     queryOptions({
-      queryKey: courseQueries.key.list(),
-      queryFn: () => apiJson<CourseListResponse>("/api/courses?limit=100"),
+      queryKey: courseQueries.key.list(page),
+      queryFn: () => {
+        const params = new URLSearchParams({
+          limit: String(page?.limit ?? 100),
+        });
+        if (page?.after) params.set("after", page.after);
+        if (page?.before) params.set("before", page.before);
+        return apiJson<CourseListResponse>(`/api/courses?${params.toString()}`);
+      },
     }),
   detail: (id: string) =>
     queryOptions({

@@ -32,7 +32,25 @@ export const APP_NAV = [
   },
 ] as const;
 
-export type AppNavItem = (typeof APP_NAV)[number];
+export const STUDENT_NAV = [
+  { href: "/student", label: "Student", title: "Student", description: "" },
+] as const;
+
+export const PARENT_NAV = [
+  { href: "/parent", label: "Parent", title: "Parent", description: "" },
+] as const;
+
+export function navForRole(role: string | null | undefined) {
+  if (role === "org:admin") return APP_NAV;
+  if (role === "org:student") return STUDENT_NAV;
+  if (role === "org:parent") return PARENT_NAV;
+  return [];
+}
+
+export type AppNavItem =
+  | (typeof APP_NAV)[number]
+  | (typeof STUDENT_NAV)[number]
+  | (typeof PARENT_NAV)[number];
 export type AppNavHref = AppNavItem["href"];
 
 export function isAppNavActive(pathname: string, href: string): boolean {
@@ -43,7 +61,9 @@ export function isAppNavActive(pathname: string, href: string): boolean {
 }
 
 export function appPageByHref(href: AppNavHref): AppNavItem {
-  const page = APP_NAV.find((item) => item.href === href);
+  const page = [...APP_NAV, ...STUDENT_NAV, ...PARENT_NAV].find(
+    (item) => item.href === href,
+  );
   if (page === undefined) {
     throw new Error(`Unknown in-app route: ${href}`);
   }

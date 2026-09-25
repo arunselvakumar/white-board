@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { CourseCatalog } from "@/components/courses/course-catalog";
 import {
@@ -71,59 +72,71 @@ function CourseWorkspace({
             }}
           />
         ) : (
-          <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-            <h1 className="text-2xl tracking-tight">
-              {view === "create" ? "Add Course" : "Edit Course"}
-            </h1>
-            <CourseForm
-              defaultValues={
-                view === "edit" && editing != null
-                  ? courseToFormValues(editing)
-                  : undefined
-              }
-              submitLabel="Save Course"
-              onCancel={() => {
-                setView("list");
-                setEditingId(null);
-              }}
-              onSubmit={(input: CourseWriteInput) => {
-                if (view === "edit" && editingId != null) {
-                  setCourses((current) =>
-                    current.map((item) =>
-                      item.id === editingId
-                        ? {
-                            ...item,
-                            ...input,
-                            updatedAt: NOW,
-                          }
-                        : item,
-                    ),
-                  );
-                } else {
-                  setCourses((current) => [
-                    {
-                      id: crypto.randomUUID(),
-                      ...input,
-                      description: input.description ?? null,
-                      code: input.code ?? null,
-                      category: input.category ?? null,
-                      totalLearningHours: input.totalLearningHours ?? null,
-                      eligibility: input.eligibility ?? null,
-                      learningOutcomes: input.learningOutcomes ?? [],
-                      syllabusOutline: input.syllabusOutline ?? [],
-                      archivedAt: null,
-                      createdAt: NOW,
-                      updatedAt: NOW,
-                      createdByUserId: "user_1",
-                    },
-                    ...current,
-                  ]);
+          <div className="w-full p-6">
+            <div
+              className={`flex flex-col gap-6 ${view === "create" ? "max-w-4xl" : "max-w-lg"}`}
+            >
+              <PageHeader
+                back={{
+                  label: "Courses",
+                  onClick: () => {
+                    setView("list");
+                    setEditingId(null);
+                  },
+                }}
+                title={view === "create" ? "Add Course" : "Edit Course"}
+                meta={view === "edit" ? editing?.name : undefined}
+              />
+              <CourseForm
+                defaultValues={
+                  view === "edit" && editing != null
+                    ? courseToFormValues(editing)
+                    : undefined
                 }
-                setView("list");
-                setEditingId(null);
-                return Promise.resolve();
-              }}
-            />
+                submitLabel="Save Course"
+                onCancel={() => {
+                  setView("list");
+                  setEditingId(null);
+                }}
+                onSubmit={(input: CourseWriteInput) => {
+                  if (view === "edit" && editingId != null) {
+                    setCourses((current) =>
+                      current.map((item) =>
+                        item.id === editingId
+                          ? {
+                              ...item,
+                              ...input,
+                              updatedAt: NOW,
+                            }
+                          : item,
+                      ),
+                    );
+                  } else {
+                    setCourses((current) => [
+                      {
+                        id: crypto.randomUUID(),
+                        ...input,
+                        description: input.description ?? null,
+                        code: input.code ?? null,
+                        category: input.category ?? null,
+                        totalLearningHours: input.totalLearningHours ?? null,
+                        eligibility: input.eligibility ?? null,
+                        learningOutcomes: input.learningOutcomes ?? [],
+                        syllabusOutline: input.syllabusOutline ?? [],
+                        archivedAt: null,
+                        createdAt: NOW,
+                        updatedAt: NOW,
+                        createdByUserId: "user_1",
+                      },
+                      ...current,
+                    ]);
+                  }
+                  setView("list");
+                  setEditingId(null);
+                  return Promise.resolve();
+                }}
+              />
+            </div>
           </div>
         )}
       </AppShell>
@@ -183,6 +196,54 @@ export const List: Story = {
     await expect(canvas.getByText("Tally")).toBeVisible();
     await expect(canvas.getByText("Python")).toBeVisible();
     await expect(canvas.getByText("₹8,000")).toBeVisible();
+  },
+};
+
+function PaginatedCourses() {
+  const [page, setPage] = useState(1);
+  const courses = Array.from({ length: 13 }, (_, index) =>
+    sampleCourse({ id: `course-${index}`, name: `Course ${index + 1}` }),
+  );
+  return (
+    <WorkspaceGate>
+      <AppShell>
+        <CourseCatalog
+          courses={courses.slice((page - 1) * 12, page * 12)}
+          pagination={{
+            total: courses.length,
+            page,
+            pageSize: 12,
+            hasNext: page < 2,
+            hasPrevious: page > 1,
+            onNext: () => {
+              setPage(2);
+            },
+            onPrevious: () => {
+              setPage(1);
+            },
+          }}
+          onAdd={() => undefined}
+          onEdit={() => undefined}
+          onArchive={() => undefined}
+        />
+      </AppShell>
+    </WorkspaceGate>
+  );
+}
+
+export const Pagination: Story = {
+  render: () => <PaginatedCourses />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("Showing 1–12 of 13 Courses")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await expect(canvas.getByText("Showing 13–13 of 13 Courses")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Course 13" }),
+    ).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Previous page" }),
+    );
+    await expect(canvas.getByText("Showing 1–12 of 13 Courses")).toBeVisible();
   },
 };
 

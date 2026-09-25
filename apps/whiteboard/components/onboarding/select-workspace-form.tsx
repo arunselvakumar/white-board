@@ -4,6 +4,7 @@ import { useAuth, useOrganizationList } from "@clerk/nextjs";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "@repo/ui/components/button";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -14,7 +15,7 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
   const router = useRouter();
   const { orgId } = useAuth();
   const { isLoaded, setActive, userMemberships } = useOrganizationList({
-    userMemberships: true,
+    userMemberships: { infinite: true },
   });
   const destination = postWorkspacePath(redirectUrl);
   const [selectingId, setSelectingId] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
       router.replace(`/create-workspace${query}`);
       return;
     }
-    if (orgId != null) {
+    if (membershipCount === 1 && orgId === soleOrganizationId) {
       router.replace(destination);
     }
   }, [
@@ -45,11 +46,12 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
     membershipCount,
     orgId,
     router,
+    soleOrganizationId,
     userMemberships.isLoading,
   ]);
 
   useEffect(() => {
-    if (!isLoaded || orgId != null || membershipCount !== 1) {
+    if (!isLoaded || membershipCount !== 1 || orgId === soleOrganizationId) {
       return;
     }
     if (soleOrganizationId === undefined) {
@@ -90,6 +92,7 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
     try {
       await setActive({ organization: organizationId });
       router.replace(destination);
+      router.refresh();
     } catch {
       setError("Could not switch to that workspace. Please try again.");
       setSelectingId(null);
@@ -99,7 +102,6 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
   if (
     !isLoaded ||
     userMemberships.isLoading ||
-    orgId != null ||
     (membershipCount < 2 && error == null && selectingId == null)
   ) {
     return <LoadingScreen />;
@@ -117,13 +119,14 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
           const isSelecting = selectingId === organization.id;
           return (
             <li key={organization.id}>
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 disabled={selectingId != null}
                 onClick={() => {
                   void onSelect(organization.id);
                 }}
-                className="border-border hover:border-primary/60 group flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                className="border-border hover:border-primary/60 group flex h-auto w-full items-center justify-start gap-3 rounded-xl p-4 text-left font-normal transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg text-sm">
                   {organization.name.slice(0, 1).toUpperCase()}
@@ -139,11 +142,24 @@ export function SelectWorkspaceForm({ redirectUrl }: { redirectUrl: string }) {
                     className="text-muted-foreground group-hover:text-primary shrink-0 transition-colors"
                   />
                 )}
-              </button>
+              </Button>
             </li>
           );
         })}
       </ul>
+      {userMemberships.hasNextPage && (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={userMemberships.isFetching}
+          onClick={() => {
+            userMemberships.fetchNext();
+          }}
+        >
+          {userMemberships.isFetching ? "Loading…" : "Show more Workspaces"}
+        </Button>
+      )}
       <FormAlert message={error} />
     </>
   );

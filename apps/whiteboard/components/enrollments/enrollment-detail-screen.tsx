@@ -16,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
-import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import {
   Select,
@@ -34,7 +33,9 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
+import { studentFullName } from "@/components/students/student-profile-view";
 import { EnrollmentSettingsForm } from "@/components/enrollments/enrollment-settings-form";
 import { FeePlanForm } from "@/components/enrollments/fee-plan-form";
 import { classModeLabel, formatTimingSlots } from "@/lib/class-mode";
@@ -88,9 +89,8 @@ export function EnrollmentDetailScreen({
     },
   });
   const saveMode = useMutation({
-    mutationFn: (
-      classModeOverride: "offline" | "online" | "hybrid" | null,
-    ) => overrideEnrollmentMode(enrollmentId, classModeOverride),
+    mutationFn: (classModeOverride: "offline" | "online" | "hybrid" | null) =>
+      overrideEnrollmentMode(enrollmentId, classModeOverride),
     onSuccess: async () => {
       await invalidateRegisterQueries(queryClient);
     },
@@ -135,19 +135,14 @@ export function EnrollmentDetailScreen({
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6 p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl tracking-tight">Enrollment</h1>
-          <p className="text-muted-foreground text-sm">
-            {student.name} · {course.name} · {batch.name}
-          </p>
-        </div>
-        {ended ? (
-          <Badge variant="secondary">Ended</Badge>
-        ) : (
-          <Badge variant="outline">Active</Badge>
-        )}
-      </div>
+      <PageHeader
+        back={{
+          href: `/students/${student.id}`,
+          label: studentFullName(student),
+        }}
+        title="Enrollment"
+        meta={`${course.name} · ${batch.name} · ${ended ? "Ended" : "Active"}`}
+      />
       <div className="grid gap-2 text-sm">
         <p>
           Class Mode:{" "}
@@ -162,7 +157,9 @@ export function EnrollmentDetailScreen({
             : ""}
           {` · ${enrollment.feePlanType.replace("_", "-")}`}
         </p>
-        <p>Remaining dues: {formatPaiseAsRupees(enrollment.remainingDuesPaise)}</p>
+        <p>
+          Remaining dues: {formatPaiseAsRupees(enrollment.remainingDuesPaise)}
+        </p>
         <p>
           Timings:{" "}
           {enrollment.timingSource === "batch"
@@ -308,7 +305,8 @@ export function EnrollmentDetailScreen({
           <AlertDialogHeader>
             <AlertDialogTitle>End this Enrollment?</AlertDialogTitle>
             <AlertDialogDescription>
-              {student.name} leaves the {batch.name} register. Fee Payments stay.
+              {student.name} leaves the {batch.name} register. Fee Payments
+              stay.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

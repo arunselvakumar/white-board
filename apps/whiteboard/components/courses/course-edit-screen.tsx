@@ -1,8 +1,13 @@
 "use client";
 
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import {
   CourseForm,
   courseToFormValues,
@@ -24,7 +29,11 @@ export function CourseEditScreen({ courseId }: { courseId: string }) {
 
   return (
     <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-      <h1 className="text-2xl tracking-tight">Edit Course</h1>
+      <PageHeader
+        back={{ href: "/courses", label: "Courses" }}
+        title="Edit Course"
+        meta={course.name}
+      />
       <CourseForm
         defaultValues={courseToFormValues(course)}
         submitLabel="Save Course"

@@ -21,6 +21,7 @@ export default defineConfig({
             "src/**/*.test.ts",
             "lib/**/*.test.ts",
             "app/api/**/*.test.ts",
+            "proxy.test.ts",
           ],
           exclude: ["**/*.http.test.ts"],
         },

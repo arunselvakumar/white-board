@@ -38,7 +38,7 @@ P1 (attendance, enquiry CRM, session calendar, certificates, WhatsApp) and Schoo
 | Fee Plan / Fee Payment / Receipt | invoice, bill (in P0)                         |
 | Owner Dashboard                  | analytics                                     |
 
-A **Student** is a Workspace record. They do not sign in in P0. Do not create Clerk Users for learners.
+A **Student** remains a Workspace record, distinct from a Clerk User. Add Student invites a Student with an email address as `org:student` and father, mother, and Guardians with email addresses as `org:parent`. The Owner (`org:admin`) alone can use the existing register screens and APIs; Student and Parent currently have Hello world pages.
 
 ## Architecture
 
@@ -62,6 +62,8 @@ A **Student** is a Workspace record. They do not sign in in P0. Do not create Cl
 - In-app chrome: `AppShell` with nav from `lib/app-nav.ts`. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
 - Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md), [`.grok/skills/tanstack-query/SKILL.md`](./.grok/skills/tanstack-query/SKILL.md).
 - Storybook play functions for every P0 form and empty state. Select options portal to `document.body`.
+- Student photos and initials use `components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.
+- Add forms use the Add Student page content width: `w-full p-6` outside and `max-w-4xl` inside. Apply this to Add Course, Add Batch, Enroll Student, and future add flows; keep Storybook previews aligned with the page.
 
 ## Testing
 

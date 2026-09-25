@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2, UserRound } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import {
   Controller,
   useFieldArray,
@@ -12,11 +12,6 @@ import {
 import { z } from "zod";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/avatar";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -28,8 +23,13 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 
+import {
+  PageHeader,
+  type PageHeaderBack,
+} from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import { StudentAvatar } from "@/components/students/student-avatar";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";
 import type {
   StudentResponse,
@@ -347,17 +347,23 @@ function DropdownField({
 }
 
 export function StudentForm({
+  studentId,
   defaultValues,
   submitLabel = "Save Student",
   onSubmit,
   onCancel,
   preview = false,
+  back,
+  padded = true,
 }: {
+  studentId?: string;
   defaultValues?: Partial<StudentFormValues>;
   submitLabel?: string;
   onSubmit?: (input: StudentWriteInput) => Promise<void>;
   onCancel?: () => void;
   preview?: boolean;
+  back?: PageHeaderBack;
+  padded?: boolean;
 }) {
   const {
     register,
@@ -380,6 +386,7 @@ export function StudentForm({
   });
   const educationStatus = useWatch({ control, name: "educationStatus" });
   const photoUrl = useWatch({ control, name: "photoUrl" });
+  const name = useWatch({ control, name: "name" });
 
   function field(
     name: TextFieldName,
@@ -404,7 +411,7 @@ export function StudentForm({
   return (
     <form
       noValidate
-      className="bg-background min-h-screen px-4 py-8 sm:px-6 lg:py-12"
+      className={padded ? "w-full p-6" : "w-full"}
       onSubmit={handleSubmit(async (values) => {
         if (preview || onSubmit == null) return;
         try {
@@ -419,26 +426,23 @@ export function StudentForm({
       })}
     >
       <div className="max-w-4xl space-y-7">
+        <PageHeader
+          back={back}
+          title={defaultValues == null ? "Add Student" : "Edit Student"}
+          meta={
+            defaultValues == null
+              ? "Record the Student and their contacts. Email addresses entered here receive Workspace invitations when you save. Course and Batch details are added with an Enrollment."
+              : "Update the Student and their contacts. Course and Batch details are managed through Enrollments."
+          }
+          actions={
+            preview ? (
+              <span className="bg-muted text-muted-foreground w-fit rounded-full px-3 py-1 text-xs font-medium">
+                Form preview
+              </span>
+            ) : null
+          }
+        />
         <FormAlert message={errors.root?.message} />
-        <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-primary mb-2 text-xs font-semibold tracking-[0.18em] uppercase">
-              Student register
-            </p>
-            <h1 className="text-3xl font-semibold tracking-tight">
-              {defaultValues == null ? "Add Student" : "Edit Student"}
-            </h1>
-            <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-              Record the Student and their contacts. Course and Batch details
-              are added when you create an Enrollment.
-            </p>
-          </div>
-          {preview ? (
-            <span className="bg-muted text-muted-foreground w-fit rounded-full px-3 py-1 text-xs font-medium">
-              Form preview
-            </span>
-          ) : null}
-        </header>
 
         <Section
           number="01"
@@ -471,14 +475,13 @@ export function StudentForm({
             <div className="space-y-2">
               <Label htmlFor="photoUrl">Student photo</Label>
               <div className="bg-muted/40 text-muted-foreground flex h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs">
-                <Avatar className="size-20">
-                  {photoUrl.trim() === "" ? null : (
-                    <AvatarImage src={photoUrl} alt="Student photo preview" />
-                  )}
-                  <AvatarFallback>
-                    <UserRound className="size-8" aria-hidden="true" />
-                  </AvatarFallback>
-                </Avatar>
+                <StudentAvatar
+                  studentId={studentId}
+                  name={name}
+                  photoUrl={photoUrl.trim()}
+                  className="size-20"
+                  imageAlt="Student photo preview"
+                />
               </div>
               <Input
                 id="photoUrl"

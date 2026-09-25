@@ -9,6 +9,7 @@ import { TooltipProvider } from "@repo/ui/components/tooltip";
 import "@clerk/ui/themes/shadcn.css";
 import "@repo/ui/globals.css";
 import { QueryProvider } from "@/components/query-provider";
+import { ThemePreferenceSync } from "@/components/theme-preference-sync";
 
 const fontSans = Urbanist({
   subsets: ["latin"],
@@ -45,10 +46,15 @@ export default function RootLayout({
           appearance={{ theme: shadcn }}
           signInUrl="/login"
           signUpUrl="/signup"
-          signInFallbackRedirectUrl="/"
-          signUpFallbackRedirectUrl="/"
+          signInFallbackRedirectUrl="/select-workspace"
+          signUpFallbackRedirectUrl="/select-workspace"
         >
-          <ThemeProvider>
+          <ThemeProvider
+            defaultTheme="light"
+            enableSystem={false}
+            storageKey="whiteboard-theme-dom"
+          >
+            <ThemePreferenceSync />
             <TooltipProvider>
               <QueryProvider>{children}</QueryProvider>
             </TooltipProvider>

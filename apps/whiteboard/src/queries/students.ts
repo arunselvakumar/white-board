@@ -75,6 +75,12 @@ export type StudentListResponse = {
   total: number;
 };
 
+export type StudentListPage = {
+  limit?: number;
+  after?: string;
+  before?: string;
+};
+
 export type StudentWriteInput = {
   name: string;
   phone: string;
@@ -91,16 +97,25 @@ const jsonHeaders = { "content-type": "application/json" };
 export const studentQueries = {
   key: {
     all: ["students"] as const,
-    list: (q?: string) => [...studentQueries.key.all, "list", q] as const,
+    list: (q?: string, page?: StudentListPage) =>
+      [...studentQueries.key.all, "list", q, page] as const,
     detail: (id: string) => [...studentQueries.key.all, "detail", id] as const,
   },
-  list: (q?: string) =>
+  list: (q?: string, page?: StudentListPage) =>
     queryOptions({
-      queryKey: studentQueries.key.list(q),
+      queryKey: studentQueries.key.list(q, page),
       queryFn: () => {
-        const params = new URLSearchParams({ limit: "100" });
+        const params = new URLSearchParams({
+          limit: String(page?.limit ?? 100),
+        });
         if (q != null && q.length > 0) {
           params.set("q", q);
+        }
+        if (page?.after != null) {
+          params.set("after", page.after);
+        }
+        if (page?.before != null) {
+          params.set("before", page.before);
         }
         return apiJson<StudentListResponse>(
           `/api/students?${params.toString()}`,

@@ -11,13 +11,22 @@ import { useRouter } from "next/navigation";
 
 import { StudentCatalog } from "@/components/students/student-catalog";
 import { dashboardQueries } from "@/src/queries/dashboard";
-import { dropStudent, studentQueries } from "@/src/queries/students";
+import {
+  dropStudent,
+  studentQueries,
+  type StudentListPage,
+} from "@/src/queries/students";
+
+const PAGE_SIZE = 12;
 
 export function StudentsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [q, setQ] = useState<string | undefined>(undefined);
+  const [page, setPage] = useState(1);
+  const [cursor, setCursor] =
+    useState<Pick<StudentListPage, "after" | "before">>();
   useEffect(() => {
     const handle = window.setTimeout(() => {
       const next = search.trim();
@@ -29,7 +38,7 @@ export function StudentsScreen() {
   }, [search]);
   const { data, isPending, isFetching, isPlaceholderData, isError, refetch } =
     useQuery({
-      ...studentQueries.list(q),
+      ...studentQueries.list(q, { limit: PAGE_SIZE, ...cursor }),
       placeholderData: keepPreviousData,
     });
   const waitingForSearch = search.trim() !== (q ?? "");
@@ -58,7 +67,28 @@ export function StudentsScreen() {
         void refetch();
       }}
       search={search}
-      onSearchChange={setSearch}
+      onSearchChange={(value) => {
+        setSearch(value);
+        setCursor(undefined);
+        setPage(1);
+      }}
+      pagination={{
+        total: data?.total ?? 0,
+        page,
+        pageSize: PAGE_SIZE,
+        hasNext: data?.nextCursor != null,
+        hasPrevious: data?.prevCursor != null,
+        onNext: () => {
+          if (data?.nextCursor == null) return;
+          setCursor({ after: data.nextCursor });
+          setPage((current) => current + 1);
+        },
+        onPrevious: () => {
+          if (data?.prevCursor == null) return;
+          setCursor({ before: data.prevCursor });
+          setPage((current) => current - 1);
+        },
+      }}
       onAdd={() => {
         router.push("/students/new");
       }}

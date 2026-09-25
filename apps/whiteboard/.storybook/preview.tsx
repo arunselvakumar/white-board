@@ -6,6 +6,7 @@ import { TooltipProvider } from "@repo/ui/components/tooltip";
 
 import "@repo/ui/globals.css";
 import { QueryProvider } from "../components/query-provider";
+import { ThemePreferenceSync } from "../components/theme-preference-sync";
 import { resetClerkMocks } from "./mocks/clerk";
 import { resetCreateWorkspaceMock } from "./mocks/create-workspace";
 
@@ -23,12 +24,20 @@ const fontMono = Geist_Mono({
 function PreviewShell({
   children,
   theme,
+  dynamicTheme,
 }: {
   children: ReactNode;
   theme: string;
+  dynamicTheme: boolean;
 }) {
   return (
-    <ThemeProvider forcedTheme={theme} enableSystem={false}>
+    <ThemeProvider
+      forcedTheme={dynamicTheme ? undefined : theme}
+      defaultTheme="light"
+      enableSystem={false}
+      storageKey="whiteboard-theme-dom"
+    >
+      {dynamicTheme && <ThemePreferenceSync />}
       <TooltipProvider>
         <QueryProvider>
           <div
@@ -74,7 +83,10 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => (
-      <PreviewShell theme={String(context.globals["theme"] ?? "light")}>
+      <PreviewShell
+        theme={String(context.globals["theme"] ?? "light")}
+        dynamicTheme={context.parameters["dynamicTheme"] === true}
+      >
         <Story />
       </PreviewShell>
     ),

@@ -39,6 +39,7 @@ export function StudentCreateScreen() {
 
   return (
     <StudentForm
+      back={{ href: "/students", label: "Students" }}
       submitLabel="Save Student"
       onCancel={() => {
         router.push("/students");

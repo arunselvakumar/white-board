@@ -13,6 +13,7 @@ import {
   StudentForm,
   studentToFormValues,
 } from "@/components/students/student-form";
+import { studentFullName } from "@/components/students/student-profile-view";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
@@ -41,8 +42,14 @@ export function StudentEditScreen({ studentId }: { studentId: string }) {
   const enrollments = student.enrollments ?? [];
 
   return (
-    <div className="w-full">
+    <div className="flex w-full flex-col gap-8 p-6">
       <StudentForm
+        studentId={studentId}
+        padded={false}
+        back={{
+          href: `/students/${studentId}`,
+          label: studentFullName(student),
+        }}
         defaultValues={studentToFormValues(student)}
         submitLabel="Save Student"
         onCancel={() => {
@@ -52,7 +59,7 @@ export function StudentEditScreen({ studentId }: { studentId: string }) {
           await update.mutateAsync(input);
         }}
       />
-      <div className="max-w-4xl space-y-3 px-4 pb-8 sm:px-6">
+      <div className="max-w-4xl space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg tracking-tight">Enrollments</h2>
           <Button

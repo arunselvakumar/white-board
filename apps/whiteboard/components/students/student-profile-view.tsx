@@ -3,14 +3,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/avatar";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 
+import { PageHeader } from "@/components/app-shell/page-header";
+import { StudentAvatar } from "@/components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
@@ -25,6 +22,17 @@ const salutations: Record<string, string> = {
   dr: "Dr.",
   prof: "Prof.",
 };
+
+export function studentFullName(student: {
+  name: string;
+  details: { salutation: string | null };
+}): string {
+  const salutation = student.details.salutation;
+  return salutation == null
+    ? student.name
+    : `${salutations[salutation]} ${student.name}`;
+}
+
 const genders: Record<string, string> = {
   female: "Female",
   male: "Male",
@@ -84,52 +92,36 @@ export function StudentProfileView({
   onEnroll: () => void;
 }) {
   const details = student.details;
-  const fullName = `${details.salutation == null ? "" : `${salutations[details.salutation]} `}${student.name}`;
+  const fullName = studentFullName(student);
+  const status = student.droppedAt == null ? "Active" : "Dropped";
   return (
-    <div className="bg-background min-h-screen px-4 py-8 sm:px-6 lg:py-12">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <Button
-              type="button"
-              variant="link"
-              className="mb-2 h-auto p-0"
-              onClick={onBack}
-            >
-              ← Students
-            </Button>
-            <div className="flex items-center gap-4">
-              <Avatar className="size-14">
-                {student.photoUrl == null ? null : (
-                  <AvatarImage src={student.photoUrl} alt="" />
-                )}
-                <AvatarFallback>
-                  {student.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-3xl font-semibold tracking-tight">
-                  {fullName}
-                </h1>
-                <Badge
-                  variant={student.droppedAt == null ? "outline" : "secondary"}
-                >
-                  {student.droppedAt == null ? "Active" : "Dropped"}
-                </Badge>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={onEdit}>
-              Edit Student
-            </Button>
-            {student.droppedAt == null ? (
-              <Button type="button" onClick={onEnroll}>
-                Enroll
+        <PageHeader
+          back={{ label: "Students", onClick: onBack }}
+          title={fullName}
+          meta={`${student.phone} · ${status}`}
+          leading={
+            <StudentAvatar
+              studentId={student.id}
+              name={student.name}
+              photoUrl={student.photoUrl}
+              className="size-14"
+            />
+          }
+          actions={
+            <>
+              <Button type="button" variant="outline" onClick={onEdit}>
+                Edit Student
               </Button>
-            ) : null}
-          </div>
-        </div>
+              {student.droppedAt == null ? (
+                <Button type="button" onClick={onEnroll}>
+                  Enroll
+                </Button>
+              ) : null}
+            </>
+          }
+        />
 
         <Panel title="Student details">
           <Detail

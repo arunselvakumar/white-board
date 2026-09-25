@@ -3,6 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@repo/ui/components/button";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
@@ -28,19 +29,30 @@ export function ReceiptScreen({ paymentId }: { paymentId: string }) {
 
   return (
     <div className="flex w-full max-w-lg flex-col gap-6 p-6 print:mx-auto print:p-0">
-      <div className="space-y-1 print:hidden">
-        <h1 className="text-2xl tracking-tight">Receipt</h1>
-        <Button
-          type="button"
-          onClick={() => {
-            window.print();
+      <div className="print:hidden">
+        <PageHeader
+          back={{
+            href: `/enrollments/${payment.enrollmentId}`,
+            label: "Enrollment",
           }}
-        >
-          Print Receipt
-        </Button>
+          title={`Receipt ${payment.receiptNumber}`}
+          meta={`${student.name} · ${course.name} · ${batch.name}`}
+          actions={
+            <Button
+              type="button"
+              onClick={() => {
+                window.print();
+              }}
+            >
+              Print Receipt
+            </Button>
+          }
+        />
       </div>
       <div className="bg-background space-y-3 rounded-lg border p-6">
-        <h2 className="text-xl tracking-tight">Receipt {payment.receiptNumber}</h2>
+        <h2 className="text-xl tracking-tight">
+          Receipt {payment.receiptNumber}
+        </h2>
         <p>Student: {student.name}</p>
         <p>
           Course: {course.name} · Batch: {batch.name}

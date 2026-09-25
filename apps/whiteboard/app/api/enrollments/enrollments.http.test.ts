@@ -24,7 +24,11 @@ vi.mock("@clerk/nextjs/server", () => ({
 const mockedAuth = vi.mocked(auth);
 
 function session(userId: string | null, orgId: string | null) {
-  mockedAuth.mockResolvedValue({ userId, orgId } as never);
+  mockedAuth.mockResolvedValue({
+    userId,
+    orgId,
+    orgRole: "org:admin",
+  } as never);
 }
 
 type IdJson = { id: string };
