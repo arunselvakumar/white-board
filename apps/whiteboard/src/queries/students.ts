@@ -131,11 +131,12 @@ export const studentQueries = {
 
 export function createStudent(
   input: StudentWriteInput,
+  requestId?: string,
 ): Promise<StudentResponse> {
   return apiJson<StudentResponse>("/api/students", {
     method: "POST",
     headers: jsonHeaders,
-    body: JSON.stringify(input),
+    body: JSON.stringify({ ...input, requestId }),
   });
 }
 

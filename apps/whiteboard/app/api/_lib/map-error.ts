@@ -9,11 +9,16 @@ const NOT_FOUND_CODES = new Set([
   "BATCH_NOT_FOUND",
   "ENROLLMENT_NOT_FOUND",
   "FEE_PAYMENT_NOT_FOUND",
+  "TEACHER_NOT_FOUND",
+  "TEACHER_ASSIGNMENT_NOT_FOUND",
+  "ATTENDANCE_REGISTER_NOT_FOUND",
+  "ATTENDANCE_MARK_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
   "COURSE_ALREADY_ARCHIVED",
   "STUDENT_ALREADY_DROPPED",
+  "STUDENT_REQUEST_CONFLICT",
   "BATCH_ALREADY_CLOSED",
   "BATCH_CLOSED",
   "COURSE_ARCHIVED",
@@ -23,6 +28,14 @@ const CONFLICT_CODES = new Set([
   "STUDENT_DROPPED",
   "FEE_OVERPAY",
   "FEE_PLAN_BELOW_PAYMENTS",
+  "TEACHER_EMAIL_IN_USE",
+  "TEACHER_USER_IN_USE",
+  "TEACHER_INACTIVE",
+  "TEACHER_ALREADY_ACTIVE",
+  "TEACHER_ALREADY_LINKED",
+  "TEACHER_ALREADY_ASSIGNED",
+  "ATTENDANCE_NOT_SCHEDULED",
+  "ATTENDANCE_ROSTER_EMPTY",
 ]);
 
 function errorCode(error: unknown): string | undefined {
@@ -55,6 +68,9 @@ export function mapError(error: unknown): Response {
   const code = errorCode(error);
   if (code === "INVALID_CURSOR" && error instanceof Error) {
     return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
+  }
+  if (code === "ATTENDANCE_FORBIDDEN" && error instanceof Error) {
+    return jsonError(StatusCodes.FORBIDDEN, code, error.message);
   }
   if (code != null && NOT_FOUND_CODES.has(code) && error instanceof Error) {
     return jsonError(StatusCodes.NOT_FOUND, code, error.message);

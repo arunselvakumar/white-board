@@ -17,6 +17,7 @@ import {
   type BatchListFilters,
 } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
+import { calendarQueries } from "@/src/queries/calendar";
 
 const PAGE_SIZE = 12;
 
@@ -46,6 +47,7 @@ export function BatchesScreen() {
     mutationFn: (id: string) => closeBatch(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: batchQueries.key.all });
+      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
     },
   });
 

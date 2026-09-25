@@ -107,10 +107,11 @@ const studentFormSchema = z.object({
   ),
   emergencyPhone: optionalPhone,
   idProofNote: z.string().max(4000),
+  batchId: z.string(),
 });
 
 export type StudentFormValues = z.infer<typeof studentFormSchema>;
-type TextFieldName = Exclude<keyof StudentFormValues, "guardians">;
+type TextFieldName = Exclude<keyof StudentFormValues, "guardians" | "batchId">;
 
 const SALUTATION_OPTIONS = [
   { value: "mr", label: "Mr." },
@@ -166,6 +167,7 @@ const initialValues: StudentFormValues = {
   guardians: [],
   emergencyPhone: "",
   idProofNote: "",
+  batchId: "none",
 };
 
 function emptyToNull(value: string): string | null {
@@ -214,6 +216,7 @@ export function studentToFormValues(
     })),
     emergencyPhone: details.emergencyPhone ?? "",
     idProofNote: student.idProofNote ?? "",
+    batchId: "none",
   };
 }
 
@@ -355,15 +358,20 @@ export function StudentForm({
   preview = false,
   back,
   padded = true,
+  enrollmentBatches,
 }: {
   studentId?: string;
   defaultValues?: Partial<StudentFormValues>;
   submitLabel?: string;
-  onSubmit?: (input: StudentWriteInput) => Promise<void>;
+  onSubmit?: (
+    input: StudentWriteInput,
+    enrollment: { batchId: string | null },
+  ) => Promise<void>;
   onCancel?: () => void;
   preview?: boolean;
   back?: PageHeaderBack;
   padded?: boolean;
+  enrollmentBatches?: { id: string; label: string }[];
 }) {
   const {
     register,
@@ -387,6 +395,7 @@ export function StudentForm({
   const educationStatus = useWatch({ control, name: "educationStatus" });
   const photoUrl = useWatch({ control, name: "photoUrl" });
   const name = useWatch({ control, name: "name" });
+  const selectedBatchId = useWatch({ control, name: "batchId" });
 
   function field(
     name: TextFieldName,
@@ -415,7 +424,9 @@ export function StudentForm({
       onSubmit={handleSubmit(async (values) => {
         if (preview || onSubmit == null) return;
         try {
-          await onSubmit(studentFormToWriteInput(values));
+          await onSubmit(studentFormToWriteInput(values), {
+            batchId: values.batchId === "none" ? null : values.batchId,
+          });
         } catch (error) {
           applyHttpFormError(
             error,
@@ -431,7 +442,9 @@ export function StudentForm({
           title={defaultValues == null ? "Add Student" : "Edit Student"}
           meta={
             defaultValues == null
-              ? "Record the Student and their contacts. Email addresses entered here receive Workspace invitations when you save. Course and Batch details are added with an Enrollment."
+              ? enrollmentBatches == null
+                ? "Record the Student and their contacts. Email addresses entered here receive Workspace invitations when you save. Course and Batch details are added with an Enrollment."
+                : "Record the Student and their contacts. Choose a Batch now or enroll later. Email addresses receive Workspace invitations when you save."
               : "Update the Student and their contacts. Course and Batch details are managed through Enrollments."
           }
           actions={
@@ -694,6 +707,58 @@ export function StudentForm({
           </div>
         </Section>
 
+        {enrollmentBatches != null ? (
+          <Section
+            number="07"
+            title="Enrollment (optional)"
+            description="Choose a Batch to enroll this Student now, or save the Student and enroll later."
+          >
+            <div className="space-y-2">
+              <Label htmlFor="student-batch">Batch (optional)</Label>
+              <Controller
+                name="batchId"
+                control={control}
+                render={({ field: batchField }) => (
+                  <Select
+                    items={[
+                      { value: "none", label: "Enroll later" },
+                      ...enrollmentBatches.map((batch) => ({
+                        value: batch.id,
+                        label: batch.label,
+                      })),
+                    ]}
+                    value={batchField.value}
+                    onValueChange={(value) => {
+                      batchField.onChange(value ?? "none");
+                    }}
+                  >
+                    <SelectTrigger
+                      id="student-batch"
+                      size="lg"
+                      className="w-full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent align="start" alignItemWithTrigger={false}>
+                      <SelectItem value="none">Enroll later</SelectItem>
+                      {enrollmentBatches.map((batch) => (
+                        <SelectItem key={batch.id} value={batch.id}>
+                          {batch.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <p className="text-muted-foreground text-sm">
+                {enrollmentBatches.length === 0
+                  ? "No open Batches are available. Save this Student and add a Batch later."
+                  : "The Enrollment will inherit this Batch’s Class Mode and Timings, and its Course’s default Fee Plan."}
+              </p>
+            </div>
+          </Section>
+        ) : null}
+
         {preview ? (
           <div className="text-muted-foreground rounded-xl border border-dashed px-5 py-4 text-sm">
             This is a UI preview. Fields entered here are not saved.
@@ -706,7 +771,9 @@ export function StudentForm({
               </Button>
             ) : null}
             <Button type="submit" disabled={isSubmitting}>
-              {submitLabel}
+              {enrollmentBatches != null && selectedBatchId !== "none"
+                ? "Save Student and enroll"
+                : submitLabel}
             </Button>
           </div>
         )}

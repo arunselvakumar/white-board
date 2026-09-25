@@ -8,6 +8,7 @@ export type StudentListParams = ListParams<StudentId> & {
 };
 
 export type StudentRepository = {
+  create(student: Student): Promise<boolean>;
   save(student: Student): Promise<void>;
   findByIdInWorkspace(
     id: StudentId,

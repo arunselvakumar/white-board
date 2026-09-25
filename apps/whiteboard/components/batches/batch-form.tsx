@@ -172,105 +172,120 @@ export function BatchForm({
       })}
     >
       <FormAlert message={errors.root?.message} />
-      {lockCourse ? null : (
+      <div className="space-y-4">
+        {lockCourse ? null : (
+          <div className="space-y-1.5">
+            <Label htmlFor="courseId">Course</Label>
+            <Controller
+              name="courseId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  items={courseItems}
+                  value={field.value.length === 0 ? null : field.value}
+                  onValueChange={(value) => {
+                    if (value == null) return;
+                    field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="courseId"
+                    size="lg"
+                    className="w-full min-w-0"
+                  >
+                    <SelectValue placeholder="Select a Course" />
+                  </SelectTrigger>
+                  <SelectContent align="start" alignItemWithTrigger={false}>
+                    {courseItems.map((course) => (
+                      <SelectItem key={course.value} value={course.value}>
+                        {course.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError message={errors.courseId?.message} />
+          </div>
+        )}
         <div className="space-y-1.5">
-          <Label htmlFor="courseId">Course</Label>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            className="h-10"
+            autoComplete="off"
+            {...register("name")}
+          />
+          <FieldError message={errors.name?.message} />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="classMode">Class Mode</Label>
           <Controller
-            name="courseId"
+            name="classMode"
             control={control}
             render={({ field }) => (
               <Select
-                items={courseItems}
-                value={field.value.length === 0 ? null : field.value}
+                items={[...CLASS_MODE_ITEMS]}
+                value={field.value}
                 onValueChange={(value) => {
                   if (value == null) return;
                   field.onChange(value);
                 }}
               >
                 <SelectTrigger
-                  id="courseId"
+                  id="classMode"
                   size="lg"
                   className="w-full min-w-0"
                 >
-                  <SelectValue placeholder="Select a Course" />
+                  <SelectValue placeholder="Select Class Mode" />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>
-                  {courseItems.map((course) => (
-                    <SelectItem key={course.value} value={course.value}>
-                      {course.label}
+                  {CLASS_MODE_ITEMS.map((mode) => (
+                    <SelectItem key={mode.value} value={mode.value}>
+                      {mode.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             )}
           />
-          <FieldError message={errors.courseId?.message} />
+          <FieldError message={errors.classMode?.message} />
         </div>
-      )}
-      <div className="space-y-1.5">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          className="h-10"
-          autoComplete="off"
-          {...register("name")}
-        />
-        <FieldError message={errors.name?.message} />
+        <div className="space-y-1.5">
+          <Label htmlFor="capacity">Capacity</Label>
+          <Input
+            id="capacity"
+            className="h-10"
+            inputMode="numeric"
+            autoComplete="off"
+            {...register("capacity")}
+          />
+          <FieldError message={errors.capacity?.message} />
+        </div>
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="classMode">Class Mode</Label>
-        <Controller
-          name="classMode"
-          control={control}
-          render={({ field }) => (
-            <Select
-              items={[...CLASS_MODE_ITEMS]}
-              value={field.value}
-              onValueChange={(value) => {
-                if (value == null) return;
-                field.onChange(value);
-              }}
-            >
-              <SelectTrigger id="classMode" size="lg" className="w-full min-w-0">
-                <SelectValue placeholder="Select Class Mode" />
-              </SelectTrigger>
-              <SelectContent align="start" alignItemWithTrigger={false}>
-                {CLASS_MODE_ITEMS.map((mode) => (
-                  <SelectItem key={mode.value} value={mode.value}>
-                    {mode.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        />
-        <FieldError message={errors.classMode?.message} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="capacity">Capacity</Label>
-        <Input
-          id="capacity"
-          className="h-10"
-          inputMode="numeric"
-          autoComplete="off"
-          {...register("capacity")}
-        />
-        <FieldError message={errors.capacity?.message} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="room">Room</Label>
-        <Input id="room" className="h-10" autoComplete="off" {...register("room")} />
-        <FieldError message={errors.room?.message} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="joinUrl">Join URL</Label>
-        <Input
-          id="joinUrl"
-          className="h-10"
-          autoComplete="off"
-          {...register("joinUrl")}
-        />
-        <FieldError message={errors.joinUrl?.message} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="room">Room</Label>
+          <Input
+            id="room"
+            className="h-10"
+            autoComplete="off"
+            {...register("room")}
+          />
+          <FieldError message={errors.room?.message} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="joinUrl">Join URL</Label>
+          <Input
+            id="joinUrl"
+            className="h-10"
+            autoComplete="off"
+            {...register("joinUrl")}
+          />
+          <FieldError message={errors.joinUrl?.message} />
+        </div>
       </div>
       <div className="space-y-3">
         <Label>Timings</Label>
@@ -287,7 +302,10 @@ export function BatchForm({
                       const checked = daysField.value.includes(day.value);
                       const checkboxId = `slot-${index}-day-${day.value}`;
                       return (
-                        <div key={day.value} className="flex items-center gap-2">
+                        <div
+                          key={day.value}
+                          className="flex items-center gap-2"
+                        >
                           <Checkbox
                             id={checkboxId}
                             checked={checked}
@@ -358,7 +376,9 @@ export function BatchForm({
             ) : null}
           </div>
         ))}
-        <FieldError message={errors.timings?.root?.message ?? errors.timings?.message} />
+        <FieldError
+          message={errors.timings?.root?.message ?? errors.timings?.message}
+        />
         <Button
           type="button"
           variant="ghost"

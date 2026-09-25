@@ -14,6 +14,37 @@ import { toDomainStudent } from "./prisma-student-mapper";
 export class PrismaStudentRepository implements StudentRepository {
   constructor(private readonly db: PrismaClient) {}
 
+  async create(student: Student): Promise<boolean> {
+    try {
+      await this.db.student.create({
+        data: {
+          id: student.id.value,
+          workspaceId: student.workspaceId.value,
+          createdByUserId: student.createdByUserId.value,
+          name: student.name.value,
+          phone: student.phone.value,
+          email: student.email?.value ?? null,
+          photoUrl: student.photoUrl?.value ?? null,
+          address: student.address?.value ?? null,
+          idProofNote: student.idProofNote?.value ?? null,
+          guardianName: student.guardianName?.value ?? null,
+          guardianPhone: student.guardianPhone?.value ?? null,
+          profileDetails: student.details,
+          createdAt: student.createdAt,
+          updatedAt: student.updatedAt,
+        },
+      });
+      return true;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      )
+        return false;
+      throw error;
+    }
+  }
+
   async save(student: Student): Promise<void> {
     const mutable = {
       name: student.name.value,

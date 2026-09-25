@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { CalendarResponseModel } from "../calendar/calendar-response-model";
 
 import { CloseBatchRequestModel } from "../batches/close-batch-request-model";
 import { CloseBatchResponseModel } from "../batches/close-batch-response-model";
@@ -62,9 +63,38 @@ import { SetEnrollmentTimingsResponseModel } from "../enrollments/set-enrollment
 import { GetOwnerDashboardResponseModel } from "../dashboard/get-owner-dashboard-response-model";
 import { GetReceiptRequestModel } from "../payments/get-receipt-request-model";
 import { GetReceiptResponseModel } from "../payments/get-receipt-response-model";
+import { ActivateTeacherResponseModel } from "../teacher/activate/activate-teacher-response-model";
+import { CreateTeacherRequestModel } from "../teachers/create-teacher-request-model";
+import { ListTeachersRequestModel } from "../teachers/list-teachers-request-model";
+import { ListTeachersResponseModel } from "../teachers/list-teachers-response-model";
+import { TeacherResponseModel } from "../teachers/teacher-response-model";
+import { TeacherParamsModel } from "../teachers/[id]/teacher-params-model";
+import { UpdateTeacherProfileRequestModel } from "../teachers/[id]/profile/update-teacher-profile-request-model";
+import { AssignTeacherBatchRequestModel, TeacherBatchesResponseModel } from "../teachers/[id]/batches/assignment-models";
+import { UnassignTeacherBatchParamsModel } from "../teachers/[id]/batches/[batchId]/unassign/route";
+import { AttendanceRegisterParamsModel, AttendanceRegisterResponseModel, ListAttendanceRegistersRequestModel, ListAttendanceRegistersResponseModel, OpenAttendanceRegisterRequestModel } from "../attendance/registers/attendance-models";
+import { SaveAttendanceMarksRequestModel } from "../attendance/registers/[id]/marks/save-attendance-marks-request-model";
+import { ListStudentAttendanceRequestModel, StudentAttendanceHistoryResponseModel, StudentAttendanceParamsModel } from "../students/[id]/attendance/student-attendance-models";
 import { buildOpenApiDocument } from "./openapi";
 
 export const openApiDocument = buildOpenApiDocument([
+  { method: "get", path: "/api/calendar", summary: "View role-scoped recurring Batch Timings", tags: ["Calendar"], successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: CalendarResponseModel, errors: [401, 403, 500] },
+  { method: "post", path: "/api/attendance/registers", summary: "Open a Batch Attendance Register for today or an earlier date", tags: ["Attendance"], body: OpenAttendanceRegisterRequestModel, successStatus: StatusCodes.CREATED, successDescription: "Opened", successSchema: AttendanceRegisterResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "get", path: "/api/attendance/registers", summary: "List Batch Attendance Registers", tags: ["Attendance"], query: ListAttendanceRegistersRequestModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: ListAttendanceRegistersResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "get", path: "/api/attendance/registers/{id}", summary: "Get an Attendance Register", tags: ["Attendance"], params: AttendanceRegisterParamsModel, successStatus: StatusCodes.OK, successDescription: "Found", successSchema: AttendanceRegisterResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/attendance/registers/{id}/marks", summary: "Mark or correct Attendance", tags: ["Attendance"], params: AttendanceRegisterParamsModel, body: SaveAttendanceMarksRequestModel, successStatus: StatusCodes.OK, successDescription: "Saved", successSchema: AttendanceRegisterResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "get", path: "/api/students/{id}/attendance", summary: "Get Student Attendance history", tags: ["Attendance"], params: StudentAttendanceParamsModel, query: ListStudentAttendanceRequestModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: StudentAttendanceHistoryResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/teachers", summary: "Add and invite a Teacher", tags: ["Teachers"], body: CreateTeacherRequestModel, successStatus: StatusCodes.CREATED, successDescription: "Created", successSchema: TeacherResponseModel, errors: [400, 401, 403, 409, 500] },
+  { method: "get", path: "/api/teachers", summary: "List Teachers", tags: ["Teachers"], query: ListTeachersRequestModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: ListTeachersResponseModel, errors: [400, 401, 403, 500] },
+  { method: "get", path: "/api/teachers/{id}", summary: "Get a Teacher", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Found", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/teachers/{id}/profile", summary: "Update Teacher profile", tags: ["Teachers"], params: TeacherParamsModel, body: UpdateTeacherProfileRequestModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "post", path: "/api/teachers/{id}/invite", summary: "Resend Teacher invitation", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "post", path: "/api/teachers/{id}/deactivate", summary: "Deactivate Teacher", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "get", path: "/api/teachers/{id}/batches", summary: "List Teacher Batches", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: TeacherBatchesResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/teachers/{id}/batches", summary: "Assign Teacher to Batch", tags: ["Teachers"], params: TeacherParamsModel, body: AssignTeacherBatchRequestModel, successStatus: StatusCodes.OK, successDescription: "Assigned", successSchema: TeacherBatchesResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "post", path: "/api/teachers/{id}/batches/{batchId}/unassign", summary: "Unassign Teacher from Batch", tags: ["Teachers"], params: UnassignTeacherBatchParamsModel, successStatus: StatusCodes.OK, successDescription: "Unassigned", successSchema: TeacherBatchesResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "post", path: "/api/teacher/activate", summary: "Activate Teacher membership link", tags: ["Teachers"], successStatus: StatusCodes.OK, successDescription: "Activated", successSchema: ActivateTeacherResponseModel, errors: [401, 403, 404, 409, 500] },
+  { method: "get", path: "/api/teacher/batches", summary: "List My Batches", tags: ["Teachers"], successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: TeacherBatchesResponseModel, errors: [401, 403, 404, 500] },
   {
     method: "post",
     path: "/api/students",
@@ -78,6 +108,7 @@ export const openApiDocument = buildOpenApiDocument([
       StatusCodes.BAD_REQUEST,
       StatusCodes.UNAUTHORIZED,
       StatusCodes.FORBIDDEN,
+      StatusCodes.CONFLICT,
       StatusCodes.INTERNAL_SERVER_ERROR,
     ],
   },

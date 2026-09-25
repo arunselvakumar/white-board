@@ -26,6 +26,7 @@ import { APP_NAV_ICONS } from "./app-nav-icons";
 
 const icons: Record<string, LucideIcon> = {
   Dashboard: APP_NAV_ICONS["/"],
+  Calendar: APP_NAV_ICONS["/calendar"],
   Students: APP_NAV_ICONS["/students"],
   Student: UserRound,
   Courses: APP_NAV_ICONS["/courses"],

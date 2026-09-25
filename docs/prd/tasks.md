@@ -329,11 +329,44 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 
 ## Changes after P0
 
-| ID     | Title                                                                               | Status | Area         |
-| ------ | ----------------------------------------------------------------------------------- | ------ | ------------ |
-| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                | done   | Auth+HTTP+UI |
-| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces | done   | Auth+UI      |
+| ID     | Title                                                                               | Status      | Area                     |
+| ------ | ----------------------------------------------------------------------------------- | ----------- | ------------------------ |
+| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                | done        | Auth+HTTP+UI             |
+| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces | done        | Auth+UI                  |
+| WB-003 | Teacher profile, role, invitations, Batch assignments, and My Batches               | done        | Domain+Data+Auth+HTTP+UI |
+| WB-004 | Student Attendance Registers, marks, history, and Owner/Teacher access              | done        | Domain+Data+Auth+HTTP+UI |
+| WB-005 | Optional Batch Enrollment while adding a Student                                    | done        | UI+Enrollment            |
+| WB-006 | Record Attendance for a missed earlier date                                         | in_progress | Domain+HTTP+UI           |
+| WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                          | done        | Read+HTTP+UI             |
 
 ### WB-001 — Student and Parent Workspace invitations
 
 **Done when:** Add Student sends role-specific Clerk invitations for supplied email addresses; Student and Parent Users see one Hello world navigation item and cannot enter Owner pages or APIs; route, HTTP, and Storybook tests pass. See [ADR-0027](../adr/0027-student-and-parent-workspace-invitations.md).
+
+### WB-003 — Teachers
+
+**Spec:** [training-institute-teachers.md](./training-institute-teachers.md). **Blocked by:** WB-001 and WB-002 (both done).
+
+**Done when:** Owner can create, edit, invite, deactivate, and assign a Teacher to Batches; an invited Teacher can activate and see only assigned Batches; role and Workspace isolation, OpenAPI, unit tests, Postgres HTTP tests, and Storybook play functions pass.
+
+### WB-004 — Student Attendance
+
+**Spec:** [training-institute-attendance.md](./training-institute-attendance.md). **Blocked by:** WB-003 (done).
+
+**Done when:** Owner and assigned Teacher can open today's Batch Attendance Register, save and correct Marks with an audit trail, and see only authorized roster data; Owner can review Student Attendance history; OpenAPI, unit, Postgres HTTP, Storybook, typecheck, lint, and build pass.
+
+### WB-005 — Add Student with optional Enrollment
+
+**Done when:** Add Student offers an optional open Batch; selecting one creates the Student and then an Enrollment using the Batch defaults. If Enrollment fails after Student creation, the Owner can retry without creating another Student. Existing Add Student without Enrollment and Edit Student keep working. Storybook, typecheck, lint, and build pass.
+
+### WB-006 — Record Attendance for a missed earlier date
+
+**Spec:** [training-institute-attendance.md](./training-institute-attendance.md). **Blocked by:** WB-004 (done).
+
+**Done when:** Owner and assigned Teacher can choose a date from Batch creation through today, open or reopen that date's Register, review the current scheduled roster, and save Marks. Future and pre-Batch dates are rejected; HTTP tests, Storybook, typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-007 — Calendar
+
+**Blocked by:** WB-003 (done). Requested as a separate feature while WB-006 is in progress.
+
+**Done when:** Owner, Teacher, Student, and Parent can open a read-only Calendar scoped to their Batches or Enrollments; week is the default, day and month can be selected; role and Workspace isolation, OpenAPI, Postgres HTTP tests, Storybook, typecheck, lint, and build pass.

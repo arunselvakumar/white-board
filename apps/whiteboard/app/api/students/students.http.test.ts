@@ -150,6 +150,42 @@ describe("student HTTP APIs", () => {
     ]);
   });
 
+  it("reuses the same Student request after a lost response without sending invitations twice", async () => {
+    const requestId = randomUUID();
+    const request = () =>
+      new Request("http://localhost/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId,
+          name: "Anita",
+          phone: "9876543210",
+          email: "anita@example.com",
+        }),
+      });
+    const first = await createStudent(request());
+    const second = await createStudent(request());
+    expect(first.status).toBe(StatusCodes.CREATED);
+    expect(second.status).toBe(StatusCodes.CREATED);
+    expect((await json<StudentJson>(first)).id).toBe(requestId);
+    expect((await json<StudentJson>(second)).id).toBe(requestId);
+    expect(mockInvitation).toHaveBeenCalledTimes(1);
+    expect(await prisma.student.count({ where: { id: requestId } })).toBe(1);
+
+    const conflict = await createStudent(
+      new Request("http://localhost/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, name: "Other", phone: "9876543210" }),
+      }),
+    );
+    expect(conflict.status).toBe(StatusCodes.CONFLICT);
+
+    session(userId, `org_${randomUUID()}`);
+    const otherWorkspace = await createStudent(request());
+    expect(otherWorkspace.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
   it("documents Student routes on OpenAPI", async () => {
     session(null, null);
     const spec = await json<SpecJson>(getOpenApi());

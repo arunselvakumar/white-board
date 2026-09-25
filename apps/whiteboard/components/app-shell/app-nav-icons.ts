@@ -13,10 +13,14 @@ import type { AppNavHref } from "@/lib/app-nav";
 
 export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/": LayoutDashboard,
+  "/calendar": CalendarClock,
   "/students": GraduationCap,
   "/courses": BookOpen,
   "/batches": CalendarClock,
   "/fees": Banknote,
   "/student": UserRound,
   "/parent": UsersRound,
+  "/teacher": BookOpen,
+  "/teachers": UsersRound,
+  "/attendance": CalendarClock,
 };

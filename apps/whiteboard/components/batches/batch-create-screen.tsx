@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { BatchForm } from "@/components/batches/batch-form";
 import { batchQueries, createBatch } from "@/src/queries/batches";
+import { calendarQueries } from "@/src/queries/calendar";
 import { courseQueries } from "@/src/queries/courses";
 
 export function BatchCreateScreen() {
@@ -20,6 +21,7 @@ export function BatchCreateScreen() {
     mutationFn: createBatch,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: batchQueries.key.all });
+      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
       router.push("/batches");
     },
   });
@@ -29,7 +31,7 @@ export function BatchCreateScreen() {
 
   return (
     <div className="w-full p-6">
-      <div className="flex max-w-4xl flex-col gap-6">
+      <div className="flex w-full max-w-4xl flex-col gap-6">
         <PageHeader
           back={{ href: "/batches", label: "Batches" }}
           title="Add Batch"

@@ -1,6 +1,7 @@
 import type { RawStudentDetails } from "../domain/student-details";
 
 export type CreateStudentCommand = RawStudentDetails & {
+  requestId?: string;
   name: string;
   phone: string;
   email?: string | null;

@@ -20,6 +20,7 @@ import {
 import { PageHeader } from "@/components/app-shell/page-header";
 import { BatchForm, batchToFormValues } from "@/components/batches/batch-form";
 import { batchQueries, updateBatchSchedule } from "@/src/queries/batches";
+import { calendarQueries } from "@/src/queries/calendar";
 import { courseQueries } from "@/src/queries/courses";
 import { enrollmentQueries } from "@/src/queries/enrollments";
 import { studentQueries } from "@/src/queries/students";
@@ -38,6 +39,7 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
       updateBatchSchedule(batchId, input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: batchQueries.key.all });
+      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
       router.push("/batches");
     },
   });
@@ -50,81 +52,83 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
   );
 
   return (
-    <div className="flex w-full max-w-lg flex-col gap-6 p-6">
-      <PageHeader
-        back={{ href: "/batches", label: "Batches" }}
-        title={batch.name}
-        meta={`${course?.name ?? "Course"} · ${batch.closedAt == null ? "Open" : "Closed"}`}
-        actions={
-          batch.closedAt == null ? (
-            <Button
-              type="button"
-              onClick={() => {
-                router.push(`/batches/${batchId}/enroll`);
-              }}
-            >
-              Enroll Student
-            </Button>
-          ) : null
-        }
-      />
-      <section className="space-y-3">
-        <h2 className="text-lg tracking-tight">Enrolled Students</h2>
-        <p className="text-muted-foreground text-sm">
-          {roster.length}/{batch.capacity} seats filled
-        </p>
-        {roster.length === 0 ? (
+    <div className="w-full p-6">
+      <div className="flex w-full max-w-4xl flex-col gap-6">
+        <PageHeader
+          back={{ href: "/batches", label: "Batches" }}
+          title={batch.name}
+          meta={`${course?.name ?? "Course"} · ${batch.closedAt == null ? "Open" : "Closed"}`}
+          actions={
+            batch.closedAt == null ? (
+              <Button
+                type="button"
+                onClick={() => {
+                  router.push(`/batches/${batchId}/enroll`);
+                }}
+              >
+                Enroll Student
+              </Button>
+            ) : null
+          }
+        />
+        <section className="space-y-3">
+          <h2 className="text-lg tracking-tight">Enrolled Students</h2>
           <p className="text-muted-foreground text-sm">
-            No Students enrolled in this Batch yet.
+            {roster.length}/{batch.capacity} seats filled
           </p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {roster.map((enrollment) => (
-                <TableRow key={enrollment.id}>
-                  <TableCell className="font-medium">
-                    {studentNameById.get(enrollment.studentId) ?? "Student"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Active</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        router.push(`/enrollments/${enrollment.id}`);
-                      }}
-                    >
-                      Open
-                    </Button>
-                  </TableCell>
+          {roster.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No Students enrolled in this Batch yet.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </section>
-      <BatchForm
-        lockCourse
-        courses={course == null ? [] : [{ id: course.id, name: course.name }]}
-        defaultValues={batchToFormValues(batch)}
-        submitLabel="Save Batch"
-        onCancel={() => {
-          router.push("/batches");
-        }}
-        onSubmit={async (input) => {
-          await update.mutateAsync(input);
-        }}
-      />
+              </TableHeader>
+              <TableBody>
+                {roster.map((enrollment) => (
+                  <TableRow key={enrollment.id}>
+                    <TableCell className="font-medium">
+                      {studentNameById.get(enrollment.studentId) ?? "Student"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Active</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          router.push(`/enrollments/${enrollment.id}`);
+                        }}
+                      >
+                        Open
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </section>
+        <BatchForm
+          lockCourse
+          courses={course == null ? [] : [{ id: course.id, name: course.name }]}
+          defaultValues={batchToFormValues(batch)}
+          submitLabel="Save Batch"
+          onCancel={() => {
+            router.push("/batches");
+          }}
+          onSubmit={async (input) => {
+            await update.mutateAsync(input);
+          }}
+        />
+      </div>
     </div>
   );
 }

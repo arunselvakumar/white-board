@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import { openApiDocument } from "./openapi-document";
 
 describe("openApiDocument", () => {
+  it("documents the read-only Calendar for every role", () => {
+    expect(openApiDocument.paths["/api/calendar"]?.["get"]).toBeDefined();
+    expect(openApiDocument.paths["/api/calendar"]?.["post"]).toBeUndefined();
+  });
   it("does not document Todo routes", () => {
     const paths = openApiDocument.paths;
     expect(paths["/api/todos"]).toBeUndefined();
@@ -48,5 +52,29 @@ describe("openApiDocument", () => {
     expect(paths["/api/courses/{id}"]?.["get"]).toBeDefined();
     expect(paths["/api/courses/{id}/update"]?.["post"]).toBeDefined();
     expect(paths["/api/courses/{id}/archive"]?.["post"]).toBeDefined();
+  });
+
+  it("documents Teacher management and My Batches", () => {
+    const paths = openApiDocument.paths;
+    expect(paths["/api/teachers"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers"]?.["get"]).toBeDefined();
+    expect(paths["/api/teachers/{id}"]?.["get"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/profile"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/invite"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/deactivate"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/batches"]?.["get"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/batches"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/batches/{batchId}/unassign"]?.["post"]).toBeDefined();
+    expect(paths["/api/teacher/activate"]?.["post"]).toBeDefined();
+    expect(paths["/api/teacher/batches"]?.["get"]).toBeDefined();
+  });
+
+  it("documents Attendance registers, marks, and Student history", () => {
+    const paths = openApiDocument.paths;
+    expect(paths["/api/attendance/registers"]?.["post"]).toBeDefined();
+    expect(paths["/api/attendance/registers"]?.["get"]).toBeDefined();
+    expect(paths["/api/attendance/registers/{id}"]?.["get"]).toBeDefined();
+    expect(paths["/api/attendance/registers/{id}/marks"]?.["post"]).toBeDefined();
+    expect(paths["/api/students/{id}/attendance"]?.["get"]).toBeDefined();
   });
 });

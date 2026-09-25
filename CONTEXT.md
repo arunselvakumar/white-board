@@ -98,9 +98,15 @@ _Avoid_: medium, channel, delivery type
 When teaching happens. A Batch has default Timings (days of week and clock times). An Enrollment may inherit those or set Student-specific Timings (home tuition).
 _Avoid_: timetable (P1 calendar of sessions), period
 
+**Calendar**:
+A read-only view of recurring weekly Timings. The Owner sees open Batches in the Active Workspace; a Teacher sees assigned open Batches; a Student or Parent sees active Enrollments linked through their verified Email. Day, week, and month views repeat the stored Timings. It does not create individual sessions or account for cancellations and holidays.
+
 **Enrollment**:
 The fact that a Student is taking a Course in a Batch, with Class Mode, Timings, and a Fee Plan. A Student may have many Enrollments.
 _Avoid_: admission (that is creating the Student), registration, mapping
+
+**Teacher**:
+A person who teaches a Batch in a Training Institute Workspace. A Teacher is a Workspace record, distinct from the Clerk User who signs in with role `org:teacher`. Types are Centre Teacher and Visiting Tutor. The Owner assigns Teachers to Batches; a Batch may have several Teachers.
 
 **Fee Plan**:
 What a Student owes for one Enrollment: one-time, monthly, or installments, with amounts and due dates. Copied from the Course default at enroll time and then adjustable.
@@ -183,6 +189,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Course** belongs to one **Workspace**.
 - A **Batch** belongs to one **Course**.
 - An **Enrollment** joins one **Student** to one **Course** and one **Batch**, and has one **Fee Plan**.
+- A **Teacher** belongs to one **Workspace** and may be assigned to many **Batches**; a **Batch** may have several **Teachers**.
 - A **Student** may have many **Enrollments**.
 - A **Fee Payment** belongs to one **Fee Plan** and produces one **Receipt**.
 - **Class Mode** is set on the **Batch** and may be overridden on the **Enrollment**.

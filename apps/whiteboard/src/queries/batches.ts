@@ -43,6 +43,7 @@ export type BatchWriteInput = {
 };
 
 export type BatchListFilters = {
+  workspaceId?: string | null;
   courseId?: string;
   limit?: number;
   after?: string;

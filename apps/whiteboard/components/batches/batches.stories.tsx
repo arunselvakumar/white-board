@@ -84,9 +84,7 @@ function BatchWorkspace({
           />
         ) : (
           <div className="w-full p-6">
-            <div
-              className={`flex flex-col gap-6 ${view === "create" ? "max-w-4xl" : "max-w-lg"}`}
-            >
+            <div className="flex w-full max-w-4xl flex-col gap-6">
               <PageHeader
                 back={{
                   label: "Batches",
@@ -267,13 +265,15 @@ export const Pagination: Story = {
 
 export const Validation: Story = {
   render: () => (
-    <div className="max-w-lg p-6">
-      <BatchForm
-        courses={COURSES}
-        defaultValues={{ courseId: "", name: "", capacity: "" }}
-        submitLabel="Save Batch"
-        onSubmit={() => Promise.resolve()}
-      />
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl">
+        <BatchForm
+          courses={COURSES}
+          defaultValues={{ courseId: "", name: "", capacity: "" }}
+          submitLabel="Save Batch"
+          onSubmit={() => Promise.resolve()}
+        />
+      </div>
     </div>
   ),
   play: async ({ canvas, userEvent }) => {

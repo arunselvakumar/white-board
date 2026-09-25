@@ -6,6 +6,7 @@ export const APP_NAV = [
     description:
       "Today's Batches, active Students, and outstanding dues will show here.",
   },
+  { href: "/calendar", label: "Calendar", title: "Calendar", description: "Batch Timings in this Workspace." },
   {
     href: "/students",
     label: "Students",
@@ -25,6 +26,13 @@ export const APP_NAV = [
     description: "Batches for those Courses will show here.",
   },
   {
+    href: "/teachers",
+    label: "Teachers",
+    title: "Teachers",
+    description: "Teachers and their Batch assignments.",
+  },
+  { href: "/attendance", label: "Attendance", title: "Attendance", description: "Daily Batch Attendance Registers." },
+  {
     href: "/fees",
     label: "Fees",
     title: "Fees",
@@ -34,23 +42,32 @@ export const APP_NAV = [
 
 export const STUDENT_NAV = [
   { href: "/student", label: "Student", title: "Student", description: "" },
+  { href: "/calendar", label: "Calendar", title: "Calendar", description: "My Batch Timings." },
 ] as const;
 
 export const PARENT_NAV = [
   { href: "/parent", label: "Parent", title: "Parent", description: "" },
+  { href: "/calendar", label: "Calendar", title: "Calendar", description: "Student Batch Timings." },
+] as const;
+
+export const TEACHER_NAV = [
+  { href: "/teacher", label: "My Batches", title: "My Batches", description: "Assigned Batches." },
+  { href: "/calendar", label: "Calendar", title: "Calendar", description: "My assigned Batch Timings." },
 ] as const;
 
 export function navForRole(role: string | null | undefined) {
   if (role === "org:admin") return APP_NAV;
   if (role === "org:student") return STUDENT_NAV;
   if (role === "org:parent") return PARENT_NAV;
+  if (role === "org:teacher") return TEACHER_NAV;
   return [];
 }
 
 export type AppNavItem =
   | (typeof APP_NAV)[number]
   | (typeof STUDENT_NAV)[number]
-  | (typeof PARENT_NAV)[number];
+  | (typeof PARENT_NAV)[number]
+  | (typeof TEACHER_NAV)[number];
 export type AppNavHref = AppNavItem["href"];
 
 export function isAppNavActive(pathname: string, href: string): boolean {
@@ -61,7 +78,7 @@ export function isAppNavActive(pathname: string, href: string): boolean {
 }
 
 export function appPageByHref(href: AppNavHref): AppNavItem {
-  const page = [...APP_NAV, ...STUDENT_NAV, ...PARENT_NAV].find(
+  const page = [...APP_NAV, ...STUDENT_NAV, ...PARENT_NAV, ...TEACHER_NAV].find(
     (item) => item.href === href,
   );
   if (page === undefined) {

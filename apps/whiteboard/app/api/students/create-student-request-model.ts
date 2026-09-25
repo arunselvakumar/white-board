@@ -2,6 +2,7 @@ import { z } from "zod";
 import { studentDetailsRequestFields } from "./student-details-model";
 
 export const CreateStudentRequestModel = z.object({
+  requestId: z.uuid().optional(),
   ...studentDetailsRequestFields,
   name: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(1).max(32),

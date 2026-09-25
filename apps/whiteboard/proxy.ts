@@ -12,6 +12,10 @@ const appRouteSegments = new Set([
   "payments",
   "student",
   "parent",
+  "teacher",
+  "teachers",
+  "attendance",
+  "calendar",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

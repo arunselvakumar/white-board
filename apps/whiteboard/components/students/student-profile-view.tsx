@@ -12,6 +12,9 @@ import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
 import { studentQueries, type StudentResponse } from "@/src/queries/students";
+import { attendanceQueries } from "@/src/queries/attendance";
+import { useAuth } from "@clerk/nextjs";
+import { useState } from "react";
 
 const salutations: Record<string, string> = {
   mr: "Mr.",
@@ -286,10 +289,14 @@ export function StudentProfileView({
 
 export function StudentProfileScreen({ studentId }: { studentId: string }) {
   const router = useRouter();
+  const { orgId } = useAuth();
+  const [attendanceCursor, setAttendanceCursor] = useState<{ after?: string; before?: string }>();
   const { data: student } = useSuspenseQuery(studentQueries.detail(studentId));
   const { data: courses } = useSuspenseQuery(courseQueries.list());
   const { data: batches } = useSuspenseQuery(batchQueries.list());
+  const { data: attendance } = useSuspenseQuery(attendanceQueries.student(orgId, studentId, attendanceCursor));
   return (
+    <>
     <StudentProfileView
       student={student}
       courseNameById={
@@ -308,5 +315,7 @@ export function StudentProfileScreen({ studentId }: { studentId: string }) {
         router.push(`/students/${studentId}/enroll`);
       }}
     />
+    <section className="w-full px-6 pb-6"><div className="max-w-4xl rounded-2xl border p-5 sm:p-7"><h2 className="mb-4 text-lg font-semibold">Attendance history</h2>{attendance.items.length === 0 ? <p className="text-muted-foreground text-sm">No Attendance recorded yet.</p> : <ul className="space-y-2">{attendance.items.map((item) => <li key={item.id} className="flex flex-wrap justify-between gap-2 rounded-lg border p-3 text-sm"><span>{item.date} · {item.batchName}</span><span className="capitalize">{item.status}{item.note ? ` · ${item.note}` : ""}</span></li>)}</ul>}<div className="mt-4 flex gap-2"><Button type="button" variant="outline" disabled={!attendance.prevCursor} onClick={() => { setAttendanceCursor({ before: attendance.prevCursor ?? undefined }); }}>Previous</Button><Button type="button" variant="outline" disabled={!attendance.nextCursor} onClick={() => { setAttendanceCursor({ after: attendance.nextCursor ?? undefined }); }}>Next</Button></div></div></section>
+    </>
   );
 }

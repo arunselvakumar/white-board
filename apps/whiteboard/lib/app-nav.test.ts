@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import { APP_NAV, appPageByHref, isAppNavActive, navForRole } from "./app-nav";
 
 describe("role navigation", () => {
-  it("shows only Student to a Student and only Parent to a Parent", () => {
+  it("shows each role its home and Calendar", () => {
     expect(navForRole("org:student").map((item) => item.label)).toEqual([
       "Student",
+      "Calendar",
     ]);
     expect(navForRole("org:parent").map((item) => item.label)).toEqual([
       "Parent",
+      "Calendar",
     ]);
     expect(navForRole("org:member")).toEqual([]);
     expect(navForRole("org:admin")).toEqual(APP_NAV);
@@ -38,10 +40,19 @@ describe("appPageByHref", () => {
   it("covers every nav item", () => {
     expect(APP_NAV.map((item) => item.href)).toEqual([
       "/",
+      "/calendar",
       "/students",
       "/courses",
       "/batches",
+      "/teachers",
+      "/attendance",
       "/fees",
     ]);
+  });
+
+  it("offers Calendar to every supported role", () => {
+    for (const role of ["org:admin", "org:teacher", "org:student", "org:parent"]) {
+      expect(navForRole(role).some((item) => item.href === "/calendar")).toBe(true);
+    }
   });
 });
