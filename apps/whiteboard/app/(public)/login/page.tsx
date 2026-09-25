@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { safeRedirectPath } from "@/lib/safe-redirect";
+import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 type LoginPageProps = {
   searchParams: Promise<{ redirect_url?: string | string[] }>;
@@ -15,7 +16,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const { isAuthenticated } = await auth();
   if (isAuthenticated) {
-    redirect(redirectUrl);
+    redirect(workspaceEntryPath(redirectUrl));
   }
 
   return <LoginForm redirectUrl={redirectUrl} />;

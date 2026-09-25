@@ -20,6 +20,7 @@ import { LoadingScreen } from "@/components/auth/loading-screen";
 import { PasswordField } from "@/components/auth/password-field";
 import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
 import { navigateAfterAuth } from "@/lib/navigate-after-auth";
+import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required"),
@@ -41,6 +42,7 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
   const router = useRouter();
   const { signIn, errors, fetchStatus } = useSignIn();
   const { isSignedIn } = useAuth();
+  const entryPath = workspaceEntryPath(redirectUrl);
   const [step, setStep] = useState<"credentials" | "second-factor">(
     "credentials",
   );
@@ -56,9 +58,9 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.replace(redirectUrl);
+      router.replace(entryPath);
     }
-  }, [isSignedIn, redirectUrl, router]);
+  }, [entryPath, isSignedIn, router]);
 
   const busy = isSubmitting || fetchStatus === "fetching";
 
@@ -83,7 +85,7 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
     }
     if (signIn.status === "complete") {
       await signIn.finalize({
-        navigate: navigateAfterAuth(router, redirectUrl),
+        navigate: navigateAfterAuth(router, entryPath),
       });
     }
   };
@@ -95,7 +97,7 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
     }
     if (signIn.status === "complete") {
       await signIn.finalize({
-        navigate: navigateAfterAuth(router, redirectUrl),
+        navigate: navigateAfterAuth(router, entryPath),
       });
     }
   };
@@ -110,7 +112,7 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
   const continueWithGoogle = () => {
     void signIn.sso({
       strategy: "oauth_google",
-      redirectUrl,
+      redirectUrl: entryPath,
       redirectCallbackUrl: "/sso-callback",
     });
   };

@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { APP_NAV, appPageByHref, isAppNavActive } from "./app-nav";
+import { APP_NAV, appPageByHref, isAppNavActive, navForRole } from "./app-nav";
+
+describe("role navigation", () => {
+  it("shows only Student to a Student and only Parent to a Parent", () => {
+    expect(navForRole("org:student").map((item) => item.label)).toEqual(["Student"]);
+    expect(navForRole("org:parent").map((item) => item.label)).toEqual(["Parent"]);
+    expect(navForRole("org:member")).toEqual([]);
+    expect(navForRole("org:admin")).toEqual(APP_NAV);
+  });
+});
 
 describe("isAppNavActive", () => {
   it("treats Dashboard as active only on the In-app Home", () => {

@@ -39,3 +39,19 @@ export const Default: Story = {
     ).toBeVisible();
   },
 };
+
+export const ActiveWorkspaceStillRequiresSelection: Story = {
+  beforeEach() {
+    clerkMocks.orgId = "org_riverside";
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Select a workspace" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: /Harbor Academy/ }),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: /Harbor Academy/ }));
+    await expect(clerkMocks.setActive).toHaveBeenCalledWith({ organization: "org_harbor" });
+  },
+};

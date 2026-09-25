@@ -38,7 +38,7 @@ P1 (attendance, enquiry CRM, session calendar, certificates, WhatsApp) and Schoo
 | Fee Plan / Fee Payment / Receipt | invoice, bill (in P0)                         |
 | Owner Dashboard                  | analytics                                     |
 
-A **Student** is a Workspace record. They do not sign in in P0. Do not create Clerk Users for learners.
+A **Student** remains a Workspace record, distinct from a Clerk User. Add Student invites a Student with an email address as `org:student` and father, mother, and Guardians with email addresses as `org:parent`. The Owner (`org:admin`) alone can use the existing register screens and APIs; Student and Parent currently have Hello world pages.
 
 ## Architecture
 

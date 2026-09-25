@@ -1,10 +1,11 @@
 "use client";
 
-import { UserButton, useOrganization } from "@clerk/nextjs";
+import { UserButton, useAuth, useOrganization, useOrganizationList } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { Button } from "@repo/ui/components/button";
 import { Separator } from "@repo/ui/components/separator";
 import {
   Sidebar,
@@ -20,14 +21,17 @@ import {
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
 
-import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
+import { isAppNavActive, navForRole } from "@/lib/app-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "/";
   const { organization } = useOrganization();
+  const { userMemberships } = useOrganizationList({ userMemberships: true });
+  const { orgRole } = useAuth();
   const workspaceName = organization?.name ?? "Workspace";
+  const navigation = navForRole(orgRole);
 
   return (
     <SidebarProvider>
@@ -59,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <SidebarGroupContent>
               <nav aria-label="Main">
                 <SidebarMenu>
-                  {APP_NAV.map((item) => {
+                  {navigation.map((item) => {
                     const Icon = APP_NAV_ICONS[item.href];
                     const active = isAppNavActive(pathname, item.href);
                     return (
@@ -89,6 +93,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="text-muted-foreground truncate text-sm font-light">
             {workspaceName}
           </p>
+          {(userMemberships.count ?? 0) > 1 && (
+            <Button variant="ghost" size="sm" render={<Link href="/select-workspace" />}>
+              Switch Workspace
+            </Button>
+          )}
           <div className="ml-auto">
             <UserButton />
           </div>

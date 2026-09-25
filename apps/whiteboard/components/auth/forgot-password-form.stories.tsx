@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
@@ -68,5 +68,29 @@ export const ResetValidationErrors: Story = {
     await expect(
       canvas.getByText("Password must be at least 8 characters"),
     ).toBeVisible();
+  },
+};
+
+export const ResetFinishesAtWorkspaceSelection: Story = {
+  beforeEach() {
+    clerkMocks.signIn.resetPasswordEmailCode.verifyCode.mockImplementation(() => ({ error: null }));
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
+    await userEvent.click(canvas.getByRole("button", { name: "Send reset code" }));
+    await userEvent.type(await canvas.findByLabelText("Reset code"), "123456");
+    await userEvent.type(canvas.getByLabelText("New password"), "password123");
+    await expect(canvas.getByLabelText("Reset code")).toHaveValue("123456");
+    await expect(canvas.getByLabelText("New password")).toHaveValue("password123");
+    await userEvent.click(canvas.getByRole("button", { name: "Reset password" }));
+    await waitFor(() => expect(clerkMocks.signIn.resetPasswordEmailCode.verifyCode).toHaveBeenCalled());
+    await waitFor(() => expect(clerkMocks.signIn.resetPasswordEmailCode.submitPassword).toHaveBeenCalled());
+    await waitFor(() => expect(clerkMocks.signIn.finalize).toHaveBeenCalled());
+    const call = clerkMocks.signIn.finalize.mock.calls.at(-1)?.[0] as {
+      navigate: (input: { decorateUrl: (url: string) => string }) => void;
+    };
+    let destination = "";
+    call.navigate({ decorateUrl: (url) => { destination = url; return url; } });
+    await expect(destination).toBe("/select-workspace");
   },
 };

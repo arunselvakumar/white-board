@@ -429,8 +429,9 @@ export function StudentForm({
               {defaultValues == null ? "Add Student" : "Edit Student"}
             </h1>
             <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-              Record the Student and their contacts. Course and Batch details
-              are added when you create an Enrollment.
+              {defaultValues == null
+                ? "Record the Student and their contacts. Email addresses entered here receive Workspace invitations when you save. Course and Batch details are added with an Enrollment."
+                : "Update the Student and their contacts. Course and Batch details are managed through Enrollments."}
             </p>
           </div>
           {preview ? (

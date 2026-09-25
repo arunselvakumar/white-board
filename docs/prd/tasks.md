@@ -12,6 +12,8 @@ status_values:
 
 # P0 tasks — Replace the register
 
+The P0 board below is the original delivery sequence. Work after P0 is recorded at the end of this file.
+
 Sequential tickets for [training-institute-p0.md](./training-institute-p0.md). Work **top to bottom**. Do not start a ticket until every `Blocked by` ticket is `done`.
 
 Update **Status** in the board when you pick up or finish work. Leave **Issue** blank until a tracker id exists.
@@ -324,3 +326,14 @@ Remove `src/todo`, `/api/todos`, Todo Prisma model (migration), Storybook/tests 
 Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dashboard cards deep-link. Storybook coverage for every P0 form. Copy uses CONTEXT.md words only. No leftover “Open board” / Todo chrome.
 
 **Done when:** a new Owner can complete the P0 loop using only the UI, and Storybook play functions cover that loop’s screens.
+
+## Changes after P0
+
+| ID | Title | Status | Area |
+| --- | --- | --- | --- |
+| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role | done | Auth+HTTP+UI |
+| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces | done | Auth+UI |
+
+### WB-001 — Student and Parent Workspace invitations
+
+**Done when:** Add Student sends role-specific Clerk invitations for supplied email addresses; Student and Parent Users see one Hello world navigation item and cannot enter Owner pages or APIs; route, HTTP, and Storybook tests pass. See [ADR-0027](../adr/0027-student-and-parent-workspace-invitations.md).
