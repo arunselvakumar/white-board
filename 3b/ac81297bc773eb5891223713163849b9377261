@@ -1,0 +1,303 @@
+apps/whiteboard/app/(app)/attendance/batches/[id]/page.tsx
+  s_05ce0d5cc5baf7::t_c04447c212fc72 1-11
+apps/whiteboard/app/(app)/attendance/page.tsx
+  s_05ce0d5cc5baf7::t_bb47092acfea87 1-6
+apps/whiteboard/app/(app)/teacher/batches/[id]/attendance/page.tsx
+  s_05ce0d5cc5baf7::t_de85232daab66b 1-11
+apps/whiteboard/app/api/_lib/require-attendance-session.ts
+  s_05ce0d5cc5baf7::t_db388a5f32a187 1-34
+apps/whiteboard/app/api/attendance/registers/[id]/marks/route.ts
+  s_05ce0d5cc5baf7::t_02ad37fb069065 1-31
+apps/whiteboard/app/api/attendance/registers/[id]/marks/save-attendance-marks-request-model.ts
+  s_05ce0d5cc5baf7::t_f54e5f78a65328 1-14
+apps/whiteboard/app/api/attendance/registers/[id]/route.ts
+  s_05ce0d5cc5baf7::t_23b0739db30468 1-25
+apps/whiteboard/app/api/attendance/registers/attendance-models.ts
+  s_05ce0d5cc5baf7::t_78a8b5013c930a 1-79
+apps/whiteboard/app/api/attendance/registers/route.ts
+  s_05ce0d5cc5baf7::t_fe41aa706e303b 1-49
+apps/whiteboard/app/api/students/[id]/attendance/route.ts
+  s_05ce0d5cc5baf7::t_b503ed3694c8fe 1-48
+apps/whiteboard/app/api/students/[id]/attendance/student-attendance-models.ts
+  s_05ce0d5cc5baf7::t_46949ade2ed8aa 1-28
+apps/whiteboard/components/attendance/attendance-form.tsx
+  s_05ce0d5cc5baf7::t_5d5d56068ade0a 1-171
+apps/whiteboard/components/attendance/attendance-screens.tsx
+  s_3e71353ff0b80b::t_29ff1f6a5a1854 1-291
+apps/whiteboard/components/attendance/attendance.stories.tsx
+  s_3e71353ff0b80b::t_e69ffb45fc6033 1-102
+apps/whiteboard/components/attendance/backdated-attendance-form.tsx
+  s_3e71353ff0b80b::t_0b68831024e3cd 1-75
+apps/whiteboard/components/batches/batch-form.tsx
+  s_5d47fe76fe9563::t_562b1a040a8df0 175-222,224,226,230-231,238,242,245-247,254-265,268-288,305-308,379-381
+apps/whiteboard/components/students/student-admission.stories.tsx
+  s_05ce0d5cc5baf7::t_c2e5457f7143c1 1-60
+apps/whiteboard/components/students/student-form-preview.stories.tsx
+  s_05ce0d5cc5baf7::t_d46443777d710e 2,72-124
+apps/whiteboard/components/students/student-form.tsx
+  s_05ce0d5cc5baf7::t_99219243838046 110,114,170,219,361,366-369,374,398,427-429,445-447,710-761,774-776
+apps/whiteboard/src/queries/batches.ts
+  s_05ce0d5cc5baf7::t_a3a34d12b235d5 46
+apps/whiteboard/src/queries/student-admission.test.ts
+  s_05ce0d5cc5baf7::t_d787b369ccab92 1-120
+apps/whiteboard/src/queries/student-admission.ts
+  s_05ce0d5cc5baf7::t_ae06e91db80198 1-160
+apps/whiteboard/src/training/application/attendance-handlers.ts
+  s_3e71353ff0b80b::t_8650fecb56e587 1-207
+apps/whiteboard/src/training/domain/attendance-register.test.ts
+  s_05ce0d5cc5baf7::t_ecbc35072d02ce 1-151
+apps/whiteboard/src/training/domain/attendance-register.ts
+  s_05ce0d5cc5baf7::t_9957a814c18ab0 1-268
+apps/whiteboard/src/training/domain/attendance-repository.ts
+  s_05ce0d5cc5baf7::t_7837f8425e023a 1-68
+apps/whiteboard/src/training/infrastructure/prisma-attendance-repository.ts
+  s_3e71353ff0b80b::t_ffb96fe69a8e5e 1-349
+docs/prd/training-institute-attendance.md
+  s_05ce0d5cc5baf7::t_29c47b72040093 1-45
+packages/db/prisma/migrations/20260925075839_teachers/migration.sql
+  s_05ce0d5cc5baf7::t_0bc330a4f3897b 1-62
+packages/db/prisma/migrations/20260925114026_attendance_registers/migration.sql
+  s_05ce0d5cc5baf7::t_eb170c878c7280 1-79
+AGENTS.md
+  s_5d47fe76fe9563::t_a5be396f3ea1e5 66
+CONTEXT.md
+  s_4166dde58bde30::t_d24760b63245a6 101-103,108-110,192
+apps/whiteboard/app/(app)/calendar/page.tsx
+  s_4166dde58bde30::t_d7e6f6b1816577 1-9
+apps/whiteboard/app/(app)/page.tsx
+  s_05ce0d5cc5baf7::t_1d997c9abf118b 4,16-17,28
+apps/whiteboard/app/(app)/teacher/page.tsx
+  s_05ce0d5cc5baf7::t_f67095b7612e84 1-4
+apps/whiteboard/app/(app)/teachers/[id]/page.tsx
+  s_05ce0d5cc5baf7::t_5e50f5f2440d0c 1-6
+apps/whiteboard/app/(app)/teachers/new/page.tsx
+  s_05ce0d5cc5baf7::t_967d5ce7191525 1-4
+apps/whiteboard/app/(app)/teachers/page.tsx
+  s_05ce0d5cc5baf7::t_29e86e92f87210 1-4
+apps/whiteboard/app/api/_lib/map-error.ts
+  s_05ce0d5cc5baf7::t_4d113858619112 12-15,21,31-38,72-74
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_4166dde58bde30::t_65b744d337924e 6-9,56-79
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_4166dde58bde30::t_43601d688f308e 2,66-77,81-97,111
+apps/whiteboard/app/api/_lib/require-teacher-session.ts
+  s_05ce0d5cc5baf7::t_0990955b04de81 1-12
+apps/whiteboard/app/api/attendance/attendance.http.test.ts
+  s_3e71353ff0b80b::t_cff86669040f87 1-597
+apps/whiteboard/app/api/calendar/calendar-response-model.ts
+  s_4166dde58bde30::t_e24526503e7178 1-18
+apps/whiteboard/app/api/calendar/calendar.http.test.ts
+  s_4166dde58bde30::t_8684adc05961b3 1-90
+apps/whiteboard/app/api/calendar/route.ts
+  s_4166dde58bde30::t_069c014c1d3add 1-33
+apps/whiteboard/app/api/students/create-student-request-model.ts
+  s_05ce0d5cc5baf7::t_6ff08f1da65344 5
+apps/whiteboard/app/api/students/students.http.test.ts
+  s_05ce0d5cc5baf7::t_c574ba5a8a04f1 153-188
+apps/whiteboard/app/api/teacher/activate/activate-teacher-response-model.ts
+  s_05ce0d5cc5baf7::t_28d52dbdf9b24b 1-3
+apps/whiteboard/app/api/teacher/activate/route.ts
+  s_05ce0d5cc5baf7::t_9a8d1fa467f51f 1-35
+apps/whiteboard/app/api/teacher/batches/route.ts
+  s_05ce0d5cc5baf7::t_44979df26bfff1 1-15
+apps/whiteboard/app/api/teachers/[id]/batches/[batchId]/unassign/route.ts
+  s_05ce0d5cc5baf7::t_6afa02592d2a10 1-20
+apps/whiteboard/app/api/teachers/[id]/batches/assignment-models.ts
+  s_05ce0d5cc5baf7::t_b72f34042aa58a 1-15
+apps/whiteboard/app/api/teachers/[id]/batches/route.ts
+  s_05ce0d5cc5baf7::t_8b4afa5b007e5f 1-29
+apps/whiteboard/app/api/teachers/[id]/deactivate/route.ts
+  s_05ce0d5cc5baf7::t_171e31df31eb3e 1-16
+apps/whiteboard/app/api/teachers/[id]/invite/route.ts
+  s_05ce0d5cc5baf7::t_bd9ae2b83c817a 1-16
+apps/whiteboard/app/api/teachers/[id]/profile/route.ts
+  s_05ce0d5cc5baf7::t_39e4d01fda53aa 1-18
+apps/whiteboard/app/api/teachers/[id]/profile/update-teacher-profile-request-model.ts
+  s_05ce0d5cc5baf7::t_50e75c46e84aa6 1-8
+apps/whiteboard/app/api/teachers/[id]/route.ts
+  s_05ce0d5cc5baf7::t_927f507a786451 1-16
+apps/whiteboard/app/api/teachers/[id]/teacher-params-model.ts
+  s_05ce0d5cc5baf7::t_1184739c813bf3 1-3
+apps/whiteboard/app/api/teachers/create-teacher-request-model.ts
+  s_05ce0d5cc5baf7::t_473750b38b9174 1-9
+apps/whiteboard/app/api/teachers/list-teachers-request-model.ts
+  s_05ce0d5cc5baf7::t_9cfa142ea019ee 1-9
+apps/whiteboard/app/api/teachers/list-teachers-response-model.ts
+  s_05ce0d5cc5baf7::t_fc404d3346f1c8 1-10
+apps/whiteboard/app/api/teachers/route.ts
+  s_05ce0d5cc5baf7::t_e120cec08ea625 1-42
+apps/whiteboard/app/api/teachers/teacher-response-model.ts
+  s_05ce0d5cc5baf7::t_b28583759a1bfc 1-33
+apps/whiteboard/app/api/teachers/teachers.http.test.ts
+  s_05ce0d5cc5baf7::t_56e05b2828d1b5 1-292
+apps/whiteboard/components/app-shell/app-breadcrumbs.tsx
+  s_4166dde58bde30::t_864d75f0857cbb 29
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_4166dde58bde30::t_72733c8dbf3c78 16,23-25
+apps/whiteboard/components/batches/batch-create-screen.tsx
+  s_4166dde58bde30::t_6752f2d2b9bca5 13,24,34
+apps/whiteboard/components/batches/batch-edit-screen.tsx
+  s_4166dde58bde30::t_7262544220efdf 23,42,55-75,77,79-89,91-131
+apps/whiteboard/components/batches/batches-screen.tsx
+  s_4166dde58bde30::t_dc36b28b646cf3 20,50
+apps/whiteboard/components/batches/batches.stories.tsx
+  s_5d47fe76fe9563::t_9d9278730f43d8 87,268-276
+apps/whiteboard/components/calendar/calendar-screen.tsx
+  s_4166dde58bde30::t_dee19b84cf65e0 1-14
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_4166dde58bde30::t_4511bcd899a02d 1-157
+apps/whiteboard/components/calendar/calendar.stories.tsx
+  s_4166dde58bde30::t_cac05ae1fdad67 1-34
+apps/whiteboard/components/courses/course-create-screen.tsx
+  s_5d47fe76fe9563::t_141c75c5c3ccad 23
+apps/whiteboard/components/courses/course-edit-screen.tsx
+  s_4166dde58bde30::t_ec8090bd33e0fe 16,27,33-50
+apps/whiteboard/components/courses/courses-screen.tsx
+  s_4166dde58bde30::t_2179a2b475c450 18,36
+apps/whiteboard/components/courses/courses.stories.tsx
+  s_5d47fe76fe9563::t_bdb4ac57af11fc 76,250-256
+apps/whiteboard/components/students/student-create-screen.tsx
+  s_05ce0d5cc5baf7::t_0f65004e933273 3-8,10-12,14,16,18-25,28-104,108-135,137-168,170-171,173-191,193-310,316,320-329
+apps/whiteboard/components/students/student-profile-view.tsx
+  s_05ce0d5cc5baf7::t_0c68ec73af6952 15-17,292-293,297,299,318-319
+apps/whiteboard/components/teachers/my-batches-screen.tsx
+  s_05ce0d5cc5baf7::t_869f86e2dc63dd 1-24
+apps/whiteboard/components/teachers/teacher-create-screen.tsx
+  s_05ce0d5cc5baf7::t_23f48b49ef7283 1-20
+apps/whiteboard/components/teachers/teacher-detail-screen.tsx
+  s_05ce0d5cc5baf7::t_8e9ef2902b2a18 1-60
+apps/whiteboard/components/teachers/teacher-form.tsx
+  s_05ce0d5cc5baf7::t_7b7178031606ea 1-63
+apps/whiteboard/components/teachers/teachers-empty-state.tsx
+  s_05ce0d5cc5baf7::t_a840f7f0f66d0c 1-10
+apps/whiteboard/components/teachers/teachers-screen.tsx
+  s_05ce0d5cc5baf7::t_d3470162d9d0fe 1-28
+apps/whiteboard/components/teachers/teachers.stories.tsx
+  s_05ce0d5cc5baf7::t_94bb894957cfab 1-46
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_4166dde58bde30::t_bd85f6e5af5c9a 12,15,33,35,43
+apps/whiteboard/lib/app-nav.test.ts
+  s_4166dde58bde30::t_299552c976240e 6,9,13,43,47-48,52-57
+apps/whiteboard/lib/app-nav.ts
+  s_4166dde58bde30::t_3cb00d053a14e3 9,28-34,45,50-55,62,69-70,81
+apps/whiteboard/lib/calendar-dates.test.ts
+  s_4166dde58bde30::t_58dda1c5cd4556 1-25
+apps/whiteboard/lib/calendar-dates.ts
+  s_4166dde58bde30::t_9a5d150f992ec9 1-72
+apps/whiteboard/lib/workspace-access.test.ts
+  s_4166dde58bde30::t_96a77b22cb0eae 30-45
+apps/whiteboard/lib/workspace-access.ts
+  s_4166dde58bde30::t_a8e3251d6cec40 10,19,22-23
+apps/whiteboard/proxy.ts
+  s_4166dde58bde30::t_da4a2ae0be936e 15-18
+apps/whiteboard/src/queries/attendance.ts
+  s_05ce0d5cc5baf7::t_6135bb51ef06df 1-122
+apps/whiteboard/src/queries/calendar.test.ts
+  s_4166dde58bde30::t_479b7e8f1dc6ae 1-10
+apps/whiteboard/src/queries/calendar.ts
+  s_4166dde58bde30::t_ab2d4a7e68fe91 1-26
+apps/whiteboard/src/queries/invalidate-register.ts
+  s_4166dde58bde30::t_3055676a1ba792 4,8,14-16,18
+apps/whiteboard/src/queries/students.ts
+  s_05ce0d5cc5baf7::t_aaaa0c02021753 134,139
+apps/whiteboard/src/queries/teachers.test.ts
+  s_05ce0d5cc5baf7::t_760d7fda5d61a1 1-14
+apps/whiteboard/src/queries/teachers.ts
+  s_05ce0d5cc5baf7::t_e26c30f3c972ed 1-70
+apps/whiteboard/src/training/application/calendar-schedule.ts
+  s_4166dde58bde30::t_5258da8e620c6e 1-20
+apps/whiteboard/src/training/application/create-student.command.ts
+  s_05ce0d5cc5baf7::t_5f029739dd96a2 4
+apps/whiteboard/src/training/application/create-student.handler.ts
+  s_05ce0d5cc5baf7::t_66b31dd94dfddc 3,9,24,30-47,52-66
+apps/whiteboard/src/training/application/not-found-error.ts
+  s_05ce0d5cc5baf7::t_b32f24a79d2400 45-53
+apps/whiteboard/src/training/application/teacher-assignment-handlers.ts
+  s_05ce0d5cc5baf7::t_c2b01546a4523e 1-42
+apps/whiteboard/src/training/application/teacher-handlers.ts
+  s_05ce0d5cc5baf7::t_ff0e376e760124 1-151
+apps/whiteboard/src/training/domain/student-repository.ts
+  s_05ce0d5cc5baf7::t_1bc4e992a9d42c 11
+apps/whiteboard/src/training/domain/teacher-assignment-repository.ts
+  s_05ce0d5cc5baf7::t_e2e6af5f4fe135 1-17
+apps/whiteboard/src/training/domain/teacher-repository.ts
+  s_05ce0d5cc5baf7::t_5d1d87ae297996 1-17
+apps/whiteboard/src/training/domain/teacher.test.ts
+  s_05ce0d5cc5baf7::t_ec30b7f78c7d80 1-52
+apps/whiteboard/src/training/domain/teacher.ts
+  s_05ce0d5cc5baf7::t_4d7851703f967b 1-190
+apps/whiteboard/src/training/infrastructure/clerk-teacher-inviter.ts
+  s_05ce0d5cc5baf7::t_a668af67515cd3 1-75
+apps/whiteboard/src/training/infrastructure/create-attendance-handlers.ts
+  s_05ce0d5cc5baf7::t_02215c63384267 1-8
+apps/whiteboard/src/training/infrastructure/create-calendar-schedule-reader.ts
+  s_4166dde58bde30::t_dd2a003304ef77 1-9
+apps/whiteboard/src/training/infrastructure/create-teacher-assignment-handlers.ts
+  s_05ce0d5cc5baf7::t_a28b95c3378f79 1-9
+apps/whiteboard/src/training/infrastructure/create-teacher-handlers.ts
+  s_05ce0d5cc5baf7::t_b3340e7365b6f5 1-15
+apps/whiteboard/src/training/infrastructure/prisma-calendar-schedule-reader.ts
+  s_4166dde58bde30::t_a1ed0dcec793ce 1-74
+apps/whiteboard/src/training/infrastructure/prisma-student-repository.ts
+  s_05ce0d5cc5baf7::t_35c5c6649670d6 17-47
+apps/whiteboard/src/training/infrastructure/prisma-teacher-assignment-repository.ts
+  s_05ce0d5cc5baf7::t_b2bce96fd48a86 1-47
+apps/whiteboard/src/training/infrastructure/prisma-teacher-repository.ts
+  s_05ce0d5cc5baf7::t_7fa8438349e1e7 1-119
+docs/prd/tasks.md
+  s_4166dde58bde30::t_4f848382e36740 332-340,345-372
+docs/prd/training-institute-teachers.md
+  s_05ce0d5cc5baf7::t_86f197ac7ccfd0 1-53
+docs/superpowers/plans/2026-09-25-attendance-module.md
+  s_05ce0d5cc5baf7::t_1aaaf418e1ca9f 1-48
+docs/superpowers/plans/2026-09-25-teachers-module.md
+  s_05ce0d5cc5baf7::t_97322ec3aca34a 1-68
+packages/db/prisma/migrations/20260925080000_teacher_active_uniqueness/migration.sql
+  s_05ce0d5cc5baf7::t_1fae23ac8f13a0 1-11
+packages/db/prisma/migrations/20260925090000_teacher_active_identity/migration.sql
+  s_05ce0d5cc5baf7::t_5be07cba1d34fc 1-9
+packages/db/prisma/migrations/20260925114500_attendance_active_uniqueness/migration.sql
+  s_05ce0d5cc5baf7::t_b61d6356d4d625 1-3
+packages/db/prisma/schema.prisma
+  s_05ce0d5cc5baf7::t_cbf51862463bf8 57-82,135-136,143-188,210,246,254-314
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3bac81297bc773eb5891223713163849b9377261",
+  "prompts": {},
+  "sessions": {
+    "s_05ce0d5cc5baf7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d744-9c4a-7212-96d4-72155db87dc8",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_3e71353ff0b80b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d8c5-daa1-7991-b8f5-d803c18dba95",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_4166dde58bde30": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d917-b493-7311-9d93-ec510a6e221e",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_5d47fe76fe9563": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d742-ff88-7942-adc7-b17e935c05ad",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
