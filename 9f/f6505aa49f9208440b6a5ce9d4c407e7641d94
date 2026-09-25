@@ -1,0 +1,251 @@
+apps/whiteboard/app/(app)/page.tsx
+  s_ceb352826e0909::t_2aa0f91bedff0b 1,3,7-17,19-25
+apps/whiteboard/app/(onboarding)/select-workspace/page.stories.tsx
+  s_ceb352826e0909::t_acde84e5429c21 42-61
+apps/whiteboard/app/(public)/accept-invitation/page.tsx
+  s_ceb352826e0909::t_7e8191304259bf 1-28
+apps/whiteboard/app/api/_lib/require-session.test.ts
+  s_ceb352826e0909::t_c91141edf81309 1-36
+apps/whiteboard/app/api/batches/batches.http.test.ts
+  s_ceb352826e0909::t_c56151ddefd1a9 22-26
+apps/whiteboard/app/api/courses/courses.http.test.ts
+  s_ceb352826e0909::t_dca9d3e04cc783 22-26
+apps/whiteboard/app/api/dashboard/dashboard.http.test.ts
+  s_ceb352826e0909::t_22be1ed7c563af 19-23
+apps/whiteboard/app/api/enrollments/enrollments.http.test.ts
+  s_ceb352826e0909::t_496b4bfb5b186d 27-31
+apps/whiteboard/app/api/students/students.http.test.ts
+  s_ceb352826e0909::t_da3f34e0e24ada 15-25,28-32,37-42,99-100,105-152,174-184
+apps/whiteboard/components/app-shell/app-breadcrumbs.tsx
+  s_ceb352826e0909::t_eb6cc1b6eee58d 1-102
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_ceb352826e0909::t_656509619be02b 2,36-41,45-160
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_ceb352826e0909::t_9386c73642b41a 3-8,14,18,21,31,34-35,40-41,43,48,63,71-74,78,87,101-103,106,112-120,125-127
+apps/whiteboard/components/app-shell/page-header.tsx
+  s_ceb352826e0909::t_68ea00e8dc8e21 1-77
+apps/whiteboard/components/auth/accept-invitation-form.stories.tsx
+  s_ceb352826e0909::t_33ae6e2dc946da 1-80
+apps/whiteboard/components/auth/accept-invitation-form.tsx
+  s_ceb352826e0909::t_b1bdceec312572 1-170
+apps/whiteboard/components/auth/forgot-password-form.stories.tsx
+  s_ceb352826e0909::t_914ef9665297c9 2,73-117
+apps/whiteboard/components/auth/login-form.stories.tsx
+  s_ceb352826e0909::t_ca13b7e0b0e8ce 2,71,132-157
+apps/whiteboard/components/auth/signup-form.stories.tsx
+  s_ceb352826e0909::t_d4be1d92b936d4 2,87,92-118
+apps/whiteboard/components/batches/batch-create-screen.tsx
+  s_9ad88ec6f9c29b::t_7a37ba4698bdba 3-7,10,31-50
+apps/whiteboard/components/batches/batch-edit-screen.tsx
+  s_ceb352826e0909::t_9aa688c318a1eb 3-7,20-21,54-70,118
+apps/whiteboard/components/batches/batches-screen.tsx
+  s_93c4e1e5af856d::t_2ce73e9a3d9677 14-18,21-22,27-29,31-42,55-59,64-85
+apps/whiteboard/components/batches/batches.stories.tsx
+  s_9ad88ec6f9c29b::t_96d21ace649511 5,86-99,101-174,213-267,318-320,338-340
+apps/whiteboard/components/catalog/catalog-chrome.tsx
+  s_93c4e1e5af856d::t_bce9f6a1c195b4 1-138
+apps/whiteboard/components/courses/course-create-screen.tsx
+  s_9ad88ec6f9c29b::t_3f10d913a6e9ab 6,22-37
+apps/whiteboard/components/courses/course-edit-screen.tsx
+  s_ceb352826e0909::t_2ed232e0d0ea74 3-7,10,32-36
+apps/whiteboard/components/courses/courses-screen.tsx
+  s_93c4e1e5af856d::t_80889e1ce4d77d 3-9,16,19-20,24-30,40-62
+apps/whiteboard/components/courses/courses.stories.tsx
+  s_9ad88ec6f9c29b::t_f2105844df8ae6 5,75-94,96-139,202-249
+apps/whiteboard/components/enrollments/enrollment-create-screen.tsx
+  s_9ad88ec6f9c29b::t_26bf647b43e83d 3-7,10,12,14,73-81,83-117
+apps/whiteboard/components/enrollments/enrollment-detail-screen.tsx
+  s_ceb352826e0909::t_3478e312fd840f 36,38,92-93,138-145,160-162,308-309
+apps/whiteboard/components/enrollments/enrollments.stories.tsx
+  s_9ad88ec6f9c29b::t_1034f66ca621ad 5,44-48,50-64
+apps/whiteboard/components/enrollments/receipt-screen.tsx
+  s_ceb352826e0909::t_03c59e2468dbf5 6,32-36,38-50,53-55
+apps/whiteboard/components/onboarding/select-workspace-form.stories.tsx
+  s_ceb352826e0909::t_5dd7b8df66bd53 103-115
+apps/whiteboard/components/onboarding/select-workspace-form.tsx
+  s_ceb352826e0909::t_cf8973b91407b1 7,18,40,49,54,95,122,124,129,145,150-162
+apps/whiteboard/components/students/student-avatar.tsx
+  s_ceb352826e0909::t_5f35463c9955ad 1-39
+apps/whiteboard/components/students/students-screen.tsx
+  s_93c4e1e5af856d::t_90df944f083a13 14-20,27-29,41,70-91
+apps/whiteboard/components/students/students.stories.tsx
+  s_93c4e1e5af856d::t_64e2c07644b6cd 3,110-113,115-144,146-158,271-275,285-368,434-436
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_ceb352826e0909::t_71ae39f937e634 1-51
+apps/whiteboard/lib/app-nav.test.ts
+  s_ceb352826e0909::t_9f159796579dfa 3-16
+apps/whiteboard/lib/student-avatar-style.ts
+  s_ceb352826e0909::t_bdbe11289d54b8 1-35
+apps/whiteboard/lib/workspace-access.test.ts
+  s_ceb352826e0909::t_1d8f1abd593613 1-30
+apps/whiteboard/lib/workspace-access.ts
+  s_ceb352826e0909::t_15dce02ebb7536 1-21
+apps/whiteboard/package.json
+  s_93c4e1e5af856d::t_ff1a3fb1a029eb 22,29,33-34
+apps/whiteboard/proxy.test.ts
+  s_ceb352826e0909::t_a6bf2a7fe09654 1-78
+apps/whiteboard/proxy.ts
+  s_ceb352826e0909::t_0ece1ce00502c0 2,4-28
+apps/whiteboard/src/queries/batches.ts
+  s_93c4e1e5af856d::t_2525111a09a8ad 45-50,65-67,69-70
+apps/whiteboard/src/queries/catalog-pagination.test.ts
+  s_93c4e1e5af856d::t_d7fc33b64f3437 1-53
+apps/whiteboard/src/queries/courses.ts
+  s_93c4e1e5af856d::t_3cf91fd19ff0e9 30-35,58-59,62,64-72
+apps/whiteboard/src/training/application/invite-student-on-created.test.ts
+  s_ceb352826e0909::t_c452c43eade24f 1-91
+apps/whiteboard/src/training/application/invite-student-on-created.ts
+  s_ceb352826e0909::t_ec40d4ec7709e2 1-56
+apps/whiteboard/src/training/application/student-invitees.test.ts
+  s_ceb352826e0909::t_4d858c86a5916a 1-35
+apps/whiteboard/src/training/application/student-invitees.ts
+  s_ceb352826e0909::t_0b3fca3fd1dcea 1-34
+apps/whiteboard/src/training/infrastructure/clerk-student-invitation-sender.test.ts
+  s_ceb352826e0909::t_07038fbc374e38 1-76
+apps/whiteboard/src/training/infrastructure/clerk-student-invitation-sender.ts
+  s_ceb352826e0909::t_60133f4e26926d 1-35
+apps/whiteboard/src/training/infrastructure/create-student-handlers.ts
+  s_ceb352826e0909::t_e7fb08a8041a59 8,10-11,13,34-50
+docs/prd/tasks.md
+  s_ceb352826e0909::t_49cae5066a3d8f 15-16,41-64,104-108,116-117,329-339
+docs/prd/training-institute-p0.md
+  s_ceb352826e0909::t_47f05e756f2345 48-49,153-180
+AGENTS.md
+  s_df861cb079c377::t_cc0bec80e3ea3a 41,65-66
+CONTEXT.md
+  s_df861cb079c377::t_66eefcdc81c5cc 78,82,213
+apps/whiteboard/.env.example
+  s_df861cb079c377::t_3db0c90ea50198 5-6
+apps/whiteboard/.storybook/expect-app-shell.ts
+  s_e1c6950fb3100c::t_51b4074f19ca4b 49,51,56
+apps/whiteboard/.storybook/mocks/clerk.tsx
+  s_df861cb079c377::t_3e51687987c3a3 22,27-28,36,53,74,98-101,114,129-132,137,142-143,161,166-167,179,208-210
+apps/whiteboard/.storybook/preview.tsx
+  s_93c4e1e5af856d::t_3238ecec1478e7 9,27,31,34-40,86-89
+apps/whiteboard/app/(app)/parent/page.tsx
+  s_df861cb079c377::t_d07e7af1e94109 1-11
+apps/whiteboard/app/(app)/student/page.tsx
+  s_df861cb079c377::t_700907f8d4b083 1-11
+apps/whiteboard/app/(public)/forgot-password/page.tsx
+  s_df861cb079c377::t_84c47d9ed1f2d8 5,10
+apps/whiteboard/app/(public)/login/page.tsx
+  s_df861cb079c377::t_15dfc0fd2fca35 6,19
+apps/whiteboard/app/(public)/signup/page.tsx
+  s_df861cb079c377::t_752af1c0a757f5 5,10
+apps/whiteboard/app/api/_lib/require-session.ts
+  s_df861cb079c377::t_2f2d5364444c74 5,13,28-34
+apps/whiteboard/app/layout.tsx
+  s_df861cb079c377::t_09a04f9a472258 12,49-50,52-57
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_df861cb079c377::t_b628fe43508574 7-8,20-21
+apps/whiteboard/components/app-shell/theme-toggle.tsx
+  s_93c4e1e5af856d::t_10fc06bdca6c86 1-33
+apps/whiteboard/components/auth/forgot-password-form.tsx
+  s_df861cb079c377::t_34eb32431a7590 21,54,88,110,152
+apps/whiteboard/components/auth/login-form.tsx
+  s_df861cb079c377::t_526600572ad416 23,45,61,63,88,100,115
+apps/whiteboard/components/auth/signup-form.tsx
+  s_df861cb079c377::t_d153edae0677d9 23,58,75,97,112
+apps/whiteboard/components/batches/batch-catalog.tsx
+  s_7927a574797eb4::t_a0dc0674c4aedb 4,39-44,56-59,69-72,79-81,83-87,90-97,99,103-274,280,283,285-312
+apps/whiteboard/components/courses/course-catalog.tsx
+  s_7927a574797eb4::t_fc6d65336f8fd6 4,32-37,45-48,54-57,63-66,68-75,77,81-222,228,231,233-260
+apps/whiteboard/components/fees/fees-catalog.tsx
+  s_93c4e1e5af856d::t_fb066c0ccab8c4 3,21,40-113,115-154
+apps/whiteboard/components/fees/fees.stories.tsx
+  s_93c4e1e5af856d::t_3d4a757f413b66 71
+apps/whiteboard/components/students/student-avatar.stories.tsx
+  s_93c4e1e5af856d::t_e77da0bbce005c 1-32
+apps/whiteboard/components/students/student-catalog.tsx
+  s_e1c6950fb3100c::t_49730043663043 4-12,43-105,119,132,136-149,152-159,161,165-217,219,221,225-277,279-314,318-381,386-387,390,392-445
+apps/whiteboard/components/students/student-edit-screen.tsx
+  s_e1c6950fb3100c::t_93e78a50d59bbb 16,45,47-52,62
+apps/whiteboard/components/students/student-form.tsx
+  s_df861cb079c377::t_7035b523ddaafc 4,26-29,32,350,356-357,359,365-366,389,414,429-444,478-484
+apps/whiteboard/components/students/student-profile-view.tsx
+  s_e1c6950fb3100c::t_2f7fe11ef3d8ef 9-10,25-35,95-96,98,100-115,117-124
+apps/whiteboard/components/theme-preference-sync.tsx
+  s_93c4e1e5af856d::t_a1b7c16d7a6c32 1-17
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_df861cb079c377::t_506d775eb31799 1-63
+apps/whiteboard/lib/app-nav.ts
+  s_df861cb079c377::t_1a3c8e6d131bdf 35-53,64-66
+apps/whiteboard/lib/student-avatar-style.test.ts
+  s_e1c6950fb3100c::t_8d48c7d6dfca99 1-30
+apps/whiteboard/lib/theme-store.test.ts
+  s_93c4e1e5af856d::t_8d2f627196fe7e 1-28
+apps/whiteboard/lib/theme-store.ts
+  s_93c4e1e5af856d::t_1561f356af5c1c 1-25
+apps/whiteboard/lib/workspace-entry.test.ts
+  s_df861cb079c377::t_d45996e9ac8bc7 1-19
+apps/whiteboard/lib/workspace-entry.ts
+  s_df861cb079c377::t_e21367e8a3a3b3 1-8
+apps/whiteboard/src/queries/students.test.ts
+  s_93c4e1e5af856d::t_55f6019ef7ae4b 1-64
+apps/whiteboard/src/queries/students.ts
+  s_93c4e1e5af856d::t_cf195b804223d9 78-83,100-101,104,106,108-110,114-119
+apps/whiteboard/vitest.config.ts
+  s_df861cb079c377::t_30adfee1f47c80 24
+docs/adr/0027-student-and-parent-workspace-invitations.md
+  s_df861cb079c377::t_9ee81ef3f44ba7 1-9
+docs/ui/student-avatar.md
+  s_e1c6950fb3100c::t_aac5af31bf24c3 1-7
+packages/ui/src/styles/globals.css
+  s_93c4e1e5af856d::t_7d22b9b628d31f 34-41,68-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9ff6505aa49f9208440b6a5ce9d4c407e7641d94",
+  "prompts": {},
+  "sessions": {
+    "s_7927a574797eb4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d693-df1e-7522-840d-2cd873ca382d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_93c4e1e5af856d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d39d-d59b-7420-847d-02bc25b3b497",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9ad88ec6f9c29b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d68d-e5d4-7710-baae-29100c8480ac",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ceb352826e0909": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d735-08c6-7740-a933-667d822d3d15",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_df861cb079c377": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d69d-4559-74a2-abff-8789dd99d2dc",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_e1c6950fb3100c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d399-90fc-7a03-add4-8baf85e1993e",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
