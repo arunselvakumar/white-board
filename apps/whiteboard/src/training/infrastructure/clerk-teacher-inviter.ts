@@ -17,7 +17,7 @@ export class ClerkTeacherInviter implements TeacherInviter {
       inviterUserId: input.inviterUserId,
       emailAddress: input.email,
       role: "org:teacher",
-      redirectUrl: "/accept-invitation",
+      redirectUrl: "/app/accept-invitation",
       publicMetadata: { teacherId: input.teacherId },
     });
     return invitation.id;

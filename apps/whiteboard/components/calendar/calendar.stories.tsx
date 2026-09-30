@@ -6,8 +6,8 @@ import type { CalendarItem } from "@/src/queries/calendar";
 import { CalendarView } from "./calendar-view";
 
 const items: CalendarItem[] = [
-  { id: "10000000-0000-4000-8000-000000000001", batchId: "20000000-0000-4000-8000-000000000001", batchName: "DCA Morning", courseId: "30000000-0000-4000-8000-000000000001", courseName: "DCA", studentName: null, classMode: "offline", room: "Lab 1", joinUrl: null, timezone: "Asia/Kolkata", timings: [{ daysOfWeek: [1, 2, 3, 4, 5], startTime: "09:00", endTime: "11:00" }], activeFrom: "2025-01-01T00:00:00.000Z" },
-  { id: "10000000-0000-4000-8000-000000000002", batchId: "20000000-0000-4000-8000-000000000002", batchName: "Python Evening", courseId: "30000000-0000-4000-8000-000000000002", courseName: "Python", studentName: null, classMode: "online", room: null, joinUrl: "https://example.com", timezone: "Asia/Kolkata", timings: [{ daysOfWeek: [1, 3, 5], startTime: "17:00", endTime: "18:30" }], activeFrom: "2025-01-01T00:00:00.000Z" },
+  { id: "10000000-0000-4000-8000-000000000001", batchId: "20000000-0000-4000-8000-000000000001", batchName: "DCA Morning", courseId: "30000000-0000-4000-8000-000000000001", courseName: "DCA", studentName: null, classMode: "offline", meetingOption: "external", room: "Lab 1", joinUrl: null, timezone: "Asia/Kolkata", timings: [{ daysOfWeek: [1, 2, 3, 4, 5], startTime: "09:00", endTime: "11:00" }], activeFrom: "2025-01-01T00:00:00.000Z" },
+  { id: "10000000-0000-4000-8000-000000000002", batchId: "20000000-0000-4000-8000-000000000002", batchName: "Python Evening", courseId: "30000000-0000-4000-8000-000000000002", courseName: "Python", studentName: null, classMode: "online", meetingOption: "external", room: null, joinUrl: "https://example.com", timezone: "Asia/Kolkata", timings: [{ daysOfWeek: [1, 3, 5], startTime: "17:00", endTime: "18:30" }], activeFrom: "2025-01-01T00:00:00.000Z" },
 ];
 
 const meta = { title: "Pages/Calendar", component: CalendarView, parameters: { layout: "fullscreen" } } satisfies Meta<typeof CalendarView>;

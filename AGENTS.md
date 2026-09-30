@@ -47,7 +47,7 @@ A **Student** remains a Workspace record, distinct from a Clerk User. Add Studen
 - HTTP is Next.js Route Handlers in `apps/whiteboard/app/api` (ADR-0006). No separate API process.
 - Writes = commands, reads = queries, no bus (ADR-0007). Named operations, not generic PATCH (ADR-0015).
 - Zod only on HTTP Request/Response models next to routes (ADR-0016, ADR-0021). Domain does not import Zod.
-- OpenAPI from those models; a route is unfinished until it is on `/api/docs` (ADR-0012).
+- OpenAPI from those models; a route is unfinished until it is on `/app/api/docs` (ADR-0012).
 - Tenant is the **Active Workspace** on the Session. Never send `workspaceId` in the body (ADR-0014). 401 no Session, 403 no Active Workspace, 404 other tenant.
 - Postgres holds resource rows only. Clerk ids are opaque strings. No User or Workspace table (ADR-0018).
 - Soft delete is an invisible tombstone (ADR-0019). Lists use bidirectional cursors plus total (ADR-0020).
@@ -85,7 +85,7 @@ bun run test:http
 bun run check-types
 ```
 
-Whiteboard APIs: http://localhost:3000/api/docs
+Whiteboard APIs: http://localhost:3000/app/api/docs
 
 ## Do not
 

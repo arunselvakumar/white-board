@@ -4,13 +4,16 @@ import { TeacherNotFoundError } from "../application/not-found-error";
 import { DomainError } from "../domain/errors";
 import type { ListPage } from "../domain/list";
 import { Teacher } from "../domain/teacher";
-import type { TeacherListParams, TeacherRepository } from "../domain/teacher-repository";
+import { teacherDetailsFromStored } from "../domain/teacher-details";
+import type { TeacherListParams, TeacherPersistenceChanges, TeacherRepository } from "../domain/teacher-repository";
+import { encryptPrivateText } from "./teacher-private-data";
 
 export class PrismaTeacherRepository implements TeacherRepository {
   constructor(private readonly db: PrismaClient) {}
 
-  async create(teacher: Teacher): Promise<void> {
+  async create(teacher: Teacher, changes: TeacherPersistenceChanges = {}): Promise<void> {
     try {
+      const privateData = privateDataChanges(changes);
       await this.db.teacher.create({ data: {
         id: teacher.id,
         workspaceId: teacher.workspaceId,
@@ -20,6 +23,13 @@ export class PrismaTeacherRepository implements TeacherRepository {
         kind: teacher.kind,
         phone: teacher.phone,
         qualificationSummary: teacher.qualificationSummary,
+        profileDetails: teacher.details,
+        photoMimeType: teacher.photoMimeType,
+        photoUpdatedAt: teacher.photoUpdatedAt,
+        photoData: changes.photoData,
+        idNumberLast4: teacher.idNumberLast4,
+        bankAccountLast4: teacher.bankAccountLast4,
+        ...privateData,
         clerkUserId: teacher.clerkUserId,
         invitationId: teacher.invitationId,
         invitationStatus: teacher.invitationStatus,
@@ -36,8 +46,9 @@ export class PrismaTeacherRepository implements TeacherRepository {
     }
   }
 
-  async save(teacher: Teacher): Promise<void> {
+  async save(teacher: Teacher, changes: TeacherPersistenceChanges = {}): Promise<void> {
     try {
+      const privateData = privateDataChanges(changes);
       const result = await this.db.teacher.updateMany({
         where: { id: teacher.id, workspaceId: teacher.workspaceId, deletedAt: null },
         data: {
@@ -45,6 +56,13 @@ export class PrismaTeacherRepository implements TeacherRepository {
           kind: teacher.kind,
           phone: teacher.phone,
           qualificationSummary: teacher.qualificationSummary,
+          profileDetails: teacher.details,
+          photoMimeType: teacher.photoMimeType,
+          photoUpdatedAt: teacher.photoUpdatedAt,
+          ...(changes.photoData == null ? {} : { photoData: changes.photoData }),
+          idNumberLast4: teacher.idNumberLast4,
+          bankAccountLast4: teacher.bankAccountLast4,
+          ...privateData,
           clerkUserId: teacher.clerkUserId,
           invitationId: teacher.invitationId,
           invitationStatus: teacher.invitationStatus,
@@ -63,12 +81,20 @@ export class PrismaTeacherRepository implements TeacherRepository {
   }
 
   async findByIdInWorkspace(id: string, workspaceId: string): Promise<Teacher | null> {
-    const row = await this.db.teacher.findFirst({ where: { id, workspaceId, deletedAt: null } });
+    const row = await this.db.teacher.findFirst({ where: { id, workspaceId, deletedAt: null }, omit: PRIVATE_DATA_OMIT });
     return row == null ? null : fromRow(row);
   }
 
+  async findPhotoByIdInWorkspace(id: string, workspaceId: string): Promise<{ mimeType: string; bytes: Uint8Array } | null> {
+    const row = await this.db.teacher.findFirst({
+      where: { id, workspaceId, deletedAt: null, photoData: { not: null } },
+      select: { photoData: true, photoMimeType: true },
+    });
+    return row?.photoData != null && row.photoMimeType != null ? { mimeType: row.photoMimeType, bytes: row.photoData } : null;
+  }
+
   async findByClerkUserInWorkspace(clerkUserId: string, workspaceId: string): Promise<Teacher | null> {
-    const row = await this.db.teacher.findFirst({ where: { clerkUserId, workspaceId, deletedAt: null, deactivatedAt: null } });
+    const row = await this.db.teacher.findFirst({ where: { clerkUserId, workspaceId, deletedAt: null, deactivatedAt: null }, omit: PRIVATE_DATA_OMIT });
     return row == null ? null : fromRow(row);
   }
 
@@ -91,6 +117,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
         where: { ...countWhere, ...cursorWhere },
         orderBy: [{ createdAt: direction }, { id: direction }],
         take: params.limit + 1,
+        omit: PRIVATE_DATA_OMIT,
       }),
       this.db.teacher.count({ where: countWhere }),
     ]);
@@ -104,16 +131,25 @@ export class PrismaTeacherRepository implements TeacherRepository {
   }
 }
 
-type TeacherRow = Prisma.TeacherGetPayload<Record<string, never>>;
+const PRIVATE_DATA_OMIT = { photoData: true, idNumberEncrypted: true, bankAccountEncrypted: true } as const;
+type TeacherRow = Omit<Prisma.TeacherGetPayload<Record<string, never>>, keyof typeof PRIVATE_DATA_OMIT>;
 
 function fromRow(row: TeacherRow): Teacher {
   return Teacher.reconstitute({
     ...row,
     kind: row.kind,
     invitationStatus: row.invitationStatus,
+    details: teacherDetailsFromStored(row.profileDetails),
   });
 }
 
 function isUniqueError(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+}
+
+function privateDataChanges(changes: TeacherPersistenceChanges): { idNumberEncrypted?: string | null; bankAccountEncrypted?: string | null } {
+  return {
+    ...(changes.idNumber === undefined ? {} : { idNumberEncrypted: changes.idNumber == null || changes.idNumber.trim() === "" ? null : encryptPrivateText(changes.idNumber.trim()) }),
+    ...(changes.bankAccountNumber === undefined ? {} : { bankAccountEncrypted: changes.bankAccountNumber == null || changes.bankAccountNumber.trim() === "" ? null : encryptPrivateText(changes.bankAccountNumber.trim()) }),
+  };
 }

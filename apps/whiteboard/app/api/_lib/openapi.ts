@@ -30,11 +30,13 @@ export type OpenApiOperation = {
   successStatus: StatusCodes;
   successDescription: string;
   successSchema?: z.ZodType;
+  successBinaryContentTypes?: string[];
   errors: StatusCodes[];
 };
 
 export type OpenApiDocument = {
   openapi: string;
+  servers: { url: string }[];
   info: {
     title: string;
     version: string;
@@ -63,7 +65,19 @@ const STATUS_DESCRIPTIONS: Partial<Record<StatusCodes, string>> = {
 
 function responsesFor(operation: OpenApiOperation): JsonObject {
   const responses: JsonObject = {};
-  if (operation.successSchema != null) {
+  if (operation.successBinaryContentTypes != null) {
+    responses[String(operation.successStatus)] = {
+      description: operation.successDescription,
+      content: Object.fromEntries(
+        operation.successBinaryContentTypes.map((mimeType) => [
+          mimeType,
+          {
+            schema: { type: "string", format: "binary" },
+          },
+        ]),
+      ),
+    };
+  } else if (operation.successSchema != null) {
     responses[String(operation.successStatus)] = {
       description: operation.successDescription,
       content: {
@@ -173,6 +187,7 @@ export function buildOpenApiDocument(
 
   return {
     openapi: "3.0.3",
+    servers: [{ url: "/app" }],
     info: {
       title: "Whiteboard API",
       version: "0.0.0",

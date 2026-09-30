@@ -19,30 +19,30 @@ function matchesStudent(student: { email: string | null; profileDetails: unknown
 export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
   constructor(private readonly db: PrismaClient) {}
 
-  async execute(input: { workspaceId: string; userId: string; role: CalendarRole; verifiedEmails?: string[] }): Promise<CalendarItem[]> {
+  async execute(input: { workspaceId: string; userId: string; role: CalendarRole; verifiedEmails?: string[]; includeClosed?: boolean }): Promise<CalendarItem[]> {
     const workspaceId = input.workspaceId;
     if (input.role === "org:admin") {
       const batches = await this.db.batch.findMany({
-        where: { workspaceId, deletedAt: null, closedAt: null, course: { deletedAt: null } },
+        where: { workspaceId, deletedAt: null, ...(!input.includeClosed ? { closedAt: null } : {}), course: { deletedAt: null } },
         include: { course: { select: { name: true } } },
         orderBy: [{ name: "asc" }, { id: "asc" }],
       });
       return batches.map((batch) => ({
         id: batch.id, batchId: batch.id, batchName: batch.name, courseId: batch.courseId, courseName: batch.course.name,
-        studentName: null, classMode: batch.classMode, room: batch.room, joinUrl: batch.joinUrl,
+        studentName: null, classMode: batch.classMode, room: batch.room, joinUrl: batch.joinUrl, meetingOption: batch.meetingOption,
         timezone: batch.timezone, timings: WeeklyTimings.create(batch.timings).toJson(), activeFrom: batch.createdAt.toISOString(),
       }));
     }
 
     if (input.role === "org:teacher") {
       const assignments = await this.db.batchTeacherAssignment.findMany({
-        where: { workspaceId, deletedAt: null, unassignedAt: null, teacher: { workspaceId, clerkUserId: input.userId, deletedAt: null, deactivatedAt: null }, batch: { workspaceId, deletedAt: null, closedAt: null, course: { deletedAt: null } } },
+        where: { workspaceId, deletedAt: null, unassignedAt: null, teacher: { workspaceId, clerkUserId: input.userId, deletedAt: null, deactivatedAt: null }, batch: { workspaceId, deletedAt: null, ...(!input.includeClosed ? { closedAt: null } : {}), course: { deletedAt: null } } },
         include: { batch: { include: { course: { select: { name: true } } } } },
         orderBy: [{ batch: { name: "asc" } }, { id: "asc" }],
       });
       return assignments.map(({ batch }) => ({
         id: batch.id, batchId: batch.id, batchName: batch.name, courseId: batch.courseId, courseName: batch.course.name,
-        studentName: null, classMode: batch.classMode, room: batch.room, joinUrl: batch.joinUrl,
+        studentName: null, classMode: batch.classMode, room: batch.room, joinUrl: batch.joinUrl, meetingOption: batch.meetingOption,
         timezone: batch.timezone, timings: WeeklyTimings.create(batch.timings).toJson(), activeFrom: batch.createdAt.toISOString(),
       }));
     }
@@ -65,7 +65,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
       courseId: enrollment.courseId, courseName: enrollment.course.name,
       studentName: enrollment.student.name,
       classMode: enrollment.classModeOverride ?? enrollment.batch.classMode,
-      room: enrollment.batch.room, joinUrl: enrollment.batch.joinUrl,
+      room: enrollment.batch.room, joinUrl: enrollment.batch.joinUrl, meetingOption: enrollment.batch.meetingOption,
       timezone: enrollment.batch.timezone,
       timings: WeeklyTimings.create(enrollment.timingSource === "student" ? enrollment.studentTimings : enrollment.batch.timings).toJson(),
       activeFrom: enrollment.createdAt.toISOString(),

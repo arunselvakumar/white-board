@@ -10,6 +10,7 @@ export const CalendarItemModel = z.object({
   classMode: z.enum(["offline", "online", "hybrid"]),
   room: z.string().nullable(),
   joinUrl: z.string().nullable(),
+  meetingOption: z.enum(["external", "whiteboard"]),
   timezone: z.string(),
   timings: z.array(z.object({ daysOfWeek: z.array(z.number().int().min(0).max(6)), startTime: z.string(), endTime: z.string() })),
   activeFrom: z.iso.datetime(),

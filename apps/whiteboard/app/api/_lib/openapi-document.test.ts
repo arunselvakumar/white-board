@@ -7,6 +7,14 @@ describe("openApiDocument", () => {
     expect(openApiDocument.paths["/api/calendar"]?.["get"]).toBeDefined();
     expect(openApiDocument.paths["/api/calendar"]?.["post"]).toBeUndefined();
   });
+  it("documents class access, recording downloads, and provider webhooks", () => {
+    const path = "/api/classes/{batchId}/{date}/{startTime}";
+    expect(openApiDocument.paths[path]?.["get"]).toBeDefined();
+    expect(openApiDocument.paths[`${path}/start`]?.["post"]).toBeDefined();
+    expect(openApiDocument.paths[`${path}/join`]?.["post"]).toBeDefined();
+    expect(openApiDocument.paths[`${path}/recording`]?.["get"]).toBeDefined();
+    expect(openApiDocument.paths["/api/webhooks/realtimekit"]?.["post"]).toBeDefined();
+  });
   it("does not document Todo routes", () => {
     const paths = openApiDocument.paths;
     expect(paths["/api/todos"]).toBeUndefined();
@@ -65,6 +73,15 @@ describe("openApiDocument", () => {
     expect(paths["/api/teachers/{id}/batches"]?.["get"]).toBeDefined();
     expect(paths["/api/teachers/{id}/batches"]?.["post"]).toBeDefined();
     expect(paths["/api/teachers/{id}/batches/{batchId}/unassign"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/photo"]?.["get"]?.["responses"]).toMatchObject({
+      "200": { content: { "image/jpeg": { schema: { type: "string", format: "binary" } } } },
+    });
+    expect(paths["/api/teachers/{id}/documents"]?.["get"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/documents"]?.["post"]).toBeDefined();
+    expect(paths["/api/teachers/{id}/documents/{documentId}"]?.["get"]?.["responses"]).toMatchObject({
+      "200": { content: { "application/pdf": { schema: { type: "string", format: "binary" } } } },
+    });
+    expect(paths["/api/teachers/{id}/documents/{documentId}/remove"]?.["post"]).toBeDefined();
     expect(paths["/api/teacher/activate"]?.["post"]).toBeDefined();
     expect(paths["/api/teacher/batches"]?.["get"]).toBeDefined();
   });

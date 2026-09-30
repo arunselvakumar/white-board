@@ -44,10 +44,10 @@ export default function RootLayout({
       <body>
         <ClerkProvider
           appearance={{ theme: shadcn }}
-          signInUrl="/login"
-          signUpUrl="/signup"
-          signInFallbackRedirectUrl="/select-workspace"
-          signUpFallbackRedirectUrl="/select-workspace"
+          signInUrl="/app/login"
+          signUpUrl="/app/signup"
+          signInFallbackRedirectUrl="/app/select-workspace"
+          signUpFallbackRedirectUrl="/app/select-workspace"
         >
           <ThemeProvider
             defaultTheme="light"

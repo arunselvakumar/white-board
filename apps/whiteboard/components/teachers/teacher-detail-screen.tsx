@@ -12,8 +12,10 @@ import { Label } from "@repo/ui/components/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/components/select";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { assignTeacherBatch, deactivateTeacher, inviteTeacher, teacherQueries, unassignTeacherBatch, updateTeacher } from "@/src/queries/teachers";
+import { addTeacherDocument, assignTeacherBatch, deactivateTeacher, inviteTeacher, removeTeacherDocument, teacherQueries, unassignTeacherBatch, updateTeacher } from "@/src/queries/teachers";
 import { TeacherForm } from "./teacher-form";
+import { TeacherAvatar } from "./teacher-avatar";
+import { TeacherDocumentsSection } from "./teacher-documents-section";
 
 const assignmentSchema = z.object({ batchId: z.uuid("Choose a Batch") });
 
@@ -25,6 +27,7 @@ export function TeacherDetailScreen({ id }: { id: string }) {
   const [batchCursor, setBatchCursor] = useState<{ after?: string; before?: string }>({});
   const { data: teacher } = useSuspenseQuery(teacherQueries.detail(orgId, id));
   const { data: assigned } = useSuspenseQuery(teacherQueries.batches(orgId, id));
+  const { data: documents } = useSuspenseQuery(teacherQueries.documents(orgId, id));
   const { data: batches } = useSuspenseQuery(teacherQueries.batchOptions(orgId, { limit: 100, ...batchCursor }));
   const form = useForm<z.infer<typeof assignmentSchema>>({ resolver: zodResolver(assignmentSchema), defaultValues: { batchId: "" } });
   const refresh = async () => queryClient.invalidateQueries({ queryKey: teacherQueries.key.all });
@@ -33,11 +36,13 @@ export function TeacherDetailScreen({ id }: { id: string }) {
   const deactivate = useMutation({ mutationFn: () => deactivateTeacher(id), onSuccess: refresh });
   const assign = useMutation({ mutationFn: (batchId: string) => assignTeacherBatch(id, batchId), onSuccess: refresh });
   const unassign = useMutation({ mutationFn: (batchId: string) => unassignTeacherBatch(id, batchId), onSuccess: refresh });
+  const addDocument = useMutation({ mutationFn: (input: Parameters<typeof addTeacherDocument>[1]) => addTeacherDocument(id, input), onSuccess: refresh });
+  const removeDocument = useMutation({ mutationFn: (documentId: string) => removeTeacherDocument(id, documentId), onSuccess: refresh });
   const available = batches.items.filter((batch) => batch.closedAt == null && !assigned.items.some((item) => item.id === batch.id));
 
   return <main className="w-full p-6"><div className="max-w-4xl space-y-7">
     <PageHeader back={{ href: "/teachers", label: "Teachers" }} title={teacher.name} />
-    <div className="rounded-xl border p-5 space-y-2"><p className="text-sm">Invitation: <strong>{teacher.invitationStatus}</strong></p>
+    <div className="rounded-xl border p-5 space-y-2"><div className="flex items-center gap-3"><TeacherAvatar name={teacher.name} photoUrl={teacher.photoUrl} className="size-16" /><div><p className="font-medium">{teacher.details.preferredName ?? teacher.name}</p><p className="text-sm">Invitation: <strong>{teacher.invitationStatus}</strong></p></div></div>
       {teacher.invitationStatus === "failed" && <p role="alert" className="text-sm text-destructive">The invitation failed. Resend it to grant access.</p>}
       {teacher.deactivatedAt && <p className="text-sm">This Teacher is inactive.</p>}
       {!teacher.deactivatedAt && <div className="flex gap-2">
@@ -46,7 +51,8 @@ export function TeacherDetailScreen({ id }: { id: string }) {
       </div>}
       {(invite.isError || deactivate.isError) && <p role="alert" className="text-sm text-destructive">Could not complete the action. Please try again.</p>}
     </div>
-    <section className="space-y-4"><h2 className="text-lg font-semibold">Profile</h2>{teacher.deactivatedAt ? <p className="text-sm">{teacher.email} · {teacher.kind === "visiting_tutor" ? "Visiting Tutor" : "Centre Teacher"}</p> : <TeacherForm teacher={teacher} onSubmit={async (input) => { await update.mutateAsync(input); }} onCancel={() => { router.push("/teachers"); }} />}</section>
+    <section className="space-y-4"><h2 className="text-lg font-semibold">Profile</h2>{teacher.deactivatedAt ? <p className="text-sm">{teacher.email} · {teacher.kind === "visiting_tutor" ? "Visiting Tutor" : "Centre Teacher"}</p> : <TeacherForm key={teacher.updatedAt} teacher={teacher} onSubmit={async (input) => { await update.mutateAsync(input); }} onCancel={() => { router.push("/teachers"); }} />}</section>
+    <TeacherDocumentsSection teacherId={id} documents={documents.items} disabled={!!teacher.deactivatedAt} onAdd={async (input) => { await addDocument.mutateAsync(input); }} onRemove={async (documentId) => { await removeDocument.mutateAsync(documentId); }} />
     <section className="space-y-4"><h2 className="text-lg font-semibold">Assigned Batches</h2>
       {assigned.items.length === 0 ? <p className="text-muted-foreground text-sm">No Batches assigned.</p> : <div className="divide-y rounded-xl border">{assigned.items.map((batch) => <div key={batch.id} className="flex items-center justify-between p-4"><span>{batch.name}</span><Button variant="outline" disabled={unassign.isPending || !!teacher.deactivatedAt} onClick={() => { unassign.mutate(batch.id); }}>Unassign</Button></div>)}</div>}
       {!teacher.deactivatedAt && <form className="flex items-end gap-3" onSubmit={form.handleSubmit(async ({ batchId }) => { await assign.mutateAsync(batchId); form.reset(); })}>

@@ -10,6 +10,14 @@ import type { UserId } from "./user-id";
 import type { WeeklyTimings } from "./weekly-timings";
 import type { WorkspaceId } from "./workspace-id";
 
+export type MeetingOption = "external" | "whiteboard";
+
+function meetingOption(value: string | undefined): MeetingOption {
+  if (value == null || value === "external") return "external";
+  if (value === "whiteboard") return "whiteboard";
+  throw new DomainError("INVALID_MEETING_OPTION", "Choose an external link or a Whiteboard class.");
+}
+
 export function batchRoom(raw: string | null | undefined): OptionalText | null {
   return OptionalText.create(
     raw,
@@ -40,6 +48,7 @@ export type BatchProps = {
   capacity: Capacity;
   room: OptionalText | null;
   joinUrl: OptionalText | null;
+  meetingOption?: MeetingOption;
   timings: WeeklyTimings;
   timezone: string;
   closedAt: Date | null;
@@ -65,6 +74,7 @@ export class Batch {
     capacity: Capacity;
     room: OptionalText | null;
     joinUrl: OptionalText | null;
+    meetingOption?: string;
     timings: WeeklyTimings;
     timezone?: string;
     now: Date;
@@ -79,6 +89,7 @@ export class Batch {
       capacity: input.capacity,
       room: input.room,
       joinUrl: input.joinUrl,
+      meetingOption: meetingOption(input.meetingOption),
       timings: input.timings,
       timezone: input.timezone ?? "Asia/Kolkata",
       closedAt: null,
@@ -138,6 +149,10 @@ export class Batch {
     return this.props.joinUrl;
   }
 
+  get meetingOption(): MeetingOption {
+    return this.props.meetingOption ?? "external";
+  }
+
   get timings(): WeeklyTimings {
     return this.props.timings;
   }
@@ -176,6 +191,7 @@ export class Batch {
     capacity: Capacity;
     room: OptionalText | null;
     joinUrl: OptionalText | null;
+    meetingOption?: string;
     timings: WeeklyTimings;
     now: Date;
   }): void {
@@ -186,6 +202,7 @@ export class Batch {
       capacity: input.capacity,
       room: input.room,
       joinUrl: input.joinUrl,
+      meetingOption: meetingOption(input.meetingOption ?? this.props.meetingOption),
       timings: input.timings,
       updatedAt: input.now,
     };

@@ -9,6 +9,7 @@ export type BatchReadModel = {
   capacity: number;
   room: string | null;
   joinUrl: string | null;
+  meetingOption: "external" | "whiteboard";
   timings: WeeklySlot[];
   timezone: string;
   closedAt: Date | null;
@@ -30,6 +31,7 @@ export function toBatchReadModel(
     capacity: batch.capacity.value,
     room: batch.room?.value ?? null,
     joinUrl: batch.joinUrl?.value ?? null,
+    meetingOption: batch.meetingOption,
     timings: batch.timings.toJson(),
     timezone: batch.timezone,
     closedAt: batch.closedAt,

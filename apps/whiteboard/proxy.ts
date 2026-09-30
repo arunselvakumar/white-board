@@ -16,18 +16,17 @@ const appRouteSegments = new Set([
   "teachers",
   "attendance",
   "calendar",
+  "classes",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
-  const area = request.nextUrl.pathname.split("/")[1];
+  const pathname =
+    request.nextUrl.pathname.replace(/^\/app(?=\/|$)/, "") || "/";
+  const area = pathname.split("/")[1];
   if (area == null || !appRouteSegments.has(area)) return;
   const { userId, orgId, orgRole } = await auth();
-  if (
-    userId != null &&
-    orgId != null &&
-    !isAllowedAppPath(request.nextUrl.pathname, orgRole)
-  ) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (userId != null && orgId != null && !isAllowedAppPath(pathname, orgRole)) {
+    return NextResponse.redirect(new URL("/app", request.url));
   }
 });
 

@@ -25,7 +25,7 @@ export class ClerkStudentInvitationSender implements InvitationSender {
         inviterUserId: input.inviterUserId,
         emailAddress: input.emailAddress,
         role: input.role,
-        redirectUrl: "/accept-invitation",
+        redirectUrl: "/app/accept-invitation",
       });
     } catch (error) {
       if (isPendingInvitation(error)) return;

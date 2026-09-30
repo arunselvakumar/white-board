@@ -9,6 +9,7 @@ export function mapBatchResponse(batch: BatchReadModel) {
     capacity: batch.capacity,
     room: batch.room,
     joinUrl: batch.joinUrl,
+    meetingOption: batch.meetingOption,
     timings: batch.timings,
     timezone: batch.timezone,
     closedAt: batch.closedAt?.toISOString() ?? null,

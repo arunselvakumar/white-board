@@ -338,6 +338,8 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-005 | Optional Batch Enrollment while adding a Student                                    | done        | UI+Enrollment            |
 | WB-006 | Record Attendance for a missed earlier date                                         | in_progress | Domain+HTTP+UI           |
 | WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                          | done        | Read+HTTP+UI             |
+| WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI |
+| WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings | in_progress | Domain+Data+HTTP+UI+Cloudflare |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -370,3 +372,15 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Blocked by:** WB-003 (done). Requested as a separate feature while WB-006 is in progress.
 
 **Done when:** Owner, Teacher, Student, and Parent can open a read-only Calendar scoped to their Batches or Enrollments; week is the default, day and month can be selected; role and Workspace isolation, OpenAPI, Postgres HTTP tests, Storybook, typecheck, lint, and build pass.
+
+### WB-008 — Expanded Teacher profile
+
+**Spec:** [training-institute-teachers.md](./training-institute-teachers.md), expanded profile section. **Blocked by:** WB-003 (done). Requested while WB-006 is in progress.
+
+**Done when:** Owner can create and edit the complete Teacher profile, take or upload and replace a photo, record availability and private verification/pay details, and upload/download/remove private documents. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook, typecheck, lint, and build pass.
+
+### WB-009 — Online classes
+
+**Spec:** [Whiteboard online classes design](../superpowers/specs/2026-09-30-whiteboard-online-classes-design.md). **Blocked by:** WB-007 (done). Requested separately while WB-006 is in progress.
+
+**Done when:** An Online or Hybrid Batch uses an external link or a Whiteboard class; role-scoped Users visit a pre-join page; Owner/assigned Teacher starts a RealtimeKit meeting; Students/Parents join after recording begins; the private R2 recording can be downloaded after upload; OpenAPI, tests, Storybook, typecheck, lint, build, and a live Cloudflare class verification pass. Code is implemented; Cloudflare App, webhook, and private R2 bucket still need provisioning and live verification.

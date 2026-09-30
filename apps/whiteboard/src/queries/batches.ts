@@ -16,6 +16,7 @@ export type BatchResponse = {
   capacity: number;
   room: string | null;
   joinUrl: string | null;
+  meetingOption: "external" | "whiteboard";
   timings: TimingSlot[];
   timezone: string;
   closedAt: string | null;
@@ -39,6 +40,7 @@ export type BatchWriteInput = {
   capacity: number;
   room?: string | null;
   joinUrl?: string | null;
+  meetingOption?: "external" | "whiteboard";
   timings: TimingSlot[];
 };
 

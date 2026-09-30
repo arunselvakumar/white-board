@@ -9,6 +9,7 @@ import { Button } from "@repo/ui/components/button";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { teacherQueries } from "@/src/queries/teachers";
 import { TeachersEmptyState } from "./teachers-empty-state";
+import { TeacherAvatar } from "./teacher-avatar";
 
 export function TeachersScreen() {
   const { orgId } = useAuth();
@@ -19,7 +20,7 @@ export function TeachersScreen() {
     <div className="flex items-center justify-between"><PageHeader title="Teachers" /><Button render={<Link href="/teachers/new" />}>Add Teacher</Button></div>
     {data.items.length === 0 ? <TeachersEmptyState /> : <div className="divide-y rounded-xl border">
       {data.items.map((teacher) => <Link key={teacher.id} href={`/teachers/${teacher.id}`} className="flex items-center justify-between gap-4 p-4 hover:bg-muted/40">
-        <span><span className="block font-medium">{teacher.name}</span><span className="text-muted-foreground text-sm">{teacher.email}</span></span>
+        <span className="flex items-center gap-3"><TeacherAvatar name={teacher.name} photoUrl={teacher.photoUrl} className="size-11" /><span><span className="block font-medium">{teacher.preferredName ?? teacher.name}</span><span className="text-muted-foreground text-sm">{teacher.email}</span></span></span>
         <span className="text-muted-foreground text-sm">{teacher.deactivatedAt ? "Inactive" : teacher.kind === "visiting_tutor" ? "Visiting Tutor" : "Centre Teacher"} · {teacher.invitationStatus}</span>
       </Link>)}
     </div>}

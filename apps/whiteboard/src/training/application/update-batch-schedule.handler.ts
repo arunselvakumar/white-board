@@ -36,6 +36,7 @@ export class UpdateBatchScheduleHandler {
       capacity: Capacity.create(command.capacity),
       room: batchRoom(command.room),
       joinUrl: batchJoinUrl(command.joinUrl),
+      meetingOption: command.meetingOption,
       timings: WeeklyTimings.create(command.timings),
       now: new Date(),
     });

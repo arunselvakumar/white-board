@@ -20,6 +20,7 @@ import { LoadingScreen } from "@/components/auth/loading-screen";
 import { PasswordField } from "@/components/auth/password-field";
 import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
 import { navigateAfterAuth } from "@/lib/navigate-after-auth";
+import { withAppBasePath } from "@/lib/app-base-path";
 import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 const loginSchema = z.object({
@@ -112,8 +113,8 @@ export function LoginForm({ redirectUrl }: { redirectUrl: string }) {
   const continueWithGoogle = () => {
     void signIn.sso({
       strategy: "oauth_google",
-      redirectUrl: entryPath,
-      redirectCallbackUrl: "/sso-callback",
+      redirectUrl: withAppBasePath(entryPath),
+      redirectCallbackUrl: withAppBasePath("/sso-callback"),
     });
   };
 

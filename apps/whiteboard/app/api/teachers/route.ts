@@ -6,6 +6,7 @@ import { createTeacherHandlers } from "@/src/training/infrastructure/create-teac
 
 import { CreateTeacherRequestModel } from "./create-teacher-request-model";
 import { ListTeachersRequestModel } from "./list-teachers-request-model";
+import { mapTeacherListItem } from "./list-teachers-response-model";
 import { mapTeacherResponse } from "./teacher-response-model";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
       before: url.searchParams.get("before") ?? undefined,
     }));
     const page = await handlers.list({ ...model, workspaceId: session.orgId });
-    return Response.json({ ...page, items: page.items.map(mapTeacherResponse) });
+    return Response.json({ ...page, items: page.items.map(mapTeacherListItem) });
   } catch (error) {
     return mapError(error);
   }

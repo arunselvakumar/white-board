@@ -5,6 +5,7 @@ export type CreateBatchCommand = {
   capacity: number;
   room?: string | null;
   joinUrl?: string | null;
+  meetingOption?: string;
   timings: unknown;
   workspaceId: string;
   createdByUserId: string;

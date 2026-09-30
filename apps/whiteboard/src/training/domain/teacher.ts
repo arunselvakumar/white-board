@@ -2,6 +2,7 @@ import { DomainError } from "./errors";
 import { Phone } from "./phone";
 import { OptionalText } from "./optional-text";
 import { parseUuid } from "./uuid";
+import { teacherDetailsFromRaw, type RawTeacherDetails, type TeacherDetails } from "./teacher-details";
 
 export const TEACHER_KINDS = ["centre_teacher", "visiting_tutor"] as const;
 export type TeacherKind = (typeof TEACHER_KINDS)[number];
@@ -16,6 +17,11 @@ export type TeacherProps = {
   kind: TeacherKind;
   phone: string | null;
   qualificationSummary: string | null;
+  details: TeacherDetails;
+  photoMimeType: string | null;
+  photoUpdatedAt: Date | null;
+  idNumberLast4: string | null;
+  bankAccountLast4: string | null;
   clerkUserId: string | null;
   invitationId: string | null;
   invitationStatus: TeacherInvitationStatus;
@@ -77,6 +83,7 @@ export class Teacher {
     kind: string;
     phone?: string | null;
     qualificationSummary?: string | null;
+    details?: RawTeacherDetails;
     now: Date;
   }): Teacher {
     return new Teacher({
@@ -88,6 +95,11 @@ export class Teacher {
       kind: teacherKind(input.kind),
       phone: Phone.createOptional(input.phone)?.value ?? null,
       qualificationSummary: optionalQualification(input.qualificationSummary),
+      details: teacherDetailsFromRaw(input.details, input.now),
+      photoMimeType: null,
+      photoUpdatedAt: null,
+      idNumberLast4: null,
+      bankAccountLast4: null,
       clerkUserId: null,
       invitationId: null,
       invitationStatus: "not_sent",
@@ -112,6 +124,11 @@ export class Teacher {
   get kind() { return this.props.kind; }
   get phone() { return this.props.phone; }
   get qualificationSummary() { return this.props.qualificationSummary; }
+  get details() { return this.props.details; }
+  get photoMimeType() { return this.props.photoMimeType; }
+  get photoUpdatedAt() { return this.props.photoUpdatedAt; }
+  get idNumberLast4() { return this.props.idNumberLast4; }
+  get bankAccountLast4() { return this.props.bankAccountLast4; }
   get clerkUserId() { return this.props.clerkUserId; }
   get invitationId() { return this.props.invitationId; }
   get invitationStatus() { return this.props.invitationStatus; }
@@ -128,6 +145,7 @@ export class Teacher {
     kind: string;
     phone?: string | null;
     qualificationSummary?: string | null;
+    details?: RawTeacherDetails;
     now: Date;
   }): void {
     this.assertActive();
@@ -137,7 +155,34 @@ export class Teacher {
       kind: teacherKind(input.kind),
       phone: Phone.createOptional(input.phone)?.value ?? null,
       qualificationSummary: optionalQualification(input.qualificationSummary),
+      details: input.details == null ? this.props.details : teacherDetailsFromRaw(input.details, input.now, this.props.details),
       updatedAt: input.now,
+    };
+  }
+
+  attachPhoto(mimeType: string, now: Date): void {
+    this.assertActive();
+    this.props = { ...this.props, photoMimeType: mimeType, photoUpdatedAt: now, updatedAt: now };
+  }
+
+  recordPrivateNumberMasks(input: { idNumber?: string | null; bankAccountNumber?: string | null }, now: Date): void {
+    this.assertActive();
+    const last4 = (value: string | null | undefined, label: string): string | null | undefined => {
+      if (value === undefined) return undefined;
+      if (value === null || value.trim() === "") return null;
+      const normalized = value.replace(/[\s-]/g, "");
+      if (!/^[A-Za-z0-9]{4,64}$/.test(normalized)) {
+        throw new DomainError("TEACHER_PRIVATE_NUMBER_INVALID", `${label} must be 4 to 64 letters or digits.`);
+      }
+      return normalized.slice(-4);
+    };
+    const idNumberLast4 = last4(input.idNumber, "ID number");
+    const bankAccountLast4 = last4(input.bankAccountNumber, "Bank account number");
+    this.props = {
+      ...this.props,
+      idNumberLast4: idNumberLast4 === undefined ? this.props.idNumberLast4 : idNumberLast4,
+      bankAccountLast4: bankAccountLast4 === undefined ? this.props.bankAccountLast4 : bankAccountLast4,
+      updatedAt: now,
     };
   }
 

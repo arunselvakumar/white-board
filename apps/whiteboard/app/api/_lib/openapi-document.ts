@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { CalendarResponseModel } from "../calendar/calendar-response-model";
+import { ClassDetailResponseModel, ClassParamsModel, ClassTokenResponseModel } from "../classes/class-models";
 
 import { CloseBatchRequestModel } from "../batches/close-batch-request-model";
 import { CloseBatchResponseModel } from "../batches/close-batch-response-model";
@@ -70,8 +71,9 @@ import { ListTeachersResponseModel } from "../teachers/list-teachers-response-mo
 import { TeacherResponseModel } from "../teachers/teacher-response-model";
 import { TeacherParamsModel } from "../teachers/[id]/teacher-params-model";
 import { UpdateTeacherProfileRequestModel } from "../teachers/[id]/profile/update-teacher-profile-request-model";
+import { AddTeacherDocumentRequestModel, ListTeacherDocumentsResponseModel, RemoveTeacherDocumentResponseModel, TeacherDocumentMetadataModel, TeacherDocumentParamsModel } from "../teachers/[id]/documents/teacher-document-models";
 import { AssignTeacherBatchRequestModel, TeacherBatchesResponseModel } from "../teachers/[id]/batches/assignment-models";
-import { UnassignTeacherBatchParamsModel } from "../teachers/[id]/batches/[batchId]/unassign/route";
+import { UnassignTeacherBatchParamsModel } from "../teachers/[id]/batches/[batchId]/unassign/unassign-teacher-batch-params-model";
 import { AttendanceRegisterParamsModel, AttendanceRegisterResponseModel, ListAttendanceRegistersRequestModel, ListAttendanceRegistersResponseModel, OpenAttendanceRegisterRequestModel } from "../attendance/registers/attendance-models";
 import { SaveAttendanceMarksRequestModel } from "../attendance/registers/[id]/marks/save-attendance-marks-request-model";
 import { ListStudentAttendanceRequestModel, StudentAttendanceHistoryResponseModel, StudentAttendanceParamsModel } from "../students/[id]/attendance/student-attendance-models";
@@ -79,6 +81,11 @@ import { buildOpenApiDocument } from "./openapi";
 
 export const openApiDocument = buildOpenApiDocument([
   { method: "get", path: "/api/calendar", summary: "View role-scoped recurring Batch Timings", tags: ["Calendar"], successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: CalendarResponseModel, errors: [401, 403, 500] },
+  { method: "get", path: "/api/classes/{batchId}/{date}/{startTime}", summary: "View a class before joining", tags: ["Classes"], params: ClassParamsModel, successStatus: StatusCodes.OK, successDescription: "Class", successSchema: ClassDetailResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/classes/{batchId}/{date}/{startTime}/start", summary: "Start a Whiteboard class as Owner or Teacher", tags: ["Classes"], params: ClassParamsModel, successStatus: StatusCodes.OK, successDescription: "Host token", successSchema: ClassTokenResponseModel, errors: [400, 401, 403, 404, 409, 503] },
+  { method: "post", path: "/api/classes/{batchId}/{date}/{startTime}/join", summary: "Join a recorded Whiteboard class", tags: ["Classes"], params: ClassParamsModel, successStatus: StatusCodes.OK, successDescription: "Participant token", successSchema: ClassTokenResponseModel, errors: [400, 401, 403, 404, 409, 503] },
+  { method: "get", path: "/api/classes/{batchId}/{date}/{startTime}/recording", summary: "Download a class recording", tags: ["Classes"], params: ClassParamsModel, successStatus: 302, successDescription: "Short-lived private R2 download redirect", errors: [400, 401, 403, 404, 409, 503] },
+  { method: "post", path: "/api/webhooks/realtimekit", summary: "Receive signed RealtimeKit meeting and recording events", tags: ["Classes"], security: false, successStatus: StatusCodes.NO_CONTENT, successDescription: "Processed", errors: [400, 401, 503] },
   { method: "post", path: "/api/attendance/registers", summary: "Open a Batch Attendance Register for today or an earlier date", tags: ["Attendance"], body: OpenAttendanceRegisterRequestModel, successStatus: StatusCodes.CREATED, successDescription: "Opened", successSchema: AttendanceRegisterResponseModel, errors: [400, 401, 403, 404, 409, 500] },
   { method: "get", path: "/api/attendance/registers", summary: "List Batch Attendance Registers", tags: ["Attendance"], query: ListAttendanceRegistersRequestModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: ListAttendanceRegistersResponseModel, errors: [400, 401, 403, 404, 500] },
   { method: "get", path: "/api/attendance/registers/{id}", summary: "Get an Attendance Register", tags: ["Attendance"], params: AttendanceRegisterParamsModel, successStatus: StatusCodes.OK, successDescription: "Found", successSchema: AttendanceRegisterResponseModel, errors: [400, 401, 403, 404, 500] },
@@ -87,7 +94,12 @@ export const openApiDocument = buildOpenApiDocument([
   { method: "post", path: "/api/teachers", summary: "Add and invite a Teacher", tags: ["Teachers"], body: CreateTeacherRequestModel, successStatus: StatusCodes.CREATED, successDescription: "Created", successSchema: TeacherResponseModel, errors: [400, 401, 403, 409, 500] },
   { method: "get", path: "/api/teachers", summary: "List Teachers", tags: ["Teachers"], query: ListTeachersRequestModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: ListTeachersResponseModel, errors: [400, 401, 403, 500] },
   { method: "get", path: "/api/teachers/{id}", summary: "Get a Teacher", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Found", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "get", path: "/api/teachers/{id}/photo", summary: "Get a Teacher photo", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Photo", successBinaryContentTypes: ["image/jpeg", "image/png", "image/webp"], errors: [400, 401, 403, 404, 500] },
   { method: "post", path: "/api/teachers/{id}/profile", summary: "Update Teacher profile", tags: ["Teachers"], params: TeacherParamsModel, body: UpdateTeacherProfileRequestModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "get", path: "/api/teachers/{id}/documents", summary: "List private Teacher documents", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: ListTeacherDocumentsResponseModel, errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/teachers/{id}/documents", summary: "Add a private Teacher document", tags: ["Teachers"], params: TeacherParamsModel, body: AddTeacherDocumentRequestModel, successStatus: StatusCodes.CREATED, successDescription: "Created", successSchema: TeacherDocumentMetadataModel, errors: [400, 401, 403, 404, 409, 500] },
+  { method: "get", path: "/api/teachers/{id}/documents/{documentId}", summary: "Download a private Teacher document", tags: ["Teachers"], params: TeacherDocumentParamsModel, successStatus: StatusCodes.OK, successDescription: "Document", successBinaryContentTypes: ["application/pdf", "image/jpeg", "image/png"], errors: [400, 401, 403, 404, 500] },
+  { method: "post", path: "/api/teachers/{id}/documents/{documentId}/remove", summary: "Remove a private Teacher document", tags: ["Teachers"], params: TeacherDocumentParamsModel, successStatus: StatusCodes.OK, successDescription: "Removed", successSchema: RemoveTeacherDocumentResponseModel, errors: [400, 401, 403, 404, 500] },
   { method: "post", path: "/api/teachers/{id}/invite", summary: "Resend Teacher invitation", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
   { method: "post", path: "/api/teachers/{id}/deactivate", summary: "Deactivate Teacher", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Updated", successSchema: TeacherResponseModel, errors: [400, 401, 403, 404, 409, 500] },
   { method: "get", path: "/api/teachers/{id}/batches", summary: "List Teacher Batches", tags: ["Teachers"], params: TeacherParamsModel, successStatus: StatusCodes.OK, successDescription: "Listed", successSchema: TeacherBatchesResponseModel, errors: [400, 401, 403, 404, 500] },

@@ -78,6 +78,21 @@ describe("Batch", () => {
     }).toThrow(DomainError);
   });
 
+  it("stores the Whiteboard meeting choice for an Online Batch", () => {
+    const batch = createBatch();
+    batch.updateSchedule({
+      name: batch.name,
+      classMode: ClassMode.create("online"),
+      meetingOption: "whiteboard",
+      capacity: batch.capacity,
+      room: null,
+      joinUrl: null,
+      timings: batch.timings,
+      now: NOW,
+    });
+    expect(batch.meetingOption).toBe("whiteboard");
+  });
+
   it("refuses new Enrollments when closed", () => {
     const batch = createBatch();
     batch.assertOpenForEnrollment();

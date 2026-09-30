@@ -10,11 +10,12 @@ export type CalendarItem = {
   classMode: "offline" | "online" | "hybrid";
   room: string | null;
   joinUrl: string | null;
+  meetingOption: "external" | "whiteboard";
   timezone: string;
   timings: { daysOfWeek: readonly number[]; startTime: string; endTime: string }[];
   activeFrom: string;
 };
 
 export type CalendarScheduleReader = {
-  execute(input: { workspaceId: string; userId: string; role: CalendarRole; verifiedEmails?: string[] }): Promise<CalendarItem[]>;
+  execute(input: { workspaceId: string; userId: string; role: CalendarRole; verifiedEmails?: string[]; includeClosed?: boolean }): Promise<CalendarItem[]>;
 };
