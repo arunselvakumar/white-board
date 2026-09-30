@@ -15,7 +15,7 @@ export default function Home() {
           <code className="font-mono text-xs">@repo/ui</code>.
         </p>
       </div>
-      <Button>Get started</Button>
+      <Button render={<a href="/app/signup" />}>Get started</Button>
     </main>
   );
 }

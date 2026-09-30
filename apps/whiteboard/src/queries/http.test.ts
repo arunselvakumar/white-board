@@ -20,8 +20,12 @@ describe("apiJson", () => {
       ),
     );
 
-    await expect(apiJson<{ id: string }>("/api/students/stu_1")).resolves.toEqual(
-      { id: "stu_1" },
+    await expect(
+      apiJson<{ id: string }>("/api/students/stu_1"),
+    ).resolves.toEqual({ id: "stu_1" });
+    expect(fetch).toHaveBeenCalledWith(
+      "/app/api/students/stu_1",
+      expect.any(Object),
     );
   });
 

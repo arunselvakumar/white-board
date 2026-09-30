@@ -36,11 +36,13 @@ describe("Workspace role access", () => {
     expect(isAllowedAppPath("/teacher", "org:admin")).toBe(false);
   });
 
-  it("lets every supported role open only the shared Calendar route", () => {
+  it("lets every supported role open shared Calendar and class routes", () => {
     for (const role of ["org:admin", "org:teacher", "org:student", "org:parent"]) {
       expect(isAllowedAppPath("/calendar", role)).toBe(true);
+      expect(isAllowedAppPath("/classes/batch/2026-09-30/09%3A00", role)).toBe(true);
     }
     expect(isAllowedAppPath("/calendar", "org:member")).toBe(false);
+    expect(isAllowedAppPath("/classes/batch/2026-09-30/09%3A00", "org:member")).toBe(false);
     expect(isAllowedAppPath("/calendar/private", "org:student")).toBe(false);
   });
 });

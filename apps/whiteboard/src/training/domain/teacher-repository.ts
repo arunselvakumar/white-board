@@ -9,9 +9,16 @@ export type TeacherListParams = {
 };
 
 export type TeacherRepository = {
-  create(teacher: Teacher): Promise<void>;
-  save(teacher: Teacher): Promise<void>;
+  create(teacher: Teacher, changes?: TeacherPersistenceChanges): Promise<void>;
+  save(teacher: Teacher, changes?: TeacherPersistenceChanges): Promise<void>;
   findByIdInWorkspace(id: string, workspaceId: string): Promise<Teacher | null>;
+  findPhotoByIdInWorkspace(id: string, workspaceId: string): Promise<{ mimeType: string; bytes: Uint8Array } | null>;
   findByClerkUserInWorkspace(clerkUserId: string, workspaceId: string): Promise<Teacher | null>;
   listInWorkspace(params: TeacherListParams): Promise<ListPage<Teacher>>;
+};
+
+export type TeacherPersistenceChanges = {
+  photoData?: Uint8Array;
+  idNumber?: string | null;
+  bankAccountNumber?: string | null;
 };

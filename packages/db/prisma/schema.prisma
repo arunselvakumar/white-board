@@ -15,6 +15,13 @@ enum ClassMode {
   @@map("class_mode")
 }
 
+enum MeetingOption {
+  external
+  whiteboard
+
+  @@map("meeting_option")
+}
+
 enum TimingSource {
   batch
   student
@@ -120,6 +127,7 @@ model Batch {
   capacity        Int
   room            String?   @db.VarChar(80)
   joinUrl         String?   @map("join_url") @db.VarChar(2048)
+  meetingOption   MeetingOption @default(external) @map("meeting_option")
   /// Weekly slots: { daysOfWeek: number[], startTime: "HH:mm", endTime: "HH:mm" }[]
   timings         Json
   timezone        String    @default("Asia/Kolkata") @db.VarChar(64)
@@ -134,10 +142,34 @@ model Batch {
   enrollments Enrollment[]
   teacherAssignments BatchTeacherAssignment[]
   attendanceRegisters AttendanceRegister[]
+  classOccurrences ClassOccurrence[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([courseId, deletedAt])
   @@map("batches")
+}
+
+model ClassOccurrence {
+  id                String    @id @db.Uuid
+  workspaceId       String    @map("workspace_id")
+  batchId           String    @map("batch_id") @db.Uuid
+  classDate         DateTime  @map("class_date") @db.Date
+  startTime         String    @map("start_time") @db.VarChar(5)
+  endTime           String    @map("end_time") @db.VarChar(5)
+  providerMeetingId String?   @unique @map("provider_meeting_id") @db.VarChar(100)
+  status            String    @default("starting") @db.VarChar(20)
+  recordingId       String?   @map("recording_id") @db.VarChar(100)
+  recordingStatus   String    @default("pending") @map("recording_status") @db.VarChar(20)
+  recordingObjectKey String?  @map("recording_object_key") @db.VarChar(1024)
+  startedByUserId   String    @map("started_by_user_id")
+  startedAt         DateTime  @default(now()) @map("started_at")
+  endedAt           DateTime? @map("ended_at")
+
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@unique([batchId, classDate, startTime])
+  @@index([workspaceId, batchId, classDate])
+  @@map("class_occurrences")
 }
 
 model Teacher {
@@ -149,6 +181,14 @@ model Teacher {
   kind                  TeacherKind
   phone                 String?                 @db.VarChar(32)
   qualificationSummary  String?                 @map("qualification_summary") @db.VarChar(1000)
+  profileDetails        Json                    @default("{}") @map("profile_details")
+  photoData             Bytes?                 @map("photo_data")
+  photoMimeType         String?                @map("photo_mime_type") @db.VarChar(50)
+  photoUpdatedAt        DateTime?              @map("photo_updated_at")
+  idNumberEncrypted     String?                @map("id_number_encrypted") @db.Text
+  idNumberLast4         String?                @map("id_number_last4") @db.VarChar(4)
+  bankAccountEncrypted  String?                @map("bank_account_encrypted") @db.Text
+  bankAccountLast4      String?                @map("bank_account_last4") @db.VarChar(4)
   clerkUserId           String?                 @map("clerk_user_id")
   invitationId          String?                 @map("invitation_id")
   invitationStatus      TeacherInvitationStatus @default(not_sent) @map("invitation_status")
@@ -160,10 +200,31 @@ model Teacher {
   deletedByUserId       String?                 @map("deleted_by_user_id")
 
   batchAssignments BatchTeacherAssignment[]
+  documents        TeacherDocument[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([workspaceId, clerkUserId])
   @@map("teachers")
+}
+
+model TeacherDocument {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  teacherId       String    @map("teacher_id") @db.Uuid
+  kind            String    @db.VarChar(32)
+  name            String    @db.VarChar(200)
+  mimeType        String    @map("mime_type") @db.VarChar(50)
+  encryptedData   Bytes     @map("encrypted_data")
+  sizeBytes       Int       @map("size_bytes")
+  uploadedAt      DateTime  @default(now()) @map("uploaded_at")
+  uploadedByUserId String   @map("uploaded_by_user_id")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, teacherId, deletedAt, uploadedAt, id])
+  @@map("teacher_documents")
 }
 
 model BatchTeacherAssignment {

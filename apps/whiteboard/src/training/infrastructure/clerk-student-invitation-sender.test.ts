@@ -55,7 +55,7 @@ describe("Clerk Student invitation adapter", () => {
   it("sends a role-specific Workspace invitation", async () => {
     await new ClerkStudentInvitationSender().send(invite);
     expect(mockState.calls).toEqual([
-      { ...invite, redirectUrl: "/accept-invitation" },
+      { ...invite, redirectUrl: "/app/accept-invitation" },
     ]);
   });
 
@@ -63,7 +63,7 @@ describe("Clerk Student invitation adapter", () => {
     mockState.failure = "pending";
     await new ClerkStudentInvitationSender().send(invite);
     expect(mockState.calls).toEqual([
-      { ...invite, redirectUrl: "/accept-invitation" },
+      { ...invite, redirectUrl: "/app/accept-invitation" },
     ]);
   });
 

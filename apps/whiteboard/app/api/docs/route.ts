@@ -19,7 +19,7 @@ const HTML = `<!DOCTYPE html>
     <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
     <script>
       window.ui = SwaggerUIBundle({
-        url: "/api/openapi.json",
+        url: "/app/api/openapi.json",
         dom_id: "#swagger-ui",
         withCredentials: true,
       });

@@ -29,6 +29,7 @@ import {
 } from "@repo/ui/components/sidebar";
 
 import { isAppNavActive, navForRole } from "@/lib/app-nav";
+import { withAppBasePath } from "@/lib/app-base-path";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { AppBreadcrumbs } from "./app-breadcrumbs";
@@ -54,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 render={<Link href="/" />}
               >
                 <Image
-                  src="/whiteboard-logo.svg"
+                  src={withAppBasePath("/whiteboard-logo.svg")}
                   alt=""
                   width={32}
                   height={32}

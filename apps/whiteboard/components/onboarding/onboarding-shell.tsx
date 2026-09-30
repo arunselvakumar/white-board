@@ -11,7 +11,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
         <div className="w-full max-w-[352px] space-y-8">{children}</div>
       </div>
       <div className="flex justify-center pb-8">
-        <SignOutButton redirectUrl="/login">
+        <SignOutButton redirectUrl="/app/login">
           <Button variant="ghost" size="sm">
             Sign out
           </Button>

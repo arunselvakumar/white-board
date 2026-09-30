@@ -24,6 +24,7 @@ function sampleBatch(overrides: Partial<BatchResponse> = {}): BatchResponse {
     capacity: 20,
     room: "Lab 1",
     joinUrl: null,
+    meetingOption: "external",
     timings: [
       { daysOfWeek: [1, 2, 3, 4, 5], startTime: "09:00", endTime: "11:00" },
     ],
@@ -114,6 +115,7 @@ function BatchWorkspace({
                         capacity: String(editing.capacity),
                         room: editing.room ?? "",
                         joinUrl: editing.joinUrl ?? "",
+                        meetingOption: editing.meetingOption,
                         timings: editing.timings.map((slot) => ({
                           daysOfWeek: [...slot.daysOfWeek],
                           startTime: slot.startTime,
@@ -138,6 +140,7 @@ function BatchWorkspace({
                               classMode: input.classMode,
                               room: input.room ?? null,
                               joinUrl: input.joinUrl ?? null,
+                              meetingOption: input.meetingOption ?? "external",
                               updatedAt: NOW,
                             }
                           : item,
@@ -153,6 +156,7 @@ function BatchWorkspace({
                         capacity: input.capacity,
                         room: input.room ?? null,
                         joinUrl: input.joinUrl ?? null,
+                        meetingOption: input.meetingOption ?? "external",
                         timings: input.timings,
                         timezone: "Asia/Kolkata",
                         closedAt: null,
@@ -320,6 +324,21 @@ export const Create: Story = {
     ).toBeVisible();
     await expect(canvas.getByText("DCA Weekday 9–11 Offline")).toBeVisible();
     await expect(canvas.getByText("Offline")).toBeVisible();
+  },
+};
+
+export const OnlineMeetingChoice: Story = {
+  render: () => <div className="w-full p-6"><div className="w-full max-w-4xl"><BatchForm
+    courses={COURSES}
+    defaultValues={{ courseId: COURSE_ID, name: "Python Online", classMode: "online", timings: [{ daysOfWeek: [1], startTime: "09:00", endTime: "10:00" }] }}
+    submitLabel="Save Batch"
+    onSubmit={() => Promise.resolve()}
+  /></div></div>,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(canvas.getByLabelText("Join URL")).toBeVisible();
+    await userEvent.click(canvas.getByLabelText("Online meeting"));
+    await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole("option", { name: "Whiteboard class" }));
+    await expect(canvas.queryByLabelText("Join URL")).toBeNull();
   },
 };
 

@@ -21,6 +21,7 @@ export class PrismaBatchRepository implements BatchRepository {
       capacity: batch.capacity.value,
       room: batch.room?.value ?? null,
       joinUrl: batch.joinUrl?.value ?? null,
+      meetingOption: batch.meetingOption,
       timings: batch.timings.toJson() as Prisma.InputJsonValue,
       timezone: batch.timezone,
       closedAt: batch.closedAt,

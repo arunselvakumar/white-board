@@ -12,6 +12,7 @@ export type CalendarItem = {
   classMode: "offline" | "online" | "hybrid";
   room: string | null;
   joinUrl: string | null;
+  meetingOption: "external" | "whiteboard";
   timezone: string;
   timings: { daysOfWeek: number[]; startTime: string; endTime: string }[];
   activeFrom: string;

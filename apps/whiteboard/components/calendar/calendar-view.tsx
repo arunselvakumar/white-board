@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, MonitorPlay } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 
 import { addDays, addMonths, dateKeyInZone, expandCalendarItems, formatDate, monthGrid, weekDates, type CalendarEvent, type DateKey } from "@/lib/calendar-dates";
 import type { CalendarItem } from "@/src/queries/calendar";
+import { classPath } from "@/src/queries/classes";
 
 type ViewMode = "day" | "week" | "month";
 type Event = CalendarEvent<CalendarItem>;
@@ -48,16 +50,22 @@ function eventLabel(event: Event): string {
 
 function CalendarEventCard({ event, compact = false }: { event: Event; compact?: boolean }) {
   const colors = colorFor(event.item.courseId);
-  if (compact) return <div title={eventLabel(event)} className={`truncate rounded-md px-2 py-1 text-xs font-medium ${colors.chip}`}>
+  const href = classPath(event.item.batchId, event.date, `${String(Math.floor(event.startMinutes / 60)).padStart(2, "0")}:${String(event.startMinutes % 60).padStart(2, "0")}`);
+  const linked = event.item.classMode !== "offline";
+  if (compact) return linked ? <Link href={href} title={eventLabel(event)} className={`block truncate rounded-md px-2 py-1 text-xs font-medium ${colors.chip}`}>
+    {timeLabel(event.startMinutes)} · {event.item.courseName}{event.item.studentName ? ` · ${event.item.studentName}` : ""}
+  </Link> : <div title={eventLabel(event)} className={`truncate rounded-md px-2 py-1 text-xs font-medium ${colors.chip}`}>
     {timeLabel(event.startMinutes)} · {event.item.courseName}{event.item.studentName ? ` · ${event.item.studentName}` : ""}
   </div>;
-  return <div aria-label={eventLabel(event)} title={eventLabel(event)} className={`h-full overflow-hidden rounded-r-lg border-l-4 px-2.5 py-1.5 shadow-sm ${colors.card}`}>
+  const content = <>
     <p className="truncate text-[11px] font-semibold opacity-75">{timeLabel(event.startMinutes)}–{timeLabel(event.endMinutes)}</p>
     <p className="truncate text-xs font-bold sm:text-sm">{event.item.courseName}</p>
     <p className="truncate text-[11px] font-medium">{event.item.batchName}</p>
     {event.item.studentName && <p className="truncate text-[11px] opacity-75">{event.item.studentName}</p>}
     <p className="mt-1 flex items-center gap-1 truncate text-[11px] capitalize opacity-75">{event.item.room ? <MapPin className="size-3 shrink-0" /> : <MonitorPlay className="size-3 shrink-0" />}{event.item.classMode}{event.item.room ? ` · ${event.item.room}` : ""}</p>
-  </div>;
+  </>;
+  const className = `block h-full overflow-hidden rounded-r-lg border-l-4 px-2.5 py-1.5 shadow-sm ${colors.card}`;
+  return linked ? <Link href={href} aria-label={`Open ${eventLabel(event)}`} title={eventLabel(event)} className={className}>{content}</Link> : <div aria-label={eventLabel(event)} title={eventLabel(event)} className={className}>{content}</div>;
 }
 
 function layoutDay(events: Event[]): { event: Event; lane: number; lanes: number }[] {

@@ -11,8 +11,11 @@ const NOT_FOUND_CODES = new Set([
   "FEE_PAYMENT_NOT_FOUND",
   "TEACHER_NOT_FOUND",
   "TEACHER_ASSIGNMENT_NOT_FOUND",
+  "TEACHER_DOCUMENT_NOT_FOUND",
   "ATTENDANCE_REGISTER_NOT_FOUND",
   "ATTENDANCE_MARK_NOT_FOUND",
+  "CLASS_NOT_FOUND",
+  "CLASS_FORBIDDEN",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -34,8 +37,14 @@ const CONFLICT_CODES = new Set([
   "TEACHER_ALREADY_ACTIVE",
   "TEACHER_ALREADY_LINKED",
   "TEACHER_ALREADY_ASSIGNED",
+  "TEACHER_DOCUMENT_LIMIT",
   "ATTENDANCE_NOT_SCHEDULED",
   "ATTENDANCE_ROSTER_EMPTY",
+  "CLASS_NOT_HOSTED",
+  "CLASS_NOT_IN_PROGRESS",
+  "CLASS_STARTING",
+  "CLASS_NOT_READY",
+  "CLASS_ENDED",
 ]);
 
 function errorCode(error: unknown): string | undefined {
@@ -71,6 +80,9 @@ export function mapError(error: unknown): Response {
   }
   if (code === "ATTENDANCE_FORBIDDEN" && error instanceof Error) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);
+  }
+  if ((code === "CLASS_NOT_CONFIGURED" || code === "CLASS_PROVIDER_UNAVAILABLE") && error instanceof Error) {
+    return jsonError(StatusCodes.SERVICE_UNAVAILABLE, code, error.message);
   }
   if (code != null && NOT_FOUND_CODES.has(code) && error instanceof Error) {
     return jsonError(StatusCodes.NOT_FOUND, code, error.message);

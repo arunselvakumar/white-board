@@ -10,6 +10,7 @@ export const batchResponseFields = {
   capacity: z.number().int(),
   room: z.string().nullable(),
   joinUrl: z.string().nullable(),
+  meetingOption: z.enum(["external", "whiteboard"]),
   timings: z.array(TimingSlotModel),
   timezone: z.string(),
   closedAt: z.iso.datetime().nullable(),

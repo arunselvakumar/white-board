@@ -29,12 +29,14 @@ describe("app route gate", () => {
     async (orgRole) => {
       const response = await handler(
         () => Promise.resolve({ userId: "user_1", orgId: "org_1", orgRole }),
-        request("/students/new"),
+        request("/app/students/new"),
       );
       expect(response).toBeDefined();
       if (response == null) throw new Error("Expected a redirect");
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(response.headers.get("location")).toBe(
+        "http://localhost:3000/app",
+      );
     },
   );
 
@@ -47,7 +49,7 @@ describe("app route gate", () => {
             orgId: "org_1",
             orgRole: "org:admin",
           }),
-        request("/students/new"),
+        request("/app/students/new"),
       ),
     ).toBeUndefined();
   });
@@ -61,7 +63,7 @@ describe("app route gate", () => {
             orgId: "org_1",
             orgRole: "org:student",
           }),
-        request("/student"),
+        request("/app/student"),
       ),
     ).toBeUndefined();
     const response = await handler(
@@ -71,8 +73,8 @@ describe("app route gate", () => {
           orgId: "org_1",
           orgRole: "org:student",
         }),
-      request("/parent"),
+      request("/app/parent"),
     );
-    expect(response?.headers.get("location")).toBe("http://localhost:3000/");
+    expect(response?.headers.get("location")).toBe("http://localhost:3000/app");
   });
 });

@@ -21,6 +21,7 @@ export function toDomainBatch(row: BatchRecord): Batch {
     capacity: Capacity.create(row.capacity),
     room: batchRoom(row.room),
     joinUrl: batchJoinUrl(row.joinUrl),
+    meetingOption: row.meetingOption,
     timings: WeeklyTimings.create(row.timings),
     timezone: row.timezone,
     closedAt: row.closedAt,

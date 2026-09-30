@@ -1,0 +1,214 @@
+import { classSlotForDate } from "../domain/class-occurrence";
+import { DomainError } from "../domain/errors";
+import type { CalendarItem, CalendarRole, CalendarScheduleReader } from "./calendar-schedule";
+
+export type ClassKey = {
+  workspaceId: string;
+  batchId: string;
+  date: string;
+  startTime: string;
+};
+
+export type ClassActor = ClassKey & {
+  userId: string;
+  role: CalendarRole;
+  verifiedEmails?: string[];
+};
+
+export type ClassOccurrenceRecord = ClassKey & {
+  id: string;
+  endTime: string;
+  providerMeetingId: string | null;
+  status: "starting" | "live" | "ended" | "failed";
+  recordingId: string | null;
+  recordingStatus: "pending" | "requesting" | "recording" | "uploading" | "ready" | "error";
+  recordingObjectKey: string | null;
+};
+
+export type ClassOccurrenceStore = {
+  find(key: ClassKey): Promise<ClassOccurrenceRecord | null>;
+  claim(input: ClassKey & { endTime: string; startedByUserId: string }): Promise<{ occurrence: ClassOccurrenceRecord; claimed: boolean }>;
+  setMeeting(id: string, meetingId: string): Promise<void>;
+  findByMeetingId(meetingId: string): Promise<ClassOccurrenceRecord | null>;
+  claimRecording(id: string): Promise<boolean>;
+  markEnded(id: string): Promise<void>;
+  setRecordingStatus(id: string, status: ClassOccurrenceRecord["recordingStatus"], fields?: { recordingId?: string; objectKey?: string }): Promise<void>;
+};
+
+export type MeetingGateway = {
+  ensureConfigured(): void;
+  createMeeting(title: string): Promise<string>;
+  addParticipant(meetingId: string, input: { userId: string; name: string; host: boolean }): Promise<string>;
+  startRecording(meetingId: string, occurrence: ClassOccurrenceRecord): Promise<string>;
+  endMeeting(meetingId: string): Promise<void>;
+  deactivateMeeting(meetingId: string): Promise<void>;
+};
+
+export type ClassDetail = {
+  batchId: string;
+  batchName: string;
+  courseName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  timezone: string;
+  meetingOption: "external" | "whiteboard";
+  joinUrl: string | null;
+  isHost: boolean;
+  status: "scheduled" | ClassOccurrenceRecord["status"];
+  recordingStatus: ClassOccurrenceRecord["recordingStatus"] | null;
+  recordingReady: boolean;
+};
+
+function localDateAndMinutes(now: Date, timezone: string): { date: string; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(now);
+  const part = (name: string) => parts.find((value) => value.type === name)?.value ?? "";
+  return {
+    date: `${part("year")}-${part("month")}-${part("day")}`,
+    minutes: Number(part("hour")) * 60 + Number(part("minute")),
+  };
+}
+
+function clockMinutes(clock: string): number {
+  const [hour, minute] = clock.split(":").map(Number);
+  return (hour ?? 0) * 60 + (minute ?? 0);
+}
+
+export class ClassService {
+  constructor(private readonly deps: {
+    schedule: CalendarScheduleReader;
+    occurrences: ClassOccurrenceStore;
+    meetings: MeetingGateway;
+    now: () => Date;
+  }) {}
+
+  private async context(input: ClassActor, includeClosed = false): Promise<{ item: CalendarItem; endTime: string; isHost: boolean }> {
+    const items = await this.deps.schedule.execute({
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+      role: input.role,
+      verifiedEmails: input.verifiedEmails,
+      includeClosed,
+    });
+    const found = items.map((item) => ({ item, slot: classSlotForDate(item.timings, input.date, input.startTime) }))
+      .find(({ item, slot }) => item.batchId === input.batchId && item.classMode !== "offline" && slot != null && input.date >= localDateAndMinutes(new Date(item.activeFrom), item.timezone).date);
+    if (found?.slot == null) throw new DomainError("CLASS_NOT_FOUND", "Class not found.");
+    return { item: found.item, endTime: found.slot.endTime, isHost: input.role === "org:admin" || input.role === "org:teacher" };
+  }
+
+  async get(input: ClassActor): Promise<ClassDetail> {
+    const occurrence = await this.deps.occurrences.find(input);
+    let item: CalendarItem;
+    let endTime: string;
+    let isHost: boolean;
+    try {
+      ({ item, endTime, isHost } = await this.context(input, true));
+    } catch (error) {
+      if (!(error instanceof DomainError) || error.code !== "CLASS_NOT_FOUND" || occurrence?.recordingStatus !== "ready" || (input.role !== "org:admin" && input.role !== "org:teacher")) throw error;
+      const items = await this.deps.schedule.execute({ workspaceId: input.workspaceId, userId: input.userId, role: input.role, includeClosed: true });
+      const historical = items.find((candidate) => candidate.batchId === input.batchId);
+      if (historical == null) throw error;
+      item = historical;
+      endTime = occurrence.endTime;
+      isHost = true;
+    }
+    const option = occurrence == null ? item.meetingOption : "whiteboard";
+    return {
+      batchId: item.batchId,
+      batchName: item.batchName,
+      courseName: item.courseName,
+      date: input.date,
+      startTime: input.startTime,
+      endTime,
+      timezone: item.timezone,
+      meetingOption: option,
+      joinUrl: option === "external" ? item.joinUrl : null,
+      isHost,
+      status: occurrence?.status ?? "scheduled",
+      recordingStatus: occurrence?.recordingStatus ?? null,
+      recordingReady: isHost && occurrence?.recordingStatus === "ready",
+    };
+  }
+
+  async start(input: ClassActor, name: string): Promise<{ authToken: string }> {
+    const { item, endTime, isHost } = await this.context(input);
+    if (!isHost) throw new DomainError("CLASS_FORBIDDEN", "Only the Owner or assigned Teacher can start this class.");
+    if (item.meetingOption !== "whiteboard") throw new DomainError("CLASS_NOT_HOSTED", "This Batch uses an external meeting link.");
+    const local = localDateAndMinutes(this.deps.now(), item.timezone);
+    if (local.date !== input.date || local.minutes < clockMinutes(input.startTime) - 15 || local.minutes > clockMinutes(endTime) + 30) {
+      throw new DomainError("CLASS_NOT_IN_PROGRESS", "This class can start from 15 minutes before its Timing until 30 minutes after it ends.");
+    }
+    this.deps.meetings.ensureConfigured();
+    const claim = await this.deps.occurrences.claim({ ...input, endTime, startedByUserId: input.userId });
+    const occurrence = claim.occurrence;
+    if (occurrence.status === "ended" || occurrence.status === "failed") throw new DomainError("CLASS_ENDED", "This class has ended.");
+    let meetingId = occurrence.providerMeetingId;
+    if (meetingId == null) {
+      if (!claim.claimed) throw new DomainError("CLASS_STARTING", "The class is starting. Please try again shortly.");
+      meetingId = await this.deps.meetings.createMeeting(`${item.courseName} · ${item.batchName}`);
+      await this.deps.occurrences.setMeeting(occurrence.id, meetingId);
+    }
+    return { authToken: await this.deps.meetings.addParticipant(meetingId, { userId: input.userId, name, host: true }) };
+  }
+
+  async join(input: ClassActor, name: string): Promise<{ authToken: string }> {
+    const { item, endTime, isHost } = await this.context(input);
+    if (item.meetingOption !== "whiteboard") throw new DomainError("CLASS_NOT_HOSTED", "This Batch uses an external meeting link.");
+    const local = localDateAndMinutes(this.deps.now(), item.timezone);
+    if (local.date !== input.date || local.minutes > clockMinutes(endTime) + 30) throw new DomainError("CLASS_NOT_IN_PROGRESS", "This class is no longer open for joining.");
+    const occurrence = await this.deps.occurrences.find(input);
+    if (occurrence?.providerMeetingId == null || occurrence.status !== "live" || occurrence.recordingStatus !== "recording") {
+      throw new DomainError("CLASS_NOT_READY", "Wait for the Teacher to start the recorded class.");
+    }
+    return { authToken: await this.deps.meetings.addParticipant(occurrence.providerMeetingId, { userId: input.userId, name, host: isHost }) };
+  }
+
+  async meetingStarted(meetingId: string): Promise<void> {
+    const occurrence = await this.deps.occurrences.findByMeetingId(meetingId);
+    if (occurrence == null || occurrence.recordingId != null || !await this.deps.occurrences.claimRecording(occurrence.id)) return;
+    try {
+      const recordingId = await this.deps.meetings.startRecording(meetingId, occurrence);
+      await this.deps.occurrences.setRecordingStatus(occurrence.id, "pending", { recordingId });
+    } catch (error) {
+      await this.deps.occurrences.setRecordingStatus(occurrence.id, "error");
+      await this.deps.meetings.endMeeting(meetingId);
+      throw error;
+    }
+  }
+
+  async meetingEnded(meetingId: string): Promise<void> {
+    const occurrence = await this.deps.occurrences.findByMeetingId(meetingId);
+    if (occurrence != null) {
+      await this.deps.occurrences.markEnded(occurrence.id);
+      await this.deps.meetings.deactivateMeeting(meetingId);
+    }
+  }
+
+  async recordingChanged(input: { meetingId: string; recordingId: string; status: string; outputFileName?: string }): Promise<void> {
+    const occurrence = await this.deps.occurrences.findByMeetingId(input.meetingId);
+    if (occurrence == null || (occurrence.recordingId != null && occurrence.recordingId !== input.recordingId)) return;
+    if (input.status === "RECORDING") await this.deps.occurrences.setRecordingStatus(occurrence.id, "recording", { recordingId: input.recordingId });
+    if (input.status === "UPLOADING") await this.deps.occurrences.setRecordingStatus(occurrence.id, "uploading", { recordingId: input.recordingId });
+    if (input.status === "ERRORED" || input.status === "PAUSED") {
+      await this.deps.occurrences.setRecordingStatus(occurrence.id, "error", { recordingId: input.recordingId });
+      if (occurrence.status !== "ended") await this.deps.meetings.endMeeting(input.meetingId);
+    }
+    if (input.status === "UPLOADED" && input.outputFileName != null && /^[A-Za-z0-9_.-]+\.mp4$/.test(input.outputFileName)) {
+      await this.deps.occurrences.setRecordingStatus(occurrence.id, "ready", {
+        recordingId: input.recordingId,
+        objectKey: `${occurrence.workspaceId}/${occurrence.id}/${input.outputFileName}`,
+      });
+    }
+  }
+
+  async recordingObjectKey(input: ClassActor): Promise<string> {
+    if (input.role !== "org:admin" && input.role !== "org:teacher") throw new DomainError("CLASS_NOT_FOUND", "Class recording not found.");
+    const items = await this.deps.schedule.execute({ workspaceId: input.workspaceId, userId: input.userId, role: input.role, includeClosed: true });
+    if (!items.some((item) => item.batchId === input.batchId)) throw new DomainError("CLASS_NOT_FOUND", "Class recording not found.");
+    const occurrence = await this.deps.occurrences.find(input);
+    if (occurrence?.recordingStatus !== "ready" || occurrence.recordingObjectKey == null) throw new DomainError("CLASS_NOT_READY", "The recording is not ready to download.");
+    return occurrence.recordingObjectKey;
+  }
+}

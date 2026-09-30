@@ -1,11 +1,9 @@
-import { z } from "zod";
-
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
 import { mapAssignedBatches } from "@/app/api/teachers/[id]/batches/assignment-models";
 import { createTeacherAssignmentHandlers } from "@/src/training/infrastructure/create-teacher-assignment-handlers";
+import { UnassignTeacherBatchParamsModel } from "./unassign-teacher-batch-params-model";
 
-export const UnassignTeacherBatchParamsModel = z.object({ id: z.uuid(), batchId: z.uuid() });
 const handlers = createTeacherAssignmentHandlers();
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string; batchId: string }> }): Promise<Response> {

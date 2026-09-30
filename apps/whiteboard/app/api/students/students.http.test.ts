@@ -124,28 +124,28 @@ describe("student HTTP APIs", () => {
         inviterUserId: userId,
         emailAddress: "anita@example.com",
         role: "org:student",
-        redirectUrl: "/accept-invitation",
+        redirectUrl: "/app/accept-invitation",
       },
       {
         organizationId: orgId,
         inviterUserId: userId,
         emailAddress: "ravi@example.com",
         role: "org:parent",
-        redirectUrl: "/accept-invitation",
+        redirectUrl: "/app/accept-invitation",
       },
       {
         organizationId: orgId,
         inviterUserId: userId,
         emailAddress: "meera@example.com",
         role: "org:parent",
-        redirectUrl: "/accept-invitation",
+        redirectUrl: "/app/accept-invitation",
       },
       {
         organizationId: orgId,
         inviterUserId: userId,
         emailAddress: "asha@example.com",
         role: "org:parent",
-        redirectUrl: "/accept-invitation",
+        redirectUrl: "/app/accept-invitation",
       },
     ]);
   });

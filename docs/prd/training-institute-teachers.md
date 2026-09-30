@@ -50,4 +50,12 @@ The development Clerk instance has `org:teacher` in its default Role Set. Config
 
 ## Outside this slice
 
-Student attendance, Teacher availability and clash detection, salary or payroll, bank details, documents, background checks, performance evaluation, and Teacher self-service profile editing.
+Student attendance, availability-based clash detection, payroll payments, external background-check integration, performance evaluation, and Teacher self-service profile editing.
+
+## Expanded Teacher profile (approved 2026-09-29)
+
+The Owner can record a Teacher photo, salutation, preferred display name, gender, date of birth, alternate phone, city or area, full address, emergency contact, teaching specialisms, learner levels, teaching experience, highest qualification, certifications, languages, short bio, portfolio link, start date, weekly availability, ID proof type and number, background check status/date/note, pay basis and rate, and bank details. The existing invitation email remains fixed after creation. A Teacher's specialisms describe expertise; Batch assignment is still a separate Owner action. Weekly availability is a profile record and does not reject Batch assignments or detect clashes.
+
+The Add Teacher UI requires a photo and offers camera capture or file upload; the API permits photo omission so existing integrations and records remain valid. The Owner can replace the photo later. JPEG, PNG, and WebP photos are limited to 2 MiB after client resizing and are served from an authenticated, Workspace-scoped endpoint. The Owner can attach up to ten active PDF, JPEG, or PNG documents of at most 3 MiB each, tagged as certificate, identity, background check, or other. Removing a document creates an invisible tombstone.
+
+Full ID and bank account numbers and document bytes are encrypted in Postgres with AES-256-GCM using `TEACHER_PRIVATE_DATA_KEY`. API responses expose only the last four characters of the numbers. The key must be configured before saving those fields or documents; losing it makes existing encrypted data unreadable. Photo, documents, verification, and pay data are Owner-only. The Teacher list exposes a summary without private profile fields. No payroll transfer or background-check service is part of this expansion.
