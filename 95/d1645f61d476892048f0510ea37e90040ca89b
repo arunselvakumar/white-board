@@ -1,0 +1,279 @@
+AGENTS.md
+  s_5b0265dac3d46b::t_e4e0ac08ad5965 50,88
+README.md
+  s_5b0265dac3d46b::t_347daf54ee3ba0 41
+apps/marketing/app/page.tsx
+  s_5b0265dac3d46b::t_45158e8ed817ff 18
+apps/whiteboard/.env.example
+  s_5b0265dac3d46b::t_dcc343e0b484b7 3-6,9-22
+apps/whiteboard/README.md
+  s_5b0265dac3d46b::t_6b07a788508d60 9-32
+apps/whiteboard/app/(app)/classes/[batchId]/[date]/[startTime]/page.tsx
+  s_5b0265dac3d46b::t_ea10d3e3397c70 1-9
+apps/whiteboard/app/api/_lib/map-error.ts
+  s_5b0265dac3d46b::t_4ef8f21cfa251c 14,17-18,40,43-47,84-86
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_5b0265dac3d46b::t_dc0e9200b086bc 10-17,76-84
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_5b0265dac3d46b::t_a4048f717721c2 3,74,76,84-88,97,99-102
+apps/whiteboard/app/api/_lib/openapi.ts
+  s_5b0265dac3d46b::t_846defdc050e9c 33,39,68-80,190
+apps/whiteboard/app/api/batches/batch-response-fields.ts
+  s_5b0265dac3d46b::t_c4ef6b55a20734 13
+apps/whiteboard/app/api/batches/create-batch-request-model.ts
+  s_5b0265dac3d46b::t_cb8b0d69725762 4,12-13
+apps/whiteboard/app/api/batches/join-url-model.ts
+  s_5b0265dac3d46b::t_b3252084368baa 1-6
+apps/whiteboard/app/api/batches/map-batch-response.ts
+  s_5b0265dac3d46b::t_36cafdf255c9b0 12
+apps/whiteboard/app/api/batches/update-batch-schedule-request-model.ts
+  s_5b0265dac3d46b::t_3e9ac18e8206b5 4,11-12
+apps/whiteboard/app/api/calendar/calendar-response-model.ts
+  s_5b0265dac3d46b::t_f5be7b1e31276c 13
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/join/route.ts
+  s_5b0265dac3d46b::t_5edfb0d5c7bf5f 1-11
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/recording/route.ts
+  s_5b0265dac3d46b::t_05771c0d912ba8 1-15
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/route.ts
+  s_5b0265dac3d46b::t_fd02c75ad91595 1-13
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/start/route.ts
+  s_5b0265dac3d46b::t_ad09d5d8f5b278 1-11
+apps/whiteboard/app/api/classes/class-models.ts
+  s_5b0265dac3d46b::t_5796aff0d8f398 1-25
+apps/whiteboard/app/api/classes/class-route.ts
+  s_5b0265dac3d46b::t_7cc5059131de4d 1-28
+apps/whiteboard/app/api/classes/classes.http.test.ts
+  s_5b0265dac3d46b::t_83f3e3ee336b13 1-60
+apps/whiteboard/app/api/docs/route.ts
+  s_5b0265dac3d46b::t_e54a3bb3cb55bf 22
+apps/whiteboard/app/api/students/students.http.test.ts
+  s_5b0265dac3d46b::t_5061cec3ac997a 127,134,141,148
+apps/whiteboard/app/api/teachers/[id]/batches/[batchId]/unassign/route.ts
+  s_5b0265dac3d46b::t_990e2ebefb53d3 5
+apps/whiteboard/app/api/teachers/[id]/batches/[batchId]/unassign/unassign-teacher-batch-params-model.ts
+  s_5b0265dac3d46b::t_bd52a8cd6198aa 1-3
+apps/whiteboard/app/api/teachers/[id]/documents/[documentId]/remove/route.ts
+  s_5b0265dac3d46b::t_c745bb08c62093 1-16
+apps/whiteboard/app/api/teachers/[id]/documents/[documentId]/route.ts
+  s_5b0265dac3d46b::t_80df7120c26597 1-23
+apps/whiteboard/app/api/teachers/[id]/documents/route.ts
+  s_5b0265dac3d46b::t_7976e8569eec3e 1-30
+apps/whiteboard/app/api/teachers/[id]/documents/teacher-document-models.ts
+  s_5b0265dac3d46b::t_c4125f10e55bf5 1-27
+apps/whiteboard/app/api/teachers/[id]/photo/route.ts
+  s_5b0265dac3d46b::t_4ca6a27d3473fa 1-24
+apps/whiteboard/app/api/teachers/[id]/profile/update-teacher-profile-request-model.ts
+  s_5b0265dac3d46b::t_a3a33a4f1f6633 2,9-11
+apps/whiteboard/app/api/teachers/create-teacher-request-model.ts
+  s_5b0265dac3d46b::t_736414cb8f79ee 2,10-12
+apps/whiteboard/app/api/teachers/list-teachers-response-model.ts
+  s_5b0265dac3d46b::t_5bef61c00237cb 2,4-22,25
+apps/whiteboard/app/api/teachers/route.ts
+  s_5b0265dac3d46b::t_4318151e21d24d 9,39
+apps/whiteboard/app/api/teachers/teacher-details-model.ts
+  s_5b0265dac3d46b::t_c61250f5deb617 1-52
+apps/whiteboard/app/api/teachers/teacher-response-model.ts
+  s_5b0265dac3d46b::t_de840f921d7a96 2,5,14-16,32-36
+apps/whiteboard/app/api/teachers/teachers.http.test.ts
+  s_5b0265dac3d46b::t_efb95e68170f72 5-7,11-14,22,46-55,72,93-94,168-322
+apps/whiteboard/app/api/webhooks/realtimekit/route.ts
+  s_5b0265dac3d46b::t_b106a43068765f 1-24
+apps/whiteboard/app/layout.tsx
+  s_5b0265dac3d46b::t_51b0654b501ba5 47-50
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_5b0265dac3d46b::t_9c7112a5f78dc3 77,82,104,109
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_5b0265dac3d46b::t_4fbab5918ecdfe 32,58
+apps/whiteboard/components/auth/auth-heading.tsx
+  s_5b0265dac3d46b::t_42e9f713207718 2,14
+apps/whiteboard/components/auth/login-form.tsx
+  s_5b0265dac3d46b::t_cd5c1f629c8f6e 23,116-117
+apps/whiteboard/components/auth/signup-form.tsx
+  s_5b0265dac3d46b::t_d99a2cd67a9469 23,113-114
+apps/whiteboard/components/batches/batch-form.tsx
+  s_5b0265dac3d46b::t_fc0b16d51f49d3 4,26-29,48,62-64,91,110-111,160,166-167,292-301,303,305
+apps/whiteboard/components/batches/batches.stories.tsx
+  s_5b0265dac3d46b::t_6ef196b79f71c3 27,118,143,159,330-344
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_5b0265dac3d46b::t_a0b9377f59a7e2 4,10,53-57,60,66-68
+apps/whiteboard/components/calendar/calendar.stories.tsx
+  s_5b0265dac3d46b::t_a8ebe630655a99 9-10
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_5b0265dac3d46b::t_20ac97d069f7f7 1-66
+apps/whiteboard/components/classes/class-prejoin-screen.tsx
+  s_5b0265dac3d46b::t_cd2b7d72a483c6 1-60
+apps/whiteboard/components/classes/realtimekit-room.tsx
+  s_5b0265dac3d46b::t_11d6cd5e3117fb 1-14
+apps/whiteboard/components/onboarding/onboarding-shell.tsx
+  s_5b0265dac3d46b::t_ec99338d63dc63 14
+apps/whiteboard/components/teachers/teacher-avatar.tsx
+  s_5b0265dac3d46b::t_7ccc08b88375e7 1-10
+apps/whiteboard/components/teachers/teacher-create-screen.tsx
+  s_5b0265dac3d46b::t_a7472b20441ef0 5-6,9-11,16-24,26-28,30-38
+apps/whiteboard/components/teachers/teacher-detail-screen.tsx
+  s_5b0265dac3d46b::t_a33cce3e21901a 15,17-18,30,39-40,45,54-55
+apps/whiteboard/components/teachers/teacher-documents-section.tsx
+  s_5b0265dac3d46b::t_2219f30ddc4d44 1-58
+apps/whiteboard/components/teachers/teacher-files.ts
+  s_5b0265dac3d46b::t_8b6b64242a00b0 1-62
+apps/whiteboard/components/teachers/teacher-form-values.ts
+  s_5b0265dac3d46b::t_49d4106b3ca735 1-111
+apps/whiteboard/components/teachers/teacher-form.tsx
+  s_5b0265dac3d46b::t_1f4d43cd530f9c 1-2
+apps/whiteboard/components/teachers/teacher-profile-form.tsx
+  s_5b0265dac3d46b::t_f2c7c24df0fc57 1-147
+apps/whiteboard/components/teachers/teachers-screen.tsx
+  s_5b0265dac3d46b::t_f27817f68d679d 12,23
+apps/whiteboard/components/teachers/teachers.stories.tsx
+  s_5b0265dac3d46b::t_feb4cd0dff9ab7 2,6-7,9,14,19-23,27-56,71,74-83,94-109
+apps/whiteboard/lib/app-base-path.ts
+  s_5b0265dac3d46b::t_9029b35c6a46d7 1-5
+apps/whiteboard/lib/workspace-access.test.ts
+  s_5b0265dac3d46b::t_b189369a9b3590 39,42,45
+apps/whiteboard/lib/workspace-access.ts
+  s_5b0265dac3d46b::t_5868561caa191c 20
+apps/whiteboard/next.config.ts
+  s_5b0265dac3d46b::t_2a506dd8ca3417 4
+apps/whiteboard/package.json
+  s_5b0265dac3d46b::t_8d095ce20a8b5f 19-20,23-24,34,38
+apps/whiteboard/proxy.test.ts
+  s_5b0265dac3d46b::t_9673cad7265112 32,37-39,52,66,76,78
+apps/whiteboard/proxy.ts
+  s_5b0265dac3d46b::t_02caccd24a6782 19,23-25,28-29
+apps/whiteboard/src/queries/batches.ts
+  s_5b0265dac3d46b::t_1df7e2f03f3705 19,43
+apps/whiteboard/src/queries/calendar.ts
+  s_5b0265dac3d46b::t_63d0511b683470 15
+apps/whiteboard/src/queries/catalog-pagination.test.ts
+  s_5b0265dac3d46b::t_7ccb21b2f33d0c 34,49
+apps/whiteboard/src/queries/classes.ts
+  s_5b0265dac3d46b::t_863d7bbeb5e9d1 1-21
+apps/whiteboard/src/queries/http.test.ts
+  s_5b0265dac3d46b::t_467daf93936439 23-28
+apps/whiteboard/src/queries/http.ts
+  s_5b0265dac3d46b::t_978d78049000a5 1-2,32-36,38-41
+apps/whiteboard/src/queries/students.test.ts
+  s_5b0265dac3d46b::t_f9409cb16b7abd 33,60
+apps/whiteboard/src/queries/teachers.ts
+  s_5b0265dac3d46b::t_e2e63f28b7879c 6-37,41-43,50-56,58,63-64,80,115-116
+apps/whiteboard/src/training/application/batch-read-model.ts
+  s_5b0265dac3d46b::t_20c2a7fe986847 12,34
+apps/whiteboard/src/training/application/calendar-schedule.ts
+  s_5b0265dac3d46b::t_840978a0b04841 13,20
+apps/whiteboard/src/training/application/class-service.test.ts
+  s_5b0265dac3d46b::t_170a41f126cce9 1-120
+apps/whiteboard/src/training/application/class-service.ts
+  s_5b0265dac3d46b::t_7c1d24ab2dff96 1-214
+apps/whiteboard/src/training/application/create-batch.command.ts
+  s_5b0265dac3d46b::t_2cb9efacbed755 8
+apps/whiteboard/src/training/application/create-batch.handler.ts
+  s_5b0265dac3d46b::t_e627d528c0c7dd 48
+apps/whiteboard/src/training/application/teacher-binary.test.ts
+  s_5b0265dac3d46b::t_d7a9e67dc730bf 1-42
+apps/whiteboard/src/training/application/teacher-binary.ts
+  s_5b0265dac3d46b::t_b7aaf11364f598 1-59
+apps/whiteboard/src/training/application/teacher-handlers.ts
+  s_5b0265dac3d46b::t_b182a0abbdee01 4-7,26,37-39,42,52,55-61,72-116,155-157,160-169
+apps/whiteboard/src/training/application/update-batch-schedule.command.ts
+  s_5b0265dac3d46b::t_79c1283671a95c 8
+apps/whiteboard/src/training/application/update-batch-schedule.handler.ts
+  s_5b0265dac3d46b::t_39a1cf254026d9 39
+apps/whiteboard/src/training/domain/batch.test.ts
+  s_5b0265dac3d46b::t_fa6565fc88f0a4 81-95
+apps/whiteboard/src/training/domain/batch.ts
+  s_5b0265dac3d46b::t_7d579bcf9e32d2 13-20,51,77,92,152-155,194,205
+apps/whiteboard/src/training/domain/class-occurrence.test.ts
+  s_5b0265dac3d46b::t_db4c0ede030e4b 1-18
+apps/whiteboard/src/training/domain/class-occurrence.ts
+  s_5b0265dac3d46b::t_5903fd907bb28b 1-16
+apps/whiteboard/src/training/domain/teacher-details.ts
+  s_5b0265dac3d46b::t_9bf04ac7907c2b 1-166
+apps/whiteboard/src/training/domain/teacher-document-repository.ts
+  s_5b0265dac3d46b::t_76f59d3409d18f 1-20
+apps/whiteboard/src/training/domain/teacher-repository.ts
+  s_5b0265dac3d46b::t_395f88b3facb2c 12-13,15,19-24
+apps/whiteboard/src/training/domain/teacher.test.ts
+  s_5b0265dac3d46b::t_b1d61bac2fcc8a 52-116
+apps/whiteboard/src/training/domain/teacher.ts
+  s_5b0265dac3d46b::t_06a64db605d289 5,20-24,86,98-102,127-131,148,158,163-188
+apps/whiteboard/src/training/infrastructure/class-recording-download.ts
+  s_5b0265dac3d46b::t_3b7ae6c299f301 1-18
+apps/whiteboard/src/training/infrastructure/clerk-student-invitation-sender.test.ts
+  s_5b0265dac3d46b::t_a8a734c6c7ad18 58,66
+apps/whiteboard/src/training/infrastructure/clerk-student-invitation-sender.ts
+  s_5b0265dac3d46b::t_cd15d1ec326113 28
+apps/whiteboard/src/training/infrastructure/clerk-teacher-inviter.ts
+  s_5b0265dac3d46b::t_1a5efe356ab7c4 20
+apps/whiteboard/src/training/infrastructure/create-class-service.ts
+  s_5b0265dac3d46b::t_e9477813b6768a 1-27
+apps/whiteboard/src/training/infrastructure/create-teacher-handlers.ts
+  s_5b0265dac3d46b::t_c23959af660619 6,15
+apps/whiteboard/src/training/infrastructure/prisma-batch-mapper.ts
+  s_5b0265dac3d46b::t_c1d30cac95393e 24
+apps/whiteboard/src/training/infrastructure/prisma-batch-repository.ts
+  s_5b0265dac3d46b::t_e5848ed4de590a 24
+apps/whiteboard/src/training/infrastructure/prisma-calendar-schedule-reader.ts
+  s_5b0265dac3d46b::t_2ffde41ac690db 22,26,32,39,45,68
+apps/whiteboard/src/training/infrastructure/prisma-class-occurrence-store.ts
+  s_5b0265dac3d46b::t_5486e7254f5cae 1-103
+apps/whiteboard/src/training/infrastructure/prisma-teacher-document-repository.ts
+  s_5b0265dac3d46b::t_e255ff48ac81da 1-60
+apps/whiteboard/src/training/infrastructure/prisma-teacher-repository.ts
+  s_5b0265dac3d46b::t_b964cb3ce257c7 7-9,14,16,26-32,49,51,59-65,84,88-95,97,120,134-135,142,149-155
+apps/whiteboard/src/training/infrastructure/realtimekit-meeting-gateway.test.ts
+  s_5b0265dac3d46b::t_79d4cfcc76f6d1 1-44
+apps/whiteboard/src/training/infrastructure/realtimekit-meeting-gateway.ts
+  s_5b0265dac3d46b::t_da3238469e2dcf 1-100
+apps/whiteboard/src/training/infrastructure/realtimekit-webhook.test.ts
+  s_5b0265dac3d46b::t_7a94b1ce5b7658 1-16
+apps/whiteboard/src/training/infrastructure/realtimekit-webhook.ts
+  s_5b0265dac3d46b::t_245d73cdaf1077 1-35
+apps/whiteboard/src/training/infrastructure/teacher-private-data.test.ts
+  s_5b0265dac3d46b::t_9048158fd1b991 1-22
+apps/whiteboard/src/training/infrastructure/teacher-private-data.ts
+  s_5b0265dac3d46b::t_7c3c711cf620dc 1-29
+bun.lock
+  s_5b0265dac3d46b::t_593b14958d9be9 41-42,45-46,56,60,164-201,256-263,574-577,594-595,698-709,1152-1153,1442-1443,1520-1521,1542-1543,1736-1737,1892-1893,1914-1915,2024-2025,2054-2055,2298-2299,2302-2307,2610-2611
+docs/deployment/vercel-services.md
+  s_5b0265dac3d46b::t_395c06c8118bf9 1-14
+docs/prd/tasks.md
+  s_5b0265dac3d46b::t_46a3bd9179d841 341-342,375-386
+docs/prd/training-institute-teachers.md
+  s_5b0265dac3d46b::t_68d4491a6af5a6 53-61
+docs/superpowers/plans/2026-09-29-teacher-profile-expansion.md
+  s_5b0265dac3d46b::t_ccbf13a77b6cf8 1-81
+docs/superpowers/plans/2026-09-30-whiteboard-online-classes.md
+  s_5b0265dac3d46b::t_d8c0a34a597456 1-76
+docs/superpowers/specs/2026-09-30-whiteboard-online-classes-design.md
+  s_5b0265dac3d46b::t_ffd8f8ce7c20eb 1-35
+packages/db/prisma/migrations/20260929190000_teacher_profile_expansion/migration.sql
+  s_5b0265dac3d46b::t_e5c78ff671c27e 1-31
+packages/db/prisma/migrations/20260930070000_whiteboard_meeting_option/migration.sql
+  s_5b0265dac3d46b::t_28ea7cc4773635 1-2
+packages/db/prisma/migrations/20260930071000_class_occurrences/migration.sql
+  s_5b0265dac3d46b::t_9d4969a137ec62 1-21
+packages/db/prisma/schema.prisma
+  s_5b0265dac3d46b::t_45dc03f342d119 18-24,130,145,152-174,184-191,203,210-229
+task.md
+  s_5b0265dac3d46b::t_3eb07d7ca64964 1-37
+turbo.json
+  s_5b0265dac3d46b::t_78c4fceb5bfc6d 8-18
+vercel.json
+  s_5b0265dac3d46b::t_21ba019bf253a2 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "95d1645f61d476892048f0510ea37e90040ca89b",
+  "prompts": {},
+  "sessions": {
+    "s_5b0265dac3d46b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0efbf-ad0d-7de3-b1e1-b03c0c199978",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
