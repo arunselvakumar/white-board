@@ -1,0 +1,19 @@
+apps/whiteboard/.storybook/preview.tsx
+  s_a3dab82f4a2930::t_9a7584128d6a28 10,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "16f6d654c15141f5da9a341581fa4e3e6802d4aa",
+  "prompts": {},
+  "sessions": {
+    "s_a3dab82f4a2930": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "278f8751-a712-4070-9da0-fd492e757fc1",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
