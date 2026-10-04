@@ -1,0 +1,23 @@
+apps/whiteboard/lib/safe-redirect.ts
+  s_55e820d032ae6c::t_fccc32228356b6 1-2,27,33,39-48
+apps/whiteboard/lib/workspace-entry.test.ts
+  s_55e820d032ae6c::t_0d9b1e854944bc 16-24,27
+apps/whiteboard/next.config.ts
+  s_55e820d032ae6c::t_202ee5d3fd8815 2,8-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0d2d7895ebab5198c76b2156897fe0747dd7fefc",
+  "prompts": {},
+  "sessions": {
+    "s_55e820d032ae6c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-b7f6-7de2-a2e1-f3f1f35b3c38",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
