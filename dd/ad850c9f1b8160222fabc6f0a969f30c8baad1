@@ -1,0 +1,71 @@
+apps/whiteboard/components/app-shell/app-breadcrumbs.tsx
+  s_16a46b5e9ed0fc::t_160a802ee08594 23,34,36,39-40
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_16a46b5e9ed0fc::t_35fcd4f94fe8d9 49,64,72-73,78,88,126
+apps/whiteboard/components/app-shell/tabs-preview.stories.tsx
+  s_16a46b5e9ed0fc::t_b70bb32bbcfcda 1-51
+apps/whiteboard/components/online-classes/online-classes-view.stories.tsx
+  s_d0902af5721283::t_b2c611c00ad494 1-72
+apps/whiteboard/components/online-classes/online-classes-view.tsx
+  s_d0902af5721283::t_17e514e135a053 1-115
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_d0902af5721283::t_f8eef30def1f9d 15-27
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_d0902af5721283::t_4ef8293a3e82a2 12-15,18-21,39-51
+apps/whiteboard/lib/app-nav.test.ts
+  s_d0902af5721283::t_6774f235e4b856 6,10,15,46,56-68
+apps/whiteboard/lib/app-nav.ts
+  s_d0902af5721283::t_2e0ccd385308c7 9-20,45-50,61-72,77-88,92-109
+apps/whiteboard/lib/online-classes.test.ts
+  s_d0902af5721283::t_986ad7848babd6 1-60
+apps/whiteboard/lib/online-classes.ts
+  s_d0902af5721283::t_80bfb13fdc5296 1-41
+apps/whiteboard/lib/workspace-access.test.ts
+  s_d0902af5721283::t_34fe20c3b9c20b 39-45,47-50,53-56
+apps/whiteboard/lib/workspace-access.ts
+  s_d0902af5721283::t_3f832228086941 19-39,43-44
+packages/ui/src/components/sidebar.tsx
+  s_16a46b5e9ed0fc::t_a414c957d8ddc2 251,484
+apps/whiteboard/.storybook/main.ts
+  s_16a46b5e9ed0fc::t_3ce70886095f71 25
+apps/whiteboard/app/(app)/online-classes/page.tsx
+  s_d0902af5721283::t_13c2f8b0eb0449 1-9
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_d0902af5721283::t_b1d2c4c6c625c4 9,18
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_d0902af5721283::t_67f327d802c75e 77,82-89,111,116-123,150-156,160,171
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_16a46b5e9ed0fc::t_fb31ffbd24c20d 5,156
+apps/whiteboard/components/online-classes/online-classes-screen.tsx
+  s_d0902af5721283::t_b7d7fbb9bb10eb 1-17
+apps/whiteboard/components/query-suspense.tsx
+  s_16a46b5e9ed0fc::t_d5637ccafd9456 4,26-27,29
+packages/ui/src/components/tabs.tsx
+  s_16a46b5e9ed0fc::t_e63ecd497032cb 16,18,27,31,61,63-64
+packages/ui/src/styles/globals.css
+  s_16a46b5e9ed0fc::t_b8558f9a941921 34-38,40-41,68-72,74-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ddad850c9f1b8160222fabc6f0a969f30c8baad1",
+  "prompts": {},
+  "sessions": {
+    "s_16a46b5e9ed0fc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-9728-70d0-a773-835910921dd2",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d0902af5721283": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a105da-373b-75b2-a6e8-e3d664cf4a82",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
