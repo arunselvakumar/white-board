@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar variant="inset" collapsible="offcanvas">
-        <SidebarHeader className="px-4 pt-4 pb-3">
+        <SidebarHeader className="border-sidebar-border border-b px-4 pt-5 pb-4">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   height={32}
                   className="size-8"
                 />
-                <span className="truncate text-base font-semibold tracking-tight">
+                <span className="text-sidebar-foreground truncate text-base font-semibold tracking-tight">
                   Whiteboard
                 </span>
               </SidebarMenuButton>
@@ -69,13 +69,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-3">
-            <SidebarGroupLabel className="px-3 text-[11px] font-semibold tracking-[0.12em] text-white/70">
+          <SidebarGroup className="px-3 pt-5">
+            <SidebarGroupLabel className="text-sidebar-foreground/55 px-3 text-[11px] font-semibold tracking-[0.12em]">
               SESSIONS
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <nav aria-label="Main">
-                <SidebarMenu>
+                <SidebarMenu className="gap-1">
                   {navigation.map((item) => {
                     const Icon = APP_NAV_ICONS[item.href];
                     const active = isAppNavActive(pathname, item.href);
@@ -85,7 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                           isActive={active}
                           tooltip={item.label}
                           aria-current={active ? "page" : undefined}
-                          className="h-10 rounded-lg px-3 text-white/90 hover:text-white data-[active=true]:text-white"
+                          className="text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground h-11 rounded-xl px-3 transition-colors data-active:shadow-[0_5px_16px_rgba(10,7,31,0.2)]"
                           render={<Link href={item.href} />}
                         >
                           <Icon />
@@ -123,7 +123,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <UserButton />
           </div>
         </header>
-        <div className="border-b px-6 py-2.5 print:hidden">
+        <div className="border-border/70 bg-secondary/45 border-b px-4 py-2.5 sm:px-6 print:hidden">
           <AppBreadcrumbs />
         </div>
         {children}

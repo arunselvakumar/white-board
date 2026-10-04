@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, MonitorPlay } from "lucide-react";
+import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock3, MapPin, MonitorPlay } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 
 import { addDays, addMonths, dateKeyInZone, expandCalendarItems, formatDate, monthGrid, weekDates, type CalendarEvent, type DateKey } from "@/lib/calendar-dates";
@@ -153,7 +153,7 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
 
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-2"><Button variant="outline" size="icon" aria-label="Previous" onClick={() => { move(-1); }}><ChevronLeft className="size-4" /></Button><Button variant="outline" size="sm" onClick={() => { setSelected(today); }}>Today</Button><Button variant="outline" size="icon" aria-label="Next" onClick={() => { move(1); }}><ChevronRight className="size-4" /></Button><h2 className="ml-2 text-lg font-semibold tracking-tight sm:text-xl">{rangeLabel(mode, selected, dates)}</h2></div>
-      <div className="flex rounded-xl border bg-card p-1 shadow-sm" aria-label="Calendar view">{(["day", "week", "month"] as const).map((view) => <Button key={view} size="sm" variant={mode === view ? "secondary" : "ghost"} aria-pressed={mode === view} onClick={() => { setMode(view); }} className="min-w-16">{view[0]?.toUpperCase()}{view.slice(1)}</Button>)}</div>
+      <div className="flex rounded-xl border border-border/70 bg-secondary/70 p-1" aria-label="Calendar view">{(["day", "week", "month"] as const).map((view) => <Button key={view} size="sm" variant="ghost" aria-pressed={mode === view} onClick={() => { setMode(view); }} className={`min-w-20 rounded-lg border px-3 font-semibold transition-all ${mode === view ? "border-border/70 bg-card text-primary shadow-sm hover:bg-card" : "border-transparent text-muted-foreground hover:bg-card/70 hover:text-foreground"}`}>{mode === view && <CheckCircle2 aria-hidden="true" className="size-4 fill-primary text-primary-foreground" />}{view[0]?.toUpperCase()}{view.slice(1)}</Button>)}</div>
     </div>
 
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground"><div className="flex flex-wrap items-center gap-x-4 gap-y-2">{[...courses].map(([id, name]) => <span key={id} className="flex items-center gap-1.5"><span className={`size-2.5 rounded-full ${colorFor(id).dot}`} />{name}</span>)}</div><p className="flex items-center gap-1.5"><Clock3 className="size-3.5" /> {items.length ? `Times shown in each Batch’s timezone${new Set(items.map((item) => item.timezone)).size === 1 ? ` · ${timezone}` : ""}` : "Weekly Batch Timings"}</p></div>

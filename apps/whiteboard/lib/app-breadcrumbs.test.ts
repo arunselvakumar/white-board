@@ -12,6 +12,19 @@ it("shows the invited role instead of Dashboard in family navigation", () => {
 });
 
 describe("getAppBreadcrumbs", () => {
+  it("shows Online Classes as its current page for each supported role", () => {
+    for (const role of [
+      "org:admin",
+      "org:teacher",
+      "org:student",
+      "org:parent",
+    ]) {
+      expect(getAppBreadcrumbs("/online-classes", role)).toEqual([
+        { label: "Online Classes", href: "/online-classes" },
+      ]);
+    }
+  });
+
   it("marks Dashboard as the current page on the app home", () => {
     expect(getAppBreadcrumbs("/")).toEqual([{ label: "Dashboard", href: "/" }]);
   });

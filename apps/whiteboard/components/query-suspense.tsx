@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { Component, type ReactNode, Suspense } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -22,8 +23,10 @@ export function PageFallback() {
 }
 
 export function QuerySuspense({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
-    <QueryErrorResetBoundary>
+    <QueryErrorResetBoundary key={pathname}>
       {({ reset }) => (
         <QueryErrorBoundary onReset={reset}>
           <Suspense fallback={<PageFallback />}>{children}</Suspense>

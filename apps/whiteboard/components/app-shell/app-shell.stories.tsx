@@ -74,12 +74,19 @@ export const StudentNavigation: Story = {
       );
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
-    await expect(nav.getAllByRole("link")).toHaveLength(2);
+    await expect(nav.getAllByRole("link")).toHaveLength(3);
     await expect(nav.getByRole("link", { name: "Student" })).toHaveAttribute(
       "href",
       "/student",
     );
-    await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute("href", "/calendar");
+    await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute(
+      "href",
+      "/calendar",
+    );
+    await expect(nav.getByRole("link", { name: "Online Classes" })).toHaveAttribute(
+      "href",
+      "/online-classes",
+    );
     await expect(canvas.getByText("Hello world")).toBeVisible();
   },
 };
@@ -101,12 +108,19 @@ export const ParentNavigation: Story = {
       );
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
-    await expect(nav.getAllByRole("link")).toHaveLength(2);
+    await expect(nav.getAllByRole("link")).toHaveLength(3);
     await expect(nav.getByRole("link", { name: "Parent" })).toHaveAttribute(
       "href",
       "/parent",
     );
-    await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute("href", "/calendar");
+    await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute(
+      "href",
+      "/calendar",
+    );
+    await expect(nav.getByRole("link", { name: "Online Classes" })).toHaveAttribute(
+      "href",
+      "/online-classes",
+    );
     await expect(canvas.getByText("Hello world")).toBeVisible();
   },
 };
@@ -133,10 +147,17 @@ export const ThemePreference: Story = {
     await waitFor(() =>
       expect(within(sidebar).getByText("SESSIONS")).toBeVisible(),
     );
+    const activeNav = within(sidebar).getByRole("link", {
+      name: "Dashboard",
+    });
+    await expect(
+      canvasElement.ownerDocument.defaultView?.getComputedStyle(activeNav)
+        .backgroundColor,
+    ).toBe("rgb(102, 90, 199)");
     await expect(
       canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
         .backgroundColor,
-    ).toBe("rgb(27, 27, 27)");
+    ).toBe("rgb(32, 26, 62)");
     const toggle = body.getByRole("switch", { name: "Dark mode" });
 
     await expect(toggle).not.toBeChecked();
@@ -147,7 +168,7 @@ export const ThemePreference: Story = {
       expect(
         canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
           .backgroundColor,
-      ).toBe("rgb(17, 17, 17)"),
+      ).toBe("rgb(22, 18, 43)"),
     );
     await expect(
       canvasElement.ownerDocument.defaultView?.localStorage.getItem(

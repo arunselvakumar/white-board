@@ -6,7 +6,18 @@ export const APP_NAV = [
     description:
       "Today's Batches, active Students, and outstanding dues will show here.",
   },
-  { href: "/calendar", label: "Calendar", title: "Calendar", description: "Batch Timings in this Workspace." },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    title: "Calendar",
+    description: "Batch Timings in this Workspace.",
+  },
+  {
+    href: "/online-classes",
+    label: "Online Classes",
+    title: "Online Classes",
+    description: "Upcoming Online and Hybrid Batch Timings.",
+  },
   {
     href: "/students",
     label: "Students",
@@ -31,7 +42,12 @@ export const APP_NAV = [
     title: "Teachers",
     description: "Teachers and their Batch assignments.",
   },
-  { href: "/attendance", label: "Attendance", title: "Attendance", description: "Daily Batch Attendance Registers." },
+  {
+    href: "/attendance",
+    label: "Attendance",
+    title: "Attendance",
+    description: "Daily Batch Attendance Registers.",
+  },
   {
     href: "/fees",
     label: "Fees",
@@ -42,17 +58,55 @@ export const APP_NAV = [
 
 export const STUDENT_NAV = [
   { href: "/student", label: "Student", title: "Student", description: "" },
-  { href: "/calendar", label: "Calendar", title: "Calendar", description: "My Batch Timings." },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    title: "Calendar",
+    description: "My Batch Timings.",
+  },
+  {
+    href: "/online-classes",
+    label: "Online Classes",
+    title: "Online Classes",
+    description: "My upcoming Online and Hybrid Batch Timings.",
+  },
 ] as const;
 
 export const PARENT_NAV = [
   { href: "/parent", label: "Parent", title: "Parent", description: "" },
-  { href: "/calendar", label: "Calendar", title: "Calendar", description: "Student Batch Timings." },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    title: "Calendar",
+    description: "Student Batch Timings.",
+  },
+  {
+    href: "/online-classes",
+    label: "Online Classes",
+    title: "Online Classes",
+    description: "Upcoming Online and Hybrid Batch Timings.",
+  },
 ] as const;
 
 export const TEACHER_NAV = [
-  { href: "/teacher", label: "My Batches", title: "My Batches", description: "Assigned Batches." },
-  { href: "/calendar", label: "Calendar", title: "Calendar", description: "My assigned Batch Timings." },
+  {
+    href: "/teacher",
+    label: "My Batches",
+    title: "My Batches",
+    description: "Assigned Batches.",
+  },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    title: "Calendar",
+    description: "My assigned Batch Timings.",
+  },
+  {
+    href: "/online-classes",
+    label: "Online Classes",
+    title: "Online Classes",
+    description: "Upcoming Online and Hybrid Batch Timings.",
+  },
 ] as const;
 
 export function navForRole(role: string | null | undefined) {

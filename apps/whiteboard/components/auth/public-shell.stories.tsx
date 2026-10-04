@@ -9,7 +9,6 @@ const meta = {
   component: PublicShell,
   tags: ["autodocs"],
   args: {
-    background: "/images/login/1.jpg",
     children: (
       <AuthHeading title="Welcome back" description="Sign in to continue" />
     ),

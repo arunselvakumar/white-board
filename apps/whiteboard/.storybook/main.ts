@@ -22,7 +22,7 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-docs"),
   ],
   framework: getAbsolutePath("@storybook/nextjs-vite"),
-  staticDirs: ["../public"],
+  staticDirs: ["../public", { from: "../public", to: "/app" }],
   async viteFinal(viteConfig) {
     const { mergeConfig } = await import("vite");
     return mergeConfig(viteConfig, {

@@ -10,7 +10,7 @@ const meta = {
     layout: "fullscreen",
   },
   render: () => (
-    <PublicShell background="/images/login/2.jpg">
+    <PublicShell>
       <SignupForm />
     </PublicShell>
   ),

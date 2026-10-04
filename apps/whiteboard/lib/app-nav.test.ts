@@ -3,14 +3,16 @@ import { describe, expect, it } from "vitest";
 import { APP_NAV, appPageByHref, isAppNavActive, navForRole } from "./app-nav";
 
 describe("role navigation", () => {
-  it("shows each role its home and Calendar", () => {
+  it("shows each role its home, Calendar, and Online Classes", () => {
     expect(navForRole("org:student").map((item) => item.label)).toEqual([
       "Student",
       "Calendar",
+      "Online Classes",
     ]);
     expect(navForRole("org:parent").map((item) => item.label)).toEqual([
       "Parent",
       "Calendar",
+      "Online Classes",
     ]);
     expect(navForRole("org:member")).toEqual([]);
     expect(navForRole("org:admin")).toEqual(APP_NAV);
@@ -41,6 +43,7 @@ describe("appPageByHref", () => {
     expect(APP_NAV.map((item) => item.href)).toEqual([
       "/",
       "/calendar",
+      "/online-classes",
       "/students",
       "/courses",
       "/batches",
@@ -50,9 +53,19 @@ describe("appPageByHref", () => {
     ]);
   });
 
-  it("offers Calendar to every supported role", () => {
-    for (const role of ["org:admin", "org:teacher", "org:student", "org:parent"]) {
-      expect(navForRole(role).some((item) => item.href === "/calendar")).toBe(true);
+  it("offers Calendar and Online Classes to every supported role", () => {
+    for (const role of [
+      "org:admin",
+      "org:teacher",
+      "org:student",
+      "org:parent",
+    ]) {
+      expect(navForRole(role).some((item) => item.href === "/calendar")).toBe(
+        true,
+      );
+      expect(
+        navForRole(role).some((item) => item.href === "/online-classes"),
+      ).toBe(true);
     }
   });
 });

@@ -9,10 +9,16 @@ export function getAppBreadcrumbs(
   pathname: string,
   role?: string | null,
 ): AppBreadcrumb[] {
-  if (pathname === "/calendar") return [{ label: "Calendar", href: "/calendar" }];
+  if (pathname === "/calendar")
+    return [{ label: "Calendar", href: "/calendar" }];
+  if (pathname === "/online-classes")
+    return [{ label: "Online Classes", href: "/online-classes" }];
   if (role === "org:student") return [{ label: "Student", href: "/student" }];
   if (role === "org:parent") return [{ label: "Parent", href: "/parent" }];
-  if (role === "org:teacher") return pathname === "/teacher" ? [{ label: "My Batches", href: "/teacher" }] : [{ label: "My Batches", href: "/teacher" }, { label: "Attendance" }];
+  if (role === "org:teacher")
+    return pathname === "/teacher"
+      ? [{ label: "My Batches", href: "/teacher" }]
+      : [{ label: "My Batches", href: "/teacher" }, { label: "Attendance" }];
   const [area, id, action] = pathname.split("/").filter(Boolean);
 
   if (area === undefined) {
@@ -30,9 +36,19 @@ export function getAppBreadcrumbs(
   if (area === "fees") {
     return [dashboard, { label: "Fees" }];
   }
-  if (area === "attendance") return [dashboard, { label: "Attendance", href: "/attendance" }, ...(id ? [{ label: "Batch Register" }] : [])];
+  if (area === "attendance")
+    return [
+      dashboard,
+      { label: "Attendance", href: "/attendance" },
+      ...(id ? [{ label: "Batch Register" }] : []),
+    ];
 
-  if (area !== "students" && area !== "courses" && area !== "batches" && area !== "teachers") {
+  if (
+    area !== "students" &&
+    area !== "courses" &&
+    area !== "batches" &&
+    area !== "teachers"
+  ) {
     return [dashboard];
   }
 
