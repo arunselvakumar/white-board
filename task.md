@@ -1,12 +1,12 @@
 # Handoff: Online classes and Cloudflare recording
 
-Updated: 2026-09-30. Resume from this file when continuing WB-009.
+Updated: 2026-10-04. Resume from this file when continuing WB-009.
 
 ## Current state
 
-- Branch: `feat/teacher-profile-expansion`. The working tree has uncommitted changes for WB-009 **and** unrelated Teacher profile work. Preserve both sets of edits; do not reset the tree.
-- WB-009 remains `in_progress` in [`docs/prd/tasks.md`](docs/prd/tasks.md). Code is implemented locally. The RealtimeKit app and presets now exist, but R2 setup, deployment, and a live recorded-class test are pending.
-- WB-006 (missed-date Attendance) is also `in_progress`. The Teacher profile work is marked done on the ticket board but is still uncommitted in this tree.
+- Branch: `main` at `0d2d789`. WB-009 and Teacher profile work are pushed. Preserve unrelated local UI edits in the working tree.
+- WB-009 remains `in_progress` in [`docs/prd/tasks.md`](docs/prd/tasks.md). Vercel, Neon, Cloudflare, and the Owner recording/download flow work. The Student join and unauthorized User checks were deferred by the user.
+- WB-006 (missed-date Attendance) is also `in_progress`.
 
 ## What was implemented for WB-009
 
@@ -19,19 +19,39 @@ Updated: 2026-09-30. Resume from this file when continuing WB-009.
 
 ## Verification already performed
 
-- Latest: `bun run check-types` passed; `bun run test` passed **157/157** unit tests; `bun run --filter whiteboard lint` passed; `git diff --check` passed.
-- Earlier in this implementation, Postgres HTTP tests passed **85/85**, Storybook tests passed **119/119**, and the Whiteboard build passed. The latest sandbox blocks local port binding/Postgres access and external font resolution, so these three could not be rerun after the final small changes. Storybook's external, waiting, and recording-download states were also inspected in the browser.
-- No real Cloudflare meeting or recording has been tested. Do not mark WB-009 `done` until that passes.
+- Latest: `bun run check-types`, `bun run --filter whiteboard lint`, and a webpack production build passed; unit tests passed **158/158**, Postgres HTTP tests **85/85**, Storybook tests **124/124**.
+- Vercel production deployment `0d2d789` is **Ready** at `https://white-board-v3.vercel.app`. `/` serves the Marketing Site; `/app` redirects an unsigned User to login; `/app/api/docs` loads; a signed-in Owner can open the Owner Dashboard.
+- All 14 Prisma migrations are applied to the linked Neon production database. The private R2 bucket and RealtimeKit webhook are active. A real Owner class recorded, uploaded, and downloaded a playable MP4.
+- The Vercel Production deployment currently uses Clerk **development** keys for internal testing. Replace them with a production Clerk instance when the user chooses to pay for Clerk.
 
-## Pending, in order
+## Pending
 
-1. **User action required:** Cloudflare Dashboard is signed in. The open tab is on the R2 subscription page. Cloudflare shows $0 due now and free monthly usage, but clicking **Add R2 subscription to my account** accepts terms and starts a renewing usage-based subscription. The user must complete that action personally; the agent stopped before it. Do not paste credentials or secrets into chat.
-2. RealtimeKit app **Whiteboard** was created in Cloudflare account `47f1201ab3118481f947bd3e565cad31`; app ID is `a6a73062-10be-420b-9ab0-6a1cfcbfdfa2`. Presets `whiteboard_host` and `whiteboard_student` were created. The host cannot manually start/stop recording or change participant presets. The Student has no host controls or screenshare. Configure these preset names through `CLOUDFLARE_REALTIMEKIT_HOST_PRESET` and `CLOUDFLARE_REALTIMEKIT_STUDENT_PRESET`.
-3. After the user completes R2 subscription, create a **private** recordings bucket and restricted R2 credentials. Create a RealtimeKit API token and webhook for `meeting.started`, `meeting.ended`, and `recording.statusUpdate`. Creating persistent API credentials or changing sensitive access through the browser requires action-time confirmation under the browser policy. Use the instructions and exact environment variable names in the [Whiteboard README](apps/whiteboard/README.md).
-4. The user plans to deploy on Vercel. Configure the secrets there, use the repository's root `vercel.json` Services setup, register the webhook against the public `/app/api/webhooks/realtimekit` URL, and apply the two WB-009 Prisma migrations. The existing Teacher profile migration may also need deploying, depending on deployment state. See [`docs/deployment/vercel-services.md`](docs/deployment/vercel-services.md).
-5. Run a real Online or Hybrid Whiteboard class: Owner/assigned Teacher starts, recording becomes active, an enrolled Student joins, meeting ends, upload completes, and Owner/assigned Teacher downloads the MP4. Verify unauthorized Users cannot join or download.
-6. Rerun `bun run test:http`, `bun run --filter whiteboard test-storybook`, and `bun run --filter whiteboard build` when the environment permits. Review the final diff without discarding the unrelated Teacher changes, then mark WB-009 `done` only after live verification.
+1. The user deferred accepting the Clerk invitation for the test Student `b.arunselvakumar+1@gmail.com` and signing in as that Student. When ready, verify Student/Parent admission only after recording starts, and verify an unauthorized User cannot join or download. Do not mark WB-009 `done` before these checks.
+2. In the Owner live test, leaving the RealtimeKit room did not immediately end the session. The test meeting was closed with the Cloudflare API, then the recording uploaded. Investigate whether this was normal session-end delay or whether an explicit Owner/Teacher “End class for everyone” control is needed. Do not claim automatic ending was verified.
+3. Replace interim Clerk development keys in Vercel with production Clerk keys when the user chooses a paid plan. Decide an R2 recording retention policy before routine production use.
 
 ## Resume guidance
 
 Read `AGENTS.md`, `CONTEXT.md`, applicable ADRs, and the WB-009 spec before changing code. Useful skills for the next session: `superpowers:executing-plans` and `superpowers:verification-before-completion`. Cloudflare configuration should remain server-side; the R2 bucket must remain private.
+
+## 2026-10-04 continuation
+
+- The user activated the R2 subscription. Created `whiteboard-class-recordings` in the existing Cloudflare account; its Public Access is **Disabled**. Created an account R2 token with Object Read & Write limited to that bucket. A temporary object was uploaded, read, and removed successfully.
+- Created an enabled RealtimeKit webhook for `meeting.started`, `meeting.ended`, and `recording.statusUpdate` at the deployed `/app/api/webhooks/realtimekit` URL. Its configuration ID is `ee50b949-e45a-424e-b114-b869d43e0ca7`.
+- Created a Realtime Admin account API token. A Cloudflare API read succeeded. Created a temporary RealtimeKit meeting, issued host and Student preset tokens, and deactivated the meeting successfully.
+- Saved all nine Cloudflare values in ignored `apps/whiteboard/.env.local`, with file permissions `600`. No secret values are in this handoff. Aligned local Clerk redirect paths with `/app`.
+- Fixed the proxy matcher so `/app` receives Clerk context. Local `/app` and `/app/students` now redirect to `/app/login`; `/app/login` and `/app/api/docs` return 200.
+- Updated four Storybook expectations for the `/app` base path. Latest local verification: 157/157 unit tests, 85/85 Postgres HTTP tests, 124/124 Storybook tests, typecheck, lint, and a webpack production build passed. The default Turbopack build still fails locally while binding a port in a child process.
+- Saved `CLOUDFLARE_REALTIMEKIT_WEBHOOK_ID` and `CLOUDFLARE_R2_RECORDINGS_BUCKET` as Vercel Production Config variables. The credential variables have not been sent to Vercel.
+- **Still pending:** Production Clerk keys, Cloudflare Production Secret variables in Vercel, Neon Prisma migrations, a deployment containing the proxy fix, and a real recorded class. The Vercel CLI login needs renewal; user confirmation for its persistent access and for transmitting Cloudflare secrets to Vercel was requested. Do not mark WB-009 `done` until live verification.
+
+### Later on 2026-10-04
+
+- With the user's approval, renewed Vercel CLI access and saved the RealtimeKit API token plus both restricted R2 credentials as Vercel **Production Secret** variables. Added the two Clerk development keys from ignored `.env.local` to Vercel Production (`CLERK_SECRET_KEY` as Secret, publishable key as Config). This is an interim internal/test setup; replace them with production Clerk instance keys when the user chooses a paid plan. No Clerk upgrade was accepted.
+- Signed in to the Vercel-linked Neon project after the user completed email verification. The direct `neondb` connection showed all 14 migrations pending. Applied all 14 with `prisma migrate deploy`, then `prisma migrate status` reported the schema up to date. The connection string was used only in process memory and was not added to the repository.
+- Committed and pushed `9672636` for the `/app` auth matcher and corrected Storybook paths. Its Vercel build failed on a Next 16 Turbopack `next/font/google` resolver error. Changed the Whiteboard build script to `next build --webpack` and added Clerk variables to Turbo's `globalEnv`, verified the local production build, then committed and pushed `6568832`.
+- Vercel deployed `6568832` to `https://white-board-v3.vercel.app` with status **Ready**. Read-only production checks: `/` 200, `/app` 307 to `/app/login`, `/app/login` 200, `/app/api/docs` 200.
+- Fixed the post-login `/app/app` redirect and packaged Prisma’s native engine in the deployed Next output. Unit tests rose to 158; typecheck, lint, and webpack build passed. Committed and pushed `0d2d789`; the resulting Vercel deployment is Ready. The Owner signed in and opened the Owner Dashboard.
+- Created test Course `WB-009 Recording Test` (`WB009-QA`) and Online Batch `WB-009 Sunday Recording QA` (`6d6f6f70-7636-4212-b647-934d8aaa3160`). The Owner started its 2026-10-04 13:10 Whiteboard class. The RealtimeKit UI displayed `REC`; a second tab showed the class live and recording.
+- Added test Student `WB-009 Test Student` (`03efdff6-ecca-427b-959d-64e93088c909`) with `b.arunselvakumar+1@gmail.com` and an active Enrollment in that Batch, with the user's approval. Clerk sent an invitation. The user chose to skip the Student join test for now.
+- After the host left, the pre-join page still showed the class live, so the test meeting was deactivated through the Cloudflare API. The `meeting.ended` and recording webhooks then moved the class to ended/ready. The Owner downloaded a 22,815,825-byte MP4; `ffprobe` found H264/AAC streams and a 284.8863-second duration. The local download is no longer present; use the class page to download it again if needed.
