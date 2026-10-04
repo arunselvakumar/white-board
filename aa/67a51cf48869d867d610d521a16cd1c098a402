@@ -1,0 +1,21 @@
+docs/prd/tasks.md
+  s_55e820d032ae6c::t_222630f4df0adf 386
+task.md
+  s_55e820d032ae6c::t_b1424e95888aff 3,7-9,22-25,27,29-31,36-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aa67a51cf48869d867d610d521a16cd1c098a402",
+  "prompts": {},
+  "sessions": {
+    "s_55e820d032ae6c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-b7f6-7de2-a2e1-f3f1f35b3c38",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
