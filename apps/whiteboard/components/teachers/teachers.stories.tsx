@@ -104,6 +104,6 @@ export const Documents: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(canvas.getByText("Fine Arts Diploma.pdf")).toBeVisible();
-    await expect(canvas.getByRole("link", { name: "Download Fine Arts Diploma.pdf" })).toHaveAttribute("href", "/api/teachers/550e8400-e29b-41d4-a716-446655440000/documents/550e8400-e29b-41d4-a716-446655440001");
+    await expect(canvas.getByRole("link", { name: "Download Fine Arts Diploma.pdf" })).toHaveAttribute("href", "/app/api/teachers/550e8400-e29b-41d4-a716-446655440000/documents/550e8400-e29b-41d4-a716-446655440001");
   },
 };

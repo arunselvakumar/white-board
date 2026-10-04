@@ -68,8 +68,8 @@ export const GoogleSignIn: Story = {
     );
     await expect(clerkMocks.signIn.sso).toHaveBeenCalledWith({
       strategy: "oauth_google",
-      redirectUrl: "/select-workspace",
-      redirectCallbackUrl: "/sso-callback",
+      redirectUrl: "/app/select-workspace",
+      redirectCallbackUrl: "/app/sso-callback",
     });
   },
 };

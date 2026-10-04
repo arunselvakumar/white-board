@@ -61,6 +61,6 @@ export const RecordingDownload: Story = {
   beforeEach: () => { state({ ...detail, meetingOption: "whiteboard", joinUrl: null, status: "ended", recordingStatus: "ready", recordingReady: true }); },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Ready to download")).toBeVisible();
-    await expect(canvas.getByRole("link", { name: "Download recording" })).toHaveAttribute("href", `/api/classes/${batchId}/${date}/09%3A00/recording`);
+    await expect(canvas.getByRole("link", { name: "Download recording" })).toHaveAttribute("href", `/app/api/classes/${batchId}/${date}/09%3A00/recording`);
   },
 };
