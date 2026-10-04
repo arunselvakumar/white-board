@@ -1,0 +1,21 @@
+apps/whiteboard/package.json
+  s_55e820d032ae6c::t_0e99436f4a5d1c 8
+turbo.json
+  s_55e820d032ae6c::t_94c84de4423c7f 9-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "65688325e84c44eaf288bd9a20b479373271cc9e",
+  "prompts": {},
+  "sessions": {
+    "s_55e820d032ae6c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-b7f6-7de2-a2e1-f3f1f35b3c38",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
