@@ -1,0 +1,35 @@
+apps/whiteboard/components/auth/login-form.stories.tsx
+  s_16a46b5e9ed0fc::t_26700549a68aee 71-72
+apps/whiteboard/components/auth/signup-form.stories.tsx
+  s_16a46b5e9ed0fc::t_1b9e99228df017 87-88
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_16a46b5e9ed0fc::t_69b310789d27e5 64
+apps/whiteboard/components/teachers/teachers.stories.tsx
+  s_16a46b5e9ed0fc::t_92e906ff6b4760 107
+apps/whiteboard/proxy.ts
+  s_55e820d032ae6c::t_c3957562b92080 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9672636232640d5c34b2c1ea95a46aa74b5fc1de",
+  "prompts": {},
+  "sessions": {
+    "s_16a46b5e9ed0fc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-9728-70d0-a773-835910921dd2",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_55e820d032ae6c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104a0-b7f6-7de2-a2e1-f3f1f35b3c38",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
