@@ -1,4 +1,5 @@
-export type CalendarRole = "org:admin" | "org:teacher" | "org:student" | "org:parent";
+export type CalendarRole =
+  "org:admin" | "org:teacher" | "org:student" | "org:parent";
 
 export type CalendarItem = {
   id: string;
@@ -12,10 +13,20 @@ export type CalendarItem = {
   joinUrl: string | null;
   meetingOption: "external" | "whiteboard";
   timezone: string;
-  timings: { daysOfWeek: readonly number[]; startTime: string; endTime: string }[];
+  timings: {
+    daysOfWeek: readonly number[];
+    startTime: string;
+    endTime: string;
+  }[];
   activeFrom: string;
 };
 
 export type CalendarScheduleReader = {
-  execute(input: { workspaceId: string; userId: string; role: CalendarRole; verifiedEmails?: string[]; includeClosed?: boolean }): Promise<CalendarItem[]>;
+  execute(input: {
+    workspaceId: string;
+    userId: string;
+    role: CalendarRole;
+    verifiedEmails?: string[];
+    includeClosed?: boolean;
+  }): Promise<CalendarItem[]>;
 };

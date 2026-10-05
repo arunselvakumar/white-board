@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { TeacherDetailsRequestModel, TeacherPhotoRequestModel, TeacherPrivateDetailsRequestModel } from "./teacher-details-model";
+import {
+  TeacherDetailsRequestModel,
+  TeacherPhotoRequestModel,
+  TeacherPrivateDetailsRequestModel,
+} from "./teacher-details-model";
 
 export const CreateTeacherRequestModel = z.object({
   name: z.string().trim().min(1).max(200),

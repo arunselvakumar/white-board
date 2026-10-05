@@ -329,17 +329,17 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 
 ## Changes after P0
 
-| ID     | Title                                                                               | Status      | Area                     |
-| ------ | ----------------------------------------------------------------------------------- | ----------- | ------------------------ |
-| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                | done        | Auth+HTTP+UI             |
-| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces | done        | Auth+UI                  |
-| WB-003 | Teacher profile, role, invitations, Batch assignments, and My Batches               | done        | Domain+Data+Auth+HTTP+UI |
-| WB-004 | Student Attendance Registers, marks, history, and Owner/Teacher access              | done        | Domain+Data+Auth+HTTP+UI |
-| WB-005 | Optional Batch Enrollment while adding a Student                                    | done        | UI+Enrollment            |
-| WB-006 | Record Attendance for a missed earlier date                                         | in_progress | Domain+HTTP+UI           |
-| WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                          | done        | Read+HTTP+UI             |
-| WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI |
-| WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings | in_progress | Domain+Data+HTTP+UI+Cloudflare |
+| ID     | Title                                                                                    | Status      | Area                           |
+| ------ | ---------------------------------------------------------------------------------------- | ----------- | ------------------------------ |
+| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                     | done        | Auth+HTTP+UI                   |
+| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces      | done        | Auth+UI                        |
+| WB-003 | Teacher profile, role, invitations, Batch assignments, and My Batches                    | done        | Domain+Data+Auth+HTTP+UI       |
+| WB-004 | Student Attendance Registers, marks, history, and Owner/Teacher access                   | done        | Domain+Data+Auth+HTTP+UI       |
+| WB-005 | Optional Batch Enrollment while adding a Student                                         | done        | UI+Enrollment                  |
+| WB-006 | Record Attendance for a missed earlier date                                              | in_progress | Domain+HTTP+UI                 |
+| WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                               | done        | Read+HTTP+UI                   |
+| WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI            |
+| WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare |
 
 ### WB-001 — Student and Parent Workspace invitations
 

@@ -47,7 +47,9 @@ export function BatchesScreen() {
     mutationFn: (id: string) => closeBatch(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: batchQueries.key.all });
-      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
+      await queryClient.invalidateQueries({
+        queryKey: calendarQueries.key.all,
+      });
     },
   });
 

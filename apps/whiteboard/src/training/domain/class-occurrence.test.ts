@@ -2,9 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { classSlotForDate } from "./class-occurrence";
 
-const slots = [
-  { daysOfWeek: [1, 3], startTime: "09:00", endTime: "10:00" },
-];
+const slots = [{ daysOfWeek: [1, 3], startTime: "09:00", endTime: "10:00" }];
 
 describe("classSlotForDate", () => {
   it("finds the scheduled Batch Timing on its local weekday", () => {

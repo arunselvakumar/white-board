@@ -26,9 +26,7 @@ export async function POST(
       UpdateBatchScheduleParamsModel.safeParse({ id }),
     );
     const body: unknown = await request.json();
-    const model = parseOrThrow(
-      UpdateBatchScheduleRequestModel.safeParse(body),
-    );
+    const model = parseOrThrow(UpdateBatchScheduleRequestModel.safeParse(body));
     const batch = await handlers.updateSchedule.execute({
       id: params.id,
       ...model,

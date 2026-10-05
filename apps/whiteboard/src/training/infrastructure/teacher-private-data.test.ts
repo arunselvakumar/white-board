@@ -1,12 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { decryptPrivateBytes, encryptPrivateBytes } from "./teacher-private-data";
+import {
+  decryptPrivateBytes,
+  encryptPrivateBytes,
+} from "./teacher-private-data";
 
 afterEach(() => vi.unstubAllEnvs());
 
 describe("Teacher private data", () => {
   it("encrypts data and restores it with the configured key", () => {
-    vi.stubEnv("TEACHER_PRIVATE_DATA_KEY", Buffer.alloc(32, 7).toString("base64"));
+    vi.stubEnv(
+      "TEACHER_PRIVATE_DATA_KEY",
+      Buffer.alloc(32, 7).toString("base64"),
+    );
     const source = Buffer.from("secret bank number");
     const encrypted = encryptPrivateBytes(source);
     expect(Buffer.from(encrypted).includes(source)).toBe(false);

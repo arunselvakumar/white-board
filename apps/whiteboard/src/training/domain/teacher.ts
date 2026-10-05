@@ -2,11 +2,16 @@ import { DomainError } from "./errors";
 import { Phone } from "./phone";
 import { OptionalText } from "./optional-text";
 import { parseUuid } from "./uuid";
-import { teacherDetailsFromRaw, type RawTeacherDetails, type TeacherDetails } from "./teacher-details";
+import {
+  teacherDetailsFromRaw,
+  type RawTeacherDetails,
+  type TeacherDetails,
+} from "./teacher-details";
 
 export const TEACHER_KINDS = ["centre_teacher", "visiting_tutor"] as const;
 export type TeacherKind = (typeof TEACHER_KINDS)[number];
-export type TeacherInvitationStatus = "not_sent" | "sent" | "failed" | "accepted";
+export type TeacherInvitationStatus =
+  "not_sent" | "sent" | "failed" | "accepted";
 
 export type TeacherProps = {
   id: string;
@@ -47,7 +52,10 @@ function teacherName(raw: string): string {
 function teacherEmail(raw: string): string {
   const value = raw.trim().toLowerCase();
   if (value.length === 0) {
-    throw new DomainError("TEACHER_EMAIL_REQUIRED", "Teacher email is required.");
+    throw new DomainError(
+      "TEACHER_EMAIL_REQUIRED",
+      "Teacher email is required.",
+    );
   }
   if (value.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
     throw new DomainError("TEACHER_EMAIL_INVALID", "Teacher email is invalid.");
@@ -63,12 +71,14 @@ function teacherKind(raw: string): TeacherKind {
 }
 
 function optionalQualification(raw: string | null | undefined): string | null {
-  return OptionalText.create(
-    raw,
-    1000,
-    "TEACHER_QUALIFICATION_TOO_LONG",
-    "Qualification summary must be at most 1000 characters.",
-  )?.value ?? null;
+  return (
+    OptionalText.create(
+      raw,
+      1000,
+      "TEACHER_QUALIFICATION_TOO_LONG",
+      "Qualification summary must be at most 1000 characters.",
+    )?.value ?? null
+  );
 }
 
 export class Teacher {
@@ -116,29 +126,75 @@ export class Teacher {
     return new Teacher(props);
   }
 
-  get id() { return this.props.id; }
-  get workspaceId() { return this.props.workspaceId; }
-  get createdByUserId() { return this.props.createdByUserId; }
-  get name() { return this.props.name; }
-  get email() { return this.props.email; }
-  get kind() { return this.props.kind; }
-  get phone() { return this.props.phone; }
-  get qualificationSummary() { return this.props.qualificationSummary; }
-  get details() { return this.props.details; }
-  get photoMimeType() { return this.props.photoMimeType; }
-  get photoUpdatedAt() { return this.props.photoUpdatedAt; }
-  get idNumberLast4() { return this.props.idNumberLast4; }
-  get bankAccountLast4() { return this.props.bankAccountLast4; }
-  get clerkUserId() { return this.props.clerkUserId; }
-  get invitationId() { return this.props.invitationId; }
-  get invitationStatus() { return this.props.invitationStatus; }
-  get deactivatedAt() { return this.props.deactivatedAt; }
-  get deactivatedByUserId() { return this.props.deactivatedByUserId; }
-  get createdAt() { return this.props.createdAt; }
-  get updatedAt() { return this.props.updatedAt; }
-  get deletedAt() { return this.props.deletedAt; }
-  get deletedByUserId() { return this.props.deletedByUserId; }
-  get isActive() { return this.props.deactivatedAt == null && this.props.deletedAt == null; }
+  get id() {
+    return this.props.id;
+  }
+  get workspaceId() {
+    return this.props.workspaceId;
+  }
+  get createdByUserId() {
+    return this.props.createdByUserId;
+  }
+  get name() {
+    return this.props.name;
+  }
+  get email() {
+    return this.props.email;
+  }
+  get kind() {
+    return this.props.kind;
+  }
+  get phone() {
+    return this.props.phone;
+  }
+  get qualificationSummary() {
+    return this.props.qualificationSummary;
+  }
+  get details() {
+    return this.props.details;
+  }
+  get photoMimeType() {
+    return this.props.photoMimeType;
+  }
+  get photoUpdatedAt() {
+    return this.props.photoUpdatedAt;
+  }
+  get idNumberLast4() {
+    return this.props.idNumberLast4;
+  }
+  get bankAccountLast4() {
+    return this.props.bankAccountLast4;
+  }
+  get clerkUserId() {
+    return this.props.clerkUserId;
+  }
+  get invitationId() {
+    return this.props.invitationId;
+  }
+  get invitationStatus() {
+    return this.props.invitationStatus;
+  }
+  get deactivatedAt() {
+    return this.props.deactivatedAt;
+  }
+  get deactivatedByUserId() {
+    return this.props.deactivatedByUserId;
+  }
+  get createdAt() {
+    return this.props.createdAt;
+  }
+  get updatedAt() {
+    return this.props.updatedAt;
+  }
+  get deletedAt() {
+    return this.props.deletedAt;
+  }
+  get deletedByUserId() {
+    return this.props.deletedByUserId;
+  }
+  get isActive() {
+    return this.props.deactivatedAt == null && this.props.deletedAt == null;
+  }
 
   updateProfile(input: {
     name: string;
@@ -155,33 +211,57 @@ export class Teacher {
       kind: teacherKind(input.kind),
       phone: Phone.createOptional(input.phone)?.value ?? null,
       qualificationSummary: optionalQualification(input.qualificationSummary),
-      details: input.details == null ? this.props.details : teacherDetailsFromRaw(input.details, input.now, this.props.details),
+      details:
+        input.details == null
+          ? this.props.details
+          : teacherDetailsFromRaw(input.details, input.now, this.props.details),
       updatedAt: input.now,
     };
   }
 
   attachPhoto(mimeType: string, now: Date): void {
     this.assertActive();
-    this.props = { ...this.props, photoMimeType: mimeType, photoUpdatedAt: now, updatedAt: now };
+    this.props = {
+      ...this.props,
+      photoMimeType: mimeType,
+      photoUpdatedAt: now,
+      updatedAt: now,
+    };
   }
 
-  recordPrivateNumberMasks(input: { idNumber?: string | null; bankAccountNumber?: string | null }, now: Date): void {
+  recordPrivateNumberMasks(
+    input: { idNumber?: string | null; bankAccountNumber?: string | null },
+    now: Date,
+  ): void {
     this.assertActive();
-    const last4 = (value: string | null | undefined, label: string): string | null | undefined => {
+    const last4 = (
+      value: string | null | undefined,
+      label: string,
+    ): string | null | undefined => {
       if (value === undefined) return undefined;
       if (value === null || value.trim() === "") return null;
       const normalized = value.replace(/[\s-]/g, "");
       if (!/^[A-Za-z0-9]{4,64}$/.test(normalized)) {
-        throw new DomainError("TEACHER_PRIVATE_NUMBER_INVALID", `${label} must be 4 to 64 letters or digits.`);
+        throw new DomainError(
+          "TEACHER_PRIVATE_NUMBER_INVALID",
+          `${label} must be 4 to 64 letters or digits.`,
+        );
       }
       return normalized.slice(-4);
     };
     const idNumberLast4 = last4(input.idNumber, "ID number");
-    const bankAccountLast4 = last4(input.bankAccountNumber, "Bank account number");
+    const bankAccountLast4 = last4(
+      input.bankAccountNumber,
+      "Bank account number",
+    );
     this.props = {
       ...this.props,
-      idNumberLast4: idNumberLast4 === undefined ? this.props.idNumberLast4 : idNumberLast4,
-      bankAccountLast4: bankAccountLast4 === undefined ? this.props.bankAccountLast4 : bankAccountLast4,
+      idNumberLast4:
+        idNumberLast4 === undefined ? this.props.idNumberLast4 : idNumberLast4,
+      bankAccountLast4:
+        bankAccountLast4 === undefined
+          ? this.props.bankAccountLast4
+          : bankAccountLast4,
       updatedAt: now,
     };
   }
@@ -189,7 +269,10 @@ export class Teacher {
   markInvited(invitationId: string, now: Date): void {
     this.assertActive();
     if (this.props.clerkUserId != null) {
-      throw new DomainError("TEACHER_ALREADY_ACTIVE", "Teacher has already joined.");
+      throw new DomainError(
+        "TEACHER_ALREADY_ACTIVE",
+        "Teacher has already joined.",
+      );
     }
     this.props = {
       ...this.props,
@@ -206,8 +289,14 @@ export class Teacher {
 
   activate(clerkUserId: string, now: Date): void {
     this.assertActive();
-    if (this.props.clerkUserId != null && this.props.clerkUserId !== clerkUserId) {
-      throw new DomainError("TEACHER_ALREADY_LINKED", "Teacher is linked to another User.");
+    if (
+      this.props.clerkUserId != null &&
+      this.props.clerkUserId !== clerkUserId
+    ) {
+      throw new DomainError(
+        "TEACHER_ALREADY_LINKED",
+        "Teacher is linked to another User.",
+      );
     }
     this.props = {
       ...this.props,

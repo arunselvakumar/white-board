@@ -10,6 +10,12 @@ export async function GET(): Promise<Response> {
   try {
     const session = await requireTeacherSession();
     if (isResponse(session)) return session;
-    return Response.json(mapAssignedBatches(await handlers.listForUser(session.userId, session.orgId)));
-  } catch (error) { return mapError(error); }
+    return Response.json(
+      mapAssignedBatches(
+        await handlers.listForUser(session.userId, session.orgId),
+      ),
+    );
+  } catch (error) {
+    return mapError(error);
+  }
 }

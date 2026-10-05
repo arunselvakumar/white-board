@@ -186,7 +186,11 @@ export function EnrollmentForm({
                   field.onChange(value);
                 }}
               >
-                <SelectTrigger id="studentId" size="lg" className="w-full min-w-0">
+                <SelectTrigger
+                  id="studentId"
+                  size="lg"
+                  className="w-full min-w-0"
+                >
                   <SelectValue placeholder="Select a Student" />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>
@@ -217,7 +221,11 @@ export function EnrollmentForm({
                   field.onChange(value);
                 }}
               >
-                <SelectTrigger id="batchId" size="lg" className="w-full min-w-0">
+                <SelectTrigger
+                  id="batchId"
+                  size="lg"
+                  className="w-full min-w-0"
+                >
                   <SelectValue placeholder="Select a Batch" />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>
@@ -279,7 +287,11 @@ export function EnrollmentForm({
                 field.onChange(value);
               }}
             >
-              <SelectTrigger id="timingSource" size="lg" className="w-full min-w-0">
+              <SelectTrigger
+                id="timingSource"
+                size="lg"
+                className="w-full min-w-0"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
@@ -306,7 +318,10 @@ export function EnrollmentForm({
                       {DAY_OF_WEEK_ITEMS.map((day) => {
                         const checkboxId = `enroll-slot-${index}-day-${day.value}`;
                         return (
-                          <div key={day.value} className="flex items-center gap-2">
+                          <div
+                            key={day.value}
+                            className="flex items-center gap-2"
+                          >
                             <Checkbox
                               id={checkboxId}
                               checked={daysField.value.includes(day.value)}

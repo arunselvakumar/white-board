@@ -4,10 +4,7 @@ import type { BatchRepository } from "../domain/batch-repository";
 import { CourseId } from "../domain/course-id";
 import type { EnrollmentRepository } from "../domain/enrollment-repository";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toBatchReadModel,
-  type BatchReadModel,
-} from "./batch-read-model";
+import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import { decodeListCursor, encodeListCursor } from "./list-cursor";
 import type { ListBatchesQuery } from "./list-batches.query";
 

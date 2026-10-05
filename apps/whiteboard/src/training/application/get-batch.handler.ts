@@ -2,10 +2,7 @@ import { BatchId } from "../domain/batch-id";
 import type { BatchRepository } from "../domain/batch-repository";
 import type { EnrollmentRepository } from "../domain/enrollment-repository";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toBatchReadModel,
-  type BatchReadModel,
-} from "./batch-read-model";
+import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import type { GetBatchQuery } from "./get-batch.query";
 import { BatchNotFoundError } from "./not-found-error";
 

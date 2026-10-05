@@ -11,6 +11,16 @@ export function classSlotForDate(
 ): ClassSlot | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
   const calendarDate = new Date(`${date}T00:00:00.000Z`);
-  if (Number.isNaN(calendarDate.getTime()) || calendarDate.toISOString().slice(0, 10) !== date) return null;
-  return slots.find((slot) => slot.startTime === startTime && slot.daysOfWeek.includes(calendarDate.getUTCDay())) ?? null;
+  if (
+    Number.isNaN(calendarDate.getTime()) ||
+    calendarDate.toISOString().slice(0, 10) !== date
+  )
+    return null;
+  return (
+    slots.find(
+      (slot) =>
+        slot.startTime === startTime &&
+        slot.daysOfWeek.includes(calendarDate.getUTCDay()),
+    ) ?? null
+  );
 }

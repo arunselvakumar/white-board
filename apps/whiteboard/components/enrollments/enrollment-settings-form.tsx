@@ -220,7 +220,10 @@ export function EnrollmentSettingsForm({
                       {DAY_OF_WEEK_ITEMS.map((day) => {
                         const checkboxId = `enroll-edit-slot-${index}-day-${day.value}`;
                         return (
-                          <div key={day.value} className="flex items-center gap-2">
+                          <div
+                            key={day.value}
+                            className="flex items-center gap-2"
+                          >
                             <Checkbox
                               id={checkboxId}
                               checked={daysField.value.includes(day.value)}
@@ -253,7 +256,9 @@ export function EnrollmentSettingsForm({
               </fieldset>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor={`edit-timings.${index}.startTime`}>Start</Label>
+                  <Label htmlFor={`edit-timings.${index}.startTime`}>
+                    Start
+                  </Label>
                   <Input
                     id={`edit-timings.${index}.startTime`}
                     type="time"

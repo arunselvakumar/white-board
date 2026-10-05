@@ -6,13 +6,27 @@ import { UnassignTeacherBatchParamsModel } from "./unassign-teacher-batch-params
 
 const handlers = createTeacherAssignmentHandlers();
 
-export async function POST(_request: Request, context: { params: Promise<{ id: string; batchId: string }> }): Promise<Response> {
+export async function POST(
+  _request: Request,
+  context: { params: Promise<{ id: string; batchId: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id, batchId } = parseOrThrow(UnassignTeacherBatchParamsModel.safeParse(await context.params));
-    return Response.json(mapAssignedBatches(await handlers.unassign({
-      teacherId: id, batchId, workspaceId: session.orgId, userId: session.userId,
-    })));
-  } catch (error) { return mapError(error); }
+    const { id, batchId } = parseOrThrow(
+      UnassignTeacherBatchParamsModel.safeParse(await context.params),
+    );
+    return Response.json(
+      mapAssignedBatches(
+        await handlers.unassign({
+          teacherId: id,
+          batchId,
+          workspaceId: session.orgId,
+          userId: session.userId,
+        }),
+      ),
+    );
+  } catch (error) {
+    return mapError(error);
+  }
 }

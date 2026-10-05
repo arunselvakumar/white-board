@@ -3,10 +3,7 @@ import type { CourseRepository } from "../domain/course-repository";
 import { UserId } from "../domain/user-id";
 import { WorkspaceId } from "../domain/workspace-id";
 import type { ArchiveCourseCommand } from "./archive-course.command";
-import {
-  toCourseReadModel,
-  type CourseReadModel,
-} from "./course-read-model";
+import { toCourseReadModel, type CourseReadModel } from "./course-read-model";
 import type { EventDispatcher } from "./event-dispatcher";
 import { CourseNotFoundError } from "./not-found-error";
 

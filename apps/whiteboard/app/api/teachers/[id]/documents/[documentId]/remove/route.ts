@@ -5,12 +5,24 @@ import { TeacherDocumentParamsModel } from "../../teacher-document-models";
 
 const handlers = createTeacherHandlers();
 
-export async function POST(_request: Request, context: { params: Promise<{ id: string; documentId: string }> }): Promise<Response> {
+export async function POST(
+  _request: Request,
+  context: { params: Promise<{ id: string; documentId: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id, documentId } = parseOrThrow(TeacherDocumentParamsModel.safeParse(await context.params));
-    await handlers.removeDocument(documentId, id, session.orgId, session.userId);
+    const { id, documentId } = parseOrThrow(
+      TeacherDocumentParamsModel.safeParse(await context.params),
+    );
+    await handlers.removeDocument(
+      documentId,
+      id,
+      session.orgId,
+      session.userId,
+    );
     return Response.json({ id: documentId });
-  } catch (error) { return mapError(error); }
+  } catch (error) {
+    return mapError(error);
+  }
 }

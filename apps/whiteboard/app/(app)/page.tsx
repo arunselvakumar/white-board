@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
           ? "Parent"
           : orgRole === "org:teacher"
             ? "My Batches"
-          : "Owner Dashboard",
+            : "Owner Dashboard",
   };
 }
 

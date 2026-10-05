@@ -20,8 +20,9 @@ export type CalendarItem = {
 
 export const calendarQueries = {
   key: { all: ["calendar"] as const },
-  schedule: (sessionScope: string) => queryOptions({
-    queryKey: [...calendarQueries.key.all, sessionScope] as const,
-    queryFn: () => apiJson<{ items: CalendarItem[] }>("/api/calendar"),
-  }),
+  schedule: (sessionScope: string) =>
+    queryOptions({
+      queryKey: [...calendarQueries.key.all, sessionScope] as const,
+      queryFn: () => apiJson<{ items: CalendarItem[] }>("/api/calendar"),
+    }),
 };

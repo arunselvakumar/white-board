@@ -21,7 +21,9 @@ export function BatchCreateScreen() {
     mutationFn: createBatch,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: batchQueries.key.all });
-      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
+      await queryClient.invalidateQueries({
+        queryKey: calendarQueries.key.all,
+      });
       router.push("/batches");
     },
   });

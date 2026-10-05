@@ -22,7 +22,11 @@ export const DAY_OF_WEEK_ITEMS = [
 ] as const;
 
 export function formatTimingSlots(
-  slots: { daysOfWeek: readonly number[]; startTime: string; endTime: string }[],
+  slots: {
+    daysOfWeek: readonly number[];
+    startTime: string;
+    endTime: string;
+  }[],
 ): string {
   return slots
     .map((slot) => {

@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client"],
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   outputFileTracingIncludes: {
-    "/*": ["../../node_modules/.bun/@prisma+client@*/node_modules/.prisma/client/**/*"],
+    "/*": [
+      "../../node_modules/.bun/@prisma+client@*/node_modules/.prisma/client/**/*",
+    ],
   },
 };
 

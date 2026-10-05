@@ -1,6 +1,9 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
-import { TeacherHandlers, type TeacherInviter } from "../application/teacher-handlers";
+import {
+  TeacherHandlers,
+  type TeacherInviter,
+} from "../application/teacher-handlers";
 import { ClerkTeacherInviter } from "./clerk-teacher-inviter";
 import { PrismaTeacherRepository } from "./prisma-teacher-repository";
 import { PrismaTeacherDocumentRepository } from "./prisma-teacher-document-repository";

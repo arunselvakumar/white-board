@@ -13,8 +13,7 @@ const CreateWorkspaceInput = z.object({
 export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceInput>;
 
 export type CreateWorkspaceResult =
-  | { ok: true; id: string }
-  | { ok: false; message: string };
+  { ok: true; id: string } | { ok: false; message: string };
 
 function userFacingMessage(error: unknown): string {
   if (

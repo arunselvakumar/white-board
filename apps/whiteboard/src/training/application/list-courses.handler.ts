@@ -2,10 +2,7 @@ import type { Course } from "../domain/course";
 import { CourseId } from "../domain/course-id";
 import type { CourseRepository } from "../domain/course-repository";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toCourseReadModel,
-  type CourseReadModel,
-} from "./course-read-model";
+import { toCourseReadModel, type CourseReadModel } from "./course-read-model";
 import { decodeListCursor, encodeListCursor } from "./list-cursor";
 import type { ListCoursesQuery } from "./list-courses.query";
 

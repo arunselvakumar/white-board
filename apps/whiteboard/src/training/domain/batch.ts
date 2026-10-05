@@ -15,7 +15,10 @@ export type MeetingOption = "external" | "whiteboard";
 function meetingOption(value: string | undefined): MeetingOption {
   if (value == null || value === "external") return "external";
   if (value === "whiteboard") return "whiteboard";
-  throw new DomainError("INVALID_MEETING_OPTION", "Choose an external link or a Whiteboard class.");
+  throw new DomainError(
+    "INVALID_MEETING_OPTION",
+    "Choose an external link or a Whiteboard class.",
+  );
 }
 
 export function batchRoom(raw: string | null | undefined): OptionalText | null {
@@ -202,7 +205,9 @@ export class Batch {
       capacity: input.capacity,
       room: input.room,
       joinUrl: input.joinUrl,
-      meetingOption: meetingOption(input.meetingOption ?? this.props.meetingOption),
+      meetingOption: meetingOption(
+        input.meetingOption ?? this.props.meetingOption,
+      ),
       timings: input.timings,
       updatedAt: input.now,
     };

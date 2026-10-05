@@ -33,7 +33,9 @@ export function CoursesScreen() {
     mutationFn: (id: string) => archiveCourse(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: courseQueries.key.all });
-      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
+      await queryClient.invalidateQueries({
+        queryKey: calendarQueries.key.all,
+      });
     },
   });
 

@@ -18,7 +18,9 @@ export const ClassDetailResponseModel = z.object({
   joinUrl: z.string().nullable(),
   isHost: z.boolean(),
   status: z.enum(["scheduled", "starting", "live", "ended", "failed"]),
-  recordingStatus: z.enum(["pending", "requesting", "recording", "uploading", "ready", "error"]).nullable(),
+  recordingStatus: z
+    .enum(["pending", "requesting", "recording", "uploading", "ready", "error"])
+    .nullable(),
   recordingReady: z.boolean(),
 });
 

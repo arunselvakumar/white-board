@@ -328,16 +328,33 @@ export const Create: Story = {
 };
 
 export const OnlineMeetingChoice: Story = {
-  render: () => <div className="w-full p-6"><div className="w-full max-w-4xl"><BatchForm
-    courses={COURSES}
-    defaultValues={{ courseId: COURSE_ID, name: "Python Online", classMode: "online", timings: [{ daysOfWeek: [1], startTime: "09:00", endTime: "10:00" }] }}
-    submitLabel="Save Batch"
-    onSubmit={() => Promise.resolve()}
-  /></div></div>,
+  render: () => (
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl">
+        <BatchForm
+          courses={COURSES}
+          defaultValues={{
+            courseId: COURSE_ID,
+            name: "Python Online",
+            classMode: "online",
+            timings: [
+              { daysOfWeek: [1], startTime: "09:00", endTime: "10:00" },
+            ],
+          }}
+          submitLabel="Save Batch"
+          onSubmit={() => Promise.resolve()}
+        />
+      </div>
+    </div>
+  ),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(canvas.getByLabelText("Join URL")).toBeVisible();
     await userEvent.click(canvas.getByLabelText("Online meeting"));
-    await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole("option", { name: "Whiteboard class" }));
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Whiteboard class",
+      }),
+    );
     await expect(canvas.queryByLabelText("Join URL")).toBeNull();
   },
 };

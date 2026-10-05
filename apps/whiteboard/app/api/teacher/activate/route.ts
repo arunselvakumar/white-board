@@ -18,8 +18,15 @@ export async function POST(): Promise<Response> {
     let pageSize = 100;
     let membershipTeacherId: unknown;
     while (pageSize === 100) {
-      const memberships = await clerk.users.getOrganizationMembershipList({ userId: session.userId, limit: 100, offset });
-      const membership = memberships.data.find((item) => item.organization.id === session.orgId && item.role === "org:teacher");
+      const memberships = await clerk.users.getOrganizationMembershipList({
+        userId: session.userId,
+        limit: 100,
+        offset,
+      });
+      const membership = memberships.data.find(
+        (item) =>
+          item.organization.id === session.orgId && item.role === "org:teacher",
+      );
       if (membership != null) {
         membershipTeacherId = membership.publicMetadata["teacherId"];
         break;
@@ -28,8 +35,19 @@ export async function POST(): Promise<Response> {
       offset += pageSize;
     }
     const teacherId = z.uuid().safeParse(membershipTeacherId);
-    if (!teacherId.success) return jsonError(403, "TEACHER_LINK_REQUIRED", "This Teacher invitation is not linked to a Teacher profile.");
-    const teacher = await handlers.activate({ id: teacherId.data, workspaceId: session.orgId, clerkUserId: session.userId });
+    if (!teacherId.success)
+      return jsonError(
+        403,
+        "TEACHER_LINK_REQUIRED",
+        "This Teacher invitation is not linked to a Teacher profile.",
+      );
+    const teacher = await handlers.activate({
+      id: teacherId.data,
+      workspaceId: session.orgId,
+      clerkUserId: session.userId,
+    });
     return Response.json({ teacherId: teacher.id });
-  } catch (error) { return mapError(error); }
+  } catch (error) {
+    return mapError(error);
+  }
 }

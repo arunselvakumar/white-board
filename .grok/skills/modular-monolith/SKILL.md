@@ -9,12 +9,12 @@ ADR-0009. First product context is `training` at `apps/whiteboard/src/training/{
 
 ## Layers
 
-| Layer | Lives in | May import |
-| --- | --- | --- |
-| Domain | `src/<context>/domain` | nothing outside this folder |
-| Application | `src/<context>/application` | domain |
-| Infrastructure | `src/<context>/infrastructure` | domain, application, `@repo/db` |
-| HTTP | `app/api/...` | application, infrastructure, Zod models beside the route |
+| Layer          | Lives in                       | May import                                               |
+| -------------- | ------------------------------ | -------------------------------------------------------- |
+| Domain         | `src/<context>/domain`         | nothing outside this folder                              |
+| Application    | `src/<context>/application`    | domain                                                   |
+| Infrastructure | `src/<context>/infrastructure` | domain, application, `@repo/db`                          |
+| HTTP           | `app/api/...`                  | application, infrastructure, Zod models beside the route |
 
 Domain does not import Zod, Prisma, or Next.js. Copy `todo` layering, not Todo's product language.
 

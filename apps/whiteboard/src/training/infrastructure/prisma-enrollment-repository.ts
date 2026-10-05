@@ -192,7 +192,9 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     const where: Prisma.EnrollmentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
-      ...(params.studentId != null ? { studentId: params.studentId.value } : {}),
+      ...(params.studentId != null
+        ? { studentId: params.studentId.value }
+        : {}),
       ...(params.batchId != null ? { batchId: params.batchId.value } : {}),
       ...cursor,
     };
@@ -200,7 +202,9 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     const countWhere: Prisma.EnrollmentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
-      ...(params.studentId != null ? { studentId: params.studentId.value } : {}),
+      ...(params.studentId != null
+        ? { studentId: params.studentId.value }
+        : {}),
       ...(params.batchId != null ? { batchId: params.batchId.value } : {}),
     };
     const [rows, total] = await Promise.all([

@@ -25,7 +25,9 @@ export class ListEnrollmentsHandler {
     private readonly payments: FeePaymentRepository,
   ) {}
 
-  async execute(query: ListEnrollmentsQuery): Promise<ListEnrollmentsReadModel> {
+  async execute(
+    query: ListEnrollmentsQuery,
+  ): Promise<ListEnrollmentsReadModel> {
     const workspaceId = WorkspaceId.create(query.workspaceId);
     const after =
       query.after == null
@@ -39,7 +41,8 @@ export class ListEnrollmentsHandler {
       workspaceId,
       studentId:
         query.studentId == null ? undefined : StudentId.create(query.studentId),
-      batchId: query.batchId == null ? undefined : BatchId.create(query.batchId),
+      batchId:
+        query.batchId == null ? undefined : BatchId.create(query.batchId),
       limit: query.limit,
       after,
       before,

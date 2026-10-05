@@ -10,10 +10,7 @@ import {
   type EnrollmentReadModel,
 } from "./enrollment-read-model";
 import type { EventDispatcher } from "./event-dispatcher";
-import {
-  BatchNotFoundError,
-  EnrollmentNotFoundError,
-} from "./not-found-error";
+import { BatchNotFoundError, EnrollmentNotFoundError } from "./not-found-error";
 import type { MoveEnrollmentCommand } from "./move-enrollment.command";
 
 export class MoveEnrollmentHandler {

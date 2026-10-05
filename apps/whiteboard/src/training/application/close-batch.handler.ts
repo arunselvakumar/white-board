@@ -2,10 +2,7 @@ import { BatchId } from "../domain/batch-id";
 import type { BatchRepository } from "../domain/batch-repository";
 import { UserId } from "../domain/user-id";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toBatchReadModel,
-  type BatchReadModel,
-} from "./batch-read-model";
+import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import type { CloseBatchCommand } from "./close-batch.command";
 import type { EventDispatcher } from "./event-dispatcher";
 import { BatchNotFoundError } from "./not-found-error";

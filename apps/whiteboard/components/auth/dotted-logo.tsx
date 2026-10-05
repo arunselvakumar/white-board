@@ -136,7 +136,11 @@ function buildLogo(
   const originY = (height - logoSide) / 2;
   const dots: Dot[] = [];
 
-  for (let row = 0, y = originY; y < originY + logoSide; y += LOGO_STEP, row += 1) {
+  for (
+    let row = 0, y = originY;
+    y < originY + logoSide;
+    y += LOGO_STEP, row += 1
+  ) {
     const xStart = originX + (row % 2 === 0 ? 0 : LOGO_STEP / 2);
     for (let x = xStart; x < originX + logoSide; x += LOGO_STEP) {
       const u = (x - originX) / logoSide;
@@ -168,7 +172,9 @@ export function DottedLogo({ className }: { className?: string }) {
     const mask = logoMask();
     if (!ctx || !mask) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const globe = buildGlobe();
     const globeZ = new Float32Array(globe.length);
     const globeOrder = globe.map((_, index) => index);
@@ -239,9 +245,17 @@ export function DottedLogo({ className }: { className?: string }) {
       if (!reduce && time >= nextBlink) {
         const roll = Math.random();
         const layer: Blink["layer"] =
-          roll < 0.62 ? "globe" : roll < 0.9 || opacity < 0.35 ? "field" : "logo";
+          roll < 0.62
+            ? "globe"
+            : roll < 0.9 || opacity < 0.35
+              ? "field"
+              : "logo";
         const count =
-          layer === "globe" ? globe.length : layer === "field" ? field.length : logo.length;
+          layer === "globe"
+            ? globe.length
+            : layer === "field"
+              ? field.length
+              : logo.length;
         if (count > 0) {
           blinks.push({
             layer,
@@ -276,7 +290,16 @@ export function DottedLogo({ className }: { className?: string }) {
       for (let index = 0; index < field.length; index += 1) {
         const dot = field[index];
         if (!dot) continue;
-        drawDot(dot.x, dot.y, 1.35, 132, 140, 186, 0.34, fieldBlink[index] ?? 0);
+        drawDot(
+          dot.x,
+          dot.y,
+          1.35,
+          132,
+          140,
+          186,
+          0.34,
+          fieldBlink[index] ?? 0,
+        );
       }
 
       const logoSide = Math.min(width, height) * LOGO_SCALE;

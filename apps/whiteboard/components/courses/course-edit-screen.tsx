@@ -24,7 +24,9 @@ export function CourseEditScreen({ courseId }: { courseId: string }) {
       updateCourse(courseId, input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: courseQueries.key.all });
-      await queryClient.invalidateQueries({ queryKey: calendarQueries.key.all });
+      await queryClient.invalidateQueries({
+        queryKey: calendarQueries.key.all,
+      });
       router.push("/courses");
     },
   });

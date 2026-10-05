@@ -6,11 +6,20 @@ import { TeacherParamsModel } from "./teacher-params-model";
 
 const handlers = createTeacherHandlers();
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function GET(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id } = parseOrThrow(TeacherParamsModel.safeParse(await context.params));
-    return Response.json(mapTeacherResponse(await handlers.get(id, session.orgId)));
-  } catch (error) { return mapError(error); }
+    const { id } = parseOrThrow(
+      TeacherParamsModel.safeParse(await context.params),
+    );
+    return Response.json(
+      mapTeacherResponse(await handlers.get(id, session.orgId)),
+    );
+  } catch (error) {
+    return mapError(error);
+  }
 }

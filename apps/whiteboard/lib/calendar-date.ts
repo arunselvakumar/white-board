@@ -4,7 +4,9 @@ export function addCalendarMonths(isoDate: string, months: number): string {
   const month = Number(monthText);
   const day = Number(dayText);
   const targetMonthIndex = month - 1 + months;
-  const lastDay = new Date(Date.UTC(year, targetMonthIndex + 1, 0)).getUTCDate();
+  const lastDay = new Date(
+    Date.UTC(year, targetMonthIndex + 1, 0),
+  ).getUTCDate();
   const clampedDay = Math.min(day, lastDay);
   return new Date(Date.UTC(year, targetMonthIndex, clampedDay))
     .toISOString()

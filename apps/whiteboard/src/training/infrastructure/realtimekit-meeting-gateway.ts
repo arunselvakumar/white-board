@@ -1,52 +1,106 @@
-import type { ClassOccurrenceRecord, MeetingGateway } from "../application/class-service";
+import type {
+  ClassOccurrenceRecord,
+  MeetingGateway,
+} from "../application/class-service";
 import { DomainError } from "../domain/errors";
 
 export type RealtimeKitConfig = {
-  accountId: string; appId: string; apiToken: string;
-  hostPreset: string; studentPreset: string;
-  r2Bucket: string; r2AccessKeyId: string; r2SecretAccessKey: string;
+  accountId: string;
+  appId: string;
+  apiToken: string;
+  hostPreset: string;
+  studentPreset: string;
+  r2Bucket: string;
+  r2AccessKeyId: string;
+  r2SecretAccessKey: string;
 };
 
 export class RealtimeKitMeetingGateway implements MeetingGateway {
-  constructor(private readonly config: RealtimeKitConfig, private readonly fetcher: typeof fetch = fetch) {}
+  constructor(
+    private readonly config: RealtimeKitConfig,
+    private readonly fetcher: typeof fetch = fetch,
+  ) {}
 
   ensureConfigured(): void {
     if (Object.values(this.config).some((value) => value.trim().length === 0)) {
-      throw new DomainError("CLASS_NOT_CONFIGURED", "Whiteboard classes need Cloudflare RealtimeKit and R2 configuration.");
+      throw new DomainError(
+        "CLASS_NOT_CONFIGURED",
+        "Whiteboard classes need Cloudflare RealtimeKit and R2 configuration.",
+      );
     }
   }
 
-  private async post(path: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const response = await this.fetcher(`https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/realtime/kit/${this.config.appId}${path}`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${this.config.apiToken}`, "content-type": "application/json" },
-      body: JSON.stringify(body),
-    });
+  private async post(
+    path: string,
+    body: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const response = await this.fetcher(
+      `https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/realtime/kit/${this.config.appId}${path}`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${this.config.apiToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      },
+    );
     const payload: unknown = await response.json();
-    if (!response.ok || typeof payload !== "object" || payload == null || !("success" in payload) || payload.success !== true || !("data" in payload) || typeof payload.data !== "object" || payload.data == null) {
-      throw new DomainError("CLASS_PROVIDER_UNAVAILABLE", "Whiteboard classes are temporarily unavailable.");
+    if (
+      !response.ok ||
+      typeof payload !== "object" ||
+      payload == null ||
+      !("success" in payload) ||
+      payload.success !== true ||
+      !("data" in payload) ||
+      typeof payload.data !== "object" ||
+      payload.data == null
+    ) {
+      throw new DomainError(
+        "CLASS_PROVIDER_UNAVAILABLE",
+        "Whiteboard classes are temporarily unavailable.",
+      );
     }
     return payload.data as Record<string, unknown>;
   }
 
   async createMeeting(title: string): Promise<string> {
-    const data = await this.post("/meetings", { title, record_on_start: false });
-    if (typeof data["id"] !== "string") throw new DomainError("CLASS_PROVIDER_UNAVAILABLE", "Whiteboard could not create this class.");
+    const data = await this.post("/meetings", {
+      title,
+      record_on_start: false,
+    });
+    if (typeof data["id"] !== "string")
+      throw new DomainError(
+        "CLASS_PROVIDER_UNAVAILABLE",
+        "Whiteboard could not create this class.",
+      );
     return data["id"];
   }
 
-  async addParticipant(meetingId: string, input: { userId: string; name: string; host: boolean }): Promise<string> {
+  async addParticipant(
+    meetingId: string,
+    input: { userId: string; name: string; host: boolean },
+  ): Promise<string> {
     const data = await this.post(`/meetings/${meetingId}/participants`, {
       name: input.name,
-      preset_name: input.host ? this.config.hostPreset : this.config.studentPreset,
+      preset_name: input.host
+        ? this.config.hostPreset
+        : this.config.studentPreset,
       custom_participant_id: `${input.userId}:${crypto.randomUUID()}`,
     });
     const token = data["token"] ?? data["authToken"];
-    if (typeof token !== "string") throw new DomainError("CLASS_PROVIDER_UNAVAILABLE", "Whiteboard could not open this class.");
+    if (typeof token !== "string")
+      throw new DomainError(
+        "CLASS_PROVIDER_UNAVAILABLE",
+        "Whiteboard could not open this class.",
+      );
     return token;
   }
 
-  async startRecording(meetingId: string, occurrence: ClassOccurrenceRecord): Promise<string> {
+  async startRecording(
+    meetingId: string,
+    occurrence: ClassOccurrenceRecord,
+  ): Promise<string> {
     const data = await this.post("/recordings", {
       meeting_id: meetingId,
       video_config: { codec: "H264", export_file: true },
@@ -59,7 +113,11 @@ export class RealtimeKitMeetingGateway implements MeetingGateway {
         path: `${occurrence.workspaceId}/${occurrence.id}`,
       },
     });
-    if (typeof data["id"] !== "string") throw new DomainError("CLASS_PROVIDER_UNAVAILABLE", "Whiteboard could not record this class.");
+    if (typeof data["id"] !== "string")
+      throw new DomainError(
+        "CLASS_PROVIDER_UNAVAILABLE",
+        "Whiteboard could not record this class.",
+      );
     return data["id"];
   }
 
@@ -69,14 +127,29 @@ export class RealtimeKitMeetingGateway implements MeetingGateway {
   }
 
   async deactivateMeeting(meetingId: string): Promise<void> {
-    const response = await this.fetcher(`https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/realtime/kit/${this.config.appId}/meetings/${meetingId}`, {
-      method: "PATCH",
-      headers: { authorization: `Bearer ${this.config.apiToken}`, "content-type": "application/json" },
-      body: JSON.stringify({ status: "INACTIVE" }),
-    });
+    const response = await this.fetcher(
+      `https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/realtime/kit/${this.config.appId}/meetings/${meetingId}`,
+      {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${this.config.apiToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ status: "INACTIVE" }),
+      },
+    );
     const payload: unknown = await response.json();
-    if (!response.ok || typeof payload !== "object" || payload == null || !("success" in payload) || payload.success !== true) {
-      throw new DomainError("CLASS_PROVIDER_UNAVAILABLE", "Whiteboard could not close this class.");
+    if (
+      !response.ok ||
+      typeof payload !== "object" ||
+      payload == null ||
+      !("success" in payload) ||
+      payload.success !== true
+    ) {
+      throw new DomainError(
+        "CLASS_PROVIDER_UNAVAILABLE",
+        "Whiteboard could not close this class.",
+      );
     }
   }
 }
@@ -84,7 +157,11 @@ export class RealtimeKitMeetingGateway implements MeetingGateway {
 export function realtimeKitConfigFromEnv(): RealtimeKitConfig {
   const value = (key: string) => {
     const result = process.env[key]?.trim();
-    if (!result) throw new DomainError("CLASS_NOT_CONFIGURED", "Whiteboard classes need Cloudflare RealtimeKit and R2 configuration.");
+    if (!result)
+      throw new DomainError(
+        "CLASS_NOT_CONFIGURED",
+        "Whiteboard classes need Cloudflare RealtimeKit and R2 configuration.",
+      );
     return result;
   };
   return {

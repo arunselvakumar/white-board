@@ -131,8 +131,7 @@ export function FeePlanForm({
             type: values.type,
             amountPaise,
             concessionPaise,
-            installmentCount:
-              values.type === "installments" ? count : null,
+            installmentCount: values.type === "installments" ? count : null,
             dueDates: dueDatesFor(values.type, net, count, start),
           });
         } catch (error) {
@@ -159,7 +158,11 @@ export function FeePlanForm({
                 field.onChange(value);
               }}
             >
-              <SelectTrigger id="feePlanType" size="lg" className="w-full min-w-0">
+              <SelectTrigger
+                id="feePlanType"
+                size="lg"
+                className="w-full min-w-0"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
@@ -234,5 +237,3 @@ function dueDatesFor(
     amountPaise: base + (index === 0 ? remainder : 0),
   }));
 }
-
-

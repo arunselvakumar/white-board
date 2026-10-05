@@ -1,5 +1,11 @@
 export type DateKey = string;
-export type CalendarEvent<T> = { id: string; date: DateKey; startMinutes: number; endMinutes: number; item: T };
+export type CalendarEvent<T> = {
+  id: string;
+  date: DateKey;
+  startMinutes: number;
+  endMinutes: number;
+  item: T;
+};
 
 function utcDate(key: DateKey): Date {
   return new Date(`${key}T00:00:00.000Z`);
@@ -20,7 +26,9 @@ export function addMonths(key: DateKey, months: number): DateKey {
   const day = date.getUTCDate();
   date.setUTCDate(1);
   date.setUTCMonth(date.getUTCMonth() + months);
-  const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  const lastDay = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0),
+  ).getUTCDate();
   date.setUTCDate(Math.min(day, lastDay));
   return keyOf(date);
 }
@@ -41,8 +49,14 @@ export function monthGrid(key: DateKey): DateKey[] {
 }
 
 export function dateKeyInZone(date: Date, timezone: string): DateKey {
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
-  const get = (name: string) => parts.find((part) => part.type === name)?.value ?? "";
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const get = (name: string) =>
+    parts.find((part) => part.type === name)?.value ?? "";
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
@@ -51,7 +65,18 @@ export function minutesFromClock(clock: string): number {
   return (hour ?? 0) * 60 + (minute ?? 0);
 }
 
-export function expandCalendarItems<T extends { id: string; timezone: string; activeFrom: string; timings: { daysOfWeek: readonly number[]; startTime: string; endTime: string }[] }>(items: T[], dates: DateKey[]): CalendarEvent<T>[] {
+export function expandCalendarItems<
+  T extends {
+    id: string;
+    timezone: string;
+    activeFrom: string;
+    timings: {
+      daysOfWeek: readonly number[];
+      startTime: string;
+      endTime: string;
+    }[];
+  },
+>(items: T[], dates: DateKey[]): CalendarEvent<T>[] {
   const events: CalendarEvent<T>[] = [];
   for (const item of items) {
     const firstDay = dateKeyInZone(new Date(item.activeFrom), item.timezone);
@@ -60,13 +85,30 @@ export function expandCalendarItems<T extends { id: string; timezone: string; ac
       const day = weekday(date);
       for (const [index, slot] of item.timings.entries()) {
         if (!slot.daysOfWeek.includes(day)) continue;
-        events.push({ id: `${item.id}:${date}:${index}`, date, startMinutes: minutesFromClock(slot.startTime), endMinutes: minutesFromClock(slot.endTime), item });
+        events.push({
+          id: `${item.id}:${date}:${index}`,
+          date,
+          startMinutes: minutesFromClock(slot.startTime),
+          endMinutes: minutesFromClock(slot.endTime),
+          item,
+        });
       }
     }
   }
-  return events.sort((a, b) => a.date.localeCompare(b.date) || a.startMinutes - b.startMinutes || a.item.id.localeCompare(b.item.id));
+  return events.sort(
+    (a, b) =>
+      a.date.localeCompare(b.date) ||
+      a.startMinutes - b.startMinutes ||
+      a.item.id.localeCompare(b.item.id),
+  );
 }
 
-export function formatDate(key: DateKey, options: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat("en-US", { timeZone: "UTC", ...options }).format(utcDate(key));
+export function formatDate(
+  key: DateKey,
+  options: Intl.DateTimeFormatOptions,
+): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    ...options,
+  }).format(utcDate(key));
 }

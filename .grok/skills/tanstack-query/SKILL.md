@@ -80,12 +80,12 @@ return (
 
 ## Do not
 
-| Avoid | Use instead |
-| --- | --- |
-| `useQuery` + `isPending` on a page | `useSuspenseQuery` inside `QuerySuspense` |
-| `useEffect` + `fetch` | `queryOptions` + `apiJson` |
-| Clerk org/session in a queryFn | `useOrganization` / `useAuth` |
-| `workspaceId` in the query key or body | Active Workspace on the Session (ADR-0014) |
+| Avoid                                  | Use instead                                                                             |
+| -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `useQuery` + `isPending` on a page     | `useSuspenseQuery` inside `QuerySuspense`                                               |
+| `useEffect` + `fetch`                  | `queryOptions` + `apiJson`                                                              |
+| Clerk org/session in a queryFn         | `useOrganization` / `useAuth`                                                           |
+| `workspaceId` in the query key or body | Active Workspace on the Session (ADR-0014)                                              |
 | `enabled: false` on `useSuspenseQuery` | It is not supported — skip the component or use `useQuery` only for true optional reads |
 
 Optional reads that must not throw (typeahead with an empty string, a panel the User has not opened) may use `useQuery`. That is the exception, not the default.

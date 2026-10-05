@@ -40,14 +40,18 @@ describe("Teacher", () => {
     teacher.activate("user_teacher", base.now);
     expect(teacher.invitationStatus).toBe("accepted");
     expect(teacher.clerkUserId).toBe("user_teacher");
-    expect(() => { teacher.activate("user_other", base.now); }).toThrow();
+    expect(() => {
+      teacher.activate("user_other", base.now);
+    }).toThrow();
   });
 
   it("deactivates without losing identity or assignment history", () => {
     const teacher = Teacher.create(base);
     teacher.deactivate("user_owner", base.now);
     expect(teacher.isActive).toBe(false);
-    expect(() => { teacher.activate("user_teacher", base.now); }).toThrow();
+    expect(() => {
+      teacher.activate("user_teacher", base.now);
+    }).toThrow();
   });
 
   it("normalizes expanded profile details for a Visiting Tutor", () => {
@@ -65,7 +69,9 @@ describe("Teacher", () => {
         languages: ["Hindi", " English "],
         yearsExperience: 7,
         startDate: "2024-06-01",
-        availability: [{ daysOfWeek: [1, 3], startTime: "09:00", endTime: "12:00" }],
+        availability: [
+          { daysOfWeek: [1, 3], startTime: "09:00", endTime: "12:00" },
+        ],
         payBasis: "hourly",
         payRatePaise: 150000,
       },
@@ -77,37 +83,65 @@ describe("Teacher", () => {
       learnerLevels: ["Beginner"],
       certifications: ["Fine Arts Diploma"],
       languages: ["Hindi", "English"],
-      availability: [{ daysOfWeek: [1, 3], startTime: "09:00", endTime: "12:00" }],
+      availability: [
+        { daysOfWeek: [1, 3], startTime: "09:00", endTime: "12:00" },
+      ],
       payBasis: "hourly",
       payRatePaise: 150000,
     });
   });
 
   it("rejects overlapping availability and invalid pay details", () => {
-    expect(() => Teacher.create({
-      ...base,
-      details: { availability: [
-        { daysOfWeek: [1], startTime: "09:00", endTime: "11:00" },
-        { daysOfWeek: [1], startTime: "10:00", endTime: "12:00" },
-      ] },
-    })).toThrow();
-    expect(() => Teacher.create({ ...base, details: { payBasis: "hourly", payRatePaise: -1 } })).toThrow();
-    expect(() => Teacher.create({ ...base, details: { dateOfBirth: "2099-01-01" } })).toThrow();
+    expect(() =>
+      Teacher.create({
+        ...base,
+        details: {
+          availability: [
+            { daysOfWeek: [1], startTime: "09:00", endTime: "11:00" },
+            { daysOfWeek: [1], startTime: "10:00", endTime: "12:00" },
+          ],
+        },
+      }),
+    ).toThrow();
+    expect(() =>
+      Teacher.create({
+        ...base,
+        details: { payBasis: "hourly", payRatePaise: -1 },
+      }),
+    ).toThrow();
+    expect(() =>
+      Teacher.create({ ...base, details: { dateOfBirth: "2099-01-01" } }),
+    ).toThrow();
   });
 
   it("preserves omitted profile details on a legacy profile update", () => {
-    const teacher = Teacher.create({ ...base, details: { preferredName: "Meera", languages: ["Hindi"] } });
-    teacher.updateProfile({ name: "Meera Sharma", kind: "centre_teacher", now: base.now });
+    const teacher = Teacher.create({
+      ...base,
+      details: { preferredName: "Meera", languages: ["Hindi"] },
+    });
+    teacher.updateProfile({
+      name: "Meera Sharma",
+      kind: "centre_teacher",
+      now: base.now,
+    });
     expect(teacher.details.preferredName).toBe("Meera");
     expect(teacher.details.languages).toEqual(["Hindi"]);
-    teacher.updateProfile({ name: "Meera Sharma", kind: "centre_teacher", details: { preferredName: null }, now: base.now });
+    teacher.updateProfile({
+      name: "Meera Sharma",
+      kind: "centre_teacher",
+      details: { preferredName: null },
+      now: base.now,
+    });
     expect(teacher.details.preferredName).toBeNull();
     expect(teacher.details.languages).toEqual(["Hindi"]);
   });
 
   it("records only the last four characters of private numbers", () => {
     const teacher = Teacher.create(base);
-    teacher.recordPrivateNumberMasks({ idNumber: "ABCD 1234", bankAccountNumber: "1234-5678-9012" }, base.now);
+    teacher.recordPrivateNumberMasks(
+      { idNumber: "ABCD 1234", bankAccountNumber: "1234-5678-9012" },
+      base.now,
+    );
     expect(teacher.idNumberLast4).toBe("1234");
     expect(teacher.bankAccountLast4).toBe("9012");
     teacher.recordPrivateNumberMasks({ idNumber: null }, base.now);

@@ -81,7 +81,11 @@ export function mapError(error: unknown): Response {
   if (code === "ATTENDANCE_FORBIDDEN" && error instanceof Error) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);
   }
-  if ((code === "CLASS_NOT_CONFIGURED" || code === "CLASS_PROVIDER_UNAVAILABLE") && error instanceof Error) {
+  if (
+    (code === "CLASS_NOT_CONFIGURED" ||
+      code === "CLASS_PROVIDER_UNAVAILABLE") &&
+    error instanceof Error
+  ) {
     return jsonError(StatusCodes.SERVICE_UNAVAILABLE, code, error.message);
   }
   if (code != null && NOT_FOUND_CODES.has(code) && error instanceof Error) {

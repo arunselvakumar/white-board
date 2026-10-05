@@ -6,11 +6,26 @@ import { mapTeacherResponse } from "../../teacher-response-model";
 
 const handlers = createTeacherHandlers();
 
-export async function POST(_request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function POST(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id } = parseOrThrow(TeacherParamsModel.safeParse(await context.params));
-    return Response.json(mapTeacherResponse(await handlers.deactivate({ id, workspaceId: session.orgId, userId: session.userId })));
-  } catch (error) { return mapError(error); }
+    const { id } = parseOrThrow(
+      TeacherParamsModel.safeParse(await context.params),
+    );
+    return Response.json(
+      mapTeacherResponse(
+        await handlers.deactivate({
+          id,
+          workspaceId: session.orgId,
+          userId: session.userId,
+        }),
+      ),
+    );
+  } catch (error) {
+    return mapError(error);
+  }
 }

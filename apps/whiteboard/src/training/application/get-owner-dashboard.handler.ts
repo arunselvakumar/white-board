@@ -15,39 +15,34 @@ export class GetOwnerDashboardHandler {
   ): Promise<OwnerDashboardReadModel> {
     const workspaceId = WorkspaceId.create(query.workspaceId).value;
     const now = query.now ?? new Date();
-    const [
-      activeStudentCount,
-      recentStudents,
-      batches,
-      enrollments,
-      payments,
-    ] = await Promise.all([
-      this.db.student.count({
-        where: { workspaceId, deletedAt: null, droppedAt: null },
-      }),
-      this.db.student.findMany({
-        where: { workspaceId, deletedAt: null, droppedAt: null },
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        take: 5,
-      }),
-      this.db.batch.findMany({
-        where: { workspaceId, deletedAt: null, closedAt: null },
-      }),
-      this.db.enrollment.findMany({
-        where: { workspaceId, deletedAt: null, endedAt: null },
-        select: {
-          id: true,
-          batchId: true,
-          feePlanAmountPaise: true,
-          feePlanConcessionPaise: true,
-        },
-      }),
-      this.db.feePayment.groupBy({
-        by: ["enrollmentId"],
-        where: { workspaceId, deletedAt: null },
-        _sum: { amountPaise: true },
-      }),
-    ]);
+    const [activeStudentCount, recentStudents, batches, enrollments, payments] =
+      await Promise.all([
+        this.db.student.count({
+          where: { workspaceId, deletedAt: null, droppedAt: null },
+        }),
+        this.db.student.findMany({
+          where: { workspaceId, deletedAt: null, droppedAt: null },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: 5,
+        }),
+        this.db.batch.findMany({
+          where: { workspaceId, deletedAt: null, closedAt: null },
+        }),
+        this.db.enrollment.findMany({
+          where: { workspaceId, deletedAt: null, endedAt: null },
+          select: {
+            id: true,
+            batchId: true,
+            feePlanAmountPaise: true,
+            feePlanConcessionPaise: true,
+          },
+        }),
+        this.db.feePayment.groupBy({
+          by: ["enrollmentId"],
+          where: { workspaceId, deletedAt: null },
+          _sum: { amountPaise: true },
+        }),
+      ]);
 
     const paidByEnrollment = new Map(
       payments.map((row) => [row.enrollmentId, row._sum.amountPaise ?? 0]),

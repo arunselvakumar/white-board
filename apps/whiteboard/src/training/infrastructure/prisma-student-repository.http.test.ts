@@ -39,9 +39,7 @@ describe("PrismaStudentRepository", () => {
     expect(loaded?.phone.value).toBe("9876543210");
     expect(loaded?.deletedAt).toBeNull();
 
-    expect(
-      await students.findByIdInWorkspace(id, otherWorkspaceId),
-    ).toBeNull();
+    expect(await students.findByIdInWorkspace(id, otherWorkspaceId)).toBeNull();
 
     loaded?.drop(UserId.create("user_2"), new Date("2026-09-12T14:00:00.000Z"));
     if (loaded == null) {

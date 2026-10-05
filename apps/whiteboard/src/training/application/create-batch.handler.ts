@@ -9,10 +9,7 @@ import type { CourseRepository } from "../domain/course-repository";
 import { UserId } from "../domain/user-id";
 import { WeeklyTimings } from "../domain/weekly-timings";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toBatchReadModel,
-  type BatchReadModel,
-} from "./batch-read-model";
+import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import type { CreateBatchCommand } from "./create-batch.command";
 import type { EventDispatcher } from "./event-dispatcher";
 import { CourseNotFoundError } from "./not-found-error";

@@ -1,10 +1,7 @@
 import { CourseId } from "../domain/course-id";
 import type { CourseRepository } from "../domain/course-repository";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toCourseReadModel,
-  type CourseReadModel,
-} from "./course-read-model";
+import { toCourseReadModel, type CourseReadModel } from "./course-read-model";
 import type { GetCourseQuery } from "./get-course.query";
 import { CourseNotFoundError } from "./not-found-error";
 

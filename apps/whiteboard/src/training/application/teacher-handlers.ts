@@ -2,9 +2,17 @@ import { DomainError } from "../domain/errors";
 import { Teacher } from "../domain/teacher";
 import type { TeacherRepository } from "../domain/teacher-repository";
 import type { RawTeacherDetails } from "../domain/teacher-details";
-import { decodeTeacherPhoto, type EncodedTeacherBinary } from "./teacher-binary";
+import {
+  decodeTeacherPhoto,
+  type EncodedTeacherBinary,
+} from "./teacher-binary";
 import { decodeTeacherDocument } from "./teacher-binary";
-import type { TeacherDocumentContent, TeacherDocumentKind, TeacherDocumentMetadata, TeacherDocumentRepository } from "../domain/teacher-document-repository";
+import type {
+  TeacherDocumentContent,
+  TeacherDocumentKind,
+  TeacherDocumentMetadata,
+  TeacherDocumentRepository,
+} from "../domain/teacher-document-repository";
 import { decodeListCursor, encodeListCursor } from "./list-cursor";
 import { TeacherNotFoundError } from "./not-found-error";
 
@@ -16,7 +24,13 @@ export type TeacherInviter = {
     email: string;
     previousInvitationId: string | null;
   }): Promise<string>;
-  removeAccess(input: { workspaceId: string; teacherId: string; clerkUserId: string | null; invitationId: string | null; userId: string }): Promise<void>;
+  removeAccess(input: {
+    workspaceId: string;
+    teacherId: string;
+    clerkUserId: string | null;
+    invitationId: string | null;
+    userId: string;
+  }): Promise<void>;
 };
 
 export class TeacherHandlers {
@@ -35,11 +49,15 @@ export class TeacherHandlers {
     phone?: string | null;
     qualificationSummary?: string | null;
     details?: RawTeacherDetails;
-    privateDetails?: { idNumber?: string | null; bankAccountNumber?: string | null };
+    privateDetails?: {
+      idNumber?: string | null;
+      bankAccountNumber?: string | null;
+    };
     photo?: EncodedTeacherBinary;
   }): Promise<Teacher> {
     const now = new Date();
-    const photo = command.photo == null ? null : await decodeTeacherPhoto(command.photo);
+    const photo =
+      command.photo == null ? null : await decodeTeacherPhoto(command.photo);
     const teacher = Teacher.create({
       id: crypto.randomUUID(),
       workspaceId: command.workspaceId,
@@ -53,7 +71,8 @@ export class TeacherHandlers {
       now,
     });
     if (photo != null) teacher.attachPhoto(photo.mimeType, now);
-    if (command.privateDetails != null) teacher.recordPrivateNumberMasks(command.privateDetails, now);
+    if (command.privateDetails != null)
+      teacher.recordPrivateNumberMasks(command.privateDetails, now);
     await this.teachers.create(teacher, {
       photoData: photo?.bytes,
       idNumber: command.privateDetails?.idNumber,
@@ -69,49 +88,113 @@ export class TeacherHandlers {
     return teacher;
   }
 
-  async getPhoto(id: string, workspaceId: string): Promise<{ mimeType: string; bytes: Uint8Array }> {
+  async getPhoto(
+    id: string,
+    workspaceId: string,
+  ): Promise<{ mimeType: string; bytes: Uint8Array }> {
     const photo = await this.teachers.findPhotoByIdInWorkspace(id, workspaceId);
     if (photo == null) throw new TeacherNotFoundError();
     return photo;
   }
 
-  async listDocuments(id: string, workspaceId: string): Promise<TeacherDocumentMetadata[]> {
+  async listDocuments(
+    id: string,
+    workspaceId: string,
+  ): Promise<TeacherDocumentMetadata[]> {
     await this.get(id, workspaceId);
     return this.documents.list(id, workspaceId);
   }
 
   async addDocument(command: {
-    teacherId: string; workspaceId: string; userId: string;
-    kind: TeacherDocumentKind; name: string; mimeType: string; dataBase64: string;
+    teacherId: string;
+    workspaceId: string;
+    userId: string;
+    kind: TeacherDocumentKind;
+    name: string;
+    mimeType: string;
+    dataBase64: string;
   }): Promise<TeacherDocumentMetadata> {
     const teacher = await this.get(command.teacherId, command.workspaceId);
-    if (!teacher.isActive) throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
+    if (!teacher.isActive)
+      throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
     const name = command.name.trim();
-    if (name.length === 0 || name.length > 200 || Array.from(name).some((character) => character === "/" || character === "\\" || character.charCodeAt(0) < 32)) {
-      throw new DomainError("TEACHER_DOCUMENT_NAME_INVALID", "Document name is invalid.");
+    if (
+      name.length === 0 ||
+      name.length > 200 ||
+      Array.from(name).some(
+        (character) =>
+          character === "/" ||
+          character === "\\" ||
+          character.charCodeAt(0) < 32,
+      )
+    ) {
+      throw new DomainError(
+        "TEACHER_DOCUMENT_NAME_INVALID",
+        "Document name is invalid.",
+      );
     }
-    const current = await this.documents.list(command.teacherId, command.workspaceId);
-    if (current.length >= 10) throw new DomainError("TEACHER_DOCUMENT_LIMIT", "A Teacher may have at most ten active documents.");
+    const current = await this.documents.list(
+      command.teacherId,
+      command.workspaceId,
+    );
+    if (current.length >= 10)
+      throw new DomainError(
+        "TEACHER_DOCUMENT_LIMIT",
+        "A Teacher may have at most ten active documents.",
+      );
     const file = await decodeTeacherDocument(command);
     const document: TeacherDocumentMetadata = {
-      id: crypto.randomUUID(), teacherId: teacher.id, kind: command.kind,
-      name, mimeType: file.mimeType, sizeBytes: file.bytes.length, uploadedAt: new Date(),
+      id: crypto.randomUUID(),
+      teacherId: teacher.id,
+      kind: command.kind,
+      name,
+      mimeType: file.mimeType,
+      sizeBytes: file.bytes.length,
+      uploadedAt: new Date(),
     };
-    await this.documents.create({ ...document, workspaceId: command.workspaceId, uploadedByUserId: command.userId, bytes: file.bytes });
+    await this.documents.create({
+      ...document,
+      workspaceId: command.workspaceId,
+      uploadedByUserId: command.userId,
+      bytes: file.bytes,
+    });
     return document;
   }
 
-  async getDocument(id: string, teacherId: string, workspaceId: string): Promise<TeacherDocumentContent> {
+  async getDocument(
+    id: string,
+    teacherId: string,
+    workspaceId: string,
+  ): Promise<TeacherDocumentContent> {
     await this.get(teacherId, workspaceId);
     const document = await this.documents.find(id, teacherId, workspaceId);
-    if (document == null) throw new DomainError("TEACHER_DOCUMENT_NOT_FOUND", "Teacher document was not found.");
+    if (document == null)
+      throw new DomainError(
+        "TEACHER_DOCUMENT_NOT_FOUND",
+        "Teacher document was not found.",
+      );
     return document;
   }
 
-  async removeDocument(id: string, teacherId: string, workspaceId: string, userId: string): Promise<void> {
+  async removeDocument(
+    id: string,
+    teacherId: string,
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
     await this.get(teacherId, workspaceId);
-    const removed = await this.documents.remove(id, teacherId, workspaceId, userId, new Date());
-    if (!removed) throw new DomainError("TEACHER_DOCUMENT_NOT_FOUND", "Teacher document was not found.");
+    const removed = await this.documents.remove(
+      id,
+      teacherId,
+      workspaceId,
+      userId,
+      new Date(),
+    );
+    if (!removed)
+      throw new DomainError(
+        "TEACHER_DOCUMENT_NOT_FOUND",
+        "Teacher document was not found.",
+      );
   }
 
   async list(query: {
@@ -125,8 +208,14 @@ export class TeacherHandlers {
     nextCursor: string | null;
     prevCursor: string | null;
   }> {
-    const after = query.after == null ? undefined : decodeListCursor(query.after, (id) => ({ value: id }));
-    const before = query.before == null ? undefined : decodeListCursor(query.before, (id) => ({ value: id }));
+    const after =
+      query.after == null
+        ? undefined
+        : decodeListCursor(query.after, (id) => ({ value: id }));
+    const before =
+      query.before == null
+        ? undefined
+        : decodeListCursor(query.before, (id) => ({ value: id }));
     const page = await this.teachers.listInWorkspace({
       workspaceId: query.workspaceId,
       limit: query.limit,
@@ -138,10 +227,21 @@ export class TeacherHandlers {
     return {
       items: page.items,
       total: page.total,
-      nextCursor: last != null && (query.before != null || page.hasMore)
-        ? encodeListCursor({ createdAt: last.createdAt, id: { value: last.id } }) : null,
-      prevCursor: first != null && (query.after != null || (query.before != null && page.hasMore))
-        ? encodeListCursor({ createdAt: first.createdAt, id: { value: first.id } }) : null,
+      nextCursor:
+        last != null && (query.before != null || page.hasMore)
+          ? encodeListCursor({
+              createdAt: last.createdAt,
+              id: { value: last.id },
+            })
+          : null,
+      prevCursor:
+        first != null &&
+        (query.after != null || (query.before != null && page.hasMore))
+          ? encodeListCursor({
+              createdAt: first.createdAt,
+              id: { value: first.id },
+            })
+          : null,
     };
   }
 
@@ -153,15 +253,20 @@ export class TeacherHandlers {
     phone?: string | null;
     qualificationSummary?: string | null;
     details?: RawTeacherDetails;
-    privateDetails?: { idNumber?: string | null; bankAccountNumber?: string | null };
+    privateDetails?: {
+      idNumber?: string | null;
+      bankAccountNumber?: string | null;
+    };
     photo?: EncodedTeacherBinary;
   }): Promise<Teacher> {
     const teacher = await this.get(command.id, command.workspaceId);
     const now = new Date();
-    const photo = command.photo == null ? null : await decodeTeacherPhoto(command.photo);
+    const photo =
+      command.photo == null ? null : await decodeTeacherPhoto(command.photo);
     teacher.updateProfile({ ...command, now });
     if (photo != null) teacher.attachPhoto(photo.mimeType, now);
-    if (command.privateDetails != null) teacher.recordPrivateNumberMasks(command.privateDetails, now);
+    if (command.privateDetails != null)
+      teacher.recordPrivateNumberMasks(command.privateDetails, now);
     await this.teachers.save(teacher, {
       photoData: photo?.bytes,
       idNumber: command.privateDetails?.idNumber,
@@ -170,10 +275,19 @@ export class TeacherHandlers {
     return teacher;
   }
 
-  async invite(command: { id: string; workspaceId: string; userId: string }): Promise<Teacher> {
+  async invite(command: {
+    id: string;
+    workspaceId: string;
+    userId: string;
+  }): Promise<Teacher> {
     const teacher = await this.get(command.id, command.workspaceId);
-    if (!teacher.isActive) throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
-    if (teacher.clerkUserId != null) throw new DomainError("TEACHER_ALREADY_ACTIVE", "Teacher has already joined.");
+    if (!teacher.isActive)
+      throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
+    if (teacher.clerkUserId != null)
+      throw new DomainError(
+        "TEACHER_ALREADY_ACTIVE",
+        "Teacher has already joined.",
+      );
     await this.sendInvitation(teacher, command.userId);
     return teacher;
   }
@@ -189,9 +303,14 @@ export class TeacherHandlers {
     return teacher;
   }
 
-  async deactivate(command: { id: string; workspaceId: string; userId: string }): Promise<Teacher> {
+  async deactivate(command: {
+    id: string;
+    workspaceId: string;
+    userId: string;
+  }): Promise<Teacher> {
     const teacher = await this.get(command.id, command.workspaceId);
-    if (!teacher.isActive) throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
+    if (!teacher.isActive)
+      throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
     await this.invitations.removeAccess({
       workspaceId: command.workspaceId,
       teacherId: teacher.id,
@@ -204,7 +323,10 @@ export class TeacherHandlers {
     return teacher;
   }
 
-  private async sendInvitation(teacher: Teacher, inviterUserId: string): Promise<void> {
+  private async sendInvitation(
+    teacher: Teacher,
+    inviterUserId: string,
+  ): Promise<void> {
     try {
       const invitationId = await this.invitations.send({
         teacherId: teacher.id,
@@ -215,7 +337,11 @@ export class TeacherHandlers {
       });
       teacher.markInvited(invitationId, new Date());
     } catch (error) {
-      console.error("Teacher invitation failed", { teacherId: teacher.id }, error);
+      console.error(
+        "Teacher invitation failed",
+        { teacherId: teacher.id },
+        error,
+      );
       teacher.markInvitationFailed(new Date());
     }
     await this.teachers.save(teacher);

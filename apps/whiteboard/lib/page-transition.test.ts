@@ -26,9 +26,9 @@ function click(
 
 describe("pageTransitionHref", () => {
   it("returns the router path without the /app base path", () => {
-    expect(
-      pageTransitionHref(click("http://localhost:3000/app/signup")),
-    ).toBe("/signup");
+    expect(pageTransitionHref(click("http://localhost:3000/app/signup"))).toBe(
+      "/signup",
+    );
     expect(
       pageTransitionHref(
         click("http://localhost:3000/app/students/abc?tab=fees#dues"),

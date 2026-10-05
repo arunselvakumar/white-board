@@ -8,14 +8,30 @@ import { createCalendarScheduleReader } from "@/src/training/infrastructure/crea
 export const dynamic = "force-dynamic";
 
 const query = createCalendarScheduleReader();
-const roles = new Set<CalendarRole>(["org:admin", "org:teacher", "org:student", "org:parent"]);
+const roles = new Set<CalendarRole>([
+  "org:admin",
+  "org:teacher",
+  "org:student",
+  "org:parent",
+]);
 
 export async function GET(): Promise<Response> {
   try {
     const { userId, orgId, orgRole } = await auth();
-    if (userId == null) return jsonError(401, "UNAUTHENTICATED", "Authentication required.");
-    if (orgId == null) return jsonError(403, "NO_ACTIVE_WORKSPACE", "An active Workspace is required.");
-    if (!roles.has(orgRole as CalendarRole)) return jsonError(403, "FORBIDDEN", "Calendar access is not available for this role.");
+    if (userId == null)
+      return jsonError(401, "UNAUTHENTICATED", "Authentication required.");
+    if (orgId == null)
+      return jsonError(
+        403,
+        "NO_ACTIVE_WORKSPACE",
+        "An active Workspace is required.",
+      );
+    if (!roles.has(orgRole as CalendarRole))
+      return jsonError(
+        403,
+        "FORBIDDEN",
+        "Calendar access is not available for this role.",
+      );
 
     let verifiedEmails: string[] | undefined;
     if (orgRole === "org:student" || orgRole === "org:parent") {
@@ -25,7 +41,12 @@ export async function GET(): Promise<Response> {
         .filter((email) => email.verification?.status === "verified")
         .map((email) => email.emailAddress);
     }
-    const items = await query.execute({ workspaceId: orgId, userId, role: orgRole as CalendarRole, verifiedEmails });
+    const items = await query.execute({
+      workspaceId: orgId,
+      userId,
+      role: orgRole as CalendarRole,
+      verifiedEmails,
+    });
     return Response.json({ items });
   } catch (error) {
     return mapError(error);

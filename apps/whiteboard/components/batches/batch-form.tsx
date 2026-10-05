@@ -24,7 +24,11 @@ import type { BatchResponse, BatchWriteInput } from "@/src/queries/batches";
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 function isHttpsUrl(value: string): boolean {
-  try { return new URL(value).protocol === "https:"; } catch { return false; }
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 const batchFormSchema = z
@@ -59,8 +63,17 @@ const batchFormSchema = z
       .min(1, "Batch Timings need at least one weekly slot"),
   })
   .superRefine((value, ctx) => {
-    if (value.classMode !== "offline" && value.meetingOption === "external" && value.joinUrl.trim().length > 0) {
-      if (!isHttpsUrl(value.joinUrl)) ctx.addIssue({ code: "custom", path: ["joinUrl"], message: "Join URL must be an HTTPS link" });
+    if (
+      value.classMode !== "offline" &&
+      value.meetingOption === "external" &&
+      value.joinUrl.trim().length > 0
+    ) {
+      if (!isHttpsUrl(value.joinUrl))
+        ctx.addIssue({
+          code: "custom",
+          path: ["joinUrl"],
+          message: "Join URL must be an HTTPS link",
+        });
     }
     value.timings.forEach((slot, index) => {
       if (slot.startTime >= slot.endTime) {
@@ -107,8 +120,12 @@ export function batchFormToWriteInput(
     classMode: values.classMode,
     capacity: Number(values.capacity),
     room: emptyToNull(values.room),
-    joinUrl: values.classMode === "offline" || values.meetingOption === "whiteboard" ? null : emptyToNull(values.joinUrl),
-    meetingOption: values.classMode === "offline" ? "external" : values.meetingOption,
+    joinUrl:
+      values.classMode === "offline" || values.meetingOption === "whiteboard"
+        ? null
+        : emptyToNull(values.joinUrl),
+    meetingOption:
+      values.classMode === "offline" ? "external" : values.meetingOption,
     timings: values.timings.map((slot) => ({
       daysOfWeek: [...slot.daysOfWeek],
       startTime: slot.startTime,
@@ -289,20 +306,52 @@ export function BatchForm({
           />
           <FieldError message={errors.room?.message} />
         </div>
-        {classMode !== "offline" && <div className="space-y-1.5">
-          <Label htmlFor="meetingOption">Online meeting</Label>
-          <Controller name="meetingOption" control={control} render={({ field }) => <Select
-            items={[{ value: "external", label: "External link" }, { value: "whiteboard", label: "Whiteboard class" }]}
-            value={field.value}
-            onValueChange={(value) => { if (value != null) field.onChange(value); }}
-          ><SelectTrigger id="meetingOption" size="lg" className="w-full min-w-0"><SelectValue /></SelectTrigger><SelectContent align="start" alignItemWithTrigger={false}><SelectItem value="external">External link</SelectItem><SelectItem value="whiteboard">Whiteboard class</SelectItem></SelectContent></Select>} />
-          <FieldError message={errors.meetingOption?.message} />
-        </div>}
-        {classMode !== "offline" && meetingOption === "external" && <div className="space-y-1.5">
-          <Label htmlFor="joinUrl">Join URL</Label>
-          <Input id="joinUrl" className="h-10" autoComplete="off" {...register("joinUrl")} />
-          <FieldError message={errors.joinUrl?.message} />
-        </div>}
+        {classMode !== "offline" && (
+          <div className="space-y-1.5">
+            <Label htmlFor="meetingOption">Online meeting</Label>
+            <Controller
+              name="meetingOption"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  items={[
+                    { value: "external", label: "External link" },
+                    { value: "whiteboard", label: "Whiteboard class" },
+                  ]}
+                  value={field.value}
+                  onValueChange={(value) => {
+                    if (value != null) field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="meetingOption"
+                    size="lg"
+                    className="w-full min-w-0"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="start" alignItemWithTrigger={false}>
+                    <SelectItem value="external">External link</SelectItem>
+                    <SelectItem value="whiteboard">Whiteboard class</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError message={errors.meetingOption?.message} />
+          </div>
+        )}
+        {classMode !== "offline" && meetingOption === "external" && (
+          <div className="space-y-1.5">
+            <Label htmlFor="joinUrl">Join URL</Label>
+            <Input
+              id="joinUrl"
+              className="h-10"
+              autoComplete="off"
+              {...register("joinUrl")}
+            />
+            <FieldError message={errors.joinUrl?.message} />
+          </div>
+        )}
       </div>
       <div className="space-y-3">
         <Label>Timings</Label>

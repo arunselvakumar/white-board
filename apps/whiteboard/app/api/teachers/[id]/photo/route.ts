@@ -5,11 +5,16 @@ import { TeacherParamsModel } from "../teacher-params-model";
 
 const handlers = createTeacherHandlers();
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function GET(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id } = parseOrThrow(TeacherParamsModel.safeParse(await context.params));
+    const { id } = parseOrThrow(
+      TeacherParamsModel.safeParse(await context.params),
+    );
     const photo = await handlers.getPhoto(id, session.orgId);
     return new Response(Buffer.from(photo.bytes), {
       headers: {

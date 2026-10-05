@@ -5,5 +5,8 @@ import { PrismaTeacherAssignmentRepository } from "./prisma-teacher-assignment-r
 import { PrismaTeacherRepository } from "./prisma-teacher-repository";
 
 export function createTeacherAssignmentHandlers(): TeacherAssignmentHandlers {
-  return new TeacherAssignmentHandlers(new PrismaTeacherRepository(prisma), new PrismaTeacherAssignmentRepository(prisma));
+  return new TeacherAssignmentHandlers(
+    new PrismaTeacherRepository(prisma),
+    new PrismaTeacherAssignmentRepository(prisma),
+  );
 }

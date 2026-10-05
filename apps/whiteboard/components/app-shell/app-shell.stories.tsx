@@ -83,10 +83,9 @@ export const StudentNavigation: Story = {
       "href",
       "/calendar",
     );
-    await expect(nav.getByRole("link", { name: "Online Classes" })).toHaveAttribute(
-      "href",
-      "/online-classes",
-    );
+    await expect(
+      nav.getByRole("link", { name: "Online Classes" }),
+    ).toHaveAttribute("href", "/online-classes");
     await expect(canvas.getByText("Hello world")).toBeVisible();
   },
 };
@@ -117,10 +116,9 @@ export const ParentNavigation: Story = {
       "href",
       "/calendar",
     );
-    await expect(nav.getByRole("link", { name: "Online Classes" })).toHaveAttribute(
-      "href",
-      "/online-classes",
-    );
+    await expect(
+      nav.getByRole("link", { name: "Online Classes" }),
+    ).toHaveAttribute("href", "/online-classes");
     await expect(canvas.getByText("Hello world")).toBeVisible();
   },
 };

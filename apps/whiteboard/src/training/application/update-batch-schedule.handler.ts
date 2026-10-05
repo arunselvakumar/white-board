@@ -6,10 +6,7 @@ import { Capacity } from "../domain/capacity";
 import { ClassMode } from "../domain/class-mode";
 import { WeeklyTimings } from "../domain/weekly-timings";
 import { WorkspaceId } from "../domain/workspace-id";
-import {
-  toBatchReadModel,
-  type BatchReadModel,
-} from "./batch-read-model";
+import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import type { EventDispatcher } from "./event-dispatcher";
 import { BatchNotFoundError } from "./not-found-error";
 import type { UpdateBatchScheduleCommand } from "./update-batch-schedule.command";
@@ -20,9 +17,7 @@ export class UpdateBatchScheduleHandler {
     private readonly events: EventDispatcher,
   ) {}
 
-  async execute(
-    command: UpdateBatchScheduleCommand,
-  ): Promise<BatchReadModel> {
+  async execute(command: UpdateBatchScheduleCommand): Promise<BatchReadModel> {
     const batch = await this.batches.findByIdInWorkspace(
       BatchId.create(command.id),
       WorkspaceId.create(command.workspaceId),

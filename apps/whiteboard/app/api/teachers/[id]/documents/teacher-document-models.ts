@@ -18,10 +18,17 @@ export const TeacherDocumentMetadataModel = z.object({
   uploadedAt: z.iso.datetime(),
 });
 
-export const ListTeacherDocumentsResponseModel = z.object({ items: z.array(TeacherDocumentMetadataModel) });
-export const TeacherDocumentParamsModel = z.object({ id: z.uuid(), documentId: z.uuid() });
+export const ListTeacherDocumentsResponseModel = z.object({
+  items: z.array(TeacherDocumentMetadataModel),
+});
+export const TeacherDocumentParamsModel = z.object({
+  id: z.uuid(),
+  documentId: z.uuid(),
+});
 export const RemoveTeacherDocumentResponseModel = z.object({ id: z.uuid() });
 
-export function mapTeacherDocumentMetadata(document: TeacherDocumentMetadata): z.infer<typeof TeacherDocumentMetadataModel> {
+export function mapTeacherDocumentMetadata(
+  document: TeacherDocumentMetadata,
+): z.infer<typeof TeacherDocumentMetadataModel> {
   return { ...document, uploadedAt: document.uploadedAt.toISOString() };
 }

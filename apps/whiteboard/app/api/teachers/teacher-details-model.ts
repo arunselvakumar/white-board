@@ -29,7 +29,12 @@ export const TeacherDetailsResponseModel = z.object({
   startDate: z.iso.date().nullable(),
   availability: z.array(WeeklySlot),
   idProofType: z.string().nullable(),
-  backgroundCheckStatus: z.enum(["not_checked", "pending", "completed", "needs_review"]),
+  backgroundCheckStatus: z.enum([
+    "not_checked",
+    "pending",
+    "completed",
+    "needs_review",
+  ]),
   backgroundCheckDate: z.iso.date().nullable(),
   backgroundCheckNote: z.string().nullable(),
   payBasis: z.enum(["monthly", "hourly", "per_batch"]).nullable(),

@@ -47,7 +47,12 @@ function parseSlot(raw: unknown): WeeklySlot {
     );
   }
   const daysOfWeek = record.daysOfWeek.map((day) => {
-    if (typeof day !== "number" || !Number.isInteger(day) || day < 0 || day > 6) {
+    if (
+      typeof day !== "number" ||
+      !Number.isInteger(day) ||
+      day < 0 ||
+      day > 6
+    ) {
       throw new DomainError(
         "TIMINGS_INVALID",
         "Days of week must be 0 (Sunday) through 6 (Saturday).",

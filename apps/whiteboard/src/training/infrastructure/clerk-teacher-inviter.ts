@@ -23,18 +23,29 @@ export class ClerkTeacherInviter implements TeacherInviter {
     return invitation.id;
   }
 
-  async removeAccess(input: Parameters<TeacherInviter["removeAccess"]>[0]): Promise<void> {
+  async removeAccess(
+    input: Parameters<TeacherInviter["removeAccess"]>[0],
+  ): Promise<void> {
     const clerk = await clerkClient();
     const memberIds = new Set<string>();
     if (input.clerkUserId != null) memberIds.add(input.clerkUserId);
     let offset = 0;
     let pageSize = 100;
     while (pageSize === 100) {
-      const page = await clerk.organizations.getOrganizationMembershipList({ organizationId: input.workspaceId, limit: 100, offset });
+      const page = await clerk.organizations.getOrganizationMembershipList({
+        organizationId: input.workspaceId,
+        limit: 100,
+        offset,
+      });
       for (const membership of page.data) {
-        if (membership.role !== "org:teacher" || membership.publicMetadata["teacherId"] !== input.teacherId) continue;
+        if (
+          membership.role !== "org:teacher" ||
+          membership.publicMetadata["teacherId"] !== input.teacherId
+        )
+          continue;
         const userId = membership.publicUserData?.userId;
-        if (userId == null) throw new Error("Teacher membership has no Clerk User ID.");
+        if (userId == null)
+          throw new Error("Teacher membership has no Clerk User ID.");
         memberIds.add(userId);
       }
       pageSize = page.data.length;
@@ -42,7 +53,10 @@ export class ClerkTeacherInviter implements TeacherInviter {
     }
     for (const userId of memberIds) {
       try {
-        await clerk.organizations.deleteOrganizationMembership({ organizationId: input.workspaceId, userId });
+        await clerk.organizations.deleteOrganizationMembership({
+          organizationId: input.workspaceId,
+          userId,
+        });
       } catch (error) {
         if (!isClerkNotFound(error)) throw error;
       }
@@ -50,7 +64,10 @@ export class ClerkTeacherInviter implements TeacherInviter {
     if (input.invitationId == null) return;
     let status: string | undefined;
     try {
-      const invitation = await clerk.organizations.getOrganizationInvitation({ organizationId: input.workspaceId, invitationId: input.invitationId });
+      const invitation = await clerk.organizations.getOrganizationInvitation({
+        organizationId: input.workspaceId,
+        invitationId: input.invitationId,
+      });
       status = invitation.status;
     } catch (error) {
       if (isClerkNotFound(error)) return;
@@ -71,5 +88,10 @@ export class ClerkTeacherInviter implements TeacherInviter {
 }
 
 function isClerkNotFound(error: unknown): boolean {
-  return typeof error === "object" && error != null && "status" in error && error.status === 404;
+  return (
+    typeof error === "object" &&
+    error != null &&
+    "status" in error &&
+    error.status === 404
+  );
 }

@@ -7,12 +7,29 @@ import { UpdateTeacherProfileRequestModel } from "./update-teacher-profile-reque
 
 const handlers = createTeacherHandlers();
 
-export async function POST(request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const session = await requireSession();
     if (isResponse(session)) return session;
-    const { id } = parseOrThrow(TeacherParamsModel.safeParse(await context.params));
-    const model = parseOrThrow(UpdateTeacherProfileRequestModel.safeParse(await request.json()));
-    return Response.json(mapTeacherResponse(await handlers.updateProfile({ ...model, id, workspaceId: session.orgId })));
-  } catch (error) { return mapError(error); }
+    const { id } = parseOrThrow(
+      TeacherParamsModel.safeParse(await context.params),
+    );
+    const model = parseOrThrow(
+      UpdateTeacherProfileRequestModel.safeParse(await request.json()),
+    );
+    return Response.json(
+      mapTeacherResponse(
+        await handlers.updateProfile({
+          ...model,
+          id,
+          workspaceId: session.orgId,
+        }),
+      ),
+    );
+  } catch (error) {
+    return mapError(error);
+  }
 }

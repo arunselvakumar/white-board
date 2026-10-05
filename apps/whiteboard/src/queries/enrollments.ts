@@ -102,9 +102,7 @@ export const enrollmentQueries = {
     }),
 };
 
-export function enrollStudent(
-  input: EnrollInput,
-): Promise<EnrollmentResponse> {
+export function enrollStudent(input: EnrollInput): Promise<EnrollmentResponse> {
   return apiJson<EnrollmentResponse>("/api/enrollments", {
     method: "POST",
     headers: jsonHeaders,

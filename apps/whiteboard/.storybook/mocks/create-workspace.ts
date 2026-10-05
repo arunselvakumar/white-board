@@ -11,12 +11,13 @@ type CreateWorkspaceInput = {
   institutionType: AvailableInstitutionType;
 };
 
-const succeed = (_input: CreateWorkspaceInput): Promise<CreateWorkspaceResult> =>
+const succeed = (
+  _input: CreateWorkspaceInput,
+): Promise<CreateWorkspaceResult> =>
   Promise.resolve({ ok: true, id: "org_new" });
 
-export const createWorkspace = fn<CreateWorkspaceFn>(succeed).mockName(
-  "createWorkspace",
-);
+export const createWorkspace =
+  fn<CreateWorkspaceFn>(succeed).mockName("createWorkspace");
 
 export function resetCreateWorkspaceMock(): void {
   createWorkspace.mockReset();

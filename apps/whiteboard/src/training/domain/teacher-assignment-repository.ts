@@ -10,8 +10,21 @@ export type AssignedBatch = {
 };
 
 export type TeacherAssignmentRepository = {
-  batchStatus(batchId: string, workspaceId: string): Promise<"open" | "closed" | "missing">;
-  assign(input: { teacherId: string; batchId: string; workspaceId: string; userId: string }): Promise<void>;
-  unassign(input: { teacherId: string; batchId: string; workspaceId: string; userId: string }): Promise<boolean>;
+  batchStatus(
+    batchId: string,
+    workspaceId: string,
+  ): Promise<"open" | "closed" | "missing">;
+  assign(input: {
+    teacherId: string;
+    batchId: string;
+    workspaceId: string;
+    userId: string;
+  }): Promise<void>;
+  unassign(input: {
+    teacherId: string;
+    batchId: string;
+    workspaceId: string;
+    userId: string;
+  }): Promise<boolean>;
   listActive(teacherId: string, workspaceId: string): Promise<AssignedBatch[]>;
 };
