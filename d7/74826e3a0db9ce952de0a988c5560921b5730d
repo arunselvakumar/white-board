@@ -1,0 +1,367 @@
+.grok/skills/modular-monolith/SKILL.md
+  s_9099fee0038e5a::t_ec7045bd17b917 40
+.grok/skills/tanstack-query/SKILL.md
+  s_9099fee0038e5a::t_2e2ccfa7c323a3 44-46,52-53
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_9099fee0038e5a::t_fa20b49f13f703 7-12,15,31-41,46-56,61-91,96-106,111-112,114,117-139,148-156,165-173,180-194,196-235
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_9099fee0038e5a::t_8f4240f2875a79 2,4-7,9-12,14-17,19-87,89-94,96-99,101-107,109-112,115-1009
+apps/whiteboard/app/api/_lib/openapi.ts
+  s_9099fee0038e5a::t_a29b669abd57e1 46,67-76,95,109,170,172-182,185-193,199,210,226,229
+apps/whiteboard/app/api/training-institute/attendance/attendance.http.test.ts
+  s_9099fee0038e5a::t_a3c36af2f2ab88 51,152,164,178,205-209,225-229,236-238,277-279,308,315-317,346-348,383,406,424,458-462,565,574,582,590,604
+apps/whiteboard/app/api/training-institute/attendance/registers/[id]/marks/route.ts
+  s_9099fee0038e5a::t_f7ab89eee6d3e0 4,6,8,20-22,25-27
+apps/whiteboard/app/api/training-institute/attendance/registers/[id]/marks/save-attendance-marks-request-model.ts
+  s_9099fee0038e5a::t_70497dc27d0590 3
+apps/whiteboard/app/api/training-institute/attendance/registers/[id]/route.ts
+  s_9099fee0038e5a::t_1427b606282a68 5,19-21
+apps/whiteboard/app/api/training-institute/attendance/registers/attendance-models.ts
+  s_9099fee0038e5a::t_0cb645f5c7eaf0 5,9,19-22,32,42,49-50,52-53,61
+apps/whiteboard/app/api/training-institute/attendance/registers/route.ts
+  s_9099fee0038e5a::t_b689987b8fdab8 5,7,17-19,36
+apps/whiteboard/app/api/training-institute/batches/[id]/close/route.ts
+  s_9099fee0038e5a::t_14cf4804a42044 5,24-26
+apps/whiteboard/app/api/training-institute/batches/[id]/route.ts
+  s_9099fee0038e5a::t_fcfde9a584dfa1 5,24-26
+apps/whiteboard/app/api/training-institute/batches/[id]/schedule/route.ts
+  s_9099fee0038e5a::t_e6dc78c7d1597b 6-7,26,29-31
+apps/whiteboard/app/api/training-institute/batches/batch-response-fields.ts
+  s_9099fee0038e5a::t_7e384ad789ba0b 3,14
+apps/whiteboard/app/api/training-institute/batches/batches.http.test.ts
+  s_9099fee0038e5a::t_7c2fec80e165cb 8,60-65,71,79,87,100,126-128,136-138,144-149,158-163,172,184,204,216,218-223,227,245,258,275-277,283-297
+apps/whiteboard/app/api/training-institute/batches/close-batch-request-model.ts
+  s_9099fee0038e5a::t_f1de8464c41cce 3,6-8
+apps/whiteboard/app/api/training-institute/batches/close-batch-response-model.ts
+  s_9099fee0038e5a::t_4f987ca46ee0a7 5-9
+apps/whiteboard/app/api/training-institute/batches/create-batch-request-model.ts
+  s_9099fee0038e5a::t_936bce56157875 3-4,6,12,14,17-19
+apps/whiteboard/app/api/training-institute/batches/create-batch-response-model.ts
+  s_9099fee0038e5a::t_355e105efd59b9 5-9
+apps/whiteboard/app/api/training-institute/batches/get-batch-request-model.ts
+  s_9099fee0038e5a::t_e7dc4a042cb8bd 3-5
+apps/whiteboard/app/api/training-institute/batches/get-batch-response-model.ts
+  s_9099fee0038e5a::t_ca6d1df536938d 5-8
+apps/whiteboard/app/api/training-institute/batches/join-url-model.ts
+  s_9099fee0038e5a::t_db7b1d3396949f 3
+apps/whiteboard/app/api/training-institute/batches/list-batches-request-model.ts
+  s_9099fee0038e5a::t_0c5e379aa2999b 3,15-17
+apps/whiteboard/app/api/training-institute/batches/list-batches-response-model.ts
+  s_9099fee0038e5a::t_09269f62fd32fe 5,12-14
+apps/whiteboard/app/api/training-institute/batches/route.ts
+  s_9099fee0038e5a::t_08deb58db85fe2 7-8,22-24,46
+apps/whiteboard/app/api/training-institute/batches/timing-slot-model.ts
+  s_9099fee0038e5a::t_8a1ed21ff6aca9 3
+apps/whiteboard/app/api/training-institute/batches/update-batch-schedule-params-model.ts
+  s_9099fee0038e5a::t_4367953d62fa42 1-8
+apps/whiteboard/app/api/training-institute/batches/update-batch-schedule-request-model.ts
+  s_9099fee0038e5a::t_b61d8819fbeb57 3-4,6,11,13,16-17
+apps/whiteboard/app/api/training-institute/batches/update-batch-schedule-response-model.ts
+  s_9099fee0038e5a::t_5639a4309d9415 5-9
+apps/whiteboard/app/api/training-institute/calendar/calendar-response-model.ts
+  s_9099fee0038e5a::t_0d7f392ca6b3bb 3-4,6,28-31
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/cancel/route.ts
+  s_9099fee0038e5a::t_95d4d98488507f 3-5,17-19,21
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/join/route.ts
+  s_9099fee0038e5a::t_69052dd8e43d6c 5
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/move/route.ts
+  s_9099fee0038e5a::t_245fe42960ade7 3-5,17-19,21
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/recording/route.ts
+  s_9099fee0038e5a::t_8721c9d51a9273 5
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/restore/route.ts
+  s_9099fee0038e5a::t_aa38f69e7feaf6 5-6,18-20
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/route.ts
+  s_9099fee0038e5a::t_38777d73d2a308 5
+apps/whiteboard/app/api/training-institute/classes/[batchId]/[date]/[startTime]/start/route.ts
+  s_9099fee0038e5a::t_0831a309cc16f4 5
+apps/whiteboard/app/api/training-institute/classes/class-change-models.ts
+  s_9099fee0038e5a::t_ed7176691aedb4 6,12-14,16-17,19,27
+apps/whiteboard/app/api/training-institute/classes/class-models.ts
+  s_9099fee0038e5a::t_4154e4d14e1483 3,9,47-49
+apps/whiteboard/app/api/training-institute/classes/class-route.ts
+  s_9099fee0038e5a::t_36c6e95e6cb413 8,40
+apps/whiteboard/app/api/training-institute/classes/classes.http.test.ts
+  s_9099fee0038e5a::t_99af3b4357f6c5 38-42,131-133
+apps/whiteboard/app/api/training-institute/courses/[id]/archive/route.ts
+  s_9099fee0038e5a::t_a205d93291c128 5,26-28
+apps/whiteboard/app/api/training-institute/courses/[id]/route.ts
+  s_9099fee0038e5a::t_bc001260cb62f5 5,26-28
+apps/whiteboard/app/api/training-institute/courses/[id]/update/route.ts
+  s_9099fee0038e5a::t_fa28e3f05b860b 6-7,27-29,31-33
+apps/whiteboard/app/api/training-institute/courses/archive-course-request-model.ts
+  s_9099fee0038e5a::t_d2cecca074238c 1-9
+apps/whiteboard/app/api/training-institute/courses/archive-course-response-model.ts
+  s_9099fee0038e5a::t_7b79e84f85fcd3 5-6,8-9
+apps/whiteboard/app/api/training-institute/courses/courses.http.test.ts
+  s_9099fee0038e5a::t_9821e891c9df07 69,99-113,128,138,156,171,217,227,236-254,266-271,280-285,293-295,305-307,323-325,335,345,352-354,359-361
+apps/whiteboard/app/api/training-institute/courses/create-course-request-model.ts
+  s_9099fee0038e5a::t_036a2f872a0cf5 4-5,7-9
+apps/whiteboard/app/api/training-institute/courses/create-course-response-model.ts
+  s_9099fee0038e5a::t_8144d60ece6ec4 5-6,8-9
+apps/whiteboard/app/api/training-institute/courses/get-course-request-model.ts
+  s_9099fee0038e5a::t_d4c256cf39c014 3,7-8
+apps/whiteboard/app/api/training-institute/courses/get-course-response-model.ts
+  s_9099fee0038e5a::t_c687e90bc2f899 5-6,8-9
+apps/whiteboard/app/api/training-institute/courses/list-course-item-response-model.ts
+  s_9099fee0038e5a::t_0b0da3e30362c1 1-10
+apps/whiteboard/app/api/training-institute/courses/list-courses-request-model.ts
+  s_9099fee0038e5a::t_b2c8d370b79714 3,14-16
+apps/whiteboard/app/api/training-institute/courses/list-courses-response-model.ts
+  s_9099fee0038e5a::t_81319f3109e5a6 3,5-6,12-13
+apps/whiteboard/app/api/training-institute/courses/route.ts
+  s_9099fee0038e5a::t_063310e97d7be7 7-8,22-24,55
+apps/whiteboard/app/api/training-institute/courses/update-course-params-model.ts
+  s_9099fee0038e5a::t_f310b6256884eb 3,7-9
+apps/whiteboard/app/api/training-institute/courses/update-course-request-model.ts
+  s_9099fee0038e5a::t_ef5dfe7cf89ae4 4-5,7-9
+apps/whiteboard/app/api/training-institute/courses/update-course-response-model.ts
+  s_9099fee0038e5a::t_0ab7aaec2b7616 5-6,8-9
+apps/whiteboard/app/api/training-institute/dashboard/dashboard.http.test.ts
+  s_9099fee0038e5a::t_777ac657597f7a 7-8,54,74,85-90
+apps/whiteboard/app/api/training-institute/dashboard/get-owner-dashboard-response-model.ts
+  s_9099fee0038e5a::t_0b2ff6885b1d00 3,5,16,35-36
+apps/whiteboard/app/api/training-institute/enrollments/[id]/end/route.ts
+  s_9099fee0038e5a::t_1541f70eacc401 5,24-26
+apps/whiteboard/app/api/training-institute/enrollments/[id]/fee-plan/route.ts
+  s_9099fee0038e5a::t_eaaa84de3377a4 5-6,25-27,29-31
+apps/whiteboard/app/api/training-institute/enrollments/[id]/mode/route.ts
+  s_9099fee0038e5a::t_11a6af11c8be14 6-7,26,30
+apps/whiteboard/app/api/training-institute/enrollments/[id]/move/route.ts
+  s_9099fee0038e5a::t_3f56e00edb8151 6-7,25-27,29-31
+apps/whiteboard/app/api/training-institute/enrollments/[id]/payments/route.ts
+  s_9099fee0038e5a::t_5c9c6e360112a2 7-8,10-11,29-31,33-35,62-64,67
+apps/whiteboard/app/api/training-institute/enrollments/[id]/route.ts
+  s_9099fee0038e5a::t_7e248a69f583a9 5,24-26
+apps/whiteboard/app/api/training-institute/enrollments/[id]/timings/route.ts
+  s_9099fee0038e5a::t_3b957876c44c63 6-7,26,30
+apps/whiteboard/app/api/training-institute/enrollments/adjust-fee-plan-params-model.ts
+  s_9099fee0038e5a::t_b26eebb3673525 1-8
+apps/whiteboard/app/api/training-institute/enrollments/adjust-fee-plan-request-model.ts
+  s_9099fee0038e5a::t_b4b97abb07884c 3,5,10,12-13
+apps/whiteboard/app/api/training-institute/enrollments/adjust-fee-plan-response-model.ts
+  s_9099fee0038e5a::t_713a3855a69762 5,8-9
+apps/whiteboard/app/api/training-institute/enrollments/create-enrollment-request-model.ts
+  s_9099fee0038e5a::t_0381fd7aa3225c 3,5,13,16-17
+apps/whiteboard/app/api/training-institute/enrollments/create-enrollment-response-model.ts
+  s_9099fee0038e5a::t_4f7b112ddda247 5-9
+apps/whiteboard/app/api/training-institute/enrollments/due-date-model.ts
+  s_9099fee0038e5a::t_7ff67616925f7e 3
+apps/whiteboard/app/api/training-institute/enrollments/end-enrollment-request-model.ts
+  s_9099fee0038e5a::t_05a5ac23ea7e57 1-8
+apps/whiteboard/app/api/training-institute/enrollments/end-enrollment-response-model.ts
+  s_9099fee0038e5a::t_d6b69d3a194c8e 5,8-9
+apps/whiteboard/app/api/training-institute/enrollments/enrollment-response-fields.ts
+  s_9099fee0038e5a::t_1a00eb53984276 3,5,14,20
+apps/whiteboard/app/api/training-institute/enrollments/enrollments.http.test.ts
+  s_9099fee0038e5a::t_a124b424d0e5fc 8-10,62,75,96,121-126,132,147,164-171,178-190,197-204,212-214,221-228,234-246,252-257,269,280,299,311,322,338,350-352
+apps/whiteboard/app/api/training-institute/enrollments/get-enrollment-request-model.ts
+  s_9099fee0038e5a::t_34513b712f8e28 1-8
+apps/whiteboard/app/api/training-institute/enrollments/get-enrollment-response-model.ts
+  s_9099fee0038e5a::t_6c24d8664dd5b5 5-9
+apps/whiteboard/app/api/training-institute/enrollments/list-enrollments-request-model.ts
+  s_9099fee0038e5a::t_1a4f2aa81ad011 3,15-16
+apps/whiteboard/app/api/training-institute/enrollments/list-enrollments-response-model.ts
+  s_9099fee0038e5a::t_4ee849e40e2c87 5,11-12
+apps/whiteboard/app/api/training-institute/enrollments/list-fee-payments-params-model.ts
+  s_9099fee0038e5a::t_b2623ac66f36f4 1-8
+apps/whiteboard/app/api/training-institute/enrollments/list-fee-payments-request-model.ts
+  s_9099fee0038e5a::t_deea3fa04be869 3,13-14
+apps/whiteboard/app/api/training-institute/enrollments/list-fee-payments-response-model.ts
+  s_9099fee0038e5a::t_372f6a8cd49387 5,11-12
+apps/whiteboard/app/api/training-institute/enrollments/move-enrollment-params-model.ts
+  s_9099fee0038e5a::t_6b4cf2b6dcea4f 1-8
+apps/whiteboard/app/api/training-institute/enrollments/move-enrollment-request-model.ts
+  s_9099fee0038e5a::t_887d9c00875a6e 3,6-7
+apps/whiteboard/app/api/training-institute/enrollments/move-enrollment-response-model.ts
+  s_9099fee0038e5a::t_58dee10fb1a115 5-9
+apps/whiteboard/app/api/training-institute/enrollments/override-enrollment-mode-params-model.ts
+  s_9099fee0038e5a::t_b67e3ee3e3548a 1-8
+apps/whiteboard/app/api/training-institute/enrollments/override-enrollment-mode-request-model.ts
+  s_9099fee0038e5a::t_64b218de7954c6 3,6-7
+apps/whiteboard/app/api/training-institute/enrollments/override-enrollment-mode-response-model.ts
+  s_9099fee0038e5a::t_fa26ae313bda99 1-10
+apps/whiteboard/app/api/training-institute/enrollments/record-fee-payment-params-model.ts
+  s_9099fee0038e5a::t_36587b83071b6f 1-8
+apps/whiteboard/app/api/training-institute/enrollments/record-fee-payment-request-model.ts
+  s_9099fee0038e5a::t_74cebad2ecc0a9 3,8-9
+apps/whiteboard/app/api/training-institute/enrollments/record-fee-payment-response-model.ts
+  s_9099fee0038e5a::t_90fe5f9f2041c5 5-9
+apps/whiteboard/app/api/training-institute/enrollments/route.ts
+  s_9099fee0038e5a::t_3b384b2f595458 7-8,22-24,46
+apps/whiteboard/app/api/training-institute/enrollments/set-enrollment-timings-params-model.ts
+  s_9099fee0038e5a::t_a548e9d6e34569 1-8
+apps/whiteboard/app/api/training-institute/enrollments/set-enrollment-timings-request-model.ts
+  s_9099fee0038e5a::t_41aa988c6390d2 3,5,7,9-10
+apps/whiteboard/app/api/training-institute/enrollments/set-enrollment-timings-response-model.ts
+  s_9099fee0038e5a::t_9f54e0a24e152c 5-9
+apps/whiteboard/app/api/training-institute/holidays/[id]/remove/route.ts
+  s_9099fee0038e5a::t_9aa4c4e918c0c8 5,18
+apps/whiteboard/app/api/training-institute/holidays/holiday-models.ts
+  s_9099fee0038e5a::t_d7952d33663c9b 3,9,11
+apps/whiteboard/app/api/training-institute/holidays/route.ts
+  s_9099fee0038e5a::t_f414cd2e292657 7,16-18
+apps/whiteboard/app/api/training-institute/payments/[id]/receipt/route.ts
+  s_9099fee0038e5a::t_c67c4d443fc593 5,24-26
+apps/whiteboard/app/api/training-institute/payments/get-receipt-request-model.ts
+  s_9099fee0038e5a::t_744a524dffacc6 1-8
+apps/whiteboard/app/api/training-institute/payments/get-receipt-response-model.ts
+  s_9099fee0038e5a::t_62d4b20bbdaf38 5-10
+apps/whiteboard/app/api/training-institute/students/[id]/attendance/route.ts
+  s_9099fee0038e5a::t_30f3167cbbe8ca 5-6,19-21,25
+apps/whiteboard/app/api/training-institute/students/[id]/attendance/student-attendance-models.ts
+  s_9099fee0038e5a::t_fdd3dcf7cebae6 3-6,15
+apps/whiteboard/app/api/training-institute/students/[id]/drop/route.ts
+  s_9099fee0038e5a::t_15f0bd2fdbc75a 5,26-28
+apps/whiteboard/app/api/training-institute/students/[id]/profile/route.ts
+  s_9099fee0038e5a::t_0704a771dc68ec 6-7,28,32
+apps/whiteboard/app/api/training-institute/students/[id]/route.ts
+  s_9099fee0038e5a::t_92ad5921cdb7a1 5,26-28
+apps/whiteboard/app/api/training-institute/students/create-student-request-model.ts
+  s_9099fee0038e5a::t_2ae63bcc369a56 4,17-18
+apps/whiteboard/app/api/training-institute/students/create-student-response-model.ts
+  s_9099fee0038e5a::t_b6e00c544be392 5-7,9-10
+apps/whiteboard/app/api/training-institute/students/drop-student-request-model.ts
+  s_9099fee0038e5a::t_48b24dbc336c5b 3,7-9
+apps/whiteboard/app/api/training-institute/students/drop-student-response-model.ts
+  s_9099fee0038e5a::t_1392bed4a72b00 5,9-10
+apps/whiteboard/app/api/training-institute/students/get-student-request-model.ts
+  s_9099fee0038e5a::t_3cf0d5d8a27f37 3,7-8
+apps/whiteboard/app/api/training-institute/students/get-student-response-model.ts
+  s_9099fee0038e5a::t_807c5c07ea8381 5,16,18,21-23
+apps/whiteboard/app/api/training-institute/students/list-student-item-response-model.ts
+  s_9099fee0038e5a::t_49ae733182bbe9 5-7,9-10
+apps/whiteboard/app/api/training-institute/students/list-students-request-model.ts
+  s_9099fee0038e5a::t_74701b21cb8d92 3,15-17
+apps/whiteboard/app/api/training-institute/students/list-students-response-model.ts
+  s_9099fee0038e5a::t_c2a2b9f346d77a 3,5-6,12-14
+apps/whiteboard/app/api/training-institute/students/route.ts
+  s_9099fee0038e5a::t_f95b5c891f5267 7-8,22-24,46
+apps/whiteboard/app/api/training-institute/students/student-details-model.ts
+  s_9099fee0038e5a::t_97c362a15a4f3a 56
+apps/whiteboard/app/api/training-institute/students/student-response-fields.ts
+  s_9099fee0038e5a::t_497375740caf70 2,14
+apps/whiteboard/app/api/training-institute/students/students.http.test.ts
+  s_9099fee0038e5a::t_d3dec4f023838b 82,107,156,173-175,178,194-199,211,221,229,254,304-306,313-324,331-333,352,358-360,366-368,375-377,382-393,400-405,414-419,424-426,437-439
+apps/whiteboard/app/api/training-institute/students/update-student-profile-params-model.ts
+  s_9099fee0038e5a::t_19bffed85f21dd 1-9
+apps/whiteboard/app/api/training-institute/students/update-student-profile-request-model.ts
+  s_9099fee0038e5a::t_0e85ea2cce819a 4,16-17
+apps/whiteboard/app/api/training-institute/students/update-student-profile-response-model.ts
+  s_9099fee0038e5a::t_16d18c0283b30b 5-7,9-11
+apps/whiteboard/app/api/training-institute/teacher/activate/activate-teacher-response-model.ts
+  s_9099fee0038e5a::t_c5aec4070eb91e 3-5
+apps/whiteboard/app/api/training-institute/teacher/batches/route.ts
+  s_9099fee0038e5a::t_7e0409804e65b0 4
+apps/whiteboard/app/api/training-institute/teachers/[id]/batches/[batchId]/unassign/route.ts
+  s_9099fee0038e5a::t_a202c809bf8926 3,5,17-19
+apps/whiteboard/app/api/training-institute/teachers/[id]/batches/[batchId]/unassign/unassign-teacher-batch-params-model.ts
+  s_9099fee0038e5a::t_ba0ca4aacff98a 3
+apps/whiteboard/app/api/training-institute/teachers/[id]/batches/assignment-models.ts
+  s_9099fee0038e5a::t_20e1ce5634546a 3-6,16-17
+apps/whiteboard/app/api/training-institute/teachers/[id]/batches/route.ts
+  s_9099fee0038e5a::t_dce376777f2953 4,6,21,39,42-44
+apps/whiteboard/app/api/training-institute/teachers/[id]/deactivate/route.ts
+  s_9099fee0038e5a::t_4c3104cedc1678 4,17
+apps/whiteboard/app/api/training-institute/teachers/[id]/documents/[documentId]/remove/route.ts
+  s_9099fee0038e5a::t_73cc16c8d8ce9e 4,16-18
+apps/whiteboard/app/api/training-institute/teachers/[id]/documents/[documentId]/route.ts
+  s_9099fee0038e5a::t_f157e57a0373a4 4,16-18
+apps/whiteboard/app/api/training-institute/teachers/[id]/documents/route.ts
+  s_9099fee0038e5a::t_68c3ee893ad0f2 6,8,22,39,42-44
+apps/whiteboard/app/api/training-institute/teachers/[id]/documents/teacher-document-models.ts
+  s_9099fee0038e5a::t_780c939ce1546f 4,11,21-22,24,28-30,34
+apps/whiteboard/app/api/training-institute/teachers/[id]/invite/route.ts
+  s_9099fee0038e5a::t_8a9be04805cc43 4,17
+apps/whiteboard/app/api/training-institute/teachers/[id]/photo/route.ts
+  s_9099fee0038e5a::t_4cf4b744dedfe2 4,16
+apps/whiteboard/app/api/training-institute/teachers/[id]/profile/route.ts
+  s_9099fee0038e5a::t_660e8400dcb55f 4,6,18,21-23
+apps/whiteboard/app/api/training-institute/teachers/[id]/profile/update-teacher-profile-request-model.ts
+  s_9099fee0038e5a::t_cd1745a6e0d85b 3-5,8,13-15
+apps/whiteboard/app/api/training-institute/teachers/[id]/route.ts
+  s_9099fee0038e5a::t_1c0d790710a431 5,17
+apps/whiteboard/app/api/training-institute/teachers/[id]/teacher-params-model.ts
+  s_9099fee0038e5a::t_68583b76f733f1 3
+apps/whiteboard/app/api/training-institute/teachers/create-teacher-request-model.ts
+  s_9099fee0038e5a::t_1edfabec0db0ed 3-5,8,14-16
+apps/whiteboard/app/api/training-institute/teachers/list-teachers-request-model.ts
+  s_9099fee0038e5a::t_ce8a0c8c3db278 3
+apps/whiteboard/app/api/training-institute/teachers/list-teachers-response-model.ts
+  s_9099fee0038e5a::t_bddd3b8f462036 6,19,30,37-38
+apps/whiteboard/app/api/training-institute/teachers/route.ts
+  s_9099fee0038e5a::t_01857f23391188 7-8,21-23,44
+apps/whiteboard/app/api/training-institute/teachers/teacher-details-model.ts
+  s_9099fee0038e5a::t_d3131fc1c3fe3a 11,47-48,50,55
+apps/whiteboard/app/api/training-institute/teachers/teacher-response-model.ts
+  s_9099fee0038e5a::t_4366e32ce63245 5,7,14,29,49
+apps/whiteboard/app/api/training-institute/teachers/teachers.http.test.ts
+  s_9099fee0038e5a::t_340a952e3e57b0 75,142,178-182,189-193,210-222,232-234,262-264,280-286,290-292,315-317,340-342,345-347,371-373,404-410,429-433,450-461,474-477,480-482,495,504,514,544-546,555-557,575-586,591-593,612-623,667-669,684-689,710-715,741-746,749-751,782-787,810-815,833-838,852-857,862-864,889-891,932-938,948-954,960-962,970,1022-1028,1082-1088,1092-1098,1126,1135
+apps/whiteboard/components/calendar/class-change-dialog.tsx
+  s_9099fee0038e5a::t_3b021dae218915 34-37
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_9099fee0038e5a::t_9acd46f4e7ff24 132
+apps/whiteboard/components/teachers/teacher-documents-section.tsx
+  s_9099fee0038e5a::t_502c121e884129 178
+apps/whiteboard/components/teachers/teachers.stories.tsx
+  s_9099fee0038e5a::t_c62c4b6cc7bc63 229
+apps/whiteboard/lib/page-transition.test.ts
+  s_9099fee0038e5a::t_2339f067e3a0ac 109
+apps/whiteboard/src/queries/attendance.ts
+  s_9099fee0038e5a::t_6cff4c123f5ab9 76,97,105,118-125
+apps/whiteboard/src/queries/batches.ts
+  s_9099fee0038e5a::t_cc32e38d70bb7d 74-76,82-83,88,100-107,111
+apps/whiteboard/src/queries/calendar.ts
+  s_9099fee0038e5a::t_685926d47b8f8f 65-66,108,115-120
+apps/whiteboard/src/queries/catalog-pagination.test.ts
+  s_9099fee0038e5a::t_ec198ddabee286 34,49
+apps/whiteboard/src/queries/courses.ts
+  s_9099fee0038e5a::t_e4ac0753f932c2 71-73,79-80,85,96-103,107-112
+apps/whiteboard/src/queries/dashboard.ts
+  s_9099fee0038e5a::t_d324100e8f9b50 38-39
+apps/whiteboard/src/queries/enrollments.ts
+  s_9099fee0038e5a::t_ecd81e58d802f3 81,88-91,98,104-107,112,123-130,137-144,151-158,162-167,180-187,198
+apps/whiteboard/src/queries/http.test.ts
+  s_9099fee0038e5a::t_09c47bb889aa14 24,27,52-54
+apps/whiteboard/src/queries/student-admission.ts
+  s_9099fee0038e5a::t_1afd7807c07aeb 55-56,102-108
+apps/whiteboard/src/queries/students.test.ts
+  s_9099fee0038e5a::t_6ea71ad2195c0c 33,60
+apps/whiteboard/src/queries/students.ts
+  s_9099fee0038e5a::t_e7a096a11ac36f 121,128-129,137,148-155,159-164
+apps/whiteboard/src/queries/teachers.ts
+  s_9099fee0038e5a::t_ff41d3e559442e 131-133,139-140,145-146,152-154,168-170,193-194,202,208,214-216,218-220,222,228-233,235,242,246-248
+apps/whiteboard/src/training-institute/infrastructure/prisma-calendar-schedule-reader.ts
+  s_9099fee0038e5a::t_8c6fef39b51ab5 87-89,92-104,106-107,109-110
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-change-store.ts
+  s_9099fee0038e5a::t_d8bbb741c272dc 299-307,309
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-occurrence-store.ts
+  s_9099fee0038e5a::t_4da777096beee6 11-13,85-97
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-repository.ts
+  s_9099fee0038e5a::t_d83e270e469ae5 148-149
+apps/whiteboard/src/training-institute/infrastructure/prisma-enrollment-repository.ts
+  s_9099fee0038e5a::t_1b444891d03cbd 266-268
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-payment-repository.ts
+  s_9099fee0038e5a::t_de7a1dfe319eff 169-171
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.http.test.ts
+  s_9099fee0038e5a::t_9c421955ae8397 54-56
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.ts
+  s_9099fee0038e5a::t_6deafa12633f8c 173-175
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-assignment-repository.ts
+  s_9099fee0038e5a::t_0be29b87128692 63-73,81-91,93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d774826e3a0db9ce952de0a988c5560921b5730d",
+  "prompts": {},
+  "sessions": {
+    "s_9099fee0038e5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25dca414-5744-4150-bd29-0b38ae5c59b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
