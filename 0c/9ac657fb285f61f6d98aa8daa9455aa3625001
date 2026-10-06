@@ -1,0 +1,19 @@
+apps/whiteboard/app/api/training-institute/home/home.http.test.ts
+  s_462fb8a438ef73::t_1c4bc7d8dfa1c2 5,68-69,121-123,151,222-225,241,243
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0c9ac657fb285f61f6d98aa8daa9455aa3625001",
+  "prompts": {},
+  "sessions": {
+    "s_462fb8a438ef73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f23106a4-191d-4faf-9352-1ee239a31388",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
