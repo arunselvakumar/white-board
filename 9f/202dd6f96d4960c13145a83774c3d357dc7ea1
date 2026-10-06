@@ -1,0 +1,23 @@
+apps/whiteboard/src/queries/classes.test.ts
+  s_9099fee0038e5a::t_55a3fb3fdd3c58 1-14
+apps/whiteboard/src/queries/classes.ts
+  s_9099fee0038e5a::t_cab99a9fbeabaa 20
+docs/prd/tasks.md
+  s_9099fee0038e5a::t_2801403158088a 344
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9f202dd6f96d4960c13145a83774c3d357dc7ea1",
+  "prompts": {},
+  "sessions": {
+    "s_9099fee0038e5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25dca414-5744-4150-bd29-0b38ae5c59b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
