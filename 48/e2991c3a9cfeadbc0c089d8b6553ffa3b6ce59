@@ -1,0 +1,219 @@
+apps/whiteboard/app/api/_lib/require-attendance-session.ts
+  s_9099fee0038e5a::t_1c099a45c3892c 4
+apps/whiteboard/app/api/attendance/attendance.http.test.ts
+  s_9099fee0038e5a::t_c61b548ad7c5d7 75,84,96,105,119,170,187,205,223,232,234,243,266,284,315,419,426,435,441,446,452,460,498,509,522
+apps/whiteboard/app/api/attendance/registers/[id]/marks/route.ts
+  s_9099fee0038e5a::t_563cfebf0ae94f 7
+apps/whiteboard/app/api/attendance/registers/[id]/route.ts
+  s_9099fee0038e5a::t_4491b0a271a504 3
+apps/whiteboard/app/api/attendance/registers/attendance-models.ts
+  s_9099fee0038e5a::t_148aa538c4476d 3
+apps/whiteboard/app/api/attendance/registers/route.ts
+  s_9099fee0038e5a::t_7ba13eed25f462 3
+apps/whiteboard/app/api/batches/[id]/close/route.ts
+  s_9099fee0038e5a::t_5324e95f53f252 3
+apps/whiteboard/app/api/batches/[id]/route.ts
+  s_9099fee0038e5a::t_0686656b4c4d01 3
+apps/whiteboard/app/api/batches/[id]/schedule/route.ts
+  s_9099fee0038e5a::t_83ca494de00a71 3
+apps/whiteboard/app/api/batches/map-batch-response.ts
+  s_9099fee0038e5a::t_80e0b63e916417 1
+apps/whiteboard/app/api/batches/route.ts
+  s_9099fee0038e5a::t_b3665238c98553 5
+apps/whiteboard/app/api/calendar/calendar.http.test.ts
+  s_9099fee0038e5a::t_7ce275ef672cef 65,74,99,114,132,143,229,238
+apps/whiteboard/app/api/calendar/route.ts
+  s_9099fee0038e5a::t_a5968d3bcc1b75 8-10
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/cancel/route.ts
+  s_9099fee0038e5a::t_dbdb0aebfea949 6
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/join/route.ts
+  s_9099fee0038e5a::t_c321aac75a6a4f 6
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/move/route.ts
+  s_9099fee0038e5a::t_10bf23bcccd1e9 6
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/recording/route.ts
+  s_9099fee0038e5a::t_4e4019671cdf66 6-7
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/restore/route.ts
+  s_9099fee0038e5a::t_ff78ba52fc6c15 7
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/route.ts
+  s_9099fee0038e5a::t_9ba4ab06a49e67 6
+apps/whiteboard/app/api/classes/[batchId]/[date]/[startTime]/start/route.ts
+  s_9099fee0038e5a::t_dc02b16678cd30 6
+apps/whiteboard/app/api/classes/class-changes.http.test.ts
+  s_9099fee0038e5a::t_1261a03f71c577 154,163,178,208,232,254,410,594,632
+apps/whiteboard/app/api/classes/class-route.ts
+  s_9099fee0038e5a::t_26194b56459a3c 5-6
+apps/whiteboard/app/api/classes/classes.http.test.ts
+  s_9099fee0038e5a::t_f12b7b6f5ea89f 56,65,99,127,129,139
+apps/whiteboard/app/api/courses/[id]/archive/route.ts
+  s_9099fee0038e5a::t_a3bb392891c355 3
+apps/whiteboard/app/api/courses/[id]/route.ts
+  s_9099fee0038e5a::t_00552ad111af3b 3
+apps/whiteboard/app/api/courses/[id]/update/route.ts
+  s_9099fee0038e5a::t_35910a72762ee5 3
+apps/whiteboard/app/api/courses/courses.http.test.ts
+  s_9099fee0038e5a::t_37d23c0a0ab4c8 274
+apps/whiteboard/app/api/courses/map-course-response.ts
+  s_9099fee0038e5a::t_e86b7e0daf1041 1
+apps/whiteboard/app/api/courses/route.ts
+  s_9099fee0038e5a::t_aeb8638f0c7374 5
+apps/whiteboard/app/api/dashboard/route.ts
+  s_9099fee0038e5a::t_f4f08eff8903e8 3
+apps/whiteboard/app/api/enrollments/[id]/end/route.ts
+  s_9099fee0038e5a::t_2061c9ca2d9dec 3
+apps/whiteboard/app/api/enrollments/[id]/fee-plan/route.ts
+  s_9099fee0038e5a::t_6e00407a35102b 3
+apps/whiteboard/app/api/enrollments/[id]/mode/route.ts
+  s_9099fee0038e5a::t_939fcfc8ba9e19 3
+apps/whiteboard/app/api/enrollments/[id]/move/route.ts
+  s_9099fee0038e5a::t_70dad0424362fc 3
+apps/whiteboard/app/api/enrollments/[id]/payments/route.ts
+  s_9099fee0038e5a::t_6360fc3fe71f7b 5
+apps/whiteboard/app/api/enrollments/[id]/route.ts
+  s_9099fee0038e5a::t_c41e6e15472e07 3
+apps/whiteboard/app/api/enrollments/[id]/timings/route.ts
+  s_9099fee0038e5a::t_d9194b7c714645 3
+apps/whiteboard/app/api/enrollments/map-enrollment-response.ts
+  s_9099fee0038e5a::t_316a8a3b48abaf 1
+apps/whiteboard/app/api/enrollments/route.ts
+  s_9099fee0038e5a::t_af2ab799681d7a 5
+apps/whiteboard/app/api/holidays/[id]/remove/route.ts
+  s_9099fee0038e5a::t_8bddb3a88ff06a 6
+apps/whiteboard/app/api/holidays/route.ts
+  s_9099fee0038e5a::t_afe2f82fe15c83 5
+apps/whiteboard/app/api/payments/[id]/receipt/route.ts
+  s_9099fee0038e5a::t_fabf1f85f28278 3
+apps/whiteboard/app/api/payments/map-fee-payment-response.ts
+  s_9099fee0038e5a::t_0772368e452cde 1
+apps/whiteboard/app/api/students/[id]/attendance/route.ts
+  s_9099fee0038e5a::t_f08d3e72fc3070 3
+apps/whiteboard/app/api/students/[id]/drop/route.ts
+  s_9099fee0038e5a::t_87f717263c2f74 3
+apps/whiteboard/app/api/students/[id]/profile/route.ts
+  s_9099fee0038e5a::t_92d9586249bbcf 3
+apps/whiteboard/app/api/students/[id]/route.ts
+  s_9099fee0038e5a::t_9ece65632eebdd 3
+apps/whiteboard/app/api/students/map-student-response.ts
+  s_9099fee0038e5a::t_b7393fd6edfbe4 1-2
+apps/whiteboard/app/api/students/route.ts
+  s_9099fee0038e5a::t_91d62bc5a60bbd 5
+apps/whiteboard/app/api/students/students.http.test.ts
+  s_9099fee0038e5a::t_e206285e901457 173,320,396
+apps/whiteboard/app/api/teacher/activate/route.ts
+  s_9099fee0038e5a::t_6063565d43cbc7 8
+apps/whiteboard/app/api/teacher/batches/route.ts
+  s_9099fee0038e5a::t_088b97733c2aaa 5
+apps/whiteboard/app/api/teachers/[id]/batches/[batchId]/unassign/route.ts
+  s_9099fee0038e5a::t_fc0c3a99fa48a9 4
+apps/whiteboard/app/api/teachers/[id]/batches/route.ts
+  s_9099fee0038e5a::t_e450748656e846 3
+apps/whiteboard/app/api/teachers/[id]/deactivate/route.ts
+  s_9099fee0038e5a::t_8f508028eb3afe 3
+apps/whiteboard/app/api/teachers/[id]/documents/[documentId]/remove/route.ts
+  s_9099fee0038e5a::t_dee92b8486eec8 3
+apps/whiteboard/app/api/teachers/[id]/documents/[documentId]/route.ts
+  s_9099fee0038e5a::t_f52c26eb348db2 3
+apps/whiteboard/app/api/teachers/[id]/documents/route.ts
+  s_9099fee0038e5a::t_d5da5bf8890674 5
+apps/whiteboard/app/api/teachers/[id]/documents/teacher-document-models.ts
+  s_9099fee0038e5a::t_4f77e7fbd84864 2
+apps/whiteboard/app/api/teachers/[id]/invite/route.ts
+  s_9099fee0038e5a::t_b06880874e62fb 3
+apps/whiteboard/app/api/teachers/[id]/photo/route.ts
+  s_9099fee0038e5a::t_1ee86b3a39f43a 3
+apps/whiteboard/app/api/teachers/[id]/profile/route.ts
+  s_9099fee0038e5a::t_4541cd3a94ba6e 3
+apps/whiteboard/app/api/teachers/[id]/route.ts
+  s_9099fee0038e5a::t_423dd0fac00e7e 3
+apps/whiteboard/app/api/teachers/list-teachers-response-model.ts
+  s_9099fee0038e5a::t_1cc919669fc075 4
+apps/whiteboard/app/api/teachers/route.ts
+  s_9099fee0038e5a::t_b62ffcc7354b8a 5
+apps/whiteboard/app/api/teachers/teacher-response-model.ts
+  s_9099fee0038e5a::t_955236dfd78c22 4
+apps/whiteboard/app/api/teachers/teachers.http.test.ts
+  s_9099fee0038e5a::t_fe86fb8de9f9b5 28,345,368,398,437,482,544,579,595,615,819,828,891,900,909,963,976
+apps/whiteboard/app/api/webhooks/realtimekit/route.ts
+  s_9099fee0038e5a::t_eba4be6d871342 1,5
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_9099fee0038e5a::t_22c5364163a2a5 42
+apps/whiteboard/components/calendar/class-change-dialog.tsx
+  s_9099fee0038e5a::t_7b78c1dacfc825 34
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_9099fee0038e5a::t_044a5b68dc7a5e 4
+apps/whiteboard/lib/calendar-dates.ts
+  s_9099fee0038e5a::t_b0aeb5aa1d4408 6
+apps/whiteboard/lib/class-changes.ts
+  s_9099fee0038e5a::t_e8afc0ea8959f8 1
+apps/whiteboard/src/queries/classes.ts
+  s_9099fee0038e5a::t_748d1030c0065e 3
+apps/whiteboard/src/training-institute/application/get-owner-dashboard.handler.ts
+  s_9099fee0038e5a::t_112ae4b0b0f921 23,26,31,34,43
+apps/whiteboard/src/training-institute/infrastructure/prisma-attendance-repository.ts
+  s_9099fee0038e5a::t_054e3da151b7dc 21,38,58,66,77,95,134,149,152,161,171,185,200,208,214,232,245,254,260,283
+apps/whiteboard/src/training-institute/infrastructure/prisma-batch-mapper.ts
+  s_9099fee0038e5a::t_db59fd6964ed1d 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-batch-repository.ts
+  s_9099fee0038e5a::t_ad5a1e7ec2b376 34,45,70,82,89,95,100,116,144
+apps/whiteboard/src/training-institute/infrastructure/prisma-calendar-schedule-reader.ts
+  s_9099fee0038e5a::t_163798ad9debec 52,87,138,146,171
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-change-store.ts
+  s_9099fee0038e5a::t_0acbcef49d4d20 23,26,100,103,136,144,205,213,225,244,251,259,272,278,299,328,362,399,420,424
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-occurrence-store.ts
+  s_9099fee0038e5a::t_4a3aaf9d939886 11,39,58,83,103,112,119,127,139,153
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-mapper.ts
+  s_9099fee0038e5a::t_013ac7f4015875 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-repository.ts
+  s_9099fee0038e5a::t_b6b9f69a833cf4 47,63,87,98,107,112,148,176
+apps/whiteboard/src/training-institute/infrastructure/prisma-enrollment-mapper.ts
+  s_9099fee0038e5a::t_2654cf627d4b86 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-enrollment-repository.ts
+  s_9099fee0038e5a::t_cf346f6a4d0f62 41,52,83,88,100,136,143,162,178,192,202,211,216,233,250,266,294
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-payment-mapper.ts
+  s_9099fee0038e5a::t_5ffaf6bfcfff86 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-payment-repository.ts
+  s_9099fee0038e5a::t_911d05ead8b1ab 29,40,67,71,95,109,118,126,131,145,155,169,197
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-mapper.ts
+  s_9099fee0038e5a::t_a9f9593e35c4db 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.http.test.ts
+  s_9099fee0038e5a::t_95025c5b5cb621 54
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.ts
+  s_9099fee0038e5a::t_b9cdc0a2fedad5 19,66,79,103,115,125,129,137,142,173,201
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-assignment-repository.ts
+  s_9099fee0038e5a::t_5c367dcc6be1f7 16,34,63,80
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-document-repository.ts
+  s_9099fee0038e5a::t_939f4233fb1e5d 31,38,50,71,92,116
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-repository.ts
+  s_9099fee0038e5a::t_cabe4275245653 24,67,111,122,135,143,147,171,177,197
+docs/adr/0010-packages-db-is-prisma-only.md
+  s_9099fee0038e5a::t_1f7541ccfe155e 3-4
+packages/db/prisma.config.ts
+  s_9099fee0038e5a::t_fc8a19cc6317aa 1-16
+packages/db/prisma/migrations/20261006120000_training_institute_schema/migration.sql
+  s_9099fee0038e5a::t_c281dafc52da9e 1-39
+packages/db/prisma/schema/base.prisma
+  s_9099fee0038e5a::t_339af92092e9bc 1-11
+packages/db/prisma/schema/training-institute.prisma
+  s_9099fee0038e5a::t_a48fc98c973e1a 1,7,10,15,18,23,26,31,34,40,43,50,53,58,61,67,70,75,78,85,88,96,99,104,106,122-123,127,130,136,140,151-156,161,164,180,185,189,196,208,213,217,231,234,240,253,261-262,267,270,284,288,291,303-304,309,312,332-333,339,342,349-350,355,366-370,376,379,391-392,396,399,406,415-418,423,426,429-430,436,440,443,449,457,463
+packages/db/src/index.ts
+  s_9099fee0038e5a::t_ee1fd276df697f 4-8
+packages/db/tsconfig.json
+  s_9099fee0038e5a::t_d71dc87769b712 12
+docs/adr/0030-postgres-schema-per-bounded-context.md
+  s_9099fee0038e5a::t_7486ca2c5281c4 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "48e2991c3a9cfeadbc0c089d8b6553ffa3b6ce59",
+  "prompts": {},
+  "sessions": {
+    "s_9099fee0038e5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25dca414-5744-4150-bd29-0b38ae5c59b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
