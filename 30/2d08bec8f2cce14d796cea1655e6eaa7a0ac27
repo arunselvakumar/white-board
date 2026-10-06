@@ -1,0 +1,29 @@
+CONTEXT.md
+  s_e6d8703aebdcb0::t_64d005264470c1 102-118,213-215,278
+docs/prd/tasks.md
+  s_e6d8703aebdcb0::t_3d50bd51ba2586 343,388-393
+docs/prd/training-institute-attendance.md
+  s_e6d8703aebdcb0::t_e6280c5d63e1e8 41
+docs/adr/0028-class-changes-are-exceptions-over-weekly-timings.md
+  s_e6d8703aebdcb0::t_e1067873024e3a 1-15
+docs/adr/0029-class-change-product-decisions.md
+  s_e6d8703aebdcb0::t_4a3e7110e42cc2 1-41
+docs/prd/training-institute-class-changes.md
+  s_e6d8703aebdcb0::t_bfe935ac5f9e07 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "302d08bec8f2cce14d796cea1655e6eaa7a0ac27",
+  "prompts": {},
+  "sessions": {
+    "s_e6d8703aebdcb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30500495-0124-46fc-9ca7-65b48c5214c6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
