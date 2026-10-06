@@ -99,7 +99,23 @@ When teaching happens. A Batch has default Timings (days of week and clock times
 _Avoid_: timetable (P1 calendar of sessions), period
 
 **Calendar**:
-A read-only view of recurring weekly Timings. The Owner sees open Batches in the Active Workspace; a Teacher sees assigned open Batches; a Student or Parent sees active Enrollments linked through their verified Email. Day, week, and month views repeat the stored Timings. It does not create individual sessions or account for cancellations and holidays.
+A read-only view of Classes from recurring weekly Timings, with Class Changes and Holidays applied. The Owner sees open Batches in the Active Workspace; a Teacher sees assigned open Batches; both also see Student-specific Classes for home tuition. A Student or Parent sees active Enrollments linked through their verified Email. Day, week, and month views are available. Upcoming changes for the next 14 days are listed at the top.
+
+**Class**:
+One meeting of a Batch on a local date at a start time. Weekly Timings produce Classes; there is no stored row per Class. A Student on Student-specific Timings has their own Classes in the Batch.
+_Avoid_: session, lecture, period, occurrence (in UI copy)
+
+**Cancelled Class**:
+A Class that will not happen, with an optional reason. The Owner or an assigned Teacher cancels it; it can be restored until it starts.
+_Avoid_: deleted class, skipped class
+
+**Moved Class**:
+A Class moved to another date and/or time. Its original slot shows where it moved; the new slot is marked **Rescheduled**.
+_Avoid_: reschedule (as the entity name), make-up class (as the entity name)
+
+**Holiday**:
+One date or a date range on which every Class in the Workspace is cancelled. Declared by the Owner, with an optional reason.
+_Avoid_: leave, vacation, closure, day off (as the entity name)
 
 **Enrollment**:
 The fact that a Student is taking a Course in a Batch, with Class Mode, Timings, and a Fee Plan. A Student may have many Enrollments.
@@ -194,6 +210,9 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Fee Payment** belongs to one **Fee Plan** and produces one **Receipt**.
 - **Class Mode** is set on the **Batch** and may be overridden on the **Enrollment**.
 - **Timing** defaults from the **Batch**; **Enrollment** may set Student-specific Timings.
+- **Timings** produce **Classes**. A **Class** is a Batch, a date, and a start time.
+- A **Class** may be cancelled or moved once; restoring it brings back the original. Changing a **Class** never changes the Batch's weekly **Timings**.
+- A **Holiday** belongs to one **Workspace** and cancels every **Class** on its dates.
 - The **Owner Dashboard** is the **In-app Home** for a Training Institute **Workspace**.
 
 ## Example dialogue
@@ -256,3 +275,4 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Online vs offline — resolved: **Class Mode** on the **Batch**, overridable on the **Enrollment**. Hybrid is a valid mode.
 - Student-specific hours (home tuition) — resolved: **Timing** on the **Enrollment** may inherit the Batch or be Student-specific.
 - Enquiry, attendance, certificates, WhatsApp, GST, live classroom, franchise royalty — resolved: not P0. P1/P2.
+- Cancellations, holidays, and moved classes ([issue #13](https://github.com/white-board-io/white-board-v3/issues/13)) — resolved: **Cancelled Class**, **Moved Class**, and **Holiday** are exceptions over weekly **Timings**, not a session calendar. Owner and assigned Teachers change Classes; Holidays are Owner-only and Workspace-wide. See [ADR-0028](docs/adr/0028-class-changes-are-exceptions-over-weekly-timings.md) and [ADR-0029](docs/adr/0029-class-change-product-decisions.md).

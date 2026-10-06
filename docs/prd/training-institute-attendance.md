@@ -38,7 +38,7 @@ An Owner or assigned Teacher can open an Attendance Register for a Batch on toda
 
 ## Outside this slice
 
-Automatic absences, QR or biometric check-in, geolocation, parent alerts, Student self-service, multiple meetings per Batch per day, exact historical roster reconstruction, holidays, and clash-aware session calendar.
+Automatic absences, QR or biometric check-in, geolocation, parent alerts, Student self-service, multiple meetings per Batch per day, exact historical roster reconstruction, and clash-aware session calendar. Cancelled Classes, Moved Classes, and Holidays were added later by [Class Changes](./training-institute-class-changes.md).
 
 ## Delivery
 
