@@ -8,7 +8,9 @@ import type {
 import { lockBatchSchedule } from "./schedule-locks";
 
 type Row = NonNullable<
-  Awaited<ReturnType<PrismaClient["trainingInstituteClassOccurrence"]["findFirst"]>>
+  Awaited<
+    ReturnType<PrismaClient["trainingInstituteClassOccurrence"]["findFirst"]>
+  >
 >;
 
 function toRecord(row: Row): ClassOccurrenceRecord {
@@ -80,18 +82,19 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
         existing.providerMeetingId == null &&
         existing.status === "starting"
       ) {
-        const reclaimed = await this.db.trainingInstituteClassOccurrence.updateMany({
-          where: {
-            id: existing.id,
-            providerMeetingId: null,
-            status: "starting",
-            startedAt: { lt: new Date(Date.now() - 30_000) },
-          },
-          data: {
-            startedAt: new Date(),
-            startedByUserId: input.startedByUserId,
-          },
-        });
+        const reclaimed =
+          await this.db.trainingInstituteClassOccurrence.updateMany({
+            where: {
+              id: existing.id,
+              providerMeetingId: null,
+              status: "starting",
+              startedAt: { lt: new Date(Date.now() - 30_000) },
+            },
+            data: {
+              startedAt: new Date(),
+              startedByUserId: input.startedByUserId,
+            },
+          });
         if (reclaimed.count === 1)
           return { occurrence: existing, claimed: true };
       }

@@ -43,6 +43,7 @@ export type OpenApiDocument = {
     description: string;
   };
   components: {
+    schemas: Record<string, JsonObject>;
     securitySchemes: {
       clerkSession: {
         type: string;
@@ -63,7 +64,16 @@ const STATUS_DESCRIPTIONS: Partial<Record<StatusCodes, string>> = {
   [StatusCodes.INTERNAL_SERVER_ERROR]: "Unexpected error",
 };
 
-function responsesFor(operation: OpenApiOperation): JsonObject {
+/**
+ * Request and Response models keyed by their code name. Each becomes a
+ * component named without the `Model` suffix. Component names are global in
+ * `/api/docs`, so they carry the bounded context (ADR-0030).
+ */
+export type OpenApiComponents = Record<string, z.ZodType>;
+
+type SchemaRef = (schema: z.ZodType) => JsonObject;
+
+function responsesFor(operation: OpenApiOperation, ref: SchemaRef): JsonObject {
   const responses: JsonObject = {};
   if (operation.successBinaryContentTypes != null) {
     responses[String(operation.successStatus)] = {
@@ -82,7 +92,7 @@ function responsesFor(operation: OpenApiOperation): JsonObject {
       description: operation.successDescription,
       content: {
         "application/json": {
-          schema: zodToOpenApiSchema(operation.successSchema),
+          schema: ref(operation.successSchema),
         },
       },
     };
@@ -96,7 +106,7 @@ function responsesFor(operation: OpenApiOperation): JsonObject {
       description: STATUS_DESCRIPTIONS[status] ?? "Error",
       content: {
         "application/json": {
-          schema: zodToOpenApiSchema(ErrorResponseModel),
+          schema: ref(ErrorResponseModel),
         },
       },
     };
@@ -157,15 +167,36 @@ function parametersFor(operation: OpenApiOperation): unknown[] {
 
 export function buildOpenApiDocument(
   operations: readonly OpenApiOperation[],
+  components: OpenApiComponents,
 ): OpenApiDocument {
+  const names = new Map<z.ZodType, string>([
+    [ErrorResponseModel, "ErrorResponse"],
+  ]);
+  for (const [name, schema] of Object.entries(components)) {
+    names.set(schema, name.replace(/Model$/, ""));
+  }
+  const schemas: Record<string, JsonObject> = {};
+  for (const [schema, name] of names) {
+    schemas[name] = zodToOpenApiSchema(schema);
+  }
+
   const paths: OpenApiDocument["paths"] = {};
   for (const operation of operations) {
+    const ref: SchemaRef = (schema) => {
+      const name = names.get(schema);
+      if (name == null) {
+        throw new Error(
+          `${operation.method.toUpperCase()} ${operation.path} uses a body or response model that is not an OpenAPI component.`,
+        );
+      }
+      return { $ref: `#/components/schemas/${name}` };
+    };
     const pathItem = paths[operation.path] ?? {};
     const item: JsonObject = {
       summary: operation.summary,
       tags: operation.tags,
       security: operation.security === false ? [] : [{ clerkSession: [] }],
-      responses: responsesFor(operation),
+      responses: responsesFor(operation, ref),
     };
     const parameters = parametersFor(operation);
     if (parameters.length > 0) {
@@ -176,7 +207,7 @@ export function buildOpenApiDocument(
         required: true,
         content: {
           "application/json": {
-            schema: zodToOpenApiSchema(operation.body),
+            schema: ref(operation.body),
           },
         },
       };
@@ -192,9 +223,10 @@ export function buildOpenApiDocument(
       title: "Whiteboard API",
       version: "0.0.0",
       description:
-        "Whiteboard HTTP APIs. Training Institute P0 resources plus the sample Todo context.",
+        "Whiteboard HTTP APIs. Each bounded context has its own path prefix and component names, starting with Training Institute.",
     },
     components: {
+      schemas,
       securitySchemes: {
         clerkSession: {
           type: "apiKey",

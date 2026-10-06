@@ -62,7 +62,8 @@ export const calendarQueries = {
   schedule: (sessionScope: string) =>
     queryOptions({
       queryKey: [...calendarQueries.key.all, sessionScope] as const,
-      queryFn: () => apiJson<CalendarResponse>("/api/calendar"),
+      queryFn: () =>
+        apiJson<CalendarResponse>("/api/training-institute/calendar"),
     }),
 };
 
@@ -104,13 +105,16 @@ export const declareHoliday = (input: {
   endDate: string;
   reason: string | null;
 }) =>
-  apiJson<Holiday>("/api/holidays", {
+  apiJson<Holiday>("/api/training-institute/holidays", {
     method: "POST",
     headers: jsonHeaders,
     body: JSON.stringify(input),
   });
 
 export const removeHoliday = (id: string) =>
-  apiJson<undefined>(`/api/holidays/${encodeURIComponent(id)}/remove`, {
-    method: "POST",
-  });
+  apiJson<undefined>(
+    `/api/training-institute/holidays/${encodeURIComponent(id)}/remove`,
+    {
+      method: "POST",
+    },
+  );

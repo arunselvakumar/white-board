@@ -73,7 +73,7 @@ export const attendanceQueries = {
           total: number;
           nextCursor: string | null;
           prevCursor: string | null;
-        }>(`/api/attendance/registers?${params.toString()}`);
+        }>(`/api/training-institute/attendance/registers?${params.toString()}`);
       },
     }),
   student: (
@@ -94,7 +94,7 @@ export const attendanceQueries = {
         if (cursor?.after) params.set("after", cursor.after);
         if (cursor?.before) params.set("before", cursor.before);
         return apiJson<AttendanceHistory>(
-          `/api/students/${studentId}/attendance?${params.toString()}`,
+          `/api/training-institute/students/${studentId}/attendance?${params.toString()}`,
         );
       },
     }),
@@ -102,7 +102,7 @@ export const attendanceQueries = {
 
 const headers = { "content-type": "application/json" };
 export const openAttendanceRegister = (batchId: string, date?: string) =>
-  apiJson<AttendanceRegister>("/api/attendance/registers", {
+  apiJson<AttendanceRegister>("/api/training-institute/attendance/registers", {
     method: "POST",
     headers,
     body: JSON.stringify({ batchId, ...(date == null ? {} : { date }) }),
@@ -115,8 +115,11 @@ export const saveAttendanceMarks = (
     note: string | null;
   }[],
 ) =>
-  apiJson<AttendanceRegister>(`/api/attendance/registers/${id}/marks`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ marks }),
-  });
+  apiJson<AttendanceRegister>(
+    `/api/training-institute/attendance/registers/${id}/marks`,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ marks }),
+    },
+  );

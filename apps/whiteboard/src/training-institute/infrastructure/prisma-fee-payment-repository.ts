@@ -166,7 +166,9 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
 
 function cursorWhere(
   params: FeePaymentListParams,
-): Pick<Prisma.TrainingInstituteFeePaymentWhereInput, "OR"> | Record<string, never> {
+):
+  | Pick<Prisma.TrainingInstituteFeePaymentWhereInput, "OR">
+  | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [

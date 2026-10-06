@@ -41,13 +41,16 @@ export const courseQueries = {
         const params = new URLSearchParams();
         if (filters?.q) params.set("q", filters.q);
         const query = params.size > 0 ? `?${params.toString()}` : "";
-        return apiJson<CourseListResponse>(`/api/courses${query}`);
+        return apiJson<CourseListResponse>(
+          `/api/training-institute/courses${query}`,
+        );
       },
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: courseQueries.key.detail(id),
-      queryFn: () => apiJson<CourseResponse>(`/api/courses/${id}`),
+      queryFn: () =>
+        apiJson<CourseResponse>(`/api/training-institute/courses/${id}`),
     }),
 };
 ```

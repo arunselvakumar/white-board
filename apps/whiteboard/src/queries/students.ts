@@ -118,14 +118,15 @@ export const studentQueries = {
           params.set("before", page.before);
         }
         return apiJson<StudentListResponse>(
-          `/api/students?${params.toString()}`,
+          `/api/training-institute/students?${params.toString()}`,
         );
       },
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: studentQueries.key.detail(id),
-      queryFn: () => apiJson<StudentResponse>(`/api/students/${id}`),
+      queryFn: () =>
+        apiJson<StudentResponse>(`/api/training-institute/students/${id}`),
     }),
 };
 
@@ -133,7 +134,7 @@ export function createStudent(
   input: StudentWriteInput,
   requestId?: string,
 ): Promise<StudentResponse> {
-  return apiJson<StudentResponse>("/api/students", {
+  return apiJson<StudentResponse>("/api/training-institute/students", {
     method: "POST",
     headers: jsonHeaders,
     body: JSON.stringify({ ...input, requestId }),
@@ -144,15 +145,21 @@ export function updateStudentProfile(
   id: string,
   input: StudentWriteInput,
 ): Promise<StudentResponse> {
-  return apiJson<StudentResponse>(`/api/students/${id}/profile`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(input),
-  });
+  return apiJson<StudentResponse>(
+    `/api/training-institute/students/${id}/profile`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(input),
+    },
+  );
 }
 
 export function dropStudent(id: string): Promise<StudentResponse> {
-  return apiJson<StudentResponse>(`/api/students/${id}/drop`, {
-    method: "POST",
-  });
+  return apiJson<StudentResponse>(
+    `/api/training-institute/students/${id}/drop`,
+    {
+      method: "POST",
+    },
+  );
 }

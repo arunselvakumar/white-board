@@ -37,7 +37,7 @@ export type CourseRepository = {
 };
 ```
 
-Prisma implementations live in infrastructure. Lists are bidirectional cursor + total (ADR-0020). Soft delete is an invisible tombstone (ADR-0019). HTTP is named commands (`POST /api/courses/:id/archive`), not generic PATCH.
+Prisma implementations live in infrastructure. Lists are bidirectional cursor + total (ADR-0020). Soft delete is an invisible tombstone (ADR-0019). HTTP is named commands (`POST /api/training-institute/courses/:id/archive`), not generic PATCH.
 
 ## Events
 

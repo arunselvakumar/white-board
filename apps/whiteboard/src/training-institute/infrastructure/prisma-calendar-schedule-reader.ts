@@ -84,27 +84,30 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
     }
 
     if (input.role === "org:teacher") {
-      const assignments = await this.db.trainingInstituteBatchTeacherAssignment.findMany({
-        where: {
-          workspaceId,
-          deletedAt: null,
-          unassignedAt: null,
-          teacher: {
-            workspaceId,
-            clerkUserId: input.userId,
-            deletedAt: null,
-            deactivatedAt: null,
-          },
-          batch: {
+      const assignments =
+        await this.db.trainingInstituteBatchTeacherAssignment.findMany({
+          where: {
             workspaceId,
             deletedAt: null,
-            ...(!input.includeClosed ? { closedAt: null } : {}),
-            course: { deletedAt: null },
+            unassignedAt: null,
+            teacher: {
+              workspaceId,
+              clerkUserId: input.userId,
+              deletedAt: null,
+              deactivatedAt: null,
+            },
+            batch: {
+              workspaceId,
+              deletedAt: null,
+              ...(!input.includeClosed ? { closedAt: null } : {}),
+              course: { deletedAt: null },
+            },
           },
-        },
-        include: { batch: { include: { course: { select: { name: true } } } } },
-        orderBy: [{ batch: { name: "asc" } }, { id: "asc" }],
-      });
+          include: {
+            batch: { include: { course: { select: { name: true } } } },
+          },
+          orderBy: [{ batch: { name: "asc" } }, { id: "asc" }],
+        });
       const homeTuition = await this.homeTuition(
         workspaceId,
         assignments.map(({ batch }) => batch.id),

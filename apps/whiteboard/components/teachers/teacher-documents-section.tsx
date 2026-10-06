@@ -175,7 +175,7 @@ export function TeacherDocumentsSection({
                   render={
                     <a
                       href={withAppBasePath(
-                        `/api/teachers/${teacherId}/documents/${document.id}`,
+                        `/api/training-institute/teachers/${teacherId}/documents/${document.id}`,
                       )}
                       aria-label={`Download ${document.name}`}
                     />

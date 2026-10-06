@@ -129,7 +129,7 @@ export const RecordingDownload: Story = {
       canvas.getByRole("link", { name: "Download recording" }),
     ).toHaveAttribute(
       "href",
-      `/app/api/classes/${batchId}/${date}/09%3A00/recording`,
+      `/app/api/training-institute/classes/${batchId}/${date}/09%3A00/recording`,
     );
   },
 };

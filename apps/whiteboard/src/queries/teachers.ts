@@ -128,24 +128,30 @@ export const teacherQueries = {
         });
         if (page?.after) params.set("after", page.after);
         if (page?.before) params.set("before", page.before);
-        return apiJson<TeacherList>(`/api/teachers?${params.toString()}`);
+        return apiJson<TeacherList>(
+          `/api/training-institute/teachers?${params.toString()}`,
+        );
       },
     }),
   detail: (workspaceId: string | null | undefined, id: string) =>
     queryOptions({
       queryKey: [...teacherQueries.key.all, workspaceId, "detail", id],
-      queryFn: () => apiJson<TeacherProfile>(`/api/teachers/${id}`),
+      queryFn: () =>
+        apiJson<TeacherProfile>(`/api/training-institute/teachers/${id}`),
     }),
   batches: (workspaceId: string | null | undefined, id: string) =>
     queryOptions({
       queryKey: [...teacherQueries.key.all, workspaceId, "batches", id],
-      queryFn: () => apiJson<BatchList>(`/api/teachers/${id}/batches`),
+      queryFn: () =>
+        apiJson<BatchList>(`/api/training-institute/teachers/${id}/batches`),
     }),
   documents: (workspaceId: string | null | undefined, id: string) =>
     queryOptions({
       queryKey: [...teacherQueries.key.all, workspaceId, "documents", id],
       queryFn: () =>
-        apiJson<{ items: TeacherDocument[] }>(`/api/teachers/${id}/documents`),
+        apiJson<{ items: TeacherDocument[] }>(
+          `/api/training-institute/teachers/${id}/documents`,
+        ),
     }),
   batchOptions: (
     workspaceId: string | null | undefined,
@@ -159,7 +165,9 @@ export const teacherQueries = {
         });
         if (page?.after) params.set("after", page.after);
         if (page?.before) params.set("before", page.before);
-        return apiJson<BatchListResponse>(`/api/batches?${params.toString()}`);
+        return apiJson<BatchListResponse>(
+          `/api/training-institute/batches?${params.toString()}`,
+        );
       },
     }),
 };
@@ -182,7 +190,8 @@ export const myBatchQueries = {
   ) =>
     queryOptions({
       queryKey: ["teacher", workspaceId, userId, "batches"],
-      queryFn: () => apiJson<BatchList>("/api/teacher/batches"),
+      queryFn: () =>
+        apiJson<BatchList>("/api/training-institute/teacher/batches"),
       staleTime: 0,
       gcTime: 0,
     }),
@@ -190,41 +199,50 @@ export const myBatchQueries = {
 
 const headers = { "content-type": "application/json" };
 export const createTeacher = (input: TeacherWriteInput) =>
-  apiJson<TeacherProfile>("/api/teachers", {
+  apiJson<TeacherProfile>("/api/training-institute/teachers", {
     method: "POST",
     headers,
     body: JSON.stringify(input),
   });
 export const updateTeacher = (id: string, input: TeacherWriteInput) =>
-  apiJson<TeacherProfile>(`/api/teachers/${id}/profile`, {
+  apiJson<TeacherProfile>(`/api/training-institute/teachers/${id}/profile`, {
     method: "POST",
     headers,
     body: JSON.stringify(input),
   });
 export const inviteTeacher = (id: string) =>
-  apiJson<TeacherProfile>(`/api/teachers/${id}/invite`, { method: "POST" });
+  apiJson<TeacherProfile>(`/api/training-institute/teachers/${id}/invite`, {
+    method: "POST",
+  });
 export const deactivateTeacher = (id: string) =>
-  apiJson<TeacherProfile>(`/api/teachers/${id}/deactivate`, { method: "POST" });
+  apiJson<TeacherProfile>(`/api/training-institute/teachers/${id}/deactivate`, {
+    method: "POST",
+  });
 export const assignTeacherBatch = (id: string, batchId: string) =>
-  apiJson<BatchList>(`/api/teachers/${id}/batches`, {
+  apiJson<BatchList>(`/api/training-institute/teachers/${id}/batches`, {
     method: "POST",
     headers,
     body: JSON.stringify({ batchId }),
   });
 export const unassignTeacherBatch = (id: string, batchId: string) =>
-  apiJson<BatchList>(`/api/teachers/${id}/batches/${batchId}/unassign`, {
-    method: "POST",
-  });
+  apiJson<BatchList>(
+    `/api/training-institute/teachers/${id}/batches/${batchId}/unassign`,
+    {
+      method: "POST",
+    },
+  );
 export const addTeacherDocument = (id: string, input: TeacherDocumentInput) =>
-  apiJson<TeacherDocument>(`/api/teachers/${id}/documents`, {
+  apiJson<TeacherDocument>(`/api/training-institute/teachers/${id}/documents`, {
     method: "POST",
     headers,
     body: JSON.stringify(input),
   });
 export const removeTeacherDocument = (id: string, documentId: string) =>
   apiJson<{ id: string }>(
-    `/api/teachers/${id}/documents/${documentId}/remove`,
+    `/api/training-institute/teachers/${id}/documents/${documentId}/remove`,
     { method: "POST" },
   );
 export const activateTeacher = () =>
-  apiJson<{ teacherId: string }>("/api/teacher/activate", { method: "POST" });
+  apiJson<{ teacherId: string }>("/api/training-institute/teacher/activate", {
+    method: "POST",
+  });

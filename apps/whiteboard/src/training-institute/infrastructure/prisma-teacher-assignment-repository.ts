@@ -60,16 +60,17 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     workspaceId: string;
     userId: string;
   }): Promise<boolean> {
-    const result = await this.db.trainingInstituteBatchTeacherAssignment.updateMany({
-      where: {
-        workspaceId: input.workspaceId,
-        teacherId: input.teacherId,
-        batchId: input.batchId,
-        unassignedAt: null,
-        deletedAt: null,
-      },
-      data: { unassignedAt: new Date(), unassignedByUserId: input.userId },
-    });
+    const result =
+      await this.db.trainingInstituteBatchTeacherAssignment.updateMany({
+        where: {
+          workspaceId: input.workspaceId,
+          teacherId: input.teacherId,
+          batchId: input.batchId,
+          unassignedAt: null,
+          deletedAt: null,
+        },
+        data: { unassignedAt: new Date(), unassignedByUserId: input.userId },
+      });
     return result.count > 0;
   }
 
@@ -77,17 +78,19 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     teacherId: string,
     workspaceId: string,
   ): Promise<AssignedBatch[]> {
-    const rows = await this.db.trainingInstituteBatchTeacherAssignment.findMany({
-      where: {
-        teacherId,
-        workspaceId,
-        unassignedAt: null,
-        deletedAt: null,
-        batch: { deletedAt: null },
+    const rows = await this.db.trainingInstituteBatchTeacherAssignment.findMany(
+      {
+        where: {
+          teacherId,
+          workspaceId,
+          unassignedAt: null,
+          deletedAt: null,
+          batch: { deletedAt: null },
+        },
+        include: { batch: true },
+        orderBy: [{ assignedAt: "desc" }, { id: "desc" }],
       },
-      include: { batch: true },
-      orderBy: [{ assignedAt: "desc" }, { id: "desc" }],
-    });
+    );
     return rows.map((row) => ({
       id: row.batch.id,
       name: row.batch.name,

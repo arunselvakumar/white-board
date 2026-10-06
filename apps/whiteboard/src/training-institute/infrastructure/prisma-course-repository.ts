@@ -145,7 +145,8 @@ function mapCourseWriteError(error: unknown): Error {
 
 function cursorWhere(
   params: CourseListParams,
-): Pick<Prisma.TrainingInstituteCourseWhereInput, "OR"> | Record<string, never> {
+):
+  Pick<Prisma.TrainingInstituteCourseWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [

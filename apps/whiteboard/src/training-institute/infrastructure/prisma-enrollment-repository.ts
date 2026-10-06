@@ -263,7 +263,9 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
 
 function cursorWhere(
   params: EnrollmentListParams,
-): Pick<Prisma.TrainingInstituteEnrollmentWhereInput, "OR"> | Record<string, never> {
+):
+  | Pick<Prisma.TrainingInstituteEnrollmentWhereInput, "OR">
+  | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [

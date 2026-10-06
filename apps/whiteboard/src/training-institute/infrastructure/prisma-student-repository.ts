@@ -170,7 +170,9 @@ export class PrismaStudentRepository implements StudentRepository {
 
 function cursorWhere(
   params: StudentListParams,
-): Pick<Prisma.TrainingInstituteStudentWhereInput, "OR"> | Record<string, never> {
+):
+  | Pick<Prisma.TrainingInstituteStudentWhereInput, "OR">
+  | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [

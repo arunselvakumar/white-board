@@ -296,15 +296,17 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     workspaceId: string,
     slot: ClassSlotKey,
   ): Promise<boolean> {
-    const occurrence = await this.db.trainingInstituteClassOccurrence.findFirst({
-      where: {
-        workspaceId,
-        batchId: slot.batchId,
-        classDate: dateValue(slot.date),
-        startTime: slot.startTime,
+    const occurrence = await this.db.trainingInstituteClassOccurrence.findFirst(
+      {
+        where: {
+          workspaceId,
+          batchId: slot.batchId,
+          classDate: dateValue(slot.date),
+          startTime: slot.startTime,
+        },
+        select: { id: true },
       },
-      select: { id: true },
-    });
+    );
     return occurrence != null;
   }
 
