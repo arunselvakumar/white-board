@@ -74,6 +74,10 @@ _Avoid_: admin, org admin, owner role (as a Clerk slug)
 The Institution Type Whiteboard sells today. A Workspace of this type is a computer education centre, home tuition centre, skill centre, or similar — not a School or College.
 _Avoid_: academy (as the type name), coaching (as the type name), institute ERP
 
+**Bounded Context**:
+One Institution Type's product inside Whiteboard, with its own words and rules. Today there is one: **Training Institute**. A future School context has its own Student, separate from a Training Institute Student. Each Bounded Context has one code folder (`src/training-institute`), one Postgres schema (`training_institute`), one API path prefix (`/api/training-institute`), and one name prefix for Prisma models and OpenAPI components (`TrainingInstitute…`). See ADR-0030.
+_Avoid_: module, product line, tenant type (in code comments)
+
 **Student**:
 A learner at the Training Institute. A Workspace-scoped record, distinct from a Clerk User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `org:student`. Enquiry pipeline is separate.
 _Avoid_: pupil, scholar, user, account, child (as the entity name)
