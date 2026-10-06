@@ -4,6 +4,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 
+import { UpcomingDemosCard } from "@/components/enquiries/upcoming-demos-card";
 import { myBatchQueries } from "@/src/queries/teachers";
 
 export function MyBatchesScreen() {
@@ -79,6 +80,7 @@ function MyBatchesContent({
             ))}
           </div>
         )}
+        <UpcomingDemosCard />
       </div>
     </main>
   );

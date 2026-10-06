@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
-import { Checkbox } from "@repo/ui/components/checkbox";
-import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -17,11 +15,16 @@ import {
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import {
+  DEFAULT_TIMING_SLOT,
+  refineStudentTimings,
+  TIMING_SOURCE_ITEMS,
+  timingSlotSchema,
+  TimingSlotsEditor,
+} from "@/components/enrollments/student-timings-fields";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";
-import { CLASS_MODE_ITEMS, DAY_OF_WEEK_ITEMS } from "@/lib/class-mode";
+import { CLASS_MODE_ITEMS } from "@/lib/class-mode";
 import type { EnrollInput } from "@/src/queries/enrollments";
-
-const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const enrollmentFormSchema = z
   .object({
@@ -29,66 +32,15 @@ const enrollmentFormSchema = z
     batchId: z.string().min(1, "Batch is required"),
     classModeOverride: z.enum(["inherit", "offline", "online", "hybrid"]),
     timingSource: z.enum(["batch", "student"]),
-    timings: z.array(
-      z.object({
-        daysOfWeek: z.array(z.number().int().min(0).max(6)),
-        startTime: z.string(),
-        endTime: z.string(),
-      }),
-    ),
+    timings: z.array(timingSlotSchema),
   })
-  .superRefine((value, ctx) => {
-    if (value.timingSource !== "student") {
-      return;
-    }
-    if (value.timings.length === 0) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["timings"],
-        message: "Student-specific Timings need at least one weekly slot",
-      });
-      return;
-    }
-    value.timings.forEach((slot, index) => {
-      if (slot.daysOfWeek.length === 0) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["timings", index, "daysOfWeek"],
-          message: "Pick at least one day",
-        });
-      }
-      if (!TIME_RE.test(slot.startTime) || !TIME_RE.test(slot.endTime)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["timings", index, "endTime"],
-          message: "Times must be HH:mm",
-        });
-      } else if (slot.startTime >= slot.endTime) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["timings", index, "endTime"],
-          message: "Start time must be before end time",
-        });
-      }
-    });
-  });
+  .superRefine(refineStudentTimings);
 
 export type EnrollmentFormValues = z.infer<typeof enrollmentFormSchema>;
-
-const defaultSlot = {
-  daysOfWeek: [] as number[],
-  startTime: "17:00",
-  endTime: "18:00",
-};
 
 const MODE_ITEMS = [
   { value: "inherit", label: "Inherit Batch Class Mode" },
   ...CLASS_MODE_ITEMS,
-];
-
-const TIMING_ITEMS = [
-  { value: "batch", label: "Inherit Batch Timings" },
-  { value: "student", label: "Student-specific Timings" },
 ];
 
 export function EnrollmentForm({
@@ -120,7 +72,6 @@ export function EnrollmentForm({
   }));
   const {
     control,
-    register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
@@ -131,11 +82,10 @@ export function EnrollmentForm({
       batchId: "",
       classModeOverride: "inherit",
       timingSource: "batch",
-      timings: [defaultSlot],
+      timings: [DEFAULT_TIMING_SLOT],
       ...defaultValues,
     },
   });
-  const timings = useFieldArray({ control, name: "timings" });
   const timingSource = useWatch({ control, name: "timingSource" });
 
   return (
@@ -280,7 +230,7 @@ export function EnrollmentForm({
           control={control}
           render={({ field }) => (
             <Select
-              items={[...TIMING_ITEMS]}
+              items={[...TIMING_SOURCE_ITEMS]}
               value={field.value}
               onValueChange={(value) => {
                 if (value == null) return;
@@ -295,7 +245,7 @@ export function EnrollmentForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
-                {TIMING_ITEMS.map((item) => (
+                {TIMING_SOURCE_ITEMS.map((item) => (
                   <SelectItem key={item.value} value={item.value}>
                     {item.label}
                   </SelectItem>
@@ -305,79 +255,22 @@ export function EnrollmentForm({
           )}
         />
       </div>
-      {timingSource === "student"
-        ? timings.fields.map((field, index) => (
-            <div key={field.id} className="space-y-3 rounded-lg border p-3">
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Days of week</legend>
-                <Controller
-                  name={`timings.${index}.daysOfWeek`}
-                  control={control}
-                  render={({ field: daysField }) => (
-                    <div className="flex flex-wrap gap-3">
-                      {DAY_OF_WEEK_ITEMS.map((day) => {
-                        const checkboxId = `enroll-slot-${index}-day-${day.value}`;
-                        return (
-                          <div
-                            key={day.value}
-                            className="flex items-center gap-2"
-                          >
-                            <Checkbox
-                              id={checkboxId}
-                              checked={daysField.value.includes(day.value)}
-                              onCheckedChange={(next) => {
-                                if (next) {
-                                  daysField.onChange(
-                                    [...daysField.value, day.value].sort(
-                                      (a, b) => a - b,
-                                    ),
-                                  );
-                                  return;
-                                }
-                                daysField.onChange(
-                                  daysField.value.filter(
-                                    (value) => value !== day.value,
-                                  ),
-                                );
-                              }}
-                            />
-                            <Label htmlFor={checkboxId}>{day.label}</Label>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                />
-                <FieldError
-                  message={errors.timings?.[index]?.daysOfWeek?.message}
-                />
-              </fieldset>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor={`timings.${index}.startTime`}>Start</Label>
-                  <Input
-                    id={`timings.${index}.startTime`}
-                    type="time"
-                    className="h-10"
-                    {...register(`timings.${index}.startTime`)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor={`timings.${index}.endTime`}>End</Label>
-                  <Input
-                    id={`timings.${index}.endTime`}
-                    type="time"
-                    className="h-10"
-                    {...register(`timings.${index}.endTime`)}
-                  />
-                  <FieldError
-                    message={errors.timings?.[index]?.endTime?.message}
-                  />
-                </div>
-              </div>
-            </div>
-          ))
-        : null}
+      {timingSource === "student" ? (
+        <Controller
+          name="timings"
+          control={control}
+          render={({ field }) => (
+            <TimingSlotsEditor
+              value={field.value}
+              onChange={field.onChange}
+              errors={field.value.map((_, index) => ({
+                daysOfWeek: errors.timings?.[index]?.daysOfWeek?.message,
+                endTime: errors.timings?.[index]?.endTime?.message,
+              }))}
+            />
+          )}
+        />
+      ) : null}
       <FieldError message={errors.timings?.message} />
       <div className="flex gap-2">
         <Button type="submit" disabled={isSubmitting}>

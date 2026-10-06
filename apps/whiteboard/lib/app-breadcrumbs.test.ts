@@ -48,6 +48,19 @@ describe("getAppBreadcrumbs", () => {
     ],
     ["/enrollments/123", ["Dashboard", "Enrollment"]],
     ["/payments/123/receipt", ["Dashboard", "Fees", "Receipt"]],
+    ["/enquiries", ["Dashboard", "Enquiries"]],
+    ["/enquiries/new", ["Dashboard", "Enquiries", "Add enquiry"]],
+    ["/enquiries/sources", ["Dashboard", "Enquiries", "Enquiry Sources"]],
+    ["/enquiries/summary", ["Dashboard", "Enquiries", "Enquiry summary"]],
+    ["/enquiries/123", ["Dashboard", "Enquiries", "Enquiry"]],
+    [
+      "/enquiries/123/edit",
+      ["Dashboard", "Enquiries", "Enquiry", "Edit enquiry"],
+    ],
+    [
+      "/enquiries/123/convert",
+      ["Dashboard", "Enquiries", "Enquiry", "Convert to Student"],
+    ],
   ])("builds a trail for %s", (pathname, labels) => {
     const crumbs = getAppBreadcrumbs(pathname);
     expect(crumbs.map((crumb) => crumb.label)).toEqual(labels);
@@ -61,4 +74,15 @@ describe("getAppBreadcrumbs", () => {
       href: "/students/123",
     });
   });
+});
+
+it("starts a Teacher's Enquiry trail at Enquiries", () => {
+  expect(getAppBreadcrumbs("/enquiries", "org:teacher")).toEqual([
+    { label: "Enquiries" },
+  ]);
+  expect(getAppBreadcrumbs("/enquiries/123/edit", "org:teacher")).toEqual([
+    { label: "Enquiries", href: "/enquiries" },
+    { label: "Enquiry", href: "/enquiries/123" },
+    { label: "Edit enquiry" },
+  ]);
 });

@@ -36,6 +36,46 @@ describe("Workspace role access", () => {
     expect(isAllowedAppPath("/teacher", "org:admin")).toBe(false);
   });
 
+  it("lets the Owner and Teachers work Enquiries, and keeps Students and Parents out", () => {
+    const staffPaths = [
+      "/enquiries",
+      "/enquiries/new",
+      "/enquiries/3f0c2a52-1d7e-4c55-9d8e-0b8a4e6f5a10",
+      "/enquiries/3f0c2a52-1d7e-4c55-9d8e-0b8a4e6f5a10/edit",
+    ];
+    for (const path of staffPaths) {
+      expect(isAllowedAppPath(path, "org:admin")).toBe(true);
+      expect(isAllowedAppPath(path, "org:teacher")).toBe(true);
+      expect(isAllowedAppPath(path, "org:student")).toBe(false);
+      expect(isAllowedAppPath(path, "org:parent")).toBe(false);
+      expect(isAllowedAppPath(path, "org:member")).toBe(false);
+    }
+  });
+
+  it("keeps Enquiry Sources, the summary, and Convert to Student for the Owner", () => {
+    const ownerPaths = [
+      "/enquiries/sources",
+      "/enquiries/summary",
+      "/enquiries/3f0c2a52-1d7e-4c55-9d8e-0b8a4e6f5a10/convert",
+    ];
+    for (const path of ownerPaths) {
+      expect(isAllowedAppPath(path, "org:admin")).toBe(true);
+      expect(isAllowedAppPath(path, "org:teacher")).toBe(false);
+      expect(isAllowedAppPath(path, "org:student")).toBe(false);
+      expect(isAllowedAppPath(path, "org:parent")).toBe(false);
+    }
+  });
+
+  it("does not read Owner-only Enquiry pages as an Enquiry id", () => {
+    expect(isAllowedAppPath("/enquiries/sources/edit", "org:teacher")).toBe(
+      false,
+    );
+    expect(isAllowedAppPath("/enquiries/summary/edit", "org:teacher")).toBe(
+      false,
+    );
+    expect(isAllowedAppPath("/enquiries/new/edit", "org:teacher")).toBe(false);
+  });
+
   it("lets every supported role open shared Calendar, Online Classes, and class routes", () => {
     for (const role of [
       "org:admin",
