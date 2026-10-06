@@ -1,0 +1,29 @@
+.grok/skills/modular-monolith/SKILL.md
+  s_9099fee0038e5a::t_6d5f3b24712678 8-15,55-56
+AGENTS.md
+  s_9099fee0038e5a::t_9ae3143fefbc10 46-47,56
+CLAUDE.md
+  s_9099fee0038e5a::t_6ad69a1587b070 44-47
+CONTEXT.md
+  s_9099fee0038e5a::t_3934f92773a4de 77-80
+apps/whiteboard/eslint.config.js
+  s_9099fee0038e5a::t_c19abf68665dc6 5-30,44
+docs/prd/tasks.md
+  s_9099fee0038e5a::t_06803ff19d5531 343-344,395-400
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ddd0b920354044dd7caeae3510ff737bd0e2b79f",
+  "prompts": {},
+  "sessions": {
+    "s_9099fee0038e5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25dca414-5744-4150-bd29-0b38ae5c59b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
