@@ -52,13 +52,13 @@ Import only from `@/lib/gsap` (it registers `useGSAP`, `ScrollTrigger`, `SplitTe
 
 Three orchestrated moments on the whole page, nothing else moves on its own:
 
-1. **Hero load**: the register opens and its rows lift into a product table. One timeline, ~2.4s, eased, starts after mount.
+1. **Hero dot field**: a three.js point cloud (the only WebGL on the site) in the spirit of the Whiteboard sign-in panel's dotted logo and of the Vercel and Cloudflare heroes. Dots on paper converge into the logo mark, then morph through dot-matrix product words, with the pointer displacing nearby dots. GSAP drives the morph timeline; three.js only renders. Reduced motion renders the static logo.
 2. **Register loop**: a pinned, scrubbed sequence of six 3D cards, one per step.
 3. **Receipt print**: a receipt slides out of a 3D plate when the fees section enters.
 
 Everything else: no fade-up-on-scroll per section, no hover lift on every block. Hover is only on links and buttons.
 
-Use `gsap.matchMedia()` with `(prefers-reduced-motion: no-preference)`; under reduced motion render the final state with no tweens. All 3D is CSS 3D (`perspective`, `rotateX/Y`, `translateZ`, `transform-style: preserve-3d`) driven by GSAP; no WebGL. Set initial hidden states in CSS classes (or `gsap.set` inside `useGSAP`) so the server and client markup match.
+Use `gsap.matchMedia()` with `(prefers-reduced-motion: no-preference)`; under reduced motion render the final state with no tweens. The register loop and the receipt are CSS 3D (`perspective`, `rotateX/Y`, `translateZ`, `transform-style: preserve-3d`) driven by GSAP. WebGL (three.js) is allowed only in the hero dot field. Set initial hidden states in CSS classes (or `gsap.set` inside `useGSAP`) so the server and client markup match.
 
 Keep ScrollTrigger pins inside the section's own wrapper; use `scope` on `useGSAP`; never leak triggers (the hook cleans up).
 

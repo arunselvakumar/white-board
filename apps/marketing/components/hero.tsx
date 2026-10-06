@@ -1,5 +1,5 @@
 import { Button } from "@repo/ui/components/button";
-import { RegisterScene } from "@/components/register-scene";
+import { HeroDotField } from "@/components/hero-dot-field";
 
 export function Hero() {
   return (
@@ -7,8 +7,16 @@ export function Hero() {
       aria-labelledby="hero-heading"
       className="bg-background relative overflow-x-clip"
     >
-      <div className="container-site grid min-h-[calc(100svh-4rem)] items-center gap-y-12 pt-28 pb-16 lg:grid-cols-12 lg:gap-x-6 lg:pt-32 lg:pb-24">
-        <div className="relative z-10 lg:col-span-5">
+      <HeroDotField />
+      <p className="sr-only">
+        Dots form the Whiteboard mark, then the words Students, Courses,
+        Batches, Fees, and Receipts, then a ruled register page.
+      </p>
+      <div className="container-site relative grid min-h-[calc(100svh-4rem)] items-center pt-28 pb-16 lg:grid-cols-12 lg:gap-x-6 lg:pt-32 lg:pb-24">
+        <div
+          data-dot-copy
+          className="relative z-10 pb-[56vw] lg:col-span-5 lg:pb-0"
+        >
           <h1 id="hero-heading" className="text-display text-foreground">
             Throw away the register.
           </h1>
@@ -36,9 +44,6 @@ export function Hero() {
               Sign in
             </a>
           </div>
-        </div>
-        <div className="min-[1400px]:-mr-24 lg:col-span-7 lg:col-start-6 lg:-mr-10">
-          <RegisterScene />
         </div>
       </div>
     </section>
