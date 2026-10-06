@@ -1,0 +1,27 @@
+apps/whiteboard/src/training/domain/class-change.test.ts
+  s_e6d8703aebdcb0::t_15f1deab6a02b2 1-180
+apps/whiteboard/src/training/domain/class-change.ts
+  s_e6d8703aebdcb0::t_8f0bb69d8c62df 1-230
+apps/whiteboard/src/training/domain/class-schedule.test.ts
+  s_e6d8703aebdcb0::t_c2a9c7baad601d 1-184
+apps/whiteboard/src/training/domain/class-schedule.ts
+  s_e6d8703aebdcb0::t_8ff12f1ecfe840 1-237
+apps/whiteboard/src/training/domain/holiday.ts
+  s_e6d8703aebdcb0::t_709340bbd4d68e 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "864c39c7984a29ed02da9265e27929f2f832a2b8",
+  "prompts": {},
+  "sessions": {
+    "s_e6d8703aebdcb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30500495-0124-46fc-9ca7-65b48c5214c6",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
