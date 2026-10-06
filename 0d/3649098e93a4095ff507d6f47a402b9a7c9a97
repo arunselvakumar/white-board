@@ -1,0 +1,19 @@
+apps/whiteboard/app/api/classes/classes.http.test.ts
+  s_e6d8703aebdcb0::t_fd0494c3e023a6 48-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0d3649098e93a4095ff507d6f47a402b9a7c9a97",
+  "prompts": {},
+  "sessions": {
+    "s_e6d8703aebdcb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30500495-0124-46fc-9ca7-65b48c5214c6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
