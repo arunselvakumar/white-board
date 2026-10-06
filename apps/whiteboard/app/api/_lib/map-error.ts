@@ -17,6 +17,9 @@ const NOT_FOUND_CODES = new Set([
   "CLASS_NOT_FOUND",
   "CLASS_FORBIDDEN",
   "HOLIDAY_NOT_FOUND",
+  "ENQUIRY_NOT_FOUND",
+  "DEMO_NOT_FOUND",
+  "ENQUIRY_SOURCE_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -61,6 +64,28 @@ const CONFLICT_CODES = new Set([
   "HOLIDAY_STARTED",
   "ATTENDANCE_CLASS_CANCELLED",
   "BATCH_HAS_CLASS_CHANGES",
+  "ENQUIRY_CLOSED",
+  "ENQUIRY_JOINED",
+  "ENQUIRY_NOT_CLOSED",
+  "ENQUIRY_ALREADY_CONVERTED",
+  "ENQUIRY_SOURCE_RETIRED",
+  "ENQUIRY_SOURCE_NAME_IN_USE",
+  "ENQUIRY_SOURCE_ALREADY_RETIRED",
+  "ENQUIRY_SOURCE_NOT_RETIRED",
+  "DEMO_CLASS_UNAVAILABLE",
+  "DEMO_IN_PAST",
+  "DEMO_ON_HOLIDAY",
+  "DEMO_TEACHER_CLASH",
+  "DEMO_NOT_STARTED",
+  "DEMO_CANCELLED",
+  "DEMO_ALREADY_CANCELLED",
+  "DEMO_ATTENDANCE_MARKED",
+  "DEMO_FREE",
+  "DEMO_FEE_ALREADY_PAID",
+]);
+const ENQUIRY_FORBIDDEN_CODES = new Set([
+  "ENQUIRY_CONVERT_FORBIDDEN",
+  "ENQUIRY_SUMMARY_FORBIDDEN",
 ]);
 
 function errorCode(error: unknown): string | undefined {
@@ -96,6 +121,13 @@ export function mapError(error: unknown): Response {
   }
   if (
     (code === "ATTENDANCE_FORBIDDEN" || code === "HOLIDAY_FORBIDDEN") &&
+    error instanceof Error
+  ) {
+    return jsonError(StatusCodes.FORBIDDEN, code, error.message);
+  }
+  if (
+    code != null &&
+    ENQUIRY_FORBIDDEN_CODES.has(code) &&
     error instanceof Error
   ) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);

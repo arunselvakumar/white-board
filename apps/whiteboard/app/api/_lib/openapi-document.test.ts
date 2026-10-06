@@ -200,6 +200,42 @@ describe("openApiDocument", () => {
     ).toBeDefined();
   });
 
+  it("documents Enquiries, demos, and Enquiry Sources", () => {
+    const paths = openApiDocument.paths;
+    const base = "/api/training-institute";
+    const expected: [string, string][] = [
+      ["get", "/enquiries"],
+      ["post", "/enquiries"],
+      ["get", "/enquiries/options"],
+      ["get", "/enquiries/summary"],
+      ["post", "/enquiries/phone-matches"],
+      ["get", "/enquiries/{id}"],
+      ["post", "/enquiries/{id}/details"],
+      ["post", "/enquiries/{id}/follow-ups"],
+      ["post", "/enquiries/{id}/not-interested"],
+      ["post", "/enquiries/{id}/reopen"],
+      ["post", "/enquiries/{id}/convert"],
+      ["post", "/enquiries/{id}/demos"],
+      ["get", "/demos"],
+      ["get", "/demos/slots"],
+      ["post", "/demos/{id}/attendance"],
+      ["post", "/demos/{id}/fee-paid"],
+      ["post", "/demos/{id}/cancel"],
+      ["get", "/enquiry-sources"],
+      ["post", "/enquiry-sources"],
+      ["post", "/enquiry-sources/{id}/rename"],
+      ["post", "/enquiry-sources/{id}/retire"],
+      ["post", "/enquiry-sources/{id}/restore"],
+    ];
+    for (const [method, path] of expected) {
+      expect(
+        paths[`${base}${path}`]?.[method],
+        `${method} ${path}`,
+      ).toBeDefined();
+    }
+    expect(paths[`${base}/enquiries/{id}`]?.["patch"]).toBeUndefined();
+  });
+
   it("names every component with its bounded context (ADR-0030)", () => {
     const names = Object.keys(openApiDocument.components.schemas);
     expect(names).toContain("CreateTrainingInstituteStudentRequest");

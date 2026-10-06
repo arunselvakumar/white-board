@@ -121,6 +121,7 @@ model TrainingInstituteCourse {
 
   batches     TrainingInstituteBatch[]
   enrollments TrainingInstituteEnrollment[]
+  enquiries   TrainingInstituteEnquiry[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@map("courses")
@@ -154,6 +155,7 @@ model TrainingInstituteBatch {
   attendanceRegisters TrainingInstituteAttendanceRegister[]
   classOccurrences TrainingInstituteClassOccurrence[]
   classChanges     TrainingInstituteClassChange[]
+  enquiryDemos     TrainingInstituteEnquiryDemo[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([courseId, deletedAt])
@@ -260,6 +262,7 @@ model TrainingInstituteTeacher {
 
   batchAssignments TrainingInstituteBatchTeacherAssignment[]
   documents        TrainingInstituteTeacherDocument[]
+  enquiryDemos     TrainingInstituteEnquiryDemo[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([workspaceId, clerkUserId])
@@ -331,6 +334,7 @@ model TrainingInstituteStudent {
 
   enrollments TrainingInstituteEnrollment[]
   attendanceMarks TrainingInstituteAttendanceMark[]
+  convertedFromEnquiry TrainingInstituteEnquiry?
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([workspaceId, phone])
@@ -368,6 +372,7 @@ model TrainingInstituteEnrollment {
   batch       TrainingInstituteBatch        @relation(fields: [batchId], references: [id], onDelete: Restrict)
   feePayments TrainingInstituteFeePayment[]
   attendanceMarks TrainingInstituteAttendanceMark[]
+  convertedFromEnquiries TrainingInstituteEnquiry[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([studentId, deletedAt])
@@ -460,5 +465,172 @@ model TrainingInstituteFeePayment {
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([enrollmentId, deletedAt, paidAt, id])
   @@map("fee_payments")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteEnquiryStage {
+  new
+  follow_up
+  demo_scheduled
+  demo_attended
+  joined
+  not_interested
+
+  @@map("enquiry_stage")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteEnquiryActivityKind {
+  created
+  follow_up
+  not_interested
+  reopened
+  joined
+  details_updated
+
+  @@map("enquiry_activity_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteDemoKind {
+  batch
+  one_to_one
+
+  @@map("demo_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteDemoFeeKind {
+  free
+  paid
+
+  @@map("demo_fee_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteDemoAttendance {
+  unmarked
+  attended
+  missed
+
+  @@map("demo_attendance")
+  @@schema("training_institute")
+}
+
+/// Where Enquiries come from. Names are unique among a Workspace's active
+/// Sources, ignoring case (partial unique index in the migration).
+model TrainingInstituteEnquirySource {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  name            String    @db.VarChar(80)
+  retiredAt       DateTime? @map("retired_at")
+  retiredByUserId String?   @map("retired_by_user_id")
+  createdByUserId String    @map("created_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  enquiries TrainingInstituteEnquiry[]
+
+  @@index([workspaceId, retiredAt])
+  @@map("enquiry_sources")
+  @@schema("training_institute")
+}
+
+/// A prospect asking about a Course or subject before admission. Not a Student.
+model TrainingInstituteEnquiry {
+  id                    String                        @id @db.Uuid
+  workspaceId           String                        @map("workspace_id")
+  createdByUserId       String                        @map("created_by_user_id")
+  prospectName          String                        @map("prospect_name") @db.VarChar(200)
+  phone                 String                        @db.VarChar(32)
+  email                 String?                       @db.VarChar(320)
+  guardianName          String?                       @map("guardian_name") @db.VarChar(200)
+  guardianPhone         String?                       @map("guardian_phone") @db.VarChar(32)
+  courseId              String?                       @map("course_id") @db.Uuid
+  subject               String?                       @db.VarChar(200)
+  preferredClassMode    TrainingInstituteClassMode?   @map("preferred_class_mode")
+  preferredTiming       String?                       @map("preferred_timing") @db.VarChar(200)
+  sourceId              String?                       @map("source_id") @db.Uuid
+  notes                 String?                       @db.Text
+  /// Worked out by the domain on every change; stored so lists can filter.
+  stage                 TrainingInstituteEnquiryStage @default(new)
+  nextFollowUpOn        DateTime?                     @map("next_follow_up_on") @db.Date
+  notInterestedReason   String?                       @map("not_interested_reason") @db.VarChar(200)
+  closedAt              DateTime?                     @map("closed_at")
+  closedByUserId        String?                       @map("closed_by_user_id")
+  convertedStudentId    String?                       @unique @map("converted_student_id") @db.Uuid
+  convertedEnrollmentId String?                       @map("converted_enrollment_id") @db.Uuid
+  convertedAt           DateTime?                     @map("converted_at")
+  convertedByUserId     String?                       @map("converted_by_user_id")
+  createdAt             DateTime                      @default(now()) @map("created_at")
+  updatedAt             DateTime                      @updatedAt @map("updated_at")
+  deletedAt             DateTime?                     @map("deleted_at")
+  deletedByUserId       String?                       @map("deleted_by_user_id")
+
+  course              TrainingInstituteCourse?           @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  source              TrainingInstituteEnquirySource?    @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  convertedStudent    TrainingInstituteStudent?          @relation(fields: [convertedStudentId], references: [id], onDelete: Restrict)
+  convertedEnrollment TrainingInstituteEnrollment?       @relation(fields: [convertedEnrollmentId], references: [id], onDelete: Restrict)
+  activities          TrainingInstituteEnquiryActivity[]
+  demos               TrainingInstituteEnquiryDemo[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([workspaceId, stage, nextFollowUpOn])
+  @@index([workspaceId, phone])
+  @@map("enquiries")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteEnquiryActivity {
+  id              String                               @id @db.Uuid
+  workspaceId     String                               @map("workspace_id")
+  enquiryId       String                               @map("enquiry_id") @db.Uuid
+  kind            TrainingInstituteEnquiryActivityKind
+  note            String?                              @db.VarChar(1000)
+  nextFollowUpOn  DateTime?                            @map("next_follow_up_on") @db.Date
+  createdByUserId String                               @map("created_by_user_id")
+  createdAt       DateTime                             @default(now()) @map("created_at")
+
+  enquiry TrainingInstituteEnquiry @relation(fields: [enquiryId], references: [id], onDelete: Restrict)
+
+  @@index([enquiryId, createdAt])
+  @@map("enquiry_activities")
+  @@schema("training_institute")
+}
+
+/// A trial class for an Enquiry's prospect: one date's Class of a Batch, or a
+/// one-to-one slot with a Teacher. Never takes a seat or appears in Attendance.
+model TrainingInstituteEnquiryDemo {
+  id                       String                          @id @db.Uuid
+  workspaceId              String                          @map("workspace_id")
+  enquiryId                String                          @map("enquiry_id") @db.Uuid
+  kind                     TrainingInstituteDemoKind
+  batchId                  String?                         @map("batch_id") @db.Uuid
+  teacherId                String?                         @map("teacher_id") @db.Uuid
+  demoDate                 DateTime                        @map("demo_date") @db.Date
+  startTime                String                          @map("start_time") @db.VarChar(5)
+  endTime                  String                          @map("end_time") @db.VarChar(5)
+  timezone                 String                          @db.VarChar(64)
+  feeKind                  TrainingInstituteDemoFeeKind    @map("fee_kind")
+  feeAmountPaise           Int?                            @map("fee_amount_paise")
+  feePaidAt                DateTime?                       @map("fee_paid_at")
+  feePaidByUserId          String?                         @map("fee_paid_by_user_id")
+  attendance               TrainingInstituteDemoAttendance @default(unmarked)
+  attendanceMarkedAt       DateTime?                       @map("attendance_marked_at")
+  attendanceMarkedByUserId String?                         @map("attendance_marked_by_user_id")
+  cancelledAt              DateTime?                       @map("cancelled_at")
+  cancelledByUserId        String?                         @map("cancelled_by_user_id")
+  createdByUserId          String                          @map("created_by_user_id")
+  createdAt                DateTime                        @default(now()) @map("created_at")
+  updatedAt                DateTime                        @updatedAt @map("updated_at")
+
+  enquiry TrainingInstituteEnquiry  @relation(fields: [enquiryId], references: [id], onDelete: Restrict)
+  batch   TrainingInstituteBatch?   @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  teacher TrainingInstituteTeacher? @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, demoDate])
+  @@index([workspaceId, teacherId, demoDate])
+  @@index([enquiryId])
+  @@map("enquiry_demos")
   @@schema("training_institute")
 }
