@@ -45,14 +45,12 @@ describe("Class pre-join HTTP", () => {
       orgId: workspaceId,
       orgRole: "org:admin",
     } as never);
-    getUser
-      .mockReset()
-      .mockResolvedValue({
-        firstName: "Owner",
-        lastName: null,
-        username: null,
-        emailAddresses: [],
-      });
+    getUser.mockReset().mockResolvedValue({
+      firstName: "Owner",
+      lastName: null,
+      username: null,
+      emailAddresses: [],
+    });
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     const courseId = randomUUID();
     await prisma.course.create({
