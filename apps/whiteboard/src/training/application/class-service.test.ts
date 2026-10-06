@@ -98,6 +98,7 @@ describe("ClassService", () => {
     });
     expect(await cancelled.get(input)).toMatchObject({
       status: "cancelled",
+      joinUrl: null,
       classChange: { status: "cancelled", reason: "Power cut", movedTo: null },
       rescheduledFrom: null,
     });

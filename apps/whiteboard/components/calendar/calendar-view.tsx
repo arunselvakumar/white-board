@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays,
+  CalendarOff,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -11,6 +12,7 @@ import {
   MapPin,
   MonitorPlay,
 } from "lucide-react";
+import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 
 import {
@@ -24,8 +26,30 @@ import {
   type CalendarEvent,
   type DateKey,
 } from "@/lib/calendar-dates";
-import type { CalendarItem } from "@/src/queries/calendar";
+import {
+  classChangeSummary,
+  classMarker,
+  isOff,
+  upcomingChanges,
+} from "@/lib/class-changes";
+import type {
+  CalendarItem,
+  CalendarPermissions,
+  ClassChange,
+  Holiday,
+} from "@/src/queries/calendar";
 import { classPath } from "@/src/queries/classes";
+import { holidayOn } from "@/src/training/domain/class-schedule";
+
+import {
+  ClassChangeDialog,
+  type ClassChangeActions,
+} from "./class-change-dialog";
+import {
+  HolidaysDialog,
+  holidayRangeLabel,
+  type HolidayActions,
+} from "./holidays-dialog";
 
 type ViewMode = "day" | "week" | "month";
 type Event = CalendarEvent<CalendarItem>;
@@ -98,50 +122,79 @@ function rangeLabel(
 
 function eventLabel(event: Event): string {
   const { item } = event;
-  return `${item.courseName}, ${item.batchName}, ${timeLabel(event.startMinutes)} to ${timeLabel(event.endMinutes)}, ${item.classMode}${item.room ? `, ${item.room}` : ""}${item.studentName ? `, ${item.studentName}` : ""}`;
+  const summary = classChangeSummary(event.scheduled);
+  return `${item.courseName}, ${item.batchName}, ${timeLabel(event.startMinutes)} to ${timeLabel(event.endMinutes)}, ${item.classMode}${item.room ? `, ${item.room}` : ""}${item.studentName ? `, ${item.studentName}` : ""}${summary ? `, ${summary}` : ""}`;
 }
 
 function CalendarEventCard({
   event,
   compact = false,
+  onSelect,
 }: {
   event: Event;
   compact?: boolean;
+  onSelect?: (event: Event) => void;
 }) {
   const colors = colorFor(event.item.courseId);
   const href = classPath(
     event.item.batchId,
     event.date,
-    `${String(Math.floor(event.startMinutes / 60)).padStart(2, "0")}:${String(event.startMinutes % 60).padStart(2, "0")}`,
+    event.scheduled.startTime,
   );
   const linked = event.item.classMode !== "offline";
-  if (compact)
-    return linked ? (
-      <Link
-        href={href}
-        title={eventLabel(event)}
-        className={`block truncate rounded-md px-2 py-1 text-xs font-medium ${colors.chip}`}
-      >
-        {timeLabel(event.startMinutes)} · {event.item.courseName}
+  const off = isOff(event.scheduled);
+  const marker = classMarker(event.scheduled);
+  const offClass = off ? "opacity-60 saturate-50" : "";
+  const titleClass = off ? "line-through decoration-2" : "";
+  const label = eventLabel(event);
+  if (compact) {
+    const chip = (
+      <>
+        {timeLabel(event.startMinutes)} ·{" "}
+        <span className={titleClass}>{event.item.courseName}</span>
         {event.item.studentName ? ` · ${event.item.studentName}` : ""}
+        {marker ? ` · ${marker}` : ""}
+      </>
+    );
+    const chipClass = `block w-full truncate rounded-md px-2 py-1 text-left text-xs font-medium ${colors.chip} ${offClass} ${event.scheduled.rescheduled ? "ring-1 ring-current ring-dashed" : ""}`;
+    if (onSelect)
+      return (
+        <Button
+          variant="ghost"
+          title={label}
+          aria-label={`Change ${label}`}
+          className={`${chipClass} h-auto justify-start`}
+          onClick={() => {
+            onSelect(event);
+          }}
+        >
+          <span className="truncate">{chip}</span>
+        </Button>
+      );
+    return linked ? (
+      <Link href={href} title={label} className={chipClass}>
+        {chip}
       </Link>
     ) : (
-      <div
-        title={eventLabel(event)}
-        className={`truncate rounded-md px-2 py-1 text-xs font-medium ${colors.chip}`}
-      >
-        {timeLabel(event.startMinutes)} · {event.item.courseName}
-        {event.item.studentName ? ` · ${event.item.studentName}` : ""}
+      <div title={label} className={chipClass}>
+        {chip}
       </div>
     );
+  }
   const content = (
     <>
       <p className="truncate text-[11px] font-semibold opacity-75">
         {timeLabel(event.startMinutes)}–{timeLabel(event.endMinutes)}
       </p>
-      <p className="truncate text-xs font-bold sm:text-sm">
+      <p className={`truncate text-xs font-bold sm:text-sm ${titleClass}`}>
         {event.item.courseName}
       </p>
+      {marker && (
+        <p className="truncate text-[11px] font-semibold tracking-wide uppercase">
+          {marker}
+          {event.scheduled.reason ? ` · ${event.scheduled.reason}` : ""}
+        </p>
+      )}
       <p className="truncate text-[11px] font-medium">{event.item.batchName}</p>
       {event.item.studentName && (
         <p className="truncate text-[11px] opacity-75">
@@ -159,24 +212,46 @@ function CalendarEventCard({
       </p>
     </>
   );
-  const className = `block h-full overflow-hidden rounded-r-lg border-l-4 px-2.5 py-1.5 shadow-sm ${colors.card}`;
+  const className = `block h-full overflow-hidden rounded-r-lg border-l-4 px-2.5 py-1.5 shadow-sm ${colors.card} ${offClass} ${event.scheduled.rescheduled ? "border-dashed" : ""}`;
+  if (onSelect)
+    return (
+      <Button
+        variant="ghost"
+        aria-label={`Change ${label}`}
+        title={label}
+        className={`${className} h-full w-full flex-col items-stretch justify-start gap-0 rounded-l-none text-left font-normal whitespace-normal`}
+        onClick={() => {
+          onSelect(event);
+        }}
+      >
+        {content}
+      </Button>
+    );
   return linked ? (
     <Link
       href={href}
-      aria-label={`Open ${eventLabel(event)}`}
-      title={eventLabel(event)}
+      aria-label={`Open ${label}`}
+      title={label}
       className={className}
     >
       {content}
     </Link>
   ) : (
-    <div
-      aria-label={eventLabel(event)}
-      title={eventLabel(event)}
-      className={className}
-    >
+    <div aria-label={label} title={label} className={className}>
       {content}
     </div>
+  );
+}
+
+function HolidayLabel({ holiday }: { holiday: Holiday | null }) {
+  if (holiday == null) return null;
+  return (
+    <p className="mx-auto mt-1 flex max-w-full items-center justify-center gap-1 truncate text-[11px] font-semibold text-rose-700 dark:text-rose-300">
+      <CalendarOff className="size-3 shrink-0" />
+      <span className="truncate">
+        Holiday{holiday.reason ? ` · ${holiday.reason}` : ""}
+      </span>
+    </p>
   );
 }
 
@@ -213,10 +288,14 @@ function TimeGrid({
   dates,
   events,
   today,
+  holidays,
+  onSelect,
 }: {
   dates: DateKey[];
   events: Event[];
   today: DateKey;
+  holidays: Holiday[];
+  onSelect?: (event: Event) => void;
 }) {
   const earliest = events.length
     ? Math.min(...events.map((event) => event.startMinutes))
@@ -250,6 +329,7 @@ function TimeGrid({
               >
                 {Number(date.slice(-2))}
               </p>
+              <HolidayLabel holiday={holidayOn(holidays, date)} />
             </div>
           ))}
         </div>
@@ -297,7 +377,7 @@ function TimeGrid({
                       width: `${100 / lanes}%`,
                     }}
                   >
-                    <CalendarEventCard event={event} />
+                    <CalendarEventCard event={event} onSelect={onSelect} />
                   </div>
                 ),
               )}
@@ -314,11 +394,15 @@ function MonthGrid({
   events,
   selected,
   today,
+  holidays,
+  onSelect,
 }: {
   dates: DateKey[];
   events: Event[];
   selected: DateKey;
   today: DateKey;
+  holidays: Holiday[];
+  onSelect?: (event: Event) => void;
 }) {
   return (
     <div className="bg-card overflow-x-auto rounded-2xl border shadow-sm">
@@ -346,8 +430,14 @@ function MonthGrid({
                 >
                   {Number(date.slice(-2))}
                 </span>
+                <HolidayLabel holiday={holidayOn(holidays, date)} />
                 {dayEvents.slice(0, 3).map((event) => (
-                  <CalendarEventCard key={event.id} event={event} compact />
+                  <CalendarEventCard
+                    key={event.id}
+                    event={event}
+                    compact
+                    onSelect={onSelect}
+                  />
                 ))}
                 {dayEvents.length > 3 && (
                   <p className="px-1 text-[11px] font-semibold">
@@ -363,18 +453,124 @@ function MonthGrid({
   );
 }
 
-export function CalendarView({ items }: { items: CalendarItem[] }) {
+const NO_PERMISSIONS: CalendarPermissions = {
+  changeClasses: false,
+  manageHolidays: false,
+};
+
+function UpcomingChanges({
+  changes,
+}: {
+  changes: ReturnType<typeof upcomingChanges<CalendarItem>>;
+}) {
+  if (changes.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="upcoming-changes"
+      className="bg-card rounded-2xl border p-4 shadow-sm sm:p-5"
+    >
+      <h2
+        id="upcoming-changes"
+        className="flex items-center gap-2 text-sm font-semibold"
+      >
+        <CalendarOff className="size-4 text-rose-600" /> Upcoming changes
+        <span className="text-muted-foreground font-normal">
+          · next 14 days
+        </span>
+      </h2>
+      <ul className="mt-3 divide-y">
+        {changes.map((change) => (
+          <li
+            key={change.id}
+            className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm"
+          >
+            <span className="w-28 shrink-0 font-medium">
+              {formatDate(change.date, {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+            {change.kind === "holiday" ? (
+              <span className="min-w-0 flex-1">
+                <Badge variant="destructive">Holiday</Badge>{" "}
+                {holidayRangeLabel(change)}
+                {change.reason ? ` · ${change.reason}` : ""}
+              </span>
+            ) : (
+              <span className="min-w-0 flex-1">
+                <Badge
+                  variant={
+                    change.event.scheduled.status === "scheduled"
+                      ? "secondary"
+                      : "destructive"
+                  }
+                >
+                  {classMarker(change.event.scheduled)}
+                </Badge>{" "}
+                <span className="font-medium">
+                  {change.event.item.courseName}
+                </span>{" "}
+                · {change.event.item.batchName}
+                {change.event.item.studentName
+                  ? ` · ${change.event.item.studentName}`
+                  : ""}{" "}
+                · {timeLabel(change.event.startMinutes)}
+                <span className="text-muted-foreground block text-xs">
+                  {change.summary}
+                </span>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function CalendarView({
+  items,
+  classChanges = [],
+  holidays = [],
+  permissions = NO_PERMISSIONS,
+  classActions,
+  holidayActions,
+}: {
+  items: CalendarItem[];
+  classChanges?: ClassChange[];
+  holidays?: Holiday[];
+  permissions?: CalendarPermissions;
+  classActions?: ClassChangeActions;
+  holidayActions?: HolidayActions;
+}) {
   const timezone = items[0]?.timezone ?? "Asia/Kolkata";
   const today = dateKeyInZone(new Date(), timezone);
   const [selected, setSelected] = useState<DateKey>(today);
   const [mode, setMode] = useState<ViewMode>("week");
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [holidaysOpen, setHolidaysOpen] = useState(false);
+  const exceptions = { classChanges, holidays };
   const dates =
     mode === "day"
       ? [selected]
       : mode === "week"
         ? weekDates(selected)
         : monthGrid(selected);
-  const events = expandCalendarItems(items, dates);
+  const events = expandCalendarItems(items, dates, exceptions);
+  const happening = events.filter((event) => !isOff(event.scheduled));
+  const changes = upcomingChanges(
+    expandCalendarItems(
+      items,
+      Array.from({ length: 14 }, (_, index) => addDays(today, index)),
+      exceptions,
+    ),
+    holidays,
+    today,
+  );
+  const onSelect =
+    permissions.changeClasses && classActions != null
+      ? setSelectedEvent
+      : undefined;
   const courses = new Map(
     items.map((item) => [item.courseId, item.courseName]),
   );
@@ -400,21 +596,23 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
               Calendar
             </h1>
             <p className="mt-2 text-sm text-white/75">
-              Your Batch Timings, all in one place.
+              Your Classes, all in one place.
             </p>
           </div>
           <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
-            <p className="text-2xl font-semibold">{events.length}</p>
+            <p className="text-2xl font-semibold">{happening.length}</p>
             <p className="text-xs text-white/75">
               {mode === "day"
-                ? "Timings today"
+                ? "Classes today"
                 : mode === "week"
-                  ? "Timings this week"
-                  : "Timings this month"}
+                  ? "Classes this week"
+                  : "Classes this month"}
             </p>
           </div>
         </div>
       </div>
+
+      <UpcomingChanges changes={changes} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
@@ -451,31 +649,43 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
             {rangeLabel(mode, selected, dates)}
           </h2>
         </div>
-        <div
-          className="border-border/70 bg-secondary/70 flex rounded-xl border p-1"
-          aria-label="Calendar view"
-        >
-          {(["day", "week", "month"] as const).map((view) => (
+        <div className="flex flex-wrap items-center gap-2">
+          {permissions.manageHolidays && holidayActions && (
             <Button
-              key={view}
-              size="sm"
-              variant="ghost"
-              aria-pressed={mode === view}
+              variant="outline"
               onClick={() => {
-                setMode(view);
+                setHolidaysOpen(true);
               }}
-              className={`min-w-20 rounded-lg border px-3 font-semibold transition-all ${mode === view ? "border-border/70 bg-card text-primary hover:bg-card shadow-sm" : "text-muted-foreground hover:bg-card/70 hover:text-foreground border-transparent"}`}
             >
-              {mode === view && (
-                <CheckCircle2
-                  aria-hidden="true"
-                  className="fill-primary text-primary-foreground size-4"
-                />
-              )}
-              {view[0]?.toUpperCase()}
-              {view.slice(1)}
+              <CalendarOff className="size-4" /> Holidays
             </Button>
-          ))}
+          )}
+          <div
+            className="border-border/70 bg-secondary/70 flex rounded-xl border p-1"
+            aria-label="Calendar view"
+          >
+            {(["day", "week", "month"] as const).map((view) => (
+              <Button
+                key={view}
+                size="sm"
+                variant="ghost"
+                aria-pressed={mode === view}
+                onClick={() => {
+                  setMode(view);
+                }}
+                className={`min-w-20 rounded-lg border px-3 font-semibold transition-all ${mode === view ? "border-border/70 bg-card text-primary hover:bg-card shadow-sm" : "text-muted-foreground hover:bg-card/70 hover:text-foreground border-transparent"}`}
+              >
+                {mode === view && (
+                  <CheckCircle2
+                    aria-hidden="true"
+                    className="fill-primary text-primary-foreground size-4"
+                  />
+                )}
+                {view[0]?.toUpperCase()}
+                {view.slice(1)}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -512,17 +722,44 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
           events={events}
           selected={selected}
           today={today}
+          holidays={holidays}
+          onSelect={onSelect}
         />
       ) : (
-        <TimeGrid dates={dates} events={events} today={today} />
+        <TimeGrid
+          dates={dates}
+          events={events}
+          today={today}
+          holidays={holidays}
+          onSelect={onSelect}
+        />
       )}
 
       {items.length > 0 && (
         <p className="text-muted-foreground flex items-center gap-2 text-xs">
           <MonitorPlay className="size-3.5" />
-          Timings repeat weekly. Changes to Batch or Enrollment Timings appear
-          here automatically.
+          Timings repeat weekly. Cancelled, Moved, and Holiday Classes are
+          marked{onSelect ? "; select a Class to change it" : ""}.
         </p>
+      )}
+
+      <ClassChangeDialog
+        key={selectedEvent?.id ?? "none"}
+        event={selectedEvent}
+        canChange={permissions.changeClasses}
+        actions={classActions}
+        onClose={() => {
+          setSelectedEvent(null);
+        }}
+      />
+      {permissions.manageHolidays && holidayActions && (
+        <HolidaysDialog
+          open={holidaysOpen}
+          onOpenChange={setHolidaysOpen}
+          holidays={holidays}
+          today={today}
+          actions={holidayActions}
+        />
       )}
     </main>
   );

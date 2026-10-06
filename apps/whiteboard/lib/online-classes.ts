@@ -3,10 +3,12 @@ import {
   dateKeyInZone,
   expandCalendarItems,
   type CalendarEvent,
+  type CalendarExceptions,
 } from "./calendar-dates";
 
 type ScheduledOnlineClass = {
   id: string;
+  batchId: string;
   timezone: string;
   activeFrom: string;
   classMode: "offline" | "online" | "hybrid";
@@ -21,6 +23,7 @@ export function upcomingOnlineClasses<T extends ScheduledOnlineClass>(
   items: readonly T[],
   now: Date,
   days = 30,
+  exceptions?: CalendarExceptions,
 ): CalendarEvent<T>[] {
   const events = items
     .filter((item) => item.classMode !== "offline")
@@ -29,7 +32,7 @@ export function upcomingOnlineClasses<T extends ScheduledOnlineClass>(
       const dates = Array.from({ length: days }, (_, index) =>
         addDays(firstDate, index),
       );
-      return expandCalendarItems([item], dates);
+      return expandCalendarItems([item], dates, exceptions);
     });
 
   return events.sort(

@@ -5,10 +5,19 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Download, ExternalLink, Radio, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarClock,
+  CalendarOff,
+  Download,
+  ExternalLink,
+  Radio,
+  Video,
+} from "lucide-react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { classApiPath, classQueries } from "@/src/queries/classes";
+import { clockLabel, slotLabel } from "@/lib/class-changes";
+import { classApiPath, classPath, classQueries } from "@/src/queries/classes";
 import { apiJson } from "@/src/queries/http";
 import { withAppBasePath } from "@/lib/app-base-path";
 
@@ -67,6 +76,16 @@ export function ClassPrejoinScreen({
     }
   }
 
+  const change = data.classChange;
+  const heading =
+    change == null
+      ? "Join class"
+      : change.status === "moved"
+        ? "This class has moved"
+        : change.status === "holiday"
+          ? "No class: Holiday"
+          : "This class is cancelled";
+
   return (
     <main className="w-full p-6">
       <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -83,12 +102,49 @@ export function ClassPrejoinScreen({
           <p className="text-muted-foreground text-sm font-medium">
             {data.courseName} · {data.batchName}
           </p>
-          <h1 className="mt-1 text-2xl font-semibold">Join class</h1>
+          <h1 className="mt-1 text-2xl font-semibold">{heading}</h1>
           <p className="text-muted-foreground mt-2 text-sm">
             {data.date} · {data.startTime}–{data.endTime} · {data.timezone}
           </p>
+          {data.rescheduledFrom && (
+            <p className="mt-3 flex items-center gap-2 text-sm font-medium">
+              <CalendarClock className="text-primary size-4" /> Rescheduled from{" "}
+              {slotLabel(data.rescheduledFrom)}
+            </p>
+          )}
           <div className="mt-6 border-t pt-6">
-            {data.meetingOption === "external" ? (
+            {change != null ? (
+              <div role="status" className="space-y-3">
+                <p className="flex items-center gap-2 text-sm font-medium">
+                  <CalendarOff className="size-4 text-rose-600" />
+                  {change.status === "moved" && change.movedTo
+                    ? `Moved to ${slotLabel(change.movedTo)}–${clockLabel(change.movedTo.endTime)}`
+                    : change.status === "holiday"
+                      ? "This day is a Holiday. There is no class to start or join."
+                      : "There is no class to start or join."}
+                </p>
+                {change.reason && (
+                  <p className="text-muted-foreground text-sm">
+                    Reason: {change.reason}
+                  </p>
+                )}
+                {change.status === "moved" && change.movedTo && (
+                  <Button
+                    render={
+                      <Link
+                        href={classPath(
+                          batchId,
+                          change.movedTo.date,
+                          change.movedTo.startTime,
+                        )}
+                      />
+                    }
+                  >
+                    Go to the new time
+                  </Button>
+                )}
+              </div>
+            ) : data.meetingOption === "external" ? (
               <>
                 <p className="text-muted-foreground text-sm">
                   This Batch uses an external meeting link. It opens in a new
@@ -163,33 +219,35 @@ export function ClassPrejoinScreen({
             )}
           </div>
         </div>
-        {data.meetingOption === "whiteboard" && data.isHost && (
-          <div className="bg-card rounded-2xl border p-6">
-            <h2 className="font-semibold">Class recording</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              {data.recordingStatus === "ready"
-                ? "Ready to download"
-                : data.recordingStatus === "uploading"
-                  ? "Uploading recording…"
-                  : data.recordingStatus === "recording"
-                    ? "Recording in progress"
-                    : data.recordingStatus === "error"
-                      ? "Recording failed"
-                      : "Available after the class ends and upload completes"}
-            </p>
-            {data.recordingReady && (
-              <a
-                className={buttonVariants({
-                  variant: "outline",
-                  className: "mt-4",
-                })}
-                href={withAppBasePath(`${apiPath}/recording`)}
-              >
-                <Download className="mr-2 size-4" /> Download recording
-              </a>
-            )}
-          </div>
-        )}
+        {data.meetingOption === "whiteboard" &&
+          data.isHost &&
+          change == null && (
+            <div className="bg-card rounded-2xl border p-6">
+              <h2 className="font-semibold">Class recording</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {data.recordingStatus === "ready"
+                  ? "Ready to download"
+                  : data.recordingStatus === "uploading"
+                    ? "Uploading recording…"
+                    : data.recordingStatus === "recording"
+                      ? "Recording in progress"
+                      : data.recordingStatus === "error"
+                        ? "Recording failed"
+                        : "Available after the class ends and upload completes"}
+              </p>
+              {data.recordingReady && (
+                <a
+                  className={buttonVariants({
+                    variant: "outline",
+                    className: "mt-4",
+                  })}
+                  href={withAppBasePath(`${apiPath}/recording`)}
+                >
+                  <Download className="mr-2 size-4" /> Download recording
+                </a>
+              )}
+            </div>
+          )}
       </div>
     </main>
   );

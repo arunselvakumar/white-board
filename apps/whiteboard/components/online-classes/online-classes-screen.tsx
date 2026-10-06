@@ -13,5 +13,11 @@ export function OnlineClassesScreen() {
     calendarQueries.schedule(`${orgId}:${userId}:${orgRole}`),
   );
 
-  return <OnlineClassesView items={data.items} />;
+  return (
+    <OnlineClassesView
+      items={data.items}
+      classChanges={data.classChanges}
+      holidays={data.holidays}
+    />
+  );
 }

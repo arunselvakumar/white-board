@@ -216,7 +216,12 @@ export class ClassService {
       endTime,
       timezone: item.timezone,
       meetingOption: option,
-      joinUrl: option === "external" ? item.joinUrl : null,
+      // A cancelled Class offers no way in, even through its external link.
+      joinUrl:
+        option === "external" &&
+        (scheduled == null || scheduled.status === "scheduled")
+          ? item.joinUrl
+          : null,
       isHost,
       status:
         occurrence?.status ??
