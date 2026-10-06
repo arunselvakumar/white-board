@@ -1,21 +1,25 @@
-import { Button } from "@repo/ui/components/button";
+import { ClosingCta } from "@/components/closing-cta";
+import { FeesSection } from "@/components/fees-section";
+import { Hero } from "@/components/hero";
+import { MorningSection } from "@/components/morning-section";
+import { RegisterLoop } from "@/components/register-loop";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { WhoSection } from "@/components/who-section";
 
 export default function Home() {
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-8">
-      <div className="flex max-w-lg flex-col gap-3 text-center">
-        <p className="text-muted-foreground text-sm font-light tracking-wide uppercase">
-          Whiteboard
-        </p>
-        <h1 className="text-4xl tracking-tight">
-          Think together, on one board.
-        </h1>
-        <p className="text-muted-foreground text-sm leading-relaxed font-light">
-          Marketing site for Whiteboard. Shared components live in{" "}
-          <code className="font-mono text-xs">@repo/ui</code>.
-        </p>
-      </div>
-      <Button render={<a href="/app/signup" />}>Get started</Button>
-    </main>
+    <>
+      <SiteHeader />
+      <main id="main">
+        <Hero />
+        <RegisterLoop />
+        <FeesSection />
+        <MorningSection />
+        <WhoSection />
+        <ClosingCta />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

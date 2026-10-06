@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Urbanist } from "next/font/google";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
-import { TooltipProvider } from "@repo/ui/components/tooltip";
 
-import "@repo/ui/globals.css";
+import "./marketing.css";
 
 const fontSans = Urbanist({
   subsets: ["latin"],
@@ -14,12 +13,19 @@ const fontSans = Urbanist({
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
+  weight: ["400"],
   variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
-  title: "Whiteboard — Marketing",
-  description: "Marketing site for Whiteboard",
+  title: "Whiteboard — the register, on a screen",
+  description:
+    "Whiteboard runs a Training Institute without a paper register: Students, Courses, Batches, fees, and receipts in one Workspace.",
+  icons: { icon: "/whiteboard-logo.svg" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f6f7fb",
 };
 
 export default function RootLayout({
@@ -29,13 +35,17 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       suppressHydrationWarning
       className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
     >
-      <body>
-        <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+      <body className="bg-background text-foreground">
+        <ThemeProvider
+          defaultTheme="light"
+          enableSystem={false}
+          storageKey="whiteboard-marketing-theme"
+        >
+          {children}
         </ThemeProvider>
       </body>
     </html>
