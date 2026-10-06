@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withAppBasePath } from "@/lib/app-base-path";
 
-import type { Teacher } from "@/src/training/domain/teacher";
+import type { Teacher } from "@/src/training-institute/domain/teacher";
 
 export const TeacherListItemResponseModel = z.object({
   id: z.uuid(),

@@ -1,6 +1,6 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAttendanceSession } from "@/app/api/_lib/require-attendance-session";
-import { createAttendanceHandlers } from "@/src/training/infrastructure/create-attendance-handlers";
+import { createAttendanceHandlers } from "@/src/training-institute/infrastructure/create-attendance-handlers";
 import {
   AttendanceRegisterParamsModel,
   mapAttendanceRegister,

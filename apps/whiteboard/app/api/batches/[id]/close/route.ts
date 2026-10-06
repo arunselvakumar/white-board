@@ -1,6 +1,6 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createBatchHandlers } from "@/src/training/infrastructure/create-batch-handlers";
+import { createBatchHandlers } from "@/src/training-institute/infrastructure/create-batch-handlers";
 
 import { CloseBatchRequestModel } from "../../close-batch-request-model";
 import { mapBatchResponse } from "../../map-batch-response";

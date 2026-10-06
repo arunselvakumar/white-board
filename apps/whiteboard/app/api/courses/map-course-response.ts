@@ -1,4 +1,4 @@
-import type { CourseReadModel } from "@/src/training/application/course-read-model";
+import type { CourseReadModel } from "@/src/training-institute/application/course-read-model";
 
 export function mapCourseResponse(course: CourseReadModel) {
   return {

@@ -4,7 +4,7 @@ import {
   AttendanceRegisterParamsModel,
   mapAttendanceRegister,
 } from "@/app/api/attendance/registers/attendance-models";
-import { createAttendanceHandlers } from "@/src/training/infrastructure/create-attendance-handlers";
+import { createAttendanceHandlers } from "@/src/training-institute/infrastructure/create-attendance-handlers";
 import { SaveAttendanceMarksRequestModel } from "./save-attendance-marks-request-model";
 
 const handlers = createAttendanceHandlers();

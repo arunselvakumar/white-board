@@ -38,7 +38,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       deletedByUserId: enrollment.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.enrollment.updateMany({
+    const updated = await this.db.trainingInstituteEnrollment.updateMany({
       where: { id: enrollment.id.value, deletedAt: null },
       data: mutable,
     });
@@ -49,7 +49,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       throw new EnrollmentNotFoundError();
     }
     try {
-      await this.db.enrollment.create({
+      await this.db.trainingInstituteEnrollment.create({
         data: {
           id: enrollment.id.value,
           workspaceId: enrollment.workspaceId.value,
@@ -80,12 +80,12 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
   ): Promise<void> {
     await this.db.$transaction(async (tx) => {
       await tx.$queryRaw`
-        SELECT id FROM batches
+        SELECT id FROM training_institute.batches
         WHERE id = ${enrollment.batchId.value}::uuid
           AND workspace_id = ${enrollment.workspaceId.value}
           AND deleted_at IS NULL
         FOR UPDATE`;
-      const occupied = await tx.enrollment.count({
+      const occupied = await tx.trainingInstituteEnrollment.count({
         where: {
           batchId: enrollment.batchId.value,
           workspaceId: enrollment.workspaceId.value,
@@ -97,7 +97,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       if (occupied >= capacity) {
         throw new DomainError("BATCH_AT_CAPACITY", "Batch is at capacity.");
       }
-      const duplicate = await tx.enrollment.findFirst({
+      const duplicate = await tx.trainingInstituteEnrollment.findFirst({
         where: {
           studentId: enrollment.studentId.value,
           batchId: enrollment.batchId.value,
@@ -133,14 +133,14 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
         deletedAt: enrollment.deletedAt,
         deletedByUserId: enrollment.deletedByUserId?.value ?? null,
       };
-      const updated = await tx.enrollment.updateMany({
+      const updated = await tx.trainingInstituteEnrollment.updateMany({
         where: { id: enrollment.id.value, deletedAt: null },
         data: mutable,
       });
       if (updated.count > 0) {
         return;
       }
-      await tx.enrollment.create({
+      await tx.trainingInstituteEnrollment.create({
         data: {
           id: enrollment.id.value,
           workspaceId: enrollment.workspaceId.value,
@@ -159,7 +159,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     batchId: BatchId,
     workspaceId: WorkspaceId,
   ): Promise<Enrollment | null> {
-    const row = await this.db.enrollment.findFirst({
+    const row = await this.db.trainingInstituteEnrollment.findFirst({
       where: {
         studentId: studentId.value,
         batchId: batchId.value,
@@ -175,7 +175,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     id: EnrollmentId,
     workspaceId: WorkspaceId,
   ): Promise<Enrollment | null> {
-    const row = await this.db.enrollment.findFirst({
+    const row = await this.db.trainingInstituteEnrollment.findFirst({
       where: {
         id: id.value,
         workspaceId: workspaceId.value,
@@ -189,7 +189,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     params: EnrollmentListParams,
   ): Promise<ListPage<Enrollment>> {
     const cursor = cursorWhere(params);
-    const where: Prisma.EnrollmentWhereInput = {
+    const where: Prisma.TrainingInstituteEnrollmentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.studentId != null
@@ -199,7 +199,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       ...cursor,
     };
     const orderBy = listOrderBy(params.before != null);
-    const countWhere: Prisma.EnrollmentWhereInput = {
+    const countWhere: Prisma.TrainingInstituteEnrollmentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.studentId != null
@@ -208,12 +208,12 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       ...(params.batchId != null ? { batchId: params.batchId.value } : {}),
     };
     const [rows, total] = await Promise.all([
-      this.db.enrollment.findMany({
+      this.db.trainingInstituteEnrollment.findMany({
         where,
         orderBy,
         take: params.limit + 1,
       }),
-      this.db.enrollment.count({ where: countWhere }),
+      this.db.trainingInstituteEnrollment.count({ where: countWhere }),
     ]);
     const hasMore = rows.length > params.limit;
     const pageRows = hasMore ? rows.slice(0, params.limit) : rows;
@@ -230,7 +230,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     batchId: BatchId,
     workspaceId: WorkspaceId,
   ): Promise<number> {
-    return this.db.enrollment.count({
+    return this.db.trainingInstituteEnrollment.count({
       where: {
         batchId: batchId.value,
         workspaceId: workspaceId.value,
@@ -247,7 +247,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     if (batchIds.length === 0) {
       return new Map();
     }
-    const rows = await this.db.enrollment.groupBy({
+    const rows = await this.db.trainingInstituteEnrollment.groupBy({
       by: ["batchId"],
       where: {
         workspaceId: workspaceId.value,
@@ -263,7 +263,7 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
 
 function cursorWhere(
   params: EnrollmentListParams,
-): Pick<Prisma.EnrollmentWhereInput, "OR"> | Record<string, never> {
+): Pick<Prisma.TrainingInstituteEnrollmentWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [
@@ -291,7 +291,7 @@ function cursorWhere(
 
 function listOrderBy(
   ascending: boolean,
-): Prisma.EnrollmentOrderByWithRelationInput[] {
+): Prisma.TrainingInstituteEnrollmentOrderByWithRelationInput[] {
   const direction = ascending ? "asc" : "desc";
   return [{ createdAt: direction }, { id: direction }];
 }

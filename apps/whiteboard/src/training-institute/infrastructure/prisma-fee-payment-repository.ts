@@ -26,7 +26,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
       deletedByUserId: payment.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.feePayment.updateMany({
+    const updated = await this.db.trainingInstituteFeePayment.updateMany({
       where: { id: payment.id.value, deletedAt: null },
       data: mutable,
     });
@@ -37,7 +37,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
       throw new FeePaymentNotFoundError();
     }
     try {
-      await this.db.feePayment.create({
+      await this.db.trainingInstituteFeePayment.create({
         data: {
           id: payment.id.value,
           workspaceId: payment.workspaceId.value,
@@ -64,11 +64,11 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
   ): Promise<FeePayment> {
     return this.db.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${workspaceId.value}))`;
-      const count = await tx.feePayment.count({
+      const count = await tx.trainingInstituteFeePayment.count({
         where: { workspaceId: workspaceId.value },
       });
       const payment = build(count + 1);
-      await tx.feePayment.create({
+      await tx.trainingInstituteFeePayment.create({
         data: {
           id: payment.id.value,
           workspaceId: payment.workspaceId.value,
@@ -92,7 +92,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
     id: FeePaymentId,
     workspaceId: WorkspaceId,
   ): Promise<FeePayment | null> {
-    const row = await this.db.feePayment.findFirst({
+    const row = await this.db.trainingInstituteFeePayment.findFirst({
       where: {
         id: id.value,
         workspaceId: workspaceId.value,
@@ -106,7 +106,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
     params: FeePaymentListParams,
   ): Promise<ListPage<FeePayment>> {
     const cursor = cursorWhere(params);
-    const where: Prisma.FeePaymentWhereInput = {
+    const where: Prisma.TrainingInstituteFeePaymentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.enrollmentId != null
@@ -115,7 +115,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
       ...cursor,
     };
     const orderBy = listOrderBy(params.before != null);
-    const countWhere: Prisma.FeePaymentWhereInput = {
+    const countWhere: Prisma.TrainingInstituteFeePaymentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.enrollmentId != null
@@ -123,12 +123,12 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
         : {}),
     };
     const [rows, total] = await Promise.all([
-      this.db.feePayment.findMany({
+      this.db.trainingInstituteFeePayment.findMany({
         where,
         orderBy,
         take: params.limit + 1,
       }),
-      this.db.feePayment.count({ where: countWhere }),
+      this.db.trainingInstituteFeePayment.count({ where: countWhere }),
     ]);
     const hasMore = rows.length > params.limit;
     const pageRows = hasMore ? rows.slice(0, params.limit) : rows;
@@ -142,7 +142,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
   }
 
   async nextReceiptSequence(workspaceId: WorkspaceId): Promise<number> {
-    const count = await this.db.feePayment.count({
+    const count = await this.db.trainingInstituteFeePayment.count({
       where: { workspaceId: workspaceId.value },
     });
     return count + 1;
@@ -152,7 +152,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
     enrollmentId: EnrollmentId,
     workspaceId: WorkspaceId,
   ): Promise<number> {
-    const result = await this.db.feePayment.aggregate({
+    const result = await this.db.trainingInstituteFeePayment.aggregate({
       where: {
         enrollmentId: enrollmentId.value,
         workspaceId: workspaceId.value,
@@ -166,7 +166,7 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
 
 function cursorWhere(
   params: FeePaymentListParams,
-): Pick<Prisma.FeePaymentWhereInput, "OR"> | Record<string, never> {
+): Pick<Prisma.TrainingInstituteFeePaymentWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [
@@ -194,7 +194,7 @@ function cursorWhere(
 
 function listOrderBy(
   ascending: boolean,
-): Prisma.FeePaymentOrderByWithRelationInput[] {
+): Prisma.TrainingInstituteFeePaymentOrderByWithRelationInput[] {
   const direction = ascending ? "asc" : "desc";
   return [{ createdAt: direction }, { id: direction }];
 }

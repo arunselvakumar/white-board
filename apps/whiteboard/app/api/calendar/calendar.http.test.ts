@@ -62,7 +62,7 @@ describe("Calendar HTTP", () => {
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
 
     const courseId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -71,7 +71,7 @@ describe("Calendar HTTP", () => {
         defaultFeeAmountPaise: 0,
       },
     });
-    await prisma.batch.createMany({
+    await prisma.trainingInstituteBatch.createMany({
       data: [
         {
           id: batchId,
@@ -96,7 +96,7 @@ describe("Calendar HTTP", () => {
       ],
     });
     const studentId = randomUUID();
-    await prisma.student.create({
+    await prisma.trainingInstituteStudent.create({
       data: {
         id: studentId,
         workspaceId,
@@ -111,7 +111,7 @@ describe("Calendar HTTP", () => {
         },
       },
     });
-    await prisma.enrollment.create({
+    await prisma.trainingInstituteEnrollment.create({
       data: {
         id: randomUUID(),
         workspaceId,
@@ -129,7 +129,7 @@ describe("Calendar HTTP", () => {
       },
     });
     const teacherId = randomUUID();
-    await prisma.teacher.create({
+    await prisma.trainingInstituteTeacher.create({
       data: {
         id: teacherId,
         workspaceId,
@@ -140,7 +140,7 @@ describe("Calendar HTTP", () => {
         clerkUserId: "user_teacher",
       },
     });
-    await prisma.batchTeacherAssignment.create({
+    await prisma.trainingInstituteBatchTeacherAssignment.create({
       data: {
         id: randomUUID(),
         workspaceId,
@@ -226,7 +226,7 @@ describe("Calendar HTTP", () => {
   });
 
   it("removes closed Batches and ended Enrollments from current schedules", async () => {
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: otherBatchId },
       data: { closedAt: new Date() },
     });
@@ -235,7 +235,7 @@ describe("Calendar HTTP", () => {
       batchId,
     ]);
 
-    await prisma.enrollment.updateMany({
+    await prisma.trainingInstituteEnrollment.updateMany({
       where: { workspaceId, batchId },
       data: { endedAt: new Date() },
     });

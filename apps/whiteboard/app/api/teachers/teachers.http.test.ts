@@ -25,7 +25,7 @@ import {
 import { POST as unassignBatch } from "./[id]/batches/[batchId]/unassign/route";
 import { POST as activateTeacher } from "../teacher/activate/route";
 import { GET as getMyBatches } from "../teacher/batches/route";
-import { PrismaTeacherDocumentRepository } from "@/src/training/infrastructure/prisma-teacher-document-repository";
+import { PrismaTeacherDocumentRepository } from "@/src/training-institute/infrastructure/prisma-teacher-document-repository";
 
 vi.mock("@clerk/nextjs/server", () => ({
   auth: vi.fn(),
@@ -342,7 +342,7 @@ describe("Teacher HTTP APIs", () => {
       }),
     );
     expect(response.status).toBe(400);
-    expect(await prisma.teacher.count({ where: { workspaceId } })).toBe(0);
+    expect(await prisma.trainingInstituteTeacher.count({ where: { workspaceId } })).toBe(0);
   });
 
   it("encrypts private numbers and preserves or clears them on profile update", async () => {
@@ -365,7 +365,7 @@ describe("Teacher HTTP APIs", () => {
       idNumberLast4: "1234",
       bankAccountLast4: "9012",
     });
-    const stored = await prisma.teacher.findUniqueOrThrow({
+    const stored = await prisma.trainingInstituteTeacher.findUniqueOrThrow({
       where: { id: teacher.id },
     });
     expect(stored.idNumberEncrypted).not.toContain("ABCD1234");
@@ -395,7 +395,7 @@ describe("Teacher HTTP APIs", () => {
       ((await cleared.json()) as { privateDetails: unknown }).privateDetails,
     ).toEqual({ idNumberLast4: null, bankAccountLast4: "9012" });
     expect(
-      (await prisma.teacher.findUniqueOrThrow({ where: { id: teacher.id } }))
+      (await prisma.trainingInstituteTeacher.findUniqueOrThrow({ where: { id: teacher.id } }))
         .idNumberEncrypted,
     ).toBeNull();
   });
@@ -434,7 +434,7 @@ describe("Teacher HTTP APIs", () => {
       kind: "certificate",
       name: "Fine Arts Diploma.pdf",
     });
-    const stored = await prisma.teacherDocument.findUniqueOrThrow({
+    const stored = await prisma.trainingInstituteTeacherDocument.findUniqueOrThrow({
       where: { id: document.id },
     });
     expect(Buffer.from(stored.encryptedData).equals(pdf)).toBe(false);
@@ -479,7 +479,7 @@ describe("Teacher HTTP APIs", () => {
     ).toBe(404);
     expect(
       (
-        await prisma.teacherDocument.findUniqueOrThrow({
+        await prisma.trainingInstituteTeacherDocument.findUniqueOrThrow({
           where: { id: document.id },
         })
       ).deletedAt,
@@ -541,7 +541,7 @@ describe("Teacher HTTP APIs", () => {
     );
     expect(response.status).toBe(400);
     expect(
-      await prisma.teacherDocument.count({ where: { teacherId: teacher.id } }),
+      await prisma.trainingInstituteTeacherDocument.count({ where: { teacherId: teacher.id } }),
     ).toBe(0);
   });
 
@@ -576,7 +576,7 @@ describe("Teacher HTTP APIs", () => {
     expect(results.filter((result) => result.status === 201)).toHaveLength(10);
     expect(results.filter((result) => result.status === 409)).toHaveLength(1);
     expect(
-      await prisma.teacherDocument.count({
+      await prisma.trainingInstituteTeacherDocument.count({
         where: { teacherId: teacher.id, deletedAt: null },
       }),
     ).toBe(10);
@@ -592,7 +592,7 @@ describe("Teacher HTTP APIs", () => {
         }),
       )
     ).json()) as TeacherJson;
-    await prisma.teacher.update({
+    await prisma.trainingInstituteTeacher.update({
       where: { id: teacher.id },
       data: { deactivatedAt: new Date() },
     });
@@ -612,7 +612,7 @@ describe("Teacher HTTP APIs", () => {
       }),
     ).rejects.toMatchObject({ code: "TEACHER_INACTIVE" });
     expect(
-      await prisma.teacherDocument.count({ where: { teacherId: teacher.id } }),
+      await prisma.trainingInstituteTeacherDocument.count({ where: { teacherId: teacher.id } }),
     ).toBe(0);
   });
 
@@ -816,7 +816,7 @@ describe("Teacher HTTP APIs", () => {
   it("assigns, lists, and unassigns a Batch while retaining assignment history", async () => {
     const courseId = randomUUID();
     const batchId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -825,7 +825,7 @@ describe("Teacher HTTP APIs", () => {
         defaultFeeAmountPaise: 1000,
       },
     });
-    await prisma.batch.create({
+    await prisma.trainingInstituteBatch.create({
       data: {
         id: batchId,
         workspaceId,
@@ -888,7 +888,7 @@ describe("Teacher HTTP APIs", () => {
       0,
     );
     expect(
-      await prisma.batchTeacherAssignment.count({
+      await prisma.trainingInstituteBatchTeacherAssignment.count({
         where: { teacherId: teacher.id, batchId },
       }),
     ).toBe(1);
@@ -897,7 +897,7 @@ describe("Teacher HTTP APIs", () => {
   it("refuses closed and other Workspace Batches", async () => {
     const courseId = randomUUID();
     const batchId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -906,7 +906,7 @@ describe("Teacher HTTP APIs", () => {
         defaultFeeAmountPaise: 1000,
       },
     });
-    await prisma.batch.create({
+    await prisma.trainingInstituteBatch.create({
       data: {
         id: batchId,
         workspaceId,
@@ -960,7 +960,7 @@ describe("Teacher HTTP APIs", () => {
     const courseId = randomUUID();
     const assignedBatchId = randomUUID();
     const otherBatchId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -973,7 +973,7 @@ describe("Teacher HTTP APIs", () => {
       [assignedBatchId, "Morning"],
       [otherBatchId, "Evening"],
     ] as const) {
-      await prisma.batch.create({
+      await prisma.trainingInstituteBatch.create({
         data: {
           id,
           workspaceId,

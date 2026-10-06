@@ -72,7 +72,7 @@ describe("Student Attendance HTTP APIs", () => {
     teacherId = randomUUID();
     session("user_owner", workspaceId);
     const courseId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -81,7 +81,7 @@ describe("Student Attendance HTTP APIs", () => {
         defaultFeeAmountPaise: 1000,
       },
     });
-    await prisma.batch.create({
+    await prisma.trainingInstituteBatch.create({
       data: {
         id: batchId,
         workspaceId,
@@ -93,7 +93,7 @@ describe("Student Attendance HTTP APIs", () => {
         timings: [{ daysOfWeek: [DAY], startTime: "10:00", endTime: "11:00" }],
       },
     });
-    await prisma.student.create({
+    await prisma.trainingInstituteStudent.create({
       data: {
         id: studentId,
         workspaceId,
@@ -102,7 +102,7 @@ describe("Student Attendance HTTP APIs", () => {
         phone: "9876543210",
       },
     });
-    await prisma.enrollment.create({
+    await prisma.trainingInstituteEnrollment.create({
       data: {
         id: enrollmentId,
         workspaceId,
@@ -116,7 +116,7 @@ describe("Student Attendance HTTP APIs", () => {
         feePlanDueDates: [],
       },
     });
-    await prisma.teacher.create({
+    await prisma.trainingInstituteTeacher.create({
       data: {
         id: teacherId,
         workspaceId,
@@ -167,7 +167,7 @@ describe("Student Attendance HTTP APIs", () => {
     );
     expect(corrected.status).toBe(200);
     expect(
-      await prisma.attendanceMarkChange.count({
+      await prisma.trainingInstituteAttendanceMarkChange.count({
         where: { mark: { registerId: register.id } },
       }),
     ).toBe(2);
@@ -184,7 +184,7 @@ describe("Student Attendance HTTP APIs", () => {
   });
 
   it("opens a missed day's Register using the current scheduled roster and reuses it", async () => {
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: {
         createdAt: new Date(`${YESTERDAY}T00:00:00.000Z`),
@@ -202,7 +202,7 @@ describe("Student Attendance HTTP APIs", () => {
     });
     const second = await openRegister(request({ batchId, date: YESTERDAY }));
     expect(((await second.json()) as RegisterJson).id).toBe(register.id);
-    expect(await prisma.attendanceRegister.count({ where: { batchId } })).toBe(
+    expect(await prisma.trainingInstituteAttendanceRegister.count({ where: { batchId } })).toBe(
       1,
     );
     const saved = await saveMarks(
@@ -220,7 +220,7 @@ describe("Student Attendance HTTP APIs", () => {
     expect(
       (await openRegister(request({ batchId, date: YESTERDAY }))).status,
     ).toBe(400);
-    expect(await prisma.attendanceRegister.count({ where: { batchId } })).toBe(
+    expect(await prisma.trainingInstituteAttendanceRegister.count({ where: { batchId } })).toBe(
       0,
     );
   });
@@ -229,9 +229,9 @@ describe("Student Attendance HTTP APIs", () => {
     const otherStudentId = randomUUID();
     const otherEnrollmentId = randomUUID();
     const courseId = (
-      await prisma.batch.findUniqueOrThrow({ where: { id: batchId } })
+      await prisma.trainingInstituteBatch.findUniqueOrThrow({ where: { id: batchId } })
     ).courseId;
-    await prisma.student.create({
+    await prisma.trainingInstituteStudent.create({
       data: {
         id: otherStudentId,
         workspaceId,
@@ -240,7 +240,7 @@ describe("Student Attendance HTTP APIs", () => {
         phone: "9876543211",
       },
     });
-    await prisma.enrollment.create({
+    await prisma.trainingInstituteEnrollment.create({
       data: {
         id: otherEnrollmentId,
         workspaceId,
@@ -263,7 +263,7 @@ describe("Student Attendance HTTP APIs", () => {
     expect(register.marks.map((mark) => mark.enrollmentId)).toEqual([
       enrollmentId,
     ]);
-    await prisma.enrollment.update({
+    await prisma.trainingInstituteEnrollment.update({
       where: { id: enrollmentId },
       data: { endedAt: new Date() },
     });
@@ -281,7 +281,7 @@ describe("Student Attendance HTTP APIs", () => {
   it("limits Teacher access to assigned Batches and lets the Owner see Student history", async () => {
     session("user_teacher", workspaceId, "org:teacher");
     expect((await openRegister(request({ batchId }))).status).toBe(404);
-    await prisma.batchTeacherAssignment.create({
+    await prisma.trainingInstituteBatchTeacherAssignment.create({
       data: {
         id: randomUUID(),
         workspaceId,
@@ -312,7 +312,7 @@ describe("Student Attendance HTTP APIs", () => {
       ((await history.json()) as { items: { registerId: string }[] }).items[0]
         ?.registerId,
     ).toBe(register.id);
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: {
         createdAt: new Date(`${YESTERDAY}T00:00:00.000Z`),
@@ -416,14 +416,14 @@ describe("Student Attendance HTTP APIs", () => {
     ).toBe(404);
     session("user_owner", workspaceId);
     expect(
-      await prisma.attendanceMarkChange.count({
+      await prisma.trainingInstituteAttendanceMarkChange.count({
         where: { mark: { registerId: register.id } },
       }),
     ).toBe(0);
   });
 
   it("rejects an unscheduled or empty roster and does not create a Register", async () => {
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: {
         timings: [
@@ -432,24 +432,24 @@ describe("Student Attendance HTTP APIs", () => {
       },
     });
     expect((await openRegister(request({ batchId }))).status).toBe(409);
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: {
         timings: [{ daysOfWeek: [DAY], startTime: "10:00", endTime: "11:00" }],
       },
     });
-    await prisma.enrollment.update({
+    await prisma.trainingInstituteEnrollment.update({
       where: { id: enrollmentId },
       data: { endedAt: new Date() },
     });
     expect((await openRegister(request({ batchId }))).status).toBe(409);
-    expect(await prisma.attendanceRegister.count({ where: { batchId } })).toBe(
+    expect(await prisma.trainingInstituteAttendanceRegister.count({ where: { batchId } })).toBe(
       0,
     );
   });
 
   it("includes a Student scheduled by individual Timings when Batch Timings omit today", async () => {
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: {
         timings: [
@@ -457,7 +457,7 @@ describe("Student Attendance HTTP APIs", () => {
         ],
       },
     });
-    await prisma.enrollment.update({
+    await prisma.trainingInstituteEnrollment.update({
       where: { id: enrollmentId },
       data: {
         timingSource: "student",
@@ -495,7 +495,7 @@ describe("Student Attendance HTTP APIs", () => {
       ).status,
     ).toBe(404);
     expect(
-      await prisma.attendanceMarkChange.count({
+      await prisma.trainingInstituteAttendanceMarkChange.count({
         where: { mark: { registerId: register.id } },
       }),
     ).toBe(0);
@@ -506,7 +506,7 @@ describe("Student Attendance HTTP APIs", () => {
       200,
     );
     expect(
-      await prisma.attendanceMarkChange.count({
+      await prisma.trainingInstituteAttendanceMarkChange.count({
         where: { mark: { registerId: register.id } },
       }),
     ).toBe(1);
@@ -519,7 +519,7 @@ describe("Student Attendance HTTP APIs", () => {
     const previousId = randomUUID();
     const yesterday = new Date(`${TODAY}T00:00:00.000Z`);
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-    await prisma.attendanceRegister.create({
+    await prisma.trainingInstituteAttendanceRegister.create({
       data: {
         id: previousId,
         workspaceId,

@@ -16,7 +16,7 @@ export class PrismaStudentRepository implements StudentRepository {
 
   async create(student: Student): Promise<boolean> {
     try {
-      await this.db.student.create({
+      await this.db.trainingInstituteStudent.create({
         data: {
           id: student.id.value,
           workspaceId: student.workspaceId.value,
@@ -63,7 +63,7 @@ export class PrismaStudentRepository implements StudentRepository {
       deletedByUserId: student.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.student.updateMany({
+    const updated = await this.db.trainingInstituteStudent.updateMany({
       where: { id: student.id.value, deletedAt: null },
       data: mutable,
     });
@@ -76,7 +76,7 @@ export class PrismaStudentRepository implements StudentRepository {
     }
 
     try {
-      await this.db.student.create({
+      await this.db.trainingInstituteStudent.create({
         data: {
           id: student.id.value,
           workspaceId: student.workspaceId.value,
@@ -100,7 +100,7 @@ export class PrismaStudentRepository implements StudentRepository {
     id: StudentId,
     workspaceId: WorkspaceId,
   ): Promise<Student | null> {
-    const row = await this.db.student.findFirst({
+    const row = await this.db.trainingInstituteStudent.findFirst({
       where: {
         id: id.value,
         workspaceId: workspaceId.value,
@@ -112,7 +112,7 @@ export class PrismaStudentRepository implements StudentRepository {
 
   async listInWorkspace(params: StudentListParams): Promise<ListPage<Student>> {
     const q = params.q?.trim();
-    const searchWhere: Prisma.StudentWhereInput | undefined =
+    const searchWhere: Prisma.TrainingInstituteStudentWhereInput | undefined =
       q != null && q.length > 0
         ? {
             OR: [
@@ -122,11 +122,11 @@ export class PrismaStudentRepository implements StudentRepository {
           }
         : undefined;
     const cursor = cursorWhere(params);
-    const where: Prisma.StudentWhereInput = {
+    const where: Prisma.TrainingInstituteStudentWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       AND: [searchWhere, cursor].filter(
-        (part): part is Prisma.StudentWhereInput =>
+        (part): part is Prisma.TrainingInstituteStudentWhereInput =>
           part != null && Object.keys(part).length > 0,
       ),
     };
@@ -134,12 +134,12 @@ export class PrismaStudentRepository implements StudentRepository {
     const orderBy = listOrderBy(params.before != null);
 
     const [rows, total] = await Promise.all([
-      this.db.student.findMany({
+      this.db.trainingInstituteStudent.findMany({
         where,
         orderBy,
         take: params.limit + 1,
       }),
-      this.db.student.count({
+      this.db.trainingInstituteStudent.count({
         where: {
           workspaceId: params.workspaceId.value,
           deletedAt: null,
@@ -170,7 +170,7 @@ export class PrismaStudentRepository implements StudentRepository {
 
 function cursorWhere(
   params: StudentListParams,
-): Pick<Prisma.StudentWhereInput, "OR"> | Record<string, never> {
+): Pick<Prisma.TrainingInstituteStudentWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [
@@ -198,7 +198,7 @@ function cursorWhere(
 
 function listOrderBy(
   ascending: boolean,
-): Prisma.StudentOrderByWithRelationInput[] {
+): Prisma.TrainingInstituteStudentOrderByWithRelationInput[] {
   const direction = ascending ? "asc" : "desc";
   return [{ createdAt: direction }, { id: direction }];
 }

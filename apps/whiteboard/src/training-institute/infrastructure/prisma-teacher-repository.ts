@@ -21,7 +21,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
   ): Promise<void> {
     try {
       const privateData = privateDataChanges(changes);
-      await this.db.teacher.create({
+      await this.db.trainingInstituteTeacher.create({
         data: {
           id: teacher.id,
           workspaceId: teacher.workspaceId,
@@ -64,7 +64,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
   ): Promise<void> {
     try {
       const privateData = privateDataChanges(changes);
-      const result = await this.db.teacher.updateMany({
+      const result = await this.db.trainingInstituteTeacher.updateMany({
         where: {
           id: teacher.id,
           workspaceId: teacher.workspaceId,
@@ -108,7 +108,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
     id: string,
     workspaceId: string,
   ): Promise<Teacher | null> {
-    const row = await this.db.teacher.findFirst({
+    const row = await this.db.trainingInstituteTeacher.findFirst({
       where: { id, workspaceId, deletedAt: null },
       omit: PRIVATE_DATA_OMIT,
     });
@@ -119,7 +119,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
     id: string,
     workspaceId: string,
   ): Promise<{ mimeType: string; bytes: Uint8Array } | null> {
-    const row = await this.db.teacher.findFirst({
+    const row = await this.db.trainingInstituteTeacher.findFirst({
       where: { id, workspaceId, deletedAt: null, photoData: { not: null } },
       select: { photoData: true, photoMimeType: true },
     });
@@ -132,7 +132,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
     clerkUserId: string,
     workspaceId: string,
   ): Promise<Teacher | null> {
-    const row = await this.db.teacher.findFirst({
+    const row = await this.db.trainingInstituteTeacher.findFirst({
       where: { clerkUserId, workspaceId, deletedAt: null, deactivatedAt: null },
       omit: PRIVATE_DATA_OMIT,
     });
@@ -140,11 +140,11 @@ export class PrismaTeacherRepository implements TeacherRepository {
   }
 
   async listInWorkspace(params: TeacherListParams): Promise<ListPage<Teacher>> {
-    const countWhere: Prisma.TeacherWhereInput = {
+    const countWhere: Prisma.TrainingInstituteTeacherWhereInput = {
       workspaceId: params.workspaceId,
       deletedAt: null,
     };
-    const cursorWhere: Prisma.TeacherWhereInput =
+    const cursorWhere: Prisma.TrainingInstituteTeacherWhereInput =
       params.after != null
         ? {
             OR: [
@@ -168,13 +168,13 @@ export class PrismaTeacherRepository implements TeacherRepository {
           : {};
     const direction = params.before != null ? "asc" : "desc";
     const [rows, total] = await Promise.all([
-      this.db.teacher.findMany({
+      this.db.trainingInstituteTeacher.findMany({
         where: { ...countWhere, ...cursorWhere },
         orderBy: [{ createdAt: direction }, { id: direction }],
         take: params.limit + 1,
         omit: PRIVATE_DATA_OMIT,
       }),
-      this.db.teacher.count({ where: countWhere }),
+      this.db.trainingInstituteTeacher.count({ where: countWhere }),
     ]);
     const hasMore = rows.length > params.limit;
     const pageRows = hasMore ? rows.slice(0, params.limit) : rows;
@@ -194,7 +194,7 @@ const PRIVATE_DATA_OMIT = {
   bankAccountEncrypted: true,
 } as const;
 type TeacherRow = Omit<
-  Prisma.TeacherGetPayload<Record<string, never>>,
+  Prisma.TrainingInstituteTeacherGetPayload<Record<string, never>>,
   keyof typeof PRIVATE_DATA_OMIT
 >;
 

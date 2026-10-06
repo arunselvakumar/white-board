@@ -5,9 +5,9 @@ import { mapError } from "@/app/api/_lib/map-error";
 import {
   relevantClassChanges,
   type CalendarRole,
-} from "@/src/training/application/calendar-schedule";
-import { createCalendarScheduleReader } from "@/src/training/infrastructure/create-calendar-schedule-reader";
-import { createClassExceptionsReader } from "@/src/training/infrastructure/create-class-change-handlers";
+} from "@/src/training-institute/application/calendar-schedule";
+import { createCalendarScheduleReader } from "@/src/training-institute/infrastructure/create-calendar-schedule-reader";
+import { createClassExceptionsReader } from "@/src/training-institute/infrastructure/create-class-change-handlers";
 
 export const dynamic = "force-dynamic";
 

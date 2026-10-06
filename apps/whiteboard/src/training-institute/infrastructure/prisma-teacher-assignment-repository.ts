@@ -13,7 +13,7 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     batchId: string,
     workspaceId: string,
   ): Promise<"open" | "closed" | "missing"> {
-    const batch = await this.db.batch.findFirst({
+    const batch = await this.db.trainingInstituteBatch.findFirst({
       where: { id: batchId, workspaceId, deletedAt: null },
       select: { closedAt: true },
     });
@@ -31,7 +31,7 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     userId: string;
   }): Promise<void> {
     try {
-      await this.db.batchTeacherAssignment.create({
+      await this.db.trainingInstituteBatchTeacherAssignment.create({
         data: {
           id: crypto.randomUUID(),
           workspaceId: input.workspaceId,
@@ -60,7 +60,7 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     workspaceId: string;
     userId: string;
   }): Promise<boolean> {
-    const result = await this.db.batchTeacherAssignment.updateMany({
+    const result = await this.db.trainingInstituteBatchTeacherAssignment.updateMany({
       where: {
         workspaceId: input.workspaceId,
         teacherId: input.teacherId,
@@ -77,7 +77,7 @@ export class PrismaTeacherAssignmentRepository implements TeacherAssignmentRepos
     teacherId: string,
     workspaceId: string,
   ): Promise<AssignedBatch[]> {
-    const rows = await this.db.batchTeacherAssignment.findMany({
+    const rows = await this.db.trainingInstituteBatchTeacherAssignment.findMany({
       where: {
         teacherId,
         workspaceId,

@@ -271,7 +271,7 @@ describe("course HTTP APIs", () => {
       code: "COURSE_ALREADY_ARCHIVED",
     });
 
-    const row = await prisma.course.findUnique({ where: { id } });
+    const row = await prisma.trainingInstituteCourse.findUnique({ where: { id } });
     expect(row?.archivedAt).not.toBeNull();
     expect(row?.archivedByUserId).toBe(userId);
     expect(row?.deletedAt).toBeNull();

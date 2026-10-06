@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import type { ClassDetail } from "@/src/training/application/class-service";
+import type { ClassDetail } from "@/src/training-institute/application/class-service";
 
 import { apiJson } from "./http";
 

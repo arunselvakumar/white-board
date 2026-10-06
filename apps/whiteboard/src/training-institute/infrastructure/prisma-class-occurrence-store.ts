@@ -8,7 +8,7 @@ import type {
 import { lockBatchSchedule } from "./schedule-locks";
 
 type Row = NonNullable<
-  Awaited<ReturnType<PrismaClient["classOccurrence"]["findFirst"]>>
+  Awaited<ReturnType<PrismaClient["trainingInstituteClassOccurrence"]["findFirst"]>>
 >;
 
 function toRecord(row: Row): ClassOccurrenceRecord {
@@ -36,7 +36,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
   constructor(private readonly db: PrismaClient) {}
 
   async find(key: ClassKey): Promise<ClassOccurrenceRecord | null> {
-    const row = await this.db.classOccurrence.findFirst({
+    const row = await this.db.trainingInstituteClassOccurrence.findFirst({
       where: {
         workspaceId: key.workspaceId,
         batchId: key.batchId,
@@ -55,7 +55,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
       const row = await this.db.$transaction(async (tx) => {
         await lockBatchSchedule(tx, input.workspaceId, input.batchId);
         await verify();
-        return tx.classOccurrence.create({
+        return tx.trainingInstituteClassOccurrence.create({
           data: {
             id: crypto.randomUUID(),
             workspaceId: input.workspaceId,
@@ -80,7 +80,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
         existing.providerMeetingId == null &&
         existing.status === "starting"
       ) {
-        const reclaimed = await this.db.classOccurrence.updateMany({
+        const reclaimed = await this.db.trainingInstituteClassOccurrence.updateMany({
           where: {
             id: existing.id,
             providerMeetingId: null,
@@ -100,7 +100,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
   }
 
   async setMeeting(id: string, meetingId: string): Promise<void> {
-    await this.db.classOccurrence.update({
+    await this.db.trainingInstituteClassOccurrence.update({
       where: { id },
       data: { providerMeetingId: meetingId },
     });
@@ -109,14 +109,14 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
   async findByMeetingId(
     meetingId: string,
   ): Promise<ClassOccurrenceRecord | null> {
-    const row = await this.db.classOccurrence.findUnique({
+    const row = await this.db.trainingInstituteClassOccurrence.findUnique({
       where: { providerMeetingId: meetingId },
     });
     return row == null ? null : toRecord(row);
   }
 
   async claimRecording(id: string): Promise<boolean> {
-    const result = await this.db.classOccurrence.updateMany({
+    const result = await this.db.trainingInstituteClassOccurrence.updateMany({
       where: { id, recordingId: null, recordingStatus: "pending" },
       data: { recordingStatus: "requesting" },
     });
@@ -124,7 +124,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
   }
 
   async markEnded(id: string): Promise<void> {
-    await this.db.classOccurrence.updateMany({
+    await this.db.trainingInstituteClassOccurrence.updateMany({
       where: { id, status: { in: ["starting", "live"] } },
       data: { status: "ended", endedAt: new Date() },
     });
@@ -136,7 +136,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
     fields: { recordingId?: string; objectKey?: string } = {},
   ): Promise<void> {
     if (status === "pending") {
-      await this.db.classOccurrence.update({
+      await this.db.trainingInstituteClassOccurrence.update({
         where: { id },
         data: { recordingId: fields.recordingId },
       });
@@ -150,7 +150,7 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
           : status === "uploading" || status === "ready"
             ? "ended"
             : "starting";
-    await this.db.classOccurrence.updateMany({
+    await this.db.trainingInstituteClassOccurrence.updateMany({
       where: {
         id,
         ...(status === "recording"

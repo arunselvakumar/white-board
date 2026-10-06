@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAttendanceSession } from "@/app/api/_lib/require-attendance-session";
-import { createClassChangeHandlers } from "@/src/training/infrastructure/create-class-change-handlers";
+import { createClassChangeHandlers } from "@/src/training-institute/infrastructure/create-class-change-handlers";
 
 import { DeclareHolidayRequestModel } from "./holiday-models";
 

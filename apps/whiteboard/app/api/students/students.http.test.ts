@@ -170,7 +170,7 @@ describe("student HTTP APIs", () => {
     expect((await json<StudentJson>(first)).id).toBe(requestId);
     expect((await json<StudentJson>(second)).id).toBe(requestId);
     expect(mockInvitation).toHaveBeenCalledTimes(1);
-    expect(await prisma.student.count({ where: { id: requestId } })).toBe(1);
+    expect(await prisma.trainingInstituteStudent.count({ where: { id: requestId } })).toBe(1);
 
     const conflict = await createStudent(
       new Request("http://localhost/api/students", {
@@ -317,7 +317,7 @@ describe("student HTTP APIs", () => {
     expect((await json<StudentJson>(updated)).details.guardians).toHaveLength(
       1,
     );
-    const row = await prisma.student.findUnique({ where: { id: body.id } });
+    const row = await prisma.trainingInstituteStudent.findUnique({ where: { id: body.id } });
     expect(row?.profileDetails).toMatchObject({
       guardians: [{ name: "Meera Sharma" }],
     });
@@ -393,7 +393,7 @@ describe("student HTTP APIs", () => {
     );
     expect(twice.status).toBe(StatusCodes.CONFLICT);
 
-    const row = await prisma.student.findUnique({ where: { id } });
+    const row = await prisma.trainingInstituteStudent.findUnique({ where: { id } });
     expect(row?.droppedAt).not.toBeNull();
     expect(row?.deletedAt).toBeNull();
   });

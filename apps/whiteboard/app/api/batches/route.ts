@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createBatchHandlers } from "@/src/training/infrastructure/create-batch-handlers";
+import { createBatchHandlers } from "@/src/training-institute/infrastructure/create-batch-handlers";
 
 import { CreateBatchRequestModel } from "./create-batch-request-model";
 import { ListBatchesRequestModel } from "./list-batches-request-model";

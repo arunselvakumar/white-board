@@ -1,6 +1,6 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createTeacherAssignmentHandlers } from "@/src/training/infrastructure/create-teacher-assignment-handlers";
+import { createTeacherAssignmentHandlers } from "@/src/training-institute/infrastructure/create-teacher-assignment-handlers";
 import { TeacherParamsModel } from "../teacher-params-model";
 import {
   AssignTeacherBatchRequestModel,

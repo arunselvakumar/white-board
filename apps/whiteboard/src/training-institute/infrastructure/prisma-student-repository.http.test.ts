@@ -51,7 +51,7 @@ describe("PrismaStudentRepository", () => {
     expect(dropped?.droppedAt).not.toBeNull();
     expect(dropped?.deletedAt).toBeNull();
 
-    const row = await prisma.student.findUnique({ where: { id: id.value } });
+    const row = await prisma.trainingInstituteStudent.findUnique({ where: { id: id.value } });
     expect(row?.droppedByUserId).toBe("user_2");
     expect(row?.deletedAt).toBeNull();
   });

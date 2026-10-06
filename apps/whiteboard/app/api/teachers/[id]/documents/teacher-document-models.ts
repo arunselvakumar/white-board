@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { TeacherDocumentMetadata } from "@/src/training/domain/teacher-document-repository";
+import type { TeacherDocumentMetadata } from "@/src/training-institute/domain/teacher-document-repository";
 
 export const AddTeacherDocumentRequestModel = z.object({
   kind: z.enum(["certificate", "identity", "background_check", "other"]),

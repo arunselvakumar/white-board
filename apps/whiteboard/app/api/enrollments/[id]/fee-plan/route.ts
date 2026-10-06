@@ -1,6 +1,6 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createEnrollmentHandlers } from "@/src/training/infrastructure/create-enrollment-handlers";
+import { createEnrollmentHandlers } from "@/src/training-institute/infrastructure/create-enrollment-handlers";
 
 import { AdjustFeePlanParamsModel } from "../../adjust-fee-plan-params-model";
 import { AdjustFeePlanRequestModel } from "../../adjust-fee-plan-request-model";

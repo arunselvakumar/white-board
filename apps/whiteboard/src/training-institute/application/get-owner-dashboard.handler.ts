@@ -20,18 +20,18 @@ export class GetOwnerDashboardHandler {
     const now = query.now ?? new Date();
     const [activeStudentCount, recentStudents, batches, enrollments, payments] =
       await Promise.all([
-        this.db.student.count({
+        this.db.trainingInstituteStudent.count({
           where: { workspaceId, deletedAt: null, droppedAt: null },
         }),
-        this.db.student.findMany({
+        this.db.trainingInstituteStudent.findMany({
           where: { workspaceId, deletedAt: null, droppedAt: null },
           orderBy: [{ createdAt: "desc" }, { id: "desc" }],
           take: 5,
         }),
-        this.db.batch.findMany({
+        this.db.trainingInstituteBatch.findMany({
           where: { workspaceId, deletedAt: null, closedAt: null },
         }),
-        this.db.enrollment.findMany({
+        this.db.trainingInstituteEnrollment.findMany({
           where: { workspaceId, deletedAt: null, endedAt: null },
           select: {
             id: true,
@@ -40,7 +40,7 @@ export class GetOwnerDashboardHandler {
             feePlanConcessionPaise: true,
           },
         }),
-        this.db.feePayment.groupBy({
+        this.db.trainingInstituteFeePayment.groupBy({
           by: ["enrollmentId"],
           where: { workspaceId, deletedAt: null },
           _sum: { amountPaise: true },

@@ -1,4 +1,4 @@
-import type { BatchReadModel } from "@/src/training/application/batch-read-model";
+import type { BatchReadModel } from "@/src/training-institute/application/batch-read-model";
 
 export function mapBatchResponse(batch: BatchReadModel) {
   return {

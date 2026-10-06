@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { AttendanceRegister } from "@/src/training/domain/attendance-register";
+import type { AttendanceRegister } from "@/src/training-institute/domain/attendance-register";
 
 export const OpenAttendanceRegisterRequestModel = z.object({
   batchId: z.uuid(),

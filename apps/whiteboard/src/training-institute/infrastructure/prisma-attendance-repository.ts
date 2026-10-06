@@ -18,7 +18,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     batchId: string,
     workspaceId: string,
   ): Promise<AttendanceBatch | null> {
-    return this.db.batch.findFirst({
+    return this.db.trainingInstituteBatch.findFirst({
       where: { id: batchId, workspaceId, deletedAt: null },
       select: {
         id: true,
@@ -35,7 +35,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     batchId: string,
     workspaceId: string,
   ): Promise<boolean> {
-    const teacher = await this.db.teacher.findFirst({
+    const teacher = await this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
         clerkUserId: userId,
@@ -55,7 +55,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     workspaceId: string,
     date: string,
   ): Promise<AttendanceRegister | null> {
-    const row = await this.db.attendanceRegister.findFirst({
+    const row = await this.db.trainingInstituteAttendanceRegister.findFirst({
       where: { batchId, workspaceId, date: dateValue(date), deletedAt: null },
       include: { marks: { where: { deletedAt: null } } },
     });
@@ -63,7 +63,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
   }
 
   async activeRoster(batchId: string, workspaceId: string) {
-    const enrollments = await this.db.enrollment.findMany({
+    const enrollments = await this.db.trainingInstituteEnrollment.findMany({
       where: {
         batchId,
         workspaceId,
@@ -74,7 +74,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       include: { student: true },
       orderBy: [{ student: { name: "asc" } }, { id: "asc" }],
     });
-    const batch = await this.db.batch.findUniqueOrThrow({
+    const batch = await this.db.trainingInstituteBatch.findUniqueOrThrow({
       where: { id: batchId },
       select: { timings: true },
     });
@@ -92,7 +92,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
 
   async create(register: AttendanceRegister): Promise<void> {
     try {
-      await this.db.attendanceRegister.create({
+      await this.db.trainingInstituteAttendanceRegister.create({
         data: {
           id: register.id,
           workspaceId: register.workspaceId,
@@ -131,7 +131,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     id: string,
     workspaceId: string,
   ): Promise<AttendanceRegister | null> {
-    const row = await this.db.attendanceRegister.findFirst({
+    const row = await this.db.trainingInstituteAttendanceRegister.findFirst({
       where: { id, workspaceId, deletedAt: null },
       include: { marks: { where: { deletedAt: null } } },
     });
@@ -146,10 +146,10 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
   ): Promise<AttendanceRegister | null> {
     return this.db.$transaction(async (tx) => {
       const locked = await tx.$queryRaw<{ id: string }[]>(
-        Prisma.sql`SELECT id FROM attendance_registers WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL FOR UPDATE`,
+        Prisma.sql`SELECT id FROM training_institute.attendance_registers WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL FOR UPDATE`,
       );
       if (locked.length === 0) return null;
-      const row = await tx.attendanceRegister.findFirst({
+      const row = await tx.trainingInstituteAttendanceRegister.findFirst({
         where: { id, workspaceId, deletedAt: null },
         include: { marks: { where: { deletedAt: null } } },
       });
@@ -158,7 +158,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       const now = new Date();
       const changes = register.mark(input, userId, now);
       for (const change of changes) {
-        await tx.attendanceMark.update({
+        await tx.trainingInstituteAttendanceMark.update({
           where: { id: change.markId },
           data: {
             status: change.newStatus,
@@ -168,7 +168,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
             updatedAt: now,
           },
         });
-        await tx.attendanceMarkChange.create({
+        await tx.trainingInstituteAttendanceMarkChange.create({
           data: {
             id: crypto.randomUUID(),
             markId: change.markId,
@@ -182,7 +182,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
         });
       }
       if (changes.length > 0)
-        await tx.attendanceRegister.update({
+        await tx.trainingInstituteAttendanceRegister.update({
           where: { id },
           data: { updatedAt: now },
         });
@@ -197,7 +197,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     after?: ListCursor<{ value: string }>;
     before?: ListCursor<{ value: string }>;
   }): Promise<ListPage<AttendanceRegister>> {
-    const base: Prisma.AttendanceRegisterWhereInput = {
+    const base: Prisma.TrainingInstituteAttendanceRegisterWhereInput = {
       batchId: params.batchId,
       workspaceId: params.workspaceId,
       deletedAt: null,
@@ -205,13 +205,13 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     const cursor = cursorWhere(params.after, params.before);
     const direction = params.before != null ? "asc" : "desc";
     const [rows, total] = await Promise.all([
-      this.db.attendanceRegister.findMany({
+      this.db.trainingInstituteAttendanceRegister.findMany({
         where: { ...base, ...cursor },
         include: { marks: { where: { deletedAt: null } } },
         orderBy: [{ createdAt: direction }, { id: direction }],
         take: params.limit + 1,
       }),
-      this.db.attendanceRegister.count({ where: base }),
+      this.db.trainingInstituteAttendanceRegister.count({ where: base }),
     ]);
     const hasMore = rows.length > params.limit;
     const items = hasMore ? rows.slice(0, params.limit) : rows;
@@ -229,7 +229,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     workspaceId: string,
   ): Promise<boolean> {
     return (
-      (await this.db.student.count({
+      (await this.db.trainingInstituteStudent.count({
         where: { id: studentId, workspaceId, deletedAt: null },
       })) > 0
     );
@@ -242,7 +242,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     after?: ListCursor<{ value: string }>;
     before?: ListCursor<{ value: string }>;
   }): Promise<ListPage<AttendanceHistoryItem>> {
-    const base: Prisma.AttendanceMarkWhereInput = {
+    const base: Prisma.TrainingInstituteAttendanceMarkWhereInput = {
       studentId: params.studentId,
       workspaceId: params.workspaceId,
       deletedAt: null,
@@ -251,13 +251,13 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     const cursor = cursorWhere(params.after, params.before);
     const direction = params.before != null ? "asc" : "desc";
     const [rows, total] = await Promise.all([
-      this.db.attendanceMark.findMany({
+      this.db.trainingInstituteAttendanceMark.findMany({
         where: { ...base, ...cursor },
         include: { register: { include: { batch: true } } },
         orderBy: [{ createdAt: direction }, { id: direction }],
         take: params.limit + 1,
       }),
-      this.db.attendanceMark.count({ where: base }),
+      this.db.trainingInstituteAttendanceMark.count({ where: base }),
     ]);
     const hasMore = rows.length > params.limit;
     const items = hasMore ? rows.slice(0, params.limit) : rows;
@@ -280,7 +280,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
   }
 }
 
-type RegisterRow = Prisma.AttendanceRegisterGetPayload<{
+type RegisterRow = Prisma.TrainingInstituteAttendanceRegisterGetPayload<{
   include: { marks: true };
 }>;
 

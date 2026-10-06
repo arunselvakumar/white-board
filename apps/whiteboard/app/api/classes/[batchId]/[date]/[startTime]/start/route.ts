@@ -3,7 +3,7 @@ import {
   classActor,
   type ClassRouteContext,
 } from "@/app/api/classes/class-route";
-import { createClassService } from "@/src/training/infrastructure/create-class-service";
+import { createClassService } from "@/src/training-institute/infrastructure/create-class-service";
 
 export async function POST(
   _request: Request,

@@ -1,6 +1,6 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createStudentHandlers } from "@/src/training/infrastructure/create-student-handlers";
+import { createStudentHandlers } from "@/src/training-institute/infrastructure/create-student-handlers";
 
 import { mapStudentResponse } from "../../map-student-response";
 import { UpdateStudentProfileParamsModel } from "../../update-student-profile-params-model";

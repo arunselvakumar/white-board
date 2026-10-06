@@ -1,6 +1,6 @@
 import { mapError } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createDashboardHandlers } from "@/src/training/infrastructure/create-dashboard-handlers";
+import { createDashboardHandlers } from "@/src/training-institute/infrastructure/create-dashboard-handlers";
 
 export const dynamic = "force-dynamic";
 

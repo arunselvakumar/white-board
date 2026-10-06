@@ -1,4 +1,4 @@
-import type { BatchRecord } from "@repo/db";
+import type { TrainingInstituteBatch as BatchRecord } from "@repo/db";
 
 import { Batch, batchJoinUrl, batchRoom } from "../domain/batch";
 import { BatchId } from "../domain/batch-id";

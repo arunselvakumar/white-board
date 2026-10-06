@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createEnrollmentHandlers } from "@/src/training/infrastructure/create-enrollment-handlers";
+import { createEnrollmentHandlers } from "@/src/training-institute/infrastructure/create-enrollment-handlers";
 
 import { ListFeePaymentsParamsModel } from "../../list-fee-payments-params-model";
 import { ListFeePaymentsRequestModel } from "../../list-fee-payments-request-model";

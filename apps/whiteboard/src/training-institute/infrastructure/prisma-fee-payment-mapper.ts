@@ -1,4 +1,4 @@
-import type { FeePaymentRecord } from "@repo/db";
+import type { TrainingInstituteFeePayment as FeePaymentRecord } from "@repo/db";
 
 import { EnrollmentId } from "../domain/enrollment-id";
 import { FeePayment } from "../domain/fee-payment";

@@ -1,4 +1,4 @@
-import type { EnrollmentReadModel } from "@/src/training/application/enrollment-read-model";
+import type { EnrollmentReadModel } from "@/src/training-institute/application/enrollment-read-model";
 
 export function mapEnrollmentResponse(enrollment: EnrollmentReadModel) {
   return {

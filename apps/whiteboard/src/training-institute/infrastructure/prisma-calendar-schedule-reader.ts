@@ -49,7 +49,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
   }): Promise<CalendarItem[]> {
     const workspaceId = input.workspaceId;
     if (input.role === "org:admin") {
-      const batches = await this.db.batch.findMany({
+      const batches = await this.db.trainingInstituteBatch.findMany({
         where: {
           workspaceId,
           deletedAt: null,
@@ -84,7 +84,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
     }
 
     if (input.role === "org:teacher") {
-      const assignments = await this.db.batchTeacherAssignment.findMany({
+      const assignments = await this.db.trainingInstituteBatchTeacherAssignment.findMany({
         where: {
           workspaceId,
           deletedAt: null,
@@ -135,7 +135,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
         .filter((email): email is string => email != null),
     );
     if (emails.size === 0) return [];
-    const students = await this.db.student.findMany({
+    const students = await this.db.trainingInstituteStudent.findMany({
       where: { workspaceId, deletedAt: null, droppedAt: null },
       select: { id: true, email: true, profileDetails: true },
     });
@@ -143,7 +143,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
       .filter((student) => matchesStudent(student, input.role, emails))
       .map((student) => student.id);
     if (studentIds.length === 0) return [];
-    const enrollments = await this.db.enrollment.findMany({
+    const enrollments = await this.db.trainingInstituteEnrollment.findMany({
       where: {
         workspaceId,
         studentId: { in: studentIds },
@@ -168,7 +168,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
     batchIds: string[],
   ): Promise<CalendarItem[]> {
     if (batchIds.length === 0) return [];
-    const enrollments = await this.db.enrollment.findMany({
+    const enrollments = await this.db.trainingInstituteEnrollment.findMany({
       where: {
         workspaceId,
         batchId: { in: batchIds },

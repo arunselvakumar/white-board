@@ -1,5 +1,5 @@
-import type { EnrollmentReadModel } from "@/src/training/application/enrollment-read-model";
-import type { StudentReadModel } from "@/src/training/application/student-read-model";
+import type { EnrollmentReadModel } from "@/src/training-institute/application/enrollment-read-model";
+import type { StudentReadModel } from "@/src/training-institute/application/student-read-model";
 
 function mapEnrollmentSummary(enrollment: EnrollmentReadModel) {
   return {

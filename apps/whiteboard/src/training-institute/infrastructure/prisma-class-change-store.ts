@@ -20,10 +20,10 @@ const dateValue = (date: string) => new Date(`${date}T00:00:00.000Z`);
 const dateKey = (date: Date) => date.toISOString().slice(0, 10);
 
 type ChangeRow = NonNullable<
-  Awaited<ReturnType<PrismaClient["classChange"]["findFirst"]>>
+  Awaited<ReturnType<PrismaClient["trainingInstituteClassChange"]["findFirst"]>>
 >;
 type HolidayRow = NonNullable<
-  Awaited<ReturnType<PrismaClient["holiday"]["findFirst"]>>
+  Awaited<ReturnType<PrismaClient["trainingInstituteHoliday"]["findFirst"]>>
 >;
 
 function toChange(row: ChangeRow): ClassChange {
@@ -97,10 +97,10 @@ const batchSelect = {
     },
     select: { id: true, studentTimings: true },
   },
-} satisfies Prisma.BatchSelect;
+} satisfies Prisma.TrainingInstituteBatchSelect;
 
 function toChangeableBatch(
-  row: Prisma.BatchGetPayload<{ select: typeof batchSelect }>,
+  row: Prisma.TrainingInstituteBatchGetPayload<{ select: typeof batchSelect }>,
 ): ChangeableBatch {
   const firstDate = localNow(row.createdAt, row.timezone).date;
   return {
@@ -133,7 +133,7 @@ export class PrismaClassExceptionsReader implements ClassExceptionsReader {
     const [changes, holidays] = await Promise.all([
       batchIds.length === 0
         ? []
-        : this.db.classChange.findMany({
+        : this.db.trainingInstituteClassChange.findMany({
             where: {
               workspaceId,
               batchId: { in: [...new Set(batchIds)] },
@@ -141,7 +141,7 @@ export class PrismaClassExceptionsReader implements ClassExceptionsReader {
             },
             orderBy: [{ classDate: "asc" }, { startTime: "asc" }],
           }),
-      this.db.holiday.findMany({
+      this.db.trainingInstituteHoliday.findMany({
         where: { workspaceId, deletedAt: null },
         orderBy: [{ startDate: "asc" }],
       }),
@@ -202,7 +202,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     workspaceId: string,
     batchId: string,
   ): Promise<ChangeableBatch | null> {
-    const row = await this.db.batch.findFirst({
+    const row = await this.db.trainingInstituteBatch.findFirst({
       where: { id: batchId, workspaceId, deletedAt: null },
       select: batchSelect,
     });
@@ -210,7 +210,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
   }
 
   async openBatches(workspaceId: string): Promise<ChangeableBatch[]> {
-    const rows = await this.db.batch.findMany({
+    const rows = await this.db.trainingInstituteBatch.findMany({
       where: { workspaceId, deletedAt: null, closedAt: null },
       select: batchSelect,
     });
@@ -222,7 +222,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     batchId: string,
     userId: string,
   ): Promise<boolean> {
-    const teacher = await this.db.teacher.findFirst({
+    const teacher = await this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
         clerkUserId: userId,
@@ -241,14 +241,14 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     workspaceId: string,
     batchId?: string,
   ): Promise<ClassChange[]> {
-    const rows = await this.db.classChange.findMany({
+    const rows = await this.db.trainingInstituteClassChange.findMany({
       where: { workspaceId, deletedAt: null, ...(batchId ? { batchId } : {}) },
     });
     return rows.map(toChange);
   }
 
   async activeHolidays(workspaceId: string): Promise<Holiday[]> {
-    const rows = await this.db.holiday.findMany({
+    const rows = await this.db.trainingInstituteHoliday.findMany({
       where: { workspaceId, deletedAt: null },
       orderBy: [{ startDate: "asc" }],
     });
@@ -256,7 +256,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
   }
 
   async findHoliday(workspaceId: string, id: string): Promise<Holiday | null> {
-    const row = await this.db.holiday.findFirst({
+    const row = await this.db.trainingInstituteHoliday.findFirst({
       where: { id, workspaceId, deletedAt: null },
     });
     return row == null ? null : toHoliday(row);
@@ -269,13 +269,13 @@ export class PrismaClassChangeStore implements ClassChangeStore {
   ): Promise<boolean> {
     // Same row lock an Attendance save takes, so the two can't interleave.
     await this.db.$queryRaw`
-      SELECT id FROM attendance_registers
+      SELECT id FROM training_institute.attendance_registers
       WHERE workspace_id = ${workspaceId}
         AND deleted_at IS NULL
         AND date BETWEEN ${dateValue(dates.from)}::date AND ${dateValue(dates.to)}::date
         ${batchId ? Prisma.sql`AND batch_id = ${batchId}::uuid` : Prisma.empty}
       FOR UPDATE`;
-    const mark = await this.db.attendanceMark.findFirst({
+    const mark = await this.db.trainingInstituteAttendanceMark.findFirst({
       where: {
         workspaceId,
         deletedAt: null,
@@ -296,7 +296,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     workspaceId: string,
     slot: ClassSlotKey,
   ): Promise<boolean> {
-    const occurrence = await this.db.classOccurrence.findFirst({
+    const occurrence = await this.db.trainingInstituteClassOccurrence.findFirst({
       where: {
         workspaceId,
         batchId: slot.batchId,
@@ -325,7 +325,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     };
     try {
       await this.write(async (tx) => {
-        await tx.classChange.upsert({
+        await tx.trainingInstituteClassChange.upsert({
           where: { id: props.id },
           create: {
             id: props.id,
@@ -359,7 +359,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
   ): Promise<void> {
     const props = holiday.toProps();
     await this.write(async (tx) => {
-      await tx.holiday.upsert({
+      await tx.trainingInstituteHoliday.upsert({
         where: { id: props.id },
         create: {
           id: props.id,
@@ -396,7 +396,7 @@ async function tombstoneEmptyRegisters(
     userId: string;
   },
 ): Promise<void> {
-  const registers = await tx.attendanceRegister.findMany({
+  const registers = await tx.trainingInstituteAttendanceRegister.findMany({
     where: {
       workspaceId: input.workspaceId,
       deletedAt: null,
@@ -417,11 +417,11 @@ async function tombstoneEmptyRegisters(
   if (registers.length === 0) return;
   const now = new Date();
   const ids = registers.map((register) => register.id);
-  await tx.attendanceMark.updateMany({
+  await tx.trainingInstituteAttendanceMark.updateMany({
     where: { registerId: { in: ids }, deletedAt: null },
     data: { deletedAt: now, deletedByUserId: input.userId },
   });
-  await tx.attendanceRegister.updateMany({
+  await tx.trainingInstituteAttendanceRegister.updateMany({
     where: { id: { in: ids } },
     data: { deletedAt: now, deletedByUserId: input.userId },
   });

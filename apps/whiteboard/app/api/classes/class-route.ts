@@ -2,8 +2,8 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 
 import { jsonError } from "@/app/api/_lib/json-error";
 import { parseOrThrow } from "@/app/api/_lib/map-error";
-import type { ClassActor } from "@/src/training/application/class-service";
-import type { CalendarRole } from "@/src/training/application/calendar-schedule";
+import type { ClassActor } from "@/src/training-institute/application/class-service";
+import type { CalendarRole } from "@/src/training-institute/application/calendar-schedule";
 
 import { ClassParamsModel } from "./class-models";
 

@@ -44,7 +44,7 @@ export class PrismaCourseRepository implements CourseRepository {
 
     let updated;
     try {
-      updated = await this.db.course.updateMany({
+      updated = await this.db.trainingInstituteCourse.updateMany({
         where: { id: course.id.value, deletedAt: null },
         data: mutable,
       });
@@ -60,7 +60,7 @@ export class PrismaCourseRepository implements CourseRepository {
     }
 
     try {
-      await this.db.course.create({
+      await this.db.trainingInstituteCourse.create({
         data: {
           id: course.id.value,
           workspaceId: course.workspaceId.value,
@@ -84,7 +84,7 @@ export class PrismaCourseRepository implements CourseRepository {
     id: CourseId,
     workspaceId: WorkspaceId,
   ): Promise<Course | null> {
-    const row = await this.db.course.findFirst({
+    const row = await this.db.trainingInstituteCourse.findFirst({
       where: {
         id: id.value,
         workspaceId: workspaceId.value,
@@ -95,7 +95,7 @@ export class PrismaCourseRepository implements CourseRepository {
   }
 
   async listInWorkspace(params: CourseListParams): Promise<ListPage<Course>> {
-    const where: Prisma.CourseWhereInput = {
+    const where: Prisma.TrainingInstituteCourseWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...cursorWhere(params),
@@ -104,12 +104,12 @@ export class PrismaCourseRepository implements CourseRepository {
     const orderBy = listOrderBy(params.before != null);
 
     const [rows, total] = await Promise.all([
-      this.db.course.findMany({
+      this.db.trainingInstituteCourse.findMany({
         where,
         orderBy,
         take: params.limit + 1,
       }),
-      this.db.course.count({
+      this.db.trainingInstituteCourse.count({
         where: {
           workspaceId: params.workspaceId.value,
           deletedAt: null,
@@ -145,7 +145,7 @@ function mapCourseWriteError(error: unknown): Error {
 
 function cursorWhere(
   params: CourseListParams,
-): Pick<Prisma.CourseWhereInput, "OR"> | Record<string, never> {
+): Pick<Prisma.TrainingInstituteCourseWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [
@@ -173,7 +173,7 @@ function cursorWhere(
 
 function listOrderBy(
   ascending: boolean,
-): Prisma.CourseOrderByWithRelationInput[] {
+): Prisma.TrainingInstituteCourseOrderByWithRelationInput[] {
   const direction = ascending ? "asc" : "desc";
   return [{ createdAt: direction }, { id: direction }];
 }

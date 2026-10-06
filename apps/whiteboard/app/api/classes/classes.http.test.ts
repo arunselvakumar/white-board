@@ -53,7 +53,7 @@ describe("Class pre-join HTTP", () => {
     });
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     const courseId = randomUUID();
-    await prisma.course.create({
+    await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
         workspaceId,
@@ -62,7 +62,7 @@ describe("Class pre-join HTTP", () => {
         defaultFeeAmountPaise: 0,
       },
     });
-    await prisma.batch.create({
+    await prisma.trainingInstituteBatch.create({
       data: {
         id: batchId,
         workspaceId,
@@ -96,7 +96,7 @@ describe("Class pre-join HTTP", () => {
   });
 
   it("shows a Whiteboard waiting state and scopes Student access to Enrollment", async () => {
-    await prisma.batch.update({
+    await prisma.trainingInstituteBatch.update({
       where: { id: batchId },
       data: { meetingOption: "whiteboard", joinUrl: null },
     });
@@ -124,9 +124,9 @@ describe("Class pre-join HTTP", () => {
     expect((await get()).status).toBe(404);
     const studentId = randomUUID();
     const courseId = (
-      await prisma.batch.findUniqueOrThrow({ where: { id: batchId } })
+      await prisma.trainingInstituteBatch.findUniqueOrThrow({ where: { id: batchId } })
     ).courseId;
-    await prisma.student.create({
+    await prisma.trainingInstituteStudent.create({
       data: {
         id: studentId,
         workspaceId,
@@ -136,7 +136,7 @@ describe("Class pre-join HTTP", () => {
         email: "asha@example.com",
       },
     });
-    await prisma.enrollment.create({
+    await prisma.trainingInstituteEnrollment.create({
       data: {
         id: randomUUID(),
         workspaceId,

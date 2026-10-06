@@ -5,7 +5,7 @@ import { jsonError } from "@/app/api/_lib/json-error";
 import { mapError } from "@/app/api/_lib/map-error";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { requireTeacherSession } from "@/app/api/_lib/require-teacher-session";
-import { createTeacherHandlers } from "@/src/training/infrastructure/create-teacher-handlers";
+import { createTeacherHandlers } from "@/src/training-institute/infrastructure/create-teacher-handlers";
 
 const handlers = createTeacherHandlers();
 

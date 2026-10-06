@@ -28,14 +28,14 @@ export class PrismaTeacherDocumentRepository implements TeacherDocumentRepositor
       const teachers = await tx.$queryRaw<
         { id: string; deactivatedAt: Date | null }[]
       >(Prisma.sql`
-        SELECT "id", "deactivated_at" AS "deactivatedAt" FROM "teachers"
+        SELECT "id", "deactivated_at" AS "deactivatedAt" FROM "training_institute"."teachers"
         WHERE "id" = ${input.teacherId}::uuid AND "workspace_id" = ${input.workspaceId} AND "deleted_at" IS NULL
         FOR UPDATE
       `);
       if (teachers.length === 0) throw new TeacherNotFoundError();
       if (teachers[0]?.deactivatedAt != null)
         throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
-      const count = await tx.teacherDocument.count({
+      const count = await tx.trainingInstituteTeacherDocument.count({
         where: {
           teacherId: input.teacherId,
           workspaceId: input.workspaceId,
@@ -47,7 +47,7 @@ export class PrismaTeacherDocumentRepository implements TeacherDocumentRepositor
           "TEACHER_DOCUMENT_LIMIT",
           "A Teacher may have at most ten active documents.",
         );
-      await tx.teacherDocument.create({
+      await tx.trainingInstituteTeacherDocument.create({
         data: {
           id: input.id,
           workspaceId: input.workspaceId,
@@ -68,7 +68,7 @@ export class PrismaTeacherDocumentRepository implements TeacherDocumentRepositor
     teacherId: string,
     workspaceId: string,
   ): Promise<TeacherDocumentMetadata[]> {
-    const rows = await this.db.teacherDocument.findMany({
+    const rows = await this.db.trainingInstituteTeacherDocument.findMany({
       where: { teacherId, workspaceId, deletedAt: null },
       orderBy: [{ uploadedAt: "desc" }, { id: "desc" }],
       omit: { encryptedData: true },
@@ -89,7 +89,7 @@ export class PrismaTeacherDocumentRepository implements TeacherDocumentRepositor
     teacherId: string,
     workspaceId: string,
   ): Promise<TeacherDocumentContent | null> {
-    const row = await this.db.teacherDocument.findFirst({
+    const row = await this.db.trainingInstituteTeacherDocument.findFirst({
       where: { id, teacherId, workspaceId, deletedAt: null },
     });
     return row == null
@@ -113,7 +113,7 @@ export class PrismaTeacherDocumentRepository implements TeacherDocumentRepositor
     userId: string,
     now: Date,
   ): Promise<boolean> {
-    const result = await this.db.teacherDocument.updateMany({
+    const result = await this.db.trainingInstituteTeacherDocument.updateMany({
       where: { id, teacherId, workspaceId, deletedAt: null },
       data: { deletedAt: now, deletedByUserId: userId },
     });

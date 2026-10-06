@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withAppBasePath } from "@/lib/app-base-path";
 
-import type { Teacher } from "@/src/training/domain/teacher";
+import type { Teacher } from "@/src/training-institute/domain/teacher";
 import { TeacherDetailsResponseModel } from "./teacher-details-model";
 
 export const TeacherResponseModel = z.object({

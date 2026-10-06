@@ -31,7 +31,7 @@ import type {
   ClassSlotTime,
 } from "@/src/queries/calendar";
 import { classPath } from "@/src/queries/classes";
-import { hasStarted, localNow } from "@/src/training/domain/class-schedule";
+import { hasStarted, localNow } from "@/src/training-institute/domain/class-schedule";
 
 export type ClassChangeActions = {
   onCancel: (key: ClassKey, reason: string | null) => Promise<void>;

@@ -3,8 +3,8 @@ import {
   classActor,
   type ClassRouteContext,
 } from "@/app/api/classes/class-route";
-import { signedClassRecordingUrl } from "@/src/training/infrastructure/class-recording-download";
-import { createClassService } from "@/src/training/infrastructure/create-class-service";
+import { signedClassRecordingUrl } from "@/src/training-institute/infrastructure/class-recording-download";
+import { createClassService } from "@/src/training-institute/infrastructure/create-class-service";
 
 export const dynamic = "force-dynamic";
 

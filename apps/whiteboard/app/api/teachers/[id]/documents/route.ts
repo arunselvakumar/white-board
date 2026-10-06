@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse, requireSession } from "@/app/api/_lib/require-session";
-import { createTeacherHandlers } from "@/src/training/infrastructure/create-teacher-handlers";
+import { createTeacherHandlers } from "@/src/training-institute/infrastructure/create-teacher-handlers";
 import { TeacherParamsModel } from "../teacher-params-model";
 import {
   AddTeacherDocumentRequestModel,

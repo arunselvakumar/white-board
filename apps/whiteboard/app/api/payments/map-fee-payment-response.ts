@@ -1,4 +1,4 @@
-import type { FeePaymentReadModel } from "@/src/training/application/fee-payment-read-model";
+import type { FeePaymentReadModel } from "@/src/training-institute/application/fee-payment-read-model";
 
 export function mapFeePaymentResponse(payment: FeePaymentReadModel) {
   return {

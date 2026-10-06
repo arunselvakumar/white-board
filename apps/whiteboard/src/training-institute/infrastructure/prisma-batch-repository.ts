@@ -31,7 +31,7 @@ export class PrismaBatchRepository implements BatchRepository {
       deletedByUserId: batch.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.batch.updateMany({
+    const updated = await this.db.trainingInstituteBatch.updateMany({
       where: { id: batch.id.value, deletedAt: null },
       data: mutable,
     });
@@ -42,7 +42,7 @@ export class PrismaBatchRepository implements BatchRepository {
       throw new BatchNotFoundError();
     }
     try {
-      await this.db.batch.create({
+      await this.db.trainingInstituteBatch.create({
         data: {
           id: batch.id.value,
           workspaceId: batch.workspaceId.value,
@@ -67,7 +67,7 @@ export class PrismaBatchRepository implements BatchRepository {
     id: BatchId,
     workspaceId: WorkspaceId,
   ): Promise<Batch | null> {
-    const row = await this.db.batch.findFirst({
+    const row = await this.db.trainingInstituteBatch.findFirst({
       where: {
         id: id.value,
         workspaceId: workspaceId.value,
@@ -79,25 +79,25 @@ export class PrismaBatchRepository implements BatchRepository {
 
   async listInWorkspace(params: BatchListParams): Promise<ListPage<Batch>> {
     const cursor = cursorWhere(params);
-    const where: Prisma.BatchWhereInput = {
+    const where: Prisma.TrainingInstituteBatchWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.courseId != null ? { courseId: params.courseId.value } : {}),
       ...cursor,
     };
     const orderBy = listOrderBy(params.before != null);
-    const countWhere: Prisma.BatchWhereInput = {
+    const countWhere: Prisma.TrainingInstituteBatchWhereInput = {
       workspaceId: params.workspaceId.value,
       deletedAt: null,
       ...(params.courseId != null ? { courseId: params.courseId.value } : {}),
     };
     const [rows, total] = await Promise.all([
-      this.db.batch.findMany({
+      this.db.trainingInstituteBatch.findMany({
         where,
         orderBy,
         take: params.limit + 1,
       }),
-      this.db.batch.count({ where: countWhere }),
+      this.db.trainingInstituteBatch.count({ where: countWhere }),
     ]);
     const hasMore = rows.length > params.limit;
     const pageRows = hasMore ? rows.slice(0, params.limit) : rows;
@@ -113,7 +113,7 @@ export class PrismaBatchRepository implements BatchRepository {
 
 function cursorWhere(
   params: BatchListParams,
-): Pick<Prisma.BatchWhereInput, "OR"> | Record<string, never> {
+): Pick<Prisma.TrainingInstituteBatchWhereInput, "OR"> | Record<string, never> {
   if (params.after != null) {
     return {
       OR: [
@@ -141,7 +141,7 @@ function cursorWhere(
 
 function listOrderBy(
   ascending: boolean,
-): Prisma.BatchOrderByWithRelationInput[] {
+): Prisma.TrainingInstituteBatchOrderByWithRelationInput[] {
   const direction = ascending ? "asc" : "desc";
   return [{ createdAt: direction }, { id: direction }];
 }

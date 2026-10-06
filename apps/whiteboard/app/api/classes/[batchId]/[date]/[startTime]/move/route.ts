@@ -3,7 +3,7 @@ import { requireAttendanceSession } from "@/app/api/_lib/require-attendance-sess
 import { MoveClassRequestModel } from "@/app/api/classes/class-change-models";
 import { ClassParamsModel } from "@/app/api/classes/class-models";
 import type { ClassRouteContext } from "@/app/api/classes/class-route";
-import { createClassChangeHandlers } from "@/src/training/infrastructure/create-class-change-handlers";
+import { createClassChangeHandlers } from "@/src/training-institute/infrastructure/create-class-change-handlers";
 
 const handlers = createClassChangeHandlers();
 

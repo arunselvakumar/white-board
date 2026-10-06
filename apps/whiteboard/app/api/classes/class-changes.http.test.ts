@@ -151,7 +151,7 @@ async function seedWorkspace(timings: unknown) {
   const homeStudentId = randomUUID();
   const homeEnrollmentId = randomUUID();
   const batchEnrollmentId = randomUUID();
-  await prisma.course.create({
+  await prisma.trainingInstituteCourse.create({
     data: {
       id: courseId,
       workspaceId,
@@ -160,7 +160,7 @@ async function seedWorkspace(timings: unknown) {
       defaultFeeAmountPaise: 0,
     },
   });
-  await prisma.batch.create({
+  await prisma.trainingInstituteBatch.create({
     data: {
       id: batchId,
       workspaceId,
@@ -175,7 +175,7 @@ async function seedWorkspace(timings: unknown) {
       createdAt: new Date(Date.now() - 30 * 86_400_000),
     },
   });
-  await prisma.student.createMany({
+  await prisma.trainingInstituteStudent.createMany({
     data: [
       {
         id: batchStudentId,
@@ -205,7 +205,7 @@ async function seedWorkspace(timings: unknown) {
     feePlanDueDates: [{ dueOn: day(30), amountPaise: 0 }],
     createdAt: new Date(Date.now() - 30 * 86_400_000),
   };
-  await prisma.enrollment.createMany({
+  await prisma.trainingInstituteEnrollment.createMany({
     data: [
       {
         ...enrollment,
@@ -229,7 +229,7 @@ async function seedWorkspace(timings: unknown) {
     ],
   });
   const teacherId = randomUUID();
-  await prisma.teacher.createMany({
+  await prisma.trainingInstituteTeacher.createMany({
     data: [
       {
         id: teacherId,
@@ -251,7 +251,7 @@ async function seedWorkspace(timings: unknown) {
       },
     ],
   });
-  await prisma.batchTeacherAssignment.create({
+  await prisma.trainingInstituteBatchTeacherAssignment.create({
     data: {
       id: randomUUID(),
       workspaceId,
@@ -407,7 +407,7 @@ describe("Class changes HTTP", () => {
     expect(
       (await cancel(batchId, day(7), "09:00", "x".repeat(201))).status,
     ).toBe(400);
-    await prisma.classOccurrence.create({
+    await prisma.trainingInstituteClassOccurrence.create({
       data: {
         id: randomUUID(),
         workspaceId,
@@ -591,7 +591,7 @@ describe("Class changes today", () => {
       { daysOfWeek: EVERY_DAY, startTime: "15:00", endTime: "16:00" },
     ]));
     // The home-tuition Student isn't part of these checks.
-    await prisma.enrollment.updateMany({
+    await prisma.trainingInstituteEnrollment.updateMany({
       where: { workspaceId, timingSource: "student" },
       data: { endedAt: new Date() },
     });
@@ -629,7 +629,7 @@ describe("Class changes today", () => {
 
     expect((await cancel(batchId, TODAY, "15:00")).status).toBe(200);
     expect(
-      await prisma.attendanceRegister.count({
+      await prisma.trainingInstituteAttendanceRegister.count({
         where: { workspaceId, deletedAt: null },
       }),
     ).toBe(0);
