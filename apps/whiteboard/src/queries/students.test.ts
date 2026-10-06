@@ -30,7 +30,7 @@ describe("student list query", () => {
     );
 
     expect(fetch).toHaveBeenCalledWith(
-      "/app/api/students?limit=12&q=Anita&after=next-page",
+      "/app/api/training-institute/students?limit=12&q=Anita&after=next-page",
       expect.any(Object),
     );
   });
@@ -57,7 +57,7 @@ describe("student list query", () => {
     );
 
     expect(fetch).toHaveBeenCalledWith(
-      "/app/api/students?limit=12&before=previous-page",
+      "/app/api/training-institute/students?limit=12&before=previous-page",
       expect.any(Object),
     );
   });

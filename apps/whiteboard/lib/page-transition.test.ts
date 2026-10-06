@@ -106,7 +106,7 @@ describe("pageTransitionHref", () => {
     expect(
       pageTransitionHref(
         click(
-          "http://localhost:3000/app/api/teachers/1/documents/2",
+          "http://localhost:3000/app/api/training-institute/teachers/1/documents/2",
           "http://localhost:3000/app/teachers/1",
         ),
       ),

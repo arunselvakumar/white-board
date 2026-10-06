@@ -35,6 +35,7 @@ export const dashboardQueries = {
   get: () =>
     queryOptions({
       queryKey: dashboardQueries.key.all,
-      queryFn: () => apiJson<DashboardResponse>("/api/dashboard"),
+      queryFn: () =>
+        apiJson<DashboardResponse>("/api/training-institute/dashboard"),
     }),
 };

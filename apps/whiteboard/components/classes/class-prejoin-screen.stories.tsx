@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import type { ClassDetail } from "@/src/training/application/class-service";
+import type { ClassDetail } from "@/src/training-institute/application/class-service";
 import { classQueries } from "@/src/queries/classes";
 import { getQueryClient } from "@/src/queries/query-client";
 import { clerkMocks } from "../../.storybook/mocks/clerk";
@@ -129,7 +129,7 @@ export const RecordingDownload: Story = {
       canvas.getByRole("link", { name: "Download recording" }),
     ).toHaveAttribute(
       "href",
-      `/app/api/classes/${batchId}/${date}/09%3A00/recording`,
+      `/app/api/training-institute/classes/${batchId}/${date}/09%3A00/recording`,
     );
   },
 };

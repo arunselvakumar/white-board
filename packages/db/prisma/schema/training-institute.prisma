@@ -1,0 +1,464 @@
+enum TrainingInstituteClassMode {
+  offline
+  online
+  hybrid
+
+  @@map("class_mode")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteMeetingOption {
+  external
+  whiteboard
+
+  @@map("meeting_option")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteClassChangeKind {
+  cancelled
+  moved
+
+  @@map("class_change_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteTimingSource {
+  batch
+  student
+
+  @@map("timing_source")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteFeePlanType {
+  one_time
+  monthly
+  installments
+
+  @@map("fee_plan_type")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteFeePaymentMethod {
+  cash
+  upi
+  card
+  other
+
+  @@map("fee_payment_method")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteCourseDurationKind {
+  fixed
+  flexible
+
+  @@map("course_duration_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteCourseDurationUnit {
+  days
+  weeks
+  months
+
+  @@map("course_duration_unit")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteTeacherKind {
+  centre_teacher
+  visiting_tutor
+
+  @@map("teacher_kind")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteTeacherInvitationStatus {
+  not_sent
+  sent
+  failed
+  accepted
+
+  @@map("teacher_invitation_status")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteAttendanceStatus {
+  unmarked
+  present
+  absent
+  late
+  excused
+
+  @@map("attendance_status")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteCourse {
+  id                    String    @id @db.Uuid
+  workspaceId           String    @map("workspace_id")
+  createdByUserId       String    @map("created_by_user_id")
+  name                  String    @db.VarChar(200)
+  durationKind          TrainingInstituteCourseDurationKind @default(flexible) @map("duration_kind")
+  durationValue         Int?               @map("duration_value")
+  durationUnit          TrainingInstituteCourseDurationUnit? @map("duration_unit")
+  code                  String?             @db.VarChar(40)
+  category              String?             @db.VarChar(100)
+  totalLearningHours    Int?                @map("total_learning_hours")
+  eligibility           String?             @db.Text
+  learningOutcomes      String[]            @default([]) @map("learning_outcomes")
+  syllabusOutline       String[]            @default([]) @map("syllabus_outline")
+  description           String?   @db.Text
+  defaultFeeAmountPaise Int       @map("default_fee_amount_paise")
+  archivedAt            DateTime? @map("archived_at")
+  archivedByUserId      String?   @map("archived_by_user_id")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  deletedAt             DateTime? @map("deleted_at")
+  deletedByUserId       String?   @map("deleted_by_user_id")
+
+  batches     TrainingInstituteBatch[]
+  enrollments TrainingInstituteEnrollment[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@map("courses")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteBatch {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  courseId        String    @map("course_id") @db.Uuid
+  createdByUserId String    @map("created_by_user_id")
+  name            String    @db.VarChar(200)
+  classMode       TrainingInstituteClassMode @map("class_mode")
+  capacity        Int
+  room            String?   @db.VarChar(80)
+  joinUrl         String?   @map("join_url") @db.VarChar(2048)
+  meetingOption   TrainingInstituteMeetingOption @default(external) @map("meeting_option")
+  /// Weekly slots: { daysOfWeek: number[], startTime: "HH:mm", endTime: "HH:mm" }[]
+  timings         Json
+  timezone        String    @default("Asia/Kolkata") @db.VarChar(64)
+  closedAt        DateTime? @map("closed_at")
+  closedByUserId  String?   @map("closed_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  course      TrainingInstituteCourse       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  enrollments TrainingInstituteEnrollment[]
+  teacherAssignments TrainingInstituteBatchTeacherAssignment[]
+  attendanceRegisters TrainingInstituteAttendanceRegister[]
+  classOccurrences TrainingInstituteClassOccurrence[]
+  classChanges     TrainingInstituteClassChange[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([courseId, deletedAt])
+  @@map("batches")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteClassOccurrence {
+  id                String    @id @db.Uuid
+  workspaceId       String    @map("workspace_id")
+  batchId           String    @map("batch_id") @db.Uuid
+  classDate         DateTime  @map("class_date") @db.Date
+  startTime         String    @map("start_time") @db.VarChar(5)
+  endTime           String    @map("end_time") @db.VarChar(5)
+  providerMeetingId String?   @unique @map("provider_meeting_id") @db.VarChar(100)
+  status            String    @default("starting") @db.VarChar(20)
+  recordingId       String?   @map("recording_id") @db.VarChar(100)
+  recordingStatus   String    @default("pending") @map("recording_status") @db.VarChar(20)
+  recordingObjectKey String?  @map("recording_object_key") @db.VarChar(1024)
+  startedByUserId   String    @map("started_by_user_id")
+  startedAt         DateTime  @default(now()) @map("started_at")
+  endedAt           DateTime? @map("ended_at")
+
+  batch TrainingInstituteBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@unique([batchId, classDate, startTime])
+  @@index([workspaceId, batchId, classDate])
+  @@map("class_occurrences")
+  @@schema("training_institute")
+}
+
+/// One active change per original Class (Batch, local date, start time). See ADR-0028.
+model TrainingInstituteClassChange {
+  id               String          @id @db.Uuid
+  workspaceId      String          @map("workspace_id")
+  batchId          String          @map("batch_id") @db.Uuid
+  classDate        DateTime        @map("class_date") @db.Date
+  startTime        String          @map("start_time") @db.VarChar(5)
+  endTime          String          @map("end_time") @db.VarChar(5)
+  kind             TrainingInstituteClassChangeKind
+  reason           String?         @db.VarChar(200)
+  movedToDate      DateTime?       @map("moved_to_date") @db.Date
+  movedToStartTime String?         @map("moved_to_start_time") @db.VarChar(5)
+  movedToEndTime   String?         @map("moved_to_end_time") @db.VarChar(5)
+  createdByUserId  String          @map("created_by_user_id")
+  updatedByUserId  String          @map("updated_by_user_id")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  deletedAt        DateTime?       @map("deleted_at")
+  deletedByUserId  String?         @map("deleted_by_user_id")
+
+  batch TrainingInstituteBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, batchId, classDate])
+  @@index([workspaceId, deletedAt, classDate])
+  @@map("class_changes")
+  @@schema("training_institute")
+}
+
+/// Workspace-wide dates on which every Class is cancelled. See ADR-0028.
+model TrainingInstituteHoliday {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  startDate       DateTime  @map("start_date") @db.Date
+  endDate         DateTime  @map("end_date") @db.Date
+  reason          String?   @db.VarChar(200)
+  createdByUserId String    @map("created_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  @@index([workspaceId, deletedAt, startDate])
+  @@map("holidays")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteTeacher {
+  id                    String                  @id @db.Uuid
+  workspaceId           String                  @map("workspace_id")
+  createdByUserId       String                  @map("created_by_user_id")
+  name                  String                  @db.VarChar(200)
+  email                 String                  @db.VarChar(320)
+  kind                  TrainingInstituteTeacherKind
+  phone                 String?                 @db.VarChar(32)
+  qualificationSummary  String?                 @map("qualification_summary") @db.VarChar(1000)
+  profileDetails        Json                    @default("{}") @map("profile_details")
+  photoData             Bytes?                 @map("photo_data")
+  photoMimeType         String?                @map("photo_mime_type") @db.VarChar(50)
+  photoUpdatedAt        DateTime?              @map("photo_updated_at")
+  idNumberEncrypted     String?                @map("id_number_encrypted") @db.Text
+  idNumberLast4         String?                @map("id_number_last4") @db.VarChar(4)
+  bankAccountEncrypted  String?                @map("bank_account_encrypted") @db.Text
+  bankAccountLast4      String?                @map("bank_account_last4") @db.VarChar(4)
+  clerkUserId           String?                 @map("clerk_user_id")
+  invitationId          String?                 @map("invitation_id")
+  invitationStatus      TrainingInstituteTeacherInvitationStatus @default(not_sent) @map("invitation_status")
+  deactivatedAt         DateTime?               @map("deactivated_at")
+  deactivatedByUserId   String?                 @map("deactivated_by_user_id")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
+  deletedAt             DateTime?               @map("deleted_at")
+  deletedByUserId       String?                 @map("deleted_by_user_id")
+
+  batchAssignments TrainingInstituteBatchTeacherAssignment[]
+  documents        TrainingInstituteTeacherDocument[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([workspaceId, clerkUserId])
+  @@map("teachers")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteTeacherDocument {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  teacherId       String    @map("teacher_id") @db.Uuid
+  kind            String    @db.VarChar(32)
+  name            String    @db.VarChar(200)
+  mimeType        String    @map("mime_type") @db.VarChar(50)
+  encryptedData   Bytes     @map("encrypted_data")
+  sizeBytes       Int       @map("size_bytes")
+  uploadedAt      DateTime  @default(now()) @map("uploaded_at")
+  uploadedByUserId String   @map("uploaded_by_user_id")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  teacher TrainingInstituteTeacher @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, teacherId, deletedAt, uploadedAt, id])
+  @@map("teacher_documents")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteBatchTeacherAssignment {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  teacherId          String    @map("teacher_id") @db.Uuid
+  batchId            String    @map("batch_id") @db.Uuid
+  assignedByUserId   String    @map("assigned_by_user_id")
+  assignedAt         DateTime  @default(now()) @map("assigned_at")
+  unassignedAt       DateTime? @map("unassigned_at")
+  unassignedByUserId String?   @map("unassigned_by_user_id")
+  deletedAt          DateTime? @map("deleted_at")
+  deletedByUserId    String?   @map("deleted_by_user_id")
+
+  teacher TrainingInstituteTeacher @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  batch   TrainingInstituteBatch   @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, teacherId, unassignedAt])
+  @@index([workspaceId, batchId, unassignedAt])
+  @@map("batch_teacher_assignments")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteStudent {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  createdByUserId String    @map("created_by_user_id")
+  name            String    @db.VarChar(200)
+  phone           String    @db.VarChar(32)
+  email           String?   @db.VarChar(320)
+  photoUrl        String?   @map("photo_url") @db.VarChar(2048)
+  address         String?   @db.Text
+  idProofNote     String?   @map("id_proof_note") @db.Text
+  guardianName    String?   @map("guardian_name") @db.VarChar(200)
+  guardianPhone   String?   @map("guardian_phone") @db.VarChar(32)
+  profileDetails  Json      @default("{}") @map("profile_details")
+  droppedAt       DateTime? @map("dropped_at")
+  droppedByUserId String?   @map("dropped_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  enrollments TrainingInstituteEnrollment[]
+  attendanceMarks TrainingInstituteAttendanceMark[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([workspaceId, phone])
+  @@index([workspaceId, name])
+  @@map("students")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteEnrollment {
+  id                      String       @id @db.Uuid
+  workspaceId             String       @map("workspace_id")
+  studentId               String       @map("student_id") @db.Uuid
+  courseId                String       @map("course_id") @db.Uuid
+  batchId                 String       @map("batch_id") @db.Uuid
+  createdByUserId         String       @map("created_by_user_id")
+  classModeOverride       TrainingInstituteClassMode?   @map("class_mode_override")
+  timingSource            TrainingInstituteTimingSource @map("timing_source")
+  /// Student-specific slots when timingSource is student. Same shape as Batch.timings.
+  studentTimings          Json?        @map("student_timings")
+  endedAt                 DateTime?    @map("ended_at")
+  endedByUserId           String?      @map("ended_by_user_id")
+  feePlanType             TrainingInstituteFeePlanType  @map("fee_plan_type")
+  feePlanAmountPaise      Int          @map("fee_plan_amount_paise")
+  feePlanInstallmentCount Int?         @map("fee_plan_installment_count")
+  feePlanConcessionPaise  Int          @default(0) @map("fee_plan_concession_paise")
+  /// [{ dueOn: "YYYY-MM-DD", amountPaise: number }]
+  feePlanDueDates         Json         @map("fee_plan_due_dates")
+  createdAt               DateTime     @default(now()) @map("created_at")
+  updatedAt               DateTime     @updatedAt @map("updated_at")
+  deletedAt               DateTime?    @map("deleted_at")
+  deletedByUserId         String?      @map("deleted_by_user_id")
+
+  student     TrainingInstituteStudent      @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  course      TrainingInstituteCourse       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  batch       TrainingInstituteBatch        @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  feePayments TrainingInstituteFeePayment[]
+  attendanceMarks TrainingInstituteAttendanceMark[]
+
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([studentId, deletedAt])
+  @@index([batchId, deletedAt, endedAt])
+  @@map("enrollments")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteAttendanceRegister {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  batchId         String    @map("batch_id") @db.Uuid
+  date            DateTime  @db.Date
+  timezone        String    @db.VarChar(64)
+  createdByUserId String    @map("created_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  batch TrainingInstituteBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  marks TrainingInstituteAttendanceMark[]
+
+  @@index([workspaceId, batchId, date])
+  @@map("attendance_registers")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteAttendanceMark {
+  id                  String           @id @db.Uuid
+  workspaceId         String           @map("workspace_id")
+  registerId          String           @map("register_id") @db.Uuid
+  enrollmentId        String           @map("enrollment_id") @db.Uuid
+  studentId           String           @map("student_id") @db.Uuid
+  studentNameSnapshot String           @map("student_name_snapshot") @db.VarChar(200)
+  status              TrainingInstituteAttendanceStatus @default(unmarked)
+  note                String?          @db.VarChar(500)
+  markedByUserId      String?          @map("marked_by_user_id")
+  markedAt            DateTime?        @map("marked_at")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+  deletedAt           DateTime?        @map("deleted_at")
+  deletedByUserId     String?          @map("deleted_by_user_id")
+
+  register TrainingInstituteAttendanceRegister @relation(fields: [registerId], references: [id], onDelete: Restrict)
+  enrollment TrainingInstituteEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  student TrainingInstituteStudent @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  changes TrainingInstituteAttendanceMarkChange[]
+
+  @@unique([registerId, enrollmentId])
+  @@index([workspaceId, studentId, createdAt])
+  @@map("attendance_marks")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteAttendanceMarkChange {
+  id              String           @id @db.Uuid
+  markId          String           @map("mark_id") @db.Uuid
+  oldStatus       TrainingInstituteAttendanceStatus @map("old_status")
+  newStatus       TrainingInstituteAttendanceStatus @map("new_status")
+  oldNote         String?          @map("old_note") @db.VarChar(500)
+  newNote         String?          @map("new_note") @db.VarChar(500)
+  changedByUserId String           @map("changed_by_user_id")
+  changedAt       DateTime         @default(now()) @map("changed_at")
+
+  mark TrainingInstituteAttendanceMark @relation(fields: [markId], references: [id], onDelete: Restrict)
+
+  @@index([markId, changedAt])
+  @@map("attendance_mark_changes")
+  @@schema("training_institute")
+}
+
+model TrainingInstituteFeePayment {
+  id               String           @id @db.Uuid
+  workspaceId      String           @map("workspace_id")
+  enrollmentId     String           @map("enrollment_id") @db.Uuid
+  recordedByUserId String           @map("recorded_by_user_id")
+  amountPaise      Int              @map("amount_paise")
+  method           TrainingInstituteFeePaymentMethod
+  paidAt           DateTime         @map("paid_at")
+  receiptNumber    String           @map("receipt_number") @db.VarChar(32)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  deletedAt        DateTime?        @map("deleted_at")
+  deletedByUserId  String?          @map("deleted_by_user_id")
+
+  enrollment TrainingInstituteEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, receiptNumber])
+  @@index([workspaceId, deletedAt, createdAt, id])
+  @@index([enrollmentId, deletedAt, paidAt, id])
+  @@map("fee_payments")
+  @@schema("training_institute")
+}

@@ -1,8 +1,8 @@
-import { createClassService } from "@/src/training/infrastructure/create-class-service";
+import { createClassService } from "@/src/training-institute/infrastructure/create-class-service";
 import {
   parseRealtimeKitEvent,
   verifyRealtimeKitWebhook,
-} from "@/src/training/infrastructure/realtimekit-webhook";
+} from "@/src/training-institute/infrastructure/realtimekit-webhook";
 
 export const runtime = "nodejs";
 

@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import type { ClassDetail } from "@/src/training/application/class-service";
+import type { ClassDetail } from "@/src/training-institute/application/class-service";
 
 import { apiJson } from "./http";
 
@@ -17,7 +17,7 @@ export function classApiPath(
   date: string,
   startTime: string,
 ): string {
-  return `/api${classPath(batchId, date, startTime)}`;
+  return `/api/training-institute${classPath(batchId, date, startTime)}`;
 }
 
 export const classQueries = {

@@ -5,7 +5,14 @@ description: Context-first modular monolith in Whiteboard — domain/application
 
 # Modular monolith
 
-ADR-0009. First product context is `training` at `apps/whiteboard/src/training/{domain,application,infrastructure}`. HTTP stays in `app/api/`. Prisma stays in `packages/db`.
+ADR-0009, ADR-0030. First product context is `training-institute` at `apps/whiteboard/src/training-institute/{domain,application,infrastructure}`. HTTP stays in `app/api/training-institute/`. Prisma stays in `packages/db`, in the context's own schema file and Postgres schema.
+
+## A new bounded context
+
+1. `src/<context>/{domain,application,infrastructure}`. Names inside the folder stay unprefixed (`Student`, `PrismaStudentRepository`).
+2. `packages/db/prisma/schema/<context>.prisma`. Add the Postgres schema to `schemas` in `base.prisma`. Every model and enum gets `@@schema("<context_snake>")` and a context prefix (`SchoolStudent`), with `@@map` keeping table names short.
+3. Routes under `app/api/<context>/`. Request/Response models carry the context in their names and are listed as components in `app/api/_lib/openapi-document.ts`.
+4. Add the context to `BOUNDED_CONTEXTS` in `apps/whiteboard/eslint.config.js`.
 
 ## Layers
 
@@ -37,7 +44,7 @@ export type CourseRepository = {
 };
 ```
 
-Prisma implementations live in infrastructure. Lists are bidirectional cursor + total (ADR-0020). Soft delete is an invisible tombstone (ADR-0019). HTTP is named commands (`POST /api/courses/:id/archive`), not generic PATCH.
+Prisma implementations live in infrastructure. Lists are bidirectional cursor + total (ADR-0020). Soft delete is an invisible tombstone (ADR-0019). HTTP is named commands (`POST /api/training-institute/courses/:id/archive`), not generic PATCH.
 
 ## Events
 
@@ -45,7 +52,8 @@ Aggregates record events. After persist, the handler calls `EventDispatcher.disp
 
 ## Do not
 
-- Create `/api/<context>` until the HTTP ticket
+- Create `/api/<context>` routes until the HTTP ticket
+- Import another context's folder; refer to it by ID
 - Put repositories in `packages/db`
 - Share domain types across contexts via a new package
 - Hang fees off Student; Fee Plan belongs to Enrollment

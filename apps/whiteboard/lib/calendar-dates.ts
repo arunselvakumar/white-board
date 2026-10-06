@@ -3,7 +3,7 @@ import {
   type ClassChangeFact,
   type HolidayFact,
   type ScheduledClass,
-} from "@/src/training/domain/class-schedule";
+} from "@/src/training-institute/domain/class-schedule";
 
 export type DateKey = string;
 export type CalendarEvent<T> = {

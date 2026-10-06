@@ -43,7 +43,8 @@ A **Student** remains a Workspace record, distinct from a Clerk User. Add Studen
 ## Architecture
 
 - Context-first modular monolith inside Whiteboard: `apps/whiteboard/src/<context>/{domain,application,infrastructure}` (ADR-0009). How-to: [`.grok/skills/modular-monolith/SKILL.md`](./.grok/skills/modular-monolith/SKILL.md).
-- First product context is **`training`**.
+- First product context is **`training-institute`**.
+- Each bounded context gets its own Postgres schema (`training_institute`), its own Prisma schema file with context-prefixed models and enums (`TrainingInstituteStudent`), its own API prefix (`/api/training-institute/...`), and context-prefixed HTTP models and OpenAPI components (ADR-0030). Inside the context folder, names stay unprefixed. A context never imports another context's folder (ESLint enforces it); refer to other contexts by ID.
 - HTTP is Next.js Route Handlers in `apps/whiteboard/app/api` (ADR-0006). No separate API process.
 - Writes = commands, reads = queries, no bus (ADR-0007). Named operations, not generic PATCH (ADR-0015).
 - Zod only on HTTP Request/Response models next to routes (ADR-0016, ADR-0021). Domain does not import Zod.
@@ -52,7 +53,7 @@ A **Student** remains a Workspace record, distinct from a Clerk User. Add Studen
 - Postgres holds resource rows only. Clerk ids are opaque strings. No User or Workspace table (ADR-0018).
 - Soft delete is an invisible tombstone (ADR-0019). Lists use bidirectional cursors plus total (ADR-0020).
 - Errors: `{ code, message, details? }` (ADR-0017).
-- Prisma lives only in `packages/db` (ADR-0010).
+- Prisma lives only in `packages/db` (ADR-0010). Migrations that move tables are written by hand; never accept a generated drop-and-recreate (ADR-0030).
 
 ## UI
 

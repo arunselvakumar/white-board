@@ -52,8 +52,8 @@ export const studentAdmissionQueries = {
       refetchOnMount: "always",
       queryFn: async (): Promise<AdmissionBatchOption[]> => {
         const [courses, batches] = await Promise.all([
-          allPages<CourseResponse>("/api/courses"),
-          allPages<BatchResponse>("/api/batches"),
+          allPages<CourseResponse>("/api/training-institute/courses"),
+          allPages<BatchResponse>("/api/training-institute/batches"),
         ]);
         const activeCourses = new Map(
           courses
@@ -99,10 +99,13 @@ export async function hasAdmissionEnrollment(
   studentId: string,
   batchId: string,
 ): Promise<boolean> {
-  const enrollments = await allPages<EnrollmentResponse>("/api/enrollments", {
-    studentId,
-    batchId,
-  });
+  const enrollments = await allPages<EnrollmentResponse>(
+    "/api/training-institute/enrollments",
+    {
+      studentId,
+      batchId,
+    },
+  );
   return enrollments.some((item) => item.endedAt == null);
 }
 

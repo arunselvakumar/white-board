@@ -78,32 +78,38 @@ export const enrollmentQueries = {
         if (filters?.studentId) params.set("studentId", filters.studentId);
         if (filters?.batchId) params.set("batchId", filters.batchId);
         return apiJson<EnrollmentListResponse>(
-          `/api/enrollments?${params.toString()}`,
+          `/api/training-institute/enrollments?${params.toString()}`,
         );
       },
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: enrollmentQueries.key.detail(id),
-      queryFn: () => apiJson<EnrollmentResponse>(`/api/enrollments/${id}`),
+      queryFn: () =>
+        apiJson<EnrollmentResponse>(
+          `/api/training-institute/enrollments/${id}`,
+        ),
     }),
   payments: (id: string) =>
     queryOptions({
       queryKey: enrollmentQueries.key.payments(id),
       queryFn: () =>
         apiJson<FeePaymentListResponse>(
-          `/api/enrollments/${id}/payments?limit=100`,
+          `/api/training-institute/enrollments/${id}/payments?limit=100`,
         ),
     }),
   receipt: (id: string) =>
     queryOptions({
       queryKey: enrollmentQueries.key.receipt(id),
-      queryFn: () => apiJson<FeePaymentResponse>(`/api/payments/${id}/receipt`),
+      queryFn: () =>
+        apiJson<FeePaymentResponse>(
+          `/api/training-institute/payments/${id}/receipt`,
+        ),
     }),
 };
 
 export function enrollStudent(input: EnrollInput): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>("/api/enrollments", {
+  return apiJson<EnrollmentResponse>("/api/training-institute/enrollments", {
     method: "POST",
     headers: jsonHeaders,
     body: JSON.stringify(input),
@@ -114,39 +120,51 @@ export function overrideEnrollmentMode(
   id: string,
   classModeOverride: "offline" | "online" | "hybrid" | null,
 ): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>(`/api/enrollments/${id}/mode`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify({ classModeOverride }),
-  });
+  return apiJson<EnrollmentResponse>(
+    `/api/training-institute/enrollments/${id}/mode`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ classModeOverride }),
+    },
+  );
 }
 
 export function setEnrollmentTimings(
   id: string,
   input: { timingSource: "batch" | "student"; studentTimings?: TimingSlot[] },
 ): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>(`/api/enrollments/${id}/timings`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(input),
-  });
+  return apiJson<EnrollmentResponse>(
+    `/api/training-institute/enrollments/${id}/timings`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(input),
+    },
+  );
 }
 
 export function moveEnrollment(
   id: string,
   batchId: string,
 ): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>(`/api/enrollments/${id}/move`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify({ batchId }),
-  });
+  return apiJson<EnrollmentResponse>(
+    `/api/training-institute/enrollments/${id}/move`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ batchId }),
+    },
+  );
 }
 
 export function endEnrollment(id: string): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>(`/api/enrollments/${id}/end`, {
-    method: "POST",
-  });
+  return apiJson<EnrollmentResponse>(
+    `/api/training-institute/enrollments/${id}/end`,
+    {
+      method: "POST",
+    },
+  );
 }
 
 export function adjustFeePlan(
@@ -159,11 +177,14 @@ export function adjustFeePlan(
     dueDates: { dueOn: string; amountPaise: number }[];
   },
 ): Promise<EnrollmentResponse> {
-  return apiJson<EnrollmentResponse>(`/api/enrollments/${id}/fee-plan`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(input),
-  });
+  return apiJson<EnrollmentResponse>(
+    `/api/training-institute/enrollments/${id}/fee-plan`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(input),
+    },
+  );
 }
 
 export function recordFeePayment(
@@ -174,7 +195,7 @@ export function recordFeePayment(
   },
 ): Promise<FeePaymentResponse> {
   return apiJson<FeePaymentResponse>(
-    `/api/enrollments/${enrollmentId}/payments`,
+    `/api/training-institute/enrollments/${enrollmentId}/payments`,
     {
       method: "POST",
       headers: jsonHeaders,

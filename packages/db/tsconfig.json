@@ -9,6 +9,6 @@
     "moduleResolution": "Bundler",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "eslint.config.js"],
+  "include": ["src/**/*.ts", "prisma.config.ts", "eslint.config.js"],
   "exclude": ["node_modules", "dist", "prisma"]
 }

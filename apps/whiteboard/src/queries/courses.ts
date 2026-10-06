@@ -68,18 +68,21 @@ export const courseQueries = {
         });
         if (page?.after) params.set("after", page.after);
         if (page?.before) params.set("before", page.before);
-        return apiJson<CourseListResponse>(`/api/courses?${params.toString()}`);
+        return apiJson<CourseListResponse>(
+          `/api/training-institute/courses?${params.toString()}`,
+        );
       },
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: courseQueries.key.detail(id),
-      queryFn: () => apiJson<CourseResponse>(`/api/courses/${id}`),
+      queryFn: () =>
+        apiJson<CourseResponse>(`/api/training-institute/courses/${id}`),
     }),
 };
 
 export function createCourse(input: CourseWriteInput): Promise<CourseResponse> {
-  return apiJson<CourseResponse>("/api/courses", {
+  return apiJson<CourseResponse>("/api/training-institute/courses", {
     method: "POST",
     headers: jsonHeaders,
     body: JSON.stringify(input),
@@ -90,15 +93,21 @@ export function updateCourse(
   id: string,
   input: CourseWriteInput,
 ): Promise<CourseResponse> {
-  return apiJson<CourseResponse>(`/api/courses/${id}/update`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(input),
-  });
+  return apiJson<CourseResponse>(
+    `/api/training-institute/courses/${id}/update`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(input),
+    },
+  );
 }
 
 export function archiveCourse(id: string): Promise<CourseResponse> {
-  return apiJson<CourseResponse>(`/api/courses/${id}/archive`, {
-    method: "POST",
-  });
+  return apiJson<CourseResponse>(
+    `/api/training-institute/courses/${id}/archive`,
+    {
+      method: "POST",
+    },
+  );
 }

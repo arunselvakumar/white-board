@@ -1,0 +1,180 @@
+import { Prisma, type PrismaClient } from "@repo/db";
+
+import { CourseNotFoundError } from "../application/not-found-error";
+import { DomainError } from "../domain/errors";
+import type { Course } from "../domain/course";
+import type { CourseId } from "../domain/course-id";
+import type {
+  CourseListParams,
+  CourseRepository,
+} from "../domain/course-repository";
+import type { ListPage } from "../domain/list";
+import type { WorkspaceId } from "../domain/workspace-id";
+import { toDomainCourse } from "./prisma-course-mapper";
+
+export class PrismaCourseRepository implements CourseRepository {
+  constructor(private readonly db: PrismaClient) {}
+
+  async save(course: Course): Promise<void> {
+    const mutable = {
+      name: course.name.value,
+      durationKind: course.duration.value.kind,
+      durationValue:
+        course.duration.value.kind === "fixed"
+          ? course.duration.value.value
+          : null,
+      durationUnit:
+        course.duration.value.kind === "fixed"
+          ? course.duration.value.unit
+          : null,
+      code: course.details.value.code,
+      category: course.details.value.category,
+      totalLearningHours: course.details.value.totalLearningHours,
+      eligibility: course.details.value.eligibility,
+      learningOutcomes: course.details.value.learningOutcomes,
+      syllabusOutline: course.details.value.syllabusOutline,
+      description: course.description?.value ?? null,
+      defaultFeeAmountPaise: course.defaultFeeAmount.value,
+      archivedAt: course.archivedAt,
+      archivedByUserId: course.archivedByUserId?.value ?? null,
+      updatedAt: course.updatedAt,
+      deletedAt: course.deletedAt,
+      deletedByUserId: course.deletedByUserId?.value ?? null,
+    };
+
+    let updated;
+    try {
+      updated = await this.db.trainingInstituteCourse.updateMany({
+        where: { id: course.id.value, deletedAt: null },
+        data: mutable,
+      });
+    } catch (error) {
+      throw mapCourseWriteError(error);
+    }
+    if (updated.count > 0) {
+      return;
+    }
+
+    if (course.deletedAt != null) {
+      throw new CourseNotFoundError();
+    }
+
+    try {
+      await this.db.trainingInstituteCourse.create({
+        data: {
+          id: course.id.value,
+          workspaceId: course.workspaceId.value,
+          createdByUserId: course.createdByUserId.value,
+          createdAt: course.createdAt,
+          ...mutable,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw mapCourseWriteError(error);
+      }
+      throw error;
+    }
+  }
+
+  async findByIdInWorkspace(
+    id: CourseId,
+    workspaceId: WorkspaceId,
+  ): Promise<Course | null> {
+    const row = await this.db.trainingInstituteCourse.findFirst({
+      where: {
+        id: id.value,
+        workspaceId: workspaceId.value,
+        deletedAt: null,
+      },
+    });
+    return row == null ? null : toDomainCourse(row);
+  }
+
+  async listInWorkspace(params: CourseListParams): Promise<ListPage<Course>> {
+    const where: Prisma.TrainingInstituteCourseWhereInput = {
+      workspaceId: params.workspaceId.value,
+      deletedAt: null,
+      ...cursorWhere(params),
+    };
+
+    const orderBy = listOrderBy(params.before != null);
+
+    const [rows, total] = await Promise.all([
+      this.db.trainingInstituteCourse.findMany({
+        where,
+        orderBy,
+        take: params.limit + 1,
+      }),
+      this.db.trainingInstituteCourse.count({
+        where: {
+          workspaceId: params.workspaceId.value,
+          deletedAt: null,
+        },
+      }),
+    ]);
+
+    const hasMore = rows.length > params.limit;
+    const pageRows = hasMore ? rows.slice(0, params.limit) : rows;
+    const inDisplayOrder =
+      params.before != null ? [...pageRows].reverse() : pageRows;
+
+    return {
+      items: inDisplayOrder.map(toDomainCourse),
+      total,
+      hasMore,
+    };
+  }
+}
+
+function mapCourseWriteError(error: unknown): Error {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return new DomainError(
+      "COURSE_CODE_IN_USE",
+      "Course code is already in use in this Workspace.",
+    );
+  }
+  return error instanceof Error ? error : new Error("Could not save Course.");
+}
+
+function cursorWhere(
+  params: CourseListParams,
+):
+  Pick<Prisma.TrainingInstituteCourseWhereInput, "OR"> | Record<string, never> {
+  if (params.after != null) {
+    return {
+      OR: [
+        { createdAt: { lt: params.after.createdAt } },
+        {
+          createdAt: params.after.createdAt,
+          id: { lt: params.after.id.value },
+        },
+      ],
+    };
+  }
+  if (params.before != null) {
+    return {
+      OR: [
+        { createdAt: { gt: params.before.createdAt } },
+        {
+          createdAt: params.before.createdAt,
+          id: { gt: params.before.id.value },
+        },
+      ],
+    };
+  }
+  return {};
+}
+
+function listOrderBy(
+  ascending: boolean,
+): Prisma.TrainingInstituteCourseOrderByWithRelationInput[] {
+  const direction = ascending ? "asc" : "desc";
+  return [{ createdAt: direction }, { id: direction }];
+}

@@ -1,4 +1,4 @@
-import type { ScheduledClass } from "@/src/training/domain/class-schedule";
+import type { ScheduledClass } from "@/src/training-institute/domain/class-schedule";
 
 import {
   addDays,

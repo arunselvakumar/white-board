@@ -39,7 +39,7 @@ import type {
   Holiday,
 } from "@/src/queries/calendar";
 import { classPath } from "@/src/queries/classes";
-import { holidayOn } from "@/src/training/domain/class-schedule";
+import { holidayOn } from "@/src/training-institute/domain/class-schedule";
 
 import {
   ClassChangeDialog,

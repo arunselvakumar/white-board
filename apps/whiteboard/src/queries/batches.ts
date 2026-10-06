@@ -71,18 +71,21 @@ export const batchQueries = {
         if (filters?.courseId) params.set("courseId", filters.courseId);
         if (filters?.after) params.set("after", filters.after);
         if (filters?.before) params.set("before", filters.before);
-        return apiJson<BatchListResponse>(`/api/batches?${params.toString()}`);
+        return apiJson<BatchListResponse>(
+          `/api/training-institute/batches?${params.toString()}`,
+        );
       },
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: batchQueries.key.detail(id),
-      queryFn: () => apiJson<BatchResponse>(`/api/batches/${id}`),
+      queryFn: () =>
+        apiJson<BatchResponse>(`/api/training-institute/batches/${id}`),
     }),
 };
 
 export function createBatch(input: BatchWriteInput): Promise<BatchResponse> {
-  return apiJson<BatchResponse>("/api/batches", {
+  return apiJson<BatchResponse>("/api/training-institute/batches", {
     method: "POST",
     headers: jsonHeaders,
     body: JSON.stringify(input),
@@ -94,15 +97,18 @@ export function updateBatchSchedule(
   input: BatchWriteInput,
 ): Promise<BatchResponse> {
   const { courseId: _courseId, ...body } = input;
-  return apiJson<BatchResponse>(`/api/batches/${id}/schedule`, {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(body),
-  });
+  return apiJson<BatchResponse>(
+    `/api/training-institute/batches/${id}/schedule`,
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 export function closeBatch(id: string): Promise<BatchResponse> {
-  return apiJson<BatchResponse>(`/api/batches/${id}/close`, {
+  return apiJson<BatchResponse>(`/api/training-institute/batches/${id}/close`, {
     method: "POST",
   });
 }
