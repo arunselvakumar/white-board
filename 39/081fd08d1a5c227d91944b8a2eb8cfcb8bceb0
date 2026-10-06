@@ -1,0 +1,31 @@
+apps/marketing/DESIGN.md
+  s_4343ed446f1345::t_349609c16e81e0 55,61
+apps/marketing/components/dot-field.tsx
+  s_4343ed446f1345::t_9c8c5ed2077ed6 3-27,30-32,34-36,39-43,45-56,58-108,110-135,137,139-147,149,151-163,166-287,289-664,667-678,680-697,699-702,705-707,709-710,713,720-741,744,746-772,775-780
+apps/marketing/components/hero-dot-field.tsx
+  s_4343ed446f1345::t_2622399d8043ff 1-9
+apps/marketing/components/hero.tsx
+  s_4343ed446f1345::t_139add81cc017f 2,10-19
+apps/marketing/lib/dot-shapes.ts
+  s_4343ed446f1345::t_5aab89dfa7be61 1-324
+apps/marketing/package.json
+  s_4343ed446f1345::t_bf3ed5db01b7e3 19-20,29-30,32
+bun.lock
+  s_4343ed446f1345::t_c30cb7f1c9de10 26,35,270-271,922-923,986-989,992-993,1792-1793,2196-2197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "39081fd08d1a5c227d91944b8a2eb8cfcb8bceb0",
+  "prompts": {},
+  "sessions": {
+    "s_4343ed446f1345": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9384ff0a-8483-4aed-bce2-fa69c700c6e8",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
