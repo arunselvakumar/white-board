@@ -17,7 +17,7 @@ export function classApiPath(
   date: string,
   startTime: string,
 ): string {
-  return `/api${classPath(batchId, date, startTime)}`;
+  return `/api/training-institute${classPath(batchId, date, startTime)}`;
 }
 
 export const classQueries = {

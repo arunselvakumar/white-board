@@ -341,7 +341,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI            |
 | WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare |
 | WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI            |
-| WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | in_progress | Data+HTTP+Docs                 |
+| WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
 
 ### WB-001 — Student and Parent Workspace invitations
 
