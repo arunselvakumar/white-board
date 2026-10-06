@@ -21,6 +21,11 @@ describe("openApiDocument", () => {
       openApiDocument.paths["/api/webhooks/realtimekit"]?.["post"],
     ).toBeDefined();
   });
+  it("documents the Student and Parent Home", () => {
+    expect(
+      openApiDocument.paths["/api/training-institute/home"]?.["get"],
+    ).toBeDefined();
+  });
   it("does not document Todo routes", () => {
     const paths = openApiDocument.paths;
     expect(paths["/api/todos"]).toBeUndefined();

@@ -5,37 +5,8 @@ import type {
   CalendarRole,
   CalendarScheduleReader,
 } from "../application/calendar-schedule";
+import { familyEmails, isLinkedStudent } from "../application/family-links";
 import { WeeklyTimings } from "../domain/weekly-timings";
-
-type ProfileDetails = {
-  father?: { email?: unknown };
-  mother?: { email?: unknown };
-  guardians?: { email?: unknown }[];
-};
-
-function normalizedEmail(value: unknown): string | null {
-  return typeof value === "string" && value.trim()
-    ? value.trim().toLowerCase()
-    : null;
-}
-
-function matchesStudent(
-  student: { email: string | null; profileDetails: unknown },
-  role: CalendarRole,
-  emails: Set<string>,
-): boolean {
-  if (role === "org:student")
-    return emails.has(normalizedEmail(student.email) ?? "");
-  const details = student.profileDetails as ProfileDetails | null;
-  const contacts = [
-    details?.father?.email,
-    details?.mother?.email,
-    ...(Array.isArray(details?.guardians)
-      ? details.guardians.map((guardian) => guardian.email)
-      : []),
-  ];
-  return contacts.some((email) => emails.has(normalizedEmail(email) ?? ""));
-}
 
 export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
   constructor(private readonly db: PrismaClient) {}
@@ -132,18 +103,15 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
       ];
     }
 
-    const emails = new Set(
-      (input.verifiedEmails ?? [])
-        .map(normalizedEmail)
-        .filter((email): email is string => email != null),
-    );
+    const emails = familyEmails(input.verifiedEmails ?? []);
     if (emails.size === 0) return [];
+    const role = input.role;
     const students = await this.db.trainingInstituteStudent.findMany({
       where: { workspaceId, deletedAt: null, droppedAt: null },
       select: { id: true, email: true, profileDetails: true },
     });
     const studentIds = students
-      .filter((student) => matchesStudent(student, input.role, emails))
+      .filter((student) => isLinkedStudent(student, role, emails))
       .map((student) => student.id);
     if (studentIds.length === 0) return [];
     const enrollments = await this.db.trainingInstituteEnrollment.findMany({
@@ -191,7 +159,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
   }
 }
 
-function toEnrollmentItem(enrollment: {
+export function toEnrollmentItem(enrollment: {
   id: string;
   batchId: string;
   courseId: string;

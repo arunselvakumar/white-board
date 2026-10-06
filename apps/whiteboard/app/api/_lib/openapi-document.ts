@@ -76,6 +76,7 @@ import { SetTrainingInstituteEnrollmentTimingsParamsModel } from "../training-in
 import { SetTrainingInstituteEnrollmentTimingsRequestModel } from "../training-institute/enrollments/set-enrollment-timings-request-model";
 import { SetTrainingInstituteEnrollmentTimingsResponseModel } from "../training-institute/enrollments/set-enrollment-timings-response-model";
 import { GetTrainingInstituteOwnerDashboardResponseModel } from "../training-institute/dashboard/get-owner-dashboard-response-model";
+import { GetTrainingInstituteFamilyHomeResponseModel } from "../training-institute/home/get-family-home-response-model";
 import { GetTrainingInstituteReceiptRequestModel } from "../training-institute/payments/get-receipt-request-model";
 import { GetTrainingInstituteReceiptResponseModel } from "../training-institute/payments/get-receipt-response-model";
 import { ActivateTrainingInstituteTeacherResponseModel } from "../training-institute/teacher/activate/activate-teacher-response-model";
@@ -940,6 +941,21 @@ export const openApiDocument = buildOpenApiDocument(
         StatusCodes.INTERNAL_SERVER_ERROR,
       ],
     },
+    {
+      method: "get",
+      path: "/api/training-institute/home",
+      summary:
+        "Get the Student or Parent Home: next Class, dues, recent Attendance, and recordings for each linked Student",
+      tags: ["Home"],
+      successStatus: StatusCodes.OK,
+      successDescription: "Found",
+      successSchema: GetTrainingInstituteFamilyHomeResponseModel,
+      errors: [
+        StatusCodes.UNAUTHORIZED,
+        StatusCodes.FORBIDDEN,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      ],
+    },
   ],
   {
     ActivateTrainingInstituteTeacherResponseModel,
@@ -965,6 +981,7 @@ export const openApiDocument = buildOpenApiDocument(
     GetTrainingInstituteBatchResponseModel,
     GetTrainingInstituteCourseResponseModel,
     GetTrainingInstituteEnrollmentResponseModel,
+    GetTrainingInstituteFamilyHomeResponseModel,
     GetTrainingInstituteOwnerDashboardResponseModel,
     GetTrainingInstituteReceiptResponseModel,
     GetTrainingInstituteStudentResponseModel,

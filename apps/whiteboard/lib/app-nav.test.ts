@@ -5,12 +5,12 @@ import { APP_NAV, appPageByHref, isAppNavActive, navForRole } from "./app-nav";
 describe("role navigation", () => {
   it("shows each role its home, Calendar, and Online Classes", () => {
     expect(navForRole("org:student").map((item) => item.label)).toEqual([
-      "Student",
+      "Home",
       "Calendar",
       "Online Classes",
     ]);
     expect(navForRole("org:parent").map((item) => item.label)).toEqual([
-      "Parent",
+      "Home",
       "Calendar",
       "Online Classes",
     ]);

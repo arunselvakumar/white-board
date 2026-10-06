@@ -13,8 +13,8 @@ export function getAppBreadcrumbs(
     return [{ label: "Calendar", href: "/calendar" }];
   if (pathname === "/online-classes")
     return [{ label: "Online Classes", href: "/online-classes" }];
-  if (role === "org:student") return [{ label: "Student", href: "/student" }];
-  if (role === "org:parent") return [{ label: "Parent", href: "/parent" }];
+  if (role === "org:student") return [{ label: "Home", href: "/student" }];
+  if (role === "org:parent") return [{ label: "Home", href: "/parent" }];
   if (role === "org:teacher")
     return pathname === "/teacher"
       ? [{ label: "My Batches", href: "/teacher" }]

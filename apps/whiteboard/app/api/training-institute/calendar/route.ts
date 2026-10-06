@@ -1,7 +1,8 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 import { jsonError } from "@/app/api/_lib/json-error";
 import { mapError } from "@/app/api/_lib/map-error";
+import { verifiedEmails } from "@/app/api/_lib/require-family-session";
 import {
   relevantClassChanges,
   type CalendarRole,
@@ -38,19 +39,14 @@ export async function GET(): Promise<Response> {
         "Calendar access is not available for this role.",
       );
 
-    let verifiedEmails: string[] | undefined;
-    if (orgRole === "org:student" || orgRole === "org:parent") {
-      const clerk = await clerkClient();
-      const user = await clerk.users.getUser(userId);
-      verifiedEmails = user.emailAddresses
-        .filter((email) => email.verification?.status === "verified")
-        .map((email) => email.emailAddress);
-    }
     const items = await query.execute({
       workspaceId: orgId,
       userId,
       role: orgRole as CalendarRole,
-      verifiedEmails,
+      verifiedEmails:
+        orgRole === "org:student" || orgRole === "org:parent"
+          ? await verifiedEmails(userId)
+          : undefined,
     });
     const { changes, holidays } = await exceptions.forBatches(
       orgId,

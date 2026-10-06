@@ -2,10 +2,12 @@ import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Parent" };
+import { FamilyHomeScreen } from "@/components/home/family-home-screen";
+
+export const metadata: Metadata = { title: "Parent Home" };
 
 export default async function ParentPage() {
   const { orgRole } = await auth();
   if (orgRole !== "org:parent") redirect("/");
-  return <main className="p-6">Hello world</main>;
+  return <FamilyHomeScreen role="org:parent" />;
 }

@@ -234,7 +234,10 @@ export class ClassService {
           ? "cancelled"
           : "scheduled"),
       recordingStatus: occurrence?.recordingStatus ?? null,
-      recordingReady: isHost && occurrence?.recordingStatus === "ready",
+      // Reaching here means this User may see the Class, so they may also
+      // download its recording: a host, or a Student or Parent whose active
+      // Enrollment has this Class (ADR-0031).
+      recordingReady: occurrence?.recordingStatus === "ready",
       classChange:
         scheduled != null && scheduled.status !== "scheduled"
           ? {
@@ -424,16 +427,27 @@ export class ClassService {
   }
 
   async recordingObjectKey(input: ClassActor): Promise<string> {
-    if (input.role !== "org:admin" && input.role !== "org:teacher")
-      throw new DomainError("CLASS_NOT_FOUND", "Class recording not found.");
-    const items = await this.deps.schedule.execute({
-      workspaceId: input.workspaceId,
-      userId: input.userId,
-      role: input.role,
-      includeClosed: true,
-    });
-    if (!items.some((item) => item.batchId === input.batchId))
-      throw new DomainError("CLASS_NOT_FOUND", "Class recording not found.");
+    if (input.role === "org:admin" || input.role === "org:teacher") {
+      const items = await this.deps.schedule.execute({
+        workspaceId: input.workspaceId,
+        userId: input.userId,
+        role: input.role,
+        includeClosed: true,
+      });
+      if (!items.some((item) => item.batchId === input.batchId))
+        throw new DomainError("CLASS_NOT_FOUND", "Class recording not found.");
+    } else {
+      // A Student or Parent may download only a Class of an active Enrollment,
+      // on or after the date it began (ADR-0031).
+      await this.context(input).catch((error: unknown) => {
+        if (error instanceof DomainError && error.code === "CLASS_NOT_FOUND")
+          throw new DomainError(
+            "CLASS_NOT_FOUND",
+            "Class recording not found.",
+          );
+        throw error;
+      });
+    }
     const occurrence = await this.deps.occurrences.find(input);
     if (
       occurrence?.recordingStatus !== "ready" ||
