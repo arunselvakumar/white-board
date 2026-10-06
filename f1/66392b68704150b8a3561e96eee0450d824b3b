@@ -1,0 +1,51 @@
+apps/whiteboard/components/calendar/calendar-screen.tsx
+  s_e6d8703aebdcb0::t_69c943564ae0b7 3-7,10-18,22-29,32,36-67
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_e6d8703aebdcb0::t_2e797c48eab59d 7,15,29-40,42-52,125-126,132,136,142,145-154,156-176,179-180,183,189,192-197,215-229,233-234,240,246-257,291-292,297-298,332,380,397-398,404-405,433,435-440,456-545,550-552,559-573,599,603,606,608-609,615-616,652-653,655,657,660,662-688,725-726,729-735,741-742,745-763
+apps/whiteboard/components/calendar/calendar.stories.tsx
+  s_e6d8703aebdcb0::t_d0c91c23a41075 2,4-9,87-299
+apps/whiteboard/components/calendar/class-change-dialog.tsx
+  s_e6d8703aebdcb0::t_35bdb6b4384df2 1-436
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_e6d8703aebdcb0::t_6508107f98f6d9 136-231
+apps/whiteboard/components/classes/class-prejoin-screen.tsx
+  s_e6d8703aebdcb0::t_792dd3aa862478 8-16,19-20,79-88,105,109-114,116-147,222-250
+apps/whiteboard/components/online-classes/online-classes-screen.tsx
+  s_e6d8703aebdcb0::t_4e74f64c8ff092 16-22
+apps/whiteboard/components/online-classes/online-classes-view.tsx
+  s_e6d8703aebdcb0::t_6a832cbdb9c629 4-5,7,9-13,24-25,29-30,33-36,91-94,100,106-123,136-140
+apps/whiteboard/lib/calendar-dates.ts
+  s_e6d8703aebdcb0::t_0c7adbbba79fef 1-7,15-21,24-25,87,96-100,103-107,109-114,116,118-119,121
+apps/whiteboard/lib/class-changes.test.ts
+  s_e6d8703aebdcb0::t_db85f1fef16be6 1-117
+apps/whiteboard/lib/class-changes.ts
+  s_e6d8703aebdcb0::t_b1855470183bd0 1-128
+apps/whiteboard/lib/online-classes.ts
+  s_e6d8703aebdcb0::t_49008ab9cf26b9 6,11,26,35
+apps/whiteboard/src/queries/calendar.ts
+  s_e6d8703aebdcb0::t_3cc91436f17ce7 3,22-59,65,68-116
+apps/whiteboard/src/queries/http.ts
+  s_e6d8703aebdcb0::t_254b3af4cbfb85 44
+apps/whiteboard/src/training/application/class-service.test.ts
+  s_e6d8703aebdcb0::t_6cafd4b8fb623e 101
+apps/whiteboard/src/training/application/class-service.ts
+  s_e6d8703aebdcb0::t_b92abc4b4a6689 219-224
+apps/whiteboard/components/calendar/holidays-dialog.tsx
+  s_e6d8703aebdcb0::t_897886968443e7 1-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f166392b68704150b8a3561e96eee0450d824b3b",
+  "prompts": {},
+  "sessions": {
+    "s_e6d8703aebdcb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30500495-0124-46fc-9ca7-65b48c5214c6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
