@@ -22,6 +22,13 @@ enum MeetingOption {
   @@map("meeting_option")
 }
 
+enum ClassChangeKind {
+  cancelled
+  moved
+
+  @@map("class_change_kind")
+}
+
 enum TimingSource {
   batch
   student
@@ -143,6 +150,7 @@ model Batch {
   teacherAssignments BatchTeacherAssignment[]
   attendanceRegisters AttendanceRegister[]
   classOccurrences ClassOccurrence[]
+  classChanges     ClassChange[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([courseId, deletedAt])
@@ -170,6 +178,50 @@ model ClassOccurrence {
   @@unique([batchId, classDate, startTime])
   @@index([workspaceId, batchId, classDate])
   @@map("class_occurrences")
+}
+
+/// One active change per original Class (Batch, local date, start time). See ADR-0028.
+model ClassChange {
+  id               String          @id @db.Uuid
+  workspaceId      String          @map("workspace_id")
+  batchId          String          @map("batch_id") @db.Uuid
+  classDate        DateTime        @map("class_date") @db.Date
+  startTime        String          @map("start_time") @db.VarChar(5)
+  endTime          String          @map("end_time") @db.VarChar(5)
+  kind             ClassChangeKind
+  reason           String?         @db.VarChar(200)
+  movedToDate      DateTime?       @map("moved_to_date") @db.Date
+  movedToStartTime String?         @map("moved_to_start_time") @db.VarChar(5)
+  movedToEndTime   String?         @map("moved_to_end_time") @db.VarChar(5)
+  createdByUserId  String          @map("created_by_user_id")
+  updatedByUserId  String          @map("updated_by_user_id")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  deletedAt        DateTime?       @map("deleted_at")
+  deletedByUserId  String?         @map("deleted_by_user_id")
+
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, batchId, classDate])
+  @@index([workspaceId, deletedAt, classDate])
+  @@map("class_changes")
+}
+
+/// Workspace-wide dates on which every Class is cancelled. See ADR-0028.
+model Holiday {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  startDate       DateTime  @map("start_date") @db.Date
+  endDate         DateTime  @map("end_date") @db.Date
+  reason          String?   @db.VarChar(200)
+  createdByUserId String    @map("created_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  deletedByUserId String?   @map("deleted_by_user_id")
+
+  @@index([workspaceId, deletedAt, startDate])
+  @@map("holidays")
 }
 
 model Teacher {

@@ -14,6 +14,11 @@ export type DashboardResponse = {
     capacity: number;
     enrolledCount: number;
     timings: TimingSlot[];
+    todayClasses: {
+      startTime: string;
+      endTime: string;
+      rescheduled: boolean;
+    }[];
   }[];
   recentStudents: {
     id: string;

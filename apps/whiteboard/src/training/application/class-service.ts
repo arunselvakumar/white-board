@@ -1,10 +1,17 @@
-import { classSlotForDate } from "../domain/class-occurrence";
+import {
+  classAt,
+  clockMinutes,
+  localNow,
+  type ClassSlotTime,
+  type ScheduledClass,
+} from "../domain/class-schedule";
 import { DomainError } from "../domain/errors";
 import type {
   CalendarItem,
   CalendarRole,
   CalendarScheduleReader,
 } from "./calendar-schedule";
+import type { ClassExceptionsReader } from "./class-change-handlers";
 
 export type ClassKey = {
   workspaceId: string;
@@ -32,8 +39,13 @@ export type ClassOccurrenceRecord = ClassKey & {
 
 export type ClassOccurrenceStore = {
   find(key: ClassKey): Promise<ClassOccurrenceRecord | null>;
+  /**
+   * Creates the occurrence under the Batch's schedule lock after `verify`
+   * passes, so a Class can't be started while it is being cancelled.
+   */
   claim(
     input: ClassKey & { endTime: string; startedByUserId: string },
+    verify: () => Promise<void>,
   ): Promise<{ occurrence: ClassOccurrenceRecord; claimed: boolean }>;
   setMeeting(id: string, meetingId: string): Promise<void>;
   findByMeetingId(meetingId: string): Promise<ClassOccurrenceRecord | null>;
@@ -72,41 +84,38 @@ export type ClassDetail = {
   meetingOption: "external" | "whiteboard";
   joinUrl: string | null;
   isHost: boolean;
-  status: "scheduled" | ClassOccurrenceRecord["status"];
+  status: "scheduled" | "cancelled" | ClassOccurrenceRecord["status"];
   recordingStatus: ClassOccurrenceRecord["recordingStatus"] | null;
   recordingReady: boolean;
+  /** Set when this Class won't happen at this slot. */
+  classChange: {
+    status: "cancelled" | "moved" | "holiday";
+    reason: string | null;
+    movedTo: ClassSlotTime | null;
+  } | null;
+  /** Set when this slot is the new time of a Moved Class. */
+  rescheduledFrom: { date: string; startTime: string } | null;
 };
 
-function localDateAndMinutes(
-  now: Date,
-  timezone: string,
-): { date: string; minutes: number } {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(now);
-  const part = (name: string) =>
-    parts.find((value) => value.type === name)?.value ?? "";
-  return {
-    date: `${part("year")}-${part("month")}-${part("day")}`,
-    minutes: Number(part("hour")) * 60 + Number(part("minute")),
-  };
-}
+const localDateAndMinutes = localNow;
 
-function clockMinutes(clock: string): number {
-  const [hour, minute] = clock.split(":").map(Number);
-  return (hour ?? 0) * 60 + (minute ?? 0);
+function notHappening(scheduled: ScheduledClass): DomainError {
+  const movedTo = scheduled.change?.movedTo;
+  return new DomainError(
+    "CLASS_CANCELLED",
+    scheduled.status === "moved" && movedTo != null
+      ? `This Class has moved to ${movedTo.date} at ${movedTo.startTime}.`
+      : scheduled.status === "holiday"
+        ? "This Class is off for a Holiday."
+        : "This Class has been cancelled.",
+  );
 }
 
 export class ClassService {
   constructor(
     private readonly deps: {
       schedule: CalendarScheduleReader;
+      exceptions: ClassExceptionsReader;
       occurrences: ClassOccurrenceStore;
       meetings: MeetingGateway;
       now: () => Date;
@@ -116,32 +125,58 @@ export class ClassService {
   private async context(
     input: ClassActor,
     includeClosed = false,
-  ): Promise<{ item: CalendarItem; endTime: string; isHost: boolean }> {
-    const items = await this.deps.schedule.execute({
-      workspaceId: input.workspaceId,
-      userId: input.userId,
-      role: input.role,
-      verifiedEmails: input.verifiedEmails,
-      includeClosed,
-    });
+  ): Promise<{
+    item: CalendarItem;
+    scheduled: ScheduledClass;
+    endTime: string;
+    isHost: boolean;
+  }> {
+    const items = (
+      await this.deps.schedule.execute({
+        workspaceId: input.workspaceId,
+        userId: input.userId,
+        role: input.role,
+        verifiedEmails: input.verifiedEmails,
+        includeClosed,
+      })
+    ).filter(
+      (item) => item.batchId === input.batchId && item.classMode !== "offline",
+    );
+    const { changes, holidays } =
+      items.length === 0
+        ? { changes: [], holidays: [] }
+        : await this.deps.exceptions.forBatches(input.workspaceId, [
+            input.batchId,
+          ]);
     const found = items
       .map((item) => ({
         item,
-        slot: classSlotForDate(item.timings, input.date, input.startTime),
+        scheduled: classAt(
+          {
+            batchId: item.batchId,
+            timings: item.timings,
+            firstDate: localDateAndMinutes(
+              new Date(item.activeFrom),
+              item.timezone,
+            ).date,
+          },
+          input,
+          changes,
+          holidays,
+        ),
       }))
-      .find(
-        ({ item, slot }) =>
-          item.batchId === input.batchId &&
-          item.classMode !== "offline" &&
-          slot != null &&
-          input.date >=
-            localDateAndMinutes(new Date(item.activeFrom), item.timezone).date,
-      );
-    if (found?.slot == null)
+      .sort(
+        (a, b) =>
+          Number(b.scheduled?.status === "scheduled") -
+          Number(a.scheduled?.status === "scheduled"),
+      )
+      .find(({ scheduled }) => scheduled != null);
+    if (found?.scheduled == null)
       throw new DomainError("CLASS_NOT_FOUND", "Class not found.");
     return {
       item: found.item,
-      endTime: found.slot.endTime,
+      scheduled: found.scheduled,
+      endTime: found.scheduled.endTime,
       isHost: input.role === "org:admin" || input.role === "org:teacher",
     };
   }
@@ -151,8 +186,9 @@ export class ClassService {
     let item: CalendarItem;
     let endTime: string;
     let isHost: boolean;
+    let scheduled: ScheduledClass | null = null;
     try {
-      ({ item, endTime, isHost } = await this.context(input, true));
+      ({ item, endTime, isHost, scheduled } = await this.context(input, true));
     } catch (error) {
       if (
         !(error instanceof DomainError) ||
@@ -185,16 +221,44 @@ export class ClassService {
       endTime,
       timezone: item.timezone,
       meetingOption: option,
-      joinUrl: option === "external" ? item.joinUrl : null,
+      // A cancelled Class offers no way in, even through its external link.
+      joinUrl:
+        option === "external" &&
+        (scheduled == null || scheduled.status === "scheduled")
+          ? item.joinUrl
+          : null,
       isHost,
-      status: occurrence?.status ?? "scheduled",
+      status:
+        occurrence?.status ??
+        (scheduled != null && scheduled.status !== "scheduled"
+          ? "cancelled"
+          : "scheduled"),
       recordingStatus: occurrence?.recordingStatus ?? null,
       recordingReady: isHost && occurrence?.recordingStatus === "ready",
+      classChange:
+        scheduled != null && scheduled.status !== "scheduled"
+          ? {
+              status: scheduled.status,
+              reason: scheduled.reason,
+              movedTo:
+                scheduled.status === "moved"
+                  ? (scheduled.change?.movedTo ?? null)
+                  : null,
+            }
+          : null,
+      rescheduledFrom:
+        scheduled?.rescheduled === true && scheduled.change != null
+          ? {
+              date: scheduled.change.date,
+              startTime: scheduled.change.startTime,
+            }
+          : null,
     };
   }
 
   async start(input: ClassActor, name: string): Promise<{ authToken: string }> {
-    const { item, endTime, isHost } = await this.context(input);
+    const { item, endTime, isHost, scheduled } = await this.context(input);
+    if (scheduled.status !== "scheduled") throw notHappening(scheduled);
     if (!isHost)
       throw new DomainError(
         "CLASS_FORBIDDEN",
@@ -217,11 +281,14 @@ export class ClassService {
       );
     }
     this.deps.meetings.ensureConfigured();
-    const claim = await this.deps.occurrences.claim({
-      ...input,
-      endTime,
-      startedByUserId: input.userId,
-    });
+    const claim = await this.deps.occurrences.claim(
+      { ...input, endTime, startedByUserId: input.userId },
+      async () => {
+        const current = await this.context(input);
+        if (current.scheduled.status !== "scheduled")
+          throw notHappening(current.scheduled);
+      },
+    );
     const occurrence = claim.occurrence;
     if (occurrence.status === "ended" || occurrence.status === "failed")
       throw new DomainError("CLASS_ENDED", "This class has ended.");
@@ -247,7 +314,8 @@ export class ClassService {
   }
 
   async join(input: ClassActor, name: string): Promise<{ authToken: string }> {
-    const { item, endTime, isHost } = await this.context(input);
+    const { item, endTime, isHost, scheduled } = await this.context(input);
+    if (scheduled.status !== "scheduled") throw notHappening(scheduled);
     if (item.meetingOption !== "whiteboard")
       throw new DomainError(
         "CLASS_NOT_HOSTED",

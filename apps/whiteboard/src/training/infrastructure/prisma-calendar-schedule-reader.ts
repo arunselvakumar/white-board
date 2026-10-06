@@ -59,21 +59,28 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
         include: { course: { select: { name: true } } },
         orderBy: [{ name: "asc" }, { id: "asc" }],
       });
-      return batches.map((batch) => ({
-        id: batch.id,
-        batchId: batch.id,
-        batchName: batch.name,
-        courseId: batch.courseId,
-        courseName: batch.course.name,
-        studentName: null,
-        classMode: batch.classMode,
-        room: batch.room,
-        joinUrl: batch.joinUrl,
-        meetingOption: batch.meetingOption,
-        timezone: batch.timezone,
-        timings: WeeklyTimings.create(batch.timings).toJson(),
-        activeFrom: batch.createdAt.toISOString(),
-      }));
+      const homeTuition = await this.homeTuition(
+        workspaceId,
+        batches.map((batch) => batch.id),
+      );
+      return [
+        ...batches.map((batch) => ({
+          id: batch.id,
+          batchId: batch.id,
+          batchName: batch.name,
+          courseId: batch.courseId,
+          courseName: batch.course.name,
+          studentName: null,
+          classMode: batch.classMode,
+          room: batch.room,
+          joinUrl: batch.joinUrl,
+          meetingOption: batch.meetingOption,
+          timezone: batch.timezone,
+          timings: WeeklyTimings.create(batch.timings).toJson(),
+          activeFrom: batch.createdAt.toISOString(),
+        })),
+        ...homeTuition,
+      ];
     }
 
     if (input.role === "org:teacher") {
@@ -98,21 +105,28 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
         include: { batch: { include: { course: { select: { name: true } } } } },
         orderBy: [{ batch: { name: "asc" } }, { id: "asc" }],
       });
-      return assignments.map(({ batch }) => ({
-        id: batch.id,
-        batchId: batch.id,
-        batchName: batch.name,
-        courseId: batch.courseId,
-        courseName: batch.course.name,
-        studentName: null,
-        classMode: batch.classMode,
-        room: batch.room,
-        joinUrl: batch.joinUrl,
-        meetingOption: batch.meetingOption,
-        timezone: batch.timezone,
-        timings: WeeklyTimings.create(batch.timings).toJson(),
-        activeFrom: batch.createdAt.toISOString(),
-      }));
+      const homeTuition = await this.homeTuition(
+        workspaceId,
+        assignments.map(({ batch }) => batch.id),
+      );
+      return [
+        ...assignments.map(({ batch }) => ({
+          id: batch.id,
+          batchId: batch.id,
+          batchName: batch.name,
+          courseId: batch.courseId,
+          courseName: batch.course.name,
+          studentName: null,
+          classMode: batch.classMode,
+          room: batch.room,
+          joinUrl: batch.joinUrl,
+          meetingOption: batch.meetingOption,
+          timezone: batch.timezone,
+          timings: WeeklyTimings.create(batch.timings).toJson(),
+          activeFrom: batch.createdAt.toISOString(),
+        })),
+        ...homeTuition,
+      ];
     }
 
     const emails = new Set(
@@ -145,24 +159,72 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
       },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
-    return enrollments.map((enrollment) => ({
-      id: enrollment.id,
-      batchId: enrollment.batchId,
-      batchName: enrollment.batch.name,
-      courseId: enrollment.courseId,
-      courseName: enrollment.course.name,
-      studentName: enrollment.student.name,
-      classMode: enrollment.classModeOverride ?? enrollment.batch.classMode,
-      room: enrollment.batch.room,
-      joinUrl: enrollment.batch.joinUrl,
-      meetingOption: enrollment.batch.meetingOption,
-      timezone: enrollment.batch.timezone,
-      timings: WeeklyTimings.create(
-        enrollment.timingSource === "student"
-          ? enrollment.studentTimings
-          : enrollment.batch.timings,
-      ).toJson(),
-      activeFrom: enrollment.createdAt.toISOString(),
-    }));
+    return enrollments.map(toEnrollmentItem);
   }
+
+  /** Student-specific Classes (home tuition) in Batches the Owner or Teacher sees. */
+  private async homeTuition(
+    workspaceId: string,
+    batchIds: string[],
+  ): Promise<CalendarItem[]> {
+    if (batchIds.length === 0) return [];
+    const enrollments = await this.db.enrollment.findMany({
+      where: {
+        workspaceId,
+        batchId: { in: batchIds },
+        timingSource: "student",
+        deletedAt: null,
+        endedAt: null,
+        student: { deletedAt: null, droppedAt: null },
+      },
+      include: {
+        student: { select: { name: true } },
+        batch: true,
+        course: { select: { name: true } },
+      },
+      orderBy: [{ student: { name: "asc" } }, { id: "asc" }],
+    });
+    return enrollments.map(toEnrollmentItem);
+  }
+}
+
+function toEnrollmentItem(enrollment: {
+  id: string;
+  batchId: string;
+  courseId: string;
+  createdAt: Date;
+  classModeOverride: "offline" | "online" | "hybrid" | null;
+  timingSource: "batch" | "student";
+  studentTimings: unknown;
+  student: { name: string };
+  course: { name: string };
+  batch: {
+    name: string;
+    classMode: "offline" | "online" | "hybrid";
+    room: string | null;
+    joinUrl: string | null;
+    meetingOption: "external" | "whiteboard";
+    timezone: string;
+    timings: unknown;
+  };
+}): CalendarItem {
+  return {
+    id: enrollment.id,
+    batchId: enrollment.batchId,
+    batchName: enrollment.batch.name,
+    courseId: enrollment.courseId,
+    courseName: enrollment.course.name,
+    studentName: enrollment.student.name,
+    classMode: enrollment.classModeOverride ?? enrollment.batch.classMode,
+    room: enrollment.batch.room,
+    joinUrl: enrollment.batch.joinUrl,
+    meetingOption: enrollment.batch.meetingOption,
+    timezone: enrollment.batch.timezone,
+    timings: WeeklyTimings.create(
+      enrollment.timingSource === "student"
+        ? enrollment.studentTimings
+        : enrollment.batch.timings,
+    ).toJson(),
+    activeFrom: enrollment.createdAt.toISOString(),
+  };
 }

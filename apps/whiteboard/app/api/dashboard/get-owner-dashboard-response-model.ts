@@ -14,6 +14,13 @@ export const GetOwnerDashboardResponseModel = z.object({
       capacity: z.number().int(),
       enrolledCount: z.number().int(),
       timings: z.array(TimingSlotModel),
+      todayClasses: z.array(
+        z.object({
+          startTime: z.string(),
+          endTime: z.string(),
+          rescheduled: z.boolean(),
+        }),
+      ),
     }),
   ),
   recentStudents: z.array(

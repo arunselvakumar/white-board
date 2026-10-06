@@ -16,6 +16,7 @@ const NOT_FOUND_CODES = new Set([
   "ATTENDANCE_MARK_NOT_FOUND",
   "CLASS_NOT_FOUND",
   "CLASS_FORBIDDEN",
+  "HOLIDAY_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -45,6 +46,21 @@ const CONFLICT_CODES = new Set([
   "CLASS_STARTING",
   "CLASS_NOT_READY",
   "CLASS_ENDED",
+  "CLASS_CANCELLED",
+  "CLASS_ALREADY_CANCELLED",
+  "CLASS_ALREADY_MOVED",
+  "CLASS_ALREADY_STARTED",
+  "CLASS_HAS_ATTENDANCE",
+  "CLASS_ON_HOLIDAY",
+  "CLASS_NOT_CHANGED",
+  "CLASS_MOVE_TO_HOLIDAY",
+  "CLASS_MOVE_TARGET_TAKEN",
+  "CLASS_CHANGE_CONFLICT",
+  "HOLIDAY_OVERLAPS",
+  "HOLIDAY_CONFLICTS_WITH_HELD_CLASS",
+  "HOLIDAY_STARTED",
+  "ATTENDANCE_CLASS_CANCELLED",
+  "BATCH_HAS_CLASS_CHANGES",
 ]);
 
 function errorCode(error: unknown): string | undefined {
@@ -78,7 +94,10 @@ export function mapError(error: unknown): Response {
   if (code === "INVALID_CURSOR" && error instanceof Error) {
     return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
   }
-  if (code === "ATTENDANCE_FORBIDDEN" && error instanceof Error) {
+  if (
+    (code === "ATTENDANCE_FORBIDDEN" || code === "HOLIDAY_FORBIDDEN") &&
+    error instanceof Error
+  ) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);
   }
   if (

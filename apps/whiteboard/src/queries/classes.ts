@@ -21,9 +21,16 @@ export function classApiPath(
 }
 
 export const classQueries = {
+  key: { all: ["classes"] as const },
   detail: (scope: string, batchId: string, date: string, startTime: string) =>
     queryOptions({
-      queryKey: ["classes", scope, batchId, date, startTime] as const,
+      queryKey: [
+        ...classQueries.key.all,
+        scope,
+        batchId,
+        date,
+        startTime,
+      ] as const,
       queryFn: () =>
         apiJson<ClassDetail>(classApiPath(batchId, date, startTime)),
       refetchInterval: 5000,

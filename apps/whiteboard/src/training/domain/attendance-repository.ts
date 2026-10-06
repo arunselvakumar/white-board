@@ -1,5 +1,6 @@
 import type { AttendanceRegister } from "./attendance-register";
 import type { ListCursor, ListPage } from "./list";
+import type { WeeklySlot } from "./weekly-timings";
 
 export type AttendanceBatch = {
   id: string;
@@ -35,12 +36,17 @@ export type AttendanceRepository = {
     workspaceId: string,
     date: string,
   ): Promise<AttendanceRegister | null>;
-  scheduledRoster(
+  /** Active Enrollments with their effective weekly Timings. */
+  activeRoster(
     batchId: string,
     workspaceId: string,
-    weekday: number,
   ): Promise<
-    { enrollmentId: string; studentId: string; studentName: string }[]
+    {
+      enrollmentId: string;
+      studentId: string;
+      studentName: string;
+      timings: WeeklySlot[];
+    }[]
   >;
   create(register: AttendanceRegister): Promise<void>;
   findById(id: string, workspaceId: string): Promise<AttendanceRegister | null>;

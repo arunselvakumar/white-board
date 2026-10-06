@@ -33,7 +33,11 @@ async function items() {
   const response = await GET();
   return {
     status: response.status,
-    body: (await response.json()) as { items: CalendarItem[]; code?: string },
+    body: (await response.json()) as {
+      items: CalendarItem[];
+      permissions?: { changeClasses: boolean; manageHolidays: boolean };
+      code?: string;
+    },
   };
 }
 
@@ -47,16 +51,14 @@ describe("Calendar HTTP", () => {
     batchId = randomUUID();
     otherBatchId = randomUUID();
     session("user_owner", workspaceId);
-    getUser
-      .mockReset()
-      .mockResolvedValue({
-        emailAddresses: [
-          {
-            emailAddress: "learner@example.com",
-            verification: { status: "verified" },
-          },
-        ],
-      });
+    getUser.mockReset().mockResolvedValue({
+      emailAddresses: [
+        {
+          emailAddress: "learner@example.com",
+          verification: { status: "verified" },
+        },
+      ],
+    });
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
 
     const courseId = randomUUID();
@@ -150,20 +152,41 @@ describe("Calendar HTTP", () => {
   });
 
   it("scopes the same read to Owner, Teacher, Student, and Parent", async () => {
+    const owner = (await items()).body;
+    expect(owner.items.map((item) => item.batchId).sort()).toEqual(
+      [batchId, batchId, otherBatchId].sort(),
+    );
+    // Home tuition: the Owner also sees the Student-specific Class.
     expect(
-      (await items()).body.items.map((item) => item.batchId).sort(),
-    ).toEqual([batchId, otherBatchId].sort());
+      owner.items.filter((item) => item.studentName != null),
+    ).toMatchObject([
+      { batchId, studentName: "Asha", timings: [{ startTime: "11:00" }] },
+    ]);
+    expect(owner.permissions).toEqual({
+      changeClasses: true,
+      manageHolidays: true,
+    });
 
     session("user_teacher", workspaceId, "org:teacher");
-    expect((await items()).body.items.map((item) => item.batchId)).toEqual([
-      batchId,
+    const teacher = (await items()).body;
+    expect(teacher.items.map((item) => item.studentName)).toEqual([
+      null,
+      "Asha",
     ]);
+    expect(teacher.permissions).toEqual({
+      changeClasses: true,
+      manageHolidays: false,
+    });
 
     session("user_student", workspaceId, "org:student");
     let result = await items();
     expect(result.body.items).toMatchObject([
       { batchId, studentName: "Asha", timings: [{ startTime: "11:00" }] },
     ]);
+    expect(result.body.permissions).toEqual({
+      changeClasses: false,
+      manageHolidays: false,
+    });
 
     session("user_parent", workspaceId, "org:parent");
     for (const emailAddress of [
@@ -208,6 +231,7 @@ describe("Calendar HTTP", () => {
       data: { closedAt: new Date() },
     });
     expect((await items()).body.items.map((item) => item.batchId)).toEqual([
+      batchId,
       batchId,
     ]);
 

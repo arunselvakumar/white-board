@@ -1,3 +1,10 @@
+import {
+  classesOn,
+  type ClassChangeFact,
+  type HolidayFact,
+  type ScheduledClass,
+} from "@/src/training/domain/class-schedule";
+
 export type DateKey = string;
 export type CalendarEvent<T> = {
   id: string;
@@ -5,7 +12,16 @@ export type CalendarEvent<T> = {
   startMinutes: number;
   endMinutes: number;
   item: T;
+  /** The Class after Class Changes and Holidays are applied. */
+  scheduled: ScheduledClass;
 };
+
+export type CalendarExceptions = {
+  classChanges: readonly ClassChangeFact[];
+  holidays: readonly HolidayFact[];
+};
+
+const NO_EXCEPTIONS: CalendarExceptions = { classChanges: [], holidays: [] };
 
 function utcDate(key: DateKey): Date {
   return new Date(`${key}T00:00:00.000Z`);
@@ -68,6 +84,7 @@ export function minutesFromClock(clock: string): number {
 export function expandCalendarItems<
   T extends {
     id: string;
+    batchId: string;
     timezone: string;
     activeFrom: string;
     timings: {
@@ -76,21 +93,32 @@ export function expandCalendarItems<
       endTime: string;
     }[];
   },
->(items: T[], dates: DateKey[]): CalendarEvent<T>[] {
+>(
+  items: T[],
+  dates: DateKey[],
+  exceptions: CalendarExceptions = NO_EXCEPTIONS,
+): CalendarEvent<T>[] {
   const events: CalendarEvent<T>[] = [];
   for (const item of items) {
-    const firstDay = dateKeyInZone(new Date(item.activeFrom), item.timezone);
+    const source = {
+      batchId: item.batchId,
+      timings: item.timings,
+      firstDate: dateKeyInZone(new Date(item.activeFrom), item.timezone),
+    };
     for (const date of dates) {
-      if (date < firstDay) continue;
-      const day = weekday(date);
-      for (const [index, slot] of item.timings.entries()) {
-        if (!slot.daysOfWeek.includes(day)) continue;
+      for (const scheduled of classesOn(
+        source,
+        date,
+        exceptions.classChanges,
+        exceptions.holidays,
+      )) {
         events.push({
-          id: `${item.id}:${date}:${index}`,
+          id: `${item.id}:${date}:${scheduled.startTime}${scheduled.rescheduled ? ":rescheduled" : ""}`,
           date,
-          startMinutes: minutesFromClock(slot.startTime),
-          endMinutes: minutesFromClock(slot.endTime),
+          startMinutes: minutesFromClock(scheduled.startTime),
+          endMinutes: minutesFromClock(scheduled.endTime),
           item,
+          scheduled,
         });
       }
     }

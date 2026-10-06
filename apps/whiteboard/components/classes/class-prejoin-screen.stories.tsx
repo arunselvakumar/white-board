@@ -25,6 +25,8 @@ const detail: ClassDetail = {
   status: "scheduled",
   recordingStatus: null,
   recordingReady: false,
+  classChange: null,
+  rescheduledFrom: null,
 };
 
 function state(value: ClassDetail, role = "org:admin") {
@@ -129,5 +131,101 @@ export const RecordingDownload: Story = {
       "href",
       `/app/api/classes/${batchId}/${date}/09%3A00/recording`,
     );
+  },
+};
+
+export const CancelledClass: Story = {
+  beforeEach: () => {
+    state(
+      {
+        ...detail,
+        meetingOption: "whiteboard",
+        joinUrl: null,
+        isHost: false,
+        status: "cancelled",
+        classChange: { status: "cancelled", reason: "Pongal", movedTo: null },
+      },
+      "org:student",
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "This class is cancelled" }),
+    ).toBeVisible();
+    await expect(canvas.getByText("Reason: Pongal")).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: /Join|Start/ }),
+    ).toBeNull();
+    await expect(
+      canvas.queryByRole("link", { name: "Open meeting" }),
+    ).toBeNull();
+  },
+};
+
+export const CancelledHostedClassForOwner: Story = {
+  beforeEach: () => {
+    state({
+      ...detail,
+      meetingOption: "whiteboard",
+      joinUrl: null,
+      status: "cancelled",
+      classChange: { status: "holiday", reason: "Diwali", movedTo: null },
+    });
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "No class: Holiday" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Start class" }),
+    ).toBeNull();
+    await expect(canvas.queryByText("Class recording")).toBeNull();
+  },
+};
+
+export const MovedClass: Story = {
+  beforeEach: () => {
+    state(
+      {
+        ...detail,
+        joinUrl: null,
+        isHost: false,
+        status: "cancelled",
+        classChange: {
+          status: "moved",
+          reason: null,
+          movedTo: { date: "2026-10-03", startTime: "16:00", endTime: "18:00" },
+        },
+      },
+      "org:parent",
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "This class has moved" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Moved to Sat, Oct 3 · 4:00 PM–6:00 PM"),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Go to the new time" }),
+    ).toHaveAttribute("href", `/classes/${batchId}/2026-10-03/16%3A00`);
+  },
+};
+
+export const RescheduledClass: Story = {
+  beforeEach: () => {
+    state({
+      ...detail,
+      rescheduledFrom: { date: "2026-09-28", startTime: "09:00" },
+    });
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText(/Rescheduled\s+from Mon, Sep 28 · 9:00 AM/),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Open meeting" }),
+    ).toBeVisible();
   },
 };

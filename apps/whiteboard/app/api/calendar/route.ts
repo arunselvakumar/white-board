@@ -2,12 +2,17 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 
 import { jsonError } from "@/app/api/_lib/json-error";
 import { mapError } from "@/app/api/_lib/map-error";
-import type { CalendarRole } from "@/src/training/application/calendar-schedule";
+import {
+  relevantClassChanges,
+  type CalendarRole,
+} from "@/src/training/application/calendar-schedule";
 import { createCalendarScheduleReader } from "@/src/training/infrastructure/create-calendar-schedule-reader";
+import { createClassExceptionsReader } from "@/src/training/infrastructure/create-class-change-handlers";
 
 export const dynamic = "force-dynamic";
 
 const query = createCalendarScheduleReader();
+const exceptions = createClassExceptionsReader();
 const roles = new Set<CalendarRole>([
   "org:admin",
   "org:teacher",
@@ -47,7 +52,19 @@ export async function GET(): Promise<Response> {
       role: orgRole as CalendarRole,
       verifiedEmails,
     });
-    return Response.json({ items });
+    const { changes, holidays } = await exceptions.forBatches(
+      orgId,
+      items.map((item) => item.batchId),
+    );
+    return Response.json({
+      items,
+      classChanges: relevantClassChanges(items, changes),
+      holidays,
+      permissions: {
+        changeClasses: orgRole === "org:admin" || orgRole === "org:teacher",
+        manageHolidays: orgRole === "org:admin",
+      },
+    });
   } catch (error) {
     return mapError(error);
   }

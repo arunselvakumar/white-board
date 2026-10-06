@@ -340,6 +340,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                               | done        | Read+HTTP+UI                   |
 | WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI            |
 | WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare |
+| WB-010 | Class cancellations, Holidays, and Moved Classes                                         | in_progress | Domain+Data+HTTP+UI            |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -384,3 +385,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Spec:** [Whiteboard online classes design](../superpowers/specs/2026-09-30-whiteboard-online-classes-design.md). **Blocked by:** WB-007 (done). Requested separately while WB-006 is in progress.
 
 **Done when:** An Online or Hybrid Batch uses an external link or a Whiteboard class; role-scoped Users visit a pre-join page; Owner/assigned Teacher starts a RealtimeKit meeting; Students/Parents join after recording begins; the private R2 recording can be downloaded after upload; OpenAPI, tests, Storybook, typecheck, lint, build, and a live Cloudflare class verification pass. Cloudflare App, webhook, and private R2 bucket are configured; the Owner recording and download passed. Student join and unauthorized User checks remain deferred by the user.
+
+### WB-010 — Class cancellations, Holidays, and Moved Classes
+
+**Spec:** [training-institute-class-changes.md](./training-institute-class-changes.md). **Issue:** [#13](https://github.com/white-board-io/white-board-v3/issues/13). **Decisions:** [ADR-0028](../adr/0028-class-changes-are-exceptions-over-weekly-timings.md), [ADR-0029](../adr/0029-class-change-product-decisions.md). **Blocked by:** WB-004, WB-007, WB-009 (Attendance, Calendar, and online Classes exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/6).
+
+**Done when:** Owner and assigned Teachers can cancel, move, and restore a Class; the Owner can declare and remove Workspace Holidays; every role's Calendar shows the changes and Upcoming changes; cancelled Classes can't be started, joined, or marked; the Owner Dashboard respects today's changes. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass.

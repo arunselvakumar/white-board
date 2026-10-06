@@ -79,6 +79,9 @@ export const Populated: Story = {
                     endTime: "11:00",
                   },
                 ],
+                todayClasses: [
+                  { startTime: "16:00", endTime: "18:00", rescheduled: true },
+                ],
               },
             ],
             recentStudents: [
@@ -103,6 +106,9 @@ export const Populated: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
     await expect(canvas.getByText("DCA Weekday 9–11 Offline")).toBeVisible();
+    await expect(
+      canvas.getByText(/Today 16:00–18:00 · Rescheduled/),
+    ).toBeVisible();
     await expect(canvas.getByText("₹4,000")).toBeVisible();
   },
 };

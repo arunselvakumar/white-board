@@ -1,5 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
+import { MovedClassGuard } from "../application/moved-class-guard";
+import { PrismaClassChangeStore } from "./prisma-class-change-store";
 import { CloseBatchHandler } from "../application/close-batch.handler";
 import { CreateBatchHandler } from "../application/create-batch.handler";
 import type { EventDispatcher } from "../application/event-dispatcher";
@@ -30,7 +32,14 @@ export function createBatchHandlers(deps?: {
   const events = deps?.events ?? new InProcessEventDispatcher();
   return {
     create: new CreateBatchHandler(batches, courses, events),
-    updateSchedule: new UpdateBatchScheduleHandler(batches, events),
+    updateSchedule: new UpdateBatchScheduleHandler(
+      batches,
+      events,
+      new MovedClassGuard({
+        store: new PrismaClassChangeStore(db),
+        now: () => new Date(),
+      }),
+    ),
     close: new CloseBatchHandler(batches, events),
     get: new GetBatchHandler(batches, enrollments),
     list: new ListBatchesHandler(batches, enrollments),

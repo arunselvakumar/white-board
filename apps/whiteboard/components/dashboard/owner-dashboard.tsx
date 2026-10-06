@@ -8,7 +8,6 @@ import {
   EmptyHeader,
 } from "@repo/ui/components/empty";
 
-import { formatTimingSlots } from "@/lib/class-mode";
 import { formatPaiseAsRupees } from "@/lib/money";
 import type { DashboardResponse } from "@/src/queries/dashboard";
 
@@ -93,8 +92,12 @@ export function OwnerDashboard({
                   <span className="flex flex-col items-start gap-1">
                     <span>{batch.name}</span>
                     <span className="text-muted-foreground text-xs font-normal">
-                      {batch.enrolledCount}/{batch.capacity} ·{" "}
-                      {formatTimingSlots(batch.timings)}
+                      {batch.enrolledCount}/{batch.capacity} · Today{" "}
+                      {batch.todayClasses
+                        .map((slot) => `${slot.startTime}–${slot.endTime}`)
+                        .join(", ")}
+                      {batch.todayClasses.some((slot) => slot.rescheduled) &&
+                        " · Rescheduled"}
                     </span>
                   </span>
                 </Button>

@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+import { ClassChangeModel } from "../classes/class-change-models";
+import { HolidayModel } from "../holidays/holiday-models";
+
 export const CalendarItemModel = z.object({
   id: z.uuid(),
   batchId: z.uuid(),
@@ -24,4 +27,10 @@ export const CalendarItemModel = z.object({
 
 export const CalendarResponseModel = z.object({
   items: z.array(CalendarItemModel),
+  classChanges: z.array(ClassChangeModel),
+  holidays: z.array(HolidayModel),
+  permissions: z.object({
+    changeClasses: z.boolean(),
+    manageHolidays: z.boolean(),
+  }),
 });
