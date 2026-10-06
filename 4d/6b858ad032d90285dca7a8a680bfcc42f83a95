@@ -1,0 +1,85 @@
+CONTEXT.md
+  s_462fb8a438ef73::t_704601290677ba 147-154,229
+apps/whiteboard/app/(app)/page.tsx
+  s_462fb8a438ef73::t_93858ba4d28ed0 13,15,25-26
+apps/whiteboard/app/(app)/parent/page.tsx
+  s_462fb8a438ef73::t_27e2c863a86185 5-7,12
+apps/whiteboard/app/(app)/student/page.tsx
+  s_462fb8a438ef73::t_a140971d58fd05 5-7,12
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_462fb8a438ef73::t_8c4dc261990b70 24-28
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_462fb8a438ef73::t_52a6cb4e7154cd 79,944-958,984
+apps/whiteboard/app/api/_lib/require-family-session.ts
+  s_462fb8a438ef73::t_a35067b783b825 1-51
+apps/whiteboard/app/api/training-institute/calendar/route.ts
+  s_462fb8a438ef73::t_f0722547227f1b 1,5,46-49
+apps/whiteboard/app/api/training-institute/home/get-family-home-response-model.ts
+  s_462fb8a438ef73::t_1a8c031178fbf2 1-60
+apps/whiteboard/app/api/training-institute/home/home.http.test.ts
+  s_462fb8a438ef73::t_e0ffd45c113314 1-333
+apps/whiteboard/app/api/training-institute/home/route.ts
+  s_462fb8a438ef73::t_ee354324f05238 1-25
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_462fb8a438ef73::t_bb4a2ae86b7c59 6,23-24
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_462fb8a438ef73::t_aef7188b13a2c7 78,111
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_462fb8a438ef73::t_4b84460609e557 137-181
+apps/whiteboard/components/classes/class-prejoin-screen.tsx
+  s_462fb8a438ef73::t_828aaa2999a604 223
+apps/whiteboard/components/home/family-home-screen.tsx
+  s_462fb8a438ef73::t_1030cf5beacc32 1-16
+apps/whiteboard/components/home/family-home.tsx
+  s_462fb8a438ef73::t_a44e3f8fc60428 1-319
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_462fb8a438ef73::t_3be3c996361776 5,7,10
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_462fb8a438ef73::t_aaf7f596b9206d 16-17
+apps/whiteboard/lib/app-nav.test.ts
+  s_462fb8a438ef73::t_0dff68041e8b11 8,13
+apps/whiteboard/lib/app-nav.ts
+  s_462fb8a438ef73::t_202c49af91b74e 60-65,81-87
+apps/whiteboard/src/queries/family-home.ts
+  s_462fb8a438ef73::t_c2706297fc37e2 1-18
+apps/whiteboard/src/training-institute/application/class-service.test.ts
+  s_462fb8a438ef73::t_2cdd2366aa60d5 197,295-298,302,307-310
+apps/whiteboard/src/training-institute/application/class-service.ts
+  s_462fb8a438ef73::t_650fd30d00452c 237-240,430-450
+apps/whiteboard/src/training-institute/application/family-home.test.ts
+  s_462fb8a438ef73::t_f1c508d1768b63 1-283
+apps/whiteboard/src/training-institute/infrastructure/create-family-home-handlers.ts
+  s_462fb8a438ef73::t_f655b528faf69d 1-13
+apps/whiteboard/src/training-institute/infrastructure/prisma-calendar-schedule-reader.ts
+  s_462fb8a438ef73::t_a24c47b0770ace 8,106,108,114,162
+docs/adr/0027-student-and-parent-workspace-invitations.md
+  s_462fb8a438ef73::t_c5e043a55edf98 10-11
+docs/prd/tasks.md
+  s_462fb8a438ef73::t_91b5ef082a6d54 345,402-407
+apps/whiteboard/components/home/family-home.stories.tsx
+  s_462fb8a438ef73::t_ffe5f085c0bf84 1-226
+apps/whiteboard/src/training-institute/application/family-home.ts
+  s_462fb8a438ef73::t_2d529c8b2287fb 1-252
+apps/whiteboard/src/training-institute/application/family-links.ts
+  s_462fb8a438ef73::t_0a1cc904b4628c 1-44
+apps/whiteboard/src/training-institute/infrastructure/prisma-family-home-source.ts
+  s_462fb8a438ef73::t_1878e15b05a39e 1-173
+docs/adr/0031-student-and-parent-home-product-decisions.md
+  s_462fb8a438ef73::t_793138bbcd7e36 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4d6b858ad032d90285dca7a8a680bfcc42f83a95",
+  "prompts": {},
+  "sessions": {
+    "s_462fb8a438ef73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f23106a4-191d-4faf-9352-1ee239a31388",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
