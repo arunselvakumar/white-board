@@ -1,0 +1,61 @@
+@import "@repo/ui/globals.css";
+
+/* Marketing Site surfaces and 3D helpers. Tokens come from @repo/ui/globals.css. */
+
+@utility surface-night {
+  color: #f8f7ff;
+  background-color: #100e22;
+  background-image: radial-gradient(
+    circle at 50% 40%,
+    #322e58 0%,
+    #1a1733 52%,
+    #100e22 100%
+  );
+}
+
+@utility scene {
+  perspective: 1600px;
+  perspective-origin: 50% 40%;
+}
+
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+@utility container-site {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1280px;
+  padding-inline: 1.5rem;
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility text-display {
+  font-weight: 300;
+  font-size: clamp(2.75rem, 7vw, 6.5rem);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+@utility text-section {
+  font-weight: 300;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
