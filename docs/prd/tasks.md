@@ -343,6 +343,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI            |
 | WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
 | WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access            |
+| WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI            |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -405,3 +406,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Issue:** [#12](https://github.com/white-board-io/white-board-v3/issues/12). **Decisions:** [ADR-0031](../adr/0031-student-and-parent-home-product-decisions.md). **Blocked by:** WB-001, WB-004, WB-007, WB-009 (invitations, Attendance, Calendar, and recordings exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/8).
 
 **Done when:** an invited Student lands on a Student Home that shows their next Class, remaining dues per active Enrollment, latest 5 Attendance marks, and latest 5 ready recordings, or a clear empty state for each; a Parent sees the same for each linked Student on one page; Students and Parents can download recordings of their own Classes since the Enrollment began; Owner and Teacher flows are unchanged. Role and Workspace isolation, OpenAPI, unit and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-013 — Enquiries and demo classes
+
+**Spec:** [training-institute-enquiries.md](./training-institute-enquiries.md). **Issue:** [#19](https://github.com/white-board-io/white-board-v3/issues/19). **Decisions:** [ADR-0032](../adr/0032-enquiry-and-demo-product-decisions.md). **Blocked by:** WB-003, WB-004, WB-010 (Teachers, Attendance, and Class Changes exist).
+
+**Done when:** the Owner and Teachers can record, follow up, close, and reopen Enquiries, see Follow-ups due, and book, mark, and cancel free or paid Batch and one-to-one demos; the Owner converts an Enquiry into a Student and Enrollment in one step under the usual admission rules, manages Enquiry Sources, and sees the monthly summary; a Teacher's Home lists their demos; Students and Parents can't see any of it; Enquiries and demo fees don't change Batch capacity, dues, Attendance, or the Owner Dashboard. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
