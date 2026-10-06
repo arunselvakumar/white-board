@@ -1,14 +1,15 @@
 import {
   AttendanceRegister,
   attendanceDate,
-  attendanceWeekday,
   localDateInTimezone,
 } from "../domain/attendance-register";
+import { classesOn } from "../domain/class-schedule";
 import type {
   AttendanceHistoryItem,
   AttendanceRepository,
 } from "../domain/attendance-repository";
 import { DomainError } from "../domain/errors";
+import type { ClassExceptionsReader } from "./class-change-handlers";
 import { decodeListCursor, encodeListCursor } from "./list-cursor";
 
 export type AttendanceActor = {
@@ -18,7 +19,10 @@ export type AttendanceActor = {
 };
 
 export class AttendanceHandlers {
-  constructor(private readonly store: AttendanceRepository) {}
+  constructor(
+    private readonly store: AttendanceRepository,
+    private readonly exceptions: ClassExceptionsReader,
+  ) {}
 
   async open(
     batchId: string,
@@ -48,12 +52,37 @@ export class AttendanceHandlers {
         "BATCH_CLOSED",
         "Closed Batches cannot receive Attendance Registers.",
       );
-    const weekday = attendanceWeekday(date);
-    const roster = await this.store.scheduledRoster(
-      batchId,
-      actor.workspaceId,
-      weekday,
-    );
+    const [enrollments, { changes, holidays }] = await Promise.all([
+      this.store.activeRoster(batchId, actor.workspaceId),
+      this.exceptions.forBatches(actor.workspaceId, [batchId]),
+    ]);
+    // Students with a Class that happens on this date, including Moved Classes.
+    const classes = enrollments.map((enrollment) => ({
+      enrollment,
+      classes: classesOn(
+        { batchId, timings: enrollment.timings },
+        date,
+        changes,
+        holidays,
+      ),
+    }));
+    const roster = classes
+      .filter(({ classes }) =>
+        classes.some((scheduled) => scheduled.status === "scheduled"),
+      )
+      .map(({ enrollment }) => ({
+        enrollmentId: enrollment.enrollmentId,
+        studentId: enrollment.studentId,
+        studentName: enrollment.studentName,
+      }));
+    if (
+      roster.length === 0 &&
+      classes.some(({ classes }) => classes.length > 0)
+    )
+      throw new DomainError(
+        "ATTENDANCE_CLASS_CANCELLED",
+        "Every Class on this date was cancelled, moved, or is a Holiday.",
+      );
     const register = AttendanceRegister.create({
       id: crypto.randomUUID(),
       workspaceId: actor.workspaceId,

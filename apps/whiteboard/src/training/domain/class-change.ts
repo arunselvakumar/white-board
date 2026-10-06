@@ -47,8 +47,9 @@ function reasonValue(raw: string | null | undefined): string | null {
   );
 }
 
-function slotValue(
-  original: { batchId: string; date: string; startTime: string },
+/** Validates the new slot of a Moved Class. */
+export function moveTarget(
+  original: { date: string; startTime: string },
   to: ClassSlotTime,
   now: LocalNow,
 ): ClassSlotTime {
@@ -114,7 +115,7 @@ export class ClassChange {
       ...original,
       kind: "moved",
       reason: reasonValue(input.reason),
-      movedTo: slotValue(original, input.to, input.localNow),
+      movedTo: moveTarget(original, input.to, input.localNow),
       createdByUserId: input.userId,
       updatedByUserId: input.userId,
       createdAt: input.now,
@@ -180,7 +181,7 @@ export class ClassChange {
       ...this.props,
       kind: "moved",
       reason: reasonValue(input.reason),
-      movedTo: slotValue(this.props, input.to, input.localNow),
+      movedTo: moveTarget(this.props, input.to, input.localNow),
       updatedByUserId: input.userId,
       updatedAt: input.now,
     };

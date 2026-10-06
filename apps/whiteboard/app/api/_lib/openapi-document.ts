@@ -1,6 +1,16 @@
 import { StatusCodes } from "http-status-codes";
 import { CalendarResponseModel } from "../calendar/calendar-response-model";
 import {
+  CancelClassRequestModel,
+  ClassChangeModel,
+  MoveClassRequestModel,
+} from "../classes/class-change-models";
+import {
+  DeclareHolidayRequestModel,
+  HolidayModel,
+  HolidayParamsModel,
+} from "../holidays/holiday-models";
+import {
   ClassDetailResponseModel,
   ClassParamsModel,
   ClassTokenResponseModel,
@@ -106,7 +116,7 @@ export const openApiDocument = buildOpenApiDocument([
   {
     method: "get",
     path: "/api/calendar",
-    summary: "View role-scoped recurring Batch Timings",
+    summary: "View role-scoped Batch Timings with Class Changes and Holidays",
     tags: ["Calendar"],
     successStatus: StatusCodes.OK,
     successDescription: "Listed",
@@ -155,6 +165,63 @@ export const openApiDocument = buildOpenApiDocument([
     successStatus: 302,
     successDescription: "Short-lived private R2 download redirect",
     errors: [400, 401, 403, 404, 409, 503],
+  },
+  {
+    method: "post",
+    path: "/api/classes/{batchId}/{date}/{startTime}/cancel",
+    summary:
+      "Cancel a Class, or a Rescheduled Class, as Owner or assigned Teacher",
+    tags: ["Classes"],
+    params: ClassParamsModel,
+    body: CancelClassRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Cancelled",
+    successSchema: ClassChangeModel,
+    errors: [400, 401, 403, 404, 409, 500],
+  },
+  {
+    method: "post",
+    path: "/api/classes/{batchId}/{date}/{startTime}/move",
+    summary:
+      "Move a Class to another date or time as Owner or assigned Teacher",
+    tags: ["Classes"],
+    params: ClassParamsModel,
+    body: MoveClassRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Moved",
+    successSchema: ClassChangeModel,
+    errors: [400, 401, 403, 404, 409, 500],
+  },
+  {
+    method: "post",
+    path: "/api/classes/{batchId}/{date}/{startTime}/restore",
+    summary: "Restore a Cancelled or Moved Class before it happens",
+    tags: ["Classes"],
+    params: ClassParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Restored",
+    errors: [400, 401, 403, 404, 409, 500],
+  },
+  {
+    method: "post",
+    path: "/api/holidays",
+    summary: "Declare a Workspace Holiday as Owner",
+    tags: ["Classes"],
+    body: DeclareHolidayRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "Declared",
+    successSchema: HolidayModel,
+    errors: [400, 401, 403, 409, 500],
+  },
+  {
+    method: "post",
+    path: "/api/holidays/{id}/remove",
+    summary: "Remove an upcoming Holiday as Owner",
+    tags: ["Classes"],
+    params: HolidayParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Removed",
+    errors: [400, 401, 403, 404, 409, 500],
   },
   {
     method: "post",

@@ -148,13 +148,19 @@ describe("classesOn", () => {
     };
     expect(classesOn(otherTime, "2026-11-07", [moved], [])).toEqual([]);
     expect(
-      classesOn({ ...source, firstDate: "2026-11-03" }, "2026-11-07", [moved], []),
+      classesOn(
+        { ...source, firstDate: "2026-11-03" },
+        "2026-11-07",
+        [moved],
+        [],
+      ),
     ).toEqual([]);
   });
 
   it("finds the Class at a start time, preferring the one that will happen", () => {
-    expect(classAt(source, { date: "2026-11-02", startTime: "09:00" }, [], []))
-      .toMatchObject({ status: "scheduled" });
+    expect(
+      classAt(source, { date: "2026-11-02", startTime: "09:00" }, [], []),
+    ).toMatchObject({ status: "scheduled" });
     expect(
       classAt(source, { date: "2026-11-02", startTime: "10:00" }, [], []),
     ).toBeNull();

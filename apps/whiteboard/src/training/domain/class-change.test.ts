@@ -40,7 +40,9 @@ describe("ClassChange", () => {
         userId: "u",
         now,
       }),
-    ).toThrow(expect.objectContaining({ code: "CLASS_CHANGE_REASON_TOO_LONG" }));
+    ).toThrow(
+      expect.objectContaining({ code: "CLASS_CHANGE_REASON_TOO_LONG" }),
+    );
   });
 
   it("moves a Class to a future slot", () => {
@@ -61,8 +63,14 @@ describe("ClassChange", () => {
       { date: original.date, startTime: "09:00", endTime: "10:00" },
       "CLASS_MOVE_SAME_SLOT",
     ],
-    [{ date: "2026-11-02", startTime: "09:00", endTime: "10:00" }, "CLASS_MOVE_IN_PAST"],
-    [{ date: "2026-11-01", startTime: "16:00", endTime: "17:00" }, "CLASS_MOVE_IN_PAST"],
+    [
+      { date: "2026-11-02", startTime: "09:00", endTime: "10:00" },
+      "CLASS_MOVE_IN_PAST",
+    ],
+    [
+      { date: "2026-11-01", startTime: "16:00", endTime: "17:00" },
+      "CLASS_MOVE_IN_PAST",
+    ],
   ])("rejects moving to %o", (to, code) => {
     expect(() =>
       ClassChange.move(original, { to, userId: "u", now, localNow }),
@@ -102,24 +110,24 @@ describe("ClassChange", () => {
 
   it("refuses to restore once the original or new slot has started", () => {
     const later = { date: "2026-11-05", minutes: 0 };
-    expect(() =>
+    expect(() => {
       ClassChange.cancel(original, { userId: "u", now }).restore({
         userId: "u",
         now,
         localNow: later,
-      }),
-    ).toThrow(expect.objectContaining({ code: "CLASS_ALREADY_STARTED" }));
+      });
+    }).toThrow(expect.objectContaining({ code: "CLASS_ALREADY_STARTED" }));
     const moved = ClassChange.move(
       { ...original, date: "2026-11-11" },
       { to: saturday, userId: "u", now, localNow },
     );
-    expect(() =>
+    expect(() => {
       moved.restore({
         userId: "u",
         now,
         localNow: { date: "2026-11-07", minutes: 17 * 60 },
-      }),
-    ).toThrow(expect.objectContaining({ code: "CLASS_ALREADY_STARTED" }));
+      });
+    }).toThrow(expect.objectContaining({ code: "CLASS_ALREADY_STARTED" }));
   });
 });
 
@@ -151,7 +159,10 @@ describe("Holiday", () => {
 
   it.each([
     [{ startDate: "2026-11-31" }, "HOLIDAY_DATES_INVALID"],
-    [{ endDate: "2026-10-31", startDate: "2026-11-01" }, "HOLIDAY_DATES_INVALID"],
+    [
+      { endDate: "2026-10-31", startDate: "2026-11-01" },
+      "HOLIDAY_DATES_INVALID",
+    ],
     [{ startDate: "2026-10-29" }, "HOLIDAY_IN_PAST"],
     [{ endDate: "2027-02-01" }, "HOLIDAY_TOO_LONG"],
     [{ reason: "x".repeat(201) }, "HOLIDAY_REASON_TOO_LONG"],
@@ -171,9 +182,9 @@ describe("Holiday", () => {
 
   it("can be removed until its first day has passed", () => {
     const holiday = declare({});
-    expect(() =>
-      holiday.remove({ userId: "u", now, today: "2026-11-02" }),
-    ).toThrow(expect.objectContaining({ code: "HOLIDAY_STARTED" }));
+    expect(() => {
+      holiday.remove({ userId: "u", now, today: "2026-11-02" });
+    }).toThrow(expect.objectContaining({ code: "HOLIDAY_STARTED" }));
     holiday.remove({ userId: "u", now, today: "2026-11-01" });
     expect(holiday.toProps().deletedAt).toEqual(now);
   });

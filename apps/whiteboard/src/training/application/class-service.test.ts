@@ -7,6 +7,7 @@ import {
   type MeetingGateway,
 } from "./class-service";
 import type { CalendarItem, CalendarScheduleReader } from "./calendar-schedule";
+import type { ClassExceptions } from "./class-change-handlers";
 import { DomainError } from "../domain/errors";
 
 const item: CalendarItem = {
@@ -25,7 +26,13 @@ const item: CalendarItem = {
   activeFrom: "2026-09-01T00:00:00.000Z",
 };
 
-function service(items: CalendarItem[] = [item], configured = true) {
+const noExceptions: ClassExceptions = { changes: [], holidays: [] };
+
+function service(
+  items: CalendarItem[] = [item],
+  configured = true,
+  exceptions: ClassExceptions = noExceptions,
+) {
   const schedule: CalendarScheduleReader = {
     execute: () => Promise.resolve(items),
   };
@@ -54,6 +61,7 @@ function service(items: CalendarItem[] = [item], configured = true) {
   };
   return new ClassService({
     schedule,
+    exceptions: { forBatches: () => Promise.resolve(exceptions) },
     occurrences,
     meetings,
     now: () => new Date("2026-09-30T03:30:00.000Z"),
@@ -70,6 +78,87 @@ const input = {
 };
 
 describe("ClassService", () => {
+  const hostedItem: CalendarItem = { ...item, meetingOption: "whiteboard" };
+
+  it("explains a Cancelled Class and refuses to start or join it", async () => {
+    const cancelled = service([hostedItem], true, {
+      changes: [
+        {
+          id: "change-1",
+          batchId: item.batchId,
+          date: input.date,
+          startTime: "09:00",
+          endTime: "10:00",
+          kind: "cancelled",
+          reason: "Power cut",
+          movedTo: null,
+        },
+      ],
+      holidays: [],
+    });
+    expect(await cancelled.get(input)).toMatchObject({
+      status: "cancelled",
+      classChange: { status: "cancelled", reason: "Power cut", movedTo: null },
+      rescheduledFrom: null,
+    });
+    await expect(cancelled.start(input, "Owner")).rejects.toMatchObject({
+      code: "CLASS_CANCELLED",
+    });
+    await expect(
+      cancelled.join({ ...input, role: "org:student" }, "Asha"),
+    ).rejects.toMatchObject({ code: "CLASS_CANCELLED" });
+  });
+
+  it("treats a Holiday Class as cancelled", async () => {
+    const holiday = service([hostedItem], true, {
+      changes: [],
+      holidays: [
+        {
+          id: "h",
+          startDate: input.date,
+          endDate: input.date,
+          reason: "Diwali",
+        },
+      ],
+    });
+    await expect(holiday.start(input, "Owner")).rejects.toMatchObject({
+      code: "CLASS_CANCELLED",
+      message: "This Class is off for a Holiday.",
+    });
+  });
+
+  it("finds a Moved Class at its new time and points the old slot there", async () => {
+    const moved = {
+      changes: [
+        {
+          id: "change-1",
+          batchId: item.batchId,
+          date: "2026-09-23",
+          startTime: "09:00",
+          endTime: "10:00",
+          kind: "moved" as const,
+          reason: null,
+          movedTo: { date: input.date, startTime: "16:00", endTime: "17:30" },
+        },
+      ],
+      holidays: [],
+    };
+    expect(
+      await service([item], true, moved).get({ ...input, startTime: "16:00" }),
+    ).toMatchObject({
+      status: "scheduled",
+      endTime: "17:30",
+      classChange: null,
+      rescheduledFrom: { date: "2026-09-23", startTime: "09:00" },
+    });
+    expect(
+      await service([item], true, moved).get({ ...input, date: "2026-09-23" }),
+    ).toMatchObject({
+      status: "cancelled",
+      classChange: { status: "moved", movedTo: { date: input.date } },
+    });
+  });
+
   it("shows the external link on the pre-join page", async () => {
     const result = await service().get(input);
     expect(result.meetingOption).toBe("external");
@@ -168,6 +257,7 @@ describe("ClassService", () => {
     };
     const sut = new ClassService({
       schedule: { execute: () => Promise.resolve([hosted]) },
+      exceptions: { forBatches: () => Promise.resolve(noExceptions) },
       occurrences: store,
       meetings,
       now: () => new Date("2026-09-30T03:30:00.000Z"),

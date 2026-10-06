@@ -1,4 +1,8 @@
-import { daysBetween, isCalendarDate, type HolidayFact } from "./class-schedule";
+import {
+  daysBetween,
+  isCalendarDate,
+  type HolidayFact,
+} from "./class-schedule";
 import { DomainError } from "./errors";
 import { OptionalText } from "./optional-text";
 

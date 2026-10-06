@@ -8,6 +8,8 @@ export type DashboardBatchReadModel = {
   capacity: number;
   enrolledCount: number;
   timings: WeeklySlot[];
+  /** Classes that happen today after Class Changes and Holidays. */
+  todayClasses: { startTime: string; endTime: string; rescheduled: boolean }[];
 };
 
 export type DashboardStudentReadModel = {

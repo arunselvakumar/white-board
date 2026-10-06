@@ -8,7 +8,11 @@ export type ScheduleSlot = {
   endTime: string;
 };
 
-export type ClassSlotTime = { date: string; startTime: string; endTime: string };
+export type ClassSlotTime = {
+  date: string;
+  startTime: string;
+  endTime: string;
+};
 
 export type ClassChangeFact = {
   id: string;
@@ -186,7 +190,9 @@ export function classesOn(
         status,
         rescheduled: false,
         reason:
-          status === "holiday" ? holiday?.reason ?? null : change?.reason ?? null,
+          status === "holiday"
+            ? (holiday?.reason ?? null)
+            : (change?.reason ?? null),
         change,
         holiday: status === "holiday" ? holiday : null,
       });

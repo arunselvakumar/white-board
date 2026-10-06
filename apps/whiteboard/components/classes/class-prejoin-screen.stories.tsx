@@ -25,6 +25,8 @@ const detail: ClassDetail = {
   status: "scheduled",
   recordingStatus: null,
   recordingReady: false,
+  classChange: null,
+  rescheduledFrom: null,
 };
 
 function state(value: ClassDetail, role = "org:admin") {

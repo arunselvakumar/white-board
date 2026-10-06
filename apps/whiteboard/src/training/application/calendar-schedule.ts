@@ -1,3 +1,10 @@
+import {
+  classesOn,
+  localNow,
+  type ClassChangeFact,
+  type HolidayFact,
+} from "../domain/class-schedule";
+
 export type CalendarRole =
   "org:admin" | "org:teacher" | "org:student" | "org:parent";
 
@@ -30,3 +37,31 @@ export type CalendarScheduleReader = {
     includeClosed?: boolean;
   }): Promise<CalendarItem[]>;
 };
+
+export type CalendarExceptions = {
+  classChanges: ClassChangeFact[];
+  holidays: HolidayFact[];
+};
+
+/** Keep only Class Changes to Classes these Calendar items actually have. */
+export function relevantClassChanges(
+  items: readonly CalendarItem[],
+  changes: readonly ClassChangeFact[],
+): ClassChangeFact[] {
+  return changes.filter((change) =>
+    items.some(
+      (item) =>
+        item.batchId === change.batchId &&
+        classesOn(
+          {
+            batchId: item.batchId,
+            timings: item.timings,
+            firstDate: localNow(new Date(item.activeFrom), item.timezone).date,
+          },
+          change.date,
+          [],
+          [],
+        ).some((scheduled) => scheduled.startTime === change.startTime),
+    ),
+  );
+}

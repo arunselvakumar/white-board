@@ -74,10 +74,6 @@ export function localDateInTimezone(now: Date, timezone: string): string {
   return `${value("year")}-${value("month")}-${value("day")}`;
 }
 
-export function attendanceWeekday(date: string): number {
-  return new Date(`${attendanceDate(date)}T12:00:00.000Z`).getUTCDay();
-}
-
 function status(raw: string): AttendanceStatus {
   if (!ATTENDANCE_STATUSES.includes(raw as AttendanceStatus))
     throw new DomainError(

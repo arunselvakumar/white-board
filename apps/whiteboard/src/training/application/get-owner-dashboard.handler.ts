@@ -1,14 +1,17 @@
 import type { PrismaClient } from "@repo/db";
 
+import { classesOn, localNow } from "../domain/class-schedule";
 import { WeeklyTimings } from "../domain/weekly-timings";
 import { WorkspaceId } from "../domain/workspace-id";
+import type { ClassExceptionsReader } from "./class-change-handlers";
 import type { GetOwnerDashboardQuery } from "./get-owner-dashboard.query";
 import type { OwnerDashboardReadModel } from "./owner-dashboard-read-model";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 export class GetOwnerDashboardHandler {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(
+    private readonly db: PrismaClient,
+    private readonly exceptions: ClassExceptionsReader,
+  ) {}
 
   async execute(
     query: GetOwnerDashboardQuery,
@@ -65,21 +68,36 @@ export class GetOwnerDashboardHandler {
       );
     }
 
-    const todayBatches = batches
-      .filter((batch) => {
-        const timings = WeeklyTimings.create(batch.timings);
-        const weekday = weekdayInZone(now, batch.timezone);
-        return timings.slots.some((slot) => slot.daysOfWeek.includes(weekday));
-      })
-      .map((batch) => ({
-        id: batch.id,
-        name: batch.name,
-        courseId: batch.courseId,
-        classMode: batch.classMode,
-        capacity: batch.capacity,
-        enrolledCount: enrolledByBatch.get(batch.id) ?? 0,
-        timings: WeeklyTimings.create(batch.timings).toJson(),
-      }));
+    const { changes, holidays } = await this.exceptions.forBatches(
+      workspaceId,
+      batches.map((batch) => batch.id),
+    );
+    const todayBatches = batches.flatMap((batch) => {
+      const timings = WeeklyTimings.create(batch.timings);
+      const todayClasses = classesOn(
+        { batchId: batch.id, timings: timings.slots },
+        localNow(now, batch.timezone).date,
+        changes,
+        holidays,
+      ).filter((scheduled) => scheduled.status === "scheduled");
+      if (todayClasses.length === 0) return [];
+      return [
+        {
+          id: batch.id,
+          name: batch.name,
+          courseId: batch.courseId,
+          classMode: batch.classMode,
+          capacity: batch.capacity,
+          enrolledCount: enrolledByBatch.get(batch.id) ?? 0,
+          timings: timings.toJson(),
+          todayClasses: todayClasses.map((scheduled) => ({
+            startTime: scheduled.startTime,
+            endTime: scheduled.endTime,
+            rescheduled: scheduled.rescheduled,
+          })),
+        },
+      ];
+    });
 
     return {
       activeStudentCount,
@@ -93,13 +111,4 @@ export class GetOwnerDashboardHandler {
       })),
     };
   }
-}
-
-function weekdayInZone(now: Date, timeZone: string): number {
-  const label = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    weekday: "short",
-  }).format(now);
-  const index = WEEKDAYS.indexOf(label);
-  return index === -1 ? now.getUTCDay() : index;
 }

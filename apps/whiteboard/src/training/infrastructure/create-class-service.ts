@@ -5,6 +5,7 @@ import {
   type MeetingGateway,
 } from "../application/class-service";
 import { createCalendarScheduleReader } from "./create-calendar-schedule-reader";
+import { PrismaClassExceptionsReader } from "./prisma-class-change-store";
 import { PrismaClassOccurrenceStore } from "./prisma-class-occurrence-store";
 import {
   RealtimeKitMeetingGateway,
@@ -30,6 +31,7 @@ export function createClassService(): ClassService {
   };
   return new ClassService({
     schedule: createCalendarScheduleReader(prisma),
+    exceptions: new PrismaClassExceptionsReader(prisma),
     occurrences: new PrismaClassOccurrenceStore(prisma),
     meetings,
     now: () => new Date(),

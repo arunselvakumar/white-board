@@ -7,6 +7,7 @@ import type {
   AttendanceRepository,
 } from "../domain/attendance-repository";
 import type { ListCursor, ListPage } from "../domain/list";
+import { WeeklyTimings } from "../domain/weekly-timings";
 
 const dateValue = (date: string) => new Date(`${date}T00:00:00.000Z`);
 
@@ -61,7 +62,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     return row == null ? null : fromRow(row);
   }
 
-  async scheduledRoster(batchId: string, workspaceId: string, weekday: number) {
+  async activeRoster(batchId: string, workspaceId: string) {
     const enrollments = await this.db.enrollment.findMany({
       where: {
         batchId,
@@ -77,20 +78,16 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       where: { id: batchId },
       select: { timings: true },
     });
-    return enrollments
-      .filter((enrollment) =>
-        includesDay(
-          enrollment.timingSource === "student"
-            ? enrollment.studentTimings
-            : batch.timings,
-          weekday,
-        ),
-      )
-      .map((enrollment) => ({
-        enrollmentId: enrollment.id,
-        studentId: enrollment.studentId,
-        studentName: enrollment.student.name,
-      }));
+    return enrollments.map((enrollment) => ({
+      enrollmentId: enrollment.id,
+      studentId: enrollment.studentId,
+      studentName: enrollment.student.name,
+      timings: WeeklyTimings.create(
+        enrollment.timingSource === "student"
+          ? enrollment.studentTimings
+          : batch.timings,
+      ).toJson(),
+    }));
   }
 
   async create(register: AttendanceRegister): Promise<void> {
@@ -318,19 +315,6 @@ function fromRow(row: RegisterRow): AttendanceRegister {
           a.id.localeCompare(b.id),
       ),
   });
-}
-
-function includesDay(timings: unknown, weekday: number): boolean {
-  return (
-    Array.isArray(timings) &&
-    timings.some((slot: unknown) => {
-      if (typeof slot !== "object" || slot == null || !("daysOfWeek" in slot))
-        return false;
-      return (
-        Array.isArray(slot.daysOfWeek) && slot.daysOfWeek.includes(weekday)
-      );
-    })
-  );
 }
 
 function cursorWhere(
