@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@repo/db";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET as downloadRecording } from "../classes/[batchId]/[date]/[startTime]/recording/route";
 import { GET } from "./route";
@@ -65,6 +65,8 @@ async function home() {
 }
 
 const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6];
+// Noon in Asia/Kolkata, so setup and assertions agree on "today".
+const NOW = new Date("2026-09-30T06:30:00.000Z");
 
 describe("Student and Parent Home HTTP", () => {
   let workspaceId: string;
@@ -116,6 +118,9 @@ describe("Student and Parent Home HTTP", () => {
   }
 
   beforeEach(async () => {
+    // Only Date is faked; Prisma's timers keep running.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
     workspaceId = `org_${randomUUID()}`;
     courseId = randomUUID();
     batchId = randomUUID();
@@ -143,7 +148,7 @@ describe("Student and Parent Home HTTP", () => {
         classMode: "online",
         meetingOption: "whiteboard",
         capacity: 20,
-        // Late enough that today's Class hasn't ended in any test run.
+        // Later today at NOW, so the next Class is today's.
         timings: [
           { daysOfWeek: EVERY_DAY, startTime: "23:00", endTime: "23:59" },
         ],
@@ -214,6 +219,10 @@ describe("Student and Parent Home HTTP", () => {
     }
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("shows a Student their next Class, dues, Attendance, and recordings", async () => {
     session("user_asha", workspaceId, "org:student");
     signedInAs("asha@example.com");
@@ -229,7 +238,9 @@ describe("Student and Parent Home HTTP", () => {
         batchName: "Daily Online",
         courseName: "Python",
         classMode: "online",
+        date: localDate(0),
         startTime: "23:00",
+        inProgress: false,
       },
       dues: [
         {
@@ -247,8 +258,6 @@ describe("Student and Parent Home HTTP", () => {
       // The recording from before the Enrollment began is left out.
       recordings: [{ batchId, date: localDate(-1), startTime: "23:00" }],
     });
-    // Tomorrow only if the run lands in the last minute of the day.
-    expect([localDate(0), localDate(1)]).toContain(asha?.nextClass?.date);
   });
 
   it("shows a Parent a section for each linked Student", async () => {
