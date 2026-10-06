@@ -134,6 +134,51 @@ export const RecordingDownload: Story = {
   },
 };
 
+export const StudentRecordingDownload: Story = {
+  beforeEach: () => {
+    state(
+      {
+        ...detail,
+        meetingOption: "whiteboard",
+        joinUrl: null,
+        isHost: false,
+        status: "ended",
+        recordingStatus: "ready",
+        recordingReady: true,
+      },
+      "org:student",
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Ready to download")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Download recording" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/api/training-institute/classes/${batchId}/${date}/09%3A00/recording`,
+    );
+  },
+};
+
+export const StudentRecordingNotReady: Story = {
+  beforeEach: () => {
+    state(
+      {
+        ...detail,
+        meetingOption: "whiteboard",
+        joinUrl: null,
+        isHost: false,
+        status: "ended",
+        recordingStatus: "uploading",
+      },
+      "org:student",
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByText("Class recording")).toBeNull();
+  },
+};
+
 export const CancelledClass: Story = {
   beforeEach: () => {
     state(

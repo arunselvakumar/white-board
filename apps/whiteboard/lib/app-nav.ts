@@ -57,7 +57,12 @@ export const APP_NAV = [
 ] as const;
 
 export const STUDENT_NAV = [
-  { href: "/student", label: "Student", title: "Student", description: "" },
+  {
+    href: "/student",
+    label: "Home",
+    title: "Student Home",
+    description: "Next Class, dues, Attendance, and recordings.",
+  },
   {
     href: "/calendar",
     label: "Calendar",
@@ -73,7 +78,13 @@ export const STUDENT_NAV = [
 ] as const;
 
 export const PARENT_NAV = [
-  { href: "/parent", label: "Parent", title: "Parent", description: "" },
+  {
+    href: "/parent",
+    label: "Home",
+    title: "Parent Home",
+    description:
+      "Next Class, dues, Attendance, and recordings for each Student.",
+  },
   {
     href: "/calendar",
     label: "Calendar",

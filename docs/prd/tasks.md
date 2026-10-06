@@ -342,6 +342,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare |
 | WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI            |
 | WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
+| WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access            |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -398,3 +399,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Issue:** [#14](https://github.com/white-board-io/white-board-v3/issues/14). **Decision:** [ADR-0030](../adr/0030-postgres-schema-per-bounded-context.md), which supersedes ADR-0010's single schema. **Blocked by:** WB-010 (merged). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/7).
 
 **Done when:** every Training Institute table and enum lives in the `training_institute` Postgres schema with no data loss; Prisma models and enums, HTTP models, and OpenAPI components carry the `TrainingInstitute` prefix; routes live under `/api/training-institute/`; `src/training` is `src/training-institute`; an ESLint rule keeps contexts from importing each other; typecheck, lint, unit, and Postgres HTTP tests pass. No behaviour changes for users.
+
+### WB-012 — Student and Parent Home
+
+**Issue:** [#12](https://github.com/white-board-io/white-board-v3/issues/12). **Decisions:** [ADR-0031](../adr/0031-student-and-parent-home-product-decisions.md). **Blocked by:** WB-001, WB-004, WB-007, WB-009 (invitations, Attendance, Calendar, and recordings exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/8).
+
+**Done when:** an invited Student lands on a Student Home that shows their next Class, remaining dues per active Enrollment, latest 5 Attendance marks, and latest 5 ready recordings, or a clear empty state for each; a Parent sees the same for each linked Student on one page; Students and Parents can download recordings of their own Classes since the Enrollment began; Owner and Teacher flows are unchanged. Role and Workspace isolation, OpenAPI, unit and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.

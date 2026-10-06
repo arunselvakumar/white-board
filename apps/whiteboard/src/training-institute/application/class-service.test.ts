@@ -194,7 +194,7 @@ describe("ClassService", () => {
     ).rejects.toMatchObject({ code: "CLASS_NOT_CONFIGURED" });
   });
 
-  it("admits Students only after recording starts and restricts downloads to hosts", async () => {
+  it("admits Students only after recording starts and limits their downloads to their own Classes", async () => {
     const hosted = {
       ...item,
       meetingOption: "whiteboard" as const,
@@ -292,13 +292,22 @@ describe("ClassService", () => {
       status: "UPLOADED",
       outputFileName: "class.mp4",
     });
+    expect(await sut.get(student)).toMatchObject({ recordingReady: true });
+    expect(await sut.recordingObjectKey(student)).toBe("org_1/occ_1/class.mp4");
+    // Enrolled after the Class: the recording stays with the hosts.
+    hosted.activeFrom = "2026-10-01T00:00:00.000Z";
     await expect(sut.recordingObjectKey(student)).rejects.toMatchObject({
       code: "CLASS_NOT_FOUND",
     });
+    hosted.activeFrom = item.activeFrom;
     expect(await sut.recordingObjectKey(input)).toBe("org_1/occ_1/class.mp4");
     hosted.timings = [
       { daysOfWeek: [3], startTime: "11:00", endTime: "12:00" },
     ];
+    // The Class is no longer one of the Student's Classes.
+    await expect(sut.recordingObjectKey(student)).rejects.toMatchObject({
+      code: "CLASS_NOT_FOUND",
+    });
     expect(await sut.get(input)).toMatchObject({
       status: "ended",
       recordingReady: true,

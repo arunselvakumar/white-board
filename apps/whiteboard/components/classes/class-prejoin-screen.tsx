@@ -220,7 +220,7 @@ export function ClassPrejoinScreen({
           </div>
         </div>
         {data.meetingOption === "whiteboard" &&
-          data.isHost &&
+          (data.isHost || data.recordingReady) &&
           change == null && (
             <div className="bg-card rounded-2xl border p-6">
               <h2 className="font-semibold">Class recording</h2>

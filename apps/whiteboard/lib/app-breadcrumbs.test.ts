@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { getAppBreadcrumbs } from "./app-breadcrumbs";
 
-it("shows the invited role instead of Dashboard in family navigation", () => {
+it("shows Home instead of Dashboard in family navigation", () => {
   expect(getAppBreadcrumbs("/", "org:student")).toEqual([
-    { label: "Student", href: "/student" },
+    { label: "Home", href: "/student" },
   ]);
   expect(getAppBreadcrumbs("/parent", "org:parent")).toEqual([
-    { label: "Parent", href: "/parent" },
+    { label: "Home", href: "/parent" },
   ]);
 });
 

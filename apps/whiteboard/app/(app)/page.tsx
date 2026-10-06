@@ -10,9 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title:
       orgRole === "org:student"
-        ? "Student"
+        ? "Student Home"
         : orgRole === "org:parent"
-          ? "Parent"
+          ? "Parent Home"
           : orgRole === "org:teacher"
             ? "My Batches"
             : "Owner Dashboard",
@@ -22,9 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const { orgId, orgRole } = await auth();
   if (orgId == null) return null;
-  if (orgRole === "org:student")
-    return <main className="p-6">Hello world</main>;
-  if (orgRole === "org:parent") return <main className="p-6">Hello world</main>;
+  if (orgRole === "org:student") redirect("/student");
+  if (orgRole === "org:parent") redirect("/parent");
   if (orgRole === "org:teacher") redirect("/teacher");
   if (orgRole !== "org:admin") notFound();
   return <OwnerDashboardScreen />;

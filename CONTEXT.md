@@ -144,6 +144,14 @@ _Avoid_: invoice, bill, voucher
 The In-app Home for a Training Institute: active Student count, outstanding dues, today's Batches, recent Students.
 _Avoid_: analytics, reports, insights (as the screen name)
 
+**Student Home**:
+The In-app Home for a Student User: their next Class, remaining dues per active Enrollment, latest Attendance marks, and ready Class recordings they may download. See ADR-0031.
+_Avoid_: student dashboard, student portal
+
+**Parent Home**:
+The In-app Home for a Parent User: the Student Home's cards for each Student they are linked to, on one page. A Parent is linked to a Student through a verified email address that matches the Student's father, mother, or Guardian email.
+_Avoid_: parent dashboard, family portal
+
 **P0**:
 The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.
 
@@ -218,6 +226,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Class** may be cancelled or moved once; restoring it brings back the original. Changing a **Class** never changes the Batch's weekly **Timings**.
 - A **Holiday** belongs to one **Workspace** and cancels every **Class** on its dates.
 - The **Owner Dashboard** is the **In-app Home** for a Training Institute **Workspace**.
+- The **Student Home** and **Parent Home** are the **In-app Home** for Student and Parent Users. A Student or Parent may download a **Class** recording only from an active **Enrollment**, on or after the date it began.
 
 ## Example dialogue
 

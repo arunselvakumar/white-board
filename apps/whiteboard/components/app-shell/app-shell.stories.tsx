@@ -75,7 +75,7 @@ export const StudentNavigation: Story = {
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
     await expect(nav.getAllByRole("link")).toHaveLength(3);
-    await expect(nav.getByRole("link", { name: "Student" })).toHaveAttribute(
+    await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/student",
     );
@@ -108,7 +108,7 @@ export const ParentNavigation: Story = {
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
     await expect(nav.getAllByRole("link")).toHaveLength(3);
-    await expect(nav.getByRole("link", { name: "Parent" })).toHaveAttribute(
+    await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/parent",
     );
