@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useMutation,
   useQueryClient,
   useSuspenseQuery,
   type QueryClient,
@@ -14,16 +15,19 @@ import {
   moveClass,
   removeHoliday,
   restoreClass,
+  type ClassKey,
+  type ClassSlotTime,
 } from "@/src/queries/calendar";
+import { classQueries } from "@/src/queries/classes";
 import { dashboardQueries } from "@/src/queries/dashboard";
 
 import { CalendarView } from "./calendar-view";
 
-async function refresh(queryClient: QueryClient): Promise<void> {
+async function invalidateSchedule(queryClient: QueryClient): Promise<void> {
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: calendarQueries.key.all }),
     queryClient.invalidateQueries({ queryKey: dashboardQueries.key.all }),
-    queryClient.invalidateQueries({ queryKey: ["classes"] }),
+    queryClient.invalidateQueries({ queryKey: classQueries.key.all }),
   ]);
 }
 
@@ -33,6 +37,26 @@ export function CalendarScreen() {
   const { data } = useSuspenseQuery(
     calendarQueries.schedule(`${orgId}:${userId}:${orgRole}`),
   );
+  const onSuccess = () => invalidateSchedule(queryClient);
+  const cancel = useMutation({
+    mutationFn: ({ key, reason }: { key: ClassKey; reason: string | null }) =>
+      cancelClass(key, reason),
+    onSuccess,
+  });
+  const move = useMutation({
+    mutationFn: ({
+      key,
+      input,
+    }: {
+      key: ClassKey;
+      input: ClassSlotTime & { reason: string | null };
+    }) => moveClass(key, input),
+    onSuccess,
+  });
+  const restore = useMutation({ mutationFn: restoreClass, onSuccess });
+  const declare = useMutation({ mutationFn: declareHoliday, onSuccess });
+  const remove = useMutation({ mutationFn: removeHoliday, onSuccess });
+
   return (
     <CalendarView
       items={data.items}
@@ -41,26 +65,21 @@ export function CalendarScreen() {
       permissions={data.permissions}
       classActions={{
         onCancel: async (key, reason) => {
-          await cancelClass(key, reason);
-          await refresh(queryClient);
+          await cancel.mutateAsync({ key, reason });
         },
         onMove: async (key, input) => {
-          await moveClass(key, input);
-          await refresh(queryClient);
+          await move.mutateAsync({ key, input });
         },
         onRestore: async (key) => {
-          await restoreClass(key);
-          await refresh(queryClient);
+          await restore.mutateAsync(key);
         },
       }}
       holidayActions={{
         onDeclare: async (input) => {
-          await declareHoliday(input);
-          await refresh(queryClient);
+          await declare.mutateAsync(input);
         },
         onRemove: async (id) => {
-          await removeHoliday(id);
-          await refresh(queryClient);
+          await remove.mutateAsync(id);
         },
       }}
     />

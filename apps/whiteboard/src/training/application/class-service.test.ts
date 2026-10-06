@@ -205,7 +205,8 @@ describe("ClassService", () => {
     let deactivated = false;
     const store: ClassOccurrenceStore = {
       find: () => Promise.resolve(occurrence),
-      claim: (key) => {
+      claim: async (key, verify) => {
+        await verify();
         occurrence = {
           ...key,
           id: "occ_1",
@@ -215,7 +216,7 @@ describe("ClassService", () => {
           recordingStatus: "pending",
           recordingObjectKey: null,
         };
-        return Promise.resolve({ occurrence, claimed: true });
+        return { occurrence, claimed: true };
       },
       setMeeting: (_id, meetingId) => {
         if (occurrence) occurrence.providerMeetingId = meetingId;

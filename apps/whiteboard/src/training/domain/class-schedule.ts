@@ -225,6 +225,29 @@ export function classesOn(
   );
 }
 
+/**
+ * Upcoming Moved Classes whose original slot no longer exists in any of these
+ * Timings. Their Rescheduled slot would silently disappear (ADR-0028), so
+ * Timing edits that produce any are refused.
+ */
+export function orphanedMoves(
+  changes: readonly ClassChangeFact[],
+  sources: readonly ScheduleSource[],
+  now: LocalNow,
+): ClassChangeFact[] {
+  return changes.filter(
+    (change) =>
+      change.kind === "moved" &&
+      change.movedTo != null &&
+      !hasStarted(change.movedTo, now) &&
+      !sources.some(
+        (source) =>
+          source.batchId === change.batchId &&
+          regularSlot(source, change.date, change.startTime) != null,
+      ),
+  );
+}
+
 /** The Class at a start time on a date, original or Rescheduled. */
 export function classAt(
   source: ScheduleSource,

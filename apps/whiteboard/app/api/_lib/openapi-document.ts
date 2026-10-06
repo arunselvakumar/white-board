@@ -704,6 +704,7 @@ export const openApiDocument = buildOpenApiDocument([
       StatusCodes.UNAUTHORIZED,
       StatusCodes.FORBIDDEN,
       StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
       StatusCodes.INTERNAL_SERVER_ERROR,
     ],
   },

@@ -2,9 +2,19 @@ import { randomUUID } from "node:crypto";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@repo/db";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import { POST as openRegister } from "../attendance/registers/route";
+import { POST as updateBatchSchedule } from "../batches/[id]/schedule/route";
+import { POST as setEnrollmentTimings } from "../enrollments/[id]/timings/route";
 import { POST as saveMarks } from "../attendance/registers/[id]/marks/route";
 import { GET as getCalendar } from "../calendar/route";
 import { GET as getDashboard } from "../dashboard/route";
@@ -24,32 +34,27 @@ const mockedAuth = vi.mocked(auth);
 const mockedClerkClient = vi.mocked(clerkClient);
 const getUser = vi.fn();
 
-function localNow(): { date: string; minutes: number } {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date());
-  const part = (type: string) =>
-    parts.find((value) => value.type === type)?.value ?? "";
-  return {
-    date: `${part("year")}-${part("month")}-${part("day")}`,
-    minutes: Number(part("hour")) * 60 + Number(part("minute")),
-  };
-}
-
-const NOW = localNow();
-const TODAY = NOW.date;
+// Pin the clock to 10:00 IST today so "today" tests run at any hour.
+const TODAY = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
+const PINNED_NOW = new Date(`${TODAY}T04:30:00.000Z`);
 const day = (offset: number) =>
   new Date(Date.parse(`${TODAY}T00:00:00.000Z`) + offset * 86_400_000)
     .toISOString()
     .slice(0, 10);
-// Today's late Class only exists to test changes on the same day.
-const LATE_ENOUGH = NOW.minutes < 23 * 60;
+
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(PINNED_NOW);
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 type Json = Record<string, unknown> & { code?: string };
 
@@ -144,6 +149,7 @@ async function seedWorkspace(timings: unknown) {
   const batchId = randomUUID();
   const batchStudentId = randomUUID();
   const homeStudentId = randomUUID();
+  const homeEnrollmentId = randomUUID();
   const batchEnrollmentId = randomUUID();
   await prisma.course.create({
     data: {
@@ -196,7 +202,7 @@ async function seedWorkspace(timings: unknown) {
     createdByUserId: "user_owner",
     feePlanType: "one_time" as const,
     feePlanAmountPaise: 0,
-    feePlanDueDates: [],
+    feePlanDueDates: [{ dueOn: day(30), amountPaise: 0 }],
     createdAt: new Date(Date.now() - 30 * 86_400_000),
   };
   await prisma.enrollment.createMany({
@@ -209,7 +215,7 @@ async function seedWorkspace(timings: unknown) {
       },
       {
         ...enrollment,
-        id: randomUUID(),
+        id: homeEnrollmentId,
         studentId: homeStudentId,
         timingSource: "student",
         studentTimings: [
@@ -254,7 +260,7 @@ async function seedWorkspace(timings: unknown) {
       assignedByUserId: "user_owner",
     },
   });
-  return { workspaceId, batchId, batchEnrollmentId };
+  return { workspaceId, batchId, batchEnrollmentId, homeEnrollmentId };
 }
 
 const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6];
@@ -262,12 +268,13 @@ const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6];
 describe("Class changes HTTP", () => {
   let workspaceId: string;
   let batchId: string;
+  let homeEnrollmentId: string;
 
   beforeEach(async () => {
     getUser.mockReset();
     verifiedEmail("owner@example.com");
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
-    ({ workspaceId, batchId } = await seedWorkspace([
+    ({ workspaceId, batchId, homeEnrollmentId } = await seedWorkspace([
       { daysOfWeek: EVERY_DAY, startTime: "09:00", endTime: "11:00" },
     ]));
     session("user_owner", workspaceId);
@@ -416,6 +423,57 @@ describe("Class changes HTTP", () => {
     );
   });
 
+  it("refuses Timing edits that would drop an upcoming Moved Class", async () => {
+    expect(
+      (
+        await move(batchId, day(7), "09:00", {
+          date: day(10),
+          startTime: "16:00",
+          endTime: "18:00",
+        })
+      ).status,
+    ).toBe(200);
+    const schedule = async (startTime: string, endTime: string) =>
+      json(
+        await updateBatchSchedule(
+          post({
+            name: "DCA Weekday 9–11",
+            classMode: "online",
+            capacity: 20,
+            meetingOption: "external",
+            joinUrl: "https://meet.google.com/example",
+            timings: [{ daysOfWeek: EVERY_DAY, startTime, endTime }],
+          }),
+          { params: Promise.resolve({ id: batchId }) },
+        ),
+      );
+    expect(await schedule("10:00", "12:00")).toMatchObject({
+      status: 409,
+      body: { code: "BATCH_HAS_CLASS_CHANGES" },
+    });
+    // Same start time keeps the original slot, so the Moved Class survives.
+    expect((await schedule("09:00", "10:30")).status).toBe(200);
+
+    expect(
+      (
+        await move(batchId, day(8), "17:00", {
+          date: day(11),
+          startTime: "18:00",
+          endTime: "19:00",
+        })
+      ).status,
+    ).toBe(200);
+    const inheritBatch = async () =>
+      json(
+        await setEnrollmentTimings(post({ timingSource: "batch" }), {
+          params: Promise.resolve({ id: homeEnrollmentId }),
+        }),
+      );
+    expect((await inheritBatch()).body.code).toBe("BATCH_HAS_CLASS_CHANGES");
+    expect((await restore(batchId, day(8), "17:00")).status).toBe(204);
+    expect((await inheritBatch()).status).toBe(200);
+  });
+
   it("lets assigned Teachers change Classes and keeps everyone else out", async () => {
     session("user_teacher", workspaceId, "org:teacher");
     expect((await cancel(batchId, day(7), "09:00")).status).toBe(200);
@@ -520,7 +578,7 @@ describe("Class changes HTTP", () => {
   });
 });
 
-describe.skipIf(!LATE_ENOUGH)("Class changes today", () => {
+describe("Class changes today", () => {
   let workspaceId: string;
   let batchId: string;
   let batchEnrollmentId: string;
@@ -530,7 +588,7 @@ describe.skipIf(!LATE_ENOUGH)("Class changes today", () => {
     verifiedEmail("owner@example.com");
     mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     ({ workspaceId, batchId, batchEnrollmentId } = await seedWorkspace([
-      { daysOfWeek: EVERY_DAY, startTime: "23:58", endTime: "23:59" },
+      { daysOfWeek: EVERY_DAY, startTime: "15:00", endTime: "16:00" },
     ]));
     // The home-tuition Student isn't part of these checks.
     await prisma.enrollment.updateMany({
@@ -563,13 +621,13 @@ describe.skipIf(!LATE_ENOUGH)("Class changes today", () => {
     expect(await todayBatches()).toMatchObject([
       {
         id: batchId,
-        todayClasses: [{ startTime: "23:58", rescheduled: false }],
+        todayClasses: [{ startTime: "15:00", rescheduled: false }],
       },
     ]);
     const opened = await open();
     expect(opened.status).toBe(201);
 
-    expect((await cancel(batchId, TODAY, "23:58")).status).toBe(200);
+    expect((await cancel(batchId, TODAY, "15:00")).status).toBe(200);
     expect(
       await prisma.attendanceRegister.count({
         where: { workspaceId, deletedAt: null },
@@ -578,14 +636,14 @@ describe.skipIf(!LATE_ENOUGH)("Class changes today", () => {
     expect((await open()).body.code).toBe("ATTENDANCE_CLASS_CANCELLED");
     expect(await todayBatches()).toEqual([]);
 
-    expect((await restore(batchId, TODAY, "23:58")).status).toBe(204);
+    expect((await restore(batchId, TODAY, "15:00")).status).toBe(204);
     const reopened = await open();
     expect(reopened.status).toBe(201);
     await saveMarks(
       post({ marks: [{ enrollmentId: batchEnrollmentId, status: "present" }] }),
       { params: Promise.resolve({ id: String(reopened.body["id"]) }) },
     );
-    expect((await cancel(batchId, TODAY, "23:58")).body.code).toBe(
+    expect((await cancel(batchId, TODAY, "15:00")).body.code).toBe(
       "CLASS_HAS_ATTENDANCE",
     );
     expect(
@@ -598,20 +656,20 @@ describe.skipIf(!LATE_ENOUGH)("Class changes today", () => {
   });
 
   it("shows a Class moved to today on the Owner Dashboard and in Attendance", async () => {
-    expect((await cancel(batchId, TODAY, "23:58")).status).toBe(200);
+    expect((await cancel(batchId, TODAY, "15:00")).status).toBe(200);
     expect(
       (
-        await move(batchId, day(3), "23:58", {
+        await move(batchId, day(3), "15:00", {
           date: TODAY,
-          startTime: "23:30",
-          endTime: "23:50",
+          startTime: "12:00",
+          endTime: "13:00",
         })
       ).status,
     ).toBe(200);
     expect(await todayBatches()).toMatchObject([
       {
         id: batchId,
-        todayClasses: [{ startTime: "23:30", rescheduled: true }],
+        todayClasses: [{ startTime: "12:00", rescheduled: true }],
       },
     ]);
     expect(await open()).toMatchObject({

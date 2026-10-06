@@ -40,10 +40,25 @@ export type ChangeableBatch = {
   timezone: string;
   closed: boolean;
   /** Batch Timings first, then each active Student-specific Timing. */
-  sources: ScheduleSource[];
+  sources: (ScheduleSource & { enrollmentId?: string })[];
 };
 
 export type ClassChangeStore = {
+  /**
+   * Runs `work` in one transaction holding this Batch's schedule lock (and a
+   * shared Workspace schedule lock), so checks and writes can't interleave
+   * with another change, a Holiday, or a Register save.
+   */
+  withBatchLock<T>(
+    workspaceId: string,
+    batchId: string,
+    work: (store: ClassChangeStore) => Promise<T>,
+  ): Promise<T>;
+  /** Like `withBatchLock`, but exclusive across the Workspace (Holidays). */
+  withWorkspaceLock<T>(
+    workspaceId: string,
+    work: (store: ClassChangeStore) => Promise<T>,
+  ): Promise<T>;
   findBatch(
     workspaceId: string,
     batchId: string,
@@ -57,7 +72,10 @@ export type ClassChangeStore = {
   activeChanges(workspaceId: string, batchId?: string): Promise<ClassChange[]>;
   activeHolidays(workspaceId: string): Promise<Holiday[]>;
   findHoliday(workspaceId: string, id: string): Promise<Holiday | null>;
-  /** True when a Register on one of these dates has a Mark other than Unmarked. */
+  /**
+   * True when a Register on one of these dates has a Mark other than Unmarked.
+   * Locks those Registers, so a concurrent Attendance save waits or is seen.
+   */
   hasSavedAttendance(
     workspaceId: string,
     batchId: string | null,
@@ -112,23 +130,44 @@ function hasScheduledClass(
   );
 }
 
-function earliestToday(now: Date, timezones: string[]): string {
-  const dates = (timezones.length ? timezones : ["Asia/Kolkata"]).map(
-    (timezone) => localNow(now, timezone).date,
-  );
-  return dates.reduce((min, date) => (date < min ? date : min));
+/**
+ * The latest local date across these timezones. A Holiday starting on or after
+ * it can't touch a day that is already over for any Batch.
+ */
+export function latestToday(now: Date, timezones: string[]): string {
+  const dates = timezones.map((timezone) => localNow(now, timezone).date);
+  // No open Batches means no Classes to protect; UTC is fine then.
+  return dates.length > 0
+    ? dates.reduce((max, date) => (date > max ? date : max))
+    : now.toISOString().slice(0, 10);
 }
 
 export class ClassChangeHandlers {
   constructor(
-    private readonly deps: { store: ClassChangeStore; now: () => Date },
+    private readonly deps: {
+      store: ClassChangeStore;
+      now: () => Date;
+      /** Set on the copy that runs inside a schedule lock. */
+      locked?: boolean;
+    },
   ) {}
+
+  /** The same handlers, running against a store bound to a locked transaction. */
+  private within(store: ClassChangeStore): ClassChangeHandlers {
+    return new ClassChangeHandlers({ ...this.deps, store, locked: true });
+  }
 
   async cancel(
     actor: ScheduleActor,
     key: ClassSlotKey,
     input: { reason?: string | null },
   ): Promise<ClassChangeFact> {
+    if (!this.deps.locked)
+      return this.deps.store.withBatchLock(
+        actor.workspaceId,
+        key.batchId,
+        (store) => this.within(store).cancel(actor, key, input),
+      );
     const ctx = await this.context(actor, key);
     const { found, batch, now, local } = ctx;
     if (found.rescheduled && found.change != null) {
@@ -177,6 +216,12 @@ export class ClassChangeHandlers {
     key: ClassSlotKey,
     input: { to: ClassSlotTime; reason?: string | null },
   ): Promise<ClassChangeFact> {
+    if (!this.deps.locked)
+      return this.deps.store.withBatchLock(
+        actor.workspaceId,
+        key.batchId,
+        (store) => this.within(store).move(actor, key, input),
+      );
     const ctx = await this.context(actor, key);
     const { found, batch, now, local, changes, holidays } = ctx;
     if (found.status === "moved" && !found.rescheduled)
@@ -227,6 +272,12 @@ export class ClassChangeHandlers {
   }
 
   async restore(actor: ScheduleActor, key: ClassSlotKey): Promise<void> {
+    if (!this.deps.locked)
+      return this.deps.store.withBatchLock(
+        actor.workspaceId,
+        key.batchId,
+        (store) => this.within(store).restore(actor, key),
+      );
     const ctx = await this.context(actor, key);
     const { found, batch, now, local } = ctx;
     if (found.change == null)
@@ -263,6 +314,10 @@ export class ClassChangeHandlers {
     input: { startDate: string; endDate: string; reason?: string | null },
   ): Promise<HolidayFact> {
     this.assertOwner(actor);
+    if (!this.deps.locked)
+      return this.deps.store.withWorkspaceLock(actor.workspaceId, (store) =>
+        this.within(store).declareHoliday(actor, input),
+      );
     const now = this.deps.now();
     const batches = await this.deps.store.openBatches(actor.workspaceId);
     const holiday = Holiday.declare({
@@ -271,7 +326,7 @@ export class ClassChangeHandlers {
       ...input,
       userId: actor.userId,
       now,
-      today: earliestToday(
+      today: latestToday(
         now,
         batches.map((batch) => batch.timezone),
       ),
@@ -308,6 +363,10 @@ export class ClassChangeHandlers {
 
   async removeHoliday(actor: ScheduleActor, id: string): Promise<void> {
     this.assertOwner(actor);
+    if (!this.deps.locked)
+      return this.deps.store.withWorkspaceLock(actor.workspaceId, (store) =>
+        this.within(store).removeHoliday(actor, id),
+      );
     const holiday = await this.deps.store.findHoliday(actor.workspaceId, id);
     if (holiday == null)
       throw new DomainError("HOLIDAY_NOT_FOUND", "Holiday not found.");
@@ -316,7 +375,7 @@ export class ClassChangeHandlers {
     holiday.remove({
       userId: actor.userId,
       now,
-      today: earliestToday(
+      today: latestToday(
         now,
         batches.map((batch) => batch.timezone),
       ),

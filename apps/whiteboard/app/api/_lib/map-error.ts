@@ -60,6 +60,7 @@ const CONFLICT_CODES = new Set([
   "HOLIDAY_CONFLICTS_WITH_HELD_CLASS",
   "HOLIDAY_STARTED",
   "ATTENDANCE_CLASS_CANCELLED",
+  "BATCH_HAS_CLASS_CHANGES",
 ]);
 
 function errorCode(error: unknown): string | undefined {

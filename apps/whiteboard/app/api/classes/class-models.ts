@@ -17,14 +17,11 @@ export const ClassDetailResponseModel = z.object({
   meetingOption: z.enum(["external", "whiteboard"]),
   joinUrl: z.string().nullable(),
   isHost: z.boolean(),
-  status: z.enum([
-    "scheduled",
-    "cancelled",
-    "starting",
-    "live",
-    "ended",
-    "failed",
-  ]),
+  status: z
+    .enum(["scheduled", "cancelled", "starting", "live", "ended", "failed"])
+    .describe(
+      "`cancelled` means the Class is not happening at this slot: cancelled, moved away, or on a Holiday. `classChange.status` says which.",
+    ),
   recordingStatus: z
     .enum(["pending", "requesting", "recording", "uploading", "ready", "error"])
     .nullable(),

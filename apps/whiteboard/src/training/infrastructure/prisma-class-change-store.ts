@@ -12,6 +12,9 @@ import { localNow } from "../domain/class-schedule";
 import { DomainError } from "../domain/errors";
 import { Holiday } from "../domain/holiday";
 import { WeeklyTimings } from "../domain/weekly-timings";
+import { lockBatchSchedule, lockWorkspaceSchedule } from "./schedule-locks";
+
+type Db = PrismaClient | Prisma.TransactionClient;
 
 const dateValue = (date: string) => new Date(`${date}T00:00:00.000Z`);
 const dateKey = (date: Date) => date.toISOString().slice(0, 10);
@@ -92,7 +95,7 @@ const batchSelect = {
       timingSource: "student" as const,
       student: { deletedAt: null, droppedAt: null },
     },
-    select: { studentTimings: true },
+    select: { id: true, studentTimings: true },
   },
 } satisfies Prisma.BatchSelect;
 
@@ -112,6 +115,7 @@ function toChangeableBatch(
       },
       ...row.enrollments.map((enrollment) => ({
         batchId: row.id,
+        enrollmentId: enrollment.id,
         timings: WeeklyTimings.create(enrollment.studentTimings).slots,
         firstDate,
       })),
@@ -150,7 +154,49 @@ export class PrismaClassExceptionsReader implements ClassExceptionsReader {
 }
 
 export class PrismaClassChangeStore implements ClassChangeStore {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Db) {}
+
+  /** Runs writes in the current transaction, or a new one outside a lock. */
+  private write<T>(
+    work: (tx: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
+    return "$transaction" in this.db
+      ? this.db.$transaction(work)
+      : work(this.db);
+  }
+
+  private transaction<T>(
+    lock: (tx: Prisma.TransactionClient) => Promise<void>,
+    work: (store: ClassChangeStore) => Promise<T>,
+  ): Promise<T> {
+    if (!("$transaction" in this.db))
+      throw new Error("Schedule locks can't be nested.");
+    return this.db.$transaction(async (tx) => {
+      await lock(tx);
+      return work(new PrismaClassChangeStore(tx));
+    });
+  }
+
+  withBatchLock<T>(
+    workspaceId: string,
+    batchId: string,
+    work: (store: ClassChangeStore) => Promise<T>,
+  ): Promise<T> {
+    return this.transaction(
+      (tx) => lockBatchSchedule(tx, workspaceId, batchId),
+      work,
+    );
+  }
+
+  withWorkspaceLock<T>(
+    workspaceId: string,
+    work: (store: ClassChangeStore) => Promise<T>,
+  ): Promise<T> {
+    return this.transaction(
+      (tx) => lockWorkspaceSchedule(tx, workspaceId),
+      work,
+    );
+  }
 
   async findBatch(
     workspaceId: string,
@@ -221,6 +267,14 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     batchId: string | null,
     dates: { from: string; to: string },
   ): Promise<boolean> {
+    // Same row lock an Attendance save takes, so the two can't interleave.
+    await this.db.$queryRaw`
+      SELECT id FROM attendance_registers
+      WHERE workspace_id = ${workspaceId}
+        AND deleted_at IS NULL
+        AND date BETWEEN ${dateValue(dates.from)}::date AND ${dateValue(dates.to)}::date
+        ${batchId ? Prisma.sql`AND batch_id = ${batchId}::uuid` : Prisma.empty}
+      FOR UPDATE`;
     const mark = await this.db.attendanceMark.findFirst({
       where: {
         workspaceId,
@@ -270,7 +324,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
       deletedByUserId: props.deletedByUserId,
     };
     try {
-      await this.db.$transaction(async (tx) => {
+      await this.write(async (tx) => {
         await tx.classChange.upsert({
           where: { id: props.id },
           create: {
@@ -304,7 +358,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     emptyRegisterDates?: { from: string; to: string },
   ): Promise<void> {
     const props = holiday.toProps();
-    await this.db.$transaction(async (tx) => {
+    await this.write(async (tx) => {
       await tx.holiday.upsert({
         where: { id: props.id },
         create: {

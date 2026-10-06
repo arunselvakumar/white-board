@@ -1,5 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
+import { MovedClassGuard } from "../application/moved-class-guard";
+import { PrismaClassChangeStore } from "./prisma-class-change-store";
 import { AdjustFeePlanHandler } from "../application/adjust-fee-plan.handler";
 import { EndEnrollmentHandler } from "../application/end-enrollment.handler";
 import { EnrollStudentHandler } from "../application/enroll-student.handler";
@@ -57,7 +59,15 @@ export function createEnrollmentHandlers(deps?: {
       payments,
       events,
     ),
-    setTimings: new SetEnrollmentTimingsHandler(enrollments, payments, events),
+    setTimings: new SetEnrollmentTimingsHandler(
+      enrollments,
+      payments,
+      events,
+      new MovedClassGuard({
+        store: new PrismaClassChangeStore(db),
+        now: () => new Date(),
+      }),
+    ),
     move: new MoveEnrollmentHandler(enrollments, batches, payments, events),
     end: new EndEnrollmentHandler(enrollments, payments, events),
     get: new GetEnrollmentHandler(enrollments, payments),

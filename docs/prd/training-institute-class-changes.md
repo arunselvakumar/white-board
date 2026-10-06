@@ -39,7 +39,8 @@ Decisions behind this spec: [ADR-0028](../adr/0028-class-changes-are-exceptions-
 - The new time of a Moved Class must be in the future. End time must be after start time. It can't land on a Holiday, on another Class of the same Batch with the same start time, or on its own original slot.
 - A Class on a Holiday can't be cancelled; it is already off. It can be moved.
 - Restoring a Moved Class also removes its new slot. That slot must not have started.
-- A Holiday is one or more dates (at most 92 days), starting today or later. If it includes today, it is refused when any Class today has started or has saved Attendance. Holidays can't overlap. A Holiday can be removed until its first day has passed.
+- Editing Batch Timings or Student-specific Timings is refused while it would remove the original slot of an upcoming Moved Class. Restore that Class first.
+- A Holiday is one or more dates (at most 92 days), starting today or later in every Batch's timezone. If it includes today, it is refused when any Class today has started or has saved Attendance. Holidays can't overlap. A Holiday can be removed until its first day has passed.
 - Students on Student-specific Timings are affected only when their own Class (same Batch, date, and start time) changes.
 - Everything is scoped to the Active Workspace. Other Workspaces' Batches return 404.
 

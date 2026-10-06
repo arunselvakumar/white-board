@@ -5,6 +5,7 @@ import type {
   ClassOccurrenceRecord,
   ClassOccurrenceStore,
 } from "../application/class-service";
+import { lockBatchSchedule } from "./schedule-locks";
 
 type Row = NonNullable<
   Awaited<ReturnType<PrismaClient["classOccurrence"]["findFirst"]>>
@@ -48,18 +49,23 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
 
   async claim(
     input: ClassKey & { endTime: string; startedByUserId: string },
+    verify: () => Promise<void>,
   ): Promise<{ occurrence: ClassOccurrenceRecord; claimed: boolean }> {
     try {
-      const row = await this.db.classOccurrence.create({
-        data: {
-          id: crypto.randomUUID(),
-          workspaceId: input.workspaceId,
-          batchId: input.batchId,
-          classDate: dateValue(input.date),
-          startTime: input.startTime,
-          endTime: input.endTime,
-          startedByUserId: input.startedByUserId,
-        },
+      const row = await this.db.$transaction(async (tx) => {
+        await lockBatchSchedule(tx, input.workspaceId, input.batchId);
+        await verify();
+        return tx.classOccurrence.create({
+          data: {
+            id: crypto.randomUUID(),
+            workspaceId: input.workspaceId,
+            batchId: input.batchId,
+            classDate: dateValue(input.date),
+            startTime: input.startTime,
+            endTime: input.endTime,
+            startedByUserId: input.startedByUserId,
+          },
+        });
       });
       return { occurrence: toRecord(row), claimed: true };
     } catch (error) {

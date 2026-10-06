@@ -137,10 +137,13 @@ function CancelForm({
 
 function MoveForm({
   initial,
+  minDate,
   onSubmit,
   onBack,
 }: {
   initial: ClassSlotTime;
+  /** Today in the Batch's timezone; earlier dates are in the past. */
+  minDate: string;
   onSubmit: (input: ClassSlotTime & { reason: string | null }) => Promise<void>;
   onBack: () => void;
 }) {
@@ -176,6 +179,7 @@ function MoveForm({
           <Input
             id="move-date"
             type="date"
+            min={minDate}
             aria-invalid={errors.date != null}
             {...register("date")}
           />
@@ -340,6 +344,7 @@ export function ClassChangeDialog({
           />
         ) : mode === "move" ? (
           <MoveForm
+            minDate={local.date}
             initial={{
               date: event.date,
               startTime: scheduled.startTime,

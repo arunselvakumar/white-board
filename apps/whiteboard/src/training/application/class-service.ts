@@ -39,8 +39,13 @@ export type ClassOccurrenceRecord = ClassKey & {
 
 export type ClassOccurrenceStore = {
   find(key: ClassKey): Promise<ClassOccurrenceRecord | null>;
+  /**
+   * Creates the occurrence under the Batch's schedule lock after `verify`
+   * passes, so a Class can't be started while it is being cancelled.
+   */
   claim(
     input: ClassKey & { endTime: string; startedByUserId: string },
+    verify: () => Promise<void>,
   ): Promise<{ occurrence: ClassOccurrenceRecord; claimed: boolean }>;
   setMeeting(id: string, meetingId: string): Promise<void>;
   findByMeetingId(meetingId: string): Promise<ClassOccurrenceRecord | null>;
@@ -276,11 +281,14 @@ export class ClassService {
       );
     }
     this.deps.meetings.ensureConfigured();
-    const claim = await this.deps.occurrences.claim({
-      ...input,
-      endTime,
-      startedByUserId: input.userId,
-    });
+    const claim = await this.deps.occurrences.claim(
+      { ...input, endTime, startedByUserId: input.userId },
+      async () => {
+        const current = await this.context(input);
+        if (current.scheduled.status !== "scheduled")
+          throw notHappening(current.scheduled);
+      },
+    );
     const occurrence = claim.occurrence;
     if (occurrence.status === "ended" || occurrence.status === "failed")
       throw new DomainError("CLASS_ENDED", "This class has ended.");

@@ -8,6 +8,7 @@ import { WeeklyTimings } from "../domain/weekly-timings";
 import { WorkspaceId } from "../domain/workspace-id";
 import { toBatchReadModel, type BatchReadModel } from "./batch-read-model";
 import type { EventDispatcher } from "./event-dispatcher";
+import type { MovedClassGuard } from "./moved-class-guard";
 import { BatchNotFoundError } from "./not-found-error";
 import type { UpdateBatchScheduleCommand } from "./update-batch-schedule.command";
 
@@ -15,9 +16,11 @@ export class UpdateBatchScheduleHandler {
   constructor(
     private readonly batches: BatchRepository,
     private readonly events: EventDispatcher,
+    private readonly movedClasses: MovedClassGuard,
   ) {}
 
   async execute(command: UpdateBatchScheduleCommand): Promise<BatchReadModel> {
+    const timings = WeeklyTimings.create(command.timings);
     const batch = await this.batches.findByIdInWorkspace(
       BatchId.create(command.id),
       WorkspaceId.create(command.workspaceId),
@@ -32,8 +35,13 @@ export class UpdateBatchScheduleHandler {
       room: batchRoom(command.room),
       joinUrl: batchJoinUrl(command.joinUrl),
       meetingOption: command.meetingOption,
-      timings: WeeklyTimings.create(command.timings),
+      timings,
       now: new Date(),
+    });
+    await this.movedClasses.assertTimingsKeepMovedClasses({
+      workspaceId: command.workspaceId,
+      batchId: command.id,
+      batchTimings: timings.slots,
     });
     await this.batches.save(batch);
     await this.events.dispatch(batch.pullDomainEvents());
