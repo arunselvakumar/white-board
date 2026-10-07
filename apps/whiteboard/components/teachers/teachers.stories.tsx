@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { addDays, dateKeyInZone } from "@/lib/calendar-dates";
+import { enquiryQueries, type DemoResponse } from "@/src/queries/enquiries";
+import { getQueryClient } from "@/src/queries/query-client";
+import { clerkMocks } from "../../.storybook/mocks/clerk";
+
+import { MyBatchesScreen } from "./my-batches-screen";
 import { TeacherForm } from "./teacher-form";
 import { TeachersEmptyState } from "./teachers-empty-state";
 import { TeacherDocumentsSection } from "./teacher-documents-section";
@@ -228,5 +234,141 @@ export const Documents: Story = {
       "href",
       "/app/api/training-institute/teachers/550e8400-e29b-41d4-a716-446655440000/documents/550e8400-e29b-41d4-a716-446655440001",
     );
+  },
+};
+
+/** Answers My Batches' reads: activation, assigned Batches, and demos. */
+function mockMyBatchesApi(demos: DemoResponse[]) {
+  const original = globalThis.fetch;
+  const replies: Record<string, unknown> = {
+    "POST /teacher/activate": { teacherId: "t1" },
+    "GET /teacher/batches": {
+      items: [
+        {
+          id: "660e8400-e29b-41d4-a716-446655440002",
+          name: "DCA Evening",
+          courseId: "770e8400-e29b-41d4-a716-446655440000",
+          classMode: "offline",
+          timings: [
+            { daysOfWeek: [1, 3, 5], startTime: "17:00", endTime: "18:00" },
+          ],
+          timezone: "Asia/Kolkata",
+          room: "Lab 2",
+          assignedAt: "2026-09-01T00:00:00.000Z",
+        },
+      ],
+    },
+    "GET /demos": { items: demos },
+  };
+  globalThis.fetch = (input, init) => {
+    const href =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+    const { pathname } = new URL(href, window.location.origin);
+    const route = `${(init?.method ?? "GET").toUpperCase()} ${pathname.replace(/^\/app\/api\/training-institute/, "")}`;
+    if (!(route in replies)) return original(input, init);
+    return Promise.resolve(
+      new Response(JSON.stringify(replies[route]), {
+        headers: { "content-type": "application/json" },
+      }),
+    );
+  };
+  return () => {
+    globalThis.fetch = original;
+  };
+}
+
+function demoOn(
+  date: string,
+  patch: Partial<DemoResponse> & Pick<DemoResponse, "id" | "prospectName">,
+): DemoResponse {
+  return {
+    enquiryId: `enquiry-${patch.id}`,
+    enquiryInterest: "DCA",
+    kind: "batch",
+    batchId: "660e8400-e29b-41d4-a716-446655440002",
+    batchName: "DCA Evening",
+    courseName: "DCA",
+    teacherId: null,
+    teacherName: null,
+    date,
+    startTime: "17:00",
+    endTime: "18:00",
+    timezone: "Asia/Kolkata",
+    feeKind: "free",
+    feeAmountPaise: null,
+    feePaidAt: null,
+    attendance: "unmarked",
+    attendanceMarkedAt: null,
+    cancelledAt: null,
+    createdByUserId: "user_owner",
+    createdAt: "2026-10-01T09:00:00.000Z",
+    ...patch,
+  };
+}
+
+export const MyBatchesWithDemos: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/teacher" } } },
+  beforeEach: () => {
+    clerkMocks.orgId = "org_riverside";
+    clerkMocks.orgRole = "org:teacher";
+    getQueryClient().removeQueries({ queryKey: enquiryQueries.key.all });
+    const today = dateKeyInZone(new Date(), "Asia/Kolkata");
+    return mockMyBatchesApi([
+      demoOn(today, { id: "d1", prospectName: "Riya Patel" }),
+      demoOn(addDays(today, 1), {
+        id: "d2",
+        prospectName: "Arjun Nair",
+        kind: "one_to_one",
+        enquiryInterest: "Class 10 Maths",
+        batchId: null,
+        batchName: null,
+        courseName: null,
+        startTime: "10:30",
+        endTime: "11:15",
+      }),
+    ]);
+  },
+  render: () => <MyBatchesScreen />,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("heading", { name: "My Batches" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { name: "DCA Evening" }),
+    ).toBeVisible();
+    await expect(
+      await canvas.findByRole("heading", { name: "Upcoming demos" }),
+    ).toBeVisible();
+    const today = within(await canvas.findByRole("list", { name: "Today" }));
+    await expect(
+      today.getByRole("link", { name: /Riya Patel demo/ }),
+    ).toHaveAttribute("href", "/enquiries/enquiry-d1");
+    const tomorrow = within(canvas.getByRole("list", { name: "Tomorrow" }));
+    await expect(
+      tomorrow.getByText("One-to-one · Class 10 Maths"),
+    ).toBeVisible();
+  },
+};
+
+export const MyBatchesNoDemos: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/teacher" } } },
+  beforeEach: () => {
+    clerkMocks.orgId = "org_riverside";
+    clerkMocks.orgRole = "org:teacher";
+    getQueryClient().removeQueries({ queryKey: enquiryQueries.key.all });
+    return mockMyBatchesApi([]);
+  },
+  render: () => <MyBatchesScreen />,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("No demos in the next 7 days."),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Take Attendance" }),
+    ).toBeVisible();
   },
 };

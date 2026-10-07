@@ -79,7 +79,7 @@ One Institution Type's product inside Whiteboard, with its own words and rules. 
 _Avoid_: module, product line, tenant type (in code comments)
 
 **Student**:
-A learner at the Training Institute. A Workspace-scoped record, distinct from a Clerk User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `org:student`. Enquiry pipeline is separate.
+A learner at the Training Institute. A Workspace-scoped record, distinct from a Clerk User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `org:student`. Enquiries are separate until converted.
 _Avoid_: pupil, scholar, user, account, child (as the entity name)
 
 **Guardian**:
@@ -151,6 +151,18 @@ _Avoid_: student dashboard, student portal
 **Parent Home**:
 The In-app Home for a Parent User: the Student Home's cards for each Student they are linked to, on one page. A Parent is linked to a Student through a verified email address that matches the Student's father, mother, or Guardian email.
 _Avoid_: parent dashboard, family portal
+
+**Enquiry**:
+A prospect asking about a Course or subject before admission, recorded by the Owner or a Teacher with a Source, preferred Class Mode and timing, and follow-up history. An Enquiry is not a Student and has no login. Its stage is New, Follow-up due, Demo scheduled, Demo attended, Joined, or Not interested. The Owner converts it into a Student and Enrollment in one step. See ADR-0032.
+_Avoid_: lead, prospect record, inquiry
+
+**Demo**:
+A free or paid trial class booked for an Enquiry: one date's Class of a Batch (Batch demo) or a one-to-one demo with a chosen Teacher at a chosen date and time. A demo doesn't take a Batch seat, and its fee is separate from course fees.
+_Avoid_: trial, demo session, sample class
+
+**Enquiry Source**:
+Where an Enquiry came from, such as Phone call, Walk-in, or Referral. Each Workspace keeps its own list; a retired Source stays on past Enquiries.
+_Avoid_: channel, lead source, campaign
 
 **P0**:
 The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.

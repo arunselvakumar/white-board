@@ -77,4 +77,25 @@ describe("app route gate", () => {
     );
     expect(response?.headers.get("location")).toBe("http://localhost:3000/app");
   });
+
+  it.each([
+    ["org:teacher", "/app/enquiries", undefined],
+    ["org:teacher", "/app/enquiries/new", undefined],
+    ["org:teacher", "/app/enquiries/abc", undefined],
+    ["org:teacher", "/app/enquiries/abc/edit", undefined],
+    ["org:teacher", "/app/enquiries/sources", "http://localhost:3000/app"],
+    ["org:teacher", "/app/enquiries/summary", "http://localhost:3000/app"],
+    ["org:teacher", "/app/enquiries/abc/convert", "http://localhost:3000/app"],
+    ["org:admin", "/app/enquiries/sources", undefined],
+    ["org:admin", "/app/enquiries/summary", undefined],
+    ["org:admin", "/app/enquiries/abc/convert", undefined],
+    ["org:student", "/app/enquiries", "http://localhost:3000/app"],
+    ["org:parent", "/app/enquiries/abc", "http://localhost:3000/app"],
+  ])("gates %s on %s", async (orgRole, path, location) => {
+    const response = await handler(
+      () => Promise.resolve({ userId: "user_1", orgId: "org_1", orgRole }),
+      request(path),
+    );
+    expect(response?.headers.get("location")).toBe(location);
+  });
 });

@@ -13,6 +13,10 @@ export function getAppBreadcrumbs(
     return [{ label: "Calendar", href: "/calendar" }];
   if (pathname === "/online-classes")
     return [{ label: "Online Classes", href: "/online-classes" }];
+  if (pathname === "/enquiries" || pathname.startsWith("/enquiries/")) {
+    const trail = enquiryBreadcrumbs(pathname);
+    return role === "org:teacher" ? trail : [dashboard, ...trail];
+  }
   if (role === "org:student") return [{ label: "Home", href: "/student" }];
   if (role === "org:parent") return [{ label: "Home", href: "/parent" }];
   if (role === "org:teacher")
@@ -80,4 +84,19 @@ export function getAppBreadcrumbs(
     return [dashboard, parent, { label: `Edit ${section.singular}` }];
   }
   return [dashboard, parent, { label: section.singular }];
+}
+
+function enquiryBreadcrumbs(pathname: string): AppBreadcrumb[] {
+  const [, id, action] = pathname.split("/").filter(Boolean);
+  if (id === undefined) return [{ label: "Enquiries" }];
+  const enquiries = { label: "Enquiries", href: "/enquiries" };
+  if (id === "new") return [enquiries, { label: "Add enquiry" }];
+  if (id === "sources") return [enquiries, { label: "Enquiry Sources" }];
+  if (id === "summary") return [enquiries, { label: "Enquiry summary" }];
+  if (action === undefined) return [enquiries, { label: "Enquiry" }];
+  const enquiry = { label: "Enquiry", href: `/enquiries/${id}` };
+  if (action === "edit") return [enquiries, enquiry, { label: "Edit enquiry" }];
+  if (action === "convert")
+    return [enquiries, enquiry, { label: "Convert to Student" }];
+  return [enquiries, { label: "Enquiry" }];
 }

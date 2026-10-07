@@ -14,6 +14,12 @@ describe("role navigation", () => {
       "Calendar",
       "Online Classes",
     ]);
+    expect(navForRole("org:teacher").map((item) => item.label)).toEqual([
+      "My Batches",
+      "Enquiries",
+      "Calendar",
+      "Online Classes",
+    ]);
     expect(navForRole("org:member")).toEqual([]);
     expect(navForRole("org:admin")).toEqual(APP_NAV);
   });
@@ -45,6 +51,7 @@ describe("appPageByHref", () => {
       "/calendar",
       "/online-classes",
       "/students",
+      "/enquiries",
       "/courses",
       "/batches",
       "/teachers",

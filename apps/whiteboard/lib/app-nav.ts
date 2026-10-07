@@ -25,6 +25,12 @@ export const APP_NAV = [
     description: "Students in this Workspace will show here.",
   },
   {
+    href: "/enquiries",
+    label: "Enquiries",
+    title: "Enquiries",
+    description: "Enquiries, follow-ups, and demos before admission.",
+  },
+  {
     href: "/courses",
     label: "Courses",
     title: "Courses",
@@ -105,6 +111,12 @@ export const TEACHER_NAV = [
     label: "My Batches",
     title: "My Batches",
     description: "Assigned Batches.",
+  },
+  {
+    href: "/enquiries",
+    label: "Enquiries",
+    title: "Enquiries",
+    description: "Enquiries, follow-ups, and demos before admission.",
   },
   {
     href: "/calendar",

@@ -11,6 +11,13 @@ export function destinationForRole(role: WorkspaceRole): string {
   return "/";
 }
 
+/** Enquiry Sources, the Enquiry summary, and Convert to Student: Owner only (ADR-0032). */
+const OWNER_ENQUIRY_PATH = /^\/enquiries\/(?:sources|summary|[^/]+\/convert)$/;
+
+/** The Enquiries list, Add enquiry, an Enquiry, and Edit enquiry: Owner and Teachers. */
+const STAFF_ENQUIRY_PATH =
+  /^\/enquiries(?:\/new|\/(?!(?:new|sources|summary)(?:\/|$))[^/]+(?:\/edit)?)?$/;
+
 export function isAllowedAppPath(
   pathname: string,
   role: WorkspaceRole,
@@ -42,5 +49,9 @@ export function isAllowedAppPath(
   if (pathname === "/teacher") return role === "org:teacher";
   if (/^\/teacher\/batches\/[^/]+\/attendance$/.test(pathname))
     return role === "org:teacher";
+  // Checked before the Staff routes so "sources" and "summary" never read as an Enquiry id.
+  if (OWNER_ENQUIRY_PATH.test(pathname)) return isOwnerRole(role);
+  if (STAFF_ENQUIRY_PATH.test(pathname))
+    return isOwnerRole(role) || role === "org:teacher";
   return isOwnerRole(role);
 }
