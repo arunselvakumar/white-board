@@ -1,0 +1,27 @@
+apps/whiteboard/app/api/training-institute/attachments/route.ts
+  s_2818932b6efba1::t_a006986cc894fa 23-47,63-64
+apps/whiteboard/app/api/training-institute/homework/homework.http.test.ts
+  s_2818932b6efba1::t_a7d0ef7d781e89 880-898
+apps/whiteboard/components/class-work/staff/homework-form-dialog.tsx
+  s_2818932b6efba1::t_e9b94a9d50d48e 137
+apps/whiteboard/components/class-work/staff/study-material-form-dialog.tsx
+  s_2818932b6efba1::t_7764b8f48ef985 117
+docs/adr/0033-study-material-and-homework-product-decisions.md
+  s_2818932b6efba1::t_6b5e88b8145d45 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d53e8fb824610b482fde0c2eb549d3f8d5c2b6c1",
+  "prompts": {},
+  "sessions": {
+    "s_2818932b6efba1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6749436-eeb5-41c3-b373-7109590b8a47",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
