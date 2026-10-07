@@ -21,7 +21,7 @@ export async function GET(
     const { id } = parseOrThrow(
       TrainingInstituteTeacherParamsModel.safeParse(await context.params),
     );
-    const documents = await handlers.listDocuments(id, session.orgId);
+    const documents = await handlers.listDocuments(id, session.workspaceId);
     return Response.json({ items: documents.map(mapTeacherDocumentMetadata) });
   } catch (error) {
     return mapError(error);
@@ -46,7 +46,7 @@ export async function POST(
     const document = await handlers.addDocument({
       ...body,
       teacherId: id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       userId: session.userId,
     });
     return Response.json(mapTeacherDocumentMetadata(document), {

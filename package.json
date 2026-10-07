@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,css}\"",
     "check-types": "turbo run check-types",
     "check-versions": "check-dependency-version-consistency --dep-type=dependencies,devDependencies,optionalDependencies,peerDependencies,resolutions .",
-    "ci": "bun run check-versions && bun run format:check && bun run lint && bun run check-types && bun run test && bun run build && bun run test-storybook",
+    "ci": "bun run check-versions && bun run format:check && bun run lint && bun run check-types && bun run test && bun run test:http && bun run build && bun run test-storybook",
     "storybook": "turbo run storybook --filter=whiteboard",
     "build-storybook": "turbo run build-storybook --filter=whiteboard",
     "test-storybook": "turbo run test-storybook --filter=whiteboard"

@@ -19,13 +19,28 @@ jobs:
     name: CI
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: whiteboard
+          POSTGRES_PASSWORD: whiteboard
+          POSTGRES_DB: whiteboard
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U whiteboard -d whiteboard"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 20
     env:
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZHVtbXkuY2xlcmsuYWNjb3VudHMuZGV2JA
-      CLERK_SECRET_KEY: sk_test_ci_dummy_not_a_real_secret
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /login
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /signup
-      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: /
-      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: /
+      # CI-only values; nothing here is a real secret.
+      BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere
+      BETTER_AUTH_URL: http://localhost:3000
+      EMAIL_TRANSPORT: log
+      DATABASE_URL: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard
+      DATABASE_URL_TEST: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard_test
+      DATABASE_URL_ADMIN: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard
     steps:
       - uses: actions/checkout@v4
 
@@ -40,6 +55,9 @@ jobs:
       - run: bun run format:check
       - run: bun run lint
       - run: bun run check-types
+      - run: bun run test
+      # Creates whiteboard_test and applies migrations itself (vitest global setup).
+      - run: bun run test:http
       - run: bun run build
 
       - uses: actions/cache@v4

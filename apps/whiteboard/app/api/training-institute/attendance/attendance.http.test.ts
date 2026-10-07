@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -9,8 +10,11 @@ import { GET as getRegister } from "./registers/[id]/route";
 import { POST as saveMarks } from "./registers/[id]/marks/route";
 import { GET as getStudentAttendance } from "../students/[id]/attendance/route";
 
-vi.mock("@clerk/nextjs/server", () => ({ auth: vi.fn() }));
-const mockedAuth = vi.mocked(auth);
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
+}));
+const mockedAuth = vi.mocked(getAuth);
 const TODAY = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Kolkata",
   year: "numeric",
@@ -41,9 +45,11 @@ type RegisterJson = {
 function session(
   userId: string | null,
   orgId: string | null,
-  orgRole = "org:admin",
+  orgRole: WorkspaceRole = "owner",
 ) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
+  mockedAuth.mockResolvedValue(
+    authStateFor({ userId, workspaceId: orgId, role: orgRole }),
+  );
 }
 
 function request(
@@ -124,7 +130,7 @@ describe("Student Attendance HTTP APIs", () => {
         name: "Meera",
         email: `${teacherId}@example.com`,
         kind: "centre_teacher",
-        clerkUserId: "user_teacher",
+        userId: "user_teacher",
         invitationStatus: "accepted",
       },
     });
@@ -287,7 +293,7 @@ describe("Student Attendance HTTP APIs", () => {
   });
 
   it("limits Teacher access to assigned Batches and lets the Owner see Student history", async () => {
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect((await openRegister(request({ batchId }))).status).toBe(404);
     await prisma.trainingInstituteBatchTeacherAssignment.create({
       data: {
@@ -335,11 +341,11 @@ describe("Student Attendance HTTP APIs", () => {
         ],
       },
     });
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     const earlier = await openRegister(request({ batchId, date: YESTERDAY }));
     expect(earlier.status).toBe(201);
     expect(((await earlier.json()) as RegisterJson).date).toBe(YESTERDAY);
-    session("user_parent", workspaceId, "org:parent");
+    session("user_parent", workspaceId, "parent");
     expect(
       (
         await getStudentAttendance(
@@ -398,7 +404,7 @@ describe("Student Attendance HTTP APIs", () => {
       await openRegister(request({ batchId }))
     ).json()) as RegisterJson;
     const context = { params: Promise.resolve({ id: register.id }) };
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect(
       (
         await getRegister(

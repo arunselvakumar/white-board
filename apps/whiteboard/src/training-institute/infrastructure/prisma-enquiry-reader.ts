@@ -279,7 +279,7 @@ export class PrismaEnquiryReader implements EnquiryReader {
     const teacher = await this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
-        clerkUserId: userId,
+        userId,
         deletedAt: null,
         deactivatedAt: null,
       },

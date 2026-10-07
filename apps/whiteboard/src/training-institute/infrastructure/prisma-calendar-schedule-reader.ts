@@ -19,7 +19,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
     includeClosed?: boolean;
   }): Promise<CalendarItem[]> {
     const workspaceId = input.workspaceId;
-    if (input.role === "org:admin") {
+    if (input.role === "owner") {
       const batches = await this.db.trainingInstituteBatch.findMany({
         where: {
           workspaceId,
@@ -54,7 +54,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
       ];
     }
 
-    if (input.role === "org:teacher") {
+    if (input.role === "teacher") {
       const assignments =
         await this.db.trainingInstituteBatchTeacherAssignment.findMany({
           where: {
@@ -63,7 +63,7 @@ export class PrismaCalendarScheduleReader implements CalendarScheduleReader {
             unassignedAt: null,
             teacher: {
               workspaceId,
-              clerkUserId: input.userId,
+              userId: input.userId,
               deletedAt: null,
               deactivatedAt: null,
             },

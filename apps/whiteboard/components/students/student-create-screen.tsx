@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import {
   useMutation,
   useQueryClient,
@@ -35,10 +35,10 @@ type PendingAdmission = {
 };
 
 function storageKey(
-  orgId: string | null | undefined,
+  workspaceId: string | null | undefined,
   userId: string | null | undefined,
 ) {
-  return `student-admission:${orgId}:${userId}`;
+  return `student-admission:${workspaceId}:${userId}`;
 }
 
 export function StudentEnrollmentRecovery({
@@ -105,13 +105,13 @@ export function StudentEnrollmentRecovery({
 export function StudentCreateScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { orgId, userId } = useAuth();
+  const { workspaceId, userId } = useAuth();
   const { data: enrollmentBatches } = useSuspenseQuery(
-    studentAdmissionQueries.batchOptions(orgId),
+    studentAdmissionQueries.batchOptions(workspaceId),
   );
   const [pending, setPending] = useState<PendingAdmission | null>(null);
   const [restored, setRestored] = useState(false);
-  const key = storageKey(orgId, userId);
+  const key = storageKey(workspaceId, userId);
   useEffect(() => {
     let active = true;
     queueMicrotask(() => {

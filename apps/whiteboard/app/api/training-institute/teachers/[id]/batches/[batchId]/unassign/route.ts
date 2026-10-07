@@ -23,7 +23,7 @@ export async function POST(
         await handlers.unassign({
           teacherId: id,
           batchId,
-          workspaceId: session.orgId,
+          workspaceId: session.workspaceId,
           userId: session.userId,
         }),
       ),

@@ -8,7 +8,7 @@ import { BatchCatalog } from "@/components/batches/batch-catalog";
 import { BatchForm } from "@/components/batches/batch-form";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 import type { BatchResponse, BatchWriteInput } from "@/src/queries/batches";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 const COURSE_ID = "550e8400-e29b-41d4-a716-446655440000";
@@ -188,12 +188,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/batches" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 

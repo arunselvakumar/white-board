@@ -28,7 +28,7 @@ export async function POST(
     );
     const course = await handlers.archive.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       archivedByUserId: session.userId,
     });
     return Response.json(mapCourseResponse(course));

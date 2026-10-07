@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
@@ -41,14 +41,12 @@ export function AttendanceEmptyState() {
 }
 
 export function AttendanceBatchesScreen() {
-  const { orgId } = useAuth();
+  const { workspaceId } = useAuth();
   const [pageCursor, setPageCursor] = useState<Scoped<Cursor> | null>(null);
   const cursor =
-    pageCursor != null && pageCursor.scope === orgId
-      ? pageCursor.value
-      : undefined;
+    pageCursor?.scope === workspaceId ? pageCursor.value : undefined;
   const batches = useQuery(
-    batchQueries.list({ limit: 20, workspaceId: orgId, ...cursor }),
+    batchQueries.list({ limit: 20, workspaceId, ...cursor }),
   );
 
   return (
@@ -92,7 +90,7 @@ export function AttendanceBatchesScreen() {
                 disabled={!batches.data.prevCursor}
                 onClick={() => {
                   setPageCursor({
-                    scope: orgId ?? "",
+                    scope: workspaceId ?? "",
                     value: { before: batches.data.prevCursor ?? undefined },
                   });
                 }}
@@ -105,7 +103,7 @@ export function AttendanceBatchesScreen() {
                 disabled={!batches.data.nextCursor}
                 onClick={() => {
                   setPageCursor({
-                    scope: orgId ?? "",
+                    scope: workspaceId ?? "",
                     value: { after: batches.data.nextCursor ?? undefined },
                   });
                 }}
@@ -127,8 +125,8 @@ export function BatchAttendanceScreen({
   batchId: string;
   teacher?: boolean;
 }) {
-  const { orgId, userId } = useAuth();
-  const scope = `${orgId ?? ""}:${userId ?? ""}:${batchId}`;
+  const { workspaceId, userId } = useAuth();
+  const scope = `${workspaceId ?? ""}:${userId ?? ""}:${batchId}`;
   const client = useQueryClient();
   const [selected, setSelected] = useState<Scoped<AttendanceRegister> | null>(
     null,
@@ -138,7 +136,7 @@ export function BatchAttendanceScreen({
   const [opening, setOpening] = useState(false);
   const cursor = pageCursor?.scope === scope ? pageCursor.value : undefined;
   const registers = useQuery(
-    attendanceQueries.batch(orgId, userId, batchId, cursor),
+    attendanceQueries.batch(workspaceId, userId, batchId, cursor),
   );
   const chosen = selected?.scope === scope ? selected.value : null;
   const today =

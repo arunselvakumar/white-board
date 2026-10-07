@@ -32,7 +32,7 @@ export async function POST(
     const enrollment = await handlers.overrideMode.execute({
       id: params.id,
       classModeOverride: model.classModeOverride,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));
   } catch (error) {

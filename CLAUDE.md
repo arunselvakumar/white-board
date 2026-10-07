@@ -45,7 +45,7 @@ Do not start P1 (attendance, enquiry CRM, certificates, WhatsApp, live classroom
 - HTTP in `apps/whiteboard/app/api/training-institute/...` with Zod Request/Response models beside the route. Model names carry the context (`CreateTrainingInstituteStudentRequestModel`) because they become global OpenAPI components.
 - Prisma in `packages/db` only. Each context has its own schema file (`prisma/schema/training-institute.prisma`), its own Postgres schema (`training_institute`), and `TrainingInstitute`-prefixed models and enums. Raw SQL names the schema (`training_institute.batches`).
 - The first real bounded context is `training-institute`. A new context gets its own Postgres schema, model prefix, API prefix, and `src/` folder (ADR-0030). Do not add a sample Todo context.
-- Students are not Clerk Users. Fees belong to the Enrollment, not the Student.
+- Students are not Users. Auth is `@repo/auth` (Better Auth, ADR-0034): `getAuth()` on the server, `useAuth()` in the browser. Fees belong to the Enrollment, not the Student.
 
 ## Commands
 

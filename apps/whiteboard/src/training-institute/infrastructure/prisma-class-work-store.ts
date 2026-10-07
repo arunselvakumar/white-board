@@ -145,7 +145,7 @@ export class PrismaClassWorkStore implements ClassWorkStore {
     return this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
-        clerkUserId: userId,
+        userId,
         deletedAt: null,
         deactivatedAt: null,
       },

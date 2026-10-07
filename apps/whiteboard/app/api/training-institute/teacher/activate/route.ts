@@ -1,5 +1,4 @@
-import { clerkClient } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { workspaces } from "@repo/auth/server";
 
 import { jsonError } from "@/app/api/_lib/json-error";
 import { mapError } from "@/app/api/_lib/map-error";
@@ -9,43 +8,26 @@ import { createTeacherHandlers } from "@/src/training-institute/infrastructure/c
 
 const handlers = createTeacherHandlers();
 
+/** Links the signed-in Teacher User to the Teacher they were invited as. */
 export async function POST(): Promise<Response> {
   try {
     const session = await requireTeacherSession();
     if (isResponse(session)) return session;
-    const clerk = await clerkClient();
-    let offset = 0;
-    let pageSize = 100;
-    let membershipTeacherId: unknown;
-    while (pageSize === 100) {
-      const memberships = await clerk.users.getOrganizationMembershipList({
+    const teacher = await handlers.activate({
+      workspaceId: session.workspaceId,
+      userId: session.userId,
+      acceptedInvitationIds: await workspaces.acceptedInvitationIds({
+        workspaceId: session.workspaceId,
         userId: session.userId,
-        limit: 100,
-        offset,
-      });
-      const membership = memberships.data.find(
-        (item) =>
-          item.organization.id === session.orgId && item.role === "org:teacher",
-      );
-      if (membership != null) {
-        membershipTeacherId = membership.publicMetadata["teacherId"];
-        break;
-      }
-      pageSize = memberships.data.length;
-      offset += pageSize;
-    }
-    const teacherId = z.uuid().safeParse(membershipTeacherId);
-    if (!teacherId.success)
+        role: "teacher",
+      }),
+    });
+    if (teacher == null)
       return jsonError(
         403,
         "TEACHER_LINK_REQUIRED",
         "This Teacher invitation is not linked to a Teacher profile.",
       );
-    const teacher = await handlers.activate({
-      id: teacherId.data,
-      workspaceId: session.orgId,
-      clerkUserId: session.userId,
-    });
     return Response.json({ teacherId: teacher.id });
   } catch (error) {
     return mapError(error);

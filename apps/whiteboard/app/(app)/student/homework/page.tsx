@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -7,7 +7,7 @@ import { FamilyHomeworkScreen } from "@/components/class-work/family/family-home
 export const metadata: Metadata = { title: "Homework" };
 
 export default async function StudentHomeworkPage() {
-  const { orgRole } = await auth();
-  if (orgRole !== "org:student") redirect("/");
-  return <FamilyHomeworkScreen role="org:student" />;
+  const { role } = await getAuth();
+  if (role !== "student") redirect("/");
+  return <FamilyHomeworkScreen role="student" />;
 }

@@ -1,5 +1,7 @@
 # Clerk ids are opaque foreign keys; we do not copy User or Workspace
 
+> **Superseded by [ADR-0034](./0034-identity-on-better-auth.md):** Users and Workspaces now have tables, but only in the `identity` schema. Other contexts still hold their ids as opaque strings.
+
 Postgres holds resource tables only. There is no `User` or `Workspace` table. The sample Todo stores `workspaceId` (Clerk Organization id) and `createdByUserId` (Clerk User id) as opaque strings. `id` is a UUID we mint. Open vs completed is `completedAt` (null = open).
 
 Clerk remains the source of truth for **User** and **Workspace**. We do not sync those records into Prisma in this spike.

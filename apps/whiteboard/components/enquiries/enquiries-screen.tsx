@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarClock, Plus, Search } from "lucide-react";
 import Link from "next/link";
@@ -87,8 +87,8 @@ const EMPTY_COPY: Record<
 };
 
 export function EnquiriesScreen() {
-  const { orgRole } = useAuth();
-  const isOwner = isOwnerRole(orgRole);
+  const { role } = useAuth();
+  const isOwner = isOwnerRole(role);
   const searchParams = useSearchParams();
   const initialView = searchParams.get("view");
   const [view, setView] = useState<EnquiryListView>(

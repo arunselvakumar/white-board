@@ -33,7 +33,7 @@ export async function POST(
       id: params.id,
       timingSource: model.timingSource,
       studentTimings: model.studentTimings,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));
   } catch (error) {

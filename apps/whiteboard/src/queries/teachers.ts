@@ -54,7 +54,7 @@ export type TeacherProfile = {
     bankAccountLast4: string | null;
   };
   invitationStatus: "not_sent" | "sent" | "failed" | "accepted";
-  clerkUserId: string | null;
+  userId: string | null;
   deactivatedAt: string | null;
   createdAt: string;
   updatedAt: string;

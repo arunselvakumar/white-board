@@ -6,7 +6,7 @@ import {
   useSuspenseQuery,
   type QueryClient,
 } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 
 import {
   calendarQueries,
@@ -32,10 +32,10 @@ async function invalidateSchedule(queryClient: QueryClient): Promise<void> {
 }
 
 export function CalendarScreen() {
-  const { userId, orgId, orgRole } = useAuth();
+  const { userId, workspaceId, role } = useAuth();
   const queryClient = useQueryClient();
   const { data } = useSuspenseQuery(
-    calendarQueries.schedule(`${orgId}:${userId}:${orgRole}`),
+    calendarQueries.schedule(`${workspaceId}:${userId}:${role}`),
   );
   const onSuccess = () => invalidateSchedule(queryClient);
   const cancel = useMutation({

@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
     );
     const teacher = await handlers.create({
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       userId: session.userId,
     });
     return Response.json(mapTeacherResponse(teacher), {
@@ -47,7 +47,10 @@ export async function GET(request: Request): Promise<Response> {
         before: url.searchParams.get("before") ?? undefined,
       }),
     );
-    const page = await handlers.list({ ...model, workspaceId: session.orgId });
+    const page = await handlers.list({
+      ...model,
+      workspaceId: session.workspaceId,
+    });
     return Response.json({
       ...page,
       items: page.items.map(mapTeacherListItem),

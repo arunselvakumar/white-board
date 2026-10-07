@@ -32,7 +32,7 @@ export async function POST(
     const batch = await handlers.updateSchedule.execute({
       id: params.id,
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapBatchResponse(batch));
   } catch (error) {

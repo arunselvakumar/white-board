@@ -17,7 +17,11 @@ export async function GET(
         await context.params,
       ),
     );
-    const document = await handlers.getDocument(documentId, id, session.orgId);
+    const document = await handlers.getDocument(
+      documentId,
+      id,
+      session.workspaceId,
+    );
     const extension =
       document.mimeType === "application/pdf"
         ? "pdf"

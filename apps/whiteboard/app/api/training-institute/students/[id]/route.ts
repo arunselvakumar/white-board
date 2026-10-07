@@ -28,7 +28,7 @@ export async function GET(
     );
     const student = await handlers.get.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapGetStudentResponse(student));
   } catch (error) {

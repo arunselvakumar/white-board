@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
 import { SelectWorkspaceForm } from "@/components/onboarding/select-workspace-form";
-import { clerkMocks } from "../../../.storybook/mocks/clerk";
+import { authMocks, signInAs } from "../../../.storybook/mocks/auth";
 
 const meta = {
   title: "Pages/Workspace Selection",
@@ -16,9 +16,17 @@ const meta = {
     </OnboardingShell>
   ),
   beforeEach() {
-    clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside School" } },
-      { organization: { id: "org_harbor", name: "Harbor Academy" } },
+    signInAs("owner", { name: "Riverside School" });
+    authMocks.workspaceId = null;
+    authMocks.role = null;
+    authMocks.workspaces = [
+      ...authMocks.workspaces,
+      {
+        id: "org_harbor",
+        name: "Harbor Academy",
+        role: "teacher",
+        institutionType: "training_institute",
+      },
     ];
   },
 } satisfies Meta;
@@ -42,7 +50,8 @@ export const Default: Story = {
 
 export const ActiveWorkspaceStillRequiresSelection: Story = {
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
+    authMocks.workspaceId = "org_riverside";
+    authMocks.role = "owner";
   },
   play: async ({ canvas, userEvent }) => {
     await expect(
@@ -54,8 +63,16 @@ export const ActiveWorkspaceStillRequiresSelection: Story = {
     await userEvent.click(
       canvas.getByRole("button", { name: /Harbor Academy/ }),
     );
-    await expect(clerkMocks.setActive).toHaveBeenCalledWith({
-      organization: "org_harbor",
-    });
+    await expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/");
+  },
+};
+
+export const SignOut: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Sign out" }));
+    await waitFor(() =>
+      expect(authMocks.navigateInApp).toHaveBeenCalledWith("/login"),
+    );
+    await expect(authMocks.signOut).toHaveBeenCalledWith("/login");
   },
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import {
   useMutation,
   useQueryClient,
@@ -52,7 +52,7 @@ import { NotInterestedDialog } from "./not-interested-dialog";
 type Dialog = "follow-up" | "book-demo" | "not-interested" | null;
 
 export function EnquiryDetailScreen({ enquiryId }: { enquiryId: string }) {
-  const { orgRole } = useAuth();
+  const { role } = useAuth();
   const queryClient = useQueryClient();
   const [{ data: enquiry }, { data: options }] = useSuspenseQueries({
     queries: [enquiryQueries.detail(enquiryId), enquiryQueries.options()],
@@ -87,7 +87,7 @@ export function EnquiryDetailScreen({ enquiryId }: { enquiryId: string }) {
     <EnquiryDetailView
       enquiry={enquiry}
       options={options}
-      isOwner={isOwnerRole(orgRole)}
+      isOwner={isOwnerRole(role)}
       reopening={reopen.isPending}
       onFollowUp={async (input) => {
         await followUp.mutateAsync(input);

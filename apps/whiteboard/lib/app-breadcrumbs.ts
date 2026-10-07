@@ -1,3 +1,5 @@
+import type { WorkspaceRole } from "./workspace-access";
+
 export type AppBreadcrumb = {
   label: string;
   href?: string;
@@ -7,7 +9,7 @@ const dashboard: AppBreadcrumb = { label: "Dashboard", href: "/" };
 
 export function getAppBreadcrumbs(
   pathname: string,
-  role?: string | null,
+  role?: WorkspaceRole,
 ): AppBreadcrumb[] {
   if (pathname === "/calendar")
     return [{ label: "Calendar", href: "/calendar" }];
@@ -15,10 +17,10 @@ export function getAppBreadcrumbs(
     return [{ label: "Online Classes", href: "/online-classes" }];
   if (pathname === "/enquiries" || pathname.startsWith("/enquiries/")) {
     const trail = enquiryBreadcrumbs(pathname);
-    return role === "org:teacher" ? trail : [dashboard, ...trail];
+    return role === "teacher" ? trail : [dashboard, ...trail];
   }
-  if (role === "org:student" || role === "org:parent") {
-    const home = role === "org:student" ? "/student" : "/parent";
+  if (role === "student" || role === "parent") {
+    const home = role === "student" ? "/student" : "/parent";
     if (!pathname.startsWith(`${home}/homework`))
       return [{ label: "Home", href: home }];
     const homework = { label: "Homework", href: `${home}/homework` };
@@ -26,7 +28,7 @@ export function getAppBreadcrumbs(
       ? [homework]
       : [homework, { label: "Homework details" }];
   }
-  if (role === "org:teacher") {
+  if (role === "teacher") {
     const myBatches = { label: "My Batches", href: "/teacher" };
     if (pathname === "/teacher") return [myBatches];
     const [, , , batchId, action, homeworkId] = pathname.split("/");

@@ -24,12 +24,11 @@ export type TeacherInviter = {
     email: string;
     previousInvitationId: string | null;
   }): Promise<string>;
+  /** Ends the Teacher's sign-in access: their membership and any invitation. */
   removeAccess(input: {
     workspaceId: string;
-    teacherId: string;
-    clerkUserId: string | null;
+    teacherUserId: string | null;
     invitationId: string | null;
-    userId: string;
   }): Promise<void>;
 };
 
@@ -283,7 +282,7 @@ export class TeacherHandlers {
     const teacher = await this.get(command.id, command.workspaceId);
     if (!teacher.isActive)
       throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
-    if (teacher.clerkUserId != null)
+    if (teacher.userId != null)
       throw new DomainError(
         "TEACHER_ALREADY_ACTIVE",
         "Teacher has already joined.",
@@ -292,13 +291,27 @@ export class TeacherHandlers {
     return teacher;
   }
 
+  /**
+   * Links the signed-in User to the Teacher whose invitation they accepted
+   * (ADR-0034). Returns null when none of their accepted invitations belongs
+   * to an active Teacher in the Workspace.
+   */
   async activate(command: {
-    id: string;
     workspaceId: string;
-    clerkUserId: string;
-  }): Promise<Teacher> {
-    const teacher = await this.get(command.id, command.workspaceId);
-    teacher.activate(command.clerkUserId, new Date());
+    userId: string;
+    acceptedInvitationIds: readonly string[];
+  }): Promise<Teacher | null> {
+    const teacher =
+      (await this.teachers.findByUserInWorkspace(
+        command.userId,
+        command.workspaceId,
+      )) ??
+      (await this.teachers.findByInvitationInWorkspace(
+        command.acceptedInvitationIds,
+        command.workspaceId,
+      ));
+    if (teacher == null) return null;
+    teacher.activate(command.userId, new Date());
     await this.teachers.save(teacher);
     return teacher;
   }
@@ -313,10 +326,8 @@ export class TeacherHandlers {
       throw new DomainError("TEACHER_INACTIVE", "Teacher is inactive.");
     await this.invitations.removeAccess({
       workspaceId: command.workspaceId,
-      teacherId: teacher.id,
-      clerkUserId: teacher.clerkUserId,
+      teacherUserId: teacher.userId,
       invitationId: teacher.invitationId,
-      userId: command.userId,
     });
     teacher.deactivate(command.userId, new Date());
     await this.teachers.save(teacher);

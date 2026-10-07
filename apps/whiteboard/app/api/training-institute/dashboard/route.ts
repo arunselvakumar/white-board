@@ -13,7 +13,7 @@ export async function GET(): Promise<Response> {
       return session;
     }
     const dashboard = await handlers.get.execute({
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json({
       activeStudentCount: dashboard.activeStudentCount,

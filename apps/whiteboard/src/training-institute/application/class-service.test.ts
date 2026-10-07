@@ -71,7 +71,7 @@ function service(
 const input = {
   workspaceId: "org_1",
   userId: "user_1",
-  role: "org:admin" as const,
+  role: "owner" as const,
   batchId: item.batchId,
   date: "2026-09-30",
   startTime: "09:00",
@@ -106,7 +106,7 @@ describe("ClassService", () => {
       code: "CLASS_CANCELLED",
     });
     await expect(
-      cancelled.join({ ...input, role: "org:student" }, "Asha"),
+      cancelled.join({ ...input, role: "student" }, "Asha"),
     ).rejects.toMatchObject({ code: "CLASS_CANCELLED" });
   });
 
@@ -266,7 +266,7 @@ describe("ClassService", () => {
     });
     const student = {
       ...input,
-      role: "org:student" as const,
+      role: "student" as const,
       userId: "student_1",
     };
     expect(await sut.start(input, "Teacher")).toEqual({

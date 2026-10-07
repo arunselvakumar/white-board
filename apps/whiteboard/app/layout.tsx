@@ -1,12 +1,11 @@
-import { ClerkProvider } from "@clerk/nextjs";
-import { shadcn } from "@clerk/ui/themes";
+import { getAuthSnapshot } from "@repo/auth/server";
+import { AuthProvider } from "@repo/auth/react";
 import type { Metadata } from "next";
 import { Geist_Mono, Urbanist } from "next/font/google";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import { TooltipProvider } from "@repo/ui/components/tooltip";
 
-import "@clerk/ui/themes/shadcn.css";
 import "@repo/ui/globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { ThemePreferenceSync } from "@/components/theme-preference-sync";
@@ -30,11 +29,12 @@ export const metadata: Metadata = {
   description: "The Whiteboard application",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const snapshot = await getAuthSnapshot();
   return (
     <html
       lang="en"
@@ -42,13 +42,7 @@ export default function RootLayout({
       className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
     >
       <body>
-        <ClerkProvider
-          appearance={{ theme: shadcn }}
-          signInUrl="/app/login"
-          signUpUrl="/app/signup"
-          signInFallbackRedirectUrl="/app/select-workspace"
-          signUpFallbackRedirectUrl="/app/select-workspace"
-        >
+        <AuthProvider snapshot={snapshot}>
           <ThemeProvider
             defaultTheme="light"
             enableSystem={false}
@@ -59,7 +53,7 @@ export default function RootLayout({
               <QueryProvider>{children}</QueryProvider>
             </TooltipProvider>
           </ThemeProvider>
-        </ClerkProvider>
+        </AuthProvider>
       </body>
     </html>
   );

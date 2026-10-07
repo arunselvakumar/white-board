@@ -14,7 +14,7 @@ export async function GET(): Promise<Response> {
     if (session instanceof Response) return session;
     const home: GetTrainingInstituteFamilyHomeResponseModel =
       await handler.execute({
-        workspaceId: session.orgId,
+        workspaceId: session.workspaceId,
         role: session.role,
         verifiedEmails: session.verifiedEmails,
       });

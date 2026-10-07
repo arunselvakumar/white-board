@@ -252,7 +252,7 @@ model TrainingInstituteTeacher {
   idNumberLast4         String?                @map("id_number_last4") @db.VarChar(4)
   bankAccountEncrypted  String?                @map("bank_account_encrypted") @db.Text
   bankAccountLast4      String?                @map("bank_account_last4") @db.VarChar(4)
-  clerkUserId           String?                 @map("clerk_user_id")
+  userId                String?                 @map("user_id")
   invitationId          String?                 @map("invitation_id")
   invitationStatus      TrainingInstituteTeacherInvitationStatus @default(not_sent) @map("invitation_status")
   deactivatedAt         DateTime?               @map("deactivated_at")
@@ -269,7 +269,7 @@ model TrainingInstituteTeacher {
   homework         TrainingInstituteHomework[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
-  @@index([workspaceId, clerkUserId])
+  @@index([workspaceId, userId])
   @@map("teachers")
   @@schema("training_institute")
 }

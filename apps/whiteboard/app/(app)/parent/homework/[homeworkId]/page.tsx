@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -13,8 +13,8 @@ export default async function ParentHomeworkDetailPage({
   params: Promise<{ homeworkId: string }>;
   searchParams: Promise<{ student?: string | string[] }>;
 }) {
-  const { orgRole } = await auth();
-  if (orgRole !== "org:parent") redirect("/");
+  const { role } = await getAuth();
+  if (role !== "parent") redirect("/");
   const [{ homeworkId }, { student }] = await Promise.all([
     params,
     searchParams,
@@ -22,7 +22,7 @@ export default async function ParentHomeworkDetailPage({
   const studentId = Array.isArray(student) ? student[0] : student;
   return (
     <HomeworkDetailScreen
-      role="org:parent"
+      role="parent"
       homeworkId={homeworkId}
       studentId={studentId ?? null}
     />

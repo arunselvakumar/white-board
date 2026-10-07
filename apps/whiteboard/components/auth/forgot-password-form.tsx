@@ -1,9 +1,13 @@
 "use client";
 
-import { useAuth, useSignIn } from "@clerk/nextjs";
+import {
+  navigateInApp,
+  useAuth,
+  usePasswordReset,
+  useSignIn,
+} from "@repo/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,8 +20,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LoadingScreen } from "@/components/auth/loading-screen";
 import { PasswordField } from "@/components/auth/password-field";
-import { clerkFieldMessage, clerkGlobalMessage } from "@/lib/clerk-errors";
-import { navigateAfterAuth } from "@/lib/navigate-after-auth";
+import { authErrorMessage } from "@/lib/auth-errors";
 import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 const requestSchema = z.object({
@@ -31,16 +34,31 @@ const resetSchema = z.object({
     .string()
     .min(6, "Enter the 6-digit code")
     .max(6, "Enter the 6-digit code"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must be at most 128 characters"),
 });
 
 type ResetValues = z.infer<typeof resetSchema>;
 
+/**
+ * The Password Reset Flow: email → emailed code and a new password. A reset
+ * signs out every Session, then signs this browser in with the new password.
+ */
 export function ForgotPasswordForm() {
-  const router = useRouter();
-  const { signIn, errors, fetchStatus } = useSignIn();
   const { isSignedIn } = useAuth();
-  const [step, setStep] = useState<"request" | "reset">("request");
+  const passwordReset = usePasswordReset();
+  const signIn = useSignIn();
+  const [email, setEmail] = useState<string | null>(null);
+  const step = email == null ? "request" : "reset";
+  const entryPath = workspaceEntryPath("/");
+  const fetchStatus =
+    passwordReset.fetchStatus === "fetching" ||
+    signIn.fetchStatus === "fetching"
+      ? "fetching"
+      : "idle";
+  const error = passwordReset.error ?? signIn.error;
 
   const requestForm = useForm<RequestValues>({
     resolver: zodResolver(requestSchema),
@@ -50,44 +68,27 @@ export function ForgotPasswordForm() {
   });
 
   useEffect(() => {
-    if (isSignedIn) {
-      router.replace(workspaceEntryPath("/"));
-    }
-  }, [isSignedIn, router]);
+    if (isSignedIn) navigateInApp(entryPath);
+  }, [entryPath, isSignedIn]);
 
   const onSubmitRequest = async (values: RequestValues) => {
-    const { error: createError } = await signIn.create({
-      identifier: values.email,
-    });
-    if (createError) {
-      return;
-    }
-    const { error } = await signIn.resetPasswordEmailCode.sendCode();
-    if (error) {
-      return;
-    }
-    setStep("reset");
+    const { error: sendError } = await passwordReset.sendCode(values.email);
+    if (sendError == null) setEmail(values.email.trim());
   };
 
   const onSubmitReset = async (values: ResetValues) => {
-    const { error: verifyError } =
-      await signIn.resetPasswordEmailCode.verifyCode({
-        code: values.code,
-      });
-    if (verifyError) {
-      return;
-    }
-    const { error } = await signIn.resetPasswordEmailCode.submitPassword({
+    if (email == null) return;
+    const { error: resetError } = await passwordReset.reset({
+      email,
+      code: values.code,
       password: values.password,
     });
-    if (error) {
-      return;
-    }
-    if (signIn.status === "complete") {
-      await signIn.finalize({
-        navigate: navigateAfterAuth(router, workspaceEntryPath("/")),
-      });
-    }
+    if (resetError != null) return;
+    const { error: signInError } = await signIn.password({
+      identifier: email,
+      password: values.password,
+    });
+    navigateInApp(signInError == null ? entryPath : "/login");
   };
 
   if (isSignedIn) {
@@ -128,12 +129,12 @@ export function ForgotPasswordForm() {
             <FieldError
               message={
                 requestForm.formState.errors.email?.message ??
-                clerkFieldMessage(errors.fields.identifier)
+                authErrorMessage(error, "email")
               }
             />
           </div>
 
-          <FormAlert message={clerkGlobalMessage(errors.global)} />
+          <FormAlert message={authErrorMessage(error, "global")} />
 
           <Button
             type="submit"
@@ -170,7 +171,7 @@ export function ForgotPasswordForm() {
             <FieldError
               message={
                 resetForm.formState.errors.code?.message ??
-                clerkFieldMessage(errors.fields.code)
+                authErrorMessage(error, "code")
               }
             />
           </div>
@@ -186,12 +187,12 @@ export function ForgotPasswordForm() {
             <FieldError
               message={
                 resetForm.formState.errors.password?.message ??
-                clerkFieldMessage(errors.fields.password)
+                authErrorMessage(error, "password")
               }
             />
           </div>
 
-          <FormAlert message={clerkGlobalMessage(errors.global)} />
+          <FormAlert message={authErrorMessage(error, "global")} />
 
           <Button
             type="submit"

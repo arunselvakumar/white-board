@@ -28,7 +28,7 @@ const config: StorybookConfig = {
     return mergeConfig(viteConfig, {
       resolve: {
         alias: {
-          "@clerk/nextjs": path.resolve(configDir, "mocks/clerk.tsx"),
+          "@repo/auth/react": path.resolve(configDir, "mocks/auth.tsx"),
         },
       },
       optimizeDeps: {

@@ -11,7 +11,7 @@ import {
 } from "@/components/class-work/family/family-class-work.fixtures";
 import { FamilyHome } from "@/components/home/family-home";
 import type { FamilyHomeStudent } from "@/src/queries/family-home";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 // 2026-09-30 09:00 in Asia/Kolkata.
 const NOW = new Date("2026-09-30T03:30:00.000Z");
@@ -108,13 +108,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/student" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.orgRole = "org:student";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("student", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 
@@ -127,7 +121,7 @@ export const StudentHome: Story = {
       <FamilyHome
         home={{ students: [asha] }}
         classWork={{ students: [ashaClassWork] }}
-        role="org:student"
+        role="student"
         now={NOW}
       />
     </AppShell>
@@ -174,7 +168,7 @@ export const StudentHomeDueToday: Story = {
       <FamilyHome
         home={{ students: [asha] }}
         classWork={{ students: [ashaClassWork] }}
-        role="org:student"
+        role="student"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -207,14 +201,14 @@ export const StudentHomeDueToday: Story = {
 export const ParentHome: Story = {
   parameters: { nextjs: { navigation: { pathname: "/parent" } } },
   beforeEach() {
-    clerkMocks.orgRole = "org:parent";
+    signInAs("parent", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>
       <FamilyHome
         home={{ students: [asha, ravi] }}
         classWork={{ students: [ashaClassWork] }}
-        role="org:parent"
+        role="parent"
         now={NOW}
       />
     </AppShell>
@@ -261,7 +255,7 @@ export const ParentHome: Story = {
 export const StudentNotLinked: Story = {
   render: () => (
     <AppShell>
-      <FamilyHome home={{ students: [] }} role="org:student" now={NOW} />
+      <FamilyHome home={{ students: [] }} role="student" now={NOW} />
     </AppShell>
   ),
   play: async ({ canvas }) => {
@@ -287,7 +281,7 @@ export const StudentWithoutEnrollments: Story = {
             },
           ],
         }}
-        role="org:student"
+        role="student"
         now={NOW}
       />
     </AppShell>

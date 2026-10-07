@@ -7,6 +7,18 @@ import { nextJsConfig } from "@repo/eslint-config/next-js";
 // Layer folders are flat, so `../../` from a context file leaves the context.
 const BOUNDED_CONTEXTS = ["training-institute"];
 
+// The auth vendor stays behind @repo/auth (ADR-0034).
+const AUTH_VENDOR_PATTERNS = [
+  {
+    regex: "^better-auth(?:/|$)",
+    message: "Import auth from @repo/auth (server, react, roles, testing).",
+  },
+  {
+    regex: "^@clerk/",
+    message: "Clerk was replaced by @repo/auth (ADR-0034).",
+  },
+];
+
 const contextBoundaries = BOUNDED_CONTEXTS.map((context) => ({
   files: [`src/${context}/**/*.{ts,tsx}`],
   rules: {
@@ -14,6 +26,7 @@ const contextBoundaries = BOUNDED_CONTEXTS.map((context) => ({
       "error",
       {
         patterns: [
+          ...AUTH_VENDOR_PATTERNS,
           {
             regex: `^@/src/(?!${context}/)`,
             message: `The ${context} context may import only its own folder. Refer to other contexts by ID.`,
@@ -39,6 +52,11 @@ export default [
         },
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    rules: {
+      "no-restricted-imports": ["error", { patterns: AUTH_VENDOR_PATTERNS }],
     },
   },
   ...contextBoundaries,

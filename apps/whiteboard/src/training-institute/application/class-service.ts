@@ -177,7 +177,7 @@ export class ClassService {
       item: found.item,
       scheduled: found.scheduled,
       endTime: found.scheduled.endTime,
-      isHost: input.role === "org:admin" || input.role === "org:teacher",
+      isHost: input.role === "owner" || input.role === "teacher",
     };
   }
 
@@ -194,7 +194,7 @@ export class ClassService {
         !(error instanceof DomainError) ||
         error.code !== "CLASS_NOT_FOUND" ||
         occurrence?.recordingStatus !== "ready" ||
-        (input.role !== "org:admin" && input.role !== "org:teacher")
+        (input.role !== "owner" && input.role !== "teacher")
       )
         throw error;
       const items = await this.deps.schedule.execute({
@@ -427,7 +427,7 @@ export class ClassService {
   }
 
   async recordingObjectKey(input: ClassActor): Promise<string> {
-    if (input.role === "org:admin" || input.role === "org:teacher") {
+    if (input.role === "owner" || input.role === "teacher") {
       const items = await this.deps.schedule.execute({
         workspaceId: input.workspaceId,
         userId: input.userId,

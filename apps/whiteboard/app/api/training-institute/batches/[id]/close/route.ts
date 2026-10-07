@@ -26,7 +26,7 @@ export async function POST(
     );
     const batch = await handlers.close.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       closedByUserId: session.userId,
     });
     return Response.json(mapBatchResponse(batch));

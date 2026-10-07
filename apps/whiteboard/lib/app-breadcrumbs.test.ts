@@ -1,24 +1,20 @@
+import { WORKSPACE_ROLES } from "@repo/auth/roles";
 import { describe, expect, it } from "vitest";
 
 import { getAppBreadcrumbs } from "./app-breadcrumbs";
 
 it("shows Home instead of Dashboard in family navigation", () => {
-  expect(getAppBreadcrumbs("/", "org:student")).toEqual([
+  expect(getAppBreadcrumbs("/", "student")).toEqual([
     { label: "Home", href: "/student" },
   ]);
-  expect(getAppBreadcrumbs("/parent", "org:parent")).toEqual([
+  expect(getAppBreadcrumbs("/parent", "parent")).toEqual([
     { label: "Home", href: "/parent" },
   ]);
 });
 
 describe("getAppBreadcrumbs", () => {
   it("shows Online Classes as its current page for each supported role", () => {
-    for (const role of [
-      "org:admin",
-      "org:teacher",
-      "org:student",
-      "org:parent",
-    ]) {
+    for (const role of WORKSPACE_ROLES) {
       expect(getAppBreadcrumbs("/online-classes", role)).toEqual([
         { label: "Online Classes", href: "/online-classes" },
       ]);
@@ -77,10 +73,10 @@ describe("getAppBreadcrumbs", () => {
 });
 
 it("starts a Teacher's Enquiry trail at Enquiries", () => {
-  expect(getAppBreadcrumbs("/enquiries", "org:teacher")).toEqual([
+  expect(getAppBreadcrumbs("/enquiries", "teacher")).toEqual([
     { label: "Enquiries" },
   ]);
-  expect(getAppBreadcrumbs("/enquiries/123/edit", "org:teacher")).toEqual([
+  expect(getAppBreadcrumbs("/enquiries/123/edit", "teacher")).toEqual([
     { label: "Enquiries", href: "/enquiries" },
     { label: "Enquiry", href: "/enquiries/123" },
     { label: "Edit enquiry" },
@@ -88,13 +84,13 @@ it("starts a Teacher's Enquiry trail at Enquiries", () => {
 });
 
 it("trails Homework and Study Material for every role (ADR-0033)", () => {
-  expect(getAppBreadcrumbs("/batches/b1/homework", "org:admin")).toEqual([
+  expect(getAppBreadcrumbs("/batches/b1/homework", "owner")).toEqual([
     { label: "Dashboard", href: "/" },
     { label: "Batches", href: "/batches" },
     { label: "Homework and Study Material", href: "/batches/b1/homework" },
   ]);
   expect(
-    getAppBreadcrumbs("/batches/b1/homework/h1", "org:admin").map(
+    getAppBreadcrumbs("/batches/b1/homework/h1", "owner").map(
       (crumb) => crumb.label,
     ),
   ).toEqual([
@@ -104,7 +100,7 @@ it("trails Homework and Study Material for every role (ADR-0033)", () => {
     "Submissions",
   ]);
   expect(
-    getAppBreadcrumbs("/teacher/batches/b1/homework/h1", "org:teacher"),
+    getAppBreadcrumbs("/teacher/batches/b1/homework/h1", "teacher"),
   ).toEqual([
     { label: "My Batches", href: "/teacher" },
     {
@@ -114,15 +110,15 @@ it("trails Homework and Study Material for every role (ADR-0033)", () => {
     { label: "Submissions" },
   ]);
   expect(
-    getAppBreadcrumbs("/teacher/batches/b1/attendance", "org:teacher"),
+    getAppBreadcrumbs("/teacher/batches/b1/attendance", "teacher"),
   ).toEqual([
     { label: "My Batches", href: "/teacher" },
     { label: "Attendance" },
   ]);
-  expect(getAppBreadcrumbs("/student/homework", "org:student")).toEqual([
+  expect(getAppBreadcrumbs("/student/homework", "student")).toEqual([
     { label: "Homework", href: "/student/homework" },
   ]);
-  expect(getAppBreadcrumbs("/parent/homework/h1", "org:parent")).toEqual([
+  expect(getAppBreadcrumbs("/parent/homework/h1", "parent")).toEqual([
     { label: "Homework", href: "/parent/homework" },
     { label: "Homework details" },
   ]);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
@@ -12,11 +12,11 @@ import { TeachersEmptyState } from "./teachers-empty-state";
 import { TeacherAvatar } from "./teacher-avatar";
 
 export function TeachersScreen() {
-  const { orgId } = useAuth();
+  const { workspaceId } = useAuth();
   const [page, setPage] = useState(1);
   const [cursor, setCursor] = useState<{ after?: string; before?: string }>({});
   const { data } = useSuspenseQuery(
-    teacherQueries.list(orgId, { limit: 20, ...cursor }),
+    teacherQueries.list(workspaceId, { limit: 20, ...cursor }),
   );
   return (
     <main className="w-full p-6">

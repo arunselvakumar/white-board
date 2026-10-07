@@ -5,7 +5,7 @@ import { AppEmptyPage } from "@/components/app-shell/app-empty-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV } from "@/lib/app-nav";
 import { expectAppShell } from "../../.storybook/expect-app-shell";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
   title: "Workspace/AppShell",
@@ -14,12 +14,7 @@ const meta = {
     layout: "fullscreen",
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>
@@ -40,14 +35,52 @@ export const Default: Story = {
       breadcrumb.getByRole("link", { name: "Dashboard" }),
     ).toHaveAttribute("aria-current", "page");
     await expectAppShell(canvas, canvasElement, userEvent, APP_NAV[0]);
+    await expect(
+      canvas.queryByRole("link", { name: "Switch Workspace" }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const AccountMenuSignOut: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Account menu for Arun" }),
+    );
+    const menu = within(await body.findByRole("menu"));
+    await waitFor(() =>
+      expect(menu.getByText("arun@example.com")).toBeVisible(),
+    );
+    await userEvent.click(menu.getByRole("menuitem", { name: "Sign out" }));
+    await waitFor(() =>
+      expect(authMocks.navigateInApp).toHaveBeenCalledWith("/login"),
+    );
+    await expect(authMocks.signOut).toHaveBeenCalledWith("/login");
+  },
+};
+
+export const WithoutUser: Story = {
+  beforeEach() {
+    authMocks.user = null;
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Riverside Centre")).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: /Account menu/ }),
+    ).not.toBeInTheDocument();
   },
 };
 
 export const MultipleWorkspaces: Story = {
   beforeEach() {
-    clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside Centre" } },
-      { organization: { id: "org_harbor", name: "Harbor Academy" } },
+    authMocks.workspaces = [
+      ...authMocks.workspaces,
+      {
+        id: "org_harbor",
+        name: "Harbor Academy",
+        role: "teacher",
+        institutionType: "training_institute",
+      },
     ];
   },
   play: async ({ canvas }) => {
@@ -59,7 +92,7 @@ export const MultipleWorkspaces: Story = {
 
 export const StudentNavigation: Story = {
   beforeEach() {
-    clerkMocks.orgRole = "org:student";
+    signInAs("student", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>
@@ -96,7 +129,7 @@ export const StudentNavigation: Story = {
 
 export const ParentNavigation: Story = {
   beforeEach() {
-    clerkMocks.orgRole = "org:parent";
+    signInAs("parent", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>

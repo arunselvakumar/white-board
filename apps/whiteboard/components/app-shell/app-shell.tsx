@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  UserButton,
-  useAuth,
-  useOrganization,
-  useOrganizationList,
-} from "@clerk/nextjs";
+import { useAuth, useWorkspace, useWorkspaceList } from "@repo/auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,14 +29,15 @@ import { withAppBasePath } from "@/lib/app-base-path";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { ThemeToggle } from "./theme-toggle";
+import { UserMenu } from "./user-menu";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "/";
-  const { organization } = useOrganization();
-  const { userMemberships } = useOrganizationList({ userMemberships: true });
-  const { orgRole } = useAuth();
-  const workspaceName = organization?.name ?? "Workspace";
-  const navigation = navForRole(orgRole);
+  const { workspace } = useWorkspace();
+  const { workspaces } = useWorkspaceList();
+  const { role } = useAuth();
+  const workspaceName = workspace?.name ?? "Workspace";
+  const navigation = navForRole(role);
 
   return (
     <SidebarProvider>
@@ -110,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="text-muted-foreground truncate text-sm font-light">
             {workspaceName}
           </p>
-          {(userMemberships.count ?? 0) > 1 && (
+          {workspaces.length > 1 && (
             <Button
               variant="ghost"
               size="sm"
@@ -120,7 +116,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Button>
           )}
           <div className="ml-auto">
-            <UserButton />
+            <UserMenu />
           </div>
         </header>
         <div className="border-border/70 bg-secondary/45 border-b px-4 py-2.5 sm:px-6 print:hidden">

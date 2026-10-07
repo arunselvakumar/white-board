@@ -1,9 +1,8 @@
 "use client";
 
-import { SignOutButton } from "@clerk/nextjs";
 import type { ReactNode } from "react";
-import { Button } from "@repo/ui/components/button";
 
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { PageTransition } from "@/components/page-transition";
 
 export function OnboardingShell({ children }: { children: ReactNode }) {
@@ -15,11 +14,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
         </div>
       </div>
       <div className="flex justify-center pb-8">
-        <SignOutButton redirectUrl="/app/login">
-          <Button variant="ghost" size="sm">
-            Sign out
-          </Button>
-        </SignOutButton>
+        <SignOutButton />
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import { CollectPaymentForm } from "@/components/enrollments/collect-payment-for
 import { EnrollmentForm } from "@/components/enrollments/enrollment-form";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 import { QueryHttpError } from "@/src/queries/http";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const STUDENT_ID = "880e8400-e29b-41d4-a716-446655440000";
 const BATCH_ID = "660e8400-e29b-41d4-a716-446655440000";
@@ -23,12 +23,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/students" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 

@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
     );
     const batch = await handlers.create.execute({
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       createdByUserId: session.userId,
     });
     return Response.json(mapBatchResponse(batch), {
@@ -51,7 +51,7 @@ export async function GET(request: Request): Promise<Response> {
       }),
     );
     const page = await handlers.list.execute({
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       courseId: model.courseId,
       limit: model.limit,
       after: model.after,

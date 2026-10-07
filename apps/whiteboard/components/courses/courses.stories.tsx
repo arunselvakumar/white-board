@@ -11,7 +11,7 @@ import {
 } from "@/components/courses/course-form";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
 import type { CourseResponse, CourseWriteInput } from "@/src/queries/courses";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 
@@ -149,12 +149,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/courses" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 

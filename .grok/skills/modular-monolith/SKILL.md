@@ -27,7 +27,7 @@ Domain does not import Zod, Prisma, or Next.js. Copy `todo` layering, not Todo's
 
 ## Shared kernel in a context
 
-Every context has `DomainError`, `WorkspaceId`, `UserId` (opaque Clerk ids), and an `EventDispatcher` port. Resource ids are UUID value objects. Clerk ids are trimmed non-empty strings. Do not add a User or Workspace table.
+Every context has `DomainError`, `WorkspaceId`, `UserId` (opaque identity ids), and an `EventDispatcher` port. Resource ids are UUID value objects. User and Workspace ids are trimmed non-empty strings. Do not add a User or Workspace table to a context: they live only in the `identity` schema (ADR-0034).
 
 ## Repository ports
 

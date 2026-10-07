@@ -15,7 +15,7 @@ import {
 
 /** Where a Student's or Parent's Homework page lives. */
 export function homeworkPagePath(role: FamilyHomeRole): string {
-  return role === "org:parent" ? "/parent/homework" : "/student/homework";
+  return role === "parent" ? "/parent/homework" : "/student/homework";
 }
 
 export function homeworkDetailPath(

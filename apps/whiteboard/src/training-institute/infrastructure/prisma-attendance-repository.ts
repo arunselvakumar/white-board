@@ -38,7 +38,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     const teacher = await this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
-        clerkUserId: userId,
+        userId,
         deletedAt: null,
         deactivatedAt: null,
         batchAssignments: {

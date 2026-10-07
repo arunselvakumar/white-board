@@ -5,7 +5,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ import { TeacherDocumentsSection } from "./teacher-documents-section";
 const assignmentSchema = z.object({ batchId: z.uuid("Choose a Batch") });
 
 export function TeacherDetailScreen({ id }: { id: string }) {
-  const { orgId } = useAuth();
+  const { workspaceId } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [batchPage, setBatchPage] = useState(1);
@@ -47,15 +47,17 @@ export function TeacherDetailScreen({ id }: { id: string }) {
     after?: string;
     before?: string;
   }>({});
-  const { data: teacher } = useSuspenseQuery(teacherQueries.detail(orgId, id));
+  const { data: teacher } = useSuspenseQuery(
+    teacherQueries.detail(workspaceId, id),
+  );
   const { data: assigned } = useSuspenseQuery(
-    teacherQueries.batches(orgId, id),
+    teacherQueries.batches(workspaceId, id),
   );
   const { data: documents } = useSuspenseQuery(
-    teacherQueries.documents(orgId, id),
+    teacherQueries.documents(workspaceId, id),
   );
   const { data: batches } = useSuspenseQuery(
-    teacherQueries.batchOptions(orgId, { limit: 100, ...batchCursor }),
+    teacherQueries.batchOptions(workspaceId, { limit: 100, ...batchCursor }),
   );
   const form = useForm<z.infer<typeof assignmentSchema>>({
     resolver: zodResolver(assignmentSchema),
@@ -132,7 +134,7 @@ export function TeacherDetailScreen({ id }: { id: string }) {
           )}
           {!teacher.deactivatedAt && (
             <div className="flex gap-2">
-              {!teacher.clerkUserId && (
+              {!teacher.userId && (
                 <Button
                   variant="outline"
                   disabled={invite.isPending}

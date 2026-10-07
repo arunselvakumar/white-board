@@ -10,7 +10,7 @@ import type {
   FamilyClassWorkView,
   FamilyHomeworkView,
 } from "@/src/queries/class-work";
-import { clerkMocks } from "../../../.storybook/mocks/clerk";
+import { signInAs } from "../../../.storybook/mocks/auth";
 
 import {
   ASHA_ID,
@@ -166,11 +166,7 @@ const meta = {
   },
   decorators: [withFreshQueryClient],
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.orgRole = "org:student";
-    clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside Centre" } },
-    ];
+    signInAs("student", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 
@@ -184,7 +180,7 @@ export const StudentHomework: Story = {
     <AppShell>
       <FamilyHomework
         classWork={{ students: [ashaClassWork] }}
-        role="org:student"
+        role="student"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -247,7 +243,7 @@ export const StudentStudyMaterial: Story = {
     <AppShell>
       <FamilyHomework
         classWork={{ students: [ashaClassWork] }}
-        role="org:student"
+        role="student"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -286,13 +282,13 @@ export const StudentStudyMaterial: Story = {
 export const ParentWithTwoStudents: Story = {
   parameters: { nextjs: { navigation: { pathname: "/parent/homework" } } },
   beforeEach() {
-    clerkMocks.orgRole = "org:parent";
+    signInAs("parent", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>
       <FamilyHomework
         classWork={{ students: [ashaClassWork, raviClassWork] }}
-        role="org:parent"
+        role="parent"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -322,7 +318,7 @@ export const StudentNotLinked: Story = {
     <AppShell>
       <FamilyHomework
         classWork={{ students: [] }}
-        role="org:student"
+        role="student"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -337,13 +333,13 @@ export const StudentNotLinked: Story = {
 export const ParentNotLinked: Story = {
   parameters: { nextjs: { navigation: { pathname: "/parent/homework" } } },
   beforeEach() {
-    clerkMocks.orgRole = "org:parent";
+    signInAs("parent", { name: "Riverside Centre" });
   },
   render: () => (
     <AppShell>
       <FamilyHomework
         classWork={{ students: [] }}
-        role="org:parent"
+        role="parent"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -370,7 +366,7 @@ export const StudentWithoutBatches: Story = {
             },
           ],
         }}
-        role="org:student"
+        role="student"
         now={CLASS_WORK_NOW}
       />
     </AppShell>
@@ -387,7 +383,7 @@ function detail(homeworkId: string, studentId: string | null = ASHA_ID) {
   return (
     <AppShell>
       <HomeworkDetailScreen
-        role="org:student"
+        role="student"
         homeworkId={homeworkId}
         studentId={studentId}
         now={CLASS_WORK_NOW}
@@ -583,13 +579,13 @@ export const DetailParentView: Story = {
     nextjs: { navigation: { pathname: "/parent/homework/detail" } },
   },
   beforeEach() {
-    clerkMocks.orgRole = "org:parent";
+    signInAs("parent", { name: "Riverside Centre" });
     return mockFamilyApi([ashaClassWork, raviClassWork]);
   },
   render: () => (
     <AppShell>
       <HomeworkDetailScreen
-        role="org:parent"
+        role="parent"
         homeworkId={submittedHomework.id}
         studentId={ASHA_ID}
         now={CLASS_WORK_NOW}

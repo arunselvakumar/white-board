@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAuth } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { StatusCodes } from "http-status-codes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -17,18 +18,17 @@ import { GET as getEnrollment } from "./[id]/route";
 import { POST as setTimings } from "./[id]/timings/route";
 import { POST as enroll } from "./route";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
+const mockedAuth = vi.mocked(getAuth);
 
 function session(userId: string | null, orgId: string | null) {
-  mockedAuth.mockResolvedValue({
-    userId,
-    orgId,
-    orgRole: "org:admin",
-  } as never);
+  mockedAuth.mockResolvedValue(
+    authStateFor({ userId, workspaceId: orgId, role: "owner" }),
+  );
 }
 
 type IdJson = { id: string };

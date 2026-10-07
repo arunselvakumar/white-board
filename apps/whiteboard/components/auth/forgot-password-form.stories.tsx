@@ -3,7 +3,29 @@ import { expect, waitFor } from "storybook/test";
 
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { authFailure, authMocks, signInAs } from "../../.storybook/mocks/auth";
+
+type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
+type UserEvent = Parameters<NonNullable<Story["play"]>>[0]["userEvent"];
+
+async function requestCode(
+  canvas: Canvas,
+  userEvent: UserEvent,
+): Promise<void> {
+  await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
+  await userEvent.click(
+    canvas.getByRole("button", { name: "Send reset code" }),
+  );
+}
+
+async function submitReset(
+  canvas: Canvas,
+  userEvent: UserEvent,
+): Promise<void> {
+  await userEvent.type(await canvas.findByLabelText("Reset code"), "123456");
+  await userEvent.type(canvas.getByLabelText("New password"), "password123");
+  await userEvent.click(canvas.getByRole("button", { name: "Reset password" }));
+}
 
 const meta = {
   title: "Auth/ForgotPasswordForm",
@@ -23,6 +45,9 @@ export const RequestCode: Story = {
     await expect(
       canvas.getByRole("button", { name: "Send reset code" }),
     ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Back to sign in" }),
+    ).toHaveAttribute("href", "/login");
   },
 };
 
@@ -32,35 +57,56 @@ export const ValidationErrors: Story = {
       canvas.getByRole("button", { name: "Send reset code" }),
     );
     await expect(canvas.getByText("Enter a valid email address")).toBeVisible();
+    await expect(authMocks.passwordReset.sendCode).not.toHaveBeenCalled();
+  },
+};
+
+export const RequestEmailError: Story = {
+  beforeEach() {
+    authMocks.passwordReset.sendCode.mockImplementation(() =>
+      authFailure("INVALID_EMAIL"),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await requestCode(canvas, userEvent);
+    await expect(
+      await canvas.findByText("Enter a valid email address."),
+    ).toBeVisible();
+    await expect(canvas.getByLabelText("Email")).toBeVisible();
+  },
+};
+
+export const RequestGlobalError: Story = {
+  beforeEach() {
+    authMocks.passwordReset.sendCode.mockImplementation(() =>
+      authFailure("TOO_MANY_REQUESTS", 429),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await requestCode(canvas, userEvent);
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Too many attempts. Please try again later.",
+    );
   },
 };
 
 export const ResetPassword: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Send reset code" }),
-    );
+    await requestCode(canvas, userEvent);
     await expect(
       await canvas.findByText("Enter the code and choose a new password"),
     ).toBeVisible();
     await expect(canvas.getByLabelText("Reset code")).toBeVisible();
     await expect(canvas.getByLabelText("New password")).toBeVisible();
-    await expect(clerkMocks.signIn.create).toHaveBeenCalledWith({
-      identifier: "ada@example.com",
-    });
-    await expect(
-      clerkMocks.signIn.resetPasswordEmailCode.sendCode,
-    ).toHaveBeenCalled();
+    await expect(authMocks.passwordReset.sendCode).toHaveBeenCalledWith(
+      "ada@example.com",
+    );
   },
 };
 
 export const ResetValidationErrors: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Send reset code" }),
-    );
+    await requestCode(canvas, userEvent);
     await userEvent.click(
       await canvas.findByRole("button", { name: "Reset password" }),
     );
@@ -68,20 +114,45 @@ export const ResetValidationErrors: Story = {
     await expect(
       canvas.getByText("Password must be at least 8 characters"),
     ).toBeVisible();
+    await expect(authMocks.passwordReset.reset).not.toHaveBeenCalled();
+  },
+};
+
+export const ResetCodeError: Story = {
+  beforeEach() {
+    authMocks.passwordReset.reset.mockImplementation(() =>
+      authFailure("INVALID_OTP"),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await requestCode(canvas, userEvent);
+    await submitReset(canvas, userEvent);
+    await expect(
+      await canvas.findByText("That code is incorrect. Please try again."),
+    ).toBeVisible();
+    await expect(authMocks.signIn.password).not.toHaveBeenCalled();
+    await expect(authMocks.navigateInApp).not.toHaveBeenCalled();
+  },
+};
+
+export const ResetPasswordError: Story = {
+  beforeEach() {
+    authMocks.passwordReset.reset.mockImplementation(() =>
+      authFailure("PASSWORD_TOO_SHORT"),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await requestCode(canvas, userEvent);
+    await submitReset(canvas, userEvent);
+    await expect(
+      await canvas.findByText("Password is too short."),
+    ).toBeVisible();
   },
 };
 
 export const ResetFinishesAtWorkspaceSelection: Story = {
-  beforeEach() {
-    clerkMocks.signIn.resetPasswordEmailCode.verifyCode.mockImplementation(
-      () => ({ error: null }),
-    );
-  },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Email"), "ada@example.com");
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Send reset code" }),
-    );
+    await requestCode(canvas, userEvent);
     await userEvent.type(await canvas.findByLabelText("Reset code"), "123456");
     await userEvent.type(canvas.getByLabelText("New password"), "password123");
     await expect(canvas.getByLabelText("Reset code")).toHaveValue("123456");
@@ -92,26 +163,45 @@ export const ResetFinishesAtWorkspaceSelection: Story = {
       canvas.getByRole("button", { name: "Reset password" }),
     );
     await waitFor(() =>
-      expect(
-        clerkMocks.signIn.resetPasswordEmailCode.verifyCode,
-      ).toHaveBeenCalled(),
+      expect(authMocks.navigateInApp).toHaveBeenCalledWith("/select-workspace"),
     );
-    await waitFor(() =>
-      expect(
-        clerkMocks.signIn.resetPasswordEmailCode.submitPassword,
-      ).toHaveBeenCalled(),
-    );
-    await waitFor(() => expect(clerkMocks.signIn.finalize).toHaveBeenCalled());
-    const call = clerkMocks.signIn.finalize.mock.calls.at(-1)?.[0] as {
-      navigate: (input: { decorateUrl: (url: string) => string }) => void;
-    };
-    let destination = "";
-    call.navigate({
-      decorateUrl: (url) => {
-        destination = url;
-        return url;
-      },
+    await expect(authMocks.passwordReset.reset).toHaveBeenCalledWith({
+      email: "ada@example.com",
+      code: "123456",
+      password: "password123",
     });
-    await expect(destination).toBe("/select-workspace");
+    await expect(authMocks.signIn.password).toHaveBeenCalledWith({
+      identifier: "ada@example.com",
+      password: "password123",
+    });
+  },
+};
+
+export const ResetThenSignInFails: Story = {
+  beforeEach() {
+    authMocks.signIn.password.mockImplementation(() =>
+      authFailure("EMAIL_NOT_VERIFIED", 403),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await requestCode(canvas, userEvent);
+    await submitReset(canvas, userEvent);
+    await waitFor(() =>
+      expect(authMocks.navigateInApp).toHaveBeenCalledWith("/login"),
+    );
+  },
+};
+
+export const SignedIn: Story = {
+  beforeEach() {
+    signInAs("owner");
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector(".animate-spin"),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(authMocks.navigateInApp).toHaveBeenCalledWith("/select-workspace"),
+    );
   },
 };

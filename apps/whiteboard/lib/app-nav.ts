@@ -1,3 +1,5 @@
+import type { WorkspaceRole } from "./workspace-access";
+
 export const APP_NAV = [
   {
     href: "/",
@@ -144,11 +146,11 @@ export const TEACHER_NAV = [
   },
 ] as const;
 
-export function navForRole(role: string | null | undefined) {
-  if (role === "org:admin") return APP_NAV;
-  if (role === "org:student") return STUDENT_NAV;
-  if (role === "org:parent") return PARENT_NAV;
-  if (role === "org:teacher") return TEACHER_NAV;
+export function navForRole(role: WorkspaceRole) {
+  if (role === "owner") return APP_NAV;
+  if (role === "student") return STUDENT_NAV;
+  if (role === "parent") return PARENT_NAV;
+  if (role === "teacher") return TEACHER_NAV;
   return [];
 }
 

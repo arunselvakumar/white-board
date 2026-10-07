@@ -20,7 +20,7 @@ export async function POST(
     await handlers.removeDocument(
       documentId,
       id,
-      session.orgId,
+      session.workspaceId,
       session.userId,
     );
     return Response.json({ id: documentId });

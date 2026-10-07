@@ -15,7 +15,7 @@ import type {
   EnquiryResponse,
   PhoneMatchesResponse,
 } from "@/src/queries/enquiries";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 import { EnquiriesScreen } from "./enquiries-screen";
 import { EnquiryCreateScreen } from "./enquiry-create-screen";
@@ -308,6 +308,9 @@ const meta = {
     layout: "fullscreen",
     nextjs: { navigation: { pathname: "/enquiries" } },
   },
+  beforeEach() {
+    signInAs("owner");
+  },
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -433,7 +436,7 @@ export const ListEmptyStates: Story = {
 
 export const ListForTeacher: Story = {
   beforeEach: () => {
-    clerkMocks.orgRole = "org:teacher";
+    signInAs("teacher");
     return mockApi({ "GET /enquiries": listRoute(listItems) });
   },
   render: () => <EnquiriesScreen />,
@@ -804,7 +807,7 @@ export const DetailDemoAttendedOwner: Story = {
 export const DetailDemoAttendedTeacher: Story = {
   parameters: detailParameters,
   beforeEach: () => {
-    clerkMocks.orgRole = "org:teacher";
+    signInAs("teacher");
     return mockApi(detailRoutes(attended));
   },
   render: () => <EnquiryDetailScreen enquiryId={ENQUIRY_ID} />,
@@ -994,7 +997,7 @@ export const BookBatchDemo: Story = {
 export const BookOneToOneDemoClash: Story = {
   parameters: detailParameters,
   beforeEach: () => {
-    clerkMocks.orgRole = "org:teacher";
+    signInAs("teacher");
     return mockApi(
       detailRoutes(detail(), {
         "GET /enquiries/options": () => ({

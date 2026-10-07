@@ -1,5 +1,7 @@
 # Student and Parent Workspace invitations
 
+> **Amended by [ADR-0034](./0034-identity-on-better-auth.md):** invitations are rows in `identity.workspace_invitations`, sent as React Email through Resend; roles are `student` and `parent`; accepting requires the invited email to be verified.
+
 The register is growing beyond the initial P0 scope. A Student remains a Workspace resource in Postgres. If the Add Student form has a Student email address, Whiteboard sends a Clerk Organization invitation with role `org:student`. Father, mother, and Guardian email addresses receive role `org:parent`. Addresses are normalized and deduplicated per Student; the Student role takes precedence if one address appears in both places. Missing email addresses do not block admission and receive no invitation.
 
 The `StudentCreated` domain event is dispatched after the Student is saved. Its in-process listener loads the saved Student and calls a Clerk invitation adapter. Duplicate pending invitations are treated as already sent. A failed invitation is logged and does not prevent the remaining invitations or the saved Student from succeeding. This follows ADR-0008 and does not add a second process or an outbox. Delivery status and automatic retry are not part of this first invitation slice.

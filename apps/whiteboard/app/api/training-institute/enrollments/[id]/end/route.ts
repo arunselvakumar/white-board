@@ -26,7 +26,7 @@ export async function POST(
     );
     const enrollment = await handlers.end.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       endedByUserId: session.userId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));

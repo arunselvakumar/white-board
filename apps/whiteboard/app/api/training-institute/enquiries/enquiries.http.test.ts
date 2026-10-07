@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import {
+  authStateFor,
+  clearOutbox,
+  emailsTo,
+  lastInvitationIdFor,
+  outbox,
+  seedWorkspaceMember,
+} from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { StatusCodes } from "http-status-codes";
 import {
@@ -87,20 +95,12 @@ const contract: [
   Same<ConvertEnquiryView, ConvertEnquiryResponse>,
 ] = [true, true, true, true, true, true, true, true, true, true];
 
-const mockInvitation = vi.hoisted(() =>
-  vi.fn<(input: { emailAddress: string; role: string }) => Promise<void>>(),
-);
-
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(() =>
-    Promise.resolve({
-      organizations: { createOrganizationInvitation: mockInvitation },
-    }),
-  ),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
+const mockedAuth = vi.mocked(getAuth);
 
 // Pin the clock to 10:00 IST today so "today" tests run at any hour.
 const TODAY = new Intl.DateTimeFormat("en-CA", {
@@ -138,12 +138,19 @@ type Result<T = Json> = { status: number; body: T };
 type Context = { params: Promise<{ id: string }> };
 type Handler = (request: Request, context: Context) => Promise<Response>;
 
-const OWNER = "user_owner";
+/** Unique per run: identity Users are shared by every test file. */
+const OWNER = `user_owner_${randomUUID()}`;
 const TEACHER = "user_teacher";
 const OTHER_TEACHER = "user_teacher_two";
 
-function session(userId: string | null, orgId: string | null, orgRole: string) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
+function session(
+  userId: string | null,
+  orgId: string | null,
+  orgRole: WorkspaceRole,
+) {
+  mockedAuth.mockResolvedValue(
+    authStateFor({ userId, workspaceId: orgId, role: orgRole }),
+  );
 }
 
 async function call<T = Json>(
@@ -189,6 +196,8 @@ async function seedWorkspace(): Promise<Seed> {
     teacherId: randomUUID(),
     otherTeacherId: randomUUID(),
   };
+  // The Owner must own the identity Workspace to send invitations.
+  await seedWorkspaceMember({ workspaceId, userId: OWNER, role: "owner" });
   const everyDay = [0, 1, 2, 3, 4, 5, 6];
   const createdAt = new Date(PINNED_NOW.getTime() - 30 * 86_400_000);
   await prisma.trainingInstituteCourse.createMany({
@@ -248,7 +257,7 @@ async function seedWorkspace(): Promise<Seed> {
         name: "Meera",
         email: `${seed.teacherId}@example.com`,
         kind: "centre_teacher",
-        clerkUserId: TEACHER,
+        userId: TEACHER,
         invitationStatus: "accepted",
       },
       {
@@ -258,7 +267,7 @@ async function seedWorkspace(): Promise<Seed> {
         name: "Arjun",
         email: `${seed.otherTeacherId}@example.com`,
         kind: "visiting_tutor",
-        clerkUserId: OTHER_TEACHER,
+        userId: OTHER_TEACHER,
         invitationStatus: "accepted",
       },
     ],
@@ -278,10 +287,10 @@ async function seedWorkspace(): Promise<Seed> {
 let seed: Seed;
 
 const asOwner = () => {
-  session(OWNER, seed.workspaceId, "org:admin");
+  session(OWNER, seed.workspaceId, "owner");
 };
 const asTeacher = (userId = TEACHER) => {
-  session(userId, seed.workspaceId, "org:teacher");
+  session(userId, seed.workspaceId, "teacher");
 };
 
 async function sources(): Promise<EnquirySource[]> {
@@ -382,8 +391,7 @@ async function summary(): Promise<EnquirySummaryResponse> {
 
 describe("Enquiries and demos HTTP API", () => {
   beforeEach(async () => {
-    mockInvitation.mockReset();
-    mockInvitation.mockResolvedValue(undefined);
+    clearOutbox();
     seed = await seedWorkspace();
     asOwner();
   });
@@ -721,13 +729,20 @@ describe("Enquiries and demos HTTP API", () => {
       timingSource: "batch",
       feePlanAmountPaise: 300_000,
     });
-    expect(mockInvitation).toHaveBeenCalledWith(
+    const invitations = await prisma.identityWorkspaceInvitation.findMany({
+      where: { organizationId: seed.workspaceId },
+    });
+    expect(invitations).toEqual([
       expect.objectContaining({
-        emailAddress: "ravi@example.com",
-        role: "org:student",
-        organizationId: seed.workspaceId,
+        email: "ravi@example.com",
+        role: "student",
+        status: "pending",
+        inviterId: OWNER,
       }),
-    );
+    ]);
+    expect(emailsTo("ravi@example.com")).toHaveLength(1);
+    expect(emailsTo("ravi@example.com")[0]?.text).toContain("as a Student");
+    expect(lastInvitationIdFor("ravi@example.com")).toBe(invitations[0]?.id);
 
     const again = await call(convertEnquiry, {
       id: enquiry.id,
@@ -737,6 +752,12 @@ describe("Enquiries and demos HTTP API", () => {
       status: StatusCodes.CONFLICT,
       body: { code: "ENQUIRY_ALREADY_CONVERTED" },
     });
+    expect(emailsTo("ravi@example.com")).toHaveLength(1);
+    expect(
+      await prisma.identityWorkspaceInvitation.count({
+        where: { organizationId: seed.workspaceId },
+      }),
+    ).toBe(1);
     expect(
       (
         await call(logFollowUp, {
@@ -774,6 +795,44 @@ describe("Enquiries and demos HTTP API", () => {
       id: seed.eveningBatchId,
     });
     expect(batch.body.enrolledCount).toBe(1);
+  });
+
+  it("converts an Enquiry when the Student invitation cannot be sent", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const enquiry = await create({ email: "kiran@example.com" });
+    // The Owner no longer owns the identity Workspace, so inviting fails.
+    await prisma.identityWorkspaceMember.updateMany({
+      where: { organizationId: seed.workspaceId, userId: OWNER },
+      data: { role: "teacher" },
+    });
+
+    const converted = await call<ConvertEnquiryResponse>(convertEnquiry, {
+      id: enquiry.id,
+      body: { batchId: seed.eveningBatchId, timingSource: "batch" },
+    });
+    expect(converted.status, JSON.stringify(converted.body)).toBe(
+      StatusCodes.CREATED,
+    );
+    expect(
+      await prisma.trainingInstituteStudent.findUniqueOrThrow({
+        where: { id: converted.body.studentId },
+      }),
+    ).toMatchObject({ email: "kiran@example.com" });
+    expect(converted.body.enquiry.stage).toBe("joined");
+    expect(
+      await prisma.identityWorkspaceInvitation.count({
+        where: { organizationId: seed.workspaceId },
+      }),
+    ).toBe(0);
+    expect(outbox).toEqual([]);
+    expect(consoleError).toHaveBeenCalledWith(
+      "Student invitation failed",
+      { studentId: converted.body.studentId, role: "student" },
+      expect.objectContaining({ code: "NOT_WORKSPACE_OWNER" }),
+    );
+    consoleError.mockRestore();
   });
 
   it("refuses to convert into a full Batch and leaves everything as it was", async () => {
@@ -1358,7 +1417,7 @@ describe("Enquiries and demos HTTP API", () => {
     ).toBe(StatusCodes.FORBIDDEN);
   });
 
-  it.each(["org:student", "org:parent"])(
+  it.each(["student", "parent"] as const)(
     "gives %s 403 everywhere",
     async (role) => {
       asOwner();
@@ -1392,7 +1451,7 @@ describe("Enquiries and demos HTTP API", () => {
   );
 
   it("returns 401 without a session", async () => {
-    session(null, null, "org:admin");
+    session(null, null, "owner");
     expect((await call(queryOnly(listEnquiries))).status).toBe(
       StatusCodes.UNAUTHORIZED,
     );

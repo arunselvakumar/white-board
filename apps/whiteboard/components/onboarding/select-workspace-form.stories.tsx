@@ -1,14 +1,29 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
+import { expect, waitFor } from "storybook/test";
 
 import { SelectWorkspaceForm } from "@/components/onboarding/select-workspace-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import {
+  authFailure,
+  authMocks,
+  storyUser,
+  type WorkspaceSummary,
+} from "../../.storybook/mocks/auth";
 
+function workspace(
+  id: string,
+  name: string,
+  role: WorkspaceSummary["role"] = "owner",
+): WorkspaceSummary {
+  return { id, name, role, institutionType: "training_institute" };
+}
+
+const riverside = workspace("org_riverside", "Riverside School");
 const workspaces = [
-  { organization: { id: "org_riverside", name: "Riverside School" } },
-  { organization: { id: "org_harbor", name: "Harbor Academy" } },
-  { organization: { id: "org_north", name: "North Campus" } },
+  riverside,
+  workspace("org_harbor", "Harbor Academy", "teacher"),
+  workspace("org_north", "North Campus", "parent"),
 ];
 
 const meta = {
@@ -19,7 +34,9 @@ const meta = {
     redirectUrl: "/",
   },
   beforeEach() {
-    clerkMocks.memberships = workspaces;
+    authMocks.userId = storyUser.id;
+    authMocks.user = storyUser;
+    authMocks.workspaces = workspaces;
   },
 } satisfies Meta<typeof SelectWorkspaceForm>;
 
@@ -40,6 +57,7 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("button", { name: /North Campus/ }),
     ).toBeVisible();
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
 };
 
@@ -48,18 +66,29 @@ export const SelectsWorkspace: Story = {
     await userEvent.click(
       canvas.getByRole("button", { name: /Harbor Academy/ }),
     );
-    await expect(clerkMocks.setActive).toHaveBeenCalledWith({
-      organization: "org_harbor",
-    });
+    await expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/");
+    await waitFor(() =>
+      expect(
+        canvas.getByRole("button", { name: /Riverside School/ }),
+      ).toBeDisabled(),
+    );
+  },
+};
+
+export const SelectsWorkspaceWithRedirect: Story = {
+  args: { redirectUrl: "/students?tab=active" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /North Campus/ }));
+    await expect(authMocks.setActive).toHaveBeenCalledWith(
+      "org_north",
+      "/students?tab=active",
+    );
   },
 };
 
 export const SelectFailure: Story = {
   beforeEach() {
-    clerkMocks.memberships = workspaces;
-    clerkMocks.setActive.mockImplementation(() => {
-      throw new Error("switch failed");
-    });
+    authMocks.setActive.mockImplementation(() => authFailure("FORBIDDEN", 403));
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(
@@ -68,17 +97,38 @@ export const SelectFailure: Story = {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
       "Could not switch to that workspace. Please try again.",
     );
+    await expect(
+      canvas.getByRole("button", { name: /Harbor Academy/ }),
+    ).toBeEnabled();
+  },
+};
+
+export const AutoActivatesSoleWorkspace: Story = {
+  beforeEach() {
+    authMocks.workspaces = [riverside];
+  },
+  args: { redirectUrl: "/fees" },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(
+      canvasElement.querySelector(".animate-spin"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: "Select a workspace" }),
+    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith(
+        "org_riverside",
+        "/fees",
+      ),
+    );
+    await expect(authMocks.setActive).toHaveBeenCalledTimes(1);
   },
 };
 
 export const AutoActivateFailure: Story = {
   beforeEach() {
-    clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside School" } },
-    ];
-    clerkMocks.setActive.mockImplementation(() => {
-      throw new Error("activation failed");
-    });
+    authMocks.workspaces = [riverside];
+    authMocks.setActive.mockImplementation(() => authFailure("FORBIDDEN", 403));
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
@@ -90,26 +140,32 @@ export const AutoActivateFailure: Story = {
   },
 };
 
-export const Loading: Story = {
+export const SoleWorkspaceAlreadyActive: Story = {
   beforeEach() {
-    clerkMocks.membershipsLoading = true;
+    authMocks.workspaces = [riverside];
+    authMocks.workspaceId = riverside.id;
+    authMocks.role = riverside.role;
   },
-  play: async ({ canvasElement }) => {
-    await expect(
-      canvasElement.querySelector(".animate-spin"),
-    ).toBeInTheDocument();
+  args: { redirectUrl: "/batches" },
+  play: async () => {
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith("/batches"),
+    );
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
 };
 
-export const MoreWorkspacesAvailable: Story = {
+export const NoWorkspaces: Story = {
   beforeEach() {
-    clerkMocks.memberships = workspaces;
-    clerkMocks.membershipHasNextPage = true;
+    authMocks.workspaces = [];
   },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Show more Workspaces" }),
+  args: { redirectUrl: "/batches" },
+  play: async () => {
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith(
+        "/create-workspace?redirect_url=%2Fbatches",
+      ),
     );
-    await expect(clerkMocks.fetchNextMemberships).toHaveBeenCalled();
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
 };

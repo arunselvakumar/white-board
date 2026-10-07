@@ -13,7 +13,7 @@ import type {
   StudyMaterialView,
   SubmissionView,
 } from "@/src/queries/class-work";
-import { clerkMocks } from "../../../.storybook/mocks/clerk";
+import { signInAs } from "../../../.storybook/mocks/auth";
 
 import { BatchClassWorkScreen } from "./batch-class-work-screen";
 import { STUDY_MATERIAL_EMPTY_MESSAGE } from "./study-material-form-dialog";
@@ -328,11 +328,7 @@ const meta = {
     nextjs: { navigation: { pathname: TEACHER_BASE } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.orgRole = "org:teacher";
-    clerkMocks.memberships = [
-      { organization: { id: "org_riverside", name: "Riverside Centre" } },
-    ];
+    signInAs("teacher", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 export default meta;
@@ -453,9 +449,11 @@ export const EmptyStates: Story = {
     const dialog = within(
       await body.findByRole("dialog", { name: "Set homework" }),
     );
-    await expect(
-      dialog.getByText(/This Batch has no Classes in the last 60 days/),
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        dialog.getByText(/This Batch has no Classes in the last 60 days/),
+      ).toBeVisible(),
+    );
     await expect(
       dialog.getByRole("button", { name: "Set homework" }),
     ).toBeDisabled();
@@ -501,7 +499,7 @@ export const ClosedBatch: Story = {
 export const OwnerWithRemovedItem: Story = {
   parameters: { nextjs: { navigation: { pathname: OWNER_BASE } } },
   beforeEach: () => {
-    clerkMocks.orgRole = "org:admin";
+    signInAs("owner", { name: "Riverside Centre" });
     return mockApi({
       ...batchRoute(
         batchView({
@@ -845,7 +843,7 @@ export const SubmissionsForRemovedHomework: Story = {
     nextjs: { navigation: { pathname: `${OWNER_BASE}/${EXCEL_ID}` } },
   },
   beforeEach: () => {
-    clerkMocks.orgRole = "org:admin";
+    signInAs("owner", { name: "Riverside Centre" });
     const view = submissionsView();
     return mockApi(
       submissionsRoute({

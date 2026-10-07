@@ -13,7 +13,7 @@ import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
 import { studentQueries, type StudentResponse } from "@/src/queries/students";
 import { attendanceQueries } from "@/src/queries/attendance";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { useState } from "react";
 
 const salutations: Record<string, string> = {
@@ -289,7 +289,7 @@ export function StudentProfileView({
 
 export function StudentProfileScreen({ studentId }: { studentId: string }) {
   const router = useRouter();
-  const { orgId } = useAuth();
+  const { workspaceId } = useAuth();
   const [attendanceCursor, setAttendanceCursor] = useState<{
     after?: string;
     before?: string;
@@ -298,7 +298,7 @@ export function StudentProfileScreen({ studentId }: { studentId: string }) {
   const { data: courses } = useSuspenseQuery(courseQueries.list());
   const { data: batches } = useSuspenseQuery(batchQueries.list());
   const { data: attendance } = useSuspenseQuery(
-    attendanceQueries.student(orgId, studentId, attendanceCursor),
+    attendanceQueries.student(workspaceId, studentId, attendanceCursor),
   );
   return (
     <>

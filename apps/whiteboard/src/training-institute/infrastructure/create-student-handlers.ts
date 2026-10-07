@@ -10,7 +10,7 @@ import { UpdateStudentProfileHandler } from "../application/update-student-profi
 import { StudentId } from "../domain/student-id";
 import { WorkspaceId } from "../domain/workspace-id";
 import { InProcessEventDispatcher } from "./in-process-event-dispatcher";
-import { ClerkStudentInvitationSender } from "./clerk-student-invitation-sender";
+import { WorkspaceStudentInvitationSender } from "./workspace-student-invitation-sender";
 import { PrismaEnrollmentRepository } from "./prisma-enrollment-repository";
 import { PrismaFeePaymentRepository } from "./prisma-fee-payment-repository";
 import { PrismaStudentRepository } from "./prisma-student-repository";
@@ -46,7 +46,7 @@ export function createStudentHandlers(deps?: {
               details: student.details,
               createdByUserId: student.createdByUserId.value,
             };
-      }, new ClerkStudentInvitationSender()),
+      }, new WorkspaceStudentInvitationSender()),
     ]);
   return {
     create: new CreateStudentHandler(repository, events),

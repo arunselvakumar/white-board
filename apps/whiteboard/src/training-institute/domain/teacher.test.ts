@@ -22,7 +22,7 @@ describe("Teacher", () => {
     expect(teacher.phone).toBe("9876543210");
     expect(teacher.qualificationSummary).toBe("Python instructor");
     expect(teacher.invitationStatus).toBe("not_sent");
-    expect(teacher.clerkUserId).toBeNull();
+    expect(teacher.userId).toBeNull();
   });
 
   it("requires a name, valid email, and known Teacher type", () => {
@@ -39,7 +39,7 @@ describe("Teacher", () => {
     expect(teacher.invitationStatus).toBe("sent");
     teacher.activate("user_teacher", base.now);
     expect(teacher.invitationStatus).toBe("accepted");
-    expect(teacher.clerkUserId).toBe("user_teacher");
+    expect(teacher.userId).toBe("user_teacher");
     expect(() => {
       teacher.activate("user_other", base.now);
     }).toThrow();

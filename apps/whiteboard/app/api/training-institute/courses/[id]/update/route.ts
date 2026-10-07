@@ -43,7 +43,7 @@ export async function POST(
       syllabusOutline: model.syllabusOutline ?? [],
       description: model.description,
       defaultFeeAmountPaise: model.defaultFeeAmountPaise,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapCourseResponse(course));
   } catch (error) {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -34,10 +34,10 @@ export function ClassPrejoinScreen({
   date: string;
   startTime: string;
 }) {
-  const { orgId, userId, orgRole } = useAuth();
+  const { workspaceId, userId, role } = useAuth();
   const { data, refetch } = useSuspenseQuery(
     classQueries.detail(
-      `${orgId}:${userId}:${orgRole}`,
+      `${workspaceId}:${userId}:${role}`,
       batchId,
       date,
       startTime,

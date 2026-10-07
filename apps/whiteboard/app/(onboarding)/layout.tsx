@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { protect } from "@repo/auth/server";
 import type { ReactNode } from "react";
 
 import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
@@ -8,7 +8,7 @@ export default async function OnboardingLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  await auth.protect();
+  await protect();
 
   return <OnboardingShell>{children}</OnboardingShell>;
 }

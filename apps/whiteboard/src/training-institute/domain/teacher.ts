@@ -27,7 +27,7 @@ export type TeacherProps = {
   photoUpdatedAt: Date | null;
   idNumberLast4: string | null;
   bankAccountLast4: string | null;
-  clerkUserId: string | null;
+  userId: string | null;
   invitationId: string | null;
   invitationStatus: TeacherInvitationStatus;
   deactivatedAt: Date | null;
@@ -110,7 +110,7 @@ export class Teacher {
       photoUpdatedAt: null,
       idNumberLast4: null,
       bankAccountLast4: null,
-      clerkUserId: null,
+      userId: null,
       invitationId: null,
       invitationStatus: "not_sent",
       deactivatedAt: null,
@@ -165,8 +165,8 @@ export class Teacher {
   get bankAccountLast4() {
     return this.props.bankAccountLast4;
   }
-  get clerkUserId() {
-    return this.props.clerkUserId;
+  get userId() {
+    return this.props.userId;
   }
   get invitationId() {
     return this.props.invitationId;
@@ -268,7 +268,7 @@ export class Teacher {
 
   markInvited(invitationId: string, now: Date): void {
     this.assertActive();
-    if (this.props.clerkUserId != null) {
+    if (this.props.userId != null) {
       throw new DomainError(
         "TEACHER_ALREADY_ACTIVE",
         "Teacher has already joined.",
@@ -287,12 +287,9 @@ export class Teacher {
     this.props = { ...this.props, invitationStatus: "failed", updatedAt: now };
   }
 
-  activate(clerkUserId: string, now: Date): void {
+  activate(userId: string, now: Date): void {
     this.assertActive();
-    if (
-      this.props.clerkUserId != null &&
-      this.props.clerkUserId !== clerkUserId
-    ) {
+    if (this.props.userId != null && this.props.userId !== userId) {
       throw new DomainError(
         "TEACHER_ALREADY_LINKED",
         "Teacher is linked to another User.",
@@ -300,7 +297,7 @@ export class Teacher {
     }
     this.props = {
       ...this.props,
-      clerkUserId,
+      userId,
       invitationStatus: "accepted",
       updatedAt: now,
     };
