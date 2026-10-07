@@ -1,0 +1,23 @@
+CONTEXT.md
+  s_2818932b6efba1::t_e09757b1d514d4 167-178,255-258
+docs/adr/0033-study-material-and-homework-product-decisions.md
+  s_2818932b6efba1::t_7887fe5374c43c 1-53
+docs/prd/tasks.md
+  s_2818932b6efba1::t_fe46ec08395528 347,416-421
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a4f738e2ac15a027a148df02628a9955fda1419a",
+  "prompts": {},
+  "sessions": {
+    "s_2818932b6efba1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6749436-eeb5-41c3-b373-7109590b8a47",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
