@@ -344,6 +344,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
 | WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access            |
 | WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI            |
+| WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access     |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -412,3 +413,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Spec:** [training-institute-enquiries.md](./training-institute-enquiries.md). **Issue:** [#19](https://github.com/white-board-io/white-board-v3/issues/19). **Decisions:** [ADR-0032](../adr/0032-enquiry-and-demo-product-decisions.md). **Blocked by:** WB-003, WB-004, WB-010 (Teachers, Attendance, and Class Changes exist).
 
 **Done when:** the Owner and Teachers can record, follow up, close, and reopen Enquiries, see Follow-ups due, and book, mark, and cancel free or paid Batch and one-to-one demos; the Owner converts an Enquiry into a Student and Enrollment in one step under the usual admission rules, manages Enquiry Sources, and sees the monthly summary; a Teacher's Home lists their demos; Students and Parents can't see any of it; Enquiries and demo fees don't change Batch capacity, dues, Attendance, or the Owner Dashboard. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-014 — Study Material and Homework
+
+**Issue:** [#21](https://github.com/white-board-io/white-board-v3/issues/21). **Decisions:** [ADR-0033](../adr/0033-study-material-and-homework-product-decisions.md). **Blocked by:** WB-003, WB-010, WB-012 (Teachers, Class Changes, and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/9).
+
+**Done when:** the Owner and assigned Teachers can share Study Material and set Homework against a Class date with a due date, edit and remove them, and see per Homework who submitted, who didn't, and who was late, checking each with a remark; Students and linked Parents see them on Home and the Homework page, submit with optional files, and see remarks; late joiners see earlier items without owing them; leavers keep items from while enrolled; unassigned Teachers and other Batches' Students can't see or post. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
