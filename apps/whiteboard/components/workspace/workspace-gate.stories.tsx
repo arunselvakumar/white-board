@@ -121,3 +121,25 @@ export const ActivationFailure: Story = {
     await expect(await canvas.findByRole("alert")).toBeVisible();
   },
 };
+
+export const RoleCannotOpenScreen: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/students/new" } } },
+  beforeEach() {
+    signInAs("student", { name: "Riverside School" });
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByText("In-app home")).not.toBeInTheDocument();
+    await waitFor(() => expect(getRouter().replace).toHaveBeenCalledWith("/"));
+  },
+};
+
+export const RoleCanOpenScreen: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/student/homework" } } },
+  beforeEach() {
+    signInAs("student", { name: "Riverside School" });
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("In-app home")).toBeVisible();
+    await expect(getRouter().replace).not.toHaveBeenCalled();
+  },
+};

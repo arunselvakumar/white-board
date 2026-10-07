@@ -65,3 +65,38 @@ export function isAllowedAppPath(
     return isOwnerRole(role) || role === "teacher";
   return isOwnerRole(role);
 }
+
+/** In-app areas whose screens depend on the role. */
+const ROLE_GATED_AREAS = new Set([
+  "students",
+  "courses",
+  "batches",
+  "fees",
+  "enrollments",
+  "payments",
+  "student",
+  "parent",
+  "teacher",
+  "teachers",
+  "attendance",
+  "calendar",
+  "classes",
+  "enquiries",
+]);
+
+/**
+ * True when a User with `role` must be sent from this in-app path to the
+ * In-app Home. The Workspace Gate checks it on every navigation; the APIs
+ * behind each screen enforce the same roles with 403 (ADR-0013).
+ */
+export function mustLeaveAppPath(
+  pathname: string,
+  role: WorkspaceRole,
+): boolean {
+  const area = pathname.split("/")[1];
+  return (
+    area != null &&
+    ROLE_GATED_AREAS.has(area) &&
+    !isAllowedAppPath(pathname, role)
+  );
+}

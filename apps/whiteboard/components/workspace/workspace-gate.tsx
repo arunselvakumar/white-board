@@ -8,6 +8,7 @@ import { Button } from "@repo/ui/components/button";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LoadingScreen } from "@/components/auth/loading-screen";
 import { postWorkspacePath } from "@/lib/safe-redirect";
+import { mustLeaveAppPath } from "@/lib/workspace-access";
 
 const ACTIVATION_ERROR =
   "Could not switch to that workspace. Please try again.";
@@ -21,18 +22,25 @@ function withRedirect(path: string, redirectUrl: string): string {
 /**
  * The Workspace Gate (CONTEXT.md): zero Workspaces → Workspace Creation, one
  * and none active → activate it, several and none active → Workspace
- * Selection, an Active Workspace → the page.
+ * Selection, an Active Workspace → the page. A screen the role may not use
+ * sends the User to the In-app Home instead.
  */
 export function WorkspaceGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { workspaceId } = useAuth();
+  const { workspaceId, role } = useAuth();
   const { workspaces, setActive } = useWorkspaceList();
   const [activationError, setActivationError] = useState<string | undefined>();
   const [retryNonce, setRetryNonce] = useState(0);
   const attempted = useRef<number | null>(null);
 
   const redirectUrl = postWorkspacePath(pathname);
+  const leavePage = workspaceId != null && mustLeaveAppPath(pathname, role);
+
+  useEffect(() => {
+    if (leavePage) router.replace("/");
+  }, [leavePage, router]);
+
   const soleWorkspaceId =
     workspaces.length === 1 ? (workspaces[0]?.id ?? null) : null;
 
@@ -78,7 +86,7 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (workspaceId == null) {
+  if (workspaceId == null || leavePage) {
     return <LoadingScreen />;
   }
 

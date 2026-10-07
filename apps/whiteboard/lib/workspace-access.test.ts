@@ -5,6 +5,7 @@ import {
   destinationForRole,
   isAllowedAppPath,
   isOwnerRole,
+  mustLeaveAppPath,
 } from "./workspace-access";
 
 describe("Workspace role access", () => {
@@ -107,5 +108,47 @@ describe("Workspace role access", () => {
     expect(isAllowedAppPath("/parent/homework/h1", "parent")).toBe(true);
     expect(isAllowedAppPath("/parent/homework", "teacher")).toBe(false);
     expect(isAllowedAppPath("/parent/homework/h1/x", "parent")).toBe(false);
+  });
+});
+
+describe("Workspace Gate role redirect", () => {
+  it.each(["student", "parent"] as const)(
+    "sends %s away from Add Student",
+    (role) => {
+      expect(mustLeaveAppPath("/students/new", role)).toBe(true);
+    },
+  );
+
+  it("lets the Owner open Add Student", () => {
+    expect(mustLeaveAppPath("/students/new", "owner")).toBe(false);
+  });
+
+  it("keeps each Home within its role", () => {
+    expect(mustLeaveAppPath("/student", "student")).toBe(false);
+    expect(mustLeaveAppPath("/parent", "student")).toBe(true);
+  });
+
+  it("never redirects from the In-app Home or ungated screens", () => {
+    for (const role of WORKSPACE_ROLES) {
+      expect(mustLeaveAppPath("/", role)).toBe(false);
+      expect(mustLeaveAppPath("/online-classes", role)).toBe(false);
+    }
+  });
+
+  it.each([
+    ["teacher", "/enquiries", false],
+    ["teacher", "/enquiries/new", false],
+    ["teacher", "/enquiries/abc", false],
+    ["teacher", "/enquiries/abc/edit", false],
+    ["teacher", "/enquiries/sources", true],
+    ["teacher", "/enquiries/summary", true],
+    ["teacher", "/enquiries/abc/convert", true],
+    ["owner", "/enquiries/sources", false],
+    ["owner", "/enquiries/summary", false],
+    ["owner", "/enquiries/abc/convert", false],
+    ["student", "/enquiries", true],
+    ["parent", "/enquiries/abc", true],
+  ] as const)("gates %s on %s", (role, path, leave) => {
+    expect(mustLeaveAppPath(path, role)).toBe(leave);
   });
 });

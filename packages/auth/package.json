@@ -6,6 +6,7 @@
   "exports": {
     "./roles": "./src/roles.ts",
     "./server": "./src/server/index.ts",
+    "./proxy": "./src/proxy.ts",
     "./client": "./src/client/index.ts",
     "./react": "./src/react/index.ts",
     "./testing": "./src/testing/index.ts"

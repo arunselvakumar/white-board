@@ -30,7 +30,11 @@ Better Auth's own organization permissions go only to `owner`. Teachers, Student
 
 ## 4. Access is checked on every request
 
-Session cookie caching is off. Every request reads the session row, then the member row for the Active Workspace. Signing out, a password reset, or a removed membership therefore takes effect on the very next request. A Session whose Active Workspace no longer has the User as a member has no `workspaceId` and no `role`. The proxy and the APIs then treat it as having no Active Workspace (`403 NO_ACTIVE_WORKSPACE` per ADR-0014).
+Session cookie caching is off. Every server render and API request reads the session row, then the member row for the Active Workspace (`getAuth()`). Signing out, a password reset, or a removed membership therefore takes effect on the very next request. A Session whose Active Workspace no longer has the User as a member has no `workspaceId` and no `role`. The APIs then answer `403 NO_ACTIVE_WORKSPACE` (ADR-0014).
+
+`proxy.ts` never touches the database. Vercel bundles the proxy as its own function, without Prisma's query engine, and a proxy that queried Postgres crashed there. The proxy is the Auth Gate only: a request without a session cookie goes to Sign-in with its Redirect URL (`@repo/auth/proxy`). It is an optimistic check. `protect()` in the layouts validates the Session against the database, and so does every API route.
+
+Role access to screens moved from the proxy into the Workspace Gate (`mustLeaveAppPath` in `lib/workspace-access.ts`). The gate runs in the browser on every navigation and sends a role away from screens it may not use. Page reads run only in the browser, so a screen's data is never rendered for the wrong role. The APIs behind each screen still enforce the roles with 403; they are the security boundary.
 
 ## 5. The auth API is an allowlist
 
