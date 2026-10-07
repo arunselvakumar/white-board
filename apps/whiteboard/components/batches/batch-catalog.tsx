@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { CalendarDays, DoorOpen, Plus, UsersRound } from "lucide-react";
 import {
@@ -281,6 +282,16 @@ export function BatchCatalog({
                           }}
                         >
                           Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Homework and Study Material for ${batch.name}`}
+                          render={
+                            <Link href={`/batches/${batch.id}/homework`} />
+                          }
+                        >
+                          Homework
                         </Button>
                         {closed ? null : (
                           <Button

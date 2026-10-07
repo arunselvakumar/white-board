@@ -6,11 +6,13 @@ describe("role navigation", () => {
   it("shows each role its home, Calendar, and Online Classes", () => {
     expect(navForRole("org:student").map((item) => item.label)).toEqual([
       "Home",
+      "Homework",
       "Calendar",
       "Online Classes",
     ]);
     expect(navForRole("org:parent").map((item) => item.label)).toEqual([
       "Home",
+      "Homework",
       "Calendar",
       "Online Classes",
     ]);
@@ -74,5 +76,22 @@ describe("appPageByHref", () => {
         navForRole(role).some((item) => item.href === "/online-classes"),
       ).toBe(true);
     }
+  });
+
+  it("offers Homework to Students and Parents without lighting up Home", () => {
+    expect(navForRole("org:student").map((item) => item.href)).toContain(
+      "/student/homework",
+    );
+    expect(navForRole("org:parent").map((item) => item.href)).toContain(
+      "/parent/homework",
+    );
+    expect(isAppNavActive("/student/homework", "/student")).toBe(false);
+    expect(isAppNavActive("/student/homework/h1", "/student/homework")).toBe(
+      true,
+    );
+    expect(isAppNavActive("/parent", "/parent")).toBe(true);
+    expect(isAppNavActive("/teacher/batches/b1/homework", "/teacher")).toBe(
+      true,
+    );
   });
 });

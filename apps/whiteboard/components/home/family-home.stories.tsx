@@ -2,6 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import {
+  ASHA_ID,
+  CLASS_WORK_NOW,
+  ashaClassWork,
+  dueTodayHomework,
+  overdueHomework,
+} from "@/components/class-work/family/family-class-work.fixtures";
 import { FamilyHome } from "@/components/home/family-home";
 import type { FamilyHomeStudent } from "@/src/queries/family-home";
 import { clerkMocks } from "../../.storybook/mocks/clerk";
@@ -117,7 +124,12 @@ type Story = StoryObj<typeof meta>;
 export const StudentHome: Story = {
   render: () => (
     <AppShell>
-      <FamilyHome home={{ students: [asha] }} role="org:student" now={NOW} />
+      <FamilyHome
+        home={{ students: [asha] }}
+        classWork={{ students: [ashaClassWork] }}
+        role="org:student"
+        now={NOW}
+      />
     </AppShell>
   ),
   play: async ({ canvas }) => {
@@ -141,6 +153,54 @@ export const StudentHome: Story = {
         `/api/training-institute/classes/${BATCH}/2026-09-29/18%3A00/recording`,
       ),
     );
+    await expect(
+      canvas.getByRole("link", { name: "See all Homework" }),
+    ).toHaveAttribute("href", "/student/homework");
+    const materials = within(
+      canvas.getByRole("list", { name: "New Study Material" }),
+    );
+    await expect(materials.getAllByRole("listitem")).toHaveLength(3);
+    await expect(materials.getByText("Loops notes")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "See all Study Material" }),
+    ).toHaveAttribute("href", "/student/homework");
+  },
+};
+
+/** Homework due today, seen on Home the day it is due. */
+export const StudentHomeDueToday: Story = {
+  render: () => (
+    <AppShell>
+      <FamilyHome
+        home={{ students: [asha] }}
+        classWork={{ students: [ashaClassWork] }}
+        role="org:student"
+        now={CLASS_WORK_NOW}
+      />
+    </AppShell>
+  ),
+  play: async ({ canvas }) => {
+    const homework = within(canvas.getByRole("list", { name: "Homework due" }));
+    // Overdue first, then due in the next 7 days; 20 Oct is too far out.
+    await expect(
+      homework.getAllByRole("link").map((link) => link.textContent),
+    ).toEqual([
+      "Loops practice set",
+      "Functions worksheet",
+      "Lists and tuples",
+    ]);
+    await expect(homework.getByText("Overdue")).toBeVisible();
+    await expect(homework.getByText(/Due today/)).toBeVisible();
+    await expect(
+      homework.getByRole("link", { name: dueTodayHomework.title }),
+    ).toBeVisible();
+    await expect(
+      homework.getByRole("link", { name: "Loops practice set" }),
+    ).toHaveAttribute(
+      "href",
+      `/student/homework/${overdueHomework.id}?student=${ASHA_ID}`,
+    );
+    await expect(homework.queryByText("Mini project: calculator")).toBeNull();
   },
 };
 
@@ -153,6 +213,7 @@ export const ParentHome: Story = {
     <AppShell>
       <FamilyHome
         home={{ students: [asha, ravi] }}
+        classWork={{ students: [ashaClassWork] }}
         role="org:parent"
         now={NOW}
       />
@@ -175,7 +236,21 @@ export const ParentHome: Story = {
     await expect(
       raviSection.queryByRole("link", { name: "Open Class" }),
     ).toBeNull();
-    await expect(raviSection.getByText("Nothing due")).toBeVisible();
+    // Dues and Homework both say so; Ravi has no class-work entry at all.
+    await expect(raviSection.getAllByText("Nothing due")).toHaveLength(2);
+    await expect(raviSection.getByText("No Study Material yet.")).toBeVisible();
+    const ashaSection = within(
+      canvas.getByRole("region", { name: "Asha Kumar" }),
+    );
+    await expect(
+      ashaSection.getByRole("link", { name: "Loops practice set" }),
+    ).toHaveAttribute(
+      "href",
+      `/parent/homework/${overdueHomework.id}?student=${ASHA_ID}`,
+    );
+    await expect(
+      ashaSection.getByRole("link", { name: "See all Homework" }),
+    ).toHaveAttribute("href", "/parent/homework");
     await expect(
       raviSection.getByText("No Attendance marked yet."),
     ).toBeVisible();
@@ -222,5 +297,7 @@ export const StudentWithoutEnrollments: Story = {
     await expect(canvas.getByText("No active Enrollments.")).toBeVisible();
     await expect(canvas.getByText("No Attendance marked yet.")).toBeVisible();
     await expect(canvas.getByText("No recordings yet.")).toBeVisible();
+    await expect(canvas.getByText("Nothing due")).toBeVisible();
+    await expect(canvas.getByText("No Study Material yet.")).toBeVisible();
   },
 };
