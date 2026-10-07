@@ -21,6 +21,31 @@ function tooLarge(): Response {
 }
 
 /**
+ * Reads at most `limit` bytes of the body, stopping as soon as it is larger,
+ * so a chunked request without a Content-Length can't fill memory.
+ */
+async function readLimited(
+  body: ReadableStream<Uint8Array> | null,
+  limit: number,
+): Promise<Uint8Array | null> {
+  if (body == null) return new Uint8Array();
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks, total);
+}
+
+/**
  * Uploads one file as the raw request body (ADR-0033). It waits until a
  * Study Material, Homework, or Submission saved by the same User attaches it.
  */
@@ -35,8 +60,8 @@ export async function POST(request: Request): Promise<Response> {
     );
     const declared = Number(request.headers.get("content-length") ?? "0");
     if (declared > ATTACHMENT_MAX_BYTES) return tooLarge();
-    const bytes = new Uint8Array(await request.arrayBuffer());
-    if (bytes.length > ATTACHMENT_MAX_BYTES) return tooLarge();
+    const bytes = await readLimited(request.body, ATTACHMENT_MAX_BYTES);
+    if (bytes == null) return tooLarge();
     const upload = await handlers.upload(member, {
       name: name ?? null,
       mimeType: request.headers.get("content-type"),

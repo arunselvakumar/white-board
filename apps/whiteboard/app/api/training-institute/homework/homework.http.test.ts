@@ -877,6 +877,25 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
       (await uploadFile(new Uint8Array(4 * 1024 * 1024 + 1), "image/png"))
         .status,
     ).toBe(413);
+    // A streamed body with no Content-Length stops at the limit too.
+    const chunk = new Uint8Array(1024 * 1024);
+    let sent = 0;
+    const streamed = await upload(
+      new Request("http://localhost/api/training-institute/attachments", {
+        method: "POST",
+        headers: { "content-type": "image/png" },
+        body: new ReadableStream<Uint8Array>({
+          pull(controller) {
+            sent += 1;
+            if (sent > 64) controller.close();
+            else controller.enqueue(chunk);
+          },
+        }),
+        duplex: "half",
+      } as RequestInit),
+    );
+    expect(streamed.status).toBe(413);
+    expect(sent).toBeLessThan(10);
 
     const ids: string[] = [];
     for (let index = 0; index < 6; index += 1)

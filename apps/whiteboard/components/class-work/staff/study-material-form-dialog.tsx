@@ -114,6 +114,7 @@ export function StudyMaterialFormDialog({
           </DialogDescription>
         </DialogHeader>
         <StudyMaterialForm
+          key={material?.id ?? "new"}
           batchId={batchId}
           classDates={classDates}
           today={today}

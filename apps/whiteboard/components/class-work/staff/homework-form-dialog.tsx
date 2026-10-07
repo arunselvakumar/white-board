@@ -134,6 +134,7 @@ export function HomeworkFormDialog({
           </DialogDescription>
         </DialogHeader>
         <HomeworkForm
+          key={homework?.id ?? "new"}
           batchId={batchId}
           classDates={classDates}
           today={today}

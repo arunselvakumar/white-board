@@ -26,7 +26,7 @@ The Enrollment begins on the local date it was created in the Batch's timezone, 
 
 **Decision:** Yes, until the Teacher checks it.
 
-Until it's checked, the Student or a linked Parent can change the note, replace attachments, or undo "done". Once the Owner or a Teacher marks it checked, it is locked. The Submission records who last submitted it (the Student or a Parent) and when; Late is worked out from that time against the current due date.
+Until it's checked, the Student or a linked Parent can change the note, replace attachments, or undo "done". Once the Owner or a Teacher marks it checked, it is locked. The Submission keeps who first marked it done (the Student or a Parent) and when; Late compares that first time with the current due date, so a later change doesn't make it late. Who made the latest change is recorded too. Undoing ends the Submission; marking it done again starts a new one.
 
 **Considered options:** until checked (chosen); never; always, with a "changed after checking" flag.
 
