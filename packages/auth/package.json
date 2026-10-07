@@ -1,0 +1,38 @@
+{
+  "name": "@repo/auth",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./roles": "./src/roles.ts",
+    "./server": "./src/server/index.ts",
+    "./client": "./src/client/index.ts",
+    "./react": "./src/react/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/db": "*",
+    "@repo/email-templates": "*",
+    "better-auth": "1.7.7",
+    "resend": "^6.11.1"
+  },
+  "peerDependencies": {
+    "next": "16.3.4",
+    "react": "19.2.8"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "10.9.1",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "typescript": "6.0.2"
+  }
+}
