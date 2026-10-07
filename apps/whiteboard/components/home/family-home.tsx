@@ -16,8 +16,13 @@ import {
 import { Download } from "lucide-react";
 import Link from "next/link";
 
+import { HomeworkHomeCards } from "@/components/class-work/family/homework-home-cards";
 import { withAppBasePath } from "@/lib/app-base-path";
 import { formatPaiseAsRupees } from "@/lib/money";
+import type {
+  FamilyClassWorkStudentView,
+  FamilyClassWorkView,
+} from "@/src/queries/class-work";
 import { classApiPath, classPath } from "@/src/queries/classes";
 import type {
   FamilyHomeResponse,
@@ -251,17 +256,33 @@ function RecordingsCard({
   );
 }
 
+const NO_CLASS_WORK: FamilyClassWorkView = { students: [] };
+
 function StudentCards({
   student,
+  classWork,
+  role,
   now,
 }: {
   student: FamilyHomeStudent;
+  classWork: FamilyClassWorkView;
+  role: FamilyHomeRole;
   now: Date;
 }) {
+  const studentClassWork: FamilyClassWorkStudentView = classWork.students.find(
+    (candidate) => candidate.id === student.id,
+  ) ?? {
+    id: student.id,
+    name: student.name,
+    batches: [],
+    homework: [],
+    materials: [],
+  };
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <NextClassCard nextClass={student.nextClass} now={now} />
       <DuesCard dues={student.dues} />
+      <HomeworkHomeCards student={studentClassWork} role={role} now={now} />
       <AttendanceCard marks={student.recentAttendance} />
       <RecordingsCard recordings={student.recordings} />
     </div>
@@ -271,10 +292,13 @@ function StudentCards({
 export function FamilyHome({
   home,
   role,
+  classWork = NO_CLASS_WORK,
   now = new Date(),
 }: {
   home: FamilyHomeResponse;
   role: FamilyHomeRole;
+  /** Homework and Study Material for the same Students. */
+  classWork?: FamilyClassWorkView;
   now?: Date;
 }) {
   const title = role === "org:parent" ? "Parent Home" : "Student Home";
@@ -305,12 +329,23 @@ export function FamilyHome({
               >
                 {student.name}
               </h2>
-              <StudentCards student={student} now={now} />
+              <StudentCards
+                student={student}
+                classWork={classWork}
+                role={role}
+                now={now}
+              />
             </section>
           ))
         ) : (
           home.students.map((student) => (
-            <StudentCards key={student.id} student={student} now={now} />
+            <StudentCards
+              key={student.id}
+              student={student}
+              classWork={classWork}
+              role={role}
+              now={now}
+            />
           ))
         )}
       </div>

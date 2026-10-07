@@ -20,6 +20,10 @@ const NOT_FOUND_CODES = new Set([
   "ENQUIRY_NOT_FOUND",
   "DEMO_NOT_FOUND",
   "ENQUIRY_SOURCE_NOT_FOUND",
+  "STUDY_MATERIAL_NOT_FOUND",
+  "HOMEWORK_NOT_FOUND",
+  "HOMEWORK_SUBMISSION_NOT_FOUND",
+  "ATTACHMENT_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -82,6 +86,12 @@ const CONFLICT_CODES = new Set([
   "DEMO_ATTENDANCE_MARKED",
   "DEMO_FREE",
   "DEMO_FEE_ALREADY_PAID",
+  "STUDY_MATERIAL_REMOVED",
+  "HOMEWORK_REMOVED",
+  "HOMEWORK_ACCESS_ENDED",
+  "HOMEWORK_SUBMISSION_CHECKED",
+  "HOMEWORK_NOT_SUBMITTED",
+  "ATTACHMENT_UPLOAD_LIMIT",
 ]);
 const ENQUIRY_FORBIDDEN_CODES = new Set([
   "ENQUIRY_CONVERT_FORBIDDEN",
@@ -120,7 +130,9 @@ export function mapError(error: unknown): Response {
     return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
   }
   if (
-    (code === "ATTENDANCE_FORBIDDEN" || code === "HOLIDAY_FORBIDDEN") &&
+    (code === "ATTENDANCE_FORBIDDEN" ||
+      code === "HOLIDAY_FORBIDDEN" ||
+      code === "CLASS_WORK_FORBIDDEN") &&
     error instanceof Error
   ) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);

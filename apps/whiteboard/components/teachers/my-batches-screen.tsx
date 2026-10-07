@@ -70,12 +70,20 @@ function MyBatchesContent({
                         </p>
                       ))}
                 </div>
-                <Link
-                  className="mt-4 inline-block text-sm font-medium underline"
-                  href={`/teacher/batches/${batch.id}/attendance`}
-                >
-                  Take Attendance
-                </Link>
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+                  <Link
+                    className="inline-block text-sm font-medium underline"
+                    href={`/teacher/batches/${batch.id}/attendance`}
+                  >
+                    Take Attendance
+                  </Link>
+                  <Link
+                    className="inline-block text-sm font-medium underline"
+                    href={`/teacher/batches/${batch.id}/homework`}
+                  >
+                    Homework and Study Material
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

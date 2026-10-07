@@ -164,6 +164,18 @@ _Avoid_: trial, demo session, sample class
 Where an Enquiry came from, such as Phone call, Walk-in, or Referral. Each Workspace keeps its own list; a retired Source stays on past Enquiries.
 _Avoid_: channel, lead source, campaign
 
+**Study Material**:
+Notes, a link, or files (PDF, JPEG, PNG) the Owner or an assigned Teacher shares with a Batch, optionally for one Class date. Every Student in the Batch and their linked Parents see it, including Students who join later. See ADR-0033.
+_Avoid_: resource, content, upload (as the entity name)
+
+**Homework**:
+Work set for a Batch after one of its Classes: a title, instructions, optional files, the Class date it follows from, and a due date. It is overdue from the day after the due date until submitted. Homework due before a Student joined is shown to them for reference but isn't owed.
+_Avoid_: assignment, task, worksheet (as the entity name)
+
+**Submission**:
+A Student's Homework marked done, by the Student or a linked Parent, with an optional note and files. It is Late when first made after the due date. It can be changed or undone until the Owner or a Teacher checks it, optionally with a remark the Student and Parents see.
+_Avoid_: hand-in, turn-in, answer
+
 **P0**:
 The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.
 
@@ -239,6 +251,10 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Holiday** belongs to one **Workspace** and cancels every **Class** on its dates.
 - The **Owner Dashboard** is the **In-app Home** for a Training Institute **Workspace**.
 - The **Student Home** and **Parent Home** are the **In-app Home** for Student and Parent Users. A Student or Parent may download a **Class** recording only from an active **Enrollment**, on or after the date it began.
+
+- **Study Material** and **Homework** belong to one **Batch**. A **Homework** belongs to one of the Batch's **Class** dates.
+- A **Submission** belongs to one **Homework** and one **Student**; there is at most one live Submission per Homework and Student.
+- A Student who leaves a Batch keeps read access to Study Material and Homework posted while they were enrolled.
 
 ## Example dialogue
 

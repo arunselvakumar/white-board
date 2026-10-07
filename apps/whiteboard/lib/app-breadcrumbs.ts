@@ -17,12 +17,28 @@ export function getAppBreadcrumbs(
     const trail = enquiryBreadcrumbs(pathname);
     return role === "org:teacher" ? trail : [dashboard, ...trail];
   }
-  if (role === "org:student") return [{ label: "Home", href: "/student" }];
-  if (role === "org:parent") return [{ label: "Home", href: "/parent" }];
-  if (role === "org:teacher")
-    return pathname === "/teacher"
-      ? [{ label: "My Batches", href: "/teacher" }]
-      : [{ label: "My Batches", href: "/teacher" }, { label: "Attendance" }];
+  if (role === "org:student" || role === "org:parent") {
+    const home = role === "org:student" ? "/student" : "/parent";
+    if (!pathname.startsWith(`${home}/homework`))
+      return [{ label: "Home", href: home }];
+    const homework = { label: "Homework", href: `${home}/homework` };
+    return pathname === homework.href
+      ? [homework]
+      : [homework, { label: "Homework details" }];
+  }
+  if (role === "org:teacher") {
+    const myBatches = { label: "My Batches", href: "/teacher" };
+    if (pathname === "/teacher") return [myBatches];
+    const [, , , batchId, action, homeworkId] = pathname.split("/");
+    if (action !== "homework") return [myBatches, { label: "Attendance" }];
+    const work = {
+      label: "Homework and Study Material",
+      href: `/teacher/batches/${batchId}/homework`,
+    };
+    return homeworkId === undefined
+      ? [myBatches, work]
+      : [myBatches, work, { label: "Submissions" }];
+  }
   const [area, id, action] = pathname.split("/").filter(Boolean);
 
   if (area === undefined) {
@@ -79,6 +95,15 @@ export function getAppBreadcrumbs(
   }
   if (action === "enroll" && (area === "students" || area === "batches")) {
     return [dashboard, parent, resource, { label: "Enroll Student" }];
+  }
+  if (action === "homework" && area === "batches") {
+    const work = {
+      label: "Homework and Study Material",
+      href: `/batches/${id}/homework`,
+    };
+    return pathname === work.href
+      ? [dashboard, parent, work]
+      : [dashboard, parent, work, { label: "Submissions" }];
   }
   if (area === "courses" || area === "batches") {
     return [dashboard, parent, { label: `Edit ${section.singular}` }];

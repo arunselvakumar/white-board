@@ -27,6 +27,8 @@ export type OpenApiOperation = {
   params?: z.ZodType;
   query?: z.ZodType;
   body?: z.ZodType;
+  /** A raw file body in one of these types instead of JSON. */
+  bodyBinaryContentTypes?: string[];
   successStatus: StatusCodes;
   successDescription: string;
   successSchema?: z.ZodType;
@@ -61,6 +63,7 @@ const STATUS_DESCRIPTIONS: Partial<Record<StatusCodes, string>> = {
   [StatusCodes.FORBIDDEN]: "Active workspace required",
   [StatusCodes.NOT_FOUND]: "Not found",
   [StatusCodes.CONFLICT]: "Domain state conflict",
+  [StatusCodes.REQUEST_TOO_LONG]: "File too large",
   [StatusCodes.INTERNAL_SERVER_ERROR]: "Unexpected error",
 };
 
@@ -202,7 +205,17 @@ export function buildOpenApiDocument(
     if (parameters.length > 0) {
       item["parameters"] = parameters;
     }
-    if (operation.body != null) {
+    if (operation.bodyBinaryContentTypes != null) {
+      item["requestBody"] = {
+        required: true,
+        content: Object.fromEntries(
+          operation.bodyBinaryContentTypes.map((mimeType) => [
+            mimeType,
+            { schema: { type: "string", format: "binary" } },
+          ]),
+        ),
+      };
+    } else if (operation.body != null) {
       item["requestBody"] = {
         required: true,
         content: {

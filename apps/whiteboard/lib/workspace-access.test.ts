@@ -96,4 +96,26 @@ describe("Workspace role access", () => {
     ).toBe(false);
     expect(isAllowedAppPath("/calendar/private", "org:student")).toBe(false);
   });
+
+  it("opens Homework and Study Material to the roles that use them (ADR-0033)", () => {
+    expect(isAllowedAppPath("/batches/b1/homework", "org:admin")).toBe(true);
+    expect(isAllowedAppPath("/batches/b1/homework/h1", "org:admin")).toBe(true);
+    expect(isAllowedAppPath("/batches/b1/homework", "org:teacher")).toBe(false);
+    expect(
+      isAllowedAppPath("/teacher/batches/b1/homework", "org:teacher"),
+    ).toBe(true);
+    expect(
+      isAllowedAppPath("/teacher/batches/b1/homework/h1", "org:teacher"),
+    ).toBe(true);
+    expect(
+      isAllowedAppPath("/teacher/batches/b1/homework", "org:student"),
+    ).toBe(false);
+    expect(isAllowedAppPath("/student/homework", "org:student")).toBe(true);
+    expect(isAllowedAppPath("/student/homework/h1", "org:student")).toBe(true);
+    expect(isAllowedAppPath("/student/homework", "org:parent")).toBe(false);
+    expect(isAllowedAppPath("/parent/homework", "org:parent")).toBe(true);
+    expect(isAllowedAppPath("/parent/homework/h1", "org:parent")).toBe(true);
+    expect(isAllowedAppPath("/parent/homework", "org:teacher")).toBe(false);
+    expect(isAllowedAppPath("/parent/homework/h1/x", "org:parent")).toBe(false);
+  });
 });

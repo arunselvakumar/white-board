@@ -74,10 +74,14 @@ export const StudentNavigation: Story = {
       );
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
-    await expect(nav.getAllByRole("link")).toHaveLength(3);
+    await expect(nav.getAllByRole("link")).toHaveLength(4);
     await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/student",
+    );
+    await expect(nav.getByRole("link", { name: "Homework" })).toHaveAttribute(
+      "href",
+      "/student/homework",
     );
     await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute(
       "href",
@@ -107,10 +111,14 @@ export const ParentNavigation: Story = {
       );
     }
     const nav = within(body.getByRole("navigation", { name: "Main" }));
-    await expect(nav.getAllByRole("link")).toHaveLength(3);
+    await expect(nav.getAllByRole("link")).toHaveLength(4);
     await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/parent",
+    );
+    await expect(nav.getByRole("link", { name: "Homework" })).toHaveAttribute(
+      "href",
+      "/parent/homework",
     );
     await expect(nav.getByRole("link", { name: "Calendar" })).toHaveAttribute(
       "href",

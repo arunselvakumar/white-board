@@ -70,6 +70,12 @@ export const STUDENT_NAV = [
     description: "Next Class, dues, Attendance, and recordings.",
   },
   {
+    href: "/student/homework",
+    label: "Homework",
+    title: "Homework",
+    description: "Homework and Study Material from my Batches.",
+  },
+  {
     href: "/calendar",
     label: "Calendar",
     title: "Calendar",
@@ -90,6 +96,12 @@ export const PARENT_NAV = [
     title: "Parent Home",
     description:
       "Next Class, dues, Attendance, and recordings for each Student.",
+  },
+  {
+    href: "/parent/homework",
+    label: "Homework",
+    title: "Homework",
+    description: "Homework and Study Material for each Student.",
   },
   {
     href: "/calendar",
@@ -148,8 +160,9 @@ export type AppNavItem =
 export type AppNavHref = AppNavItem["href"];
 
 export function isAppNavActive(pathname: string, href: string): boolean {
-  if (href === "/") {
-    return pathname === "/";
+  // Family Homes have their own nav items beneath them (/student/homework).
+  if (href === "/" || href === "/student" || href === "/parent") {
+    return pathname === href;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

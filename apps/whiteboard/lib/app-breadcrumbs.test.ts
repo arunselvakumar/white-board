@@ -86,3 +86,44 @@ it("starts a Teacher's Enquiry trail at Enquiries", () => {
     { label: "Edit enquiry" },
   ]);
 });
+
+it("trails Homework and Study Material for every role (ADR-0033)", () => {
+  expect(getAppBreadcrumbs("/batches/b1/homework", "org:admin")).toEqual([
+    { label: "Dashboard", href: "/" },
+    { label: "Batches", href: "/batches" },
+    { label: "Homework and Study Material", href: "/batches/b1/homework" },
+  ]);
+  expect(
+    getAppBreadcrumbs("/batches/b1/homework/h1", "org:admin").map(
+      (crumb) => crumb.label,
+    ),
+  ).toEqual([
+    "Dashboard",
+    "Batches",
+    "Homework and Study Material",
+    "Submissions",
+  ]);
+  expect(
+    getAppBreadcrumbs("/teacher/batches/b1/homework/h1", "org:teacher"),
+  ).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    {
+      label: "Homework and Study Material",
+      href: "/teacher/batches/b1/homework",
+    },
+    { label: "Submissions" },
+  ]);
+  expect(
+    getAppBreadcrumbs("/teacher/batches/b1/attendance", "org:teacher"),
+  ).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    { label: "Attendance" },
+  ]);
+  expect(getAppBreadcrumbs("/student/homework", "org:student")).toEqual([
+    { label: "Homework", href: "/student/homework" },
+  ]);
+  expect(getAppBreadcrumbs("/parent/homework/h1", "org:parent")).toEqual([
+    { label: "Homework", href: "/parent/homework" },
+    { label: "Homework details" },
+  ]);
+});

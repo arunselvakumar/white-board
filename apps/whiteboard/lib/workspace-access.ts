@@ -47,7 +47,15 @@ export function isAllowedAppPath(
   if (pathname === "/student") return role === "org:student";
   if (pathname === "/parent") return role === "org:parent";
   if (pathname === "/teacher") return role === "org:teacher";
+  // Homework and Study Material (ADR-0033): the family page and a Homework.
+  if (/^\/student\/homework(?:\/[^/]+)?$/.test(pathname))
+    return role === "org:student";
+  if (/^\/parent\/homework(?:\/[^/]+)?$/.test(pathname))
+    return role === "org:parent";
   if (/^\/teacher\/batches\/[^/]+\/attendance$/.test(pathname))
+    return role === "org:teacher";
+  // A Batch's Homework and Study Material, and one Homework's Submissions.
+  if (/^\/teacher\/batches\/[^/]+\/homework(?:\/[^/]+)?$/.test(pathname))
     return role === "org:teacher";
   // Checked before the Staff routes so "sources" and "summary" never read as an Enquiry id.
   if (OWNER_ENQUIRY_PATH.test(pathname)) return isOwnerRole(role);
