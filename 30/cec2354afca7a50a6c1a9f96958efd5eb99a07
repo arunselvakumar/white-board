@@ -1,0 +1,91 @@
+.github/workflows/ci.yml
+  s_47ca3a523b12b8::t_06b2b701d496ba 22-35,37-43,58-60
+bun.lock
+  s_47ca3a523b12b8::t_9e20c8aced76f9 50,90-114,131-151,275,281,291-295,297,299,301,303,305,307-309,511,513,521-522,657-663,665,667,669,671,673,675,677,679,681-697,701-702,705-706,747-748,767,869,917,1005,1013,1049-1050,1059,1061,1095,1097,1117,1119,1125,1127,1131,1167,1169-1171,1179-1180,1207-1216,1237-1239,1243,1245,1407,1409,1411,1413,1489-1490,1511,1523,1525,1535,1537-1539,1541,1575-1576,1581,1591,1597,1609-1610,1627-1628,1633,1647,1649,1685,1701-1702,1709-1710,1721-1723,1735-1736,1739,1763-1764,1779,1799-1800,1809,1829,1831,1833,1861-1862,1867-1872,1909,1911,1913,1979-1980,2003-2004,2019,2055-2056,2065,2067,2069-2071,2073,2075,2077,2079,2081,2083,2085,2095,2123-2124,2127-2130,2141,2143,2145,2147,2149,2151,2157-2158,2161,2163,2171,2191,2197,2199,2211,2213,2215,2217,2219,2245,2247,2249,2251,2255,2257,2259,2261
+compose.yaml
+  s_47ca3a523b12b8::t_239c258a110085 19-25
+package.json
+  s_47ca3a523b12b8::t_fe0750e6490f2f 16
+packages/auth/package.json
+  s_47ca3a523b12b8::t_62e57b4485bf2f 1-38
+packages/auth/src/config.ts
+  s_47ca3a523b12b8::t_329568e354c5f2 1-236
+packages/auth/src/email/sender.ts
+  s_47ca3a523b12b8::t_179643e2130248 1-121
+packages/auth/src/react/hooks.ts
+  s_47ca3a523b12b8::t_54ee0649b1c57b 1-258
+packages/auth/src/react/index.ts
+  s_47ca3a523b12b8::t_4cee5c0a174634 1-17
+packages/auth/src/roles.ts
+  s_47ca3a523b12b8::t_13f1b9b0528278 1-64
+packages/auth/src/server/auth.ts
+  s_47ca3a523b12b8::t_ba419b8221cb0c 1-53
+packages/auth/src/server/get-auth.ts
+  s_47ca3a523b12b8::t_61a640fc815cc2 1-92
+packages/auth/src/server/index.ts
+  s_47ca3a523b12b8::t_dca0dbdaf5868c 1-30
+packages/auth/src/server/workspaces.ts
+  s_47ca3a523b12b8::t_3f5b198df04249 1-405
+packages/auth/tsconfig.json
+  s_47ca3a523b12b8::t_28d14dda60b202 1-11
+packages/db/prisma/migrations/20261008090000_identity/migration.sql
+  s_47ca3a523b12b8::t_1d60f5b164d124 1-171
+packages/db/prisma/migrations/20261008090100_teacher_user_id/migration.sql
+  s_47ca3a523b12b8::t_09dab7c112ef28 1-8
+packages/db/prisma/schema/base.prisma
+  s_47ca3a523b12b8::t_fc2565252f7075 10
+packages/db/prisma/schema/identity.prisma
+  s_47ca3a523b12b8::t_2145d38076a6f2 1-144
+packages/db/prisma/schema/training-institute.prisma
+  s_47ca3a523b12b8::t_e2a623be7414a6 255,272
+packages/email-templates/eslint.config.js
+  s_47ca3a523b12b8::t_c1e87f441a05b2 1-19
+packages/email-templates/package.json
+  s_47ca3a523b12b8::t_db39b4d9f127d6 1-31
+packages/email-templates/src/components/email-layout.tsx
+  s_47ca3a523b12b8::t_4650a2c0e984f8 1-93
+packages/email-templates/src/emails/workspace-invitation.tsx
+  s_47ca3a523b12b8::t_5625168feb6ce3 1-106
+packages/email-templates/tsconfig.json
+  s_47ca3a523b12b8::t_5e664eeef26b51 1-11
+turbo.json
+  s_47ca3a523b12b8::t_de47e9707027ad 8-19
+packages/auth/eslint.config.js
+  s_47ca3a523b12b8::t_13dae02a24d0f3 1-16
+packages/auth/src/allowed-paths.ts
+  s_47ca3a523b12b8::t_05e05aae2cc1a6 1-56
+packages/auth/src/client/index.ts
+  s_47ca3a523b12b8::t_f6acc273edebb5 1-53
+packages/auth/src/react/auth-provider.tsx
+  s_47ca3a523b12b8::t_833754a6df69df 1-29
+packages/auth/src/testing/index.ts
+  s_47ca3a523b12b8::t_e5b82d79c6cf8b 1-138
+packages/auth/src/types.ts
+  s_47ca3a523b12b8::t_5b0c0bbbe5895c 1-48
+packages/auth/src/urls.ts
+  s_47ca3a523b12b8::t_2055b74c2e1dd0 1-35
+packages/auth/src/workspace.ts
+  s_47ca3a523b12b8::t_750b1ac77692ff 1-18
+packages/email-templates/src/components/brand.ts
+  s_47ca3a523b12b8::t_2dabcb2c72ebb8 1-9
+packages/email-templates/src/emails/verification-code.tsx
+  s_47ca3a523b12b8::t_dd3f31a1daa176 1-93
+packages/email-templates/src/index.ts
+  s_47ca3a523b12b8::t_6415f0ed5b4a17 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "30cec2354afca7a50a6c1a9f96958efd5eb99a07",
+  "prompts": {},
+  "sessions": {
+    "s_47ca3a523b12b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00f2cd3e-b6a6-4415-abf1-e64d3cdb053f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
