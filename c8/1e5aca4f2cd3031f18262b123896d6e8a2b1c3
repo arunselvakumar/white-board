@@ -1,0 +1,35 @@
+apps/whiteboard/components/workspace/workspace-gate.stories.tsx
+  s_47ca3a523b12b8::t_2627cadb6f1609 124-145
+apps/whiteboard/components/workspace/workspace-gate.tsx
+  s_47ca3a523b12b8::t_95a5c5a3c2838f 11,25-26,31,38-43,89
+apps/whiteboard/lib/workspace-access.test.ts
+  s_47ca3a523b12b8::t_a9126104b0e2c9 8,113-154
+apps/whiteboard/lib/workspace-access.ts
+  s_47ca3a523b12b8::t_11d74238131a66 68-102
+apps/whiteboard/proxy.test.ts
+  s_47ca3a523b12b8::t_63bd77453cdb4e 2,6-9,15-16,25-35,41-42,48-49
+apps/whiteboard/proxy.ts
+  s_47ca3a523b12b8::t_d6e06b6ff71e82 1,19-23,25,29-36
+docs/adr/0034-identity-on-better-auth.md
+  s_47ca3a523b12b8::t_a389565a14627b 33-37
+packages/auth/package.json
+  s_47ca3a523b12b8::t_601ecf0a44ebd2 9
+packages/auth/src/proxy.ts
+  s_47ca3a523b12b8::t_f32f9ac0087f2a 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c81e5aca4f2cd3031f18262b123896d6e8a2b1c3",
+  "prompts": {},
+  "sessions": {
+    "s_47ca3a523b12b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00f2cd3e-b6a6-4415-abf1-e64d3cdb053f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
