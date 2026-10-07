@@ -169,5 +169,6 @@ ALTER TABLE "training_institute"."enquiry_demos" ADD CONSTRAINT "enquiry_demos_k
 -- A paid demo has an amount from ₹1 to ₹1,00,000; a free demo has none.
 ALTER TABLE "training_institute"."enquiry_demos" ADD CONSTRAINT "enquiry_demos_fee_check" CHECK (
   ("fee_kind" = 'free' AND "fee_amount_paise" IS NULL AND "fee_paid_at" IS NULL)
-  OR ("fee_kind" = 'paid' AND "fee_amount_paise" BETWEEN 100 AND 10000000)
+  OR ("fee_kind" = 'paid' AND "fee_amount_paise" IS NOT NULL
+      AND "fee_amount_paise" BETWEEN 100 AND 10000000)
 );

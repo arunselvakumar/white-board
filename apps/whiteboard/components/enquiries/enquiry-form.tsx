@@ -323,6 +323,10 @@ export function EnquiryForm({
     onSuccess: (matches, value) => {
       setChecked({ digits: digitsOf(value), matches });
     },
+    // Let a later blur or pause retry the same number after a failed check.
+    onError: (_error, value) => {
+      if (lastChecked.current === digitsOf(value)) lastChecked.current = null;
+    },
   });
   const { mutate: runPhoneCheck } = phoneCheck;
   const requestPhoneCheck = (value: string) => {
