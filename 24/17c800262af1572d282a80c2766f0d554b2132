@@ -1,0 +1,21 @@
+apps/whiteboard/components/enquiries/enquiry-form.tsx
+  s_89190f7be1bf2e::t_5cb6a5f79bc02f 326-329
+packages/db/prisma/migrations/20261007090000_enquiries_and_demos/migration.sql
+  s_89190f7be1bf2e::t_b379f5ba1c3618 172-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2417c800262af1572d282a80c2766f0d554b2132",
+  "prompts": {},
+  "sessions": {
+    "s_89190f7be1bf2e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0740219a-31cb-4f34-96d1-eb9364c0b50d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
