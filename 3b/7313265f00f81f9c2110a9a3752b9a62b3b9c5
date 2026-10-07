@@ -1,0 +1,81 @@
+apps/whiteboard/app/api/_lib/map-error.ts
+  s_2818932b6efba1::t_4192b9ba39f884 23-26,89-94,133-135
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_2818932b6efba1::t_f2a07f5c8d7736 239-278
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_2818932b6efba1::t_b92ed81668a5e0 150-169,1267-1437,1527-1541
+apps/whiteboard/app/api/_lib/openapi.ts
+  s_2818932b6efba1::t_3ed897e30499ce 30-31,66,208-218
+apps/whiteboard/app/api/training-institute/attachments/[id]/route.ts
+  s_2818932b6efba1::t_e0b02f5491468a 1-44
+apps/whiteboard/app/api/training-institute/attachments/route.ts
+  s_2818932b6efba1::t_f139d30e70ba24 1-49
+apps/whiteboard/app/api/training-institute/batches/[id]/class-work/route.ts
+  s_2818932b6efba1::t_a1cc82cc783b6a 1-28
+apps/whiteboard/app/api/training-institute/batches/[id]/homework/route.ts
+  s_2818932b6efba1::t_f309eac0962c83 1-38
+apps/whiteboard/app/api/training-institute/batches/[id]/study-materials/route.ts
+  s_2818932b6efba1::t_6885793cc73705 1-40
+apps/whiteboard/app/api/training-institute/home/homework/route.ts
+  s_2818932b6efba1::t_92a5135e9ed512 1-19
+apps/whiteboard/app/api/training-institute/homework/[id]/remove/route.ts
+  s_2818932b6efba1::t_3c2bbe905ba5c1 1-28
+apps/whiteboard/app/api/training-institute/homework/[id]/submissions/[submissionId]/check/route.ts
+  s_2818932b6efba1::t_5e2e57ef346c75 1-37
+apps/whiteboard/app/api/training-institute/homework/[id]/submissions/route.ts
+  s_2818932b6efba1::t_adcf9eb26ceb86 1-28
+apps/whiteboard/app/api/training-institute/homework/[id]/submit/route.ts
+  s_2818932b6efba1::t_407bc13999d343 1-36
+apps/whiteboard/app/api/training-institute/homework/[id]/undo-submission/route.ts
+  s_2818932b6efba1::t_c042b6c94aa6db 1-36
+apps/whiteboard/app/api/training-institute/homework/[id]/update/route.ts
+  s_2818932b6efba1::t_fe28795d217bbe 1-36
+apps/whiteboard/app/api/training-institute/homework/class-work-models.ts
+  s_2818932b6efba1::t_45f5b83b7f3d2e 1-189
+apps/whiteboard/app/api/training-institute/homework/class-work-session.ts
+  s_2818932b6efba1::t_2ddae09b72dcf4 1-74
+apps/whiteboard/app/api/training-institute/homework/homework.http.test.ts
+  s_2818932b6efba1::t_bfc15c20c758c6 1-897
+apps/whiteboard/app/api/training-institute/study-materials/[id]/remove/route.ts
+  s_2818932b6efba1::t_4be336d27ef82d 1-28
+apps/whiteboard/app/api/training-institute/study-materials/[id]/update/route.ts
+  s_2818932b6efba1::t_1cb10f4901b8ef 1-36
+apps/whiteboard/src/queries/class-work.ts
+  s_2818932b6efba1::t_ede11c38848516 1-239
+apps/whiteboard/src/training-institute/application/class-work-handlers.ts
+  s_2818932b6efba1::t_874de724a5c9bb 1-1222
+apps/whiteboard/src/training-institute/application/class-work-ports.ts
+  s_2818932b6efba1::t_8b10c1399fcad7 1-295
+apps/whiteboard/src/training-institute/application/class-work-views.ts
+  s_2818932b6efba1::t_0ca0605b5aef75 1-180
+apps/whiteboard/src/training-institute/domain/class-work.test.ts
+  s_2818932b6efba1::t_89c0bb9e921640 1-203
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-work-store.ts
+  s_2818932b6efba1::t_a186f1afe00f21 1-835
+packages/db/prisma/migrations/20261007150000_study_material_and_homework/migration.sql
+  s_2818932b6efba1::t_2aa0d0de8cb8f2 1-164
+packages/db/prisma/schema/training-institute.prisma
+  s_2818932b6efba1::t_635d45d97e4817 159-160,268-269,342,642-775
+apps/whiteboard/src/training-institute/application/attachment-file.ts
+  s_2818932b6efba1::t_9264d73d325bdf 1-99
+apps/whiteboard/src/training-institute/domain/class-work.ts
+  s_2818932b6efba1::t_9d612dcb88974a 1-230
+apps/whiteboard/src/training-institute/infrastructure/create-class-work-handlers.ts
+  s_2818932b6efba1::t_15d10f7bd77743 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3b7313265f00f81f9c2110a9a3752b9a62b3b9c5",
+  "prompts": {},
+  "sessions": {
+    "s_2818932b6efba1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6749436-eeb5-41c3-b373-7109590b8a47",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
