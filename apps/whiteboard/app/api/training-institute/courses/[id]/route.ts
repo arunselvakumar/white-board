@@ -28,7 +28,7 @@ export async function GET(
     );
     const course = await handlers.get.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapCourseResponse(course));
   } catch (error) {

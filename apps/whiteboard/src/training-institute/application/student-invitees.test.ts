@@ -14,9 +14,9 @@ describe("Student invitation recipients", () => {
         },
       }),
     ).toEqual([
-      { emailAddress: "learner@example.com", role: "org:student" },
-      { emailAddress: "family@example.com", role: "org:parent" },
-      { emailAddress: "grandparent@example.com", role: "org:parent" },
+      { emailAddress: "learner@example.com", role: "student" },
+      { emailAddress: "family@example.com", role: "parent" },
+      { emailAddress: "grandparent@example.com", role: "parent" },
     ]);
   });
 
@@ -30,6 +30,6 @@ describe("Student invitation recipients", () => {
           guardians: [{ email: "PARENT@example.com" }],
         },
       }),
-    ).toEqual([{ emailAddress: "parent@example.com", role: "org:parent" }]);
+    ).toEqual([{ emailAddress: "parent@example.com", role: "parent" }]);
   });
 });

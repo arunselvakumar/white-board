@@ -15,7 +15,7 @@ export async function GET(
     const { id } = parseOrThrow(
       TrainingInstituteTeacherParamsModel.safeParse(await context.params),
     );
-    const photo = await handlers.getPhoto(id, session.orgId);
+    const photo = await handlers.getPhoto(id, session.workspaceId);
     return new Response(Buffer.from(photo.bytes), {
       headers: {
         "content-type": photo.mimeType,

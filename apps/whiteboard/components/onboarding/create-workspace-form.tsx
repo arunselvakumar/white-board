@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useOrganizationList } from "@clerk/nextjs";
+import { useAuth, useWorkspaceList } from "@repo/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Blocks,
@@ -87,11 +87,10 @@ export function CreateWorkspaceForm({
   createWorkspace: CreateWorkspaceFn;
 }) {
   const router = useRouter();
-  const { orgId } = useAuth();
-  const { isLoaded, setActive, userMemberships } = useOrganizationList({
-    userMemberships: true,
-  });
+  const { workspaceId } = useAuth();
+  const { workspaces, setActive } = useWorkspaceList();
   const destination = postWorkspacePath(redirectUrl);
+  const alreadyMember = workspaceId != null || workspaces.length > 0;
 
   const {
     register,
@@ -107,28 +106,12 @@ export function CreateWorkspaceForm({
     },
   });
 
-  const membershipCount = userMemberships.count ?? 0;
-
+  // Workspace Creation is not offered once the User belongs to a Workspace.
   useEffect(() => {
-    if (!isLoaded || userMemberships.isLoading) {
-      return;
-    }
-    if (orgId != null || membershipCount > 0) {
-      router.replace(destination);
-    }
-  }, [
-    destination,
-    isLoaded,
-    membershipCount,
-    orgId,
-    router,
-    userMemberships.isLoading,
-  ]);
+    if (alreadyMember) router.replace(destination);
+  }, [alreadyMember, destination, router]);
 
   const onSubmit = async (values: FormValues) => {
-    if (!isLoaded) {
-      return;
-    }
     try {
       const result = await createWorkspace({
         name: values.name,
@@ -138,8 +121,11 @@ export function CreateWorkspaceForm({
         setError("root", { message: result.message });
         return;
       }
-      await setActive({ organization: result.id });
-      router.replace(destination);
+      const { error } = await setActive(result.id, destination);
+      if (error != null)
+        setError("root", {
+          message: "Your workspace was created. Reload the page to open it.",
+        });
     } catch {
       setError("root", {
         message: "Could not create your workspace. Please try again.",
@@ -147,12 +133,7 @@ export function CreateWorkspaceForm({
     }
   };
 
-  if (
-    !isLoaded ||
-    userMemberships.isLoading ||
-    orgId != null ||
-    membershipCount > 0
-  ) {
+  if (alreadyMember) {
     return <LoadingScreen />;
   }
 

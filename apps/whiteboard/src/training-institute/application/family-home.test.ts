@@ -245,7 +245,7 @@ describe("GetFamilyHomeHandler", () => {
       load: () => Promise.resolve(data),
     }).execute({
       workspaceId: "org_1",
-      role: "org:parent",
+      role: "parent",
       verifiedEmails: ["parent@example.com"],
       now: NOW,
     });

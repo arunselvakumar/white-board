@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
     );
     const enrollment = await handlers.enroll.execute({
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       createdByUserId: session.userId,
     });
     return Response.json(mapEnrollmentResponse(enrollment), {
@@ -52,7 +52,7 @@ export async function GET(request: Request): Promise<Response> {
       }),
     );
     const page = await handlers.list.execute({
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       studentId: model.studentId,
       batchId: model.batchId,
       limit: model.limit,

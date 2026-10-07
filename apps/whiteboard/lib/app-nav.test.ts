@@ -1,29 +1,30 @@
+import { WORKSPACE_ROLES } from "@repo/auth/roles";
 import { describe, expect, it } from "vitest";
 
 import { APP_NAV, appPageByHref, isAppNavActive, navForRole } from "./app-nav";
 
 describe("role navigation", () => {
   it("shows each role its home, Calendar, and Online Classes", () => {
-    expect(navForRole("org:student").map((item) => item.label)).toEqual([
+    expect(navForRole("student").map((item) => item.label)).toEqual([
       "Home",
       "Homework",
       "Calendar",
       "Online Classes",
     ]);
-    expect(navForRole("org:parent").map((item) => item.label)).toEqual([
+    expect(navForRole("parent").map((item) => item.label)).toEqual([
       "Home",
       "Homework",
       "Calendar",
       "Online Classes",
     ]);
-    expect(navForRole("org:teacher").map((item) => item.label)).toEqual([
+    expect(navForRole("teacher").map((item) => item.label)).toEqual([
       "My Batches",
       "Enquiries",
       "Calendar",
       "Online Classes",
     ]);
-    expect(navForRole("org:member")).toEqual([]);
-    expect(navForRole("org:admin")).toEqual(APP_NAV);
+    expect(navForRole(null)).toEqual([]);
+    expect(navForRole("owner")).toEqual(APP_NAV);
   });
 });
 
@@ -63,12 +64,7 @@ describe("appPageByHref", () => {
   });
 
   it("offers Calendar and Online Classes to every supported role", () => {
-    for (const role of [
-      "org:admin",
-      "org:teacher",
-      "org:student",
-      "org:parent",
-    ]) {
+    for (const role of WORKSPACE_ROLES) {
       expect(navForRole(role).some((item) => item.href === "/calendar")).toBe(
         true,
       );
@@ -79,10 +75,10 @@ describe("appPageByHref", () => {
   });
 
   it("offers Homework to Students and Parents without lighting up Home", () => {
-    expect(navForRole("org:student").map((item) => item.href)).toContain(
+    expect(navForRole("student").map((item) => item.href)).toContain(
       "/student/homework",
     );
-    expect(navForRole("org:parent").map((item) => item.href)).toContain(
+    expect(navForRole("parent").map((item) => item.href)).toContain(
       "/parent/homework",
     );
     expect(isAppNavActive("/student/homework", "/student")).toBe(false);

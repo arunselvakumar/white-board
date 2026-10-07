@@ -26,7 +26,7 @@ export async function GET(
     );
     const enrollment = await handlers.get.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));
   } catch (error) {

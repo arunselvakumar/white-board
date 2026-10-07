@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { protect } from "@repo/auth/server";
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/app-shell/app-shell";
@@ -11,7 +11,7 @@ export default async function AppLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  await auth.protect();
+  await protect();
 
   return (
     <WorkspaceGate>

@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
     );
     const student = await handlers.create.execute({
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       createdByUserId: session.userId,
     });
     return Response.json(mapStudentResponse(student), {
@@ -51,7 +51,7 @@ export async function GET(request: Request): Promise<Response> {
       }),
     );
     const page = await handlers.list.execute({
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       limit: model.limit,
       q: model.q,
       after: model.after,

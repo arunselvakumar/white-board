@@ -17,7 +17,7 @@ export async function GET(
       TrainingInstituteTeacherParamsModel.safeParse(await context.params),
     );
     return Response.json(
-      mapTeacherResponse(await handlers.get(id, session.orgId)),
+      mapTeacherResponse(await handlers.get(id, session.workspaceId)),
     );
   } catch (error) {
     return mapError(error);

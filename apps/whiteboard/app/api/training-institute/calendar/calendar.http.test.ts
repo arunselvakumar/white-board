@@ -1,26 +1,34 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET } from "./route";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const getUser = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
 
 function session(
   userId: string | null,
   orgId: string | null,
-  orgRole = "org:admin",
+  orgRole: WorkspaceRole = "owner",
+  { email = "learner@example.com", emailVerified = true } = {},
 ) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
+  mockedAuth.mockResolvedValue(
+    authStateFor({
+      userId,
+      workspaceId: orgId,
+      role: orgRole,
+      email,
+      emailVerified,
+    }),
+  );
 }
 
 type CalendarItem = {
@@ -51,15 +59,6 @@ describe("Calendar HTTP", () => {
     batchId = randomUUID();
     otherBatchId = randomUUID();
     session("user_owner", workspaceId);
-    getUser.mockReset().mockResolvedValue({
-      emailAddresses: [
-        {
-          emailAddress: "learner@example.com",
-          verification: { status: "verified" },
-        },
-      ],
-    });
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
 
     const courseId = randomUUID();
     await prisma.trainingInstituteCourse.create({
@@ -137,7 +136,7 @@ describe("Calendar HTTP", () => {
         name: "Meera",
         email: "teacher@example.com",
         kind: "centre_teacher",
-        clerkUserId: "user_teacher",
+        userId: "user_teacher",
       },
     });
     await prisma.trainingInstituteBatchTeacherAssignment.create({
@@ -167,7 +166,7 @@ describe("Calendar HTTP", () => {
       manageHolidays: true,
     });
 
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     const teacher = (await items()).body;
     expect(teacher.items.map((item) => item.studentName)).toEqual([
       null,
@@ -178,7 +177,7 @@ describe("Calendar HTTP", () => {
       manageHolidays: false,
     });
 
-    session("user_student", workspaceId, "org:student");
+    session("user_student", workspaceId, "student");
     let result = await items();
     expect(result.body.items).toMatchObject([
       { batchId, studentName: "Asha", timings: [{ startTime: "11:00" }] },
@@ -188,17 +187,12 @@ describe("Calendar HTTP", () => {
       manageHolidays: false,
     });
 
-    session("user_parent", workspaceId, "org:parent");
-    for (const emailAddress of [
+    for (const email of [
       "father@example.com",
       "mother@example.com",
       "guardian@example.com",
     ]) {
-      getUser.mockResolvedValue({
-        emailAddresses: [
-          { emailAddress, verification: { status: "verified" } },
-        ],
-      });
+      session("user_parent", workspaceId, "parent", { email });
       result = await items();
       expect(result.body.items).toMatchObject([
         { batchId, studentName: "Asha", timings: [{ startTime: "11:00" }] },
@@ -209,16 +203,11 @@ describe("Calendar HTTP", () => {
   it("requires an active Session, verified email, and tenant-scoped records", async () => {
     session(null, null);
     expect((await items()).status).toBe(401);
-    session("user_student", null, "org:student");
+    session("user_student", null, "student");
     expect((await items()).status).toBe(403);
-    session("user_student", workspaceId, "org:student");
-    getUser.mockResolvedValue({
-      emailAddresses: [
-        {
-          emailAddress: "learner@example.com",
-          verification: { status: "unverified" },
-        },
-      ],
+    session("user_student", workspaceId, "student", {
+      email: "learner@example.com",
+      emailVerified: false,
     });
     expect((await items()).body.items).toEqual([]);
     session("user_owner", `org_${randomUUID()}`);
@@ -239,7 +228,7 @@ describe("Calendar HTTP", () => {
       where: { workspaceId, batchId },
       data: { endedAt: new Date() },
     });
-    session("user_student", workspaceId, "org:student");
+    session("user_student", workspaceId, "student");
     expect((await items()).body.items).toEqual([]);
   });
 });

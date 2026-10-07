@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
+import { expect, waitFor } from "storybook/test";
 
 import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
 import { withAuthFormFrame } from "../../.storybook/decorators";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import {
+  authFailure,
+  authMocks,
+  signInAs,
+  storyUser,
+} from "../../.storybook/mocks/auth";
 import { createWorkspace } from "../../.storybook/mocks/create-workspace";
 
 const meta = {
@@ -13,6 +19,10 @@ const meta = {
   args: {
     redirectUrl: "/",
     createWorkspace,
+  },
+  beforeEach() {
+    authMocks.userId = storyUser.id;
+    authMocks.user = storyUser;
   },
 } satisfies Meta<typeof CreateWorkspaceForm>;
 
@@ -67,9 +77,35 @@ export const SubmitsName: Story = {
       name: "Apex Training Institute",
       institutionType: "training_institute",
     });
-    await expect(clerkMocks.setActive).toHaveBeenCalledWith({
-      organization: "org_new",
-    });
+    await expect(authMocks.setActive).toHaveBeenCalledWith("org_new", "/");
+  },
+};
+
+export const SubmitsWithRedirect: Story = {
+  args: { redirectUrl: "/courses" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText("Workspace name"), "Apex");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith("org_new", "/courses"),
+    );
+  },
+};
+
+export const ActivationFailure: Story = {
+  beforeEach() {
+    authMocks.setActive.mockImplementation(() => authFailure("FORBIDDEN", 403));
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText("Workspace name"), "Apex");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Your workspace was created. Reload the page to open it.",
+    );
   },
 };
 
@@ -118,13 +154,38 @@ export const CreateFailure: Story = {
   },
 };
 
-export const Loading: Story = {
+export const CreateError: Story = {
   beforeEach() {
-    clerkMocks.organizationListLoaded = false;
+    createWorkspace.mockImplementation(() =>
+      Promise.reject(new Error("network down")),
+    );
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText("Workspace name"), "Apex");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Could not create your workspace. Please try again.",
+    );
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
+  },
+};
+
+export const AlreadyMember: Story = {
+  args: { redirectUrl: "/students" },
+  beforeEach() {
+    signInAs("owner");
+  },
+  play: async ({ canvas, canvasElement }) => {
     await expect(
       canvasElement.querySelector(".animate-spin"),
     ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: "Create your workspace" }),
+    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith("/students"),
+    );
   },
 };

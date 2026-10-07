@@ -34,7 +34,7 @@ export async function POST(
     const student = await handlers.updateProfile.execute({
       id: params.id,
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapStudentResponse(student));
   } catch (error) {

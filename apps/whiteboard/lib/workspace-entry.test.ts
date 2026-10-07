@@ -13,7 +13,7 @@ describe("workspaceEntryPath", () => {
     );
   });
 
-  it("removes the public app base path from Clerk return URLs", () => {
+  it("removes the public app base path from return URLs", () => {
     expect(workspaceEntryPath("https://white-board-v3.vercel.app/app")).toBe(
       "/select-workspace",
     );

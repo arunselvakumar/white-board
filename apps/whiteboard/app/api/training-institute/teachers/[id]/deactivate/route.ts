@@ -20,7 +20,7 @@ export async function POST(
       mapTeacherResponse(
         await handlers.deactivate({
           id,
-          workspaceId: session.orgId,
+          workspaceId: session.workspaceId,
           userId: session.userId,
         }),
       ),

@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth, workspaces, type WorkspaceRole } from "@repo/auth/server";
+import {
+  authStateFor,
+  clearOutbox,
+  emailsTo,
+  lastInvitationIdFor,
+  outbox,
+  seedWorkspaceMember,
+} from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
@@ -27,19 +35,15 @@ import { POST as activateTeacher } from "../teacher/activate/route";
 import { GET as getMyBatches } from "../teacher/batches/route";
 import { PrismaTeacherDocumentRepository } from "@/src/training-institute/infrastructure/prisma-teacher-document-repository";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const createInvitation = vi.fn();
-const getMemberships = vi.fn();
-const revokeInvitation = vi.fn();
-const getOrganizationMemberships = vi.fn();
-const getOrganizationInvitation = vi.fn();
-const deleteOrganizationMembership = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
+
+/** Unique per run: identity Users are shared by every test file. */
+const OWNER = `user_owner_${randomUUID()}`;
 
 type TeacherJson = {
   id: string;
@@ -66,9 +70,61 @@ async function validPdf() {
 function session(
   userId: string | null,
   orgId: string | null,
-  orgRole = "org:admin",
+  orgRole: WorkspaceRole = "owner",
 ) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
+  mockedAuth.mockResolvedValue(
+    authStateFor({ userId, workspaceId: orgId, role: orgRole }),
+  );
+}
+
+/** Identity emails are unique across every test, so each Teacher gets one. */
+function uniqueEmail(name: string): string {
+  return `${name}-${randomUUID()}@example.com`;
+}
+
+async function teacherRow(id: string) {
+  return prisma.trainingInstituteTeacher.findUniqueOrThrow({ where: { id } });
+}
+
+async function invitation(id: string | null) {
+  return prisma.identityWorkspaceInvitation.findUniqueOrThrow({
+    where: { id: id ?? "" },
+  });
+}
+
+async function invitationsIn(workspaceId: string) {
+  return prisma.identityWorkspaceInvitation.findMany({
+    where: { organizationId: workspaceId },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+async function memberCount(workspaceId: string, userId: string) {
+  return prisma.identityWorkspaceMember.count({
+    where: { organizationId: workspaceId, userId },
+  });
+}
+
+/**
+ * What Better Auth's accept endpoint does: the invited User (signed in with
+ * the invited email) becomes a member, and the invitation is accepted.
+ */
+async function acceptInvitation(input: {
+  workspaceId: string;
+  invitationId: string | null;
+  userId: string;
+}) {
+  const accepted = await invitation(input.invitationId);
+  await seedWorkspaceMember({
+    workspaceId: input.workspaceId,
+    userId: input.userId,
+    email: accepted.email,
+    role: "teacher",
+  });
+  await prisma.identityWorkspaceInvitation.update({
+    where: { id: accepted.id },
+    data: { status: "accepted" },
+  });
 }
 
 function createRequest(body: unknown): Request {
@@ -82,31 +138,16 @@ function createRequest(body: unknown): Request {
 describe("Teacher HTTP APIs", () => {
   let workspaceId: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    clearOutbox();
     vi.stubEnv(
       "TEACHER_PRIVATE_DATA_KEY",
       Buffer.alloc(32, 7).toString("base64"),
     );
     workspaceId = `org_${randomUUID()}`;
-    session("user_owner", workspaceId);
-    createInvitation.mockReset().mockResolvedValue({ id: "oinv_1" });
-    getMemberships.mockReset().mockResolvedValue({ data: [] });
-    revokeInvitation.mockReset().mockResolvedValue({ id: "oinv_1" });
-    getOrganizationMemberships.mockReset().mockResolvedValue({ data: [] });
-    getOrganizationInvitation
-      .mockReset()
-      .mockResolvedValue({ status: "pending" });
-    deleteOrganizationMembership.mockReset().mockResolvedValue({});
-    mockedClerkClient.mockResolvedValue({
-      organizations: {
-        createOrganizationInvitation: createInvitation,
-        revokeOrganizationInvitation: revokeInvitation,
-        getOrganizationMembershipList: getOrganizationMemberships,
-        getOrganizationInvitation,
-        deleteOrganizationMembership,
-      },
-      users: { getOrganizationMembershipList: getMemberships },
-    } as never);
+    // The Owner must own the identity Workspace to send invitations.
+    await seedWorkspaceMember({ workspaceId, userId: OWNER, role: "owner" });
+    session(OWNER, workspaceId);
   });
 
   afterEach(() => vi.unstubAllEnvs());
@@ -129,14 +170,20 @@ describe("Teacher HTTP APIs", () => {
       kind: "visiting_tutor",
       invitationStatus: "sent",
     });
-    expect(createInvitation).toHaveBeenCalledWith(
+    const { invitationId } = await teacherRow(teacher.id);
+    expect(invitationId).toEqual(expect.any(String));
+    expect(await invitationsIn(workspaceId)).toEqual([
       expect.objectContaining({
-        organizationId: workspaceId,
-        emailAddress: "meera@example.com",
-        role: "org:teacher",
-        publicMetadata: { teacherId: teacher.id },
+        id: invitationId,
+        email: "meera@example.com",
+        role: "teacher",
+        status: "pending",
+        inviterId: OWNER,
       }),
-    );
+    ]);
+    expect(emailsTo("meera@example.com")).toHaveLength(1);
+    expect(emailsTo("meera@example.com")[0]?.text).toContain("as a Teacher");
+    expect(lastInvitationIdFor("meera@example.com")).toBe(invitationId);
 
     const listed = await GET(
       new Request("http://localhost/api/training-institute/teachers?limit=10"),
@@ -148,7 +195,13 @@ describe("Teacher HTTP APIs", () => {
   });
 
   it("keeps the profile with a failed invitation state for retry", async () => {
-    createInvitation.mockRejectedValueOnce(new Error("Clerk unavailable"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    // The signed-in Owner does not own this identity Workspace, so the
+    // invitation is refused.
+    const unowned = `org_${randomUUID()}`;
+    session(OWNER, unowned);
     const response = await POST(
       createRequest({
         name: "Asha Rao",
@@ -157,9 +210,47 @@ describe("Teacher HTTP APIs", () => {
       }),
     );
     expect(response.status).toBe(201);
-    expect(((await response.json()) as TeacherJson).invitationStatus).toBe(
-      "failed",
+    const teacher = (await response.json()) as TeacherJson;
+    expect(teacher.invitationStatus).toBe("failed");
+    expect((await teacherRow(teacher.id)).invitationId).toBeNull();
+    expect(await invitationsIn(unowned)).toEqual([]);
+    expect(outbox).toEqual([]);
+    expect(consoleError).toHaveBeenCalledWith(
+      "Teacher invitation failed",
+      { teacherId: teacher.id },
+      expect.objectContaining({ code: "WORKSPACE_NOT_FOUND" }),
     );
+    consoleError.mockRestore();
+  });
+
+  it("marks the invitation failed when the email already belongs to a member", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const email = uniqueEmail("asha");
+    await seedWorkspaceMember({
+      workspaceId,
+      userId: `user_member_${randomUUID()}`,
+      email,
+      role: "student",
+    });
+    const response = await POST(
+      createRequest({ name: "Asha", email, kind: "centre_teacher" }),
+    );
+    expect(response.status).toBe(201);
+    const teacher = (await response.json()) as TeacherJson;
+    expect(teacher.invitationStatus).toBe("failed");
+    expect((await teacherRow(teacher.id)).invitationId).toBeNull();
+    expect(await invitationsIn(workspaceId)).toEqual([]);
+    expect(emailsTo(email)).toEqual([]);
+    expect(consoleError).toHaveBeenCalledWith(
+      "Teacher invitation failed",
+      { teacherId: teacher.id },
+      expect.objectContaining({
+        message: "This email already belongs to a member of the Workspace.",
+      }),
+    );
+    consoleError.mockRestore();
   });
 
   it("rejects duplicate email in the same Workspace", async () => {
@@ -173,7 +264,7 @@ describe("Teacher HTTP APIs", () => {
   });
 
   it("keeps Owner-only APIs closed to Teachers", async () => {
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect(
       (
         await GET(
@@ -193,7 +284,7 @@ describe("Teacher HTTP APIs", () => {
       ).status,
     ).toBe(401);
     expect((await getMyBatches()).status).toBe(401);
-    session("user_teacher", null, "org:teacher");
+    session("user_teacher", null, "teacher");
     expect((await getMyBatches()).status).toBe(403);
   });
 
@@ -349,7 +440,7 @@ describe("Teacher HTTP APIs", () => {
     expect(photo.status).toBe(200);
     expect(photo.headers.get("content-type")).toBe("image/png");
     expect(Buffer.from(await photo.arrayBuffer())).toEqual(bytes);
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect((await getTeacherPhoto(photoRequest(), context)).status).toBe(403);
     session("user_other", `org_${randomUUID()}`);
     expect((await getTeacherPhoto(photoRequest(), context)).status).toBe(404);
@@ -537,7 +628,7 @@ describe("Teacher HTTP APIs", () => {
       )
     ).json()) as TeacherJson;
     const context = { params: Promise.resolve({ id: teacher.id }) };
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect(
       (
         await listTeacherDocuments(
@@ -659,7 +750,7 @@ describe("Teacher HTTP APIs", () => {
         mimeType: "application/pdf",
         sizeBytes: pdf.length,
         uploadedAt: new Date(),
-        uploadedByUserId: "user_owner",
+        uploadedByUserId: OWNER,
         bytes: pdf,
       }),
     ).rejects.toMatchObject({ code: "TEACHER_INACTIVE" });
@@ -671,7 +762,11 @@ describe("Teacher HTTP APIs", () => {
   });
 
   it("retries a failed invitation", async () => {
-    createInvitation.mockRejectedValueOnce(new Error("Clerk unavailable"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const unowned = `org_${randomUUID()}`;
+    session(OWNER, unowned);
     const created = await POST(
       createRequest({
         name: "Asha",
@@ -680,6 +775,14 @@ describe("Teacher HTTP APIs", () => {
       }),
     );
     const teacher = (await created.json()) as TeacherJson;
+    expect(teacher.invitationStatus).toBe("failed");
+    consoleError.mockRestore();
+
+    await seedWorkspaceMember({
+      workspaceId: unowned,
+      userId: OWNER,
+      role: "owner",
+    });
     const resent = await resendTeacherInvitation(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/invite`,
@@ -693,10 +796,20 @@ describe("Teacher HTTP APIs", () => {
     expect(((await resent.json()) as TeacherJson).invitationStatus).toBe(
       "sent",
     );
-    expect(createInvitation).toHaveBeenCalledTimes(2);
+    const { invitationId } = await teacherRow(teacher.id);
+    expect(await invitationsIn(unowned)).toEqual([
+      expect.objectContaining({
+        id: invitationId,
+        email: "asha@example.com",
+        role: "teacher",
+        status: "pending",
+      }),
+    ]);
+    expect(emailsTo("asha@example.com")).toHaveLength(1);
+    expect(lastInvitationIdFor("asha@example.com")).toBe(invitationId);
   });
 
-  it("revokes a pending invitation before sending a replacement", async () => {
+  it("cancels a pending invitation before sending a replacement", async () => {
     const teacher = (await (
       await POST(
         createRequest({
@@ -706,6 +819,7 @@ describe("Teacher HTTP APIs", () => {
         }),
       )
     ).json()) as TeacherJson;
+    const first = (await teacherRow(teacher.id)).invitationId;
     const resent = await resendTeacherInvitation(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/invite`,
@@ -716,16 +830,23 @@ describe("Teacher HTTP APIs", () => {
       { params: Promise.resolve({ id: teacher.id }) },
     );
     expect(resent.status).toBe(200);
-    expect(revokeInvitation).toHaveBeenCalledWith(
-      expect.objectContaining({
-        invitationId: "oinv_1",
-        organizationId: workspaceId,
-      }),
+    expect(((await resent.json()) as TeacherJson).invitationStatus).toBe(
+      "sent",
     );
-    expect(createInvitation).toHaveBeenCalledTimes(2);
+    const second = (await teacherRow(teacher.id)).invitationId;
+    expect(second).not.toBe(first);
+    expect((await invitation(first)).status).toBe("canceled");
+    expect(await invitation(second)).toMatchObject({
+      email: "asha@example.com",
+      role: "teacher",
+      status: "pending",
+    });
+    expect(await invitationsIn(workspaceId)).toHaveLength(2);
+    expect(emailsTo("asha@example.com")).toHaveLength(2);
+    expect(lastInvitationIdFor("asha@example.com")).toBe(second);
   });
 
-  it("reports Clerk cleanup failure and lets the Owner retry deactivation", async () => {
+  it("reports access cleanup failure and lets the Owner retry deactivation", async () => {
     const teacher = (await (
       await POST(
         createRequest({
@@ -735,7 +856,14 @@ describe("Teacher HTTP APIs", () => {
         }),
       )
     ).json()) as TeacherJson;
-    revokeInvitation.mockRejectedValueOnce(new Error("Clerk unavailable"));
+    const { invitationId } = await teacherRow(teacher.id);
+    // A database outage while revoking access; nothing else fails this way.
+    const revoke = vi
+      .spyOn(workspaces, "revokeInvitationAccess")
+      .mockRejectedValueOnce(new Error("Identity database unavailable"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
     const context = { params: Promise.resolve({ id: teacher.id }) };
     const request = () =>
       new Request(
@@ -744,7 +872,11 @@ describe("Teacher HTTP APIs", () => {
           method: "POST",
         },
       );
-    expect((await deactivateTeacher(request(), context)).status).toBe(500);
+    try {
+      expect((await deactivateTeacher(request(), context)).status).toBe(500);
+    } finally {
+      consoleError.mockRestore();
+    }
     const stillActive = await getTeacher(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}`,
@@ -755,29 +887,23 @@ describe("Teacher HTTP APIs", () => {
       ((await stillActive.json()) as { deactivatedAt: string | null })
         .deactivatedAt,
     ).toBeNull();
+    expect((await invitation(invitationId)).status).toBe("pending");
     expect((await deactivateTeacher(request(), context)).status).toBe(200);
+    expect(revoke).toHaveBeenCalledTimes(2);
+    expect((await invitation(invitationId)).status).toBe("canceled");
+    revoke.mockRestore();
   });
 
   it("removes an accepted Teacher membership before local activation", async () => {
+    const email = uniqueEmail("asha");
+    const teacherUser = `user_teacher_${randomUUID()}`;
     const teacher = (await (
-      await POST(
-        createRequest({
-          name: "Asha",
-          email: "asha@example.com",
-          kind: "centre_teacher",
-        }),
-      )
+      await POST(createRequest({ name: "Asha", email, kind: "centre_teacher" }))
     ).json()) as TeacherJson;
-    getOrganizationMemberships.mockResolvedValueOnce({
-      data: [
-        {
-          role: "org:teacher",
-          publicMetadata: { teacherId: teacher.id },
-          publicUserData: { userId: "user_teacher" },
-        },
-      ],
-    });
-    getOrganizationInvitation.mockResolvedValueOnce({ status: "accepted" });
+    const { invitationId } = await teacherRow(teacher.id);
+    await acceptInvitation({ workspaceId, invitationId, userId: teacherUser });
+    expect(await memberCount(workspaceId, teacherUser)).toBe(1);
+
     const response = await deactivateTeacher(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/deactivate`,
@@ -788,24 +914,22 @@ describe("Teacher HTTP APIs", () => {
       { params: Promise.resolve({ id: teacher.id }) },
     );
     expect(response.status).toBe(200);
-    expect(deleteOrganizationMembership).toHaveBeenCalledWith({
-      organizationId: workspaceId,
-      userId: "user_teacher",
-    });
-    expect(revokeInvitation).not.toHaveBeenCalled();
+    expect(await memberCount(workspaceId, teacherUser)).toBe(0);
+    expect(await memberCount(workspaceId, OWNER)).toBe(1);
+    // Accepted, not cancelled: the access was removed through the member.
+    expect((await invitation(invitationId)).status).toBe("accepted");
   });
 
-  it("can finish deactivation after Clerk access was already removed", async () => {
+  it("can finish deactivation after the Teacher's access was already removed", async () => {
+    const email = uniqueEmail("asha");
+    const teacherUser = `user_teacher_${randomUUID()}`;
     const teacher = (await (
-      await POST(
-        createRequest({
-          name: "Asha",
-          email: "asha@example.com",
-          kind: "centre_teacher",
-        }),
-      )
+      await POST(createRequest({ name: "Asha", email, kind: "centre_teacher" }))
     ).json()) as TeacherJson;
-    getOrganizationInvitation.mockResolvedValueOnce({ status: "accepted" });
+    const { invitationId } = await teacherRow(teacher.id);
+    await acceptInvitation({ workspaceId, invitationId, userId: teacherUser });
+    await workspaces.removeMember({ workspaceId, userId: teacherUser });
+
     const response = await deactivateTeacher(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/deactivate`,
@@ -816,8 +940,40 @@ describe("Teacher HTTP APIs", () => {
       { params: Promise.resolve({ id: teacher.id }) },
     );
     expect(response.status).toBe(200);
-    expect(deleteOrganizationMembership).not.toHaveBeenCalled();
-    expect(revokeInvitation).not.toHaveBeenCalled();
+    expect(
+      ((await response.json()) as { deactivatedAt: string }).deactivatedAt,
+    ).toEqual(expect.any(String));
+    expect(await memberCount(workspaceId, teacherUser)).toBe(0);
+    expect((await invitation(invitationId)).status).toBe("accepted");
+  });
+
+  it("removes an activated Teacher's membership on deactivation", async () => {
+    const email = uniqueEmail("asha");
+    const teacherUser = `user_teacher_${randomUUID()}`;
+    const teacher = (await (
+      await POST(createRequest({ name: "Asha", email, kind: "centre_teacher" }))
+    ).json()) as TeacherJson;
+    const { invitationId } = await teacherRow(teacher.id);
+    await acceptInvitation({ workspaceId, invitationId, userId: teacherUser });
+    session(teacherUser, workspaceId, "teacher");
+    expect((await activateTeacher()).status).toBe(200);
+
+    session(OWNER, workspaceId);
+    const response = await deactivateTeacher(
+      new Request(
+        `http://localhost/api/training-institute/teachers/${teacher.id}/deactivate`,
+        {
+          method: "POST",
+        },
+      ),
+      { params: Promise.resolve({ id: teacher.id }) },
+    );
+    expect(response.status).toBe(200);
+    expect(await memberCount(workspaceId, teacherUser)).toBe(0);
+    expect(await memberCount(workspaceId, OWNER)).toBe(1);
+    const row = await teacherRow(teacher.id);
+    expect(row.userId).toBe(teacherUser);
+    expect(row.deactivatedAt).toBeInstanceOf(Date);
   });
 
   it("deactivates a Teacher and refuses further invitation", async () => {
@@ -829,6 +985,7 @@ describe("Teacher HTTP APIs", () => {
       }),
     );
     const teacher = (await created.json()) as TeacherJson;
+    const { invitationId } = await teacherRow(teacher.id);
     const deactivated = await deactivateTeacher(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/deactivate`,
@@ -842,12 +999,7 @@ describe("Teacher HTTP APIs", () => {
     expect(
       ((await deactivated.json()) as { deactivatedAt: string }).deactivatedAt,
     ).toEqual(expect.any(String));
-    expect(revokeInvitation).toHaveBeenCalledWith(
-      expect.objectContaining({
-        organizationId: workspaceId,
-        invitationId: "oinv_1",
-      }),
-    );
+    expect((await invitation(invitationId)).status).toBe("canceled");
     const retry = await resendTeacherInvitation(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/invite`,
@@ -858,6 +1010,7 @@ describe("Teacher HTTP APIs", () => {
       { params: Promise.resolve({ id: teacher.id }) },
     );
     expect(retry.status).toBe(409);
+    expect(emailsTo("asha@example.com")).toHaveLength(1);
     const assignments = await getAssignments(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/batches`,
@@ -873,6 +1026,13 @@ describe("Teacher HTTP APIs", () => {
       }),
     );
     expect(replacement.status).toBe(201);
+    const replacementTeacher = (await replacement.json()) as TeacherJson;
+    expect(replacementTeacher.invitationStatus).toBe("sent");
+    expect(
+      (await invitation((await teacherRow(replacementTeacher.id)).invitationId))
+        .status,
+    ).toBe("pending");
+    expect(emailsTo("asha@example.com")).toHaveLength(2);
   });
 
   it("hides another Workspace's Teacher ID", async () => {
@@ -901,7 +1061,7 @@ describe("Teacher HTTP APIs", () => {
       data: {
         id: courseId,
         workspaceId,
-        createdByUserId: "user_owner",
+        createdByUserId: OWNER,
         name: "Python",
         defaultFeeAmountPaise: 1000,
       },
@@ -911,7 +1071,7 @@ describe("Teacher HTTP APIs", () => {
         id: batchId,
         workspaceId,
         courseId,
-        createdByUserId: "user_owner",
+        createdByUserId: OWNER,
         name: "Morning",
         classMode: "offline",
         capacity: 10,
@@ -990,7 +1150,7 @@ describe("Teacher HTTP APIs", () => {
       data: {
         id: courseId,
         workspaceId,
-        createdByUserId: "user_owner",
+        createdByUserId: OWNER,
         name: "Python",
         defaultFeeAmountPaise: 1000,
       },
@@ -1000,7 +1160,7 @@ describe("Teacher HTTP APIs", () => {
         id: batchId,
         workspaceId,
         courseId,
-        createdByUserId: "user_owner",
+        createdByUserId: OWNER,
         name: "Morning",
         classMode: "offline",
         capacity: 10,
@@ -1030,12 +1190,13 @@ describe("Teacher HTTP APIs", () => {
     expect((await assignBatch(req(randomUUID()), context)).status).toBe(404);
   });
 
-  it("links the Clerk membership to the matching Teacher and restricts My Batches", async () => {
+  it("links the accepted invitation to the matching Teacher and restricts My Batches", async () => {
+    const teacherUser = `user_teacher_${randomUUID()}`;
     const teacher = (await (
       await POST(
         createRequest({
           name: "Asha",
-          email: "asha@example.com",
+          email: uniqueEmail("asha"),
           kind: "centre_teacher",
         }),
       )
@@ -1056,7 +1217,7 @@ describe("Teacher HTTP APIs", () => {
       data: {
         id: courseId,
         workspaceId,
-        createdByUserId: "user_owner",
+        createdByUserId: OWNER,
         name: "Python",
         defaultFeeAmountPaise: 1000,
       },
@@ -1070,7 +1231,7 @@ describe("Teacher HTTP APIs", () => {
           id,
           workspaceId,
           courseId,
-          createdByUserId: "user_owner",
+          createdByUserId: OWNER,
           name,
           classMode: "offline",
           capacity: 10,
@@ -1098,19 +1259,22 @@ describe("Teacher HTTP APIs", () => {
       ),
       { params: Promise.resolve({ id: otherTeacher.id }) },
     );
-    session("user_teacher", workspaceId, "org:teacher");
-    getMemberships.mockResolvedValue({
-      data: [
-        {
-          organization: { id: workspaceId },
-          role: "org:teacher",
-          publicMetadata: { teacherId: teacher.id },
-        },
-      ],
+    await acceptInvitation({
+      workspaceId,
+      invitationId: (await teacherRow(teacher.id)).invitationId,
+      userId: teacherUser,
     });
+    session(teacherUser, workspaceId, "teacher");
     const activated = await activateTeacher();
     expect(activated.status).toBe(200);
     expect(await activated.json()).toEqual({ teacherId: teacher.id });
+    expect(await teacherRow(teacher.id)).toMatchObject({
+      userId: teacherUser,
+      invitationStatus: "accepted",
+    });
+    const again = await activateTeacher();
+    expect(again.status).toBe(200);
+    expect(await again.json()).toEqual({ teacherId: teacher.id });
     expect((await getMyBatches()).status).toBe(200);
     expect(
       (
@@ -1129,7 +1293,7 @@ describe("Teacher HTTP APIs", () => {
         )
       ).status,
     ).toBe(403);
-    session("user_owner", workspaceId);
+    session(OWNER, workspaceId);
     await unassignBatch(
       new Request(
         `http://localhost/api/training-institute/teachers/${teacher.id}/batches/${assignedBatchId}/unassign`,
@@ -1137,61 +1301,125 @@ describe("Teacher HTTP APIs", () => {
       ),
       { params: Promise.resolve({ id: teacher.id, batchId: assignedBatchId }) },
     );
-    session("user_teacher", workspaceId, "org:teacher");
+    session(teacherUser, workspaceId, "teacher");
     expect(
       ((await getMyBatches().then((r) => r.json())) as { items: unknown[] })
         .items,
     ).toEqual([]);
-    session("user_stranger", workspaceId, "org:teacher");
+    session("user_stranger", workspaceId, "teacher");
     expect((await getMyBatches()).status).toBe(404);
   });
 
-  it("refuses activation without trusted invitation metadata", async () => {
-    session("user_teacher", workspaceId, "org:teacher");
-    getMemberships.mockResolvedValue({
-      data: [
-        {
-          organization: { id: workspaceId },
-          role: "org:teacher",
-          publicMetadata: {},
-        },
-      ],
+  it("refuses activation without an accepted invitation for the Teacher", async () => {
+    const email = uniqueEmail("asha");
+    const teacherUser = `user_teacher_${randomUUID()}`;
+    const teacher = (await (
+      await POST(createRequest({ name: "Asha", email, kind: "centre_teacher" }))
+    ).json()) as TeacherJson;
+    const activate = async () => {
+      const response = await activateTeacher();
+      return {
+        status: response.status,
+        body: (await response.json()) as { code?: string },
+      };
+    };
+    const refused = {
+      status: 403,
+      body: { code: "TEACHER_LINK_REQUIRED" },
+    };
+
+    // A User with no identity record.
+    session(`user_stranger_${randomUUID()}`, workspaceId, "teacher");
+    expect(await activate()).toMatchObject(refused);
+
+    // The invited email signed in, but the invitation is still pending.
+    await seedWorkspaceMember({
+      workspaceId,
+      userId: teacherUser,
+      email,
+      role: "teacher",
     });
-    expect((await activateTeacher()).status).toBe(403);
+    session(teacherUser, workspaceId, "teacher");
+    expect(await activate()).toMatchObject(refused);
+
+    // A Teacher invitation for the same email accepted in another Workspace.
+    const otherWorkspaceId = `org_${randomUUID()}`;
+    await seedWorkspaceMember({
+      workspaceId: otherWorkspaceId,
+      userId: OWNER,
+      role: "owner",
+    });
+    await prisma.identityWorkspaceInvitation.create({
+      data: {
+        id: `inv_${randomUUID()}`,
+        organizationId: otherWorkspaceId,
+        email,
+        role: "teacher",
+        status: "accepted",
+        expiresAt: new Date(Date.now() + 86_400_000),
+        inviterId: OWNER,
+      },
+    });
+    expect(await activate()).toMatchObject(refused);
+
+    // An accepted invitation that no Teacher holds (an earlier one).
+    await prisma.identityWorkspaceInvitation.create({
+      data: {
+        id: `inv_${randomUUID()}`,
+        organizationId: workspaceId,
+        email,
+        role: "teacher",
+        status: "accepted",
+        expiresAt: new Date(Date.now() + 86_400_000),
+        inviterId: OWNER,
+      },
+    });
+    expect(await activate()).toMatchObject(refused);
+    expect((await teacherRow(teacher.id)).userId).toBeNull();
   });
 
-  it("finds a Teacher membership beyond the first Clerk page", async () => {
+  it("links the Teacher through its latest invitation among accepted invitations elsewhere", async () => {
+    const email = uniqueEmail("asha");
+    const teacherUser = `user_teacher_${randomUUID()}`;
     const teacher = (await (
-      await POST(
-        createRequest({
-          name: "Asha",
-          email: "asha@example.com",
-          kind: "centre_teacher",
-        }),
-      )
+      await POST(createRequest({ name: "Asha", email, kind: "centre_teacher" }))
     ).json()) as TeacherJson;
-    session("user_teacher", workspaceId, "org:teacher");
-    getMemberships.mockResolvedValueOnce({
-      data: Array.from({ length: 100 }, (_, index) => ({
-        organization: { id: `org_other_${index}` },
-        role: "org:teacher",
-        publicMetadata: {},
-      })),
-    });
-    getMemberships.mockResolvedValueOnce({
-      data: [
-        {
-          organization: { id: workspaceId },
-          role: "org:teacher",
-          publicMetadata: { teacherId: teacher.id },
+    const resent = await resendTeacherInvitation(
+      new Request(
+        `http://localhost/api/training-institute/teachers/${teacher.id}/invite`,
+        { method: "POST" },
+      ),
+      { params: Promise.resolve({ id: teacher.id }) },
+    );
+    expect(resent.status).toBe(200);
+    const { invitationId } = await teacherRow(teacher.id);
+    expect(lastInvitationIdFor(email)).toBe(invitationId);
+    await acceptInvitation({ workspaceId, invitationId, userId: teacherUser });
+    // The same User accepted Teacher invitations in other Workspaces later.
+    for (let index = 0; index < 3; index += 1) {
+      const otherWorkspaceId = `org_${randomUUID()}`;
+      await seedWorkspaceMember({
+        workspaceId: otherWorkspaceId,
+        userId: OWNER,
+        role: "owner",
+      });
+      await prisma.identityWorkspaceInvitation.create({
+        data: {
+          id: `inv_${randomUUID()}`,
+          organizationId: otherWorkspaceId,
+          email,
+          role: "teacher",
+          status: "accepted",
+          expiresAt: new Date(Date.now() + 86_400_000),
+          inviterId: OWNER,
+          createdAt: new Date(Date.now() + (index + 1) * 1000),
         },
-      ],
-    });
-    expect((await activateTeacher()).status).toBe(200);
-    expect(getMemberships).toHaveBeenLastCalledWith({
-      userId: "user_teacher",
-      limit: 100,
-      offset: 100,
-    });
+      });
+    }
+
+    session(teacherUser, workspaceId, "teacher");
+    const activated = await activateTeacher();
+    expect(activated.status).toBe(200);
+    expect(await activated.json()).toEqual({ teacherId: teacher.id });
   });
 });

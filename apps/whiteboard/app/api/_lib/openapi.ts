@@ -47,7 +47,7 @@ export type OpenApiDocument = {
   components: {
     schemas: Record<string, JsonObject>;
     securitySchemes: {
-      clerkSession: {
+      session: {
         type: string;
         in: string;
         name: string;
@@ -198,7 +198,7 @@ export function buildOpenApiDocument(
     const item: JsonObject = {
       summary: operation.summary,
       tags: operation.tags,
-      security: operation.security === false ? [] : [{ clerkSession: [] }],
+      security: operation.security === false ? [] : [{ session: [] }],
       responses: responsesFor(operation, ref),
     };
     const parameters = parametersFor(operation);
@@ -241,10 +241,11 @@ export function buildOpenApiDocument(
     components: {
       schemas,
       securitySchemes: {
-        clerkSession: {
+        session: {
           type: "apiKey",
           in: "cookie",
-          name: "__session",
+          // "__Secure-better-auth.session_token" over HTTPS (ADR-0034).
+          name: "better-auth.session_token",
         },
       },
     },

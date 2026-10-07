@@ -32,7 +32,7 @@ export async function POST(
     const enrollment = await handlers.move.execute({
       id: params.id,
       batchId: model.batchId,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));
   } catch (error) {

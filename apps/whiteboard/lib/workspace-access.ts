@@ -1,13 +1,15 @@
-export type WorkspaceRole = string | null | undefined;
+import type { WorkspaceRole as Role } from "@repo/auth/roles";
+
+export type WorkspaceRole = Role | null | undefined;
 
 export function isOwnerRole(role: WorkspaceRole): boolean {
-  return role === "org:admin";
+  return role === "owner";
 }
 
 export function destinationForRole(role: WorkspaceRole): string {
-  if (role === "org:student") return "/student";
-  if (role === "org:parent") return "/parent";
-  if (role === "org:teacher") return "/teacher";
+  if (role === "student") return "/student";
+  if (role === "parent") return "/parent";
+  if (role === "teacher") return "/teacher";
   return "/";
 }
 
@@ -25,41 +27,41 @@ export function isAllowedAppPath(
   if (pathname === "/") return true;
   if (pathname === "/calendar")
     return (
-      role === "org:admin" ||
-      role === "org:teacher" ||
-      role === "org:student" ||
-      role === "org:parent"
+      role === "owner" ||
+      role === "teacher" ||
+      role === "student" ||
+      role === "parent"
     );
   if (pathname === "/online-classes")
     return (
-      role === "org:admin" ||
-      role === "org:teacher" ||
-      role === "org:student" ||
-      role === "org:parent"
+      role === "owner" ||
+      role === "teacher" ||
+      role === "student" ||
+      role === "parent"
     );
   if (/^\/classes\/[^/]+\/[^/]+\/[^/]+$/.test(pathname))
     return (
-      role === "org:admin" ||
-      role === "org:teacher" ||
-      role === "org:student" ||
-      role === "org:parent"
+      role === "owner" ||
+      role === "teacher" ||
+      role === "student" ||
+      role === "parent"
     );
-  if (pathname === "/student") return role === "org:student";
-  if (pathname === "/parent") return role === "org:parent";
-  if (pathname === "/teacher") return role === "org:teacher";
+  if (pathname === "/student") return role === "student";
+  if (pathname === "/parent") return role === "parent";
+  if (pathname === "/teacher") return role === "teacher";
   // Homework and Study Material (ADR-0033): the family page and a Homework.
   if (/^\/student\/homework(?:\/[^/]+)?$/.test(pathname))
-    return role === "org:student";
+    return role === "student";
   if (/^\/parent\/homework(?:\/[^/]+)?$/.test(pathname))
-    return role === "org:parent";
+    return role === "parent";
   if (/^\/teacher\/batches\/[^/]+\/attendance$/.test(pathname))
-    return role === "org:teacher";
+    return role === "teacher";
   // A Batch's Homework and Study Material, and one Homework's Submissions.
   if (/^\/teacher\/batches\/[^/]+\/homework(?:\/[^/]+)?$/.test(pathname))
-    return role === "org:teacher";
+    return role === "teacher";
   // Checked before the Staff routes so "sources" and "summary" never read as an Enquiry id.
   if (OWNER_ENQUIRY_PATH.test(pathname)) return isOwnerRole(role);
   if (STAFF_ENQUIRY_PATH.test(pathname))
-    return isOwnerRole(role) || role === "org:teacher";
+    return isOwnerRole(role) || role === "teacher";
   return isOwnerRole(role);
 }

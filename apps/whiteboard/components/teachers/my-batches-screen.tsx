@@ -1,15 +1,15 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import Link from "next/link";
 
 import { UpcomingDemosCard } from "@/components/enquiries/upcoming-demos-card";
 import { myBatchQueries } from "@/src/queries/teachers";
 
 export function MyBatchesScreen() {
-  const { orgId, userId } = useAuth();
-  const activation = useQuery(myBatchQueries.activation(orgId, userId));
+  const { workspaceId, userId } = useAuth();
+  const activation = useQuery(myBatchQueries.activation(workspaceId, userId));
   if (activation.isPending)
     return <main className="p-6">Opening My Batches…</main>;
   if (activation.isError)
@@ -22,7 +22,7 @@ export function MyBatchesScreen() {
         </p>
       </main>
     );
-  return <MyBatchesContent workspaceId={orgId} userId={userId} />;
+  return <MyBatchesContent workspaceId={workspaceId} userId={userId} />;
 }
 
 const DAYS = [

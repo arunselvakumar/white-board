@@ -33,7 +33,7 @@ export async function POST(request: Request): Promise<Response> {
       syllabusOutline: model.syllabusOutline ?? [],
       description: model.description,
       defaultFeeAmountPaise: model.defaultFeeAmountPaise,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       createdByUserId: session.userId,
     });
     return Response.json(mapCourseResponse(course), {
@@ -59,7 +59,7 @@ export async function GET(request: Request): Promise<Response> {
       }),
     );
     const page = await handlers.list.execute({
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       limit: model.limit,
       after: model.after,
       before: model.before,

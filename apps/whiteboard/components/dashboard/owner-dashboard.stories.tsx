@@ -4,7 +4,7 @@ import { expect } from "storybook/test";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
   title: "Pages/Owner Dashboard",
@@ -13,12 +13,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 

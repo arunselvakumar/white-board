@@ -26,7 +26,7 @@ export async function GET(
     );
     const batch = await handlers.get.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapBatchResponse(batch));
   } catch (error) {

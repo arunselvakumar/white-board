@@ -1020,7 +1020,7 @@ export class ClassWorkHandlers {
   }
 
   private static submitterRole(family: ClassWorkFamily): "student" | "parent" {
-    return family.role === "org:parent" ? "parent" : "student";
+    return family.role === "parent" ? "parent" : "student";
   }
 
   async submitHomework(

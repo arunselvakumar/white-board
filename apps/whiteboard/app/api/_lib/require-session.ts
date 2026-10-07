@@ -1,40 +1,20 @@
-import { auth } from "@clerk/nextjs/server";
-import { StatusCodes } from "http-status-codes";
-
-import { jsonError } from "./json-error";
-import { isOwnerRole } from "@/lib/workspace-access";
+import { requireWorkspaceSession } from "./require-workspace-session";
 
 export type ApiSession = {
   userId: string;
-  orgId: string;
+  workspaceId: string;
 };
 
+/** The Owner of the Active Workspace (the register's screens and APIs). */
 export async function requireSession(): Promise<ApiSession | Response> {
-  const { userId, orgId, orgRole } = await auth();
-  if (userId == null) {
-    return jsonError(
-      StatusCodes.UNAUTHORIZED,
-      "UNAUTHENTICATED",
-      "Authentication required.",
-    );
-  }
-  if (orgId == null) {
-    return jsonError(
-      StatusCodes.FORBIDDEN,
-      "NO_ACTIVE_WORKSPACE",
-      "An active workspace is required.",
-    );
-  }
-  if (!isOwnerRole(orgRole)) {
-    return jsonError(
-      StatusCodes.FORBIDDEN,
-      "FORBIDDEN",
-      "Owner access is required.",
-    );
-  }
-  return { userId, orgId };
+  const session = await requireWorkspaceSession(
+    ["owner"],
+    "Owner access is required.",
+  );
+  if (session instanceof Response) return session;
+  return { userId: session.userId, workspaceId: session.workspaceId };
 }
 
-export function isResponse(value: ApiSession | Response): value is Response {
+export function isResponse(value: unknown): value is Response {
   return value instanceof Response;
 }

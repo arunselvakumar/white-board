@@ -225,7 +225,7 @@ export class PrismaClassChangeStore implements ClassChangeStore {
     const teacher = await this.db.trainingInstituteTeacher.findFirst({
       where: {
         workspaceId,
-        clerkUserId: userId,
+        userId,
         deletedAt: null,
         deactivatedAt: null,
         batchAssignments: {

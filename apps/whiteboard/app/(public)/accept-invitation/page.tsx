@@ -1,28 +1,39 @@
+import { getAuth, workspaces } from "@repo/auth/server";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 import { AcceptInvitationForm } from "@/components/auth/accept-invitation-form";
-import { workspaceEntryPath } from "@/lib/workspace-entry";
 
 export const metadata: Metadata = { title: "Join Workspace" };
 
 type PageProps = {
-  searchParams: Promise<{
-    __clerk_ticket?: string | string[];
-    __clerk_status?: string | string[];
-  }>;
+  searchParams: Promise<{ id?: string | string[] }>;
 };
 
 export default async function AcceptInvitationPage({
   searchParams,
 }: PageProps) {
   const params = await searchParams;
-  const ticket = Array.isArray(params.__clerk_ticket)
-    ? (params.__clerk_ticket[0] ?? null)
-    : (params.__clerk_ticket ?? null);
-  const status = Array.isArray(params.__clerk_status)
-    ? (params.__clerk_status[0] ?? null)
-    : (params.__clerk_status ?? null);
-  if (status === "complete") redirect(workspaceEntryPath("/"));
-  return <AcceptInvitationForm ticket={ticket} status={status} />;
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const [invitation, auth] = await Promise.all([
+    id != null && id.length > 0 && id.length <= 128
+      ? workspaces.previewInvitation(id)
+      : Promise.resolve(null),
+    getAuth(),
+  ]);
+  return (
+    <AcceptInvitationForm
+      invitation={
+        invitation == null
+          ? null
+          : {
+              id: invitation.id,
+              email: invitation.email,
+              role: invitation.role,
+              workspaceName: invitation.workspaceName,
+              hasAccount: invitation.hasAccount,
+            }
+      }
+      signedInEmail={auth.user?.email ?? null}
+    />
+  );
 }

@@ -5,8 +5,7 @@ import {
   type HolidayFact,
 } from "../domain/class-schedule";
 
-export type CalendarRole =
-  "org:admin" | "org:teacher" | "org:student" | "org:parent";
+export type CalendarRole = "owner" | "teacher" | "student" | "parent";
 
 export type CalendarItem = {
   id: string;

@@ -14,7 +14,7 @@ describe("StudentCreated invitation listener", () => {
     const sent: {
       emailAddress: string;
       role: string;
-      organizationId: string;
+      workspaceId: string;
       inviterUserId: string;
     }[] = [];
     const listener = new InviteStudentOnCreated(
@@ -40,22 +40,22 @@ describe("StudentCreated invitation listener", () => {
 
     expect(sent).toEqual([
       {
-        organizationId: "org_1",
+        workspaceId: "org_1",
         inviterUserId: "user_owner",
         emailAddress: "student@example.com",
-        role: "org:student",
+        role: "student",
       },
       {
-        organizationId: "org_1",
+        workspaceId: "org_1",
         inviterUserId: "user_owner",
         emailAddress: "parent@example.com",
-        role: "org:parent",
+        role: "parent",
       },
       {
-        organizationId: "org_1",
+        workspaceId: "org_1",
         inviterUserId: "user_owner",
         emailAddress: "guardian@example.com",
-        role: "org:parent",
+        role: "parent",
       },
     ]);
   });
@@ -78,7 +78,7 @@ describe("StudentCreated invitation listener", () => {
         send: ({ emailAddress }) => {
           attempted.push(emailAddress);
           if (emailAddress === "student@example.com")
-            return Promise.reject(new Error("Clerk unavailable"));
+            return Promise.reject(new Error("Email unavailable"));
           return Promise.resolve();
         },
       },

@@ -31,7 +31,7 @@ export async function expectAppShell(
   await expect(canvas.getByText(current.description)).toBeVisible();
   await expect(canvas.getByText("Riverside Centre")).toBeVisible();
   await expect(
-    canvas.getByRole("button", { name: "Open user menu" }),
+    canvas.getByRole("button", { name: "Account menu for Arun" }),
   ).toBeVisible();
 
   const view = canvasElement.ownerDocument.defaultView;

@@ -32,7 +32,7 @@ export async function POST(
     const enrollment = await handlers.adjustFeePlan.execute({
       id: params.id,
       ...model,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapEnrollmentResponse(enrollment));
   } catch (error) {

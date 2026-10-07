@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import {
+  authStateFor,
+  clearOutbox,
+  emailsTo,
+  lastInvitationIdFor,
+  outbox,
+  seedWorkspaceMember,
+} from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { StatusCodes } from "http-status-codes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,34 +20,36 @@ import { POST as updateProfile } from "./[id]/profile/route";
 import { GET as getStudent } from "./[id]/route";
 import { GET as listStudents, POST as createStudent } from "./route";
 
-const mockInvitation = vi.hoisted(() =>
-  vi.fn<
-    (input: {
-      organizationId: string;
-      inviterUserId: string;
-      emailAddress: string;
-      role: string;
-    }) => Promise<void>
-  >(),
-);
-
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(() =>
-    Promise.resolve({
-      organizations: { createOrganizationInvitation: mockInvitation },
-    }),
-  ),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
+const mockedAuth = vi.mocked(getAuth);
 
 function session(
   userId: string | null,
   orgId: string | null,
-  orgRole = "org:admin",
+  orgRole: WorkspaceRole = "owner",
 ) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
+  mockedAuth.mockResolvedValue(
+    authStateFor({ userId, workspaceId: orgId, role: orgRole }),
+  );
+}
+
+/** Invitation rows in a Workspace, by email. */
+async function invitationsIn(workspaceId: string) {
+  return prisma.identityWorkspaceInvitation.findMany({
+    where: { organizationId: workspaceId },
+    orderBy: { email: "asc" },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      status: true,
+      inviterId: true,
+    },
+  });
 }
 
 type StudentJson = {
@@ -92,13 +102,13 @@ function admitRequest(name: string, phone: string) {
 }
 
 describe("student HTTP APIs", () => {
-  const userId = "user_http";
+  const userId = `user_http_${randomUUID()}`;
   let orgId: string;
 
-  beforeEach(() => {
-    mockInvitation.mockReset();
-    mockInvitation.mockImplementation(() => Promise.resolve());
+  beforeEach(async () => {
+    clearOutbox();
     orgId = `org_${randomUUID()}`;
+    await seedWorkspaceMember({ workspaceId: orgId, userId, role: "owner" });
     session(userId, orgId);
   });
 
@@ -118,36 +128,147 @@ describe("student HTTP APIs", () => {
       }),
     );
     expect(response.status).toBe(201);
-    expect(mockInvitation.mock.calls.map(([input]) => input)).toEqual([
+
+    const invitations = await invitationsIn(orgId);
+    expect(
+      invitations.map(({ email, role, status, inviterId }) => ({
+        email,
+        role,
+        status,
+        inviterId,
+      })),
+    ).toEqual([
       {
-        organizationId: orgId,
-        inviterUserId: userId,
-        emailAddress: "anita@example.com",
-        role: "org:student",
-        redirectUrl: "/app/accept-invitation",
+        email: "anita@example.com",
+        role: "student",
+        status: "pending",
+        inviterId: userId,
       },
       {
-        organizationId: orgId,
-        inviterUserId: userId,
-        emailAddress: "ravi@example.com",
-        role: "org:parent",
-        redirectUrl: "/app/accept-invitation",
+        email: "asha@example.com",
+        role: "parent",
+        status: "pending",
+        inviterId: userId,
       },
       {
-        organizationId: orgId,
-        inviterUserId: userId,
-        emailAddress: "meera@example.com",
-        role: "org:parent",
-        redirectUrl: "/app/accept-invitation",
+        email: "meera@example.com",
+        role: "parent",
+        status: "pending",
+        inviterId: userId,
       },
       {
-        organizationId: orgId,
-        inviterUserId: userId,
-        emailAddress: "asha@example.com",
-        role: "org:parent",
-        redirectUrl: "/app/accept-invitation",
+        email: "ravi@example.com",
+        role: "parent",
+        status: "pending",
+        inviterId: userId,
       },
     ]);
+
+    expect(outbox.map((email) => email.to)).toEqual([
+      "anita@example.com",
+      "ravi@example.com",
+      "meera@example.com",
+      "asha@example.com",
+    ]);
+    expect(emailsTo("anita@example.com")[0]?.text).toContain("as a Student");
+    for (const parent of [
+      "ravi@example.com",
+      "meera@example.com",
+      "asha@example.com",
+    ])
+      expect(emailsTo(parent)[0]?.text).toContain("as a Parent");
+    for (const invitation of invitations)
+      expect(lastInvitationIdFor(invitation.email)).toBe(invitation.id);
+  });
+
+  it("counts a pending invitation or an existing member as already sent", async () => {
+    const suffix = randomUUID();
+    const sibling = `sibling-${suffix}@example.com`;
+    const father = `father-${suffix}@example.com`;
+    const member = `member-${suffix}@example.com`;
+    await seedWorkspaceMember({
+      workspaceId: orgId,
+      userId: `user_member_${suffix}`,
+      email: member,
+      role: "parent",
+    });
+    const admit = (name: string, email: string) =>
+      createStudent(
+        new Request("http://localhost/api/training-institute/students", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            phone: "9876543210",
+            email,
+            father: { name: "Ravi", email: father },
+            mother: { name: "Meera", email: member },
+          }),
+        }),
+      );
+
+    expect((await admit("Anita", `anita-${suffix}@example.com`)).status).toBe(
+      StatusCodes.CREATED,
+    );
+    expect((await admit("Kiran", sibling)).status).toBe(StatusCodes.CREATED);
+
+    const invitations = await invitationsIn(orgId);
+    expect(
+      invitations.map(({ email, role, status }) => ({ email, role, status })),
+    ).toEqual([
+      {
+        email: `anita-${suffix}@example.com`,
+        role: "student",
+        status: "pending",
+      },
+      { email: father, role: "parent", status: "pending" },
+      { email: sibling, role: "student", status: "pending" },
+    ]);
+    expect(emailsTo(father)).toHaveLength(1);
+    expect(emailsTo(member)).toHaveLength(0);
+    expect(emailsTo(sibling)).toHaveLength(1);
+  });
+
+  it("admits the Student when the invitation cannot be sent", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    // The signed-in Owner is not a member of this identity Workspace, so
+    // every invitation is refused.
+    const unseeded = `org_${randomUUID()}`;
+    session(userId, unseeded);
+    const response = await createStudent(
+      new Request("http://localhost/api/training-institute/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Anita",
+          phone: "9876543210",
+          email: "anita@example.com",
+          father: { name: "Ravi", email: "ravi@example.com" },
+        }),
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const student = await json<StudentJson>(response);
+    expect(
+      await prisma.trainingInstituteStudent.count({
+        where: { id: student.id, workspaceId: unseeded },
+      }),
+    ).toBe(1);
+    expect(await invitationsIn(unseeded)).toEqual([]);
+    expect(outbox).toEqual([]);
+    expect(consoleError).toHaveBeenCalledWith(
+      "Student invitation failed",
+      { studentId: student.id, role: "student" },
+      expect.objectContaining({ code: "WORKSPACE_NOT_FOUND" }),
+    );
+    expect(consoleError).toHaveBeenCalledWith(
+      "Student invitation failed",
+      { studentId: student.id, role: "parent" },
+      expect.objectContaining({ code: "WORKSPACE_NOT_FOUND" }),
+    );
+    consoleError.mockRestore();
   });
 
   it("reuses the same Student request after a lost response without sending invitations twice", async () => {
@@ -169,7 +290,10 @@ describe("student HTTP APIs", () => {
     expect(second.status).toBe(StatusCodes.CREATED);
     expect((await json<StudentJson>(first)).id).toBe(requestId);
     expect((await json<StudentJson>(second)).id).toBe(requestId);
-    expect(mockInvitation).toHaveBeenCalledTimes(1);
+    expect(emailsTo("anita@example.com")).toHaveLength(1);
+    expect(
+      (await invitationsIn(orgId)).map(({ email, role }) => ({ email, role })),
+    ).toEqual([{ email: "anita@example.com", role: "student" }]);
     expect(
       await prisma.trainingInstituteStudent.count({ where: { id: requestId } }),
     ).toBe(1);
@@ -213,7 +337,7 @@ describe("student HTTP APIs", () => {
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
   });
 
-  it.each(["org:student", "org:parent"])(
+  it.each(["student", "parent"] as const)(
     "returns 403 for %s on the Student register API",
     async (role) => {
       session(userId, orgId, role);

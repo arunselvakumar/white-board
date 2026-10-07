@@ -1,6 +1,6 @@
 export type StudentInvitee = {
   emailAddress: string;
-  role: "org:student" | "org:parent";
+  role: "student" | "parent";
 };
 
 type EmailContact = { email?: string | null };
@@ -24,11 +24,11 @@ export function studentInvitees(student: {
     }
   };
 
-  add(student.email, "org:student");
-  add(student.details.father.email, "org:parent");
-  add(student.details.mother.email, "org:parent");
+  add(student.email, "student");
+  add(student.details.father.email, "parent");
+  add(student.details.mother.email, "parent");
   for (const guardian of student.details.guardians) {
-    add(guardian.email, "org:parent");
+    add(guardian.email, "parent");
   }
   return [...recipients.values()];
 }

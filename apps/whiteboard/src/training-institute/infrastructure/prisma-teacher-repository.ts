@@ -38,7 +38,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
           idNumberLast4: teacher.idNumberLast4,
           bankAccountLast4: teacher.bankAccountLast4,
           ...privateData,
-          clerkUserId: teacher.clerkUserId,
+          userId: teacher.userId,
           invitationId: teacher.invitationId,
           invitationStatus: teacher.invitationStatus,
           deactivatedAt: teacher.deactivatedAt,
@@ -84,7 +84,7 @@ export class PrismaTeacherRepository implements TeacherRepository {
           idNumberLast4: teacher.idNumberLast4,
           bankAccountLast4: teacher.bankAccountLast4,
           ...privateData,
-          clerkUserId: teacher.clerkUserId,
+          userId: teacher.userId,
           invitationId: teacher.invitationId,
           invitationStatus: teacher.invitationStatus,
           deactivatedAt: teacher.deactivatedAt,
@@ -128,12 +128,30 @@ export class PrismaTeacherRepository implements TeacherRepository {
       : null;
   }
 
-  async findByClerkUserInWorkspace(
-    clerkUserId: string,
+  async findByUserInWorkspace(
+    userId: string,
     workspaceId: string,
   ): Promise<Teacher | null> {
     const row = await this.db.trainingInstituteTeacher.findFirst({
-      where: { clerkUserId, workspaceId, deletedAt: null, deactivatedAt: null },
+      where: { userId, workspaceId, deletedAt: null, deactivatedAt: null },
+      omit: PRIVATE_DATA_OMIT,
+    });
+    return row == null ? null : fromRow(row);
+  }
+
+  async findByInvitationInWorkspace(
+    invitationIds: readonly string[],
+    workspaceId: string,
+  ): Promise<Teacher | null> {
+    if (invitationIds.length === 0) return null;
+    // Deactivated Teachers are returned too, so activating one reports
+    // TEACHER_INACTIVE instead of a missing link.
+    const row = await this.db.trainingInstituteTeacher.findFirst({
+      where: {
+        invitationId: { in: [...invitationIds] },
+        workspaceId,
+        deletedAt: null,
+      },
       omit: PRIVATE_DATA_OMIT,
     });
     return row == null ? null : fromRow(row);

@@ -3,7 +3,7 @@
 // through the father, mother, or a Guardian email address. Only verified
 // email addresses count.
 
-export type FamilyRole = "org:student" | "org:parent";
+export type FamilyRole = "student" | "parent";
 
 type ProfileDetails = {
   father?: { email?: unknown };
@@ -30,7 +30,7 @@ export function isLinkedStudent(
   role: FamilyRole,
   emails: ReadonlySet<string>,
 ): boolean {
-  if (role === "org:student")
+  if (role === "student")
     return emails.has(normalizedEmail(student.email) ?? "");
   const details = student.profileDetails as ProfileDetails | null;
   const contacts = [

@@ -12,7 +12,7 @@ import { WorkspaceId } from "./workspace-id";
 const UUID = "550e8400-e29b-41d4-a716-446655440000";
 
 describe("WorkspaceId", () => {
-  it("trims a Clerk id", () => {
+  it("trims an identity id", () => {
     expect(WorkspaceId.create("  org_1  ").value).toBe("org_1");
   });
 
@@ -28,7 +28,7 @@ describe("WorkspaceId", () => {
 });
 
 describe("UserId", () => {
-  it("trims a Clerk id", () => {
+  it("trims an identity id", () => {
     expect(UserId.create("  user_1  ").value).toBe("user_1");
   });
 

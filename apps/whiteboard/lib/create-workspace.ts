@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { WorkspaceAccessError, getAuth, workspaces } from "@repo/auth/server";
 import { z } from "zod";
 
 import { AVAILABLE_INSTITUTION_TYPE_VALUES } from "@/lib/institution-type";
@@ -15,30 +15,11 @@ export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceInput>;
 export type CreateWorkspaceResult =
   { ok: true; id: string } | { ok: false; message: string };
 
-function userFacingMessage(error: unknown): string {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "errors" in error &&
-    Array.isArray(error.errors)
-  ) {
-    const first = error.errors[0] as
-      { longMessage?: string; message?: string } | undefined;
-    const text = first?.longMessage ?? first?.message;
-    if (typeof text === "string" && text.length > 0) {
-      return text;
-    }
-  }
-  if (error instanceof Error && error.message.length > 0) {
-    return error.message;
-  }
-  return "Could not create your workspace. Please try again.";
-}
-
+/** Workspace Creation. The signed-in User becomes the Workspace Owner. */
 export async function createWorkspace(
   raw: CreateWorkspaceInput,
 ): Promise<CreateWorkspaceResult> {
-  const { userId } = await auth();
+  const { userId } = await getAuth();
   if (userId == null) {
     return { ok: false, message: "Authentication required." };
   }
@@ -52,16 +33,20 @@ export async function createWorkspace(
   }
 
   try {
-    const clerk = await clerkClient();
-    const organization = await clerk.organizations.createOrganization({
+    const workspace = await workspaces.create({
       name: parsed.data.name,
-      createdBy: userId,
-      publicMetadata: {
-        institutionType: parsed.data.institutionType,
-      },
+      institutionType: parsed.data.institutionType,
+      ownerUserId: userId,
     });
-    return { ok: true, id: organization.id };
+    return { ok: true, id: workspace.id };
   } catch (error) {
-    return { ok: false, message: userFacingMessage(error) };
+    if (error instanceof WorkspaceAccessError) {
+      return { ok: false, message: error.message };
+    }
+    console.error("Workspace Creation failed", error);
+    return {
+      ok: false,
+      message: "Could not create your workspace. Please try again.",
+    };
   }
 }

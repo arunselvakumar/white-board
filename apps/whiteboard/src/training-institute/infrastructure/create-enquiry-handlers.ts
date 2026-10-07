@@ -6,7 +6,7 @@ import type { EventDispatcher } from "../application/event-dispatcher";
 import { InviteStudentOnCreated } from "../application/invite-student-on-created";
 import { StudentId } from "../domain/student-id";
 import { WorkspaceId } from "../domain/workspace-id";
-import { ClerkStudentInvitationSender } from "./clerk-student-invitation-sender";
+import { WorkspaceStudentInvitationSender } from "./workspace-student-invitation-sender";
 import { InProcessEventDispatcher } from "./in-process-event-dispatcher";
 import { PrismaEnquiryReader } from "./prisma-enquiry-reader";
 import { PrismaEnquiryStore } from "./prisma-enquiry-store";
@@ -33,7 +33,7 @@ function studentEvents(db: PrismaClient): EventDispatcher {
             details: student.details,
             createdByUserId: student.createdByUserId.value,
           };
-    }, new ClerkStudentInvitationSender()),
+    }, new WorkspaceStudentInvitationSender()),
   ]);
 }
 

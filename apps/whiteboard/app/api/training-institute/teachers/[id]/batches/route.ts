@@ -21,7 +21,7 @@ export async function GET(
       TrainingInstituteTeacherParamsModel.safeParse(await context.params),
     );
     return Response.json(
-      mapAssignedBatches(await handlers.list(id, session.orgId)),
+      mapAssignedBatches(await handlers.list(id, session.workspaceId)),
     );
   } catch (error) {
     return mapError(error);
@@ -48,7 +48,7 @@ export async function POST(
         await handlers.assign({
           teacherId: id,
           batchId,
-          workspaceId: session.orgId,
+          workspaceId: session.workspaceId,
           userId: session.userId,
         }),
       ),

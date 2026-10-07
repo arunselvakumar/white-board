@@ -1,8 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
-
-import { jsonError } from "@/app/api/_lib/json-error";
 import { mapError } from "@/app/api/_lib/map-error";
-import { verifiedEmails } from "@/app/api/_lib/require-family-session";
+import {
+  requireWorkspaceSession,
+  verifiedEmailsOf,
+} from "@/app/api/_lib/require-workspace-session";
 import {
   relevantClassChanges,
   type CalendarRole,
@@ -14,42 +14,33 @@ export const dynamic = "force-dynamic";
 
 const query = createCalendarScheduleReader();
 const exceptions = createClassExceptionsReader();
-const roles = new Set<CalendarRole>([
-  "org:admin",
-  "org:teacher",
-  "org:student",
-  "org:parent",
-]);
+const roles = [
+  "owner",
+  "teacher",
+  "student",
+  "parent",
+] as const satisfies readonly CalendarRole[];
 
 export async function GET(): Promise<Response> {
   try {
-    const { userId, orgId, orgRole } = await auth();
-    if (userId == null)
-      return jsonError(401, "UNAUTHENTICATED", "Authentication required.");
-    if (orgId == null)
-      return jsonError(
-        403,
-        "NO_ACTIVE_WORKSPACE",
-        "An active Workspace is required.",
-      );
-    if (!roles.has(orgRole as CalendarRole))
-      return jsonError(
-        403,
-        "FORBIDDEN",
-        "Calendar access is not available for this role.",
-      );
+    const session = await requireWorkspaceSession(
+      roles,
+      "Calendar access is not available for this role.",
+    );
+    if (session instanceof Response) return session;
+    const { userId, workspaceId, role } = session;
 
     const items = await query.execute({
-      workspaceId: orgId,
+      workspaceId,
       userId,
-      role: orgRole as CalendarRole,
+      role,
       verifiedEmails:
-        orgRole === "org:student" || orgRole === "org:parent"
-          ? await verifiedEmails(userId)
+        role === "student" || role === "parent"
+          ? verifiedEmailsOf(session.user)
           : undefined,
     });
     const { changes, holidays } = await exceptions.forBatches(
-      orgId,
+      workspaceId,
       items.map((item) => item.batchId),
     );
     return Response.json({
@@ -57,8 +48,8 @@ export async function GET(): Promise<Response> {
       classChanges: relevantClassChanges(items, changes),
       holidays,
       permissions: {
-        changeClasses: orgRole === "org:admin" || orgRole === "org:teacher",
-        manageHolidays: orgRole === "org:admin",
+        changeClasses: role === "owner" || role === "teacher",
+        manageHolidays: role === "owner",
       },
     });
   } catch (error) {

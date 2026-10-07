@@ -4,7 +4,7 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { addDays, dateKeyInZone } from "@/lib/calendar-dates";
 import { enquiryQueries, type DemoResponse } from "@/src/queries/enquiries";
 import { getQueryClient } from "@/src/queries/query-client";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 import { MyBatchesScreen } from "./my-batches-screen";
 import { TeacherForm } from "./teacher-form";
@@ -180,7 +180,7 @@ export const EditTeacher: Story = {
               bankIfsc: null,
             },
             invitationStatus: "accepted",
-            clerkUserId: "user_1",
+            userId: "user_1",
             deactivatedAt: null,
             createdAt: "2026-09-25T00:00:00.000Z",
             updatedAt: "2026-09-25T00:00:00.000Z",
@@ -313,8 +313,7 @@ function demoOn(
 export const MyBatchesWithDemos: Story = {
   parameters: { nextjs: { navigation: { pathname: "/teacher" } } },
   beforeEach: () => {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.orgRole = "org:teacher";
+    signInAs("teacher");
     getQueryClient().removeQueries({ queryKey: enquiryQueries.key.all });
     const today = dateKeyInZone(new Date(), "Asia/Kolkata");
     return mockMyBatchesApi([
@@ -357,8 +356,7 @@ export const MyBatchesWithDemos: Story = {
 export const MyBatchesNoDemos: Story = {
   parameters: { nextjs: { navigation: { pathname: "/teacher" } } },
   beforeEach: () => {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.orgRole = "org:teacher";
+    signInAs("teacher");
     getQueryClient().removeQueries({ queryKey: enquiryQueries.key.all });
     return mockMyBatchesApi([]);
   },

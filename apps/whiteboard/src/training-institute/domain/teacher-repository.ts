@@ -16,8 +16,13 @@ export type TeacherRepository = {
     id: string,
     workspaceId: string,
   ): Promise<{ mimeType: string; bytes: Uint8Array } | null>;
-  findByClerkUserInWorkspace(
-    clerkUserId: string,
+  findByUserInWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<Teacher | null>;
+  /** The Teacher (not deleted) whose latest invitation is one of these ids. */
+  findByInvitationInWorkspace(
+    invitationIds: readonly string[],
     workspaceId: string,
   ): Promise<Teacher | null>;
   listInWorkspace(params: TeacherListParams): Promise<ListPage<Teacher>>;

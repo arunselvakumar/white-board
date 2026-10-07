@@ -12,7 +12,7 @@ import type {
   StudentResponse,
   StudentWriteInput,
 } from "@/src/queries/students";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 
@@ -169,12 +169,7 @@ const meta = {
     nextjs: { navigation: { pathname: "/students" } },
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 

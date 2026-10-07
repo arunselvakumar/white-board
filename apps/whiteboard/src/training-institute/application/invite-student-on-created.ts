@@ -14,7 +14,7 @@ type StudentForInvitation = {
 export type InvitationSender = {
   send(
     input: StudentInvitee & {
-      organizationId: string;
+      workspaceId: string;
       inviterUserId: string;
     },
   ): Promise<void>;
@@ -38,7 +38,7 @@ export class InviteStudentOnCreated {
       try {
         await this.invitations.send({
           ...invitee,
-          organizationId: event.workspaceId,
+          workspaceId: event.workspaceId,
           inviterUserId: student.createdByUserId,
         });
       } catch (error) {

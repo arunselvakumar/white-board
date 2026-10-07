@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -8,9 +9,9 @@ import { GET as downloadRecording } from "../classes/[batchId]/[date]/[startTime
 import { GET } from "./route";
 import type { GetTrainingInstituteFamilyHomeResponseModel } from "./get-family-home-response-model";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 vi.mock(
   "@/src/training-institute/infrastructure/class-recording-download",
@@ -20,24 +21,26 @@ vi.mock(
   }),
 );
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const getUser = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
 
-function session(userId: string, orgId: string, orgRole: string) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
-}
-
-function signedInAs(...emails: string[]) {
-  getUser.mockResolvedValue({
-    firstName: "Family",
-    lastName: null,
-    username: null,
-    emailAddresses: emails.map((emailAddress) => ({
-      emailAddress,
-      verification: { status: "verified" },
-    })),
-  });
+/** `email` is the User's one email; it links Students only when verified. */
+function session(
+  userId: string,
+  orgId: string,
+  orgRole: WorkspaceRole,
+  email = `${userId}@example.test`,
+  emailVerified = true,
+) {
+  mockedAuth.mockResolvedValue(
+    authStateFor({
+      userId,
+      workspaceId: orgId,
+      role: orgRole,
+      name: "Family",
+      email,
+      emailVerified,
+    }),
+  );
 }
 
 function localDate(daysFromToday: number): string {
@@ -124,10 +127,7 @@ describe("Student and Parent Home HTTP", () => {
     workspaceId = `org_${randomUUID()}`;
     courseId = randomUUID();
     batchId = randomUUID();
-    session("user_owner", workspaceId, "org:admin");
-    getUser.mockReset();
-    signedInAs();
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
+    session("user_owner", workspaceId, "owner");
 
     await prisma.trainingInstituteCourse.create({
       data: {
@@ -224,8 +224,7 @@ describe("Student and Parent Home HTTP", () => {
   });
 
   it("shows a Student their next Class, dues, Attendance, and recordings", async () => {
-    session("user_asha", workspaceId, "org:student");
-    signedInAs("asha@example.com");
+    session("user_asha", workspaceId, "student", "asha@example.com");
     const { status, body } = await home();
     expect(status).toBe(200);
     expect(body.students).toHaveLength(1);
@@ -261,8 +260,7 @@ describe("Student and Parent Home HTTP", () => {
   });
 
   it("shows a Parent a section for each linked Student", async () => {
-    session("user_dad", workspaceId, "org:parent");
-    signedInAs("Dad@Example.com");
+    session("user_dad", workspaceId, "parent", "Dad@Example.com");
     const { body } = await home();
     expect(body.students.map((student) => student.name)).toEqual([
       "Asha",
@@ -278,33 +276,23 @@ describe("Student and Parent Home HTTP", () => {
     });
 
     // A Parent email that isn't on any Student, or an unverified one, sees nothing.
-    signedInAs("stranger@example.com");
+    session("user_dad", workspaceId, "parent", "stranger@example.com");
     expect((await home()).body.students).toEqual([]);
-    getUser.mockResolvedValue({
-      emailAddresses: [
-        {
-          emailAddress: "dad@example.com",
-          verification: { status: "unverified" },
-        },
-      ],
-    });
+    session("user_dad", workspaceId, "parent", "dad@example.com", false);
     expect((await home()).body.students).toEqual([]);
   });
 
   it("keeps Workspaces apart and refuses the Owner and Teachers", async () => {
-    session("user_asha", `org_${randomUUID()}`, "org:student");
-    signedInAs("asha@example.com");
+    session("user_asha", `org_${randomUUID()}`, "student", "asha@example.com");
     expect((await home()).body.students).toEqual([]);
 
-    for (const role of ["org:admin", "org:teacher", "org:member"]) {
+    for (const role of ["owner", "teacher"] as const) {
       session("user_x", workspaceId, role);
       expect((await home()).status).toBe(403);
     }
-    mockedAuth.mockResolvedValue({
-      userId: null,
-      orgId: null,
-      orgRole: null,
-    } as never);
+    mockedAuth.mockResolvedValue(
+      authStateFor({ userId: null, workspaceId: null }),
+    );
     expect((await home()).status).toBe(401);
   });
 
@@ -316,8 +304,7 @@ describe("Student and Parent Home HTTP", () => {
           params: Promise.resolve({ batchId, date, startTime: "23:00" }),
         },
       );
-    session("user_asha", workspaceId, "org:student");
-    signedInAs("asha@example.com");
+    session("user_asha", workspaceId, "student", "asha@example.com");
     const ok = await download(localDate(-1));
     expect(ok.status).toBe(302);
     expect(ok.headers.get("location")).toBe(
@@ -327,7 +314,7 @@ describe("Student and Parent Home HTTP", () => {
     expect((await download(localDate(-40))).status).toBe(404);
 
     // Ravi isn't enrolled in the Batch.
-    signedInAs("ravi@example.com");
+    session("user_ravi", workspaceId, "student", "ravi@example.com");
     expect((await download(localDate(-1))).status).toBe(404);
 
     // Once the Enrollment ends, so does access.
@@ -335,8 +322,7 @@ describe("Student and Parent Home HTTP", () => {
       where: { id: ashaEnrollmentId },
       data: { endedAt: new Date(), endedByUserId: "user_owner" },
     });
-    session("user_dad", workspaceId, "org:parent");
-    signedInAs("dad@example.com");
+    session("user_dad", workspaceId, "parent", "dad@example.com");
     expect((await download(localDate(-1))).status).toBe(404);
   });
 });

@@ -36,6 +36,9 @@ export default defineConfig({
             DATABASE_URL:
               process.env["DATABASE_URL_TEST"] ??
               "postgresql://whiteboard:whiteboard@localhost:5433/whiteboard_test",
+            BETTER_AUTH_SECRET: "http-tests-only-secret-0123456789abcdef",
+            BETTER_AUTH_URL: "http://localhost:3000",
+            EMAIL_TRANSPORT: "outbox",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
         },

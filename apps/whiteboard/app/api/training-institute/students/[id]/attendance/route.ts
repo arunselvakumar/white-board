@@ -30,7 +30,11 @@ export async function GET(
     );
     const page = await handlers.studentHistory(
       { studentId: id, ...query },
-      { workspaceId: session.orgId, userId: session.userId, role: "owner" },
+      {
+        workspaceId: session.workspaceId,
+        userId: session.userId,
+        role: "owner",
+      },
     );
     return Response.json({
       ...page,

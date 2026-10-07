@@ -28,7 +28,7 @@ export async function POST(
     );
     const student = await handlers.drop.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       droppedByUserId: session.userId,
     });
     return Response.json(mapStudentResponse(student));

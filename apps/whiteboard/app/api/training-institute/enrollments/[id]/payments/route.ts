@@ -38,7 +38,7 @@ export async function POST(
       amountPaise: model.amountPaise,
       method: model.method,
       paidAt: model.paidAt,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       recordedByUserId: session.userId,
     });
     return Response.json(mapFeePaymentResponse(payment), {
@@ -72,7 +72,7 @@ export async function GET(
     );
     const page = await handlers.listPayments.execute({
       enrollmentId: params.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
       limit: model.limit,
       after: model.after,
       before: model.before,

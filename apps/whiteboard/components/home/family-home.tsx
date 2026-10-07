@@ -33,7 +33,7 @@ import {
   localNow,
 } from "@/src/training-institute/domain/class-schedule";
 
-export type FamilyHomeRole = "org:student" | "org:parent";
+export type FamilyHomeRole = "student" | "parent";
 
 const CLASS_MODE_LABELS = {
   offline: "Offline",
@@ -301,7 +301,7 @@ export function FamilyHome({
   classWork?: FamilyClassWorkView;
   now?: Date;
 }) {
-  const title = role === "org:parent" ? "Parent Home" : "Student Home";
+  const title = role === "parent" ? "Parent Home" : "Student Home";
   return (
     <main className="w-full p-6">
       <div className="max-w-5xl space-y-6">
@@ -310,13 +310,13 @@ export function FamilyHome({
           <Empty className="border">
             <EmptyHeader>
               <EmptyDescription>
-                {role === "org:parent"
+                {role === "parent"
                   ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
                   : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
-        ) : role === "org:parent" ? (
+        ) : role === "parent" ? (
           home.students.map((student) => (
             <section
               key={student.id}

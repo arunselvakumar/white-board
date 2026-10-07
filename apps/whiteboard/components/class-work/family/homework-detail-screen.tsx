@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertDialog,
@@ -118,7 +118,7 @@ function submittedByLabel(
   studentName: string,
 ): string {
   if (by === "parent") return "Marked done by a Parent";
-  return role === "org:student"
+  return role === "student"
     ? "Marked done by you"
     : `Marked done by ${studentName}`;
 }
@@ -291,7 +291,7 @@ function YourWorkCard({
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const parent = role === "org:parent";
+  const parent = role === "parent";
   const submission = homework.submission;
   const timezone = batchTimezone(batch);
   const checked = homework.status === "checked";
@@ -480,7 +480,7 @@ export function HomeworkDetail({
           <ArrowLeft aria-hidden="true" className="size-4" /> All Homework
         </Link>
         <header className="space-y-2">
-          {role === "org:parent" && (
+          {role === "parent" && (
             <p className="text-muted-foreground text-sm">For {student.name}</p>
           )}
           <h1 className="text-2xl tracking-tight break-words">
@@ -560,9 +560,9 @@ export function HomeworkDetailScreen({
   studentId: string | null;
   now?: Date;
 }) {
-  const { orgId, userId } = useAuth();
+  const { workspaceId, userId } = useAuth();
   const { data } = useSuspenseQuery(
-    classWorkQueries.family(`${orgId}:${userId}:${role}`),
+    classWorkQueries.family(`${workspaceId}:${userId}:${role}`),
   );
   return (
     <HomeworkDetail

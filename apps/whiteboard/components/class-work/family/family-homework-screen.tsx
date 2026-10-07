@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import { Card, CardContent } from "@repo/ui/components/card";
 import {
   Empty,
@@ -100,7 +100,7 @@ function StudentClassWork({
   if (student.batches.length === 0) {
     return (
       <EmptyText>
-        {role === "org:parent"
+        {role === "parent"
           ? `${student.name} isn’t in a Batch yet. Homework and Study Material show here once they join one.`
           : "You aren’t in a Batch yet. Homework and Study Material show here once you join one."}
       </EmptyText>
@@ -119,9 +119,9 @@ function StudentClassWork({
           key={batch.id}
           className="bg-muted text-muted-foreground rounded-lg px-3 py-2 text-sm"
         >
-          {role === "org:parent" ? `${student.name} left` : "You left"}{" "}
-          {batch.name}. Items shared before{" "}
-          {role === "org:parent" ? "they" : "you"} left are still here.
+          {role === "parent" ? `${student.name} left` : "You left"} {batch.name}
+          . Items shared before {role === "parent" ? "they" : "you"} left are
+          still here.
         </p>
       ))}
       <Tabs defaultValue="homework" className="gap-4">
@@ -204,11 +204,11 @@ export function FamilyHomework({
         <h1 className="text-2xl tracking-tight">Homework</h1>
         {classWork.students.length === 0 ? (
           <EmptyText>
-            {role === "org:parent"
+            {role === "parent"
               ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
               : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."}
           </EmptyText>
-        ) : role === "org:parent" ? (
+        ) : role === "parent" ? (
           classWork.students.map((student) => (
             <section
               key={student.id}
@@ -246,9 +246,9 @@ export function FamilyHomeworkScreen({
   role: FamilyHomeRole;
   now?: Date;
 }) {
-  const { orgId, userId } = useAuth();
+  const { workspaceId, userId } = useAuth();
   const { data } = useSuspenseQuery(
-    classWorkQueries.family(`${orgId}:${userId}:${role}`),
+    classWorkQueries.family(`${workspaceId}:${userId}:${role}`),
   );
   return <FamilyHomework classWork={data} role={role} now={now} />;
 }

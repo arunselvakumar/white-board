@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import {
   afterAll,
@@ -25,14 +26,12 @@ import { POST as cancelClass } from "./[batchId]/[date]/[startTime]/cancel/route
 import { POST as moveClass } from "./[batchId]/[date]/[startTime]/move/route";
 import { POST as restoreClass } from "./[batchId]/[date]/[startTime]/restore/route";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const getUser = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
 
 // Pin the clock to 10:00 IST today so "today" tests run at any hour.
 const TODAY = new Intl.DateTimeFormat("en-CA", {
@@ -58,21 +57,22 @@ afterAll(() => {
 
 type Json = Record<string, unknown> & { code?: string };
 
+/** `email` is the User's verified email (links Student and Parent Users). */
 function session(
   userId: string | null,
   orgId: string | null,
-  orgRole = "org:admin",
+  orgRole: WorkspaceRole = "owner",
+  email = "owner@example.com",
 ) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
-}
-
-function verifiedEmail(emailAddress: string) {
-  getUser.mockResolvedValue({
-    firstName: "Test",
-    lastName: null,
-    username: null,
-    emailAddresses: [{ emailAddress, verification: { status: "verified" } }],
-  });
+  mockedAuth.mockResolvedValue(
+    authStateFor({
+      userId,
+      workspaceId: orgId,
+      role: orgRole,
+      name: "Test",
+      email,
+    }),
+  );
 }
 
 function post(body?: unknown): Request {
@@ -238,7 +238,7 @@ async function seedWorkspace(timings: unknown) {
         name: "Meera",
         email: `${teacherId}@example.com`,
         kind: "centre_teacher",
-        clerkUserId: "user_teacher",
+        userId: "user_teacher",
       },
       {
         id: randomUUID(),
@@ -247,7 +247,7 @@ async function seedWorkspace(timings: unknown) {
         name: "Kumar",
         email: `${randomUUID()}@example.com`,
         kind: "centre_teacher",
-        clerkUserId: "user_other_teacher",
+        userId: "user_other_teacher",
       },
     ],
   });
@@ -271,9 +271,6 @@ describe("Class changes HTTP", () => {
   let homeEnrollmentId: string;
 
   beforeEach(async () => {
-    getUser.mockReset();
-    verifiedEmail("owner@example.com");
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     ({ workspaceId, batchId, homeEnrollmentId } = await seedWorkspace([
       { daysOfWeek: EVERY_DAY, startTime: "09:00", endTime: "11:00" },
     ]));
@@ -290,8 +287,7 @@ describe("Class changes HTTP", () => {
     expect((await calendar()).classChanges).toMatchObject([
       { date: day(7), startTime: "09:00", kind: "cancelled", reason: "Pongal" },
     ]);
-    session("user_student", workspaceId, "org:student");
-    verifiedEmail("asha@example.com");
+    session("user_student", workspaceId, "student", "asha@example.com");
     expect((await calendar()).classChanges).toMatchObject([
       { date: day(7), kind: "cancelled" },
     ]);
@@ -475,7 +471,7 @@ describe("Class changes HTTP", () => {
   });
 
   it("lets assigned Teachers change Classes and keeps everyone else out", async () => {
-    session("user_teacher", workspaceId, "org:teacher");
+    session("user_teacher", workspaceId, "teacher");
     expect((await cancel(batchId, day(7), "09:00")).status).toBe(200);
     expect(
       (
@@ -485,11 +481,11 @@ describe("Class changes HTTP", () => {
       ).status,
     ).toBe(403);
 
-    session("user_other_teacher", workspaceId, "org:teacher");
+    session("user_other_teacher", workspaceId, "teacher");
     expect((await restore(batchId, day(7), "09:00")).status).toBe(404);
-    session("user_student", workspaceId, "org:student");
+    session("user_student", workspaceId, "student");
     expect((await restore(batchId, day(7), "09:00")).status).toBe(403);
-    session("user_parent", workspaceId, "org:parent");
+    session("user_parent", workspaceId, "parent");
     expect((await cancel(batchId, day(8), "09:00")).status).toBe(403);
     session(null, null);
     expect((await cancel(batchId, day(8), "09:00")).status).toBe(401);
@@ -501,12 +497,11 @@ describe("Class changes HTTP", () => {
     expect((await cancel(batchId, day(7), "17:00", "Ravi unwell")).status).toBe(
       200,
     );
-    session("user_student", workspaceId, "org:student");
-    verifiedEmail("ravi@example.com");
+    session("user_student", workspaceId, "student", "ravi@example.com");
     expect((await calendar()).classChanges).toMatchObject([
       { startTime: "17:00", reason: "Ravi unwell" },
     ]);
-    verifiedEmail("asha@example.com");
+    session("user_student", workspaceId, "student", "asha@example.com");
     expect((await calendar()).classChanges).toEqual([]);
   });
 
@@ -520,8 +515,7 @@ describe("Class changes HTTP", () => {
       status: 201,
       body: { startDate: day(14), endDate: day(16), reason: "Diwali" },
     });
-    session("user_student", workspaceId, "org:student");
-    verifiedEmail("asha@example.com");
+    session("user_student", workspaceId, "student", "asha@example.com");
     expect((await calendar()).holidays).toMatchObject([
       { startDate: day(14), endDate: day(16) },
     ]);
@@ -584,9 +578,6 @@ describe("Class changes today", () => {
   let batchEnrollmentId: string;
 
   beforeEach(async () => {
-    getUser.mockReset();
-    verifiedEmail("owner@example.com");
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     ({ workspaceId, batchId, batchEnrollmentId } = await seedWorkspace([
       { daysOfWeek: EVERY_DAY, startTime: "15:00", endTime: "16:00" },
     ]));

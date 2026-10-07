@@ -4,7 +4,11 @@ import { expect } from "storybook/test";
 import type { ClassDetail } from "@/src/training-institute/application/class-service";
 import { classQueries } from "@/src/queries/classes";
 import { getQueryClient } from "@/src/queries/query-client";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import {
+  authMocks,
+  signInAs,
+  type WorkspaceRole,
+} from "../../.storybook/mocks/auth";
 
 import { ClassPrejoinScreen } from "./class-prejoin-screen";
 
@@ -29,12 +33,11 @@ const detail: ClassDetail = {
   rescheduledFrom: null,
 };
 
-function state(value: ClassDetail, role = "org:admin") {
-  clerkMocks.orgId = "org_riverside";
-  clerkMocks.orgRole = role;
+function state(value: ClassDetail, role: WorkspaceRole = "owner") {
+  signInAs(role);
   getQueryClient().setQueryData(
     classQueries.detail(
-      `org_riverside:undefined:${role}`,
+      `${authMocks.workspaceId}:${authMocks.userId}:${role}`,
       batchId,
       date,
       startTime,
@@ -75,7 +78,7 @@ export const WaitingForRecording: Story = {
   beforeEach: () => {
     state(
       { ...detail, meetingOption: "whiteboard", joinUrl: null, isHost: false },
-      "org:student",
+      "student",
     );
   },
   play: async ({ canvas }) => {
@@ -99,7 +102,7 @@ export const RecordedClassReadyToJoin: Story = {
         status: "live",
         recordingStatus: "recording",
       },
-      "org:student",
+      "student",
     );
   },
   play: async ({ canvas }) => {
@@ -146,7 +149,7 @@ export const StudentRecordingDownload: Story = {
         recordingStatus: "ready",
         recordingReady: true,
       },
-      "org:student",
+      "student",
     );
   },
   play: async ({ canvas }) => {
@@ -171,7 +174,7 @@ export const StudentRecordingNotReady: Story = {
         status: "ended",
         recordingStatus: "uploading",
       },
-      "org:student",
+      "student",
     );
   },
   play: async ({ canvas }) => {
@@ -190,7 +193,7 @@ export const CancelledClass: Story = {
         status: "cancelled",
         classChange: { status: "cancelled", reason: "Pongal", movedTo: null },
       },
-      "org:student",
+      "student",
     );
   },
   play: async ({ canvas }) => {
@@ -242,7 +245,7 @@ export const MovedClass: Story = {
           movedTo: { date: "2026-10-03", startTime: "16:00", endTime: "18:00" },
         },
       },
-      "org:parent",
+      "parent",
     );
   },
   play: async ({ canvas }) => {

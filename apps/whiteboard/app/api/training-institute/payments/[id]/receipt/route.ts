@@ -26,7 +26,7 @@ export async function GET(
     );
     const payment = await handlers.getReceipt.execute({
       id: model.id,
-      workspaceId: session.orgId,
+      workspaceId: session.workspaceId,
     });
     return Response.json(mapFeePaymentResponse(payment));
   } catch (error) {

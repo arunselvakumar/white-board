@@ -1,19 +1,18 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET } from "./[batchId]/[date]/[startTime]/route";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const getUser = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
 
 function dateAndDay() {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -44,18 +43,14 @@ describe("Class pre-join HTTP", () => {
   beforeEach(async () => {
     workspaceId = `org_${randomUUID()}`;
     batchId = randomUUID();
-    mockedAuth.mockResolvedValue({
-      userId: "user_owner",
-      orgId: workspaceId,
-      orgRole: "org:admin",
-    } as never);
-    getUser.mockReset().mockResolvedValue({
-      firstName: "Owner",
-      lastName: null,
-      username: null,
-      emailAddresses: [],
-    });
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
+    mockedAuth.mockResolvedValue(
+      authStateFor({
+        userId: "user_owner",
+        workspaceId,
+        role: "owner",
+        name: "Owner",
+      }),
+    );
     const courseId = randomUUID();
     await prisma.trainingInstituteCourse.create({
       data: {
@@ -91,11 +86,14 @@ describe("Class pre-join HTTP", () => {
       joinUrl: "https://meet.google.com/example",
       isHost: true,
     });
-    mockedAuth.mockResolvedValue({
-      userId: "user_owner",
-      orgId: `org_${randomUUID()}`,
-      orgRole: "org:admin",
-    } as never);
+    mockedAuth.mockResolvedValue(
+      authStateFor({
+        userId: "user_owner",
+        workspaceId: `org_${randomUUID()}`,
+        role: "owner",
+        name: "Owner",
+      }),
+    );
     expect((await get()).status).toBe(404);
   });
 
@@ -109,22 +107,15 @@ describe("Class pre-join HTTP", () => {
       joinUrl: null,
       status: "scheduled",
     });
-    mockedAuth.mockResolvedValue({
-      userId: "user_student",
-      orgId: workspaceId,
-      orgRole: "org:student",
-    } as never);
-    getUser.mockResolvedValue({
-      firstName: "Asha",
-      lastName: null,
-      username: null,
-      emailAddresses: [
-        {
-          emailAddress: "asha@example.com",
-          verification: { status: "verified" },
-        },
-      ],
-    });
+    mockedAuth.mockResolvedValue(
+      authStateFor({
+        userId: "user_student",
+        workspaceId,
+        role: "student",
+        name: "Asha",
+        email: "asha@example.com",
+      }),
+    );
     expect((await get()).status).toBe(404);
     const studentId = randomUUID();
     const courseId = (

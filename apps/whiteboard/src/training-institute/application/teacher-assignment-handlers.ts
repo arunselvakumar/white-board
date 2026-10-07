@@ -22,11 +22,11 @@ export class TeacherAssignmentHandlers {
   }
 
   async listForUser(
-    clerkUserId: string,
+    userId: string,
     workspaceId: string,
   ): Promise<AssignedBatch[]> {
-    const teacher = await this.teachers.findByClerkUserInWorkspace(
-      clerkUserId,
+    const teacher = await this.teachers.findByUserInWorkspace(
+      userId,
       workspaceId,
     );
     if (!teacher?.isActive) throw new TeacherNotFoundError();

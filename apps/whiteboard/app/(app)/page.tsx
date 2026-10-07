@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
@@ -6,25 +6,25 @@ import { redirect } from "next/navigation";
 import { OwnerDashboardScreen } from "@/components/dashboard/owner-dashboard-screen";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { orgRole } = await auth();
+  const { role } = await getAuth();
   return {
     title:
-      orgRole === "org:student"
+      role === "student"
         ? "Student Home"
-        : orgRole === "org:parent"
+        : role === "parent"
           ? "Parent Home"
-          : orgRole === "org:teacher"
+          : role === "teacher"
             ? "My Batches"
             : "Owner Dashboard",
   };
 }
 
 export default async function HomePage() {
-  const { orgId, orgRole } = await auth();
-  if (orgId == null) return null;
-  if (orgRole === "org:student") redirect("/student");
-  if (orgRole === "org:parent") redirect("/parent");
-  if (orgRole === "org:teacher") redirect("/teacher");
-  if (orgRole !== "org:admin") notFound();
+  const { workspaceId, role } = await getAuth();
+  if (workspaceId == null) return null;
+  if (role === "student") redirect("/student");
+  if (role === "parent") redirect("/parent");
+  if (role === "teacher") redirect("/teacher");
+  if (role !== "owner") notFound();
   return <OwnerDashboardScreen />;
 }

@@ -4,7 +4,7 @@ import {
   TeacherHandlers,
   type TeacherInviter,
 } from "../application/teacher-handlers";
-import { ClerkTeacherInviter } from "./clerk-teacher-inviter";
+import { WorkspaceTeacherInviter } from "./workspace-teacher-inviter";
 import { PrismaTeacherRepository } from "./prisma-teacher-repository";
 import { PrismaTeacherDocumentRepository } from "./prisma-teacher-document-repository";
 
@@ -14,7 +14,7 @@ export function createTeacherHandlers(deps?: {
 }): TeacherHandlers {
   return new TeacherHandlers(
     new PrismaTeacherRepository(deps?.prisma ?? prisma),
-    deps?.invitations ?? new ClerkTeacherInviter(),
+    deps?.invitations ?? new WorkspaceTeacherInviter(),
     new PrismaTeacherDocumentRepository(deps?.prisma ?? prisma),
   );
 }

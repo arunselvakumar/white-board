@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@repo/auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -15,8 +15,8 @@ import {
 import { getAppBreadcrumbs } from "@/lib/app-breadcrumbs";
 
 export function AppBreadcrumbs() {
-  const { orgRole } = useAuth();
-  const crumbs = getAppBreadcrumbs(usePathname() || "/", orgRole);
+  const { role } = useAuth();
+  const crumbs = getAppBreadcrumbs(usePathname() || "/", role);
 
   return (
     <Breadcrumb className="min-w-0 overflow-x-auto" aria-label="Breadcrumb">

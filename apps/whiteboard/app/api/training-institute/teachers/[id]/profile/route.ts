@@ -27,7 +27,7 @@ export async function POST(
         await handlers.updateProfile({
           ...model,
           id,
-          workspaceId: session.orgId,
+          workspaceId: session.workspaceId,
         }),
       ),
     );

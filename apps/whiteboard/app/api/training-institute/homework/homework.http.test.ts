@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth, type WorkspaceRole } from "@repo/auth/server";
+import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/db";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
@@ -37,14 +38,12 @@ import {
   TrainingInstituteHomeworkSubmissionsResponseModel,
 } from "./class-work-models";
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  clerkClient: vi.fn(),
+vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getAuth: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(auth);
-const mockedClerkClient = vi.mocked(clerkClient);
-const getUser = vi.fn();
+const mockedAuth = vi.mocked(getAuth);
 
 // Wednesday 2026-09-30, noon in Asia/Kolkata.
 const NOW = new Date("2026-09-30T06:30:00.000Z");
@@ -61,14 +60,21 @@ const SUNDAY = "2026-09-27";
 type Json = Record<string, unknown> & { code?: string; message?: string };
 type Result<T = Json> = { status: number; body: T };
 
-function as(userId: string, orgId: string, orgRole: string, emails = []) {
-  mockedAuth.mockResolvedValue({ userId, orgId, orgRole } as never);
-  getUser.mockResolvedValue({
-    emailAddresses: (emails as string[]).map((emailAddress) => ({
-      emailAddress,
-      verification: { status: "verified" },
-    })),
-  });
+/** Without `email`, the User has no verified email to link Students by. */
+function as(
+  userId: string,
+  orgId: string,
+  orgRole: WorkspaceRole,
+  email?: string,
+) {
+  mockedAuth.mockResolvedValue(
+    authStateFor({
+      userId,
+      workspaceId: orgId,
+      role: orgRole,
+      ...(email == null ? { emailVerified: false } : { email }),
+    }),
+  );
 }
 
 async function read<T>(response: Response): Promise<Result<T>> {
@@ -141,32 +147,28 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
   let kiranId: string;
 
   const owner = () => {
-    as("user_owner", workspaceId, "org:admin");
+    as("user_owner", workspaceId, "owner");
   };
   const teacher = () => {
-    as("user_teacher", workspaceId, "org:teacher");
+    as("user_teacher", workspaceId, "teacher");
   };
   const otherTeacher = () => {
-    as("user_teacher_2", workspaceId, "org:teacher");
+    as("user_teacher_2", workspaceId, "teacher");
   };
   const asha = () => {
-    as("user_asha", workspaceId, "org:student", ["asha@example.com"] as never);
+    as("user_asha", workspaceId, "student", "asha@example.com");
   };
   const ashaParent = () => {
-    as("user_dad", workspaceId, "org:parent", ["dad@example.com"] as never);
+    as("user_dad", workspaceId, "parent", "dad@example.com");
   };
   const ravi = () => {
-    as("user_ravi", workspaceId, "org:student", ["ravi@example.com"] as never);
+    as("user_ravi", workspaceId, "student", "ravi@example.com");
   };
   const meera = () => {
-    as("user_meera", workspaceId, "org:student", [
-      "meera@example.com",
-    ] as never);
+    as("user_meera", workspaceId, "student", "meera@example.com");
   };
   const kiran = () => {
-    as("user_kiran", workspaceId, "org:student", [
-      "kiran@example.com",
-    ] as never);
+    as("user_kiran", workspaceId, "student", "kiran@example.com");
   };
 
   async function addBatch(name: string, createdDaysAgo = 120) {
@@ -225,7 +227,7 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
     return id;
   }
 
-  async function addTeacher(clerkUserId: string, name: string) {
+  async function addTeacher(userId: string, name: string) {
     const id = randomUUID();
     await prisma.trainingInstituteTeacher.create({
       data: {
@@ -233,9 +235,9 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
         workspaceId,
         createdByUserId: "user_owner",
         name,
-        email: `${clerkUserId}@example.com`,
+        email: `${userId}@example.com`,
         kind: "centre_teacher",
-        clerkUserId,
+        userId,
         invitationStatus: "accepted",
       },
     });
@@ -336,8 +338,6 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
     vi.setSystemTime(NOW);
     workspaceId = `org_${randomUUID()}`;
     courseId = randomUUID();
-    getUser.mockReset();
-    mockedClerkClient.mockResolvedValue({ users: { getUser } } as never);
     await prisma.trainingInstituteCourse.create({
       data: {
         id: courseId,
@@ -457,7 +457,7 @@ describe("Homework and Study Material HTTP (ADR-0033)", () => {
     expect((await material()).status).toBe(403);
     expect((await overview()).status).toBe(403);
 
-    as("user_owner", `org_${randomUUID()}`, "org:admin");
+    as("user_owner", `org_${randomUUID()}`, "owner");
     expect((await overview()).status).toBe(404);
     expect((await roster(set.body.id)).status).toBe(404);
   });

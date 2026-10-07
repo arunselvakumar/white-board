@@ -2,7 +2,12 @@
 
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
-import { Component, type ReactNode, Suspense } from "react";
+import {
+  Component,
+  type ReactNode,
+  Suspense,
+  useSyncExternalStore,
+} from "react";
 import { Button } from "@repo/ui/components/button";
 import {
   Empty,
@@ -22,8 +27,27 @@ export function PageFallback() {
   );
 }
 
+const noSubscription = () => () => undefined;
+
+/** False on the server and during hydration, true after. */
+function useIsClient(): boolean {
+  return useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  );
+}
+
+/**
+ * Page reads run in the browser only (ADR-0026): query functions fetch
+ * relative `/app/api/...` URLs with the browser's Session cookie, which the
+ * server render has neither of. The shell around this renders on the server.
+ */
 export function QuerySuspense({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const isClient = useIsClient();
+
+  if (!isClient) return <PageFallback />;
 
   return (
     <QueryErrorResetBoundary key={pathname}>

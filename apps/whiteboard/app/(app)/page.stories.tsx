@@ -8,7 +8,7 @@ import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
 import { FeesCatalog } from "@/components/fees/fees-catalog";
 import { StudentCatalog } from "@/components/students/student-catalog";
 import { WorkspaceGate } from "@/components/workspace/workspace-gate";
-import { clerkMocks } from "../../.storybook/mocks/clerk";
+import { signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
   title: "Pages/In-app",
@@ -16,12 +16,7 @@ const meta = {
     layout: "fullscreen",
   },
   beforeEach() {
-    clerkMocks.orgId = "org_riverside";
-    clerkMocks.memberships = [
-      {
-        organization: { id: "org_riverside", name: "Riverside Centre" },
-      },
-    ];
+    signInAs("owner", { name: "Riverside Centre" });
   },
 } satisfies Meta;
 
