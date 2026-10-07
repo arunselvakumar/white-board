@@ -236,6 +236,46 @@ describe("openApiDocument", () => {
     expect(paths[`${base}/enquiries/{id}`]?.["patch"]).toBeUndefined();
   });
 
+  it("documents Homework, Study Material, Submissions, and files (ADR-0033)", () => {
+    const paths = openApiDocument.paths;
+    const base = "/api/training-institute";
+    const expected: [string, string][] = [
+      ["get", "/batches/{id}/class-work"],
+      ["post", "/batches/{id}/study-materials"],
+      ["post", "/study-materials/{id}/update"],
+      ["post", "/study-materials/{id}/remove"],
+      ["post", "/batches/{id}/homework"],
+      ["post", "/homework/{id}/update"],
+      ["post", "/homework/{id}/remove"],
+      ["get", "/homework/{id}/submissions"],
+      ["post", "/homework/{id}/submissions/{submissionId}/check"],
+      ["get", "/home/homework"],
+      ["post", "/homework/{id}/submit"],
+      ["post", "/homework/{id}/undo-submission"],
+      ["post", "/attachments"],
+      ["get", "/attachments/{id}"],
+    ];
+    for (const [method, path] of expected) {
+      expect(
+        paths[`${base}${path}`]?.[method],
+        `${method} ${path}`,
+      ).toBeDefined();
+    }
+    expect(paths[`${base}/attachments`]?.["post"]).toMatchObject({
+      requestBody: {
+        content: {
+          "application/pdf": { schema: { type: "string", format: "binary" } },
+          "image/png": { schema: { type: "string", format: "binary" } },
+        },
+      },
+    });
+    expect(
+      paths[`${base}/attachments/{id}`]?.["get"]?.["responses"],
+    ).toMatchObject({
+      "200": { content: { "image/jpeg": { schema: { format: "binary" } } } },
+    });
+  });
+
   it("names every component with its bounded context (ADR-0030)", () => {
     const names = Object.keys(openApiDocument.components.schemas);
     expect(names).toContain("CreateTrainingInstituteStudentRequest");
