@@ -1,0 +1,105 @@
+apps/whiteboard/app/(app)/batches/[id]/homework/[homeworkId]/page.tsx
+  s_2818932b6efba1::t_cf2df94254c271 1-19
+apps/whiteboard/app/(app)/batches/[id]/homework/page.tsx
+  s_2818932b6efba1::t_d39a5e7b9bdc3c 1-16
+apps/whiteboard/app/(app)/parent/homework/[homeworkId]/page.tsx
+  s_2818932b6efba1::t_3a7a1e630f1327 1-30
+apps/whiteboard/app/(app)/parent/homework/page.tsx
+  s_2818932b6efba1::t_e04863ba9b00db 1-13
+apps/whiteboard/app/(app)/student/homework/[homeworkId]/page.tsx
+  s_2818932b6efba1::t_d3dbe8ff0a4923 1-30
+apps/whiteboard/app/(app)/student/homework/page.tsx
+  s_2818932b6efba1::t_27c3fbe0c6d73c 1-13
+apps/whiteboard/app/(app)/teacher/batches/[id]/homework/[homeworkId]/page.tsx
+  s_2818932b6efba1::t_bb6c6a9182733f 1-19
+apps/whiteboard/app/(app)/teacher/batches/[id]/homework/page.tsx
+  s_2818932b6efba1::t_1f7cf3e25775c0 1-19
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_2818932b6efba1::t_c5abc8f6be007c 5,28-29
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_2818932b6efba1::t_9d04a940c2cf41 77,82-85,114,119-122
+apps/whiteboard/components/batches/batch-catalog.tsx
+  s_2818932b6efba1::t_ed1ccf8dc5c6e6 3,286-295
+apps/whiteboard/components/class-work/attachments.tsx
+  s_2818932b6efba1::t_f4dd5aa99ecb6c 1-193
+apps/whiteboard/components/class-work/family/class-work-family.stories.tsx
+  s_2818932b6efba1::t_f3a491c1d80c82 1-641
+apps/whiteboard/components/class-work/family/family-class-work-format.ts
+  s_2818932b6efba1::t_c6d7009442adc8 1-208
+apps/whiteboard/components/class-work/family/family-class-work-items.tsx
+  s_2818932b6efba1::t_fa61639c17726a 1-196
+apps/whiteboard/components/class-work/family/family-homework-screen.tsx
+  s_2818932b6efba1::t_54b1ffa627e1ec 1-254
+apps/whiteboard/components/class-work/family/homework-detail-screen.tsx
+  s_2818932b6efba1::t_5732a58fbd562b 1-576
+apps/whiteboard/components/class-work/staff/batch-class-work-screen.tsx
+  s_2818932b6efba1::t_c99d343339e512 1-665
+apps/whiteboard/components/class-work/staff/check-submission-dialog.tsx
+  s_2818932b6efba1::t_7bb03a37a93e61 1-172
+apps/whiteboard/components/class-work/staff/class-work-format.ts
+  s_2818932b6efba1::t_40d26e021d5860 1-107
+apps/whiteboard/components/class-work/staff/class-work-staff.stories.tsx
+  s_2818932b6efba1::t_4e923f8243aaa6 1-870
+apps/whiteboard/components/class-work/staff/homework-form-dialog.tsx
+  s_2818932b6efba1::t_b3beb5e73fb7da 1-342
+apps/whiteboard/components/class-work/staff/homework-submissions-screen.tsx
+  s_2818932b6efba1::t_00435736599b06 1-264
+apps/whiteboard/components/home/family-home-screen.tsx
+  s_2818932b6efba1::t_e56613fe60a8fd 4,6,13-20
+apps/whiteboard/components/home/family-home.stories.tsx
+  s_2818932b6efba1::t_8214e757a67e31 5-11,127-132,156-203,216,239-253,300-301
+apps/whiteboard/components/home/family-home.tsx
+  s_2818932b6efba1::t_12f3644eb7f6fb 19,22-25,259-260,263-264,268-269,272-280,285,295,300-301,332-337,342-348
+apps/whiteboard/components/teachers/my-batches-screen.tsx
+  s_2818932b6efba1::t_84578530a43997 73-86
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_2818932b6efba1::t_cc3df873fa0598 89-129
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_2818932b6efba1::t_624e8b72346694 20-41,99-107
+apps/whiteboard/lib/app-nav.test.ts
+  s_2818932b6efba1::t_78f4d20bfedd40 9,15,80-96
+apps/whiteboard/lib/app-nav.ts
+  s_2818932b6efba1::t_012d8c2fef4fc2 72-77,100-105,163-165
+apps/whiteboard/lib/workspace-access.test.ts
+  s_2818932b6efba1::t_a1d616833ec542 99-120
+apps/whiteboard/lib/workspace-access.ts
+  s_2818932b6efba1::t_5fe06cc48e10b4 50-54,57-59
+apps/whiteboard/components/class-work/family/family-class-work.fixtures.ts
+  s_ddd8fc8aa6cc84::t_83897b04c01540 1-265
+apps/whiteboard/components/class-work/family/homework-home-cards.tsx
+  s_ddd8fc8aa6cc84::t_8f478dd35abdf0 1-103
+apps/whiteboard/components/class-work/staff/study-material-form-dialog.tsx
+  s_a590c1af1dc687::t_52c397d10d6fbc 1-321
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "81cc08abfbd408d1127115e8072235bac13e29d4",
+  "prompts": {},
+  "sessions": {
+    "s_2818932b6efba1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6749436-eeb5-41c3-b373-7109590b8a47",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a590c1af1dc687": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a69e2d51f318d490f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ddd8fc8aa6cc84": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae4b64de714f936a3",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
