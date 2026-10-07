@@ -87,7 +87,7 @@ return (
 | -------------------------------------- | --------------------------------------------------------------------------------------- |
 | `useQuery` + `isPending` on a page     | `useSuspenseQuery` inside `QuerySuspense`                                               |
 | `useEffect` + `fetch`                  | `queryOptions` + `apiJson`                                                              |
-| Clerk org/session in a queryFn         | `useOrganization` / `useAuth`                                                           |
+| Session or Workspace in a queryFn      | `useAuth()` from `@repo/auth/react` (`workspaceId`, `userId`, `role`)                   |
 | `workspaceId` in the query key or body | Active Workspace on the Session (ADR-0014)                                              |
 | `enabled: false` on `useSuspenseQuery` | It is not supported — skip the component or use `useQuery` only for true optional reads |
 

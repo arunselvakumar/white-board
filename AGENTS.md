@@ -38,7 +38,7 @@ P1 (attendance, enquiry CRM, session calendar, certificates, WhatsApp) and Schoo
 | Fee Plan / Fee Payment / Receipt | invoice, bill (in P0)                         |
 | Owner Dashboard                  | analytics                                     |
 
-A **Student** remains a Workspace record, distinct from a Clerk User. Add Student invites a Student with an email address as `org:student` and father, mother, and Guardians with email addresses as `org:parent`. The Owner (`org:admin`) alone can use the existing register screens and APIs; Student and Parent currently have Hello world pages.
+A **Student** remains a Workspace record, distinct from a User. Add Student invites a Student with an email address as `student` and father, mother, and Guardians with email addresses as `parent`. Roles are `owner`, `teacher`, `student`, and `parent` (ADR-0034). The Owner alone can use the register screens and APIs; Teachers, Students, and Parents have their own screens.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ A **Student** remains a Workspace record, distinct from a Clerk User. Add Studen
 - Zod only on HTTP Request/Response models next to routes (ADR-0016, ADR-0021). Domain does not import Zod.
 - OpenAPI from those models; a route is unfinished until it is on `/app/api/docs` (ADR-0012).
 - Tenant is the **Active Workspace** on the Session. Never send `workspaceId` in the body (ADR-0014). 401 no Session, 403 no Active Workspace, 404 other tenant.
-- Postgres holds resource rows only. Clerk ids are opaque strings. No User or Workspace table (ADR-0018).
+- Identity (Users, Sessions, Workspaces, members, invitations) lives in the `identity` schema, owned by `packages/auth` (`@repo/auth`, Better Auth; ADR-0034). Other contexts hold User and Workspace ids as opaque strings and never join to `identity`. Only `@repo/auth` imports `better-auth` (ESLint enforces it). Auth emails are React Email templates in `packages/email-templates`.
 - Soft delete is an invisible tombstone (ADR-0019). Lists use bidirectional cursors plus total (ADR-0020).
 - Errors: `{ code, message, details? }` (ADR-0017).
 - Prisma lives only in `packages/db` (ADR-0010). Migrations that move tables are written by hand; never accept a generated drop-and-recreate (ADR-0030).
@@ -91,7 +91,7 @@ Whiteboard APIs: http://localhost:3000/app/api/docs
 ## Do not
 
 - Build School/College features (report cards, TC, transport, library, hostel, periods).
-- Treat Students as Clerk Users.
+- Treat Students as Users.
 - Hang fees off the Student instead of the Enrollment.
 - Add attendance, WhatsApp, GST, live video, or franchise royalty in P0.
 - Add a sample Todo context back.

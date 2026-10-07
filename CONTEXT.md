@@ -17,15 +17,15 @@ A person who can authenticate into Whiteboard.
 _Avoid_: account, customer, client
 
 **Session**:
-A Clerk-managed authenticated session for a User, present only inside Whiteboard.
+An authenticated session for a User, present only inside Whiteboard. Whiteboard issues and stores it (ADR-0034).
 
 **Sign-in Flow**:
-The custom authentication flow at `/login` that produces a Session. Password Sign-in is Sign-in Identifier + password, then Second-Factor Verification when Clerk requires it — or Google Sign-in.
-_Avoid_: login, sign-in page, Clerk SignIn
+The custom authentication flow at `/login` that produces a Session. Password Sign-in is Sign-in Identifier + password — or Google Sign-in. A User whose Email is not yet verified completes Email Verification first.
+_Avoid_: login, sign-in page
 
 **Sign-up Flow**:
 The custom account-creation flow at `/signup` that produces a User. Password Sign-up is two in-page steps: Username, Email, and password, then Email Verification — or Google Sign-in.
-_Avoid_: signup, register, Clerk SignUp
+_Avoid_: signup, register
 
 **Password Reset Flow**:
 The custom self-service flow at `/forgot-password` that lets a User set a new password.
@@ -35,7 +35,7 @@ _Avoid_: forget-password, forgot password flow
 The full-screen split-panel shell used only by the Sign-in, Sign-up, and Password Reset Flows. It has no authenticated chrome.
 
 **Onboarding Layout**:
-The full-screen shell for Workspace Creation and Workspace Selection. A Session is present; there is no app header and no photo panel. A sign-out action is available so a stuck User can leave. Not Clerk's create-organization or choose-organization widgets.
+The full-screen shell for Workspace Creation and Workspace Selection. A Session is present; there is no app header and no photo panel. A sign-out action is available so a stuck User can leave.
 
 **Auth Gate**:
 The Whiteboard-wide rule that every in-app route requires a Session. Unauthenticated requests are sent to the Sign-in Flow.
@@ -47,7 +47,7 @@ The `?redirect_url=<path>` query on `/login` when the Auth Gate bounces an unaut
 The Whiteboard screen at `/` a User lands on after a successful auth flow when no Redirect URL is set. For a Training Institute Workspace this is the **Owner Dashboard**.
 
 **Workspace**:
-The tenant a User belongs to. Realized as a Clerk Organization. A User may belong to many Workspaces. Identified to people by its name.
+The tenant a User belongs to. Stored in `identity.workspaces`. A User may belong to many Workspaces. Identified to people by its name.
 _Avoid_: organization (in product language), company, tenant, org
 
 **Active Workspace**:
@@ -63,12 +63,12 @@ The screen at `/select-workspace` where a User with a Session and more than one 
 The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. Training Institute is selected by default and is the only type that can be chosen. School, Preschool, College, University, and Other are listed as coming soon and cannot be selected. Not offered once the User already belongs to a Workspace.
 
 **Institution Type**:
-The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Only **Training Institute** is available today; it is the default. The other values are coming soon and cannot be selected. Stored on the Clerk Organization as public metadata.
+The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Only **Training Institute** is available today; it is the default. The other values are coming soon and cannot be selected. Stored on the Workspace and cannot be changed after Workspace Creation.
 _Avoid_: education type, organization type, workspace type, category
 
 **Workspace Owner**:
 The User who created a Workspace. There is exactly one per Workspace. In the product they are the Owner; other members are not Owners even if they later have the same access.
-_Avoid_: admin, org admin, owner role (as a Clerk slug)
+_Avoid_: admin, org admin
 
 **Training Institute**:
 The Institution Type Whiteboard sells today. A Workspace of this type is a computer education centre, home tuition centre, skill centre, or similar — not a School or College.
@@ -79,11 +79,11 @@ One Institution Type's product inside Whiteboard, with its own words and rules. 
 _Avoid_: module, product line, tenant type (in code comments)
 
 **Student**:
-A learner at the Training Institute. A Workspace-scoped record, distinct from a Clerk User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `org:student`. Enquiries are separate until converted.
+A learner at the Training Institute. A Workspace-scoped record, distinct from a User. Creating a Student is admitting them. A Student with an email address is invited to the Workspace with role `student`. Enquiries are separate until converted.
 _Avoid_: pupil, scholar, user, account, child (as the entity name)
 
 **Guardian**:
-An additional contact named on a Student, such as a grandparent. A Student may have multiple Guardians, each with a relationship and contact details on the Student record. Father and mother details are also stored on the Student. A father, mother, or Guardian with an email address is invited to the Workspace with role `org:parent`.
+An additional contact named on a Student, such as a grandparent. A Student may have multiple Guardians, each with a relationship and contact details on the Student record. Father and mother details are also stored on the Student. A father, mother, or Guardian with an email address is invited to the Workspace with role `parent`.
 _Avoid_: parent as a login, family account
 
 **Course**:
@@ -126,7 +126,7 @@ The fact that a Student is taking a Course in a Batch, with Class Mode, Timings,
 _Avoid_: admission (that is creating the Student), registration, mapping
 
 **Teacher**:
-A person who teaches a Batch in a Training Institute Workspace. A Teacher is a Workspace record, distinct from the Clerk User who signs in with role `org:teacher`. Types are Centre Teacher and Visiting Tutor. The Owner assigns Teachers to Batches; a Batch may have several Teachers.
+A person who teaches a Batch in a Training Institute Workspace. A Teacher is a Workspace record, distinct from the User who signs in with role `teacher`. Types are Centre Teacher and Visiting Tutor. The Owner assigns Teachers to Batches; a Batch may have several Teachers.
 
 **Fee Plan**:
 What a Student owes for one Enrollment: one-time, monthly, or installments, with amounts and due dates. Copied from the Course default at enroll time and then adjustable.
@@ -198,10 +198,7 @@ The User's mobile number. Optional. Not collected in the current Sign-up Flow. N
 _Avoid_: mobile, cell, phone number as a Sign-in method
 
 **Email Verification**:
-The Sign-up step where a User confirms their Email by entering a 6-digit code Clerk sent. Until this succeeds, Sign-up is incomplete and there is no Session.
-
-**Second-Factor Verification**:
-The Sign-in step where a User with 2FA enabled enters a 6-digit code Clerk emailed them. Reached only when password Sign-in returns `needs_second_factor`. Until this succeeds, there is no Session.
+The step where a User confirms their Email by entering the 6-digit code Whiteboard emailed them. Part of the Sign-up Flow, and of joining a Workspace from an invitation. Until this succeeds there is no Session, and Sign-in asks for it again.
 
 **Phone Verification**:
 A future Sign-up step that would confirm Phone with an SMS code. Not part of the current Sign-up Flow. Tracked in [issue #2](https://github.com/white-board-io/white-board-v3/issues/2).
@@ -214,7 +211,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - The **Sign-in Flow**, **Sign-up Flow**, and **Password Reset Flow** all use the **Public Layout**
 - **Workspace Creation** and **Workspace Selection** use the **Onboarding Layout**
 - Completing the **Sign-in Flow** or **Password Reset Flow** produces a **Session**
-- Password **Sign-in Flow** requires **Second-Factor Verification** when Clerk asks for it, before a **Session** exists
+- Password **Sign-in Flow** requires a verified **Email** before a **Session** exists
 - Completing the **Sign-up Flow** produces a **User** and a **Session**
 - Password **Sign-up Flow** requires **Email Verification** before a **Session** exists
 - **Phone Verification** is not required to complete Sign-up
@@ -236,7 +233,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Workspace** has one **Institution Type**
 - Workspace Creation can only set **Institution Type** to Training Institute; other values are coming soon
 - Tenant data is read and written only for the **Active Workspace** on the **Session**. The client does not send which Workspace.
-- **User** and **Workspace** identity live in Clerk. Our database stores resource data and references them by Clerk id; it does not copy User or Workspace rows.
+- **User** and **Workspace** identity live in the `identity` schema (ADR-0034). Other contexts reference them by opaque id and never join to them.
 - A **Student** belongs to one **Workspace**. A Student is not a **User**.
 - A **Course** belongs to one **Workspace**.
 - A **Batch** belongs to one **Course**.
@@ -258,11 +255,11 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 
 ## Example dialogue
 
-> **Dev:** "Should the Marketing Site have a Sign-in button that opens Clerk?"
+> **Dev:** "Should the Marketing Site have a Sign-in button?"
 > **Domain expert:** "No. Identity belongs to Whiteboard. The Marketing Site is public — no Session, no Sign-in."
 
-> **Dev:** "Can we keep Clerk's prebuilt SignIn card and just restyle it?"
-> **Domain expert:** "No. The Sign-in Flow is a custom Public Layout — split panel, our fields, our errors. Prebuilt Clerk UI is not the Sign-in Flow."
+> **Dev:** "Can we use an auth library's prebuilt sign-in card and just restyle it?"
+> **Domain expert:** "No. The Sign-in Flow is a custom Public Layout — split panel, our fields, our errors."
 
 > **Dev:** "Should Sign-in have separate Email and Username boxes?"
 > **Domain expert:** "No. One Sign-in Identifier — Email or Username. Then password, or Google Sign-in."
@@ -273,11 +270,11 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 > **Dev:** "After Sign-in, do we send them to `/discover`?"
 > **Domain expert:** "No. `/` is the In-app Home. They only get there once the Workspace Gate has an Active Workspace."
 
-> **Dev:** "Should we add an `owner` role in Clerk?"
-> **Domain expert:** "No. Workspace Owner is the creator. Clerk already makes them the org admin. Don't invent a second slug."
+> **Dev:** "Can a Workspace have two Owners?"
+> **Domain expert:** "No. The Workspace Owner is the creator, with role `owner`. Nobody can be invited as an Owner."
 
-> **Dev:** "Is a Student a User we create in Clerk?"
-> **Domain expert:** "A Student remains a Workspace record. If they have an email address, invite them as a User with the Student role. Do not replace the Student record with a Clerk User."
+> **Dev:** "Is a Student a User?"
+> **Domain expert:** "A Student remains a Workspace record. If they have an email address, invite them as a User with the Student role. Do not replace the Student record with a User."
 
 > **Dev:** "Can Course and Batch be the same thing?"
 > **Domain expert:** "No. Course is what is taught. Batch is when, how, and with whom. DCA is a Course; DCA Weekday 9–11 Offline is a Batch."
@@ -292,23 +289,23 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Sign-in is not email-only: **Google Sign-in** is in, and “Email(username)” is the **Sign-in Identifier** — one field that accepts **Email** or **Username**.
 - Sign-up “username, phone as well” — resolved: password Sign-up is **Username**, **Email**, and password; first/last name are not collected. **Phone** is optional and not collected in the current Sign-up Flow. **Phone** is not a **Sign-in Identifier**.
 - Post-submit Sign-up verification — resolved: **Email Verification** only. **Phone Verification** deferred to [issue #2](https://github.com/white-board-io/white-board-v3/issues/2).
-- Sign-in second factor — resolved: **Second-Factor Verification** is part of the Sign-in Flow.
+- Sign-in second factor — resolved: none for now. Clerk's new-device code was dropped with Clerk (ADR-0034); optional two-factor is backlog.
 - Whiteboard `/` is not a public landing — resolved: **Auth Gate**. Post-auth destination is `/` (**In-app Home**). In this feature, “/discover” means `/`, not a new route.
 - **Google Sign-in** placement — resolved: below the password submit button, not above the fields.
-- “organization” in product language — resolved: **Workspace**. Clerk Organization is the backing, not the word Users see.
+- “organization” in product language — resolved: **Workspace**. Better Auth's "organization" is the backing, not the word Users see.
 - “selected workspace” / “log them into that workspace” — resolved: **Active Workspace**. The three-way routing is the **Workspace Gate**.
-- “owner role” — resolved: **Workspace Owner** is the creating User, not a custom Clerk role.
-- Workspace Creation fields — resolved: **name** and **Institution Type**. **Training Institute** is the default and the only selectable value. School, Preschool, College, University, and Other are shown as coming soon. Address and board are not collected in this slice. Institution Type is Clerk Organization public metadata, not a Postgres Workspace row.
+- “owner role” — resolved: **Workspace Owner** is the creating User, with role `owner`.
+- Workspace Creation fields — resolved: **name** and **Institution Type**. **Training Institute** is the default and the only selectable value. School, Preschool, College, University, and Other are shown as coming soon. Address and board are not collected in this slice. Institution Type is a column on `identity.workspaces`.
 - Creating a second Workspace — resolved: out of scope. **Workspace Creation** is onboarding only (zero Workspaces).
 - Creation / Selection chrome — resolved: **Onboarding Layout** (no header, no photos, sign-out available).
 - Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.
 - Switching Workspaces from the In-app Home — resolved: out of this slice. Tracked in [issue #4](https://github.com/white-board-io/white-board-v3/issues/4).
-- Create / select UI — resolved: our **Workspace Creation** and **Workspace Selection** screens only. No Clerk organization widgets.
+- Create / select UI — resolved: our **Workspace Creation** and **Workspace Selection** screens only.
 - “Todo” / “TODO APIs” — resolved: not a product concept. Disposable sample resource for reviewing backend architecture. Do not add to Language. When the first real resource ships, Todo is deleted.
 - “todo context” in code — resolved: a sample module under `apps/whiteboard/src/todo` so the modular-monolith template is visible. It is not a product bounded context. Do not add a CONTEXT-MAP.md for it.
 - **Auth Gate** vs APIs — resolved: the Auth Gate sends unauthenticated _browser_ routes to the **Sign-in Flow**. HTTP APIs that need a **Session** do not enter Sign-in; they fail closed. `/api/docs` is the documented unauthenticated exception.
 - “workspace id in the API body” — resolved: tenant is the **Active Workspace** on the **Session**, not a request field. No Session → 401. Session without Active Workspace → 403.
-- “User / Workspace tables in Postgres” — resolved: do not copy them. Resource rows hold Clerk ids. Clerk stays the store for people and tenants.
+- “User / Workspace tables in Postgres” — resolved: they live only in the `identity` schema (ADR-0034, superseding ADR-0018). Resource rows hold their ids as opaque strings.
 - First product slice after auth — resolved: **P0** for **Training Institute** only. Replace the paper register: **Student**, **Course**, **Batch**, **Enrollment**, **Fee Plan**, **Fee Payment**, **Receipt**, **Owner Dashboard**. Spec: [docs/prd/training-institute-p0.md](docs/prd/training-institute-p0.md). Tickets: [docs/prd/tasks.md](docs/prd/tasks.md).
 - “Student login” — resolved: a **Student** is not a **User**. No Student or Guardian Session in P0.
 - Course vs class vs batch — resolved: **Course** is the catalog item; **Batch** is the scheduled run; **Enrollment** is the Student in that run.

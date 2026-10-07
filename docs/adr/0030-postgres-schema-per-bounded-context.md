@@ -1,5 +1,7 @@
 # One Postgres schema per bounded context
 
+> **Amended by [ADR-0034](./0034-identity-on-better-auth.md):** identity has its own schema, `identity`, with `Identity`-prefixed models. "Workspace and User identity stay in Clerk" no longer applies.
+
 **Supersedes [ADR-0010](./0010-packages-db-is-prisma-only.md)'s "one Postgres, one schema, all tables".** The rest of ADR-0010 still applies.
 
 [Issue #14](https://github.com/white-board-io/white-board-v3/issues/14). Every table we had belonged to the Training Institute product, but the names didn't say so. School, College, University, and Preschool are next. They have different aggregates and rules: a school Student has an Academic Year, Grade, and Section, while a Training Institute Student has Enrollments on Batches. They will not share one `students` table with a `type` column. With generic names, the first School module would collide in three places. Postgres allows only one `students` table and one `class_mode` enum in `public`. Prisma model names are global to the client. OpenAPI component names are global in `/api/docs`.

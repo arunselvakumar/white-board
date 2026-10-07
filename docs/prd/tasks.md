@@ -343,6 +343,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI            |
 | WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
 | WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access            |
+| WB-015 | Replace Clerk with Better Auth (`@repo/auth`), Resend, and React Email invitations       | in_progress | Auth+Data+HTTP+UI+Email        |
 | WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI            |
 | WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access     |
 
@@ -419,3 +420,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Issue:** [#21](https://github.com/white-board-io/white-board-v3/issues/21). **Decisions:** [ADR-0033](../adr/0033-study-material-and-homework-product-decisions.md). **Blocked by:** WB-003, WB-010, WB-012 (Teachers, Class Changes, and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/9).
 
 **Done when:** the Owner and assigned Teachers can share Study Material and set Homework against a Class date with a due date, edit and remove them, and see per Homework who submitted, who didn't, and who was late, checking each with a remark; Students and linked Parents see them on Home and the Homework page, submit with optional files, and see remarks; late joiners see earlier items without owing them; leavers keep items from while enrolled; unassigned Teachers and other Batches' Students can't see or post. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-015 — Replace Clerk with Better Auth
+
+**Plan:** [2026-10-07-clerk-to-better-auth.md](../superpowers/plans/2026-10-07-clerk-to-better-auth.md). **Decisions:** [ADR-0034](../adr/0034-identity-on-better-auth.md). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/10).
+
+**Done when:** Sign-up with Email Verification, Sign-in by Username or Email, Google Sign-in, Password Reset, Workspace Creation and Selection, and Teacher, Student, and Parent invitations work on Better Auth with Users, Workspaces, members, and invitations in the `identity` schema; roles are `owner`, `teacher`, `student`, `parent`; emails are React Email templates sent with Resend; no code imports Clerk; every existing 401/403/404 tenancy test passes unchanged in intent; identity flows have Postgres HTTP tests; Storybook play functions cover every auth form state; CI runs unit and Postgres HTTP tests; typecheck, lint, and build pass. Mark `done` after merge.
