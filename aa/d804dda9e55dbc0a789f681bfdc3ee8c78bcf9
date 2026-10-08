@@ -1,0 +1,121 @@
+apps/construction-management/.storybook/mocks/api.tsx
+  s_9c3f172fe92a46::t_80928068ac0469 1-64
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_ea9d1b40e29ca6 9-11,36-38,85-107
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_25a30b12f62554::t_8ca66cdfcac08c 1-325
+apps/construction-management/app/app/masters/settings/backdated-entry/page.tsx
+  s_25a30b12f62554::t_a5d1427b23d64c 1-9
+apps/construction-management/app/app/masters/settings/page.tsx
+  s_25a30b12f62554::t_2556360ccca901 1-53
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_25a30b12f62554::t_8dcd663aab6eb9 1-211
+apps/construction-management/components/settings/backdated-entry-form.tsx
+  s_25a30b12f62554::t_660599a9783849 1-290
+apps/construction-management/components/settings/backdated-limit-fields.tsx
+  s_25a30b12f62554::t_8141759b1e0bb9 1-107
+apps/construction-management/components/settings/backdated-module-dialog.tsx
+  s_25a30b12f62554::t_869469d52e137c 1-142
+apps/construction-management/components/settings/designation-multi-select.tsx
+  s_25a30b12f62554::t_0024d10ef4ab74 1-90
+apps/construction-management/components/settings/settings-index.stories.tsx
+  s_25a30b12f62554::t_dd167667615b9a 1-29
+apps/construction-management/docs/modules/12-settings-configuration.md
+  s_25a30b12f62554::t_b21efceea00148 310,423,428
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_e000168b88e86b 154,206-207
+apps/construction-management/lib/settings-nav.ts
+  s_25a30b12f62554::t_cc9b768addc359 1-24
+apps/construction-management/src/shared-kernel/backdated-policy-reader.ts
+  s_25a30b12f62554::t_4c4100e45e18f7 1-97
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_25a30b12f62554::t_786b4bd6c2f4e7 1-441
+packages/db/prisma/migrations/20261009010000_construction_backdated_entry_policies/migration.sql
+  s_25a30b12f62554::t_7611cb21169ba3 1-24
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_46f6061b9e0d85 184-209
+packages/ui/src/components/combobox.tsx
+  s_25a30b12f62554::t_6124e3a44a9b3b 239,243-244,261
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry-policy-fields.ts
+  s_29d3e4a3628b61::t_77040b62c9e486 1-45
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model.ts
+  s_29d3e4a3628b61::t_71d5197efe97fd 1-40
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/map-backdated-entry-policy.ts
+  s_2316c10137dec8::t_5dbdcb1fbfd0e3 1-38
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/route.ts
+  s_2316c10137dec8::t_ac4cc8d2f02180 1-27
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/route.ts
+  s_2316c10137dec8::t_e610b2eb153556 1-39
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model.ts
+  s_2316c10137dec8::t_630d5a9809998d 1-32
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model.ts
+  s_2316c10137dec8::t_39b563a54b1db9 1-11
+apps/construction-management/src/organization/application/backdated-policy-handlers.ts
+  s_29d3e4a3628b61::t_06bd85b47efe99 1-74
+apps/construction-management/src/organization/infrastructure/create-backdated-policy-handlers.ts
+  s_f6906f7dbe469e::t_3010d3eefbdd06 1-15
+apps/construction-management/src/organization/infrastructure/prisma-backdated-policy-store.ts
+  s_29d3e4a3628b61::t_ab5c15330d5d52 1-80
+apps/construction-management/src/queries/settings.ts
+  s_25a30b12f62554::t_60d4c6934de0a4 1-45
+apps/construction-management/src/shared-kernel/backdated-policy.test.ts
+  s_d9fc69446658a7::t_5862fa38d8effd 1-279
+apps/construction-management/src/shared-kernel/calendar-date.ts
+  s_29d3e4a3628b61::t_197e2fdb0b1020 1-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aad804dda9e55dbc0a789f681bfdc3ee8c78bcf9",
+  "prompts": {},
+  "sessions": {
+    "s_2316c10137dec8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a6a9a26b6a25d0bd2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_29d3e4a3628b61": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a3819d2eff4036ccb",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c3f172fe92a46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1436510-6545-4236-9394-8c7f247ccc83",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d9fc69446658a7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5257b4deec56e868",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f6906f7dbe469e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a262ac68e751bdf68",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
