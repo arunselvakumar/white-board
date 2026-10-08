@@ -105,7 +105,7 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 ### CM-003 — App wiring
 
-**Done when:** `bun run dev --filter=construction-management` serves :3002 with the `@repo/ui` theme; `.env.example` lists DB, auth, S3 (local S3 stand-in: SeaweedFS, since MinIO no longer publishes pullable images) and OTP provider keys; `docker compose` has the `construction` database alongside Whiteboard's; `bun run check-types` and `lint` pass.
+**Done when:** `bun run dev --filter=construction-management` serves :3002 with the `@repo/ui` theme; `.env.example` lists DB, auth, file storage (Vercel Blob; a local folder in development) and OTP provider keys; `docker compose` has the `construction` database alongside Whiteboard's; `bun run check-types` and `lint` pass.
 
 ### CM-004 — First Prisma schema file
 
@@ -211,7 +211,7 @@ CM-112 detail: Designation routes are `GET/POST /designations`, `GET /designatio
 
 ### CM-115 — Profiles
 
-**Done when:** Company profile (name, logo to S3, mobile, email, GSTIN with checksum validation, PAN format validation, address, currency, timezone) and My Profile (photo, contact, masked ids) screens; Storybook states.
+**Done when:** Company profile (name, logo to Vercel Blob, mobile, email, GSTIN with checksum validation, PAN format validation, address, currency, timezone) and My Profile (photo, contact, masked ids) screens; Storybook states.
 
 ### CM-116 — Plans & trial
 
@@ -283,7 +283,7 @@ Goal: the daily reality of a site — who came, for how long, what they are owed
 
 ### CM-217 / CM-218 — Reports and muster roll
 
-**Done when:** report requests enqueue a job (M0's harness runs it inline until M9 adds the queue), produce Excel + PDF to S3, and return a download link; the combined muster-roll/wage register has the columns required by the CLRA Ease-of-Compliance combined register (name, father's name, category, days worked, wage rate, OT, gross, deductions, net, signature column) — see research doc §2 Labour.
+**Done when:** report requests enqueue a job (M0's harness runs it inline until M9 adds the queue), produce Excel + PDF to Vercel Blob, and return a download link; the combined muster-roll/wage register has the columns required by the CLRA Ease-of-Compliance combined register (name, father's name, category, days worked, wage rate, OT, gross, deductions, net, signature column) — see research doc §2 Labour.
 
 ---
 
@@ -342,7 +342,7 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 | CM-404 |   4 | Amenities & Common Developments masters + project assignment                                                                                          | todo   | CM-402     | Domain+UI   |
 | CM-405 |   5 | Locations for non-building projects                                                                                                                   | todo   | CM-402     | Domain+UI   |
 | CM-406 |   6 | Project resources: assign team members, contractors, suppliers, vendors (needs CM-5xx masters for parties — or ship contractor/supplier masters here) | todo   | CM-401     | Domain+UI   |
-| CM-407 |   7 | Attachments service (S3 presigned upload, quota, thumbnails) in the kernel                                                                            | todo   | CM-008     | Kernel      |
+| CM-407 |   7 | Attachments service (Vercel Blob private uploads through our routes, quota, thumbnails) in the kernel                                                 | todo   | CM-008     | Kernel      |
 | CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | todo   | CM-407     | Domain+UI   |
 | CM-409 |   9 | Testing Reports: items (seed 4) + dated report files                                                                                                  | todo   | CM-407     | Domain+UI   |
 | CM-410 |  10 | Gallery (all project media, search, uploaded-by)                                                                                                      | todo   | CM-407     | HTTP+UI     |
