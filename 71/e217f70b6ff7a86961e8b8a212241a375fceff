@@ -1,0 +1,73 @@
+apps/construction-management/.env.example
+  s_25a30b12f62554::t_f24b7aae3e5f4b 36-39
+apps/construction-management/app/api/_lib/require-access.ts
+  s_25a30b12f62554::t_12a720e075f29d 1-42
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_ba9dc22776eda1 149,192
+apps/construction-management/src/organization/application/create-company.test.ts
+  s_25a30b12f62554::t_48f6e81cb9f12d 46,86,88-93
+apps/construction-management/src/organization/application/plan-gate.ts
+  s_25a30b12f62554::t_d026a8e5d004f5 1-21
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_25a30b12f62554::t_b1990ec14d4592 1-301
+apps/construction-management/src/organization/application/team-member-read-model.ts
+  s_25a30b12f62554::t_79e6a6b33be13c 1-66
+apps/construction-management/src/organization/domain/new-company.ts
+  s_25a30b12f62554::t_f2e4823596d417 6,9-11,39,51-67,81
+apps/construction-management/src/organization/domain/team-member-repository.ts
+  s_25a30b12f62554::t_8ba27628d96dc7 1-40
+apps/construction-management/src/organization/domain/team-member.test.ts
+  s_25a30b12f62554::t_46aade2d803d19 1-149
+apps/construction-management/src/organization/domain/team-member.ts
+  s_25a30b12f62554::t_128ed8e742714c 1-385
+apps/construction-management/src/organization/infrastructure/create-company-handlers.ts
+  s_25a30b12f62554::t_8d82f26963f40d 13-14,25-28
+apps/construction-management/src/organization/infrastructure/create-company.http.test.ts
+  s_25a30b12f62554::t_d361606dca1e25 73,98
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_25a30b12f62554::t_8b90d0885dcf2e 1-26
+apps/construction-management/src/organization/infrastructure/designations.http.test.ts
+  s_25a30b12f62554::t_5552b7be54397e 20
+apps/construction-management/src/organization/infrastructure/prisma-new-company-store.ts
+  s_25a30b12f62554::t_20adc269d3a42e 8,11-14,51
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_25a30b12f62554::t_380efc53eb422d 1-301
+apps/construction-management/src/organization/infrastructure/private-data-cipher.ts
+  s_25a30b12f62554::t_7e4c213f1ad669 1-9
+apps/construction-management/src/organization/infrastructure/team-members.http.test.ts
+  s_25a30b12f62554::t_a0c1ad67b28526 1-233
+apps/construction-management/src/shared-kernel/access/prisma-access-reader.ts
+  s_25a30b12f62554::t_d225c352351ce6 1-41
+apps/construction-management/src/shared-kernel/private-data.test.ts
+  s_25a30b12f62554::t_b90ee25d280d4a 1-26
+apps/construction-management/src/shared-kernel/private-data.ts
+  s_25a30b12f62554::t_715c43d2875033 1-57
+apps/construction-management/src/shared-kernel/tax-ids.test.ts
+  s_25a30b12f62554::t_ee63d7dc5c4707 4,44-53
+apps/construction-management/src/shared-kernel/tax-ids.ts
+  s_25a30b12f62554::t_279e3d55fa5ef8 71-115
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_90569e8b43ef0c 43-44
+packages/db/prisma/migrations/20261008220000_construction_team_members/migration.sql
+  s_25a30b12f62554::t_79981b1975166f 1-70
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_e84a6be610b090 107-108,114-183
+turbo.json
+  s_25a30b12f62554::t_2d492a1c4ab10d 43-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "71e217f70b6ff7a86961e8b8a212241a375fceff",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
