@@ -1,0 +1,33 @@
+apps/construction-management/.env.example
+  s_25a30b12f62554::t_82fe60c13970b5 30-34
+apps/construction-management/.gitignore
+  s_25a30b12f62554::t_45d56786f41a79 39
+apps/construction-management/README.md
+  s_25a30b12f62554::t_fd3abe62396b98 9
+apps/construction-management/docs/03-target-architecture.md
+  s_25a30b12f62554::t_1f065ea23c8d0e 13,17,29,126,152,155,168
+apps/construction-management/docs/adr/CM-0001-app-and-schemas.md
+  s_25a30b12f62554::t_2f124b5bf7eb4f 52-54
+apps/construction-management/docs/prd/handoff/M0.md
+  s_25a30b12f62554::t_a10cec306202e8 14,25
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_5f07ad4e23ddc7 108,214,286,345
+turbo.json
+  s_25a30b12f62554::t_aeb00dd959c596 39-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b9ac815aea08955062d24336ac9ef19512f904f7",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
