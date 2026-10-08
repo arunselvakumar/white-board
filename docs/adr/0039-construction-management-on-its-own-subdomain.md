@@ -8,9 +8,9 @@ Construction Management is a new, separate Next.js app in `apps/construction-man
 
 **Vercel.** A third project built from the same repository (`arunselvakumar/white-board`), following ADR-0035:
 
-| Project                               | Root Directory                 | Domains              |
-| ------------------------------------- | ------------------------------ | -------------------- |
-| `white-board-construction-management` | `apps/construction-management` | `web.white-board.io` |
+| Project                   | Root Directory                 | Domains              |
+| ------------------------- | ------------------------------ | -------------------- |
+| `construction-management` | `apps/construction-management` | `web.white-board.io` |
 
 It uses the Marketing Site's settings: the Next.js framework preset with default commands, "Include files outside the Root Directory" on, and "Skip deployments when there are no changes" on.
 
