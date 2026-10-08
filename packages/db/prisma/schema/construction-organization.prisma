@@ -26,3 +26,23 @@ model ConstructionOrganizationCompanyProfile {
   @@map("company_profiles")
   @@schema("construction_organization")
 }
+
+/// Who changed what, appended by application services and never updated
+/// (`03-target-architecture.md §3`). Written through `recordAudit` in the
+/// shared kernel.
+model ConstructionOrganizationAuditEvent {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  actorUserId String   @map("actor_user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  before      Json?
+  after       Json?
+  occurredAt  DateTime @map("occurred_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, entityType, entityId])
+  @@index([workspaceId, occurredAt])
+  @@map("audit_events")
+  @@schema("construction_organization")
+}
