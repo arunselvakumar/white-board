@@ -137,27 +137,27 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 Goal: a builder can sign up, create a Company, invite staff, decide what each one may do, and start a trial — the "01 Organization, Identity & Access" spec minus devices and data-export, which move to M9.
 
-| ID     | Seq | Title                                                                                                        | Status | Blocked by             | Area      | Issue |
-| ------ | --: | ------------------------------------------------------------------------------------------------------------ | ------ | ---------------------- | --------- | ----- |
-| CM-101 |   1 | ADR CM-0002: Company = Workspace; mobile-OTP login plugin in `@repo/auth`; roles `owner`/`member`            | done   | CM-001                 | Docs      |       |
-| CM-102 |   2 | `@repo/auth`: mobile OTP sign-in/sign-up plugin (SMS provider adapter, rate limit, test bypass)              | done   | CM-101                 | Auth      |       |
-| CM-103 |   3 | Sign-up / sign-in screens: mobile OTP first, email+password second, "Choose Organization" after login        | done   | CM-009, CM-102         | UI        |       |
-| CM-104 |   4 | Company creation: name, mobile, email, country, currency, GSTIN/PAN (optional) → Workspace + profile         | done   | CM-005, CM-102         | Domain    |       |
-| CM-105 |   5 | Company HTTP + Create Company screen (first-run wizard) + company switcher                                   | done   | CM-103, CM-104         | HTTP+UI   |       |
-| CM-106 |   6 | Designation aggregate + seed set (38 names, 6 with templates) copied into each new Company                   | done   | CM-104                 | Domain    |       |
-| CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | done   | CM-106                 | Domain    |       |
-| CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | done   | CM-107                 | Domain    |       |
-| CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | done   | CM-102, CM-108         | Auth      |       |
-| CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | done   | CM-108, CM-109         | HTTP      |       |
+| ID     | Seq | Title                                                                                                        | Status      | Blocked by             | Area      | Issue |
+| ------ | --: | ------------------------------------------------------------------------------------------------------------ | ----------- | ---------------------- | --------- | ----- |
+| CM-101 |   1 | ADR CM-0002: Company = Workspace; mobile-OTP login plugin in `@repo/auth`; roles `owner`/`member`            | done        | CM-001                 | Docs      |       |
+| CM-102 |   2 | `@repo/auth`: mobile OTP sign-in/sign-up plugin (SMS provider adapter, rate limit, test bypass)              | done        | CM-101                 | Auth      |       |
+| CM-103 |   3 | Sign-up / sign-in screens: mobile OTP first, email+password second, "Choose Organization" after login        | done        | CM-009, CM-102         | UI        |       |
+| CM-104 |   4 | Company creation: name, mobile, email, country, currency, GSTIN/PAN (optional) → Workspace + profile         | done        | CM-005, CM-102         | Domain    |       |
+| CM-105 |   5 | Company HTTP + Create Company screen (first-run wizard) + company switcher                                   | done        | CM-103, CM-104         | HTTP+UI   |       |
+| CM-106 |   6 | Designation aggregate + seed set (38 names, 6 with templates) copied into each new Company                   | done        | CM-104                 | Domain    |       |
+| CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | done        | CM-106                 | Domain    |       |
+| CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | done        | CM-107                 | Domain    |       |
+| CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | done        | CM-102, CM-108         | Auth      |       |
+| CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | done        | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | in_progress | CM-105, CM-110         | UI        |       |
-| CM-112 |  12 | Designations screens (list, add, duplicate, edit template)                                                   | todo   | CM-105, CM-106         | UI        |       |
-| CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | todo   | CM-107                 | Kernel    |       |
-| CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | todo   | CM-107                 | Kernel+UI |       |
-| CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | todo   | CM-105                 | UI        |       |
-| CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | todo   | CM-104                 | Domain    |       |
-| CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | todo   | CM-116                 | HTTP+UI   |       |
-| CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | todo   | CM-116                 | Domain    |       |
-| CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | todo   | CM-111, CM-115, CM-117 | UI        |       |
+| CM-112 |  12 | Designations HTTP + screens (list, add, duplicate, edit template) and the shared Permission Matrix component | done        | CM-105, CM-106         | HTTP+UI   |       |
+| CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | todo        | CM-107                 | Kernel    |       |
+| CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | todo        | CM-107                 | Kernel+UI |       |
+| CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | todo        | CM-105                 | UI        |       |
+| CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | todo        | CM-104                 | Domain    |       |
+| CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | todo        | CM-116                 | HTTP+UI   |       |
+| CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | todo        | CM-116                 | Domain    |       |
+| CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | todo        | CM-111, CM-115, CM-117 | UI        |       |
 
 ### CM-101 — ADR CM-0002
 
@@ -198,6 +198,8 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 ### CM-110 / CM-111 / CM-112 — Team Members & Designations HTTP and screens
 
 **Done when:** routes on `/api/docs`; Team Member list (search, status chips, kebab: Share invite link, Edit, Delete), add wizard with the three steps from the legacy (`details → select projects → permission matrix` with column select-all, category expand, search); Designations list/add/duplicate with template editor using the same matrix component.
+
+CM-112 detail: Designation routes are `GET/POST /designations`, `GET /designations/{id}`, `POST /designations/{id}/update|duplicate|delete`, each checked against the `organization.designations` menu. The list returns every live Designation by name with `total` and no cursor (a Company has a few dozen). Templates travel as `{ menuKey: Flag[] }`; unknown menus or flags are 400, unsupported cells are dropped. Deleting a Designation a live Team Member holds is 409 `DESIGNATION_IN_USE`. The matrix component is `components/permissions/permission-matrix.tsx`.
 
 ### CM-113 — Back-dated policy
 

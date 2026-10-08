@@ -1,5 +1,5 @@
 import { PermissionSet, type Flag } from "@/src/shared-kernel/access";
-import { notFound } from "@/src/shared-kernel/domain-error";
+import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
 import { Designation } from "../domain/designation";
@@ -16,11 +16,19 @@ function templateOf(template: Template): PermissionSet | null {
   return template == null ? null : PermissionSet.fromGrants(template);
 }
 
+/** Whether any live Team Member of the Company holds the Designation. */
+export type DesignationInUse = (
+  workspaceId: string,
+  designationId: string,
+) => Promise<boolean>;
+
 /** Designation commands and queries (CM-106). Access is checked by the caller. */
 export class DesignationHandlers {
   constructor(
     private readonly designations: DesignationRepository,
     private readonly clock: () => Date = () => new Date(),
+    /** Without it, delete does not check Team Members (unit tests). */
+    private readonly inUse?: DesignationInUse,
   ) {}
 
   private async load(workspaceId: string, id: string): Promise<Designation> {
@@ -101,6 +109,11 @@ export class DesignationHandlers {
     by: string;
   }): Promise<void> {
     const designation = await this.load(input.workspaceId, input.id);
+    if (this.inUse != null && (await this.inUse(input.workspaceId, input.id)))
+      throw conflict(
+        "DESIGNATION_IN_USE",
+        "Team Members hold this Designation. Give them another Designation first.",
+      );
     designation.delete(input.by, this.clock());
     await this.designations.save(designation);
   }

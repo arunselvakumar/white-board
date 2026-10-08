@@ -26,6 +26,12 @@ import {
   JoinRequestIdParamsModel,
   ListConstructionOrganizationJoinRequestsResponseModel,
 } from "@/app/api/construction/organization/join-requests/join-request-models";
+import { ConstructionOrganizationDesignationParamsModel } from "@/app/api/construction/organization/designations/[id]/designation-params-model";
+import { DuplicateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/[id]/duplicate/duplicate-designation-request-model";
+import { UpdateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/[id]/update/update-designation-request-model";
+import { CreateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/create-designation-request-model";
+import { ConstructionOrganizationDesignationResponseModel } from "@/app/api/construction/organization/designations/designation-response-model";
+import { ListConstructionOrganizationDesignationsResponseModel } from "@/app/api/construction/organization/designations/list-designations-response-model";
 
 import {
   buildOpenApiDocument,
@@ -60,7 +66,14 @@ export const openApiComponents: OpenApiComponents = {
   SetConstructionOrganizationTeamMemberPermissionsRequestModel,
   AssignConstructionOrganizationTeamMemberProjectsRequestModel,
   RevealConstructionOrganizationTeamMemberIdsResponseModel,
+  ListConstructionOrganizationDesignationsResponseModel,
+  ConstructionOrganizationDesignationResponseModel,
+  CreateConstructionOrganizationDesignationRequestModel,
+  UpdateConstructionOrganizationDesignationRequestModel,
+  DuplicateConstructionOrganizationDesignationRequestModel,
 };
+
+const DESIGNATIONS = "/api/construction/organization/designations";
 
 /** Every route. A route is unfinished until it is listed here (root ADR-0012). */
 export const openApiOperations: OpenApiOperation[] = [
@@ -105,6 +118,92 @@ export const openApiOperations: OpenApiOperation[] = [
     successDescription: "The Company profile",
     successSchema: GetConstructionOrganizationCompanyProfileResponseModel,
     errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "get",
+    path: DESIGNATIONS,
+    summary:
+      "Every live Designation of the Active Company, by name (a few dozen, so not paged)",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "Designations and their Permission Templates",
+    successSchema: ListConstructionOrganizationDesignationsResponseModel,
+    errors: [...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: DESIGNATIONS,
+    summary:
+      "Add a Designation, optionally with a Permission Template (unsupported cells are dropped)",
+    tags: ORGANIZATION,
+    body: CreateConstructionOrganizationDesignationRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "The new Designation",
+    successSchema: ConstructionOrganizationDesignationResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
+  },
+  {
+    method: "get",
+    path: `${DESIGNATIONS}/{id}`,
+    summary: "One Designation with its Permission Template",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationDesignationParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Designation",
+    successSchema: ConstructionOrganizationDesignationResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: `${DESIGNATIONS}/{id}/update`,
+    summary:
+      "Rename a Designation and replace its Permission Template (null or {} removes it)",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationDesignationParamsModel,
+    body: UpdateConstructionOrganizationDesignationRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated Designation",
+    successSchema: ConstructionOrganizationDesignationResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: `${DESIGNATIONS}/{id}/duplicate`,
+    summary:
+      'Copy a Designation with its Permission Template (name defaults to "<name> (copy)")',
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationDesignationParamsModel,
+    body: DuplicateConstructionOrganizationDesignationRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "The copy",
+    successSchema: ConstructionOrganizationDesignationResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: `${DESIGNATIONS}/{id}/delete`,
+    summary:
+      "Delete a Designation (409 DESIGNATION_IN_USE while a Team Member holds it)",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationDesignationParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Deleted",
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
   },
 ];
 
