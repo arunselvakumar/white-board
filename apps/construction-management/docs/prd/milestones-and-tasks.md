@@ -85,8 +85,8 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 | ID     | Seq | Title                                                                                             | Status | Blocked by     | Area   | Issue |
 | ------ | --: | ------------------------------------------------------------------------------------------------- | ------ | -------------- | ------ | ----- |
-| CM-001 |   1 | ADR CM-0001: Construction Management app and `construction_*` schemas in the shared repo          | todo   | —              | Docs   |       |
-| CM-002 |   2 | CONTEXT.md for the construction app (vocabulary from `00-overview.md` glossary)                   | todo   | CM-001         | Docs   |       |
+| CM-001 |   1 | ADR CM-0001: Construction Management app and `construction_*` schemas in the shared repo          | done   | —              | Docs   |       |
+| CM-002 |   2 | CONTEXT.md for the construction app (vocabulary from `00-overview.md` glossary)                   | done   | CM-001         | Docs   |       |
 | CM-003 |   3 | App wiring: `@repo/auth`, `@repo/ui`, `@repo/db`, Tailwind tokens, env, `docker compose`          | todo   | CM-001         | Infra  |       |
 | CM-004 |   4 | Prisma multi-file: `construction-organization.prisma` with a placeholder model + migration        | todo   | CM-003         | Data   |       |
 | CM-005 |   5 | HTTP skeleton: `/api/construction/*` error envelope, session guard, `/api/docs` OpenAPI           | todo   | CM-003         | HTTP   |       |
@@ -97,7 +97,7 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 ### CM-001 — ADR CM-0001
 
-**Done when:** `apps/construction-management/docs/adr/CM-0001-app-and-schemas.md` records: own app on :3002, own `construction_<context>` Postgres schemas in the shared database, reuse of `@repo/auth`/`@repo/ui`/`packages/db`, Company = Workspace, no cross-import with Whiteboard contexts (ESLint rule). Lists the 12 contexts from `03-target-architecture.md §2`.
+**Done when:** `apps/construction-management/docs/adr/CM-0001-app-and-schemas.md` records: own app on :3002, own `construction_<context>` Postgres schemas in the app's own `construction` database (shared Prisma schema and migration history in `packages/db`), reuse of `@repo/auth`/`@repo/ui`/`packages/db`, Company = Workspace, no cross-import with Whiteboard contexts (ESLint rule). Lists the 12 contexts from `03-target-architecture.md §2`.
 
 ### CM-002 — CONTEXT.md
 
