@@ -1,0 +1,77 @@
+apps/construction-management/.storybook/main.ts
+  s_25a30b12f62554::t_10026804559da6 1-40
+apps/construction-management/.storybook/mocks/auth.tsx
+  s_25a30b12f62554::t_16be95f54ee474 1-241
+apps/construction-management/.storybook/preview.tsx
+  s_25a30b12f62554::t_bc1d2b59109058 1-103
+apps/construction-management/README.md
+  s_25a30b12f62554::t_cb0e91828ad947 3-17,20-23,26
+apps/construction-management/app/(public)/layout.tsx
+  s_25a30b12f62554::t_615cdba834a8c0 1-11
+apps/construction-management/app/(public)/sign-in/page.tsx
+  s_25a30b12f62554::t_f616e660814bb4 1-15
+apps/construction-management/app/(public)/sign-up/page.tsx
+  s_25a30b12f62554::t_62fd224bc010bb 1-15
+apps/construction-management/app/app/layout.tsx
+  s_25a30b12f62554::t_4fcbd4cdbfc855 1-19
+apps/construction-management/app/app/masters/page.tsx
+  s_25a30b12f62554::t_a5f8af40427f69 1-9
+apps/construction-management/app/app/page.tsx
+  s_25a30b12f62554::t_2ed76a49113753 1-5
+apps/construction-management/app/app/projects/page.tsx
+  s_25a30b12f62554::t_e1d40f39554340 1-9
+apps/construction-management/app/app/workspace/page.tsx
+  s_25a30b12f62554::t_bb5c8f6fc14790 1-9
+apps/construction-management/app/page.tsx
+  s_25a30b12f62554::t_0e6c13372a2619 1-2,4
+apps/construction-management/components/app-shell/app-area-page.tsx
+  s_25a30b12f62554::t_6246f037390c30 1-16
+apps/construction-management/components/app-shell/app-nav-icons.ts
+  s_25a30b12f62554::t_6f621ea8050e0b 1-9
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_25a30b12f62554::t_41519f7946ec5c 1-111
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_25a30b12f62554::t_27ce8b7f97d789 1-95
+apps/construction-management/components/app-shell/brand-mark.tsx
+  s_25a30b12f62554::t_87341be03276d6 1-18
+apps/construction-management/components/app-shell/company-switcher.tsx
+  s_25a30b12f62554::t_c585880b16b8c9 1-21
+apps/construction-management/components/app-shell/page-placeholder.tsx
+  s_25a30b12f62554::t_be2c22ae6f7d20 1-37
+apps/construction-management/components/app-shell/user-menu.tsx
+  s_25a30b12f62554::t_3ef2d20fe67b3a 1-79
+apps/construction-management/components/auth/auth-heading.tsx
+  s_25a30b12f62554::t_5374223ceb6c0b 1-14
+apps/construction-management/components/auth/public-shell.stories.tsx
+  s_25a30b12f62554::t_1543ce113e9145 1-35
+apps/construction-management/components/auth/public-shell.tsx
+  s_25a30b12f62554::t_1d82942594bcf3 1-41
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_bc14850e7b07c8 96
+apps/construction-management/lib/app-nav.test.ts
+  s_25a30b12f62554::t_d71eb965bef5e6 1-20
+apps/construction-management/lib/app-nav.ts
+  s_25a30b12f62554::t_a489bd71065d27 1-41
+apps/construction-management/proxy.ts
+  s_25a30b12f62554::t_48bb3df74e3ff2 1-31
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_e779de5930fbc9 4-5,49-66
+apps/construction-management/vitest.shims.d.ts
+  s_25a30b12f62554::t_45255f55b858e3 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bcd31e162c819c396596cf2c64dbd88e16359517",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
