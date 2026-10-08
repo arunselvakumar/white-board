@@ -211,3 +211,20 @@ export const MobileAlreadyInUse: Story = {
     await expect(canvas.getByLabelText("Mobile")).toBeVisible();
   },
 };
+
+export const NoDesignationsYet: Story = {
+  beforeEach() {
+    fetchMock = mockFetch([
+      {
+        path: DESIGNATIONS_URL,
+        respond: () => Response.json({ items: [], total: 0 }),
+      },
+    ]);
+    return fetchMock.restore;
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("link", { name: "Add a Designation" }),
+    ).toHaveAttribute("href", "/app/masters/designations/new");
+  },
+};

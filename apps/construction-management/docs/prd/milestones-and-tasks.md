@@ -157,7 +157,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | done        | CM-104                 | Domain    |       |
 | CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | done        | CM-116                 | HTTP+UI   |       |
 | CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | done        | CM-116                 | Domain    |       |
-| CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | in_progress | CM-111, CM-115, CM-117 | UI        |       |
+| CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | done | CM-111, CM-115, CM-117 | UI        |       |
 
 ### CM-101 — ADR CM-0002
 

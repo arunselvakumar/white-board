@@ -1,6 +1,7 @@
 "use client";
 
 import { normalizeMobile } from "@repo/auth/construction/react";
+import Link from "next/link";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@repo/ui/components/input";
@@ -224,6 +225,18 @@ export function TeamMemberDetailsFields({
               </Select>
             )}
           />
+          {designations.length === 0 && (
+            <p className="text-muted-foreground text-xs">
+              No Designations yet.{" "}
+              <Link
+                href="/app/masters/designations/new"
+                className="text-primary underline underline-offset-4"
+              >
+                Add a Designation
+              </Link>{" "}
+              first.
+            </p>
+          )}
           <FieldError message={errors.designationId?.message} />
         </div>
         <div className="space-y-1.5">
