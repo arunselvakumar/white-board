@@ -4,15 +4,18 @@
 /// Other contexts refer to a User or Workspace only by its opaque id.
 
 model IdentityUser {
-  id              String   @id
-  name            String
-  email           String   @unique
-  emailVerified   Boolean  @default(false) @map("email_verified")
-  image           String?
-  username        String?  @unique
-  displayUsername String?  @map("display_username")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @default(now()) @map("updated_at")
+  id                  String   @id
+  name                String
+  email               String   @unique
+  emailVerified       Boolean  @default(false) @map("email_verified")
+  image               String?
+  username            String?  @unique
+  displayUsername     String?  @map("display_username")
+  /// E.164 mobile for OTP sign-in (Construction Management, ADR CM-0002).
+  phoneNumber         String?  @unique @map("phone_number")
+  phoneNumberVerified Boolean? @map("phone_number_verified")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @map("updated_at")
 
   sessions    IdentitySession[]
   accounts    IdentityAccount[]

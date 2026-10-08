@@ -2,6 +2,10 @@
 export type CompanyProfile = {
   id: string;
   workspaceId: string;
+  name: string;
+  mobile: string | null;
+  email: string | null;
+  country: string;
   gstin: string | null;
   pan: string | null;
   address: string | null;
@@ -10,6 +14,8 @@ export type CompanyProfile = {
   isIndian: boolean;
   /** IANA time zone. */
   timezone: string;
+  /** Storage key of the logo printed on documents (CM-115). */
+  logoKey: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

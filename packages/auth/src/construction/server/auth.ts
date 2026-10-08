@@ -3,12 +3,19 @@ import { toNextJsHandler } from "better-auth/next-js";
 
 import { createEmailSender } from "../../email/sender";
 import { createConstructionAuthOptions } from "../config";
+import { createSmsSender } from "../sms";
 
 function createConstructionAuth() {
-  return betterAuth(createConstructionAuthOptions(constructionEmailSender));
+  return betterAuth(
+    createConstructionAuthOptions(
+      constructionEmailSender,
+      constructionSmsSender,
+    ),
+  );
 }
 
 export const constructionEmailSender = createEmailSender();
+export const constructionSmsSender = createSmsSender();
 
 const globalForAuth = globalThis as typeof globalThis & {
   constructionAuth?: ReturnType<typeof createConstructionAuth>;

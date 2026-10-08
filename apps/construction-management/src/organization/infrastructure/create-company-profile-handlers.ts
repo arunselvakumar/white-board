@@ -1,9 +1,22 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
-import { GetCompanyProfileHandler } from "../application/get-company-profile";
-import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
+import type { ObjectStorage } from "@/src/shared-kernel/files";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
-export function createCompanyProfileHandlers(deps?: { prisma?: PrismaClient }) {
-  const reader = new PrismaCompanyProfileReader(deps?.prisma ?? prisma);
-  return { get: new GetCompanyProfileHandler(reader) };
+import type { CompanyNames } from "../application/company-directory";
+import { CompanyImages } from "../application/company-images";
+import { CompanyProfileHandlers } from "../application/company-profile-handlers";
+import { AuthCompanyDirectory } from "./auth-company-directory";
+import { PrismaCompanyProfileStore } from "./prisma-company-profile-store";
+
+export function createCompanyProfileHandlers(deps?: {
+  prisma?: PrismaClient;
+  names?: CompanyNames;
+  storage?: ObjectStorage;
+}) {
+  return new CompanyProfileHandlers(
+    new PrismaCompanyProfileStore(deps?.prisma ?? prisma),
+    deps?.names ?? new AuthCompanyDirectory(),
+    new CompanyImages(deps?.storage ?? objectStorage()),
+  );
 }

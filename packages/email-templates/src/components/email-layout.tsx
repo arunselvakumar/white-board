@@ -12,12 +12,19 @@ import type { ReactNode } from "react";
 
 import { brand } from "./brand";
 
+/** Which product sends the email; Whiteboard unless the caller says otherwise. */
+export type EmailProduct = { name: string; mark: string };
+
+const WHITEBOARD: EmailProduct = { name: "Whiteboard", mark: "W" };
+
 export function EmailLayout({
   preview,
   children,
+  product = WHITEBOARD,
 }: {
   preview: string;
   children: ReactNode;
+  product?: EmailProduct;
 }) {
   return (
     <Html lang="en">
@@ -27,14 +34,14 @@ export function EmailLayout({
         <Container style={styles.container}>
           <Section style={styles.header}>
             <Text style={styles.wordmark}>
-              <span style={styles.mark}>W</span> Whiteboard
+              <span style={styles.mark}>{product.mark}</span> {product.name}
             </Text>
           </Section>
           <Section style={styles.card}>{children}</Section>
           <Hr style={styles.rule} />
           <Text style={styles.footer}>
-            Whiteboard sent this email because someone used this address in
-            Whiteboard. If that wasn&apos;t you, you can ignore it.
+            {product.name} sent this email because someone used this address in{" "}
+            {product.name}. If that wasn&apos;t you, you can ignore it.
           </Text>
         </Container>
       </Body>

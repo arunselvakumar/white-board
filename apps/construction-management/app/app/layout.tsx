@@ -1,4 +1,5 @@
 import { protectCompany } from "@repo/auth/construction/server";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/app-shell/app-shell";
@@ -9,7 +10,8 @@ export default async function AppLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  await protectCompany();
+  const auth = await protectCompany();
+  if (auth.workspaceId == null) redirect("/continue");
 
   return (
     <AppShell>

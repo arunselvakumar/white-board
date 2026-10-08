@@ -14,12 +14,17 @@ export class PrismaCompanyProfileReader implements CompanyProfileReader {
     return {
       id: row.id,
       workspaceId: row.workspaceId,
+      name: row.name,
+      mobile: row.mobile,
+      email: row.email,
+      country: row.country,
       gstin: row.gstin,
       pan: row.pan,
       address: row.address,
       currency: row.currency,
       isIndian: row.isIndian,
       timezone: row.timezone,
+      logoKey: row.logoKey,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

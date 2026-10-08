@@ -8,6 +8,13 @@
 model ConstructionOrganizationCompanyProfile {
   id          String    @id @db.Uuid
   workspaceId String    @unique @map("workspace_id")
+  /// Mirrors the Workspace name, kept in step by the rename command.
+  name        String    @default("")
+  /// E.164.
+  mobile      String?
+  email       String?
+  /// ISO 3166-1 alpha-2.
+  country     String    @default("IN") @db.Char(2)
   gstin       String?   @db.VarChar(15)
   pan         String?   @db.VarChar(10)
   address     String?
@@ -17,6 +24,8 @@ model ConstructionOrganizationCompanyProfile {
   isIndian    Boolean   @default(true) @map("is_indian")
   /// IANA time zone used for dates on documents.
   timezone    String    @default("Asia/Kolkata")
+  /// Storage key of the logo printed on documents (CM-115); a `stored_files` row.
+  logoKey     String?   @map("logo_key")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy   String    @map("created_by")
@@ -44,5 +53,312 @@ model ConstructionOrganizationAuditEvent {
   @@index([workspaceId, entityType, entityId])
   @@index([workspaceId, occurredAt])
   @@map("audit_events")
+  @@schema("construction_organization")
+}
+
+/// What a Company has bought, and until when (CM-104 trial; CM-116 plans,
+/// add-ons and checkout). One current row per Company.
+model ConstructionOrganizationSubscription {
+  id          String   @id @db.Uuid
+  workspaceId String   @unique @map("workspace_id")
+  planCode    String   @map("plan_code")
+  isTrial     Boolean  @map("is_trial")
+  startsAt    DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt      DateTime @map("ends_at") @db.Timestamptz(3)
+  autoRenew   Boolean  @default(false) @map("auto_renew")
+  /// Add-on units per grant: `{ "team_member": 2, "storage_gb": 1 }` (CM-116).
+  addOns      Json     @default("{}") @map("add_ons")
+  /// Paise, before GST, paid for `starts_at`–`ends_at`; the upgrade credit.
+  paidValue   Int      @default(0) @map("paid_value")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("subscriptions")
+  @@schema("construction_organization")
+}
+
+/// A job title in a Company, optionally with a Permission Template (CM-106).
+/// Each Company gets its own copy of the seed set. Names are unique among
+/// live rows (partial index, hand-written in the migration).
+model ConstructionOrganizationDesignation {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  name               String
+  isSeed             Boolean   @default(false) @map("is_seed")
+  /// `{ "<menu key>": <flags bitmask> }` (ADR CM-0003); null = no template.
+  permissionTemplate Json?     @map("permission_template")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String    @map("created_by")
+  updatedBy          String    @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([workspaceId])
+  @@map("designations")
+  @@schema("construction_organization")
+}
+
+/// One Permission Matrix row per Team Member per menu (ADR CM-0003). `flags`
+/// is a bitmask over the kernel's flag list; cells a menu does not support
+/// are never written. Keyed by the Team Member so a Joining Pending member's
+/// matrix exists before they have a User.
+model ConstructionOrganizationMemberMenuPermission {
+  workspaceId String   @map("workspace_id")
+  memberId    String   @map("member_id") @db.Uuid
+  menu        String
+  flags       Int
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy   String   @map("updated_by")
+
+  member ConstructionOrganizationTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, menu])
+  @@index([workspaceId, menu])
+  @@map("member_menu_permissions")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationMemberType {
+  normal
+  hrms
+
+  @@map("member_type")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationTeamMemberStatus {
+  joining_pending
+  active
+  rejected
+
+  @@map("team_member_status")
+  @@schema("construction_organization")
+}
+
+/// A User's employee record in one Company (CM-108). Until `user_id` is set
+/// it is the Join Request (ADR CM-0002). Aadhaar and PAN are AES-256-GCM
+/// ciphertext; the last four characters are kept for masking. Mobile and
+/// email are each unique among live members (partial indexes in the
+/// migration); at least one is set.
+model ConstructionOrganizationTeamMember {
+  id               String                                   @id @db.Uuid
+  workspaceId      String                                   @map("workspace_id")
+  userId           String?                                  @map("user_id")
+  name             String
+  designationId    String                                   @map("designation_id") @db.Uuid
+  mobile           String?
+  email            String?
+  address          String?
+  aadhaarEncrypted String?                                  @map("aadhaar_encrypted")
+  aadhaarLast4     String?                                  @map("aadhaar_last4") @db.Char(4)
+  panEncrypted     String?                                  @map("pan_encrypted")
+  panLast4         String?                                  @map("pan_last4") @db.Char(4)
+  emergencyContact String?                                  @map("emergency_contact")
+  /// Storage key of the photo set in My Profile (CM-115); a `stored_files` row.
+  photoKey         String?                                  @map("photo_key")
+  memberType       ConstructionOrganizationMemberType       @default(normal) @map("member_type")
+  isOwner          Boolean                                  @default(false) @map("is_owner")
+  status           ConstructionOrganizationTeamMemberStatus @default(joining_pending)
+  inviteToken      String?                                  @unique @map("invite_token")
+  invitedAt        DateTime?                                @map("invited_at") @db.Timestamptz(3)
+  joinedAt         DateTime?                                @map("joined_at") @db.Timestamptz(3)
+  createdAt        DateTime                                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                                 @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                                   @map("created_by")
+  updatedBy        String                                   @map("updated_by")
+  deletedAt        DateTime?                                @map("deleted_at") @db.Timestamptz(3)
+
+  permissions ConstructionOrganizationMemberMenuPermission[]
+  projects    ConstructionOrganizationTeamMemberProject[]
+
+  @@index([workspaceId, createdAt])
+  @@index([userId])
+  @@index([mobile])
+  @@map("team_members")
+  @@schema("construction_organization")
+}
+
+/// Projects a Team Member works on (ids from the projects context, CM-204).
+model ConstructionOrganizationTeamMemberProject {
+  memberId  String @map("member_id") @db.Uuid
+  projectId String @map("project_id")
+
+  member ConstructionOrganizationTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, projectId])
+  @@map("team_member_projects")
+  @@schema("construction_organization")
+}
+
+/// The Company's Back-dated Entry policy (CM-113, `modules/12`): default
+/// create and edit day limits with override Designations, the Financial
+/// Closing Date, and per-module settings. One row per Company, written on
+/// the first save; no row means no limits. Validated by `BackdatedPolicy` in
+/// the shared kernel.
+model ConstructionOrganizationBackdatedEntryPolicy {
+  id                           String    @id @db.Uuid
+  workspaceId                  String    @unique @map("workspace_id")
+  /// 0 = no restriction.
+  createDays                   Int       @map("create_days")
+  createOverrideDesignationIds String[]  @map("create_override_designation_ids") @db.Uuid
+  editDays                     Int       @map("edit_days")
+  editOverrideDesignationIds   String[]  @map("edit_override_designation_ids") @db.Uuid
+  /// Inclusive; a calendar date in the Company time zone.
+  financialClosingDate         DateTime? @map("financial_closing_date") @db.Date
+  /// `{ "<module key>": { mode, create: { days, overrideDesignationIds }, edit } }`.
+  modules                      Json
+  createdAt                    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy                    String    @map("created_by")
+  updatedBy                    String    @map("updated_by")
+
+  @@map("backdated_entry_policies")
+  @@schema("construction_organization")
+}
+
+/// How one module's document numbers look (CM-114, `modules/12`): prefix,
+/// fiscal-year token, project token, padded counter. `project_id` null is
+/// the module's default ("All projects"). At most one live default per
+/// module and one live rule per (module, project): partial unique indexes,
+/// hand-written in the migration. Validated by `SequenceRule` in the kernel.
+model ConstructionOrganizationSequenceRule {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  /// Kernel `SequenceModuleKey` (`purchase_request`, `purchase_order`, …).
+  module          String
+  /// A Project id from the projects context (M2); null = default rule.
+  projectId       String?   @map("project_id")
+  prefix          String
+  projectToken    String    @default("") @map("project_token")
+  startNumber     Int       @map("start_number")
+  padding         Int       @default(5)
+  separator       String    @default("/")
+  fiscalYearToken Boolean   @default(true) @map("fiscal_year_token")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String    @map("created_by")
+  updatedBy       String    @map("updated_by")
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  counters ConstructionOrganizationSequenceCounter[]
+
+  @@index([workspaceId, module])
+  @@map("sequence_rules")
+  @@schema("construction_organization")
+}
+
+/// The last number issued per rule per fiscal year. Incremented with a row
+/// lock in the same transaction as the document insert, so numbers are
+/// consecutive and gap-free (`nextSequenceNumber` in the kernel).
+model ConstructionOrganizationSequenceCounter {
+  ruleId     String   @map("rule_id") @db.Uuid
+  /// Start year of the fiscal year (2026 = 26-27); 0 when the rule has no
+  /// fiscal-year token and its counter never restarts.
+  fiscalYear Int      @map("fiscal_year")
+  lastNumber Int      @map("last_number")
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  rule ConstructionOrganizationSequenceRule @relation(fields: [ruleId], references: [id], onDelete: Restrict)
+
+  @@id([ruleId, fiscalYear])
+  @@map("sequence_counters")
+  @@schema("construction_organization")
+}
+
+/// Every file a Company keeps in storage (CM-115): logos and photos now,
+/// drawings and attachments later. Keys are `companies/<workspaceId>/...`.
+/// Storage usage (CM-116) sums `bytes` of live rows; a replaced or removed
+/// file gets `deleted_at` and its object is deleted.
+model ConstructionOrganizationStoredFile {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  key         String    @unique
+  /// What the file is for: `company_logo`, `member_photo`.
+  kind        String
+  contentType String    @map("content_type")
+  bytes       Int
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, deletedAt])
+  @@map("stored_files")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationSubscriptionOrderKind {
+  new
+  extend
+  upgrade
+  add_ons
+
+  @@map("subscription_order_kind")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationSubscriptionOrderStatus {
+  created
+  paid
+  failed
+
+  @@map("subscription_order_status")
+  @@schema("construction_organization")
+}
+
+/// One checkout (CM-117): the price snapshot (paise), buyer and seller, and
+/// the Razorpay order. Rows are never edited apart from `created → paid |
+/// failed`; a paid order is the tax invoice.
+model ConstructionOrganizationSubscriptionOrder {
+  id               String                                          @id @db.Uuid
+  workspaceId      String                                          @map("workspace_id")
+  kind             ConstructionOrganizationSubscriptionOrderKind
+  planCode         String                                          @map("plan_code")
+  planName         String                                          @map("plan_name")
+  months           Int?
+  /// Add-ons on a running plan: days charged.
+  days             Int?
+  /// Add-on units bought, per grant.
+  addOns           Json                                            @map("add_ons")
+  /// Order Summary lines: item, description, rate, quantity, months/days, amount.
+  lines            Json
+  catalogueVersion Int                                             @map("catalogue_version")
+  currency         String                                          @default("INR") @db.Char(3)
+  subTotal         Int                                             @map("sub_total")
+  lastPlanDiscount Int                                             @map("last_plan_discount")
+  taxableAmount    Int                                             @map("taxable_amount")
+  cgst             Int
+  sgst             Int
+  igst             Int
+  total            Int
+  startsAt         DateTime                                        @map("starts_at") @db.Timestamptz(3)
+  endsAt           DateTime                                        @map("ends_at") @db.Timestamptz(3)
+  billingName      String                                          @map("billing_name")
+  billingAddress   String                                          @map("billing_address")
+  billingStateCode String                                          @map("billing_state_code") @db.Char(2)
+  billingGstin     String?                                         @map("billing_gstin") @db.VarChar(15)
+  /// Seller block printed on the invoice, as it was when the order was made.
+  seller           Json
+  gateway          String                                          @default("razorpay")
+  gatewayOrderId   String                                          @unique @map("gateway_order_id")
+  gatewayPaymentId String?                                         @map("gateway_payment_id")
+  status           ConstructionOrganizationSubscriptionOrderStatus @default(created)
+  invoiceNumber    String?                                         @unique @map("invoice_number")
+  createdBy        String                                          @map("created_by")
+  createdAt        DateTime                                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  paidAt           DateTime?                                       @map("paid_at") @db.Timestamptz(3)
+  failedAt         DateTime?                                       @map("failed_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, paidAt])
+  @@map("subscription_orders")
+  @@schema("construction_organization")
+}
+
+/// The seller's tax invoice numbers, one counter per fiscal year (`26-27`).
+model ConstructionOrganizationSubscriptionInvoiceCounter {
+  fiscalYear String @id @map("fiscal_year")
+  lastNumber Int    @map("last_number")
+
+  @@map("subscription_invoice_counters")
   @@schema("construction_organization")
 }
