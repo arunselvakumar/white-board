@@ -21,8 +21,12 @@ export const MOBILE_OTP_SEND_WINDOW_SECONDS = 15 * 60;
 export function otpTestCode(): string | null {
   const code = process.env["OTP_TEST_CODE"];
   if (code == null || code.length === 0) return null;
-  if (process.env["NODE_ENV"] === "production")
+  if (process.env["NODE_ENV"] === "production") {
+    // `next build` runs with NODE_ENV=production and a developer's .env;
+    // it never verifies a code, so the bypass is simply off while building.
+    if (process.env["NEXT_PHASE"] === "phase-production-build") return null;
     throw new Error("OTP_TEST_CODE must not be set in production.");
+  }
   if (!/^\d{6}$/.test(code))
     throw new Error("OTP_TEST_CODE must be six digits.");
   return code;
