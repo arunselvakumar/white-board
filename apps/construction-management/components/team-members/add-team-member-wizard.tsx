@@ -132,14 +132,17 @@ export function AddTeamMemberWizard() {
               className="text-primary mx-auto size-10"
             />
             <h1 className="text-2xl font-semibold tracking-tight">
-              {created.name} is invited
+              {created.email == null
+                ? `${created.name} is added`
+                : `${created.name} is invited`}
             </h1>
             <p className="text-muted-foreground text-sm">
-              They show as Joining Pending until they sign in with{" "}
-              {created.mobile ?? created.email} and accept.
+              {created.email == null
+                ? "They have no email, so they cannot sign in yet. Add one to invite them."
+                : `They show as Joining Pending until they sign in with ${created.email} and accept.`}
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {created.invitePath != null && (
+              {created.invitePath != null && created.email != null && (
                 <Button
                   onClick={() => {
                     setSharing(true);
@@ -156,12 +159,13 @@ export function AddTeamMemberWizard() {
               </Link>
             </div>
           </div>
-          {created.invitePath != null && (
+          {created.invitePath != null && created.email != null && (
             <ShareInviteDialog
               open={sharing}
               onOpenChange={setSharing}
               memberName={created.name}
               companyName={company?.name ?? "our Company"}
+              email={created.email}
               invitePath={created.invitePath}
             />
           )}

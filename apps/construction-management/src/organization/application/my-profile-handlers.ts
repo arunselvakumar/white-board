@@ -13,15 +13,21 @@ import {
   type TeamMemberReadModel,
 } from "./team-member-read-model";
 
-export type MyProfile = TeamMemberReadModel & { photoKey: string | null };
+export type MyProfile = TeamMemberReadModel & {
+  photoKey: string | null;
+  /** False while the mobile is a way to sign in (SMS on, ADR CM-0009). */
+  mobileEditable: boolean;
+};
 
 /**
- * What a member may change about themself. Mobile is how they sign in and
- * Designation is the Owner's call, so neither is here. An omitted field
- * stays as it is; null clears it.
+ * What a member may change about themself. Designation is the Owner's call,
+ * so it is not here. Mobile is applied only while SMS is off (ADR CM-0009);
+ * while it is on the mobile is their sign-in and is ignored. An omitted
+ * field stays as it is; null clears it.
  */
 export type MyProfileChanges = {
   name: string;
+  mobile?: string | null;
   email?: string | null;
   address?: string | null;
   emergencyContact?: string | null;
@@ -38,6 +44,7 @@ function audited(member: TeamMember) {
   const { details } = member;
   return {
     name: details.name,
+    mobile: details.mobile,
     email: details.email,
     address: details.address,
     emergencyContact: details.emergencyContact,
@@ -58,6 +65,8 @@ export class MyProfileHandlers {
     private readonly photos: MemberPhotoStore,
     private readonly images: CompanyImages,
     private readonly clock: () => Date = () => new Date(),
+    /** Whether a mobile is a way to sign in (SMS on, ADR CM-0009). */
+    private readonly mobileSignIn: () => boolean = () => true,
   ) {}
 
   private async mine(workspaceId: string, userId: string): Promise<TeamMember> {
@@ -76,7 +85,11 @@ export class MyProfileHandlers {
       this.photos.photoKey(member.workspaceId, member.id),
     ]);
     const names = new Map(designations.map((item) => [item.id, item.name]));
-    return { ...toTeamMemberReadModel(member, names), photoKey };
+    return {
+      ...toTeamMemberReadModel(member, names),
+      photoKey,
+      mobileEditable: !this.mobileSignIn(),
+    };
   }
 
   private audit(member: TeamMember, by: string, action: string): AuditEvent {
@@ -102,10 +115,14 @@ export class MyProfileHandlers {
     const before = audited(member);
     const { changes } = input;
     const current = member.details;
+    const mobileIsSignIn = this.mobileSignIn();
     const details = teamMemberDetails({
       name: changes.name,
       designationId: current.designationId,
-      mobile: current.mobile,
+      mobile:
+        mobileIsSignIn || changes.mobile === undefined
+          ? current.mobile
+          : changes.mobile,
       email: changes.email === undefined ? current.email : changes.email,
       address:
         changes.address === undefined ? current.address : changes.address,
@@ -117,7 +134,9 @@ export class MyProfileHandlers {
         changes.aadhaar === undefined ? current.aadhaar : changes.aadhaar,
       pan: changes.pan === undefined ? current.pan : changes.pan,
     });
-    member.updateDetails(details, input.userId, this.clock());
+    member.updateDetails(details, input.userId, this.clock(), {
+      mobileIsSignIn,
+    });
     await this.members.save(member, {
       ...this.audit(member, input.userId, "team_member.profile_updated"),
       before,

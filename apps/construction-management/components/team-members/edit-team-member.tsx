@@ -142,7 +142,7 @@ export function EditTeamMember({ id }: { id: string }) {
                   aadhaar: member.aadhaarMasked,
                   pan: member.panMasked,
                 }}
-                mobileLocked={member.status === "active" && !member.isOwner}
+                mobileLocked={member.mobileLocked}
               />
               <FormAlert message={form.formState.errors.root?.message} />
               {details.isSuccess && !form.formState.isDirty && (

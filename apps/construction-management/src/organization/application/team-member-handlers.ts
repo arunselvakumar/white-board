@@ -4,7 +4,11 @@ import {
   type MemberAccess,
 } from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
-import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  DomainError,
+  conflict,
+  notFound,
+} from "@/src/shared-kernel/domain-error";
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
@@ -54,6 +58,8 @@ export class TeamMemberHandlers {
     private readonly plan: PlanGate,
     private readonly events: EventDispatcher,
     private readonly clock: () => Date = () => new Date(),
+    /** Whether a mobile is a way to sign in (SMS on, ADR CM-0009). */
+    private readonly mobileSignIn: () => boolean = () => true,
   ) {}
 
   private async load(workspaceId: string, id: string): Promise<TeamMember> {
@@ -214,7 +220,9 @@ export class TeamMemberHandlers {
       input.workspaceId,
       details.designationId,
     );
-    member.updateDetails(details, input.by, now);
+    member.updateDetails(details, input.by, now, {
+      mobileIsSignIn: this.mobileSignIn(),
+    });
     if (input.memberType !== member.memberType) {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");
@@ -269,12 +277,25 @@ export class TeamMemberHandlers {
     return this.view(member);
   }
 
+  /**
+   * A fresh invite link, sent again. While SMS is off the invitation goes
+   * only by email, so a member without one cannot be invited (ADR CM-0009).
+   */
   async resendInvite(input: {
     workspaceId: string;
     id: string;
     by: string;
   }): Promise<TeamMemberReadModel> {
     const member = await this.load(input.workspaceId, input.id);
+    if (
+      member.status !== "active" &&
+      member.details.email == null &&
+      !this.mobileSignIn()
+    )
+      throw conflict(
+        "MEMBER_EMAIL_REQUIRED",
+        "Add an email to invite this Team Member.",
+      );
     member.resendInvite(input.by, this.clock());
     await this.members.save(
       member,

@@ -35,8 +35,8 @@ export function TeamInvitationEmail({
         Accept the invitation
       </Button>
       <Text style={styles.small}>
-        Sign in with this email address, or with the mobile number the Company
-        has for you, to accept. If the button does not work, open {joinUrl}
+        Sign in or create an account with this email address to accept. If the
+        button does not work, open {joinUrl}
       </Text>
     </EmailLayout>
   );

@@ -9,7 +9,7 @@ import type {
 function text(message: InvitationMessage): string {
   const role =
     message.designationName == null ? "" : ` as ${message.designationName}`;
-  return `${message.memberName}, you are invited to join ${message.companyName}${role} on Construction Management. Open ${message.link} and sign in with this number or email to accept.`;
+  return `${message.memberName}, you are invited to join ${message.companyName}${role} on Construction Management. Open ${message.link} and sign in with this number to accept.`;
 }
 
 /** Invitation email (React Email, CM-119) and SMS. */

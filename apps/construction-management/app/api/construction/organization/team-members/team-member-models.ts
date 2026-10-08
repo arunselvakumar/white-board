@@ -1,3 +1,4 @@
+import { isConstructionSmsEnabled } from "@repo/auth/construction/server";
 import { z } from "zod";
 
 import {
@@ -43,6 +44,11 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   memberType: z.enum(["normal", "hrms"]),
   isOwner: z.boolean(),
   status: z.enum(["joining_pending", "active", "rejected"]),
+  mobileLocked: z
+    .boolean()
+    .describe(
+      "The mobile is a joined member's sign-in (SMS on, ADR CM-0009), so `update` rejects a change with MOBILE_LOCKED",
+    ),
   projectIds: z.array(z.string()),
   permissions: PermissionGrantsModel,
   invitePath: z.string().nullable(),
@@ -61,6 +67,11 @@ export function toTeamMemberResponse(
 ): ConstructionOrganizationTeamMemberResponseModel {
   return {
     ...member,
+    mobileLocked:
+      isConstructionSmsEnabled() &&
+      // Same rule as TeamMember.updateDetails: locked once past Joining Pending.
+      member.status !== "joining_pending" &&
+      !member.isOwner,
     permissions: member.permissions satisfies PermissionGrants,
     invitedAt: member.invitedAt?.toISOString() ?? null,
     joinedAt: member.joinedAt?.toISOString() ?? null,

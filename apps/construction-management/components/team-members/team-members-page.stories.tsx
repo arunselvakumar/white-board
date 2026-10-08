@@ -19,7 +19,7 @@ function member(overrides: Partial<TeamMember>): TeamMember {
       name: "Site Engineer",
     },
     mobile: "+919876543210",
-    email: null,
+    email: "suresh@kale.in",
     address: null,
     aadhaarMasked: null,
     panMasked: null,
@@ -27,6 +27,7 @@ function member(overrides: Partial<TeamMember>): TeamMember {
     memberType: "normal",
     isOwner: false,
     status: "joining_pending",
+    mobileLocked: false,
     projectIds: [],
     permissions: {},
     invitePath: "/join/Zt0kenZt0kenZt0kenZt0kenZt0ken12",
@@ -59,6 +60,30 @@ const HRMS = member({
   status: "active",
   mobile: null,
   email: "anita@patil.in",
+  invitePath: null,
+});
+
+/** No email: a record that cannot sign in or be invited (ADR CM-0009). */
+const MOBILE_ONLY = member({
+  id: "0199c3a0-0000-7000-8000-000000000103",
+  name: "Ganesh More",
+  mobile: "+919812345678",
+  email: null,
+});
+const DECLINED = member({
+  id: "0199c3a0-0000-7000-8000-000000000104",
+  name: "Vijay Shinde",
+  email: "vijay@patil.in",
+  mobile: null,
+  status: "rejected",
+  invitePath: null,
+});
+const DECLINED_MOBILE_ONLY = member({
+  id: "0199c3a0-0000-7000-8000-000000000105",
+  name: "Sunil Pawar",
+  mobile: "+919811122233",
+  email: null,
+  status: "rejected",
   invitePath: null,
 });
 
@@ -141,6 +166,58 @@ export const WithMembers: Story = {
     await waitFor(() =>
       expect(canvas.queryByText("Suresh Kale")).not.toBeInTheDocument(),
     );
+  },
+};
+
+export const InviteNeedsAnEmail: Story = {
+  beforeEach() {
+    fetchMock = mockFetch([
+      {
+        path: LIST,
+        respond: () => page([MOBILE_ONLY, DECLINED, DECLINED_MOBILE_ONLY]),
+      },
+    ]);
+    return fetchMock.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await canvas.findByText("3 Team Members")).toBeVisible();
+    // Menus animate in; their items are there before they are fully opaque.
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Actions for Ganesh More" }),
+    );
+    await expect(
+      await body.findByRole("menuitem", { name: "Edit" }),
+    ).toBeInTheDocument();
+    await expect(
+      body.queryByRole("menuitem", { name: "Share invite link" }),
+    ).not.toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(body.queryByRole("menu")).not.toBeInTheDocument(),
+    );
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Actions for Vijay Shinde" }),
+    );
+    await expect(
+      await body.findByRole("menuitem", { name: "Invite again" }),
+    ).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(body.queryByRole("menu")).not.toBeInTheDocument(),
+    );
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Actions for Sunil Pawar" }),
+    );
+    await expect(
+      await body.findByRole("menuitem", { name: "Edit" }),
+    ).toBeInTheDocument();
+    await expect(
+      body.queryByRole("menuitem", { name: "Invite again" }),
+    ).not.toBeInTheDocument();
   },
 };
 

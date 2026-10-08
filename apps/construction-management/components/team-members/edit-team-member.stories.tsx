@@ -63,8 +63,10 @@ export const EditDetailsKeepsAadhaar: Story = {
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();
-    // A joined member's mobile is their sign-in.
-    await expect(canvas.getByLabelText("Mobile")).toHaveAttribute("readonly");
+    // While SMS is off the mobile is only a contact, so it stays editable.
+    await expect(canvas.getByLabelText("Mobile")).not.toHaveAttribute(
+      "readonly",
+    );
     await userEvent.clear(name);
     await userEvent.type(name, "Suresh K.");
     await userEvent.click(canvas.getByRole("button", { name: "Save details" }));
@@ -73,6 +75,34 @@ export const EditDetailsKeepsAadhaar: Story = {
     );
     // Blank Aadhaar is left out, so the stored one stays.
     await expect("aadhaar" in bodyOf(`${ONE}/update`)).toBe(false);
+  },
+};
+
+export const MobileLockedWhileSmsIsOn: Story = {
+  beforeEach() {
+    fetchMock?.restore();
+    fetchMock = mockFetch([
+      {
+        path: "/api/construction/organization/designations",
+        respond: () => Response.json(DESIGNATION_LIST),
+      },
+      {
+        path: ONE,
+        respond: () => Response.json({ ...MEMBER, mobileLocked: true }),
+      },
+    ]);
+    return fetchMock.restore;
+  },
+  play: async ({ canvas }) => {
+    // A joined member's mobile is their sign-in while SMS is on.
+    await expect(await canvas.findByLabelText("Mobile")).toHaveAttribute(
+      "readonly",
+    );
+    await expect(
+      canvas.getByText(
+        "They sign in with this number; they change it in My Profile.",
+      ),
+    ).toBeVisible();
   },
 };
 

@@ -276,7 +276,8 @@ openApiOperations.push(
   {
     method: "get",
     path: "/api/construction/organization/join-requests",
-    summary: "Join Requests for the signed-in User's verified mobile or email",
+    summary:
+      "Join Requests for the signed-in User's verified email (or mobile while SMS is on)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
     successDescription: "Pending Join Requests",
@@ -345,7 +346,8 @@ openApiOperations.push(
   {
     method: "post",
     path: TEAM_MEMBERS,
-    summary: "Add a Team Member: Joining Pending, invited by email/SMS",
+    summary:
+      "Add a Team Member: Joining Pending, invited by email (and SMS while SMS is on)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationTeamMemberRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -403,7 +405,8 @@ openApiOperations.push(
   {
     method: "post",
     path: `${TEAM_MEMBERS}/{id}/resend-invite`,
-    summary: "Send a new invite link (also reopens a declined request)",
+    summary:
+      "Send a new invite link (also reopens a declined request); needs an email while SMS is off",
     tags: ORGANIZATION,
     params: TeamMemberIdParamsModel,
     successStatus: StatusCodes.OK,
@@ -573,7 +576,7 @@ openApiOperations.push(
     method: "post",
     path: "/api/construction/organization/me/profile/update",
     summary:
-      "Change the caller's own name, email, address, emergency contact, Aadhaar and PAN",
+      "Change the caller's own name, email, address, emergency contact, Aadhaar and PAN (and mobile while SMS is off)",
     tags: ORGANIZATION,
     body: UpdateConstructionOrganizationMyProfileRequestModel,
     successStatus: StatusCodes.OK,

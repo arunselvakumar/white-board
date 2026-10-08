@@ -186,7 +186,7 @@ function TeamMemberRows({
           <EmptyDescription>
             {filtered
               ? "Try another name or status."
-              : "Add your site engineers, supervisors and accountants. They join with their mobile number."}
+              : "Add your site engineers, supervisors and accountants. They join by signing in with their email."}
           </EmptyDescription>
         </EmptyHeader>
         {!filtered && (
@@ -245,7 +245,8 @@ function TeamMemberRows({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {member.status === "joining_pending" &&
-                    member.invitePath != null && (
+                    member.invitePath != null &&
+                    member.email != null && (
                       <DropdownMenuItem
                         onClick={() => {
                           setSharing(member);
@@ -254,7 +255,7 @@ function TeamMemberRows({
                         Share invite link
                       </DropdownMenuItem>
                     )}
-                  {member.status === "rejected" && (
+                  {member.status === "rejected" && member.email != null && (
                     <DropdownMenuItem
                       onClick={() => {
                         resend.mutate(member.id);
@@ -317,7 +318,7 @@ function TeamMemberRows({
           </Button>
         </div>
       )}
-      {sharing?.invitePath != null && (
+      {sharing?.invitePath != null && sharing.email != null && (
         <ShareInviteDialog
           open
           onOpenChange={(open) => {
@@ -325,6 +326,7 @@ function TeamMemberRows({
           }}
           memberName={sharing.name}
           companyName={company?.name ?? "our Company"}
+          email={sharing.email}
           invitePath={sharing.invitePath}
         />
       )}

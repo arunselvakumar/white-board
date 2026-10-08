@@ -1,4 +1,7 @@
-import { constructionOrigin } from "@repo/auth/construction/server";
+import {
+  constructionOrigin,
+  isConstructionSmsEnabled,
+} from "@repo/auth/construction/server";
 import { prisma, type PrismaClient } from "@repo/db";
 
 import {
@@ -40,6 +43,7 @@ export function createTeamMemberHandlers(deps?: {
         profiles,
         deps?.channels ?? invitationChannels,
         constructionOrigin,
+        isConstructionSmsEnabled,
       ),
     ]);
   return new TeamMemberHandlers(
@@ -47,6 +51,8 @@ export function createTeamMemberHandlers(deps?: {
     designations,
     deps?.plan ?? createPlanGate({ prisma: db }),
     events,
+    undefined,
+    isConstructionSmsEnabled,
   );
 }
 
@@ -56,5 +62,7 @@ export function createJoinRequestHandlers(deps?: { prisma?: PrismaClient }) {
     new PrismaTeamMemberRepository(db, privateDataCipher),
     authCompanyMemberships,
     new PrismaCompanyProfileReader(db),
+    undefined,
+    isConstructionSmsEnabled,
   );
 }

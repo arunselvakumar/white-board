@@ -27,7 +27,18 @@ function contactLine(preview: JoinLinkPreview): string {
   return preview.contacts.map((contact) => contact.masked).join(" or ");
 }
 
-/** `/join/<token>` (CM-109): sign in with the invited number, then accept. */
+/** What they sign in with: the email, or the number while SMS is on. */
+function contactNoun(preview: JoinLinkPreview): "email" | "number" {
+  return preview.contacts.some((contact) => contact.kind === "email") ||
+    preview.contacts.length === 0
+    ? "email"
+    : "number";
+}
+
+/**
+ * `/join/<token>` (CM-109): sign in with the invited email, then accept.
+ * While SMS is on (ADR CM-0009) the invited number is listed too.
+ */
 export function JoinLinkCard({
   token,
   preview,
@@ -64,6 +75,7 @@ export function JoinLinkCard({
   const notForYou =
     failure instanceof QueryHttpError &&
     failure.code === "JOIN_REQUEST_NOT_FOUND";
+  const noun = contactNoun(preview);
 
   return (
     <>
@@ -74,7 +86,9 @@ export function JoinLinkCard({
       {!signedIn ? (
         <div className="space-y-3">
           <p className="text-muted-foreground text-sm">
-            Sign in with {contactLine(preview)} to accept.
+            {preview.contacts.length === 0
+              ? "This invitation has no email yet. Ask the person who invited you to add one, then sign in with it to accept."
+              : `Sign in with ${contactLine(preview)} to accept.`}
           </p>
           <Link
             href={`/sign-in?redirect_url=${redirect}`}
@@ -95,7 +109,11 @@ export function JoinLinkCard({
       ) : notForYou ? (
         <div className="space-y-3">
           <FormAlert
-            message={`This invitation is for ${contactLine(preview)}. You are signed in with a different number or email.`}
+            message={
+              preview.contacts.length === 0
+                ? "This invitation has no email yet. Ask the person who invited you to add one."
+                : `This invitation is for ${contactLine(preview)}. You are signed in with a different ${noun}.`
+            }
           />
           <Button
             variant="outline"
@@ -104,7 +122,7 @@ export function JoinLinkCard({
               void signOut(`/join/${token}`);
             }}
           >
-            Sign out and use that number
+            Sign out and use that {noun}
           </Button>
         </div>
       ) : (

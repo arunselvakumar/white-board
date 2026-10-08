@@ -1,3 +1,4 @@
+import { isConstructionSmsEnabled } from "@repo/auth/construction/server";
 import { prisma, type PrismaClient } from "@repo/db";
 
 import type { ObjectStorage } from "@/src/shared-kernel/files";
@@ -20,5 +21,7 @@ export function createMyProfileHandlers(deps?: {
     new PrismaDesignationRepository(db),
     new PrismaMemberPhotoStore(db),
     new CompanyImages(deps?.storage ?? objectStorage()),
+    undefined,
+    isConstructionSmsEnabled,
   );
 }

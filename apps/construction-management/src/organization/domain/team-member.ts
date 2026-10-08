@@ -18,7 +18,10 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export type TeamMemberDetails = {
   name: string;
   designationId: string;
-  /** E.164. How most Team Members sign in and join; mobile or email is required. */
+  /**
+   * E.164. A contact; also a way to sign in and join while SMS is on
+   * (ADR CM-0009). Mobile or email is required.
+   */
   mobile: string | null;
   email: string | null;
   address: string | null;
@@ -66,7 +69,7 @@ export function teamMemberDetails(input: {
   if (mobile == null && email == null)
     throw new DomainError(
       "MOBILE_OR_EMAIL_REQUIRED",
-      "Enter a mobile number or an email address, so they can join.",
+      "Enter an email to invite them, or at least a mobile number.",
     );
   const aadhaarRaw = optional(input.aadhaar);
   const aadhaar = aadhaarRaw == null ? null : normalizeAadhaar(aadhaarRaw);
@@ -259,8 +262,18 @@ export class TeamMember {
     this.props = { ...this.props, updatedAt: now, updatedBy: by };
   }
 
-  updateDetails(details: TeamMemberDetails, by: string, now: Date): void {
+  /**
+   * `mobileIsSignIn` is false while SMS is off (ADR CM-0009): the mobile is
+   * then only a contact, so anyone allowed to edit may correct it.
+   */
+  updateDetails(
+    details: TeamMemberDetails,
+    by: string,
+    now: Date,
+    { mobileIsSignIn = true }: { mobileIsSignIn?: boolean } = {},
+  ): void {
     if (
+      mobileIsSignIn &&
       this.props.status !== "joining_pending" &&
       details.mobile !== this.props.details.mobile &&
       !this.props.isOwner

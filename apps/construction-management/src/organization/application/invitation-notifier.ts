@@ -15,7 +15,10 @@ export type InvitationMessage = {
   link: string;
 };
 
-/** Sends the invitation by email and SMS (transports live in `@repo/auth`). */
+/**
+ * Sends the invitation by email, and by SMS while SMS is on (ADR CM-0009).
+ * Transports live in `@repo/auth`.
+ */
 export type InvitationChannels = {
   email(to: string, message: InvitationMessage): Promise<void>;
   sms(to: string, message: InvitationMessage): Promise<void>;
@@ -26,8 +29,9 @@ function isInvited(event: DomainEvent): event is TeamMemberInvited {
 }
 
 /**
- * Tells a new Team Member about their Join Request (CM-109). The Owner can
- * always share the link themselves; a failed send never undoes the invite.
+ * Tells a new Team Member about their Join Request (CM-109): by email, and
+ * by SMS while SMS is on (ADR CM-0009). The Owner can always share the link
+ * themselves; a failed send never undoes the invite.
  */
 export class InvitationNotifier implements DomainEventListener {
   constructor(
@@ -36,6 +40,8 @@ export class InvitationNotifier implements DomainEventListener {
     private readonly profiles: CompanyProfileReader,
     private readonly channels: InvitationChannels,
     private readonly origin: () => string,
+    /** Whether texts go out (SMS on, ADR CM-0009); off unless wired. */
+    private readonly smsEnabled: () => boolean = () => false,
   ) {}
 
   async handle(event: DomainEvent): Promise<void> {
@@ -62,7 +68,7 @@ export class InvitationNotifier implements DomainEventListener {
     const sends: Promise<void>[] = [];
     if (member.details.email != null)
       sends.push(this.channels.email(member.details.email, message));
-    if (member.details.mobile != null)
+    if (member.details.mobile != null && this.smsEnabled())
       sends.push(this.channels.sms(member.details.mobile, message));
     const results = await Promise.allSettled(sends);
     for (const result of results)

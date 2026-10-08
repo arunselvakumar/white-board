@@ -59,8 +59,8 @@ export const teamMemberDetailsSchema = z
     emergencyContact: z.string().trim().max(120, "Too long"),
   })
   .refine((values) => values.mobile !== "" || values.email !== "", {
-    path: ["mobile"],
-    message: "Enter a mobile number or an email, so they can join",
+    path: ["email"],
+    message: "Enter an email (to invite them) or a mobile number",
   });
 
 export type TeamMemberDetailsValues = z.infer<typeof teamMemberDetailsSchema>;
@@ -87,7 +87,7 @@ export const DETAIL_ERROR_FIELDS: Record<
   DESIGNATION_REQUIRED: "designationId",
   DESIGNATION_NOT_FOUND: "designationId",
   MOBILE_INVALID: "mobile",
-  MOBILE_OR_EMAIL_REQUIRED: "mobile",
+  MOBILE_OR_EMAIL_REQUIRED: "email",
   MEMBER_MOBILE_IN_USE: "mobile",
   MOBILE_LOCKED: "mobile",
   EMAIL_INVALID: "email",
@@ -240,29 +240,34 @@ export function TeamMemberDetailsFields({
           <FieldError message={errors.designationId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="member-mobile">Mobile</Label>
-          <MobileField
-            id="member-mobile"
-            readOnly={mobileLocked}
-            {...form.register("mobile")}
-          />
-          {mobileLocked && (
-            <p className="text-muted-foreground text-xs">
-              They sign in with this number; they change it in My Profile.
-            </p>
-          )}
-          <FieldError message={errors.mobile?.message} />
-        </div>
-        <div className="space-y-1.5">
           <Label htmlFor="member-email">Email</Label>
           <Input
             id="member-email"
             type="email"
             placeholder="suresh@example.in"
             className="h-10"
+            aria-describedby="member-email-hint"
             {...form.register("email")}
           />
+          <p id="member-email-hint" className="text-muted-foreground text-xs">
+            They sign in with this email to join.
+          </p>
           <FieldError message={errors.email?.message} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="member-mobile">Mobile</Label>
+          <MobileField
+            id="member-mobile"
+            readOnly={mobileLocked}
+            aria-describedby="member-mobile-hint"
+            {...form.register("mobile")}
+          />
+          <p id="member-mobile-hint" className="text-muted-foreground text-xs">
+            {mobileLocked
+              ? "They sign in with this number; they change it in My Profile."
+              : "A contact number. Without an email they stay a record and cannot sign in."}
+          </p>
+          <FieldError message={errors.mobile?.message} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="member-aadhaar">Aadhaar</Label>
