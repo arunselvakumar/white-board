@@ -1,0 +1,129 @@
+apps/construction-management/.storybook/mocks/api.tsx
+  s_25a30b12f62554::t_cbbb1c337417f0 1-64
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_023ce6895fd3f1 36-51,90-97,396-470
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry-policy-fields.ts
+  s_25a30b12f62554::t_15229cf29798ff 1-45
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_25a30b12f62554::t_46f8a34a1741f6 1-345
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model.ts
+  s_25a30b12f62554::t_583a1af21e4db9 1-40
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/map-backdated-entry-policy.ts
+  s_25a30b12f62554::t_bbc44e95ac477d 1-38
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/route.ts
+  s_25a30b12f62554::t_5d143e3466b3a1 1-27
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/route.ts
+  s_25a30b12f62554::t_16c9337834a2ff 1-43
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model.ts
+  s_25a30b12f62554::t_50b9fdc043cc3a 1-38
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model.ts
+  s_25a30b12f62554::t_56a089e4ca4013 1-11
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/[id]/delete/route.ts
+  s_25a30b12f62554::t_69cc5fcafe31e5 1-40
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/[id]/sequence-rule-params-model.ts
+  s_25a30b12f62554::t_e2181986f24d3d 1-5
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/[id]/update/route.ts
+  s_25a30b12f62554::t_5bca3b245d5a11 1-52
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/[id]/update/update-sequence-rule-models.ts
+  s_25a30b12f62554::t_1eb6b8e446848c 1-28
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/create-sequence-rule-models.ts
+  s_25a30b12f62554::t_bcc76d26f6637c 1-30
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/list-sequence-rules-models.ts
+  s_25a30b12f62554::t_21339d459dd51e 1-26
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/route.ts
+  s_25a30b12f62554::t_168510a8f2ca59 1-78
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/sequence-rule-fields.ts
+  s_25a30b12f62554::t_3451bde5fd4fb9 1-80
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/sequence-rules.http.test.ts
+  s_25a30b12f62554::t_628afcd31db838 1-267
+apps/construction-management/app/app/masters/settings/backdated-entry/page.tsx
+  s_25a30b12f62554::t_f88e60c019fba1 1-9
+apps/construction-management/app/app/masters/settings/page.tsx
+  s_25a30b12f62554::t_42dfea625ae324 1-53
+apps/construction-management/app/app/masters/settings/sequence-ids/page.tsx
+  s_25a30b12f62554::t_46fa0884ce0b3e 1-9
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_25a30b12f62554::t_e66a7500715c8d 1-212
+apps/construction-management/components/settings/backdated-entry-form.tsx
+  s_25a30b12f62554::t_b50ec817a6cae9 1-291
+apps/construction-management/components/settings/backdated-limit-fields.tsx
+  s_25a30b12f62554::t_fff1225fd400b5 1-107
+apps/construction-management/components/settings/backdated-module-dialog.tsx
+  s_25a30b12f62554::t_b3816a9f9e9fcd 1-142
+apps/construction-management/components/settings/designation-multi-select.tsx
+  s_25a30b12f62554::t_8d1770f0e3203c 1-90
+apps/construction-management/components/settings/sequence-ids-manager.stories.tsx
+  s_25a30b12f62554::t_7f11e89da54131 1-218
+apps/construction-management/components/settings/sequence-ids-manager.tsx
+  s_25a30b12f62554::t_aad0c6576337b3 1-296
+apps/construction-management/components/settings/sequence-rule-dialog.tsx
+  s_25a30b12f62554::t_91435d40473416 1-373
+apps/construction-management/components/settings/settings-index.stories.tsx
+  s_25a30b12f62554::t_0c5b664a440622 1-29
+apps/construction-management/docs/modules/12-settings-configuration.md
+  s_25a30b12f62554::t_f37a8d08bc0fd1 157-158,312,419-421,425,430
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_a5064bff33c3e0 154-155,208-209,214-215
+apps/construction-management/lib/settings-nav.ts
+  s_25a30b12f62554::t_edf1fa7d399b1f 1-24
+apps/construction-management/src/organization/application/backdated-policy-handlers.ts
+  s_25a30b12f62554::t_0df88949ee6dae 1-79
+apps/construction-management/src/organization/application/sequence-rule-handlers.ts
+  s_25a30b12f62554::t_d85da462fa8a49 1-131
+apps/construction-management/src/organization/infrastructure/create-backdated-policy-handlers.ts
+  s_25a30b12f62554::t_e556039bba0433 1-15
+apps/construction-management/src/organization/infrastructure/create-sequence-rule-handlers.ts
+  s_25a30b12f62554::t_f4b290a7e17d06 1-10
+apps/construction-management/src/organization/infrastructure/prisma-backdated-policy-store.ts
+  s_25a30b12f62554::t_44acef9640477a 1-118
+apps/construction-management/src/organization/infrastructure/prisma-sequence-rule-store.ts
+  s_25a30b12f62554::t_380752564eb975 1-241
+apps/construction-management/src/queries/settings.ts
+  s_25a30b12f62554::t_3aa9a9cf535b00 1-100
+apps/construction-management/src/shared-kernel/backdated-policy-reader.ts
+  s_25a30b12f62554::t_d695eddb198344 1-97
+apps/construction-management/src/shared-kernel/backdated-policy.test.ts
+  s_25a30b12f62554::t_8456617d94dcb4 1-279
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_25a30b12f62554::t_a38f958be7a631 1-441
+apps/construction-management/src/shared-kernel/calendar-date.ts
+  s_25a30b12f62554::t_0a9ce3cf832b9e 1-77
+apps/construction-management/src/shared-kernel/sequence/fiscal-year.ts
+  s_25a30b12f62554::t_76ce103e3d244f 1-29
+apps/construction-management/src/shared-kernel/sequence/index.ts
+  s_25a30b12f62554::t_dea0ececbc75ed 1-24
+apps/construction-management/src/shared-kernel/sequence/modules.ts
+  s_25a30b12f62554::t_038ccc1e7677b4 1-55
+apps/construction-management/src/shared-kernel/sequence/next-sequence-number.http.test.ts
+  s_25a30b12f62554::t_dd09405f659c42 1-155
+apps/construction-management/src/shared-kernel/sequence/next-sequence-number.ts
+  s_25a30b12f62554::t_1fd451a0ac6cf5 1-148
+apps/construction-management/src/shared-kernel/sequence/sequence-rule.test.ts
+  s_25a30b12f62554::t_4837011e552da3 1-119
+apps/construction-management/src/shared-kernel/sequence/sequence-rule.ts
+  s_25a30b12f62554::t_62821f5acfc402 1-151
+packages/db/prisma/migrations/20261009010000_construction_backdated_entry_policies/migration.sql
+  s_25a30b12f62554::t_5d90401d52b32a 1-24
+packages/db/prisma/migrations/20261009020000_construction_sequence_rules/migration.sql
+  s_25a30b12f62554::t_3e6884f77f82e9 1-46
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_9e3931cf158fa1 184-258
+packages/ui/src/components/combobox.tsx
+  s_25a30b12f62554::t_d6a3743b4c71a7 239,243-244,261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b49f5251666f0c5bf532b0328d902249382d3401",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
