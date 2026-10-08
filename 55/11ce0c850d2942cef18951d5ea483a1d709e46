@@ -1,0 +1,169 @@
+apps/construction-management/.gitignore
+  s_25a30b12f62554::t_979e1ddc26a8a7 35-37
+apps/construction-management/.storybook/mocks/api.ts
+  s_25a30b12f62554::t_a42878e6450a34 1-85
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_8630d2ee0725d5 9-13,38-41,44-53,91,98-216
+apps/construction-management/app/api/construction/organization/company-profile/company-profile-body.ts
+  s_25a30b12f62554::t_7584e8a5fb2efb 1-34
+apps/construction-management/app/api/construction/organization/company-profile/company-profile.http.test.ts
+  s_25a30b12f62554::t_9aa4cceb5db53c 8-9,11-12,14,21,23,25-30,33-43,47-70,72-79,84-90,92-111,115-116,124-129,131-132,135-137,141,144-150,152-369,374,376-390,394
+apps/construction-management/app/api/construction/organization/company-profile/get-company-profile-response-model.ts
+  s_25a30b12f62554::t_80e0c56ef3380c 3-7,10-16,23-33
+apps/construction-management/app/api/construction/organization/company-profile/logo/remove/route.ts
+  s_25a30b12f62554::t_ec50c5dafcd266 1-29
+apps/construction-management/app/api/construction/organization/company-profile/logo/route.ts
+  s_25a30b12f62554::t_8bcfa8015a5295 1-54
+apps/construction-management/app/api/construction/organization/company-profile/route.ts
+  s_25a30b12f62554::t_beb728fc9d19d4 2-3,6,12,15-19,21-22
+apps/construction-management/app/api/construction/organization/company-profile/update/route.ts
+  s_25a30b12f62554::t_bbeab05872936d 1-43
+apps/construction-management/app/api/construction/organization/me/me.http.test.ts
+  s_25a30b12f62554::t_9cb165d3d0d6ae 1-369
+apps/construction-management/app/api/construction/organization/me/photo/remove/route.ts
+  s_25a30b12f62554::t_e7b058ee401710 1-27
+apps/construction-management/app/api/construction/organization/me/photo/route.ts
+  s_25a30b12f62554::t_8a2e94f9a50dd7 1-48
+apps/construction-management/app/api/construction/organization/me/profile/get-my-profile-response-model.ts
+  s_25a30b12f62554::t_4649010f155834 1-32
+apps/construction-management/app/api/construction/organization/me/profile/my-profile-body.ts
+  s_25a30b12f62554::t_c9527901c97f67 1-29
+apps/construction-management/app/api/construction/organization/me/profile/reveal-identifiers/reveal-my-identifiers-response-model.ts
+  s_25a30b12f62554::t_e15c299a09d692 1-12
+apps/construction-management/app/api/construction/organization/me/profile/reveal-identifiers/route.ts
+  s_25a30b12f62554::t_cc98f1f0c539eb 1-33
+apps/construction-management/app/api/construction/organization/me/profile/route.ts
+  s_25a30b12f62554::t_e93957f2496a38 1-25
+apps/construction-management/app/api/construction/organization/me/profile/update/route.ts
+  s_25a30b12f62554::t_a4ab2f20163325 1-34
+apps/construction-management/app/app/masters/company/page.tsx
+  s_25a30b12f62554::t_85b92d79e877a3 1-9
+apps/construction-management/app/app/profile/page.tsx
+  s_25a30b12f62554::t_5992e528e68bc7 1-9
+apps/construction-management/components/app-shell/user-menu.stories.tsx
+  s_25a30b12f62554::t_3a4b1e77fffc99 1-57
+apps/construction-management/components/app-shell/user-menu.tsx
+  s_25a30b12f62554::t_e2aae8666b46d8 4,8-15,27-28,38-43,45,47-51,53,70,88-92
+apps/construction-management/components/company-profile/company-profile-form.stories.tsx
+  s_25a30b12f62554::t_99335902a3c22c 1-337
+apps/construction-management/components/company-profile/company-profile-form.tsx
+  s_25a30b12f62554::t_f7074da17a1f51 1-445
+apps/construction-management/components/company-profile/company-profile-screen.tsx
+  s_9c3f172fe92a46::t_ddec60017162ac 1-48
+apps/construction-management/components/my-profile/my-profile-form.stories.tsx
+  s_25a30b12f62554::t_433c1a2ba57c23 1-290
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_25a30b12f62554::t_d7867a8b9cc4a9 1-379
+apps/construction-management/components/my-profile/my-profile-screen.tsx
+  s_25a30b12f62554::t_d06ae4ac9f7072 1-30
+apps/construction-management/components/profile/image-uploader.tsx
+  s_25a30b12f62554::t_3a82bcbb427617 1-158
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_5044ef99dd2dc5 156,214-220
+apps/construction-management/package.json
+  s_25a30b12f62554::t_57fdd854cfca6b 24
+apps/construction-management/src/organization/application/company-images.ts
+  s_25a30b12f62554::t_463262885e3a77 1-89
+apps/construction-management/src/organization/application/company-profile-handlers.test.ts
+  s_25a30b12f62554::t_b94de8d41d9495 1-161
+apps/construction-management/src/organization/application/company-profile-handlers.ts
+  s_25a30b12f62554::t_544c4b5b191ea5 1-182
+apps/construction-management/src/organization/application/company-profile-store.ts
+  s_25a30b12f62554::t_b841742cc319d4 1-23
+apps/construction-management/src/organization/application/get-company-profile.test.ts
+  s_25a30b12f62554::t_40463e8c805e17 21
+apps/construction-management/src/organization/application/member-photo-store.ts
+  s_25a30b12f62554::t_22baff68ad8fac 1-27
+apps/construction-management/src/organization/domain/company-profile.ts
+  s_25a30b12f62554::t_a1e96a724b51ed 17-18
+apps/construction-management/src/organization/infrastructure/create-company-profile-handlers.ts
+  s_25a30b12f62554::t_aa41441298d5ae 3-4,6-21
+apps/construction-management/src/organization/infrastructure/create-my-profile-handlers.ts
+  s_25a30b12f62554::t_74a3e2ddcd98f2 1-24
+apps/construction-management/src/organization/infrastructure/prisma-company-profile-reader.ts
+  s_25a30b12f62554::t_d96e4ee3df34d8 27
+apps/construction-management/src/organization/infrastructure/prisma-company-profile-store.ts
+  s_25a30b12f62554::t_7561a37c7abf28 1-66
+apps/construction-management/src/organization/infrastructure/prisma-member-photo-store.ts
+  s_25a30b12f62554::t_79ef2de7a934bf 1-65
+apps/construction-management/src/queries/company-profile.ts
+  s_25a30b12f62554::t_f4779d08740cd4 1-51
+apps/construction-management/src/queries/my-profile.ts
+  s_25a30b12f62554::t_65f3b7908d6a13 1-44
+apps/construction-management/src/shared-kernel/files/image-file.test.ts
+  s_25a30b12f62554::t_04a81cb5143582 1-87
+apps/construction-management/src/shared-kernel/files/image-file.ts
+  s_25a30b12f62554::t_738268737f94bc 1-93
+apps/construction-management/src/shared-kernel/files/index.ts
+  s_25a30b12f62554::t_b188fc295b67cc 1-18
+apps/construction-management/src/shared-kernel/files/local-file-storage.ts
+  s_25a30b12f62554::t_fdab2b068925bb 1-62
+apps/construction-management/src/shared-kernel/files/object-storage.ts
+  s_25a30b12f62554::t_588a1889d74784 1-38
+apps/construction-management/src/shared-kernel/files/storage-from-env.ts
+  s_25a30b12f62554::t_814be9adcae85c 1-46
+apps/construction-management/src/shared-kernel/files/storage.test.ts
+  s_25a30b12f62554::t_130513a55d13f4 1-150
+apps/construction-management/src/shared-kernel/files/stored-files.ts
+  s_25a30b12f62554::t_82a5df3f77270c 1-65
+apps/construction-management/src/shared-kernel/files/vercel-blob-storage.ts
+  s_25a30b12f62554::t_65a04e5cfbbd61 1-45
+apps/construction-management/test/companies.ts
+  s_25a30b12f62554::t_7f8fe7ae0d4136 1-92
+apps/construction-management/test/files.ts
+  s_25a30b12f62554::t_7e35b1ccae8544 1-18
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_a553505a7ec653 1,46-51
+bun.lock
+  s_25a30b12f62554::t_afe43656edc3e2 25,1022-1029,1098-1099,1360-1361,1420-1421,1472-1473,1498-1499,1528-1529,1546-1547,1664-1665,1676-1677,1718-1719,1740-1741,1746-1747,1880-1881,1936-1937,1986-1987,2014-2015,2066-2067,2134-2137,2222-2225
+packages/db/prisma/migrations/20261009020000_construction_stored_files/migration.sql
+  s_25a30b12f62554::t_37c0dd92754563 1-27
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_4ae889db15a52d 27-28,153-154,188-208
+apps/construction-management/app/api/_lib/uploads.ts
+  s_29d3e4a3628b61::t_611f7739579d6b 1-57
+apps/construction-management/app/api/construction/organization/company-profile/update/update-company-profile-request-model.ts
+  s_29d3e4a3628b61::t_f98a21fed9bb4d 1-29
+apps/construction-management/app/api/construction/organization/me/profile/update/update-my-profile-request-model.ts
+  s_29d3e4a3628b61::t_710417624f9c57 1-19
+apps/construction-management/next.config.ts
+  s_29d3e4a3628b61::t_4aef1614054a25 10-15
+apps/construction-management/src/organization/application/company-directory.ts
+  s_29d3e4a3628b61::t_a9120286412b1b 14-18
+apps/construction-management/src/organization/application/my-profile-handlers.ts
+  s_29d3e4a3628b61::t_91f672f9e79ea3 1-217
+apps/construction-management/src/organization/infrastructure/auth-company-directory.ts
+  s_29d3e4a3628b61::t_b5686bbf418682 3-6,9,20-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5511ce0c850d2942cef18951d5ea483a1d709e46",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_29d3e4a3628b61": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a3819d2eff4036ccb",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c3f172fe92a46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1436510-6545-4236-9394-8c7f247ccc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
