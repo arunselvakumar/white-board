@@ -1,0 +1,48 @@
+/// Construction Management — organization context (ADR CM-0001): the
+/// Company's profile and, later, Team Members, Designations, the Permission
+/// Matrix, settings and subscription. Lives in the app's own `construction`
+/// database. A Company is a Workspace in `identity`; rows hold its id as an
+/// opaque string and never join to `identity`.
+
+/// One per Company: the details a Workspace row does not carry.
+model ConstructionOrganizationCompanyProfile {
+  id          String    @id @db.Uuid
+  workspaceId String    @unique @map("workspace_id")
+  gstin       String?   @db.VarChar(15)
+  pan         String?   @db.VarChar(10)
+  address     String?
+  /// ISO 4217. INR unless the Company is not Indian.
+  currency    String    @default("INR") @db.Char(3)
+  /// Switches India-only behaviour (GSTIN, PAN, TDS, Indian number grouping).
+  isIndian    Boolean   @default(true) @map("is_indian")
+  /// IANA time zone used for dates on documents.
+  timezone    String    @default("Asia/Kolkata")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@map("company_profiles")
+  @@schema("construction_organization")
+}
+
+/// Who changed what, appended by application services and never updated
+/// (`03-target-architecture.md §3`). Written through `recordAudit` in the
+/// shared kernel.
+model ConstructionOrganizationAuditEvent {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  actorUserId String   @map("actor_user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  before      Json?
+  after       Json?
+  occurredAt  DateTime @map("occurred_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, entityType, entityId])
+  @@index([workspaceId, occurredAt])
+  @@map("audit_events")
+  @@schema("construction_organization")
+}

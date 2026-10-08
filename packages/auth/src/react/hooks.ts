@@ -26,8 +26,8 @@ export function navigateInApp(path: string): void {
 
 type BetterFetchResult = { error: unknown } | { error: null };
 
-/** Runs auth calls one at a time, tracking `fetchStatus` and the last error. */
-function useAuthAction() {
+/** Runs auth calls one at a time, tracking `fetchStatus` and the last error. Shared with the construction hooks. */
+export function useAuthAction() {
   const [fetchStatus, setFetchStatus] = useState<FetchStatus>("idle");
   const [error, setError] = useState<AuthError | null>(null);
 

@@ -9,7 +9,12 @@
     "./proxy": "./src/proxy.ts",
     "./client": "./src/client/index.ts",
     "./react": "./src/react/index.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./construction/server": "./src/construction/server/index.ts",
+    "./construction/proxy": "./src/construction/proxy.ts",
+    "./construction/client": "./src/construction/client.ts",
+    "./construction/react": "./src/construction/react/index.ts",
+    "./construction/testing": "./src/construction/testing.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

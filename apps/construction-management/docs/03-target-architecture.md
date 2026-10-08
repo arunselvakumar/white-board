@@ -10,11 +10,11 @@ flowchart LR
     CF --> ALB[ALB]
     ALB --> ECS[ECS Fargate<br/>construction-management<br/>Next.js standalone]
     ECS --> RDS[(RDS PostgreSQL 16<br/>Multi-AZ, one DB,<br/>schema per context)]
-    ECS --> S3[(S3: attachments,<br/>drawings, photos,<br/>generated reports)]
+    ECS --> BLOB[(Vercel Blob, private:<br/>attachments, drawings,<br/>photos, generated reports)]
     ECS --> SQS[SQS + worker service<br/>reports, backups,<br/>notifications, accruals]
     SQS --> WK[ECS worker task<br/>same image, worker entry]
     WK --> RDS
-    WK --> S3
+    WK --> BLOB
     WK --> SES[SES email]
     WK --> FCMW[Web Push / FCM<br/>for the mobile shell]
     ECS --> RZ[Razorpay<br/>subscriptions & UPI]
@@ -26,7 +26,7 @@ flowchart LR
 
 - **Compute:** one container image, two entrypoints (web, worker). Fargate, autoscaled on CPU and ALB request count. No Lambda for the core app — the Prisma connection model and long-running report jobs fit a container better.
 - **Database:** Amazon RDS PostgreSQL 16, Multi-AZ, RDS Proxy in front for connection pooling. Point-in-time recovery 35 days. One database `construction`; schemas per context (below). Migrations applied at deploy by a one-off ECS task (same pattern as Whiteboard ADR-0036).
-- **Files:** S3 with per-company prefixes, presigned PUT for uploads (10 MB cap kept from legacy; larger for `.dwg`), presigned GET with short TTL. Image resizing on upload in the worker. Storage quota per plan computed from an `attachments` table, not by listing S3.
+- **Files (owner decision 2026-10-08: Vercel Blob, not S3):** Vercel Blob with `access: "private"` and per-company pathnames (`companies/<workspaceId>/…`); uploads and downloads go through our routes, which check the Session and Permission Matrix, so no file URL is ever public. 10 MB cap per file (larger for `.dwg`). Storage quota per plan computed from our own file table, not by listing the store. Development and tests keep files on disk (no Blob emulator exists). See ADR CM-0001.
 - **Background work:** SQS FIFO per job type; the worker consumes and writes a `jobs` row (queued → running → done/failed) that the UI polls or receives by push — replaces the legacy "please wait while another report is generating" with a proper job queue.
 - **Push & realtime:** web push (VAPID) for the PWA; FCM via the same worker when a native shell exists. Chat is Postgres-backed with server-sent events (no Firebase RTDB).
 - **Email/SMS/OTP:** SES for email; an SMS provider (MSG91 or AWS SNS India) for OTP; OTP login stays because that is what site staff know.
@@ -123,7 +123,7 @@ Nearly every business document (PR, PO, GRN, MT, MR, DN, worksheet, equipment sh
 ### Reads and reports
 
 - Screens read through `queryOptions` + `useSuspenseQuery` (root ADR-0026). Lists are cursor-paginated with totals (root ADR-0020) — the legacy page/per_page lists become cursors.
-- Dashboards and the ~40 legacy reports read from **SQL views / materialised views in `construction_reporting`** refreshed by events or on schedule; PDFs/Excels are rendered by the worker from the same queries and stored on S3; the UI gets a job id and a notification on completion (legacy behaviour preserved).
+- Dashboards and the ~40 legacy reports read from **SQL views / materialised views in `construction_reporting`** refreshed by events or on schedule; PDFs/Excels are rendered by the worker from the same queries and stored in Vercel Blob; the UI gets a job id and a notification on completion (legacy behaviour preserved).
 - "Central" (cross-project) views are the same queries without `project_id`.
 
 ### Offline and mobile
@@ -147,10 +147,10 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 
 ## 4. Migration from legacy (if customers move)
 
-1. Export per company via the legacy API (`*/GetAll`, `*/Report`, backup ZIPs) into S3 raw.
+1. Export per company via the legacy API (`*/GetAll`, `*/Report`, backup ZIPs) into raw storage.
 2. Transform with a one-off script per context: map int statuses to enums, split `paidToType` polymorphism into typed FKs, convert opening balances into ledger entries, map `companyId` → `workspace_id`.
 3. Load through the application's own commands where invariants matter (numbering, ledgers), bulk-insert where they don't (masters, attachments metadata).
-4. Attachments: copy from legacy storage to S3 by URL; keep legacy URL as `source_url` until verified.
+4. Attachments: copy from legacy storage to Vercel Blob by URL; keep legacy URL as `source_url` until verified.
 5. Run both for one reporting period; reconcile ledger closing balances and stock positions per project before cut-over.
 
 ## 5. Decisions to record as ADRs (first batch)
@@ -163,5 +163,5 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 | CM-0004 | Ledger-first money and stock; balances derived                                                                      | Legacy edits balances in place; India compliance needs auditability                    |
 | CM-0005 | Shared-kernel document behaviours (numbering, back-dated guard, approval, attachments, comments)                    | Eleven aggregates share them; avoid eleven implementations                             |
 | CM-0006 | PWA + offline outbox before native                                                                                  | Replaces Flutter; site connectivity                                                    |
-| CM-0007 | Reports are worker jobs on SQS writing to S3; dashboards read `construction_reporting` views                        | Legacy async-report UX kept, but on a real queue                                       |
+| CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                       |
 | CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                    |
