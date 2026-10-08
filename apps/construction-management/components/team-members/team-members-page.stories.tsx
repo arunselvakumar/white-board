@@ -133,9 +133,10 @@ export const WithMembers: Story = {
       await body.findByRole("menuitem", { name: "Delete" }),
     );
     const confirm = within(await body.findByRole("alertdialog"));
+    // The dialog animates in; its text is there before it is fully opaque.
     await expect(
       confirm.getByText("Their invitation is cancelled."),
-    ).toBeVisible();
+    ).toBeInTheDocument();
     await userEvent.click(confirm.getByRole("button", { name: "Delete" }));
     await waitFor(() =>
       expect(canvas.queryByText("Suresh Kale")).not.toBeInTheDocument(),

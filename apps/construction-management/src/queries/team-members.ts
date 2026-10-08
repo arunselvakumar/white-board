@@ -105,3 +105,20 @@ export function revealTeamMemberIds(id: string) {
     `/${encodeURIComponent(id)}/reveal`,
   );
 }
+
+export type DesignationOption = {
+  id: string;
+  name: string;
+  template: PermissionGrants | null;
+};
+
+/** Designations for the Team Member form (the route is CM-112's). */
+export const designationOptionsQuery = queryOptions({
+  queryKey: ["organization", "designations", "options"],
+  queryFn: async () =>
+    (
+      await apiJson<{ items: DesignationOption[] }>(
+        "/api/construction/organization/designations",
+      )
+    ).items,
+});
