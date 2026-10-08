@@ -13,6 +13,27 @@
         "typescript": "6.0.2",
       },
     },
+    "apps/construction-management": {
+      "name": "construction-management",
+      "version": "0.1.0",
+      "dependencies": {
+        "@repo/ui": "*",
+        "next": "16.3.4",
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+      },
+      "devDependencies": {
+        "@repo/eslint-config": "*",
+        "@repo/typescript-config": "*",
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "26.4.1",
+        "@types/react": "19.2.18",
+        "@types/react-dom": "19.2.5",
+        "@typescript/native": "npm:typescript@7.0.2",
+        "eslint": "10.9.1",
+        "tailwindcss": "^4",
+      },
+    },
     "apps/marketing": {
       "name": "marketing",
       "version": "0.1.0",
@@ -1119,6 +1140,8 @@
     "confbox": ["confbox@0.2.4", "", {}, "sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ=="],
 
     "consola": ["consola@3.4.2", "", {}, "sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA=="],
+
+    "construction-management": ["construction-management@workspace:apps/construction-management"],
 
     "convert-source-map": ["convert-source-map@2.0.0", "", {}, "sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg=="],
 
