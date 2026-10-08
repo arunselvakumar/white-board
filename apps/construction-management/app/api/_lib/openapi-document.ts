@@ -33,6 +33,22 @@ import { CreateConstructionOrganizationDesignationRequestModel } from "@/app/api
 import { ConstructionOrganizationDesignationResponseModel } from "@/app/api/construction/organization/designations/designation-response-model";
 import { ListConstructionOrganizationDesignationsResponseModel } from "@/app/api/construction/organization/designations/list-designations-response-model";
 
+import { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model";
+import { UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model";
+import { UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model";
+import { ConstructionOrganizationSequenceRuleParamsModel } from "@/app/api/construction/organization/settings/sequence-rules/[id]/sequence-rule-params-model";
+import {
+  UpdateConstructionOrganizationSequenceRuleRequestModel,
+  UpdateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/[id]/update/update-sequence-rule-models";
+import {
+  CreateConstructionOrganizationSequenceRuleRequestModel,
+  CreateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/create-sequence-rule-models";
+import {
+  ListConstructionOrganizationSequenceRulesQueryModel,
+  ListConstructionOrganizationSequenceRulesResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/list-sequence-rules-models";
 import {
   buildOpenApiDocument,
   type OpenApiComponents,
@@ -71,6 +87,14 @@ export const openApiComponents: OpenApiComponents = {
   CreateConstructionOrganizationDesignationRequestModel,
   UpdateConstructionOrganizationDesignationRequestModel,
   DuplicateConstructionOrganizationDesignationRequestModel,
+  GetConstructionOrganizationBackdatedEntryPolicyResponseModel,
+  UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel,
+  UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
+  ListConstructionOrganizationSequenceRulesResponseModel,
+  CreateConstructionOrganizationSequenceRuleRequestModel,
+  CreateConstructionOrganizationSequenceRuleResponseModel,
+  UpdateConstructionOrganizationSequenceRuleRequestModel,
+  UpdateConstructionOrganizationSequenceRuleResponseModel,
 };
 
 const DESIGNATIONS = "/api/construction/organization/designations";
@@ -366,6 +390,81 @@ openApiOperations.push(
     successDescription: "Full identifiers",
     successSchema: RevealConstructionOrganizationTeamMemberIdsResponseModel,
     errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+);
+
+openApiOperations.push(
+  {
+    method: "get",
+    path: "/api/construction/organization/settings/backdated-entry",
+    summary: "The Company's Back-dated Entry policy",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription:
+      "Default limits, the Financial Closing Date and all 24 modules",
+    successSchema: GetConstructionOrganizationBackdatedEntryPolicyResponseModel,
+    errors: [...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/backdated-entry/update",
+    summary: "Replace the Company's Back-dated Entry policy",
+    tags: ORGANIZATION,
+    body: UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The saved policy",
+    successSchema:
+      UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/settings/sequence-rules",
+    summary: "The Company's Sequence ID rules",
+    tags: ORGANIZATION,
+    query: ListConstructionOrganizationSequenceRulesQueryModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Live rules, in module order, defaults first",
+    successSchema: ListConstructionOrganizationSequenceRulesResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules",
+    summary: "Add a Sequence ID rule for a module",
+    tags: ORGANIZATION,
+    body: CreateConstructionOrganizationSequenceRuleRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "The new rule",
+    successSchema: CreateConstructionOrganizationSequenceRuleResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules/{id}/update",
+    summary: "Change a Sequence ID rule's number format",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationSequenceRuleParamsModel,
+    body: UpdateConstructionOrganizationSequenceRuleRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated rule",
+    successSchema: UpdateConstructionOrganizationSequenceRuleResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules/{id}/delete",
+    summary: "Delete a Sequence ID rule that never issued a number",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationSequenceRuleParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Deleted",
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
   },
 );
 
