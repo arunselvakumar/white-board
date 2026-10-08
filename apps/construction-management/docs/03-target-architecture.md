@@ -50,7 +50,7 @@ apps/construction-management/
     tracking/               tasks, issues, inspections
     procurement/            PR, PO, GRN, inventory, transfers, stores, MR, DN
     finance/                accounts, transactions, petty cash, invoices, payments, TDS, GST
-    labour/                 labour & vendor attendance, balances
+    labour/                 labour & vendor registers, attendance, ledger, wage payments
     sales/                  inquiries, follow-ups, bookings
     hrms/                   attendance, leaves, shifts, holidays, salary
     reporting/              dashboards, reports, backups (read models + jobs)
@@ -167,4 +167,4 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 | CM-0006 | PWA + offline outbox before native                                                                                  | Replaces Flutter; site connectivity                                                    |
 | CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                       |
 | CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                    |
-| CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                          | SMS needs DLT registration the business does not have yet                              |
+| CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                           | SMS needs DLT registration the business does not have yet                              |

@@ -188,7 +188,7 @@ A gang / piece-rate contractor who supplies workers counted by head per category
 
 ## Seed data (verbatim from notes)
 
-### Departments (~54)
+### Departments (~54; the list below has 53, and those 53 are the seed set)
 
 Surveying, Departmental Work, Equipment, Tancha Work, Steel Reinforcement Work, Flooring Work, False Ceiling, Pollution Control, Landscaping, Planning, Marketing, Purchase, Account, HVAC, Solar Electric, Solar Water Heater, Corporation Water, Water, Drainage, Soil Backfilling, Excavation, Labour, Miscellaneous Labour, Elevation, Concrete Hacking, Glazing, Silicone, Stone Fixing, Soil Nail & Gunting, Anti Termite, Soil Filling, Diaphragm Wall, Piling Work, Safety, Shuttering, Glass Fixing, Aluminum Section, POP, Trimix Work, Exposed Work, Fire Safety, Fabrication, Carpentry, Cleaning, Acid Wash, Painting, Tiling Work, Plumbing, Electric, Chicken mesh, Water Proofing, Masonry & Plaster, RCC.
 
