@@ -1,0 +1,257 @@
+apps/construction-management/app/api/construction/labour/_party-files/party-file-models.ts
+  s_ec41e28a857a0b::t_623a08c7c7b94d 1-58
+apps/construction-management/app/api/construction/labour/_party-files/party-file-openapi.ts
+  s_ec41e28a857a0b::t_d4e963f37bcbab 1-124
+apps/construction-management/app/api/construction/labour/_party-files/party-file-routes.ts
+  s_ec41e28a857a0b::t_33e86d75c02796 1-239
+apps/construction-management/app/api/construction/labour/labours/[id]/activate/route.ts
+  s_ec41e28a857a0b::t_bf33b0f63d9fba 1-31
+apps/construction-management/app/api/construction/labour/labours/[id]/deactivate/route.ts
+  s_ec41e28a857a0b::t_a1cd02cb4a3213 1-31
+apps/construction-management/app/api/construction/labour/labours/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_c7843081dbf643 1-35
+apps/construction-management/app/api/construction/labour/labours/[id]/documents/[docId]/delete/route.ts
+  s_ec41e28a857a0b::t_a1802bf95e9764 1-8
+apps/construction-management/app/api/construction/labour/labours/[id]/documents/[docId]/route.ts
+  s_ec41e28a857a0b::t_2f04601f78e459 1-8
+apps/construction-management/app/api/construction/labour/labours/[id]/documents/route.ts
+  s_ec41e28a857a0b::t_a26905103a215e 1-11
+apps/construction-management/app/api/construction/labour/labours/[id]/photo/remove/route.ts
+  s_ec41e28a857a0b::t_74d7f89de71ade 1-8
+apps/construction-management/app/api/construction/labour/labours/[id]/photo/route.ts
+  s_ec41e28a857a0b::t_ab2d94258fa179 1-11
+apps/construction-management/app/api/construction/labour/labours/[id]/route.ts
+  s_ec41e28a857a0b::t_299c947ebb792c 1-30
+apps/construction-management/app/api/construction/labour/labours/[id]/transfers/route.ts
+  s_ec41e28a857a0b::t_e1c5ef810db982 1-39
+apps/construction-management/app/api/construction/labour/labours/[id]/update/route.ts
+  s_ec41e28a857a0b::t_00d9ad1a9f4e76 1-47
+apps/construction-management/app/api/construction/labour/labours/export/route.ts
+  s_ec41e28a857a0b::t_0f17b161dac495 1-54
+apps/construction-management/app/api/construction/labour/labours/handlers.ts
+  s_ec41e28a857a0b::t_bb85055a0d93e2 1-14
+apps/construction-management/app/api/construction/labour/labours/import-template/route.ts
+  s_ec41e28a857a0b::t_eab50d8587fce2 1-43
+apps/construction-management/app/api/construction/labour/labours/import/route.ts
+  s_ec41e28a857a0b::t_3732e794b0c7ef 1-56
+apps/construction-management/app/api/construction/labour/labours/labour-models.ts
+  s_ec41e28a857a0b::t_1a44f8cdf2a706 1-291
+apps/construction-management/app/api/construction/labour/labours/labour-openapi.ts
+  s_ec41e28a857a0b::t_3221272c8fc678 1-241
+apps/construction-management/app/api/construction/labour/labours/labours.http.test.ts
+  s_ec41e28a857a0b::t_ce84b9adc3d106 1-1039
+apps/construction-management/app/api/construction/labour/labours/options/route.ts
+  s_ec41e28a857a0b::t_3bf4cf4bcbcca9 1-55
+apps/construction-management/app/api/construction/labour/labours/route.ts
+  s_ec41e28a857a0b::t_dd0db5b99adf94 1-87
+apps/construction-management/app/api/construction/labour/labours/transfer/route.ts
+  s_ec41e28a857a0b::t_6040504b5a4220 1-43
+apps/construction-management/app/api/construction/labour/vendors/[id]/activate/route.ts
+  s_ec41e28a857a0b::t_28f7907347a553 1-38
+apps/construction-management/app/api/construction/labour/vendors/[id]/deactivate/route.ts
+  s_ec41e28a857a0b::t_63a3e43acad4dd 1-38
+apps/construction-management/app/api/construction/labour/vendors/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_d33b2f4b9be34b 1-35
+apps/construction-management/app/api/construction/labour/vendors/[id]/documents/[docId]/delete/route.ts
+  s_ec41e28a857a0b::t_8b843a1e2033f4 1-8
+apps/construction-management/app/api/construction/labour/vendors/[id]/documents/[docId]/route.ts
+  s_ec41e28a857a0b::t_6802415729e6c1 1-8
+apps/construction-management/app/api/construction/labour/vendors/[id]/documents/route.ts
+  s_ec41e28a857a0b::t_2d5915aeec667d 1-11
+apps/construction-management/app/api/construction/labour/vendors/[id]/photo/remove/route.ts
+  s_ec41e28a857a0b::t_1de3da14d56925 1-8
+apps/construction-management/app/api/construction/labour/vendors/[id]/photo/route.ts
+  s_ec41e28a857a0b::t_ccb8985881b126 1-11
+apps/construction-management/app/api/construction/labour/vendors/[id]/route.ts
+  s_ec41e28a857a0b::t_b68c81fe7062a2 1-32
+apps/construction-management/app/api/construction/labour/vendors/[id]/update/route.ts
+  s_ec41e28a857a0b::t_0b5477a1473874 1-54
+apps/construction-management/app/api/construction/labour/vendors/[id]/update/update-vendor-request-model.ts
+  s_ec41e28a857a0b::t_cec379fcb2d3f9 1-13
+apps/construction-management/app/api/construction/labour/vendors/[id]/vendor-params-model.ts
+  s_ec41e28a857a0b::t_9929a62e1bfa52 1-5
+apps/construction-management/app/api/construction/labour/vendors/create-vendor-request-model.ts
+  s_ec41e28a857a0b::t_2db398ab8098e9 1-10
+apps/construction-management/app/api/construction/labour/vendors/handlers.ts
+  s_ec41e28a857a0b::t_b05d697d09eb01 1-14
+apps/construction-management/app/api/construction/labour/vendors/list-vendors-request-model.ts
+  s_ec41e28a857a0b::t_ee17993475e38e 1-17
+apps/construction-management/app/api/construction/labour/vendors/list-vendors-response-model.ts
+  s_ec41e28a857a0b::t_307341a5b610a1 1-14
+apps/construction-management/app/api/construction/labour/vendors/options/list-vendor-options-request-model.ts
+  s_ec41e28a857a0b::t_4c5b8fe8c2f7e9 1-5
+apps/construction-management/app/api/construction/labour/vendors/options/list-vendor-options-response-model.ts
+  s_ec41e28a857a0b::t_c136b0505a60af 1-11
+apps/construction-management/app/api/construction/labour/vendors/options/route.ts
+  s_ec41e28a857a0b::t_3d9370be290364 1-41
+apps/construction-management/app/api/construction/labour/vendors/route.ts
+  s_ec41e28a857a0b::t_be98b8cadeecd2 1-94
+apps/construction-management/app/api/construction/labour/vendors/vendor-models.ts
+  s_ec41e28a857a0b::t_e0d862c2e15233 1-201
+apps/construction-management/app/api/construction/labour/vendors/vendor-openapi.ts
+  s_ec41e28a857a0b::t_48c9dfc76951bd 1-152
+apps/construction-management/app/api/construction/labour/vendors/vendors.http.test.ts
+  s_ec41e28a857a0b::t_a47b64ed49fc0e 1-795
+apps/construction-management/app/app/masters/labours/[id]/page.tsx
+  s_ec41e28a857a0b::t_57ba653de55f83 1-14
+apps/construction-management/app/app/masters/labours/new/page.tsx
+  s_ec41e28a857a0b::t_6b735f09b03a85 1-9
+apps/construction-management/app/app/masters/labours/page.tsx
+  s_ec41e28a857a0b::t_da59edc1ba33fc 1-9
+apps/construction-management/app/app/masters/vendors/[id]/page.tsx
+  s_ec41e28a857a0b::t_25751f176c2960 1-14
+apps/construction-management/app/app/masters/vendors/new/page.tsx
+  s_ec41e28a857a0b::t_90c5b67ba7a4f9 1-9
+apps/construction-management/app/app/masters/vendors/page.tsx
+  s_ec41e28a857a0b::t_9de6aa449ed038 1-9
+apps/construction-management/components/labours/import-dialog.stories.tsx
+  s_ec41e28a857a0b::t_4b8e2cb8c544b9 1-139
+apps/construction-management/components/labours/import-dialog.tsx
+  s_ec41e28a857a0b::t_0119cd7e77202f 1-259
+apps/construction-management/components/labours/labour-files.tsx
+  s_ec41e28a857a0b::t_cbbc8273048659 1-179
+apps/construction-management/components/labours/labour-fixtures.ts
+  s_ec41e28a857a0b::t_4800d7e488c66e 1-189
+apps/construction-management/components/labours/labour-form-schema.ts
+  s_ec41e28a857a0b::t_1966f941c0c41e 1-269
+apps/construction-management/components/labours/labour-form.stories.tsx
+  s_ec41e28a857a0b::t_5c9f6aaae87784 1-288
+apps/construction-management/components/labours/labour-form.tsx
+  s_ec41e28a857a0b::t_ab7ba001a4f332 1-604
+apps/construction-management/components/labours/labours-page.stories.tsx
+  s_ec41e28a857a0b::t_4e0e0fdcaf34ce 1-216
+apps/construction-management/components/labours/labours-page.tsx
+  s_ec41e28a857a0b::t_d5e2394141f866 1-641
+apps/construction-management/components/labours/transfer-dialog.stories.tsx
+  s_ec41e28a857a0b::t_3c6e8dbe9ca9af 1-125
+apps/construction-management/components/labours/transfer-dialog.tsx
+  s_ec41e28a857a0b::t_efdb26d6c98e80 1-234
+apps/construction-management/components/labours/transfer-history-sheet.tsx
+  s_ec41e28a857a0b::t_1afd8e934ba2e4 1-88
+apps/construction-management/components/money/money-input.tsx
+  s_ec41e28a857a0b::t_7979c3186a0d8e 1-77
+apps/construction-management/components/vendors/rate-card-editor.tsx
+  s_ec41e28a857a0b::t_13fc1991af9133 1-298
+apps/construction-management/components/vendors/vendor-fixtures.ts
+  s_ec41e28a857a0b::t_7261f059211ed9 1-133
+apps/construction-management/components/vendors/vendor-form-schema.ts
+  s_ec41e28a857a0b::t_4d3aa6c01489a3 1-272
+apps/construction-management/components/vendors/vendor-form.stories.tsx
+  s_ec41e28a857a0b::t_53b87e3f1fc82d 1-438
+apps/construction-management/components/vendors/vendor-form.tsx
+  s_ec41e28a857a0b::t_4ec8a94d114ac4 1-316
+apps/construction-management/components/vendors/vendors-page.stories.tsx
+  s_ec41e28a857a0b::t_f39911a259ad7f 1-131
+apps/construction-management/components/vendors/vendors-page.tsx
+  s_ec41e28a857a0b::t_6ed8a4d1c6d967 1-455
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_8534fcecd337b1 275-279,307,311-316
+apps/construction-management/src/labour/application/labour-columns.ts
+  s_ec41e28a857a0b::t_49e380972b0f43 1-122
+apps/construction-management/src/labour/application/labour-fakes.ts
+  s_ec41e28a857a0b::t_8e98702e36fbdd 1-269
+apps/construction-management/src/labour/application/labour-handlers.test.ts
+  s_ec41e28a857a0b::t_6f9ecd03674724 1-209
+apps/construction-management/src/labour/application/labour-handlers.ts
+  s_ec41e28a857a0b::t_f335b227bf6c10 1-543
+apps/construction-management/src/labour/application/labour-import.test.ts
+  s_ec41e28a857a0b::t_4ac1a8cafbc408 1-141
+apps/construction-management/src/labour/application/labour-import.ts
+  s_ec41e28a857a0b::t_dd15c45e9100e6 1-378
+apps/construction-management/src/labour/application/labour-ports.ts
+  s_ec41e28a857a0b::t_b536367ad1217a 1-159
+apps/construction-management/src/labour/application/party-files.test.ts
+  s_ec41e28a857a0b::t_24f4bfa5ffd774 1-171
+apps/construction-management/src/labour/application/party-files.ts
+  s_ec41e28a857a0b::t_dfd7d4eccdaa19 1-347
+apps/construction-management/src/labour/application/vendor-handlers.ts
+  s_ec41e28a857a0b::t_0bfa5fe494790b 1-423
+apps/construction-management/src/labour/domain/labour-attendance.test.ts
+  s_ec41e28a857a0b::t_80bf1d2a7c2de8 97,100,102
+apps/construction-management/src/labour/domain/labour.test.ts
+  s_ec41e28a857a0b::t_dcda726ab4a45a 1-239
+apps/construction-management/src/labour/domain/labour.ts
+  s_ec41e28a857a0b::t_0e12f4b40e823c 1-449
+apps/construction-management/src/labour/domain/vendor.test.ts
+  s_ec41e28a857a0b::t_0420424604cada 1-264
+apps/construction-management/src/labour/domain/vendor.ts
+  s_ec41e28a857a0b::t_94235cddd9f178 1-431
+apps/construction-management/src/labour/infrastructure/create-labour-handlers.ts
+  s_ec41e28a857a0b::t_2aa7abd1009b81 1-42
+apps/construction-management/src/labour/infrastructure/create-vendor-handlers.ts
+  s_ec41e28a857a0b::t_926a7b48323360 1-15
+apps/construction-management/src/labour/infrastructure/labour-project-on.ts
+  s_ec41e28a857a0b::t_3330ed336f02e8 1-50
+apps/construction-management/src/labour/infrastructure/labour-workbook.ts
+  s_ec41e28a857a0b::t_79e34f3e01fede 1-275
+apps/construction-management/src/labour/infrastructure/prisma-labour-queries.ts
+  s_ec41e28a857a0b::t_f414f9d578ede9 1-319
+apps/construction-management/src/labour/infrastructure/prisma-labour-repository.ts
+  s_ec41e28a857a0b::t_bb5fe641a3d20c 1-430
+apps/construction-management/src/labour/infrastructure/prisma-party-files-store.ts
+  s_ec41e28a857a0b::t_c824da71e623e2 1-166
+apps/construction-management/src/labour/infrastructure/prisma-vendor-store.ts
+  s_ec41e28a857a0b::t_3f4cb90fe59502 1-486
+apps/construction-management/src/labour/infrastructure/private-data-cipher.ts
+  s_ec41e28a857a0b::t_44e2f10e352543 1-9
+apps/construction-management/src/queries/labours.ts
+  s_ec41e28a857a0b::t_e9bec14710a97e 1-235
+apps/construction-management/src/shared-kernel/files/document-file.test.ts
+  s_ec41e28a857a0b::t_a845b4044d7dbe 1-50
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_498b95e5cf9535::t_7b21df46c8230a 77-84,764-771
+apps/construction-management/lib/masters-nav.ts
+  s_c5a10e8eccceac::t_d3026ea9a291b1 4,7,72-87
+apps/construction-management/src/queries/vendors.ts
+  s_6ed4f486369998::t_9d8a3510ff07d5 1-136
+apps/construction-management/src/shared-kernel/files/document-file.ts
+  s_892449e9d04a63::t_93bae7fe9c74b8 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "caf0bef17b2112d55b614111406fa95dc4334e28",
+  "prompts": {},
+  "sessions": {
+    "s_498b95e5cf9535": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac06296bf98678c51",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6ed4f486369998": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad3339b49b9c1e87d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_892449e9d04a63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a1901b1f99caa2166",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c5a10e8eccceac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa7f1613d2219e682",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
