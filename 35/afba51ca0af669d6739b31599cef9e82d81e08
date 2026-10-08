@@ -1,0 +1,41 @@
+apps/construction-management/docs/03-target-architecture.md
+  s_ec41e28a857a0b::t_607e62e98b66f1 53,170
+apps/construction-management/docs/README.md
+  s_ec41e28a857a0b::t_7c0f08fc48e526 23-37
+apps/construction-management/docs/adr/CM-0004-ledger-first-balances.md
+  s_ec41e28a857a0b::t_299b1672662d4f 1-30
+apps/construction-management/docs/modules/02-master-records.md
+  s_ec41e28a857a0b::t_e146eb7ad45fb1 191
+apps/construction-management/docs/modules/08-labour-vendor-attendance.md
+  s_ec41e28a857a0b::t_d7dd1790a1e181 505-564
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_36eca5de44a4ef 271-272
+apps/construction-management/src/masters/infrastructure/seeds/masters.json
+  s_ec41e28a857a0b::t_9a796134dcba9c 1-69
+packages/db/prisma/migrations/20261010010000_construction_site_workforce/migration.sql
+  s_ec41e28a857a0b::t_3093851a19126f 1-550
+packages/db/prisma/schema/base.prisma
+  s_ec41e28a857a0b::t_1208526230a34b 10
+packages/db/prisma/schema/construction-labour.prisma
+  s_ec41e28a857a0b::t_33e1d04598678f 1-420
+packages/db/prisma/schema/construction-masters.prisma
+  s_ec41e28a857a0b::t_f08c9ebfa0ff21 1-70
+packages/db/prisma/schema/construction-projects.prisma
+  s_ec41e28a857a0b::t_4145014a6b9923 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "35afba51ca0af669d6739b31599cef9e82d81e08",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
