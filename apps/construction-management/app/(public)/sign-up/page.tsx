@@ -1,15 +1,19 @@
+import { getCompanyAuth } from "@repo/auth/construction/server";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { AuthHeading } from "@/components/auth/auth-heading";
+import { SignUpForm } from "@/components/auth/sign-up-form";
+import { continuePath } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = { title: "Sign up" };
 
-/** Mobile OTP and email sign-up arrive with CM-103. */
-export default function SignUpPage() {
-  return (
-    <AuthHeading
-      title="Create your account"
-      description="Sign up with your mobile number. Coming in the next release."
-    />
-  );
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string }>;
+}) {
+  const { redirect_url: redirectUrl = null } = await searchParams;
+  const auth = await getCompanyAuth();
+  if (auth.isAuthenticated) redirect(continuePath(redirectUrl));
+  return <SignUpForm redirectUrl={redirectUrl} />;
 }

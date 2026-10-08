@@ -62,6 +62,8 @@ export async function getCompanyAuthFromHeaders(
       name: user.name,
       email: user.email,
       emailVerified: user.emailVerified,
+      phoneNumber:
+        user.phoneNumberVerified === true ? (user.phoneNumber ?? null) : null,
       image: user.image ?? null,
     },
   };

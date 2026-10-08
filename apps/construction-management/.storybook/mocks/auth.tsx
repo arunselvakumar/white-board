@@ -37,9 +37,15 @@ export type AuthMockState = {
   role: CompanyRole | null;
   user: CompanyAuthUser | null;
   companies: CompanySummary[];
+  mobileOtp: {
+    sendCode: Action<[string]>;
+    verifyCode: Action<[{ mobile: string; code: string }]>;
+    setName: Action<[string]>;
+  };
   emailSignIn: Action<[{ email: string; password: string }]>;
   emailSignUp: {
     create: Action<[{ name: string; email: string; password: string }]>;
+    sendEmailCode: Action<[string]>;
     verifyEmailCode: Action<[{ email: string; code: string }]>;
   };
   setActive: Action<[string, string]>;
@@ -63,6 +69,7 @@ export const storyUser: CompanyAuthUser = {
   name: "Ramesh Patil",
   email: "ramesh@patilbuilders.in",
   emailVerified: true,
+  phoneNumber: "+919876543210",
   image: null,
 };
 
@@ -77,9 +84,15 @@ function createState(): AuthMockState {
     role: null,
     user: null,
     companies: [],
+    mobileOtp: {
+      sendCode: action("mobileOtp.sendCode"),
+      verifyCode: action("mobileOtp.verifyCode"),
+      setName: action("mobileOtp.setName"),
+    },
     emailSignIn: action("emailSignIn"),
     emailSignUp: {
       create: action("emailSignUp.create"),
+      sendEmailCode: action("emailSignUp.sendEmailCode"),
       verifyEmailCode: action("emailSignUp.verifyEmailCode"),
     },
     setActive: action("setActive"),
@@ -194,6 +207,41 @@ export function useCompanyList() {
   };
 }
 
+export {
+  formatMobile,
+  isPlaceholderEmail,
+  isValidMobile,
+  normalizeMobile,
+} from "@repo/auth/construction/mobile";
+
+export function useCompanyMobileOtp() {
+  const send = useMockAction((mobile: string) =>
+    authMocks.mobileOtp.sendCode(mobile),
+  );
+  const verify = useMockAction((input: { mobile: string; code: string }) =>
+    authMocks.mobileOtp.verifyCode(input),
+  );
+  const name = useMockAction((value: string) =>
+    authMocks.mobileOtp.setName(value),
+  );
+  return {
+    sendCode: send.run,
+    verifyCode: verify.run,
+    setName: name.run,
+    fetchStatus: [send, verify, name].some(
+      (hook) => hook.fetchStatus === "fetching",
+    )
+      ? ("fetching" as const)
+      : ("idle" as const),
+    error: verify.error ?? send.error ?? name.error,
+    clearError: () => {
+      send.clearError();
+      verify.clearError();
+      name.clearError();
+    },
+  };
+}
+
 export function useCompanyEmailSignIn() {
   const { run, fetchStatus, error, clearError } = useMockAction(
     (input: { email: string; password: string }) =>
@@ -207,19 +255,25 @@ export function useCompanyEmailSignUp() {
     (input: { name: string; email: string; password: string }) =>
       authMocks.emailSignUp.create(input),
   );
+  const resend = useMockAction((email: string) =>
+    authMocks.emailSignUp.sendEmailCode(email),
+  );
   const verify = useMockAction((input: { email: string; code: string }) =>
     authMocks.emailSignUp.verifyEmailCode(input),
   );
   return {
     create: create.run,
+    sendEmailCode: resend.run,
     verifyEmailCode: verify.run,
-    fetchStatus:
-      create.fetchStatus === "fetching" || verify.fetchStatus === "fetching"
-        ? ("fetching" as const)
-        : ("idle" as const),
-    error: create.error ?? verify.error,
+    fetchStatus: [create, resend, verify].some(
+      (hook) => hook.fetchStatus === "fetching",
+    )
+      ? ("fetching" as const)
+      : ("idle" as const),
+    error: verify.error ?? create.error ?? resend.error,
     clearError: () => {
       create.clearError();
+      resend.clearError();
       verify.clearError();
     },
   };

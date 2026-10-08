@@ -1,15 +1,19 @@
+import { getCompanyAuth } from "@repo/auth/construction/server";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { AuthHeading } from "@/components/auth/auth-heading";
+import { SignInForm } from "@/components/auth/sign-in-form";
+import { continuePath } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-/** Mobile OTP and email sign-in arrive with CM-103. */
-export default function SignInPage() {
-  return (
-    <AuthHeading
-      title="Sign in"
-      description="Sign in with your mobile number. Coming in the next release."
-    />
-  );
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string }>;
+}) {
+  const { redirect_url: redirectUrl = null } = await searchParams;
+  const auth = await getCompanyAuth();
+  if (auth.isAuthenticated) redirect(continuePath(redirectUrl));
+  return <SignInForm redirectUrl={redirectUrl} />;
 }

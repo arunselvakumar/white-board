@@ -8,12 +8,17 @@ import { GetCompanyProfileHandler } from "./get-company-profile";
 const profile: CompanyProfile = {
   id: "0199c3a0-0000-7000-8000-000000000001",
   workspaceId: "company-a",
+  name: "Patil Builders",
+  mobile: null,
+  email: null,
+  country: "IN",
   gstin: null,
   pan: null,
   address: null,
   currency: "INR",
   isIndian: true,
   timezone: "Asia/Kolkata",
+  logoKey: null,
   createdAt: new Date("2026-10-08T00:00:00Z"),
   updatedAt: new Date("2026-10-08T00:00:00Z"),
 };

@@ -1,11 +1,18 @@
 "use client";
 
 import {
+  useCompanyAuth,
   useCompanySignOut,
   useCompanyUser,
 } from "@repo/auth/construction/react";
-import { LogOut } from "lucide-react";
-import { Avatar, AvatarFallback } from "@repo/ui/components/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { CreditCard, LogOut, UserRound } from "lucide-react";
+import Link from "next/link";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -17,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 
+import { myProfileQuery } from "@/src/queries/my-profile";
+
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const letters = parts.length > 1 ? [parts[0], parts.at(-1)] : [parts[0]];
@@ -26,11 +35,22 @@ export function initials(name: string): string {
     .toUpperCase();
 }
 
-/** The signed-in User's name and email, and Sign out. */
-export function UserMenu() {
+/**
+ * The signed-in User's name and email, My Profile and Sign out. The avatar
+ * shows their My Profile photo in the Active Company when they have one;
+ * pass `photoUrl` to skip loading it (null for initials).
+ */
+export function UserMenu({ photoUrl }: { photoUrl?: string | null } = {}) {
   const { user } = useCompanyUser();
+  const { workspaceId } = useCompanyAuth();
   const { signOut, fetchStatus } = useCompanySignOut();
+  const { data: me } = useQuery({
+    ...myProfileQuery,
+    enabled: photoUrl === undefined && user != null && workspaceId != null,
+    retry: false,
+  });
   if (user == null) return null;
+  const photo = photoUrl === undefined ? (me?.photoUrl ?? null) : photoUrl;
   const displayName =
     user.name.trim().length > 0 ? user.name.trim() : user.email;
 
@@ -47,6 +67,7 @@ export function UserMenu() {
         }
       >
         <Avatar className="size-8">
+          {photo != null && <AvatarImage src={photo} alt="" />}
           <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
             {initials(displayName) || "?"}
           </AvatarFallback>
@@ -63,6 +84,15 @@ export function UserMenu() {
             </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem render={<Link href="/app/profile" />}>
+          <UserRound />
+          My Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href="/app/subscription" />}>
+          <CreditCard />
+          Your Subscription
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           disabled={fetchStatus === "fetching"}

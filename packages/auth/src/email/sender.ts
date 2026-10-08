@@ -1,6 +1,8 @@
 import type { RenderedEmail } from "@repo/email-templates";
 import { Resend } from "resend";
 
+import { isLiveProduction } from "../runtime";
+
 /** One email to one recipient. */
 export type OutgoingEmail = RenderedEmail & { to: string };
 
@@ -79,7 +81,7 @@ class MailpitSender implements EmailSender {
 
 /** Codes and links must never reach production logs or memory. */
 function assertNotProduction(transport: EmailTransport): void {
-  if (process.env["NODE_ENV"] === "production")
+  if (isLiveProduction())
     throw new Error(
       `EMAIL_TRANSPORT=${transport} is for development and tests only.`,
     );

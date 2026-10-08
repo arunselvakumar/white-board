@@ -32,6 +32,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# files stored on disk when BLOB_READ_WRITE_TOKEN is not set (CM-115)
+/.blob-local
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

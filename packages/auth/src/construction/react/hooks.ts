@@ -59,6 +59,42 @@ export function useCompanyList() {
   return { companies, setActive, fetchStatus, error };
 }
 
+/**
+ * Mobile OTP sign-in and sign-up (ADR CM-0002): send a code, then verify it.
+ * Verifying an unknown number creates the User and signs them in.
+ */
+export function useCompanyMobileOtp() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+
+  const sendCode = useCallback(
+    (mobile: string) =>
+      run(() =>
+        constructionAuthClient().phoneNumber.sendOtp({ phoneNumber: mobile }),
+      ),
+    [run],
+  );
+
+  const verifyCode = useCallback(
+    (input: { mobile: string; code: string }) =>
+      run(() =>
+        constructionAuthClient().phoneNumber.verify({
+          phoneNumber: input.mobile,
+          code: input.code.trim(),
+        }),
+      ),
+    [run],
+  );
+
+  /** Names a User who signed up by mobile (their name starts as the number). */
+  const setName = useCallback(
+    (name: string) =>
+      run(() => constructionAuthClient().updateUser({ name: name.trim() })),
+    [run],
+  );
+
+  return { sendCode, verifyCode, setName, fetchStatus, error, clearError };
+}
+
 /** Email and password sign-in (the secondary path; mobile OTP is primary). */
 export function useCompanyEmailSignIn() {
   const { run, fetchStatus, error, clearError } = useAuthAction();
@@ -91,6 +127,17 @@ export function useCompanyEmailSignUp() {
     [run],
   );
 
+  const sendEmailCode = useCallback(
+    (email: string) =>
+      run(() =>
+        constructionAuthClient().emailOtp.sendVerificationOtp({
+          email: email.trim(),
+          type: "email-verification",
+        }),
+      ),
+    [run],
+  );
+
   /** Verifies the email and signs the User in. */
   const verifyEmailCode = useCallback(
     (input: { email: string; code: string }) =>
@@ -103,7 +150,14 @@ export function useCompanyEmailSignUp() {
     [run],
   );
 
-  return { create, verifyEmailCode, fetchStatus, error, clearError };
+  return {
+    create,
+    sendEmailCode,
+    verifyEmailCode,
+    fetchStatus,
+    error,
+    clearError,
+  };
 }
 
 export function useCompanySignOut() {

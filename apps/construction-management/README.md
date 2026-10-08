@@ -7,7 +7,7 @@ The rebuild of BuildControl for Indian builders and contractors, as its own Next
 ```sh
 bun install
 docker compose up -d              # Postgres (construction, construction_test), Mailpit
-cp apps/construction-management/.env.example apps/construction-management/.env   # then fill BETTER_AUTH_SECRET
+cp apps/construction-management/.env.example apps/construction-management/.env   # fill BETTER_AUTH_SECRET and CONSTRUCTION_PRIVATE_DATA_KEY; OTP_TEST_CODE=000000 signs any mobile in locally
 DATABASE_URL=postgresql://whiteboard:whiteboard@localhost:5433/construction bun run --filter @repo/db migrate:deploy
 bun run dev --filter=construction-management   # http://localhost:3002
 ```
@@ -22,5 +22,7 @@ bun run --cwd apps/construction-management test:http      # HTTP tests on constr
 bun run --cwd apps/construction-management test-storybook # Storybook play functions
 bun run --cwd apps/construction-management storybook      # http://localhost:6007
 ```
+
+Sign in at http://localhost:3002/sign-in with any +91 mobile; the code is printed in the server log (`SMS_TRANSPORT=log`). Files go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set, otherwise to `apps/construction-management/.blob-local`.
 
 APIs: http://localhost:3002/api/docs

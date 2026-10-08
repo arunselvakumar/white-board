@@ -1,3 +1,4 @@
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -21,11 +22,7 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: [
-            "src/**/*.test.ts",
-            "lib/**/*.test.ts",
-            "app/api/**/*.test.ts",
-          ],
+          include: ["src/**/*.test.ts", "lib/**/*.test.ts", "app/**/*.test.ts"],
           exclude: ["**/*.http.test.ts"],
         },
       },
@@ -34,12 +31,29 @@ export default defineConfig({
         test: {
           name: "http",
           environment: "node",
-          include: ["app/api/**/*.http.test.ts", "src/**/*.http.test.ts"],
+          include: ["app/**/*.http.test.ts", "src/**/*.http.test.ts"],
           env: {
             DATABASE_URL: TEST_DATABASE_URL,
             BETTER_AUTH_SECRET: "http-tests-only-secret-0123456789abcdef",
             BETTER_AUTH_URL: "http://localhost:3002",
             EMAIL_TRANSPORT: "outbox",
+            SMS_TRANSPORT: "outbox",
+            OTP_TEST_CODE: "246810",
+            // Per-IP limits off; the per-mobile OTP limit always applies.
+            AUTH_RATE_LIMIT: "off",
+            CONSTRUCTION_PRIVATE_DATA_KEY:
+              "aHR0cC10ZXN0cy1vbmx5LXByaXZhdGUtZGF0YS1rZXk=",
+            // Files go to disk, never to Vercel Blob (CM-115).
+            BLOB_READ_WRITE_TOKEN: "",
+            BLOB_LOCAL_DIR: path.join(
+              os.tmpdir(),
+              "construction-blob-http-tests",
+            ),
+            // Webhook tests sign bodies with this; checkout uses a fake gateway.
+            RAZORPAY_WEBHOOK_SECRET: "http-tests-only-razorpay-webhook-secret",
+            RAZORPAY_KEY_ID: "",
+            RAZORPAY_KEY_SECRET: "",
+            CONSTRUCTION_SELLER_STATE_CODE: "27",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.

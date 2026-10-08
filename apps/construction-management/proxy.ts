@@ -2,7 +2,7 @@ import { hasCompanySessionCookie } from "@repo/auth/construction/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 
 /** Screens a signed-out visitor may open. */
-const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up"]);
+const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up", "/continue"]);
 
 /**
  * The page gate: no session cookie → Sign in with a redirect URL. It never
@@ -12,7 +12,7 @@ const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up"]);
 export default function proxy(request: NextRequest): NextResponse | undefined {
   const { pathname } = request.nextUrl;
   if (pathname === "/api" || pathname.startsWith("/api/")) return;
-  if (PUBLIC_PATHS.has(pathname)) return;
+  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith("/join/")) return;
   if (hasCompanySessionCookie(request.headers)) return;
 
   const signIn = new URL("/sign-in", request.url);

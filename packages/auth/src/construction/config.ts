@@ -1,4 +1,5 @@
 import { prisma } from "@repo/db";
+import { renderCompanyCodeEmail } from "@repo/email-templates";
 import type { BetterAuthOptions } from "better-auth";
 import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -12,7 +13,8 @@ import {
   CONSTRUCTION_COOKIE_PREFIX,
   CONSTRUCTION_LOCAL_ORIGIN,
 } from "./constants";
-import { renderCompanyCodeEmail } from "./emails";
+import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
+import { createSmsSender, type SmsSender } from "./sms";
 import {
   COMPANY_WORKSPACE_KIND,
   companyAccessControl,
@@ -37,6 +39,9 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-out",
   "/sign-up/email",
   "/sign-in/email",
+  "/phone-number/send-otp",
+  "/phone-number/verify",
+  "/update-user",
   "/email-otp/send-verification-otp",
   "/email-otp/verify-email",
   "/email-otp/request-password-reset",
@@ -46,7 +51,20 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/organization/get-active-member",
 ];
 
+/**
+ * The origin links (invites, sign-in callbacks) point at. A preview uses its
+ * own branch URL rather than the production domain.
+ */
 export function constructionOrigin(): string {
+  const configured = process.env["BETTER_AUTH_URL"];
+  const branch = process.env["VERCEL_BRANCH_URL"];
+  if (
+    (configured == null || configured.length === 0) &&
+    process.env["VERCEL_ENV"] === "preview" &&
+    branch != null &&
+    branch.length > 0
+  )
+    return `https://${branch}`;
   return appOrigin(CONSTRUCTION_LOCAL_ORIGIN);
 }
 
@@ -65,6 +83,7 @@ function requiredSecret(): string | undefined {
  */
 export function createConstructionAuthOptions(
   email: EmailSender = createEmailSender(),
+  sms: SmsSender = createSmsSender(),
 ) {
   return {
     appName: "Construction Management",
@@ -108,10 +127,14 @@ export function createConstructionAuthOptions(
         "/email-otp/verify-email": { window: 60, max: 10 },
         "/email-otp/request-password-reset": { window: 60, max: 3 },
         "/email-otp/reset-password": { window: 60, max: 10 },
+        "/phone-number/send-otp": { window: 60, max: 5 },
+        "/phone-number/verify": { window: 60, max: 10 },
       },
     },
     plugins: [
       allowedPaths("construction-allowed-paths", CONSTRUCTION_AUTH_PATHS),
+      perMobileOtpLimit(),
+      mobileOtp(sms),
       emailOTP({
         overrideDefaultEmailVerification: true,
         sendVerificationOnSignUp: true,
@@ -125,7 +148,7 @@ export function createConstructionAuthOptions(
             throw new APIError("BAD_REQUEST", {
               message: "This code type is not available.",
             });
-          const rendered = renderCompanyCodeEmail({
+          const rendered = await renderCompanyCodeEmail({
             code: otp,
             purpose:
               type === "email-verification" ? "verify-email" : "reset-password",
