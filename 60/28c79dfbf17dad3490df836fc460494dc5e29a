@@ -1,0 +1,101 @@
+apps/construction-management/.env.example
+  s_25a30b12f62554::t_19beb146de3824 40-57
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_6fdb08d43d5221 9-20,45-54,101-200
+apps/construction-management/app/api/_lib/openapi.ts
+  s_9c3f172fe92a46::t_98bbd75d3769d2 70
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/route.ts
+  s_25a30b12f62554::t_c33f951e8496b4 1-34
+apps/construction-management/app/api/construction/organization/subscription/checkout/route.ts
+  s_25a30b12f62554::t_37821834dcc8f4 1-60
+apps/construction-management/app/api/construction/organization/subscription/checkout/start-checkout-request-model.ts
+  s_25a30b12f62554::t_c39a3956d047f1 1-15
+apps/construction-management/app/api/construction/organization/subscription/checkout/start-checkout-response-model.ts
+  s_25a30b12f62554::t_458034fcd2e9a4 1-19
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/route.ts
+  s_25a30b12f62554::t_76dd879c45dc08 1-44
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/verify-checkout-request-model.ts
+  s_25a30b12f62554::t_f52c161fcac04c 1-12
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/verify-checkout-response-model.ts
+  s_25a30b12f62554::t_8f4c603de004d5 1-11
+apps/construction-management/app/api/construction/organization/subscription/invoices/[id]/pdf/get-invoice-pdf-params-model.ts
+  s_9c3f172fe92a46::t_ddd3080adf9253 1-9
+apps/construction-management/app/api/construction/organization/subscription/invoices/[id]/pdf/route.ts
+  s_9c3f172fe92a46::t_bc4562635c4b9c 1-41
+apps/construction-management/app/api/construction/organization/subscription/invoices/list-invoices-request-model.ts
+  s_9c3f172fe92a46::t_85ccd2d1e4b17f 1-16
+apps/construction-management/app/api/construction/organization/subscription/invoices/list-invoices-response-model.ts
+  s_9c3f172fe92a46::t_6bdb66cb1b937a 1-26
+apps/construction-management/app/api/construction/organization/subscription/invoices/route.ts
+  s_25a30b12f62554::t_0101510dff7b22 1-90
+apps/construction-management/app/api/webhooks/razorpay/razorpay-webhook-response-model.ts
+  s_9c3f172fe92a46::t_3ac616146a63ed 1-14
+apps/construction-management/app/api/webhooks/razorpay/route.ts
+  s_9c3f172fe92a46::t_c18b861d147d0d 1-40
+apps/construction-management/app/app/subscription/checkout/page.tsx
+  s_25a30b12f62554::t_5961312f43173e 1-15
+apps/construction-management/app/app/subscription/page.tsx
+  s_25a30b12f62554::t_61b1f477713d09 1-9
+apps/construction-management/components/subscription/checkout-wizard.stories.tsx
+  s_25a30b12f62554::t_68300b379f3b3c 1-222
+apps/construction-management/components/subscription/checkout-wizard.tsx
+  s_25a30b12f62554::t_2d0635be1e8819 1-828
+apps/construction-management/components/subscription/subscription-overview.stories.tsx
+  s_25a30b12f62554::t_23b94d2e3f7776 1-109
+apps/construction-management/components/subscription/subscription-overview.tsx
+  s_25a30b12f62554::t_73b70ae5864225 1-262
+apps/construction-management/components/subscription/subscription-story-fixtures.ts
+  s_25a30b12f62554::t_6747e2658e5828 1-256
+apps/construction-management/components/subscription/subscription-text.ts
+  s_25a30b12f62554::t_d3e20b70a56e50 1-31
+apps/construction-management/lib/razorpay-checkout.ts
+  s_25a30b12f62554::t_ce50626bd1cdb1 1-67
+apps/construction-management/package.json
+  s_25a30b12f62554::t_52397abf3b03d5 28
+apps/construction-management/src/organization/infrastructure/invoice-pdf.ts
+  s_25a30b12f62554::t_20b9fe4227c51d 1-211
+apps/construction-management/src/queries/subscription.ts
+  s_25a30b12f62554::t_b8cc7c41fcef9d 1-62
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_5b966237883308 45-49
+bun.lock
+  s_25a30b12f62554::t_5cb34049ee02dd 29,2000,2106-2141,2166-2171,2188-2199,2204-2205,2226-2227,2246-2249,2266-2267,2306-2313,2324-2327,2332-2337,2342-2343,2346-2349
+turbo.json
+  s_25a30b12f62554::t_f6792f9dd63e83 44-52
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/quote-checkout-request-model.ts
+  s_2316c10137dec8::t_7bf7b48f16f9fd 1-15
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/quote-checkout-response-model.ts
+  s_2316c10137dec8::t_b46136fecf33ee 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6028c79dfbf17dad3490df836fc460494dc5e29a",
+  "prompts": {},
+  "sessions": {
+    "s_2316c10137dec8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a6a9a26b6a25d0bd2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c3f172fe92a46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1436510-6545-4236-9394-8c7f247ccc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
