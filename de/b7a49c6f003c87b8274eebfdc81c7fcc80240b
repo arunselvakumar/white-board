@@ -1,0 +1,151 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_ba903390005fcf 69-72,744-747
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/create-sequence-rule-models.ts
+  s_ec41e28a857a0b::t_cadbf939991f33 15
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/route.ts
+  s_ec41e28a857a0b::t_fd9ae74ad388c4 1,7,9,24,54-57,72-75
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/sequence-rules.http.test.ts
+  s_ec41e28a857a0b::t_052b249adbaba9 11,140-141,151-154
+apps/construction-management/app/api/construction/organization/team-members/[id]/projects/route.ts
+  s_ec41e28a857a0b::t_88b1d58dc5cb98 4,6-9,18-21,41-45
+apps/construction-management/app/api/construction/organization/team-members/handlers.ts
+  s_ec41e28a857a0b::t_23b0ff580aa33b 1-2,4,8-10
+apps/construction-management/app/api/construction/organization/team-members/route.ts
+  s_ec41e28a857a0b::t_bf34f583cdafef 6,13,76-81
+apps/construction-management/app/api/construction/organization/team-members/team-members.http.test.ts
+  s_ec41e28a857a0b::t_4004ce401fd56b 6-11,57-58,66,99,104
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_ec41e28a857a0b::t_dcc188337b72c5 1-10
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_ec41e28a857a0b::t_e1914959422fc2 1-127
+apps/construction-management/app/api/construction/projects/projects/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_a61dba178dbe87 1-31
+apps/construction-management/app/api/construction/projects/projects/[id]/route.ts
+  s_ec41e28a857a0b::t_718d3fe971590c 1-30
+apps/construction-management/app/api/construction/projects/projects/[id]/update/route.ts
+  s_ec41e28a857a0b::t_d624d3196804fd 1-44
+apps/construction-management/app/api/construction/projects/projects/[id]/update/update-project-request-model.ts
+  s_ec41e28a857a0b::t_185f4a607ad21e 1-16
+apps/construction-management/app/api/construction/projects/projects/create-project-request-model.ts
+  s_ec41e28a857a0b::t_47c9b1a316c355 1-10
+apps/construction-management/app/api/construction/projects/projects/list-projects-models.ts
+  s_ec41e28a857a0b::t_add90c9f5dfda9 1-39
+apps/construction-management/app/api/construction/projects/projects/options/list-project-options-response-model.ts
+  s_ec41e28a857a0b::t_f4997ef0aef731 1-18
+apps/construction-management/app/api/construction/projects/projects/options/route.ts
+  s_ec41e28a857a0b::t_84baf7e4fe50e5 1-32
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_ec41e28a857a0b::t_e90491b471a332 1-77
+apps/construction-management/app/api/construction/projects/projects/projects.http.test.ts
+  s_ec41e28a857a0b::t_a5c4846448aaa7 1-540
+apps/construction-management/app/api/construction/projects/projects/route.ts
+  s_ec41e28a857a0b::t_f60597b49de6aa 1-67
+apps/construction-management/app/app/projects/[id]/attendance/page.tsx
+  s_ec41e28a857a0b::t_e29a833f214935 1-16
+apps/construction-management/app/app/projects/[id]/edit/page.tsx
+  s_ec41e28a857a0b::t_5fa1a091f0a911 1-14
+apps/construction-management/app/app/projects/[id]/layout.tsx
+  s_ec41e28a857a0b::t_1fdb634cc98e77 1-15
+apps/construction-management/app/app/projects/[id]/page.tsx
+  s_ec41e28a857a0b::t_d812cc89b77f19 1-14
+apps/construction-management/app/app/projects/[id]/payments/page.tsx
+  s_ec41e28a857a0b::t_ec906365011173 1-16
+apps/construction-management/app/app/projects/[id]/reports/page.tsx
+  s_ec41e28a857a0b::t_28f821c0cad063 1-16
+apps/construction-management/app/app/projects/new/page.tsx
+  s_ec41e28a857a0b::t_1eb3b976df135f 1-9
+apps/construction-management/app/app/projects/page.tsx
+  s_ec41e28a857a0b::t_ed25552c8be44b 3,8
+apps/construction-management/components/projects/project-fixtures.ts
+  s_ec41e28a857a0b::t_85545c543848e5 1-70
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_ec41e28a857a0b::t_861abb9e56563a 1-266
+apps/construction-management/components/projects/project-form.tsx
+  s_ec41e28a857a0b::t_aed737570c86f0 1-364
+apps/construction-management/components/projects/project-overview.tsx
+  s_ec41e28a857a0b::t_86af8ec2e663a6 1-82
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_ec41e28a857a0b::t_848c6c9dc647d4 1-132
+apps/construction-management/components/projects/project-shell.tsx
+  s_ec41e28a857a0b::t_a0f57b779a07b7 1-104
+apps/construction-management/components/projects/projects-home.stories.tsx
+  s_ec41e28a857a0b::t_531d31fde6f518 1-112
+apps/construction-management/components/projects/projects-home.tsx
+  s_ec41e28a857a0b::t_8c10f6712781cc 1-190
+apps/construction-management/components/settings/sequence-ids-manager.stories.tsx
+  s_ec41e28a857a0b::t_c95a4b424ed7d3 36-41,55,59-63,67,69,71-72,150,234-265
+apps/construction-management/components/settings/sequence-ids-manager.tsx
+  s_ec41e28a857a0b::t_7354472be19f1e 42,76,85-93,101,158-160,203-204,256-263
+apps/construction-management/components/settings/sequence-rule-dialog.tsx
+  s_ec41e28a857a0b::t_cc83620116865d 49-50,77,92-93,104-105,111,113-119,126-131,135-138,158-162,236,255,264,266
+apps/construction-management/components/team-members/add-team-member-wizard.stories.tsx
+  s_ec41e28a857a0b::t_66615c72861cf9 65-82,120-122,150
+apps/construction-management/components/team-members/add-team-member-wizard.tsx
+  s_ec41e28a857a0b::t_f7b23e3f97a235 77,112,211-213
+apps/construction-management/components/team-members/edit-team-member.tsx
+  s_ec41e28a857a0b::t_1b18bc0b49ec8b 35,163
+apps/construction-management/components/team-members/projects-step.stories.tsx
+  s_ec41e28a857a0b::t_7da64c7b6398c1 1-121
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_d1aa809f334a20 274,303-304
+apps/construction-management/src/organization/application/project-directory.test.ts
+  s_ec41e28a857a0b::t_7de4dbd3dd9c5f 1-35
+apps/construction-management/src/organization/application/project-directory.ts
+  s_ec41e28a857a0b::t_e3a2e8148030b0 1-27
+apps/construction-management/src/organization/infrastructure/create-subscription-handlers.ts
+  s_ec41e28a857a0b::t_9308c5f1f0183d 19,34
+apps/construction-management/src/organization/infrastructure/prisma-project-directory.ts
+  s_ec41e28a857a0b::t_ab273626a8377b 1-29
+apps/construction-management/src/organization/infrastructure/prisma-usage-reader.ts
+  s_ec41e28a857a0b::t_17bd5de09feddb 1-2,9,14-29
+apps/construction-management/src/projects/application/project-handlers.test.ts
+  s_ec41e28a857a0b::t_bc096050c7b0e1 1-224
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_ec41e28a857a0b::t_29f93bfd5c368e 1-182
+apps/construction-management/src/projects/domain/project.test.ts
+  s_ec41e28a857a0b::t_be18dbd29289b9 1-160
+apps/construction-management/src/projects/domain/project.ts
+  s_ec41e28a857a0b::t_87224030869aa6 1-230
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_ec41e28a857a0b::t_78070ebb7b5de7 1-156
+apps/construction-management/test/companies.ts
+  s_ec41e28a857a0b::t_90a597a05d5fff 183-207
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_01797fdd8fba69::t_08ab7409f5dd38 1-37
+apps/construction-management/src/projects/domain/project-repository.ts
+  s_01797fdd8fba69::t_3687773545a69b 1-36
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_01797fdd8fba69::t_d62c6e3f2a7c55 1-25
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_01797fdd8fba69::t_ea26bc16685087 1-51
+apps/construction-management/components/projects/project-status.tsx
+  s_ec41e28a857a0b::t_ee9ad69924f280 1-66
+apps/construction-management/components/team-members/projects-step.tsx
+  s_ec41e28a857a0b::t_3640ee1700c2c8 1-7,9-12,15,21-124,127-129,131-151,153-182
+apps/construction-management/src/queries/projects.ts
+  s_ec41e28a857a0b::t_d8a7c92ec02eea 1-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "deb7a49c6f003c87b8274eebfdc81c7fcc80240b",
+  "prompts": {},
+  "sessions": {
+    "s_01797fdd8fba69": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae922e64938b9cde0",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
