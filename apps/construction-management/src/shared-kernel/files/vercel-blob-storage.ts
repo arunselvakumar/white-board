@@ -4,11 +4,17 @@ import type { ObjectStorage, StoredObject } from "./object-storage";
 
 /**
  * `ObjectStorage` on Vercel Blob. Every blob is private and stored at its
- * key exactly (no random suffix); reads go through our routes with the
- * store's read-write token, so no blob URL ever reaches a browser.
+ * key exactly (no random suffix); reads go through our routes, so no blob
+ * URL ever reaches a browser. Credentials are a static read-write token, or
+ * (`token` null) the deployment's OIDC token with `BLOB_STORE_ID`, which is
+ * what a Blob store connected to the Vercel project provides.
  */
 export class VercelBlobStorage implements ObjectStorage {
-  constructor(private readonly token: string) {}
+  constructor(private readonly token: string | null) {}
+
+  private credentials(): { token?: string } {
+    return this.token == null ? {} : { token: this.token };
+  }
 
   async put(
     key: string,
@@ -20,13 +26,16 @@ export class VercelBlobStorage implements ObjectStorage {
       contentType,
       addRandomSuffix: false,
       allowOverwrite: true,
-      token: this.token,
+      ...this.credentials(),
     });
   }
 
   async get(key: string): Promise<StoredObject | null> {
     try {
-      const result = await get(key, { access: "private", token: this.token });
+      const result = await get(key, {
+        access: "private",
+        ...this.credentials(),
+      });
       if (result?.statusCode !== 200) return null;
       return {
         body: result.stream,
@@ -40,6 +49,6 @@ export class VercelBlobStorage implements ObjectStorage {
   }
 
   async delete(key: string): Promise<void> {
-    await del(key, { token: this.token });
+    await del(key, this.credentials());
   }
 }

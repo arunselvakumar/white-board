@@ -140,11 +140,22 @@ describe("storageFromEnv", () => {
     expect(storageFromEnv()).toBeInstanceOf(VercelBlobStorage);
   });
 
-  it("uses files on disk without a token, but never in production", () => {
+  it("uses Vercel Blob over OIDC when a store is connected", async () => {
     vi.stubEnv("BLOB_READ_WRITE_TOKEN", "");
+    vi.stubEnv("BLOB_STORE_ID", "store_test");
+    const storage = storageFromEnv();
+    expect(storage).toBeInstanceOf(VercelBlobStorage);
+    await storage.delete("companies/c1/logo/a.png");
+    // No static token: @vercel/blob uses VERCEL_OIDC_TOKEN with BLOB_STORE_ID.
+    expect(del).toHaveBeenLastCalledWith("companies/c1/logo/a.png", {});
+  });
+
+  it("uses files on disk without credentials, but never in production", () => {
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "");
+    vi.stubEnv("BLOB_STORE_ID", "");
     vi.stubEnv("NODE_ENV", "development");
     expect(storageFromEnv()).toBeInstanceOf(LocalFileStorage);
     vi.stubEnv("NODE_ENV", "production");
-    expect(() => storageFromEnv()).toThrow("BLOB_READ_WRITE_TOKEN is required");
+    expect(() => storageFromEnv()).toThrow("Connect a Vercel Blob store");
   });
 });
