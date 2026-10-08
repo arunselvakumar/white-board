@@ -176,6 +176,14 @@ _Avoid_: assignment, task, worksheet (as the entity name)
 A Student's Homework marked done, by the Student or a linked Parent, with an optional note and files. It is Late when first made after the due date. It can be changed or undone until the Owner or a Teacher checks it, optionally with a remark the Student and Parents see.
 _Avoid_: hand-in, turn-in, answer
 
+**Test**:
+A test the Owner or an assigned Teacher records for a Batch: a name, date, maximum marks, an optional pass mark, and an optional topic or syllabus note. It is for the whole Batch or for one Student in it (a single-student Test, such as a re-test). A Test is a Draft until it is published; only then do the Students on it and their linked Parents see its results. See ADR-0038.
+_Avoid_: exam, assessment, quiz (as the entity name)
+
+**Test Result**:
+One listed Student's result on a Test: scored with marks (whole or half marks, from 0 to the maximum), absent, or exempt, with an optional remark. With a pass mark, a scored result is a pass or a fail. Changes after publishing are logged with the old and new values, who, and when.
+_Avoid_: grade, score card, mark sheet
+
 **P0**:
 The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.
 
@@ -252,6 +260,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Study Material** and **Homework** belong to one **Batch**. A **Homework** belongs to one of the Batch's **Class** dates.
 - A **Submission** belongs to one **Homework** and one **Student**; there is at most one live Submission per Homework and Student.
 - A Student who leaves a Batch keeps read access to Study Material and Homework posted while they were enrolled.
+- A **Test** belongs to one **Batch**, and a single-student Test to one **Student** in it. A whole-batch Test lists the Batch's Students on its date; a **Test Result** belongs to one Test and one Student. Students and Parents see only the Student's own published Test Results, never another Student's marks or Batch numbers.
 
 ## Example dialogue
 

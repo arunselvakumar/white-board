@@ -89,6 +89,23 @@ describe("Workspace role access", () => {
   });
 
   it("opens Homework and Study Material to the roles that use them (ADR-0033)", () => {
+    expect(isAllowedAppPath("/batches/b1/tests", "owner")).toBe(true);
+    expect(isAllowedAppPath("/batches/b1/tests/t1", "owner")).toBe(true);
+    expect(isAllowedAppPath("/batches/b1/tests", "teacher")).toBe(false);
+    expect(isAllowedAppPath("/teacher/batches/b1/tests", "teacher")).toBe(true);
+    expect(isAllowedAppPath("/teacher/batches/b1/tests/t1", "teacher")).toBe(
+      true,
+    );
+    expect(isAllowedAppPath("/teacher/batches/b1/students/s1", "teacher")).toBe(
+      true,
+    );
+    expect(isAllowedAppPath("/teacher/batches/b1/tests", "student")).toBe(
+      false,
+    );
+    expect(isAllowedAppPath("/student/results", "student")).toBe(true);
+    expect(isAllowedAppPath("/student/results", "parent")).toBe(false);
+    expect(isAllowedAppPath("/parent/results", "parent")).toBe(true);
+    expect(isAllowedAppPath("/parent/results", "owner")).toBe(false);
     expect(isAllowedAppPath("/batches/b1/homework", "owner")).toBe(true);
     expect(isAllowedAppPath("/batches/b1/homework/h1", "owner")).toBe(true);
     expect(isAllowedAppPath("/batches/b1/homework", "teacher")).toBe(false);

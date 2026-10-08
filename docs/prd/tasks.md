@@ -346,6 +346,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-015 | Replace Clerk with Better Auth (`@repo/auth`), Resend, and React Email invitations       | in_progress | Auth+Data+HTTP+UI+Email        |
 | WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI            |
 | WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access     |
+| WB-016 | Tests: create, enter marks, publish to families, correct with a logged history           | in_progress | Domain+Data+HTTP+UI+Access     |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -420,6 +421,12 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Issue:** [#21](https://github.com/white-board-io/white-board-v3/issues/21). **Decisions:** [ADR-0033](../adr/0033-study-material-and-homework-product-decisions.md). **Blocked by:** WB-003, WB-010, WB-012 (Teachers, Class Changes, and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/9).
 
 **Done when:** the Owner and assigned Teachers can share Study Material and set Homework against a Class date with a due date, edit and remove them, and see per Homework who submitted, who didn't, and who was late, checking each with a remark; Students and linked Parents see them on Home and the Homework page, submit with optional files, and see remarks; late joiners see earlier items without owing them; leavers keep items from while enrolled; unassigned Teachers and other Batches' Students can't see or post. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-016 — Tests and marks
+
+**Issue:** [#28](https://github.com/arunselvakumar/white-board/issues/28). **Decisions:** [ADR-0038](../adr/0038-class-test-product-decisions.md). **Blocked by:** WB-003, WB-012 (Teachers and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/11).
+
+**Done when:** the Owner and assigned Teachers can create a whole-batch or single-student Test, enter scored, absent, and exempt results with remarks, save a draft, and publish after a confirmation that says families will see results and remarks; marks outside 0 to the maximum are refused with a clear message; published marks can be corrected without approval and every change is logged; the Batch view shows each Test's average, highest, lowest, and who scored below the pass mark, was absent, or was exempt, leaving single-student Tests out of those numbers; staff see each Student's full Test history, drafts marked; Students and linked Parents see only the Student's own published results on a Results page and Home; unassigned Teachers, other Batches' Students, and other Workspaces can't see or change any of it. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
 
 ### WB-015 — Replace Clerk with Better Auth
 

@@ -43,6 +43,8 @@ describe("getAppBreadcrumbs", () => {
       ["Dashboard", "Batches", "Batch", "Enroll Student"],
     ],
     ["/enrollments/123", ["Dashboard", "Enrollment"]],
+    ["/batches/123/tests", ["Dashboard", "Batches", "Tests"]],
+    ["/batches/123/tests/456", ["Dashboard", "Batches", "Tests", "Test"]],
     ["/payments/123/receipt", ["Dashboard", "Fees", "Receipt"]],
     ["/enquiries", ["Dashboard", "Enquiries"]],
     ["/enquiries/new", ["Dashboard", "Enquiries", "Add enquiry"]],
@@ -121,5 +123,30 @@ it("trails Homework and Study Material for every role (ADR-0033)", () => {
   expect(getAppBreadcrumbs("/parent/homework/h1", "parent")).toEqual([
     { label: "Homework", href: "/parent/homework" },
     { label: "Homework details" },
+  ]);
+});
+
+it("builds Test trails for Teachers and Results for families", () => {
+  expect(getAppBreadcrumbs("/teacher/batches/b1/tests", "teacher")).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    { label: "Tests" },
+  ]);
+  expect(getAppBreadcrumbs("/teacher/batches/b1/tests/t1", "teacher")).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    { label: "Tests", href: "/teacher/batches/b1/tests" },
+    { label: "Test" },
+  ]);
+  expect(
+    getAppBreadcrumbs("/teacher/batches/b1/students/s1", "teacher"),
+  ).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    { label: "Tests", href: "/teacher/batches/b1/tests" },
+    { label: "Test history" },
+  ]);
+  expect(getAppBreadcrumbs("/student/results", "student")).toEqual([
+    { label: "Results", href: "/student/results" },
+  ]);
+  expect(getAppBreadcrumbs("/parent/results", "parent")).toEqual([
+    { label: "Results", href: "/parent/results" },
   ]);
 });

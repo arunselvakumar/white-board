@@ -24,6 +24,7 @@ const NOT_FOUND_CODES = new Set([
   "HOMEWORK_NOT_FOUND",
   "HOMEWORK_SUBMISSION_NOT_FOUND",
   "ATTACHMENT_NOT_FOUND",
+  "CLASS_TEST_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -92,6 +93,14 @@ const CONFLICT_CODES = new Set([
   "HOMEWORK_SUBMISSION_CHECKED",
   "HOMEWORK_NOT_SUBMITTED",
   "ATTACHMENT_UPLOAD_LIMIT",
+  "CLASS_TEST_DATE_LOCKED",
+  "CLASS_TEST_PUBLISHED",
+  "CLASS_TEST_ALREADY_PUBLISHED",
+  "CLASS_TEST_RESULTS_INCOMPLETE",
+  "CLASS_TEST_NOBODY_LISTED",
+  "CLASS_TEST_MAX_BELOW_MARKS",
+  "CLASS_TEST_MARKS_LOCKED",
+  "CLASS_TEST_RESULT_CHANGED",
 ]);
 const ENQUIRY_FORBIDDEN_CODES = new Set([
   "ENQUIRY_CONVERT_FORBIDDEN",
@@ -132,7 +141,8 @@ export function mapError(error: unknown): Response {
   if (
     (code === "ATTENDANCE_FORBIDDEN" ||
       code === "HOLIDAY_FORBIDDEN" ||
-      code === "CLASS_WORK_FORBIDDEN") &&
+      code === "CLASS_WORK_FORBIDDEN" ||
+      code === "CLASS_TEST_FORBIDDEN") &&
     error instanceof Error
   ) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);
@@ -155,10 +165,11 @@ export function mapError(error: unknown): Response {
     return jsonError(StatusCodes.NOT_FOUND, code, error.message);
   }
   if (error instanceof Error && error.name === "DomainError" && code != null) {
+    const { details } = error as { details?: unknown };
     if (CONFLICT_CODES.has(code)) {
-      return jsonError(StatusCodes.CONFLICT, code, error.message);
+      return jsonError(StatusCodes.CONFLICT, code, error.message, details);
     }
-    return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
+    return jsonError(StatusCodes.BAD_REQUEST, code, error.message, details);
   }
   console.error(error);
   return jsonError(
