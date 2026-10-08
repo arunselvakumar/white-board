@@ -11,19 +11,21 @@ Whiteboard and the Marketing Site deploy as two Vercel projects from the same re
 
 ## `white-board` (Whiteboard)
 
+Build Command: `bash scripts/vercel-build.sh`. On production deploys it applies pending database migrations, then builds; preview deploys only build, because Preview and Production share one database (ADR-0036).
+
 Whiteboard is served at the root of its host. Its API docs are at `/api/docs`, the RealtimeKit webhook is at `/api/webhooks/realtimekit`, and Better Auth is at `/api/auth` (ADR-0034). In the project environment set:
 
 - `BETTER_AUTH_SECRET` (generate with `openssl rand -base64 32`; required at build and run time) and `BETTER_AUTH_URL=https://app.white-board.io`.
 - `RESEND_API_KEY` and `EMAIL_FROM` (an address on a domain verified in Resend). Production sends email with Resend by default.
 - Optionally `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Register `https://app.white-board.io/api/auth/callback/google` as an authorized redirect URI in Google Cloud.
-- A reachable Postgres `DATABASE_URL`, then run `bun run --filter @repo/db migrate:deploy` against it.
+- A reachable Postgres `DATABASE_URL`, and `DATABASE_URL_UNPOOLED` for migrations (the Neon integration sets both).
 - The service credentials required by the features you enable. Register the RealtimeKit webhook at `https://app.white-board.io/api/webhooks/realtimekit`.
 
 Do not use the example localhost database URL in Vercel. Preview deployments trust their own `VERCEL_URL` and branch URL for auth, but Google sign-in works only on origins registered with Google.
 
 ## `white-board-marketing` (Marketing Site)
 
-The Marketing Site has no Session and needs no secrets. `NEXT_PUBLIC_WHITEBOARD_URL` overrides where Sign-in and Sign-up links go; it defaults to `https://app.white-board.io`. Old `/app` and `/app/*` links redirect to Whiteboard.
+The Marketing Site has no Session and needs no secrets. `NEXT_PUBLIC_WHITEBOARD_URL` overrides where Sign-in and Sign-up links go; it defaults to `https://app.white-board.io`.
 
 ## DNS (GoDaddy)
 

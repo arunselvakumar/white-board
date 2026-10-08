@@ -17,7 +17,7 @@ The Marketing Site and Whiteboard shared one Vercel project and one domain. `ver
 
 **Code.** Whiteboard has no `basePath`. Better Auth's base path is `/api/auth`, invitation links are `https://app.white-board.io/accept-invitation?id=…`, and `BETTER_AUTH_URL` is `https://app.white-board.io`. The Marketing Site links to `NEXT_PUBLIC_WHITEBOARD_URL` (default `https://app.white-board.io`; `http://localhost:3001` in development).
 
-**Old links keep working.** Whiteboard redirects `/app` and `/app/*` to the same path without the prefix. The Marketing Site redirects `/app` and `/app/*` to `app.white-board.io`. This covers bookmarks and invitation emails sent before the move.
+**No redirects for the old `/app` paths.** Whiteboard goes live for the first time on these domains, so there are no old links to keep working. `white-board.io/app/*` is a Marketing Site 404.
 
 **Webhooks don't follow redirects.** The Cloudflare RealtimeKit webhook must be re-registered at `https://app.white-board.io/api/webhooks/realtimekit`, and the Google OAuth redirect URI is `https://app.white-board.io/api/auth/callback/google`.
 
