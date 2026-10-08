@@ -1,0 +1,161 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_d713cb8ee78d3a 69-72,752-755
+apps/construction-management/app/api/construction/masters/_lib/lookup-routes.ts
+  s_ec41e28a857a0b::t_dfe26ac945e4d4 1-52
+apps/construction-management/app/api/construction/masters/_lib/master-models.ts
+  s_ec41e28a857a0b::t_ab4f3ab7584dd2 1-58
+apps/construction-management/app/api/construction/masters/_lib/master-routes.ts
+  s_ec41e28a857a0b::t_7375deb9e649b5 1-142
+apps/construction-management/app/api/construction/masters/departments/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_e82f1c425715cf 1-6
+apps/construction-management/app/api/construction/masters/departments/[id]/disable/route.ts
+  s_ec41e28a857a0b::t_5870e1afe7796f 1-6
+apps/construction-management/app/api/construction/masters/departments/[id]/enable/route.ts
+  s_ec41e28a857a0b::t_3143cfa1c835b5 1-6
+apps/construction-management/app/api/construction/masters/departments/[id]/route.ts
+  s_ec41e28a857a0b::t_4c92681ddc2d63 1-6
+apps/construction-management/app/api/construction/masters/departments/[id]/update/route.ts
+  s_ec41e28a857a0b::t_39bee57305524a 1-6
+apps/construction-management/app/api/construction/masters/departments/department-models.ts
+  s_ec41e28a857a0b::t_b5e2f62cc3acd0 1-28
+apps/construction-management/app/api/construction/masters/departments/department-routes.ts
+  s_ec41e28a857a0b::t_ac9627b290cf22 1-9
+apps/construction-management/app/api/construction/masters/departments/route.ts
+  s_ec41e28a857a0b::t_a2c2b06cd913f1 1-9
+apps/construction-management/app/api/construction/masters/labour-categories/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_d8969b515f4906 1-6
+apps/construction-management/app/api/construction/masters/labour-categories/[id]/disable/route.ts
+  s_ec41e28a857a0b::t_49b93989364c05 1-6
+apps/construction-management/app/api/construction/masters/labour-categories/[id]/enable/route.ts
+  s_ec41e28a857a0b::t_bb6bf2a48eb8ee 1-6
+apps/construction-management/app/api/construction/masters/labour-categories/[id]/route.ts
+  s_ec41e28a857a0b::t_bade908c7c3c11 1-6
+apps/construction-management/app/api/construction/masters/labour-categories/[id]/update/route.ts
+  s_ec41e28a857a0b::t_749e2333554fde 1-6
+apps/construction-management/app/api/construction/masters/labour-categories/labour-category-models.ts
+  s_ec41e28a857a0b::t_13c5a58ae38805 1-30
+apps/construction-management/app/api/construction/masters/labour-categories/labour-category-routes.ts
+  s_ec41e28a857a0b::t_e3b988de08f2fd 1-9
+apps/construction-management/app/api/construction/masters/labour-categories/route.ts
+  s_ec41e28a857a0b::t_391afc6377e793 1-9
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_ec41e28a857a0b::t_033fad5e37631f 1-189
+apps/construction-management/app/api/construction/masters/masters.http.test.ts
+  s_ec41e28a857a0b::t_29739d0b952b3e 1-665
+apps/construction-management/app/api/construction/masters/supervisors/[id]/delete/route.ts
+  s_ec41e28a857a0b::t_88be7e681481ea 1-6
+apps/construction-management/app/api/construction/masters/supervisors/[id]/disable/route.ts
+  s_ec41e28a857a0b::t_87c0720f73701f 1-6
+apps/construction-management/app/api/construction/masters/supervisors/[id]/enable/route.ts
+  s_ec41e28a857a0b::t_471047ad4eac2e 1-6
+apps/construction-management/app/api/construction/masters/supervisors/[id]/route.ts
+  s_ec41e28a857a0b::t_ccc93ac7027b3e 1-6
+apps/construction-management/app/api/construction/masters/supervisors/[id]/update/route.ts
+  s_ec41e28a857a0b::t_cec3a234a5736e 1-6
+apps/construction-management/app/api/construction/masters/supervisors/route.ts
+  s_ec41e28a857a0b::t_c6dc7997cdb781 1-9
+apps/construction-management/app/api/construction/masters/supervisors/supervisor-models.ts
+  s_ec41e28a857a0b::t_e23c1f64503389 1-80
+apps/construction-management/app/api/construction/masters/supervisors/supervisor-routes.ts
+  s_ec41e28a857a0b::t_2f2e7287b02dfc 1-38
+apps/construction-management/app/app/masters/departments/page.tsx
+  s_ec41e28a857a0b::t_6e1ac6e9537f11 1-9
+apps/construction-management/app/app/masters/labour-categories/page.tsx
+  s_ec41e28a857a0b::t_cdd08b8555d441 1-9
+apps/construction-management/app/app/masters/supervisors/page.tsx
+  s_ec41e28a857a0b::t_4920f78c0ef6d3 1-9
+apps/construction-management/components/masters/lookup-list.stories.tsx
+  s_ec41e28a857a0b::t_e3e73a93ab8cad 1-227
+apps/construction-management/components/masters/lookup-list.tsx
+  s_ec41e28a857a0b::t_27715d56bf96ed 1-194
+apps/construction-management/components/masters/lookup-name-dialog.stories.tsx
+  s_ec41e28a857a0b::t_f2cf53ab5fbd44 1-158
+apps/construction-management/components/masters/lookup-name-dialog.tsx
+  s_ec41e28a857a0b::t_33d7597fbb0be4 1-125
+apps/construction-management/components/masters/lookup-screens.ts
+  s_ec41e28a857a0b::t_a0e8105c82722d 1-49
+apps/construction-management/components/masters/masters-story-support.tsx
+  s_ec41e28a857a0b::t_49154ce3879aad 1-204
+apps/construction-management/components/masters/supervisor-dialog.stories.tsx
+  s_ec41e28a857a0b::t_0eecd8b4f29abb 1-159
+apps/construction-management/components/masters/supervisor-dialog.tsx
+  s_ec41e28a857a0b::t_8cfcece64a3b92 1-234
+apps/construction-management/components/masters/supervisors-list.stories.tsx
+  s_ec41e28a857a0b::t_159bc9a6145fa3 1-127
+apps/construction-management/components/masters/supervisors-list.tsx
+  s_ec41e28a857a0b::t_a615b8fd89bd15 1-194
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_1a8d2ad9db327b 273,299-300
+apps/construction-management/lib/masters-nav.ts
+  s_ec41e28a857a0b::t_02e6456fd7f9d9 4,6,8,67-99
+apps/construction-management/src/composition/company-created-listeners.ts
+  s_ec41e28a857a0b::t_806178253f336f 1-12
+apps/construction-management/src/masters/application/lookup-handlers.ts
+  s_ec41e28a857a0b::t_b76a6a2e91cd8d 1-187
+apps/construction-management/src/masters/application/masters-handlers.test.ts
+  s_ec41e28a857a0b::t_7190137d64011a 1-494
+apps/construction-management/src/masters/application/ports.ts
+  s_ec41e28a857a0b::t_2ac6a4ea084aa4 1-65
+apps/construction-management/src/masters/application/supervisor-handlers.ts
+  s_ec41e28a857a0b::t_8bc091a3e854d8 1-225
+apps/construction-management/src/masters/domain/lookup-entry.test.ts
+  s_ec41e28a857a0b::t_589e7e4a3949b1 1-111
+apps/construction-management/src/masters/domain/lookup-entry.ts
+  s_ec41e28a857a0b::t_ac0cf2fab92ead 1-181
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_ec41e28a857a0b::t_46a966495681a4 1-87
+apps/construction-management/src/masters/domain/supervisor.test.ts
+  s_ec41e28a857a0b::t_31e009ff4dc75d 1-82
+apps/construction-management/src/masters/domain/supervisor.ts
+  s_ec41e28a857a0b::t_e28a6e90fe445e 1-191
+apps/construction-management/src/masters/infrastructure/create-masters-handlers.ts
+  s_ec41e28a857a0b::t_06e0ead105d6e7 1-33
+apps/construction-management/src/masters/infrastructure/seed-company-masters.ts
+  s_ec41e28a857a0b::t_11851ee586b865 1-87
+apps/construction-management/src/queries/masters.ts
+  s_ec41e28a857a0b::t_cba110fb678041 1-145
+apps/construction-management/components/masters/master-list-parts.tsx
+  s_892449e9d04a63::t_801f8053ce1c50 1-222
+apps/construction-management/src/masters/infrastructure/prisma-lookup-store.ts
+  s_01797fdd8fba69::t_f98a741643a719 1-151
+apps/construction-management/src/masters/infrastructure/prisma-master-usage.ts
+  s_01797fdd8fba69::t_881ba709492b79 1-59
+apps/construction-management/src/masters/infrastructure/prisma-supervisor-store.ts
+  s_01797fdd8fba69::t_812b25d8c12c63 1-120
+apps/construction-management/src/masters/infrastructure/prisma-team-member-directory.ts
+  s_01797fdd8fba69::t_c8a07b44461e13 1-27
+apps/construction-management/src/organization/infrastructure/create-company-handlers.ts
+  s_892449e9d04a63::t_583945835aafe6 3-6,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7ed2d8f77cfe1139de392b507c4f735639271656",
+  "prompts": {},
+  "sessions": {
+    "s_01797fdd8fba69": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae922e64938b9cde0",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_892449e9d04a63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a1901b1f99caa2166",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
