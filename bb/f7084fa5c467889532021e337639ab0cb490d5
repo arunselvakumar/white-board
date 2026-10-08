@@ -1,0 +1,33 @@
+apps/construction-management/src/labour/application/directories.ts
+  s_ec41e28a857a0b::t_0cdb0511966c80 1-34
+apps/construction-management/src/labour/domain/ledger.test.ts
+  s_ec41e28a857a0b::t_1462f94579185f 1-157
+apps/construction-management/src/labour/domain/ledger.ts
+  s_ec41e28a857a0b::t_56b74953f12f89 1-203
+apps/construction-management/src/labour/domain/wages.test.ts
+  s_ec41e28a857a0b::t_5e1ca66f59ba1a 1-131
+apps/construction-management/src/labour/domain/wages.ts
+  s_ec41e28a857a0b::t_8bc7636a3c0853 1-163
+apps/construction-management/src/labour/infrastructure/prisma-directories.ts
+  s_ec41e28a857a0b::t_e437c243ccb889 1-79
+apps/construction-management/src/labour/infrastructure/prisma-ledger.http.test.ts
+  s_ec41e28a857a0b::t_a98b7185a8b16f 1-90
+apps/construction-management/src/labour/infrastructure/prisma-ledger.ts
+  s_ec41e28a857a0b::t_b2d9d025abbf20 1-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bbf7084fa5c467889532021e337639ab0cb490d5",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
