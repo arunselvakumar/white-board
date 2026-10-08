@@ -67,6 +67,10 @@ import { ListConstructionOrganizationInvoicesResponseModel } from "@/app/api/con
 import { ListConstructionOrganizationPlansResponseModel } from "@/app/api/construction/organization/subscription/plans/list-plans-response-model";
 import { ReceiveConstructionOrganizationRazorpayWebhookResponseModel } from "@/app/api/webhooks/razorpay/razorpay-webhook-response-model";
 import {
+  mastersOpenApiComponents,
+  mastersOpenApiOperations,
+} from "@/app/api/construction/masters/masters-openapi";
+import {
   projectsOpenApiComponents,
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
@@ -744,6 +748,10 @@ openApiOperations.push(
 // The projects context (CM-204) lists its own models and routes.
 Object.assign(openApiComponents, projectsOpenApiComponents);
 openApiOperations.push(...projectsOpenApiOperations);
+
+// The masters context (CM-203) lists its own models and routes.
+Object.assign(openApiComponents, mastersOpenApiComponents);
+openApiOperations.push(...mastersOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

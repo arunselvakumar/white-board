@@ -1,5 +1,9 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
+// The composition root is wiring, not another context: it hands this
+// factory the other contexts' `CompanyCreated` listeners (seed copies).
+// eslint-disable-next-line no-restricted-imports
+import { companyCreatedListeners } from "@/src/composition/company-created-listeners";
 import {
   InProcessEventDispatcher,
   type EventDispatcher,
@@ -27,7 +31,7 @@ export function createCompanyHandlers(deps?: {
         new PrismaTeamMemberRepository(db, privateDataCipher),
       ),
       seedDesignations,
-      deps?.events ?? new InProcessEventDispatcher(),
+      deps?.events ?? new InProcessEventDispatcher(companyCreatedListeners()),
     ),
   };
 }

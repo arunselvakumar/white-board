@@ -1,8 +1,11 @@
 import {
   BadgeCheck,
   Building,
+  HardHat,
   Settings2,
+  UserCheck,
   Users,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -58,6 +61,39 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Settings",
         description: "Sequence IDs and Back-dated Entry rules.",
         icon: Settings2,
+      },
+    ],
+  },
+  {
+    // Labours and Vendors (CM-207, CM-209) go first when they arrive.
+    label: "Labour & Vendors",
+    sections: [
+      {
+        href: "/app/masters/labour-categories",
+        label: "Labour Categories",
+        title: "Labour Categories",
+        description:
+          "Trades labourers and a Vendor's headcount are booked under.",
+        icon: HardHat,
+      },
+      {
+        href: "/app/masters/supervisors",
+        label: "Supervisors",
+        title: "Supervisors",
+        description: "The people on site who look after a group of labourers.",
+        icon: UserCheck,
+      },
+    ],
+  },
+  {
+    label: "Work",
+    sections: [
+      {
+        href: "/app/masters/departments",
+        label: "Departments",
+        title: "Departments",
+        description: "Trades and work categories: RCC, Plumbing, Painting…",
+        icon: Wrench,
       },
     ],
   },
