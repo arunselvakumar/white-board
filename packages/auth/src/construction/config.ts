@@ -51,7 +51,20 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/organization/get-active-member",
 ];
 
+/**
+ * The origin links (invites, sign-in callbacks) point at. A preview uses its
+ * own branch URL rather than the production domain.
+ */
 export function constructionOrigin(): string {
+  const configured = process.env["BETTER_AUTH_URL"];
+  const branch = process.env["VERCEL_BRANCH_URL"];
+  if (
+    (configured == null || configured.length === 0) &&
+    process.env["VERCEL_ENV"] === "preview" &&
+    branch != null &&
+    branch.length > 0
+  )
+    return `https://${branch}`;
   return appOrigin(CONSTRUCTION_LOCAL_ORIGIN);
 }
 

@@ -3,6 +3,7 @@ import type { BetterAuthPlugin } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { phoneNumber } from "better-auth/plugins";
 
+import { isLiveProduction } from "../runtime";
 import { isValidMobile, placeholderEmailFor } from "./mobile";
 import type { SmsSender } from "./sms";
 
@@ -15,13 +16,14 @@ export const MOBILE_OTP_SENDS_PER_WINDOW = 5;
 export const MOBILE_OTP_SEND_WINDOW_SECONDS = 15 * 60;
 
 /**
- * The development and test bypass code. Never honoured in production, and
- * the server refuses to start if it is set there.
+ * The development, test and preview bypass code. Never honoured in live
+ * production (previews have their own database), and the server refuses to
+ * start if it is set there.
  */
 export function otpTestCode(): string | null {
   const code = process.env["OTP_TEST_CODE"];
   if (code == null || code.length === 0) return null;
-  if (process.env["NODE_ENV"] === "production") {
+  if (isLiveProduction()) {
     // `next build` runs with NODE_ENV=production and a developer's .env;
     // it never verifies a code, so the bypass is simply off while building.
     if (process.env["NEXT_PHASE"] === "phase-production-build") return null;

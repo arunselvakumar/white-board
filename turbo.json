@@ -48,7 +48,8 @@
     "CONSTRUCTION_SELLER_GSTIN",
     "CONSTRUCTION_SELLER_SAC",
     "NEXT_PHASE",
-    "BLOB_STORE_ID"
+    "BLOB_STORE_ID",
+    "VERCEL_ENV"
   ],
   "tasks": {
     "generate": {

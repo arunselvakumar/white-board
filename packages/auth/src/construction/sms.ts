@@ -1,3 +1,5 @@
+import { isLiveProduction } from "../runtime";
+
 /** One text message to one mobile (E.164). */
 export type OutgoingSms = {
   to: string;
@@ -28,7 +30,7 @@ function transportFromEnv(): SmsTransport {
 }
 
 function assertNotProduction(transport: SmsTransport): void {
-  if (process.env["NODE_ENV"] === "production")
+  if (isLiveProduction())
     throw new Error(
       `SMS_TRANSPORT=${transport} is for development and tests only.`,
     );
