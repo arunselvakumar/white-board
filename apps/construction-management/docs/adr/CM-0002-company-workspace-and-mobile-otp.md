@@ -4,13 +4,13 @@
 - Date: 2026-10-08
 - Ticket: CM-101
 
-Site engineers, supervisors and store keepers know one way to sign in: type a mobile number, receive a code. Many of them have no email address they read. Owners run two or three companies (a building firm and a land firm, say) and switch between them. The legacy product mixes coarse "roles" with a per-member permission matrix, and nobody could say what the roles controlled (`modules/01` open question 1).
+Site engineers, supervisors and store keepers know one way to sign in: type a mobile number, receive a code. Many of them have no email address they read. Owners run two or three companies (a building firm and a land firm, say) and switch between them. Mixing coarse roles with a per-member permission matrix gives two answers to "what may this person do" (`modules/01` open question 1).
 
 ## Decision
 
 **A Company is a Better Auth organization**, stored as a Workspace row in `identity.workspaces` (root ADR-0034) with `institution_type = construction_company`. Construction code says "Company" and holds `workspaceId` as an opaque string (ADR CM-0001). The app has its own Better Auth instance, `@repo/auth/construction/*`, over the same identity tables, with its own cookie prefix (`construction`), so it never shares a Session with Whiteboard.
 
-**Two roles inside a Company: `owner` and `member`.** The User who creates the Company is its Owner and can do everything, including buying the plan; an Owner cannot be removed. Everyone else is a `member`. What a Member may do comes from the **Permission Matrix** (ADR CM-0003), never from the role. Legacy roles (Administrator, Builder, Site Engineer) are not carried over; Designations with Permission Templates cover what they were for.
+**Two roles inside a Company: `owner` and `member`.** The User who creates the Company is its Owner and can do everything, including buying the plan; an Owner cannot be removed. Everyone else is a `member`. What a Member may do comes from the **Permission Matrix** (ADR CM-0003), never from the role. There are no further roles such as Administrator or Builder; Designations with Permission Templates cover that need.
 
 **Sign-in is mobile OTP first, email and password second.**
 
@@ -35,6 +35,6 @@ Site engineers, supervisors and store keepers know one way to sign in: type a mo
 ## Considered options
 
 - **Email-only auth (Whiteboard's):** wrong for site staff. Rejected.
-- **A custom OTP scheme with our own JWTs (legacy):** duplicates Better Auth's sessions and rate limiting. Rejected.
-- **Keep legacy roles beside the matrix:** two sources of truth for access. Rejected.
+- **A custom OTP scheme with our own JWTs:** duplicates Better Auth's sessions and rate limiting. Rejected.
+- **Roles beside the matrix:** two sources of truth for access. Rejected.
 - **Better Auth invitations for joining:** email-only and a second record beside the Team Member. Rejected.

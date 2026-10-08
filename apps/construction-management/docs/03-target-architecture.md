@@ -147,6 +147,8 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 
 ## 4. Migration from legacy (if customers move)
 
+> **Not planned (2026-10-08, owner decision).** Construction Management is greenfield: customers start fresh and nothing is imported from BuildControl or other tools. The steps below are kept only as a record; no code, column or seed exists for them. The BuildControl analysis in these docs is product research, not a compatibility target.
+
 1. Export per company via the legacy API (`*/GetAll`, `*/Report`, backup ZIPs) into S3 raw.
 2. Transform with a one-off script per context: map int statuses to enums, split `paidToType` polymorphism into typed FKs, convert opening balances into ledger entries, map `companyId` → `workspace_id`.
 3. Load through the application's own commands where invariants matter (numbering, ledgers), bulk-insert where they don't (masters, attachments metadata).
