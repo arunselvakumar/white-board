@@ -1,0 +1,25 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_4e62d46695dce1 91
+packages/db/prisma/migrations/20261008160000_construction_organization/migration.sql
+  s_25a30b12f62554::t_830349fa8b12ea 1-26
+packages/db/prisma/schema/base.prisma
+  s_25a30b12f62554::t_2b0b70763e3a6e 10
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_0da745ad4b40b7 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "529ed60d91a760e45990eae841c33a5af095f2f5",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
