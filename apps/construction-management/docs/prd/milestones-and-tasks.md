@@ -139,7 +139,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 
 | ID     | Seq | Title                                                                                                        | Status | Blocked by             | Area      | Issue |
 | ------ | --: | ------------------------------------------------------------------------------------------------------------ | ------ | ---------------------- | --------- | ----- |
-| CM-101 |   1 | ADR CM-0002: Company = Workspace; mobile-OTP login plugin in `@repo/auth`; roles `owner`/`member`            | todo   | CM-001                 | Docs      |       |
+| CM-101 |   1 | ADR CM-0002: Company = Workspace; mobile-OTP login plugin in `@repo/auth`; roles `owner`/`member`            | done   | CM-001                 | Docs      |       |
 | CM-102 |   2 | `@repo/auth`: mobile OTP sign-in/sign-up plugin (SMS provider adapter, rate limit, test bypass)              | todo   | CM-101                 | Auth      |       |
 | CM-103 |   3 | Sign-up / sign-in screens: mobile OTP first, email+password second, "Choose Organization" after login        | todo   | CM-009, CM-102         | UI        |       |
 | CM-104 |   4 | Company creation: name, mobile, email, country, currency, GSTIN/PAN (optional) → Workspace + profile         | todo   | CM-005, CM-102         | Domain    |       |
