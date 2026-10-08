@@ -1,0 +1,23 @@
+apps/construction-management/README.md
+  s_25a30b12f62554::t_a63713e31777db 10,26-27
+apps/construction-management/docs/prd/handoff/M1.md
+  s_25a30b12f62554::t_3610f2876228a5 1-84
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_cafbcd9e4f0361 140-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "328be84c473bc3e793b293467cc4387e1363e6c4",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
