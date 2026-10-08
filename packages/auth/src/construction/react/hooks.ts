@@ -85,7 +85,14 @@ export function useCompanyMobileOtp() {
     [run],
   );
 
-  return { sendCode, verifyCode, fetchStatus, error, clearError };
+  /** Names a User who signed up by mobile (their name starts as the number). */
+  const setName = useCallback(
+    (name: string) =>
+      run(() => constructionAuthClient().updateUser({ name: name.trim() })),
+    [run],
+  );
+
+  return { sendCode, verifyCode, setName, fetchStatus, error, clearError };
 }
 
 /** Email and password sign-in (the secondary path; mobile OTP is primary). */
@@ -120,6 +127,17 @@ export function useCompanyEmailSignUp() {
     [run],
   );
 
+  const sendEmailCode = useCallback(
+    (email: string) =>
+      run(() =>
+        constructionAuthClient().emailOtp.sendVerificationOtp({
+          email: email.trim(),
+          type: "email-verification",
+        }),
+      ),
+    [run],
+  );
+
   /** Verifies the email and signs the User in. */
   const verifyEmailCode = useCallback(
     (input: { email: string; code: string }) =>
@@ -132,7 +150,14 @@ export function useCompanyEmailSignUp() {
     [run],
   );
 
-  return { create, verifyEmailCode, fetchStatus, error, clearError };
+  return {
+    create,
+    sendEmailCode,
+    verifyEmailCode,
+    fetchStatus,
+    error,
+    clearError,
+  };
 }
 
 export function useCompanySignOut() {

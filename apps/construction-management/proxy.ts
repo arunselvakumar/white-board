@@ -2,7 +2,7 @@ import { hasCompanySessionCookie } from "@repo/auth/construction/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 
 /** Screens a signed-out visitor may open. */
-const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up"]);
+const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up", "/continue"]);
 
 /**
  * The page gate: no session cookie → Sign in with a redirect URL. It never

@@ -21,11 +21,7 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: [
-            "src/**/*.test.ts",
-            "lib/**/*.test.ts",
-            "app/api/**/*.test.ts",
-          ],
+          include: ["src/**/*.test.ts", "lib/**/*.test.ts", "app/**/*.test.ts"],
           exclude: ["**/*.http.test.ts"],
         },
       },
@@ -34,7 +30,7 @@ export default defineConfig({
         test: {
           name: "http",
           environment: "node",
-          include: ["app/api/**/*.http.test.ts", "src/**/*.http.test.ts"],
+          include: ["app/**/*.http.test.ts", "src/**/*.http.test.ts"],
           env: {
             DATABASE_URL: TEST_DATABASE_URL,
             BETTER_AUTH_SECRET: "http-tests-only-secret-0123456789abcdef",

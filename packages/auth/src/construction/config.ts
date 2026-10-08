@@ -41,6 +41,7 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-in/email",
   "/phone-number/send-otp",
   "/phone-number/verify",
+  "/update-user",
   "/email-otp/send-verification-otp",
   "/email-otp/verify-email",
   "/email-otp/request-password-reset",

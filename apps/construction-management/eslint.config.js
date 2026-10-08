@@ -100,6 +100,6 @@ export default [
   sharedKernelBoundary,
   ...storybook.configs["flat/recommended"],
   {
-    ignores: ["storybook-static/**"],
+    ignores: ["storybook-static/**", ".next-verify/**"],
   },
 ];

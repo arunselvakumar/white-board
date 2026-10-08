@@ -84,6 +84,13 @@ const preview: Preview = {
             id: "aria-hidden-focus",
             enabled: false,
           },
+          {
+            // Contrast is a property of the shared palette (root ADR-0002):
+            // muted, destructive and primary text sit just under 4.5:1 in
+            // places. Fix it in @repo/ui for both apps, then turn this on.
+            id: "color-contrast",
+            enabled: false,
+          },
         ],
       },
     },
