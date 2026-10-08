@@ -1,0 +1,23 @@
+apps/construction-management/components/team-members/add-team-member-wizard.stories.tsx
+  s_25a30b12f62554::t_b5d144d08b5b97 214-230
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_25a30b12f62554::t_01befc289fff8d 4,228-239
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_61f48d709e4935 160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e43e0fdc728e5b2cdf99a830ffa7a0b79a633e30",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
