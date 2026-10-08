@@ -26,6 +26,17 @@ describe("openApiDocument", () => {
       openApiDocument.paths["/api/training-institute/home"]?.["get"],
     ).toBeDefined();
   });
+  it("documents Tests for staff and published results for families", () => {
+    const paths = openApiDocument.paths;
+    const base = "/api/training-institute";
+    expect(paths[`${base}/batches/{id}/tests`]?.["get"]).toBeDefined();
+    expect(paths[`${base}/batches/{id}/tests`]?.["post"]).toBeDefined();
+    expect(paths[`${base}/tests/{id}`]?.["get"]).toBeDefined();
+    for (const action of ["update", "results", "publish", "delete"])
+      expect(paths[`${base}/tests/{id}/${action}`]?.["post"]).toBeDefined();
+    expect(paths[`${base}/students/{id}/tests`]?.["get"]).toBeDefined();
+    expect(paths[`${base}/home/results`]?.["get"]).toBeDefined();
+  });
   it("does not document Todo routes", () => {
     const paths = openApiDocument.paths;
     expect(paths["/api/todos"]).toBeUndefined();
