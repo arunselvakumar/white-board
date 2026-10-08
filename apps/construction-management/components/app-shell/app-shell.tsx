@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@repo/ui/components/sidebar";
 
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
@@ -23,8 +24,12 @@ import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
+import { MastersNavMenu } from "./masters-nav-menu";
 import { PlanBanner } from "./plan-banner";
 import { UserMenu } from "./user-menu";
+
+const NAV_BUTTON_CLASS =
+  "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground h-11 rounded-xl px-3 transition-colors data-active:shadow-[0_5px_16px_rgba(10,7,31,0.2)]";
 
 /** Authenticated chrome: the three areas, the Active Company, the account menu. */
 export function AppShell({ children }: { children: ReactNode }) {
@@ -32,6 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
+      <CloseMobileSidebarOnNavigate pathname={pathname} />
       <Sidebar variant="inset" collapsible="offcanvas">
         <SidebarHeader className="border-sidebar-border border-b px-4 pt-5 pb-4">
           <SidebarMenu>
@@ -57,6 +63,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <nav aria-label="Main">
                 <SidebarMenu className="gap-1">
                   {APP_NAV.map((item) => {
+                    if (item.href === "/app/masters")
+                      return (
+                        <MastersNavMenu
+                          key={item.href}
+                          pathname={pathname}
+                          buttonClassName={NAV_BUTTON_CLASS}
+                        />
+                      );
                     const Icon = APP_NAV_ICONS[item.href];
                     const active = isAppNavActive(pathname, item.href);
                     return (
@@ -65,7 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                           isActive={active}
                           tooltip={item.label}
                           aria-current={active ? "page" : undefined}
-                          className="text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground h-11 rounded-xl px-3 transition-colors data-active:shadow-[0_5px_16px_rgba(10,7,31,0.2)]"
+                          className={NAV_BUTTON_CLASS}
                           render={<Link href={item.href} />}
                         >
                           <Icon />
@@ -94,4 +108,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       </SidebarInset>
     </SidebarProvider>
   );
+}
+
+/** On a phone the sidebar is a sheet; close it once a link has navigated. */
+function CloseMobileSidebarOnNavigate({ pathname }: { pathname: string }) {
+  const { setOpenMobile } = useSidebar();
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
+  return null;
 }
