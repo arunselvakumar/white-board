@@ -1,0 +1,165 @@
+apps/construction-management/.env.example
+  s_25a30b12f62554::t_901d09ef8f1c04 39-56
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_3298503609360b 57-68,119-128,634-736
+apps/construction-management/app/api/_lib/openapi.ts
+  s_25a30b12f62554::t_027a94559bbb4d 70
+apps/construction-management/app/api/_lib/require-access.ts
+  s_25a30b12f62554::t_9693862859a9c7 11,14,26-29,46-49
+apps/construction-management/app/api/_lib/require-plan-active.ts
+  s_25a30b12f62554::t_420b41be578423 1-36
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/quote-checkout-request-model.ts
+  s_25a30b12f62554::t_8d96e7fe01b455 1-15
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/quote-checkout-response-model.ts
+  s_25a30b12f62554::t_d13cfda8dd0950 1-10
+apps/construction-management/app/api/construction/organization/subscription/checkout/quote/route.ts
+  s_25a30b12f62554::t_2fc192d55590ae 1-34
+apps/construction-management/app/api/construction/organization/subscription/checkout/route.ts
+  s_25a30b12f62554::t_9649733f9ab21b 1-60
+apps/construction-management/app/api/construction/organization/subscription/checkout/start-checkout-request-model.ts
+  s_25a30b12f62554::t_561349e1ae896f 1-15
+apps/construction-management/app/api/construction/organization/subscription/checkout/start-checkout-response-model.ts
+  s_25a30b12f62554::t_519568e0d8a7a9 1-19
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/route.ts
+  s_25a30b12f62554::t_dcd11cd58cdfec 1-44
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/verify-checkout-request-model.ts
+  s_25a30b12f62554::t_9444457aa5a65a 1-12
+apps/construction-management/app/api/construction/organization/subscription/checkout/verify/verify-checkout-response-model.ts
+  s_25a30b12f62554::t_da41a58b5a5118 1-11
+apps/construction-management/app/api/construction/organization/subscription/get-subscription-response-model.ts
+  s_25a30b12f62554::t_ca8d1bd4f556ca 1-45
+apps/construction-management/app/api/construction/organization/subscription/invoices/[id]/pdf/get-invoice-pdf-params-model.ts
+  s_25a30b12f62554::t_16a90e16bf7ad8 1-9
+apps/construction-management/app/api/construction/organization/subscription/invoices/[id]/pdf/route.ts
+  s_25a30b12f62554::t_9c8282eaaa02ff 1-41
+apps/construction-management/app/api/construction/organization/subscription/invoices/list-invoices-request-model.ts
+  s_25a30b12f62554::t_f76ac12df31be0 1-16
+apps/construction-management/app/api/construction/organization/subscription/invoices/list-invoices-response-model.ts
+  s_25a30b12f62554::t_a73059f585d3ee 1-26
+apps/construction-management/app/api/construction/organization/subscription/invoices/route.ts
+  s_25a30b12f62554::t_adab477a5f36b0 1-90
+apps/construction-management/app/api/construction/organization/subscription/plans/list-plans-response-model.ts
+  s_25a30b12f62554::t_36fff9dd0346ba 1-44
+apps/construction-management/app/api/construction/organization/subscription/plans/route.ts
+  s_25a30b12f62554::t_7da8dcdd2ac0d4 1-39
+apps/construction-management/app/api/construction/organization/subscription/route.ts
+  s_25a30b12f62554::t_adf9f6b581a33f 1-54
+apps/construction-management/app/api/construction/organization/subscription/subscription-fields.ts
+  s_25a30b12f62554::t_8ee88f3319849e 1-107
+apps/construction-management/app/api/construction/organization/subscription/subscription.http.test.ts
+  s_25a30b12f62554::t_d7a4c61f05c3fe 1-572
+apps/construction-management/app/api/webhooks/razorpay/razorpay-webhook-response-model.ts
+  s_25a30b12f62554::t_1095a8f85c8cab 1-14
+apps/construction-management/app/api/webhooks/razorpay/route.ts
+  s_25a30b12f62554::t_9f8f334fda895f 1-40
+apps/construction-management/app/app/subscription/checkout/page.tsx
+  s_25a30b12f62554::t_5ddc62ed0e3ff2 1-15
+apps/construction-management/app/app/subscription/page.tsx
+  s_25a30b12f62554::t_3d766c8ceb30cb 1-9
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_25a30b12f62554::t_ea5b8f66478042 26,92
+apps/construction-management/components/app-shell/plan-banner.stories.tsx
+  s_25a30b12f62554::t_7bcf001d7fee92 1-83
+apps/construction-management/components/app-shell/plan-banner.tsx
+  s_25a30b12f62554::t_f45be8835af97f 1-93
+apps/construction-management/components/subscription/checkout-wizard.stories.tsx
+  s_25a30b12f62554::t_7db17a787d09ab 1-222
+apps/construction-management/components/subscription/checkout-wizard.tsx
+  s_25a30b12f62554::t_deb6dbf9f3b0a0 1-828
+apps/construction-management/components/subscription/subscription-overview.stories.tsx
+  s_25a30b12f62554::t_8a9e34498c4be6 1-109
+apps/construction-management/components/subscription/subscription-overview.tsx
+  s_25a30b12f62554::t_ebde2ff94a466d 1-262
+apps/construction-management/components/subscription/subscription-story-fixtures.ts
+  s_25a30b12f62554::t_0e00424303dae2 1-256
+apps/construction-management/components/subscription/subscription-text.ts
+  s_25a30b12f62554::t_c36b4e65e048c7 1-31
+apps/construction-management/docs/modules/01-organization-identity-access.md
+  s_25a30b12f62554::t_80cf725f9f40f6 630-632
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_f5ea6bd00ea171 157-159,231-239,244-252,255-261
+apps/construction-management/lib/razorpay-checkout.ts
+  s_25a30b12f62554::t_9d1059d5279b51 1-67
+apps/construction-management/package.json
+  s_25a30b12f62554::t_e8c6b9b65324ee 30
+apps/construction-management/src/organization/application/plan-gate.ts
+  s_25a30b12f62554::t_a30597ef9e13be 2-4,6-10
+apps/construction-management/src/organization/application/subscription-handlers.ts
+  s_25a30b12f62554::t_2e5e79655c4342 1-335
+apps/construction-management/src/organization/application/subscription-plan-gate.test.ts
+  s_25a30b12f62554::t_583f99d40c0b5a 1-75
+apps/construction-management/src/organization/application/subscription-plan-gate.ts
+  s_25a30b12f62554::t_9341952e18152c 1-38
+apps/construction-management/src/organization/application/subscription-ports.ts
+  s_25a30b12f62554::t_abaee2afbc4877 1-80
+apps/construction-management/src/organization/domain/checkout.ts
+  s_25a30b12f62554::t_4e27ec734cc60a 1-246
+apps/construction-management/src/organization/domain/plan.ts
+  s_25a30b12f62554::t_a74a692f362287 1-159
+apps/construction-management/src/organization/domain/subscription-order.ts
+  s_25a30b12f62554::t_171ae0435b0fd7 1-110
+apps/construction-management/src/organization/domain/subscription.test.ts
+  s_25a30b12f62554::t_f256c6b4703e6f 1-378
+apps/construction-management/src/organization/domain/subscription.ts
+  s_25a30b12f62554::t_b1c57d95516c81 1-165
+apps/construction-management/src/organization/domain/usage.ts
+  s_25a30b12f62554::t_1639c4be52461b 1-25
+apps/construction-management/src/organization/infrastructure/create-subscription-handlers.ts
+  s_25a30b12f62554::t_ff3909127ce9f9 1-68
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_25a30b12f62554::t_4fb81fb68b36d0 14,17,48
+apps/construction-management/src/organization/infrastructure/fake-payment-gateway.ts
+  s_25a30b12f62554::t_2b9d31797147f1 1-56
+apps/construction-management/src/organization/infrastructure/invoice-pdf.ts
+  s_25a30b12f62554::t_a3fa6537d8efc4 1-211
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.ts
+  s_25a30b12f62554::t_338c77ec5dc699 1-23
+apps/construction-management/src/organization/infrastructure/plan-catalogue.ts
+  s_25a30b12f62554::t_3d1fa9a68cdfda 1-29
+apps/construction-management/src/organization/infrastructure/prisma-subscription-repository.ts
+  s_25a30b12f62554::t_96ab2fef234ee6 1-338
+apps/construction-management/src/organization/infrastructure/prisma-usage-reader.ts
+  s_25a30b12f62554::t_b41fa3923efedc 1-54
+apps/construction-management/src/organization/infrastructure/razorpay.test.ts
+  s_25a30b12f62554::t_6ba0cf8888f92c 1-78
+apps/construction-management/src/organization/infrastructure/razorpay.ts
+  s_25a30b12f62554::t_4c8eaf180c2897 1-95
+apps/construction-management/src/organization/infrastructure/seeds/plans.json
+  s_25a30b12f62554::t_24bafa07deb19a 1-51
+apps/construction-management/src/organization/infrastructure/seller.ts
+  s_25a30b12f62554::t_2144cd8b578be1 1-23
+apps/construction-management/src/organization/infrastructure/storage-meter.ts
+  s_25a30b12f62554::t_a72bbf8c6295a5 1-37
+apps/construction-management/src/queries/subscription.ts
+  s_25a30b12f62554::t_756bd91e3632ae 1-62
+apps/construction-management/src/shared-kernel/gst-states.ts
+  s_25a30b12f62554::t_2a72cccf636fa5 1-51
+apps/construction-management/src/shared-kernel/plan.ts
+  s_25a30b12f62554::t_95ae2f845ee209 1-85
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_772bb90834a8c0 52-56
+bun.lock
+  s_25a30b12f62554::t_34c04de12963ab 31,2042,2154-2189,2214-2219,2236-2247,2252-2253,2274-2275,2298-2301,2318-2319,2358-2365,2376-2379,2384-2389,2394-2395,2398-2401
+packages/db/prisma/migrations/20261009030000_construction_subscription_orders/migration.sql
+  s_25a30b12f62554::t_accc75ccaf8bf4 1-71
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_e5b0c0b94fff8f 69-72,288-364
+turbo.json
+  s_25a30b12f62554::t_1025494f1fd87b 41-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4c0c2b9ea18e90e4bbcff88f19927df1b3cc5503",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
