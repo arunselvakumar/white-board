@@ -105,7 +105,7 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 ### CM-003 — App wiring
 
-**Done when:** `bun run dev --filter=construction-management` serves :3002 with the `@repo/ui` theme; `.env.example` lists DB, auth, S3 (local MinIO) and OTP provider keys; `docker compose` has the `construction` database alongside Whiteboard's; `bun run check-types` and `lint` pass.
+**Done when:** `bun run dev --filter=construction-management` serves :3002 with the `@repo/ui` theme; `.env.example` lists DB, auth, S3 (local S3 stand-in: SeaweedFS, since MinIO no longer publishes pullable images) and OTP provider keys; `docker compose` has the `construction` database alongside Whiteboard's; `bun run check-types` and `lint` pass.
 
 ### CM-004 — First Prisma schema file
 
@@ -129,7 +129,7 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 ### CM-009 — App shell
 
-**Done when:** `/sign-in`, `/sign-up` use the public layout; `/app/*` uses `AppShell` from `@repo/ui` with the three top-level areas (Projects, Workspace, Masters) and a company switcher placeholder; Storybook renders the shell with empty states.
+**Done when:** `/sign-in`, `/sign-up` use the public layout (their forms arrive with CM-103); `/app/*` uses `AppShell` from `@repo/ui` with the three top-level areas (Projects, Workspace, Masters) and a company switcher placeholder; Storybook renders the shell with empty states.
 
 ---
 
