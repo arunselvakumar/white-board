@@ -59,6 +59,12 @@ export type TestResultInput = {
   status: TestResultStatus | null;
   marks?: number | null;
   remark?: string | null;
+  /**
+   * The result's `updatedAt` when the page loaded, or null if it was blank.
+   * A save from a stale page is refused instead of undoing someone else's
+   * change.
+   */
+  expectedUpdatedAt: string | null;
 };
 
 function forbidden(): DomainError {
@@ -66,6 +72,17 @@ function forbidden(): DomainError {
     "CLASS_TEST_FORBIDDEN",
     "Only the Owner and Teachers assigned to this Batch can do this.",
   );
+}
+
+/** Tags an error about one Student with their id, so the page can find the row. */
+function forStudent<T>(studentId: string, work: () => T): T {
+  try {
+    return work();
+  } catch (error) {
+    if (error instanceof DomainError && error.details === undefined)
+      throw new DomainError(error.code, error.message, { studentId });
+    throw error;
+  }
 }
 
 function testNotFound(): DomainError {
@@ -228,7 +245,7 @@ function byNewestTest(a: Dated, b: Dated): number {
   );
 }
 
-/** Commands and reads for Tests and their results (ADR-0037). */
+/** Commands and reads for Tests and their results (ADR-0038). */
 export class ClassTestHandlers {
   private readonly newId: () => string;
 
@@ -480,6 +497,15 @@ export class ClassTestHandlers {
       await store.lockTest(actor.workspaceId, id);
       const { test, batch } = await this.staffTest(actor, id, store);
       const results = await store.results(actor.workspaceId, [test.id]);
+      if (
+        test.publishedAt != null &&
+        (details.maxMarks !== test.maxMarks ||
+          details.passMarks !== test.passMarks)
+      )
+        throw new DomainError(
+          "CLASS_TEST_MARKS_LOCKED",
+          "The maximum and pass mark can't change after the Test is published.",
+        );
       if (details.heldOn !== test.heldOn) {
         if (test.publishedAt != null)
           throw new DomainError(
@@ -566,46 +592,60 @@ export class ClassTestHandlers {
       );
       const published = test.publishedAt != null;
       const seen = new Set<string>();
-      const plan = entries.map((entry) => {
-        const name = listed.get(entry.studentId);
-        if (name == null)
-          throw new DomainError(
-            "CLASS_TEST_STUDENT_NOT_LISTED",
-            "That Student isn't listed on this Test.",
-          );
-        if (seen.has(entry.studentId))
-          throw new DomainError(
-            "CLASS_TEST_STUDENT_REPEATED",
-            `${name} appears more than once.`,
-          );
-        seen.add(entry.studentId);
-        const current = existing.get(entry.studentId) ?? null;
-        if (entry.status == null) {
-          if (published)
+      const plan = entries.map((entry) =>
+        forStudent(entry.studentId, () => {
+          const name = listed.get(entry.studentId);
+          if (name == null)
             throw new DomainError(
-              "CLASS_TEST_RESULT_REQUIRED",
-              `Published results can't be left blank. Mark ${name} absent or exempt instead.`,
+              "CLASS_TEST_STUDENT_NOT_LISTED",
+              "That Student isn't listed on this Test.",
             );
+          if (seen.has(entry.studentId))
+            throw new DomainError(
+              "CLASS_TEST_STUDENT_REPEATED",
+              `${name} appears more than once.`,
+            );
+          seen.add(entry.studentId);
+          const current = existing.get(entry.studentId) ?? null;
           if (
-            (entry.remark?.trim() ?? "") !== "" ||
-            (entry.marks ?? null) != null
+            (current?.updatedAt.toISOString() ?? null) !==
+            entry.expectedUpdatedAt
           )
             throw new DomainError(
-              "CLASS_TEST_STATUS_REQUIRED",
-              `Choose scored, absent, or exempt for ${name}.`,
+              "CLASS_TEST_RESULT_CHANGED",
+              `${name}'s result was changed by someone else after you opened this Test. Load the latest marks and try again.`,
             );
-          return { studentId: entry.studentId, current, next: null };
-        }
-        return {
-          studentId: entry.studentId,
-          current,
-          next: testResult(
-            { status: entry.status, marks: entry.marks, remark: entry.remark },
-            test.maxMarks,
-            name,
-          ),
-        };
-      });
+          if (entry.status == null) {
+            if (published)
+              throw new DomainError(
+                "CLASS_TEST_RESULT_REQUIRED",
+                `Published results can't be left blank. Mark ${name} absent or exempt instead.`,
+              );
+            if (
+              (entry.remark?.trim() ?? "") !== "" ||
+              (entry.marks ?? null) != null
+            )
+              throw new DomainError(
+                "CLASS_TEST_STATUS_REQUIRED",
+                `Choose scored, absent, or exempt for ${name}.`,
+              );
+            return { studentId: entry.studentId, current, next: null };
+          }
+          return {
+            studentId: entry.studentId,
+            current,
+            next: testResult(
+              {
+                status: entry.status,
+                marks: entry.marks,
+                remark: entry.remark,
+              },
+              test.maxMarks,
+              name,
+            ),
+          };
+        }),
+      );
       const now = this.deps.now();
       for (const { studentId, current, next } of plan) {
         if (next == null) {

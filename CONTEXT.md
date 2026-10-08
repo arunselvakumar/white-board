@@ -177,7 +177,7 @@ A Student's Homework marked done, by the Student or a linked Parent, with an opt
 _Avoid_: hand-in, turn-in, answer
 
 **Test**:
-A test the Owner or an assigned Teacher records for a Batch: a name, date, maximum marks, an optional pass mark, and an optional topic or syllabus note. It is for the whole Batch or for one Student in it (a single-student Test, such as a re-test). A Test is a Draft until it is published; only then do the Students on it and their linked Parents see its results. See ADR-0037.
+A test the Owner or an assigned Teacher records for a Batch: a name, date, maximum marks, an optional pass mark, and an optional topic or syllabus note. It is for the whole Batch or for one Student in it (a single-student Test, such as a re-test). A Test is a Draft until it is published; only then do the Students on it and their linked Parents see its results. See ADR-0038.
 _Avoid_: exam, assessment, quiz (as the entity name)
 
 **Test Result**:

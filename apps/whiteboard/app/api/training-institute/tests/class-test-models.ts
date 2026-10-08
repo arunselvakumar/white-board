@@ -1,4 +1,4 @@
-// HTTP models for Tests and results (ADR-0037). Response models mirror
+// HTTP models for Tests and results (ADR-0038). Response models mirror
 // application/class-test-views.ts.
 
 import { z } from "zod";
@@ -35,6 +35,8 @@ export const SaveTrainingInstituteTestResultsRequestModel = z.object({
         status: ResultStatus.nullable(),
         marks: z.number().nullish(),
         remark: z.string().max(500).nullish(),
+        /** The result's updatedAt when the page loaded; null if it was blank. */
+        expectedUpdatedAt: z.iso.datetime().nullable(),
       }),
     )
     .max(500),

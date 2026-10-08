@@ -1,4 +1,4 @@
-// Shared wording for Test results on staff and family screens (ADR-0037).
+// Shared wording for Test results on staff and family screens (ADR-0038).
 
 import {
   formatMarks,

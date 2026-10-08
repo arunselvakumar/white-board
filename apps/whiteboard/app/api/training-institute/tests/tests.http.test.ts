@@ -91,9 +91,11 @@ type Entry = {
   status: "scored" | "absent" | "exempt" | null;
   marks?: number | null;
   remark?: string | null;
+  /** Left out, the result's current updatedAt is sent, as a fresh page would. */
+  expectedUpdatedAt?: string | null;
 };
 
-describe("Class tests HTTP (ADR-0037)", () => {
+describe("Class tests HTTP (ADR-0038)", () => {
   let workspaceId: string;
   let courseId: string;
   let batchId: string;
@@ -231,9 +233,23 @@ describe("Class tests HTTP (ADR-0037)", () => {
     testId: string,
     results: Entry[],
   ): Promise<Result<ClassTestDetailView & Json>> {
+    const saved = await prisma.trainingInstituteTestResult.findMany({
+      where: { testId },
+      select: { studentId: true, updatedAt: true },
+    });
+    const loaded = new Map(
+      saved.map((row) => [row.studentId, row.updatedAt.toISOString()]),
+    );
+    const body = results.map((entry) => ({
+      ...entry,
+      expectedUpdatedAt:
+        entry.expectedUpdatedAt === undefined
+          ? (loaded.get(entry.studentId) ?? null)
+          : entry.expectedUpdatedAt,
+    }));
     const result = await read<ClassTestDetailView & Json>(
       await saveResults(
-        post(`/t/${testId}/results`, { results }),
+        post(`/t/${testId}/results`, { results: body }),
         ctx({ id: testId }),
       ),
     );
@@ -441,6 +457,7 @@ describe("Class tests HTTP (ADR-0037)", () => {
     expect(over.body).toMatchObject({
       code: "CLASS_TEST_MARKS_OUT_OF_RANGE",
       message: "Marks for Asha must be from 0 to 50.",
+      details: { studentId: ashaId },
     });
     const under = await save(id, [
       { studentId: raviId, status: "scored", marks: -1 },
@@ -666,13 +683,13 @@ describe("Class tests HTTP (ADR-0037)", () => {
     ).toEqual([]);
   });
 
-  it("edits details, but not the date after publishing or a maximum below a mark", async () => {
+  it("edits a published Test's name and topic, but not its date, maximum, or pass mark", async () => {
     const id = await publishedTest();
     const details = {
       name: "Weekly test 3 (Loops)",
       heldOn: day(-2),
-      maxMarks: 45,
-      passMarks: 20,
+      maxMarks: 50,
+      passMarks: 18,
       topic: null,
     };
     const edited = await read<ClassTestDetailView & Json>(
@@ -681,18 +698,21 @@ describe("Class tests HTTP (ADR-0037)", () => {
     expect(edited.status).toBe(200);
     expect(edited.body.test).toMatchObject({
       name: "Weekly test 3 (Loops)",
-      maxMarks: 45,
-      passMarks: 20,
+      maxMarks: 50,
+      passMarks: 18,
       topic: null,
     });
-    const lowMax = await read<Json>(
-      await updateTest(
-        post(`/t/${id}/update`, { ...details, maxMarks: 40 }),
-        ctx({ id }),
-      ),
-    );
-    expect(lowMax.status).toBe(409);
-    expect(lowMax.body.code).toBe("CLASS_TEST_MAX_BELOW_MARKS");
+    // Moving the pass mark would turn Asha's 34 into a fail with no record.
+    for (const change of [{ passMarks: 40 }, { maxMarks: 60 }]) {
+      const locked = await read<Json>(
+        await updateTest(
+          post(`/t/${id}/update`, { ...details, ...change }),
+          ctx({ id }),
+        ),
+      );
+      expect(locked.status).toBe(409);
+      expect(locked.body.code).toBe("CLASS_TEST_MARKS_LOCKED");
+    }
     const moved = await read<Json>(
       await updateTest(
         post(`/t/${id}/update`, { ...details, heldOn: day(-3) }),
@@ -701,6 +721,72 @@ describe("Class tests HTTP (ADR-0037)", () => {
     );
     expect(moved.status).toBe(409);
     expect(moved.body.code).toBe("CLASS_TEST_DATE_LOCKED");
+  });
+
+  it("changes a draft's maximum, but not below a mark already entered", async () => {
+    owner();
+    const id = (await create()).body.test.id;
+    await save(id, [{ studentId: raviId, status: "scored", marks: 41.5 }]);
+    const details = { name: "Weekly test 3", heldOn: day(-2), passMarks: 18 };
+    const lowered = await read<ClassTestDetailView & Json>(
+      await updateTest(
+        post(`/t/${id}/update`, { ...details, maxMarks: 45 }),
+        ctx({ id }),
+      ),
+    );
+    expect(lowered.body.test.maxMarks).toBe(45);
+    const tooLow = await read<Json>(
+      await updateTest(
+        post(`/t/${id}/update`, { ...details, maxMarks: 40 }),
+        ctx({ id }),
+      ),
+    );
+    expect(tooLow.status).toBe(409);
+    expect(tooLow.body.code).toBe("CLASS_TEST_MAX_BELOW_MARKS");
+  });
+
+  it("refuses a save from a stale page instead of undoing someone else's change", async () => {
+    const id = await publishedTest();
+    const loaded = (await detail(id)).body.rows.find(
+      (row) => row.student.id === raviId,
+    )?.result?.updatedAt;
+    expect(loaded).toBeDefined();
+
+    // The Teacher corrects Ravi a minute later.
+    vi.setSystemTime(new Date(NOW.getTime() + 60_000));
+    teacher();
+    expect(
+      (await save(id, [{ studentId: raviId, status: "scored", marks: 44 }]))
+        .status,
+    ).toBe(200);
+
+    // The Owner's page still shows Ravi as first loaded.
+    owner();
+    const stale = await save(id, [
+      {
+        studentId: raviId,
+        status: "scored",
+        marks: 41.5,
+        expectedUpdatedAt: loaded ?? null,
+      },
+    ]);
+    expect(stale.status).toBe(409);
+    expect(stale.body).toMatchObject({
+      code: "CLASS_TEST_RESULT_CHANGED",
+      details: { studentId: raviId },
+    });
+    expect(
+      (await detail(id)).body.rows.find((row) => row.student.id === raviId)
+        ?.result?.marks,
+    ).toBe(44);
+
+    // A draft row the page loaded as blank can't wipe a result saved since.
+    const draftId = (await create({ name: "Mock" })).body.test.id;
+    await save(draftId, [{ studentId: ashaId, status: "scored", marks: 20 }]);
+    const blanked = await save(draftId, [
+      { studentId: ashaId, status: null, expectedUpdatedAt: null },
+    ]);
+    expect(blanked.body.code).toBe("CLASS_TEST_RESULT_CHANGED");
   });
 
   it("moves a draft's date only where every saved result still fits", async () => {

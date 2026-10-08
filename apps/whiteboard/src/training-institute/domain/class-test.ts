@@ -1,4 +1,4 @@
-// Test and result rules (ADR-0037). Pure: no I/O.
+// Test and result rules (ADR-0038). Pure: no I/O.
 
 import { isCalendarDate } from "./class-schedule";
 import { DomainError } from "./errors";

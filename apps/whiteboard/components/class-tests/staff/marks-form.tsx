@@ -50,6 +50,7 @@ import {
   type TestResultStatus,
   type TestRosterRowView,
 } from "@/src/queries/class-tests";
+import { QueryHttpError } from "@/src/queries/http";
 
 import {
   errorCode,
@@ -138,47 +139,61 @@ function formValues(view: ClassTestDetailView): Values {
   return { rows: view.rows.map(rowValues) };
 }
 
+/**
+ * The rows this page changed, each with the `updatedAt` it loaded, so a save
+ * never sends (and overwrites) a row someone else changed meanwhile.
+ */
 function toInput(
   rows: readonly TestRosterRowView[],
   values: Values,
+  changed: (index: number) => boolean,
 ): TestResultInput[] {
-  return rows.map((row, index) => {
+  return rows.flatMap((row, index): TestResultInput[] => {
+    if (!changed(index)) return [];
     const value = values.rows[index] ?? { status: "", marks: "", remark: "" };
     const remark = value.remark.trim();
+    const expectedUpdatedAt = row.result?.updatedAt ?? null;
     if (value.status === "")
-      return {
+      return [
+        {
+          studentId: row.student.id,
+          status: null,
+          marks: null,
+          remark: null,
+          expectedUpdatedAt,
+        },
+      ];
+    return [
+      {
         studentId: row.student.id,
-        status: null,
-        marks: null,
-        remark: null,
-      };
-    return {
-      studentId: row.student.id,
-      status: value.status,
-      marks: value.status === "scored" ? Number(value.marks.trim()) : null,
-      remark: remark === "" ? null : remark,
-    };
+        status: value.status,
+        marks: value.status === "scored" ? Number(value.marks.trim()) : null,
+        remark: remark === "" ? null : remark,
+        expectedUpdatedAt,
+      },
+    ];
   });
 }
 
-/** The row a server message names, preferring the longest matching name. */
-function rowNamedIn(
-  message: string,
+/** The row a server error is about, from the Student id in its details. */
+function rowInError(
+  error: unknown,
   rows: readonly TestRosterRowView[],
 ): number | null {
-  let best: number | null = null;
-  let bestLength = 0;
-  for (const [index, row] of rows.entries()) {
-    const { name } = row.student;
-    if (message.includes(name) && name.length > bestLength) {
-      best = index;
-      bestLength = name.length;
-    }
-  }
-  return best;
+  const details = error instanceof QueryHttpError ? error.details : null;
+  const studentId =
+    typeof details === "object" && details != null && "studentId" in details
+      ? details.studentId
+      : null;
+  const index = rows.findIndex((row) => row.student.id === studentId);
+  return index === -1 ? null : index;
 }
 
+/** Another User saved this Test after the page loaded. */
+const STALE_CODE = "CLASS_TEST_RESULT_CHANGED";
+
 const ROW_ERROR_FIELD: Record<string, "status" | "marks" | "remark"> = {
+  [STALE_CODE]: "status",
   CLASS_TEST_MARKS_REQUIRED: "marks",
   CLASS_TEST_MARKS_OUT_OF_RANGE: "marks",
   CLASS_TEST_MARKS_STEP: "marks",
@@ -222,8 +237,9 @@ export function MarksForm({
     setValue,
     getValues,
     reset,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isDirty, isSubmitting, dirtyFields },
   } = useForm<Values>({ resolver, defaultValues: formValues(view) });
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -249,15 +265,31 @@ export function MarksForm({
     ]);
   }
 
-  /** Saves every row. Returns false and shows the server's message on failure. */
+  /** Fetches the Test again and replaces this page's marks with it. */
+  async function loadLatest() {
+    const next = await queryClient.query({
+      ...classTestQueries.detail(test.id),
+      staleTime: 0,
+    });
+    setStale(false);
+    await settle(next);
+  }
+
+  /** Saves the changed rows. Returns false and shows the server's message on failure. */
   async function save(values: Values): Promise<boolean> {
     let next: ClassTestDetailView;
+    const changed = (index: number) => {
+      const row = dirtyFields.rows?.[index];
+      return row != null && Object.values(row).some(Boolean);
+    };
     try {
-      next = await saveTestResults(test.id, toInput(rows, values));
+      next = await saveTestResults(test.id, toInput(rows, values, changed));
     } catch (error) {
       const message = errorMessage(error);
-      const field = ROW_ERROR_FIELD[errorCode(error) ?? ""];
-      const index = field == null ? null : rowNamedIn(message, rows);
+      const code = errorCode(error);
+      setStale(code === STALE_CODE);
+      const field = ROW_ERROR_FIELD[code ?? ""];
+      const index = field == null ? null : rowInError(error, rows);
       if (field != null && index != null)
         setError(
           `rows.${index}.${field}`,
@@ -267,6 +299,7 @@ export function MarksForm({
       setError("root", { message });
       return false;
     }
+    setStale(false);
     await settle(next);
     return true;
   }
@@ -412,6 +445,18 @@ export function MarksForm({
             </p>
           )}
           <FormAlert message={errors.root?.message} />
+          {stale ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                void loadLatest();
+              }}
+            >
+              Load latest marks
+            </Button>
+          ) : null}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-muted-foreground text-xs">
               {isDirty ? (

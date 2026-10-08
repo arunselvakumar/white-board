@@ -1,4 +1,4 @@
-// Wording and small helpers for the staff Test screens (ADR-0037).
+// Wording and small helpers for the staff Test screens (ADR-0038).
 
 import { formatMarks } from "@/src/queries/class-tests";
 

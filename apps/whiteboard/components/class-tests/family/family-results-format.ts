@@ -1,4 +1,4 @@
-// Helpers for the Student and Parent Results page and Home card (ADR-0037).
+// Helpers for the Student and Parent Results page and Home card (ADR-0038).
 // Everything here works on one Student's own published results; nothing
 // compares a Student with anyone else.
 

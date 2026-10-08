@@ -1,4 +1,4 @@
-// Story fixtures for a Student's Test history (ADR-0037).
+// Story fixtures for a Student's Test history (ADR-0038).
 
 import type {
   ClassTestBatchView,

@@ -22,7 +22,7 @@ import {
 
 /**
  * The Home card for one Student: their newest published Test results
- * (ADR-0037), with a link to the Results page.
+ * (ADR-0038), with a link to the Results page.
  */
 export function ResultsHomeCard({
   student,

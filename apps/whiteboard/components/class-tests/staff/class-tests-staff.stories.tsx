@@ -133,7 +133,7 @@ const detailRoute = (view: ClassTestDetailView): Record<string, Route> => ({
   [`GET /tests/${view.test.id}`]: () => ({ json: view }),
 });
 
-/** The detail the server would return after saving `results`. */
+/** The detail the server would return after saving `results` (changed rows only). */
 function withResults(
   view: ClassTestDetailView,
   results: TestResultInput[],
@@ -142,7 +142,8 @@ function withResults(
     ...view,
     rows: view.rows.map((row) => {
       const input = results.find((item) => item.studentId === row.student.id);
-      if (input?.status == null) return { ...row, result: null };
+      if (input == null) return row;
+      if (input.status == null) return { ...row, result: null };
       return {
         ...row,
         result: {
@@ -511,37 +512,28 @@ export const DraftMarkEntry: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));
     await waitFor(() =>
       expect(callsTo(`POST /tests/${UNIT_2_ID}/results`)[0]?.body).toEqual({
+        // Only the rows this page changed, each with the version it loaded.
         results: [
-          { studentId: arjun.id, status: "scored", marks: 37.5, remark: null },
+          {
+            studentId: arjun.id,
+            status: "scored",
+            marks: 37.5,
+            remark: null,
+            expectedUpdatedAt: null,
+          },
           {
             studentId: asha.id,
             status: "absent",
             marks: null,
             remark: "Neat work.",
-          },
-          {
-            studentId: draftDetail().rows[2]?.student.id,
-            status: "scored",
-            marks: 12.5,
-            remark: null,
-          },
-          {
-            studentId: draftDetail().rows[3]?.student.id,
-            status: "absent",
-            marks: null,
-            remark: null,
-          },
-          {
-            studentId: draftDetail().rows[4]?.student.id,
-            status: "scored",
-            marks: 38,
-            remark: null,
+            expectedUpdatedAt: draftDetail().rows[1]?.result?.updatedAt,
           },
           {
             studentId: draftDetail().rows[5]?.student.id,
             status: "exempt",
             marks: null,
             remark: "Joined after this topic.",
+            expectedUpdatedAt: null,
           },
         ],
       }),
@@ -581,19 +573,23 @@ export const SaveBlankDraftRows: Story = {
     await userEvent.clear(marks);
     await userEvent.type(marks, "40");
     await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));
+    // Blank rows the page didn't touch aren't sent, so they can't wipe a
+    // result someone else saved meanwhile.
     await waitFor(() =>
       expect(
         (
           callsTo(`POST /tests/${UNIT_2_ID}/results`)[0]?.body as {
             results: TestResultInput[];
           }
-        ).results[0],
-      ).toEqual({
-        studentId: arjun.id,
-        status: null,
-        marks: null,
-        remark: null,
-      }),
+        ).results,
+      ).toEqual([
+        expect.objectContaining({
+          studentId: asha.id,
+          status: "scored",
+          marks: 40,
+          expectedUpdatedAt: draftDetail().rows[1]?.result?.updatedAt,
+        }),
+      ]),
     );
   },
 };
@@ -608,6 +604,7 @@ export const MarksServerError: Story = {
         json: {
           code: "CLASS_TEST_MARKS_OUT_OF_RANGE",
           message: "Marks for Asha Menon must be from 0 to 40.",
+          details: { studentId: asha.id },
         },
       }),
     }),
@@ -707,6 +704,9 @@ export const PublishTest: Story = {
       status: "scored",
       marks: 29,
       remark: "Good improvement.",
+      expectedUpdatedAt:
+        completeDraftDetail().rows.find((row) => row.student.id === arjun.id)
+          ?.result?.updatedAt ?? null,
     });
     await expect(await canvas.findByText(PUBLISHED_EDIT_NOTE)).toBeVisible();
     await expect(canvas.queryByText(DRAFT_VISIBILITY_NOTE)).toBeNull();
@@ -767,10 +767,14 @@ export const PublishedWithChangeHistory: Story = {
     const dialog = within(
       await body.findByRole("dialog", { name: "Edit test details" }),
     );
-    await expect(dialog.getByLabelText("Date")).toBeDisabled();
+    // Changing these would change pass or fail with no record (ADR-0038).
+    for (const label of ["Date", "Maximum marks", "Pass mark (optional)"])
+      await expect(dialog.getByLabelText(label)).toHaveAttribute("readonly");
     await waitFor(() =>
       expect(
-        dialog.getByText("The date can’t change after the Test is published."),
+        dialog.getByText(
+          /The date, maximum, and pass mark can’t change after the Test is\s+published\./,
+        ),
       ).toBeVisible(),
     );
     await expect(
@@ -780,29 +784,31 @@ export const PublishedWithChangeHistory: Story = {
 };
 
 export const EditDetailsServerError: Story = {
-  parameters: testPage(UNIT_1_ID),
+  parameters: testPage(UNIT_2_ID),
   beforeEach: () =>
     mockApi({
-      ...detailRoute(publishedDetail()),
-      [`POST /tests/${UNIT_1_ID}/update`]: () => ({
-        status: 422,
+      ...detailRoute(draftDetail()),
+      [`POST /tests/${UNIT_2_ID}/update`]: () => ({
+        status: 409,
         json: {
           code: "CLASS_TEST_MAX_BELOW_MARKS",
           message: "Maximum marks can't be below a mark already entered (47).",
         },
       }),
     }),
-  render: () => <TeacherTest testId={UNIT_1_ID} />,
+  render: () => <TeacherTest testId={UNIT_2_ID} />,
   play: async ({ canvas, canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
+    const { test } = draftDetail();
     await userEvent.click(
       await canvas.findByRole("button", { name: "Edit details" }),
     );
     const dialog = within(
       await body.findByRole("dialog", { name: "Edit test details" }),
     );
-    await expect(dialog.getByLabelText("Test name")).toHaveValue(unit1.name);
+    await expect(dialog.getByLabelText("Test name")).toHaveValue(test.name);
     const max = dialog.getByLabelText("Maximum marks");
+    await expect(max).not.toHaveAttribute("readonly");
     await userEvent.clear(max);
     await userEvent.type(max, "40");
     await userEvent.click(dialog.getByRole("button", { name: "Save details" }));
@@ -811,13 +817,70 @@ export const EditDetailsServerError: Story = {
         "Maximum marks can't be below a mark already entered (47).",
       ),
     ).toBeVisible();
-    await expect(callsTo(`POST /tests/${UNIT_1_ID}/update`)[0]?.body).toEqual({
-      name: unit1.name,
-      heldOn: unit1.heldOn,
+    await expect(callsTo(`POST /tests/${UNIT_2_ID}/update`)[0]?.body).toEqual({
+      name: test.name,
+      heldOn: test.heldOn,
       maxMarks: 40,
-      passMarks: 20,
-      topic: null,
+      passMarks: test.passMarks,
+      topic: test.topic,
     });
+  },
+};
+
+export const StaleSave: Story = {
+  parameters: testPage(UNIT_2_ID),
+  beforeEach: () => {
+    const view = draftDetail();
+    const latest = {
+      ...view,
+      rows: view.rows.map((row) =>
+        row.student.id === asha.id && row.result != null
+          ? {
+              ...row,
+              result: {
+                ...row.result,
+                status: "scored" as const,
+                marks: 44,
+                updatedAt: at("2026-10-07", "12:05"),
+              },
+            }
+          : row,
+      ),
+    };
+    let reads = 0;
+    return mockApi({
+      [`GET /tests/${UNIT_2_ID}`]: () => {
+        reads += 1;
+        return { json: reads === 1 ? view : latest };
+      },
+      [`POST /tests/${UNIT_2_ID}/results`]: () => ({
+        status: 409,
+        json: {
+          code: "CLASS_TEST_RESULT_CHANGED",
+          message:
+            "Asha Menon's result was changed by someone else after you opened this Test. Load the latest marks and try again.",
+          details: { studentId: asha.id },
+        },
+      }),
+    });
+  },
+  render: () => <TeacherTest testId={UNIT_2_ID} />,
+  play: async ({ canvas }) => {
+    const marks = await canvas.findByLabelText(`Marks for ${asha.name}`);
+    await userEvent.clear(marks);
+    await userEvent.type(marks, "30");
+    await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      /changed by someone else/,
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Load latest marks" }),
+    );
+    await waitFor(() => expect(marks).toHaveValue("44"));
+    await expect(canvas.getByText("All changes saved")).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Load latest marks" }),
+    ).toBeNull();
   },
 };
 

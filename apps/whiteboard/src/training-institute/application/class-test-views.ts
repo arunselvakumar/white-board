@@ -1,4 +1,4 @@
-// Read models for Tests and results (ADR-0037). The HTTP models and the
+// Read models for Tests and results (ADR-0038). The HTTP models and the
 // client query types match these exactly.
 
 import type { TestResultStatus, TestScope } from "../domain/class-test";

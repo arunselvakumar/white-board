@@ -16,7 +16,7 @@ type Back = { label: string; href: string };
 
 /**
  * One Student's Tests, for staff. A Teacher sees the Tests in every Batch
- * they're assigned to (ADR-0037, decision 2) and reaches this from a Test.
+ * they're assigned to (ADR-0038, decision 2) and reaches this from a Test.
  */
 export function StudentTestHistoryScreen({
   studentId,

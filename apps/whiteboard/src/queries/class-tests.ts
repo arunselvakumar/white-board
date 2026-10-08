@@ -34,7 +34,7 @@ export type {
 
 const BASE = "/api/training-institute";
 
-/** Whole numbers, 1 to 1000 (ADR-0037). */
+/** Whole numbers, 1 to 1000 (ADR-0038). */
 export const TEST_MAX_MARKS_LIMIT = 1000;
 export const TEST_NAME_MAX = 200;
 export const TEST_TOPIC_MAX = 1000;
@@ -63,6 +63,8 @@ export type TestResultInput = {
   /** Whole or half marks; null unless scored. */
   marks: number | null;
   remark: string | null;
+  /** The row's `result.updatedAt` when the page loaded; null if it was blank. */
+  expectedUpdatedAt: string | null;
 };
 
 function post<T>(path: string, body?: unknown): Promise<T> {

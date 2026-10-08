@@ -424,7 +424,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 
 ### WB-016 — Tests and marks
 
-**Issue:** [#28](https://github.com/arunselvakumar/white-board/issues/28). **Decisions:** [ADR-0037](../adr/0037-class-test-product-decisions.md). **Blocked by:** WB-003, WB-012 (Teachers and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/11).
+**Issue:** [#28](https://github.com/arunselvakumar/white-board/issues/28). **Decisions:** [ADR-0038](../adr/0038-class-test-product-decisions.md). **Blocked by:** WB-003, WB-012 (Teachers and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/11).
 
 **Done when:** the Owner and assigned Teachers can create a whole-batch or single-student Test, enter scored, absent, and exempt results with remarks, save a draft, and publish after a confirmation that says families will see results and remarks; marks outside 0 to the maximum are refused with a clear message; published marks can be corrected without approval and every change is logged; the Batch view shows each Test's average, highest, lowest, and who scored below the pass mark, was absent, or was exempt, leaving single-student Tests out of those numbers; staff see each Student's full Test history, drafts marked; Students and linked Parents see only the Student's own published results on a Results page and Home; unassigned Teachers, other Batches' Students, and other Workspaces can't see or change any of it. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
 

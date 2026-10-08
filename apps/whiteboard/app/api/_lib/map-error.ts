@@ -99,6 +99,8 @@ const CONFLICT_CODES = new Set([
   "CLASS_TEST_RESULTS_INCOMPLETE",
   "CLASS_TEST_NOBODY_LISTED",
   "CLASS_TEST_MAX_BELOW_MARKS",
+  "CLASS_TEST_MARKS_LOCKED",
+  "CLASS_TEST_RESULT_CHANGED",
 ]);
 const ENQUIRY_FORBIDDEN_CODES = new Set([
   "ENQUIRY_CONVERT_FORBIDDEN",
@@ -163,10 +165,11 @@ export function mapError(error: unknown): Response {
     return jsonError(StatusCodes.NOT_FOUND, code, error.message);
   }
   if (error instanceof Error && error.name === "DomainError" && code != null) {
+    const { details } = error as { details?: unknown };
     if (CONFLICT_CODES.has(code)) {
-      return jsonError(StatusCodes.CONFLICT, code, error.message);
+      return jsonError(StatusCodes.CONFLICT, code, error.message, details);
     }
-    return jsonError(StatusCodes.BAD_REQUEST, code, error.message);
+    return jsonError(StatusCodes.BAD_REQUEST, code, error.message, details);
   }
   console.error(error);
   return jsonError(

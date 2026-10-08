@@ -114,7 +114,7 @@ function StudentResults({
 }
 
 /**
- * The Student's own published Test results, newest first (ADR-0037). A Parent
+ * The Student's own published Test results, newest first (ADR-0038). A Parent
  * sees one section per linked Student. Nothing here compares a Student with
  * anyone else.
  */

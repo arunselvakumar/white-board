@@ -274,11 +274,20 @@ function TestForm({
       noValidate
       className="space-y-4"
       onSubmit={handleSubmit(async (values) => {
+        // A published Test keeps its date, maximum, and pass mark (ADR-0038).
         const input = {
           name: values.name,
-          heldOn: values.heldOn,
-          maxMarks: Number(values.maxMarks),
-          passMarks: values.passMarks === "" ? null : Number(values.passMarks),
+          heldOn: test != null && dateLocked ? test.heldOn : values.heldOn,
+          maxMarks:
+            test != null && dateLocked
+              ? test.maxMarks
+              : Number(values.maxMarks),
+          passMarks:
+            test != null && dateLocked
+              ? test.passMarks
+              : values.passMarks === ""
+                ? null
+                : Number(values.passMarks),
           topic: values.topic === "" ? null : values.topic,
         };
         let saved: ClassTestDetailView;
@@ -304,7 +313,8 @@ function TestForm({
             setError("heldOn", { message });
           else if (
             code === "CLASS_TEST_MAX_MARKS_INVALID" ||
-            code === "CLASS_TEST_MAX_BELOW_MARKS"
+            code === "CLASS_TEST_MAX_BELOW_MARKS" ||
+            code === "CLASS_TEST_MARKS_LOCKED"
           )
             setError("maxMarks", { message });
           else if (code === "CLASS_TEST_PASS_MARKS_INVALID")
@@ -361,14 +371,15 @@ function TestForm({
             className="h-10"
             min={firstDate}
             max={today}
-            disabled={dateLocked}
+            readOnly={dateLocked}
             aria-invalid={errors.heldOn != null}
             aria-describedby={dateLocked ? "test-date-locked" : undefined}
             {...register("heldOn")}
           />
           {dateLocked ? (
             <p id="test-date-locked" className="text-muted-foreground text-xs">
-              The date can’t change after the Test is published.
+              The date, maximum, and pass mark can’t change after the Test is
+              published.
             </p>
           ) : null}
           <FieldError message={errors.heldOn?.message} />
@@ -380,7 +391,9 @@ function TestForm({
             inputMode="numeric"
             className="h-10"
             placeholder="e.g. 50"
+            readOnly={dateLocked}
             aria-invalid={errors.maxMarks != null}
+            aria-describedby={dateLocked ? "test-date-locked" : undefined}
             {...register("maxMarks")}
           />
           <FieldError message={errors.maxMarks?.message} />
@@ -392,7 +405,9 @@ function TestForm({
             inputMode="numeric"
             className="h-10"
             placeholder="e.g. 20"
+            readOnly={dateLocked}
             aria-invalid={errors.passMarks != null}
+            aria-describedby={dateLocked ? "test-date-locked" : undefined}
             {...register("passMarks")}
           />
           <FieldError message={errors.passMarks?.message} />

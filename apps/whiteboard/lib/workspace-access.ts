@@ -59,7 +59,7 @@ export function isAllowedAppPath(
   // A Batch's Homework and Study Material, and one Homework's Submissions.
   if (/^\/teacher\/batches\/[^/]+\/homework(?:\/[^/]+)?$/.test(pathname))
     return role === "teacher";
-  // Tests (ADR-0037): the family Results page, a Batch's Tests, one Test,
+  // Tests (ADR-0038): the family Results page, a Batch's Tests, one Test,
   // and a Student's Test history from the Teacher's Batch.
   if (pathname === "/student/results") return role === "student";
   if (pathname === "/parent/results") return role === "parent";
