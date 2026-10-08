@@ -32,3 +32,4 @@ export {
   normalizeMobile,
 } from "../mobile";
 export { constructionOrigin } from "../config";
+export { isConstructionSmsEnabled } from "../features";

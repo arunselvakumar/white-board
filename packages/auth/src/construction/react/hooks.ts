@@ -95,7 +95,7 @@ export function useCompanyMobileOtp() {
   return { sendCode, verifyCode, setName, fetchStatus, error, clearError };
 }
 
-/** Email and password sign-in (the secondary path; mobile OTP is primary). */
+/** Email and password sign-in: the sign-in while SMS is off (ADR CM-0009). */
 export function useCompanyEmailSignIn() {
   const { run, fetchStatus, error, clearError } = useAuthAction();
   const signIn = useCallback(
@@ -158,6 +158,39 @@ export function useCompanyEmailSignUp() {
     error,
     clearError,
   };
+}
+
+/**
+ * Forgot password: email a 6-digit code, then set a new password with it.
+ * An unknown email still "sends" (nothing is emailed), so the screen never
+ * reveals whether an email has an account. A reset signs out every Session.
+ */
+export function useCompanyPasswordReset() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+
+  const requestCode = useCallback(
+    (email: string) =>
+      run(() =>
+        constructionAuthClient().emailOtp.requestPasswordReset({
+          email: email.trim(),
+        }),
+      ),
+    [run],
+  );
+
+  const resetPassword = useCallback(
+    (input: { email: string; code: string; password: string }) =>
+      run(() =>
+        constructionAuthClient().emailOtp.resetPassword({
+          email: input.email.trim(),
+          otp: input.code.trim(),
+          password: input.password,
+        }),
+      ),
+    [run],
+  );
+
+  return { requestCode, resetPassword, fetchStatus, error, clearError };
 }
 
 export function useCompanySignOut() {

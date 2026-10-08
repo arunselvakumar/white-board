@@ -8,7 +8,7 @@ import { SignInForm } from "./sign-in-form";
 const meta = {
   title: "Auth/SignInForm",
   component: SignInForm,
-  args: { redirectUrl: null },
+  args: { redirectUrl: null, mobileOtp: false },
   render: (args) => (
     <PublicShell>
       <SignInForm {...args} />
@@ -20,6 +20,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Mobile: Story = {
+  args: { mobileOtp: true },
   play: async ({ canvas: page, userEvent }) => {
     const panel = (name = "Mobile") =>
       within(page.getByRole("tabpanel", { name }));
@@ -52,6 +53,7 @@ export const Mobile: Story = {
 };
 
 export const InvalidMobile: Story = {
+  args: { mobileOtp: true },
   play: async ({ canvas: page, userEvent }) => {
     const panel = (name = "Mobile") =>
       within(page.getByRole("tabpanel", { name }));
@@ -65,6 +67,7 @@ export const InvalidMobile: Story = {
 };
 
 export const WrongCode: Story = {
+  args: { mobileOtp: true },
   play: async ({ canvas: page, userEvent }) => {
     const panel = (name = "Mobile") =>
       within(page.getByRole("tabpanel", { name }));
@@ -86,7 +89,7 @@ export const WrongCode: Story = {
 };
 
 export const KeepsRedirect: Story = {
-  args: { redirectUrl: "/app/masters" },
+  args: { mobileOtp: true, redirectUrl: "/app/masters" },
   play: async ({ canvas: page, userEvent }) => {
     const panel = (name = "Mobile") =>
       within(page.getByRole("tabpanel", { name }));
@@ -107,20 +110,16 @@ export const KeepsRedirect: Story = {
 
 export const Email: Story = {
   play: async ({ canvas: page, userEvent }) => {
-    const panel = (name = "Mobile") =>
-      within(page.getByRole("tabpanel", { name }));
-    await userEvent.click(page.getByRole("tab", { name: "Email" }));
-    await userEvent.type(
-      panel("Email").getByLabelText("Email"),
-      "ramesh@patil.in",
-    );
-    await userEvent.type(
-      panel("Email").getByLabelText("Password"),
-      "site-pass-1",
-    );
-    await userEvent.click(
-      panel("Email").getByRole("button", { name: "Sign in" }),
-    );
+    await expect(page.queryByRole("tab", { name: "Mobile" })).toBeNull();
+    await expect(
+      page.getByText("Sign in with your email and password."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Forgot password?" }),
+    ).toHaveAttribute("href", "/forgot-password");
+    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Password"), "site-pass-1");
+    await userEvent.click(page.getByRole("button", { name: "Sign in" }));
     await waitFor(() =>
       expect(authMocks.emailSignIn).toHaveBeenCalledWith({
         email: "ramesh@patil.in",
@@ -133,35 +132,19 @@ export const Email: Story = {
 
 export const EmailNotVerified: Story = {
   play: async ({ canvas: page, userEvent }) => {
-    const panel = (name = "Mobile") =>
-      within(page.getByRole("tabpanel", { name }));
     authMocks.emailSignIn.mockImplementation(() =>
       authFailure("EMAIL_NOT_VERIFIED", 403),
     );
-    await userEvent.click(page.getByRole("tab", { name: "Email" }));
-    await userEvent.type(
-      panel("Email").getByLabelText("Email"),
-      "ramesh@patil.in",
-    );
-    await userEvent.type(
-      panel("Email").getByLabelText("Password"),
-      "site-pass-1",
-    );
-    await userEvent.click(
-      panel("Email").getByRole("button", { name: "Sign in" }),
-    );
-    await expect(
-      await panel("Email").findByText("ramesh@patil.in"),
-    ).toBeVisible();
+    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Password"), "site-pass-1");
+    await userEvent.click(page.getByRole("button", { name: "Sign in" }));
+    await expect(await page.findByText("ramesh@patil.in")).toBeVisible();
     await expect(authMocks.emailSignUp.sendEmailCode).toHaveBeenCalledWith(
       "ramesh@patil.in",
     );
-    await userEvent.type(
-      panel("Email").getByLabelText("6-digit code"),
-      "654321",
-    );
+    await userEvent.type(page.getByLabelText("6-digit code"), "654321");
     await userEvent.click(
-      panel("Email").getByRole("button", { name: "Verify and sign in" }),
+      page.getByRole("button", { name: "Verify and sign in" }),
     );
     await waitFor(() =>
       expect(authMocks.navigateInApp).toHaveBeenCalledWith("/continue"),
@@ -171,22 +154,14 @@ export const EmailNotVerified: Story = {
 
 export const WrongPassword: Story = {
   play: async ({ canvas: page, userEvent }) => {
-    const panel = (name = "Mobile") =>
-      within(page.getByRole("tabpanel", { name }));
     authMocks.emailSignIn.mockImplementation(() =>
       authFailure("INVALID_EMAIL_OR_PASSWORD", 401),
     );
-    await userEvent.click(page.getByRole("tab", { name: "Email" }));
-    await userEvent.type(
-      panel("Email").getByLabelText("Email"),
-      "ramesh@patil.in",
-    );
-    await userEvent.type(panel("Email").getByLabelText("Password"), "wrong");
-    await userEvent.click(
-      panel("Email").getByRole("button", { name: "Sign in" }),
-    );
+    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Password"), "wrong");
+    await userEvent.click(page.getByRole("button", { name: "Sign in" }));
     await expect(
-      await panel("Email").findByText("Incorrect email or password."),
+      await page.findByText("Incorrect email or password."),
     ).toBeVisible();
   },
 };

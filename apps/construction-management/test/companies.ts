@@ -11,16 +11,16 @@ import { createDesignationHandlers } from "@/src/organization/infrastructure/cre
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag, PermissionGrants } from "@/src/shared-kernel/access";
 
-import { newMobile, signInByMobile, TEST_ORIGIN } from "./sessions";
+import { newEmail, signInByEmail, TEST_ORIGIN } from "./sessions";
 
 // Real sessions through the auth routes (HTTP tests of routes).
 
 /**
- * An Owner signed in by mobile with a fresh Company active, plus helpers
+ * An Owner signed in by email with a fresh Company active, plus helpers
  * to call routes as that Owner.
  */
 export async function ownerWithCompany(name = "Patil Builders") {
-  const owner = await signInByMobile();
+  const owner = await signInByEmail();
   const created = await createCompanyRoute(
     new Request(`${TEST_ORIGIN}/api/construction/organization/companies`, {
       method: "POST",
@@ -52,7 +52,7 @@ export async function memberWith(
   },
   permissions: PermissionGrants,
 ) {
-  const mobile = newMobile();
+  const email = newEmail();
   const member = await createTeamMemberHandlers().invite({
     workspaceId: company.workspaceId,
     by: company.userId,
@@ -60,11 +60,11 @@ export async function memberWith(
     details: {
       name: "Member",
       designationId: company.designationId("Site Engineer"),
-      mobile,
+      email,
     },
     permissions,
   });
-  const session = await signInByMobile(mobile);
+  const session = await signInByEmail(email, "Member");
   await prisma.identityWorkspaceMember.create({
     data: {
       id: `member_${member.id}`,

@@ -8,7 +8,7 @@ import { POST as createCompany } from "@/app/api/construction/organization/compa
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag } from "@/src/shared-kernel/access";
-import { signInByMobile, TEST_ORIGIN } from "@/test/sessions";
+import { signInByEmail, TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteDesignation } from "./[id]/delete/route";
 import { POST as duplicateDesignation } from "./[id]/duplicate/route";
@@ -53,7 +53,7 @@ async function owner(): Promise<{
   userId: string;
   workspaceId: string;
 }> {
-  const { cookie, userId } = await signInByMobile();
+  const { cookie, userId } = await signInByEmail();
   const response = await createCompany(
     post(`${TEST_ORIGIN}/api/construction/organization/companies`, cookie, {
       name: "Patil Builders",
@@ -81,7 +81,7 @@ async function member(
   company: { workspaceId: string; userId: string },
   grants: Record<string, Flag[]>,
 ): Promise<string> {
-  const { cookie, userId, mobile } = await signInByMobile();
+  const { cookie, userId, email } = await signInByEmail();
   await seedCompanyMember({
     workspaceId: company.workspaceId,
     userId,
@@ -98,7 +98,7 @@ async function member(
     details: {
       name: "Suresh Kale",
       designationId: designations[0]?.id ?? "",
-      mobile,
+      email,
     },
     permissions: grants,
   });

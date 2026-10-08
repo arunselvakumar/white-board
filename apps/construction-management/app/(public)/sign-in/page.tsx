@@ -1,4 +1,7 @@
-import { getCompanyAuth } from "@repo/auth/construction/server";
+import {
+  getCompanyAuth,
+  isConstructionSmsEnabled,
+} from "@repo/auth/construction/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -15,5 +18,10 @@ export default async function SignInPage({
   const { redirect_url: redirectUrl = null } = await searchParams;
   const auth = await getCompanyAuth();
   if (auth.isAuthenticated) redirect(continuePath(redirectUrl));
-  return <SignInForm redirectUrl={redirectUrl} />;
+  return (
+    <SignInForm
+      redirectUrl={redirectUrl}
+      mobileOtp={isConstructionSmsEnabled()}
+    />
+  );
 }

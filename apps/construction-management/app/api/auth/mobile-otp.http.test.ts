@@ -2,7 +2,9 @@ import { randomInt } from "node:crypto";
 
 import { lastSmsCodeFor, smsOutbox } from "@repo/auth/construction/testing";
 import { prisma } from "@repo/db";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { withSms } from "@/test/sessions";
 
 import { POST } from "./[...all]/route";
 
@@ -29,7 +31,27 @@ async function json<T>(response: Response): Promise<T> {
 
 type ErrorJson = { code?: string; message?: string };
 
-describe("mobile OTP sign-in (CM-102)", () => {
+describe("mobile OTP while SMS is off (ADR CM-0009)", () => {
+  it("answers 404 and texts nothing", async () => {
+    smsOutbox.length = 0;
+    const mobile = newMobile();
+    const sent = await authPost("/phone-number/send-otp", {
+      phoneNumber: mobile,
+    });
+    expect(sent.status).toBe(404);
+    const verified = await authPost("/phone-number/verify", {
+      phoneNumber: mobile,
+      code: "246810",
+    });
+    expect(verified.status).toBe(404);
+    expect(smsOutbox).toEqual([]);
+  });
+});
+
+describe("mobile OTP sign-in while SMS is on (CM-102)", () => {
+  const sms = withSms();
+  beforeAll(sms.on);
+  afterAll(sms.off);
   beforeEach(() => {
     smsOutbox.length = 0;
   });

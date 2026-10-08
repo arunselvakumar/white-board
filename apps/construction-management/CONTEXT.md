@@ -15,7 +15,7 @@ The Company the current Session is working in. Every API call is scoped to it; i
 _Avoid_: current org, selected tenant
 
 **User**:
-A person who can sign in, by mobile OTP or by email and password. A User exists once, across all their Companies.
+A person who can sign in: by email and password, and by mobile OTP once SMS is on (ADR CM-0009). A User exists once, across all their Companies.
 _Avoid_: account, login, customer
 
 **Team Member**:

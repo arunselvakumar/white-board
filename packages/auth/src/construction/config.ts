@@ -13,6 +13,7 @@ import {
   CONSTRUCTION_COOKIE_PREFIX,
   CONSTRUCTION_LOCAL_ORIGIN,
 } from "./constants";
+import { isConstructionSmsEnabled } from "./features";
 import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
 import { createSmsSender, type SmsSender } from "./sms";
 import {
@@ -39,8 +40,6 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-out",
   "/sign-up/email",
   "/sign-in/email",
-  "/phone-number/send-otp",
-  "/phone-number/verify",
   "/update-user",
   "/email-otp/send-verification-otp",
   "/email-otp/verify-email",
@@ -50,6 +49,19 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/organization/set-active",
   "/organization/get-active-member",
 ];
+
+/** Mobile OTP sign-in; reachable only while SMS is on (ADR CM-0009). */
+export const MOBILE_OTP_AUTH_PATHS: readonly string[] = [
+  "/phone-number/send-otp",
+  "/phone-number/verify",
+];
+
+/** The auth API paths reachable right now. */
+export function constructionAuthPaths(): readonly string[] {
+  return isConstructionSmsEnabled()
+    ? [...CONSTRUCTION_AUTH_PATHS, ...MOBILE_OTP_AUTH_PATHS]
+    : CONSTRUCTION_AUTH_PATHS;
+}
 
 /**
  * The origin links (invites, sign-in callbacks) point at. A preview uses its
@@ -132,7 +144,9 @@ export function createConstructionAuthOptions(
       },
     },
     plugins: [
-      allowedPaths("construction-allowed-paths", CONSTRUCTION_AUTH_PATHS),
+      // The phone-number plugin stays registered (stable types); its paths
+      // answer 404 while SMS is off.
+      allowedPaths("construction-allowed-paths", constructionAuthPaths),
       perMobileOtpLimit(),
       mobileOtp(sms),
       emailOTP({

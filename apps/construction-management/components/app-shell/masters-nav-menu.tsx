@@ -2,7 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,9 +38,12 @@ export function MastersNavMenu({
 }) {
   const inMasters = isAppNavActive(pathname, MASTERS_HREF);
   const [open, setOpen] = useState(inMasters);
-  useEffect(() => {
+  // Arriving on a Masters page opens the submenu (state adjusted in render).
+  const [wasInMasters, setWasInMasters] = useState(inMasters);
+  if (inMasters !== wasInMasters) {
+    setWasInMasters(inMasters);
     if (inMasters) setOpen(true);
-  }, [inMasters]);
+  }
 
   const current = activeMastersSection(pathname);
   const Icon = APP_NAV_ICONS[MASTERS_HREF];

@@ -6,6 +6,7 @@ export {
   useCompanyEmailSignUp,
   useCompanyList,
   useCompanyMobileOtp,
+  useCompanyPasswordReset,
   useCompanySignOut,
   useCompanyUser,
 } from "./hooks";

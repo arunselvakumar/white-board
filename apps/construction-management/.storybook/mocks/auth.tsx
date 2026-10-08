@@ -48,6 +48,10 @@ export type AuthMockState = {
     sendEmailCode: Action<[string]>;
     verifyEmailCode: Action<[{ email: string; code: string }]>;
   };
+  passwordReset: {
+    requestCode: Action<[string]>;
+    resetPassword: Action<[{ email: string; code: string; password: string }]>;
+  };
   setActive: Action<[string, string]>;
   signOut: Action<[string]>;
   navigateInApp: ReturnType<typeof fn<(path: string) => void>>;
@@ -94,6 +98,10 @@ function createState(): AuthMockState {
       create: action("emailSignUp.create"),
       sendEmailCode: action("emailSignUp.sendEmailCode"),
       verifyEmailCode: action("emailSignUp.verifyEmailCode"),
+    },
+    passwordReset: {
+      requestCode: action("passwordReset.requestCode"),
+      resetPassword: action("passwordReset.resetPassword"),
     },
     setActive: action("setActive"),
     signOut: action("signOut"),
@@ -275,6 +283,30 @@ export function useCompanyEmailSignUp() {
       create.clearError();
       resend.clearError();
       verify.clearError();
+    },
+  };
+}
+
+export function useCompanyPasswordReset() {
+  const request = useMockAction((email: string) =>
+    authMocks.passwordReset.requestCode(email),
+  );
+  const reset = useMockAction(
+    (input: { email: string; code: string; password: string }) =>
+      authMocks.passwordReset.resetPassword(input),
+  );
+  return {
+    requestCode: request.run,
+    resetPassword: reset.run,
+    fetchStatus: [request, reset].some(
+      (hook) => hook.fetchStatus === "fetching",
+    )
+      ? ("fetching" as const)
+      : ("idle" as const),
+    error: reset.error ?? request.error,
+    clearError: () => {
+      request.clearError();
+      reset.clearError();
     },
   };
 }
