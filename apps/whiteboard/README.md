@@ -6,7 +6,7 @@ The Whiteboard Next.js application.
 bun run dev --filter=whiteboard
 ```
 
-Runs on [http://localhost:3000/app](http://localhost:3000/app).
+Runs on [http://localhost:3001](http://localhost:3001).
 
 ## Teacher private data
 

@@ -36,7 +36,7 @@ jobs:
     env:
       # CI-only values; nothing here is a real secret.
       BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere
-      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3001
       EMAIL_TRANSPORT: log
       DATABASE_URL: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard
       DATABASE_URL_TEST: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard_test

@@ -38,7 +38,7 @@ bun run generate
 bun run --filter @repo/db migrate:deploy
 ```
 
-Whiteboard APIs: [http://localhost:3000/api/docs](http://localhost:3000/api/docs).
+Whiteboard APIs: [http://localhost:3001/api/docs](http://localhost:3001/api/docs). The Marketing Site runs on [http://localhost:3000](http://localhost:3000).
 
 ```sh
 bun run test

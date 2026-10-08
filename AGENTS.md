@@ -80,13 +80,13 @@ bun install
 docker compose up -d
 bun run generate
 bun run --filter @repo/db migrate:deploy
-bun run dev --filter=whiteboard   # :3000
+bun run dev --filter=whiteboard   # :3001 (Marketing Site: --filter=marketing, :3000)
 bun run test
 bun run test:http
 bun run check-types
 ```
 
-Whiteboard APIs: http://localhost:3000/api/docs
+Whiteboard APIs: http://localhost:3001/api/docs (the Marketing Site runs on http://localhost:3000)
 
 ## Do not
 

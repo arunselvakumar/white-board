@@ -13,7 +13,7 @@ export function appOrigin(): string {
   return (
     vercelOrigin(process.env["VERCEL_PROJECT_PRODUCTION_URL"]) ??
     vercelOrigin(process.env["VERCEL_URL"]) ??
-    "http://localhost:3000"
+    "http://localhost:3001"
   );
 }
 
