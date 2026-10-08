@@ -150,7 +150,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | todo   | CM-102, CM-108         | Auth      |       |
 | CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | todo   | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | todo   | CM-105, CM-110         | UI        |       |
-| CM-112 |  12 | Designations screens (list, add, duplicate, edit template)                                                   | todo   | CM-105, CM-106         | UI        |       |
+| CM-112 |  12 | Designations HTTP + screens (list, add, duplicate, edit template) and the shared Permission Matrix component | done   | CM-105, CM-106         | HTTP+UI   |       |
 | CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | todo   | CM-107                 | Kernel    |       |
 | CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | todo   | CM-107                 | Kernel+UI |       |
 | CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | todo   | CM-105                 | UI        |       |
@@ -198,6 +198,8 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 ### CM-110 / CM-111 / CM-112 — Team Members & Designations HTTP and screens
 
 **Done when:** routes on `/api/docs`; Team Member list (search, status chips, kebab: Share invite link, Edit, Delete), add wizard with the three steps from the legacy (`details → select projects → permission matrix` with column select-all, category expand, search); Designations list/add/duplicate with template editor using the same matrix component.
+
+CM-112 detail: Designation routes are `GET/POST /designations`, `GET /designations/{id}`, `POST /designations/{id}/update|duplicate|delete`, each checked against the `organization.designations` menu. The list returns every live Designation by name with `total` and no cursor (a Company has a few dozen). Templates travel as `{ menuKey: Flag[] }`; unknown menus or flags are 400, unsupported cells are dropped. Deleting a Designation a live Team Member holds is 409 `DESIGNATION_IN_USE`. The matrix component is `components/permissions/permission-matrix.tsx`.
 
 ### CM-113 — Back-dated policy
 
