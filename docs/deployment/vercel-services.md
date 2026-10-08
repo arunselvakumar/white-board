@@ -1,13 +1,14 @@
 # Vercel projects
 
-Whiteboard and the Marketing Site deploy as two Vercel projects from the same repository, `arunselvakumar/white-board`, on the personal Vercel account (ADR-0035). Both deploy `main` to production and every pull request to a preview.
+Whiteboard, the Marketing Site, and Construction Management deploy as three Vercel projects from the same repository, `arunselvakumar/white-board`, on the personal Vercel account (ADR-0035, ADR-0039). All three deploy `main` to production and every pull request to a preview.
 
-| Project                 | Root Directory    | Production domains                     |
-| ----------------------- | ----------------- | -------------------------------------- |
-| `white-board`           | `apps/whiteboard` | `app.white-board.io`                   |
-| `white-board-marketing` | `apps/marketing`  | `white-board.io`, `www.white-board.io` |
+| Project                               | Root Directory                 | Production domains                     |
+| ------------------------------------- | ------------------------------ | -------------------------------------- |
+| `white-board`                         | `apps/whiteboard`              | `app.white-board.io`                   |
+| `white-board-marketing`               | `apps/marketing`               | `white-board.io`, `www.white-board.io` |
+| `white-board-construction-management` | `apps/construction-management` | `web.white-board.io`                   |
 
-`www.white-board.io` redirects to `white-board.io`. In both projects, keep "Include files outside the Root Directory" on, because the apps import the workspace packages.
+`www.white-board.io` redirects to `white-board.io`. In every project, keep "Include files outside the Root Directory" on, because the apps import the workspace packages.
 
 ## `white-board` (Whiteboard)
 
@@ -27,8 +28,12 @@ Do not use the example localhost database URL in Vercel. Preview deployments tru
 
 The Marketing Site has no Session and needs no secrets. `NEXT_PUBLIC_WHITEBOARD_URL` overrides where Sign-in and Sign-up links go; it defaults to `https://app.white-board.io`.
 
+## `white-board-construction-management` (Construction Management)
+
+Construction Management has no Session and needs no secrets yet. It uses the Next.js preset with default commands.
+
 ## DNS (GoDaddy)
 
-`white-board.io` is registered at GoDaddy and keeps its nameservers there. Add the records Vercel shows for each domain under the project's Settings → Domains: an `A` record for the apex, and `CNAME` records for `www` and `app`. Leave any `MX` and `TXT` records for email alone.
+`white-board.io` is registered at GoDaddy and keeps its nameservers there. Add the records Vercel shows for each domain under the project's Settings → Domains: an `A` record for the apex, and `CNAME` records for `www`, `app`, and `web`. Leave any `MX` and `TXT` records for email alone.
 
 The apps do not make server-to-server requests to each other.
