@@ -84,7 +84,7 @@ export function isFlag(value: string): value is Flag {
 /** `CRUDAPNO` → mask. */
 export function maskFromLetters(letters: string): number {
   return toMask(
-    [...letters].map((letter) => {
+    letters.split("").map((letter) => {
       const flag = FLAG_LETTERS[letter];
       if (flag == null) throw new Error(`Unknown flag letter ${letter}`);
       return flag;
