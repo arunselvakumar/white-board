@@ -5,9 +5,13 @@ import { recordAudit } from "@/src/shared-kernel/audit";
 import type { NewCompanyStore } from "../application/new-company-store";
 import type { NewCompany } from "../domain/new-company";
 import { insertDesignations } from "./prisma-designation-repository";
+import type { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 
 export class PrismaNewCompanyStore implements NewCompanyStore {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(
+    private readonly db: PrismaClient,
+    private readonly members: PrismaTeamMemberRepository,
+  ) {}
 
   async create(company: NewCompany): Promise<void> {
     const details = company.details.value;
@@ -44,6 +48,7 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
         },
       });
       await insertDesignations(tx, company.designations);
+      await this.members.write(tx, company.ownerMember);
       await recordAudit(tx, {
         workspaceId: company.workspaceId,
         actorUserId: ownerId,

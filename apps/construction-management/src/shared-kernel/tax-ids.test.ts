@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isValidAadhaar,
   gstinCheckCharacter,
   isValidGstin,
   isValidPan,
@@ -38,5 +39,15 @@ describe("PAN", () => {
   it("masks all but the last four characters", () => {
     expect(maskIdentifier("AAPFU0939F")).toBe("XXXXXX939F");
     expect(maskIdentifier("123412341234")).toBe("XXXXXXXX1234");
+  });
+});
+
+describe("Aadhaar", () => {
+  it("checks the Verhoeff digit", () => {
+    expect(isValidAadhaar("2341 2341 2346")).toBe(true);
+    expect(isValidAadhaar("987654321096")).toBe(true);
+    expect(isValidAadhaar("234123412345")).toBe(false);
+    expect(isValidAadhaar("134123412346")).toBe(false);
+    expect(isValidAadhaar("23412341234")).toBe(false);
   });
 });

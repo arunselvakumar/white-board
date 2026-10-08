@@ -43,7 +43,7 @@ function setup(storeFails = false) {
       Designation.create({
         id: "d1",
         workspaceId,
-        name: "Site Engineer",
+        name: "Owner",
         template: null,
         isSeed: true,
         by,
@@ -83,8 +83,14 @@ describe("CreateCompanyHandler", () => {
       email: null,
     });
     expect(created[0]?.designations.map((item) => item.name)).toEqual([
-      "Site Engineer",
+      "Owner",
     ]);
+    expect(created[0]?.ownerMember).toMatchObject({
+      isOwner: true,
+      status: "active",
+      userId: "user-1",
+    });
+    expect(created[0]?.ownerMember.details.designationId).toBe("d1");
     expect(created[0]?.details.value).toMatchObject({
       currency: "INR",
       timezone: "Asia/Kolkata",

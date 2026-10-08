@@ -70,7 +70,7 @@ describe("createCompany on Postgres (CM-104)", () => {
       userId,
       userName: "Ramesh Patil",
       userMobile: null,
-      userEmail: null,
+      userEmail: `${userId}@example.test`,
     };
     await handlers.create.execute({ ...input, name: "Patil Builders" });
     await handlers.create.execute({ ...input, name: "Patil Land" });
@@ -95,7 +95,7 @@ describe("createCompany on Postgres (CM-104)", () => {
         userId,
         userName: "Ramesh Patil",
         userMobile: null,
-        userEmail: null,
+        userEmail: `${userId}@example.test`,
       }),
     ).rejects.toThrow("db down");
     await expect(companies.listForUser(userId)).resolves.toEqual([]);

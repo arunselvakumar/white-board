@@ -68,3 +68,48 @@ export function maskIdentifier(value: string, visible = 4): string {
   if (value.length <= visible) return value;
   return `${"X".repeat(value.length - visible)}${value.slice(-visible)}`;
 }
+
+// Verhoeff tables (dihedral group D5) for the Aadhaar check digit.
+const VERHOEFF_D = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+  [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+  [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+  [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+  [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+  [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+  [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+  [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+];
+const VERHOEFF_P = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+  [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+  [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+  [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+  [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+  [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+];
+
+function verhoeffValid(digits: string): boolean {
+  let check = 0;
+  const reversed = digits.split("").reverse();
+  for (let index = 0; index < reversed.length; index += 1) {
+    const digit = Number(reversed[index]);
+    const permuted = VERHOEFF_P[index % 8]?.[digit] ?? 0;
+    check = VERHOEFF_D[check]?.[permuted] ?? 0;
+  }
+  return check === 0;
+}
+
+/** Twelve digits, not starting with 0 or 1, with a valid Verhoeff check digit. */
+export function isValidAadhaar(raw: string): boolean {
+  const digits = raw.replace(/[\s-]/g, "");
+  return /^[2-9]\d{11}$/.test(digits) && verhoeffValid(digits);
+}
+
+export function normalizeAadhaar(raw: string): string {
+  return raw.replace(/[\s-]/g, "");
+}

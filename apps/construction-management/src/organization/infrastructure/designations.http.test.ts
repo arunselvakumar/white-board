@@ -17,7 +17,7 @@ async function newCompany(): Promise<{ workspaceId: string; userId: string }> {
     userId,
     userName: "Owner",
     userMobile: null,
-    userEmail: null,
+    userEmail: `${userId}@example.test`,
   });
   return { workspaceId: created.workspaceId, userId };
 }

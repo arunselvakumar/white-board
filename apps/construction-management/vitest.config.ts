@@ -40,6 +40,8 @@ export default defineConfig({
             OTP_TEST_CODE: "246810",
             // Per-IP limits off; the per-mobile OTP limit always applies.
             AUTH_RATE_LIMIT: "off",
+            CONSTRUCTION_PRIVATE_DATA_KEY:
+              "aHR0cC10ZXN0cy1vbmx5LXByaXZhdGUtZGF0YS1rZXk=",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.

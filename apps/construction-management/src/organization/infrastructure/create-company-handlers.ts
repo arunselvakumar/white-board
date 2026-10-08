@@ -10,6 +10,8 @@ import { CreateCompanyHandler } from "../application/create-company";
 import { AuthCompanyDirectory } from "./auth-company-directory";
 import { seedDesignations } from "./designation-seeds";
 import { PrismaNewCompanyStore } from "./prisma-new-company-store";
+import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
+import { privateDataCipher } from "./private-data-cipher";
 
 export function createCompanyHandlers(deps?: {
   prisma?: PrismaClient;
@@ -20,7 +22,10 @@ export function createCompanyHandlers(deps?: {
   return {
     create: new CreateCompanyHandler(
       deps?.directory ?? new AuthCompanyDirectory(),
-      new PrismaNewCompanyStore(db),
+      new PrismaNewCompanyStore(
+        db,
+        new PrismaTeamMemberRepository(db, privateDataCipher),
+      ),
       seedDesignations,
       deps?.events ?? new InProcessEventDispatcher(),
     ),

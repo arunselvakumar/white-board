@@ -146,7 +146,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-105 |   5 | Company HTTP + Create Company screen (first-run wizard) + company switcher                                   | done   | CM-103, CM-104         | HTTP+UI   |       |
 | CM-106 |   6 | Designation aggregate + seed set (38 names, 6 with templates) copied into each new Company                   | done   | CM-104                 | Domain    |       |
 | CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | done   | CM-106                 | Domain    |       |
-| CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | todo   | CM-107                 | Domain    |       |
+| CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | done   | CM-107                 | Domain    |       |
 | CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | todo   | CM-102, CM-108         | Auth      |       |
 | CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | todo   | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | todo   | CM-105, CM-110         | UI        |       |
@@ -189,7 +189,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 
 ### CM-108 — Team Member aggregate
 
-**Done when:** fields from `modules/01` (name, designation, mobile, email, address, Aadhaar, PAN, emergency contact, `memberType` normal|hrms, `isOwner`); `assignToProjects(ids)` stored as ids (projects exist from CM-204); invite link token; Aadhaar/PAN stored encrypted and returned masked unless `reveal` is called (OTP-gated in M9).
+**Done when:** fields from `modules/01` (name, designation, mobile, email, address, Aadhaar, PAN, emergency contact, `memberType` normal|hrms, `isOwner`) — name and Designation required, plus a mobile **or** an email (site staff often have no email; ADR CM-0002), Aadhaar checked by its Verhoeff digit, PAN by format; the Owner gets their own record (Designation "Owner") when the Company is created; `assignToProjects(ids)` stored as ids (projects exist from CM-204); invite link token; Aadhaar/PAN stored encrypted and returned masked unless `reveal` is called (OTP-gated in M9).
 
 ### CM-109 — Invitation & join
 

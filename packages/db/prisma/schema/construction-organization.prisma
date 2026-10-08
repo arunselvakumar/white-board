@@ -104,8 +104,80 @@ model ConstructionOrganizationMemberMenuPermission {
   updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
   updatedBy   String   @map("updated_by")
 
+  member ConstructionOrganizationTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
   @@id([memberId, menu])
   @@index([workspaceId, menu])
   @@map("member_menu_permissions")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationMemberType {
+  normal
+  hrms
+
+  @@map("member_type")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationTeamMemberStatus {
+  joining_pending
+  active
+  rejected
+
+  @@map("team_member_status")
+  @@schema("construction_organization")
+}
+
+/// A User's employee record in one Company (CM-108). Until `user_id` is set
+/// it is the Join Request (ADR CM-0002). Aadhaar and PAN are AES-256-GCM
+/// ciphertext; the last four characters are kept for masking. Mobile and
+/// email are each unique among live members (partial indexes in the
+/// migration); at least one is set.
+model ConstructionOrganizationTeamMember {
+  id               String                                   @id @db.Uuid
+  workspaceId      String                                   @map("workspace_id")
+  userId           String?                                  @map("user_id")
+  name             String
+  designationId    String                                   @map("designation_id") @db.Uuid
+  mobile           String?
+  email            String?
+  address          String?
+  aadhaarEncrypted String?                                  @map("aadhaar_encrypted")
+  aadhaarLast4     String?                                  @map("aadhaar_last4") @db.Char(4)
+  panEncrypted     String?                                  @map("pan_encrypted")
+  panLast4         String?                                  @map("pan_last4") @db.Char(4)
+  emergencyContact String?                                  @map("emergency_contact")
+  memberType       ConstructionOrganizationMemberType       @default(normal) @map("member_type")
+  isOwner          Boolean                                  @default(false) @map("is_owner")
+  status           ConstructionOrganizationTeamMemberStatus @default(joining_pending)
+  inviteToken      String?                                  @unique @map("invite_token")
+  invitedAt        DateTime?                                @map("invited_at") @db.Timestamptz(3)
+  joinedAt         DateTime?                                @map("joined_at") @db.Timestamptz(3)
+  createdAt        DateTime                                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                                 @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                                   @map("created_by")
+  updatedBy        String                                   @map("updated_by")
+  deletedAt        DateTime?                                @map("deleted_at") @db.Timestamptz(3)
+
+  permissions ConstructionOrganizationMemberMenuPermission[]
+  projects    ConstructionOrganizationTeamMemberProject[]
+
+  @@index([workspaceId, createdAt])
+  @@index([userId])
+  @@index([mobile])
+  @@map("team_members")
+  @@schema("construction_organization")
+}
+
+/// Projects a Team Member works on (ids from the projects context, CM-204).
+model ConstructionOrganizationTeamMemberProject {
+  memberId  String @map("member_id") @db.Uuid
+  projectId String @map("project_id")
+
+  member ConstructionOrganizationTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, projectId])
+  @@map("team_member_projects")
   @@schema("construction_organization")
 }

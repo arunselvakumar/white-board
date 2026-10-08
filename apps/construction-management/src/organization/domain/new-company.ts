@@ -3,7 +3,11 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { CompanyDetails } from "./company-details";
 import type { Designation } from "./designation";
 import type { CompanyCreated } from "./events";
+import { TeamMember, teamMemberDetails } from "./team-member";
 import { TRIAL_PLAN_CODE, trialEndsAt } from "./trial";
+
+/** The seed Designation the creator's own Team Member gets. */
+export const OWNER_DESIGNATION = "Owner";
 
 export type CompanyOwner = {
   userId: string;
@@ -32,6 +36,7 @@ export class NewCompany {
     readonly owner: CompanyOwner,
     readonly trial: TrialSubscription,
     readonly designations: readonly Designation[],
+    readonly ownerMember: TeamMember,
     readonly createdAt: Date,
   ) {}
 
@@ -43,6 +48,23 @@ export class NewCompany {
     designations: readonly Designation[];
     now: Date;
   }): NewCompany {
+    const ownerDesignation =
+      input.designations.find((item) => item.name === OWNER_DESIGNATION) ??
+      input.designations[0];
+    if (ownerDesignation == null)
+      throw new Error("A new Company needs its seed Designations.");
+    const ownerMember = TeamMember.owner({
+      id: newId(input.now.getTime()),
+      workspaceId: input.workspaceId,
+      userId: input.owner.userId,
+      details: teamMemberDetails({
+        name: input.owner.name,
+        designationId: ownerDesignation.id,
+        mobile: input.owner.mobile,
+        email: input.owner.email,
+      }),
+      now: input.now,
+    });
     return new NewCompany(
       input.workspaceId,
       newId(input.now.getTime()),
@@ -56,6 +78,7 @@ export class NewCompany {
         endsAt: trialEndsAt(input.now),
       },
       input.designations,
+      ownerMember,
       input.now,
     );
   }
