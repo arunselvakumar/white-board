@@ -1,0 +1,29 @@
+packages/auth/src/construction/config.ts
+  s_25a30b12f62554::t_c2b03c6d18cd28 54-57,59-67
+packages/auth/src/construction/mobile-otp.ts
+  s_25a30b12f62554::t_79e0cce09a37be 6,19-21,26
+packages/auth/src/construction/sms.ts
+  s_25a30b12f62554::t_462fcf92528e98 1-2,33
+packages/auth/src/email/sender.ts
+  s_25a30b12f62554::t_bfc7eaec990173 4-5,84
+packages/auth/src/runtime.ts
+  s_25a30b12f62554::t_ee8894ebfea0c3 1-11
+turbo.json
+  s_25a30b12f62554::t_adb3826d6d5292 51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "16f15994bcc2b6ec1971cfc1393a5f147eb34721",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
