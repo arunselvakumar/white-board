@@ -1,0 +1,107 @@
+AGENTS.md
+  s_47ca3a523b12b8::t_97f9776697e0a4 51,89
+README.md
+  s_47ca3a523b12b8::t_f20355768e638e 41
+apps/marketing/components/closing-cta.tsx
+  s_47ca3a523b12b8::t_3967b31f153383 2-5,24,33
+apps/marketing/components/hero.tsx
+  s_47ca3a523b12b8::t_7e70b872d342b9 3-6,37,45
+apps/marketing/components/site-footer.tsx
+  s_47ca3a523b12b8::t_102de6603a48dc 2-5,11-12
+apps/marketing/components/site-header.tsx
+  s_47ca3a523b12b8::t_98880b5ff9b88a 7-10,88,97
+apps/marketing/lib/whiteboard-url.ts
+  s_47ca3a523b12b8::t_1013b31ab8d0d3 1-13
+apps/marketing/next.config.ts
+  s_47ca3a523b12b8::t_1e66cfe1755183 3-5,8-22
+apps/whiteboard/.storybook/main.ts
+  s_47ca3a523b12b8::t_9097ef3eb63eff 25
+apps/whiteboard/README.md
+  s_47ca3a523b12b8::t_e13481ea42b52a 29
+apps/whiteboard/app/api/auth/[...all]/route.ts
+  s_47ca3a523b12b8::t_d1c25972db165f 3
+apps/whiteboard/app/api/auth/auth-route.http.test.ts
+  s_47ca3a523b12b8::t_7939dd7f3cef48 11
+apps/whiteboard/app/api/auth/auth-test-client.ts
+  s_47ca3a523b12b8::t_19e583749101ad 50,52
+apps/whiteboard/app/api/auth/identity.http.test.ts
+  s_47ca3a523b12b8::t_75b8c6b130b43f 351
+apps/whiteboard/app/api/training-institute/teachers/list-teachers-response-model.ts
+  s_47ca3a523b12b8::t_c0c710ae41dbad 28
+apps/whiteboard/app/api/training-institute/teachers/teacher-response-model.ts
+  s_47ca3a523b12b8::t_120d513ef55b00 47
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_47ca3a523b12b8::t_9e71d189b2cff4 53
+apps/whiteboard/components/auth/auth-heading.tsx
+  s_47ca3a523b12b8::t_4579cd3f18a781 13
+apps/whiteboard/components/class-work/staff/class-work-staff.stories.tsx
+  s_47ca3a523b12b8::t_4b573034207399 23
+apps/whiteboard/components/classes/class-prejoin-screen.stories.tsx
+  s_47ca3a523b12b8::t_c96fb89e508618 135,161
+apps/whiteboard/components/classes/class-prejoin-screen.tsx
+  s_47ca3a523b12b8::t_918076815b1c13 243
+apps/whiteboard/components/enquiries/enquiries-owner.stories.tsx
+  s_47ca3a523b12b8::t_c811baf1bbf48c 25,46
+apps/whiteboard/components/enquiries/enquiries.stories.tsx
+  s_47ca3a523b12b8::t_fdee2b92c59900 27
+apps/whiteboard/components/home/family-home.tsx
+  s_47ca3a523b12b8::t_3f9c0c2f2dca48 242
+apps/whiteboard/components/teachers/teacher-documents-section.tsx
+  s_47ca3a523b12b8::t_aff3040b1a0b31 176
+apps/whiteboard/components/teachers/teachers.stories.tsx
+  s_47ca3a523b12b8::t_13404336964bd7 235,271
+apps/whiteboard/lib/page-transition.test.ts
+  s_47ca3a523b12b8::t_ef212fdb7e8665 10,29,34,39,44,52,59,64,71,78,85,92,97,101-102,109,111,116-117,124-125
+apps/whiteboard/lib/page-transition.ts
+  s_47ca3a523b12b8::t_b63304979b4602 41
+apps/whiteboard/lib/safe-redirect.ts
+  s_47ca3a523b12b8::t_eccefdc506f42a 1-2,28,34,40-42,44
+apps/whiteboard/next.config.ts
+  s_47ca3a523b12b8::t_a7540e34aa85c0 13-20
+apps/whiteboard/proxy.test.ts
+  s_47ca3a523b12b8::t_5b45fe945b7101 16,19,29,33,36-41,43-48
+apps/whiteboard/proxy.ts
+  s_47ca3a523b12b8::t_2b6b20725a6a31 20,25
+apps/whiteboard/src/queries/catalog-pagination.test.ts
+  s_47ca3a523b12b8::t_ca28636fdb74bf 34,49
+apps/whiteboard/src/queries/class-work.ts
+  s_47ca3a523b12b8::t_bc3a779df3d236 169
+apps/whiteboard/src/queries/http.test.ts
+  s_47ca3a523b12b8::t_f18583001a0451 27
+apps/whiteboard/src/queries/http.ts
+  s_47ca3a523b12b8::t_9d6f4bafd707ee 30
+apps/whiteboard/src/queries/students.test.ts
+  s_47ca3a523b12b8::t_9b60613d3e2cd6 33,60
+docs/adr/0034-identity-on-better-auth.md
+  s_47ca3a523b12b8::t_0ee5f07aee0c21 3-4
+docs/adr/0035-whiteboard-on-its-own-subdomain.md
+  s_47ca3a523b12b8::t_feb5286f4d2a81 1-30
+packages/auth/src/react/hooks.ts
+  s_47ca3a523b12b8::t_0673d5adc1f865 24,144-145
+packages/auth/src/server/auth.ts
+  s_47ca3a523b12b8::t_6b20d82a21683c 27
+packages/auth/src/urls.ts
+  s_47ca3a523b12b8::t_57e6541c37510a 1-2,31
+packages/email-templates/src/emails/workspace-invitation.tsx
+  s_47ca3a523b12b8::t_3bd89e5ab002c4 68
+turbo.json
+  s_47ca3a523b12b8::t_788948f0e49d85 10
+docs/deployment/vercel-services.md
+  s_47ca3a523b12b8::t_fd626320107136 1,3,5-8,10,12-16,18,20,24-30,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "faafb3e4aab54fe0367c4b633590d6d01c86de7f",
+  "prompts": {},
+  "sessions": {
+    "s_47ca3a523b12b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00f2cd3e-b6a6-4415-abf1-e64d3cdb053f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
