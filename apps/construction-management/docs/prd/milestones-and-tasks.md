@@ -151,7 +151,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | todo   | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | todo   | CM-105, CM-110         | UI        |       |
 | CM-112 |  12 | Designations screens (list, add, duplicate, edit template)                                                   | todo   | CM-105, CM-106         | UI        |       |
-| CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | todo   | CM-107                 | Kernel    |       |
+| CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | done   | CM-107                 | Kernel    |       |
 | CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | todo   | CM-107                 | Kernel+UI |       |
 | CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | todo   | CM-105                 | UI        |       |
 | CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | todo   | CM-104                 | Domain    |       |
@@ -202,6 +202,8 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 ### CM-113 — Back-dated policy
 
 **Done when:** `BackdatedPolicy` per workspace: `create.days`, `edit.days`, `overrideDesignationIds`, `financialClosingDate`, per-module overrides keyed by `module` + `entryDateField`; `assertCanCreate/Edit(module, entryDate, member)` in the kernel; Settings screen mirrors the legacy groups (Procurement, Site, Inventory, Accounts, Labour & Vendor, Sales, HRMS). Unit tests for global, override, closing date.
+
+**Delivered:** `src/shared-kernel/backdated-policy.ts` (24-module catalogue, `assertCanCreate/Edit(policy, module, entryDate, { designationId, isOwner }, today)` with `today` a `YYYY-MM-DD` in the Company time zone) and `backdated-policy-reader.ts` (`loadBackdatedPolicy`, `loadBackdatedActor`) for commands in any context. The Owner passes day limits; the inclusive closing date blocks everyone (`modules/12` open questions 7 and 12). One row per Company in `construction_organization.backdated_entry_policies`, written on first save (no row = no limits). `GET …/settings/backdated-entry`, `POST …/settings/backdated-entry/update` (menu `organization.settings`), audited with before/after.
 
 ### CM-114 — Sequence rules
 

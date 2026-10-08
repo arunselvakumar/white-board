@@ -6,6 +6,9 @@ import { CreateConstructionOrganizationCompanyRequestModel } from "@/app/api/con
 import { CreateConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/create-company-response-model";
 import { ListMyConstructionOrganizationCompaniesResponseModel } from "@/app/api/construction/organization/companies/me/list-my-companies-response-model";
 import { GetConstructionOrganizationCompanyProfileResponseModel } from "@/app/api/construction/organization/company-profile/get-company-profile-response-model";
+import { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model";
+import { UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model";
+import { UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model";
 
 import {
   buildOpenApiDocument,
@@ -30,6 +33,9 @@ export const openApiComponents: OpenApiComponents = {
   ListMyConstructionOrganizationCompaniesResponseModel,
   SwitchConstructionOrganizationCompanyResponseModel,
   GetConstructionOrganizationCompanyProfileResponseModel,
+  GetConstructionOrganizationBackdatedEntryPolicyResponseModel,
+  UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel,
+  UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
 };
 
 /** Every route. A route is unfinished until it is listed here (root ADR-0012). */
@@ -75,6 +81,29 @@ export const openApiOperations: OpenApiOperation[] = [
     successDescription: "The Company profile",
     successSchema: GetConstructionOrganizationCompanyProfileResponseModel,
     errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/settings/backdated-entry",
+    summary: "The Company's Back-dated Entry policy",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription:
+      "Default limits, the Financial Closing Date and all 24 modules",
+    successSchema: GetConstructionOrganizationBackdatedEntryPolicyResponseModel,
+    errors: [...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/backdated-entry/update",
+    summary: "Replace the Company's Back-dated Entry policy",
+    tags: ORGANIZATION,
+    body: UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The saved policy",
+    successSchema:
+      UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
   },
 ];
 

@@ -307,7 +307,7 @@ stateDiagram-v2
     CheckOverride --> Blocked: no override
 ```
 
-Whether override designations may also bypass the financial closing date is an open question.
+Override designations do **not** bypass the financial closing date; it blocks everyone, the Owner included (decided in CM-113). The Owner passes every day limit.
 
 ### 3. Change currency
 
@@ -420,9 +420,9 @@ Company owner (`isCompanyOwner`) has all permissions (inferred).
 4. Are worksheet form settings per project or company-wide?
 5. Exact list of hideable Material Received fields.
 6. Does "Hide/Show Modules" apply to all users of the project or only the current user?
-7. Can override designations bypass the financial closing date?
+7. ~~Can override designations bypass the financial closing date?~~ **Decided (CM-113):** no. The closing date blocks everyone, the Owner included; to post into a closed period the Owner moves the date, which is audited. Override designations and the Owner pass only the day limits.
 8. What does `MenuPermission/AssignMenu` do exactly — assign a menu set to a user, a designation, or a project?
 9. Do approval-capable modules have a per-module "approval required" switch besides Worksheet and Equipment Usage?
 10. Does changing currency affect existing documents/PDFs?
 11. What does `isNonIndianCompany` hide?
-12. Is the financial closing date inclusive?
+12. ~~Is the financial closing date inclusive?~~ **Decided (CM-113):** yes. Days and dates are calendar dates in the Company time zone; an entry is "older than N days" when `today − entryDate > N`, so N days back is still allowed.

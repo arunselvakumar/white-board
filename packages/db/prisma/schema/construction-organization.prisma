@@ -181,3 +181,29 @@ model ConstructionOrganizationTeamMemberProject {
   @@map("team_member_projects")
   @@schema("construction_organization")
 }
+
+/// The Company's Back-dated Entry policy (CM-113, `modules/12`): default
+/// create and edit day limits with override Designations, the Financial
+/// Closing Date, and per-module settings. One row per Company, written on
+/// the first save; no row means no limits. Validated by `BackdatedPolicy` in
+/// the shared kernel.
+model ConstructionOrganizationBackdatedEntryPolicy {
+  id                           String    @id @db.Uuid
+  workspaceId                  String    @unique @map("workspace_id")
+  /// 0 = no restriction.
+  createDays                   Int       @map("create_days")
+  createOverrideDesignationIds String[]  @map("create_override_designation_ids") @db.Uuid
+  editDays                     Int       @map("edit_days")
+  editOverrideDesignationIds   String[]  @map("edit_override_designation_ids") @db.Uuid
+  /// Inclusive; a calendar date in the Company time zone.
+  financialClosingDate         DateTime? @map("financial_closing_date") @db.Date
+  /// `{ "<module key>": { mode, create: { days, overrideDesignationIds }, edit } }`.
+  modules                      Json
+  createdAt                    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy                    String    @map("created_by")
+  updatedBy                    String    @map("updated_by")
+
+  @@map("backdated_entry_policies")
+  @@schema("construction_organization")
+}
