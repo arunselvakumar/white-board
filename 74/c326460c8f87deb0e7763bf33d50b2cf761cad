@@ -1,0 +1,41 @@
+README.md
+  s_78b3a795e3e795::t_24a5ece1114e36 9
+apps/construction-management/.gitignore
+  s_78b3a795e3e795::t_bd85264386d54c 1-36
+apps/construction-management/README.md
+  s_78b3a795e3e795::t_3e5404f4543194 1-9
+apps/construction-management/app/globals.css
+  s_78b3a795e3e795::t_67168fb419804e 1
+apps/construction-management/app/layout.tsx
+  s_78b3a795e3e795::t_6415fb368f950b 1-36
+apps/construction-management/app/page.tsx
+  s_78b3a795e3e795::t_10a06545df6933 1-8
+apps/construction-management/eslint.config.js
+  s_78b3a795e3e795::t_0d43e05acc891b 1-16
+apps/construction-management/next.config.ts
+  s_78b3a795e3e795::t_a2c743e4afa18f 1-7
+apps/construction-management/package.json
+  s_78b3a795e3e795::t_5897c98ba882a3 1-30
+apps/construction-management/postcss.config.mjs
+  s_78b3a795e3e795::t_1ea31a9fd4a870 1
+apps/construction-management/tsconfig.json
+  s_78b3a795e3e795::t_5a6aabb3967581 1-24
+bun.lock
+  s_78b3a795e3e795::t_6f3e37bef20d2f 16-36,1144-1145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "74c326460c8f87deb0e7763bf33d50b2cf761cad",
+  "prompts": {},
+  "sessions": {
+    "s_78b3a795e3e795": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f3dfa31-4012-4ee3-827a-425cb8820053",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
