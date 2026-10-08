@@ -796,7 +796,7 @@ enum TrainingInstituteTestResultStatus {
   @@schema("training_institute")
 }
 
-/// A Test for a whole Batch or for one Student in it (ADR-0037). Results stay
+/// A Test for a whole Batch or for one Student in it (ADR-0038). Results stay
 /// hidden from Students and Parents until published_at is set.
 model TrainingInstituteClassTest {
   id                 String                          @id @db.Uuid

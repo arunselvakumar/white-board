@@ -1,4 +1,4 @@
--- Tests, results, and the change history of published results (WB-016, ADR-0037).
+-- Tests, results, and the change history of published results (WB-016, ADR-0038).
 -- Written by hand from Prisma's diff; only adds objects in training_institute.
 -- CreateEnum
 CREATE TYPE "training_institute"."class_test_scope" AS ENUM ('batch', 'student');
