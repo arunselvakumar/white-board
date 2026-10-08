@@ -1,0 +1,21 @@
+packages/db/prisma/migrations/20261008120000_class_tests/migration.sql
+  s_c3d8734b68e987::t_08b86df840b66c 1
+packages/db/prisma/schema/training-institute.prisma
+  s_c3d8734b68e987::t_d85d84ff379a9e 799
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dbe5e90e389b98e70d5337777dddc1e068d6d455",
+  "prompts": {},
+  "sessions": {
+    "s_c3d8734b68e987": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2f37b59-a3b6-4236-9c00-99231252dfb4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
