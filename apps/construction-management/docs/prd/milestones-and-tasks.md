@@ -148,7 +148,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | done   | CM-106                 | Domain    |       |
 | CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | done   | CM-107                 | Domain    |       |
 | CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | done   | CM-102, CM-108         | Auth      |       |
-| CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | todo   | CM-108, CM-109         | HTTP      |       |
+| CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | done   | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | todo   | CM-105, CM-110         | UI        |       |
 | CM-112 |  12 | Designations screens (list, add, duplicate, edit template)                                                   | todo   | CM-105, CM-106         | UI        |       |
 | CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | todo   | CM-107                 | Kernel    |       |

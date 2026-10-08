@@ -9,7 +9,8 @@ import {
   type DesignationReadModel,
 } from "./designation-read-model";
 
-type Template = Readonly<Record<string, readonly Flag[]>> | null | undefined;
+type Template =
+  Readonly<Partial<Record<string, readonly Flag[]>>> | null | undefined;
 
 function templateOf(template: Template): PermissionSet | null {
   return template == null ? null : PermissionSet.fromGrants(template);

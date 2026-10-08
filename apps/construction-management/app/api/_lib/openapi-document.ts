@@ -10,6 +10,17 @@ import {
   GetConstructionOrganizationJoinLinkResponseModel,
   JoinLinkTokenParamsModel,
 } from "@/app/api/construction/organization/join-links/[token]/join-link-models";
+import { AssignConstructionOrganizationTeamMemberProjectsRequestModel } from "@/app/api/construction/organization/team-members/[id]/projects/assign-projects-request-model";
+import { SetConstructionOrganizationTeamMemberPermissionsRequestModel } from "@/app/api/construction/organization/team-members/[id]/permissions/set-permissions-request-model";
+import { RevealConstructionOrganizationTeamMemberIdsResponseModel } from "@/app/api/construction/organization/team-members/[id]/reveal/reveal-response-model";
+import { UpdateConstructionOrganizationTeamMemberRequestModel } from "@/app/api/construction/organization/team-members/[id]/update/update-team-member-request-model";
+import { CreateConstructionOrganizationTeamMemberRequestModel } from "@/app/api/construction/organization/team-members/create-team-member-request-model";
+import { ListConstructionOrganizationTeamMembersRequestModel } from "@/app/api/construction/organization/team-members/list-team-members-request-model";
+import { ListConstructionOrganizationTeamMembersResponseModel } from "@/app/api/construction/organization/team-members/list-team-members-response-model";
+import {
+  ConstructionOrganizationTeamMemberResponseModel,
+  TeamMemberIdParamsModel,
+} from "@/app/api/construction/organization/team-members/team-member-models";
 import {
   AcceptConstructionOrganizationJoinRequestResponseModel,
   JoinRequestIdParamsModel,
@@ -42,6 +53,13 @@ export const openApiComponents: OpenApiComponents = {
   ListConstructionOrganizationJoinRequestsResponseModel,
   AcceptConstructionOrganizationJoinRequestResponseModel,
   GetConstructionOrganizationJoinLinkResponseModel,
+  ConstructionOrganizationTeamMemberResponseModel,
+  ListConstructionOrganizationTeamMembersResponseModel,
+  CreateConstructionOrganizationTeamMemberRequestModel,
+  UpdateConstructionOrganizationTeamMemberRequestModel,
+  SetConstructionOrganizationTeamMemberPermissionsRequestModel,
+  AssignConstructionOrganizationTeamMemberProjectsRequestModel,
+  RevealConstructionOrganizationTeamMemberIdsResponseModel,
 };
 
 /** Every route. A route is unfinished until it is listed here (root ADR-0012). */
@@ -137,6 +155,118 @@ openApiOperations.push(
     successDescription: "The Company and who the request is for, masked",
     successSchema: GetConstructionOrganizationJoinLinkResponseModel,
     errors: [StatusCodes.BAD_REQUEST, StatusCodes.NOT_FOUND],
+  },
+);
+
+const TEAM_MEMBERS = "/api/construction/organization/team-members";
+const MEMBER_ERRORS = [
+  ...SESSION_ERRORS,
+  StatusCodes.BAD_REQUEST,
+  StatusCodes.NOT_FOUND,
+  StatusCodes.CONFLICT,
+];
+
+openApiOperations.push(
+  {
+    method: "get",
+    path: TEAM_MEMBERS,
+    summary: "Team Members, newest first (organization.team_members read)",
+    tags: ORGANIZATION,
+    query: ListConstructionOrganizationTeamMembersRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "A page of Team Members",
+    successSchema: ListConstructionOrganizationTeamMembersResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.BAD_REQUEST],
+  },
+  {
+    method: "post",
+    path: TEAM_MEMBERS,
+    summary: "Add a Team Member: Joining Pending, invited by email/SMS",
+    tags: ORGANIZATION,
+    body: CreateConstructionOrganizationTeamMemberRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "The new Team Member",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: [...MEMBER_ERRORS, StatusCodes.PAYMENT_REQUIRED],
+  },
+  {
+    method: "get",
+    path: `${TEAM_MEMBERS}/{id}`,
+    summary: "One Team Member",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/update`,
+    summary: "Edit a Team Member's details and Member Type",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    body: UpdateConstructionOrganizationTeamMemberRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: [...MEMBER_ERRORS, StatusCodes.PAYMENT_REQUIRED],
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/permissions`,
+    summary: "Replace a Team Member's Permission Matrix",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    body: SetConstructionOrganizationTeamMemberPermissionsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: MEMBER_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/projects`,
+    summary: "Replace the Projects a Team Member works on",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    body: AssignConstructionOrganizationTeamMemberProjectsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: MEMBER_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/resend-invite`,
+    summary: "Send a new invite link (also reopens a declined request)",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member with a new link",
+    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: MEMBER_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/remove`,
+    summary: "Remove a Team Member and end their membership",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Removed",
+    errors: MEMBER_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/reveal`,
+    summary: "Reveal a Team Member's Aadhaar and PAN (Owner only, logged)",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Full identifiers",
+    successSchema: RevealConstructionOrganizationTeamMemberIdsResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
   },
 );
 

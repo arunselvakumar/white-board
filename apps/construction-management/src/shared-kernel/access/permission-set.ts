@@ -30,11 +30,11 @@ export class PermissionSet {
 
   /** From `{ menu: ["create", …] }` (HTTP, seeds). */
   static fromGrants(
-    grants: Readonly<Record<string, readonly Flag[]>>,
+    grants: Readonly<Partial<Record<string, readonly Flag[]>>>,
   ): PermissionSet {
     const masks: Record<string, number> = {};
     for (const [key, flags] of Object.entries(grants))
-      masks[key] = toMask(flags);
+      if (flags != null) masks[key] = toMask(flags);
     return PermissionSet.fromMasks(masks);
   }
 

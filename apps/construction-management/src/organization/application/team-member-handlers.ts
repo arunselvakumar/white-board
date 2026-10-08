@@ -1,4 +1,8 @@
-import { PermissionSet, type Flag } from "@/src/shared-kernel/access";
+import {
+  PermissionSet,
+  type Flag,
+  type MemberAccess,
+} from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 import type { EventDispatcher } from "@/src/shared-kernel/events";
@@ -11,6 +15,7 @@ import type {
   TeamMemberListParams,
   TeamMemberRepository,
 } from "../domain/team-member-repository";
+import { assertCanGrant } from "./grant-rules";
 import type { PlanGate } from "./plan-gate";
 import {
   toTeamMemberReadModel,
@@ -28,7 +33,7 @@ export type TeamMemberDetailsInput = {
   emergencyContact?: string | null;
 };
 
-type Grants = Readonly<Record<string, readonly Flag[]>>;
+type Grants = Readonly<Partial<Record<string, readonly Flag[]>>>;
 
 /** Raised when a Team Member is added or invited again; CM-109 notifies them. */
 export type TeamMemberInvited = {
@@ -138,6 +143,8 @@ export class TeamMemberHandlers {
   async invite(input: {
     workspaceId: string;
     by: string;
+    /** Who is granting the matrix; the Owner when omitted (tests, seeds). */
+    grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
     memberType: MemberType;
     projectIds?: readonly string[];
@@ -158,6 +165,8 @@ export class TeamMemberHandlers {
       input.memberType === "hrms" || input.permissions == null
         ? applyTemplate(designation, input.memberType)
         : PermissionSet.fromGrants(input.permissions);
+    if (input.grantor != null)
+      assertCanGrant(input.grantor, permissions, { userId: null });
     const member = TeamMember.invite({
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
@@ -181,13 +190,26 @@ export class TeamMemberHandlers {
     workspaceId: string;
     id: string;
     by: string;
+    grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
     memberType: MemberType;
   }): Promise<TeamMemberReadModel> {
     const now = this.clock();
     const member = await this.load(input.workspaceId, input.id);
     const before = this.audit(member, input.by, "").after;
-    const details = teamMemberDetails(input.details);
+    // Screens only ever hold masked identifiers: leaving Aadhaar or PAN out
+    // keeps what is stored; null clears it.
+    const details = teamMemberDetails({
+      ...input.details,
+      aadhaar:
+        input.details.aadhaar === undefined
+          ? member.details.aadhaar
+          : input.details.aadhaar,
+      pan:
+        input.details.pan === undefined
+          ? member.details.pan
+          : input.details.pan,
+    });
     const designation = await this.designation(
       input.workspaceId,
       details.designationId,
@@ -197,12 +219,10 @@ export class TeamMemberHandlers {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");
       else await this.plan.assertCanAdd(input.workspaceId, "team_member");
-      member.changeType(
-        input.memberType,
-        applyTemplate(designation, input.memberType),
-        input.by,
-        now,
-      );
+      const restarted = applyTemplate(designation, input.memberType);
+      if (input.grantor != null)
+        assertCanGrant(input.grantor, restarted, member);
+      member.changeType(input.memberType, restarted, input.by, now);
     }
     await this.members.save(
       member,
@@ -215,15 +235,15 @@ export class TeamMemberHandlers {
     workspaceId: string;
     id: string;
     by: string;
+    grantor?: MemberAccess;
     permissions: Grants;
   }): Promise<TeamMemberReadModel> {
     const member = await this.load(input.workspaceId, input.id);
     const before = member.permissions.toGrants();
-    member.setPermissions(
-      PermissionSet.fromGrants(input.permissions),
-      input.by,
-      this.clock(),
-    );
+    const permissions = PermissionSet.fromGrants(input.permissions);
+    if (input.grantor != null)
+      assertCanGrant(input.grantor, permissions, member);
+    member.setPermissions(permissions, input.by, this.clock());
     await this.members.save(
       member,
       this.audit(member, input.by, "team_member.permissions_changed", {
