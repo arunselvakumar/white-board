@@ -13,17 +13,21 @@ describe("workspaceEntryPath", () => {
     );
   });
 
-  it("removes the public app base path from return URLs", () => {
-    expect(workspaceEntryPath("https://white-board-v3.vercel.app/app")).toBe(
+  it("keeps only the path of an absolute return URL", () => {
+    expect(workspaceEntryPath("https://app.white-board.io/")).toBe(
       "/select-workspace",
     );
-    expect(workspaceEntryPath("/app/students/new?source=invite")).toBe(
+    expect(
+      workspaceEntryPath(
+        "https://app.white-board.io/students/new?source=invite",
+      ),
+    ).toBe(
       "/select-workspace?redirect_url=%2Fstudents%2Fnew%3Fsource%3Dinvite",
     );
   });
 
   it("does not return to an authentication page", () => {
     expect(workspaceEntryPath("/login")).toBe("/select-workspace");
-    expect(workspaceEntryPath("/app/login")).toBe("/select-workspace");
+    expect(workspaceEntryPath("/signup?from=hero")).toBe("/select-workspace");
   });
 });

@@ -40,7 +40,7 @@ function useIsClient(): boolean {
 
 /**
  * Page reads run in the browser only (ADR-0026): query functions fetch
- * relative `/app/api/...` URLs with the browser's Session cookie, which the
+ * relative `/api/...` URLs with the browser's Session cookie, which the
  * server render has neither of. The shell around this renders on the server.
  */
 export function QuerySuspense({ children }: { children: ReactNode }) {

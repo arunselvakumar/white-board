@@ -18,7 +18,7 @@ export type AuthClient = ReturnType<typeof createClient>;
 
 let client: AuthClient | null = null;
 
-/** The Better Auth browser client, bound to this origin's `/app/api/auth`. */
+/** The Better Auth browser client, bound to this origin's `/api/auth`. */
 export function authClient(): AuthClient {
   if (typeof window === "undefined")
     throw new Error("authClient() is only available in the browser.");
