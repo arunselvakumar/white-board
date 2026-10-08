@@ -1,0 +1,41 @@
+apps/construction-management/app/app/masters/team-members/[id]/page.tsx
+  s_25a30b12f62554::t_8d2f660a3bff96 1-14
+apps/construction-management/app/app/masters/team-members/new/page.tsx
+  s_25a30b12f62554::t_1b91997ad74f49 1-9
+apps/construction-management/components/team-members/add-team-member-wizard.stories.tsx
+  s_25a30b12f62554::t_1928f5c0d2ae9d 1-213
+apps/construction-management/components/team-members/add-team-member-wizard.tsx
+  s_25a30b12f62554::t_ab90bb697f7782 1-255
+apps/construction-management/components/team-members/edit-team-member.stories.tsx
+  s_25a30b12f62554::t_557d473bd42e5e 1-125
+apps/construction-management/components/team-members/edit-team-member.tsx
+  s_25a30b12f62554::t_1eada776205a1a 1-201
+apps/construction-management/components/team-members/projects-step.tsx
+  s_25a30b12f62554::t_0834c222ccd24f 1-29
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_25a30b12f62554::t_86ffacb95e10d7 1-309
+apps/construction-management/components/team-members/team-member-fixtures.ts
+  s_25a30b12f62554::t_bdfaae519f7f8c 1-54
+apps/construction-management/components/team-members/team-members-page.stories.tsx
+  s_25a30b12f62554::t_bf58d6e023aa51 136,139
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_b006f492e714dd 140-160
+apps/construction-management/src/queries/team-members.ts
+  s_25a30b12f62554::t_da0e62b158003e 108-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "66e8a4d92b7e61b6da4a6fd81691b98a9e657106",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
