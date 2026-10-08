@@ -91,3 +91,21 @@ model ConstructionOrganizationDesignation {
   @@map("designations")
   @@schema("construction_organization")
 }
+
+/// One Permission Matrix row per Team Member per menu (ADR CM-0003). `flags`
+/// is a bitmask over the kernel's flag list; cells a menu does not support
+/// are never written. Keyed by the Team Member so a Joining Pending member's
+/// matrix exists before they have a User.
+model ConstructionOrganizationMemberMenuPermission {
+  workspaceId String   @map("workspace_id")
+  memberId    String   @map("member_id") @db.Uuid
+  menu        String
+  flags       Int
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy   String   @map("updated_by")
+
+  @@id([memberId, menu])
+  @@index([workspaceId, menu])
+  @@map("member_menu_permissions")
+  @@schema("construction_organization")
+}
