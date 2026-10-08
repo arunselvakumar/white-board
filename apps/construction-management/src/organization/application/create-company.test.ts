@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import type { DomainEvent } from "@/src/shared-kernel/events";
 
+import { Designation } from "../domain/designation";
 import type { NewCompany } from "../domain/new-company";
 import {
   CreateCompanyHandler,
@@ -38,6 +39,17 @@ function setup(storeFails = false) {
         return Promise.resolve();
       },
     },
+    ({ workspaceId, by, now }) => [
+      Designation.create({
+        id: "d1",
+        workspaceId,
+        name: "Site Engineer",
+        template: null,
+        isSeed: true,
+        by,
+        now,
+      }),
+    ],
     {
       dispatch: (raised) => {
         events.push(...raised);
@@ -70,6 +82,9 @@ describe("CreateCompanyHandler", () => {
       mobile: "+919876543210",
       email: null,
     });
+    expect(created[0]?.designations.map((item) => item.name)).toEqual([
+      "Site Engineer",
+    ]);
     expect(created[0]?.details.value).toMatchObject({
       currency: "INR",
       timezone: "Asia/Kolkata",

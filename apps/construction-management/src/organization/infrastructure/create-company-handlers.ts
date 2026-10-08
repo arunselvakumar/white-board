@@ -8,6 +8,7 @@ import {
 import type { CompanyDirectory } from "../application/company-directory";
 import { CreateCompanyHandler } from "../application/create-company";
 import { AuthCompanyDirectory } from "./auth-company-directory";
+import { seedDesignations } from "./designation-seeds";
 import { PrismaNewCompanyStore } from "./prisma-new-company-store";
 
 export function createCompanyHandlers(deps?: {
@@ -20,6 +21,7 @@ export function createCompanyHandlers(deps?: {
     create: new CreateCompanyHandler(
       deps?.directory ?? new AuthCompanyDirectory(),
       new PrismaNewCompanyStore(db),
+      seedDesignations,
       deps?.events ?? new InProcessEventDispatcher(),
     ),
   };

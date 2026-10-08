@@ -4,6 +4,7 @@ import { recordAudit } from "@/src/shared-kernel/audit";
 
 import type { NewCompanyStore } from "../application/new-company-store";
 import type { NewCompany } from "../domain/new-company";
+import { insertDesignations } from "./prisma-designation-repository";
 
 export class PrismaNewCompanyStore implements NewCompanyStore {
   constructor(private readonly db: PrismaClient) {}
@@ -42,6 +43,7 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
           endsAt: company.trial.endsAt,
         },
       });
+      await insertDesignations(tx, company.designations);
       await recordAudit(tx, {
         workspaceId: company.workspaceId,
         actorUserId: ownerId,

@@ -70,3 +70,24 @@ model ConstructionOrganizationSubscription {
   @@map("subscriptions")
   @@schema("construction_organization")
 }
+
+/// A job title in a Company, optionally with a Permission Template (CM-106).
+/// Each Company gets its own copy of the seed set. Names are unique among
+/// live rows (partial index, hand-written in the migration).
+model ConstructionOrganizationDesignation {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  name               String
+  isSeed             Boolean   @default(false) @map("is_seed")
+  /// `{ "<menu key>": <flags bitmask> }` (ADR CM-0003); null = no template.
+  permissionTemplate Json?     @map("permission_template")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String    @map("created_by")
+  updatedBy          String    @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([workspaceId])
+  @@map("designations")
+  @@schema("construction_organization")
+}

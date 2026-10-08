@@ -1,6 +1,7 @@
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { CompanyDetails } from "./company-details";
+import type { Designation } from "./designation";
 import type { CompanyCreated } from "./events";
 import { TRIAL_PLAN_CODE, trialEndsAt } from "./trial";
 
@@ -30,6 +31,7 @@ export class NewCompany {
     readonly details: CompanyDetails,
     readonly owner: CompanyOwner,
     readonly trial: TrialSubscription,
+    readonly designations: readonly Designation[],
     readonly createdAt: Date,
   ) {}
 
@@ -37,6 +39,8 @@ export class NewCompany {
     workspaceId: string;
     details: CompanyDetails;
     owner: CompanyOwner;
+    /** The Company's own copy of the seed Designations (CM-106). */
+    designations: readonly Designation[];
     now: Date;
   }): NewCompany {
     return new NewCompany(
@@ -51,6 +55,7 @@ export class NewCompany {
         startsAt: input.now,
         endsAt: trialEndsAt(input.now),
       },
+      input.designations,
       input.now,
     );
   }
