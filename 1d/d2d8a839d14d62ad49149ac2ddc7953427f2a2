@@ -1,0 +1,25 @@
+apps/construction-management/src/labour/domain/labour-attendance.test.ts
+  s_ec41e28a857a0b::t_e8151ef191da1f 1-107
+apps/construction-management/src/labour/domain/labour-attendance.ts
+  s_ec41e28a857a0b::t_6031d1a0fa524a 1-211
+apps/construction-management/src/labour/domain/vendor-attendance.test.ts
+  s_ec41e28a857a0b::t_ec7821ea80e360 1-94
+apps/construction-management/src/labour/domain/vendor-attendance.ts
+  s_ec41e28a857a0b::t_08bdf5d81491ea 1-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1dd2d8a839d14d62ad49149ac2ddc7953427f2a2",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
