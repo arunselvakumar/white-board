@@ -24,6 +24,8 @@ model ConstructionOrganizationCompanyProfile {
   isIndian    Boolean   @default(true) @map("is_indian")
   /// IANA time zone used for dates on documents.
   timezone    String    @default("Asia/Kolkata")
+  /// Storage key of the logo printed on documents (CM-115); a `stored_files` row.
+  logoKey     String?   @map("logo_key")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy   String    @map("created_by")
@@ -148,6 +150,8 @@ model ConstructionOrganizationTeamMember {
   panEncrypted     String?                                  @map("pan_encrypted")
   panLast4         String?                                  @map("pan_last4") @db.Char(4)
   emergencyContact String?                                  @map("emergency_contact")
+  /// Storage key of the photo set in My Profile (CM-115); a `stored_files` row.
+  photoKey         String?                                  @map("photo_key")
   memberType       ConstructionOrganizationMemberType       @default(normal) @map("member_type")
   isOwner          Boolean                                  @default(false) @map("is_owner")
   status           ConstructionOrganizationTeamMemberStatus @default(joining_pending)
@@ -179,5 +183,26 @@ model ConstructionOrganizationTeamMemberProject {
 
   @@id([memberId, projectId])
   @@map("team_member_projects")
+  @@schema("construction_organization")
+}
+
+/// Every file a Company keeps in storage (CM-115): logos and photos now,
+/// drawings and attachments later. Keys are `companies/<workspaceId>/...`.
+/// Storage usage (CM-116) sums `bytes` of live rows; a replaced or removed
+/// file gets `deleted_at` and its object is deleted.
+model ConstructionOrganizationStoredFile {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  key         String    @unique
+  /// What the file is for: `company_logo`, `member_photo`.
+  kind        String
+  contentType String    @map("content_type")
+  bytes       Int
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, deletedAt])
+  @@map("stored_files")
   @@schema("construction_organization")
 }

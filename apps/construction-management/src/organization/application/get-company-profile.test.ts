@@ -18,6 +18,7 @@ const profile: CompanyProfile = {
   currency: "INR",
   isIndian: true,
   timezone: "Asia/Kolkata",
+  logoKey: null,
   createdAt: new Date("2026-10-08T00:00:00Z"),
   updatedAt: new Date("2026-10-08T00:00:00Z"),
 };

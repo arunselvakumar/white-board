@@ -1,3 +1,4 @@
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -42,6 +43,12 @@ export default defineConfig({
             AUTH_RATE_LIMIT: "off",
             CONSTRUCTION_PRIVATE_DATA_KEY:
               "aHR0cC10ZXN0cy1vbmx5LXByaXZhdGUtZGF0YS1rZXk=",
+            // Files go to disk, never to Vercel Blob (CM-115).
+            BLOB_READ_WRITE_TOKEN: "",
+            BLOB_LOCAL_DIR: path.join(
+              os.tmpdir(),
+              "construction-blob-http-tests",
+            ),
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.

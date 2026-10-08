@@ -24,6 +24,7 @@ export class PrismaCompanyProfileReader implements CompanyProfileReader {
       currency: row.currency,
       isIndian: row.isIndian,
       timezone: row.timezone,
+      logoKey: row.logoKey,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

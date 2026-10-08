@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   distDir: process.env["NEXT_DIST_DIR"] ?? ".next",
   transpilePackages: ["@repo/ui", "@repo/db", "@repo/auth"],
   serverExternalPackages: ["@prisma/client"],
+  experimental: {
+    // The proxy buffers request bodies up to this size and cuts the rest.
+    // Above the largest upload (a 10 MB photo, CM-115), so a cut body is
+    // still too large and refused rather than stored truncated.
+    proxyClientMaxBodySize: "11mb",
+  },
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   outputFileTracingIncludes: {
     "/*": [

@@ -1,9 +1,12 @@
 import { companies } from "@repo/auth/construction/server";
 
-import type { CompanyDirectory } from "../application/company-directory";
+import type {
+  CompanyDirectory,
+  CompanyNames,
+} from "../application/company-directory";
 
 /** `CompanyDirectory` over `@repo/auth` (ADR CM-0002). */
-export class AuthCompanyDirectory implements CompanyDirectory {
+export class AuthCompanyDirectory implements CompanyDirectory, CompanyNames {
   createWorkspace(input: {
     name: string;
     ownerUserId: string;
@@ -13,5 +16,9 @@ export class AuthCompanyDirectory implements CompanyDirectory {
 
   deleteWorkspace(workspaceId: string): Promise<void> {
     return companies.deleteCreated(workspaceId);
+  }
+
+  renameWorkspace(workspaceId: string, name: string): Promise<void> {
+    return companies.rename(workspaceId, name);
   }
 }

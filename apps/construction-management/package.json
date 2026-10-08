@@ -21,6 +21,7 @@
     "@repo/db": "*",
     "@repo/ui": "*",
     "@tanstack/react-query": "^5.102.8",
+    "@vercel/blob": "2.8.1",
     "http-status-codes": "^2.3.0",
     "lucide-react": "^1.42.0",
     "next": "16.3.4",
