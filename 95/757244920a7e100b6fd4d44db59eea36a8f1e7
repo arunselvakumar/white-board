@@ -1,0 +1,87 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_25a30b12f62554::t_11b9344898ada0 9-14,39-43,46-47,92-177
+apps/construction-management/app/api/construction/organization/designations/[id]/designation-params-model.ts
+  s_25a30b12f62554::t_e076a8ff780144 1-5
+apps/construction-management/app/api/construction/organization/designations/[id]/duplicate/duplicate-designation-request-model.ts
+  s_25a30b12f62554::t_6e22f10f66d476 1-11
+apps/construction-management/app/api/construction/organization/designations/[id]/update/update-designation-request-model.ts
+  s_25a30b12f62554::t_da31bd148a0541 1-13
+apps/construction-management/app/api/construction/organization/designations/create-designation-request-model.ts
+  s_25a30b12f62554::t_ca76b51d4c096c 1-12
+apps/construction-management/app/api/construction/organization/designations/designations.http.test.ts
+  s_25a30b12f62554::t_7b09c55d783295 1-366
+apps/construction-management/app/app/masters/designations/[id]/page.tsx
+  s_25a30b12f62554::t_da0a157600ac03 1-14
+apps/construction-management/app/app/masters/designations/new/page.tsx
+  s_25a30b12f62554::t_eb35c14064c266 1-9
+apps/construction-management/app/app/masters/designations/page.tsx
+  s_25a30b12f62554::t_e15c0b33221312 1-9
+apps/construction-management/components/designations/designation-form.stories.tsx
+  s_25a30b12f62554::t_72fc72e0e160a6 1-168
+apps/construction-management/components/designations/designation-form.tsx
+  s_25a30b12f62554::t_831e0676c9df27 1-175
+apps/construction-management/components/designations/designation-story-support.tsx
+  s_25a30b12f62554::t_e11a8eb721849b 1-119
+apps/construction-management/components/designations/designations-list.stories.tsx
+  s_25a30b12f62554::t_97f9fc52eb0325 1-181
+apps/construction-management/components/designations/designations-list.tsx
+  s_25a30b12f62554::t_595d6a40c14b63 1-270
+apps/construction-management/components/permissions/permission-matrix.stories.tsx
+  s_25a30b12f62554::t_489b2065f94c22 1-175
+apps/construction-management/components/permissions/permission-matrix.tsx
+  s_25a30b12f62554::t_47caa4342669c4 1-339
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_fa4e89b73abca1 153,202-203
+apps/construction-management/lib/permission-matrix.test.ts
+  s_25a30b12f62554::t_d4aee22a3f6734 1-107
+apps/construction-management/lib/permission-matrix.ts
+  s_25a30b12f62554::t_65ddee4704865b 1-146
+apps/construction-management/src/organization/application/designation-handlers.test.ts
+  s_25a30b12f62554::t_ba367ea67fe472 1-81
+apps/construction-management/src/organization/application/designation-handlers.ts
+  s_25a30b12f62554::t_d6cd4e17c3406a 2,18-23,29-30,111-115
+apps/construction-management/src/organization/infrastructure/create-designation-handlers.ts
+  s_25a30b12f62554::t_79aa79022854e4 5-6,9-10,12-14
+apps/construction-management/src/queries/designations.ts
+  s_25a30b12f62554::t_80d5d534f0a840 1-100
+apps/construction-management/app/api/construction/organization/designations/[id]/delete/route.ts
+  s_2316c10137dec8::t_0ca32d930b86e0 1-43
+apps/construction-management/app/api/construction/organization/designations/[id]/duplicate/route.ts
+  s_2316c10137dec8::t_2dab68c064102b 1-52
+apps/construction-management/app/api/construction/organization/designations/[id]/route.ts
+  s_2316c10137dec8::t_09dc90220e90f2 1-36
+apps/construction-management/app/api/construction/organization/designations/[id]/update/route.ts
+  s_2316c10137dec8::t_32a710f3860e37 1-47
+apps/construction-management/app/api/construction/organization/designations/designation-response-model.ts
+  s_2316c10137dec8::t_2be6eb9bf5a885 1-32
+apps/construction-management/app/api/construction/organization/designations/designation-template.ts
+  s_2316c10137dec8::t_f4ef7bde69734e 1-38
+apps/construction-management/app/api/construction/organization/designations/list-designations-response-model.ts
+  s_2316c10137dec8::t_5012f2f1e74725 1-12
+apps/construction-management/app/api/construction/organization/designations/route.ts
+  s_2316c10137dec8::t_92750e8f1e3edb 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "95757244920a7e100b6fd4d44db59eea36a8f1e7",
+  "prompts": {},
+  "sessions": {
+    "s_2316c10137dec8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a6a9a26b6a25d0bd2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
