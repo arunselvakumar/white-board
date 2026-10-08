@@ -2,6 +2,10 @@
 export type CompanyProfile = {
   id: string;
   workspaceId: string;
+  name: string;
+  mobile: string | null;
+  email: string | null;
+  country: string;
   gstin: string | null;
   pan: string | null;
   address: string | null;

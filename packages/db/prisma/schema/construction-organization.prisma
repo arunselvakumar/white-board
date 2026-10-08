@@ -8,6 +8,13 @@
 model ConstructionOrganizationCompanyProfile {
   id          String    @id @db.Uuid
   workspaceId String    @unique @map("workspace_id")
+  /// Mirrors the Workspace name, kept in step by the rename command.
+  name        String    @default("")
+  /// E.164.
+  mobile      String?
+  email       String?
+  /// ISO 3166-1 alpha-2.
+  country     String    @default("IN") @db.Char(2)
   gstin       String?   @db.VarChar(15)
   pan         String?   @db.VarChar(10)
   address     String?
@@ -44,5 +51,22 @@ model ConstructionOrganizationAuditEvent {
   @@index([workspaceId, entityType, entityId])
   @@index([workspaceId, occurredAt])
   @@map("audit_events")
+  @@schema("construction_organization")
+}
+
+/// What a Company has bought, and until when (CM-104 trial; CM-116 plans,
+/// add-ons and checkout). One current row per Company.
+model ConstructionOrganizationSubscription {
+  id          String   @id @db.Uuid
+  workspaceId String   @unique @map("workspace_id")
+  planCode    String   @map("plan_code")
+  isTrial     Boolean  @map("is_trial")
+  startsAt    DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt      DateTime @map("ends_at") @db.Timestamptz(3)
+  autoRenew   Boolean  @default(false) @map("auto_renew")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("subscriptions")
   @@schema("construction_organization")
 }
