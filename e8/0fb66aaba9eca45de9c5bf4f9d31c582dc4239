@@ -1,0 +1,43 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_581d73081f10a9 95
+apps/construction-management/src/shared-kernel/audit.http.test.ts
+  s_25a30b12f62554::t_34a121dcac988f 1-51
+apps/construction-management/src/shared-kernel/audit.ts
+  s_25a30b12f62554::t_51ba97fd5bc7e7 1-46
+apps/construction-management/src/shared-kernel/decimal.ts
+  s_25a30b12f62554::t_1b917bf0058112 1-44
+apps/construction-management/src/shared-kernel/ids.test.ts
+  s_25a30b12f62554::t_eca2a7caa45732 1-13
+apps/construction-management/src/shared-kernel/ids.ts
+  s_25a30b12f62554::t_5fdf076666cc6d 1-27
+apps/construction-management/src/shared-kernel/money.test.ts
+  s_25a30b12f62554::t_5e15127c68b762 1-41
+apps/construction-management/src/shared-kernel/money.ts
+  s_25a30b12f62554::t_23a6a0b25941ad 1-99
+apps/construction-management/src/shared-kernel/quantity.test.ts
+  s_25a30b12f62554::t_ac0a2b63c6400a 1-18
+apps/construction-management/src/shared-kernel/quantity.ts
+  s_25a30b12f62554::t_f20d1bfdc23a96 1-66
+apps/construction-management/src/shared-kernel/tombstone.ts
+  s_25a30b12f62554::t_88e6fc91f3176f 1-17
+packages/db/prisma/migrations/20261008170000_construction_audit_events/migration.sql
+  s_25a30b12f62554::t_28e45a9a0dc6ba 1-21
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_8a03c25be387f2 29-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e80fb66aaba9eca45de9c5bf4f9d31c582dc4239",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
