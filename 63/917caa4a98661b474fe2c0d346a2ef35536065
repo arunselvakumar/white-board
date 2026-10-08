@@ -1,0 +1,89 @@
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_c3d8734b68e987::t_6262b6d8b5e4df 110,119-122,151,160-163
+apps/whiteboard/components/batches/batch-catalog.tsx
+  s_c3d8734b68e987::t_7b65bedcac91c8 296-303
+apps/whiteboard/components/class-tests/family/class-tests-family.stories.tsx
+  s_c3d8734b68e987::t_2eea3bae63dab5 1-343
+apps/whiteboard/components/class-tests/family/family-result-items.tsx
+  s_c3d8734b68e987::t_31cfbf4c6e51ec 1-184
+apps/whiteboard/components/class-tests/family/family-results-format.ts
+  s_c3d8734b68e987::t_19b026ab6c80a4 1-102
+apps/whiteboard/components/class-tests/family/family-results-screen.tsx
+  s_c3d8734b68e987::t_e467c8dd94f517 1-170
+apps/whiteboard/components/class-tests/family/family-results.fixtures.ts
+  s_c3d8734b68e987::t_5c797f19f905dd 1-159
+apps/whiteboard/components/class-tests/family/results-home-card.tsx
+  s_c3d8734b68e987::t_5db5bdd89c356c 1-62
+apps/whiteboard/components/class-tests/history/class-tests-history.stories.tsx
+  s_c3d8734b68e987::t_ae42df54b3e2a0 1-451
+apps/whiteboard/components/class-tests/history/student-test-history-screen.tsx
+  s_c3d8734b68e987::t_e044f26360e731 1-110
+apps/whiteboard/components/class-tests/history/student-test-history.tsx
+  s_c3d8734b68e987::t_ad72f30a6f39d5 1-333
+apps/whiteboard/components/class-tests/staff/class-tests-staff.fixtures.ts
+  s_c3d8734b68e987::t_4fabd8a213e394 1-268
+apps/whiteboard/components/class-tests/staff/class-tests-staff.stories.tsx
+  s_c3d8734b68e987::t_1d9bd3195f67b3 1-853
+apps/whiteboard/components/class-tests/staff/marks-form.tsx
+  s_c3d8734b68e987::t_997968f713223e 1-763
+apps/whiteboard/components/class-tests/staff/test-detail-screen.tsx
+  s_c3d8734b68e987::t_379fd8353045bf 1-224
+apps/whiteboard/components/class-tests/staff/test-summary.tsx
+  s_c3d8734b68e987::t_c1e58fec13e063 1-145
+apps/whiteboard/components/home/family-home-screen.tsx
+  s_c3d8734b68e987::t_caeea6389901a5 6,15,19,22-29
+apps/whiteboard/components/home/family-home.stories.tsx
+  s_c3d8734b68e987::t_857fdc270dd1ca 5-9,129,135,147-148,168-185,236,278-292,337-340
+apps/whiteboard/components/home/family-home.tsx
+  s_c3d8734b68e987::t_53672a5dad8916 19,22,259,264,270,283-285,291,302,309-310,344,356
+apps/whiteboard/components/students/student-profile-view.tsx
+  s_c3d8734b68e987::t_dc4154d8186651 10,377-380
+apps/whiteboard/components/teachers/my-batches-screen.tsx
+  s_c3d8734b68e987::t_0ac772a7484430 86-91
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_c3d8734b68e987::t_06103350ab2896 134-138
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_c3d8734b68e987::t_92ebad02c18fd6 38-41
+apps/whiteboard/lib/workspace-access.test.ts
+  s_c3d8734b68e987::t_367b1a3c8d5125 99-101
+apps/whiteboard/components/class-tests/history/fixtures.ts
+  s_7eb6403833d1bc::t_f05be4c2b95d5a 1-178
+apps/whiteboard/components/class-tests/staff/batch-tests-screen.tsx
+  s_3126e716824b29::t_a41e4e8a79407a 1-208
+apps/whiteboard/components/class-tests/staff/test-form-dialog.tsx
+  s_3126e716824b29::t_0c0a1f7dddc3bb 1-530
+apps/whiteboard/components/class-tests/staff/test-staff-format.ts
+  s_3126e716824b29::t_3990e95d1bf102 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "63917caa4a98661b474fe2c0d346a2ef35536065",
+  "prompts": {},
+  "sessions": {
+    "s_3126e716824b29": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a6f211b8b54b7f754",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7eb6403833d1bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af0747b1a112bef9f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c3d8734b68e987": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2f37b59-a3b6-4236-9c00-99231252dfb4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
