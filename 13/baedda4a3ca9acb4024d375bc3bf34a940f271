@@ -1,0 +1,99 @@
+apps/construction-management/.gitignore
+  s_25a30b12f62554::t_31019aa71d5cb5 39
+apps/construction-management/.storybook/mocks/auth.tsx
+  s_25a30b12f62554::t_3ac33caee3b47a 40-44,48,86-90,94,209-243,257-259,265,267-272,275
+apps/construction-management/.storybook/preview.tsx
+  s_25a30b12f62554::t_f99eb51f70ca2a 87-93
+apps/construction-management/app/(onboarding)/choose-company/page.tsx
+  s_25a30b12f62554::t_7b8e879b85b4b4 1-14
+apps/construction-management/app/(onboarding)/layout.tsx
+  s_25a30b12f62554::t_701a7b3cf197c8 1-13
+apps/construction-management/app/(public)/sign-in/page.tsx
+  s_25a30b12f62554::t_e44f00ca999ed8 1,3,5-6,10-18
+apps/construction-management/app/(public)/sign-up/page.tsx
+  s_25a30b12f62554::t_1d5a1147a98098 1,3,5-6,10-18
+apps/construction-management/app/app/layout.tsx
+  s_25a30b12f62554::t_3cdcc2bd5db6e7 2,13-14
+apps/construction-management/app/continue/continue.http.test.ts
+  s_25a30b12f62554::t_8050cd77020114 1-68
+apps/construction-management/app/continue/route.ts
+  s_25a30b12f62554::t_b311216e927c9a 1-44
+apps/construction-management/components/auth/auth-divider.tsx
+  s_25a30b12f62554::t_f2cb3ffdb18028 1-9
+apps/construction-management/components/auth/auth-tabs.tsx
+  s_25a30b12f62554::t_7c54117671a58f 1-29
+apps/construction-management/components/auth/code-form.tsx
+  s_25a30b12f62554::t_eee21a72835531 1-146
+apps/construction-management/components/auth/email-sign-in-form.tsx
+  s_25a30b12f62554::t_5eee64f6b324c0 1-136
+apps/construction-management/components/auth/email-sign-up-form.tsx
+  s_25a30b12f62554::t_90df4dc095d304 1-138
+apps/construction-management/components/auth/field-error.tsx
+  s_25a30b12f62554::t_a1e8aba3a791f6 1-6
+apps/construction-management/components/auth/form-alert.tsx
+  s_25a30b12f62554::t_628cb99e27ab16 1-10
+apps/construction-management/components/auth/mobile-field.tsx
+  s_25a30b12f62554::t_1138a36d373b9d 1-25
+apps/construction-management/components/auth/mobile-otp-flow.tsx
+  s_25a30b12f62554::t_83898f07ec18d5 1-154
+apps/construction-management/components/auth/password-field.tsx
+  s_25a30b12f62554::t_c4553891764550 1-33
+apps/construction-management/components/auth/sign-in-form.stories.tsx
+  s_25a30b12f62554::t_c6e0b98219d39c 1-192
+apps/construction-management/components/auth/sign-in-form.tsx
+  s_25a30b12f62554::t_30cfe3c8a8d2b3 1-32
+apps/construction-management/components/auth/sign-up-form.stories.tsx
+  s_25a30b12f62554::t_720f7a88b2d8c7 1-90
+apps/construction-management/components/auth/sign-up-form.tsx
+  s_25a30b12f62554::t_fe3bdd850b43a1 1-32
+apps/construction-management/components/onboarding/choose-company-form.stories.tsx
+  s_25a30b12f62554::t_6f42651312484f 1-63
+apps/construction-management/components/onboarding/choose-company-form.tsx
+  s_25a30b12f62554::t_ed5fdc9b04b45c 1-99
+apps/construction-management/components/onboarding/onboarding-shell.tsx
+  s_25a30b12f62554::t_2c6f68676992dc 1-38
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_9b67ce5393bb4f 144
+apps/construction-management/eslint.config.js
+  s_25a30b12f62554::t_a5d512b5a8e213 103
+apps/construction-management/lib/auth-errors.ts
+  s_25a30b12f62554::t_17c6f04a8fa051 1-80
+apps/construction-management/lib/safe-redirect.test.ts
+  s_25a30b12f62554::t_223d71cf82c3ec 1-30
+apps/construction-management/lib/safe-redirect.ts
+  s_25a30b12f62554::t_774448dbb686a2 1-32
+apps/construction-management/next.config.ts
+  s_25a30b12f62554::t_f86d1782693883 5-7
+apps/construction-management/proxy.ts
+  s_25a30b12f62554::t_5db38e46ae5c4e 5
+apps/construction-management/test/sessions.ts
+  s_25a30b12f62554::t_44e12243bd2265 1-44
+apps/construction-management/tsconfig.json
+  s_25a30b12f62554::t_d8643aa6515e98 25
+apps/construction-management/vitest.config.ts
+  s_25a30b12f62554::t_11013ef4fee247 24,33
+packages/auth/src/construction/config.ts
+  s_25a30b12f62554::t_6325f4ee2f44d8 44
+packages/auth/src/construction/react/hooks.ts
+  s_25a30b12f62554::t_015d545be9687f 88-95,130-140,153-160
+packages/auth/src/construction/server/companies.ts
+  s_25a30b12f62554::t_88744811e723ae 5,8-9,30-45
+turbo.json
+  s_25a30b12f62554::t_c833290956eecd 42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "13baedda4a3ca9acb4024d375bc3bf34a940f271",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
