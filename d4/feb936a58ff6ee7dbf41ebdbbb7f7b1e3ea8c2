@@ -1,0 +1,21 @@
+docs/adr/0039-construction-management-on-its-own-subdomain.md
+  s_78b3a795e3e795::t_c0d27e6ebe9d44 11-13
+docs/deployment/vercel-services.md
+  s_78b3a795e3e795::t_c6f7ace8bf6581 5-9,31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d4feb936a58ff6ee7dbf41ebdbbb7f7b1e3ea8c2",
+  "prompts": {},
+  "sessions": {
+    "s_78b3a795e3e795": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f3dfa31-4012-4ee3-827a-425cb8820053",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
