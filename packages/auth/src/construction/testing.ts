@@ -4,6 +4,7 @@ import { COMPANY_WORKSPACE_KIND, type CompanyRole } from "./roles";
 import type { CompanyAuthState } from "./types";
 
 export { outbox, type OutgoingEmail } from "../email/sender";
+export { smsOutbox, type OutgoingSms } from "./sms";
 
 /**
  * The `getCompanyAuth()` result for a test Session. `userId: null` is signed
@@ -90,4 +91,12 @@ export async function seedCompanyMember(input: {
       createdAt: now,
     },
   });
+}
+
+/** The newest code texted to a mobile. */
+export async function lastSmsCodeFor(mobile: string): Promise<string> {
+  const { smsOutbox } = await import("./sms");
+  const code = smsOutbox.filter((sms) => sms.to === mobile).at(-1)?.code;
+  if (code == null) throw new Error(`No code was texted to ${mobile}.`);
+  return code;
 }

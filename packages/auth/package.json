@@ -14,7 +14,8 @@
     "./construction/proxy": "./src/construction/proxy.ts",
     "./construction/client": "./src/construction/client.ts",
     "./construction/react": "./src/construction/react/index.ts",
-    "./construction/testing": "./src/construction/testing.ts"
+    "./construction/testing": "./src/construction/testing.ts",
+    "./construction/mobile": "./src/construction/mobile.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

@@ -40,6 +40,10 @@ export default defineConfig({
             BETTER_AUTH_SECRET: "http-tests-only-secret-0123456789abcdef",
             BETTER_AUTH_URL: "http://localhost:3002",
             EMAIL_TRANSPORT: "outbox",
+            SMS_TRANSPORT: "outbox",
+            OTP_TEST_CODE: "246810",
+            // Per-IP limits off; the per-mobile OTP limit always applies.
+            AUTH_RATE_LIMIT: "off",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.

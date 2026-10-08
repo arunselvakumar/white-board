@@ -59,6 +59,35 @@ export function useCompanyList() {
   return { companies, setActive, fetchStatus, error };
 }
 
+/**
+ * Mobile OTP sign-in and sign-up (ADR CM-0002): send a code, then verify it.
+ * Verifying an unknown number creates the User and signs them in.
+ */
+export function useCompanyMobileOtp() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+
+  const sendCode = useCallback(
+    (mobile: string) =>
+      run(() =>
+        constructionAuthClient().phoneNumber.sendOtp({ phoneNumber: mobile }),
+      ),
+    [run],
+  );
+
+  const verifyCode = useCallback(
+    (input: { mobile: string; code: string }) =>
+      run(() =>
+        constructionAuthClient().phoneNumber.verify({
+          phoneNumber: input.mobile,
+          code: input.code.trim(),
+        }),
+      ),
+    [run],
+  );
+
+  return { sendCode, verifyCode, fetchStatus, error, clearError };
+}
+
 /** Email and password sign-in (the secondary path; mobile OTP is primary). */
 export function useCompanyEmailSignIn() {
   const { run, fetchStatus, error, clearError } = useAuthAction();

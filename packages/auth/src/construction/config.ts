@@ -13,6 +13,8 @@ import {
   CONSTRUCTION_LOCAL_ORIGIN,
 } from "./constants";
 import { renderCompanyCodeEmail } from "./emails";
+import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
+import { createSmsSender, type SmsSender } from "./sms";
 import {
   COMPANY_WORKSPACE_KIND,
   companyAccessControl,
@@ -37,6 +39,8 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-out",
   "/sign-up/email",
   "/sign-in/email",
+  "/phone-number/send-otp",
+  "/phone-number/verify",
   "/email-otp/send-verification-otp",
   "/email-otp/verify-email",
   "/email-otp/request-password-reset",
@@ -65,6 +69,7 @@ function requiredSecret(): string | undefined {
  */
 export function createConstructionAuthOptions(
   email: EmailSender = createEmailSender(),
+  sms: SmsSender = createSmsSender(),
 ) {
   return {
     appName: "Construction Management",
@@ -108,10 +113,14 @@ export function createConstructionAuthOptions(
         "/email-otp/verify-email": { window: 60, max: 10 },
         "/email-otp/request-password-reset": { window: 60, max: 3 },
         "/email-otp/reset-password": { window: 60, max: 10 },
+        "/phone-number/send-otp": { window: 60, max: 5 },
+        "/phone-number/verify": { window: 60, max: 10 },
       },
     },
     plugins: [
       allowedPaths("construction-allowed-paths", CONSTRUCTION_AUTH_PATHS),
+      perMobileOtpLimit(),
+      mobileOtp(sms),
       emailOTP({
         overrideDefaultEmailVerification: true,
         sendVerificationOnSignUp: true,
