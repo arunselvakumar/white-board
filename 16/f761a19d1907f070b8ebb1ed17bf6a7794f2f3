@@ -1,0 +1,91 @@
+apps/construction-management/.env.example
+  s_ec41e28a857a0b::t_3bab1bead9841e 19-23
+apps/construction-management/.storybook/mocks/auth.tsx
+  s_ec41e28a857a0b::t_dcc77129e7ffd4 51-54,102-105,290-313
+apps/construction-management/CONTEXT.md
+  s_ec41e28a857a0b::t_66d96108e7590a 18
+apps/construction-management/README.md
+  s_ec41e28a857a0b::t_c98ba91630c108 10,26
+apps/construction-management/app/(public)/forgot-password/page.tsx
+  s_ec41e28a857a0b::t_36823ca6d89b81 1-14
+apps/construction-management/app/(public)/sign-in/page.tsx
+  s_ec41e28a857a0b::t_c534a40635df5b 1-4,21-26
+apps/construction-management/app/(public)/sign-up/page.tsx
+  s_ec41e28a857a0b::t_8ba21153b23f47 1-4,21-26
+apps/construction-management/app/api/auth/mobile-otp.http.test.ts
+  s_ec41e28a857a0b::t_a00708e2f5535f 5-7,34-54
+apps/construction-management/app/api/auth/password-reset.http.test.ts
+  s_ec41e28a857a0b::t_e441ae51f1114a 1-158
+apps/construction-management/app/api/construction/organization/companies/companies.http.test.ts
+  s_ec41e28a857a0b::t_512ab43c5f5828 9,46,61,72,77,90
+apps/construction-management/app/api/construction/organization/designations/designations.http.test.ts
+  s_ec41e28a857a0b::t_fae05314bdc76e 11,56,84,101
+apps/construction-management/app/continue/continue.http.test.ts
+  s_ec41e28a857a0b::t_1d5e6969d7cba3 7,32,37,53,60
+apps/construction-management/components/app-shell/masters-nav-menu.tsx
+  s_ec41e28a857a0b::t_a94196180872ca 5,41-44,46
+apps/construction-management/components/auth/code-form.tsx
+  s_ec41e28a857a0b::t_c63ed7e25e250e 17-22,30-31,84,89,99,103-185
+apps/construction-management/components/auth/email-sign-in-form.tsx
+  s_ec41e28a857a0b::t_76b9dd7a997e2e 9,32,117-125
+apps/construction-management/components/auth/forgot-password-form.stories.tsx
+  s_ec41e28a857a0b::t_49154adb68654d 1-104
+apps/construction-management/components/auth/forgot-password-form.tsx
+  s_ec41e28a857a0b::t_76f3fcc537c17f 1-249
+apps/construction-management/components/auth/public-shell.stories.tsx
+  s_ec41e28a857a0b::t_deec90f4b1a0ab 14
+apps/construction-management/components/auth/sign-in-form.stories.tsx
+  s_ec41e28a857a0b::t_6b1eb35e1a04aa 11,23,56,70,92,113-122,138-141,145,147,160-162,164
+apps/construction-management/components/auth/sign-in-form.tsx
+  s_ec41e28a857a0b::t_a8203fecfd8d7c 10-20,25-29,31-38
+apps/construction-management/components/auth/sign-up-form.stories.tsx
+  s_ec41e28a857a0b::t_d67e1807087e81 11,23,48-51,53,55-56,64-65
+apps/construction-management/components/auth/sign-up-form.tsx
+  s_ec41e28a857a0b::t_3fd06a0078b0ab 10-20,27-34
+apps/construction-management/docs/03-target-architecture.md
+  s_ec41e28a857a0b::t_990dd87f5501d3 32,83,170
+apps/construction-management/docs/README.md
+  s_ec41e28a857a0b::t_11137ba23d18c1 25
+apps/construction-management/docs/adr/CM-0002-company-workspace-and-mobile-otp.md
+  s_ec41e28a857a0b::t_cc89c597927f50 3
+apps/construction-management/docs/adr/CM-0009-email-sign-in-while-sms-is-off.md
+  s_ec41e28a857a0b::t_d617f8a98aaf93 1-32
+apps/construction-management/proxy.ts
+  s_ec41e28a857a0b::t_5509299c26c691 5-10
+apps/construction-management/test/companies.ts
+  s_ec41e28a857a0b::t_cafe29cd065b77 14,19,23,55,63,67
+apps/construction-management/test/sessions.ts
+  s_ec41e28a857a0b::t_cc6b989d7da12e 1-4,17-76,79-80,87,96-110
+packages/auth/src/allowed-paths.ts
+  s_ec41e28a857a0b::t_3f6372b646b8ea 48-51,54,59-60
+packages/auth/src/construction/config.ts
+  s_ec41e28a857a0b::t_e7d31d625b8db0 16,53-65,147-149
+packages/auth/src/construction/features.ts
+  s_ec41e28a857a0b::t_2ef2e3db470322 1-8
+packages/auth/src/construction/react/hooks.ts
+  s_ec41e28a857a0b::t_0af7210f5084bb 98,163-195
+packages/auth/src/construction/react/index.ts
+  s_ec41e28a857a0b::t_0233829f939e02 9
+packages/auth/src/construction/server/index.ts
+  s_ec41e28a857a0b::t_4785bbdf4df690 35
+packages/auth/src/construction/server/messaging.ts
+  s_ec41e28a857a0b::t_e985a67fe4628d 3,9-10,16-18,20
+turbo.json
+  s_ec41e28a857a0b::t_d010eb91a5eb79 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "16f761a19d1907f070b8ebb1ed17bf6a7794f2f3",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
