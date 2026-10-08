@@ -1,0 +1,95 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_6e21449892cd30 279-280,349-350,408-409,579
+apps/construction-management/app/api/construction/organization/join-requests/join-requests.http.test.ts
+  s_ec41e28a857a0b::t_5b4c88aa187d3f 7,14-21,60-94,104,112-113,118-119,121-123,125,127,129-131,133-134,143,172-185,187-192,204,207-208,210,219,224,226,241-242,247,254,260,262-263,267-312
+apps/construction-management/app/api/construction/organization/join-requests/route.ts
+  s_ec41e28a857a0b::t_a82cfa1c12c000 12
+apps/construction-management/app/api/construction/organization/me/me.http.test.ts
+  s_ec41e28a857a0b::t_56ce42ce53f70c 5,10,53,117,167-206,411-432
+apps/construction-management/app/api/construction/organization/me/profile/get-my-profile-response-model.ts
+  s_ec41e28a857a0b::t_586a2363644d0d 15-22
+apps/construction-management/app/api/construction/organization/me/profile/my-profile-body.ts
+  s_ec41e28a857a0b::t_93e791d715bc07 16
+apps/construction-management/app/api/construction/organization/me/profile/update/route.ts
+  s_ec41e28a857a0b::t_b3f688de79bc34 15-18
+apps/construction-management/app/api/construction/organization/me/profile/update/update-my-profile-request-model.ts
+  s_ec41e28a857a0b::t_d011f266f61d09 4-6,10-17
+apps/construction-management/app/api/construction/organization/team-members/team-members.http.test.ts
+  s_ec41e28a857a0b::t_b6a3a59d6c5b7c 3,7,23-25,56,104-105,111,160,211,228,282,296,304-354,366-414
+apps/construction-management/components/join/join-link-card.stories.tsx
+  s_ec41e28a857a0b::t_c0f1bfc62ed66b 15,38,72,94-96,99,110-129
+apps/construction-management/components/join/join-link-card.tsx
+  s_ec41e28a857a0b::t_5446976006df9e 30-41,78,89-91,112-116,125
+apps/construction-management/components/my-profile/my-profile-form.stories.tsx
+  s_ec41e28a857a0b::t_c3b5aecec0a92a 29,57,148-208
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_ec41e28a857a0b::t_7fbcac5eed445c 3,19,38-43,73-74,87-90,123-125,155-160,234-260
+apps/construction-management/components/team-members/add-team-member-wizard.stories.tsx
+  s_ec41e28a857a0b::t_83308063c6e10b 85-91,119-123,126,143-192
+apps/construction-management/components/team-members/add-team-member-wizard.tsx
+  s_ec41e28a857a0b::t_787e1eab58e496 135-137,140-142,145,162,168
+apps/construction-management/components/team-members/edit-team-member.stories.tsx
+  s_ec41e28a857a0b::t_8087df9f597db0 66-69,81-108
+apps/construction-management/components/team-members/edit-team-member.tsx
+  s_ec41e28a857a0b::t_c8aa0c19569f5f 145
+apps/construction-management/components/team-members/share-invite-dialog.tsx
+  s_ec41e28a857a0b::t_4c06135683a05b 19-20,27,34-35,43,59-60
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_ec41e28a857a0b::t_7c97a7e2bc2ed8 62-63,90,249,252-254,257-271
+apps/construction-management/components/team-members/team-member-fixtures.ts
+  s_ec41e28a857a0b::t_689f44b8beb965 37,45
+apps/construction-management/components/team-members/team-members-page.stories.tsx
+  s_ec41e28a857a0b::t_d191ab74dffcec 22,30,66-89,172-223
+apps/construction-management/components/team-members/team-members-page.tsx
+  s_ec41e28a857a0b::t_c069995588ca0c 189,248-249,258,321,329
+apps/construction-management/src/organization/application/invitation-notifier.test.ts
+  s_ec41e28a857a0b::t_e4f86dd29a7e60 1-105
+apps/construction-management/src/organization/application/invitation-notifier.ts
+  s_ec41e28a857a0b::t_230b217a581baf 18-21,32-34,43-44,71
+apps/construction-management/src/organization/application/join-requests.ts
+  s_ec41e28a857a0b::t_6096e600da137d 30-33,47-50,58-59,62-69,77,99,142-145,154
+apps/construction-management/src/organization/application/my-profile-handlers.ts
+  s_ec41e28a857a0b::t_e5e3a6f91aeed3 16-20,23-26,30,47,68-69,88-92,118,122-125,137-139
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_ec41e28a857a0b::t_cc76fdeafa3810 7-11,61-62,223-225,280-283,290-298
+apps/construction-management/src/organization/domain/team-member.test.ts
+  s_ec41e28a857a0b::t_005f406b1786d0 43-46,140,150-169
+apps/construction-management/src/organization/domain/team-member.ts
+  s_ec41e28a857a0b::t_c0dbd88ef892f3 21-24,72,265-274,276
+apps/construction-management/src/organization/infrastructure/create-my-profile-handlers.ts
+  s_ec41e28a857a0b::t_0d8ec13b218602 1,24-25
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_ec41e28a857a0b::t_8f4ba0087273cc 1-4,46,54-55,65-66
+apps/construction-management/src/organization/infrastructure/invitation-channels.ts
+  s_ec41e28a857a0b::t_ab5b72b1e92e5c 12
+apps/construction-management/src/organization/infrastructure/team-members.http.test.ts
+  s_ec41e28a857a0b::t_11d5f8fcfbd307 58,207
+packages/email-templates/src/emails/construction/team-invitation.tsx
+  s_ec41e28a857a0b::t_e1615677b573e6 38-39
+apps/construction-management/app/api/construction/organization/team-members/team-member-models.ts
+  s_c5a10e8eccceac::t_226ffdd823cb62 1,47-51,70-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "561874f6908139bb6113c05a6a9b61074e23dc01",
+  "prompts": {},
+  "sessions": {
+    "s_c5a10e8eccceac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa7f1613d2219e682",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
