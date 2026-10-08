@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 const handlers = createCompanyProfileHandlers();
 
 /** The Active Company's profile. Owner-only until the Permission Matrix exists (CM-107). */
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   try {
-    const session = await requireOwnerSession();
+    const session = await requireOwnerSession(request);
     if (isResponse(session)) return session;
     const profile = await handlers.get.execute({
       workspaceId: session.workspaceId,

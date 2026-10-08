@@ -4,7 +4,7 @@ import { useCompanyList } from "@repo/auth/construction/react";
 import { Building, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Item,
   ItemActions,
@@ -85,15 +85,16 @@ export function ChooseCompanyForm({
       )}
       {joinRequests}
       <FormAlert message={authErrorMessage(error, "global")} />
-      <Button
-        variant={companies.length === 0 ? "default" : "outline"}
-        className="h-10 w-full"
-        nativeButton={false}
-        render={<Link href="/create-company" />}
+      <Link
+        href="/create-company"
+        className={buttonVariants({
+          variant: companies.length === 0 ? "default" : "outline",
+          className: "h-10 w-full",
+        })}
       >
         <Plus />
         Create a Company
-      </Button>
+      </Link>
     </>
   );
 }

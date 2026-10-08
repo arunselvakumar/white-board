@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, waitFor, within } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
@@ -39,9 +39,9 @@ async function expectArea(
   ).toBeVisible();
   await expect(canvas.getByText("Nothing here yet")).toBeVisible();
   await expect(canvas.getByText(current.description)).toBeVisible();
-  await expect(canvas.getByLabelText("Active Company")).toHaveTextContent(
-    "Patil Builders",
-  );
+  await expect(
+    canvas.getByRole("button", { name: /Active Company: Patil Builders/ }),
+  ).toBeVisible();
   const view = canvasElement.ownerDocument.defaultView;
   if (view != null && view.innerWidth >= 768) {
     const nav = within(canvas.getByRole("navigation", { name: "Main" }));
@@ -85,9 +85,50 @@ export const NoActiveCompany: Story = {
     authMocks.workspaceId = null;
   },
   play: async ({ canvas }) => {
-    await expect(canvas.getByLabelText("Active Company")).toHaveTextContent(
-      "No Company",
+    await expect(
+      canvas.getByRole("button", { name: /Active Company: none/ }),
+    ).toHaveTextContent("No Company");
+  },
+};
+
+export const SwitchCompany: Story = {
+  ...shellAt("/app/projects"),
+  beforeEach() {
+    signInAs("owner", { name: "Patil Builders" });
+    authMocks.companies = [
+      ...authMocks.companies,
+      { id: "company_shree", name: "Shree Infra", role: "member" },
+    ];
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const fetchMock = fn(() =>
+      Promise.resolve(Response.json({ activeCompanyId: "company_shree" })),
     );
+    const original = globalThis.fetch;
+    globalThis.fetch = fetchMock;
+    try {
+      await userEvent.click(
+        canvas.getByRole("button", { name: /Active Company: Patil Builders/ }),
+      );
+      const menu = within(
+        await within(canvasElement.ownerDocument.body).findByRole("menu"),
+      );
+      await expect(
+        menu.getByRole("menuitem", { name: /Create a Company/ }),
+      ).toHaveAttribute("href", "/create-company");
+      await userEvent.click(
+        menu.getByRole("menuitem", { name: "Shree Infra" }),
+      );
+      await waitFor(() =>
+        expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
+      );
+      await expect(fetchMock).toHaveBeenCalledWith(
+        "/api/construction/organization/companies/company_shree/switch",
+        expect.objectContaining({ method: "POST" }),
+      );
+    } finally {
+      globalThis.fetch = original;
+    }
   },
 };
 

@@ -143,7 +143,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-102 |   2 | `@repo/auth`: mobile OTP sign-in/sign-up plugin (SMS provider adapter, rate limit, test bypass)              | done   | CM-101                 | Auth      |       |
 | CM-103 |   3 | Sign-up / sign-in screens: mobile OTP first, email+password second, "Choose Organization" after login        | done   | CM-009, CM-102         | UI        |       |
 | CM-104 |   4 | Company creation: name, mobile, email, country, currency, GSTIN/PAN (optional) → Workspace + profile         | done   | CM-005, CM-102         | Domain    |       |
-| CM-105 |   5 | Company HTTP + Create Company screen (first-run wizard) + company switcher                                   | todo   | CM-103, CM-104         | HTTP+UI   |       |
+| CM-105 |   5 | Company HTTP + Create Company screen (first-run wizard) + company switcher                                   | done   | CM-103, CM-104         | HTTP+UI   |       |
 | CM-106 |   6 | Designation aggregate + seed set (37 names, 6 with templates) copied into each new Company                   | todo   | CM-104                 | Domain    |       |
 | CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | todo   | CM-106                 | Domain    |       |
 | CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | todo   | CM-107                 | Domain    |       |

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { getCompanyAuth } from "@repo/auth/construction/server";
+import { getCompanyAuthFromHeaders } from "@repo/auth/construction/server";
 import { companyAuthStateFor } from "@repo/auth/construction/testing";
 import { prisma } from "@repo/db";
 import { StatusCodes } from "http-status-codes";
@@ -12,10 +12,13 @@ import { GET as getCompanyProfile } from "./route";
 
 vi.mock(import("@repo/auth/construction/server"), async (importOriginal) => ({
   ...(await importOriginal()),
-  getCompanyAuth: vi.fn(),
+  getCompanyAuthFromHeaders: vi.fn(),
 }));
 
-const mockedAuth = vi.mocked(getCompanyAuth);
+const mockedAuth = vi.mocked(getCompanyAuthFromHeaders);
+
+const request = () =>
+  new Request("http://localhost/api/construction/organization/company-profile");
 
 function session(input: {
   userId: string | null;
@@ -32,7 +35,7 @@ async function json<T>(response: Response): Promise<T> {
 describe("GET /api/construction/organization/company-profile", () => {
   it("is 401 without a Session", async () => {
     session({ userId: null, workspaceId: null });
-    const response = await getCompanyProfile();
+    const response = await getCompanyProfile(request());
     expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
     expect(await json(response)).toEqual({
       code: "UNAUTHENTICATED",
@@ -42,21 +45,21 @@ describe("GET /api/construction/organization/company-profile", () => {
 
   it("is 403 without an Active Company", async () => {
     session({ userId: "user-1", workspaceId: null });
-    const response = await getCompanyProfile();
+    const response = await getCompanyProfile(request());
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(response)).toMatchObject({ code: "NO_ACTIVE_COMPANY" });
   });
 
   it("is 403 for a Member until the Permission Matrix exists", async () => {
     session({ userId: "user-2", workspaceId: randomUUID(), role: "member" });
-    const response = await getCompanyProfile();
+    const response = await getCompanyProfile(request());
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(response)).toMatchObject({ code: "FORBIDDEN" });
   });
 
   it("is 404 when the Company has no profile", async () => {
     session({ userId: "user-3", workspaceId: randomUUID() });
-    const response = await getCompanyProfile();
+    const response = await getCompanyProfile(request());
     expect(response.status).toBe(StatusCodes.NOT_FOUND);
     expect(await json(response)).toMatchObject({
       code: "COMPANY_PROFILE_NOT_FOUND",
@@ -88,7 +91,7 @@ describe("GET /api/construction/organization/company-profile", () => {
     });
 
     session({ userId: "user-4", workspaceId: mine });
-    const response = await getCompanyProfile();
+    const response = await getCompanyProfile(request());
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
       gstin: "27AAPFU0939F1ZV",

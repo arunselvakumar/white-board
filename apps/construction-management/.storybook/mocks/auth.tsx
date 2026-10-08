@@ -69,6 +69,7 @@ export const storyUser: CompanyAuthUser = {
   name: "Ramesh Patil",
   email: "ramesh@patilbuilders.in",
   emailVerified: true,
+  phoneNumber: "+919876543210",
   image: null,
 };
 

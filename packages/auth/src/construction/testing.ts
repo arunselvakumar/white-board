@@ -16,6 +16,7 @@ export function companyAuthStateFor(session: {
   role?: CompanyRole | null;
   email?: string;
   name?: string;
+  phoneNumber?: string | null;
 }): CompanyAuthState {
   if (session.userId == null)
     return {
@@ -38,6 +39,7 @@ export function companyAuthStateFor(session: {
       name: session.name ?? session.userId,
       email: session.email ?? `${session.userId}@example.test`,
       emailVerified: true,
+      phoneNumber: session.phoneNumber ?? null,
       image: null,
     },
   };

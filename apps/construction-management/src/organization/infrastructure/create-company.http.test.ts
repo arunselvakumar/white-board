@@ -80,10 +80,13 @@ describe("createCompany on Postgres (CM-104)", () => {
   it("removes the Workspace when the profile cannot be written", async () => {
     const userId = await newUser();
     const failing = createCompanyHandlers({
-      prisma: {
-        ...prisma,
-        $transaction: () => Promise.reject(new Error("db down")),
-      } as unknown as typeof prisma,
+      prisma: new Proxy(prisma, {
+        get(target, property, receiver) {
+          if (property === "$transaction")
+            return () => Promise.reject(new Error("db down"));
+          return Reflect.get(target, property, receiver) as unknown;
+        },
+      }),
     });
     await expect(
       failing.create.execute({

@@ -63,6 +63,8 @@ const STATUS_DESCRIPTIONS: Partial<Record<StatusCodes, string>> = {
   [StatusCodes.FORBIDDEN]: "Active Company required, or not allowed",
   [StatusCodes.NOT_FOUND]: "Not found",
   [StatusCodes.CONFLICT]: "Domain state conflict",
+  [StatusCodes.PAYMENT_REQUIRED]: "Plan limit reached or plan expired",
+  [StatusCodes.TOO_MANY_REQUESTS]: "Too many requests",
   [StatusCodes.REQUEST_TOO_LONG]: "File too large",
   [StatusCodes.INTERNAL_SERVER_ERROR]: "Unexpected error",
 };

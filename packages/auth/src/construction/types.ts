@@ -5,6 +5,8 @@ export type CompanyAuthUser = {
   name: string;
   email: string;
   emailVerified: boolean;
+  /** E.164, when the User signed in by mobile (ADR CM-0002). */
+  phoneNumber: string | null;
   image: string | null;
 };
 
