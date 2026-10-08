@@ -10,6 +10,18 @@ import type {
 
 import { CalendarView } from "./calendar-view";
 
+/**
+ * Types into a dialog field until it holds `value`. On slow CI runners the
+ * dialog's opening focus handling can swallow the first keystrokes.
+ */
+async function fillIn(field: HTMLElement, value: string): Promise<void> {
+  await waitFor(async () => {
+    await userEvent.clear(field);
+    await userEvent.type(field, value);
+    await expect(field).toHaveValue(value);
+  });
+}
+
 const items: CalendarItem[] = [
   {
     id: "10000000-0000-4000-8000-000000000001",
@@ -174,7 +186,7 @@ export const OwnerCancelsAClass: Story = {
     await userEvent.click(
       await body.findByRole("button", { name: "Cancel class" }),
     );
-    await userEvent.type(body.getByLabelText("Reason (optional)"), "Pongal");
+    await fillIn(body.getByLabelText("Reason (optional)"), "Pongal");
     await userEvent.click(body.getByRole("button", { name: "Cancel class" }));
     await waitFor(() =>
       expect(args.classActions?.onCancel).toHaveBeenCalledWith(
@@ -203,18 +215,15 @@ export const OwnerMovesAClass: Story = {
     );
     const start = body.getByLabelText("Start");
     const end = body.getByLabelText("End");
-    await userEvent.clear(end);
-    await userEvent.type(end, "08:00");
+    await fillIn(end, "08:00");
     await userEvent.click(body.getByRole("button", { name: "Move class" }));
     await waitFor(() =>
       expect(
         body.getByText("End time must be after the start time."),
       ).toBeVisible(),
     );
-    await userEvent.clear(start);
-    await userEvent.type(start, "16:00");
-    await userEvent.clear(end);
-    await userEvent.type(end, "18:00");
+    await fillIn(start, "16:00");
+    await fillIn(end, "18:00");
     await userEvent.click(body.getByRole("button", { name: "Move class" }));
     await waitFor(() =>
       expect(args.classActions?.onMove).toHaveBeenCalledWith(
@@ -270,10 +279,8 @@ export const OwnerDeclaresAHoliday: Story = {
     );
     const first = body.getByLabelText("First day");
     const last = body.getByLabelText("Last day");
-    await userEvent.clear(first);
-    await userEvent.type(first, addDays(today, 4));
-    await userEvent.clear(last);
-    await userEvent.type(last, addDays(today, 3));
+    await fillIn(first, addDays(today, 4));
+    await fillIn(last, addDays(today, 3));
     await userEvent.click(
       body.getByRole("button", { name: "Declare Holiday" }),
     );
@@ -282,9 +289,8 @@ export const OwnerDeclaresAHoliday: Story = {
         body.getByText("The last day must be on or after the first day."),
       ).toBeVisible(),
     );
-    await userEvent.clear(last);
-    await userEvent.type(last, addDays(today, 6));
-    await userEvent.type(body.getByLabelText("Reason (optional)"), "Diwali");
+    await fillIn(last, addDays(today, 6));
+    await fillIn(body.getByLabelText("Reason (optional)"), "Diwali");
     await userEvent.click(
       body.getByRole("button", { name: "Declare Holiday" }),
     );
