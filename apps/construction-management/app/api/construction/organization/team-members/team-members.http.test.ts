@@ -3,7 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
-import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import {
+  addProject,
+  jsonRequest,
+  memberWith,
+  ownerWithCompany,
+} from "@/test/companies";
 import { newEmail, newMobile, TEST_ORIGIN, withSms } from "@/test/sessions";
 
 import { POST as setPermissions } from "./[id]/permissions/route";
@@ -49,6 +54,8 @@ function params(id: string) {
 describe("Team Members HTTP (CM-110)", () => {
   it("covers the Owner's whole flow", async () => {
     const owner = await ownerWithCompany();
+    const projectA = await addProject(owner.workspaceId, owner.userId);
+    const projectB = await addProject(owner.workspaceId, owner.userId);
     const created = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "Suresh Kale",
@@ -56,7 +63,7 @@ describe("Team Members HTTP (CM-110)", () => {
         email: newEmail(),
         aadhaar: "2341 2341 2346",
         memberType: "normal",
-        projectIds: ["project-a"],
+        projectIds: [projectA],
       }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
@@ -89,12 +96,12 @@ describe("Team Members HTTP (CM-110)", () => {
     const moved = await json<Member>(
       await assignProjects(
         jsonRequest(`${BASE}/${suresh.id}/projects`, owner.cookie, {
-          projectIds: ["project-b"],
+          projectIds: [projectB],
         }),
         params(suresh.id),
       ),
     );
-    expect(moved.projectIds).toEqual(["project-b"]);
+    expect(moved.projectIds).toEqual([projectB]);
 
     const hrms = await json<Member>(
       await update(

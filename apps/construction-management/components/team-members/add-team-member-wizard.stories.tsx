@@ -63,6 +63,24 @@ export const NormalMemberWithTemplate: Story = {
         respond: () => Response.json(DESIGNATION_LIST),
       },
       {
+        path: "/api/construction/projects/projects/options",
+        respond: () =>
+          Response.json({
+            items: [
+              {
+                id: "0199a000-0000-7000-8000-000000000001",
+                name: "Shree Heights",
+                status: "ongoing",
+              },
+              {
+                id: "0199a000-0000-7000-8000-000000000002",
+                name: "Green Valley",
+                status: "not_started",
+              },
+            ],
+          }),
+      },
+      {
         method: "POST",
         path: MEMBERS_URL,
         respond: () => Response.json(teamMember(), { status: 201 }),
@@ -99,7 +117,9 @@ export const NormalMemberWithTemplate: Story = {
     await userEvent.type(canvas.getByLabelText("Aadhaar"), "2341 2341 2346");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
-    await expect(await canvas.findByText("No Projects yet")).toBeVisible();
+    await userEvent.click(
+      await canvas.findByRole("checkbox", { name: /Shree Heights/ }),
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
     // The matrix starts from the Site Engineer template.
@@ -127,7 +147,7 @@ export const NormalMemberWithTemplate: Story = {
       mobile: "+919876543210",
       aadhaar: "2341 2341 2346",
       memberType: "normal",
-      projectIds: [],
+      projectIds: ["0199a000-0000-7000-8000-000000000001"],
       permissions: {
         "labour.attendance": ["create", "read", "update"],
         "procurement.purchase_requests": ["create", "read", "approve"],

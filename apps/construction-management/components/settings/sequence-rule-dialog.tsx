@@ -46,7 +46,8 @@ const TOKEN_RE = /^[A-Za-z0-9/_.-]*$/;
 const tokenMessage = `Use up to ${String(SEQUENCE_LIMITS.tokenLength)} letters, digits and / - _ .`;
 
 const schema = z.object({
-  projectId: z.literal("default"),
+  /** "default" for All projects, else a Project id. */
+  projectId: z.string().min(1, "Choose a Project"),
   prefix: z
     .string()
     .trim()
@@ -73,7 +74,7 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>;
 
-const PROJECT_ITEMS = [{ value: "default", label: "All projects (default)" }];
+const DEFAULT_ITEM = { value: "default", label: "All projects (default)" };
 
 const SEPARATOR_ITEMS = [
   { value: "/", label: "/ (slash)" },
@@ -88,6 +89,8 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   SEQUENCE_PROJECT_TOKEN_INVALID: "projectToken",
   SEQUENCE_START_NUMBER_INVALID: "startNumber",
   SEQUENCE_PADDING_INVALID: "padding",
+  SEQUENCE_RULE_EXISTS: "projectId",
+  PROJECT_NOT_FOUND: "projectId",
 };
 
 function separatorOf(value: Values["separator"]): SequenceSeparator {
@@ -98,23 +101,41 @@ function separatorOf(value: Values["separator"]): SequenceSeparator {
 export function SequenceRuleDialog({
   module,
   rule,
+  projects,
+  canAddDefault,
   today,
   onSaved,
   onClose,
 }: {
   module: SequenceModuleKey;
-  /** Null to add the module's default rule. */
+  /** Null to add a rule: the module's default or one Project's. */
   rule: SequenceRuleItem | null;
+  /**
+   * Projects a new rule may be for (those without one for this module);
+   * when editing, the rule's own Project for its label.
+   */
+  projects: readonly { id: string; name: string }[];
+  /** Whether the module still has no rule for All projects. */
+  canAddDefault: boolean;
   /** `YYYY-MM-DD`; picks the fiscal year shown in the preview. */
   today: string;
   onSaved: () => void;
   onClose: () => void;
 }) {
   const start = rule ?? standardSequenceSettings(module);
+  const projectItems = [
+    ...(rule?.isDefault === true || (rule == null && canAddDefault)
+      ? [DEFAULT_ITEM]
+      : []),
+    ...projects.map((project) => ({ value: project.id, label: project.name })),
+  ];
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
-      projectId: "default",
+      projectId:
+        rule == null
+          ? (projectItems[0]?.value ?? "")
+          : (rule.projectId ?? "default"),
       prefix: start.prefix,
       projectToken: start.projectToken,
       startNumber: start.startNumber,
@@ -134,7 +155,11 @@ export function SequenceRuleDialog({
         fiscalYearToken: values.fiscalYearToken,
       };
       return rule == null
-        ? createSequenceRule({ module, projectId: null, ...settings })
+        ? createSequenceRule({
+            module,
+            projectId: values.projectId === "default" ? null : values.projectId,
+            ...settings,
+          })
         : updateSequenceRule(rule.id, {
             ...settings,
             expectedUpdatedAt: rule.updatedAt,
@@ -208,7 +233,7 @@ export function SequenceRuleDialog({
               control={form.control}
               render={({ field }) => (
                 <Select
-                  items={PROJECT_ITEMS}
+                  items={projectItems}
                   value={field.value}
                   disabled={rule != null}
                   onValueChange={(value) => {
@@ -227,7 +252,7 @@ export function SequenceRuleDialog({
                     alignItemWithTrigger={false}
                     aria-label="Projects"
                   >
-                    {PROJECT_ITEMS.map((item) => (
+                    {projectItems.map((item) => (
                       <SelectItem key={item.value} value={item.value}>
                         {item.label}
                       </SelectItem>
@@ -236,8 +261,9 @@ export function SequenceRuleDialog({
                 </Select>
               )}
             />
+            <FieldError message={errors.projectId?.message} />
             <p className="text-muted-foreground text-sm">
-              Rules for a single Project arrive with Projects.
+              A Project&apos;s own rule replaces the default for that Project.
             </p>
           </div>
 

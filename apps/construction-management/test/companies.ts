@@ -180,3 +180,28 @@ export function actAs(input: {
     companyAuthStateFor(input),
   );
 }
+
+/**
+ * A live Project of the Company (CM-204), written straight to
+ * `construction_projects.projects` for tests that only need its id.
+ */
+export async function addProject(
+  workspaceId: string,
+  by: string,
+  name = `Project ${randomUUID().slice(0, 8)}`,
+): Promise<string> {
+  const id = randomUUID();
+  const now = new Date();
+  await prisma.constructionProjectsProject.create({
+    data: {
+      id,
+      workspaceId,
+      name,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
+}

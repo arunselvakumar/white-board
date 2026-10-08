@@ -74,6 +74,7 @@ export function AddTeamMemberWizard() {
   } | null>(null);
   const [created, setCreated] = useState<TeamMember | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [projectIds, setProjectIds] = useState<string[]>([]);
 
   const template =
     designations.find((item) => item.id === designationId)?.template ?? {};
@@ -108,7 +109,7 @@ export function AddTeamMemberWizard() {
     try {
       await mutation.mutateAsync({
         ...detailsInput(values, { keepIdentifiersWhenBlank: false }),
-        projectIds: [],
+        projectIds: memberType === "hrms" ? [] : projectIds,
         permissions: memberType === "hrms" ? undefined : grants,
       });
     } catch (error) {
@@ -207,7 +208,9 @@ export function AddTeamMemberWizard() {
           {step === "details" && (
             <TeamMemberDetailsFields form={form} designations={designations} />
           )}
-          {step === "projects" && <ProjectsStep />}
+          {step === "projects" && (
+            <ProjectsStep value={projectIds} onChange={setProjectIds} />
+          )}
           {step === "permissions" && (
             <div className="space-y-3">
               <p className="text-muted-foreground text-sm">

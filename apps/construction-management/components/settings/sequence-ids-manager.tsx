@@ -39,6 +39,7 @@ import {
 import { FormAlert } from "@/components/auth/form-alert";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { QueryHttpError } from "@/src/queries/http";
+import { projectOptionsQuery } from "@/src/queries/projects";
 import {
   deleteSequenceRule,
   sequenceRulesQuery,
@@ -72,6 +73,7 @@ export function SequenceIdsManager({
   today?: string;
 }) {
   const { data } = useSuspenseQuery(sequenceRulesQuery);
+  const { data: projectOptions } = useSuspenseQuery(projectOptionsQuery);
   const queryClient = useQueryClient();
   const [module, setModule] = useState<SequenceModuleKey>("purchase_request");
   const [editing, setEditing] = useState<SequenceRuleItem | "new" | null>(null);
@@ -80,6 +82,15 @@ export function SequenceIdsManager({
   const fiscalYear = fiscalYearOf(today);
   const rules = data.items.filter((rule) => rule.module === module);
   const hasDefault = rules.some((rule) => rule.isDefault);
+  const projectName = new Map(
+    projectOptions.items.map((project) => [project.id, project.name]),
+  );
+  // Projects that may still get their own rule for this module.
+  const withRule = new Set(rules.map((rule) => rule.projectId));
+  const openProjects = projectOptions.items.filter(
+    (project) => !withRule.has(project.id),
+  );
+  const canAdd = !hasDefault || openProjects.length > 0;
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: sequenceRulesQuery.queryKey });
   const remove = useMutation({ mutationFn: deleteSequenceRule });
@@ -87,7 +98,7 @@ export function SequenceIdsManager({
   const addButton = (
     <Button
       type="button"
-      disabled={hasDefault}
+      disabled={!canAdd}
       onClick={() => {
         setError(undefined);
         setEditing("new");
@@ -144,8 +155,9 @@ export function SequenceIdsManager({
 
         {rules.length > 0 && hasDefault && (
           <p className="text-muted-foreground text-sm">
-            This module has its rule for All projects. Rules for a single
-            Project arrive with Projects.
+            {openProjects.length > 0
+              ? "This module has its rule for All projects. Add a rule for a single Project to number its documents its own way."
+              : "This module has its rule for All projects, and every Project has its own rule."}
           </p>
         )}
 
@@ -188,7 +200,8 @@ export function SequenceIdsManager({
                   <p className="flex items-center gap-2 text-sm font-medium">
                     {rule.isDefault
                       ? "All projects (default)"
-                      : `Project ${rule.projectId ?? ""}`}
+                      : (projectName.get(rule.projectId ?? "") ??
+                        "A Project you cannot see")}
                     {rule.issued && <Badge variant="secondary">In use</Badge>}
                   </p>
                   <p className="font-mono text-base">
@@ -240,6 +253,14 @@ export function SequenceIdsManager({
           <SequenceRuleDialog
             module={module}
             rule={editing === "new" ? null : editing}
+            projects={
+              editing === "new"
+                ? openProjects
+                : projectOptions.items.filter(
+                    (project) => project.id === editing.projectId,
+                  )
+            }
+            canAddDefault={!hasDefault}
             today={today}
             onClose={() => {
               setEditing(null);

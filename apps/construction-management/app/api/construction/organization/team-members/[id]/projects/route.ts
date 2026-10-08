@@ -1,8 +1,12 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { assertKnownProjects } from "@/src/organization/application/project-directory";
 
-import { teamMemberHandlers as handlers } from "../../handlers";
+import {
+  teamMemberHandlers as handlers,
+  projectDirectory,
+} from "../../handlers";
 import {
   TeamMemberIdParamsModel,
   toTeamMemberResponse,
@@ -11,7 +15,10 @@ import { AssignConstructionOrganizationTeamMemberProjectsRequestModel } from "./
 
 export const dynamic = "force-dynamic";
 
-/** Replaces the Projects a Team Member works on (CM-110). */
+/**
+ * Replaces the Projects a Team Member works on (CM-110); 400
+ * `PROJECT_NOT_FOUND` for an id that is not a live Project (CM-204).
+ */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -30,6 +37,11 @@ export async function POST(
       AssignConstructionOrganizationTeamMemberProjectsRequestModel.safeParse(
         await request.json(),
       ),
+    );
+    await assertKnownProjects(
+      projectDirectory,
+      session.workspaceId,
+      projectIds,
     );
     const member = await handlers.assignProjects({
       workspaceId: session.workspaceId,

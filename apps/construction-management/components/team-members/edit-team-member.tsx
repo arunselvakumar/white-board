@@ -32,7 +32,7 @@ import {
 import type { PermissionGrants } from "@/src/shared-kernel/access";
 
 import { MemberStatusBadge } from "./member-status-badge";
-import { ProjectsStep } from "./projects-step";
+import { TeamMemberProjectsTab } from "./projects-step";
 import {
   DETAIL_ERROR_FIELDS,
   TeamMemberDetailsFields,
@@ -160,7 +160,7 @@ export function EditTeamMember({ id }: { id: string }) {
 
           {member.memberType === "normal" && (
             <TabsContent value="projects">
-              <ProjectsStep />
+              <TeamMemberProjectsTab member={member} />
             </TabsContent>
           )}
 

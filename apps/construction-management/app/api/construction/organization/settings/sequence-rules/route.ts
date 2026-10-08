@@ -1,9 +1,12 @@
+import { prisma } from "@repo/db";
 import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { assertKnownProjects } from "@/src/organization/application/project-directory";
 import { createSequenceRuleHandlers } from "@/src/organization/infrastructure/create-sequence-rule-handlers";
+import { PrismaProjectDirectory } from "@/src/organization/infrastructure/prisma-project-directory";
 
 import {
   CreateConstructionOrganizationSequenceRuleRequestModel,
@@ -18,6 +21,7 @@ import { mapSequenceRule } from "./sequence-rule-fields";
 export const dynamic = "force-dynamic";
 
 const handlers = createSequenceRuleHandlers();
+const projectDirectory = new PrismaProjectDirectory(prisma);
 
 /** The Company's Sequence ID rules (CM-114). */
 export async function GET(request: Request): Promise<Response> {
@@ -47,7 +51,10 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a rule: the module's default, or (from M2) one Project's. */
+/**
+ * Adds a rule: the module's default, or one Project's (400
+ * `PROJECT_NOT_FOUND` unless it is a live Project of the Company).
+ */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -62,6 +69,10 @@ export async function POST(request: Request): Promise<Response> {
       ),
     );
     const { module, projectId, ...settings } = model;
+    if (projectId != null)
+      await assertKnownProjects(projectDirectory, session.workspaceId, [
+        projectId,
+      ]);
     const created = await handlers.create({
       workspaceId: session.workspaceId,
       module,
