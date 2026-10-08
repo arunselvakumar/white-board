@@ -66,6 +66,10 @@ model ConstructionOrganizationSubscription {
   startsAt    DateTime @map("starts_at") @db.Timestamptz(3)
   endsAt      DateTime @map("ends_at") @db.Timestamptz(3)
   autoRenew   Boolean  @default(false) @map("auto_renew")
+  /// Add-on units per grant: `{ "team_member": 2, "storage_gb": 1 }` (CM-116).
+  addOns      Json     @default("{}") @map("add_ons")
+  /// Paise, before GST, paid for `starts_at`–`ends_at`; the upgrade credit.
+  paidValue   Int      @default(0) @map("paid_value")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -279,5 +283,82 @@ model ConstructionOrganizationStoredFile {
 
   @@index([workspaceId, deletedAt])
   @@map("stored_files")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationSubscriptionOrderKind {
+  new
+  extend
+  upgrade
+  add_ons
+
+  @@map("subscription_order_kind")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationSubscriptionOrderStatus {
+  created
+  paid
+  failed
+
+  @@map("subscription_order_status")
+  @@schema("construction_organization")
+}
+
+/// One checkout (CM-117): the price snapshot (paise), buyer and seller, and
+/// the Razorpay order. Rows are never edited apart from `created → paid |
+/// failed`; a paid order is the tax invoice.
+model ConstructionOrganizationSubscriptionOrder {
+  id               String                                          @id @db.Uuid
+  workspaceId      String                                          @map("workspace_id")
+  kind             ConstructionOrganizationSubscriptionOrderKind
+  planCode         String                                          @map("plan_code")
+  planName         String                                          @map("plan_name")
+  months           Int?
+  /// Add-ons on a running plan: days charged.
+  days             Int?
+  /// Add-on units bought, per grant.
+  addOns           Json                                            @map("add_ons")
+  /// Order Summary lines: item, description, rate, quantity, months/days, amount.
+  lines            Json
+  catalogueVersion Int                                             @map("catalogue_version")
+  currency         String                                          @default("INR") @db.Char(3)
+  subTotal         Int                                             @map("sub_total")
+  lastPlanDiscount Int                                             @map("last_plan_discount")
+  taxableAmount    Int                                             @map("taxable_amount")
+  cgst             Int
+  sgst             Int
+  igst             Int
+  total            Int
+  startsAt         DateTime                                        @map("starts_at") @db.Timestamptz(3)
+  endsAt           DateTime                                        @map("ends_at") @db.Timestamptz(3)
+  billingName      String                                          @map("billing_name")
+  billingAddress   String                                          @map("billing_address")
+  billingStateCode String                                          @map("billing_state_code") @db.Char(2)
+  billingGstin     String?                                         @map("billing_gstin") @db.VarChar(15)
+  /// Seller block printed on the invoice, as it was when the order was made.
+  seller           Json
+  gateway          String                                          @default("razorpay")
+  gatewayOrderId   String                                          @unique @map("gateway_order_id")
+  gatewayPaymentId String?                                         @map("gateway_payment_id")
+  status           ConstructionOrganizationSubscriptionOrderStatus @default(created)
+  invoiceNumber    String?                                         @unique @map("invoice_number")
+  createdBy        String                                          @map("created_by")
+  createdAt        DateTime                                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  paidAt           DateTime?                                       @map("paid_at") @db.Timestamptz(3)
+  failedAt         DateTime?                                       @map("failed_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, paidAt])
+  @@map("subscription_orders")
+  @@schema("construction_organization")
+}
+
+/// The seller's tax invoice numbers, one counter per fiscal year (`26-27`).
+model ConstructionOrganizationSubscriptionInvoiceCounter {
+  fiscalYear String @id @map("fiscal_year")
+  lastNumber Int    @map("last_number")
+
+  @@map("subscription_invoice_counters")
   @@schema("construction_organization")
 }

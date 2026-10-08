@@ -1,21 +1,10 @@
-/** What a Company's plan counts (CM-116). */
-export type PlanGrant =
-  "team_member" | "hrms_member" | "project" | "storage_gb";
-
 /**
- * Plan limits for create commands (CM-118). Throws `PLAN_LIMIT_EXCEEDED`
- * or `PLAN_EXPIRED`; the organization context implements it over the
- * Company's subscription.
+ * The plan port lives in the shared kernel so every context's create
+ * commands can ask it (CM-118); the organization context implements it as
+ * `SubscriptionPlanGate`.
  */
-export type PlanGate = {
-  assertCanAdd(
-    workspaceId: string,
-    grant: PlanGrant,
-    quantity?: number,
-  ): Promise<void>;
-};
-
-/** Allows everything; for tests that are not about plans. */
-export const UNLIMITED_PLAN: PlanGate = {
-  assertCanAdd: () => Promise.resolve(),
-};
+export {
+  UNLIMITED_PLAN,
+  type PlanGate,
+  type PlanGrant,
+} from "@/src/shared-kernel/plan";

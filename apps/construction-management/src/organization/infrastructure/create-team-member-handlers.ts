@@ -11,9 +11,10 @@ import {
   type InvitationChannels,
 } from "../application/invitation-notifier";
 import { JoinRequestHandlers } from "../application/join-requests";
-import { UNLIMITED_PLAN, type PlanGate } from "../application/plan-gate";
+import type { PlanGate } from "../application/plan-gate";
 import { TeamMemberHandlers } from "../application/team-member-handlers";
 import { authCompanyMemberships } from "./auth-company-memberships";
+import { createPlanGate } from "./create-subscription-handlers";
 import { invitationChannels } from "./invitation-channels";
 import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
 import { PrismaDesignationRepository } from "./prisma-designation-repository";
@@ -44,7 +45,7 @@ export function createTeamMemberHandlers(deps?: {
   return new TeamMemberHandlers(
     members,
     designations,
-    deps?.plan ?? UNLIMITED_PLAN,
+    deps?.plan ?? createPlanGate({ prisma: db }),
     events,
   );
 }

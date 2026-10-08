@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "currency": "INR",
+  "plans": [
+    {
+      "code": "basic",
+      "name": "Basic",
+      "rank": 1,
+      "durations": [
+        { "months": 6, "pricePaise": 1400000 },
+        { "months": 12, "pricePaise": 2100000 }
+      ],
+      "includes": {
+        "project": 10,
+        "team_member": 5,
+        "hrms_member": 10,
+        "storage_gb": 20
+      }
+    }
+  ],
+  "addOns": [
+    {
+      "grant": "team_member",
+      "name": "Extra Team Member",
+      "unitSize": 1,
+      "pricePerUnitPerMonthPaise": 29900,
+      "minimumQuantity": 1
+    },
+    {
+      "grant": "project",
+      "name": "Extra Project",
+      "unitSize": 1,
+      "pricePerUnitPerMonthPaise": 29900,
+      "minimumQuantity": 1
+    },
+    {
+      "grant": "storage_gb",
+      "name": "30 GB storage",
+      "unitSize": 30,
+      "pricePerUnitPerMonthPaise": 29900,
+      "minimumQuantity": 1
+    },
+    {
+      "grant": "hrms_member",
+      "name": "HRMS Team Member",
+      "unitSize": 1,
+      "pricePerUnitPerMonthPaise": 3000,
+      "minimumQuantity": 5
+    }
+  ]
+}

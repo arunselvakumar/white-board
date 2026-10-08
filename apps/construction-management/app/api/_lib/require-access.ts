@@ -8,8 +8,10 @@ import {
   type MenuKey,
 } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
+import { isWriteFlag } from "@/src/shared-kernel/plan";
 
 import { jsonError } from "./json-error";
+import { requirePlanActive } from "./require-plan-active";
 import {
   isResponse,
   requireCompanySession,
@@ -21,7 +23,10 @@ export type AccessSession = CompanySession & { access: MemberAccess };
 /**
  * The Session plus a Permission Matrix check (ADR CM-0003): 401 / 403
  * `NO_ACTIVE_COMPANY` as `requireCompanySession`, then 403
- * `PERMISSION_DENIED` unless `can(member, menu, flag, { projectId })`.
+ * `PERMISSION_DENIED` unless `can(member, menu, flag, { projectId })`,
+ * then 402 `PLAN_EXPIRED` for a write flag (create, update, delete,
+ * approve, reject, transfer, import) once the Company's plan has ended
+ * (CM-118). Reads and `export` stay open on an ended plan.
  */
 export async function requireAccess(
   request: Request,
@@ -38,5 +43,9 @@ export async function requireAccess(
       "PERMISSION_DENIED",
       "You do not have permission to do this. Ask the Owner to change your Permission Matrix.",
     );
+  if (isWriteFlag(flag)) {
+    const ended = await requirePlanActive(session);
+    if (ended != null) return ended;
+  }
   return { ...session, access };
 }

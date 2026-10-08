@@ -154,9 +154,9 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | done        | CM-107                 | Kernel    |       |
 | CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | done        | CM-107                 | Kernel+UI |       |
 | CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | done        | CM-105                 | UI        |       |
-| CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | todo        | CM-104                 | Domain    |       |
-| CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | todo        | CM-116                 | HTTP+UI   |       |
-| CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | todo        | CM-116                 | Domain    |       |
+| CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | done        | CM-104                 | Domain    |       |
+| CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | done        | CM-116                 | HTTP+UI   |       |
+| CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | done        | CM-116                 | Domain    |       |
 | CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | in_progress | CM-111, CM-115, CM-117 | UI        |       |
 
 ### CM-101 — ADR CM-0002
@@ -228,13 +228,37 @@ Decided while building it:
 
 **Done when:** `Plan` (includes: projects, team members, HRMS seats, storage GB; prices per duration), `AddOn` (per unit per month), `Subscription(workspaceId, planId, startsAt, endsAt, autoRenew, addOns[])`, `UsageSnapshot` computed from counts; `startTrial` on company creation (14 days, Basic limits); `Your Subscription` read model (plan, expiry, usage bars).
 
+Decisions (CM-116):
+
+- The catalogue is versioned JSON, `src/organization/infrastructure/seeds/plans.json`; orders store `catalogueVersion`. Only **Basic** is known: 6 months ₹14,000, 12 months ₹21,000 (paise in the file), 10 Projects, 5 Team Members, **10 HRMS Team Members** (our number; open question), 20 GB. `rank` orders Plans for "same or higher".
+- Prices are **before GST**; GST 18% is added and shown separately (CGST 9% + SGST 9% when the buyer's state is the seller's, IGST 18% otherwise).
+- Add-ons per unit per month: Extra Team Member, Extra Project, 30 GB storage at ₹299 (minimum 1 each), HRMS Team Member ₹30 (minimum 5). At most 500 units per add-on per order.
+- Status is derived from dates: `trial` (`isTrial` and not ended), `active`, `expired` (now ≥ `endsAt`). Days left count a part day as a day.
+- Usage: Team Members are live Normal members including the Owner and Joining Pending invites; HRMS seats count HRMS members only; Projects count 0 until CM-204; storage sums `construction_organization.stored_files.bytes` once that table exists (0 before).
+- `GET /api/construction/organization/subscription` is open to every Team Member of the Company; amounts and billing (`owner`) are null for a Member.
+
 ### CM-117 — Razorpay checkout
 
 **Done when:** Choose plan → duration → add-ons → buyer details (billing address, GSTIN) → Razorpay order → webhook verifies signature → subscription activated/extended/upgraded ("new plan must be same or higher"); invoices list with PDF; test-mode keys in `.env.example`.
 
+Decisions (CM-117):
+
+- Order kinds: `new` (from a Trial or an ended plan; starts on payment), `extend` (same plan; months added to the current end; running add-ons renewed for the same months), `upgrade` (rank ≥ current; starts on payment; add-ons chosen again), `add_ons` (running plan only; charged per unit per day as 1/30 of the monthly price for the days left). A Trial can only buy `new`; an active plan cannot buy `new`.
+- **Last Plan Discount** = the pre-GST value paid for the running period (plan and add-ons) × days left ÷ days in the period, capped at the Sub Total. Coupons are not built.
+- Orders are immutable rows (`created → paid | failed`) with the full price snapshot, buyer details (name, address, GST state, optional GSTIN that must match the state) and the seller block. A `failed` order can still be paid by a later attempt on the same Razorpay order.
+- Payment is settled by the webhook (`payment.captured` / `order.paid`, `X-Razorpay-Signature` HMAC-SHA256 of the raw body) **and** by `checkout/verify` (HMAC of `order_id|payment_id` with the key secret), whichever arrives first; both lock the order row, so replays never extend twice.
+- A paid order is the tax invoice, numbered `CM/<FY>/<00001>` per Indian fiscal year (16 characters at most). Seller name, address, GSTIN, state (default 27 Maharashtra) and SAC (default 997331) come from `CONSTRUCTION_SELLER_*`. The buyer's billing address is kept on the order; a reusable list of Company GST registrations (rebuild recommendation 8) waits for Procurement.
+- Without `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` the checkout shows "Payments are not configured" and `POST …/checkout` returns 503 `PAYMENTS_NOT_CONFIGURED`.
+
 ### CM-118 — Enforcement
 
-**Done when:** creating a project/member/HRMS member beyond the plan returns `plan_limit_exceeded` with the limit in `details`; expired plan → all commands except export return `plan_expired`; owner-only checkout; banner in the shell. HTTP tests for each.
+**Done when:** creating a project/member/HRMS member beyond the plan returns `PLAN_LIMIT_EXCEEDED` (402) with `{ grant, limit, used }` in `details`; expired plan → all commands except export return `PLAN_EXPIRED` (402); owner-only checkout; banner in the shell. HTTP tests for each.
+
+Decisions (CM-118):
+
+- The `PlanGate` port lives in the shared kernel (`src/shared-kernel/plan.ts`) so every context's create commands can ask it; the organization context implements it (`SubscriptionPlanGate`, composed by `createPlanGate()`).
+- Expiry is checked centrally in `requireAccess` for the write flags `create update delete approve reject transfer import`; `read print report view_all notification financial export` stay open. Owner-only command routes that use `requireOwnerSession` call `requirePlanActive(session)`. The subscription, checkout and webhook routes, sign-out and Company switching are never blocked.
+- A Company with no subscription row (only seeded test data) is not limited.
 
 ---
 
