@@ -231,7 +231,7 @@ export function buildOpenApiDocument(
 
   return {
     openapi: "3.0.3",
-    servers: [{ url: "/app" }],
+    servers: [{ url: "/" }],
     info: {
       title: "Whiteboard API",
       version: "0.0.0",
