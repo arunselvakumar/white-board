@@ -6,6 +6,8 @@ Claude Code instructions for Whiteboard. Operating rules that apply to every age
 
 Whiteboard is an education-management SaaS. Identity lives only in the authenticated **Whiteboard** app (`apps/whiteboard`). The **Marketing Site** (`apps/marketing`) is public and has no Session.
 
+The monorepo also holds **Construction Management** (`apps/construction-management`), a separate Next.js app on :3002 that will replace the legacy BuildControl product for Indian builders and contractors. Its documentation lives in [`apps/construction-management/docs/`](./apps/construction-management/docs/), not in the root `docs/`: start at its `README.md` (table of contents), then `00-overview.md`, `01-domain-model.md`, `02-module-relationships.md`, `03-target-architecture.md`, and the per-module specs under `modules/`. Put Construction Management PRDs, tickets, and app-specific ADRs there; root `docs/adr/` stays for repo-wide decisions.
+
 We are **not** building a school ERP yet. Workspace Creation only allows **Training Institute** (default). School, Preschool, College, University, and Other are **Coming soon**.
 
 ### P0 — Replace the register (current work)
@@ -38,6 +40,7 @@ Do not start P1 (attendance, enquiry CRM, certificates, WhatsApp, live classroom
 | `.grok/skills/tanstack-query/SKILL.md`    | Client reads: `queryOptions` + `useSuspenseQuery` |
 | `.grok/skills/modular-monolith/SKILL.md`  | Domain/application/infrastructure layering        |
 | `AGENTS.md`                               | Architecture don’ts and commands                  |
+| `apps/construction-management/docs/`      | Construction Management PRDs, tickets, and ADRs   |
 
 ## Implementation shape
 
