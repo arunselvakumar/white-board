@@ -47,9 +47,9 @@ export class TestBrowser {
     return response;
   }
 
-  /** Calls `/app/api/auth/<path>`. */
+  /** Calls `/api/auth/<path>`. */
   auth(path: string, body?: unknown): Promise<Response> {
-    return this.request(`/app/api/auth${path}`, { body });
+    return this.request(`/api/auth${path}`, { body });
   }
 
   private store(response: Response): void {

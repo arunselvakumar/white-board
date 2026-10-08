@@ -22,7 +22,7 @@ import {
 import { UpcomingDemosCard } from "./upcoming-demos-card";
 
 /* ------------------------------------------------------------------ */
-/* API mock: answers /app/api/training-institute/* from story handlers */
+/* API mock: answers /api/training-institute/* from story handlers */
 /* ------------------------------------------------------------------ */
 
 type ApiReply = { status?: number; json: unknown };
@@ -43,7 +43,7 @@ function mockTrainingInstituteApi(
           : input.url;
     const url = new URL(href, window.location.origin);
     const method = (init?.method ?? "GET").toUpperCase();
-    const route = `${method} ${url.pathname.replace(/^\/app\/api\/training-institute/, "")}`;
+    const route = `${method} ${url.pathname.replace(/^\/api\/training-institute/, "")}`;
     const handler = routes[route];
     if (handler == null) return original(input, init);
     const body: unknown =

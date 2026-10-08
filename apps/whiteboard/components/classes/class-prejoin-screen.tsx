@@ -19,7 +19,6 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { clockLabel, slotLabel } from "@/lib/class-changes";
 import { classApiPath, classPath, classQueries } from "@/src/queries/classes";
 import { apiJson } from "@/src/queries/http";
-import { withAppBasePath } from "@/lib/app-base-path";
 
 const RealtimeKitRoom = dynamic(() => import("./realtimekit-room"), {
   ssr: false,
@@ -241,7 +240,7 @@ export function ClassPrejoinScreen({
                     variant: "outline",
                     className: "mt-4",
                   })}
-                  href={withAppBasePath(`${apiPath}/recording`)}
+                  href={`${apiPath}/recording`}
                 >
                   <Download className="mr-2 size-4" /> Download recording
                 </a>

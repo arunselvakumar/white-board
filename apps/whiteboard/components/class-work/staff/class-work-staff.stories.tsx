@@ -20,7 +20,7 @@ import { STUDY_MATERIAL_EMPTY_MESSAGE } from "./study-material-form-dialog";
 import { HomeworkSubmissionsScreen } from "./homework-submissions-screen";
 
 /* ------------------------------------------------------------------ */
-/* API mock: answers /app/api/training-institute/* from story routes   */
+/* API mock: answers /api/training-institute/* from story routes   */
 /* ------------------------------------------------------------------ */
 
 type Reply = { status?: number; json: unknown };

@@ -38,7 +38,7 @@ bun run generate
 bun run --filter @repo/db migrate:deploy
 ```
 
-Whiteboard APIs: [http://localhost:3000/app/api/docs](http://localhost:3000/app/api/docs).
+Whiteboard APIs: [http://localhost:3000/api/docs](http://localhost:3000/api/docs).
 
 ```sh
 bun run test

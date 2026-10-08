@@ -1,4 +1,5 @@
-import { APP_BASE_PATH } from "@/lib/app-base-path";
+/** Whiteboard used to be served under `/app` (ADR-0035). */
+const LEGACY_APP_PREFIX = "/app";
 
 const DEFAULT_REDIRECT = "/";
 
@@ -24,23 +25,23 @@ export function safeRedirectPath(value: string | undefined): string {
     if (value.includes("://")) {
       return DEFAULT_REDIRECT;
     }
-    return withoutAppBasePath(value);
+    return withoutLegacyAppPrefix(value);
   }
 
   try {
     const url = new URL(value);
     const path = `${url.pathname}${url.search}${url.hash}`;
-    return path.length > 0 ? withoutAppBasePath(path) : DEFAULT_REDIRECT;
+    return path.length > 0 ? withoutLegacyAppPrefix(path) : DEFAULT_REDIRECT;
   } catch {
     return DEFAULT_REDIRECT;
   }
 }
 
-function withoutAppBasePath(path: string): string {
-  if (path === APP_BASE_PATH) return DEFAULT_REDIRECT;
-  if (!path.startsWith(APP_BASE_PATH)) return path;
+function withoutLegacyAppPrefix(path: string): string {
+  if (path === LEGACY_APP_PREFIX) return DEFAULT_REDIRECT;
+  if (!path.startsWith(LEGACY_APP_PREFIX)) return path;
 
-  const suffix = path.slice(APP_BASE_PATH.length);
+  const suffix = path.slice(LEGACY_APP_PREFIX.length);
   if (suffix.startsWith("/")) return suffix;
   if (suffix.startsWith("?") || suffix.startsWith("#")) return `/${suffix}`;
   return path;

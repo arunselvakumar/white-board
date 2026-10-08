@@ -48,7 +48,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - HTTP is Next.js Route Handlers in `apps/whiteboard/app/api` (ADR-0006). No separate API process.
 - Writes = commands, reads = queries, no bus (ADR-0007). Named operations, not generic PATCH (ADR-0015).
 - Zod only on HTTP Request/Response models next to routes (ADR-0016, ADR-0021). Domain does not import Zod.
-- OpenAPI from those models; a route is unfinished until it is on `/app/api/docs` (ADR-0012).
+- OpenAPI from those models; a route is unfinished until it is on `/api/docs` (ADR-0012).
 - Tenant is the **Active Workspace** on the Session. Never send `workspaceId` in the body (ADR-0014). 401 no Session, 403 no Active Workspace, 404 other tenant.
 - Identity (Users, Sessions, Workspaces, members, invitations) lives in the `identity` schema, owned by `packages/auth` (`@repo/auth`, Better Auth; ADR-0034). Other contexts hold User and Workspace ids as opaque strings and never join to `identity`. Only `@repo/auth` imports `better-auth` (ESLint enforces it). Auth emails are React Email templates in `packages/email-templates`.
 - Soft delete is an invisible tombstone (ADR-0019). Lists use bidirectional cursors plus total (ADR-0020).
@@ -86,7 +86,7 @@ bun run test:http
 bun run check-types
 ```
 
-Whiteboard APIs: http://localhost:3000/app/api/docs
+Whiteboard APIs: http://localhost:3000/api/docs
 
 ## Do not
 

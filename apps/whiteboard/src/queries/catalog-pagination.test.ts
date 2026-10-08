@@ -31,7 +31,7 @@ describe("catalog pagination", () => {
       courseQueries.list({ limit: 12, after: "next" }),
     );
     expect(fetch).toHaveBeenCalledWith(
-      "/app/api/training-institute/courses?limit=12&after=next",
+      "/api/training-institute/courses?limit=12&after=next",
       expect.any(Object),
     );
   });
@@ -46,7 +46,7 @@ describe("catalog pagination", () => {
       }),
     );
     expect(fetch).toHaveBeenCalledWith(
-      "/app/api/training-institute/batches?limit=12&courseId=course-1&before=previous",
+      "/api/training-institute/batches?limit=12&courseId=course-1&before=previous",
       expect.any(Object),
     );
   });

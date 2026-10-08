@@ -1,5 +1,9 @@
 import { Button } from "@repo/ui/components/button";
 import { HeroDotField } from "@/components/hero-dot-field";
+import {
+  WHITEBOARD_SIGN_IN_URL,
+  WHITEBOARD_SIGN_UP_URL,
+} from "@/lib/whiteboard-url";
 
 export function Hero() {
   return (
@@ -30,7 +34,7 @@ export function Hero() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Button
-              render={<a href="/app/signup" />}
+              render={<a href={WHITEBOARD_SIGN_UP_URL} />}
               nativeButton={false}
               size="lg"
               className="h-12 px-6 text-base font-semibold"
@@ -38,7 +42,7 @@ export function Hero() {
               Create your Workspace
             </Button>
             <a
-              href="/app/login"
+              href={WHITEBOARD_SIGN_IN_URL}
               className="text-foreground decoration-foreground/30 hover:decoration-foreground focus-visible:ring-ring/50 -mx-1 rounded-md px-1 text-base font-semibold underline underline-offset-4 transition-colors focus-visible:ring-3 focus-visible:outline-none"
             >
               Sign in

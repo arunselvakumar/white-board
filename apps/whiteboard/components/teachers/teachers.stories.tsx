@@ -232,7 +232,7 @@ export const Documents: Story = {
       canvas.getByRole("link", { name: "Download Fine Arts Diploma.pdf" }),
     ).toHaveAttribute(
       "href",
-      "/app/api/training-institute/teachers/550e8400-e29b-41d4-a716-446655440000/documents/550e8400-e29b-41d4-a716-446655440001",
+      "/api/training-institute/teachers/550e8400-e29b-41d4-a716-446655440000/documents/550e8400-e29b-41d4-a716-446655440001",
     );
   },
 };
@@ -268,7 +268,7 @@ function mockMyBatchesApi(demos: DemoResponse[]) {
           ? input.href
           : input.url;
     const { pathname } = new URL(href, window.location.origin);
-    const route = `${(init?.method ?? "GET").toUpperCase()} ${pathname.replace(/^\/app\/api\/training-institute/, "")}`;
+    const route = `${(init?.method ?? "GET").toUpperCase()} ${pathname.replace(/^\/api\/training-institute/, "")}`;
     if (!(route in replies)) return original(input, init);
     return Promise.resolve(
       new Response(JSON.stringify(replies[route]), {

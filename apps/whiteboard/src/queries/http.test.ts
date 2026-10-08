@@ -24,7 +24,7 @@ describe("apiJson", () => {
       apiJson<{ id: string }>("/api/training-institute/students/stu_1"),
     ).resolves.toEqual({ id: "stu_1" });
     expect(fetch).toHaveBeenCalledWith(
-      "/app/api/training-institute/students/stu_1",
+      "/api/training-institute/students/stu_1",
       expect.any(Object),
     );
   });

@@ -8,7 +8,7 @@ beforeEach(() => {
   clearOutbox();
 });
 
-describe("auth route under the /app base path", () => {
+describe("auth route", () => {
   it("signs up, verifies the email code, and reads the Session", async () => {
     const browser = new TestBrowser();
     const person = newIdentity();
@@ -47,13 +47,6 @@ describe("auth route under the /app base path", () => {
       email: person.email,
       emailVerified: true,
     });
-  });
-
-  it("accepts the URL as Next.js hands it over, without /app", async () => {
-    // Next.js strips the base path from request.url before the route runs.
-    const browser = new TestBrowser();
-    const response = await browser.request("/api/auth/get-session");
-    expect(response.status).toBe(200);
   });
 
   it.each([

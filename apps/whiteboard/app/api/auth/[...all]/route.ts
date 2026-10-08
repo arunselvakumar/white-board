@@ -1,4 +1,4 @@
 import { authRouteHandlers } from "@repo/auth/server";
 
-/** Better Auth's HTTP API at `/app/api/auth/*` (ADR-0034). */
+/** Better Auth's HTTP API at `/api/auth/*` (ADR-0034, ADR-0035). */
 export const { GET, POST } = authRouteHandlers;

@@ -1,4 +1,8 @@
 import { Button } from "@repo/ui/components/button";
+import {
+  WHITEBOARD_SIGN_IN_URL,
+  WHITEBOARD_SIGN_UP_URL,
+} from "@/lib/whiteboard-url";
 
 export function ClosingCta() {
   return (
@@ -17,7 +21,7 @@ export function ClosingCta() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Button
-              render={<a href="/app/signup" />}
+              render={<a href={WHITEBOARD_SIGN_UP_URL} />}
               nativeButton={false}
               variant="secondary"
               size="lg"
@@ -26,7 +30,7 @@ export function ClosingCta() {
               Create your Workspace
             </Button>
             <a
-              href="/app/login"
+              href={WHITEBOARD_SIGN_IN_URL}
               className="text-primary-foreground decoration-primary-foreground/40 hover:decoration-primary-foreground focus-visible:ring-primary-foreground/60 rounded-md text-base font-semibold underline underline-offset-4 transition-colors focus-visible:ring-3 focus-visible:outline-none"
             >
               Sign in

@@ -1,5 +1,7 @@
 # Identity on Better Auth
 
+> **Amended by [ADR-0035](./0035-whiteboard-on-its-own-subdomain.md):** Whiteboard moved to the root of `app.white-board.io`, so the `/app` prefix in the paths below no longer exists (`/api/auth/*`, `/accept-invitation?id=…`).
+
 Clerk bills per user, and Whiteboard will have many Students and Parents who sign in rarely. Before launch, we moved Users, Sessions, Workspaces, members, and invitations to self-hosted [Better Auth](https://www.better-auth.com) (1.7) on our own Postgres. There were no customers and no data to keep: the move is a fresh start, with no User migration. Plan: [`docs/superpowers/plans/2026-10-07-clerk-to-better-auth.md`](../superpowers/plans/2026-10-07-clerk-to-better-auth.md).
 
 **Supersedes:** [ADR-0004](./0004-workspace-owner-is-clerk-org-admin.md) (the Owner role), [ADR-0018](./0018-clerk-ids-as-opaque-foreign-keys.md)'s "no User or Workspace table", and [ADR-0025](./0025-institution-type-in-clerk-public-metadata.md) (where the Institution Type is stored). **Amends:** [ADR-0001](./0001-custom-auth-form-over-clerk-prebuilt-ui.md), [ADR-0005](./0005-custom-workspace-gate-over-clerk-org-ui.md), [ADR-0013](./0013-apis-require-a-session.md), [ADR-0023](./0023-domain-unit-tests-and-http-tests-on-postgres.md), [ADR-0027](./0027-student-and-parent-workspace-invitations.md), and [ADR-0030](./0030-postgres-schema-per-bounded-context.md).

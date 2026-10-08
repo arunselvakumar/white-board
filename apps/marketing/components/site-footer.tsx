@@ -1,11 +1,15 @@
 import Image from "next/image";
+import {
+  WHITEBOARD_SIGN_IN_URL,
+  WHITEBOARD_SIGN_UP_URL,
+} from "@/lib/whiteboard-url";
 
 const linkClass =
   "rounded-md text-sm font-semibold text-foreground/80 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
 const links = [
-  { href: "/app/login", label: "Sign in" },
-  { href: "/app/signup", label: "Create your Workspace" },
+  { href: WHITEBOARD_SIGN_IN_URL, label: "Sign in" },
+  { href: WHITEBOARD_SIGN_UP_URL, label: "Create your Workspace" },
   { href: "#how-it-works", label: "How it works" },
 ] as const;
 

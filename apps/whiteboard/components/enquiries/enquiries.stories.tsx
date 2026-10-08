@@ -24,7 +24,7 @@ import { EnquiryEditScreen } from "./enquiry-edit-screen";
 import { todayInKolkata } from "./enquiry-format";
 
 /* ------------------------------------------------------------------ */
-/* API mock: answers /app/api/training-institute/* from story routes   */
+/* API mock: answers /api/training-institute/* from story routes   */
 /* ------------------------------------------------------------------ */
 
 type Reply = { status?: number; json: unknown };
