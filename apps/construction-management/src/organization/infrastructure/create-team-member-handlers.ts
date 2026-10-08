@@ -5,8 +5,9 @@ import {
   type EventDispatcher,
 } from "@/src/shared-kernel/events";
 
-import { UNLIMITED_PLAN, type PlanGate } from "../application/plan-gate";
+import type { PlanGate } from "../application/plan-gate";
 import { TeamMemberHandlers } from "../application/team-member-handlers";
+import { createPlanGate } from "./create-subscription-handlers";
 import { PrismaDesignationRepository } from "./prisma-designation-repository";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
@@ -20,7 +21,7 @@ export function createTeamMemberHandlers(deps?: {
   return new TeamMemberHandlers(
     new PrismaTeamMemberRepository(db, privateDataCipher),
     new PrismaDesignationRepository(db),
-    deps?.plan ?? UNLIMITED_PLAN,
+    deps?.plan ?? createPlanGate({ prisma: db }),
     deps?.events ?? new InProcessEventDispatcher(),
   );
 }

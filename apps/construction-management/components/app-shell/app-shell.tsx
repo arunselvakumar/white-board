@@ -23,6 +23,7 @@ import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
+import { PlanBanner } from "./plan-banner";
 import { UserMenu } from "./user-menu";
 
 /** Authenticated chrome: the three areas, the Active Company, the account menu. */
@@ -88,6 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <UserMenu />
           </div>
         </header>
+        <PlanBanner />
         {children}
       </SidebarInset>
     </SidebarProvider>
