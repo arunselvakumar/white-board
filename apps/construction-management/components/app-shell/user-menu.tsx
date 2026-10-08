@@ -6,7 +6,7 @@ import {
   useCompanyUser,
 } from "@repo/auth/construction/react";
 import { useQuery } from "@tanstack/react-query";
-import { LogOut, UserRound } from "lucide-react";
+import { CreditCard, LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import {
   Avatar,
@@ -88,6 +88,10 @@ export function UserMenu({ photoUrl }: { photoUrl?: string | null } = {}) {
         <DropdownMenuItem render={<Link href="/app/profile" />}>
           <UserRound />
           My Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href="/app/subscription" />}>
+          <CreditCard />
+          Your Subscription
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
