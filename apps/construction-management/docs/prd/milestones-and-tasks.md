@@ -87,7 +87,7 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 | ------ | --: | ------------------------------------------------------------------------------------------------- | ------ | -------------- | ------ | ----- |
 | CM-001 |   1 | ADR CM-0001: Construction Management app and `construction_*` schemas in the shared repo          | done   | —              | Docs   |       |
 | CM-002 |   2 | CONTEXT.md for the construction app (vocabulary from `00-overview.md` glossary)                   | done   | CM-001         | Docs   |       |
-| CM-003 |   3 | App wiring: `@repo/auth`, `@repo/ui`, `@repo/db`, Tailwind tokens, env, `docker compose`          | todo   | CM-001         | Infra  |       |
+| CM-003 |   3 | App wiring: `@repo/auth`, `@repo/ui`, `@repo/db`, Tailwind tokens, env, `docker compose`          | done   | CM-001         | Infra  |       |
 | CM-004 |   4 | Prisma multi-file: `construction-organization.prisma` with a placeholder model + migration        | todo   | CM-003         | Data   |       |
 | CM-005 |   5 | HTTP skeleton: `/api/construction/*` error envelope, session guard, `/api/docs` OpenAPI           | todo   | CM-003         | HTTP   |       |
 | CM-006 |   6 | Test harness: domain unit tests + HTTP tests on `construction_test` Postgres                      | todo   | CM-004, CM-005 | Infra  |       |

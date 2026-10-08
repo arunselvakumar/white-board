@@ -31,22 +31,28 @@ export const ALLOWED_AUTH_PATHS: readonly string[] = [
 /** OAuth providers redirect back to `/callback/<provider>`. */
 const ALLOWED_AUTH_PREFIXES: readonly string[] = ["/callback/"];
 
-export function isAllowedAuthPath(pathname: string): boolean {
+export function isAllowedAuthPath(
+  pathname: string,
+  allowed: readonly string[] = ALLOWED_AUTH_PATHS,
+): boolean {
   if (!pathname.startsWith(`${AUTH_BASE_PATH}/`)) return false;
   const path = pathname.slice(AUTH_BASE_PATH.length);
   return (
-    ALLOWED_AUTH_PATHS.includes(path) ||
+    allowed.includes(path) ||
     ALLOWED_AUTH_PREFIXES.some(
       (prefix) => path.startsWith(prefix) && path.length > prefix.length,
     )
   );
 }
 
-export function allowedPaths(): BetterAuthPlugin {
+export function allowedPaths(
+  id = "whiteboard-allowed-paths",
+  allowed: readonly string[] = ALLOWED_AUTH_PATHS,
+): BetterAuthPlugin {
   return {
-    id: "whiteboard-allowed-paths",
+    id,
     onRequest(request) {
-      if (isAllowedAuthPath(new URL(request.url).pathname))
+      if (isAllowedAuthPath(new URL(request.url).pathname, allowed))
         return Promise.resolve(undefined);
       return Promise.resolve({
         response: new Response("Not Found", { status: 404 }),

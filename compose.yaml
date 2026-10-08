@@ -23,5 +23,16 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  # S3 stand-in for Construction Management files (ADR CM-0001), on :9000.
+  # Accepts any access key locally; the app creates its bucket on first use.
+  s3:
+    image: chrislusf/seaweedfs:3.97
+    command: server -dir=/data -s3 -s3.port=9000 -master.volumeSizeLimitMB=256
+    ports:
+      - "9000:9000"
+    volumes:
+      - s3_data:/data
+
 volumes:
   postgres_data:
+  s3_data:
