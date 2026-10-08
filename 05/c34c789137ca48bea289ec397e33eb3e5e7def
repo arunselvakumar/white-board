@@ -1,0 +1,21 @@
+docs/adr/0037-dependency-updates-with-renovate.md
+  s_831642d5bde38d::t_1639eaf6c96da1 1-18
+renovate.json
+  s_831642d5bde38d::t_9bbc00e530a152 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "05c34c789137ca48bea289ec397e33eb3e5e7def",
+  "prompts": {},
+  "sessions": {
+    "s_831642d5bde38d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf7aeba9-4cbe-41ab-a0d9-fc6f3b4704b2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
