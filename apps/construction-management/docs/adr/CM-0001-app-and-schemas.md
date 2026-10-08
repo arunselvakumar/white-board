@@ -4,7 +4,7 @@
 - Date: 2026-10-08
 - Ticket: CM-001
 
-Construction Management replaces the legacy BuildControl product for Indian builders and contractors. It shares nothing with the education product except people who write code, the design system, and the identity layer. It must not leak into Whiteboard's contexts, and Whiteboard must not leak into it.
+Construction Management is a new, greenfield product for Indian builders and contractors; customers start fresh, with no data migrated from other tools. It shares nothing with the education product except people who write code, the design system, and the identity layer. It must not leak into Whiteboard's contexts, and Whiteboard must not leak into it.
 
 ## Decision
 

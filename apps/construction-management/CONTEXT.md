@@ -1,6 +1,6 @@
 # Construction Management
 
-The rebuild of the legacy BuildControl product for Indian builders and contractors. Use these words on screens, in code comments, in tests, and in API descriptions. Derived from the glossary in [`docs/00-overview.md`](./docs/00-overview.md); module specs under [`docs/modules/`](./docs/modules/) define each term in detail.
+A new construction management product for Indian builders and contractors. Customers start fresh; nothing is imported from other tools. Use these words on screens, in code comments, in tests, and in API descriptions. Derived from the glossary in [`docs/00-overview.md`](./docs/00-overview.md); module specs under [`docs/modules/`](./docs/modules/) define each term in detail.
 
 ## Language
 
@@ -20,7 +20,7 @@ _Avoid_: account, login, customer
 
 **Team Member**:
 A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, Member Type, projects, and the Permission Matrix.
-_Avoid_: user, employee, staff (in UI copy); "employee" only where the legacy screen name is quoted
+_Avoid_: user, employee, staff (in UI copy)
 
 **Owner**:
 The Team Member who created the Company. Buys and renews the plan, can do everything, cannot be removed. Role `owner` in `@repo/auth`.
@@ -68,7 +68,7 @@ _Avoid_: trade, team
 
 **Contractor**:
 A party that executes work, labour-and-material or labour-only. Has invoices with TDS. Not a User.
-_Avoid_: subcontractor (unless that is the legacy label)
+_Avoid_: subcontractor
 
 **Supplier**:
 A party that sells material. Linked to POs and GRNs. Not a User.
@@ -145,22 +145,22 @@ _Avoid_: price (unless it is a rate), cost
 
 ## Say / do not say
 
-| Say                  | Do not say (in UI copy)                 |
-| -------------------- | --------------------------------------- |
-| Company              | organization, tenant, org, firm         |
-| Team Member          | user, employee, staff                   |
-| Owner                | admin, super admin                      |
-| Designation          | role, position                          |
-| Permission Matrix    | roles, ACL                              |
-| Labour               | worker, labourer                        |
-| Vendor (labour gang) | supplier, contractor                    |
-| Supplier (material)  | vendor                                  |
-| Project              | site, job                               |
-| Wing / Unit          | tower, block, flat                      |
-| Daily Worksheet      | daily log                               |
-| Inquiry              | enquiry, lead                           |
-| Sequence ID          | serial number                           |
-| Back-dated Entry     | backdate                                |
-| Sign in / Sign up    | log in, register (except legacy quotes) |
+| Say                  | Do not say (in UI copy)         |
+| -------------------- | ------------------------------- |
+| Company              | organization, tenant, org, firm |
+| Team Member          | user, employee, staff           |
+| Owner                | admin, super admin              |
+| Designation          | role, position                  |
+| Permission Matrix    | roles, ACL                      |
+| Labour               | worker, labourer                |
+| Vendor (labour gang) | supplier, contractor            |
+| Supplier (material)  | vendor                          |
+| Project              | site, job                       |
+| Wing / Unit          | tower, block, flat              |
+| Daily Worksheet      | daily log                       |
+| Inquiry              | enquiry, lead                   |
+| Sequence ID          | serial number                   |
+| Back-dated Entry     | backdate                        |
+| Sign in / Sign up    | log in, register                |
 
 `Workspace` appears in code because `@repo/auth` calls a Company a Workspace. It never appears in UI copy as the tenant; on screens "Workspace" names only the cross-project area.
