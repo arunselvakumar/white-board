@@ -1,0 +1,63 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_26c7c2d536a6e5 145
+apps/construction-management/src/organization/application/company-directory.ts
+  s_25a30b12f62554::t_ada42b1fcf2c89 1-13
+apps/construction-management/src/organization/application/create-company.test.ts
+  s_25a30b12f62554::t_116d9fb902e1ba 1-120
+apps/construction-management/src/organization/application/create-company.ts
+  s_25a30b12f62554::t_7334857a54bdb1 1-74
+apps/construction-management/src/organization/application/get-company-profile.test.ts
+  s_25a30b12f62554::t_51a860b1457c8d 11-14
+apps/construction-management/src/organization/application/new-company-store.ts
+  s_25a30b12f62554::t_8e19b691deae82 1-6
+apps/construction-management/src/organization/domain/company-details.ts
+  s_25a30b12f62554::t_f80b76549cc19c 1-122
+apps/construction-management/src/organization/domain/company-profile.ts
+  s_25a30b12f62554::t_5e428c6a8b7e5e 5-8
+apps/construction-management/src/organization/domain/countries.ts
+  s_25a30b12f62554::t_1b20a91659b522 1-81
+apps/construction-management/src/organization/domain/events.ts
+  s_25a30b12f62554::t_00c3c1a9292493 1-10
+apps/construction-management/src/organization/domain/new-company.ts
+  s_25a30b12f62554::t_f3347eb69f14c9 1-67
+apps/construction-management/src/organization/domain/trial.ts
+  s_25a30b12f62554::t_e92f0d31736ba1 1-8
+apps/construction-management/src/organization/infrastructure/auth-company-directory.ts
+  s_25a30b12f62554::t_fb956f21cf5481 1-17
+apps/construction-management/src/organization/infrastructure/create-company-handlers.ts
+  s_25a30b12f62554::t_99cf55e207bcc9 1-26
+apps/construction-management/src/organization/infrastructure/create-company.http.test.ts
+  s_25a30b12f62554::t_979bffdcc7b9ee 1-100
+apps/construction-management/src/organization/infrastructure/prisma-company-profile-reader.ts
+  s_25a30b12f62554::t_13d7fcf004ad94 17-20
+apps/construction-management/src/organization/infrastructure/prisma-new-company-store.ts
+  s_25a30b12f62554::t_80dbd63b198250 1-56
+apps/construction-management/src/shared-kernel/events.ts
+  s_25a30b12f62554::t_8ebc6c9a03888f 1-32
+apps/construction-management/src/shared-kernel/tax-ids.test.ts
+  s_25a30b12f62554::t_35c3e0b4cd2b8c 1-42
+apps/construction-management/src/shared-kernel/tax-ids.ts
+  s_25a30b12f62554::t_13638681c7b76a 1-70
+packages/auth/src/construction/server/companies.ts
+  s_25a30b12f62554::t_324a3b3a013188 1-2,13-23,25-58
+packages/db/prisma/migrations/20261008190000_construction_company_creation/migration.sql
+  s_25a30b12f62554::t_ef3f575399581c 1-25
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_aae243853833ad 11-17,56-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "32b0fe475e32d36da06b8c19d5af206cd7bf69b7",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
