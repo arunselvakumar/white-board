@@ -1,0 +1,21 @@
+apps/construction-management/CONTEXT.md
+  s_25a30b12f62554::t_cf0a5aa72f6c70 3,23,71,148-164
+apps/construction-management/docs/adr/CM-0001-app-and-schemas.md
+  s_25a30b12f62554::t_8a3c9394bbea86 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b0c639341ebd2b083a7c27c46ac189f1591486ca",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
