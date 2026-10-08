@@ -1,0 +1,59 @@
+CONTEXT.md
+  s_c3d8734b68e987::t_776fe256679c24 179-186,263
+apps/whiteboard/app/(app)/batches/[id]/tests/[testId]/page.tsx
+  s_c3d8734b68e987::t_88fa27a52468d4 1-20
+apps/whiteboard/app/(app)/batches/[id]/tests/page.tsx
+  s_c3d8734b68e987::t_bda144cd2e6c1c 1-14
+apps/whiteboard/app/(app)/parent/results/page.tsx
+  s_c3d8734b68e987::t_1f6a44f4b427e9 1-13
+apps/whiteboard/app/(app)/student/results/page.tsx
+  s_c3d8734b68e987::t_42f3a63f880b42 1-13
+apps/whiteboard/app/(app)/teacher/batches/[id]/students/[studentId]/page.tsx
+  s_c3d8734b68e987::t_d8dfc3ae9b5e88 1-20
+apps/whiteboard/app/(app)/teacher/batches/[id]/tests/[testId]/page.tsx
+  s_c3d8734b68e987::t_a9f5dd90267cbf 1-20
+apps/whiteboard/app/(app)/teacher/batches/[id]/tests/page.tsx
+  s_c3d8734b68e987::t_f9e73eb3570e9b 1-16
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_c3d8734b68e987::t_918944e0074583 5,31-32
+apps/whiteboard/components/class-tests/result-format.ts
+  s_c3d8734b68e987::t_6553bbf5b4c2a5 1-41
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_c3d8734b68e987::t_af4a3e9677a6cb 46-47,128-154
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_c3d8734b68e987::t_42865173b40c5b 24-25,36-44,50,120-125
+apps/whiteboard/lib/app-nav.test.ts
+  s_c3d8734b68e987::t_5090d83c5a875e 11,18
+apps/whiteboard/lib/app-nav.ts
+  s_c3d8734b68e987::t_5ce607804eb8cb 80-85,114-119
+apps/whiteboard/lib/workspace-access.test.ts
+  s_c3d8734b68e987::t_64febf26d1cf03 92-108
+apps/whiteboard/lib/workspace-access.ts
+  s_c3d8734b68e987::t_bf547c61c8e119 62-71
+apps/whiteboard/src/training-institute/application/class-test-handlers.ts
+  s_c3d8734b68e987::t_9a4e33616b4660 194-198,408,781
+apps/whiteboard/src/training-institute/domain/class-test.ts
+  s_c3d8734b68e987::t_300376f6b96db7 230-232
+docs/adr/0037-class-test-product-decisions.md
+  s_c3d8734b68e987::t_5922025c08b225 48
+docs/prd/tasks.md
+  s_c3d8734b68e987::t_facccf1e04bed4 349,424-429
+apps/whiteboard/src/queries/class-tests.ts
+  s_c3d8734b68e987::t_3d5c41e927a0d3 1-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "64fdf867fb08da5c8ecb1b655f3c7371f842b2a7",
+  "prompts": {},
+  "sessions": {
+    "s_c3d8734b68e987": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2f37b59-a3b6-4236-9c00-99231252dfb4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
