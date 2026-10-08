@@ -1,0 +1,43 @@
+apps/construction-management/app/api/_lib/require-access.ts
+  s_25a30b12f62554::t_e9c5a705056c7a 11,14,26-29,46-49
+apps/construction-management/app/api/_lib/require-plan-active.ts
+  s_9c3f172fe92a46::t_864d19f831418f 1-36
+apps/construction-management/app/api/construction/organization/subscription/subscription.http.test.ts
+  s_25a30b12f62554::t_58db7384a8ff3e 1-572
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_25a30b12f62554::t_68a0326d8e41e8 26,92
+apps/construction-management/components/app-shell/plan-banner.stories.tsx
+  s_25a30b12f62554::t_bb1f86dc860b47 1-83
+apps/construction-management/components/app-shell/plan-banner.tsx
+  s_25a30b12f62554::t_f733ca55ee33c3 1-93
+apps/construction-management/docs/modules/01-organization-identity-access.md
+  s_25a30b12f62554::t_b0870d3671dabe 630-632
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_10e298e33e1aa2 157-159,218-226,231-239,242-248
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_25a30b12f62554::t_fd37455a66effe 8,10,24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9ef2d87d1022db4ffc6d0187a074751cf5c1589f",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c3f172fe92a46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1436510-6545-4236-9394-8c7f247ccc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
