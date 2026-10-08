@@ -96,9 +96,9 @@ describe("Workspace role access", () => {
     expect(isAllowedAppPath("/teacher/batches/b1/tests/t1", "teacher")).toBe(
       true,
     );
-    expect(
-      isAllowedAppPath("/teacher/batches/b1/students/s1", "teacher"),
-    ).toBe(true);
+    expect(isAllowedAppPath("/teacher/batches/b1/students/s1", "teacher")).toBe(
+      true,
+    );
     expect(isAllowedAppPath("/teacher/batches/b1/tests", "student")).toBe(
       false,
     );

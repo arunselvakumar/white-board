@@ -83,6 +83,12 @@ function MyBatchesContent({
                   >
                     Homework and Study Material
                   </Link>
+                  <Link
+                    className="inline-block text-sm font-medium underline"
+                    href={`/teacher/batches/${batch.id}/tests`}
+                  >
+                    Tests
+                  </Link>
                 </div>
               </div>
             ))}

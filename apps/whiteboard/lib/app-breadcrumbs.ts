@@ -35,7 +35,10 @@ export function getAppBreadcrumbs(
     if (pathname === "/teacher") return [myBatches];
     const [, , , batchId, action, itemId] = pathname.split("/");
     if (action === "tests" || action === "students") {
-      const tests = { label: "Tests", href: `/teacher/batches/${batchId}/tests` };
+      const tests = {
+        label: "Tests",
+        href: `/teacher/batches/${batchId}/tests`,
+      };
       if (action === "students")
         return [myBatches, tests, { label: "Test history" }];
       return itemId === undefined

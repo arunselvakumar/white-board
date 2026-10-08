@@ -131,13 +131,11 @@ it("builds Test trails for Teachers and Results for families", () => {
     { label: "My Batches", href: "/teacher" },
     { label: "Tests" },
   ]);
-  expect(getAppBreadcrumbs("/teacher/batches/b1/tests/t1", "teacher")).toEqual(
-    [
-      { label: "My Batches", href: "/teacher" },
-      { label: "Tests", href: "/teacher/batches/b1/tests" },
-      { label: "Test" },
-    ],
-  );
+  expect(getAppBreadcrumbs("/teacher/batches/b1/tests/t1", "teacher")).toEqual([
+    { label: "My Batches", href: "/teacher" },
+    { label: "Tests", href: "/teacher/batches/b1/tests" },
+    { label: "Test" },
+  ]);
   expect(
     getAppBreadcrumbs("/teacher/batches/b1/students/s1", "teacher"),
   ).toEqual([

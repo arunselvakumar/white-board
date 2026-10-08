@@ -293,6 +293,14 @@ export function BatchCatalog({
                         >
                           Homework
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Tests for ${batch.name}`}
+                          render={<Link href={`/batches/${batch.id}/tests`} />}
+                        >
+                          Tests
+                        </Button>
                         {closed ? null : (
                           <Button
                             type="button"

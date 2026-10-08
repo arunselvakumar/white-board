@@ -3,6 +3,11 @@ import { expect, within } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import {
+  ashaResults,
+  COMPARISON_WORDS,
+  tallyExempt,
+} from "@/components/class-tests/family/family-results.fixtures";
+import {
   ASHA_ID,
   CLASS_WORK_NOW,
   ashaClassWork,
@@ -121,12 +126,13 @@ export const StudentHome: Story = {
       <FamilyHome
         home={{ students: [asha] }}
         classWork={{ students: [ashaClassWork] }}
+        results={{ students: [ashaResults] }}
         role="student"
         now={NOW}
       />
     </AppShell>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     await expect(
       canvas.getByRole("heading", { name: "Student Home" }),
     ).toBeVisible();
@@ -138,7 +144,8 @@ export const StudentHome: Story = {
     await expect(canvas.getAllByText("₹3,500")).toHaveLength(2);
     await expect(canvas.getByText("₹1,000 of ₹4,500 paid")).toBeVisible();
     await expect(canvas.getByText("Present")).toBeVisible();
-    await expect(canvas.getByText("Absent")).toBeVisible();
+    // One Attendance mark and one Test result (Tally basics) say Absent.
+    await expect(canvas.getAllByText("Absent")).toHaveLength(2);
     await expect(
       canvas.getByRole("link", { name: /Download recording/ }),
     ).toHaveAttribute(
@@ -158,6 +165,24 @@ export const StudentHome: Story = {
     await expect(
       canvas.getByRole("link", { name: "See all Study Material" }),
     ).toHaveAttribute("href", "/student/homework");
+
+    // The 5 newest published results, compact; the sixth is on Results.
+    const results = within(
+      canvas.getByRole("list", { name: "Latest results" }),
+    );
+    await expect(results.getAllByRole("listitem")).toHaveLength(5);
+    await expect(results.getByText("Functions test")).toBeVisible();
+    await expect(results.getByText("42 / 50")).toBeVisible();
+    await expect(results.getByText("Fail")).toBeVisible();
+    await expect(results.getByText("Individual Test")).toBeVisible();
+    await expect(results.queryByText(tallyExempt.name)).toBeNull();
+    await expect(
+      results.queryByText("Neat work on default arguments."),
+    ).toBeNull();
+    await expect(
+      canvas.getByRole("link", { name: "See all results" }),
+    ).toHaveAttribute("href", "/student/results");
+    await expect(canvasElement.textContent).not.toMatch(COMPARISON_WORDS);
   },
 };
 
@@ -208,6 +233,7 @@ export const ParentHome: Story = {
       <FamilyHome
         home={{ students: [asha, ravi] }}
         classWork={{ students: [ashaClassWork] }}
+        results={{ students: [ashaResults] }}
         role="parent"
         now={NOW}
       />
@@ -249,6 +275,21 @@ export const ParentHome: Story = {
       raviSection.getByText("No Attendance marked yet."),
     ).toBeVisible();
     await expect(raviSection.getByText("No recordings yet.")).toBeVisible();
+    // Each Student's own results; Ravi has none published yet.
+    await expect(
+      within(
+        ashaSection.getByRole("list", { name: "Latest results" }),
+      ).getAllByRole("listitem"),
+    ).toHaveLength(5);
+    await expect(
+      ashaSection.getByRole("link", { name: "See all results" }),
+    ).toHaveAttribute("href", "/parent/results");
+    await expect(
+      raviSection.getByText("No published results yet."),
+    ).toBeVisible();
+    await expect(
+      raviSection.queryByRole("list", { name: "Latest results" }),
+    ).toBeNull();
   },
 };
 
@@ -293,5 +334,9 @@ export const StudentWithoutEnrollments: Story = {
     await expect(canvas.getByText("No recordings yet.")).toBeVisible();
     await expect(canvas.getByText("Nothing due")).toBeVisible();
     await expect(canvas.getByText("No Study Material yet.")).toBeVisible();
+    await expect(canvas.getByText("No published results yet.")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "See all results" }),
+    ).toHaveAttribute("href", "/student/results");
   },
 };

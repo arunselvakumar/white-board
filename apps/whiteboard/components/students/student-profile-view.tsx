@@ -7,6 +7,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { StudentTestHistorySection } from "@/components/class-tests/history/student-test-history";
 import { StudentAvatar } from "@/components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
@@ -373,6 +374,10 @@ export function StudentProfileScreen({ studentId }: { studentId: string }) {
           </div>
         </div>
       </section>
+      <StudentTestHistorySection
+        studentId={studentId}
+        testsBasePath="/batches"
+      />
     </>
   );
 }

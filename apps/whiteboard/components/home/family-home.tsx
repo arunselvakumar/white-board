@@ -16,8 +16,10 @@ import {
 import { Download } from "lucide-react";
 import Link from "next/link";
 
+import { ResultsHomeCard } from "@/components/class-tests/family/results-home-card";
 import { HomeworkHomeCards } from "@/components/class-work/family/homework-home-cards";
 import { formatPaiseAsRupees } from "@/lib/money";
+import type { FamilyTestResultsView } from "@/src/queries/class-tests";
 import type {
   FamilyClassWorkStudentView,
   FamilyClassWorkView,
@@ -254,15 +256,18 @@ function RecordingsCard({
 }
 
 const NO_CLASS_WORK: FamilyClassWorkView = { students: [] };
+const NO_RESULTS: FamilyTestResultsView = { students: [] };
 
 function StudentCards({
   student,
   classWork,
+  results,
   role,
   now,
 }: {
   student: FamilyHomeStudent;
   classWork: FamilyClassWorkView;
+  results: FamilyTestResultsView;
   role: FamilyHomeRole;
   now: Date;
 }) {
@@ -275,11 +280,15 @@ function StudentCards({
     homework: [],
     materials: [],
   };
+  const studentResults = results.students.find(
+    (candidate) => candidate.id === student.id,
+  ) ?? { id: student.id, name: student.name, results: [] };
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <NextClassCard nextClass={student.nextClass} now={now} />
       <DuesCard dues={student.dues} />
       <HomeworkHomeCards student={studentClassWork} role={role} now={now} />
+      <ResultsHomeCard student={studentResults} role={role} />
       <AttendanceCard marks={student.recentAttendance} />
       <RecordingsCard recordings={student.recordings} />
     </div>
@@ -290,12 +299,15 @@ export function FamilyHome({
   home,
   role,
   classWork = NO_CLASS_WORK,
+  results = NO_RESULTS,
   now = new Date(),
 }: {
   home: FamilyHomeResponse;
   role: FamilyHomeRole;
   /** Homework and Study Material for the same Students. */
   classWork?: FamilyClassWorkView;
+  /** Published Test results for the same Students. */
+  results?: FamilyTestResultsView;
   now?: Date;
 }) {
   const title = role === "parent" ? "Parent Home" : "Student Home";
@@ -329,6 +341,7 @@ export function FamilyHome({
               <StudentCards
                 student={student}
                 classWork={classWork}
+                results={results}
                 role={role}
                 now={now}
               />
@@ -340,6 +353,7 @@ export function FamilyHome({
               key={student.id}
               student={student}
               classWork={classWork}
+              results={results}
               role={role}
               now={now}
             />
