@@ -1,36 +1,25 @@
 import { mapError } from "@/app/api/_lib/map-error";
-import {
-  isResponse,
-  requireOwnerSession,
-} from "@/app/api/_lib/require-session";
+import { requireAccess } from "@/app/api/_lib/require-access";
+import { isResponse } from "@/app/api/_lib/require-session";
 import { createCompanyProfileHandlers } from "@/src/organization/infrastructure/create-company-profile-handlers";
 
-import type { GetConstructionOrganizationCompanyProfileResponseModel } from "./get-company-profile-response-model";
+import { companyProfileBody } from "./company-profile-body";
 
 export const dynamic = "force-dynamic";
 
 const handlers = createCompanyProfileHandlers();
 
-/** The Active Company's profile. Owner-only until the Permission Matrix exists (CM-107). */
+/** The Active Company's profile (`organization.settings` read). */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const session = await requireOwnerSession(request);
+    const session = await requireAccess(
+      request,
+      "organization.settings",
+      "read",
+    );
     if (isResponse(session)) return session;
-    const profile = await handlers.get.execute({
-      workspaceId: session.workspaceId,
-    });
-    const body: GetConstructionOrganizationCompanyProfileResponseModel = {
-      id: profile.id,
-      gstin: profile.gstin,
-      pan: profile.pan,
-      address: profile.address,
-      currency: profile.currency,
-      isIndian: profile.isIndian,
-      timezone: profile.timezone,
-      createdAt: profile.createdAt.toISOString(),
-      updatedAt: profile.updatedAt.toISOString(),
-    };
-    return Response.json(body);
+    const profile = await handlers.get(session.workspaceId);
+    return Response.json(companyProfileBody(profile, session.access));
   } catch (error) {
     return mapError(error);
   }

@@ -11,3 +11,8 @@ export type CompanyDirectory = {
   /** Compensation when the rest of company creation fails. */
   deleteWorkspace(workspaceId: string): Promise<void>;
 };
+
+/** Keeps the Workspace name (the switcher's) in step with the profile (CM-115). */
+export type CompanyNames = {
+  renameWorkspace(workspaceId: string, name: string): Promise<void>;
+};

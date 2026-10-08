@@ -14,6 +14,8 @@ export type CompanyProfile = {
   isIndian: boolean;
   /** IANA time zone. */
   timezone: string;
+  /** Storage key of the logo printed on documents (CM-115). */
+  logoKey: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

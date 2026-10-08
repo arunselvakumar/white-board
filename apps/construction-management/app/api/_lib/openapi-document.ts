@@ -49,6 +49,11 @@ import {
   ListConstructionOrganizationSequenceRulesQueryModel,
   ListConstructionOrganizationSequenceRulesResponseModel,
 } from "@/app/api/construction/organization/settings/sequence-rules/list-sequence-rules-models";
+import { UpdateConstructionOrganizationCompanyProfileRequestModel } from "@/app/api/construction/organization/company-profile/update/update-company-profile-request-model";
+import { GetConstructionOrganizationMyProfileResponseModel } from "@/app/api/construction/organization/me/profile/get-my-profile-response-model";
+import { RevealConstructionOrganizationMyIdentifiersResponseModel } from "@/app/api/construction/organization/me/profile/reveal-identifiers/reveal-my-identifiers-response-model";
+import { UpdateConstructionOrganizationMyProfileRequestModel } from "@/app/api/construction/organization/me/profile/update/update-my-profile-request-model";
+import { IMAGE_CONTENT_TYPES } from "@/src/shared-kernel/files";
 import {
   buildOpenApiDocument,
   type OpenApiComponents,
@@ -95,7 +100,21 @@ export const openApiComponents: OpenApiComponents = {
   CreateConstructionOrganizationSequenceRuleResponseModel,
   UpdateConstructionOrganizationSequenceRuleRequestModel,
   UpdateConstructionOrganizationSequenceRuleResponseModel,
+  UpdateConstructionOrganizationCompanyProfileRequestModel,
+  GetConstructionOrganizationMyProfileResponseModel,
+  UpdateConstructionOrganizationMyProfileRequestModel,
+  RevealConstructionOrganizationMyIdentifiersResponseModel,
 };
+
+const IMAGE_TYPES = [...IMAGE_CONTENT_TYPES];
+
+const UPLOAD_ERRORS = [
+  StatusCodes.BAD_REQUEST,
+  StatusCodes.UNAUTHORIZED,
+  StatusCodes.FORBIDDEN,
+  StatusCodes.NOT_FOUND,
+  StatusCodes.CONFLICT,
+] as const;
 
 const DESIGNATIONS = "/api/construction/organization/designations";
 
@@ -136,7 +155,7 @@ export const openApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: "/api/construction/organization/company-profile",
-    summary: "The Active Company's profile",
+    summary: "The Active Company's profile (Settings read)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
     successDescription: "The Company profile",
@@ -464,6 +483,128 @@ openApiOperations.push(
     params: ConstructionOrganizationSequenceRuleParamsModel,
     successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Deleted",
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
+  },
+);
+
+openApiOperations.push(
+  {
+    method: "post",
+    path: "/api/construction/organization/company-profile/update",
+    summary:
+      "Change the Company's name, contact, GSTIN, PAN, address, currency and time zone (Settings update; the country is fixed)",
+    tags: ORGANIZATION,
+    body: UpdateConstructionOrganizationCompanyProfileRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated Company profile",
+    successSchema: GetConstructionOrganizationCompanyProfileResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/company-profile/logo",
+    summary: "The Company logo, for the Company's Team Members",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "The logo image",
+    successBinaryContentTypes: IMAGE_TYPES,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/company-profile/logo",
+    summary:
+      "Set or replace the Company logo: the image as the body, PNG, JPEG or WebP, at most 2 MB (Settings update)",
+    tags: ORGANIZATION,
+    bodyBinaryContentTypes: IMAGE_TYPES,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Company profile with its new logo",
+    successSchema: GetConstructionOrganizationCompanyProfileResponseModel,
+    errors: [...UPLOAD_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/company-profile/logo/remove",
+    summary: "Remove the Company logo (Settings update)",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Company profile without a logo",
+    successSchema: GetConstructionOrganizationCompanyProfileResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/me/profile",
+    summary: "My Profile: the caller's own Team Member record",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "The caller's Team Member record, ids masked",
+    successSchema: GetConstructionOrganizationMyProfileResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/me/profile/update",
+    summary:
+      "Change the caller's own name, email, address, emergency contact, Aadhaar and PAN",
+    tags: ORGANIZATION,
+    body: UpdateConstructionOrganizationMyProfileRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated record",
+    successSchema: GetConstructionOrganizationMyProfileResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/me/profile/reveal-identifiers",
+    summary:
+      "The caller's own Aadhaar and PAN in full (audited; an OTP step arrives with M9)",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "Aadhaar and PAN",
+    successSchema: RevealConstructionOrganizationMyIdentifiersResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/me/photo",
+    summary: "The caller's own photo",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "The photo image",
+    successBinaryContentTypes: IMAGE_TYPES,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/me/photo",
+    summary:
+      "Set or replace the caller's photo: the image as the body, PNG, JPEG or WebP, at most 10 MB",
+    tags: ORGANIZATION,
+    bodyBinaryContentTypes: IMAGE_TYPES,
+    successStatus: StatusCodes.OK,
+    successDescription: "The caller's record with the new photo",
+    successSchema: GetConstructionOrganizationMyProfileResponseModel,
+    errors: [...UPLOAD_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/me/photo/remove",
+    summary: "Remove the caller's photo",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "The caller's record without a photo",
+    successSchema: GetConstructionOrganizationMyProfileResponseModel,
     errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
   },
 );

@@ -153,7 +153,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-112 |  12 | Designations HTTP + screens (list, add, duplicate, edit template) and the shared Permission Matrix component | done        | CM-105, CM-106         | HTTP+UI   |       |
 | CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | done        | CM-107                 | Kernel    |       |
 | CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | done        | CM-107                 | Kernel+UI |       |
-| CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | todo        | CM-105                 | UI        |       |
+| CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | done        | CM-105                 | UI        |       |
 | CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | todo        | CM-104                 | Domain    |       |
 | CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | todo        | CM-116                 | HTTP+UI   |       |
 | CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | todo        | CM-116                 | Domain    |       |
@@ -216,6 +216,13 @@ CM-112 detail: Designation routes are `GET/POST /designations`, `GET /designatio
 ### CM-115 — Profiles
 
 **Done when:** Company profile (name, logo to Vercel Blob, mobile, email, GSTIN with checksum validation, PAN format validation, address, currency, timezone) and My Profile (photo, contact, masked ids) screens; Storybook states.
+
+Decided while building it:
+
+- The Company's own GSTIN and PAN print on its documents, so they are shown in full to anyone with `organization.settings` read; only Team Members' personal Aadhaar and PAN are masked. Changing the profile or the logo needs `organization.settings` update; the logo image itself streams to every Team Member of the Company.
+- The country is fixed when the Company is created (it decides GST, PAN, TDS and which plans are offered); the profile changes name (which also renames the Company in the switcher), mobile, email, GSTIN, PAN, address, currency and time zone. Saves carry the `updatedAt` the form loaded and are refused with `COMPANY_PROFILE_CHANGED` (409) when someone saved since.
+- Files go through our routes (raw body with its `content-type`; no presigned browser upload) to private Vercel Blob storage (files on disk in development and tests) under `companies/<workspaceId>/...`, are checked by content (PNG, JPEG, WebP; logo ≤ 2 MB, photo ≤ 10 MB; `FILE_TOO_LARGE`, `FILE_TYPE_NOT_ALLOWED`), and are served only through routes that stream them to the Company's own Team Members. Every stored file is a row in `construction_organization.stored_files` (bytes, kind, deleted_at) for storage usage (CM-116).
+- My Profile is the signed-in User's own Team Member record in the Active Company: photo, name, email, address, emergency contact, Aadhaar and PAN. The mobile is how they sign in and is read-only there. Email here is the Team Member's contact email; changing the User's sign-in email (with verification) is not part of M1. A member may always reveal their own Aadhaar and PAN; each reveal is audited, and the OTP step arrives with M9.
 
 ### CM-116 — Plans & trial
 
