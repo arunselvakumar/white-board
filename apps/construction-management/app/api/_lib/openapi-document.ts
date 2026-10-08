@@ -75,6 +75,14 @@ import {
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
 import {
+  vendorOpenApiComponents,
+  vendorOpenApiOperations,
+} from "@/app/api/construction/labour/vendors/vendor-openapi";
+import {
+  labourOpenApiComponents,
+  labourOpenApiOperations,
+} from "@/app/api/construction/labour/labours/labour-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -752,6 +760,14 @@ openApiOperations.push(...projectsOpenApiOperations);
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
 openApiOperations.push(...mastersOpenApiOperations);
+
+// The Vendor register (CM-208, CM-209) lists its own models and routes.
+Object.assign(openApiComponents, vendorOpenApiComponents);
+openApiOperations.push(...vendorOpenApiOperations);
+
+// The Labour register (CM-205 – CM-207) lists its own models and routes.
+Object.assign(openApiComponents, labourOpenApiComponents);
+openApiOperations.push(...labourOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

@@ -94,13 +94,12 @@ describe("priceDay", () => {
   });
 
   it("marks each labourer once per command", () => {
-    expect(() =>
-      assertDistinctLabourers([
+    expect(() => { assertDistinctLabourers([
         { labourId: "l1", status: "present" },
         { labourId: "l1", status: "absent" },
-      ]),
+      ]); },
     ).toThrow(expect.objectContaining({ code: "LABOUR_MARKED_TWICE" }));
-    expect(() => assertDistinctLabourers([])).toThrow(
+    expect(() => { assertDistinctLabourers([]); }).toThrow(
       expect.objectContaining({ code: "ATTENDANCE_EMPTY" }),
     );
   });

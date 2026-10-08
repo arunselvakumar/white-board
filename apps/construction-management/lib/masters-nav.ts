@@ -1,8 +1,10 @@
 import {
   BadgeCheck,
   Building,
+  Handshake,
   HardHat,
   Settings2,
+  Shovel,
   UserCheck,
   Users,
   Wrench,
@@ -65,9 +67,24 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
     ],
   },
   {
-    // Labours and Vendors (CM-207, CM-209) go first when they arrive.
     label: "Labour & Vendors",
     sections: [
+      {
+        href: "/app/masters/labours",
+        label: "Labours",
+        title: "Labours",
+        description:
+          "Your own labourers: wage, Project, transfers and Excel import.",
+        icon: Shovel,
+      },
+      {
+        href: "/app/masters/vendors",
+        label: "Vendors",
+        title: "Vendors",
+        description:
+          "Labour gangs you hire by the head, with a rate card per shift.",
+        icon: Handshake,
+      },
       {
         href: "/app/masters/labour-categories",
         label: "Labour Categories",
