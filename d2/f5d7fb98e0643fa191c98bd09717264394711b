@@ -1,0 +1,71 @@
+apps/construction-management/docs/00-overview.md
+  s_422dc83af2c17c::t_6d546728770e21 1-96
+apps/construction-management/docs/01-domain-model.md
+  s_422dc83af2c17c::t_7cb306269dff50 1-326
+apps/construction-management/docs/02-module-relationships.md
+  s_422dc83af2c17c::t_1373743ed5396b 1-187
+apps/construction-management/docs/03-target-architecture.md
+  s_422dc83af2c17c::t_389524e8810df5 1-167
+apps/construction-management/docs/04-gaps-and-roadmap.md
+  s_422dc83af2c17c::t_be17714b05eb71 1-103
+apps/construction-management/docs/README.md
+  s_422dc83af2c17c::t_403e1499f97a0f 1-61
+apps/construction-management/docs/legacy/_notes-masters.md
+  s_422dc83af2c17c::t_64ebac26749169 1-76
+apps/construction-management/docs/legacy/_notes-project.md
+  s_422dc83af2c17c::t_d320029d78429f 1-68
+apps/construction-management/docs/legacy/_notes-strings.md
+  s_422dc83af2c17c::t_364eed8fcd1939 1-135
+apps/construction-management/docs/legacy/_working-notes.md
+  s_422dc83af2c17c::t_632e042f99597a 1-44
+apps/construction-management/docs/modules/01-organization-identity-access.md
+  s_422dc83af2c17c::t_3060cd320f9a0f 1-635
+apps/construction-management/docs/modules/02-master-records.md
+  s_422dc83af2c17c::t_e93fdd7d1f3f26 1-733
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_422dc83af2c17c::t_51ec342602b9d5 1-509
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_422dc83af2c17c::t_57a3993e075f1b 1-588
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_422dc83af2c17c::t_14b99a5c2519d3 1-511
+apps/construction-management/docs/modules/06-procurement-inventory.md
+  s_422dc83af2c17c::t_4bc66a9f4e64ca 1-837
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_422dc83af2c17c::t_b438a7de202416 1-711
+apps/construction-management/docs/modules/08-labour-vendor-attendance.md
+  s_422dc83af2c17c::t_6f336b22fcf54c 1-520
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_422dc83af2c17c::t_8b5e5e56e9d41c 1-506
+apps/construction-management/docs/modules/10-hrms.md
+  s_422dc83af2c17c::t_726e0db5183748 1-762
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_422dc83af2c17c::t_0ba62a5e2bac74 1-463
+apps/construction-management/docs/modules/12-settings-configuration.md
+  s_422dc83af2c17c::t_e14da3cb4672d6 1-428
+apps/construction-management/docs/modules/13-chat-notifications-support.md
+  s_422dc83af2c17c::t_2c26e7068d641a 1-425
+apps/construction-management/docs/prd/milestone-kickoff-prompt.md
+  s_422dc83af2c17c::t_aa4276b5beab51 1-61
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_422dc83af2c17c::t_a214a27cd4f306 1-432
+apps/construction-management/docs/research/market-and-compliance.md
+  s_422dc83af2c17c::t_0942b1dc24b0e9 1-126
+CLAUDE.md
+  s_422dc83af2c17c::t_3244dfc5b1cbd0 9-10,43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d2f5d7fb98e0643fa191c98bd09717264394711b",
+  "prompts": {},
+  "sessions": {
+    "s_422dc83af2c17c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d17fecfd-2fe8-4d13-b0c0-f65b8710ff5a",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
