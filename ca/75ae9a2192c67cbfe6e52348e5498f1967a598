@@ -1,0 +1,87 @@
+apps/construction-management/app/api/construction/organization/subscription/get-subscription-response-model.ts
+  s_25a30b12f62554::t_a5acdf1371693b 1-45
+apps/construction-management/app/api/construction/organization/subscription/plans/list-plans-response-model.ts
+  s_25a30b12f62554::t_a4146d39aed801 1-44
+apps/construction-management/app/api/construction/organization/subscription/route.ts
+  s_25a30b12f62554::t_c57be5dee805c2 1-54
+apps/construction-management/app/api/construction/organization/subscription/subscription-fields.ts
+  s_25a30b12f62554::t_5a8729140b6bc6 1-107
+apps/construction-management/src/organization/application/subscription-handlers.ts
+  s_25a30b12f62554::t_f991ced0d333a6 1-335
+apps/construction-management/src/organization/application/subscription-plan-gate.test.ts
+  s_25a30b12f62554::t_7fa5aabea95481 1-75
+apps/construction-management/src/organization/application/subscription-plan-gate.ts
+  s_25a30b12f62554::t_8e19fbb0dbd302 1-38
+apps/construction-management/src/organization/application/subscription-ports.ts
+  s_25a30b12f62554::t_82cafe25b7be51 1-80
+apps/construction-management/src/organization/domain/checkout.ts
+  s_25a30b12f62554::t_9d26973f184b60 1-246
+apps/construction-management/src/organization/domain/plan.ts
+  s_25a30b12f62554::t_74a106c9028b6f 1-159
+apps/construction-management/src/organization/domain/subscription-order.ts
+  s_25a30b12f62554::t_9b55013ab89e8a 1-110
+apps/construction-management/src/organization/domain/subscription.test.ts
+  s_25a30b12f62554::t_7d3a0f8a565a78 1-378
+apps/construction-management/src/organization/domain/subscription.ts
+  s_25a30b12f62554::t_e12b97bbe1ee2a 1-165
+apps/construction-management/src/organization/domain/usage.ts
+  s_25a30b12f62554::t_49c7bbee1d5835 1-25
+apps/construction-management/src/organization/infrastructure/fake-payment-gateway.ts
+  s_25a30b12f62554::t_eeeeb2f631f784 1-56
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.ts
+  s_25a30b12f62554::t_630f30795441a1 1-23
+apps/construction-management/src/organization/infrastructure/plan-catalogue.ts
+  s_25a30b12f62554::t_0db81806717b93 1-29
+apps/construction-management/src/organization/infrastructure/prisma-subscription-repository.ts
+  s_25a30b12f62554::t_b450f59e01b44f 1-338
+apps/construction-management/src/organization/infrastructure/prisma-usage-reader.ts
+  s_25a30b12f62554::t_4d47aae139908c 1-54
+apps/construction-management/src/organization/infrastructure/razorpay.test.ts
+  s_25a30b12f62554::t_765b03b70be8d3 1-78
+apps/construction-management/src/organization/infrastructure/razorpay.ts
+  s_25a30b12f62554::t_f8903e574a6722 1-95
+apps/construction-management/src/organization/infrastructure/seeds/plans.json
+  s_25a30b12f62554::t_9831cafcd8dc28 1-51
+apps/construction-management/src/organization/infrastructure/seller.ts
+  s_25a30b12f62554::t_481394aaa5738c 1-23
+apps/construction-management/src/organization/infrastructure/storage-meter.ts
+  s_25a30b12f62554::t_63144e4927ea00 1-37
+apps/construction-management/src/shared-kernel/gst-states.ts
+  s_25a30b12f62554::t_bca1c1f588c5f4 1-51
+apps/construction-management/src/shared-kernel/plan.ts
+  s_25a30b12f62554::t_5928e34aa73d93 1-85
+packages/db/prisma/migrations/20261009030000_construction_subscription_orders/migration.sql
+  s_25a30b12f62554::t_29ffa637590532 1-71
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_c5bbf0bc0f3143 67-70,188-264
+apps/construction-management/app/api/construction/organization/subscription/plans/route.ts
+  s_2316c10137dec8::t_8dc680c8a83ac1 1-39
+apps/construction-management/src/organization/application/plan-gate.ts
+  s_2316c10137dec8::t_8123b3eaef01cd 2-4,6-10
+apps/construction-management/src/organization/infrastructure/create-subscription-handlers.ts
+  s_2316c10137dec8::t_af4ff95f8db95c 1-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ca75ae9a2192c67cbfe6e52348e5498f1967a598",
+  "prompts": {},
+  "sessions": {
+    "s_2316c10137dec8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a6a9a26b6a25d0bd2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
