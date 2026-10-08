@@ -348,7 +348,7 @@ describe("Invitations", () => {
     expect(result.status).toBe("sent");
     const invitationId = lastInvitationIdFor(person.email);
     expect(emailsTo(person.email).at(-1)?.text).toContain(
-      "http://localhost:3000/app/accept-invitation?id=",
+      "http://localhost:3001/accept-invitation?id=",
     );
 
     const preview = await workspaces.previewInvitation(invitationId);

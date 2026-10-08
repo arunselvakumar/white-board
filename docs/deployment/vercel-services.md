@@ -1,22 +1,32 @@
-# Vercel services
+# Vercel projects
 
-Create one Vercel project with its Root Directory set to the repository root. The root `vercel.json` builds the Marketing Site (`apps/marketing`) and Whiteboard (`apps/whiteboard`) as separate Next.js services.
+Whiteboard and the Marketing Site deploy as two Vercel projects from the same repository, `arunselvakumar/white-board`, on the personal Vercel account (ADR-0035). Both deploy `main` to production and every pull request to a preview.
 
-| Public path                    | Service      |
-| ------------------------------ | ------------ |
-| `/app` and `/app/*`            | `whiteboard` |
-| Everything else, including `/` | `marketing`  |
+| Project                 | Root Directory    | Production domains                     |
+| ----------------------- | ----------------- | -------------------------------------- |
+| `white-board`           | `apps/whiteboard` | `app.white-board.io`                   |
+| `white-board-marketing` | `apps/marketing`  | `white-board.io`, `www.white-board.io` |
 
-Whiteboard uses the Next.js `/app` base path. Its API docs are at `/app/api/docs`, and the RealtimeKit webhook is at `/app/api/webhooks/realtimekit`. Auth is Better Auth served at `/app/api/auth` (ADR-0034). In the Vercel project environment set:
+`www.white-board.io` redirects to `white-board.io`. In both projects, keep "Include files outside the Root Directory" on, because the apps import the workspace packages.
 
-- `BETTER_AUTH_SECRET` (generate with `openssl rand -base64 32`; required at build and run time) and `BETTER_AUTH_URL` (the public origin, without `/app`).
+## `white-board` (Whiteboard)
+
+Whiteboard is served at the root of its host. Its API docs are at `/api/docs`, the RealtimeKit webhook is at `/api/webhooks/realtimekit`, and Better Auth is at `/api/auth` (ADR-0034). In the project environment set:
+
+- `BETTER_AUTH_SECRET` (generate with `openssl rand -base64 32`; required at build and run time) and `BETTER_AUTH_URL=https://app.white-board.io`.
 - `RESEND_API_KEY` and `EMAIL_FROM` (an address on a domain verified in Resend). Production sends email with Resend by default.
-- Optionally `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Register `<BETTER_AUTH_URL>/app/api/auth/callback/google` as an authorized redirect URI in Google Cloud.
+- Optionally `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Register `https://app.white-board.io/api/auth/callback/google` as an authorized redirect URI in Google Cloud.
 - A reachable Postgres `DATABASE_URL`, then run `bun run --filter @repo/db migrate:deploy` against it.
-- The service credentials required by the features you enable.
+- The service credentials required by the features you enable. Register the RealtimeKit webhook at `https://app.white-board.io/api/webhooks/realtimekit`.
 
 Do not use the example localhost database URL in Vercel. Preview deployments trust their own `VERCEL_URL` and branch URL for auth, but Google sign-in works only on origins registered with Google.
 
-The apps do not make server-to-server requests to each other. Browser navigation from Marketing to Whiteboard uses `/app/signup`, so there are no service bindings to configure. If a server-side call is added later, declare a binding on the calling service and read its injected URL at runtime.
+## `white-board-marketing` (Marketing Site)
 
-Run `vercel dev -L` from the repository root to test the combined routing locally. It starts both services and injects any declared bindings. This deployment configuration does not run database migrations; run `bun run --filter @repo/db migrate:deploy` against the deployment database as a separate release step.
+The Marketing Site has no Session and needs no secrets. `NEXT_PUBLIC_WHITEBOARD_URL` overrides where Sign-in and Sign-up links go; it defaults to `https://app.white-board.io`. Old `/app` and `/app/*` links redirect to Whiteboard.
+
+## DNS (GoDaddy)
+
+`white-board.io` is registered at GoDaddy and keeps its nameservers there. Add the records Vercel shows for each domain under the project's Settings → Domains: an `A` record for the apex, and `CNAME` records for `www` and `app`. Leave any `MX` and `TXT` records for email alone.
+
+The apps do not make server-to-server requests to each other.

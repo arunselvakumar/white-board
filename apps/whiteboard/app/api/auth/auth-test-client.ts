@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { GET, POST } from "./[...all]/route";
 
-export const ORIGIN = "http://localhost:3000";
+export const ORIGIN = "http://localhost:3001";
 
 /** A cookie jar for one browser, enough for Better Auth's session cookie. */
 export class TestBrowser {
@@ -47,9 +47,9 @@ export class TestBrowser {
     return response;
   }
 
-  /** Calls `/app/api/auth/<path>`. */
+  /** Calls `/api/auth/<path>`. */
   auth(path: string, body?: unknown): Promise<Response> {
-    return this.request(`/app/api/auth${path}`, { body });
+    return this.request(`/api/auth${path}`, { body });
   }
 
   private store(response: Response): void {

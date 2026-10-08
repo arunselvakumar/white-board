@@ -65,7 +65,7 @@ WorkspaceInvitationEmail.PreviewProps = {
   workspaceName: "Sri Vidya Computer Centre",
   inviterName: "Arun",
   role: "student",
-  acceptUrl: "http://localhost:3000/app/accept-invitation?id=example",
+  acceptUrl: "http://localhost:3001/accept-invitation?id=example",
   expiresInDays: 7,
 } satisfies WorkspaceInvitationEmailProps;
 

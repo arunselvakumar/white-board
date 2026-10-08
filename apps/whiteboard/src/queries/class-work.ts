@@ -1,6 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { withAppBasePath } from "@/lib/app-base-path";
 import type {
   AttachmentView,
   BatchClassWorkView,
@@ -167,7 +166,7 @@ export function undoHomeworkSubmission(
 
 /** Download link for an attachment the signed-in User can see. */
 export function attachmentHref(attachmentId: string): string {
-  return withAppBasePath(`${BASE}/attachments/${attachmentId}`);
+  return `${BASE}/attachments/${attachmentId}`;
 }
 
 function shrinkPhoto(file: File): Promise<Blob> {

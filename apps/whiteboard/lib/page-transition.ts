@@ -1,5 +1,3 @@
-import { APP_BASE_PATH } from "@/lib/app-base-path";
-
 export type PageTransitionClick = {
   destination: URL;
   current: URL;
@@ -40,9 +38,8 @@ export function pageTransitionHref(click: PageTransitionClick): string | null {
     return null;
   }
 
-  const nextPath = routerPathname(click.destination.pathname);
+  const nextPath = click.destination.pathname;
   if (
-    nextPath == null ||
     nextPath === "/api" ||
     nextPath.startsWith("/api/") ||
     nextPath.startsWith("/_next")
@@ -55,14 +52,4 @@ export function pageTransitionHref(click: PageTransitionClick): string | null {
   }
 
   return `${nextPath}${click.destination.search}${click.destination.hash}`;
-}
-
-function routerPathname(pathname: string): string | null {
-  if (pathname === APP_BASE_PATH || pathname === `${APP_BASE_PATH}/`) {
-    return "/";
-  }
-  if (!pathname.startsWith(`${APP_BASE_PATH}/`)) {
-    return null;
-  }
-  return pathname.slice(APP_BASE_PATH.length);
 }

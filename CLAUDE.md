@@ -56,4 +56,4 @@ bun run test:http
 bun run check-types
 ```
 
-APIs: http://localhost:3000/api/docs
+APIs: http://localhost:3001/api/docs (Whiteboard; the Marketing Site is on :3000)

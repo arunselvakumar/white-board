@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { withAppBasePath } from "@/lib/app-base-path";
 
 import type { Teacher } from "@/src/training-institute/domain/teacher";
 
@@ -26,9 +25,7 @@ export function mapTeacherListItem(
     photoUrl:
       teacher.photoUpdatedAt == null
         ? null
-        : withAppBasePath(
-            `/api/training-institute/teachers/${teacher.id}/photo?v=${teacher.photoUpdatedAt.getTime()}`,
-          ),
+        : `/api/training-institute/teachers/${teacher.id}/photo?v=${teacher.photoUpdatedAt.getTime()}`,
     invitationStatus: teacher.invitationStatus,
     deactivatedAt: teacher.deactivatedAt?.toISOString() ?? null,
   };

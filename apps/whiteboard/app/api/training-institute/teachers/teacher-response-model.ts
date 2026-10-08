@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { withAppBasePath } from "@/lib/app-base-path";
 
 import type { Teacher } from "@/src/training-institute/domain/teacher";
 import { TrainingInstituteTeacherDetailsResponseModel } from "./teacher-details-model";
@@ -45,9 +44,7 @@ export function mapTeacherResponse(
     photoUrl:
       teacher.photoUpdatedAt == null
         ? null
-        : withAppBasePath(
-            `/api/training-institute/teachers/${teacher.id}/photo?v=${teacher.photoUpdatedAt.getTime()}`,
-          ),
+        : `/api/training-institute/teachers/${teacher.id}/photo?v=${teacher.photoUpdatedAt.getTime()}`,
     privateDetails: {
       idNumberLast4: teacher.idNumberLast4,
       bankAccountLast4: teacher.bankAccountLast4,

@@ -1,8 +1,5 @@
-/** Whiteboard is served under `/app` (next.config.ts `basePath`). */
-export const APP_BASE_PATH = "/app";
-
-/** Better Auth sees the full request path, `/app` included. */
-export const AUTH_BASE_PATH = `${APP_BASE_PATH}/api/auth`;
+/** Better Auth's endpoints. Whiteboard is served at the root of its own host (ADR-0035). */
+export const AUTH_BASE_PATH = "/api/auth";
 
 function vercelOrigin(host: string | undefined): string | null {
   return host != null && host.length > 0 ? `https://${host}` : null;
@@ -16,7 +13,7 @@ export function appOrigin(): string {
   return (
     vercelOrigin(process.env["VERCEL_PROJECT_PRODUCTION_URL"]) ??
     vercelOrigin(process.env["VERCEL_URL"]) ??
-    "http://localhost:3000"
+    "http://localhost:3001"
   );
 }
 
@@ -31,5 +28,5 @@ export function trustedOrigins(): string[] {
 }
 
 export function acceptInvitationUrl(invitationId: string): string {
-  return `${appOrigin()}${APP_BASE_PATH}/accept-invitation?id=${encodeURIComponent(invitationId)}`;
+  return `${appOrigin()}/accept-invitation?id=${encodeURIComponent(invitationId)}`;
 }

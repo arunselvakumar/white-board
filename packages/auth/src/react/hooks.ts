@@ -10,7 +10,6 @@ import {
 } from "../client";
 import type { WorkspaceRole } from "../roles";
 import type { AuthUser, WorkspaceSummary } from "../types";
-import { APP_BASE_PATH } from "../urls";
 import { useAuthSnapshot } from "./auth-provider";
 
 export type FetchStatus = "idle" | "fetching";
@@ -22,7 +21,7 @@ export type FetchStatus = "idle" | "fetching";
  */
 export function navigateInApp(path: string): void {
   const target = path.startsWith("/") ? path : `/${path}`;
-  window.location.assign(`${APP_BASE_PATH}${target === "/" ? "" : target}`);
+  window.location.assign(target);
 }
 
 type BetterFetchResult = { error: unknown } | { error: null };
@@ -142,8 +141,8 @@ export function useSignIn() {
       run(() =>
         authClient().signIn.social({
           provider: "google",
-          callbackURL: `${APP_BASE_PATH}${callbackPath}`,
-          errorCallbackURL: `${APP_BASE_PATH}/login`,
+          callbackURL: callbackPath,
+          errorCallbackURL: "/login",
         }),
       ),
     [run],

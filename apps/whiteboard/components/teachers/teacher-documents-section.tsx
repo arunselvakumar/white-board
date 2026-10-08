@@ -28,7 +28,6 @@ import type {
   TeacherDocument,
   TeacherDocumentInput,
 } from "@/src/queries/teachers";
-import { withAppBasePath } from "@/lib/app-base-path";
 import { encodeTeacherDocument } from "./teacher-files";
 
 const documentOptions = [
@@ -174,9 +173,7 @@ export function TeacherDocumentsSection({
                   size="sm"
                   render={
                     <a
-                      href={withAppBasePath(
-                        `/api/training-institute/teachers/${teacherId}/documents/${document.id}`,
-                      )}
+                      href={`/api/training-institute/teachers/${teacherId}/documents/${document.id}`}
                       aria-label={`Download ${document.name}`}
                     />
                   }

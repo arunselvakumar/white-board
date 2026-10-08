@@ -1,8 +1,6 @@
 import { hasSessionCookie } from "@repo/auth/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { APP_BASE_PATH } from "@/lib/app-base-path";
-
 /** Screens a signed-out visitor may open. */
 const PUBLIC_PATHS = new Set([
   "/login",
@@ -10,10 +8,6 @@ const PUBLIC_PATHS = new Set([
   "/forgot-password",
   "/accept-invitation",
 ]);
-
-function appPathname(request: NextRequest): string {
-  return request.nextUrl.pathname.replace(/^\/app(?=\/|$)/, "") || "/";
-}
 
 /**
  * The Auth Gate for pages: no session cookie → Sign-in with a Redirect URL.
@@ -23,12 +17,12 @@ function appPathname(request: NextRequest): string {
  * (ADR-0034 §4).
  */
 export default function proxy(request: NextRequest): NextResponse | undefined {
-  const pathname = appPathname(request);
+  const { pathname } = request.nextUrl;
   if (pathname === "/api" || pathname.startsWith("/api/")) return;
   if (PUBLIC_PATHS.has(pathname)) return;
   if (hasSessionCookie(request.headers)) return;
 
-  const login = new URL(`${APP_BASE_PATH}/login`, request.url);
+  const login = new URL("/login", request.url);
   login.searchParams.set(
     "redirect_url",
     `${pathname}${request.nextUrl.search}`,

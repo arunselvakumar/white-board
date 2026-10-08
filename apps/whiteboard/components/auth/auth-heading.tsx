@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { withAppBasePath } from "@/lib/app-base-path";
 
 export function AuthHeading({
   title,
@@ -11,7 +10,7 @@ export function AuthHeading({
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       <Image
-        src={withAppBasePath("/whiteboard-logo.svg")}
+        src="/whiteboard-logo.svg"
         alt="Whiteboard"
         width={48}
         height={48}

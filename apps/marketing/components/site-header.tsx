@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
+import {
+  WHITEBOARD_SIGN_IN_URL,
+  WHITEBOARD_SIGN_UP_URL,
+} from "@/lib/whiteboard-url";
 
 const focusRing =
   "rounded-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -81,7 +85,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-5 md:ml-0">
           <a
-            href="/app/login"
+            href={WHITEBOARD_SIGN_IN_URL}
             className={cn(
               "text-primary hover:text-brand-800 hidden text-sm font-semibold transition-colors md:inline",
               focusRing,
@@ -90,7 +94,7 @@ export function SiteHeader() {
             Sign in
           </a>
           <Button
-            render={<a href="/app/signup" />}
+            render={<a href={WHITEBOARD_SIGN_UP_URL} />}
             nativeButton={false}
             size="lg"
             className="h-10 px-4 text-sm font-semibold"

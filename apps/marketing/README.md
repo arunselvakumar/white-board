@@ -6,7 +6,7 @@ The public site for Whiteboard. It has no Session; "Sign in" and "Create your Wo
 bun run dev --filter=marketing
 ```
 
-Runs on [http://localhost:3001](http://localhost:3001).
+Runs on [http://localhost:3000](http://localhost:3000).
 
 - Design brief, tokens, copy voice, and motion budget: [`DESIGN.md`](./DESIGN.md)
 - Sections live in `components/`; the page composes them in `app/page.tsx`

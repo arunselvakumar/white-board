@@ -17,7 +17,6 @@ import { Download } from "lucide-react";
 import Link from "next/link";
 
 import { HomeworkHomeCards } from "@/components/class-work/family/homework-home-cards";
-import { withAppBasePath } from "@/lib/app-base-path";
 import { formatPaiseAsRupees } from "@/lib/money";
 import type {
   FamilyClassWorkStudentView,
@@ -240,9 +239,7 @@ function RecordingsCard({
                 </span>
                 <a
                   className={buttonVariants({ variant: "ghost", size: "sm" })}
-                  href={withAppBasePath(
-                    `${classApiPath(recording.batchId, recording.date, recording.startTime)}/recording`,
-                  )}
+                  href={`${classApiPath(recording.batchId, recording.date, recording.startTime)}/recording`}
                   aria-label={`Download recording of ${calendarDate(recording.date)} ${recording.startTime}`}
                 >
                   <Download className="size-4" /> Download

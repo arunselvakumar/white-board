@@ -1,5 +1,3 @@
-import { withAppBasePath } from "@/lib/app-base-path";
-
 export type ErrorEnvelope = {
   code: string;
   message: string;
@@ -29,11 +27,7 @@ export async function apiJson<T>(
     headers.set("accept", "application/json");
   }
 
-  const requestUrl =
-    typeof input === "string" && input.startsWith("/api/")
-      ? withAppBasePath(input)
-      : input;
-  const response = await fetch(requestUrl, { ...init, headers });
+  const response = await fetch(input, { ...init, headers });
   if (!response.ok) {
     throw new QueryHttpError(
       response.status,
