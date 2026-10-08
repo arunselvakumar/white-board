@@ -78,6 +78,12 @@ export const STUDENT_NAV = [
     description: "Homework and Study Material from my Batches.",
   },
   {
+    href: "/student/results",
+    label: "Results",
+    title: "Results",
+    description: "My published Test results.",
+  },
+  {
     href: "/calendar",
     label: "Calendar",
     title: "Calendar",
@@ -104,6 +110,12 @@ export const PARENT_NAV = [
     label: "Homework",
     title: "Homework",
     description: "Homework and Study Material for each Student.",
+  },
+  {
+    href: "/parent/results",
+    label: "Results",
+    title: "Results",
+    description: "Published Test results for each Student.",
   },
   {
     href: "/calendar",

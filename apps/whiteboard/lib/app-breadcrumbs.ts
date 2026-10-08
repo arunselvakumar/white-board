@@ -21,6 +21,8 @@ export function getAppBreadcrumbs(
   }
   if (role === "student" || role === "parent") {
     const home = role === "student" ? "/student" : "/parent";
+    if (pathname.startsWith(`${home}/results`))
+      return [{ label: "Results", href: `${home}/results` }];
     if (!pathname.startsWith(`${home}/homework`))
       return [{ label: "Home", href: home }];
     const homework = { label: "Homework", href: `${home}/homework` };
@@ -31,13 +33,21 @@ export function getAppBreadcrumbs(
   if (role === "teacher") {
     const myBatches = { label: "My Batches", href: "/teacher" };
     if (pathname === "/teacher") return [myBatches];
-    const [, , , batchId, action, homeworkId] = pathname.split("/");
+    const [, , , batchId, action, itemId] = pathname.split("/");
+    if (action === "tests" || action === "students") {
+      const tests = { label: "Tests", href: `/teacher/batches/${batchId}/tests` };
+      if (action === "students")
+        return [myBatches, tests, { label: "Test history" }];
+      return itemId === undefined
+        ? [myBatches, { label: "Tests" }]
+        : [myBatches, tests, { label: "Test" }];
+    }
     if (action !== "homework") return [myBatches, { label: "Attendance" }];
     const work = {
       label: "Homework and Study Material",
       href: `/teacher/batches/${batchId}/homework`,
     };
-    return homeworkId === undefined
+    return itemId === undefined
       ? [myBatches, work]
       : [myBatches, work, { label: "Submissions" }];
   }
@@ -106,6 +116,12 @@ export function getAppBreadcrumbs(
     return pathname === work.href
       ? [dashboard, parent, work]
       : [dashboard, parent, work, { label: "Submissions" }];
+  }
+  if (action === "tests" && area === "batches") {
+    const tests = { label: "Tests", href: `/batches/${id}/tests` };
+    return pathname === tests.href
+      ? [dashboard, parent, { label: "Tests" }]
+      : [dashboard, parent, tests, { label: "Test" }];
   }
   if (area === "courses" || area === "batches") {
     return [dashboard, parent, { label: `Edit ${section.singular}` }];

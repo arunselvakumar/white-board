@@ -227,9 +227,9 @@ export type TestStats = {
 export function testStats(
   results: readonly { status: TestResultStatus; marks: number | null }[],
 ): TestStats {
-  const marks = results
-    .filter((result) => result.status === "scored" && result.marks != null)
-    .map((result) => result.marks as number);
+  const marks = results.flatMap((result) =>
+    result.status === "scored" && result.marks != null ? [result.marks] : [],
+  );
   const total = marks.reduce((sum, value) => sum + value, 0);
   return {
     tested: marks.length,

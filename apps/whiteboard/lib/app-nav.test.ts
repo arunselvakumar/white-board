@@ -8,12 +8,14 @@ describe("role navigation", () => {
     expect(navForRole("student").map((item) => item.label)).toEqual([
       "Home",
       "Homework",
+      "Results",
       "Calendar",
       "Online Classes",
     ]);
     expect(navForRole("parent").map((item) => item.label)).toEqual([
       "Home",
       "Homework",
+      "Results",
       "Calendar",
       "Online Classes",
     ]);

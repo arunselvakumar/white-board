@@ -191,8 +191,11 @@ function summary(
     highest: batchWide ? stats.highest : null,
     lowest: batchWide ? stats.lowest : null,
     belowPass: entered
-      .filter((result) => passed(result, test.passMarks) === false)
-      .map((result) => ({ ...named(result), marks: result.marks as number }))
+      .flatMap((result) =>
+        passed(result, test.passMarks) === false && result.marks != null
+          ? [{ ...named(result), marks: result.marks }]
+          : [],
+      )
       .sort(byName),
     absentStudents: entered
       .filter((result) => result.status === "absent")
@@ -402,7 +405,7 @@ export class ClassTestHandlers {
         end: student.spans.some((span) => span.end == null)
           ? null
           : student.spans
-              .map((span) => span.end as string)
+              .flatMap((span) => (span.end == null ? [] : [span.end]))
               .reduce((a, b) => (a > b ? a : b)),
       }))
       .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
@@ -775,7 +778,7 @@ export class ClassTestHandlers {
             marks: result.marks,
             passed: passed(result, test.passMarks),
             remark: result.remark,
-            publishedAt: (test.publishedAt as Date).toISOString(),
+            publishedAt: (test.publishedAt ?? test.updatedAt).toISOString(),
           })),
       })),
     };
