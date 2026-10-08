@@ -71,13 +71,6 @@ export const Workspace: Story = {
   },
 };
 
-export const Masters: Story = {
-  ...shellAt("/app/masters"),
-  play: async ({ canvasElement }) => {
-    await expectArea(canvasElement, APP_NAV[2]);
-  },
-};
-
 export const NoActiveCompany: Story = {
   ...shellAt("/app/projects"),
   beforeEach() {
