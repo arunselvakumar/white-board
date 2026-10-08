@@ -1,0 +1,29 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_25a30b12f62554::t_26dccb2b8c0c52 148,188
+apps/construction-management/src/organization/domain/starting-permissions.test.ts
+  s_25a30b12f62554::t_ed843fc104f661 1-36
+apps/construction-management/src/organization/domain/starting-permissions.ts
+  s_25a30b12f62554::t_5df8fa3e359cc6 1-21
+packages/db/prisma/migrations/20261008210000_construction_member_menu_permissions/migration.sql
+  s_25a30b12f62554::t_0335140f217bd6 1-15
+packages/db/prisma/schema/construction-organization.prisma
+  s_25a30b12f62554::t_fc8b269c3377b4 94-111
+apps/construction-management/docs/adr/CM-0003-permission-matrix.md
+  s_25a30b12f62554::t_4bfdd8541f6a77 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "958a4270e937d768ba7383bfddcac2ba30e57fcc",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
