@@ -1,0 +1,19 @@
+apps/construction-management/docs/prd/handoff/M1.md
+  s_25a30b12f62554::t_9a11bfd543b9b7 71-72,75-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0e7c665b3127e5ad111f3edf4e622b5bbe3fa370",
+  "prompts": {},
+  "sessions": {
+    "s_25a30b12f62554": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf25475b-71d1-498f-9d82-5b79311b5c52",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
