@@ -1,0 +1,49 @@
+.github/workflows/ci.yml
+  s_47ca3a523b12b8::t_bae52ee08d9dcd 39
+AGENTS.md
+  s_47ca3a523b12b8::t_942d880d68cef8 83,89
+CLAUDE.md
+  s_47ca3a523b12b8::t_82dc755ad71423 59
+README.md
+  s_47ca3a523b12b8::t_abe60f396b1d27 41
+apps/marketing/README.md
+  s_47ca3a523b12b8::t_fddc4e52cffff6 9
+apps/marketing/lib/whiteboard-url.ts
+  s_47ca3a523b12b8::t_962459b035f935 3,9
+apps/marketing/package.json
+  s_47ca3a523b12b8::t_4309cb07096e4f 7
+apps/whiteboard/.env.example
+  s_47ca3a523b12b8::t_6cbe87574f5516 4
+apps/whiteboard/README.md
+  s_47ca3a523b12b8::t_110fe65233462a 9
+apps/whiteboard/app/api/auth/auth-test-client.ts
+  s_47ca3a523b12b8::t_f33f155d67c0c0 5
+apps/whiteboard/app/api/auth/identity.http.test.ts
+  s_47ca3a523b12b8::t_c4ace7f2df5a30 351
+apps/whiteboard/package.json
+  s_47ca3a523b12b8::t_b32bcbcb6be637 7
+apps/whiteboard/vitest.config.ts
+  s_47ca3a523b12b8::t_f607b4ca0ea026 40
+docs/adr/0035-whiteboard-on-its-own-subdomain.md
+  s_47ca3a523b12b8::t_9b9dfb30788b02 18,28
+packages/auth/src/urls.ts
+  s_47ca3a523b12b8::t_7a50f22fb1d475 16
+packages/email-templates/src/emails/workspace-invitation.tsx
+  s_47ca3a523b12b8::t_404ba0e94cd2b6 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "72f65f27c54a81321dd496ef278e706700d5adf2",
+  "prompts": {},
+  "sessions": {
+    "s_47ca3a523b12b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00f2cd3e-b6a6-4415-abf1-e64d3cdb053f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
