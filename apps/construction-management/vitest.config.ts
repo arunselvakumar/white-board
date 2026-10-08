@@ -42,6 +42,11 @@ export default defineConfig({
             AUTH_RATE_LIMIT: "off",
             CONSTRUCTION_PRIVATE_DATA_KEY:
               "aHR0cC10ZXN0cy1vbmx5LXByaXZhdGUtZGF0YS1rZXk=",
+            // Webhook tests sign bodies with this; checkout uses a fake gateway.
+            RAZORPAY_WEBHOOK_SECRET: "http-tests-only-razorpay-webhook-secret",
+            RAZORPAY_KEY_ID: "",
+            RAZORPAY_KEY_SECRET: "",
+            CONSTRUCTION_SELLER_STATE_CODE: "27",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.
