@@ -4,6 +4,16 @@ import type { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } fro
 import type { UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model";
 import type { UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model";
 
+import type {
+  UpdateConstructionOrganizationSequenceRuleRequestModel,
+  UpdateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/[id]/update/update-sequence-rule-models";
+import type {
+  CreateConstructionOrganizationSequenceRuleRequestModel,
+  CreateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/create-sequence-rule-models";
+import type { ListConstructionOrganizationSequenceRulesResponseModel } from "@/app/api/construction/organization/settings/sequence-rules/list-sequence-rules-models";
+
 import { apiJson } from "./http";
 
 const SETTINGS = "/api/construction/organization/settings";
@@ -42,4 +52,49 @@ export function updateBackdatedEntryPolicy(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
+}
+
+export type SequenceRuleItem =
+  ListConstructionOrganizationSequenceRulesResponseModel["items"][number];
+
+/** Every live rule; small (one default per module plus one per Project). */
+export const sequenceRulesQuery = queryOptions({
+  queryKey: ["organization", "settings", "sequence-rules"],
+  queryFn: () =>
+    apiJson<ListConstructionOrganizationSequenceRulesResponseModel>(
+      `${SETTINGS}/sequence-rules`,
+    ),
+});
+
+export function createSequenceRule(
+  input: CreateConstructionOrganizationSequenceRuleRequestModel,
+): Promise<CreateConstructionOrganizationSequenceRuleResponseModel> {
+  return apiJson(`${SETTINGS}/sequence-rules`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export function updateSequenceRule(
+  id: string,
+  input: UpdateConstructionOrganizationSequenceRuleRequestModel,
+): Promise<UpdateConstructionOrganizationSequenceRuleResponseModel> {
+  return apiJson(
+    `${SETTINGS}/sequence-rules/${encodeURIComponent(id)}/update`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function deleteSequenceRule(id: string): Promise<void> {
+  return apiJson(
+    `${SETTINGS}/sequence-rules/${encodeURIComponent(id)}/delete`,
+    {
+      method: "POST",
+    },
+  );
 }

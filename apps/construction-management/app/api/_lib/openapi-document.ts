@@ -9,6 +9,19 @@ import { GetConstructionOrganizationCompanyProfileResponseModel } from "@/app/ap
 import { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model";
 import { UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-request-model";
 import { UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/update/update-backdated-entry-policy-response-model";
+import { ConstructionOrganizationSequenceRuleParamsModel } from "@/app/api/construction/organization/settings/sequence-rules/[id]/sequence-rule-params-model";
+import {
+  UpdateConstructionOrganizationSequenceRuleRequestModel,
+  UpdateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/[id]/update/update-sequence-rule-models";
+import {
+  CreateConstructionOrganizationSequenceRuleRequestModel,
+  CreateConstructionOrganizationSequenceRuleResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/create-sequence-rule-models";
+import {
+  ListConstructionOrganizationSequenceRulesQueryModel,
+  ListConstructionOrganizationSequenceRulesResponseModel,
+} from "@/app/api/construction/organization/settings/sequence-rules/list-sequence-rules-models";
 
 import {
   buildOpenApiDocument,
@@ -36,6 +49,11 @@ export const openApiComponents: OpenApiComponents = {
   GetConstructionOrganizationBackdatedEntryPolicyResponseModel,
   UpdateConstructionOrganizationBackdatedEntryPolicyRequestModel,
   UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
+  ListConstructionOrganizationSequenceRulesResponseModel,
+  CreateConstructionOrganizationSequenceRuleRequestModel,
+  CreateConstructionOrganizationSequenceRuleResponseModel,
+  UpdateConstructionOrganizationSequenceRuleRequestModel,
+  UpdateConstructionOrganizationSequenceRuleResponseModel,
 };
 
 /** Every route. A route is unfinished until it is listed here (root ADR-0012). */
@@ -104,6 +122,55 @@ export const openApiOperations: OpenApiOperation[] = [
     successSchema:
       UpdateConstructionOrganizationBackdatedEntryPolicyResponseModel,
     errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/settings/sequence-rules",
+    summary: "The Company's Sequence ID rules",
+    tags: ORGANIZATION,
+    query: ListConstructionOrganizationSequenceRulesQueryModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Live rules, in module order, defaults first",
+    successSchema: ListConstructionOrganizationSequenceRulesResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules",
+    summary: "Add a Sequence ID rule for a module",
+    tags: ORGANIZATION,
+    body: CreateConstructionOrganizationSequenceRuleRequestModel,
+    successStatus: StatusCodes.CREATED,
+    successDescription: "The new rule",
+    successSchema: CreateConstructionOrganizationSequenceRuleResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.CONFLICT],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules/{id}/update",
+    summary: "Change a Sequence ID rule's number format",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationSequenceRuleParamsModel,
+    body: UpdateConstructionOrganizationSequenceRuleRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated rule",
+    successSchema: UpdateConstructionOrganizationSequenceRuleResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/settings/sequence-rules/{id}/delete",
+    summary: "Delete a Sequence ID rule that never issued a number",
+    tags: ORGANIZATION,
+    params: ConstructionOrganizationSequenceRuleParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Deleted",
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
   },
 ];
 

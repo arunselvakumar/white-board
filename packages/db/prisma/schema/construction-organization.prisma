@@ -207,3 +207,52 @@ model ConstructionOrganizationBackdatedEntryPolicy {
   @@map("backdated_entry_policies")
   @@schema("construction_organization")
 }
+
+/// How one module's document numbers look (CM-114, `modules/12`): prefix,
+/// fiscal-year token, project token, padded counter. `project_id` null is
+/// the module's default ("All projects"). At most one live default per
+/// module and one live rule per (module, project): partial unique indexes,
+/// hand-written in the migration. Validated by `SequenceRule` in the kernel.
+model ConstructionOrganizationSequenceRule {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  /// Kernel `SequenceModuleKey` (`purchase_request`, `purchase_order`, …).
+  module          String
+  /// A Project id from the projects context (M2); null = default rule.
+  projectId       String?   @map("project_id")
+  prefix          String
+  projectToken    String    @default("") @map("project_token")
+  startNumber     Int       @map("start_number")
+  padding         Int       @default(5)
+  separator       String    @default("/")
+  fiscalYearToken Boolean   @default(true) @map("fiscal_year_token")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String    @map("created_by")
+  updatedBy       String    @map("updated_by")
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  counters ConstructionOrganizationSequenceCounter[]
+
+  @@index([workspaceId, module])
+  @@map("sequence_rules")
+  @@schema("construction_organization")
+}
+
+/// The last number issued per rule per fiscal year. Incremented with a row
+/// lock in the same transaction as the document insert, so numbers are
+/// consecutive and gap-free (`nextSequenceNumber` in the kernel).
+model ConstructionOrganizationSequenceCounter {
+  ruleId     String   @map("rule_id") @db.Uuid
+  /// Start year of the fiscal year (2026 = 26-27); 0 when the rule has no
+  /// fiscal-year token and its counter never restarts.
+  fiscalYear Int      @map("fiscal_year")
+  lastNumber Int      @map("last_number")
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  rule ConstructionOrganizationSequenceRule @relation(fields: [ruleId], references: [id], onDelete: Restrict)
+
+  @@id([ruleId, fiscalYear])
+  @@map("sequence_counters")
+  @@schema("construction_organization")
+}

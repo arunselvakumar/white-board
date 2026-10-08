@@ -154,6 +154,8 @@ Only Worksheet (and the Equipment Usage "Approval" toggle) has an explicit on/of
 
 Preview = `{prefix}/{projectIdToken}/{zeroPad(number)}` → `PR/26-27/PX/00001`.
 
+Rebuild (CM-114): parts are joined by the separator, empty parts skipped, in the order prefix, fiscal year (`26-27`, when the fiscal-year token is on), project token, zero-padded counter → `PR/26-27/P1/00001`. A module with no saved rule uses its standard rule (`PR/26-27/00001`), which is saved as the default the first time a number is issued; so every module always has exactly one effective default.
+
 ### BackdatedEntryGlobal
 
 | Field                        | Legacy field                             | Type               | Required | Notes                            |
@@ -414,9 +416,9 @@ Company owner (`isCompanyOwner`) has all permissions (inferred).
 
 ## Open questions
 
-1. Is numbering padding fixed at 5 digits?
-2. Does the counter reset when the prefix changes (e.g. new FY)?
-3. Can a numbering rule be deleted once used?
+1. ~~Is numbering padding fixed at 5 digits?~~ **Decided (CM-114):** configurable 1–10 digits, default 5; longer numbers are never cut.
+2. ~~Does the counter reset when the prefix changes (e.g. new FY)?~~ **Decided (CM-114):** the counter belongs to the rule, not the prefix. With the fiscal-year token on it restarts at the start number every 1 April; with it off it never restarts (so numbers cannot repeat across years). Editing a rule never reissues a number: a raised start number jumps ahead, a lowered one is ignored until the next fiscal year.
+3. ~~Can a numbering rule be deleted once used?~~ **Decided (CM-114):** no — 409 `SEQUENCE_RULE_IN_USE`; edit it instead. An unused rule can be deleted; the module then falls back to its standard rule.
 4. Are worksheet form settings per project or company-wide?
 5. Exact list of hideable Material Received fields.
 6. Does "Hide/Show Modules" apply to all users of the project or only the current user?
