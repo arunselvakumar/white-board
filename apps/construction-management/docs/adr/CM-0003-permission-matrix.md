@@ -35,4 +35,5 @@ Every route calls it once, through `requireAccess(request, menu, flag)`, before 
 
 - **Role-based access (owner/admin/engineer…):** too coarse for the people this product is for. Rejected.
 - **Menus and flags as database rows:** lets an Owner invent cells the API ignores. Rejected.
+- **Better Auth dynamic access control** (per-Company roles in `organizationRole`, checked with `hasPermission`): fits Designations as roles, but a per-member matrix would need a hidden role per Team Member, and it cannot express project scoping, View All or Financial, which would stay in our code anyway. Better Auth invitations are email-only, so mobile invites would stay custom too. Owner decision (2026-10-08): keep Better Auth for identity, sessions and `owner`/`member` membership; keep the matrix and Join Requests in the organization context. Rejected.
 - **A JSON matrix on the Team Member row:** simpler reads, but no cheap "who gets notified" query. Rejected.
