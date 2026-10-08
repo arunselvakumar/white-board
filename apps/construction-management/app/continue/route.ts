@@ -3,7 +3,7 @@ import {
   getCompanyAuthFromHeaders,
 } from "@repo/auth/construction/server";
 
-import { safeAppPath } from "@/lib/safe-redirect";
+import { isJoinPath, safeAppPath } from "@/lib/safe-redirect";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +31,8 @@ export async function GET(request: Request): Promise<Response> {
       : `?redirect_url=${encodeURIComponent(target)}`;
 
   if (!auth.isAuthenticated) return redirectTo(request, `/sign-in${carry}`);
+  // An invite link works with or without a Company.
+  if (isJoinPath(target)) return redirectTo(request, target);
   if (auth.workspaceId != null) return redirectTo(request, target);
 
   const mine = await companies.listForUser(auth.userId);

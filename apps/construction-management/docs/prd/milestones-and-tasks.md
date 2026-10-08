@@ -147,7 +147,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-106 |   6 | Designation aggregate + seed set (38 names, 6 with templates) copied into each new Company                   | done   | CM-104                 | Domain    |       |
 | CM-107 |   7 | Permission matrix: `menu` + `flag` enums, `MemberMenuPermission`, `can()` guard, designation templates       | done   | CM-106                 | Domain    |       |
 | CM-108 |   8 | Team Member aggregate: Normal vs HRMS member, profile fields, project assignment stub, invite link           | done   | CM-107                 | Domain    |       |
-| CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | todo   | CM-102, CM-108         | Auth      |       |
+| CM-109 |   9 | Invitation & join flow: invite by mobile/email, join request pending → accepted/rejected, multi-company      | done   | CM-102, CM-108         | Auth      |       |
 | CM-110 |  10 | Team Members HTTP + OpenAPI (list, create, update, invite, resend, remove, permissions)                      | todo   | CM-108, CM-109         | HTTP      |       |
 | CM-111 |  11 | Team Member screens: list with status chips, add wizard (details → projects → permission matrix), edit       | todo   | CM-105, CM-110         | UI        |       |
 | CM-112 |  12 | Designations screens (list, add, duplicate, edit template)                                                   | todo   | CM-105, CM-106         | UI        |       |
@@ -193,7 +193,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 
 ### CM-109 — Invitation & join
 
-**Done when:** invite by mobile or email → `@repo/auth` invitation; invitee signs up/in → sees "New Join Request" → accepts → membership active; owner can resend/cancel; a user in several companies switches; `JoiningPending` chip until accepted. HTTP tests for invite → accept and for a rejected invite.
+**Done when:** invite by mobile or email → a Joining Pending Team Member is the invitation (ADR CM-0002; not a Better Auth invitation, which is email-only), sent by email and SMS with a `/join/<token>` link; invitee signs up/in with that mobile or email → sees the Join Request → accepts → `member` membership through `@repo/auth`; owner can resend/cancel; a user in several companies switches; `JoiningPending` chip until accepted. HTTP tests for invite → accept and for a rejected invite.
 
 ### CM-110 / CM-111 / CM-112 — Team Members & Designations HTTP and screens
 

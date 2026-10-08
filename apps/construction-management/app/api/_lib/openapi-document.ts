@@ -6,6 +6,15 @@ import { CreateConstructionOrganizationCompanyRequestModel } from "@/app/api/con
 import { CreateConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/create-company-response-model";
 import { ListMyConstructionOrganizationCompaniesResponseModel } from "@/app/api/construction/organization/companies/me/list-my-companies-response-model";
 import { GetConstructionOrganizationCompanyProfileResponseModel } from "@/app/api/construction/organization/company-profile/get-company-profile-response-model";
+import {
+  GetConstructionOrganizationJoinLinkResponseModel,
+  JoinLinkTokenParamsModel,
+} from "@/app/api/construction/organization/join-links/[token]/join-link-models";
+import {
+  AcceptConstructionOrganizationJoinRequestResponseModel,
+  JoinRequestIdParamsModel,
+  ListConstructionOrganizationJoinRequestsResponseModel,
+} from "@/app/api/construction/organization/join-requests/join-request-models";
 
 import {
   buildOpenApiDocument,
@@ -30,6 +39,9 @@ export const openApiComponents: OpenApiComponents = {
   ListMyConstructionOrganizationCompaniesResponseModel,
   SwitchConstructionOrganizationCompanyResponseModel,
   GetConstructionOrganizationCompanyProfileResponseModel,
+  ListConstructionOrganizationJoinRequestsResponseModel,
+  AcceptConstructionOrganizationJoinRequestResponseModel,
+  GetConstructionOrganizationJoinLinkResponseModel,
 };
 
 /** Every route. A route is unfinished until it is listed here (root ADR-0012). */
@@ -77,6 +89,56 @@ export const openApiOperations: OpenApiOperation[] = [
     errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
   },
 ];
+
+openApiOperations.push(
+  {
+    method: "get",
+    path: "/api/construction/organization/join-requests",
+    summary: "Join Requests for the signed-in User's verified mobile or email",
+    tags: ORGANIZATION,
+    successStatus: StatusCodes.OK,
+    successDescription: "Pending Join Requests",
+    successSchema: ListConstructionOrganizationJoinRequestsResponseModel,
+    errors: [StatusCodes.UNAUTHORIZED],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/join-requests/{id}/accept",
+    summary: "Accept a Join Request and make that Company active",
+    tags: ORGANIZATION,
+    params: JoinRequestIdParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Joined",
+    successSchema: AcceptConstructionOrganizationJoinRequestResponseModel,
+    errors: [
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+    ],
+  },
+  {
+    method: "post",
+    path: "/api/construction/organization/join-requests/{id}/reject",
+    summary: "Decline a Join Request",
+    tags: ORGANIZATION,
+    params: JoinRequestIdParamsModel,
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Declined",
+    errors: [StatusCodes.UNAUTHORIZED, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "get",
+    path: "/api/construction/organization/join-links/{token}",
+    summary: "What an invite link shows before sign-in",
+    tags: ORGANIZATION,
+    security: false,
+    params: JoinLinkTokenParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Company and who the request is for, masked",
+    successSchema: GetConstructionOrganizationJoinLinkResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, StatusCodes.NOT_FOUND],
+  },
+);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

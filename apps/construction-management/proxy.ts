@@ -12,7 +12,7 @@ const PUBLIC_PATHS = new Set(["/sign-in", "/sign-up", "/continue"]);
 export default function proxy(request: NextRequest): NextResponse | undefined {
   const { pathname } = request.nextUrl;
   if (pathname === "/api" || pathname.startsWith("/api/")) return;
-  if (PUBLIC_PATHS.has(pathname)) return;
+  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith("/join/")) return;
   if (hasCompanySessionCookie(request.headers)) return;
 
   const signIn = new URL("/sign-in", request.url);

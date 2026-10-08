@@ -90,4 +90,58 @@ export const companies = {
     });
     return headers;
   },
+
+  /**
+   * Adds a User to a Company as a `member` (a Join Request was accepted,
+   * ADR CM-0002). Does nothing if they are already in it.
+   */
+  async addMember(input: {
+    workspaceId: string;
+    userId: string;
+  }): Promise<void> {
+    const existing = await prisma.identityWorkspaceMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: input.workspaceId,
+          userId: input.userId,
+        },
+      },
+      select: { id: true },
+    });
+    if (existing != null) return;
+    await constructionAuth.api.addMember({
+      body: {
+        userId: input.userId,
+        role: "member",
+        organizationId: input.workspaceId,
+      },
+    });
+  },
+
+  /**
+   * Removes a Member (never the Owner). Their Sessions stop pointing at the
+   * Company, so access ends on their next request.
+   */
+  async removeMember(input: {
+    workspaceId: string;
+    userId: string;
+  }): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      const removed = await tx.identityWorkspaceMember.deleteMany({
+        where: {
+          organizationId: input.workspaceId,
+          userId: input.userId,
+          role: { not: "owner" },
+        },
+      });
+      if (removed.count === 0) return;
+      await tx.identitySession.updateMany({
+        where: {
+          userId: input.userId,
+          activeOrganizationId: input.workspaceId,
+        },
+        data: { activeOrganizationId: null },
+      });
+    });
+  },
 };

@@ -21,6 +21,13 @@ describe("safeAppPath", () => {
       expect(safeAppPath(value)).toBe(APP_HOME);
   });
 
+  it("keeps an invite link", () => {
+    expect(safeAppPath("/join/abcdefghijklmnopqrstuvwx")).toBe(
+      "/join/abcdefghijklmnopqrstuvwx",
+    );
+    expect(safeAppPath("/join/short")).toBe(APP_HOME);
+  });
+
   it("carries the target through /continue", () => {
     expect(continuePath(null)).toBe("/continue");
     expect(continuePath("/app/masters")).toBe(

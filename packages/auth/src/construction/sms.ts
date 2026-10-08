@@ -4,6 +4,8 @@ export type OutgoingSms = {
   text: string;
   /** The OTP, when the message carries one; MSG91 sends it into a template. */
   code?: string;
+  /** The link an invitation carries; MSG91 sends it into the invite template. */
+  link?: string;
 };
 
 export type SmsSender = {
@@ -32,11 +34,22 @@ function assertNotProduction(transport: SmsTransport): void {
     );
 }
 
-/** MSG91's Flow API with an OTP template (`##otp##`). */
+/**
+ * MSG91's Flow API. Codes use the OTP template (`##otp##`); other notices
+ * (invitations) use `MSG91_INVITE_TEMPLATE_ID` with `##link##`, and are
+ * skipped until that DLT-approved template exists.
+ */
 class Msg91Sender implements SmsSender {
   async send(sms: OutgoingSms): Promise<void> {
     const authKey = process.env["MSG91_AUTH_KEY"];
-    const templateId = process.env["MSG91_TEMPLATE_ID"];
+    const templateId =
+      sms.code == null
+        ? process.env["MSG91_INVITE_TEMPLATE_ID"]
+        : process.env["MSG91_TEMPLATE_ID"];
+    if (sms.code == null && !templateId) {
+      console.warn(`[sms] no invite template; not texting ${sms.to}`);
+      return;
+    }
     if (!authKey || !templateId)
       throw new Error("MSG91_AUTH_KEY and MSG91_TEMPLATE_ID are required.");
     const response = await fetch("https://control.msg91.com/api/v5/flow", {
@@ -45,7 +58,12 @@ class Msg91Sender implements SmsSender {
       body: JSON.stringify({
         template_id: templateId,
         short_url: "0",
-        recipients: [{ mobiles: sms.to.replace(/^\+/, ""), otp: sms.code }],
+        recipients: [
+          {
+            mobiles: sms.to.replace(/^\+/, ""),
+            ...(sms.code == null ? { link: sms.link } : { otp: sms.code }),
+          },
+        ],
       }),
     });
     if (!response.ok)

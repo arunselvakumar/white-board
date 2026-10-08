@@ -6,6 +6,7 @@ import { TooltipProvider } from "@repo/ui/components/tooltip";
 
 import "@repo/ui/globals.css";
 import { QueryProvider } from "../components/query-provider";
+import { getQueryClient } from "../src/queries/query-client";
 import { resetAuthMocks } from "./mocks/auth";
 
 const fontSans = Urbanist({
@@ -104,6 +105,8 @@ const preview: Preview = {
   ],
   beforeEach() {
     resetAuthMocks();
+    // One browser query client serves every story; start each one empty.
+    getQueryClient().clear();
   },
 };
 
