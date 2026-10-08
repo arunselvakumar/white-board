@@ -1,4 +1,5 @@
 import { constructionMessaging } from "@repo/auth/construction/server";
+import { renderTeamInvitationEmail } from "@repo/email-templates";
 
 import type {
   InvitationChannels,
@@ -11,23 +12,17 @@ function text(message: InvitationMessage): string {
   return `${message.memberName}, you are invited to join ${message.companyName}${role} on Construction Management. Open ${message.link} and sign in with this number or email to accept.`;
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-/** Plain invitation notices; React Email templates replace them in CM-119. */
+/** Invitation email (React Email, CM-119) and SMS. */
 export const invitationChannels: InvitationChannels = {
-  email: (to, message) =>
-    constructionMessaging.sendEmail({
-      to,
-      subject: `Join ${message.companyName} on Construction Management`,
-      text: text(message),
-      html: `<p>${escapeHtml(text(message))}</p><p><a href="${escapeHtml(message.link)}">Accept the invitation</a></p>`,
-    }),
+  email: async (to, message) => {
+    const rendered = await renderTeamInvitationEmail({
+      companyName: message.companyName,
+      memberName: message.memberName,
+      designationName: message.designationName,
+      joinUrl: message.link,
+    });
+    await constructionMessaging.sendEmail({ to, ...rendered });
+  },
   sms: (to, message) =>
     constructionMessaging.sendSms({
       to,

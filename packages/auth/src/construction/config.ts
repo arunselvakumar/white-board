@@ -1,4 +1,5 @@
 import { prisma } from "@repo/db";
+import { renderCompanyCodeEmail } from "@repo/email-templates";
 import type { BetterAuthOptions } from "better-auth";
 import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -12,7 +13,6 @@ import {
   CONSTRUCTION_COOKIE_PREFIX,
   CONSTRUCTION_LOCAL_ORIGIN,
 } from "./constants";
-import { renderCompanyCodeEmail } from "./emails";
 import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
 import { createSmsSender, type SmsSender } from "./sms";
 import {
@@ -135,7 +135,7 @@ export function createConstructionAuthOptions(
             throw new APIError("BAD_REQUEST", {
               message: "This code type is not available.",
             });
-          const rendered = renderCompanyCodeEmail({
+          const rendered = await renderCompanyCodeEmail({
             code: otp,
             purpose:
               type === "email-verification" ? "verify-email" : "reset-password",
