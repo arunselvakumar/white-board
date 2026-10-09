@@ -160,6 +160,7 @@ export const AddValidatesAndSaves: Story = {
       overtimeWagePerHour: 10_050,
       openingBalance: -50_000,
       weeklyHolidays: [0, 6],
+      workingHoursPerDay: "8",
       labourCategoryId: MASON.id,
       currentProjectId: TOWER.id,
       aadhaar: null,
@@ -167,6 +168,56 @@ export const AddValidatesAndSaves: Story = {
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith("/app/masters/labours"),
     );
+  },
+};
+
+/**
+ * Working hours per day (ADR CM-0011): 8 unless changed, more than 0 and at
+ * most 24 with two places, sent as typed.
+ */
+export const WorkingHoursPerDay: Story = {
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        method: "POST",
+        path: LABOURS,
+        respond: () => Response.json(DHURESH, { status: 201 }),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const hours = await canvas.findByLabelText("Working hours per day");
+    await expect(hours).toHaveValue("8");
+    await expect(
+      canvas.getByText("Time worked beyond this is overtime."),
+    ).toBeVisible();
+
+    await userEvent.type(canvas.getByLabelText("Labour name"), "Ravi Kumar");
+    await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
+    await userEvent.type(canvas.getByLabelText("Wage per day"), "700");
+    await choose(canvas, body, userEvent, "Project", "Tower A");
+
+    const message = "Enter hours more than 0 and at most 24, like 8 or 8.5";
+    for (const wrong of ["0", "24.5", "8.125"]) {
+      await userEvent.clear(hours);
+      await userEvent.type(hours, wrong);
+      await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+      await expect(await canvas.findByText(message)).toBeVisible();
+      await expect(hours).toHaveAttribute("aria-invalid", "true");
+    }
+    await expect(posts()).toBe(0);
+
+    await userEvent.clear(hours);
+    await userEvent.type(hours, "12");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(sent(LABOURS)).toBeDefined());
+    await expect(sent(LABOURS)).toMatchObject({
+      name: "Ravi Kumar",
+      workingHoursPerDay: "12",
+    });
   },
 };
 
@@ -218,7 +269,7 @@ export const EditWithoutFinancial: Story = {
     </StoryQueryClient>
   ),
   beforeEach: () => {
-    const hidden = withoutAmounts(DHURESH);
+    const hidden = { ...withoutAmounts(DHURESH), workingHoursPerDay: "9.5" };
     api = mockFetch([
       ...LOOKUPS,
       {
@@ -259,6 +310,10 @@ export const EditWithoutFinancial: Story = {
     await expect(canvas.queryByLabelText("Wage per day")).toBeNull();
     await expect(canvas.queryByLabelText("Opening balance")).toBeNull();
     await expect(canvas.getByText(/You cannot see wages/)).toBeVisible();
+    // Working hours are not money: shown and kept without Financial.
+    await expect(canvas.getByLabelText("Working hours per day")).toHaveValue(
+      "9.5",
+    );
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();
@@ -282,6 +337,7 @@ export const EditWithoutFinancial: Story = {
     >;
     await expect(update).toMatchObject({
       name: "Dhuresh P.",
+      workingHoursPerDay: "9.5",
       expectedUpdatedAt: DHURESH.updatedAt,
     });
     await expect("wagePerDay" in update).toBe(false);
