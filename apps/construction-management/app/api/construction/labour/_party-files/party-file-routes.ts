@@ -3,7 +3,11 @@ import { StatusCodes } from "http-status-codes";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
-import { imageResponse, readUpload } from "@/app/api/_lib/uploads";
+import {
+  contentDisposition,
+  imageResponse,
+  readUpload,
+} from "@/app/api/_lib/uploads";
 import {
   PARTY_DOCUMENT_MAX_BYTES,
   PARTY_PHOTO_MAX_BYTES,
@@ -44,17 +48,11 @@ async function ownerId(context: IdContext): Promise<string> {
   return parseOrThrow(PartyIdParamsModel.safeParse(await context.params)).id;
 }
 
-/** `content-disposition` with a UTF-8 file name (RFC 6266). */
-function disposition(kind: "inline" | "attachment", fileName: string): string {
-  const ascii = fileName.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
-  return `${kind}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(fileName)}`;
-}
-
 function documentResponse(object: StoredObject, fileName: string): Response {
   const isImage = object.contentType.startsWith("image/");
   const headers = new Headers({
     "content-type": object.contentType,
-    "content-disposition": disposition(
+    "content-disposition": contentDisposition(
       isImage ? "inline" : "attachment",
       fileName,
     ),

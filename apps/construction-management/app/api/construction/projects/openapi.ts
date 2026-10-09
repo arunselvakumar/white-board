@@ -7,6 +7,7 @@ import type {
 
 import { UpdateConstructionProjectsProjectRequestModel } from "./projects/[id]/update/update-project-request-model";
 import { CreateConstructionProjectsProjectRequestModel } from "./projects/create-project-request-model";
+import { ListConstructionProjectsCustomFieldLabelsResponseModel } from "./projects/custom-field-labels/custom-field-labels-models";
 import {
   ListConstructionProjectsProjectsQueryModel,
   ListConstructionProjectsProjectsResponseModel,
@@ -33,9 +34,10 @@ export const projectsOpenApiComponents: OpenApiComponents = {
   CreateConstructionProjectsProjectRequestModel,
   UpdateConstructionProjectsProjectRequestModel,
   ListConstructionProjectsProjectOptionsResponseModel,
+  ListConstructionProjectsCustomFieldLabelsResponseModel,
 };
 
-/** The projects context's routes (CM-204). */
+/** The projects context's routes (CM-204, CM-413). */
 export const projectsOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
@@ -53,7 +55,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: BASE,
     summary:
-      "Add a Project (402 PLAN_LIMIT_EXCEEDED beyond the plan; 409 PROJECT_NAME_IN_USE)",
+      "Add a Project with optional contract details and custom fields (402 PLAN_LIMIT_EXCEEDED beyond the plan; 409 PROJECT_NAME_IN_USE)",
     tags: PROJECTS,
     body: CreateConstructionProjectsProjectRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -79,6 +81,17 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "get",
+    path: `${BASE}/custom-field-labels`,
+    summary:
+      "Custom-field labels used on the Company's live Projects, grouped ignoring case, most used first (at most 50)",
+    tags: PROJECTS,
+    successStatus: StatusCodes.OK,
+    successDescription: "Labels for the custom-field name picker",
+    successSchema: ListConstructionProjectsCustomFieldLabelsResponseModel,
+    errors: [...SESSION_ERRORS],
+  },
+  {
+    method: "get",
     path: `${BASE}/{id}`,
     summary: "One Project (404 for a Member not assigned to it)",
     tags: PROJECTS,
@@ -92,7 +105,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/update`,
     summary:
-      "Edit a Project (409 PROJECT_CHANGED when expectedUpdatedAt is stale, PROJECT_NAME_IN_USE)",
+      "Edit a Project; contract details or custom fields left out are kept (409 PROJECT_CHANGED when expectedUpdatedAt is stale, PROJECT_NAME_IN_USE)",
     tags: PROJECTS,
     params: ConstructionProjectsProjectParamsModel,
     body: UpdateConstructionProjectsProjectRequestModel,
@@ -111,7 +124,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/delete`,
     summary:
-      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance or payments point at it)",
+      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance, payments or documents point at it)",
     tags: PROJECTS,
     params: ConstructionProjectsProjectParamsModel,
     successStatus: StatusCodes.NO_CONTENT,

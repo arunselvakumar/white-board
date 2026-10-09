@@ -2,7 +2,7 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { projectHandlers as handlers } from "../../handlers";
+import { projectHandlers as handlers, projectFinancial } from "../../handlers";
 import {
   ConstructionProjectsProjectParamsModel,
   toProjectResponse,
@@ -22,7 +22,10 @@ export async function GET(
       ConstructionProjectsProjectParamsModel.safeParse(await context.params),
     );
     return Response.json(
-      toProjectResponse(await handlers.get(session.access, id)),
+      toProjectResponse(
+        await handlers.get(session.access, id),
+        projectFinancial(session.access),
+      ),
     );
   } catch (error) {
     return mapError(error);

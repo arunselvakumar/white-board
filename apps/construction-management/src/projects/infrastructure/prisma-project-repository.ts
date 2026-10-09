@@ -6,11 +6,29 @@ import {
   calendarDateToDb,
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import { newId } from "@/src/shared-kernel/ids";
 
 import { Project } from "../domain/project";
 import type { ProjectRepository } from "../domain/project-repository";
 
-type Row = Prisma.ConstructionProjectsProjectGetPayload<object>;
+/** Every read brings the custom fields, in their order on the form. */
+const withCustomFields = {
+  customFields: { orderBy: { position: "asc" } },
+} satisfies Prisma.ConstructionProjectsProjectInclude;
+
+type Row = Prisma.ConstructionProjectsProjectGetPayload<{
+  include: typeof withCustomFields;
+}>;
+
+type Tx = Prisma.TransactionClient;
+
+function dateFromDb(value: Date | null) {
+  return value == null ? null : calendarDateFromDb(value);
+}
+
+function dateToDb(value: string | null) {
+  return value == null ? null : calendarDateToDb(value);
+}
 
 export function toProject(row: Row): Project {
   return Project.reconstitute({
@@ -19,8 +37,25 @@ export function toProject(row: Row): Project {
     name: row.name,
     status: row.status,
     address: row.address,
-    startDate: row.startDate == null ? null : calendarDateFromDb(row.startDate),
-    endDate: row.endDate == null ? null : calendarDateFromDb(row.endDate),
+    startDate: dateFromDb(row.startDate),
+    endDate: dateFromDb(row.endDate),
+    clientName: row.clientName,
+    clientPhone: row.clientPhone,
+    tenderRef: row.tenderRef,
+    quotationNo: row.quotationNo,
+    quotationDate: dateFromDb(row.quotationDate),
+    loaNo: row.loaNo,
+    loaDate: dateFromDb(row.loaDate),
+    clientOrderNo: row.clientOrderNo,
+    clientOrderDate: dateFromDb(row.clientOrderDate),
+    agreementNo: row.agreementNo,
+    agreementDate: dateFromDb(row.agreementDate),
+    // At most ₹1,000 crore in paise, well inside a safe integer.
+    orderValue: row.orderValue == null ? null : Number(row.orderValue),
+    customFields: row.customFields.map(({ label, value }) => ({
+      label,
+      value,
+    })),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     createdBy: row.createdBy,
@@ -30,14 +65,45 @@ export function toProject(row: Row): Project {
 }
 
 function detailsData(project: Project) {
+  const contract = project.contract;
   return {
     name: project.name,
     status: project.status,
     address: project.address,
-    startDate:
-      project.startDate == null ? null : calendarDateToDb(project.startDate),
-    endDate: project.endDate == null ? null : calendarDateToDb(project.endDate),
+    startDate: dateToDb(project.startDate),
+    endDate: dateToDb(project.endDate),
+    clientName: contract.clientName,
+    clientPhone: contract.clientPhone,
+    tenderRef: contract.tenderRef,
+    quotationNo: contract.quotationNo,
+    quotationDate: dateToDb(contract.quotationDate),
+    loaNo: contract.loaNo,
+    loaDate: dateToDb(contract.loaDate),
+    clientOrderNo: contract.clientOrderNo,
+    clientOrderDate: dateToDb(contract.clientOrderDate),
+    agreementNo: contract.agreementNo,
+    agreementDate: dateToDb(contract.agreementDate),
+    orderValue:
+      contract.orderValue == null ? null : BigInt(contract.orderValue),
   };
+}
+
+/** The custom fields are saved with the Project: the whole list each time. */
+async function writeCustomFields(tx: Tx, project: Project): Promise<void> {
+  await tx.constructionProjectsCustomField.deleteMany({
+    where: { projectId: project.id, workspaceId: project.workspaceId },
+  });
+  if (project.customFields.length === 0) return;
+  await tx.constructionProjectsCustomField.createMany({
+    data: project.customFields.map((field, position) => ({
+      id: newId(),
+      workspaceId: project.workspaceId,
+      projectId: project.id,
+      label: field.label,
+      value: field.value,
+      position,
+    })),
+  });
 }
 
 function nameInUse(error: unknown): unknown {
@@ -59,6 +125,7 @@ export class PrismaProjectRepository implements ProjectRepository {
   async findById(workspaceId: string, id: string): Promise<Project | null> {
     const row = await this.db.constructionProjectsProject.findFirst({
       where: { id, workspaceId, deletedAt: null },
+      include: withCustomFields,
     });
     return row == null ? null : toProject(row);
   }
@@ -75,6 +142,7 @@ export class PrismaProjectRepository implements ProjectRepository {
         ...(ids == null ? {} : { id: { in: [...ids] } }),
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
+      include: withCustomFields,
     });
     return rows.map(toProject);
   }
@@ -93,6 +161,7 @@ export class PrismaProjectRepository implements ProjectRepository {
             updatedBy: project.updatedBy,
           },
         });
+        await writeCustomFields(tx, project);
         await recordAudit(tx, audit);
       });
     } catch (error) {
@@ -126,6 +195,7 @@ export class PrismaProjectRepository implements ProjectRepository {
             "PROJECT_CHANGED",
             "Someone else changed this Project after you opened it. Reload to see their changes.",
           );
+        await writeCustomFields(tx, project);
         await recordAudit(tx, audit);
       });
     } catch (error) {

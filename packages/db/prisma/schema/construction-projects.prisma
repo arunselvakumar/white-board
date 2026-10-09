@@ -16,22 +16,103 @@ enum ConstructionProjectsProjectStatus {
 /// A site the Company builds. Names are unique among a Company's live
 /// Projects (partial index in the migration).
 model ConstructionProjectsProject {
-  id          String                            @id @db.Uuid
-  workspaceId String                            @map("workspace_id")
-  name        String
-  status      ConstructionProjectsProjectStatus @default(ongoing)
-  address     String?
+  id              String                            @id @db.Uuid
+  workspaceId     String                            @map("workspace_id")
+  name            String
+  status          ConstructionProjectsProjectStatus @default(ongoing)
+  address         String?
   /// Calendar dates in the Company time zone.
-  startDate   DateTime?                         @map("start_date") @db.Date
-  endDate     DateTime?                         @map("end_date") @db.Date
-  createdAt   DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt   DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy   String                            @map("created_by")
-  updatedBy   String                            @map("updated_by")
-  deletedAt   DateTime?                         @map("deleted_at") @db.Timestamptz(3)
-  deletedBy   String?                           @map("deleted_by")
+  startDate       DateTime?                         @map("start_date") @db.Date
+  endDate         DateTime?                         @map("end_date") @db.Date
+  /// Contract details (CM-413): who gave the work and the papers that
+  /// gave it — all optional. Dates are calendar dates.
+  clientName      String?                           @map("client_name")
+  /// E.164 Indian mobile, `+91…`.
+  clientPhone     String?                           @map("client_phone")
+  tenderRef       String?                           @map("tender_ref")
+  quotationNo     String?                           @map("quotation_no")
+  quotationDate   DateTime?                         @map("quotation_date") @db.Date
+  loaNo           String?                           @map("loa_no")
+  loaDate         DateTime?                         @map("loa_date") @db.Date
+  /// The Client Order: the PO / WO the client issued to the Company. Not
+  /// the Purchase Order the Company sends a supplier (CM-504).
+  clientOrderNo   String?                           @map("client_order_no")
+  clientOrderDate DateTime?                         @map("client_order_date") @db.Date
+  agreementNo     String?                           @map("agreement_no")
+  agreementDate   DateTime?                         @map("agreement_date") @db.Date
+  /// Value of the Client Order excluding GST, in paise (Financial).
+  orderValue      BigInt?                           @map("order_value")
+  createdAt       DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String                            @map("created_by")
+  updatedBy       String                            @map("updated_by")
+  deletedAt       DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?                           @map("deleted_by")
+
+  customFields ConstructionProjectsCustomField[]
+  documents    ConstructionProjectsDocument[]
 
   @@index([workspaceId, status])
   @@map("projects")
+  @@schema("construction_projects")
+}
+
+/// A field the Company named itself on one Project (CM-413), e.g. "Site
+/// engineer". Saved with the Project: an edit replaces the whole list.
+/// Labels are unique per Project ignoring case (index in the migration).
+model ConstructionProjectsCustomField {
+  id          String @id @db.Uuid
+  workspaceId String @map("workspace_id")
+  projectId   String @map("project_id") @db.Uuid
+  label       String
+  value       String
+  /// Order on the form, from 0.
+  position    Int
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, position])
+  @@index([workspaceId])
+  @@map("custom_fields")
+  @@schema("construction_projects")
+}
+
+/// Which paper a Project document is a copy of (CM-414).
+enum ConstructionProjectsDocumentKind {
+  tender
+  quotation
+  loa
+  client_order
+  agreement
+  other
+
+  @@map("document_kind")
+  @@schema("construction_projects")
+}
+
+/// A file kept on a Project (CM-414): a scan of the work order, the signed
+/// agreement, a BOQ. Any type but executables, at most 25 MB; the object
+/// is private storage at `file_key` (a `stored_files` row).
+model ConstructionProjectsDocument {
+  id          String                           @id @db.Uuid
+  workspaceId String                           @map("workspace_id")
+  projectId   String                           @map("project_id") @db.Uuid
+  kind        ConstructionProjectsDocumentKind
+  fileKey     String                           @unique @map("file_key")
+  fileName    String                           @map("file_name")
+  /// The type we serve it as, found from its content: a PDF, PNG, JPEG or
+  /// WebP is shown in the browser; anything else is application/octet-stream
+  /// and always downloads.
+  contentType String                           @map("content_type")
+  bytes       Int
+  createdAt   DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String                           @map("created_by")
+  deletedAt   DateTime?                        @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                          @map("deleted_by")
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, projectId, deletedAt])
+  @@map("documents")
   @@schema("construction_projects")
 }

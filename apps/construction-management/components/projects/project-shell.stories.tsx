@@ -51,12 +51,14 @@ export const Overview: Story = {
     const links = tabs.getAllByRole("link");
     await expect(links.map((link) => link.textContent)).toEqual([
       "Overview",
+      "Documents",
       "Attendance",
       "Payments",
       "Reports",
     ]);
     await expect(links.map((link) => link.getAttribute("href"))).toEqual([
       PATH,
+      `${PATH}/documents`,
       `${PATH}/attendance`,
       `${PATH}/payments`,
       `${PATH}/reports`,

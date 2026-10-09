@@ -540,6 +540,7 @@ describe("Projects HTTP (CM-204)", () => {
       ["/api/construction/projects/projects", "get"],
       ["/api/construction/projects/projects", "post"],
       ["/api/construction/projects/projects/options", "get"],
+      ["/api/construction/projects/projects/custom-field-labels", "get"],
       ["/api/construction/projects/projects/{id}", "get"],
       ["/api/construction/projects/projects/{id}/update", "post"],
       ["/api/construction/projects/projects/{id}/delete", "post"],

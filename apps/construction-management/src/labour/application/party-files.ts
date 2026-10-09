@@ -2,6 +2,7 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 import {
   checkImage,
+  cleanFileName,
   companyFileKey,
   type NewStoredFile,
   type ObjectStorage,
@@ -95,20 +96,6 @@ export const partyPhotoNotFound = () =>
 
 export const partyDocumentNotFound = () =>
   notFound("DOCUMENT_NOT_FOUND", "This document was not found.");
-
-/** A safe file name to show and to send back in `content-disposition`. */
-export function cleanFileName(raw: string | null, extension: string): string {
-  const last = (raw ?? "").split(/[\\/]/).at(-1) ?? "";
-  // No control characters or quotes: the name goes into a header.
-  let base = "";
-  for (let index = 0; index < last.length; index += 1) {
-    const code = last.charCodeAt(index);
-    if (code >= 0x20 && code !== 0x7f && code !== 0x22)
-      base += last.charAt(index);
-  }
-  base = base.trim().slice(0, 200);
-  return base.length === 0 ? `document.${extension}` : base;
-}
 
 /**
  * Photo and "Other Documents" of a labourer or a vendor (CM-205, CM-208):

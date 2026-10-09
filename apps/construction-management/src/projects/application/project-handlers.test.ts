@@ -10,6 +10,7 @@ import {
 
 import type { Project } from "../domain/project";
 import type {
+  ProjectCustomFieldLabels,
   ProjectRepository,
   ProjectUsage,
 } from "../domain/project-repository";
@@ -94,10 +95,18 @@ function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
   const usage: ProjectUsage = {
     isInUse: (_workspaceId, projectId) => Promise.resolve(used.has(projectId)),
   };
+  const asked: { workspaceId: string; limit: number }[] = [];
+  const labels: ProjectCustomFieldLabels = {
+    list: (workspaceId, limit) => {
+      asked.push({ workspaceId, limit });
+      return Promise.resolve(["Site engineer", "Client architect"]);
+    },
+  };
   const handlers = new ProjectHandlers(
     repository,
     options.plan ?? UNLIMITED_PLAN,
     usage,
+    labels,
     clock,
   );
   const add = (name: string, status?: string) =>
@@ -105,8 +114,9 @@ function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
       workspaceId: "company-1",
       by: "owner",
       details: { name, status },
+      financial: true,
     });
-  return { handlers, repository, used, add };
+  return { handlers, repository, used, add, asked };
 }
 
 describe("ProjectHandlers", () => {
@@ -182,6 +192,7 @@ describe("ProjectHandlers", () => {
       id: created.id,
       by: "owner",
       details: { name: "Kumari Heights", status: "on_hold" },
+      financial: true,
       expectedUpdatedAt: created.updatedAt,
     });
     expect(updated.status).toBe("on_hold");
@@ -197,6 +208,7 @@ describe("ProjectHandlers", () => {
         id: created.id,
         by: "owner",
         details: { name: "Kumari Heights", status: "completed" },
+        financial: true,
         expectedUpdatedAt: created.updatedAt,
       }),
     ).rejects.toMatchObject({ code: "PROJECT_CHANGED", kind: "conflict" });
@@ -220,5 +232,110 @@ describe("ProjectHandlers", () => {
     await expect(add("Kumari Heights")).resolves.toMatchObject({
       name: "Kumari Heights",
     });
+  });
+
+  it("sets the order value only with the Financial flag", async () => {
+    const { handlers } = setup();
+    const create = (financial: boolean) =>
+      handlers.create({
+        workspaceId: "company-1",
+        by: "owner",
+        details: {
+          name: financial ? "Kumari Heights" : "Asaripallam Tower",
+          clientName: "Sri Balaji Developers",
+          orderValue: 4_85_00_000_00,
+        },
+        financial,
+      });
+    expect(await create(true)).toMatchObject({ orderValue: 4_85_00_000_00 });
+    // Without Financial the value is dropped, the rest is saved.
+    expect(await create(false)).toMatchObject({
+      clientName: "Sri Balaji Developers",
+      orderValue: null,
+    });
+  });
+
+  it("keeps the stored order value when a caller without Financial edits", async () => {
+    const { handlers, repository } = setup();
+    const created = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: { name: "Kumari Heights", orderValue: 4_85_00_000_00 },
+      financial: true,
+    });
+    const kept = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "member",
+      details: {
+        name: "Kumari Heights",
+        status: "ongoing",
+        orderValue: 1,
+        quotationNo: "SBD/Q/2026/114",
+      },
+      financial: false,
+      expectedUpdatedAt: created.updatedAt,
+    });
+    expect(kept).toMatchObject({
+      orderValue: 4_85_00_000_00,
+      quotationNo: "SBD/Q/2026/114",
+    });
+    // Not even null clears it.
+    const stillKept = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "member",
+      details: { name: "Kumari Heights", status: "ongoing", orderValue: null },
+      financial: false,
+      expectedUpdatedAt: kept.updatedAt,
+    });
+    expect(stillKept.orderValue).toBe(4_85_00_000_00);
+    const cleared = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: { name: "Kumari Heights", status: "ongoing", orderValue: null },
+      financial: true,
+      expectedUpdatedAt: stillKept.updatedAt,
+    });
+    expect(cleared.orderValue).toBeNull();
+    expect(repository.audits.at(-1)).toMatchObject({
+      before: { orderValue: 4_85_00_000_00 },
+      after: { orderValue: null },
+    });
+  });
+
+  it("audits the contract details and custom fields", async () => {
+    const { handlers, repository } = setup();
+    await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: {
+        name: "Kumari Heights",
+        clientPhone: "98431 22110",
+        loaDate: "2026-03-05",
+        customFields: [{ label: "Site engineer", value: "Prabhu Saravanan" }],
+      },
+      financial: true,
+    });
+    expect(repository.audits.at(-1)).toMatchObject({
+      action: "project.created",
+      after: {
+        name: "Kumari Heights",
+        clientPhone: "+919843122110",
+        loaDate: "2026-03-05",
+        orderValue: null,
+        customFields: [{ label: "Site engineer", value: "Prabhu Saravanan" }],
+      },
+    });
+  });
+
+  it("asks for at most 50 custom-field labels of the Company", async () => {
+    const { handlers, asked } = setup();
+    expect(await handlers.customFieldLabels(OWNER)).toEqual([
+      "Site engineer",
+      "Client architect",
+    ]);
+    expect(asked).toEqual([{ workspaceId: "company-1", limit: 50 }]);
   });
 });

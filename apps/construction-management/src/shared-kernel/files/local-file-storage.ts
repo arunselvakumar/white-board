@@ -1,7 +1,7 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { ObjectStorage, StoredObject } from "./object-storage";
+import type { ObjectHead, ObjectStorage, StoredObject } from "./object-storage";
 
 const SAFE_KEY =
   /^[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
@@ -48,6 +48,21 @@ export class LocalFileStorage implements ObjectStorage {
         contentType,
         contentLength: bytes.byteLength,
       };
+    } catch (error) {
+      if (isMissing(error)) return null;
+      throw error;
+    }
+  }
+
+  async head(key: string): Promise<ObjectHead | null> {
+    const file = this.pathOf(key);
+    try {
+      const [info, meta] = await Promise.all([
+        stat(file),
+        readFile(`${file}.meta.json`, "utf8"),
+      ]);
+      const { contentType } = JSON.parse(meta) as { contentType: string };
+      return { bytes: info.size, contentType };
     } catch (error) {
       if (isMissing(error)) return null;
       throw error;

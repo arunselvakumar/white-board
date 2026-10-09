@@ -32,6 +32,15 @@ Who uses it:
 - Save: `Project/Store` (legacy), `v2/projects/{id}` (read/update).
 - The record also carries `useProjectLogoInReport` and `noOfPhase`.
 
+**Contract Details, Custom Fields and Documents (CM-413, CM-414, [ADR CM-0010](../adr/CM-0010-project-contract-details-and-documents.md)).** These are not in the legacy app. The owner asked for them on 2026-10-09. The rebuilt form groups the Project into four cards:
+
+- **Project:** the existing fields, the only required card.
+- **Client:** name and mobile.
+- **Contract:** Order Value (₹, excluding GST), then one row per paper with its number, date and attached files. The rows are Tender / RFQ ref., Quotation, LOA, PO / WO and Agreement. Quotation and PO / WO always show; the others appear on demand.
+- **Additional details:** Custom Fields as name and value pairs, with names suggested from other Projects.
+
+The optional cards start collapsed and show a one-line summary. Every field in the Client, Contract and Additional details cards is optional; the Project card keeps its required name and status. A **Documents** tab in the project shell lists every file grouped by paper, with view (PDFs and images only), download and delete. Files picked on Add Project upload once the Project is saved.
+
 ### Project options menu
 
 - **View project details**.
@@ -163,6 +172,16 @@ Task uses "Location Type / Wing / Locations"; MR uses "Location Type / Wing / Lo
 | vendorDetailIds        | FK[] → Vendor                                        | no       | Resources.                                                                               |
 | contactIds             | FK[] → Contact                                       | no       | Resources (`Contact/GetAll`).                                                            |
 | progressPct            | decimal(5,2)                                         | system   | Shown on card; source likely Task progress (inferred).                                   |
+| clientName             | string ≤ 120                                         | no       | Client. Who gave the work (CM-413, ADR CM-0010).                                         |
+| clientPhone            | E.164 Indian mobile                                  | no       | Client's mobile.                                                                         |
+| tenderRef              | string ≤ 60                                          | no       | "Tender / RFQ ref." — the client's tender or RFQ number.                                 |
+| quotationNo / Date     | string ≤ 60 / date                                   | no       | The Company's Quotation to the client.                                                   |
+| loaNo / Date           | string ≤ 60 / date                                   | no       | Letter of Award (government and EPC work).                                               |
+| clientOrderNo / Date   | string ≤ 60 / date                                   | no       | "PO / WO" — the Client Order. Not the procurement Purchase Order (06).                   |
+| agreementNo / Date     | string ≤ 60 / date                                   | no       | The signed contract agreement.                                                           |
+| orderValue             | paise (bigint)                                       | no       | Client Order value excluding GST; Financial flag only.                                   |
+| customFields           | {label, value}[] ≤ 20                                | no       | Per-Project fields the Company names; labels unique ignoring case.                       |
+| documents              | ProjectDocument[] ≤ 50                               | no       | Files filed under tender / quotation / loa / client_order / agreement / other (CM-414).  |
 
 ### ProjectType
 
