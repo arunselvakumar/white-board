@@ -1,0 +1,25 @@
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_bb60ced25b0bff::t_4372ae34e812d5 71
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_bb60ced25b0bff::t_e3e7954cfea4d5 72
+apps/whiteboard/components/dashboard/owner-dashboard.stories.tsx
+  s_bb60ced25b0bff::t_84cd932bdfb1cb 60,65,110,128-129
+apps/whiteboard/components/dashboard/owner-dashboard.tsx
+  s_bb60ced25b0bff::t_356cd21619a47b 46,210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "07cfe8d263d9368a46ba98229e3c04fd02249cbb",
+  "prompts": {},
+  "sessions": {
+    "s_bb60ced25b0bff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f499a6f7-38c8-4c12-ba8c-83f7c7656605",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
