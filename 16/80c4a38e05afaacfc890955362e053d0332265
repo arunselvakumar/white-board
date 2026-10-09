@@ -1,0 +1,99 @@
+apps/construction-management/CONTEXT.md
+  s_ec41e28a857a0b::t_2f8c5ffdda3c75 148-149
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_a9d2cdf1371ec2 188,681-682,684
+apps/construction-management/app/api/_lib/require-plan-active.ts
+  s_ec41e28a857a0b::t_a527101b54a12f 8-10
+apps/construction-management/app/api/construction/organization/companies/companies.http.test.ts
+  s_ec41e28a857a0b::t_16bb32f8505b6a 55
+apps/construction-management/app/api/construction/organization/subscription/get-subscription-response-model.ts
+  s_ec41e28a857a0b::t_e9866af1cad492 6-19,24-28
+apps/construction-management/app/api/construction/organization/subscription/route.ts
+  s_ec41e28a857a0b::t_4bd5ef5f302308 17-18,29-36
+apps/construction-management/app/api/construction/organization/subscription/subscription.http.test.ts
+  s_ec41e28a857a0b::t_0423a5f1fe499d 20,135-136,151,158-160,164-167,178-195,327,364,460-461,496-522,525,562,594-597
+apps/construction-management/app/api/construction/projects/projects/projects.http.test.ts
+  s_ec41e28a857a0b::t_6819e2bc2a17e6 10-15,276
+apps/construction-management/components/app-shell/plan-banner.stories.tsx
+  s_ec41e28a857a0b::t_909f7094925f14 6,9,23,26,30,32-35,60,73-84
+apps/construction-management/components/app-shell/plan-banner.tsx
+  s_ec41e28a857a0b::t_1890df5d3c5279 21-22,24-25,30-33,37,51-54
+apps/construction-management/components/auth/sign-up-form.tsx
+  s_ec41e28a857a0b::t_c93eae09a5df4a 25
+apps/construction-management/components/onboarding/create-company-wizard.tsx
+  s_ec41e28a857a0b::t_25eec5141f68e5 115,152,176
+apps/construction-management/components/subscription/checkout-wizard.stories.tsx
+  s_ec41e28a857a0b::t_382d37b39473e4 13,56,60,189
+apps/construction-management/components/subscription/checkout-wizard.tsx
+  s_ec41e28a857a0b::t_7d51af33b7836b 143,207,241,448-450,485
+apps/construction-management/components/subscription/subscription-overview.stories.tsx
+  s_ec41e28a857a0b::t_e6a634caba6a42 13,29,32,38,43-46
+apps/construction-management/components/subscription/subscription-overview.tsx
+  s_ec41e28a857a0b::t_f5e1689fe3e338 85-106,117,119,124,126,133,209-268,278,295-299
+apps/construction-management/components/subscription/subscription-story-fixtures.ts
+  s_ec41e28a857a0b::t_60da246ff00668 22-26,38-45,50,63-75,78-93,97,248-249
+apps/construction-management/docs/adr/CM-0009-email-sign-in-while-sms-is-off.md
+  s_ec41e28a857a0b::t_cebfafacd79a3e 32
+apps/construction-management/docs/modules/01-organization-identity-access.md
+  s_ec41e28a857a0b::t_8654d7d6cf2646 630
+apps/construction-management/docs/modules/13-chat-notifications-support.md
+  s_ec41e28a857a0b::t_6c8cbbc43e9edc 252-260,409
+apps/construction-management/docs/prd/handoff/M1.md
+  s_ec41e28a857a0b::t_1457d7a2c994b2 6,15,25,70
+apps/construction-management/docs/prd/handoff/M2.md
+  s_ec41e28a857a0b::t_358031d9da0812 5,7,13,73-75
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_54b2e4f2dc3821 48,138-140,161,180,231,233,240,250,265
+apps/construction-management/src/organization/application/create-company.test.ts
+  s_ec41e28a857a0b::t_03ea15c6426b55 65
+apps/construction-management/src/organization/application/create-company.ts
+  s_ec41e28a857a0b::t_edc66b9edd8e7b 39-40,82
+apps/construction-management/src/organization/application/subscription-handlers.ts
+  s_ec41e28a857a0b::t_3ae13fee238ac7 11,28-32,34-42,111,115,121-130,133-140,161,246-253
+apps/construction-management/src/organization/application/subscription-plan-gate.test.ts
+  s_ec41e28a857a0b::t_d8537331bfbfac 26-27,31,43,50,66,70,74-76
+apps/construction-management/src/organization/application/subscription-plan-gate.ts
+  s_ec41e28a857a0b::t_52bae7056bedc0 15-16
+apps/construction-management/src/organization/application/subscription-ports.ts
+  s_ec41e28a857a0b::t_8169a69673577b 29-31,37-40
+apps/construction-management/src/organization/domain/checkout.ts
+  s_ec41e28a857a0b::t_4ff202f1d27efb 9,89-92,95,103,109-115,152,164-167,170,172-173,177-179,181-182,191,196-198,200
+apps/construction-management/src/organization/domain/events.ts
+  s_ec41e28a857a0b::t_4842dae59a1378 3
+apps/construction-management/src/organization/domain/new-company.ts
+  s_ec41e28a857a0b::t_84bfec4f0c0eef 20-22
+apps/construction-management/src/organization/domain/subscription.test.ts
+  s_ec41e28a857a0b::t_a1a1161bfa3294 92,106-108,151,170,180,190,196-212,275-288,290,297-324
+apps/construction-management/src/organization/domain/subscription.ts
+  s_ec41e28a857a0b::t_db606c9c3b9a5c 7-10,48-50,63,68-89,91,141,170
+apps/construction-management/src/organization/domain/usage.ts
+  s_ec41e28a857a0b::t_49969836b2dd76 12-17,22,28
+apps/construction-management/src/organization/infrastructure/create-company.http.test.ts
+  s_ec41e28a857a0b::t_c3bbaa5a6c9ada 23,50-51,53-54
+apps/construction-management/src/organization/infrastructure/prisma-new-company-store.ts
+  s_ec41e28a857a0b::t_a3aad7b5d4d435 48
+apps/construction-management/src/organization/infrastructure/prisma-subscription-repository.ts
+  s_ec41e28a857a0b::t_5e4f1769eef049 171-174,196-200,202-224,256-257
+apps/construction-management/test/companies.ts
+  s_ec41e28a857a0b::t_b43dc3b932984b 9,102-123
+packages/db/prisma/migrations/20261010030000_construction_remove_trial/migration.sql
+  s_ec41e28a857a0b::t_0f14dc0738eea5 1-12
+packages/db/prisma/schema/construction-organization.prisma
+  s_ec41e28a857a0b::t_936347a461f1f3 59-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1680c4a38e05afaacfc890955362e053d0332265",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
