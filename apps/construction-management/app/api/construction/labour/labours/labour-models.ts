@@ -27,6 +27,8 @@ export const ConstructionLabourLabourResponseModel = z.object({
   wagePerMonth: paise.nullable(),
   /** Null without Financial. */
   overtimeWagePerHour: paise.nullable(),
+  /** Decimal hours a day; time worked beyond it is overtime (ADR CM-0011). */
+  workingHoursPerDay: z.string(),
   /** 0 = Sunday … 6 = Saturday. */
   weeklyHolidays: z.array(z.int().min(0).max(6)),
   /** Signed: negative is an advance given before the app. Null without Financial. */
@@ -72,6 +74,7 @@ export function toLabourResponse(
     wagePerDay: money(details.wagePerDay),
     wagePerMonth: money(details.wagePerMonth),
     overtimeWagePerHour: money(details.overtimeWagePerHour),
+    workingHoursPerDay: details.workingHoursPerDay,
     weeklyHolidays: details.weeklyHolidays,
     openingBalance: money(item.openingBalance),
     balance: money(item.balance),
@@ -103,6 +106,14 @@ const labourFields = {
   joiningDate: z.string().describe("Calendar date, YYYY-MM-DD."),
   wageType: z.enum(["daily", "monthly"]),
   weeklyHolidays: z.array(z.int()).max(7).optional(),
+  /**
+   * Decimal hours a day, 0 < h ≤ 24, two places at most. Leave out (or
+   * null) for 8 on create, to keep the stored value on update.
+   */
+  workingHoursPerDay: z
+    .union([z.string().max(12), z.number()])
+    .nullable()
+    .optional(),
   uanNumber: optionalText,
   esicNumber: optionalText,
   labourCategoryId: z.uuid().nullable().optional(),
@@ -235,6 +246,8 @@ export const ConstructionLabourLabourOptionResponseModel = z.object({
   supervisorId: z.uuid().nullable(),
   wageType: z.enum(["daily", "monthly"]),
   weeklyHolidays: z.array(z.int()),
+  /** Decimal hours a day (ADR CM-0011). */
+  workingHoursPerDay: z.string(),
   /** Null without Financial on `labour.labour`. */
   wagePerDay: paise.nullable(),
   wagePerMonth: paise.nullable(),

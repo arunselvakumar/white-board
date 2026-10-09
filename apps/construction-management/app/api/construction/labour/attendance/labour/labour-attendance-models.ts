@@ -22,6 +22,10 @@ const STATUSES = [
 
 const status = z.enum(STATUSES);
 
+const timeOfDay = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM, 00:00 to 23:59.");
+
 // Requests
 
 export const GetConstructionLabourLabourAttendanceSheetRequestModel = z.object({
@@ -46,14 +50,33 @@ export const MarkConstructionLabourLabourAttendanceRequestModel = z.object({
         shift: z.string().max(40).nullable().optional(),
         /** Snapshot; leave out to use the labourer's own Supervisor. */
         supervisorId: z.uuid().nullable().optional(),
+        /** `HH:MM` (24-hour, Company time); only on `present` or `half_day`. */
+        checkIn: timeOfDay.nullable().optional(),
+        /** `HH:MM`; needs `checkIn`. At or before `checkIn` is the next day. */
+        checkOut: timeOfDay.nullable().optional(),
+        /** Unpaid break in minutes, 0–720; 60 when left out with a check-in. */
+        breakMinutes: z.int().min(0).max(720).nullable().optional(),
         overtime: z
           .array(
             z.object({
               labourCategoryId: z.uuid().nullable(),
-              /** Decimal hours, 0 < h ≤ 24, two places at most. */
-              hours: z.union([z.string().max(12), z.number()]),
+              /**
+               * Decimal hours, 0 < h ≤ 24, two places at most. Required
+               * unless `fromTimes`.
+               */
+              hours: z
+                .union([z.string().max(12), z.number()])
+                .nullable()
+                .optional(),
               /** Paise per hour; leave out for the labourer's overtime wage. */
               ratePerHour: z.int().nullable().optional(),
+              /**
+               * The server works the hours out from check-in, check-out,
+               * break and the Labour's working hours (ADR CM-0011); the line
+               * is dropped while there is no check-out or no extra time. At
+               * most one per day.
+               */
+              fromTimes: z.boolean().optional(),
             }),
           )
           .max(10)
@@ -137,6 +160,8 @@ export const ConstructionLabourLabourAttendanceOvertimeResponseModel = z.object(
     hours: z.string(),
     ratePerHour: money,
     amount: money,
+    /** Hours worked out from the day's times (ADR CM-0011). */
+    fromTimes: z.boolean(),
   },
 );
 
@@ -151,6 +176,16 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   isPaidLeave: z.boolean(),
   shift: z.string().nullable(),
   supervisor: ref.nullable(),
+  /** `HH:MM`, or null. */
+  checkIn: z.string().nullable(),
+  /** `HH:MM`, or null; at or before `checkIn` is the next day. */
+  checkOut: z.string().nullable(),
+  /** Unpaid break in minutes; null without a check-in. */
+  breakMinutes: z.int().nullable(),
+  /** Snapshot of the Labour's working hours a day (decimal hours). */
+  workingHours: z.string(),
+  /** check-out − check-in − break, decimal hours; null without both times. */
+  workedHours: z.string().nullable(),
   wageType: z.enum(["daily", "monthly"]),
   /** Snapshot wage per day or per month. */
   wageRate: money,
@@ -195,6 +230,8 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
         wagePerMonth: money,
         /** The default rate of a new overtime line. */
         overtimeWagePerHour: money,
+        /** Decimal hours a day; time worked beyond it is overtime. */
+        workingHoursPerDay: z.string().nullable(),
         /** Active and on this Project on the date. */
         canMark: z.boolean(),
         isActive: z.boolean(),
@@ -207,6 +244,9 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
             status,
             isPaidLeave: z.boolean(),
             shift: z.string().nullable(),
+            checkIn: z.string().nullable(),
+            checkOut: z.string().nullable(),
+            breakMinutes: z.int().nullable(),
           })
           .nullable(),
         attendance:
@@ -323,6 +363,11 @@ export function toLabourAttendanceDayResponse(
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
     supervisor: day.supervisor,
+    checkIn: day.checkIn,
+    checkOut: day.checkOut,
+    breakMinutes: day.breakMinutes,
+    workingHours: day.workingHours,
+    workedHours: day.workedHours,
     wageType: day.wageType,
     wageRate: amount(day.wageRate, financial),
     earned: amount(day.earned, financial),
@@ -332,6 +377,7 @@ export function toLabourAttendanceDayResponse(
       hours: line.hours,
       ratePerHour: amount(line.ratePerHour, financial),
       amount: amount(line.amount, financial),
+      fromTimes: line.fromTimes,
     })),
     overtimeHours: day.overtimeHours,
     overtimeAmount: amount(day.overtimeAmount, financial),

@@ -291,6 +291,7 @@ Goal: the daily reality of a site — who came, for how long, what they are owed
 | CM-217 |  17 | Reports: All Labour Attendance, All Labour Payment, Month-wise Labour, Vendor Attendance (Excel/PDF jobs)                                                                    | done   | CM-214         | HTTP+UI        |       |
 | CM-218 |  18 | Muster roll export (Form XVI/XVII combined register) per contractor/project per month                                                                                        | done   | CM-217         | HTTP           |       |
 | CM-219 |  19 | M2 polish: dashboard widgets (labours present, labour/vendor payment status), empty states, Storybook                                                                        | done   | CM-216, CM-217 | UI             |       |
+| CM-220 |  20 | Labour attendance check-in / check-out, break, working hours per Labour (default 8), overtime from times (ADR CM-0011)                                                       | doing  | CM-210, CM-211 | Domain+HTTP+UI |       |
 
 ### CM-201 — ADR CM-0004
 

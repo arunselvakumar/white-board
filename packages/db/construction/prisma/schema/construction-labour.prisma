@@ -39,6 +39,8 @@ model ConstructionLabourLabour {
   wagePerMonth        Int?                       @map("wage_per_month")
   /// Paise.
   overtimeWagePerHour Int                        @map("overtime_wage_per_hour")
+  /// Hours a day; time worked beyond it is overtime (ADR CM-0011).
+  workingHoursPerDay  Decimal                    @default(8) @map("working_hours_per_day") @db.Decimal(4, 2)
   /// Weekdays off, 0 = Sunday … 6 = Saturday.
   weeklyHolidays      Int[]                      @map("weekly_holidays")
   uanNumber           String?                    @map("uan_number") @db.VarChar(12)
@@ -122,6 +124,14 @@ model ConstructionLabourAttendance {
   isPaidLeave    Boolean                            @default(false) @map("is_paid_leave")
   shift          String?
   supervisorId   String?                            @map("supervisor_id") @db.Uuid
+  /// `HH:MM`, Company time; only on Present or Half Day (ADR CM-0011).
+  checkIn        String?                            @map("check_in") @db.Char(5)
+  /// `HH:MM`; at or before `check_in` means the next day.
+  checkOut       String?                            @map("check_out") @db.Char(5)
+  /// Unpaid break in minutes; set when there is a check-in.
+  breakMinutes   Int?                               @map("break_minutes")
+  /// The Labour's working hours a day, as on the day it was marked.
+  workingHours   Decimal                            @default(8) @map("working_hours") @db.Decimal(4, 2)
   wageType       ConstructionLabourWageType         @map("wage_type")
   /// Paise: wage per day, or wage per month, as on the day it was marked.
   wageRate       Int                                @map("wage_rate")
@@ -154,6 +164,8 @@ model ConstructionLabourOvertime {
   ratePerHour      Int     @map("rate_per_hour")
   /// Paise: hours × rate, rounded half up.
   amount           Int
+  /// Hours worked out from check-in, check-out and break (ADR CM-0011).
+  fromTimes        Boolean @default(false) @map("from_times")
 
   attendance ConstructionLabourAttendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
 

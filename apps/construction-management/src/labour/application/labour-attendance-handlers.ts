@@ -179,6 +179,8 @@ export type LabourOvertimeReadModel = {
   hours: string;
   ratePerHour: number;
   amount: number;
+  /** Hours worked out from the day's times (ADR CM-0011). */
+  fromTimes: boolean;
 };
 
 export type LabourAttendanceDayReadModel = {
@@ -192,6 +194,13 @@ export type LabourAttendanceDayReadModel = {
   isPaidLeave: boolean;
   shift: string | null;
   supervisor: Ref | null;
+  checkIn: string | null;
+  checkOut: string | null;
+  breakMinutes: number | null;
+  /** Snapshot of the Labour's working hours a day. */
+  workingHours: string;
+  /** check-out − check-in − break; null without both times. */
+  workedHours: string | null;
   wageType: WageCard["wageType"];
   /** Snapshot: wage per day or per month the day was priced at. */
   wageRate: number;
@@ -217,6 +226,8 @@ export type LabourSheetRowReadModel = {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
+  /** Decimal hours a day; null for a labourer no longer listed. */
+  workingHoursPerDay: string | null;
   /** Active and on this Project on the date: the row can be marked. */
   canMark: boolean;
   isActive: boolean;
@@ -230,6 +241,9 @@ export type LabourSheetRowReadModel = {
     status: AttendanceStatus;
     isPaidLeave: boolean;
     shift: string | null;
+    checkIn: string | null;
+    checkOut: string | null;
+    breakMinutes: number | null;
   } | null;
   attendance: LabourAttendanceDayReadModel | null;
 };

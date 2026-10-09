@@ -84,25 +84,39 @@ export function dayEarned(input: {
 
 export const MAX_OVERTIME_HOURS_PER_DAY = 24;
 
-/**
- * Overtime hours as an exact decimal string with at most two places,
- * `0 < hours ≤ 24`.
- */
-export function overtimeHours(raw: string | number): string {
+/** A Labour's working hours per day unless set otherwise (ADR CM-0011). */
+export const DEFAULT_WORKING_HOURS = "8";
+
+/** The unpaid break taken off a day with check-in and check-out. */
+export const DEFAULT_BREAK_MINUTES = 60;
+
+/** The longest break one day may have. */
+export const MAX_BREAK_MINUTES = 720;
+
+/** Hours as hundredths, `0 < hours ≤ 24`, at most two places. */
+function parseHours(raw: string | number, error: () => DomainError): bigint {
   let parsed: { numerator: bigint; scale: number };
   try {
     parsed = parseDecimal(raw);
   } catch {
-    throw invalidHours();
+    throw error();
   }
-  if (parsed.scale > 2) throw invalidHours();
+  if (parsed.scale > 2) throw error();
   const hundredths = divideRounded(
     parsed.numerator * 100n,
     pow10(parsed.scale),
   );
   if (hundredths <= 0n || hundredths > BigInt(MAX_OVERTIME_HOURS_PER_DAY * 100))
-    throw invalidHours();
-  return formatHundredths(hundredths);
+    throw error();
+  return hundredths;
+}
+
+/**
+ * Overtime hours as an exact decimal string with at most two places,
+ * `0 < hours ≤ 24`.
+ */
+export function overtimeHours(raw: string | number): string {
+  return formatHundredths(parseHours(raw, invalidHours));
 }
 
 function invalidHours(): DomainError {
@@ -110,6 +124,97 @@ function invalidHours(): DomainError {
     "OVERTIME_HOURS_INVALID",
     "Overtime hours must be more than 0 and at most 24, in steps of 0.01.",
   );
+}
+
+/**
+ * A Labour's working hours per day (ADR CM-0011): a decimal string with at
+ * most two places, `0 < hours ≤ 24`. Time worked beyond it is overtime.
+ */
+export function workingHours(raw: string | number): string {
+  return formatHundredths(
+    parseHours(
+      raw,
+      () =>
+        new DomainError(
+          "WORKING_HOURS_INVALID",
+          "Working hours must be more than 0 and at most 24, in steps of 0.01.",
+        ),
+    ),
+  );
+}
+
+const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+/** A clock time `HH:MM` (24-hour, Company time), or `TIME_INVALID`. */
+export function timeOfDay(raw: string, field: string): string {
+  const value = raw.trim();
+  if (!TIME_RE.test(value))
+    throw new DomainError(
+      "TIME_INVALID",
+      "Enter a time as HH:MM, from 00:00 to 23:59.",
+      { details: { field } },
+    );
+  return value;
+}
+
+function minutesOf(time: string): number {
+  const [hours = 0, minutes = 0] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Minutes from check-in to check-out. A check-out earlier than the check-in
+ * is on the next day (a night shift), so the span is under 24 hours.
+ */
+export function spanMinutes(checkIn: string, checkOut: string): number {
+  const span = minutesOf(checkOut) - minutesOf(checkIn);
+  return span <= 0 ? span + 24 * 60 : span;
+}
+
+/** The day crosses midnight: check-out is on the next day. */
+export function endsNextDay(checkIn: string, checkOut: string): boolean {
+  return minutesOf(checkOut) <= minutesOf(checkIn);
+}
+
+/** A break is whole minutes, 0 to 720. */
+export function assertBreakMinutes(minutes: number): void {
+  if (!Number.isInteger(minutes) || minutes < 0 || minutes > MAX_BREAK_MINUTES)
+    throw new DomainError(
+      "BREAK_INVALID",
+      `The break is whole minutes from 0 to ${String(MAX_BREAK_MINUTES)}.`,
+      { details: { field: "breakMinutes" } },
+    );
+}
+
+/**
+ * Hours worked and hours beyond the working hours for a day with both
+ * times (ADR CM-0011): worked = check-out − check-in − break, extra =
+ * worked − working hours, both in hundredths of an hour, rounded half up.
+ * `extra` is 0 when the Labour worked their hours or less.
+ */
+export function hoursFromTimes(input: {
+  checkIn: string;
+  checkOut: string;
+  breakMinutes: number;
+  /** Decimal hours. */
+  workingHours: string;
+}): { worked: string; extra: string | null } {
+  const span = spanMinutes(input.checkIn, input.checkOut);
+  assertBreakMinutes(input.breakMinutes);
+  if (input.breakMinutes >= span)
+    throw new DomainError(
+      "BREAK_TOO_LONG",
+      "The break must be shorter than the time from check-in to check-out.",
+      { details: { field: "breakMinutes" } },
+    );
+  const worked = BigInt(span - input.breakMinutes) * 100n;
+  const standard =
+    BigInt(hoursInHundredths(workingHours(input.workingHours))) * 60n;
+  const extra = divideRounded(worked - standard, 60n);
+  return {
+    worked: formatHundredths(divideRounded(worked, 60n)),
+    extra: extra > 0n ? formatHundredths(extra) : null,
+  };
 }
 
 /** Total of several overtime hour strings, as hundredths of an hour. */
