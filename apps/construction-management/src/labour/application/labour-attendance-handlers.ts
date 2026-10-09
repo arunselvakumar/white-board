@@ -377,7 +377,6 @@ function overtimeAmountOf(day: PricedDay): number {
   return day.overtime.reduce((sum, line) => sum + line.amount, 0);
 }
 
-/** A copy of a domain error with `labourId` (and more) added to its details. */
 /** Hours worked on a day with both times (ADR CM-0011), else null. */
 function workedHoursOf(day: PricedDay): string | null {
   if (day.checkIn == null || day.checkOut == null) return null;
@@ -389,6 +388,7 @@ function workedHoursOf(day: PricedDay): string | null {
   }).worked;
 }
 
+/** A copy of a domain error with `labourId` (and more) added to its details. */
 function forLabourer(
   error: unknown,
   labourId: string,
