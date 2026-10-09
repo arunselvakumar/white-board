@@ -11,6 +11,10 @@ export class GetOwnerDashboardHandler {
   constructor(
     private readonly db: PrismaClient,
     private readonly exceptions: ClassExceptionsReader,
+    /** Open Fee Follow-ups due today or earlier (ADR-0039). */
+    private readonly countFeeFollowUpsDue: (
+      workspaceId: string,
+    ) => Promise<number>,
   ) {}
 
   async execute(
@@ -18,34 +22,41 @@ export class GetOwnerDashboardHandler {
   ): Promise<OwnerDashboardReadModel> {
     const workspaceId = WorkspaceId.create(query.workspaceId).value;
     const now = query.now ?? new Date();
-    const [activeStudentCount, recentStudents, batches, enrollments, payments] =
-      await Promise.all([
-        this.db.trainingInstituteStudent.count({
-          where: { workspaceId, deletedAt: null, droppedAt: null },
-        }),
-        this.db.trainingInstituteStudent.findMany({
-          where: { workspaceId, deletedAt: null, droppedAt: null },
-          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-          take: 5,
-        }),
-        this.db.trainingInstituteBatch.findMany({
-          where: { workspaceId, deletedAt: null, closedAt: null },
-        }),
-        this.db.trainingInstituteEnrollment.findMany({
-          where: { workspaceId, deletedAt: null, endedAt: null },
-          select: {
-            id: true,
-            batchId: true,
-            feePlanAmountPaise: true,
-            feePlanConcessionPaise: true,
-          },
-        }),
-        this.db.trainingInstituteFeePayment.groupBy({
-          by: ["enrollmentId"],
-          where: { workspaceId, deletedAt: null },
-          _sum: { amountPaise: true },
-        }),
-      ]);
+    const [
+      activeStudentCount,
+      recentStudents,
+      batches,
+      enrollments,
+      payments,
+      feeFollowUpsDueCount,
+    ] = await Promise.all([
+      this.db.trainingInstituteStudent.count({
+        where: { workspaceId, deletedAt: null, droppedAt: null },
+      }),
+      this.db.trainingInstituteStudent.findMany({
+        where: { workspaceId, deletedAt: null, droppedAt: null },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: 5,
+      }),
+      this.db.trainingInstituteBatch.findMany({
+        where: { workspaceId, deletedAt: null, closedAt: null },
+      }),
+      this.db.trainingInstituteEnrollment.findMany({
+        where: { workspaceId, deletedAt: null, endedAt: null },
+        select: {
+          id: true,
+          batchId: true,
+          feePlanAmountPaise: true,
+          feePlanConcessionPaise: true,
+        },
+      }),
+      this.db.trainingInstituteFeePayment.groupBy({
+        by: ["enrollmentId"],
+        where: { workspaceId, deletedAt: null },
+        _sum: { amountPaise: true },
+      }),
+      this.countFeeFollowUpsDue(workspaceId),
+    ]);
 
     const paidByEnrollment = new Map(
       payments.map((row) => [row.enrollmentId, row._sum.amountPaise ?? 0]),
@@ -102,6 +113,7 @@ export class GetOwnerDashboardHandler {
     return {
       activeStudentCount,
       outstandingDuesPaise,
+      feeFollowUpsDueCount,
       todayBatches,
       recentStudents: recentStudents.map((student) => ({
         id: student.id,

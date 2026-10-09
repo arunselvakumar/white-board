@@ -381,6 +381,7 @@ model TrainingInstituteEnrollment {
   course                 TrainingInstituteCourse           @relation(fields: [courseId], references: [id], onDelete: Restrict)
   batch                  TrainingInstituteBatch            @relation(fields: [batchId], references: [id], onDelete: Restrict)
   feePayments            TrainingInstituteFeePayment[]
+  feeFollowUps           TrainingInstituteFeeFollowUp[]
   attendanceMarks        TrainingInstituteAttendanceMark[]
   convertedFromEnquiries TrainingInstituteEnquiry[]
 
@@ -475,6 +476,52 @@ model TrainingInstituteFeePayment {
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([enrollmentId, deletedAt, paidAt, id])
   @@map("fee_payments")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteFeeFollowUpChannel {
+  phone
+  whatsapp_sms
+  in_person
+  other
+
+  @@map("fee_follow_up_channel")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteFeeFollowUpCloseReason {
+  superseded
+  done
+  dues_cleared
+
+  @@map("fee_follow_up_close_reason")
+  @@schema("training_institute")
+}
+
+/// The Owner's record of chasing an Enrollment's dues (ADR-0039). At most one
+/// open (closed_at IS NULL) per Enrollment: partial unique index in the migration.
+model TrainingInstituteFeeFollowUp {
+  id             String                                   @id @db.Uuid
+  workspaceId    String                                   @map("workspace_id")
+  enrollmentId   String                                   @map("enrollment_id") @db.Uuid
+  channel        TrainingInstituteFeeFollowUpChannel
+  note           String?                                  @db.VarChar(500)
+  nextFollowUpOn DateTime?                                @map("next_follow_up_on") @db.Date
+  loggedByUserId String                                   @map("logged_by_user_id")
+  editedByUserId String?                                  @map("edited_by_user_id")
+  editedAt       DateTime?                                @map("edited_at")
+  /// Null for dues_cleared: the payment or Fee Plan change closed it.
+  closedByUserId String?                                  @map("closed_by_user_id")
+  closedAt       DateTime?                                @map("closed_at")
+  closeReason    TrainingInstituteFeeFollowUpCloseReason? @map("close_reason")
+  createdAt      DateTime                                 @default(now()) @map("created_at")
+  updatedAt      DateTime                                 @updatedAt @map("updated_at")
+
+  enrollment TrainingInstituteEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+
+  @@index([enrollmentId, createdAt])
+  @@index([workspaceId, closedAt, nextFollowUpOn])
+  @@map("fee_follow_ups")
   @@schema("training_institute")
 }
 

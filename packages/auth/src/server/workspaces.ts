@@ -402,4 +402,18 @@ export const workspaces = {
     });
     return user == null ? "User" : inviterDisplayName(user);
   },
+
+  /** Display names for many Users at once, such as who logged each entry. */
+  async displayNames(userIds: string[]): Promise<Map<string, string>> {
+    const ids = [...new Set(userIds)];
+    if (ids.length === 0) return new Map();
+    const users = await prisma.identityUser.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true, username: true, email: true },
+    });
+    const names = new Map(
+      users.map((user) => [user.id, inviterDisplayName(user)]),
+    );
+    return new Map(ids.map((id) => [id, names.get(id) ?? "User"]));
+  },
 };

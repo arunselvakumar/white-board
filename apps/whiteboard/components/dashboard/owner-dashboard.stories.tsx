@@ -28,6 +28,7 @@ export const Empty: Story = {
           dashboard={{
             activeStudentCount: 0,
             outstandingDuesPaise: 0,
+            feeFollowUpsDueCount: 0,
             todayBatches: [],
             recentStudents: [],
           }}
@@ -59,6 +60,7 @@ export const Populated: Story = {
           dashboard={{
             activeStudentCount: 1,
             outstandingDuesPaise: 400000,
+            feeFollowUpsDueCount: 0,
             todayBatches: [
               {
                 id: "660e8400-e29b-41d4-a716-446655440000",

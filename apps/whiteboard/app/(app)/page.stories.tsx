@@ -34,6 +34,7 @@ export const Dashboard: Story = {
           dashboard={{
             activeStudentCount: 0,
             outstandingDuesPaise: 0,
+            feeFollowUpsDueCount: 0,
             todayBatches: [],
             recentStudents: [],
           }}

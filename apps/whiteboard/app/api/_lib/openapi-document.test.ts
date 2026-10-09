@@ -211,6 +211,22 @@ describe("openApiDocument", () => {
     ).toBeDefined();
   });
 
+  it("documents the dues list and Fee Follow-ups", () => {
+    const paths = openApiDocument.paths;
+    const base = "/api/training-institute";
+    const expected: [string, string][] = [
+      ["get", "/fee-dues"],
+      ["get", "/fee-follow-ups/due"],
+      ["get", "/enrollments/{id}/fee-follow-ups"],
+      ["post", "/enrollments/{id}/fee-follow-ups"],
+      ["post", "/fee-follow-ups/{id}/edit"],
+      ["post", "/fee-follow-ups/{id}/done"],
+    ];
+    for (const [method, path] of expected) {
+      expect(paths[`${base}${path}`]?.[method]).toBeDefined();
+    }
+  });
+
   it("documents Enquiries, demos, and Enquiry Sources", () => {
     const paths = openApiDocument.paths;
     const base = "/api/training-institute";

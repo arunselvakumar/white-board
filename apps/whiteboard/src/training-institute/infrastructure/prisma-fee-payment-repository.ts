@@ -1,7 +1,11 @@
 import { Prisma, type PrismaClient } from "@repo/db";
 
-import { FeePaymentNotFoundError } from "../application/not-found-error";
+import {
+  EnrollmentNotFoundError,
+  FeePaymentNotFoundError,
+} from "../application/not-found-error";
 import type { EnrollmentId } from "../domain/enrollment-id";
+import { DomainError } from "../domain/errors";
 import type { FeePayment } from "../domain/fee-payment";
 import type { FeePaymentId } from "../domain/fee-payment-id";
 import type {
@@ -11,6 +15,10 @@ import type {
 import type { ListPage } from "../domain/list";
 import type { WorkspaceId } from "../domain/workspace-id";
 import { toDomainFeePayment } from "./prisma-fee-payment-mapper";
+import {
+  closeFeeFollowUpsWhenDuesCleared,
+  lockEnrollmentDues,
+} from "./prisma-fee-follow-up-store";
 
 export class PrismaFeePaymentRepository implements FeePaymentRepository {
   constructor(private readonly db: PrismaClient) {}
@@ -68,6 +76,21 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
         where: { workspaceId: workspaceId.value },
       });
       const payment = build(count + 1);
+      // The Enrollment lock Fee Follow-ups take, so one can't be logged on
+      // dues this payment clears.
+      const dues = await lockEnrollmentDues(
+        tx,
+        workspaceId.value,
+        payment.enrollmentId.value,
+      );
+      if (dues == null) throw new EnrollmentNotFoundError();
+      // Checked again under the lock: two payments at once can't overpay.
+      if (payment.amount.value > dues.netAmountPaise - dues.paidPaise) {
+        throw new DomainError(
+          "FEE_OVERPAY",
+          "Fee Payment cannot exceed remaining dues.",
+        );
+      }
       await tx.trainingInstituteFeePayment.create({
         data: {
           id: payment.id.value,
@@ -84,6 +107,12 @@ export class PrismaFeePaymentRepository implements FeePaymentRepository {
           deletedByUserId: payment.deletedByUserId?.value ?? null,
         },
       });
+      await closeFeeFollowUpsWhenDuesCleared(
+        tx,
+        workspaceId.value,
+        payment.enrollmentId.value,
+        payment.createdAt,
+      );
       return payment;
     });
   }

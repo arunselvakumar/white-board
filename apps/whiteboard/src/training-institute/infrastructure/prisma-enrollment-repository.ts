@@ -13,6 +13,7 @@ import type { ListPage } from "../domain/list";
 import type { StudentId } from "../domain/student-id";
 import type { WorkspaceId } from "../domain/workspace-id";
 import { toDomainEnrollment } from "./prisma-enrollment-mapper";
+import { closeFeeFollowUpsWhenDuesCleared } from "./prisma-fee-follow-up-store";
 
 export class PrismaEnrollmentRepository implements EnrollmentRepository {
   constructor(private readonly db: PrismaClient) {}
@@ -38,9 +39,22 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       deletedByUserId: enrollment.deletedByUserId?.value ?? null,
     };
 
-    const updated = await this.db.trainingInstituteEnrollment.updateMany({
-      where: { id: enrollment.id.value, deletedAt: null },
-      data: mutable,
+    // A Fee Plan change can clear the dues; the open Fee Follow-up closes in
+    // the same transaction, while the UPDATE holds the Enrollment row lock.
+    const updated = await this.db.$transaction(async (tx) => {
+      const result = await tx.trainingInstituteEnrollment.updateMany({
+        where: { id: enrollment.id.value, deletedAt: null },
+        data: mutable,
+      });
+      if (result.count > 0) {
+        await closeFeeFollowUpsWhenDuesCleared(
+          tx,
+          enrollment.workspaceId.value,
+          enrollment.id.value,
+          enrollment.updatedAt,
+        );
+      }
+      return result;
     });
     if (updated.count > 0) {
       return;

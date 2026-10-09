@@ -1,6 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/db";
 
 import { GetOwnerDashboardHandler } from "../application/get-owner-dashboard.handler";
+import { createFeeDuesHandlers } from "./create-fee-dues-handlers";
 import { PrismaClassExceptionsReader } from "./prisma-class-change-store";
 
 export type DashboardHandlers = {
@@ -10,10 +11,14 @@ export type DashboardHandlers = {
 export function createDashboardHandlers(deps?: {
   prisma?: PrismaClient;
 }): DashboardHandlers {
+  const db = deps?.prisma ?? prisma;
+  const feeDues = createFeeDuesHandlers({ prisma: db });
   return {
     get: new GetOwnerDashboardHandler(
-      deps?.prisma ?? prisma,
-      new PrismaClassExceptionsReader(deps?.prisma ?? prisma),
+      db,
+      new PrismaClassExceptionsReader(db),
+      async (workspaceId) =>
+        (await feeDues.queries.followUpsDue({ workspaceId })).length,
     ),
   };
 }

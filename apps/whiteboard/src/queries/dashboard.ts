@@ -6,6 +6,8 @@ import { apiJson } from "./http";
 export type DashboardResponse = {
   activeStudentCount: number;
   outstandingDuesPaise: number;
+  /** Open Fee Follow-ups whose next date is today or earlier. */
+  feeFollowUpsDueCount: number;
   todayBatches: {
     id: string;
     name: string;
