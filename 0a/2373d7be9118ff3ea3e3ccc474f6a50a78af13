@@ -1,0 +1,77 @@
+apps/construction-management/.storybook/mocks/xhr.ts
+  s_6497dd4ebf3e73::t_94457dca8fb9f2 1-112
+apps/construction-management/app/app/_lib/viewer-can.ts
+  s_6497dd4ebf3e73::t_477c6a9299849b 1-25
+apps/construction-management/app/app/projects/[id]/documents/page.tsx
+  s_6497dd4ebf3e73::t_413dbaab094de8 1-19
+apps/construction-management/components/projects/documents/delete-document-dialog.tsx
+  s_6497dd4ebf3e73::t_cdc95b564e0f20 1-89
+apps/construction-management/components/projects/documents/document-attachments.stories.tsx
+  s_6497dd4ebf3e73::t_d910dc68c8deaa 1-348
+apps/construction-management/components/projects/documents/document-fixtures.ts
+  s_6497dd4ebf3e73::t_a1962e35c451cd 1-186
+apps/construction-management/components/projects/documents/project-documents-page.stories.tsx
+  s_6497dd4ebf3e73::t_e48f0c433e3782 1-388
+apps/construction-management/components/projects/documents/project-documents-page.tsx
+  s_6497dd4ebf3e73::t_67da9b48600305 1-340
+apps/construction-management/components/projects/documents/upload-documents-dialog.tsx
+  s_6497dd4ebf3e73::t_ece447771b3e97 1-268
+apps/construction-management/components/projects/documents/use-document-uploads.ts
+  s_9c3f172fe92a46::t_3e3627aa4afee6 1-126
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_6497dd4ebf3e73::t_73e3167eea7c1d 54,61
+apps/construction-management/components/projects/project-shell.tsx
+  s_6497dd4ebf3e73::t_1dd88888c66174 20
+apps/construction-management/lib/project-documents.test.ts
+  s_6497dd4ebf3e73::t_4abbcbdb47e8c2 1-147
+apps/construction-management/src/queries/project-documents.test.ts
+  s_6497dd4ebf3e73::t_afa6a10fd578bb 1-345
+apps/construction-management/src/queries/project-documents.ts
+  s_6497dd4ebf3e73::t_5036e38af2e987 1-254
+apps/construction-management/components/projects/documents/document-attachments.tsx
+  s_0666893810e874::t_2b5ed5a2c73f66 3-31,33-38,40-42,62-79,81-86,91-95,103-149,151-440
+apps/construction-management/components/projects/documents/document-file-icon.tsx
+  s_c5b871fa8233d2::t_ebccd926f70931 1-38
+apps/construction-management/lib/project-documents.ts
+  s_c5b871fa8233d2::t_229105160a234a 1-213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0a2373d7be9118ff3ea3e3ccc474f6a50a78af13",
+  "prompts": {},
+  "sessions": {
+    "s_0666893810e874": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af765abe37f8ca19b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c3f172fe92a46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1436510-6545-4236-9394-8c7f247ccc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c5b871fa8233d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a19942c19e89f2add",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
