@@ -11,6 +11,7 @@ import {
   type ProjectStatus,
 } from "../domain/project";
 import type {
+  ProjectCustomFieldLabels,
   ProjectRepository,
   ProjectUsage,
 } from "../domain/project-repository";
@@ -43,8 +44,33 @@ function countByStatus(projects: readonly Project[]): ProjectStatusCounts {
   return counts;
 }
 
+/** The audit row's before/after; plain JSON (orderValue is a number). */
 function snapshot(project: Project) {
-  return { ...project.details };
+  return {
+    ...project.details,
+    ...project.contract,
+    customFields: project.customFields.map(({ label, value }) => ({
+      label,
+      value,
+    })),
+  };
+}
+
+/** The label picker shows at most this many (CM-413). */
+export const CUSTOM_FIELD_LABELS_LIMIT = 50;
+
+/**
+ * Without the Project menu's Financial flag the order value is not the
+ * caller's to set: dropped, so a new Project has none and an edit keeps
+ * the stored one.
+ */
+function withoutOrderValue(
+  details: ProjectDetailsInput,
+  financial: boolean,
+): ProjectDetailsInput {
+  if (financial) return details;
+  const { orderValue: _ignored, ...rest } = details;
+  return rest;
 }
 
 /**
@@ -59,6 +85,7 @@ export class ProjectHandlers {
     private readonly projects: ProjectRepository,
     private readonly plan: PlanGate,
     private readonly usage: ProjectUsage,
+    private readonly labels: ProjectCustomFieldLabels,
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
@@ -119,17 +146,30 @@ export class ProjectHandlers {
     return toProjectReadModel(await this.load(viewer, id));
   }
 
-  /** New Project; 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118). */
+  /**
+   * Custom-field labels already used on the Company's live Projects, for
+   * the label picker; every Project, not only the viewer's, so the
+   * Company's names stay consistent.
+   */
+  async customFieldLabels(viewer: ProjectViewer): Promise<string[]> {
+    return this.labels.list(viewer.workspaceId, CUSTOM_FIELD_LABELS_LIMIT);
+  }
+
+  /**
+   * New Project; 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118).
+   * `financial`: whether the caller may set the order value.
+   */
   async create(input: {
     workspaceId: string;
     by: string;
     details: ProjectDetailsInput;
+    financial: boolean;
   }): Promise<ProjectReadModel> {
     const now = this.clock();
     const project = Project.create({
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
-      details: input.details,
+      details: withoutOrderValue(input.details, input.financial),
       by: input.by,
       now,
     });
@@ -141,17 +181,25 @@ export class ProjectHandlers {
     return toProjectReadModel(project);
   }
 
-  /** Edit Project; 409 `PROJECT_CHANGED` when someone saved in between. */
+  /**
+   * Edit Project; 409 `PROJECT_CHANGED` when someone saved in between.
+   * Without `financial` the stored order value stays as it is.
+   */
   async update(input: {
     viewer: ProjectViewer;
     id: string;
     by: string;
     details: ProjectDetailsInput;
+    financial: boolean;
     expectedUpdatedAt: Date;
   }): Promise<ProjectReadModel> {
     const project = await this.load(input.viewer, input.id);
     const before = snapshot(project);
-    project.update(input.details, input.by, this.clock());
+    project.update(
+      withoutOrderValue(input.details, input.financial),
+      input.by,
+      this.clock(),
+    );
     await this.projects.update(
       project,
       input.expectedUpdatedAt,
@@ -170,7 +218,7 @@ export class ProjectHandlers {
     if (await this.usage.isInUse(project.workspaceId, project.id))
       throw conflict(
         "PROJECT_IN_USE",
-        "Labours, vendors, attendance or payments are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
+        "Labours, vendors, attendance, payments or documents are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
       );
     const before = snapshot(project);
     project.delete(input.by, this.clock());

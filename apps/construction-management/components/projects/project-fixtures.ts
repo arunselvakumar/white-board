@@ -13,13 +13,45 @@ export function project(
     address: "Plot 12, Survey No. 45, Vadasery, Nagercoil 629001",
     startDate: "2026-04-01",
     endDate: "2027-03-31",
+    clientName: null,
+    clientPhone: null,
+    tenderRef: null,
+    quotationNo: null,
+    quotationDate: null,
+    loaNo: null,
+    loaDate: null,
+    clientOrderNo: null,
+    clientOrderDate: null,
+    agreementNo: null,
+    agreementDate: null,
+    orderValue: null,
+    customFields: [],
     createdAt: AT,
     updatedAt: AT,
     ...overrides,
   };
 }
 
-export const KUMARI = project();
+/** A Project with its contract details filled in (CM-413). */
+export const KUMARI = project({
+  clientName: "Sri Balaji Developers",
+  clientPhone: "+919843122110",
+  tenderRef: "SBD/T/2026/031",
+  quotationNo: "SBD/Q/2026/114",
+  quotationDate: "2026-02-10",
+  loaNo: "SBD/LOA/2026/022",
+  loaDate: "2026-03-05",
+  clientOrderNo: "SBD/WO/2026/057",
+  clientOrderDate: "2026-03-12",
+  agreementNo: "SBD/AGR/2026/009",
+  agreementDate: "2026-03-20",
+  // ₹4,85,00,000 excluding GST, in paise.
+  orderValue: 4_85_00_000_00,
+  customFields: [
+    { label: "Site engineer", value: "Prabhu Saravanan" },
+    { label: "Client architect", value: "Meenakshi Associates, Madurai" },
+  ],
+});
 
 export const STORY_PROJECTS: ProjectResponse[] = [
   project({
