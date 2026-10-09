@@ -97,7 +97,7 @@ export class FeeFollowUp {
     this.assertOpen();
     this.props = {
       ...this.props,
-      ...validDetails(details, action.today),
+      ...validDetails(details, action.today, this.props.nextFollowUpOn),
       editedByUserId: action.userId,
       editedAt: action.now,
       updatedAt: action.now,
@@ -146,9 +146,11 @@ export function noDuesToFollowUp(): DomainError {
   );
 }
 
+/** `kept` is the date already saved: an edit may leave a passed date as it is. */
 function validDetails(
   details: FeeFollowUpDetails,
   today: string,
+  kept: string | null = null,
 ): Pick<FeeFollowUpProps, "channel" | "note" | "nextFollowUpOn"> {
   if (!FEE_FOLLOW_UP_CHANNELS.includes(details.channel as FeeFollowUpChannel))
     throw new DomainError(
@@ -167,7 +169,7 @@ function validDetails(
       "FEE_FOLLOW_UP_DATE_INVALID",
       "Next follow-up date is invalid.",
     );
-  if (next != null && next < today)
+  if (next != null && next < today && next !== kept)
     throw new DomainError(
       "FEE_FOLLOW_UP_DATE_IN_PAST",
       "The next follow-up date can't be in the past.",

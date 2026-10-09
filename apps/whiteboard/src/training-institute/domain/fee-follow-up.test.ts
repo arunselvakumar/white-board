@@ -91,15 +91,39 @@ describe("FeeFollowUp", () => {
     expect(props.editedAt).toEqual(later);
   });
 
+  it("lets an edit keep a next date that has since passed", () => {
+    const followUp = logged({ channel: "phone", nextFollowUpOn: "2026-10-09" });
+    const tomorrow = { ...ACTION, today: "2026-10-10" };
+    followUp.edit(
+      { channel: "phone", note: "No answer", nextFollowUpOn: "2026-10-09" },
+      tomorrow,
+    );
+    expect(followUp.toProps().note).toBe("No answer");
+    expect(
+      code(() => {
+        followUp.edit(
+          { channel: "phone", nextFollowUpOn: "2026-10-08" },
+          tomorrow,
+        );
+      }),
+    ).toBe("FEE_FOLLOW_UP_DATE_IN_PAST");
+  });
+
   it("closes as done or superseded, then can't change", () => {
     const done = logged();
     done.markDone(ACTION);
     expect(done.open).toBe(false);
     expect(done.toProps().closeReason).toBe("done");
-    expect(code(() => { done.edit({ channel: "phone" }, ACTION); })).toBe(
-      "FEE_FOLLOW_UP_CLOSED",
-    );
-    expect(code(() => { done.markDone(ACTION); })).toBe("FEE_FOLLOW_UP_CLOSED");
+    expect(
+      code(() => {
+        done.edit({ channel: "phone" }, ACTION);
+      }),
+    ).toBe("FEE_FOLLOW_UP_CLOSED");
+    expect(
+      code(() => {
+        done.markDone(ACTION);
+      }),
+    ).toBe("FEE_FOLLOW_UP_CLOSED");
 
     const older = logged();
     older.supersede(ACTION);
