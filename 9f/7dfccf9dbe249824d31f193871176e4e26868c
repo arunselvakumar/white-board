@@ -1,0 +1,113 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_76335e96eb7f71 101-104,808-811
+apps/construction-management/app/api/construction/reporting/reports/[id]/download/route.ts
+  s_ec41e28a857a0b::t_7eb002d6a448d1 1-60
+apps/construction-management/app/api/construction/reporting/reports/[id]/route.ts
+  s_ec41e28a857a0b::t_38de767a548d6a 1-34
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_ec41e28a857a0b::t_d3f3b2fa2c97b0 1-92
+apps/construction-management/app/api/construction/reporting/reports/reports.http.test.ts
+  s_ec41e28a857a0b::t_beed5dde2643bc 1-729
+apps/construction-management/components/reports/recent-reports.tsx
+  s_ec41e28a857a0b::t_c51214bc42f7ac 1-86
+apps/construction-management/components/reports/report-card.tsx
+  s_ec41e28a857a0b::t_bad5789385e482 1-192
+apps/construction-management/components/reports/report-catalogue.ts
+  s_ec41e28a857a0b::t_5be41dc281cf1b 1-118
+apps/construction-management/components/reports/report-fixtures.ts
+  s_ec41e28a857a0b::t_7b4508ddb7c82a 1-63
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_ec41e28a857a0b::t_28fd3f53263076 1-302
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_f542a635f70ec0 289-290,368-369
+apps/construction-management/src/reporting/application/build-report.ts
+  s_ec41e28a857a0b::t_98ff932a88d152 1-118
+apps/construction-management/src/reporting/application/ports.ts
+  s_ec41e28a857a0b::t_807430ad504904 1-121
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_ec41e28a857a0b::t_efdcbe7144fcdf 1-286
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_ec41e28a857a0b::t_85b80cd56bab18 1-205
+apps/construction-management/src/reporting/domain/labour-attendance-report.ts
+  s_ec41e28a857a0b::t_b9dd9b1be7fc64 1-136
+apps/construction-management/src/reporting/domain/labour-days.ts
+  s_ec41e28a857a0b::t_16264a1084654e 1-185
+apps/construction-management/src/reporting/domain/labour-month-report.ts
+  s_ec41e28a857a0b::t_6406d1e138f0de 1-105
+apps/construction-management/src/reporting/domain/labour-payment-report.ts
+  s_ec41e28a857a0b::t_516b76291cdbb0 1-71
+apps/construction-management/src/reporting/domain/muster-roll.ts
+  s_ec41e28a857a0b::t_94570a1df9055e 1-145
+apps/construction-management/src/reporting/domain/report-builders.test.ts
+  s_ec41e28a857a0b::t_dd2d7fcd875706 1-600
+apps/construction-management/src/reporting/domain/report-document.ts
+  s_ec41e28a857a0b::t_69e22287035fb4 1-104
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_ec41e28a857a0b::t_840ab310c2c35e 1-123
+apps/construction-management/src/reporting/domain/report-period.ts
+  s_ec41e28a857a0b::t_959b8f9f751353 1-87
+apps/construction-management/src/reporting/domain/vendor-attendance-report.ts
+  s_ec41e28a857a0b::t_4faa6bb5bbb71e 1-108
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_ec41e28a857a0b::t_76a84fe551deeb 1-46
+apps/construction-management/src/reporting/infrastructure/pdf-report.ts
+  s_ec41e28a857a0b::t_a8eaec0f1edb54 1-374
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_ec41e28a857a0b::t_aedf5627c8f392 1-116
+apps/construction-management/src/reporting/infrastructure/prisma-report-source.ts
+  s_ec41e28a857a0b::t_4261e20b375f70 1-315
+apps/construction-management/src/reporting/infrastructure/xlsx-report.ts
+  s_ec41e28a857a0b::t_869f08cff1e031 1-156
+packages/db/prisma/migrations/20261010020000_construction_report_jobs/migration.sql
+  s_ec41e28a857a0b::t_2a81f346cdcfb3 1-35
+packages/db/prisma/schema/base.prisma
+  s_ec41e28a857a0b::t_ad33ab6783745d 10
+packages/db/prisma/schema/construction-reporting.prisma
+  s_ec41e28a857a0b::t_fe00612f245231 1-55
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_1f28543a7d6d64::t_3f430fec12e085 1-161
+apps/construction-management/app/api/construction/reporting/reports/report-openapi.ts
+  s_31a5b6f1a389ec::t_01f206072735ef 1-88
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_31a5b6f1a389ec::t_3bcddcc8581307 1-125
+apps/construction-management/components/reports/report-downloads.tsx
+  s_31a5b6f1a389ec::t_b6f115368385e2 1-45
+apps/construction-management/components/reports/reports-page.tsx
+  s_31a5b6f1a389ec::t_0a3f7701e8f852 1-62
+apps/construction-management/src/queries/reports.ts
+  s_31a5b6f1a389ec::t_e2e906d066b805 1-63
+apps/construction-management/src/reporting/domain/ledger-summary.ts
+  s_31a5b6f1a389ec::t_5bf154f5dedc88 1-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9f7dfccf9dbe249824d31f193871176e4e26868c",
+  "prompts": {},
+  "sessions": {
+    "s_1f28543a7d6d64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4b8b946834351d06",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_31a5b6f1a389ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a14231de213b2badf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
