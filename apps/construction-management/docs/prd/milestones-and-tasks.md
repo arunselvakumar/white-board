@@ -279,8 +279,8 @@ Goal: the daily reality of a site — who came, for how long, what they are owed
 | CM-209 |   9 | Vendor HTTP + screens (list, add with shift/category rate card, edit)                                                                                                        | done   | CM-208         | HTTP+UI        |       |
 | CM-210 |  10 | Labour attendance: per date per project; Present/Half/Absent/On Leave/Holiday/Paid Leave; shift; supervisor; OT lines (category, wages/hr, hours ≤ 24); multi-select marking | todo   | CM-205, CM-113 | Domain         |       |
 | CM-211 |  11 | Labour attendance HTTP + screens (mark day for many, recorded list, edit, filters)                                                                                           | todo   | CM-210         | HTTP+UI        |       |
-| CM-212 |  12 | Vendor attendance: per date per vendor per category/shift: full-day count, half-day count, OT hours → pay from rate card                                                     | todo   | CM-208, CM-113 | Domain         |       |
-| CM-213 |  13 | Vendor attendance HTTP + screens (grid by category, OT attendance, month view)                                                                                               | todo   | CM-212         | HTTP+UI        |       |
+| CM-212 |  12 | Vendor attendance: per date per vendor per category/shift: full-day count, half-day count, OT hours → pay from rate card                                                     | done   | CM-208, CM-113 | Domain         |       |
+| CM-213 |  13 | Vendor attendance HTTP + screens (grid by category, OT attendance, month view)                                                                                               | done   | CM-212         | HTTP+UI        |       |
 | CM-214 |  14 | Balances: `LabourLedger`/`VendorLedger` entries (opening, earned per day, OT, advance, payment); To Pay / Advance / Previous / Final for monthly, weekly, custom periods     | todo   | CM-210, CM-212 | Domain         |       |
 | CM-215 |  15 | Wage payment command (date, mode Cash/Bank, reference, amount, paid by, remarks, document) posting to the ledger; "Mark Paid Leave"                                          | todo   | CM-214         | Domain+HTTP    |       |
 | CM-216 |  16 | Payment screens: labour & vendor payment lists, pay dialog, balance view                                                                                                     | todo   | CM-215         | UI             |       |
@@ -321,6 +321,25 @@ Goal: the daily reality of a site — who came, for how long, what they are owed
 ### CM-212 — Vendor attendance
 
 **Done when:** one row per vendor per date per project with lines per (shift, category): full-day count, half-day count, OT hours; pay = full × rate + half × rate/2 + OT × OT rate from the vendor's rate card as of that date; event feeds the vendor ledger.
+
+### CM-212 / CM-213 — Vendor attendance delivered
+
+**Delivered:** `VendorAttendanceHandlers` (`src/labour/application/vendor-attendance-handlers.ts`) prices a day with the domain's `priceVendorDay` from the vendor's live rate card. It refuses a future date (`ATTENDANCE_DATE_IN_FUTURE`), a missing Project or vendor (404), a vendor not assigned to the Project (`VENDOR_NOT_ON_PROJECT`, **400**, the same as `CATEGORY_NOT_ON_SHIFT`), an inactive vendor (`VENDOR_INACTIVE`) and a vendor without a rate card (`VENDOR_NO_RATE_CARD`). Line errors carry `details.lineIndex`, `shiftId` and `labourCategoryId`. A new day passes the back-dated create limit. A recorded day changes only with `expectedUpdatedAt` (a missing or stale one is 409 `VENDOR_ATTENDANCE_CHANGED`), Attendance update and the edit limit. **An edit re-prices every line from the current rate card.** Clearing a day uses the edit limit. `PrismaVendorAttendanceStore` writes the row, its lines, `reverseSource` + the new `earned` entry and the audit event (`vendor_attendance.recorded|updated|cleared`) in one transaction. The partial unique index turns a racing create into a 409. A cleared row is a tombstone with its entry reversed, so the day can be recorded again. HTTP under `/api/construction/labour/attendance/vendors` (Menu `labour.attendance` on the Project; amounts need `labour.vendor` Financial and are null without it):
+
+- `GET day?projectId&date`: the grid of active assigned vendors with their rate cards and recorded lines, plus read-only rows for vendors recorded that day who have since left the Project.
+- `POST record`: 201 for a new day (create), 200 for an edit (update).
+- `POST {id}/clear`: 204; needs delete.
+- `GET ?projectId&from&to&vendorId&categoryId&page&pageSize`: a simple page plus total, newest first.
+- `GET month?projectId&month=YYYY-MM`: the vendor × day matrix with totals per vendor, Labour Category and day.
+- `GET overtime?projectId&from&to`: at most 366 days.
+
+Screens: the project's Attendance tab is a layout with Labour / Vendor sub-tabs. `/attendance` redirects to `labour`, which is a placeholder until CM-211. `/attendance/vendors` has three views:
+
+- **Day:** date picker defaulting to today, previous/next. Each vendor gets a card with, per shift, a row per category: Full day / Half day / OT hours with numeric keypads, a pay preview per line and a day total using the server's formula, Save, Clear day, and Copy yesterday.
+- **Month:** the matrix and category totals.
+- **Overtime:** overtime lines for a date range.
+
+Empty states: no vendors on the Project (links to Masters → Vendors), and a vendor without a rate card (links to the vendor).
 
 ### CM-214 — Balances
 
