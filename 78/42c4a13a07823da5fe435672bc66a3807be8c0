@@ -1,0 +1,25 @@
+apps/construction-management/.storybook/vitest.setup.ts
+  s_3326055b33eb36::t_8658e7a6c6e67a 1-15
+apps/construction-management/vitest.config.ts
+  s_3326055b33eb36::t_c36e3f797b6334 73,77-79
+apps/whiteboard/.storybook/vitest.setup.ts
+  s_3326055b33eb36::t_590cadffbf16ce 1-15
+apps/whiteboard/vitest.config.ts
+  s_3326055b33eb36::t_239d310812567f 56,60-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7842c4a13a07823da5fe435672bc66a3807be8c0",
+  "prompts": {},
+  "sessions": {
+    "s_3326055b33eb36": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4899bfd-f616-41e6-b788-e07127b32e5c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
