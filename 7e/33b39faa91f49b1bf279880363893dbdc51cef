@@ -1,0 +1,65 @@
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_6497dd4ebf3e73::t_df91f168aa89ca 3,12-19
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_6497dd4ebf3e73::t_8999136d8be040 10,37,40,58,82-92,108,127
+apps/construction-management/app/api/construction/projects/projects/[id]/route.ts
+  s_6497dd4ebf3e73::t_7d6d32c6f7d169 5,25-28
+apps/construction-management/app/api/construction/projects/projects/[id]/update/route.ts
+  s_6497dd4ebf3e73::t_7fedd22830a7d9 5-8,18-20,38,44,47
+apps/construction-management/app/api/construction/projects/projects/contract-details.http.test.ts
+  s_6497dd4ebf3e73::t_a12b04aec81472 1-444
+apps/construction-management/app/api/construction/projects/projects/custom-field-labels/route.ts
+  s_6497dd4ebf3e73::t_ccc8003f8da3ae 1-26
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_6497dd4ebf3e73::t_ddff2155c5fcad 5-12,23-39,49-76,91-107,111-112,134-161,164-167,170,179-194
+apps/construction-management/app/api/construction/projects/projects/projects.http.test.ts
+  s_6497dd4ebf3e73::t_5dd67a38ef6c92 543
+apps/construction-management/app/api/construction/projects/projects/route.ts
+  s_6497dd4ebf3e73::t_24d5f17f9fddf0 7,32,34,47,58,63,65
+apps/construction-management/components/projects/project-fixtures.ts
+  s_9e5b83cf4abbe4::t_033d6627f4e617 16-28,35-54
+apps/construction-management/src/projects/application/project-handlers.test.ts
+  s_6497dd4ebf3e73::t_9f6fe1137fa7f3 13,98-104,109,117,119,195,211,236-340
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_6497dd4ebf3e73::t_2b11ab37554062 14,47,49-73,88,149-161,166,172,184-187,193,198-202,221
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_6497dd4ebf3e73::t_3c1c47695709ca 4-7,9-12,20,23,33-37
+apps/construction-management/src/projects/domain/project-contract.ts
+  s_6497dd4ebf3e73::t_847f04cece25fc 1-232
+apps/construction-management/src/projects/domain/project-repository.ts
+  s_6497dd4ebf3e73::t_56fa5cb4c523a9 29-37
+apps/construction-management/src/projects/domain/project.test.ts
+  s_6497dd4ebf3e73::t_114219c1ba53d1 11,35-46,174-440
+apps/construction-management/src/projects/domain/project.ts
+  s_6497dd4ebf3e73::t_29b76a8bf8d3d6 8-16,37-41,48-49,124-134,137,139-140,154-155,217-243,248-252
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_6497dd4ebf3e73::t_1bf759f8c0e537 6,24
+apps/construction-management/src/projects/infrastructure/prisma-custom-field-labels.ts
+  s_6497dd4ebf3e73::t_ffa64fbf08a305 1-40
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_6497dd4ebf3e73::t_4ec4c058890401 9,14-31,40-58,68,73-87,91-108,128,145,164,198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7e33b39faa91f49b1bf279880363893dbdc51cef",
+  "prompts": {},
+  "sessions": {
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9e5b83cf4abbe4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b45b75e-00e9-4e5b-a8d5-bbaa4ca3c145",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
