@@ -245,7 +245,7 @@ describe("Project documents HTTP (CM-414)", () => {
       `inline; filename="LOA _ Kumari Heights.pdf"; filename*=UTF-8''LOA%20%E2%80%93%20Kumari%20Heights.pdf`,
     );
     expect(shown.headers.get("x-content-type-options")).toBe("nosniff");
-    expect(shown.headers.get("cache-control")).toBe("private, max-age=3600");
+    expect(shown.headers.get("cache-control")).toBe("private, no-store");
     expect(shown.headers.get("content-security-policy")).toBe(
       "default-src 'none'; frame-ancestors 'self'",
     );

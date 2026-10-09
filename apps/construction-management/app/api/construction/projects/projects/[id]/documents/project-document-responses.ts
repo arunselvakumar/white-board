@@ -63,7 +63,10 @@ export function projectDocumentResponse(
       inline ? "inline" : "attachment",
       document.fileName,
     ),
-    "cache-control": "private, max-age=3600",
+    // Never reused from the browser cache: a deleted file, or another
+    // Team Member signing in on a shared site tablet, must hit the access
+    // checks again.
+    "cache-control": "private, no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": inline
       ? "default-src 'none'; frame-ancestors 'self'"

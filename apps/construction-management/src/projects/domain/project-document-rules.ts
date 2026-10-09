@@ -31,18 +31,37 @@ export const PROJECT_DOCUMENTS_MAX = 50;
  * scanned, and the Documents tab says so.
  */
 export const BLOCKED_DOCUMENT_EXTENSIONS = [
+  // Native programs and installers.
   "exe",
   "msi",
-  "bat",
-  "cmd",
   "com",
   "scr",
-  "ps1",
-  "vbs",
-  "sh",
+  "pif",
+  "cpl",
+  "msc",
   "apk",
   "dmg",
   "jar",
+  "msix",
+  "appx",
+  "appimage",
+  // Scripts Windows or a shell runs on a double-click; the content check
+  // cannot tell these from text, so the name is the only guard.
+  "bat",
+  "cmd",
+  "ps1",
+  "vbs",
+  "vbe",
+  "js",
+  "jse",
+  "wsf",
+  "wsh",
+  "hta",
+  "sh",
+  // Shortcuts and settings files that launch or change things.
+  "lnk",
+  "scf",
+  "reg",
 ] as const;
 
 /** Files at most this size go up in one request; larger ones in parts. */

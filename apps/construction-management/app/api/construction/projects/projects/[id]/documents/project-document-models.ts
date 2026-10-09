@@ -69,7 +69,7 @@ export const StartConstructionProjectsDocumentUploadRequestModel = z.object({
     .min(1)
     .max(255)
     .describe(
-      "The file's name; 400 FILE_TYPE_NOT_ALLOWED for a program (.exe, .msi, .bat, .cmd, .com, .scr, .ps1, .vbs, .sh, .apk, .dmg, .jar).",
+      "The file's name; 400 FILE_TYPE_NOT_ALLOWED for a program, script or shortcut (`BLOCKED_DOCUMENT_EXTENSIONS`: .exe, .msi, .bat, .ps1, .js, .hta, .lnk, .reg and the like).",
     ),
   bytes: z
     .int()

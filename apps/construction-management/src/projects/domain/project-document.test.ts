@@ -86,6 +86,23 @@ describe("isBlockedDocumentName", () => {
       expect(isBlockedDocumentName(name), name).toBe(true);
   });
 
+  it("refuses scripts and shortcuts the content check cannot catch", () => {
+    for (const name of [
+      "invoice.pdf.js",
+      "payment.hta",
+      "update.vbe",
+      "run.WSF",
+      "Work order.lnk",
+      "settings.reg",
+      "panel.cpl",
+      "photo.pif",
+      "explorer.scf",
+      "app.msix",
+      "tool.AppImage",
+    ])
+      expect(isBlockedDocumentName(name), name).toBe(true);
+  });
+
   it("lets documents, drawings and zips through", () => {
     for (const name of [
       "LOA.pdf",
