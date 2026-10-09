@@ -38,6 +38,7 @@ import { CollectPaymentForm } from "@/components/enrollments/collect-payment-for
 import { studentFullName } from "@/components/students/student-profile-view";
 import { EnrollmentSettingsForm } from "@/components/enrollments/enrollment-settings-form";
 import { FeePlanForm } from "@/components/enrollments/fee-plan-form";
+import { FeeFollowUpsCard } from "@/components/enrollments/fee-follow-ups/fee-follow-ups-card";
 import { classModeLabel, formatTimingSlots } from "@/lib/class-mode";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
@@ -245,6 +246,7 @@ export function EnrollmentDetailScreen({
           </Table>
         )}
       </div>
+      <FeeFollowUpsCard enrollmentId={enrollmentId} timezone={batch.timezone} />
       {ended || otherBatches.length === 0 ? null : (
         <div className="space-y-3">
           <h2 className="text-lg tracking-tight">Move to another Batch</h2>
