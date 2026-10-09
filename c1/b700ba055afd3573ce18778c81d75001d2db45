@@ -1,0 +1,117 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_81dfd1cc8207c6 97-100,800-803
+apps/construction-management/app/api/construction/labour/balances/balance-models.ts
+  s_ec41e28a857a0b::t_fdcd1f2c9590fe 1-204
+apps/construction-management/app/api/construction/labour/balances/balances.http.test.ts
+  s_ec41e28a857a0b::t_47a36e1d28f47e 1-412
+apps/construction-management/app/api/construction/labour/payments/[id]/cancel/route.ts
+  s_ec41e28a857a0b::t_7b98f48e274498 1-55
+apps/construction-management/app/api/construction/labour/payments/[id]/receipt/remove/route.ts
+  s_ec41e28a857a0b::t_414884a3b213e4 1-48
+apps/construction-management/app/api/construction/labour/payments/[id]/receipt/route.ts
+  s_ec41e28a857a0b::t_acece6c7e531e1 1-91
+apps/construction-management/app/api/construction/labour/payments/[id]/route.ts
+  s_ec41e28a857a0b::t_4a39338b5938b0 1-39
+apps/construction-management/app/api/construction/labour/payments/handlers.ts
+  s_ec41e28a857a0b::t_70681593e91a06 1-75
+apps/construction-management/app/api/construction/labour/payments/payers/route.ts
+  s_ec41e28a857a0b::t_1eb115cc3c5427 1-37
+apps/construction-management/app/api/construction/labour/payments/payment-models.ts
+  s_ec41e28a857a0b::t_b1610c8c3d24cd 1-149
+apps/construction-management/app/api/construction/labour/payments/payments.http.test.ts
+  s_ec41e28a857a0b::t_c92dd8530061d5 1-559
+apps/construction-management/app/api/construction/labour/payments/route.ts
+  s_ec41e28a857a0b::t_ba2cf62d71660f 1-145
+apps/construction-management/app/app/projects/[id]/payments/page.tsx
+  s_ec41e28a857a0b::t_b2b1af90f67bd7 3,7-12,14-16
+apps/construction-management/components/payments/balances-table.tsx
+  s_ec41e28a857a0b::t_de5d28723a3dfe 1-243
+apps/construction-management/components/payments/pay-dialog.stories.tsx
+  s_ec41e28a857a0b::t_4f89fa371ad4a9 1-182
+apps/construction-management/components/payments/pay-dialog.tsx
+  s_ec41e28a857a0b::t_37019efca0769f 1-390
+apps/construction-management/components/payments/payment-fixtures.ts
+  s_ec41e28a857a0b::t_dbf6d3bbda4e08 1-283
+apps/construction-management/components/payments/payment-format.ts
+  s_ec41e28a857a0b::t_0471bb52b14020 1-99
+apps/construction-management/components/payments/payments-list.tsx
+  s_ec41e28a857a0b::t_2fb80233514520 1-408
+apps/construction-management/components/payments/payments-page.stories.tsx
+  s_ec41e28a857a0b::t_2e9c9c593c2450 1-174
+apps/construction-management/components/payments/payments-page.tsx
+  s_ec41e28a857a0b::t_58e5ef3d38d4e1 1-134
+apps/construction-management/components/payments/period-switcher.tsx
+  s_ec41e28a857a0b::t_c10c98775aa085 1-131
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_ec41e28a857a0b::t_968106fa444164 1-291
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_7fa7248551782f 286-288,354-363
+apps/construction-management/src/labour/application/balance-handlers.test.ts
+  s_ec41e28a857a0b::t_03dd9ee59fd6d7 1-218
+apps/construction-management/src/labour/application/balance-handlers.ts
+  s_ec41e28a857a0b::t_07797ab2716d7c 1-366
+apps/construction-management/src/labour/application/wage-payment-handlers.test.ts
+  s_ec41e28a857a0b::t_fc61f4dea606af 1-246
+apps/construction-management/src/labour/infrastructure/wage-payment-store.ts
+  s_ec41e28a857a0b::t_ddc8c5fb26c6a2 1-407
+apps/construction-management/src/queries/balances.ts
+  s_ec41e28a857a0b::t_cea8da83b19b0f 1-70
+apps/construction-management/src/queries/payments.ts
+  s_ec41e28a857a0b::t_258ba7f83cad14 1-137
+apps/construction-management/app/api/construction/labour/balances/route.ts
+  s_1f28543a7d6d64::t_b57887d033d56b 1-53
+apps/construction-management/app/api/construction/labour/balances/statement/route.ts
+  s_aee5a48b38136c::t_cd0e564af610c5 1-52
+apps/construction-management/app/api/construction/labour/payments/payment-openapi.ts
+  s_aee5a48b38136c::t_2294178fc9493e 1-186
+apps/construction-management/components/payments/pay-form-schema.ts
+  s_aee5a48b38136c::t_eac8eb61a2c147 1-82
+apps/construction-management/components/payments/statement-sheet.stories.tsx
+  s_31a5b6f1a389ec::t_590fa63a06a794 1-112
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_31a5b6f1a389ec::t_76c8b2a93899a3 1-516
+apps/construction-management/src/labour/infrastructure/balance-store.ts
+  s_aee5a48b38136c::t_33b06a7fc76f03 1-247
+apps/construction-management/src/labour/infrastructure/wage-payment-factory.ts
+  s_aee5a48b38136c::t_66b065ac1b43c7 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c1b700ba055afd3573ce18778c81d75001d2db45",
+  "prompts": {},
+  "sessions": {
+    "s_1f28543a7d6d64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4b8b946834351d06",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_31a5b6f1a389ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a14231de213b2badf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_aee5a48b38136c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a587341d24578819d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
