@@ -192,7 +192,7 @@ export const ThemePreference: Story = {
       throw new Error("Sidebar is missing");
     }
     await waitFor(() =>
-      expect(within(sidebar).getByText("SESSIONS")).toBeVisible(),
+      expect(within(sidebar).getByText("Main menu")).toBeVisible(),
     );
     const activeNav = within(sidebar).getByRole("link", {
       name: "Dashboard",
@@ -200,11 +200,11 @@ export const ThemePreference: Story = {
     await expect(
       canvasElement.ownerDocument.defaultView?.getComputedStyle(activeNav)
         .backgroundColor,
-    ).toBe("rgb(102, 90, 199)");
+    ).toBe("rgb(241, 242, 248)");
     await expect(
       canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
         .backgroundColor,
-    ).toBe("rgb(32, 26, 62)");
+    ).toBe("rgb(255, 255, 255)");
     const toggle = body.getByRole("switch", { name: "Dark mode" });
 
     await expect(toggle).not.toBeChecked();
@@ -215,7 +215,7 @@ export const ThemePreference: Story = {
       expect(
         canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
           .backgroundColor,
-      ).toBe("rgb(22, 18, 43)"),
+      ).toBe("rgb(22, 24, 34)"),
     );
     await expect(
       canvasElement.ownerDocument.defaultView?.localStorage.getItem(
