@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { getAuth, type WorkspaceRole } from "@repo/auth/server";
 import { authStateFor, seedWorkspaceMember } from "@repo/auth/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
 import {
   afterAll,

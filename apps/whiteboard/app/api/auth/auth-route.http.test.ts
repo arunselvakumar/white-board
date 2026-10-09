@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { clearOutbox, lastCodeFor } from "@repo/auth/testing";
 import { beforeEach, describe, expect, it } from "vitest";
 

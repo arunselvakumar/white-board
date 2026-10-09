@@ -1,4 +1,4 @@
-import type { TrainingInstituteEnrollment as EnrollmentRecord } from "@repo/db";
+import type { TrainingInstituteEnrollment as EnrollmentRecord } from "@repo/whiteboard-db";
 
 import { ClassMode } from "../domain/class-mode";
 import { CourseId } from "../domain/course-id";

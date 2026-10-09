@@ -9,7 +9,7 @@ import {
   outbox,
   seedWorkspaceMember,
 } from "@repo/auth/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
 import {
   afterAll,

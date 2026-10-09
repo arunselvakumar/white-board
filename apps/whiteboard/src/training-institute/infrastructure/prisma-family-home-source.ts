@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/db";
+import type { PrismaClient } from "@repo/whiteboard-db";
 
 import {
   FAMILY_HOME_RECENT_LIMIT,

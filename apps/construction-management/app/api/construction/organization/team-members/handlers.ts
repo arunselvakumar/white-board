@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { PrismaProjectDirectory } from "@/src/organization/infrastructure/prisma-project-directory";

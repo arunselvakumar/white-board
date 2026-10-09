@@ -57,7 +57,7 @@ apps/construction-management/
     messaging/              chat, notifications, support tickets
     shared-kernel/          LocationRef, Money, Quantity, SequenceRule, BackdatedPolicy, Approval, Attachment, Comment
   docs/                     this folder
-packages/db/prisma/schema/
+packages/db/construction/prisma/schema/   @repo/construction-db (root ADR-0040)
   construction-*.prisma     one file per context, @@schema("construction_<context>")
 ```
 
@@ -157,15 +157,15 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 
 ## 5. Decisions to record as ADRs (first batch)
 
-| #       | Decision                                                                                                            | Why it needs an ADR                                                                    |
-| ------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| CM-0001 | Construction Management is its own app and its own set of `construction_*` schemas in the shared repo               | Reuses `@repo/auth`, `@repo/ui`, `packages/db`; must not leak into Whiteboard contexts |
-| CM-0002 | Company = Workspace in `@repo/auth`; OTP-by-mobile login plugin                                                     | Site staff log in by phone; multi-company users                                        |
-| CM-0003 | Permission matrix (menu × flag bitmask) over role-only RBAC                                                         | Product differentiator; `view_all` and `financial` are query/response concerns         |
-| CM-0004 | Ledger-first money and stock; balances derived                                                                      | Legacy edits balances in place; India compliance needs auditability                    |
-| CM-0005 | Shared-kernel document behaviours (numbering, back-dated guard, approval, attachments, comments)                    | Eleven aggregates share them; avoid eleven implementations                             |
-| CM-0006 | PWA + offline outbox before native                                                                                  | Replaces Flutter; site connectivity                                                    |
-| CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                       |
-| CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                    |
-| CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                           | SMS needs DLT registration the business does not have yet                              |
-| CM-0010 | Project Contract Details, per-Project Custom Fields, Project Documents with direct browser uploads to private Blob  | Owner request (2026-10-09); Vercel 4.5 MB body limit                                   |
+| #       | Decision                                                                                                            | Why it needs an ADR                                                                                                     |
+| ------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| CM-0001 | Construction Management is its own app and its own set of `construction_*` schemas in the shared repo               | Reuses `@repo/auth`, `@repo/ui`; own `packages/db/construction` (root ADR-0040); must not leak into Whiteboard contexts |
+| CM-0002 | Company = Workspace in `@repo/auth`; OTP-by-mobile login plugin                                                     | Site staff log in by phone; multi-company users                                                                         |
+| CM-0003 | Permission matrix (menu × flag bitmask) over role-only RBAC                                                         | Product differentiator; `view_all` and `financial` are query/response concerns                                          |
+| CM-0004 | Ledger-first money and stock; balances derived                                                                      | Legacy edits balances in place; India compliance needs auditability                                                     |
+| CM-0005 | Shared-kernel document behaviours (numbering, back-dated guard, approval, attachments, comments)                    | Eleven aggregates share them; avoid eleven implementations                                                              |
+| CM-0006 | PWA + offline outbox before native                                                                                  | Replaces Flutter; site connectivity                                                                                     |
+| CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                                                        |
+| CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                                                     |
+| CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                           | SMS needs DLT registration the business does not have yet                                                               |
+| CM-0010 | Project Contract Details, per-Project Custom Fields, Project Documents with direct browser uploads to private Blob  | Owner request (2026-10-09); Vercel 4.5 MB body limit                                                                    |

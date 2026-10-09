@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { CreateStudentHandler } from "../application/create-student.handler";
 import { DropStudentHandler } from "../application/drop-student.handler";

@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/db";
+import type { Prisma } from "@repo/construction-db";
 
 import type { CalendarDate } from "../calendar-date";
 import { newId } from "../ids";

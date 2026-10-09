@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 

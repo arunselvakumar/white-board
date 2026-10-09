@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { COMPANY_WORKSPACE_KIND, parseCompanyRole } from "../roles";
 import type { CompanySummary } from "../types";

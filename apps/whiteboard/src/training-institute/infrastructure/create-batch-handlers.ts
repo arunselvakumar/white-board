@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { MovedClassGuard } from "../application/moved-class-guard";
 import { PrismaClassChangeStore } from "./prisma-class-change-store";

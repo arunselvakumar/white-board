@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 
 import { TeacherAssignmentHandlers } from "../application/teacher-assignment-handlers";
 import { PrismaTeacherAssignmentRepository } from "./prisma-teacher-assignment-repository";

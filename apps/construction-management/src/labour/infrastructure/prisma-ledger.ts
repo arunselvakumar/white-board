@@ -1,4 +1,4 @@
-import { Prisma } from "@repo/db";
+import { Prisma } from "@repo/construction-db";
 
 import {
   calendarDateFromDb,

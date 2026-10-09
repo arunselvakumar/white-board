@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { planExpired } from "@/src/shared-kernel/plan";
 

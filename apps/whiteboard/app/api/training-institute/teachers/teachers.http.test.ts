@@ -9,7 +9,7 @@ import {
   outbox,
   seedWorkspaceMember,
 } from "@repo/auth/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

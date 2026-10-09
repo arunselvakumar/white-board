@@ -1,0 +1,14 @@
+/// Construction Management's own client (ADR-0040). It is generated inside
+/// this package so it never overwrites Whiteboard's client.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../generated/client"
+}
+
+/// One Postgres schema per bounded context (ADR-0030, ADR CM-0001). `public`
+/// holds only `_prisma_migrations`.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["identity", "construction_organization", "construction_masters", "construction_projects", "construction_labour", "construction_reporting"]
+}

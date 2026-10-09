@@ -1,5 +1,7 @@
 # One Postgres schema per bounded context
 
+> **Amended by [ADR-0040](./0040-one-database-package-per-product.md):** Whiteboard's Prisma schema now lives in `packages/db/whiteboard` (`@repo/whiteboard-db`). Construction Management has its own package and database.
+>
 > **Amended by [ADR-0034](./0034-identity-on-better-auth.md):** identity has its own schema, `identity`, with `Identity`-prefixed models. "Workspace and User identity stay in Clerk" no longer applies.
 
 **Supersedes [ADR-0010](./0010-packages-db-is-prisma-only.md)'s "one Postgres, one schema, all tables".** The rest of ADR-0010 still applies.

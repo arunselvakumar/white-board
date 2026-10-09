@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PrismaClient } from "@repo/db";
+import { PrismaClient } from "@repo/whiteboard-db";
 
 const ADMIN_URL =
   process.env["DATABASE_URL_ADMIN"] ??
@@ -33,7 +33,7 @@ export default async function setup(): Promise<void> {
 
   const dbPackage = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../../packages/db",
+    "../../packages/db/whiteboard",
   );
   execSync("bunx prisma migrate deploy", {
     cwd: dbPackage,

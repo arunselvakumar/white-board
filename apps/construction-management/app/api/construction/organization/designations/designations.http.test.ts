@@ -1,5 +1,5 @@
 import { seedCompanyMember } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 

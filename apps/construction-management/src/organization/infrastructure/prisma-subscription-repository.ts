@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { PLAN_GRANTS, type PlanGrant } from "@/src/shared-kernel/plan";

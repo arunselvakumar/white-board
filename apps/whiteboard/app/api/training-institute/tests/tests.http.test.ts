@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { getAuth, type WorkspaceRole } from "@repo/auth/server";
 import { authStateFor } from "@repo/auth/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {

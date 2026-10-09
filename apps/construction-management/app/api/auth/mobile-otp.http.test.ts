@@ -1,7 +1,7 @@
 import { randomInt } from "node:crypto";
 
 import { lastSmsCodeFor, smsOutbox } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { withSms } from "@/test/sessions";

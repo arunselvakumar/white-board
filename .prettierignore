@@ -9,3 +9,6 @@ build
 storybook-static
 .next-*
 .blob-local
+
+# Prisma clients, generated into each database package (ADR-0040)
+packages/db/*/generated

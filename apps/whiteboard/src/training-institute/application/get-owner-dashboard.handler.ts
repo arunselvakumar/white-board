@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/db";
+import type { PrismaClient } from "@repo/whiteboard-db";
 
 import { classesOn, localNow } from "../domain/class-schedule";
 import { WeeklyTimings } from "../domain/weekly-timings";

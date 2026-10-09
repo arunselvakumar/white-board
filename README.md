@@ -7,7 +7,8 @@ Turborepo monorepo for Whiteboard, managed with [Bun](https://bun.com).
 - `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs, plus Storybook (port 6006)
 - `apps/marketing` — Next.js marketing site (port 3001)
 - `apps/construction-management` — Next.js Construction Management app (port 3002)
-- `packages/db` — Prisma schema, migrations, and client
+- `packages/db/whiteboard` (`@repo/whiteboard-db`) — Whiteboard's Prisma schema, migrations, and client
+- `packages/db/construction` (`@repo/construction-db`) — Construction Management's Prisma schema, migrations, and client
 - `packages/ui` — shared [shadcn/ui](https://ui.shadcn.com) component library (Tailwind CSS v4)
 - `packages/eslint-config` — strict shared ESLint configs (type-aware)
 - `packages/typescript-config` — shared TypeScript configs
@@ -34,10 +35,21 @@ bun run dev --filter=marketing
 ```sh
 docker compose up -d
 cp apps/whiteboard/.env.example apps/whiteboard/.env
-cp packages/db/.env.example packages/db/.env
+cp packages/db/whiteboard/.env.example packages/db/whiteboard/.env
+cp packages/db/construction/.env.example packages/db/construction/.env
 bun run generate
-bun run --filter @repo/db migrate:deploy
+bun run --filter @repo/whiteboard-db migrate:deploy
+bun run --filter @repo/construction-db migrate:deploy
 ```
+
+Each product has its own database and its own migration history (ADR-0040). A database created before that split still has the old shared history; drop it and migrate again:
+
+```sh
+docker compose exec postgres psql -U whiteboard -d postgres -c "DROP DATABASE whiteboard WITH (FORCE)" -c "CREATE DATABASE whiteboard"
+docker compose exec postgres psql -U whiteboard -d postgres -c "DROP DATABASE construction WITH (FORCE)" -c "CREATE DATABASE construction"
+```
+
+The HTTP test databases (`whiteboard_test`, `construction_test`) need the same: drop them, and the next `bun run test:http` recreates them.
 
 Whiteboard APIs: [http://localhost:3001/api/docs](http://localhost:3001/api/docs). The Marketing Site runs on [http://localhost:3000](http://localhost:3000).
 

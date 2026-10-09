@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 
 import { outbox, type OutgoingEmail } from "../email/sender";
 import type { WorkspaceRole } from "../roles";

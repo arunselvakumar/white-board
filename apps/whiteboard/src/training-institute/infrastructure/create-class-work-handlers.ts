@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { ClassWorkHandlers } from "../application/class-work-handlers";
 import { PrismaClassWorkStore } from "./prisma-class-work-store";

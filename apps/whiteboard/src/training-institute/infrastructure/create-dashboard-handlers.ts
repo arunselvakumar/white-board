@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { GetOwnerDashboardHandler } from "../application/get-owner-dashboard.handler";
 import { createFeeDuesHandlers } from "./create-fee-dues-handlers";

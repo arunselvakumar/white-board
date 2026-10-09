@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { seedCompanyMember } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
 import { signInByEmail, TEST_ORIGIN } from "@/test/sessions";

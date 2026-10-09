@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { COMPANY_WORKSPACE_KIND, type CompanyRole } from "./roles";
 import type { CompanyAuthState } from "./types";

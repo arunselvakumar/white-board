@@ -4,6 +4,8 @@
 - Date: 2026-10-08
 - Ticket: CM-001
 
+> **Amended by root [ADR-0040](../../../../docs/adr/0040-one-database-package-per-product.md) (2026-10-09):** Construction Management has its own database package, `packages/db/construction` (`@repo/construction-db`), with its own schema, migration history, client, and `identity` schema. The shared package, the shared migration history, and the empty Whiteboard schemas in `construction` are gone. Below, read `@repo/db` as `@repo/construction-db`.
+
 Construction Management is a new, greenfield product for Indian builders and contractors; customers start fresh, with no data migrated from other tools. It shares nothing with the education product except people who write code, the design system, and the identity layer. It must not leak into Whiteboard's contexts, and Whiteboard must not leak into it.
 
 ## Decision
@@ -12,17 +14,17 @@ Construction Management is a new, greenfield product for Indian builders and con
 
 **Shared packages, reused as they are.**
 
-| Package                    | Used for                                                                                                                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@repo/auth`               | Users, Sessions, Companies (Better Auth organizations), memberships, invitations. The app imports `@repo/auth/construction/*`, which configures the same tables differently. |
-| `@repo/ui`                 | Components, tokens, `globals.css` (root ADR-0002, ADR-0003).                                                                                                                 |
-| `@repo/db` (`packages/db`) | The only Prisma client. One schema file per context: `prisma/schema/construction-<context>.prisma`.                                                                          |
+| Package                                              | Used for                                                                                                                                                                     |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@repo/auth`                                         | Users, Sessions, Companies (Better Auth organizations), memberships, invitations. The app imports `@repo/auth/construction/*`, which configures the same tables differently. |
+| `@repo/ui`                                           | Components, tokens, `globals.css` (root ADR-0002, ADR-0003).                                                                                                                 |
+| `@repo/construction-db` (`packages/db/construction`) | The app's Prisma client (root ADR-0040). One schema file per context: `prisma/schema/construction-<context>.prisma`.                                                         |
 
 **Company = Workspace.** A Company is a Better Auth organization stored in `identity.workspaces` (root ADR-0034). The app holds `workspaceId` and `userId` as opaque strings and never joins to `identity`. CM-0002 records the auth details.
 
 **One Postgres schema per context, in the app's own database.** Each bounded context gets the schema `construction_<context>`, Prisma models and enums prefixed `Construction<Context>`, the API prefix `/api/construction/<context>`, and OpenAPI components with the same prefix. Inside a context folder names are unprefixed.
 
-The app connects to its **own database** — `construction` in development, `construction_test` in HTTP tests, an RDS database `construction` in production (`03-target-architecture.md §1`) — through the same `@repo/db` client with a different `DATABASE_URL`. `packages/db` keeps **one** Prisma schema and **one** migration history, so every migration runs in both databases: Whiteboard's `training_institute` schema exists, empty, in `construction`, and the `construction_*` schemas exist, empty, in `whiteboard`. That costs a few empty tables and buys one client, one `prisma generate`, one migration workflow, and no cross-product data in either database.
+The app connects to its **own database** — `construction` in development, `construction_test` in HTTP tests, an RDS database `construction` in production (`03-target-architecture.md §1`). ~~`packages/db` keeps **one** Prisma schema and **one** migration history, so every migration runs in both databases.~~ Since root ADR-0040, `packages/db/construction` has its own Prisma schema, migration history and client, so only `identity` and the `construction_*` schemas exist in `construction`.
 
 **The twelve contexts** (`03-target-architecture.md §2`):
 
@@ -57,4 +59,4 @@ A context's schema file and migration are added by the milestone that first need
 
 - **A folder inside Whiteboard** (`apps/whiteboard/src/construction-*`): one deployable, but two products in one session, one nav, one `/api/docs`, and every Whiteboard deploy carrying construction code. Rejected.
 - **Schemas in Whiteboard's database:** fewer databases locally, but Whiteboard and Construction Management have different hosting (Vercel/Neon vs AWS RDS) and different customers; sharing a database would share a User table across two products by accident. Rejected.
-- **A second Prisma schema and client for construction:** cleaner databases, but two generators, two migration histories and two `PrismaClient` types in one repo, against root ADR-0010. Rejected for now.
+- **A second Prisma schema and client for construction:** cleaner databases, but two generators, two migration histories and two `PrismaClient` types in one repo, against root ADR-0010. Rejected for now; adopted later by root ADR-0040.

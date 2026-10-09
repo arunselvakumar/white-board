@@ -2,7 +2,7 @@ import {
   constructionOrigin,
   isConstructionSmsEnabled,
 } from "@repo/auth/construction/server";
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import {
   InProcessEventDispatcher,

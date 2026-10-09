@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { mapError } from "@/app/api/_lib/map-error";
 import {

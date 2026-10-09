@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { describe, expect, it } from "vitest";
 
 import { Batch, batchRoom } from "../domain/batch";

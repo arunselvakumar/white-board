@@ -8,7 +8,8 @@ The rebuild of BuildControl for Indian builders and contractors, as its own Next
 bun install
 docker compose up -d              # Postgres (construction, construction_test), Mailpit
 cp apps/construction-management/.env.example apps/construction-management/.env   # fill BETTER_AUTH_SECRET and CONSTRUCTION_PRIVATE_DATA_KEY
-DATABASE_URL=postgresql://whiteboard:whiteboard@localhost:5433/construction bun run --filter @repo/db migrate:deploy
+cp packages/db/construction/.env.example packages/db/construction/.env
+bun run --filter @repo/construction-db migrate:deploy
 bun run dev --filter=construction-management   # http://localhost:3002
 ```
 
