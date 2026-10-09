@@ -23,20 +23,20 @@ export const ResetsPassword: Story = {
     await expect(
       page.getByRole("link", { name: "Back to sign in" }),
     ).toHaveAttribute("href", "/sign-in");
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.click(page.getByRole("button", { name: "Send code" }));
     await waitFor(() =>
       expect(authMocks.passwordReset.requestCode).toHaveBeenCalledWith(
-        "ramesh@patil.in",
+        "arun@anugraha.in",
       ),
     );
-    await expect(await page.findByText("ramesh@patil.in")).toBeVisible();
+    await expect(await page.findByText("arun@anugraha.in")).toBeVisible();
     await userEvent.type(page.getByLabelText("6-digit code"), "123456");
     await userEvent.type(page.getByLabelText("New password"), "new-site-pass");
     await userEvent.click(page.getByRole("button", { name: "Reset password" }));
     await waitFor(() =>
       expect(authMocks.passwordReset.resetPassword).toHaveBeenCalledWith({
-        email: "ramesh@patil.in",
+        email: "arun@anugraha.in",
         code: "123456",
         password: "new-site-pass",
       }),
@@ -56,7 +56,7 @@ export const WrongCode: Story = {
     authMocks.passwordReset.resetPassword.mockImplementation(() =>
       authFailure("INVALID_OTP"),
     );
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.click(page.getByRole("button", { name: "Send code" }));
     await userEvent.type(await page.findByLabelText("6-digit code"), "000000");
     await userEvent.type(page.getByLabelText("New password"), "new-site-pass");
@@ -73,7 +73,7 @@ export const WrongCode: Story = {
 
 export const ShortPassword: Story = {
   play: async ({ canvas: page, userEvent }) => {
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.click(page.getByRole("button", { name: "Send code" }));
     await userEvent.type(await page.findByLabelText("6-digit code"), "123456");
     await userEvent.type(page.getByLabelText("New password"), "short");
@@ -87,18 +87,18 @@ export const ShortPassword: Story = {
 
 export const UseAnotherEmail: Story = {
   play: async ({ canvas: page, userEvent }) => {
-    await userEvent.type(page.getByLabelText("Email"), "wrong@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "wrong@anugraha.in");
     await userEvent.click(page.getByRole("button", { name: "Send code" }));
     await userEvent.click(
       await page.findByRole("button", { name: "Use another email" }),
     );
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.click(page.getByRole("button", { name: "Send code" }));
     await waitFor(() =>
       expect(authMocks.passwordReset.requestCode).toHaveBeenLastCalledWith(
-        "ramesh@patil.in",
+        "arun@anugraha.in",
       ),
     );
-    await expect(await page.findByText("ramesh@patil.in")).toBeVisible();
+    await expect(await page.findByText("arun@anugraha.in")).toBeVisible();
   },
 };

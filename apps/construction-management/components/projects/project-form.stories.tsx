@@ -9,7 +9,7 @@ import {
 } from "../../.storybook/mocks/api";
 import { NewProjectScreen } from "./project-form";
 import { ProjectEditScreen } from "./project-overview";
-import { SHANTI } from "./project-fixtures";
+import { KUMARI } from "./project-fixtures";
 
 const BASE = "/api/construction/projects/projects";
 
@@ -46,7 +46,7 @@ export const NewValidatesAndSaves: Story = {
     api((call) =>
       call.method === "POST" && call.path === BASE
         ? Response.json(
-            { ...SHANTI, ...(call.body as object) },
+            { ...KUMARI, ...(call.body as object) },
             { status: 201 },
           )
         : undefined,
@@ -64,7 +64,7 @@ export const NewValidatesAndSaves: Story = {
 
     await userEvent.type(
       canvas.getByLabelText("Project name"),
-      "Shanti Heights",
+      "Kumari Heights",
     );
     await userEvent.type(canvas.getByLabelText("Start date"), "2026-10-08");
     await userEvent.type(
@@ -88,18 +88,18 @@ export const NewValidatesAndSaves: Story = {
     );
     await userEvent.type(
       canvas.getByLabelText("Project address"),
-      "Baner, Pune",
+      "Vadasery, Nagercoil",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${SHANTI.id}`,
+        `/app/projects/${KUMARI.id}`,
       ),
     );
     await expect(posts()[0]?.body).toEqual({
-      name: "Shanti Heights",
+      name: "Kumari Heights",
       status: "not_started",
-      address: "Baner, Pune",
+      address: "Vadasery, Nagercoil",
       startDate: "2026-10-08",
       endDate: "2027-03-31",
     });
@@ -122,7 +122,7 @@ export const NewShowsNameInUse: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(
       canvas.getByLabelText("Project name"),
-      "Shanti Heights",
+      "Kumari Heights",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await expect(
@@ -133,7 +133,7 @@ export const NewShowsNameInUse: Story = {
       "true",
     );
     await expect(posts()[0]?.body).toEqual({
-      name: "Shanti Heights",
+      name: "Kumari Heights",
       status: "ongoing",
       address: null,
       startDate: null,
@@ -172,16 +172,16 @@ export const NewShowsPlanLimit: Story = {
 export const EditSaves: Story = {
   render: () => (
     <StoryQueries>
-      <ProjectEditScreen id={SHANTI.id} />
+      <ProjectEditScreen id={KUMARI.id} />
     </StoryQueries>
   ),
   beforeEach: () =>
     api((call) => {
-      if (call.method === "GET" && call.path === `${BASE}/${SHANTI.id}`)
-        return Response.json(SHANTI);
-      if (call.method === "POST" && call.path === `${BASE}/${SHANTI.id}/update`)
+      if (call.method === "GET" && call.path === `${BASE}/${KUMARI.id}`)
+        return Response.json(KUMARI);
+      if (call.method === "POST" && call.path === `${BASE}/${KUMARI.id}/update`)
         return Response.json({
-          ...SHANTI,
+          ...KUMARI,
           ...(call.body as object),
           updatedAt: "2026-10-08T07:00:00.000Z",
         });
@@ -190,7 +190,7 @@ export const EditSaves: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const name = await canvas.findByLabelText("Project name");
-    await expect(name).toHaveValue("Shanti Heights");
+    await expect(name).toHaveValue("Kumari Heights");
     await expect(canvas.getByLabelText("Start date")).toHaveValue("2026-04-01");
     await userEvent.click(canvas.getByLabelText("Status"));
     await userEvent.click(await body.findByRole("option", { name: "On hold" }));
@@ -198,16 +198,16 @@ export const EditSaves: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${SHANTI.id}`,
+        `/app/projects/${KUMARI.id}`,
       ),
     );
     await expect(posts()[0]?.body).toEqual({
-      name: "Shanti Heights",
+      name: "Kumari Heights",
       status: "on_hold",
       address: null,
       startDate: "2026-04-01",
       endDate: "2027-03-31",
-      expectedUpdatedAt: SHANTI.updatedAt,
+      expectedUpdatedAt: KUMARI.updatedAt,
     });
   },
 };
@@ -216,7 +216,7 @@ export const EditShowsSomeoneElsesChange: Story = {
   render: EditSaves.render,
   beforeEach: () =>
     api((call) => {
-      if (call.method === "GET") return Response.json(SHANTI);
+      if (call.method === "GET") return Response.json(KUMARI);
       return Response.json(
         {
           code: "PROJECT_CHANGED",
@@ -239,7 +239,7 @@ export const DeleteRefusedWhileInUse: Story = {
   render: EditSaves.render,
   beforeEach: () =>
     api((call) => {
-      if (call.method === "GET") return Response.json(SHANTI);
+      if (call.method === "GET") return Response.json(KUMARI);
       if (call.path.endsWith("/delete"))
         return Response.json(
           {

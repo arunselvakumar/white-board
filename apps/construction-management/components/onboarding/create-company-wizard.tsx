@@ -232,7 +232,7 @@ export function CreateCompanyWizard() {
             <Input
               id="company-name"
               autoFocus
-              placeholder="Patil Builders"
+              placeholder="Anugraha Engineers"
               className="h-10"
               {...form.register("name")}
             />
@@ -252,7 +252,7 @@ export function CreateCompanyWizard() {
               <Input
                 id="company-email"
                 type="email"
-                placeholder="office@patilbuilders.in"
+                placeholder="office@anugrahaengineers.in"
                 className="h-10"
                 {...form.register("email")}
               />
@@ -346,7 +346,7 @@ export function CreateCompanyWizard() {
                   <Label htmlFor="company-gstin">GSTIN</Label>
                   <Input
                     id="company-gstin"
-                    placeholder="27AAPFU0939F1ZV"
+                    placeholder="33AAPFA0939F1ZM"
                     autoCapitalize="characters"
                     className="h-10 uppercase placeholder:normal-case"
                     {...form.register("gstin")}
@@ -357,7 +357,7 @@ export function CreateCompanyWizard() {
                   <Label htmlFor="company-pan">Company PAN</Label>
                   <Input
                     id="company-pan"
-                    placeholder="AAPFU0939F"
+                    placeholder="AAPFA0939F"
                     autoCapitalize="characters"
                     className="h-10 uppercase placeholder:normal-case"
                     {...form.register("pan")}

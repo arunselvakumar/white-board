@@ -12,7 +12,7 @@ async function newCompany(): Promise<{ workspaceId: string; userId: string }> {
     data: { id: userId, name: "Owner", email: `${userId}@example.test` },
   });
   const created = await createCompanyHandlers().create.execute({
-    name: "Patil Builders",
+    name: "Anugraha Engineers",
     country: "IN",
     userId,
     userName: "Owner",

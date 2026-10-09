@@ -12,11 +12,11 @@ export const DATE = "2026-10-08";
 export const AT = "2026-10-08T05:00:00.000Z";
 
 export const MASON = "019a0000-0000-7000-8000-0000000000c1";
-export const SUNIL = "019a0000-0000-7000-8000-0000000000d1";
-export const RAJU = "019a0000-0000-7000-8000-0000000000e1";
-export const SITA = "019a0000-0000-7000-8000-0000000000e2";
-export const MOHAN = "019a0000-0000-7000-8000-0000000000e3";
-export const ANIL = "019a0000-0000-7000-8000-0000000000e4";
+export const SUNDAR = "019a0000-0000-7000-8000-0000000000d1";
+export const DHURESH = "019a0000-0000-7000-8000-0000000000e1";
+export const KAVITHA = "019a0000-0000-7000-8000-0000000000e2";
+export const MURUGAN = "019a0000-0000-7000-8000-0000000000e3";
+export const ANBU = "019a0000-0000-7000-8000-0000000000e4";
 
 function day(
   labourId: string,
@@ -33,7 +33,7 @@ function day(
     status: "present",
     isPaidLeave: false,
     shift: "General",
-    supervisor: { id: SUNIL, name: "Sunil" },
+    supervisor: { id: SUNDAR, name: "Sundar" },
     wageType: "daily",
     wageRate: 70_000,
     earned: 70_000,
@@ -57,7 +57,7 @@ function row(
     name,
     labourCode: null,
     labourCategory: { id: MASON, name: "Mason" },
-    supervisor: { id: SUNIL, name: "Sunil" },
+    supervisor: { id: SUNDAR, name: "Sundar" },
     weeklyHolidays: [0],
     wageType: "daily",
     wagePerDay: 70_000,
@@ -74,26 +74,26 @@ function row(
   };
 }
 
-export const RAJU_SAVED = day(RAJU, "Raju Pawar");
-export const ANIL_SAVED = day(ANIL, "Anil Jadhav", { shift: null });
+export const DHURESH_SAVED = day(DHURESH, "Dhuresh Nawin");
+export const ANBU_SAVED = day(ANBU, "Anbu Selvan", { shift: null });
 
 export const SHEET: LabourSheet = {
   projectId: PROJECT_ID,
   date: DATE,
   labourers: [
-    row(ANIL, "Anil Jadhav", { attendance: ANIL_SAVED }),
-    row(MOHAN, "Mohan Patil", {
+    row(ANBU, "Anbu Selvan", { attendance: ANBU_SAVED }),
+    row(MURUGAN, "Murugan Ganesan", {
       weeklyHolidays: [4],
       isWeeklyHoliday: true,
       suggestedStatus: "holiday",
       supervisor: null,
     }),
-    row(RAJU, "Raju Pawar", {
+    row(DHURESH, "Dhuresh Nawin", {
       labourCode: "L-07",
-      attendance: RAJU_SAVED,
+      attendance: DHURESH_SAVED,
       yesterday: { status: "present", isPaidLeave: false, shift: "General" },
     }),
-    row(SITA, "Sita Kale", {
+    row(KAVITHA, "Kavitha Murugan", {
       wageType: "monthly",
       wagePerDay: null,
       wagePerMonth: 3_100_000,
@@ -103,7 +103,7 @@ export const SHEET: LabourSheet = {
     }),
   ],
   labourCategories: [{ id: MASON, name: "Mason" }],
-  supervisors: [{ id: SUNIL, name: "Sunil" }],
+  supervisors: [{ id: SUNDAR, name: "Sundar" }],
   totals: {
     marked: 2,
     present: 2,
@@ -147,8 +147,8 @@ export const MONTH: LabourAttendanceMonth = {
   ),
   labourers: [
     {
-      labourId: RAJU,
-      name: "Raju Pawar",
+      labourId: DHURESH,
+      name: "Dhuresh Nawin",
       labourCode: "L-07",
       days: [
         {
@@ -183,8 +183,8 @@ export const MONTH: LabourAttendanceMonth = {
       },
     },
     {
-      labourId: SITA,
-      name: "Sita Kale",
+      labourId: KAVITHA,
+      name: "Kavitha Murugan",
       labourCode: null,
       days: [
         {

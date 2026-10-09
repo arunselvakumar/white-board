@@ -11,8 +11,8 @@ import { ProjectsStep, TeamMemberProjectsTab } from "./projects-step";
 import { teamMember } from "./team-member-fixtures";
 
 const OPTIONS = "/api/construction/projects/projects/options";
-const SHANTI = "0199c4a0-0000-7000-8000-000000000001";
-const AUNDH = "0199c4a0-0000-7000-8000-000000000002";
+const KUMARI = "0199c4a0-0000-7000-8000-000000000001";
+const ASARIPALLAM = "0199c4a0-0000-7000-8000-000000000002";
 
 let options: { id: string; name: string; status: string }[] = [];
 let calls: ApiCall[] = [];
@@ -32,8 +32,8 @@ const meta = {
   component: ProjectsStep,
   beforeEach() {
     options = [
-      { id: AUNDH, name: "Aundh Tower", status: "ongoing" },
-      { id: SHANTI, name: "Shanti Heights", status: "on_hold" },
+      { id: ASARIPALLAM, name: "Asaripallam Tower", status: "ongoing" },
+      { id: KUMARI, name: "Kumari Heights", status: "on_hold" },
     ];
     calls = [];
     const api = mockApi((call) => {
@@ -63,21 +63,23 @@ type Story = StoryObj<typeof meta>;
 export const ChoosesProjects: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(
-      await canvas.findByRole("checkbox", { name: /Shanti Heights/ }),
+      await canvas.findByRole("checkbox", { name: /Kumari Heights/ }),
     );
     await expect(canvas.getByText("1 Project selected")).toBeVisible();
-    await expect(canvas.getByLabelText("Chosen")).toHaveTextContent(SHANTI);
+    await expect(canvas.getByLabelText("Chosen")).toHaveTextContent(KUMARI);
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: /Aundh Tower/ }),
+      canvas.getByRole("checkbox", { name: /Asaripallam Tower/ }),
     );
     // In the list's order.
     await expect(canvas.getByLabelText("Chosen")).toHaveTextContent(
-      `${AUNDH},${SHANTI}`,
+      `${ASARIPALLAM},${KUMARI}`,
     );
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: /Shanti Heights/ }),
+      canvas.getByRole("checkbox", { name: /Kumari Heights/ }),
     );
-    await expect(canvas.getByLabelText("Chosen")).toHaveTextContent(AUNDH);
+    await expect(canvas.getByLabelText("Chosen")).toHaveTextContent(
+      ASARIPALLAM,
+    );
   },
 };
 
@@ -97,16 +99,18 @@ export const EditTabSaves: Story = {
   render: () => (
     <StoryQueries>
       <div className="p-6">
-        <TeamMemberProjectsTab member={teamMember({ projectIds: [AUNDH] })} />
+        <TeamMemberProjectsTab
+          member={teamMember({ projectIds: [ASARIPALLAM] })}
+        />
       </div>
     </StoryQueries>
   ),
   play: async ({ canvas, userEvent }) => {
     await expect(
-      await canvas.findByRole("checkbox", { name: /Aundh Tower/ }),
+      await canvas.findByRole("checkbox", { name: /Asaripallam Tower/ }),
     ).toBeChecked();
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: /Shanti Heights/ }),
+      canvas.getByRole("checkbox", { name: /Kumari Heights/ }),
     );
     await userEvent.click(
       canvas.getByRole("button", { name: "Save Projects" }),
@@ -114,7 +118,7 @@ export const EditTabSaves: Story = {
     await expect(await canvas.findByText("Projects saved.")).toBeVisible();
     await waitFor(() =>
       expect(calls.find((call) => call.method === "POST")?.body).toEqual({
-        projectIds: [AUNDH, SHANTI],
+        projectIds: [ASARIPALLAM, KUMARI],
       }),
     );
   },

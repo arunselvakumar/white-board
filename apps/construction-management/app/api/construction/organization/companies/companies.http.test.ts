@@ -46,9 +46,9 @@ describe("Companies HTTP (CM-105)", () => {
     const { cookie, userId, email } = await signInByEmail();
     const response = await createCompany(
       post(BASE, cookie, {
-        name: "Patil Builders",
+        name: "Anugraha Engineers",
         country: "IN",
-        gstin: "27AAPFU0939F1ZV",
+        gstin: "33AAPFA0939F1ZM",
       }),
     );
     expect(response.status).toBe(StatusCodes.CREATED);
@@ -60,14 +60,19 @@ describe("Companies HTTP (CM-105)", () => {
       });
     // The Owner's sign-in is not copied to the Company contact.
     expect(profile.mobile).toBeNull();
-    expect(profile.gstin).toBe("27AAPFU0939F1ZV");
+    expect(profile.gstin).toBe("33AAPFA0939F1ZM");
 
     const mine = await json<Mine>(
       await listMine(new Request(`${BASE}/me`, { headers: { cookie } })),
     );
     expect(mine.activeCompanyId).toBe(created.id);
     expect(mine.items).toEqual([
-      { id: created.id, name: "Patil Builders", role: "owner", isActive: true },
+      {
+        id: created.id,
+        name: "Anugraha Engineers",
+        role: "owner",
+        isActive: true,
+      },
     ]);
     expect(email).toMatch(/@example\.test$/);
     expect(userId).toBeTruthy();
@@ -77,9 +82,9 @@ describe("Companies HTTP (CM-105)", () => {
     const { cookie } = await signInByEmail();
     const response = await createCompany(
       post(BASE, cookie, {
-        name: "Patil Builders",
+        name: "Anugraha Engineers",
         country: "IN",
-        gstin: "27AAPFU0939F1ZW",
+        gstin: "33AAPFA0939F1ZW",
       }),
     );
     expect(response.status).toBe(StatusCodes.BAD_REQUEST);

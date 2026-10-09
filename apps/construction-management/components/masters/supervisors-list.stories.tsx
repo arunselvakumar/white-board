@@ -21,8 +21,8 @@ function serve(initial = STORY_SUPERVISORS) {
       base: BASE,
       code: "SUPERVISOR",
       initial,
-      inUse: ["Raju Mukadam"],
-      teamMembers: [{ id: STORY_TEAM_MEMBER_ID, name: "Suresh Kale" }],
+      inUse: ["Rakesh Mirtha"],
+      teamMembers: [{ id: STORY_TEAM_MEMBER_ID, name: "Prabhu Saravanan" }],
     });
     return api.restore;
   };
@@ -48,22 +48,22 @@ export const WithSupervisors: Story = {
     const rows = within(list).getAllByRole("listitem");
     await expect(
       rows.map((row) => row.querySelector("p")?.textContent),
-    ).toEqual(["Raju Mukadam", "Suresh Kale", "Vijay Pawar"]);
-    const [raju, suresh, vijay] = rows;
-    if (raju == null || suresh == null || vijay == null)
+    ).toEqual(["Prabhu Saravanan", "Rakesh Mirtha", "Vignesh Anand"]);
+    const [prabhu, rakesh, vignesh] = rows;
+    if (rakesh == null || prabhu == null || vignesh == null)
       throw new Error("Rows missing");
-    await expect(within(raju).getByText("+91 98765 43210")).toBeVisible();
+    await expect(within(rakesh).getByText("+91 77081 65767")).toBeVisible();
     await expect(
-      within(suresh).getByText("Team Member: Suresh Kale"),
+      within(prabhu).getByText("Team Member: Prabhu Saravanan"),
     ).toBeVisible();
-    await expect(within(vijay).getByText("Disabled")).toBeVisible();
+    await expect(within(vignesh).getByText("Disabled")).toBeVisible();
 
-    await userEvent.type(canvas.getByLabelText("Search Supervisors"), "98765");
+    await userEvent.type(canvas.getByLabelText("Search Supervisors"), "77081");
     await expect(within(list).getAllByRole("listitem")).toHaveLength(1);
     await userEvent.clear(canvas.getByLabelText("Search Supervisors"));
 
     const body = within(canvasElement.ownerDocument.body);
-    await chooseFromMenu(canvasElement, userEvent, "Vijay Pawar", "Enable");
+    await chooseFromMenu(canvasElement, userEvent, "Vignesh Anand", "Enable");
     await waitFor(() =>
       expect(
         within(within(list).getAllByRole("listitem")[2] ?? list).queryByText(
@@ -72,10 +72,10 @@ export const WithSupervisors: Story = {
       ).toBeNull(),
     );
 
-    await chooseFromMenu(canvasElement, userEvent, "Suresh Kale", "Edit");
+    await chooseFromMenu(canvasElement, userEvent, "Prabhu Saravanan", "Edit");
     const dialog = within(await body.findByRole("dialog"));
     await expect(dialog.getByLabelText("Supervisor name")).toHaveValue(
-      "Suresh Kale",
+      "Prabhu Saravanan",
     );
   },
 };
@@ -84,7 +84,7 @@ export const DeleteAsksFirst: Story = {
   beforeEach: serve(),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await chooseFromMenu(canvasElement, userEvent, "Raju Mukadam", "Delete");
+    await chooseFromMenu(canvasElement, userEvent, "Rakesh Mirtha", "Delete");
     const dialog = await body.findByRole("alertdialog");
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Delete" }),
@@ -101,14 +101,14 @@ export const DeleteAsksFirst: Story = {
       expect(body.queryByRole("alertdialog")).not.toBeInTheDocument(),
     );
 
-    await chooseFromMenu(canvasElement, userEvent, "Vijay Pawar", "Delete");
+    await chooseFromMenu(canvasElement, userEvent, "Vignesh Anand", "Delete");
     await userEvent.click(
       within(await body.findByRole("alertdialog")).getByRole("button", {
         name: "Delete",
       }),
     );
     await waitFor(() =>
-      expect(canvas.queryByText("Vijay Pawar")).not.toBeInTheDocument(),
+      expect(canvas.queryByText("Vignesh Anand")).not.toBeInTheDocument(),
     );
   },
 };

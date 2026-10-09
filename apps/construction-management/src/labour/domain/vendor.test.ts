@@ -34,7 +34,7 @@ function create(shifts: VendorShiftInput[] = [], details = {}) {
     id: "vendor-1",
     workspaceId: "ws",
     details: {
-      name: "  Ramesh   Gang ",
+      name: "  Muthu   Gang ",
       joiningDate: "2026-04-01",
       ...details,
     },
@@ -59,12 +59,12 @@ function codeOf(run: () => unknown): string | undefined {
 describe("Vendor (CM-208)", () => {
   it("creates with cleaned details, unique projects and no rate card", () => {
     const vendor = create([], {
-      contactNumber: "98765 43210",
-      address: "  Pune ",
+      contactNumber: "77081 65767",
+      address: "  Nagercoil ",
     });
-    expect(vendor.name).toBe("Ramesh Gang");
-    expect(vendor.contactNumber).toBe("+919876543210");
-    expect(vendor.address).toBe("Pune");
+    expect(vendor.name).toBe("Muthu Gang");
+    expect(vendor.contactNumber).toBe("+917708165767");
+    expect(vendor.address).toBe("Nagercoil");
     expect(vendor.projectIds).toEqual(["p1", "p2"]);
     expect(vendor.isActive).toBe(true);
     expect(vendor.hasRateCard).toBe(false);
@@ -169,7 +169,7 @@ describe("Vendor (CM-208)", () => {
       shift("Shift 2", [rate(HELPER)]),
     ]);
     vendor.update({
-      details: { name: "Ramesh Gang", joiningDate: "2026-04-01" },
+      details: { name: "Muthu Gang", joiningDate: "2026-04-01" },
       projectIds: ["p2"],
       shifts: [
         shift("Day", [rate(MASON, null, null), rate(HELPER, 40_000, 5_000)], {
@@ -198,7 +198,7 @@ describe("Vendor (CM-208)", () => {
     const vendor = create([shift("Shift 1", [rate(MASON)])]);
     const update = (shifts: VendorShiftInput[]) => () => {
       vendor.update({
-        details: { name: "Ramesh Gang", joiningDate: "2026-04-01" },
+        details: { name: "Muthu Gang", joiningDate: "2026-04-01" },
         projectIds: [],
         shifts,
         newShiftId: () => "x",

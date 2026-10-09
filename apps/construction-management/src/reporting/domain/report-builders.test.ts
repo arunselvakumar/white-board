@@ -18,19 +18,19 @@ import {
 import { datesIn, monthRange, rangeLabel } from "./report-period";
 import { buildVendorAttendanceReport } from "./vendor-attendance-report";
 
-const RAJU: ReportLabour = {
-  id: "raju",
-  name: "Raju Pawar",
+const DHURESH: ReportLabour = {
+  id: "dhuresh",
+  name: "Dhuresh Nawin",
   labourCode: "L-1",
-  fatherName: "Shankar Pawar",
+  fatherName: "Nawin Kumar",
   category: "Mason",
   gender: "male",
   wageType: "daily",
   wageRate: 80_000,
 };
-const ASHA: ReportLabour = {
-  id: "asha",
-  name: "Asha Kale",
+const ABIRAMI: ReportLabour = {
+  id: "abirami",
+  name: "Abirami Priya",
   labourCode: null,
   fatherName: null,
   category: "Helper",
@@ -38,7 +38,7 @@ const ASHA: ReportLabour = {
   wageType: "monthly",
   wageRate: 1_550_000,
 };
-const IDLE: ReportLabour = { ...RAJU, id: "idle", name: "Zed Idle" };
+const IDLE: ReportLabour = { ...DHURESH, id: "idle", name: "Zed Idle" };
 
 function day(
   labourId: string,
@@ -62,10 +62,10 @@ function day(
 }
 
 /**
- * August 2026 has 31 days. Raju (daily ₹800): present every weekday 1–31
+ * August 2026 has 31 days. Dhuresh (daily ₹800): present every weekday 1–31
  * except: half day on the 3rd, absent on the 4th, leave on the 5th, paid
  * leave on the 6th, holiday on the 7th; 2.5 OT hours on the 10th and 1.25
- * on the 31st at ₹100/h. Asha (monthly ₹15,500 → ₹500 a day): present on
+ * on the 31st at ₹100/h. Abirami (monthly ₹15,500 → ₹500 a day): present on
  * the 1st, holiday on the 2nd, half day on the 31st.
  */
 function august(): ReportLabourDay[] {
@@ -73,39 +73,44 @@ function august(): ReportLabourDay[] {
   for (const date of datesIn(monthRange("2026-08"))) {
     const n = Number(date.slice(8));
     if (n === 3)
-      days.push(day("raju", date, { status: "half_day", earned: 40_000 }));
+      days.push(day("dhuresh", date, { status: "half_day", earned: 40_000 }));
     else if (n === 4)
-      days.push(day("raju", date, { status: "absent", earned: 0 }));
+      days.push(day("dhuresh", date, { status: "absent", earned: 0 }));
     else if (n === 5)
-      days.push(day("raju", date, { status: "on_leave", earned: 0 }));
+      days.push(day("dhuresh", date, { status: "on_leave", earned: 0 }));
     else if (n === 6)
-      days.push(day("raju", date, { status: "on_leave", isPaidLeave: true }));
+      days.push(
+        day("dhuresh", date, { status: "on_leave", isPaidLeave: true }),
+      );
     else if (n === 7)
-      days.push(day("raju", date, { status: "holiday", earned: 0 }));
+      days.push(day("dhuresh", date, { status: "holiday", earned: 0 }));
     else if (n === 10)
       days.push(
-        day("raju", date, { overtimeHundredths: 250, overtimeAmount: 25_000 }),
+        day("dhuresh", date, {
+          overtimeHundredths: 250,
+          overtimeAmount: 25_000,
+        }),
       );
     else if (n === 31)
       days.push(
-        day("raju", date, {
+        day("dhuresh", date, {
           overtimeHundredths: 125,
           overtimeAmount: 12_500,
-          supervisor: "Mohan",
+          supervisor: "Murugan",
           shift: "Shift 1",
         }),
       );
-    else days.push(day("raju", date));
+    else days.push(day("dhuresh", date));
   }
   const monthly = { wageType: "monthly" as const, wageRate: 1_550_000 };
   days.push(
-    day("asha", "2026-08-01", { ...monthly, earned: 50_000 }),
-    day("asha", "2026-08-02", {
+    day("abirami", "2026-08-01", { ...monthly, earned: 50_000 }),
+    day("abirami", "2026-08-02", {
       ...monthly,
       status: "holiday",
       earned: 50_000,
     }),
-    day("asha", "2026-08-31", {
+    day("abirami", "2026-08-31", {
       ...monthly,
       status: "half_day",
       earned: 25_000,
@@ -114,9 +119,9 @@ function august(): ReportLabourDay[] {
   return days;
 }
 
-// Raju: 31 days − 5 special = 26 present days at ₹800 + half ₹400 + PL ₹800.
-const RAJU_EARNED = 26 * 80_000 + 40_000 + 80_000;
-const ASHA_EARNED = 125_000;
+// Dhuresh: 31 days − 5 special = 26 present days at ₹800 + half ₹400 + PL ₹800.
+const DHURESH_EARNED = 26 * 80_000 + 40_000 + 80_000;
+const ABIRAMI_EARNED = 125_000;
 
 function rowOf(table: ReportTable | undefined, name: string) {
   const row = table?.rows.find((cells) => cells.includes(name));
@@ -136,23 +141,23 @@ describe("All Labour Attendance", () => {
   it("counts each status per Labour over a 31-day month, with OT hours and totals", () => {
     const report = buildLabourAttendanceReport({
       range,
-      labours: [RAJU, ASHA, IDLE],
+      labours: [DHURESH, ABIRAMI, IDLE],
       days: august(),
     });
     const [summary, byDay] = report.tables;
     // Only Labours marked in the period, by name.
     expect(summary?.rows.map((row) => row[1])).toEqual([
-      "Asha Kale",
-      "Raju Pawar",
+      "Abirami Priya",
+      "Dhuresh Nawin",
     ]);
-    const raju = rowOf(summary, "Raju Pawar");
-    expect(raju("Present")).toBe(26);
-    expect(raju("Half day")).toBe(1);
-    expect(raju("Absent")).toBe(1);
-    expect(raju("Leave")).toBe(1);
-    expect(raju("Paid leave")).toBe(1);
-    expect(raju("Holiday")).toBe(1);
-    expect(raju("OT hours")).toBe(3.75);
+    const dhuresh = rowOf(summary, "Dhuresh Nawin");
+    expect(dhuresh("Present")).toBe(26);
+    expect(dhuresh("Half day")).toBe(1);
+    expect(dhuresh("Absent")).toBe(1);
+    expect(dhuresh("Leave")).toBe(1);
+    expect(dhuresh("Paid leave")).toBe(1);
+    expect(dhuresh("Holiday")).toBe(1);
+    expect(dhuresh("OT hours")).toBe(3.75);
     expect(totalOf(summary, "Present")).toBe(27);
     expect(totalOf(summary, "Half day")).toBe(2);
     expect(totalOf(summary, "Holiday")).toBe(2);
@@ -162,7 +167,7 @@ describe("All Labour Attendance", () => {
     expect(byDay?.rows).toHaveLength(31 + 3);
     expect(byDay?.rows[0]).toEqual([
       "01 Aug 2026",
-      "Asha Kale",
+      "Abirami Priya",
       null,
       "Present",
       null,
@@ -171,11 +176,11 @@ describe("All Labour Attendance", () => {
     ]);
     expect(byDay?.rows.at(-1)).toEqual([
       "31 Aug 2026",
-      "Raju Pawar",
+      "Dhuresh Nawin",
       "L-1",
       "Present",
       "Shift 1",
-      "Mohan",
+      "Murugan",
       1.25,
     ]);
     expect(totalOf(byDay, "OT hours")).toBe(3.75);
@@ -184,10 +189,10 @@ describe("All Labour Attendance", () => {
   it("leaves out days outside the range", () => {
     const report = buildLabourAttendanceReport({
       range: { from: "2026-08-01", to: "2026-08-02" },
-      labours: [RAJU, ASHA],
+      labours: [DHURESH, ABIRAMI],
       days: august(),
     });
-    expect(rowOf(report.tables[0], "Raju Pawar")("Present")).toBe(2);
+    expect(rowOf(report.tables[0], "Dhuresh Nawin")("Present")).toBe(2);
     expect(report.tables[1]?.rows).toHaveLength(4);
   });
 });
@@ -196,7 +201,7 @@ describe("Month-wise Labour", () => {
   it("lays out Labour × 31 days with marks, counts and earnings", () => {
     const report = buildMonthWiseLabourReport({
       month: "2026-08",
-      labours: [RAJU, ASHA],
+      labours: [DHURESH, ABIRAMI],
       days: august(),
       financial: true,
     });
@@ -217,8 +222,8 @@ describe("Month-wise Labour", () => {
       "OT amount",
       "Total",
     ]);
-    const raju = rowOf(table, "Raju Pawar");
-    expect(["1", "3", "4", "5", "6", "7"].map(raju)).toEqual([
+    const dhuresh = rowOf(table, "Dhuresh Nawin");
+    expect(["1", "3", "4", "5", "6", "7"].map(dhuresh)).toEqual([
       "P",
       "½",
       "A",
@@ -226,23 +231,23 @@ describe("Month-wise Labour", () => {
       "PL",
       "H",
     ]);
-    expect(raju("OT hrs")).toBe(3.75);
-    expect(raju("Earned")).toBe(RAJU_EARNED);
-    expect(raju("OT amount")).toBe(37_500);
-    expect(raju("Total")).toBe(RAJU_EARNED + 37_500);
-    const asha = rowOf(table, "Asha Kale");
-    expect(asha("2")).toBe("H");
-    expect(asha("15")).toBeNull();
-    // Day totals count Labours at work; the 31st has Raju P and Asha ½.
+    expect(dhuresh("OT hrs")).toBe(3.75);
+    expect(dhuresh("Earned")).toBe(DHURESH_EARNED);
+    expect(dhuresh("OT amount")).toBe(37_500);
+    expect(dhuresh("Total")).toBe(DHURESH_EARNED + 37_500);
+    const abirami = rowOf(table, "Abirami Priya");
+    expect(abirami("2")).toBe("H");
+    expect(abirami("15")).toBeNull();
+    // Day totals count Labours at work; the 31st has Dhuresh P and Abirami ½.
     expect(totalOf(table, "31")).toBe("2");
     expect(totalOf(table, "4")).toBeNull();
-    expect(totalOf(table, "Earned")).toBe(RAJU_EARNED + ASHA_EARNED);
+    expect(totalOf(table, "Earned")).toBe(DHURESH_EARNED + ABIRAMI_EARNED);
   });
 
   it("leaves the money columns out without Financial", () => {
     const report = buildMonthWiseLabourReport({
       month: "2026-08",
-      labours: [RAJU],
+      labours: [DHURESH],
       days: august(),
       financial: false,
     });
@@ -280,33 +285,33 @@ describe("All Labour Payment (ADR CM-0004 mapping)", () => {
 
   const entries: ReportLedgerEntry[] = [
     // Before the period: opening ₹1,000 owed, a July day, a July payment.
-    entry("raju", "opening", 100_000, "2026-06-01"),
-    entry("raju", "earned", 80_000, "2026-07-31"),
-    entry("raju", "payment", -50_000, "2026-07-31"),
+    entry("dhuresh", "opening", 100_000, "2026-06-01"),
+    entry("dhuresh", "earned", 80_000, "2026-07-31"),
+    entry("dhuresh", "payment", -50_000, "2026-07-31"),
     // In the period.
-    entry("raju", "earned", 80_000, "2026-08-01"),
-    entry("raju", "earned", 80_000, "2026-08-02"),
-    entry("raju", "overtime", 25_000, "2026-08-02"),
+    entry("dhuresh", "earned", 80_000, "2026-08-01"),
+    entry("dhuresh", "earned", 80_000, "2026-08-02"),
+    entry("dhuresh", "overtime", 25_000, "2026-08-02"),
     // The 2nd re-marked as a half day: reversal (same kind), then ₹400.
-    entry("raju", "earned", -80_000, "2026-08-02"),
-    entry("raju", "earned", 40_000, "2026-08-02"),
-    entry("raju", "advance", -30_000, "2026-08-10"),
-    entry("raju", "payment", -60_000, "2026-08-20"),
+    entry("dhuresh", "earned", -80_000, "2026-08-02"),
+    entry("dhuresh", "earned", 40_000, "2026-08-02"),
+    entry("dhuresh", "advance", -30_000, "2026-08-10"),
+    entry("dhuresh", "payment", -60_000, "2026-08-20"),
     // A cancelled payment nets out.
-    entry("raju", "payment", -10_000, "2026-08-21"),
-    entry("raju", "payment", 10_000, "2026-08-21"),
+    entry("dhuresh", "payment", -10_000, "2026-08-21"),
+    entry("dhuresh", "payment", 10_000, "2026-08-21"),
     // After the period: ignored.
-    entry("raju", "earned", 80_000, "2026-09-01"),
-    // Asha joins in the period with an advance given before the app
+    entry("dhuresh", "earned", 80_000, "2026-09-01"),
+    // Abirami joins in the period with an advance given before the app
     // (opening dated inside the period counts as Previous Balance).
-    entry("asha", "opening", -20_000, "2026-08-15"),
-    entry("asha", "earned", 50_000, "2026-08-16"),
+    entry("abirami", "opening", -20_000, "2026-08-15"),
+    entry("abirami", "earned", 50_000, "2026-08-16"),
   ];
 
   it("maps entries to Previous Balance, To Pay, Advance, Paid and Final Amount", () => {
     expect(
       paymentFigures(
-        entries.filter((e) => e.partyId === "raju"),
+        entries.filter((e) => e.partyId === "dhuresh"),
         range,
       ),
     ).toEqual({
@@ -320,7 +325,7 @@ describe("All Labour Payment (ADR CM-0004 mapping)", () => {
     });
     expect(
       paymentFigures(
-        entries.filter((e) => e.partyId === "asha"),
+        entries.filter((e) => e.partyId === "abirami"),
         range,
       ),
     ).toEqual({
@@ -350,16 +355,16 @@ describe("All Labour Payment (ADR CM-0004 mapping)", () => {
   it("builds one row per Labour with totals, zero for a Labour with no entries", () => {
     const report = buildLabourPaymentReport({
       range,
-      labours: [RAJU, ASHA, IDLE],
+      labours: [DHURESH, ABIRAMI, IDLE],
       entries,
     });
     const [table] = report.tables;
     expect(table?.rows.map((row) => row[1])).toEqual([
-      "Asha Kale",
-      "Raju Pawar",
+      "Abirami Priya",
+      "Dhuresh Nawin",
       "Zed Idle",
     ]);
-    expect(rowOf(table, "Raju Pawar")("Final Amount")).toBe(185_000);
+    expect(rowOf(table, "Dhuresh Nawin")("Final Amount")).toBe(185_000);
     expect(rowOf(table, "Zed Idle")("Previous Balance")).toBe(0);
     expect(totalOf(table, "Previous Balance")).toBe(110_000);
     expect(totalOf(table, "To Pay")).toBe(195_000);
@@ -374,7 +379,7 @@ describe("Vendor Attendance", () => {
     {
       date: "2026-08-02",
       projectName: "Tower A",
-      vendorName: "Ramesh Gang",
+      vendorName: "Muthu Gang",
       shiftName: "Shift 1",
       category: "Mason",
       fullDayCount: 3,
@@ -387,7 +392,7 @@ describe("Vendor Attendance", () => {
     {
       date: "2026-08-01",
       projectName: "Villa",
-      vendorName: "Suresh",
+      vendorName: "Prabhu",
       shiftName: "Shift 1",
       category: "Helper",
       fullDayCount: 2,
@@ -440,13 +445,13 @@ describe("Vendor Attendance", () => {
       lines,
       financial: false,
       central: true,
-      filters: { vendor: "Ramesh Gang", category: null },
+      filters: { vendor: "Muthu Gang", category: null },
     });
     const labels = report.tables[0]?.columns.map((col) => col.label);
     expect(labels?.[1]).toBe("Project");
     expect(labels).not.toContain("Pay");
     expect(report.title).toBe("Central Vendor Attendance Report");
-    expect(report.notes[0]).toBe("Vendor: Ramesh Gang");
+    expect(report.notes[0]).toBe("Vendor: Muthu Gang");
   });
 });
 
@@ -454,23 +459,23 @@ describe("Muster roll (combined register)", () => {
   it("has the combined register columns and computes days, wages and net", () => {
     const report = buildMusterRoll({
       month: "2026-08",
-      labours: [RAJU, ASHA, IDLE],
+      labours: [DHURESH, ABIRAMI, IDLE],
       days: august(),
       entries: [
         {
-          partyId: "raju",
+          partyId: "dhuresh",
           kind: "advance",
           amount: -30_000,
           entryDate: "2026-08-10",
         },
         {
-          partyId: "raju",
+          partyId: "dhuresh",
           kind: "payment",
           amount: -60_000,
           entryDate: "2026-08-20",
         },
         {
-          partyId: "raju",
+          partyId: "dhuresh",
           kind: "payment",
           amount: -5_000,
           entryDate: "2026-07-31",
@@ -503,32 +508,32 @@ describe("Muster roll (combined register)", () => {
       "Signature / thumb impression",
     ]);
 
-    const raju = rowOf(table, "Raju Pawar");
-    expect(raju("Father's name")).toBe("Shankar Pawar");
-    expect(raju("Sex")).toBe("M");
-    expect(raju("10")).toBe("P+2.5");
-    expect(raju("31")).toBe("P+1.25");
-    expect(raju("3")).toBe("½");
-    expect(raju("Days worked")).toBe(26.5);
+    const dhuresh = rowOf(table, "Dhuresh Nawin");
+    expect(dhuresh("Father's name")).toBe("Nawin Kumar");
+    expect(dhuresh("Sex")).toBe("M");
+    expect(dhuresh("10")).toBe("P+2.5");
+    expect(dhuresh("31")).toBe("P+1.25");
+    expect(dhuresh("3")).toBe("½");
+    expect(dhuresh("Days worked")).toBe(26.5);
     // Present 26 + half 0.5 + paid leave 1; the holiday is unpaid on a daily wage.
-    expect(raju("Paid days")).toBe(27.5);
-    expect(raju("Wage type")).toBe("Per day");
-    expect(raju("Wage rate")).toBe(80_000);
-    expect(raju("Basic earned")).toBe(RAJU_EARNED);
-    expect(raju("OT amount")).toBe(37_500);
-    expect(raju("Gross")).toBe(RAJU_EARNED + 37_500);
-    expect(raju("Advance")).toBe(30_000);
-    expect(raju("Deductions")).toBe(0);
-    expect(raju("Net payable")).toBe(RAJU_EARNED + 37_500 - 30_000);
-    expect(raju("Paid in month")).toBe(60_000);
-    expect(raju("Signature / thumb impression")).toBeNull();
+    expect(dhuresh("Paid days")).toBe(27.5);
+    expect(dhuresh("Wage type")).toBe("Per day");
+    expect(dhuresh("Wage rate")).toBe(80_000);
+    expect(dhuresh("Basic earned")).toBe(DHURESH_EARNED);
+    expect(dhuresh("OT amount")).toBe(37_500);
+    expect(dhuresh("Gross")).toBe(DHURESH_EARNED + 37_500);
+    expect(dhuresh("Advance")).toBe(30_000);
+    expect(dhuresh("Deductions")).toBe(0);
+    expect(dhuresh("Net payable")).toBe(DHURESH_EARNED + 37_500 - 30_000);
+    expect(dhuresh("Paid in month")).toBe(60_000);
+    expect(dhuresh("Signature / thumb impression")).toBeNull();
 
-    const asha = rowOf(table, "Asha Kale");
+    const abirami = rowOf(table, "Abirami Priya");
     // A holiday is paid on a monthly wage.
-    expect(asha("Days worked")).toBe(1.5);
-    expect(asha("Paid days")).toBe(2.5);
-    expect(asha("Wage type")).toBe("Per month");
-    expect(asha("Sex")).toBe("F");
+    expect(abirami("Days worked")).toBe(1.5);
+    expect(abirami("Paid days")).toBe(2.5);
+    expect(abirami("Wage type")).toBe("Per month");
+    expect(abirami("Sex")).toBe("F");
 
     // On the Project but not marked: a blank row at the current wage.
     const idle = rowOf(table, "Zed Idle");
@@ -536,7 +541,9 @@ describe("Muster roll (combined register)", () => {
     expect(idle("Gross")).toBe(0);
     expect(idle("Wage rate")).toBe(80_000);
 
-    expect(totalOf(table, "Gross")).toBe(RAJU_EARNED + 37_500 + ASHA_EARNED);
+    expect(totalOf(table, "Gross")).toBe(
+      DHURESH_EARNED + 37_500 + ABIRAMI_EARNED,
+    );
     expect(totalOf(table, "Wage rate")).toBeNull();
     expect(totalOf(table, "Days worked")).toBe(28);
     expect(totalOf(table, "1")).toBe("2");

@@ -63,7 +63,7 @@ export function panHolderType(pan: string): PanHolderType | null {
   return HOLDER_TYPES[pan.trim().toUpperCase().charAt(3)] ?? null;
 }
 
-/** `AAPFU0939F` → `XXXXXX939F`: the last four characters stay visible. */
+/** `AAPFA0939F` → `XXXXXX939F`: the last four characters stay visible. */
 export function maskIdentifier(value: string, visible = 4): string {
   if (value.length <= visible) return value;
   return `${"X".repeat(value.length - visible)}${value.slice(-visible)}`;

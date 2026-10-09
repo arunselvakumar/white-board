@@ -11,7 +11,7 @@ async function newUser(): Promise<string> {
   await prisma.identityUser.create({
     data: {
       id,
-      name: "Ramesh Patil",
+      name: "Arun Selva Kumar",
       email: `${id}@example.test`,
       emailVerified: true,
     },
@@ -24,26 +24,26 @@ describe("createCompany on Postgres (CM-104)", () => {
     const userId = await newUser();
     const handlers = createCompanyHandlers();
     const created = await handlers.create.execute({
-      name: "Patil Builders",
+      name: "Anugraha Engineers",
       country: "IN",
-      gstin: "27AAPFU0939F1ZV",
-      pan: "AAPFU0939F",
+      gstin: "33AAPFA0939F1ZM",
+      pan: "AAPFA0939F",
       userId,
-      userName: "Ramesh Patil",
+      userName: "Arun Selva Kumar",
       userMobile: null,
       userEmail: `${userId}@example.test`,
     });
 
     await expect(companies.listForUser(userId)).resolves.toEqual([
-      { id: created.workspaceId, name: "Patil Builders", role: "owner" },
+      { id: created.workspaceId, name: "Anugraha Engineers", role: "owner" },
     ]);
     await expect(
       prisma.constructionOrganizationCompanyProfile.findUnique({
         where: { workspaceId: created.workspaceId },
       }),
     ).resolves.toMatchObject({
-      name: "Patil Builders",
-      gstin: "27AAPFU0939F1ZV",
+      name: "Anugraha Engineers",
+      gstin: "33AAPFA0939F1ZM",
       currency: "INR",
       isIndian: true,
     });
@@ -65,12 +65,12 @@ describe("createCompany on Postgres (CM-104)", () => {
     const input = {
       country: "IN",
       userId,
-      userName: "Ramesh Patil",
+      userName: "Arun Selva Kumar",
       userMobile: null,
       userEmail: `${userId}@example.test`,
     };
-    await handlers.create.execute({ ...input, name: "Patil Builders" });
-    await handlers.create.execute({ ...input, name: "Patil Land" });
+    await handlers.create.execute({ ...input, name: "Anugraha Engineers" });
+    await handlers.create.execute({ ...input, name: "Anugraha Land" });
     await expect(companies.listForUser(userId)).resolves.toHaveLength(2);
   });
 
@@ -90,7 +90,7 @@ describe("createCompany on Postgres (CM-104)", () => {
         name: "Half Made",
         country: "IN",
         userId,
-        userName: "Ramesh Patil",
+        userName: "Arun Selva Kumar",
         userMobile: null,
         userEmail: `${userId}@example.test`,
       }),

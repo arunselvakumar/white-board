@@ -25,11 +25,16 @@ function labourer(
 ): AttendanceLabourer {
   return {
     id,
-    name: id === "raju" ? "Raju Pawar" : id === "sita" ? "Sita Kale" : id,
+    name:
+      id === "dhuresh"
+        ? "Dhuresh Nawin"
+        : id === "kavitha"
+          ? "Kavitha Murugan"
+          : id,
     labourCode: null,
     isActive: true,
     labourCategoryId: "mason",
-    supervisorId: "sunil",
+    supervisorId: "sundar",
     weeklyHolidays: [0],
     card: options.monthly
       ? {
@@ -50,8 +55,8 @@ function labourer(
 
 function setup() {
   const store = new FakeLabourAttendanceStore(TODAY);
-  store.add(labourer("raju"), "p1", "2026-09-01");
-  store.add(labourer("sita", { monthly: true }), "p1", "2026-09-01");
+  store.add(labourer("dhuresh"), "p1", "2026-09-01");
+  store.add(labourer("kavitha", { monthly: true }), "p1", "2026-09-01");
   store.add(labourer("old", { isActive: false }), "p1", "2026-09-01");
   store.add(labourer("moved"), "p1", "2026-09-01");
   store.transfer("moved", "p2", "2026-10-05");
@@ -63,7 +68,7 @@ function setup() {
     store,
     fakeDirectory({ p1: "Tower A", p2: "Villa" }),
     fakeDirectory({ mason: "Mason" }),
-    fakeDirectory({ sunil: "Sunil" }),
+    fakeDirectory({ sundar: "Sundar" }),
     guard,
     () => new Date(NOW.getTime() + tick++),
   );
@@ -79,11 +84,11 @@ function mark(overrides: Partial<MarkLabourDayInput> = {}): MarkLabourDayInput {
     date: TODAY,
     marks: [
       {
-        labourId: "raju",
+        labourId: "dhuresh",
         status: "present",
         overtime: [{ labourCategoryId: "mason", hours: "1.5" }],
       },
-      { labourId: "sita", status: "half_day" },
+      { labourId: "kavitha", status: "half_day" },
     ],
     canCreate: true,
     canEdit: true,
@@ -106,20 +111,20 @@ describe("LabourAttendanceHandlers.markDay", () => {
     const { store, handlers, guard } = setup();
     const saved = await handlers.markDay(mark());
     expect(saved.map((day) => day.labourName)).toEqual([
-      "Raju Pawar",
-      "Sita Kale",
+      "Dhuresh Nawin",
+      "Kavitha Murugan",
     ]);
     expect(saved[0]).toMatchObject({
       earned: 70_000,
       overtimeHours: "1.5",
       overtimeAmount: 15_000,
       total: 85_000,
-      supervisor: { id: "sunil", name: "Sunil" },
+      supervisor: { id: "sundar", name: "Sundar" },
     });
     // Monthly: 31,000 ÷ 31 days × ½.
     expect(saved[1]?.earned).toBe(50_000);
-    expect(store.balance("raju")).toBe(85_000);
-    expect(store.balance("sita")).toBe(50_000);
+    expect(store.balance("dhuresh")).toBe(85_000);
+    expect(store.balance("kavitha")).toBe(50_000);
     expect(guard.checks).toEqual([{ action: "create", date: TODAY }]);
   });
 
@@ -162,9 +167,9 @@ describe("LabourAttendanceHandlers.markDay", () => {
       handlers.markDay(
         mark({
           marks: [
-            { labourId: "sita", status: "present" },
+            { labourId: "kavitha", status: "present" },
             {
-              labourId: "raju",
+              labourId: "dhuresh",
               status: "absent",
               overtime: [{ labourCategoryId: null, hours: 2 }],
             },
@@ -173,14 +178,14 @@ describe("LabourAttendanceHandlers.markDay", () => {
       ),
     );
     expect(absent.code).toBe("OVERTIME_ON_ABSENT_DAY");
-    expect(absent.details).toMatchObject({ labourId: "raju" });
+    expect(absent.details).toMatchObject({ labourId: "dhuresh" });
 
     const category = await failure(
       handlers.markDay(
         mark({
           marks: [
             {
-              labourId: "raju",
+              labourId: "dhuresh",
               status: "present",
               overtime: [{ labourCategoryId: "welder", hours: 1 }],
             },
@@ -193,7 +198,9 @@ describe("LabourAttendanceHandlers.markDay", () => {
     const supervisor = await failure(
       handlers.markDay(
         mark({
-          marks: [{ labourId: "raju", status: "present", supervisorId: "x" }],
+          marks: [
+            { labourId: "dhuresh", status: "present", supervisorId: "x" },
+          ],
         }),
       ),
     );
@@ -207,22 +214,22 @@ describe("LabourAttendanceHandlers.markDay", () => {
 
   it("re-marks with expected updatedAt, reversing and reposting; stale or missing → 409", async () => {
     const { store, handlers, guard } = setup();
-    const [raju] = await handlers.markDay(mark());
-    if (raju == null) throw new Error("no row");
+    const [dhuresh] = await handlers.markDay(mark());
+    if (dhuresh == null) throw new Error("no row");
 
     const missing = await failure(
       handlers.markDay(
-        mark({ marks: [{ labourId: "raju", status: "absent" }] }),
+        mark({ marks: [{ labourId: "dhuresh", status: "absent" }] }),
       ),
     );
     expect(missing.code).toBe("ATTENDANCE_CHANGED");
-    expect(missing.details).toEqual({ labourId: "raju" });
+    expect(missing.details).toEqual({ labourId: "dhuresh" });
 
     const stale = await failure(
       handlers.markDay(
         mark({
-          marks: [{ labourId: "raju", status: "absent" }],
-          expected: { raju: new Date("2026-01-01") },
+          marks: [{ labourId: "dhuresh", status: "absent" }],
+          expected: { dhuresh: new Date("2026-01-01") },
         }),
       ),
     );
@@ -231,8 +238,8 @@ describe("LabourAttendanceHandlers.markDay", () => {
     const noEdit = await failure(
       handlers.markDay(
         mark({
-          marks: [{ labourId: "raju", status: "absent" }],
-          expected: { raju: raju.updatedAt },
+          marks: [{ labourId: "dhuresh", status: "absent" }],
+          expected: { dhuresh: dhuresh.updatedAt },
           canEdit: false,
         }),
       ),
@@ -241,24 +248,24 @@ describe("LabourAttendanceHandlers.markDay", () => {
 
     const [again] = await handlers.markDay(
       mark({
-        marks: [{ labourId: "raju", status: "absent" }],
-        expected: { raju: raju.updatedAt },
+        marks: [{ labourId: "dhuresh", status: "absent" }],
+        expected: { dhuresh: dhuresh.updatedAt },
       }),
     );
-    expect(again?.id).toBe(raju.id);
+    expect(again?.id).toBe(dhuresh.id);
     expect(again?.total).toBe(0);
-    expect(store.balance("raju")).toBe(0);
+    expect(store.balance("dhuresh")).toBe(0);
     expect(guard.checks.at(-1)).toEqual({ action: "edit", date: TODAY });
     expect(store.audits).toContain("labour_attendance.updated");
   });
 
   it("keeps a saved overtime rate when a re-mark sends none", async () => {
     const { handlers } = setup();
-    const [raju] = await handlers.markDay(
+    const [dhuresh] = await handlers.markDay(
       mark({
         marks: [
           {
-            labourId: "raju",
+            labourId: "dhuresh",
             status: "present",
             overtime: [
               { labourCategoryId: "mason", hours: 1, ratePerHour: 20_000 },
@@ -267,18 +274,18 @@ describe("LabourAttendanceHandlers.markDay", () => {
         ],
       }),
     );
-    if (raju == null) throw new Error("no row");
+    if (dhuresh == null) throw new Error("no row");
     // A member without Financial re-marks: the line comes back without a rate.
     const [again] = await handlers.markDay(
       mark({
         marks: [
           {
-            labourId: "raju",
+            labourId: "dhuresh",
             status: "present",
             overtime: [{ labourCategoryId: "mason", hours: 2 }],
           },
         ],
-        expected: { raju: raju.updatedAt },
+        expected: { dhuresh: dhuresh.updatedAt },
       }),
     );
     expect(again?.overtimeAmount).toBe(40_000);
@@ -296,10 +303,10 @@ describe("LabourAttendanceHandlers paid leave and clear", () => {
   it("toggles Paid Leave on a leave day and clears days", async () => {
     const { store, handlers } = setup();
     const [leave] = await handlers.markDay(
-      mark({ marks: [{ labourId: "raju", status: "on_leave" }] }),
+      mark({ marks: [{ labourId: "dhuresh", status: "on_leave" }] }),
     );
     if (leave == null) throw new Error("no row");
-    expect(store.balance("raju")).toBe(0);
+    expect(store.balance("dhuresh")).toBe(0);
     const paid = await handlers.setPaidLeave({
       actor: OWNER,
       attendanceId: leave.id,
@@ -307,7 +314,7 @@ describe("LabourAttendanceHandlers paid leave and clear", () => {
       expectedUpdatedAt: leave.updatedAt,
     });
     expect(paid.isPaidLeave).toBe(true);
-    expect(store.balance("raju")).toBe(70_000);
+    expect(store.balance("dhuresh")).toBe(70_000);
 
     const stale = await failure(
       handlers.setPaidLeave({
@@ -323,27 +330,27 @@ describe("LabourAttendanceHandlers paid leave and clear", () => {
       actor: OWNER,
       projectId: "p1",
       date: TODAY,
-      labourIds: ["raju"],
-      expected: { raju: paid.updatedAt },
+      labourIds: ["dhuresh"],
+      expected: { dhuresh: paid.updatedAt },
     });
-    expect(store.balance("raju")).toBe(0);
+    expect(store.balance("dhuresh")).toBe(0);
     const gone = await failure(
       handlers.clearDay({
         actor: OWNER,
         projectId: "p1",
         date: TODAY,
-        labourIds: ["raju"],
-        expected: { raju: paid.updatedAt },
+        labourIds: ["dhuresh"],
+        expected: { dhuresh: paid.updatedAt },
       }),
     );
     expect(gone.code).toBe("ATTENDANCE_NOT_FOUND");
-    expect(gone.details).toEqual({ labourId: "raju" });
+    expect(gone.details).toEqual({ labourId: "dhuresh" });
   });
 
   it("refuses Paid Leave on a day that is not On Leave", async () => {
     const { handlers } = setup();
     const [present] = await handlers.markDay(
-      mark({ marks: [{ labourId: "raju", status: "present" }] }),
+      mark({ marks: [{ labourId: "dhuresh", status: "present" }] }),
     );
     if (present == null) throw new Error("no row");
     const refused = await failure(
@@ -364,21 +371,21 @@ describe("LabourAttendanceHandlers queries", () => {
     await handlers.markDay(
       mark({
         date: YESTERDAY,
-        marks: [{ labourId: "raju", status: "half_day", shift: "Shift 1" }],
+        marks: [{ labourId: "dhuresh", status: "half_day", shift: "Shift 1" }],
       }),
     );
     const sunday = await handlers.sheet("w1", "p1", "2026-10-04");
     expect(
       sunday.labourers.map((row) => [row.name, row.suggestedStatus]),
     ).toEqual([
+      ["Dhuresh Nawin", "holiday"],
+      ["Kavitha Murugan", "holiday"],
       ["moved", "holiday"],
-      ["Raju Pawar", "holiday"],
-      ["Sita Kale", "holiday"],
     ]);
     const today = await handlers.sheet("w1", "p1", TODAY);
     expect(today.labourers.map((row) => row.name)).toEqual([
-      "Raju Pawar",
-      "Sita Kale",
+      "Dhuresh Nawin",
+      "Kavitha Murugan",
     ]);
     expect(today.labourers[0]).toMatchObject({
       suggestedStatus: "half_day",
@@ -388,7 +395,7 @@ describe("LabourAttendanceHandlers queries", () => {
       labourCategory: { id: "mason", name: "Mason" },
     });
     expect(today.labourCategories).toEqual([{ id: "mason", name: "Mason" }]);
-    expect(today.supervisors).toEqual([{ id: "sunil", name: "Sunil" }]);
+    expect(today.supervisors).toEqual([{ id: "sundar", name: "Sundar" }]);
   });
 
   it("totals the month grid per Labour", async () => {
@@ -398,16 +405,16 @@ describe("LabourAttendanceHandlers queries", () => {
       mark({
         date: "2026-10-02",
         marks: [
-          { labourId: "raju", status: "on_leave", isPaidLeave: true },
-          { labourId: "sita", status: "holiday" },
+          { labourId: "dhuresh", status: "on_leave", isPaidLeave: true },
+          { labourId: "kavitha", status: "holiday" },
         ],
       }),
     );
     const grid = await handlers.month("w1", "p1", "2026-10");
     expect(grid.dates).toHaveLength(31);
-    const raju = grid.labourers.find((row) => row.labourId === "raju");
-    expect(raju?.days.map((day) => day.code)).toEqual(["P", "PL"]);
-    expect(raju?.totals).toMatchObject({
+    const dhuresh = grid.labourers.find((row) => row.labourId === "dhuresh");
+    expect(dhuresh?.days.map((day) => day.code)).toEqual(["P", "PL"]);
+    expect(dhuresh?.totals).toMatchObject({
       present: 1,
       paidLeave: 1,
       overtimeHours: "1.5",
@@ -415,8 +422,8 @@ describe("LabourAttendanceHandlers queries", () => {
       overtimeAmount: 15_000,
       total: 155_000,
     });
-    const sita = grid.labourers.find((row) => row.labourId === "sita");
-    expect(sita?.totals).toMatchObject({
+    const kavitha = grid.labourers.find((row) => row.labourId === "kavitha");
+    expect(kavitha?.totals).toMatchObject({
       halfDay: 1,
       holiday: 1,
       earned: 150_000,

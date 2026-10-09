@@ -8,13 +8,13 @@ import { describe, expect, it } from "vitest";
 describe("mobile numbers (ADR CM-0002)", () => {
   it("normalises the ways people type an Indian mobile", () => {
     for (const typed of [
-      "98765 43210",
-      "+91 98765 43210",
-      "+91-98765-43210",
-      "09876543210",
-      "919876543210",
+      "77081 65767",
+      "+91 77081 65767",
+      "+91-77081-65767",
+      "07708165767",
+      "917708165767",
     ])
-      expect(normalizeMobile(typed)).toBe("+919876543210");
+      expect(normalizeMobile(typed)).toBe("+917708165767");
   });
 
   it("rejects numbers that are not Indian mobiles", () => {
@@ -28,6 +28,6 @@ describe("mobile numbers (ADR CM-0002)", () => {
   });
 
   it("formats for screens", () => {
-    expect(formatMobile("+919876543210")).toBe("+91 98765 43210");
+    expect(formatMobile("+917708165767")).toBe("+91 77081 65767");
   });
 });

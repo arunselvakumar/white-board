@@ -88,28 +88,31 @@ describe("Projects HTTP (CM-204)", () => {
       counts: { all: 0, ongoing: 0, not_started: 0, on_hold: 0, completed: 0 },
     });
 
-    const shanti = await create(owner.cookie, {
-      name: "  Shanti   Heights ",
-      address: "Plot 12, Baner, Pune",
+    const kumari = await create(owner.cookie, {
+      name: "  Kumari   Heights ",
+      address: "Plot 12, Vadasery, Nagercoil",
       startDate: "2026-04-01",
       endDate: "2027-03-31",
     });
-    expect(shanti).toMatchObject({
-      name: "Shanti Heights",
+    expect(kumari).toMatchObject({
+      name: "Kumari Heights",
       status: "ongoing",
-      address: "Plot 12, Baner, Pune",
+      address: "Plot 12, Vadasery, Nagercoil",
       startDate: "2026-04-01",
       endDate: "2027-03-31",
     });
     await create(owner.cookie, { name: "Zen Villas", status: "completed" });
-    await create(owner.cookie, { name: "Aundh Tower" });
-    await create(owner.cookie, { name: "Baner Plots", status: "not_started" });
+    await create(owner.cookie, { name: "Asaripallam Tower" });
+    await create(owner.cookie, {
+      name: "Vadasery Plots",
+      status: "not_started",
+    });
 
     const all = await list(owner.cookie);
     expect(all.items.map((item) => item.name)).toEqual([
-      "Aundh Tower",
-      "Shanti Heights",
-      "Baner Plots",
+      "Asaripallam Tower",
+      "Kumari Heights",
+      "Vadasery Plots",
       "Zen Villas",
     ]);
     expect(all.counts).toEqual({
@@ -132,21 +135,21 @@ describe("Projects HTTP (CM-204)", () => {
     ).toBe(StatusCodes.BAD_REQUEST);
 
     const read = await getProject(
-      jsonRequest(`${BASE}/${shanti.id}`, owner.cookie),
-      params(shanti.id),
+      jsonRequest(`${BASE}/${kumari.id}`, owner.cookie),
+      params(kumari.id),
     );
-    expect(await json<Project>(read)).toEqual(shanti);
+    expect(await json<Project>(read)).toEqual(kumari);
 
     const updated = await updateProject(
-      jsonRequest(`${BASE}/${shanti.id}/update`, owner.cookie, {
-        name: "Shanti Heights",
+      jsonRequest(`${BASE}/${kumari.id}/update`, owner.cookie, {
+        name: "Kumari Heights",
         status: "on_hold",
         address: "",
         startDate: "2026-04-01",
         endDate: null,
-        expectedUpdatedAt: shanti.updatedAt,
+        expectedUpdatedAt: kumari.updatedAt,
       }),
-      params(shanti.id),
+      params(kumari.id),
     );
     expect(updated.status).toBe(StatusCodes.OK);
     const after = await json<Project>(updated);
@@ -157,7 +160,7 @@ describe("Projects HTTP (CM-204)", () => {
     });
 
     const audits = await prisma.constructionOrganizationAuditEvent.findMany({
-      where: { workspaceId: owner.workspaceId, entityId: shanti.id },
+      where: { workspaceId: owner.workspaceId, entityId: kumari.id },
       orderBy: { occurredAt: "asc" },
     });
     expect(audits.map((item) => item.action)).toEqual([
@@ -168,31 +171,31 @@ describe("Projects HTTP (CM-204)", () => {
     expect(audits[1]?.after).toMatchObject({ status: "on_hold" });
 
     const deleted = await deleteProject(
-      jsonRequest(`${BASE}/${shanti.id}/delete`, owner.cookie, {}),
-      params(shanti.id),
+      jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
+      params(kumari.id),
     );
     expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
     const row = await prisma.constructionProjectsProject.findUnique({
-      where: { id: shanti.id },
+      where: { id: kumari.id },
     });
     expect(row?.deletedAt).not.toBeNull();
     expect(row?.deletedBy).toBe(owner.userId);
     expect(
       (
         await getProject(
-          jsonRequest(`${BASE}/${shanti.id}`, owner.cookie),
-          params(shanti.id),
+          jsonRequest(`${BASE}/${kumari.id}`, owner.cookie),
+          params(kumari.id),
         )
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
     expect((await list(owner.cookie)).total).toBe(3);
     // A deleted Project's name is free again.
-    await create(owner.cookie, { name: "Shanti Heights" });
+    await create(owner.cookie, { name: "Kumari Heights" });
   });
 
   it("validates the form: name, name in use, dates", async () => {
     const owner = await ownerWithCompany();
-    await create(owner.cookie, { name: "Shanti Heights" });
+    await create(owner.cookie, { name: "Kumari Heights" });
     const attempt = async (body: Record<string, unknown>) => {
       const response = await createProject(
         jsonRequest(BASE, owner.cookie, body),
@@ -210,13 +213,13 @@ describe("Projects HTTP (CM-204)", () => {
       status: StatusCodes.BAD_REQUEST,
       body: { code: "PROJECT_NAME_TOO_LONG" },
     });
-    expect(await attempt({ name: "shanti heights" })).toMatchObject({
+    expect(await attempt({ name: "kumari heights" })).toMatchObject({
       status: StatusCodes.CONFLICT,
       body: { code: "PROJECT_NAME_IN_USE" },
     });
     expect(
       await attempt({
-        name: "Aundh Tower",
+        name: "Asaripallam Tower",
         startDate: "2026-10-08",
         endDate: "2026-10-01",
       }),
@@ -225,13 +228,13 @@ describe("Projects HTTP (CM-204)", () => {
       body: { code: "PROJECT_DATES_INVALID" },
     });
     expect(
-      await attempt({ name: "Aundh Tower", startDate: "2026-02-30" }),
+      await attempt({ name: "Asaripallam Tower", startDate: "2026-02-30" }),
     ).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       body: { code: "PROJECT_DATE_INVALID" },
     });
     expect(
-      await attempt({ name: "Aundh Tower", status: "done" }),
+      await attempt({ name: "Asaripallam Tower", status: "done" }),
     ).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       body: { code: "VALIDATION_ERROR" },
@@ -240,31 +243,31 @@ describe("Projects HTTP (CM-204)", () => {
 
   it("refuses a stale edit with 409 PROJECT_CHANGED and a rename onto another Project", async () => {
     const owner = await ownerWithCompany();
-    const shanti = await create(owner.cookie, { name: "Shanti Heights" });
-    await create(owner.cookie, { name: "Aundh Tower" });
+    const kumari = await create(owner.cookie, { name: "Kumari Heights" });
+    await create(owner.cookie, { name: "Asaripallam Tower" });
     const edit = (body: Record<string, unknown>) =>
       updateProject(
-        jsonRequest(`${BASE}/${shanti.id}/update`, owner.cookie, {
-          name: "Shanti Heights",
+        jsonRequest(`${BASE}/${kumari.id}/update`, owner.cookie, {
+          name: "Kumari Heights",
           status: "ongoing",
           ...body,
         }),
-        params(shanti.id),
+        params(kumari.id),
       );
     const first = await edit({
       status: "completed",
-      expectedUpdatedAt: shanti.updatedAt,
+      expectedUpdatedAt: kumari.updatedAt,
     });
     expect(first.status).toBe(StatusCodes.OK);
     const stale = await edit({
       status: "on_hold",
-      expectedUpdatedAt: shanti.updatedAt,
+      expectedUpdatedAt: kumari.updatedAt,
     });
     expect(stale.status).toBe(StatusCodes.CONFLICT);
     expect(await json(stale)).toMatchObject({ code: "PROJECT_CHANGED" });
     const fresh = await json<Project>(first);
     const clash = await edit({
-      name: "Aundh Tower",
+      name: "Asaripallam Tower",
       expectedUpdatedAt: fresh.updatedAt,
     });
     expect(clash.status).toBe(StatusCodes.CONFLICT);
@@ -324,7 +327,7 @@ describe("Projects HTTP (CM-204)", () => {
 
   it("refuses to delete a Project while a labour works on it", async () => {
     const owner = await ownerWithCompany();
-    const shanti = await create(owner.cookie, { name: "Shanti Heights" });
+    const kumari = await create(owner.cookie, { name: "Kumari Heights" });
     const labourId = newId();
     await prisma.$executeRaw`
       INSERT INTO construction_labour.labours
@@ -332,11 +335,11 @@ describe("Projects HTTP (CM-204)", () => {
          overtime_wage_per_hour, current_project_id, created_by, updated_by)
       VALUES
         (${labourId}::uuid, ${owner.workspaceId}, 'Ramu', DATE '2026-10-01',
-         'daily', 70000, 10000, ${shanti.id}::uuid, ${owner.userId}, ${owner.userId})
+         'daily', 70000, 10000, ${kumari.id}::uuid, ${owner.userId}, ${owner.userId})
     `;
     const refused = await deleteProject(
-      jsonRequest(`${BASE}/${shanti.id}/delete`, owner.cookie, {}),
-      params(shanti.id),
+      jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
+      params(kumari.id),
     );
     expect(refused.status).toBe(StatusCodes.CONFLICT);
     expect(await json(refused)).toMatchObject({ code: "PROJECT_IN_USE" });
@@ -346,159 +349,161 @@ describe("Projects HTTP (CM-204)", () => {
       WHERE id = ${labourId}::uuid
     `;
     const allowed = await deleteProject(
-      jsonRequest(`${BASE}/${shanti.id}/delete`, owner.cookie, {}),
-      params(shanti.id),
+      jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
+      params(kumari.id),
     );
     expect(allowed.status).toBe(StatusCodes.NO_CONTENT);
   });
 
   it("shows a Member only their Projects; others are 404 to them", async () => {
     const owner = await ownerWithCompany();
-    const shanti = await create(owner.cookie, { name: "Shanti Heights" });
-    const aundh = await create(owner.cookie, { name: "Aundh Tower" });
+    const kumari = await create(owner.cookie, { name: "Kumari Heights" });
+    const asaripallam = await create(owner.cookie, {
+      name: "Asaripallam Tower",
+    });
     const member = await memberWith(owner, {
       "projects.project": ["create", "read", "update", "delete"],
     });
-    await assign(member.memberId, [shanti.id]);
+    await assign(member.memberId, [kumari.id]);
 
     const page = await list(member.cookie);
-    expect(page.items.map((item) => item.name)).toEqual(["Shanti Heights"]);
+    expect(page.items.map((item) => item.name)).toEqual(["Kumari Heights"]);
     expect(page.counts.all).toBe(1);
     const options = await json<{ items: unknown[] }>(
       await listOptions(jsonRequest(`${BASE}/options`, member.cookie)),
     );
     expect(options.items).toEqual([
-      { id: shanti.id, name: "Shanti Heights", status: "ongoing" },
+      { id: kumari.id, name: "Kumari Heights", status: "ongoing" },
     ]);
 
     expect(
       (
         await getProject(
-          jsonRequest(`${BASE}/${shanti.id}`, member.cookie),
-          params(shanti.id),
+          jsonRequest(`${BASE}/${kumari.id}`, member.cookie),
+          params(kumari.id),
         )
       ).status,
     ).toBe(StatusCodes.OK);
     expect(
       (
         await getProject(
-          jsonRequest(`${BASE}/${aundh.id}`, member.cookie),
-          params(aundh.id),
+          jsonRequest(`${BASE}/${asaripallam.id}`, member.cookie),
+          params(asaripallam.id),
         )
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
     const editOther = await updateProject(
-      jsonRequest(`${BASE}/${aundh.id}/update`, member.cookie, {
-        name: "Aundh Tower",
+      jsonRequest(`${BASE}/${asaripallam.id}/update`, member.cookie, {
+        name: "Asaripallam Tower",
         status: "completed",
-        expectedUpdatedAt: aundh.updatedAt,
+        expectedUpdatedAt: asaripallam.updatedAt,
       }),
-      params(aundh.id),
+      params(asaripallam.id),
     );
     expect(editOther.status).toBe(StatusCodes.NOT_FOUND);
     expect(
       (
         await deleteProject(
-          jsonRequest(`${BASE}/${aundh.id}/delete`, member.cookie, {}),
-          params(aundh.id),
+          jsonRequest(`${BASE}/${asaripallam.id}/delete`, member.cookie, {}),
+          params(asaripallam.id),
         )
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
     const editMine = await updateProject(
-      jsonRequest(`${BASE}/${shanti.id}/update`, member.cookie, {
-        name: "Shanti Heights",
+      jsonRequest(`${BASE}/${kumari.id}/update`, member.cookie, {
+        name: "Kumari Heights",
         status: "on_hold",
-        expectedUpdatedAt: shanti.updatedAt,
+        expectedUpdatedAt: kumari.updatedAt,
       }),
-      params(shanti.id),
+      params(kumari.id),
     );
     expect(editMine.status).toBe(StatusCodes.OK);
 
     // A Member who adds a Project is not assigned to it.
-    await create(member.cookie, { name: "Kothrud Row Houses" });
+    await create(member.cookie, { name: "Parvathipuram Row Houses" });
     expect((await list(member.cookie)).total).toBe(1);
     expect((await list(owner.cookie)).total).toBe(3);
   });
 
   it("is 403 for a Member without the Project menu, yet the picker stays open", async () => {
     const owner = await ownerWithCompany();
-    const shanti = await create(owner.cookie, { name: "Shanti Heights" });
+    const kumari = await create(owner.cookie, { name: "Kumari Heights" });
     const member = await memberWith(owner, {
       "organization.team_members": ["read"],
     });
-    await assign(member.memberId, [shanti.id]);
+    await assign(member.memberId, [kumari.id]);
     for (const response of [
       await listProjects(jsonRequest(BASE, member.cookie)),
       await createProject(
-        jsonRequest(BASE, member.cookie, { name: "Aundh Tower" }),
+        jsonRequest(BASE, member.cookie, { name: "Asaripallam Tower" }),
       ),
       await getProject(
-        jsonRequest(`${BASE}/${shanti.id}`, member.cookie),
-        params(shanti.id),
+        jsonRequest(`${BASE}/${kumari.id}`, member.cookie),
+        params(kumari.id),
       ),
     ]) {
       expect(response.status).toBe(StatusCodes.FORBIDDEN);
       expect(await json(response)).toMatchObject({ code: "PERMISSION_DENIED" });
     }
     const readOnly = await memberWith(owner, { "projects.project": ["read"] });
-    await assign(readOnly.memberId, [shanti.id]);
+    await assign(readOnly.memberId, [kumari.id]);
     const edit = await updateProject(
-      jsonRequest(`${BASE}/${shanti.id}/update`, readOnly.cookie, {
-        name: "Shanti Heights",
+      jsonRequest(`${BASE}/${kumari.id}/update`, readOnly.cookie, {
+        name: "Kumari Heights",
         status: "completed",
-        expectedUpdatedAt: shanti.updatedAt,
+        expectedUpdatedAt: kumari.updatedAt,
       }),
-      params(shanti.id),
+      params(kumari.id),
     );
     expect(edit.status).toBe(StatusCodes.FORBIDDEN);
 
     const options = await json<{ items: { id: string }[] }>(
       await listOptions(jsonRequest(`${BASE}/options`, member.cookie)),
     );
-    expect(options.items.map((item) => item.id)).toEqual([shanti.id]);
+    expect(options.items.map((item) => item.id)).toEqual([kumari.id]);
   });
 
   it("keeps Companies apart", async () => {
-    const patil = await ownerWithCompany("Patil Builders");
-    const kale = await ownerWithCompany("Kale Constructions");
-    const shanti = await create(patil.cookie, { name: "Shanti Heights" });
+    const anugraha = await ownerWithCompany("Anugraha Engineers");
+    const sakthi = await ownerWithCompany("Sakthi Constructions");
+    const kumari = await create(anugraha.cookie, { name: "Kumari Heights" });
     // The same name is fine in another Company.
-    await create(kale.cookie, { name: "Shanti Heights" });
-    expect((await list(kale.cookie)).total).toBe(1);
+    await create(sakthi.cookie, { name: "Kumari Heights" });
+    expect((await list(sakthi.cookie)).total).toBe(1);
     expect(
       (
         await getProject(
-          jsonRequest(`${BASE}/${shanti.id}`, kale.cookie),
-          params(shanti.id),
+          jsonRequest(`${BASE}/${kumari.id}`, sakthi.cookie),
+          params(kumari.id),
         )
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
     expect(
       (
         await deleteProject(
-          jsonRequest(`${BASE}/${shanti.id}/delete`, kale.cookie, {}),
-          params(shanti.id),
+          jsonRequest(`${BASE}/${kumari.id}/delete`, sakthi.cookie, {}),
+          params(kumari.id),
         )
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
     const options = await json<{ items: { id: string }[] }>(
-      await listOptions(jsonRequest(`${BASE}/options`, kale.cookie)),
+      await listOptions(jsonRequest(`${BASE}/options`, sakthi.cookie)),
     );
-    expect(options.items.map((item) => item.id)).not.toContain(shanti.id);
+    expect(options.items.map((item) => item.id)).not.toContain(kumari.id);
   });
 
   it("checks Team Member Project assignments against live Projects", async () => {
     const owner = await ownerWithCompany();
-    const other = await ownerWithCompany("Kale Constructions");
-    const shanti = await create(owner.cookie, { name: "Shanti Heights" });
-    const foreign = await create(other.cookie, { name: "Aundh Tower" });
+    const other = await ownerWithCompany("Sakthi Constructions");
+    const kumari = await create(owner.cookie, { name: "Kumari Heights" });
+    const foreign = await create(other.cookie, { name: "Asaripallam Tower" });
     const members = `${TEST_ORIGIN}/api/construction/organization/team-members`;
     const add = (projectIds: string[]) =>
       createTeamMember(
         jsonRequest(members, owner.cookie, {
-          name: "Suresh Kale",
+          name: "Prabhu Saravanan",
           designationId: owner.designationId("Site Engineer"),
-          email: `suresh-${newId()}@example.test`,
+          email: `prabhu-${newId()}@example.test`,
           memberType: "normal",
           projectIds,
         }),
@@ -509,10 +514,10 @@ describe("Projects HTTP (CM-204)", () => {
       code: "PROJECT_NOT_FOUND",
       details: { projectIds: [foreign.id] },
     });
-    const added = await add([shanti.id]);
+    const added = await add([kumari.id]);
     expect(added.status).toBe(StatusCodes.CREATED);
     const member = await json<{ id: string; projectIds: string[] }>(added);
-    expect(member.projectIds).toEqual([shanti.id]);
+    expect(member.projectIds).toEqual([kumari.id]);
 
     const reassign = (projectIds: string[]) =>
       assignProjects(

@@ -59,12 +59,12 @@ type Profile = {
 };
 
 const changes = {
-  name: "Patil Infra",
+  name: "Anugraha Infra",
   mobile: "+919812345678",
-  email: "Office@PatilInfra.in",
-  gstin: "27aapfu0939f1zv",
-  pan: "AAPFU0939F",
-  address: "Plot 4, Baner, Pune",
+  email: "Office@AnugrahaInfra.in",
+  gstin: "33aapfa0939f1zm",
+  pan: "AAPFA0939F",
+  address: "Plot 4, Vadasery, Nagercoil",
   currency: "INR",
   timezone: "Asia/Kolkata",
 };
@@ -103,9 +103,9 @@ describe("GET /api/construction/organization/company-profile", () => {
     const response = await getCompanyProfile(get());
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
-      name: "Patil Infra",
-      gstin: "27AAPFU0939F1ZV",
-      pan: "AAPFU0939F",
+      name: "Anugraha Infra",
+      gstin: "33AAPFA0939F1ZM",
+      pan: "AAPFA0939F",
       canUpdate: false,
       logoUrl: null,
     });
@@ -158,9 +158,9 @@ describe("POST /api/construction/organization/company-profile/update", () => {
     );
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
-      name: "Patil Infra",
-      email: "office@patilinfra.in",
-      gstin: "27AAPFU0939F1ZV",
+      name: "Anugraha Infra",
+      email: "office@anugrahainfra.in",
+      gstin: "33AAPFA0939F1ZM",
       // The country is fixed at creation.
       country: "IN",
     });
@@ -168,15 +168,18 @@ describe("POST /api/construction/organization/company-profile/update", () => {
     const workspace = await prisma.identityWorkspace.findUniqueOrThrow({
       where: { id: workspaceId },
     });
-    expect(workspace.name).toBe("Patil Infra");
+    expect(workspace.name).toBe("Anugraha Infra");
     const audit =
       await prisma.constructionOrganizationAuditEvent.findFirstOrThrow({
         where: { workspaceId, action: "company.profile_updated" },
       });
-    expect(audit.before).toMatchObject({ name: "Patil Builders", gstin: null });
+    expect(audit.before).toMatchObject({
+      name: "Anugraha Engineers",
+      gstin: null,
+    });
     expect(audit.after).toMatchObject({
-      name: "Patil Infra",
-      gstin: "27AAPFU0939F1ZV",
+      name: "Anugraha Infra",
+      gstin: "33AAPFA0939F1ZM",
     });
   });
 
@@ -202,7 +205,7 @@ describe("POST /api/construction/organization/company-profile/update", () => {
     const { workspaceId, ownerId } = await newCompany();
     actAs({ userId: ownerId, workspaceId });
     const wrongCheck = await updateCompanyProfile(
-      post("/update", { ...changes, gstin: "27AAPFU0939F1ZW" }),
+      post("/update", { ...changes, gstin: "33AAPFA0939F1ZW" }),
     );
     expect(wrongCheck.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(wrongCheck)).toMatchObject({ code: "GSTIN_INVALID" });

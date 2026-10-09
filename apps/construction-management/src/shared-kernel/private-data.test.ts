@@ -16,7 +16,7 @@ describe("PrivateDataCipher", () => {
   });
 
   it("rejects tampering and the wrong key", () => {
-    const sealed = cipher.encrypt("AAPFU0939F");
+    const sealed = cipher.encrypt("AAPFA0939F");
     const other = PrivateDataCipher.fromKey(randomBytes(32).toString("base64"));
     expect(() => other.decrypt(sealed)).toThrow();
     const parts = sealed.split(".");

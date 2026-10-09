@@ -28,7 +28,7 @@ function vendor(
     id,
     workspaceId: "w1",
     details: {
-      name: id === "v1" ? "Ramesh Gang" : `Vendor ${id}`,
+      name: id === "v1" ? "Muthu Gang" : `Vendor ${id}`,
       joiningDate: "2026-01-01",
     },
     projectIds: options.projectIds ?? ["p1"],
@@ -405,10 +405,10 @@ describe("VendorAttendanceHandlers queries", () => {
   });
 
   it("keeps a recorded vendor in the grid after it left the Project", async () => {
-    const ramesh = vendor("v1");
-    const { handlers } = setup([ramesh]);
+    const muthu = vendor("v1");
+    const { handlers } = setup([muthu]);
     await handlers.record(input());
-    ramesh.setActive(false, "u1", NOW);
+    muthu.setActive(false, "u1", NOW);
     const grid = await handlers.day("w1", "p1", "2026-10-07");
     expect(grid.vendors).toHaveLength(1);
     expect(grid.vendors[0]).toMatchObject({
@@ -442,7 +442,7 @@ describe("VendorAttendanceHandlers queries", () => {
     const month = await handlers.month("w1", "p1", "2026-10");
     expect(month.dates).toHaveLength(31);
     expect(month.vendors.map((row) => row.vendorName)).toEqual([
-      "Ramesh Gang",
+      "Muthu Gang",
       "Vendor v2",
     ]);
     expect(month.vendors[0]?.totals).toEqual({
@@ -495,7 +495,7 @@ describe("VendorAttendanceHandlers queries", () => {
     );
     expect(overtime.items).toHaveLength(1);
     expect(overtime.items[0]).toMatchObject({
-      vendorName: "Ramesh Gang",
+      vendorName: "Muthu Gang",
       labourCategoryName: "Helper",
       overtimeHours: "1.5",
       overtimeAmount: 10_500,

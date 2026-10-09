@@ -91,14 +91,14 @@ function paid(input: {
 const quote = (
   subscription: Subscription | null,
   choice: Parameters<typeof quoteCheckout>[0]["choice"],
-  buyerStateCode = "27",
+  buyerStateCode = "33",
 ) =>
   quoteCheckout({
     catalogue,
     subscription,
     choice,
     buyerStateCode,
-    sellerStateCode: "27",
+    sellerStateCode: "33",
     now: NOW,
   });
 
@@ -376,32 +376,36 @@ describe("Invoices and billing addresses", () => {
   it("checks the GSTIN and that it belongs to the billing state", () => {
     expect(
       billingAddress({
-        name: "Patil Builders",
-        address: "Baner, Pune",
-        stateCode: "27",
-        gstin: "27aapfu0939f1zv",
+        name: "Anugraha Engineers",
+        address: "Vadasery, Nagercoil",
+        stateCode: "33",
+        gstin: "33aapfa0939f1zm",
       }),
-    ).toMatchObject({ gstin: "27AAPFU0939F1ZV" });
+    ).toMatchObject({ gstin: "33AAPFA0939F1ZM" });
     expect(() =>
       billingAddress({
-        name: "Patil",
-        address: "Pune",
+        name: "Anugraha",
+        address: "Nagercoil",
         stateCode: "29",
-        gstin: "27AAPFU0939F1ZV",
+        gstin: "33AAPFA0939F1ZM",
       }),
     ).toThrow(
       expect.objectContaining({ code: "GSTIN_STATE_MISMATCH" }) as Error,
     );
     expect(() =>
       billingAddress({
-        name: "Patil",
-        address: "Pune",
-        stateCode: "27",
-        gstin: "27AAPFU0939F1ZW",
+        name: "Anugraha",
+        address: "Nagercoil",
+        stateCode: "33",
+        gstin: "33AAPFA0939F1ZW",
       }),
     ).toThrow(expect.objectContaining({ code: "GSTIN_INVALID" }) as Error);
     expect(() =>
-      billingAddress({ name: "Patil", address: "Pune", stateCode: "25" }),
+      billingAddress({
+        name: "Anugraha",
+        address: "Nagercoil",
+        stateCode: "25",
+      }),
     ).toThrow(
       expect.objectContaining({ code: "BILLING_STATE_INVALID" }) as Error,
     );

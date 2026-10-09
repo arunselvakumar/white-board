@@ -52,7 +52,7 @@ export const CreatesACompany: Story = {
       Response.json(
         {
           id: "company_new",
-          name: "Patil Builders",
+          name: "Anugraha Engineers",
         },
         { status: 201 },
       ),
@@ -64,18 +64,18 @@ export const CreatesACompany: Story = {
       ).toBeVisible();
       await userEvent.type(
         canvas.getByLabelText("Company name"),
-        "Patil Builders",
+        "Anugraha Engineers",
       );
       await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
       // The Owner's verified mobile is offered as the Company mobile.
       await expect(await canvas.findByLabelText("Company mobile")).toHaveValue(
-        "9876543210",
+        "7708165767",
       );
       await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
       await expect(await canvas.findByText("Step 3 of 3")).toBeVisible();
-      await userEvent.type(canvas.getByLabelText("GSTIN"), "27AAPFU0939F1ZW");
+      await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZW");
       await userEvent.click(
         canvas.getByRole("button", { name: "Create Company" }),
       );
@@ -83,13 +83,15 @@ export const CreatesACompany: Story = {
         await canvas.findByText("Enter a valid 15-character GSTIN"),
       ).toBeVisible();
       await userEvent.clear(canvas.getByLabelText("GSTIN"));
-      await userEvent.type(canvas.getByLabelText("GSTIN"), "27AAPFU0939F1ZV");
+      await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZM");
       await userEvent.click(
         canvas.getByRole("button", { name: "Create Company" }),
       );
 
       await expect(
-        await canvas.findByRole("heading", { name: "Patil Builders is ready" }),
+        await canvas.findByRole("heading", {
+          name: "Anugraha Engineers is ready",
+        }),
       ).toBeVisible();
       const sent = spy.mock.calls[0]?.[1]?.body;
       const body = JSON.parse(typeof sent === "string" ? sent : "{}") as Record<
@@ -97,11 +99,11 @@ export const CreatesACompany: Story = {
         unknown
       >;
       await expect(body).toMatchObject({
-        name: "Patil Builders",
-        mobile: "+919876543210",
+        name: "Anugraha Engineers",
+        mobile: "+917708165767",
         country: "IN",
         currency: "INR",
-        gstin: "27AAPFU0939F1ZV",
+        gstin: "33AAPFA0939F1ZM",
         pan: null,
       });
       await userEvent.click(
@@ -148,7 +150,7 @@ export const ServerErrorReturnsToTheField: Story = {
       ),
     );
     try {
-      await userEvent.type(canvas.getByLabelText("Company name"), "Patil");
+      await userEvent.type(canvas.getByLabelText("Company name"), "Anugraha");
       await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
       await userEvent.click(
         await canvas.findByRole("button", { name: "Continue" }),

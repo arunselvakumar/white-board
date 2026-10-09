@@ -17,7 +17,7 @@ export function MobileField(props: ComponentProps<typeof InputGroupInput>) {
         type="tel"
         inputMode="tel"
         autoComplete="tel-national"
-        placeholder="98765 43210"
+        placeholder="77081 65767"
         {...props}
       />
     </InputGroup>

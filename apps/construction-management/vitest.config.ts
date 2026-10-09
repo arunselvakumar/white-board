@@ -53,7 +53,7 @@ export default defineConfig({
             RAZORPAY_WEBHOOK_SECRET: "http-tests-only-razorpay-webhook-secret",
             RAZORPAY_KEY_ID: "",
             RAZORPAY_KEY_SECRET: "",
-            CONSTRUCTION_SELLER_STATE_CODE: "27",
+            CONSTRUCTION_SELLER_STATE_CODE: "33",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
           // One database; files must not interleave their writes.

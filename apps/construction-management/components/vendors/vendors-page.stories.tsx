@@ -62,7 +62,7 @@ export const WithVendors: Story = {
     const table = await canvas.findByRole("table", { name: "Vendors" });
     const rows = within(table);
     await expect(
-      rows.getByRole("link", { name: "Ramesh Gang" }),
+      rows.getByRole("link", { name: "Muthu Gang" }),
     ).toHaveAttribute(
       "href",
       `/app/masters/vendors/${VENDOR_SUMMARIES[0]?.id ?? ""}`,
@@ -82,14 +82,14 @@ export const WithVendors: Story = {
     );
 
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Actions for Ramesh Gang" }),
+      await canvas.findByRole("button", { name: "Actions for Muthu Gang" }),
     );
     await userEvent.click(
       await body.findByRole("menuitem", { name: "Deactivate" }),
     );
     const dialog = within(await body.findByRole("alertdialog"));
     await waitFor(() =>
-      expect(dialog.getByText("Deactivate Ramesh Gang?")).toBeVisible(),
+      expect(dialog.getByText("Deactivate Muthu Gang?")).toBeVisible(),
     );
     await userEvent.click(dialog.getByRole("button", { name: "Deactivate" }));
     await waitFor(() =>

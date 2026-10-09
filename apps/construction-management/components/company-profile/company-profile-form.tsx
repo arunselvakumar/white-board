@@ -79,7 +79,7 @@ const schema = z
       .trim()
       .toUpperCase()
       .refine((value) => value === "" || isValidPan(value), {
-        message: "Enter a valid 10-character PAN, like AAPFU0939F",
+        message: "Enter a valid 10-character PAN, like AAPFA0939F",
       }),
     address: z.string().trim().max(500, "Use at most 500 characters"),
     currency: z.string().length(3),
@@ -263,7 +263,7 @@ export function CompanyProfileForm({
                   id="company-mobile"
                   type="tel"
                   inputMode="tel"
-                  placeholder="+971 50 123 4567"
+                  placeholder="+91 77081 65767"
                   className="h-10"
                   {...form.register("mobile")}
                 />
@@ -275,7 +275,7 @@ export function CompanyProfileForm({
               <Input
                 id="company-email"
                 type="email"
-                placeholder="office@patilbuilders.in"
+                placeholder="office@anugrahaengineers.in"
                 className="h-10"
                 {...form.register("email")}
               />
@@ -289,7 +289,7 @@ export function CompanyProfileForm({
                 <Label htmlFor="company-gstin">GSTIN</Label>
                 <Input
                   id="company-gstin"
-                  placeholder="27AAPFU0939F1ZV"
+                  placeholder="33AAPFA0939F1ZM"
                   autoCapitalize="characters"
                   className="h-10 uppercase placeholder:normal-case"
                   {...form.register("gstin")}
@@ -300,7 +300,7 @@ export function CompanyProfileForm({
                 <Label htmlFor="company-pan">Company PAN</Label>
                 <Input
                   id="company-pan"
-                  placeholder="AAPFU0939F"
+                  placeholder="AAPFA0939F"
                   autoCapitalize="characters"
                   className="h-10 uppercase placeholder:normal-case"
                   {...form.register("pan")}

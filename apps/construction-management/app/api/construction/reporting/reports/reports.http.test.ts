@@ -68,7 +68,7 @@ async function seed(company: Company) {
     data: {
       id: supervisor,
       workspaceId: ws,
-      name: `Mohan ${supervisor.slice(-6)}`,
+      name: `Murugan ${supervisor.slice(-6)}`,
       ...AUDIT,
     },
   });
@@ -95,11 +95,11 @@ async function seed(company: Company) {
     });
     return id;
   };
-  const raju = await labour("Raju Pawar", {
-    fatherName: "Shankar Pawar",
+  const dhuresh = await labour("Dhuresh Nawin", {
+    fatherName: "Nawin Kumar",
     gender: "male",
   });
-  const asha = await labour("Asha Kale", { gender: "female" });
+  const abirami = await labour("Abirami Priya", { gender: "female" });
 
   const mark = async (
     labourId: string,
@@ -138,21 +138,21 @@ async function seed(company: Company) {
     });
     return id;
   };
-  await mark(raju, "2026-08-01", "present", 80_000, {
+  await mark(dhuresh, "2026-08-01", "present", 80_000, {
     hours: "2",
     amount: 20_000,
   });
-  await mark(raju, "2026-08-02", "half_day", 40_000);
-  await mark(raju, "2026-08-31", "present", 80_000);
-  await mark(asha, "2026-08-01", "present", 80_000);
-  await mark(asha, "2026-08-02", "absent", 0);
+  await mark(dhuresh, "2026-08-02", "half_day", 40_000);
+  await mark(dhuresh, "2026-08-31", "present", 80_000);
+  await mark(abirami, "2026-08-01", "present", 80_000);
+  await mark(abirami, "2026-08-02", "absent", 0);
   // Another Project's day stays out of Tower A's reports.
   await prisma.constructionLabourAttendance.create({
     data: {
       id: newId(),
       workspaceId: ws,
       projectId: villa,
-      labourId: asha,
+      labourId: abirami,
       attendanceDate: date("2026-08-03"),
       status: "present",
       wageType: "daily",
@@ -183,21 +183,21 @@ async function seed(company: Company) {
     reversesEntryId,
     createdBy: "test",
   });
-  const cancelled = entry(raju, "payment", -10_000, "2026-08-21");
+  const cancelled = entry(dhuresh, "payment", -10_000, "2026-08-21");
   await prisma.constructionLabourLedgerEntry.createMany({
     data: [
-      entry(raju, "opening", 100_000, "2026-06-01", null),
-      entry(raju, "earned", 80_000, "2026-07-31"),
-      entry(raju, "earned", 80_000, "2026-08-01"),
-      entry(raju, "overtime", 20_000, "2026-08-01"),
-      entry(raju, "earned", 40_000, "2026-08-02"),
-      entry(raju, "earned", 80_000, "2026-08-31"),
-      entry(raju, "advance", -30_000, "2026-08-10"),
-      entry(raju, "payment", -60_000, "2026-08-20"),
+      entry(dhuresh, "opening", 100_000, "2026-06-01", null),
+      entry(dhuresh, "earned", 80_000, "2026-07-31"),
+      entry(dhuresh, "earned", 80_000, "2026-08-01"),
+      entry(dhuresh, "overtime", 20_000, "2026-08-01"),
+      entry(dhuresh, "earned", 40_000, "2026-08-02"),
+      entry(dhuresh, "earned", 80_000, "2026-08-31"),
+      entry(dhuresh, "advance", -30_000, "2026-08-10"),
+      entry(dhuresh, "payment", -60_000, "2026-08-20"),
       cancelled,
-      entry(raju, "payment", 10_000, "2026-08-21", tower, cancelled.id),
-      entry(asha, "opening", -20_000, "2026-08-15", null),
-      entry(asha, "earned", 80_000, "2026-08-01"),
+      entry(dhuresh, "payment", 10_000, "2026-08-21", tower, cancelled.id),
+      entry(abirami, "opening", -20_000, "2026-08-15", null),
+      entry(abirami, "earned", 80_000, "2026-08-01"),
     ],
   });
 
@@ -206,7 +206,7 @@ async function seed(company: Company) {
     data: {
       id: vendor,
       workspaceId: ws,
-      name: "Ramesh Gang",
+      name: "Muthu Gang",
       joiningDate: date("2026-01-01"),
       ...AUDIT,
     },
@@ -239,7 +239,7 @@ async function seed(company: Company) {
     });
   await vendorDay(tower, "2026-08-05");
   await vendorDay(villa, "2026-08-06");
-  return { tower, villa, raju, asha, vendor, mason };
+  return { tower, villa, dhuresh, abirami, vendor, mason };
 }
 
 type Seeded = Awaited<ReturnType<typeof seed>>;
@@ -324,7 +324,7 @@ async function member(
 
 describe("report jobs HTTP", () => {
   it("All Labour Attendance: an Excel with the header block and totals, and a PDF", async () => {
-    const company = await ownerWithCompany("Patil Builders");
+    const company = await ownerWithCompany("Anugraha Engineers");
     const s: Seeded = await seed(company);
     const job = await generate(company.cookie, {
       kind: "labour_attendance",
@@ -343,7 +343,7 @@ describe("report jobs HTTP", () => {
       "Day by day",
     ]);
     const summary = tableOf(book.getWorksheet("Summary"), "Sl. No.");
-    expect(summary.rows[0]?.[0]).toBe("Patil Builders");
+    expect(summary.rows[0]?.[0]).toBe("Anugraha Engineers");
     expect(
       summary.rows.some(
         (row) => row[0] === "Period" && row[1] === "01 Aug 2026 to 31 Aug 2026",
@@ -367,17 +367,17 @@ describe("report jobs HTTP", () => {
       "Holiday",
       "OT hours",
     ]);
-    const raju = summary.find("Raju Pawar");
-    expect(summary.cell(raju, "Present")).toBe(2);
-    expect(summary.cell(raju, "Half day")).toBe(1);
-    expect(summary.cell(raju, "OT hours")).toBe(2);
+    const dhuresh = summary.find("Dhuresh Nawin");
+    expect(summary.cell(dhuresh, "Present")).toBe(2);
+    expect(summary.cell(dhuresh, "Half day")).toBe(1);
+    expect(summary.cell(dhuresh, "OT hours")).toBe(2);
     expect(summary.cell(summary.totals, "Present")).toBe(3);
     expect(summary.cell(summary.totals, "Absent")).toBe(1);
-    // Asha's Villa day is not in Tower A's report.
+    // Abirami's Villa day is not in Tower A's report.
     const days = tableOf(book.getWorksheet("Day by day"), "Date");
-    expect(days.body.filter((row) => row.includes("Asha Kale"))).toHaveLength(
-      2,
-    );
+    expect(
+      days.body.filter((row) => row.includes("Abirami Priya")),
+    ).toHaveLength(2);
     await expectPdf(company.cookie, job);
 
     const stored = await prisma.constructionOrganizationStoredFile.findMany({
@@ -397,16 +397,16 @@ describe("report jobs HTTP", () => {
     expect(job.includesMoney).toBe(true);
     const book = await workbook(company.cookie, job);
     const table = tableOf(book.worksheets[0], "Sl. No.");
-    const raju = table.find("Raju Pawar");
+    const dhuresh = table.find("Dhuresh Nawin");
     // Previous 1000 + 800; To Pay 800 + 200 + 400 + 800; advance 300; paid 600.
-    expect(table.cell(raju, "Previous Balance")).toBe(1_800);
-    expect(table.cell(raju, "To Pay")).toBe(2_200);
-    expect(table.cell(raju, "Advance")).toBe(300);
-    expect(table.cell(raju, "Paid")).toBe(600);
-    expect(table.cell(raju, "Final Amount")).toBe(3_100);
-    const asha = table.find("Asha Kale");
-    expect(table.cell(asha, "Previous Balance")).toBe(-200);
-    expect(table.cell(asha, "Final Amount")).toBe(600);
+    expect(table.cell(dhuresh, "Previous Balance")).toBe(1_800);
+    expect(table.cell(dhuresh, "To Pay")).toBe(2_200);
+    expect(table.cell(dhuresh, "Advance")).toBe(300);
+    expect(table.cell(dhuresh, "Paid")).toBe(600);
+    expect(table.cell(dhuresh, "Final Amount")).toBe(3_100);
+    const abirami = table.find("Abirami Priya");
+    expect(table.cell(abirami, "Previous Balance")).toBe(-200);
+    expect(table.cell(abirami, "Final Amount")).toBe(600);
     expect(table.cell(table.totals, "Final Amount")).toBe(3_700);
     await expectPdf(company.cookie, job);
   });
@@ -424,11 +424,11 @@ describe("report jobs HTTP", () => {
     expect(table.header.slice(2, 33)).toEqual(
       Array.from({ length: 31 }, (_, index) => String(index + 1)),
     );
-    const raju = table.find("Raju Pawar");
-    expect(table.cell(raju, "1")).toBe("P");
-    expect(table.cell(raju, "2")).toBe("½");
-    expect(table.cell(raju, "Earned")).toBe(2_000);
-    expect(table.cell(raju, "OT amount")).toBe(200);
+    const dhuresh = table.find("Dhuresh Nawin");
+    expect(table.cell(dhuresh, "1")).toBe("P");
+    expect(table.cell(dhuresh, "2")).toBe("½");
+    expect(table.cell(dhuresh, "Earned")).toBe(2_000);
+    expect(table.cell(dhuresh, "OT amount")).toBe(200);
     expect(table.cell(table.totals, "Total")).toBe(3_000);
     await expectPdf(company.cookie, job);
   });
@@ -451,9 +451,7 @@ describe("report jobs HTTP", () => {
     expect(table.cell(table.totals, "Pay")).toBe(3_150);
     expect(
       table.rows.some((row) =>
-        String(row[0]).startsWith(
-          "Vendor: Ramesh Gang; Labour Category: Mason",
-        ),
+        String(row[0]).startsWith("Vendor: Muthu Gang; Labour Category: Mason"),
       ),
     ).toBe(true);
     await expectPdf(company.cookie, job);
@@ -509,14 +507,14 @@ describe("report jobs HTTP", () => {
       "Paid in month",
       "Signature / thumb impression",
     ]);
-    const raju = table.find("Raju Pawar");
-    expect(table.cell(raju, "Father's name")).toBe("Shankar Pawar");
-    expect(table.cell(raju, "1")).toBe("P+2");
-    expect(table.cell(raju, "Days worked")).toBe(2.5);
-    expect(table.cell(raju, "Gross")).toBe(2_200);
-    expect(table.cell(raju, "Advance")).toBe(300);
-    expect(table.cell(raju, "Net payable")).toBe(1_900);
-    expect(table.cell(raju, "Paid in month")).toBe(600);
+    const dhuresh = table.find("Dhuresh Nawin");
+    expect(table.cell(dhuresh, "Father's name")).toBe("Nawin Kumar");
+    expect(table.cell(dhuresh, "1")).toBe("P+2");
+    expect(table.cell(dhuresh, "Days worked")).toBe(2.5);
+    expect(table.cell(dhuresh, "Gross")).toBe(2_200);
+    expect(table.cell(dhuresh, "Advance")).toBe(300);
+    expect(table.cell(dhuresh, "Net payable")).toBe(1_900);
+    expect(table.cell(dhuresh, "Paid in month")).toBe(600);
     await expectPdf(company.cookie, job);
   });
 

@@ -50,12 +50,12 @@ export const CATEGORY_LIST = {
   total: 4,
 };
 
-export const RAMESH_GANG: VendorResponse = {
+export const MUTHU_GANG: VendorResponse = {
   id: "0199a1b2-0000-7000-8000-0000000000b1",
-  name: "Ramesh Gang",
+  name: "Muthu Gang",
   joiningDate: "2026-04-01",
-  contactNumber: "+919876543210",
-  address: "Hadapsar, Pune",
+  contactNumber: "+917708165767",
+  address: "Kottar, Nagercoil",
   isActive: true,
   hasRateCard: true,
   photoUrl: null,
@@ -104,20 +104,20 @@ export const RAMESH_GANG: VendorResponse = {
 
 export const VENDOR_SUMMARIES: VendorSummary[] = [
   {
-    id: RAMESH_GANG.id,
-    name: "Ramesh Gang",
-    contactNumber: "+919876543210",
+    id: MUTHU_GANG.id,
+    name: "Muthu Gang",
+    contactNumber: "+917708165767",
     isActive: true,
     hasRateCard: true,
     shiftCount: 2,
-    projects: RAMESH_GANG.projects,
+    projects: MUTHU_GANG.projects,
     balance: 2_500_000,
     createdAt: AT,
     updatedAt: AT,
   },
   {
     id: "0199a1b2-0000-7000-8000-0000000000b2",
-    name: "Sunil Gang",
+    name: "Sundar Gang",
     contactNumber: null,
     isActive: false,
     hasRateCard: false,

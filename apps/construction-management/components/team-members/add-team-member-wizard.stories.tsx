@@ -28,7 +28,7 @@ const meta = {
   title: "Masters/AddTeamMemberWizard",
   component: AddTeamMemberWizard,
   beforeEach() {
-    signInAs("owner", { name: "Patil Builders" });
+    signInAs("owner", { name: "Anugraha Engineers" });
   },
   render: () => (
     <QuerySuspense>
@@ -69,7 +69,7 @@ export const NormalMemberWithTemplate: Story = {
             items: [
               {
                 id: "0199a000-0000-7000-8000-000000000001",
-                name: "Shree Heights",
+                name: "Sri Heights",
                 status: "ongoing",
               },
               {
@@ -98,7 +98,7 @@ export const NormalMemberWithTemplate: Story = {
       canvas.getByText("Choose a Designation", { selector: "p" }),
     ).toBeVisible();
 
-    await userEvent.type(canvas.getByLabelText("Name"), "Suresh Kale");
+    await userEvent.type(canvas.getByLabelText("Name"), "Prabhu Saravanan");
     await chooseDesignation(canvas, body, userEvent, "Site Engineer");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await expect(
@@ -106,8 +106,8 @@ export const NormalMemberWithTemplate: Story = {
         "Enter an email (to invite them) or a mobile number",
       ),
     ).toBeVisible();
-    await userEvent.type(canvas.getByLabelText("Email"), "suresh@kale.in");
-    await userEvent.type(canvas.getByLabelText("Mobile"), "98765 43210");
+    await userEvent.type(canvas.getByLabelText("Email"), "prabhu@sakthi.in");
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await userEvent.type(canvas.getByLabelText("Aadhaar"), "2341 2341 2345");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await expect(
@@ -118,7 +118,7 @@ export const NormalMemberWithTemplate: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
     await userEvent.click(
-      await canvas.findByRole("checkbox", { name: /Shree Heights/ }),
+      await canvas.findByRole("checkbox", { name: /Sri Heights/ }),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
@@ -134,17 +134,19 @@ export const NormalMemberWithTemplate: Story = {
     );
 
     await expect(
-      await canvas.findByRole("heading", { name: "Suresh Kale is invited" }),
+      await canvas.findByRole("heading", {
+        name: "Prabhu Saravanan is invited",
+      }),
     ).toBeVisible();
     await expect(
       canvas.getByText(
-        "They show as Joining Pending until they sign in with suresh@kale.in and accept.",
+        "They show as Joining Pending until they sign in with prabhu@sakthi.in and accept.",
       ),
     ).toBeVisible();
     await expect(sentBody()).toMatchObject({
-      name: "Suresh Kale",
-      email: "suresh@kale.in",
-      mobile: "+919876543210",
+      name: "Prabhu Saravanan",
+      email: "prabhu@sakthi.in",
+      mobile: "+917708165767",
       aadhaar: "2341 2341 2346",
       memberType: "normal",
       projectIds: ["0199a000-0000-7000-8000-000000000001"],
@@ -161,7 +163,7 @@ export const NormalMemberWithTemplate: Story = {
       expect(dialog.getByLabelText("Invite link")).toBeVisible(),
     );
     await expect(
-      dialog.getByText(/They sign in with suresh@kale\.in/),
+      dialog.getByText(/They sign in with prabhu@sakthi\.in/),
     ).toBeVisible();
   },
 };
@@ -184,14 +186,17 @@ export const MobileOnlyCannotSignInYet: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.type(await canvas.findByLabelText("Name"), "Suresh Kale");
+    await userEvent.type(
+      await canvas.findByLabelText("Name"),
+      "Prabhu Saravanan",
+    );
     await chooseDesignation(canvas, body, userEvent, "Site Engineer");
     await expect(
       canvas.getByText(
         "A contact number. Without an email they stay a record and cannot sign in.",
       ),
     ).toBeVisible();
-    await userEvent.type(canvas.getByLabelText("Mobile"), "98765 43210");
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await userEvent.click(
       await canvas.findByRole("button", { name: "Continue" }),
@@ -200,7 +205,7 @@ export const MobileOnlyCannotSignInYet: Story = {
       await canvas.findByRole("button", { name: "Add and invite" }),
     );
     await expect(
-      await canvas.findByRole("heading", { name: "Suresh Kale is added" }),
+      await canvas.findByRole("heading", { name: "Prabhu Saravanan is added" }),
     ).toBeVisible();
     await expect(
       canvas.getByText(
@@ -224,7 +229,7 @@ export const HrmsMemberSkipsProjects: Story = {
         method: "POST",
         path: MEMBERS_URL,
         respond: () =>
-          Response.json(teamMember({ name: "Anita", memberType: "hrms" }), {
+          Response.json(teamMember({ name: "Anitha", memberType: "hrms" }), {
             status: 201,
           }),
       },
@@ -234,9 +239,9 @@ export const HrmsMemberSkipsProjects: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(await canvas.findByText("HRMS only"));
-    await userEvent.type(canvas.getByLabelText("Name"), "Anita");
+    await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
     await chooseDesignation(canvas, body, userEvent, "Accountant");
-    await userEvent.type(canvas.getByLabelText("Email"), "anita@patil.in");
+    await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
     await expect(await canvas.findByText(/HRMS default set/)).toBeVisible();
@@ -276,9 +281,9 @@ export const MobileAlreadyInUse: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.type(await canvas.findByLabelText("Name"), "Suresh");
+    await userEvent.type(await canvas.findByLabelText("Name"), "Prabhu");
     await chooseDesignation(canvas, body, userEvent, "Accountant");
-    await userEvent.type(canvas.getByLabelText("Mobile"), "9876543210");
+    await userEvent.type(canvas.getByLabelText("Mobile"), "7708165767");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await userEvent.click(
       await canvas.findByRole("button", { name: "Continue" }),

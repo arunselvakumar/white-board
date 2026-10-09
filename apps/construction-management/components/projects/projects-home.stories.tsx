@@ -38,15 +38,15 @@ export const WithProjects: Story = {
     ).toBeVisible();
     const cards = within(canvas.getByRole("list", { name: "Projects" }));
     await expect(cards.getAllByRole("link")).toHaveLength(5);
-    const shanti = cards.getByRole("link", { name: /Shanti Heights/ });
-    await expect(shanti).toHaveAttribute(
+    const kumari = cards.getByRole("link", { name: /Kumari Heights/ });
+    await expect(kumari).toHaveAttribute(
       "href",
       "/app/projects/0199c4a0-0000-7000-8000-000000000001",
     );
-    await expect(shanti).toHaveTextContent("1 Apr 2026 – 31 Mar 2027");
-    await expect(shanti).toHaveTextContent("Baner, Pune 411045");
+    await expect(kumari).toHaveTextContent("1 Apr 2026 – 31 Mar 2027");
+    await expect(kumari).toHaveTextContent("Vadasery, Nagercoil 629001");
     await expect(
-      cards.getByRole("link", { name: /Baner Plots/ }),
+      cards.getByRole("link", { name: /Vadasery Plots/ }),
     ).toHaveTextContent("No address or dates yet.");
     await expect(
       canvas.getByRole("link", { name: "New Project" }),
@@ -79,8 +79,8 @@ export const FiltersByStatus: Story = {
         .getAllByRole("link")
         .map((link) => link.textContent),
     ).toEqual([
-      expect.stringContaining("Aundh Tower"),
-      expect.stringContaining("Shanti Heights"),
+      expect.stringContaining("Asaripallam Tower"),
+      expect.stringContaining("Kumari Heights"),
     ]);
   },
 };

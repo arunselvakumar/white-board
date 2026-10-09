@@ -119,14 +119,14 @@ async function fixtures(company: Company) {
     seedProject(company.workspaceId, `Villa ${suffix}`),
     seedCategory(company.workspaceId, `Mason ${suffix}`),
     seedCategory(company.workspaceId, `Welder ${suffix}`, true),
-    seedSupervisor(company.workspaceId, `Sunil ${suffix}`),
+    seedSupervisor(company.workspaceId, `Sundar ${suffix}`),
   ]);
   return { tower, villa, mason, welder, supervisor, suffix };
 }
 
 function labourBody(projectId: string, extra: Record<string, unknown> = {}) {
   return {
-    name: "Raju Pawar",
+    name: "Dhuresh Nawin",
     joiningDate: "2026-09-01",
     wageType: "daily",
     wagePerDay: 70_000,
@@ -251,14 +251,14 @@ describe("Labour register (CM-205 – CM-207)", () => {
         labourCode: "L-001",
         openingBalance: 150_000,
         aadhaar: "2341 2341 2346",
-        contactNumber: "98765 43210",
+        contactNumber: "77081 65767",
         labourCategoryId: mason,
         supervisorId: supervisor,
         uanNumber: "100123456789",
       }),
     );
     expect(labour).toMatchObject({
-      name: "Raju Pawar",
+      name: "Dhuresh Nawin",
       labourCode: "L-001",
       wageType: "daily",
       wagePerDay: 70_000,
@@ -266,7 +266,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       openingBalance: 150_000,
       balance: 150_000,
       aadhaarMasked: "XXXXXXXX2346",
-      contactNumber: "+919876543210",
+      contactNumber: "+917708165767",
       currentProject: { id: tower },
       labourCategory: { id: mason },
       supervisor: { id: supervisor },
@@ -426,11 +426,11 @@ describe("Labour register (CM-205 – CM-207)", () => {
       balance: null,
     });
     // Omitted amounts are kept.
-    const renamed = await update(clerk.cookie, seen, { name: "Raju P." });
+    const renamed = await update(clerk.cookie, seen, { name: "Dhuresh P." });
     expect(renamed.status).toBe(StatusCodes.OK);
     const owner = await get(company.cookie, labour.id);
     expect(owner).toMatchObject({
-      name: "Raju P.",
+      name: "Dhuresh P.",
       wagePerDay: 70_000,
       openingBalance: 30_000,
     });
@@ -449,7 +449,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const { tower, villa, mason, supervisor } = await fixtures(company);
     const a = await created(
       company.cookie,
-      labourBody(tower, { name: "Anil", labourCategoryId: mason }),
+      labourBody(tower, { name: "Anbu", labourCategoryId: mason }),
     );
     const b = await created(
       company.cookie,
@@ -475,7 +475,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect((await page("")).total).toBe(3);
     expect(
       (await page(`projectId=${tower}`)).items.map((item) => item.name),
-    ).toEqual(["Chetan", "Anil"]);
+    ).toEqual(["Chetan", "Anbu"]);
     expect((await page("active=false")).items.map((item) => item.id)).toEqual([
       a.id,
     ]);
@@ -491,7 +491,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(first.items).toHaveLength(2);
     expect(first.prevCursor).toBeNull();
     const second = await page(`limit=2&after=${first.nextCursor ?? ""}`);
-    expect(second.items.map((item) => item.name)).toEqual(["Anil"]);
+    expect(second.items.map((item) => item.name)).toEqual(["Anbu"]);
     expect(second.nextCursor).toBeNull();
     const back = await page(`limit=2&before=${second.prevCursor ?? ""}`);
     expect(back.items.map((item) => item.id)).toEqual(
@@ -502,7 +502,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
   it("transfers one or many Labours, with history and date rules", async () => {
     const company = await ownerWithCompany();
     const { tower, villa } = await fixtures(company);
-    const raju = await created(company.cookie, labourBody(tower));
+    const dhuresh = await created(company.cookie, labourBody(tower));
     const shyam = await created(
       company.cookie,
       labourBody(tower, { name: "Shyam" }),
@@ -511,16 +511,16 @@ describe("Labour register (CM-205 – CM-207)", () => {
       transferLabours(jsonRequest(`${BASE}/transfer`, cookie, body));
 
     const same = await transfer(company.cookie, {
-      labourIds: [raju.id],
+      labourIds: [dhuresh.id],
       toProjectId: tower,
       transferDate: "2026-10-01",
     });
     expect(same.status).toBe(StatusCodes.CONFLICT);
     expect(await codeOf(same)).toBe("TRANSFER_SAME_PROJECT");
 
-    await markAttendance(company.workspaceId, raju.id, tower, "2026-10-03");
+    await markAttendance(company.workspaceId, dhuresh.id, tower, "2026-10-03");
     const early = await transfer(company.cookie, {
-      labourIds: [raju.id, shyam.id],
+      labourIds: [dhuresh.id, shyam.id],
       toProjectId: villa,
       transferDate: "2026-10-03",
     });
@@ -530,7 +530,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect((await get(company.cookie, shyam.id)).currentProject.id).toBe(tower);
 
     const moved = await transfer(company.cookie, {
-      labourIds: [raju.id, shyam.id],
+      labourIds: [dhuresh.id, shyam.id],
       toProjectId: villa,
       transferDate: "2026-10-04",
       remark: "Slab work",
@@ -558,8 +558,8 @@ describe("Labour register (CM-205 – CM-207)", () => {
       }[];
     }>(
       await listTransfers(
-        jsonRequest(`${BASE}/${raju.id}/transfers`, company.cookie),
-        params(raju.id),
+        jsonRequest(`${BASE}/${dhuresh.id}/transfers`, company.cookie),
+        params(dhuresh.id),
       ),
     );
     expect(history.items).toHaveLength(2);
@@ -583,9 +583,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
           ),
         )
       ).items.map((item) => item.id);
-    expect(await options(tower, "2026-10-03")).toEqual([raju.id, shyam.id]);
+    expect(await options(tower, "2026-10-03")).toEqual([dhuresh.id, shyam.id]);
     expect(await options(villa, "2026-10-03")).toEqual([]);
-    expect(await options(villa, "2026-10-04")).toEqual([raju.id, shyam.id]);
+    expect(await options(villa, "2026-10-04")).toEqual([dhuresh.id, shyam.id]);
     expect(await options(tower, "2026-08-01")).toEqual([]);
   });
 
@@ -697,7 +697,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
 
   it("keeps Companies apart", async () => {
     const first = await ownerWithCompany();
-    const second = await ownerWithCompany("Kale Constructions");
+    const second = await ownerWithCompany("Sakthi Constructions");
     const { tower } = await fixtures(first);
     const theirs = await fixtures(second);
     const labour = await created(first.cookie, labourBody(tower));
@@ -737,7 +737,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const sheet = template.getWorksheet("Labours");
     const lists = template.getWorksheet("Lists");
     expect(sheet?.getRow(1).getCell(1).value).toBe("Labour Name*");
-    expect(sheet?.getRow(2).getCell(1).value).toBe("Raju Pawar");
+    expect(sheet?.getRow(2).getCell(1).value).toBe("Dhuresh Nawin");
     const listed: unknown[] = [];
     lists?.getColumn(1).eachCell((cell) => listed.push(cell.value));
     expect(listed).toContain(`Tower A ${suffix}`);
@@ -775,7 +775,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       "Project*": "Nowhere",
       "Labour Id": "DB-1",
     });
-    fill(4, { ...good, "Labour Name*": "Mahesh", "Labour Id": "imp-1" });
+    fill(4, { ...good, "Labour Name*": "Manikandan", "Labour Id": "imp-1" });
     const bytes = await xlsxBytes(template);
 
     const preview = await importLabours(
@@ -822,7 +822,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     ).toBe(1);
 
     sheet.spliceRows(3, 2);
-    fill(3, { ...good, "Labour Name*": "Mahesh", "Labour Id": "IMP-2" });
+    fill(3, { ...good, "Labour Name*": "Manikandan", "Labour Id": "IMP-2" });
     const fixed = await xlsxBytes(template);
     const imported = await importLabours(
       upload(`${BASE}/import?dryRun=false`, company.cookie, fixed, XLSX),
@@ -993,7 +993,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       ).status,
     ).toBe(StatusCodes.NOT_FOUND);
 
-    const other = await ownerWithCompany("Kale Constructions");
+    const other = await ownerWithCompany("Sakthi Constructions");
     expect(
       (
         await listDocuments(

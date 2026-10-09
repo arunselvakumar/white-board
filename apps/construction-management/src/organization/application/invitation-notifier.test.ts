@@ -19,7 +19,7 @@ function setup(contact: { mobile?: string; email?: string }) {
     id: "member-1",
     workspaceId: "company-a",
     details: teamMemberDetails({
-      name: "Suresh Kale",
+      name: "Prabhu Saravanan",
       designationId: "designation-1",
       ...contact,
     }),
@@ -72,34 +72,34 @@ function setup(contact: { mobile?: string; email?: string }) {
 describe("InvitationNotifier", () => {
   it("sends only the email while SMS is off (the default)", async () => {
     const { member, sent, notify } = setup({
-      mobile: "+919876543210",
-      email: "suresh@kale.in",
+      mobile: "+917708165767",
+      email: "prabhu@sakthi.in",
     });
     await notify();
     expect(sent).toEqual([
       {
         channel: "email",
-        to: "suresh@kale.in",
+        to: "prabhu@sakthi.in",
         link: `https://cm.example.test/join/${member.inviteToken ?? ""}`,
       },
     ]);
   });
 
   it("sends nothing to a member with only a mobile while SMS is off", async () => {
-    const { sent, notify } = setup({ mobile: "+919876543210" });
+    const { sent, notify } = setup({ mobile: "+917708165767" });
     await notify(() => false);
     expect(sent).toEqual([]);
   });
 
   it("also texts the mobile while SMS is on", async () => {
     const { sent, notify } = setup({
-      mobile: "+919876543210",
-      email: "suresh@kale.in",
+      mobile: "+917708165767",
+      email: "prabhu@sakthi.in",
     });
     await notify(() => true);
     expect(sent.map(({ channel, to }) => ({ channel, to }))).toEqual([
-      { channel: "email", to: "suresh@kale.in" },
-      { channel: "sms", to: "+919876543210" },
+      { channel: "email", to: "prabhu@sakthi.in" },
+      { channel: "sms", to: "+917708165767" },
     ]);
   });
 });

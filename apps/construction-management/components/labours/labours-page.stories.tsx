@@ -6,10 +6,10 @@ import { StoryQueryClient } from "@/components/designations/designation-story-su
 import { mockFetch } from "../../.storybook/mock-fetch";
 import {
   CATEGORY_LIST,
-  MOHAN,
+  MURUGAN,
   PROJECT_OPTIONS,
-  RAJU,
-  SEEMA,
+  DHURESH,
+  MEENA,
   SUPERVISOR_LIST,
   TOWER,
   VILLA,
@@ -48,13 +48,13 @@ function listUrls(): string[] {
     .filter((url) => url.startsWith(`${LABOURS}?`));
 }
 
-function serve(items: (typeof RAJU)[]) {
+function serve(items: (typeof DHURESH)[]) {
   return () => {
     api = mockFetch([
       ...LOOKUPS,
       { path: LABOURS, respond: () => Response.json(listOf(items)) },
       {
-        path: `${LABOURS}/${RAJU.id}/transfers`,
+        path: `${LABOURS}/${DHURESH.id}/transfers`,
         respond: () =>
           Response.json({
             items: [
@@ -64,7 +64,7 @@ function serve(items: (typeof RAJU)[]) {
                 toProject: VILLA,
                 transferDate: "2026-09-01",
                 remark: null,
-                createdAt: RAJU.createdAt,
+                createdAt: DHURESH.createdAt,
               },
               {
                 id: "0199a1b2-0000-7000-8000-00000000e002",
@@ -72,7 +72,7 @@ function serve(items: (typeof RAJU)[]) {
                 toProject: TOWER,
                 transferDate: "2026-10-04",
                 remark: "Slab work",
-                createdAt: RAJU.createdAt,
+                createdAt: DHURESH.createdAt,
               },
             ],
           }),
@@ -101,23 +101,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const WithLabours: Story = {
-  beforeEach: serve([RAJU, SEEMA, MOHAN]),
+  beforeEach: serve([DHURESH, MEENA, MURUGAN]),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const table = await canvas.findByRole("table", { name: "Labours" });
     const rows = within(table).getAllByRole("row").slice(1);
     await expect(rows).toHaveLength(3);
-    const [raju, seema, mohan] = rows;
-    if (raju == null || seema == null || mohan == null)
+    const [dhuresh, meena, murugan] = rows;
+    if (dhuresh == null || meena == null || murugan == null)
       throw new Error("Rows missing");
-    await expect(within(raju).getByText("₹700.00 / day")).toBeVisible();
-    await expect(within(raju).getByText("₹2,450.00")).toBeVisible();
-    await expect(within(seema).getByText("₹18,000.00 / month")).toBeVisible();
-    await expect(within(seema).getByText("Villa Phase 2")).toBeVisible();
-    await expect(within(mohan).getByText("Inactive")).toBeVisible();
+    await expect(within(dhuresh).getByText("₹700.00 / day")).toBeVisible();
+    await expect(within(dhuresh).getByText("₹2,450.00")).toBeVisible();
+    await expect(within(meena).getByText("₹18,000.00 / month")).toBeVisible();
+    await expect(within(meena).getByText("Villa Phase 2")).toBeVisible();
+    await expect(within(murugan).getByText("Inactive")).toBeVisible();
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Raju Pawar" }),
+      canvas.getByRole("button", { name: "Actions for Dhuresh Nawin" }),
     );
     await userEvent.click(
       await body.findByRole("menuitem", { name: "Transfer history" }),
@@ -131,7 +131,7 @@ export const WithLabours: Story = {
 };
 
 export const WithoutFinancial: Story = {
-  beforeEach: serve([withoutAmounts(RAJU), withoutAmounts(SEEMA)]),
+  beforeEach: serve([withoutAmounts(DHURESH), withoutAmounts(MEENA)]),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole("table", { name: "Labours" });
     await expect(
@@ -156,7 +156,7 @@ export const Empty: Story = {
 };
 
 export const Filters: Story = {
-  beforeEach: serve([RAJU]),
+  beforeEach: serve([DHURESH]),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await canvas.findByRole("table", { name: "Labours" });
@@ -183,9 +183,9 @@ export const Filters: Story = {
       expect(listUrls().some((url) => url.includes("active=false"))).toBe(true),
     );
 
-    await userEvent.type(canvas.getByLabelText("Search Labours"), "raju");
+    await userEvent.type(canvas.getByLabelText("Search Labours"), "dhuresh");
     await waitFor(() =>
-      expect(listUrls().some((url) => url.includes("q=raju"))).toBe(true),
+      expect(listUrls().some((url) => url.includes("q=dhuresh"))).toBe(true),
     );
     await expect(
       canvas.getByRole("link", { name: "Export" }).getAttribute("href"),
@@ -194,15 +194,15 @@ export const Filters: Story = {
 };
 
 export const TransferSelected: Story = {
-  beforeEach: serve([RAJU, SEEMA]),
+  beforeEach: serve([DHURESH, MEENA]),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await canvas.findByRole("table", { name: "Labours" });
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Select Raju Pawar" }),
+      canvas.getByRole("checkbox", { name: "Select Dhuresh Nawin" }),
     );
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Select Seema Kale" }),
+      canvas.getByRole("checkbox", { name: "Select Meena Selvi" }),
     );
     await expect(canvas.getByText(/2 selected/)).toBeVisible();
     await userEvent.click(

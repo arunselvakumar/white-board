@@ -185,7 +185,7 @@ export function TeamMemberDetailsFields({
           <Label htmlFor="member-name">Name</Label>
           <Input
             id="member-name"
-            placeholder="Suresh Kale"
+            placeholder="Prabhu Saravanan"
             className="h-10"
             {...form.register("name")}
           />
@@ -244,7 +244,7 @@ export function TeamMemberDetailsFields({
           <Input
             id="member-email"
             type="email"
-            placeholder="suresh@example.in"
+            placeholder="prabhu@example.in"
             className="h-10"
             aria-describedby="member-email-hint"
             {...form.register("email")}
@@ -305,7 +305,7 @@ export function TeamMemberDetailsFields({
           <Label htmlFor="member-address">Address</Label>
           <Input
             id="member-address"
-            placeholder="Flat 4, Baner Road, Pune"
+            placeholder="Flat 4, Anna Nagar, Chennai"
             className="h-10"
             {...form.register("address")}
           />

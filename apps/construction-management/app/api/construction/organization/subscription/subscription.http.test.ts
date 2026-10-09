@@ -76,13 +76,17 @@ async function json<T>(response: Response): Promise<T> {
 async function newCompany() {
   const userId = randomUUID();
   await prisma.identityUser.create({
-    data: { id: userId, name: "Ramesh Patil", email: `${userId}@example.test` },
+    data: {
+      id: userId,
+      name: "Arun Selva Kumar",
+      email: `${userId}@example.test`,
+    },
   });
   const { workspaceId } = await createCompanyHandlers().create.execute({
-    name: "Patil Builders",
+    name: "Anugraha Engineers",
     country: "IN",
     userId,
-    userName: "Ramesh Patil",
+    userName: "Arun Selva Kumar",
     userMobile: null,
     userEmail: `${userId}@example.test`,
   });
@@ -93,10 +97,10 @@ async function newCompany() {
 }
 
 const BILLING = {
-  name: "Patil Builders",
-  address: "Plot 4, Baner, Pune",
-  stateCode: "27",
-  gstin: "27AAPFU0939F1ZV",
+  name: "Anugraha Engineers",
+  address: "Plot 4, Vadasery, Nagercoil",
+  stateCode: "33",
+  gstin: "33AAPFA0939F1ZM",
 };
 
 function signedWebhook(body: unknown, secret = WEBHOOK_SECRET) {

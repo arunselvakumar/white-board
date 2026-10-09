@@ -93,11 +93,11 @@ export const FirstPlan: Story = {
     ).toBeVisible();
     await userEvent.type(
       canvas.getByLabelText("Billing name"),
-      "Patil Builders",
+      "Anugraha Engineers",
     );
     await userEvent.type(
       canvas.getByLabelText("Billing address"),
-      "Plot 4, Baner, Pune 411045",
+      "Plot 4, Vadasery, Nagercoil 629001",
     );
     await userEvent.click(canvas.getByLabelText("State"));
     await userEvent.click(
@@ -105,7 +105,7 @@ export const FirstPlan: Story = {
     );
     await userEvent.type(
       canvas.getByLabelText("GSTIN (optional)"),
-      "27AAPFU0939F1ZV",
+      "33AAPFA0939F1ZM",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await expect(
@@ -113,7 +113,7 @@ export const FirstPlan: Story = {
     ).toBeVisible();
     await userEvent.click(canvas.getByLabelText("State"));
     await userEvent.click(
-      await body.findByRole("option", { name: "Maharashtra" }),
+      await body.findByRole("option", { name: "Tamil Nadu" }),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
@@ -150,7 +150,7 @@ export const PaymentCancelled: Story = {
     ).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await expect(await canvas.findByLabelText("Billing name")).toHaveValue(
-      "Patil Builders",
+      "Anugraha Engineers",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await userEvent.click(await canvas.findByRole("button", { name: /^Pay / }));

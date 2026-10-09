@@ -5,18 +5,18 @@ import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import {
   EMPTY_STATEMENT,
   PROJECT_ID,
-  RAJU_ID,
-  RAJU_STATEMENT,
+  DHURESH_ID,
+  DHURESH_STATEMENT,
 } from "./payment-fixtures";
 import { StatementSheet } from "./statement-sheet";
 
-const STATEMENT = `/api/construction/labour/balances/statement?projectId=${PROJECT_ID}&partyType=labour&partyId=${RAJU_ID}&from=2026-09-01&to=2026-09-30`;
+const STATEMENT = `/api/construction/labour/balances/statement?projectId=${PROJECT_ID}&partyType=labour&partyId=${DHURESH_ID}&from=2026-09-01&to=2026-09-30`;
 const PAID_ID = "0199a000-0000-7000-8000-0000000000d1";
 const CANCEL = `/api/construction/labour/payments/${PAID_ID}/cancel`;
 
 let api: ReturnType<typeof mockApi>;
 
-function serve(statement: typeof RAJU_STATEMENT) {
+function serve(statement: typeof DHURESH_STATEMENT) {
   return () => {
     api = mockApi((call) => {
       if (call.method === "GET" && call.path === STATEMENT)
@@ -35,7 +35,7 @@ const meta = {
   args: {
     projectId: PROJECT_ID,
     partyType: "labour",
-    party: { id: RAJU_ID, name: "Raju Pawar" },
+    party: { id: DHURESH_ID, name: "Dhuresh Nawin" },
     range: { from: "2026-09-01", to: "2026-09-30" },
     onOpenChange: fn(),
   },
@@ -51,11 +51,11 @@ type Story = StoryObj<typeof meta>;
 
 /** Entries with their Project and running balance; cancel a payment after a confirm. */
 export const RunningBalance: Story = {
-  beforeEach: serve(RAJU_STATEMENT),
+  beforeEach: serve(DHURESH_STATEMENT),
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const sheet = within(
-      await body.findByRole("dialog", { name: "Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Dhuresh Nawin" }),
     );
     const entries = await sheet.findByRole("list", { name: "Entries" });
     const items = within(entries).getAllByRole("listitem");
@@ -102,7 +102,7 @@ export const NoEntries: Story = {
   play: async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
     const sheet = within(
-      await body.findByRole("dialog", { name: "Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Dhuresh Nawin" }),
     );
     await expect(
       await sheet.findByText("No entries in this period."),

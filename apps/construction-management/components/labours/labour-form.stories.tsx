@@ -9,7 +9,7 @@ import {
   CATEGORY_LIST,
   MASON,
   PROJECT_OPTIONS,
-  RAJU,
+  DHURESH,
   SUPERVISOR_LIST,
   TOWER,
   withoutAmounts,
@@ -85,7 +85,7 @@ export const AddValidatesAndSaves: Story = {
       {
         method: "POST",
         path: LABOURS,
-        respond: () => Response.json(RAJU, { status: 201 }),
+        respond: () => Response.json(DHURESH, { status: 201 }),
       },
     ]);
     return api.restore;
@@ -121,7 +121,7 @@ export const AddValidatesAndSaves: Story = {
       ),
     );
 
-    await userEvent.type(canvas.getByLabelText("Labour name"), "Raju Pawar");
+    await userEvent.type(canvas.getByLabelText("Labour name"), "Dhuresh Nawin");
     await userEvent.type(canvas.getByLabelText("Labour Id"), "L-001");
     await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
     await userEvent.type(canvas.getByLabelText("Wage per day"), "700");
@@ -151,7 +151,7 @@ export const AddValidatesAndSaves: Story = {
 
     await waitFor(() => expect(sent(LABOURS)).toBeDefined());
     await expect(sent(LABOURS)).toMatchObject({
-      name: "Raju Pawar",
+      name: "Dhuresh Nawin",
       labourCode: "L-001",
       joiningDate: "2026-09-01",
       wageType: "daily",
@@ -194,7 +194,7 @@ export const ServerErrorOnField: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.type(
       await canvas.findByLabelText("Labour name"),
-      "Raju Pawar",
+      "Dhuresh Nawin",
     );
     await userEvent.type(canvas.getByLabelText("Labour Id"), "L-001");
     await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
@@ -214,16 +214,19 @@ export const ServerErrorOnField: Story = {
 export const EditWithoutFinancial: Story = {
   render: () => (
     <StoryQueryClient>
-      <EditLabourScreen id={RAJU.id} />
+      <EditLabourScreen id={DHURESH.id} />
     </StoryQueryClient>
   ),
   beforeEach: () => {
-    const hidden = withoutAmounts(RAJU);
+    const hidden = withoutAmounts(DHURESH);
     api = mockFetch([
       ...LOOKUPS,
-      { path: `${LABOURS}/${RAJU.id}`, respond: () => Response.json(hidden) },
       {
-        path: `${LABOURS}/${RAJU.id}/documents`,
+        path: `${LABOURS}/${DHURESH.id}`,
+        respond: () => Response.json(hidden),
+      },
+      {
+        path: `${LABOURS}/${DHURESH.id}/documents`,
         respond: () =>
           Response.json({
             items: [
@@ -232,15 +235,15 @@ export const EditWithoutFinancial: Story = {
                 fileName: "Aadhaar card.pdf",
                 contentType: "application/pdf",
                 bytes: 120_000,
-                createdAt: RAJU.createdAt,
-                url: `${LABOURS}/${RAJU.id}/documents/0199a1b2-0000-7000-8000-00000000f001`,
+                createdAt: DHURESH.createdAt,
+                url: `${LABOURS}/${DHURESH.id}/documents/0199a1b2-0000-7000-8000-00000000f001`,
               },
             ],
           }),
       },
       {
         method: "POST",
-        path: `${LABOURS}/${RAJU.id}/update`,
+        path: `${LABOURS}/${DHURESH.id}/update`,
         respond: () => Response.json(hidden),
       },
     ]);
@@ -248,10 +251,10 @@ export const EditWithoutFinancial: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(
-      await canvas.findByRole("heading", { name: "Edit Raju Pawar" }),
+      await canvas.findByRole("heading", { name: "Edit Dhuresh Nawin" }),
     ).toBeVisible();
     await expect(canvas.getByLabelText("Labour name")).toHaveValue(
-      "Raju Pawar",
+      "Dhuresh Nawin",
     );
     await expect(canvas.queryByLabelText("Wage per day")).toBeNull();
     await expect(canvas.queryByLabelText("Opening balance")).toBeNull();
@@ -268,18 +271,18 @@ export const EditWithoutFinancial: Story = {
     ).toBeVisible();
 
     await userEvent.clear(canvas.getByLabelText("Labour name"));
-    await userEvent.type(canvas.getByLabelText("Labour name"), "Raju P.");
+    await userEvent.type(canvas.getByLabelText("Labour name"), "Dhuresh P.");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(sent(`${LABOURS}/${RAJU.id}/update`)).toBeDefined(),
+      expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toBeDefined(),
     );
-    const update = sent(`${LABOURS}/${RAJU.id}/update`) as Record<
+    const update = sent(`${LABOURS}/${DHURESH.id}/update`) as Record<
       string,
       unknown
     >;
     await expect(update).toMatchObject({
-      name: "Raju P.",
-      expectedUpdatedAt: RAJU.updatedAt,
+      name: "Dhuresh P.",
+      expectedUpdatedAt: DHURESH.updatedAt,
     });
     await expect("wagePerDay" in update).toBe(false);
     await expect("openingBalance" in update).toBe(false);

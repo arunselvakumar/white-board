@@ -99,11 +99,11 @@ async function seedSupervisor(workspaceId: string, name: string) {
 }
 
 async function fixtures(company: Company) {
-  const [tower, villa, mason, sunil] = await Promise.all([
+  const [tower, villa, mason, sundar] = await Promise.all([
     addProject(company.workspaceId, company.userId, "Tower A"),
     addProject(company.workspaceId, company.userId, "Villa"),
     seedCategory(company.workspaceId, "Mason"),
-    seedSupervisor(company.workspaceId, "Sunil"),
+    seedSupervisor(company.workspaceId, "Sundar"),
   ]);
   const labour = async (body: Record<string, unknown>) => {
     const response = await createLabour(
@@ -112,7 +112,7 @@ async function fixtures(company: Company) {
         overtimeWagePerHour: OT,
         weeklyHolidays: [],
         currentProjectId: tower,
-        supervisorId: sunil,
+        supervisorId: sundar,
         labourCategoryId: mason,
         ...body,
       }),
@@ -121,17 +121,17 @@ async function fixtures(company: Company) {
       throw new Error(`labour: ${await response.text()}`);
     return (await json<{ id: string }>(response)).id;
   };
-  const raju = await labour({
-    name: "Raju Pawar",
+  const dhuresh = await labour({
+    name: "Dhuresh Nawin",
     wageType: "daily",
     wagePerDay: DAILY,
   });
-  const sita = await labour({
-    name: "Sita Kale",
+  const kavitha = await labour({
+    name: "Kavitha Murugan",
     wageType: "monthly",
     wagePerMonth: MONTHLY,
   });
-  return { tower, villa, mason, sunil, raju, sita };
+  return { tower, villa, mason, sundar, dhuresh, kavitha };
 }
 
 type Fixtures = Awaited<ReturnType<typeof fixtures>>;
@@ -193,13 +193,13 @@ function body(f: Fixtures, overrides: Record<string, unknown> = {}) {
     date: YESTERDAY,
     marks: [
       {
-        labourId: f.raju,
+        labourId: f.dhuresh,
         status: "present",
         shift: "Shift 1",
         overtime: [{ labourCategoryId: f.mason, hours: "1.5" }],
       },
       {
-        labourId: f.sita,
+        labourId: f.kavitha,
         status: "half_day",
         overtime: [{ labourCategoryId: null, hours: 2, ratePerHour: 12_500 }],
       },
@@ -212,31 +212,31 @@ describe("labour attendance HTTP", () => {
   it("marks many Labours, posts earned and overtime, re-marks with expected and clears", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
-    const [raju, sita] = await marked(company.cookie, body(f));
-    expect(raju).toMatchObject({
-      labourId: f.raju,
+    const [dhuresh, kavitha] = await marked(company.cookie, body(f));
+    expect(dhuresh).toMatchObject({
+      labourId: f.dhuresh,
       status: "present",
       shift: "Shift 1",
-      supervisor: { id: f.sunil, name: "Sunil" },
+      supervisor: { id: f.sundar, name: "Sundar" },
       wageRate: DAILY,
       earned: DAILY,
       overtimeHours: "1.5",
       overtimeAmount: 15_000,
       total: DAILY + 15_000,
     });
-    expect(raju?.overtime[0]).toMatchObject({
+    expect(dhuresh?.overtime[0]).toMatchObject({
       labourCategoryId: f.mason,
       ratePerHour: OT,
     });
-    expect(sita).toMatchObject({
+    expect(kavitha).toMatchObject({
       wageRate: MONTHLY,
       earned: monthlyDay(YESTERDAY, 1),
       overtimeAmount: 25_000,
     });
-    expect(await ledgerSum(f.raju)).toBe(DAILY + 15_000);
-    expect(await ledgerSum(f.sita)).toBe(monthlyDay(YESTERDAY, 1) + 25_000);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY + 15_000);
+    expect(await ledgerSum(f.kavitha)).toBe(monthlyDay(YESTERDAY, 1) + 25_000);
     const entries = await prisma.constructionLabourLedgerEntry.findMany({
-      where: { sourceId: raju?.id },
+      where: { sourceId: dhuresh?.id },
       orderBy: { kind: "asc" },
     });
     expect(entries.map((entry) => [entry.kind, entry.amount])).toEqual([
@@ -249,19 +249,19 @@ describe("labour attendance HTTP", () => {
     const again = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.raju, status: "absent" }],
+        marks: [{ labourId: f.dhuresh, status: "absent" }],
       }),
     );
     expect(again).toMatchObject({
       status: StatusCodes.CONFLICT,
       code: "ATTENDANCE_CHANGED",
-      details: { labourId: f.raju },
+      details: { labourId: f.dhuresh },
     });
     const stale = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.raju, status: "absent" }],
-        expected: { [f.raju]: "2026-01-01T00:00:00.000Z" },
+        marks: [{ labourId: f.dhuresh, status: "absent" }],
+        expected: { [f.dhuresh]: "2026-01-01T00:00:00.000Z" },
       }),
     );
     expect(stale.status).toBe(StatusCodes.CONFLICT);
@@ -269,24 +269,24 @@ describe("labour attendance HTTP", () => {
     // Re-mark: reverse and repost; the balance follows.
     const [changed] = await marked(company.cookie, {
       ...body(f),
-      marks: [{ labourId: f.raju, status: "half_day" }],
-      expected: { [f.raju]: raju?.updatedAt },
+      marks: [{ labourId: f.dhuresh, status: "half_day" }],
+      expected: { [f.dhuresh]: dhuresh?.updatedAt },
     });
-    expect(changed?.id).toBe(raju?.id);
+    expect(changed?.id).toBe(dhuresh?.id);
     expect(changed?.total).toBe(DAILY / 2);
     expect(changed?.overtime).toEqual([]);
-    expect(await ledgerSum(f.raju)).toBe(DAILY / 2);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY / 2);
     const balances = await prismaLedger.balances(
       prisma,
       company.workspaceId,
       "labour",
-      [f.raju],
+      [f.dhuresh],
       TODAY,
     );
-    expect(balances.get(f.raju)).toBe(DAILY / 2);
+    expect(balances.get(f.dhuresh)).toBe(DAILY / 2);
     expect(
       await prisma.constructionLabourLedgerEntry.count({
-        where: { sourceId: raju?.id },
+        where: { sourceId: dhuresh?.id },
       }),
     ).toBe(5);
 
@@ -295,25 +295,28 @@ describe("labour attendance HTTP", () => {
       await clear(company.cookie, {
         projectId: f.tower,
         date: YESTERDAY,
-        labourIds: [f.raju],
-        expected: { [f.raju]: raju?.updatedAt },
+        labourIds: [f.dhuresh],
+        expected: { [f.dhuresh]: dhuresh?.updatedAt },
       }),
     );
     expect(staleClear).toMatchObject({
       status: StatusCodes.CONFLICT,
-      details: { labourId: f.raju },
+      details: { labourId: f.dhuresh },
     });
     const cleared = await clear(company.cookie, {
       projectId: f.tower,
       date: YESTERDAY,
-      labourIds: [f.raju, f.sita],
-      expected: { [f.raju]: changed?.updatedAt, [f.sita]: sita?.updatedAt },
+      labourIds: [f.dhuresh, f.kavitha],
+      expected: {
+        [f.dhuresh]: changed?.updatedAt,
+        [f.kavitha]: kavitha?.updatedAt,
+      },
     });
     expect(cleared.status).toBe(StatusCodes.NO_CONTENT);
-    expect(await ledgerSum(f.raju)).toBe(0);
-    expect(await ledgerSum(f.sita)).toBe(0);
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
+    expect(await ledgerSum(f.kavitha)).toBe(0);
     const audits = await prisma.constructionOrganizationAuditEvent.findMany({
-      where: { entityId: raju?.id },
+      where: { entityId: dhuresh?.id },
       orderBy: { occurredAt: "asc" },
     });
     expect(audits.map((audit) => audit.action)).toEqual([
@@ -328,23 +331,23 @@ describe("labour attendance HTTP", () => {
   it("pays a Holiday only to the monthly Labour, and Paid Leave toggles the ledger", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
-    const [raju, sita] = await marked(company.cookie, {
+    const [dhuresh, kavitha] = await marked(company.cookie, {
       projectId: f.tower,
       date: YESTERDAY,
       marks: [
-        { labourId: f.raju, status: "holiday" },
-        { labourId: f.sita, status: "holiday" },
+        { labourId: f.dhuresh, status: "holiday" },
+        { labourId: f.kavitha, status: "holiday" },
       ],
     });
-    expect(raju?.earned).toBe(0);
-    expect(sita?.earned).toBe(monthlyDay(YESTERDAY));
-    expect(await ledgerSum(f.raju)).toBe(0);
+    expect(dhuresh?.earned).toBe(0);
+    expect(kavitha?.earned).toBe(monthlyDay(YESTERDAY));
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
 
     const [leave] = await marked(company.cookie, {
       projectId: f.tower,
       date: YESTERDAY,
-      marks: [{ labourId: f.raju, status: "on_leave" }],
-      expected: { [f.raju]: raju?.updatedAt },
+      marks: [{ labourId: f.dhuresh, status: "on_leave" }],
+      expected: { [f.dhuresh]: dhuresh?.updatedAt },
     });
     if (leave == null) throw new Error("no leave row");
     expect(leave.earned).toBe(0);
@@ -355,7 +358,7 @@ describe("labour attendance HTTP", () => {
     expect(paid.status).toBe(StatusCodes.OK);
     const paidDay = await json<Day>(paid);
     expect(paidDay).toMatchObject({ isPaidLeave: true, earned: DAILY });
-    expect(await ledgerSum(f.raju)).toBe(DAILY);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
     const unpaid = await json<Day>(
       await paidLeave(company.cookie, leave.id, {
         isPaidLeave: false,
@@ -363,13 +366,13 @@ describe("labour attendance HTTP", () => {
       }),
     );
     expect(unpaid.earned).toBe(0);
-    expect(await ledgerSum(f.raju)).toBe(0);
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
 
     // Paid Leave on a day that is not On Leave is refused.
     const notLeave = await failure(
-      await paidLeave(company.cookie, sita?.id ?? "", {
+      await paidLeave(company.cookie, kavitha?.id ?? "", {
         isPaidLeave: true,
-        expectedUpdatedAt: sita?.updatedAt,
+        expectedUpdatedAt: kavitha?.updatedAt,
       }),
     );
     expect(notLeave.code).toBe("PAID_LEAVE_NEEDS_LEAVE");
@@ -383,7 +386,7 @@ describe("labour attendance HTTP", () => {
         ...body(f),
         marks: [
           {
-            labourId: f.sita,
+            labourId: f.kavitha,
             status: "absent",
             overtime: [{ labourCategoryId: null, hours: 1 }],
           },
@@ -393,13 +396,13 @@ describe("labour attendance HTTP", () => {
     expect(absent).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       code: "OVERTIME_ON_ABSENT_DAY",
-      details: { labourId: f.sita },
+      details: { labourId: f.kavitha },
     });
 
-    // Raju moves to the Villa from two days ago.
+    // Dhuresh moves to the Villa from two days ago.
     const moved = await transferLabours(
       jsonRequest(`${LABOURS}/transfer`, company.cookie, {
-        labourIds: [f.raju],
+        labourIds: [f.dhuresh],
         toProjectId: f.villa,
         transferDate: addDays(TODAY, -2),
       }),
@@ -408,13 +411,13 @@ describe("labour attendance HTTP", () => {
     const offProject = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.raju, status: "present" }],
+        marks: [{ labourId: f.dhuresh, status: "present" }],
       }),
     );
     expect(offProject).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       code: "LABOUR_NOT_ON_PROJECT",
-      details: { labourId: f.raju, projectId: f.villa },
+      details: { labourId: f.dhuresh, projectId: f.villa },
     });
     // Before the transfer the day belongs to the Tower; after, to the Villa.
     expect(
@@ -422,7 +425,7 @@ describe("labour attendance HTTP", () => {
         await mark(company.cookie, {
           ...body(f),
           date: addDays(TODAY, -3),
-          marks: [{ labourId: f.raju, status: "present" }],
+          marks: [{ labourId: f.dhuresh, status: "present" }],
         })
       ).status,
     ).toBe(StatusCodes.OK);
@@ -431,30 +434,32 @@ describe("labour attendance HTTP", () => {
         await mark(company.cookie, {
           ...body(f),
           projectId: f.villa,
-          marks: [{ labourId: f.raju, status: "present" }],
+          marks: [{ labourId: f.dhuresh, status: "present" }],
         })
       ).status,
     ).toBe(StatusCodes.OK);
     const towerSheet = await json<{ labourers: { labourId: string }[] }>(
       await sheet(company.cookie, f.tower, YESTERDAY),
     );
-    expect(towerSheet.labourers.map((row) => row.labourId)).toEqual([f.sita]);
+    expect(towerSheet.labourers.map((row) => row.labourId)).toEqual([
+      f.kavitha,
+    ]);
 
     await deactivateLabour(
-      jsonRequest(`${LABOURS}/${f.sita}/deactivate`, company.cookie, {}),
-      { params: Promise.resolve({ id: f.sita }) },
+      jsonRequest(`${LABOURS}/${f.kavitha}/deactivate`, company.cookie, {}),
+      { params: Promise.resolve({ id: f.kavitha }) },
     );
     const inactive = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.sita, status: "present" }],
+        marks: [{ labourId: f.kavitha, status: "present" }],
       }),
     );
     expect(inactive).toMatchObject({
       code: "LABOUR_INACTIVE",
-      details: { labourId: f.sita },
+      details: { labourId: f.kavitha },
     });
-    expect(await ledgerSum(f.sita)).toBe(0);
+    expect(await ledgerSum(f.kavitha)).toBe(0);
   });
 
   it("applies the back-dated guard to a Member, and the Owner passes it", async () => {
@@ -492,8 +497,8 @@ describe("labour attendance HTTP", () => {
         clerk.cookie,
         body(f, {
           date: old,
-          marks: [{ labourId: f.raju, status: "absent" }],
-          expected: { [f.raju]: ownerDay?.updatedAt },
+          marks: [{ labourId: f.dhuresh, status: "absent" }],
+          expected: { [f.dhuresh]: ownerDay?.updatedAt },
         }),
       ),
     );
@@ -502,8 +507,8 @@ describe("labour attendance HTTP", () => {
       await clear(clerk.cookie, {
         projectId: f.tower,
         date: old,
-        labourIds: [f.raju],
-        expected: { [f.raju]: ownerDay?.updatedAt },
+        labourIds: [f.dhuresh],
+        expected: { [f.dhuresh]: ownerDay?.updatedAt },
       }),
     );
     expect(clearOld.code).toBe("BACKDATED_EDIT_BLOCKED");
@@ -539,12 +544,12 @@ describe("labour attendance HTTP", () => {
     });
     expect(day?.overtime[0]?.ratePerHour).toBeNull();
     // The Member's mark is still priced from the labourer's wages.
-    expect(await ledgerSum(f.raju)).toBe(DAILY + 15_000);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY + 15_000);
     const remark = await failure(
       await mark(creator.cookie, {
         ...body(f),
-        marks: [{ labourId: f.raju, status: "absent" }],
-        expected: { [f.raju]: day?.updatedAt },
+        marks: [{ labourId: f.dhuresh, status: "absent" }],
+        expected: { [f.dhuresh]: day?.updatedAt },
       }),
     );
     expect(remark.status).toBe(StatusCodes.FORBIDDEN);
@@ -553,8 +558,8 @@ describe("labour attendance HTTP", () => {
         await clear(creator.cookie, {
           projectId: f.tower,
           date: YESTERDAY,
-          labourIds: [f.raju],
-          expected: { [f.raju]: day?.updatedAt },
+          labourIds: [f.dhuresh],
+          expected: { [f.dhuresh]: day?.updatedAt },
         })
       ).status,
     ).toBe(StatusCodes.FORBIDDEN);
@@ -581,7 +586,7 @@ describe("labour attendance HTTP", () => {
       totals: { earned: number | null };
     }>(await sheet(accountant.cookie, f.tower, YESTERDAY));
     expect(withMoney.labourers[0]).toMatchObject({
-      name: "Raju Pawar",
+      name: "Dhuresh Nawin",
       overtimeWagePerHour: OT,
     });
     expect(withMoney.totals.earned).toBe(DAILY + monthlyDay(YESTERDAY, 1));
@@ -590,9 +595,9 @@ describe("labour attendance HTTP", () => {
   it("serves the sheet with hints, the recorded list with filters and cursors, and the month grid", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
-    // Sita's weekly holiday is the weekday of TODAY.
+    // Kavitha's weekly holiday is the weekday of TODAY.
     await prisma.constructionLabourLabour.update({
-      where: { id: f.sita },
+      where: { id: f.kavitha },
       data: { weeklyHolidays: [weekdayOf(TODAY)] },
     });
     await marked(company.cookie, body(f));
@@ -608,28 +613,32 @@ describe("labour attendance HTTP", () => {
       labourCategories: { id: string }[];
       supervisors: { id: string; name: string }[];
     }>(await sheet(company.cookie, f.tower, TODAY));
-    const rajuRow = today.labourers.find((row) => row.labourId === f.raju);
-    const sitaRow = today.labourers.find((row) => row.labourId === f.sita);
-    expect(rajuRow).toMatchObject({
+    const dhureshRow = today.labourers.find(
+      (row) => row.labourId === f.dhuresh,
+    );
+    const kavithaRow = today.labourers.find(
+      (row) => row.labourId === f.kavitha,
+    );
+    expect(dhureshRow).toMatchObject({
       suggestedStatus: "present",
       yesterday: { status: "present", shift: "Shift 1" },
       attendance: null,
       labourCategory: { id: f.mason },
     });
-    expect(sitaRow).toMatchObject({
+    expect(kavithaRow).toMatchObject({
       suggestedStatus: "holiday",
       isWeeklyHoliday: true,
     });
     expect(today.labourCategories.map((item) => item.id)).toContain(f.mason);
-    expect(today.supervisors).toEqual([{ id: f.sunil, name: "Sunil" }]);
+    expect(today.supervisors).toEqual([{ id: f.sundar, name: "Sundar" }]);
 
     const twoDaysAgo = addDays(TODAY, -2);
     await marked(company.cookie, {
       projectId: f.tower,
       date: twoDaysAgo,
       marks: [
-        { labourId: f.raju, status: "on_leave", isPaidLeave: true },
-        { labourId: f.sita, status: "absent" },
+        { labourId: f.dhuresh, status: "on_leave", isPaidLeave: true },
+        { labourId: f.kavitha, status: "absent" },
       ],
     });
 
@@ -679,11 +688,11 @@ describe("labour attendance HTTP", () => {
         ),
       ),
     );
-    expect(paidOnly.items.map((item) => item.labourId)).toEqual([f.raju]);
+    expect(paidOnly.items.map((item) => item.labourId)).toEqual([f.dhuresh]);
     const byLabour = await json<{ total: number }>(
       await listDays(
         jsonRequest(
-          `${BASE}?projectId=${f.tower}&labourId=${f.sita}&from=${YESTERDAY}&to=${YESTERDAY}&supervisorId=${f.sunil}`,
+          `${BASE}?projectId=${f.tower}&labourId=${f.kavitha}&from=${YESTERDAY}&to=${YESTERDAY}&supervisorId=${f.sundar}`,
           company.cookie,
         ),
       ),
@@ -708,13 +717,17 @@ describe("labour attendance HTTP", () => {
       ),
     );
     expect(grid.dates).toHaveLength(daysInMonth(YESTERDAY));
-    const rajuGrid = grid.labourers.find((row) => row.labourId === f.raju);
+    const dhureshGrid = grid.labourers.find(
+      (row) => row.labourId === f.dhuresh,
+    );
     const sameMonth = twoDaysAgo.slice(0, 7) === month;
-    expect(rajuGrid?.days.find((day) => day.date === YESTERDAY)).toMatchObject({
+    expect(
+      dhureshGrid?.days.find((day) => day.date === YESTERDAY),
+    ).toMatchObject({
       code: "P",
       overtimeHours: "1.5",
     });
-    expect(rajuGrid?.totals).toMatchObject({
+    expect(dhureshGrid?.totals).toMatchObject({
       present: 1,
       paidLeave: sameMonth ? 1 : 0,
       overtimeHours: "1.5",

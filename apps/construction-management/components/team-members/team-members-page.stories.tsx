@@ -13,13 +13,13 @@ function member(overrides: Partial<TeamMember>): TeamMember {
   return {
     id: "0199c3a0-0000-7000-8000-000000000101",
     userId: null,
-    name: "Suresh Kale",
+    name: "Prabhu Saravanan",
     designation: {
       id: "0199c3a0-0000-7000-8000-000000000201",
       name: "Site Engineer",
     },
-    mobile: "+919876543210",
-    email: "suresh@kale.in",
+    mobile: "+917708165767",
+    email: "prabhu@sakthi.in",
     address: null,
     aadhaarMasked: null,
     panMasked: null,
@@ -41,7 +41,7 @@ function member(overrides: Partial<TeamMember>): TeamMember {
 
 const OWNER = member({
   id: "0199c3a0-0000-7000-8000-000000000100",
-  name: "Ramesh Patil",
+  name: "Arun Selva Kumar",
   designation: { id: "0199c3a0-0000-7000-8000-000000000200", name: "Owner" },
   isOwner: true,
   status: "active",
@@ -51,7 +51,7 @@ const OWNER = member({
 const PENDING = member({});
 const HRMS = member({
   id: "0199c3a0-0000-7000-8000-000000000102",
-  name: "Anita Joshi",
+  name: "Anitha Selvi",
   designation: {
     id: "0199c3a0-0000-7000-8000-000000000202",
     name: "Accountant",
@@ -59,28 +59,28 @@ const HRMS = member({
   memberType: "hrms",
   status: "active",
   mobile: null,
-  email: "anita@patil.in",
+  email: "anitha@anugraha.in",
   invitePath: null,
 });
 
 /** No email: a record that cannot sign in or be invited (ADR CM-0009). */
 const MOBILE_ONLY = member({
   id: "0199c3a0-0000-7000-8000-000000000103",
-  name: "Ganesh More",
+  name: "Ganesh Kumar",
   mobile: "+919812345678",
   email: null,
 });
 const DECLINED = member({
   id: "0199c3a0-0000-7000-8000-000000000104",
-  name: "Vijay Shinde",
-  email: "vijay@patil.in",
+  name: "Vignesh Pandian",
+  email: "vignesh@anugraha.in",
   mobile: null,
   status: "rejected",
   invitePath: null,
 });
 const DECLINED_MOBILE_ONLY = member({
   id: "0199c3a0-0000-7000-8000-000000000105",
-  name: "Sunil Pawar",
+  name: "Senthil Kumar",
   mobile: "+919811122233",
   email: null,
   status: "rejected",
@@ -102,7 +102,7 @@ const meta = {
   title: "Masters/TeamMembersPage",
   component: TeamMembersPage,
   beforeEach() {
-    signInAs("owner", { name: "Patil Builders" });
+    signInAs("owner", { name: "Anugraha Engineers" });
   },
 } satisfies Meta<typeof TeamMembersPage>;
 
@@ -136,11 +136,11 @@ export const WithMembers: Story = {
     await expect(rows.getByText("HRMS")).toBeVisible();
     // The Owner has no row actions.
     await expect(
-      canvas.queryByRole("button", { name: "Actions for Ramesh Patil" }),
+      canvas.queryByRole("button", { name: "Actions for Arun Selva Kumar" }),
     ).not.toBeInTheDocument();
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Suresh Kale" }),
+      canvas.getByRole("button", { name: "Actions for Prabhu Saravanan" }),
     );
     await userEvent.click(
       await body.findByRole("menuitem", { name: "Share invite link" }),
@@ -155,7 +155,7 @@ export const WithMembers: Story = {
     );
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Suresh Kale" }),
+      canvas.getByRole("button", { name: "Actions for Prabhu Saravanan" }),
     );
     await userEvent.click(
       await body.findByRole("menuitem", { name: "Delete" }),
@@ -167,7 +167,7 @@ export const WithMembers: Story = {
     );
     await userEvent.click(confirm.getByRole("button", { name: "Delete" }));
     await waitFor(() =>
-      expect(canvas.queryByText("Suresh Kale")).not.toBeInTheDocument(),
+      expect(canvas.queryByText("Prabhu Saravanan")).not.toBeInTheDocument(),
     );
   },
 };
@@ -188,7 +188,7 @@ export const InviteNeedsAnEmail: Story = {
     // Menus animate in; their items are there before they are fully opaque.
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Ganesh More" }),
+      canvas.getByRole("button", { name: "Actions for Ganesh Kumar" }),
     );
     await expect(
       await body.findByRole("menuitem", { name: "Edit" }),
@@ -202,7 +202,7 @@ export const InviteNeedsAnEmail: Story = {
     );
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Vijay Shinde" }),
+      canvas.getByRole("button", { name: "Actions for Vignesh Pandian" }),
     );
     await expect(
       await body.findByRole("menuitem", { name: "Invite again" }),
@@ -213,7 +213,7 @@ export const InviteNeedsAnEmail: Story = {
     );
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Actions for Sunil Pawar" }),
+      canvas.getByRole("button", { name: "Actions for Senthil Kumar" }),
     );
     await expect(
       await body.findByRole("menuitem", { name: "Edit" }),

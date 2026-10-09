@@ -43,7 +43,7 @@ async function signUpVerified(email: string): Promise<void> {
   const signedUp = await authPost("/sign-up/email", {
     email,
     password: OLD_PASSWORD,
-    name: "Ramesh Patil",
+    name: "Arun Selva Kumar",
   });
   expect(signedUp.status).toBe(200);
   const verified = await authPost("/email-otp/verify-email", {

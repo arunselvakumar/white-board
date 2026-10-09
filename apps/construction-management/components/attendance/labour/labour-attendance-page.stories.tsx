@@ -13,13 +13,13 @@ import {
   DATE,
   EMPTY_SHEET,
   MASON,
-  MOHAN,
+  MURUGAN,
   MONTH,
   PROJECT_ID,
-  RAJU,
-  RAJU_SAVED,
+  DHURESH,
+  DHURESH_SAVED,
   SHEET,
-  SITA,
+  KAVITHA,
 } from "./labour-attendance-fixtures";
 import { LabourAttendancePage } from "./labour-attendance-page";
 
@@ -70,36 +70,38 @@ function sheetApi(post?: (call: ApiCall) => Response | undefined) {
 export const MarkingSheet: Story = {
   beforeEach: sheetApi((call) =>
     call.path === `${API}/mark`
-      ? Response.json({ items: [RAJU_SAVED, RAJU_SAVED, RAJU_SAVED] })
+      ? Response.json({ items: [DHURESH_SAVED, DHURESH_SAVED, DHURESH_SAVED] })
       : undefined,
   ),
   play: async ({ canvas, userEvent }) => {
-    const raju = within(
-      await canvas.findByRole("listitem", { name: "Raju Pawar" }),
+    const dhuresh = within(
+      await canvas.findByRole("listitem", { name: "Dhuresh Nawin" }),
     );
-    const mohan = within(canvas.getByRole("listitem", { name: "Mohan Patil" }));
+    const murugan = within(
+      canvas.getByRole("listitem", { name: "Murugan Ganesan" }),
+    );
     // The weekly holiday is pre-filled and marked unsaved.
     await expect(
-      mohan.getByRole("button", { name: "Mohan Patil Holiday" }),
+      murugan.getByRole("button", { name: "Murugan Ganesan Holiday" }),
     ).toHaveAttribute("aria-pressed", "true");
-    await expect(mohan.getByText("Unsaved change")).toBeInTheDocument();
+    await expect(murugan.getByText("Unsaved change")).toBeInTheDocument();
 
     await userEvent.click(
-      canvas.getByRole("button", { name: "Sita Kale Present" }),
+      canvas.getByRole("button", { name: "Kavitha Murugan Present" }),
     );
     await userEvent.click(
-      raju.getByRole("button", { name: "Raju Pawar overtime" }),
+      dhuresh.getByRole("button", { name: "Dhuresh Nawin overtime" }),
     );
     await userEvent.click(
-      raju.getByRole("button", { name: "Add overtime line" }),
+      dhuresh.getByRole("button", { name: "Add overtime line" }),
     );
     await userEvent.type(
-      raju.getByLabelText("Raju Pawar overtime 1 hours"),
+      dhuresh.getByLabelText("Dhuresh Nawin overtime 1 hours"),
       "2",
     );
-    await expect(raju.getByLabelText("Raju Pawar earns")).toHaveTextContent(
-      formatPaise(90_000),
-    );
+    await expect(
+      dhuresh.getByLabelText("Dhuresh Nawin earns"),
+    ).toHaveTextContent(formatPaise(90_000));
 
     await userEvent.click(canvas.getByRole("button", { name: "Save 3" }));
     await expect(await canvas.findByText("Saved 3 Labours.")).toBeVisible();
@@ -108,18 +110,18 @@ export const MarkingSheet: Story = {
       projectId: PROJECT_ID,
       date: DATE,
       marks: [
-        { labourId: MOHAN, status: "holiday", shift: null, overtime: [] },
+        { labourId: MURUGAN, status: "holiday", shift: null, overtime: [] },
         {
-          labourId: RAJU,
+          labourId: DHURESH,
           status: "present",
           shift: "General",
           overtime: [
             { labourCategoryId: MASON, hours: "2", ratePerHour: 10_000 },
           ],
         },
-        { labourId: SITA, status: "present", shift: null, overtime: [] },
+        { labourId: KAVITHA, status: "present", shift: null, overtime: [] },
       ],
-      expected: { [RAJU]: AT },
+      expected: { [DHURESH]: AT },
     });
   },
 };
@@ -133,23 +135,23 @@ export const BulkMark: Story = {
     await userEvent.click(
       await canvas.findByRole("button", { name: "Copy yesterday" }),
     );
-    // Sita was Half Day yesterday; Raju is already saved today and stays.
+    // Kavitha was Half Day yesterday; Dhuresh is already saved today and stays.
     await expect(
-      canvas.getByRole("button", { name: "Sita Kale Half Day" }),
+      canvas.getByRole("button", { name: "Kavitha Murugan Half Day" }),
     ).toHaveAttribute("aria-pressed", "true");
 
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Select Sita Kale" }),
+      canvas.getByRole("checkbox", { name: "Select Kavitha Murugan" }),
     );
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Select Mohan Patil" }),
+      canvas.getByRole("checkbox", { name: "Select Murugan Ganesan" }),
     );
     await expect(canvas.getByText("2 selected")).toBeVisible();
     await userEvent.click(
       canvas.getByRole("button", { name: "Mark selected Absent" }),
     );
     await expect(
-      canvas.getByRole("button", { name: "Mohan Patil Absent" }),
+      canvas.getByRole("button", { name: "Murugan Ganesan Absent" }),
     ).toHaveAttribute("aria-pressed", "true");
 
     await userEvent.click(canvas.getByRole("button", { name: "Save 2" }));
@@ -158,8 +160,8 @@ export const BulkMark: Story = {
       projectId: PROJECT_ID,
       date: DATE,
       marks: [
-        { labourId: MOHAN, status: "absent", shift: null, overtime: [] },
-        { labourId: SITA, status: "absent", shift: "Shift 1", overtime: [] },
+        { labourId: MURUGAN, status: "absent", shift: null, overtime: [] },
+        { labourId: KAVITHA, status: "absent", shift: "Shift 1", overtime: [] },
       ],
     });
   },
@@ -172,22 +174,26 @@ export const RowError: Story = {
       {
         code: "ATTENDANCE_CHANGED",
         message:
-          "Sita Kale's day was changed after you opened it. Reload to see the latest.",
-        details: { labourId: SITA },
+          "Kavitha Murugan's day was changed after you opened it. Reload to see the latest.",
+        details: { labourId: KAVITHA },
       },
       { status: 409 },
     ),
   ),
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Sita Kale Present" }),
+      await canvas.findByRole("button", { name: "Kavitha Murugan Present" }),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Save 2" }));
-    const sita = within(canvas.getByRole("listitem", { name: "Sita Kale" }));
-    await expect(await sita.findByRole("alert")).toHaveTextContent(
-      "Sita Kale's day was changed",
+    const kavitha = within(
+      canvas.getByRole("listitem", { name: "Kavitha Murugan" }),
     );
-    await expect(canvas.getByText("Not saved: see Sita Kale.")).toBeVisible();
+    await expect(await kavitha.findByRole("alert")).toHaveTextContent(
+      "Kavitha Murugan's day was changed",
+    );
+    await expect(
+      canvas.getByText("Not saved: see Kavitha Murugan."),
+    ).toBeVisible();
   },
 };
 
@@ -203,14 +209,16 @@ export const MonthGrid: Story = {
     return api.restore;
   },
   play: async ({ canvas }) => {
-    const raju = within(await canvas.findByRole("row", { name: "Raju Pawar" }));
+    const dhuresh = within(
+      await canvas.findByRole("row", { name: "Dhuresh Nawin" }),
+    );
     await expect(
-      raju.getByLabelText("Raju Pawar 2026-10-02 PL"),
+      dhuresh.getByLabelText("Dhuresh Nawin 2026-10-02 PL"),
     ).toHaveTextContent("PL");
     await expect(
-      raju.getByLabelText("Raju Pawar 2026-10-01 P"),
+      dhuresh.getByLabelText("Dhuresh Nawin 2026-10-01 P"),
     ).toHaveTextContent("P2");
-    await expect(raju.getByText(formatPaise(160_000))).toBeVisible();
+    await expect(dhuresh.getByText(formatPaise(160_000))).toBeVisible();
   },
 };
 

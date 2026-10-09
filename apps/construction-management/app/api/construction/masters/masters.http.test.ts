@@ -90,7 +90,7 @@ async function labourUsing(
     data: {
       id,
       workspaceId,
-      name: "Ramesh Jadhav",
+      name: "Ravi Chandran",
       joiningDate: new Date("2026-10-01"),
       wageType: "daily",
       wagePerDay: 80_000,
@@ -410,7 +410,7 @@ describe("Masters HTTP (CM-203)", () => {
     );
     const supervisor = await json<SupervisorBody>(
       await createSupervisor(
-        jsonRequest(SUPERVISORS, owner.cookie, { name: "Raju Mukadam" }),
+        jsonRequest(SUPERVISORS, owner.cookie, { name: "Rakesh Mirtha" }),
       ),
     );
     const labourId = await labourUsing(owner.workspaceId, {
@@ -462,35 +462,38 @@ describe("Masters HTTP (CM-203)", () => {
 
     const created = await createSupervisor(
       jsonRequest(SUPERVISORS, owner.cookie, {
-        name: "Ramesh Patil",
-        mobile: "98765 43210",
+        name: "Arun Selva Kumar",
+        mobile: "77081 65767",
         teamMemberId: ownerMember.id,
       }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
     const supervisor = await json<SupervisorBody>(created);
     expect(supervisor).toMatchObject({
-      name: "Ramesh Patil",
-      mobile: "+919876543210",
+      name: "Arun Selva Kumar",
+      mobile: "+917708165767",
       teamMemberId: ownerMember.id,
       teamMemberName: ownerMember.name,
       disabled: false,
     });
 
     const badMobile = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, { name: "Raju", mobile: "123" }),
+      jsonRequest(SUPERVISORS, owner.cookie, {
+        name: "Dhuresh",
+        mobile: "123",
+      }),
     );
     expect(badMobile.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(badMobile)).toMatchObject({ code: "MOBILE_INVALID" });
 
-    const other = await ownerWithCompany("Kale Constructions");
+    const other = await ownerWithCompany("Sakthi Constructions");
     const theirMember =
       await prisma.constructionOrganizationTeamMember.findFirst({
         where: { workspaceId: other.workspaceId, isOwner: true },
       });
     const foreign = await createSupervisor(
       jsonRequest(SUPERVISORS, owner.cookie, {
-        name: "Raju",
+        name: "Dhuresh",
         teamMemberId: theirMember?.id,
       }),
     );
@@ -500,7 +503,7 @@ describe("Masters HTTP (CM-203)", () => {
     });
 
     const sameName = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, { name: "ramesh patil" }),
+      jsonRequest(SUPERVISORS, owner.cookie, { name: "arun selva kumar" }),
     );
     expect(sameName.status).toBe(StatusCodes.CONFLICT);
     expect(await json(sameName)).toMatchObject({
@@ -509,7 +512,7 @@ describe("Masters HTTP (CM-203)", () => {
 
     const updated = await updateSupervisor(
       jsonRequest(`${SUPERVISORS}/${supervisor.id}/update`, owner.cookie, {
-        name: "Ramesh P.",
+        name: "Muthu P.",
         mobile: null,
         teamMemberId: null,
         expectedUpdatedAt: supervisor.updatedAt,
@@ -518,14 +521,14 @@ describe("Masters HTTP (CM-203)", () => {
     );
     expect(updated.status).toBe(StatusCodes.OK);
     expect(await json(updated)).toMatchObject({
-      name: "Ramesh P.",
+      name: "Muthu P.",
       mobile: null,
       teamMemberId: null,
       teamMemberName: null,
     });
     const stale = await updateSupervisor(
       jsonRequest(`${SUPERVISORS}/${supervisor.id}/update`, owner.cookie, {
-        name: "Ramesh",
+        name: "Muthu",
         expectedUpdatedAt: supervisor.updatedAt,
       }),
       params(supervisor.id),
@@ -558,7 +561,7 @@ describe("Masters HTTP (CM-203)", () => {
 
   it("does not show or change another Company's rows", async () => {
     const mine = await ownerWithCompany();
-    const theirs = await ownerWithCompany("Kale Constructions");
+    const theirs = await ownerWithCompany("Sakthi Constructions");
     const [their] = await listOf<Lookup>(
       listCategories,
       CATEGORIES,
@@ -577,7 +580,7 @@ describe("Masters HTTP (CM-203)", () => {
     expect(disabled.status).toBe(StatusCodes.NOT_FOUND);
     const theirSupervisor = await json<SupervisorBody>(
       await createSupervisor(
-        jsonRequest(SUPERVISORS, theirs.cookie, { name: "Raju" }),
+        jsonRequest(SUPERVISORS, theirs.cookie, { name: "Dhuresh" }),
       ),
     );
     const updated = await updateSupervisor(
@@ -590,7 +593,7 @@ describe("Masters HTTP (CM-203)", () => {
     expect(updated.status).toBe(StatusCodes.NOT_FOUND);
     // The same name in two Companies is fine.
     const same = await createSupervisor(
-      jsonRequest(SUPERVISORS, mine.cookie, { name: "Raju" }),
+      jsonRequest(SUPERVISORS, mine.cookie, { name: "Dhuresh" }),
     );
     expect(same.status).toBe(StatusCodes.CREATED);
   });
@@ -614,7 +617,7 @@ describe("Masters HTTP (CM-203)", () => {
     );
     expect(departments.status).toBe(StatusCodes.FORBIDDEN);
     const supervisor = await createSupervisor(
-      jsonRequest(SUPERVISORS, reader.cookie, { name: "Raju" }),
+      jsonRequest(SUPERVISORS, reader.cookie, { name: "Dhuresh" }),
     );
     expect(supervisor.status).toBe(StatusCodes.CREATED);
     const { id } = await json<SupervisorBody>(supervisor);

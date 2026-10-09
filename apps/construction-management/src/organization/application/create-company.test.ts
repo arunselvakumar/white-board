@@ -13,13 +13,13 @@ import {
 const NOW = new Date("2026-10-08T06:30:00Z");
 
 const command: CreateCompanyCommand = {
-  name: "  Patil Builders  ",
+  name: "  Anugraha Engineers  ",
   country: "IN",
-  gstin: "27AAPFU0939F1ZV",
-  pan: "AAPFU0939F",
+  gstin: "33AAPFA0939F1ZM",
+  pan: "AAPFA0939F",
   userId: "user-1",
-  userName: "Ramesh Patil",
-  userMobile: "+919876543210",
+  userName: "Arun Selva Kumar",
+  userMobile: "+917708165767",
   userEmail: null,
 };
 
@@ -67,18 +67,18 @@ describe("CreateCompanyHandler", () => {
     const result = await handler.execute(command);
 
     expect(directory.createWorkspace).toHaveBeenCalledWith({
-      name: "Patil Builders",
+      name: "Anugraha Engineers",
       ownerUserId: "user-1",
     });
     expect(result).toEqual({
       workspaceId: "company-1",
-      name: "Patil Builders",
+      name: "Anugraha Engineers",
     });
     expect(created).toHaveLength(1);
     expect(created[0]?.owner).toEqual({
       userId: "user-1",
-      name: "Ramesh Patil",
-      mobile: "+919876543210",
+      name: "Arun Selva Kumar",
+      mobile: "+917708165767",
       email: null,
     });
     expect(created[0]?.designations.map((item) => item.name)).toEqual([
@@ -114,7 +114,7 @@ describe("CreateCompanyHandler", () => {
   it("rejects a GSTIN that fails its check character or does not contain the PAN", async () => {
     const { handler } = setup();
     await expect(
-      handler.execute({ ...command, gstin: "27AAPFU0939F1ZW" }),
+      handler.execute({ ...command, gstin: "33AAPFA0939F1ZW" }),
     ).rejects.toMatchObject({ code: "GSTIN_INVALID" });
     await expect(
       handler.execute({ ...command, pan: "ABCPE1234F" }),

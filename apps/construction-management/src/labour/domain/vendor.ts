@@ -99,7 +99,7 @@ function cleanContact(raw: string | null | undefined): string | null {
   if (mobile == null)
     throw new DomainError(
       "VENDOR_CONTACT_NUMBER_INVALID",
-      "Enter a valid mobile number, like 98765 43210.",
+      "Enter a valid mobile number, like 77081 65767.",
     );
   return mobile;
 }

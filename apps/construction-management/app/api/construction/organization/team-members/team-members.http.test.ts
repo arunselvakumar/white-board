@@ -58,7 +58,7 @@ describe("Team Members HTTP (CM-110)", () => {
     const projectB = await addProject(owner.workspaceId, owner.userId);
     const created = await create(
       jsonRequest(BASE, owner.cookie, {
-        name: "Suresh Kale",
+        name: "Prabhu Saravanan",
         designationId: owner.designationId("Site Engineer"),
         email: newEmail(),
         aadhaar: "2341 2341 2346",
@@ -67,13 +67,13 @@ describe("Team Members HTTP (CM-110)", () => {
       }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
-    const suresh = await json<Member>(created);
-    expect(suresh).toMatchObject({
+    const prabhu = await json<Member>(created);
+    expect(prabhu).toMatchObject({
       status: "joining_pending",
       aadhaarMasked: "XXXXXXXX2346",
       designation: { name: "Site Engineer" },
     });
-    expect(suresh.permissions["labour.attendance"]).toEqual([
+    expect(prabhu.permissions["labour.attendance"]).toEqual([
       "create",
       "read",
       "update",
@@ -81,12 +81,12 @@ describe("Team Members HTTP (CM-110)", () => {
 
     const permitted = await json<Member>(
       await setPermissions(
-        jsonRequest(`${BASE}/${suresh.id}/permissions`, owner.cookie, {
+        jsonRequest(`${BASE}/${prabhu.id}/permissions`, owner.cookie, {
           permissions: {
             "procurement.purchase_requests": ["create", "read", "delete"],
           },
         }),
-        params(suresh.id),
+        params(prabhu.id),
       ),
     );
     expect(permitted.permissions).toEqual({
@@ -95,34 +95,34 @@ describe("Team Members HTTP (CM-110)", () => {
 
     const moved = await json<Member>(
       await assignProjects(
-        jsonRequest(`${BASE}/${suresh.id}/projects`, owner.cookie, {
+        jsonRequest(`${BASE}/${prabhu.id}/projects`, owner.cookie, {
           projectIds: [projectB],
         }),
-        params(suresh.id),
+        params(prabhu.id),
       ),
     );
     expect(moved.projectIds).toEqual([projectB]);
 
     const hrms = await json<Member>(
       await update(
-        jsonRequest(`${BASE}/${suresh.id}/update`, owner.cookie, {
-          name: "Suresh K.",
+        jsonRequest(`${BASE}/${prabhu.id}/update`, owner.cookie, {
+          name: "Prabhu K.",
           designationId: owner.designationId("Accountant"),
           email: (
             await json<{ email: string }>(
               await getOne(
-                jsonRequest(`${BASE}/${suresh.id}`, owner.cookie),
-                params(suresh.id),
+                jsonRequest(`${BASE}/${prabhu.id}`, owner.cookie),
+                params(prabhu.id),
               ),
             )
           ).email,
           memberType: "hrms",
         }),
-        params(suresh.id),
+        params(prabhu.id),
       ),
     );
     expect(hrms).toMatchObject({
-      name: "Suresh K.",
+      name: "Prabhu K.",
       memberType: "hrms",
       projectIds: [],
     });
@@ -130,15 +130,15 @@ describe("Team Members HTTP (CM-110)", () => {
 
     const resent = await json<Member>(
       await resend(
-        jsonRequest(`${BASE}/${suresh.id}/resend-invite`, owner.cookie, {}),
-        params(suresh.id),
+        jsonRequest(`${BASE}/${prabhu.id}/resend-invite`, owner.cookie, {}),
+        params(prabhu.id),
       ),
     );
-    expect(resent.invitePath).not.toBe(suresh.invitePath);
+    expect(resent.invitePath).not.toBe(prabhu.invitePath);
 
     const revealed = await reveal(
-      jsonRequest(`${BASE}/${suresh.id}/reveal`, owner.cookie, {}),
-      params(suresh.id),
+      jsonRequest(`${BASE}/${prabhu.id}/reveal`, owner.cookie, {}),
+      params(prabhu.id),
     );
     expect(await json(revealed)).toEqual({
       aadhaar: "234123412346",
@@ -146,20 +146,20 @@ describe("Team Members HTTP (CM-110)", () => {
     });
 
     const removed = await remove(
-      jsonRequest(`${BASE}/${suresh.id}/remove`, owner.cookie, {}),
-      params(suresh.id),
+      jsonRequest(`${BASE}/${prabhu.id}/remove`, owner.cookie, {}),
+      params(prabhu.id),
     );
     expect(removed.status).toBe(StatusCodes.NO_CONTENT);
     const gone = await getOne(
-      jsonRequest(`${BASE}/${suresh.id}`, owner.cookie),
-      params(suresh.id),
+      jsonRequest(`${BASE}/${prabhu.id}`, owner.cookie),
+      params(prabhu.id),
     );
     expect(gone.status).toBe(StatusCodes.NOT_FOUND);
   });
 
   it("lists with search, status and cursors", async () => {
     const owner = await ownerWithCompany();
-    for (const name of ["Asha", "Bhavesh", "Chetan"])
+    for (const name of ["Abirami", "Bhavesh", "Chetan"])
       await create(
         jsonRequest(BASE, owner.cookie, {
           name,
@@ -184,7 +184,7 @@ describe("Team Members HTTP (CM-110)", () => {
         ),
       ),
     );
-    expect(second.items.map((item) => item.name)).toEqual(["Asha"]);
+    expect(second.items.map((item) => item.name)).toEqual(["Abirami"]);
     expect(second.nextCursor).toBeNull();
     const back = await json<Page>(
       await list(
@@ -280,7 +280,7 @@ describe("Team Members HTTP (CM-110)", () => {
 
   it("never shows another Company's Team Member, and validates menus", async () => {
     const owner = await ownerWithCompany();
-    const other = await ownerWithCompany("Shree Infra");
+    const other = await ownerWithCompany("Sri Infra");
     const theirs = await json<Member>(
       await create(
         jsonRequest(BASE, other.cookie, {

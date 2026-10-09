@@ -30,20 +30,20 @@ export const Mobile: Story = {
     );
     await userEvent.type(
       panel().getByLabelText("Mobile number"),
-      "98765 43210",
+      "77081 65767",
     );
     await userEvent.click(panel().getByRole("button", { name: "Send code" }));
     await waitFor(() =>
       expect(authMocks.mobileOtp.sendCode).toHaveBeenCalledWith(
-        "+919876543210",
+        "+917708165767",
       ),
     );
-    await expect(await panel().findByText("+91 98765 43210")).toBeVisible();
+    await expect(await panel().findByText("+91 77081 65767")).toBeVisible();
     await userEvent.type(panel().getByLabelText("6-digit code"), "123456");
     await userEvent.click(panel().getByRole("button", { name: "Sign in" }));
     await waitFor(() =>
       expect(authMocks.mobileOtp.verifyCode).toHaveBeenCalledWith({
-        mobile: "+919876543210",
+        mobile: "+917708165767",
         code: "123456",
       }),
     );
@@ -74,7 +74,7 @@ export const WrongCode: Story = {
     authMocks.mobileOtp.verifyCode.mockImplementation(() =>
       authFailure("INVALID_OTP"),
     );
-    await userEvent.type(panel().getByLabelText("Mobile number"), "9876543210");
+    await userEvent.type(panel().getByLabelText("Mobile number"), "7708165767");
     await userEvent.click(panel().getByRole("button", { name: "Send code" }));
     await userEvent.type(
       await panel().findByLabelText("6-digit code"),
@@ -93,7 +93,7 @@ export const KeepsRedirect: Story = {
   play: async ({ canvas: page, userEvent }) => {
     const panel = (name = "Mobile") =>
       within(page.getByRole("tabpanel", { name }));
-    await userEvent.type(panel().getByLabelText("Mobile number"), "9876543210");
+    await userEvent.type(panel().getByLabelText("Mobile number"), "7708165767");
     await userEvent.click(panel().getByRole("button", { name: "Send code" }));
     await userEvent.type(
       await panel().findByLabelText("6-digit code"),
@@ -117,12 +117,12 @@ export const Email: Story = {
     await expect(
       page.getByRole("link", { name: "Forgot password?" }),
     ).toHaveAttribute("href", "/forgot-password");
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.type(page.getByLabelText("Password"), "site-pass-1");
     await userEvent.click(page.getByRole("button", { name: "Sign in" }));
     await waitFor(() =>
       expect(authMocks.emailSignIn).toHaveBeenCalledWith({
-        email: "ramesh@patil.in",
+        email: "arun@anugraha.in",
         password: "site-pass-1",
       }),
     );
@@ -135,12 +135,12 @@ export const EmailNotVerified: Story = {
     authMocks.emailSignIn.mockImplementation(() =>
       authFailure("EMAIL_NOT_VERIFIED", 403),
     );
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.type(page.getByLabelText("Password"), "site-pass-1");
     await userEvent.click(page.getByRole("button", { name: "Sign in" }));
-    await expect(await page.findByText("ramesh@patil.in")).toBeVisible();
+    await expect(await page.findByText("arun@anugraha.in")).toBeVisible();
     await expect(authMocks.emailSignUp.sendEmailCode).toHaveBeenCalledWith(
-      "ramesh@patil.in",
+      "arun@anugraha.in",
     );
     await userEvent.type(page.getByLabelText("6-digit code"), "654321");
     await userEvent.click(
@@ -157,7 +157,7 @@ export const WrongPassword: Story = {
     authMocks.emailSignIn.mockImplementation(() =>
       authFailure("INVALID_EMAIL_OR_PASSWORD", 401),
     );
-    await userEvent.type(page.getByLabelText("Email"), "ramesh@patil.in");
+    await userEvent.type(page.getByLabelText("Email"), "arun@anugraha.in");
     await userEvent.type(page.getByLabelText("Password"), "wrong");
     await userEvent.click(page.getByRole("button", { name: "Sign in" }));
     await expect(

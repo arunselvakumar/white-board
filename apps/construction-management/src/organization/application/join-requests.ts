@@ -28,7 +28,7 @@ export type JoinLinkPreview = {
   companyName: string;
   memberName: string;
   /**
-   * Who the request is for, masked: `r••••@patil.in`, and `+91 ••••• 43210`
+   * Who the request is for, masked: `a••••@anugraha.in`, and `+91 ••••• 65767`
    * while SMS is on.
    */
   contacts: { kind: "mobile" | "email"; masked: string }[];

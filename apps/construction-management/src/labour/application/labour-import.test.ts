@@ -20,7 +20,7 @@ const LOOKUPS: LabourLookups = {
         { id: "c1", name: "Mason", disabled: false },
         { id: "c2", name: "Welder", disabled: true },
       ],
-      supervisors: [{ id: "s1", name: "Sunil", disabled: false }],
+      supervisors: [{ id: "s1", name: "Sundar", disabled: false }],
     }),
 };
 
@@ -68,7 +68,7 @@ describe("LabourImport", () => {
     const preview = await importer.preview("w1", [
       row(2, {
         labourCategory: "MASON",
-        supervisor: "sunil",
+        supervisor: "sundar",
         labourCode: "X1",
       }),
       row(3, {
@@ -111,7 +111,7 @@ describe("LabourImport", () => {
 
     const result = await importer.commit({
       workspaceId: "w1",
-      sheet: [row(2, { openingBalance: -100 }), row(3, { name: "Mahesh" })],
+      sheet: [row(2, { openingBalance: -100 }), row(3, { name: "Manikandan" })],
       by: "u1",
     });
     expect(result.imported).toBe(2);

@@ -36,15 +36,15 @@ async function ownerCompany() {
   await prisma.identityUser.create({
     data: {
       id: ownerId,
-      name: "Ramesh Patil",
+      name: "Arun Selva Kumar",
       email: `${ownerId}@example.test`,
     },
   });
   const { workspaceId } = await createCompanyHandlers().create.execute({
-    name: "Patil Builders",
+    name: "Anugraha Engineers",
     country: "IN",
     userId: ownerId,
-    userName: "Ramesh Patil",
+    userName: "Arun Selva Kumar",
     userMobile: null,
     userEmail: `${ownerId}@example.test`,
   });
@@ -107,7 +107,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       by: ownerId,
       memberType: "normal",
       details: {
-        name: "Suresh Kale",
+        name: "Prabhu Saravanan",
         designationId: engineerId,
         mobile: newMobile(),
         email,
@@ -125,25 +125,25 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
     // The link previews without a Session, masked, listing only the email.
     const token = invited.invitePath?.split("/").at(-1) ?? "";
     const preview = await json<Preview>(await previewOf(token));
-    expect(preview.companyName).toBe("Patil Builders");
+    expect(preview.companyName).toBe("Anugraha Engineers");
     expect(preview.contacts).toEqual([
       { kind: "email", masked: `u••••@${email.split("@")[1] ?? ""}` },
     ]);
 
-    const { cookie, userId } = await signInByEmail(email, "Suresh Kale");
+    const { cookie, userId } = await signInByEmail(email, "Prabhu Saravanan");
     const listed = await json<Requests>(await listAs(cookie));
     expect(listed.items).toEqual([
       expect.objectContaining({
         id: invited.id,
-        companyName: "Patil Builders",
-        memberName: "Suresh Kale",
+        companyName: "Anugraha Engineers",
+        memberName: "Prabhu Saravanan",
       }),
     ]);
 
     const accepted = await acceptAs(cookie, invited.id);
     expect(accepted.status).toBe(StatusCodes.OK);
     await expect(companies.listForUser(userId)).resolves.toEqual([
-      { id: workspaceId, name: "Patil Builders", role: "member" },
+      { id: workspaceId, name: "Anugraha Engineers", role: "member" },
     ]);
     const session = await prisma.identitySession.findFirst({
       where: { userId },
@@ -180,7 +180,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       by: ownerId,
       memberType: "normal",
       details: {
-        name: "Suresh",
+        name: "Prabhu",
         designationId: engineerId,
         mobile: newMobile(),
       },
@@ -199,7 +199,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       by: ownerId,
       memberType: "normal",
       details: {
-        name: "Suresh",
+        name: "Prabhu",
         designationId: engineerId,
         email: newEmail(),
       },
@@ -221,7 +221,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       workspaceId,
       by: ownerId,
       memberType: "normal",
-      details: { name: "Suresh", designationId: engineerId, email },
+      details: { name: "Prabhu", designationId: engineerId, email },
     });
     const { cookie, userId } = await signInByEmail(email);
     const rejected = await reject(
@@ -251,13 +251,13 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       workspaceId: first.workspaceId,
       by: first.ownerId,
       memberType: "normal",
-      details: { name: "Suresh", designationId: first.engineerId, email },
+      details: { name: "Prabhu", designationId: first.engineerId, email },
     });
     const b = await members.invite({
       workspaceId: second.workspaceId,
       by: second.ownerId,
       memberType: "hrms",
-      details: { name: "Suresh", designationId: second.engineerId, email },
+      details: { name: "Prabhu", designationId: second.engineerId, email },
     });
     const { cookie, userId } = await signInByEmail(email);
     for (const id of [a.id, b.id]) await acceptAs(cookie, id);
@@ -285,7 +285,7 @@ describe("Join Requests (CM-109), SMS on (ADR CM-0009)", () => {
       by: ownerId,
       memberType: "normal",
       details: {
-        name: "Suresh Kale",
+        name: "Prabhu Saravanan",
         designationId: engineerId,
         mobile,
         email,
@@ -306,7 +306,7 @@ describe("Join Requests (CM-109), SMS on (ADR CM-0009)", () => {
     const { cookie, userId } = await signInByMobile(mobile);
     expect((await acceptAs(cookie, invited.id)).status).toBe(StatusCodes.OK);
     await expect(companies.listForUser(userId)).resolves.toEqual([
-      { id: workspaceId, name: "Patil Builders", role: "member" },
+      { id: workspaceId, name: "Anugraha Engineers", role: "member" },
     ]);
   });
 });

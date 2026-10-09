@@ -34,9 +34,9 @@ function rule(overrides: Partial<SequenceRuleItem>): SequenceRuleItem {
 
 let rules: SequenceRuleItem[] = [];
 let projects: { id: string; name: string; status: string }[] = [];
-const SHANTI = {
+const KUMARI = {
   id: "0199c0de-0000-7000-8000-0000000000c1",
-  name: "Shanti Heights",
+  name: "Kumari Heights",
   status: "ongoing",
 };
 let calls: ApiCall[] = [];
@@ -235,7 +235,7 @@ export const DeletesAnUnusedRule: Story = {
 export const AddsARuleForOneProject: Story = {
   beforeEach() {
     rules = [rule({})];
-    projects = [SHANTI];
+    projects = [KUMARI];
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
@@ -246,18 +246,18 @@ export const AddsARuleForOneProject: Story = {
     const dialog = within(await body.findByRole("dialog"));
     // The default exists, so the new rule is for a Project.
     await expect(dialog.getByLabelText("Project")).toHaveTextContent(
-      "Shanti Heights",
+      "Kumari Heights",
     );
     await userEvent.type(dialog.getByLabelText("Project token"), "SH");
     await userEvent.click(dialog.getByRole("button", { name: "Save rule" }));
     await waitFor(() => expect(writes()).toHaveLength(1));
     await expect(writes()[0]?.body).toMatchObject({
       module: "purchase_request",
-      projectId: SHANTI.id,
+      projectId: KUMARI.id,
       projectToken: "SH",
     });
     // The rule shows the Project's name; every Project now has a rule.
-    await expect(await canvas.findByText("Shanti Heights")).toBeVisible();
+    await expect(await canvas.findByText("Kumari Heights")).toBeVisible();
     await expect(
       canvas.getByRole("button", { name: "Add rule" }),
     ).toBeDisabled();

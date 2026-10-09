@@ -9,7 +9,7 @@ import {
   type ApiCall,
 } from "../../../.storybook/mocks/api";
 import {
-  ANIL_NO_CARD,
+  ANBU_NO_CARD,
   DATE,
   grid,
   HELPER,
@@ -18,10 +18,10 @@ import {
   NIGHT,
   OVERTIME,
   PROJECT_ID,
-  RAMESH,
-  RAMESH_ROW,
-  RAMESH_TODAY,
-  RAMESH_YESTERDAY,
+  MUTHU,
+  MUTHU_ROW,
+  MUTHU_TODAY,
+  MUTHU_YESTERDAY,
   SHIFT_1,
   YESTERDAY,
 } from "./vendor-attendance-fixtures";
@@ -65,15 +65,15 @@ export const DayGrid: Story = {
       if (call.method === "GET" && call.path === dayPath(DATE))
         return Response.json(
           grid(DATE, [
-            { ...RAMESH_ROW, attendance: saved ? RAMESH_TODAY : null },
-            ANIL_NO_CARD,
+            { ...MUTHU_ROW, attendance: saved ? MUTHU_TODAY : null },
+            ANBU_NO_CARD,
           ]),
         );
       if (call.method === "GET" && call.path === dayPath(YESTERDAY))
-        return Response.json(grid(YESTERDAY, [RAMESH_ROW, ANIL_NO_CARD]));
+        return Response.json(grid(YESTERDAY, [MUTHU_ROW, ANBU_NO_CARD]));
       if (call.method === "POST" && call.path === `${API}/record`) {
         saved = true;
-        return Response.json(RAMESH_TODAY, { status: 201 });
+        return Response.json(MUTHU_TODAY, { status: 201 });
       }
       return undefined;
     });
@@ -81,49 +81,49 @@ export const DayGrid: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const card = within(
-      await canvas.findByRole("form", { name: "Ramesh Gang attendance" }),
+      await canvas.findByRole("form", { name: "Muthu Gang attendance" }),
     );
     // The vendor without a rate card links to Masters instead.
     await expect(
       canvas.getByRole("link", { name: "Add rate card" }),
-    ).toHaveAttribute("href", `/app/masters/vendors/${ANIL_NO_CARD.vendorId}`);
+    ).toHaveAttribute("href", `/app/masters/vendors/${ANBU_NO_CARD.vendorId}`);
     // Nothing recorded yesterday, so there is nothing to copy.
     await expect(
       canvas.queryByRole("button", { name: "Copy yesterday" }),
     ).toBeNull();
 
     await userEvent.type(
-      card.getByLabelText("Ramesh Gang Shift 1 Mason full day"),
+      card.getByLabelText("Muthu Gang Shift 1 Mason full day"),
       "3",
     );
     await userEvent.type(
-      card.getByLabelText("Ramesh Gang Shift 1 Mason half day"),
+      card.getByLabelText("Muthu Gang Shift 1 Mason half day"),
       "1",
     );
     await userEvent.type(
-      card.getByLabelText("Ramesh Gang Shift 1 Helper full day"),
+      card.getByLabelText("Muthu Gang Shift 1 Helper full day"),
       "2",
     );
     await userEvent.type(
-      card.getByLabelText("Ramesh Gang Shift 1 Helper OT hours"),
+      card.getByLabelText("Muthu Gang Shift 1 Helper OT hours"),
       "1.5",
     );
     await expect(
-      card.getByLabelText("Ramesh Gang Shift 1 Mason pay"),
+      card.getByLabelText("Muthu Gang Shift 1 Mason pay"),
     ).toHaveTextContent(formatPaise(315_000));
     await expect(
-      card.getByLabelText("Ramesh Gang Shift 1 Helper pay"),
+      card.getByLabelText("Muthu Gang Shift 1 Helper pay"),
     ).toHaveTextContent(formatPaise(120_600));
-    await expect(
-      card.getByLabelText("Ramesh Gang day total"),
-    ).toHaveTextContent(formatPaise(435_600));
+    await expect(card.getByLabelText("Muthu Gang day total")).toHaveTextContent(
+      formatPaise(435_600),
+    );
 
     await userEvent.click(card.getByRole("button", { name: "Save" }));
     await expect(await card.findByText("Saved.")).toBeVisible();
     await expect(posted()).toHaveLength(1);
     await expect(posted()[0]?.body).toEqual({
       projectId: PROJECT_ID,
-      vendorId: RAMESH,
+      vendorId: MUTHU,
       date: DATE,
       lines: [
         {
@@ -153,13 +153,13 @@ export const CopyYesterday: Story = {
   beforeEach: () => {
     api = mockApi((call) => {
       if (call.method === "GET" && call.path === dayPath(DATE))
-        return Response.json(grid(DATE, [RAMESH_ROW]));
+        return Response.json(grid(DATE, [MUTHU_ROW]));
       if (call.method === "GET" && call.path === dayPath(YESTERDAY))
         return Response.json(
-          grid(YESTERDAY, [{ ...RAMESH_ROW, attendance: RAMESH_YESTERDAY }]),
+          grid(YESTERDAY, [{ ...MUTHU_ROW, attendance: MUTHU_YESTERDAY }]),
         );
       if (call.method === "POST" && call.path === `${API}/record`)
-        return Response.json(RAMESH_TODAY, { status: 201 });
+        return Response.json(MUTHU_TODAY, { status: 201 });
       return undefined;
     });
     return api.restore;
@@ -169,13 +169,13 @@ export const CopyYesterday: Story = {
       await canvas.findByRole("button", { name: "Copy yesterday" }),
     );
     await expect(
-      canvas.getByLabelText("Ramesh Gang Shift 1 Mason full day"),
+      canvas.getByLabelText("Muthu Gang Shift 1 Mason full day"),
     ).toHaveValue("2");
     await expect(
-      canvas.getByLabelText("Ramesh Gang Night Mason full day"),
+      canvas.getByLabelText("Muthu Gang Night Mason full day"),
     ).toHaveValue("1");
     await expect(
-      canvas.getByLabelText("Ramesh Gang day total"),
+      canvas.getByLabelText("Muthu Gang day total"),
     ).toHaveTextContent(formatPaise(280_000));
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(posted()).toHaveLength(1));
@@ -193,7 +193,7 @@ export const ServerErrorOnLine: Story = {
   beforeEach: () => {
     api = mockApi((call) => {
       if (call.method === "GET" && call.path.startsWith(`${API}/day?`))
-        return Response.json(grid(DATE, [RAMESH_ROW]));
+        return Response.json(grid(DATE, [MUTHU_ROW]));
       if (call.method === "POST")
         return Response.json(
           {
@@ -213,7 +213,7 @@ export const ServerErrorOnLine: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const card = within(
-      await canvas.findByRole("form", { name: "Ramesh Gang attendance" }),
+      await canvas.findByRole("form", { name: "Muthu Gang attendance" }),
     );
     // Empty save is refused on the screen.
     await userEvent.click(card.getByRole("button", { name: "Save" }));
@@ -223,7 +223,7 @@ export const ServerErrorOnLine: Story = {
     await expect(posted()).toHaveLength(0);
 
     await userEvent.type(
-      card.getByLabelText("Ramesh Gang Night Mason OT hours"),
+      card.getByLabelText("Muthu Gang Night Mason OT hours"),
       "2",
     );
     await userEvent.click(card.getByRole("button", { name: "Save" }));
@@ -233,7 +233,7 @@ export const ServerErrorOnLine: Story = {
       ),
     ).toBeVisible();
     await expect(
-      card.getByLabelText("Ramesh Gang Night Mason OT hours"),
+      card.getByLabelText("Muthu Gang Night Mason OT hours"),
     ).toHaveAttribute("aria-invalid", "true");
   },
 };
@@ -275,7 +275,7 @@ export const MonthView: Story = {
       await canvas.findByRole("table", { name: "Vendor attendance by day" }),
     );
     await expect(
-      table.getByRole("rowheader", { name: "Ramesh Gang" }),
+      table.getByRole("rowheader", { name: "Muthu Gang" }),
     ).toBeVisible();
     await expect(table.getAllByRole("columnheader")).toHaveLength(1 + 31 + 4);
     await expect(table.getAllByText("5 + 1½ · 1.5h").length).toBeGreaterThan(0);
