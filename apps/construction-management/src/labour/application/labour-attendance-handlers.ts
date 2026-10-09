@@ -694,11 +694,23 @@ export class LabourAttendanceHandlers {
         labourer.supervisorId != null && supervisors.has(labourer.supervisorId)
           ? labourer.supervisorId
           : null;
+      // A line sent without a rate (a member without Financial cannot see
+      // it) keeps the rate the saved day had for that category, so a
+      // re-mark never silently resets a custom overtime rate.
+      const saved = existing.get(mark.labourId)?.overtime ?? [];
+      const overtime = mark.overtime?.map((line) => {
+        if (line.ratePerHour != null) return line;
+        const kept = saved.find(
+          (old) => old.labourCategoryId === line.labourCategoryId,
+        );
+        return kept == null ? line : { ...line, ratePerHour: kept.ratePerHour };
+      });
       let day: PricedDay;
       try {
         day = priceDay({
           mark: {
             ...mark,
+            overtime,
             supervisorId:
               mark.supervisorId === undefined ? own : mark.supervisorId,
           },

@@ -252,6 +252,38 @@ describe("LabourAttendanceHandlers.markDay", () => {
     expect(store.audits).toContain("labour_attendance.updated");
   });
 
+  it("keeps a saved overtime rate when a re-mark sends none", async () => {
+    const { handlers } = setup();
+    const [raju] = await handlers.markDay(
+      mark({
+        marks: [
+          {
+            labourId: "raju",
+            status: "present",
+            overtime: [
+              { labourCategoryId: "mason", hours: 1, ratePerHour: 20_000 },
+            ],
+          },
+        ],
+      }),
+    );
+    if (raju == null) throw new Error("no row");
+    // A member without Financial re-marks: the line comes back without a rate.
+    const [again] = await handlers.markDay(
+      mark({
+        marks: [
+          {
+            labourId: "raju",
+            status: "present",
+            overtime: [{ labourCategoryId: "mason", hours: 2 }],
+          },
+        ],
+        expected: { raju: raju.updatedAt },
+      }),
+    );
+    expect(again?.overtimeAmount).toBe(40_000);
+  });
+
   it("applies the back-dated guard", async () => {
     const { handlers, guard } = setup();
     guard.refuse = "create";
