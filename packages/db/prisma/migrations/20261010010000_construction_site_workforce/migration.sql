@@ -442,8 +442,6 @@ ALTER TABLE "construction_labour"."vendor_attendance" ADD CONSTRAINT "vendor_att
 -- AddForeignKey
 ALTER TABLE "construction_labour"."vendor_attendance_lines" ADD CONSTRAINT "vendor_attendance_lines_attendance_id_fkey" FOREIGN KEY ("attendance_id") REFERENCES "construction_labour"."vendor_attendance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- RenameIndex
-ALTER INDEX "training_institute"."teacher_documents_workspace_id_teacher_id_deleted_at_uploaded_a" RENAME TO "teacher_documents_workspace_id_teacher_id_deleted_at_upload_idx";
 
 
 -- One live row per name per Company, per list; one live Project per name;
