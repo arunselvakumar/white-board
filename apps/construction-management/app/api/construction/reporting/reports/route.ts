@@ -25,6 +25,14 @@ import {
 
 export const dynamic = "force-dynamic";
 
+/**
+ * The POST runs the job inside the request (until M9's queue), so the
+ * platform may cut it off here. Equal to `REPORT_TIME_LIMIT_SECONDS`
+ * (Next.js reads this as a literal; the HTTP test checks they agree):
+ * a job left running past it reads as failed.
+ */
+export const maxDuration = 60;
+
 function paramsOf(
   model: RequestConstructionReportingReportRequestModel,
   projectIds: string[] | null,

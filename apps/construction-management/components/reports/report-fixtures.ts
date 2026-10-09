@@ -49,6 +49,18 @@ export const FAILED_PAYMENT = job({
   includesMoney: true,
 });
 
+/** A job the platform cut off: the API reads it as failed. */
+export const TIMED_OUT_MUSTER = job({
+  id: "0190a000-0000-7000-8000-0000000000b5",
+  kind: "muster_roll",
+  title: "Muster roll and wage register",
+  params: { month: "2026-09" },
+  status: "failed",
+  error: "The report took too long. Try a shorter period.",
+  includesMoney: true,
+  finishedAt: null,
+});
+
 export const RUNNING_VENDOR = job({
   id: "0190a000-0000-7000-8000-0000000000b3",
   kind: "vendor_attendance",

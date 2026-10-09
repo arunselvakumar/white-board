@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
     "/*": [
       "../../node_modules/.bun/@prisma+client@*/node_modules/.prisma/client/**/*",
     ],
+    // Report PDFs read their Noto fonts from node_modules at run time
+    // (src/reporting/infrastructure/pdf-fonts.ts); the job runs in the POST.
+    "/api/construction/reporting/reports": [
+      "./node_modules/@fontsource/noto-sans*/files/*-{400,700}-normal.woff",
+      "../../node_modules/.bun/@fontsource+noto-sans*/node_modules/@fontsource/noto-sans*/files/*-{400,700}-normal.woff",
+    ],
   },
 };
 

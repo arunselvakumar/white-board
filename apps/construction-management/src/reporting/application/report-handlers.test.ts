@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import type { StoredObject } from "@/src/shared-kernel/files";
 
-import type { ReportJob } from "../domain/report-job";
+import { REPORT_TIMED_OUT_MESSAGE, type ReportJob } from "../domain/report-job";
 import type {
   ReportFile,
   ReportJobStore,
@@ -131,7 +131,10 @@ const renderer: ReportRenderer = {
   pdf: () => Promise.resolve(new TextEncoder().encode("%PDF-1.7")),
 };
 
-function setup(reportSource: ReportSource = source()) {
+function setup(
+  reportSource: ReportSource = source(),
+  clock: () => Date = () => new Date("2026-10-09T10:30:00Z"),
+) {
   const memory = memoryStore();
   const disk = memoryStorage();
   const executor: ReportExecutor = createReportExecutor({
@@ -149,6 +152,7 @@ function setup(reportSource: ReportSource = source()) {
     },
     runner: inlineReportRunner(executor),
     storage: disk.storage,
+    clock,
     newId: () => `job-${String((id += 1))}`,
   });
   return { ...memory, ...disk, handlers, executor };
@@ -272,6 +276,71 @@ describe("report jobs (inline runner)", () => {
     await expect(handlers.get("other", first.id)).rejects.toMatchObject({
       code: "REPORT_NOT_FOUND",
     });
+  });
+});
+
+describe("a job the platform cut off", () => {
+  const STARTED = new Date("2026-10-09T10:00:00Z");
+
+  /** A job left `running` (or `queued`) when its request was killed. */
+  async function stuck(status: "queued" | "running") {
+    let now = STARTED;
+    const ctx = setup(source(), () => now);
+    await ctx.store.create({
+      id: "stuck",
+      workspaceId: WORKSPACE,
+      projectId: PROJECT,
+      kind: "labour_attendance",
+      params: ATTENDANCE.params,
+      status,
+      includesMoney: false,
+      xlsxKey: null,
+      pdfKey: null,
+      fileName: null,
+      error: null,
+      requestedBy: "user-1",
+      createdAt: STARTED,
+      startedAt: status === "running" ? STARTED : null,
+      finishedAt: null,
+    });
+    return {
+      ...ctx,
+      at: (minutes: number) => {
+        now = new Date(STARTED.getTime() + minutes * 60_000);
+      },
+    };
+  }
+
+  it("still reads as running within the time limit", async () => {
+    const { handlers, at } = await stuck("running");
+    at(0.5);
+    expect((await handlers.get(WORKSPACE, "stuck")).status).toBe("running");
+  });
+
+  it("reads as failed from get and list once stale, refuses its download, and leaves the row alone", async () => {
+    const { handlers, jobs, at } = await stuck("running");
+    at(10);
+    const read = await handlers.get(WORKSPACE, "stuck");
+    expect(read.status).toBe("failed");
+    expect(read.error).toBe(REPORT_TIMED_OUT_MESSAGE);
+    const [listed] = await handlers.list(WORKSPACE, {
+      projectId: PROJECT,
+      kinds: ["labour_attendance"],
+    });
+    expect(listed?.status).toBe("failed");
+    expect(listed?.error).toBe(REPORT_TIMED_OUT_MESSAGE);
+    await expect(handlers.download(read, "pdf")).rejects.toMatchObject({
+      code: "REPORT_NOT_READY",
+    });
+    expect(jobs.get("stuck")?.status).toBe("running");
+  });
+
+  it("fails a queued job that never started", async () => {
+    const { handlers, at } = await stuck("queued");
+    at(10);
+    const read = await handlers.get(WORKSPACE, "stuck");
+    expect(read.status).toBe("failed");
+    expect(read.error).toBe(REPORT_TIMED_OUT_MESSAGE);
   });
 });
 

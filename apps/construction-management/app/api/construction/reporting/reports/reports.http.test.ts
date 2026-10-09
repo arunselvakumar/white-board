@@ -4,6 +4,12 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import {
+  REPORT_TIME_LIMIT_SECONDS,
+  REPORT_TIMED_OUT_MESSAGE,
+} from "@/src/reporting/domain/report-job";
+import { inspectPdf } from "@/src/reporting/infrastructure/pdf-inspect";
+import { UNPRINTABLE_NOTE } from "@/src/reporting/infrastructure/pdf-report";
 import type { Flag } from "@/src/shared-kernel/access";
 import { newId } from "@/src/shared-kernel/ids";
 import {
@@ -21,7 +27,11 @@ import type {
   ConstructionReportingReportJobResponseModel as Job,
   ListConstructionReportingReportsResponseModel as JobList,
 } from "./report-models";
-import { GET as listReports, POST as requestReport } from "./route";
+import {
+  GET as listReports,
+  maxDuration,
+  POST as requestReport,
+} from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/reporting/reports`;
 const XLSX =
@@ -683,6 +693,119 @@ describe("report jobs HTTP", () => {
     expect(
       (await download(elsewhere.cookie, attendance.id, "pdf")).status,
     ).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("prints the muster roll's names in their own scripts, and notes a script it cannot print", async () => {
+    const company = await ownerWithCompany();
+    const tower = await addProject(
+      company.workspaceId,
+      company.userId,
+      `Tower A ${newId().slice(-6)}`,
+    );
+    const hire = (name: string) =>
+      prisma.constructionLabourLabour.create({
+        data: {
+          id: newId(),
+          workspaceId: company.workspaceId,
+          name,
+          joiningDate: date("2026-06-01"),
+          wageType: "daily",
+          wagePerDay: 80_000,
+          overtimeWagePerHour: 10_000,
+          weeklyHolidays: [0],
+          currentProjectId: tower,
+          ...AUDIT,
+        },
+      });
+    const musterPdf = async () => {
+      const job = await generate(company.cookie, {
+        kind: "muster_roll",
+        projectId: tower,
+        params: { month: "2026-08" },
+      });
+      const response = await download(company.cookie, job.id, "pdf");
+      expect(response.status).toBe(StatusCodes.OK);
+      const bytes = await bytesOf(response);
+      expect(new TextDecoder().decode(bytes.slice(0, 5))).toBe("%PDF-");
+      return inspectPdf(bytes);
+    };
+    for (const name of ["Raju Pawar", "राजू पवार", "முருகன்"]) await hire(name);
+
+    const printed = await musterPdf();
+    expect(printed.fonts).toEqual(
+      expect.arrayContaining([
+        "NotoSans-Regular",
+        "NotoSans-Bold",
+        "NotoSansDevanagari-Regular",
+        "NotoSansTamil-Regular",
+      ]),
+    );
+    const lines = printed.pages.flat();
+    for (const name of ["Raju Pawar", "राजू पवार", "முருகன்"])
+      expect(lines).toContain(name);
+    expect(lines).not.toContain(UNPRINTABLE_NOTE);
+
+    await hire("አበበ");
+    const noted = await musterPdf();
+    for (const page of noted.pages) expect(page).toContain(UNPRINTABLE_NOTE);
+    expect(noted.pages.flat()).toContain("???");
+  });
+
+  it("reads a job the platform cut off as failed, and refuses its download", async () => {
+    // The POST runs the job inline; its time limit is the shared constant.
+    expect(maxDuration).toBe(REPORT_TIME_LIMIT_SECONDS);
+    const company = await ownerWithCompany();
+    const tower = await addProject(
+      company.workspaceId,
+      company.userId,
+      `Tower A ${newId().slice(-6)}`,
+    );
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60_000);
+    const stuck = async (status: "running" | "queued") => {
+      const id = newId();
+      await prisma.constructionReportingReportJob.create({
+        data: {
+          id,
+          workspaceId: company.workspaceId,
+          projectId: tower,
+          kind: "labour_attendance",
+          params: { kind: "labour_attendance", ...AUGUST },
+          status,
+          includesMoney: false,
+          requestedBy: company.userId,
+          createdAt: tenMinutesAgo,
+          startedAt: status === "running" ? tenMinutesAgo : null,
+        },
+      });
+      return id;
+    };
+    const running = await stuck("running");
+    const queued = await stuck("queued");
+
+    const read = await json<Job>(
+      await getReport(jsonRequest(`${BASE}/${running}`, company.cookie), {
+        params: Promise.resolve({ id: running }),
+      }),
+    );
+    expect(read.status).toBe("failed");
+    expect(read.error).toBe(REPORT_TIMED_OUT_MESSAGE);
+    expect(read.downloads).toEqual({ xlsx: null, pdf: null });
+
+    const list = await json<JobList>(
+      await listReports(
+        jsonRequest(`${BASE}?projectId=${tower}`, company.cookie),
+      ),
+    );
+    expect(
+      list.items.map((item) => [item.id, item.status, item.error]),
+    ).toEqual([
+      [queued, "failed", REPORT_TIMED_OUT_MESSAGE],
+      [running, "failed", REPORT_TIMED_OUT_MESSAGE],
+    ]);
+
+    const refused = await download(company.cookie, running, "pdf");
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await errorCode(refused)).toBe("REPORT_NOT_READY");
   });
 
   it("validates the request", async () => {

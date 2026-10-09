@@ -15,6 +15,7 @@ import {
   NEW_ATTENDANCE,
   PROJECT_ID,
   RUNNING_VENDOR,
+  TIMED_OUT_MUSTER,
   TODAY,
 } from "./report-fixtures";
 import { ReportsPage } from "./reports-page";
@@ -140,6 +141,32 @@ export const Empty: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("No reports yet")).toBeVisible();
+  },
+};
+
+/**
+ * A report cut off by the time limit reads as failed: no spinner, no
+ * downloads, and the reason, so the list stops polling.
+ */
+export const TimedOut: Story = {
+  beforeEach: () => {
+    api = mockApi((call) =>
+      call.method === "GET" && call.path === LIST_PATH
+        ? list([TIMED_OUT_MUSTER])
+        : undefined,
+    );
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    const recent = within(
+      await canvas.findByRole("list", { name: "Recent reports" }),
+    );
+    await expect(recent.getByText("Failed")).toBeVisible();
+    await expect(
+      recent.getByText("The report took too long. Try a shorter period."),
+    ).toBeVisible();
+    await expect(recent.queryByText("Generating")).toBeNull();
+    await expect(recent.queryAllByRole("link")).toHaveLength(0);
   },
 };
 

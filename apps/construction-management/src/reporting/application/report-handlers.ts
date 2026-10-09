@@ -6,6 +6,7 @@ import {
   checkReportParams,
   checkReportScope,
   failureMessage,
+  withTimeLimit,
   type ReportJob,
   type ReportKind,
   type ReportParams,
@@ -123,11 +124,16 @@ export function createReportHandlers(deps: {
   const clock = deps.clock ?? (() => new Date());
   const newId = deps.newId ?? (() => defaultNewId());
 
+  /**
+   * A job as readers see it: one the platform cut off (still queued or
+   * running past the time limit) reads as failed, so the screen stops
+   * polling and the download says so.
+   */
   async function get(workspaceId: string, id: string): Promise<ReportJob> {
     const job = await deps.store.get(workspaceId, id);
     if (job == null)
       throw notFound("REPORT_NOT_FOUND", "There is no such report.");
-    return job;
+    return withTimeLimit(job, clock());
   }
 
   return {
@@ -178,10 +184,12 @@ export function createReportHandlers(deps: {
       },
     ): Promise<ReportJob[]> {
       if (filter.kinds.length === 0) return [];
-      return deps.store.list(workspaceId, { ...filter, limit: 50 });
+      const jobs = await deps.store.list(workspaceId, { ...filter, limit: 50 });
+      const now = clock();
+      return jobs.map((job) => withTimeLimit(job, now));
     },
 
-    /** The file of a done job, streamed from storage. */
+    /** The file of a done job (read through `get`), streamed from storage. */
     async download(
       job: ReportJob,
       format: ReportFormat,
