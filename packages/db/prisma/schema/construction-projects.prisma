@@ -100,7 +100,9 @@ model ConstructionProjectsDocument {
   kind        ConstructionProjectsDocumentKind
   fileKey     String                           @unique @map("file_key")
   fileName    String                           @map("file_name")
-  /// What the browser said it was; never trusted when serving.
+  /// The type we serve it as, found from its content: a PDF, PNG, JPEG or
+  /// WebP is shown in the browser; anything else is application/octet-stream
+  /// and always downloads.
   contentType String                           @map("content_type")
   bytes       Int
   createdAt   DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
