@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { EnquiryHandlers } from "../application/enquiry-handlers";
 import { EnquiryQueries } from "../application/enquiry-queries";

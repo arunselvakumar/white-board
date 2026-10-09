@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { getCompanyAuthFromHeaders } from "@repo/auth/construction/server";
 import { companyAuthStateFor } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it, vi } from "vitest";
 

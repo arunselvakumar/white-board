@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/db";
+import type { Prisma } from "@repo/whiteboard-db";
 
 // Postgres advisory locks held until the transaction ends (ADR-0028).
 // Batch-level work (Class Changes, starting an online Class) takes the

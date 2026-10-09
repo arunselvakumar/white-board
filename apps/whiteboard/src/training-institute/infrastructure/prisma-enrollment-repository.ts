@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { EnrollmentNotFoundError } from "../application/not-found-error";
 import type { BatchId } from "../domain/batch-id";

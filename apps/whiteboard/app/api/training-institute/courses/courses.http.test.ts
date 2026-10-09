@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { getAuth } from "@repo/auth/server";
 import { authStateFor } from "@repo/auth/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

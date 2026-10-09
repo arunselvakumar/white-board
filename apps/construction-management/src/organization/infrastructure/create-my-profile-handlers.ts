@@ -1,5 +1,5 @@
 import { isConstructionSmsEnabled } from "@repo/auth/construction/server";
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { ObjectStorage } from "@/src/shared-kernel/files";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";

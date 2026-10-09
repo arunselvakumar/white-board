@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { StudentNotFoundError } from "../application/not-found-error";
 import type { ListPage } from "../domain/list";

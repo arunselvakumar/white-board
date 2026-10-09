@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import { DesignationHandlers } from "../application/designation-handlers";
 import { PrismaDesignationRepository } from "./prisma-designation-repository";

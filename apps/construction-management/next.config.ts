@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   distDir: process.env["NEXT_DIST_DIR"] ?? ".next",
   transpilePackages: [
     "@repo/ui",
-    "@repo/db",
+    "@repo/construction-db",
     "@repo/auth",
     "@repo/email-templates",
   ],
@@ -21,10 +21,10 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "26mb",
   },
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
+  // The Prisma client and its query engine are generated inside the db
+  // package (ADR-0040); ship them with every route.
   outputFileTracingIncludes: {
-    "/*": [
-      "../../node_modules/.bun/@prisma+client@*/node_modules/.prisma/client/**/*",
-    ],
+    "/*": ["../../packages/db/construction/generated/client/**/*"],
   },
 };
 

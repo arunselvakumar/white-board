@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/db";
+import type { PrismaClient } from "@repo/construction-db";
 
 import type { TeamMemberDirectory } from "../application/ports";
 

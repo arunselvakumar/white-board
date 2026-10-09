@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { renderCompanyCodeEmail } from "@repo/email-templates";
 import type { BetterAuthOptions } from "better-auth";
 import { APIError } from "better-auth/api";

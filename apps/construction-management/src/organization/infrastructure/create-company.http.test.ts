@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { companies } from "@repo/auth/construction/server";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
 import { createCompanyHandlers } from "./create-company-handlers";

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { getCompanyAuthFromHeaders } from "@repo/auth/construction/server";
 import { companyAuthStateFor } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import { vi } from "vitest";
 
 import { POST as createCompanyRoute } from "@/app/api/construction/organization/companies/route";

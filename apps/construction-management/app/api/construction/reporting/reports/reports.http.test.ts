@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 import ExcelJS from "exceljs";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";

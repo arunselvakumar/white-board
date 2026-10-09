@@ -18,7 +18,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@repo/auth": "*",
-    "@repo/db": "*",
+    "@repo/construction-db": "*",
     "@repo/email-templates": "*",
     "@repo/ui": "*",
     "@tanstack/react-query": "^5.102.8",

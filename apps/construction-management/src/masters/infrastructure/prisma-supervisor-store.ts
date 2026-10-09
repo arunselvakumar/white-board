@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@repo/db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 

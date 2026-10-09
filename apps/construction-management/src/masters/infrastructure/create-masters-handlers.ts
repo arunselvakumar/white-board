@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import { LookupHandlers } from "../application/lookup-handlers";
 import { SupervisorHandlers } from "../application/supervisor-handlers";

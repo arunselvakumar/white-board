@@ -1,4 +1,4 @@
-import type { TrainingInstituteStudent as StudentRecord } from "@repo/db";
+import type { TrainingInstituteStudent as StudentRecord } from "@repo/whiteboard-db";
 
 import { EmailAddress } from "../domain/email-address";
 import { Phone } from "../domain/phone";

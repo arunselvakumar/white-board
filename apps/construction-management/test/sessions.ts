@@ -1,7 +1,7 @@
 import { randomInt, randomUUID } from "node:crypto";
 
 import { outbox } from "@repo/auth/construction/testing";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { POST as authPost } from "@/app/api/auth/[...all]/route";
 

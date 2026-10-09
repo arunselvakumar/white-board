@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 /** Bytes a Company stores (CM-116 usage, CM-118 limit). */
 export type StorageMeter = {

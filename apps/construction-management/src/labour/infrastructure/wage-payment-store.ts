@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import type { BackdatedLimit } from "@/src/shared-kernel/backdated-policy";

@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { DomainError } from "../domain/errors";
 import type {

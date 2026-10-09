@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/db";
+import type { PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";

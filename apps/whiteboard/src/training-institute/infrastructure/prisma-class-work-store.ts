@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@repo/db";
+import type { Prisma, PrismaClient } from "@repo/whiteboard-db";
 
 import type {
   AttachmentFile,

@@ -1,4 +1,4 @@
-import type { TrainingInstituteCourse as CourseRecord } from "@repo/db";
+import type { TrainingInstituteCourse as CourseRecord } from "@repo/whiteboard-db";
 
 import { Course } from "../domain/course";
 import { CourseDescription } from "../domain/course-description";

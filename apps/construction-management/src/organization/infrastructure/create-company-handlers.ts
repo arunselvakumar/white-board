@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 // The composition root is wiring, not another context: it hands this
 // factory the other contexts' `CompanyCreated` listeners (seed copies).

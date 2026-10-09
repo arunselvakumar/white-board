@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import { BackdatedPolicyHandlers } from "../application/backdated-policy-handlers";
 import { PrismaBackdatedPolicyStore } from "./prisma-backdated-policy-store";

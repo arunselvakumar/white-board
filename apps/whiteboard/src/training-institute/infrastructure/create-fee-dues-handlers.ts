@@ -1,5 +1,5 @@
 import { workspaces } from "@repo/auth/server";
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import type { UserNames } from "../application/fee-dues-ports";
 import { FeeDuesQueries } from "../application/fee-dues-queries";

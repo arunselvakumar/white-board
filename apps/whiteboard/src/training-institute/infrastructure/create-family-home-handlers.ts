@@ -1,4 +1,4 @@
-import { prisma, type PrismaClient } from "@repo/db";
+import { prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import { GetFamilyHomeHandler } from "../application/family-home";
 import { PrismaClassExceptionsReader } from "./prisma-class-change-store";

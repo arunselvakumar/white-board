@@ -12,7 +12,7 @@ case "${VERCEL_ENV:-}" in
     # Migrations need a direct connection; Neon's pooled URL can't take the
     # advisory lock Prisma uses.
     (
-      cd ../../packages/db
+      cd ../../packages/db/construction
       DATABASE_URL="${DATABASE_URL_UNPOOLED:-${DATABASE_URL:?DATABASE_URL is not set}}" \
         bun run migrate:deploy
     )

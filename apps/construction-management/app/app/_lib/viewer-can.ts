@@ -1,5 +1,5 @@
 import { protectCompany } from "@repo/auth/construction/server";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { can, type Flag, type MenuKey } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";

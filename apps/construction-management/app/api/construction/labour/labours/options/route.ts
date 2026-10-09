@@ -3,7 +3,7 @@ import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { companyToday } from "@/src/labour/infrastructure/prisma-labour-queries";
 import { can } from "@/src/shared-kernel/access";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/construction-db";
 
 import { labour } from "../handlers";
 import {

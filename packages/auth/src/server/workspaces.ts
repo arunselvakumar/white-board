@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { Prisma, prisma } from "@repo/db";
+import { Prisma, prisma } from "@repo/whiteboard-db";
 import { generateId } from "better-auth";
 import { APIError } from "better-auth/api";
 

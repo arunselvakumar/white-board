@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { ProjectUsage } from "../domain/project-repository";
 

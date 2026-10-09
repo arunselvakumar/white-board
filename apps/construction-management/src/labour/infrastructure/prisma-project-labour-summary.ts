@@ -1,4 +1,7 @@
-import { prisma as defaultPrisma, type PrismaClient } from "@repo/db";
+import {
+  prisma as defaultPrisma,
+  type PrismaClient,
+} from "@repo/construction-db";
 
 import {
   calendarDateFromDb,
