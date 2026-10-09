@@ -1,0 +1,425 @@
+.prettierignore
+  s_658d3beb79774d::t_5a0f138e632b03 12-14
+apps/construction-management/app/api/_lib/require-access.ts
+  s_658d3beb79774d::t_ad41672c1c397b 1
+apps/construction-management/app/api/_lib/require-plan-active.ts
+  s_658d3beb79774d::t_b43e09748d9918 1
+apps/construction-management/app/api/auth/mobile-otp.http.test.ts
+  s_658d3beb79774d::t_6e6e9a1696ac8d 4
+apps/construction-management/app/api/auth/password-reset.http.test.ts
+  s_658d3beb79774d::t_7f6a9d5f251a27 4
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance.http.test.ts
+  s_658d3beb79774d::t_f50a7c7c2ce8bc 1
+apps/construction-management/app/api/construction/labour/attendance/vendors/vendor-attendance.http.test.ts
+  s_658d3beb79774d::t_332391e393f561 1
+apps/construction-management/app/api/construction/labour/balances/balances.http.test.ts
+  s_658d3beb79774d::t_1c111e1e183fb2 1
+apps/construction-management/app/api/construction/labour/labours/delete-races.http.test.ts
+  s_658d3beb79774d::t_d41cbd7f452126 1
+apps/construction-management/app/api/construction/labour/labours/labours.http.test.ts
+  s_658d3beb79774d::t_bf3090ba873227 1
+apps/construction-management/app/api/construction/labour/labours/options/route.ts
+  s_658d3beb79774d::t_4766f5d81ce26d 6
+apps/construction-management/app/api/construction/labour/payments/handlers.ts
+  s_658d3beb79774d::t_fe62073c0e28f0 1
+apps/construction-management/app/api/construction/labour/payments/large-totals.http.test.ts
+  s_658d3beb79774d::t_cd6f28384c8bdd 1
+apps/construction-management/app/api/construction/labour/payments/payments.http.test.ts
+  s_658d3beb79774d::t_b7690e17a30749 1
+apps/construction-management/app/api/construction/labour/payments/route.ts
+  s_658d3beb79774d::t_d83cf4931325ec 1
+apps/construction-management/app/api/construction/labour/summary/summary.http.test.ts
+  s_658d3beb79774d::t_8cfca6bea0e021 1
+apps/construction-management/app/api/construction/labour/vendors/vendors.http.test.ts
+  s_658d3beb79774d::t_62627f32592707 1
+apps/construction-management/app/api/construction/masters/masters.http.test.ts
+  s_658d3beb79774d::t_f3add5f1927bc8 1
+apps/construction-management/app/api/construction/organization/companies/companies.http.test.ts
+  s_658d3beb79774d::t_9b4116edbb790d 4
+apps/construction-management/app/api/construction/organization/company-profile/company-profile.http.test.ts
+  s_658d3beb79774d::t_8c221fc64e0235 3
+apps/construction-management/app/api/construction/organization/designations/designations.http.test.ts
+  s_658d3beb79774d::t_7908fefe4a86d0 2
+apps/construction-management/app/api/construction/organization/join-requests/join-requests.http.test.ts
+  s_658d3beb79774d::t_6f9773d0cc236b 5
+apps/construction-management/app/api/construction/organization/me/me.http.test.ts
+  s_658d3beb79774d::t_21107ecc0649fb 3
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_658d3beb79774d::t_6f38444383c4c6 5
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/route.ts
+  s_658d3beb79774d::t_2cb668a407c265 1
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/sequence-rules.http.test.ts
+  s_658d3beb79774d::t_b03fe6300bfccb 5
+apps/construction-management/app/api/construction/organization/subscription/subscription.http.test.ts
+  s_658d3beb79774d::t_27b03427ea4246 5
+apps/construction-management/app/api/construction/organization/team-members/handlers.ts
+  s_658d3beb79774d::t_2d81ca66b48b9f 1
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/documents.http.test.ts
+  s_658d3beb79774d::t_a4adf3120e075a 1
+apps/construction-management/app/api/construction/projects/projects/contract-details.http.test.ts
+  s_658d3beb79774d::t_a3979ecf416e5e 1
+apps/construction-management/app/api/construction/projects/projects/options/route.ts
+  s_658d3beb79774d::t_a27ec4d94de2a3 1
+apps/construction-management/app/api/construction/projects/projects/projects.http.test.ts
+  s_658d3beb79774d::t_9850de11add7ad 1
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_658d3beb79774d::t_b800ecde51aa6c 1
+apps/construction-management/app/api/construction/reporting/reports/reports.http.test.ts
+  s_658d3beb79774d::t_36dd31706337a6 1
+apps/construction-management/app/app/_lib/viewer-can.ts
+  s_658d3beb79774d::t_f9d88395f145a0 2
+apps/construction-management/app/continue/continue.http.test.ts
+  s_658d3beb79774d::t_cfdbc54cb53367 4
+apps/construction-management/next.config.ts
+  s_658d3beb79774d::t_750f829af27b28 10,24-25,27
+apps/construction-management/package.json
+  s_658d3beb79774d::t_5d131dd841a189 21
+apps/construction-management/scripts/vercel-build.sh
+  s_658d3beb79774d::t_7eb34fa13cd364 15
+apps/construction-management/src/labour/infrastructure/balance-store.ts
+  s_658d3beb79774d::t_d95d3d302efb44 1
+apps/construction-management/src/labour/infrastructure/create-labour-handlers.ts
+  s_658d3beb79774d::t_f596afef07ddf0 1
+apps/construction-management/src/labour/infrastructure/create-vendor-handlers.ts
+  s_658d3beb79774d::t_d77eab7028358b 1
+apps/construction-management/src/labour/infrastructure/labour-attendance-factory.ts
+  s_658d3beb79774d::t_572012d2015e1b 1
+apps/construction-management/src/labour/infrastructure/labour-attendance-store.ts
+  s_658d3beb79774d::t_01eaddde679a07 1
+apps/construction-management/src/labour/infrastructure/labour-project-on.ts
+  s_658d3beb79774d::t_1c4b21679ad80d 1
+apps/construction-management/src/labour/infrastructure/party-locks.ts
+  s_658d3beb79774d::t_cbf11bba8f0064 1
+apps/construction-management/src/labour/infrastructure/prisma-directories.ts
+  s_658d3beb79774d::t_91a2eababd1eb9 1
+apps/construction-management/src/labour/infrastructure/prisma-labour-queries.ts
+  s_658d3beb79774d::t_45445ccb373941 1
+apps/construction-management/src/labour/infrastructure/prisma-labour-repository.ts
+  s_658d3beb79774d::t_0b7fa3a94443e2 1
+apps/construction-management/src/labour/infrastructure/prisma-ledger.http.test.ts
+  s_658d3beb79774d::t_788edf60138d81 3
+apps/construction-management/src/labour/infrastructure/prisma-ledger.ts
+  s_658d3beb79774d::t_613467ba0c2c6c 1
+apps/construction-management/src/labour/infrastructure/prisma-party-files-store.ts
+  s_658d3beb79774d::t_9f10ad2bf2f073 1
+apps/construction-management/src/labour/infrastructure/prisma-project-labour-summary.ts
+  s_658d3beb79774d::t_05c6eba79a4ef2 1-4
+apps/construction-management/src/labour/infrastructure/prisma-vendor-store.ts
+  s_658d3beb79774d::t_c2be2186d758d3 1
+apps/construction-management/src/labour/infrastructure/vendor-attendance-factory.ts
+  s_658d3beb79774d::t_f685a6d7c5f295 1
+apps/construction-management/src/labour/infrastructure/vendor-attendance-store.ts
+  s_658d3beb79774d::t_380987ae5362b3 1
+apps/construction-management/src/labour/infrastructure/wage-payment-factory.ts
+  s_658d3beb79774d::t_1d80051bd6be37 1
+apps/construction-management/src/labour/infrastructure/wage-payment-store.ts
+  s_658d3beb79774d::t_09ff349a6b05e2 1
+apps/construction-management/src/masters/infrastructure/create-masters-handlers.ts
+  s_658d3beb79774d::t_7529e81ce60f74 1
+apps/construction-management/src/masters/infrastructure/prisma-lookup-store.ts
+  s_658d3beb79774d::t_b200beae2585c6 1
+apps/construction-management/src/masters/infrastructure/prisma-master-usage.ts
+  s_658d3beb79774d::t_b9edcaa7eb61a6 1
+apps/construction-management/src/masters/infrastructure/prisma-supervisor-store.ts
+  s_658d3beb79774d::t_2bb05e6487e8e6 1
+apps/construction-management/src/masters/infrastructure/prisma-team-member-directory.ts
+  s_658d3beb79774d::t_90e268955b0fd6 1
+apps/construction-management/src/masters/infrastructure/seed-company-masters.ts
+  s_658d3beb79774d::t_f0d9626eea47e8 1
+apps/construction-management/src/organization/infrastructure/create-backdated-policy-handlers.ts
+  s_658d3beb79774d::t_5e8be574c93e8e 1
+apps/construction-management/src/organization/infrastructure/create-company-handlers.ts
+  s_658d3beb79774d::t_c1b5a21bd6dbfa 1
+apps/construction-management/src/organization/infrastructure/create-company-profile-handlers.ts
+  s_658d3beb79774d::t_125a83317482c7 1
+apps/construction-management/src/organization/infrastructure/create-company.http.test.ts
+  s_658d3beb79774d::t_74d0ef17605382 4
+apps/construction-management/src/organization/infrastructure/create-designation-handlers.ts
+  s_658d3beb79774d::t_d3709f57d97092 1
+apps/construction-management/src/organization/infrastructure/create-my-profile-handlers.ts
+  s_658d3beb79774d::t_b3988fad414d88 2
+apps/construction-management/src/organization/infrastructure/create-sequence-rule-handlers.ts
+  s_658d3beb79774d::t_0bf9ff662c665c 1
+apps/construction-management/src/organization/infrastructure/create-subscription-handlers.ts
+  s_658d3beb79774d::t_d27a16c35e2ff3 1
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_658d3beb79774d::t_e8b1b51652f7c5 5
+apps/construction-management/src/organization/infrastructure/designations.http.test.ts
+  s_658d3beb79774d::t_c40ad7cfea1cfe 3
+apps/construction-management/src/organization/infrastructure/prisma-backdated-policy-store.ts
+  s_658d3beb79774d::t_9700f37c7ef00b 1
+apps/construction-management/src/organization/infrastructure/prisma-company-profile-reader.ts
+  s_658d3beb79774d::t_97208ad6c64852 1
+apps/construction-management/src/organization/infrastructure/prisma-company-profile-store.ts
+  s_658d3beb79774d::t_4195f2280b3795 1
+apps/construction-management/src/organization/infrastructure/prisma-designation-repository.ts
+  s_658d3beb79774d::t_98ea231d8a7692 1
+apps/construction-management/src/organization/infrastructure/prisma-member-photo-store.ts
+  s_658d3beb79774d::t_ee40a1f12a2816 1
+apps/construction-management/src/organization/infrastructure/prisma-new-company-store.ts
+  s_658d3beb79774d::t_b23f9cc0b810db 1
+apps/construction-management/src/organization/infrastructure/prisma-project-directory.ts
+  s_658d3beb79774d::t_52e597a28a0a3a 1
+apps/construction-management/src/organization/infrastructure/prisma-sequence-rule-store.ts
+  s_658d3beb79774d::t_c7c0a82ed5e960 1
+apps/construction-management/src/organization/infrastructure/prisma-subscription-repository.ts
+  s_658d3beb79774d::t_40a1ce90103095 1
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_658d3beb79774d::t_b85c6cfd9b0674 1
+apps/construction-management/src/organization/infrastructure/prisma-usage-reader.ts
+  s_658d3beb79774d::t_5a3ca94055bd71 1
+apps/construction-management/src/organization/infrastructure/storage-meter.ts
+  s_658d3beb79774d::t_101c2d76651427 1
+apps/construction-management/src/organization/infrastructure/team-members.http.test.ts
+  s_658d3beb79774d::t_6bb907b86d1f81 3
+apps/construction-management/src/projects/infrastructure/create-project-documents.ts
+  s_658d3beb79774d::t_d8eeccd4af8855 1
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_658d3beb79774d::t_e7f60e298bcd4b 1
+apps/construction-management/src/projects/infrastructure/prisma-custom-field-labels.ts
+  s_658d3beb79774d::t_400e6811b33581 1
+apps/construction-management/src/projects/infrastructure/prisma-project-document-store.ts
+  s_658d3beb79774d::t_9dbdecd6089eee 1
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_658d3beb79774d::t_3efd4369399edf 1
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_658d3beb79774d::t_89f5b144da02fa 1
+apps/construction-management/src/projects/infrastructure/prisma-uploader-names.ts
+  s_658d3beb79774d::t_8f942a5c182ced 1
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_658d3beb79774d::t_bc8e2558b6bfc1 1
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_658d3beb79774d::t_3b320b01252170 1
+apps/construction-management/src/reporting/infrastructure/prisma-report-source.ts
+  s_658d3beb79774d::t_a15578d32528f7 1
+apps/construction-management/src/shared-kernel/access/prisma-access-reader.ts
+  s_658d3beb79774d::t_91b92018929f33 1
+apps/construction-management/src/shared-kernel/audit.http.test.ts
+  s_658d3beb79774d::t_2ecd952c65268b 3
+apps/construction-management/src/shared-kernel/audit.ts
+  s_658d3beb79774d::t_1d4d9b5ff5dd60 1
+apps/construction-management/src/shared-kernel/backdated-policy-reader.ts
+  s_658d3beb79774d::t_aa46b9f7b2c157 1
+apps/construction-management/src/shared-kernel/files/stored-files.ts
+  s_658d3beb79774d::t_c9f08a8e9b18a5 1
+apps/construction-management/src/shared-kernel/sequence/next-sequence-number.http.test.ts
+  s_658d3beb79774d::t_02d0c84324bc7a 3
+apps/construction-management/src/shared-kernel/sequence/next-sequence-number.ts
+  s_658d3beb79774d::t_496c4ff3d1b847 1
+apps/construction-management/test/companies.ts
+  s_658d3beb79774d::t_e89c4138f1fcd3 5
+apps/construction-management/test/sessions.ts
+  s_658d3beb79774d::t_55e7805ca8fad5 4
+apps/construction-management/vitest.http-global-setup.ts
+  s_658d3beb79774d::t_a1495791cb8443 5,40
+apps/whiteboard/app/api/auth/auth-route.http.test.ts
+  s_658d3beb79774d::t_3d4a78218539ae 1
+apps/whiteboard/app/api/auth/identity.http.test.ts
+  s_658d3beb79774d::t_a2f95b44fe19d3 1
+apps/whiteboard/app/api/training-institute/attendance/attendance.http.test.ts
+  s_658d3beb79774d::t_1574c1ce8f5166 5
+apps/whiteboard/app/api/training-institute/calendar/calendar.http.test.ts
+  s_658d3beb79774d::t_dba9e24af434fd 5
+apps/whiteboard/app/api/training-institute/classes/class-changes.http.test.ts
+  s_658d3beb79774d::t_a595dc083c68d4 5
+apps/whiteboard/app/api/training-institute/classes/classes.http.test.ts
+  s_658d3beb79774d::t_6cdebd506cafc4 5
+apps/whiteboard/app/api/training-institute/courses/courses.http.test.ts
+  s_658d3beb79774d::t_6e7afb9e4e21fd 5
+apps/whiteboard/app/api/training-institute/enquiries/enquiries.http.test.ts
+  s_658d3beb79774d::t_11247e28ec3597 12
+apps/whiteboard/app/api/training-institute/fee-dues/fee-dues.http.test.ts
+  s_658d3beb79774d::t_6b3136bd386329 5
+apps/whiteboard/app/api/training-institute/home/home.http.test.ts
+  s_658d3beb79774d::t_e3ac7c67311658 5
+apps/whiteboard/app/api/training-institute/homework/homework.http.test.ts
+  s_658d3beb79774d::t_d9d3db5a83e0ac 5
+apps/whiteboard/app/api/training-institute/students/students.http.test.ts
+  s_658d3beb79774d::t_0a68cfaefcb9cc 12
+apps/whiteboard/app/api/training-institute/teachers/teachers.http.test.ts
+  s_658d3beb79774d::t_18027ceda41e28 12
+apps/whiteboard/app/api/training-institute/tests/tests.http.test.ts
+  s_658d3beb79774d::t_cd0a9ec2b025ef 5
+apps/whiteboard/next.config.ts
+  s_658d3beb79774d::t_3aa8781d16d88d 7,13-14,16
+apps/whiteboard/package.json
+  s_658d3beb79774d::t_22e61476f011d4 26
+apps/whiteboard/scripts/vercel-build.sh
+  s_658d3beb79774d::t_2394c3dbb0c246 13
+apps/whiteboard/src/training-institute/application/get-owner-dashboard.handler.ts
+  s_658d3beb79774d::t_19fafecb977460 1
+apps/whiteboard/src/training-institute/infrastructure/create-attendance-handlers.ts
+  s_658d3beb79774d::t_b45adebcb4e239 1
+apps/whiteboard/src/training-institute/infrastructure/create-batch-handlers.ts
+  s_658d3beb79774d::t_65e3b27ba176c5 1
+apps/whiteboard/src/training-institute/infrastructure/create-calendar-schedule-reader.ts
+  s_658d3beb79774d::t_8d59b0537e5e3f 1
+apps/whiteboard/src/training-institute/infrastructure/create-class-change-handlers.ts
+  s_658d3beb79774d::t_c1275bc5ba6e4c 1
+apps/whiteboard/src/training-institute/infrastructure/create-class-service.ts
+  s_658d3beb79774d::t_98a4fecd5dc46e 1
+apps/whiteboard/src/training-institute/infrastructure/create-class-test-handlers.ts
+  s_658d3beb79774d::t_99cb68e98b897b 1
+apps/whiteboard/src/training-institute/infrastructure/create-class-work-handlers.ts
+  s_658d3beb79774d::t_3eb41d135b35db 1
+apps/whiteboard/src/training-institute/infrastructure/create-course-handlers.ts
+  s_658d3beb79774d::t_b3afb76c995c22 1
+apps/whiteboard/src/training-institute/infrastructure/create-dashboard-handlers.ts
+  s_658d3beb79774d::t_cc23dfa6dc54ed 1
+apps/whiteboard/src/training-institute/infrastructure/create-enquiry-handlers.ts
+  s_658d3beb79774d::t_d50ebcab5ff943 1
+apps/whiteboard/src/training-institute/infrastructure/create-enrollment-handlers.ts
+  s_658d3beb79774d::t_6675f7f41e451d 1
+apps/whiteboard/src/training-institute/infrastructure/create-family-home-handlers.ts
+  s_658d3beb79774d::t_6ebb61c74ff89b 1
+apps/whiteboard/src/training-institute/infrastructure/create-fee-dues-handlers.ts
+  s_658d3beb79774d::t_a26ace24ab509f 2
+apps/whiteboard/src/training-institute/infrastructure/create-student-handlers.ts
+  s_658d3beb79774d::t_e2166a33622a0e 1
+apps/whiteboard/src/training-institute/infrastructure/create-teacher-assignment-handlers.ts
+  s_658d3beb79774d::t_9efa818c9b964f 1
+apps/whiteboard/src/training-institute/infrastructure/create-teacher-handlers.ts
+  s_658d3beb79774d::t_1f3558fcf14227 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-attendance-repository.ts
+  s_658d3beb79774d::t_3b52cf98d26e88 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-batch-mapper.ts
+  s_658d3beb79774d::t_9a64cdc57c14be 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-batch-repository.http.test.ts
+  s_658d3beb79774d::t_b7f98ab713a730 3
+apps/whiteboard/src/training-institute/infrastructure/prisma-batch-repository.ts
+  s_658d3beb79774d::t_1af8ba353934ae 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-calendar-schedule-reader.ts
+  s_658d3beb79774d::t_059c086232f19f 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-change-store.ts
+  s_658d3beb79774d::t_bc10a565d22a8f 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-occurrence-store.ts
+  s_658d3beb79774d::t_f946bea802b729 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-test-store.ts
+  s_658d3beb79774d::t_590376ba9ca90a 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-class-work-store.ts
+  s_658d3beb79774d::t_847981bc1de1ab 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-mapper.ts
+  s_658d3beb79774d::t_9ac8bea4442574 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-repository.http.test.ts
+  s_658d3beb79774d::t_d7166eb9466c0d 3
+apps/whiteboard/src/training-institute/infrastructure/prisma-course-repository.ts
+  s_658d3beb79774d::t_79348bcef2afe5 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-enquiry-reader.ts
+  s_658d3beb79774d::t_fc20c4282374d3 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-enquiry-store.ts
+  s_658d3beb79774d::t_b5eccb6eac0c57 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-enrollment-mapper.ts
+  s_658d3beb79774d::t_dad6f18f9dd4a2 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-enrollment-repository.ts
+  s_658d3beb79774d::t_c1835159b06f0a 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-family-home-source.ts
+  s_658d3beb79774d::t_6505b306ac310c 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-dues-reader.ts
+  s_658d3beb79774d::t_64a41625d5bac7 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-follow-up-store.ts
+  s_658d3beb79774d::t_74d25dc88427cf 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-payment-mapper.ts
+  s_658d3beb79774d::t_67679150847763 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-fee-payment-repository.ts
+  s_658d3beb79774d::t_82d288af45665c 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-mapper.ts
+  s_658d3beb79774d::t_fcf048c1913671 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.http.test.ts
+  s_658d3beb79774d::t_8d568f87c5b8f5 3
+apps/whiteboard/src/training-institute/infrastructure/prisma-student-repository.ts
+  s_658d3beb79774d::t_57e92cf7069bc3 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-assignment-repository.ts
+  s_658d3beb79774d::t_02c696d89783de 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-document-repository.ts
+  s_658d3beb79774d::t_2058d728035ca8 1
+apps/whiteboard/src/training-institute/infrastructure/prisma-teacher-repository.ts
+  s_658d3beb79774d::t_586529fd5b4d3b 1
+apps/whiteboard/src/training-institute/infrastructure/schedule-locks.ts
+  s_658d3beb79774d::t_9ddeef27c54400 1
+apps/whiteboard/vitest.http-global-setup.ts
+  s_658d3beb79774d::t_30ad3a4e8a420c 5,36
+bun.lock
+  s_658d3beb79774d::t_4a2f026747d636 22,96,138,140,160-177,768,778-779
+package.json
+  s_658d3beb79774d::t_078d3c199d6e1d 35-36
+packages/auth/package.json
+  s_658d3beb79774d::t_f210bcfadfc1ed 25,27
+packages/auth/src/config.ts
+  s_658d3beb79774d::t_15c1522eacc578 1
+packages/auth/src/construction/config.ts
+  s_658d3beb79774d::t_a550f74296cf93 1
+packages/auth/src/construction/mobile-otp.ts
+  s_658d3beb79774d::t_2cc4dbf400cdd4 1
+packages/auth/src/construction/server/companies.ts
+  s_658d3beb79774d::t_8ff50312639552 3
+packages/auth/src/construction/server/get-auth.ts
+  s_658d3beb79774d::t_7e8fc1828e9469 1
+packages/auth/src/construction/testing.ts
+  s_658d3beb79774d::t_063a3795387c51 1
+packages/auth/src/server/get-auth.ts
+  s_658d3beb79774d::t_bb2a6591a1f32e 1
+packages/auth/src/server/workspaces.ts
+  s_658d3beb79774d::t_e6e6817a910383 3
+packages/auth/src/testing/index.ts
+  s_658d3beb79774d::t_d118a11f59a214 1
+packages/db/construction/.env.example
+  s_658d3beb79774d::t_9ab17620027082 1
+packages/db/construction/.gitignore
+  s_658d3beb79774d::t_31c2b13bb48d15 1-2
+packages/db/construction/eslint.config.js
+  s_658d3beb79774d::t_d52c2312949952 17
+packages/db/construction/package.json
+  s_658d3beb79774d::t_89093702d1cb3d 1-29
+packages/db/construction/prisma.config.ts
+  s_658d3beb79774d::t_e3944b4d87e39f 1-17
+packages/db/construction/prisma/migrations/0_init/migration.sql
+  s_658d3beb79774d::t_01586adba776b7 1-9,16-18,22-27,52-63,67-75,361-594,604-615,626-785,861-914,918-968,993-1052,1054-1055,1058,1081-1083
+packages/db/construction/prisma/schema/base.prisma
+  s_658d3beb79774d::t_39a10aa16c2a87 1-14
+packages/db/construction/prisma/schema/identity.prisma
+  s_658d3beb79774d::t_758fde030243cb 1-3,14,85-86,103
+packages/db/construction/src/client.ts
+  s_658d3beb79774d::t_755f4a39cb5828 1-11
+packages/db/construction/src/index.ts
+  s_658d3beb79774d::t_4ec578c25c120b 1-2
+packages/db/construction/tsconfig.json
+  s_658d3beb79774d::t_1cc854a947656f 13
+packages/db/whiteboard/.gitignore
+  s_658d3beb79774d::t_528dbc2326a9a8 1-2
+packages/db/whiteboard/eslint.config.js
+  s_658d3beb79774d::t_a19935407214c3 1-19
+packages/db/whiteboard/package.json
+  s_658d3beb79774d::t_526165fecaf16b 2
+packages/db/whiteboard/prisma.config.ts
+  s_658d3beb79774d::t_42b09970ed57a5 11-13
+packages/db/whiteboard/prisma/migrations/0_init/migration.sql
+  s_658d3beb79774d::t_ad502617fec0eb 1-53,69-502,592-859,887-988,1013-1105,1107,1121-1173
+packages/db/whiteboard/prisma/migrations/migration_lock.toml
+  s_658d3beb79774d::t_a6f079c6ce45ce 1-3
+packages/db/whiteboard/prisma/schema/base.prisma
+  s_658d3beb79774d::t_8b8b978e37ef37 1-2,5,13
+packages/db/whiteboard/prisma/schema/identity.prisma
+  s_658d3beb79774d::t_0fce6e706179cf 1-145
+packages/db/whiteboard/src/client.ts
+  s_658d3beb79774d::t_7a91c7f44ea7d4 1
+packages/db/whiteboard/src/index.ts
+  s_658d3beb79774d::t_d92f0e10abebe9 2,9
+packages/db/whiteboard/tsconfig.json
+  s_658d3beb79774d::t_93ec7f746181c2 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "87e74f24c6f266aa545b883570c79a2b263e93fe",
+  "prompts": {},
+  "sessions": {
+    "s_658d3beb79774d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "423aa90c-e096-40cc-9ba4-c4602a56bf8f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
