@@ -1,0 +1,19 @@
+apps/construction-management/components/attendance/labour/labour-recorded-list.tsx
+  s_3ec404ebeb145c::t_e4b88fdb29e19d 28,132-173,210,224-226,240-248,291-294
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7ff42ed32d80d5ea5d38830090d7e6cb239e2226",
+  "prompts": {},
+  "sessions": {
+    "s_3ec404ebeb145c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe02f20e-0542-44cf-9327-167954aed72e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
