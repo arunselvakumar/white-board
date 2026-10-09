@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth, useWorkspace, useWorkspaceList } from "@repo/auth/react";
+import { Building2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,6 +31,9 @@ import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
+const NAV_BUTTON_CLASS =
+  "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-accent data-active:text-sidebar-foreground data-active:[&_svg]:text-sidebar-primary h-10 gap-3 rounded-xl px-3 transition-colors data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] [&_svg]:size-[18px]";
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "/";
   const { workspace } = useWorkspace();
@@ -40,8 +44,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <Sidebar variant="inset" collapsible="offcanvas">
-        <SidebarHeader className="border-sidebar-border border-b px-4 pt-5 pb-4">
+      <Sidebar variant="sidebar" collapsible="offcanvas">
+        <SidebarHeader className="px-4 pt-6 pb-2">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -52,11 +56,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Image
                   src="/whiteboard-logo.svg"
                   alt=""
-                  width={32}
-                  height={32}
-                  className="size-8"
+                  width={36}
+                  height={36}
+                  className="size-9"
                 />
-                <span className="text-sidebar-foreground truncate text-base font-semibold tracking-tight">
+                <span className="text-sidebar-foreground truncate text-lg font-semibold tracking-tight">
                   Whiteboard
                 </span>
               </SidebarMenuButton>
@@ -64,9 +68,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-3 pt-5">
-            <SidebarGroupLabel className="text-sidebar-foreground/55 px-3 text-[11px] font-semibold tracking-[0.12em]">
-              SESSIONS
+          <SidebarGroup className="px-3 pt-4">
+            <SidebarGroupLabel className="text-sidebar-foreground/45 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
+              Main menu
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <nav aria-label="Main">
@@ -80,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                           isActive={active}
                           tooltip={item.label}
                           aria-current={active ? "page" : undefined}
-                          className="text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground h-11 rounded-xl px-3 transition-colors data-active:shadow-[0_5px_16px_rgba(10,7,31,0.2)]"
+                          className={NAV_BUTTON_CLASS}
                           render={<Link href={item.href} />}
                         >
                           <Icon />
@@ -94,16 +98,22 @@ export function AppShell({ children }: { children: ReactNode }) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="px-3 pb-4">
+        <SidebarFooter className="border-sidebar-border mx-3 border-t px-0 pt-3 pb-4">
           <ThemeToggle />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 px-4 print:hidden">
+        <header className="bg-card/85 border-border/70 sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
           <SidebarTrigger />
-          <Separator orientation="vertical" className="h-4" />
-          <p className="text-muted-foreground truncate text-sm font-light">
-            {workspaceName}
+          <Separator orientation="vertical" className="mr-1 h-4" />
+          <p className="text-foreground flex min-w-0 items-center gap-2 text-sm">
+            <span
+              aria-hidden="true"
+              className="bg-primary/10 text-primary flex size-7 shrink-0 items-center justify-center rounded-lg"
+            >
+              <Building2 className="size-4" />
+            </span>
+            <span className="truncate">{workspaceName}</span>
           </p>
           {workspaces.length > 1 && (
             <Button
@@ -118,7 +128,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <UserMenu />
           </div>
         </header>
-        <div className="border-border/70 bg-secondary/45 border-b px-4 py-2.5 sm:px-6 print:hidden">
+        <div className="px-4 pt-4 sm:px-6 print:hidden">
           <AppBreadcrumbs />
         </div>
         {children}

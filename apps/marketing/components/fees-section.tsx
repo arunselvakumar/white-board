@@ -128,12 +128,9 @@ export function FeesSection() {
             Dues you can see from the desk.
           </h2>
 
-          <dl className="border-sidebar-border mt-12 max-w-[60ch] border-t">
+          <dl className="mt-12 max-w-[60ch] border-t border-white/14">
             {FEE_POINTS.map((point) => (
-              <div
-                key={point.name}
-                className="border-sidebar-border border-b py-5"
-              >
+              <div key={point.name} className="border-b border-white/14 py-5">
                 <dt className="text-[1.0625rem] font-semibold">{point.name}</dt>
                 <dd className="mt-1 text-[1.0625rem] leading-[1.6] text-[#c4b5fd]/85">
                   {point.body}
@@ -210,7 +207,7 @@ export function FeesSection() {
 
             {/* The plate: a dark slab seen from above, with the paper slit at its back edge. */}
             <div className="relative h-20 [perspective:700px]">
-              <div className="border-sidebar-border absolute inset-x-0 -top-px h-24 origin-top [transform:rotateX(58deg)] rounded-b-xl border bg-[#201a3e] [transform-style:preserve-3d]">
+              <div className="absolute inset-x-0 -top-px h-24 origin-top [transform:rotateX(58deg)] rounded-b-xl border border-white/14 bg-[#201a3e] [transform-style:preserve-3d]">
                 <div className="absolute inset-x-3 top-px h-[3px] rounded-full bg-[#f6f7fb]/85 sm:inset-x-11" />
                 <div className="absolute inset-x-0 top-full h-4 origin-top [transform:rotateX(-58deg)] rounded-b-xl bg-[#17132f]" />
               </div>

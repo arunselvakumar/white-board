@@ -38,6 +38,7 @@ export const Empty: Story = {
           onOpenStudent={() => undefined}
           onOpenStudents={() => undefined}
           onOpenFees={() => undefined}
+          onOpenCalendar={() => undefined}
         />
       </AppShell>
     </WorkspaceGate>
@@ -104,6 +105,7 @@ export const Populated: Story = {
           onOpenStudent={() => undefined}
           onOpenStudents={() => undefined}
           onOpenFees={openFees}
+          onOpenCalendar={() => undefined}
         />
       </AppShell>
     </WorkspaceGate>

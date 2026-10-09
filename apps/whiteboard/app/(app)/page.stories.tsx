@@ -44,6 +44,7 @@ export const Dashboard: Story = {
           onOpenStudent={() => undefined}
           onOpenStudents={() => undefined}
           onOpenFees={() => undefined}
+          onOpenCalendar={() => undefined}
         />
       </AppShell>
     </WorkspaceGate>

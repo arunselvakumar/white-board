@@ -31,6 +31,9 @@ export function OwnerDashboardScreen() {
       onOpenFees={() => {
         router.push("/fees");
       }}
+      onOpenCalendar={() => {
+        router.push("/calendar");
+      }}
     />
   );
 }
