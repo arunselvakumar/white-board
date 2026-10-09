@@ -2,7 +2,10 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { projectHandlers as handlers } from "../../../handlers";
+import {
+  projectHandlers as handlers,
+  projectFinancial,
+} from "../../../handlers";
 import {
   ConstructionProjectsProjectParamsModel,
   toProjectResponse,
@@ -12,7 +15,9 @@ import { UpdateConstructionProjectsProjectRequestModel } from "./update-project-
 export const dynamic = "force-dynamic";
 
 /**
- * Edit Project (CM-204): every field at once. 409 `PROJECT_CHANGED` when
+ * Edit Project (CM-204): every field at once; a contract detail or the
+ * custom-field list left out keeps what is stored (CM-413), and without
+ * the Financial flag the order value is kept. 409 `PROJECT_CHANGED` when
  * `expectedUpdatedAt` is stale; 404 for a Member not assigned to it.
  */
 export async function POST(
@@ -30,14 +35,16 @@ export async function POST(
         await request.json(),
       ),
     );
+    const financial = projectFinancial(session.access);
     const updated = await handlers.update({
       viewer: session.access,
       id,
       by: session.userId,
       details,
+      financial,
       expectedUpdatedAt: new Date(expectedUpdatedAt),
     });
-    return Response.json(toProjectResponse(updated));
+    return Response.json(toProjectResponse(updated, financial));
   } catch (error) {
     return mapError(error);
   }

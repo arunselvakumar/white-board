@@ -5,6 +5,15 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 
+import {
+  NO_CONTRACT_DETAILS,
+  contractDetails,
+  customFields,
+  type ProjectContractDetails,
+  type ProjectContractInput,
+  type ProjectCustomField,
+} from "./project-contract";
+
 export const PROJECT_NAME_MAX = 120;
 export const PROJECT_ADDRESS_MAX = 500;
 
@@ -25,14 +34,19 @@ export function isProjectStatus(value: string): value is ProjectStatus {
   return (PROJECT_STATUSES as readonly string[]).includes(value);
 }
 
-/** What a Team Member types on the Project form. */
+/**
+ * What a Team Member types on the Project form. The contract details and
+ * custom fields (CM-413) are optional; left out of an edit, they keep what
+ * is stored.
+ */
 export type ProjectDetailsInput = {
   name: string;
   status?: string | null;
   address?: string | null;
   startDate?: string | null;
   endDate?: string | null;
-};
+  customFields?: readonly { label: string; value: string }[];
+} & ProjectContractInput;
 
 export type ProjectDetails = {
   name: string;
@@ -107,20 +121,23 @@ export function projectDetails(input: ProjectDetailsInput): ProjectDetails {
   };
 }
 
-export type ProjectProps = ProjectDetails & {
-  id: string;
-  workspaceId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
-  updatedBy: string;
-  deletedAt: Date | null;
-};
+export type ProjectProps = ProjectDetails &
+  ProjectContractDetails & {
+    customFields: ProjectCustomField[];
+    id: string;
+    workspaceId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy: string;
+    updatedBy: string;
+    deletedAt: Date | null;
+  };
 
 /**
- * A construction job (`modules/03`). M2 ships this minimal Project —
+ * A construction job (`modules/03`). M2 shipped the minimal Project —
  * name, status, address and dates — because labour and attendance are
- * scoped to one (CM-204); M4 grows it.
+ * scoped to one (CM-204); CM-413 adds the contract details and custom
+ * fields; M4 grows it further.
  */
 export class Project {
   private constructor(private props: ProjectProps) {}
@@ -134,6 +151,8 @@ export class Project {
   }): Project {
     return new Project({
       ...projectDetails(input.details),
+      ...contractDetails(input.details, NO_CONTRACT_DETAILS),
+      customFields: customFields(input.details.customFields ?? []),
       id: input.id,
       workspaceId: input.workspaceId,
       createdAt: input.now,
@@ -195,11 +214,42 @@ export class Project {
     };
   }
 
-  /** Edit Project: every field at once (the legacy app allows any status change). */
+  get contract(): ProjectContractDetails {
+    return {
+      clientName: this.props.clientName,
+      clientPhone: this.props.clientPhone,
+      tenderRef: this.props.tenderRef,
+      quotationNo: this.props.quotationNo,
+      quotationDate: this.props.quotationDate,
+      loaNo: this.props.loaNo,
+      loaDate: this.props.loaDate,
+      clientOrderNo: this.props.clientOrderNo,
+      clientOrderDate: this.props.clientOrderDate,
+      agreementNo: this.props.agreementNo,
+      agreementDate: this.props.agreementDate,
+      orderValue: this.props.orderValue,
+    };
+  }
+
+  /** In the order they were entered. */
+  get customFields(): readonly ProjectCustomField[] {
+    return this.props.customFields;
+  }
+
+  /**
+   * Edit Project: name, status, address and dates at once (the legacy app
+   * allows any status change); a contract detail or the custom-field list
+   * left out keeps what is stored.
+   */
   update(details: ProjectDetailsInput, by: string, now: Date): void {
     this.props = {
       ...this.props,
       ...projectDetails(details),
+      ...contractDetails(details, this.contract),
+      customFields:
+        details.customFields === undefined
+          ? this.props.customFields
+          : customFields(details.customFields),
       updatedAt: now,
       updatedBy: by,
     };

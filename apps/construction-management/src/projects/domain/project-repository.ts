@@ -27,6 +27,15 @@ export type ProjectRepository = {
 };
 
 /**
+ * Custom-field labels in use on the Company's live Projects (CM-413), for
+ * the label picker: grouped ignoring case under the most-used spelling,
+ * most used first, then by name.
+ */
+export type ProjectCustomFieldLabels = {
+  list(workspaceId: string, limit: number): Promise<string[]>;
+};
+
+/**
  * Whether site records still point at a Project: labours working there,
  * vendors assigned to it, attendance or wage payments on it (M2). A
  * Project in use cannot be deleted.

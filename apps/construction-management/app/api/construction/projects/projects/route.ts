@@ -4,7 +4,7 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { projectHandlers as handlers } from "../handlers";
+import { projectHandlers as handlers, projectFinancial } from "../handlers";
 import { CreateConstructionProjectsProjectRequestModel } from "./create-project-request-model";
 import {
   ListConstructionProjectsProjectsQueryModel,
@@ -29,8 +29,9 @@ export async function GET(request: Request): Promise<Response> {
       ),
     );
     const page = await handlers.list(session.access, status);
+    const financial = projectFinancial(session.access);
     const body: ListConstructionProjectsProjectsResponseModel = {
-      items: page.items.map(toProjectResponse),
+      items: page.items.map((item) => toProjectResponse(item, financial)),
       total: page.total,
       counts: page.counts,
     };
@@ -43,6 +44,7 @@ export async function GET(request: Request): Promise<Response> {
 /**
  * New Project (CM-204). 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118).
  * The creator is not assigned to it; the Owner assigns Team Members.
+ * Without the Financial flag an `orderValue` in the body is ignored.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -53,12 +55,14 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
+    const financial = projectFinancial(session.access);
     const created = await handlers.create({
       workspaceId: session.workspaceId,
       by: session.userId,
       details: model,
+      financial,
     });
-    return Response.json(toProjectResponse(created), {
+    return Response.json(toProjectResponse(created, financial), {
       status: StatusCodes.CREATED,
     });
   } catch (error) {
