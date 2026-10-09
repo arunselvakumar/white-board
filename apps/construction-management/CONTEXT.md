@@ -82,6 +82,18 @@ _Avoid_: supplier, contractor (for gangs)
 An individual worker on the Company's own roll, with a daily or monthly wage and an OT rate. A record, not a User.
 _Avoid_: worker, employee, staff
 
+**Labour Category**:
+The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, Helper…). Seeded per Company; seed rows can be disabled, not renamed.
+_Avoid_: skill, trade (for this list)
+
+**Supervisor**:
+The person on site who looks after a group of Labours. Often a Team Member, but need not sign in.
+_Avoid_: foreman, mukadam (that is a Vendor)
+
+**Rate Card**:
+A Vendor's shifts, each with a rate per day and an overtime rate per Labour Category.
+_Avoid_: price list, tariff
+
 **Other Party**:
 Any other counter-party — a customer you raise a sales invoice to, a consultant, a lender.
 
@@ -137,6 +149,40 @@ _Avoid_: backdate, past entry
 What the Company has bought (projects, Team Members, HRMS seats, storage) and until when. A new Company starts on a 14-day Trial.
 _Avoid_: license, package
 
+### Labour attendance and wages
+
+**Attendance**:
+Labour attendance is one status per Labour per day (Present, Half Day, Absent, On Leave, Holiday) in the Project they were on that day. Vendor attendance is a headcount per shift and Labour Category (Full day, Half day, OT hours).
+_Avoid_: muster (for the daily entry), check-in (that is HRMS)
+
+**Paid Leave**:
+An On Leave day that is paid. The only way a daily-wage Labour is paid for a day off.
+
+**Overtime (OT)**:
+Hours beyond the day, at a rate per hour; at most 24 hours a day for a Labour.
+
+**Transfer**:
+Moving a Labour to another Project from a date. Their balance goes with them.
+_Avoid_: shift (for this), reassign
+
+**Ledger / Balance**:
+Every amount owed or paid is an entry that is never edited; a balance is the sum of entries (ADR CM-0004). Positive is owed to the Labour or Vendor; an Advance makes it smaller.
+_Avoid_: account (for a Labour's balance)
+
+**Opening Balance**:
+What was owed (or advanced, if negative) on the joining date, before the app.
+
+**Wage Payment / Advance**:
+Money paid against wages earned (Payment) or ahead of them (Advance), by Cash or Bank.
+_Avoid_: salary (that is HRMS), settlement
+
+**Previous Balance / To Pay / Final Amount**:
+For a period: owed before it, earned in it (wages + OT), and owed at its end after Advances and Payments.
+
+**Muster Roll**:
+The monthly combined attendance and wage register for the Company's own Labours, printed for labour-law inspection.
+_Avoid_: attendance sheet
+
 ### Money
 
 **Amount**:
@@ -162,5 +208,8 @@ _Avoid_: price (unless it is a rate), cost
 | Sequence ID          | serial number                   |
 | Back-dated Entry     | backdate                        |
 | Sign in / Sign up    | log in, register                |
+| Labours (plural)     | labourers, workers              |
+| Rate Card            | price list                      |
+| Wage Payment         | salary (for Labours)            |
 
 `Workspace` appears in code because `@repo/auth` calls a Company a Workspace. It never appears in UI copy as the tenant; on screens "Workspace" names only the cross-project area.
