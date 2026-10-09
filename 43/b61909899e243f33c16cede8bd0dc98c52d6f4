@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance-models.ts
+  s_3ec404ebeb145c::t_6d541e0a531756 25-28,53-58,63-70,73-79,163-164,179-188,233-234,247-249,366-370,380
+apps/construction-management/app/api/construction/labour/labours/labour-models.ts
+  s_3ec404ebeb145c::t_60671bd22b9a61 30-31,77,109-116,249-250
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_3ec404ebeb145c::t_e31dc7ce502e65 294
+apps/construction-management/src/labour/application/labour-attendance-handlers.ts
+  s_3ec404ebeb145c::t_16a03d6b1722e5 182-183,197-203,229-230,244-246
+apps/construction-management/src/labour/domain/labour-attendance.ts
+  s_3ec404ebeb145c::t_631d50ef94314c 7,9,11,15-16,27-31,34-39,49-54,64-65,73-74,86-91,98-150,155-158,187-202,209,228,253-256,270-276
+apps/construction-management/src/labour/domain/labour.ts
+  s_3ec404ebeb145c::t_3752ede7e4b58f 14-19,43-47,72-73,194-203,257
+apps/construction-management/src/labour/domain/wages.ts
+  s_3ec404ebeb145c::t_984642ff097e10 87-97,102,104,110-119,129-219
+packages/db/construction/prisma/migrations/20261009133145_construction_labour_attendance_times/migration.sql
+  s_3ec404ebeb145c::t_89e521408aeaee 1-28
+packages/db/construction/prisma/schema/construction-labour.prisma
+  s_3ec404ebeb145c::t_ab1db6ae597c93 42-43,127-134,167-168
+apps/construction-management/docs/adr/CM-0011-attendance-check-in-out-and-working-hours.md
+  s_3ec404ebeb145c::t_a42561ecc0cd9e 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "43b61909899e243f33c16cede8bd0dc98c52d6f4",
+  "prompts": {},
+  "sessions": {
+    "s_3ec404ebeb145c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe02f20e-0542-44cf-9327-167954aed72e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
