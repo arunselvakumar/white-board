@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-models.ts
+  s_6497dd4ebf3e73::t_d11d880a4e10bb 1-122
+apps/construction-management/app/api/construction/projects/projects/custom-field-labels/custom-field-labels-models.ts
+  s_6497dd4ebf3e73::t_0968cbd3d3f075 1-14
+apps/construction-management/src/projects/domain/project-contract-rules.ts
+  s_6497dd4ebf3e73::t_5b58085c372f8b 1-35
+apps/construction-management/src/projects/domain/project-document-rules.ts
+  s_6497dd4ebf3e73::t_c4b614ae38ae28 1-49
+packages/db/prisma/schema/construction-projects.prisma
+  s_6497dd4ebf3e73::t_0ef9e52cae13fb 103-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5357c2b71d7e450faf017cad46618edd0cab5049",
+  "prompts": {},
+  "sessions": {
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
