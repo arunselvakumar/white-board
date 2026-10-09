@@ -53,10 +53,13 @@ export default defineConfig({
         ],
         test: {
           name: "storybook",
+          setupFiles: ["./.storybook/vitest.setup.ts"],
           browser: {
             enabled: true,
             headless: true,
-            provider: playwright({}),
+            provider: playwright({
+              contextOptions: { reducedMotion: "reduce" },
+            }),
             instances: [{ browser: "chromium" }],
           },
         },
