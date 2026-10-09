@@ -34,6 +34,7 @@ export const Dashboard: Story = {
           dashboard={{
             activeStudentCount: 0,
             outstandingDuesPaise: 0,
+            feeFollowUpsDueCount: 0,
             todayBatches: [],
             recentStudents: [],
           }}
@@ -149,9 +150,18 @@ export const Fees: Story = {
     <WorkspaceGate>
       <AppShell>
         <FeesCatalog
-          dues={[]}
-          onCollect={() => undefined}
-          onOpenStudents={() => undefined}
+          dues={{
+            filter: "all",
+            sort: "amount",
+            items: [],
+            counts: { overdue: 0, dueSoon: 0, all: 0 },
+            totalRemainingPaise: 0,
+          }}
+          followUpsDue={[]}
+          filter="all"
+          sort="amount"
+          onFilterChange={() => undefined}
+          onSortChange={() => undefined}
         />
       </AppShell>
     </WorkspaceGate>

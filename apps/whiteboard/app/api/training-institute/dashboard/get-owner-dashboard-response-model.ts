@@ -5,6 +5,8 @@ import { TrainingInstituteTimingSlotModel } from "../batches/timing-slot-model";
 export const GetTrainingInstituteOwnerDashboardResponseModel = z.object({
   activeStudentCount: z.number().int(),
   outstandingDuesPaise: z.number().int(),
+  /** Open Fee Follow-ups whose next date is today or earlier. */
+  feeFollowUpsDueCount: z.number().int(),
   todayBatches: z.array(
     z.object({
       id: z.uuid(),

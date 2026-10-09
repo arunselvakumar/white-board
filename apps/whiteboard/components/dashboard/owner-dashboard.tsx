@@ -45,7 +45,7 @@ export function OwnerDashboard({
           </EmptyContent>
         </Empty>
       )}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Button
           type="button"
           variant="outline"
@@ -70,6 +70,21 @@ export function OwnerDashboard({
           </span>
           <span className="text-2xl tracking-tight">
             {formatPaiseAsRupees(dashboard.outstandingDuesPaise)}
+          </span>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-auto flex-col items-start gap-1 p-4"
+          onClick={onOpenFees}
+        >
+          <span className="text-muted-foreground text-sm font-normal">
+            Follow-ups due today
+          </span>
+          <span
+            className={`text-2xl tracking-tight ${dashboard.feeFollowUpsDueCount > 0 ? "text-amber-700 dark:text-amber-200" : ""}`}
+          >
+            {dashboard.feeFollowUpsDueCount}
           </span>
         </Button>
       </div>

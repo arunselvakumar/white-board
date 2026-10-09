@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
@@ -28,6 +28,7 @@ export const Empty: Story = {
           dashboard={{
             activeStudentCount: 0,
             outstandingDuesPaise: 0,
+            feeFollowUpsDueCount: 0,
             todayBatches: [],
             recentStudents: [],
           }}
@@ -48,10 +49,18 @@ export const Empty: Story = {
     await expect(
       canvas.getByText("Add the first Course this centre teaches."),
     ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: /Follow-ups due today/ }),
+    ).toHaveTextContent("Follow-ups due today0");
   },
 };
 
+const openFees = fn();
+
 export const Populated: Story = {
+  beforeEach() {
+    openFees.mockClear();
+  },
   render: () => (
     <WorkspaceGate>
       <AppShell>
@@ -59,6 +68,7 @@ export const Populated: Story = {
           dashboard={{
             activeStudentCount: 1,
             outstandingDuesPaise: 400000,
+            feeFollowUpsDueCount: 2,
             todayBatches: [
               {
                 id: "660e8400-e29b-41d4-a716-446655440000",
@@ -93,17 +103,23 @@ export const Populated: Story = {
           onOpenBatch={() => undefined}
           onOpenStudent={() => undefined}
           onOpenStudents={() => undefined}
-          onOpenFees={() => undefined}
+          onOpenFees={openFees}
         />
       </AppShell>
     </WorkspaceGate>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByText("Anita Sharma")).toBeVisible();
     await expect(canvas.getByText("DCA Weekday 9–11 Offline")).toBeVisible();
     await expect(
       canvas.getByText(/Today 16:00–18:00 · Rescheduled/),
     ).toBeVisible();
     await expect(canvas.getByText("₹4,000")).toBeVisible();
+    const followUps = canvas.getByRole("button", {
+      name: /Follow-ups due today/,
+    });
+    await expect(followUps).toHaveTextContent("Follow-ups due today2");
+    await userEvent.click(followUps);
+    await expect(openFees).toHaveBeenCalledOnce();
   },
 };

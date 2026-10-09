@@ -51,3 +51,12 @@ export class TeacherNotFoundError extends Error {
     this.name = "TeacherNotFoundError";
   }
 }
+
+export class FeeFollowUpNotFoundError extends Error {
+  readonly code = "FEE_FOLLOW_UP_NOT_FOUND";
+
+  constructor() {
+    super("Fee Follow-up not found.");
+    this.name = "FeeFollowUpNotFoundError";
+  }
+}

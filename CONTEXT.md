@@ -140,6 +140,14 @@ _Avoid_: transaction, collection (as the entity name)
 The numbered document for one Fee Payment. Printable in P0. Not GST-compliant in P0.
 _Avoid_: invoice, bill, voucher
 
+**Dues list**:
+The Owner's list of Enrollments with remaining dues, on the Fees screen. **Overdue** means the Fee Plan amounts due before today add up to more than what has been paid, counting payments against the oldest due dates first. **Due soon** means a due date from today to 3 days ahead still has an unpaid part. When a Fee Plan's due-date amounts don't add up to its total, its dates are only a guide and it appears under All with a balance. See ADR-0039.
+_Avoid_: defaulters, collections, receivables
+
+**Fee Follow-up**:
+The Owner's record of chasing one Enrollment's dues: a channel (Phone, WhatsApp/SMS, In person, or Other), an optional note, and an optional next follow-up date. An Enrollment has at most one open Fee Follow-up; logging a new one closes the last, and it closes by itself when the remaining dues reach zero. Owner-only; Whiteboard sends nothing. See ADR-0039.
+_Avoid_: reminder (Whiteboard doesn't send one), dunning
+
 **Owner Dashboard**:
 The In-app Home for a Training Institute: active Student count, outstanding dues, today's Batches, recent Students.
 _Avoid_: analytics, reports, insights (as the screen name)

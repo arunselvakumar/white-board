@@ -18,6 +18,7 @@ export async function GET(): Promise<Response> {
     return Response.json({
       activeStudentCount: dashboard.activeStudentCount,
       outstandingDuesPaise: dashboard.outstandingDuesPaise,
+      feeFollowUpsDueCount: dashboard.feeFollowUpsDueCount,
       todayBatches: dashboard.todayBatches,
       recentStudents: dashboard.recentStudents.map((student) => ({
         ...student,

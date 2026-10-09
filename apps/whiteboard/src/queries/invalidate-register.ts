@@ -4,6 +4,7 @@ import { batchQueries } from "./batches";
 import { calendarQueries } from "./calendar";
 import { dashboardQueries } from "./dashboard";
 import { enrollmentQueries } from "./enrollments";
+import { feeDuesQueries } from "./fee-dues";
 import { studentQueries } from "./students";
 import { studentAdmissionQueries } from "./student-admission";
 
@@ -17,5 +18,6 @@ export function invalidateRegisterQueries(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: batchQueries.key.all }),
     queryClient.invalidateQueries({ queryKey: calendarQueries.key.all }),
     queryClient.invalidateQueries({ queryKey: dashboardQueries.key.all }),
+    queryClient.invalidateQueries({ queryKey: feeDuesQueries.key.all }),
   ]);
 }
