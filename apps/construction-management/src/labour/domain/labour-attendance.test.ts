@@ -13,6 +13,7 @@ const daily: WageCard = {
   wagePerDay: 80_000,
   wagePerMonth: null,
   overtimeWagePerHour: 12_000,
+  workingHours: "8",
 };
 
 function price(mark: Parameters<typeof priceDay>[0]["mark"], card = daily) {
@@ -109,6 +110,7 @@ describe("priceDay", () => {
           wagePerDay: null,
           wagePerMonth: 31_00_000,
           overtimeWagePerHour: 0,
+          workingHours: "8",
         },
       ).earned,
     ).toBe(1_00_000);

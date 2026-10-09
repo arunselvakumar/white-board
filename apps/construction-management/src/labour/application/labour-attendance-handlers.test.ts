@@ -42,12 +42,14 @@ function labourer(
           wagePerDay: null,
           wagePerMonth: 3_100_000,
           overtimeWagePerHour: 15_000,
+          workingHours: "8",
         }
       : {
           wageType: "daily",
           wagePerDay: 70_000,
           wagePerMonth: null,
           overtimeWagePerHour: 10_000,
+          workingHours: "8",
         },
     ...options,
   };

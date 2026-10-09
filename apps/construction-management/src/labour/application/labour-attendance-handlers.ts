@@ -24,6 +24,7 @@ import { monthOf } from "../domain/ledger";
 import {
   ATTENDANCE_STATUSES,
   datesBetween,
+  hoursFromTimes,
   hoursInHundredths,
   weekdayOf,
   type AttendanceStatus,
@@ -377,6 +378,17 @@ function overtimeAmountOf(day: PricedDay): number {
 }
 
 /** A copy of a domain error with `labourId` (and more) added to its details. */
+/** Hours worked on a day with both times (ADR CM-0011), else null. */
+function workedHoursOf(day: PricedDay): string | null {
+  if (day.checkIn == null || day.checkOut == null) return null;
+  return hoursFromTimes({
+    checkIn: day.checkIn,
+    checkOut: day.checkOut,
+    breakMinutes: day.breakMinutes ?? 0,
+    workingHours: day.workingHours,
+  }).worked;
+}
+
 function forLabourer(
   error: unknown,
   labourId: string,
@@ -549,6 +561,11 @@ export class LabourAttendanceHandlers {
           supervisor == null
             ? null
             : { id: supervisor.id, name: supervisor.name },
+        checkIn: day.checkIn,
+        checkOut: day.checkOut,
+        breakMinutes: day.breakMinutes,
+        workingHours: day.workingHours,
+        workedHours: workedHoursOf(day),
         wageType: day.wageType,
         wageRate: day.wageRate,
         earned: day.earned,
@@ -561,6 +578,7 @@ export class LabourAttendanceHandlers {
           hours: line.hours,
           ratePerHour: line.ratePerHour,
           amount: line.amount,
+          fromTimes: line.fromTimes,
         })),
         overtimeHours: formatHundredths(overtimeHundredths(day)),
         overtimeAmount,
@@ -714,13 +732,18 @@ export class LabourAttendanceHandlers {
           : null;
       // A line sent without a rate (a member without Financial cannot see
       // it) keeps the rate the saved day had for that category, so a
-      // re-mark never silently resets a custom overtime rate.
+      // re-mark never silently resets a custom overtime rate. The line from
+      // the times keeps the saved line from the times first.
       const saved = existing.get(mark.labourId)?.overtime ?? [];
       const overtime = mark.overtime?.map((line) => {
         if (line.ratePerHour != null) return line;
-        const kept = saved.find(
-          (old) => old.labourCategoryId === line.labourCategoryId,
-        );
+        const fromTimes = line.fromTimes === true;
+        const sameCategory = (old: (typeof saved)[number]) =>
+          old.labourCategoryId === line.labourCategoryId;
+        const kept =
+          saved.find((old) =>
+            fromTimes ? old.fromTimes : !old.fromTimes && sameCategory(old),
+          ) ?? saved.find(sameCategory);
         return kept == null ? line : { ...line, ratePerHour: kept.ratePerHour };
       });
       let day: PricedDay;
@@ -865,6 +888,10 @@ export class LabourAttendanceHandlers {
             isPaidLeave: day.isPaidLeave,
             shift: day.shift,
             supervisorId: day.supervisorId,
+            checkIn: day.checkIn,
+            checkOut: day.checkOut,
+            breakMinutes: day.breakMinutes,
+            workingHours: day.workingHours,
             wageType: day.wageType,
             wageRate: day.wageRate,
             earned: day.earned,
@@ -979,6 +1006,7 @@ export class LabourAttendanceHandlers {
         wagePerDay: labourer?.card.wagePerDay ?? null,
         wagePerMonth: labourer?.card.wagePerMonth ?? null,
         overtimeWagePerHour: labourer?.card.overtimeWagePerHour ?? null,
+        workingHoursPerDay: labourer?.card.workingHours ?? null,
         canMark: entry.canMark,
         isActive: labourer?.isActive ?? false,
         onProject: entry.canMark,
@@ -991,6 +1019,9 @@ export class LabourAttendanceHandlers {
                 status: before.status,
                 isPaidLeave: before.isPaidLeave,
                 shift: before.shift,
+                checkIn: before.checkIn,
+                checkOut: before.checkOut,
+                breakMinutes: before.breakMinutes,
               },
         attendance,
       };

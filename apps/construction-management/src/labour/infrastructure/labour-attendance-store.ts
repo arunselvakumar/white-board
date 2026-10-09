@@ -26,7 +26,7 @@ import type {
   StoredLabourDay,
 } from "../application/labour-attendance-handlers";
 import { dayLedgerEntries, type PricedDay } from "../domain/labour-attendance";
-import type { Weekday } from "../domain/wages";
+import { workingHours, type Weekday } from "../domain/wages";
 import { projectsOn } from "./labour-project-on";
 import { lockLiveParties } from "./party-locks";
 import { companyToday, PrismaLabourQueries } from "./prisma-labour-queries";
@@ -53,6 +53,10 @@ function toStored(row: Row): StoredLabourDay {
     isPaidLeave: row.isPaidLeave,
     shift: row.shift,
     supervisorId: row.supervisorId,
+    checkIn: row.checkIn,
+    checkOut: row.checkOut,
+    breakMinutes: row.breakMinutes,
+    workingHours: workingHours(row.workingHours.toString()),
     wageType: row.wageType,
     wageRate: row.wageRate,
     earned: row.earned,
@@ -61,6 +65,7 @@ function toStored(row: Row): StoredLabourDay {
       hours: line.hours.toString(),
       ratePerHour: line.ratePerHour,
       amount: line.amount,
+      fromTimes: line.fromTimes,
     })),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -81,6 +86,7 @@ function toLabourer(row: {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number;
+  workingHoursPerDay: string | Prisma.Decimal;
 }): AttendanceLabourer {
   return {
     id: row.id,
@@ -95,6 +101,7 @@ function toLabourer(row: {
       wagePerDay: row.wagePerDay,
       wagePerMonth: row.wagePerMonth,
       overtimeWagePerHour: row.overtimeWagePerHour,
+      workingHours: workingHours(row.workingHoursPerDay.toString()),
     },
   };
 }
@@ -117,6 +124,10 @@ function snapshot(day: PricedDay) {
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
     supervisorId: day.supervisorId,
+    checkIn: day.checkIn,
+    checkOut: day.checkOut,
+    breakMinutes: day.breakMinutes,
+    workingHours: day.workingHours,
     wageType: day.wageType,
     wageRate: day.wageRate,
     earned: day.earned,
@@ -131,6 +142,10 @@ function rowData(day: PricedDay) {
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
     supervisorId: day.supervisorId,
+    checkIn: day.checkIn,
+    checkOut: day.checkOut,
+    breakMinutes: day.breakMinutes,
+    workingHours: day.workingHours,
     wageType: day.wageType,
     wageRate: day.wageRate,
     earned: day.earned,
@@ -374,6 +389,7 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
               hours: line.hours,
               ratePerHour: line.ratePerHour,
               amount: line.amount,
+              fromTimes: line.fromTimes,
             })),
           });
         await prismaLedger.reverseSource(
