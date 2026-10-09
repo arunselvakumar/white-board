@@ -401,7 +401,7 @@ describe("Masters HTTP (CM-203)", () => {
     expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
-  it("will not delete a Labour Category or Supervisor a labourer uses", async () => {
+  it("will not delete a Labour Category or Supervisor a Labour uses", async () => {
     const owner = await ownerWithCompany();
     const category = await json<Lookup>(
       await createCategory(

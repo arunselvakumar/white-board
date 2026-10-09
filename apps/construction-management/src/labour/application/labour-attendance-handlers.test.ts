@@ -102,7 +102,7 @@ async function failure(promise: Promise<unknown>): Promise<DomainError> {
 }
 
 describe("LabourAttendanceHandlers.markDay", () => {
-  it("prices many labourers and posts earned + overtime to the ledger", async () => {
+  it("prices many Labours and posts earned + overtime to the ledger", async () => {
     const { store, handlers, guard } = setup();
     const saved = await handlers.markDay(mark());
     expect(saved.map((day) => day.labourName)).toEqual([
@@ -123,7 +123,7 @@ describe("LabourAttendanceHandlers.markDay", () => {
     expect(guard.checks).toEqual([{ action: "create", date: TODAY }]);
   });
 
-  it("refuses inactive, off-project and unknown labourers with details.labourId", async () => {
+  it("refuses inactive, off-project and unknown Labours with details.labourId", async () => {
     const { handlers } = setup();
     const inactive = await failure(
       handlers.markDay(
@@ -391,7 +391,7 @@ describe("LabourAttendanceHandlers queries", () => {
     expect(today.supervisors).toEqual([{ id: "sunil", name: "Sunil" }]);
   });
 
-  it("totals the month grid per labourer", async () => {
+  it("totals the month grid per Labour", async () => {
     const { handlers } = setup();
     await handlers.markDay(mark({ date: "2026-10-01" }));
     await handlers.markDay(

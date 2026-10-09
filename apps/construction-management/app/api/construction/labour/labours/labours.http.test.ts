@@ -242,7 +242,7 @@ function upload(
 }
 
 describe("Labour register (CM-205 – CM-207)", () => {
-  it("adds a labourer with an opening balance posted to the ledger", async () => {
+  it("adds a Labour with an opening balance posted to the ledger", async () => {
     const company = await ownerWithCompany();
     const { tower, mason, supervisor } = await fixtures(company);
     const labour = await created(
@@ -499,7 +499,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
   });
 
-  it("transfers one or many labourers, with history and date rules", async () => {
+  it("transfers one or many Labours, with history and date rules", async () => {
     const company = await ownerWithCompany();
     const { tower, villa } = await fixtures(company);
     const raju = await created(company.cookie, labourBody(tower));

@@ -194,7 +194,7 @@ const receiptNotFound = () =>
 
 function partyNotFound(partyType: PartyType): DomainError {
   return partyType === "labour"
-    ? notFound("LABOUR_NOT_FOUND", "This labourer was not found.")
+    ? notFound("LABOUR_NOT_FOUND", "This Labour was not found.")
     : notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
 }
 

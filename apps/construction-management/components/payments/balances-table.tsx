@@ -72,7 +72,7 @@ export function BalancesTable({
           <EmptyTitle>No {nouns.many} to pay</EmptyTitle>
           <EmptyDescription>
             {partyType === "labour"
-              ? "Labourers on this Project, and anyone who worked here in this period, show here. Add them in Masters → Labours."
+              ? "Labours on this Project, and anyone who worked here in this period, show here. Add them in Masters → Labours."
               : "Vendors assigned to this Project, and any who worked here in this period, show here. Assign them in Masters → Vendors."}
           </EmptyDescription>
         </EmptyHeader>

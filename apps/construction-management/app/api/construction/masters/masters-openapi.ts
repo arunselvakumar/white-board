@@ -158,7 +158,7 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     plural: "Labour Categories",
     menu: "masters.labour_categories",
     inUse:
-      "409 SEED_IS_READ_ONLY for a seed row, LABOUR_CATEGORY_IN_USE while labourers, rate cards or attendance use it.",
+      "409 SEED_IS_READ_ONLY for a seed row, LABOUR_CATEGORY_IN_USE while Labours, rate cards or attendance use it.",
     list: ListConstructionMastersLabourCategoriesResponseModel,
     item: ConstructionMastersLabourCategoryResponseModel,
     create: CreateConstructionMastersLabourCategoryRequestModel,
@@ -180,7 +180,7 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     label: "Supervisor",
     plural: "Supervisors",
     menu: "masters.labours",
-    inUse: "409 SUPERVISOR_IN_USE while labourers or attendance name them.",
+    inUse: "409 SUPERVISOR_IN_USE while Labours or attendance name them.",
     list: ListConstructionMastersSupervisorsResponseModel,
     item: ConstructionMastersSupervisorResponseModel,
     create: CreateConstructionMastersSupervisorRequestModel,

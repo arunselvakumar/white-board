@@ -652,7 +652,7 @@ export function LabourMarkingSheet({
       mark.mutate(payload, {
         onSuccess: (saved) => {
           onSaved(
-            `Saved ${String(saved.items.length)} labourer${saved.items.length === 1 ? "" : "s"}.`,
+            `Saved ${String(saved.items.length)} Labour${saved.items.length === 1 ? "" : "s"}.`,
           );
         },
         onError: (failure) => {
@@ -662,7 +662,7 @@ export function LabourMarkingSheet({
               setRowErrors({ [labourId]: failure.message });
               const name =
                 sheet.labourers.find((row) => row.labourId === labourId)
-                  ?.name ?? "a labourer";
+                  ?.name ?? "a Labour";
               setFormError(`Not saved: see ${name}.`);
               return;
             }
@@ -714,7 +714,7 @@ export function LabourMarkingSheet({
         <div className="relative w-full sm:w-64">
           <Search className="text-muted-foreground pointer-events-none absolute top-3 left-3 size-4" />
           <Input
-            aria-label="Search labourers"
+            aria-label="Search Labours"
             placeholder="Search name or Labour Id"
             className="h-10 pl-9"
             value={search}
@@ -743,7 +743,7 @@ export function LabourMarkingSheet({
             type="button"
             variant="outline"
             className="h-10"
-            title="Every visible labourer Present, except weekly holidays"
+            title="Every visible Labour Present, except weekly holidays"
             disabled={markable.length === 0}
             onClick={() => {
               for (const { row, index } of markable)
@@ -870,7 +870,7 @@ export function LabourMarkingSheet({
 
       {visible.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          No labourer matches the filter.
+          No Labour matches the filter.
         </p>
       ) : (
         <ul className="space-y-2">
@@ -925,9 +925,7 @@ export function LabourMarkingSheet({
         rows={selectedSaved}
         onCleared={(count) => {
           setSelected(new Set());
-          onSaved(
-            `Cleared ${String(count)} labourer${count === 1 ? "" : "s"}.`,
-          );
+          onSaved(`Cleared ${String(count)} Labour${count === 1 ? "" : "s"}.`);
         }}
       />
     </form>

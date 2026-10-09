@@ -58,7 +58,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: BASE,
     summary:
-      "Marked labour days of a Project, newest date first, by dates, labourer, Supervisor and status (amounts null without Labour Financial)",
+      "Marked labour days of a Project, newest date first, by dates, Labour, Supervisor and status (amounts null without Labour Financial)",
     tags: LABOUR,
     query: ListConstructionLabourLabourAttendanceRequestModel,
     successStatus: StatusCodes.OK,
@@ -70,7 +70,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${BASE}/sheet`,
     summary:
-      "The labour marking sheet for a Project and date: labourers on the Project that day, their row and a pre-fill hint",
+      "The labour marking sheet for a Project and date: Labours on the Project that day, their row and a pre-fill hint",
     tags: LABOUR,
     query: GetConstructionLabourLabourAttendanceSheetRequestModel,
     successStatus: StatusCodes.OK,
@@ -82,7 +82,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/mark`,
     summary:
-      "Mark many labourers' day in one transaction, priced and posted to the labour ledger (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY 400; ATTENDANCE_CHANGED 409 with details.labourId; back-dated 403)",
+      "Mark many Labours' day in one transaction, priced and posted to the labour ledger (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY 400; ATTENDANCE_CHANGED 409 with details.labourId; back-dated 403)",
     tags: LABOUR,
     body: MarkConstructionLabourLabourAttendanceRequestModel,
     successStatus: StatusCodes.OK,
@@ -94,7 +94,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/clear`,
     summary:
-      "Clear labourers' marked day: tombstones and ledger reversals, all or none (needs Attendance delete; back-dated edit limit)",
+      "Clear Labours' marked day: tombstones and ledger reversals, all or none (needs Attendance delete; back-dated edit limit)",
     tags: LABOUR,
     body: ClearConstructionLabourLabourAttendanceRequestModel,
     successStatus: StatusCodes.NO_CONTENT,
@@ -118,7 +118,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${BASE}/month`,
     summary:
-      "Month grid: labourer × day codes (P/H/A/L/PL/HO) with overtime hours and totals per labourer",
+      "Month grid: Labour × day codes (P/H/A/L/PL/HO) with overtime hours and totals per Labour",
     tags: LABOUR,
     query: GetConstructionLabourLabourAttendanceMonthRequestModel,
     successStatus: StatusCodes.OK,

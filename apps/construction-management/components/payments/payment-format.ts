@@ -94,6 +94,6 @@ export function sourceLabel(line: StatementLine): string {
 }
 
 export const PARTY_NOUNS = {
-  labour: { one: "labourer", many: "labourers", title: "Labour" },
+  labour: { one: "Labour", many: "Labours", title: "Labour" },
   vendor: { one: "Vendor", many: "Vendors", title: "Vendor" },
 } as const;

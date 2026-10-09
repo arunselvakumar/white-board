@@ -22,14 +22,14 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   code: "LABOUR_CATEGORY",
   singular: "Labour Category",
   plural: "Labour Categories",
-  description: "Trades labourers and a Vendor's headcount are booked under.",
+  description: "Trades Labours and a Vendor's headcount are booked under.",
   dialogDescription:
-    "A trade a labourer or a Vendor's headcount is booked under.",
+    "A trade a Labour or a Vendor's headcount is booked under.",
   placeholder: "Bar Bender",
   emptyDescription:
-    "Add the trades your labourers work in, like Mason, Helper or Carpenter.",
+    "Add the trades your Labours work in, like Mason, Helper or Carpenter.",
   deleteDescription:
-    "It will no longer be offered anywhere. A Labour Category that labourers, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
+    "It will no longer be offered anywhere. A Labour Category that Labours, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
   icon: HardHat,
 };
 

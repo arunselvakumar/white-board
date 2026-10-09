@@ -103,7 +103,7 @@ export const RefusedBeforeAttendance: Story = {
   play: async ({ args, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = await body.findByRole("dialog", {
-      name: "Transfer 2 labourers",
+      name: "Transfer 2 Labours",
     });
     const inDialog = within(dialog);
     await userEvent.click(

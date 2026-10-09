@@ -63,7 +63,7 @@ export const PreviewWithErrors: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Import labourers" }),
+      await body.findByRole("dialog", { name: "Import Labours" }),
     );
     await expect(
       dialog.getByRole("link", { name: "Download sample sheet" }),
@@ -84,7 +84,7 @@ export const PreviewWithErrors: Story = {
     ).toBeVisible();
     await expect(dialog.getByText("1 ready · 1 with errors")).toBeVisible();
     await expect(
-      dialog.getByRole("button", { name: "Import 1 labourer" }),
+      dialog.getByRole("button", { name: "Import 1 Labour" }),
     ).toBeDisabled();
     await expect(uploadedUrls()).toEqual([`${IMPORT}?dryRun=true`]);
   },
@@ -98,17 +98,15 @@ export const ImportsWhenEveryRowIsValid: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Import labourers" }),
+      await body.findByRole("dialog", { name: "Import Labours" }),
     );
     await userEvent.upload(dialog.getByLabelText("Choose Excel file"), sheet());
     const importButton = await dialog.findByRole("button", {
-      name: "Import 2 labourers",
+      name: "Import 2 Labours",
     });
     await waitFor(() => expect(importButton).toBeEnabled());
     await userEvent.click(importButton);
-    await expect(
-      await dialog.findByText("Imported 2 labourers."),
-    ).toBeVisible();
+    await expect(await dialog.findByText("Imported 2 Labours.")).toBeVisible();
     await expect(uploadedUrls()).toEqual([
       `${IMPORT}?dryRun=true`,
       `${IMPORT}?dryRun=false`,
@@ -122,7 +120,7 @@ export const RefusesOtherFiles: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Import labourers" }),
+      await body.findByRole("dialog", { name: "Import Labours" }),
     );
     await userEvent.upload(
       dialog.getByLabelText("Choose Excel file"),

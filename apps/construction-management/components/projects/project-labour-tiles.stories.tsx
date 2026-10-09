@@ -79,11 +79,11 @@ export const Today: Story = {
     ).toBeVisible();
     await expect(canvas.getByText("₹1,84,500.00")).toBeVisible();
     await expect(
-      canvas.getByRole("link", { name: /Labourers present/ }),
+      canvas.getByRole("link", { name: /Labours present/ }),
     ).toHaveAttribute("href", `/app/projects/${SHANTI.id}/attendance/labour`);
     const table = within(
       canvas.getByRole("table", {
-        name: "Labourers present and vendor heads per day",
+        name: "Labours present and vendor heads per day",
       }),
     );
     await expect(table.getAllByRole("row")).toHaveLength(15);

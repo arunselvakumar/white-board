@@ -221,7 +221,7 @@ describe("project labour summary (CM-219)", () => {
   });
 
   it("is on /api/docs", async () => {
-    const document = (await (await getOpenApi()).json()) as {
+    const document = (await getOpenApi().json()) as {
       paths: Record<string, unknown>;
     };
     expect(document.paths).toHaveProperty("/api/construction/labour/summary");

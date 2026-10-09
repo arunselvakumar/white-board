@@ -98,7 +98,7 @@ export const AddValidatesAndSaves: Story = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
-      await canvas.findByText("Enter the labourer's name"),
+      await canvas.findByText("Enter the Labour's name"),
     ).toBeVisible();
     await expect(canvas.getByText("Enter the wage per day")).toBeVisible();
     await expect(canvas.getByText("Choose the Project")).toBeVisible();
@@ -181,7 +181,7 @@ export const ServerErrorOnField: Story = {
           Response.json(
             {
               code: "LABOUR_CODE_TAKEN",
-              message: "Another labourer has this Labour Id.",
+              message: "Another Labour has this Labour Id.",
               details: { field: "labourCode" },
             },
             { status: 409 },
@@ -202,7 +202,7 @@ export const ServerErrorOnField: Story = {
     await choose(canvas, body, userEvent, "Project", "Tower A");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
-      await canvas.findByText("Another labourer has this Labour Id."),
+      await canvas.findByText("Another Labour has this Labour Id."),
     ).toBeVisible();
     await expect(canvas.getByLabelText("Labour Id")).toHaveAttribute(
       "aria-invalid",

@@ -102,7 +102,7 @@ export const MarkingSheet: Story = {
     );
 
     await userEvent.click(canvas.getByRole("button", { name: "Save 3" }));
-    await expect(await canvas.findByText("Saved 3 labourers.")).toBeVisible();
+    await expect(await canvas.findByText("Saved 3 Labours.")).toBeVisible();
     await expect(posted()).toHaveLength(1);
     await expect(posted()[0]?.body).toEqual({
       projectId: PROJECT_ID,
@@ -224,7 +224,7 @@ export const EmptyProject: Story = {
   },
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("No labourers on this Project"),
+      await canvas.findByText("No Labours on this Project"),
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Go to Labours" }),

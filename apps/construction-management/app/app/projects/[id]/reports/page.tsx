@@ -1,16 +1,19 @@
-import { FileSpreadsheet } from "lucide-react";
 import type { Metadata } from "next";
 
-import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
+import { ReportsPage } from "@/components/reports/reports-page";
 
 export const metadata: Metadata = { title: "Reports" };
 
-export default function ProjectReportsPage() {
+/** The Project's labour and vendor reports (CM-217, CM-218). */
+export default async function ProjectReportsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   return (
-    <PagePlaceholder
-      title="Reports"
-      description="Attendance and payment reports for this Project. Arrives with CM-217."
-      icon={FileSpreadsheet}
-    />
+    <div className="w-full max-w-6xl p-4 sm:p-6">
+      <ReportsPage projectId={id} />
+    </div>
   );
 }

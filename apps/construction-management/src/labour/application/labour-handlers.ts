@@ -66,7 +66,7 @@ export type LabourDirectories = {
 };
 
 export const labourNotFound = () =>
-  notFound("LABOUR_NOT_FOUND", "This labourer was not found.");
+  notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
 
 /** What the audit log keeps of a labourer: never the Aadhaar number. */
 export function labourSnapshot(labour: Labour) {
@@ -426,14 +426,11 @@ export class LabourHandlers {
   }): Promise<LabourReadModel[]> {
     const ids = [...new Set(input.labourIds)];
     if (ids.length === 0)
-      throw new DomainError(
-        "LABOURS_REQUIRED",
-        "Choose at least one labourer.",
-      );
+      throw new DomainError("LABOURS_REQUIRED", "Choose at least one Labour.");
     if (ids.length > 500)
       throw new DomainError(
         "TOO_MANY_LABOURS",
-        "Transfer at most 500 labourers at a time.",
+        "Transfer at most 500 Labours at a time.",
       );
     const transferDate = assertCalendarDate(
       input.transferDate.trim(),
@@ -537,7 +534,7 @@ export class LabourHandlers {
 export function labourCodeTaken(): DomainError {
   return new DomainError(
     "LABOUR_CODE_TAKEN",
-    "Another labourer has this Labour Id.",
+    "Another Labour has this Labour Id.",
     { kind: "conflict", details: { field: "labourCode" } },
   );
 }

@@ -81,7 +81,7 @@ const rowSchema = z
     overtime: z.array(overtimeLineSchema),
   })
   .refine((row) => row.status !== "absent" || row.overtime.length === 0, {
-    message: "An Absent labourer cannot have overtime.",
+    message: "An Absent Labour cannot have overtime.",
     path: ["overtime"],
   });
 

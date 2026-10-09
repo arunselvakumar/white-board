@@ -74,7 +74,7 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         label: "Labours",
         title: "Labours",
         description:
-          "Your own labourers: wage, Project, transfers and Excel import.",
+          "Your own Labours: wage, Project, transfers and Excel import.",
         icon: Shovel,
       },
       {
@@ -90,14 +90,14 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         label: "Labour Categories",
         title: "Labour Categories",
         description:
-          "Trades labourers and a Vendor's headcount are booked under.",
+          "Trades Labours and a Vendor's headcount are booked under.",
         icon: HardHat,
       },
       {
         href: "/app/masters/supervisors",
         label: "Supervisors",
         title: "Supervisors",
-        description: "The people on site who look after a group of labourers.",
+        description: "The people on site who look after a group of Labours.",
         icon: UserCheck,
       },
     ],

@@ -53,7 +53,7 @@ describe("periods", () => {
   });
 });
 
-describe("summarize — a 31-day month of a daily-wage labourer", () => {
+describe("summarize — a 31-day month of a daily-wage Labour", () => {
   // ₹800 a day, Sundays off, a half day on every Saturday, 2 hours of
   // overtime at ₹120/hour on 10 and 20 October, ₹3,000 owed before the
   // month, a ₹2,000 advance on 6 October and a ₹10,000 payment on 25th.

@@ -142,12 +142,12 @@ export class LabourImport {
     if (sheet.length === 0)
       throw new DomainError(
         "IMPORT_EMPTY",
-        "The sheet has no labourers. Fill in the template from row 2.",
+        "The sheet has no Labours. Fill in the template from row 2.",
       );
     if (sheet.length > MAX_IMPORT_ROWS)
       throw new DomainError(
         "IMPORT_TOO_MANY_ROWS",
-        `Import at most ${String(MAX_IMPORT_ROWS)} labourers at a time.`,
+        `Import at most ${String(MAX_IMPORT_ROWS)} Labours at a time.`,
         { details: { maxRows: MAX_IMPORT_ROWS, rows: sheet.length } },
       );
     const lookups = await this.lookups.all(workspaceId);
@@ -277,7 +277,7 @@ export class LabourImport {
           fail(
             "labourCode",
             "LABOUR_CODE_TAKEN",
-            "Another labourer has this Labour Id.",
+            "Another Labour has this Labour Id.",
           );
       }
 

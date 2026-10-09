@@ -86,7 +86,7 @@ export function priceDay(input: {
   if (wageRate == null)
     throw new DomainError(
       "WAGE_REQUIRED",
-      "This labourer has no wage for their wage type.",
+      "This Labour has no wage for their wage type.",
     );
   const shift = mark.shift?.trim() ?? "";
   if (shift.length > SHIFT_MAX)
@@ -99,7 +99,7 @@ export function priceDay(input: {
   if (lines.length > 0 && mark.status === "absent")
     throw new DomainError(
       "OVERTIME_ON_ABSENT_DAY",
-      "An Absent labourer cannot have overtime on that day.",
+      "An Absent Labour cannot have overtime on that day.",
     );
   const overtime = lines.map((line) => {
     const hours = overtimeHours(line.hours);
@@ -123,7 +123,7 @@ export function priceDay(input: {
   if (totalHundredths > MAX_OVERTIME_HOURS_PER_DAY * 100)
     throw new DomainError(
       "OVERTIME_HOURS_INVALID",
-      "A labourer's overtime adds up to at most 24 hours a day.",
+      "A Labour's overtime adds up to at most 24 hours a day.",
     );
 
   return {
@@ -198,7 +198,7 @@ export function assertDistinctLabourers(marks: readonly DayMark[]): void {
     if (seen.has(mark.labourId))
       throw new DomainError(
         "LABOUR_MARKED_TWICE",
-        "A labourer appears twice in this attendance.",
+        "A Labour appears twice in this attendance.",
         { details: { labourId: mark.labourId } },
       );
     seen.add(mark.labourId);
@@ -206,6 +206,6 @@ export function assertDistinctLabourers(marks: readonly DayMark[]): void {
   if (marks.length === 0)
     throw new DomainError(
       "ATTENDANCE_EMPTY",
-      "Choose at least one labourer to mark.",
+      "Choose at least one Labour to mark.",
     );
 }

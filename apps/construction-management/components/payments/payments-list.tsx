@@ -213,7 +213,7 @@ function PaymentRows({
           <EmptyDescription>
             {filtered
               ? "Try another type, kind or date range."
-              : "Pay a labourer or a Vendor from the Labour or Vendor tab; their payments list here."}
+              : "Pay a Labour or a Vendor from the Labour or Vendor tab; their payments list here."}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

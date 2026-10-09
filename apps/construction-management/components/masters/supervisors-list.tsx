@@ -82,14 +82,14 @@ export function SupervisorsList() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Supervisors"
-          meta="The people on site who look after a group of labourers."
+          meta="The people on site who look after a group of Labours."
           actions={addButton}
         />
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={UserCheck}
             title="No Supervisors yet"
-            description="Add the mukadams and site supervisors your labourers report to. Attendance can then be filtered by Supervisor."
+            description="Add the mukadams and site supervisors your Labours report to. Attendance can then be filtered by Supervisor."
             action={addButton}
           />
         ) : (
@@ -168,7 +168,7 @@ export function SupervisorsList() {
       ) : null}
       <ConfirmDeleteDialog
         name={pendingDelete?.name ?? null}
-        description="They will no longer be offered anywhere. A Supervisor that labourers or attendance name cannot be deleted; disable them instead."
+        description="They will no longer be offered anywhere. A Supervisor that Labours or attendance name cannot be deleted; disable them instead."
         error={deleteError}
         pending={command.isPending}
         onClose={() => {

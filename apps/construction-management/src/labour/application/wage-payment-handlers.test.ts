@@ -162,7 +162,7 @@ describe("WagePaymentHandlers", () => {
     expect(payments.size).toBe(0);
   });
 
-  it("pays a vendor on a Project it is assigned to, and a labourer on any live Project", async () => {
+  it("pays a vendor on a Project it is assigned to, and a Labour on any live Project", async () => {
     const { handlers } = fakes();
     await expect(
       handlers.record({

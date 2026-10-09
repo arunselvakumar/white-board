@@ -27,7 +27,7 @@ const baseSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Enter the labourer's name")
+    .min(1, "Enter the Labour's name")
     .max(100, "Use at most 100 characters"),
   labourCode: z.string().trim().max(30, "Use at most 30 characters"),
   fatherName: z.string().trim().max(100, "Use at most 100 characters"),

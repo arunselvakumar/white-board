@@ -117,9 +117,9 @@ export function ImportDialog({
     >
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Import labourers</DialogTitle>
+          <DialogTitle>Import Labours</DialogTitle>
           <DialogDescription>
-            Fill in the sample sheet, one labourer per row, and upload it. Every
+            Fill in the sample sheet, one Labour per row, and upload it. Every
             row is checked first; nothing is added until every row is right.
           </DialogDescription>
         </DialogHeader>
@@ -170,7 +170,7 @@ export function ImportDialog({
           <div className="space-y-3">
             <p role="status" className="text-sm">
               {imported
-                ? `Imported ${String(preview.imported)} ${preview.imported === 1 ? "labourer" : "labourers"}.`
+                ? `Imported ${String(preview.imported)} ${preview.imported === 1 ? "Labour" : "Labours"}.`
                 : `${String(preview.valid)} ready · ${String(preview.invalid)} with errors`}
             </p>
             <div className="max-h-80 overflow-auto rounded-lg border">
@@ -249,7 +249,7 @@ export function ImportDialog({
             >
               {commit.isPending
                 ? "Importing…"
-                : `Import ${String(preview?.valid ?? 0)} ${preview?.valid === 1 ? "labourer" : "labourers"}`}
+                : `Import ${String(preview?.valid ?? 0)} ${preview?.valid === 1 ? "Labour" : "Labours"}`}
             </Button>
           )}
         </DialogFooter>

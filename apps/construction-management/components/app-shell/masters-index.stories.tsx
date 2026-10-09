@@ -24,7 +24,7 @@ export const Default: Story = {
       ).toBeVisible();
       for (const section of group.sections)
         await expect(
-          region.getByRole("link", { name: new RegExp(section.title) }),
+          region.getByRole("link", { name: new RegExp(`^${section.title}`) }),
         ).toHaveAttribute("href", section.href);
     }
   },

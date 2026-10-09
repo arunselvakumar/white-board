@@ -425,6 +425,6 @@ export class PrismaLabourRepository implements LabourRepository {
 export function labourChanged() {
   return conflict(
     "LABOUR_CHANGED",
-    "Someone else changed this labourer after you opened it. Reload to see their changes.",
+    "Someone else changed this Labour after you opened it. Reload to see their changes.",
   );
 }

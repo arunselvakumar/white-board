@@ -145,7 +145,7 @@ export const WithoutFinancial: Story = {
 export const Empty: Story = {
   beforeEach: serve([]),
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No labourers yet")).toBeVisible();
+    await expect(await canvas.findByText("No Labours yet")).toBeVisible();
     await expect(
       canvas.getAllByRole("link", { name: "Add Labour" }).at(-1),
     ).toHaveAttribute("href", "/app/masters/labours/new");
@@ -209,7 +209,7 @@ export const TransferSelected: Story = {
       canvas.getByRole("button", { name: "Transfer selected" }),
     );
     const dialog = await body.findByRole("dialog", {
-      name: "Transfer 2 labourers",
+      name: "Transfer 2 Labours",
     });
     await expect(dialog).toHaveTextContent("From 2 Projects");
   },

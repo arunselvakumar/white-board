@@ -151,8 +151,8 @@ export function SupervisorDialog({
                 : `Edit ${supervisor.name}`}
             </DialogTitle>
             <DialogDescription>
-              The person on site who looks after a group of labourers. They do
-              not need to sign in.
+              The person on site who looks after a group of Labours. They do not
+              need to sign in.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">

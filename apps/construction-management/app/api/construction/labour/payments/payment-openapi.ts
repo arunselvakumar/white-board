@@ -81,7 +81,7 @@ export const paymentOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: PAYMENTS_PATH,
     summary:
-      "Record a payment or advance to a labourer or vendor, posting one negative ledger entry (PAYMENT_AMOUNT_INVALID, VENDOR_NOT_ON_PROJECT, PAYMENT_DATE_IN_FUTURE, TEAM_MEMBER_NOT_FOUND 400; party or Project 404; back-dated 403)",
+      "Record a payment or advance to a Labour or vendor, posting one negative ledger entry (PAYMENT_AMOUNT_INVALID, VENDOR_NOT_ON_PROJECT, PAYMENT_DATE_IN_FUTURE, TEAM_MEMBER_NOT_FOUND 400; party or Project 404; back-dated 403)",
     tags: LABOUR,
     body: RecordConstructionLabourWagePaymentRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -163,7 +163,7 @@ export const paymentOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: BALANCES_PATH,
     summary:
-      "Previous Balance, To Pay, Advance, Paid and Final Amount per labourer or vendor of a Project for a monthly, weekly or custom period (party-wide figures; null without Financial)",
+      "Previous Balance, To Pay, Advance, Paid and Final Amount per Labour or vendor of a Project for a monthly, weekly or custom period (party-wide figures; null without Financial)",
     tags: LABOUR,
     query: GetConstructionLabourBalancesRequestModel,
     successStatus: StatusCodes.OK,

@@ -173,7 +173,7 @@ function Results({
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Labourer</TableHead>
+              <TableHead>Labour</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Shift</TableHead>
               <TableHead>Supervisor</TableHead>
@@ -294,10 +294,10 @@ export function LabourRecordedList({
           />
         </div>
         <FilterSelect
-          label="Labourer"
+          label="Labour"
           value={labourId}
           items={[
-            { value: ALL, label: "Every labourer" },
+            { value: ALL, label: "Every Labour" },
             ...(options.data?.labourers ?? []).map((row) => ({
               value: row.labourId,
               label: row.name,

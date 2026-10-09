@@ -49,9 +49,9 @@ function NoLabourers() {
         <EmptyMedia variant="icon">
           <Users />
         </EmptyMedia>
-        <EmptyTitle>No labourers on this Project</EmptyTitle>
+        <EmptyTitle>No Labours on this Project</EmptyTitle>
         <EmptyDescription>
-          Add labourers to this Project in Masters → Labours, or transfer them
+          Add Labours to this Project in Masters → Labours, or transfer them
           here, to mark their attendance.
         </EmptyDescription>
       </EmptyHeader>

@@ -107,7 +107,7 @@ export function checkLabourDetails(
 
   const name = optional(input.name) ?? "";
   if (name.length === 0)
-    problem("name", "LABOUR_NAME_REQUIRED", "Enter the labourer's name.");
+    problem("name", "LABOUR_NAME_REQUIRED", "Enter the Labour's name.");
   else if (name.length > 100)
     problem(
       "name",
@@ -365,7 +365,7 @@ export class Labour {
 
   private assertLive(): void {
     if (this.props.deletedAt != null)
-      throw new DomainError("LABOUR_NOT_FOUND", "This labourer was deleted.", {
+      throw new DomainError("LABOUR_NOT_FOUND", "This Labour was deleted.", {
         kind: "not_found",
       });
   }

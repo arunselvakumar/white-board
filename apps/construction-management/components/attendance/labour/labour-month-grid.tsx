@@ -73,7 +73,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   if (data.labourers.length === 0)
     return (
       <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-        No labourers on this Project in this month.
+        No Labours on this Project in this month.
       </p>
     );
   const counts = new Map(data.dayCounts.map((row) => [row.date, row]));
@@ -93,7 +93,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 min-w-36">
-                Labourer
+                Labour
               </TableHead>
               {data.dates.map((date) => (
                 <TableHead key={date} className="px-1 text-center tabular-nums">

@@ -33,7 +33,7 @@ function codeOf(run: () => unknown): string | undefined {
 }
 
 describe("labourDetails", () => {
-  it("tidies a daily-wage labourer", () => {
+  it("tidies a daily-wage Labour", () => {
     const details = labourDetails({
       ...BASE,
       labourCode: " L-01 ",

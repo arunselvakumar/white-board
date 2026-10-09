@@ -20,7 +20,7 @@ function price(mark: Parameters<typeof priceDay>[0]["mark"], card = daily) {
 }
 
 describe("priceDay", () => {
-  it("snapshots the wage and prices overtime at the labourer's rate", () => {
+  it("snapshots the wage and prices overtime at the Labour's rate", () => {
     const day = price({
       labourId: "l1",
       status: "present",
@@ -93,14 +93,15 @@ describe("priceDay", () => {
     ).toBe(1_00_000);
   });
 
-  it("marks each labourer once per command", () => {
-    expect(() => { assertDistinctLabourers([
+  it("marks each Labour once per command", () => {
+    expect(() => {
+      assertDistinctLabourers([
         { labourId: "l1", status: "present" },
         { labourId: "l1", status: "absent" },
-      ]); },
-    ).toThrow(expect.objectContaining({ code: "LABOUR_MARKED_TWICE" }));
-    expect(() => { assertDistinctLabourers([]); }).toThrow(
-      expect.objectContaining({ code: "ATTENDANCE_EMPTY" }),
-    );
+      ]);
+    }).toThrow(expect.objectContaining({ code: "LABOUR_MARKED_TWICE" }));
+    expect(() => {
+      assertDistinctLabourers([]);
+    }).toThrow(expect.objectContaining({ code: "ATTENDANCE_EMPTY" }));
   });
 });

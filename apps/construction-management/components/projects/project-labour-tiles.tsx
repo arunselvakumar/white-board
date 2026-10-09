@@ -79,7 +79,7 @@ function PresentChart({
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 id="present-chart" className="text-sm font-semibold">
-          Labourers present, last 14 days
+          Labours present, last 14 days
         </h3>
         {shown != null && (
           <p className="text-muted-foreground text-xs" aria-live="polite">
@@ -125,7 +125,7 @@ function PresentChart({
         <span>Today</span>
       </div>
       <table className="sr-only">
-        <caption>Labourers present and vendor heads per day</caption>
+        <caption>Labours present and vendor heads per day</caption>
         <thead>
           <tr>
             <th scope="col">Day</th>
@@ -184,7 +184,7 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Tile
           icon={<HardHat className="size-4" />}
-          label="Labourers present"
+          label="Labours present"
           value={`${String(labourers.present + labourers.halfDay)} of ${String(labourers.onProject)}`}
           detail={
             labourers.unmarked > 0
@@ -202,7 +202,7 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
         />
         <Tile
           icon={<Wallet className="size-4" />}
-          label="Owed to labourers"
+          label="Owed to Labours"
           value={
             data.labourBalance == null
               ? "—"

@@ -580,7 +580,7 @@ export class LabourAttendanceHandlers {
       if (labourer == null)
         throw rowError(
           "LABOUR_NOT_FOUND",
-          "This labourer was not found.",
+          "This Labour was not found.",
           "not_found",
           { labourId: mark.labourId },
         );
@@ -649,7 +649,7 @@ export class LabourAttendanceHandlers {
     for (const mark of input.marks) {
       const row = existing.get(mark.labourId);
       const seen = expected[mark.labourId];
-      const name = labourers.get(mark.labourId)?.name ?? "This labourer";
+      const name = labourers.get(mark.labourId)?.name ?? "This Labour";
       if (row == null) {
         if (seen != null)
           throw conflict(
@@ -759,12 +759,12 @@ export class LabourAttendanceHandlers {
     if (input.labourIds.length === 0)
       throw new DomainError(
         "ATTENDANCE_EMPTY",
-        "Choose at least one labourer to clear.",
+        "Choose at least one Labour to clear.",
       );
     if (new Set(input.labourIds).size !== input.labourIds.length)
       throw new DomainError(
         "LABOUR_MARKED_TWICE",
-        "A labourer appears twice in this request.",
+        "A Labour appears twice in this request.",
       );
     await this.assertProject(actor.workspaceId, input.projectId);
     const days = await this.store.daysOf(
@@ -782,7 +782,7 @@ export class LabourAttendanceHandlers {
       if (day == null)
         throw rowError(
           "ATTENDANCE_NOT_FOUND",
-          "This labourer has no attendance on this Project that day.",
+          "This Labour has no attendance on this Project that day.",
           "not_found",
           { labourId },
         );

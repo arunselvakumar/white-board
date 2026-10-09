@@ -209,7 +209,7 @@ function body(f: Fixtures, overrides: Record<string, unknown> = {}) {
 }
 
 describe("labour attendance HTTP", () => {
-  it("marks many labourers, posts earned and overtime, re-marks with expected and clears", async () => {
+  it("marks many Labours, posts earned and overtime, re-marks with expected and clears", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     const [raju, sita] = await marked(company.cookie, body(f));
@@ -325,7 +325,7 @@ describe("labour attendance HTTP", () => {
     expect((await mark(company.cookie, body(f))).status).toBe(StatusCodes.OK);
   });
 
-  it("pays a Holiday only to the monthly labourer, and Paid Leave toggles the ledger", async () => {
+  it("pays a Holiday only to the monthly Labour, and Paid Leave toggles the ledger", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     const [raju, sita] = await marked(company.cookie, {
@@ -375,7 +375,7 @@ describe("labour attendance HTTP", () => {
     expect(notLeave.code).toBe("PAID_LEAVE_NEEDS_LEAVE");
   });
 
-  it("refuses overtime on an absent day, inactive labourers and labourers off the Project that day", async () => {
+  it("refuses overtime on an absent day, inactive Labours and Labours off the Project that day", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     const absent = await failure(

@@ -101,7 +101,7 @@ function toLabourer(row: {
 function changed(labourId: string) {
   return conflict(
     "ATTENDANCE_CHANGED",
-    "Someone changed this labourer's day after you opened it. Reload to see the latest.",
+    "Someone changed this Labour's day after you opened it. Reload to see the latest.",
     { labourId },
   );
 }

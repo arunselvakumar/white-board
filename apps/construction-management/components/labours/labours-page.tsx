@@ -177,7 +177,7 @@ export function LaboursPage() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Labours"
-          meta="Your own labourers: wages, Project and transfers."
+          meta="Your own Labours: wages, Project and transfers."
           actions={
             <div className="flex flex-wrap gap-2">
               <Button
@@ -301,7 +301,7 @@ const CONFIRM: Record<
   },
   delete: {
     title: (name) => `Delete ${name}?`,
-    body: "Only a labourer with no attendance and no payments can be deleted. Deactivate someone who has worked for you instead.",
+    body: "Only a Labour with no attendance and no payments can be deleted. Deactivate someone who has worked for you instead.",
     action: "Delete",
   },
 };
@@ -358,12 +358,12 @@ function LabourRows({
             <HardHat />
           </EmptyMedia>
           <EmptyTitle>
-            {filtered ? "No labourers match" : "No labourers yet"}
+            {filtered ? "No Labours match" : "No Labours yet"}
           </EmptyTitle>
           <EmptyDescription>
             {filtered
               ? "Try another name, status, Project, category or Supervisor."
-              : "Add the labourers on your own roll with their wage and Project, or import them from Excel."}
+              : "Add the Labours on your own roll with their wage and Project, or import them from Excel."}
           </EmptyDescription>
         </EmptyHeader>
         {!filtered && (
@@ -397,7 +397,7 @@ function LabourRows({
     <div className="space-y-3">
       <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
         <p className="text-muted-foreground text-sm">
-          {data.total} {data.total === 1 ? "labourer" : "labourers"}
+          {data.total} {data.total === 1 ? "Labour" : "Labours"}
           {selected.size > 0 && ` · ${String(selected.size)} selected`}
         </p>
         {selected.size > 0 && (

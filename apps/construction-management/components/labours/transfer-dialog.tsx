@@ -125,7 +125,7 @@ export function TransferDialog({
           <DialogTitle>
             {single != null
               ? `Transfer ${single.name}`
-              : `Transfer ${String(labours.length)} labourers`}
+              : `Transfer ${String(labours.length)} Labours`}
           </DialogTitle>
           <DialogDescription>
             {single != null

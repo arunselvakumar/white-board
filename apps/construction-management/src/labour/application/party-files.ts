@@ -79,7 +79,7 @@ const FOLDERS: Record<PartyOwnerType, { photo: string; document: string }> = {
 };
 
 const NOUNS: Record<PartyOwnerType, string> = {
-  labour: "labourer",
+  labour: "Labour",
   vendor: "vendor",
 };
 
