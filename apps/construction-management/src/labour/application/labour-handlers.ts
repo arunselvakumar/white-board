@@ -46,7 +46,8 @@ export type CreateLabourInput = LabourDetailsInput & {
 /**
  * An edit of the register entry. Money fields and Aadhaar left `undefined`
  * keep their stored values (a Team Member without Financial never sees
- * them); `null` Aadhaar removes it.
+ * them); `null` Aadhaar removes it. Working hours left out or `null` keep
+ * theirs.
  */
 export type UpdateLabourInput = Omit<
   LabourDetailsInput,
@@ -284,6 +285,11 @@ export class LabourHandlers {
         patch.overtimeWagePerHour === undefined
           ? current.overtimeWagePerHour
           : patch.overtimeWagePerHour,
+      workingHoursPerDay:
+        patch.workingHoursPerDay == null ||
+        String(patch.workingHoursPerDay).trim() === ""
+          ? current.workingHoursPerDay
+          : patch.workingHoursPerDay,
       aadhaar: patch.aadhaar === undefined ? current.aadhaar : patch.aadhaar,
     });
     await this.assertReferences(

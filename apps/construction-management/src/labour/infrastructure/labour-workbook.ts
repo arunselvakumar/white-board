@@ -165,6 +165,8 @@ export async function labourExport(
       wagePerDay: money(details.wagePerDay),
       wagePerMonth: money(details.wagePerMonth),
       overtimeWagePerHour: money(details.overtimeWagePerHour),
+      // Not money: shown without Financial.
+      workingHoursPerDay: Number(details.workingHoursPerDay),
       weeklyHolidays: WEEKDAYS(details.weeklyHolidays),
       openingBalance: money(labour.openingBalance),
       project: labour.currentProject.name,

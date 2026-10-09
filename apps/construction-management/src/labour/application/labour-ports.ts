@@ -128,6 +128,8 @@ export type LabourOption = {
   supervisorId: string | null;
   wageType: LabourDetails["wageType"];
   weeklyHolidays: number[];
+  /** Decimal hours a day (ADR CM-0011). */
+  workingHoursPerDay: string;
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number;

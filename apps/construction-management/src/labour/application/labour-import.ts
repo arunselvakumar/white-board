@@ -249,6 +249,8 @@ export class LabourImport {
         wagePerDay,
         wagePerMonth,
         overtimeWagePerHour,
+        // Blank is the default 8 hours.
+        workingHoursPerDay: text(cells.workingHoursPerDay),
         weeklyHolidays: weeklyHolidays ?? [],
         uanNumber: text(cells.uanNumber),
         esicNumber: text(cells.esicNumber),
