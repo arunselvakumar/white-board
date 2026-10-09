@@ -19,16 +19,11 @@ const USAGE: SubscriptionView["usage"] = [
   { grant: "storage_gb", used: 1.2, limit: 20 },
 ];
 
-export const trialView: SubscriptionView = {
-  planCode: "basic",
-  planName: "Basic",
-  status: "trial",
-  isTrial: true,
-  startsAt: "2026-10-03T06:30:00.000Z",
-  endsAt: "2026-10-17T06:30:00.000Z",
-  daysLeft: 9,
-  autoRenew: false,
-  usage: USAGE,
+/** A new Company: no plan yet, so nothing is limited. */
+export const noPlanView: SubscriptionView = {
+  status: "none",
+  plan: null,
+  usage: USAGE.map((bar) => ({ ...bar, limit: null })),
   addOns: [],
   canManage: true,
   owner: {
@@ -39,16 +34,20 @@ export const trialView: SubscriptionView = {
 };
 
 export const activeView: SubscriptionView = {
-  ...trialView,
   status: "active",
-  isTrial: false,
-  startsAt: "2026-10-08T06:30:00.000Z",
-  endsAt: "2027-04-08T06:30:00.000Z",
-  daysLeft: 182,
+  plan: {
+    code: "basic",
+    name: "Basic",
+    startsAt: "2026-10-08T06:30:00.000Z",
+    endsAt: "2027-04-08T06:30:00.000Z",
+    daysLeft: 182,
+    autoRenew: false,
+  },
   usage: USAGE.map((bar) =>
     bar.grant === "team_member" ? { ...bar, used: 7, limit: 7 } : bar,
   ),
   addOns: [{ grant: "team_member", name: "Extra Team Member", quantity: 2 }],
+  canManage: true,
   owner: {
     unusedValuePaise: 1_400_000,
     lastBillingAddress: {
@@ -61,15 +60,41 @@ export const activeView: SubscriptionView = {
   },
 };
 
+/** A running plan with a few days left. */
+export const endingSoonView: SubscriptionView = {
+  ...activeView,
+  plan: {
+    code: "basic",
+    name: "Basic",
+    startsAt: "2026-04-14T06:30:00.000Z",
+    endsAt: "2026-10-14T06:30:00.000Z",
+    daysLeft: 5,
+    autoRenew: false,
+  },
+};
+
 export const expiredView: SubscriptionView = {
-  ...trialView,
   status: "expired",
-  endsAt: "2026-10-06T06:30:00.000Z",
-  daysLeft: 0,
+  plan: {
+    code: "basic",
+    name: "Basic",
+    startsAt: "2026-04-06T06:30:00.000Z",
+    endsAt: "2026-10-06T06:30:00.000Z",
+    daysLeft: 0,
+    autoRenew: false,
+  },
+  usage: USAGE,
+  addOns: [],
+  canManage: true,
+  owner: {
+    unusedValuePaise: 0,
+    lastBillingAddress: null,
+    paymentsConfigured: true,
+  },
 };
 
 export const memberView: SubscriptionView = {
-  ...trialView,
+  ...activeView,
   canManage: false,
   owner: null,
 };
@@ -220,7 +245,8 @@ export function mockSubscriptionApi(api: Api = {}) {
     if (!post && path.endsWith(`${base}/plans`)) body = api.plans ?? plans;
     else if (!post && path.endsWith(`${base}/invoices`))
       body = api.invoices ?? noInvoices;
-    else if (!post && path.endsWith(base)) body = api.subscription ?? trialView;
+    else if (!post && path.endsWith(base))
+      body = api.subscription ?? noPlanView;
     else if (post && path.endsWith(`${base}/checkout/quote`))
       body = api.quote ?? quote;
     else if (post && path.endsWith(`${base}/checkout/verify`))

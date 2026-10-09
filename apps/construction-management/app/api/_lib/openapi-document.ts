@@ -185,7 +185,7 @@ export const openApiOperations: OpenApiOperation[] = [
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationCompanyRequestModel,
     successStatus: StatusCodes.CREATED,
-    successDescription: "The Company, on a 14-day trial",
+    successDescription: "The Company, made the Active Company",
     successSchema: CreateConstructionOrganizationCompanyResponseModel,
     errors: [StatusCodes.BAD_REQUEST, StatusCodes.UNAUTHORIZED],
   },
@@ -678,9 +678,10 @@ openApiOperations.push(
       "Your Subscription: plan, status, expiry and usage (amounts for the Owner only)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
-    successDescription: "The Active Company's subscription",
+    successDescription:
+      "The Active Company's subscription; `plan` is null and nothing is limited before its first plan",
     successSchema: GetConstructionOrganizationSubscriptionResponseModel,
-    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+    errors: [...SESSION_ERRORS],
   },
   {
     method: "get",

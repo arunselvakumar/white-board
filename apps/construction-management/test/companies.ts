@@ -6,6 +6,7 @@ import { prisma } from "@repo/db";
 import { vi } from "vitest";
 
 import { POST as createCompanyRoute } from "@/app/api/construction/organization/companies/route";
+import { addMonths } from "@/src/organization/domain/subscription";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
 import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
@@ -95,6 +96,28 @@ export function jsonRequest(
     method,
     headers: { "content-type": "application/json", cookie },
     body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+/**
+ * Puts a Company on a paid plan (Basic unless named), as if its first
+ * order had been paid; a new Company has no plan and no limits. Pass a
+ * past `endsAt` for an ended plan.
+ */
+export async function givePlan(
+  workspaceId: string,
+  input: { planCode?: string; endsAt?: Date } = {},
+): Promise<void> {
+  const now = new Date();
+  await prisma.constructionOrganizationSubscription.create({
+    data: {
+      id: randomUUID(),
+      workspaceId,
+      planCode: input.planCode ?? "basic",
+      startsAt: now,
+      endsAt: input.endsAt ?? addMonths(now, 6),
+      paidValue: 1_400_000,
+    },
   });
 }
 

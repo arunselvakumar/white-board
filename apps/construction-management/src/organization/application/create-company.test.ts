@@ -62,7 +62,7 @@ function setup(storeFails = false) {
 }
 
 describe("CreateCompanyHandler", () => {
-  it("creates the Workspace with the caller as its one Owner and a 14-day trial", async () => {
+  it("creates the Workspace with the caller as its one Owner", async () => {
     const { handler, directory, created, events } = setup();
     const result = await handler.execute(command);
 
@@ -73,7 +73,6 @@ describe("CreateCompanyHandler", () => {
     expect(result).toEqual({
       workspaceId: "company-1",
       name: "Patil Builders",
-      trialEndsAt: new Date("2026-10-22T06:30:00Z"),
     });
     expect(created).toHaveLength(1);
     expect(created[0]?.owner).toEqual({

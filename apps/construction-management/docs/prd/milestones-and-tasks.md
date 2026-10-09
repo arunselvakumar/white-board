@@ -45,7 +45,7 @@ Ticket ids are `CM-<milestone><nn>`: `CM-105` is milestone 1, ticket 5.
 | Milestone | Name                               | Spec                                                                                                                | Outcome the owner can see                                                                                       | Priority |
 | --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- |
 | **M0**    | Project setup                      | [03-target-architecture](../03-target-architecture.md)                                                              | App boots on :3002 against Postgres, CI green, `/api/docs` serves, first `construction_*` schema migrates       | 1        |
-| **M1**    | SaaS onboarding & access           | [modules/01](../modules/01-organization-identity-access.md), [modules/12](../modules/12-settings-configuration.md)  | Sign up by mobile OTP or email, create a Company, invite team members, set the permission matrix, start a trial | 1        |
+| **M1**    | SaaS onboarding & access           | [modules/01](../modules/01-organization-identity-access.md), [modules/12](../modules/12-settings-configuration.md)  | Sign up by mobile OTP or email, create a Company, invite team members, set the permission matrix, choose a plan | 1        |
 | **M2**    | Site workforce (labour & vendor)   | [modules/08](../modules/08-labour-vendor-attendance.md), [modules/02](../modules/02-master-records.md)              | Register labour and vendor gangs, mark daily attendance with OT, see running balances, pay wages                | 1        |
 | **M3**    | Staff HRMS                         | [modules/10](../modules/10-hrms.md)                                                                                 | Office staff check in within a geo-fence, apply for leave, HR runs shifts, holidays and monthly salary          | 1        |
 | **M4**    | Projects & structure               | [modules/03](../modules/03-projects-structure-drawings-gallery.md)                                                  | Full project wizard, phases → wings → floors → units, drawings, gallery, testing reports                        | 2        |
@@ -135,7 +135,9 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 ## M1 — SaaS onboarding & access
 
-Goal: a builder can sign up, create a Company, invite staff, decide what each one may do, and start a trial — the "01 Organization, Identity & Access" spec minus devices and data-export, which move to M9.
+Goal: a builder can sign up, create a Company, invite staff, decide what each one may do, and buy a plan — the "01 Organization, Identity & Access" spec minus devices and data-export, which move to M9.
+
+> **Trial removed on 2026-10-09 at the owner's request; it will be designed later.** A new Company has no subscription: no plan, no limits and never expired until its Owner buys a plan. CM-104 and CM-116–118 below are amended.
 
 > **Amended at the start of M2 (2026-10-08, [ADR CM-0009](../adr/CM-0009-email-sign-in-while-sms-is-off.md)):** SMS is off until the business can send DLT-registered texts. Sign-in is email and password, with a Forgot password flow. The mobile OTP routes (CM-102, CM-103) stay built behind `CONSTRUCTION_SMS=on`. Invitations (CM-109) go by email and share link only, and a Team Member with only a mobile is a record until an email is added.
 
@@ -156,7 +158,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 | CM-113 |  13 | Back-dated entry policy (global days, override designations, financial closing date) + guard                 | done   | CM-107                 | Kernel    |       |
 | CM-114 |  14 | Sequence rules (`SequenceRule`, fiscal-year token, per-project scope, counters) + Settings screen            | done   | CM-107                 | Kernel+UI |       |
 | CM-115 |  15 | Company profile & my-profile screens (logo, GSTIN/PAN masked, address, currency, timezone)                   | done   | CM-105                 | UI        |       |
-| CM-116 |  16 | Plans & trial: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage), 14-day trial | done   | CM-104                 | Domain    |       |
+| CM-116 |  16 | Plans & subscription: `Plan`, `Subscription`, usage counters (projects, members, HRMS seats, storage)        | done   | CM-104                 | Domain    |       |
 | CM-117 |  17 | Razorpay checkout (order → webhook → activate), billing address, invoices list                               | done   | CM-116                 | HTTP+UI   |       |
 | CM-118 |  18 | Plan enforcement: block create when usage exceeded; read-only on expiry; export always allowed               | done   | CM-116                 | Domain    |       |
 | CM-119 |  19 | M1 polish: empty states, Storybook for every form, OTP/invite React Email templates                          | done   | CM-111, CM-115, CM-117 | UI        |       |
@@ -175,7 +177,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 
 ### CM-104 — Company creation
 
-**Done when:** `createCompany` command creates the Workspace via `@repo/auth`, makes the caller `owner`, writes `CompanyProfile`, copies the seed sets (designations now; departments/UoMs/categories arrive in M2/M4), starts a trial (CM-116 fills the plan; until then a `trialEndsAt`), and emits `CompanyCreated`. Domain tests for invariants (name required, one owner).
+**Done when:** `createCompany` command creates the Workspace via `@repo/auth`, makes the caller `owner`, writes `CompanyProfile`, copies the seed sets (designations now; departments/UoMs/categories arrive in M2/M4), and emits `CompanyCreated`. It creates no subscription: a Company has none until its Owner buys a plan (CM-117). Domain tests for invariants (name required, one owner).
 
 ### CM-105 — Company HTTP + screens
 
@@ -226,16 +228,16 @@ Decided while building it:
 - Files go through our routes (raw body with its `content-type`; no presigned browser upload) to private Vercel Blob storage (files on disk in development and tests) under `companies/<workspaceId>/...`, are checked by content (PNG, JPEG, WebP; logo ≤ 2 MB, photo ≤ 10 MB; `FILE_TOO_LARGE`, `FILE_TYPE_NOT_ALLOWED`), and are served only through routes that stream them to the Company's own Team Members. Every stored file is a row in `construction_organization.stored_files` (bytes, kind, deleted_at) for storage usage (CM-116).
 - My Profile is the signed-in User's own Team Member record in the Active Company: photo, name, email, address, emergency contact, Aadhaar and PAN. The mobile is how they sign in and is read-only there. Email here is the Team Member's contact email; changing the User's sign-in email (with verification) is not part of M1. A member may always reveal their own Aadhaar and PAN; each reveal is audited, and the OTP step arrives with M9.
 
-### CM-116 — Plans & trial
+### CM-116 — Plans & subscription
 
-**Done when:** `Plan` (includes: projects, team members, HRMS seats, storage GB; prices per duration), `AddOn` (per unit per month), `Subscription(workspaceId, planId, startsAt, endsAt, autoRenew, addOns[])`, `UsageSnapshot` computed from counts; `startTrial` on company creation (14 days, Basic limits); `Your Subscription` read model (plan, expiry, usage bars).
+**Done when:** `Plan` (includes: projects, team members, HRMS seats, storage GB; prices per duration), `AddOn` (per unit per month), `Subscription(workspaceId, planId, startsAt, endsAt, autoRenew, addOns[])`, `UsageSnapshot` computed from counts; `Your Subscription` read model (plan, expiry, usage bars).
 
 Decisions (CM-116):
 
 - The catalogue is versioned JSON, `src/organization/infrastructure/seeds/plans.json`; orders store `catalogueVersion`. Only **Basic** is known: 6 months ₹14,000, 12 months ₹21,000 (paise in the file), 10 Projects, 5 Team Members, **10 HRMS Team Members** (our number; open question), 20 GB. `rank` orders Plans for "same or higher".
 - Prices are **before GST**; GST 18% is added and shown separately (CGST 9% + SGST 9% when the buyer's state is the seller's, IGST 18% otherwise).
 - Add-ons per unit per month: Extra Team Member, Extra Project, 30 GB storage at ₹299 (minimum 1 each), HRMS Team Member ₹30 (minimum 5). At most 500 units per add-on per order.
-- Status is derived from dates: `trial` (`isTrial` and not ended), `active`, `expired` (now ≥ `endsAt`). Days left count a part day as a day.
+- Status is derived from dates: `active`, or `expired` (now ≥ `endsAt`). A Company with no subscription row is `none`: the read model's `plan` is null and usage has no limits (`limit: null`). Days left count a part day as a day.
 - Usage: Team Members are live Normal members including the Owner and Joining Pending invites; HRMS seats count HRMS members only; Projects count 0 until CM-204; storage sums `construction_organization.stored_files.bytes` once that table exists (0 before).
 - `GET /api/construction/organization/subscription` is open to every Team Member of the Company; amounts and billing (`owner`) are null for a Member.
 
@@ -245,7 +247,7 @@ Decisions (CM-116):
 
 Decisions (CM-117):
 
-- Order kinds: `new` (from a Trial or an ended plan; starts on payment), `extend` (same plan; months added to the current end; running add-ons renewed for the same months), `upgrade` (rank ≥ current; starts on payment; add-ons chosen again), `add_ons` (running plan only; charged per unit per day as 1/30 of the monthly price for the days left). A Trial can only buy `new`; an active plan cannot buy `new`.
+- Order kinds: `new` (no running plan — none yet, or the last one ended; starts on payment; the Company's first paid order creates its subscription row), `extend` (same plan; months added to the current end; running add-ons renewed for the same months), `upgrade` (rank ≥ current; starts on payment; add-ons chosen again), `add_ons` (running plan only; charged per unit per day as 1/30 of the monthly price for the days left). Without a running plan only `new` can be bought; a running plan cannot buy `new`.
 - **Last Plan Discount** = the pre-GST value paid for the running period (plan and add-ons) × days left ÷ days in the period, capped at the Sub Total. Coupons are not built.
 - Orders are immutable rows (`created → paid | failed`) with the full price snapshot, buyer details (name, address, GST state, optional GSTIN that must match the state) and the seller block. A `failed` order can still be paid by a later attempt on the same Razorpay order.
 - Payment is settled by the webhook (`payment.captured` / `order.paid`, `X-Razorpay-Signature` HMAC-SHA256 of the raw body) **and** by `checkout/verify` (HMAC of `order_id|payment_id` with the key secret), whichever arrives first; both lock the order row, so replays never extend twice.
@@ -260,7 +262,7 @@ Decisions (CM-118):
 
 - The `PlanGate` port lives in the shared kernel (`src/shared-kernel/plan.ts`) so every context's create commands can ask it; the organization context implements it (`SubscriptionPlanGate`, composed by `createPlanGate()`).
 - Expiry is checked centrally in `requireAccess` for the write flags `create update delete approve reject transfer import`; `read print report view_all notification financial export` stay open. Owner-only command routes that use `requireOwnerSession` call `requirePlanActive(session)`. The subscription, checkout and webhook routes, sign-out and Company switching are never blocked.
-- A Company with no subscription row (only seeded test data) is not limited.
+- A Company with no subscription row (no plan bought yet) is neither limited nor expired.
 
 ---
 

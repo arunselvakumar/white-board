@@ -5,9 +5,9 @@ import { planExpired } from "@/src/shared-kernel/plan";
 import { mapError } from "./map-error";
 
 /**
- * Whether the Company's plan (trial or paid) has ended: one indexed read of
- * `construction_organization.subscriptions`. A Company without a row is not
- * limited (only seeded test Companies lack one).
+ * Whether the Company's plan has ended: one indexed read of
+ * `construction_organization.subscriptions`. A Company without a row has
+ * no plan yet, so it is neither limited nor ended.
  */
 export async function planHasEnded(
   workspaceId: string,

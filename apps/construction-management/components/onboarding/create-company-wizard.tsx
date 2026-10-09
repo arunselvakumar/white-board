@@ -108,16 +108,11 @@ const CURRENCY_ITEMS = CURRENCIES.map((currency) => ({
   label: currency,
 }));
 
-const dateFormat = new Intl.DateTimeFormat("en-IN", { dateStyle: "long" });
-
 /** The first-run wizard (CM-105): name → contact → country and tax → done. */
 export function CreateCompanyWizard() {
   const { user } = useCompanyUser();
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState<{
-    name: string;
-    trialEndsAt: string;
-  } | null>(null);
+  const [done, setDone] = useState<{ name: string } | null>(null);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -154,7 +149,7 @@ export function CreateCompanyWizard() {
         gstin: isIndia && values.gstin !== "" ? values.gstin : null,
         pan: isIndia && values.pan !== "" ? values.pan : null,
       });
-      setDone({ name: created.name, trialEndsAt: created.trialEndsAt });
+      setDone({ name: created.name });
     } catch (error) {
       const { field, message } = fieldForCode(error, SERVER_FIELDS);
       if (field == null) {
@@ -178,7 +173,7 @@ export function CreateCompanyWizard() {
         />
         <AuthHeading
           title={`${done.name} is ready`}
-          description={`Your free trial runs until ${dateFormat.format(new Date(done.trialEndsAt))}.`}
+          description="You are its Owner. Add your first Project to get started."
         />
         <Button
           className="h-10 w-full"

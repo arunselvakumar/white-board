@@ -7,7 +7,12 @@ import { POST as createTeamMember } from "@/app/api/construction/organization/te
 import { GET as getSubscription } from "@/app/api/construction/organization/subscription/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { newId } from "@/src/shared-kernel/ids";
-import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import {
+  givePlan,
+  jsonRequest,
+  memberWith,
+  ownerWithCompany,
+} from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteProject } from "./[id]/delete/route";
@@ -268,6 +273,7 @@ describe("Projects HTTP (CM-204)", () => {
 
   it("refuses a Project beyond the plan with 402 and counts Projects as usage", async () => {
     const owner = await ownerWithCompany();
+    await givePlan(owner.workspaceId);
     await create(owner.cookie, { name: "Project 1" });
     // Basic allows 10 Projects; fill the rest directly.
     const now = new Date();

@@ -140,7 +140,7 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   GSTIN_STATE_MISMATCH: "gstin",
 };
 
-/** Which checkout a status allows: a new plan from a trial or an ended plan. */
+/** Which checkout a status allows: a new plan when none is running (none yet, or ended). */
 export function resolveKind(
   status: SubscriptionView["status"],
   requested: string | null | undefined,
@@ -204,7 +204,7 @@ export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
             <EmptyTitle>Payments are not configured</EmptyTitle>
             <EmptyDescription>
               Online payment is not set up on this server yet, so plans cannot
-              be bought here. Your trial and your data are not affected.
+              be bought here. Your data is not affected.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -238,7 +238,7 @@ function CheckoutForm({
   const [paying, setPaying] = useState(false);
 
   const currentPlan = catalogue.plans.find(
-    (plan) => plan.code === subscription.planCode,
+    (plan) => plan.code === subscription.plan?.code,
   );
   const offered =
     kind === "upgrade"
@@ -445,7 +445,9 @@ function CheckoutForm({
         meta={
           kind === "new"
             ? "Prices are before GST, which is added at checkout."
-            : `${subscription.planName} plan · ends on ${longDate.format(new Date(subscription.endsAt))} · ${daysLeftText(subscription.daysLeft)}`
+            : subscription.plan == null
+              ? null
+              : `${subscription.plan.name} plan · ends on ${longDate.format(new Date(subscription.plan.endsAt))} · ${daysLeftText(subscription.plan.daysLeft)}`
         }
       />
       <div className="space-y-3">
@@ -480,7 +482,7 @@ function CheckoutForm({
             form={form}
             catalogue={catalogue}
             kind={kind}
-            daysLeft={subscription.daysLeft}
+            daysLeft={subscription.plan?.daysLeft ?? 0}
           />
         )}
         {stepKey === "buyer" && <BuyerStep form={form} />}

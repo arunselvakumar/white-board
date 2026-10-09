@@ -3,10 +3,10 @@ import { expect, waitFor } from "storybook/test";
 
 import {
   activeView,
+  endingSoonView,
   expiredView,
-  memberView,
   mockSubscriptionApi,
-  trialView,
+  noPlanView,
 } from "@/components/subscription/subscription-story-fixtures";
 
 import { signInAs } from "../../.storybook/mocks/auth";
@@ -20,18 +20,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Trial: Story = {
+export const EndingSoon: Story = {
   beforeEach() {
     signInAs("owner");
-    return mockSubscriptionApi({ subscription: trialView }).restore;
+    return mockSubscriptionApi({ subscription: endingSoonView }).restore;
   },
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("Free trial: 9 days left"),
+      await canvas.findByText("Your plan ends soon: 5 days left"),
     ).toBeVisible();
-    await expect(
-      canvas.getByRole("link", { name: "Choose a plan" }),
-    ).toHaveAttribute("href", "/app/subscription/checkout?kind=new");
+    await expect(canvas.getByRole("link", { name: "Extend" })).toHaveAttribute(
+      "href",
+      "/app/subscription/checkout?kind=extend",
+    );
   },
 };
 
@@ -56,7 +57,7 @@ export const ExpiredForAMember: Story = {
   beforeEach() {
     signInAs("member");
     return mockSubscriptionApi({
-      subscription: { ...memberView, status: "expired", daysLeft: 0 },
+      subscription: { ...expiredView, canManage: false, owner: null },
     }).restore;
   },
   play: async ({ canvas }) => {
@@ -66,6 +67,18 @@ export const ExpiredForAMember: Story = {
     await expect(
       canvas.queryByRole("link", { name: "Choose a plan" }),
     ).toBeNull();
+  },
+};
+
+export const NoPlanShowsNothing: Story = {
+  beforeEach() {
+    signInAs("owner");
+    return mockSubscriptionApi({ subscription: noPlanView }).restore;
+  },
+  play: async ({ canvasElement }) => {
+    await waitFor(() =>
+      expect(canvasElement.querySelector("[role=status]")).toBeNull(),
+    );
   },
 };
 

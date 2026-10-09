@@ -9,7 +9,6 @@ export const GRANT_LABELS: Record<PlanGrant, string> = {
 };
 
 export const STATUS_LABELS = {
-  trial: "Free trial",
   active: "Active",
   expired: "Ended",
 } as const;

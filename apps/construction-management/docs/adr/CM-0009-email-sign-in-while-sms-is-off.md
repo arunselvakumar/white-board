@@ -29,4 +29,4 @@ When SMS comes back, setting `CONSTRUCTION_SMS=on` (plus the MSG91 keys and DLT 
 
 - **Delete the mobile OTP code:** we would rebuild it in weeks. Rejected.
 - **Passwordless emailed code instead of passwords:** the code path already exists for verification, but a second sign-in flow means more screens and tests for this PR. Not now; it can be added later beside passwords.
-- **Free or trial SMS gateways without DLT:** not allowed for commercial texts in India. Rejected.
+- **Free SMS gateways without DLT:** not allowed for commercial texts in India. Rejected.

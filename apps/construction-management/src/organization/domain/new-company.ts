@@ -4,7 +4,6 @@ import type { CompanyDetails } from "./company-details";
 import type { Designation } from "./designation";
 import type { CompanyCreated } from "./events";
 import { TeamMember, teamMemberDetails } from "./team-member";
-import { TRIAL_PLAN_CODE, trialEndsAt } from "./trial";
 
 /** The seed Designation the creator's own Team Member gets. */
 export const OWNER_DESIGNATION = "Owner";
@@ -16,17 +15,11 @@ export type CompanyOwner = {
   email: string | null;
 };
 
-export type TrialSubscription = {
-  id: string;
-  planCode: string;
-  isTrial: true;
-  startsAt: Date;
-  endsAt: Date;
-};
-
 /**
  * Everything written when a Company is created (CM-104): its profile, its
- * Owner, and its trial. The Workspace itself already exists in `@repo/auth`.
+ * Owner, and its seed sets. No Subscription: a Company has none until its
+ * Owner buys a plan (CM-117). The Workspace itself already exists in
+ * `@repo/auth`.
  */
 export class NewCompany {
   private constructor(
@@ -34,7 +27,6 @@ export class NewCompany {
     readonly profileId: string,
     readonly details: CompanyDetails,
     readonly owner: CompanyOwner,
-    readonly trial: TrialSubscription,
     readonly designations: readonly Designation[],
     readonly ownerMember: TeamMember,
     readonly createdAt: Date,
@@ -70,13 +62,6 @@ export class NewCompany {
       newId(input.now.getTime()),
       input.details,
       input.owner,
-      {
-        id: newId(input.now.getTime()),
-        planCode: TRIAL_PLAN_CODE,
-        isTrial: true,
-        startsAt: input.now,
-        endsAt: trialEndsAt(input.now),
-      },
       input.designations,
       ownerMember,
       input.now,

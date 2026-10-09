@@ -51,7 +51,6 @@ function toSubscription(row: SubscriptionRow): Subscription {
     row.id,
     row.workspaceId,
     row.planCode,
-    row.isTrial,
     row.startsAt,
     row.endsAt,
     row.autoRenew,
@@ -169,7 +168,10 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
     gatewayOrderId: string;
     gatewayPaymentId: string;
     paidAt: Date;
-    apply: (order: SubscriptionOrder, current: Subscription) => Subscription;
+    apply: (
+      order: SubscriptionOrder,
+      current: Subscription | null,
+    ) => Subscription;
   }): Promise<SettleResult> {
     return this.db.$transaction(async (tx) => {
       // Row locks serialise the webhook and the checkout callback.
@@ -191,23 +193,35 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
         Prisma.sql`SELECT id FROM construction_organization.subscriptions
           WHERE workspace_id = ${order.workspaceId} FOR UPDATE`,
       );
-      const row =
-        await tx.constructionOrganizationSubscription.findUniqueOrThrow({
-          where: { workspaceId: order.workspaceId },
-        });
-      const before = toSubscription(row);
-      const after = input.apply(order, before);
-      await tx.constructionOrganizationSubscription.update({
-        where: { id: row.id },
-        data: {
-          planCode: after.planCode,
-          isTrial: after.isTrial,
-          startsAt: after.startsAt,
-          endsAt: after.endsAt,
-          addOns: json(after.addOns),
-          paidValue: after.paidValue,
-        },
+      // No row before the Company's first plan: `apply` starts one. Two
+      // first payments at once collide on the unique workspace id, and the
+      // loser's transaction rolls back for the gateway to retry.
+      const row = await tx.constructionOrganizationSubscription.findUnique({
+        where: { workspaceId: order.workspaceId },
       });
+      const before = row == null ? null : toSubscription(row);
+      const after = input.apply(order, before);
+      const data = {
+        planCode: after.planCode,
+        startsAt: after.startsAt,
+        endsAt: after.endsAt,
+        addOns: json(after.addOns),
+        paidValue: after.paidValue,
+      };
+      if (row == null)
+        await tx.constructionOrganizationSubscription.create({
+          data: {
+            id: after.id,
+            workspaceId: after.workspaceId,
+            autoRenew: after.autoRenew,
+            ...data,
+          },
+        });
+      else
+        await tx.constructionOrganizationSubscription.update({
+          where: { id: row.id },
+          data,
+        });
       const fiscalYear = fiscalYearOf(input.paidAt);
       const counter = await tx.$queryRaw<{ last_number: number }[]>(
         Prisma.sql`INSERT INTO construction_organization.subscription_invoice_counters (fiscal_year, last_number)
@@ -230,7 +244,6 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
       });
       const view = (subscription: Subscription) => ({
         planCode: subscription.planCode,
-        isTrial: subscription.isTrial,
         startsAt: subscription.startsAt,
         endsAt: subscription.endsAt,
         addOns: subscription.addOns,
@@ -240,8 +253,8 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
         actorUserId: order.createdBy,
         action: PAID_ACTIONS[order.quote.kind],
         entityType: "subscription",
-        entityId: row.id,
-        before: view(before),
+        entityId: after.id,
+        before: before == null ? null : view(before),
         after: { ...view(after), orderId: order.id },
         occurredAt: input.paidAt,
       });

@@ -17,6 +17,7 @@ import { createSubscriptionHandlers } from "@/src/organization/infrastructure/cr
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { FakePaymentGateway } from "@/src/organization/infrastructure/fake-payment-gateway";
 import { razorpaySignature } from "@/src/organization/infrastructure/razorpay";
+import { givePlan } from "@/test/companies";
 
 import { mapError } from "../../../_lib/map-error";
 import { POST as startCheckout } from "./checkout/route";
@@ -131,10 +132,8 @@ function captured(orderId: string, paymentId: string, amount: number) {
 
 type Overview = {
   status: string;
-  planName: string;
-  daysLeft: number;
-  endsAt: string;
-  usage: { grant: string; used: number; limit: number }[];
+  plan: { name: string; daysLeft: number; endsAt: string } | null;
+  usage: { grant: string; used: number; limit: number | null }[];
   addOns: { grant: string; quantity: number }[];
   owner: { paymentsConfigured: boolean; lastBillingAddress: unknown } | null;
 };
@@ -149,23 +148,23 @@ describe("Your Subscription (CM-116)", () => {
     );
   });
 
-  it("shows the 14-day Basic trial with usage to every Team Member, amounts to the Owner only", async () => {
+  it("shows no plan and unlimited usage for a new Company, amounts to the Owner only", async () => {
     const { workspaceId, userId } = await newCompany();
     signIn(userId, workspaceId);
     const response = await getSubscription(new Request(BASE));
     expect(response.status).toBe(StatusCodes.OK);
     const owner = await json<Overview>(response);
     expect(owner).toMatchObject({
-      planName: "Basic",
-      status: "trial",
-      daysLeft: 14,
+      status: "none",
+      plan: null,
+      addOns: [],
       owner: { paymentsConfigured: true, lastBillingAddress: null },
     });
     expect(owner.usage).toEqual([
-      { grant: "project", used: 0, limit: 10 },
-      { grant: "team_member", used: 1, limit: 5 },
-      { grant: "hrms_member", used: 0, limit: 10 },
-      { grant: "storage_gb", used: 0, limit: 20 },
+      { grant: "project", used: 0, limit: null },
+      { grant: "team_member", used: 1, limit: null },
+      { grant: "hrms_member", used: 0, limit: null },
+      { grant: "storage_gb", used: 0, limit: null },
     ]);
 
     signIn("a-member", workspaceId, "member");
@@ -174,6 +173,24 @@ describe("Your Subscription (CM-116)", () => {
     );
     expect(member.owner).toBeNull();
     expect(member.usage).toEqual(owner.usage);
+  });
+
+  it("shows the plan, days left and limits once there is one", async () => {
+    const { workspaceId, userId } = await newCompany();
+    await givePlan(workspaceId);
+    signIn(userId, workspaceId);
+    const view = await json<Overview>(await getSubscription(new Request(BASE)));
+    expect(view).toMatchObject({
+      status: "active",
+      plan: { name: "Basic" },
+    });
+    expect(view.plan?.daysLeft).toBeGreaterThan(150);
+    expect(view.usage).toEqual([
+      { grant: "project", used: 0, limit: 10 },
+      { grant: "team_member", used: 1, limit: 5 },
+      { grant: "hrms_member", used: 0, limit: 10 },
+      { grant: "storage_gb", used: 0, limit: 20 },
+    ]);
   });
 
   it("lists plans for the Owner only", async () => {
@@ -307,6 +324,7 @@ describe("Checkout and Razorpay (CM-117)", () => {
     );
     expect(activated).toMatchObject({
       status: "active",
+      plan: { name: "Basic" },
       addOns: [{ grant: "team_member", quantity: 2 }],
     });
     expect(activated.usage[1]).toEqual({
@@ -343,7 +361,7 @@ describe("Checkout and Razorpay (CM-117)", () => {
     const after = await json<Overview>(
       await getSubscription(new Request(BASE)),
     );
-    expect(after.endsAt).toBe(activated.endsAt);
+    expect(after.plan?.endsAt).toBe(activated.plan?.endsAt);
 
     const invoices = await json<{
       items: {
@@ -439,8 +457,8 @@ describe("Checkout and Razorpay (CM-117)", () => {
     const extended = await json<Overview>(
       await getSubscription(new Request(BASE)),
     );
-    expect(extended.endsAt).toBe(
-      addMonths(new Date(active.endsAt), 12).toISOString(),
+    expect(extended.plan?.endsAt).toBe(
+      addMonths(new Date(active.plan?.endsAt ?? ""), 12).toISOString(),
     );
 
     // Someone else's order is not found.
@@ -475,8 +493,36 @@ describe("Checkout and Razorpay (CM-117)", () => {
 });
 
 describe("Plan enforcement (CM-118)", () => {
+  it("neither limits nor ends a Company with no plan", async () => {
+    const { workspaceId, userId, designationId } = await newCompany();
+    signIn(userId, workspaceId);
+    expect(
+      await requireAccess(
+        new Request(
+          "http://localhost/api/construction/organization/team-members",
+        ),
+        "organization.team_members",
+        "create",
+      ),
+    ).not.toBeInstanceOf(Response);
+    const members = createTeamMemberHandlers();
+    // More than Basic's 5 Team Members.
+    for (let index = 1; index <= 6; index += 1)
+      await members.invite({
+        workspaceId,
+        by: userId,
+        memberType: "normal",
+        details: {
+          name: `Member ${String(index)}`,
+          designationId,
+          mobile: `+9197${String(index).padStart(8, "0")}`,
+        },
+      });
+  });
+
   it("refuses a Team Member beyond the plan with 402 and the limit", async () => {
     const { workspaceId, userId, designationId } = await newCompany();
+    await givePlan(workspaceId);
     const members = createTeamMemberHandlers();
     const invite = (index: number, memberType: "normal" | "hrms") =>
       members.invite({
@@ -513,10 +559,7 @@ describe("Plan enforcement (CM-118)", () => {
 
   it("makes an ended plan read-only: writes 402, reads and export allowed, renewal open", async () => {
     const { workspaceId, userId, designationId } = await newCompany();
-    await prisma.constructionOrganizationSubscription.update({
-      where: { workspaceId },
-      data: { endsAt: new Date(Date.now() - 60_000) },
-    });
+    await givePlan(workspaceId, { endsAt: new Date(Date.now() - 60_000) });
     signIn(userId, workspaceId);
     const request = () =>
       new Request(
@@ -548,7 +591,10 @@ describe("Plan enforcement (CM-118)", () => {
     const overview = await json<Overview>(
       await getSubscription(new Request(BASE)),
     );
-    expect(overview).toMatchObject({ status: "expired", daysLeft: 0 });
+    expect(overview).toMatchObject({
+      status: "expired",
+      plan: { daysLeft: 0 },
+    });
 
     await expect(
       createTeamMemberHandlers().invite({

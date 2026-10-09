@@ -22,7 +22,7 @@ export function SignUpForm({
     <>
       <AuthHeading
         title="Create your account"
-        description="Start a 14-day free trial for your Company."
+        description="Create an account for your Company."
       />
       {mobileOtp ? (
         <AuthTabs

@@ -12,8 +12,8 @@ import type { SubscriptionRepository, UsageReader } from "./subscription-ports";
  * The plan limits over the Company's Subscription and usage (CM-118):
  * `PLAN_EXPIRED` once the plan has ended, `PLAN_LIMIT_EXCEEDED` with
  * `{ grant, limit, used }` when the plan plus add-ons allows no more.
- * A Company with no Subscription row (seeded test data only; every created
- * Company has one) is not limited.
+ * A Company with no Subscription row (no plan bought yet) is not limited
+ * and has not expired.
  */
 export class SubscriptionPlanGate implements PlanGate {
   constructor(

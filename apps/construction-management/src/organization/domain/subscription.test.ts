@@ -69,10 +69,6 @@ const catalogue = PlanCatalogue.of({
 const NOW = new Date("2026-10-08T06:30:00.000Z");
 const days = (count: number) => new Date(NOW.getTime() + count * DAY_MS);
 
-function trial(endsAt = days(14)) {
-  return new Subscription("s", "w", "basic", true, NOW, endsAt, false, {}, 0);
-}
-
 function paid(input: {
   startsAt: Date;
   endsAt: Date;
@@ -84,7 +80,6 @@ function paid(input: {
     "s",
     "w",
     input.planCode ?? "basic",
-    false,
     input.startsAt,
     input.endsAt,
     false,
@@ -94,7 +89,7 @@ function paid(input: {
 }
 
 const quote = (
-  subscription: Subscription,
+  subscription: Subscription | null,
   choice: Parameters<typeof quoteCheckout>[0]["choice"],
   buyerStateCode = "27",
 ) =>
@@ -108,9 +103,9 @@ const quote = (
   });
 
 describe("Subscription status (CM-116)", () => {
-  it("is a trial with Basic's limits and days left, then expired", () => {
-    const subscription = trial();
-    expect(subscription.status(NOW)).toBe("trial");
+  it("is active with its plan's limits and days left, then expired", () => {
+    const subscription = paid({ startsAt: NOW, endsAt: days(14) });
+    expect(subscription.status(NOW)).toBe("active");
     expect(subscription.daysLeft(NOW)).toBe(14);
     expect(subscription.daysLeft(new Date(NOW.getTime() + 1))).toBe(14);
     expect(subscription.limits(catalogue)).toEqual({
@@ -153,7 +148,7 @@ describe("Subscription status (CM-116)", () => {
 
 describe("Checkout prices (CM-117)", () => {
   it("prices a new plan with add-ons by the month, CGST+SGST in the seller's state", () => {
-    const result = quote(trial(), {
+    const result = quote(null, {
       kind: "new",
       planCode: "basic",
       months: 6,
@@ -172,7 +167,7 @@ describe("Checkout prices (CM-117)", () => {
 
   it("charges IGST across states", () => {
     const result = quote(
-      trial(),
+      null,
       { kind: "new", planCode: "basic", months: 12 },
       "29",
     );
@@ -182,7 +177,7 @@ describe("Checkout prices (CM-117)", () => {
 
   it("enforces add-on minimums and offered durations", () => {
     expect(() =>
-      quote(trial(), {
+      quote(null, {
         kind: "new",
         planCode: "basic",
         months: 6,
@@ -192,24 +187,29 @@ describe("Checkout prices (CM-117)", () => {
       expect.objectContaining({ code: "ADD_ON_QUANTITY_INVALID" }) as Error,
     );
     expect(() =>
-      quote(trial(), { kind: "new", planCode: "basic", months: 3 }),
+      quote(null, { kind: "new", planCode: "basic", months: 3 }),
     ).toThrow(
       expect.objectContaining({ code: "DURATION_NOT_OFFERED" }) as Error,
     );
   });
 
-  it("allows only a new plan from a trial or an ended plan", () => {
-    for (const kind of ["extend", "upgrade", "add_ons"] as const)
-      expect(() =>
-        quote(trial(), {
-          kind,
-          planCode: "basic",
-          months: 6,
-          addOns: { team_member: 1 },
-        }),
-      ).toThrow(
-        expect.objectContaining({ code: "CHECKOUT_NOT_ALLOWED" }) as Error,
-      );
+  it("allows only a new plan when none is running (none yet, or ended)", () => {
+    const ended = paid({ startsAt: days(-200), endsAt: days(-20) });
+    for (const current of [null, ended])
+      for (const kind of ["extend", "upgrade", "add_ons"] as const)
+        expect(() =>
+          quote(current, {
+            kind,
+            planCode: "basic",
+            months: 6,
+            addOns: { team_member: 1 },
+          }),
+        ).toThrow(
+          expect.objectContaining({ code: "CHECKOUT_NOT_ALLOWED" }) as Error,
+        );
+    expect(
+      quote(ended, { kind: "new", planCode: "basic", months: 6 }).endsAt,
+    ).toEqual(addMonths(NOW, 6));
     const running = paid({ startsAt: days(-10), endsAt: days(170) });
     expect(() =>
       quote(running, { kind: "new", planCode: "basic", months: 6 }),
@@ -272,25 +272,56 @@ describe("Checkout prices (CM-117)", () => {
 });
 
 describe("Applying a paid order (CM-117)", () => {
-  it("activates from a trial, starting when paid", () => {
-    const after = trial().afterPayment(
-      {
-        kind: "new",
-        planCode: "basic",
-        months: 6,
-        addOns: { team_member: 1 },
-        subTotal: 1_579_400,
-      },
-      days(3),
-    );
+  it("starts the first Subscription from a new plan, when paid", () => {
+    const terms = {
+      kind: "new" as const,
+      planCode: "basic",
+      months: 6,
+      addOns: { team_member: 1 },
+      subTotal: 1_579_400,
+    };
+    const after = Subscription.started({
+      id: "s",
+      workspaceId: "w",
+      terms,
+      paidAt: days(3),
+    });
     expect(after).toMatchObject({
-      isTrial: false,
+      planCode: "basic",
       startsAt: days(3),
       endsAt: addMonths(days(3), 6),
       addOns: { team_member: 1 },
       paidValue: 1_579_400,
     });
     expect(after.status(days(3))).toBe("active");
+    expect(() =>
+      Subscription.started({
+        id: "s",
+        workspaceId: "w",
+        terms: { ...terms, kind: "extend" },
+        paidAt: NOW,
+      }),
+    ).toThrow();
+  });
+
+  it("restarts an ended plan from a new order, when paid", () => {
+    const ended = paid({ startsAt: days(-200), endsAt: days(-20) });
+    expect(
+      ended.afterPayment(
+        {
+          kind: "new",
+          planCode: "basic",
+          months: 12,
+          addOns: {},
+          subTotal: 2_100_000,
+        },
+        NOW,
+      ),
+    ).toMatchObject({
+      startsAt: NOW,
+      endsAt: addMonths(NOW, 12),
+      paidValue: 2_100_000,
+    });
   });
 
   it("extends from the end, or from payment once ended", () => {

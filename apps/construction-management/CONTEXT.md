@@ -145,8 +145,8 @@ _Avoid_: serial number, invoice number
 An entry dated in the past. How many days back a Team Member may create or edit one is set per module, can be overridden by Designation, and stops at the Financial Closing Date.
 _Avoid_: backdate, past entry
 
-**Plan / Subscription / Trial**:
-What the Company has bought (projects, Team Members, HRMS seats, storage) and until when. A new Company starts on a 14-day Trial.
+**Plan / Subscription**:
+What the Company has bought (projects, Team Members, HRMS seats, storage) and until when. A new Company has no plan, and nothing is limited, until its Owner buys one.
 _Avoid_: license, package
 
 ### Labour attendance and wages

@@ -14,7 +14,8 @@ const handlers = createSubscriptionHandlers();
 
 /**
  * "Your Subscription" (CM-116): any Team Member of the Active Company sees
- * the plan, expiry and usage; amounts and billing only the Owner.
+ * the plan, expiry and usage; amounts and billing only the Owner. A Company
+ * with no plan yet gets `status: "none"`, `plan: null` and unlimited usage.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -24,14 +25,15 @@ export async function GET(request: Request): Promise<Response> {
       isOwner: session.role === "owner",
     });
     const body: GetConstructionOrganizationSubscriptionResponseModel = {
-      planCode: view.planCode,
-      planName: view.planName,
       status: view.status,
-      isTrial: view.isTrial,
-      startsAt: view.startsAt.toISOString(),
-      endsAt: view.endsAt.toISOString(),
-      daysLeft: view.daysLeft,
-      autoRenew: view.autoRenew,
+      plan:
+        view.plan == null
+          ? null
+          : {
+              ...view.plan,
+              startsAt: view.plan.startsAt.toISOString(),
+              endsAt: view.plan.endsAt.toISOString(),
+            },
       usage: view.usage,
       addOns: view.addOns,
       canManage: view.canManage,

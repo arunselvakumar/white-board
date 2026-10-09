@@ -52,7 +52,7 @@ describe("Companies HTTP (CM-105)", () => {
       }),
     );
     expect(response.status).toBe(StatusCodes.CREATED);
-    const created = await json<{ id: string; trialEndsAt: string }>(response);
+    const created = await json<{ id: string }>(response);
 
     const profile =
       await prisma.constructionOrganizationCompanyProfile.findUniqueOrThrow({

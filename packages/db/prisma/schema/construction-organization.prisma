@@ -56,13 +56,13 @@ model ConstructionOrganizationAuditEvent {
   @@schema("construction_organization")
 }
 
-/// What a Company has bought, and until when (CM-104 trial; CM-116 plans,
-/// add-ons and checkout). One current row per Company.
+/// What a Company has bought, and until when (CM-116 plans, add-ons and
+/// checkout). At most one current row per Company, made by its first paid
+/// order; a Company without a row has no plan and no limits.
 model ConstructionOrganizationSubscription {
   id          String   @id @db.Uuid
   workspaceId String   @unique @map("workspace_id")
   planCode    String   @map("plan_code")
-  isTrial     Boolean  @map("is_trial")
   startsAt    DateTime @map("starts_at") @db.Timestamptz(3)
   endsAt      DateTime @map("ends_at") @db.Timestamptz(3)
   autoRenew   Boolean  @default(false) @map("auto_renew")
