@@ -53,6 +53,25 @@ export const KUMARI = project({
   ],
 });
 
+/** A Coimbatore job with a Quotation, a Work Order and two custom fields. */
+export const ANUGRAHA = project({
+  id: "0199c4a0-0000-7000-8000-000000000006",
+  name: "Anugraha Residency",
+  address: "Plot 12, Survey No. 45, Saravanampatti, Coimbatore 641035",
+  clientName: "Sri Balaji Developers",
+  clientPhone: "+919843122110",
+  quotationNo: "SBD/Q/2026/114",
+  quotationDate: "2026-02-12",
+  clientOrderNo: "WO/2026/031",
+  clientOrderDate: "2026-03-02",
+  // ₹1,84,50,000 excluding GST, in paise.
+  orderValue: 1_84_50_000_00,
+  customFields: [
+    { label: "Site engineer", value: "Prabhu Saravanan" },
+    { label: "Architect", value: "Meenakshi Associates, Madurai" },
+  ],
+});
+
 export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000002",

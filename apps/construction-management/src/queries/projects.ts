@@ -6,6 +6,7 @@ import {
 
 import type { UpdateConstructionProjectsProjectRequestModel } from "@/app/api/construction/projects/projects/[id]/update/update-project-request-model";
 import type { CreateConstructionProjectsProjectRequestModel } from "@/app/api/construction/projects/projects/create-project-request-model";
+import type { ListConstructionProjectsCustomFieldLabelsResponseModel } from "@/app/api/construction/projects/projects/custom-field-labels/custom-field-labels-models";
 import type { ListConstructionProjectsProjectsResponseModel } from "@/app/api/construction/projects/projects/list-projects-models";
 import type { ListConstructionProjectsProjectOptionsResponseModel } from "@/app/api/construction/projects/projects/options/list-project-options-response-model";
 import type { ConstructionProjectsProjectResponseModel } from "@/app/api/construction/projects/projects/project-models";
@@ -37,6 +38,18 @@ export const projectOptionsQuery = queryOptions({
   queryFn: () =>
     apiJson<ListConstructionProjectsProjectOptionsResponseModel>(
       `${PROJECTS_API}/options`,
+    ),
+});
+
+/**
+ * Custom-field names already used on the Company's Projects, most used
+ * first (CM-413). Under `PROJECTS_KEY`, so saving a Project refreshes it.
+ */
+export const customFieldLabelsQuery = queryOptions({
+  queryKey: [...PROJECTS_KEY, "custom-field-labels"],
+  queryFn: () =>
+    apiJson<ListConstructionProjectsCustomFieldLabelsResponseModel>(
+      `${PROJECTS_API}/custom-field-labels`,
     ),
 });
 

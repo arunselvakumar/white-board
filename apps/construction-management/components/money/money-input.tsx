@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -57,13 +57,16 @@ export function formatPaise(paise: number): string {
  * A rupee amount field: `₹` prefix, decimal keypad on phones. The form keeps
  * rupees as text; convert with `rupeesToPaise` when sending. Focusing it
  * selects the amount, so typing replaces a default `0` instead of making it
- * `0120`.
+ * `0120`. `suffix` is text after the amount, e.g. "excl. GST".
  */
 export function MoneyInput({
   className,
   onFocus,
+  suffix,
   ...props
-}: Omit<ComponentProps<typeof InputGroupInput>, "type" | "inputMode">) {
+}: Omit<ComponentProps<typeof InputGroupInput>, "type" | "inputMode"> & {
+  suffix?: ReactNode;
+}) {
   return (
     <InputGroup className={className}>
       <InputGroupAddon>
@@ -79,6 +82,11 @@ export function MoneyInput({
         }}
         {...props}
       />
+      {suffix == null ? null : (
+        <InputGroupAddon align="inline-end">
+          <InputGroupText>{suffix}</InputGroupText>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   );
 }

@@ -3,11 +3,18 @@ import { Geist_Mono, Urbanist } from "next/font/google";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import { TooltipProvider } from "@repo/ui/components/tooltip";
+import { sb } from "storybook/test";
 
 import "@repo/ui/globals.css";
 import { QueryProvider } from "../components/query-provider";
 import { getQueryClient } from "../src/queries/query-client";
 import { resetAuthMocks } from "./mocks/auth";
+
+// Spies that keep the real code; a story may stand in its own (the Project
+// form's held-files story picks files without the real attachments UI).
+sb.mock("../components/projects/documents/document-attachments.tsx", {
+  spy: true,
+});
 
 const fontSans = Urbanist({
   subsets: ["latin"],
