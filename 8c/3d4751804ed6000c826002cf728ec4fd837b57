@@ -1,0 +1,27 @@
+apps/construction-management/CONTEXT.md
+  s_6497dd4ebf3e73::t_3e9e26f8925af6 106-133,151,242-244
+apps/construction-management/docs/03-target-architecture.md
+  s_6497dd4ebf3e73::t_d19012fbb45368 171
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_6497dd4ebf3e73::t_595b1ee78ee951 35-43,175-184
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_6497dd4ebf3e73::t_b990eb08322a96 438-441
+apps/construction-management/docs/adr/CM-0010-project-contract-details-and-documents.md
+  s_6497dd4ebf3e73::t_53493050b18423 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8c3d4751804ed6000c826002cf728ec4fd837b57",
+  "prompts": {},
+  "sessions": {
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
