@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="px-3 pt-4">
-            <SidebarGroupLabel className="text-sidebar-foreground/45 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
+            <SidebarGroupLabel className="text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
               Main menu
             </SidebarGroupLabel>
             <SidebarGroupContent>

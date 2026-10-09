@@ -43,6 +43,7 @@ const QUICK_ACTIONS: readonly {
 
 function admittedDate(value: string): string {
   return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -206,11 +207,7 @@ export function OwnerDashboard({
           <StatCard
             label="Follow-ups due today"
             value={dashboard.feeFollowUpsDueCount}
-            caption={
-              followUpsDue
-                ? "Fee Follow-ups waiting on you"
-                : "Nothing to chase"
-            }
+            caption={followUpsDue ? "Due today or overdue" : "Nothing to chase"}
             icon={BellRing}
             tone={
               followUpsDue

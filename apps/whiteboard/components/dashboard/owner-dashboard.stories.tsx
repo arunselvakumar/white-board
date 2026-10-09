@@ -57,10 +57,12 @@ export const Empty: Story = {
 };
 
 const openFees = fn();
+const openCalendar = fn();
 
 export const Populated: Story = {
   beforeEach() {
     openFees.mockClear();
+    openCalendar.mockClear();
   },
   render: () => (
     <WorkspaceGate>
@@ -105,7 +107,7 @@ export const Populated: Story = {
           onOpenStudent={() => undefined}
           onOpenStudents={() => undefined}
           onOpenFees={openFees}
-          onOpenCalendar={() => undefined}
+          onOpenCalendar={openCalendar}
         />
       </AppShell>
     </WorkspaceGate>
@@ -123,5 +125,7 @@ export const Populated: Story = {
     await expect(followUps).toHaveTextContent("Follow-ups due today2");
     await userEvent.click(followUps);
     await expect(openFees).toHaveBeenCalledOnce();
+    await userEvent.click(canvas.getByRole("button", { name: "Calendar" }));
+    await expect(openCalendar).toHaveBeenCalledOnce();
   },
 };
