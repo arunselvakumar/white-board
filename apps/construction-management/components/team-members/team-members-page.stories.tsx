@@ -150,6 +150,9 @@ export const WithMembers: Story = {
       `${window.location.origin}/join/Zt0kenZt0kenZt0kenZt0kenZt0ken12`,
     );
     await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(body.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
 
     await userEvent.click(
       canvas.getByRole("button", { name: "Actions for Suresh Kale" }),
@@ -158,10 +161,10 @@ export const WithMembers: Story = {
       await body.findByRole("menuitem", { name: "Delete" }),
     );
     const confirm = within(await body.findByRole("alertdialog"));
-    // The dialog animates in; its text is there before it is fully opaque.
-    await expect(
-      confirm.getByText("Their invitation is cancelled."),
-    ).toBeInTheDocument();
+    // The dialog animates in; it takes clicks only once fully open.
+    await waitFor(() =>
+      expect(confirm.getByText("Their invitation is cancelled.")).toBeVisible(),
+    );
     await userEvent.click(confirm.getByRole("button", { name: "Delete" }));
     await waitFor(() =>
       expect(canvas.queryByText("Suresh Kale")).not.toBeInTheDocument(),
