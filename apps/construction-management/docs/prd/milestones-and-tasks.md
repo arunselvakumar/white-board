@@ -137,6 +137,8 @@ Goal: the construction app is a real app in the monorepo with the same guarantee
 
 Goal: a builder can sign up, create a Company, invite staff, decide what each one may do, and start a trial — the "01 Organization, Identity & Access" spec minus devices and data-export, which move to M9.
 
+> **Amended at the start of M2 (2026-10-08, [ADR CM-0009](../adr/CM-0009-email-sign-in-while-sms-is-off.md)):** SMS is off until the business can send DLT-registered texts. Sign-in is email and password, with a Forgot password flow. The mobile OTP routes (CM-102, CM-103) stay built behind `CONSTRUCTION_SMS=on`. Invitations (CM-109) go by email and share link only, and a Team Member with only a mobile is a record until an email is added.
+
 | ID     | Seq | Title                                                                                                        | Status | Blocked by             | Area      | Issue |
 | ------ | --: | ------------------------------------------------------------------------------------------------------------ | ------ | ---------------------- | --------- | ----- |
 | CM-101 |   1 | ADR CM-0002: Company = Workspace; mobile-OTP login plugin in `@repo/auth`; roles `owner`/`member`            | done   | CM-001                 | Docs      |       |
