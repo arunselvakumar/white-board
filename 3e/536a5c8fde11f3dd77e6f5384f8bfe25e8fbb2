@@ -1,0 +1,123 @@
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance-openapi.ts
+  s_ec41e28a857a0b::t_20a81961f98c7e 61,73,85,97,121
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance.http.test.ts
+  s_ec41e28a857a0b::t_defeb0010cac3f 212,328,378
+apps/construction-management/app/api/construction/labour/labours/labour-openapi.ts
+  s_ec41e28a857a0b::t_f1eff51f7ea0d5 70,74,82,86,98,102,110,114,137,167,171,179,184,195,199,206,210,218,232,240
+apps/construction-management/app/api/construction/labour/labours/labours.http.test.ts
+  s_ec41e28a857a0b::t_3a54c23317ca2b 245,502
+apps/construction-management/app/api/construction/labour/payments/payment-openapi.ts
+  s_ec41e28a857a0b::t_572d847e9e725b 84,166
+apps/construction-management/app/api/construction/labour/summary/summary.http.test.ts
+  s_ec41e28a857a0b::t_566a88a841023b 224
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_ec41e28a857a0b::t_5008b481cba162 161,183
+apps/construction-management/app/api/construction/masters/masters.http.test.ts
+  s_ec41e28a857a0b::t_6eab33cb7897b4 404
+apps/construction-management/components/app-shell/masters-index.stories.tsx
+  s_ec41e28a857a0b::t_aa207330e96dba 27
+apps/construction-management/components/attendance/labour/labour-attendance-page.stories.tsx
+  s_ec41e28a857a0b::t_2b58d485a2918d 105,227
+apps/construction-management/components/attendance/labour/labour-attendance-page.tsx
+  s_ec41e28a857a0b::t_3c2bc19f99eace 52,54
+apps/construction-management/components/attendance/labour/labour-marking-sheet.tsx
+  s_ec41e28a857a0b::t_86859c57f117f4 655,665,717,746,873,928
+apps/construction-management/components/attendance/labour/labour-month-grid.tsx
+  s_ec41e28a857a0b::t_3c12f8f494e7eb 76,96
+apps/construction-management/components/attendance/labour/labour-recorded-list.tsx
+  s_ec41e28a857a0b::t_9c8b83c6c39be6 176,297,300
+apps/construction-management/components/attendance/labour/labour-sheet-form.ts
+  s_ec41e28a857a0b::t_e5dc486c08a9b0 84
+apps/construction-management/components/labours/import-dialog.stories.tsx
+  s_ec41e28a857a0b::t_6a935b54c88fd4 66,87,101,105,109,123
+apps/construction-management/components/labours/import-dialog.tsx
+  s_ec41e28a857a0b::t_68a32a6a6bbea4 120,122,173,252
+apps/construction-management/components/labours/labour-form-schema.ts
+  s_ec41e28a857a0b::t_892363d3583982 30
+apps/construction-management/components/labours/labour-form.stories.tsx
+  s_ec41e28a857a0b::t_9d55b369ed8a98 101,184,205
+apps/construction-management/components/labours/labours-page.stories.tsx
+  s_ec41e28a857a0b::t_121305443e33f1 148,212
+apps/construction-management/components/labours/labours-page.tsx
+  s_ec41e28a857a0b::t_bb08c78de78dd3 180,304,361,366,400
+apps/construction-management/components/labours/transfer-dialog.stories.tsx
+  s_ec41e28a857a0b::t_66c6ad1562f6cc 106
+apps/construction-management/components/labours/transfer-dialog.tsx
+  s_ec41e28a857a0b::t_bfda6b1ba17cbe 128
+apps/construction-management/components/masters/lookup-screens.ts
+  s_ec41e28a857a0b::t_5b0f46681e875a 25,27,30,32
+apps/construction-management/components/masters/supervisor-dialog.tsx
+  s_ec41e28a857a0b::t_efcd7b86246df7 154-155
+apps/construction-management/components/masters/supervisors-list.tsx
+  s_ec41e28a857a0b::t_b99d2f47644974 85,92,171
+apps/construction-management/components/payments/balances-table.tsx
+  s_ec41e28a857a0b::t_13de91257126e4 75
+apps/construction-management/components/payments/payment-format.ts
+  s_ec41e28a857a0b::t_6cfc5ba55a4270 97
+apps/construction-management/components/payments/payments-list.tsx
+  s_ec41e28a857a0b::t_a52eef8e0bfa23 216
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_ec41e28a857a0b::t_b85f465301768e 67
+apps/construction-management/components/projects/project-labour-tiles.stories.tsx
+  s_ec41e28a857a0b::t_089547d2cdb54b 82,86
+apps/construction-management/components/projects/project-labour-tiles.tsx
+  s_ec41e28a857a0b::t_7521e5941b7997 82,128,187,205
+apps/construction-management/lib/masters-nav.ts
+  s_ec41e28a857a0b::t_20dafe005c0399 77,93,100
+apps/construction-management/src/labour/application/balance-handlers.ts
+  s_ec41e28a857a0b::t_dc358cb4b3870c 200
+apps/construction-management/src/labour/application/labour-attendance-handlers.test.ts
+  s_ec41e28a857a0b::t_e841a2bf4fe25f 105,126,394
+apps/construction-management/src/labour/application/labour-attendance-handlers.ts
+  s_ec41e28a857a0b::t_b9153e2571d7f0 583,652,762,767,785
+apps/construction-management/src/labour/application/labour-handlers.ts
+  s_ec41e28a857a0b::t_1552d429471778 69,429,433,537
+apps/construction-management/src/labour/application/labour-import.ts
+  s_ec41e28a857a0b::t_6d79aae84e59b1 145,150,280
+apps/construction-management/src/labour/application/party-files.ts
+  s_ec41e28a857a0b::t_51ed47d0106af9 82
+apps/construction-management/src/labour/application/wage-payment-handlers.test.ts
+  s_ec41e28a857a0b::t_2e8e1d8e149558 165
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_ec41e28a857a0b::t_13a4ee5283dad8 197
+apps/construction-management/src/labour/domain/labour-attendance.test.ts
+  s_ec41e28a857a0b::t_6f841cbf628ef4 23,96-98,101-105
+apps/construction-management/src/labour/domain/labour-attendance.ts
+  s_ec41e28a857a0b::t_0468779f0950d1 89,102,126,201,209
+apps/construction-management/src/labour/domain/labour.test.ts
+  s_ec41e28a857a0b::t_bb96e51007645f 36
+apps/construction-management/src/labour/domain/labour.ts
+  s_ec41e28a857a0b::t_0152c12fd88f96 110,368
+apps/construction-management/src/labour/domain/ledger.test.ts
+  s_ec41e28a857a0b::t_8454d33b713d29 56
+apps/construction-management/src/labour/infrastructure/labour-attendance-store.ts
+  s_ec41e28a857a0b::t_c8e20a479a57f2 104
+apps/construction-management/src/labour/infrastructure/prisma-labour-repository.ts
+  s_ec41e28a857a0b::t_dce0d60bc20bdf 428
+apps/construction-management/app/app/projects/[id]/reports/page.tsx
+  s_31a5b6f1a389ec::t_be45e2e3b0bbdf 3,7-13,15-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3e536a5c8fde11f3dd77e6f5384f8bfe25e8fbb2",
+  "prompts": {},
+  "sessions": {
+    "s_31a5b6f1a389ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a14231de213b2badf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
