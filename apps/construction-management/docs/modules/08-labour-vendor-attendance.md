@@ -536,6 +536,7 @@ These settle the open questions below for M2. Where this section and the legacy 
 - **Supervisor** is a filter on the marking screen and a snapshot on the row. It is not a permission (open question 13).
 - **Mark Paid Leave** toggles `isPaidLeave` on an On Leave day and reposts its ledger entries.
 - Back-dated guard: `module = labour_attendance`.
+- Re-marking a day re-prices it from the labourer's **current** wages (the day changed, so it is priced again); days that are not re-marked keep their snapshot, and "Mark Paid Leave" alone keeps the snapshot wage (CM-210 build decision).
 
 **Vendors**
 

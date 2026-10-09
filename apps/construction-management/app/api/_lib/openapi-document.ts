@@ -91,6 +91,10 @@ import {
   vendorAttendanceOpenApiOperations,
 } from "@/app/api/construction/labour/attendance/vendors/vendor-attendance-openapi";
 import {
+  labourAttendanceOpenApiComponents,
+  labourAttendanceOpenApiOperations,
+} from "@/app/api/construction/labour/attendance/labour/labour-attendance-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -784,6 +788,10 @@ openApiOperations.push(...labourSummaryOpenApiOperations);
 // Vendor attendance (CM-212, CM-213) lists its own models and routes.
 Object.assign(openApiComponents, vendorAttendanceOpenApiComponents);
 openApiOperations.push(...vendorAttendanceOpenApiOperations);
+
+// Labour attendance (CM-210, CM-211) lists its own models and routes.
+Object.assign(openApiComponents, labourAttendanceOpenApiComponents);
+openApiOperations.push(...labourAttendanceOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

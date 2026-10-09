@@ -1,16 +1,18 @@
-import { CalendarCheck } from "lucide-react";
 import type { Metadata } from "next";
 
-import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
+import { LabourAttendancePage } from "@/components/attendance/labour/labour-attendance-page";
 
 export const metadata: Metadata = { title: "Labour attendance" };
 
-export default function ProjectLabourAttendancePage() {
+export default async function ProjectLabourAttendancePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   return (
-    <PagePlaceholder
-      title="Labour attendance"
-      description="Mark labour attendance for this Project. Arrives with CM-211."
-      icon={CalendarCheck}
-    />
+    <div className="w-full max-w-6xl p-4 sm:p-6">
+      <LabourAttendancePage projectId={id} />
+    </div>
   );
 }
