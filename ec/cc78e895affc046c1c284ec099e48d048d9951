@@ -1,0 +1,79 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_5ee188479ed873 93-96,792-795
+apps/construction-management/app/api/construction/labour/attendance/labour/[id]/paid-leave/route.ts
+  s_ec41e28a857a0b::t_b12a6fe7421c2a 1-66
+apps/construction-management/app/api/construction/labour/attendance/labour/clear/route.ts
+  s_ec41e28a857a0b::t_f5aabfae40c354 1-47
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance-models.ts
+  s_ec41e28a857a0b::t_3e99ae73a0cd0c 1-413
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance-openapi.ts
+  s_ec41e28a857a0b::t_57412eff392452 1-129
+apps/construction-management/app/api/construction/labour/attendance/labour/labour-attendance.http.test.ts
+  s_ec41e28a857a0b::t_71a573c026ce5a 1-740
+apps/construction-management/app/api/construction/labour/attendance/labour/mark/route.ts
+  s_ec41e28a857a0b::t_3ca12ac8279d56 1-60
+apps/construction-management/app/api/construction/labour/attendance/labour/month/route.ts
+  s_ec41e28a857a0b::t_355eb502eda5b0 1-46
+apps/construction-management/app/api/construction/labour/attendance/labour/route.ts
+  s_ec41e28a857a0b::t_819f863ca1b496 1-87
+apps/construction-management/app/api/construction/labour/attendance/labour/sheet/route.ts
+  s_ec41e28a857a0b::t_494fb6490bc23f 1-46
+apps/construction-management/components/attendance/labour/labour-attendance-fixtures.ts
+  s_ec41e28a857a0b::t_4c6a5e85df2db6 1-218
+apps/construction-management/components/attendance/labour/labour-attendance-page.stories.tsx
+  s_ec41e28a857a0b::t_6765f04835b859 1-233
+apps/construction-management/components/attendance/labour/labour-attendance-page.tsx
+  s_ec41e28a857a0b::t_5c3e31320f17a2 1-211
+apps/construction-management/components/attendance/labour/labour-marking-sheet.tsx
+  s_ec41e28a857a0b::t_f48a38c8caf5ad 1-935
+apps/construction-management/components/attendance/labour/labour-month-grid.tsx
+  s_ec41e28a857a0b::t_b35621465f5291 1-215
+apps/construction-management/components/attendance/labour/labour-recorded-list.tsx
+  s_ec41e28a857a0b::t_b8f295ba75d207 1-332
+apps/construction-management/components/attendance/labour/labour-sheet-form.ts
+  s_ec41e28a857a0b::t_311f2e2cb6834d 1-251
+apps/construction-management/docs/modules/08-labour-vendor-attendance.md
+  s_ec41e28a857a0b::t_2ae5df9992e727 539
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_ed6216740b2eb8 282-283,323-326
+apps/construction-management/src/labour/application/labour-attendance-fakes.ts
+  s_ec41e28a857a0b::t_11e165d5ab7e0b 1-316
+apps/construction-management/src/labour/application/labour-attendance-handlers.test.ts
+  s_ec41e28a857a0b::t_5b8bb716c09999 1-406
+apps/construction-management/src/labour/application/labour-attendance-handlers.ts
+  s_ec41e28a857a0b::t_3513eb0c5cadd2 1-1140
+apps/construction-management/src/labour/infrastructure/labour-attendance-store.ts
+  s_ec41e28a857a0b::t_f5ac5eba3c6d1a 1-502
+apps/construction-management/src/queries/labour-attendance.ts
+  s_ec41e28a857a0b::t_686303ba01eab1 1-154
+apps/construction-management/app/api/construction/labour/attendance/labour/handlers.ts
+  s_1f28543a7d6d64::t_ba7af44b9810c8 1-25
+apps/construction-management/src/labour/infrastructure/labour-attendance-factory.ts
+  s_1f28543a7d6d64::t_dfe6944d891105 1-26
+apps/construction-management/app/app/projects/[id]/attendance/labour/page.tsx
+  s_ec41e28a857a0b::t_0aeb9b14b826e7 3,7-12,14-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "eccc78e895affc046c1c284ec099e48d048d9951",
+  "prompts": {},
+  "sessions": {
+    "s_1f28543a7d6d64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4b8b946834351d06",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
