@@ -1,0 +1,43 @@
+.grok/skills/modular-monolith/SKILL.md
+  s_658d3beb79774d::t_7c7d886ed45888 3,8,13,23,57
+AGENTS.md
+  s_658d3beb79774d::t_6ff1fffbf386a8 56,82
+CLAUDE.md
+  s_658d3beb79774d::t_394758f1cb61dd 49
+README.md
+  s_658d3beb79774d::t_2bfad0ced738fe 10-11,38-39,41-42,45-53
+apps/construction-management/README.md
+  s_658d3beb79774d::t_3ac02dbde5efda 11-12
+apps/construction-management/docs/03-target-architecture.md
+  s_658d3beb79774d::t_a684d82cd922b2 60,160-171
+apps/construction-management/docs/adr/CM-0001-app-and-schemas.md
+  s_658d3beb79774d::t_190ca26b5202cb 7-8,17-21,27,62
+apps/construction-management/docs/prd/milestone-kickoff-prompt.md
+  s_658d3beb79774d::t_b8359c4ac3c298 21
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_658d3beb79774d::t_0144186c825c7e 33
+apps/whiteboard/README.md
+  s_658d3beb79774d::t_2bf999d27d88a3 30
+docs/adr/0010-packages-db-is-prisma-only.md
+  s_658d3beb79774d::t_d463c496639f55 3-4
+docs/adr/0030-postgres-schema-per-bounded-context.md
+  s_658d3beb79774d::t_0592523ca82af5 3-4
+docs/adr/0040-one-database-package-per-product.md
+  s_658d3beb79774d::t_c2280db6e62fcb 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a5b8d036916fc37aa99580124331ab1894863d8e",
+  "prompts": {},
+  "sessions": {
+    "s_658d3beb79774d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "423aa90c-e096-40cc-9ba4-c4602a56bf8f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
