@@ -55,10 +55,13 @@ export function formatPaise(paise: number): string {
 
 /**
  * A rupee amount field: `₹` prefix, decimal keypad on phones. The form keeps
- * rupees as text; convert with `rupeesToPaise` when sending.
+ * rupees as text; convert with `rupeesToPaise` when sending. Focusing it
+ * selects the amount, so typing replaces a default `0` instead of making it
+ * `0120`.
  */
 export function MoneyInput({
   className,
+  onFocus,
   ...props
 }: Omit<ComponentProps<typeof InputGroupInput>, "type" | "inputMode">) {
   return (
@@ -70,6 +73,10 @@ export function MoneyInput({
         type="text"
         inputMode="decimal"
         autoComplete="off"
+        onFocus={(event) => {
+          event.currentTarget.select();
+          onFocus?.(event);
+        }}
         {...props}
       />
     </InputGroup>
