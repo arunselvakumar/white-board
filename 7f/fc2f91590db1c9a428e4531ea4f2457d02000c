@@ -1,0 +1,19 @@
+.github/workflows/storybook-stress.yml
+  s_3326055b33eb36::t_9d88d9a954b7c1 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7ffc2f91590db1c9a428e4531ea4f2457d02000c",
+  "prompts": {},
+  "sessions": {
+    "s_3326055b33eb36": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4899bfd-f616-41e6-b788-e07127b32e5c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
