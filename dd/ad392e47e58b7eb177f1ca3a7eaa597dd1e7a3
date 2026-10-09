@@ -1,0 +1,21 @@
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_6497dd4ebf3e73::t_48fc6355c7ae26 760
+apps/construction-management/components/projects/project-form.tsx
+  s_6497dd4ebf3e73::t_48eab6dc9773a2 564-565
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ddad392e47e58b7eb177f1ca3a7eaa597dd1e7a3",
+  "prompts": {},
+  "sessions": {
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
