@@ -1,11 +1,12 @@
 import type {
   LabourAttendanceDay,
+  LabourAttendanceList,
   LabourAttendanceMonth,
   LabourSheet,
   LabourSheetRow,
 } from "@/src/queries/labour-attendance";
 
-/** Story data for labour attendance (CM-211). */
+/** Story data for labour attendance (CM-211, times CM-220). */
 
 export const PROJECT_ID = "019a0000-0000-7000-8000-000000000001";
 export const DATE = "2026-10-08";
@@ -34,6 +35,11 @@ function day(
     isPaidLeave: false,
     shift: "General",
     supervisor: { id: SUNDAR, name: "Sundar" },
+    checkIn: null,
+    checkOut: null,
+    breakMinutes: null,
+    workingHours: "8",
+    workedHours: null,
     wageType: "daily",
     wageRate: 70_000,
     earned: 70_000,
@@ -63,6 +69,7 @@ function row(
     wagePerDay: 70_000,
     wagePerMonth: null,
     overtimeWagePerHour: 10_000,
+    workingHoursPerDay: "8",
     canMark: true,
     isActive: true,
     onProject: true,
@@ -75,7 +82,28 @@ function row(
 }
 
 export const DHURESH_SAVED = day(DHURESH, "Dhuresh Nawin");
-export const ANBU_SAVED = day(ANBU, "Anbu Selvan", { shift: null });
+
+/** 08:00–19:00 with the hour's break: 10 h worked, 2 h from the times. */
+export const ANBU_SAVED = day(ANBU, "Anbu Selvan", {
+  shift: null,
+  checkIn: "08:00",
+  checkOut: "19:00",
+  breakMinutes: 60,
+  workedHours: "10",
+  overtime: [
+    {
+      labourCategoryId: MASON,
+      labourCategoryName: "Mason",
+      hours: "2",
+      ratePerHour: 10_000,
+      amount: 20_000,
+      fromTimes: true,
+    },
+  ],
+  overtimeHours: "2",
+  overtimeAmount: 20_000,
+  total: 90_000,
+});
 
 export const SHEET: LabourSheet = {
   projectId: PROJECT_ID,
@@ -91,7 +119,14 @@ export const SHEET: LabourSheet = {
     row(DHURESH, "Dhuresh Nawin", {
       labourCode: "L-07",
       attendance: DHURESH_SAVED,
-      yesterday: { status: "present", isPaidLeave: false, shift: "General" },
+      yesterday: {
+        status: "present",
+        isPaidLeave: false,
+        shift: "General",
+        checkIn: "09:00",
+        checkOut: "18:00",
+        breakMinutes: 60,
+      },
     }),
     row(KAVITHA, "Kavitha Murugan", {
       wageType: "monthly",
@@ -99,7 +134,14 @@ export const SHEET: LabourSheet = {
       wagePerMonth: 3_100_000,
       overtimeWagePerHour: 15_000,
       suggestedStatus: "half_day",
-      yesterday: { status: "half_day", isPaidLeave: false, shift: "Shift 1" },
+      yesterday: {
+        status: "half_day",
+        isPaidLeave: false,
+        shift: "Shift 1",
+        checkIn: "09:00",
+        checkOut: "13:30",
+        breakMinutes: 0,
+      },
     }),
   ],
   labourCategories: [{ id: MASON, name: "Mason" }],
@@ -112,7 +154,7 @@ export const SHEET: LabourSheet = {
     onLeave: 0,
     holiday: 0,
     earned: 140_000,
-    overtimeAmount: 0,
+    overtimeAmount: 20_000,
   },
 };
 
@@ -120,7 +162,57 @@ export const EMPTY_SHEET: LabourSheet = {
   ...SHEET,
   labourers: [],
   supervisors: [],
-  totals: { ...SHEET.totals, marked: 0, present: 0, earned: 0 },
+  totals: {
+    ...SHEET.totals,
+    marked: 0,
+    present: 0,
+    earned: 0,
+    overtimeAmount: 0,
+  },
+};
+
+/**
+ * Recorded days: one with times and overtime from them, a night shift that
+ * ends the next day, a short Half Day, and days without times.
+ */
+export const RECORDED: LabourAttendanceList = {
+  items: [
+    ANBU_SAVED,
+    day(KAVITHA, "Kavitha Murugan", {
+      id: "019a0000-0000-7000-8000-0000000003e2",
+      status: "half_day",
+      shift: "Shift 1",
+      checkIn: "09:00",
+      checkOut: "13:30",
+      breakMinutes: 0,
+      workedHours: "4.5",
+      wageType: "monthly",
+      wageRate: 3_100_000,
+      earned: 50_000,
+      total: 50_000,
+    }),
+    day(MURUGAN, "Murugan Ganesan", {
+      id: "019a0000-0000-7000-8000-0000000003e3",
+      shift: "Shift 3",
+      checkIn: "21:00",
+      checkOut: "06:00",
+      breakMinutes: 30,
+      workedHours: "8.5",
+      supervisor: null,
+    }),
+    DHURESH_SAVED,
+    day(DHURESH, "Dhuresh Nawin", {
+      id: "019a0000-0000-7000-8000-0000000003e1",
+      date: "2026-10-07",
+      status: "absent",
+      shift: null,
+      earned: 0,
+      total: 0,
+    }),
+  ],
+  nextCursor: null,
+  prevCursor: null,
+  total: 5,
 };
 
 const zero = {
