@@ -1,0 +1,39 @@
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_bb60ced25b0bff::t_9440cf141ea098 3,11,14,35-41,50-51,59,70-73,108-129,132,134
+apps/construction-management/components/projects/projects-home.tsx
+  s_bb60ced25b0bff::t_699d4fd8d1bbcb 4-14,68-140,146,148,151,155-169,172-178,180,183,186,188-193,200-201,213-214,237-248,250,252-309
+apps/marketing/components/fees-section.tsx
+  s_bb60ced25b0bff::t_77e02ebdd8a2ee 131,133,210
+apps/whiteboard/app/(app)/page.stories.tsx
+  s_bb60ced25b0bff::t_a0dd5104922fa5 47
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_bb60ced25b0bff::t_ffa2cc267d2012 195,203,207,218
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_bb60ced25b0bff::t_ee1c18a42c8f69 4,34-36,47-48,59-61,63,71-73,87,101,106,108-116,131
+apps/whiteboard/components/app-shell/theme-toggle.tsx
+  s_bb60ced25b0bff::t_212d9a9ea0df3e 13,15,17
+apps/whiteboard/components/dashboard/owner-dashboard-screen.tsx
+  s_bb60ced25b0bff::t_d8e8cc88a94a78 34-36
+apps/whiteboard/components/dashboard/owner-dashboard.stories.tsx
+  s_bb60ced25b0bff::t_66e37acefe005d 41,108
+apps/whiteboard/components/dashboard/owner-dashboard.tsx
+  s_bb60ced25b0bff::t_3873ed70486fcf 4-18,20,22-25,28-140,149,158,160-161,163-178,180-185,187-231,233-324,326-330,332-337,341-347,349,353-389,391-399,401
+packages/ui/src/styles/globals.css
+  s_bb60ced25b0bff::t_698de472dca007 34-36,38-41,68-72,74-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a540a327797ee0247e8c01653782223ed6022071",
+  "prompts": {},
+  "sessions": {
+    "s_bb60ced25b0bff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f499a6f7-38c8-4c12-ba8c-83f7c7656605",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
