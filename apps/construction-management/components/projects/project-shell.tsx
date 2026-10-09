@@ -17,6 +17,7 @@ import { ProjectStatusBadge, projectDates } from "./project-status";
 /** The Project's sections; later tickets fill Attendance, Payments, Reports. */
 export const PROJECT_TABS = [
   { segment: "", label: "Overview" },
+  { segment: "documents", label: "Documents" },
   { segment: "attendance", label: "Attendance" },
   { segment: "payments", label: "Payments" },
   { segment: "reports", label: "Reports" },
