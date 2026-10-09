@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { checkDocumentFile } from "@/lib/project-documents";
+import { QueryHttpError } from "@/src/queries/http";
 import type { ProjectDocumentKind } from "@/src/projects/domain/project-document-rules";
 import {
   isUploadCancelled,
@@ -18,7 +19,16 @@ export type DocumentUpload = {
   progress: number;
   state: "uploading" | "done" | "error";
   error?: string;
+  /** False when trying the same bytes again cannot help. */
+  retryable?: boolean;
 };
+
+/** The server refused the file itself: a program, too big, or empty. */
+const FINAL_CODES = new Set([
+  "FILE_TYPE_NOT_ALLOWED",
+  "FILE_TOO_LARGE",
+  "FILE_EMPTY",
+]);
 
 /**
  * Files going up to one Project, each with its own progress, error and
@@ -64,7 +74,13 @@ export function useDocumentUploads(projectId: string) {
         patch(id, { state: "done", progress: 100 });
       } catch (error) {
         if (isUploadCancelled(error)) return;
-        patch(id, { state: "error", error: uploadErrorMessage(error) });
+        patch(id, {
+          state: "error",
+          error: uploadErrorMessage(error),
+          retryable: !(
+            error instanceof QueryHttpError && FINAL_CODES.has(error.code)
+          ),
+        });
       } finally {
         controllers.current.delete(id);
       }
@@ -122,5 +138,9 @@ export function useDocumentUploads(projectId: string) {
 
 /** Whether a file can be retried (a refused program or size cannot). */
 export function canRetry(upload: DocumentUpload): boolean {
-  return upload.state === "error" && checkDocumentFile(upload.file) == null;
+  return (
+    upload.state === "error" &&
+    upload.retryable !== false &&
+    checkDocumentFile(upload.file) == null
+  );
 }
