@@ -1,0 +1,87 @@
+apps/construction-management/app/api/construction/labour/attendance/vendors/[id]/clear/route.ts
+  s_ec41e28a857a0b::t_d9770c547360ae 1-63
+apps/construction-management/app/api/construction/labour/attendance/vendors/day/route.ts
+  s_ec41e28a857a0b::t_d72e4ad2e2fd35 1-46
+apps/construction-management/app/api/construction/labour/attendance/vendors/handlers.ts
+  s_ec41e28a857a0b::t_ae7b2de2191a4c 1-13
+apps/construction-management/app/api/construction/labour/attendance/vendors/month/route.ts
+  s_ec41e28a857a0b::t_ee3aa51e2a2440 1-46
+apps/construction-management/app/api/construction/labour/attendance/vendors/overtime/route.ts
+  s_ec41e28a857a0b::t_901eb43fec35fa 1-44
+apps/construction-management/app/api/construction/labour/attendance/vendors/record/route.ts
+  s_ec41e28a857a0b::t_efb56507d455a9 1-68
+apps/construction-management/app/api/construction/labour/attendance/vendors/route.ts
+  s_ec41e28a857a0b::t_e7cb6ab99eed2c 1-56
+apps/construction-management/app/api/construction/labour/attendance/vendors/vendor-attendance-models.ts
+  s_ec41e28a857a0b::t_7744711e764322 1-369
+apps/construction-management/app/api/construction/labour/attendance/vendors/vendor-attendance-openapi.ts
+  s_ec41e28a857a0b::t_51ebbf504df0f3 1-127
+apps/construction-management/app/api/construction/labour/attendance/vendors/vendor-attendance.http.test.ts
+  s_ec41e28a857a0b::t_d6442d33f80e7d 1-634
+apps/construction-management/app/app/projects/[id]/attendance/attendance-tabs.tsx
+  s_ec41e28a857a0b::t_aa47fed69e30b2 1-43
+apps/construction-management/app/app/projects/[id]/attendance/labour/page.tsx
+  s_ec41e28a857a0b::t_36d080b2171f7c 1-16
+apps/construction-management/app/app/projects/[id]/attendance/layout.tsx
+  s_ec41e28a857a0b::t_ff0eed5d2ee53b 1-22
+apps/construction-management/app/app/projects/[id]/attendance/page.tsx
+  s_ec41e28a857a0b::t_b9acc64b9af4e9 1,3-10
+apps/construction-management/app/app/projects/[id]/attendance/vendors/page.tsx
+  s_ec41e28a857a0b::t_c230f697fc0b4b 1-18
+apps/construction-management/components/attendance/vendor/vendor-attendance-fixtures.ts
+  s_ec41e28a857a0b::t_5d16364dcb3d6c 1-277
+apps/construction-management/components/attendance/vendor/vendor-attendance-page.stories.tsx
+  s_ec41e28a857a0b::t_a25c313f6e0322 1-313
+apps/construction-management/components/attendance/vendor/vendor-attendance-page.tsx
+  s_ec41e28a857a0b::t_fdd6ad1a3b3bdb 1-211
+apps/construction-management/components/attendance/vendor/vendor-day-card.tsx
+  s_ec41e28a857a0b::t_702a4a85ee898d 1-462
+apps/construction-management/components/attendance/vendor/vendor-day-form.ts
+  s_ec41e28a857a0b::t_f287189f112383 1-184
+apps/construction-management/components/attendance/vendor/vendor-month-view.tsx
+  s_ec41e28a857a0b::t_c47b49df9f3d9c 1-235
+apps/construction-management/components/attendance/vendor/vendor-overtime-view.tsx
+  s_ec41e28a857a0b::t_e5c403583b88d2 1-165
+apps/construction-management/docs/modules/08-labour-vendor-attendance.md
+  s_ec41e28a857a0b::t_9227c0d3aebb07 544
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_0272cfdb37a21d 282-283,325-343
+apps/construction-management/src/labour/application/vendor-attendance-fakes.ts
+  s_ec41e28a857a0b::t_be8e5194a623a2 1-254
+apps/construction-management/src/labour/application/vendor-attendance-handlers.test.ts
+  s_ec41e28a857a0b::t_4857072a0c462e 1-541
+apps/construction-management/src/labour/application/vendor-attendance-handlers.ts
+  s_ec41e28a857a0b::t_ad7c16583a80e0 1-836
+apps/construction-management/src/labour/infrastructure/vendor-attendance-store.ts
+  s_ec41e28a857a0b::t_007968b8c42474 1-370
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_498b95e5cf9535::t_1677d85c3daf37 85-88,776-779
+apps/construction-management/src/labour/infrastructure/vendor-attendance-factory.ts
+  s_498b95e5cf9535::t_0728a3c04a7b44 1-27
+apps/construction-management/src/queries/vendor-attendance.ts
+  s_498b95e5cf9535::t_c0cb023f935f57 1-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "22f34a2206d8b6606d7053e95f5d0a93eed99cb6",
+  "prompts": {},
+  "sessions": {
+    "s_498b95e5cf9535": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac06296bf98678c51",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
