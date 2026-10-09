@@ -1,0 +1,21 @@
+CONTEXT.md
+  s_1efebd1241fd66::t_b92b8e49333d33 143-150
+docs/adr/0039-fee-dues-follow-up-product-decisions.md
+  s_1efebd1241fd66::t_4730ab237d4636 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c9a9dc6b3466644c3dbd601eef7556403926ebf8",
+  "prompts": {},
+  "sessions": {
+    "s_1efebd1241fd66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d12237a7-64c5-41e1-90e1-d36543c90069",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
