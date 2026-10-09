@@ -1,0 +1,61 @@
+apps/construction-management/app/api/construction/reporting/reports/reports.http.test.ts
+  s_ec41e28a857a0b::t_b434f7dd2d24c8 7-12,30-34,698-810
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_ec41e28a857a0b::t_b7ba9f0369b646 28-35
+apps/construction-management/components/reports/report-fixtures.ts
+  s_ec41e28a857a0b::t_413bb099c14e4b 52-63
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_ec41e28a857a0b::t_c4610c8a531f51 18,147-172
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_ec41e28a857a0b::t_29b344f6a48cf4 370-372
+apps/construction-management/next.config.ts
+  s_ec41e28a857a0b::t_8cee3b8ae79a2d 26-31
+apps/construction-management/package.json
+  s_ec41e28a857a0b::t_a6105efb91feb3 19-28,30,46
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_ec41e28a857a0b::t_f2b040b7fd4b70 6,134-137,155,282-346
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_ec41e28a857a0b::t_3bbef15f81acca 9,127-131,136,187-189,192
+apps/construction-management/src/reporting/domain/report-job.test.ts
+  s_ec41e28a857a0b::t_8ead526e00e90c 1-86
+apps/construction-management/src/reporting/infrastructure/pdf-fonts.ts
+  s_ec41e28a857a0b::t_13b79f196c15c0 1-201
+apps/construction-management/src/reporting/infrastructure/pdf-inspect.ts
+  s_ec41e28a857a0b::t_4b91768d080acb 1-97
+apps/construction-management/src/reporting/infrastructure/pdf-report.test.ts
+  s_ec41e28a857a0b::t_13743c370e375a 1-160
+apps/construction-management/src/reporting/infrastructure/pdf-report.ts
+  s_ec41e28a857a0b::t_66475c0fad6f0f 6,15-21,36-46,48-51,53-161,203,213-228,236,254,258,271-275,279-280,295,305,309,325-327,330,343,345,357-362,364-365,369,400,427-430,433-434,436-442,444-449,454-515,520-521,525-526,528-531
+apps/construction-management/src/reporting/infrastructure/script-runs.test.ts
+  s_ec41e28a857a0b::t_a90015d396766e 1-110
+apps/construction-management/src/reporting/infrastructure/script-runs.ts
+  s_ec41e28a857a0b::t_97e7f30c780716 1-105
+bun.lock
+  s_ec41e28a857a0b::t_6d6960fbae7711 20-29,31,47,465-484,683-684,2013-2014
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_4ff4d7f7574dc4::t_f251196cd22923 67-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f7bcdf543448031e05a9251799e11b014532e37a",
+  "prompts": {},
+  "sessions": {
+    "s_4ff4d7f7574dc4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a0c66c2e654ef2ef7",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
