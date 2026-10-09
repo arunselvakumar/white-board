@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ChevronDown,
   ClipboardCopy,
+  Clock,
   Plus,
   Search,
   Trash2,
@@ -55,6 +56,7 @@ import {
 
 import {
   isRowDirty,
+  isTimedStatus,
   labourMarkPayload,
   labourSheetDefaults,
   labourSheetFormSchema,
@@ -64,8 +66,16 @@ import {
   SHIFT_OPTIONS,
   STATUS_LABELS,
   STATUS_OPTIONS,
+  TIMES_FIELDS,
+  withStatus,
+  withTimes,
+  withYesterday,
+  type LabourRowDraft,
   type LabourSheetFormValues,
+  type TimesField,
+  type TimesPatch,
 } from "./labour-sheet-form";
+import { RowTimes, SetTimesDialog, workingDayLabel } from "./labour-times";
 
 const ALL = "all";
 const NO_CATEGORY = "none";
@@ -77,7 +87,30 @@ function categoryValue(id: string | undefined): string {
 type Form = {
   control: Control<LabourSheetFormValues>;
   setValue: UseFormSetValue<LabourSheetFormValues>;
+  /** Replace a row's draft through a pure change (status, times, yesterday). */
+  apply: (
+    index: number,
+    change: (draft: LabourRowDraft) => LabourRowDraft,
+  ) => void;
 };
+
+/** A row's error: from the server (`details.labourId`) or the form check. */
+type RowError = { message: string; field?: TimesField };
+
+function isTimesField(value: unknown): value is TimesField {
+  return TIMES_FIELDS.some((field) => field === value);
+}
+
+/** Decimal hours of the row's overtime lines, for the OT button. */
+function overtimeTotal(draft: LabourRowDraft): string | null {
+  let hundredths = 0;
+  for (const line of draft.overtime) {
+    const hours = Number(line.hours);
+    if (line.hours.trim() !== "" && Number.isFinite(hours))
+      hundredths += Math.round(hours * 100);
+  }
+  return hundredths > 0 ? String(hundredths / 100) : null;
+}
 
 function SimpleSelect({
   label,
@@ -169,6 +202,13 @@ function OvertimeLines({
           key={field.id}
           className="grid grid-cols-2 gap-2 sm:grid-cols-[minmax(8rem,1fr)_6rem_8rem_auto] sm:items-end"
         >
+          {lines[line]?.fromTimes === true ? (
+            <p className="text-muted-foreground col-span-2 flex flex-wrap items-center gap-2 text-xs sm:col-span-4">
+              <Badge variant="secondary">From times</Badge>
+              Follows check-in and check-out. Change the hours to set them
+              yourself.
+            </p>
+          ) : null}
           <div className="col-span-2 space-y-1 sm:col-span-1">
             <Label className="text-xs">Labour Category</Label>
             <SimpleSelect
@@ -203,6 +243,13 @@ function OvertimeLines({
                   event.target.value,
                   { shouldDirty: true },
                 );
+                // Typed hours no longer follow the times (ADR CM-0011).
+                if (lines[line]?.fromTimes === true)
+                  form.setValue(
+                    `rows.${index}.overtime.${line}.fromTimes`,
+                    false,
+                    { shouldDirty: true },
+                  );
               }}
             />
           </div>
@@ -272,6 +319,9 @@ function ReadOnlyRow({ row }: { row: LabourSheetRow }) {
         <span className="text-sm">
           {STATUS_LABELS[day.status]}
           {day.isPaidLeave ? " (paid)" : ""}
+          {day.checkIn == null
+            ? ""
+            : ` · ${day.checkIn}–${day.checkOut ?? "…"}`}
           {Number(day.overtimeHours) > 0 ? ` · ${day.overtimeHours} h OT` : ""}
           {day.total == null ? "" : ` · ${formatPaise(day.total)}`}
         </span>
@@ -299,7 +349,7 @@ function SheetRow({
   financial: boolean;
   selected: boolean;
   onSelect: (on: boolean) => void;
-  error: string | undefined;
+  error: RowError | undefined;
 }) {
   const draft = useWatch({ control: form.control, name: `rows.${index}` });
   const [open, setOpen] = useState(
@@ -307,13 +357,16 @@ function SheetRow({
   );
   const dirty = isRowDirty(row, draft);
   const preview = financial ? previewEarned(row, draft, date) : null;
+  const timed = isTimedStatus(draft.status);
+  const overtimeHours = overtimeTotal(draft);
   const setStatus = (status: AttendanceStatus) => {
-    form.setValue(`rows.${index}.status`, status, { shouldDirty: true });
-    if (status === "absent")
-      form.setValue(`rows.${index}.overtime`, [], { shouldDirty: true });
-    if (status !== "on_leave")
-      form.setValue(`rows.${index}.isPaidLeave`, false, { shouldDirty: true });
+    form.apply(index, (current) => withStatus(row, current, status));
   };
+  const setTimes = (patch: TimesPatch) => {
+    form.apply(index, (current) => withTimes(row, current, patch));
+  };
+  // A field error shows on the field; anything else under the row.
+  const onField = error?.field != null && timed;
   const shiftItems = [
     { value: NO_SHIFT, label: "No shift" },
     ...SHIFT_OPTIONS.map((shift) => ({ value: shift, label: shift })),
@@ -334,7 +387,7 @@ function SheetRow({
         error != null && "border-destructive",
       )}
     >
-      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[auto_minmax(10rem,1fr)_auto_9rem_auto] lg:items-center">
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[auto_minmax(10rem,1fr)_auto_9rem_12rem] lg:items-center">
         <div className="flex items-start gap-3 lg:contents">
           <Checkbox
             aria-label={`Select ${row.name}`}
@@ -366,6 +419,7 @@ function SheetRow({
                 row.labourCategory?.name,
                 row.supervisor?.name,
                 row.wageType === "monthly" ? "Monthly" : "Daily",
+                workingDayLabel(row),
               ]
                 .filter(Boolean)
                 .join(" · ")}
@@ -404,6 +458,21 @@ function SheetRow({
           ))}
         </ToggleGroup>
 
+        {timed ? (
+          <div className="lg:col-span-3 lg:col-start-3 lg:row-start-2">
+            <RowTimes
+              row={row}
+              draft={draft}
+              serverError={
+                error?.field == null
+                  ? undefined
+                  : { field: error.field, message: error.message }
+              }
+              onChange={setTimes}
+            />
+          </div>
+        ) : null}
+
         <SimpleSelect
           label={`${row.name} shift`}
           value={draft.shift === "" ? NO_SHIFT : draft.shift}
@@ -419,11 +488,12 @@ function SheetRow({
           }}
         />
 
-        <div className="flex flex-wrap items-center gap-2">
+        {/* A fixed column on desktop, so every row's status lines up. */}
+        <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
           <Button
             type="button"
             variant="outline"
-            className="h-11"
+            className="h-11 min-w-20 justify-between"
             aria-expanded={open}
             aria-label={`${row.name} overtime`}
             disabled={draft.status === "absent"}
@@ -432,16 +502,14 @@ function SheetRow({
             }}
           >
             OT
-            {draft.overtime.length > 0
-              ? ` (${String(draft.overtime.length)})`
-              : ""}
+            {overtimeHours == null ? "" : ` ${overtimeHours} h`}
             <ChevronDown
               className={cn("transition-transform", open && "rotate-180")}
             />
           </Button>
           {preview == null ? null : (
             <span
-              className="text-sm font-medium tabular-nums"
+              className="text-sm font-medium tabular-nums lg:ml-auto"
               aria-label={`${row.name} earns`}
             >
               {formatPaise(preview)}
@@ -475,9 +543,9 @@ function SheetRow({
         />
       ) : null}
 
-      {error == null ? null : (
+      {error == null || onField ? null : (
         <p role="alert" className="text-destructive text-sm">
-          {error}
+          {error.message}
         </p>
       )}
     </li>
@@ -565,11 +633,20 @@ function labourIdOf(details: unknown): string | null {
   return null;
 }
 
+/** `details.field` when it names one of the row's time fields. */
+function timesFieldOf(details: unknown): TimesField | undefined {
+  if (details != null && typeof details === "object" && "field" in details)
+    return isTimesField(details.field) ? details.field : undefined;
+  return undefined;
+}
+
 /**
  * The marking sheet for one date (CM-211): a row per labourer with status
- * buttons, Paid Leave on Leave, shift and overtime lines; multi-select bulk
- * marks, "Mark all present" and "Copy yesterday". Save sends only the rows
- * that changed, each with its loaded `updatedAt`.
+ * buttons, Paid Leave on Leave, shift and overtime lines; check-in,
+ * check-out and break on Present / Half Day with overtime from the times
+ * (CM-220, ADR CM-0011); multi-select bulk marks and "Set times", "Mark all
+ * present" and "Copy yesterday". Save sends only the rows that changed, each
+ * with its loaded `updatedAt`.
  */
 export function LabourMarkingSheet({
   projectId,
@@ -588,15 +665,36 @@ export function LabourMarkingSheet({
       resolver: zodResolver(labourSheetFormSchema),
       defaultValues: labourSheetDefaults(sheet),
     });
-  const form: Form = { control, setValue };
+  const apply: Form["apply"] = (index, change) => {
+    const before = getValues(`rows.${index}`);
+    const after = change(before);
+    const dirty = { shouldDirty: true };
+    if (after.status !== before.status)
+      setValue(`rows.${index}.status`, after.status, dirty);
+    if (after.isPaidLeave !== before.isPaidLeave)
+      setValue(`rows.${index}.isPaidLeave`, after.isPaidLeave, dirty);
+    if (after.shift !== before.shift)
+      setValue(`rows.${index}.shift`, after.shift, dirty);
+    if (after.checkIn !== before.checkIn)
+      setValue(`rows.${index}.checkIn`, after.checkIn, dirty);
+    if (after.checkOut !== before.checkOut)
+      setValue(`rows.${index}.checkOut`, after.checkOut, dirty);
+    if (after.breakMinutes !== before.breakMinutes)
+      setValue(`rows.${index}.breakMinutes`, after.breakMinutes, dirty);
+    if (JSON.stringify(after.overtime) !== JSON.stringify(before.overtime))
+      setValue(`rows.${index}.overtime`, after.overtime, dirty);
+  };
+  const form: Form = { control, setValue, apply };
   const rows = useWatch({ control, name: "rows" });
   const mark = useMarkLabourDay();
   const [search, setSearch] = useState("");
   const [supervisorId, setSupervisorId] = useState(ALL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+  const [rowErrors, setRowErrors] = useState<Record<string, RowError>>({});
   const [formError, setFormError] = useState<string>();
   const [clearing, setClearing] = useState(false);
+  const [settingTimes, setSettingTimes] = useState(false);
+  const [notice, setNotice] = useState<string>();
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -619,6 +717,12 @@ export function LabourMarkingSheet({
     selected.has(row.labourId),
   );
   const selectedSaved = selectedRows.filter((row) => row.attendance != null);
+  const selectedIndexes = sheet.labourers.flatMap((row, index) =>
+    row.canMark && selected.has(row.labourId) ? [index] : [],
+  );
+  const timedIndexes = selectedIndexes.filter((index) =>
+    isTimedStatus(rows[index]?.status ?? ""),
+  );
   const allSelected =
     markable.length > 0 &&
     markable.every(({ row }) => selected.has(row.labourId));
@@ -627,11 +731,8 @@ export function LabourMarkingSheet({
   );
 
   const setStatusAt = (index: number, status: AttendanceStatus) => {
-    setValue(`rows.${index}.status`, status, { shouldDirty: true });
-    if (status === "absent")
-      setValue(`rows.${index}.overtime`, [], { shouldDirty: true });
-    if (status !== "on_leave")
-      setValue(`rows.${index}.isPaidLeave`, false, { shouldDirty: true });
+    const row = sheet.labourers[index];
+    if (row != null) apply(index, (draft) => withStatus(row, draft, status));
   };
 
   const bulk = (status: AttendanceStatus) => {
@@ -659,7 +760,12 @@ export function LabourMarkingSheet({
           if (failure instanceof QueryHttpError) {
             const labourId = labourIdOf(failure.details);
             if (labourId != null) {
-              setRowErrors({ [labourId]: failure.message });
+              setRowErrors({
+                [labourId]: {
+                  message: failure.message,
+                  field: timesFieldOf(failure.details),
+                },
+              });
               const name =
                 sheet.labourers.find((row) => row.labourId === labourId)
                   ?.name ?? "a Labour";
@@ -674,28 +780,40 @@ export function LabourMarkingSheet({
       });
     },
     (errors) => {
-      const found: Record<string, string> = {};
+      const found: Record<string, RowError> = {};
       const values = getValues();
       type LineError = {
         hours?: { message?: string };
         rate?: { message?: string };
       };
-      type RowError = {
+      type FieldErrors = {
         overtime?: { message?: string } & Partial<Record<number, LineError>>;
-      };
-      const rowErrors = (errors.rows ?? []) as unknown as Partial<
-        Record<number, RowError>
+      } & Partial<Record<TimesField, { message?: string }>>;
+      const fieldErrors = (errors.rows ?? []) as unknown as Partial<
+        Record<number, FieldErrors>
       >;
       values.rows.forEach((draft, index) => {
-        const rowError = rowErrors[index];
+        const rowError = fieldErrors[index];
         if (rowError == null) return;
+        const field = TIMES_FIELDS.find(
+          (name) => rowError[name]?.message != null,
+        );
+        if (field != null) {
+          found[draft.labourId] = {
+            message: rowError[field]?.message ?? "Check the times.",
+            field,
+          };
+          return;
+        }
         const lines = draft.overtime.map((_, at) => rowError.overtime?.[at]);
         const line = lines.find((item) => item != null);
-        found[draft.labourId] =
-          rowError.overtime?.message ??
-          line?.hours?.message ??
-          line?.rate?.message ??
-          "Check this row.";
+        found[draft.labourId] = {
+          message:
+            rowError.overtime?.message ??
+            line?.hours?.message ??
+            line?.rate?.message ??
+            "Check this row.",
+        };
       });
       setRowErrors(found);
       setFormError("Some rows need fixing.");
@@ -765,17 +883,7 @@ export function LabourMarkingSheet({
                     row.isWeeklyHoliday
                   )
                     continue;
-                  setStatusAt(index, row.yesterday.status);
-                  setValue(
-                    `rows.${index}.isPaidLeave`,
-                    row.yesterday.isPaidLeave,
-                    {
-                      shouldDirty: true,
-                    },
-                  );
-                  setValue(`rows.${index}.shift`, row.yesterday.shift ?? "", {
-                    shouldDirty: true,
-                  });
+                  apply(index, (draft) => withYesterday(row, draft));
                 }
               }}
             >
@@ -841,6 +949,17 @@ export function LabourMarkingSheet({
             >
               Mark selected Holiday
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                setNotice(undefined);
+                setSettingTimes(true);
+              }}
+            >
+              <Clock /> Set times
+            </Button>
             {selectedSaved.length > 0 ? (
               <Button
                 type="button"
@@ -860,6 +979,7 @@ export function LabourMarkingSheet({
           className="text-muted-foreground ml-auto text-sm"
           aria-live="polite"
         >
+          {notice == null ? "" : `${notice} · `}
           {sheet.totals.marked} saved
           {dirtyCount > 0 ? ` · ${String(dirtyCount)} unsaved` : ""}
           {sheet.totals.earned == null
@@ -916,6 +1036,25 @@ export function LabourMarkingSheet({
               : "Save"}
         </Button>
       </div>
+
+      <SetTimesDialog
+        open={settingTimes}
+        onOpenChange={setSettingTimes}
+        eligible={timedIndexes.length}
+        skipped={selectedIndexes.length - timedIndexes.length}
+        onApply={(patch) => {
+          for (const index of timedIndexes) {
+            const row = sheet.labourers[index];
+            if (row != null)
+              apply(index, (draft) => withTimes(row, draft, patch));
+          }
+          const skipped = selectedIndexes.length - timedIndexes.length;
+          setNotice(
+            `Times set for ${String(timedIndexes.length)} Labour${timedIndexes.length === 1 ? "" : "s"}${skipped > 0 ? `, ${String(skipped)} skipped` : ""}`,
+          );
+          setSettingTimes(false);
+        }}
+      />
 
       <ClearDayDialog
         open={clearing}
