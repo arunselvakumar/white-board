@@ -23,7 +23,7 @@ function supervisor(
   return Supervisor.create({
     id: "0199a1b2-0000-7000-8000-000000000010",
     workspaceId: "ws_1",
-    name: " Raju  Mukadam ",
+    name: " Rakesh  Mirtha ",
     by: "user_1",
     now: NOW,
     ...input,
@@ -33,12 +33,12 @@ function supervisor(
 describe("Supervisor", () => {
   it("keeps a name, an E.164 mobile and an optional Team Member", () => {
     const made = supervisor({
-      mobile: "98765 43210",
+      mobile: "77081 65767",
       teamMemberId: "0199a1b2-0000-7000-8000-0000000000aa",
     });
     expect(made.snapshot()).toEqual({
-      name: "Raju Mukadam",
-      mobile: "+919876543210",
+      name: "Rakesh Mirtha",
+      mobile: "+917708165767",
       teamMemberId: "0199a1b2-0000-7000-8000-0000000000aa",
       disabled: false,
     });
@@ -59,10 +59,10 @@ describe("Supervisor", () => {
   });
 
   it("updates, disables, enables and deletes", () => {
-    const made = supervisor({ mobile: "+919876543210" });
-    made.update({ name: "Raju", mobile: null }, "user_2", LATER);
+    const made = supervisor({ mobile: "+917708165767" });
+    made.update({ name: "Dhuresh", mobile: null }, "user_2", LATER);
     expect(made.snapshot()).toEqual({
-      name: "Raju",
+      name: "Dhuresh",
       mobile: null,
       teamMemberId: null,
       disabled: false,

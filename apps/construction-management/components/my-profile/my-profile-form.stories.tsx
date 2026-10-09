@@ -20,7 +20,7 @@ const BASE = "/api/construction/organization/me";
 function myProfile(overrides: Partial<MyProfileModel> = {}): MyProfileModel {
   return {
     id: "0199c3a0-0000-7000-8000-000000000002",
-    name: "Suresh Kale",
+    name: "Prabhu Saravanan",
     designation: {
       id: "0199c3a0-0000-7000-8000-000000000003",
       name: "Site Engineer",
@@ -106,7 +106,7 @@ export const EditAndSave: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(
-      await canvas.findByText("Site Engineer · Patil Builders"),
+      await canvas.findByText("Site Engineer · Anugraha Engineers"),
     ).toBeVisible();
     const mobile = canvas.getByLabelText("Mobile");
     await expect(mobile).toHaveValue("+91 98123 45678");
@@ -118,18 +118,21 @@ export const EditAndSave: Story = {
     ).toBeVisible();
 
     await userEvent.clear(canvas.getByLabelText("Name"));
-    await userEvent.type(canvas.getByLabelText("Email"), "suresh@");
+    await userEvent.type(canvas.getByLabelText("Email"), "prabhu@");
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
     await expect(await canvas.findByText("Enter your name")).toBeVisible();
     await expect(canvas.getByText("Enter a valid email address")).toBeVisible();
 
-    await userEvent.type(canvas.getByLabelText("Name"), "Suresh Kale");
-    await userEvent.type(canvas.getByLabelText("Email"), "patil.in");
+    await userEvent.type(canvas.getByLabelText("Name"), "Prabhu Saravanan");
+    await userEvent.type(canvas.getByLabelText("Email"), "anugraha.in");
     await userEvent.type(
       canvas.getByLabelText("Emergency contact"),
-      "Meena Kale, 98111 22233",
+      "Meena Sakthi, 98111 22233",
     );
-    await userEvent.type(canvas.getByLabelText("Address"), "Wakad, Pune");
+    await userEvent.type(
+      canvas.getByLabelText("Address"),
+      "Meenakshipuram, Nagercoil",
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
     await expect(
       await canvas.findByText("Your profile is saved."),
@@ -137,10 +140,10 @@ export const EditAndSave: Story = {
     const [update] = api?.calls("POST", `${BASE}/profile/update`) ?? [];
     // Aadhaar and PAN are not sent unless changed.
     await expect(sentJson(update?.init)).toEqual({
-      name: "Suresh Kale",
-      email: "suresh@patil.in",
-      address: "Wakad, Pune",
-      emergencyContact: "Meena Kale, 98111 22233",
+      name: "Prabhu Saravanan",
+      email: "prabhu@anugraha.in",
+      address: "Meenakshipuram, Nagercoil",
+      emergencyContact: "Meena Sakthi, 98111 22233",
     });
   },
 };
@@ -265,7 +268,10 @@ export const ServerError: Story = {
     ).restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(await canvas.findByLabelText("Email"), "a@patil.in");
+    await userEvent.type(
+      await canvas.findByLabelText("Email"),
+      "a@anugraha.in",
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
     await expect(
       await canvas.findByText(
@@ -280,7 +286,7 @@ export const PhotoUploadAndRemove: Story = {
     return server(myProfile()).restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await expect(await canvas.findByText("SK")).toBeVisible();
+    await expect(await canvas.findByText("PS")).toBeVisible();
     await userEvent.upload(
       canvas.getByLabelText("Choose photo file"),
       pngFile("me.png"),
@@ -326,7 +332,7 @@ export const NoIdentityNumbersYet: Story = {
     signInAs("owner");
     return server(
       myProfile({
-        name: "Ramesh Patil",
+        name: "Arun Selva Kumar",
         isOwner: true,
         designation: {
           id: "0199c3a0-0000-7000-8000-000000000004",
@@ -339,7 +345,7 @@ export const NoIdentityNumbersYet: Story = {
   },
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("Owner · Patil Builders"),
+      await canvas.findByText("Owner · Anugraha Engineers"),
     ).toBeVisible();
     await expect(canvas.getAllByText("Not added")).toHaveLength(2);
     await expect(

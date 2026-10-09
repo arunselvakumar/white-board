@@ -8,9 +8,9 @@ export function project(
 ): ProjectResponse {
   return {
     id: "0199c4a0-0000-7000-8000-000000000001",
-    name: "Shanti Heights",
+    name: "Kumari Heights",
     status: "ongoing",
-    address: "Plot 12, Survey No. 45, Baner, Pune 411045",
+    address: "Plot 12, Survey No. 45, Vadasery, Nagercoil 629001",
     startDate: "2026-04-01",
     endDate: "2027-03-31",
     createdAt: AT,
@@ -19,20 +19,20 @@ export function project(
   };
 }
 
-export const SHANTI = project();
+export const KUMARI = project();
 
 export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000002",
-    name: "Aundh Tower",
+    name: "Asaripallam Tower",
     address: null,
     startDate: "2026-06-15",
     endDate: null,
   }),
-  SHANTI,
+  KUMARI,
   project({
     id: "0199c4a0-0000-7000-8000-000000000003",
-    name: "Baner Plots",
+    name: "Vadasery Plots",
     status: "not_started",
     address: null,
     startDate: null,
@@ -40,9 +40,9 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   }),
   project({
     id: "0199c4a0-0000-7000-8000-000000000004",
-    name: "Kothrud Row Houses",
+    name: "Parvathipuram Row Houses",
     status: "on_hold",
-    address: "Kothrud, Pune",
+    address: "Parvathipuram, Nagercoil",
   }),
   project({
     id: "0199c4a0-0000-7000-8000-000000000005",

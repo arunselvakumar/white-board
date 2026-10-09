@@ -94,12 +94,12 @@ async function seed(company: Company) {
         ),
       )
     ).id;
-  const raju = await labour("Raju Pawar", tower);
-  const seema = await labour("Seema Kale", villa);
+  const dhuresh = await labour("Dhuresh Nawin", tower);
+  const meena = await labour("Meena Selvi", villa);
   const vendor = await json<{ id: string }>(
     await createVendor(
       jsonRequest(VENDORS, company.cookie, {
-        name: "Suresh Gang",
+        name: "Prabhu Gang",
         joiningDate: "2026-08-01",
         projectIds: [tower],
         shifts: [],
@@ -129,12 +129,12 @@ async function seed(company: Company) {
   });
   await prisma.$transaction((tx) =>
     prismaLedger.post(tx, company.workspaceId, company.userId, [
-      earned("labour", raju, tower, "2026-08-20", "earned", 50_000),
-      earned("labour", raju, tower, "2026-09-10", "earned", 70_000),
-      // Earned in another Project: still Raju's balance.
-      earned("labour", raju, villa, "2026-09-11", "overtime", 20_000),
-      // Seema worked a day on Tower A in September.
-      earned("labour", seema, tower, "2026-09-15", "earned", 35_000),
+      earned("labour", dhuresh, tower, "2026-08-20", "earned", 50_000),
+      earned("labour", dhuresh, tower, "2026-09-10", "earned", 70_000),
+      // Earned in another Project: still Dhuresh's balance.
+      earned("labour", dhuresh, villa, "2026-09-11", "overtime", 20_000),
+      // Meena worked a day on Tower A in September.
+      earned("labour", meena, tower, "2026-09-15", "earned", 35_000),
       earned("vendor", vendor.id, tower, "2026-09-10", "earned", 180_000),
     ]),
   );
@@ -143,7 +143,7 @@ async function seed(company: Company) {
       await recordPayment(
         jsonRequest(PAYMENTS, company.cookie, {
           partyType: "labour",
-          partyId: raju,
+          partyId: dhuresh,
           projectId: tower,
           mode: "cash",
           ...body,
@@ -156,7 +156,7 @@ async function seed(company: Company) {
     amount: 30_000,
   });
   await pay({ paymentDate: "2026-09-13", kind: "advance", amount: 10_000 });
-  return { tower, villa, raju, seema, vendorId: vendor.id, payment };
+  return { tower, villa, dhuresh, meena, vendorId: vendor.id, payment };
 }
 
 function balances(cookie: string, query: string) {
@@ -221,12 +221,12 @@ describe("labour and vendor balances HTTP", () => {
       ),
     );
     expect(month).toMatchObject({ from: "2026-09-01", to: "2026-09-30" });
-    // Raju is on Tower A; Seema is on Villa but worked here this month.
+    // Dhuresh is on Tower A; Meena is on Villa but worked here this month.
     expect(month.items.map((item) => [item.name, item.onProject])).toEqual([
-      ["Raju Pawar", true],
-      ["Seema Kale", false],
+      ["Dhuresh Nawin", true],
+      ["Meena Selvi", false],
     ]);
-    expect(rowOf(month, s.raju)).toMatchObject({
+    expect(rowOf(month, s.dhuresh)).toMatchObject({
       previousBalance: 150_000,
       earned: 70_000,
       overtime: 20_000,
@@ -235,8 +235,8 @@ describe("labour and vendor balances HTTP", () => {
       paid: 30_000,
       finalAmount: 200_000,
     });
-    await expectMatchesSummarize(s.raju, rowOf(month, s.raju), month);
-    await expectMatchesSummarize(s.seema, rowOf(month, s.seema), month);
+    await expectMatchesSummarize(s.dhuresh, rowOf(month, s.dhuresh), month);
+    await expectMatchesSummarize(s.meena, rowOf(month, s.meena), month);
     expect(month.totals.finalAmount).toBe(200_000 + 135_000);
 
     const week = await json<Balances>(
@@ -246,12 +246,12 @@ describe("labour and vendor balances HTTP", () => {
       ),
     );
     expect(week).toMatchObject({ from: "2026-09-14", to: "2026-09-20" });
-    expect(rowOf(week, s.raju)).toMatchObject({
+    expect(rowOf(week, s.dhuresh)).toMatchObject({
       previousBalance: 200_000,
       toPay: 0,
       finalAmount: 200_000,
     });
-    await expectMatchesSummarize(s.seema, rowOf(week, s.seema), week);
+    await expectMatchesSummarize(s.meena, rowOf(week, s.meena), week);
 
     const custom = await json<Balances>(
       await balances(
@@ -259,17 +259,17 @@ describe("labour and vendor balances HTTP", () => {
         `projectId=${s.tower}&partyType=labour&kind=custom&anchor=2026-09-11&to=2026-09-12`,
       ),
     );
-    expect(rowOf(custom, s.raju)).toMatchObject({
+    expect(rowOf(custom, s.dhuresh)).toMatchObject({
       previousBalance: 220_000,
       overtime: 20_000,
       paid: 30_000,
       finalAmount: 210_000,
     });
-    // Seema has no entry on Tower A in this range and is not on it.
-    expect(custom.items.map((item) => item.partyId)).toEqual([s.raju]);
+    // Meena has no entry on Tower A in this range and is not on it.
+    expect(custom.items.map((item) => item.partyId)).toEqual([s.dhuresh]);
     await expectMatchesSummarize(
-      s.raju,
-      rowOf(custom, s.raju),
+      s.dhuresh,
+      rowOf(custom, s.dhuresh),
       period("custom", "2026-09-11", "2026-09-12"),
     );
 
@@ -305,20 +305,20 @@ describe("labour and vendor balances HTTP", () => {
     );
     expect(cancelled.status).toBe(StatusCodes.NO_CONTENT);
     const month = await json<Balances>(await balances(company.cookie, query));
-    expect(rowOf(month, s.raju)).toMatchObject({
+    expect(rowOf(month, s.dhuresh)).toMatchObject({
       paid: 0,
       finalAmount: 230_000,
     });
 
     const response = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.raju}&from=2026-09-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
         company.cookie,
       ),
     );
     expect(response.status).toBe(StatusCodes.OK);
     const statement = await json<Statement>(response);
-    expect(statement.name).toBe("Raju Pawar");
+    expect(statement.name).toBe("Dhuresh Nawin");
     expect(statement.openingBalance).toBe(150_000);
     expect(
       statement.lines.map((line) => [
@@ -345,11 +345,11 @@ describe("labour and vendor balances HTTP", () => {
     expect(reversal).toMatchObject({ isReversal: true });
     expect(advance?.payment?.cancelled).toBe(false);
 
-    // Seema is neither on Project B nor has entries there.
+    // Meena is neither on Project B nor has entries there.
     const other = await addProject(company.workspaceId, company.userId, "B");
     const off = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${other}&partyType=labour&partyId=${s.seema}&from=2026-09-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${other}&partyType=labour&partyId=${s.meena}&from=2026-09-01&to=2026-09-30`,
         company.cookie,
       ),
     );
@@ -357,7 +357,7 @@ describe("labour and vendor balances HTTP", () => {
     // …but she has entries on Tower A, so it shows there.
     const onTower = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.seema}&from=2026-08-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.meena}&from=2026-08-01&to=2026-09-30`,
         company.cookie,
       ),
     );
@@ -377,13 +377,13 @@ describe("labour and vendor balances HTTP", () => {
       ),
     );
     expect(body.financial).toBe(false);
-    expect(body.items.map((item) => item.name)).toContain("Raju Pawar");
-    expect(rowOf(body, s.raju).finalAmount).toBeNull();
+    expect(body.items.map((item) => item.name)).toContain("Dhuresh Nawin");
+    expect(rowOf(body, s.dhuresh).finalAmount).toBeNull();
     expect(body.totals.finalAmount).toBeNull();
     const statement = await json<Statement>(
       await getStatement(
         jsonRequest(
-          `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.raju}&from=2026-09-01&to=2026-09-30`,
+          `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
           viewer.cookie,
         ),
       ),

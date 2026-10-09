@@ -49,7 +49,7 @@ const meta = {
       <SupervisorDialog {...args} />
     </StoryQueryClient>
   ),
-  beforeEach: serve([{ id: STORY_TEAM_MEMBER_ID, name: "Suresh Kale" }]),
+  beforeEach: serve([{ id: STORY_TEAM_MEMBER_ID, name: "Prabhu Saravanan" }]),
 } satisfies Meta<typeof SupervisorDialog>;
 
 export default meta;
@@ -84,7 +84,7 @@ export const AddValidatesAndSaves: Story = {
     );
     await userEvent.click(dialog.getByLabelText("Team Member (optional)"));
     await userEvent.click(
-      await body.findByRole("option", { name: "Suresh Kale" }),
+      await body.findByRole("option", { name: "Prabhu Saravanan" }),
     );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(args.onClose).toHaveBeenCalled());
@@ -103,7 +103,7 @@ export const NameInUse: Story = {
     );
     await userEvent.type(
       dialog.getByLabelText("Supervisor name"),
-      "raju mukadam",
+      "rakesh mirtha",
     );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await expect(
@@ -113,30 +113,30 @@ export const NameInUse: Story = {
   },
 };
 
-const RAJU = STORY_SUPERVISORS[0];
+const DHURESH = STORY_SUPERVISORS[0];
 
 export const EditSendsLoadedUpdatedAt: Story = {
-  args: { supervisor: RAJU ?? null },
+  args: { supervisor: DHURESH ?? null },
   play: async ({ args, canvasElement, userEvent }) => {
     const dialog = within(
       await within(canvasElement.ownerDocument.body).findByRole("dialog"),
     );
     await waitFor(() =>
       expect(
-        dialog.getByRole("heading", { name: "Edit Raju Mukadam" }),
+        dialog.getByRole("heading", { name: "Edit Rakesh Mirtha" }),
       ).toBeVisible(),
     );
     await expect(dialog.getByLabelText("Mobile (optional)")).toHaveValue(
-      "9876543210",
+      "7708165767",
     );
     await userEvent.clear(dialog.getByLabelText("Mobile (optional)"));
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(args.onClose).toHaveBeenCalled());
-    await expect(sentTo(api.spy, `${String(RAJU?.id)}/update`)).toEqual({
-      name: "Raju Mukadam",
+    await expect(sentTo(api.spy, `${String(DHURESH?.id)}/update`)).toEqual({
+      name: "Rakesh Mirtha",
       mobile: null,
       teamMemberId: null,
-      expectedUpdatedAt: RAJU?.updatedAt,
+      expectedUpdatedAt: DHURESH?.updatedAt,
     });
   },
 };

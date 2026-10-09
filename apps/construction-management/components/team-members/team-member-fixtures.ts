@@ -31,10 +31,10 @@ export function teamMember(overrides: Partial<TeamMember> = {}): TeamMember {
   return {
     id: "0199c3a0-0000-7000-8000-000000000101",
     userId: null,
-    name: "Suresh Kale",
+    name: "Prabhu Saravanan",
     designation: { id: DESIGNATIONS[0]?.id ?? "", name: "Site Engineer" },
-    mobile: "+919876543210",
-    email: "suresh@kale.in",
+    mobile: "+917708165767",
+    email: "prabhu@sakthi.in",
     address: null,
     aadhaarMasked: "XXXXXXXX2346",
     panMasked: null,

@@ -22,13 +22,13 @@ function profile(
 ): CompanyProfileModel {
   return {
     id: "0199c3a0-0000-7000-8000-000000000001",
-    name: "Patil Builders",
-    mobile: "+919876543210",
-    email: "office@patilbuilders.in",
+    name: "Anugraha Engineers",
+    mobile: "+917708165767",
+    email: "office@anugrahaengineers.in",
     country: "IN",
     gstin: null,
     pan: null,
-    address: "Plot 4, Baner, Pune",
+    address: "Plot 4, Vadasery, Nagercoil",
     currency: "INR",
     isIndian: true,
     timezone: "Asia/Kolkata",
@@ -97,17 +97,17 @@ export const EditAndSave: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const name = await canvas.findByLabelText("Company name");
-    await expect(name).toHaveValue("Patil Builders");
+    await expect(name).toHaveValue("Anugraha Engineers");
     await expect(canvas.getByLabelText("Company mobile")).toHaveValue(
-      "9876543210",
+      "7708165767",
     );
     await expect(canvas.getByLabelText("Country")).toHaveValue("India");
     await expect(canvas.getByLabelText("Country")).toBeDisabled();
 
     await userEvent.clear(name);
-    await userEvent.type(name, "Patil Infra");
-    await userEvent.type(canvas.getByLabelText("GSTIN"), "27AAPFU0939F1ZV");
-    await userEvent.type(canvas.getByLabelText("Company PAN"), "aapfu0939f");
+    await userEvent.type(name, "Anugraha Infra");
+    await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZM");
+    await userEvent.type(canvas.getByLabelText("Company PAN"), "aapfa0939f");
     await userEvent.click(canvas.getByLabelText("Time zone"));
     await userEvent.click(
       await within(document.body).findByRole("option", { name: "Asia/Dubai" }),
@@ -119,12 +119,12 @@ export const EditAndSave: Story = {
     ).toBeVisible();
     const [update] = api?.calls("POST", `${BASE}/update`) ?? [];
     await expect(sentJson(update?.init)).toEqual({
-      name: "Patil Infra",
-      mobile: "+919876543210",
-      email: "office@patilbuilders.in",
-      gstin: "27AAPFU0939F1ZV",
-      pan: "AAPFU0939F",
-      address: "Plot 4, Baner, Pune",
+      name: "Anugraha Infra",
+      mobile: "+917708165767",
+      email: "office@anugrahaengineers.in",
+      gstin: "33AAPFA0939F1ZM",
+      pan: "AAPFA0939F",
+      address: "Plot 4, Vadasery, Nagercoil",
       currency: "INR",
       timezone: "Asia/Dubai",
       expectedUpdatedAt: "2026-10-08T06:30:00.000Z",
@@ -139,8 +139,8 @@ export const ValidationMessages: Story = {
   play: async ({ canvas, userEvent }) => {
     const name = await canvas.findByLabelText("Company name");
     await userEvent.clear(name);
-    // The check character of 27AAPFU0939F1ZV is V, not W.
-    await userEvent.type(canvas.getByLabelText("GSTIN"), "27AAPFU0939F1ZW");
+    // The check character of 33AAPFA0939F1ZM is V, not W.
+    await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZW");
     await userEvent.type(canvas.getByLabelText("Company PAN"), "AAPF0939F");
     await userEvent.clear(canvas.getByLabelText("Company email"));
     await userEvent.type(canvas.getByLabelText("Company email"), "office@");
@@ -153,12 +153,12 @@ export const ValidationMessages: Story = {
       canvas.getByText(/last character does not match its checksum/),
     ).toBeVisible();
     await expect(
-      canvas.getByText("Enter a valid 10-character PAN, like AAPFU0939F"),
+      canvas.getByText("Enter a valid 10-character PAN, like AAPFA0939F"),
     ).toBeVisible();
     await expect(canvas.getByText("Enter a valid email address")).toBeVisible();
 
     await userEvent.clear(canvas.getByLabelText("GSTIN"));
-    await userEvent.type(canvas.getByLabelText("GSTIN"), "27AAPFU0939F1ZV");
+    await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZM");
     await userEvent.clear(canvas.getByLabelText("Company PAN"));
     await userEvent.type(canvas.getByLabelText("Company PAN"), "ABCPE1234F");
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
@@ -205,7 +205,7 @@ export const LogoUploadReplaceRemove: Story = {
     await expect(
       await canvas.findByRole("button", { name: "Upload logo" }),
     ).toBeVisible();
-    await expect(canvas.getByText("PB")).toBeVisible();
+    await expect(canvas.getByText("AE")).toBeVisible();
     await userEvent.upload(
       canvas.getByLabelText("Choose logo file"),
       pngFile("logo.png"),
@@ -262,8 +262,8 @@ export const ReadOnlyWithoutSettingsUpdate: Story = {
     return server(
       profile({
         canUpdate: false,
-        gstin: "27AAPFU0939F1ZV",
-        pan: "AAPFU0939F",
+        gstin: "33AAPFA0939F1ZM",
+        pan: "AAPFA0939F",
         logoUrl: PIXEL_PNG,
       }),
     ).restore;
@@ -271,10 +271,10 @@ export const ReadOnlyWithoutSettingsUpdate: Story = {
   play: async ({ canvas }) => {
     // The Company's own GSTIN and PAN are shown in full.
     await expect(await canvas.findByLabelText("GSTIN")).toHaveValue(
-      "27AAPFU0939F1ZV",
+      "33AAPFA0939F1ZM",
     );
     await expect(canvas.getByLabelText("Company PAN")).toHaveValue(
-      "AAPFU0939F",
+      "AAPFA0939F",
     );
     await expect(canvas.getByLabelText("Company name")).toBeDisabled();
     await expect(

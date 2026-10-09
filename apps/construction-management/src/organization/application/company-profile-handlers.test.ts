@@ -16,7 +16,7 @@ function setup(options: { failSave?: boolean } = {}) {
   let profile: CompanyProfile = {
     id: "0199c3a0-0000-7000-8000-000000000001",
     workspaceId: "company-a",
-    name: "Patil Builders",
+    name: "Anugraha Engineers",
     mobile: null,
     email: null,
     country: "IN",
@@ -70,7 +70,7 @@ function setup(options: { failSave?: boolean } = {}) {
 }
 
 const changes = {
-  name: "Patil Builders",
+  name: "Anugraha Engineers",
   currency: "INR",
   timezone: "Asia/Kolkata",
 };
@@ -81,11 +81,11 @@ describe("CompanyProfileHandlers", () => {
     const updated = await handlers.update({
       workspaceId: "company-a",
       by: "user-1",
-      changes: { ...changes, gstin: "27AAPFU0939F1ZV" },
+      changes: { ...changes, gstin: "33AAPFA0939F1ZM" },
     });
     expect(updated).toMatchObject({
       country: "IN",
-      gstin: "27AAPFU0939F1ZV",
+      gstin: "33AAPFA0939F1ZM",
       updatedAt: NOW,
     });
   });
@@ -95,14 +95,14 @@ describe("CompanyProfileHandlers", () => {
     await handlers.update({
       workspaceId: "company-a",
       by: "u",
-      changes: { ...changes, gstin: "27AAPFU0939F1ZV", address: "Pune" },
+      changes: { ...changes, gstin: "33AAPFA0939F1ZM", address: "Nagercoil" },
     });
     const updated = await handlers.update({
       workspaceId: "company-a",
       by: "u",
       changes: { ...changes, address: null },
     });
-    expect(updated).toMatchObject({ gstin: "27AAPFU0939F1ZV", address: null });
+    expect(updated).toMatchObject({ gstin: "33AAPFA0939F1ZM", address: null });
   });
 
   it("renames the Workspace only when the name changes", async () => {
@@ -112,9 +112,9 @@ describe("CompanyProfileHandlers", () => {
     await handlers.update({
       workspaceId: "company-a",
       by: "u",
-      changes: { ...changes, name: "  Patil Infra " },
+      changes: { ...changes, name: "  Anugraha Infra " },
     });
-    expect(renamed).toEqual(["Patil Infra"]);
+    expect(renamed).toEqual(["Anugraha Infra"]);
   });
 
   it("refuses a save based on an older load", async () => {

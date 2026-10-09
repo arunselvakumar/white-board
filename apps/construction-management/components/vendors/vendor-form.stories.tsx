@@ -12,7 +12,7 @@ import {
   HELPER,
   MASON,
   PROJECT_OPTIONS,
-  RAMESH_GANG,
+  MUTHU_GANG,
 } from "./vendor-fixtures";
 
 const VENDORS = "/api/construction/labour/vendors";
@@ -80,7 +80,7 @@ export const AddWithRateCard: Story = {
       {
         method: "POST",
         path: VENDORS,
-        respond: () => Response.json(RAMESH_GANG, { status: 201 }),
+        respond: () => Response.json(MUTHU_GANG, { status: 201 }),
       },
     ]);
     return api.restore;
@@ -100,8 +100,8 @@ export const AddWithRateCard: Story = {
     await expect(canvas.getByText("Choose a Labour Category")).toBeVisible();
     await expect(posts()).toBe(0);
 
-    await userEvent.type(canvas.getByLabelText("Vendor name"), "Ramesh Gang");
-    await userEvent.type(canvas.getByLabelText("Contact number"), "9876543210");
+    await userEvent.type(canvas.getByLabelText("Vendor name"), "Muthu Gang");
+    await userEvent.type(canvas.getByLabelText("Contact number"), "7708165767");
     await userEvent.type(canvas.getByLabelText("Opening balance"), "25000");
     await userEvent.click(
       await canvas.findByRole("checkbox", { name: "Tower A" }),
@@ -174,8 +174,8 @@ export const AddWithRateCard: Story = {
     );
     const bodySent = sent(VENDORS) as Record<string, unknown>;
     await expect(bodySent).toMatchObject({
-      name: "Ramesh Gang",
-      contactNumber: "9876543210",
+      name: "Muthu Gang",
+      contactNumber: "7708165767",
       address: null,
       projectIds: [PROJECT_OPTIONS[0]?.id],
       openingBalance: 2_500_000,
@@ -239,7 +239,7 @@ export const AddShowsServerErrorOnTheRow: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.type(
       await canvas.findByLabelText("Vendor name"),
-      "Sunil Gang",
+      "Sundar Gang",
     );
     await choose(
       canvas,
@@ -276,7 +276,7 @@ export const AddWithoutRateCardWarns: Story = {
         path: VENDORS,
         respond: () =>
           Response.json(
-            { ...RAMESH_GANG, shifts: [], hasRateCard: false },
+            { ...MUTHU_GANG, shifts: [], hasRateCard: false },
             { status: 201 },
           ),
       },
@@ -286,7 +286,7 @@ export const AddWithoutRateCardWarns: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(
       await canvas.findByLabelText("Vendor name"),
-      "Sunil Gang",
+      "Sundar Gang",
     );
     await userEvent.click(
       canvas.getByRole("button", { name: "Remove Shift 1" }),
@@ -297,39 +297,39 @@ export const AddWithoutRateCardWarns: Story = {
       expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
     );
     await expect(sent(VENDORS)).toMatchObject({
-      name: "Sunil Gang",
+      name: "Sundar Gang",
       shifts: [],
       openingBalance: 0,
     });
   },
 };
 
-const EDIT_PATH = `${VENDORS}/${RAMESH_GANG.id}`;
+const EDIT_PATH = `${VENDORS}/${MUTHU_GANG.id}`;
 
 export const EditReplacesTheRateCard: Story = {
   render: () => (
     <StoryQueryClient>
-      <EditVendorScreen id={RAMESH_GANG.id} />
+      <EditVendorScreen id={MUTHU_GANG.id} />
     </StoryQueryClient>
   ),
   beforeEach: () => {
     api = mockFetch([
       ...LOOKUPS,
-      { path: EDIT_PATH, respond: () => Response.json(RAMESH_GANG) },
+      { path: EDIT_PATH, respond: () => Response.json(MUTHU_GANG) },
       {
         method: "POST",
         path: `${EDIT_PATH}/update`,
-        respond: () => Response.json(RAMESH_GANG),
+        respond: () => Response.json(MUTHU_GANG),
       },
     ]);
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
     await expect(
-      await canvas.findByRole("heading", { name: "Edit Ramesh Gang" }),
+      await canvas.findByRole("heading", { name: "Edit Muthu Gang" }),
     ).toBeVisible();
     await expect(canvas.getByLabelText("Contact number")).toHaveValue(
-      "9876543210",
+      "7708165767",
     );
     await expect(canvas.getByLabelText("Opening balance")).toHaveValue("25000");
     const dayRate = canvas.getByLabelText("Shift 1 category 1 rate per day");
@@ -344,12 +344,12 @@ export const EditReplacesTheRateCard: Story = {
       expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
     );
     await expect(sent(`${EDIT_PATH}/update`)).toMatchObject({
-      expectedUpdatedAt: RAMESH_GANG.updatedAt,
+      expectedUpdatedAt: MUTHU_GANG.updatedAt,
       openingBalance: 2_500_000,
       projectIds: [PROJECT_OPTIONS[0]?.id],
       shifts: [
         {
-          id: RAMESH_GANG.shifts[0]?.id,
+          id: MUTHU_GANG.shifts[0]?.id,
           name: "Shift 1",
           startTime: "08:00",
           endTime: "17:00",
@@ -374,15 +374,15 @@ export const EditReplacesTheRateCard: Story = {
 export const EditWithoutFinancialHidesAmounts: Story = {
   render: () => (
     <StoryQueryClient>
-      <EditVendorScreen id={RAMESH_GANG.id} />
+      <EditVendorScreen id={MUTHU_GANG.id} />
     </StoryQueryClient>
   ),
   beforeEach: () => {
     const hidden = {
-      ...RAMESH_GANG,
+      ...MUTHU_GANG,
       openingBalance: null,
       balance: null,
-      shifts: RAMESH_GANG.shifts.map((shift) => ({
+      shifts: MUTHU_GANG.shifts.map((shift) => ({
         ...shift,
         rates: shift.rates.map((rate) => ({
           ...rate,
@@ -404,7 +404,7 @@ export const EditWithoutFinancialHidesAmounts: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(
-      await canvas.findByRole("heading", { name: "Edit Ramesh Gang" }),
+      await canvas.findByRole("heading", { name: "Edit Muthu Gang" }),
     ).toBeVisible();
     await expect(canvas.queryByLabelText("Opening balance")).toBeNull();
     await expect(

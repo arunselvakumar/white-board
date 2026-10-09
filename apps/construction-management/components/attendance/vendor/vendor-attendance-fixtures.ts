@@ -14,16 +14,16 @@ export const YESTERDAY = "2026-10-07";
 
 export const MASON = "019a0000-0000-7000-8000-0000000000c1";
 export const HELPER = "019a0000-0000-7000-8000-0000000000c2";
-export const RAMESH = "019a0000-0000-7000-8000-0000000000a1";
-export const ANIL = "019a0000-0000-7000-8000-0000000000a2";
+export const MUTHU = "019a0000-0000-7000-8000-0000000000a1";
+export const ANBU = "019a0000-0000-7000-8000-0000000000a2";
 export const SHIFT_1 = "019a0000-0000-7000-8000-0000000000b1";
 export const NIGHT = "019a0000-0000-7000-8000-0000000000b2";
 
 const AT = "2026-10-07T12:00:00.000Z";
 
-export const RAMESH_ROW: VendorAttendanceGridRow = {
-  vendorId: RAMESH,
-  vendorName: "Ramesh Gang",
+export const MUTHU_ROW: VendorAttendanceGridRow = {
+  vendorId: MUTHU,
+  vendorName: "Muthu Gang",
   canRecord: true,
   onProject: true,
   isActive: true,
@@ -67,9 +67,9 @@ export const RAMESH_ROW: VendorAttendanceGridRow = {
   attendance: null,
 };
 
-export const ANIL_NO_CARD: VendorAttendanceGridRow = {
-  vendorId: ANIL,
-  vendorName: "Anil Gang",
+export const ANBU_NO_CARD: VendorAttendanceGridRow = {
+  vendorId: ANBU,
+  vendorName: "Anbu Gang",
   canRecord: false,
   onProject: true,
   isActive: true,
@@ -78,11 +78,11 @@ export const ANIL_NO_CARD: VendorAttendanceGridRow = {
   attendance: null,
 };
 
-export const RAMESH_YESTERDAY: VendorAttendanceDay = {
+export const MUTHU_YESTERDAY: VendorAttendanceDay = {
   id: "019a0000-0000-7000-8000-0000000000d1",
   projectId: PROJECT_ID,
-  vendorId: RAMESH,
-  vendorName: "Ramesh Gang",
+  vendorId: MUTHU,
+  vendorName: "Muthu Gang",
   date: YESTERDAY,
   totalPay: 280_000,
   fullDayCount: 3,
@@ -134,8 +134,8 @@ export function grid(
 }
 
 /** What Save sends back for the day entered in the story. */
-export const RAMESH_TODAY: VendorAttendanceDay = {
-  ...RAMESH_YESTERDAY,
+export const MUTHU_TODAY: VendorAttendanceDay = {
+  ...MUTHU_YESTERDAY,
   id: "019a0000-0000-7000-8000-0000000000d2",
   date: DATE,
   totalPay: 435_600,
@@ -183,8 +183,8 @@ export const MONTH: VendorAttendanceMonth = {
   ),
   vendors: [
     {
-      vendorId: RAMESH,
-      vendorName: "Ramesh Gang",
+      vendorId: MUTHU,
+      vendorName: "Muthu Gang",
       days: [
         {
           date: "2026-10-01",
@@ -261,8 +261,8 @@ export const OVERTIME: VendorAttendanceOvertime = {
     {
       attendanceId: "019a0000-0000-7000-8000-0000000000e1",
       date: "2026-10-01",
-      vendorId: RAMESH,
-      vendorName: "Ramesh Gang",
+      vendorId: MUTHU,
+      vendorName: "Muthu Gang",
       shiftId: SHIFT_1,
       shiftName: "Shift 1",
       labourCategoryId: HELPER,

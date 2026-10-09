@@ -24,9 +24,9 @@ export const HELPER = {
   id: "0199a1b2-0000-7000-8000-00000000c002",
   name: "Helper",
 };
-export const SUNIL = {
+export const SUNDAR = {
   id: "0199a1b2-0000-7000-8000-00000000d001",
-  name: "Sunil Jadhav",
+  name: "Sundar Rajan",
 };
 
 export const PROJECT_OPTIONS = [
@@ -57,7 +57,7 @@ export const CATEGORY_LIST = {
 export const SUPERVISOR_LIST = {
   items: [
     {
-      ...SUNIL,
+      ...SUNDAR,
       mobile: null,
       teamMember: null,
       disabled: false,
@@ -68,11 +68,11 @@ export const SUPERVISOR_LIST = {
   total: 1,
 };
 
-export const RAJU: LabourResponse = {
+export const DHURESH: LabourResponse = {
   id: "0199a1b2-0000-7000-8000-00000000b001",
-  name: "Raju Pawar",
+  name: "Dhuresh Nawin",
   labourCode: "L-001",
-  fatherName: "Shankar Pawar",
+  fatherName: "Nawin Kumar",
   joiningDate: "2026-09-01",
   wageType: "daily",
   wagePerDay: 70_000,
@@ -85,8 +85,8 @@ export const RAJU: LabourResponse = {
   esicNumber: null,
   aadhaarMasked: "XXXXXXXX2346",
   labourCategory: MASON,
-  supervisor: SUNIL,
-  contactNumber: "+919876543210",
+  supervisor: SUNDAR,
+  contactNumber: "+917708165767",
   gender: "male",
   currentProject: TOWER,
   isActive: true,
@@ -95,10 +95,10 @@ export const RAJU: LabourResponse = {
   updatedAt: AT,
 };
 
-export const SEEMA: LabourResponse = {
-  ...RAJU,
+export const MEENA: LabourResponse = {
+  ...DHURESH,
   id: "0199a1b2-0000-7000-8000-00000000b002",
-  name: "Seema Kale",
+  name: "Meena Selvi",
   labourCode: "L-002",
   fatherName: null,
   wageType: "monthly",
@@ -113,10 +113,10 @@ export const SEEMA: LabourResponse = {
   currentProject: VILLA,
 };
 
-export const MOHAN: LabourResponse = {
-  ...RAJU,
+export const MURUGAN: LabourResponse = {
+  ...DHURESH,
   id: "0199a1b2-0000-7000-8000-00000000b003",
-  name: "Mohan Shinde",
+  name: "Mohan Raj",
   labourCode: null,
   isActive: false,
   balance: 0,
@@ -154,7 +154,7 @@ const values = (name: string, project: string | null) => ({
 
 export const PREVIEW_WITH_ERRORS: LabourImportPreview = {
   rows: [
-    { row: 2, ok: true, errors: [], values: values("Ganesh More", "Tower A") },
+    { row: 2, ok: true, errors: [], values: values("Ganesh Kumar", "Tower A") },
     {
       row: 3,
       ok: false,
@@ -170,7 +170,7 @@ export const PREVIEW_WITH_ERRORS: LabourImportPreview = {
           message: "Enter a valid 12-digit Aadhaar number.",
         },
       ],
-      values: values("Mahesh Patil", "Nowhere"),
+      values: values("Manikandan Raja", "Nowhere"),
     },
   ],
   valid: 1,
@@ -180,8 +180,13 @@ export const PREVIEW_WITH_ERRORS: LabourImportPreview = {
 
 export const PREVIEW_VALID: LabourImportPreview = {
   rows: [
-    { row: 2, ok: true, errors: [], values: values("Ganesh More", "Tower A") },
-    { row: 3, ok: true, errors: [], values: values("Mahesh Patil", "Tower A") },
+    { row: 2, ok: true, errors: [], values: values("Ganesh Kumar", "Tower A") },
+    {
+      row: 3,
+      ok: true,
+      errors: [],
+      values: values("Manikandan Raja", "Tower A"),
+    },
   ],
   valid: 2,
   invalid: 0,

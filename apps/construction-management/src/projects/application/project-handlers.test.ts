@@ -113,14 +113,14 @@ describe("ProjectHandlers", () => {
   it("lists by status then name with counts per status", async () => {
     const { handlers, add } = setup();
     await add("Zen Villas", "completed");
-    await add("Shanti Heights");
-    await add("Baner Plots", "not_started");
-    await add("Aundh Tower");
+    await add("Kumari Heights");
+    await add("Vadasery Plots", "not_started");
+    await add("Asaripallam Tower");
     const page = await handlers.list(OWNER);
     expect(page.items.map((item) => item.name)).toEqual([
-      "Aundh Tower",
-      "Shanti Heights",
-      "Baner Plots",
+      "Asaripallam Tower",
+      "Kumari Heights",
+      "Vadasery Plots",
       "Zen Villas",
     ]);
     expect(page.counts).toEqual({
@@ -137,8 +137,8 @@ describe("ProjectHandlers", () => {
 
   it("shows a Member only the Projects they are assigned to", async () => {
     const { handlers, add } = setup();
-    const mine = await add("Shanti Heights");
-    const other = await add("Aundh Tower");
+    const mine = await add("Kumari Heights");
+    const other = await add("Asaripallam Tower");
     const member: ProjectViewer = {
       workspaceId: "company-1",
       userId: "member",
@@ -149,7 +149,7 @@ describe("ProjectHandlers", () => {
       mine.id,
     ]);
     expect(await handlers.options(member)).toEqual([
-      { id: mine.id, name: "Shanti Heights", status: "ongoing" },
+      { id: mine.id, name: "Kumari Heights", status: "ongoing" },
     ]);
     await expect(handlers.get(member, other.id)).rejects.toMatchObject({
       code: "PROJECT_NOT_FOUND",
@@ -166,7 +166,7 @@ describe("ProjectHandlers", () => {
         Promise.reject(planLimitExceeded(grant, 10, 10)),
     };
     const { add, repository } = setup({ plan });
-    await expect(add("Shanti Heights")).rejects.toMatchObject({
+    await expect(add("Kumari Heights")).rejects.toMatchObject({
       code: "PLAN_LIMIT_EXCEEDED",
       kind: "limit",
       details: { grant: "project", limit: 10, used: 10 },
@@ -176,12 +176,12 @@ describe("ProjectHandlers", () => {
 
   it("updates with optimistic concurrency and audits before/after", async () => {
     const { handlers, add, repository } = setup();
-    const created = await add("Shanti Heights");
+    const created = await add("Kumari Heights");
     const updated = await handlers.update({
       viewer: OWNER,
       id: created.id,
       by: "owner",
-      details: { name: "Shanti Heights", status: "on_hold" },
+      details: { name: "Kumari Heights", status: "on_hold" },
       expectedUpdatedAt: created.updatedAt,
     });
     expect(updated.status).toBe("on_hold");
@@ -196,7 +196,7 @@ describe("ProjectHandlers", () => {
         viewer: OWNER,
         id: created.id,
         by: "owner",
-        details: { name: "Shanti Heights", status: "completed" },
+        details: { name: "Kumari Heights", status: "completed" },
         expectedUpdatedAt: created.updatedAt,
       }),
     ).rejects.toMatchObject({ code: "PROJECT_CHANGED", kind: "conflict" });
@@ -204,7 +204,7 @@ describe("ProjectHandlers", () => {
 
   it("refuses to delete a Project in use, then tombstones it", async () => {
     const { handlers, add, used, repository } = setup();
-    const created = await add("Shanti Heights");
+    const created = await add("Kumari Heights");
     used.add(created.id);
     await expect(
       handlers.delete({ viewer: OWNER, id: created.id, by: "owner" }),
@@ -214,11 +214,11 @@ describe("ProjectHandlers", () => {
     expect((await handlers.list(OWNER)).total).toBe(0);
     expect(repository.audits.at(-1)).toMatchObject({
       action: "project.deleted",
-      before: { name: "Shanti Heights" },
+      before: { name: "Kumari Heights" },
     });
     // The name is free again.
-    await expect(add("Shanti Heights")).resolves.toMatchObject({
-      name: "Shanti Heights",
+    await expect(add("Kumari Heights")).resolves.toMatchObject({
+      name: "Kumari Heights",
     });
   });
 });

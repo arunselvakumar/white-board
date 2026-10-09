@@ -8,9 +8,9 @@ import { TeamMember, teamMemberDetails } from "./team-member";
 const NOW = new Date("2026-10-08T00:00:00Z");
 
 const details = teamMemberDetails({
-  name: " Suresh  Kale ",
+  name: " Prabhu  Saravanan ",
   designationId: "designation-1",
-  mobile: "+919876543210",
+  mobile: "+917708165767",
   aadhaar: "2341 2341 2346",
   pan: "abcpe1234f",
 });
@@ -31,7 +31,7 @@ function invite(memberType: "normal" | "hrms" = "normal") {
 describe("teamMemberDetails", () => {
   it("tidies and validates", () => {
     expect(details).toMatchObject({
-      name: "Suresh Kale",
+      name: "Prabhu Saravanan",
       aadhaar: "234123412346",
       pan: "ABCPE1234F",
       email: null,
@@ -56,7 +56,7 @@ describe("teamMemberDetails", () => {
       teamMemberDetails({
         name: "A",
         designationId: "d",
-        mobile: "+919876543210",
+        mobile: "+917708165767",
         aadhaar: "234123412345",
       }),
     ).toThrow(expect.objectContaining({ code: "AADHAAR_INVALID" }) as Error);
@@ -64,7 +64,7 @@ describe("teamMemberDetails", () => {
       teamMemberDetails({
         name: "A",
         designationId: "d",
-        mobile: "+919876543210",
+        mobile: "+917708165767",
         pan: "ABCXE1234F",
       }),
     ).toThrow(expect.objectContaining({ code: "PAN_INVALID" }) as Error);

@@ -175,10 +175,10 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     const response = await create(company, {
-      name: "  Ramesh Gang ",
+      name: "  Muthu Gang ",
       joiningDate: "2026-04-01",
-      contactNumber: "98765 43210",
-      address: "Hadapsar, Pune",
+      contactNumber: "77081 65767",
+      address: "Kottar, Nagercoil",
       projectIds: [f.villa, f.tower],
       shifts: rateCard(f.mason, f.helper),
       openingBalance: 2_500_000,
@@ -186,9 +186,9 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     expect(response.status).toBe(StatusCodes.CREATED);
     const vendor = await json<Vendor>(response);
     expect(vendor).toMatchObject({
-      name: "Ramesh Gang",
+      name: "Muthu Gang",
       joiningDate: "2026-04-01",
-      contactNumber: "+919876543210",
+      contactNumber: "+917708165767",
       isActive: true,
       hasRateCard: true,
       openingBalance: 2_500_000,
@@ -231,7 +231,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
   it("saves a vendor without a rate card and without an opening entry", async () => {
     const company = await ownerWithCompany();
     const response = await create(company, {
-      name: "Sunil Gang",
+      name: "Sundar Gang",
       joiningDate: "2026-09-01",
     });
     expect(response.status).toBe(StatusCodes.CREATED);
@@ -310,7 +310,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     const f = await fixtures(company);
     const created = await json<Vendor>(
       await create(company, {
-        name: "Ramesh Gang",
+        name: "Muthu Gang",
         joiningDate: "2026-04-01",
         projectIds: [f.tower],
         shifts: rateCard(f.mason, f.helper),
@@ -322,7 +322,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
 
     const response = await updateVendor(
       jsonRequest(`${BASE}/${created.id}/update`, company.cookie, {
-        name: "Ramesh Gang (Pune)",
+        name: "Muthu Gang (Nagercoil)",
         joiningDate: "2026-04-02",
         projectIds: [f.villa],
         shifts: [
@@ -357,7 +357,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     );
     expect(response.status).toBe(StatusCodes.OK);
     const updated = await json<Vendor>(response);
-    expect(updated.name).toBe("Ramesh Gang (Pune)");
+    expect(updated.name).toBe("Muthu Gang (Nagercoil)");
     expect(updated.projects.map((project) => project.id)).toEqual([f.villa]);
     expect(
       updated.shifts.map((shift) => [shift.name, shift.startTime]),
@@ -404,7 +404,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     // An unchanged opening balance writes no entries.
     await updateVendor(
       jsonRequest(`${BASE}/${created.id}/update`, company.cookie, {
-        name: "Ramesh Gang (Pune)",
+        name: "Muthu Gang (Nagercoil)",
         joiningDate: "2026-04-02",
         projectIds: [f.villa],
         shifts: [],
@@ -418,18 +418,18 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
   it("lists with search, project and active filters, and activates and deactivates", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
-    const ramesh = await json<Vendor>(
+    const muthu = await json<Vendor>(
       await create(company, {
-        name: "Ramesh Gang",
+        name: "Muthu Gang",
         joiningDate: "2026-04-01",
         projectIds: [f.tower],
         shifts: rateCard(f.mason, f.helper),
         openingBalance: 50_000,
       }),
     );
-    const sunil = await json<Vendor>(
+    const sundar = await json<Vendor>(
       await create(company, {
-        name: "Sunil Gang",
+        name: "Sundar Gang",
         joiningDate: "2026-04-01",
         contactNumber: "9123456780",
         projectIds: [f.villa],
@@ -445,38 +445,38 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     const all = await list();
     expect(all.total).toBe(2);
     expect(all.items.map((item) => item.name)).toEqual([
-      "Sunil Gang",
-      "Ramesh Gang",
+      "Sundar Gang",
+      "Muthu Gang",
     ]);
     expect(all.items[1]).toMatchObject({
       shiftCount: 2,
       hasRateCard: true,
       balance: 50_000,
     });
-    expect((await list("?q=ramesh")).items.map((item) => item.id)).toEqual([
-      ramesh.id,
+    expect((await list("?q=muthu")).items.map((item) => item.id)).toEqual([
+      muthu.id,
     ]);
     expect((await list("?q=23456")).items.map((item) => item.id)).toEqual([
-      sunil.id,
+      sundar.id,
     ]);
     expect(
       (await list(`?projectId=${f.villa}`)).items.map((item) => item.id),
-    ).toEqual([sunil.id]);
+    ).toEqual([sundar.id]);
 
     const deactivated = await deactivateVendor(
-      jsonRequest(`${BASE}/${sunil.id}/deactivate`, company.cookie, {}),
-      params(sunil.id),
+      jsonRequest(`${BASE}/${sundar.id}/deactivate`, company.cookie, {}),
+      params(sundar.id),
     );
     expect((await json<Vendor>(deactivated)).isActive).toBe(false);
     expect((await list("?active=true")).items.map((item) => item.id)).toEqual([
-      ramesh.id,
+      muthu.id,
     ]);
     expect((await list("?active=false")).items.map((item) => item.id)).toEqual([
-      sunil.id,
+      sundar.id,
     ]);
     const activated = await activateVendor(
-      jsonRequest(`${BASE}/${sunil.id}/activate`, company.cookie, {}),
-      params(sunil.id),
+      jsonRequest(`${BASE}/${sundar.id}/activate`, company.cookie, {}),
+      params(sundar.id),
     );
     expect((await json<Vendor>(activated)).isActive).toBe(true);
 
@@ -605,7 +605,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     const f = await fixtures(company);
     const vendor = await json<Vendor>(
       await create(company, {
-        name: "Ramesh Gang",
+        name: "Muthu Gang",
         joiningDate: "2026-04-01",
         shifts: rateCard(f.mason, f.helper),
         openingBalance: 75_000,
@@ -634,7 +634,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     // Renaming a shift with null rates keeps the amounts.
     const kept = await updateVendor(
       jsonRequest(`${BASE}/${vendor.id}/update`, clerk.cookie, {
-        name: "Ramesh Gang",
+        name: "Muthu Gang",
         joiningDate: "2026-04-01",
         shifts: seen.shifts.map((shift) => ({
           ...shift,
@@ -680,7 +680,7 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
   it("keeps a photo and documents (party files, owner type vendor)", async () => {
     const company = await ownerWithCompany();
     const vendor = await json<Vendor & { photoUrl: string | null }>(
-      await create(company, { name: "Ramesh Gang", joiningDate: "2026-04-01" }),
+      await create(company, { name: "Muthu Gang", joiningDate: "2026-04-01" }),
     );
     expect(vendor.photoUrl).toBeNull();
     const url = `${BASE}/${vendor.id}`;
@@ -746,9 +746,9 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
 
   it("keeps Companies apart", async () => {
     const first = await ownerWithCompany();
-    const second = await ownerWithCompany("Kale Constructions");
+    const second = await ownerWithCompany("Sakthi Constructions");
     const vendor = await json<Vendor>(
-      await create(first, { name: "Ramesh Gang", joiningDate: "2026-04-01" }),
+      await create(first, { name: "Muthu Gang", joiningDate: "2026-04-01" }),
     );
     const response = await getVendor(
       jsonRequest(`${BASE}/${vendor.id}`, second.cookie),

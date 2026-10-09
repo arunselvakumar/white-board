@@ -4,21 +4,21 @@ import { expect, within } from "storybook/test";
 import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { SHANTI } from "./project-fixtures";
+import { KUMARI } from "./project-fixtures";
 import { ProjectOverview } from "./project-overview";
 import { ProjectShell } from "./project-shell";
 
 const BASE = "/api/construction/projects/projects";
-const PATH = `/app/projects/${SHANTI.id}`;
+const PATH = `/app/projects/${KUMARI.id}`;
 
 const meta = {
   title: "Projects/ProjectShell",
   component: ProjectShell,
-  args: { id: SHANTI.id, children: null },
+  args: { id: KUMARI.id, children: null },
   beforeEach() {
     const api = mockApi((call) =>
-      call.method === "GET" && call.path === `${BASE}/${SHANTI.id}`
-        ? Response.json(SHANTI)
+      call.method === "GET" && call.path === `${BASE}/${KUMARI.id}`
+        ? Response.json(KUMARI)
         : undefined,
     );
     return api.restore;
@@ -26,8 +26,8 @@ const meta = {
   parameters: { nextjs: { navigation: { pathname: PATH } } },
   render: () => (
     <StoryQueries>
-      <ProjectShell id={SHANTI.id}>
-        <ProjectOverview id={SHANTI.id} />
+      <ProjectShell id={KUMARI.id}>
+        <ProjectOverview id={KUMARI.id} />
       </ProjectShell>
     </StoryQueries>
   ),
@@ -39,7 +39,7 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByRole("heading", { level: 1, name: "Shanti Heights" }),
+      await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" }),
     ).toBeVisible();
     await expect(canvas.getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
@@ -69,7 +69,7 @@ export const Overview: Story = {
     await expect(details.getByText("1 Apr 2026")).toBeVisible();
     await expect(details.getByText("31 Mar 2027")).toBeVisible();
     await expect(
-      details.getByText("Plot 12, Survey No. 45, Baner, Pune 411045"),
+      details.getByText("Plot 12, Survey No. 45, Vadasery, Nagercoil 629001"),
     ).toBeVisible();
   },
 };
@@ -80,7 +80,7 @@ export const AttendanceTab: Story = {
   },
   render: () => (
     <StoryQueries>
-      <ProjectShell id={SHANTI.id}>
+      <ProjectShell id={KUMARI.id}>
         <PagePlaceholder
           title="Attendance"
           description="Mark labour and vendor attendance for this Project. Arrives with CM-211."

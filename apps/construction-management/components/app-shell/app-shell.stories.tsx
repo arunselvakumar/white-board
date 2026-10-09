@@ -23,7 +23,7 @@ const meta = {
   title: "App/AppShell",
   tags: ["autodocs"],
   beforeEach() {
-    signInAs("owner", { name: "Patil Builders" });
+    signInAs("owner", { name: "Anugraha Engineers" });
   },
 } satisfies Meta;
 
@@ -41,7 +41,7 @@ async function expectArea(
   await expect(canvas.getByText("Nothing here yet")).toBeVisible();
   await expect(canvas.getByText(current.description)).toBeVisible();
   await expect(
-    canvas.getByRole("button", { name: /Active Company: Patil Builders/ }),
+    canvas.getByRole("button", { name: /Active Company: Anugraha Engineers/ }),
   ).toBeVisible();
   const view = canvasElement.ownerDocument.defaultView;
   if (view != null && view.innerWidth >= 768) {
@@ -132,21 +132,23 @@ export const NoActiveCompany: Story = {
 export const SwitchCompany: Story = {
   ...shellAt("/app/projects"),
   beforeEach() {
-    signInAs("owner", { name: "Patil Builders" });
+    signInAs("owner", { name: "Anugraha Engineers" });
     authMocks.companies = [
       ...authMocks.companies,
-      { id: "company_shree", name: "Shree Infra", role: "member" },
+      { id: "company_sri", name: "Sri Infra", role: "member" },
     ];
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const fetchMock = fn(() =>
-      Promise.resolve(Response.json({ activeCompanyId: "company_shree" })),
+      Promise.resolve(Response.json({ activeCompanyId: "company_sri" })),
     );
     const original = globalThis.fetch;
     globalThis.fetch = fetchMock;
     try {
       await userEvent.click(
-        canvas.getByRole("button", { name: /Active Company: Patil Builders/ }),
+        canvas.getByRole("button", {
+          name: /Active Company: Anugraha Engineers/,
+        }),
       );
       const menu = within(
         await within(canvasElement.ownerDocument.body).findByRole("menu"),
@@ -154,14 +156,12 @@ export const SwitchCompany: Story = {
       await expect(
         menu.getByRole("menuitem", { name: /Create a Company/ }),
       ).toHaveAttribute("href", "/create-company");
-      await userEvent.click(
-        menu.getByRole("menuitem", { name: "Shree Infra" }),
-      );
+      await userEvent.click(menu.getByRole("menuitem", { name: "Sri Infra" }));
       await waitFor(() =>
         expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
       );
       await expect(fetchMock).toHaveBeenCalledWith(
-        "/api/construction/organization/companies/company_shree/switch",
+        "/api/construction/organization/companies/company_sri/switch",
         expect.objectContaining({ method: "POST" }),
       );
     } finally {
@@ -175,11 +175,11 @@ export const AccountMenuSignOut: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole("button", { name: "Account menu for Ramesh Patil" }),
+      canvas.getByRole("button", { name: "Account menu for Arun Selva Kumar" }),
     );
     const menu = within(await body.findByRole("menu"));
     await waitFor(() =>
-      expect(menu.getByText("ramesh@patilbuilders.in")).toBeVisible(),
+      expect(menu.getByText("muthu@anugrahaengineers.in")).toBeVisible(),
     );
     await userEvent.click(menu.getByRole("menuitem", { name: "Sign out" }));
     await waitFor(() =>

@@ -155,7 +155,7 @@ function ProjectForm({
             id="project-name"
             className="h-10"
             autoComplete="off"
-            placeholder="Shanti Heights"
+            placeholder="Anugraha Residency"
             aria-invalid={errors.name != null}
             {...form.register("name")}
           />
@@ -226,7 +226,7 @@ function ProjectForm({
           <Textarea
             id="project-address"
             rows={3}
-            placeholder="Plot 12, Survey No. 45, Baner, Pune 411045"
+            placeholder="Plot 12, Survey No. 45, Saravanampatti, Coimbatore 641035"
             aria-invalid={errors.address != null}
             {...form.register("address")}
           />

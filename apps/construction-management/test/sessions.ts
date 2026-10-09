@@ -53,7 +53,7 @@ export function lastEmailCodeFor(email: string): string {
  */
 export async function signInByEmail(
   email = newEmail(),
-  name = "Ramesh Patil",
+  name = "Arun Selva Kumar",
 ): Promise<{ cookie: string; userId: string; email: string }> {
   const signedUp = await postAuth("/sign-up/email", {
     email,

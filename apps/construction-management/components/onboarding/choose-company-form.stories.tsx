@@ -25,8 +25,8 @@ export const SeveralCompanies: Story = {
     signInAs("owner");
     authMocks.workspaceId = null;
     authMocks.companies = [
-      { id: "company_patil", name: "Patil Builders", role: "owner" },
-      { id: "company_shree", name: "Shree Infra", role: "member" },
+      { id: "company_anugraha", name: "Anugraha Engineers", role: "owner" },
+      { id: "company_sri", name: "Sri Infra", role: "member" },
     ];
   },
   play: async ({ canvas, userEvent }) => {
@@ -35,11 +35,11 @@ export const SeveralCompanies: Story = {
     ).toBeVisible();
     await expect(canvas.getByText("Team Member")).toBeVisible();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Open Shree Infra" }),
+      canvas.getByRole("button", { name: "Open Sri Infra" }),
     );
     await waitFor(() =>
       expect(authMocks.setActive).toHaveBeenCalledWith(
-        "company_shree",
+        "company_sri",
         "/app/masters",
       ),
     );

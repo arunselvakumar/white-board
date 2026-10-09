@@ -4,7 +4,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import { StoryQueryClient } from "@/components/designations/designation-story-support";
 
 import { mockFetch } from "../../.storybook/mock-fetch";
-import { PROJECT_OPTIONS, RAJU, SEEMA, VILLA } from "./labour-fixtures";
+import { PROJECT_OPTIONS, DHURESH, MEENA, VILLA } from "./labour-fixtures";
 import { TransferDialog } from "./transfer-dialog";
 
 const TRANSFER = "/api/construction/labour/labours/transfer";
@@ -34,7 +34,7 @@ const meta = {
   title: "Masters/Labours/Transfer dialog",
   component: TransferDialog,
   args: {
-    labours: [RAJU],
+    labours: [DHURESH],
     open: true,
     onOpenChange: fn(),
     onTransferred: fn(),
@@ -50,11 +50,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const TransferOne: Story = {
-  beforeEach: serve(() => Response.json({ items: [RAJU] })),
+  beforeEach: serve(() => Response.json({ items: [DHURESH] })),
   play: async ({ args, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = await body.findByRole("dialog", {
-      name: "Transfer Raju Pawar",
+      name: "Transfer Dhuresh Nawin",
     });
     const inDialog = within(dialog);
     await userEvent.click(inDialog.getByRole("button", { name: "Transfer" }));
@@ -65,7 +65,7 @@ export const TransferOne: Story = {
     await userEvent.click(
       inDialog.getByRole("combobox", { name: "To Project" }),
     );
-    // Raju is on Tower A, so only the other Project is offered.
+    // Dhuresh is on Tower A, so only the other Project is offered.
     await expect(
       await body.findByRole("option", { name: "Villa Phase 2" }),
     ).toBeInTheDocument();
@@ -79,7 +79,7 @@ export const TransferOne: Story = {
 
     await waitFor(() => expect(args.onTransferred).toHaveBeenCalled());
     await expect(sentBody()).toEqual({
-      labourIds: [RAJU.id],
+      labourIds: [DHURESH.id],
       toProjectId: VILLA.id,
       transferDate: "2026-10-04",
       remark: "Slab work",
@@ -89,13 +89,13 @@ export const TransferOne: Story = {
 };
 
 export const RefusedBeforeAttendance: Story = {
-  args: { labours: [RAJU, SEEMA] },
+  args: { labours: [DHURESH, MEENA] },
   beforeEach: serve(() =>
     Response.json(
       {
         code: "TRANSFER_BEFORE_ATTENDANCE",
         message:
-          "Raju Pawar has attendance up to 2026-10-06 in their current Project. Choose a later date.",
+          "Dhuresh Nawin has attendance up to 2026-10-06 in their current Project. Choose a later date.",
       },
       { status: 409 },
     ),

@@ -15,7 +15,7 @@ import {
 const VALID_AADHAAR = "234123412346";
 
 const BASE: LabourDetailsInput = {
-  name: "  Raju   Pawar ",
+  name: "  Dhuresh   Nawin ",
   joiningDate: "2026-10-01",
   wageType: "daily",
   wagePerDay: 70_000,
@@ -38,19 +38,19 @@ describe("labourDetails", () => {
       ...BASE,
       labourCode: " L-01 ",
       weeklyHolidays: [6, 0],
-      contactNumber: "98765 43210",
+      contactNumber: "77081 65767",
       aadhaar: "2341 2341 2346",
       gender: "male",
     });
     expect(details).toMatchObject({
-      name: "Raju Pawar",
+      name: "Dhuresh Nawin",
       labourCode: "L-01",
       wageType: "daily",
       wagePerDay: 70_000,
       wagePerMonth: null,
       overtimeWagePerHour: 10_000,
       weeklyHolidays: [0, 6],
-      contactNumber: "+919876543210",
+      contactNumber: "+917708165767",
       aadhaar: VALID_AADHAAR,
       gender: "male",
     });
@@ -209,7 +209,7 @@ describe("assertTransferDate", () => {
   it("allows the last transfer date or later, after attendance", () => {
     expect(() => {
       assertTransferDate({
-        name: "Raju",
+        name: "Dhuresh",
         transferDate: "2026-10-05",
         lastTransferDate: "2026-10-05",
         latestAttendanceDate: "2026-10-04",
@@ -218,7 +218,7 @@ describe("assertTransferDate", () => {
     expect(
       codeOf(() => {
         assertTransferDate({
-          name: "Raju",
+          name: "Dhuresh",
           transferDate: "2026-10-04",
           lastTransferDate: "2026-10-05",
           latestAttendanceDate: null,
@@ -228,7 +228,7 @@ describe("assertTransferDate", () => {
     expect(
       codeOf(() => {
         assertTransferDate({
-          name: "Raju",
+          name: "Dhuresh",
           transferDate: "2026-10-06",
           lastTransferDate: "2026-10-01",
           latestAttendanceDate: "2026-10-06",

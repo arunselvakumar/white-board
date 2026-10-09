@@ -223,7 +223,7 @@ export function LabourForm({
               id="labour-name"
               className="h-10"
               autoComplete="off"
-              placeholder="Raju Pawar"
+              placeholder="Dhuresh Nawin"
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

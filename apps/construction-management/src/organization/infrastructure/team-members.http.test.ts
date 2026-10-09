@@ -13,13 +13,17 @@ import { createTeamMemberHandlers } from "./create-team-member-handlers";
 async function newCompany() {
   const userId = randomUUID();
   await prisma.identityUser.create({
-    data: { id: userId, name: "Ramesh Patil", email: `${userId}@example.test` },
+    data: {
+      id: userId,
+      name: "Arun Selva Kumar",
+      email: `${userId}@example.test`,
+    },
   });
   const { workspaceId } = await createCompanyHandlers().create.execute({
-    name: "Patil Builders",
+    name: "Anugraha Engineers",
     country: "IN",
     userId,
-    userName: "Ramesh Patil",
+    userName: "Arun Selva Kumar",
     userMobile: "+919800000001",
     userEmail: null,
   });
@@ -53,9 +57,9 @@ describe("Team Members on Postgres (CM-108)", () => {
       by: userId,
       memberType: "normal",
       details: {
-        name: "Suresh Kale",
+        name: "Prabhu Saravanan",
         designationId: byName("Site Engineer"),
-        email: "suresh@kale.in",
+        email: "prabhu@sakthi.in",
         aadhaar: "234123412346",
         pan: "ABCPE1234F",
       },
@@ -100,9 +104,9 @@ describe("Team Members on Postgres (CM-108)", () => {
       by: userId,
       memberType: "hrms",
       details: {
-        name: "Anita",
+        name: "Anitha",
         designationId: byName("Accountant"),
-        email: "anita@p.in",
+        email: "anitha@p.in",
       },
       projectIds: ["project-a"],
       permissions: { "finance.petty_cash": ["approve"] },
@@ -157,7 +161,7 @@ describe("Team Members on Postgres (CM-108)", () => {
 
   it("lists with search, status and cursor pages", async () => {
     const { workspaceId, userId, byName } = await newCompany();
-    for (const [index, name] of ["Asha", "Bhavesh", "Chetan"].entries())
+    for (const [index, name] of ["Abirami", "Bhavesh", "Chetan"].entries())
       await handlers.invite({
         workspaceId,
         by: userId,
@@ -186,7 +190,7 @@ describe("Team Members on Postgres (CM-108)", () => {
       status: "joining_pending",
       after: { createdAt: last?.createdAt ?? new Date(), id: last?.id ?? "" },
     });
-    expect(next.items.map((item) => item.name)).toEqual(["Asha"]);
+    expect(next.items.map((item) => item.name)).toEqual(["Abirami"]);
     const found = await handlers.list({
       workspaceId,
       limit: 10,
@@ -202,9 +206,9 @@ describe("Team Members on Postgres (CM-108)", () => {
       by: userId,
       memberType: "normal",
       details: {
-        name: "Suresh",
+        name: "Prabhu",
         designationId: byName("Site Engineer"),
-        email: "suresh@kale.in",
+        email: "prabhu@sakthi.in",
       },
       projectIds: ["project-a"],
     });

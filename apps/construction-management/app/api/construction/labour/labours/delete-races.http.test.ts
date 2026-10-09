@@ -33,7 +33,7 @@ function params(id: string) {
 async function addLabour(company: Company, projectId: string) {
   const response = await createLabour(
     jsonRequest(`${API}/labours`, company.cookie, {
-      name: `Raju ${newId().slice(-6)}`,
+      name: `Dhuresh ${newId().slice(-6)}`,
       joiningDate: "2026-08-01",
       wageType: "daily",
       wagePerDay: 70_000,

@@ -7,9 +7,9 @@ import {
   OWNER_MEMBER,
   PAYERS,
   PROJECT_ID,
-  RAJU_ID,
-  RAJU_PAYMENT,
-  SUNIL_MEMBER,
+  DHURESH_ID,
+  DHURESH_PAYMENT,
+  SUNDAR_MEMBER,
   TODAY,
 } from "./payment-fixtures";
 
@@ -19,7 +19,8 @@ const PAYERS_PATH = `${API}/payers?projectId=${PROJECT_ID}&partyType=labour`;
 let api: ReturnType<typeof mockApi>;
 
 function serve(
-  record: () => Response = () => Response.json(RAJU_PAYMENT, { status: 201 }),
+  record: () => Response = () =>
+    Response.json(DHURESH_PAYMENT, { status: 201 }),
 ) {
   return () => {
     api = mockApi((call) => {
@@ -44,7 +45,7 @@ const meta = {
   args: {
     projectId: PROJECT_ID,
     partyType: "labour",
-    party: { id: RAJU_ID, name: "Raju Pawar", finalAmount: 200_000 },
+    party: { id: DHURESH_ID, name: "Dhuresh Nawin", finalAmount: 200_000 },
     today: TODAY,
     onOpenChange: fn(),
     onPaid: fn(),
@@ -68,14 +69,14 @@ export const DefaultsAndSendsPaise: Story = {
   play: async ({ args, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Pay Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
     );
     const amount = await dialog.findByLabelText("Amount");
     await expect(amount).toHaveValue("2000");
     await expect(dialog.getByLabelText("Payment date")).toHaveValue(TODAY);
     await expect(
       dialog.getByRole("combobox", { name: "Paid by" }),
-    ).toHaveTextContent("Ramesh Patil");
+    ).toHaveTextContent("Arun Selva Kumar");
 
     await userEvent.click(dialog.getByRole("button", { name: "Bank" }));
     await userEvent.click(
@@ -92,7 +93,7 @@ export const DefaultsAndSendsPaise: Story = {
     await userEvent.click(dialog.getByRole("button", { name: "Advance" }));
     await userEvent.click(dialog.getByRole("combobox", { name: "Paid by" }));
     await userEvent.click(
-      await body.findByRole("option", { name: "Sunil Jadhav" }),
+      await body.findByRole("option", { name: "Sundar Rajan" }),
     );
     await userEvent.type(dialog.getByLabelText("Remarks"), "Festival advance");
     await userEvent.click(
@@ -102,14 +103,14 @@ export const DefaultsAndSendsPaise: Story = {
     await waitFor(() => expect(args.onPaid).toHaveBeenCalled());
     await expect(sent()).toEqual({
       partyType: "labour",
-      partyId: RAJU_ID,
+      partyId: DHURESH_ID,
       projectId: PROJECT_ID,
       paymentDate: TODAY,
       kind: "advance",
       mode: "bank",
       amount: 150_050,
       reference: "UTR 88231",
-      paidByMemberId: SUNIL_MEMBER,
+      paidByMemberId: SUNDAR_MEMBER,
       remarks: "Festival advance",
     });
     await expect(args.onOpenChange).toHaveBeenCalledWith(false);
@@ -118,12 +119,12 @@ export const DefaultsAndSendsPaise: Story = {
 
 /** Nothing owed and no Financial: the amount starts empty and is required. */
 export const ValidatesAmount: Story = {
-  args: { party: { id: RAJU_ID, name: "Raju Pawar", finalAmount: null } },
+  args: { party: { id: DHURESH_ID, name: "Dhuresh Nawin", finalAmount: null } },
   beforeEach: serve(),
   play: async ({ args, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Pay Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
     );
     const amount = await dialog.findByLabelText("Amount");
     await expect(amount).toHaveValue("");
@@ -160,7 +161,7 @@ export const BackdatedRefused: Story = {
   play: async ({ args, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Pay Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
     );
     const date = await dialog.findByLabelText("Payment date");
     await userEvent.clear(date);

@@ -40,8 +40,8 @@ export const STORY_TEAM_MEMBER_ID = "0199a1b2-0000-7000-8000-0000000004aa";
 export const STORY_SUPERVISORS: SupervisorItem[] = [
   {
     id: "0199a1b2-0000-7000-8000-000000000401",
-    name: "Raju Mukadam",
-    mobile: "+919876543210",
+    name: "Rakesh Mirtha",
+    mobile: "+917708165767",
     teamMemberId: null,
     teamMemberName: null,
     disabled: false,
@@ -50,17 +50,17 @@ export const STORY_SUPERVISORS: SupervisorItem[] = [
   },
   {
     id: "0199a1b2-0000-7000-8000-000000000402",
-    name: "Suresh Kale",
+    name: "Prabhu Saravanan",
     mobile: null,
     teamMemberId: STORY_TEAM_MEMBER_ID,
-    teamMemberName: "Suresh Kale",
+    teamMemberName: "Prabhu Saravanan",
     disabled: false,
     createdAt: AT,
     updatedAt: AT,
   },
   {
     id: "0199a1b2-0000-7000-8000-000000000403",
-    name: "Vijay Pawar",
+    name: "Vignesh Anand",
     mobile: null,
     teamMemberId: null,
     teamMemberName: null,

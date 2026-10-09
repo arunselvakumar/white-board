@@ -16,7 +16,7 @@ function project(details: Partial<ProjectDetailsInput> = {}) {
   return Project.create({
     id: "p1",
     workspaceId: "company-1",
-    details: { name: "Shanti Heights", ...details },
+    details: { name: "Kumari Heights", ...details },
     by: "user-1",
     now: NOW,
   });
@@ -34,7 +34,7 @@ function codeOf(run: () => unknown): string | undefined {
 describe("Project", () => {
   it("starts Ongoing with only a name", () => {
     expect(project().details).toEqual({
-      name: "Shanti Heights",
+      name: "Kumari Heights",
       status: "ongoing",
       address: null,
       startDate: null,
@@ -49,16 +49,16 @@ describe("Project", () => {
     expect(codeOf(() => project({ name: "x".repeat(121) }))).toBe(
       "PROJECT_NAME_TOO_LONG",
     );
-    expect(project({ name: "  Shanti   Heights " }).name).toBe(
-      "Shanti Heights",
+    expect(project({ name: "  Kumari   Heights " }).name).toBe(
+      "Kumari Heights",
     );
     expect(project({ name: "x".repeat(120) }).name).toHaveLength(120);
   });
 
   it("keeps an address of at most 500 characters; blank is none", () => {
-    expect(project({ address: "  Plot 12, Baner, Pune " }).address).toBe(
-      "Plot 12, Baner, Pune",
-    );
+    expect(
+      project({ address: "  Plot 12, Vadasery, Nagercoil " }).address,
+    ).toBe("Plot 12, Vadasery, Nagercoil");
     expect(project({ address: "   " }).address).toBeNull();
     expect(codeOf(() => project({ address: "a".repeat(501) }))).toBe(
       "PROJECT_ADDRESS_TOO_LONG",
@@ -109,9 +109,9 @@ describe("Project", () => {
     const item = project();
     item.update(
       {
-        name: "Shanti Heights Phase 2",
+        name: "Kumari Heights Phase 2",
         status: "completed",
-        address: "Baner",
+        address: "Vadasery",
         startDate: "2025-04-01",
         endDate: "2026-09-30",
       },
@@ -119,9 +119,9 @@ describe("Project", () => {
       LATER,
     );
     expect(item.details).toEqual({
-      name: "Shanti Heights Phase 2",
+      name: "Kumari Heights Phase 2",
       status: "completed",
-      address: "Baner",
+      address: "Vadasery",
       startDate: "2025-04-01",
       endDate: "2026-09-30",
     });

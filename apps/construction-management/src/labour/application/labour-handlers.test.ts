@@ -20,7 +20,7 @@ function setup() {
     fakeDirectories({
       projects: ["p1", "p2"],
       labourCategories: ["mason", "welder"],
-      supervisors: ["sunil"],
+      supervisors: ["sundar"],
       disabled: ["welder"],
     }),
     () => NOW,
@@ -29,7 +29,7 @@ function setup() {
 }
 
 const INPUT: CreateLabourInput = {
-  name: "Raju",
+  name: "Dhuresh",
   joiningDate: "2026-09-01",
   wageType: "daily",
   wagePerDay: 70_000,
@@ -97,7 +97,7 @@ describe("LabourHandlers", () => {
       by: "u1",
     });
     const base = {
-      name: "Raju P",
+      name: "Dhuresh P",
       joiningDate: "2026-09-01",
       wageType: "daily",
       labourCategoryId: "mason",

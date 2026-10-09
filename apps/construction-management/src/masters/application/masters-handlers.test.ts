@@ -385,7 +385,7 @@ describe("SupervisorHandlers", () => {
       Promise.resolve(
         new Map(
           workspaceId === WS && ids.includes(MEMBER)
-            ? [[MEMBER, "Suresh Kale"]]
+            ? [[MEMBER, "Prabhu Saravanan"]]
             : [],
         ),
       ),
@@ -399,16 +399,16 @@ describe("SupervisorHandlers", () => {
     );
     const made = await handlers.create({
       workspaceId: WS,
-      name: "Suresh",
-      mobile: "9876543210",
+      name: "Prabhu",
+      mobile: "7708165767",
       teamMemberId: MEMBER,
       by: OWNER,
     });
     expect(made).toMatchObject({
-      name: "Suresh",
-      mobile: "+919876543210",
+      name: "Prabhu",
+      mobile: "+917708165767",
       teamMemberId: MEMBER,
-      teamMemberName: "Suresh Kale",
+      teamMemberName: "Prabhu Saravanan",
       disabled: false,
     });
     expect(await handlers.list(WS)).toEqual([made]);
@@ -424,7 +424,7 @@ describe("SupervisorHandlers", () => {
       await codeOf(() =>
         handlers.create({
           workspaceId: WS,
-          name: "Raju",
+          name: "Dhuresh",
           teamMemberId: "0199a1b2-0000-7000-8000-0000000000bb",
           by: OWNER,
         }),
@@ -440,21 +440,21 @@ describe("SupervisorHandlers", () => {
     );
     const made = await handlers.create({
       workspaceId: WS,
-      name: "Raju",
+      name: "Dhuresh",
       by: OWNER,
     });
     const updated = await handlers.update({
       workspaceId: WS,
       id: made.id,
-      name: "Raju Mukadam",
-      mobile: "+919876543210",
+      name: "Rakesh Mirtha",
+      mobile: "+917708165767",
       teamMemberId: null,
       expectedUpdatedAt: made.updatedAt,
       by: OWNER,
     });
     expect(updated).toMatchObject({
-      name: "Raju Mukadam",
-      mobile: "+919876543210",
+      name: "Rakesh Mirtha",
+      mobile: "+917708165767",
     });
     expect(
       await codeOf(() =>

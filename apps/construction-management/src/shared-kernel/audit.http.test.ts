@@ -16,7 +16,7 @@ describe("recordAudit", () => {
       entityType: "company_profile",
       entityId: "profile-1",
       before: { gstin: null },
-      after: { gstin: "27AAPFU0939F1ZV" },
+      after: { gstin: "33AAPFA0939F1ZM" },
     });
     const rows = await prisma.constructionOrganizationAuditEvent.findMany({
       where: { workspaceId },
@@ -25,7 +25,7 @@ describe("recordAudit", () => {
     expect(rows[0]).toMatchObject({
       action: "company_profile.updated",
       before: { gstin: null },
-      after: { gstin: "27AAPFU0939F1ZV" },
+      after: { gstin: "33AAPFA0939F1ZM" },
     });
   });
 });

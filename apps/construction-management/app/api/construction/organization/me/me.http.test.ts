@@ -74,7 +74,7 @@ describe("GET /api/construction/organization/me/profile", () => {
     const response = await getMyProfile(get("/profile"));
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
-      name: "Ramesh Patil",
+      name: "Arun Selva Kumar",
       mobile: ownerMobile,
       isOwner: true,
       designation: { name: "Owner" },
@@ -95,7 +95,7 @@ describe("GET /api/construction/organization/me/profile", () => {
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
       id: memberId,
-      name: "Suresh Kale",
+      name: "Prabhu Saravanan",
       aadhaarMasked: "XXXXXXXX2346",
       panMasked: "XXXXXX234F",
       isOwner: false,
@@ -126,18 +126,18 @@ describe("POST /api/construction/organization/me/profile/update", () => {
     const before = await json<MyProfile>(await getMyProfile(get("/profile")));
     const response = await updateMyProfile(
       post("/profile/update", {
-        name: "Suresh  Kale ",
-        email: "Suresh@Patil.in",
-        address: "Wakad, Pune",
-        emergencyContact: "Meena Kale, +91 98111 22233",
+        name: "Prabhu  Saravanan ",
+        email: "Prabhu@Anugraha.in",
+        address: "Meenakshipuram, Nagercoil",
+        emergencyContact: "Meena Sakthi, +91 98111 22233",
       }),
     );
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({
-      name: "Suresh Kale",
-      email: "suresh@patil.in",
-      address: "Wakad, Pune",
-      emergencyContact: "Meena Kale, +91 98111 22233",
+      name: "Prabhu Saravanan",
+      email: "prabhu@anugraha.in",
+      address: "Meenakshipuram, Nagercoil",
+      emergencyContact: "Meena Sakthi, +91 98111 22233",
       mobile: before.mobile,
       // Omitted ids are kept.
       aadhaarMasked: "XXXXXXXX2346",
@@ -148,18 +148,18 @@ describe("POST /api/construction/organization/me/profile/update", () => {
       });
     expect(audit.actorUserId).toBe(userId);
     expect(audit.after).toMatchObject({
-      email: "suresh@patil.in",
+      email: "prabhu@anugraha.in",
       aadhaar: "XXXXXXXX2346",
     });
     expect(JSON.stringify(audit)).not.toContain("234123412346");
 
     // Omitted fields stay; null clears.
     const again = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale", address: null }),
+      post("/profile/update", { name: "Prabhu Saravanan", address: null }),
     );
     expect(await json(again)).toMatchObject({
-      email: "suresh@patil.in",
-      emergencyContact: "Meena Kale, +91 98111 22233",
+      email: "prabhu@anugraha.in",
+      emergencyContact: "Meena Sakthi, +91 98111 22233",
       address: null,
     });
   });
@@ -177,7 +177,10 @@ describe("POST /api/construction/organization/me/profile/update", () => {
     expect(before.mobileEditable).toBe(true);
 
     const changed = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale", mobile: "+919000000000" }),
+      post("/profile/update", {
+        name: "Prabhu Saravanan",
+        mobile: "+919000000000",
+      }),
     );
     expect(changed.status).toBe(StatusCodes.OK);
     expect(await json(changed)).toMatchObject({
@@ -186,20 +189,20 @@ describe("POST /api/construction/organization/me/profile/update", () => {
     });
 
     const invalid = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale", mobile: "98765" }),
+      post("/profile/update", { name: "Prabhu Saravanan", mobile: "98765" }),
     );
     expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(invalid)).toMatchObject({ code: "MOBILE_INVALID" });
 
     const inUse = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale", mobile: taken }),
+      post("/profile/update", { name: "Prabhu Saravanan", mobile: taken }),
     );
     expect(inUse.status).toBe(StatusCodes.CONFLICT);
     expect(await json(inUse)).toMatchObject({ code: "MEMBER_MOBILE_IN_USE" });
 
     // Omitted, the mobile stays.
     const kept = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale" }),
+      post("/profile/update", { name: "Prabhu Saravanan" }),
     );
     expect(await json(kept)).toMatchObject({ mobile: "+919000000000" });
   });
@@ -209,7 +212,7 @@ describe("POST /api/construction/organization/me/profile/update", () => {
     actAs({ userId: ownerId, workspaceId });
     const invalid = await updateMyProfile(
       post("/profile/update", {
-        name: "Ramesh Patil",
+        name: "Arun Selva Kumar",
         aadhaar: "234123412345",
       }),
     );
@@ -218,7 +221,7 @@ describe("POST /api/construction/organization/me/profile/update", () => {
 
     const set = await updateMyProfile(
       post("/profile/update", {
-        name: "Ramesh Patil",
+        name: "Arun Selva Kumar",
         aadhaar: "2341 2341 2346",
         pan: "abcpe1234f",
       }),
@@ -228,7 +231,7 @@ describe("POST /api/construction/organization/me/profile/update", () => {
       panMasked: "XXXXXX234F",
     });
     const cleared = await updateMyProfile(
-      post("/profile/update", { name: "Ramesh Patil", pan: null }),
+      post("/profile/update", { name: "Arun Selva Kumar", pan: null }),
     );
     expect(await json(cleared)).toMatchObject({
       aadhaarMasked: "XXXXXXXX2346",
@@ -238,12 +241,12 @@ describe("POST /api/construction/organization/me/profile/update", () => {
 
   it("is 409 when another Team Member in the Company has the email", async () => {
     const { workspaceId, ownerId } = await newCompany();
-    await addMember(workspaceId, ownerId, {}, { email: "taken@patil.in" });
+    await addMember(workspaceId, ownerId, {}, { email: "taken@anugraha.in" });
     actAs({ userId: ownerId, workspaceId });
     const response = await updateMyProfile(
       post("/profile/update", {
-        name: "Ramesh Patil",
-        email: "taken@patil.in",
+        name: "Arun Selva Kumar",
+        email: "taken@anugraha.in",
       }),
     );
     expect(response.status).toBe(StatusCodes.CONFLICT);
@@ -350,9 +353,9 @@ describe("My Profile photo in storage", () => {
     const { workspaceId, ownerId } = await newCompany();
     actAs({ userId: ownerId, workspaceId });
     await uploadPhoto(upload(pngBytes(), "image/png"));
-    await updateMyProfile(post("/profile/update", { name: "R. Patil" }));
+    await updateMyProfile(post("/profile/update", { name: "R. Anugraha" }));
     const profile = await json<MyProfile>(await getMyProfile(get("/profile")));
-    expect(profile).toMatchObject({ name: "R. Patil" });
+    expect(profile).toMatchObject({ name: "R. Anugraha" });
     expect(profile.photoUrl).not.toBeNull();
   });
 
@@ -421,7 +424,10 @@ describe("My Profile while SMS is on (ADR CM-0009)", () => {
     const before = await json<MyProfile>(await getMyProfile(get("/profile")));
     expect(before.mobileEditable).toBe(false);
     const response = await updateMyProfile(
-      post("/profile/update", { name: "Suresh Kale", mobile: "+919000000000" }),
+      post("/profile/update", {
+        name: "Prabhu Saravanan",
+        mobile: "+919000000000",
+      }),
     );
     expect(response.status).toBe(StatusCodes.OK);
     expect(await json(response)).toMatchObject({

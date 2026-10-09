@@ -20,7 +20,7 @@ import { newEmail, signInByEmail, TEST_ORIGIN } from "./sessions";
  * An Owner signed in by email with a fresh Company active, plus helpers
  * to call routes as that Owner.
  */
-export async function ownerWithCompany(name = "Patil Builders") {
+export async function ownerWithCompany(name = "Anugraha Engineers") {
   const owner = await signInByEmail();
   const created = await createCompanyRoute(
     new Request(`${TEST_ORIGIN}/api/construction/organization/companies`, {
@@ -127,7 +127,7 @@ export async function givePlan(
  * A real Company (Workspace, profile, Designations, the Owner's Team
  * Member) with a fresh Owner. Mobiles are random so tests never collide.
  */
-export async function newCompany(name = "Patil Builders"): Promise<{
+export async function newCompany(name = "Anugraha Engineers"): Promise<{
   workspaceId: string;
   ownerId: string;
   ownerMobile: string;
@@ -137,7 +137,7 @@ export async function newCompany(name = "Patil Builders"): Promise<{
   await prisma.identityUser.create({
     data: {
       id: ownerId,
-      name: "Ramesh Patil",
+      name: "Arun Selva Kumar",
       email: `${ownerId}@example.test`,
     },
   });
@@ -145,7 +145,7 @@ export async function newCompany(name = "Patil Builders"): Promise<{
     name,
     country: "IN",
     userId: ownerId,
-    userName: "Ramesh Patil",
+    userName: "Arun Selva Kumar",
     userMobile: ownerMobile,
     userEmail: null,
   });
@@ -170,7 +170,7 @@ export async function addMember(
     by: ownerId,
     memberType: "normal",
     details: {
-      name: "Suresh Kale",
+      name: "Prabhu Saravanan",
       designationId,
       mobile: `+9197${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       ...details,

@@ -120,9 +120,9 @@ async function fixtures(company: Company) {
         }),
       ),
     );
-  const ramesh = await vendor("Ramesh Gang", [tower]);
-  const suresh = await vendor("Suresh Contractors", [villa]);
-  return { tower, villa, mason, helper, ramesh, suresh };
+  const muthu = await vendor("Muthu Gang", [tower]);
+  const prabhu = await vendor("Prabhu Contractors", [villa]);
+  return { tower, villa, mason, helper, muthu, prabhu };
 }
 
 type Fixtures = Awaited<ReturnType<typeof fixtures>>;
@@ -131,10 +131,10 @@ function body(
   f: Fixtures,
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
-  const [shift1] = f.ramesh.shifts;
+  const [shift1] = f.muthu.shifts;
   return {
     projectId: f.tower,
-    vendorId: f.ramesh.id,
+    vendorId: f.muthu.id,
     date: YESTERDAY,
     lines: [
       {
@@ -208,7 +208,7 @@ describe("vendor attendance HTTP", () => {
       overtimeHours: "1.5",
       ratePerDay: 55_050,
     });
-    expect(await ledgerSum(f.ramesh.id)).toBe(DAY_PAY);
+    expect(await ledgerSum(f.muthu.id)).toBe(DAY_PAY);
     const entries = await prisma.constructionLabourLedgerEntry.findMany({
       where: { sourceId: day.id },
     });
@@ -234,7 +234,7 @@ describe("vendor attendance HTTP", () => {
     expect(await errorCode(stale)).toBe("VENDOR_ATTENDANCE_CHANGED");
 
     // An edit reverses the old entry and posts the new one.
-    const night = f.ramesh.shifts[1]?.id;
+    const night = f.muthu.shifts[1]?.id;
     const edited = await record(
       company.cookie,
       body(f, {
@@ -255,7 +255,7 @@ describe("vendor attendance HTTP", () => {
     expect(changed.id).toBe(day.id);
     expect(changed.totalPay).toBe(130_000);
     expect(changed.lines).toHaveLength(1);
-    expect(await ledgerSum(f.ramesh.id)).toBe(130_000);
+    expect(await ledgerSum(f.muthu.id)).toBe(130_000);
     expect(
       await prisma.constructionLabourLedgerEntry.count({
         where: { sourceId: day.id },
@@ -279,7 +279,7 @@ describe("vendor attendance HTTP", () => {
         ),
       ),
     );
-    expect(grid.vendors.map((row) => row.vendorId)).toEqual([f.ramesh.id]);
+    expect(grid.vendors.map((row) => row.vendorId)).toEqual([f.muthu.id]);
     expect(grid.vendors[0]?.canRecord).toBe(true);
     expect(grid.vendors[0]?.attendance?.totalPay).toBe(130_000);
     expect(grid.totalPay).toBe(130_000);
@@ -293,7 +293,7 @@ describe("vendor attendance HTTP", () => {
       expectedUpdatedAt: changed.updatedAt,
     });
     expect(cleared.status).toBe(StatusCodes.NO_CONTENT);
-    expect(await ledgerSum(f.ramesh.id)).toBe(0);
+    expect(await ledgerSum(f.muthu.id)).toBe(0);
     expect((await clear(company.cookie, day.id)).status).toBe(
       StatusCodes.NOT_FOUND,
     );
@@ -316,7 +316,7 @@ describe("vendor attendance HTTP", () => {
   it("refuses a category off the shift, a vendor off the Project, an inactive vendor and a future date", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
-    const night = f.ramesh.shifts[1]?.id;
+    const night = f.muthu.shifts[1]?.id;
 
     const offShift = await record(
       company.cookie,
@@ -344,7 +344,7 @@ describe("vendor attendance HTTP", () => {
 
     const offProject = await record(
       company.cookie,
-      body(f, { vendorId: f.suresh.id }),
+      body(f, { vendorId: f.prabhu.id }),
     );
     expect(offProject.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await errorCode(offProject)).toBe("VENDOR_NOT_ON_PROJECT");
@@ -357,13 +357,13 @@ describe("vendor attendance HTTP", () => {
     expect(await errorCode(future)).toBe("ATTENDANCE_DATE_IN_FUTURE");
 
     await deactivateVendor(
-      jsonRequest(`${VENDORS}/${f.ramesh.id}/deactivate`, company.cookie, {}),
-      { params: Promise.resolve({ id: f.ramesh.id }) },
+      jsonRequest(`${VENDORS}/${f.muthu.id}/deactivate`, company.cookie, {}),
+      { params: Promise.resolve({ id: f.muthu.id }) },
     );
     const inactive = await record(company.cookie, body(f));
     expect(inactive.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await errorCode(inactive)).toBe("VENDOR_INACTIVE");
-    expect(await ledgerSum(f.ramesh.id)).toBe(0);
+    expect(await ledgerSum(f.muthu.id)).toBe(0);
   });
 
   it("applies the back-dated guard to a Member, and the Owner passes it", async () => {
@@ -415,7 +415,7 @@ describe("vendor attendance HTTP", () => {
       ratePerDay: null,
       amount: null,
     });
-    expect(await ledgerSum(f.ramesh.id)).toBe(DAY_PAY * 2);
+    expect(await ledgerSum(f.muthu.id)).toBe(DAY_PAY * 2);
   });
 
   it("checks Attendance on the Project, the update and delete flags, and Vendor Financial", async () => {
@@ -485,7 +485,7 @@ describe("vendor attendance HTTP", () => {
     const second = await json<Vendor>(
       await createVendor(
         jsonRequest(VENDORS, company.cookie, {
-          name: "Anil Gang",
+          name: "Anbu Gang",
           joiningDate: "2026-01-01",
           projectIds: [f.tower],
           shifts: [
@@ -564,8 +564,8 @@ describe("vendor attendance HTTP", () => {
     );
     expect(view.dates[0]).toBe(first);
     expect(view.vendors.map((row) => row.vendorName)).toEqual([
-      "Anil Gang",
-      "Ramesh Gang",
+      "Anbu Gang",
+      "Muthu Gang",
     ]);
     expect(view.vendors[1]?.totals).toMatchObject({
       fullDayCount: 5 * dates.length,

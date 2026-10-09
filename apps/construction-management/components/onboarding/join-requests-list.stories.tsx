@@ -11,9 +11,9 @@ import { OnboardingShell } from "./onboarding-shell";
 
 const REQUEST = {
   id: "0199c3a0-0000-7000-8000-000000000010",
-  companyId: "company_shree",
-  companyName: "Shree Infra",
-  memberName: "Ramesh Patil",
+  companyId: "company_sri",
+  companyName: "Sri Infra",
+  memberName: "Arun Selva Kumar",
   invitedAt: "2026-10-08T06:30:00.000Z",
 };
 
@@ -61,9 +61,11 @@ export const AcceptARequest: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Join Requests" }),
     ).toBeVisible();
-    await expect(canvas.getByText("Invited you as Ramesh Patil")).toBeVisible();
+    await expect(
+      canvas.getByText("Invited you as Arun Selva Kumar"),
+    ).toBeVisible();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Accept Shree Infra" }),
+      canvas.getByRole("button", { name: "Accept Sri Infra" }),
     );
     await waitFor(() =>
       expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
@@ -93,10 +95,10 @@ export const DeclineARequest: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Decline Shree Infra" }),
+      await canvas.findByRole("button", { name: "Decline Sri Infra" }),
     );
     await waitFor(() =>
-      expect(canvas.queryByText("Shree Infra")).not.toBeInTheDocument(),
+      expect(canvas.queryByText("Sri Infra")).not.toBeInTheDocument(),
     );
     await expect(authMocks.navigateInApp).not.toHaveBeenCalled();
   },

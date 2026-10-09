@@ -9,7 +9,7 @@ import type { PaidOrderTerms } from "./subscription";
 export type BillingAddress = {
   name: string;
   address: string;
-  /** GST state code, the place of supply (`27` Maharashtra). */
+  /** GST state code, the place of supply (`33` Tamil Nadu). */
   stateCode: string;
   gstin: string | null;
 };

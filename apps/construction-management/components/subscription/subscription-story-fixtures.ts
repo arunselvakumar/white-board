@@ -51,10 +51,10 @@ export const activeView: SubscriptionView = {
   owner: {
     unusedValuePaise: 1_400_000,
     lastBillingAddress: {
-      name: "Patil Builders",
-      address: "Plot 4, Baner, Pune 411045",
-      stateCode: "27",
-      gstin: "27AAPFU0939F1ZV",
+      name: "Anugraha Engineers",
+      address: "Plot 4, Vadasery, Nagercoil 629001",
+      stateCode: "33",
+      gstin: "33AAPFA0939F1ZM",
     },
     paymentsConfigured: true,
   },

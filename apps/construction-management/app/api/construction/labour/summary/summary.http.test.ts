@@ -75,7 +75,7 @@ async function mark(
 async function seed(company: Company) {
   const projectId = await addProject(company.workspaceId, company.userId);
   const other = await addProject(company.workspaceId, company.userId);
-  const [raju, sita, mohan, idle] = await Promise.all([
+  const [dhuresh, kavitha, murugan, idle] = await Promise.all([
     labourer(company, projectId),
     labourer(company, projectId),
     labourer(company, projectId),
@@ -83,18 +83,18 @@ async function seed(company: Company) {
   ]);
   await labourer(company, other);
   await labourer(company, projectId, false);
-  await mark(company, projectId, raju, TODAY, "present");
-  await mark(company, projectId, sita, TODAY, "half_day");
-  await mark(company, projectId, mohan, TODAY, "holiday");
-  await mark(company, projectId, raju, YESTERDAY, "present");
-  await mark(company, projectId, sita, YESTERDAY, "absent");
+  await mark(company, projectId, dhuresh, TODAY, "present");
+  await mark(company, projectId, kavitha, TODAY, "half_day");
+  await mark(company, projectId, murugan, TODAY, "holiday");
+  await mark(company, projectId, dhuresh, YESTERDAY, "present");
+  await mark(company, projectId, kavitha, YESTERDAY, "absent");
 
   const vendorId = newId();
   await prisma.constructionLabourVendor.create({
     data: {
       id: vendorId,
       workspaceId: company.workspaceId,
-      name: "Shinde Gang",
+      name: "Pandian Gang",
       joiningDate: calendarDateToDb("2026-01-01"),
       createdBy: company.userId,
       updatedBy: company.userId,
@@ -144,8 +144,8 @@ async function seed(company: Company) {
   });
   await prisma.$transaction((tx) =>
     prismaLedger.post(tx, company.workspaceId, company.userId, [
-      entry("labour", raju, 1_60_000),
-      entry("labour", sita, -50_000),
+      entry("labour", dhuresh, 1_60_000),
+      entry("labour", kavitha, -50_000),
       entry("vendor", vendorId, 4_00_000),
     ]),
   );

@@ -124,7 +124,7 @@ export function MobileOtpFlow({
           <Input
             id="name"
             autoComplete="name"
-            placeholder="Ramesh Patil"
+            placeholder="Arun Selva Kumar"
             className="h-10"
             {...form.register("name")}
           />

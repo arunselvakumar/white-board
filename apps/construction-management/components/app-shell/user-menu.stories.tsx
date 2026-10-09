@@ -21,9 +21,9 @@ export const InitialsAndMyProfile: Story = {
   args: { photoUrl: null },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const trigger = canvas.getByRole("button", {
-      name: "Account menu for Ramesh Patil",
+      name: "Account menu for Arun Selva Kumar",
     });
-    await expect(trigger).toHaveTextContent("RP");
+    await expect(trigger).toHaveTextContent("AK");
     await userEvent.click(trigger);
     const menu = within(
       await within(canvasElement.ownerDocument.body).findByRole("menu"),

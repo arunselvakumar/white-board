@@ -14,7 +14,7 @@ import {
   page,
   PAYERS,
   PROJECT_ID,
-  RAJU_PAYMENT,
+  DHURESH_PAYMENT,
   TODAY,
 } from "./payment-fixtures";
 import { PaymentsPage } from "./payments-page";
@@ -30,7 +30,7 @@ function gets(prefix: string): ApiCall[] {
     .filter((call) => call.method === "GET" && call.path.startsWith(prefix));
 }
 
-function serve(options: { payments?: (typeof RAJU_PAYMENT)[] } = {}) {
+function serve(options: { payments?: (typeof DHURESH_PAYMENT)[] } = {}) {
   return () => {
     api = mockApi((call) => {
       if (call.method !== "GET") return undefined;
@@ -80,10 +80,10 @@ export const LabourWithPeriodSwitch: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement);
     await expect(
-      await canvas.findByRole("button", { name: "Pay Raju Pawar" }),
+      await canvas.findByRole("button", { name: "Pay Dhuresh Nawin" }),
     ).toBeVisible();
     await expect(canvas.getByText("September 2026")).toBeVisible();
-    // Raju's Final Amount and the total of both labourers.
+    // Dhuresh's Final Amount and the total of both labourers.
     await expect(canvas.getAllByText("₹2,000.00").length).toBeGreaterThan(0);
     await expect(canvas.getAllByText("₹3,350.00").length).toBeGreaterThan(0);
     await expect(canvas.getAllByText("Other Project").length).toBeGreaterThan(
@@ -104,7 +104,7 @@ export const LabourWithPeriodSwitch: Story = {
     );
     await waitFor(() =>
       expect(
-        canvas.queryByRole("button", { name: "Pay Seema Kale" }),
+        canvas.queryByRole("button", { name: "Pay Meena Selvi" }),
       ).toBeNull(),
     );
 
@@ -124,10 +124,10 @@ export const PayFromRow: Story = {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Pay Raju Pawar" }),
+      await canvas.findByRole("button", { name: "Pay Dhuresh Nawin" }),
     );
     const dialog = within(
-      await body.findByRole("dialog", { name: "Pay Raju Pawar" }),
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
     );
     await expect(await dialog.findByLabelText("Amount")).toHaveValue("2000");
   },
@@ -146,13 +146,13 @@ export const EmptyVendors: Story = {
 /** Recorded payments with a kind filter. */
 export const PaymentsTab: Story = {
   args: { initialTab: "payments" },
-  beforeEach: serve({ payments: [RAJU_PAYMENT, GANG_ADVANCE] }),
+  beforeEach: serve({ payments: [DHURESH_PAYMENT, GANG_ADVANCE] }),
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement);
     await expect(
       await canvas.findByText("2 payments · ₹5,300.00"),
     ).toBeVisible();
-    await expect(canvas.getAllByText("Suresh Gang").length).toBeGreaterThan(0);
+    await expect(canvas.getAllByText("Prabhu Gang").length).toBeGreaterThan(0);
     await userEvent.click(canvas.getByRole("button", { name: "Advances" }));
     await expect(
       await canvas.findByText("1 payment · ₹5,000.00"),

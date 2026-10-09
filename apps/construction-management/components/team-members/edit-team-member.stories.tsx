@@ -8,7 +8,7 @@ import { signInAs } from "../../.storybook/mocks/auth";
 import { EditTeamMember } from "./edit-team-member";
 import { DESIGNATION_LIST, teamMember } from "./team-member-fixtures";
 
-const MEMBER = teamMember({ status: "active", userId: "user_suresh" });
+const MEMBER = teamMember({ status: "active", userId: "user_prabhu" });
 const ONE = `/api/construction/organization/team-members/${MEMBER.id}`;
 
 let fetchMock: ReturnType<typeof mockFetch> | null = null;
@@ -37,7 +37,7 @@ const meta = {
       {
         method: "POST",
         path: `${ONE}/update`,
-        respond: () => Response.json({ ...MEMBER, name: "Suresh K." }),
+        respond: () => Response.json({ ...MEMBER, name: "Prabhu K." }),
       },
       {
         method: "POST",
@@ -68,10 +68,10 @@ export const EditDetailsKeepsAadhaar: Story = {
       "readonly",
     );
     await userEvent.clear(name);
-    await userEvent.type(name, "Suresh K.");
+    await userEvent.type(name, "Prabhu K.");
     await userEvent.click(canvas.getByRole("button", { name: "Save details" }));
     await waitFor(() =>
-      expect(bodyOf(`${ONE}/update`)).toMatchObject({ name: "Suresh K." }),
+      expect(bodyOf(`${ONE}/update`)).toMatchObject({ name: "Prabhu K." }),
     );
     // Blank Aadhaar is left out, so the stored one stays.
     await expect("aadhaar" in bodyOf(`${ONE}/update`)).toBe(false);
@@ -139,7 +139,7 @@ export const OwnerMatrixIsFixed: Story = {
       {
         path: ONE,
         respond: () =>
-          Response.json({ ...MEMBER, isOwner: true, name: "Ramesh Patil" }),
+          Response.json({ ...MEMBER, isOwner: true, name: "Arun Selva Kumar" }),
       },
     ]);
     return fetchMock.restore;

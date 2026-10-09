@@ -74,7 +74,7 @@ async function fixtures(company: Company) {
   const labour = await json<{ id: string }>(
     await createLabour(
       jsonRequest(LABOURS, company.cookie, {
-        name: "Raju Pawar",
+        name: "Dhuresh Nawin",
         joiningDate: "2026-08-01",
         wageType: "daily",
         wagePerDay: 70_000,
@@ -88,7 +88,7 @@ async function fixtures(company: Company) {
   const vendor = await json<{ id: string }>(
     await createVendor(
       jsonRequest(VENDORS, company.cookie, {
-        name: "Suresh Gang",
+        name: "Prabhu Gang",
         joiningDate: "2026-08-01",
         projectIds: [villa],
         shifts: [],
@@ -186,7 +186,7 @@ describe("wage payments HTTP", () => {
     expect(paid.status).toBe(StatusCodes.CREATED);
     const payment = await json<Payment>(paid);
     expect(payment).toMatchObject({
-      partyName: "Raju Pawar",
+      partyName: "Dhuresh Nawin",
       projectName: "Tower A",
       kind: "payment",
       mode: "cash",
@@ -384,7 +384,7 @@ describe("wage payments HTTP", () => {
       ),
     );
     expect(vendors.items.map((item) => item.partyName)).toEqual([
-      "Suresh Gang",
+      "Prabhu Gang",
     ]);
   });
 

@@ -70,10 +70,10 @@ export function authFailure(
 
 export const storyUser: CompanyAuthUser = {
   id: "user_owner",
-  name: "Ramesh Patil",
-  email: "ramesh@patilbuilders.in",
+  name: "Arun Selva Kumar",
+  email: "muthu@anugrahaengineers.in",
   emailVerified: true,
-  phoneNumber: "+919876543210",
+  phoneNumber: "+917708165767",
   image: null,
 };
 
@@ -121,8 +121,8 @@ export function signInAs(
   company: { id?: string; name?: string } = {},
 ): void {
   const summary: CompanySummary = {
-    id: company.id ?? "company_patil",
-    name: company.name ?? "Patil Builders",
+    id: company.id ?? "company_anugraha",
+    name: company.name ?? "Anugraha Engineers",
     role,
   };
   authMocks.userId = storyUser.id;

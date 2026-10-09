@@ -20,7 +20,7 @@ function entry(
   sequence += 1;
   return {
     id: `e${String(sequence)}`,
-    partyId: "raju",
+    partyId: "dhuresh",
     kind,
     amount,
     entryDate,
@@ -130,26 +130,26 @@ const projects = {
 };
 
 describe("BalanceHandlers", () => {
-  const raju: BalanceParty = {
-    id: "raju",
-    name: "Raju",
+  const dhuresh: BalanceParty = {
+    id: "dhuresh",
+    name: "Dhuresh",
     code: null,
     isActive: true,
     onProject: true,
   };
-  const seema: BalanceParty = { ...raju, id: "seema", onProject: false };
+  const meena: BalanceParty = { ...dhuresh, id: "meena", onProject: false };
   const entries = [
     entry("2026-08-01", "opening", 100_000, { projectId: null }),
     entry("2026-09-10", "earned", 70_000),
     entry("2026-09-11", "overtime", 20_000, { projectId: "villa" }),
     entry("2026-09-12", "earned", 35_000, {
-      partyId: "seema",
+      partyId: "meena",
       projectId: "villa",
     }),
   ];
 
   it("summarizes each party over all of its entries, defaulting to this month", async () => {
-    const handlers = new BalanceHandlers(store([raju], entries), projects);
+    const handlers = new BalanceHandlers(store([dhuresh], entries), projects);
     const result = await handlers.balances({
       workspaceId: "w",
       projectId: "tower",
@@ -167,7 +167,7 @@ describe("BalanceHandlers", () => {
 
   it("refuses a statement of a party neither on the Project nor with entries in it", async () => {
     const handlers = new BalanceHandlers(
-      store([raju, seema], entries),
+      store([dhuresh, meena], entries),
       projects,
     );
     await expect(
@@ -175,7 +175,7 @@ describe("BalanceHandlers", () => {
         workspaceId: "w",
         projectId: "tower",
         partyType: "labour",
-        partyId: "seema",
+        partyId: "meena",
         from: "2026-09-01",
         to: "2026-09-30",
       }),
@@ -184,7 +184,7 @@ describe("BalanceHandlers", () => {
       workspaceId: "w",
       projectId: "tower",
       partyType: "labour",
-      partyId: "raju",
+      partyId: "dhuresh",
       from: "2026-09-01",
       to: "2026-09-30",
     });
@@ -195,7 +195,7 @@ describe("BalanceHandlers", () => {
   });
 
   it("refuses a period that ends before it starts and an unknown Project", async () => {
-    const handlers = new BalanceHandlers(store([raju], entries), projects);
+    const handlers = new BalanceHandlers(store([dhuresh], entries), projects);
     await expect(
       handlers.balances({
         workspaceId: "w",

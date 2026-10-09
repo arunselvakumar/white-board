@@ -5,7 +5,7 @@ import type { ProjectLabourSummary } from "@/src/queries/labour-summary";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { SHANTI } from "./project-fixtures";
+import { KUMARI } from "./project-fixtures";
 import { ProjectLabourTiles } from "./project-labour-tiles";
 
 const SUMMARY_PATH = "/api/construction/labour/summary";
@@ -53,7 +53,7 @@ function serve(body: ProjectLabourSummary | null) {
 const meta = {
   title: "Projects/LabourTiles",
   component: ProjectLabourTiles,
-  args: { projectId: SHANTI.id },
+  args: { projectId: KUMARI.id },
   render: (args) => (
     <StoryQueries>
       <div className="max-w-5xl p-6">
@@ -80,7 +80,7 @@ export const Today: Story = {
     await expect(canvas.getByText("₹1,84,500.00")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: /Labours present/ }),
-    ).toHaveAttribute("href", `/app/projects/${SHANTI.id}/attendance/labour`);
+    ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/attendance/labour`);
     const table = within(
       canvas.getByRole("table", {
         name: "Labours present and vendor heads per day",

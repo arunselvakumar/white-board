@@ -16,8 +16,8 @@ function fakes(options: { today?: string; parties?: PaymentParty[] } = {}) {
   const payments = new Map<string, StoredWagePayment>();
   const cancelled = new Set<string>();
   const parties = options.parties ?? [
-    { id: "raju", name: "Raju", projectIds: ["tower"] },
-    { id: "gang", name: "Suresh Gang", projectIds: ["villa"] },
+    { id: "dhuresh", name: "Dhuresh", projectIds: ["tower"] },
+    { id: "gang", name: "Prabhu Gang", projectIds: ["villa"] },
   ];
   const objects = new Map<string, Uint8Array>();
   const guarded: string[] = [];
@@ -120,7 +120,7 @@ const actor = { workspaceId: "w", userId: "u", role: "owner" as const };
 const input = {
   actor,
   partyType: "labour" as const,
-  partyId: "raju",
+  partyId: "dhuresh",
   projectId: "tower",
   paymentDate: "2026-10-05",
   kind: "payment" as const,
@@ -133,7 +133,7 @@ describe("WagePaymentHandlers", () => {
     const { handlers, guarded } = fakes();
     const payment = await handlers.record({ ...input, paidByMemberId: "m1" });
     expect(payment).toMatchObject({
-      partyName: "Raju",
+      partyName: "Dhuresh",
       projectName: "tower",
       paidBy: { id: "m1", name: "Owner" },
       amount: 50_000,
@@ -171,7 +171,7 @@ describe("WagePaymentHandlers", () => {
         partyId: "gang",
         projectId: "villa",
       }),
-    ).resolves.toMatchObject({ partyName: "Suresh Gang" });
+    ).resolves.toMatchObject({ partyName: "Prabhu Gang" });
     await expect(
       handlers.record({ ...input, projectId: "villa" }),
     ).resolves.toMatchObject({ projectId: "villa" });

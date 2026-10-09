@@ -689,7 +689,7 @@ function BuyerStep({ form }: StepProps) {
           <Input
             id="billing-name"
             className="h-10"
-            placeholder="Patil Builders"
+            placeholder="Anugraha Engineers"
             {...form.register("name")}
           />
           <FieldError message={errors.name?.message} />
@@ -699,7 +699,7 @@ function BuyerStep({ form }: StepProps) {
           <Textarea
             id="billing-address"
             rows={3}
-            placeholder="Plot 4, Baner, Pune 411045"
+            placeholder="Plot 4, Avinashi Road, Coimbatore 641018"
             {...form.register("address")}
           />
           <FieldError message={errors.address?.message} />
@@ -745,7 +745,7 @@ function BuyerStep({ form }: StepProps) {
           <Input
             id="billing-gstin"
             className="h-10 uppercase"
-            placeholder="27AAPFU0939F1ZV"
+            placeholder="33AAPFA0939F1ZM"
             maxLength={15}
             {...form.register("gstin")}
           />

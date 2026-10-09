@@ -56,7 +56,7 @@ async function owner(): Promise<{
   const { cookie, userId } = await signInByEmail();
   const response = await createCompany(
     post(`${TEST_ORIGIN}/api/construction/organization/companies`, cookie, {
-      name: "Patil Builders",
+      name: "Anugraha Engineers",
       country: "IN",
     }),
   );
@@ -96,7 +96,7 @@ async function member(
     by: company.userId,
     memberType: "normal",
     details: {
-      name: "Suresh Kale",
+      name: "Prabhu Saravanan",
       designationId: designations[0]?.id ?? "",
       email,
     },

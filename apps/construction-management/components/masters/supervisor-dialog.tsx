@@ -162,7 +162,7 @@ export function SupervisorDialog({
                 id="supervisor-name"
                 className="h-10"
                 autoComplete="off"
-                placeholder="Raju Mukadam"
+                placeholder="Rakesh Mirtha"
                 aria-invalid={errors.name != null}
                 {...form.register("name")}
               />

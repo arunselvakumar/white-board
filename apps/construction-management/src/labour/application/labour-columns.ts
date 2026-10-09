@@ -3,7 +3,12 @@
  * sheet order. Amounts in the sheet are rupees; the API is paise.
  */
 export const LABOUR_COLUMNS = [
-  { key: "name", header: "Labour Name*", example: "Raju Pawar", width: 24 },
+  {
+    key: "name",
+    header: "Labour Name*",
+    example: "Dhuresh Nawin",
+    width: 24,
+  },
   {
     key: "labourCode",
     header: "Labour Id",
@@ -14,7 +19,7 @@ export const LABOUR_COLUMNS = [
   {
     key: "fatherName",
     header: "Father's Name",
-    example: "Shankar Pawar",
+    example: "Nawin Kumar",
     width: 22,
   },
   {
@@ -70,7 +75,7 @@ export const LABOUR_COLUMNS = [
   {
     key: "contactNumber",
     header: "Contact Number",
-    example: "9876543210",
+    example: "7708165767",
     width: 16,
     text: true,
   },
