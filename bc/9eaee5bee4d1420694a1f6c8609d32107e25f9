@@ -1,0 +1,55 @@
+apps/construction-management/.storybook/preview.tsx
+  s_6497dd4ebf3e73::t_5c1c13ced98179 6,13-18
+apps/construction-management/components/money/money-input.tsx
+  s_6497dd4ebf3e73::t_f8b87da38ea5cc 3,60,65,67-69,85-89
+apps/construction-management/components/projects/contract-papers-field.tsx
+  s_6497dd4ebf3e73::t_75d5fb8574f725 1-188
+apps/construction-management/components/projects/custom-fields-field.tsx
+  s_6497dd4ebf3e73::t_9557151b25a1ec 1-227
+apps/construction-management/components/projects/form-card.tsx
+  s_6497dd4ebf3e73::t_18d3018cbfe99e 1-104
+apps/construction-management/components/projects/project-fixtures.ts
+  s_6497dd4ebf3e73::t_dfef138891c915 56-74
+apps/construction-management/components/projects/project-form-schema.ts
+  s_6497dd4ebf3e73::t_f738dc2bdf4037 1-329
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_6497dd4ebf3e73::t_9d48d0af3d0b4a 3-5,12-20,25,37-40,46-77,91-93,97-110,119,143,148,152,154,157,162-280,297,308,313,345-507,509-534,543-544,557-569,575-729,731,754
+apps/construction-management/components/projects/project-form.tsx
+  s_6497dd4ebf3e73::t_6f27ebebf96685 6-15,41-46,56-77,79-83,90-100,103-171,174-183,187,194-195,198,200-204,207-209,211-270,275,280-305,307-365,367-399,401-455,457,459,472-476,480-484,491,495-500,503,505-518
+apps/construction-management/components/projects/project-overview.stories.tsx
+  s_6497dd4ebf3e73::t_a0b1cff1b262b5 1-100
+apps/construction-management/components/projects/project-overview.tsx
+  s_6497dd4ebf3e73::t_d06db4428ce336 4-7,10,12-17,45-163,170,205-206
+apps/construction-management/src/queries/projects.ts
+  s_6497dd4ebf3e73::t_da8230be73378d 9,44-55
+packages/ui/src/components/autocomplete.tsx
+  s_6497dd4ebf3e73::t_2b9d7bdc4f838c 1-103
+apps/construction-management/components/projects/project-contract.ts
+  s_0666893810e874::t_4c8f5eb2aea29f 1-97
+apps/construction-management/components/projects/project-flash.ts
+  s_0666893810e874::t_70ce3b04ceeeea 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bc9eaee5bee4d1420694a1f6c8609d32107e25f9",
+  "prompts": {},
+  "sessions": {
+    "s_0666893810e874": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af765abe37f8ca19b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
