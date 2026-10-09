@@ -435,6 +435,10 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 | CM-410 |  10 | Gallery (all project media, search, uploaded-by)                                                                                                      | todo   | CM-407     | HTTP+UI     |
 | CM-411 |  11 | Project home tiles, hide/show modules, tile ordering, pin project                                                                                     | todo   | CM-402     | UI          |
 | CM-412 |  12 | Project dashboard shell with Task/Payments/Materials sections stubbed for later milestones                                                            | todo   | CM-411     | UI          |
+| CM-413 |  13 | Contract Details (Client, Tender/RFQ, Quotation, LOA, PO / WO, Agreement, Order Value) and Custom Fields on a Project                                 | done   | CM-204     | Domain+UI   |
+| CM-414 |  14 | Project Documents: any file but programs, ≤ 25 MB, filed by paper; direct browser uploads to Blob                                                     | done   | CM-204     | Domain+UI   |
+
+> CM-413 and CM-414 shipped ahead of M4 at the owner's request ([ADR CM-0010](../adr/CM-0010-project-contract-details-and-documents.md)). CM-414 also brings the direct browser upload that CM-407 can grow into the shared attachments service.
 
 ## M5 — Procurement & inventory (board only)
 

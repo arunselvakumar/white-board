@@ -168,3 +168,4 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 | CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                       |
 | CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                    |
 | CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                           | SMS needs DLT registration the business does not have yet                              |
+| CM-0010 | Project Contract Details, per-Project Custom Fields, Project Documents with direct browser uploads to private Blob  | Owner request (2026-10-09); Vercel 4.5 MB body limit                                   |

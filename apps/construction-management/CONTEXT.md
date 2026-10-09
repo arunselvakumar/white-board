@@ -103,6 +103,34 @@ Any other counter-party — a customer you raise a sales invoice to, a consultan
 A construction job. Almost everything hangs off a Project. One of the three top-level areas (**Projects**).
 _Avoid_: site (for the record), job
 
+**Client**:
+Who gave the Company the work on a Project: a name and a mobile on the Project. Not a Party master (yet).
+_Avoid_: customer, owner (the Owner is the Company's)
+
+**Contract Details**:
+The papers that gave the Company a Project, each optional, in the order they happen: Tender / RFQ reference, Quotation (No. and date), Letter of Award (LOA), Client Order, Agreement, and the Order Value (ADR CM-0010).
+_Avoid_: tender details, order details
+
+**Quotation**:
+The Company's numbered price offer to the Client, with the date it was issued.
+_Avoid_: quote (in UI copy), estimate, bid
+
+**Client Order (PO / WO)**:
+The Purchase Order or Work Order the Client issued to the Company, accepting the Quotation. On screens it is "PO / WO". Not the Purchase Order the Company sends a Supplier (PR / PO below).
+_Avoid_: purchase order (alone), work order (alone), order
+
+**Order Value**:
+The Client Order's value excluding GST, shown only to Team Members with the Project menu's Financial flag.
+_Avoid_: contract value, budget (that is the Company's own figure)
+
+**Custom Field**:
+A field a Team Member names on one Project ("Site engineer", "Architect") and fills with text. Names already used on other Projects are offered so spelling stays the same.
+_Avoid_: extra field, attribute, metadata
+
+**Project Document**:
+A file kept on a Project, filed under the paper it is a copy of (Tender, Quotation, LOA, PO / WO, Agreement) or Other. Any type but programs, up to 25 MB.
+_Avoid_: attachment (for these), upload
+
 **Phase / Wing / Floor / Unit**:
 The building structure inside a Project. A Wing has a type (Commercial, Residential, Bungalow scheme, Plotting scheme…) that drives Floor generation.
 _Avoid_: tower, block, flat (use Wing and Unit)
@@ -120,7 +148,7 @@ The day's work record per Contractor/Department/location: labour counts, approxi
 _Avoid_: DPR (that is the Daily Progress Report built from Worksheets), daily log
 
 **PR / PO / GRN / MT / MR / DN**:
-Purchase Request, Purchase Order, Goods Receipt Note, Material Transfer, Material Request (central store), Delivery Note. Spell them out on first use in a screen.
+Purchase Request, Purchase Order, Goods Receipt Note, Material Transfer, Material Request (central store), Delivery Note. Spell them out on first use in a screen. This Purchase Order goes from the Company to a Supplier; the one a Client sends the Company is the Client Order.
 _Avoid_: requisition, indent, invoice (for a PO)
 
 **Petty Cash**:
@@ -211,5 +239,8 @@ _Avoid_: price (unless it is a rate), cost
 | Labours (plural)     | labourers, workers              |
 | Rate Card            | price list                      |
 | Wage Payment         | salary (for Labours)            |
+| Client               | customer                        |
+| PO / WO (Client)     | purchase order (alone)          |
+| Tender / RFQ ref.    | enquiry ref.                    |
 
 `Workspace` appears in code because `@repo/auth` calls a Company a Workspace. It never appears in UI copy as the tenant; on screens "Workspace" names only the cross-project area.
