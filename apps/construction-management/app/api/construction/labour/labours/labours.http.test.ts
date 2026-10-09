@@ -46,6 +46,7 @@ type Labour = {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
+  workingHoursPerDay: string;
   weeklyHolidays: number[];
   openingBalance: number | null;
   balance: number | null;
@@ -263,6 +264,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       wageType: "daily",
       wagePerDay: 70_000,
       wagePerMonth: null,
+      workingHoursPerDay: "8",
       openingBalance: 150_000,
       balance: 150_000,
       aadhaarMasked: "XXXXXXXX2346",
@@ -372,6 +374,62 @@ describe("Labour register (CM-205 – CM-207)", () => {
       wagePerMonth: 18_00_000,
       wagePerDay: null,
     });
+  });
+
+  it("keeps working hours a day: 8 by default, kept when an edit leaves them out, shown without Financial", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { workingHoursPerDay: "9.50" }),
+    );
+    expect(labour.workingHoursPerDay).toBe("9.5");
+    const row = await prisma.constructionLabourLabour.findUniqueOrThrow({
+      where: { id: labour.id },
+    });
+    expect(row.workingHoursPerDay.toString()).toBe("9.5");
+
+    const renamed = await json<Labour>(
+      await update(company.cookie, labour, { name: "Dhuresh P" }),
+    );
+    expect(renamed.workingHoursPerDay).toBe("9.5");
+    const cleared = await json<Labour>(
+      await update(company.cookie, renamed, { workingHoursPerDay: null }),
+    );
+    expect(cleared.workingHoursPerDay).toBe("9.5");
+    const changed = await json<Labour>(
+      await update(company.cookie, cleared, { workingHoursPerDay: 12 }),
+    );
+    expect(changed.workingHoursPerDay).toBe("12");
+    const invalid = await update(company.cookie, changed, {
+      workingHoursPerDay: "25",
+    });
+    expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(invalid)).toBe("WORKING_HOURS_INVALID");
+
+    const clerk = await memberOn(
+      company,
+      { "masters.labours": ["read"], "labour.attendance": ["read"] },
+      [tower],
+    );
+    expect((await get(clerk.cookie, labour.id)).workingHoursPerDay).toBe("12");
+    const options = await json<{
+      items: { id: string; workingHoursPerDay: string; wagePerDay: unknown }[];
+    }>(
+      await labourOptions(
+        jsonRequest(
+          `${BASE}/options?projectId=${tower}&date=2026-10-01`,
+          clerk.cookie,
+        ),
+      ),
+    );
+    expect(options.items).toEqual([
+      expect.objectContaining({
+        id: labour.id,
+        workingHoursPerDay: "12",
+        wagePerDay: null,
+      }),
+    ]);
   });
 
   it("validates fields, references and the Labour Id", async () => {
@@ -765,6 +823,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       "Project*": `tower a ${suffix}`,
       "Labour Category": `Mason ${suffix}`,
       "Labour Id": "IMP-1",
+      "Working Hours per Day": 9,
     };
     fill(2, good);
     fill(3, {
@@ -822,7 +881,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
     ).toBe(1);
 
     sheet.spliceRows(3, 2);
-    fill(3, { ...good, "Labour Name*": "Manikandan", "Labour Id": "IMP-2" });
+    // Blank working hours are 8.
+    const { "Working Hours per Day": _hours, ...noHours } = good;
+    fill(3, { ...noHours, "Labour Name*": "Manikandan", "Labour Id": "IMP-2" });
     const fixed = await xlsxBytes(template);
     const imported = await importLabours(
       upload(`${BASE}/import?dryRun=false`, company.cookie, fixed, XLSX),
@@ -836,6 +897,12 @@ describe("Labour register (CM-205 – CM-207)", () => {
       await listLabours(jsonRequest(`${BASE}?q=IMP`, company.cookie)),
     );
     expect(list.items).toHaveLength(2);
+    expect(
+      list.items.map((item) => [item.name, item.workingHoursPerDay]).sort(),
+    ).toEqual([
+      ["Ganesh", "9"],
+      ["Manikandan", "8"],
+    ]);
     expect(list.items[0]).toMatchObject({
       wagePerDay: 65_000,
       overtimeWagePerHour: 8_050,
@@ -873,6 +940,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(cell("Labour Name")).toBe("Tower man");
     expect(cell("Wage per Day (₹)")).toBe(700);
     expect(cell("Aadhaar Number")).toBe("XXXXXXXX2346");
+    expect(cell("Working Hours per Day")).toBe(8);
 
     const clerk = await memberOn(company, { "masters.labours": ["read"] });
     const hidden = (
@@ -884,6 +952,11 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(
       hidden?.getRow(2).getCell(headers.indexOf("Wage per Day (₹)") + 1).value,
     ).toBeNull();
+    // Working hours are not an amount.
+    expect(
+      hidden?.getRow(2).getCell(headers.indexOf("Working Hours per Day") + 1)
+        .value,
+    ).toBe(8);
   });
 
   it("keeps a photo and documents", async () => {

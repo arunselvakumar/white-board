@@ -40,6 +40,11 @@ type Day = {
   isPaidLeave: boolean;
   shift: string | null;
   supervisor: { id: string; name: string } | null;
+  checkIn: string | null;
+  checkOut: string | null;
+  breakMinutes: number | null;
+  workingHours: string;
+  workedHours: string | null;
   wageRate: number | null;
   earned: number | null;
   overtime: {
@@ -47,6 +52,7 @@ type Day = {
     hours: string;
     ratePerHour: number | null;
     amount: number | null;
+    fromTimes: boolean;
   }[];
   overtimeHours: string;
   overtimeAmount: number | null;
@@ -131,7 +137,7 @@ async function fixtures(company: Company) {
     wageType: "monthly",
     wagePerMonth: MONTHLY,
   });
-  return { tower, villa, mason, sundar, dhuresh, kavitha };
+  return { tower, villa, mason, sundar, dhuresh, kavitha, labour };
 }
 
 type Fixtures = Awaited<ReturnType<typeof fixtures>>;
@@ -733,6 +739,121 @@ describe("labour attendance HTTP", () => {
       overtimeHours: "1.5",
       earned: sameMonth ? 2 * DAILY : DAILY,
       overtimeAmount: 15_000,
+    });
+  });
+
+  it("works overtime out from check-in and check-out at the Labour's working hours (ADR CM-0011)", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const watchman = await f.labour({
+      name: "Watchman Velu",
+      wageType: "daily",
+      wagePerDay: DAILY,
+      workingHoursPerDay: 9,
+    });
+    const timed = (times: Record<string, unknown>) => ({
+      projectId: f.tower,
+      date: YESTERDAY,
+      marks: [
+        {
+          labourId: watchman,
+          status: "present",
+          ...times,
+          overtime: [{ labourCategoryId: f.mason, fromTimes: true, hours: 7 }],
+        },
+      ],
+    });
+
+    // 08:00–19:00 less a 1-hour break is 10 hours: 1 hour beyond 9.
+    const [day] = await marked(
+      company.cookie,
+      timed({ checkIn: "08:00", checkOut: "19:00", breakMinutes: 60 }),
+    );
+    expect(day).toMatchObject({
+      checkIn: "08:00",
+      checkOut: "19:00",
+      breakMinutes: 60,
+      workingHours: "9",
+      workedHours: "10",
+      overtime: [
+        {
+          labourCategoryId: f.mason,
+          hours: "1",
+          ratePerHour: OT,
+          amount: OT,
+          fromTimes: true,
+        },
+      ],
+      overtimeHours: "1",
+      total: DAILY + OT,
+    });
+    const entries = await prisma.constructionLabourLedgerEntry.findMany({
+      where: { sourceId: day?.id },
+      orderBy: { kind: "asc" },
+    });
+    expect(entries.map((entry) => [entry.kind, entry.amount])).toEqual([
+      ["earned", DAILY],
+      ["overtime", OT],
+    ]);
+    const row = await prisma.constructionLabourAttendance.findUniqueOrThrow({
+      where: { id: day?.id },
+      include: { overtime: true },
+    });
+    expect(row.workingHours.toString()).toBe("9");
+    expect(row.overtime[0]?.fromTimes).toBe(true);
+
+    // A later check-out re-works the line.
+    const [later] = await marked(company.cookie, {
+      ...timed({ checkIn: "08:00", checkOut: "20:30" }),
+      expected: { [watchman]: day?.updatedAt },
+    });
+    expect(later).toMatchObject({
+      workedHours: "11.5",
+      overtime: [{ hours: "2.5", amount: 25_000, fromTimes: true }],
+    });
+    expect(await ledgerSum(watchman)).toBe(DAILY + 25_000);
+
+    // A check-in alone: no overtime from the times yet.
+    const [morning] = await marked(company.cookie, {
+      ...timed({ checkIn: "08:00", checkOut: null }),
+      expected: { [watchman]: later?.updatedAt },
+    });
+    expect(morning).toMatchObject({
+      checkIn: "08:00",
+      checkOut: null,
+      breakMinutes: 60,
+      workedHours: null,
+      overtime: [],
+    });
+    expect(await ledgerSum(watchman)).toBe(DAILY);
+
+    // The sheet carries working hours and yesterday's times.
+    const today = await json<{
+      labourers: {
+        labourId: string;
+        workingHoursPerDay: string | null;
+        yesterday: { checkIn: string | null; breakMinutes: number | null };
+      }[];
+    }>(await sheet(company.cookie, f.tower, TODAY));
+    expect(
+      today.labourers.find((row) => row.labourId === watchman),
+    ).toMatchObject({
+      workingHoursPerDay: "9",
+      yesterday: { checkIn: "08:00", breakMinutes: 60 },
+    });
+
+    // Times on an Absent day are refused for that Labour.
+    const absent = await failure(
+      await mark(company.cookie, {
+        projectId: f.tower,
+        date: YESTERDAY,
+        marks: [{ labourId: f.dhuresh, status: "absent", checkIn: "09:00" }],
+      }),
+    );
+    expect(absent).toMatchObject({
+      status: StatusCodes.BAD_REQUEST,
+      code: "TIMES_NEED_PRESENT",
+      details: { labourId: f.dhuresh, field: "checkIn" },
     });
   });
 

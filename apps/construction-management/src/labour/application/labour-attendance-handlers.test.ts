@@ -293,6 +293,84 @@ describe("LabourAttendanceHandlers.markDay", () => {
     expect(again?.overtimeAmount).toBe(40_000);
   });
 
+  it("works out overtime from the times and keeps its saved rate on a re-mark", async () => {
+    const { store, handlers } = setup();
+    const [dhuresh] = await handlers.markDay(
+      mark({
+        marks: [
+          {
+            labourId: "dhuresh",
+            status: "present",
+            checkIn: "08:00",
+            checkOut: "19:30",
+            overtime: [
+              {
+                labourCategoryId: "mason",
+                fromTimes: true,
+                ratePerHour: 12_000,
+              },
+              { labourCategoryId: "mason", hours: 1 },
+            ],
+          },
+        ],
+      }),
+    );
+    if (dhuresh == null) throw new Error("no row");
+    expect(dhuresh).toMatchObject({
+      checkIn: "08:00",
+      checkOut: "19:30",
+      breakMinutes: 60,
+      workingHours: "8",
+      workedHours: "10.5",
+      overtime: [
+        { hours: "2.5", ratePerHour: 12_000, amount: 30_000, fromTimes: true },
+        { hours: "1", ratePerHour: 10_000, amount: 10_000, fromTimes: false },
+      ],
+      overtimeHours: "3.5",
+    });
+    expect(store.balance("dhuresh")).toBe(70_000 + 40_000);
+
+    // A member without Financial changes the check-out: no rates come back.
+    const [again] = await handlers.markDay(
+      mark({
+        marks: [
+          {
+            labourId: "dhuresh",
+            status: "present",
+            checkIn: "08:00",
+            checkOut: "20:00",
+            overtime: [
+              { labourCategoryId: "mason", hours: 1 },
+              { labourCategoryId: "mason", fromTimes: true },
+            ],
+          },
+        ],
+        expected: { dhuresh: dhuresh.updatedAt },
+      }),
+    );
+    expect(again?.overtime).toMatchObject([
+      { hours: "1", ratePerHour: 10_000, fromTimes: false },
+      { hours: "3", ratePerHour: 12_000, amount: 36_000, fromTimes: true },
+    ]);
+    expect(again?.workedHours).toBe("11");
+  });
+
+  it("refuses times on an Absent day with details.labourId", async () => {
+    const { handlers } = setup();
+    const refused = await failure(
+      handlers.markDay(
+        mark({
+          marks: [{ labourId: "dhuresh", status: "absent", checkIn: "09:00" }],
+        }),
+      ),
+    );
+    expect(refused.code).toBe("TIMES_NEED_PRESENT");
+    expect(refused.details).toMatchObject({
+      field: "checkIn",
+      labourId: "dhuresh",
+    });
+  });
+
   it("applies the back-dated guard", async () => {
     const { handlers, guard } = setup();
     guard.refuse = "create";
@@ -398,6 +476,54 @@ describe("LabourAttendanceHandlers queries", () => {
     });
     expect(today.labourCategories).toEqual([{ id: "mason", name: "Mason" }]);
     expect(today.supervisors).toEqual([{ id: "sundar", name: "Sundar" }]);
+  });
+
+  it("shows working hours and yesterday's times on the sheet", async () => {
+    const { handlers } = setup();
+    await handlers.markDay(
+      mark({
+        date: YESTERDAY,
+        marks: [
+          {
+            labourId: "dhuresh",
+            status: "present",
+            checkIn: "22:00",
+            checkOut: "07:00",
+            breakMinutes: 30,
+          },
+        ],
+      }),
+    );
+    await handlers.markDay(
+      mark({
+        marks: [{ labourId: "kavitha", status: "present", checkIn: "09:00" }],
+      }),
+    );
+    const sheet = await handlers.sheet("w1", "p1", TODAY);
+    expect(sheet.labourers[0]).toMatchObject({
+      workingHoursPerDay: "8",
+      yesterday: {
+        status: "present",
+        checkIn: "22:00",
+        checkOut: "07:00",
+        breakMinutes: 30,
+      },
+      attendance: null,
+    });
+    expect(sheet.labourers[1]).toMatchObject({
+      yesterday: null,
+      attendance: {
+        checkIn: "09:00",
+        checkOut: null,
+        breakMinutes: 60,
+        workingHours: "8",
+        workedHours: null,
+      },
+    });
+    const [night] = (
+      await handlers.sheet("w1", "p1", YESTERDAY)
+    ).labourers.flatMap((row) => (row.attendance == null ? [] : [row]));
+    expect(night?.attendance?.workedHours).toBe("8.5");
   });
 
   it("totals the month grid per Labour", async () => {

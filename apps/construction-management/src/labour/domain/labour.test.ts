@@ -99,6 +99,26 @@ describe("labourDetails", () => {
     ).toBe("OVERTIME_WAGE_REQUIRED");
   });
 
+  it("takes working hours a day, 8 when left out", () => {
+    expect(labourDetails(BASE).workingHoursPerDay).toBe("8");
+    expect(
+      labourDetails({ ...BASE, workingHoursPerDay: null }).workingHoursPerDay,
+    ).toBe("8");
+    expect(
+      labourDetails({ ...BASE, workingHoursPerDay: " " }).workingHoursPerDay,
+    ).toBe("8");
+    expect(
+      labourDetails({ ...BASE, workingHoursPerDay: "8.50" }).workingHoursPerDay,
+    ).toBe("8.5");
+    expect(
+      labourDetails({ ...BASE, workingHoursPerDay: 12 }).workingHoursPerDay,
+    ).toBe("12");
+    for (const bad of [0, 25, "8.123", "abc"])
+      expect(
+        codeOf(() => labourDetails({ ...BASE, workingHoursPerDay: bad })),
+      ).toBe("WORKING_HOURS_INVALID");
+  });
+
   it("checks names, dates, weekdays and statutory numbers", () => {
     expect(codeOf(() => labourDetails({ ...BASE, name: " " }))).toBe(
       "LABOUR_NAME_REQUIRED",

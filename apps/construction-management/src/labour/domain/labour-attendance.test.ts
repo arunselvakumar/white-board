@@ -128,3 +128,167 @@ describe("priceDay", () => {
     }).toThrow(expect.objectContaining({ code: "ATTENDANCE_EMPTY" }));
   });
 });
+
+describe("priceDay with check-in and check-out (ADR CM-0011)", () => {
+  const timed = { labourId: "l1", status: "present" as const };
+  const fromTimes = { labourCategoryId: "c1", fromTimes: true };
+
+  it("keeps the times, a 60-minute break by default and the working hours", () => {
+    const day = price(
+      { ...timed, checkIn: "09:00", checkOut: "18:00" },
+      { ...daily, workingHours: "8.50" },
+    );
+    expect(day).toMatchObject({
+      checkIn: "09:00",
+      checkOut: "18:00",
+      breakMinutes: 60,
+      workingHours: "8.5",
+      earned: 80_000,
+      overtime: [],
+    });
+    // A check-in alone is allowed and has the break too.
+    expect(price({ ...timed, checkIn: "08:00" })).toMatchObject({
+      checkIn: "08:00",
+      checkOut: null,
+      breakMinutes: 60,
+    });
+    // No times: no break, even if one is sent; blanks are no time.
+    expect(
+      price({ ...timed, checkIn: " ", checkOut: "", breakMinutes: 30 }),
+    ).toMatchObject({ checkIn: null, checkOut: null, breakMinutes: null });
+  });
+
+  it("works out the line from the times, ignoring hours sent with it", () => {
+    const day = price({
+      ...timed,
+      checkIn: "08:00",
+      checkOut: "19:30",
+      breakMinutes: 60,
+      overtime: [
+        { ...fromTimes, hours: 5 },
+        { labourCategoryId: null, hours: 1, ratePerHour: 15_000 },
+      ],
+    });
+    expect(day.overtime).toEqual([
+      {
+        labourCategoryId: "c1",
+        hours: "2.5",
+        ratePerHour: 12_000,
+        amount: 30_000,
+        fromTimes: true,
+      },
+      {
+        labourCategoryId: null,
+        hours: "1",
+        ratePerHour: 15_000,
+        amount: 15_000,
+        fromTimes: false,
+      },
+    ]);
+    // An edited rate on the line from the times stays.
+    expect(
+      price({
+        ...timed,
+        checkIn: "08:00",
+        checkOut: "19:30",
+        overtime: [{ ...fromTimes, ratePerHour: 20_000 }],
+      }).overtime[0],
+    ).toMatchObject({ hours: "2.5", amount: 50_000 });
+  });
+
+  it("measures overtime against the Labour's working hours, on a Half Day too", () => {
+    const day = price(
+      {
+        labourId: "l1",
+        status: "half_day",
+        checkIn: "08:00",
+        checkOut: "19:30",
+        overtime: [fromTimes],
+      },
+      { ...daily, workingHours: "9.5" },
+    );
+    expect(day).toMatchObject({
+      earned: 40_000,
+      workingHours: "9.5",
+      overtime: [{ hours: "1", fromTimes: true }],
+    });
+    // A night shift past midnight.
+    expect(
+      price({
+        ...timed,
+        checkIn: "20:00",
+        checkOut: "06:00",
+        breakMinutes: 0,
+        overtime: [fromTimes],
+      }).overtime,
+    ).toMatchObject([{ hours: "2" }]);
+  });
+
+  it("drops the line from the times without a check-out or without extra time", () => {
+    expect(
+      price({ ...timed, checkIn: "08:00", overtime: [fromTimes] }).overtime,
+    ).toEqual([]);
+    expect(
+      price({
+        ...timed,
+        checkIn: "09:00",
+        checkOut: "18:00",
+        overtime: [fromTimes],
+      }).overtime,
+    ).toEqual([]);
+    expect(price({ ...timed, overtime: [fromTimes] }).overtime).toEqual([]);
+  });
+
+  it("allows one line from the times, within 24 overtime hours a day", () => {
+    expect(() =>
+      price({
+        ...timed,
+        checkIn: "08:00",
+        checkOut: "19:30",
+        overtime: [fromTimes, fromTimes],
+      }),
+    ).toThrow(expect.objectContaining({ code: "OVERTIME_FROM_TIMES_TWICE" }));
+    expect(() =>
+      price({
+        ...timed,
+        checkIn: "08:00",
+        checkOut: "19:30",
+        overtime: [fromTimes, { labourCategoryId: null, hours: 23 }],
+      }),
+    ).toThrow(expect.objectContaining({ code: "OVERTIME_HOURS_INVALID" }));
+    // A manual line still needs its hours.
+    expect(() =>
+      price({ ...timed, overtime: [{ labourCategoryId: null }] }),
+    ).toThrow(expect.objectContaining({ code: "OVERTIME_HOURS_INVALID" }));
+  });
+
+  it("refuses times that do not fit the day", () => {
+    for (const status of ["absent", "on_leave", "holiday"] as const)
+      expect(() => price({ labourId: "l1", status, checkIn: "09:00" })).toThrow(
+        expect.objectContaining({ code: "TIMES_NEED_PRESENT" }),
+      );
+    expect(() => price({ ...timed, checkOut: "18:00" })).toThrow(
+      expect.objectContaining({ code: "CHECK_IN_REQUIRED" }),
+    );
+    expect(() =>
+      price({ ...timed, checkIn: "09:00", checkOut: "09:00" }),
+    ).toThrow(expect.objectContaining({ code: "CHECK_OUT_SAME_AS_CHECK_IN" }));
+    expect(() =>
+      price({
+        ...timed,
+        checkIn: "09:00",
+        checkOut: "10:00",
+        breakMinutes: 60,
+      }),
+    ).toThrow(expect.objectContaining({ code: "BREAK_TOO_LONG" }));
+    expect(() =>
+      price({ ...timed, checkIn: "09:00", breakMinutes: 721 }),
+    ).toThrow(expect.objectContaining({ code: "BREAK_INVALID" }));
+    expect(() => price({ ...timed, checkIn: "9:00" })).toThrow(
+      expect.objectContaining({
+        code: "TIME_INVALID",
+        details: { field: "checkIn" },
+      }),
+    );
+  });
+});
