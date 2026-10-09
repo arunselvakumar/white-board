@@ -1,0 +1,23 @@
+packages/db/prisma/migrations/20261012000000_construction_project_contract_details/migration.sql
+  s_6497dd4ebf3e73::t_9b91433dce923d 1-41
+packages/db/prisma/migrations/20261012010000_construction_project_documents/migration.sql
+  s_6497dd4ebf3e73::t_047c44776622b2 1-32
+packages/db/prisma/schema/construction-projects.prisma
+  s_6497dd4ebf3e73::t_03fd7676921131 19-23,25-53,59-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2dfdcb7408f336aa32344932d3ffcef970925bbc",
+  "prompts": {},
+  "sessions": {
+    "s_6497dd4ebf3e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58a50129-78c1-4f42-b7ff-76f99b4f31c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
