@@ -1,0 +1,39 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_ec41e28a857a0b::t_2736680876d717 85-88,780-783
+apps/construction-management/app/api/construction/labour/summary/route.ts
+  s_ec41e28a857a0b::t_974733cf847a9a 1-46
+apps/construction-management/app/api/construction/labour/summary/summary-models.ts
+  s_ec41e28a857a0b::t_ed2deb28a4a00d 1-62
+apps/construction-management/app/api/construction/labour/summary/summary-openapi.ts
+  s_ec41e28a857a0b::t_6d836dd40fc440 1-36
+apps/construction-management/app/api/construction/labour/summary/summary.http.test.ts
+  s_ec41e28a857a0b::t_3fa17444ca7d4b 1-229
+apps/construction-management/components/projects/project-labour-tiles.stories.tsx
+  s_ec41e28a857a0b::t_ae3dc9ee3e4067 1-111
+apps/construction-management/components/projects/project-labour-tiles.tsx
+  s_ec41e28a857a0b::t_366d782d71a164 1-229
+apps/construction-management/components/projects/project-overview.tsx
+  s_ec41e28a857a0b::t_b53a120567bac8 10,36,41-42
+apps/construction-management/src/labour/application/project-labour-summary.ts
+  s_ec41e28a857a0b::t_948d784c379f16 1-59
+apps/construction-management/src/labour/infrastructure/prisma-project-labour-summary.ts
+  s_ec41e28a857a0b::t_548a9ffc21c5fa 1-138
+apps/construction-management/src/queries/labour-summary.ts
+  s_ec41e28a857a0b::t_e4f1512fa5d09c 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "49159e4767e85c0e0f6638ac9807b87b7cfe3cdf",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
