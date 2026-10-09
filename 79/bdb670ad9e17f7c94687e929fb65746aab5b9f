@@ -1,0 +1,21 @@
+packages/db/prisma/migrations/20261010005000_training_institute_rename_teacher_documents_index/migration.sql
+  s_ec41e28a857a0b::t_a6b55cadf971b0 1-4
+packages/db/prisma/migrations/20261010030000_construction_remove_trial/migration.sql
+  s_ec41e28a857a0b::t_f10a597546ad44 9-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "79bdb670ad9e17f7c94687e929fb65746aab5b9f",
+  "prompts": {},
+  "sessions": {
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
