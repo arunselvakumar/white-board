@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { ObjectStorage } from "@/src/shared-kernel/files";
+import { cleanFileName, type ObjectStorage } from "@/src/shared-kernel/files";
 
 import {
   PartyFiles,
-  cleanFileName,
   type PartyDocumentRecord,
   type PartyFilesStore,
   type PartyRef,
@@ -31,6 +30,17 @@ function memoryStorage() {
               body: new Blob([Uint8Array.from(bytes)]).stream(),
               contentType: "application/octet-stream",
               contentLength: bytes.byteLength,
+            },
+      );
+    },
+    head: (key) => {
+      const bytes = objects.get(key);
+      return Promise.resolve(
+        bytes == null
+          ? null
+          : {
+              bytes: bytes.byteLength,
+              contentType: "application/octet-stream",
             },
       );
     },

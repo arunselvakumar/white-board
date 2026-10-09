@@ -12,7 +12,12 @@ export {
 export {
   companyFileKey,
   fileVersion,
+  firstBytes,
+  type DirectUploads,
+  type ObjectHead,
   type ObjectStorage,
   type StoredObject,
 } from "./object-storage";
+export { cleanFileName, fileExtension } from "./file-name";
+export { PROGRAM_SNIFF_BYTES, isProgram } from "./executable-file";
 export type { NewStoredFile } from "./stored-files";

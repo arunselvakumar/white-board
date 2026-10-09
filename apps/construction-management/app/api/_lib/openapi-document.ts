@@ -75,6 +75,10 @@ import {
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
 import {
+  projectDocumentOpenApiComponents,
+  projectDocumentOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/documents/project-document-openapi";
+import {
   vendorOpenApiComponents,
   vendorOpenApiOperations,
 } from "@/app/api/construction/labour/vendors/vendor-openapi";
@@ -777,6 +781,10 @@ openApiOperations.push(
 // The projects context (CM-204) lists its own models and routes.
 Object.assign(openApiComponents, projectsOpenApiComponents);
 openApiOperations.push(...projectsOpenApiOperations);
+
+// Project documents (CM-414) list their own models and routes.
+Object.assign(openApiComponents, projectDocumentOpenApiComponents);
+openApiOperations.push(...projectDocumentOpenApiOperations);
 
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
