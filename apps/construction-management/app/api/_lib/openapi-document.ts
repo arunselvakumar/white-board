@@ -83,6 +83,10 @@ import {
   labourOpenApiOperations,
 } from "@/app/api/construction/labour/labours/labour-openapi";
 import {
+  labourSummaryOpenApiComponents,
+  labourSummaryOpenApiOperations,
+} from "@/app/api/construction/labour/summary/summary-openapi";
+import {
   vendorAttendanceOpenApiComponents,
   vendorAttendanceOpenApiOperations,
 } from "@/app/api/construction/labour/attendance/vendors/vendor-attendance-openapi";
@@ -772,6 +776,10 @@ openApiOperations.push(...vendorOpenApiOperations);
 // The Labour register (CM-205 – CM-207) lists its own models and routes.
 Object.assign(openApiComponents, labourOpenApiComponents);
 openApiOperations.push(...labourOpenApiOperations);
+
+// The project labour summary (CM-219) lists its own model and route.
+Object.assign(openApiComponents, labourSummaryOpenApiComponents);
+openApiOperations.push(...labourSummaryOpenApiOperations);
 
 // Vendor attendance (CM-212, CM-213) lists its own models and routes.
 Object.assign(openApiComponents, vendorAttendanceOpenApiComponents);

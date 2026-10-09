@@ -7,6 +7,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { projectQuery } from "@/src/queries/projects";
 
 import { EditProjectForm } from "./project-form";
+import { ProjectLabourTiles } from "./project-labour-tiles";
 import { ProjectStatusBadge, formatCalendarDate } from "./project-status";
 
 const DATE_TIME = new Intl.DateTimeFormat("en-IN", {
@@ -32,12 +33,13 @@ function Detail({
   );
 }
 
-/** Overview tab: the Project's details (M4 adds the dashboard tiles). */
+/** Overview tab: labour today (CM-219) and the Project's details. */
 export function ProjectOverview({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
   const none = <span className="text-muted-foreground font-normal">—</span>;
   return (
-    <div className="w-full p-6">
+    <div className="w-full max-w-5xl space-y-6 p-6">
+      <ProjectLabourTiles projectId={id} />
       <section
         aria-labelledby="project-details"
         className="bg-card w-full max-w-4xl space-y-4 rounded-xl border p-4 sm:p-6"
