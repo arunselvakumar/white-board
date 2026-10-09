@@ -1,0 +1,55 @@
+/// Construction Management — reporting context (ADR CM-0001, `modules/11`):
+/// report jobs and the files they produce. Reports read other contexts'
+/// tables (a read model); this schema holds only the jobs. A job runs inline
+/// in the request until M9 moves it onto a queue (CM-217).
+
+enum ConstructionReportingReportKind {
+  labour_attendance
+  labour_payment
+  labour_month
+  vendor_attendance
+  muster_roll
+
+  @@map("report_kind")
+  @@schema("construction_reporting")
+}
+
+enum ConstructionReportingJobStatus {
+  queued
+  running
+  done
+  failed
+
+  @@map("job_status")
+  @@schema("construction_reporting")
+}
+
+/// One requested report (CM-217, CM-218): queued → running → done | failed.
+/// A done job points at an Excel and a PDF in private storage (each a
+/// `stored_files` row of kind `report`); a failed job keeps the message.
+model ConstructionReportingReportJob {
+  id            String                          @id @db.Uuid
+  workspaceId   String                          @map("workspace_id")
+  /// Null for a central (all-projects) report.
+  projectId     String?                         @map("project_id") @db.Uuid
+  kind          ConstructionReportingReportKind
+  /// The filters the report was asked for (period, vendor, category, …).
+  params        Json
+  status        ConstructionReportingJobStatus  @default(queued)
+  /// The files carry amounts: downloading needs Financial on the menu.
+  includesMoney Boolean                         @default(false) @map("includes_money")
+  xlsxKey       String?                         @map("xlsx_key")
+  pdfKey        String?                         @map("pdf_key")
+  /// Download name without extension, e.g. `muster-roll-2026-09`.
+  fileName      String?                         @map("file_name")
+  /// Why a failed job failed, in words a screen can show (no stack).
+  error         String?
+  requestedBy   String                          @map("requested_by")
+  createdAt     DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  startedAt     DateTime?                       @map("started_at") @db.Timestamptz(3)
+  finishedAt    DateTime?                       @map("finished_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, projectId, createdAt])
+  @@map("report_jobs")
+  @@schema("construction_reporting")
+}

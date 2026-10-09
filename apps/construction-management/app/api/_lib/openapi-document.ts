@@ -99,6 +99,10 @@ import {
   paymentOpenApiOperations,
 } from "@/app/api/construction/labour/payments/payment-openapi";
 import {
+  reportingOpenApiComponents,
+  reportingOpenApiOperations,
+} from "@/app/api/construction/reporting/reports/report-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -800,6 +804,10 @@ openApiOperations.push(...labourAttendanceOpenApiOperations);
 // Wage payments and balances (CM-214, CM-215) list their own models and routes.
 Object.assign(openApiComponents, paymentOpenApiComponents);
 openApiOperations.push(...paymentOpenApiOperations);
+
+// Report jobs (CM-217, CM-218) list their own models and routes.
+Object.assign(openApiComponents, reportingOpenApiComponents);
+openApiOperations.push(...reportingOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,
