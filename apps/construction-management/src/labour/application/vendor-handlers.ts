@@ -3,6 +3,7 @@ import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
+import { MAX_PAISE } from "../domain/labour";
 import {
   Vendor,
   type VendorDetailsInput,
@@ -150,6 +151,12 @@ function assertOpening(value: number | null): void {
     throw new DomainError(
       "VENDOR_OPENING_BALANCE_INVALID",
       "The opening balance is a whole number of paise.",
+    );
+  if (value != null && Math.abs(value) > MAX_PAISE)
+    throw new DomainError(
+      "AMOUNT_TOO_LARGE",
+      "The opening balance is at most ₹2,00,00,000, owed or advanced.",
+      { details: { amount: value, max: MAX_PAISE } },
     );
 }
 

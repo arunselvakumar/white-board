@@ -36,6 +36,20 @@ export type NewLedgerEntry = {
   reversesEntryId: string | null;
 };
 
+/**
+ * The most one amount (an entry, a payment, a day's pay) can be: a Postgres
+ * `integer` of paise, about ₹21.47 crore. Sums of amounts are bigint.
+ */
+export const MAX_AMOUNT_PAISE = 2_147_483_647;
+
+/** Refuses an amount that does not fit one `integer` column. */
+export function assertAmountFits(amount: number, message: string): void {
+  if (Math.abs(amount) > MAX_AMOUNT_PAISE)
+    throw new DomainError("AMOUNT_TOO_LARGE", message, {
+      details: { amount, max: MAX_AMOUNT_PAISE },
+    });
+}
+
 export type LedgerSourceType =
   | "labour"
   | "vendor"

@@ -22,6 +22,7 @@ import type {
 } from "../application/labour-ports";
 import { Labour } from "../domain/labour";
 import type { Weekday } from "../domain/wages";
+import { lockLiveParties } from "./party-locks";
 import { prismaLedger } from "./prisma-ledger";
 
 type Tx = Prisma.TransactionClient;
@@ -91,6 +92,23 @@ function openingEntry(labour: Labour, amount: number) {
 }
 
 /** The labour register's writes, each in one transaction (ADR CM-0004). */
+/** Whether any live attendance or wage payment exists for the labourer. */
+async function hasRecords(
+  tx: Tx,
+  workspaceId: string,
+  id: string,
+): Promise<boolean> {
+  const [attendance, payments] = await Promise.all([
+    tx.constructionLabourAttendance.count({
+      where: { workspaceId, labourId: id, deletedAt: null },
+    }),
+    tx.constructionLabourWagePayment.count({
+      where: { workspaceId, partyType: "labour", partyId: id, deletedAt: null },
+    }),
+  ]);
+  return attendance + payments > 0;
+}
+
 export class PrismaLabourRepository implements LabourRepository {
   constructor(
     private readonly db: PrismaClient,
@@ -163,18 +181,13 @@ export class PrismaLabourRepository implements LabourRepository {
   }
 
   async openingBalance(workspaceId: string, id: string): Promise<number> {
-    const sum = await this.db.constructionLabourLedgerEntry.aggregate({
-      where: {
-        workspaceId,
-        partyType: "labour",
-        partyId: id,
-        sourceType: "labour",
-        sourceId: id,
-        kind: "opening",
-      },
-      _sum: { amount: true },
-    });
-    return sum._sum.amount ?? 0;
+    const sums = await prismaLedger.openingBalances(
+      this.db,
+      workspaceId,
+      "labour",
+      [id],
+    );
+    return sums.get(id) ?? 0;
   }
 
   async insert(
@@ -285,14 +298,24 @@ export class PrismaLabourRepository implements LabourRepository {
     }
   }
 
-  async delete(labour: Labour, audit: AuditEvent): Promise<void> {
-    await this.db.$transaction(async (tx) => {
-      const written = await tx.constructionLabourLabour.updateMany({
-        where: {
-          id: labour.id,
-          workspaceId: labour.workspaceId,
-          deletedAt: null,
-        },
+  async delete(
+    labour: Labour,
+    audit: AuditEvent,
+  ): Promise<"deleted" | "has_records"> {
+    return this.db.$transaction(async (tx) => {
+      // FOR UPDATE waits for any attendance or payment being written for
+      // this labourer (they hold FOR SHARE), so the check below sees it.
+      await lockLiveParties(
+        tx,
+        labour.workspaceId,
+        "labour",
+        [labour.id],
+        "update",
+      );
+      if (await hasRecords(tx, labour.workspaceId, labour.id))
+        return "has_records";
+      await tx.constructionLabourLabour.update({
+        where: { id: labour.id },
         data: {
           deletedAt: labour.deletedAt,
           deletedBy: labour.updatedBy,
@@ -300,7 +323,6 @@ export class PrismaLabourRepository implements LabourRepository {
           updatedBy: labour.updatedBy,
         },
       });
-      if (written.count === 0) throw labourNotFound();
       await prismaLedger.reverseSource(
         tx,
         labour.workspaceId,
@@ -309,6 +331,7 @@ export class PrismaLabourRepository implements LabourRepository {
         labour.id,
       );
       await recordAudit(tx, audit);
+      return "deleted";
     });
   }
 
@@ -354,23 +377,6 @@ export class PrismaLabourRepository implements LabourRepository {
       },
       { timeout: 60_000 },
     );
-  }
-
-  async hasRecords(workspaceId: string, id: string): Promise<boolean> {
-    const [attendance, payments] = await Promise.all([
-      this.db.constructionLabourAttendance.count({
-        where: { workspaceId, labourId: id, deletedAt: null },
-      }),
-      this.db.constructionLabourWagePayment.count({
-        where: {
-          workspaceId,
-          partyType: "labour",
-          partyId: id,
-          deletedAt: null,
-        },
-      }),
-    ]);
-    return attendance + payments > 0;
   }
 
   async latestAttendance(

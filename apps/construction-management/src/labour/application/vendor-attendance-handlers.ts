@@ -81,7 +81,8 @@ export type VendorAttendanceStore = {
    * Creates the row (`expectedUpdatedAt` null; 409
    * `VENDOR_ATTENDANCE_CHANGED` when a live row already exists) or
    * compare-and-sets it on `updatedAt` and replaces its lines; reverses the
-   * row's live ledger entries and posts the new ones.
+   * row's live ledger entries and posts the new ones. Locks the vendor row
+   * first: 404 `VENDOR_NOT_FOUND` when it was deleted meanwhile.
    */
   save(input: {
     id: string;

@@ -137,6 +137,9 @@ describe("Vendor (CM-208)", () => {
     expect(codeOf(() => create([shift("Shift 1", [rate(MASON, -1)])]))).toBe(
       "VENDOR_RATE_INVALID",
     );
+    expect(
+      codeOf(() => create([shift("Shift 1", [rate(MASON, 2_000_000_001)])])),
+    ).toBe("VENDOR_RATE_INVALID");
     expect(codeOf(() => create([shift("Shift 1", [rate(MASON, 1.5)])]))).toBe(
       "VENDOR_RATE_INVALID",
     );

@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/db";
+import { Prisma } from "@repo/db";
 
 import {
   calendarDateFromDb,
@@ -8,6 +8,7 @@ import {
 import { newId } from "@/src/shared-kernel/ids";
 
 import {
+  assertAmountFits,
   liveEntries,
   reversalOf,
   type LedgerEntry,
@@ -17,6 +18,42 @@ import {
 } from "../domain/ledger";
 
 type Tx = Prisma.TransactionClient;
+
+/**
+ * A Postgres `bigint` sum as paise. Rows are `integer` paise (one amount is
+ * at most ₹21.47 crore); their sums are not, so every money total is read
+ * as `SUM(amount)::bigint`, never through Prisma's `_sum` of an Int field.
+ */
+export function paiseFromBigint(value: bigint | number | null): number {
+  const paise = Number(value ?? 0);
+  if (!Number.isSafeInteger(paise))
+    throw new Error(
+      `A money total is beyond ${String(Number.MAX_SAFE_INTEGER)} paise.`,
+    );
+  return paise;
+}
+
+/** Per-party sums of entries, as bigint (see `paiseFromBigint`). */
+async function partySums(
+  db: Tx,
+  workspaceId: string,
+  partyType: PartyType,
+  partyIds: readonly string[],
+  filter: Prisma.Sql,
+): Promise<Map<string, number>> {
+  if (partyIds.length === 0) return new Map();
+  const rows = await db.$queryRaw<{ partyId: string; amount: bigint }[]>(
+    Prisma.sql`SELECT party_id::text AS "partyId",
+        COALESCE(SUM(amount), 0)::bigint AS "amount"
+      FROM construction_labour.ledger_entries
+      WHERE workspace_id = ${workspaceId}
+        AND party_type = ${partyType}::construction_labour.party_type
+        AND party_id = ANY(${[...new Set(partyIds)]}::uuid[])
+        AND ${filter}
+      GROUP BY party_id`,
+  );
+  return new Map(rows.map((row) => [row.partyId, paiseFromBigint(row.amount)]));
+}
 
 export type StoredLedgerEntry = LedgerEntry & {
   partyType: PartyType;
@@ -63,6 +100,11 @@ export const prismaLedger = {
     by: string,
     entries: readonly NewLedgerEntry[],
   ): Promise<void> {
+    for (const entry of entries)
+      assertAmountFits(
+        entry.amount,
+        "One amount is at most ₹21,47,48,364. Split it into smaller entries.",
+      );
     const rows = entries
       .filter((entry) => entry.amount !== 0)
       .map((entry) => ({
@@ -124,24 +166,38 @@ export const prismaLedger = {
   },
 
   /** Balances (sum of entries up to `on`) for many parties at once. */
-  async balances(
+  balances(
     db: Tx,
     workspaceId: string,
     partyType: PartyType,
     partyIds: readonly string[],
     on: CalendarDate,
   ): Promise<Map<string, number>> {
-    if (partyIds.length === 0) return new Map();
-    const sums = await db.constructionLabourLedgerEntry.groupBy({
-      by: ["partyId"],
-      where: {
-        workspaceId,
-        partyType,
-        partyId: { in: [...new Set(partyIds)] },
-        entryDate: { lte: calendarDateToDb(on) },
-      },
-      _sum: { amount: true },
-    });
-    return new Map(sums.map((row) => [row.partyId, row._sum.amount ?? 0]));
+    return partySums(
+      db,
+      workspaceId,
+      partyType,
+      partyIds,
+      Prisma.sql`entry_date <= ${on}::date`,
+    );
+  },
+
+  /**
+   * Net opening balances (the party's own `opening` entries and their
+   * reversals) for many parties at once.
+   */
+  openingBalances(
+    db: Tx,
+    workspaceId: string,
+    partyType: PartyType,
+    partyIds: readonly string[],
+  ): Promise<Map<string, number>> {
+    return partySums(
+      db,
+      workspaceId,
+      partyType,
+      partyIds,
+      Prisma.sql`kind = 'opening' AND source_type = ${partyType}`,
+    );
   },
 };

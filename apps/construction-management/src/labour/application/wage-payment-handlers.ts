@@ -88,7 +88,11 @@ export type WagePaymentStore = {
     partyType: PartyType,
     ids: readonly string[],
   ): Promise<Map<string, string>>;
-  /** The payment row, its negative ledger entry and the audit event. */
+  /**
+   * The payment row, its negative ledger entry and the audit event, after
+   * locking the party's row (404 `LABOUR_NOT_FOUND` / `VENDOR_NOT_FOUND`
+   * when it was deleted meanwhile).
+   */
   insert(payment: StoredWagePayment): Promise<void>;
   /**
    * Tombstones the payment (compare-and-set on `updatedAt`, else 409

@@ -132,13 +132,21 @@ export class FakeLabourRepository implements LabourRepository {
     return Promise.resolve();
   }
 
-  delete(labour: Labour, audit: AuditEvent): Promise<void> {
+  delete(
+    labour: Labour,
+    audit: AuditEvent,
+  ): Promise<"deleted" | "has_records"> {
+    if (
+      (this.attendance.get(labour.id)?.length ?? 0) > 0 ||
+      this.payments.has(labour.id)
+    )
+      return Promise.resolve("has_records");
     this.labours.set(labour.id, this.copy(labour));
     const entries = this.ledger.get(labour.id) ?? [];
     const live = entries.reduce((sum, amount) => sum + amount, 0);
     this.ledger.set(labour.id, [...entries, -live]);
     this.audits.push(audit);
-    return Promise.resolve();
+    return Promise.resolve("deleted");
   }
 
   transfer(
@@ -159,12 +167,6 @@ export class FakeLabourRepository implements LabourRepository {
     }
     this.audits.push(...audits);
     return Promise.resolve();
-  }
-
-  hasRecords(_workspaceId: string, id: string): Promise<boolean> {
-    return Promise.resolve(
-      (this.attendance.get(id)?.length ?? 0) > 0 || this.payments.has(id),
-    );
   }
 
   latestAttendance(

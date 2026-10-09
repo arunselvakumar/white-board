@@ -40,6 +40,27 @@ describe("priceDay", () => {
     ]);
   });
 
+  it("keeps the overtime rate within ₹2 crore and a day's overtime within an integer", () => {
+    expect(() =>
+      price({
+        labourId: "l1",
+        status: "present",
+        overtime: [
+          { labourCategoryId: null, hours: 1, ratePerHour: 2_000_000_001 },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: "OVERTIME_RATE_INVALID" }));
+    expect(() =>
+      price({
+        labourId: "l1",
+        status: "present",
+        overtime: [
+          { labourCategoryId: null, hours: 2, ratePerHour: 2_000_000_000 },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: "AMOUNT_TOO_LARGE" }));
+  });
+
   it("lets a line override the overtime rate", () => {
     expect(
       price({

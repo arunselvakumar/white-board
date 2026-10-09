@@ -61,14 +61,18 @@ export type LabourRepository = {
     joiningDateChanged: boolean;
     audit: AuditEvent;
   }): Promise<void>;
-  /** Tombstones the labourer and reverses their opening entry. */
-  delete(labour: Labour, audit: AuditEvent): Promise<void>;
+  /**
+   * In one transaction: locks the live labourer row (`LABOUR_NOT_FOUND`
+   * when gone), and unless any live attendance or wage payment exists
+   * (`has_records`, nothing written) tombstones it and reverses their
+   * opening entry. Attendance and payment writes lock the same row, so
+   * neither can slip in between the check and the tombstone.
+   */
+  delete(labour: Labour, audit: AuditEvent): Promise<"deleted" | "has_records">;
   transfer(
     moves: readonly LabourMove[],
     audits: readonly AuditEvent[],
   ): Promise<void>;
-  /** Whether any live attendance or wage payment exists for the labourer. */
-  hasRecords(workspaceId: string, id: string): Promise<boolean>;
   /** The latest live attendance date per labourer. */
   latestAttendance(
     workspaceId: string,

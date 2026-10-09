@@ -397,17 +397,18 @@ export class LabourHandlers {
     by: string;
   }): Promise<void> {
     const labour = await this.load(input.workspaceId, input.id);
-    if (await this.labours.hasRecords(input.workspaceId, labour.id))
-      throw conflict(
-        "LABOUR_HAS_RECORDS",
-        `${labour.details.name} has attendance or payments. Mark them Inactive instead.`,
-      );
+    const name = labour.details.name;
     const before = labourSnapshot(labour);
     labour.delete(input.by, this.clock());
-    await this.labours.delete(
+    const result = await this.labours.delete(
       labour,
       this.audit(labour, input.by, "labour.deleted", { before }),
     );
+    if (result === "has_records")
+      throw conflict(
+        "LABOUR_HAS_RECORDS",
+        `${name} has attendance or payments. Mark them Inactive instead.`,
+      );
   }
 
   /**

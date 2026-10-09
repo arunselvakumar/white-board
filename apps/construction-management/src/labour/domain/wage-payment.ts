@@ -1,6 +1,7 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
+import { MAX_PAISE } from "./labour";
 import type { NewLedgerEntry, PartyType } from "./ledger";
 
 export type PaymentKind = "payment" | "advance";
@@ -13,7 +14,7 @@ export type WagePaymentInput = {
   paymentDate: CalendarDate;
   kind: PaymentKind;
   mode: PaymentMode;
-  /** Paise, > 0. */
+  /** Paise, > 0 and at most `MAX_PAISE` (₹2 crore). */
   amount: number;
   reference?: string | null;
   paidByMemberId?: string | null;
@@ -56,6 +57,12 @@ export function wagePayment(input: WagePaymentInput): WagePayment {
     throw new DomainError(
       "PAYMENT_AMOUNT_INVALID",
       "Enter an amount more than zero.",
+    );
+  if (input.amount > MAX_PAISE)
+    throw new DomainError(
+      "AMOUNT_TOO_LARGE",
+      "One payment is at most ₹2,00,00,000. Record a larger amount as more than one payment.",
+      { details: { amount: input.amount, max: MAX_PAISE } },
     );
   return {
     partyType: input.partyType,

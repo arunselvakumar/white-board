@@ -25,6 +25,7 @@ import type {
   VendorDayListParams,
 } from "../application/vendor-attendance-handlers";
 import { vendorDayLedgerEntries } from "../domain/vendor-attendance";
+import { lockLiveParties } from "./party-locks";
 import { prismaLedger } from "./prisma-ledger";
 
 const INCLUDE = {
@@ -182,6 +183,14 @@ export class PrismaVendorAttendanceStore implements VendorAttendanceStore {
     const { day, workspaceId, by, now } = input;
     try {
       await this.db.$transaction(async (tx) => {
+        // A vendor deleted meanwhile is refused; a delete waits for this.
+        await lockLiveParties(
+          tx,
+          workspaceId,
+          "vendor",
+          [day.vendorId],
+          "share",
+        );
         let before: StoredVendorDay | null = null;
         if (input.expectedUpdatedAt == null) {
           await tx.constructionLabourVendorAttendance.create({
@@ -287,6 +296,13 @@ export class PrismaVendorAttendanceStore implements VendorAttendanceStore {
   ): Promise<void> {
     const { day, by, now } = input;
     await this.db.$transaction(async (tx) => {
+      await lockLiveParties(
+        tx,
+        day.workspaceId,
+        "vendor",
+        [day.vendorId],
+        "share",
+      );
       const updated = await tx.constructionLabourVendorAttendance.updateMany({
         where: {
           id: day.id,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { MAX_PAISE } from "./labour";
 import { paymentLedgerEntries, wagePayment } from "./wage-payment";
 
 const base = {
@@ -37,6 +38,13 @@ describe("wagePayment", () => {
       );
     expect(() => wagePayment({ ...base, reference: "x".repeat(101) })).toThrow(
       expect.objectContaining({ code: "PAYMENT_REFERENCE_TOO_LONG" }),
+    );
+  });
+
+  it("keeps one payment within ₹2 crore so the row fits an integer", () => {
+    expect(wagePayment({ ...base, amount: MAX_PAISE }).amount).toBe(MAX_PAISE);
+    expect(() => wagePayment({ ...base, amount: MAX_PAISE + 1 })).toThrow(
+      expect.objectContaining({ code: "AMOUNT_TOO_LARGE" }),
     );
   });
 });

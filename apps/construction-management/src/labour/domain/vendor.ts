@@ -6,6 +6,8 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 
+import { MAX_PAISE } from "./labour";
+
 export const VENDOR_NAME_MAX = 120;
 export const VENDOR_ADDRESS_MAX = 500;
 export const VENDOR_SHIFT_NAME_MAX = 40;
@@ -137,10 +139,10 @@ function amount(
   rateIndex: number,
   field: "ratePerDay" | "overtimePerHour",
 ): number {
-  if (!Number.isSafeInteger(value) || value < 0)
+  if (!Number.isSafeInteger(value) || value < 0 || value > MAX_PAISE)
     throw new DomainError(
       "VENDOR_RATE_INVALID",
-      "Rates are whole paise, zero or more.",
+      "Rates are whole paise, zero or more, up to ₹2,00,00,000.",
       { details: { shiftIndex, rateIndex, field } },
     );
   return value;

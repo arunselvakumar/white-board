@@ -62,6 +62,36 @@ describe("priceVendorDay", () => {
     ]);
   });
 
+  it("refuses a day whose pay does not fit an integer of paise", () => {
+    const dear: RateCard = new Map([
+      [
+        "s1",
+        {
+          name: "Shift 1",
+          rates: new Map([
+            ["mason", { ratePerDay: 2_000_000_000, overtimePerHour: 0 }],
+          ]),
+        },
+      ],
+    ]);
+    expect(() =>
+      priceVendorDay({
+        vendorId: "v1",
+        projectId: "p1",
+        date: "2026-10-05",
+        card: dear,
+        lines: [
+          {
+            shiftId: "s1",
+            labourCategoryId: "mason",
+            fullDayCount: 2,
+            halfDayCount: 0,
+          },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: "AMOUNT_TOO_LARGE" }));
+  });
+
   it("refuses categories off the card, duplicates, empty and negative lines", () => {
     const line = {
       shiftId: "s1",

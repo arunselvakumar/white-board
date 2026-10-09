@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@repo/db";
+import { Prisma, type PrismaClient } from "@repo/db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import type { BackdatedLimit } from "@/src/shared-kernel/backdated-policy";
@@ -35,7 +35,8 @@ import type {
 import type { PartyType } from "../domain/ledger";
 import { paymentLedgerEntries } from "../domain/wage-payment";
 import { companyToday } from "./prisma-labour-queries";
-import { prismaLedger } from "./prisma-ledger";
+import { lockLiveParties } from "./party-locks";
+import { paiseFromBigint, prismaLedger } from "./prisma-ledger";
 
 type Row = Prisma.ConstructionLabourWagePaymentGetPayload<object>;
 
@@ -137,16 +138,43 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     const hasMore = page.length > params.limit;
     const rows = page.slice(0, params.limit);
     if (backwards) rows.reverse();
-    const totals = await this.db.constructionLabourWagePayment.aggregate({
-      where: { AND: filters },
-      _count: { _all: true },
-      _sum: { amount: true },
-    });
+    const totals = await this.totals(params);
+    return { items: rows.map(toStored), hasMore, ...totals };
+  }
+
+  /**
+   * Count and amount of every payment matching the filters (not the page).
+   * The amount is a bigint sum: a Project's payments pass the `integer`
+   * max of ₹21.47 crore long before any one payment could.
+   */
+  private async totals(
+    params: WagePaymentListParams,
+  ): Promise<{ total: number; totalAmount: number }> {
+    const conditions = [
+      Prisma.sql`workspace_id = ${params.workspaceId}`,
+      Prisma.sql`project_id = ${params.projectId}::uuid`,
+      Prisma.sql`deleted_at IS NULL`,
+      Prisma.sql`party_type = ANY(${[...params.partyTypes]}::construction_labour.party_type[])`,
+    ];
+    if (params.partyId != null)
+      conditions.push(Prisma.sql`party_id = ${params.partyId}::uuid`);
+    if (params.kind != null)
+      conditions.push(
+        Prisma.sql`kind = ${params.kind}::construction_labour.payment_kind`,
+      );
+    if (params.from != null)
+      conditions.push(Prisma.sql`payment_date >= ${params.from}::date`);
+    if (params.to != null)
+      conditions.push(Prisma.sql`payment_date <= ${params.to}::date`);
+    const [row] = await this.db.$queryRaw<{ total: bigint; amount: bigint }[]>(
+      Prisma.sql`SELECT COUNT(*) AS "total",
+          COALESCE(SUM(amount), 0)::bigint AS "amount"
+        FROM construction_labour.wage_payments
+        WHERE ${Prisma.join(conditions, " AND ")}`,
+    );
     return {
-      items: rows.map(toStored),
-      total: totals._count._all,
-      hasMore,
-      totalAmount: totals._sum.amount ?? 0,
+      total: Number(row?.total ?? 0n),
+      totalAmount: paiseFromBigint(row?.amount ?? null),
     };
   }
 
@@ -199,6 +227,14 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
 
   async insert(payment: StoredWagePayment): Promise<void> {
     await this.db.$transaction(async (tx) => {
+      // A party deleted meanwhile is refused; a delete waits for this.
+      await lockLiveParties(
+        tx,
+        payment.workspaceId,
+        payment.partyType,
+        [payment.partyId],
+        "share",
+      );
       await tx.constructionLabourWagePayment.create({
         data: {
           id: payment.id,

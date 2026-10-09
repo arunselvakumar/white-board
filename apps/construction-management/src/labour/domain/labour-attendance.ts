@@ -1,7 +1,8 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import type { NewLedgerEntry } from "./ledger";
+import { MAX_PAISE } from "./labour";
+import { assertAmountFits, type NewLedgerEntry } from "./ledger";
 import {
   MAX_OVERTIME_HOURS_PER_DAY,
   dayEarned,
@@ -11,6 +12,9 @@ import {
   type AttendanceStatus,
   type WageType,
 } from "./wages";
+
+const OVERTIME_TOO_LARGE =
+  "A Labour's overtime for one day is at most ₹21,47,48,364. Check the overtime rate.";
 
 /** One overtime line as a supervisor enters it. */
 export type OvertimeInput = {
@@ -104,18 +108,28 @@ export function priceDay(input: {
   const overtime = lines.map((line) => {
     const hours = overtimeHours(line.hours);
     const ratePerHour = line.ratePerHour ?? card.overtimeWagePerHour;
-    if (!Number.isSafeInteger(ratePerHour) || ratePerHour < 0)
+    if (
+      !Number.isSafeInteger(ratePerHour) ||
+      ratePerHour < 0 ||
+      ratePerHour > MAX_PAISE
+    )
       throw new DomainError(
         "OVERTIME_RATE_INVALID",
-        "The overtime rate must be zero or more.",
+        "The overtime rate must be zero or more, up to ₹2,00,00,000 an hour.",
       );
+    const amount = overtimeAmount(hours, ratePerHour);
+    assertAmountFits(amount, OVERTIME_TOO_LARGE);
     return {
       labourCategoryId: line.labourCategoryId,
       hours,
       ratePerHour,
-      amount: overtimeAmount(hours, ratePerHour),
+      amount,
     };
   });
+  assertAmountFits(
+    overtime.reduce((sum, line) => sum + line.amount, 0),
+    OVERTIME_TOO_LARGE,
+  );
   const totalHundredths = overtime.reduce(
     (sum, line) => sum + hoursInHundredths(line.hours),
     0,

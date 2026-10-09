@@ -16,6 +16,8 @@ The legacy app kept running figures: a labourer's opening balance was an editabl
 - **Sign convention for labour and vendors:** positive means the Company owes the party (opening owed, wages earned, overtime); payments and advances are negative. A negative opening balance is an advance given before the app.
 - **Reports read balances from entries.** The balance on a date is the sum of entries up to that date. A period summary is: opening (before the period), earned, overtime, advances, payments, closing. The legacy labour payment figures map onto it: Previous Balance = opening; To Pay = earned + overtime; Advance = advances; Final Amount = closing.
 - **Amounts are snapshots.** An attendance row keeps the wage rate it was priced at and its earned amount; a vendor attendance line keeps the rate card it was priced at. Changing a labourer's wage or a vendor's rates changes future days, never past ones.
+- **Amounts fit a 32-bit column; sums are 64-bit.** One entry or payment is at most 2,147,483,647 paise (`AMOUNT_TOO_LARGE` above it; payments and wages cap at ₹2 crore). Every sum of money is computed in SQL as `SUM(amount)::bigint`, so totals past ₹2.14 crore stay exact.
+- **A party cannot be deleted while it is being paid or marked.** Writers lock the Labour or Vendor row `FOR SHARE` and a delete locks it `FOR UPDATE`, checking for records inside the same transaction.
 - **The entry is written in the same transaction as its source row**, so a saved attendance day always has its money and vice versa.
 
 ## Consequences

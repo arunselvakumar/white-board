@@ -126,6 +126,10 @@ export type LabourAttendanceStore = {
   list(
     params: LabourDayListParams,
   ): Promise<{ items: StoredLabourDay[]; total: number; hasMore: boolean }>;
+  /**
+   * Writes every day in one transaction, after locking the labourers' rows
+   * (404 `LABOUR_NOT_FOUND` when one was deleted meanwhile).
+   */
   save(input: {
     workspaceId: string;
     writes: readonly LabourDayWrite[];

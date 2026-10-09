@@ -17,6 +17,7 @@ import type {
 } from "../application/vendor-handlers";
 import { liveEntries } from "../domain/ledger";
 import { Vendor } from "../domain/vendor";
+import { lockLiveParties } from "./party-locks";
 import { prismaLedger } from "./prisma-ledger";
 
 type Tx = Prisma.TransactionClient;
@@ -96,14 +97,12 @@ function rateRows(vendor: Vendor, now: Date) {
     .map((row, index) => ({ id: newId(start + index), ...row }));
 }
 
-async function lock(tx: Tx, workspaceId: string, id: string): Promise<void> {
-  const locked = await tx.$queryRaw<{ id: string }[]>`
-    SELECT id FROM construction_labour.vendors
-    WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL
-    FOR UPDATE
-  `;
-  if (locked.length === 0)
-    throw notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
+/**
+ * FOR UPDATE on the live vendor row: waits for any attendance or payment
+ * being written for it (they hold FOR SHARE, `lockLiveParties`).
+ */
+function lock(tx: Tx, workspaceId: string, id: string): Promise<void> {
+  return lockLiveParties(tx, workspaceId, "vendor", [id], "update");
 }
 
 async function writeProjects(tx: Tx, vendor: Vendor): Promise<void> {
@@ -448,23 +447,11 @@ export class PrismaVendorStore implements VendorStore {
     });
   }
 
-  async openingBalances(
+  openingBalances(
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, number>> {
-    if (ids.length === 0) return new Map();
-    const sums = await this.db.constructionLabourLedgerEntry.groupBy({
-      by: ["partyId"],
-      where: {
-        workspaceId,
-        partyType: "vendor",
-        partyId: { in: [...new Set(ids)] },
-        sourceType: "vendor",
-        kind: "opening",
-      },
-      _sum: { amount: true },
-    });
-    return new Map(sums.map((row) => [row.partyId, row._sum.amount ?? 0]));
+    return prismaLedger.openingBalances(this.db, workspaceId, "vendor", ids);
   }
 
   balances(

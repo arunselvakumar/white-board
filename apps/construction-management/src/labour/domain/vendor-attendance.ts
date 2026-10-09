@@ -1,7 +1,7 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import type { NewLedgerEntry } from "./ledger";
+import { assertAmountFits, type NewLedgerEntry } from "./ledger";
 import { vendorLineAmount } from "./wages";
 import { parseDecimal } from "@/src/shared-kernel/decimal";
 
@@ -161,12 +161,17 @@ export function priceVendorDay(input: {
       }),
     };
   });
+  const totalPay = lines.reduce((sum, line) => sum + line.amount, 0);
+  assertAmountFits(
+    totalPay,
+    "A vendor's pay for one day is at most ₹21,47,48,364. Check the counts and the rate card.",
+  );
   return {
     vendorId: input.vendorId,
     projectId: input.projectId,
     date: input.date,
     lines,
-    totalPay: lines.reduce((sum, line) => sum + line.amount, 0),
+    totalPay,
   };
 }
 

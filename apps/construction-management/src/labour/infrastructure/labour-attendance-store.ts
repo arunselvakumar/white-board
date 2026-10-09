@@ -28,6 +28,7 @@ import type {
 import { dayLedgerEntries, type PricedDay } from "../domain/labour-attendance";
 import type { Weekday } from "../domain/wages";
 import { projectsOn } from "./labour-project-on";
+import { lockLiveParties } from "./party-locks";
 import { companyToday, PrismaLabourQueries } from "./prisma-labour-queries";
 import { prismaLedger } from "./prisma-ledger";
 
@@ -305,6 +306,14 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
   ): Promise<void> {
     const { workspaceId, by, now } = input;
     await this.db.$transaction(async (tx) => {
+      // A labourer deleted meanwhile is refused; a delete waits for this.
+      await lockLiveParties(
+        tx,
+        workspaceId,
+        "labour",
+        input.writes.map((write) => write.day.labourId),
+        "share",
+      );
       const start = now.getTime();
       let step = 0;
       for (const write of input.writes) {
@@ -404,6 +413,13 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
   ): Promise<void> {
     const { workspaceId, by, now } = input;
     await this.db.$transaction(async (tx) => {
+      await lockLiveParties(
+        tx,
+        workspaceId,
+        "labour",
+        input.days.map(({ day }) => day.labourId),
+        "share",
+      );
       for (const { day, expectedUpdatedAt } of input.days) {
         const updated = await tx.constructionLabourAttendance.updateMany({
           where: {

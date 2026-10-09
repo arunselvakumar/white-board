@@ -105,17 +105,7 @@ export class PrismaLabourQueries implements LabourQueries {
           },
           select: { id: true, name: true },
         }),
-        this.db.constructionLabourLedgerEntry.groupBy({
-          by: ["sourceId"],
-          where: {
-            workspaceId,
-            partyType: "labour",
-            sourceType: "labour",
-            kind: "opening",
-            sourceId: { in: ids },
-          },
-          _sum: { amount: true },
-        }),
+        prismaLedger.openingBalances(this.db, workspaceId, "labour", ids),
         prismaLedger.balances(this.db, workspaceId, "labour", ids, today),
       ]);
     const byId = <T extends { id: string }>(items: T[]) =>
@@ -123,9 +113,6 @@ export class PrismaLabourQueries implements LabourQueries {
     const projectNames = byId(projects);
     const categoryNames = byId(categories);
     const supervisorNames = byId(supervisors);
-    const opening = new Map(
-      openings.map((row) => [row.sourceId, row._sum.amount ?? 0]),
-    );
     return rows.map((row) => ({
       id: row.id,
       details: {
@@ -161,7 +148,7 @@ export class PrismaLabourQueries implements LabourQueries {
           : (supervisorNames.get(row.supervisorId) ?? null),
       isActive: row.isActive,
       photoKey: row.photoKey,
-      openingBalance: opening.get(row.id) ?? 0,
+      openingBalance: openings.get(row.id) ?? 0,
       balance: balances.get(row.id) ?? 0,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
