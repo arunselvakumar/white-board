@@ -4,6 +4,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV, type AppNavHref } from "@/lib/app-nav";
+import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
@@ -68,6 +69,50 @@ export const Workspace: Story = {
   ...shellAt("/app/workspace"),
   play: async ({ canvasElement }) => {
     await expectArea(canvasElement, APP_NAV[1]);
+  },
+};
+
+export const MastersSubmenu: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/app/masters/designations" } },
+  },
+  render: () => (
+    <AppShell>
+      <p>Designations</p>
+    </AppShell>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const view = canvasElement.ownerDocument.defaultView;
+    if (view == null || view.innerWidth < 768) return;
+    const nav = within(canvas.getByRole("navigation", { name: "Main" }));
+    const submenu = within(nav.getByRole("list", { name: "Masters" }));
+    for (const group of MASTERS_GROUPS) {
+      const list = within(submenu.getByRole("list", { name: group.label }));
+      for (const section of group.sections)
+        await expect(
+          list.getByRole("link", { name: section.label }),
+        ).toHaveAttribute("href", section.href);
+    }
+    await expect(
+      submenu.getByRole("link", { name: "Designations" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(nav.getByRole("link", { name: "Masters" })).toHaveAttribute(
+      "href",
+      "/app/masters",
+    );
+
+    await userEvent.click(
+      nav.getByRole("button", { name: "Hide Masters list" }),
+    );
+    await waitFor(() =>
+      expect(nav.queryByRole("list", { name: "Masters" })).toBeNull(),
+    );
+    await userEvent.click(
+      nav.getByRole("button", { name: "Show Masters list" }),
+    );
+    await expect(
+      await nav.findByRole("list", { name: "Masters" }),
+    ).toBeVisible();
   },
 };
 

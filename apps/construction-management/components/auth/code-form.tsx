@@ -14,9 +14,12 @@ import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "./field-error";
 
-const codeSchema = z.object({
-  code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
-});
+/** A 6-digit emailed or texted code. */
+export const sixDigitCode = z
+  .string()
+  .regex(/^\d{6}$/, "Enter the 6-digit code");
+
+const codeSchema = z.object({ code: sixDigitCode });
 
 type CodeValues = z.infer<typeof codeSchema>;
 
@@ -24,7 +27,8 @@ const RESEND_AFTER_SECONDS = 30;
 
 /**
  * The 6-digit code step shared by mobile and email sign-in. `onSubmit`
- * resolves the server error message for the code, if any.
+ * resolves the server error message for the code, if any. Forgot password
+ * reuses its input and resend link with a new-password field.
  */
 export function CodeForm({
   sentTo,
@@ -49,18 +53,6 @@ export function CodeForm({
     resolver: zodResolver(codeSchema),
     defaultValues: { code: "" },
   });
-  const [secondsLeft, setSecondsLeft] = useState(RESEND_AFTER_SECONDS);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const timer = setTimeout(() => {
-      setSecondsLeft((value) => value - 1);
-    }, 1000);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [secondsLeft]);
-
   return (
     <form
       onSubmit={(event) => {
@@ -89,27 +81,12 @@ export function CodeForm({
           name="code"
           control={form.control}
           render={({ field }) => (
-            <InputOTP
+            <SixDigitCodeInput
               id="code"
-              maxLength={6}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              autoFocus
-              aria-label="6-digit code"
               value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}
-            >
-              <InputOTPGroup>
-                {[0, 1, 2, 3, 4, 5].map((index) => (
-                  <InputOTPSlot
-                    key={index}
-                    index={index}
-                    className="size-11 text-base"
-                  />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
+            />
           )}
         />
         <FieldError
@@ -119,28 +96,90 @@ export function CodeForm({
       <Button type="submit" disabled={busy} className="h-10 w-full">
         {busy ? "Checking…" : submitLabel}
       </Button>
-      <p className="text-muted-foreground text-center text-sm font-light">
-        {secondsLeft > 0 ? (
-          <span>Resend the code in {secondsLeft}s</span>
-        ) : (
-          <>
-            Didn&apos;t get it?{" "}
-            <Button
-              type="button"
-              variant="link"
-              className="h-auto p-0 text-sm"
-              disabled={busy}
-              onClick={() => {
-                void onResend().then((sent) => {
-                  if (sent) setSecondsLeft(RESEND_AFTER_SECONDS);
-                });
-              }}
-            >
-              Resend code
-            </Button>
-          </>
-        )}
-      </p>
+      <ResendCode busy={busy} onResend={onResend} />
     </form>
+  );
+}
+
+/** The six-slot code input; autofocuses and fills from an SMS or email. */
+export function SixDigitCodeInput({
+  id,
+  value,
+  onChange,
+  onBlur,
+}: {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+}) {
+  return (
+    <InputOTP
+      id={id}
+      maxLength={6}
+      inputMode="numeric"
+      autoComplete="one-time-code"
+      autoFocus
+      aria-label="6-digit code"
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+    >
+      <InputOTPGroup>
+        {[0, 1, 2, 3, 4, 5].map((index) => (
+          <InputOTPSlot
+            key={index}
+            index={index}
+            className="size-11 text-base"
+          />
+        ))}
+      </InputOTPGroup>
+    </InputOTP>
+  );
+}
+
+/** "Resend code", offered once the countdown since the last send ends. */
+export function ResendCode({
+  busy,
+  onResend,
+}: {
+  busy: boolean;
+  onResend: () => Promise<boolean>;
+}) {
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_AFTER_SECONDS);
+
+  useEffect(() => {
+    if (secondsLeft <= 0) return;
+    const timer = setTimeout(() => {
+      setSecondsLeft((value) => value - 1);
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [secondsLeft]);
+
+  return (
+    <p className="text-muted-foreground text-center text-sm font-light">
+      {secondsLeft > 0 ? (
+        <span>Resend the code in {secondsLeft}s</span>
+      ) : (
+        <>
+          Didn&apos;t get it?{" "}
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 text-sm"
+            disabled={busy}
+            onClick={() => {
+              void onResend().then((sent) => {
+                if (sent) setSecondsLeft(RESEND_AFTER_SECONDS);
+              });
+            }}
+          >
+            Resend code
+          </Button>
+        </>
+      )}
+    </p>
   );
 }

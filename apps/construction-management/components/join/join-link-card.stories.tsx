@@ -12,7 +12,7 @@ const PREVIEW: JoinLinkPreview = {
   id: "0199c3a0-0000-7000-8000-000000000011",
   companyName: "Patil Builders",
   memberName: "Suresh Kale",
-  contacts: [{ kind: "mobile", masked: "+91 ••••• 43210" }],
+  contacts: [{ kind: "email", masked: "s••••@kale.in" }],
 };
 
 const meta = {
@@ -35,7 +35,7 @@ export const SignedOut: Story = {
       canvas.getByRole("heading", { name: "Join Patil Builders" }),
     ).toBeVisible();
     await expect(
-      canvas.getByText("Sign in with +91 ••••• 43210 to accept."),
+      canvas.getByText("Sign in with s••••@kale.in to accept."),
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Sign in to accept" }),
@@ -69,7 +69,7 @@ export const SignedInAccepts: Story = {
   },
 };
 
-export const SignedInWithAnotherNumber: Story = {
+export const SignedInWithAnotherEmail: Story = {
   args: { signedIn: true },
   beforeEach() {
     signInAs("owner");
@@ -91,10 +91,12 @@ export const SignedInWithAnotherNumber: Story = {
         canvas.getByRole("button", { name: "Join Patil Builders" }),
       );
       await expect(
-        await canvas.findByText(/This invitation is for \+91 ••••• 43210/),
+        await canvas.findByText(
+          "This invitation is for s••••@kale.in. You are signed in with a different email.",
+        ),
       ).toBeVisible();
       await userEvent.click(
-        canvas.getByRole("button", { name: "Sign out and use that number" }),
+        canvas.getByRole("button", { name: "Sign out and use that email" }),
       );
       await waitFor(() =>
         expect(authMocks.signOut).toHaveBeenCalledWith(`/join/${TOKEN}`),
@@ -102,6 +104,26 @@ export const SignedInWithAnotherNumber: Story = {
     } finally {
       restore();
     }
+  },
+};
+
+/** While SMS is on the invited number is listed beside the email. */
+export const SignedOutWithSms: Story = {
+  args: {
+    preview: {
+      ...PREVIEW,
+      contacts: [
+        { kind: "mobile", masked: "+91 ••••• 43210" },
+        { kind: "email", masked: "s••••@kale.in" },
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText(
+        "Sign in with +91 ••••• 43210 or s••••@kale.in to accept.",
+      ),
+    ).toBeVisible();
   },
 };
 

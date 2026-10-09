@@ -12,7 +12,7 @@ export const CreateConstructionOrganizationSequenceRuleRequestModel = z.object({
     .uuid()
     .nullable()
     .describe(
-      "Null for the module's default rule (All projects). Project rules arrive with Projects (M2).",
+      "Null for the module's default rule (All projects), or a live Project's id.",
     ),
   ...sequenceRuleSettingsFields,
 });

@@ -3,13 +3,14 @@ import { StatusCodes } from "http-status-codes";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { assertKnownProjects } from "@/src/organization/application/project-directory";
 import {
   decodeListCursor,
   encodeListCursor,
 } from "@/src/shared-kernel/list-cursor";
 
 import { CreateConstructionOrganizationTeamMemberRequestModel } from "./create-team-member-request-model";
-import { teamMemberHandlers as handlers } from "./handlers";
+import { teamMemberHandlers as handlers, projectDirectory } from "./handlers";
 import { ListConstructionOrganizationTeamMembersRequestModel } from "./list-team-members-request-model";
 import type { ListConstructionOrganizationTeamMembersResponseModel } from "./list-team-members-response-model";
 import { toTeamMemberResponse } from "./team-member-models";
@@ -72,6 +73,12 @@ export async function POST(request: Request): Promise<Response> {
       ),
     );
     const { memberType, projectIds, permissions, ...details } = model;
+    if (memberType === "normal")
+      await assertKnownProjects(
+        projectDirectory,
+        session.workspaceId,
+        projectIds,
+      );
     const member = await handlers.invite({
       workspaceId: session.workspaceId,
       by: session.userId,

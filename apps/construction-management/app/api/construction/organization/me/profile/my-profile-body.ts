@@ -13,6 +13,7 @@ export function myProfileBody(
     name: profile.name,
     designation: profile.designation,
     mobile: profile.mobile,
+    mobileEditable: profile.mobileEditable,
     email: profile.email,
     address: profile.address,
     emergencyContact: profile.emergencyContact,

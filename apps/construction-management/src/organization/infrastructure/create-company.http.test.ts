@@ -20,7 +20,7 @@ async function newUser(): Promise<string> {
 }
 
 describe("createCompany on Postgres (CM-104)", () => {
-  it("creates the Workspace, Owner membership, profile, trial and audit event", async () => {
+  it("creates the Workspace, Owner membership, profile and audit event, and no subscription", async () => {
     const userId = await newUser();
     const handlers = createCompanyHandlers();
     const created = await handlers.create.execute({
@@ -47,14 +47,11 @@ describe("createCompany on Postgres (CM-104)", () => {
       currency: "INR",
       isIndian: true,
     });
-    const trial =
-      await prisma.constructionOrganizationSubscription.findUniqueOrThrow({
+    await expect(
+      prisma.constructionOrganizationSubscription.findUnique({
         where: { workspaceId: created.workspaceId },
-      });
-    expect(trial.isTrial).toBe(true);
-    expect(trial.endsAt.getTime() - trial.startsAt.getTime()).toBe(
-      14 * 24 * 60 * 60 * 1000,
-    );
+      }),
+    ).resolves.toBeNull();
     await expect(
       prisma.constructionOrganizationAuditEvent.count({
         where: { workspaceId: created.workspaceId, action: "company.created" },

@@ -33,6 +33,12 @@ function rule(overrides: Partial<SequenceRuleItem>): SequenceRuleItem {
 }
 
 let rules: SequenceRuleItem[] = [];
+let projects: { id: string; name: string; status: string }[] = [];
+const SHANTI = {
+  id: "0199c0de-0000-7000-8000-0000000000c1",
+  name: "Shanti Heights",
+  status: "ongoing",
+};
 let calls: ApiCall[] = [];
 let deleteResponse: () => Response = () => new Response(null, { status: 204 });
 
@@ -46,15 +52,24 @@ const meta = {
   args: { today: "2026-10-08" },
   beforeEach() {
     rules = [];
+    projects = [];
     calls = [];
     const api = mockApi((call) => {
       calls.push(call);
+      if (
+        call.method === "GET" &&
+        call.path === "/api/construction/projects/projects/options"
+      )
+        return Response.json({ items: projects });
       if (call.method === "GET" && call.path === BASE)
         return Response.json({ items: rules, total: rules.length });
       if (call.method === "POST" && call.path === BASE) {
+        const sent = call.body as Partial<SequenceRuleItem>;
         const created = rule({
-          ...(call.body as Partial<SequenceRuleItem>),
+          ...sent,
           id: "0199c0de-0000-7000-8000-0000000000b2",
+          isDefault: sent.projectId == null,
+          scope: sent.projectId == null ? "workspace" : "project",
         });
         rules = [...rules, created];
         return Response.json(created, { status: 201 });
@@ -132,7 +147,7 @@ export const EmptyModuleAddsADefaultRule: Story = {
       separator: "/",
       fiscalYearToken: true,
     });
-    // One default per module: adding another waits for Projects.
+    // One default per module, and no Projects to give their own rule.
     await expect(
       canvas.getByRole("button", { name: "Add rule" }),
     ).toBeDisabled();
@@ -214,5 +229,37 @@ export const DeletesAnUnusedRule: Story = {
     await expect(writes()[0]?.path).toBe(
       `${BASE}/0199c0de-0000-7000-8000-0000000000a1/delete`,
     );
+  },
+};
+
+export const AddsARuleForOneProject: Story = {
+  beforeEach() {
+    rules = [rule({})];
+    projects = [SHANTI];
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      await canvas.findByText("All projects (default)"),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Add rule" }));
+    const dialog = within(await body.findByRole("dialog"));
+    // The default exists, so the new rule is for a Project.
+    await expect(dialog.getByLabelText("Project")).toHaveTextContent(
+      "Shanti Heights",
+    );
+    await userEvent.type(dialog.getByLabelText("Project token"), "SH");
+    await userEvent.click(dialog.getByRole("button", { name: "Save rule" }));
+    await waitFor(() => expect(writes()).toHaveLength(1));
+    await expect(writes()[0]?.body).toMatchObject({
+      module: "purchase_request",
+      projectId: SHANTI.id,
+      projectToken: "SH",
+    });
+    // The rule shows the Project's name; every Project now has a rule.
+    await expect(await canvas.findByText("Shanti Heights")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Add rule" }),
+    ).toBeDisabled();
   },
 };

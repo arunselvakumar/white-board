@@ -32,13 +32,12 @@ export type SeedDesignations = (input: {
 export type CreatedCompany = {
   workspaceId: string;
   name: string;
-  trialEndsAt: Date;
 };
 
 /**
  * Company creation (CM-104): the Workspace in `@repo/auth` with the caller
- * as Owner, then the profile, the Owner's Team Member, the seed sets and the
- * trial in one transaction. If that transaction fails the Workspace is
+ * as Owner, then the profile, the Owner's Team Member and the seed sets in
+ * one transaction. If that transaction fails the Workspace is
  * removed again, so a half-made Company never appears in the switcher.
  */
 export class CreateCompanyHandler {
@@ -80,10 +79,6 @@ export class CreateCompanyHandler {
       throw error;
     }
     await this.events.dispatch([company.createdEvent()]);
-    return {
-      workspaceId,
-      name: details.value.name,
-      trialEndsAt: company.trial.endsAt,
-    };
+    return { workspaceId, name: details.value.name };
   }
 }

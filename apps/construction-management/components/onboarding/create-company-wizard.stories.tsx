@@ -53,7 +53,6 @@ export const CreatesACompany: Story = {
         {
           id: "company_new",
           name: "Patil Builders",
-          trialEndsAt: "2026-10-22T06:30:00.000Z",
         },
         { status: 201 },
       ),

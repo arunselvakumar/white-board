@@ -6,21 +6,22 @@ import { prisma } from "@repo/db";
 import { vi } from "vitest";
 
 import { POST as createCompanyRoute } from "@/app/api/construction/organization/companies/route";
+import { addMonths } from "@/src/organization/domain/subscription";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
 import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag, PermissionGrants } from "@/src/shared-kernel/access";
 
-import { newMobile, signInByMobile, TEST_ORIGIN } from "./sessions";
+import { newEmail, signInByEmail, TEST_ORIGIN } from "./sessions";
 
 // Real sessions through the auth routes (HTTP tests of routes).
 
 /**
- * An Owner signed in by mobile with a fresh Company active, plus helpers
+ * An Owner signed in by email with a fresh Company active, plus helpers
  * to call routes as that Owner.
  */
 export async function ownerWithCompany(name = "Patil Builders") {
-  const owner = await signInByMobile();
+  const owner = await signInByEmail();
   const created = await createCompanyRoute(
     new Request(`${TEST_ORIGIN}/api/construction/organization/companies`, {
       method: "POST",
@@ -52,7 +53,7 @@ export async function memberWith(
   },
   permissions: PermissionGrants,
 ) {
-  const mobile = newMobile();
+  const email = newEmail();
   const member = await createTeamMemberHandlers().invite({
     workspaceId: company.workspaceId,
     by: company.userId,
@@ -60,11 +61,11 @@ export async function memberWith(
     details: {
       name: "Member",
       designationId: company.designationId("Site Engineer"),
-      mobile,
+      email,
     },
     permissions,
   });
-  const session = await signInByMobile(mobile);
+  const session = await signInByEmail(email, "Member");
   await prisma.identityWorkspaceMember.create({
     data: {
       id: `member_${member.id}`,
@@ -95,6 +96,28 @@ export function jsonRequest(
     method,
     headers: { "content-type": "application/json", cookie },
     body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+/**
+ * Puts a Company on a paid plan (Basic unless named), as if its first
+ * order had been paid; a new Company has no plan and no limits. Pass a
+ * past `endsAt` for an ended plan.
+ */
+export async function givePlan(
+  workspaceId: string,
+  input: { planCode?: string; endsAt?: Date } = {},
+): Promise<void> {
+  const now = new Date();
+  await prisma.constructionOrganizationSubscription.create({
+    data: {
+      id: randomUUID(),
+      workspaceId,
+      planCode: input.planCode ?? "basic",
+      startsAt: now,
+      endsAt: input.endsAt ?? addMonths(now, 6),
+      paidValue: 1_400_000,
+    },
   });
 }
 
@@ -179,4 +202,29 @@ export function actAs(input: {
   vi.mocked(getCompanyAuthFromHeaders).mockResolvedValue(
     companyAuthStateFor(input),
   );
+}
+
+/**
+ * A live Project of the Company (CM-204), written straight to
+ * `construction_projects.projects` for tests that only need its id.
+ */
+export async function addProject(
+  workspaceId: string,
+  by: string,
+  name = `Project ${randomUUID().slice(0, 8)}`,
+): Promise<string> {
+  const id = randomUUID();
+  const now = new Date();
+  await prisma.constructionProjectsProject.create({
+    data: {
+      id,
+      workspaceId,
+      name,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
 }

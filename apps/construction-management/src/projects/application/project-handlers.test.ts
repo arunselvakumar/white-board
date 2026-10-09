@@ -1,0 +1,224 @@
+import { describe, expect, it } from "vitest";
+
+import type { AuditEvent } from "@/src/shared-kernel/audit";
+import { conflict } from "@/src/shared-kernel/domain-error";
+import {
+  UNLIMITED_PLAN,
+  planLimitExceeded,
+  type PlanGate,
+} from "@/src/shared-kernel/plan";
+
+import type { Project } from "../domain/project";
+import type {
+  ProjectRepository,
+  ProjectUsage,
+} from "../domain/project-repository";
+import { ProjectHandlers, type ProjectViewer } from "./project-handlers";
+
+class MemoryProjects implements ProjectRepository {
+  readonly rows = new Map<string, Project>();
+  readonly audits: AuditEvent[] = [];
+  /** `updatedAt` as stored, to imitate the compare-and-set. */
+  private readonly stamps = new Map<string, number>();
+
+  findById(workspaceId: string, id: string): Promise<Project | null> {
+    const found = this.rows.get(id);
+    return Promise.resolve(
+      found?.workspaceId === workspaceId && found.deletedAt == null
+        ? found
+        : null,
+    );
+  }
+
+  list(
+    workspaceId: string,
+    ids: ReadonlySet<string> | null,
+  ): Promise<Project[]> {
+    return Promise.resolve(
+      [...this.rows.values()].filter(
+        (item) =>
+          item.workspaceId === workspaceId &&
+          item.deletedAt == null &&
+          (ids == null || ids.has(item.id)),
+      ),
+    );
+  }
+
+  insert(project: Project, audit: AuditEvent): Promise<void> {
+    const clash = [...this.rows.values()].some(
+      (item) =>
+        item.workspaceId === project.workspaceId &&
+        item.deletedAt == null &&
+        item.name.toLowerCase() === project.name.toLowerCase(),
+    );
+    if (clash)
+      return Promise.reject(conflict("PROJECT_NAME_IN_USE", "In use."));
+    this.rows.set(project.id, project);
+    this.stamps.set(project.id, project.updatedAt.getTime());
+    this.audits.push(audit);
+    return Promise.resolve();
+  }
+
+  update(
+    project: Project,
+    expectedUpdatedAt: Date,
+    audit: AuditEvent,
+  ): Promise<void> {
+    if (this.stamps.get(project.id) !== expectedUpdatedAt.getTime())
+      return Promise.reject(conflict("PROJECT_CHANGED", "Changed."));
+    this.stamps.set(project.id, project.updatedAt.getTime());
+    this.audits.push(audit);
+    return Promise.resolve();
+  }
+
+  delete(project: Project, audit: AuditEvent): Promise<void> {
+    this.audits.push(audit);
+    this.rows.set(project.id, project);
+    return Promise.resolve();
+  }
+}
+
+const OWNER: ProjectViewer = {
+  workspaceId: "company-1",
+  userId: "owner",
+  role: "owner",
+  projectIds: new Set(),
+};
+
+let tick = Date.parse("2026-10-08T00:00:00Z");
+const clock = () => new Date((tick += 1000));
+
+function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
+  const repository = new MemoryProjects();
+  const used = options.used ?? new Set<string>();
+  const usage: ProjectUsage = {
+    isInUse: (_workspaceId, projectId) => Promise.resolve(used.has(projectId)),
+  };
+  const handlers = new ProjectHandlers(
+    repository,
+    options.plan ?? UNLIMITED_PLAN,
+    usage,
+    clock,
+  );
+  const add = (name: string, status?: string) =>
+    handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: { name, status },
+    });
+  return { handlers, repository, used, add };
+}
+
+describe("ProjectHandlers", () => {
+  it("lists by status then name with counts per status", async () => {
+    const { handlers, add } = setup();
+    await add("Zen Villas", "completed");
+    await add("Shanti Heights");
+    await add("Baner Plots", "not_started");
+    await add("Aundh Tower");
+    const page = await handlers.list(OWNER);
+    expect(page.items.map((item) => item.name)).toEqual([
+      "Aundh Tower",
+      "Shanti Heights",
+      "Baner Plots",
+      "Zen Villas",
+    ]);
+    expect(page.counts).toEqual({
+      all: 4,
+      ongoing: 2,
+      not_started: 1,
+      on_hold: 0,
+      completed: 1,
+    });
+    const ongoing = await handlers.list(OWNER, "ongoing");
+    expect(ongoing.total).toBe(2);
+    expect(ongoing.counts.all).toBe(4);
+  });
+
+  it("shows a Member only the Projects they are assigned to", async () => {
+    const { handlers, add } = setup();
+    const mine = await add("Shanti Heights");
+    const other = await add("Aundh Tower");
+    const member: ProjectViewer = {
+      workspaceId: "company-1",
+      userId: "member",
+      role: "member",
+      projectIds: new Set([mine.id]),
+    };
+    expect((await handlers.list(member)).items.map((item) => item.id)).toEqual([
+      mine.id,
+    ]);
+    expect(await handlers.options(member)).toEqual([
+      { id: mine.id, name: "Shanti Heights", status: "ongoing" },
+    ]);
+    await expect(handlers.get(member, other.id)).rejects.toMatchObject({
+      code: "PROJECT_NOT_FOUND",
+      kind: "not_found",
+    });
+    await expect(
+      handlers.delete({ viewer: member, id: other.id, by: "member" }),
+    ).rejects.toMatchObject({ code: "PROJECT_NOT_FOUND" });
+  });
+
+  it("asks the plan before creating", async () => {
+    const plan: PlanGate = {
+      assertCanAdd: (_workspaceId, grant) =>
+        Promise.reject(planLimitExceeded(grant, 10, 10)),
+    };
+    const { add, repository } = setup({ plan });
+    await expect(add("Shanti Heights")).rejects.toMatchObject({
+      code: "PLAN_LIMIT_EXCEEDED",
+      kind: "limit",
+      details: { grant: "project", limit: 10, used: 10 },
+    });
+    expect(repository.rows.size).toBe(0);
+  });
+
+  it("updates with optimistic concurrency and audits before/after", async () => {
+    const { handlers, add, repository } = setup();
+    const created = await add("Shanti Heights");
+    const updated = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: { name: "Shanti Heights", status: "on_hold" },
+      expectedUpdatedAt: created.updatedAt,
+    });
+    expect(updated.status).toBe("on_hold");
+    expect(repository.audits.at(-1)).toMatchObject({
+      action: "project.updated",
+      entityType: "project",
+      before: { status: "ongoing" },
+      after: { status: "on_hold" },
+    });
+    await expect(
+      handlers.update({
+        viewer: OWNER,
+        id: created.id,
+        by: "owner",
+        details: { name: "Shanti Heights", status: "completed" },
+        expectedUpdatedAt: created.updatedAt,
+      }),
+    ).rejects.toMatchObject({ code: "PROJECT_CHANGED", kind: "conflict" });
+  });
+
+  it("refuses to delete a Project in use, then tombstones it", async () => {
+    const { handlers, add, used, repository } = setup();
+    const created = await add("Shanti Heights");
+    used.add(created.id);
+    await expect(
+      handlers.delete({ viewer: OWNER, id: created.id, by: "owner" }),
+    ).rejects.toMatchObject({ code: "PROJECT_IN_USE", kind: "conflict" });
+    used.clear();
+    await handlers.delete({ viewer: OWNER, id: created.id, by: "owner" });
+    expect((await handlers.list(OWNER)).total).toBe(0);
+    expect(repository.audits.at(-1)).toMatchObject({
+      action: "project.deleted",
+      before: { name: "Shanti Heights" },
+    });
+    // The name is free again.
+    await expect(add("Shanti Heights")).resolves.toMatchObject({
+      name: "Shanti Heights",
+    });
+  });
+});

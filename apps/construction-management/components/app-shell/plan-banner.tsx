@@ -18,27 +18,23 @@ type Banner = {
 };
 
 function bannerFor(view: SubscriptionView): Banner | null {
-  const days = `${String(view.daysLeft)} ${view.daysLeft === 1 ? "day" : "days"} left`;
-  const choose = {
-    label: "Choose a plan",
-    href: "/app/subscription/checkout?kind=new",
-  };
+  const daysLeft = view.plan?.daysLeft ?? 0;
+  const days = `${String(daysLeft)} ${daysLeft === 1 ? "day" : "days"} left`;
   switch (view.status) {
+    case "none":
+      return null;
     case "expired":
       return {
         message:
           "Your plan has ended. Your data is safe and read-only; export is still available.",
-        action: choose,
+        action: {
+          label: "Choose a plan",
+          href: "/app/subscription/checkout?kind=new",
+        },
         tone: "bg-destructive/10",
       };
-    case "trial":
-      return {
-        message: `Free trial: ${days}`,
-        action: choose,
-        tone: "bg-primary/10",
-      };
     case "active":
-      return view.daysLeft <= ENDING_SOON_DAYS
+      return daysLeft <= ENDING_SOON_DAYS
         ? {
             message: `Your plan ends soon: ${days}`,
             action: {
@@ -52,9 +48,10 @@ function bannerFor(view: SubscriptionView): Banner | null {
 }
 
 /**
- * The plan banner under the shell header (CM-118): trial days left, a paid
- * plan about to end, or an ended plan (read-only, export still open). It
- * never blocks the page: while loading or on error it shows nothing.
+ * The plan banner under the shell header (CM-118): a plan about to end, or
+ * an ended plan (read-only, export still open). A Company with no plan yet
+ * sees nothing. It never blocks the page: while loading or on error it
+ * shows nothing.
  */
 export function PlanBanner() {
   const { data } = useQuery({ ...subscriptionQuery, retry: false });

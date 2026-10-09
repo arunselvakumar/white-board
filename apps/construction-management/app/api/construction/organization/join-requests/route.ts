@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createJoinRequestHandlers();
 
-/** Join Requests for the signed-in User's verified mobile or email (CM-109). */
+/** Join Requests for the signed-in User's verified email (or mobile while SMS is on; CM-109, ADR CM-0009). */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireUserSession(request);

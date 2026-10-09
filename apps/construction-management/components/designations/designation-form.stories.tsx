@@ -133,8 +133,14 @@ export const EditSaves: Story = {
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
+    // The full Permission Matrix renders here; slow CI runners need longer
+    // than the default 1 s.
     await expect(
-      await canvas.findByRole("heading", { name: "Edit Site Engineer" }),
+      await canvas.findByRole(
+        "heading",
+        { name: "Edit Site Engineer" },
+        { timeout: 5000 },
+      ),
     ).toBeVisible();
     const name = canvas.getByLabelText("Designation name");
     await expect(name).toHaveValue("Site Engineer");

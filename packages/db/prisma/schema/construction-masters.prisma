@@ -1,0 +1,70 @@
+/// Construction Management — masters context (ADR CM-0001, `modules/02`):
+/// the Company's lookup lists other contexts pick from. M2 adds the labour
+/// subset: Labour Categories, Departments and Supervisors. Each Company gets
+/// its own copy of the seed sets when it is created (CM-203). Names are
+/// unique among live rows of a list (partial indexes in the migration).
+
+/// A trade a labourer or a vendor's headcount is booked under (Carpenter,
+/// Mason, …). Seed rows can be disabled, not renamed or deleted.
+model ConstructionMastersLabourCategory {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  /// Disabled categories stay on old records but leave the pickers.
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("labour_categories")
+  @@schema("construction_masters")
+}
+
+/// A trade or work category (not an org unit): Masonry & Plaster, RCC, …
+/// Used by contractors, worksheets, issues and tasks in later milestones.
+model ConstructionMastersDepartment {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("departments")
+  @@schema("construction_masters")
+}
+
+/// The person on site responsible for a group of labourers. Often a Team
+/// Member (`team_member_id`), but a site may have a supervisor who never
+/// signs in, so the name is the record.
+model ConstructionMastersSupervisor {
+  id           String    @id @db.Uuid
+  workspaceId  String    @map("workspace_id")
+  name         String
+  /// E.164.
+  mobile       String?
+  /// The Team Member this supervisor is, if any (organization context id).
+  teamMemberId String?   @map("team_member_id") @db.Uuid
+  disabledAt   DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy    String    @map("created_by")
+  updatedBy    String    @map("updated_by")
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("supervisors")
+  @@schema("construction_masters")
+}

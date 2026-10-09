@@ -12,7 +12,14 @@ export const GetConstructionOrganizationMyProfileResponseModel = z.object({
   mobile: z
     .string()
     .nullable()
-    .describe("E.164; how the User signs in, so it is not editable here"),
+    .describe(
+      "E.164. A contact while SMS is off; the sign-in while it is on (ADR CM-0009)",
+    ),
+  mobileEditable: z
+    .boolean()
+    .describe(
+      "Whether `update` accepts a mobile: true while SMS is off, false while the mobile is the sign-in",
+    ),
   email: z.string().nullable(),
   address: z.string().nullable(),
   emergencyContact: z.string().nullable(),

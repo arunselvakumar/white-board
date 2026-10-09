@@ -45,14 +45,19 @@ export function isAllowedAuthPath(
   );
 }
 
+/**
+ * `allowed` may be a function, read on every request, for paths a setting
+ * turns on and off (Construction Management's mobile OTP).
+ */
 export function allowedPaths(
   id = "whiteboard-allowed-paths",
-  allowed: readonly string[] = ALLOWED_AUTH_PATHS,
+  allowed: readonly string[] | (() => readonly string[]) = ALLOWED_AUTH_PATHS,
 ): BetterAuthPlugin {
   return {
     id,
     onRequest(request) {
-      if (isAllowedAuthPath(new URL(request.url).pathname, allowed))
+      const paths = typeof allowed === "function" ? allowed() : allowed;
+      if (isAllowedAuthPath(new URL(request.url).pathname, paths))
         return Promise.resolve(undefined);
       return Promise.resolve({
         response: new Response("Not Found", { status: 404 }),

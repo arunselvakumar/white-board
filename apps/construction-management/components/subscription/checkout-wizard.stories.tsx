@@ -10,7 +10,7 @@ import {
   activeView,
   memberView,
   mockSubscriptionApi,
-  trialView,
+  noPlanView,
 } from "./subscription-story-fixtures";
 
 /** Razorpay Checkout stand-in: pays at once and calls the success handler. */
@@ -53,11 +53,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NewPlanFromTrial: Story = {
+export const FirstPlan: Story = {
   args: { kind: "new" },
   beforeEach() {
     signInAs("owner");
-    const api = mockSubscriptionApi({ subscription: trialView });
+    const api = mockSubscriptionApi({ subscription: noPlanView });
     const razorpay = installFakeRazorpay();
     return () => {
       api.restore();
@@ -186,7 +186,7 @@ export const PaymentsNotConfigured: Story = {
     signInAs("owner");
     return mockSubscriptionApi({
       subscription: {
-        ...trialView,
+        ...noPlanView,
         owner: {
           unusedValuePaise: 0,
           lastBillingAddress: null,

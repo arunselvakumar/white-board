@@ -11,7 +11,7 @@ const meta = {
     children: (
       <AuthHeading
         title="Sign in"
-        description="Sign in with your mobile number."
+        description="Sign in with your email and password."
       />
     ),
   },

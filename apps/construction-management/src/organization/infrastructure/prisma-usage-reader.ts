@@ -1,18 +1,32 @@
+import { Prisma, type PrismaClient } from "@repo/db";
+
 import type { PlanGrant } from "@/src/shared-kernel/plan";
 
 import type { UsageReader } from "../application/subscription-ports";
 import { BYTES_PER_GB, type UsageSnapshot } from "../domain/usage";
 import type { StorageMeter } from "./storage-meter";
 
-/** Live Projects in a Company. Projects arrive in M2 (CM-204). */
+/** Live Projects in a Company (CM-204). */
 export type ProjectCounter = {
   countLive(workspaceId: string): Promise<number>;
 };
 
-/** Until the projects context exists there are no Projects to count. */
-export const NO_PROJECTS: ProjectCounter = {
-  countLive: () => Promise.resolve(0),
-};
+/**
+ * Counts live rows of `construction_projects.projects` by id and tombstone
+ * only: the organization context never imports the projects context.
+ */
+export class PrismaProjectCounter implements ProjectCounter {
+  constructor(private readonly db: PrismaClient) {}
+
+  async countLive(workspaceId: string): Promise<number> {
+    const rows = await this.db.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`SELECT COUNT(*)::bigint AS "count"
+        FROM construction_projects.projects
+        WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL`,
+    );
+    return Number(rows[0]?.count ?? 0n);
+  }
+}
 
 type TeamMemberCounter = {
   countLive(

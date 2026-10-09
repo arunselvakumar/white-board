@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { PermissionSet } from "@/src/shared-kernel/access";
-import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import { hrmsDefaultPermissions } from "@/src/shared-kernel/access";
 import { TeamMember, teamMemberDetails } from "./team-member";
@@ -41,7 +40,10 @@ describe("teamMemberDetails", () => {
 
   it("needs a mobile or an email", () => {
     expect(() => teamMemberDetails({ name: "A", designationId: "d" })).toThrow(
-      DomainError,
+      expect.objectContaining({
+        code: "MOBILE_OR_EMAIL_REQUIRED",
+        message: "Enter an email to invite them, or at least a mobile number.",
+      }) as Error,
     );
     expect(
       teamMemberDetails({ name: "A", designationId: "d", email: "a@b.in" })
@@ -135,7 +137,7 @@ describe("TeamMember", () => {
     );
   });
 
-  it("locks a joined member's mobile", () => {
+  it("locks a joined member's mobile while it is a way to sign in", () => {
     const member = invite();
     member.accept("user-9", NOW);
     expect(() => {
@@ -145,5 +147,25 @@ describe("TeamMember", () => {
         NOW,
       );
     }).toThrow(expect.objectContaining({ code: "MOBILE_LOCKED" }) as Error);
+    expect(() => {
+      member.updateDetails(
+        { ...details, mobile: "+919812345678" },
+        "owner",
+        NOW,
+        { mobileIsSignIn: true },
+      );
+    }).toThrow(expect.objectContaining({ code: "MOBILE_LOCKED" }) as Error);
+  });
+
+  it("lets a joined member's mobile change while SMS is off", () => {
+    const member = invite();
+    member.accept("user-9", NOW);
+    member.updateDetails(
+      { ...details, mobile: "+919812345678" },
+      "owner",
+      NOW,
+      { mobileIsSignIn: false },
+    );
+    expect(member.details.mobile).toBe("+919812345678");
   });
 });

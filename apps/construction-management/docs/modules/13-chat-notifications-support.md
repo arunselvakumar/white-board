@@ -249,15 +249,15 @@ The notes give the per-module `N` flag and a few named deliveries, but not the e
 
 Legacy derives the trial banner and Plan Expired state from the subscription, and maintenance from the version check. A single table is proposed for the rebuild.
 
-| Field            | Type                                                                             | Required | Notes                                 |
-| ---------------- | -------------------------------------------------------------------------------- | -------- | ------------------------------------- |
-| Kind             | enum{FreeTrial, PlanExpired, LimitReached, Maintenance, UpdateAvailable, Custom} | yes      |                                       |
-| Audience         | enum{All, CompanyOwner, Company}                                                 | yes      | Plan purchase is "Company owner only" |
-| Company          | FK → Company                                                                     | no       | Null = platform-wide                  |
-| Message          | text                                                                             | yes      |                                       |
-| Action           | json {label, route}                                                              | no       | e.g. "Upgrade Plan"                   |
-| Starts / ends at | datetime                                                                         | yes / no |                                       |
-| Dismissible      | bool                                                                             | yes      | Maintenance is not                    |
+| Field            | Type                                                                                  | Required | Notes                                 |
+| ---------------- | ------------------------------------------------------------------------------------- | -------- | ------------------------------------- |
+| Kind             | enum{PlanEndingSoon, PlanExpired, LimitReached, Maintenance, UpdateAvailable, Custom} | yes      |                                       |
+| Audience         | enum{All, CompanyOwner, Company}                                                      | yes      | Plan purchase is "Company owner only" |
+| Company          | FK → Company                                                                          | no       | Null = platform-wide                  |
+| Message          | text                                                                                  | yes      |                                       |
+| Action           | json {label, route}                                                                   | no       | e.g. "Upgrade Plan"                   |
+| Starts / ends at | datetime                                                                              | yes / no |                                       |
+| Dismissible      | bool                                                                                  | yes      | Maintenance is not                    |
 
 ### SupportContact
 
@@ -406,7 +406,7 @@ Chat and support have no menu flag in the permission matrix (available to all me
 5. **Context-linked chat**: let a chat message link to a record (PO, issue, worksheet) — reduces "WhatsApp for site coordination" (research §4).
 6. **Notification retention and audit**: keep a log of what was sent to whom; users may delete from their list, but the log remains for audit.
 7. **Support tickets with SLA/status** visible to customer; publish response times. Support quality is a recurring complaint (research §1 takeaways).
-8. **Transparent trial/plan messaging**; never threaten data deletion — export always available (research §1, §4 item 9).
+8. **Transparent plan messaging**; never threaten data deletion — export always available (research §1, §4 item 9).
 9. **Version check without iOS review hacks**: feature flags server-side instead of hiding features per review version.
 10. **Offline**: queue outbound chat messages offline (research §4 item 2).
 

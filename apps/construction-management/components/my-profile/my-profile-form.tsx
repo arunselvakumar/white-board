@@ -1,6 +1,6 @@
 "use client";
 
-import { formatMobile } from "@repo/auth/construction/react";
+import { formatMobile, normalizeMobile } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeOff, Pencil } from "lucide-react";
@@ -16,6 +16,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { initials } from "@/components/app-shell/user-menu";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import { MobileField } from "@/components/auth/mobile-field";
 import { ImageUploader } from "@/components/profile/image-uploader";
 import { fieldForCode } from "@/lib/server-errors";
 import {
@@ -34,6 +35,12 @@ const schema = z.object({
     .trim()
     .min(1, "Enter your name")
     .max(100, "Use at most 100 characters"),
+  mobile: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || normalizeMobile(value) != null, {
+      message: "Enter a valid 10-digit mobile number",
+    }),
   email: z
     .string()
     .trim()
@@ -63,6 +70,8 @@ type Parsed = z.output<typeof schema>;
 const SERVER_FIELDS: Record<string, keyof Values> = {
   MEMBER_NAME_REQUIRED: "name",
   MEMBER_NAME_TOO_LONG: "name",
+  MOBILE_INVALID: "mobile",
+  MEMBER_MOBILE_IN_USE: "mobile",
   EMAIL_INVALID: "email",
   MEMBER_EMAIL_IN_USE: "email",
   MOBILE_OR_EMAIL_REQUIRED: "email",
@@ -75,6 +84,10 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 function valuesOf(profile: MyProfileModel): Values {
   return {
     name: profile.name,
+    // Only an editable mobile is a form value (SMS off, ADR CM-0009).
+    mobile: profile.mobileEditable
+      ? (profile.mobile?.replace(/^\+91/, "") ?? "")
+      : "",
     email: profile.email ?? "",
     address: profile.address ?? "",
     emergencyContact: profile.emergencyContact ?? "",
@@ -107,7 +120,9 @@ const IDENTIFIERS: readonly {
 
 /**
  * My Profile (CM-115): the signed-in User's own Team Member record in the
- * Active Company. Mobile is how they sign in, so it is shown, not edited.
+ * Active Company. While SMS is off (ADR CM-0009) the mobile is a contact
+ * they may change; while it is on it is how they sign in, so it is shown,
+ * not edited.
  */
 export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
   const queryClient = useQueryClient();
@@ -137,6 +152,12 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
     try {
       const updated = await mutation.mutateAsync({
         name: values.name,
+        ...(profile.mobileEditable
+          ? {
+              mobile:
+                values.mobile === "" ? null : normalizeMobile(values.mobile),
+            }
+          : {}),
         email: values.email === "" ? null : values.email,
         address: values.address === "" ? null : values.address,
         emergencyContact:
@@ -210,21 +231,33 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="my-mobile">Mobile</Label>
-              <Input
-                id="my-mobile"
-                readOnly
-                disabled
-                className="h-10"
-                value={
-                  profile.mobile == null
-                    ? "Not added"
-                    : formatMobile(profile.mobile)
-                }
-                aria-describedby="my-mobile-note"
-              />
-              <p id="my-mobile-note" className="text-muted-foreground text-xs">
-                This is how you sign in, so it cannot be changed here.
-              </p>
+              {profile.mobileEditable ? (
+                <>
+                  <MobileField id="my-mobile" {...form.register("mobile")} />
+                  <FieldError message={errors.mobile?.message} />
+                </>
+              ) : (
+                <>
+                  <Input
+                    id="my-mobile"
+                    readOnly
+                    disabled
+                    className="h-10"
+                    value={
+                      profile.mobile == null
+                        ? "Not added"
+                        : formatMobile(profile.mobile)
+                    }
+                    aria-describedby="my-mobile-note"
+                  />
+                  <p
+                    id="my-mobile-note"
+                    className="text-muted-foreground text-xs"
+                  >
+                    This is how you sign in, so it cannot be changed here.
+                  </p>
+                </>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="my-email">Email</Label>

@@ -8,7 +8,7 @@ import {
   type Quote,
 } from "../domain/checkout";
 import type { PlanCatalogue } from "../domain/plan";
-import type { Subscription, SubscriptionStatus } from "../domain/subscription";
+import { Subscription, type PlanStatus } from "../domain/subscription";
 import {
   billingAddress,
   paidOrderTerms,
@@ -25,16 +25,21 @@ import type {
   WebhookVerifier,
 } from "./subscription-ports";
 
-/** "Your Subscription" (CM-116). `owner` is null for a Member: no amounts. */
+/**
+ * "Your Subscription" (CM-116). `plan` is null before the Company's first
+ * plan (status `none`, nothing limited); `owner` is null for a Member: no
+ * amounts.
+ */
 export type SubscriptionOverview = {
-  planCode: string;
-  planName: string;
-  status: SubscriptionStatus;
-  isTrial: boolean;
-  startsAt: Date;
-  endsAt: Date;
-  daysLeft: number;
-  autoRenew: boolean;
+  status: PlanStatus;
+  plan: {
+    code: string;
+    name: string;
+    startsAt: Date;
+    endsAt: Date;
+    daysLeft: number;
+    autoRenew: boolean;
+  } | null;
   usage: UsageBar[];
   addOns: { grant: PlanGrant; name: string; quantity: number }[];
   canManage: boolean;
@@ -98,41 +103,41 @@ export class SubscriptionHandlers {
     return this.gateway != null;
   }
 
-  private async load(workspaceId: string): Promise<Subscription> {
-    const subscription = await this.subscriptions.find(workspaceId);
-    if (subscription == null)
-      throw notFound(
-        "SUBSCRIPTION_NOT_FOUND",
-        "This Company has no subscription.",
-      );
-    return subscription;
-  }
-
   async overview(
     workspaceId: string,
     viewer: { isOwner: boolean },
   ): Promise<SubscriptionOverview> {
     const now = this.clock();
-    const subscription = await this.load(workspaceId);
+    const subscription = await this.subscriptions.find(workspaceId);
     const usage = await this.usage.snapshot(workspaceId);
-    const plan = this.catalogue.plan(subscription.planCode);
     const owner = viewer.isOwner
       ? {
-          unusedValue: subscription.unusedValue(now),
+          unusedValue: subscription?.unusedValue(now) ?? 0,
           lastBillingAddress:
             await this.subscriptions.lastBillingAddress(workspaceId),
           paymentsConfigured: this.paymentsConfigured,
         }
       : null;
+    if (subscription == null)
+      return {
+        status: "none",
+        plan: null,
+        usage: usageBars(usage, null),
+        addOns: [],
+        canManage: viewer.isOwner,
+        owner,
+      };
+    const plan = this.catalogue.plan(subscription.planCode);
     return {
-      planCode: plan.code,
-      planName: plan.name,
       status: subscription.status(now),
-      isTrial: subscription.isTrial,
-      startsAt: subscription.startsAt,
-      endsAt: subscription.endsAt,
-      daysLeft: subscription.daysLeft(now),
-      autoRenew: subscription.autoRenew,
+      plan: {
+        code: plan.code,
+        name: plan.name,
+        startsAt: subscription.startsAt,
+        endsAt: subscription.endsAt,
+        daysLeft: subscription.daysLeft(now),
+        autoRenew: subscription.autoRenew,
+      },
       usage: usageBars(usage, subscription.limits(this.catalogue)),
       addOns: PLAN_GRANTS.flatMap((grant) => {
         const quantity = subscription.addOns[grant] ?? 0;
@@ -153,7 +158,7 @@ export class SubscriptionHandlers {
   }): Promise<Quote> {
     return quoteCheckout({
       catalogue: this.catalogue,
-      subscription: await this.load(input.workspaceId),
+      subscription: await this.subscriptions.find(input.workspaceId),
       choice: input.choice,
       buyerStateCode: input.stateCode,
       sellerStateCode: this.seller.stateCode,
@@ -238,7 +243,14 @@ export class SubscriptionHandlers {
       gatewayPaymentId,
       paidAt,
       apply: (order, current) =>
-        current.afterPayment(paidOrderTerms(order), paidAt),
+        current == null
+          ? Subscription.started({
+              id: newId(paidAt.getTime()),
+              workspaceId: order.workspaceId,
+              terms: paidOrderTerms(order),
+              paidAt,
+            })
+          : current.afterPayment(paidOrderTerms(order), paidAt),
     });
   }
 

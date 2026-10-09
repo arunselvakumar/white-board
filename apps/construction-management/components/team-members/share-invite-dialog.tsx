@@ -16,19 +16,23 @@ import { Label } from "@repo/ui/components/label";
 
 /**
  * The invite link for a Joining Pending Team Member (CM-111), to paste into
- * WhatsApp or SMS. Opening it lets them sign in with the invited number.
+ * WhatsApp or SMS. Opening it lets them sign in with the invited email
+ * (ADR CM-0009).
  */
 export function ShareInviteDialog({
   open,
   onOpenChange,
   memberName,
   companyName,
+  email,
   invitePath,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   memberName: string;
   companyName: string;
+  /** The invited email; they sign in with it to accept. */
+  email: string;
   invitePath: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -36,7 +40,7 @@ export function ShareInviteDialog({
     typeof window === "undefined"
       ? invitePath
       : new URL(invitePath, window.location.origin).toString();
-  const message = `${memberName}, join ${companyName} on Construction Management: ${link}`;
+  const message = `${memberName}, join ${companyName} on Construction Management: ${link} Sign in with ${email} to accept.`;
   const canShare =
     typeof navigator !== "undefined" && typeof navigator.share === "function";
 
@@ -52,8 +56,8 @@ export function ShareInviteDialog({
         <DialogHeader>
           <DialogTitle>Share invite link</DialogTitle>
           <DialogDescription>
-            Send this to {memberName}. They sign in with the mobile number or
-            email you added and accept the Join Request.
+            Send this to {memberName}. They sign in with {email} and accept the
+            Join Request.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-1.5">

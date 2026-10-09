@@ -37,16 +37,6 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
           updatedBy: ownerId,
         },
       });
-      await tx.constructionOrganizationSubscription.create({
-        data: {
-          id: company.trial.id,
-          workspaceId: company.workspaceId,
-          planCode: company.trial.planCode,
-          isTrial: true,
-          startsAt: company.trial.startsAt,
-          endsAt: company.trial.endsAt,
-        },
-      });
       await insertDesignations(tx, company.designations);
       await this.members.write(tx, company.ownerMember);
       await recordAudit(tx, {
@@ -55,7 +45,7 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
         action: "company.created",
         entityType: "company",
         entityId: company.workspaceId,
-        after: { ...details, trialEndsAt: company.trial.endsAt },
+        after: { ...details },
         occurredAt: company.createdAt,
       });
     });

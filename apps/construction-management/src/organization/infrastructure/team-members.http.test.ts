@@ -55,7 +55,7 @@ describe("Team Members on Postgres (CM-108)", () => {
       details: {
         name: "Suresh Kale",
         designationId: byName("Site Engineer"),
-        mobile: "+919800000002",
+        email: "suresh@kale.in",
         aadhaar: "234123412346",
         pan: "ABCPE1234F",
       },
@@ -204,7 +204,7 @@ describe("Team Members on Postgres (CM-108)", () => {
       details: {
         name: "Suresh",
         designationId: byName("Site Engineer"),
-        mobile: "+919800000004",
+        email: "suresh@kale.in",
       },
       projectIds: ["project-a"],
     });

@@ -27,7 +27,10 @@ export type JoinLinkPreview = {
   id: string;
   companyName: string;
   memberName: string;
-  /** Who the request is for, masked: `+91 ••••• 43210` or `r••••@patil.in`. */
+  /**
+   * Who the request is for, masked: `r••••@patil.in`, and `+91 ••••• 43210`
+   * while SMS is on.
+   */
   contacts: { kind: "mobile" | "email"; masked: string }[];
 };
 
@@ -41,9 +44,10 @@ export function maskEmail(email: string): string {
 }
 
 /**
- * Join Requests (CM-109): a pending Team Member whose mobile or email matches
- * what the signed-in User verified. Accepting adds the `member` membership
- * and links the record; rejecting closes it.
+ * Join Requests (CM-109): a pending Team Member whose email (and, while SMS
+ * is on, mobile) matches what the signed-in User verified (ADR CM-0009).
+ * Accepting adds the `member` membership and links the record; rejecting
+ * closes it.
  */
 export class JoinRequestHandlers {
   constructor(
@@ -51,7 +55,17 @@ export class JoinRequestHandlers {
     private readonly memberships: CompanyMemberships,
     private readonly profiles: CompanyProfileReader,
     private readonly clock: () => Date = () => new Date(),
+    /** Whether a mobile is a way to sign in (SMS on, ADR CM-0009). */
+    private readonly mobileSignIn: () => boolean = () => true,
   ) {}
+
+  /** What the joiner may be matched by right now. */
+  private pendingMatching(joiner: Joiner): Promise<TeamMember[]> {
+    return this.members.findPendingFor({
+      mobile: this.mobileSignIn() ? joiner.mobile : null,
+      email: joiner.email,
+    });
+  }
 
   private async companyName(workspaceId: string): Promise<string> {
     return (
@@ -60,7 +74,7 @@ export class JoinRequestHandlers {
   }
 
   private async pendingFor(joiner: Joiner, id: string): Promise<TeamMember> {
-    const pending = await this.members.findPendingFor(joiner);
+    const pending = await this.pendingMatching(joiner);
     const member = pending.find((candidate) => candidate.id === id);
     if (member == null)
       throw notFound(
@@ -82,7 +96,7 @@ export class JoinRequestHandlers {
   }
 
   async listFor(joiner: Joiner): Promise<JoinRequestView[]> {
-    const pending = await this.members.findPendingFor(joiner);
+    const pending = await this.pendingMatching(joiner);
     return Promise.all(
       pending.map(async (member) => ({
         id: member.id,
@@ -125,7 +139,10 @@ export class JoinRequestHandlers {
     );
   }
 
-  /** What `/join/<token>` shows before anyone signs in. */
+  /**
+   * What `/join/<token>` shows before anyone signs in. The mobile is listed
+   * only while it is a way to sign in; the email always is.
+   */
   async preview(token: string): Promise<JoinLinkPreview> {
     const member = await this.members.findByInviteToken(token);
     if (member?.status !== "joining_pending")
@@ -134,7 +151,7 @@ export class JoinRequestHandlers {
         "This invite link is no longer valid. Ask for a new one.",
       );
     const contacts: JoinLinkPreview["contacts"] = [];
-    if (member.details.mobile != null)
+    if (member.details.mobile != null && this.mobileSignIn())
       contacts.push({
         kind: "mobile",
         masked: maskMobile(member.details.mobile),

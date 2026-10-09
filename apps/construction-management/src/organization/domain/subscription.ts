@@ -4,7 +4,10 @@ import type { AddOnQuantities, PlanCatalogue } from "./plan";
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type SubscriptionStatus = "trial" | "active" | "expired";
+export type SubscriptionStatus = "active" | "expired";
+
+/** A Company's plan status: `none` until its first plan is paid for. */
+export type PlanStatus = SubscriptionStatus | "none";
 
 /** Calendar months later, in UTC; 31 January + 1 month is 28/29 February. */
 export function addMonths(date: Date, months: number): Date {
@@ -42,30 +45,50 @@ export type PaidOrderTerms = {
 };
 
 /**
- * A Company's current Plan, until when, and its add-ons (CM-116). One per
- * Company; a new Company starts on a 14-day Trial with Basic's limits.
- * Status is derived from the dates, never stored.
+ * A Company's current Plan, until when, and its add-ons (CM-116). At most
+ * one per Company, made by its first paid order; a Company without one has
+ * no plan and no limits. Status is derived from the dates, never stored.
  */
 export class Subscription {
   constructor(
     readonly id: string,
     readonly workspaceId: string,
     readonly planCode: string,
-    readonly isTrial: boolean,
     readonly startsAt: Date,
     readonly endsAt: Date,
     readonly autoRenew: boolean,
     readonly addOns: AddOnQuantities,
     /**
      * Pre-GST value paid for the period `startsAt`–`endsAt`; its unused
-     * share is the Last Plan Discount on an upgrade. 0 on a Trial.
+     * share is the Last Plan Discount on an upgrade.
      */
     readonly paidValue: number,
   ) {}
 
+  /** The Subscription a Company's first paid order (`new`) starts. */
+  static started(input: {
+    id: string;
+    workspaceId: string;
+    terms: PaidOrderTerms;
+    paidAt: Date;
+  }): Subscription {
+    const { terms, paidAt } = input;
+    if (terms.kind !== "new")
+      throw new Error("Only a new plan can start a Subscription.");
+    return new Subscription(
+      input.id,
+      input.workspaceId,
+      terms.planCode,
+      paidAt,
+      addMonths(paidAt, terms.months ?? 0),
+      false,
+      terms.addOns,
+      terms.subTotal,
+    );
+  }
+
   status(now: Date): SubscriptionStatus {
-    if (now.getTime() >= this.endsAt.getTime()) return "expired";
-    return this.isTrial ? "trial" : "active";
+    return now.getTime() >= this.endsAt.getTime() ? "expired" : "active";
   }
 
   hasEnded(now: Date): boolean {
@@ -109,17 +132,15 @@ export class Subscription {
       case "upgrade":
         return this.with({
           planCode: terms.planCode,
-          isTrial: false,
           startsAt: paidAt,
           endsAt: addMonths(paidAt, months),
           addOns: terms.addOns,
           paidValue: terms.subTotal,
         });
       case "extend":
-        if (ended || this.isTrial)
+        if (ended)
           return this.with({
             planCode: terms.planCode,
-            isTrial: false,
             startsAt: paidAt,
             endsAt: addMonths(paidAt, months),
             paidValue: terms.subTotal,
@@ -146,7 +167,7 @@ export class Subscription {
     changes: Partial<
       Pick<
         Subscription,
-        "planCode" | "isTrial" | "startsAt" | "endsAt" | "addOns" | "paidValue"
+        "planCode" | "startsAt" | "endsAt" | "addOns" | "paidValue"
       >
     >,
   ): Subscription {
@@ -154,7 +175,6 @@ export class Subscription {
       this.id,
       this.workspaceId,
       changes.planCode ?? this.planCode,
-      changes.isTrial ?? this.isTrial,
       changes.startsAt ?? this.startsAt,
       changes.endsAt ?? this.endsAt,
       this.autoRenew,

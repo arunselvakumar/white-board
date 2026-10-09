@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
-import { signInByMobile, TEST_ORIGIN } from "@/test/sessions";
+import { signInByEmail, TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as switchCompany } from "./[id]/switch/route";
 import { GET as listMine } from "./me/route";
@@ -43,7 +43,7 @@ describe("Companies HTTP (CM-105)", () => {
   });
 
   it("creates a Company, makes it active, and lists it as mine", async () => {
-    const { cookie, userId, mobile } = await signInByMobile();
+    const { cookie, userId, email } = await signInByEmail();
     const response = await createCompany(
       post(BASE, cookie, {
         name: "Patil Builders",
@@ -52,13 +52,13 @@ describe("Companies HTTP (CM-105)", () => {
       }),
     );
     expect(response.status).toBe(StatusCodes.CREATED);
-    const created = await json<{ id: string; trialEndsAt: string }>(response);
+    const created = await json<{ id: string }>(response);
 
     const profile =
       await prisma.constructionOrganizationCompanyProfile.findUniqueOrThrow({
         where: { workspaceId: created.id },
       });
-    // The Owner's verified mobile is not copied to the Company contact.
+    // The Owner's sign-in is not copied to the Company contact.
     expect(profile.mobile).toBeNull();
     expect(profile.gstin).toBe("27AAPFU0939F1ZV");
 
@@ -69,12 +69,12 @@ describe("Companies HTTP (CM-105)", () => {
     expect(mine.items).toEqual([
       { id: created.id, name: "Patil Builders", role: "owner", isActive: true },
     ]);
-    expect(mobile).toMatch(/^\+91/);
+    expect(email).toMatch(/@example\.test$/);
     expect(userId).toBeTruthy();
   });
 
   it("rejects an invalid GSTIN with the domain code", async () => {
-    const { cookie } = await signInByMobile();
+    const { cookie } = await signInByEmail();
     const response = await createCompany(
       post(BASE, cookie, {
         name: "Patil Builders",
@@ -87,7 +87,7 @@ describe("Companies HTTP (CM-105)", () => {
   });
 
   it("switches between the caller's Companies only", async () => {
-    const { cookie, userId } = await signInByMobile();
+    const { cookie, userId } = await signInByEmail();
     const first = randomUUID();
     const second = randomUUID();
     await seedCompanyMember({ workspaceId: first, userId });

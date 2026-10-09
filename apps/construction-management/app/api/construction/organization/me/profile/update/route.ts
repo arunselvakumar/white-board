@@ -12,7 +12,10 @@ export const dynamic = "force-dynamic";
 
 const handlers = createMyProfileHandlers();
 
-/** Changes the caller's own name, email, address, emergency contact and ids. */
+/**
+ * Changes the caller's own name, email, address, emergency contact and ids,
+ * and their mobile while SMS is off (ADR CM-0009).
+ */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireCompanySession(request);

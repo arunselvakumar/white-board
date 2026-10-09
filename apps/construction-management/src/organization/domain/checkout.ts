@@ -6,7 +6,7 @@ import { addMonths, prorate, type Subscription } from "./subscription";
 
 /**
  * What an order buys (`modules/01` workflows 14–15):
- * - `new`: a Plan from a Trial or an ended Plan;
+ * - `new`: a Plan when none is running (none yet, or the last one ended);
  * - `extend`: more months of the running Plan, added to its end;
  * - `upgrade`: the same or a higher Plan, starting now, with the unused
  *   value of the running Plan as the Last Plan Discount;
@@ -86,25 +86,33 @@ function notAllowed(message: string): DomainError {
   return new DomainError("CHECKOUT_NOT_ALLOWED", message, { kind: "conflict" });
 }
 
-/** Prices a checkout choice against the Company's Subscription now. */
+/**
+ * Prices a checkout choice against the Company's Subscription now; null
+ * when the Company has never had a plan.
+ */
 export function quoteCheckout(input: {
   catalogue: PlanCatalogue;
-  subscription: Subscription;
+  subscription: Subscription | null;
   choice: CheckoutChoice;
   buyerStateCode: string;
   sellerStateCode: string;
   now: Date;
 }): Quote {
   const { catalogue, subscription, choice, now } = input;
-  const status = subscription.status(now);
   const lines: QuoteLine[] = [];
-  let planCode = subscription.planCode;
+  let planCode = subscription?.planCode ?? "";
   let months: number | null = null;
   let days: number | null = null;
   let addOns: AddOnQuantities = {};
   let lastPlanDiscount = 0;
   let startsAt = now;
-  let endsAt = subscription.endsAt;
+  let endsAt = subscription?.endsAt ?? now;
+
+  /** The running Plan that extend, upgrade and add-ons change. */
+  const running = (message: string): Subscription => {
+    if (subscription?.status(now) !== "active") throw notAllowed(message);
+    return subscription;
+  };
 
   const addPlanLine = (code: string, wanted: number | null | undefined) => {
     const plan = catalogue.plan(code);
@@ -141,7 +149,7 @@ export function quoteCheckout(input: {
 
   switch (choice.kind) {
     case "new": {
-      if (status === "active")
+      if (subscription?.status(now) === "active")
         throw notAllowed(
           "Your plan is running. Extend it, upgrade it, or buy add-ons.",
         );
@@ -153,27 +161,25 @@ export function quoteCheckout(input: {
       break;
     }
     case "extend": {
-      if (status !== "active")
-        throw notAllowed(
-          "Choose a plan first; there is no paid plan to extend.",
-        );
-      if (choice.planCode != null && choice.planCode !== subscription.planCode)
+      const current = running(
+        "Choose a plan first; there is no running plan to extend.",
+      );
+      if (choice.planCode != null && choice.planCode !== current.planCode)
         throw notAllowed("Extending keeps your plan. Upgrade to change it.");
       months = addPlanLine(planCode, choice.months);
-      addOns = subscription.addOns;
+      addOns = current.addOns;
       addMonthlyAddOns(addOns, months);
-      startsAt = subscription.endsAt;
-      endsAt = addMonths(subscription.endsAt, months);
+      startsAt = current.endsAt;
+      endsAt = addMonths(current.endsAt, months);
       break;
     }
     case "upgrade": {
-      if (status !== "active")
-        throw notAllowed(
-          "Choose a plan first; there is no paid plan to upgrade.",
-        );
+      const current = running(
+        "Choose a plan first; there is no running plan to upgrade.",
+      );
       planCode = choice.planCode ?? "";
-      const current = catalogue.plan(subscription.planCode);
-      if (catalogue.plan(planCode).rank < current.rank)
+      const currentPlan = catalogue.plan(current.planCode);
+      if (catalogue.plan(planCode).rank < currentPlan.rank)
         throw new DomainError(
           "PLAN_DOWNGRADE_NOT_ALLOWED",
           "The new plan must be the same as your plan or higher.",
@@ -182,15 +188,16 @@ export function quoteCheckout(input: {
       months = addPlanLine(planCode, choice.months);
       addOns = catalogue.addOnQuantities(choice.addOns ?? {});
       addMonthlyAddOns(addOns, months);
-      lastPlanDiscount = subscription.unusedValue(now);
+      lastPlanDiscount = current.unusedValue(now);
       endsAt = addMonths(now, months);
       break;
     }
     case "add_ons": {
-      if (status !== "active")
-        throw notAllowed("Add-ons need a paid plan. Choose a plan first.");
+      const current = running(
+        "Add-ons need a running plan. Choose a plan first.",
+      );
       addOns = catalogue.addOnQuantities(choice.addOns ?? {});
-      days = subscription.daysLeft(now);
+      days = current.daysLeft(now);
       for (const grant of PLAN_GRANTS) {
         const quantity = addOns[grant] ?? 0;
         const addOn = catalogue.addOn(grant);

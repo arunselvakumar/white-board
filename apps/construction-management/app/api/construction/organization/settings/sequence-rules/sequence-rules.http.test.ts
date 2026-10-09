@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
+import { addProject } from "@/test/companies";
 
 import { POST as deleteRule } from "./[id]/delete/route";
 import { POST as updateRule } from "./[id]/update/route";
@@ -136,8 +137,8 @@ describe("Sequence ID rules HTTP (CM-114)", () => {
   });
 
   it("allows one rule per Project beside the default", async () => {
-    owner();
-    const projectId = randomUUID();
+    const company = owner();
+    const projectId = await addProject(company.workspaceId, company.userId);
     await create({});
     const project = await create({ projectId, projectToken: "P1" });
     expect(project.status).toBe(StatusCodes.CREATED);
@@ -147,6 +148,10 @@ describe("Sequence ID rules HTTP (CM-114)", () => {
       projectId,
     });
     expect((await create({ projectId })).status).toBe(StatusCodes.CONFLICT);
+    // Only a live Project of the Company may have a rule (CM-204).
+    const unknown = await create({ projectId: randomUUID() });
+    expect(unknown.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(unknown)).toMatchObject({ code: "PROJECT_NOT_FOUND" });
   });
 
   it("rejects invalid settings", async () => {

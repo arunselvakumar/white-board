@@ -29,7 +29,7 @@ flowchart LR
 - **Files (owner decision 2026-10-08: Vercel Blob, not S3):** Vercel Blob with `access: "private"` and per-company pathnames (`companies/<workspaceId>/…`); uploads and downloads go through our routes, which check the Session and Permission Matrix, so no file URL is ever public. 10 MB cap per file (larger for `.dwg`). Storage quota per plan computed from our own file table, not by listing the store. Development and tests keep files on disk (no Blob emulator exists). See ADR CM-0001.
 - **Background work:** SQS FIFO per job type; the worker consumes and writes a `jobs` row (queued → running → done/failed) that the UI polls or receives by push — replaces the legacy "please wait while another report is generating" with a proper job queue.
 - **Push & realtime:** web push (VAPID) for the PWA; FCM via the same worker when a native shell exists. Chat is Postgres-backed with server-sent events (no Firebase RTDB).
-- **Email/SMS/OTP:** SES for email; an SMS provider (MSG91 or AWS SNS India) for OTP; OTP login stays because that is what site staff know.
+- **Email/SMS/OTP:** SES for email; an SMS provider (MSG91 or AWS SNS India) for OTP. OTP login is built, and stays switched off until the business can send DLT-registered texts; until then sign-in is email and password (ADR CM-0009).
 - **Edge:** CloudFront + WAF; app on `app.<domain>`; marketing site separate (same split as Whiteboard ADR-0035).
 - **Observability:** CloudWatch + X-Ray; structured logs with `companyId`, `projectId`, `userId`.
 - **Secrets:** Secrets Manager; no secrets in task definitions.
@@ -50,7 +50,7 @@ apps/construction-management/
     tracking/               tasks, issues, inspections
     procurement/            PR, PO, GRN, inventory, transfers, stores, MR, DN
     finance/                accounts, transactions, petty cash, invoices, payments, TDS, GST
-    labour/                 labour & vendor attendance, balances
+    labour/                 labour & vendor registers, attendance, ledger, wage payments
     sales/                  inquiries, follow-ups, bookings
     hrms/                   attendance, leaves, shifts, holidays, salary
     reporting/              dashboards, reports, backups (read models + jobs)
@@ -80,7 +80,7 @@ Each context folder keeps `domain / application / infrastructure` (root ADR-0009
 | `reporting`    | `construction_reporting`    | `/api/construction/reporting`    | `ConstructionReporting…`    | 11                                 |
 | `messaging`    | `construction_messaging`    | `/api/construction/messaging`    | `ConstructionMessaging…`    | 13                                 |
 
-Identity (users, sessions, workspaces=companies, memberships, invitations, devices) stays in the `identity` schema owned by `@repo/auth` (root ADR-0034). "Company" in product language maps to **Workspace** in `@repo/auth`; the construction app never joins to `identity` and stores `workspaceId`/`userId` as opaque strings. OTP-by-mobile login is a Better Auth plugin, not a custom scheme.
+Identity (users, sessions, workspaces=companies, memberships, invitations, devices) stays in the `identity` schema owned by `@repo/auth` (root ADR-0034). "Company" in product language maps to **Workspace** in `@repo/auth`; the construction app never joins to `identity` and stores `workspaceId`/`userId` as opaque strings. OTP-by-mobile login is a Better Auth plugin, not a custom scheme, behind the `CONSTRUCTION_SMS` switch (ADR CM-0009).
 
 Inside a context folder names are unprefixed (`PurchaseOrder`, `PrismaPurchaseOrderRepository`); only Prisma models and OpenAPI components carry the `Construction<Context>` prefix because those namespaces are global (root ADR-0030).
 
@@ -167,3 +167,4 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 | CM-0006 | PWA + offline outbox before native                                                                                  | Replaces Flutter; site connectivity                                                    |
 | CM-0007 | Reports are worker jobs on SQS writing to Vercel Blob; dashboards read `construction_reporting` views               | Legacy async-report UX kept, but on a real queue                                       |
 | CM-0008 | Effective-dated statutory tables (GST rates, TDS sections, minimum wages, PF/ESI ceilings) as data, never constants | Research §2: rates changed in Sep 2025 and Apr 2025                                    |
+| CM-0009 | Email sign-in and email invitations while SMS is off (`CONSTRUCTION_SMS`)                                           | SMS needs DLT registration the business does not have yet                              |

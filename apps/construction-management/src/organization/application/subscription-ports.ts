@@ -26,13 +26,18 @@ export type SubscriptionRepository = {
   /**
    * Marks the order paid and applies it to the Subscription in one
    * transaction, with both rows locked; gives it the next invoice number.
-   * An order already paid is left alone (webhook replays, verify + webhook).
+   * `current` is null for the Company's first plan, and the row `apply`
+   * returns is created. An order already paid is left alone (webhook
+   * replays, verify + webhook).
    */
   settle(input: {
     gatewayOrderId: string;
     gatewayPaymentId: string;
     paidAt: Date;
-    apply: (order: SubscriptionOrder, current: Subscription) => Subscription;
+    apply: (
+      order: SubscriptionOrder,
+      current: Subscription | null,
+    ) => Subscription;
   }): Promise<SettleResult>;
   /** A failed payment attempt; a later attempt on the same order may still pay it. */
   markFailed(gatewayOrderId: string, at: Date): Promise<void>;

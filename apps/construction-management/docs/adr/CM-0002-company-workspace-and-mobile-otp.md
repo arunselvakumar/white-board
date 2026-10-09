@@ -1,6 +1,6 @@
 # CM-0002 — A Company is a Workspace; mobile OTP first; roles `owner` and `member`
 
-- Status: accepted
+- Status: accepted; sign-in order and Join Request matching amended by [CM-0009](CM-0009-email-sign-in-while-sms-is-off.md) (SMS off until the business can send texts)
 - Date: 2026-10-08
 - Ticket: CM-101
 

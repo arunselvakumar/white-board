@@ -627,7 +627,7 @@ Dashboard, Wings, Create Location, Project Drawings, Testing Report, Equipment U
 4. Why does a Team Member record carry `gstNo`?
 5. Join request values other than 0 (pending): is there a "rejected" state, and can a rejected invite be resent?
 6. Device binding (`AssignDevice`): does it restrict a member to one approved device?
-7. Other plans besides BASIC: names, prices, includes, and the trial length. _Partly decided (CM-116): the trial is 14 days on Basic's limits; plans are versioned JSON (`plans.json`), so more can be added without code. Still open: other plans, and Basic's HRMS seats (we ship 10)._
+7. Other plans besides BASIC: names, prices and includes. _Partly decided (CM-116): plans are versioned JSON (`plans.json`), so more can be added without code; a new Company has no plan and no limits until its Owner buys one. Trial removed on 2026-10-09 at the owner's request; it will be designed later. Still open: other plans, and Basic's HRMS seats (we ship 10)._
 8. Coupon rules and "Last Plan Discount" calculation on upgrade. _Decided (CM-117): Last Plan Discount = pre-GST value paid for the running period × days left ÷ days in the period, capped at the Sub Total. Coupons are not built; still open._
 9. What happens to data and access when the plan expires (read-only, blocked, or deleted)? _Decided (CM-118): read-only. Every command returns `PLAN_EXPIRED` (402); reads, export, sign-out, Company switching and buying a plan stay open; nothing is deleted._
 10. Does deleting an organization delete data immediately or after a retention window (Data Retention Policy page)?

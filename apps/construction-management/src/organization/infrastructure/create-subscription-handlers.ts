@@ -16,7 +16,7 @@ import {
 } from "./payment-gateway-from-env";
 import { planCatalogue } from "./plan-catalogue";
 import { PrismaSubscriptionRepository } from "./prisma-subscription-repository";
-import { NO_PROJECTS, PrismaUsageReader } from "./prisma-usage-reader";
+import { PrismaProjectCounter, PrismaUsageReader } from "./prisma-usage-reader";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
 import { sellerFromEnv } from "./seller";
@@ -31,7 +31,7 @@ type Deps = {
 function usageReader(db: PrismaClient) {
   return new PrismaUsageReader(
     new PrismaTeamMemberRepository(db, privateDataCipher),
-    NO_PROJECTS,
+    new PrismaProjectCounter(db),
     new PrismaStoredFilesMeter(db),
   );
 }

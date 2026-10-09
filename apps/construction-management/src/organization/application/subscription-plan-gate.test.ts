@@ -23,12 +23,12 @@ function gate(
   );
 }
 
-const trial = (endsAt: Date, addOns = {}) =>
-  new Subscription("s", "w", "basic", true, NOW, endsAt, false, addOns, 0);
+const basic = (endsAt: Date, addOns = {}) =>
+  new Subscription("s", "w", "basic", NOW, endsAt, false, addOns, 1_400_000);
 
 describe("SubscriptionPlanGate (CM-118)", () => {
   it("allows up to the plan's limit plus add-ons", async () => {
-    const running = trial(new Date(NOW.getTime() + DAY_MS));
+    const running = basic(new Date(NOW.getTime() + DAY_MS));
     await expect(
       gate(running, { team_member: 4 }).assertCanAdd("w", "team_member"),
     ).resolves.toBeUndefined();
@@ -40,14 +40,14 @@ describe("SubscriptionPlanGate (CM-118)", () => {
       details: { grant: "team_member", limit: 5, used: 5 },
     });
     await expect(
-      gate(trial(new Date(NOW.getTime() + DAY_MS), { team_member: 1 }), {
+      gate(basic(new Date(NOW.getTime() + DAY_MS), { team_member: 1 }), {
         team_member: 5,
       }).assertCanAdd("w", "team_member"),
     ).resolves.toBeUndefined();
   });
 
   it("counts HRMS seats separately from Team Members", async () => {
-    const running = trial(new Date(NOW.getTime() + DAY_MS));
+    const running = basic(new Date(NOW.getTime() + DAY_MS));
     await expect(
       gate(running, { team_member: 5, hrms_member: 9 }).assertCanAdd(
         "w",
@@ -63,13 +63,16 @@ describe("SubscriptionPlanGate (CM-118)", () => {
 
   it("refuses everything once the plan has ended", async () => {
     await expect(
-      gate(trial(NOW), {}).assertCanAdd("w", "project"),
+      gate(basic(NOW), {}).assertCanAdd("w", "project"),
     ).rejects.toMatchObject({ code: "PLAN_EXPIRED", kind: "limit" });
   });
 
-  it("does not limit a Company with no subscription row", async () => {
+  it("neither limits nor expires a Company with no plan yet", async () => {
     await expect(
       gate(null, { team_member: 99 }).assertCanAdd("w", "team_member"),
+    ).resolves.toBeUndefined();
+    await expect(
+      gate(null, { project: 99 }).assertCanAdd("w", "project", 5),
     ).resolves.toBeUndefined();
   });
 });

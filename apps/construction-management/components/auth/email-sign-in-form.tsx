@@ -6,6 +6,7 @@ import {
   useCompanyEmailSignUp,
 } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,7 +29,7 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>;
 
-/** Email and password, the secondary sign-in. An unverified email verifies here. */
+/** Email and password sign-in (ADR CM-0009). An unverified email verifies here. */
 export function EmailSignInForm({
   redirectUrl,
 }: {
@@ -113,7 +114,15 @@ export function EmailSignInForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <Link
+            href="/forgot-password"
+            className="text-primary text-sm underline-offset-4 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
         <PasswordField
           id="password"
           autoComplete="current-password"

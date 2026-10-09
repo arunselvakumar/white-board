@@ -9,17 +9,22 @@ export type UsageSnapshot = Readonly<Record<PlanGrant, number>>;
 
 export const BYTES_PER_GB = 1024 ** 3;
 
-export type UsageBar = { grant: PlanGrant; used: number; limit: number };
+/** `limit` is null when the Company has no plan, so nothing is limited. */
+export type UsageBar = {
+  grant: PlanGrant;
+  used: number;
+  limit: number | null;
+};
 
 /** One bar per grant for "Your Subscription"; storage to one decimal. */
 export function usageBars(
   usage: UsageSnapshot,
-  limits: Readonly<Record<PlanGrant, number>>,
+  limits: Readonly<Record<PlanGrant, number>> | null,
 ): UsageBar[] {
   return PLAN_GRANTS.map((grant) => ({
     grant,
     used:
       grant === "storage_gb" ? Math.ceil(usage[grant] * 10) / 10 : usage[grant],
-    limit: limits[grant],
+    limit: limits == null ? null : limits[grant],
   }));
 }

@@ -26,6 +26,7 @@ function myProfile(overrides: Partial<MyProfileModel> = {}): MyProfileModel {
       name: "Site Engineer",
     },
     mobile: "+919812345678",
+    mobileEditable: false,
     email: null,
     address: null,
     emergencyContact: null,
@@ -53,6 +54,7 @@ function server(start: MyProfileModel, override?: ApiHandler) {
       current = {
         ...current,
         name: body["name"] ?? current.name,
+        mobile: body["mobile"] === undefined ? current.mobile : body["mobile"],
         email: body["email"] ?? null,
         address: body["address"] ?? null,
         emergencyContact: body["emergencyContact"] ?? null,
@@ -140,6 +142,67 @@ export const EditAndSave: Story = {
       address: "Wakad, Pune",
       emergencyContact: "Meena Kale, 98111 22233",
     });
+  },
+};
+
+/** While SMS is off (ADR CM-0009) the mobile is a contact they may change. */
+export const EditMobileWhileSmsIsOff: Story = {
+  beforeEach() {
+    return server(myProfile({ mobileEditable: true })).restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const mobile = await canvas.findByLabelText("Mobile");
+    await expect(mobile).toBeEnabled();
+    await expect(mobile).toHaveValue("9812345678");
+    await expect(
+      canvas.queryByText(
+        "This is how you sign in, so it cannot be changed here.",
+      ),
+    ).not.toBeInTheDocument();
+
+    await userEvent.clear(mobile);
+    await userEvent.type(mobile, "12345");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
+    await expect(
+      await canvas.findByText("Enter a valid 10-digit mobile number"),
+    ).toBeVisible();
+
+    await userEvent.clear(mobile);
+    await userEvent.type(mobile, "98111 22233");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
+    await expect(
+      await canvas.findByText("Your profile is saved."),
+    ).toBeVisible();
+    const [update] = api?.calls("POST", `${BASE}/profile/update`) ?? [];
+    await expect(sentJson(update?.init)).toMatchObject({
+      mobile: "+919811122233",
+    });
+    await expect(canvas.getByLabelText("Mobile")).toHaveValue("9811122233");
+  },
+};
+
+export const MobileAlreadyInUse: Story = {
+  beforeEach() {
+    return server(myProfile({ mobileEditable: true }), (call) =>
+      call.path === `${BASE}/profile/update`
+        ? apiError(
+            409,
+            "MEMBER_MOBILE_IN_USE",
+            "Another Team Member in this Company has this mobile number.",
+          )
+        : undefined,
+    ).restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const mobile = await canvas.findByLabelText("Mobile");
+    await userEvent.clear(mobile);
+    await userEvent.type(mobile, "98111 22233");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
+    await expect(
+      await canvas.findByText(
+        "Another Team Member in this Company has this mobile number.",
+      ),
+    ).toBeVisible();
   },
 };
 

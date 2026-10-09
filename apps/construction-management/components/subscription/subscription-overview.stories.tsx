@@ -10,7 +10,7 @@ import {
   invoices,
   memberView,
   mockSubscriptionApi,
-  trialView,
+  noPlanView,
 } from "./subscription-story-fixtures";
 
 const meta = {
@@ -26,23 +26,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Trial: Story = {
+export const NoPlanYet: Story = {
   beforeEach() {
     signInAs("owner");
-    return mockSubscriptionApi({ subscription: trialView }).restore;
+    return mockSubscriptionApi({ subscription: noPlanView }).restore;
   },
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByRole("heading", { name: "Your Subscription" }),
     ).toBeVisible();
-    await expect(canvas.getByText("Free trial")).toBeVisible();
-    await expect(canvas.getByText(/9 days left/)).toBeVisible();
+    await expect(canvas.getByText("No plan yet")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Choose a plan" }),
     ).toHaveAttribute("href", "/app/subscription/checkout?kind=new");
     await expect(
-      canvas.getByRole("progressbar", { name: "Team Members" }),
-    ).toHaveAttribute("aria-valuetext", "3 of 5");
+      canvas.getByText(/Nothing is limited until you choose a plan/),
+    ).toBeVisible();
+    await expect(canvas.getByText("Team Members")).toBeVisible();
+    await expect(canvas.queryByRole("progressbar")).toBeNull();
     await expect(await canvas.findByText("No invoices yet")).toBeVisible();
   },
 };

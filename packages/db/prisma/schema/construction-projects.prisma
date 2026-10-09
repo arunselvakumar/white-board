@@ -1,0 +1,37 @@
+/// Construction Management — projects context (ADR CM-0001, `modules/03`).
+/// M2 ships the minimal Project labour and attendance are scoped to
+/// (CM-204); M4 grows it into the full project with phases, wings, floors,
+/// units, drawings and gallery.
+
+enum ConstructionProjectsProjectStatus {
+  not_started
+  ongoing
+  on_hold
+  completed
+
+  @@map("project_status")
+  @@schema("construction_projects")
+}
+
+/// A site the Company builds. Names are unique among a Company's live
+/// Projects (partial index in the migration).
+model ConstructionProjectsProject {
+  id          String                            @id @db.Uuid
+  workspaceId String                            @map("workspace_id")
+  name        String
+  status      ConstructionProjectsProjectStatus @default(ongoing)
+  address     String?
+  /// Calendar dates in the Company time zone.
+  startDate   DateTime?                         @map("start_date") @db.Date
+  endDate     DateTime?                         @map("end_date") @db.Date
+  createdAt   DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                            @map("created_by")
+  updatedBy   String                            @map("updated_by")
+  deletedAt   DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                           @map("deleted_by")
+
+  @@index([workspaceId, status])
+  @@map("projects")
+  @@schema("construction_projects")
+}

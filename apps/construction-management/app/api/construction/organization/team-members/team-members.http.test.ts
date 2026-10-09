@@ -1,10 +1,15 @@
 import { companies } from "@repo/auth/construction/server";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
-import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
-import { newMobile, TEST_ORIGIN } from "@/test/sessions";
+import {
+  addProject,
+  jsonRequest,
+  memberWith,
+  ownerWithCompany,
+} from "@/test/companies";
+import { newEmail, newMobile, TEST_ORIGIN, withSms } from "@/test/sessions";
 
 import { POST as setPermissions } from "./[id]/permissions/route";
 import { POST as assignProjects } from "./[id]/projects/route";
@@ -20,6 +25,9 @@ const BASE = `${TEST_ORIGIN}/api/construction/organization/team-members`;
 type Member = {
   id: string;
   name: string;
+  mobile: string | null;
+  email: string | null;
+  mobileLocked: boolean;
   status: string;
   memberType: string;
   projectIds: string[];
@@ -46,14 +54,16 @@ function params(id: string) {
 describe("Team Members HTTP (CM-110)", () => {
   it("covers the Owner's whole flow", async () => {
     const owner = await ownerWithCompany();
+    const projectA = await addProject(owner.workspaceId, owner.userId);
+    const projectB = await addProject(owner.workspaceId, owner.userId);
     const created = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "Suresh Kale",
         designationId: owner.designationId("Site Engineer"),
-        mobile: newMobile(),
+        email: newEmail(),
         aadhaar: "2341 2341 2346",
         memberType: "normal",
-        projectIds: ["project-a"],
+        projectIds: [projectA],
       }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
@@ -86,26 +96,26 @@ describe("Team Members HTTP (CM-110)", () => {
     const moved = await json<Member>(
       await assignProjects(
         jsonRequest(`${BASE}/${suresh.id}/projects`, owner.cookie, {
-          projectIds: ["project-b"],
+          projectIds: [projectB],
         }),
         params(suresh.id),
       ),
     );
-    expect(moved.projectIds).toEqual(["project-b"]);
+    expect(moved.projectIds).toEqual([projectB]);
 
     const hrms = await json<Member>(
       await update(
         jsonRequest(`${BASE}/${suresh.id}/update`, owner.cookie, {
           name: "Suresh K.",
           designationId: owner.designationId("Accountant"),
-          mobile: (
-            await json<{ mobile: string }>(
+          email: (
+            await json<{ email: string }>(
               await getOne(
                 jsonRequest(`${BASE}/${suresh.id}`, owner.cookie),
                 params(suresh.id),
               ),
             )
-          ).mobile,
+          ).email,
           memberType: "hrms",
         }),
         params(suresh.id),
@@ -154,7 +164,7 @@ describe("Team Members HTTP (CM-110)", () => {
         jsonRequest(BASE, owner.cookie, {
           name,
           designationId: owner.designationId("Site Supervisor"),
-          mobile: newMobile(),
+          email: newEmail(),
           memberType: "normal",
         }),
       );
@@ -205,7 +215,7 @@ describe("Team Members HTTP (CM-110)", () => {
       jsonRequest(BASE, viewer.cookie, {
         name: "X",
         designationId: owner.designationId("Admin"),
-        mobile: newMobile(),
+        email: newEmail(),
         memberType: "normal",
       }),
     );
@@ -222,7 +232,7 @@ describe("Team Members HTTP (CM-110)", () => {
     const body = (permissions: unknown) => ({
       name: "New",
       designationId: owner.designationId("Site Supervisor"),
-      mobile: newMobile(),
+      email: newEmail(),
       memberType: "normal",
       permissions,
     });
@@ -276,7 +286,7 @@ describe("Team Members HTTP (CM-110)", () => {
         jsonRequest(BASE, other.cookie, {
           name: "Theirs",
           designationId: other.designationId("Admin"),
-          mobile: newMobile(),
+          email: newEmail(),
           memberType: "normal",
         }),
       ),
@@ -290,12 +300,63 @@ describe("Team Members HTTP (CM-110)", () => {
       jsonRequest(BASE, owner.cookie, {
         name: "X",
         designationId: owner.designationId("Admin"),
-        mobile: newMobile(),
+        email: newEmail(),
         memberType: "normal",
         permissions: { "nope.menu": ["read"] },
       }),
     );
     expect(unknown.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("lets a joined Member's mobile change while SMS is off", async () => {
+    const owner = await ownerWithCompany();
+    const member = await memberWith(owner, {});
+    const shown = await json<Member>(
+      await getOne(
+        jsonRequest(`${BASE}/${member.memberId}`, owner.cookie),
+        params(member.memberId),
+      ),
+    );
+    expect(shown).toMatchObject({ status: "active", mobileLocked: false });
+    const mobile = newMobile();
+    const changed = await update(
+      jsonRequest(`${BASE}/${member.memberId}/update`, owner.cookie, {
+        name: "Member",
+        designationId: owner.designationId("Site Engineer"),
+        email: member.email,
+        mobile,
+        memberType: "normal",
+      }),
+      params(member.memberId),
+    );
+    expect(changed.status).toBe(StatusCodes.OK);
+    expect(await json<Member>(changed)).toMatchObject({
+      mobile,
+      mobileLocked: false,
+    });
+  });
+
+  it("will not invite again a Team Member without an email while SMS is off", async () => {
+    const owner = await ownerWithCompany();
+    const created = await json<Member>(
+      await create(
+        jsonRequest(BASE, owner.cookie, {
+          name: "Mobile Only",
+          designationId: owner.designationId("Site Supervisor"),
+          mobile: newMobile(),
+          memberType: "normal",
+        }),
+      ),
+    );
+    expect(created).toMatchObject({ status: "joining_pending", email: null });
+    const refused = await resend(
+      jsonRequest(`${BASE}/${created.id}/resend-invite`, owner.cookie, {}),
+      params(created.id),
+    );
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({
+      code: "MEMBER_EMAIL_REQUIRED",
+    });
   });
 
   it("is on /api/docs", async () => {
@@ -307,5 +368,54 @@ describe("Team Members HTTP (CM-110)", () => {
         "/api/construction/organization/team-members/{id}/remove",
       ]),
     );
+  });
+});
+
+describe("Team Members HTTP, SMS on (ADR CM-0009)", () => {
+  const sms = withSms();
+  beforeAll(sms.on);
+  afterAll(sms.off);
+
+  it("locks a joined Member's mobile, which is their sign-in", async () => {
+    const owner = await ownerWithCompany();
+    const member = await memberWith(owner, {});
+    const shown = await json<Member>(
+      await getOne(
+        jsonRequest(`${BASE}/${member.memberId}`, owner.cookie),
+        params(member.memberId),
+      ),
+    );
+    expect(shown.mobileLocked).toBe(true);
+    const refused = await update(
+      jsonRequest(`${BASE}/${member.memberId}/update`, owner.cookie, {
+        name: "Member",
+        designationId: owner.designationId("Site Engineer"),
+        email: member.email,
+        mobile: newMobile(),
+        memberType: "normal",
+      }),
+      params(member.memberId),
+    );
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({ code: "MOBILE_LOCKED" });
+  });
+
+  it("invites again a Team Member with only a mobile", async () => {
+    const owner = await ownerWithCompany();
+    const created = await json<Member>(
+      await create(
+        jsonRequest(BASE, owner.cookie, {
+          name: "Mobile Only",
+          designationId: owner.designationId("Site Supervisor"),
+          mobile: newMobile(),
+          memberType: "normal",
+        }),
+      ),
+    );
+    const resent = await resend(
+      jsonRequest(`${BASE}/${created.id}/resend-invite`, owner.cookie, {}),
+      params(created.id),
+    );
+    expect(resent.status).toBe(StatusCodes.OK);
   });
 });

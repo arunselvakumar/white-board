@@ -40,7 +40,6 @@ export async function POST(request: Request): Promise<Response> {
     const body: CreateConstructionOrganizationCompanyResponseModel = {
       id: created.workspaceId,
       name: created.name,
-      trialEndsAt: created.trialEndsAt.toISOString(),
     };
     return jsonWithCookies(body, { status: StatusCodes.CREATED, cookies });
   } catch (error) {

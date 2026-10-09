@@ -67,6 +67,42 @@ import { ListConstructionOrganizationInvoicesResponseModel } from "@/app/api/con
 import { ListConstructionOrganizationPlansResponseModel } from "@/app/api/construction/organization/subscription/plans/list-plans-response-model";
 import { ReceiveConstructionOrganizationRazorpayWebhookResponseModel } from "@/app/api/webhooks/razorpay/razorpay-webhook-response-model";
 import {
+  mastersOpenApiComponents,
+  mastersOpenApiOperations,
+} from "@/app/api/construction/masters/masters-openapi";
+import {
+  projectsOpenApiComponents,
+  projectsOpenApiOperations,
+} from "@/app/api/construction/projects/openapi";
+import {
+  vendorOpenApiComponents,
+  vendorOpenApiOperations,
+} from "@/app/api/construction/labour/vendors/vendor-openapi";
+import {
+  labourOpenApiComponents,
+  labourOpenApiOperations,
+} from "@/app/api/construction/labour/labours/labour-openapi";
+import {
+  labourSummaryOpenApiComponents,
+  labourSummaryOpenApiOperations,
+} from "@/app/api/construction/labour/summary/summary-openapi";
+import {
+  vendorAttendanceOpenApiComponents,
+  vendorAttendanceOpenApiOperations,
+} from "@/app/api/construction/labour/attendance/vendors/vendor-attendance-openapi";
+import {
+  labourAttendanceOpenApiComponents,
+  labourAttendanceOpenApiOperations,
+} from "@/app/api/construction/labour/attendance/labour/labour-attendance-openapi";
+import {
+  paymentOpenApiComponents,
+  paymentOpenApiOperations,
+} from "@/app/api/construction/labour/payments/payment-openapi";
+import {
+  reportingOpenApiComponents,
+  reportingOpenApiOperations,
+} from "@/app/api/construction/reporting/reports/report-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -149,7 +185,7 @@ export const openApiOperations: OpenApiOperation[] = [
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationCompanyRequestModel,
     successStatus: StatusCodes.CREATED,
-    successDescription: "The Company, on a 14-day trial",
+    successDescription: "The Company, made the Active Company",
     successSchema: CreateConstructionOrganizationCompanyResponseModel,
     errors: [StatusCodes.BAD_REQUEST, StatusCodes.UNAUTHORIZED],
   },
@@ -276,7 +312,8 @@ openApiOperations.push(
   {
     method: "get",
     path: "/api/construction/organization/join-requests",
-    summary: "Join Requests for the signed-in User's verified mobile or email",
+    summary:
+      "Join Requests for the signed-in User's verified email (or mobile while SMS is on)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
     successDescription: "Pending Join Requests",
@@ -345,7 +382,8 @@ openApiOperations.push(
   {
     method: "post",
     path: TEAM_MEMBERS,
-    summary: "Add a Team Member: Joining Pending, invited by email/SMS",
+    summary:
+      "Add a Team Member: Joining Pending, invited by email (and SMS while SMS is on)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationTeamMemberRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -403,7 +441,8 @@ openApiOperations.push(
   {
     method: "post",
     path: `${TEAM_MEMBERS}/{id}/resend-invite`,
-    summary: "Send a new invite link (also reopens a declined request)",
+    summary:
+      "Send a new invite link (also reopens a declined request); needs an email while SMS is off",
     tags: ORGANIZATION,
     params: TeamMemberIdParamsModel,
     successStatus: StatusCodes.OK,
@@ -573,7 +612,7 @@ openApiOperations.push(
     method: "post",
     path: "/api/construction/organization/me/profile/update",
     summary:
-      "Change the caller's own name, email, address, emergency contact, Aadhaar and PAN",
+      "Change the caller's own name, email, address, emergency contact, Aadhaar and PAN (and mobile while SMS is off)",
     tags: ORGANIZATION,
     body: UpdateConstructionOrganizationMyProfileRequestModel,
     successStatus: StatusCodes.OK,
@@ -639,9 +678,10 @@ openApiOperations.push(
       "Your Subscription: plan, status, expiry and usage (amounts for the Owner only)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
-    successDescription: "The Active Company's subscription",
+    successDescription:
+      "The Active Company's subscription; `plan` is null and nothing is limited before its first plan",
     successSchema: GetConstructionOrganizationSubscriptionResponseModel,
-    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+    errors: [...SESSION_ERRORS],
   },
   {
     method: "get",
@@ -733,6 +773,42 @@ openApiOperations.push(
     errors: [StatusCodes.UNAUTHORIZED],
   },
 );
+
+// The projects context (CM-204) lists its own models and routes.
+Object.assign(openApiComponents, projectsOpenApiComponents);
+openApiOperations.push(...projectsOpenApiOperations);
+
+// The masters context (CM-203) lists its own models and routes.
+Object.assign(openApiComponents, mastersOpenApiComponents);
+openApiOperations.push(...mastersOpenApiOperations);
+
+// The Vendor register (CM-208, CM-209) lists its own models and routes.
+Object.assign(openApiComponents, vendorOpenApiComponents);
+openApiOperations.push(...vendorOpenApiOperations);
+
+// The Labour register (CM-205 – CM-207) lists its own models and routes.
+Object.assign(openApiComponents, labourOpenApiComponents);
+openApiOperations.push(...labourOpenApiOperations);
+
+// The project labour summary (CM-219) lists its own model and route.
+Object.assign(openApiComponents, labourSummaryOpenApiComponents);
+openApiOperations.push(...labourSummaryOpenApiOperations);
+
+// Vendor attendance (CM-212, CM-213) lists its own models and routes.
+Object.assign(openApiComponents, vendorAttendanceOpenApiComponents);
+openApiOperations.push(...vendorAttendanceOpenApiOperations);
+
+// Labour attendance (CM-210, CM-211) lists its own models and routes.
+Object.assign(openApiComponents, labourAttendanceOpenApiComponents);
+openApiOperations.push(...labourAttendanceOpenApiOperations);
+
+// Wage payments and balances (CM-214, CM-215) list their own models and routes.
+Object.assign(openApiComponents, paymentOpenApiComponents);
+openApiOperations.push(...paymentOpenApiOperations);
+
+// Report jobs (CM-217, CM-218) list their own models and routes.
+Object.assign(openApiComponents, reportingOpenApiComponents);
+openApiOperations.push(...reportingOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

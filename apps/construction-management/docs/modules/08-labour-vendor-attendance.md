@@ -502,6 +502,67 @@ Reports render as PDF/Excel with the standard header (module 11).
 
 ---
 
+## Decisions for the build (M2, owner-approved 2026-10-08)
+
+These settle the open questions below for M2. Where this section and the legacy notes above disagree, this section wins.
+
+**Where things live**
+
+- **Labour and Vendor registers live in the `labour` context** (`construction_labour`), with attendance, the ledger and wage payments. The opening balance must be written in the same transaction as the party (ADR CM-0004). Labour Categories, Departments and Supervisors are lookups in the `masters` context (`construction_masters`). The Project is in `projects` (`construction_projects`). Other contexts are referenced by id only; the labour context reads them through ports (`ProjectDirectory`, `LabourCategoryDirectory`, `SupervisorDirectory`) that its infrastructure implements with plain reads of those tables.
+- **Menus.** Labour register: `masters.labours`. Vendor register: `masters.vendors`. Labour Categories: `masters.labour_categories`. Departments: `masters.departments`. Supervisors: `masters.labours` (there is no separate menu). Project-scoped work is under `labour.attendance` (mark labour and vendor attendance), `labour.labour` (labour transfer, labour payments, and labour reports; `transfer` and `financial` flags), and `labour.vendor` (vendor payments and vendor reports). Projects: `projects.project`. Without `financial`, every wage, rate, OT rate, earned amount, pay, balance and payment amount is `null` in Response models (`financialValue`).
+
+**Money and wages** (ADR CM-0004)
+
+- Every amount is integer paise. The API takes and returns paise. Screens show rupees.
+- **Daily wage:** Present = 1 × wage per day; Half Day = 0.5; Absent = 0; On Leave = 0, or 1 when Paid Leave; **Holiday and weekly off are unpaid** unless the day is marked Paid Leave (owner decision).
+- **Monthly wage: calendar-day proration** (owner decision). A day pays wage per month ÷ days in that month × units, where Present = 1, Half Day = 0.5, Holiday = 1, Paid Leave = 1, and Absent or unpaid leave = 0. Weekly offs are paid by marking them Holiday; the marking screen pre-fills Holiday on a labourer's weekly holidays. An unmarked day earns nothing.
+- Rounding: every day and every overtime line rounds half up to the paisa, separately.
+- **Overtime:** hours > 0 and ≤ 24 per line, with a rate per hour that defaults to the labourer's overtime wage and can be changed on the line. The line's Labour Category is optional, and when given it must be a live category. Overtime is refused on an Absent day (`OVERTIME_ON_ABSENT_DAY`); it is allowed on a Holiday (weekend overtime). The day's overtime lines may total at most 24 hours.
+- **Snapshots:** an attendance row stores the wage type and rate it was priced at, and the amount earned. A vendor attendance line stores the rate per day, the overtime rate and the shift name. Changing the master changes future entries only.
+
+**Labour**
+
+- The **opening balance** is a ledger entry (`kind = opening`), dated the joining date. Positive means the Company owes the labourer; negative is an advance given before the app (open question 9). Changing it later reverses the old entry and posts the new one.
+- **Labour Id** is optional, typed by the Company, and unique among live labourers (open question 14). There is no auto numbering in M2.
+- **Hide = delete.** Delete is a soft delete (tombstone), allowed only while the labourer has no attendance and no payments; otherwise `LABOUR_HAS_RECORDS` (409). **Inactive** keeps the labourer and their history but drops them from attendance pickers and refuses new attendance (`LABOUR_INACTIVE`) (open question 6).
+- Aadhaar is encrypted and masked like a Team Member's (shared-kernel `PrivateDataCipher`), and checked by its Verhoeff digit. UAN is 12 digits. ESIC is 10 or 17 digits. Contact numbers are E.164.
+- `fatherName` is added for the muster roll (Form XVI and XVII need it).
+- **Transfer** (open question 8): carries a transfer date (the first day in the new Project) and an optional remark. The destination must differ from the current Project. The labourer's balance belongs to the labourer, not the Project, and moves with them. Each ledger entry carries the Project it was earned in. A transfer dated before the latest attendance in the old Project is refused (`TRANSFER_BEFORE_ATTENDANCE`).
+
+**Labour attendance**
+
+- **One live row per labourer per date** (open question 7), in the Project the labourer was assigned to on that date (from the transfer history). Marking in another Project is refused (`LABOUR_NOT_ON_PROJECT`). Re-marking a day updates the row and reverses its ledger entries. Clearing a day tombstones the row and reverses its entries.
+- **Shift** is an optional free label (open question 1); the screen offers Shift 1, 2, 3 and General.
+- **Supervisor** is a filter on the marking screen and a snapshot on the row. It is not a permission (open question 13).
+- **Mark Paid Leave** toggles `isPaidLeave` on an On Leave day and reposts its ledger entries.
+- Back-dated guard: `module = labour_attendance`.
+- Re-marking a day re-prices it from the labourer's **current** wages (the day changed, so it is priced again); days that are not re-marked keep their snapshot, and "Mark Paid Leave" alone keeps the snapshot wage (CM-210 build decision).
+
+**Vendors**
+
+- A vendor needs at least one shift with at least one category rate before attendance can be recorded. Rates are per head per full day, plus overtime per hour. Editing the rate card changes future lines only (snapshots).
+- The vendor's **opening balance** is a ledger entry, as for labour.
+- **Vendor attendance:** one live row per vendor per Project per date, with one line per (shift, category) and at most one line per pair. Full and half counts are integers ≥ 0, and overtime hours are a total for the line (open question 5). A line needs at least one of full, half or overtime > 0. Pay = full × rate + half × rate ÷ 2 + overtime hours × overtime rate (half factor 0.5, open question 4). The vendor must be assigned to the Project (`VENDOR_NOT_ON_PROJECT`), and the category must be on that shift's rate card (`CATEGORY_NOT_ON_SHIFT`). There is no approval or locking beyond the back-dated guard, `module = vendor_attendance` (open question 11). Editing a recorded day re-prices every line from the vendor's current rate card (CM-212 addendum); the snapshot protects recorded days from later rate changes until someone edits them.
+
+**Payments** (CM-215)
+
+- A wage payment is `payment` (against wages earned) or `advance` (ahead of wages). The mode is Cash or Bank. Reference, paid by (a Team Member), remarks and one receipt document are optional. The amount must be > 0. It posts one negative ledger entry. Cancelling tombstones the payment and posts the reversal.
+- Back-dated guard: `module = labour_payment` / `vendor_payment` if the catalogue has them; otherwise the Labour & Vendor group default.
+- Balance periods: monthly, weekly (Monday to Sunday) and custom.
+  - **Previous Balance** = sum of entries before the period.
+  - **To Pay** = earned + overtime in the period.
+  - **Advance** = advances in the period.
+  - **Paid** = payments in the period.
+  - **Final Amount** = Previous + To Pay − Advance − Paid.
+
+**Out of M2**
+
+- Minimum-wage warnings, PF/ESI computation, BOCW tracking (M11).
+- Named vendor headcount.
+- GPS or face check-in.
+- WhatsApp attendance.
+- Offline marking (M12).
+
 ## Open questions
 
 1. What is the shift list for labour attendance — HRMS shift templates, vendor shifts, or a fixed Shift 1/2/3 like worksheets?

@@ -2,11 +2,12 @@ import { randomUUID } from "node:crypto";
 
 import { prisma } from "@repo/db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { actAs, addMember, newCompany } from "@/test/companies";
 import { bytesOf, gifBytes, pngBytes } from "@/test/files";
+import { withSms } from "@/test/sessions";
 
 import { POST as removePhoto } from "./photo/remove/route";
 import { GET as getPhoto, POST as uploadPhoto } from "./photo/route";
@@ -49,6 +50,7 @@ type MyProfile = {
   id: string;
   name: string;
   mobile: string | null;
+  mobileEditable: boolean;
   aadhaarMasked: string | null;
   panMasked: string | null;
   photoUrl: string | null;
@@ -112,7 +114,7 @@ describe("GET /api/construction/organization/me/profile", () => {
 });
 
 describe("POST /api/construction/organization/me/profile/update", () => {
-  it("changes name, email, address and emergency contact, never the mobile", async () => {
+  it("changes name, email, address and emergency contact", async () => {
     const { workspaceId, ownerId } = await newCompany();
     const { userId, memberId } = await addMember(
       workspaceId,
@@ -128,7 +130,6 @@ describe("POST /api/construction/organization/me/profile/update", () => {
         email: "Suresh@Patil.in",
         address: "Wakad, Pune",
         emergencyContact: "Meena Kale, +91 98111 22233",
-        mobile: "+919000000000",
       }),
     );
     expect(response.status).toBe(StatusCodes.OK);
@@ -161,6 +162,46 @@ describe("POST /api/construction/organization/me/profile/update", () => {
       emergencyContact: "Meena Kale, +91 98111 22233",
       address: null,
     });
+  });
+
+  it("changes the mobile while SMS is off (ADR CM-0009)", async () => {
+    const { workspaceId, ownerId } = await newCompany();
+    const other = await addMember(workspaceId, ownerId, {});
+    actAs({ userId: other.userId, workspaceId, role: "member" });
+    const taken = (await json<MyProfile>(await getMyProfile(get("/profile"))))
+      .mobile;
+
+    const { userId } = await addMember(workspaceId, ownerId, {});
+    actAs({ userId, workspaceId, role: "member" });
+    const before = await json<MyProfile>(await getMyProfile(get("/profile")));
+    expect(before.mobileEditable).toBe(true);
+
+    const changed = await updateMyProfile(
+      post("/profile/update", { name: "Suresh Kale", mobile: "+919000000000" }),
+    );
+    expect(changed.status).toBe(StatusCodes.OK);
+    expect(await json(changed)).toMatchObject({
+      mobile: "+919000000000",
+      mobileEditable: true,
+    });
+
+    const invalid = await updateMyProfile(
+      post("/profile/update", { name: "Suresh Kale", mobile: "98765" }),
+    );
+    expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(invalid)).toMatchObject({ code: "MOBILE_INVALID" });
+
+    const inUse = await updateMyProfile(
+      post("/profile/update", { name: "Suresh Kale", mobile: taken }),
+    );
+    expect(inUse.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(inUse)).toMatchObject({ code: "MEMBER_MOBILE_IN_USE" });
+
+    // Omitted, the mobile stays.
+    const kept = await updateMyProfile(
+      post("/profile/update", { name: "Suresh Kale" }),
+    );
+    expect(await json(kept)).toMatchObject({ mobile: "+919000000000" });
   });
 
   it("sets and clears Aadhaar and PAN, validating them", async () => {
@@ -365,5 +406,27 @@ describe("My Profile on /api/docs", () => {
     expect(
       spec.components.schemas["GetConstructionOrganizationMyProfileResponse"],
     ).toBeDefined();
+  });
+});
+
+describe("My Profile while SMS is on (ADR CM-0009)", () => {
+  const sms = withSms();
+  beforeAll(sms.on);
+  afterAll(sms.off);
+
+  it("shows the mobile as the sign-in and ignores a change to it", async () => {
+    const { workspaceId, ownerId } = await newCompany();
+    const { userId } = await addMember(workspaceId, ownerId, {});
+    actAs({ userId, workspaceId, role: "member" });
+    const before = await json<MyProfile>(await getMyProfile(get("/profile")));
+    expect(before.mobileEditable).toBe(false);
+    const response = await updateMyProfile(
+      post("/profile/update", { name: "Suresh Kale", mobile: "+919000000000" }),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    expect(await json(response)).toMatchObject({
+      mobile: before.mobile,
+      mobileEditable: false,
+    });
   });
 });

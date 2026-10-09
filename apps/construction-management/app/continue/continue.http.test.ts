@@ -4,7 +4,7 @@ import { seedCompanyMember } from "@repo/auth/construction/testing";
 import { prisma } from "@repo/db";
 import { describe, expect, it } from "vitest";
 
-import { signInByMobile, TEST_ORIGIN } from "@/test/sessions";
+import { signInByEmail, TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as continueRoute } from "./route";
 
@@ -29,12 +29,12 @@ describe("GET /continue (CM-103)", () => {
   });
 
   it("sends a User with no Company to Choose Company", async () => {
-    const { cookie } = await signInByMobile();
+    const { cookie } = await signInByEmail();
     expect(location(await get("/continue", cookie))).toBe("/choose-company");
   });
 
   it("opens the only Company straight away", async () => {
-    const { cookie, userId } = await signInByMobile();
+    const { cookie, userId } = await signInByEmail();
     const workspaceId = randomUUID();
     await seedCompanyMember({ workspaceId, userId, role: "member" });
     const response = await get(
@@ -50,14 +50,14 @@ describe("GET /continue (CM-103)", () => {
   });
 
   it("asks a User with several Companies to choose", async () => {
-    const { cookie, userId } = await signInByMobile();
+    const { cookie, userId } = await signInByEmail();
     await seedCompanyMember({ workspaceId: randomUUID(), userId });
     await seedCompanyMember({ workspaceId: randomUUID(), userId });
     expect(location(await get("/continue", cookie))).toBe("/choose-company");
   });
 
   it("drops a redirect target outside the app", async () => {
-    const { cookie, userId } = await signInByMobile();
+    const { cookie, userId } = await signInByEmail();
     await seedCompanyMember({ workspaceId: randomUUID(), userId });
     const response = await get(
       "/continue?redirect_url=https%3A%2F%2Fevil.example",
