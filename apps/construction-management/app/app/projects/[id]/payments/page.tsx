@@ -1,16 +1,18 @@
-import { Wallet } from "lucide-react";
 import type { Metadata } from "next";
 
-import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
+import { PaymentsPage } from "@/components/payments/payments-page";
 
 export const metadata: Metadata = { title: "Payments" };
 
-export default function ProjectPaymentsPage() {
+export default async function ProjectPaymentsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   return (
-    <PagePlaceholder
-      title="Payments"
-      description="Pay labours and vendors and see their balances on this Project. Arrives with CM-216."
-      icon={Wallet}
-    />
+    <div className="w-full max-w-6xl p-6">
+      <PaymentsPage projectId={id} />
+    </div>
   );
 }
