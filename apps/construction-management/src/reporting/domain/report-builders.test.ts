@@ -52,6 +52,9 @@ function day(
     isPaidLeave: false,
     shift: null,
     supervisor: null,
+    checkIn: null,
+    checkOut: null,
+    breakMinutes: null,
     overtimeHundredths: 0,
     wageType: "daily",
     wageRate: 80_000,
@@ -87,6 +90,9 @@ function august(): ReportLabourDay[] {
     else if (n === 10)
       days.push(
         day("dhuresh", date, {
+          checkIn: "08:00",
+          checkOut: "19:30",
+          breakMinutes: 60,
           overtimeHundredths: 250,
           overtimeAmount: 25_000,
         }),
@@ -94,6 +100,10 @@ function august(): ReportLabourDay[] {
     else if (n === 31)
       days.push(
         day("dhuresh", date, {
+          // A night shift: out the next morning.
+          checkIn: "20:00",
+          checkOut: "06:15",
+          breakMinutes: 60,
           overtimeHundredths: 125,
           overtimeAmount: 12_500,
           supervisor: "Murugan",
@@ -172,6 +182,9 @@ describe("All Labour Attendance", () => {
       "Present",
       null,
       null,
+      null,
+      null,
+      null,
       0,
     ]);
     expect(byDay?.rows.at(-1)).toEqual([
@@ -181,8 +194,14 @@ describe("All Labour Attendance", () => {
       "Present",
       "Shift 1",
       "Murugan",
+      "20:00",
+      "06:15 (+1)",
+      9.25,
       1.25,
     ]);
+    expect(rowOf(byDay, "10 Aug 2026")("Out")).toBe("19:30");
+    expect(rowOf(byDay, "10 Aug 2026")("Worked")).toBe(10.5);
+    expect(totalOf(byDay, "Worked")).toBe(19.75);
     expect(totalOf(byDay, "OT hours")).toBe(3.75);
   });
 
