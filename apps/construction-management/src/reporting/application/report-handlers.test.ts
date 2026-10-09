@@ -99,6 +99,14 @@ function memoryStorage() {
             };
       return Promise.resolve(object);
     },
+    head: (key) => {
+      const found = objects.get(key);
+      return Promise.resolve(
+        found == null
+          ? null
+          : { bytes: found.bytes.byteLength, contentType: found.contentType },
+      );
+    },
     delete: (key) => {
       objects.delete(key);
       return Promise.resolve();

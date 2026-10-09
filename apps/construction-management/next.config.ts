@@ -14,9 +14,11 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client"],
   experimental: {
     // The proxy buffers request bodies up to this size and cuts the rest.
-    // Above the largest upload (a 10 MB photo, CM-115), so a cut body is
-    // still too large and refused rather than stored truncated.
-    proxyClientMaxBodySize: "11mb",
+    // Above the largest upload through our routes (a 25 MB Project
+    // document on local disk, CM-414; deployed, those go straight to
+    // Vercel Blob), so a cut body is still too large and refused rather
+    // than stored truncated.
+    proxyClientMaxBodySize: "26mb",
   },
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   outputFileTracingIncludes: {

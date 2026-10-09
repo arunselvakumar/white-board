@@ -76,6 +76,14 @@ function fakes(options: { today?: string; parties?: PaymentParty[] } = {}) {
       };
       return Promise.resolve(object);
     },
+    head: (key) => {
+      const bytes = objects.get(key);
+      return Promise.resolve(
+        bytes == null
+          ? null
+          : { bytes: bytes.byteLength, contentType: "application/pdf" },
+      );
+    },
     delete: (key) => {
       objects.delete(key);
       return Promise.resolve();
