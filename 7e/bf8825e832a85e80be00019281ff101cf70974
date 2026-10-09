@@ -1,0 +1,79 @@
+apps/construction-management/app/api/construction/labour/payments/large-totals.http.test.ts
+  s_ec41e28a857a0b::t_2759a8f083a6d7 1-222
+apps/construction-management/docs/adr/CM-0004-ledger-first-balances.md
+  s_ec41e28a857a0b::t_8ff27b2b2c1875 19-20
+apps/construction-management/src/labour/application/labour-attendance-handlers.ts
+  s_ec41e28a857a0b::t_9f52aba2b55241 129-132
+apps/construction-management/src/labour/application/labour-fakes.ts
+  s_ec41e28a857a0b::t_0922e487dcb2b4 135-143,149
+apps/construction-management/src/labour/application/labour-handlers.ts
+  s_ec41e28a857a0b::t_4bf2ae1ad870c6 400,403,407-411
+apps/construction-management/src/labour/application/labour-ports.ts
+  s_ec41e28a857a0b::t_67c69f996c0e8c 64-71
+apps/construction-management/src/labour/application/vendor-attendance-handlers.ts
+  s_ec41e28a857a0b::t_f859e135df85d9 84-85
+apps/construction-management/src/labour/application/vendor-handlers.ts
+  s_ec41e28a857a0b::t_5546e90d488e79 6,155-160
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_ec41e28a857a0b::t_61160630feec44 91-95
+apps/construction-management/src/labour/domain/labour-attendance.test.ts
+  s_ec41e28a857a0b::t_4ade27d26d40a8 43-63
+apps/construction-management/src/labour/domain/labour-attendance.ts
+  s_ec41e28a857a0b::t_4ee1c8227fd3c4 4-5,16-18,111-115,118,120-121,126,129-132
+apps/construction-management/src/labour/domain/ledger.ts
+  s_ec41e28a857a0b::t_ddf04739417fa4 39-52
+apps/construction-management/src/labour/domain/vendor-attendance.test.ts
+  s_ec41e28a857a0b::t_c4a40c7d7a1d90 65-94
+apps/construction-management/src/labour/domain/vendor-attendance.ts
+  s_ec41e28a857a0b::t_16cd03d7aec917 4,164-168,174
+apps/construction-management/src/labour/domain/vendor.test.ts
+  s_ec41e28a857a0b::t_298be95a735a6d 140-142
+apps/construction-management/src/labour/domain/vendor.ts
+  s_ec41e28a857a0b::t_6c368c5838ee80 9-10,142,145
+apps/construction-management/src/labour/domain/wage-payment.test.ts
+  s_ec41e28a857a0b::t_9729b24e4dafca 3,43-49
+apps/construction-management/src/labour/domain/wage-payment.ts
+  s_ec41e28a857a0b::t_c79a4d8fe287fa 4,17,61-66
+apps/construction-management/src/labour/infrastructure/labour-attendance-store.ts
+  s_ec41e28a857a0b::t_60625f4ea6f15f 31,309-316,416-422
+apps/construction-management/src/labour/infrastructure/prisma-labour-queries.ts
+  s_ec41e28a857a0b::t_5835e6b9802761 108,151
+apps/construction-management/src/labour/infrastructure/prisma-labour-repository.ts
+  s_ec41e28a857a0b::t_60a042a44f2390 25,95-111,184-190,301-318,334
+apps/construction-management/src/labour/infrastructure/prisma-ledger.ts
+  s_ec41e28a857a0b::t_6308a483166ed5 1,11,22-57,103-107,169,176-201
+apps/construction-management/src/labour/infrastructure/prisma-vendor-store.ts
+  s_ec41e28a857a0b::t_9472d69d75d098 20,100-105,450,454
+apps/construction-management/src/labour/infrastructure/vendor-attendance-store.ts
+  s_ec41e28a857a0b::t_928b85995d447e 28,186-193,299-305
+apps/construction-management/src/labour/infrastructure/wage-payment-store.ts
+  s_ec41e28a857a0b::t_33080d0506a955 1,38-39,141-174,176-177,230-237
+apps/construction-management/app/api/construction/labour/labours/delete-races.http.test.ts
+  s_c270323c9f9e8d::t_5251fd2abaaf79 1-218
+apps/construction-management/src/labour/infrastructure/party-locks.ts
+  s_c270323c9f9e8d::t_e825e41bb0e613 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7ebf8825e832a85e80be00019281ff101cf70974",
+  "prompts": {},
+  "sessions": {
+    "s_c270323c9f9e8d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa1088bd6ac1ff855",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec41e28a857a0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c97071a6-c480-42b1-a84c-7b6b6a00c64b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
