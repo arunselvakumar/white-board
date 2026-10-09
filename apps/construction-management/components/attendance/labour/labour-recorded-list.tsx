@@ -25,6 +25,7 @@ import {
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
+import { endsNextDay } from "@/src/labour/domain/wages";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   labourAttendanceListQuery,
@@ -128,6 +129,48 @@ function statusText(day: LabourAttendanceDay): string {
     : STATUS_LABELS[day.status];
 }
 
+/** A check-out on the next day (a night shift) carries "+1". */
+function CheckOut({ day }: { day: LabourAttendanceDay }) {
+  if (day.checkOut == null) return <>—</>;
+  const nextDay = day.checkIn != null && endsNextDay(day.checkIn, day.checkOut);
+  return (
+    <>
+      {day.checkOut}
+      {nextDay ? (
+        <>
+          <span
+            aria-hidden="true"
+            className="text-muted-foreground ml-1 text-xs"
+            title="Next day"
+          >
+            +1
+          </span>
+          <span className="sr-only"> next day</span>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+/** "In 08:00 · Out 19:00 · Worked 10 h" for a phone card; null without times. */
+function TimesLine({ day }: { day: LabourAttendanceDay }) {
+  if (day.checkIn == null) return null;
+  return (
+    <p className="text-muted-foreground text-sm tabular-nums">
+      In <span className="text-foreground">{day.checkIn}</span> · Out{" "}
+      <span className="text-foreground">
+        <CheckOut day={day} />
+      </span>
+      {day.workedHours == null ? null : (
+        <>
+          {" "}
+          · Worked <span className="text-foreground">{day.workedHours} h</span>
+        </>
+      )}
+    </p>
+  );
+}
+
 function Results({
   filter,
   onCursor,
@@ -164,6 +207,7 @@ function Results({
                 </span>
               )}
             </div>
+            <TimesLine day={day} />
             {day.status === "on_leave" ? <PaidLeaveButton day={day} /> : null}
           </li>
         ))}
@@ -177,6 +221,9 @@ function Results({
               <TableHead>Status</TableHead>
               <TableHead>Shift</TableHead>
               <TableHead>Supervisor</TableHead>
+              <TableHead>In</TableHead>
+              <TableHead>Out</TableHead>
+              <TableHead className="text-right">Worked h</TableHead>
               <TableHead className="text-right">OT h</TableHead>
               <TableHead className="text-right">Wages</TableHead>
               <TableHead />
@@ -190,6 +237,15 @@ function Results({
                 <TableCell>{statusText(day)}</TableCell>
                 <TableCell>{day.shift ?? "—"}</TableCell>
                 <TableCell>{day.supervisor?.name ?? "—"}</TableCell>
+                <TableCell className="tabular-nums">
+                  {day.checkIn ?? "—"}
+                </TableCell>
+                <TableCell className="whitespace-nowrap tabular-nums">
+                  <CheckOut day={day} />
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {day.workedHours ?? "—"}
+                </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {day.overtimeHours}
                 </TableCell>
@@ -232,7 +288,10 @@ function Results({
   );
 }
 
-/** Recorded labour days of a Project with filters (CM-211). */
+/**
+ * Recorded labour days of a Project with filters (CM-211), with check-in,
+ * check-out and hours worked (CM-220).
+ */
 export function LabourRecordedList({
   projectId,
   initialFrom,
