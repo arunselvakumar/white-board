@@ -147,6 +147,7 @@ Attendance and vendor-attendance save endpoints were not captured (concatenated 
 | wagePerDay          | decimal(14,2)                       | if DAILY      |                                                                   |
 | wagePerMonth        | decimal(14,2)                       | if MONTHLY    |                                                                   |
 | overtimeWagePerHour | decimal(14,2)                       | yes           | "Overtime Wage per Hour\*"                                        |
+| workingHoursPerDay  | decimal(4,2)                        | no            | New (CM-220): hours a day, default 8; beyond it is overtime       |
 | weeklyHolidays      | enum{SUN,MON,TUE,WED,THU,FRI,SAT}[] | no            | Toggles                                                           |
 | openingBalance      | decimal(14,2)                       | no            | Editable; carry-in for Labour payments                            |
 | uanNumber           | string                              | no            | EPFO UAN                                                          |
@@ -186,6 +187,8 @@ Attendance and vendor-attendance save endpoints were not captured (concatenated 
 | isPaidLeave         | bool                                               | no       | "Mark Paid Leave"; meaningful when ON_LEAVE (inferred) |
 | shift               | string / FK → Shift                                | no       | "Shift"; source list for labour shifts not captured    |
 | supervisorId        | FK → TeamMember                                    | no       | Snapshot of supervisor (inferred)                      |
+| checkIn / checkOut  | time `HH:MM`                                       | no       | New (CM-220): Present / Half Day only                  |
+| breakMinutes        | int                                                | no       | New (CM-220): 60 by default when there is a check-in   |
 | markedBy / markedAt | FK / datetime                                      | yes      | (inferred)                                             |
 
 Unique (labourId, attendanceDate) — inferred; whether a labour can have two shifts on one date is open.
@@ -518,6 +521,7 @@ These settle the open questions below for M2. Where this section and the legacy 
 - **Monthly wage: calendar-day proration** (owner decision). A day pays wage per month ÷ days in that month × units, where Present = 1, Half Day = 0.5, Holiday = 1, Paid Leave = 1, and Absent or unpaid leave = 0. Weekly offs are paid by marking them Holiday; the marking screen pre-fills Holiday on a labourer's weekly holidays. An unmarked day earns nothing.
 - Rounding: every day and every overtime line rounds half up to the paisa, separately.
 - **Overtime:** hours > 0 and ≤ 24 per line, with a rate per hour that defaults to the labourer's overtime wage and can be changed on the line. The line's Labour Category is optional, and when given it must be a live category. Overtime is refused on an Absent day (`OVERTIME_ON_ABSENT_DAY`); it is allowed on a Holiday (weekend overtime). The day's overtime lines may total at most 24 hours.
+- **Check-in, check-out and working hours** (CM-220, [ADR CM-0011](../adr/CM-0011-attendance-check-in-out-and-working-hours.md)): each Labour has working hours a day (more than 0, at most 24, two places; default 8), snapshotted on every attendance day like the wage. A Present or Half Day may carry a check-in and check-out (`HH:MM`, Company time; a check-out at or before the check-in is the next day) and an unpaid break (0–720 minutes, 60 by default). Times are optional, a check-in alone is allowed, and Absent, Leave and Holiday cannot have them (`TIMES_NEED_PRESENT`). Worked = check-out − check-in − break; the hours beyond the working hours (Half Day too) are an overtime line marked `fromTimes`, whose hours the server works out; its category and rate default as for any line and can be changed, and editing its hours on the screen turns it into a manual line. Times never change the status or the day's pay.
 - **Snapshots:** an attendance row stores the wage type and rate it was priced at, and the amount earned. A vendor attendance line stores the rate per day, the overtime rate and the shift name. Changing the master changes future entries only.
 
 **Labour**
