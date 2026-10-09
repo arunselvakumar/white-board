@@ -6,6 +6,7 @@ import {
   paiseToRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
+import { DEFAULT_WORKING_HOURS } from "@/src/labour/domain/wages";
 import type {
   LabourInput,
   LabourResponse,
@@ -23,6 +24,14 @@ export const WEEKDAYS = [
   { value: 6, label: "Sat" },
 ] as const;
 
+const HOURS_RE = /^\d{1,2}(\.\d{1,2})?$/;
+
+/** More than 0 and at most 24 hours, two decimal places at most. */
+export function isWorkingHours(value: string): boolean {
+  const hours = value.trim();
+  return HOURS_RE.test(hours) && Number(hours) > 0 && Number(hours) <= 24;
+}
+
 const baseSchema = z.object({
   name: z
     .string()
@@ -37,6 +46,10 @@ const baseSchema = z.object({
   wagePerDay: z.string(),
   wagePerMonth: z.string(),
   overtimeWagePerHour: z.string(),
+  /** Decimal hours as typed; time worked beyond it is overtime (ADR CM-0011). */
+  workingHoursPerDay: z.string().trim().refine(isWorkingHours, {
+    message: "Enter hours more than 0 and at most 24, like 8 or 8.5",
+  }),
   openingBalance: z.string(),
   weeklyHolidays: z.array(z.number()),
   uanNumber: z
@@ -142,6 +155,7 @@ export function labourFormDefaults(
       wagePerDay: "",
       wagePerMonth: "",
       overtimeWagePerHour: "0",
+      workingHoursPerDay: DEFAULT_WORKING_HOURS,
       openingBalance: "",
       weeklyHolidays: [0],
       uanNumber: "",
@@ -162,6 +176,7 @@ export function labourFormDefaults(
     wagePerDay: paiseToRupees(labour.wagePerDay),
     wagePerMonth: paiseToRupees(labour.wagePerMonth),
     overtimeWagePerHour: paiseToRupees(labour.overtimeWagePerHour),
+    workingHoursPerDay: labour.workingHoursPerDay,
     openingBalance: paiseToRupees(labour.openingBalance),
     weeklyHolidays: labour.weeklyHolidays,
     uanNumber: labour.uanNumber ?? "",
@@ -185,6 +200,7 @@ function details(values: LabourFormValues) {
     joiningDate: values.joiningDate,
     wageType: values.wageType,
     weeklyHolidays: [...values.weeklyHolidays].sort((a, b) => a - b),
+    workingHoursPerDay: values.workingHoursPerDay.trim(),
     uanNumber: blank(values.uanNumber),
     esicNumber: blank(values.esicNumber),
     labourCategoryId: blank(values.labourCategoryId),
@@ -247,6 +263,7 @@ export const LABOUR_ERROR_FIELDS: Record<string, keyof LabourFormValues> = {
   WAGE_TYPE_INVALID: "wageType",
   OVERTIME_WAGE_REQUIRED: "overtimeWagePerHour",
   OVERTIME_WAGE_INVALID: "overtimeWagePerHour",
+  WORKING_HOURS_INVALID: "workingHoursPerDay",
   OPENING_BALANCE_INVALID: "openingBalance",
   WEEKLY_HOLIDAYS_INVALID: "weeklyHolidays",
   UAN_INVALID: "uanNumber",

@@ -345,6 +345,25 @@ export function LabourForm({
               <FieldError message={errors.overtimeWagePerHour?.message} />
             </div>
           )}
+          <div className="space-y-1.5">
+            <Label htmlFor="labour-working-hours">Working hours per day</Label>
+            <Input
+              id="labour-working-hours"
+              inputMode="decimal"
+              className="h-10"
+              placeholder="8"
+              aria-describedby="labour-working-hours-hint"
+              aria-invalid={errors.workingHoursPerDay != null}
+              {...form.register("workingHoursPerDay")}
+            />
+            <p
+              id="labour-working-hours-hint"
+              className="text-muted-foreground text-xs"
+            >
+              Time worked beyond this is overtime.
+            </p>
+            <FieldError message={errors.workingHoursPerDay?.message} />
+          </div>
           {showAmounts && (
             <div className="space-y-1.5">
               <Label htmlFor="labour-opening">Opening balance</Label>
