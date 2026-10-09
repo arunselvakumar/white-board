@@ -11,7 +11,12 @@ import {
   normalizeAadhaar,
 } from "@/src/shared-kernel/tax-ids";
 
-import type { WageType, Weekday } from "./wages";
+import {
+  DEFAULT_WORKING_HOURS,
+  workingHours,
+  type WageType,
+  type Weekday,
+} from "./wages";
 
 export type Gender = "male" | "female" | "other";
 
@@ -35,6 +40,11 @@ export type LabourDetails = {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number;
+  /**
+   * Decimal hours a day (ADR CM-0011); time worked beyond it is overtime.
+   * Default 8.
+   */
+  workingHoursPerDay: string;
   /** 0 = Sunday … 6 = Saturday, sorted, unique. */
   weeklyHolidays: Weekday[];
   /** EPFO UAN, 12 digits. */
@@ -59,6 +69,8 @@ export type LabourDetailsInput = {
   wagePerDay?: number | null;
   wagePerMonth?: number | null;
   overtimeWagePerHour: number | null;
+  /** Leave out (or null) for 8. */
+  workingHoursPerDay?: string | number | null;
   weeklyHolidays?: readonly number[] | null;
   uanNumber?: string | null;
   esicNumber?: string | null;
@@ -179,6 +191,16 @@ export function checkLabourDetails(
       "The overtime wage must be 0 or more, in paise.",
     );
 
+  let hoursPerDay = DEFAULT_WORKING_HOURS;
+  const rawHours = input.workingHoursPerDay;
+  if (rawHours != null && String(rawHours).trim() !== "")
+    try {
+      hoursPerDay = workingHours(rawHours);
+    } catch (error) {
+      if (!(error instanceof DomainError)) throw error;
+      problem("workingHoursPerDay", error.code, error.message);
+    }
+
   const holidays = [...(input.weeklyHolidays ?? [])];
   if (
     holidays.some((day) => !Number.isInteger(day) || day < 0 || day > 6) ||
@@ -232,6 +254,7 @@ export function checkLabourDetails(
       wagePerDay: wageType === "daily" ? (wage ?? null) : null,
       wagePerMonth: wageType === "monthly" ? (wage ?? null) : null,
       overtimeWagePerHour: overtime ?? 0,
+      workingHoursPerDay: hoursPerDay,
       weeklyHolidays: holidays.sort((a, b) => a - b) as Weekday[],
       uanNumber,
       esicNumber,

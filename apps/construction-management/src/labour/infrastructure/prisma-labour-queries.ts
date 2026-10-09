@@ -16,7 +16,7 @@ import type {
   LabourQueries,
   LabourReadModel,
 } from "../application/labour-ports";
-import type { Weekday } from "../domain/wages";
+import { workingHours, type Weekday } from "../domain/wages";
 import { prismaLedger } from "./prisma-ledger";
 
 type Row = Prisma.ConstructionLabourLabourGetPayload<object>;
@@ -124,6 +124,7 @@ export class PrismaLabourQueries implements LabourQueries {
         wagePerDay: row.wagePerDay,
         wagePerMonth: row.wagePerMonth,
         overtimeWagePerHour: row.overtimeWagePerHour,
+        workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
         weeklyHolidays: row.weeklyHolidays as Weekday[],
         uanNumber: row.uanNumber,
         esicNumber: row.esicNumber,
@@ -257,6 +258,7 @@ export class PrismaLabourQueries implements LabourQueries {
       supervisorId: row.supervisorId,
       wageType: row.wageType,
       weeklyHolidays: row.weeklyHolidays,
+      workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
       wagePerDay: row.wagePerDay,
       wagePerMonth: row.wagePerMonth,
       overtimeWagePerHour: row.overtimeWagePerHour,

@@ -78,6 +78,7 @@ export const DHURESH: LabourResponse = {
   wagePerDay: 70_000,
   wagePerMonth: null,
   overtimeWagePerHour: 10_000,
+  workingHoursPerDay: "8",
   weeklyHolidays: [0],
   openingBalance: 150_000,
   balance: 2_45_000,

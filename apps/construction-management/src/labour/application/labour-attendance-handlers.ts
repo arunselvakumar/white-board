@@ -24,6 +24,7 @@ import { monthOf } from "../domain/ledger";
 import {
   ATTENDANCE_STATUSES,
   datesBetween,
+  hoursFromTimes,
   hoursInHundredths,
   weekdayOf,
   type AttendanceStatus,
@@ -179,6 +180,8 @@ export type LabourOvertimeReadModel = {
   hours: string;
   ratePerHour: number;
   amount: number;
+  /** Hours worked out from the day's times (ADR CM-0011). */
+  fromTimes: boolean;
 };
 
 export type LabourAttendanceDayReadModel = {
@@ -192,6 +195,13 @@ export type LabourAttendanceDayReadModel = {
   isPaidLeave: boolean;
   shift: string | null;
   supervisor: Ref | null;
+  checkIn: string | null;
+  checkOut: string | null;
+  breakMinutes: number | null;
+  /** Snapshot of the Labour's working hours a day. */
+  workingHours: string;
+  /** check-out − check-in − break; null without both times. */
+  workedHours: string | null;
   wageType: WageCard["wageType"];
   /** Snapshot: wage per day or per month the day was priced at. */
   wageRate: number;
@@ -217,6 +227,8 @@ export type LabourSheetRowReadModel = {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
+  /** Decimal hours a day; null for a labourer no longer listed. */
+  workingHoursPerDay: string | null;
   /** Active and on this Project on the date: the row can be marked. */
   canMark: boolean;
   isActive: boolean;
@@ -230,6 +242,9 @@ export type LabourSheetRowReadModel = {
     status: AttendanceStatus;
     isPaidLeave: boolean;
     shift: string | null;
+    checkIn: string | null;
+    checkOut: string | null;
+    breakMinutes: number | null;
   } | null;
   attendance: LabourAttendanceDayReadModel | null;
 };
@@ -360,6 +375,17 @@ function overtimeHundredths(day: PricedDay): number {
 
 function overtimeAmountOf(day: PricedDay): number {
   return day.overtime.reduce((sum, line) => sum + line.amount, 0);
+}
+
+/** Hours worked on a day with both times (ADR CM-0011), else null. */
+function workedHoursOf(day: PricedDay): string | null {
+  if (day.checkIn == null || day.checkOut == null) return null;
+  return hoursFromTimes({
+    checkIn: day.checkIn,
+    checkOut: day.checkOut,
+    breakMinutes: day.breakMinutes ?? 0,
+    workingHours: day.workingHours,
+  }).worked;
 }
 
 /** A copy of a domain error with `labourId` (and more) added to its details. */
@@ -535,6 +561,11 @@ export class LabourAttendanceHandlers {
           supervisor == null
             ? null
             : { id: supervisor.id, name: supervisor.name },
+        checkIn: day.checkIn,
+        checkOut: day.checkOut,
+        breakMinutes: day.breakMinutes,
+        workingHours: day.workingHours,
+        workedHours: workedHoursOf(day),
         wageType: day.wageType,
         wageRate: day.wageRate,
         earned: day.earned,
@@ -547,6 +578,7 @@ export class LabourAttendanceHandlers {
           hours: line.hours,
           ratePerHour: line.ratePerHour,
           amount: line.amount,
+          fromTimes: line.fromTimes,
         })),
         overtimeHours: formatHundredths(overtimeHundredths(day)),
         overtimeAmount,
@@ -700,13 +732,18 @@ export class LabourAttendanceHandlers {
           : null;
       // A line sent without a rate (a member without Financial cannot see
       // it) keeps the rate the saved day had for that category, so a
-      // re-mark never silently resets a custom overtime rate.
+      // re-mark never silently resets a custom overtime rate. The line from
+      // the times keeps the saved line from the times first.
       const saved = existing.get(mark.labourId)?.overtime ?? [];
       const overtime = mark.overtime?.map((line) => {
         if (line.ratePerHour != null) return line;
-        const kept = saved.find(
-          (old) => old.labourCategoryId === line.labourCategoryId,
-        );
+        const fromTimes = line.fromTimes === true;
+        const sameCategory = (old: (typeof saved)[number]) =>
+          old.labourCategoryId === line.labourCategoryId;
+        const kept =
+          saved.find((old) =>
+            fromTimes ? old.fromTimes : !old.fromTimes && sameCategory(old),
+          ) ?? saved.find(sameCategory);
         return kept == null ? line : { ...line, ratePerHour: kept.ratePerHour };
       });
       let day: PricedDay;
@@ -851,6 +888,10 @@ export class LabourAttendanceHandlers {
             isPaidLeave: day.isPaidLeave,
             shift: day.shift,
             supervisorId: day.supervisorId,
+            checkIn: day.checkIn,
+            checkOut: day.checkOut,
+            breakMinutes: day.breakMinutes,
+            workingHours: day.workingHours,
             wageType: day.wageType,
             wageRate: day.wageRate,
             earned: day.earned,
@@ -965,6 +1006,7 @@ export class LabourAttendanceHandlers {
         wagePerDay: labourer?.card.wagePerDay ?? null,
         wagePerMonth: labourer?.card.wagePerMonth ?? null,
         overtimeWagePerHour: labourer?.card.overtimeWagePerHour ?? null,
+        workingHoursPerDay: labourer?.card.workingHours ?? null,
         canMark: entry.canMark,
         isActive: labourer?.isActive ?? false,
         onProject: entry.canMark,
@@ -977,6 +1019,9 @@ export class LabourAttendanceHandlers {
                 status: before.status,
                 isPaidLeave: before.isPaidLeave,
                 shift: before.shift,
+                checkIn: before.checkIn,
+                checkOut: before.checkOut,
+                breakMinutes: before.breakMinutes,
               },
         attendance,
       };

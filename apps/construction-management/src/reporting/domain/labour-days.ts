@@ -30,6 +30,12 @@ export type ReportLabourDay = {
   isPaidLeave: boolean;
   shift: string | null;
   supervisor: string | null;
+  /** `HH:MM`, Company time (ADR CM-0011); null when not recorded. */
+  checkIn: string | null;
+  /** `HH:MM`; at or before `checkIn` is the next day. */
+  checkOut: string | null;
+  /** Unpaid break in minutes; null without a check-in. */
+  breakMinutes: number | null;
   /** Overtime on the day in hundredths of an hour (2.5 h = 250). */
   overtimeHundredths: number;
   wageType: WageType;
@@ -148,6 +154,32 @@ export function hours(hundredths: number): number {
 /** A Postgres `numeric` hours value (`"2.50"`) in hundredths. */
 export function hundredthsOf(value: string | number): number {
   return Math.round(Number(value) * 100);
+}
+
+function minutesOf(time: string): number {
+  const [h = 0, m = 0] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/** The check-out is on the next day: at or before the check-in. */
+export function endsNextDay(checkIn: string, checkOut: string): boolean {
+  return minutesOf(checkOut) <= minutesOf(checkIn);
+}
+
+/**
+ * Hours worked in hundredths, check-out − check-in − break (ADR CM-0011,
+ * the same rule as the labour context), or null without both times. A
+ * check-out at or before the check-in is on the next day.
+ */
+export function workedHundredths(
+  day: Pick<ReportLabourDay, "checkIn" | "checkOut" | "breakMinutes">,
+): number | null {
+  if (day.checkIn == null || day.checkOut == null) return null;
+  let span = minutesOf(day.checkOut) - minutesOf(day.checkIn);
+  if (span <= 0) span += 24 * 60;
+  const minutes = Math.max(span - (day.breakMinutes ?? 0), 0);
+  // Minutes × 100 ÷ 60 never lands on a half, so rounding is exact.
+  return Math.round((minutes * 100) / 60);
 }
 
 /** `P`, `P+2`, `H+1.5`. */

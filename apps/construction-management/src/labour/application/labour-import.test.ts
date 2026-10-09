@@ -128,6 +128,30 @@ describe("LabourImport", () => {
     ]);
   });
 
+  it("reads working hours a day, 8 when the cell is blank", async () => {
+    const repository = new FakeLabourRepository();
+    const importer = new LabourImport(repository, LOOKUPS);
+    const preview = await importer.preview("w1", [
+      row(2, { workingHoursPerDay: "25" }),
+    ]);
+    expect(preview.rows[0]?.errors).toEqual([
+      expect.objectContaining({
+        field: "workingHoursPerDay",
+        code: "WORKING_HOURS_INVALID",
+      }),
+    ]);
+    await importer.commit({
+      workspaceId: "w1",
+      sheet: [row(2, { workingHoursPerDay: 9.5 }), row(3, { name: "Mani" })],
+      by: "u1",
+    });
+    expect(
+      [...repository.labours.values()].map(
+        (labour) => labour.details.workingHoursPerDay,
+      ),
+    ).toEqual(["9.5", "8"]);
+  });
+
   it("refuses an empty sheet and more than 1000 rows", async () => {
     const importer = new LabourImport(new FakeLabourRepository(), LOOKUPS);
     await expect(importer.preview("w1", [])).rejects.toMatchObject({

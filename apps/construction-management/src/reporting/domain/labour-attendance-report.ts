@@ -1,12 +1,14 @@
 import {
   byName,
   daysByLabour,
+  endsNextDay,
   hours,
   markOf,
   MARK_LEGEND,
   tally,
   type ReportLabour,
   type ReportLabourDay,
+  workedHundredths,
 } from "./labour-days";
 import {
   column,
@@ -19,8 +21,9 @@ import { dateLabel, type DateRange } from "./report-period";
 /**
  * All Labour Attendance (CM-217): for one Project and a date range, a
  * summary per Labour (present, half day, absent, leave, paid leave,
- * holiday, overtime hours) and every marked day with its status and
- * overtime. Only Labours marked in the Project in the range appear.
+ * holiday, overtime hours) and every marked day with its status, check-in,
+ * check-out, hours worked (ADR CM-0011) and overtime. Only Labours marked
+ * in the Project in the range appear.
  */
 export function buildLabourAttendanceReport(input: {
   range: DateRange;
@@ -74,6 +77,9 @@ export function buildLabourAttendanceReport(input: {
     column("Status", "text", 10),
     column("Shift", "text", 9),
     column("Supervisor", "text", 16),
+    column("In", "text", 6),
+    column("Out", "text", 10),
+    column("Worked", "hours"),
     column("OT hours", "hours"),
   ];
   const names = new Map(labours.map((labour) => [labour.id, labour]));
@@ -96,6 +102,9 @@ export function buildLabourAttendanceReport(input: {
         STATUS_LABEL[markOf(day)],
         day.shift,
         day.supervisor,
+        day.checkIn,
+        checkOutLabel(day),
+        workedOf(day),
         hours(day.overtimeHundredths),
       ];
     });
@@ -124,6 +133,19 @@ export function buildLabourAttendanceReport(input: {
       },
     ],
   };
+}
+
+/** `18:00`, or `06:00 (+1)` for a check-out on the next day. */
+function checkOutLabel(day: ReportLabourDay): string | null {
+  if (day.checkOut == null) return null;
+  return day.checkIn != null && endsNextDay(day.checkIn, day.checkOut)
+    ? `${day.checkOut} (+1)`
+    : day.checkOut;
+}
+
+function workedOf(day: ReportLabourDay): number | null {
+  const worked = workedHundredths(day);
+  return worked == null ? null : hours(worked);
 }
 
 const STATUS_LABEL = {

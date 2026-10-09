@@ -89,11 +89,16 @@ describe("LabourHandlers", () => {
     );
   });
 
-  it("keeps omitted amounts and reposts only a changed opening balance", async () => {
+  it("keeps omitted amounts and working hours, and reposts only a changed opening balance", async () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, openingBalance: 1_000, labourCategoryId: "mason" },
+      labour: {
+        ...INPUT,
+        openingBalance: 1_000,
+        labourCategoryId: "mason",
+        workingHoursPerDay: "9",
+      },
       by: "u1",
     });
     const base = {
@@ -110,6 +115,7 @@ describe("LabourHandlers", () => {
       by: "u1",
     });
     expect(renamed.details.wagePerDay).toBe(70_000);
+    expect(renamed.details.workingHoursPerDay).toBe("9");
     expect(repository.ledger.get(created.id)).toEqual([1_000]);
 
     const reposted = await handlers.update({

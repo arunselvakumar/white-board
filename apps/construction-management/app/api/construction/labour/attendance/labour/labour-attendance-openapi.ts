@@ -82,7 +82,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/mark`,
     summary:
-      "Mark many Labours' day in one transaction, priced and posted to the labour ledger (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY 400; ATTENDANCE_CHANGED 409 with details.labourId; back-dated 403)",
+      "Mark many Labours' day in one transaction, priced and posted to the labour ledger (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY, TIMES_NEED_PRESENT, CHECK_IN_REQUIRED, BREAK_TOO_LONG 400; overtime `fromTimes` hours worked out from check-in, check-out and break; ATTENDANCE_CHANGED 409 with details.labourId; back-dated 403)",
     tags: LABOUR,
     body: MarkConstructionLabourLabourAttendanceRequestModel,
     successStatus: StatusCodes.OK,

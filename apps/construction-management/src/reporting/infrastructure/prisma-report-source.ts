@@ -112,6 +112,9 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
         row.supervisorId == null
           ? null
           : (supervisors.get(row.supervisorId) ?? null),
+      checkIn: row.checkIn,
+      checkOut: row.checkOut,
+      breakMinutes: row.breakMinutes,
       overtimeHundredths: row.overtime.reduce(
         (sum, line) => sum + hundredthsOf(line.hours.toString()),
         0,

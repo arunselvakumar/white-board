@@ -52,6 +52,12 @@ export const LABOUR_COLUMNS = [
     money: true,
   },
   {
+    key: "workingHoursPerDay",
+    header: "Working Hours per Day",
+    example: 8,
+    width: 20,
+  },
+  {
     key: "weeklyHolidays",
     header: "Weekly Holidays",
     example: "Sun",

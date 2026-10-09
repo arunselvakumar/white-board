@@ -21,7 +21,7 @@ import type {
   NewLabour,
 } from "../application/labour-ports";
 import { Labour } from "../domain/labour";
-import type { Weekday } from "../domain/wages";
+import { workingHours, type Weekday } from "../domain/wages";
 import { lockLiveParties } from "./party-locks";
 import { prismaLedger } from "./prisma-ledger";
 
@@ -46,6 +46,7 @@ export function labourFromRow(
       wagePerDay: row.wagePerDay,
       wagePerMonth: row.wagePerMonth,
       overtimeWagePerHour: row.overtimeWagePerHour,
+      workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
       weeklyHolidays: row.weeklyHolidays as Weekday[],
       uanNumber: row.uanNumber,
       esicNumber: row.esicNumber,
@@ -127,6 +128,7 @@ export class PrismaLabourRepository implements LabourRepository {
       wagePerDay: details.wagePerDay,
       wagePerMonth: details.wagePerMonth,
       overtimeWagePerHour: details.overtimeWagePerHour,
+      workingHoursPerDay: details.workingHoursPerDay,
       weeklyHolidays: details.weeklyHolidays,
       uanNumber: details.uanNumber,
       esicNumber: details.esicNumber,
