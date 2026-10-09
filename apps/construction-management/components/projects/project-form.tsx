@@ -561,8 +561,8 @@ export function EditProjectForm({ project }: { project: ProjectResponse }) {
             Delete Project
           </h2>
           <p className="text-muted-foreground text-sm">
-            Only a Project with no labours, vendors, attendance or payments can
-            be deleted. Mark a finished Project Completed instead.
+            Only a Project with no labours, vendors, attendance, payments or
+            documents can be deleted. Mark a finished Project Completed instead.
           </p>
           <FormAlert message={deleteError} />
           <Button

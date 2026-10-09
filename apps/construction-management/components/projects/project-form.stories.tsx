@@ -757,7 +757,7 @@ export const DeleteRefusedWhileInUse: Story = {
           {
             code: "PROJECT_IN_USE",
             message:
-              "Labours, vendors, attendance or payments are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
+              "Labours, vendors, attendance, payments or documents are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
           },
           { status: 409 },
         );
