@@ -1,0 +1,23 @@
+apps/whiteboard/src/training-institute/domain/fee-follow-up.test.ts
+  s_1efebd1241fd66::t_1bea2d141f5cf6 94-111,117-126
+apps/whiteboard/src/training-institute/domain/fee-follow-up.ts
+  s_1efebd1241fd66::t_7365d188f76bd3 100,149,153,172
+docs/adr/0039-fee-dues-follow-up-product-decisions.md
+  s_1efebd1241fd66::t_21790b79e3ff5a 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "16355f0bc1c594de8fcbf42f62f0ab2ab7b6a190",
+  "prompts": {},
+  "sessions": {
+    "s_1efebd1241fd66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d12237a7-64c5-41e1-90e1-d36543c90069",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
