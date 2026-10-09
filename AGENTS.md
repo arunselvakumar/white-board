@@ -53,7 +53,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - Identity (Users, Sessions, Workspaces, members, invitations) lives in the `identity` schema, owned by `packages/auth` (`@repo/auth`, Better Auth; ADR-0034). Other contexts hold User and Workspace ids as opaque strings and never join to `identity`. Only `@repo/auth` imports `better-auth` (ESLint enforces it). Auth emails are React Email templates in `packages/email-templates`.
 - Soft delete is an invisible tombstone (ADR-0019). Lists use bidirectional cursors plus total (ADR-0020).
 - Errors: `{ code, message, details? }` (ADR-0017).
-- Prisma lives only in `packages/db` (ADR-0010). Migrations that move tables are written by hand; never accept a generated drop-and-recreate (ADR-0030).
+- Prisma lives only in the product's database package: `packages/db/whiteboard` (`@repo/whiteboard-db`) for Whiteboard, `packages/db/construction` (`@repo/construction-db`) for Construction Management (ADR-0010, ADR-0040). An app never imports the other product's package. Migrations that move tables are written by hand; never accept a generated drop-and-recreate (ADR-0030).
 
 ## UI
 
@@ -79,7 +79,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 bun install
 docker compose up -d
 bun run generate
-bun run --filter @repo/db migrate:deploy
+bun run --filter @repo/whiteboard-db migrate:deploy
 bun run dev --filter=whiteboard   # :3001 (Marketing Site: --filter=marketing, :3000)
 bun run test
 bun run test:http

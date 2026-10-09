@@ -30,7 +30,7 @@ Priority 1 is **M0 → M3** (project setup, SaaS login/signup and company onboar
 | Docs   | ADR, CONTEXT.md, spec amendments                                      |
 | Infra  | Repo wiring, CI, Docker, AWS                                          |
 | Auth   | `@repo/auth` plugins and the identity bridge                          |
-| Data   | Prisma schema files under `packages/db/prisma/schema/construction-*`  |
+| Data   | Prisma schema files under `packages/db/construction/prisma/schema/*`  |
 | Domain | `apps/construction-management/src/<context>/{domain,application}`     |
 | HTTP   | Route Handlers + Zod models + OpenAPI under `/api/construction/<ctx>` |
 | UI     | Screens in `apps/construction-management/app` + Storybook             |
