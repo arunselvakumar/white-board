@@ -401,10 +401,7 @@ export const NewUploadsHeldFilesAfterCreate: Story = {
     const restore = api(created);
     uploadSpy.mockClear();
     clearProjectFlash(ANUGRAHA.id);
-    // The stub's signature returns null; the real one renders.
-    mocked(DocumentAttachments).mockImplementation(
-      FakeAttachments as unknown as typeof DocumentAttachments,
-    );
+    mocked(DocumentAttachments).mockImplementation(FakeAttachments);
     mocked(useUploadHeldFiles).mockImplementation(useFakeUploads);
     return () => {
       restore();

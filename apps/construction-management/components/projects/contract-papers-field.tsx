@@ -106,7 +106,7 @@ export function ContractPapersField({
                   index > 0 && "border-t pt-3 sm:border-0 sm:pt-1",
                 )}
               >
-                <span className="col-span-2 text-sm font-medium sm:col-span-1">
+                <span className="self-center text-sm font-medium">
                   {paper.label}
                 </span>
                 <Input
@@ -141,18 +141,21 @@ export function ContractPapersField({
                     {...form.register(paper.dateField)}
                   />
                 )}
-                <div className="col-span-2 min-w-0 sm:col-span-1">
-                  <DocumentAttachments
-                    projectId={projectId}
-                    kind={paper.kind}
-                    label={paper.label}
-                    held={held.filter((file) => file.kind === paper.kind)}
-                    onHeldChange={(next) => {
-                      onHeldChange(paper.kind, next);
-                    }}
-                    disabled={disabled}
-                  />
-                </div>
+                {/* Phones: the paperclip sits beside the paper's name. On
+                    ≥sm it is the last column and the chips wrap under the
+                    number and date. */}
+                <DocumentAttachments
+                  projectId={projectId}
+                  kind={paper.kind}
+                  label={paper.label}
+                  held={held.filter((file) => file.kind === paper.kind)}
+                  onHeldChange={(next) => {
+                    onHeldChange(paper.kind, next);
+                  }}
+                  disabled={disabled}
+                  buttonClassName="max-sm:col-start-2 max-sm:row-start-1 max-sm:justify-self-end sm:self-center"
+                  chipsClassName="sm:col-span-3 sm:col-start-2"
+                />
                 {numberError == null && dateError == null ? null : (
                   <div className="col-span-2 sm:col-span-3 sm:col-start-2">
                     <FieldError message={numberError ?? dateError} />

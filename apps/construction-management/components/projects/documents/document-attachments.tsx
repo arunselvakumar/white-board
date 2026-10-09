@@ -53,6 +53,10 @@ export type DocumentAttachmentsProps = {
   held: readonly HeldFile[];
   onHeldChange: (next: HeldFile[]) => void;
   disabled?: boolean;
+  /** Placement of the paperclip's grid cell, e.g. a column start. */
+  buttonClassName?: string;
+  /** Placement of the chip list; it spans the whole row by default. */
+  chipsClassName?: string;
 };
 
 /**
@@ -136,9 +140,11 @@ function AttachButton({
   label,
   disabled,
   onFiles,
+  className,
 }: {
   label: string;
   disabled: boolean;
+  className?: string | undefined;
   onFiles: (files: File[]) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
@@ -149,7 +155,7 @@ function AttachButton({
     return true;
   };
   return (
-    <div className="relative self-end">
+    <div className={cn("relative self-end", className)}>
       <Input
         ref={input}
         type="file"
@@ -273,11 +279,19 @@ function FileChip({
   );
 }
 
-function ChipList({ label, children }: { label: string; children: ReactNode }) {
+function ChipList({
+  label,
+  className,
+  children,
+}: {
+  label: string;
+  className?: string | undefined;
+  children: ReactNode;
+}) {
   return (
     <ul
       aria-label={`${label} files`}
-      className="col-span-full flex min-w-0 flex-wrap gap-2"
+      className={cn("col-span-full flex min-w-0 flex-wrap gap-2", className)}
     >
       {children}
     </ul>
@@ -290,6 +304,8 @@ function SavedAttachments({
   kind,
   label,
   disabled = false,
+  buttonClassName,
+  chipsClassName,
 }: DocumentAttachmentsProps & { projectId: string }) {
   const { data } = useQuery(projectDocumentsQuery(projectId));
   const { uploads, add, retry, dismiss } = useDocumentUploads(projectId);
@@ -355,11 +371,16 @@ function SavedAttachments({
       <AttachButton
         label={label}
         disabled={disabled}
+        className={buttonClassName}
         onFiles={(files) => {
           add(files, kind);
         }}
       />
-      {chips.length > 0 ? <ChipList label={label}>{chips}</ChipList> : null}
+      {chips.length > 0 ? (
+        <ChipList label={label} className={chipsClassName}>
+          {chips}
+        </ChipList>
+      ) : null}
       <DeleteDocumentDialog
         projectId={projectId}
         document={deleting}
@@ -380,6 +401,8 @@ function HeldAttachments({
   held,
   onHeldChange,
   disabled = false,
+  buttonClassName,
+  chipsClassName,
 }: DocumentAttachmentsProps) {
   const [rejected, setRejected] = useState<Rejected[]>([]);
   const mine = held.filter((item) => item.kind === kind);
@@ -434,8 +457,17 @@ function HeldAttachments({
 
   return (
     <>
-      <AttachButton label={label} disabled={disabled} onFiles={pick} />
-      {chips.length > 0 ? <ChipList label={label}>{chips}</ChipList> : null}
+      <AttachButton
+        label={label}
+        disabled={disabled}
+        className={buttonClassName}
+        onFiles={pick}
+      />
+      {chips.length > 0 ? (
+        <ChipList label={label} className={chipsClassName}>
+          {chips}
+        </ChipList>
+      ) : null}
     </>
   );
 }
