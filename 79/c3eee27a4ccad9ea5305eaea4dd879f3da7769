@@ -1,0 +1,59 @@
+apps/construction-management/app/api/construction/hrms/attendance/approvals/route.ts
+  s_6a70f1cb429bb6::t_ea640ecb28273b 15-16
+apps/construction-management/app/api/construction/hrms/attendance/attendance-models.ts
+  s_6a70f1cb429bb6::t_d0e846b5863a1d 211-212,227-228,385-388,390-391,403
+apps/construction-management/app/app/workspace/hrms/attendance/approvals/page.tsx
+  s_6a70f1cb429bb6::t_6cbfa729319967 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/monthly/page.tsx
+  s_6a70f1cb429bb6::t_d72d55f0956b36 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/my/page.tsx
+  s_6a70f1cb429bb6::t_48c9be0d5b6f80 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/team/page.tsx
+  s_6a70f1cb429bb6::t_c4cb99f4afce04 3,10-12
+apps/construction-management/components/hrms/attendance-approvals-page.tsx
+  s_6a70f1cb429bb6::t_e7a0087f9fa2cf 1-268
+apps/construction-management/components/hrms/attendance-parts.tsx
+  s_6a70f1cb429bb6::t_80d052af9ad701 1-292
+apps/construction-management/components/hrms/backdated-attendance-dialog.tsx
+  s_6a70f1cb429bb6::t_1244efec5bab7d 1-188
+apps/construction-management/components/hrms/check-in-banner.tsx
+  s_6a70f1cb429bb6::t_b23703d587a0a9 1-50
+apps/construction-management/components/hrms/monthly-attendance-page.tsx
+  s_6a70f1cb429bb6::t_cb1f7659ed88dd 1-218
+apps/construction-management/components/hrms/my-attendance-page.tsx
+  s_6a70f1cb429bb6::t_6a506fcc18bbd0 1-480
+apps/construction-management/components/hrms/team-attendance-page.tsx
+  s_6a70f1cb429bb6::t_9dbceb4a693b62 1-193
+apps/construction-management/components/projects/projects-home.tsx
+  s_6a70f1cb429bb6::t_b46c3ac4715a29 29,221
+apps/construction-management/src/hrms/application/attendance-handlers.ts
+  s_6a70f1cb429bb6::t_b473620503239e 225,609-611,629-635,791
+apps/construction-management/src/queries/hrms-attendance.ts
+  s_63b2083019db15::t_85f80995a246d0 1-111
+apps/construction-management/components/hrms/missed-checkout-dialog.tsx
+  s_6a70f1cb429bb6::t_147ee997b9ffc6 1-168
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "79c3eee27a4ccad9ea5305eaea4dd879f3da7769",
+  "prompts": {},
+  "sessions": {
+    "s_63b2083019db15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aaf22697092594cbf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
