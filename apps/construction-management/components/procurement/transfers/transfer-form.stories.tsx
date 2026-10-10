@@ -13,6 +13,7 @@ import {
   type TransferApiOptions,
 } from "./transfer-fixtures";
 import { TransferForm } from "./transfer-form";
+import { materialNameOf, pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockTransferApi>;
 
@@ -90,7 +91,7 @@ export const Save: Story = {
     await userEvent.click(
       await listbox.findByRole("option", { name: "Villa Phase 2" }),
     );
-    await userEvent.selectOptions(form.getByLabelText("Material"), CEMENT_ID);
+    await pickMaterial(form, userEvent, CEMENT_ID);
     await expect(await form.findByText("Available: 42 Bag")).toBeVisible();
     await userEvent.type(form.getByLabelText("Quantity (Bag)"), "50");
     await expect(await form.findByText(/not enough to approve/)).toBeVisible();
@@ -119,7 +120,9 @@ export const SaveAndApprove: Story = {
       await canvas.findByRole("form", { name: "New Material Transfer" }),
     );
     await waitFor(async () => {
-      await expect(form.getByLabelText("Material")).toHaveValue(STEEL_ID);
+      await expect(
+        form.getByRole("combobox", { name: "Material" }),
+      ).toHaveValue(materialNameOf(STEEL_ID));
     });
     await userEvent.click(form.getByRole("combobox", { name: "To" }));
     await userEvent.click(

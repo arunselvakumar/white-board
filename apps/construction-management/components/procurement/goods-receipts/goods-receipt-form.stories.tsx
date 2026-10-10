@@ -23,6 +23,7 @@ import {
   EditGoodsReceiptScreen,
   NewGoodsReceiptScreen,
 } from "./goods-receipt-form";
+import { pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -133,9 +134,12 @@ export const WithoutPurchaseOrder: Story = {
     );
     await expect(await canvas.findByText("Inter-state (IGST)")).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Add material" }));
-    await userEvent.selectOptions(
-      await canvas.findByLabelText("Material, line 1"),
-      "TMT Steel Bar 12 mm (kg)",
+    await canvas.findByRole("combobox", { name: "Material, line 1" });
+    await pickMaterial(
+      canvas,
+      userEvent,
+      "TMT Steel Bar 12 mm",
+      "Material, line 1",
     );
     await expect(canvas.getByLabelText("Rate")).toHaveValue("62.5");
     await expect(canvas.getByLabelText("HSN")).toHaveValue("7214");

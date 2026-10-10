@@ -10,6 +10,7 @@ import {
 } from "@/components/procurement/stores/central-store-fixtures";
 
 import { MaterialRequestForm } from "./material-request-form";
+import { pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
 
@@ -58,11 +59,8 @@ export const RaiseRequest: Story = {
     await expect(await canvas.findByText("Choose a material.")).toBeVisible();
     await expect(posts()).toHaveLength(0);
 
-    await canvas.findByRole("option", { name: "Cement OPC 53 Grade (Bag)" });
-    await userEvent.selectOptions(
-      canvas.getByLabelText("Material"),
-      "Cement OPC 53 Grade (Bag)",
-    );
+    await canvas.findByRole("combobox", { name: "Material" });
+    await pickMaterial(canvas, userEvent, "Cement OPC 53 Grade");
     await userEvent.type(canvas.getByLabelText(/Ask Qty/), "0");
     await userEvent.click(
       canvas.getByRole("button", { name: "Raise request" }),
@@ -106,11 +104,8 @@ export const StoreNotOnProject: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     within(canvasElement);
-    await canvas.findByRole("option", { name: "M Sand (cum)" });
-    await userEvent.selectOptions(
-      canvas.getByLabelText("Material"),
-      "M Sand (cum)",
-    );
+    await canvas.findByRole("combobox", { name: "Material" });
+    await pickMaterial(canvas, userEvent, "M Sand");
     await userEvent.type(canvas.getByLabelText(/Ask Qty/), "4.5");
     await userEvent.click(
       canvas.getByRole("button", { name: "Raise request" }),

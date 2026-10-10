@@ -13,6 +13,7 @@ import {
   type InventoryApiOptions,
 } from "./inventory-fixtures";
 import { InventoryPage } from "./inventory-page";
+import { materialNameOf, pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockInventoryApi>;
 
@@ -188,7 +189,7 @@ export const Consume: Story = {
     await expect(await dialog.findByText("Choose a material.")).toBeVisible();
     await expect(calls("POST", `${INVENTORY_API}/movements`)).toHaveLength(0);
 
-    await userEvent.selectOptions(dialog.getByLabelText("Material"), CEMENT_ID);
+    await pickMaterial(dialog, userEvent, CEMENT_ID);
     await expect(dialog.getByText("In stock: 42 Bag")).toBeVisible();
     await userEvent.type(dialog.getByLabelText("Quantity"), "12.5");
     await userEvent.type(dialog.getByLabelText("Remarks"), "Plastering");
@@ -240,7 +241,11 @@ export const ConsumeRefusedForStock: Story = {
         name: "Consume Material",
       }),
     );
-    await expect(dialog.getByLabelText("Material")).toHaveValue(CEMENT_ID);
+    await waitFor(() =>
+      expect(dialog.getByRole("combobox", { name: "Material" })).toHaveValue(
+        materialNameOf(CEMENT_ID),
+      ),
+    );
     await userEvent.type(dialog.getByLabelText("Quantity"), "50");
     await userEvent.click(
       dialog.getByRole("button", { name: "Save consumption" }),
@@ -270,10 +275,13 @@ export const MissingForChosen: Story = {
         name: "Missing Materials",
       }),
     );
-    const pickers = dialog.getAllByLabelText("Material");
-    await expect(
-      pickers.map((picker) => (picker as HTMLSelectElement).value),
-    ).toEqual([SAND_ID, STEEL_ID]);
+    await waitFor(() =>
+      expect(
+        dialog
+          .getAllByRole("combobox", { name: "Material" })
+          .map((picker) => (picker as HTMLInputElement).value),
+      ).toEqual([materialNameOf(SAND_ID), materialNameOf(STEEL_ID)]),
+    );
   },
 };
 

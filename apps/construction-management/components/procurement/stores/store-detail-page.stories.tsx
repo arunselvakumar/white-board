@@ -1,15 +1,35 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
-import { IDS, mockCentralStoreApi } from "./central-store-fixtures";
+import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { inventoryHandler } from "../inventory/inventory-fixtures";
+import { transferHandler } from "../transfers/transfer-fixtures";
+import {
+  centralStoreHandler,
+  IDS,
+  type CentralStoreApiOptions,
+} from "./central-store-fixtures";
 import { StoreDetailPage } from "./store-detail-page";
+
+/** The store's own reads, then Current Inventory and transfers for its tabs. */
+function serve(
+  options: CentralStoreApiOptions = {},
+  inventory: Parameters<typeof inventoryHandler>[0] = {},
+) {
+  return () => {
+    const store = centralStoreHandler(options);
+    const stock = inventoryHandler(inventory);
+    const transfers = transferHandler();
+    return mockApi((call) => store(call) ?? stock(call) ?? transfers(call))
+      .restore;
+  };
+}
 
 const meta = {
   title: "Procurement/Central Store/Store",
   component: StoreDetailPage,
   args: { storeId: IDS.store },
-  beforeEach: () => mockCentralStoreApi().restore,
+  beforeEach: serve(),
   render: (args) => (
     <StoryQueries>
       <StoreDetailPage {...args} />
@@ -20,17 +40,20 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Stock per material with its state, then the Projects, requests and notes tabs. */
+/**
+ * Current Inventory for the store (CM-506), then the Projects, requests,
+ * notes and transfers tabs.
+ */
 export const Stock: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(
       await canvas.findByRole("heading", { name: "Ambattur Central Store" }),
     ).toBeVisible();
-    const stock = await canvas.findByRole("table", { name: "Store stock" });
-    await expect(stock).toHaveTextContent("Cement OPC 53 Grade");
-    await expect(stock).toHaveTextContent("40 Bag");
-    await expect(stock).toHaveTextContent("1,250.5 kg");
-    await expect(stock).toHaveTextContent("Low stock");
+    // The phone card list or the desktop table, whichever shows.
+    const shown = (text: string) =>
+      canvas.queryAllByText(text).some((element) => element.checkVisibility());
+    await waitFor(() => expect(shown("Cement OPC 53 Grade")).toBe(true));
+    await expect(shown("Low stock")).toBe(true);
 
     await userEvent.click(canvas.getByRole("tab", { name: "Projects" }));
     await expect(await canvas.findByText("Velachery Villas")).toBeVisible();
@@ -47,6 +70,8 @@ export const Stock: Story = {
     );
     await userEvent.click(canvas.getByRole("tab", { name: "Delivery Notes" }));
     await expect(await canvas.findByText("DN/26-27/00003")).toBeVisible();
+    await userEvent.click(canvas.getByRole("tab", { name: "Transfers" }));
+    await expect(await canvas.findByText("MT/26-27/00003")).toBeVisible();
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
@@ -54,8 +79,8 @@ export const Stock: Story = {
 
 /** A store with no stock says so. */
 export const NoStock: Story = {
-  beforeEach: () => mockCentralStoreApi({ stock: [] }).restore,
+  beforeEach: serve({ stock: [] }, { rows: [] }),
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No stock yet")).toBeVisible();
+    await expect(await canvas.findByText("No stock here yet")).toBeVisible();
   },
 };

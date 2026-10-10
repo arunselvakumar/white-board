@@ -49,6 +49,10 @@ export const centralStoreHref = {
     `${CENTRAL_STORE_PATH}/delivery-notes/${encodeURIComponent(id)}`,
   editNote: (id: string) =>
     `${CENTRAL_STORE_PATH}/delivery-notes/${encodeURIComponent(id)}/edit`,
+  register: (storeId: string) =>
+    `${CENTRAL_STORE_PATH}/${encodeURIComponent(storeId)}/register`,
+  transfer: (storeId: string, transferId?: string) =>
+    `${CENTRAL_STORE_PATH}/${encodeURIComponent(storeId)}/transfers${transferId == null ? "" : `/${encodeURIComponent(transferId)}`}`,
 };
 
 /** A Project's Materials → Material Requests pages. */
