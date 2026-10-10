@@ -2,9 +2,14 @@
 
 import type { ProcurementDocumentType } from "@/src/procurement/domain/documents";
 
+import { DocumentFilesView } from "./document-files-view";
+import { DocumentThreadView } from "./document-thread-view";
+
 /**
- * The contract every procurement detail page renders (M5). The documents
- * ticket fills these in; pages only place them and pass these props.
+ * The contract every procurement detail page renders (M5). Pages only
+ * place these and pass these props; each section loads its own data
+ * (`src/queries/procurement-documents.ts`), shows a skeleton while it
+ * does, and a "Try again" in place when it fails.
  */
 
 export type DocumentActivityProps = {
@@ -14,9 +19,28 @@ export type DocumentActivityProps = {
   heading?: "Remarks" | "Comments";
 };
 
+/** Documents whose thread is called Remarks; the rest have Comments. */
+const REMARKS_ON: readonly ProcurementDocumentType[] = [
+  "purchase_request",
+  "purchase_order",
+  "goods_receipt",
+];
+
 /** The remarks / comments thread of a document, newest last, with a box to add one. */
-export function DocumentActivity(_props: DocumentActivityProps) {
-  return null;
+export function DocumentActivity({
+  documentType,
+  documentId,
+  heading,
+}: DocumentActivityProps) {
+  return (
+    <DocumentThreadView
+      documentType={documentType}
+      documentId={documentId}
+      heading={
+        heading ?? (REMARKS_ON.includes(documentType) ? "Remarks" : "Comments")
+      }
+    />
+  );
 }
 
 export type DocumentFilesProps = {
@@ -29,6 +53,18 @@ export type DocumentFilesProps = {
 };
 
 /** The files attached to a document, with upload when `canEdit`. */
-export function DocumentFiles(_props: DocumentFilesProps) {
-  return null;
+export function DocumentFiles({
+  documentType,
+  documentId,
+  canEdit,
+  heading = "Attachments",
+}: DocumentFilesProps) {
+  return (
+    <DocumentFilesView
+      documentType={documentType}
+      documentId={documentId}
+      canEdit={canEdit}
+      heading={heading}
+    />
+  );
 }
