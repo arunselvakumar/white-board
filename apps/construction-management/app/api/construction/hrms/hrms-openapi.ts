@@ -14,6 +14,10 @@ import {
   calendarOpenApiOperations,
 } from "./calendar-openapi";
 import {
+  dashboardOpenApiComponents,
+  dashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
+import {
   leaveOpenApiComponents,
   leaveOpenApiOperations,
 } from "./leave-openapi";
@@ -42,6 +46,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   ...leaveOpenApiComponents,
   ...salarySetupOpenApiComponents,
   ...attendanceOpenApiComponents,
+  ...dashboardOpenApiComponents,
 };
 
 export const hrmsOpenApiOperations: OpenApiOperation[] = [
@@ -77,4 +82,5 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
   ...leaveOpenApiOperations,
   ...salarySetupOpenApiOperations,
   ...attendanceOpenApiOperations,
+  ...dashboardOpenApiOperations,
 ];
