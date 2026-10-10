@@ -1,0 +1,33 @@
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts.http.test.ts
+  s_6604e2237b6922::t_224e195ee27da0 339-355,368-371
+apps/construction-management/app/api/construction/procurement/goods-receipts/handlers.ts
+  s_6604e2237b6922::t_324fc1c4c14c30 12,28
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-detail.stories.tsx
+  s_6604e2237b6922::t_f74e6800814b13 1-170
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-detail.tsx
+  s_6604e2237b6922::t_3377a262c7dc8b 124-130
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-fixtures.ts
+  s_6604e2237b6922::t_a14ccf6cbdd329 3-6,275,277,279-280
+apps/construction-management/src/procurement/application/goods-receipt-handlers.ts
+  s_6604e2237b6922::t_bae88724007c63 18,21,287-288,712,732-735,737-749
+apps/construction-management/src/procurement/infrastructure/goods-receipt-factory.ts
+  s_6604e2237b6922::t_0944e844661509 29-30,41
+apps/construction-management/src/queries/goods-receipts.ts
+  s_6604e2237b6922::t_71d653dd132d5d 34-37,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6a8c9141fab5792fa748c23ec66c02ae8f187e38",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
