@@ -240,9 +240,20 @@ export function useUpdateStockSettings() {
 export function useImportInventory(location: StockLocation) {
   const invalidate = useInvalidateStock();
   return useMutation({
-    mutationFn: ({ file, dryRun }: { file: File; dryRun: boolean }) => {
+    mutationFn: ({
+      file,
+      dryRun,
+      openingDate,
+    }: {
+      file: File;
+      dryRun: boolean;
+      /** The Opening entries' date; the Company's today when left out. */
+      openingDate?: string;
+    }) => {
       const params = locationParams(location);
       params.set("dryRun", dryRun ? "true" : "false");
+      if (openingDate != null && openingDate !== "")
+        params.set("openingDate", openingDate);
       return apiJson<InventoryImportResult>(
         `${INVENTORY_API}/import?${params}`,
         {

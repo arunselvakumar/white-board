@@ -50,8 +50,8 @@ export const ConstructionProcurementSiteLocationModel = z.discriminatedUnion(
     z.object({
       type: z.literal("wing"),
       wingId: z.uuid(),
-      floorIds: z.array(z.uuid()).max(200),
-      unitIds: z.array(z.uuid()).max(5000),
+      floorIds: z.array(z.uuid()).max(200).readonly(),
+      unitIds: z.array(z.uuid()).max(5000).readonly(),
     }),
     z.object({ type: z.literal("amenity"), developmentId: z.uuid() }),
     z.object({
