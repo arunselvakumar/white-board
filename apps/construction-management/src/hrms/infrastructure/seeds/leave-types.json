@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "source": "modules/10 \"Seeded leave types\"; accrual modes per ADR CM-0012 §7. Keep in step with the backfill migration 20261010140000_construction_hrms_leave_type_seeds.",
+  "leaveTypes": [
+    {
+      "name": "Casual Leave",
+      "yearlyLimit": 12,
+      "isPaid": true,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": false,
+      "maxCarryForward": null,
+      "accrualMode": "upfront",
+      "accrualDay": null,
+      "creditPerPeriod": null,
+      "allowAdvanceUse": false
+    },
+    {
+      "name": "Compensatory Off",
+      "yearlyLimit": 0,
+      "isPaid": true,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": false,
+      "maxCarryForward": null,
+      "accrualMode": "none",
+      "accrualDay": null,
+      "creditPerPeriod": null,
+      "allowAdvanceUse": false
+    },
+    {
+      "name": "Loss of Pay",
+      "yearlyLimit": 0,
+      "isPaid": false,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": false,
+      "maxCarryForward": null,
+      "accrualMode": "none",
+      "accrualDay": null,
+      "creditPerPeriod": null,
+      "allowAdvanceUse": false
+    },
+    {
+      "name": "Maternity",
+      "yearlyLimit": 182,
+      "isPaid": true,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": false,
+      "maxCarryForward": null,
+      "accrualMode": "periodic",
+      "accrualDay": 1,
+      "creditPerPeriod": 15.17,
+      "allowAdvanceUse": false
+    },
+    {
+      "name": "Privilege Leave",
+      "yearlyLimit": 15,
+      "isPaid": true,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": true,
+      "maxCarryForward": 15,
+      "accrualMode": "periodic",
+      "accrualDay": 1,
+      "creditPerPeriod": 1.25,
+      "allowAdvanceUse": false
+    },
+    {
+      "name": "Sick",
+      "yearlyLimit": 7,
+      "isPaid": true,
+      "requiresApproval": true,
+      "approvalLevels": null,
+      "maxConsecutiveDays": null,
+      "carryForward": false,
+      "maxCarryForward": null,
+      "accrualMode": "periodic",
+      "accrualDay": 1,
+      "creditPerPeriod": 0.58,
+      "allowAdvanceUse": false
+    }
+  ]
+}

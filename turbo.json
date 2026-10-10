@@ -50,7 +50,8 @@
     "CONSTRUCTION_SELLER_SAC",
     "NEXT_PHASE",
     "BLOB_STORE_ID",
-    "VERCEL_ENV"
+    "VERCEL_ENV",
+    "CRON_SECRET"
   ],
   "tasks": {
     "generate": {

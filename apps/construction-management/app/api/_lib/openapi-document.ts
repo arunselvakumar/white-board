@@ -107,6 +107,10 @@ import {
   reportingOpenApiOperations,
 } from "@/app/api/construction/reporting/reports/report-openapi";
 import {
+  hrmsOpenApiComponents,
+  hrmsOpenApiOperations,
+} from "@/app/api/construction/hrms/hrms-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -817,6 +821,10 @@ openApiOperations.push(...paymentOpenApiOperations);
 // Report jobs (CM-217, CM-218) list their own models and routes.
 Object.assign(openApiComponents, reportingOpenApiComponents);
 openApiOperations.push(...reportingOpenApiOperations);
+
+// The hrms context (M3) lists its own models and routes.
+Object.assign(openApiComponents, hrmsOpenApiComponents);
+openApiOperations.push(...hrmsOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

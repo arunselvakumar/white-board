@@ -743,20 +743,145 @@ HRMS default set for HRMS-only members: HRMS read; Holiday read; Attendance crea
 
 ---
 
-## Open questions
+## Decisions for the build
 
-1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode?
-2. Full attendance day status enum (only Absent = 3 observed).
-3. Does a normal on-fence check-in ever need approval, or only manual / missed checkout entries?
-4. How does `my-fences` resolve: branch assignment per employee, projects assigned, or all fences?
-5. Leave year: calendar or financial year? When does carry forward run?
-6. `accrual_mode` values (from `leave-types/accrual-options`)?
-7. Do multi-level leave approvals have named approvers per level (reporting manager chain) or any holder of `approve`?
-8. Can a Pending leave be withdrawn by the employee without manager action?
-9. How are Compensatory Off credits earned (worked on holiday → credit)?
-10. Is an advance salary recovered automatically in the next run?
-11. Does "Mark Salaries as Paid" create accounting entries?
-12. Are salary components fixed amounts or percentages of CTC/Basic?
-13. Is overtime paid in HRMS salary, and at what rate (shift "Overtime Allowed" exists; payslip shows Overtime Hrs)?
-14. Does the Optional Holiday require employee selection, and is there a cap?
-15. Are HRMS employees ever also site labour (e.g. supervisors counted on worksheets)?
+M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-product-decisions.md). Statutory figures follow [ADR CM-0008](../adr/CM-0008-statutory-figures-are-dated-tables.md). Numbers in brackets point at the CM-0012 decision.
+
+**Built in the M3 foundation (CM-302, CM-303)**
+
+- **Where things live.** One context, `hrms` (`construction_hrms`, API `/api/construction/hrms/...`, screens under Workspace → HRMS at `/app/workspace/hrms`). Every M3 table exists from CM-302; later tickets add code, not tables. Team Members, Projects and Designations are read through ports (`src/hrms/application/ports.ts`) implemented with plain reads of the organization and projects tables. A member is a Team Member id (`member_id`).
+- **HRMS Settings** (menu `hrms.settings`): defaults are the legacy values (GPS disabled, 15 min grace, 8 h day, 4 h half day, Monday–Friday, 1 approval level, calendar leave year, carry forward, accrual and auto salary off). Grace 0–120 whole minutes; working hours above 0 and at most 24; half-day hours above 0 and below the working hours (two decimals each); working days unique ISO weekdays, at least one; approval levels 1 or 2; carry-forward cap 0 or more, required only when carry forward is on; the auto salary day is 1–28 (not 31, so it exists every month), required only when auto calculation is on. A switched-off value is cleared. The **PT state** is a GST state code, chosen in Settings (not taken from the Company address, which has no state field). The whole form is saved at once (`POST …/settings/update`, like every other update in the app) with `updatedAt` → 409 `HRMS_SETTINGS_CHANGED`.
+- **Leave ledger signs** (ADR CM-0004): credits are positive (initial, accrual, carry forward, released, restored), debits negative (reserved, used); an adjustment has a reason. Applying reserves; approval releases the reservation and posts `used`; rejection or withdrawal releases; an approved cancellation restores. An accrual period, a year's initial credit and a year's carry forward are posted once (unique indexes).
+- **Professional tax slabs** can differ for men and women (Maharashtra), so the member's gender sits on their salary configuration; without it the general slab applies (ADR CM-0008).
+- **Money on salary slips** is integer paise per column; one member's month fits 32 bits, and totals across members are summed in SQL as `bigint` (ADR CM-0004).
+
+**Branches, holidays and shifts (CM-304 … CM-307)**
+
+1. A fence radius is 25–5,000 whole metres; coordinates keep 6 decimals.
+2. A point is inside a fence when its distance is at most the radius plus the device's accuracy (accuracy allowance capped at 50 m; missing accuracy counts as 0); the boundary is inside.
+3. When several fences match, the nearest centre is the matched fence.
+4. One live site fence per Project; office branch names are unique per Company (ignoring case); a fence's kind never changes.
+5. Member links ("Members who check in here") exist only for office branches; removing a branch removes its links, so those members fall back to every office branch.
+6. `my-fences` needs `hrms.attendance` read; the other branch routes use `hrms.settings`.
+7. Holiday name ≤ 80 characters, description ≤ 500, year 2000–2100.
+8. Adding a holiday passes the Back-dated Entry check for `holiday`; editing or deleting checks the old date and, if it changes, the new one. Holidays are not month-locked.
+9. Holiday import: `.xlsx` only, ≤ 2 MB and 400 rows; dates `YYYY-MM-DD` or `DD/MM/YYYY`; Optional Yes/No (blank = No); duplicates, existing dates and back-dated rows are row errors; the import adds every row or none. It needs `create` (Holiday Management has no import flag).
+10. A shift's working hours cannot exceed its length; start equal to end is a 24-hour shift; a shift that crosses midnight belongs to the day it starts; names ≤ 60 characters.
+11. Rotations: Week has 7 slots from Monday, Month 31 slots from day 1 (days a month lacks are skipped), Custom Cycle 2–12 slots counted from the assignment's start; at least one slot is a shift. The slot decides whether a day is a working day; a Week Off slot carries the Settings hours and no overtime.
+12. A template named by a live rotation slot or by any assignment cannot be deleted (409); deactivating hides it from pickers and keeps existing rotations and assignments working.
+13. A new assignment closes the latest one the day before it starts; the same start date replaces it (a correction); an earlier start is refused (`SHIFT_ASSIGNMENT_BEFORE_LATEST`). Assignments are all-or-nothing across the chosen members and refused in a locked month.
+14. With no assignment (or a missing template) a member works the Settings day, shown as "Standard".
+15. A non-optional holiday wins over a week off; an optional holiday stays a working day.
+
+**Attendance (CM-308, CM-309)**
+
+1. GPS disabled: a location is stored if the phone sends one, with the nearest matching fence; no approval.
+2. Record only: a check-in inside a fence needs no approval; outside every fence, without a location or with no fence configured, it is accepted as pending and marked out of fence. The screen asks for a location and checks in without one if it is refused.
+3. Required: no location is `LOCATION_REQUIRED`; no fence is `OFFICE_LOCATION_NOT_CONFIGURED`; outside is `OUTSIDE_FENCE` with the nearest fence and how far outside.
+4. A check-in belongs to the Company date it happens on, except one before the end of the previous day's midnight-crossing shift, which belongs to that day.
+5. Check Out closes the open entry of its own date (or of the previous date for a midnight-crossing shift, within 24 h); otherwise `ATTENDANCE_OPEN_FROM_EARLIER_DAY`, or `NO_OPEN_ATTENDANCE`. The check-out location is stored but never refused.
+6. A missed checkout is only for an entry left open on an earlier day: after the check-in, within 24 h of it, not in the future, with a reason (3–500 characters); it goes to approvals; the month lock applies, the back-dated check does not.
+7. A back-dated day is before today, passes the Back-dated Entry check for `hrms_attendance`, may cross midnight (equal times refused), needs a reason, may not overlap the member's other non-rejected entries (touching is allowed), and goes to approvals.
+8. Approve and reject are separate flags; only a pending entry can be decided (`ATTENDANCE_NOT_PENDING`, `ATTENDANCE_CHANGED` when stale); nobody decides their own entry except the Owner (`ATTENDANCE_SELF_APPROVAL`); a rejection needs a reason. A rejected open entry no longer blocks check-in.
+9. Day status counts only closed entries that need no approval or are approved: Present at the shift's working hours, Half Day at its half-day hours, else Absent. Holiday wins over week off, which wins over leave, which wins over hours. Work on a holiday or week off keeps that status and counts every hour as overtime. A half-day leave reports the other half as present or absent.
+10. Overtime hours are always shown, with whether the day's shift pays them. Late = first non-rejected check-in after shift start plus grace; a member on the Settings "Standard" day has no start time and is never late.
+11. In the monthly summary and Excel, days after today are listed but not counted.
+12. Team Today states: checked in, checked out, not checked in, on leave, holiday, week off; an entry left open on an earlier day is flagged "Open from earlier".
+13. Permissions on `hrms.attendance`: read → today; create → own check-in, check-out, missed checkout and back-dated day; View All → Team Today; approve / reject → approvals; report → monthly summary; export → Excel. The summary and Excel show everyone with View All, otherwise only the member's own row.
+14. The monthly Excel (Summary and Days sheets) is a direct download built in the hrms context; there is no PDF version.
+15. The Projects home banner shows only to a member who may check in and has not checked in today on a working day; it links to My Attendance.
+16. Every change is audited with before/after and the reason; check-in and check-out both keep coordinates (6 decimals), accuracy and the matched fence.
+
+**Leave (CM-310 … CM-313)**
+
+1. Seeds: Casual Leave 12 days upfront; Compensatory Off (0, paid) and Loss of Pay (0, unpaid) have no credit; Maternity 182, Privilege Leave 15 and Sick 7 are credited monthly on day 1 at 15.17, 1.25 and 0.58 days; only Privilege Leave carries forward (up to 15); every seed needs approval and none allows advance use. Existing Companies got the seeds by migration, skipping names they already had.
+2. A leave type in a live structure, a ledger entry or a request cannot be deleted (`LEAVE_TYPE_IN_USE`); deactivate it instead. Seed types can be edited and deactivated.
+3. A monthly type needs a yearly limit above 0 and a monthly credit no larger than it; the credit day is 1–28.
+4. Without a structure a member gets every active type at its yearly limit. The structure used is the one in force today within the leave year, else the first assignment starting in that year.
+5. Initialise posts an `initial` entry on the balance's start (the later of the year start and the assignment date): the full entitlement for upfront types, 0 otherwise; no pro-rating; it is idempotent.
+6. Accrual credits each month from the balance's start up to today (never past the year end) once the accrual day has come, once per month, capped at the entitlement; the last credit is cut short (Maternity's December credit is 15.13).
+7. Accrual runs only when the Settings switch is on ("Accrue now" answers `LEAVE_ACCRUAL_DISABLED`); the scheduled route (`CRON_SECRET`) skips such Companies and is safe to run daily.
+8. Carry forward = min(unused, type cap, Company cap), posted once when the new year is initialised or accrued; pending requests of the old year count as taken; nothing is carried when the old year has no entries.
+9. Balance adjustments (how Comp Off is credited) need non-zero days (two decimals), a reason of at least 3 characters, and cannot take a balance below 0.
+10. A request stays within one leave year (`LEAVE_SPANS_YEARS`), covers at most 366 calendar days; "max consecutive days" counts leave days; the back-dated guard checks the first day; the month lock is checked on apply, decisions and cancellation requests.
+11. Two requests may share a date only as a Morning and an Afternoon (`LEAVE_OVERLAPS`).
+12. Unpaid types skip the balance check; advance use may go below zero by the credits still to come this year; pending days count as taken.
+13. A type that needs no approval is approved at once, and cancelling it is immediate.
+14. Approve and reject are separate flags (either shows Approvals); nobody decides their own request except the Owner; at level 2 the approver must differ from level 1 (except the Owner); racing approvers get one success and one 409 `LEAVE_REQUEST_CHANGED`.
+15. Withdraw (pending) and request cancellation (approved) are open to the member, whoever applied, or anyone with View All, and need create; refusing a cancellation needs a reason and the request stays approved.
+16. Leave screens show only what the caller may do (`GET /leaves/options`).
+
+**Salary structures, employee salary and the salary calculation (CM-314, CM-315, CM-316, CM-318)**
+
+1. A structure either has one balancing component (other percentages total ≤ 100%; fixed amounts are checked against each member's base) or is all percentages totalling exactly 100% (`SALARY_COMPONENTS_NOT_100_PERCENT`).
+2. Percentage components round half up to the paisa; without a balancing component the last component absorbs the rounding so components always sum to the base.
+3. Component ids survive edits so member overrides stay attached; overrides for removed components are dropped; the balancing component cannot be overridden.
+4. PF applicable needs at least one component that counts for PF wage (`PF_WAGE_COMPONENTS_REQUIRED`).
+5. Proration: each component earns monthly × payable days ÷ days in month (half-day steps). The absent and unpaid deductions are what proration took off, split in proportion.
+6. PF wage is the earned PF components only, never overtime; capped at the structure ceiling or else the table's; employee % from the structure or else the table; employer % always from the table; EPS is the table's EPS % on min(PF wage, table ceiling); EPF = employer − EPS.
+7. Rounding: earnings and overtime half up to the paisa; PF, EPF, EPS half up to the rupee; ESI up to the next rupee.
+8. ESI is on gross earnings including overtime, only when the structure has ESI on and the member is eligible for the contribution period (gross ≤ ceiling at its start; exactly ₹21,000 is eligible). The PwD ceiling and the low-wage exemption are not modelled.
+9. PT is the structure's flat amount (only in a month with earnings), else the Settings state slab on gross earnings and gender; no state means no PT.
+10. Overtime pay = 2 × full-month gross ÷ days in month ÷ that day's shift working hours, rounded per day; all overtime hours are reported, paid hours separately.
+11. Net is never negative: advance recovery is cut first, then other deductions, then PT, and the cut is shown as a shortfall. PF and ESI are never cut.
+12. Day counts are in 0.5 steps and together cannot exceed the month; days not accounted for are paid.
+13. A structure used by a live member configuration cannot be deleted (`SALARY_STRUCTURE_IN_USE`); an inactive structure stays on existing members but cannot be given to new ones; names are unique (`SALARY_STRUCTURE_NAME_TAKEN`).
+14. Employee salary configurations are effective-dated: the same start date updates in place, a later one adds a row (history kept), an earlier one is refused (`EFFECTIVE_FROM_BEFORE_CURRENT`).
+15. Save All is all or none; stale rows return 409 `EMPLOYEE_SALARY_CHANGED` with `details.memberIds`; other errors carry `details.memberId` (and `field`).
+16. Employee Management: a Not Set member needs create, a configured one update; amounts are null without Financial, and sending amounts without Financial is refused; without Financial a member can still change structure, start date, gender, UAN and ESI IP.
+17. An HRMS Team Member is sent from the Projects home to Workspace → HRMS.
+
+**Salary run (CM-316, CM-317)**
+
+1. A month is calculated from attendance's day counts. Days after the Company's today are not counted, so they are paid. Days before the member's first salary configuration starts are never paid and show as "Before joining".
+2. Only Team Members who have joined are calculated. Those who have not joined, are not Configured or whose salary starts later are listed with the reason; removed members are not calculated.
+3. A month can be calculated once it has started (`SALARY_MONTH_IN_FUTURE`). Calculate replaces Calculated slips and keeps Approved and Paid ones; recalculating one slip checks `updatedAt` (`SALARY_SLIP_CHANGED`) and refuses an approved one (`SALARY_SLIP_NOT_CALCULATED`).
+4. ESI eligibility uses the full-month gross (no overtime, no proration) of the member's first regular slip in the contribution period, or this month's when there is none yet.
+5. An advance is a `SalaryAdvance` record plus a Paid advance slip; it needs create and Financial, the member must be Configured, and nobody pays one to themselves except the Owner.
+6. Advance recovery starts in the advance's own month (or the next, if that month is already approved); each instalment is amount ÷ instalments rounded up to the paisa; what net pay could not take stays outstanding, so recovery runs past the planned instalments until done. 1–24 instalments, at most ₹2 crore.
+7. Approval (all or none) is refused on one's own slip except for the Owner (`SALARY_OWN_SLIP`) and twice (`SALARY_SLIP_ALREADY_APPROVED`); each approval writes the member's month lock.
+8. Mark Paid needs update and an Approved slip (`SALARY_NOT_APPROVED`, `SALARY_ALREADY_PAID`); Cash or Bank, a date not after today, an optional reference (≤ 100 characters). Approve and Mark Paid take at most 500 slips per call.
+9. My Salary shows the member's own Approved and Paid slips with amounts; others' amounts are null without Financial; downloading another member's payslip needs View All and Financial.
+10. A regular slip's payslip PDF is stored once (after approval or on its first download) as a `stored_files` row of kind `payslip` and never replaced; advance slips have no payslip. Payslips embed Noto fonts so Indian scripts and ₹ print.
+11. The slip's statutory snapshot keeps the member's name, designation, UAN and ESI IP number as of calculation. Employer EPF (A/c 1) and EPS are kept apart.
+12. Automatic calculation runs for last month on or after the salary day, as `system`, only when that month has no run yet; one Company failing does not stop the others (`CRON_SECRET` route).
+13. The team salary Excel has three sheets: Team salary (with totals), Advances and Not calculated; amounts are blank without Financial.
+
+**HRMS dashboard (CM-319)**
+
+1. The dashboard needs `hrms.hrms` read; each section needs its own flag and is hidden without it: team snapshot, breakdown and trend (attendance View All), approvals (approve or reject on attendance or leave), team leaves (leave View All), holidays (`hrms.holidays` read); the member's own day, balances and requests show to every Team Member with attendance or leave read.
+2. Today's breakdown and the trend follow the day status; today only, someone checked in right now counts as Present; "Absent" today includes everyone not checked in yet.
+3. The trend covers the last 14 Company dates including today; today's bar equals today's breakdown.
+4. Tiles: Present today (present + half day), On leave (half-day leave included), Not checked in, Employees (active Team Members, the Owner included).
+5. Pending approvals list only what the caller can decide now, oldest first, at most 5; upcoming team leaves run 14 days and include pending requests; the next 4 holidays are shown with optional ones flagged.
+6. The Workspace HRMS tile shows "Present today x of y", "On leave" and "To approve" to members with View All, their own day otherwise, and stays a plain link without HRMS access.
+
+**PF / ESI exports and polish (CM-320)**
+
+1. The PF ECR follows EPFO's ECR 2.0 file structure (unchanged by the 2025 revamp): 11 fields separated by `#~#`, no header, CRLF line ends, whole rupees rounded half up, refund of advances 0.
+2. EPF wage is the PF wage after the ceiling; EPS wage and EDLI wage are capped at the statutory ceiling.
+3. NCP days = days in the month − payable days, rounded down (EPFO allows no half days); a member paid nothing gets every day.
+4. A month can be exported only when it has a regular slip and none is still Calculated (`SALARY_MONTH_NOT_APPROVED`). Exports need export and Financial on `hrms.salaries`.
+5. The `.txt` holds members with a UAN; the Excel adds a "Missing UAN" sheet. UAN and IP number come from the slip, or the current salary configuration when the slip has none.
+6. The ESI export covers slips where ESI was deducted: "MC upload" (the six template columns), "Contributions" (with shares and totals), "Missing IP Number" and "Reason codes". Days paid round up; reason code is 0; last working day is blank (exits are not recorded). ESIC wants `.xls`, so the sheet says to save it as Excel 97-2003 before uploading.
+7. Team Salary has an Export menu: Team salary (Excel), PF ECR (.txt / Excel) and ESI contribution (Excel), the statutory items disabled until the month is approved, with a note counting members missing a UAN or IP number.
+8. A 403 on an HRMS page shows "You don't have access to {page}" under the tabs; loading shows a skeleton.
+9. Crons run daily: leave accrual 00:30 UTC (06:00 IST) and automatic salary calculation 01:00 UTC (06:30 IST).
+
+## Open questions (answered in CM-0012)
+
+1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
+2. Full attendance day status enum (only Absent = 3 observed). → CM-0012 §2
+3. Does a normal on-fence check-in ever need approval, or only manual / missed checkout entries? → CM-0012 §3
+4. How does `my-fences` resolve: branch assignment per employee, projects assigned, or all fences? → CM-0012 §4
+5. Leave year: calendar or financial year? When does carry forward run? → CM-0012 §6
+6. `accrual_mode` values (from `leave-types/accrual-options`)? → CM-0012 §7
+7. Do multi-level leave approvals have named approvers per level (reporting manager chain) or any holder of `approve`? → CM-0012 §5
+8. Can a Pending leave be withdrawn by the employee without manager action? → CM-0012 §8
+9. How are Compensatory Off credits earned (worked on holiday → credit)? → CM-0012 §9
+10. Is an advance salary recovered automatically in the next run? → CM-0012 §15
+11. Does "Mark Salaries as Paid" create accounting entries? → CM-0012 §16
+12. Are salary components fixed amounts or percentages of CTC/Basic? → CM-0012 §12
+13. Is overtime paid in HRMS salary, and at what rate (shift "Overtime Allowed" exists; payslip shows Overtime Hrs)? → CM-0012 §14
+14. Does the Optional Holiday require employee selection, and is there a cap? → CM-0012 §11
+15. Are HRMS employees ever also site labour (e.g. supervisors counted on worksheets)? → CM-0012 §18

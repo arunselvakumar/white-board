@@ -22,6 +22,13 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "26mb",
   },
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
+  // Payslip PDFs embed Noto fonts read from node_modules at run time
+  // (`src/shared-kernel/pdf/noto-text.ts`), which tracing cannot see.
+  outputFileTracingIncludes: {
+    "/api/construction/hrms/salaries/**/*": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+  },
   // The Prisma client is generated inside the db package (ADR-0040) and
   // bundled into the server chunks, so it looks for its query engine next to
   // the chunk, not in the package. Copy the engine there.

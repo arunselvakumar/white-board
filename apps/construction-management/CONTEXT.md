@@ -211,6 +211,136 @@ For a period: owed before it, earned in it (wages + OT), and owed at its end aft
 The monthly combined attendance and wage register for the Company's own Labours, printed for labour-law inspection.
 _Avoid_: attendance sheet
 
+### HRMS (staff attendance, leave and salary)
+
+**HRMS**:
+The Workspace area for the Company's own salaried staff: check-in attendance, shifts, holidays, leave and monthly salary ([`modules/10`](./docs/modules/10-hrms.md)). Separate from Labour attendance and wages; the two registers never mix. Spelt in capitals.
+_Avoid_: HR, payroll (for the whole area), Hrms
+
+**Employee**:
+A Team Member as HRMS pays them: a monthly salary, attendance on their own phone. The word names only the Employees page (Employee Management, each member's salary set-up); everywhere else say Team Member or member. An Employee is a User; a Labour is a record that never signs in, and nobody is both (ADR CM-0012 §18).
+_Avoid_: staff, worker, labour (for an Employee); employee (for a Labour)
+
+**HRMS Team Member**:
+A Team Member whose Member Type is HRMS: attendance, leave and salary only, no Projects. Counts against the plan's HRMS seats; the Projects home sends them to Workspace → HRMS.
+_Avoid_: HRMS user, HRMS employee
+
+**Branch**:
+An office the Company's people check in at: a name and a fence (a point and a radius of 25–5,000 m). Members can be linked to Branches; a member linked to none may check in at any Branch.
+_Avoid_: office (for the record), location, geofence (alone)
+
+**Site fence**:
+The check-in fence on a Project's site, one per Project, for the Team Members assigned to that Project. Branches and Site fences are listed together on Branches & Sites.
+_Avoid_: project branch, site branch, geofence (alone)
+
+**GPS requirement**:
+How HRMS Settings treats the location at check-in: **Disabled** (no location needed), **Record only** (captured if the phone gives one; Outside fence goes to approvals) or **Required** (Outside fence is refused).
+_Avoid_: GPS mode, location policy
+
+**Check in / Check out**:
+Starting and ending one attendance entry on the member's own phone. A day may have several entries; at most one is open. Buttons say "Check In" and "Check Out"; the nouns are check-in and check-out.
+_Avoid_: punch in / out, clock in / out, log in / out, mark attendance
+
+**Missed checkout**:
+A check-out added later, with a reason, to an entry left open on an earlier day. It waits in Attendance Approvals.
+_Avoid_: forgotten checkout, regularisation
+
+**Back-dated attendance**:
+A whole past day (check-in and check-out times) added later with a reason; on screens "Add Back-dated Attendance". It passes the Back-dated Entry check and waits in Attendance Approvals.
+_Avoid_: manual attendance, regularisation, backdate
+
+**Outside fence**:
+A check-in farther from every fence that applies to the member than its radius (plus the phone's accuracy, at most 50 m). Refused when GPS is Required; accepted and sent for approval when it is Record only.
+_Avoid_: out of range, geofence violation
+
+**Day status**:
+What one member's day counts as: **Present**, **Half Day**, **Absent**, **On Leave**, **Holiday** or **Week Off** (grid letters P, HD, A, L, H, WO). Holiday wins over Week Off, which wins over On Leave, which wins over hours worked. **Late** is a flag beside the status, never a status. Not the Labour Attendance statuses, though the words match.
+_Avoid_: leave (for On Leave), off, weekend, holiday (for a Week Off)
+
+**Shift**:
+A template of the working day: start and end, working hours, half-day hours, grace period and whether overtime is paid. A member with no Shift works the HRMS Settings day, shown as "Standard". Shift Management assigns Shifts and Rotations from a date until changed.
+_Avoid_: timing, schedule (for the template); shift (for a Labour Transfer)
+
+**Rotation**:
+A repeating cycle of Shifts and Week Offs: Week (7 slots from Monday), Month (31 slots from day 1) or Custom Cycle (2–12 slots from the assignment's start).
+_Avoid_: roster, rota, shift pattern
+
+**Leave type**:
+A kind of leave: Casual, Sick, Privilege, Maternity, Compensatory Off, Loss of Pay (seeded) or the Company's own. Paid or unpaid, a yearly limit, how it is credited, carry forward and whether it needs approval.
+_Avoid_: leave category, leave code
+
+**Leave structure**:
+A named bundle of Leave types with each one's yearly entitlement, assigned to members from a date. A member with none gets every active Leave type at its yearly limit.
+_Avoid_: leave policy, leave plan, leave template
+
+**Leave balance**:
+What a member has left of one Leave type in a leave year (calendar year, or financial year labelled "26-27"). It is the sum of ledger entries (initial, accrual, carry forward, adjustment, reserved, released, used, restored), never a stored number (ADR CM-0004); pending requests count as taken.
+_Avoid_: leave quota, leaves left, leave count
+
+**Accrual**:
+Leave credited month by month on the accrual day, up to the entitlement, when "Credit leave every month" is on in HRMS Settings. Upfront types (Casual) are credited in full when the balance is initialised instead.
+_Avoid_: leave credit run, earned leave (for the process)
+
+**Carry forward**:
+Unused days of a Leave type brought into the next leave year, capped by the type's maximum and the Company's, posted once.
+_Avoid_: rollover, encashment (not built)
+
+**Leave request**:
+An application for leave days, each Full, Morning or Afternoon. States: **Pending**, **Approved**, **Rejected**, **Withdrawn** (taken back while pending), **Cancellation requested** (approved, cancellation asked for) and **Cancelled**.
+_Avoid_: leave application (in UI copy), leave ticket, revoked
+
+**Salary structure**:
+A template of how a monthly salary is made up: Components, PF, ESI, PT, other deductions, and whether absent days and unpaid leave are deducted. Members get one in Employees with their base salary.
+_Avoid_: CTC template, pay grade, salary template
+
+**Component**:
+One earnings line of a Salary structure (Basic, HRA, Special Allowance…): a fixed monthly amount or a percentage of the member's base salary, marked when it counts for PF wage.
+_Avoid_: head, pay head, allowance (for every line)
+
+**Balancing component**:
+The one Component that takes the base salary less the others, so the Components always add up to the base. A member's override never changes it.
+_Avoid_: residual, plug, remainder
+
+**Salary run**:
+Working out a month's Salary slips for every Configured Team Member, from attendance and leave: by hand (Calculate Salary on Team Salary) or automatically on the salary day. Running it again replaces Calculated slips and keeps Approved and Paid ones.
+_Avoid_: payroll, payroll run, process salary
+
+**Salary slip**:
+One member's month in figures: day counts, earnings, deductions, employer contributions and net payable. **Calculated** → **Approved** → **Paid**. A Salary advance has a slip of its own.
+_Avoid_: pay record, salary entry, payslip (for the record)
+
+**Payslip**:
+The PDF of an Approved or Paid Salary slip, stored once and never changed. Members download their own from My Salary.
+_Avoid_: salary slip (for the PDF), pay stub, salary certificate
+
+**Salary advance**:
+Salary paid ahead of the month ("Pay Advance"), with a number of instalments; later Salary slips recover it automatically and show "Advance recovered". Not the Labour Advance on the Labour ledger.
+_Avoid_: loan, salary loan
+
+**Month lock**:
+Approving a member's Salary slip closes their month: attendance entries, leave requests and leave decisions dated in it are refused (`MONTH_LOCKED`), and corrections wait for the next month.
+_Avoid_: freeze, period close, payroll lock
+
+**PF / EPF / EPS / EDLI**:
+Provident Fund: 12% of the PF wage from the member and 12% from the Company. The Company's 12% splits into EPS (Employees' Pension Scheme: 8.33% of the PF wage up to ₹15,000) and EPF (Employees' Provident Fund, A/c 1: the rest). EDLI (Employees' Deposit Linked Insurance) is reported on the EPF wage up to ₹15,000. Rates and ceilings are dated tables (ADR CM-0008).
+_Avoid_: provident fund (after the first use), pension (for EPS)
+
+**ESI**:
+Employees' State Insurance: 0.75% of gross earnings from the member and 3.25% from the Company, for a member whose gross was within ₹21,000 at the start of the contribution period (April–September, October–March). The member's ESI number is the **IP number** (Insured Person).
+_Avoid_: ESIC (that is the Corporation), medical insurance, mediclaim
+
+**PT**:
+Professional Tax: a monthly state tax by salary slab for the PT state in HRMS Settings (some states differ for women), or a flat amount set on the Salary structure.
+_Avoid_: profession tax, P.Tax
+
+**UAN**:
+Universal Account Number: the member's 12-digit PF number, entered in Employees.
+_Avoid_: PF number, PF account number
+
+**ECR**:
+Electronic Challan cum Return: the EPFO's monthly PF upload, exported with the ESI contribution file from an approved month on Team Salary (Export → PF ECR). Members without a UAN, or without an IP number for ESI, are listed in the Excel instead of the upload.
+_Avoid_: PF challan (that is the payment), PF return file
+
 ### Money
 
 **Amount**:
@@ -219,28 +349,39 @@ _Avoid_: price (unless it is a rate), cost
 
 ## Say / do not say
 
-| Say                  | Do not say (in UI copy)         |
-| -------------------- | ------------------------------- |
-| Company              | organization, tenant, org, firm |
-| Team Member          | user, employee, staff           |
-| Owner                | admin, super admin              |
-| Designation          | role, position                  |
-| Permission Matrix    | roles, ACL                      |
-| Labour               | worker, labourer                |
-| Vendor (labour gang) | supplier, contractor            |
-| Supplier (material)  | vendor                          |
-| Project              | site, job                       |
-| Wing / Unit          | tower, block, flat              |
-| Daily Worksheet      | daily log                       |
-| Inquiry              | enquiry, lead                   |
-| Sequence ID          | serial number                   |
-| Back-dated Entry     | backdate                        |
-| Sign in / Sign up    | log in, register                |
-| Labours (plural)     | labourers, workers              |
-| Rate Card            | price list                      |
-| Wage Payment         | salary (for Labours)            |
-| Client               | customer                        |
-| PO / WO (Client)     | purchase order (alone)          |
-| Tender / RFQ ref.    | enquiry ref.                    |
+| Say                   | Do not say (in UI copy)         |
+| --------------------- | ------------------------------- |
+| Company               | organization, tenant, org, firm |
+| Team Member           | user, employee, staff           |
+| Owner                 | admin, super admin              |
+| Designation           | role, position                  |
+| Permission Matrix     | roles, ACL                      |
+| Labour                | worker, labourer                |
+| Vendor (labour gang)  | supplier, contractor            |
+| Supplier (material)   | vendor                          |
+| Project               | site, job                       |
+| Wing / Unit           | tower, block, flat              |
+| Daily Worksheet       | daily log                       |
+| Inquiry               | enquiry, lead                   |
+| Sequence ID           | serial number                   |
+| Back-dated Entry      | backdate                        |
+| Sign in / Sign up     | log in, register                |
+| Labours (plural)      | labourers, workers              |
+| Rate Card             | price list                      |
+| Wage Payment          | salary (for Labours)            |
+| Client                | customer                        |
+| PO / WO (Client)      | purchase order (alone)          |
+| Tender / RFQ ref.     | enquiry ref.                    |
+| HRMS                  | HR, payroll (for the area)      |
+| Check In / Check Out  | punch in, clock in, log in      |
+| Back-dated Attendance | regularisation, manual entry    |
+| Rotation              | roster, rota                    |
+| Leave structure       | leave policy                    |
+| Leave balance         | leave quota                     |
+| Salary run            | payroll                         |
+| Payslip               | pay stub, salary certificate    |
+| Salary advance        | loan                            |
+| Month lock            | freeze, period close            |
+| IP number (ESI)       | ESIC number                     |
 
 `Workspace` appears in code because `@repo/auth` calls a Company a Workspace. It never appears in UI copy as the tenant; on screens "Workspace" names only the cross-project area.

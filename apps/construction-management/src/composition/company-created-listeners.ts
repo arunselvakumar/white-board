@@ -1,3 +1,4 @@
+import { SeedCompanyLeaveTypesListener } from "@/src/hrms/infrastructure/seed-company-leave-types";
 import { SeedCompanyMastersListener } from "@/src/masters/infrastructure/seed-company-masters";
 import type { DomainEventListener } from "@/src/shared-kernel/events";
 
@@ -8,5 +9,8 @@ import type { DomainEventListener } from "@/src/shared-kernel/events";
  * context's listener here when it gains per-Company seeds.
  */
 export function companyCreatedListeners(): DomainEventListener[] {
-  return [new SeedCompanyMastersListener()];
+  return [
+    new SeedCompanyMastersListener(),
+    new SeedCompanyLeaveTypesListener(),
+  ];
 }
