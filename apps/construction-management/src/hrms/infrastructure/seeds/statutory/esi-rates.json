@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "effectiveFrom": "2019-07-01",
+      "wageCeiling": 2100000,
+      "pwdWageCeiling": 2500000,
+      "employeePercent": "0.75",
+      "employerPercent": "3.25",
+      "source": "ESI (Central) Rules 1950 r.51 as amended by GSR 423(E), 13 Jun 2019 (0.75% / 3.25% from 1 Jul 2019); wage ceiling Rs 21,000 (Rs 25,000 for persons with disability) from 1 Jan 2017"
+    }
+  ]
+}

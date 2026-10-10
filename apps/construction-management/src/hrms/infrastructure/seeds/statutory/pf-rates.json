@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "effectiveFrom": "2014-09-01",
+      "wageCeiling": 1500000,
+      "employeePercent": "12.00",
+      "employerPercent": "12.00",
+      "epsPercent": "8.33",
+      "source": "EPF Scheme 1952 para 2(f) as amended by GSR 609(E), 22 Aug 2014 (wage ceiling Rs 15,000 from 1 Sep 2014); EPF & MP Act 1952 s.6 (12%); EPS 1995 (8.33% of wage up to the ceiling)"
+    }
+  ]
+}

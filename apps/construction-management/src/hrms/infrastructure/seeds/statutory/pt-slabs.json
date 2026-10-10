@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "notes": "Monthly gross in paise, inclusive bounds; only slabs that charge tax are listed, so a gross outside every slab pays nothing. Gujarat (exemption limit date unconfirmed) and Tamil Nadu (half-yearly, set by each local body) are not seeded yet. Where the date a slab first applied is not confirmed, effectiveFrom is the start of FY 2025-26, when it is known to be in force; earlier months have no PT row.",
+  "rows": [
+    {
+      "stateCode": "29",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 2500000,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": 2,
+      "specialMonthAmount": 30000,
+      "source": "Karnataka Tax on Professions, Trades, Callings and Employments Act 1976, Schedule entry 1 as amended by Karnataka Act 33 of 2025 (from 1 Apr 2025): Rs 25,000 and above, Rs 200 a month, Rs 300 in February"
+    },
+    {
+      "stateCode": "27",
+      "effectiveFrom": "2023-04-01",
+      "appliesTo": "men",
+      "grossFrom": 750001,
+      "grossTo": 1000000,
+      "monthlyAmount": 17500,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "Maharashtra State Tax on Professions, Trades, Callings and Employments Act 1975, Schedule I entry 1 (as in force from 1 Apr 2023): men above Rs 7,500 up to Rs 10,000, Rs 175"
+    },
+    {
+      "stateCode": "27",
+      "effectiveFrom": "2023-04-01",
+      "appliesTo": "men",
+      "grossFrom": 1000001,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": 2,
+      "specialMonthAmount": 30000,
+      "source": "Maharashtra State Tax on Professions, Trades, Callings and Employments Act 1975, Schedule I entry 1 (as in force from 1 Apr 2023): men above Rs 10,000, Rs 200 a month, Rs 300 in February"
+    },
+    {
+      "stateCode": "27",
+      "effectiveFrom": "2023-04-01",
+      "appliesTo": "women",
+      "grossFrom": 2500001,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": 2,
+      "specialMonthAmount": 30000,
+      "source": "Maharashtra State Tax on Professions, Trades, Callings and Employments Act 1975, Schedule I entry 1 as amended from 1 Apr 2023: women up to Rs 25,000 exempt; above, Rs 200 a month, Rs 300 in February"
+    },
+    {
+      "stateCode": "36",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 1500001,
+      "grossTo": 2000000,
+      "monthlyAmount": 15000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "Telangana Tax on Professions, Trades, Callings and Employments Act 1987, Schedule entry 1 (in force FY 2025-26): above Rs 15,000 up to Rs 20,000, Rs 150"
+    },
+    {
+      "stateCode": "36",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 2000001,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "Telangana Tax on Professions, Trades, Callings and Employments Act 1987, Schedule entry 1 (in force FY 2025-26): above Rs 20,000, Rs 200"
+    },
+    {
+      "stateCode": "37",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 1500001,
+      "grossTo": 2000000,
+      "monthlyAmount": 15000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "Andhra Pradesh Tax on Professions, Trades, Callings and Employments Act 1987, Schedule entry 1 (in force FY 2025-26): above Rs 15,000 up to Rs 20,000, Rs 150"
+    },
+    {
+      "stateCode": "37",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 2000001,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "Andhra Pradesh Tax on Professions, Trades, Callings and Employments Act 1987, Schedule entry 1 (in force FY 2025-26): above Rs 20,000, Rs 200"
+    },
+    {
+      "stateCode": "19",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 1000001,
+      "grossTo": 1500000,
+      "monthlyAmount": 11000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "West Bengal State Tax on Professions, Trades, Callings and Employments Act 1979, Schedule I entry 1 (in force FY 2025-26): above Rs 10,000 up to Rs 15,000, Rs 110"
+    },
+    {
+      "stateCode": "19",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 1500001,
+      "grossTo": 2500000,
+      "monthlyAmount": 13000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "West Bengal State Tax on Professions, Trades, Callings and Employments Act 1979, Schedule I entry 1 (in force FY 2025-26): above Rs 15,000 up to Rs 25,000, Rs 130"
+    },
+    {
+      "stateCode": "19",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 2500001,
+      "grossTo": 4000000,
+      "monthlyAmount": 15000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "West Bengal State Tax on Professions, Trades, Callings and Employments Act 1979, Schedule I entry 1 (in force FY 2025-26): above Rs 25,000 up to Rs 40,000, Rs 150"
+    },
+    {
+      "stateCode": "19",
+      "effectiveFrom": "2025-04-01",
+      "appliesTo": "everyone",
+      "grossFrom": 4000001,
+      "grossTo": null,
+      "monthlyAmount": 20000,
+      "specialMonth": null,
+      "specialMonthAmount": null,
+      "source": "West Bengal State Tax on Professions, Trades, Callings and Employments Act 1979, Schedule I entry 1 (in force FY 2025-26): above Rs 40,000, Rs 200"
+    }
+  ]
+}

@@ -1,0 +1,1074 @@
+/// Construction Management — hrms context (ADR CM-0001, `modules/10`): the
+/// Company's own staff (Team Members) and their settings, geo-fences,
+/// holidays, shifts, attendance, leave and monthly salary. Separate from
+/// site Labour (`construction_labour`); the two registers never share a
+/// table (ADR CM-0012 §18).
+///
+/// Team Members, Projects and Companies are ids from other contexts
+/// (`member_id` is `construction_organization.team_members.id`), never
+/// joined. Money is integer paise; one amount fits 32 bits and sums are
+/// computed in SQL as `bigint` (ADR CM-0004). Leave balances are never
+/// stored: they are the sum of immutable leave ledger entries (ADR CM-0004).
+/// Statutory figures are platform-wide, effective-dated rows (ADR CM-0008).
+/// Product decisions behind the columns are in ADR CM-0012. CHECK
+/// constraints and partial unique indexes are hand-written in the
+/// migration.
+
+// ---------------------------------------------------------------------------
+// Settings (CM-303)
+// ---------------------------------------------------------------------------
+
+/// How check-in treats the device location (ADR CM-0012 §1).
+enum ConstructionHrmsGpsRequirement {
+  /// Check in without a location.
+  disabled
+  /// Location captured if given; outside every fence goes to approvals.
+  record_only
+  /// Outside every fence is refused (`OUTSIDE_FENCE`).
+  required
+
+  @@map("gps_requirement")
+  @@schema("construction_hrms")
+}
+
+/// When a leave year starts (ADR CM-0012 §6).
+enum ConstructionHrmsLeaveYear {
+  /// January–December, keyed "2026".
+  calendar
+  /// April–March, keyed "26-27".
+  financial
+
+  @@map("leave_year")
+  @@schema("construction_hrms")
+}
+
+/// HRMS Settings (CM-303): one row per Company, written on the first save.
+/// No row means the defaults of ADR CM-0012 (`HrmsSettings` in the hrms
+/// domain holds them and every rule).
+model ConstructionHrmsSettings {
+  id                    String                         @id @db.Uuid
+  workspaceId           String                         @unique @map("workspace_id")
+  gpsRequirement        ConstructionHrmsGpsRequirement @default(disabled) @map("gps_requirement")
+  /// Minutes of late check-in tolerated, 0–120. A shift's own grace wins.
+  graceMinutes          Int                            @default(15) @map("grace_minutes")
+  /// 0 < hours ≤ 24, two decimals.
+  workingHoursPerDay    Decimal                        @default(8) @map("working_hours_per_day") @db.Decimal(4, 2)
+  /// 0 < hours < working hours.
+  halfDayHours          Decimal                        @default(4) @map("half_day_hours") @db.Decimal(4, 2)
+  /// ISO weekdays, 1 = Monday … 7 = Sunday; unique, at least one.
+  workingDays           Int[]                          @map("working_days")
+  /// 1 or 2; a leave type may ask for its own.
+  leaveApprovalLevels   Int                            @default(1) @map("leave_approval_levels")
+  leaveYear             ConstructionHrmsLeaveYear      @default(calendar) @map("leave_year")
+  carryForwardEnabled   Boolean                        @default(false) @map("carry_forward_enabled")
+  /// Days, ≥ 0; set exactly when carry forward is enabled.
+  carryForwardMaxDays   Decimal?                       @map("carry_forward_max_days") @db.Decimal(5, 2)
+  leaveAccrualEnabled   Boolean                        @default(false) @map("leave_accrual_enabled")
+  autoSalaryCalculation Boolean                        @default(false) @map("auto_salary_calculation")
+  /// Day of the month, 1–28; set exactly when auto salary calculation is on.
+  salaryCalculationDay  Int?                           @map("salary_calculation_day")
+  /// GST state code (`shared-kernel/gst-states`) whose PT slabs apply; null = no PT by slab.
+  ptStateCode           String?                        @map("pt_state_code") @db.Char(2)
+  createdAt             DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                       @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy             String                         @map("created_by")
+  updatedBy             String                         @map("updated_by")
+
+  @@map("settings")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Branches and geo-fences (CM-304)
+// ---------------------------------------------------------------------------
+
+enum ConstructionHrmsBranchKind {
+  office_branch
+  project_site
+
+  @@map("branch_kind")
+  @@schema("construction_hrms")
+}
+
+/// A geo-fence: an office branch, or a site fence on a Project (CM-304). A
+/// point and a radius in metres. Which fences apply to a member is ADR
+/// CM-0012 §4: their linked office branches (any office branch when linked
+/// to none) plus the site fences of their Projects.
+model ConstructionHrmsBranch {
+  id           String                     @id @db.Uuid
+  workspaceId  String                     @map("workspace_id")
+  kind         ConstructionHrmsBranchKind
+  /// "Branch Name" for an office branch, "Site label" for a project site.
+  name         String
+  address      String?
+  /// Set exactly for a project site (projects context id).
+  projectId    String?                    @map("project_id") @db.Uuid
+  latitude     Decimal                    @db.Decimal(9, 6)
+  longitude    Decimal                    @db.Decimal(9, 6)
+  radiusMetres Int                        @map("radius_metres")
+  createdAt    DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy    String                     @map("created_by")
+  updatedBy    String                     @map("updated_by")
+  deletedAt    DateTime?                  @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                    @map("deleted_by")
+
+  members ConstructionHrmsMemberBranch[]
+
+  @@index([workspaceId, kind])
+  @@index([workspaceId, projectId])
+  @@map("branches")
+  @@schema("construction_hrms")
+}
+
+/// The office branches a member checks in at (ADR CM-0012 §4). A link:
+/// removing it deletes the row.
+model ConstructionHrmsMemberBranch {
+  workspaceId String   @map("workspace_id")
+  memberId    String   @map("member_id") @db.Uuid
+  branchId    String   @map("branch_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  branch ConstructionHrmsBranch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, branchId])
+  @@index([workspaceId, branchId])
+  @@map("member_branches")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Holidays (CM-305)
+// ---------------------------------------------------------------------------
+
+enum ConstructionHrmsHolidayType {
+  national
+  festival
+  company
+
+  @@map("holiday_type")
+  @@schema("construction_hrms")
+}
+
+/// A Company holiday (CM-305). One live holiday per date (partial unique
+/// index). An optional holiday is a working day unless taken as leave (ADR
+/// CM-0012 §11).
+model ConstructionHrmsHoliday {
+  id          String                      @id @db.Uuid
+  workspaceId String                      @map("workspace_id")
+  name        String
+  holidayDate DateTime                    @map("holiday_date") @db.Date
+  type        ConstructionHrmsHolidayType
+  isOptional  Boolean                     @default(false) @map("is_optional")
+  description String?
+  createdAt   DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                    @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                      @map("created_by")
+  updatedBy   String                      @map("updated_by")
+  deletedAt   DateTime?                   @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                     @map("deleted_by")
+
+  @@index([workspaceId, holidayDate])
+  @@map("holidays")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Shifts, rotations and assignments (CM-306, CM-307)
+// ---------------------------------------------------------------------------
+
+/// A shift template (CM-306). Times are `HH:MM` in the Company time zone;
+/// an end at or before the start crosses midnight. Names are unique among
+/// live templates.
+model ConstructionHrmsShiftTemplate {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  name            String
+  startTime       String    @map("start_time") @db.Char(5)
+  endTime         String    @map("end_time") @db.Char(5)
+  /// ISO weekdays, 1 = Monday … 7 = Sunday.
+  workingDays     Int[]     @map("working_days")
+  workingHours    Decimal   @map("working_hours") @db.Decimal(4, 2)
+  halfDayHours    Decimal   @map("half_day_hours") @db.Decimal(4, 2)
+  /// Overrides the Settings grace for members on this shift.
+  graceMinutes    Int       @map("grace_minutes")
+  /// Overtime is paid only on a day whose shift allows it (ADR CM-0012 §14).
+  overtimeAllowed Boolean   @default(false) @map("overtime_allowed")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String    @map("created_by")
+  updatedBy       String    @map("updated_by")
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?   @map("deleted_by")
+
+  rotationSlots ConstructionHrmsRotationSlot[]
+  assignments   ConstructionHrmsShiftAssignment[]
+
+  @@index([workspaceId])
+  @@map("shift_templates")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsRotationType {
+  week
+  month
+  custom_cycle
+
+  @@map("rotation_type")
+  @@schema("construction_hrms")
+}
+
+/// A rotation of shifts (CM-306): an ordered cycle of slots, each a shift
+/// or a week off. The cycle starts on the assignment's `effective_from`.
+model ConstructionHrmsRotationTemplate {
+  id           String                       @id @db.Uuid
+  workspaceId  String                       @map("workspace_id")
+  name         String
+  rotationType ConstructionHrmsRotationType @map("rotation_type")
+  /// Slots in one cycle: 2–12 for a custom cycle; set by the type otherwise.
+  daysPerCycle Int?                         @map("days_per_cycle")
+  isActive     Boolean                      @default(true) @map("is_active")
+  createdAt    DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy    String                       @map("created_by")
+  updatedBy    String                       @map("updated_by")
+  deletedAt    DateTime?                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                      @map("deleted_by")
+
+  slots       ConstructionHrmsRotationSlot[]
+  assignments ConstructionHrmsShiftAssignment[]
+
+  @@index([workspaceId])
+  @@map("rotation_templates")
+  @@schema("construction_hrms")
+}
+
+/// One slot of a rotation, in order from 0. A slot is a shift or a week off
+/// (exactly one).
+model ConstructionHrmsRotationSlot {
+  id              String  @id @db.Uuid
+  rotationId      String  @map("rotation_id") @db.Uuid
+  position        Int
+  shiftTemplateId String? @map("shift_template_id") @db.Uuid
+  isWeekOff       Boolean @default(false) @map("is_week_off")
+
+  rotation      ConstructionHrmsRotationTemplate @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  shiftTemplate ConstructionHrmsShiftTemplate?   @relation(fields: [shiftTemplateId], references: [id], onDelete: Restrict)
+
+  @@unique([rotationId, position])
+  @@map("rotation_slots")
+  @@schema("construction_hrms")
+}
+
+/// A member's shift or rotation from a date, "until changed" (CM-307):
+/// `effective_to` null runs on. Assigning a new one closes the open one the
+/// day before. Exactly one of shift and rotation; at most one open
+/// assignment per member (partial unique index).
+model ConstructionHrmsShiftAssignment {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  memberId           String    @map("member_id") @db.Uuid
+  shiftTemplateId    String?   @map("shift_template_id") @db.Uuid
+  rotationTemplateId String?   @map("rotation_template_id") @db.Uuid
+  effectiveFrom      DateTime  @map("effective_from") @db.Date
+  /// Inclusive; null = until changed.
+  effectiveTo        DateTime? @map("effective_to") @db.Date
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String    @map("created_by")
+  updatedBy          String    @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?   @map("deleted_by")
+
+  shiftTemplate    ConstructionHrmsShiftTemplate?    @relation(fields: [shiftTemplateId], references: [id], onDelete: Restrict)
+  rotationTemplate ConstructionHrmsRotationTemplate? @relation(fields: [rotationTemplateId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, memberId, effectiveFrom])
+  @@map("shift_assignments")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Attendance (CM-308, CM-309)
+// ---------------------------------------------------------------------------
+
+enum ConstructionHrmsAttendanceSource {
+  /// The member checked in on their phone.
+  check_in
+  /// Back-dated: both times typed in later.
+  manual
+  /// A checkout added later to an entry left open.
+  missed_checkout
+
+  @@map("attendance_source")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsApprovalStatus {
+  /// Needs no approval: an on-fence (or GPS-disabled) check-in.
+  none
+  pending
+  approved
+  rejected
+
+  @@map("approval_status")
+  @@schema("construction_hrms")
+}
+
+/// One check-in/check-out pair (CM-308). A day can have several. At most
+/// one open entry (no checkout) per member (partial unique index). Manual
+/// entries, missed checkouts and `record_only` out-of-fence check-ins need
+/// approval (ADR CM-0012 §3). Hours are derived from the times; the day
+/// status (present, half day…) is derived, never stored.
+model ConstructionHrmsAttendanceEntry {
+  id                String                           @id @db.Uuid
+  workspaceId       String                           @map("workspace_id")
+  memberId          String                           @map("member_id") @db.Uuid
+  /// The attendance day, in the Company time zone (the check-in's day).
+  attendanceDate    DateTime                         @map("attendance_date") @db.Date
+  checkInAt         DateTime                         @map("check_in_at") @db.Timestamptz(3)
+  checkInLatitude   Decimal?                         @map("check_in_latitude") @db.Decimal(9, 6)
+  checkInLongitude  Decimal?                         @map("check_in_longitude") @db.Decimal(9, 6)
+  /// Metres, as the device reported it.
+  checkInAccuracy   Decimal?                         @map("check_in_accuracy") @db.Decimal(8, 2)
+  /// The fence matched at check-in, if any.
+  checkInBranchId   String?                          @map("check_in_branch_id") @db.Uuid
+  checkOutAt        DateTime?                        @map("check_out_at") @db.Timestamptz(3)
+  checkOutLatitude  Decimal?                         @map("check_out_latitude") @db.Decimal(9, 6)
+  checkOutLongitude Decimal?                         @map("check_out_longitude") @db.Decimal(9, 6)
+  checkOutAccuracy  Decimal?                         @map("check_out_accuracy") @db.Decimal(8, 2)
+  checkOutBranchId  String?                          @map("check_out_branch_id") @db.Uuid
+  source            ConstructionHrmsAttendanceSource
+  approvalStatus    ConstructionHrmsApprovalStatus   @default(none) @map("approval_status")
+  /// Accepted outside every fence under `record_only`.
+  outOfFence        Boolean                          @default(false) @map("out_of_fence")
+  /// Why it was entered late or out of fence.
+  reason            String?
+  /// User id of the approver or rejecter.
+  decidedBy         String?                          @map("decided_by")
+  decidedAt         DateTime?                        @map("decided_at") @db.Timestamptz(3)
+  rejectionReason   String?                          @map("rejection_reason")
+  createdAt         DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                         @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                           @map("created_by")
+  updatedBy         String                           @map("updated_by")
+  deletedAt         DateTime?                        @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                          @map("deleted_by")
+
+  @@index([workspaceId, attendanceDate])
+  @@index([workspaceId, memberId, attendanceDate])
+  @@index([workspaceId, approvalStatus])
+  @@map("attendance_entries")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Leave types, structures and balances (CM-310, CM-311)
+// ---------------------------------------------------------------------------
+
+/// How a leave type is credited (ADR CM-0012 §7).
+enum ConstructionHrmsAccrualMode {
+  /// No automatic credit (Comp Off by adjustment, Loss of Pay).
+  none
+  /// The whole entitlement when the balance is initialised.
+  upfront
+  /// `credit_per_period` each period on `accrual_day`.
+  periodic
+
+  @@map("accrual_mode")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsAccrualFrequency {
+  monthly
+
+  @@map("accrual_frequency")
+  @@schema("construction_hrms")
+}
+
+/// A kind of leave (CM-310). Each Company gets the six seeds of
+/// `modules/10` (`is_seed`). Names are unique among live types.
+model ConstructionHrmsLeaveType {
+  id                 String                            @id @db.Uuid
+  workspaceId        String                            @map("workspace_id")
+  name               String
+  /// Days a year; 0 for Comp Off and Loss of Pay.
+  yearlyLimit        Decimal                           @map("yearly_limit") @db.Decimal(6, 2)
+  isPaid             Boolean                           @map("is_paid")
+  requiresApproval   Boolean                           @default(true) @map("requires_approval")
+  /// Overrides the Settings levels when set (1–2).
+  approvalLevels     Int?                              @map("approval_levels")
+  maxConsecutiveDays Int?                              @map("max_consecutive_days")
+  carryForward       Boolean                           @default(false) @map("carry_forward")
+  /// Days; set when carry forward is on.
+  maxCarryForward    Decimal?                          @map("max_carry_forward") @db.Decimal(6, 2)
+  accrualMode        ConstructionHrmsAccrualMode       @default(none) @map("accrual_mode")
+  /// Set when `accrual_mode` is periodic.
+  accrualFrequency   ConstructionHrmsAccrualFrequency? @map("accrual_frequency")
+  /// Day of the period the credit is posted, 1–28; periodic only.
+  accrualDay         Int?                              @map("accrual_day")
+  /// Days per period, e.g. 1.25; periodic only.
+  creditPerPeriod    Decimal?                          @map("credit_per_period") @db.Decimal(6, 2)
+  /// May go below zero up to the yearly limit.
+  allowAdvanceUse    Boolean                           @default(false) @map("allow_advance_use")
+  isActive           Boolean                           @default(true) @map("is_active")
+  isSeed             Boolean                           @default(false) @map("is_seed")
+  createdAt          DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String                            @map("created_by")
+  updatedBy          String                            @map("updated_by")
+  deletedAt          DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?                           @map("deleted_by")
+
+  structureLines ConstructionHrmsLeaveStructureLine[]
+
+  @@index([workspaceId])
+  @@map("leave_types")
+  @@schema("construction_hrms")
+}
+
+/// A named bundle of leave types with entitlements (CM-311).
+model ConstructionHrmsLeaveStructure {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  lines       ConstructionHrmsLeaveStructureLine[]
+  assignments ConstructionHrmsLeaveStructureAssignment[]
+
+  @@index([workspaceId])
+  @@map("leave_structures")
+  @@schema("construction_hrms")
+}
+
+/// One leave type in a structure; `entitlement_days` null = the type's
+/// yearly limit.
+model ConstructionHrmsLeaveStructureLine {
+  id              String   @id @db.Uuid
+  structureId     String   @map("structure_id") @db.Uuid
+  leaveTypeId     String   @map("leave_type_id") @db.Uuid
+  entitlementDays Decimal? @map("entitlement_days") @db.Decimal(6, 2)
+
+  structure ConstructionHrmsLeaveStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  leaveType ConstructionHrmsLeaveType      @relation(fields: [leaveTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([structureId, leaveTypeId])
+  @@map("leave_structure_lines")
+  @@schema("construction_hrms")
+}
+
+/// A member's leave structure from a date; the latest `effective_from` on
+/// or before a day is the one in force (one live row per member per date).
+model ConstructionHrmsLeaveStructureAssignment {
+  id            String    @id @db.Uuid
+  workspaceId   String    @map("workspace_id")
+  memberId      String    @map("member_id") @db.Uuid
+  structureId   String    @map("structure_id") @db.Uuid
+  effectiveFrom DateTime  @map("effective_from") @db.Date
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String    @map("created_by")
+  updatedBy     String    @map("updated_by")
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?   @map("deleted_by")
+
+  structure ConstructionHrmsLeaveStructure @relation(fields: [structureId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, memberId, effectiveFrom])
+  @@map("leave_structure_assignments")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsLeaveLedgerKind {
+  /// Credit when a balance is initialised (upfront entitlement, or 0).
+  initial
+  /// Periodic credit; one per member, type and period (`period_key`).
+  accrual
+  /// Unused days brought into the new leave year.
+  carry_forward
+  /// A manager's credit or debit with a reason (Comp Off, corrections).
+  adjustment
+  /// Days taken on an approved request.
+  used
+  /// Days held by a pending request.
+  reserved
+  /// A reservation given back (approved, rejected or withdrawn).
+  released
+  /// Used days given back when a cancellation is approved.
+  restored
+
+  @@map("leave_ledger_kind")
+  @@schema("construction_hrms")
+}
+
+/// The leave trail for a member, a leave type and a leave year (ADR
+/// CM-0004). Append-only. Credits are positive (initial, accrual,
+/// carry_forward, released, restored, a positive adjustment); debits
+/// negative (reserved, used, a negative adjustment). The available balance
+/// is the sum of the entries. Applying posts `reserved`; approval posts
+/// `released` for the reservation and `used` for the days; rejection and
+/// withdrawal post `released`; an approved cancellation posts `restored`.
+model ConstructionHrmsLeaveLedgerEntry {
+  id              String                          @id @db.Uuid
+  workspaceId     String                          @map("workspace_id")
+  memberId        String                          @map("member_id") @db.Uuid
+  leaveTypeId     String                          @map("leave_type_id") @db.Uuid
+  /// "2026" (calendar) or "26-27" (financial), from the Settings at the time.
+  leaveYear       String                          @map("leave_year") @db.VarChar(5)
+  kind            ConstructionHrmsLeaveLedgerKind
+  /// Signed days, multiples of 0.5 except accrual credits.
+  days            Decimal                         @db.Decimal(6, 2)
+  entryDate       DateTime                        @map("entry_date") @db.Date
+  /// `YYYY-MM` of an accrual, so a period is credited once.
+  periodKey       String?                         @map("period_key") @db.Char(7)
+  /// The leave request behind a reserved/used/released/restored entry.
+  requestId       String?                         @map("request_id") @db.Uuid
+  reason          String?
+  reversesEntryId String?                         @unique @map("reverses_entry_id") @db.Uuid
+  createdAt       DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy       String                          @map("created_by")
+
+  @@index([workspaceId, memberId, leaveTypeId, leaveYear])
+  @@index([requestId])
+  @@map("leave_ledger_entries")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Leave requests (CM-312, CM-313)
+// ---------------------------------------------------------------------------
+
+enum ConstructionHrmsLeaveRequestStatus {
+  pending
+  approved
+  rejected
+  /// Taken back by the member while pending (ADR CM-0012 §8).
+  withdrawn
+  cancellation_requested
+  cancelled
+
+  @@map("leave_request_status")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsLeaveSession {
+  /// 1 day.
+  full
+  /// 0.5 day.
+  morning
+  /// 0.5 day.
+  afternoon
+
+  @@map("leave_session")
+  @@schema("construction_hrms")
+}
+
+/// A leave application (CM-312). Days are listed in `leave_request_days`
+/// (holidays and week offs skipped, ADR CM-0012 §10).
+model ConstructionHrmsLeaveRequest {
+  id                 String                             @id @db.Uuid
+  workspaceId        String                             @map("workspace_id")
+  memberId           String                             @map("member_id") @db.Uuid
+  leaveTypeId        String                             @map("leave_type_id") @db.Uuid
+  fromDate           DateTime                           @map("from_date") @db.Date
+  toDate             DateTime                           @map("to_date") @db.Date
+  /// The sum of the day breakdown.
+  totalDays          Decimal                            @map("total_days") @db.Decimal(5, 1)
+  /// The leave year the days count against.
+  leaveYear          String                             @map("leave_year") @db.VarChar(5)
+  /// At least 10 characters.
+  reason             String
+  status             ConstructionHrmsLeaveRequestStatus @default(pending)
+  /// Levels this request needs (1–2), fixed when it is applied.
+  approvalLevels     Int                                @default(1) @map("approval_levels")
+  /// The level waiting for a decision; equals `approval_levels` once approved.
+  currentLevel       Int                                @default(1) @map("current_level")
+  approvalRemarks    String?                            @map("approval_remarks")
+  rejectionReason    String?                            @map("rejection_reason")
+  cancellationReason String?                            @map("cancellation_reason")
+  /// The Team Member who applied: the member, or a manager on their behalf.
+  appliedByMemberId  String                             @map("applied_by_member_id") @db.Uuid
+  createdAt          DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String                             @map("created_by")
+  updatedBy          String                             @map("updated_by")
+
+  days      ConstructionHrmsLeaveRequestDay[]
+  decisions ConstructionHrmsLeaveDecision[]
+
+  @@index([workspaceId, memberId, fromDate])
+  @@index([workspaceId, status])
+  @@map("leave_requests")
+  @@schema("construction_hrms")
+}
+
+/// One day of a leave request.
+model ConstructionHrmsLeaveRequestDay {
+  id        String                       @id @db.Uuid
+  requestId String                       @map("request_id") @db.Uuid
+  leaveDate DateTime                     @map("leave_date") @db.Date
+  session   ConstructionHrmsLeaveSession
+
+  request ConstructionHrmsLeaveRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, leaveDate])
+  @@index([leaveDate])
+  @@map("leave_request_days")
+  @@schema("construction_hrms")
+}
+
+/// What a decision was about: the request, or a cancellation request.
+enum ConstructionHrmsLeaveDecisionStage {
+  request
+  cancellation
+
+  @@map("leave_decision_stage")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsDecisionOutcome {
+  approved
+  rejected
+
+  @@map("decision_outcome")
+  @@schema("construction_hrms")
+}
+
+/// One approver's decision on a leave request (CM-312). Any holder of
+/// `approve`/`reject` on `hrms.leaves` decides, never on their own request
+/// unless Owner (ADR CM-0012 §5). One request-stage decision per level.
+model ConstructionHrmsLeaveDecision {
+  id              String                             @id @db.Uuid
+  workspaceId     String                             @map("workspace_id")
+  requestId       String                             @map("request_id") @db.Uuid
+  stage           ConstructionHrmsLeaveDecisionStage
+  level           Int
+  outcome         ConstructionHrmsDecisionOutcome
+  /// Remarks on approval; the reason on rejection.
+  remarks         String?
+  deciderMemberId String?                            @map("decider_member_id") @db.Uuid
+  decidedBy       String                             @map("decided_by")
+  decidedAt       DateTime                           @map("decided_at") @db.Timestamptz(3)
+
+  request ConstructionHrmsLeaveRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("leave_decisions")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Salary structures and employee configuration (CM-314, CM-315)
+// ---------------------------------------------------------------------------
+
+/// A salary template (CM-314). Statutory rates come from the dated tables
+/// (ADR CM-0008); the override columns are the legacy per-template switches
+/// and stay null to use the tables.
+model ConstructionHrmsSalaryStructure {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  name               String
+  description        String?
+  pfApplicable       Boolean   @default(false) @map("pf_applicable")
+  /// Employee PF % override; null = the table rate.
+  pfEmployeePercent  Decimal?  @map("pf_employee_percent") @db.Decimal(5, 2)
+  /// Cap the PF wage at the ceiling (table or override).
+  pfCapAtCeiling     Boolean   @default(true) @map("pf_cap_at_ceiling")
+  /// Paise; null = the table ceiling.
+  pfWageCeiling      Int?      @map("pf_wage_ceiling")
+  esiApplicable      Boolean   @default(false) @map("esi_applicable")
+  /// Employee ESI % override; null = the table rate.
+  esiEmployeePercent Decimal?  @map("esi_employee_percent") @db.Decimal(5, 2)
+  ptApplicable       Boolean   @default(false) @map("pt_applicable")
+  /// Paise a month, flat; null = the state slab (Settings `pt_state_code`).
+  ptMonthlyAmount    Int?      @map("pt_monthly_amount")
+  deductAbsentDays   Boolean   @default(true) @map("deduct_absent_days")
+  deductUnpaidLeave  Boolean   @default(true) @map("deduct_unpaid_leave")
+  isActive           Boolean   @default(true) @map("is_active")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String    @map("created_by")
+  updatedBy          String    @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?   @map("deleted_by")
+
+  components ConstructionHrmsSalaryComponent[]
+  deductions ConstructionHrmsSalaryDeduction[]
+  employees  ConstructionHrmsEmployeeSalaryConfig[]
+
+  @@index([workspaceId])
+  @@map("salary_structures")
+  @@schema("construction_hrms")
+}
+
+/// How a component's amount is set (ADR CM-0012 §12).
+enum ConstructionHrmsComponentBasis {
+  /// A fixed monthly amount in paise.
+  fixed
+  /// A percentage of the member's base monthly salary.
+  percent_of_base
+
+  @@map("component_basis")
+  @@schema("construction_hrms")
+}
+
+/// An earnings line of a structure (Basic, Special Allowance…). The one
+/// balancing component takes base − the others and must not go negative.
+model ConstructionHrmsSalaryComponent {
+  id              String                         @id @db.Uuid
+  structureId     String                         @map("structure_id") @db.Uuid
+  name            String
+  basis           ConstructionHrmsComponentBasis
+  /// Paise; set exactly when `basis` is fixed and the line is not balancing.
+  amount          Int?
+  /// Set exactly when `basis` is percent_of_base and the line is not balancing.
+  percent         Decimal?                       @db.Decimal(5, 2)
+  isBalancing     Boolean                        @default(false) @map("is_balancing")
+  countsForPfWage Boolean                        @default(false) @map("counts_for_pf_wage")
+  sortOrder       Int                            @map("sort_order")
+
+  structure ConstructionHrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+
+  @@index([structureId])
+  @@map("salary_components")
+  @@schema("construction_hrms")
+}
+
+/// An "other deduction" of a structure: a fixed monthly amount.
+model ConstructionHrmsSalaryDeduction {
+  id          String @id @db.Uuid
+  structureId String @map("structure_id") @db.Uuid
+  name        String
+  /// Paise a month.
+  amount      Int
+  sortOrder   Int    @map("sort_order")
+
+  structure ConstructionHrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+
+  @@index([structureId])
+  @@map("salary_deductions")
+  @@schema("construction_hrms")
+}
+
+/// Recorded for Maharashtra-style PT slabs that differ for men and women.
+enum ConstructionHrmsGender {
+  male
+  female
+  other
+
+  @@map("gender")
+  @@schema("construction_hrms")
+}
+
+/// A member's salary set-up from a date (CM-315): "Configured" when a live
+/// row is in force, "Not Set" otherwise. One live row per member per date.
+model ConstructionHrmsEmployeeSalaryConfig {
+  id                 String                  @id @db.Uuid
+  workspaceId        String                  @map("workspace_id")
+  memberId           String                  @map("member_id") @db.Uuid
+  structureId        String                  @map("structure_id") @db.Uuid
+  /// Paise a month: the "Base Salary" components are worked out from.
+  baseMonthly        Int                     @map("base_monthly")
+  /// `{ "<component id>": { "amount": paise } | { "percent": "12.5" } }`.
+  componentOverrides Json                    @default("{}") @map("component_overrides")
+  /// For PT slabs that depend on it; null = the general slab.
+  gender             ConstructionHrmsGender?
+  effectiveFrom      DateTime                @map("effective_from") @db.Date
+  createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String                  @map("created_by")
+  updatedBy          String                  @map("updated_by")
+  deletedAt          DateTime?               @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?                 @map("deleted_by")
+
+  structure ConstructionHrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, memberId, effectiveFrom])
+  @@map("employee_salary_configs")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Salary runs, slips, advances and month locks (CM-316, CM-317)
+// ---------------------------------------------------------------------------
+
+/// "Calculate Salary" for a month (CM-316): groups the month's regular
+/// slips. One per Company per month.
+model ConstructionHrmsSalaryRun {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  /// `YYYY-MM`.
+  month       String   @db.Char(7)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+  updatedBy   String   @map("updated_by")
+
+  slips ConstructionHrmsSalarySlip[]
+
+  @@unique([workspaceId, month])
+  @@map("salary_runs")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsSalarySlipKind {
+  regular
+  /// "Pay Advance Salary": paid ahead, recovered in later regular slips.
+  advance
+
+  @@map("salary_slip_kind")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsSalarySlipStatus {
+  calculated
+  approved
+  paid
+
+  @@map("salary_slip_status")
+  @@schema("construction_hrms")
+}
+
+enum ConstructionHrmsPaymentMode {
+  cash
+  bank
+
+  @@map("payment_mode")
+  @@schema("construction_hrms")
+}
+
+/// One member's salary for a month (CM-316). A Calculated slip is
+/// recalculated in place; an Approved or Paid slip never changes, and
+/// approving locks the month (ADR CM-0012 §17). Money is paise; the
+/// statutory figures used are snapshotted (ADR CM-0008). One live regular
+/// slip per member per month.
+model ConstructionHrmsSalarySlip {
+  id                   String                           @id @db.Uuid
+  workspaceId          String                           @map("workspace_id")
+  /// The regular run; null for an advance.
+  runId                String?                          @map("run_id") @db.Uuid
+  memberId             String                           @map("member_id") @db.Uuid
+  /// `YYYY-MM`.
+  month                String                           @db.Char(7)
+  kind                 ConstructionHrmsSalarySlipKind
+  status               ConstructionHrmsSalarySlipStatus @default(calculated)
+  /// The structure it was calculated with.
+  structureId          String?                          @map("structure_id") @db.Uuid
+  // Attendance Details (days; halves allowed).
+  daysInMonth          Int                              @map("days_in_month")
+  workingDays          Decimal                          @default(0) @map("working_days") @db.Decimal(5, 2)
+  presentDays          Decimal                          @default(0) @map("present_days") @db.Decimal(5, 2)
+  absentDays           Decimal                          @default(0) @map("absent_days") @db.Decimal(5, 2)
+  halfDays             Decimal                          @default(0) @map("half_days") @db.Decimal(5, 2)
+  paidLeaveDays        Decimal                          @default(0) @map("paid_leave_days") @db.Decimal(5, 2)
+  unpaidLeaveDays      Decimal                          @default(0) @map("unpaid_leave_days") @db.Decimal(5, 2)
+  weekOffDays          Decimal                          @default(0) @map("week_off_days") @db.Decimal(5, 2)
+  holidayDays          Decimal                          @default(0) @map("holiday_days") @db.Decimal(5, 2)
+  payableDays          Decimal                          @default(0) @map("payable_days") @db.Decimal(5, 2)
+  overtimeHours        Decimal                          @default(0) @map("overtime_hours") @db.Decimal(6, 2)
+  totalHours           Decimal                          @default(0) @map("total_hours") @db.Decimal(6, 2)
+  // Earnings (paise).
+  baseMonthly          Int                              @default(0) @map("base_monthly")
+  /// `[{ componentId, name, monthly, earned }]` in paise.
+  components           Json                             @default("[]")
+  overtimePay          Int                              @default(0) @map("overtime_pay")
+  grossEarnings        Int                              @default(0) @map("gross_earnings")
+  // Deductions (paise).
+  pfEmployee           Int                              @default(0) @map("pf_employee")
+  esiEmployee          Int                              @default(0) @map("esi_employee")
+  professionalTax      Int                              @default(0) @map("professional_tax")
+  absentDeduction      Int                              @default(0) @map("absent_deduction")
+  unpaidLeaveDeduction Int                              @default(0) @map("unpaid_leave_deduction")
+  otherDeductions      Int                              @default(0) @map("other_deductions")
+  advanceRecovered     Int                              @default(0) @map("advance_recovered")
+  netPayable           Int                              @default(0) @map("net_payable")
+  // Employer contributions (paise), for challans.
+  pfEmployer           Int                              @default(0) @map("pf_employer")
+  epsEmployer          Int                              @default(0) @map("eps_employer")
+  esiEmployer          Int                              @default(0) @map("esi_employer")
+  /// PF ceiling and rates, ESI rates and eligibility, PT slab used.
+  statutorySnapshot    Json                             @default("{}") @map("statutory_snapshot")
+  approvedBy           String?                          @map("approved_by")
+  approvedAt           DateTime?                        @map("approved_at") @db.Timestamptz(3)
+  paidBy               String?                          @map("paid_by")
+  paidAt               DateTime?                        @map("paid_at") @db.Timestamptz(3)
+  paymentMode          ConstructionHrmsPaymentMode?     @map("payment_mode")
+  paymentDate          DateTime?                        @map("payment_date") @db.Date
+  paymentReference     String?                          @map("payment_reference")
+  /// Storage key of the payslip PDF; a `stored_files` row.
+  payslipKey           String?                          @map("payslip_key")
+  createdAt            DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                         @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy            String                           @map("created_by")
+  updatedBy            String                           @map("updated_by")
+  deletedAt            DateTime?                        @map("deleted_at") @db.Timestamptz(3)
+  deletedBy            String?                          @map("deleted_by")
+
+  run        ConstructionHrmsSalaryRun?              @relation(fields: [runId], references: [id], onDelete: Restrict)
+  recoveries ConstructionHrmsSalaryAdvanceRecovery[]
+
+  @@index([workspaceId, month])
+  @@index([workspaceId, memberId, month])
+  @@map("salary_slips")
+  @@schema("construction_hrms")
+}
+
+/// An advance paid to a member (ADR CM-0012 §15), recovered in
+/// `instalments` from the following regular slips. Recovered when its
+/// recoveries add up to `amount`.
+model ConstructionHrmsSalaryAdvance {
+  id                 String    @id @db.Uuid
+  workspaceId        String    @map("workspace_id")
+  memberId           String    @map("member_id") @db.Uuid
+  /// The advance slip that paid it.
+  slipId             String?   @unique @map("slip_id") @db.Uuid
+  /// Paise.
+  amount             Int
+  instalments        Int       @default(1)
+  advanceDate        DateTime  @map("advance_date") @db.Date
+  /// `YYYY-MM` of the first regular slip that recovers it.
+  firstRecoveryMonth String    @map("first_recovery_month") @db.Char(7)
+  reason             String?
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String    @map("created_by")
+  updatedBy          String    @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?   @map("deleted_by")
+
+  recoveries ConstructionHrmsSalaryAdvanceRecovery[]
+
+  @@index([workspaceId, memberId])
+  @@map("salary_advances")
+  @@schema("construction_hrms")
+}
+
+/// One instalment of an advance taken off a regular slip.
+model ConstructionHrmsSalaryAdvanceRecovery {
+  id        String   @id @db.Uuid
+  advanceId String   @map("advance_id") @db.Uuid
+  slipId    String   @map("slip_id") @db.Uuid
+  /// `YYYY-MM` of the slip.
+  month     String   @db.Char(7)
+  /// Paise.
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy String   @map("created_by")
+
+  advance ConstructionHrmsSalaryAdvance @relation(fields: [advanceId], references: [id], onDelete: Restrict)
+  slip    ConstructionHrmsSalarySlip    @relation(fields: [slipId], references: [id], onDelete: Cascade)
+
+  @@unique([advanceId, slipId])
+  @@map("salary_advance_recoveries")
+  @@schema("construction_hrms")
+}
+
+/// A month closed for attendance and leave (ADR CM-0012 §17): for one
+/// member (`member_id`) or the whole Company (null). Written when a salary
+/// slip is approved; never removed in M3.
+model ConstructionHrmsMonthLock {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  memberId    String?  @map("member_id") @db.Uuid
+  /// `YYYY-MM`.
+  month       String   @db.Char(7)
+  /// The approved slip that locked it, if any.
+  slipId      String?  @map("slip_id") @db.Uuid
+  lockedAt    DateTime @map("locked_at") @db.Timestamptz(3)
+  lockedBy    String   @map("locked_by")
+
+  @@index([workspaceId, month])
+  @@map("month_locks")
+  @@schema("construction_hrms")
+}
+
+// ---------------------------------------------------------------------------
+// Statutory figures (ADR CM-0008): platform-wide, effective-dated, seeded
+// from `src/hrms/infrastructure/seeds/statutory/*.json`. Rows are never
+// edited; a new notification is a new row in a new migration. The row in
+// force for a month is the latest `effective_from` on or before the month's
+// last day.
+// ---------------------------------------------------------------------------
+
+/// EPF and EPS: wage ceiling and contribution rates.
+model ConstructionHrmsStatutoryPfRate {
+  id              String   @id @db.Uuid
+  effectiveFrom   DateTime @unique @map("effective_from") @db.Date
+  /// Paise a month.
+  wageCeiling     Int      @map("wage_ceiling")
+  employeePercent Decimal  @map("employee_percent") @db.Decimal(5, 2)
+  /// Total employer share, EPS included.
+  employerPercent Decimal  @map("employer_percent") @db.Decimal(5, 2)
+  /// The part of the employer share that goes to EPS, on wage up to the ceiling.
+  epsPercent      Decimal  @map("eps_percent") @db.Decimal(5, 2)
+  /// The notification it comes from.
+  source          String
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@map("statutory_pf_rates")
+  @@schema("construction_hrms")
+}
+
+/// ESI: gross ceilings and contribution rates.
+model ConstructionHrmsStatutoryEsiRate {
+  id              String   @id @db.Uuid
+  effectiveFrom   DateTime @unique @map("effective_from") @db.Date
+  /// Paise a month of gross.
+  wageCeiling     Int      @map("wage_ceiling")
+  /// Paise; the ceiling for a person with disability.
+  pwdWageCeiling  Int      @map("pwd_wage_ceiling")
+  employeePercent Decimal  @map("employee_percent") @db.Decimal(5, 2)
+  employerPercent Decimal  @map("employer_percent") @db.Decimal(5, 2)
+  source          String
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@map("statutory_esi_rates")
+  @@schema("construction_hrms")
+}
+
+/// Who a PT slab applies to; most states use `everyone`.
+enum ConstructionHrmsPtAppliesTo {
+  everyone
+  men
+  women
+
+  @@map("pt_applies_to")
+  @@schema("construction_hrms")
+}
+
+/// One professional tax slab of a state. A state's slabs in force for a
+/// month are those with the latest `effective_from` on or before its last
+/// day. A gross outside every slab pays nothing; a state with no rows has
+/// no PT.
+model ConstructionHrmsStatutoryPtSlab {
+  id                 String                      @id @db.Uuid
+  /// GST state code (`shared-kernel/gst-states`).
+  stateCode          String                      @map("state_code") @db.Char(2)
+  effectiveFrom      DateTime                    @map("effective_from") @db.Date
+  appliesTo          ConstructionHrmsPtAppliesTo @default(everyone) @map("applies_to")
+  /// Paise of monthly gross, inclusive.
+  grossFrom          Int                         @map("gross_from")
+  /// Paise, inclusive; null = no upper bound.
+  grossTo            Int?                        @map("gross_to")
+  /// Paise a month.
+  monthlyAmount      Int                         @map("monthly_amount")
+  /// A month (1–12) charged differently, e.g. February ₹300.
+  specialMonth       Int?                        @map("special_month")
+  specialMonthAmount Int?                        @map("special_month_amount")
+  source             String
+  createdAt          DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([stateCode, effectiveFrom, appliesTo, grossFrom])
+  @@map("statutory_pt_slabs")
+  @@schema("construction_hrms")
+}
