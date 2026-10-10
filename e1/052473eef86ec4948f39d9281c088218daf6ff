@@ -1,0 +1,37 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_6604e2237b6922::t_2eea985397434b 508
+packages/db/construction/prisma/migrations/20261011090000_construction_masters_materials/migration.sql
+  s_6604e2237b6922::t_27c724706ac108 1-171
+packages/db/construction/prisma/migrations/20261011090100_construction_organization_billing_addresses/migration.sql
+  s_6604e2237b6922::t_108355c6b2c753 1-41
+packages/db/construction/prisma/migrations/20261011090200_construction_projects_state_code/migration.sql
+  s_6604e2237b6922::t_df96ef919a0be7 1-6
+packages/db/construction/prisma/migrations/20261011090300_construction_procurement/migration.sql
+  s_6604e2237b6922::t_a7077adef7c154 1-731
+packages/db/construction/prisma/schema/base.prisma
+  s_6604e2237b6922::t_c2f9aa2b1568f1 13
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_6604e2237b6922::t_c95139d395374c 127-130,132-150,200-202,230-378
+packages/db/construction/prisma/schema/construction-organization.prisma
+  s_6604e2237b6922::t_078226ee93e320 365-399
+packages/db/construction/prisma/schema/construction-procurement.prisma
+  s_6604e2237b6922::t_45ecc959377545 1-786
+packages/db/construction/prisma/schema/construction-projects.prisma
+  s_6604e2237b6922::t_c521ff3562d626 45-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e1052473eef86ec4948f39d9281c088218daf6ff",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
