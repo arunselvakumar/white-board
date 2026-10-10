@@ -1,0 +1,29 @@
+apps/construction-management/src/hrms/domain/holiday.test.ts
+  s_6a70f1cb429bb6::t_4ddadcb76655f8 1-112
+apps/construction-management/src/hrms/domain/holiday.ts
+  s_f9fe308a3252b4::t_952117223d8596 1-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "58e7bb2d76269633af1e3523ac08335786eea97f",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f9fe308a3252b4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8cdfaf04a7a48da5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
