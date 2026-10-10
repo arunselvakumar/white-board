@@ -1,0 +1,567 @@
+apps/construction-management/CONTEXT.md
+  s_7d8917753e260e::t_44e2bc8c0b3a94 70,74,134-137,146-169,198-218,451-454
+apps/construction-management/app/api/_lib/attachments.ts
+  s_7d8917753e260e::t_7c1c9d38bec001 1-172
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_be4e71210c1f67 77-80,93-116,829-850,863-866
+apps/construction-management/app/api/_lib/require-access.ts
+  s_7d8917753e260e::t_a66bd38f169dd8 52-80
+apps/construction-management/app/api/construction/masters/_lib/party-models.ts
+  s_7d8917753e260e::t_cc9d7e6294bb07 1-140
+apps/construction-management/app/api/construction/masters/_lib/party-routes.ts
+  s_7d8917753e260e::t_188ba900b2afde 1-148
+apps/construction-management/app/api/construction/masters/contractors/[id]/activate/route.ts
+  s_7d8917753e260e::t_f8536cfcea9275 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/deactivate/route.ts
+  s_7d8917753e260e::t_5ad4e4c02ad45f 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/delete/route.ts
+  s_7d8917753e260e::t_ea9bb357dd19d0 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/route.ts
+  s_7d8917753e260e::t_64188cea4171a5 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/update/route.ts
+  s_7d8917753e260e::t_b5345c50d3cf75 1-6
+apps/construction-management/app/api/construction/masters/contractors/contractor-models.ts
+  s_7d8917753e260e::t_787e32db8adfbc 1-26
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_7d8917753e260e::t_5b390809ceb090 1-17
+apps/construction-management/app/api/construction/masters/contractors/route.ts
+  s_7d8917753e260e::t_ebad8705e9196d 1-9
+apps/construction-management/app/api/construction/masters/parties-openapi.ts
+  s_7d8917753e260e::t_ef768a581c87b5 1-165
+apps/construction-management/app/api/construction/masters/parties.http.test.ts
+  s_7d8917753e260e::t_039f3e0fa57626 1-466
+apps/construction-management/app/api/construction/masters/suppliers/[id]/activate/route.ts
+  s_7d8917753e260e::t_6c37679a066349 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/deactivate/route.ts
+  s_7d8917753e260e::t_cdf6e56269a73c 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/delete/route.ts
+  s_7d8917753e260e::t_b107a283bacbe0 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/route.ts
+  s_7d8917753e260e::t_5165658dfc1793 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/update/route.ts
+  s_7d8917753e260e::t_c418bddb21828c 1-6
+apps/construction-management/app/api/construction/masters/suppliers/route.ts
+  s_7d8917753e260e::t_59a7ade1737d71 1-9
+apps/construction-management/app/api/construction/masters/suppliers/supplier-models.ts
+  s_7d8917753e260e::t_4415bfd4615c00 1-26
+apps/construction-management/app/api/construction/masters/suppliers/supplier-routes.ts
+  s_7d8917753e260e::t_da8ff2184d66eb 1-17
+apps/construction-management/app/api/construction/projects/project-upload-routes.ts
+  s_7d8917753e260e::t_f6d678720f443a 1-172
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/[docId]/thumbnail/route.ts
+  s_7d8917753e260e::t_f3e1f3c6091438 1-28
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/document-media.http.test.ts
+  s_7d8917753e260e::t_8c3fa60143b412 1-308
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/handlers.ts
+  s_7d8917753e260e::t_1e35807af0e74b 1,5-8,16-25
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-models.ts
+  s_7d8917753e260e::t_0d0928a2b0aaaf 3-4,40-45,94-95
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-openapi.ts
+  s_7d8917753e260e::t_9615d773262bd5 2-6,37-38,40-41,107-119,143-155
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-responses.ts
+  s_7d8917753e260e::t_89621df7a9443a 1-5,16-17,19,32-35,43-45,52
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/app/route.ts
+  s_7d8917753e260e::t_6cfdb8af2d8cc0 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/presign/route.ts
+  s_7d8917753e260e::t_ad23ee5fce2ae0 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/route.ts
+  s_7d8917753e260e::t_911d71673ccb25 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_74f4ca2a31e5f1 1-9
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/delete/route.ts
+  s_7d8917753e260e::t_673151b08d8232 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/move/route.ts
+  s_7d8917753e260e::t_a72d628505dea5 1-46
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/[revisionId]/file/route.ts
+  s_7d8917753e260e::t_f5b6384add299d 1-48
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/[revisionId]/thumbnail/route.ts
+  s_7d8917753e260e::t_6369662d5e7f3c 1-37
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/route.ts
+  s_7d8917753e260e::t_077aa51927f5a0 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/route.ts
+  s_7d8917753e260e::t_fc5440c4cebb49 1-30
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/update/route.ts
+  s_7d8917753e260e::t_fd31d4e2c53d18 1-42
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/delete/route.ts
+  s_7d8917753e260e::t_ea4ad17d071c43 1-35
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/route.ts
+  s_7d8917753e260e::t_6a44b9379948e0 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/update/route.ts
+  s_7d8917753e260e::t_f3e60d5c4fb748 1-52
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/route.ts
+  s_7d8917753e260e::t_cd6e5bb084fa8a 1-62
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-models.ts
+  s_7d8917753e260e::t_665158dcb85bf8 1-219
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-openapi.ts
+  s_7d8917753e260e::t_02629f07dfe11d 1-281
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-responses.ts
+  s_7d8917753e260e::t_a3f3046ee1e241 1-108
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawings.http.test.ts
+  s_7d8917753e260e::t_d64de20e534e8e 1-871
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/handlers.ts
+  s_7d8917753e260e::t_41503e717138d2 1-25
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/route.ts
+  s_7d8917753e260e::t_a2ffa0a5d159db 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/app/route.ts
+  s_7d8917753e260e::t_743b3fd2e2aa71 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/presign/route.ts
+  s_7d8917753e260e::t_4a6b7c6c1623dd 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/route.ts
+  s_7d8917753e260e::t_e3e4a1983814b1 1-10
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_de5b69e2f3dac1 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-models.ts
+  s_7d8917753e260e::t_b3f6b287e4467e 1-113
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-openapi.ts
+  s_7d8917753e260e::t_b289c17cab01f6 1-61
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_7d8917753e260e::t_9c7f7dbd9fe10f 1-86
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery.http.test.ts
+  s_7d8917753e260e::t_2c9a6aa58bd49e 1-466
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/handlers.ts
+  s_7d8917753e260e::t_0c2a208067b0bf 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/route.ts
+  s_7d8917753e260e::t_1a3fcfc451f2fd 1-76
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/uploaders/route.ts
+  s_7d8917753e260e::t_e59b5624b87291 1-31
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/delete/route.ts
+  s_7d8917753e260e::t_cd02179203644d 1-37
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/move/route.ts
+  s_7d8917753e260e::t_1f537f96ae2b48 1-45
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/update/route.ts
+  s_7d8917753e260e::t_ec53b5c474744e 1-46
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/handlers.ts
+  s_7d8917753e260e::t_0cb4c93ac6d5d0 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/location-models.ts
+  s_7d8917753e260e::t_e3f6731acbc93f 1-99
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/location-openapi.ts
+  s_7d8917753e260e::t_e07c261726bad5 1-100
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/locations.http.test.ts
+  s_7d8917753e260e::t_c2157638dcc141 1-331
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/route.ts
+  s_7d8917753e260e::t_e14839af1c6713 1-68
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/[phaseId]/delete/route.ts
+  s_7d8917753e260e::t_f407a13fd23e3d 1-33
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/[phaseId]/rename/route.ts
+  s_7d8917753e260e::t_909a7bd298e05a 1-42
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/route.ts
+  s_7d8917753e260e::t_747cf06165332a 1-64
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/contractors/options/route.ts
+  s_7d8917753e260e::t_27a093d67338db 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/contractors/route.ts
+  s_7d8917753e260e::t_5a56b68b7381ea 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/handlers.ts
+  s_7d8917753e260e::t_74a90ba77a6232 1-80
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources-models.ts
+  s_7d8917753e260e::t_93045199b9369c 1-114
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources-openapi.ts
+  s_7d8917753e260e::t_3fde341f760c7c 1-118
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources.http.test.ts
+  s_7d8917753e260e::t_a9b3c1c77de78a 1-547
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/route.ts
+  s_7d8917753e260e::t_105b4499c8170d 1-32
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/suppliers/options/route.ts
+  s_7d8917753e260e::t_5ccac08c8ef93c 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/suppliers/route.ts
+  s_7d8917753e260e::t_74960eab008745 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/team-members/options/route.ts
+  s_7d8917753e260e::t_c16f80031c5d7b 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/team-members/route.ts
+  s_7d8917753e260e::t_7cc2d721ac359b 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/vendors/options/route.ts
+  s_7d8917753e260e::t_bfd8119cb67bfa 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/vendors/route.ts
+  s_7d8917753e260e::t_3d768351d3aa7c 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/handlers.ts
+  s_7d8917753e260e::t_0fc6ebd66e9dec 1-25
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/delete/route.ts
+  s_7d8917753e260e::t_08ab18f41d3bc2 1-39
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/reports/route.ts
+  s_7d8917753e260e::t_0ae67b59182ade 1-131
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/update/route.ts
+  s_7d8917753e260e::t_d691a662478ce0 1-56
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/route.ts
+  s_7d8917753e260e::t_0568ca59c8eb04 1-70
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/delete/route.ts
+  s_7d8917753e260e::t_16e242e53f3114 1-39
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/file/route.ts
+  s_7d8917753e260e::t_d8800f57d1d9d1 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/route.ts
+  s_7d8917753e260e::t_292f7cea3f2b73 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/thumbnail/route.ts
+  s_7d8917753e260e::t_2353913d45a169 1-34
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/update/route.ts
+  s_7d8917753e260e::t_864fc2f8e8f96e 1-57
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-models.ts
+  s_7d8917753e260e::t_a187f3cd41bcab 1-209
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-openapi.ts
+  s_7d8917753e260e::t_1a94987f41a76c 1-250
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-responses.ts
+  s_7d8917753e260e::t_f7ffc73f32f1fc 1-74
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-reports.http.test.ts
+  s_7d8917753e260e::t_76264469d5a2e4 1-755
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/app/route.ts
+  s_7d8917753e260e::t_638e90dfc4e4f1 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/presign/route.ts
+  s_7d8917753e260e::t_9ced4123ca693f 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/route.ts
+  s_7d8917753e260e::t_83f39375dd0dc2 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_a78886c659b974 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/delete/route.ts
+  s_7d8917753e260e::t_bc6390937a5b93 1-33
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/route.ts
+  s_7d8917753e260e::t_13b1672a47779f 1-30
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/update/route.ts
+  s_7d8917753e260e::t_1c53fe78f35b3e 1-47
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/handlers.ts
+  s_7d8917753e260e::t_3f8a8273e07dff 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/route.ts
+  s_7d8917753e260e::t_51f5444d98d668 1-71
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wing-models.ts
+  s_7d8917753e260e::t_910513177e6542 1-348
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wing-openapi.ts
+  s_7d8917753e260e::t_9c2292bbeb1ce9 1-154
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wings.http.test.ts
+  s_7d8917753e260e::t_40549e62fb129d 1-709
+apps/construction-management/app/app/masters/contractors/[id]/page.tsx
+  s_7d8917753e260e::t_d7854c564a823a 1-14
+apps/construction-management/app/app/masters/contractors/new/page.tsx
+  s_7d8917753e260e::t_a6527b9678a216 1-9
+apps/construction-management/app/app/masters/contractors/page.tsx
+  s_7d8917753e260e::t_66187e8d133300 1-9
+apps/construction-management/app/app/masters/suppliers/[id]/page.tsx
+  s_7d8917753e260e::t_1e5affb33a8d6a 1-14
+apps/construction-management/app/app/masters/suppliers/new/page.tsx
+  s_7d8917753e260e::t_12300fb858c265 1-9
+apps/construction-management/app/app/masters/suppliers/page.tsx
+  s_7d8917753e260e::t_e1a26d81b2103f 1-9
+apps/construction-management/app/app/projects/[id]/drawings/[albumId]/page.tsx
+  s_7d8917753e260e::t_eac126fff24c11 1-32
+apps/construction-management/app/app/projects/[id]/drawings/page.tsx
+  s_7d8917753e260e::t_a69cc960a3f5f4 1-31
+apps/construction-management/app/app/projects/[id]/gallery/page.tsx
+  s_7d8917753e260e::t_7cbee499dd4342 1-23
+apps/construction-management/app/app/projects/[id]/locations/page.tsx
+  s_7d8917753e260e::t_aac32292f3529a 1-20
+apps/construction-management/app/app/projects/[id]/resources/page.tsx
+  s_7d8917753e260e::t_2df53619123e00 1-31
+apps/construction-management/app/app/projects/[id]/testing-reports/[itemId]/page.tsx
+  s_7d8917753e260e::t_4aa0cd78c1413c 1-32
+apps/construction-management/app/app/projects/[id]/testing-reports/page.tsx
+  s_7d8917753e260e::t_6806145ded7b69 1-31
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/edit/page.tsx
+  s_7d8917753e260e::t_518f055ccaee1d 1-21
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/page.tsx
+  s_7d8917753e260e::t_e93f977ac312b1 1-20
+apps/construction-management/app/app/projects/[id]/wings/new/page.tsx
+  s_7d8917753e260e::t_c5c7d0e2a44ec7 1-29
+apps/construction-management/app/app/projects/[id]/wings/page.tsx
+  s_7d8917753e260e::t_78b6d72afe76f3 1-20
+apps/construction-management/app/app/projects/[id]/wings/structure-access.ts
+  s_7d8917753e260e::t_1a6e47f6be0260 1-17
+apps/construction-management/components/parties/parties-page.stories.tsx
+  s_7d8917753e260e::t_b9f5cef3b1ad26 1-145
+apps/construction-management/components/parties/parties-page.tsx
+  s_7d8917753e260e::t_9eb8524e868a08 1-412
+apps/construction-management/components/parties/party-fixtures.ts
+  s_7d8917753e260e::t_1093119edf4735 1-99
+apps/construction-management/components/parties/party-form-schema.ts
+  s_7d8917753e260e::t_7fc3b50012fcd1 1-126
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_7d8917753e260e::t_46740128458569 1-235
+apps/construction-management/components/parties/party-form.tsx
+  s_7d8917753e260e::t_5e3d6ecde35bed 1-395
+apps/construction-management/components/parties/party-screens.ts
+  s_7d8917753e260e::t_cf87489e955e5c 1-47
+apps/construction-management/components/projects/documents/document-fixtures.ts
+  s_7d8917753e260e::t_2551e94c74232d 44
+apps/construction-management/components/projects/documents/use-document-uploads.ts
+  s_7d8917753e260e::t_02f206c6f7c341 3,7-8,10-13,15,18-22,25-29,31-35,37,39,41
+apps/construction-management/components/projects/drawings/album-form-dialog.tsx
+  s_7d8917753e260e::t_610a118e756683 1-165
+apps/construction-management/components/projects/drawings/delete-album-dialog.tsx
+  s_7d8917753e260e::t_b6cf102cbbad27 1-84
+apps/construction-management/components/projects/drawings/delete-drawing-dialog.tsx
+  s_7d8917753e260e::t_72b93aab7ed2da 1-84
+apps/construction-management/components/projects/drawings/drawing-album-page.stories.tsx
+  s_7d8917753e260e::t_14d1b66fedf818 1-610
+apps/construction-management/components/projects/drawings/drawing-album-page.tsx
+  s_7d8917753e260e::t_33d54d26e02224 1-422
+apps/construction-management/components/projects/drawings/drawing-fixtures.ts
+  s_7d8917753e260e::t_8a815743241700 1-456
+apps/construction-management/components/projects/drawings/drawing-history-sheet.tsx
+  s_7d8917753e260e::t_d53994bd393ef2 1-147
+apps/construction-management/components/projects/drawings/drawing-upload-row.tsx
+  s_7d8917753e260e::t_8517740f084c01 1-99
+apps/construction-management/components/projects/drawings/drawings-page.stories.tsx
+  s_7d8917753e260e::t_2dbf411ea10511 1-275
+apps/construction-management/components/projects/drawings/drawings-page.tsx
+  s_7d8917753e260e::t_e436171a1c4c0a 1-232
+apps/construction-management/components/projects/drawings/move-drawing-dialog.tsx
+  s_7d8917753e260e::t_e8261412301a6d 1-191
+apps/construction-management/components/projects/drawings/rename-drawing-dialog.tsx
+  s_7d8917753e260e::t_34e009ba47ccab 1-139
+apps/construction-management/components/projects/drawings/upload-drawings-dialog.tsx
+  s_7d8917753e260e::t_065142e476bd67 1-258
+apps/construction-management/components/projects/drawings/upload-revision-dialog.tsx
+  s_7d8917753e260e::t_b67acffec031ab 1-116
+apps/construction-management/components/projects/drawings/use-drawing-uploads.ts
+  s_7d8917753e260e::t_41face569391bc 1-43
+apps/construction-management/components/projects/files/file-thumbnail.tsx
+  s_7d8917753e260e::t_6267532edda13a 1-56
+apps/construction-management/components/projects/files/file-viewer.tsx
+  s_7d8917753e260e::t_d047fb05e27966 1-142
+apps/construction-management/components/projects/files/project-no-access.tsx
+  s_7d8917753e260e::t_c299d1ff2cbfca 1-31
+apps/construction-management/components/projects/gallery/gallery-fixtures.ts
+  s_7d8917753e260e::t_b672c54803662b 1-256
+apps/construction-management/components/projects/gallery/gallery-page.stories.tsx
+  s_7d8917753e260e::t_bcf2fc9cf7de10 1-492
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_7d8917753e260e::t_88ac7c2fa66803 1-607
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_7d8917753e260e::t_a7e8e673586c91 196,530,1009
+apps/construction-management/components/projects/project-form.tsx
+  s_7d8917753e260e::t_eee73a98db6978 92,672-673,728
+apps/construction-management/components/projects/resources/project-resources-page.stories.tsx
+  s_7d8917753e260e::t_651c7844e411da 1-282
+apps/construction-management/components/projects/resources/project-resources-page.tsx
+  s_7d8917753e260e::t_846ddd09eb88d3 1-216
+apps/construction-management/components/projects/resources/resource-fixtures.ts
+  s_7d8917753e260e::t_cd9cddf8fb542c 1-82
+apps/construction-management/components/projects/resources/resource-picker-dialog.tsx
+  s_7d8917753e260e::t_eaf22dda2d2b24 1-271
+apps/construction-management/components/projects/resources/resource-sections.ts
+  s_7d8917753e260e::t_aa140bb585b837 1-52
+apps/construction-management/components/projects/resources/resources-step.ts
+  s_7d8917753e260e::t_77f5ad01cc0937 1-11
+apps/construction-management/components/projects/structure/add-wing-screen.stories.tsx
+  s_7d8917753e260e::t_b6f2222f4dc57e 1-344
+apps/construction-management/components/projects/structure/add-wing-screen.tsx
+  s_7d8917753e260e::t_4c81ae3dc6c427 1-472
+apps/construction-management/components/projects/structure/edit-wing-screen.tsx
+  s_7d8917753e260e::t_eae99363de5f23 1-219
+apps/construction-management/components/projects/structure/locations-page.stories.tsx
+  s_7d8917753e260e::t_55b4be5d077097 1-199
+apps/construction-management/components/projects/structure/locations-page.tsx
+  s_7d8917753e260e::t_26a3baa92b1d7a 1-389
+apps/construction-management/components/projects/structure/name-dialog.tsx
+  s_7d8917753e260e::t_95a200ee865db7 1-136
+apps/construction-management/components/projects/structure/structure-fixtures.ts
+  s_7d8917753e260e::t_a4193067cc67a5 1-403
+apps/construction-management/components/projects/structure/structure-parts.tsx
+  s_7d8917753e260e::t_1cbb2a8de2e174 1-139
+apps/construction-management/components/projects/structure/wing-chart.stories.tsx
+  s_7d8917753e260e::t_21ec9f3b5837b9 1-224
+apps/construction-management/components/projects/structure/wing-chart.tsx
+  s_7d8917753e260e::t_4421417ecd750e 1-189
+apps/construction-management/components/projects/structure/wing-details-schema.ts
+  s_7d8917753e260e::t_17eccc92730d5b 1-250
+apps/construction-management/components/projects/structure/wing-editor-state.ts
+  s_7d8917753e260e::t_8eb7c44962ab9b 1-236
+apps/construction-management/components/projects/structure/wing-editor.tsx
+  s_7d8917753e260e::t_9893b826dbe151 1-422
+apps/construction-management/components/projects/structure/wings-page.stories.tsx
+  s_7d8917753e260e::t_34672b398649e1 1-205
+apps/construction-management/components/projects/structure/wings-page.tsx
+  s_7d8917753e260e::t_d56c5ee62b86a4 1-402
+apps/construction-management/components/projects/testing-reports/testing-item-dialog.tsx
+  s_7d8917753e260e::t_ff26990513f51b 1-164
+apps/construction-management/components/projects/testing-reports/testing-item-page.stories.tsx
+  s_7d8917753e260e::t_69a80ea2a2d5aa 1-315
+apps/construction-management/components/projects/testing-reports/testing-item-page.tsx
+  s_7d8917753e260e::t_54a2d996682630 1-535
+apps/construction-management/components/projects/testing-reports/testing-report-fixtures.ts
+  s_7d8917753e260e::t_d047343530111d 1-359
+apps/construction-management/components/projects/testing-reports/testing-report-sheet.stories.tsx
+  s_7d8917753e260e::t_a492e3e3637ccb 1-276
+apps/construction-management/components/projects/testing-reports/testing-report-sheet.tsx
+  s_7d8917753e260e::t_b5322a8b82f087 1-365
+apps/construction-management/components/projects/testing-reports/testing-reports-page.stories.tsx
+  s_7d8917753e260e::t_35413f3a457de9 1-306
+apps/construction-management/components/projects/testing-reports/testing-reports-page.tsx
+  s_7d8917753e260e::t_8b5075e6e2bea2 1-316
+apps/construction-management/components/uploads/use-direct-upload.ts
+  s_7d8917753e260e::t_5d1eef54431460 1-157
+apps/construction-management/docs/adr/CM-0014-attachments-and-gallery-index.md
+  s_7d8917753e260e::t_202dd23aefa3c9 22
+apps/construction-management/docs/modules/02-master-records.md
+  s_7d8917753e260e::t_dd819f09e64280 718-731
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_7d8917753e260e::t_2cd2134fbf0790 530-544,555-606
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_41d9dc2c392f04 435,438-443
+apps/construction-management/lib/masters-nav.ts
+  s_7d8917753e260e::t_ac4ba508bcefc4 5,10,73-92
+apps/construction-management/lib/project-uploads.test.ts
+  s_7d8917753e260e::t_f739b182642c36 1-37
+apps/construction-management/lib/project-uploads.ts
+  s_7d8917753e260e::t_56dae74e61309e 1-69
+apps/construction-management/lib/thumbnail.test.ts
+  s_7d8917753e260e::t_783ea17b0766ea 1-29
+apps/construction-management/lib/thumbnail.ts
+  s_7d8917753e260e::t_0bdc65502a3222 1-102
+apps/construction-management/src/composition/project-media-listeners.ts
+  s_7d8917753e260e::t_793b098f917e5e 1-21
+apps/construction-management/src/composition/project-resources.ts
+  s_7d8917753e260e::t_7a8206775872f4 1-150
+apps/construction-management/src/labour/application/vendor-handlers.ts
+  s_7d8917753e260e::t_11c1aadf2a134b 1-2,4-8,47-67,160-168,388-470
+apps/construction-management/src/labour/domain/vendor.ts
+  s_7d8917753e260e::t_7d079744d5e7cd 377-409
+apps/construction-management/src/labour/infrastructure/prisma-vendor-store.ts
+  s_7d8917753e260e::t_cb3e59a4cb62ed 261-346
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_7d8917753e260e::t_92edc9c24943f1 1-491
+apps/construction-management/src/masters/domain/party.test.ts
+  s_7d8917753e260e::t_c0aef936667224 1-139
+apps/construction-management/src/masters/domain/party.ts
+  s_7d8917753e260e::t_2c37fde86b5ed3 1-344
+apps/construction-management/src/masters/infrastructure/create-party-handlers.ts
+  s_7d8917753e260e::t_fcfc14e5a3b2de 1-18
+apps/construction-management/src/masters/infrastructure/prisma-party-store.ts
+  s_7d8917753e260e::t_4e0c2e09cb33e0 1-451
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_7d8917753e260e::t_37606951c1bf98 42-53,292-428
+apps/construction-management/src/organization/domain/team-member-repository.ts
+  s_7d8917753e260e::t_0acc288a9a60bc 24-27,31-39
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_7d8917753e260e::t_148da5bc6c9369 180-234
+apps/construction-management/src/projects/application/location-handlers.ts
+  s_7d8917753e260e::t_5fcd882b93d5f6 1-211
+apps/construction-management/src/projects/application/project-documents.ts
+  s_7d8917753e260e::t_de79b230cf993b 1-6,9,13-16,21,27,29-31,59-64,69,73,129-133,139-140,144-145,148-150,152-157,214-227,240-241,244,251,259-260,262-281,298-344,346-348,356,364,368-369,376-385,390-403,410-411,425-428,431-433
+apps/construction-management/src/projects/application/project-drawings.ts
+  s_7d8917753e260e::t_bbb2a339caf731 1-825
+apps/construction-management/src/projects/application/project-gallery.ts
+  s_7d8917753e260e::t_184e3dd85a6232 1-127
+apps/construction-management/src/projects/application/project-media-listener.test.ts
+  s_7d8917753e260e::t_3c761b952a3b85 1-107
+apps/construction-management/src/projects/application/project-media-listener.ts
+  s_7d8917753e260e::t_7b9223fac006aa 1-62
+apps/construction-management/src/projects/application/project-testing-reports.ts
+  s_7d8917753e260e::t_f1b1335d7ef49c 1-756
+apps/construction-management/src/projects/application/project-visibility.ts
+  s_7d8917753e260e::t_c72613ffbb3214 1-24
+apps/construction-management/src/projects/application/structure-handlers.test.ts
+  s_7d8917753e260e::t_86f9b5f9b76b18 1-414
+apps/construction-management/src/projects/application/structure-read-model.ts
+  s_7d8917753e260e::t_379245f8f85f95 1-101
+apps/construction-management/src/projects/application/wing-handlers.ts
+  s_7d8917753e260e::t_3b19bbb43bc361 1-505
+apps/construction-management/src/projects/domain/drawing.test.ts
+  s_7d8917753e260e::t_d0d44d0c0da734 1-45
+apps/construction-management/src/projects/domain/drawing.ts
+  s_7d8917753e260e::t_d15169f710dedf 1-103
+apps/construction-management/src/projects/domain/location.ts
+  s_7d8917753e260e::t_95d3bbbdbc566a 1-149
+apps/construction-management/src/projects/domain/media-item.ts
+  s_7d8917753e260e::t_d10dcf2d7b9cfb 1-55
+apps/construction-management/src/projects/domain/phase.ts
+  s_7d8917753e260e::t_86dacfc4e40125 1-132
+apps/construction-management/src/projects/domain/project-document-rules.ts
+  s_7d8917753e260e::t_0af3d856fb19de 1-3,34,36,39
+apps/construction-management/src/projects/domain/project-document.ts
+  s_7d8917753e260e::t_6919de9e25f498 2-12,26-27,32,35,39,44,57,70,74
+apps/construction-management/src/projects/domain/project-upload-policies.ts
+  s_7d8917753e260e::t_95d7be71e29219 1-39
+apps/construction-management/src/projects/domain/structure-repository.ts
+  s_7d8917753e260e::t_c08be1409f1fed 1-109
+apps/construction-management/src/projects/domain/testing-report.test.ts
+  s_7d8917753e260e::t_6631197edc98c4 1-57
+apps/construction-management/src/projects/domain/testing-report.ts
+  s_7d8917753e260e::t_159cae56df9338 1-111
+apps/construction-management/src/projects/domain/wing-floors.ts
+  s_7d8917753e260e::t_ecb880160d84f1 1-207
+apps/construction-management/src/projects/domain/wing-generator.test.ts
+  s_7d8917753e260e::t_b718670e77e8e8 1-354
+apps/construction-management/src/projects/domain/wing-generator.ts
+  s_7d8917753e260e::t_60a7e11794f123 1-531
+apps/construction-management/src/projects/domain/wing.test.ts
+  s_7d8917753e260e::t_9e945ebe941cd3 1-497
+apps/construction-management/src/projects/domain/wing.ts
+  s_7d8917753e260e::t_0ea0b09c33bdd3 1-290
+apps/construction-management/src/projects/infrastructure/create-project-drawings.ts
+  s_7d8917753e260e::t_228391d65366ed 1-28
+apps/construction-management/src/projects/infrastructure/create-project-gallery.ts
+  s_7d8917753e260e::t_fd975464368c68 1-17
+apps/construction-management/src/projects/infrastructure/create-project-media-listener.ts
+  s_7d8917753e260e::t_6906f8cd796d18 1-11
+apps/construction-management/src/projects/infrastructure/create-project-structure.ts
+  s_7d8917753e260e::t_32b22477340848 1-55
+apps/construction-management/src/projects/infrastructure/create-project-testing-reports.ts
+  s_7d8917753e260e::t_73ca4e1d5e497d 1-32
+apps/construction-management/src/projects/infrastructure/prisma-drawing-store.ts
+  s_7d8917753e260e::t_70bf8116c7a30b 1-503
+apps/construction-management/src/projects/infrastructure/prisma-gallery-reader.ts
+  s_7d8917753e260e::t_287c3ef1e80f26 1-131
+apps/construction-management/src/projects/infrastructure/prisma-location-repository.ts
+  s_7d8917753e260e::t_2193c051e7088e 1-168
+apps/construction-management/src/projects/infrastructure/prisma-media-index.ts
+  s_7d8917753e260e::t_33d0d48efd595c 1-100
+apps/construction-management/src/projects/infrastructure/prisma-phase-repository.ts
+  s_7d8917753e260e::t_a8b87ed8a89317 1-170
+apps/construction-management/src/projects/infrastructure/prisma-project-document-store.ts
+  s_7d8917753e260e::t_be5999b9d4b92e 10,28,44-45,117,123-137,168-180
+apps/construction-management/src/projects/infrastructure/prisma-project-structure-reader.ts
+  s_7d8917753e260e::t_1b880c189b40f4 1-118
+apps/construction-management/src/projects/infrastructure/prisma-testing-report-store.ts
+  s_7d8917753e260e::t_62de7f083def90 1-490
+apps/construction-management/src/projects/infrastructure/prisma-wing-repository.ts
+  s_7d8917753e260e::t_157d25235b098f 1-376
+apps/construction-management/src/projects/infrastructure/unused-structure.ts
+  s_7d8917753e260e::t_21e4c0b8643838 1-22
+apps/construction-management/src/queries/direct-upload.ts
+  s_7d8917753e260e::t_258ae6076eba12 1-201
+apps/construction-management/src/queries/parties.ts
+  s_7d8917753e260e::t_08e7bd9066a2f1 1-110
+apps/construction-management/src/queries/project-documents.ts
+  s_7d8917753e260e::t_1376a17172d6f8 14-15,41-46,49-52,66-77
+apps/construction-management/src/queries/project-drawings.ts
+  s_7d8917753e260e::t_5efb9c37af0b13 1-209
+apps/construction-management/src/queries/project-gallery.ts
+  s_7d8917753e260e::t_0833f094ea4dcb 1-80
+apps/construction-management/src/queries/project-resources.ts
+  s_7d8917753e260e::t_573631958a4c17 1-97
+apps/construction-management/src/queries/project-structure.ts
+  s_7d8917753e260e::t_5d0667527e66d4 1-197
+apps/construction-management/src/queries/project-testing-reports.ts
+  s_7d8917753e260e::t_94caef41641481 1-222
+apps/construction-management/src/shared-kernel/attachments/attachment-key.ts
+  s_7d8917753e260e::t_7ad7633d0c6098 1-80
+apps/construction-management/src/shared-kernel/attachments/attachment-uploads.test.ts
+  s_7d8917753e260e::t_ea0c15db01b403 1-277
+apps/construction-management/src/shared-kernel/attachments/attachment-uploads.ts
+  s_7d8917753e260e::t_fc0f1d512a1d57 1-411
+apps/construction-management/src/shared-kernel/attachments/index.ts
+  s_7d8917753e260e::t_4a4e8d955fd116 1-42
+apps/construction-management/src/shared-kernel/attachments/program-names.ts
+  s_7d8917753e260e::t_4bffdd7c25420e 1-49
+apps/construction-management/src/shared-kernel/attachments/sniff.test.ts
+  s_7d8917753e260e::t_825289d5e3168e 1-104
+apps/construction-management/src/shared-kernel/attachments/sniff.ts
+  s_7d8917753e260e::t_c040e900a48c36 1-102
+apps/construction-management/src/shared-kernel/attachments/upload-policy.test.ts
+  s_7d8917753e260e::t_926c977295731a 1-142
+apps/construction-management/src/shared-kernel/attachments/upload-policy.ts
+  s_7d8917753e260e::t_48771ebb6559ed 1-100
+apps/construction-management/src/shared-kernel/project-media.ts
+  s_7d8917753e260e::t_b296364b7ab127 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2e6e451005f5ef20f2ad2915fbb756736c92f16f",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
