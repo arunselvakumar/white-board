@@ -1,0 +1,61 @@
+apps/construction-management/app/api/construction/procurement/central-inventory/central-inventory-models.ts
+  s_6604e2237b6922::t_d6ba520603285a 132-138,142-164,170-183
+apps/construction-management/app/api/construction/procurement/central-inventory/route.ts
+  s_6604e2237b6922::t_100edfa063080d 28-32
+apps/construction-management/app/api/construction/procurement/central-inventory/stock-ledger/route.ts
+  s_6604e2237b6922::t_451aeb6cd2209f 24-28
+apps/construction-management/app/api/construction/procurement/central-inventory/stock-ledger/xlsx/route.ts
+  s_6604e2237b6922::t_82ca065beaec6e 32-36
+apps/construction-management/app/api/construction/procurement/delivery-notes/approve/route.ts
+  s_6604e2237b6922::t_a9b38de4befb5d 25-29
+apps/construction-management/app/api/construction/procurement/goods-receipts/handlers.ts
+  s_6604e2237b6922::t_67143af7082e87 24,29
+apps/construction-management/app/api/construction/procurement/inventory/handlers.ts
+  s_6604e2237b6922::t_06fa208b9596ef 26,28-29
+apps/construction-management/app/api/construction/procurement/purchase-orders/handlers.ts
+  s_6604e2237b6922::t_0016e65a44d755 26,40
+apps/construction-management/app/api/construction/procurement/purchase-requests/handlers.ts
+  s_6604e2237b6922::t_aa94ae72755524 27,41
+apps/construction-management/app/api/construction/procurement/stores/[id]/delete/route.ts
+  s_6604e2237b6922::t_a30fee3e54d7b0 32-34
+apps/construction-management/app/api/construction/procurement/stores/[id]/update/route.ts
+  s_6604e2237b6922::t_9c5287620f3bd0 30-32
+apps/construction-management/app/api/construction/procurement/stores/central-store-wiring.ts
+  s_6604e2237b6922::t_e17801d5c40659 18,49
+apps/construction-management/app/api/construction/procurement/stores/route.ts
+  s_6604e2237b6922::t_5ce202b1c0547d 29-33,62-66
+apps/construction-management/app/api/construction/procurement/transfers/handlers.ts
+  s_6604e2237b6922::t_cd2e448014abb1 3,7
+apps/construction-management/app/api/construction/procurement/transfers/transfer-models.ts
+  s_6604e2237b6922::t_04900ae49bd45b 186-193,195-204,206-208,210-214,217-226
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.tsx
+  s_6604e2237b6922::t_a1c5b782c10fbc 137-138,142-146
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_6604e2237b6922::t_1db2aa54c43449 309-311,342-348
+apps/construction-management/docs/prd/handoff/M5.md
+  s_6604e2237b6922::t_735773e92e5760 3
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_6604e2237b6922::t_d85fb4fa79bfe4 520
+apps/construction-management/src/procurement/domain/central-inventory.ts
+  s_6604e2237b6922::t_04c1b5e88dd064 10-17
+apps/construction-management/src/procurement/infrastructure/procurement-events.ts
+  s_6604e2237b6922::t_cc28777f555a47 1-10
+apps/construction-management/src/queries/central-inventory.ts
+  s_6604e2237b6922::t_bd4f29f653e1dd 24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9becceddbcc9fb20d96c70f55a88a19b4a5ba713",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
