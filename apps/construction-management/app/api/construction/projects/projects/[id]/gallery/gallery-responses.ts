@@ -5,6 +5,8 @@ import {
 } from "@/src/projects/domain/media-item";
 import { can, type MemberAccess } from "@/src/shared-kernel/access";
 
+import { procurementGalleryRoutes } from "@/app/api/construction/procurement/documents/document-responses";
+
 import { documentsPath } from "../documents/project-document-responses";
 import {
   revisionFilePath,
@@ -60,7 +62,8 @@ function routesOf(
         thumbnail: testingReportThumbnailPath(item.projectId, item.sourceId),
       };
     default:
-      return null;
+      // Procurement documents' files (M5) are served by their own routes.
+      return procurementGalleryRoutes(item);
   }
 }
 
