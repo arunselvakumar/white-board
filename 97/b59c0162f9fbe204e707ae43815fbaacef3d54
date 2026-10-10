@@ -1,0 +1,119 @@
+apps/construction-management/app/api/construction/procurement/delivery-notes/delivery-note-models.ts
+  s_6604e2237b6922::t_c90fcf2c66cec7 1-152
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/close/route.ts
+  s_6604e2237b6922::t_021359c19b466e 1-47
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/delete/route.ts
+  s_6604e2237b6922::t_d9eab4ec68393f 1-43
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/pdf/route.ts
+  s_6604e2237b6922::t_c6d79b319e8d02 1-51
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/route.ts
+  s_6604e2237b6922::t_6304ddab3adbca 1-29
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/update/route.ts
+  s_6604e2237b6922::t_5e000756afea57 1-46
+apps/construction-management/app/api/construction/procurement/material-requests/form-options/route.ts
+  s_6604e2237b6922::t_c529cf098d7b00 1-50
+apps/construction-management/app/api/construction/procurement/material-requests/material-request-access.ts
+  s_6604e2237b6922::t_b0285ff629d2ef 1-51
+apps/construction-management/app/api/construction/procurement/material-requests/material-request-models.ts
+  s_6604e2237b6922::t_64023b79e34f7c 1-204
+apps/construction-management/app/api/construction/procurement/material-requests/route.ts
+  s_6604e2237b6922::t_ea84d36a8f7110 1-107
+apps/construction-management/app/api/construction/procurement/stores/[id]/delete/route.ts
+  s_6604e2237b6922::t_6657e25f0076f9 1-49
+apps/construction-management/app/api/construction/procurement/stores/[id]/route.ts
+  s_6604e2237b6922::t_d3055168f7c7c8 1-35
+apps/construction-management/app/api/construction/procurement/stores/[id]/stock/route.ts
+  s_6604e2237b6922::t_bb51c739ce22cc 1-38
+apps/construction-management/app/api/construction/procurement/stores/[id]/update/route.ts
+  s_6604e2237b6922::t_5e71cc92cde11b 1-48
+apps/construction-management/app/api/construction/procurement/stores/central-store-access.ts
+  s_6604e2237b6922::t_373861825cc270 1-91
+apps/construction-management/app/api/construction/procurement/stores/form-options/route.ts
+  s_6604e2237b6922::t_e9dc04e31c4990 1-28
+apps/construction-management/app/api/construction/procurement/stores/options/route.ts
+  s_6604e2237b6922::t_8935ac66e2b297 1-61
+apps/construction-management/app/api/construction/procurement/stores/route.ts
+  s_6604e2237b6922::t_025e252b48b74b 1-74
+apps/construction-management/app/api/construction/procurement/stores/store-models.ts
+  s_6604e2237b6922::t_719298c2a84601 1-174
+apps/construction-management/src/procurement/application/delivery-note-handlers.ts
+  s_6604e2237b6922::t_eb045b61d50b82 1-172
+apps/construction-management/src/procurement/application/material-request-handlers.ts
+  s_6604e2237b6922::t_cd63b8ed8c6126 1-189
+apps/construction-management/src/procurement/domain/central-inventory.ts
+  s_6604e2237b6922::t_563bcef81c5627 1-65
+apps/construction-management/src/procurement/domain/delivery-note.ts
+  s_6604e2237b6922::t_1ca683c9d7a488 1-175
+apps/construction-management/src/procurement/domain/material-request.ts
+  s_6604e2237b6922::t_cbf8479913fc26 1-215
+apps/construction-management/src/procurement/domain/store.ts
+  s_6604e2237b6922::t_1bca6a9302317b 1-126
+apps/construction-management/src/procurement/infrastructure/central-inventory-reader.ts
+  s_6604e2237b6922::t_4bf844c6e79aec 1-403
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_6604e2237b6922::t_b72df8e2e8dcb7 1-645
+apps/construction-management/src/procurement/infrastructure/store-repository.ts
+  s_6604e2237b6922::t_fd00348cd9dfc6 1-521
+apps/construction-management/app/api/construction/procurement/stores/central-store-wiring.ts
+  s_3e4bf03912e8a4::t_fc6badf77714aa 1-56
+apps/construction-management/src/composition/central-store-options.ts
+  s_96c39cec5f5885::t_4f588da7cc57c8 1-68
+apps/construction-management/src/procurement/application/central-inventory-queries.ts
+  s_4ca43a567c5955::t_744b2d765b6fd7 1-99
+apps/construction-management/src/procurement/application/store-handlers.ts
+  s_6604e2237b6922::t_28c5341f7f4d31 1-139
+apps/construction-management/src/procurement/infrastructure/central-inventory-xlsx.ts
+  s_3e4bf03912e8a4::t_7335b36031feca 1-103
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_96c39cec5f5885::t_8e0c2bdcc78f56 1-698
+apps/construction-management/src/procurement/infrastructure/material-request-pdf.ts
+  s_8b6911ff87b19b::t_9e9d77ff3feca3 1-255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "97b59c0162f9fbe204e707ae43815fbaacef3d54",
+  "prompts": {},
+  "sessions": {
+    "s_3e4bf03912e8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec76c7ed718a44cd",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_4ca43a567c5955": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eb991c63013f969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8b6911ff87b19b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec7939dd8bcc4694",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_96c39cec5f5885": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-acd373d987cd964ee",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
