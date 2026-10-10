@@ -1,0 +1,29 @@
+apps/construction-management/components/procurement/stores/central-store-parts.tsx
+  s_6604e2237b6922::t_c40c60f25bc2a2 1-195
+apps/construction-management/components/procurement/stores/stores-page.tsx
+  s_6604e2237b6922::t_7a57b37e1e53c2 1-125
+apps/construction-management/src/queries/central-inventory.ts
+  s_6604e2237b6922::t_b15d1b9c244949 1-101
+apps/construction-management/src/queries/delivery-notes.ts
+  s_6604e2237b6922::t_9ca0020c3da1d0 1-131
+apps/construction-management/src/queries/material-requests.ts
+  s_6604e2237b6922::t_7f25a8e608af4c 1-147
+apps/construction-management/src/queries/stores.ts
+  s_6604e2237b6922::t_fb1ebd7099d74b 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5f2361b37942e89bdda8f09fd2621f375fbc3975",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
