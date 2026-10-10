@@ -1,0 +1,47 @@
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/delete/route.ts
+  s_6604e2237b6922::t_137f38b398d1c0 27-28
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/mark-delivered/route.ts
+  s_6604e2237b6922::t_6b7b831dd0c79f 30-31
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/update/route.ts
+  s_6604e2237b6922::t_15bbe4e090d326 26-27
+apps/construction-management/app/api/construction/procurement/inventory/movements/[id]/delete/route.ts
+  s_6604e2237b6922::t_f374e5dbcab229 28-29
+apps/construction-management/app/api/construction/procurement/inventory/movements/[id]/update/route.ts
+  s_6604e2237b6922::t_de95b68004ce31 28-29
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/close/route.ts
+  s_6604e2237b6922::t_b027f98c30d39d 30-31
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/delete/route.ts
+  s_6604e2237b6922::t_efd76c9d78aa3e 34-38
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/update/route.ts
+  s_6604e2237b6922::t_5db8b0fa296126 36-40
+apps/construction-management/app/api/construction/procurement/stores/[id]/delete/route.ts
+  s_6604e2237b6922::t_107af211de2171 35-39
+apps/construction-management/app/api/construction/procurement/stores/[id]/update/route.ts
+  s_6604e2237b6922::t_42a88af38eb261 33-37
+apps/construction-management/app/api/construction/procurement/transfers/[id]/approve/route.ts
+  s_6604e2237b6922::t_111c468a076e07 26-27
+apps/construction-management/app/api/construction/procurement/transfers/[id]/delete/route.ts
+  s_6604e2237b6922::t_02effcae5ecd44 25-26
+apps/construction-management/app/api/construction/procurement/transfers/[id]/deliver/route.ts
+  s_6604e2237b6922::t_99ff7dcf9401f8 26-27
+apps/construction-management/app/api/construction/procurement/transfers/[id]/reject/route.ts
+  s_6604e2237b6922::t_16037bcb53c2e7 26-27
+apps/construction-management/app/api/construction/procurement/transfers/[id]/update/route.ts
+  s_6604e2237b6922::t_bc7c1540c7084c 26-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5d22c4a140464ae6d9100954af7c42521f538e62",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
