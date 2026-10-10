@@ -53,6 +53,7 @@ export const materialRoutes = pagedMasterRoutes({
       ...listParams(session.workspaceId, query),
       categoryId: query.categoryId,
       itemType: query.itemType,
+      searchHsn: seesMaterialRates(session),
     }),
   get: (target) => materialHandlers.get(target.workspaceId, target.id),
   create: (session, body) =>

@@ -134,7 +134,9 @@ export class PartyQuotations {
   private target(party: Party): UploadTarget {
     return {
       workspaceId: party.workspaceId,
-      ownerId: party.partyId,
+      // Contractors and Suppliers live in separate tables, so the kind is
+      // part of the owner: a key started for one never passes for the other.
+      ownerId: `${party.kind}-${party.partyId}`,
       policy: QUOTATION_POLICY,
     };
   }
