@@ -80,6 +80,22 @@ export function updateProject(
   return postJson(`${PROJECTS_API}/${encodeURIComponent(id)}/update`, input);
 }
 
+/** The file itself is the body; the server checks type and size again. */
+export function uploadProjectLogo(
+  id: string,
+  file: File,
+): Promise<ProjectResponse> {
+  return apiJson(`${PROJECTS_API}/${encodeURIComponent(id)}/logo`, {
+    method: "POST",
+    headers: { "content-type": file.type },
+    body: file,
+  });
+}
+
+export function removeProjectLogo(id: string): Promise<ProjectResponse> {
+  return postJson(`${PROJECTS_API}/${encodeURIComponent(id)}/logo/remove`);
+}
+
 export function deleteProject(id: string): Promise<void> {
   return postJson(`${PROJECTS_API}/${encodeURIComponent(id)}/delete`);
 }
@@ -103,6 +119,34 @@ export function useUpdateProject(id: string) {
       await queryClient.invalidateQueries({ queryKey: PROJECTS_KEY });
     },
   });
+}
+
+/**
+ * What the Project form decided about the logo (CM-401): keep it, set a
+ * picked file, or remove it. The form saves the Project first and then
+ * applies this, so a logo never makes the form's `updatedAt` stale.
+ */
+export type ProjectLogoChange =
+  { kind: "keep" } | { kind: "set"; file: File } | { kind: "remove" };
+
+/**
+ * Applies a logo change to a saved Project and refreshes the Project
+ * reads; false when the upload or removal failed.
+ */
+export function useApplyProjectLogo() {
+  const invalidate = useInvalidateProjects();
+  return async (id: string, change: ProjectLogoChange): Promise<boolean> => {
+    if (change.kind === "keep") return true;
+    try {
+      if (change.kind === "set") await uploadProjectLogo(id, change.file);
+      else await removeProjectLogo(id);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      await invalidate();
+    }
+  };
 }
 
 /**
