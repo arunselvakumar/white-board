@@ -1,0 +1,115 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_6604e2237b6922::t_1ade5db362b996 153-156,912-915
+apps/construction-management/app/api/construction/procurement/access/access-models.ts
+  s_6604e2237b6922::t_f095985f355d51 1-39
+apps/construction-management/app/api/construction/procurement/access/access-openapi.ts
+  s_6604e2237b6922::t_6bf3fc0a0bbec2 1-34
+apps/construction-management/app/api/construction/procurement/access/route.ts
+  s_6604e2237b6922::t_744c60727a75ca 1-54
+apps/construction-management/app/api/construction/procurement/central-inventory/central-inventory-openapi.ts
+  s_6604e2237b6922::t_0ec682936f7ff2 1-10
+apps/construction-management/app/api/construction/procurement/delivery-notes/delivery-notes-openapi.ts
+  s_6604e2237b6922::t_c3ff486909e07f 1-10
+apps/construction-management/app/api/construction/procurement/documents/documents-openapi.ts
+  s_6604e2237b6922::t_9d69d07bd94eb8 1-10
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts-openapi.ts
+  s_6604e2237b6922::t_638929d21771ae 1-10
+apps/construction-management/app/api/construction/procurement/inventory/inventory-openapi.ts
+  s_6604e2237b6922::t_f248e14e7cc272 1-10
+apps/construction-management/app/api/construction/procurement/material-requests/material-requests-openapi.ts
+  s_6604e2237b6922::t_5bf5bcd96973cb 1-10
+apps/construction-management/app/api/construction/procurement/procurement-openapi.ts
+  s_6604e2237b6922::t_169c4cb3aaecc5 1-79
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders-openapi.ts
+  s_6604e2237b6922::t_71b53edf2090e6 1-10
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-requests-openapi.ts
+  s_6604e2237b6922::t_225ccb484d2d58 1-10
+apps/construction-management/app/api/construction/procurement/stores/stores-openapi.ts
+  s_6604e2237b6922::t_76e99214759776 1-10
+apps/construction-management/app/api/construction/procurement/transfers/transfers-openapi.ts
+  s_6604e2237b6922::t_39553de1598e8f 1-10
+apps/construction-management/app/app/projects/[id]/materials/goods-received/page.tsx
+  s_6604e2237b6922::t_908c867d33293b 1-9
+apps/construction-management/app/app/projects/[id]/materials/inventory/page.tsx
+  s_6604e2237b6922::t_0e17eedbb94dd1 1-9
+apps/construction-management/app/app/projects/[id]/materials/layout.tsx
+  s_6604e2237b6922::t_a6fd2d30bb290c 1-20
+apps/construction-management/app/app/projects/[id]/materials/material-requests/page.tsx
+  s_6604e2237b6922::t_495c4b7a2c2f3c 1-9
+apps/construction-management/app/app/projects/[id]/materials/page.tsx
+  s_6604e2237b6922::t_2e8a8e7faefc78 1-13
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/page.tsx
+  s_6604e2237b6922::t_92fd0ebcbf3284 1-9
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/page.tsx
+  s_6604e2237b6922::t_3c2d2fac332d72 1-9
+apps/construction-management/app/app/projects/[id]/materials/transfers/page.tsx
+  s_6604e2237b6922::t_bdbeb0a7d19b55 1-9
+apps/construction-management/components/procurement/documents/document-activity.tsx
+  s_6604e2237b6922::t_dce78b0805c094 1-34
+apps/construction-management/components/procurement/materials-hub/coming-soon.tsx
+  s_6604e2237b6922::t_355f1e8e351823 1-24
+apps/construction-management/components/procurement/materials-hub/materials-nav.tsx
+  s_6604e2237b6922::t_0f8990dc5594cd 1-51
+apps/construction-management/components/procurement/materials-hub/materials-tabs.ts
+  s_6604e2237b6922::t_42b93d682eaea7 1-52
+apps/construction-management/components/projects/project-module-icons.ts
+  s_6604e2237b6922::t_853aa3adf0f8d3 11,33
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_6604e2237b6922::t_100ee3df27f1a6 505-507,509-516
+apps/construction-management/src/composition/procurement-directory.ts
+  s_6604e2237b6922::t_6f3aaa0657e5d7 1-182
+apps/construction-management/src/procurement/application/ports.ts
+  s_6604e2237b6922::t_d426763084910f 1-169
+apps/construction-management/src/procurement/domain/stock-ledger.ts
+  s_6604e2237b6922::t_5760099b41a8aa 1-135
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.http.test.ts
+  s_6604e2237b6922::t_113e12ef590aac 1-141
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.ts
+  s_6604e2237b6922::t_cdb9ec6063e811 1-290
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_6604e2237b6922::t_47b2f4f0d78d5d 91-97
+apps/construction-management/src/queries/procurement-access.ts
+  s_6604e2237b6922::t_4575d0955afc98 1-39
+apps/construction-management/src/shared-kernel/access/access.test.ts
+  s_6604e2237b6922::t_16950549d9e11b 65-66
+apps/construction-management/src/shared-kernel/access/menus.ts
+  s_6604e2237b6922::t_9fc09c2b19da6d 186-192
+apps/construction-management/src/shared-kernel/approval.ts
+  s_6604e2237b6922::t_63c5c19feac0c4 1-167
+apps/construction-management/src/shared-kernel/company-today.ts
+  s_6604e2237b6922::t_e8819023617993 1-24
+apps/construction-management/src/shared-kernel/gst-line.test.ts
+  s_6604e2237b6922::t_aba7ed7810bf28 1-139
+apps/construction-management/src/shared-kernel/gst-line.ts
+  s_6604e2237b6922::t_2c6dabe747f454 1-199
+apps/construction-management/src/shared-kernel/quantity.ts
+  s_6604e2237b6922::t_a6b8a43a977691 43-54,59-77
+apps/construction-management/test/procurement.ts
+  s_6604e2237b6922::t_44e6c93f7b5e52 1-249
+apps/construction-management/src/procurement/domain/documents.ts
+  s_6604e2237b6922::t_697a4af1ac2474 1-90
+apps/construction-management/src/procurement/domain/events.ts
+  s_6604e2237b6922::t_a7f99e1fb1a434 1-28
+apps/construction-management/src/procurement/domain/stock-location.ts
+  s_6604e2237b6922::t_a87eb9eaf45428 1-33
+apps/construction-management/src/procurement/infrastructure/procurement-guards.ts
+  s_6604e2237b6922::t_fec60fee2aeb34 1-47
+apps/construction-management/src/shared-kernel/approval.test.ts
+  s_6604e2237b6922::t_a963a63f533d30 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a2cc4221fa24ae2724dc982fb5c706a829473667",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
