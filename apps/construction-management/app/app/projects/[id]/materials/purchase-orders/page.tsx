@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 
-import { MaterialsComingSoon } from "@/components/procurement/materials-hub/coming-soon";
+import { PurchaseOrdersPage } from "@/components/procurement/purchase-orders/purchase-orders-page";
 
 export const metadata: Metadata = { title: "Purchase Orders" };
 
-export default function Page() {
-  return <MaterialsComingSoon title="Purchase Orders" ticket="CM-504" />;
+/** The Project's Purchase Orders (CM-504). Store POs come with CM-508. */
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <PurchaseOrdersPage projectId={id} />;
 }
