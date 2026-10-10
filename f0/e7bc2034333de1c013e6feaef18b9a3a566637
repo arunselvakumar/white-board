@@ -1,0 +1,167 @@
+apps/construction-management/CONTEXT.md
+  s_7d8917753e260e::t_0ab6e14e21fe69 70,74,134-137
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_d69dbc9b3eb558 73-76,93-96,815-818,823-826
+apps/construction-management/app/api/construction/masters/_lib/party-models.ts
+  s_7d8917753e260e::t_23a165414416ab 1-140
+apps/construction-management/app/api/construction/masters/_lib/party-routes.ts
+  s_7d8917753e260e::t_9671fc63110ea4 1-148
+apps/construction-management/app/api/construction/masters/contractors/[id]/activate/route.ts
+  s_7d8917753e260e::t_82a215d3c82dbd 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/deactivate/route.ts
+  s_7d8917753e260e::t_5e7f19ae1a10ba 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/delete/route.ts
+  s_7d8917753e260e::t_b5a3bf3d402054 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/route.ts
+  s_7d8917753e260e::t_2aa961a20fc1de 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/update/route.ts
+  s_7d8917753e260e::t_bfaa4a631bd990 1-6
+apps/construction-management/app/api/construction/masters/contractors/contractor-models.ts
+  s_7d8917753e260e::t_b96d9a66729103 1-26
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_7d8917753e260e::t_2e547cec99f702 1-17
+apps/construction-management/app/api/construction/masters/contractors/route.ts
+  s_7d8917753e260e::t_696e965cd1b1bf 1-9
+apps/construction-management/app/api/construction/masters/parties-openapi.ts
+  s_7d8917753e260e::t_5717d74a7e0c95 1-165
+apps/construction-management/app/api/construction/masters/parties.http.test.ts
+  s_7d8917753e260e::t_b36a5e7557a1cf 1-466
+apps/construction-management/app/api/construction/masters/suppliers/[id]/activate/route.ts
+  s_7d8917753e260e::t_154c8b372a60d0 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/deactivate/route.ts
+  s_7d8917753e260e::t_28faae18023956 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/delete/route.ts
+  s_7d8917753e260e::t_373bbb30c8ba0d 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/route.ts
+  s_7d8917753e260e::t_580ec2563658ef 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/update/route.ts
+  s_7d8917753e260e::t_7407ceca785c4b 1-6
+apps/construction-management/app/api/construction/masters/suppliers/route.ts
+  s_7d8917753e260e::t_b27cb80afa7e4c 1-9
+apps/construction-management/app/api/construction/masters/suppliers/supplier-models.ts
+  s_7d8917753e260e::t_c9dde04ec42ab1 1-26
+apps/construction-management/app/api/construction/masters/suppliers/supplier-routes.ts
+  s_7d8917753e260e::t_f953c291d658ff 1-17
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/contractors/options/route.ts
+  s_7d8917753e260e::t_25ce11a4a363d5 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/contractors/route.ts
+  s_7d8917753e260e::t_55282de1840e24 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/handlers.ts
+  s_7d8917753e260e::t_8b7aac6320a83e 1-80
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources-models.ts
+  s_7d8917753e260e::t_1309b214d1f21e 1-114
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources-openapi.ts
+  s_7d8917753e260e::t_f8d5fdf5a4ef23 1-118
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources.http.test.ts
+  s_7d8917753e260e::t_17d0b18d61f538 1-547
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/route.ts
+  s_7d8917753e260e::t_37bc7fee7214e3 1-32
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/suppliers/options/route.ts
+  s_7d8917753e260e::t_99985e058005f1 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/suppliers/route.ts
+  s_7d8917753e260e::t_e6bf9082b0eacf 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/team-members/options/route.ts
+  s_7d8917753e260e::t_3f2bc52f41d1b7 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/team-members/route.ts
+  s_7d8917753e260e::t_ce41fe59bcac8b 1-8
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/vendors/options/route.ts
+  s_7d8917753e260e::t_56f64c5317095f 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/vendors/route.ts
+  s_7d8917753e260e::t_7f92d6e094ea78 1-8
+apps/construction-management/app/app/masters/contractors/[id]/page.tsx
+  s_7d8917753e260e::t_ad444bcb11273a 1-14
+apps/construction-management/app/app/masters/contractors/new/page.tsx
+  s_7d8917753e260e::t_c908d23661d452 1-9
+apps/construction-management/app/app/masters/contractors/page.tsx
+  s_7d8917753e260e::t_3e03f8d0b13bd3 1-9
+apps/construction-management/app/app/masters/suppliers/[id]/page.tsx
+  s_7d8917753e260e::t_a01ba37640cd31 1-14
+apps/construction-management/app/app/masters/suppliers/new/page.tsx
+  s_7d8917753e260e::t_f9cb4715a83671 1-9
+apps/construction-management/app/app/masters/suppliers/page.tsx
+  s_7d8917753e260e::t_452458599dbbbd 1-9
+apps/construction-management/app/app/projects/[id]/resources/page.tsx
+  s_7d8917753e260e::t_ad9dd3af11e29c 1-31
+apps/construction-management/components/parties/parties-page.stories.tsx
+  s_7d8917753e260e::t_8465da9c3c7969 1-145
+apps/construction-management/components/parties/parties-page.tsx
+  s_7d8917753e260e::t_524023b13de714 1-412
+apps/construction-management/components/parties/party-fixtures.ts
+  s_7d8917753e260e::t_d808a2d6e7ebd7 1-99
+apps/construction-management/components/parties/party-form-schema.ts
+  s_7d8917753e260e::t_26690cf434d9db 1-126
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_7d8917753e260e::t_89def96b583662 1-235
+apps/construction-management/components/parties/party-form.tsx
+  s_7d8917753e260e::t_e5361431d818fc 1-395
+apps/construction-management/components/parties/party-screens.ts
+  s_7d8917753e260e::t_abd1726b88a099 1-47
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_7d8917753e260e::t_477695c8af4050 196,530,1009
+apps/construction-management/components/projects/project-form.tsx
+  s_7d8917753e260e::t_f5594b97847313 92,672-673,728
+apps/construction-management/components/projects/resources/project-resources-page.stories.tsx
+  s_7d8917753e260e::t_0ae840bf08c1c1 1-282
+apps/construction-management/components/projects/resources/project-resources-page.tsx
+  s_7d8917753e260e::t_ebaef1275321a0 1-216
+apps/construction-management/components/projects/resources/resource-fixtures.ts
+  s_7d8917753e260e::t_41598f1132587a 1-82
+apps/construction-management/components/projects/resources/resource-picker-dialog.tsx
+  s_7d8917753e260e::t_5ba828b539a327 1-271
+apps/construction-management/components/projects/resources/resource-sections.ts
+  s_7d8917753e260e::t_10fae186c5fa37 1-52
+apps/construction-management/components/projects/resources/resources-step.ts
+  s_7d8917753e260e::t_7567b1d0b5e434 1-11
+apps/construction-management/docs/modules/02-master-records.md
+  s_7d8917753e260e::t_26b863926a15bd 718-731
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_7d8917753e260e::t_350f01393d7239 552-563
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_5756e81fa36ad8 439
+apps/construction-management/lib/masters-nav.ts
+  s_7d8917753e260e::t_c9f7979c580629 4,9,71-90
+apps/construction-management/src/composition/project-resources.ts
+  s_7d8917753e260e::t_d4c5d892a7c725 1-150
+apps/construction-management/src/labour/application/vendor-handlers.ts
+  s_7d8917753e260e::t_ac845ffe1eef56 1-2,4-8,47-67,160-168,388-470
+apps/construction-management/src/labour/domain/vendor.ts
+  s_7d8917753e260e::t_20b751b455f3e6 377-409
+apps/construction-management/src/labour/infrastructure/prisma-vendor-store.ts
+  s_7d8917753e260e::t_df52f728a9eb28 261-346
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_7d8917753e260e::t_a572ebd5d3b952 1-491
+apps/construction-management/src/masters/domain/party.test.ts
+  s_7d8917753e260e::t_326b10c8194b30 1-139
+apps/construction-management/src/masters/domain/party.ts
+  s_7d8917753e260e::t_8d3934ec7084df 1-344
+apps/construction-management/src/masters/infrastructure/create-party-handlers.ts
+  s_7d8917753e260e::t_bc131f30d8fa30 1-18
+apps/construction-management/src/masters/infrastructure/prisma-party-store.ts
+  s_7d8917753e260e::t_c03958b8e9dbd5 1-451
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_7d8917753e260e::t_2e4d7e4ddeaebc 42-53,292-428
+apps/construction-management/src/organization/domain/team-member-repository.ts
+  s_7d8917753e260e::t_3b4839edf19223 24-27,31-39
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_7d8917753e260e::t_c30c7fb74debff 180-234
+apps/construction-management/src/queries/parties.ts
+  s_7d8917753e260e::t_f7da84016edc60 1-110
+apps/construction-management/src/queries/project-resources.ts
+  s_7d8917753e260e::t_ea2304c3db6b3f 1-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f0e7bc2034333de1c013e6feaef18b9a3a566637",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
