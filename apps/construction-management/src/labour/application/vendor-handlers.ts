@@ -1,5 +1,11 @@
+import { formatMobile } from "@repo/auth/construction/mobile";
+
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
-import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  DomainError,
+  conflict,
+  notFound,
+} from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
@@ -38,6 +44,27 @@ export type VendorStore = {
   list(params: VendorListParams): Promise<VendorListPage>;
   /** Active vendors assigned to the Project, by name. */
   listForProject(workspaceId: string, projectId: string): Promise<Vendor[]>;
+  /** Every live vendor on the Project, active or not, by name (Resources). */
+  listOnProject(workspaceId: string, projectId: string): Promise<Vendor[]>;
+  /** Live active vendors of the Company, by name. */
+  listActive(workspaceId: string): Promise<Vendor[]>;
+  /** The live vendors among `ids`. */
+  findMany(workspaceId: string, ids: readonly string[]): Promise<Vendor[]>;
+  /**
+   * Adds or removes one Project per vendor (Resources, CM-406), compare-and-
+   * set on each vendor's `updatedAt` (409 `VENDOR_CHANGED`), with an audit
+   * row each, in one transaction.
+   */
+  updateProjects(
+    changes: readonly {
+      vendor: Vendor;
+      loadedAt: Date;
+      projectId: string;
+      joined: boolean;
+      before: readonly string[];
+    }[],
+    by: string,
+  ): Promise<void>;
   /** Inserts the vendor, its rate card and its opening entry (if not 0). */
   insert(vendor: Vendor, openingBalance: number, by: string): Promise<void>;
   /**
@@ -128,6 +155,15 @@ export type VendorOptionReadModel = {
   name: string;
   hasRateCard: boolean;
   shifts: VendorShiftReadModel[];
+};
+
+/** One line of a Project's Resources (CM-406). */
+export type ProjectVendorReadModel = {
+  id: string;
+  name: string;
+  /** The contact number, formatted. */
+  detail: string | null;
+  isActive: boolean;
 };
 
 export type VendorWriteInput = {
@@ -347,6 +383,89 @@ export class VendorHandlers {
       hasRateCard: vendor.hasRateCard,
       shifts: this.shiftsOf(vendor, categories),
     }));
+  }
+
+  private projectLines(vendors: readonly Vendor[]): ProjectVendorReadModel[] {
+    return vendors.map((vendor) => ({
+      id: vendor.id,
+      name: vendor.name,
+      detail:
+        vendor.contactNumber == null
+          ? null
+          : formatMobile(vendor.contactNumber),
+      isActive: vendor.isActive,
+    }));
+  }
+
+  /** The vendors on a Project's Resources, active or not, by name. */
+  async onProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<ProjectVendorReadModel[]> {
+    return this.projectLines(
+      await this.store.listOnProject(workspaceId, projectId),
+    );
+  }
+
+  /** Active vendors of the Company: what a Resources picker offers. */
+  async assignable(workspaceId: string): Promise<ProjectVendorReadModel[]> {
+    return this.projectLines(await this.store.listActive(workspaceId));
+  }
+
+  /**
+   * Makes `ids` the vendors on the Project (Resources, CM-406). The caller
+   * has checked the Project is live and visible. `expectedIds` is the set
+   * the screen loaded: 409 `PROJECT_RESOURCES_CHANGED` when it moved. 400
+   * `VENDOR_NOT_FOUND` for an id that is not a live vendor of the Company,
+   * `VENDOR_INACTIVE` for an inactive one newly added; inactive vendors
+   * already on the Project may stay.
+   */
+  async setOnProject(input: {
+    workspaceId: string;
+    projectId: string;
+    ids: readonly string[];
+    expectedIds: readonly string[];
+    by: string;
+  }): Promise<void> {
+    const current = await this.store.listOnProject(
+      input.workspaceId,
+      input.projectId,
+    );
+    const currentIds = new Set(current.map((vendor) => vendor.id));
+    const expected = new Set(input.expectedIds);
+    if (
+      expected.size !== currentIds.size ||
+      [...expected].some((id) => !currentIds.has(id))
+    )
+      throw conflict(
+        "PROJECT_RESOURCES_CHANGED",
+        "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+      );
+    const wanted = new Set(input.ids);
+    const addedIds = [...wanted].filter((id) => !currentIds.has(id));
+    const added = await this.store.findMany(input.workspaceId, addedIds);
+    const found = new Set(added.map((vendor) => vendor.id));
+    const missing = addedIds.filter((id) => !found.has(id));
+    if (missing.length > 0)
+      throw new DomainError(
+        "VENDOR_NOT_FOUND",
+        "Choose Vendors from the list. One of them was not found.",
+        { details: { ids: missing } },
+      );
+    const now = this.clock();
+    const changes = [
+      ...added.map((vendor) => ({ vendor, joined: true })),
+      ...current
+        .filter((vendor) => !wanted.has(vendor.id))
+        .map((vendor) => ({ vendor, joined: false })),
+    ].map(({ vendor, joined }) => {
+      const loadedAt = vendor.updatedAt;
+      const before = [...vendor.projectIds];
+      if (joined) vendor.joinProject(input.projectId, input.by, now);
+      else vendor.leaveProject(input.projectId, input.by, now);
+      return { vendor, loadedAt, projectId: input.projectId, joined, before };
+    });
+    if (changes.length > 0) await this.store.updateProjects(changes, input.by);
   }
 
   async create(

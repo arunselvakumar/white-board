@@ -29,12 +29,14 @@ const GRID =
   "space-y-3 sm:grid sm:space-y-0 sm:grid-cols-[7.5rem_minmax(0,24rem)_10.5rem_auto] sm:gap-x-3";
 
 /**
- * The Contract card's body (CM-413): Order value, then one row per paper
- * with its number, date and files. Tender / RFQ ref., LOA and Agreement
- * rows appear when they have a value or are asked for.
+ * The Contract card's body (CM-413): Order value (with the Financial flag
+ * only), then one row per paper with its number, date and files. Tender /
+ * RFQ ref., LOA and Agreement rows appear when they have a value or are
+ * asked for.
  */
 export function ContractPapersField({
   form,
+  financial,
   projectId,
   shown,
   onShow,
@@ -43,6 +45,8 @@ export function ContractPapersField({
   disabled,
 }: {
   form: UseFormReturn<ProjectFormValues>;
+  /** The Project menu's Financial flag: the Order value shows. */
+  financial: boolean;
   projectId: string | null;
   /** Optional papers on screen. */
   shown: ReadonlySet<ProjectPaperKind>;
@@ -62,7 +66,7 @@ export function ContractPapersField({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1.5 sm:max-w-xs">
+      <div className={cn("space-y-1.5 sm:max-w-xs", !financial && "hidden")}>
         <Label htmlFor="project-order-value">Order value</Label>
         <MoneyInput
           id="project-order-value"

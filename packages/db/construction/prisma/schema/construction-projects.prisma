@@ -1,7 +1,8 @@
 /// Construction Management — projects context (ADR CM-0001, `modules/03`).
-/// M2 ships the minimal Project labour and attendance are scoped to
+/// M2 shipped the minimal Project labour and attendance are scoped to
 /// (CM-204); M4 grows it into the full project with phases, wings, floors,
-/// units, drawings and gallery.
+/// units, locations, drawings, testing reports, the Gallery index and
+/// per-member preferences (ADR CM-0013, CM-0014).
 
 enum ConstructionProjectsProjectStatus {
   not_started
@@ -13,44 +14,81 @@ enum ConstructionProjectsProjectStatus {
   @@schema("construction_projects")
 }
 
+/// What kind of work a Project is (ADR CM-0013 §1). It decides whether the
+/// Project is structured as Wings or as Locations.
+enum ConstructionProjectsProjectType {
+  residential
+  commercial
+  mixed_use
+  villas
+  plotting
+  industrial
+  institutional
+  infrastructure
+  interiors
+  other
+
+  @@map("project_type")
+  @@schema("construction_projects")
+}
+
 /// A site the Company builds. Names are unique among a Company's live
 /// Projects (partial index in the migration).
 model ConstructionProjectsProject {
-  id              String                            @id @db.Uuid
-  workspaceId     String                            @map("workspace_id")
-  name            String
-  status          ConstructionProjectsProjectStatus @default(ongoing)
-  address         String?
+  id               String                            @id @db.Uuid
+  workspaceId      String                            @map("workspace_id")
+  name             String
+  status           ConstructionProjectsProjectStatus @default(ongoing)
+  /// Required on new Projects (CM-401); null on Projects from before M4.
+  projectType      ConstructionProjectsProjectType?  @map("project_type")
+  address          String?
   /// Calendar dates in the Company time zone.
-  startDate       DateTime?                         @map("start_date") @db.Date
-  endDate         DateTime?                         @map("end_date") @db.Date
+  startDate        DateTime?                         @map("start_date") @db.Date
+  endDate          DateTime?                         @map("end_date") @db.Date
   /// Contract details (CM-413): who gave the work and the papers that
   /// gave it — all optional. Dates are calendar dates.
-  clientName      String?                           @map("client_name")
+  clientName       String?                           @map("client_name")
   /// E.164 Indian mobile, `+91…`.
-  clientPhone     String?                           @map("client_phone")
-  tenderRef       String?                           @map("tender_ref")
-  quotationNo     String?                           @map("quotation_no")
-  quotationDate   DateTime?                         @map("quotation_date") @db.Date
-  loaNo           String?                           @map("loa_no")
-  loaDate         DateTime?                         @map("loa_date") @db.Date
+  clientPhone      String?                           @map("client_phone")
+  tenderRef        String?                           @map("tender_ref")
+  quotationNo      String?                           @map("quotation_no")
+  quotationDate    DateTime?                         @map("quotation_date") @db.Date
+  loaNo            String?                           @map("loa_no")
+  loaDate          DateTime?                         @map("loa_date") @db.Date
   /// The Client Order: the PO / WO the client issued to the Company. Not
   /// the Purchase Order the Company sends a supplier (CM-504).
-  clientOrderNo   String?                           @map("client_order_no")
-  clientOrderDate DateTime?                         @map("client_order_date") @db.Date
-  agreementNo     String?                           @map("agreement_no")
-  agreementDate   DateTime?                         @map("agreement_date") @db.Date
+  clientOrderNo    String?                           @map("client_order_no")
+  clientOrderDate  DateTime?                         @map("client_order_date") @db.Date
+  agreementNo      String?                           @map("agreement_no")
+  agreementDate    DateTime?                         @map("agreement_date") @db.Date
   /// Value of the Client Order excluding GST, in paise (Financial).
-  orderValue      BigInt?                           @map("order_value")
-  createdAt       DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy       String                            @map("created_by")
-  updatedBy       String                            @map("updated_by")
-  deletedAt       DateTime?                         @map("deleted_at") @db.Timestamptz(3)
-  deletedBy       String?                           @map("deleted_by")
+  orderValue       BigInt?                           @map("order_value")
+  /// Budget in paise (Financial), informational in M4 (CM-401).
+  budgetValue      BigInt?                           @map("budget_value")
+  /// Storage key of the Project logo (PNG / JPEG / WebP ≤ 2 MB); a
+  /// `stored_files` row.
+  logoKey          String?                           @map("logo_key")
+  /// Report headers print the Project logo instead of the Company's (M9).
+  useLogoInReports Boolean                           @default(false) @map("use_logo_in_reports")
+  createdAt        DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                            @map("created_by")
+  updatedBy        String                            @map("updated_by")
+  deletedAt        DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                           @map("deleted_by")
 
-  customFields ConstructionProjectsCustomField[]
-  documents    ConstructionProjectsDocument[]
+  customFields   ConstructionProjectsCustomField[]
+  documents      ConstructionProjectsDocument[]
+  phases         ConstructionProjectsPhase[]
+  wings          ConstructionProjectsWing[]
+  locations      ConstructionProjectsLocation[]
+  drawingAlbums  ConstructionProjectsDrawingAlbum[]
+  drawings       ConstructionProjectsDrawing[]
+  testingItems   ConstructionProjectsTestingItem[]
+  testingReports ConstructionProjectsTestingReport[]
+  mediaItems     ConstructionProjectsMediaItem[]
+  hiddenModules  ConstructionProjectsHiddenModule[]
+  pins           ConstructionProjectsPin[]
 
   @@index([workspaceId, status])
   @@map("projects")
@@ -105,6 +143,8 @@ model ConstructionProjectsDocument {
   /// and always downloads.
   contentType String                           @map("content_type")
   bytes       Int
+  /// Browser-made WebP thumbnail of an image (CM-0014), if any.
+  thumbKey    String?                          @map("thumb_key")
   createdAt   DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
   createdBy   String                           @map("created_by")
   deletedAt   DateTime?                        @map("deleted_at") @db.Timestamptz(3)
@@ -114,5 +154,367 @@ model ConstructionProjectsDocument {
 
   @@index([workspaceId, projectId, deletedAt])
   @@map("documents")
+  @@schema("construction_projects")
+}
+
+/// "Phase 1", "Phase 2" … of a Project with Wings (CM-402). Names are
+/// unique in the Project ignoring case (index in the migration).
+model ConstructionProjectsPhase {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  /// Order on the Wings screen, from 0.
+  position    Int
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  wings   ConstructionProjectsWing[]
+
+  @@index([workspaceId, projectId])
+  @@map("phases")
+  @@schema("construction_projects")
+}
+
+/// The eight Wing Types of the legacy Add Wing form (ADR CM-0013 §3).
+enum ConstructionProjectsWingType {
+  commercial
+  residential
+  bungalow_scheme
+  residential_and_commercial
+  plotting_scheme
+  institutional
+  individual_unit
+  industrial
+
+  @@map("wing_type")
+  @@schema("construction_projects")
+}
+
+/// A building, block or scheme in a Phase (CM-402). Names are unique in the
+/// Project ignoring case (index in the migration).
+model ConstructionProjectsWing {
+  id          String                       @id @db.Uuid
+  workspaceId String                       @map("workspace_id")
+  projectId   String                       @map("project_id") @db.Uuid
+  phaseId     String                       @map("phase_id") @db.Uuid
+  wingType    ConstructionProjectsWingType @map("wing_type")
+  name        String
+  /// The configuration the floors were generated from (floor counts, start
+  /// number, units per floor, basements, terrace), kept to show on Edit.
+  config      Json
+  /// Order inside the Phase, from 0.
+  position    Int
+  createdAt   DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                       @map("created_by")
+  updatedBy   String                       @map("updated_by")
+  deletedAt   DateTime?                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                      @map("deleted_by")
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  phase   ConstructionProjectsPhase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  floors  ConstructionProjectsFloor[]
+  units   ConstructionProjectsUnit[]
+
+  @@index([workspaceId, projectId])
+  @@index([phaseId])
+  @@map("wings")
+  @@schema("construction_projects")
+}
+
+/// Where a floor sits in a Wing (ADR CM-0013 §3). `site` is the single
+/// floor of a bungalow or plotting scheme; `other` is a stilt, podium or
+/// mezzanine floor added in the editor.
+enum ConstructionProjectsFloorKind {
+  terrace
+  typed
+  ground
+  basement
+  site
+  other
+
+  @@map("floor_kind")
+  @@schema("construction_projects")
+}
+
+/// A floor of a Wing. Removed floors are tombstoned so site entries that
+/// name them still resolve.
+model ConstructionProjectsFloor {
+  id          String                        @id @db.Uuid
+  workspaceId String                        @map("workspace_id")
+  wingId      String                        @map("wing_id") @db.Uuid
+  kind        ConstructionProjectsFloorKind
+  name        String
+  /// Top to bottom order is `level` descending: terrace highest, basements
+  /// below zero, Ground 0.
+  level       Int
+  deletedAt   DateTime?                     @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                       @map("deleted_by")
+
+  wing  ConstructionProjectsWing   @relation(fields: [wingId], references: [id], onDelete: Cascade)
+  units ConstructionProjectsUnit[]
+
+  @@index([wingId, level])
+  @@index([workspaceId])
+  @@map("floors")
+  @@schema("construction_projects")
+}
+
+/// A flat, shop, office, bungalow or plot: the location target of site
+/// entries and, in M10, the inventory Booking sells. Names are unique in
+/// the Wing ignoring case among live units (index in the migration).
+model ConstructionProjectsUnit {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  wingId      String    @map("wing_id") @db.Uuid
+  floorId     String    @map("floor_id") @db.Uuid
+  name        String
+  /// Order on the floor, from 0.
+  position    Int
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  wing  ConstructionProjectsWing  @relation(fields: [wingId], references: [id], onDelete: Cascade)
+  floor ConstructionProjectsFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
+
+  @@index([floorId, position])
+  @@index([wingId])
+  @@index([workspaceId])
+  @@map("units")
+  @@schema("construction_projects")
+}
+
+/// A named place on a non-building Project (CM-405): "Chainage 0+000 –
+/// 2+500", "Culvert C3". Names are unique in the Project ignoring case.
+model ConstructionProjectsLocation {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  description String?
+  position    Int
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, projectId])
+  @@map("locations")
+  @@schema("construction_projects")
+}
+
+/// An album of drawings (CM-408). Every Project starts with Architect,
+/// Electrical, Plumbing and Structural Drawing. Names are unique in the
+/// Project ignoring case.
+model ConstructionProjectsDrawingAlbum {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project  ConstructionProjectsProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  drawings ConstructionProjectsDrawing[]
+
+  @@index([workspaceId, projectId])
+  @@map("drawing_albums")
+  @@schema("construction_projects")
+}
+
+/// A drawing sheet in an album; its files are revisions, the latest shown
+/// (ADR CM-0013 §8).
+model ConstructionProjectsDrawing {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  albumId     String    @map("album_id") @db.Uuid
+  name        String
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project   ConstructionProjectsProject           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  album     ConstructionProjectsDrawingAlbum      @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  revisions ConstructionProjectsDrawingRevision[]
+
+  @@index([workspaceId, projectId])
+  @@index([albumId, deletedAt])
+  @@map("drawings")
+  @@schema("construction_projects")
+}
+
+/// One uploaded file of a drawing: R1, R2 … (unique per drawing). The
+/// object is private storage at `file_key` (a `stored_files` row).
+model ConstructionProjectsDrawingRevision {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  drawingId   String    @map("drawing_id") @db.Uuid
+  revision    Int
+  fileKey     String    @unique @map("file_key")
+  fileName    String    @map("file_name")
+  contentType String    @map("content_type")
+  bytes       Int
+  thumbKey    String?   @map("thumb_key")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  drawing ConstructionProjectsDrawing @relation(fields: [drawingId], references: [id], onDelete: Cascade)
+
+  @@unique([drawingId, revision])
+  @@index([workspaceId])
+  @@map("drawing_revisions")
+  @@schema("construction_projects")
+}
+
+/// A material tested on the Project (CM-409): Rcc cube, Steel, Cement and
+/// Bricks to start with. Names are unique in the Project ignoring case.
+model ConstructionProjectsTestingItem {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project ConstructionProjectsProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reports ConstructionProjectsTestingReport[]
+
+  @@index([workspaceId, projectId])
+  @@map("testing_items")
+  @@schema("construction_projects")
+}
+
+/// A lab report for a testing item: name, report date, remark and one file.
+model ConstructionProjectsTestingReport {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  itemId      String    @map("item_id") @db.Uuid
+  name        String
+  /// Calendar date in the Company time zone; back-dated policy
+  /// `material_testing_report`.
+  reportDate  DateTime  @map("report_date") @db.Date
+  remark      String?
+  fileKey     String    @unique @map("file_key")
+  fileName    String    @map("file_name")
+  contentType String    @map("content_type")
+  bytes       Int
+  thumbKey    String?   @map("thumb_key")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  project ConstructionProjectsProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  item    ConstructionProjectsTestingItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, projectId, reportDate])
+  @@index([itemId, deletedAt])
+  @@map("testing_reports")
+  @@schema("construction_projects")
+}
+
+/// The Gallery index (ADR CM-0014): one row per image or PDF attached
+/// anywhere in a Project. `source` names the owning module (`document`,
+/// `drawing`, `testing_report` in M4; later contexts add theirs through
+/// `ProjectMediaAttached`), `source_id` its record. Text, not an enum, so a
+/// new source needs no migration.
+model ConstructionProjectsMediaItem {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  source      String
+  sourceId    String    @map("source_id") @db.Uuid
+  fileKey     String    @unique @map("file_key")
+  thumbKey    String?   @map("thumb_key")
+  fileName    String    @map("file_name")
+  contentType String    @map("content_type")
+  bytes       Int
+  uploadedBy  String    @map("uploaded_by")
+  uploadedAt  DateTime  @map("uploaded_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, projectId, uploadedAt])
+  @@index([source, sourceId])
+  @@map("media_items")
+  @@schema("construction_projects")
+}
+
+/// A home tile hidden on a Project for everyone (ADR CM-0013 §11).
+/// `module_key` is a project module key (`lib/project-modules.ts`).
+model ConstructionProjectsHiddenModule {
+  workspaceId String   @map("workspace_id")
+  projectId   String   @map("project_id") @db.Uuid
+  moduleKey   String   @map("module_key")
+  hiddenBy    String   @map("hidden_by")
+  hiddenAt    DateTime @default(now()) @map("hidden_at") @db.Timestamptz(3)
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, moduleKey])
+  @@index([workspaceId])
+  @@map("hidden_modules")
+  @@schema("construction_projects")
+}
+
+/// A Project a member pinned to the top of their Projects home.
+model ConstructionProjectsPin {
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  projectId   String   @map("project_id") @db.Uuid
+  pinnedAt    DateTime @default(now()) @map("pinned_at") @db.Timestamptz(3)
+
+  project ConstructionProjectsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, userId, projectId])
+  @@index([projectId])
+  @@map("pins")
+  @@schema("construction_projects")
+}
+
+/// A member's Project preferences that follow them across devices and
+/// Projects (ADR CM-0013 §11–12): home tile order and dashboard layout.
+model ConstructionProjectsMemberPreference {
+  workspaceId       String   @map("workspace_id")
+  userId            String   @map("user_id")
+  /// Project module keys in the member's order; modules not listed follow
+  /// in the default order.
+  tileOrder         String[] @default([]) @map("tile_order")
+  /// `[{ key, visible }]` in the member's order; null = default layout.
+  dashboardSections Json?    @map("dashboard_sections")
+  updatedAt         DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  @@id([workspaceId, userId])
+  @@map("member_preferences")
   @@schema("construction_projects")
 }

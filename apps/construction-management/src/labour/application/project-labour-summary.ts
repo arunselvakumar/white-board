@@ -1,4 +1,9 @@
-import { addDays, type CalendarDate } from "@/src/shared-kernel/calendar-date";
+import {
+  addDays,
+  daysBetween,
+  type CalendarDate,
+} from "@/src/shared-kernel/calendar-date";
+import { DomainError } from "@/src/shared-kernel/domain-error";
 
 /** One day of the "Labours present at site" series (CM-219). */
 export type PresentDay = {
@@ -28,7 +33,7 @@ export type ProjectLabourSummary = {
     recordedToday: number;
     headcountToday: number;
   };
-  /** The last 14 days, oldest first. */
+  /** The last 14 days, or `from` to `date`; oldest first. */
   presentSeries: PresentDay[];
   /** Paise; balances of the Project's labourers (positive owed, negative advanced). */
   labourBalance: { toPay: number; advanced: number };
@@ -37,10 +42,27 @@ export type ProjectLabourSummary = {
 
 export const PRESENT_SERIES_DAYS = 14;
 
-/** The dates of the series ending on `date`. */
-export function seriesDates(date: CalendarDate): CalendarDate[] {
-  return Array.from({ length: PRESENT_SERIES_DAYS }, (_, index) =>
-    addDays(date, index - PRESENT_SERIES_DAYS + 1),
+/** The longest series a caller may ask for: a year, leap day included. */
+export const PRESENT_SERIES_MAX_DAYS = 366;
+
+/**
+ * The dates of the series ending on `date`: the last 14 days, or from
+ * `from` (the Project Dashboard's duration, CM-412). 400
+ * `SUMMARY_RANGE_INVALID` when `from` is after `date` or the range is
+ * longer than 366 days.
+ */
+export function seriesDates(
+  date: CalendarDate,
+  from?: CalendarDate,
+): CalendarDate[] {
+  const days = from == null ? PRESENT_SERIES_DAYS : daysBetween(from, date) + 1;
+  if (days < 1 || days > PRESENT_SERIES_MAX_DAYS)
+    throw new DomainError(
+      "SUMMARY_RANGE_INVALID",
+      `Choose a start on or before the end date, at most ${String(PRESENT_SERIES_MAX_DAYS)} days earlier.`,
+    );
+  return Array.from({ length: days }, (_, index) =>
+    addDays(date, index - days + 1),
   );
 }
 

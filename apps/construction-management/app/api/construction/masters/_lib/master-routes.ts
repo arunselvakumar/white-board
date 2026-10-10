@@ -16,7 +16,20 @@ import {
 
 type Status = z.infer<typeof ListConstructionMastersQueryModel>["status"];
 
-type Target = { workspaceId: string; id: string; by: string };
+/**
+ * The row a command acts on. `visible` is the Projects the caller may see
+ * (null for the Owner), for lists that link rows to Projects.
+ */
+type Target = {
+  workspaceId: string;
+  id: string;
+  by: string;
+  visible: ReadonlySet<string> | null;
+};
+
+function visibleProjects(session: AccessSession): ReadonlySet<string> | null {
+  return session.access.role === "owner" ? null : session.access.projectIds;
+}
 
 /** What a masters list's routes call; the handlers check no access. */
 export type MasterRouteConfig<Item, Create, Update> = {
@@ -24,8 +37,16 @@ export type MasterRouteConfig<Item, Create, Update> = {
   createModel: z.ZodType<Create>;
   updateModel: z.ZodType<Update>;
   toResponse: (item: Item) => unknown;
-  list(workspaceId: string, status: Status): Promise<Item[]>;
-  get(workspaceId: string, id: string): Promise<Item>;
+  list(
+    workspaceId: string,
+    status: Status,
+    visible: ReadonlySet<string> | null,
+  ): Promise<Item[]>;
+  get(
+    workspaceId: string,
+    id: string,
+    visible: ReadonlySet<string> | null,
+  ): Promise<Item>;
   create(session: AccessSession, body: Create): Promise<Item>;
   update(target: Target, body: Update): Promise<Item>;
   disable(target: Target): Promise<Item>;
@@ -54,7 +75,12 @@ export function masterRoutes<Item, Create, Update>(
     const { id } = parseOrThrow(
       ConstructionMastersIdParamsModel.safeParse(await context.params),
     );
-    return { workspaceId: session.workspaceId, id, by: session.userId };
+    return {
+      workspaceId: session.workspaceId,
+      id,
+      by: session.userId,
+      visible: visibleProjects(session),
+    };
   }
 
   function command(
@@ -76,6 +102,9 @@ export function masterRoutes<Item, Create, Update>(
   }
 
   return {
+    /** For a list's extra commands: the caller and the row, access checked. */
+    command,
+
     list: async (request: Request): Promise<Response> => {
       try {
         const session = await access(request, "read");
@@ -85,7 +114,11 @@ export function masterRoutes<Item, Create, Update>(
             Object.fromEntries(new URL(request.url).searchParams),
           ),
         );
-        const items = await config.list(session.workspaceId, status);
+        const items = await config.list(
+          session.workspaceId,
+          status,
+          visibleProjects(session),
+        );
         return Response.json({
           items: items.map(config.toResponse),
           total: items.length,
@@ -117,9 +150,9 @@ export function masterRoutes<Item, Create, Update>(
       try {
         const session = await access(request, "read");
         if (isResponse(session)) return session;
-        const { workspaceId, id } = await target(session, context);
+        const { workspaceId, id, visible } = await target(session, context);
         return Response.json(
-          config.toResponse(await config.get(workspaceId, id)),
+          config.toResponse(await config.get(workspaceId, id, visible)),
         );
       } catch (error) {
         return mapError(error);

@@ -220,6 +220,47 @@ describe("project labour summary (CM-219)", () => {
     ).toBe(StatusCodes.FORBIDDEN);
   });
 
+  it("runs the series over the dashboard's duration (CM-412)", async () => {
+    const company = await ownerWithCompany();
+    const { projectId } = await seed(company);
+    const ranged = (await (
+      await getSummary(
+        jsonRequest(
+          `${BASE}?projectId=${projectId}&from=${YESTERDAY}`,
+          company.cookie,
+        ),
+      )
+    ).json()) as Summary;
+    expect(ranged.presentSeries.map((day) => day.date)).toEqual([
+      YESTERDAY,
+      TODAY,
+    ]);
+    expect(ranged.labourers.present).toBe(1);
+
+    const year = (await (
+      await getSummary(
+        jsonRequest(
+          `${BASE}?projectId=${projectId}&date=2026-10-10&from=2025-10-10`,
+          company.cookie,
+        ),
+      )
+    ).json()) as Summary;
+    expect(year.presentSeries).toHaveLength(366);
+
+    for (const query of [
+      `from=2025-10-09&date=2026-10-10`,
+      `from=2026-10-11&date=2026-10-10`,
+    ]) {
+      const refused = await getSummary(
+        jsonRequest(`${BASE}?projectId=${projectId}&${query}`, company.cookie),
+      );
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(await refused.json()).toMatchObject({
+        code: "SUMMARY_RANGE_INVALID",
+      });
+    }
+  });
+
   it("is on /api/docs", async () => {
     const document = (await getOpenApi().json()) as {
       paths: Record<string, unknown>;

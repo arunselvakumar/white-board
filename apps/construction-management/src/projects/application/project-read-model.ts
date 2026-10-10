@@ -5,18 +5,26 @@ import type {
   ProjectContractDetails,
   ProjectCustomField,
 } from "../domain/project-contract";
+import type { ProjectStructure, ProjectType } from "../domain/project-type";
 
 /**
- * A Project as the routes show it. `orderValue` (paise) is always here;
- * the route nulls it for a caller without the Project menu's Financial flag.
+ * A Project as the routes show it. `orderValue` and `budgetValue` (paise)
+ * are always here; the route nulls them for a caller without the Project
+ * menu's Financial flag. `logoKey` is the stored file; the route turns it
+ * into a URL.
  */
 export type ProjectReadModel = {
   id: string;
   name: string;
   status: ProjectStatus;
+  projectType: ProjectType | null;
+  structure: ProjectStructure;
   address: string | null;
   startDate: CalendarDate | null;
   endDate: CalendarDate | null;
+  budgetValue: number | null;
+  logoKey: string | null;
+  useLogoInReports: boolean;
   customFields: ProjectCustomField[];
   createdAt: Date;
   updatedAt: Date;
@@ -27,9 +35,14 @@ export function toProjectReadModel(project: Project): ProjectReadModel {
     id: project.id,
     name: project.name,
     status: project.status,
+    projectType: project.projectType,
+    structure: project.structure,
     address: project.address,
     startDate: project.startDate,
     endDate: project.endDate,
+    budgetValue: project.budgetValue,
+    logoKey: project.logoKey,
+    useLogoInReports: project.useLogoInReports,
     ...project.contract,
     customFields: project.customFields.map(({ label, value }) => ({
       label,

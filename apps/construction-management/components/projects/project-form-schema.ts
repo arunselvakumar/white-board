@@ -8,6 +8,7 @@ import {
   rupeesToPaise,
 } from "@/components/money/money-input";
 import {
+  PROJECT_BUDGET_MAX,
   PROJECT_CLIENT_NAME_MAX,
   PROJECT_CUSTOM_FIELD_LABEL_MAX,
   PROJECT_CUSTOM_FIELD_VALUE_MAX,
@@ -17,6 +18,10 @@ import {
   PROJECT_REFERENCE_FIELDS,
   PROJECT_REFERENCE_MAX,
 } from "@/src/projects/domain/project-contract-rules";
+import {
+  isProjectType,
+  type ProjectType,
+} from "@/src/projects/domain/project-type";
 import { QueryHttpError } from "@/src/queries/http";
 import type {
   ProjectInput,
@@ -47,12 +52,16 @@ function isClientMobile(value: string): boolean {
   return normalizeMobile(value)?.startsWith("+91") ?? false;
 }
 
-function isOrderValue(value: string): boolean {
+/** Blank, or rupees up to `max` paise. */
+const isAmountUpTo = (max: number) => (value: string) => {
   if (value.trim() === "") return true;
   if (!isRupees(value)) return false;
   const paise = rupeesToPaise(value);
-  return paise != null && paise <= PROJECT_ORDER_VALUE_MAX;
-}
+  return paise != null && paise <= max;
+};
+
+const isOrderValue = isAmountUpTo(PROJECT_ORDER_VALUE_MAX);
+const isBudget = isAmountUpTo(PROJECT_BUDGET_MAX);
 
 const customField = z.object({ label: z.string(), value: z.string() });
 
@@ -64,6 +73,16 @@ export const projectFormSchema = z
       .min(1, "Enter the Project name")
       .max(120, "Use at most 120 characters"),
     status: z.enum(PROJECT_STATUS_ORDER),
+    /** "" until chosen; required on Add Project (`newProjectFormSchema`). */
+    projectType: z
+      .string()
+      .refine((value): boolean => value === "" || isProjectType(value), {
+        message: "Choose the Project Type",
+      }),
+    budgetValue: z.string().refine(isBudget, {
+      message: "Enter the amount in rupees, like 3,20,00,000",
+    }),
+    useLogoInReports: z.boolean(),
     address: z.string().trim().max(500, "Use at most 500 characters"),
     startDate: dateField,
     endDate: dateField,
@@ -144,6 +163,21 @@ export const projectFormSchema = z
       });
   });
 
+/**
+ * Add Project needs a Project Type (CM-401). Edit does not: a Project from
+ * before M4 may stay "Not set", and the select cannot clear a type.
+ */
+export const newProjectFormSchema = projectFormSchema.superRefine(
+  (values, ctx) => {
+    if (values.projectType === "")
+      ctx.addIssue({
+        code: "custom",
+        path: ["projectType"],
+        message: "Choose the Project Type",
+      });
+  },
+);
+
 export type ProjectFormValues = z.infer<typeof projectFormSchema>;
 export type ProjectFormField = FieldPath<ProjectFormValues>;
 
@@ -165,9 +199,11 @@ export function cardOf(field: string): ProjectFormCard {
 /** Fields in the order they appear on screen, for "focus the first error". */
 export const FIELD_ORDER: readonly string[] = [
   "name",
+  "projectType",
   "status",
   "startDate",
   "endDate",
+  "budgetValue",
   "address",
   "clientName",
   "clientPhone",
@@ -191,6 +227,9 @@ export function projectFormValues(
   return {
     name: project?.name ?? "",
     status: project?.status ?? "ongoing",
+    projectType: project?.projectType ?? "",
+    budgetValue: groupRupees(paiseToRupees(project?.budgetValue)),
+    useLogoInReports: project?.useLogoInReports ?? false,
     address: project?.address ?? "",
     startDate: project?.startDate ?? "",
     endDate: project?.endDate ?? "",
@@ -221,14 +260,17 @@ export type ProjectFormInput = ProjectInput & { status: ProjectStatus };
  * The request body, plus where each sent custom field sat on the form
  * (fully blank rows are dropped, so a server `details.index` maps back).
  *
- * Order value: nothing on the client says whether the viewer has the
- * Financial flag. Without it the server answers null and ignores what is
- * sent, so a value that came back null and is still blank is left out of
- * the request instead of being sent as a clear.
+ * Order value and budget: only a viewer with the Project menu's Financial
+ * flag sends them (`financial`, from the Projects list); the server would
+ * ignore them anyway. A value that came back null and is still blank is
+ * left out of the request instead of being sent as a clear. A Project
+ * Type left blank (a Project from before M4) is left out, so it stays
+ * "Not set".
  */
 export function projectFormInput(
   values: ProjectFormValues,
   project: ProjectResponse | null,
+  financial: boolean,
 ): { input: ProjectFormInput; customFieldRows: number[] } {
   const customFieldRows: number[] = [];
   const customFields: { label: string; value: string }[] = [];
@@ -241,11 +283,19 @@ export function projectFormInput(
   });
 
   const orderValue = rupeesToPaise(values.orderValue);
-  const sendOrderValue = orderValue != null || project?.orderValue != null;
+  const sendOrderValue =
+    financial && (orderValue != null || project?.orderValue != null);
+  const budgetValue = rupeesToPaise(values.budgetValue);
+  const sendBudget =
+    financial && (budgetValue != null || project?.budgetValue != null);
 
   const input: ProjectFormInput = {
     name: values.name,
     status: values.status,
+    ...(values.projectType === ""
+      ? {}
+      : { projectType: values.projectType as ProjectType }),
+    useLogoInReports: values.useLogoInReports,
     address: blankToNull(values.address),
     startDate: blankToNull(values.startDate),
     endDate: blankToNull(values.endDate),
@@ -264,6 +314,7 @@ export function projectFormInput(
     agreementNo: blankToNull(values.agreementNo),
     agreementDate: blankToNull(values.agreementDate),
     ...(sendOrderValue ? { orderValue } : {}),
+    ...(sendBudget ? { budgetValue } : {}),
     customFields,
   };
   return { input, customFieldRows };
@@ -274,6 +325,9 @@ const SERVER_FIELDS: Record<string, ProjectFormField> = {
   PROJECT_NAME_TOO_LONG: "name",
   PROJECT_NAME_IN_USE: "name",
   PROJECT_STATUS_INVALID: "status",
+  PROJECT_TYPE_REQUIRED: "projectType",
+  PROJECT_TYPE_INVALID: "projectType",
+  PROJECT_BUDGET_INVALID: "budgetValue",
   PROJECT_ADDRESS_TOO_LONG: "address",
   PROJECT_DATE_INVALID: "startDate",
   PROJECT_DATES_INVALID: "endDate",

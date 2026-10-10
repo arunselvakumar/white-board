@@ -8,7 +8,10 @@ import {
 } from "@/src/shared-kernel/files";
 import { notFound } from "@/src/shared-kernel/domain-error";
 
-const FOLDERS: Record<ImageKind, string> = {
+/** The images this context keeps; Project logos are the projects context's. */
+type CompanyImageKind = Extract<ImageKind, "company_logo" | "member_photo">;
+
+const FOLDERS: Record<CompanyImageKind, string> = {
   company_logo: "logo",
   member_photo: "member-photos",
 };
@@ -23,7 +26,7 @@ export class CompanyImages {
   /** Uploads a checked image and returns its `stored_files` record. */
   async upload(input: {
     workspaceId: string;
-    kind: ImageKind;
+    kind: CompanyImageKind;
     bytes: Uint8Array;
     declaredType: string | null;
     by: string;

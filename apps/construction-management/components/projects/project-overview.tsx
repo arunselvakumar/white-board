@@ -7,7 +7,12 @@ import { Alert, AlertAction, AlertTitle } from "@repo/ui/components/alert";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
-import { projectQuery, type ProjectResponse } from "@/src/queries/projects";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
+import {
+  projectQuery,
+  projectsQuery,
+  type ProjectResponse,
+} from "@/src/queries/projects";
 
 import {
   clientPhoneLabel,
@@ -16,6 +21,7 @@ import {
 } from "./project-contract";
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { EditProjectForm } from "./project-form";
+import { ProjectHomeTiles } from "./project-home-tiles";
 import { ProjectLabourTiles } from "./project-labour-tiles";
 import { ProjectStatusBadge, formatCalendarDate } from "./project-status";
 
@@ -161,13 +167,17 @@ function ProjectFlash({ id }: { id: string }) {
   );
 }
 
-/** Overview tab: labour today (CM-219) and the Project's details. */
+/**
+ * The Project home (CM-411): the member's module tiles, labour today
+ * (CM-219) and the Project's details.
+ */
 export function ProjectOverview({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
   const none = <span className="text-muted-foreground font-normal">—</span>;
   return (
-    <div className="w-full max-w-5xl space-y-6 p-6">
+    <div className="w-full max-w-5xl min-w-0 space-y-6 p-6">
       <ProjectFlash id={id} />
+      <ProjectHomeTiles projectId={id} />
       <ProjectLabourTiles projectId={id} />
       <section
         aria-labelledby="project-details"
@@ -179,6 +189,13 @@ export function ProjectOverview({ id }: { id: string }) {
         <dl className="grid gap-4 sm:grid-cols-2">
           <Detail label="Status">
             <ProjectStatusBadge status={project.status} />
+          </Detail>
+          <Detail label="Project Type">
+            {project.projectType == null ? (
+              <span className="text-muted-foreground font-normal">Not set</span>
+            ) : (
+              projectTypeLabel(project.projectType)
+            )}
           </Detail>
           <Detail label="Added on">
             {DATE_TIME.format(new Date(project.createdAt))}
@@ -193,6 +210,12 @@ export function ProjectOverview({ id }: { id: string }) {
               ? none
               : formatCalendarDate(project.endDate)}
           </Detail>
+          {/* Null without the Financial flag, so it hides too. */}
+          {project.budgetValue == null ? null : (
+            <Detail label="Budget">
+              {orderValueLabel(project.budgetValue)}
+            </Detail>
+          )}
           <Detail label="Project address" className="sm:col-span-2">
             {project.address == null ? (
               none
@@ -208,8 +231,18 @@ export function ProjectOverview({ id }: { id: string }) {
   );
 }
 
-/** `/app/projects/[id]/edit`, inside the project shell. */
+/**
+ * `/app/projects/[id]/edit`, inside the project shell. The Projects list
+ * says whether the viewer has the Financial flag.
+ */
 export function ProjectEditScreen({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
-  return <EditProjectForm key={project.updatedAt} project={project} />;
+  const { data: list } = useSuspenseQuery(projectsQuery);
+  return (
+    <EditProjectForm
+      key={project.updatedAt}
+      project={project}
+      financial={list.financial}
+    />
+  );
 }

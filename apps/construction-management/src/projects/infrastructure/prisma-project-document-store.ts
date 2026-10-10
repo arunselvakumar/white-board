@@ -7,6 +7,7 @@ import {
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
 
+import { indexMedia, unindexMedia } from "./prisma-media-index";
 import type {
   ProjectDocumentStore,
   StoredProjectDocument,
@@ -24,6 +25,7 @@ function toDocument(row: Row): StoredProjectDocument {
     fileName: row.fileName,
     contentType: row.contentType,
     bytes: row.bytes,
+    thumbKey: row.thumbKey,
     createdAt: row.createdAt,
     createdBy: row.createdBy,
     deletedAt: row.deletedAt,
@@ -39,7 +41,8 @@ function isUniqueViolation(error: unknown): boolean {
 
 /**
  * `construction_projects.documents`, each write in one transaction with its
- * `stored_files` row and audit event. Adding locks the Project row, so two
+ * `stored_files` rows, its Gallery row (PDFs and images, CM-407) and audit
+ * event. Adding locks the Project row, so two
  * uploads finishing together cannot pass the per-Project limit, and a
  * Project deleted meanwhile gets no new files.
  */
@@ -111,11 +114,27 @@ export class PrismaProjectDocumentStore implements ProjectDocumentStore {
             fileName: document.fileName,
             contentType: document.contentType,
             bytes: document.bytes,
+            thumbKey: document.thumbKey ?? null,
             createdAt: document.createdAt,
             createdBy: document.createdBy,
           },
         });
         await recordStoredFile(tx, input.file);
+        if (input.thumbnail != null)
+          await recordStoredFile(tx, input.thumbnail);
+        await indexMedia(tx, {
+          workspaceId: document.workspaceId,
+          projectId: document.projectId,
+          source: "document",
+          sourceId: document.id,
+          fileKey: document.fileKey,
+          thumbKey: document.thumbKey ?? null,
+          fileName: document.fileName,
+          contentType: document.contentType,
+          bytes: document.bytes,
+          uploadedBy: document.createdBy,
+          uploadedAt: document.createdAt,
+        });
         await recordAudit(tx, input.audit);
       });
       return "added";
@@ -146,6 +165,19 @@ export class PrismaProjectDocumentStore implements ProjectDocumentStore {
         document.fileKey,
         input.now,
       );
+      if (document.thumbKey != null)
+        await markStoredFileDeleted(
+          tx,
+          document.workspaceId,
+          document.thumbKey,
+          input.now,
+        );
+      await unindexMedia(tx, {
+        workspaceId: document.workspaceId,
+        source: "document",
+        sourceId: document.id,
+        now: input.now,
+      });
       await recordAudit(tx, input.audit);
       return true;
     });

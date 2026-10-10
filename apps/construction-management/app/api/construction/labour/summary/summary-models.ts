@@ -7,7 +7,18 @@ export const LABOUR_SUMMARY_PATH = "/api/construction/labour/summary";
 export const GetConstructionLabourProjectSummaryRequestModel = z.object({
   projectId: z.uuid(),
   /** `YYYY-MM-DD`; today in the Company time zone when left out. */
-  date: z.iso.date().optional(),
+  date: z.iso
+    .date()
+    .optional()
+    .describe(
+      "The day the counts are for and the series ends on; today in the Company time zone when left out.",
+    ),
+  from: z.iso
+    .date()
+    .optional()
+    .describe(
+      "The series' first day (the Project Dashboard's duration); the last 14 days when left out. 400 SUMMARY_RANGE_INVALID after `date` or more than 366 days before it.",
+    ),
 });
 
 const balance = z

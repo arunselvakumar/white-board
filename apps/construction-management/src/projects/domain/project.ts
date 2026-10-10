@@ -13,6 +13,13 @@ import {
   type ProjectContractInput,
   type ProjectCustomField,
 } from "./project-contract";
+import { PROJECT_BUDGET_MAX } from "./project-contract-rules";
+import {
+  isProjectType,
+  projectStructure,
+  type ProjectStructure,
+  type ProjectType,
+} from "./project-type";
 
 export const PROJECT_NAME_MAX = 120;
 export const PROJECT_ADDRESS_MAX = 500;
@@ -37,7 +44,8 @@ export function isProjectStatus(value: string): value is ProjectStatus {
 /**
  * What a Team Member types on the Project form. The contract details and
  * custom fields (CM-413) are optional; left out of an edit, they keep what
- * is stored.
+ * is stored. So do the Project Type, Budget and `useLogoInReports` (CM-401),
+ * though a new Project must have a type.
  */
 export type ProjectDetailsInput = {
   name: string;
@@ -46,7 +54,23 @@ export type ProjectDetailsInput = {
   startDate?: string | null;
   endDate?: string | null;
   customFields?: readonly { label: string; value: string }[];
+  projectType?: string | null;
+  /** Paise. */
+  budgetValue?: number | null;
+  useLogoInReports?: boolean;
 } & ProjectContractInput;
+
+/**
+ * What M4 adds to a Project (CM-401). `projectType` is null only on
+ * Projects from before M4; `budgetValue` is paise and Financial; `logoKey`
+ * is the storage key of the logo, set through its own route.
+ */
+export type ProjectProfile = {
+  projectType: ProjectType | null;
+  budgetValue: number | null;
+  useLogoInReports: boolean;
+  logoKey: string | null;
+};
 
 export type ProjectDetails = {
   name: string;
@@ -89,6 +113,55 @@ function cleanStatus(raw: string | null | undefined): ProjectStatus {
   return raw;
 }
 
+/** Required: a new Project has one, and an edit may not take it away. */
+function requiredProjectType(raw: string | null | undefined): ProjectType {
+  if (raw == null || raw.trim() === "")
+    throw new DomainError(
+      "PROJECT_TYPE_REQUIRED",
+      "Choose the Project Type: it decides whether the Project has Wings or Locations.",
+    );
+  if (!isProjectType(raw))
+    throw new DomainError(
+      "PROJECT_TYPE_INVALID",
+      `"${raw}" is not a Project Type.`,
+    );
+  return raw;
+}
+
+/** Optional paise, 0 to ₹1,000 crore, like the Order Value. */
+function cleanBudget(raw: number | null | undefined): number | null {
+  if (raw == null) return null;
+  if (!Number.isSafeInteger(raw) || raw < 0 || raw > PROJECT_BUDGET_MAX)
+    throw new DomainError(
+      "PROJECT_BUDGET_INVALID",
+      "Enter the budget in rupees, up to ₹1,000 crore.",
+    );
+  return raw;
+}
+
+/**
+ * The Project Type, Budget and `useLogoInReports` as saved: a field left
+ * out keeps `current`; `null` clears the Budget. The logo is not here: it
+ * changes through its own route.
+ */
+function projectProfile(
+  input: ProjectDetailsInput,
+  current: ProjectProfile,
+): ProjectProfile {
+  return {
+    projectType:
+      input.projectType === undefined
+        ? current.projectType
+        : requiredProjectType(input.projectType),
+    budgetValue:
+      input.budgetValue === undefined
+        ? current.budgetValue
+        : cleanBudget(input.budgetValue),
+    useLogoInReports: input.useLogoInReports ?? current.useLogoInReports,
+    logoKey: current.logoKey,
+  };
+}
+
 function cleanDate(raw: string | null | undefined): CalendarDate | null {
   const value = raw?.trim() ?? "";
   if (value === "") return null;
@@ -122,7 +195,8 @@ export function projectDetails(input: ProjectDetailsInput): ProjectDetails {
 }
 
 export type ProjectProps = ProjectDetails &
-  ProjectContractDetails & {
+  ProjectContractDetails &
+  ProjectProfile & {
     customFields: ProjectCustomField[];
     id: string;
     workspaceId: string;
@@ -137,7 +211,7 @@ export type ProjectProps = ProjectDetails &
  * A construction job (`modules/03`). M2 shipped the minimal Project —
  * name, status, address and dates — because labour and attendance are
  * scoped to one (CM-204); CM-413 adds the contract details and custom
- * fields; M4 grows it further.
+ * fields; CM-401 the Project Type, Budget and logo.
  */
 export class Project {
   private constructor(private props: ProjectProps) {}
@@ -152,6 +226,19 @@ export class Project {
     return new Project({
       ...projectDetails(input.details),
       ...contractDetails(input.details, NO_CONTRACT_DETAILS),
+      ...projectProfile(
+        // Left out on create is "none chosen", not "keep".
+        {
+          ...input.details,
+          projectType: input.details.projectType ?? null,
+        },
+        {
+          projectType: null,
+          budgetValue: null,
+          useLogoInReports: false,
+          logoKey: null,
+        },
+      ),
       customFields: customFields(input.details.customFields ?? []),
       id: input.id,
       workspaceId: input.workspaceId,
@@ -187,6 +274,26 @@ export class Project {
   }
   get endDate(): CalendarDate | null {
     return this.props.endDate;
+  }
+  /** Null only on a Project from before M4 ("Not set"). */
+  get projectType(): ProjectType | null {
+    return this.props.projectType;
+  }
+  /** Wings or Locations, as the Project Type suggests (CM-0013 §1). */
+  get structure(): ProjectStructure {
+    return projectStructure(this.props.projectType);
+  }
+  /** Paise; the routes hide it without the Financial flag. */
+  get budgetValue(): number | null {
+    return this.props.budgetValue;
+  }
+  /** Report headers print the Project logo instead of the Company's (M9). */
+  get useLogoInReports(): boolean {
+    return this.props.useLogoInReports;
+  }
+  /** Storage key of the logo, or null. */
+  get logoKey(): string | null {
+    return this.props.logoKey;
   }
   get createdAt(): Date {
     return this.props.createdAt;
@@ -236,16 +343,27 @@ export class Project {
     return this.props.customFields;
   }
 
+  get profile(): ProjectProfile {
+    return {
+      projectType: this.props.projectType,
+      budgetValue: this.props.budgetValue,
+      useLogoInReports: this.props.useLogoInReports,
+      logoKey: this.props.logoKey,
+    };
+  }
+
   /**
    * Edit Project: name, status, address and dates at once (the legacy app
-   * allows any status change); a contract detail or the custom-field list
-   * left out keeps what is stored.
+   * allows any status change); a contract detail, the custom-field list,
+   * the Project Type, Budget or `useLogoInReports` left out keeps what is
+   * stored.
    */
   update(details: ProjectDetailsInput, by: string, now: Date): void {
     this.props = {
       ...this.props,
       ...projectDetails(details),
       ...contractDetails(details, this.contract),
+      ...projectProfile(details, this.profile),
       customFields:
         details.customFields === undefined
           ? this.props.customFields
@@ -253,6 +371,29 @@ export class Project {
       updatedAt: now,
       updatedBy: by,
     };
+  }
+
+  /**
+   * Sets or replaces the logo with the stored file at `key`; returns the
+   * key it replaced, whose file the caller marks deleted.
+   */
+  setLogo(key: string, by: string, now: Date): string | null {
+    const replaced = this.props.logoKey;
+    this.props = { ...this.props, logoKey: key, updatedAt: now, updatedBy: by };
+    return replaced;
+  }
+
+  /** Removes the logo; returns the key it had (null: nothing changed). */
+  removeLogo(by: string, now: Date): string | null {
+    const removed = this.props.logoKey;
+    if (removed == null) return null;
+    this.props = {
+      ...this.props,
+      logoKey: null,
+      updatedAt: now,
+      updatedBy: by,
+    };
+    return removed;
   }
 
   delete(by: string, now: Date): void {

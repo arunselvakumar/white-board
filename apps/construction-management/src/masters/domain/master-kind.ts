@@ -8,8 +8,18 @@ import {
 export const LOOKUP_KINDS = ["labour_category", "department"] as const;
 export type LookupKind = (typeof LOOKUP_KINDS)[number];
 
-/** Every masters list this context owns (CM-203). */
-export type MasterKind = LookupKind | "supervisor";
+/**
+ * Amenities and Common Developments (CM-404, ADR CM-0013 §5): name-only
+ * rows of one table with a kind, each assigned to Projects.
+ */
+export const DEVELOPMENT_KINDS = ["amenity", "common_development"] as const;
+export type DevelopmentKind = (typeof DEVELOPMENT_KINDS)[number];
+
+/** Lists whose rows are a name, a seed mark and a disabled mark. */
+export type NamedMasterKind = LookupKind | DevelopmentKind;
+
+/** Every masters list this context owns (CM-203, CM-404). */
+export type MasterKind = NamedMasterKind | "supervisor";
 
 type MasterKindInfo = {
   /** Prefix of the list's error codes: `LABOUR_CATEGORY_NAME_IN_USE`. */
@@ -34,6 +44,16 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     code: "SUPERVISOR",
     label: "Supervisor",
     plural: "Supervisors",
+  },
+  amenity: {
+    code: "AMENITY",
+    label: "Amenity",
+    plural: "Amenities",
+  },
+  common_development: {
+    code: "COMMON_DEVELOPMENT",
+    label: "Common Development",
+    plural: "Common Developments",
   },
 };
 
@@ -76,6 +96,11 @@ export function masterChanged(kind: MasterKind): DomainError {
 
 export function masterInUse(kind: MasterKind): DomainError {
   const { code, label } = MASTER_KINDS[kind];
+  if (kind === "amenity" || kind === "common_development")
+    return conflict(
+      `${code}_IN_USE`,
+      `Projects are assigned this ${label}, so it cannot be deleted. Remove it from those Projects or disable it instead.`,
+    );
   const users =
     kind === "supervisor"
       ? "Labours or attendance"

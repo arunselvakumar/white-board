@@ -67,11 +67,14 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
+/** Add Project; a Project Type is required since CM-401. */
 async function create(
   cookie: string,
   body: Record<string, unknown>,
 ): Promise<Project> {
-  const response = await createProject(jsonRequest(BASE, cookie, body));
+  const response = await createProject(
+    jsonRequest(BASE, cookie, { projectType: "commercial", ...body }),
+  );
   expect(response.status).toBe(StatusCodes.CREATED);
   return json<Project>(response);
 }
@@ -142,7 +145,7 @@ describe("Project contract details and custom fields HTTP (CM-413)", () => {
     const page = await json<{ items: Project[] }>(
       await listProjects(jsonRequest(BASE, owner.cookie)),
     );
-    expect(page.items).toEqual([kumari]);
+    expect(page.items).toEqual([{ ...kumari, pinned: false }]);
 
     const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
       where: { entityId: kumari.id, action: "project.created" },
@@ -244,7 +247,11 @@ describe("Project contract details and custom fields HTTP (CM-413)", () => {
     const owner = await ownerWithCompany();
     const attempt = async (body: Record<string, unknown>) => {
       const response = await createProject(
-        jsonRequest(BASE, owner.cookie, { name: "Kumari Heights", ...body }),
+        jsonRequest(BASE, owner.cookie, {
+          name: "Kumari Heights",
+          projectType: "commercial",
+          ...body,
+        }),
       );
       return { status: response.status, body: await json<ErrorBody>(response) };
     };

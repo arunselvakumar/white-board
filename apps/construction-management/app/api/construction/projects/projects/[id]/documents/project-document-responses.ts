@@ -1,6 +1,8 @@
-import { z } from "zod";
-
-import { contentDisposition } from "@/app/api/_lib/uploads";
+import {
+  FileDownloadQueryModel,
+  UploadKeyQueryModel,
+  storedFileResponse,
+} from "@/app/api/_lib/attachments";
 import type { ProjectDocumentView } from "@/src/projects/application/project-documents";
 import type { StoredObject } from "@/src/shared-kernel/files";
 
@@ -11,16 +13,10 @@ export function documentsPath(projectId: string): string {
   return `/api/construction/projects/projects/${projectId}/documents`;
 }
 
-export const ReceiveConstructionProjectsDocumentUploadQueryModel = z.object({
-  key: z.string().min(1).describe("The `key` from starting the upload."),
-});
+export const ReceiveConstructionProjectsDocumentUploadQueryModel =
+  UploadKeyQueryModel;
 
-export const GetConstructionProjectsDocumentQueryModel = z.object({
-  download: z
-    .enum(["1"])
-    .optional()
-    .describe("`1` saves the file instead of showing it."),
-});
+export const GetConstructionProjectsDocumentQueryModel = FileDownloadQueryModel;
 
 export function toProjectDocumentResponse(
   document: ProjectDocumentView,
@@ -33,6 +29,10 @@ export function toProjectDocumentResponse(
     bytes: document.bytes,
     viewable: document.viewable,
     url: `${documentsPath(document.projectId)}/${document.id}`,
+    thumbUrl:
+      document.thumbKey == null
+        ? null
+        : `${documentsPath(document.projectId)}/${document.id}/thumbnail`,
     createdAt: document.createdAt.toISOString(),
     createdBy: document.createdBy,
     createdByName: document.createdByName,
@@ -40,39 +40,14 @@ export function toProjectDocumentResponse(
 }
 
 /**
- * Streams a Project document with the type we sniffed when it was added,
- * never the one storage or the uploader claimed. A PDF or an image is
- * shown (`inline`) unless `download`; anything else always downloads.
- *
- * CSP: `default-src 'none'` stops any script or subresource in the file.
- * Checked in Chrome 154: its PDF viewer still renders an inline PDF under
- * it, opened directly and in an iframe on our page. `sandbox` is left off
- * shown files because it has broken Chrome's PDF viewer before (and still
- * blanks its thumbnails); `frame-ancestors 'self'` lets only our own pages
- * embed them. A download is never rendered, so it also gets `sandbox`.
+ * Streams a Project document with the type we sniffed when it was added
+ * (`storedFileResponse`): a PDF or an image is shown unless `download`;
+ * anything else always downloads.
  */
 export function projectDocumentResponse(
   document: ProjectDocumentView,
   object: StoredObject,
   download: boolean,
 ): Response {
-  const inline = document.viewable && !download;
-  const headers = new Headers({
-    "content-type": document.contentType,
-    "content-disposition": contentDisposition(
-      inline ? "inline" : "attachment",
-      document.fileName,
-    ),
-    // Never reused from the browser cache: a deleted file, or another
-    // Team Member signing in on a shared site tablet, must hit the access
-    // checks again.
-    "cache-control": "private, no-store",
-    "x-content-type-options": "nosniff",
-    "content-security-policy": inline
-      ? "default-src 'none'; frame-ancestors 'self'"
-      : "default-src 'none'; sandbox",
-  });
-  if (object.contentLength != null)
-    headers.set("content-length", String(object.contentLength));
-  return new Response(object.body, { headers });
+  return storedFileResponse(document, object, download);
 }

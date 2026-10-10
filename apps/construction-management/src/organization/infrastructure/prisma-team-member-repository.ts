@@ -179,6 +179,61 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
     });
   }
 
+  async saveMany(
+    entries: readonly { member: TeamMember; audit: AuditEvent }[],
+  ): Promise<void> {
+    if (entries.length === 0) return;
+    await this.db.$transaction(async (tx) => {
+      for (const { member, audit } of entries) {
+        await this.write(tx, member);
+        await recordAudit(tx, audit);
+      }
+    });
+  }
+
+  async findByIds(
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<TeamMember[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.db.constructionOrganizationTeamMember.findMany({
+      where: { workspaceId, id: { in: [...new Set(ids)] }, deletedAt: null },
+      include: INCLUDE,
+    });
+    return rows.map((row) => this.toDomain(row));
+  }
+
+  async listForProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<TeamMember[]> {
+    const rows = await this.db.constructionOrganizationTeamMember.findMany({
+      where: {
+        workspaceId,
+        deletedAt: null,
+        OR: [{ isOwner: true }, { projects: { some: { projectId } } }],
+      },
+      include: INCLUDE,
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map((row) => this.toDomain(row));
+  }
+
+  async listAssignable(workspaceId: string): Promise<TeamMember[]> {
+    const rows = await this.db.constructionOrganizationTeamMember.findMany({
+      where: {
+        workspaceId,
+        deletedAt: null,
+        isOwner: false,
+        memberType: "normal",
+        status: { in: ["joining_pending", "active"] },
+      },
+      include: INCLUDE,
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map((row) => this.toDomain(row));
+  }
+
   private async findOne(
     db: Db,
     where: Prisma.ConstructionOrganizationTeamMemberWhereInput,

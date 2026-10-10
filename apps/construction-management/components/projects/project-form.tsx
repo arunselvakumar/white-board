@@ -1,11 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { normalizeMobile } from "@repo/auth/construction/mobile";
 import { Building2, FileText, ListPlus, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Controller,
   useFieldArray,
@@ -33,22 +34,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
+import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
-import { rupeesToPaise } from "@/components/money/money-input";
+import { MoneyInput, rupeesToPaise } from "@/components/money/money-input";
+import { ImageUploader } from "@/components/profile/image-uploader";
 import {
   useUploadHeldFiles,
   type HeldFile,
 } from "@/components/projects/documents/document-attachments";
 import { fieldForCode } from "@/lib/server-errors";
+import { PROJECT_TYPES } from "@/src/projects/domain/project-type";
 import {
+  projectsQuery,
+  useApplyProjectLogo,
   useCreateProject,
   useDeleteProject,
   useUpdateProject,
+  type ProjectLogoChange,
   type ProjectResponse,
 } from "@/src/queries/projects";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
@@ -58,14 +65,20 @@ import { CustomFieldsField } from "./custom-fields-field";
 import { CollapsibleFormCard, FormCard } from "./form-card";
 import {
   clientPhoneLabel,
+  groupRupees,
   orderValueLabel,
   PROJECT_PAPERS,
   type ProjectPaperKind,
 } from "./project-contract";
-import { failedUploadsMessage, setProjectFlash } from "./project-flash";
+import {
+  failedUploadsMessage,
+  LOGO_FAILED_MESSAGE,
+  setProjectFlash,
+} from "./project-flash";
 import {
   cardOf,
   FIELD_ORDER,
+  newProjectFormSchema,
   projectFormInput,
   projectFormSchema,
   projectFormValues,
@@ -76,16 +89,41 @@ import {
   type ProjectFormValues,
 } from "./project-form-schema";
 import { PROJECTS_PATH, projectPath } from "./projects-home";
+import { resourcesStepPath } from "./resources/resources-step";
 import {
   formatCalendarDate,
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
+  projectInitials,
 } from "./project-status";
 
 const STATUS_ITEMS = PROJECT_STATUS_ORDER.map((status) => ({
   value: status,
   label: PROJECT_STATUS_LABELS[status],
 }));
+
+const TYPE_ITEMS = PROJECT_TYPES.map((type) => ({
+  value: type.key,
+  label: type.label,
+}));
+
+const KEEP_LOGO: ProjectLogoChange = { kind: "keep" };
+
+/** A preview URL for a picked logo file, revoked when it changes. */
+function usePickedLogoUrl(logo: ProjectLogoChange): string | null {
+  const file = logo.kind === "set" ? logo.file : null;
+  const url = useMemo(
+    () => (file == null ? null : URL.createObjectURL(file)),
+    [file],
+  );
+  useEffect(
+    () => () => {
+      if (url != null) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
+  return url;
+}
 
 type OptionalCard = Exclude<ProjectFormCard, "project">;
 
@@ -180,9 +218,16 @@ const PROGRESS_LABEL = (done: number, total: number) =>
  * and fold up to a one-line summary. On Add they start closed; on Edit a
  * card starts open when it has something in it. A card with an error opens
  * and its field takes focus.
+ *
+ * The Project card also holds the Project Type, the Budget and the logo
+ * with "Use Project logo on reports" (CM-401). Budget and Order value show
+ * only to a viewer with the Project menu's Financial flag. A picked or
+ * removed logo waits until the Project is saved, then goes through its own
+ * route.
  */
 function ProjectForm({
   project,
+  financial,
   saving,
   savingLabel,
   submitLabel,
@@ -190,16 +235,24 @@ function ProjectForm({
   onSave,
 }: {
   project: ProjectResponse | null;
+  /** The Project menu's Financial flag: Budget and Order value show. */
+  financial: boolean;
   saving: boolean;
   /** The button while saving; "Saving…" unless the screen says more. */
   savingLabel?: string;
   submitLabel: string;
   cancelHref: string;
-  onSave: (input: ProjectFormInput, held: HeldFile[]) => Promise<void>;
+  onSave: (
+    input: ProjectFormInput,
+    held: HeldFile[],
+    logo: ProjectLogoChange,
+  ) => Promise<void>;
 }) {
   const [initial] = useState(() => projectFormValues(project));
   const form = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectFormSchema),
+    resolver: zodResolver(
+      project == null ? newProjectFormSchema : projectFormSchema,
+    ),
     defaultValues: initial,
     shouldFocusError: false,
   });
@@ -219,6 +272,15 @@ function ProjectForm({
   }));
   const [shown, setShown] = useState(() => papersWithValues(initial));
   const [held, setHeld] = useState<HeldFile[]>([]);
+  const [logo, setLogo] = useState<ProjectLogoChange>(KEEP_LOGO);
+  const pickedLogoUrl = usePickedLogoUrl(logo);
+  const logoUrl =
+    logo.kind === "set"
+      ? pickedLogoUrl
+      : logo.kind === "remove"
+        ? null
+        : (project?.logoUrl ?? null);
+  const budgetField = form.register("budgetValue");
   const [focus, setFocus] = useState<string | null>(null);
 
   // Focus after the card or row it is in has rendered.
@@ -246,9 +308,13 @@ function ProjectForm({
 
   const submit = form.handleSubmit(
     async (valid) => {
-      const { input, customFieldRows } = projectFormInput(valid, project);
+      const { input, customFieldRows } = projectFormInput(
+        valid,
+        project,
+        financial,
+      );
       try {
-        await onSave(input, held);
+        await onSave(input, held, logo);
       } catch (error) {
         const field = serverField(error, customFieldRows);
         const { message } = fieldForCode(error, {});
@@ -292,6 +358,52 @@ function ProjectForm({
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
+            <Label htmlFor="project-type">Project Type</Label>
+            <Controller
+              name="projectType"
+              control={form.control}
+              render={({ field }) => (
+                <Select
+                  items={TYPE_ITEMS}
+                  value={field.value === "" ? null : field.value}
+                  onValueChange={(value) => {
+                    if (value != null) field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="project-type"
+                    ref={field.ref}
+                    size="lg"
+                    className="w-full min-w-0"
+                    aria-invalid={errors.projectType != null}
+                    aria-describedby="project-type-hint"
+                  >
+                    <SelectValue
+                      placeholder={
+                        project == null ? "Choose a type" : "Not set"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent
+                    align="start"
+                    alignItemWithTrigger={false}
+                    aria-label="Project Types"
+                  >
+                    {TYPE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <p id="project-type-hint" className="text-muted-foreground text-xs">
+              Decides whether the Project is built up as Wings or as Locations.
+            </p>
+            <FieldError message={errors.projectType?.message} />
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="project-status">Status</Label>
             <Controller
               name="status"
@@ -329,7 +441,6 @@ function ProjectForm({
             />
             <FieldError message={errors.status?.message} />
           </div>
-          <div className="hidden sm:block" />
           <div className="space-y-1.5">
             <Label htmlFor="project-start">Start date</Label>
             <Input
@@ -352,6 +463,32 @@ function ProjectForm({
             />
             <FieldError message={errors.endDate?.message} />
           </div>
+          {financial ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="project-budget">Budget</Label>
+              <MoneyInput
+                id="project-budget"
+                className="h-10"
+                placeholder="3,20,00,000"
+                aria-invalid={errors.budgetValue != null}
+                aria-describedby="project-budget-hint"
+                {...budgetField}
+                onBlur={(event) => {
+                  void budgetField.onBlur(event);
+                  const grouped = groupRupees(event.target.value);
+                  if (grouped !== event.target.value)
+                    form.setValue("budgetValue", grouped);
+                }}
+              />
+              <p
+                id="project-budget-hint"
+                className="text-muted-foreground text-xs"
+              >
+                Your own figure for the job; shown on the Project Dashboard.
+              </p>
+              <FieldError message={errors.budgetValue?.message} />
+            </div>
+          ) : null}
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="project-address">Project address</Label>
             <Textarea
@@ -362,6 +499,65 @@ function ProjectForm({
               {...form.register("address")}
             />
             <FieldError message={errors.address?.message} />
+          </div>
+          <div className="space-y-3 border-t pt-4 sm:col-span-2">
+            <div>
+              <h3 className="text-sm font-medium">Project logo</h3>
+              <p className="text-muted-foreground text-xs">
+                Shown on the Projects home and at the top of the Project.
+              </p>
+            </div>
+            <ImageUploader
+              kind="project_logo"
+              noun="logo"
+              shape="square"
+              imageUrl={logoUrl}
+              fallback={
+                values.name.trim() === "" ? (
+                  <Building2 aria-hidden="true" />
+                ) : (
+                  projectInitials(values.name.trim())
+                )
+              }
+              hint="PNG, JPEG or WebP, up to 2 MB. Saved with the Project."
+              disabled={saving}
+              onUpload={(file) => {
+                setLogo({ kind: "set", file });
+                return Promise.resolve();
+              }}
+              onRemove={() => {
+                setLogo(
+                  project?.logoUrl == null ? KEEP_LOGO : { kind: "remove" },
+                );
+                return Promise.resolve();
+              }}
+            />
+            <Controller
+              name="useLogoInReports"
+              control={form.control}
+              render={({ field }) => (
+                <div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+                  <div className="min-w-0 space-y-0.5">
+                    <Label htmlFor="project-logo-reports">
+                      Use Project logo on reports
+                    </Label>
+                    <p
+                      id="project-logo-reports-hint"
+                      className="text-muted-foreground text-xs"
+                    >
+                      Report headers print this logo instead of the
+                      Company&apos;s.
+                    </p>
+                  </div>
+                  <Switch
+                    id="project-logo-reports"
+                    aria-describedby="project-logo-reports-hint"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </div>
+              )}
+            />
           </div>
         </div>
       </FormCard>
@@ -409,6 +605,7 @@ function ProjectForm({
       >
         <ContractPapersField
           form={form}
+          financial={financial}
           projectId={project?.id ?? null}
           shown={shown}
           onShow={(kind) => {
@@ -470,15 +667,19 @@ function ProjectForm({
 }
 
 /**
- * New Project (`/app/projects/new`). Files picked under Contract wait until
- * the Project exists, then upload; the Project opens either way, and says
- * which files did not make it.
+ * New Project (`/app/projects/new`). The logo and the files picked under
+ * Contract wait until the Project exists, then upload; the Project opens
+ * either way, on its Resources as step 2 of 2 (CM-406), and its Overview
+ * says what did not make it.
  */
 export function NewProjectScreen() {
   const router = useRouter();
+  const { data: list } = useSuspenseQuery(projectsQuery);
   const create = useCreateProject();
+  const applyLogo = useApplyProjectLogo();
   const uploads = useUploadHeldFiles();
   const [uploading, setUploading] = useState<number | null>(null);
+  const [savingLogo, setSavingLogo] = useState(false);
   const progress =
     uploads.status ??
     (uploading == null ? null : { done: 0, total: uploading });
@@ -492,16 +693,25 @@ export function NewProjectScreen() {
         />
         <ProjectForm
           project={null}
-          saving={create.isPending || uploading != null}
+          financial={list.financial}
+          saving={create.isPending || savingLogo || uploading != null}
           savingLabel={
-            progress == null
-              ? undefined
-              : PROGRESS_LABEL(progress.done, progress.total)
+            progress != null
+              ? PROGRESS_LABEL(progress.done, progress.total)
+              : savingLogo
+                ? "Saving the logo…"
+                : undefined
           }
           submitLabel="Add Project"
           cancelHref={PROJECTS_PATH}
-          onSave={async (input, held) => {
+          onSave={async (input, held, logo) => {
             const created = await create.mutateAsync(input);
+            const messages: string[] = [];
+            if (logo.kind !== "keep") {
+              setSavingLogo(true);
+              if (!(await applyLogo(created.id, logo)))
+                messages.push(LOGO_FAILED_MESSAGE);
+            }
             if (held.length > 0) {
               setUploading(held.length);
               let failed: readonly HeldFile[];
@@ -511,12 +721,11 @@ export function NewProjectScreen() {
                 failed = held;
               }
               if (failed.length > 0)
-                setProjectFlash(
-                  created.id,
-                  failedUploadsMessage(failed.length),
-                );
+                messages.push(failedUploadsMessage(failed.length));
             }
-            router.push(projectPath(created.id));
+            if (messages.length > 0)
+              setProjectFlash(created.id, messages.join(" "));
+            router.push(resourcesStepPath(created.id));
           }}
         />
       </div>
@@ -524,10 +733,22 @@ export function NewProjectScreen() {
   );
 }
 
-/** Edit Project inside the project shell, with Delete below the form. */
-export function EditProjectForm({ project }: { project: ProjectResponse }) {
+/**
+ * Edit Project inside the project shell, with Delete below the form. A
+ * logo change is applied once the form is saved.
+ */
+export function EditProjectForm({
+  project,
+  financial,
+}: {
+  project: ProjectResponse;
+  /** The Project menu's Financial flag. */
+  financial: boolean;
+}) {
   const router = useRouter();
   const update = useUpdateProject(project.id);
+  const applyLogo = useApplyProjectLogo();
+  const [savingLogo, setSavingLogo] = useState(false);
   const remove = useDeleteProject();
   const [confirming, setConfirming] = useState(false);
   const [deleteError, setDeleteError] = useState<string | undefined>();
@@ -541,14 +762,20 @@ export function EditProjectForm({ project }: { project: ProjectResponse }) {
           </h2>
           <ProjectForm
             project={project}
-            saving={update.isPending}
+            financial={financial}
+            saving={update.isPending || savingLogo}
             submitLabel="Save"
             cancelHref={projectPath(project.id)}
-            onSave={async (input) => {
+            onSave={async (input, _held, logo) => {
               await update.mutateAsync({
                 ...input,
                 expectedUpdatedAt: project.updatedAt,
               });
+              if (logo.kind !== "keep") {
+                setSavingLogo(true);
+                if (!(await applyLogo(project.id, logo)))
+                  setProjectFlash(project.id, LOGO_FAILED_MESSAGE);
+              }
               router.push(projectPath(project.id));
             }}
           />
@@ -561,8 +788,9 @@ export function EditProjectForm({ project }: { project: ProjectResponse }) {
             Delete Project
           </h2>
           <p className="text-muted-foreground text-sm">
-            Only a Project with no labours, vendors, attendance, payments or
-            documents can be deleted. Mark a finished Project Completed instead.
+            Only a Project with no labours, vendors, attendance, payments,
+            documents, Wings, Locations, drawings or testing reports can be
+            deleted. Mark a finished Project Completed instead.
           </p>
           <FormAlert message={deleteError} />
           <Button

@@ -1,5 +1,9 @@
 import type { LookupEntry } from "../domain/lookup-entry";
-import type { LookupKind, MasterKind } from "../domain/master-kind";
+import type {
+  DevelopmentKind,
+  LookupKind,
+  MasterKind,
+} from "../domain/master-kind";
 import type { Supervisor } from "../domain/supervisor";
 
 /** How a write is recorded in the audit log, in the same transaction. */
@@ -62,4 +66,70 @@ export type TeamMemberDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, string>>;
+};
+
+/** An Amenity or Common Development with the live Projects it is assigned to. */
+export type DevelopmentRow = {
+  entry: LookupEntry<DevelopmentKind>;
+  /** Live Projects only; links to deleted Projects are left out. */
+  projectIds: string[];
+};
+
+/**
+ * Amenities and Common Developments in `construction_masters` (CM-404):
+ * the rows, and the Projects each is assigned to (`development_projects`).
+ */
+export type DevelopmentStore = {
+  /** Live rows of a kind (enabled and disabled), by name. */
+  list(kind: DevelopmentKind, workspaceId: string): Promise<DevelopmentRow[]>;
+  find(
+    kind: DevelopmentKind,
+    workspaceId: string,
+    id: string,
+  ): Promise<DevelopmentRow | null>;
+  /** Inserts with its Projects and audits; 409 `<KIND>_NAME_IN_USE`. */
+  insert(
+    entry: LookupEntry<DevelopmentKind>,
+    projectIds: readonly string[],
+    change: MasterChange,
+  ): Promise<void>;
+  /** As `LookupStore.update`. */
+  update(
+    entry: LookupEntry<DevelopmentKind>,
+    expectedUpdatedAt: Date,
+    change: MasterChange,
+  ): Promise<void>;
+  /** Replaces the row's Projects and audits. */
+  setProjects(
+    entry: LookupEntry<DevelopmentKind>,
+    projectIds: readonly string[],
+    change: MasterChange,
+  ): Promise<void>;
+  /** Live rows of any kind assigned to the Project, by name. */
+  listForProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<LookupEntry<DevelopmentKind>[]>;
+  /**
+   * Replaces the rows of one kind assigned to the Project and audits it on
+   * the Project (`project.<kind>_assigned`).
+   */
+  setForProject(input: {
+    workspaceId: string;
+    projectId: string;
+    kind: DevelopmentKind;
+    ids: readonly string[];
+    before: readonly string[];
+    by: string;
+    now: Date;
+  }): Promise<void>;
+};
+
+/**
+ * The Company's live Projects, by id. The projects context is referenced
+ * by id only; infrastructure reads its table without importing it.
+ */
+export type ProjectDirectory = {
+  /** The ids in `ids` that are not live Projects of the Company. */
+  unknownIds(workspaceId: string, ids: readonly string[]): Promise<string[]>;
 };

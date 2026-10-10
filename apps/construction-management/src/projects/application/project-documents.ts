@@ -1,47 +1,37 @@
+import {
+  AttachmentUploads,
+  storedFilesOf,
+  type StartedUpload,
+  type UploadTarget,
+} from "@/src/shared-kernel/attachments";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import {
-  DomainError,
+  type DomainError,
   conflict,
   notFound,
 } from "@/src/shared-kernel/domain-error";
-import {
-  cleanFileName,
-  fileTooLarge,
-  firstBytes,
-  isProgram,
-  type NewStoredFile,
-  type ObjectStorage,
-  type StoredObject,
+import type {
+  NewStoredFile,
+  ObjectStorage,
+  StoredObject,
 } from "@/src/shared-kernel/files";
-import { sniffDocumentType } from "@/src/shared-kernel/files/document-file";
 import { newId } from "@/src/shared-kernel/ids";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
+import type { ProjectDocument } from "../domain/project-document";
 import {
-  isBlockedDocumentName,
-  isProjectDocumentKey,
-  programNotAllowed,
-  projectDocumentKey,
-  uploadKeyInvalid,
-  type ProjectDocument,
-} from "../domain/project-document";
-import {
-  PROJECT_DOCUMENT_MAX_BYTES,
-  PROJECT_DOCUMENT_MULTIPART_FROM_BYTES,
   PROJECT_DOCUMENTS_MAX,
   type ProjectDocumentKind,
 } from "../domain/project-document-rules";
 import type { ProjectRepository } from "../domain/project-repository";
+import { PROJECT_DOCUMENT_POLICY } from "../domain/project-upload-policies";
 import type { ProjectViewer } from "./project-handlers";
+import { assertProjectVisible } from "./project-visibility";
+
+export type { UploadRoute } from "@/src/shared-kernel/attachments";
 
 /** `stored_files.kind` of a Project document. */
 export const PROJECT_DOCUMENT_FILE_KIND = "project_document";
-
-/** `storage_gb` is counted in GiB, like the organization context's meter. */
-const BYTES_PER_GB = 1024 ** 3;
-
-/** Enough of the file to tell a program, a PDF or an image. */
-const SNIFF_BYTES = 64;
 
 /** A stored document, `null` once it was deleted (its key stays taken). */
 export type StoredProjectDocument = ProjectDocument & {
@@ -66,18 +56,21 @@ export type ProjectDocumentStore = {
     key: string,
   ): Promise<StoredProjectDocument | null>;
   /**
-   * Inserts the document with its `stored_files` row and audit event while
-   * holding the Project: 404 `PROJECT_NOT_FOUND` once it is gone, 409
-   * `DOCUMENTS_LIMIT` at `maxDocuments` live files. `duplicate` when a row
-   * already has this key (a retried completion won the race).
+   * Inserts the document with its `stored_files` rows (the file, and the
+   * thumbnail when there is one), its Gallery row when it is a PDF or an
+   * image, and its audit event while holding the Project: 404
+   * `PROJECT_NOT_FOUND` once it is gone, 409 `DOCUMENTS_LIMIT` at
+   * `maxDocuments` live files. `duplicate` when a row already has this key
+   * (a retried completion won the race).
    */
   add(input: {
     document: ProjectDocument;
     file: NewStoredFile;
+    thumbnail?: NewStoredFile;
     audit: AuditEvent;
     maxDocuments: number;
   }): Promise<"added" | "duplicate">;
-  /** Tombstones the document; false when it was already gone. */
+  /** Tombstones the document and its Gallery row; false when it was already gone. */
   remove(input: {
     document: ProjectDocument;
     by: string;
@@ -100,9 +93,6 @@ export type ProjectDocumentView = ProjectDocument & {
   createdByName: string | null;
 };
 
-/** How the browser sends the bytes after `start`. */
-export type UploadRoute = { via: "blob"; multipart: boolean } | { via: "app" };
-
 const VIEWABLE = new Set([
   "application/pdf",
   "image/png",
@@ -124,20 +114,10 @@ function toView(
 export const projectDocumentNotFound = () =>
   notFound("DOCUMENT_NOT_FOUND", "This document was not found.");
 
-const projectNotFound = () =>
-  notFound("PROJECT_NOT_FOUND", "This Project was not found.");
-
 function documentsLimit(): DomainError {
   return conflict(
     "DOCUMENTS_LIMIT",
     `Keep at most ${String(PROJECT_DOCUMENTS_MAX)} documents on a Project. Delete one first.`,
-  );
-}
-
-function uploadNotFound(): DomainError {
-  return new DomainError(
-    "UPLOAD_NOT_FOUND",
-    "The file did not finish uploading. Try again.",
   );
 }
 
@@ -146,34 +126,35 @@ function uploadNotFound(): DomainError {
  * the client's PO / WO, the agreement. Any type but programs, at most 25 MB
  * each and 50 per Project, counted towards the Company's storage.
  *
- * The bytes never pass through a deployed function (4.5 MB body limit):
- * `start` checks the name, size, count and plan and names the key; the
- * browser sends the file straight to storage (`answerDirectUpload`), or
- * through `receive` where storage is files on disk; `complete` then checks
- * what actually arrived (size, not a program by content) and records it
- * with its `stored_files` row in one transaction. A refused or failed
- * completion deletes the object it was about.
+ * Uploads run through the kernel's attachments service (CM-407, policy
+ * `PROJECT_DOCUMENT_POLICY`): `start`, the bytes straight to storage or
+ * through `receive`, an image's thumbnail through `receiveThumbnail`, then
+ * `complete`, which records the document with its `stored_files` rows and
+ * its Gallery row in one transaction.
  *
  * Who may see a Project may see its documents; routes check the Permission
  * Matrix (`projects.project` read / update) first.
  */
 export class ProjectDocuments {
+  private readonly uploads: AttachmentUploads;
+
   constructor(
     private readonly projects: Pick<ProjectRepository, "findById">,
     private readonly store: ProjectDocumentStore,
-    private readonly storage: ObjectStorage,
-    private readonly plan: PlanGate,
+    storage: ObjectStorage,
+    plan: PlanGate,
     private readonly names: UploaderNames,
     private readonly clock: () => Date = () => new Date(),
-  ) {}
+  ) {
+    this.uploads = new AttachmentUploads(storage, plan, clock);
+  }
 
-  /** The Owner sees every Project, a Member only those assigned to them. */
-  private async project(viewer: ProjectViewer, id: string): Promise<void> {
-    const visible = viewer.role === "owner" || viewer.projectIds.has(id);
-    const found = visible
-      ? await this.projects.findById(viewer.workspaceId, id)
-      : null;
-    if (found == null) throw projectNotFound();
+  private target(viewer: ProjectViewer, projectId: string): UploadTarget {
+    return {
+      workspaceId: viewer.workspaceId,
+      ownerId: projectId,
+      policy: PROJECT_DOCUMENT_POLICY,
+    };
   }
 
   private audit(
@@ -203,43 +184,6 @@ export class ProjectDocuments {
     };
   }
 
-  /** Best effort: a leftover object costs storage, not correctness. */
-  private async discard(key: string): Promise<void> {
-    try {
-      await this.storage.delete(key);
-    } catch (error) {
-      console.error(`Could not delete ${key} from storage`, error);
-    }
-  }
-
-  /** Never delete an object a document row points at. */
-  private async discardUnlessRecorded(
-    workspaceId: string,
-    projectId: string,
-    key: string,
-  ): Promise<void> {
-    const recorded = await this.store
-      .findByKey(workspaceId, projectId, key)
-      .catch(() => "unknown" as const);
-    if (recorded == null) await this.discard(key);
-  }
-
-  private async assertRoomFor(
-    workspaceId: string,
-    projectId: string,
-    bytes: number,
-  ): Promise<void> {
-    if (
-      (await this.store.count(workspaceId, projectId)) >= PROJECT_DOCUMENTS_MAX
-    )
-      throw documentsLimit();
-    await this.plan.assertCanAdd(
-      workspaceId,
-      "storage_gb",
-      bytes / BYTES_PER_GB,
-    );
-  }
-
   private async views(
     workspaceId: string,
     documents: ProjectDocument[],
@@ -267,40 +211,20 @@ export class ProjectDocuments {
     projectId: string;
     fileName: string;
     bytes: number;
-  }): Promise<{ key: string; fileName: string; upload: UploadRoute }> {
-    const { workspaceId } = input.viewer;
-    await this.project(input.viewer, input.projectId);
-    const fileName = cleanFileName(input.fileName, "bin");
-    if (isBlockedDocumentName(fileName)) throw programNotAllowed();
-    if (input.bytes > PROJECT_DOCUMENT_MAX_BYTES)
-      throw fileTooLarge(PROJECT_DOCUMENT_MAX_BYTES);
-    await this.assertRoomFor(workspaceId, input.projectId, input.bytes);
-    const key = projectDocumentKey(
-      workspaceId,
-      input.projectId,
-      fileName,
-      this.clock(),
-    );
-    const upload: UploadRoute =
-      this.storage.directUploads == null
-        ? { via: "app" }
-        : {
-            via: "blob",
-            multipart: input.bytes >= PROJECT_DOCUMENT_MULTIPART_FROM_BYTES,
-          };
-    return { key, fileName, upload };
-  }
-
-  /** Whether this viewer may write `key` now; the size limit if so. */
-  private async allowUpload(
-    viewer: ProjectViewer,
-    projectId: string,
-    key: string,
-  ): Promise<{ maxBytes: number }> {
-    await this.project(viewer, projectId);
-    if (!isProjectDocumentKey(key, viewer.workspaceId, projectId))
-      throw uploadKeyInvalid();
-    return { maxBytes: PROJECT_DOCUMENT_MAX_BYTES };
+  }): Promise<StartedUpload> {
+    const { viewer, projectId } = input;
+    await assertProjectVisible(this.projects, viewer, projectId);
+    return this.uploads.start(this.target(viewer, projectId), {
+      fileName: input.fileName,
+      bytes: input.bytes,
+      check: async () => {
+        if (
+          (await this.store.count(viewer.workspaceId, projectId)) >=
+          PROJECT_DOCUMENTS_MAX
+        )
+          throw documentsLimit();
+      },
+    });
   }
 
   /**
@@ -313,21 +237,18 @@ export class ProjectDocuments {
     request: Request;
     body: unknown;
   }): Promise<unknown> {
-    const direct = this.storage.directUploads;
-    if (direct == null)
-      throw notFound("NOT_FOUND", "Uploads go through the app on this server.");
-    return direct.answer({
+    const { viewer, projectId } = input;
+    return this.uploads.answerDirectUpload(this.target(viewer, projectId), {
       request: input.request,
       body: input.body,
-      allow: (key) => this.allowUpload(input.viewer, input.projectId, key),
+      authorize: () => assertProjectVisible(this.projects, viewer, projectId),
     });
   }
 
   /**
    * Step 2, development and tests: the bytes through our route, where
    * storage is files on disk. 404 where browsers upload straight to
-   * storage; 409 `UPLOAD_EXISTS` rather than replace an object, as Blob
-   * refuses to overwrite.
+   * storage; 409 `UPLOAD_EXISTS` rather than replace an object.
    */
   async receive(input: {
     viewer: ProjectViewer;
@@ -335,12 +256,29 @@ export class ProjectDocuments {
     key: string;
     bytes: Uint8Array;
   }): Promise<void> {
-    if (this.storage.directUploads != null)
+    const { viewer, projectId } = input;
+    if (this.uploads.takesDirectUploads())
       throw notFound("NOT_FOUND", "Uploads go straight to storage here.");
-    await this.allowUpload(input.viewer, input.projectId, input.key);
-    if ((await this.storage.head(input.key)) != null)
-      throw conflict("UPLOAD_EXISTS", "This upload was already sent.");
-    await this.storage.put(input.key, input.bytes, "application/octet-stream");
+    await assertProjectVisible(this.projects, viewer, projectId);
+    await this.uploads.receive(this.target(viewer, projectId), {
+      key: input.key,
+      bytes: input.bytes,
+    });
+  }
+
+  /** An image's browser-made WebP thumbnail, sent before completing (CM-407). */
+  async receiveThumbnail(input: {
+    viewer: ProjectViewer;
+    projectId: string;
+    key: string;
+    bytes: Uint8Array;
+  }): Promise<void> {
+    const { viewer, projectId } = input;
+    await assertProjectVisible(this.projects, viewer, projectId);
+    await this.uploads.receiveThumbnail(this.target(viewer, projectId), {
+      key: input.key,
+      bytes: input.bytes,
+    });
   }
 
   /**
@@ -357,80 +295,57 @@ export class ProjectDocuments {
     fileName: string;
     by: string;
   }): Promise<{ document: ProjectDocumentView; created: boolean }> {
-    const { workspaceId } = input.viewer;
-    const { projectId, key } = input;
-    await this.project(input.viewer, projectId);
-    if (!isProjectDocumentKey(key, workspaceId, projectId))
-      throw uploadKeyInvalid();
-
-    const existing = await this.store.findByKey(workspaceId, projectId, key);
-    if (existing != null) {
-      // Deleted already: whatever was sent there again is not kept.
-      if (existing.deletedAt != null) {
-        await this.discard(key);
-        throw uploadNotFound();
-      }
-      return { document: await this.view(existing), created: false };
-    }
-
-    const head = await this.storage.head(key);
-    if (head == null) throw uploadNotFound();
-    try {
-      const fileName = cleanFileName(input.fileName, "bin");
-      if (isBlockedDocumentName(fileName)) throw programNotAllowed();
-      if (head.bytes === 0)
-        throw new DomainError("FILE_EMPTY", "Choose a file to upload.");
-      if (head.bytes > PROJECT_DOCUMENT_MAX_BYTES)
-        throw fileTooLarge(PROJECT_DOCUMENT_MAX_BYTES);
-      const object = await this.storage.get(key);
-      if (object == null) throw uploadNotFound();
-      const prefix = await firstBytes(object, SNIFF_BYTES);
-      if (isProgram(prefix)) throw programNotAllowed();
-      await this.plan.assertCanAdd(
-        workspaceId,
-        "storage_gb",
-        head.bytes / BYTES_PER_GB,
-      );
-
-      const now = this.clock();
-      const document: ProjectDocument = {
-        id: newId(now.getTime()),
-        workspaceId,
-        projectId,
-        kind: input.kind,
-        fileKey: key,
-        fileName,
-        contentType: sniffDocumentType(prefix) ?? "application/octet-stream",
-        bytes: head.bytes,
-        createdAt: now,
-        createdBy: input.by,
-      };
-      const result = await this.store.add({
-        document,
-        file: {
-          workspaceId,
-          key,
-          kind: PROJECT_DOCUMENT_FILE_KIND,
-          contentType: document.contentType,
-          bytes: document.bytes,
-          createdBy: input.by,
-          createdAt: now,
+    const { viewer, projectId, key } = input;
+    const { workspaceId } = viewer;
+    await assertProjectVisible(this.projects, viewer, projectId);
+    const { value, created } = await this.uploads.complete<ProjectDocument>(
+      this.target(viewer, projectId),
+      {
+        key,
+        fileName: input.fileName,
+        recorded: async () => {
+          const found = await this.store.findByKey(workspaceId, projectId, key);
+          if (found == null) return null;
+          return found.deletedAt == null
+            ? { state: "live", value: found }
+            : { state: "deleted" };
         },
-        audit: this.audit(document, input.by, "document_added", now, {
-          after: this.summary(document),
-        }),
-        maxDocuments: PROJECT_DOCUMENTS_MAX,
-      });
-      if (result === "duplicate") {
-        const winner = await this.store.findByKey(workspaceId, projectId, key);
-        if (winner == null || winner.deletedAt != null) throw uploadNotFound();
-        return { document: await this.view(winner), created: false };
-      }
-      return { document: await this.view(document), created: true };
-    } catch (error) {
-      await this.discardUnlessRecorded(workspaceId, projectId, key);
-      throw error;
-    }
+        record: async (upload) => {
+          const now = this.clock();
+          const document: ProjectDocument = {
+            id: newId(now.getTime()),
+            workspaceId,
+            projectId,
+            kind: input.kind,
+            fileKey: key,
+            fileName: upload.fileName,
+            contentType: upload.contentType,
+            bytes: upload.bytes,
+            thumbKey: upload.thumbnail?.key ?? null,
+            createdAt: now,
+            createdBy: input.by,
+          };
+          const [file, thumbnail] = storedFilesOf(upload, {
+            workspaceId,
+            kind: PROJECT_DOCUMENT_FILE_KIND,
+            by: input.by,
+            now,
+          });
+          if (file == null) throw new Error("An upload has a stored file.");
+          const result = await this.store.add({
+            document,
+            file,
+            ...(thumbnail == null ? {} : { thumbnail }),
+            audit: this.audit(document, input.by, "document_added", now, {
+              after: this.summary(document),
+            }),
+            maxDocuments: PROJECT_DOCUMENTS_MAX,
+          });
+          return result === "duplicate" ? "duplicate" : document;
+        },
+      },
+    );
+    return { document: await this.view(value), created };
   }
 
   /** Newest first, with the bytes they take. */
@@ -438,7 +353,7 @@ export class ProjectDocuments {
     viewer: ProjectViewer,
     projectId: string,
   ): Promise<{ items: ProjectDocumentView[]; totalBytes: number }> {
-    await this.project(viewer, projectId);
+    await assertProjectVisible(this.projects, viewer, projectId);
     const documents = await this.store.list(viewer.workspaceId, projectId);
     return {
       items: await this.views(viewer.workspaceId, documents),
@@ -446,37 +361,57 @@ export class ProjectDocuments {
     };
   }
 
-  async read(
+  private async live(
     viewer: ProjectViewer,
     projectId: string,
     documentId: string,
-  ): Promise<{ document: ProjectDocumentView; object: StoredObject }> {
-    await this.project(viewer, projectId);
+  ): Promise<ProjectDocument> {
+    await assertProjectVisible(this.projects, viewer, projectId);
     const found = await this.store.find(
       viewer.workspaceId,
       projectId,
       documentId,
     );
     if (found == null) throw projectDocumentNotFound();
-    const object = await this.storage.get(found.fileKey);
+    return found;
+  }
+
+  async read(
+    viewer: ProjectViewer,
+    projectId: string,
+    documentId: string,
+  ): Promise<{ document: ProjectDocumentView; object: StoredObject }> {
+    const found = await this.live(viewer, projectId, documentId);
+    const object = await this.uploads.read(found.fileKey);
     if (object == null) throw projectDocumentNotFound();
     return { document: toView(found, new Map()), object };
   }
 
-  /** Tombstone, then the object goes (best effort). */
+  /** The document's thumbnail; 404 `THUMBNAIL_NOT_FOUND` when it has none. */
+  async readThumbnail(
+    viewer: ProjectViewer,
+    projectId: string,
+    documentId: string,
+  ): Promise<StoredObject> {
+    const found = await this.live(viewer, projectId, documentId);
+    const object =
+      found.thumbKey == null ? null : await this.uploads.read(found.thumbKey);
+    if (object == null) throw thumbnailNotFound();
+    return object;
+  }
+
+  /** Tombstone, then the object and its thumbnail go (best effort). */
   async delete(input: {
     viewer: ProjectViewer;
     projectId: string;
     documentId: string;
     by: string;
   }): Promise<void> {
-    await this.project(input.viewer, input.projectId);
-    const document = await this.store.find(
-      input.viewer.workspaceId,
+    const document = await this.live(
+      input.viewer,
       input.projectId,
       input.documentId,
     );
-    if (document == null) throw projectDocumentNotFound();
     const now = this.clock();
     const removed = await this.store.remove({
       document,
@@ -487,6 +422,12 @@ export class ProjectDocuments {
       }),
     });
     if (!removed) throw projectDocumentNotFound();
-    await this.discard(document.fileKey);
+    await this.uploads.discard(
+      document.fileKey,
+      ...(document.thumbKey == null ? [] : [document.thumbKey]),
+    );
   }
 }
+
+export const thumbnailNotFound = () =>
+  notFound("THUMBNAIL_NOT_FOUND", "This file has no thumbnail.");

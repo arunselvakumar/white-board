@@ -3,23 +3,21 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { uploadPresigned } from "@vercel/blob/client";
 
 import type {
   ConstructionProjectsDocumentResponseModel,
   ListConstructionProjectsDocumentsResponseModel,
-  StartConstructionProjectsDocumentUploadResponseModel,
 } from "@/app/api/construction/projects/projects/[id]/documents/project-document-models";
 import { checkDocumentFile } from "@/lib/project-documents";
 import type { ProjectDocumentKind } from "@/src/projects/domain/project-document-rules";
 
-import { apiJson, QueryHttpError, type ErrorEnvelope } from "./http";
+import { directUpload, postJson, type UploadOptions } from "./direct-upload";
+import { apiJson, QueryHttpError } from "./http";
 import { PROJECTS_API, PROJECTS_KEY } from "./projects";
 
 export type ProjectDocument = ConstructionProjectsDocumentResponseModel;
 export type ProjectDocumentList =
   ListConstructionProjectsDocumentsResponseModel;
-type StartedUpload = StartConstructionProjectsDocumentUploadResponseModel;
 
 /** `/api/construction/projects/projects/{id}/documents` (CM-414). */
 export function projectDocumentsPath(projectId: string): string {
@@ -40,126 +38,18 @@ export function projectDocumentsQuery(projectId: string) {
   });
 }
 
-/** Bytes that never reached storage: Blob or the network failed. */
-export const UPLOAD_FAILED = "UPLOAD_FAILED";
-
-function uploadFailed(): QueryHttpError {
-  return new QueryHttpError(0, {
-    code: UPLOAD_FAILED,
-    message: "Couldn't upload. Try again.",
-  });
-}
-
-function cancelled(): DOMException {
-  return new DOMException("The upload was cancelled.", "AbortError");
-}
-
-export function isUploadCancelled(error: unknown): boolean {
-  return error instanceof DOMException && error.name === "AbortError";
-}
-
-/** What an error says on screen: the server's message, else `fallback`. */
-export function uploadErrorMessage(
-  error: unknown,
-  fallback = "Couldn't upload. Try again.",
-): string {
-  if (error instanceof QueryHttpError) return error.message;
-  return fallback;
-}
-
-function envelopeFrom(text: string, fallback: string): ErrorEnvelope {
-  try {
-    const body: unknown = JSON.parse(text);
-    if (
-      typeof body === "object" &&
-      body !== null &&
-      "code" in body &&
-      "message" in body &&
-      typeof body.code === "string" &&
-      typeof body.message === "string"
-    )
-      return { code: body.code, message: body.message };
-  } catch {
-    // Not JSON; fall through.
-  }
-  return { code: "http_error", message: fallback || "Request failed" };
-}
-
-export type UploadOptions = {
-  /** 0–100 while the bytes go up. */
-  onProgress?: (percentage: number) => void;
-  signal?: AbortSignal;
-};
+export {
+  UPLOAD_FAILED,
+  isUploadCancelled,
+  uploadErrorMessage,
+  type UploadOptions,
+} from "./direct-upload";
 
 /**
- * Step 2 in development and tests: the raw file to our own route. XHR, not
- * fetch, because only XHR reports upload progress.
- */
-function sendThroughApp(
-  url: string,
-  file: File,
-  { onProgress, signal }: UploadOptions,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted === true) {
-      reject(cancelled());
-      return;
-    }
-    const xhr = new XMLHttpRequest();
-    const abort = () => {
-      xhr.abort();
-    };
-    const settle = () => signal?.removeEventListener("abort", abort);
-    xhr.open("POST", url);
-    xhr.setRequestHeader(
-      "content-type",
-      file.type || "application/octet-stream",
-    );
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && event.total > 0)
-        onProgress?.(Math.round((event.loaded / event.total) * 100));
-    };
-    xhr.onload = () => {
-      settle();
-      if (xhr.status >= 200 && xhr.status < 300) resolve();
-      else
-        reject(
-          new QueryHttpError(
-            xhr.status,
-            envelopeFrom(xhr.responseText, xhr.statusText),
-          ),
-        );
-    };
-    xhr.onerror = () => {
-      settle();
-      reject(uploadFailed());
-    };
-    xhr.onabort = () => {
-      settle();
-      reject(cancelled());
-    };
-    signal?.addEventListener("abort", abort, { once: true });
-    xhr.send(file);
-  });
-}
-
-function postJson<T>(
-  url: string,
-  body: unknown,
-  signal?: AbortSignal,
-): Promise<T> {
-  return apiJson<T>(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
-}
-
-/**
- * Keeps one file on a Project (ADR CM-0010): start (the server checks name,
- * size, count and plan), send the bytes straight to private Blob — or to
- * our route in development — then complete, which records the document.
+ * Keeps one file on a Project (ADR CM-0010) through `directUpload`
+ * (CM-407): start (the server checks name, size, count and plan), send the
+ * bytes straight to private Blob — or to our route in development — and an
+ * image's thumbnail, then complete, which records the document.
  * A program or a file over 25 MB fails here without a request. Errors are
  * `QueryHttpError` with the server's code; a cancelled upload rejects with
  * an `AbortError`.
@@ -173,38 +63,18 @@ export async function uploadProjectDocument(
   const problem = checkDocumentFile(file);
   if (problem != null) throw new QueryHttpError(400, problem);
   const base = projectDocumentsPath(projectId);
-  const { signal, onProgress } = options;
-
-  const started = await postJson<StartedUpload>(
-    `${base}/uploads`,
-    { kind, fileName: file.name, bytes: file.size },
-    signal,
-  );
-  onProgress?.(0);
-  if (started.upload.via === "blob") {
-    try {
-      await uploadPresigned(started.key, file, {
-        access: "private",
-        handleUploadUrl: started.upload.handleUploadUrl,
-        multipart: started.upload.multipart,
-        abortSignal: signal,
-        onUploadProgress: ({ percentage }) => {
-          onProgress?.(Math.round(percentage));
-        },
-      });
-    } catch {
-      if (signal?.aborted === true) throw cancelled();
-      throw uploadFailed();
-    }
-  } else {
-    await sendThroughApp(started.upload.url, file, options);
-  }
-  onProgress?.(100);
-  return postJson<ProjectDocument>(
-    base,
-    { key: started.key, kind, fileName: started.fileName },
-    signal,
-  );
+  return directUpload({
+    startUrl: `${base}/uploads`,
+    startBody: { kind },
+    file,
+    options,
+    complete: (started, signal) =>
+      postJson<ProjectDocument>(
+        base,
+        { key: started.key, kind, fileName: started.fileName },
+        signal,
+      ),
+  });
 }
 
 export function deleteProjectDocument(

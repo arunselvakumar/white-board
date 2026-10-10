@@ -39,6 +39,18 @@ export type TeamMemberDetailsInput = {
 
 type Grants = Readonly<Partial<Record<string, readonly Flag[]>>>;
 
+/** One line of a Project's Resources (CM-406). */
+export type ProjectTeamMemberReadModel = {
+  id: string;
+  name: string;
+  /** Designation, and "Joining Pending" until they accept. */
+  detail: string | null;
+  /** False for a declined Join Request: it stays but cannot be added again. */
+  isActive: boolean;
+  /** The Owner is on every Project and cannot be taken off. */
+  isOwner: boolean;
+};
+
 /** Raised when a Team Member is added or invited again; CM-109 notifies them. */
 export type TeamMemberInvited = {
   type: "TeamMemberInvited";
@@ -275,6 +287,143 @@ export class TeamMemberHandlers {
       this.audit(member, input.by, "team_member.projects_changed", before),
     );
     return this.view(member);
+  }
+
+  private async projectLines(
+    workspaceId: string,
+    members: readonly TeamMember[],
+  ): Promise<ProjectTeamMemberReadModel[]> {
+    const names = await this.names(workspaceId);
+    return members.map((member) => {
+      const designation = names.get(member.details.designationId) ?? null;
+      const pending =
+        member.status === "joining_pending" ? "Joining Pending" : null;
+      const detail = [designation, pending].filter(Boolean).join(" · ");
+      return {
+        id: member.id,
+        name: member.details.name,
+        detail: detail === "" ? null : detail,
+        isActive: member.status !== "rejected",
+        isOwner: member.isOwner,
+      };
+    });
+  }
+
+  /**
+   * A Project's Team Members for its Resources (CM-406): the Owner, who is
+   * on every Project without being assigned, and those assigned, by name.
+   */
+  async projectTeam(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<ProjectTeamMemberReadModel[]> {
+    const members = await this.members.listForProject(workspaceId, projectId);
+    const owners = members.filter((member) => member.isOwner);
+    const others = members.filter((member) => !member.isOwner);
+    return this.projectLines(workspaceId, [...owners, ...others]);
+  }
+
+  /** Who a Project's Resources can add: Normal, not declined, not the Owner. */
+  async assignableToProjects(
+    workspaceId: string,
+  ): Promise<ProjectTeamMemberReadModel[]> {
+    return this.projectLines(
+      workspaceId,
+      await this.members.listAssignable(workspaceId),
+    );
+  }
+
+  /**
+   * Makes `ids` the Team Members assigned to the Project (Resources,
+   * CM-406), keeping the rules of Assign Projects: HRMS Team Members are on
+   * no Project (400 `HRMS_MEMBER_HAS_NO_PROJECTS`) and the Owner is on
+   * every Project, so the Owner's id is ignored. `expectedIds` is the set
+   * the screen loaded (409 `PROJECT_RESOURCES_CHANGED` when it moved); 400
+   * `TEAM_MEMBER_NOT_FOUND` for an id that is not a live Team Member of
+   * the Company, `TEAM_MEMBER_DECLINED` for a declined one newly added.
+   * The caller has checked the Project is live and visible.
+   */
+  async setProjectTeam(input: {
+    workspaceId: string;
+    projectId: string;
+    ids: readonly string[];
+    expectedIds: readonly string[];
+    by: string;
+  }): Promise<void> {
+    const current = (
+      await this.members.listForProject(input.workspaceId, input.projectId)
+    ).filter((member) => !member.isOwner);
+    const currentIds = new Set(current.map((member) => member.id));
+    const expected = new Set(input.expectedIds);
+    if (
+      expected.size !== currentIds.size ||
+      [...expected].some((id) => !currentIds.has(id))
+    )
+      throw conflict(
+        "PROJECT_RESOURCES_CHANGED",
+        "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+      );
+    const addedIds = [...new Set(input.ids)].filter(
+      (id) => !currentIds.has(id),
+    );
+    const found = await this.members.findByIds(input.workspaceId, addedIds);
+    const foundIds = new Set(found.map((member) => member.id));
+    const missing = addedIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0)
+      throw new DomainError(
+        "TEAM_MEMBER_NOT_FOUND",
+        "Choose Team Members from the list. One of them was not found.",
+        { details: { ids: missing } },
+      );
+    const added = found.filter((member) => !member.isOwner);
+    const wanted = new Set([
+      ...added.map((member) => member.id),
+      ...input.ids.filter((id) => currentIds.has(id)),
+    ]);
+    const now = this.clock();
+    const entries: { member: TeamMember; audit: AuditEvent }[] = [];
+    for (const member of added) {
+      if (member.status === "rejected")
+        throw new DomainError(
+          "TEAM_MEMBER_DECLINED",
+          `${member.details.name} declined the Join Request, so they cannot be added to a Project.`,
+          { details: { id: member.id } },
+        );
+      const before = { projectIds: member.projectIds };
+      member.assignToProjects(
+        [...member.projectIds, input.projectId],
+        input.by,
+        now,
+      );
+      entries.push({
+        member,
+        audit: this.audit(
+          member,
+          input.by,
+          "team_member.projects_changed",
+          before,
+        ),
+      });
+    }
+    for (const member of current) {
+      if (wanted.has(member.id)) continue;
+      const before = { projectIds: member.projectIds };
+      member.assignToProjects(
+        member.projectIds.filter((id) => id !== input.projectId),
+        input.by,
+        now,
+      );
+      entries.push({
+        member,
+        audit: this.audit(
+          member,
+          input.by,
+          "team_member.projects_changed",
+          before,
+        ),
+      });
+    }
+    await this.members.saveMany(entries);
   }
 
   /**

@@ -715,6 +715,20 @@ Project-side flags that touch masters: **Labour #58** (transfer = move labour be
 
 ---
 
+## Decisions for the build
+
+### CM-406
+
+Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projects-structure-product-decisions.md)); Project Resources rules are in [`modules/03`](./03-projects-structure-drawings-gallery.md) → "Decisions for the build".
+
+- Menus `masters.contractors` and `masters.suppliers` (CRUD), under Masters → **Parties**. Routes `/api/construction/masters/{contractors|suppliers}`: list, add, `{id}`, `{id}/update`, `{id}/activate`, `{id}/deactivate` (Update flag), `{id}/delete`. Lists are newest first with cursor pages and a total, searched by name, contact person, GSTIN or mobile digits, filtered by active and Project.
+- Fields: name (required, at most 120, spaces collapsed, unique among the Company's live rows of that list ignoring case — 409 `CONTRACTOR_NAME_IN_USE` / `SUPPLIER_NAME_IN_USE`; a Contractor and a Supplier may share a name), contact person (at most 120), mobile (an Indian mobile, stored E.164, `MOBILE_INVALID`), email (`EMAIL_INVALID`), address (at most 500), GSTIN (`GSTIN_INVALID`) and PAN (`PAN_INVALID`) checked by `shared-kernel/tax-ids`, and a GSTIN must hold the PAN when both are given (`GSTIN_PAN_MISMATCH`). Edit replaces the whole form with the `updatedAt` it loaded (409 `<KIND>_CHANGED`).
+- A Contractor works in Departments: ids new to it must be live Departments of the Company and enabled (400 `DEPARTMENT_NOT_FOUND` / `DEPARTMENT_DISABLED`); one it already has stays when Masters disables it. A Department deleted in Masters simply drops off its Contractors. Suppliers have no Departments.
+- Projects are chosen on the form too; ids new to the party must be live Projects of the Company (400 `PROJECT_NOT_FOUND`). The form is not limited to the Projects the editor is on (as for Vendors: the Masters menus are not project-level).
+- **Inactive** parties leave every picker, Resources' Edit dialog included, but stay on the Projects they are on; they are never added to another Project from Resources (400 `CONTRACTOR_INACTIVE` / `SUPPLIER_INACTIVE`).
+- **Delete** is a tombstone and is refused while the party is on a live Project (409 `CONTRACTOR_ON_PROJECTS` / `SUPPLIER_ON_PROJECTS`, naming them): take it off its Projects first, or deactivate it. CM-501 adds invoices, POs and GRNs to that check.
+- Every write is audited (`contractor.created|updated|activated|deactivated|deleted|projects_changed`, the same for `supplier`).
+
 ## Open questions
 
 1. Are Departments, Units and Categories per company or global with company additions only? Can a company rename a seed?

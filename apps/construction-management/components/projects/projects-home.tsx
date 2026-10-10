@@ -4,17 +4,25 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   Building2,
   CalendarDays,
-  ChevronRight,
   CircleCheck,
+  EllipsisVertical,
   HardHat,
   MapPin,
   PauseCircle,
+  Pin,
   Plus,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { buttonVariants } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/dropdown-menu";
 import {
   Empty,
   EmptyContent,
@@ -27,18 +35,21 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { CheckInBanner } from "@/components/hrms/check-in-banner";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
+import { usePinProject } from "@/src/queries/project-home";
 import {
   projectsQuery,
-  type ProjectResponse,
+  type ProjectList,
   type ProjectStatus,
 } from "@/src/queries/projects";
 
+import { ProjectAvatar } from "./project-avatar";
+import { HideModulesDialog } from "./project-home-dialogs";
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
   ProjectStatusBadge,
   projectDates,
-  projectInitials,
 } from "./project-status";
 
 export const PROJECTS_PATH = "/app/projects";
@@ -136,25 +147,97 @@ function StatCard({
 }
 
 const ROW_GRID =
-  "md:grid md:grid-cols-[minmax(0,2fr)_8rem_minmax(0,1.3fr)_1rem] md:items-center md:gap-4";
+  "md:grid md:grid-cols-[minmax(0,2fr)_8rem_minmax(0,1.3fr)] md:items-center md:gap-4";
 
-function ProjectRow({ project }: { project: ProjectResponse }) {
+type ProjectItem = ProjectList["items"][number];
+
+/**
+ * A Project's kebab on the Projects home (CM-411): Pin / Unpin, Edit and
+ * Hide modules.
+ */
+function ProjectRowMenu({ project }: { project: ProjectItem }) {
+  const router = useRouter();
+  const pin = usePinProject();
+  const [hiding, setHiding] = useState(false);
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              aria-label={`Options for ${project.name}`}
+            />
+          }
+        >
+          <EllipsisVertical />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem
+            disabled={pin.isPending}
+            onClick={() => {
+              pin.mutate({ id: project.id, pinned: !project.pinned });
+            }}
+          >
+            {project.pinned ? "Unpin" : "Pin to top"}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              router.push(`${projectPath(project.id)}/edit`);
+            }}
+          >
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setHiding(true);
+            }}
+          >
+            Hide modules
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {hiding ? (
+        <HideModulesDialog
+          projectId={project.id}
+          onClose={() => {
+            setHiding(false);
+          }}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function ProjectRow({ project }: { project: ProjectItem }) {
   const dates = projectDates(project);
   return (
-    <li>
+    <li className="flex items-center gap-1">
       <Link
         href={projectPath(project.id)}
-        className={`hover:bg-secondary/60 focus-visible:ring-ring/50 flex flex-col gap-3 rounded-xl px-3 py-3 transition-colors outline-none focus-visible:ring-3 ${ROW_GRID}`}
+        className={`hover:bg-secondary/60 focus-visible:ring-ring/50 flex min-w-0 flex-1 flex-col gap-3 rounded-xl px-3 py-3 transition-colors outline-none focus-visible:ring-3 ${ROW_GRID}`}
       >
         <div className="flex min-w-0 items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold"
-          >
-            {projectInitials(project.name)}
-          </span>
+          <ProjectAvatar name={project.name} logoUrl={project.logoUrl} />
           <div className="min-w-0 space-y-0.5">
-            <p className="truncate font-semibold">{project.name}</p>
+            <p className="flex min-w-0 items-center gap-1.5 font-semibold">
+              <span className="truncate">{project.name}</span>
+              {project.pinned ? (
+                <Pin
+                  aria-label="Pinned"
+                  role="img"
+                  className="text-primary size-3.5 shrink-0"
+                />
+              ) : null}
+            </p>
+            <p className="text-muted-foreground truncate text-xs">
+              {project.projectType == null
+                ? "Project Type not set"
+                : projectTypeLabel(project.projectType)}
+            </p>
             {project.address == null ? (
               dates == null ? (
                 <p className="text-muted-foreground text-sm">
@@ -188,18 +271,16 @@ function ProjectRow({ project }: { project: ProjectResponse }) {
             )}
           </p>
         </div>
-        <ChevronRight
-          aria-hidden="true"
-          className="text-muted-foreground hidden size-4 md:block"
-        />
       </Link>
+      <ProjectRowMenu project={project} />
     </li>
   );
 }
 
 /**
  * Projects home (CM-204, `modules/03`): status totals, then every Project
- * in one list with status chips to filter it. The Owner sees every Project; a Member those assigned to
+ * in one list with status chips to filter it, the member's pinned Projects
+ * first (CM-411). The Owner sees every Project; a Member those assigned to
  * them.
  */
 export function ProjectsHome() {
@@ -290,12 +371,16 @@ export function ProjectsHome() {
                 <div className="px-2 pb-2">
                   <div
                     aria-hidden="true"
-                    className={`text-muted-foreground hidden border-b px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${ROW_GRID}`}
+                    className="hidden items-center gap-1 border-b md:flex"
                   >
-                    <span>Project</span>
-                    <span>Status</span>
-                    <span>Dates</span>
-                    <span />
+                    <div
+                      className={`text-muted-foreground flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${ROW_GRID}`}
+                    >
+                      <span>Project</span>
+                      <span>Status</span>
+                      <span>Dates</span>
+                    </div>
+                    <span className="size-8 shrink-0" />
                   </div>
                   <ul
                     aria-label="Projects"

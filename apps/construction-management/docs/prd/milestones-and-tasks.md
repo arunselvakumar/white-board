@@ -427,26 +427,76 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 
 ---
 
-## M4 — Projects & structure (board only)
+## M4 — Projects & structure
 
 | ID     | Seq | Title                                                                                                                                                 | Status | Blocked by | Area        |
 | ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------- | ----------- |
-| CM-401 |   1 | Prisma `construction-projects.prisma`; grow Project (type, budget, logo, resources)                                                                   | todo   | CM-204     | Data+Domain |
-| CM-402 |   2 | Phases, Wings (8 types), floor generation, Units; wing/unit editor screens                                                                            | todo   | CM-401     | Domain+UI   |
-| CM-403 |   3 | `LocationRef` value object in the kernel + picker component (Wing/Floor/Unit, Amenity, Common Dev)                                                    | todo   | CM-402     | Kernel+UI   |
-| CM-404 |   4 | Amenities & Common Developments masters + project assignment                                                                                          | todo   | CM-402     | Domain+UI   |
-| CM-405 |   5 | Locations for non-building projects                                                                                                                   | todo   | CM-402     | Domain+UI   |
-| CM-406 |   6 | Project resources: assign team members, contractors, suppliers, vendors (needs CM-5xx masters for parties — or ship contractor/supplier masters here) | todo   | CM-401     | Domain+UI   |
-| CM-407 |   7 | Attachments service (Vercel Blob private uploads through our routes, quota, thumbnails) in the kernel                                                 | todo   | CM-008     | Kernel      |
-| CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | todo   | CM-407     | Domain+UI   |
-| CM-409 |   9 | Testing Reports: items (seed 4) + dated report files                                                                                                  | todo   | CM-407     | Domain+UI   |
-| CM-410 |  10 | Gallery (all project media, search, uploaded-by)                                                                                                      | todo   | CM-407     | HTTP+UI     |
-| CM-411 |  11 | Project home tiles, hide/show modules, tile ordering, pin project                                                                                     | todo   | CM-402     | UI          |
-| CM-412 |  12 | Project dashboard shell with Task/Payments/Materials sections stubbed for later milestones                                                            | todo   | CM-411     | UI          |
+| CM-401 |   1 | Prisma `construction-projects.prisma`; grow Project (type, budget, logo, resources)                                                                   | done   | CM-204     | Data+Domain |
+| CM-402 |   2 | Phases, Wings (8 types), floor generation, Units; wing/unit editor screens                                                                            | done   | CM-401     | Domain+UI   |
+| CM-403 |   3 | `LocationRef` value object in the kernel + picker component (Wing/Floor/Unit, Amenity, Common Dev)                                                    | done   | CM-402     | Kernel+UI   |
+| CM-404 |   4 | Amenities & Common Developments masters + project assignment                                                                                          | done   | CM-402     | Domain+UI   |
+| CM-405 |   5 | Locations for non-building projects                                                                                                                   | done   | CM-402     | Domain+UI   |
+| CM-406 |   6 | Project resources: assign team members, contractors, suppliers, vendors (needs CM-5xx masters for parties — or ship contractor/supplier masters here) | done   | CM-401     | Domain+UI   |
+| CM-407 |   7 | Attachments service (Vercel Blob private uploads through our routes, quota, thumbnails) in the kernel                                                 | done   | CM-008     | Kernel      |
+| CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | done   | CM-407     | Domain+UI   |
+| CM-409 |   9 | Testing Reports: items (seed 4) + dated report files                                                                                                  | done   | CM-407     | Domain+UI   |
+| CM-410 |  10 | Gallery (all project media, search, uploaded-by)                                                                                                      | done   | CM-407     | HTTP+UI     |
+| CM-411 |  11 | Project home tiles, hide/show modules, tile ordering, pin project                                                                                     | done   | CM-402     | UI          |
+| CM-412 |  12 | Project dashboard shell with Task/Payments/Materials sections stubbed for later milestones                                                            | done   | CM-411     | UI          |
 | CM-413 |  13 | Contract Details (Client, Tender/RFQ, Quotation, LOA, PO / WO, Agreement, Order Value) and Custom Fields on a Project                                 | done   | CM-204     | Domain+UI   |
 | CM-414 |  14 | Project Documents: any file but programs, ≤ 25 MB, filed by paper; direct browser uploads to Blob                                                     | done   | CM-204     | Domain+UI   |
 
 > CM-413 and CM-414 shipped ahead of M4 at the owner's request ([ADR CM-0010](../adr/CM-0010-project-contract-details-and-documents.md)). CM-414 also brings the direct browser upload that CM-407 can grow into the shared attachments service.
+
+Product answers to the `modules/03` open questions: [ADR CM-0013](../adr/CM-0013-projects-structure-product-decisions.md). Attachments and the Gallery index: [ADR CM-0014](../adr/CM-0014-attachments-and-gallery-index.md).
+
+### CM-401 — Project grows
+
+**Done when:** `construction-projects.prisma` and `construction-masters.prisma` hold every M4 table in one migration per schema (structure, locations, albums, drawings and revisions, testing items and reports, media items, hidden modules, pins, member preferences; contractors, suppliers, development types and their Project links), with the seed and backfill rows of CM-0013. The Project aggregate gains Project Type (required on create, kept when an edit omits it), Budget in paise behind the Financial flag, a logo (PNG / JPEG / WebP ≤ 2 MB through our route) and `useLogoInReports`. The Project form shows them; the Projects home card shows the logo and type. Album and testing-item seeds are created with each new Project. Domain, HTTP and Storybook tests cover the new fields, the Financial hiding and the logo upload.
+
+### CM-402 — Phases, Wings, Floors, Units
+
+**Done when:** the pure generator in `src/projects/domain` produces the floors and units of all eight Wing Types per CM-0013 §3 (unit tests per type, including Residential & Commercial numbering and the plot / bungalow schemes); phases can be added, renamed and deleted when empty; a Wing is created from configuration plus the edited floors and units in one request, edited later with ids kept and a 409 `WING_CHANGED` on a stale `updatedAt`, and deleted when nothing uses it; unit names are unique in a Wing. Screens: Wings (by Phase, totals), Add Wing → Continue to Units → editor (rename floor, add / rename / remove unit, add a named floor) → Save, Edit Wing, and the wing chart (floors × units). HTTP tests for permissions (`projects.wings`), project visibility, validation and concurrency; stories for the editor and the empty state.
+
+### CM-403 — LocationRef and the picker
+
+**Done when:** `src/shared-kernel/location-ref.ts` holds the value object of CM-0013 §7 with shape validation and a `LocationResolver` port; the composition root implements the resolver from projects (wings, floors, units, locations) and masters (assigned amenities and common developments) and rejects ids from another Project; `GET …/projects/{id}/location-options` returns the tree the picker needs; `LocationPicker` (Location Type → Wing → Floors → Units, or Amenity / Common Development / Location) offers only the types the Project has rows for and formats a one-line label. Unit tests for the value object and resolver, HTTP tests for the options route, stories for each Location Type and the empty Project.
+
+### CM-404 — Amenities and Common Developments
+
+**Done when:** the masters context lists, adds, renames, disables and deletes Amenities and Common Developments (`masters.amenities`, `masters.common_developments`), names unique per kind, seeds copied to new Companies and backfilled for existing ones; a Project's Amenities and Common Developments are assigned from the Project (Structure → Amenities tab) and from the master (projects per row). HTTP tests for both menus and the assignment; screens under Masters with stories.
+
+### CM-405 — Locations
+
+**Done when:** Locations (name ≤ 80 unique in the Project, description ≤ 300, order) can be listed, added, edited, reordered and deleted (tombstone; refused through the usage port when used) under `projects.locations`; the Locations screen and its empty state exist; HTTP tests and stories.
+
+### CM-406 — Project resources
+
+**Done when:** minimal Contractor and Supplier masters (CM-0013 §6) exist with list / add / edit / active toggle / delete under `masters.contractors` and `masters.suppliers`; a Project's Resources tab shows and changes its Team Members, Contractors, Suppliers and Vendors through one route per party kind, each writing to the owning context; the Add Project flow offers Resources as its second step. HTTP tests per party kind (permissions, other tenant, unknown ids), stories for the tab and the masters.
+
+### CM-407 — Attachments service
+
+**Done when:** `src/shared-kernel/attachments` provides the upload policies, start, presign and complete steps and browser thumbnails of CM-0014, and `useDirectUpload` runs them; Project Documents use it with no change in behaviour (their HTTP tests still pass untouched); the media index (`media_items`) is written with each document and listed by a projects query; `ProjectMediaAttached` / `ProjectMediaRemoved` events and their listener exist. Unit tests for policies and sniffing, HTTP tests for a second purpose.
+
+### CM-408 — Drawings
+
+**Done when:** albums (four seeds, add, rename, delete when empty) and drawings with revisions (upload, new revision, history, rename, delete) work under `projects.drawings` with the 100 MB drawing policy; the viewer opens PDFs and images and downloads DWG / DXF; each revision is indexed in the Gallery. HTTP tests (permissions, policy, 409 `ALBUM_NOT_EMPTY`, other tenant), stories for albums, the album page and the viewer.
+
+### CM-409 — Testing Reports
+
+**Done when:** testing items (four seeds, add, rename, delete when empty) and reports (name, date under the `material_testing_report` back-dated policy, remark, one PDF or image ≤ 25 MB) work under `projects.testing_reports`, searchable by name; reports are indexed in the Gallery. HTTP tests (permissions, back-dated refusal, search), stories.
+
+### CM-410 — Gallery
+
+**Done when:** `GET …/projects/{id}/gallery` pages the media index with cursors and a total, filtered by type, source, uploader and date range and searched by file name, under `projects.gallery` Read, and links each item to its source's file route; the Gallery screen shows thumbnails, filters, uploader names and a viewer. HTTP tests for filters and visibility, stories for the grid, the filters and the empty state.
+
+### CM-411 — Project home
+
+**Done when:** the project home shows the tiles of CM-0013 §11 by permission, Hide / Show Modules (per Project, Project Update flag), tile order (per member, all Projects) and Pin (per member; pinned first on the Projects home) are stored server-side and work from the card menu and the project options. HTTP tests for each preference, stories for the home, the arrange dialog and the hidden-modules dialog.
+
+### CM-412 — Project dashboard shell
+
+**Done when:** the Project Dashboard (`reporting.project_dashboard` Read) shows the duration filter, KPI tiles, the Project summary and Attendance sections with data, and stubs naming the milestone for every other section; Manage Dashboard shows, hides and reorders sections per member. HTTP test for the layout preference, stories for the dashboard and Manage Dashboard.
 
 ## M5 — Procurement & inventory (board only)
 

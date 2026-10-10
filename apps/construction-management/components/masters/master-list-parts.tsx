@@ -103,6 +103,7 @@ export function MasterRow({
   busy,
   onEdit,
   editLabel,
+  moreActions = [],
   onToggle,
   onDelete,
 }: {
@@ -114,6 +115,8 @@ export function MasterRow({
   /** Absent for seed rows, which cannot be renamed. */
   onEdit?: () => void;
   editLabel: string;
+  /** Menu items after the edit item, e.g. "Assign Projects". */
+  moreActions?: readonly { label: string; onSelect: () => void }[];
   onToggle: () => void;
   /** Absent for seed rows, which cannot be deleted. */
   onDelete?: () => void;
@@ -154,10 +157,15 @@ export function MasterRow({
         >
           <MoreHorizontal />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuContent align="end" className="w-44">
           {onEdit != null ? (
             <DropdownMenuItem onClick={onEdit}>{editLabel}</DropdownMenuItem>
           ) : null}
+          {moreActions.map((action) => (
+            <DropdownMenuItem key={action.label} onClick={action.onSelect}>
+              {action.label}
+            </DropdownMenuItem>
+          ))}
           <DropdownMenuItem onClick={onToggle}>
             {disabled ? "Enable" : "Disable"}
           </DropdownMenuItem>
