@@ -1,0 +1,19 @@
+apps/construction-management/components/procurement/material-picker.tsx
+  s_6604e2237b6922::t_4c286633defcb8 49,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a9cf224208bac14c6deafb3d4a8a799bab93926b",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
