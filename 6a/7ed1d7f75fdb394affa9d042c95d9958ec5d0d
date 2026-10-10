@@ -1,0 +1,29 @@
+apps/construction-management/src/queries/inventory.ts
+  s_6604e2237b6922::t_a9390436c96d71 1-279
+apps/construction-management/src/queries/material-transfers.ts
+  s_4ca43a567c5955::t_c6e6f5b8bbd305 1-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6a7ed1d7f75fdb394affa9d042c95d9958ec5d0d",
+  "prompts": {},
+  "sessions": {
+    "s_4ca43a567c5955": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eb991c63013f969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
