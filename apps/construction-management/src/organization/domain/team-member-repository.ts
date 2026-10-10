@@ -21,9 +21,22 @@ export type TeamMemberListPage = {
 export type TeamMemberRepository = {
   /** Writes the member, its projects, its matrix and the audit event atomically. */
   save(member: TeamMember, audit?: AuditEvent): Promise<void>;
+  /** Several `save`s in one transaction (a Project's Resources, CM-406). */
+  saveMany(
+    entries: readonly { member: TeamMember; audit: AuditEvent }[],
+  ): Promise<void>;
   findById(workspaceId: string, id: string): Promise<TeamMember | null>;
   findByUser(workspaceId: string, userId: string): Promise<TeamMember | null>;
   findByInviteToken(token: string): Promise<TeamMember | null>;
+  /** The live Team Members among `ids`. */
+  findByIds(workspaceId: string, ids: readonly string[]): Promise<TeamMember[]>;
+  /** Live Team Members on the Project, and the Owner (on every Project), by name. */
+  listForProject(workspaceId: string, projectId: string): Promise<TeamMember[]>;
+  /**
+   * Live Normal Team Members, Joining Pending or active, other than the
+   * Owner, by name: who a Project's Resources can add.
+   */
+  listAssignable(workspaceId: string): Promise<TeamMember[]>;
   /** Pending Join Requests in any Company for this verified mobile or email. */
   findPendingFor(contact: {
     mobile: string | null;

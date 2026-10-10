@@ -71,6 +71,10 @@ import {
   mastersOpenApiOperations,
 } from "@/app/api/construction/masters/masters-openapi";
 import {
+  partiesOpenApiComponents,
+  partiesOpenApiOperations,
+} from "@/app/api/construction/masters/parties-openapi";
+import {
   projectsOpenApiComponents,
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
@@ -78,6 +82,10 @@ import {
   projectDocumentOpenApiComponents,
   projectDocumentOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/documents/project-document-openapi";
+import {
+  projectResourcesOpenApiComponents,
+  projectResourcesOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/resources/resources-openapi";
 import {
   vendorOpenApiComponents,
   vendorOpenApiOperations,
@@ -790,9 +798,17 @@ openApiOperations.push(...projectsOpenApiOperations);
 Object.assign(openApiComponents, projectDocumentOpenApiComponents);
 openApiOperations.push(...projectDocumentOpenApiOperations);
 
+// Project Resources (CM-406): where four contexts' parties meet a Project.
+Object.assign(openApiComponents, projectResourcesOpenApiComponents);
+openApiOperations.push(...projectResourcesOpenApiOperations);
+
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
 openApiOperations.push(...mastersOpenApiOperations);
+
+// Contractors and Suppliers (CM-406) list their own models and routes.
+Object.assign(openApiComponents, partiesOpenApiComponents);
+openApiOperations.push(...partiesOpenApiOperations);
 
 // The Vendor register (CM-208, CM-209) lists its own models and routes.
 Object.assign(openApiComponents, vendorOpenApiComponents);

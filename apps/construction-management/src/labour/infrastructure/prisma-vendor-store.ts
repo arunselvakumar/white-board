@@ -258,6 +258,92 @@ export class PrismaVendorStore implements VendorStore {
     return rows.map(toDomain);
   }
 
+  async listOnProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<Vendor[]> {
+    const rows = await this.db.constructionLabourVendor.findMany({
+      where: {
+        workspaceId,
+        deletedAt: null,
+        projects: { some: { projectId } },
+      },
+      include: INCLUDE,
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map(toDomain);
+  }
+
+  async listActive(workspaceId: string): Promise<Vendor[]> {
+    const rows = await this.db.constructionLabourVendor.findMany({
+      where: { workspaceId, deletedAt: null, isActive: true },
+      include: INCLUDE,
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map(toDomain);
+  }
+
+  async findMany(
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Vendor[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.db.constructionLabourVendor.findMany({
+      where: { workspaceId, id: { in: [...new Set(ids)] }, deletedAt: null },
+      include: INCLUDE,
+    });
+    return rows.map(toDomain);
+  }
+
+  async updateProjects(
+    changes: readonly {
+      vendor: Vendor;
+      loadedAt: Date;
+      projectId: string;
+      joined: boolean;
+      before: readonly string[];
+    }[],
+    by: string,
+  ): Promise<void> {
+    await this.db.$transaction(async (tx) => {
+      for (const { vendor, loadedAt, projectId, joined, before } of changes) {
+        const updated = await tx.constructionLabourVendor.updateMany({
+          where: {
+            id: vendor.id,
+            workspaceId: vendor.workspaceId,
+            deletedAt: null,
+            updatedAt: loadedAt,
+          },
+          data: { updatedAt: vendor.updatedAt, updatedBy: by },
+        });
+        if (updated.count === 0)
+          throw conflict(
+            "VENDOR_CHANGED",
+            "Someone else changed this Vendor after you opened it. Reload to see their changes.",
+          );
+        if (joined)
+          await tx.constructionLabourVendorProject.createMany({
+            data: [{ vendorId: vendor.id, projectId }],
+            skipDuplicates: true,
+          });
+        else
+          await tx.constructionLabourVendorProject.deleteMany({
+            where: { vendorId: vendor.id, projectId },
+          });
+        await recordAudit(tx, {
+          workspaceId: vendor.workspaceId,
+          actorUserId: by,
+          action: "vendor.projects_changed",
+          entityType: "vendor",
+          entityId: vendor.id,
+          before: { projectIds: before },
+          after: { projectIds: vendor.projectIds },
+          occurredAt: vendor.updatedAt,
+        });
+      }
+    });
+  }
+
   async insert(
     vendor: Vendor,
     openingBalance: number,
