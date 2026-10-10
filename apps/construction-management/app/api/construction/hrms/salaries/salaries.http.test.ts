@@ -510,7 +510,7 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
 
   it("is on /api/docs", async () => {
     const document = await json<{ paths: Record<string, unknown> }>(
-      await getOpenApi(),
+      getOpenApi(),
     );
     for (const path of [
       "/api/construction/hrms/salaries",
