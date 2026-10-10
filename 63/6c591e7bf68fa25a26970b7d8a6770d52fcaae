@@ -1,0 +1,21 @@
+apps/construction-management/src/masters/infrastructure/prisma-material-master-stores.ts
+  s_6604e2237b6922::t_6c2f73d01ac721 226-232
+apps/construction-management/src/masters/infrastructure/prisma-quotation-store.ts
+  s_6604e2237b6922::t_7d0be1ee279628 19,78-123,129,131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "636c591e7bf68fa25a26970b7d8a6770d52fcaae",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
