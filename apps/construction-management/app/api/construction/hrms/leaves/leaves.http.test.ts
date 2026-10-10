@@ -602,10 +602,13 @@ describe("Leave requests HTTP (CM-312, CM-313)", () => {
     });
     expect(notAllowed.status).toBe(StatusCodes.FORBIDDEN);
     const choices = await json<{
-      canApplyForOthers: boolean;
+      permissions: { applyForOthers: boolean; approve: boolean };
       members: unknown[];
     }>(await get(options, "/leaves/options", manager.cookie));
-    expect(choices.canApplyForOthers).toBe(true);
+    expect(choices.permissions).toMatchObject({
+      applyForOthers: true,
+      approve: false,
+    });
     expect(choices.members.length).toBeGreaterThanOrEqual(4);
 
     const teamList = await json<{ items: Leave[] }>(

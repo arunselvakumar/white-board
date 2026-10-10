@@ -214,8 +214,20 @@ export type PreviewConstructionHrmsLeaveResponseModel = z.infer<
 
 export const GetConstructionHrmsLeaveOptionsResponseModel = z.object({
   me: z.object({ memberId: z.uuid(), name: z.string() }).nullable(),
-  canApply: z.boolean(),
-  canApplyForOthers: z.boolean(),
+  permissions: z
+    .object({
+      read: z.boolean().describe("hrms.leaves read: My Leaves."),
+      apply: z.boolean().describe("hrms.leaves create, as a Team Member."),
+      applyForOthers: z.boolean().describe("hrms.leaves create and View All."),
+      approve: z.boolean().describe("hrms.leaves approve or reject."),
+      viewTeam: z.boolean().describe("hrms.leaves View All."),
+      report: z.boolean().describe("hrms.leaves report."),
+      configure: z.boolean().describe("hrms.leave_structures read."),
+      manageBalances: z
+        .boolean()
+        .describe("hrms.leave_structures update: initialise, accrue, adjust."),
+    })
+    .describe("What the leave screens may offer you."),
   members: z.array(
     z.object({
       memberId: z.uuid(),

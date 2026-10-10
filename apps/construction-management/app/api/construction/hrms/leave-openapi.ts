@@ -443,7 +443,7 @@ export const leaveOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${LEAVES_PATH}/options`,
     summary:
-      "Active leave types and, for managers, the Team Members to apply for",
+      "Your leave permissions, the active leave types and, when you may act for others, the Team Members",
     tags: HRMS,
     successStatus: StatusCodes.OK,
     successDescription: "Options",

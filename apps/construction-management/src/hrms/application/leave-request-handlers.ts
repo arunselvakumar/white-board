@@ -179,24 +179,40 @@ export class LeaveRequestHandlers {
   // Apply
   // -------------------------------------------------------------------------
 
-  /** Leave types and (for managers) the members one may apply for. */
+  /**
+   * What the leave screens may offer the caller: their leave permissions,
+   * the active leave types, and the Team Members to pick from when they
+   * may act for others (apply on behalf, assign, initialise, adjust). Any
+   * member of the Company may ask; nothing here is private.
+   */
   async options(access: MemberAccess) {
-    assertCan(access, MENU, "read");
     const [me, types] = await Promise.all([
       this.me(access),
       this.types.list(access.workspaceId),
     ]);
-    const forOthers =
-      can(access, MENU, "view_all") && can(access, MENU, "create");
-    const members = forOthers
+    const permissions = {
+      read: can(access, MENU, "read"),
+      apply: can(access, MENU, "create") && me != null,
+      applyForOthers:
+        can(access, MENU, "view_all") && can(access, MENU, "create"),
+      approve: can(access, MENU, "approve") || can(access, MENU, "reject"),
+      viewTeam: can(access, MENU, "view_all"),
+      report: can(access, MENU, "report"),
+      configure: can(access, "hrms.leave_structures", "read"),
+      manageBalances: can(access, "hrms.leave_structures", "update"),
+    };
+    const pickMembers =
+      permissions.applyForOthers ||
+      permissions.configure ||
+      permissions.manageBalances;
+    const members = pickMembers
       ? (await this.employees.list(access.workspaceId)).filter(
           (member) => member.active,
         )
       : [];
     return {
       me: me == null ? null : { memberId: me.memberId, name: me.name },
-      canApply: can(access, MENU, "create") && me != null,
-      canApplyForOthers: forOthers,
+      permissions,
       members: members.map((member) => ({
         memberId: member.memberId,
         name: member.name,

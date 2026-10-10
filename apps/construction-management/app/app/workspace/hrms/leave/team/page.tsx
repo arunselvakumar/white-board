@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { HrmsComingSoon } from "@/components/hrms/hrms-coming-soon";
+import { TeamLeavesPage } from "@/components/hrms/leave/team-leaves-page";
 import { HRMS_PATH, hrmsPage } from "@/lib/hrms-nav";
 
-const HREF = `${HRMS_PATH}/leave/team`;
+export const metadata: Metadata = {
+  title: hrmsPage(`${HRMS_PATH}/leave/team`).title,
+};
 
-export const metadata: Metadata = { title: hrmsPage(HREF).title };
-
-/** Team Leaves (CM-313); a placeholder until that ticket builds it. */
-export default function TeamLeavesPage() {
-  return <HrmsComingSoon href={HREF} />;
+/** Team Leaves (CM-313). */
+export default function TeamLeavesRoute() {
+  return <TeamLeavesPage />;
 }
