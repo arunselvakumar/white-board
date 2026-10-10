@@ -70,6 +70,29 @@ export const WithoutFinancialHidesOrderValue: Story = {
 
 const PLAIN = project({ id: ANUGRAHA.id, name: "Anugraha Residency" });
 
+export const ShowsTheState: Story = {
+  beforeEach: serve({ ...ANUGRAHA, stateCode: "33", stateName: "Tamil Nadu" }),
+  play: async ({ canvas }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    const state = details.getByText("State");
+    await expect(state.nextElementSibling).toHaveTextContent("Tamil Nadu");
+  },
+};
+
+export const StateNotSet: Story = {
+  beforeEach: serve(PLAIN),
+  play: async ({ canvas }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    await expect(
+      details.getByText("State").nextElementSibling,
+    ).toHaveTextContent("—");
+  },
+};
+
 export const NothingFilledHidesTheCards: Story = {
   beforeEach: serve(PLAIN),
   play: async ({ canvas }) => {

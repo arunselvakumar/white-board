@@ -7,6 +7,7 @@ import {
   PROJECT_TYPES,
 } from "@/src/projects/domain/project-type";
 import { fileVersion } from "@/src/shared-kernel/files";
+import { gstStateName } from "@/src/shared-kernel/gst-states";
 import {
   PROJECT_BUDGET_MAX,
   PROJECT_CLIENT_NAME_MAX,
@@ -129,6 +130,16 @@ export const ConstructionProjectsProjectResponseModel = z.object({
     .describe(
       "Report headers print the Project logo instead of the Company's (used from M9).",
     ),
+  stateCode: z
+    .string()
+    .nullable()
+    .describe(
+      "The GST state of the site (ADR CM-0015 §1): the two-digit code, e.g. 33 for Tamil Nadu; null when not set.",
+    ),
+  stateName: z
+    .string()
+    .nullable()
+    .describe("The name of `stateCode`, e.g. Tamil Nadu; null when not set."),
   customFields: z
     .array(ConstructionProjectsCustomFieldModel)
     .describe("In the order they were entered."),
@@ -190,6 +201,13 @@ export const projectDetailsFields = {
     .optional()
     .describe(
       "Print the Project logo on report headers instead of the Company's. Defaults to false; omitted keeps it.",
+    ),
+  stateCode: z
+    .string()
+    .nullable()
+    .optional()
+    .describe(
+      "The GST state of the site, a two-digit GST state code (e.g. 33 for Tamil Nadu); 400 PROJECT_STATE_INVALID for any other. Omitted keeps it, blank or null clears it.",
     ),
   address: z
     .string()
@@ -270,6 +288,8 @@ export function toProjectResponse(
     budgetValue: financial ? item.budgetValue : null,
     logoUrl: projectLogoUrl(item.id, item.logoKey),
     useLogoInReports: item.useLogoInReports,
+    stateCode: item.stateCode,
+    stateName: item.stateCode == null ? null : gstStateName(item.stateCode),
     customFields: item.customFields.map(({ label, value }) => ({
       label,
       value,

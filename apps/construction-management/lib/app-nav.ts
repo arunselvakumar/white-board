@@ -22,7 +22,7 @@ export const APP_NAV = [
     label: "Masters",
     title: "Masters",
     description:
-      "Your Company's lists will show here: Team Members, Departments, Contractors, Suppliers, Vendors and Labours.",
+      "Your Company's lists: Team Members, Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
   },
 ] as const;
 

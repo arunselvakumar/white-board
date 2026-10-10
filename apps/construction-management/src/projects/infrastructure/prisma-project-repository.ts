@@ -68,6 +68,7 @@ export function toProject(row: Row): Project {
     budgetValue: row.budgetValue == null ? null : Number(row.budgetValue),
     useLogoInReports: row.useLogoInReports,
     logoKey: row.logoKey,
+    stateCode: row.stateCode,
     customFields: row.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -89,6 +90,7 @@ function detailsData(project: Project) {
       profile.budgetValue == null ? null : BigInt(profile.budgetValue),
     useLogoInReports: profile.useLogoInReports,
     logoKey: profile.logoKey,
+    stateCode: profile.stateCode,
     name: project.name,
     status: project.status,
     address: project.address,

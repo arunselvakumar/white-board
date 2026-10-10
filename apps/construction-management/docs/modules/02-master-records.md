@@ -729,6 +729,19 @@ Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projec
 - **Delete** is a tombstone and is refused while the party is on a live Project (409 `CONTRACTOR_ON_PROJECTS` / `SUPPLIER_ON_PROJECTS`, naming them): take it off its Projects first, or deactivate it. CM-501 adds invoices, POs and GRNs to that check.
 - Every write is audited (`contractor.created|updated|activated|deactivated|deleted|projects_changed`, the same for `supplier`).
 
+### CM-501 — Procurement masters
+
+- Menus: `masters.units`, `masters.material_categories`, `masters.materials` (Financial covers unit rate, discount, GST % and HSN; minimum stock is not financial), `masters.terms_conditions`, `masters.quotations` (Read). Each list: newest first, cursor pages, search, All / Enabled / Disabled; add, edit (`expectedUpdatedAt`, 409 `<KIND>_CHANGED`), disable, enable, delete.
+- Names unique among live rows ignoring case (409 `<KIND>_NAME_IN_USE`; Terms & Conditions by title). Seed Units and Categories can be disabled, never edited or deleted (409 `SEED_IS_READ_ONLY`); the seed Material "Cement OPC 53" is an ordinary row.
+- Seeds: the 41 units, 22 top-level Material Categories (the notes' list completed for Indian construction) and Cement OPC 53, for every new Company and backfilled for existing ones.
+- Categories have one level of parent (`MATERIAL_CATEGORY_PARENT_INVALID`, `MATERIAL_CATEGORY_HAS_CHILDREN`). A disabled unit, category or parent cannot be newly picked (`*_DISABLED`); one already on a row stays.
+- In use, so not deletable: a Unit on a Material, a Category on a Material or child, a Material with any stock entry or a line on a live PR, PO, GRN, transfer, MR or DN, a Supplier on a live PO or GRN, a Contractor on a live MR. Terms & Conditions are never in use (POs copy the text).
+- Parties: GST state from the GSTIN's first two digits (a different pick is 400 `GSTIN_STATE_MISMATCH`), else picked; Contractors have a second contact. Quotations: PDF or image, ≤ 10 MB, ≤ 50 per party, uploaded with Update on the party menu, listed on the party and on View Quotations.
+- Material picker (`GET materials/options`): Materials Read or Read on any procurement menu; a parent category also returns its sub-categories' Materials; loading by ids returns disabled Materials so a form can reopen its lines.
+- Billing addresses (Masters → Settings, `organization.settings`): the first becomes the default; deleting the default promotes the oldest remaining one. GRN fields: which optional GRN fields are hidden; an unknown key is 400.
+- Project GST state: optional on the Project form; left out keeps what is stored, `null` clears it.
+- Retired GST state codes (25, 28) are refused on billing addresses and Projects; a party with a GSTIN keeps the GSTIN's state even if retired. A member with only View Quotations may open quotation files; quotations are not in a Project Gallery.
+
 ## Open questions
 
 1. Are Departments, Units and Categories per company or global with company additions only? Can a company rename a seed?

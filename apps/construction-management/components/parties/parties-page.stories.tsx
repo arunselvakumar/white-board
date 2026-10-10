@@ -64,6 +64,8 @@ export const Contractors: Story = {
       rows.getByRole("link", { name: "Sri Balaji Constructions" }),
     ).toHaveAttribute("href", `/app/masters/contractors/${BALAJI.id}`);
     await expect(rows.getByText("Murugan · +91 77081 65767")).toBeVisible();
+    // The GST state column shows from md up; story tests run phone-wide.
+    await expect(rows.getByText("Tamil Nadu")).toBeInTheDocument();
     await expect(rows.getByText("Painting +1")).toBeVisible();
     await expect(rows.getByText("Tower A +1")).toBeVisible();
     await expect(rows.getByText("Inactive")).toBeVisible();
@@ -141,5 +143,47 @@ export const Empty: Story = {
     await expect(links).toHaveLength(2);
     for (const link of links)
       await expect(link).toHaveAttribute("href", "/app/masters/suppliers/new");
+  },
+};
+
+/** A Supplier on Purchase Orders or Goods Receipts cannot be deleted; the dialog says why. */
+export const SupplierInUse: Story = {
+  args: { list: "suppliers" },
+  beforeEach: () => {
+    api = mockFetch([
+      { path: SUPPLIERS, respond: () => Response.json(page([KAVERI])) },
+      {
+        method: "POST",
+        path: `${SUPPLIERS}/${KAVERI.id}/delete`,
+        respond: () =>
+          Response.json(
+            {
+              code: "SUPPLIER_IN_USE",
+              message:
+                "Purchase Orders or Goods Receipts name this Supplier, so it cannot be deleted. Make them inactive instead.",
+            },
+            { status: 409 },
+          ),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Actions for Kaveri Cements" }),
+    );
+    await userEvent.click(
+      await body.findByRole("menuitem", { name: "Delete" }),
+    );
+    const dialog = within(await body.findByRole("alertdialog"));
+    await userEvent.click(dialog.getByRole("button", { name: "Delete" }));
+    await expect(await dialog.findByRole("alert")).toHaveTextContent(
+      "Purchase Orders or Goods Receipts name this Supplier, so it cannot be deleted.",
+    );
+    // The dialog stays open with the reason.
+    await expect(
+      dialog.getByText("Delete Kaveri Cements?"),
+    ).toBeInTheDocument();
   },
 };

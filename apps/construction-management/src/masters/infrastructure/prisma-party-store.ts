@@ -30,6 +30,9 @@ type Row = {
   address: string | null;
   gstin: string | null;
   pan: string | null;
+  stateCode: string | null;
+  contactPerson2?: string | null;
+  mobile2?: string | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -66,6 +69,9 @@ type Data = {
   address?: string | null;
   gstin?: string | null;
   pan?: string | null;
+  stateCode?: string | null;
+  contactPerson2?: string | null;
+  mobile2?: string | null;
   isActive?: boolean;
   updatedAt?: Date;
   updatedBy?: string;
@@ -126,6 +132,9 @@ function toParty(kind: PartyKind, row: Row): Party {
     address: row.address,
     gstin: row.gstin,
     pan: row.pan,
+    stateCode: row.stateCode,
+    contactPerson2: row.contactPerson2 ?? null,
+    mobile2: row.mobile2 ?? null,
     isActive: row.isActive,
     departmentIds: (row.departments ?? [])
       .map((item) => item.departmentId)
@@ -153,9 +162,17 @@ function audit(party: Party, change: MasterChange) {
   };
 }
 
+/** A Supplier has no second contact columns. */
+function detailColumns(party: Party) {
+  const { contactPerson2, mobile2, ...common } = party.details;
+  return party.kind === "contractor"
+    ? { ...common, contactPerson2, mobile2 }
+    : common;
+}
+
 function columns(party: Party): Data {
   return {
-    ...party.details,
+    ...detailColumns(party),
     isActive: party.isActive,
     updatedAt: party.updatedAt,
     updatedBy: party.updatedBy,
@@ -345,7 +362,7 @@ export class PrismaPartyStore implements PartyStore {
     const data = {
       id: party.id,
       workspaceId: party.workspaceId,
-      ...party.details,
+      ...detailColumns(party),
       isActive: party.isActive,
       createdAt: party.createdAt,
       updatedAt: party.updatedAt,

@@ -18,6 +18,8 @@ export function project(
     budgetValue: null,
     logoUrl: null,
     useLogoInReports: false,
+    stateCode: null,
+    stateName: null,
     address: "Plot 12, Survey No. 45, Vadasery, Nagercoil 629001",
     startDate: "2026-04-01",
     endDate: "2027-03-31",
@@ -57,6 +59,8 @@ export const KUMARI = project({
   orderValue: 4_85_00_000_00,
   // ₹4,20,00,000, in paise.
   budgetValue: 4_20_00_000_00,
+  stateCode: "33",
+  stateName: "Tamil Nadu",
   customFields: [
     { label: "Site engineer", value: "Prabhu Saravanan" },
     { label: "Client architect", value: "Meenakshi Associates, Madurai" },
