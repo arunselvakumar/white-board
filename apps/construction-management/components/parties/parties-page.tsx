@@ -254,6 +254,7 @@ function PartyRows({
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead className="hidden md:table-cell">GST state</TableHead>
               {screen.departments && <TableHead>Departments</TableHead>}
               <TableHead>Projects</TableHead>
               <TableHead>Status</TableHead>
@@ -275,6 +276,9 @@ function PartyRows({
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {contactText(party)}
+                </TableCell>
+                <TableCell className="text-muted-foreground hidden md:table-cell">
+                  {party.stateName ?? "—"}
                 </TableCell>
                 {screen.departments && (
                   <TableCell
