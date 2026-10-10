@@ -1,0 +1,85 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_6a70f1cb429bb6::t_8117b708828598 109-112,825-828
+apps/construction-management/app/api/construction/hrms/hrms-openapi.ts
+  s_6a70f1cb429bb6::t_09f865b3261a5e 1-56
+apps/construction-management/app/api/construction/hrms/settings/get-hrms-settings-response-model.ts
+  s_6a70f1cb429bb6::t_b6af1510936ea4 1-22
+apps/construction-management/app/api/construction/hrms/settings/hrms-settings-fields.ts
+  s_6a70f1cb429bb6::t_0bc3608c8755f7 1-62
+apps/construction-management/app/api/construction/hrms/settings/hrms-settings.http.test.ts
+  s_6a70f1cb429bb6::t_f1dde72774bfc7 1-263
+apps/construction-management/app/api/construction/hrms/settings/map-hrms-settings.ts
+  s_6a70f1cb429bb6::t_184ec46e9ba025 1-25
+apps/construction-management/app/api/construction/hrms/settings/route.ts
+  s_6a70f1cb429bb6::t_792391c0d2a497 1-25
+apps/construction-management/app/api/construction/hrms/settings/update/route.ts
+  s_6a70f1cb429bb6::t_08c7d093bd8e90 1-36
+apps/construction-management/app/api/construction/hrms/settings/update/update-hrms-settings-request-model.ts
+  s_6a70f1cb429bb6::t_de652edb54142f 1-18
+apps/construction-management/app/api/construction/hrms/settings/update/update-hrms-settings-response-model.ts
+  s_6a70f1cb429bb6::t_72fdfb9e479c82 1-11
+apps/construction-management/src/hrms/application/hrms-fakes.ts
+  s_6a70f1cb429bb6::t_f9b06c8e3d7184 1-91
+apps/construction-management/src/hrms/application/hrms-settings-handlers.test.ts
+  s_6a70f1cb429bb6::t_62912786df3928 1-142
+apps/construction-management/src/hrms/application/in-memory-statutory-rates.ts
+  s_6a70f1cb429bb6::t_b8eff32c7f630a 1-45
+apps/construction-management/src/hrms/application/ports.ts
+  s_6a70f1cb429bb6::t_96275f8ab25bbc 1-251
+apps/construction-management/src/hrms/application/stub-ports.test.ts
+  s_6a70f1cb429bb6::t_b050bcc572eaa0 1-89
+apps/construction-management/src/hrms/application/stub-ports.ts
+  s_6a70f1cb429bb6::t_91543873c9c7d4 1-161
+apps/construction-management/src/hrms/domain/geo.test.ts
+  s_6a70f1cb429bb6::t_8d1d311a37e383 1-39
+apps/construction-management/src/hrms/domain/geo.ts
+  s_6a70f1cb429bb6::t_b623ca5a8ce20c 1-32
+apps/construction-management/src/hrms/domain/hrms-settings.test.ts
+  s_6a70f1cb429bb6::t_5dbdd1196c05c5 1-215
+apps/construction-management/src/hrms/domain/hrms-settings.ts
+  s_6a70f1cb429bb6::t_b56caa099e6a57 1-270
+apps/construction-management/src/hrms/domain/leave-year.test.ts
+  s_6a70f1cb429bb6::t_73755d42670f33 1-31
+apps/construction-management/src/hrms/domain/leave-year.ts
+  s_6a70f1cb429bb6::t_bde780abaddbc5 1-55
+apps/construction-management/src/hrms/domain/month-lock.ts
+  s_6a70f1cb429bb6::t_6d55f9f9a3a8df 1-15
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_6a70f1cb429bb6::t_3d38803a3118e8 1-70
+apps/construction-management/src/hrms/infrastructure/hrms-ports.http.test.ts
+  s_6a70f1cb429bb6::t_4716c0446a623d 1-168
+apps/construction-management/src/hrms/infrastructure/prisma-directories.ts
+  s_6a70f1cb429bb6::t_299cd5da08b77e 1-144
+apps/construction-management/src/hrms/infrastructure/prisma-hrms-settings-store.ts
+  s_6a70f1cb429bb6::t_65dac5b208fd63 1-147
+apps/construction-management/src/hrms/infrastructure/prisma-month-lock.ts
+  s_6a70f1cb429bb6::t_113c513a3aca31 1-43
+apps/construction-management/src/hrms/infrastructure/prisma-statutory-rates.ts
+  s_6a70f1cb429bb6::t_ef518112176ad8 1-86
+apps/construction-management/src/hrms/application/hrms-settings-handlers.ts
+  s_8128b29ad70a5d::t_2e3ebed08c7ee6 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7d78be0e8a4d6cf25b9094da8bd45376b27fd1fa",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8128b29ad70a5d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa115a5b7189c0b74",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
