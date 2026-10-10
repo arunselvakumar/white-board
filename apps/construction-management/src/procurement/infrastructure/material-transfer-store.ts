@@ -23,6 +23,7 @@ import {
 import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import type { ProjectMediaRemoved } from "@/src/shared-kernel/project-media";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
 import { canOnTransferSide } from "../application/inventory-access";
@@ -185,6 +186,8 @@ export class MaterialTransferCommands {
       db: PrismaClient;
       directory: ProcurementDirectory;
       dispatcher: EventDispatcher;
+      /** The Gallery's dispatcher (`ProjectMediaRemoved` on delete). */
+      media: EventDispatcher;
     },
   ) {}
 
@@ -912,5 +915,23 @@ export class MaterialTransferCommands {
         before: snapshot(before),
       });
     });
+    // Its files leave the Gallery of the Project they were shown on.
+    const projectId =
+      before.from.kind === "project"
+        ? before.from.id
+        : before.to.kind === "project"
+          ? before.to.id
+          : null;
+    if (projectId != null) {
+      const removed: ProjectMediaRemoved = {
+        type: "ProjectMediaRemoved",
+        workspaceId,
+        occurredAt: new Date(),
+        projectId,
+        source: "material_transfer",
+        sourceId: id,
+      };
+      await this.deps.media.dispatch([removed]);
+    }
   }
 }
