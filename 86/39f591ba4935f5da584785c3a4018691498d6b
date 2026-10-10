@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/masters/material-masters.http.test.ts
+  s_6604e2237b6922::t_aedbf338431cb3 655-661
+apps/construction-management/app/api/construction/masters/materials/material-routes.ts
+  s_6604e2237b6922::t_1c5a06cab3a374 56
+apps/construction-management/src/masters/application/material-ports.ts
+  s_6604e2237b6922::t_dd54ff93a81c21 88-92
+apps/construction-management/src/masters/application/party-quotations.ts
+  s_6604e2237b6922::t_3aaefe4c366d0b 137-139
+apps/construction-management/src/masters/infrastructure/prisma-material-master-stores.ts
+  s_6604e2237b6922::t_1a03336ca4feeb 442-444
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8639f591ba4935f5da584785c3a4018691498d6b",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
