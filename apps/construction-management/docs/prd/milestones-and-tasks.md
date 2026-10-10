@@ -438,7 +438,7 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 | CM-405 |   5 | Locations for non-building projects                                                                                                                   | todo        | CM-402     | Domain+UI   |
 | CM-406 |   6 | Project resources: assign team members, contractors, suppliers, vendors (needs CM-5xx masters for parties — or ship contractor/supplier masters here) | todo        | CM-401     | Domain+UI   |
 | CM-407 |   7 | Attachments service (Vercel Blob private uploads through our routes, quota, thumbnails) in the kernel                                                 | in_progress | CM-008     | Kernel      |
-| CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | todo        | CM-407     | Domain+UI   |
+| CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | in_progress | CM-407     | Domain+UI   |
 | CM-409 |   9 | Testing Reports: items (seed 4) + dated report files                                                                                                  | todo        | CM-407     | Domain+UI   |
 | CM-410 |  10 | Gallery (all project media, search, uploaded-by)                                                                                                      | todo        | CM-407     | HTTP+UI     |
 | CM-411 |  11 | Project home tiles, hide/show modules, tile ordering, pin project                                                                                     | todo        | CM-402     | UI          |
