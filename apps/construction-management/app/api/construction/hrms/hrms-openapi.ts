@@ -14,6 +14,10 @@ import {
   leaveOpenApiOperations,
 } from "./leave-openapi";
 import {
+  salariesOpenApiComponents,
+  salariesOpenApiOperations,
+} from "./salaries/salaries-openapi";
+import {
   salarySetupOpenApiComponents,
   salarySetupOpenApiOperations,
 } from "./salary-setup-openapi";
@@ -37,6 +41,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   ...calendarOpenApiComponents,
   ...leaveOpenApiComponents,
   ...salarySetupOpenApiComponents,
+  ...salariesOpenApiComponents,
 };
 
 export const hrmsOpenApiOperations: OpenApiOperation[] = [
@@ -71,4 +76,5 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
   ...calendarOpenApiOperations,
   ...leaveOpenApiOperations,
   ...salarySetupOpenApiOperations,
+  ...salariesOpenApiOperations,
 ];

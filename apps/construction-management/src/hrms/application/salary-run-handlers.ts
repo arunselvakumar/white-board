@@ -1107,6 +1107,8 @@ export class SalaryRunHandlers {
     records: SalarySlipRecord[];
     skipped: SkippedMember[];
     financial: boolean;
+    /** Company time. */
+    generatedAt: string;
   }> {
     if (!can(access, MENU, "report") && !can(access, MENU, "export"))
       assertCan(access, MENU, "report");
@@ -1129,6 +1131,7 @@ export class SalaryRunHandlers {
       })),
       skipped: await this.skipped(workspaceId, month, employees, slips),
       financial: can(access, MENU, "financial"),
+      generatedAt: dateIn(profile.timezone, this.clock(), true),
     };
   }
 

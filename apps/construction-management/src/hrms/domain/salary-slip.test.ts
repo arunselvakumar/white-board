@@ -49,13 +49,18 @@ describe("salary slip states", () => {
       assertRecalculable(slip());
     }).not.toThrow();
     for (const status of ["approved", "paid"] as const)
-      expect(codeOf(() => { assertRecalculable(slip({ status })); })).toMatchObject({
+      expect(
+        codeOf(() => {
+          assertRecalculable(slip({ status }));
+        }),
+      ).toMatchObject({
         code: "SALARY_SLIP_NOT_CALCULATED",
         kind: "conflict",
       });
     expect(
-      codeOf(() => { assertRecalculable(slip({ kind: "advance", status: "paid" })); },
-      ).code,
+      codeOf(() => {
+        assertRecalculable(slip({ kind: "advance", status: "paid" }));
+      }).code,
     ).toBe("SALARY_SLIP_NOT_CALCULATED");
   });
 
@@ -64,32 +69,40 @@ describe("salary slip states", () => {
       assertApprovable(slip(), { memberId: "m-2", isOwner: false });
     }).not.toThrow();
     expect(
-      codeOf(() => { assertApprovable(slip(), { memberId: "m-1", isOwner: false }); },
-      ),
+      codeOf(() => {
+        assertApprovable(slip(), { memberId: "m-1", isOwner: false });
+      }),
     ).toMatchObject({ code: "SALARY_OWN_SLIP", kind: "forbidden" });
     expect(() => {
       assertApprovable(slip(), { memberId: "m-1", isOwner: true });
     }).not.toThrow();
     expect(
-      codeOf(() => { assertApprovable(slip({ status: "approved" }), {
+      codeOf(() => {
+        assertApprovable(slip({ status: "approved" }), {
           memberId: "m-2",
           isOwner: false,
-        }); },
-      ),
+        });
+      }),
     ).toMatchObject({ code: "SALARY_SLIP_ALREADY_APPROVED", kind: "conflict" });
   });
 
   it("marks paid only after approval, and only once", () => {
-    expect(codeOf(() => { assertPayable(slip()); })).toMatchObject({
+    expect(
+      codeOf(() => {
+        assertPayable(slip());
+      }),
+    ).toMatchObject({
       code: "SALARY_NOT_APPROVED",
       kind: "conflict",
     });
     expect(() => {
       assertPayable(slip({ status: "approved" }));
     }).not.toThrow();
-    expect(codeOf(() => { assertPayable(slip({ status: "paid" })); }).code).toBe(
-      "SALARY_ALREADY_PAID",
-    );
+    expect(
+      codeOf(() => {
+        assertPayable(slip({ status: "paid" }));
+      }).code,
+    ).toBe("SALARY_ALREADY_PAID");
   });
 });
 

@@ -67,7 +67,7 @@ function components(value: Prisma.JsonValue): SalarySlipComponent[] {
 
 function snapshot(value: Prisma.JsonValue): Record<string, unknown> {
   return value != null && typeof value === "object" && !Array.isArray(value)
-    ? (value)
+    ? value
     : {};
 }
 
