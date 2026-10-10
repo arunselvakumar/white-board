@@ -21,10 +21,12 @@ import { createGoodsReceiptHandlers } from "@/src/procurement/infrastructure/goo
 import { can, type Flag, type MemberAccess } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
+import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
 
 /** One set of Goods Receipt handlers for every route (CM-505). */
 export const goodsReceiptHandlers = createGoodsReceiptHandlers({
   directory: procurementDirectory,
+  dispatcher: procurementEvents,
   media: projectMediaDispatcher(),
 });
 

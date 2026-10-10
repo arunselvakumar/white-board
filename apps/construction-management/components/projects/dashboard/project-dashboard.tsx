@@ -19,6 +19,7 @@ import {
   UserX,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
@@ -42,18 +43,22 @@ import {
   projectSummaryQuery,
   type DashboardSection,
 } from "@/src/queries/project-dashboard";
+import { procurementDashboardQuery } from "@/src/queries/procurement-dashboard";
+
+import { formatPaise } from "@/components/money/money-input";
+import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
 
 import { AttendanceTrend } from "./attendance-trend";
 import { DurationFilter } from "./duration-filter";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
+import { PoValueChart } from "./po-value-chart";
 
-/** The four KPI tiles; each names the milestone that will fill it. */
-const KPIS: readonly {
+/** The KPI tiles still waiting for their milestone (Material Approvals has data). */
+const KPI_STUBS: readonly {
   label: string;
   milestone: string;
   icon: LucideIcon;
 }[] = [
-  { label: "Material Approvals", milestone: "M5", icon: Package },
   { label: "Payment Approvals", milestone: "M7", icon: CreditCard },
   { label: "Pending Issues & Snags", milestone: "M8", icon: TriangleAlert },
   { label: "Pending Inspections", milestone: "M8", icon: SearchCheck },
@@ -65,8 +70,6 @@ const STUB_TEXT: Record<string, string> = {
   payments: "Payments in and out, due payments and the split by module.",
   daily_work: "Labour availability and contractor-wise labour from worksheets.",
   equipment_usage: "Top equipment by work hours, owned and rented.",
-  materials:
-    "Material summary, month-wise purchase order value and the stock register.",
   issue_snag: "Issues and snags by status.",
   inspection_request: "Inspection requests by status and the success rate.",
   booking: "Units booked and available, and the booking report.",
@@ -74,7 +77,6 @@ const STUB_TEXT: Record<string, string> = {
 };
 
 const MILESTONE_NAMES: Record<string, string> = {
-  M5: "Procurement & inventory (M5)",
   M6: "Daily site work (M6)",
   M7: "Finance (M7)",
   M8: "Tasks, issues and inspections (M8)",
@@ -292,13 +294,77 @@ function StubSection({ section }: { section: DashboardSection }) {
   );
 }
 
-function KpiTiles() {
+/**
+ * Pending Purchase Requests, Purchase Orders and Material Transfers the
+ * viewer may approve on this Project (CM-510); "—" when they may approve
+ * none of them.
+ */
+function MaterialApprovalsTile({
+  projectId,
+  duration,
+}: {
+  projectId: string;
+  duration: Duration;
+}) {
+  const { data, error } = useQuery(
+    procurementDashboardQuery(projectId, duration),
+  );
+  const approvals = data?.approvals;
+  const any =
+    approvals != null &&
+    (approvals.purchaseRequests != null ||
+      approvals.purchaseOrders != null ||
+      approvals.transfers != null);
+  const parts =
+    approvals == null
+      ? []
+      : [
+          approvals.purchaseRequests == null
+            ? null
+            : `${String(approvals.purchaseRequests)} PR`,
+          approvals.purchaseOrders == null
+            ? null
+            : `${String(approvals.purchaseOrders)} PO`,
+          approvals.transfers == null
+            ? null
+            : `${String(approvals.transfers)} transfer`,
+        ].filter((part) => part != null);
+  return (
+    <li className="bg-card flex min-w-0 flex-col gap-2 rounded-xl border p-4">
+      <span className="text-muted-foreground flex items-center gap-2 text-sm">
+        <Package aria-hidden="true" className="size-4 shrink-0" />
+        <span className="min-w-0">Material Approvals</span>
+      </span>
+      <span className="text-2xl font-semibold tabular-nums">
+        {any ? approvals.total : "—"}
+      </span>
+      <span className="text-muted-foreground text-xs">
+        {error != null
+          ? "Could not be loaded"
+          : approvals == null
+            ? "Loading…"
+            : any
+              ? `Pending: ${parts.join(" · ")}`
+              : "Nothing here for you to approve"}
+      </span>
+    </li>
+  );
+}
+
+function KpiTiles({
+  projectId,
+  duration,
+}: {
+  projectId: string;
+  duration: Duration;
+}) {
   return (
     <ul
       aria-label="Key figures"
       className="grid grid-cols-2 gap-3 lg:grid-cols-4"
     >
-      {KPIS.map((kpi) => (
+      <MaterialApprovalsTile projectId={projectId} duration={duration} />
+      {KPI_STUBS.map((kpi) => (
         <li
           key={kpi.label}
           className="bg-card flex min-w-0 flex-col gap-2 rounded-xl border border-dashed p-4"
@@ -316,6 +382,77 @@ function KpiTiles() {
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * Material Summary, purchase orders and their month-wise value (CM-510).
+ * Each part shows only with its permission on the Project.
+ */
+function MaterialsSection({
+  projectId,
+  duration,
+}: {
+  projectId: string;
+  duration: Duration;
+}) {
+  const { data, isPending, error } = useQuery(
+    procurementDashboardQuery(projectId, duration),
+  );
+  return (
+    <Section
+      id="dashboard-materials"
+      title="Materials"
+      aside={
+        <Link
+          href={`${materialsPath(projectId, "inventory")}/register`}
+          className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+        >
+          Stock Register
+        </Link>
+      }
+    >
+      {isPending ? (
+        <SectionSkeleton />
+      ) : error != null ? (
+        <p className="text-muted-foreground text-sm">
+          Materials could not be loaded.
+        </p>
+      ) : data.materials == null && data.purchaseOrders == null ? (
+        <p className="text-muted-foreground text-sm">
+          Materials need the Current Inventory or Purchase Order permission on
+          this Project.
+        </p>
+      ) : (
+        <div className="space-y-5">
+          <dl className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+            {data.materials == null ? null : (
+              <>
+                <Fact label="Materials" icon={Package}>
+                  {data.materials.total}
+                </Fact>
+                <Fact label="In stock">{data.materials.inStock}</Fact>
+                <Fact label="Low stock">{data.materials.lowStock}</Fact>
+                <Fact label="Out of stock">{data.materials.outOfStock}</Fact>
+              </>
+            )}
+            {data.purchaseOrders == null ? null : (
+              <>
+                <Fact label="Purchase orders" icon={FileText}>
+                  {data.purchaseOrders.count}
+                </Fact>
+                <Fact label="Purchase order value">
+                  {formatPaise(data.purchaseOrders.value)}
+                </Fact>
+              </>
+            )}
+          </dl>
+          {data.purchaseOrders == null ? null : (
+            <PoValueChart months={data.purchaseOrders.months} />
+          )}
+        </div>
+      )}
+    </Section>
   );
 }
 
@@ -365,7 +502,7 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
             {problem}
           </p>
         )}
-        <KpiTiles />
+        <KpiTiles projectId={projectId} duration={duration} />
         {shown.length === 0 ? (
           <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
             Every section is hidden. Use Manage dashboard to show some.
@@ -377,6 +514,14 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
             if (section.key === "attendance")
               return problem == null ? (
                 <AttendanceSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "materials")
+              return problem == null ? (
+                <MaterialsSection
                   key={section.key}
                   projectId={projectId}
                   duration={duration}
