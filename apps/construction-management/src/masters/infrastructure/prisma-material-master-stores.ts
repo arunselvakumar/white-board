@@ -223,6 +223,13 @@ async function recheckHierarchy(
       "MATERIAL_CATEGORY_PARENT_INVALID",
       "The parent is itself a sub-category. Choose a top-level category as the parent.",
     );
+  // Lock this category too: a child created under it meanwhile then waits
+  // for this edit, or is counted by it (no third level either way).
+  await tx.$queryRaw(Prisma.sql`
+    SELECT 1 FROM construction_masters.material_categories
+    WHERE id = ${category.id}::uuid
+    FOR UPDATE
+  `);
   const children = await tx.constructionMastersMaterialCategory.count({
     where: { parentId: category.id, deletedAt: null },
   });

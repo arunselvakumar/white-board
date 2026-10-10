@@ -16,7 +16,7 @@ import {
 import type { PartyKind } from "../domain/party";
 import type { Quotation } from "../domain/quotation";
 import { isUniqueViolation } from "./prisma-lookup-store";
-import { pageOf, pageQuery } from "./prisma-paging";
+import { pageOf } from "./prisma-paging";
 
 type Row = Prisma.ConstructionMastersQuotationGetPayload<object>;
 
@@ -75,82 +75,60 @@ export class PrismaQuotationStore implements QuotationStore {
 
   async list(params: QuotationListParams) {
     const search = params.search?.trim() ?? "";
-    const contains = { contains: search, mode: "insensitive" as const };
-    // Only quotations of live parties; a search matches the party or the file.
-    const [contractors, suppliers] = await Promise.all(
-      (["contractor", "supplier"] as const).map(async (kind) => {
-        if (params.partyKind != null && params.partyKind !== kind) return [];
-        const where = { workspaceId: params.workspaceId, deletedAt: null };
-        const rows =
-          kind === "contractor"
-            ? await this.db.constructionMastersContractor.findMany({
-                where,
-                select: { id: true, name: true },
-              })
-            : await this.db.constructionMastersSupplier.findMany({
-                where,
-                select: { id: true, name: true },
-              });
-        return rows;
-      }),
-    );
-    const names = new Map<string, string>();
-    for (const row of [...(contractors ?? []), ...(suppliers ?? [])])
-      names.set(row.id, row.name);
-    const matching = (rows: { id: string; name: string }[]) =>
-      rows
-        .filter(
-          (row) =>
-            search === "" ||
-            row.name.toLowerCase().includes(search.toLowerCase()),
-        )
-        .map((row) => row.id);
-    const partyFilter = (
-      kind: PartyKind,
-      rows: { id: string; name: string }[] | undefined,
-    ): Prisma.ConstructionMastersQuotationWhereInput | null =>
-      rows == null || (params.partyKind != null && params.partyKind !== kind)
-        ? null
-        : {
-            partyKind: kind,
-            OR: [
-              { partyId: { in: matching(rows) } },
-              ...(search === ""
-                ? []
-                : [
-                    {
-                      partyId: { in: rows.map((row) => row.id) },
-                      fileName: contains,
-                    },
-                  ]),
-            ],
-          };
-    const parties = [
-      partyFilter("contractor", contractors),
-      partyFilter("supplier", suppliers),
-    ].filter((item) => item != null);
-    const filters: Prisma.ConstructionMastersQuotationWhereInput[] = [
-      { workspaceId: params.workspaceId, deletedAt: null },
-      { OR: parties },
-    ];
-    const page = pageQuery(params);
-    const [rows, total] = await Promise.all([
-      this.db.constructionMastersQuotation.findMany({
-        where: {
-          AND: page.filter == null ? filters : [...filters, page.filter],
-        },
-        orderBy: page.orderBy,
-        take: page.take,
-      }),
-      this.db.constructionMastersQuotation.count({ where: { AND: filters } }),
+    const like = `%${search.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+    const backwards = params.before != null;
+    const cursor = params.after ?? params.before;
+    // Only quotations of live parties; a search matches the party or the
+    // file. One query joins the parties, so the cost follows the page, not
+    // the number of Contractors and Suppliers (CM-501 review).
+    const parties = Prisma.sql`
+      SELECT 'contractor'::text AS kind, id, name
+      FROM construction_masters.contractors
+      WHERE workspace_id = ${params.workspaceId} AND deleted_at IS NULL
+      UNION ALL
+      SELECT 'supplier'::text AS kind, id, name
+      FROM construction_masters.suppliers
+      WHERE workspace_id = ${params.workspaceId} AND deleted_at IS NULL`;
+    const where = Prisma.sql`
+      q.workspace_id = ${params.workspaceId}
+      AND q.deleted_at IS NULL
+      ${params.partyKind == null ? Prisma.empty : Prisma.sql`AND p.kind = ${params.partyKind}`}
+      ${search === "" ? Prisma.empty : Prisma.sql`AND (p.name ILIKE ${like} OR q.file_name ILIKE ${like})`}`;
+    const from = Prisma.sql`
+      FROM construction_masters.quotations q
+      JOIN (${parties}) p ON p.kind = q.party_kind::text AND p.id = q.party_id`;
+    const page =
+      cursor == null
+        ? Prisma.empty
+        : backwards
+          ? Prisma.sql`AND (q.created_at, q.id) > (${cursor.createdAt}, ${cursor.id}::uuid)`
+          : Prisma.sql`AND (q.created_at, q.id) < (${cursor.createdAt}, ${cursor.id}::uuid)`;
+    const order = backwards
+      ? Prisma.sql`ORDER BY q.created_at ASC, q.id ASC`
+      : Prisma.sql`ORDER BY q.created_at DESC, q.id DESC`;
+    const [rows, counted] = await Promise.all([
+      this.db.$queryRaw<(Row & { partyName: string })[]>(Prisma.sql`
+        SELECT q.id, q.workspace_id AS "workspaceId",
+               q.party_kind::text AS "partyKind", q.party_id AS "partyId",
+               q.file_key AS "fileKey", q.file_name AS "fileName",
+               q.content_type AS "contentType", q.bytes,
+               q.thumb_key AS "thumbKey", q.created_at AS "createdAt",
+               q.created_by AS "createdBy", q.deleted_at AS "deletedAt",
+               q.deleted_by AS "deletedBy", p.name AS "partyName"
+        ${from}
+        WHERE ${where} ${page}
+        ${order}
+        LIMIT ${params.limit + 1}`),
+      this.db.$queryRaw<{ total: bigint }[]>(Prisma.sql`
+        SELECT COUNT(*)::bigint AS total ${from} WHERE ${where}`),
     ]);
     const { items, hasMore } = pageOf(rows, params);
     return {
       items: items.map((row) => ({
         ...toQuotation(row),
-        partyName: names.get(row.partyId) ?? "",
+        partyName: row.partyName,
       })),
-      total,
+      total: Number(counted[0]?.total ?? 0),
       hasMore,
     };
   }
