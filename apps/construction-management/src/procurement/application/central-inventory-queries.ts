@@ -50,6 +50,8 @@ export type CentralInventoryFilter = {
 export type CentralInventory = {
   /** Every live Project and Store, for the location filter. */
   locations: InventoryLocation[];
+  /** Material Categories of the materials held anywhere, for the category filter. */
+  categories: { id: string; name: string }[];
   /** By material name; positions by location kind (Projects first) then name. */
   materials: InventoryMaterial[];
 };

@@ -145,6 +145,10 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     const names = this.locationNames(locations);
     await this.addMissingNames(workspaceId, names, [...positions.values()]);
 
+    const categories = new Map<string, string>();
+    for (const material of materials.values())
+      if (material.categoryId != null && material.categoryName != null)
+        categories.set(material.categoryId, material.categoryName);
     const search = filter.search?.trim().toLowerCase() ?? "";
     const grouped = new Map<string, InventoryMaterial>();
     for (const position of positions.values()) {
@@ -193,7 +197,13 @@ export class PrismaCentralInventory implements CentralInventoryReader {
         a.materialName.localeCompare(b.materialName, "en-IN") ||
         a.materialId.localeCompare(b.materialId),
     );
-    return { locations, materials: list };
+    return {
+      locations,
+      categories: [...categories]
+        .map(([id, name]) => ({ id, name }))
+        .sort((a, b) => a.name.localeCompare(b.name, "en-IN")),
+      materials: list,
+    };
   }
 
   async stockLedger(filter: StockLedgerFilter): Promise<StockLedgerReport> {
