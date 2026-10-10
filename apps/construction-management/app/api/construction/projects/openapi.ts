@@ -124,7 +124,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/delete`,
     summary:
-      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance, payments or documents point at it)",
+      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance, payments, documents, Wings or Locations point at it)",
     tags: PROJECTS,
     params: ConstructionProjectsProjectParamsModel,
     successStatus: StatusCodes.NO_CONTENT,

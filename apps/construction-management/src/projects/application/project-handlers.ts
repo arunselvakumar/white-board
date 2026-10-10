@@ -218,7 +218,7 @@ export class ProjectHandlers {
     if (await this.usage.isInUse(project.workspaceId, project.id))
       throw conflict(
         "PROJECT_IN_USE",
-        "Labours, vendors, attendance, payments or documents are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
+        "Labours, vendors, attendance, payments, documents, Wings or Locations are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
       );
     const before = snapshot(project);
     project.delete(input.by, this.clock());

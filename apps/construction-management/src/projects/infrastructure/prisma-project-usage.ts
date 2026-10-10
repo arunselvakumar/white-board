@@ -8,7 +8,8 @@ import type { ProjectUsage } from "../domain/project-repository";
  * code): live labours whose current Project it is, live vendors assigned
  * to it, live labour or vendor attendance on it, and live wage payments.
  * Its own live documents (CM-414) count too: deleting the Project would
- * leave their files in storage with nothing to show them.
+ * leave their files in storage with nothing to show them; so do its live
+ * Wings and Locations (ADR CM-0013 §13).
  */
 export class PrismaProjectUsage implements ProjectUsage {
   constructor(private readonly db: PrismaClient) {}
@@ -49,6 +50,18 @@ export class PrismaProjectUsage implements ProjectUsage {
         )
         OR EXISTS (
           SELECT 1 FROM construction_projects.documents
+          WHERE workspace_id = ${workspaceId}
+            AND project_id = ${projectId}::uuid
+            AND deleted_at IS NULL
+        )
+        OR EXISTS (
+          SELECT 1 FROM construction_projects.wings
+          WHERE workspace_id = ${workspaceId}
+            AND project_id = ${projectId}::uuid
+            AND deleted_at IS NULL
+        )
+        OR EXISTS (
+          SELECT 1 FROM construction_projects.locations
           WHERE workspace_id = ${workspaceId}
             AND project_id = ${projectId}::uuid
             AND deleted_at IS NULL
