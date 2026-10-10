@@ -251,6 +251,49 @@ describe("Remarks and comments on procurement documents (M5)", () => {
     }
   });
 
+  it("hides another member's Goods Receipt thread without View all", async () => {
+    const company = await ownerWithCompany();
+    const projectId = await addProject(company.workspaceId, company.userId);
+    const grn = await addDocument(
+      company.workspaceId,
+      company.userId,
+      "goods_receipt",
+      { location: { kind: "project", id: projectId } },
+    );
+    const ownOnly = await memberWith(company, {
+      "procurement.material_received": ["read", "create"],
+    });
+    await assign(ownOnly.memberId, projectId);
+    const viewAll = await memberWith(company, {
+      "procurement.material_received": ["read", "view_all"],
+    });
+    await assign(viewAll.memberId, projectId);
+
+    // Like the GRN's own routes: someone else's GRN is not found.
+    const hidden = await thread(ownOnly.cookie, "goods_receipt", grn.id);
+    expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await codeOf(hidden)).toBe("GOODS_RECEIPT_NOT_FOUND");
+    const write = await post(ownOnly.cookie, "goods_receipt", grn.id, {
+      body: "Seen it.",
+    });
+    expect(write.status).toBe(StatusCodes.NOT_FOUND);
+
+    expect((await thread(viewAll.cookie, "goods_receipt", grn.id)).status).toBe(
+      StatusCodes.OK,
+    );
+
+    // Their own GRN they see without View all.
+    const mine = await addDocument(
+      company.workspaceId,
+      ownOnly.userId,
+      "goods_receipt",
+      { location: { kind: "project", id: projectId } },
+    );
+    expect(
+      (await thread(ownOnly.cookie, "goods_receipt", mine.id)).status,
+    ).toBe(StatusCodes.OK);
+  });
+
   it("opens a transfer from either side, a Store side on the Company menu", async () => {
     const company = await ownerWithCompany();
     const siteA = await addProject(company.workspaceId, company.userId);

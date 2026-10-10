@@ -188,6 +188,17 @@ export function supplyTypeFor(
   );
 }
 
+/** The GRN is on a PO the form options do not hold, so it cannot be edited here. */
+export function linkedOrderMissing(
+  options: GoodsReceiptFormOptions,
+  receipt: GoodsReceipt | null,
+): boolean {
+  const linked = receipt?.purchaseOrder?.id;
+  return (
+    linked != null && !options.purchaseOrders.some((item) => item.id === linked)
+  );
+}
+
 export function goodsReceiptFormDefaults(
   options: GoodsReceiptFormOptions,
   receipt: GoodsReceipt | null,
@@ -206,7 +217,9 @@ export function goodsReceiptFormDefaults(
     receiptDate: receipt?.receiptDate ?? today,
     inventoryDate: receipt?.inventoryDate ?? today,
     supplierId,
-    purchaseOrderId: order?.id ?? "",
+    // A GRN on a PO keeps it even if the PO is missing from the options;
+    // the form then refuses to save instead of turning its lines manual.
+    purchaseOrderId: order?.id ?? receipt?.purchaseOrder?.id ?? "",
     supplyType: receipt?.supplyType ?? supplyTypeFor(options, supplierId, null),
     invoiceNo: receipt?.invoiceNo ?? "",
     invoiceDate: receipt?.invoiceDate ?? "",
@@ -220,7 +233,7 @@ export function goodsReceiptFormDefaults(
     remark: receipt?.remark ?? "",
     orderLines: order == null ? [] : orderLineValues(order, receipt),
     manualLines:
-      order != null || receipt == null
+      receipt?.purchaseOrder != null || receipt == null
         ? []
         : receipt.lines.map((line) => ({
             id: line.id,

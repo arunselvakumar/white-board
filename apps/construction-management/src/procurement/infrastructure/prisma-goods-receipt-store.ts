@@ -343,21 +343,32 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
       closedAt: null,
       receiptStatus: { in: ["not_received", "partially_received"] },
     };
-    const rows = await db.constructionProcurementPurchaseOrder.findMany({
-      where: {
-        workspaceId,
-        deletedAt: null,
-        locationKind: location.kind,
-        locationId: location.id,
-        OR:
-          options.includeId == null
-            ? [open]
-            : [open, { id: options.includeId }],
-      },
-      include: { items: true },
-      orderBy: [{ orderDate: "desc" }, { createdAt: "desc" }],
-      take: 200,
-    });
+    const here = {
+      workspaceId,
+      deletedAt: null,
+      locationKind: location.kind,
+      locationId: location.id,
+    };
+    const [openRows, linked] = await Promise.all([
+      db.constructionProcurementPurchaseOrder.findMany({
+        where: { ...here, ...open },
+        include: { items: true },
+        orderBy: [{ orderDate: "desc" }, { createdAt: "desc" }],
+        take: 200,
+      }),
+      // The PO a GRN being edited is on, even when it is received, closed or
+      // older than the 200 most recent open ones: the edit must keep it.
+      options.includeId == null
+        ? null
+        : db.constructionProcurementPurchaseOrder.findFirst({
+            where: { ...here, id: options.includeId },
+            include: { items: true },
+          }),
+    ]);
+    const rows =
+      linked == null || openRows.some((row) => row.id === linked.id)
+        ? openRows
+        : [linked, ...openRows];
     const received =
       options.excludeReceiptId == null
         ? null

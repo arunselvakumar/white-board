@@ -37,13 +37,13 @@ export async function GET(
         await context.params,
       ),
     );
+    const session = await requirePurchaseOrderAccess(request, id, ["print"]);
+    if (isResponse(session)) return session;
     const query = parseOrThrow(
       GetConstructionProcurementPurchaseOrderPdfRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requirePurchaseOrderAccess(request, id, ["print"]);
-    if (isResponse(session)) return session;
     const po = await handlers.get(session.workspaceId, id);
     const [company, located, supplier, site] = await Promise.all([
       readCompanyHeader(prisma, session.workspaceId),

@@ -30,6 +30,8 @@ export type LocatedDocument = {
   id: string;
   workspaceId: string;
   number: string;
+  /** Who raised it: a menu with View all shows others' documents only with it. */
+  createdBy: string;
   /**
    * Where its menu is checked: one scope for most documents, two for a
    * Material Transfer (either side may see it).

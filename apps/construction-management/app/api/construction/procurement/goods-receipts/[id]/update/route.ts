@@ -31,13 +31,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireReceiptAccess(request, "update", id);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       UpdateConstructionProcurementGoodsReceiptRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireReceiptAccess(request, "update", id);
-    if (isResponse(session)) return session;
     const financial = receiptFinancial(
       session.access,
       session.receipt.location,

@@ -33,11 +33,6 @@ export async function POST(
         await context.params,
       ),
     );
-    const model = parseOrThrow(
-      DecideConstructionProcurementPurchaseRequestRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const company = await requireCompanySession(request);
     if (isResponse(company)) return company;
     const target = await handlers.find(company.workspaceId, id);
@@ -50,6 +45,11 @@ export async function POST(
       },
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      DecideConstructionProcurementPurchaseRequestRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     await handlers.markOrdered(
       session.access,
       id,

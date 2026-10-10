@@ -48,13 +48,14 @@ export async function locateDocument(
     case "purchase_request": {
       const row = await db.constructionProcurementPurchaseRequest.findFirst({
         where: live(workspaceId, id),
-        select: { number: true, projectId: true },
+        select: { createdBy: true, number: true, projectId: true },
       });
       return row == null
         ? null
         : {
             ...base,
             number: row.number,
+            createdBy: row.createdBy,
             scopes: [row.projectId],
             galleryProjectId: row.projectId,
           };
@@ -62,13 +63,19 @@ export async function locateDocument(
     case "purchase_order": {
       const row = await db.constructionProcurementPurchaseOrder.findFirst({
         where: live(workspaceId, id),
-        select: { number: true, locationKind: true, locationId: true },
+        select: {
+          createdBy: true,
+          number: true,
+          locationKind: true,
+          locationId: true,
+        },
       });
       if (row == null) return null;
       const scope = locationScope(row.locationKind, row.locationId);
       return {
         ...base,
         number: row.number,
+        createdBy: row.createdBy,
         scopes: [scope],
         galleryProjectId: scope,
       };
@@ -76,13 +83,19 @@ export async function locateDocument(
     case "goods_receipt": {
       const row = await db.constructionProcurementGoodsReceipt.findFirst({
         where: live(workspaceId, id),
-        select: { number: true, locationKind: true, locationId: true },
+        select: {
+          createdBy: true,
+          number: true,
+          locationKind: true,
+          locationId: true,
+        },
       });
       if (row == null) return null;
       const scope = locationScope(row.locationKind, row.locationId);
       return {
         ...base,
         number: row.number,
+        createdBy: row.createdBy,
         scopes: [scope],
         galleryProjectId: scope,
       };
@@ -91,6 +104,7 @@ export async function locateDocument(
       const row = await db.constructionProcurementMaterialTransfer.findFirst({
         where: live(workspaceId, id),
         select: {
+          createdBy: true,
           number: true,
           fromKind: true,
           fromId: true,
@@ -104,6 +118,7 @@ export async function locateDocument(
       return {
         ...base,
         number: row.number,
+        createdBy: row.createdBy,
         scopes: [from, to],
         galleryProjectId: from ?? to,
       };
@@ -111,13 +126,14 @@ export async function locateDocument(
     case "material_request": {
       const row = await db.constructionProcurementMaterialRequest.findFirst({
         where: live(workspaceId, id),
-        select: { number: true, projectId: true },
+        select: { createdBy: true, number: true, projectId: true },
       });
       return row == null
         ? null
         : {
             ...base,
             number: row.number,
+            createdBy: row.createdBy,
             scopes: [row.projectId],
             galleryProjectId: row.projectId,
           };
@@ -125,13 +141,14 @@ export async function locateDocument(
     case "delivery_note": {
       const row = await db.constructionProcurementDeliveryNote.findFirst({
         where: live(workspaceId, id),
-        select: { number: true, projectId: true },
+        select: { createdBy: true, number: true, projectId: true },
       });
       return row == null
         ? null
         : {
             ...base,
             number: row.number,
+            createdBy: row.createdBy,
             scopes: [row.projectId],
             galleryProjectId: row.projectId,
           };

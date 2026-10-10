@@ -36,13 +36,13 @@ export async function GET(
         await context.params,
       ),
     );
+    const session = await requirePurchaseRequestAccess(request, id, "print");
+    if (isResponse(session)) return session;
     const query = parseOrThrow(
       GetConstructionProcurementPurchaseRequestPdfRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requirePurchaseRequestAccess(request, id, "print");
-    if (isResponse(session)) return session;
     const pr = await handlers.get(session.workspaceId, id);
     const [company, project, location] = await Promise.all([
       readCompanyHeader(prisma, session.workspaceId),

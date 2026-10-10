@@ -353,8 +353,13 @@ export function formDefaults(
       existing.paymentTermsDays == null
         ? ""
         : String(existing.paymentTermsDays),
+    // Only terms the form can show: one disabled or deleted since the PO
+    // was saved has no checkbox, so keeping its id would block every save.
     termsIds: existing.terms.flatMap((term) =>
-      term.termsId == null ? [] : [term.termsId],
+      term.termsId != null &&
+      options.terms.some((option) => option.id === term.termsId)
+        ? [term.termsId]
+        : [],
     ),
     deliveryAddressDiffers: existing.deliveryAddressDiffers,
     deliveryAddress: existing.deliveryAddress ?? "",
