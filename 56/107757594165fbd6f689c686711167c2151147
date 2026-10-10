@@ -1,0 +1,47 @@
+apps/construction-management/src/composition/procurement-usage.ts
+  s_6604e2237b6922::t_52f66b97b737e7 1,18,53,62,72-73,79
+apps/construction-management/src/procurement/infrastructure/central-inventory-reader.ts
+  s_6604e2237b6922::t_9ad09455be5fa9 99,105,229,234-235,241,331,354
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_6604e2237b6922::t_80005ee05899b2 613,616
+apps/construction-management/src/procurement/infrastructure/inventory-queries.ts
+  s_6604e2237b6922::t_831b9c82e7a1dd 74,89-92,102,164-166,172,286,292,439,462,466,472,625,634
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_6604e2237b6922::t_ca96b3f5a28a9f 111-113,120,416,419,472,480
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_6604e2237b6922::t_b8632f8eecf10c 420,424
+apps/construction-management/src/procurement/infrastructure/prisma-goods-receipt-store.ts
+  s_6604e2237b6922::t_8a156fda23b019 161-163,172,233,237,316,320,429,437
+apps/construction-management/src/procurement/infrastructure/prisma-purchase-order-store.ts
+  s_6604e2237b6922::t_1c7b61a56f1ef2 221,227
+apps/construction-management/src/procurement/infrastructure/prisma-purchase-request-store.ts
+  s_6604e2237b6922::t_53b00ff85d9902 130,136,320,328-331,340,352-354,359,370-372,397
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.ts
+  s_6604e2237b6922::t_3ada8fd30e4110 106-108,116,135-137,272,284
+apps/construction-management/src/procurement/infrastructure/procurement-dashboard.ts
+  s_6604e2237b6922::t_c5d68442943e8c 52,71,107,116
+apps/construction-management/src/procurement/infrastructure/purchase-request-ordering.ts
+  s_6604e2237b6922::t_a987e0bbe76191 1,27,31-32,42
+apps/construction-management/src/procurement/infrastructure/stock-level-watcher.ts
+  s_6604e2237b6922::t_5d040f51da5aaa 29,50
+apps/construction-management/src/procurement/infrastructure/stock-movement-store.ts
+  s_6604e2237b6922::t_4aadcd49912ce8 778,783,814,822
+apps/construction-management/src/procurement/infrastructure/store-repository.ts
+  s_6604e2237b6922::t_be36ac9d191fbf 277,283,378,381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "56107757594165fbd6f689c686711167c2151147",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
