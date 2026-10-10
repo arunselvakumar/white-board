@@ -1,0 +1,193 @@
+apps/construction-management/app/api/construction/masters/_lib/paged-master-routes.ts
+  s_6604e2237b6922::t_4c7073fb6f9dfe 1-207
+apps/construction-management/app/api/construction/masters/_lib/party-models.ts
+  s_6604e2237b6922::t_5bf475bb400bc7 5,36-43,54-65,94-104,166-169
+apps/construction-management/app/api/construction/masters/_lib/quotation-handlers.ts
+  s_6604e2237b6922::t_d95fd09705f9c1 1-20
+apps/construction-management/app/api/construction/masters/_lib/quotation-models.ts
+  s_6604e2237b6922::t_6355987868fe8a 1-127
+apps/construction-management/app/api/construction/masters/_lib/quotation-routes.ts
+  s_6604e2237b6922::t_dfdccf495cffed 1-274
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/[quotationId]/delete/route.ts
+  s_6604e2237b6922::t_5b6a5c244606aa 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/[quotationId]/route.ts
+  s_6604e2237b6922::t_a3f27d34a61f82 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/[quotationId]/thumbnail/route.ts
+  s_6604e2237b6922::t_9a26338264c836 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/route.ts
+  s_6604e2237b6922::t_715c9756d20b04 1-9
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/uploads/app/route.ts
+  s_6604e2237b6922::t_c36b4d8abfb8d4 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/uploads/presign/route.ts
+  s_6604e2237b6922::t_cc48a15fc6fbfc 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/uploads/route.ts
+  s_6604e2237b6922::t_8e692afece31fc 1-6
+apps/construction-management/app/api/construction/masters/contractors/[id]/quotations/uploads/thumbnail/route.ts
+  s_6604e2237b6922::t_8c6afb6e499b7e 1-6
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_6604e2237b6922::t_9aa9c8ceba416a 1,13-15
+apps/construction-management/app/api/construction/masters/material-categories/[id]/delete/route.ts
+  s_6604e2237b6922::t_63b010986a9b15 1-6
+apps/construction-management/app/api/construction/masters/material-categories/[id]/disable/route.ts
+  s_6604e2237b6922::t_35ea42e0ee86f6 1-6
+apps/construction-management/app/api/construction/masters/material-categories/[id]/enable/route.ts
+  s_6604e2237b6922::t_4c8cc5ab6ae2d2 1-6
+apps/construction-management/app/api/construction/masters/material-categories/[id]/route.ts
+  s_6604e2237b6922::t_830abe32852e60 1-6
+apps/construction-management/app/api/construction/masters/material-categories/[id]/update/route.ts
+  s_6604e2237b6922::t_f79345bc8ab5c6 1-6
+apps/construction-management/app/api/construction/masters/material-categories/material-category-models.ts
+  s_6604e2237b6922::t_98ba354c14b2b5 1-85
+apps/construction-management/app/api/construction/masters/material-categories/material-category-routes.ts
+  s_6604e2237b6922::t_ea0b5c15e9d1e4 1-44
+apps/construction-management/app/api/construction/masters/material-categories/route.ts
+  s_6604e2237b6922::t_6cc1489b765b00 1-9
+apps/construction-management/app/api/construction/masters/materials/[id]/delete/route.ts
+  s_6604e2237b6922::t_1da1f3bfc573fa 1-6
+apps/construction-management/app/api/construction/masters/materials/[id]/disable/route.ts
+  s_6604e2237b6922::t_aeddeee71a1830 1-6
+apps/construction-management/app/api/construction/masters/materials/[id]/enable/route.ts
+  s_6604e2237b6922::t_c682795e667837 1-6
+apps/construction-management/app/api/construction/masters/materials/[id]/route.ts
+  s_6604e2237b6922::t_51185287a82c28 1-6
+apps/construction-management/app/api/construction/masters/materials/[id]/update/route.ts
+  s_6604e2237b6922::t_c77bfb878070ea 1-6
+apps/construction-management/app/api/construction/masters/materials/material-models.ts
+  s_6604e2237b6922::t_3d87a667f60fc4 1-161
+apps/construction-management/app/api/construction/masters/materials/material-routes.ts
+  s_6604e2237b6922::t_990151ef799aa6 1-93
+apps/construction-management/app/api/construction/masters/materials/options/route.ts
+  s_6604e2237b6922::t_aaf473bfdb8037 1-72
+apps/construction-management/app/api/construction/masters/materials/route.ts
+  s_6604e2237b6922::t_a225039fe2e687 1-9
+apps/construction-management/app/api/construction/masters/measurement-units/[id]/delete/route.ts
+  s_6604e2237b6922::t_2049f414b8dfdc 1-6
+apps/construction-management/app/api/construction/masters/measurement-units/[id]/disable/route.ts
+  s_6604e2237b6922::t_25da4952cad987 1-6
+apps/construction-management/app/api/construction/masters/measurement-units/[id]/enable/route.ts
+  s_6604e2237b6922::t_754c141c57f253 1-6
+apps/construction-management/app/api/construction/masters/measurement-units/[id]/route.ts
+  s_6604e2237b6922::t_667b9353dbdd2c 1-6
+apps/construction-management/app/api/construction/masters/measurement-units/[id]/update/route.ts
+  s_6604e2237b6922::t_55bc58a612e2c6 1-6
+apps/construction-management/app/api/construction/masters/measurement-units/measurement-unit-models.ts
+  s_6604e2237b6922::t_1564d7e3e95921 1-62
+apps/construction-management/app/api/construction/masters/measurement-units/measurement-unit-routes.ts
+  s_6604e2237b6922::t_111a37da113fdd 1-38
+apps/construction-management/app/api/construction/masters/measurement-units/route.ts
+  s_6604e2237b6922::t_caa5b3409679f3 1-9
+apps/construction-management/app/api/construction/masters/quotations/route.ts
+  s_6604e2237b6922::t_5447c6652c2423 1-53
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/[quotationId]/delete/route.ts
+  s_6604e2237b6922::t_9a511495fc6eb0 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/[quotationId]/route.ts
+  s_6604e2237b6922::t_fbae815b4c2f09 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/[quotationId]/thumbnail/route.ts
+  s_6604e2237b6922::t_c115e36dae1240 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/route.ts
+  s_6604e2237b6922::t_ca3647c41fa44e 1-9
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/uploads/app/route.ts
+  s_6604e2237b6922::t_5964c4424a28a4 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/uploads/presign/route.ts
+  s_6604e2237b6922::t_3e405392c1f915 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/uploads/route.ts
+  s_6604e2237b6922::t_1169b28b6b2a4d 1-6
+apps/construction-management/app/api/construction/masters/suppliers/[id]/quotations/uploads/thumbnail/route.ts
+  s_6604e2237b6922::t_f8cd12cace4819 1-6
+apps/construction-management/app/api/construction/masters/suppliers/supplier-routes.ts
+  s_6604e2237b6922::t_b6c4cbe137a33c 1,13-15
+apps/construction-management/app/api/construction/masters/terms-conditions/[id]/delete/route.ts
+  s_6604e2237b6922::t_93b2269881c56c 1-6
+apps/construction-management/app/api/construction/masters/terms-conditions/[id]/disable/route.ts
+  s_6604e2237b6922::t_798ac4d9349b43 1-6
+apps/construction-management/app/api/construction/masters/terms-conditions/[id]/enable/route.ts
+  s_6604e2237b6922::t_e072d14004e89c 1-6
+apps/construction-management/app/api/construction/masters/terms-conditions/[id]/route.ts
+  s_6604e2237b6922::t_aad3e3bba1d67c 1-6
+apps/construction-management/app/api/construction/masters/terms-conditions/[id]/update/route.ts
+  s_6604e2237b6922::t_19f01a66bc6c5d 1-6
+apps/construction-management/app/api/construction/masters/terms-conditions/route.ts
+  s_6604e2237b6922::t_1032b8393d4eed 1-9
+apps/construction-management/app/api/construction/masters/terms-conditions/terms-condition-models.ts
+  s_6604e2237b6922::t_c6043802991cd1 1-67
+apps/construction-management/app/api/construction/masters/terms-conditions/terms-condition-routes.ts
+  s_6604e2237b6922::t_3133fc8facb217 1-40
+apps/construction-management/components/parties/party-fixtures.ts
+  s_6604e2237b6922::t_14c55bf9c8a6e1 52-55,78-81,98-101
+apps/construction-management/src/composition/procurement-usage.ts
+  s_6604e2237b6922::t_878d258794f2d4 1-81
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_6604e2237b6922::t_fe2a98957732a4 80-90,117-121,173-174,383-384,404-413
+apps/construction-management/src/masters/application/party-quotations.ts
+  s_6604e2237b6922::t_fdb73e07d18645 1-365
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_6604e2237b6922::t_93bbf163bf96f1 18-30,32,34-35,71-86,126-135,138-142
+apps/construction-management/src/masters/domain/material-category.ts
+  s_6604e2237b6922::t_13f9502e0469ed 1-216
+apps/construction-management/src/masters/domain/party.ts
+  s_6604e2237b6922::t_51a8f7872dcc57 8,51-58,72-77,162-206,283-306
+apps/construction-management/src/masters/domain/quotation.ts
+  s_6604e2237b6922::t_e64a5270d30fbc 1-43
+apps/construction-management/src/masters/domain/terms-condition.ts
+  s_6604e2237b6922::t_092f9126b1a659 1-173
+apps/construction-management/src/masters/infrastructure/create-material-handlers.ts
+  s_6604e2237b6922::t_d4a927171cd1f8 1-57
+apps/construction-management/src/masters/infrastructure/create-party-handlers.ts
+  s_6604e2237b6922::t_3ef0aec52b00db 3-8,11,16,23-42
+apps/construction-management/src/masters/infrastructure/material-seeds.test.ts
+  s_6604e2237b6922::t_ed2332489e3211 1-66
+apps/construction-management/src/masters/infrastructure/prisma-master-usage.ts
+  s_6604e2237b6922::t_c68a2bca00f6c8 9-10,14
+apps/construction-management/src/masters/infrastructure/prisma-material-master-stores.ts
+  s_6604e2237b6922::t_27194dff8f13fc 1-651
+apps/construction-management/src/masters/infrastructure/prisma-paging.ts
+  s_6604e2237b6922::t_65aacd45f37492 1-60
+apps/construction-management/src/masters/infrastructure/prisma-party-store.ts
+  s_6604e2237b6922::t_af2a0d268311e7 33-35,72-74,135-137,165-172,175,365
+apps/construction-management/src/masters/infrastructure/prisma-quotation-store.ts
+  s_6604e2237b6922::t_ab9abb8f45e265 1-276
+apps/construction-management/src/masters/infrastructure/seed-company-masters.ts
+  s_6604e2237b6922::t_6351cafa45b6c9 32-148,150-152,209-213
+apps/construction-management/src/masters/infrastructure/seeds/masters.json
+  s_6604e2237b6922::t_248c6768b73749 68-141
+packages/db/construction/prisma/migrations/20261011100000_construction_masters_material_seeds/migration.sql
+  s_6604e2237b6922::t_3f85408b2ce1e1 1-121
+apps/construction-management/src/masters/application/material-master-handlers.ts
+  s_8b6911ff87b19b::t_cabf6b2fd59f6c 1-670
+apps/construction-management/src/masters/application/material-ports.ts
+  s_4ca43a567c5955::t_c677718a24b374 1-143
+apps/construction-management/src/masters/domain/material.ts
+  s_8b6911ff87b19b::t_ce5d7bb9e7ba3d 1-339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a16d98aebeeecfcc709a51dde343b77949402385",
+  "prompts": {},
+  "sessions": {
+    "s_4ca43a567c5955": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eb991c63013f969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8b6911ff87b19b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec7939dd8bcc4694",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
