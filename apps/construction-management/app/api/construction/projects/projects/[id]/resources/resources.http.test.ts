@@ -170,11 +170,7 @@ async function hrmsMember(company: Company): Promise<string> {
   return member.id;
 }
 
-async function memberOn(
-  company: Company,
-  projectIds: string[],
-  flags: Flag[],
-) {
+async function memberOn(company: Company, projectIds: string[], flags: Flag[]) {
   const member = await memberWith(company, { "projects.project": flags });
   await createTeamMemberHandlers().assignProjects({
     workspaceId: company.workspaceId,

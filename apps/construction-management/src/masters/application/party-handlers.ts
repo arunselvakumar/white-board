@@ -374,16 +374,14 @@ export class PartyHandlers {
       input.workspaceId,
       party.projectIds,
     );
-    if (live.size > 0)
+    if (live.size > 0) {
+      const names = [...live.values()].map((project) => project.name);
       throw conflict(
         `${this.info.code}_ON_PROJECTS`,
-        `This ${this.info.label} is on ${[...live.values()]
-          .map((project) => project.name)
-          .join(
-            ", ",
-          )}. Take them off their Projects first, or make them inactive.`,
+        `This ${this.info.label} is on ${names.join(", ")}. Take them off their Projects first, or make them inactive.`,
         { projectIds: [...live.keys()] },
       );
+    }
     const loadedAt = party.updatedAt;
     const before = party.snapshot();
     const now = this.clock();

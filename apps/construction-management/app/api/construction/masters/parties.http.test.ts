@@ -19,7 +19,10 @@ import {
 import { POST as deleteSupplier } from "./suppliers/[id]/delete/route";
 import { GET as getSupplier } from "./suppliers/[id]/route";
 import { POST as updateSupplier } from "./suppliers/[id]/update/route";
-import { GET as listSuppliers, POST as createSupplier } from "./suppliers/route";
+import {
+  GET as listSuppliers,
+  POST as createSupplier,
+} from "./suppliers/route";
 
 const CONTRACTORS = `${TEST_ORIGIN}/api/construction/masters/contractors`;
 const SUPPLIERS = `${TEST_ORIGIN}/api/construction/masters/suppliers`;
@@ -267,7 +270,11 @@ describe("Contractors and Suppliers (CM-406)", () => {
         StatusCodes.BAD_REQUEST,
         "CONTRACTOR_NAME_TOO_LONG",
       ],
-      [{ name: "A", mobile: "12345" }, StatusCodes.BAD_REQUEST, "MOBILE_INVALID"],
+      [
+        { name: "A", mobile: "12345" },
+        StatusCodes.BAD_REQUEST,
+        "MOBILE_INVALID",
+      ],
       [{ name: "A", email: "nope" }, StatusCodes.BAD_REQUEST, "EMAIL_INVALID"],
       [
         { name: "A", gstin: "33AAPFA0939F1ZW" },
@@ -332,7 +339,9 @@ describe("Contractors and Suppliers (CM-406)", () => {
     }
     const list = async (query: string) =>
       json<Page>(
-        await listSuppliers(jsonRequest(`${SUPPLIERS}?${query}`, company.cookie)),
+        await listSuppliers(
+          jsonRequest(`${SUPPLIERS}?${query}`, company.cookie),
+        ),
       );
 
     const all = await list("");
