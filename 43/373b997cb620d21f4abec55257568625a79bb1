@@ -1,0 +1,43 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_a7ba28d0983d43 89-92,813-816
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-models.ts
+  s_7d8917753e260e::t_bbe166626a3e6b 1-113
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-openapi.ts
+  s_7d8917753e260e::t_1f914430f87305 1-61
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_7d8917753e260e::t_eb3769407d06b0 1-86
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery.http.test.ts
+  s_7d8917753e260e::t_4b1372a8c4ef3b 1-456
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/handlers.ts
+  s_7d8917753e260e::t_9d8a88e202c2a3 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/route.ts
+  s_7d8917753e260e::t_1129b18e007dd8 1-76
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/uploaders/route.ts
+  s_7d8917753e260e::t_93d8192e53af4c 1-31
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_b4c6d471067959 443
+apps/construction-management/src/projects/application/project-gallery.ts
+  s_7d8917753e260e::t_8f4b95159e6aae 1-127
+apps/construction-management/src/projects/domain/media-item.ts
+  s_7d8917753e260e::t_5c069f053f0b61 1-2,44-55
+apps/construction-management/src/projects/infrastructure/create-project-gallery.ts
+  s_7d8917753e260e::t_819f6bef0996c0 1-17
+apps/construction-management/src/projects/infrastructure/prisma-gallery-reader.ts
+  s_7d8917753e260e::t_148c0b9ccb0ebc 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "43373b997cb620d21f4abec55257568625a79bb1",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
