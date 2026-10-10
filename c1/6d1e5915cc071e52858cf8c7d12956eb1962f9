@@ -1,0 +1,43 @@
+apps/construction-management/app/app/workspace/hrms/configuration/branches/page.tsx
+  s_6a70f1cb429bb6::t_140d17d47e6e39 3,10-12
+apps/construction-management/components/hrms/branch-dialog.tsx
+  s_6a70f1cb429bb6::t_b6ef20160e8f94 1-318
+apps/construction-management/components/hrms/branches-page.stories.tsx
+  s_6a70f1cb429bb6::t_a9d423fc8d82d4 1-422
+apps/construction-management/components/hrms/hrms-parts.tsx
+  s_6a70f1cb429bb6::t_a17595ebcfbae5 1-218
+apps/construction-management/src/queries/hrms-branches.ts
+  s_6a70f1cb429bb6::t_0c3388039572c7 1-66
+apps/construction-management/components/hrms/branch-members-dialog.tsx
+  s_f9fe308a3252b4::t_a01927aa6e8512 1-152
+apps/construction-management/components/hrms/branches-page.tsx
+  s_f9fe308a3252b4::t_f417a428d81f5a 1-278
+apps/construction-management/components/hrms/fence-map-picker.tsx
+  s_f9fe308a3252b4::t_82ed9794c6723c 1-176
+apps/construction-management/components/hrms/fence-map.tsx
+  s_f9fe308a3252b4::t_a8238f936dffac 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c16d1e5915cc071e52858cf8c7d12956eb1962f9",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f9fe308a3252b4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8cdfaf04a7a48da5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
