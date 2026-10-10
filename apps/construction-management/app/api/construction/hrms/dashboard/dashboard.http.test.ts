@@ -266,7 +266,7 @@ describe("HRMS dashboard HTTP (CM-319)", () => {
 
   it("is on the API docs", async () => {
     const document = await json<{ paths: Record<string, unknown> }>(
-      await getOpenApi(),
+      getOpenApi(),
     );
     expect(document.paths).toHaveProperty("/api/construction/hrms/dashboard");
   });

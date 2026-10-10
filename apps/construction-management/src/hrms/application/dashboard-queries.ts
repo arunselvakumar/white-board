@@ -431,7 +431,9 @@ export class HrmsDashboardQueries {
     const [view, balances, pendingLeave, pendingCancellations] =
       await Promise.all([
         readsAttendance ? this.sources.attendance.today({ access }) : null,
-        readsLeave ? this.sources.leaveBalances.memberBalances(access, {}) : null,
+        readsLeave
+          ? this.sources.leaveBalances.memberBalances(access, {})
+          : null,
         readsLeave
           ? this.sources.leaveRequests.listMine(access, { status: "pending" })
           : null,

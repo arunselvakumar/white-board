@@ -89,7 +89,6 @@ const TREND_FROM = addDays(TODAY, -13);
 const TREND = Array.from({ length: 14 }, (_, index) =>
   addDays(TREND_FROM, index),
 );
-const SUNDAYS = new Set(["2026-09-27", "2026-10-04"]);
 const GANDHI_JAYANTI = "2026-10-02";
 const M3_LEAVE = ["2026-10-08", "2026-10-09", TODAY];
 
@@ -686,9 +685,7 @@ describe("HRMS dashboard (CM-319)", () => {
     });
     expect(dashboard.me?.name).toBe("Prabhu Saravanan");
     expect(calls).not.toContain("teamToday");
-    expect(calls.some((call) => call.startsWith("leaveApprovals"))).toBe(
-      false,
-    );
+    expect(calls.some((call) => call.startsWith("leaveApprovals"))).toBe(false);
   });
 
   it("gives an approver without View All the approvals but not the team", async () => {

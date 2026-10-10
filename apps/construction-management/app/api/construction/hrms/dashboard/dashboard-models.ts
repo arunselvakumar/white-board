@@ -173,7 +173,10 @@ export function toDashboardResponse(
     approvals:
       dashboard.approvals == null
         ? null
-        : { ...dashboard.approvals, items: dashboard.approvals.items.map(item) },
+        : {
+            ...dashboard.approvals,
+            items: dashboard.approvals.items.map(item),
+          },
     me:
       me == null
         ? null
