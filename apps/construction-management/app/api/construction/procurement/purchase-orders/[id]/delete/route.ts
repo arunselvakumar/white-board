@@ -29,13 +29,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requirePurchaseOrderAccess(request, id, ["delete"]);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementPurchaseOrderRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requirePurchaseOrderAccess(request, id, ["delete"]);
-    if (isResponse(session)) return session;
     await handlers.delete(
       session.access,
       id,

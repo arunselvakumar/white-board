@@ -25,13 +25,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requirePurchaseRequestAccess(request, id, "reject");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       RejectConstructionProcurementPurchaseRequestRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requirePurchaseRequestAccess(request, id, "reject");
-    if (isResponse(session)) return session;
     await handlers.decide(
       session.access,
       id,

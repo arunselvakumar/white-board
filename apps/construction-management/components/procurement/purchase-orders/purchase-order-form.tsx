@@ -218,7 +218,15 @@ function PurchaseOrderFields({
   /** Loads a PR's pending items as lines, rates from the Material master. */
   const loadPurchaseRequest = async (prId: string) => {
     form.setValue("purchaseRequestId", prId);
-    if (prId === "") return;
+    if (prId === "") {
+      // Back to no Purchase Request: keep the lines, without their links.
+      replace(
+        form
+          .getValues("lines")
+          .map((line) => ({ ...line, purchaseRequestItemId: null })),
+      );
+      return;
+    }
     const pr = options.purchaseRequests.find((item) => item.id === prId);
     if (pr == null) return;
     setLoadingPr(true);

@@ -25,16 +25,16 @@ export async function POST(
         await context.params,
       ),
     );
-    const model = parseOrThrow(
-      DecideConstructionProcurementPurchaseOrderRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requirePurchaseOrderAccess(request, id, [
       "update",
       "approve",
     ]);
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      DecideConstructionProcurementPurchaseOrderRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const expected =
       model.expectedUpdatedAt == null
         ? undefined

@@ -56,6 +56,7 @@ import {
 import {
   excessNow,
   goodsReceiptFormDefaults,
+  linkedOrderMissing,
   goodsReceiptFormSchema,
   goodsReceiptPayload,
   liveAmounts,
@@ -548,6 +549,7 @@ function GoodsReceiptForm({
   });
   const [failure, setFailure] = useState<unknown>(null);
   const errors = form.formState.errors;
+  const orderMissing = linkedOrderMissing(options, receipt);
   const supplierId = useWatch({ control: form.control, name: "supplierId" });
   const purchaseOrderId = useWatch({
     control: form.control,
@@ -830,9 +832,15 @@ function GoodsReceiptForm({
       {shortfalls != null && (
         <StockShortfallAlert shortfalls={shortfalls} action="edit" />
       )}
-      <FormAlert message={errors.root?.message} />
+      <FormAlert
+        message={
+          orderMissing
+            ? `This Goods Receipt is on ${receipt?.purchaseOrder?.number ?? "a Purchase Order"}, which could not be loaded. Reload the page; it cannot be saved without its Purchase Order.`
+            : errors.root?.message
+        }
+      />
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" disabled={saving || orderMissing}>
           {saving
             ? "Saving…"
             : receipt == null

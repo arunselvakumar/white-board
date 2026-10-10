@@ -29,13 +29,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireReceiptAccess(request, "delete", id);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementGoodsReceiptRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireReceiptAccess(request, "delete", id);
-    if (isResponse(session)) return session;
     await handlers.delete({
       actor: actorOf(session),
       id,

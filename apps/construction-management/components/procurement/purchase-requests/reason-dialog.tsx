@@ -44,16 +44,19 @@ export function ReasonDialog({
   const [problem, setProblem] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [busy, setBusy] = useState(false);
+  /** Closing by any route (Cancel, Escape, the X) starts the next opening clean. */
+  const close = () => {
+    setReason("");
+    setProblem(undefined);
+    setError(undefined);
+    onOpenChange(false);
+  };
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) {
-          setReason("");
-          setProblem(undefined);
-          setError(undefined);
-        }
-        onOpenChange(next);
+        if (next) onOpenChange(true);
+        else close();
       }}
     >
       <DialogContent>
@@ -79,10 +82,7 @@ export function ReasonDialog({
             setBusy(true);
             setError(undefined);
             onSubmit(text)
-              .then(() => {
-                setReason("");
-                onOpenChange(false);
-              })
+              .then(close)
               .catch((failure: unknown) => {
                 setError(
                   failure instanceof Error
@@ -111,13 +111,7 @@ export function ReasonDialog({
             <FieldError message={problem} />
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onOpenChange(false);
-              }}
-            >
+            <Button type="button" variant="outline" onClick={close}>
               Cancel
             </Button>
             <Button

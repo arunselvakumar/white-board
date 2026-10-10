@@ -25,13 +25,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requirePurchaseOrderAccess(request, id, ["update"]);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       CloseConstructionProcurementPurchaseOrderRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requirePurchaseOrderAccess(request, id, ["update"]);
-    if (isResponse(session)) return session;
     const expected =
       model.expectedUpdatedAt == null
         ? undefined

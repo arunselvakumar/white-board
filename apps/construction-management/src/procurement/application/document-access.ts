@@ -1,4 +1,10 @@
-import { can, type Flag, type MemberAccess } from "@/src/shared-kernel/access";
+import {
+  can,
+  hasFlag,
+  menuByKey,
+  type Flag,
+  type MemberAccess,
+} from "@/src/shared-kernel/access";
 
 import type { LocatedDocument } from "../domain/document-thread";
 import { PROCUREMENT_DOCUMENTS } from "../domain/documents";
@@ -19,6 +25,22 @@ export function canOnDocument(
   return scopes.some((projectId) =>
     can(access, menu, flag, projectId == null ? {} : { projectId }),
   );
+}
+
+/**
+ * Whether View all hides this document from the member: its menu has the
+ * View all flag (Material Received), the member lacks it on the
+ * document's side, and someone else raised it. The document's own routes
+ * answer 404 then, and so do its thread and files.
+ */
+export function hiddenWithoutViewAll(
+  access: MemberAccess,
+  document: Pick<LocatedDocument, "type" | "scopes" | "createdBy">,
+): boolean {
+  const { menu } = PROCUREMENT_DOCUMENTS[document.type];
+  if (!hasFlag(menuByKey(menu)?.supported ?? 0, "view_all")) return false;
+  if (document.createdBy === access.userId) return false;
+  return !canOnDocument(access, document, "view_all");
 }
 
 /**

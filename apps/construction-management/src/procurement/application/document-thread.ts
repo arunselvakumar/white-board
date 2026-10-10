@@ -39,6 +39,7 @@ import {
 import type { ProcurementDocumentType } from "../domain/documents";
 import {
   documentRights,
+  hiddenWithoutViewAll,
   mayRemove,
   type DocumentRights,
 } from "./document-access";
@@ -127,7 +128,8 @@ export class DocumentThread {
       type,
       documentId,
     );
-    if (document == null) throw documentNotFound(type);
+    if (document == null || hiddenWithoutViewAll(viewer, document))
+      throw documentNotFound(type);
     const rights = documentRights(viewer, document);
     if (!rights.read) throw permissionDenied();
     return { document, rights };
