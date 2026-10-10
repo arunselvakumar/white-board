@@ -78,7 +78,9 @@ export function materialOptionsHandler(
   const ids = query.get("ids")?.split(",");
   const items = options.filter(
     (option) =>
-      (search == null || option.name.toLowerCase().includes(search)) &&
+      (search == null ||
+        option.name.toLowerCase().includes(search) ||
+        (option.specification?.toLowerCase().includes(search) ?? false)) &&
       (categoryId == null || option.categoryId === categoryId) &&
       (ids == null || ids.includes(option.id)),
   );

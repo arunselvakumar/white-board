@@ -473,6 +473,10 @@ model ConstructionProcurementStockEntry {
   createdAt         DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
   createdBy         String                                @map("created_by")
 
+  /// The entry this one reverses (append-only, so never deleted).
+  reverses   ConstructionProcurementStockEntry? @relation("StockEntryReversal", fields: [reversesEntryId], references: [id], onDelete: Restrict)
+  reversedBy ConstructionProcurementStockEntry? @relation("StockEntryReversal")
+
   @@index([workspaceId, locationKind, locationId, materialId, entryDate])
   @@index([workspaceId, materialId, entryDate])
   @@index([sourceType, sourceId])
