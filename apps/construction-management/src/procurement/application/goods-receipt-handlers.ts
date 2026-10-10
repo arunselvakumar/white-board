@@ -936,7 +936,7 @@ export class GoodsReceiptHandlers {
     const order = await this.linkedOrder(tx, input, location, supplier, stored);
     const supplyType: SupplyType =
       input.supplyType ??
-      (stored != null && stored.purchaseOrderId === (order?.id ?? null)
+      (stored?.purchaseOrderId === (order?.id ?? null)
         ? stored.supplyType
         : (order?.supplyType ??
           defaultSupplyType(supplier.stateCode, location.stateCode)));
@@ -953,7 +953,7 @@ export class GoodsReceiptHandlers {
         : [];
     const materials: Map<string, MaterialFacts> =
       materialIds.length === 0
-        ? new Map()
+        ? new Map<string, MaterialFacts>()
         : await this.deps.directory.materials(tx, ws, materialIds);
     const orderLines = new Map(order?.lines.map((line) => [line.id, line]));
     const storedLines = new Map(stored?.lines.map((line) => [line.id, line]));

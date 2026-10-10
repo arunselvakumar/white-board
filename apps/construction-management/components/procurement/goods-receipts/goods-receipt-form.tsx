@@ -682,9 +682,7 @@ function GoodsReceiptForm({
                         supplyTypeFor(
                           options,
                           value,
-                          order != null && order.supplierId === value
-                            ? order
-                            : null,
+                          order?.supplierId === value ? order : null,
                         ),
                       );
                     }}
