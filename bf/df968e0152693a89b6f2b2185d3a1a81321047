@@ -1,0 +1,177 @@
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/approve/route.ts
+  s_6604e2237b6922::t_660a7cd82b68e7 1-50
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/close/route.ts
+  s_6604e2237b6922::t_aefd978c72cd94 1-50
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/delete/route.ts
+  s_6604e2237b6922::t_c4efc4be2d7c5b 1-48
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/mark-ordered/route.ts
+  s_6604e2237b6922::t_419bca002160a3 1-53
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/pdf/route.ts
+  s_6604e2237b6922::t_5b441de3636f70 1-80
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/reject/route.ts
+  s_6604e2237b6922::t_00abbfd9f33d1e 1-55
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/route.ts
+  s_6604e2237b6922::t_ac8572f3b80fcf 1-39
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/update/route.ts
+  s_6604e2237b6922::t_e5777c80fa7458 1-55
+apps/construction-management/app/api/construction/procurement/purchase-orders/bulk-approve/route.ts
+  s_6604e2237b6922::t_ddc753dd93c500 1-52
+apps/construction-management/app/api/construction/procurement/purchase-orders/bulk-reject/route.ts
+  s_6604e2237b6922::t_1c091f4f8f546b 1-52
+apps/construction-management/app/api/construction/procurement/purchase-orders/form-options/route.ts
+  s_6604e2237b6922::t_f73c5d82de09a3 1-63
+apps/construction-management/app/api/construction/procurement/purchase-orders/handlers.ts
+  s_6604e2237b6922::t_bd2e8a13d5dc95 1-66
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-order-models.ts
+  s_6604e2237b6922::t_272a1becfa9143 1-549
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders-openapi.ts
+  s_6604e2237b6922::t_f91976316f0e90 1-2,8-47,49-212,214-220
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders.http.test.ts
+  s_6604e2237b6922::t_147980e0917e42 1-717
+apps/construction-management/app/api/construction/procurement/purchase-orders/route.ts
+  s_6604e2237b6922::t_c6e8e48a2b6ed2 1-123
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/approve/route.ts
+  s_6604e2237b6922::t_29a39270a000ad 1-53
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/delete/route.ts
+  s_6604e2237b6922::t_3c2691b8175d4a 1-48
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/mark-ordered/route.ts
+  s_6604e2237b6922::t_fd6ae7fe46f410 1-70
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/pdf/route.ts
+  s_6604e2237b6922::t_bf14ac7d740e5d 1-69
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/reject/route.ts
+  s_6604e2237b6922::t_3e07f683f660e4 1-53
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/route.ts
+  s_6604e2237b6922::t_cdd60b8c5f60ed 1-39
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/update/route.ts
+  s_6604e2237b6922::t_e6d597016e8fcd 1-55
+apps/construction-management/app/api/construction/procurement/purchase-requests/bulk-approve/route.ts
+  s_6604e2237b6922::t_eca244019031ad 1-53
+apps/construction-management/app/api/construction/procurement/purchase-requests/bulk-reject/route.ts
+  s_6604e2237b6922::t_861c8321c1f111 1-53
+apps/construction-management/app/api/construction/procurement/purchase-requests/handlers.ts
+  s_6604e2237b6922::t_b497e016d18a80 1-94
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-request-models.ts
+  s_6604e2237b6922::t_bf11e48b20dc67 1-380
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-requests-openapi.ts
+  s_6604e2237b6922::t_d35a63a6422291 1-2,8-48,50-67,69-222
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-requests.http.test.ts
+  s_6604e2237b6922::t_7da6a04f7abe25 1-569
+apps/construction-management/app/api/construction/procurement/purchase-requests/quantity-info/route.ts
+  s_6604e2237b6922::t_b68dac686e6d57 1-54
+apps/construction-management/app/api/construction/procurement/purchase-requests/route.ts
+  s_6604e2237b6922::t_3f6cf1a1a40eaa 1-121
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/edit/page.tsx
+  s_6604e2237b6922::t_28f252da6a19a2 1-19
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/page.tsx
+  s_6604e2237b6922::t_d6ee250a34acd0 1-28
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/new/page.tsx
+  s_6604e2237b6922::t_8275502d81a323 1-31
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/page.tsx
+  s_6604e2237b6922::t_459422d6b417d1 3,7-14
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/[prId]/edit/page.tsx
+  s_6604e2237b6922::t_b720439f232d0b 1-19
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/[prId]/page.tsx
+  s_6604e2237b6922::t_7391a5cdd499be 1-28
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/new/page.tsx
+  s_6604e2237b6922::t_db3658b38f862d 1-31
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/page.tsx
+  s_6604e2237b6922::t_8e6beb721499be 3,7-14
+apps/construction-management/components/procurement/purchase-orders/edit-purchase-order.tsx
+  s_6604e2237b6922::t_35aee87ccedf90 1-53
+apps/construction-management/components/procurement/purchase-orders/purchase-order-actions.tsx
+  s_6604e2237b6922::t_165066be269018 1-277
+apps/construction-management/components/procurement/purchase-orders/purchase-order-detail.tsx
+  s_6604e2237b6922::t_0fd5a6d0b27051 1-412
+apps/construction-management/components/procurement/purchase-orders/purchase-order-fixtures.ts
+  s_6604e2237b6922::t_721f351505ac35 1-283
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form-schema.ts
+  s_6604e2237b6922::t_125129992dc67b 1-443
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_6604e2237b6922::t_08579dc858e075 1-836
+apps/construction-management/components/procurement/purchase-orders/purchase-order-format.tsx
+  s_6604e2237b6922::t_1135ada432df05 1-47
+apps/construction-management/components/procurement/purchase-orders/purchase-order-line-sheet.tsx
+  s_6604e2237b6922::t_e5d0eb89a41b73 1-311
+apps/construction-management/components/procurement/purchase-orders/purchase-orders-page.tsx
+  s_6604e2237b6922::t_3243ccc8a326d7 1-526
+apps/construction-management/components/procurement/purchase-orders/purchase-orders.stories.tsx
+  s_6604e2237b6922::t_ab857098726a08 1-376
+apps/construction-management/components/procurement/purchase-requests/date-filter.tsx
+  s_6604e2237b6922::t_b6a8fb62062931 1-93
+apps/construction-management/components/procurement/purchase-requests/edit-purchase-request.tsx
+  s_6604e2237b6922::t_19c18c2cae2bbb 1-48
+apps/construction-management/components/procurement/purchase-requests/filter-select.tsx
+  s_6604e2237b6922::t_4fd0382a2a5c62 1-56
+apps/construction-management/components/procurement/purchase-requests/purchase-request-actions.tsx
+  s_6604e2237b6922::t_b05424c69f5dd6 1-279
+apps/construction-management/components/procurement/purchase-requests/purchase-request-detail.tsx
+  s_6604e2237b6922::t_9a2af8959c83ef 1-260
+apps/construction-management/components/procurement/purchase-requests/purchase-request-fixtures.ts
+  s_6604e2237b6922::t_68de1b8f07272f 1-295
+apps/construction-management/components/procurement/purchase-requests/purchase-request-format.tsx
+  s_6604e2237b6922::t_bf40d8088880c4 1-106
+apps/construction-management/components/procurement/purchase-requests/purchase-request-wizard.tsx
+  s_6604e2237b6922::t_efcf7d277a9334 1-641
+apps/construction-management/components/procurement/purchase-requests/purchase-requests-page.tsx
+  s_6604e2237b6922::t_c3e360d02bb8ea 1-567
+apps/construction-management/components/procurement/purchase-requests/purchase-requests.stories.tsx
+  s_6604e2237b6922::t_cb812f2fda32bd 1-401
+apps/construction-management/components/procurement/purchase-requests/reason-dialog.tsx
+  s_6604e2237b6922::t_858bc184a99ea9 1-135
+apps/construction-management/components/procurement/purchase-requests/scroll-table.tsx
+  s_6604e2237b6922::t_43e68215551958 1-35
+apps/construction-management/next.config.ts
+  s_6604e2237b6922::t_77056d0c05a368 25-26,31-38
+apps/construction-management/src/procurement/application/purchase-order-handlers.ts
+  s_6604e2237b6922::t_407e659d37b936 1-1177
+apps/construction-management/src/procurement/application/purchase-request-handlers.ts
+  s_6604e2237b6922::t_d39399fafc0a53 1-930
+apps/construction-management/src/procurement/domain/purchase-order-amount-words.ts
+  s_6604e2237b6922::t_2d2f509e3d11db 1-87
+apps/construction-management/src/procurement/domain/purchase-order.test.ts
+  s_6604e2237b6922::t_238de0f59d6b41 1-302
+apps/construction-management/src/procurement/domain/purchase-order.ts
+  s_6604e2237b6922::t_1efcb159d7ae79 1-408
+apps/construction-management/src/procurement/domain/purchase-request-date-presets.test.ts
+  s_6604e2237b6922::t_6831f7fda870ef 1-45
+apps/construction-management/src/procurement/domain/purchase-request-date-presets.ts
+  s_6604e2237b6922::t_bfcb4b0922563d 1-53
+apps/construction-management/src/procurement/domain/purchase-request.test.ts
+  s_6604e2237b6922::t_730b9e9cdcb664 1-214
+apps/construction-management/src/procurement/domain/purchase-request.ts
+  s_6604e2237b6922::t_b834f0d4c3443e 1-289
+apps/construction-management/src/procurement/infrastructure/prisma-purchase-order-store.ts
+  s_6604e2237b6922::t_52c57c6f4603b4 1-441
+apps/construction-management/src/procurement/infrastructure/prisma-purchase-request-store.ts
+  s_6604e2237b6922::t_e60db25f065678 1-415
+apps/construction-management/src/procurement/infrastructure/purchase-order-form-options.ts
+  s_6604e2237b6922::t_e602f9318d4012 1-157
+apps/construction-management/src/procurement/infrastructure/purchase-order-pdf-writer.ts
+  s_6604e2237b6922::t_62b32140d912b7 1-299
+apps/construction-management/src/procurement/infrastructure/purchase-order-pdf.ts
+  s_6604e2237b6922::t_e264d3aa68fde2 1-273
+apps/construction-management/src/procurement/infrastructure/purchase-request-ordering.ts
+  s_6604e2237b6922::t_b347c4166f35e9 1-66
+apps/construction-management/src/procurement/infrastructure/purchase-request-pdf.ts
+  s_6604e2237b6922::t_f0696811f9cdf7 1-205
+apps/construction-management/src/queries/purchase-orders.ts
+  s_6604e2237b6922::t_3328dda61619bb 1-177
+apps/construction-management/src/queries/purchase-requests.ts
+  s_6604e2237b6922::t_a372341401a7cf 1-200
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bfdf968e0152693a89b6f2b2185d3a1a81321047",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
