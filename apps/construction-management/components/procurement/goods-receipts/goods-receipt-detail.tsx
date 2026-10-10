@@ -121,8 +121,13 @@ function Details({
 function Lines({ receipt }: { receipt: GoodsReceipt }) {
   const withOrder = receipt.purchaseOrder != null;
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
+    <div
+      role="region"
+      aria-label="Materials received, scrolls sideways"
+      tabIndex={0}
+      className="focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible"
+    >
+      <Table aria-label="Materials received">
         <TableHeader>
           <TableRow>
             <TableHead>Material</TableHead>

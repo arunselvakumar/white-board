@@ -15,8 +15,10 @@ import {
 } from "@/src/shared-kernel/gst-line";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import type { ProjectMediaRemoved } from "@/src/shared-kernel/project-media";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
+import { gallerySourceOf } from "../domain/document-thread";
 import { PROCUREMENT_DOCUMENTS } from "../domain/documents";
 import type { GoodsReceiptPosted } from "../domain/events";
 import {
@@ -282,6 +284,8 @@ export type GoodsReceiptDeps = {
   backdated: GoodsReceiptBackdated;
   today: (workspaceId: string) => Promise<CalendarDate>;
   dispatcher: EventDispatcher;
+  /** The Gallery index (`ProjectMediaRemoved` for a deleted GRN's files). */
+  media: EventDispatcher;
   /** A plain (non-transaction) client for reads. */
   db: Db;
 };
@@ -705,7 +709,7 @@ export class GoodsReceiptHandlers {
     check("goods_receipt", "edit", loaded.receiptDate);
     check("goods_receipt", "edit", loaded.inventoryDate);
     const now = new Date();
-    const events = await this.deps.store.transaction(async (tx) => {
+    const deleted = await this.deps.store.transaction(async (tx) => {
       const stored = await this.lockLive(tx, input, loaded.id);
       await this.deps.store.tombstone(tx, stored, actor.userId, now);
       const ledger = await this.deps.ledger.reverseSource(
@@ -725,9 +729,24 @@ export class GoodsReceiptHandlers {
         before: snapshot(stored),
         occurredAt: now,
       });
-      return [...ledger.events, posted(stored, "deleted", now)];
+      return {
+        stored,
+        events: [...ledger.events, posted(stored, "deleted", now)],
+      };
     });
-    await this.deps.dispatcher.dispatch(events);
+    await this.deps.dispatcher.dispatch(deleted.events);
+    // Its files leave the Project's Gallery with it (ADR CM-0014).
+    if (deleted.stored.location.kind === "project") {
+      const removed: ProjectMediaRemoved = {
+        type: "ProjectMediaRemoved",
+        workspaceId: actor.workspaceId,
+        occurredAt: now,
+        projectId: deleted.stored.location.id,
+        source: gallerySourceOf("goods_receipt"),
+        sourceId: deleted.stored.id,
+      };
+      await this.deps.media.dispatch([removed]);
+    }
   }
 
   /** The PDF's data: the GRN as viewed plus the Company's name. */

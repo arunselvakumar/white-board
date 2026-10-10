@@ -336,7 +336,23 @@ describe("Goods Receipts (CM-505)", () => {
     );
     expect(without.total).toBe(0);
 
-    // Deleting the second reverses its stock and the PO's receipt.
+    // Deleting the second reverses its stock and the PO's receipt, and
+    // takes its files out of the Project's Gallery.
+    await prisma.constructionProjectsMediaItem.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: owner.workspaceId,
+        projectId: f.projectId,
+        source: "goods_receipt",
+        sourceId: excess.id,
+        fileKey: `test/${randomUUID()}.jpg`,
+        fileName: "challan.jpg",
+        contentType: "image/jpeg",
+        bytes: 1200,
+        uploadedBy: owner.userId,
+        uploadedAt: new Date(),
+      },
+    });
     const deleted = await remove(owner.cookie, excess.id, excess.updatedAt);
     expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
     expect(await orderReceipt(order.id)).toEqual({
@@ -349,6 +365,10 @@ describe("Goods Receipts (CM-505)", () => {
     expect((await get(owner.cookie, excess.id)).status).toBe(
       StatusCodes.NOT_FOUND,
     );
+    const media = await prisma.constructionProjectsMediaItem.findFirstOrThrow({
+      where: { source: "goods_receipt", sourceId: excess.id },
+    });
+    expect(media.deletedAt).not.toBeNull();
     const audits = await prisma.constructionOrganizationAuditEvent.findMany({
       where: { workspaceId: owner.workspaceId, entityType: "goods_receipt" },
       select: { action: true },

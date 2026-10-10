@@ -9,6 +9,7 @@ import {
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
+import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import {
   goodsReceiptNotFound,
   type GoodsReceiptActor,
@@ -24,6 +25,7 @@ import { isWriteFlag } from "@/src/shared-kernel/plan";
 /** One set of Goods Receipt handlers for every route (CM-505). */
 export const goodsReceiptHandlers = createGoodsReceiptHandlers({
   directory: procurementDirectory,
+  media: projectMediaDispatcher(),
 });
 
 /** Material Received (`modules/06` #30): C R U D P N V O F, project-scoped. */

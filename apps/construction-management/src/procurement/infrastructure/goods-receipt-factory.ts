@@ -26,6 +26,8 @@ export function createGoodsReceiptHandlers(deps: {
   prisma?: PrismaClient;
   payments?: GoodsReceiptPayments;
   dispatcher?: EventDispatcher;
+  /** The Gallery index (`projectMediaDispatcher()` in composition). */
+  media?: EventDispatcher;
 }): GoodsReceiptHandlers {
   const db = deps.prisma ?? prisma;
   return new GoodsReceiptHandlers({
@@ -36,6 +38,7 @@ export function createGoodsReceiptHandlers(deps: {
     backdated: (actor) => loadBackdatedCheck(db, actor),
     today: (workspaceId) => companyToday(db, workspaceId),
     dispatcher: deps.dispatcher ?? new InProcessEventDispatcher(),
+    media: deps.media ?? new InProcessEventDispatcher(),
     db,
   });
 }

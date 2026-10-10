@@ -31,7 +31,10 @@ export type UpdateGoodsReceiptInput =
 export const GOODS_RECEIPTS_API = `${PROCUREMENT_API}/goods-receipts`;
 
 /** Every GRN query key starts here (under `PROCUREMENT_KEY`). */
-export const GOODS_RECEIPTS_KEY = [...PROCUREMENT_KEY, "goods-receipts"] as const;
+export const GOODS_RECEIPTS_KEY = [
+  ...PROCUREMENT_KEY,
+  "goods-receipts",
+] as const;
 
 export type GoodsReceiptLocation = {
   kind: "project" | "store";
@@ -74,9 +77,7 @@ export function goodsReceiptQuery(id: string) {
   return queryOptions({
     queryKey: [...GOODS_RECEIPTS_KEY, "detail", id],
     queryFn: () =>
-      apiJson<GoodsReceipt>(
-        `${GOODS_RECEIPTS_API}/${encodeURIComponent(id)}`,
-      ),
+      apiJson<GoodsReceipt>(`${GOODS_RECEIPTS_API}/${encodeURIComponent(id)}`),
   });
 }
 

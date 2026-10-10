@@ -1,5 +1,9 @@
 import type { ApiCall } from "../../../.storybook/mocks/api";
 import { PROCUREMENT_ACCESS_MENUS } from "@/app/api/construction/procurement/access/access-models";
+import {
+  documentsHandler,
+  type DocumentsApiOptions,
+} from "@/components/procurement/documents/document-fixtures";
 import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
 import {
   GOODS_RECEIPTS_API,
@@ -268,8 +272,12 @@ export function goodsReceiptHandler(options: {
   post?: (call: ApiCall) => Response;
   update?: (call: ApiCall) => Response;
   remove?: (call: ApiCall) => Response;
+  documents?: DocumentsApiOptions;
 }) {
+  const documents = documentsHandler(options.documents);
   return (call: ApiCall): Response | undefined => {
+    const thread = documents(call);
+    if (thread != null) return thread;
     const url = new URL(call.path, "http://storybook.local");
     if (url.pathname === "/api/construction/procurement/access")
       return Response.json(options.access ?? accessWith());
