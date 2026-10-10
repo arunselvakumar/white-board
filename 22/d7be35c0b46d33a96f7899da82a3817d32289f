@@ -1,0 +1,67 @@
+apps/construction-management/CONTEXT.md
+  s_7d8917753e260e::t_0670c45bf1843a 158-161
+apps/construction-management/app/api/construction/labour/summary/route.ts
+  s_7d8917753e260e::t_d3b19a46470bab 16-17,35
+apps/construction-management/app/api/construction/labour/summary/summary-models.ts
+  s_7d8917753e260e::t_2e80d71582678e 10-21
+apps/construction-management/app/api/construction/labour/summary/summary-openapi.ts
+  s_7d8917753e260e::t_1196ed19d75848 24
+apps/construction-management/app/api/construction/labour/summary/summary.http.test.ts
+  s_7d8917753e260e::t_e9c1f729dc7c53 223-263
+apps/construction-management/app/api/construction/projects/dashboard-layout/dashboard-layout-models.ts
+  s_7d8917753e260e::t_0df1167ad7e874 1-70
+apps/construction-management/app/api/construction/projects/dashboard-layout/route.ts
+  s_7d8917753e260e::t_1cf0599b0c0fc9 1-31
+apps/construction-management/app/api/construction/projects/dashboard-layout/update/route.ts
+  s_7d8917753e260e::t_b5ac60a4a95606 1-42
+apps/construction-management/app/api/construction/projects/project-home-openapi.ts
+  s_7d8917753e260e::t_f4a3cd158d6eaa 12-16,51-53,153-187
+apps/construction-management/app/api/construction/projects/projects/[id]/dashboard/dashboard-models.ts
+  s_7d8917753e260e::t_4c979ef410e934 1-74
+apps/construction-management/app/api/construction/projects/projects/[id]/dashboard/summary/route.ts
+  s_7d8917753e260e::t_20733e59159bf5 1-39
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_7d8917753e260e::t_9f95ebb7a70322 1-402
+apps/construction-management/app/app/projects/[id]/dashboard/page.tsx
+  s_7d8917753e260e::t_84eccef8563311 1-44
+apps/construction-management/components/projects/dashboard/attendance-trend.tsx
+  s_7d8917753e260e::t_c1b282868ad78d 1-179
+apps/construction-management/components/projects/dashboard/duration-filter.tsx
+  s_7d8917753e260e::t_ab06f6a1ba4b35 1-102
+apps/construction-management/components/projects/dashboard/manage-dashboard-dialog.tsx
+  s_7d8917753e260e::t_ac0a59fde241ec 1-196
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_7d8917753e260e::t_a473b88e830e25 1-385
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_7d8917753e260e::t_934c2c0de9f462 1-399
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_7d8917753e260e::t_996c56880d70f1 550-559
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_04bd6e168b9d32 445
+apps/construction-management/lib/dashboard-duration.test.ts
+  s_7d8917753e260e::t_d585e1e9e8c6f8 1-44
+apps/construction-management/lib/dashboard-duration.ts
+  s_7d8917753e260e::t_1708e10a8fd8fd 1-82
+apps/construction-management/src/labour/application/project-labour-summary.ts
+  s_7d8917753e260e::t_0769f36a6c2e0b 1-6,36,45-65
+apps/construction-management/src/labour/infrastructure/prisma-project-labour-summary.ts
+  s_7d8917753e260e::t_52fb35aa778c93 22-24,27-32,37
+apps/construction-management/src/queries/project-dashboard.ts
+  s_7d8917753e260e::t_5b68d990c1815a 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "22d7be35c0b46d33a96f7899da82a3817d32289f",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
