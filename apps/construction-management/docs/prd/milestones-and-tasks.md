@@ -405,7 +405,7 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 | CM-317 |  17 | Salary HTTP + screens: Team Salary (calculate, pay advance, mark paid), My Salary, payslip PDF                                                                                                                  | done   | CM-316                 | HTTP+UI        |       |
 | CM-318 |  18 | HRMS member onboarding: `memberType=hrms` applies the HRMS default permission set; HRMS seat counted in plan usage                                                                                              | done   | CM-108, CM-118, CM-303 | Domain         |       |
 | CM-319 |  19 | HRMS dashboard (today's snapshot, present/absent breakdown, day-wise trend, pending approvals) + Workspace tile                                                                                                 | done   | CM-309, CM-313         | UI             |       |
-| CM-320 |  20 | M3 polish: PF/ESI challan input export, Storybook, empty states                                                                                                                                                 | todo   | CM-317, CM-319         | UI             |       |
+| CM-320 |  20 | M3 polish: PF/ESI challan input export, Storybook, empty states                                                                                                                                                 | done   | CM-317, CM-319         | UI             |       |
 
 ### CM-301 — ADR CM-0008
 

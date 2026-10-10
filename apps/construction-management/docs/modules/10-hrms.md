@@ -856,6 +856,18 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 5. Pending approvals list only what the caller can decide now, oldest first, at most 5; upcoming team leaves run 14 days and include pending requests; the next 4 holidays are shown with optional ones flagged.
 6. The Workspace HRMS tile shows "Present today x of y", "On leave" and "To approve" to members with View All, their own day otherwise, and stays a plain link without HRMS access.
 
+**PF / ESI exports and polish (CM-320)**
+
+1. The PF ECR follows EPFO's ECR 2.0 file structure (unchanged by the 2025 revamp): 11 fields separated by `#~#`, no header, CRLF line ends, whole rupees rounded half up, refund of advances 0.
+2. EPF wage is the PF wage after the ceiling; EPS wage and EDLI wage are capped at the statutory ceiling.
+3. NCP days = days in the month − payable days, rounded down (EPFO allows no half days); a member paid nothing gets every day.
+4. A month can be exported only when it has a regular slip and none is still Calculated (`SALARY_MONTH_NOT_APPROVED`). Exports need export and Financial on `hrms.salaries`.
+5. The `.txt` holds members with a UAN; the Excel adds a "Missing UAN" sheet. UAN and IP number come from the slip, or the current salary configuration when the slip has none.
+6. The ESI export covers slips where ESI was deducted: "MC upload" (the six template columns), "Contributions" (with shares and totals), "Missing IP Number" and "Reason codes". Days paid round up; reason code is 0; last working day is blank (exits are not recorded). ESIC wants `.xls`, so the sheet says to save it as Excel 97-2003 before uploading.
+7. Team Salary has an Export menu: Team salary (Excel), PF ECR (.txt / Excel) and ESI contribution (Excel), the statutory items disabled until the month is approved, with a note counting members missing a UAN or IP number.
+8. A 403 on an HRMS page shows "You don't have access to {page}" under the tabs; loading shows a skeleton.
+9. Crons run daily: leave accrual 00:30 UTC (06:00 IST) and automatic salary calculation 01:00 UTC (06:30 IST).
+
 ## Open questions (answered in CM-0012)
 
 1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
