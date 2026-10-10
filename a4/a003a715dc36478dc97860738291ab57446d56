@@ -1,0 +1,21 @@
+apps/construction-management/app/api/construction/procurement/transfers/handlers.ts
+  s_6604e2237b6922::t_b16a8315cb37c4 5,13
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_6604e2237b6922::t_1ff5bf0bc6904a 26,189-190,918-935
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a4a003a715dc36478dc97860738291ab57446d56",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
