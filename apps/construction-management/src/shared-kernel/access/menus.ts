@@ -184,6 +184,13 @@ const DEFINITIONS = [
   ],
   ["masters.materials", "Materials", "master_records", "CRUDF", false],
   [
+    "masters.terms_conditions",
+    "Terms & Conditions",
+    "master_records",
+    "CRUD",
+    false,
+  ],
+  [
     "masters.bank_accounts",
     "Company's Bank A/C",
     "master_records",

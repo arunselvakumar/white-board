@@ -8,6 +8,7 @@ import {
   Images,
   LayoutDashboard,
   MapPin,
+  Package,
   Users,
   Wallet,
   Waves,
@@ -29,6 +30,7 @@ export const PROJECT_MODULE_ICONS: Record<ProjectModuleKey, LucideIcon> = {
   resources: Users,
   attendance: CalendarCheck,
   payments: Wallet,
+  materials: Package,
   reports: FileBarChart,
 };
 
