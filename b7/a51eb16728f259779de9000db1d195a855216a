@@ -1,0 +1,67 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_fb5ee59e042ee8 85-88,805-808
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/handlers.ts
+  s_7d8917753e260e::t_1a8acfd68797f3 1-25
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/delete/route.ts
+  s_7d8917753e260e::t_f7587114651fb4 1-39
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/reports/route.ts
+  s_7d8917753e260e::t_62eca58a28ac35 1-131
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/[itemId]/update/route.ts
+  s_7d8917753e260e::t_cb7ce05b6961a0 1-56
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/items/route.ts
+  s_7d8917753e260e::t_c5b201e47b650a 1-70
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/delete/route.ts
+  s_7d8917753e260e::t_700ac9f0a20395 1-39
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/file/route.ts
+  s_7d8917753e260e::t_91813f5215cec9 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/route.ts
+  s_7d8917753e260e::t_a6f65a32c96919 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/thumbnail/route.ts
+  s_7d8917753e260e::t_5ef2ec84a23201 1-34
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/reports/[reportId]/update/route.ts
+  s_7d8917753e260e::t_84cfe8cc4cae1c 1-57
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-models.ts
+  s_7d8917753e260e::t_47919c3eb47c92 1-209
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-openapi.ts
+  s_7d8917753e260e::t_4839948f2959aa 1-250
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-report-responses.ts
+  s_7d8917753e260e::t_830fb69a88242c 1-74
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/testing-reports.http.test.ts
+  s_7d8917753e260e::t_4c988f5ff16edf 1-742
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/app/route.ts
+  s_7d8917753e260e::t_d08ffe6cb46351 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/presign/route.ts
+  s_7d8917753e260e::t_f6812411fb78fa 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/route.ts
+  s_7d8917753e260e::t_48cfc5a729332f 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/testing-reports/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_113d7a0d809394 1-6
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_51cc0614c9bb53 442
+apps/construction-management/src/projects/application/project-testing-reports.ts
+  s_7d8917753e260e::t_c140dc1b7553e2 1-756
+apps/construction-management/src/projects/domain/testing-report.test.ts
+  s_7d8917753e260e::t_badc16734d1c94 1-57
+apps/construction-management/src/projects/domain/testing-report.ts
+  s_7d8917753e260e::t_191085e0885d88 1-111
+apps/construction-management/src/projects/infrastructure/create-project-testing-reports.ts
+  s_7d8917753e260e::t_d519ac9fd909f7 1-32
+apps/construction-management/src/projects/infrastructure/prisma-testing-report-store.ts
+  s_7d8917753e260e::t_6ca4073f5a209e 1-490
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b7a51eb16728f259779de9000db1d195a855216a",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
