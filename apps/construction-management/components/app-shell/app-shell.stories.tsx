@@ -4,6 +4,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV, type AppNavHref } from "@/lib/app-nav";
+import { HRMS_SECTIONS } from "@/lib/hrms-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
@@ -113,6 +114,36 @@ export const MastersSubmenu: Story = {
     await expect(
       await nav.findByRole("list", { name: "Masters" }),
     ).toBeVisible();
+  },
+};
+
+export const WorkspaceSubmenu: Story = {
+  parameters: {
+    nextjs: {
+      navigation: { pathname: "/app/workspace/hrms/attendance/team" },
+    },
+  },
+  render: () => (
+    <AppShell>
+      <p>Team Attendance</p>
+    </AppShell>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const view = canvasElement.ownerDocument.defaultView;
+    if (view == null || view.innerWidth < 768) return;
+    const nav = within(canvas.getByRole("navigation", { name: "Main" }));
+    const submenu = within(nav.getByRole("list", { name: "Workspace" }));
+    const hrms = within(submenu.getByRole("list", { name: "HRMS" }));
+    for (const section of HRMS_SECTIONS)
+      await expect(
+        hrms.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
+    await expect(
+      hrms.getByRole("link", { name: "Attendance" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      nav.getByRole("link", { name: "Workspace" }),
+    ).not.toHaveAttribute("aria-current");
   },
 };
 

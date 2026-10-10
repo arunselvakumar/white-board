@@ -747,6 +747,14 @@ HRMS default set for HRMS-only members: HRMS read; Holiday read; Attendance crea
 
 M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-product-decisions.md). Statutory figures follow [ADR CM-0008](../adr/CM-0008-statutory-figures-are-dated-tables.md). Numbers in brackets point at the CM-0012 decision.
 
+**Built in the M3 foundation (CM-302, CM-303)**
+
+- **Where things live.** One context, `hrms` (`construction_hrms`, API `/api/construction/hrms/...`, screens under Workspace → HRMS at `/app/workspace/hrms`). Every M3 table exists from CM-302; later tickets add code, not tables. Team Members, Projects and Designations are read through ports (`src/hrms/application/ports.ts`) implemented with plain reads of the organization and projects tables. A member is a Team Member id (`member_id`).
+- **HRMS Settings** (menu `hrms.settings`): defaults are the legacy values (GPS disabled, 15 min grace, 8 h day, 4 h half day, Monday–Friday, 1 approval level, calendar leave year, carry forward, accrual and auto salary off). Grace 0–120 whole minutes; working hours above 0 and at most 24; half-day hours above 0 and below the working hours (two decimals each); working days unique ISO weekdays, at least one; approval levels 1 or 2; carry-forward cap 0 or more, required only when carry forward is on; the auto salary day is 1–28 (not 31, so it exists every month), required only when auto calculation is on. A switched-off value is cleared. The **PT state** is a GST state code, chosen in Settings (not taken from the Company address, which has no state field). The whole form is saved at once (`POST …/settings/update`, like every other update in the app) with `updatedAt` → 409 `HRMS_SETTINGS_CHANGED`.
+- **Leave ledger signs** (ADR CM-0004): credits are positive (initial, accrual, carry forward, released, restored), debits negative (reserved, used); an adjustment has a reason. Applying reserves; approval releases the reservation and posts `used`; rejection or withdrawal releases; an approved cancellation restores. An accrual period, a year's initial credit and a year's carry forward are posted once (unique indexes).
+- **Professional tax slabs** can differ for men and women (Maharashtra), so the member's gender sits on their salary configuration; without it the general slab applies (ADR CM-0008).
+- **Money on salary slips** is integer paise per column; one member's month fits 32 bits, and totals across members are summed in SQL as `bigint` (ADR CM-0004).
+
 ## Open questions (answered in CM-0012)
 
 1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1

@@ -30,6 +30,7 @@ import { CompanySwitcher } from "./company-switcher";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { PlanBanner } from "./plan-banner";
 import { UserMenu } from "./user-menu";
+import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 const NAV_BUTTON_CLASS =
   "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-accent data-active:text-sidebar-foreground data-active:[&_svg]:text-sidebar-primary h-10 gap-3 rounded-xl px-3 transition-colors data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] [&_svg]:size-[18px]";
@@ -78,6 +79,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                     if (item.href === "/app/masters")
                       return (
                         <MastersNavMenu
+                          key={item.href}
+                          pathname={pathname}
+                          buttonClassName={NAV_BUTTON_CLASS}
+                        />
+                      );
+                    if (item.href === "/app/workspace")
+                      return (
+                        <WorkspaceNavMenu
                           key={item.href}
                           pathname={pathname}
                           buttonClassName={NAV_BUTTON_CLASS}
