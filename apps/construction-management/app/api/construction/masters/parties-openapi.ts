@@ -9,6 +9,16 @@ import type {
 import { ConstructionMastersIdParamsModel } from "./_lib/master-models";
 import { ListConstructionMastersPartiesQueryModel } from "./_lib/party-models";
 import {
+  AddConstructionMastersQuotationRequestModel,
+  ConstructionMastersQuotationParamsModel,
+  ConstructionMastersQuotationResponseModel,
+  ListConstructionMastersPartyQuotationsResponseModel,
+  ListConstructionMastersQuotationsQueryModel,
+  ListConstructionMastersQuotationsResponseModel,
+  StartConstructionMastersQuotationUploadRequestModel,
+  StartConstructionMastersQuotationUploadResponseModel,
+} from "./_lib/quotation-models";
+import {
   ConstructionMastersContractorResponseModel,
   CreateConstructionMastersContractorRequestModel,
   ListConstructionMastersContractorsResponseModel,
@@ -33,6 +43,12 @@ export const partiesOpenApiComponents: OpenApiComponents = {
   ListConstructionMastersSuppliersResponseModel,
   CreateConstructionMastersSupplierRequestModel,
   UpdateConstructionMastersSupplierRequestModel,
+  ConstructionMastersQuotationResponseModel,
+  ListConstructionMastersPartyQuotationsResponseModel,
+  ListConstructionMastersQuotationsResponseModel,
+  StartConstructionMastersQuotationUploadRequestModel,
+  StartConstructionMastersQuotationUploadResponseModel,
+  AddConstructionMastersQuotationRequestModel,
 };
 
 const SESSION = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN] as const;
@@ -41,6 +57,113 @@ const WRITE = [
   ...SESSION,
   StatusCodes.PAYMENT_REQUIRED,
 ] as const;
+
+function quotationOperations(path: string, label: string, menu: string): OpenApiOperation[] {
+  const base = `${path}/{id}/quotations`;
+  const params = ConstructionMastersIdParamsModel;
+  const file = ConstructionMastersQuotationParamsModel;
+  return [
+    {
+      method: "get",
+      path: base,
+      summary: `The ${label}'s quotation files, newest first (\`${menu}\` or \`masters.quotations\`, read)`,
+      tags: MASTERS,
+      params,
+      successStatus: StatusCodes.OK,
+      successDescription: "Quotations",
+      successSchema: ListConstructionMastersPartyQuotationsResponseModel,
+      errors: [StatusCodes.BAD_REQUEST, ...SESSION, StatusCodes.NOT_FOUND],
+    },
+    {
+      method: "post",
+      path: `${base}/uploads`,
+      summary: `Start a quotation upload: a PDF or an image, at most 10 MB, 50 per ${label} (\`${menu}\`, update)`,
+      tags: MASTERS,
+      params,
+      body: StartConstructionMastersQuotationUploadRequestModel,
+      successStatus: StatusCodes.CREATED,
+      successDescription: "Where the bytes go",
+      successSchema: StartConstructionMastersQuotationUploadResponseModel,
+      errors: [...WRITE, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
+    },
+    {
+      method: "post",
+      path: `${base}/uploads/app`,
+      summary: "Development and tests: the raw file at `?key=` (404 when deployed)",
+      tags: MASTERS,
+      params,
+      bodyBinaryContentTypes: ["application/octet-stream"],
+      successStatus: StatusCodes.NO_CONTENT,
+      successDescription: "Received",
+      errors: [...WRITE, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
+    },
+    {
+      method: "post",
+      path: `${base}/uploads/thumbnail`,
+      summary: "An image's WebP thumbnail at `?key=`, before finishing",
+      tags: MASTERS,
+      params,
+      bodyBinaryContentTypes: ["image/webp"],
+      successStatus: StatusCodes.NO_CONTENT,
+      successDescription: "Received",
+      errors: [...WRITE, StatusCodes.NOT_FOUND],
+    },
+    {
+      method: "post",
+      path: `${base}/uploads/presign`,
+      summary: "Deployed: the `uploadPresigned()` handshake for one key (404 with files on disk)",
+      tags: MASTERS,
+      params,
+      successStatus: StatusCodes.OK,
+      successDescription: "The presigned URL payload",
+      errors: [...WRITE, StatusCodes.NOT_FOUND],
+    },
+    {
+      method: "post",
+      path: base,
+      summary: "Finish an upload: record the file at `key` (201 new, 200 when already recorded)",
+      tags: MASTERS,
+      params,
+      body: AddConstructionMastersQuotationRequestModel,
+      successStatus: StatusCodes.CREATED,
+      successDescription: "The quotation",
+      successSchema: ConstructionMastersQuotationResponseModel,
+      errors: [...WRITE, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
+    },
+    {
+      method: "get",
+      path: `${base}/{quotationId}`,
+      summary: "Stream one quotation; `?download=1` saves it",
+      tags: MASTERS,
+      params: file,
+      successStatus: StatusCodes.OK,
+      successDescription: "The file",
+      successBinaryContentTypes: ["application/pdf", "image/png", "image/jpeg", "image/webp"],
+      errors: [StatusCodes.BAD_REQUEST, ...SESSION, StatusCodes.NOT_FOUND],
+    },
+    {
+      method: "get",
+      path: `${base}/{quotationId}/thumbnail`,
+      summary: "A quotation image's WebP thumbnail",
+      tags: MASTERS,
+      params: file,
+      successStatus: StatusCodes.OK,
+      successDescription: "The thumbnail",
+      successBinaryContentTypes: ["image/webp"],
+      errors: [StatusCodes.BAD_REQUEST, ...SESSION, StatusCodes.NOT_FOUND],
+    },
+    {
+      method: "post",
+      path: `${base}/{quotationId}/delete`,
+      summary: `Remove a quotation (\`${menu}\`, update)`,
+      tags: MASTERS,
+      params: file,
+      successStatus: StatusCodes.NO_CONTENT,
+      successDescription: "Removed",
+      errors: [...WRITE, StatusCodes.NOT_FOUND],
+    },
+  ];
+}
 
 function partyOperations(input: {
   path: string;
@@ -126,7 +249,7 @@ function partyOperations(input: {
     {
       method: "post",
       path: `${path}/{id}/delete`,
-      summary: `Delete a ${label} (a tombstone); 409 ${code}_ON_PROJECTS while on a live Project`,
+      summary: `Delete a ${label} (a tombstone); 409 ${code}_ON_PROJECTS while on a live Project, ${code}_IN_USE while a document names it`,
       tags: MASTERS,
       params,
       successStatus: StatusCodes.NO_CONTENT,
@@ -162,4 +285,18 @@ export const partiesOpenApiOperations: OpenApiOperation[] = [
     create: CreateConstructionMastersSupplierRequestModel,
     update: UpdateConstructionMastersSupplierRequestModel,
   }),
+  ...quotationOperations(`${BASE}/contractors`, "Contractor", "masters.contractors"),
+  ...quotationOperations(`${BASE}/suppliers`, "Supplier", "masters.suppliers"),
+  {
+    method: "get",
+    path: `${BASE}/quotations`,
+    summary:
+      "View Quotations: every live Contractor's and Supplier's quotation files, newest first (menu `masters.quotations`, read)",
+    tags: MASTERS,
+    query: ListConstructionMastersQuotationsQueryModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "A page of quotations",
+    successSchema: ListConstructionMastersQuotationsResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION],
+  },
 ];
