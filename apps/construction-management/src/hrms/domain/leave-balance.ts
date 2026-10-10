@@ -301,3 +301,23 @@ export function assertBalanceCovers(input: {
     },
   );
 }
+
+/**
+ * A stored key back to its leave year under the current setting: "2026"
+ * for a calendar year, "26-27" for a financial one (2000–2099). Null when
+ * the key does not have the setting's shape.
+ */
+export function leaveYearFromKey(
+  key: string,
+  setting: HrmsSettings["leaveYear"],
+): LeaveYear | null {
+  if (setting === "calendar") {
+    if (!/^\d{4}$/.test(key)) return null;
+    return leaveYearOf(`${key}-06-01`, "calendar");
+  }
+  const match = /^(\d{2})-(\d{2})$/.exec(key);
+  if (match == null) return null;
+  const first = Number(match[1]);
+  if ((first + 1) % 100 !== Number(match[2])) return null;
+  return leaveYearOf(`${String(2000 + first)}-06-01`, "financial");
+}

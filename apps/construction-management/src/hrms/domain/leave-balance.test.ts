@@ -9,6 +9,7 @@ import {
   balanceOf,
   carryForwardDays,
   createAdjustment,
+  leaveYearFromKey,
   openingCredit,
   previousLeaveYear,
   type LeaveLedgerLine,
@@ -400,5 +401,18 @@ describe("balance check on apply (CM-312)", () => {
         });
       }),
     ).toBe("LEAVE_BALANCE_INSUFFICIENT");
+  });
+});
+
+describe("leave year keys", () => {
+  it("reads a key back under the current setting", () => {
+    expect(leaveYearFromKey("2026", "calendar")).toEqual(YEAR_2026);
+    expect(leaveYearFromKey("26-27", "financial")).toEqual(
+      leaveYearOf("2026-10-10", "financial"),
+    );
+    expect(leaveYearFromKey("99-00", "financial")?.start).toBe("2099-04-01");
+    expect(leaveYearFromKey("26-28", "financial")).toBeNull();
+    expect(leaveYearFromKey("26-27", "calendar")).toBeNull();
+    expect(leaveYearFromKey("2026", "financial")).toBeNull();
   });
 });

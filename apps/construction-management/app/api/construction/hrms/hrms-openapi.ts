@@ -5,6 +5,10 @@ import type {
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
 
+import {
+  leaveOpenApiComponents,
+  leaveOpenApiOperations,
+} from "./leave-openapi";
 import { GetConstructionHrmsSettingsResponseModel } from "./settings/get-hrms-settings-response-model";
 import { UpdateConstructionHrmsSettingsRequestModel } from "./settings/update/update-hrms-settings-request-model";
 import { UpdateConstructionHrmsSettingsResponseModel } from "./settings/update/update-hrms-settings-response-model";
@@ -22,6 +26,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   GetConstructionHrmsSettingsResponseModel,
   UpdateConstructionHrmsSettingsRequestModel,
   UpdateConstructionHrmsSettingsResponseModel,
+  ...leaveOpenApiComponents,
 };
 
 export const hrmsOpenApiOperations: OpenApiOperation[] = [
@@ -53,4 +58,5 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
       StatusCodes.PAYMENT_REQUIRED,
     ],
   },
+  ...leaveOpenApiOperations,
 ];

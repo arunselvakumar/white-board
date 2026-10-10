@@ -14,7 +14,6 @@ import type {
 } from "../application/ports";
 import {
   NoAttendanceDaySource,
-  NoLeaveDaySource,
   SettingsShiftResolver,
   SettingsWorkCalendar,
 } from "../application/stub-ports";
@@ -23,6 +22,7 @@ import {
   PrismaProjectDirectory,
 } from "./prisma-directories";
 import { PrismaHrmsSettingsStore } from "./prisma-hrms-settings-store";
+import { PrismaLeaveDaySource } from "./prisma-leave-day-source";
 import { PrismaMonthLock } from "./prisma-month-lock";
 import { PrismaStatutoryRates } from "./prisma-statutory-rates";
 
@@ -56,8 +56,7 @@ export function createHrmsPorts(deps?: { prisma?: PrismaClient }): HrmsPorts {
     shifts: new SettingsShiftResolver(settings),
     // Replaced by CM-308.
     attendanceDays: new NoAttendanceDaySource(calendar),
-    // Replaced by CM-312.
-    leaveDays: new NoLeaveDaySource(),
+    leaveDays: new PrismaLeaveDaySource(db),
     monthLock: new PrismaMonthLock(db),
     statutoryRates: new PrismaStatutoryRates(db),
   };
