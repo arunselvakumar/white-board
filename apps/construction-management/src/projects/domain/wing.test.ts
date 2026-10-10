@@ -12,6 +12,13 @@ import {
 } from "./wing-floors";
 import { generateWingFloors, wingConfig } from "./wing-generator";
 
+/** The item at `index`; a test fails loudly when it is missing. */
+function nth<T>(items: readonly T[], index: number): T {
+  const item = items[index];
+  if (item === undefined) throw new Error(`No item ${String(index)}`);
+  return item;
+}
+
 const NOW = new Date("2026-10-10T10:00:00Z");
 const LATER = new Date("2026-10-10T11:00:00Z");
 
@@ -249,7 +256,7 @@ describe("Wing (CM-402)", () => {
 
   it("refuses ids, a bad type and a bad name on create", () => {
     const floors = editorFloors();
-    floors[0] = { ...floors[0]!, id: "x" };
+    floors[0] = { ...nth(floors, 0), id: "x" };
     expect(codeOf(() => newWing(floors)).code).toBe("WING_FLOOR_NOT_FOUND");
     expect(
       codeOf(() =>
@@ -292,17 +299,17 @@ describe("Wing (CM-402)", () => {
   it("an edit keeps ids, creates rows without ids and returns the rows left out", () => {
     const wing = newWing();
     const floors = asSaved(wing);
-    const ground = floors[3]!;
-    const firstUnit = floors[2]!.units[0]!;
+    const ground = nth(floors, 3);
+    const firstUnit = nth(nth(floors, 2).units, 0);
     // Rename a unit, remove a unit, add a unit, rename a floor, add a floor.
     floors[2] = {
-      ...floors[2]!,
+      ...nth(floors, 2),
       name: "Shops Floor",
       units: [{ ...firstUnit, name: "Shop 1" }],
     };
     floors[3] = { ...ground, units: [...ground.units, { name: "G03" }] };
     floors.splice(4, 0, { kind: "other", name: "Stilt Floor", units: [] });
-    const removedUnit = wing.floors[2]!.units[1]!.id;
+    const removedUnit = nth(nth(wing.floors, 2).units, 1).id;
 
     const removals = wing.update({
       name: "Wing A",
@@ -339,13 +346,13 @@ describe("Wing (CM-402)", () => {
   it("a removed floor takes its units with it; kinds stay as stored", () => {
     const wing = newWing();
     const floors = asSaved(wing);
-    const top = floors[1]!;
+    const top = nth(floors, 1);
     const removals = wing.update({
       name: "Wing A",
       phaseId: "phase-2",
       position: 3,
       // The client says "ground" for the terrace: the stored kind wins.
-      floors: [{ ...floors[0]!, kind: "ground" }, ...floors.slice(2)],
+      floors: [{ ...nth(floors, 0), kind: "ground" }, ...floors.slice(2)],
       by: "u2",
       now: LATER,
       newId: ids(),
@@ -366,7 +373,7 @@ describe("Wing (CM-402)", () => {
           name: "A",
           phaseId: "p",
           position: 0,
-          floors: [...floors, { ...floors[0]!, name: "Again" }],
+          floors: [...floors, { ...nth(floors, 0), name: "Again" }],
           by: "u",
           now: LATER,
           newId: ids(),
@@ -374,10 +381,10 @@ describe("Wing (CM-402)", () => {
       ),
     ).toEqual({ code: "WING_FLOOR_NOT_FOUND", details: { floorIndex: 5 } });
     const other = newWing();
-    const stranger = other.floors[1]!.units[0]!.id;
+    const stranger = nth(nth(other.floors, 1).units, 0).id;
     const withStranger = asSaved(wing);
     withStranger[1] = {
-      ...withStranger[1]!,
+      ...nth(withStranger, 1),
       units: [{ id: `${stranger}-x`, name: "999" }],
     };
     expect(
@@ -402,7 +409,11 @@ describe("Wing (CM-402)", () => {
     const wing = newWing();
     wing.delete("u", LATER);
     expect(wing.deletedAt).toBe(LATER);
-    expect(codeOf(() => wing.delete("u", LATER)).code).toBe("WING_NOT_FOUND");
+    expect(
+      codeOf(() => {
+        wing.delete("u", LATER);
+      }).code,
+    ).toBe("WING_NOT_FOUND");
   });
 });
 
@@ -433,9 +444,11 @@ describe("Phase (CM-402)", () => {
     expect(phase.name).toBe("Stage A");
     expect(phase.updatedAt).toBe(LATER);
     phase.delete("u2", LATER);
-    expect(codeOf(() => phase.delete("u2", LATER)).code).toBe(
-      "PHASE_NOT_FOUND",
-    );
+    expect(
+      codeOf(() => {
+        phase.delete("u2", LATER);
+      }).code,
+    ).toBe("PHASE_NOT_FOUND");
   });
 });
 
@@ -475,8 +488,10 @@ describe("Location (CM-405)", () => {
     location.moveTo(1, "u2", LATER);
     expect(location.position).toBe(1);
     location.delete("u2", LATER);
-    expect(codeOf(() => location.delete("u2", LATER)).code).toBe(
-      "LOCATION_NOT_FOUND",
-    );
+    expect(
+      codeOf(() => {
+        location.delete("u2", LATER);
+      }).code,
+    ).toBe("LOCATION_NOT_FOUND");
   });
 });

@@ -79,7 +79,7 @@ function checkKinds(type: WingType, kinds: readonly FloorKind[]): void {
     );
   for (const once of ["terrace", "ground"] as const) {
     const at = kinds.indexOf(once);
-    if (at >= 0 && kinds.indexOf(once, at + 1) >= 0)
+    if (at >= 0 && kinds.includes(once, at + 1))
       throw invalid(
         "WING_FLOORS_INVALID",
         once === "terrace"
