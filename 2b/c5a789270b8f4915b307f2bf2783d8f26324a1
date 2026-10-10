@@ -1,0 +1,31 @@
+apps/construction-management/components/procurement/material-options-fixtures.ts
+  s_6604e2237b6922::t_15db84311b788a 81-83
+apps/construction-management/docs/adr/CM-0015-procurement-inventory-product-decisions.md
+  s_6604e2237b6922::t_c1679e009eed28 10
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.http.test.ts
+  s_6604e2237b6922::t_46eca589a8460c 124-145
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.ts
+  s_6604e2237b6922::t_1d36f901053afb 148-161
+packages/db/construction/prisma/migrations/20261011090400_construction_procurement_ledger_integrity/migration.sql
+  s_6604e2237b6922::t_0e4ce348742ebc 1-17
+packages/db/construction/prisma/migrations/20261011090500_construction_masters_discount_check/migration.sql
+  s_6604e2237b6922::t_b62eeaf15474e5 1-12
+packages/db/construction/prisma/schema/construction-procurement.prisma
+  s_6604e2237b6922::t_4d0547007830b3 476-479
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2bc5a789270b8f4915b307f2bf2783d8f26324a1",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
