@@ -321,11 +321,11 @@ export const AddsABackdatedDay: Story = {
   }),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Add Backdated Attendance" }),
+      await canvas.findByRole("button", { name: "Add Back-dated Attendance" }),
     );
     const body = within(canvasElement.ownerDocument.body);
     const dialog = within(
-      await body.findByRole("dialog", { name: "Add Backdated Attendance" }),
+      await body.findByRole("dialog", { name: "Add Back-dated Attendance" }),
     );
     await expect(dialog.getByLabelText("Date")).toHaveValue("2026-10-09");
     await fireEvent.change(dialog.getByLabelText("Date"), {
@@ -378,7 +378,7 @@ export const HolidayWithNoPermissionToCheckIn: Story = {
     ).toBeVisible();
     await expect(canvas.queryByRole("button", { name: "Check In" })).toBeNull();
     await expect(
-      canvas.queryByRole("button", { name: "Add Backdated Attendance" }),
+      canvas.queryByRole("button", { name: "Add Back-dated Attendance" }),
     ).toBeNull();
   },
 };

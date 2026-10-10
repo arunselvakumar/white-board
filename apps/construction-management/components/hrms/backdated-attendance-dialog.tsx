@@ -68,7 +68,7 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Add Backdated Attendance (CM-309): a past day the member worked but did
+ * Add Back-dated Attendance (CM-309): a past day the member worked but did
  * not check in, with the times and a reason. The Back-dated Entry policy
  * for HRMS → Attendance applies; it goes to Attendance Approvals.
  */
@@ -119,7 +119,7 @@ export function BackdatedAttendanceDialog({
           }}
         >
           <DialogHeader>
-            <DialogTitle>Add Backdated Attendance</DialogTitle>
+            <DialogTitle>Add Back-dated Attendance</DialogTitle>
             <DialogDescription>
               For a past day you worked without checking in. A check-out at or
               before the check-in is on the next day. An approver will check it.

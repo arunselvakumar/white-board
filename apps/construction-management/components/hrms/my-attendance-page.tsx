@@ -431,7 +431,7 @@ function MyAttendance() {
             }}
           >
             <CalendarPlus aria-hidden="true" />
-            Add Backdated Attendance
+            Add Back-dated Attendance
           </Button>
         </section>
       ) : null}
@@ -461,7 +461,7 @@ function MyAttendance() {
  * My Attendance (CM-309): the check-in card (state, live timer, Check In /
  * Check Out with the device location), today's entries, an entry left
  * open on an earlier day with Add Missed Checkout, requests waiting for
- * approval, and Add Backdated Attendance. Menu `hrms.attendance`.
+ * approval, and Add Back-dated Attendance. Menu `hrms.attendance`.
  */
 export function MyAttendancePage() {
   return (
