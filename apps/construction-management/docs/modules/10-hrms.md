@@ -831,6 +831,22 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 16. Employee Management: a Not Set member needs create, a configured one update; amounts are null without Financial, and sending amounts without Financial is refused; without Financial a member can still change structure, start date, gender, UAN and ESI IP.
 17. An HRMS Team Member is sent from the Projects home to Workspace → HRMS.
 
+**Salary run (CM-316, CM-317)**
+
+1. A month is calculated from attendance's day counts. Days after the Company's today are not counted, so they are paid. Days before the member's first salary configuration starts are never paid and show as "Before joining".
+2. Only Team Members who have joined are calculated. Those who have not joined, are not Configured or whose salary starts later are listed with the reason; removed members are not calculated.
+3. A month can be calculated once it has started (`SALARY_MONTH_IN_FUTURE`). Calculate replaces Calculated slips and keeps Approved and Paid ones; recalculating one slip checks `updatedAt` (`SALARY_SLIP_CHANGED`) and refuses an approved one (`SALARY_SLIP_NOT_CALCULATED`).
+4. ESI eligibility uses the full-month gross (no overtime, no proration) of the member's first regular slip in the contribution period, or this month's when there is none yet.
+5. An advance is a `SalaryAdvance` record plus a Paid advance slip; it needs create and Financial, the member must be Configured, and nobody pays one to themselves except the Owner.
+6. Advance recovery starts in the advance's own month (or the next, if that month is already approved); each instalment is amount ÷ instalments rounded up to the paisa; what net pay could not take stays outstanding, so recovery runs past the planned instalments until done. 1–24 instalments, at most ₹2 crore.
+7. Approval (all or none) is refused on one's own slip except for the Owner (`SALARY_OWN_SLIP`) and twice (`SALARY_SLIP_ALREADY_APPROVED`); each approval writes the member's month lock.
+8. Mark Paid needs update and an Approved slip (`SALARY_NOT_APPROVED`, `SALARY_ALREADY_PAID`); Cash or Bank, a date not after today, an optional reference (≤ 100 characters). Approve and Mark Paid take at most 500 slips per call.
+9. My Salary shows the member's own Approved and Paid slips with amounts; others' amounts are null without Financial; downloading another member's payslip needs View All and Financial.
+10. A regular slip's payslip PDF is stored once (after approval or on its first download) as a `stored_files` row of kind `payslip` and never replaced; advance slips have no payslip. Payslips embed Noto fonts so Indian scripts and ₹ print.
+11. The slip's statutory snapshot keeps the member's name, designation, UAN and ESI IP number as of calculation. Employer EPF (A/c 1) and EPS are kept apart.
+12. Automatic calculation runs for last month on or after the salary day, as `system`, only when that month has no run yet; one Company failing does not stop the others (`CRON_SECRET` route).
+13. The team salary Excel has three sheets: Team salary (with totals), Advances and Not calculated; amounts are blank without Financial.
+
 ## Open questions (answered in CM-0012)
 
 1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
