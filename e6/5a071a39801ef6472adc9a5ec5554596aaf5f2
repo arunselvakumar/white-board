@@ -1,0 +1,81 @@
+apps/construction-management/CONTEXT.md
+  s_7d8917753e260e::t_ea659998ea86cf 70,74,134-137
+apps/construction-management/app/app/masters/contractors/[id]/page.tsx
+  s_7d8917753e260e::t_ea9c6a60365499 1-14
+apps/construction-management/app/app/masters/contractors/new/page.tsx
+  s_7d8917753e260e::t_9e415b4f849de9 1-9
+apps/construction-management/app/app/masters/contractors/page.tsx
+  s_7d8917753e260e::t_cc85b4bd7fbed6 1-9
+apps/construction-management/app/app/masters/suppliers/[id]/page.tsx
+  s_7d8917753e260e::t_12b550605f08fc 1-14
+apps/construction-management/app/app/masters/suppliers/new/page.tsx
+  s_7d8917753e260e::t_00b02f82941978 1-9
+apps/construction-management/app/app/masters/suppliers/page.tsx
+  s_7d8917753e260e::t_90180fc124cd11 1-9
+apps/construction-management/app/app/projects/[id]/resources/page.tsx
+  s_7d8917753e260e::t_82a45d4977f3d6 1-31
+apps/construction-management/components/parties/parties-page.stories.tsx
+  s_7d8917753e260e::t_71f1f3350bec73 1-145
+apps/construction-management/components/parties/parties-page.tsx
+  s_7d8917753e260e::t_f2910ae0c91e30 1-412
+apps/construction-management/components/parties/party-fixtures.ts
+  s_7d8917753e260e::t_14162d37fa0ff1 1-99
+apps/construction-management/components/parties/party-form-schema.ts
+  s_7d8917753e260e::t_cdbb45a57dbf67 1-126
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_7d8917753e260e::t_68027e32fbaaac 1-235
+apps/construction-management/components/parties/party-screens.ts
+  s_7d8917753e260e::t_6a9ce9017b25b5 1-47
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_7d8917753e260e::t_5254e66a049970 196,530,1009
+apps/construction-management/components/projects/project-form.tsx
+  s_7d8917753e260e::t_e7e2d17f61a008 92,672-673,728
+apps/construction-management/components/projects/resources/project-resources-page.stories.tsx
+  s_7d8917753e260e::t_d24bcbb0a0acce 1-282
+apps/construction-management/components/projects/resources/project-resources-page.tsx
+  s_7d8917753e260e::t_b8e09ab95bb2b4 1-216
+apps/construction-management/components/projects/resources/resource-fixtures.ts
+  s_7d8917753e260e::t_be713c05e2db87 1-82
+apps/construction-management/components/projects/resources/resource-picker-dialog.tsx
+  s_7d8917753e260e::t_3891ffcc7b748e 1-271
+apps/construction-management/components/projects/resources/resource-sections.ts
+  s_7d8917753e260e::t_1d6fc2c4c031ca 1-52
+apps/construction-management/components/projects/resources/resources-step.ts
+  s_7d8917753e260e::t_8c1bb406879f31 1-11
+apps/construction-management/docs/modules/02-master-records.md
+  s_7d8917753e260e::t_deaaebda71e97f 718-731
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_7d8917753e260e::t_e4ee5f487124bd 530-541
+apps/construction-management/lib/masters-nav.ts
+  s_7d8917753e260e::t_7d5dbb3ac0ee07 4,9,71-90
+apps/construction-management/src/queries/parties.ts
+  s_7d8917753e260e::t_5beb013d8b0dc5 1-110
+apps/construction-management/src/queries/project-resources.ts
+  s_7d8917753e260e::t_3766e9415f2f21 1-97
+apps/construction-management/components/parties/party-form.tsx
+  s_06415e8c2c8e1d::t_ddd13bed4a7839 1-395
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e65a071a39801ef6472adc9a5ec5554596aaf5f2",
+  "prompts": {},
+  "sessions": {
+    "s_06415e8c2c8e1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a31afc8b0fcfa04f7",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
