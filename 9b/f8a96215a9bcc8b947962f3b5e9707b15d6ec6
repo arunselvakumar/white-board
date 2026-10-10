@@ -1,0 +1,41 @@
+apps/construction-management/components/hrms/attendance-approvals-page.stories.tsx
+  s_6a70f1cb429bb6::t_1905db18649f06 169
+apps/construction-management/components/hrms/attendance-parts.tsx
+  s_6a70f1cb429bb6::t_9f6820bf481fef 3,12,248,259
+apps/construction-management/components/hrms/hrms-parts.tsx
+  s_6a70f1cb429bb6::t_c8cb8fce3bdcbe 3-4,33,99-134
+apps/construction-management/components/hrms/hrms-shell.tsx
+  s_6a70f1cb429bb6::t_fec9104c58668f 5-6,10,23-25,97-112
+apps/construction-management/components/hrms/monthly-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_20da53c3c8c53b 131
+apps/construction-management/components/hrms/my-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_52ee26286e9235 398
+apps/construction-management/components/hrms/team-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_c16a46d0f49f85 90
+apps/construction-management/components/hrms/hrms-no-access.stories.tsx
+  s_0da25b2215ae00::t_137030e9d20aff 1-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9bf8a96215a9bcc8b947962f3b5e9707b15d6ec6",
+  "prompts": {},
+  "sessions": {
+    "s_0da25b2215ae00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ab3bce690976075e7",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
