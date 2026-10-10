@@ -1,7 +1,7 @@
 "use client";
 
-import { MoreHorizontal, type LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { Lock, MoreHorizontal, type LucideIcon } from "lucide-react";
+import { Component, type ReactNode } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -30,6 +30,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import { QueryHttpError } from "@/src/queries/http";
 
 /**
  * Shared pieces of the HRMS Configuration screens (CM-304 – CM-307): the
@@ -93,6 +94,42 @@ export function HrmsEmpty({
       {action == null ? null : <EmptyContent>{action}</EmptyContent>}
     </Empty>
   );
+}
+
+/** The "no access" state of an HRMS page whose read answered 403. */
+export function HrmsNoAccess({ what }: { what: string }) {
+  return (
+    <HrmsEmpty
+      icon={Lock}
+      title={`You don't have access to ${what}`}
+      description="Your Permission Matrix does not include it. Ask the Owner if you need it."
+    />
+  );
+}
+
+/**
+ * Shows "You don't have access to …" for a 403 from a page read (a member
+ * whose Permission Matrix lacks the menu); any other error goes on to the
+ * app's boundary (`QuerySuspense`).
+ */
+export class HrmsAccessBoundary extends Component<
+  { children: ReactNode; what: string },
+  { error: Error | null }
+> {
+  override state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { error: error instanceof Error ? error : new Error(String(error)) };
+  }
+
+  override render() {
+    const { error } = this.state;
+    if (error == null) return this.props.children;
+    if (error instanceof QueryHttpError && error.status === 403)
+      return <HrmsNoAccess what={this.props.what} />;
+    // Not ours: the app's boundary shows it.
+    throw error;
+  }
 }
 
 export type RowAction = {

@@ -1,7 +1,6 @@
 "use client";
 
-import { Lock } from "lucide-react";
-import { Component, Suspense, type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
@@ -9,9 +8,8 @@ import { cn } from "@repo/ui/lib/utils";
 import type { HrmsDayStatus } from "@/src/hrms/application/ports";
 import type { LiveState } from "@/src/hrms/domain/attendance";
 import type { HrmsAttendanceEntry } from "@/src/queries/hrms-attendance";
-import { QueryHttpError } from "@/src/queries/http";
 
-import { HrmsEmpty } from "./hrms-parts";
+import { HrmsAccessBoundary } from "./hrms-parts";
 
 /**
  * Shared pieces of the attendance screens (CM-309): labels and tones for
@@ -238,35 +236,6 @@ export function getDeviceLocation(timeoutMs = 15_000): Promise<DeviceLocation> {
   });
 }
 
-type BoundaryProps = { children: ReactNode; what: string };
-
-/**
- * Shows "no access" for a 403 from a page read; any other error goes on
- * to the page's own boundary (`QuerySuspense`).
- */
-class AccessBoundary extends Component<BoundaryProps, { error: Error | null }> {
-  override state: { error: Error | null } = { error: null };
-
-  static getDerivedStateFromError(error: unknown) {
-    return { error: error instanceof Error ? error : new Error(String(error)) };
-  }
-
-  override render() {
-    const { error } = this.state;
-    if (error == null) return this.props.children;
-    if (error instanceof QueryHttpError && error.status === 403)
-      return (
-        <HrmsEmpty
-          icon={Lock}
-          title="You do not have access"
-          description={`Your Permission Matrix does not let you see ${this.props.what}. Ask the Owner if you need it.`}
-        />
-      );
-    // Not ours: the page's own boundary shows it.
-    throw error;
-  }
-}
-
 /** A Suspense with a skeleton and the "no access" boundary around a page read. */
 export function AttendanceRead({
   what,
@@ -276,7 +245,7 @@ export function AttendanceRead({
   children: ReactNode;
 }) {
   return (
-    <AccessBoundary what={what}>
+    <HrmsAccessBoundary what={what}>
       <Suspense
         fallback={
           <div className="space-y-3" aria-busy="true">
@@ -287,6 +256,6 @@ export function AttendanceRead({
       >
         {children}
       </Suspense>
-    </AccessBoundary>
+    </HrmsAccessBoundary>
   );
 }

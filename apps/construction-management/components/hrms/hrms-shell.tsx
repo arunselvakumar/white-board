@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
+import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { HrmsAccessBoundary } from "@/components/hrms/hrms-parts";
 import {
   HRMS_PATH,
   HRMS_SECTIONS,
@@ -18,7 +20,9 @@ import {
  * section's pages as sub-tabs. Both rows scroll sideways on a phone. Pages
  * render below and keep their own padding and width. The tab rows are
  * `contain: inline-size` so nine Configuration tabs scroll inside their row
- * instead of widening the page.
+ * instead of widening the page. A page whose read answers 403 shows
+ * "You don't have access to …" under the tabs, and a loading page shows a
+ * skeleton there, so the tabs stay put.
  */
 export function HrmsShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || HRMS_PATH;
@@ -90,7 +94,22 @@ export function HrmsShell({ children }: { children: ReactNode }) {
           </nav>
         )}
       </div>
-      {children}
+      <HrmsAccessBoundary key={pathname} what={page?.title ?? "this page"}>
+        <Suspense fallback={<HrmsPageFallback />}>{children}</Suspense>
+      </HrmsAccessBoundary>
+    </div>
+  );
+}
+
+/** A page loading under the tabs: the page frame's width and padding. */
+function HrmsPageFallback() {
+  return (
+    <div className="w-full p-6" aria-busy="true">
+      <div className="w-full max-w-4xl space-y-4">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-full max-w-sm" />
+        <Skeleton className="h-40 w-full" />
+      </div>
     </div>
   );
 }
