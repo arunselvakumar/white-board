@@ -12,17 +12,29 @@ import { ProjectsHome } from "./projects-home";
 const BASE = "/api/construction/projects/projects";
 
 let items = STORY_PROJECTS;
+let pinned: string[] = [];
+let api: ReturnType<typeof mockApi>;
 
 const meta = {
   title: "Projects/ProjectsHome",
   component: ProjectsHome,
   beforeEach() {
     items = STORY_PROJECTS;
-    const api = mockApi((call) =>
-      call.method === "GET" && call.path === BASE
-        ? Response.json(projectList(items))
-        : undefined,
-    );
+    pinned = [];
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === BASE)
+        return Response.json(projectList(items, true, pinned));
+      const [, id, verb] =
+        /\/projects\/([^/]+)\/(pin|unpin)$/.exec(call.path) ?? [];
+      if (call.method === "POST" && id != null) {
+        pinned =
+          verb === "pin"
+            ? [...pinned.filter((item) => item !== id), id]
+            : pinned.filter((item) => item !== id);
+        return Response.json({ pinned: verb === "pin" });
+      }
+      return undefined;
+    });
     return api.restore;
   },
   render: () => (
@@ -147,5 +159,75 @@ export const Phone: Story = {
     await canvas.findByRole("list", { name: "Projects" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+const ZEN = "0199c4a0-0000-7000-8000-000000000005";
+const VADASERY = "0199c4a0-0000-7000-8000-000000000003";
+
+function rowNames(canvas: {
+  getByRole: (role: "list", options: { name: string }) => HTMLElement;
+}) {
+  return within(canvas.getByRole("list", { name: "Projects" }))
+    .getAllByRole("link")
+    .map((link) => link.querySelector("p")?.textContent);
+}
+
+export const PinnedFirst: Story = {
+  beforeEach() {
+    pinned = [VADASERY, ZEN];
+  },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("list", { name: "Projects" });
+    await expect(rowNames(canvas)).toEqual([
+      "Vadasery Plots",
+      "Zen Villas",
+      "Asaripallam Tower",
+      "Kumari Heights",
+      "Parvathipuram Row Houses",
+    ]);
+    const cards = within(canvas.getByRole("list", { name: "Projects" }));
+    await expect(
+      within(cards.getByRole("link", { name: /Zen Villas/ })).getByRole("img", {
+        name: "Pinned",
+      }),
+    ).toBeVisible();
+    await expect(
+      within(cards.getByRole("link", { name: /Kumari Heights/ })).queryByRole(
+        "img",
+        { name: "Pinned" },
+      ),
+    ).toBeNull();
+  },
+};
+
+export const CardMenu: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByRole("list", { name: "Projects" });
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Options for Zen Villas" }),
+    );
+    await expect(
+      await body.findByRole("menuitem", { name: "Edit" }),
+    ).toBeVisible();
+    await expect(
+      body.getByRole("menuitem", { name: "Hide modules" }),
+    ).toBeVisible();
+    await userEvent.click(body.getByRole("menuitem", { name: "Pin to top" }));
+    await waitFor(() => expect(rowNames(canvas)[0]).toBe("Zen Villas"));
+    await expect(
+      api.calls.mock.calls.some(
+        ([call]) =>
+          call.method === "POST" && call.path === `${BASE}/${ZEN}/pin`,
+      ),
+    ).toBe(true);
+
+    // Unpin puts it back in status order.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Options for Zen Villas" }),
+    );
+    await userEvent.click(await body.findByRole("menuitem", { name: "Unpin" }));
+    await waitFor(() => expect(rowNames(canvas).at(-1)).toBe("Zen Villas"));
   },
 };

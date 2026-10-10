@@ -145,7 +145,7 @@ describe("Project contract details and custom fields HTTP (CM-413)", () => {
     const page = await json<{ items: Project[] }>(
       await listProjects(jsonRequest(BASE, owner.cookie)),
     );
-    expect(page.items).toEqual([kumari]);
+    expect(page.items).toEqual([{ ...kumari, pinned: false }]);
 
     const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
       where: { entityId: kumari.id, action: "project.created" },

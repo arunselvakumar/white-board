@@ -124,11 +124,19 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   }),
 ];
 
-/** `financial`: whether the viewer has the Project menu's Financial flag. */
+/**
+ * `financial`: whether the viewer has the Project menu's Financial flag;
+ * `pinned`: the ids the viewer pinned, listed first like the server does.
+ */
 export function projectList(
-  items: ProjectResponse[],
+  projects: ProjectResponse[],
   financial = true,
+  pinned: readonly string[] = [],
 ): ProjectList {
+  const items = [
+    ...projects.filter((item) => pinned.includes(item.id)),
+    ...projects.filter((item) => !pinned.includes(item.id)),
+  ].map((item) => ({ ...item, pinned: pinned.includes(item.id) }));
   const count = (status: ProjectResponse["status"]) =>
     items.filter((item) => item.status === status).length;
   return {

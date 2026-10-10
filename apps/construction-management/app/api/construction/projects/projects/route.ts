@@ -4,7 +4,11 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { projectHandlers as handlers, projectFinancial } from "../handlers";
+import {
+  projectHandlers as handlers,
+  projectFinancial,
+  projectHome,
+} from "../handlers";
 import { CreateConstructionProjectsProjectRequestModel } from "./create-project-request-model";
 import {
   ListConstructionProjectsProjectsQueryModel,
@@ -16,8 +20,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Projects home (CM-204): the Projects the caller may see — every one for
- * the Owner, the assigned ones for a Member — by status then name, with
- * counts per status for the filter chips.
+ * the Owner, the assigned ones for a Member — the caller's pinned ones
+ * first (CM-411), each group by status then name, with counts per status
+ * for the filter chips.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -29,9 +34,16 @@ export async function GET(request: Request): Promise<Response> {
       ),
     );
     const page = await handlers.list(session.access, status);
+    const { items, pinned } = await projectHome.pinnedFirst(
+      session.access,
+      page.items,
+    );
     const financial = projectFinancial(session.access);
     const body: ListConstructionProjectsProjectsResponseModel = {
-      items: page.items.map((item) => toProjectResponse(item, financial)),
+      items: items.map((item) => ({
+        ...toProjectResponse(item, financial),
+        pinned: pinned.has(item.id),
+      })),
       total: page.total,
       counts: page.counts,
       financial,

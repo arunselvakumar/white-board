@@ -9,7 +9,17 @@ import {
   ConstructionProjectsProjectDevelopmentsResponseModel,
   UpdateConstructionProjectsProjectDevelopmentsRequestModel,
 } from "./projects/[id]/developments/developments-models";
+import {
+  ConstructionProjectsPinResponseModel,
+  ConstructionProjectsProjectHomeResponseModel,
+  UpdateConstructionProjectsHiddenModulesRequestModel,
+} from "./projects/[id]/home/home-models";
+import { ConstructionProjectsProjectListItemModel } from "./projects/list-projects-models";
 import { ConstructionProjectsProjectParamsModel } from "./projects/project-models";
+import {
+  ConstructionProjectsTileOrderResponseModel,
+  UpdateConstructionProjectsTileOrderRequestModel,
+} from "./tile-order/tile-order-models";
 
 const PROJECTS = ["Construction · Projects"];
 
@@ -27,6 +37,12 @@ const SESSION_ERRORS = [
 export const projectHomeOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsProjectDevelopmentsResponseModel,
   UpdateConstructionProjectsProjectDevelopmentsRequestModel,
+  ConstructionProjectsProjectListItemModel,
+  ConstructionProjectsProjectHomeResponseModel,
+  UpdateConstructionProjectsHiddenModulesRequestModel,
+  ConstructionProjectsPinResponseModel,
+  UpdateConstructionProjectsTileOrderRequestModel,
+  ConstructionProjectsTileOrderResponseModel,
 };
 
 /** Routes of CM-404 (Project side), CM-411 and CM-412. */
@@ -60,5 +76,70 @@ export const projectHomeOpenApiOperations: OpenApiOperation[] = [
       StatusCodes.PAYMENT_REQUIRED,
       StatusCodes.NOT_FOUND,
     ],
+  },
+  {
+    method: "get",
+    path: `${BASE}/{id}/home`,
+    summary:
+      "A Project's home: the modules you may read on it, in your tile order; Wings and Locations by the Project's structure or rows; hidden modules left out, or marked for the Project menu's Update flag (menu `projects.project`, read; 404 for a Project you are not on)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Modules, pin and whether you may hide modules",
+    successSchema: ConstructionProjectsProjectHomeResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/hidden-modules/update`,
+    summary:
+      "Hide / Show Modules: the full set hidden on this Project, for everyone on it (menu `projects.project`, update; 400 PROJECT_MODULE_UNKNOWN)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    body: UpdateConstructionProjectsHiddenModulesRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Your home on the Project",
+    successSchema: ConstructionProjectsProjectHomeResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.PAYMENT_REQUIRED,
+      StatusCodes.NOT_FOUND,
+    ],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/pin`,
+    summary:
+      "Pin a Project to the top of your Projects home; yours only (menu `projects.project`, read)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Pinned",
+    successSchema: ConstructionProjectsPinResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/unpin`,
+    summary: "Unpin a Project (menu `projects.project`, read)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Unpinned",
+    successSchema: ConstructionProjectsPinResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: "/api/construction/projects/tile-order/update",
+    summary:
+      "Save your tile order for every Project's home; an empty list resets (any Team Member; 400 PROJECT_MODULE_UNKNOWN)",
+    tags: PROJECTS,
+    body: UpdateConstructionProjectsTileOrderRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Your tile order",
+    successSchema: ConstructionProjectsTileOrderResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
   },
 ];

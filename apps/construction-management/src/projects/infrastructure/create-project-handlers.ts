@@ -5,8 +5,13 @@ import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
 import { ProjectHandlers } from "../application/project-handlers";
+import { ProjectHomeHandlers } from "../application/project-home-handlers";
 import { ProjectLogos } from "../application/project-logos";
 import { PrismaCustomFieldLabels } from "./prisma-custom-field-labels";
+import {
+  PrismaProjectCounts,
+  PrismaProjectPreferences,
+} from "./prisma-project-preferences";
 import { PrismaProjectRepository } from "./prisma-project-repository";
 import { PrismaProjectUsage } from "./prisma-project-usage";
 
@@ -41,5 +46,19 @@ export function createProjectLogos(deps: {
     deps.storage ?? objectStorage(),
     deps.plan,
     deps.clock,
+  );
+}
+
+/** The Project home, member preferences and dashboard summary (CM-411, CM-412). */
+export function createProjectHomeHandlers(deps?: {
+  prisma?: PrismaClient;
+  clock?: () => Date;
+}): ProjectHomeHandlers {
+  const db = deps?.prisma ?? prisma;
+  return new ProjectHomeHandlers(
+    new PrismaProjectRepository(db),
+    new PrismaProjectPreferences(db),
+    new PrismaProjectCounts(db),
+    deps?.clock,
   );
 }

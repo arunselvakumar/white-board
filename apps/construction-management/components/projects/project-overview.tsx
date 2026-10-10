@@ -21,6 +21,7 @@ import {
 } from "./project-contract";
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { EditProjectForm } from "./project-form";
+import { ProjectHomeTiles } from "./project-home-tiles";
 import { ProjectLabourTiles } from "./project-labour-tiles";
 import { ProjectStatusBadge, formatCalendarDate } from "./project-status";
 
@@ -166,13 +167,17 @@ function ProjectFlash({ id }: { id: string }) {
   );
 }
 
-/** Overview tab: labour today (CM-219) and the Project's details. */
+/**
+ * The Project home (CM-411): the member's module tiles, labour today
+ * (CM-219) and the Project's details.
+ */
 export function ProjectOverview({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
   const none = <span className="text-muted-foreground font-normal">—</span>;
   return (
-    <div className="w-full max-w-5xl space-y-6 p-6">
+    <div className="w-full max-w-5xl min-w-0 space-y-6 p-6">
       <ProjectFlash id={id} />
+      <ProjectHomeTiles projectId={id} />
       <ProjectLabourTiles projectId={id} />
       <section
         aria-labelledby="project-details"

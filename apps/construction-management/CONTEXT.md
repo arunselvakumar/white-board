@@ -151,6 +151,18 @@ _Avoid_: facility, feature (in UI copy)
 Work done for a whole site rather than a Unit (Compound Wall, Internal Roads, Sewage Treatment Plant), kept in Masters and assigned to Projects like an Amenity.
 _Avoid_: common area, external development, infrastructure (that is a Project Type)
 
+**Project home**:
+The first page of a Project: a tile for each module the Team Member may open, in their own tile order, then the Project's details. The section bar under the Project's name follows the same order.
+_Avoid_: dashboard (that is the Project Dashboard), project menu
+
+**Hidden module**:
+A module someone with the Project's Update permission took off a Project's home for everyone on it. Hiding changes the home, not what anyone may open.
+_Avoid_: disabled module, removed module
+
+**Pin**:
+A Team Member's mark on a Project they want at the top of their Projects home. Each Team Member pins for themselves.
+_Avoid_: favourite, star, bookmark
+
 **Workspace (area)**:
 The cross-project area of the app: HRMS, Central Payment, Central Store, Central Reports, Central Inventory. One of the three top-level areas. Not the tenant — that is the Company.
 

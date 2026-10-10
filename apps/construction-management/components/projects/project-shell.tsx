@@ -1,41 +1,151 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Pencil } from "lucide-react";
+import {
+  usePrefetchQuery,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { EllipsisVertical, Pencil, Pin } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { buttonVariants } from "@repo/ui/components/button";
+import { useState, type ReactNode } from "react";
+import { Button, buttonVariants } from "@repo/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/dropdown-menu";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { projectTypeLabel } from "@/src/projects/domain/project-type";
+import { PROJECT_MODULES } from "@/src/projects/domain/project-modules";
+import {
+  projectTypeLabel,
+  type ProjectStructure,
+} from "@/src/projects/domain/project-type";
+import {
+  projectHomeQuery,
+  usePinProject,
+  type ProjectHome,
+} from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
 
 import { ProjectAvatar } from "./project-avatar";
+import { ArrangeTilesDialog, HideModulesDialog } from "./project-home-dialogs";
 import { PROJECTS_PATH, projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
 
-/** The Project's sections; later tickets fill Attendance, Payments, Reports. */
-export const PROJECT_TABS = [
-  { segment: "", label: "Overview" },
-  { segment: "documents", label: "Documents" },
-  { segment: "attendance", label: "Attendance" },
-  { segment: "payments", label: "Payments" },
-  { segment: "reports", label: "Reports" },
-] as const;
+/**
+ * The section bar: Home, then the member's modules in their order. Until
+ * the home loads (or if it cannot), every module of the Project's
+ * structure in the default order; each page checks access itself.
+ */
+export function projectSections(
+  home: ProjectHome | undefined,
+  structure: ProjectStructure,
+) {
+  const modules =
+    home?.modules.filter((module) => !module.hidden) ??
+    PROJECT_MODULES.filter(
+      (module) => !("structure" in module) || module.structure === structure,
+    );
+  return [
+    { segment: "", label: "Home" },
+    ...modules.map(({ segment, label }) => ({ segment, label })),
+  ];
+}
 
-function activeSegment(pathname: string, base: string): string {
+function activeSegment(
+  pathname: string,
+  base: string,
+  segments: readonly string[],
+): string {
   const rest = pathname.startsWith(base) ? pathname.slice(base.length) : "";
   const segment = rest.split("/").find(Boolean) ?? "";
-  // Edit belongs to Overview.
-  return PROJECT_TABS.some((tab) => tab.segment === segment) ? segment : "";
+  // Edit, and any page without a section, belong to Home.
+  return segments.includes(segment) ? segment : "";
+}
+
+type OptionsDialog = "hide" | "arrange" | null;
+
+/**
+ * Project options next to Edit (CM-411): Pin / Unpin for the member, Hide /
+ * show modules for the Project (Update flag only), Arrange tiles.
+ */
+function ProjectOptions({ id, home }: { id: string; home: ProjectHome }) {
+  const pin = usePinProject();
+  const [dialog, setDialog] = useState<OptionsDialog>(null);
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Project options"
+            />
+          }
+        >
+          <EllipsisVertical />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuItem
+            disabled={pin.isPending}
+            onClick={() => {
+              pin.mutate({ id, pinned: !home.pinned });
+            }}
+          >
+            {home.pinned ? "Unpin" : "Pin to top"}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {home.canHideModules ? (
+            <DropdownMenuItem
+              onClick={() => {
+                setDialog("hide");
+              }}
+            >
+              Hide / show modules
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuItem
+            onClick={() => {
+              setDialog("arrange");
+            }}
+          >
+            Arrange tiles
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {dialog === "hide" ? (
+        <HideModulesDialog
+          projectId={id}
+          onClose={() => {
+            setDialog(null);
+          }}
+        />
+      ) : null}
+      {dialog === "arrange" ? (
+        <ArrangeTilesDialog
+          projectId={id}
+          onClose={() => {
+            setDialog(null);
+          }}
+        />
+      ) : null}
+    </>
+  );
 }
 
 /**
- * The project shell (CM-204): the logo when there is one (CM-401), name,
- * status, Project Type and Edit above tab links for the Project's
- * sections. Tabs scroll sideways on a phone.
+ * The project shell (CM-204, CM-411): the logo when there is one, name,
+ * status, Project Type, a pin mark, Edit and the Project options above a
+ * section bar built from the member's Project home: Home and the modules
+ * they may open, in their tile order. The bar scrolls sideways on a phone;
+ * the page never does.
  */
 export function ProjectShell({
   id,
@@ -44,15 +154,23 @@ export function ProjectShell({
   id: string;
   children: ReactNode;
 }) {
+  // Both reads start together; the shell waits for the Project only.
+  usePrefetchQuery(projectHomeQuery(id));
   const { data: project } = useSuspenseQuery(projectQuery(id));
+  const { data: home } = useQuery(projectHomeQuery(id));
   const pathname = usePathname();
   const base = projectPath(id);
-  const current = activeSegment(pathname, base);
+  const sections = projectSections(home, project.structure);
+  const current = activeSegment(
+    pathname,
+    base,
+    sections.map((section) => section.segment),
+  );
   const dates = projectDates(project);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col">
-      <div className="w-full space-y-4 px-6 pt-6">
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
+      <div className="w-full min-w-0 space-y-4 px-6 pt-6">
         <div className="w-full max-w-6xl">
           <PageHeader
             back={{ label: "Projects", href: PROJECTS_PATH }}
@@ -73,29 +191,39 @@ export function ProjectShell({
                   <span>{projectTypeLabel(project.projectType)}</span>
                 )}
                 {dates == null ? null : <span>{dates}</span>}
+                {home?.pinned === true ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Pin aria-hidden="true" className="size-3.5" />
+                    Pinned
+                  </span>
+                ) : null}
               </span>
             }
             actions={
-              <Link
-                href={`${base}/edit`}
-                className={buttonVariants({ variant: "outline" })}
-              >
-                <Pencil aria-hidden="true" />
-                Edit
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`${base}/edit`}
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  <Pencil aria-hidden="true" />
+                  Edit
+                </Link>
+                {home == null ? null : <ProjectOptions id={id} home={home} />}
+              </div>
             }
           />
         </div>
         <nav
           aria-label="Project sections"
-          className="-mx-6 overflow-x-auto border-b px-6"
+          className="-mx-6 overflow-x-auto overscroll-x-contain border-b px-6"
         >
           <ul className="flex w-max gap-1">
-            {PROJECT_TABS.map((tab) => {
-              const href = tab.segment === "" ? base : `${base}/${tab.segment}`;
-              const active = tab.segment === current;
+            {sections.map((section) => {
+              const href =
+                section.segment === "" ? base : `${base}/${section.segment}`;
+              const active = section.segment === current;
               return (
-                <li key={tab.label}>
+                <li key={section.label}>
                   <Link
                     href={href}
                     aria-current={active ? "page" : undefined}
@@ -106,7 +234,7 @@ export function ProjectShell({
                         : "text-muted-foreground hover:text-foreground border-transparent",
                     )}
                   >
-                    {tab.label}
+                    {section.label}
                   </Link>
                 </li>
               );
