@@ -67,7 +67,7 @@ export const SALARY_STRUCTURES_PATH = `${HRMS_PATH}/configuration/salary-structu
 const PERCENT_RE = /^\d{1,3}(\.\d{1,2})?$/;
 
 const BASIS_ITEMS: { value: ComponentBasis; label: string }[] = [
-  { value: "percent_of_base", label: "% of base salary" },
+  { value: "percent_of_base", label: "% of base" },
   { value: "fixed", label: "Fixed amount" },
 ];
 
@@ -721,7 +721,7 @@ function ComponentRow({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,8rem)] gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor={`${prefix}-basis`}>Worked out as</Label>
               <Controller
