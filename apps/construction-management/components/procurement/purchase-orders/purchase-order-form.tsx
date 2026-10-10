@@ -214,11 +214,14 @@ function PurchaseOrderFields({
   const updatePo = useUpdatePurchaseOrder(existing?.id ?? "");
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
-  const busy = submitting || create.isPending || updatePo.isPending;
+  const busy =
+    submitting || loadingPr || create.isPending || updatePo.isPending;
   const errors = form.formState.errors;
 
   /** Loads a PR's pending items as lines, rates from the Material master. */
   const loadPurchaseRequest = async (prId: string) => {
+    const previousPurchaseRequestId = form.getValues("purchaseRequestId");
+    const previousLines = form.getValues("lines");
     form.setValue("purchaseRequestId", prId);
     if (prId === "") {
       // Back to no Purchase Request: keep the lines, without their links.
@@ -259,6 +262,13 @@ function PurchaseOrderFields({
         pr.requiredDate != null
       )
         form.setValue("expectedDeliveryDate", pr.requiredDate);
+    } catch {
+      // Keep the form consistent: back to the request and lines it had.
+      form.setValue("purchaseRequestId", previousPurchaseRequestId);
+      replace(previousLines);
+      setError(
+        "The Purchase Request's materials could not be loaded. Try again.",
+      );
     } finally {
       setLoadingPr(false);
     }
