@@ -205,7 +205,9 @@ export function PurchaseRequestWizard({
   const [noItems, setNoItems] = useState(false);
   const create = useCreatePurchaseRequest();
   const update = useUpdatePurchaseRequest(existing?.id ?? "");
-  const busy = create.isPending || update.isPending;
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const busy = submitting || create.isPending || update.isPending;
 
   // Mode B: materials chosen on Current Inventory.
   const preload = useQuery({
@@ -260,6 +262,11 @@ export function PurchaseRequestWizard({
 
   const submit = (approve: boolean) =>
     form.handleSubmit(async (values) => {
+      // One save at a time: the buttons stay disabled through the
+      // attachment uploads, and a second click in the same tick is ignored.
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      setSubmitting(true);
       setError(undefined);
       const input = toInput(values, approve);
       try {
@@ -289,6 +296,8 @@ export function PurchaseRequestWizard({
             : path,
         );
       } catch (failure) {
+        submittingRef.current = false;
+        setSubmitting(false);
         const { field, message } = fieldForCode(failure, SERVER_FIELDS);
         if (field != null) {
           form.setError(field, { message });

@@ -85,6 +85,11 @@ export type MaterialRow = {
 export type MaterialListParams = MasterListParams & {
   categoryId?: string;
   itemType?: MaterialItemType;
+  /**
+   * Whether the search may match HSN codes: only for readers with
+   * Materials Financial, who see the codes (a match would otherwise leak them).
+   */
+  searchHsn?: boolean;
 };
 
 /** A unit or category a Material form picks, as the check needs it. */
