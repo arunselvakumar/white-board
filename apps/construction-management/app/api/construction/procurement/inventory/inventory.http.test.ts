@@ -97,7 +97,7 @@ async function setup() {
   );
   const bag = await addUnit(owner.workspaceId, owner.userId, "Bag");
   const cement = await addMaterial(owner.workspaceId, owner.userId, {
-    name: "Cement OPC 53",
+    name: "Cement OPC 53 Grade",
     uomId: bag,
     minStockQty: "20",
   });
@@ -220,7 +220,7 @@ describe("Current Inventory (CM-506)", () => {
         row.state,
       ]),
     ).toEqual([
-      ["Cement OPC 53", "15.000", "20.000", "low_stock"],
+      ["Cement OPC 53 Grade", "15.000", "20.000", "low_stock"],
       ["M Sand", "0.000", null, "out_of_stock"],
     ]);
     expect(before.summary).toEqual({
@@ -257,7 +257,7 @@ describe("Current Inventory (CM-506)", () => {
       `${at("project", projectId)}&search=cem`,
     );
     expect(searched.items.map((row) => row.materialName)).toEqual([
-      "Cement OPC 53",
+      "Cement OPC 53 Grade",
     ]);
 
     const exported = await exportList(
@@ -297,10 +297,10 @@ describe("Current Inventory (CM-506)", () => {
       };
     }>(refused);
     expect(body.code).toBe("STOCK_INSUFFICIENT");
-    expect(body.message).toContain("Cement OPC 53");
+    expect(body.message).toContain("Cement OPC 53 Grade");
     expect(body.details.shortfalls).toEqual([
       expect.objectContaining({
-        materialName: "Cement OPC 53",
+        materialName: "Cement OPC 53 Grade",
         shortBy: "10.000",
         onDate: addDays(TODAY, -2),
       }),
@@ -575,7 +575,7 @@ describe("Current Inventory (CM-506)", () => {
     expect(sampleFile.headers.get("content-type")).toBe(XLSX);
 
     const bad = await sheet([
-      ["cement opc 53", 120, "Bag", 500],
+      ["cement opc 53 grade", 120, "Bag", 500],
       ["M Sand", 4, "Bag", null],
       ["Granite", 1, null, null],
     ]);
@@ -609,7 +609,7 @@ describe("Current Inventory (CM-506)", () => {
     );
 
     const good = await sheet([
-      ["cement opc 53", 120, "Bag", 500],
+      ["cement opc 53 grade", 120, "Bag", 500],
       ["M Sand", null, null, 30],
     ]);
     const posted = await importStock(
@@ -627,7 +627,7 @@ describe("Current Inventory (CM-506)", () => {
     expect(
       rows.map((row) => [row.materialName, row.inStock, row.estimatedQty]),
     ).toEqual([
-      ["Cement OPC 53", "120.000", "500.000"],
+      ["Cement OPC 53 Grade", "120.000", "500.000"],
       ["M Sand", "0.000", "30.000"],
     ]);
     const [opening] = (await historyOf(owner, site, cement.id)).items;
@@ -642,7 +642,7 @@ describe("Current Inventory (CM-506)", () => {
       upload(
         `${BASE}/import?${at("project", projectId)}`,
         owner.cookie,
-        await sheet([["Cement OPC 53", 10, null, null]]),
+        await sheet([["Cement OPC 53 Grade", 10, null, null]]),
       ),
     );
     expect(
@@ -700,7 +700,7 @@ describe("Current Inventory (CM-506)", () => {
     const body = await json<{ items: Record<string, string>[] }>(response);
     expect(body.items).toEqual([
       expect.objectContaining({
-        materialName: "Cement OPC 53",
+        materialName: "Cement OPC 53 Grade",
         opening: "90.000",
         received: "0.000",
         consumed: "20.000",

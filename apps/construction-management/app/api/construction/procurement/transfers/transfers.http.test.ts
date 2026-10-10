@@ -75,7 +75,7 @@ async function setup() {
   });
   const bag = await addUnit(owner.workspaceId, owner.userId, "Bag");
   const cement = await addMaterial(owner.workspaceId, owner.userId, {
-    name: "Cement OPC 53",
+    name: "Cement OPC 53 Grade",
     uomId: bag,
   });
   const tower = { kind: "project" as const, id: towerId };
@@ -148,7 +148,11 @@ describe("Material Transfer (CM-507)", () => {
       from: { name: "Tower A" },
       to: { name: "Villa B" },
       lines: [
-        { materialName: "Cement OPC 53", uomName: "Bag", quantity: "30.000" },
+        {
+          materialName: "Cement OPC 53 Grade",
+          uomName: "Bag",
+          quantity: "30.000",
+        },
       ],
     });
     expect(pending.number).toMatch(/^MT/);

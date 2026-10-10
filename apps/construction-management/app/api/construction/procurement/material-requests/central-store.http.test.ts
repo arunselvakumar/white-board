@@ -100,7 +100,7 @@ async function setup(company: Company) {
   ]);
   const categoryId = await addMaterialCategory(workspaceId, userId, "Civil");
   const cement = await addMaterial(workspaceId, userId, {
-    name: "Cement OPC 53",
+    name: "Cement OPC 53 Grade",
     categoryId,
     minStockQty: "5",
   });

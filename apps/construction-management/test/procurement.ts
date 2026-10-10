@@ -14,16 +14,16 @@ function audit(by: string) {
   return { createdAt: now, updatedAt: now, createdBy: by, updatedBy: by };
 }
 
+/**
+ * A unit of this name: the Company's live one when it exists (a seed unit
+ * such as Bag), else a new one.
+ */
 export async function addUnit(
   workspaceId: string,
   by: string,
   name = `Unit ${randomUUID().slice(0, 6)}`,
 ): Promise<string> {
-  const id = randomUUID();
-  await prisma.constructionMastersMeasurementUnit.create({
-    data: { id, workspaceId, name, ...audit(by) },
-  });
-  return id;
+  return unitNamed(workspaceId, by, name);
 }
 
 /** The Company's live unit of this name (a seed one if present), else a new one. */
@@ -40,7 +40,12 @@ export async function unitNamed(
     },
     select: { id: true },
   });
-  return found?.id ?? addUnit(workspaceId, by, name);
+  if (found != null) return found.id;
+  const id = randomUUID();
+  await prisma.constructionMastersMeasurementUnit.create({
+    data: { id, workspaceId, name, ...audit(by) },
+  });
+  return id;
 }
 
 export async function addMaterialCategory(

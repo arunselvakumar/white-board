@@ -109,7 +109,7 @@ async function fixtures(company: Company) {
     projectIds: [projectId],
   });
   const cement = await addMaterial(workspaceId, userId, {
-    name: "Cement OPC 53",
+    name: "Cement OPC 53 Grade",
     unitRate: 38_500n,
     gstRate: "28",
     hsnCode: "2523",
@@ -595,9 +595,9 @@ describe("Goods Receipts (CM-505)", () => {
       details: { shortfalls: { materialName: string; shortBy: string }[] };
     }>(negative);
     expect(error.code).toBe("STOCK_INSUFFICIENT");
-    expect(error.message).toContain("Cement OPC 53");
+    expect(error.message).toContain("Cement OPC 53 Grade");
     expect(error.details.shortfalls[0]).toMatchObject({
-      materialName: "Cement OPC 53",
+      materialName: "Cement OPC 53 Grade",
       shortBy: "30.000",
     });
     const refusedDelete = await remove(
