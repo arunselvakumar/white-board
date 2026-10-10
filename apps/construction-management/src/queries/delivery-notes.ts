@@ -24,12 +24,11 @@ export const DELIVERY_NOTES_KEY = [
   "delivery-notes",
 ] as const;
 
-export const DELIVERY_NOTE_STATUS_LABELS: Record<DeliveryNoteStatus, string> =
-  {
-    pending: "Pending",
-    in_transit: "In transit",
-    delivered: "Delivered",
-  };
+export const DELIVERY_NOTE_STATUS_LABELS: Record<DeliveryNoteStatus, string> = {
+  pending: "Pending",
+  in_transit: "In transit",
+  delivered: "Delivered",
+};
 
 export type DeliveryNoteFilter = {
   storeId?: string;

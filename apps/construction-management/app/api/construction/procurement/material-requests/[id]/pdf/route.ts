@@ -22,10 +22,11 @@ export async function GET(
     );
     const session = await requireRequestAccess(request, id, "print", "any");
     if (isResponse(session)) return session;
-    const profile = await prisma.constructionOrganizationCompanyProfile.findUnique({
-      where: { workspaceId: session.workspaceId },
-      select: { name: true, timezone: true },
-    });
+    const profile =
+      await prisma.constructionOrganizationCompanyProfile.findUnique({
+        where: { workspaceId: session.workspaceId },
+        select: { name: true, timezone: true },
+      });
     const generatedAt = new Intl.DateTimeFormat("en-IN", {
       dateStyle: "medium",
       timeStyle: "short",

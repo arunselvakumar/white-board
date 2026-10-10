@@ -36,9 +36,15 @@ describe("Store (CM-508)", () => {
       undeliveredDeliveryNotes: 0,
       undeliveredTransfers: 0,
     };
-    expect(() => assertStoreDeletable(clear)).not.toThrow();
-    expect(() =>
-      assertStoreDeletable({ ...clear, materialsInStock: 2, undeliveredTransfers: 1 }),
-    ).toThrow("it holds stock, it has Material Transfers not yet delivered");
+    expect(() => {
+      assertStoreDeletable(clear);
+    }).not.toThrow();
+    expect(() => {
+      assertStoreDeletable({
+        ...clear,
+        materialsInStock: 2,
+        undeliveredTransfers: 1,
+      });
+    }).toThrow("it holds stock, it has Material Transfers not yet delivered");
   });
 });

@@ -32,8 +32,14 @@ type Story = StoryObj<typeof meta>;
 export const StoreSideClose: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByRole("heading", { name: "MR/26-27/00007" })).toBeVisible();
-    await expect(canvas.getByText("Partially delivered", { selector: "[data-slot=badge]" })).toBeVisible();
+    await expect(
+      await canvas.findByRole("heading", { name: "MR/26-27/00007" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Partially delivered", {
+        selector: "[data-slot=badge]",
+      }),
+    ).toBeVisible();
     const lines = canvas.getByRole("table", { name: "Requested materials" });
     await expect(lines).toHaveTextContent("100 Bag");
     await expect(lines).toHaveTextContent("Columns C1–C8");
@@ -49,14 +55,25 @@ export const StoreSideClose: Story = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Close" }));
     const dialog = within(await body.findByRole("dialog"));
-    await userEvent.click(dialog.getByRole("button", { name: "Close request" }));
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Close request" }),
+    );
     await expect(
       await dialog.findByText("Write why the store will not send the rest."),
     ).toBeVisible();
-    await userEvent.type(dialog.getByLabelText("Reason"), "Cement out of stock this month");
-    await userEvent.click(dialog.getByRole("button", { name: "Close request" }));
-    await expect(await canvas.findByText("Cement out of stock this month")).toBeVisible();
-    await expect(canvas.getByText("Closed", { selector: "[data-slot=badge]" })).toBeVisible();
+    await userEvent.type(
+      dialog.getByLabelText("Reason"),
+      "Cement out of stock this month",
+    );
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Close request" }),
+    );
+    await expect(
+      await canvas.findByText("Cement out of stock this month"),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Closed", { selector: "[data-slot=badge]" }),
+    ).toBeVisible();
   },
 };
 
@@ -69,9 +86,13 @@ export const ProjectSideReadOnly: Story = {
     }).restore,
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Velan Constructions")).toBeVisible();
-    await expect(canvas.getByText("Needed for the 3rd floor slab.")).toBeVisible();
+    await expect(
+      canvas.getByText("Needed for the 3rd floor slab."),
+    ).toBeVisible();
     await expect(canvas.queryByRole("button", { name: "Close" })).toBeNull();
-    await expect(canvas.queryByRole("link", { name: "Create Delivery Note" })).toBeNull();
+    await expect(
+      canvas.queryByRole("link", { name: "Create Delivery Note" }),
+    ).toBeNull();
     await expect(canvas.queryByRole("link", { name: "PDF" })).toBeNull();
   },
 };

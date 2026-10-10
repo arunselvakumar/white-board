@@ -2,14 +2,21 @@ import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
 import { documentsHandler } from "@/components/procurement/documents/document-fixtures";
 import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
 import { PROCUREMENT_ACCESS_MENUS } from "@/app/api/construction/procurement/access/access-models";
-import type { CentralInventory, StockLedger } from "@/src/queries/central-inventory";
+import type {
+  CentralInventory,
+  StockLedger,
+} from "@/src/queries/central-inventory";
 import type { DeliveryNote } from "@/src/queries/delivery-notes";
 import type {
   MaterialRequest,
   MaterialRequestFormOptions,
 } from "@/src/queries/material-requests";
 import type { ProcurementAccess } from "@/src/queries/procurement-access";
-import type { Store, StoreFormOptions, StoreStockRow } from "@/src/queries/stores";
+import type {
+  Store,
+  StoreFormOptions,
+  StoreStockRow,
+} from "@/src/queries/stores";
 import type { Flag } from "@/src/shared-kernel/access";
 
 /** Central Store fixtures for stories (CM-508, CM-509): a Chennai builder. */
@@ -134,7 +141,12 @@ export const REQUEST: MaterialRequest = {
     },
   ],
   deliveryNotes: [
-    { id: IDS.note, number: "DN/26-27/00003", deliveryDate: "2026-10-09", status: "in_transit" },
+    {
+      id: IDS.note,
+      number: "DN/26-27/00003",
+      deliveryDate: "2026-10-09",
+      status: "in_transit",
+    },
   ],
   createdAt: AT,
   updatedAt: AT,
@@ -186,7 +198,13 @@ const position = (
   stock: string,
   inTransit: string,
   state: "in_stock" | "low_stock" | "out_of_stock",
-) => ({ location: { kind, id, name }, stock, inTransit, minimum: "50.000", state });
+) => ({
+  location: { kind, id, name },
+  stock,
+  inTransit,
+  minimum: "50.000",
+  state,
+});
 
 export const INVENTORY: CentralInventory = {
   locations: [
@@ -205,9 +223,30 @@ export const INVENTORY: CentralInventory = {
       totalStock: "245.000",
       totalInTransit: "0.000",
       positions: [
-        position("project", IDS.tower, "Anugraha Towers", "180", "0", "in_stock"),
-        position("project", IDS.villa, "Velachery Villas", "25", "0", "low_stock"),
-        position("store", IDS.store, "Ambattur Central Store", "40", "0", "low_stock"),
+        position(
+          "project",
+          IDS.tower,
+          "Anugraha Towers",
+          "180",
+          "0",
+          "in_stock",
+        ),
+        position(
+          "project",
+          IDS.villa,
+          "Velachery Villas",
+          "25",
+          "0",
+          "low_stock",
+        ),
+        position(
+          "store",
+          IDS.store,
+          "Ambattur Central Store",
+          "40",
+          "0",
+          "low_stock",
+        ),
       ],
     },
     {
@@ -219,8 +258,22 @@ export const INVENTORY: CentralInventory = {
       totalStock: "1250.500",
       totalInTransit: "200.000",
       positions: [
-        position("project", IDS.tower, "Anugraha Towers", "0", "200", "out_of_stock"),
-        position("store", IDS.store, "Ambattur Central Store", "1250.5", "0", "in_stock"),
+        position(
+          "project",
+          IDS.tower,
+          "Anugraha Towers",
+          "0",
+          "200",
+          "out_of_stock",
+        ),
+        position(
+          "store",
+          IDS.store,
+          "Ambattur Central Store",
+          "1250.5",
+          "0",
+          "in_stock",
+        ),
       ],
     },
   ],
@@ -243,7 +296,11 @@ export const LEDGER: StockLedger = {
   to: "2026-10-10",
   rows: [
     {
-      location: { kind: "store", id: IDS.store, name: "Ambattur Central Store" },
+      location: {
+        kind: "store",
+        id: IDS.store,
+        name: "Ambattur Central Store",
+      },
       materialId: IDS.cement,
       materialName: "Cement OPC 53 Grade",
       uomName: "Bag",
@@ -256,7 +313,9 @@ export const LEDGER: StockLedger = {
 };
 
 export function access(
-  flags: Partial<Record<(typeof PROCUREMENT_ACCESS_MENUS)[number], Flag[]>> | "all" = "all",
+  flags:
+    | Partial<Record<(typeof PROCUREMENT_ACCESS_MENUS)[number], Flag[]>>
+    | "all" = "all",
 ): ProcurementAccess {
   const all: Flag[] = [
     "create",
@@ -305,8 +364,14 @@ export function centralStoreHandler(options: CentralStoreApiOptions = {}) {
   const docs = documentsHandler();
   return (call: ApiCall): Response | undefined => {
     const path = call.path.split("?")[0] ?? "";
-    if (call.method === "POST" && options.writeError != null && path.startsWith(API))
-      return Response.json(options.writeError, { status: options.writeError.status });
+    if (
+      call.method === "POST" &&
+      options.writeError != null &&
+      path.startsWith(API)
+    )
+      return Response.json(options.writeError, {
+        status: options.writeError.status,
+      });
     const answered = docs(call) ?? materialOptionsHandler(call);
     if (answered != null) return answered;
     if (path.endsWith("/location-options"))
@@ -315,25 +380,37 @@ export function centralStoreHandler(options: CentralStoreApiOptions = {}) {
         wings: [],
         amenities: [],
         commonDevelopments: [],
-        locations: [{ id: "0199c4a0-0000-7000-8000-0000000001a6", name: "Culvert C3" }],
+        locations: [
+          { id: "0199c4a0-0000-7000-8000-0000000001a6", name: "Culvert C3" },
+        ],
       });
-    if (path === `${API}/access`) return Response.json(options.access ?? access());
+    if (path === `${API}/access`)
+      return Response.json(options.access ?? access());
     if (path === `${API}/stores` && call.method === "GET")
       return Response.json(page(stores));
     if (path === `${API}/stores` && call.method === "POST")
-      return Response.json({ ...STORE, ...(call.body as object), id: IDS.store }, { status: 201 });
-    if (path === `${API}/stores/form-options`) return Response.json(FORM_OPTIONS);
-    if (path === `${API}/stores/${IDS.store}`) return Response.json(stores[0] ?? STORE);
+      return Response.json(
+        { ...STORE, ...(call.body as object), id: IDS.store },
+        { status: 201 },
+      );
+    if (path === `${API}/stores/form-options`)
+      return Response.json(FORM_OPTIONS);
+    if (path === `${API}/stores/${IDS.store}`)
+      return Response.json(stores[0] ?? STORE);
     if (path === `${API}/stores/${IDS.store}/stock`)
       return Response.json({ items: options.stock ?? STORE_STOCK });
-    if (path === `${API}/stores/${IDS.store}/update`) return Response.json(STORE);
-    if (path === `${API}/stores/${IDS.store}/delete`) return new Response(null, { status: 204 });
-    if (path === `${API}/material-requests/form-options`) return Response.json(MR_FORM_OPTIONS);
+    if (path === `${API}/stores/${IDS.store}/update`)
+      return Response.json(STORE);
+    if (path === `${API}/stores/${IDS.store}/delete`)
+      return new Response(null, { status: 204 });
+    if (path === `${API}/material-requests/form-options`)
+      return Response.json(MR_FORM_OPTIONS);
     if (path === `${API}/material-requests` && call.method === "GET")
       return Response.json(page(requests));
     if (path === `${API}/material-requests` && call.method === "POST")
       return Response.json(request, { status: 201 });
-    if (path === `${API}/material-requests/${request.id}`) return Response.json(request);
+    if (path === `${API}/material-requests/${request.id}`)
+      return Response.json(request);
     if (path === `${API}/material-requests/${request.id}/close`) {
       request = {
         ...request,
@@ -374,7 +451,8 @@ export function centralStoreHandler(options: CentralStoreApiOptions = {}) {
           .filter((material) => material.positions.length > 0),
       });
     }
-    if (path === `${API}/central-inventory/stock-ledger`) return Response.json(LEDGER);
+    if (path === `${API}/central-inventory/stock-ledger`)
+      return Response.json(LEDGER);
     return undefined;
   };
 }

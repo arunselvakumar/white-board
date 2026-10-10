@@ -94,7 +94,9 @@ export function stockLedgerXlsxUrl(filter: StockLedgerFilter): string {
 /** `12.500` as `12.5`, Indian digit grouping for the whole part. */
 export function formatQuantity(decimal: string): string {
   const negative = decimal.startsWith("-");
-  const [whole = "0", fraction = ""] = (negative ? decimal.slice(1) : decimal).split(".");
+  const [whole = "0", fraction = ""] = (
+    negative ? decimal.slice(1) : decimal
+  ).split(".");
   const trimmed = fraction.replace(/0+$/, "");
   const grouped = new Intl.NumberFormat("en-IN").format(BigInt(whole));
   return `${negative ? "−" : ""}${grouped}${trimmed === "" ? "" : `.${trimmed}`}`;

@@ -16,7 +16,9 @@ let api: ReturnType<typeof mockCentralStoreApi>;
 function posts(): ApiCall[] {
   return api.calls.mock.calls
     .map(([call]) => call)
-    .filter((call) => call.method === "POST" && call.path === `${API}/delivery-notes`);
+    .filter(
+      (call) => call.method === "POST" && call.path === `${API}/delivery-notes`,
+    );
 }
 
 const meta = {
@@ -43,19 +45,29 @@ type Story = StoryObj<typeof meta>;
  */
 export const SaveAndApprove: Story = {
   play: async ({ canvas, userEvent }) => {
-    const cement = await canvas.findByLabelText("Delivered now: Cement OPC 53 Grade");
+    const cement = await canvas.findByLabelText(
+      "Delivered now: Cement OPC 53 Grade",
+    );
     await expect(cement).toHaveValue("40");
     await expect(await canvas.findByText("In store: 40 Bag")).toBeVisible();
     await userEvent.clear(cement);
     await userEvent.type(cement, "45");
-    await userEvent.click(canvas.getByRole("button", { name: "Save & Approve" }));
-    await expect(await canvas.findByText("At most 40 is pending.")).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Save & Approve" }),
+    );
+    await expect(
+      await canvas.findByText("At most 40 is pending."),
+    ).toBeVisible();
     await expect(posts()).toHaveLength(0);
 
     await userEvent.clear(cement);
     await userEvent.type(cement, "30");
-    await userEvent.clear(canvas.getByLabelText("Delivered now: TMT Steel Bar 12 mm"));
-    await userEvent.click(canvas.getByRole("button", { name: "Save & Approve" }));
+    await userEvent.clear(
+      canvas.getByLabelText("Delivered now: TMT Steel Bar 12 mm"),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Save & Approve" }),
+    );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
         `/app/workspace/central-store/delivery-notes/${IDS.note}`,
@@ -73,11 +85,17 @@ export const SaveAndApprove: Story = {
 /** Nothing to deliver is caught before saving. */
 export const NothingEntered: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.clear(await canvas.findByLabelText("Delivered now: Cement OPC 53 Grade"));
-    await userEvent.clear(canvas.getByLabelText("Delivered now: TMT Steel Bar 12 mm"));
+    await userEvent.clear(
+      await canvas.findByLabelText("Delivered now: Cement OPC 53 Grade"),
+    );
+    await userEvent.clear(
+      canvas.getByLabelText("Delivered now: TMT Steel Bar 12 mm"),
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
-      await canvas.findByText("Enter a delivered quantity for at least one material."),
+      await canvas.findByText(
+        "Enter a delivered quantity for at least one material.",
+      ),
     ).toBeVisible();
     await expect(posts()).toHaveLength(0);
   },

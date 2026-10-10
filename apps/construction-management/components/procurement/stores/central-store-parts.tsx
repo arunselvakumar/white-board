@@ -84,8 +84,10 @@ export function MaterialRequestStatusBadge({
   );
 }
 
-const NOTE_VARIANTS: Record<DeliveryNoteStatus, "secondary" | "outline" | "default"> =
-  { pending: "secondary", in_transit: "outline", delivered: "default" };
+const NOTE_VARIANTS: Record<
+  DeliveryNoteStatus,
+  "secondary" | "outline" | "default"
+> = { pending: "secondary", in_transit: "outline", delivered: "default" };
 
 export function DeliveryNoteStatusBadge({
   status,
@@ -99,8 +101,14 @@ export function DeliveryNoteStatusBadge({
   );
 }
 
-const STATE_VARIANTS: Record<StockState, "secondary" | "outline" | "destructive"> =
-  { in_stock: "secondary", low_stock: "outline", out_of_stock: "destructive" };
+const STATE_VARIANTS: Record<
+  StockState,
+  "secondary" | "outline" | "destructive"
+> = {
+  in_stock: "secondary",
+  low_stock: "outline",
+  out_of_stock: "destructive",
+};
 
 export function StockStateBadge({ state }: { state: StockState }) {
   return (

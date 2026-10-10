@@ -46,11 +46,12 @@ export const DeleteConstructionProcurementDeliveryNoteRequestModel = z.object({
   expectedUpdatedAt: z.iso.datetime(),
 });
 
-export const ApproveConstructionProcurementDeliveryNotesRequestModel =
-  z.object({
+export const ApproveConstructionProcurementDeliveryNotesRequestModel = z.object(
+  {
     /** 1–100 pending notes; all or none. */
     ids: z.array(z.uuid()).min(1).max(100),
-  });
+  },
+);
 
 export const MarkConstructionProcurementDeliveryNoteDeliveredRequestModel =
   z.object({

@@ -46,11 +46,9 @@ function ids(
       details: { field, ids: bad },
     });
   if (list.length > max)
-    throw new DomainError(
-      "TOO_MANY",
-      `Choose at most ${String(max)}.`,
-      { details: { field } },
-    );
+    throw new DomainError("TOO_MANY", `Choose at most ${String(max)}.`, {
+      details: { field },
+    });
   return list;
 }
 

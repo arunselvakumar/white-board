@@ -36,7 +36,9 @@ export const Stock: Story = {
     await expect(await canvas.findByText("Velachery Villas")).toBeVisible();
     await expect(canvas.getByText("Murugan K")).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("tab", { name: "Material Requests" }));
+    await userEvent.click(
+      canvas.getByRole("tab", { name: "Material Requests" }),
+    );
     await expect(
       await canvas.findByRole("link", { name: /MR\/26-27\/00007/ }),
     ).toHaveAttribute(

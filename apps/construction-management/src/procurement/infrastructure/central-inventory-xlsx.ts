@@ -5,10 +5,7 @@ import type {
   StockLedgerWorkbook,
   StockLedgerWorkbookHeader,
 } from "../application/central-inventory-queries";
-import {
-  STOCK_ENTRY_LABELS,
-  STOCK_ENTRY_TYPES,
-} from "../domain/stock-ledger";
+import { STOCK_ENTRY_LABELS, STOCK_ENTRY_TYPES } from "../domain/stock-ledger";
 
 const HEADER_FILL: ExcelJS.Fill = {
   type: "pattern",

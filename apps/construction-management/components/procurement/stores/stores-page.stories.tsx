@@ -25,7 +25,9 @@ type Story = StoryObj<typeof meta>;
 /** Each store with its state, Projects and store keepers; Add store and Central Inventory. */
 export const Stores: Story = {
   play: async ({ canvas, canvasElement }) => {
-    const link = await canvas.findByRole("link", { name: /Ambattur Central Store/ });
+    const link = await canvas.findByRole("link", {
+      name: /Ambattur Central Store/,
+    });
     await expect(link).toHaveAttribute(
       "href",
       `/app/workspace/central-store/${IDS.store}`,
@@ -33,8 +35,12 @@ export const Stores: Story = {
     await expect(
       canvas.getByText("Tamil Nadu · 2 Projects · 1 store keeper"),
     ).toBeVisible();
-    await expect(await canvas.findByRole("link", { name: "Add store" })).toBeVisible();
-    await expect(canvas.getByRole("link", { name: "Central Inventory" })).toBeVisible();
+    await expect(
+      await canvas.findByRole("link", { name: "Add store" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Central Inventory" }),
+    ).toBeVisible();
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

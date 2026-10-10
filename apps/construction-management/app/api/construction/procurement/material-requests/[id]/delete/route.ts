@@ -29,7 +29,12 @@ export async function POST(
         await request.json(),
       ),
     );
-    const session = await requireRequestAccess(request, id, "delete", "project");
+    const session = await requireRequestAccess(
+      request,
+      id,
+      "delete",
+      "project",
+    );
     if (isResponse(session)) return session;
     await centralStore.materialRequests.delete(
       actorOf(session),

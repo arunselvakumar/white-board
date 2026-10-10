@@ -79,7 +79,9 @@ export function DeliveryNoteForm({
   const create = useCreateDeliveryNote(materialRequestId);
   const update = useUpdateDeliveryNote(note?.id ?? "");
 
-  const onNote = new Map(note?.items.map((item) => [item.materialRequestItemId, item]));
+  const onNote = new Map(
+    note?.items.map((item) => [item.materialRequestItemId, item]),
+  );
   const lines = request.items
     .map((item) => {
       const mine = onNote.get(item.id);
@@ -133,14 +135,18 @@ export function DeliveryNoteForm({
       deliveredTo: note?.deliveredTo ?? request.receiverName ?? "",
       remark: note?.remark ?? "",
       quantities: Object.fromEntries(
-        lines.map((line) => [line.id, trimmed(line.current ?? line.pendingQty)]),
+        lines.map((line) => [
+          line.id,
+          trimmed(line.current ?? line.pendingQty),
+        ]),
       ),
     },
   });
   const errors = form.formState.errors;
   const lineError = (id: string): string | undefined =>
-    (errors.quantities as Record<string, { message?: string }> | undefined)?.[id]
-      ?.message;
+    (errors.quantities as Record<string, { message?: string }> | undefined)?.[
+      id
+    ]?.message;
   // Which submit button was pressed: Save or Save & Approve.
   const approve = useRef(false);
 
@@ -167,7 +173,10 @@ export function DeliveryNoteForm({
       const saved =
         note == null
           ? await create.mutateAsync({ ...input, approve: approve.current })
-          : await update.mutateAsync({ ...input, expectedUpdatedAt: note.updatedAt });
+          : await update.mutateAsync({
+              ...input,
+              expectedUpdatedAt: note.updatedAt,
+            });
       router.push(centralStoreHref.note(saved.id));
     } catch (error) {
       const { field, message } = fieldForCode(error, SERVER_FIELDS);
@@ -221,11 +230,7 @@ export function DeliveryNoteForm({
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="dn-remark">Remark</Label>
-            <Textarea
-              id="dn-remark"
-              rows={2}
-              {...form.register("remark")}
-            />
+            <Textarea id="dn-remark" rows={2} {...form.register("remark")} />
           </div>
         </div>
 
@@ -250,11 +255,15 @@ export function DeliveryNoteForm({
                     )}
                   </div>
                   <div className="text-sm tabular-nums">
-                    <span className="text-muted-foreground block text-xs">Requested</span>
+                    <span className="text-muted-foreground block text-xs">
+                      Requested
+                    </span>
                     {formatQuantity(line.askQty)} {line.uomName}
                   </div>
                   <div className="text-sm tabular-nums">
-                    <span className="text-muted-foreground block text-xs">Pending</span>
+                    <span className="text-muted-foreground block text-xs">
+                      Pending
+                    </span>
                     {formatQuantity(line.pendingQty)}
                   </div>
                   <div className="space-y-1">
@@ -300,7 +309,10 @@ export function DeliveryNoteForm({
               Save &amp; Approve
             </Button>
           ) : null}
-          <Link href={back.href} className={buttonVariants({ variant: "ghost" })}>
+          <Link
+            href={back.href}
+            className={buttonVariants({ variant: "ghost" })}
+          >
             Cancel
           </Link>
         </div>

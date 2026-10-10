@@ -3,12 +3,7 @@ import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import {
-  API,
-  IDS,
-  mockCentralStoreApi,
-  STORE,
-} from "./central-store-fixtures";
+import { API, IDS, mockCentralStoreApi, STORE } from "./central-store-fixtures";
 import { StoreForm } from "./store-form";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
@@ -40,14 +35,25 @@ type Story = StoryObj<typeof meta>;
 export const AddStore: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(await canvas.findByRole("button", { name: "Add store" }));
-    await expect(await canvas.findByText("Enter the store name.")).toBeVisible();
-    await expect(canvas.getByText("Choose at least one Project.")).toBeVisible();
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Add store" }),
+    );
+    await expect(
+      await canvas.findByText("Enter the store name."),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Choose at least one Project."),
+    ).toBeVisible();
     await expect(posts(`${API}/stores`)).toHaveLength(0);
 
-    await userEvent.type(canvas.getByLabelText("Store name"), "Ambattur Central Store");
+    await userEvent.type(
+      canvas.getByLabelText("Store name"),
+      "Ambattur Central Store",
+    );
     await userEvent.click(canvas.getByLabelText("Projects"));
-    await userEvent.click(await body.findByRole("option", { name: "Anugraha Towers" }));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Anugraha Towers" }),
+    );
     await userEvent.keyboard("{Escape}");
     await userEvent.click(canvas.getByLabelText("Store keepers"));
     await userEvent.click(await body.findByRole("option", { name: "Selvi R" }));
@@ -85,12 +91,16 @@ export const EditNameTaken: Story = {
   play: async ({ canvas, userEvent }) => {
     const name = await canvas.findByLabelText("Store name");
     await expect(name).toHaveValue("Ambattur Central Store");
-    await expect(canvas.getByRole("button", { name: "Remove Velachery Villas" })).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Remove Velachery Villas" }),
+    ).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
       await canvas.findByText("Another store already has this name."),
     ).toBeVisible();
-    await expect(posts(`${API}/stores/${IDS.store}/update`)[0]?.body).toMatchObject({
+    await expect(
+      posts(`${API}/stores/${IDS.store}/update`)[0]?.body,
+    ).toMatchObject({
       expectedUpdatedAt: STORE.updatedAt,
       projectIds: [IDS.tower, IDS.villa],
     });

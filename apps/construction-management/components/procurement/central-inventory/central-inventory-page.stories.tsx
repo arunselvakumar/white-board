@@ -27,15 +27,21 @@ type Story = StoryObj<typeof meta>;
 export const Inventory: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    const cement = await canvas.findByRole("table", { name: "Stock of Cement OPC 53 Grade" });
+    const cement = await canvas.findByRole("table", {
+      name: "Stock of Cement OPC 53 Grade",
+    });
     await expect(cement).toHaveTextContent("Velachery Villas");
     await expect(canvas.getByText("245 Bag")).toBeVisible();
     await expect(canvas.getByText(/200 in transit/)).toBeVisible();
 
     await userEvent.click(canvas.getByLabelText("Stock state"));
-    await userEvent.click(await body.findByRole("option", { name: "Out of stock" }));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Out of stock" }),
+    );
     await expect(
-      await canvas.findByRole("table", { name: "Stock of TMT Steel Bar 12 mm" }),
+      await canvas.findByRole("table", {
+        name: "Stock of TMT Steel Bar 12 mm",
+      }),
     ).toHaveTextContent("Anugraha Towers");
     await expect(
       canvas.queryByRole("table", { name: "Stock of Cement OPC 53 Grade" }),

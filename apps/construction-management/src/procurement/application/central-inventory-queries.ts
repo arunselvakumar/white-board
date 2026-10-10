@@ -1,10 +1,10 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
+import type { StockLedgerLine, StockState } from "../domain/central-inventory";
 import type {
-  StockLedgerLine,
-  StockState,
-} from "../domain/central-inventory";
-import type { StockLocation, StockLocationKind } from "../domain/stock-location";
+  StockLocation,
+  StockLocationKind,
+} from "../domain/stock-location";
 
 /** A Project or Store with its name. */
 export type InventoryLocation = {

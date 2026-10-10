@@ -62,7 +62,12 @@ async function code(response: Response): Promise<string> {
   return (await json<{ code: string }>(response)).code;
 }
 
-type Store = { id: string; name: string; updatedAt: string; projects: { id: string }[] };
+type Store = {
+  id: string;
+  name: string;
+  updatedAt: string;
+  projects: { id: string }[];
+};
 type RequestItem = {
   id: string;
   materialId: string;
@@ -135,7 +140,9 @@ describe("Central Store HTTP (CM-508)", () => {
     const company = await ownerWithCompany();
     const { workspaceId, userId, cookie } = company;
     const project = await addProject(workspaceId, userId, "Site 1");
-    const inactive = await addSupplier(workspaceId, userId, { isActive: false });
+    const inactive = await addSupplier(workspaceId, userId, {
+      isActive: false,
+    });
     const supplier = await addSupplier(workspaceId, userId);
 
     const none = await createStore(
@@ -265,9 +272,11 @@ describe("Central Store HTTP (CM-508)", () => {
   it("checks Request To, the Contractor and the lines of a Material Request", async () => {
     const company = await ownerWithCompany();
     const { tower, villa, cement, storeId } = await setup(company);
-    const contractor = await addContractor(company.workspaceId, company.userId, [
-      villa,
-    ]);
+    const contractor = await addContractor(
+      company.workspaceId,
+      company.userId,
+      [villa],
+    );
     const base = {
       projectId: tower,
       requestDate: TODAY,
@@ -408,7 +417,9 @@ describe("Central Store HTTP (CM-508)", () => {
       }),
       ctx(request.id),
     );
-    expect(await code(removeRequest)).toBe("MATERIAL_REQUEST_HAS_DELIVERY_NOTES");
+    expect(await code(removeRequest)).toBe(
+      "MATERIAL_REQUEST_HAS_DELIVERY_NOTES",
+    );
 
     // Approve: Issued at the store, in transit to the Project.
     const approved = await approveNote(
@@ -452,7 +463,8 @@ describe("Central Store HTTP (CM-508)", () => {
     expect(cementRow()?.totalStock).toBe("4.000");
     expect(cementRow()?.totalInTransit).toBe("6.000");
     expect(
-      cementRow()?.positions.find((row) => row.location.id === tower)?.inTransit,
+      cementRow()?.positions.find((row) => row.location.id === tower)
+        ?.inTransit,
     ).toBe("6.000");
     expect(
       cementRow()?.positions.find((row) => row.location.id === storeId)?.state,
@@ -499,10 +511,14 @@ describe("Central Store HTTP (CM-508)", () => {
     expect(restNote.status).toBe("in_transit");
     expect(restNote.items[0]?.pendingQty).toBe("2.000");
     await markDelivered(
-      jsonRequest(`${API}/delivery-notes/${restNote.id}/mark-delivered`, cookie, {
-        deliveredOn: TODAY,
-        expectedUpdatedAt: restNote.updatedAt,
-      }),
+      jsonRequest(
+        `${API}/delivery-notes/${restNote.id}/mark-delivered`,
+        cookie,
+        {
+          deliveredOn: TODAY,
+          expectedUpdatedAt: restNote.updatedAt,
+        },
+      ),
       ctx(restNote.id),
     );
     request = await json<MaterialRequest>(
@@ -526,9 +542,9 @@ describe("Central Store HTTP (CM-508)", () => {
       ctx(request.id),
     );
     expect(pdf.headers.get("content-type")).toBe("application/pdf");
-    expect(new TextDecoder().decode((await pdf.arrayBuffer()).slice(0, 5))).toBe(
-      "%PDF-",
-    );
+    expect(
+      new TextDecoder().decode((await pdf.arrayBuffer()).slice(0, 5)),
+    ).toBe("%PDF-");
 
     // The ledger shows issued at the store and received at the Project.
     const ledger = await json<{
@@ -610,7 +626,9 @@ describe("Central Store HTTP (CM-508)", () => {
       }),
       ctx(request.id),
     );
-    expect(await code(blocked)).toBe("MATERIAL_REQUEST_HAS_OPEN_DELIVERY_NOTES");
+    expect(await code(blocked)).toBe(
+      "MATERIAL_REQUEST_HAS_OPEN_DELIVERY_NOTES",
+    );
 
     const bulk = await bulkApprove(
       jsonRequest(`${API}/delivery-notes/approve`, cookie, {
@@ -721,10 +739,14 @@ describe("Central Store HTTP (CM-508)", () => {
     );
     expect(noteByMember.status).toBe(StatusCodes.FORBIDDEN);
     const close = await closeRequest(
-      jsonRequest(`${API}/material-requests/${request.id}/close`, member.cookie, {
-        reason: "No",
-        expectedUpdatedAt: request.updatedAt,
-      }),
+      jsonRequest(
+        `${API}/material-requests/${request.id}/close`,
+        member.cookie,
+        {
+          reason: "No",
+          expectedUpdatedAt: request.updatedAt,
+        },
+      ),
       ctx(request.id),
     );
     expect(close.status).toBe(StatusCodes.FORBIDDEN);
@@ -746,10 +768,14 @@ describe("Central Store HTTP (CM-508)", () => {
     );
     expect(seen.status).toBe(StatusCodes.OK);
     const done = await markDelivered(
-      jsonRequest(`${API}/delivery-notes/${note.id}/mark-delivered`, member.cookie, {
-        deliveredOn: TODAY,
-        expectedUpdatedAt: note.updatedAt,
-      }),
+      jsonRequest(
+        `${API}/delivery-notes/${note.id}/mark-delivered`,
+        member.cookie,
+        {
+          deliveredOn: TODAY,
+          expectedUpdatedAt: note.updatedAt,
+        },
+      ),
       ctx(note.id),
     );
     expect(done.status).toBe(StatusCodes.OK);
@@ -819,7 +845,8 @@ describe("Central Inventory HTTP (CM-509)", () => {
       ),
     );
     expect(
-      projects.materials.find((row) => row.materialId === cement.id)?.totalStock,
+      projects.materials.find((row) => row.materialId === cement.id)
+        ?.totalStock,
     ).toBe("23.500");
     expect(
       projects.materials.find((row) => row.materialId === steel.id),
@@ -827,7 +854,10 @@ describe("Central Inventory HTTP (CM-509)", () => {
 
     const civil = await json<Inventory>(
       await getInventory(
-        jsonRequest(`${API}/central-inventory?categoryId=${categoryId}`, cookie),
+        jsonRequest(
+          `${API}/central-inventory?categoryId=${categoryId}`,
+          cookie,
+        ),
       ),
     );
     expect(civil.materials.map((row) => row.materialId)).toEqual([cement.id]);
@@ -846,7 +876,7 @@ describe("Central Inventory HTTP (CM-509)", () => {
 
   it("lists every Central Store route on /api/docs", async () => {
     const document = await json<{ paths: Record<string, unknown> }>(
-      await getOpenApi(),
+      getOpenApi(),
     );
     for (const path of [
       "/api/construction/procurement/stores",

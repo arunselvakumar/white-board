@@ -22,9 +22,10 @@ export const cursorQuery = {
   before: z.string().min(1).optional(),
 };
 
-export function exclusiveCursors<T extends { after?: string; before?: string }>(
-  value: T,
-): boolean {
+export function exclusiveCursors(value: {
+  after?: string;
+  before?: string;
+}): boolean {
   return value.after == null || value.before == null;
 }
 
@@ -143,11 +144,13 @@ export type ListConstructionProcurementStoreOptionsResponseModel = z.infer<
   typeof ListConstructionProcurementStoreOptionsResponseModel
 >;
 
-export const GetConstructionProcurementStoreFormOptionsResponseModel = z.object({
-  projects: z.array(NamedModel),
-  teamMembers: z.array(NamedModel),
-  suppliers: z.array(NamedModel),
-});
+export const GetConstructionProcurementStoreFormOptionsResponseModel = z.object(
+  {
+    projects: z.array(NamedModel),
+    teamMembers: z.array(NamedModel),
+    suppliers: z.array(NamedModel),
+  },
+);
 export type GetConstructionProcurementStoreFormOptionsResponseModel = z.infer<
   typeof GetConstructionProcurementStoreFormOptionsResponseModel
 >;

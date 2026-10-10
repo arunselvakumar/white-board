@@ -102,7 +102,10 @@ export type DeliveryNoteRepository = {
     expectedUpdatedAt: Date,
   ): Promise<void>;
   /** All or none, in one transaction. */
-  approve(actor: ProcurementCommandActor, ids: readonly string[]): Promise<void>;
+  approve(
+    actor: ProcurementCommandActor,
+    ids: readonly string[],
+  ): Promise<void>;
   markDelivered(
     actor: ProcurementCommandActor,
     id: string,

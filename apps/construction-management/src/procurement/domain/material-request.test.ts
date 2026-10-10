@@ -13,9 +13,13 @@ const STEEL = "0199c4a0-0000-7000-8000-00000000a002";
 describe("Material Request (CM-508)", () => {
   it("cleans lines and refuses empty, repeated and zero ones", () => {
     expect(
-      materialRequestLines([{ materialId: CEMENT, askQty: "12.5", remark: " " }]),
+      materialRequestLines([
+        { materialId: CEMENT, askQty: "12.5", remark: " " },
+      ]),
     ).toEqual([{ materialId: CEMENT, askQty: "12.500", remark: null }]);
-    expect(() => materialRequestLines([])).toThrow("Add at least one material.");
+    expect(() => materialRequestLines([])).toThrow(
+      "Add at least one material.",
+    );
     expect(() =>
       materialRequestLines([
         { materialId: CEMENT, askQty: "1" },

@@ -47,7 +47,9 @@ function RequestRow({
         <span className="text-muted-foreground block truncate text-xs">
           {[
             formatDate(request.requestDate),
-            showProject ? request.projectName : `To ${request.storeName ?? "store"}`,
+            showProject
+              ? request.projectName
+              : `To ${request.storeName ?? "store"}`,
             items === 1 ? "1 material" : `${String(items)} materials`,
           ]
             .filter((part) => part != null)

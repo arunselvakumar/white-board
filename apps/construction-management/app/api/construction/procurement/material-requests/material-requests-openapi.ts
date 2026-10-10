@@ -76,7 +76,8 @@ export const materialRequestOpenApiOperations: OpenApiOperation[] = [
     query: GetConstructionProcurementMaterialRequestFormOptionsRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "Options",
-    successSchema: GetConstructionProcurementMaterialRequestFormOptionsResponseModel,
+    successSchema:
+      GetConstructionProcurementMaterialRequestFormOptionsResponseModel,
     errors: READ_ERRORS,
   },
   {

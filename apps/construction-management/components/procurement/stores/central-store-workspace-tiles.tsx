@@ -9,12 +9,19 @@ import {
   ItemTitle,
 } from "@repo/ui/components/item";
 
-import { CENTRAL_INVENTORY_PATH, CENTRAL_STORE_PATH } from "./central-store-parts";
+import {
+  CENTRAL_INVENTORY_PATH,
+  CENTRAL_STORE_PATH,
+} from "./central-store-parts";
 
 /** The Workspace page's Central Store tile (CM-508). */
 export function CentralStoreWorkspaceTile() {
   return (
-    <Item variant="outline" className="w-full" render={<Link href={CENTRAL_STORE_PATH} />}>
+    <Item
+      variant="outline"
+      className="w-full"
+      render={<Link href={CENTRAL_STORE_PATH} />}
+    >
       <ItemMedia variant="icon">
         <Warehouse />
       </ItemMedia>
@@ -35,7 +42,11 @@ export function CentralStoreWorkspaceTile() {
 /** The Workspace page's Central Inventory tile (CM-509). */
 export function CentralInventoryWorkspaceTile() {
   return (
-    <Item variant="outline" className="w-full" render={<Link href={CENTRAL_INVENTORY_PATH} />}>
+    <Item
+      variant="outline"
+      className="w-full"
+      render={<Link href={CENTRAL_INVENTORY_PATH} />}
+    >
       <ItemMedia variant="icon">
         <Boxes />
       </ItemMedia>

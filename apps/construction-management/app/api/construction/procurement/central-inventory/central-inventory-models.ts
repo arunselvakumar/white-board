@@ -36,9 +36,13 @@ export function parseLocations(
   const parts = raw.split(",").map((part) => part.trim().toLowerCase());
   const bad = parts.filter((part) => !LOCATION_RE.test(part));
   if (bad.length > 0)
-    throw new DomainError("STOCK_LOCATION_INVALID", "Choose a Project or a Store.", {
-      details: { field: "locations" },
-    });
+    throw new DomainError(
+      "STOCK_LOCATION_INVALID",
+      "Choose a Project or a Store.",
+      {
+        details: { field: "locations" },
+      },
+    );
   return [...new Set(parts)].map((part) => {
     const [kind, id] = part.split(":") as ["project" | "store", string];
     return { kind, id };
@@ -72,32 +76,34 @@ const LocationModel = z.object({
   name: z.string(),
 });
 
-export const GetConstructionProcurementCentralInventoryResponseModel = z.object({
-  /** Every live Project and Store, for the location filter. */
-  locations: z.array(LocationModel),
-  categories: z.array(NamedModel),
-  materials: z.array(
-    z.object({
-      materialId: z.uuid(),
-      materialName: z.string(),
-      uomName: z.string(),
-      categoryId: z.uuid().nullable(),
-      categoryName: z.string().nullable(),
-      totalStock: quantityString,
-      totalInTransit: quantityString,
-      positions: z.array(
-        z.object({
-          location: LocationModel,
-          stock: quantityString,
-          /** Dispatched to this location, not yet delivered. */
-          inTransit: quantityString,
-          minimum: quantityString.nullable(),
-          state: z.enum(STOCK_STATES),
-        }),
-      ),
-    }),
-  ),
-});
+export const GetConstructionProcurementCentralInventoryResponseModel = z.object(
+  {
+    /** Every live Project and Store, for the location filter. */
+    locations: z.array(LocationModel),
+    categories: z.array(NamedModel),
+    materials: z.array(
+      z.object({
+        materialId: z.uuid(),
+        materialName: z.string(),
+        uomName: z.string(),
+        categoryId: z.uuid().nullable(),
+        categoryName: z.string().nullable(),
+        totalStock: quantityString,
+        totalInTransit: quantityString,
+        positions: z.array(
+          z.object({
+            location: LocationModel,
+            stock: quantityString,
+            /** Dispatched to this location, not yet delivered. */
+            inTransit: quantityString,
+            minimum: quantityString.nullable(),
+            state: z.enum(STOCK_STATES),
+          }),
+        ),
+      }),
+    ),
+  },
+);
 export type GetConstructionProcurementCentralInventoryResponseModel = z.infer<
   typeof GetConstructionProcurementCentralInventoryResponseModel
 >;

@@ -1,19 +1,13 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
-import {
-  bulkRefused,
-  type BulkRefusal,
-} from "@/src/shared-kernel/approval";
+import { bulkRefused, type BulkRefusal } from "@/src/shared-kernel/approval";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   calendarDateFromDb,
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import {
-  DomainError,
-  notFound,
-} from "@/src/shared-kernel/domain-error";
+import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
@@ -74,7 +68,10 @@ type Row = Prisma.ConstructionProcurementDeliveryNoteGetPayload<{
 }>;
 
 export function deliveryNoteNotFound(): DomainError {
-  return notFound("DELIVERY_NOTE_NOT_FOUND", "This Delivery Note was not found.");
+  return notFound(
+    "DELIVERY_NOTE_NOT_FOUND",
+    "This Delivery Note was not found.",
+  );
 }
 
 /** Delivery Notes in `construction_procurement.delivery_notes` (CM-508). */
@@ -143,33 +140,42 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     draft: DeliveryNoteDraft,
     approve: boolean,
   ): Promise<DeliveryNoteReadModel> {
-    await assertNotFuture(this.db, actor.workspaceId, draft.deliveryDate, "deliveryDate");
+    await assertNotFuture(
+      this.db,
+      actor.workspaceId,
+      draft.deliveryDate,
+      "deliveryDate",
+    );
     const backdated = await loadBackdatedCheck(this.db, actor);
     backdated(DOC.backdated, "create", draft.deliveryDate);
     const id = newId();
     const now = new Date();
     const events: DomainEvent[] = [];
     const result = await this.db.$transaction(async (tx) => {
-      const request = await this.requests.lock(
-        tx,
-        actor.workspaceId,
-        materialRequestId,
-      ).catch((error: unknown) => {
-        if (error instanceof DomainError && error.kind === "not_found")
-          throw new DomainError(
-            "MATERIAL_REQUEST_NOT_FOUND",
-            "This Material Request was not found.",
-            { details: { field: "materialRequestId" } },
-          );
-        throw error;
-      });
+      const request = await this.requests
+        .lock(tx, actor.workspaceId, materialRequestId)
+        .catch((error: unknown) => {
+          if (error instanceof DomainError && error.kind === "not_found")
+            throw new DomainError(
+              "MATERIAL_REQUEST_NOT_FOUND",
+              "This Material Request was not found.",
+              { details: { field: "materialRequestId" } },
+            );
+          throw error;
+        });
       if (!isOpenMaterialRequest(request.status))
         throw new DomainError(
           "MATERIAL_REQUEST_NOT_OPEN",
           `This Material Request is ${MATERIAL_REQUEST_STATUS_LABELS[request.status].toLowerCase()}; nothing is left to deliver.`,
           { kind: "conflict", details: { status: request.status } },
         );
-      const lines = await this.checkLines(tx, actor.workspaceId, request, draft, null);
+      const lines = await this.checkLines(
+        tx,
+        actor.workspaceId,
+        request,
+        draft,
+        null,
+      );
       const { number } = await nextSequenceNumber(tx, {
         workspaceId: actor.workspaceId,
         module: DOC.sequence,
@@ -219,7 +225,12 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
   ): Promise<DeliveryNoteReadModel> {
     const current = await this.find(actor.workspaceId, id);
     if (current == null) throw deliveryNoteNotFound();
-    await assertNotFuture(this.db, actor.workspaceId, draft.deliveryDate, "deliveryDate");
+    await assertNotFuture(
+      this.db,
+      actor.workspaceId,
+      draft.deliveryDate,
+      "deliveryDate",
+    );
     const backdated = await loadBackdatedCheck(this.db, actor);
     backdated(DOC.backdated, "edit", current.deliveryDate);
     if (draft.deliveryDate !== current.deliveryDate)
@@ -235,7 +246,13 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
       if (before.updatedAt.getTime() !== expectedUpdatedAt.getTime())
         throw changed("DELIVERY_NOTE_CHANGED", DOC.naming.label);
       assertDeliveryNotePending(deliveryNoteStatus(before));
-      const lines = await this.checkLines(tx, actor.workspaceId, request, draft, id);
+      const lines = await this.checkLines(
+        tx,
+        actor.workspaceId,
+        request,
+        draft,
+        id,
+      );
       await tx.constructionProcurementDeliveryNoteItem.deleteMany({
         where: { deliveryNoteId: id },
       });
@@ -315,7 +332,11 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     const events: DomainEvent[] = [];
     await this.db.$transaction(async (tx) => {
       const rows = await tx.constructionProcurementDeliveryNote.findMany({
-        where: { workspaceId: actor.workspaceId, id: { in: [...ids] }, deletedAt: null },
+        where: {
+          workspaceId: actor.workspaceId,
+          id: { in: [...ids] },
+          deletedAt: null,
+        },
         select: { id: true, approvalStatus: true, deliveredAt: true },
       });
       const found = new Map(rows.map((row) => [row.id, row]));
@@ -338,7 +359,8 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
       if (refusals.length > 0) {
         if (ids.length === 1 && refusals[0] != null) {
           const [only] = refusals;
-          if (only.code === "DELIVERY_NOTE_NOT_FOUND") throw deliveryNoteNotFound();
+          if (only.code === "DELIVERY_NOTE_NOT_FOUND")
+            throw deliveryNoteNotFound();
           const row = found.get(only.id);
           assertDeliveryNotePending(
             row == null ? "pending" : deliveryNoteStatus(row),
@@ -358,7 +380,12 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     deliveredOn: CalendarDate,
     expectedUpdatedAt: Date,
   ): Promise<DeliveryNoteReadModel> {
-    await assertNotFuture(this.db, actor.workspaceId, deliveredOn, "deliveredOn");
+    await assertNotFuture(
+      this.db,
+      actor.workspaceId,
+      deliveredOn,
+      "deliveredOn",
+    );
     const backdated = await loadBackdatedCheck(this.db, actor);
     backdated(DOC.backdated, "create", deliveredOn);
     const now = new Date();
@@ -436,7 +463,10 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
             where: { id: item.id },
             data: { deliveredQty: new Prisma.Decimal(item.deliveredQty) },
           });
-      const status = deriveMaterialRequestStatus(items, request.status === "closed");
+      const status = deriveMaterialRequestStatus(
+        items,
+        request.status === "closed",
+      );
       if (status !== request.status)
         await tx.constructionProcurementMaterialRequest.update({
           where: { id: request.id },
@@ -535,7 +565,13 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     const materialIds = request.items.map((item) => item.materialId);
     const store = { kind: "store" as const, id: request.storeId };
     const [onDate, now] = await Promise.all([
-      this.ledger.stock(tx, workspaceId, store, materialIds, draft.deliveryDate),
+      this.ledger.stock(
+        tx,
+        workspaceId,
+        store,
+        materialIds,
+        draft.deliveryDate,
+      ),
       this.ledger.stock(tx, workspaceId, store, materialIds),
     ]);
     const available = new Map<string, RequestLineAvailability>();
@@ -604,16 +640,21 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     rows: readonly Row[],
   ): Promise<DeliveryNoteReadModel[]> {
     if (rows.length === 0) return [];
-    const tx = db as Tx;
+    const tx = db;
     const [projects, stores, inFlight] = await Promise.all([
       this.directory.projects(tx, workspaceId, [
         ...new Set(rows.map((row) => row.projectId)),
       ]),
       db.constructionProcurementStore.findMany({
-        where: { workspaceId, id: { in: [...new Set(rows.map((row) => row.storeId))] } },
+        where: {
+          workspaceId,
+          id: { in: [...new Set(rows.map((row) => row.storeId))] },
+        },
         select: { id: true, name: true },
       }),
-      inFlightByItem(db, [...new Set(rows.map((row) => row.materialRequestId))]),
+      inFlightByItem(db, [
+        ...new Set(rows.map((row) => row.materialRequestId)),
+      ]),
     ]);
     const storeNames = new Map(stores.map((store) => [store.id, store.name]));
     return rows.map((row) => {

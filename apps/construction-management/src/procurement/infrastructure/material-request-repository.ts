@@ -142,7 +142,9 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     private readonly media: EventDispatcher = new InProcessEventDispatcher(),
   ) {}
 
-  async list(params: MaterialRequestListParams): Promise<MaterialRequestListPage> {
+  async list(
+    params: MaterialRequestListParams,
+  ): Promise<MaterialRequestListPage> {
     const where: Prisma.ConstructionProcurementMaterialRequestWhereInput = {
       workspaceId: params.workspaceId,
       deletedAt: null,
@@ -188,7 +190,12 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     draft: MaterialRequestDraft,
   ): Promise<MaterialRequestReadModel> {
     const site = await this.checkSite(actor.workspaceId, projectId, draft);
-    await assertNotFuture(this.db, actor.workspaceId, draft.requestDate, "requestDate");
+    await assertNotFuture(
+      this.db,
+      actor.workspaceId,
+      draft.requestDate,
+      "requestDate",
+    );
     const backdated = await loadBackdatedCheck(this.db, actor);
     backdated(DOC.backdated, "create", draft.requestDate);
     const id = newId();
@@ -198,9 +205,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         projectId,
       ]);
       if (!projects.has(projectId))
-        throw new DomainError("PROJECT_NOT_FOUND", "This Project was not found.", {
-          details: { field: "projectId" },
-        });
+        throw new DomainError(
+          "PROJECT_NOT_FOUND",
+          "This Project was not found.",
+          {
+            details: { field: "projectId" },
+          },
+        );
       await this.checkParties(tx, actor.workspaceId, projectId, draft);
       const lines = await this.lines(tx, actor.workspaceId, draft, new Set());
       const { number } = await nextSequenceNumber(tx, {
@@ -253,8 +264,17 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
   ): Promise<MaterialRequestReadModel> {
     const current = await this.load(this.db, actor.workspaceId, id);
     if (current == null) throw materialRequestNotFound();
-    const site = await this.checkSite(actor.workspaceId, current.projectId, draft);
-    await assertNotFuture(this.db, actor.workspaceId, draft.requestDate, "requestDate");
+    const site = await this.checkSite(
+      actor.workspaceId,
+      current.projectId,
+      draft,
+    );
+    await assertNotFuture(
+      this.db,
+      actor.workspaceId,
+      draft.requestDate,
+      "requestDate",
+    );
     const backdated = await loadBackdatedCheck(this.db, actor);
     backdated(DOC.backdated, "edit", current.requestDate);
     if (draft.requestDate !== current.requestDate)
@@ -525,9 +545,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
       const material = materials.get(item.materialId);
       const field = `items.${String(index)}.materialId`;
       if (material == null)
-        throw new DomainError("MATERIAL_NOT_FOUND", "This material was not found.", {
-          details: { field },
-        });
+        throw new DomainError(
+          "MATERIAL_NOT_FOUND",
+          "This material was not found.",
+          {
+            details: { field },
+          },
+        );
       if (material.disabled && !kept.has(material.id))
         throw new DomainError(
           "MATERIAL_DISABLED",
@@ -553,14 +577,22 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     rows: readonly Row[],
   ): Promise<MaterialRequestReadModel[]> {
     if (rows.length === 0) return [];
-    const tx = db as Tx;
+    const tx = db;
     const projectIds = [...new Set(rows.map((row) => row.projectId))];
     const storeIds = [...new Set(rows.map((row) => row.storeId))];
     const contractorIds = [
-      ...new Set(rows.flatMap((row) => (row.contractorId == null ? [] : [row.contractorId]))),
+      ...new Set(
+        rows.flatMap((row) =>
+          row.contractorId == null ? [] : [row.contractorId],
+        ),
+      ),
     ];
     const departmentIds = [
-      ...new Set(rows.flatMap((row) => (row.departmentId == null ? [] : [row.departmentId]))),
+      ...new Set(
+        rows.flatMap((row) =>
+          row.departmentId == null ? [] : [row.departmentId],
+        ),
+      ),
     ];
     const [projects, stores, contractors, departments, inFlight] =
       await Promise.all([
@@ -579,9 +611,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     const storeNames = new Map(stores.map((store) => [store.id, store.name]));
     return rows.map((row) => {
       const contractor =
-        row.contractorId == null ? undefined : contractors.get(row.contractorId);
+        row.contractorId == null
+          ? undefined
+          : contractors.get(row.contractorId);
       const department =
-        row.departmentId == null ? undefined : departments.get(row.departmentId);
+        row.departmentId == null
+          ? undefined
+          : departments.get(row.departmentId);
       return {
         id: row.id,
         number: row.number,
@@ -591,9 +627,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         storeName: storeNames.get(row.storeId) ?? null,
         requestDate: calendarDateFromDb(row.requestDate),
         contractor:
-          contractor == null ? null : { id: contractor.id, name: contractor.name },
+          contractor == null
+            ? null
+            : { id: contractor.id, name: contractor.name },
         department:
-          department == null ? null : { id: department.id, name: department.name },
+          department == null
+            ? null
+            : { id: department.id, name: department.name },
         siteLocation: (row.siteLocation as LocationRef | null) ?? null,
         receiverName: row.receiverName,
         remark: row.remark,

@@ -32,9 +32,13 @@ export const Requests: Story = {
       "href",
       `/app/projects/${IDS.tower}/materials/material-requests/${IDS.request}`,
     );
-    await expect(link).toHaveTextContent("To Ambattur Central Store · 2 materials");
+    await expect(link).toHaveTextContent(
+      "To Ambattur Central Store · 2 materials",
+    );
     await expect(canvas.getByText("Partially delivered")).toBeVisible();
-    await expect(canvas.getByRole("link", { name: "Raise request" })).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Raise request" }),
+    ).toBeVisible();
   },
 };
 
@@ -43,7 +47,9 @@ export const Empty: Story = {
   beforeEach: () => mockCentralStoreApi({ requests: [] }).restore,
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("No Material Requests")).toBeVisible();
-    await expect(canvas.getByRole("link", { name: "Raise request" })).toHaveAttribute(
+    await expect(
+      canvas.getByRole("link", { name: "Raise request" }),
+    ).toHaveAttribute(
       "href",
       `/app/projects/${IDS.tower}/materials/material-requests/new`,
     );

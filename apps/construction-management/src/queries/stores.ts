@@ -68,8 +68,7 @@ export function storeStockQuery(id: string) {
 
 export const storeFormOptionsQuery = queryOptions({
   queryKey: [...STORES_KEY, "form-options"] as const,
-  queryFn: () =>
-    apiJson<StoreFormOptions>(`${STORES_API}/form-options`),
+  queryFn: () => apiJson<StoreFormOptions>(`${STORES_API}/form-options`),
 });
 
 /** Live stores for pickers; those serving `projectId` when given. */

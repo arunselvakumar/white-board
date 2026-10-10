@@ -58,7 +58,10 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 const loading = <p className="text-muted-foreground text-sm">Loading…</p>;
 
-class Quiet extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+class Quiet extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { failed: boolean }
+> {
   override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
@@ -169,16 +172,25 @@ export function MaterialRequestDetail({
   const router = useRouter();
   const { data: request } = useSuspenseQuery(materialRequestQuery(requestId));
   const access = useQuery(procurementAccessQuery(request.projectId)).data;
-  const may = (menu: Parameters<typeof canIn>[1], flag: Parameters<typeof canIn>[2]) =>
-    access != null && canIn(access, menu, flag);
+  const may = (
+    menu: Parameters<typeof canIn>[1],
+    flag: Parameters<typeof canIn>[2],
+  ) => access != null && canIn(access, menu, flag);
   const removal = useDeleteMaterialRequest();
   const [dialog, setDialog] = useState<"close" | "delete" | null>(null);
 
   const open =
     request.status === "requested" || request.status === "partially_delivered";
   const noNotes = request.deliveryNotes.length === 0;
-  const canEdit = side === "project" && noNotes && open && may("procurement.material_requests", "update");
-  const canDelete = side === "project" && noNotes && may("procurement.material_requests", "delete");
+  const canEdit =
+    side === "project" &&
+    noNotes &&
+    open &&
+    may("procurement.material_requests", "update");
+  const canDelete =
+    side === "project" &&
+    noNotes &&
+    may("procurement.material_requests", "delete");
   const canClose = open && may("procurement.material_requests", "approve");
   const canSend =
     open &&
@@ -186,8 +198,14 @@ export function MaterialRequestDetail({
     may("procurement.delivery_notes", "create");
   const back =
     side === "project"
-      ? { label: "Material Requests", href: projectRequestHref.list(request.projectId) }
-      : { label: request.storeName ?? "Central Store", href: centralStoreHref.store(request.storeId) };
+      ? {
+          label: "Material Requests",
+          href: projectRequestHref.list(request.projectId),
+        }
+      : {
+          label: request.storeName ?? "Central Store",
+          href: centralStoreHref.store(request.storeId),
+        };
 
   return (
     <div className="w-full max-w-5xl space-y-6">
@@ -280,7 +298,9 @@ export function MaterialRequestDetail({
         {request.closeReason == null ? null : (
           <div className="col-span-2 sm:col-span-3">
             <dt className="text-muted-foreground text-xs">Closed because</dt>
-            <dd className="text-sm whitespace-pre-wrap">{request.closeReason}</dd>
+            <dd className="text-sm whitespace-pre-wrap">
+              {request.closeReason}
+            </dd>
           </div>
         )}
       </dl>
@@ -302,17 +322,27 @@ export function MaterialRequestDetail({
               {request.items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="min-w-40">
-                    <span className="block font-medium">{item.materialName}</span>
+                    <span className="block font-medium">
+                      {item.materialName}
+                    </span>
                     {item.remark == null ? null : (
-                      <span className="text-muted-foreground block text-xs">{item.remark}</span>
+                      <span className="text-muted-foreground block text-xs">
+                        {item.remark}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap tabular-nums">
                     {formatQuantity(item.askQty)} {item.uomName}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.deliveredQty)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.inFlightQty)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.pendingQty)}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatQuantity(item.deliveredQty)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatQuantity(item.inFlightQty)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatQuantity(item.pendingQty)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

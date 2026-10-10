@@ -16,6 +16,10 @@ export function EditMaterialRequestPage({
 }) {
   const { data } = useSuspenseQuery(materialRequestQuery(requestId));
   return (
-    <MaterialRequestForm key={data.updatedAt} projectId={projectId} request={data} />
+    <MaterialRequestForm
+      key={data.updatedAt}
+      projectId={projectId}
+      request={data}
+    />
   );
 }

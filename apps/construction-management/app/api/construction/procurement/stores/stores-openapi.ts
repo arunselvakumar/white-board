@@ -54,7 +54,8 @@ export const storeOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: STORES_PATH,
-    summary: "Central Stores, newest first, by name or Project (Central store read)",
+    summary:
+      "Central Stores, newest first, by name or Project (Central store read)",
     tags: PROCUREMENT_TAGS,
     query: ListConstructionProcurementStoresRequestModel,
     successStatus: StatusCodes.OK,

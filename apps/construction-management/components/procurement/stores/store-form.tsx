@@ -96,7 +96,10 @@ export function StoreForm({ store }: { store?: Store }) {
   const withKept = (
     list: readonly { id: string; name: string }[],
     kept: readonly { id: string; name: string }[] = [],
-  ) => [...list, ...kept.filter((item) => !list.some((row) => row.id === item.id))];
+  ) => [
+    ...list,
+    ...kept.filter((item) => !list.some((row) => row.id === item.id)),
+  ];
 
   const submit = async (values: Values) => {
     const input = {
@@ -130,7 +133,10 @@ export function StoreForm({ store }: { store?: Store }) {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeader back={back} title={store == null ? "Add store" : "Edit store"} />
+        <PageHeader
+          back={back}
+          title={store == null ? "Add store" : "Edit store"}
+        />
         <form
           noValidate
           className="space-y-6"
@@ -273,7 +279,10 @@ export function StoreForm({ store }: { store?: Store }) {
                   ? "Add store"
                   : "Save"}
             </Button>
-            <Link href={back.href} className={buttonVariants({ variant: "outline" })}>
+            <Link
+              href={back.href}
+              className={buttonVariants({ variant: "outline" })}
+            >
               Cancel
             </Link>
           </div>

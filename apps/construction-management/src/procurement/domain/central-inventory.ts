@@ -17,10 +17,7 @@ export const STOCK_STATE_LABELS: Record<StockState, string> = {
 };
 
 /** At or below zero is Out of stock; at or below the minimum, Low stock. */
-export function stockState(
-  stock: string,
-  minimum: string | null,
-): StockState {
+export function stockState(stock: string, minimum: string | null): StockState {
   const quantity = Quantity.of(stock, "unit");
   if (!quantity.isPositive()) return "out_of_stock";
   if (minimum != null && quantity.compare(Quantity.of(minimum, "unit")) <= 0)
@@ -30,7 +27,10 @@ export function stockState(
 
 export function sumQuantities(values: readonly string[]): string {
   return values
-    .reduce((sum, value) => sum.add(Quantity.of(value, "unit")), Quantity.zero("unit"))
+    .reduce(
+      (sum, value) => sum.add(Quantity.of(value, "unit")),
+      Quantity.zero("unit"),
+    )
     .toDecimalString();
 }
 

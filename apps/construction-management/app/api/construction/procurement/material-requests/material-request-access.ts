@@ -38,7 +38,10 @@ export async function requireRequestAccess(
   const session = await requireCompanySession(request);
   if (isResponse(session)) return session;
   const access = await loadMemberAccess(prisma, session);
-  const found = await centralStore.materialRequests.get(session.workspaceId, id);
+  const found = await centralStore.materialRequests.get(
+    session.workspaceId,
+    id,
+  );
   if (found == null) throw materialRequestNotFound();
   const allowed =
     side === "project"

@@ -52,7 +52,10 @@ export function DeliveryNotesList({
     );
   return (
     <div className="space-y-3">
-      <ul aria-label="Delivery Notes" className="bg-card divide-y rounded-xl border">
+      <ul
+        aria-label="Delivery Notes"
+        className="bg-card divide-y rounded-xl border"
+      >
         {data.items.map((note) => (
           <li
             key={note.id}

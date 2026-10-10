@@ -31,7 +31,12 @@ export async function POST(
         await request.json(),
       ),
     );
-    const session = await requireRequestAccess(request, id, "update", "project");
+    const session = await requireRequestAccess(
+      request,
+      id,
+      "update",
+      "project",
+    );
     if (isResponse(session)) return session;
     const updated = await centralStore.materialRequests.update(
       actorOf(session),

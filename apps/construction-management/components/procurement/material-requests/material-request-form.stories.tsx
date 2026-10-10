@@ -16,7 +16,10 @@ let api: ReturnType<typeof mockCentralStoreApi>;
 function posts(): ApiCall[] {
   return api.calls.mock.calls
     .map(([call]) => call)
-    .filter((call) => call.method === "POST" && call.path === `${API}/material-requests`);
+    .filter(
+      (call) =>
+        call.method === "POST" && call.path === `${API}/material-requests`,
+    );
 }
 
 const meta = {
@@ -49,7 +52,9 @@ export const RaiseRequest: Story = {
     await expect(canvas.getByLabelText("Request To")).toHaveTextContent(
       "Ambattur Central Store",
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Raise request" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Raise request" }),
+    );
     await expect(await canvas.findByText("Choose a material.")).toBeVisible();
     await expect(posts()).toHaveLength(0);
 
@@ -59,12 +64,18 @@ export const RaiseRequest: Story = {
       "Cement OPC 53 Grade (Bag)",
     );
     await userEvent.type(canvas.getByLabelText(/Ask Qty/), "0");
-    await userEvent.click(canvas.getByRole("button", { name: "Raise request" }));
-    await expect(await canvas.findByText("Ask Qty must be more than 0.")).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Raise request" }),
+    );
+    await expect(
+      await canvas.findByText("Ask Qty must be more than 0."),
+    ).toBeVisible();
     await userEvent.clear(canvas.getByLabelText(/Ask Qty/));
     await userEvent.type(canvas.getByLabelText(/Ask Qty/), "100");
     await userEvent.type(canvas.getByLabelText("Receiver Name"), "Prabhu S");
-    await userEvent.click(canvas.getByRole("button", { name: "Raise request" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Raise request" }),
+    );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
         `/app/projects/${IDS.tower}/materials/material-requests/${IDS.request}`,
@@ -87,7 +98,8 @@ export const StoreNotOnProject: Story = {
       writeError: {
         status: 400,
         code: "STORE_NOT_ON_PROJECT",
-        message: "This store does not serve the Project. Choose a store assigned to it.",
+        message:
+          "This store does not serve the Project. Choose a store assigned to it.",
       },
     });
     return api.restore;
@@ -95,9 +107,14 @@ export const StoreNotOnProject: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     within(canvasElement);
     await canvas.findByRole("option", { name: "M Sand (cum)" });
-    await userEvent.selectOptions(canvas.getByLabelText("Material"), "M Sand (cum)");
+    await userEvent.selectOptions(
+      canvas.getByLabelText("Material"),
+      "M Sand (cum)",
+    );
     await userEvent.type(canvas.getByLabelText(/Ask Qty/), "4.5");
-    await userEvent.click(canvas.getByRole("button", { name: "Raise request" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Raise request" }),
+    );
     await expect(
       await canvas.findByText(
         "This store does not serve the Project. Choose a store assigned to it.",

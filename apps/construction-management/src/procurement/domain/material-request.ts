@@ -56,11 +56,9 @@ export function positiveQuantity(
   try {
     quantity = Quantity.of(raw.trim(), "unit");
   } catch {
-    throw new DomainError(
-      code,
-      "Enter a quantity with at most 3 decimals.",
-      { details: { field } },
-    );
+    throw new DomainError(code, "Enter a quantity with at most 3 decimals.", {
+      details: { field },
+    });
   }
   if (!quantity.isPositive())
     throw new DomainError(code, "A quantity must be more than 0.", {
@@ -170,10 +168,7 @@ export function assertMaterialRequestEditable(
   deliveryNotes: number,
 ): void {
   if (status === "closed")
-    throw conflict(
-      "MATERIAL_REQUEST_CLOSED",
-      `This ${NAMING} is closed.`,
-    );
+    throw conflict("MATERIAL_REQUEST_CLOSED", `This ${NAMING} is closed.`);
   if (deliveryNotes > 0)
     throw conflict(
       "MATERIAL_REQUEST_HAS_DELIVERY_NOTES",

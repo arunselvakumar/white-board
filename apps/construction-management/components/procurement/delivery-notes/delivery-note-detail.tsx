@@ -92,7 +92,12 @@ function DeliverDialog({
           onSubmit={(event) => {
             event.preventDefault();
             command.mutate(
-              { kind: "deliver", id: note.id, updatedAt: note.updatedAt, deliveredOn },
+              {
+                kind: "deliver",
+                id: note.id,
+                updatedAt: note.updatedAt,
+                deliveredOn,
+              },
               {
                 onSuccess: onClose,
                 onError: (caught) => {
@@ -105,8 +110,8 @@ function DeliverDialog({
           <DialogHeader>
             <DialogTitle>Mark {note.number} as delivered?</DialogTitle>
             <DialogDescription>
-              The materials are added to {note.projectName ?? "the Project"}&apos;s
-              stock as Received from store.
+              The materials are added to {note.projectName ?? "the Project"}
+              &apos;s stock as Received from store.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
@@ -148,10 +153,14 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
   const router = useRouter();
   const { data: note } = useSuspenseQuery(deliveryNoteQuery(noteId));
   const access = useQuery(procurementAccessQuery(note.projectId)).data;
-  const may = (menu: Parameters<typeof canIn>[1], flag: Parameters<typeof canIn>[2]) =>
-    access != null && canIn(access, menu, flag);
+  const may = (
+    menu: Parameters<typeof canIn>[1],
+    flag: Parameters<typeof canIn>[2],
+  ) => access != null && canIn(access, menu, flag);
   const command = useDeliveryNoteCommand();
-  const [dialog, setDialog] = useState<"approve" | "deliver" | "delete" | null>(null);
+  const [dialog, setDialog] = useState<"approve" | "deliver" | "delete" | null>(
+    null,
+  );
   const pending = note.status === "pending";
   const canDeliver =
     note.status === "in_transit" &&
@@ -161,7 +170,10 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
   return (
     <div className="w-full max-w-5xl space-y-6">
       <PageHeader
-        back={{ label: note.materialRequestNumber, href: centralStoreHref.request(note.materialRequestId) }}
+        back={{
+          label: note.materialRequestNumber,
+          href: centralStoreHref.request(note.materialRequestId),
+        }}
         title={note.number}
         leading={<DeliveryNoteStatusBadge status={note.status} />}
         meta={`${formatDate(note.deliveryDate)} · ${note.storeName ?? "Store"} → ${note.projectName ?? "Project"}`}
@@ -250,11 +262,15 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
             <TableBody>
               {note.items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="min-w-40 font-medium">{item.materialName}</TableCell>
+                  <TableCell className="min-w-40 font-medium">
+                    {item.materialName}
+                  </TableCell>
                   <TableCell className="text-right whitespace-nowrap tabular-nums">
                     {formatQuantity(item.requestedQty)} {item.uomName}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.pendingQty)}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatQuantity(item.pendingQty)}
+                  </TableCell>
                   <TableCell className="text-right font-medium tabular-nums">
                     {formatQuantity(item.quantity)}
                   </TableCell>
@@ -270,7 +286,11 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
         documentId={note.id}
         canEdit={may("procurement.delivery_notes", "update")}
       />
-      <DocumentActivity documentType="delivery_note" documentId={note.id} heading="Comments" />
+      <DocumentActivity
+        documentType="delivery_note"
+        documentId={note.id}
+        heading="Comments"
+      />
 
       <StoreConfirmDialog
         open={dialog === "approve"}
@@ -291,7 +311,11 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
         pendingLabel="Deleting…"
         destructive
         onConfirm={async () => {
-          await command.mutateAsync({ kind: "delete", id: note.id, updatedAt: note.updatedAt });
+          await command.mutateAsync({
+            kind: "delete",
+            id: note.id,
+            updatedAt: note.updatedAt,
+          });
           router.push(centralStoreHref.request(note.materialRequestId));
         }}
         onClose={() => {

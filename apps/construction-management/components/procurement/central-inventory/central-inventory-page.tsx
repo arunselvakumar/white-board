@@ -99,7 +99,11 @@ function FilterSelect({
         <SelectTrigger id={id} size="lg" className="w-full min-w-0">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent align="start" alignItemWithTrigger={false} aria-label={label}>
+        <SelectContent
+          align="start"
+          alignItemWithTrigger={false}
+          aria-label={label}
+        >
           {items.map((item) => (
             <SelectItem key={item.value} value={item.value}>
               {item.label}
@@ -129,65 +133,77 @@ function Positions({ data }: { data: CentralInventory }) {
     );
   return (
     <>
-    <h2 className="sr-only">Stock by material</h2>
-    <ul aria-label="Materials" className="space-y-3">
-      {data.materials.map((material) => (
-        <li key={material.materialId} className="bg-card space-y-2 rounded-xl border p-3">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-            <div className="min-w-0">
-              <h3 className="truncate text-sm font-semibold">{material.materialName}</h3>
-              {material.categoryName == null ? null : (
-                <p className="text-muted-foreground text-xs">{material.categoryName}</p>
-              )}
-            </div>
-            <p className="text-sm tabular-nums">
-              <span className="font-semibold">
-                {formatQuantity(material.totalStock)} {material.uomName}
-              </span>
-              {Number(material.totalInTransit) > 0 ? (
-                <span className="text-muted-foreground">
-                  {" "}
-                  · {formatQuantity(material.totalInTransit)} in transit
+      <h2 className="sr-only">Stock by material</h2>
+      <ul aria-label="Materials" className="space-y-3">
+        {data.materials.map((material) => (
+          <li
+            key={material.materialId}
+            className="bg-card space-y-2 rounded-xl border p-3"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-semibold">
+                  {material.materialName}
+                </h3>
+                {material.categoryName == null ? null : (
+                  <p className="text-muted-foreground text-xs">
+                    {material.categoryName}
+                  </p>
+                )}
+              </div>
+              <p className="text-sm tabular-nums">
+                <span className="font-semibold">
+                  {formatQuantity(material.totalStock)} {material.uomName}
                 </span>
-              ) : null}
-            </p>
-          </div>
-          <ScrollRegion bordered={false} label={`Stock of ${material.materialName}, scrolls sideways`}>
-            <Table aria-label={`Stock of ${material.materialName}`}>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Location</TableHead>
-                  <TableHead className="text-right">Stock</TableHead>
-                  <TableHead className="text-right">In transit</TableHead>
-                  <TableHead>State</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {material.positions.map((position) => (
-                  <TableRow key={locationKey(position.location)}>
-                    <TableCell className="min-w-32">
-                      {position.location.name}
-                      <span className="text-muted-foreground ml-1 text-xs">
-                        {position.location.kind === "store" ? "Store" : "Project"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatQuantity(position.stock)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatQuantity(position.inTransit)}
-                    </TableCell>
-                    <TableCell>
-                      <StockStateBadge state={position.state} />
-                    </TableCell>
+                {Number(material.totalInTransit) > 0 ? (
+                  <span className="text-muted-foreground">
+                    {" "}
+                    · {formatQuantity(material.totalInTransit)} in transit
+                  </span>
+                ) : null}
+              </p>
+            </div>
+            <ScrollRegion
+              bordered={false}
+              label={`Stock of ${material.materialName}, scrolls sideways`}
+            >
+              <Table aria-label={`Stock of ${material.materialName}`}>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Location</TableHead>
+                    <TableHead className="text-right">Stock</TableHead>
+                    <TableHead className="text-right">In transit</TableHead>
+                    <TableHead>State</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollRegion>
-        </li>
-      ))}
-    </ul>
+                </TableHeader>
+                <TableBody>
+                  {material.positions.map((position) => (
+                    <TableRow key={locationKey(position.location)}>
+                      <TableCell className="min-w-32">
+                        {position.location.name}
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          {position.location.kind === "store"
+                            ? "Store"
+                            : "Project"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatQuantity(position.stock)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatQuantity(position.inTransit)}
+                      </TableCell>
+                      <TableCell>
+                        <StockStateBadge state={position.state} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollRegion>
+          </li>
+        ))}
+      </ul>
     </>
   );
 }
@@ -221,11 +237,15 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
               <TableCell className="min-w-32">{row.location.name}</TableCell>
               <TableCell className="min-w-40">
                 {row.materialName}
-                <span className="text-muted-foreground ml-1 text-xs">{row.uomName}</span>
+                <span className="text-muted-foreground ml-1 text-xs">
+                  {row.uomName}
+                </span>
               </TableCell>
               {MOVEMENTS.map(([type]) => (
                 <TableCell key={type} className="text-right tabular-nums">
-                  {formatQuantity(type === "opening" ? row.opening : row.movements[type])}
+                  {formatQuantity(
+                    type === "opening" ? row.opening : row.movements[type],
+                  )}
                 </TableCell>
               ))}
               <TableCell className="text-right font-medium tabular-nums">
@@ -330,9 +350,9 @@ export function CentralInventoryPage() {
             onChange={setState}
             items={[
               { value: ALL, label: "Any state" },
-              ...(Object.entries(STOCK_STATE_LABELS) as [StockState, string][]).map(
-                ([value, label]) => ({ value, label }),
-              ),
+              ...(
+                Object.entries(STOCK_STATE_LABELS) as [StockState, string][]
+              ).map(([value, label]) => ({ value, label })),
             ]}
           />
         </section>

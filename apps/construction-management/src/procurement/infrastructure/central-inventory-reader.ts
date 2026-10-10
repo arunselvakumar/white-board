@@ -108,7 +108,12 @@ export class PrismaCentralInventory implements CentralInventoryReader {
 
     const positions = new Map<
       string,
-      { location: StockLocation; materialId: string; stock: string; inTransit: string }
+      {
+        location: StockLocation;
+        materialId: string;
+        stock: string;
+        inTransit: string;
+      }
     >();
     const at = (kind: StockLocationKind, id: string, materialId: string) => {
       const key = `${kind}:${id}:${materialId}`;
@@ -153,20 +158,28 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     const grouped = new Map<string, InventoryMaterial>();
     for (const position of positions.values()) {
       const material = materials.get(position.materialId);
-      if (filter.categoryId != null && material?.categoryId !== filter.categoryId)
+      if (
+        filter.categoryId != null &&
+        material?.categoryId !== filter.categoryId
+      )
         continue;
       const materialName = material?.name ?? DELETED_MATERIAL;
       if (search !== "" && !materialName.toLowerCase().includes(search))
         continue;
       const minimum =
-        minimums.get(`${stockLocationKey(position.location)}:${position.materialId}`) ??
+        minimums.get(
+          `${stockLocationKey(position.location)}:${position.materialId}`,
+        ) ??
         material?.minStockQty ??
         null;
       const state = stockState(position.stock, minimum);
       if (filter.state != null && filter.state !== state) continue;
       const location = names.get(stockLocationKey(position.location)) ?? {
         ...position.location,
-        name: position.location.kind === "project" ? "Deleted Project" : "Deleted store",
+        name:
+          position.location.kind === "project"
+            ? "Deleted Project"
+            : "Deleted store",
       };
       const entry: InventoryPosition = {
         location,
@@ -255,7 +268,9 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     for (const row of openings) pair(row).opening = row.quantity;
     for (const row of movements) pair(row).byType.set(row.type, row.quantity);
 
-    const materialIds = [...new Set([...pairs.values()].map((p) => p.materialId))];
+    const materialIds = [
+      ...new Set([...pairs.values()].map((p) => p.materialId)),
+    ];
     const materials = await this.directory.materials(
       this.db,
       workspaceId,
@@ -268,7 +283,10 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     const rows: StockLedgerRow[] = [];
     for (const entry of pairs.values()) {
       const material = materials.get(entry.materialId);
-      if (filter.categoryId != null && material?.categoryId !== filter.categoryId)
+      if (
+        filter.categoryId != null &&
+        material?.categoryId !== filter.categoryId
+      )
         continue;
       const header = materialHeader(entry.materialId, material);
       if (search !== "" && !header.materialName.toLowerCase().includes(search))
@@ -285,7 +303,10 @@ export class PrismaCentralInventory implements CentralInventoryReader {
         ...line,
         location: names.get(stockLocationKey(entry.location)) ?? {
           ...entry.location,
-          name: entry.location.kind === "project" ? "Deleted Project" : "Deleted store",
+          name:
+            entry.location.kind === "project"
+              ? "Deleted Project"
+              : "Deleted store",
         },
         materialId: entry.materialId,
         materialName: header.materialName,
@@ -310,8 +331,8 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     return this.db.$queryRaw<PositionRow[]>`
       SELECT kind, "locationId", "materialId", SUM(quantity)::text AS quantity
       FROM (
-        SELECT t.to_kind::text AS kind, t.to_id AS "locationId",
-               i.material_id AS "materialId", i.quantity
+        SELECT t.to_kind::text AS kind, t.to_id::text AS "locationId",
+               i.material_id::text AS "materialId", i.quantity
         FROM "construction_procurement"."material_transfers" t
         JOIN "construction_procurement"."material_transfer_items" i
           ON i.material_transfer_id = t.id
@@ -320,8 +341,8 @@ export class PrismaCentralInventory implements CentralInventoryReader {
           AND t.delivered_at IS NULL
           ${locationFilter(locations, Prisma.sql`t.to_kind`, Prisma.sql`t.to_id`)}
         UNION ALL
-        SELECT 'project' AS kind, d.project_id AS "locationId",
-               i.material_id AS "materialId", i.quantity
+        SELECT 'project' AS kind, d.project_id::text AS "locationId",
+               i.material_id::text AS "materialId", i.quantity
         FROM "construction_procurement"."delivery_notes" d
         JOIN "construction_procurement"."delivery_note_items" i
           ON i.delivery_note_id = d.id
@@ -330,13 +351,7 @@ export class PrismaCentralInventory implements CentralInventoryReader {
           AND d.delivered_at IS NULL
           ${locationFilter(locations, Prisma.sql`'project'`, Prisma.sql`d.project_id`)}
       ) moving
-      GROUP BY kind, "locationId", "materialId"`.then((rows) =>
-      rows.map((row) => ({
-        ...row,
-        locationId: String(row.locationId),
-        materialId: String(row.materialId),
-      })),
-    );
+      GROUP BY kind, "locationId", "materialId"`;
   }
 
   /** Per-location minimum overrides, keyed `kind:locationId:materialId`. */
@@ -392,7 +407,11 @@ export class PrismaCentralInventory implements CentralInventoryReader {
       ),
     ];
     if (missing.length === 0) return;
-    const projects = await this.directory.projects(this.db, workspaceId, missing);
+    const projects = await this.directory.projects(
+      this.db,
+      workspaceId,
+      missing,
+    );
     for (const project of projects.values())
       names.set(`project:${project.id}`, {
         kind: "project",
@@ -402,7 +421,10 @@ export class PrismaCentralInventory implements CentralInventoryReader {
   }
 }
 
-function materialHeader(materialId: string, material: MaterialFacts | undefined) {
+function materialHeader(
+  materialId: string,
+  material: MaterialFacts | undefined,
+) {
   return {
     materialId,
     materialName: material?.name ?? DELETED_MATERIAL,

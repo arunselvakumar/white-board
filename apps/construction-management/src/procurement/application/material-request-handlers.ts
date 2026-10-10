@@ -12,7 +12,11 @@ import {
   type MaterialRequestLineInput,
   type MaterialRequestStatus,
 } from "../domain/material-request";
-import type { Named, ProcurementCommandActor, StoreOption } from "./store-handlers";
+import type {
+  Named,
+  ProcurementCommandActor,
+  StoreOption,
+} from "./store-handlers";
 
 export type MaterialRequestItemReadModel = {
   id: string;
@@ -93,7 +97,9 @@ export type MaterialRequestInput = {
   items: readonly MaterialRequestLineInput[];
 };
 
-export type MaterialRequestCreate = MaterialRequestInput & { projectId: string };
+export type MaterialRequestCreate = MaterialRequestInput & {
+  projectId: string;
+};
 
 /** Fields as the repository stores them, after the shape checks. */
 export type MaterialRequestDraft = Omit<
@@ -116,7 +122,10 @@ export type MaterialRequestFormOptions = MaterialRequestFormPartyOptions & {
 
 export type MaterialRequestRepository = {
   list(params: MaterialRequestListParams): Promise<MaterialRequestListPage>;
-  find(workspaceId: string, id: string): Promise<MaterialRequestReadModel | null>;
+  find(
+    workspaceId: string,
+    id: string,
+  ): Promise<MaterialRequestReadModel | null>;
   create(
     actor: ProcurementCommandActor,
     projectId: string,

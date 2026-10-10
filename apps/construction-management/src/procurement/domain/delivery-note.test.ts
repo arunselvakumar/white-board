@@ -30,13 +30,19 @@ describe("Delivery Note (CM-508)", () => {
       deliveryNoteStatus({ approvalStatus: "approved", deliveredAt: null }),
     ).toBe("in_transit");
     expect(
-      deliveryNoteStatus({ approvalStatus: "approved", deliveredAt: new Date() }),
+      deliveryNoteStatus({
+        approvalStatus: "approved",
+        deliveredAt: new Date(),
+      }),
     ).toBe("delivered");
   });
 
   it("sends at most what is pending and what the store holds", () => {
     expect(
-      deliveryNoteLines([{ materialRequestItemId: LINE, quantity: "2" }], available),
+      deliveryNoteLines(
+        [{ materialRequestItemId: LINE, quantity: "2" }],
+        available,
+      ),
     ).toEqual([
       {
         materialRequestItemId: LINE,
@@ -45,23 +51,29 @@ describe("Delivery Note (CM-508)", () => {
       },
     ]);
     expect(() =>
-      deliveryNoteLines([{ materialRequestItemId: LINE, quantity: "6" }], available),
+      deliveryNoteLines(
+        [{ materialRequestItemId: LINE, quantity: "6" }],
+        available,
+      ),
     ).toThrow("Only 5 of Cement is still pending");
     expect(() =>
-      deliveryNoteLines([{ materialRequestItemId: LINE, quantity: "4" }], available),
+      deliveryNoteLines(
+        [{ materialRequestItemId: LINE, quantity: "4" }],
+        available,
+      ),
     ).toThrow("The store has only 3 of Cement");
     expect(() => deliveryNoteLines([], available)).toThrow();
   });
 
   it("is delivered only in transit and not before its date", () => {
-    expect(() => assertDeliverable("pending", "2026-10-01", "2026-10-02")).toThrow(
-      "Approve",
-    );
-    expect(() =>
-      assertDeliverable("in_transit", "2026-10-02", "2026-10-01"),
-    ).toThrow("before");
-    expect(() =>
-      assertDeliverable("in_transit", "2026-10-02", "2026-10-02"),
-    ).not.toThrow();
+    expect(() => {
+      assertDeliverable("pending", "2026-10-01", "2026-10-02");
+    }).toThrow("Approve");
+    expect(() => {
+      assertDeliverable("in_transit", "2026-10-02", "2026-10-01");
+    }).toThrow("before");
+    expect(() => {
+      assertDeliverable("in_transit", "2026-10-02", "2026-10-02");
+    }).not.toThrow();
   });
 });

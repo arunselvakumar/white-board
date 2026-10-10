@@ -87,7 +87,8 @@ export const deliveryNoteOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${ITEM}/update`,
-    summary: "Edit a pending note (update; DELIVERY_NOTE_NOT_PENDING, DELIVERY_NOTE_CHANGED 409)",
+    summary:
+      "Edit a pending note (update; DELIVERY_NOTE_NOT_PENDING, DELIVERY_NOTE_CHANGED 409)",
     tags: PROCUREMENT_TAGS,
     params: ConstructionProcurementDeliveryNoteParamsModel,
     body: UpdateConstructionProcurementDeliveryNoteRequestModel,

@@ -30,23 +30,37 @@ type Story = StoryObj<typeof meta>;
 export const ApproveThenDeliver: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByRole("heading", { name: "DN/26-27/00003" })).toBeVisible();
-    await expect(canvas.getByText("Pending", { selector: "[data-slot=badge]" })).toBeVisible();
-    await expect(canvas.getByRole("table", { name: "Delivered materials" })).toHaveTextContent(
-      "500 kg",
-    );
-    await expect(await canvas.findByRole("link", { name: "Edit" })).toBeVisible();
+    await expect(
+      await canvas.findByRole("heading", { name: "DN/26-27/00003" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Pending", { selector: "[data-slot=badge]" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("table", { name: "Delivered materials" }),
+    ).toHaveTextContent("500 kg");
+    await expect(
+      await canvas.findByRole("link", { name: "Edit" }),
+    ).toBeVisible();
 
     await userEvent.click(canvas.getByRole("button", { name: "Approve" }));
     const approve = within(await body.findByRole("alertdialog"));
     await userEvent.click(approve.getByRole("button", { name: "Approve" }));
-    await expect(await canvas.findByText("In transit", { selector: "[data-slot=badge]" })).toBeVisible();
+    await expect(
+      await canvas.findByText("In transit", { selector: "[data-slot=badge]" }),
+    ).toBeVisible();
     await expect(canvas.queryByRole("link", { name: "Edit" })).toBeNull();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Mark as Delivered" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Mark as Delivered" }),
+    );
     const deliver = within(await body.findByRole("dialog"));
-    await userEvent.click(deliver.getByRole("button", { name: "Mark as Delivered" }));
-    await expect(await canvas.findByText("Delivered", { selector: "[data-slot=badge]" })).toBeVisible();
+    await userEvent.click(
+      deliver.getByRole("button", { name: "Mark as Delivered" }),
+    );
+    await expect(
+      await canvas.findByText("Delivered", { selector: "[data-slot=badge]" }),
+    ).toBeVisible();
   },
 };
 

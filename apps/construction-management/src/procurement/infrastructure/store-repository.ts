@@ -76,11 +76,9 @@ function isUniqueViolation(error: unknown): boolean {
 }
 
 function nameTaken(): DomainError {
-  return conflict(
-    "STORE_NAME_TAKEN",
-    "Another store already has this name.",
-    { field: "name" },
-  );
+  return conflict("STORE_NAME_TAKEN", "Another store already has this name.", {
+    field: "name",
+  });
 }
 
 /** Central Stores in `construction_procurement.stores` (CM-508). */
@@ -360,7 +358,10 @@ export class PrismaStoreRepository implements StoreRepository {
     );
   }
 
-  async options(workspaceId: string, projectId?: string): Promise<StoreOption[]> {
+  async options(
+    workspaceId: string,
+    projectId?: string,
+  ): Promise<StoreOption[]> {
     return this.db.constructionProcurementStore.findMany({
       where: {
         workspaceId,
@@ -423,9 +424,13 @@ export class PrismaStoreRepository implements StoreRepository {
     ]);
     const missingProject = draft.projectIds.find((id) => !projects.has(id));
     if (missingProject != null)
-      throw new DomainError("PROJECT_NOT_FOUND", "This Project was not found.", {
-        details: { field: "projectIds", ids: [missingProject] },
-      });
+      throw new DomainError(
+        "PROJECT_NOT_FOUND",
+        "This Project was not found.",
+        {
+          details: { field: "projectIds", ids: [missingProject] },
+        },
+      );
     const missingKeeper = draft.keeperIds.find((id) => !keepers.has(id));
     if (missingKeeper != null)
       throw new DomainError(
@@ -437,9 +442,13 @@ export class PrismaStoreRepository implements StoreRepository {
     for (const id of draft.supplierIds) {
       const supplier = suppliers.get(id);
       if (supplier == null)
-        throw new DomainError("SUPPLIER_NOT_FOUND", "This Supplier was not found.", {
-          details: { field: "supplierIds", ids: [id] },
-        });
+        throw new DomainError(
+          "SUPPLIER_NOT_FOUND",
+          "This Supplier was not found.",
+          {
+            details: { field: "supplierIds", ids: [id] },
+          },
+        );
       if (!supplier.isActive && !kept.has(id))
         throw new DomainError(
           "SUPPLIER_INACTIVE",
@@ -465,12 +474,16 @@ export class PrismaStoreRepository implements StoreRepository {
     workspaceId: string,
     rows: readonly Row[],
   ): Promise<StoreReadModel[]> {
-    const projectIds = rows.flatMap((row) => row.projects.map((p) => p.projectId));
-    const keeperIds = rows.flatMap((row) => row.keepers.map((k) => k.teamMemberId));
+    const projectIds = rows.flatMap((row) =>
+      row.projects.map((p) => p.projectId),
+    );
+    const keeperIds = rows.flatMap((row) =>
+      row.keepers.map((k) => k.teamMemberId),
+    );
     const supplierIds = rows.flatMap((row) =>
       row.suppliers.map((s) => s.supplierId),
     );
-    const tx = db as Tx;
+    const tx = db;
     const [projects, keepers, suppliers] = await Promise.all([
       this.directory.projects(tx, workspaceId, [...new Set(projectIds)]),
       this.directory.teamMembers(tx, workspaceId, [...new Set(keeperIds)]),

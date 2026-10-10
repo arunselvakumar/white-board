@@ -48,8 +48,9 @@ export async function GET(request: Request): Promise<Response> {
     const locations =
       model.locations == null || model.locations.trim() === ""
         ? "All Projects and Stores"
-        : [...new Set(report.rows.map((row) => row.location.name))].join(", ") ||
-          "Chosen locations";
+        : [...new Set(report.rows.map((row) => row.location.name))].join(
+            ", ",
+          ) || "Chosen locations";
     const bytes = await renderStockLedgerXlsx(report, {
       company: profile?.name ?? "",
       locations,

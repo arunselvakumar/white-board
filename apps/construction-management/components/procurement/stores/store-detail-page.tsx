@@ -21,7 +21,12 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { DeliveryNotesList } from "@/components/procurement/delivery-notes/delivery-notes-list";
@@ -121,7 +126,10 @@ function Assigned({
       ) : (
         <ul aria-label={title} className="flex flex-wrap gap-2">
           {items.map((item) => (
-            <li key={item.id} className="bg-muted rounded-full px-3 py-1 text-sm">
+            <li
+              key={item.id}
+              className="bg-muted rounded-full px-3 py-1 text-sm"
+            >
               {item.name}
             </li>
           ))}
@@ -141,8 +149,10 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
   const router = useRouter();
   const { data: store } = useSuspenseQuery(storeQuery(storeId));
   const access = useQuery(procurementAccessQuery(null)).data;
-  const may = (menu: Parameters<typeof canIn>[1], flag: Parameters<typeof canIn>[2]) =>
-    access != null && canIn(access, menu, flag);
+  const may = (
+    menu: Parameters<typeof canIn>[1],
+    flag: Parameters<typeof canIn>[2],
+  ) => access != null && canIn(access, menu, flag);
   const removal = useDeleteStore();
   const [deleting, setDeleting] = useState(false);
 
@@ -194,13 +204,21 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
             </Suspense>
           </TabsContent>
           <TabsContent value="projects" className="space-y-5">
-            <Assigned title="Projects" items={store.projects} empty="No Projects." />
+            <Assigned
+              title="Projects"
+              items={store.projects}
+              empty="No Projects."
+            />
             <Assigned
               title="Store keepers"
               items={store.keepers}
               empty="No store keepers yet."
             />
-            <Assigned title="Suppliers" items={store.suppliers} empty="No Suppliers yet." />
+            <Assigned
+              title="Suppliers"
+              items={store.suppliers}
+              empty="No Suppliers yet."
+            />
           </TabsContent>
           <TabsContent value="requests">
             {may("procurement.material_requests", "read") ? (
@@ -234,7 +252,10 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
               Material Transfers from and to this store are listed with each
               Project&apos;s Material Transfers; what is on its way here shows
               as In transit on the Stock tab and in{" "}
-              <Link href={CENTRAL_INVENTORY_PATH} className="text-primary underline-offset-4 hover:underline">
+              <Link
+                href={CENTRAL_INVENTORY_PATH}
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 Central Inventory
               </Link>
               .

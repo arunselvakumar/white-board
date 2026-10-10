@@ -6,7 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Component, Suspense, type ReactNode } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -83,7 +83,10 @@ function today(): string {
 }
 
 /** Hides the location field when the Project's locations cannot be read. */
-class QuietBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+class QuietBoundary extends Component<
+  { children: ReactNode },
+  { failed: boolean }
+> {
   override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
@@ -124,7 +127,11 @@ function OptionSelect({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent align="start" alignItemWithTrigger={false} aria-label={label}>
+      <SelectContent
+        align="start"
+        alignItemWithTrigger={false}
+        aria-label={label}
+      >
         {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>
             {item.label}
@@ -157,7 +164,9 @@ export function MaterialRequestForm({
     resolver: zodResolver(schema),
     defaultValues: {
       requestDate: request?.requestDate ?? today(),
-      storeId: request?.storeId ?? (options.stores.length === 1 ? (options.stores[0]?.id ?? "") : ""),
+      storeId:
+        request?.storeId ??
+        (options.stores.length === 1 ? (options.stores[0]?.id ?? "") : ""),
       contractorId: request?.contractor?.id ?? NONE,
       departmentId: request?.department?.id ?? NONE,
       siteLocation: (request?.siteLocation as LocationRef | null) ?? null,
@@ -173,13 +182,19 @@ export function MaterialRequestForm({
   });
   const lines = useFieldArray({ control: form.control, name: "items" });
   const errors = form.formState.errors;
-  const chosen = form.watch("items").map((item) => item.materialId);
+  const watched = useWatch({ control: form.control, name: "items" });
+  const chosen = watched.map((item) => item.materialId);
 
   const storeItems = [
-    ...(options.stores.length === 1 ? [] : [{ value: "", label: "Choose a store" }]),
+    ...(options.stores.length === 1
+      ? []
+      : [{ value: "", label: "Choose a store" }]),
     ...options.stores.map((store) => ({ value: store.id, label: store.name })),
   ];
-  const withNone = (list: { id: string; name: string }[], kept?: { id: string; name: string } | null) => [
+  const withNone = (
+    list: { id: string; name: string }[],
+    kept?: { id: string; name: string } | null,
+  ) => [
     { value: NONE, label: "None" },
     ...list.map((item) => ({ value: item.id, label: item.name })),
     ...(kept != null && !list.some((item) => item.id === kept.id)
@@ -194,7 +209,8 @@ export function MaterialRequestForm({
       contractorId: values.contractorId === NONE ? null : values.contractorId,
       departmentId: values.departmentId === NONE ? null : values.departmentId,
       siteLocation: values.siteLocation,
-      receiverName: values.receiverName.trim() === "" ? null : values.receiverName,
+      receiverName:
+        values.receiverName.trim() === "" ? null : values.receiverName,
       remark: values.remark.trim() === "" ? null : values.remark,
       items: values.items.map((item) => ({
         materialId: item.materialId,
@@ -220,7 +236,10 @@ export function MaterialRequestForm({
   const back =
     request == null
       ? { label: "Material Requests", href: projectRequestHref.list(projectId) }
-      : { label: request.number, href: projectRequestHref.detail(projectId, request.id) };
+      : {
+          label: request.number,
+          href: projectRequestHref.detail(projectId, request.id),
+        };
 
   if (options.stores.length === 0)
     return (
@@ -235,7 +254,11 @@ export function MaterialRequestForm({
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
           back={back}
-          title={request == null ? "Raise Material Request" : `Edit ${request.number}`}
+          title={
+            request == null
+              ? "Raise Material Request"
+              : `Edit ${request.number}`
+          }
         />
         <form
           noValidate
@@ -359,7 +382,9 @@ export function MaterialRequestForm({
                     className="grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] sm:items-start"
                   >
                     <div className="min-w-0 space-y-1.5">
-                      <Label htmlFor={`mr-material-${String(index)}`}>Material</Label>
+                      <Label htmlFor={`mr-material-${String(index)}`}>
+                        Material
+                      </Label>
                       <Controller
                         name={`items.${index}.materialId`}
                         control={form.control}
@@ -367,11 +392,16 @@ export function MaterialRequestForm({
                           <MaterialPicker
                             id={`mr-material-${String(index)}`}
                             value={field.value === "" ? null : field.value}
-                            excludeIds={chosen.filter((id) => id !== field.value)}
+                            excludeIds={chosen.filter(
+                              (id) => id !== field.value,
+                            )}
                             invalid={lineErrors?.materialId != null}
                             onChange={(material) => {
                               field.onChange(material?.id ?? "");
-                              form.setValue(`items.${index}.uomName`, material?.uomName ?? "");
+                              form.setValue(
+                                `items.${index}.uomName`,
+                                material?.uomName ?? "",
+                              );
                             }}
                           />
                         )}
@@ -380,7 +410,10 @@ export function MaterialRequestForm({
                     </div>
                     <div className="min-w-0 space-y-1.5">
                       <Label htmlFor={`mr-qty-${String(index)}`}>
-                        Ask Qty{form.watch(`items.${index}.uomName`) === "" ? "" : ` (${form.watch(`items.${index}.uomName`)})`}
+                        Ask Qty
+                        {(watched[index]?.uomName ?? "") === ""
+                          ? ""
+                          : ` (${watched[index]?.uomName ?? ""})`}
                       </Label>
                       <Input
                         id={`mr-qty-${String(index)}`}
@@ -392,7 +425,9 @@ export function MaterialRequestForm({
                       <FieldError message={lineErrors?.askQty?.message} />
                     </div>
                     <div className="min-w-0 space-y-1.5">
-                      <Label htmlFor={`mr-line-remark-${String(index)}`}>Remark</Label>
+                      <Label htmlFor={`mr-line-remark-${String(index)}`}>
+                        Remark
+                      </Label>
                       <Input
                         id={`mr-line-remark-${String(index)}`}
                         className="h-10"
@@ -416,12 +451,19 @@ export function MaterialRequestForm({
                 );
               })}
             </ul>
-            <FieldError message={errors.items?.message ?? errors.items?.root?.message} />
+            <FieldError
+              message={errors.items?.message ?? errors.items?.root?.message}
+            />
             <Button
               type="button"
               variant="outline"
               onClick={() => {
-                lines.append({ materialId: "", uomName: "", askQty: "", remark: "" });
+                lines.append({
+                  materialId: "",
+                  uomName: "",
+                  askQty: "",
+                  remark: "",
+                });
               }}
             >
               <Plus aria-hidden="true" />
@@ -438,7 +480,10 @@ export function MaterialRequestForm({
                   ? "Raise request"
                   : "Save"}
             </Button>
-            <Link href={back.href} className={buttonVariants({ variant: "outline" })}>
+            <Link
+              href={back.href}
+              className={buttonVariants({ variant: "outline" })}
+            >
               Cancel
             </Link>
           </div>

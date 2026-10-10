@@ -71,7 +71,10 @@ export type StoreFormOptions = {
 export type StoreRepository = {
   list(params: StoreListParams): Promise<StoreListPage>;
   find(workspaceId: string, id: string): Promise<StoreReadModel | null>;
-  create(actor: ProcurementCommandActor, draft: StoreDraft): Promise<StoreReadModel>;
+  create(
+    actor: ProcurementCommandActor,
+    draft: StoreDraft,
+  ): Promise<StoreReadModel>;
   update(
     actor: ProcurementCommandActor,
     id: string,
