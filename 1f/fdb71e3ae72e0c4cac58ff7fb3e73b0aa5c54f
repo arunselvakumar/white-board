@@ -1,0 +1,43 @@
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/edit/page.tsx
+  s_6604e2237b6922::t_252edcca4c952f 1-15
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/page.tsx
+  s_6604e2237b6922::t_b6889ddc67284e 1-15
+apps/construction-management/app/app/projects/[id]/materials/transfers/new/page.tsx
+  s_6604e2237b6922::t_a99a0ac4007cdf 1-31
+apps/construction-management/app/app/projects/[id]/materials/transfers/page.tsx
+  s_6604e2237b6922::t_aa44efd8fc1806 3-5,9-22
+apps/construction-management/components/procurement/transfers/project-transfer-pages.tsx
+  s_6604e2237b6922::t_99fd4db8a49c97 1-76
+apps/construction-management/components/procurement/transfers/transfer-detail.stories.tsx
+  s_6604e2237b6922::t_f759a6cdef7587 1-163
+apps/construction-management/components/procurement/transfers/transfer-detail.tsx
+  s_6604e2237b6922::t_f9b391463bdf4a 1-454
+apps/construction-management/components/procurement/transfers/transfer-fixtures.ts
+  s_6604e2237b6922::t_5e97d3903504ef 1-208
+apps/construction-management/components/procurement/transfers/transfer-form.stories.tsx
+  s_6604e2237b6922::t_313d9793166875 1-148
+apps/construction-management/components/procurement/transfers/transfer-form.tsx
+  s_6604e2237b6922::t_3ab9fdc36b48a9 1-469
+apps/construction-management/components/procurement/transfers/transfer-parts.tsx
+  s_6604e2237b6922::t_9c0ec451b9100c 1-73
+apps/construction-management/components/procurement/transfers/transfers-list.stories.tsx
+  s_6604e2237b6922::t_4dd5d4ef414ca1 1-102
+apps/construction-management/components/procurement/transfers/transfers-list.tsx
+  s_6604e2237b6922::t_e71af1c1972db9 1-322
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1ffdb71e3ae72e0c4cac58ff7fb3e73b0aa5c54f",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
