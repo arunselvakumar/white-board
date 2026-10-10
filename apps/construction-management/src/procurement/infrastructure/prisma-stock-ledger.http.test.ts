@@ -147,11 +147,11 @@ describe("PrismaStockLedger (ADR CM-0015 §3, §5)", () => {
     const { context, posting, write, stockOn } = setup();
     const grn = randomUUID();
     const source = { type: "stock_movement" as const, id: grn };
-    let release = () => {};
+    let release: () => void = () => undefined;
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
-    let posted = () => {};
+    let posted: () => void = () => undefined;
     const hasPosted = new Promise<void>((resolve) => {
       posted = resolve;
     });
