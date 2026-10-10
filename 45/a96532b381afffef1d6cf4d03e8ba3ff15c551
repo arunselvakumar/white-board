@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/hrms/calendar-openapi.ts
+  s_6a70f1cb429bb6::t_6a504bc4bbd381 1-30
+apps/construction-management/app/api/construction/hrms/employees/shift-assignments/assignment-models.ts
+  s_6a70f1cb429bb6::t_1f62e9298f4205 1-123
+apps/construction-management/app/api/construction/hrms/employees/shift-assignments/route.ts
+  s_6a70f1cb429bb6::t_aa1518b966a4fa 1-70
+apps/construction-management/app/api/construction/hrms/employees/shift-assignments/shift-assignments.http.test.ts
+  s_6a70f1cb429bb6::t_23c196de390c0f 1-359
+apps/construction-management/app/api/construction/hrms/hrms-openapi.ts
+  s_6a70f1cb429bb6::t_23d840b9bc3b17 8-11,29,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "45a96532b381afffef1d6cf4d03e8ba3ff15c551",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
