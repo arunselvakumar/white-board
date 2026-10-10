@@ -1,0 +1,25 @@
+apps/construction-management/app/api/construction/masters/parties.http.test.ts
+  s_7d8917753e260e::t_a75ed069989b3e 22-25,273-277,342-344
+apps/construction-management/app/api/construction/projects/projects/[id]/resources/resources.http.test.ts
+  s_7d8917753e260e::t_806aa46f0c81c6 173
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_18e0ac380857c1 439
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_7d8917753e260e::t_7e12563c222a6d 377-378,381,384
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9124577c38267da001ad8b54ff67ade28b44723c",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
