@@ -6,6 +6,10 @@ import type {
 } from "@/app/api/_lib/openapi";
 
 import {
+  calendarOpenApiComponents,
+  calendarOpenApiOperations,
+} from "./calendar-openapi";
+import {
   salarySetupOpenApiComponents,
   salarySetupOpenApiOperations,
 } from "./salary-setup-openapi";
@@ -26,6 +30,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   GetConstructionHrmsSettingsResponseModel,
   UpdateConstructionHrmsSettingsRequestModel,
   UpdateConstructionHrmsSettingsResponseModel,
+  ...calendarOpenApiComponents,
   ...salarySetupOpenApiComponents,
 };
 
@@ -58,5 +63,6 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
       StatusCodes.PAYMENT_REQUIRED,
     ],
   },
+  ...calendarOpenApiOperations,
   ...salarySetupOpenApiOperations,
 ];
