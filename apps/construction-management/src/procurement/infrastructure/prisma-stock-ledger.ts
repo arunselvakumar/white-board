@@ -145,12 +145,13 @@ export class PrismaStockLedger {
     options: LedgerWriteOptions,
   ): Promise<LedgerWriteResult> {
     const { workspaceId, by } = context;
-    // One writer per source at a time: a second edit or delete of the same
-    // document waits, then finds the first one's reversal and no live
-    // entries, instead of failing on the unique reversal index.
+    // One writer per source at a time, whether it posts or reverses: a
+    // second edit or delete of the same document waits, then finds the
+    // first one's entries (or its reversal) instead of missing an
+    // uncommitted post or failing on the unique reversal index.
     const sources = [
       ...new Set(
-        reverse.map(
+        [...reverse, ...postings.map((posting) => posting.source)].map(
           (source) => `stock-source:${workspaceId}:${source.type}:${source.id}`,
         ),
       ),
