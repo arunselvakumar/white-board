@@ -1,0 +1,69 @@
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_7d8917753e260e::t_cb5efb51bb4018 127
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_975217536ff7bc 435,438
+apps/construction-management/src/projects/application/location-handlers.ts
+  s_7d8917753e260e::t_4fb1bd2310b6a7 1-211
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_7d8917753e260e::t_8f75e2b375a6db 221
+apps/construction-management/src/projects/application/project-visibility.ts
+  s_7d8917753e260e::t_165b3e378ddf01 1-21
+apps/construction-management/src/projects/application/structure-read-model.ts
+  s_7d8917753e260e::t_765b4a7811f44e 1-101
+apps/construction-management/src/projects/application/wing-handlers.ts
+  s_7d8917753e260e::t_7795539453704d 1-505
+apps/construction-management/src/projects/domain/location.ts
+  s_7d8917753e260e::t_f668b889e15445 1-149
+apps/construction-management/src/projects/domain/phase.ts
+  s_7d8917753e260e::t_ffef848f0f735f 1-132
+apps/construction-management/src/projects/domain/structure-repository.ts
+  s_7d8917753e260e::t_f7e00858dfd2a7 1-109
+apps/construction-management/src/projects/domain/wing-floors.ts
+  s_7d8917753e260e::t_c15b01eab2992a 1-207
+apps/construction-management/src/projects/domain/wing-generator.test.ts
+  s_7d8917753e260e::t_8d954280900eed 1-354
+apps/construction-management/src/projects/domain/wing-generator.ts
+  s_7d8917753e260e::t_663cd16865333d 1-531
+apps/construction-management/src/projects/domain/wing.test.ts
+  s_7d8917753e260e::t_bc2f720095ee21 1-482
+apps/construction-management/src/projects/infrastructure/create-project-structure.ts
+  s_7d8917753e260e::t_d42efc858a120c 1-55
+apps/construction-management/src/projects/infrastructure/prisma-location-repository.ts
+  s_7d8917753e260e::t_7c88dc5e6e47ff 1-168
+apps/construction-management/src/projects/infrastructure/prisma-phase-repository.ts
+  s_7d8917753e260e::t_aadbf38179037a 1-170
+apps/construction-management/src/projects/infrastructure/prisma-project-structure-reader.ts
+  s_7d8917753e260e::t_00a6df05415fee 1-118
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_7d8917753e260e::t_ac0be07612e600 11-12,56-67
+apps/construction-management/src/projects/infrastructure/prisma-wing-repository.ts
+  s_7d8917753e260e::t_38d4789f5dee04 1-376
+apps/construction-management/src/projects/infrastructure/unused-structure.ts
+  s_7d8917753e260e::t_ae001776a49023 1-22
+apps/construction-management/src/projects/domain/wing.ts
+  s_a901dc77af0560::t_a41b4d0f9bdfc2 1-290
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "63ba60eb39f9330ea406d0e75fe9c3dfae80a2ac",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a901dc77af0560": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7ac6639a7cad7718",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
