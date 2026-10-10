@@ -1,0 +1,29 @@
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts.http.test.ts
+  s_6604e2237b6922::t_d5d5cc48f0b242 112,598,600
+apps/construction-management/app/api/construction/procurement/inventory/inventory.http.test.ts
+  s_6604e2237b6922::t_4c3aceed038ca4 100,223,260,300,303,578,612,630,645,703
+apps/construction-management/app/api/construction/procurement/material-requests/central-store.http.test.ts
+  s_6604e2237b6922::t_c903a0e6807cba 103
+apps/construction-management/app/api/construction/procurement/transfers/transfers.http.test.ts
+  s_6604e2237b6922::t_75a340a3b52bf0 78,151-155
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_6604e2237b6922::t_4bc05f51c14379 241,244-247
+apps/construction-management/test/procurement.ts
+  s_6604e2237b6922::t_811655b3893605 17-20,26,43-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ae8e6a0b35e374374c77b8309825877739106e27",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
