@@ -1,0 +1,19 @@
+apps/construction-management/components/projects/drawings/drawing-album-page.stories.tsx
+  s_6604e2237b6922::t_d1cb720f25d5a4 529-533
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e1004a9f739d7e6d8ce6ae18898c424ab58663a5",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
