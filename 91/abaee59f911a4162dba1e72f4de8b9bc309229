@@ -1,0 +1,51 @@
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.stories.tsx
+  s_6604e2237b6922::t_831d811bca9d76 1-54
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.tsx
+  s_6604e2237b6922::t_76de8eec03a177 36,131-132,155,187,191,204,238
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.stories.tsx
+  s_6604e2237b6922::t_774852c60dede7 1-70
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.tsx
+  s_6604e2237b6922::t_404579ecce73b0 39,240,265
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.stories.tsx
+  s_6604e2237b6922::t_2d4d704d71b67a 1-84
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.tsx
+  s_6604e2237b6922::t_b05e83c2393bb5 154-159
+apps/construction-management/components/procurement/material-requests/material-request-detail.stories.tsx
+  s_6604e2237b6922::t_1c0fee18efa54a 1-77
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_6604e2237b6922::t_fea6d61fae43f4 40,290,320
+apps/construction-management/components/procurement/material-requests/material-request-form.stories.tsx
+  s_6604e2237b6922::t_2d769253ced8b9 1-107
+apps/construction-management/components/procurement/material-requests/material-requests-list.stories.tsx
+  s_6604e2237b6922::t_9c76f7f644a4c5 1-51
+apps/construction-management/components/procurement/stores/central-store-fixtures.ts
+  s_6604e2237b6922::t_133419ec8eef0e 1-385
+apps/construction-management/components/procurement/stores/central-store-parts.tsx
+  s_6604e2237b6922::t_a4906511db9332 3,196-220
+apps/construction-management/components/procurement/stores/store-detail-page.stories.tsx
+  s_6604e2237b6922::t_1e9be8bd526cce 1-59
+apps/construction-management/components/procurement/stores/store-detail-page.tsx
+  s_6604e2237b6922::t_2699418ec62741 44,69,103
+apps/construction-management/components/procurement/stores/store-form.stories.tsx
+  s_6604e2237b6922::t_09b33a25c5ad90 1-98
+apps/construction-management/components/procurement/stores/stores-page.stories.tsx
+  s_6604e2237b6922::t_c4eb5299d107be 1-57
+apps/construction-management/next.config.ts
+  s_6604e2237b6922::t_c50fd69ed38f2c 31-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "91abaee59f911a4162dba1e72f4de8b9bc309229",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
