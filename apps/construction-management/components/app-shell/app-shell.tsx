@@ -137,7 +137,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
+      {/* min-w-0: a wide child (a section bar, a chart) scrolls inside
+          itself instead of widening the page past the sidebar. */}
+      <SidebarInset className="min-w-0">
         <header className="bg-card/85 border-border/70 sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
           <SidebarTrigger />
           <Separator orientation="vertical" className="mr-1 h-4" />
