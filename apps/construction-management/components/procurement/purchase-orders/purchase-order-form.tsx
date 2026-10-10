@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
+import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import {
   Controller,
   useFieldArray,
@@ -212,7 +212,9 @@ function PurchaseOrderFields({
   const [loadingPr, setLoadingPr] = useState(false);
   const create = useCreatePurchaseOrder();
   const updatePo = useUpdatePurchaseOrder(existing?.id ?? "");
-  const busy = create.isPending || updatePo.isPending;
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const busy = submitting || create.isPending || updatePo.isPending;
   const errors = form.formState.errors;
 
   /** Loads a PR's pending items as lines, rates from the Material master. */
@@ -277,6 +279,11 @@ function PurchaseOrderFields({
 
   const submit = (approve: boolean) =>
     form.handleSubmit(async (formValues) => {
+      // One save at a time: the buttons stay disabled through the
+      // attachment uploads, and a second click in the same tick is ignored.
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      setSubmitting(true);
       setError(undefined);
       const input = toPurchaseOrderInput(formValues, approve);
       try {
@@ -300,6 +307,8 @@ function PurchaseOrderFields({
           failed > 0 ? `${path}?uploadFailed=${String(failed)}` : path,
         );
       } catch (failure) {
+        submittingRef.current = false;
+        setSubmitting(false);
         const { field, message } = fieldForCode(failure, SERVER_FIELDS);
         if (field != null) form.setError(field, { message });
         else setError(message);
