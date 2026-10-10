@@ -1,0 +1,25 @@
+apps/construction-management/components/procurement/material-options-fixtures.ts
+  s_6604e2237b6922::t_e81aa0846ca99b 2-7,87-89,95-229
+apps/construction-management/components/procurement/material-picker-create-dialog.tsx
+  s_6604e2237b6922::t_5360c0a1d8c64a 1-286
+apps/construction-management/components/procurement/material-picker.stories.tsx
+  s_6604e2237b6922::t_ca9b6381cf25ab 1-415
+apps/construction-management/components/procurement/material-picker.tsx
+  s_6604e2237b6922::t_f4c33d0f21f793 3-5,7-17,24-25,28,45-69,71-164,166-187,189-298
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d4b2e1731d493986e780eb72493b909254ac628d",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
