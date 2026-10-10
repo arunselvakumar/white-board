@@ -1,0 +1,37 @@
+apps/construction-management/src/hrms/domain/salary-calculation.test.ts
+  s_6a70f1cb429bb6::t_5533c15ebd52d6 697-752
+apps/construction-management/src/hrms/domain/salary-calculation.ts
+  s_6a70f1cb429bb6::t_5a88d7babcef52 75-78,94-99,225-226,371,386-387,398-402,422-431,435-440,582
+apps/construction-management/src/hrms/domain/salary-days.test.ts
+  s_6a70f1cb429bb6::t_ca93bddf696248 1-238
+apps/construction-management/src/hrms/domain/salary-slip.test.ts
+  s_6a70f1cb429bb6::t_243cfcc9045bb5 1-284
+apps/construction-management/src/hrms/domain/salary-days.ts
+  s_553a74ef78f365::t_653e69ab6382fe 1-209
+apps/construction-management/src/hrms/domain/salary-slip.ts
+  s_553a74ef78f365::t_6d5e518105cf41 1-327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "be3b81aa970e1acc976189b94b06c34375a0015c",
+  "prompts": {},
+  "sessions": {
+    "s_553a74ef78f365": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa4f04e9bb83d7969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
