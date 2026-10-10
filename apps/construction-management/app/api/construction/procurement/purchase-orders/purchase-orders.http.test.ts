@@ -703,7 +703,7 @@ describe("Purchase Orders", () => {
     expect(options.suppliers.map((s) => s.id)).toEqual([ctx.supplierId]);
     expect(options.billingAddresses).toHaveLength(1);
     const document = await json<{ paths: Record<string, unknown> }>(
-      await getOpenApi(),
+      getOpenApi(),
     );
     for (const path of [
       "/api/construction/procurement/purchase-orders",

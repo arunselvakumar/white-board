@@ -29,8 +29,8 @@ export function EditPurchaseRequest({
         <EmptyHeader>
           <EmptyTitle>{data.number} cannot be edited</EmptyTitle>
           <EmptyDescription>
-            Only pending or rejected Purchase Requests are edited, by members with
-            Update on Purchase Requests.
+            Only pending or rejected Purchase Requests are edited, by members
+            with Update on Purchase Requests.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

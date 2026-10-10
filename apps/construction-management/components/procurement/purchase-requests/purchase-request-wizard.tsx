@@ -70,14 +70,17 @@ export const purchaseRequestFormSchema = z
     remark: z.string().max(500, "Use at most 500 characters"),
   })
   .refine(
-    (value) => value.requiredDate === "" || value.requiredDate >= value.requestDate,
+    (value) =>
+      value.requiredDate === "" || value.requiredDate >= value.requestDate,
     {
       message: "Required Date cannot be before the Purchase Request Date",
       path: ["requiredDate"],
     },
   );
 
-export type PurchaseRequestFormValues = z.infer<typeof purchaseRequestFormSchema>;
+export type PurchaseRequestFormValues = z.infer<
+  typeof purchaseRequestFormSchema
+>;
 
 const STEPS = ["Materials", "Quantity", "Details"] as const;
 
@@ -87,7 +90,9 @@ const STEP_FIELDS: FieldPath<PurchaseRequestFormValues>[][] = [
   ["requestDate", "requiredDate", "remark"],
 ];
 
-const SERVER_FIELDS: Partial<Record<string, FieldPath<PurchaseRequestFormValues>>> = {
+const SERVER_FIELDS: Partial<
+  Record<string, FieldPath<PurchaseRequestFormValues>>
+> = {
   REQUEST_DATE_INVALID: "requestDate",
   DATE_IN_FUTURE: "requestDate",
   BACKDATED_CREATE_BLOCKED: "requestDate",
@@ -125,7 +130,7 @@ export function wizardDefaults(
     commonRemark: pr.commonRemark ?? "",
     requestDate: pr.requestDate,
     requiredDate: pr.requiredDate ?? "",
-    siteLocation: pr.siteLocation as LocationRef | null,
+    siteLocation: pr.siteLocation,
     remark: pr.remark ?? "",
   };
 }
@@ -145,7 +150,9 @@ function toInput(values: PurchaseRequestFormValues, approve: boolean) {
       materialId: item.materialId,
       quantity: item.quantity.trim(),
       remark:
-        values.separateRemarks && item.remark.trim() !== "" ? item.remark.trim() : null,
+        values.separateRemarks && item.remark.trim() !== ""
+          ? item.remark.trim()
+          : null,
     })),
     approve,
   };
@@ -185,11 +192,17 @@ export function PurchaseRequestWizard({
     name: "items",
   });
   const items = useWatch({ control: form.control, name: "items" });
-  const separateRemarks = useWatch({ control: form.control, name: "separateRemarks" });
+  const separateRemarks = useWatch({
+    control: form.control,
+    name: "separateRemarks",
+  });
   const [step, setStep] = useState(0);
-  const [viewSelected, setViewSelected] = useState(initialMaterialIds.length > 0);
+  const [viewSelected, setViewSelected] = useState(
+    initialMaterialIds.length > 0,
+  );
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | undefined>();
+  const [noItems, setNoItems] = useState(false);
   const create = useCreatePurchaseRequest();
   const update = useUpdatePurchaseRequest(existing?.id ?? "");
   const busy = create.isPending || update.isPending;
@@ -200,10 +213,16 @@ export function PurchaseRequestWizard({
     enabled: existing == null && initialMaterialIds.length > 0,
   });
   const preloaded = useRef(false);
+  const preloadIds = initialMaterialIds.join(",");
   useEffect(() => {
+    if (existing != null || preloadIds === "") return;
     if (preloaded.current || preload.data == null) return;
     preloaded.current = true;
-    for (const material of preload.data)
+    // The picker's read can share this cache key: keep only the ids asked for.
+    const wanted = new Set(preloadIds.split(","));
+    for (const material of preload.data.filter((option) =>
+      wanted.has(option.id),
+    ))
       append({
         materialId: material.id,
         materialName: material.name,
@@ -211,7 +230,7 @@ export function PurchaseRequestWizard({
         quantity: "",
         remark: "",
       });
-  }, [append, preload.data]);
+  }, [append, existing, preload.data, preloadIds]);
 
   const quantities = useQuery({
     ...purchaseRequestQuantityInfoQuery(
@@ -221,9 +240,20 @@ export function PurchaseRequestWizard({
     ),
     enabled: step >= 1 && items.length > 0,
   });
-  const info = new Map((quantities.data ?? []).map((row) => [row.materialId, row]));
+  const info = new Map(
+    (quantities.data ?? []).map((row) => [row.materialId, row]),
+  );
 
   const next = async () => {
+    if (step === 0) {
+      if (form.getValues("items").length === 0) {
+        setNoItems(true);
+        return;
+      }
+      setNoItems(false);
+      setStep(1);
+      return;
+    }
     const valid = await form.trigger(STEP_FIELDS[step] ?? []);
     if (valid) setStep((current) => Math.min(current + 1, STEPS.length - 1));
   };
@@ -235,8 +265,15 @@ export function PurchaseRequestWizard({
       try {
         const saved =
           existing == null
-            ? await create.mutateAsync({ projectId, source: initialMaterialIds.length > 0 ? "inventory" : "manual", ...input })
-            : await update.mutateAsync({ ...input, expectedUpdatedAt: existing.updatedAt });
+            ? await create.mutateAsync({
+                projectId,
+                source: initialMaterialIds.length > 0 ? "inventory" : "manual",
+                ...input,
+              })
+            : await update.mutateAsync({
+                ...input,
+                expectedUpdatedAt: existing.updatedAt,
+              });
         const failed: string[] = [];
         for (const file of files) {
           try {
@@ -246,19 +283,28 @@ export function PurchaseRequestWizard({
           }
         }
         const path = purchaseRequestsPath(projectId, `/${saved.id}`);
-        router.push(failed.length > 0 ? `${path}?uploadFailed=${String(failed.length)}` : path);
+        router.push(
+          failed.length > 0
+            ? `${path}?uploadFailed=${String(failed.length)}`
+            : path,
+        );
       } catch (failure) {
         const { field, message } = fieldForCode(failure, SERVER_FIELDS);
         if (field != null) {
           form.setError(field, { message });
-          const back = STEP_FIELDS.findIndex((fieldsOfStep) => fieldsOfStep.includes(field));
+          const back = STEP_FIELDS.findIndex((fieldsOfStep) =>
+            fieldsOfStep.includes(field),
+          );
           if (back >= 0) setStep(back);
         } else setError(message);
       }
     })();
 
   const errors = form.formState.errors;
-  const itemsError = errors.items?.message ?? errors.items?.root?.message;
+  const itemsError =
+    (noItems ? "Pick at least one material" : undefined) ??
+    errors.items?.message ??
+    errors.items?.root?.message;
 
   return (
     <form
@@ -283,7 +329,9 @@ export function PurchaseRequestWizard({
             <span
               className={cn(
                 "flex size-6 shrink-0 items-center justify-center rounded-full text-xs",
-                index <= step ? "bg-primary text-primary-foreground" : "bg-muted",
+                index <= step
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted",
               )}
             >
               {index + 1}
@@ -313,6 +361,7 @@ export function PurchaseRequestWizard({
                   quantity: "",
                   remark: "",
                 });
+                setNoItems(false);
                 form.clearErrors("items");
               }}
             />
@@ -331,12 +380,20 @@ export function PurchaseRequestWizard({
             View Selected ({fields.length})
           </Button>
           {viewSelected && fields.length > 0 && (
-            <ul aria-label="Selected materials" className="divide-y rounded-lg border">
+            <ul
+              aria-label="Selected materials"
+              className="divide-y rounded-lg border"
+            >
               {fields.map((field, index) => (
-                <li key={field.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                <li
+                  key={field.id}
+                  className="flex items-center justify-between gap-3 px-3 py-2"
+                >
                   <span className="min-w-0 truncate text-sm">
                     {field.materialName}{" "}
-                    <span className="text-muted-foreground">({field.uomName})</span>
+                    <span className="text-muted-foreground">
+                      ({field.uomName})
+                    </span>
                   </span>
                   <Button
                     type="button"
@@ -367,7 +424,10 @@ export function PurchaseRequestWizard({
                   <div className="grid gap-3 sm:grid-cols-[1fr_12rem] sm:items-start">
                     <div className="min-w-0">
                       <p className="font-medium">{field.materialName}</p>
-                      <p className="text-muted-foreground text-xs" data-testid={`stock-${field.materialId}`}>
+                      <p
+                        className="text-muted-foreground text-xs"
+                        data-testid={`stock-${field.materialId}`}
+                      >
                         {row == null ? (
                           quantities.isLoading ? (
                             "Loading stock…"
@@ -376,7 +436,8 @@ export function PurchaseRequestWizard({
                           )
                         ) : (
                           <>
-                            Available Stock: {quantityText(row.availableStock)} {field.uomName}
+                            Available Stock: {quantityText(row.availableStock)}{" "}
+                            {field.uomName}
                             {" · "}Balanced estimated qty:{" "}
                             {row.balancedEstimatedQty == null
                               ? "no estimate"
@@ -386,7 +447,10 @@ export function PurchaseRequestWizard({
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor={`pr-qty-${String(index)}`} className="text-xs">
+                      <Label
+                        htmlFor={`pr-qty-${String(index)}`}
+                        className="text-xs"
+                      >
                         Quantity ({field.uomName})
                       </Label>
                       <Input
@@ -401,7 +465,10 @@ export function PurchaseRequestWizard({
                   </div>
                   {separateRemarks && (
                     <div className="space-y-1">
-                      <Label htmlFor={`pr-remark-${String(index)}`} className="text-xs">
+                      <Label
+                        htmlFor={`pr-remark-${String(index)}`}
+                        className="text-xs"
+                      >
                         Remark
                       </Label>
                       <Input
@@ -410,7 +477,9 @@ export function PurchaseRequestWizard({
                         maxLength={500}
                         {...form.register(`items.${index}.remark`)}
                       />
-                      <FieldError message={errors.items?.[index]?.remark?.message} />
+                      <FieldError
+                        message={errors.items?.[index]?.remark?.message}
+                      />
                     </div>
                   )}
                 </li>
@@ -429,7 +498,9 @@ export function PurchaseRequestWizard({
                 />
               )}
             />
-            <Label htmlFor="pr-separate-remarks">Separate remark for each item</Label>
+            <Label htmlFor="pr-separate-remarks">
+              Separate remark for each item
+            </Label>
           </div>
           {!separateRemarks && (
             <div className="space-y-1.5">
@@ -486,7 +557,11 @@ export function PurchaseRequestWizard({
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="pr-remark">Remark</Label>
-            <Textarea id="pr-remark" maxLength={500} {...form.register("remark")} />
+            <Textarea
+              id="pr-remark"
+              maxLength={500}
+              {...form.register("remark")}
+            />
             <FieldError message={errors.remark?.message} />
           </div>
           {existing == null ? (
@@ -508,7 +583,8 @@ export function PurchaseRequestWizard({
             </div>
           ) : (
             <p className="text-muted-foreground text-sm sm:col-span-2">
-              Add or remove the Required Materials List on the request&rsquo;s page.
+              Add or remove the Required Materials List on the request&rsquo;s
+              page.
             </p>
           )}
         </section>

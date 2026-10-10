@@ -166,7 +166,11 @@ export function useBulkDecidePurchaseOrders() {
         `${PURCHASE_ORDERS_API}/${input.approve ? "bulk-approve" : "bulk-reject"}`,
         input.approve
           ? { projectId: input.projectId, ids: input.ids }
-          : { projectId: input.projectId, ids: input.ids, reason: input.reason },
+          : {
+              projectId: input.projectId,
+              ids: input.ids,
+              reason: input.reason,
+            },
       ),
     onSuccess: invalidate,
   });

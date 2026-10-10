@@ -115,7 +115,11 @@ export function PurchaseRequestActions({
       key: "mark-ordered",
       label: "Mark as Ordered",
       run: () => {
-        run({ kind: "mark-ordered", id: pr.id, expectedUpdatedAt: pr.updatedAt });
+        run({
+          kind: "mark-ordered",
+          id: pr.id,
+          expectedUpdatedAt: pr.updatedAt,
+        });
       },
     });
   if (actions.edit)
@@ -161,7 +165,9 @@ export function PurchaseRequestActions({
               expectedUpdatedAt: pr.updatedAt,
             });
           } catch (failure) {
-            throw new Error(fieldForCode(failure, {}).message);
+            throw new Error(fieldForCode(failure, {}).message, {
+              cause: failure,
+            });
           }
         }}
       />
@@ -182,7 +188,11 @@ export function PurchaseRequestActions({
               onClick={() => {
                 onError(undefined);
                 command.mutate(
-                  { kind: "delete", id: pr.id, expectedUpdatedAt: pr.updatedAt },
+                  {
+                    kind: "delete",
+                    id: pr.id,
+                    expectedUpdatedAt: pr.updatedAt,
+                  },
                   {
                     onSuccess: () => {
                       setDeleting(false);
@@ -219,7 +229,9 @@ export function PurchaseRequestActions({
                   ? "default"
                   : "outline"
             }
-            className={item.destructive === true ? "text-destructive" : undefined}
+            className={
+              item.destructive === true ? "text-destructive" : undefined
+            }
             disabled={command.isPending}
             onClick={item.run}
           >
@@ -248,7 +260,9 @@ export function PurchaseRequestActions({
         <DropdownMenuContent align="end">
           {items.map((item, index) => (
             <Fragment key={item.key}>
-              {item.destructive === true && index > 0 && <DropdownMenuSeparator />}
+              {item.destructive === true && index > 0 && (
+                <DropdownMenuSeparator />
+              )}
               <DropdownMenuItem
                 variant={item.destructive === true ? "destructive" : "default"}
                 onClick={item.run}

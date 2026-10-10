@@ -119,7 +119,7 @@ describe("purchase order tax math (golden)", () => {
       code(() =>
         purchaseOrderLines(
           [
-            inputs[0] ?? inputs[1]!,
+            { materialId: CEMENT.id, quantity: "1", unitRate: 100n },
             {
               materialId: STEEL.id,
               quantity: "1",
@@ -148,11 +148,17 @@ describe("purchase order tax math (golden)", () => {
         ),
       ),
     ).toBe("GST_RATE_INVALID");
-    expect(code(() => hsnCode("12345", 0))).toBe("HSN_INVALID");
+    expect(
+      code(() => {
+        hsnCode("12345", 0);
+      }),
+    ).toBe("HSN_INVALID");
     expect(hsnCode("72141090", 0)).toBe("72141090");
-    expect(code(() => purchaseOrderLines([], materials, "intra_state"))).toBe(
-      "ITEMS_REQUIRED",
-    );
+    expect(
+      code(() => {
+        purchaseOrderLines([], materials, "intra_state");
+      }),
+    ).toBe("ITEMS_REQUIRED");
   });
 });
 
@@ -196,9 +202,11 @@ describe("place and type of supply", () => {
   });
 
   it("needs a delivery address when it differs", () => {
-    expect(code(() => deliveryAddress({ differs: true, address: " " }))).toBe(
-      "DELIVERY_ADDRESS_REQUIRED",
-    );
+    expect(
+      code(() => {
+        deliveryAddress({ differs: true, address: " " });
+      }),
+    ).toBe("DELIVERY_ADDRESS_REQUIRED");
     expect(
       deliveryAddress({ differs: false, address: "ignored", stateCode: "29" }),
     ).toEqual({
@@ -248,9 +256,11 @@ describe("purchase order states", () => {
   });
 
   it("marks ordered only when approved, closes only when ordered", () => {
-    expect(code(() => assertCanMarkPurchaseOrderOrdered(state()))).toBe(
-      "PURCHASE_ORDER_NOT_ORDERABLE",
-    );
+    expect(
+      code(() => {
+        assertCanMarkPurchaseOrderOrdered(state());
+      }),
+    ).toBe("PURCHASE_ORDER_NOT_ORDERABLE");
     expect(() => {
       assertCanMarkPurchaseOrderOrdered(state({ approvalStatus: "approved" }));
     }).not.toThrow();
@@ -262,13 +272,19 @@ describe("purchase order states", () => {
       orderedAt: new Date(),
     });
     expect(closeReason(ordered, " short supply ")).toBe("short supply");
-    expect(code(() => closeReason(ordered, ""))).toBe("CLOSE_REASON_REQUIRED");
+    expect(
+      code(() => {
+        closeReason(ordered, "");
+      }),
+    ).toBe("CLOSE_REASON_REQUIRED");
     expect(
       code(() => closeReason({ ...ordered, receiptStatus: "received" }, "x")),
     ).toBe("PURCHASE_ORDER_NOT_CLOSABLE");
-    expect(code(() => assertPurchaseOrderDeletable(1))).toBe(
-      "PURCHASE_ORDER_HAS_RECEIPTS",
-    );
+    expect(
+      code(() => {
+        assertPurchaseOrderDeletable(1);
+      }),
+    ).toBe("PURCHASE_ORDER_HAS_RECEIPTS");
   });
 });
 

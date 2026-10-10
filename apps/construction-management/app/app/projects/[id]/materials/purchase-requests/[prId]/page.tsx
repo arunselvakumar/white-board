@@ -19,7 +19,9 @@ export default async function Page({
       <PurchaseRequestDetailPage
         projectId={id}
         id={prId}
-        uploadFailed={typeof uploadFailed === "string" ? Number(uploadFailed) || 0 : 0}
+        uploadFailed={
+          typeof uploadFailed === "string" ? Number(uploadFailed) || 0 : 0
+        }
       />
     </QuerySuspense>
   );

@@ -63,9 +63,11 @@ describe("purchase request lines", () => {
   });
 
   it("refuses no lines, repeats, unknown or disabled materials and bad quantities", () => {
-    expect(code(() => purchaseRequestLines([], materials, false))).toBe(
-      "ITEMS_REQUIRED",
-    );
+    expect(
+      code(() => {
+        purchaseRequestLines([], materials, false);
+      }),
+    ).toBe("ITEMS_REQUIRED");
     expect(
       code(() =>
         purchaseRequestLines(
@@ -102,16 +104,22 @@ describe("purchase request lines", () => {
       ),
     ).toBe("MATERIAL_NOT_FOUND");
     for (const bad of ["0", "-1", "1.2345", "abc", "100000000000"])
-      expect(code(() => lineQuantity(bad, 0))).toBe("QUANTITY_INVALID");
+      expect(
+        code(() => {
+          lineQuantity(bad, 0);
+        }),
+      ).toBe("QUANTITY_INVALID");
   });
 
   it("needs the Required Date on or after the request date", () => {
     expect(() => {
       assertRequiredDate("2026-10-10", "2026-10-10");
     }).not.toThrow();
-    expect(code(() => assertRequiredDate("2026-10-10", "2026-10-09"))).toBe(
-      "REQUIRED_DATE_BEFORE_REQUEST_DATE",
-    );
+    expect(
+      code(() => {
+        assertRequiredDate("2026-10-10", "2026-10-09");
+      }),
+    ).toBe("REQUIRED_DATE_BEFORE_REQUEST_DATE");
   });
 });
 
@@ -137,9 +145,11 @@ describe("purchase request states", () => {
     expect(() => {
       assertPurchaseRequestEditable(state("rejected"));
     }).not.toThrow();
-    expect(code(() => assertPurchaseRequestEditable(state("approved")))).toBe(
-      "PURCHASE_REQUEST_NOT_EDITABLE",
-    );
+    expect(
+      code(() => {
+        assertPurchaseRequestEditable(state("approved"));
+      }),
+    ).toBe("PURCHASE_REQUEST_NOT_EDITABLE");
   });
 
   it("marks as ordered from approved or partially ordered only", () => {
@@ -156,18 +166,22 @@ describe("purchase request states", () => {
       state("approved", "excess_ordered"),
       state("approved", "not_ordered", true),
     ])
-      expect(code(() => assertCanMarkOrdered(refused))).toBe(
-        "PURCHASE_REQUEST_NOT_ORDERABLE",
-      );
+      expect(
+        code(() => {
+          assertCanMarkOrdered(refused);
+        }),
+      ).toBe("PURCHASE_REQUEST_NOT_ORDERABLE");
   });
 
   it("refuses deleting a request with order lines", () => {
     expect(() => {
       assertPurchaseRequestDeletable(0);
     }).not.toThrow();
-    expect(code(() => assertPurchaseRequestDeletable(1))).toBe(
-      "PURCHASE_REQUEST_HAS_ORDERS",
-    );
+    expect(
+      code(() => {
+        assertPurchaseRequestDeletable(1);
+      }),
+    ).toBe("PURCHASE_REQUEST_HAS_ORDERS");
   });
 
   it("derives the order status from the items", () => {

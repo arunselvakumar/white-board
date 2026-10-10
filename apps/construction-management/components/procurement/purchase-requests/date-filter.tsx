@@ -38,7 +38,10 @@ export function DateFilter({
         label="Date"
         allLabel="Any date"
         value={value.preset}
-        options={DATE_PRESETS.map((item) => ({ value: item.key, label: item.label }))}
+        options={DATE_PRESETS.map((item) => ({
+          value: item.key,
+          label: item.label,
+        }))}
         onChange={(next) => {
           const preset = next as DatePreset | "";
           if (preset === "") {

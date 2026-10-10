@@ -45,10 +45,7 @@ export type PurchaseRequestFilter = {
   to?: string;
   approvalStatus?: "pending" | "approved" | "rejected";
   orderStatus?:
-    | "not_ordered"
-    | "partially_ordered"
-    | "ordered"
-    | "excess_ordered";
+    "not_ordered" | "partially_ordered" | "ordered" | "excess_ordered";
   categoryId?: string;
   materialId?: string;
   createdBy?: string;
@@ -192,7 +189,11 @@ export function useBulkDecidePurchaseRequests() {
         `${PURCHASE_REQUESTS_API}/${input.approve ? "bulk-approve" : "bulk-reject"}`,
         input.approve
           ? { projectId: input.projectId, ids: input.ids }
-          : { projectId: input.projectId, ids: input.ids, reason: input.reason },
+          : {
+              projectId: input.projectId,
+              ids: input.ids,
+              reason: input.reason,
+            },
       ),
     onSuccess: invalidate,
   });

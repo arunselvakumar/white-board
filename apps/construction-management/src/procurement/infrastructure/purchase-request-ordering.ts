@@ -1,4 +1,4 @@
-import { Prisma } from "@repo/construction-db";
+import type { Prisma } from "@repo/construction-db";
 
 import { orderStatusOf } from "../domain/purchase-request";
 

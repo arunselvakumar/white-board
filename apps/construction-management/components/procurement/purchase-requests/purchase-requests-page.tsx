@@ -41,7 +41,11 @@ import {
 } from "@/src/queries/purchase-requests";
 import { LOCATION_TYPES } from "@/src/shared-kernel/location-ref";
 
-import { DateFilter, NO_DATE_FILTER, type DateFilterValue } from "./date-filter";
+import {
+  DateFilter,
+  NO_DATE_FILTER,
+  type DateFilterValue,
+} from "./date-filter";
 import { FilterSelect } from "./filter-select";
 import {
   purchaseRequestsPath,
@@ -91,7 +95,10 @@ function toQuery(projectId: string, filters: Filters): PurchaseRequestFilter {
 function itemsLine(pr: PurchaseRequest): string {
   const first = pr.items
     .slice(0, 2)
-    .map((item) => `${item.materialName} ${quantityText(item.quantity)} ${item.uomName}`)
+    .map(
+      (item) =>
+        `${item.materialName} ${quantityText(item.quantity)} ${item.uomName}`,
+    )
     .join(", ");
   const more = pr.items.length - 2;
   return more > 0 ? `${first} +${String(more)} more` : first;
@@ -234,10 +241,11 @@ function PurchaseRequestRows({
   const [rejecting, setRejecting] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [notice, setNotice] = useState<string | undefined>();
-  const filtered =
-    JSON.stringify(filters) !== JSON.stringify(NO_FILTERS);
+  const filtered = JSON.stringify(filters) !== JSON.stringify(NO_FILTERS);
   const selectable = (pr: PurchaseRequest) => pr.approvalStatus === "pending";
-  const chosen = data.items.filter((pr) => selected.has(pr.id) && selectable(pr));
+  const chosen = data.items.filter(
+    (pr) => selected.has(pr.id) && selectable(pr),
+  );
   const toggle = (id: string, on: boolean) => {
     setSelected((current) => {
       const next = new Set(current);
@@ -261,7 +269,7 @@ function PurchaseRequestRows({
         `${String(result.decided)} ${result.decided === 1 ? "request" : "requests"} ${approve ? "approved" : "rejected"}.`,
       );
     } catch (failure) {
-      throw new Error(fieldForCode(failure, {}).message);
+      throw new Error(fieldForCode(failure, {}).message, { cause: failure });
     }
   };
 
@@ -279,7 +287,10 @@ function PurchaseRequestRows({
         id="pr-category"
         label="Material Category"
         value={filters.categoryId}
-        options={data.facets.categories.map((item) => ({ value: item.id, label: item.name }))}
+        options={data.facets.categories.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }))}
         onChange={(categoryId) => {
           onFilters({ categoryId });
         }}
@@ -288,7 +299,10 @@ function PurchaseRequestRows({
         id="pr-material"
         label="Material"
         value={filters.materialId}
-        options={data.facets.materials.map((item) => ({ value: item.id, label: item.name }))}
+        options={data.facets.materials.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }))}
         onChange={(materialId) => {
           onFilters({ materialId });
         }}
@@ -297,7 +311,10 @@ function PurchaseRequestRows({
         id="pr-created-by"
         label="Created By"
         value={filters.createdBy}
-        options={data.facets.creators.map((item) => ({ value: item.userId, label: item.name }))}
+        options={data.facets.creators.map((item) => ({
+          value: item.userId,
+          label: item.name,
+        }))}
         onChange={(createdBy) => {
           onFilters({ createdBy });
         }}
@@ -306,7 +323,10 @@ function PurchaseRequestRows({
         id="pr-location-type"
         label="Location Type"
         value={filters.locationType}
-        options={LOCATION_TYPES.map((item) => ({ value: item.key, label: item.label }))}
+        options={LOCATION_TYPES.map((item) => ({
+          value: item.key,
+          label: item.label,
+        }))}
         onChange={(locationType) => {
           onFilters({ locationType });
         }}
@@ -324,7 +344,9 @@ function PurchaseRequestRows({
               <ClipboardList />
             </EmptyMedia>
             <EmptyTitle>
-              {filtered ? "No Purchase Requests match" : "No Purchase Requests yet"}
+              {filtered
+                ? "No Purchase Requests match"
+                : "No Purchase Requests yet"}
             </EmptyTitle>
             <EmptyDescription>
               {filtered
@@ -362,11 +384,15 @@ function PurchaseRequestRows({
     <div className="space-y-3">
       {filterBar}
       <p className="text-muted-foreground text-sm">
-        {data.total} {data.total === 1 ? "Purchase Request" : "Purchase Requests"}
+        {data.total}{" "}
+        {data.total === 1 ? "Purchase Request" : "Purchase Requests"}
       </p>
       <FormAlert message={error} />
       {notice != null && (
-        <p role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
+        <p
+          role="status"
+          className="text-sm text-emerald-700 dark:text-emerald-400"
+        >
           {notice}
         </p>
       )}
@@ -396,7 +422,9 @@ function PurchaseRequestRows({
                 disabled={chosen.length === 0 || decide.isPending}
                 onClick={() => {
                   bulkDecide(true).catch((failure: unknown) => {
-                    setError(failure instanceof Error ? failure.message : undefined);
+                    setError(
+                      failure instanceof Error ? failure.message : undefined,
+                    );
                   });
                 }}
               >
@@ -438,7 +466,9 @@ function PurchaseRequestRows({
                     {pr.number}
                   </Link>
                 </TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(pr.requestDate)}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {formatDate(pr.requestDate)}
+                </TableCell>
                 <TableCell className="text-muted-foreground max-w-72 truncate">
                   {itemsLine(pr)}
                 </TableCell>
@@ -455,7 +485,11 @@ function PurchaseRequestRows({
                   {pr.createdBy.name ?? "—"}
                 </TableCell>
                 <TableCell>
-                  <PurchaseRequestActions pr={pr} variant="menu" onError={setError} />
+                  <PurchaseRequestActions
+                    pr={pr}
+                    variant="menu"
+                    onError={setError}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -476,15 +510,22 @@ function PurchaseRequestRows({
                 </Link>
                 <p className="text-muted-foreground text-xs">
                   {formatDate(pr.requestDate)}
-                  {pr.requiredDate != null && ` · needed ${formatDate(pr.requiredDate)}`}
+                  {pr.requiredDate != null &&
+                    ` · needed ${formatDate(pr.requiredDate)}`}
                 </p>
-                <p className="text-muted-foreground mt-1 truncate text-sm">{itemsLine(pr)}</p>
+                <p className="text-muted-foreground mt-1 truncate text-sm">
+                  {itemsLine(pr)}
+                </p>
                 <div className="mt-2 flex flex-wrap gap-1">
                   <ApprovalBadge status={pr.approvalStatus} />
                   <OrderBadge status={pr.orderStatus} />
                 </div>
               </div>
-              <PurchaseRequestActions pr={pr} variant="menu" onError={setError} />
+              <PurchaseRequestActions
+                pr={pr}
+                variant="menu"
+                onError={setError}
+              />
             </div>
           </li>
         ))}

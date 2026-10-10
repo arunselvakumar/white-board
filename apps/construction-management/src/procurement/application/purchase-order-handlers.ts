@@ -1059,8 +1059,7 @@ export class PurchaseOrderHandlers {
       for (const id of ids) {
         const po = locked.get(id);
         if (
-          po == null ||
-          po.location.kind !== location.kind ||
+          po?.location.kind !== location.kind ||
           po.location.id !== location.id
         ) {
           if (!bulk) throw purchaseOrderNotFound();

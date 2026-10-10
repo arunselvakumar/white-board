@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -26,9 +25,12 @@ import {
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
 import { purchaseRequestQuery } from "@/src/queries/purchase-requests";
-import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import { purchaseRequestsPath, PurchaseRequestActions } from "./purchase-request-actions";
+import {
+  purchaseRequestsPath,
+  PurchaseRequestActions,
+} from "./purchase-request-actions";
+import { ScrollTable } from "./scroll-table";
 import {
   APPROVAL_LABELS,
   ApprovalBadge,
@@ -46,9 +48,10 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 }
 
 const stamp = (iso: string) =>
-  new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(iso),
-  );
+  new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(iso));
 
 /**
  * One Purchase Request (CM-503): status, details, materials with ordered
@@ -117,18 +120,25 @@ export function PurchaseRequestDetailPage({
             "—"
           ) : (
             <Suspense fallback="…">
-              <LocationLabel projectId={projectId} value={pr.siteLocation as LocationRef} />
+              <LocationLabel projectId={projectId} value={pr.siteLocation} />
             </Suspense>
           )}
         </Fact>
         <Fact label="Raised by">{pr.createdBy.name ?? "—"}</Fact>
         <Fact label="Raised on">{stamp(pr.createdAt)}</Fact>
-        <Fact label="Source">{pr.source === "inventory" ? "Current Inventory" : "Purchase Request list"}</Fact>
+        <Fact label="Source">
+          {pr.source === "inventory"
+            ? "Current Inventory"
+            : "Purchase Request list"}
+        </Fact>
         {decided && (
           <Fact label={`${APPROVAL_LABELS[pr.approvalStatus]} by`}>
             {pr.decidedBy?.name ?? "—"}
             {pr.decidedAt != null && (
-              <span className="text-muted-foreground"> · {stamp(pr.decidedAt)}</span>
+              <span className="text-muted-foreground">
+                {" "}
+                · {stamp(pr.decidedAt)}
+              </span>
             )}
           </Fact>
         )}
@@ -138,7 +148,10 @@ export function PurchaseRequestDetailPage({
         {pr.markedOrderedAt != null && (
           <Fact label="Marked as Ordered">
             {pr.markedOrderedBy?.name ?? "—"}
-            <span className="text-muted-foreground"> · {stamp(pr.markedOrderedAt)}</span>
+            <span className="text-muted-foreground">
+              {" "}
+              · {stamp(pr.markedOrderedAt)}
+            </span>
           </Fact>
         )}
       </dl>
@@ -147,36 +160,44 @@ export function PurchaseRequestDetailPage({
         <h3 id="pr-materials" className="font-semibold">
           Materials
         </h3>
-        <div className="overflow-x-auto rounded-lg border">
-          <Table aria-label="Materials">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Material</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-right">Requested</TableHead>
-                <TableHead className="text-right">Ordered</TableHead>
-                <TableHead className="text-right">Pending</TableHead>
-                {pr.separateRemarks && <TableHead>Remark</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pr.items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.materialName}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.categoryName ?? "—"}</TableCell>
-                  <TableCell className="text-right tabular-nums whitespace-nowrap">
-                    {quantityText(item.quantity)} {item.uomName}
+        <ScrollTable label={`Materials of ${pr.number}`}>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Material</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Requested</TableHead>
+              <TableHead className="text-right">Ordered</TableHead>
+              <TableHead className="text-right">Pending</TableHead>
+              {pr.separateRemarks && <TableHead>Remark</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pr.items.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">
+                  {item.materialName}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {item.categoryName ?? "—"}
+                </TableCell>
+                <TableCell className="text-right whitespace-nowrap tabular-nums">
+                  {quantityText(item.quantity)} {item.uomName}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {quantityText(item.orderedQty)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {quantityText(item.pendingQty)}
+                </TableCell>
+                {pr.separateRemarks && (
+                  <TableCell className="text-muted-foreground">
+                    {item.remark ?? "—"}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{quantityText(item.orderedQty)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{quantityText(item.pendingQty)}</TableCell>
-                  {pr.separateRemarks && (
-                    <TableCell className="text-muted-foreground">{item.remark ?? "—"}</TableCell>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </ScrollTable>
         {!pr.separateRemarks && pr.commonRemark != null && (
           <p className="text-sm">
             <span className="text-muted-foreground">Common Remark: </span>
@@ -196,11 +217,16 @@ export function PurchaseRequestDetailPage({
           Purchase Orders
         </h3>
         {pr.purchaseOrders.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No Purchase Order raised against it yet.</p>
+          <p className="text-muted-foreground text-sm">
+            No Purchase Order raised against it yet.
+          </p>
         ) : (
           <ul className="divide-y rounded-lg border">
             {pr.purchaseOrders.map((po) => (
-              <li key={po.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+              <li
+                key={po.id}
+                className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm"
+              >
                 <Link
                   href={`/app/projects/${encodeURIComponent(projectId)}/materials/purchase-orders/${po.id}`}
                   className="font-medium hover:underline"
@@ -208,7 +234,8 @@ export function PurchaseRequestDetailPage({
                   {po.number}
                 </Link>
                 <span className="text-muted-foreground">
-                  {formatDate(po.orderDate)} · {po.supplierName} · {APPROVAL_LABELS[po.approvalStatus]}
+                  {formatDate(po.orderDate)} · {po.supplierName} ·{" "}
+                  {APPROVAL_LABELS[po.approvalStatus]}
                 </span>
                 <span className="tabular-nums">{money(po.grandTotal)}</span>
               </li>
@@ -223,7 +250,11 @@ export function PurchaseRequestDetailPage({
         canEdit={canEditFiles}
         heading="Upload Required Materials List"
       />
-      <DocumentActivity documentType="purchase_request" documentId={pr.id} heading="Remarks" />
+      <DocumentActivity
+        documentType="purchase_request"
+        documentId={pr.id}
+        heading="Remarks"
+      />
     </div>
   );
 }

@@ -5,7 +5,11 @@ import { EditPurchaseRequest } from "@/components/procurement/purchase-requests/
 
 export const metadata: Metadata = { title: "Edit Purchase Request" };
 
-export default async function Page({ params }: { params: Promise<{ id: string; prId: string }> }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string; prId: string }>;
+}) {
   const { id, prId } = await params;
   return (
     <QuerySuspense>
