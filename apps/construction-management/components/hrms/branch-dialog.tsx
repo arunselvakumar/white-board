@@ -188,8 +188,8 @@ export function BranchDialog({
   const title =
     branch == null
       ? site
-        ? "New Project site fence"
-        : "New Office Branch"
+        ? "Add site fence"
+        : "Add Branch"
       : `Edit ${branch.name}`;
 
   return (

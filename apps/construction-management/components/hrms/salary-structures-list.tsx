@@ -173,8 +173,8 @@ export function SalaryStructuresList() {
               </EmptyMedia>
               <EmptyTitle>No salary structures yet</EmptyTitle>
               <EmptyDescription>
-                Add one for each way you pay staff, like Site staff with Basic,
-                HRA and a Special Allowance.
+                Add one for each way you pay Team Members, like Site staff with
+                Basic, HRA and a Special Allowance.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>{addLink}</EmptyContent>

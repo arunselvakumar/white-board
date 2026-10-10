@@ -48,7 +48,7 @@ function Grid({ month }: { month: string }) {
       <HrmsEmpty
         icon={CalendarDays}
         title="No Team Members yet"
-        description="Team Members who have joined the Company appear here with their month."
+        description="Add Team Members in Masters → Team Members. Once they join the Company they appear here with their month."
       />
     );
   const dates = data.rows[0]?.days.map((day) => day.date) ?? [];

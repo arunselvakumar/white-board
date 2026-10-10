@@ -106,7 +106,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
       }}
     >
       <Plus aria-hidden="true" />
-      New Office Branch
+      Add Branch
     </Button>
   );
   const addSite = (
@@ -118,7 +118,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
       }}
     >
       <HardHat aria-hidden="true" />
-      New site fence
+      Add site fence
     </Button>
   );
 
@@ -148,8 +148,8 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
       {data.items.length === 0 ? (
         <HrmsEmpty
           icon={MapPin}
-          title="No fences yet"
-          description="Add your office with its location and a radius. Add a site fence for each Project where staff check in."
+          title="No branches or site fences yet"
+          description="Add your office with its location and a radius. Add a site fence for each Project where Team Members check in."
           action={
             <div className="flex flex-wrap justify-center gap-2">
               {addOffice}

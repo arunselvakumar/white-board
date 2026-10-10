@@ -299,3 +299,91 @@ export const NotShared: Story = {
     ).toBeVisible();
   },
 };
+
+const APPROVED_MONTH = STORY_SLIPS.map((slip) =>
+  slip.kind === "regular" && slip.status === "calculated"
+    ? {
+        ...slip,
+        status: "approved" as const,
+        statutory: { ...slip.statutory, uan: null },
+      }
+    : slip,
+);
+
+export const ExportsPfAndEsiOfAnApprovedMonth: Story = {
+  beforeEach: serve({ team: storyTeam({ items: APPROVED_MONTH }) }),
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      await canvas.findByText(
+        /^1 PF member has no UAN: they are left out of the upload files/,
+      ),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Export" }));
+    const menu = await screen.findByRole("menu");
+    await expect(
+      within(menu).getByRole("menuitem", { name: "Team salary (Excel)" }),
+    ).toHaveAttribute(
+      "href",
+      "/api/construction/hrms/salaries/report/team?month=2026-10",
+    );
+    await expect(within(menu).getByText("PF and ESI challans")).toBeVisible();
+    await expect(
+      within(menu).getByRole("menuitem", { name: "PF ECR (.txt)" }),
+    ).toHaveAttribute(
+      "href",
+      "/api/construction/hrms/salaries/exports/pf?month=2026-10&format=txt",
+    );
+    await expect(
+      within(menu).getByRole("menuitem", { name: "PF ECR (Excel)" }),
+    ).toHaveAttribute(
+      "href",
+      "/api/construction/hrms/salaries/exports/pf?month=2026-10&format=xlsx",
+    );
+    await expect(
+      within(menu).getByRole("menuitem", { name: "ESI contribution (Excel)" }),
+    ).toHaveAttribute(
+      "href",
+      "/api/construction/hrms/salaries/exports/esi?month=2026-10",
+    );
+  },
+};
+
+export const PfAndEsiWaitForApproval: Story = {
+  beforeEach: serve(),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Export" }),
+    );
+    const menu = await screen.findByRole("menu");
+    await expect(
+      within(menu).getByText(
+        "PF and ESI: approve every salary of the month first",
+      ),
+    ).toBeVisible();
+    const pf = within(menu).getByRole("menuitem", { name: "PF ECR (.txt)" });
+    await expect(pf).toHaveAttribute("aria-disabled", "true");
+    await expect(pf).not.toHaveAttribute("href");
+  },
+};
+
+export const ExportWithoutPfAndEsiRights: Story = {
+  beforeEach: serve({
+    team: storyTeam({
+      items: APPROVED_MONTH,
+      can: { ...storyTeam().can, exportReturns: false },
+    }),
+  }),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Export" }),
+    );
+    const menu = await screen.findByRole("menu");
+    await expect(
+      within(menu).getByRole("menuitem", { name: "Team salary (Excel)" }),
+    ).toBeVisible();
+    await expect(
+      within(menu).queryByRole("menuitem", { name: "PF ECR (.txt)" }),
+    ).toBeNull();
+    await expect(canvas.queryByText(/has no UAN/)).toBeNull();
+  },
+};

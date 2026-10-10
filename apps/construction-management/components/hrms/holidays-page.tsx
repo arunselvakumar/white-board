@@ -154,7 +154,7 @@ function HolidayYear({
       <HrmsEmpty
         icon={CalendarHeart}
         title={`No holidays in ${String(year)}`}
-        description="Add the national, festival and Company holidays your staff get, or import the year's list from Excel."
+        description="Add the national, festival and Company holidays your Team Members get, or import the year's list from Excel."
         action={
           <div className="flex flex-wrap justify-center gap-2">
             <Button type="button" onClick={onAdd}>

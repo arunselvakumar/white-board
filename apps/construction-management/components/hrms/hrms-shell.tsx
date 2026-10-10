@@ -36,7 +36,7 @@ export function HrmsShell({ children }: { children: ReactNode }) {
           <PageHeader
             back={{ label: "Workspace", href: "/app/workspace" }}
             title="HRMS"
-            meta="Attendance, leave and salary for your staff."
+            meta="Attendance, leave and salary for your Team Members."
           />
         </div>
         <nav

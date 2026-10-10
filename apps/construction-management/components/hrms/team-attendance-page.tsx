@@ -81,7 +81,7 @@ function TeamToday() {
       <HrmsEmpty
         icon={Users}
         title="No Team Members yet"
-        description="Team Members who have joined the Company appear here with today's check-in."
+        description="Add Team Members in Masters → Team Members. Once they join the Company they appear here with today's check-in."
       />
     );
   const items = data.items.filter((item) => matches(item, filter));

@@ -148,12 +148,14 @@ export const NoFencesYet: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Branches & Sites" }),
     ).toBeVisible();
-    await expect(canvas.getByText("No fences yet")).toBeVisible();
     await expect(
-      canvas.getByRole("button", { name: "New Office Branch" }),
+      canvas.getByText("No branches or site fences yet"),
     ).toBeVisible();
     await expect(
-      canvas.getByRole("button", { name: "New site fence" }),
+      canvas.getByRole("button", { name: "Add Branch" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Add site fence" }),
     ).toBeVisible();
   },
 };
@@ -178,10 +180,10 @@ export const AddsAnOfficeBranch: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "New Office Branch" }),
+      await canvas.findByRole("button", { name: "Add Branch" }),
     );
     const dialog = within(
-      await body.findByRole("dialog", { name: "New Office Branch" }),
+      await body.findByRole("dialog", { name: "Add Branch" }),
     );
     await userEvent.type(
       dialog.getByLabelText("Branch name"),
@@ -207,9 +209,7 @@ export const AddsAnOfficeBranch: Story = {
       ]),
     );
     await waitFor(() =>
-      expect(
-        body.queryByRole("dialog", { name: "New Office Branch" }),
-      ).toBeNull(),
+      expect(body.queryByRole("dialog", { name: "Add Branch" })).toBeNull(),
     );
   },
 };
@@ -219,7 +219,7 @@ export const RefusesARadiusOutsideTheLimits: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "New Office Branch" }),
+      await canvas.findByRole("button", { name: "Add Branch" }),
     );
     const dialog = within(await body.findByRole("dialog"));
     await userEvent.type(dialog.getByLabelText("Branch name"), "Tiny");
@@ -254,7 +254,7 @@ export const ShowsATakenName: Story = {
       );
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "New Office Branch" }),
+      await canvas.findByRole("button", { name: "Add Branch" }),
     );
     const dialog = within(await body.findByRole("dialog"));
     await userEvent.type(
@@ -279,10 +279,10 @@ export const AddsASiteFenceOnAFreeProject: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "New site fence" }),
+      await canvas.findByRole("button", { name: "Add site fence" }),
     );
     const dialog = within(
-      await body.findByRole("dialog", { name: "New Project site fence" }),
+      await body.findByRole("dialog", { name: "Add site fence" }),
     );
     await userEvent.click(dialog.getByRole("combobox", { name: "Project" }));
     // Sea View Towers already has its fence.
@@ -334,7 +334,7 @@ export const UsesMyLocation: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "New Office Branch" }),
+      await canvas.findByRole("button", { name: "Add Branch" }),
     );
     const dialog = within(await body.findByRole("dialog"));
     await userEvent.click(
