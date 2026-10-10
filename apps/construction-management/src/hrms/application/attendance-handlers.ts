@@ -617,7 +617,7 @@ export class AttendanceHandlers {
             access.userId,
           );
     const pending = (await this.deps.store.pending(access.workspaceId)).filter(
-      (entry) => viewer == null || entry.memberId !== viewer.memberId,
+      (entry) => entry.memberId !== viewer?.memberId,
     );
     const members = await this.deps.employees.find(
       access.workspaceId,

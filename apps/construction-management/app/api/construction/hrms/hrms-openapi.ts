@@ -6,6 +6,10 @@ import type {
 } from "@/app/api/_lib/openapi";
 
 import {
+  attendanceOpenApiComponents,
+  attendanceOpenApiOperations,
+} from "./attendance/attendance-openapi";
+import {
   calendarOpenApiComponents,
   calendarOpenApiOperations,
 } from "./calendar-openapi";
@@ -32,6 +36,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   UpdateConstructionHrmsSettingsResponseModel,
   ...calendarOpenApiComponents,
   ...salarySetupOpenApiComponents,
+  ...attendanceOpenApiComponents,
 };
 
 export const hrmsOpenApiOperations: OpenApiOperation[] = [
@@ -65,4 +70,5 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
   },
   ...calendarOpenApiOperations,
   ...salarySetupOpenApiOperations,
+  ...attendanceOpenApiOperations,
 ];

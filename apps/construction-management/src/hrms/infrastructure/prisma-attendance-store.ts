@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import type { MemberAccess } from "@/src/shared-kernel/access";
 import { recordAudit } from "@/src/shared-kernel/audit";

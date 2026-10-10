@@ -25,7 +25,6 @@ import type {
 import type {
   AttendanceDay,
   AttendanceDaySource,
-  LeaveDay,
   LeaveDaySource,
 } from "./ports";
 
@@ -126,7 +125,7 @@ export class RecordedAttendanceDaySource implements AttendanceDaySource {
     const leaveOf = new Map<string, DayLeave[]>();
     for (const byMember of leaveMonths)
       for (const [memberId, days] of byMember)
-        for (const leave of days as LeaveDay[]) {
+        for (const leave of days) {
           const key = `${memberId}|${leave.date}`;
           const list = leaveOf.get(key) ?? [];
           list.push({ paid: leave.isPaid, days: leave.days });
