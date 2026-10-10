@@ -1,0 +1,55 @@
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipt-models.ts
+  s_6604e2237b6922::t_514f1f70d921b0 242-243
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts.http.test.ts
+  s_6604e2237b6922::t_2073411e58b4e2 314-316
+apps/construction-management/app/api/construction/procurement/goods-receipts/route.ts
+  s_6604e2237b6922::t_30f6e16045aec7 86
+apps/construction-management/app/app/projects/[id]/materials/goods-received/[grnId]/edit/page.tsx
+  s_6604e2237b6922::t_de210e48e29727 1-15
+apps/construction-management/app/app/projects/[id]/materials/goods-received/[grnId]/page.tsx
+  s_6604e2237b6922::t_d259924ccbe117 1-15
+apps/construction-management/app/app/projects/[id]/materials/goods-received/new/page.tsx
+  s_6604e2237b6922::t_95b3e77e34820b 1-15
+apps/construction-management/app/app/projects/[id]/materials/goods-received/page.tsx
+  s_6604e2237b6922::t_824e3d651c727f 3,7-14
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-detail.tsx
+  s_6604e2237b6922::t_cbb013167732c7 1-393
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-errors.tsx
+  s_6604e2237b6922::t_0c5833a588f8fd 1-71
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-fixtures.ts
+  s_6604e2237b6922::t_52257c34171259 1-295
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form-schema.ts
+  s_6604e2237b6922::t_c84867e24b3042 1-344
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form.stories.tsx
+  s_6604e2237b6922::t_90015cdd07ac77 1-326
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form.tsx
+  s_6604e2237b6922::t_ed2d5d1b4c8ef4 1-1002
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-parts.tsx
+  s_6604e2237b6922::t_d370ffddc4f4bd 1-151
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.stories.tsx
+  s_6604e2237b6922::t_3d65364c231c02 1-127
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.tsx
+  s_6604e2237b6922::t_68e12d600cc46a 1-336
+apps/construction-management/src/procurement/application/goods-receipt-handlers.ts
+  s_6604e2237b6922::t_93ba67b86b3bc8 176-177
+apps/construction-management/src/procurement/infrastructure/prisma-goods-receipt-store.ts
+  s_6604e2237b6922::t_da43e8f52fc1bc 508-509,521-527,570-572
+apps/construction-management/src/queries/goods-receipts.ts
+  s_6604e2237b6922::t_eac5dabc7bb587 1-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2583b5bbaf7a1e69b19c2b4cbc358933362db1a4",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
