@@ -73,7 +73,7 @@ export const EditContractors: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await canvas.findByRole("region", { name: /Team Members/ });
-    const team = region(canvas, "Team Members 1");
+    const team = region(canvas, "Team Members 2");
     await expect(team.getByText(OWNER.name)).toBeVisible();
     await expect(
       team.getByText("Owner", { selector: "[data-slot=badge]" }),

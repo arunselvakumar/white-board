@@ -111,8 +111,10 @@ function ResourceCard({
         <div className="min-w-0 space-y-1">
           <h2 id={headingId} className="font-semibold">
             {section.title}{" "}
+            {/* Everyone listed, the Owner included: a heading that says 0
+                above the Owner's row reads wrong. */}
             <span className="text-muted-foreground font-normal">
-              {assigned.length}
+              {lines.length}
             </span>
           </h2>
           <p className="text-muted-foreground text-sm">{section.description}</p>
