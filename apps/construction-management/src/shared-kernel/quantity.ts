@@ -40,8 +40,39 @@ export class Quantity {
     return new Quantity(this.milli - other.milli, this.uomId);
   }
 
+  /** From a Prisma `Decimal` (or its string) read back from Postgres. */
+  static fromDb(
+    value: { toString(): string } | string,
+    uomId: string,
+  ): Quantity {
+    return Quantity.of(value.toString(), uomId);
+  }
+
+  negate(): Quantity {
+    return new Quantity(-this.milli, this.uomId);
+  }
+
   isNegative(): boolean {
     return this.milli < 0n;
+  }
+
+  isZero(): boolean {
+    return this.milli === 0n;
+  }
+
+  isPositive(): boolean {
+    return this.milli > 0n;
+  }
+
+  /** −1, 0 or 1. */
+  compare(other: Quantity): -1 | 0 | 1 {
+    this.assertSameUnit(other);
+    return this.milli < other.milli ? -1 : this.milli > other.milli ? 1 : 0;
+  }
+
+  /** Thousandths of the unit, for exact arithmetic (qty × rate). */
+  toMilli(): bigint {
+    return this.milli;
   }
 
   equals(other: Quantity): boolean {

@@ -124,23 +124,30 @@ model ConstructionMastersDevelopmentProject {
 /// A party the Company gives work to (CM-406, minimal; CM-501 adds
 /// quotations and opening balances). Names are unique among live rows.
 model ConstructionMastersContractor {
-  id            String    @id @db.Uuid
-  workspaceId   String    @map("workspace_id")
-  name          String
-  contactPerson String?   @map("contact_person")
+  id             String    @id @db.Uuid
+  workspaceId    String    @map("workspace_id")
+  name           String
+  contactPerson  String?   @map("contact_person")
   /// E.164.
-  mobile        String?
-  email         String?
-  address       String?
-  gstin         String?   @db.VarChar(15)
-  pan           String?   @db.VarChar(10)
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy     String    @map("created_by")
-  updatedBy     String    @map("updated_by")
-  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(3)
-  deletedBy     String?   @map("deleted_by")
+  mobile         String?
+  email          String?
+  address        String?
+  gstin          String?   @db.VarChar(15)
+  pan            String?   @db.VarChar(10)
+  /// GST state code: the GSTIN's first two digits, or picked on the form
+  /// when there is no GSTIN (CM-501, ADR CM-0015 §1).
+  stateCode      String?   @map("state_code") @db.Char(2)
+  /// Legacy's second contact (CM-501).
+  contactPerson2 String?   @map("contact_person_2")
+  /// E.164.
+  mobile2        String?   @map("mobile_2")
+  isActive       Boolean   @default(true) @map("is_active")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy      String    @map("created_by")
+  updatedBy      String    @map("updated_by")
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy      String?   @map("deleted_by")
 
   departments ConstructionMastersContractorDepartment[]
   projects    ConstructionMastersContractorProject[]
@@ -190,6 +197,9 @@ model ConstructionMastersSupplier {
   address       String?
   gstin         String?   @db.VarChar(15)
   pan           String?   @db.VarChar(10)
+  /// GST state code: the GSTIN's first two digits, or picked on the form
+  /// when there is no GSTIN. Decides CGST + SGST or IGST (ADR CM-0015 §6).
+  stateCode     String?   @map("state_code") @db.Char(2)
   isActive      Boolean   @default(true) @map("is_active")
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
@@ -215,5 +225,154 @@ model ConstructionMastersSupplierProject {
   @@id([supplierId, projectId])
   @@index([projectId])
   @@map("supplier_projects")
+  @@schema("construction_masters")
+}
+
+/// A unit material is counted in (Bag, kg, cum …). Each Company gets the
+/// 41 seed units (CM-501); seed rows can be disabled, not renamed or deleted.
+model ConstructionMastersMeasurementUnit {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  materials ConstructionMastersMaterial[]
+
+  @@index([workspaceId])
+  @@map("measurement_units")
+  @@schema("construction_masters")
+}
+
+/// A group of materials (Civil Work Materials …), one level of parent.
+model ConstructionMastersMaterialCategory {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  /// A top-level category; a category with a parent cannot be a parent.
+  parentId    String?   @map("parent_id") @db.Uuid
+  isSeed      Boolean   @default(false) @map("is_seed")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  parent    ConstructionMastersMaterialCategory?  @relation("MaterialCategoryParent", fields: [parentId], references: [id], onDelete: Restrict)
+  children  ConstructionMastersMaterialCategory[] @relation("MaterialCategoryParent")
+  materials ConstructionMastersMaterial[]
+
+  @@index([workspaceId])
+  @@map("material_categories")
+  @@schema("construction_masters")
+}
+
+enum ConstructionMastersMaterialItemType {
+  consumable
+  non_consumable
+  asset
+
+  @@map("material_item_type")
+  @@schema("construction_masters")
+}
+
+enum ConstructionMastersDiscountType {
+  amount
+  percent
+
+  @@map("discount_type")
+  @@schema("construction_masters")
+}
+
+/// A material the Company buys and stocks (CM-501). Rate details and
+/// minimum stock are the defaults procurement copies onto its lines.
+model ConstructionMastersMaterial {
+  id              String                              @id @db.Uuid
+  workspaceId     String                              @map("workspace_id")
+  name            String
+  specification   String?
+  uomId           String                              @map("uom_id") @db.Uuid
+  categoryId      String?                             @map("category_id") @db.Uuid
+  itemType        ConstructionMastersMaterialItemType @default(consumable) @map("item_type")
+  /// Rate details (Financial): paise per unit, discount, GST %, HSN.
+  unitRate        BigInt?                             @map("unit_rate")
+  discountType    ConstructionMastersDiscountType?    @map("discount_type")
+  discountPercent Decimal?                            @map("discount_percent") @db.Decimal(5, 2)
+  /// Paise per line when the discount is an amount.
+  discountAmount  BigInt?                             @map("discount_amount")
+  gstRate         Decimal?                            @map("gst_rate") @db.Decimal(5, 2)
+  hsnCode         String?                             @map("hsn_code") @db.VarChar(8)
+  /// Minimum stock to maintain at each location, unless a location overrides it.
+  minStockQty     Decimal?                            @map("min_stock_qty") @db.Decimal(14, 3)
+  disabledAt      DateTime?                           @map("disabled_at") @db.Timestamptz(3)
+  createdAt       DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String                              @map("created_by")
+  updatedBy       String                              @map("updated_by")
+  deletedAt       DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?                             @map("deleted_by")
+
+  uom      ConstructionMastersMeasurementUnit   @relation(fields: [uomId], references: [id], onDelete: Restrict)
+  category ConstructionMastersMaterialCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, name])
+  @@index([categoryId])
+  @@map("materials")
+  @@schema("construction_masters")
+}
+
+/// Reusable terms picked on Purchase Orders, which copy the text (CM-0015 §8).
+model ConstructionMastersTermsCondition {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  title       String
+  body        String
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("terms_conditions")
+  @@schema("construction_masters")
+}
+
+enum ConstructionMastersPartyKind {
+  contractor
+  supplier
+
+  @@map("party_kind")
+  @@schema("construction_masters")
+}
+
+/// A quotation file a Contractor or Supplier gave (CM-501, View Quotations).
+model ConstructionMastersQuotation {
+  id          String                       @id @db.Uuid
+  workspaceId String                       @map("workspace_id")
+  partyKind   ConstructionMastersPartyKind @map("party_kind")
+  partyId     String                       @map("party_id") @db.Uuid
+  fileKey     String                       @unique @map("file_key")
+  fileName    String                       @map("file_name")
+  contentType String                       @map("content_type")
+  bytes       Int
+  thumbKey    String?                      @map("thumb_key")
+  createdAt   DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String                       @map("created_by")
+  deletedAt   DateTime?                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                      @map("deleted_by")
+
+  @@index([workspaceId, partyKind, partyId, deletedAt])
+  @@map("quotations")
   @@schema("construction_masters")
 }

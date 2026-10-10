@@ -89,6 +89,13 @@ export const PROJECT_MODULES = [
     menu: "labour.attendance",
   },
   {
+    key: "materials",
+    label: "Materials",
+    description: "Requests, orders, receipts, stock and transfers.",
+    segment: "materials",
+    menu: "procurement.manage_materials",
+  },
+  {
     key: "reports",
     label: "Reports",
     description: "Attendance, muster roll and payment reports.",

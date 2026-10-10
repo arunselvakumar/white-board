@@ -498,12 +498,14 @@ Product answers to the `modules/03` open questions: [ADR CM-0013](../adr/CM-0013
 
 **Done when:** the Project Dashboard (`reporting.project_dashboard` Read) shows the duration filter, KPI tiles, the Project summary and Attendance sections with data, and stubs naming the milestone for every other section; Manage Dashboard shows, hides and reorders sections per member. HTTP test for the layout preference, stories for the dashboard and Manage Dashboard.
 
-## M5 — Procurement & inventory (board only)
+## M5 — Procurement & inventory
+
+Goal: material from need to use — Purchase Request → Purchase Order (GST split by state) → GRN → append-only stock ledger → consume / transfer, and Central Stores with Material Requests and Delivery Notes. Spec: `modules/06`, `modules/02`. Product decisions: [ADR CM-0015](../adr/CM-0015-procurement-inventory-product-decisions.md).
 
 | ID     | Seq | Title                                                                                                                                                                                | Status | Blocked by             | Area           |
 | ------ | --: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ---------------------- | -------------- |
 | CM-501 |   1 | Masters: Suppliers, Contractors (with departments, GST/PAN, quotations), Materials (UoM, category, HSN, GST, min stock), Material Categories, UoMs (seed 41), T&C, billing addresses | todo   | CM-203, CM-407         | Domain+HTTP+UI |
-| CM-502 |   2 | Prisma `construction-procurement.prisma`; Approval behaviour in the kernel (status, remarks, bulk)                                                                                   | todo   | CM-004, CM-114         | Data+Kernel    |
+| CM-502 |   2 | Prisma `construction-procurement.prisma`; Approval behaviour in the kernel (status, remarks, bulk)                                                                                   | done   | CM-004, CM-114         | Data+Kernel    |
 | CM-503 |   3 | Purchase Request: 3-step wizard, both creation modes, statuses incl. Ordered/Partially/Excess, bulk approval, PR PDF                                                                 | todo   | CM-501, CM-502, CM-403 | Domain+HTTP+UI |
 | CM-504 |   4 | Purchase Order: line editor (rate, discount ₹/%, GST split CGST/SGST/IGST, HSN), charges, billing address, POCs, terms, PDF; generate from PR; mark ordered                          | todo   | CM-503                 | Domain+HTTP+UI |
 | CM-505 |   5 | GRN: against PO or standalone, ordered vs received, challan/invoice, hide/show fields; `GoodsReceiptPosted` event                                                                    | todo   | CM-504                 | Domain+HTTP+UI |
@@ -512,6 +514,48 @@ Product answers to the `modules/03` open questions: [ADR CM-0013](../adr/CM-0013
 | CM-508 |   8 | Central Store: stores (projects/keepers/suppliers), store stock, Material Request, Delivery Note                                                                                     | todo   | CM-506                 | Domain+HTTP+UI |
 | CM-509 |   9 | Central Inventory view + stock ledger report job                                                                                                                                     | todo   | CM-508                 | HTTP+UI        |
 | CM-510 |  10 | Materials dashboard section (summary, month-wise PO value, stock register)                                                                                                           | todo   | CM-506                 | UI             |
+
+### CM-501 — Procurement masters
+
+**Done when:** Masters has **Materials** (name, specification, Measurement Unit, Material Category, Item Type, optional rate details — unit rate in paise, discount ₹ or %, GST %, HSN of 4–8 digits — and optional minimum stock), **Material Categories** (one level of parent) and **Measurement Units**, each Company seeded with the 41 units of `modules/02` and a starter category list; **Terms & Conditions** (title, body) with their own menu; Suppliers and Contractors gain a second contact, quotation files (attachments service) and a **View Quotations** list; the Company has **billing addresses** (name, address, state, GSTIN; one default). Names are unique among live rows ignoring case, seed rows are disabled not deleted, a master used by a document cannot be deleted. Financial off returns `null` rates. HTTP tests per master, stories for every form and empty state.
+
+### CM-502 — Procurement schema and approval kernel
+
+**Done when:** `construction-procurement.prisma` (schema `construction_procurement`) holds every M5 table in one migration, including the stock ledger with its indexes; the kernel has `ApprovalStatus`, approve / reject / bulk helpers, a remarks thread shape and an `approval` event; the six numbering modules and the Procurement and Inventory back-dated groups are registered and show in Settings; the M5 menus are in the Permission Matrix catalog. Domain tests for the approval helpers and the GST line math of CM-0015 §6.
+
+### CM-503 — Purchase Request
+
+**Done when:** a member with PR Create raises a PR from the list or from Current Inventory in three steps (Materials with Create New, Quantity with Available Stock and Balanced estimated qty, Details with date, Location via `LocationPicker`, Required Date, remark setting, attachment), **Save** or **Save & Approve**; the list filters by date, approval, fulfilment, category, material, creator and location type, and bulk approves or rejects; approve / reject with reason, remarks, Mark as Ordered, edit and delete follow CM-0015 §2 and §7; the back-dated guard and numbering apply; the PR PDF downloads. HTTP tests for each transition and refusal, stories for the wizard, list, detail and empty state.
+
+### CM-504 — Purchase Order
+
+**Done when:** the PO form (date, optional PR whose pending items load, supplier on the Project, Expected Delivery Date defaulting from the PR's Required Date, location, lines with rate / discount / GST / HSN defaulting from the Material, charges and deduction, billing address, POCs, payment terms, several T&C copied on save, delivery address override, remark, attachment) computes CGST + SGST or IGST per CM-0015 §6 the same in the browser and on the server; Save / Save & Approve, approve / reject single and bulk, remarks, Mark as Ordered, Close and edit rules of CM-0015 §2 and §8 hold; the PR's fulfilment status follows its PO lines; the PO PDF prints Indian scripts with HSN and the tax split. Golden tests for the tax math, HTTP tests, stories.
+
+### CM-505 — Goods Receipt
+
+**Done when:** a GRN against an approved / ordered PO (ordered, already received and received now per line) or without a PO posts **Received** ledger entries on its Inventory Date at the Project or Store and emits `GoodsReceiptPosted`; over-receipt shows as excess; edit and delete post reversals and are refused when stock would go below zero; the PO's receipt status follows; Supplier details and Delivery details groups honour the Company's hidden fields (Settings → GRN fields); Financial off hides rates and values; the GRN PDF downloads. HTTP tests including a back-dated GRN, an edit that would go negative, and a PO moving to partially received then received.
+
+### CM-506 — Current Inventory
+
+**Done when:** each Project lists stock per material (estimated, in stock, in transit, minimum, Low / Out of stock) from the ledger; Consume (one or many, with location), Missing, Adjust stock, Update Estimation Qty and the minimum-stock override and alert toggle work and refuse going below zero at any later date (CM-0015 §3); history shows every entry with its source and reversals; Import Inventory Stock (xlsx from the sample) posts Opening entries with per-row errors; Export Data downloads; the Stock Register (opening, received, transfer in / out, issued / from store, consumed, missing, adjustment, closing) for a date range is on screen and downloads; `StockBelowMinimum` is emitted on crossing. Domain tests for the ledger and the negative-stock check, HTTP tests, stories.
+
+### CM-507 — Material Transfer
+
+**Done when:** a transfer Project ↔ Project, Project ↔ Store or Store ↔ Store with lines (available stock shown), receiver name, attachments and a comment thread is numbered and back-dated-checked; Approve dispatches (Transferred out at the source), Reject moves nothing, Mark as Delivered posts Transferred in at the destination, in-transit quantity shows on both sides (CM-0015 §4); only pending transfers are deleted. HTTP tests for each transition and a dispatch refused for stock, stories.
+
+### CM-508 — Central Store
+
+**Done when:** the Workspace has **Stores** (name, address with state, ≥ 1 Project, store keepers, Suppliers) with their stock, transfers and Projects; POs and GRNs can target a Store; a Project raises a **Material Request** to a Store assigned to it (contractor, department, location, receiver, lines with Ask Qty, attachments, comments, PDF); the store creates **Delivery Notes** from it (pending ≤ MR pending and ≤ store stock), Approve posts Issued at the store, Mark as Delivered posts Received from store at the Project, the MR moves requested → partially delivered → delivered, and Close ends what is left with a reason. HTTP tests for the MR / DN chain, stories.
+
+### CM-509 — Central Inventory
+
+**Done when:** a Workspace screen (Central Inventory Read) shows stock per material across every Project and Store, filterable by location, category and stock state, with in-transit quantities; the Stock Ledger for a date range and locations shows on screen and downloads as xlsx (CM-0015 §12). HTTP test for the totals across two Projects and a Store, story.
+
+### CM-510 — Materials on the Project Dashboard
+
+**Done when:** the Project Dashboard's Materials section shows the Material Summary (materials, in stock, low, out, POs, PO value — value hidden without Financial), Month-wise PO Value and the Stock Register link, and the **Material Approvals** KPI counts pending PRs, POs and transfers the viewer may approve; the M5 stubs from CM-412 are gone. HTTP test for the summary, story.
+
+---
 
 ## M6 — Daily site work (board only)
 

@@ -89,6 +89,7 @@ export const Home: Story = {
       "Resources",
       "Attendance",
       "Payments",
+      "Materials",
       "Reports",
     ]);
     await expect(links[2]).toHaveAttribute("href", `${PATH}/wings`);

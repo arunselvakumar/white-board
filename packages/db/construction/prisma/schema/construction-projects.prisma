@@ -42,6 +42,9 @@ model ConstructionProjectsProject {
   /// Required on new Projects (CM-401); null on Projects from before M4.
   projectType      ConstructionProjectsProjectType?  @map("project_type")
   address          String?
+  /// GST state code of the site: the place of supply of its Purchase
+  /// Orders (ADR CM-0015 §6). Optional; unknown means intra-state.
+  stateCode        String?                           @map("state_code") @db.Char(2)
   /// Calendar dates in the Company time zone.
   startDate        DateTime?                         @map("start_date") @db.Date
   endDate          DateTime?                         @map("end_date") @db.Date

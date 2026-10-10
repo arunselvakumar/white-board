@@ -62,7 +62,8 @@ describe("the menu catalogue", () => {
       project_management: 114,
       payment_accounting: 30,
       materials: 46,
-      master_records: 92,
+      // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13).
+      master_records: 96,
       central_store: 20,
       hrms: 57,
       others: 1,
