@@ -48,6 +48,7 @@ import {
   assertNotFuture,
   changed,
   inFlightByItem,
+  removeFromGallery,
   type PrismaMaterialRequestRepository,
 } from "./material-request-repository";
 import { loadBackdatedCheck } from "./procurement-guards";
@@ -84,6 +85,8 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
     private readonly requests: PrismaMaterialRequestRepository,
     private readonly ledger: PrismaStockLedger,
     private readonly events: EventDispatcher,
+    /** The Gallery's dispatcher: files of a deleted note leave it. */
+    private readonly media: EventDispatcher = events,
   ) {}
 
   async list(params: DeliveryNoteListParams): Promise<DeliveryNoteListPage> {
@@ -294,6 +297,13 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
         before: snapshotRow(before),
         occurredAt: now,
       });
+    });
+    await removeFromGallery(this.media, {
+      workspaceId: actor.workspaceId,
+      projectId: current.projectId,
+      source: "delivery_note",
+      sourceId: id,
+      now,
     });
   }
 

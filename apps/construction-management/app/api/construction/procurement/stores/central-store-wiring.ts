@@ -5,6 +5,7 @@ import {
   materialRequestPartyOptions,
 } from "@/src/composition/central-store-options";
 import { createProjectLocations } from "@/src/composition/location-resolver";
+import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import { DeliveryNoteHandlers } from "@/src/procurement/application/delivery-note-handlers";
 import { MaterialRequestHandlers } from "@/src/procurement/application/material-request-handlers";
@@ -31,6 +32,7 @@ export function createCentralStore(db: PrismaClient = prisma) {
     db,
     procurementDirectory,
     createProjectLocations({ prisma: db }),
+    projectMediaDispatcher(),
   );
   return {
     stores: new StoreHandlers(
@@ -45,6 +47,7 @@ export function createCentralStore(db: PrismaClient = prisma) {
         requests,
         stockLedger(),
         new InProcessEventDispatcher(),
+        projectMediaDispatcher(),
       ),
     ),
     inventory,

@@ -13,12 +13,17 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import {
+  InProcessEventDispatcher,
+  type EventDispatcher,
+} from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import {
   locationRef,
   type LocationRef,
   type LocationResolver,
 } from "@/src/shared-kernel/location-ref";
+import type { ProjectMediaRemoved } from "@/src/shared-kernel/project-media";
 import { Quantity } from "@/src/shared-kernel/quantity";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
@@ -133,6 +138,8 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     private readonly db: PrismaClient,
     private readonly directory: ProcurementDirectory,
     private readonly locations: LocationResolver,
+    /** The Gallery's dispatcher: files of a deleted request leave it. */
+    private readonly media: EventDispatcher = new InProcessEventDispatcher(),
   ) {}
 
   async list(params: MaterialRequestListParams): Promise<MaterialRequestListPage> {
@@ -332,6 +339,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         before: rowSnapshot(before),
         occurredAt: now,
       });
+    });
+    await removeFromGallery(this.media, {
+      workspaceId: actor.workspaceId,
+      projectId: current.projectId,
+      source: "material_request",
+      sourceId: id,
+      now,
     });
   }
 
@@ -622,6 +636,35 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         updatedAt: row.updatedAt,
       };
     });
+  }
+}
+
+/**
+ * The Gallery is an index: after a deleted document commits, its files
+ * leave it (`ProjectMediaRemoved`); a failed listener never fails the delete.
+ */
+export async function removeFromGallery(
+  media: EventDispatcher,
+  input: {
+    workspaceId: string;
+    projectId: string;
+    source: "material_request" | "delivery_note";
+    sourceId: string;
+    now: Date;
+  },
+): Promise<void> {
+  const event: ProjectMediaRemoved = {
+    type: "ProjectMediaRemoved",
+    workspaceId: input.workspaceId,
+    occurredAt: input.now,
+    projectId: input.projectId,
+    source: input.source,
+    sourceId: input.sourceId,
+  };
+  try {
+    await media.dispatch([event]);
+  } catch (error) {
+    console.error("Could not update the Project Gallery", error);
   }
 }
 
