@@ -1,0 +1,41 @@
+apps/construction-management/src/hrms/application/attendance-days.test.ts
+  s_6a70f1cb429bb6::t_449066b4a96e10 1-184
+apps/construction-management/src/hrms/application/attendance-days.ts
+  s_6a70f1cb429bb6::t_f2bb819e1f2ec5 1-174
+apps/construction-management/src/hrms/application/attendance-handlers.ts
+  s_6a70f1cb429bb6::t_1872d190efbdd8 1-839
+apps/construction-management/src/hrms/application/ports.ts
+  s_6a70f1cb429bb6::t_c06ec0301e5728 21,186-192,196,198-201,203-206,209-217
+apps/construction-management/src/hrms/application/stub-ports.test.ts
+  s_6a70f1cb429bb6::t_b528c0fe91033f 4,9
+apps/construction-management/src/hrms/application/stub-ports.ts
+  s_6a70f1cb429bb6::t_999f6755aa1c0b 1-2,8
+apps/construction-management/src/hrms/domain/attendance.test.ts
+  s_6a70f1cb429bb6::t_4b961b710b9c4c 1-674
+apps/construction-management/src/hrms/domain/attendance.ts
+  s_6a70f1cb429bb6::t_04ac789cc00d55 1-753
+apps/construction-management/src/hrms/domain/company-time.test.ts
+  s_6a70f1cb429bb6::t_e81cc315747b89 1-43
+apps/construction-management/src/hrms/domain/company-time.ts
+  s_6a70f1cb429bb6::t_f30d156fdec3e4 1-120
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_6a70f1cb429bb6::t_ddf4461fe94b67 3-4,26,28-31,75-78,85-93,162-192
+apps/construction-management/src/hrms/infrastructure/prisma-attendance-store.ts
+  s_6a70f1cb429bb6::t_704e3c31b9f285 1-398
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4bbad753fc8c85acb87079ce7511b88be4f04791",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
