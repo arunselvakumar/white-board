@@ -13,7 +13,9 @@ type CursorFilter = {
  * order and how many rows to fetch (one more than the page, to know
  * whether more follow).
  */
-export function pageQuery(params: Pick<MasterListParams, "after" | "before" | "limit">) {
+export function pageQuery(
+  params: Pick<MasterListParams, "after" | "before" | "limit">,
+) {
   const backwards = params.before != null;
   const cursor = params.after ?? params.before;
   const filter: CursorFilter | null =

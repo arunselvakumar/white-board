@@ -100,7 +100,7 @@ async function upload(
     }),
     params(partyId),
   );
-  if (started.status !== StatusCodes.CREATED) return started;
+  if (started.status !== 201) return started;
   const body = await json<Started>(started);
   if (body.upload.via !== "app") throw new Error("Expected an app upload");
   const sent = await receiveQuotation(

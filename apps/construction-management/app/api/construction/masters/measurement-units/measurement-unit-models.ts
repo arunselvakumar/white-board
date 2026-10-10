@@ -8,7 +8,9 @@ import { pagedListModel, pagedListQuery } from "../_lib/paged-master-routes";
 const name = z
   .string()
   .max(1000)
-  .describe("Required, at most 100 characters; unique among live units ignoring case.");
+  .describe(
+    "Required, at most 100 characters; unique among live units ignoring case.",
+  );
 
 export const ConstructionMastersMeasurementUnitResponseModel = z.object({
   id: z.uuid(),
@@ -24,8 +26,9 @@ export type ConstructionMastersMeasurementUnitResponseModel = z.infer<
   typeof ConstructionMastersMeasurementUnitResponseModel
 >;
 
-export const ListConstructionMastersMeasurementUnitsQueryModel =
-  pagedListQuery({});
+export const ListConstructionMastersMeasurementUnitsQueryModel = pagedListQuery(
+  {},
+);
 
 export const ListConstructionMastersMeasurementUnitsResponseModel =
   pagedListModel(ConstructionMastersMeasurementUnitResponseModel);

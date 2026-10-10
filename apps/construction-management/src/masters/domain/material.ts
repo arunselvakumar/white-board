@@ -18,8 +18,7 @@ export const MATERIAL_SPECIFICATION_MAX = 500;
 export const MATERIAL_AMOUNT_MAX = 1_000_000_000_000;
 
 export type MaterialDiscount =
-  | { type: "amount"; paise: number }
-  | { type: "percent"; percent: string };
+  { type: "amount"; paise: number } | { type: "percent"; percent: string };
 
 /**
  * Rate Details (Financial): the defaults procurement copies onto a line.
@@ -76,7 +75,10 @@ function blank(raw: string | null | undefined): string | null {
 
 function amount(raw: number, code: string, words: string): number {
   if (!Number.isSafeInteger(raw) || raw < 0 || raw > MATERIAL_AMOUNT_MAX)
-    throw new DomainError(code, `Enter ${words} in rupees, up to ₹1,000 crore.`);
+    throw new DomainError(
+      code,
+      `Enter ${words} in rupees, up to ₹1,000 crore.`,
+    );
   return raw;
 }
 
@@ -129,7 +131,11 @@ export function materialRate(input: MaterialRateInput): MaterialRate {
       input.discount.type === "amount"
         ? {
             type: "amount",
-            paise: amount(input.discount.paise, "DISCOUNT_INVALID", "the discount"),
+            paise: amount(
+              input.discount.paise,
+              "DISCOUNT_INVALID",
+              "the discount",
+            ),
           }
         : {
             type: "percent",

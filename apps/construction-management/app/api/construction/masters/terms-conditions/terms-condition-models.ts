@@ -30,8 +30,9 @@ export type ConstructionMastersTermsConditionResponseModel = z.infer<
   typeof ConstructionMastersTermsConditionResponseModel
 >;
 
-export const ListConstructionMastersTermsConditionsQueryModel =
-  pagedListQuery({});
+export const ListConstructionMastersTermsConditionsQueryModel = pagedListQuery(
+  {},
+);
 
 export const ListConstructionMastersTermsConditionsResponseModel =
   pagedListModel(ConstructionMastersTermsConditionResponseModel);

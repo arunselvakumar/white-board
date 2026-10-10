@@ -48,9 +48,7 @@ export function createMaterialHandlers(deps?: {
 }
 
 /** Terms & Conditions (CM-501). */
-export function createTermsConditionHandlers(deps?: {
-  prisma?: PrismaClient;
-}) {
+export function createTermsConditionHandlers(deps?: { prisma?: PrismaClient }) {
   return new TermsConditionHandlers(
     new PrismaTermsConditionStore(deps?.prisma ?? prisma),
   );

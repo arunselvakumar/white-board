@@ -173,7 +173,11 @@ describe("Procurement masters HTTP (CM-501)", () => {
 
   it("gives a new Company the 41 units, the starter categories and Cement OPC 53, once", async () => {
     const owner = await ownerWithCompany();
-    const units = await page<Unit>(listUnits, `${UNITS}?limit=100`, owner.cookie);
+    const units = await page<Unit>(
+      listUnits,
+      `${UNITS}?limit=100`,
+      owner.cookie,
+    );
     expect(units.total).toBe(41);
     expect(units.items.every((item) => item.isSeed)).toBe(true);
     expect(units.items.map((item) => item.name)).toEqual(
@@ -214,7 +218,11 @@ describe("Procurement masters HTTP (CM-501)", () => {
 
   it("pages units newest first, searches, filters by state", async () => {
     const owner = await ownerWithCompany();
-    const first = await page<Unit>(listUnits, `${UNITS}?limit=20`, owner.cookie);
+    const first = await page<Unit>(
+      listUnits,
+      `${UNITS}?limit=20`,
+      owner.cookie,
+    );
     expect(first.items).toHaveLength(20);
     expect(first.total).toBe(41);
     expect(first.prevCursor).toBeNull();
@@ -537,7 +545,10 @@ describe("Procurement masters HTTP (CM-501)", () => {
     await bad({ hsnCode: "123456789" }, "HSN_CODE_INVALID");
     await bad({ gstRate: "101" }, "GST_RATE_INVALID");
     await bad({ gstRate: "12.345" }, "GST_RATE_INVALID");
-    await bad({ discount: { type: "percent", percent: "120" } }, "DISCOUNT_INVALID");
+    await bad(
+      { discount: { type: "percent", percent: "120" } },
+      "DISCOUNT_INVALID",
+    );
     await bad({ minStockQty: "-1" }, "MIN_STOCK_QTY_INVALID");
     await bad({ minStockQty: "1.2345" }, "MIN_STOCK_QTY_INVALID");
     await bad({ name: "  " }, "MATERIAL_NAME_REQUIRED");
@@ -633,6 +644,14 @@ describe("Procurement masters HTTP (CM-501)", () => {
     const clerk = await memberWith(owner, {
       "masters.materials": ["read", "create", "update"],
     });
+    const clerkList = await json<{ financial: boolean }>(
+      await listMaterials(jsonRequest(MATERIALS, clerk.cookie)),
+    );
+    expect(clerkList.financial).toBe(false);
+    const ownerList = await json<{ financial: boolean }>(
+      await listMaterials(jsonRequest(MATERIALS, owner.cookie)),
+    );
+    expect(ownerList.financial).toBe(true);
     const read = await getMaterial(
       jsonRequest(`${MATERIALS}/${material.id}`, clerk.cookie),
       params(material.id),
@@ -855,7 +874,11 @@ describe("Procurement masters HTTP (CM-501)", () => {
       params(terms.id),
     );
     expect(updated.status).toBe(StatusCodes.OK);
-    const listed = await page<Terms>(listTerms, `${TERMS}?q=door`, owner.cookie);
+    const listed = await page<Terms>(
+      listTerms,
+      `${TERMS}?q=door`,
+      owner.cookie,
+    );
     expect(listed.items.map((item) => item.title)).toEqual(["Delivery terms"]);
 
     const reader = await memberWith(owner, {
@@ -892,9 +915,9 @@ describe("Procurement masters HTTP (CM-501)", () => {
       for (const verb of ["update", "disable", "enable", "delete"])
         expect(spec.paths[`${path}/{id}/${verb}`]).toHaveProperty("post");
     }
-    expect(spec.paths["/api/construction/masters/materials/options"]).toHaveProperty(
-      "get",
-    );
+    expect(
+      spec.paths["/api/construction/masters/materials/options"],
+    ).toHaveProperty("get");
     expect(spec.components.schemas).toHaveProperty(
       "ConstructionMastersMaterialResponse",
     );

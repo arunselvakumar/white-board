@@ -1,6 +1,11 @@
 import {
   BadgeCheck,
   Building,
+  FileText,
+  Files,
+  FolderTree,
+  Package,
+  Ruler,
   Fence,
   Hammer,
   Handshake,
@@ -88,6 +93,49 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Suppliers",
         description: "Parties you buy material from, and their Projects.",
         icon: Truck,
+      },
+    ],
+  },
+  {
+    label: "Materials",
+    sections: [
+      {
+        href: "/app/masters/materials",
+        label: "Materials",
+        title: "Materials",
+        description:
+          "What you buy and stock: unit, category, rate, GST, HSN and minimum stock.",
+        icon: Package,
+      },
+      {
+        href: "/app/masters/material-categories",
+        label: "Material Categories",
+        title: "Material Categories",
+        description:
+          "Groups of Materials, one level deep: Civil Work Materials › Cement.",
+        icon: FolderTree,
+      },
+      {
+        href: "/app/masters/measurement-units",
+        label: "Measurement Units",
+        title: "Measurement Units",
+        description: "Units Materials are counted in: Bag, kg, cum, sqft…",
+        icon: Ruler,
+      },
+      {
+        href: "/app/masters/terms-conditions",
+        label: "Terms & Conditions",
+        title: "Terms & Conditions",
+        description: "Reusable terms you pick on Purchase Orders.",
+        icon: FileText,
+      },
+      {
+        href: "/app/masters/quotations",
+        label: "View Quotations",
+        title: "View Quotations",
+        description:
+          "Every quotation file your Contractors and Suppliers gave.",
+        icon: Files,
       },
     ],
   },

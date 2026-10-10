@@ -136,7 +136,9 @@ export class PrismaQuotationStore implements QuotationStore {
     const page = pageQuery(params);
     const [rows, total] = await Promise.all([
       this.db.constructionMastersQuotation.findMany({
-        where: { AND: page.filter == null ? filters : [...filters, page.filter] },
+        where: {
+          AND: page.filter == null ? filters : [...filters, page.filter],
+        },
         orderBy: page.orderBy,
         take: page.take,
       }),

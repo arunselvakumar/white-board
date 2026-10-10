@@ -57,22 +57,30 @@ const fields = {
   unitRate: paise
     .nullable()
     .optional()
-    .describe("Rate Details (Financial): paise per unit. Ignored without Materials Financial."),
+    .describe(
+      "Rate Details (Financial): paise per unit. Ignored without Materials Financial.",
+    ),
   discount: discount
     .optional()
-    .describe("Rate Details (Financial): ₹ in paise or a percent. Ignored without Financial."),
+    .describe(
+      "Rate Details (Financial): ₹ in paise or a percent. Ignored without Financial.",
+    ),
   gstRate: z
     .string()
     .max(20)
     .nullable()
     .optional()
-    .describe("Rate Details (Financial): GST %, 0–100. Ignored without Financial."),
+    .describe(
+      "Rate Details (Financial): GST %, 0–100. Ignored without Financial.",
+    ),
   hsnCode: z
     .string()
     .max(20)
     .nullable()
     .optional()
-    .describe("Rate Details (Financial): 4 to 8 digits. Ignored without Financial."),
+    .describe(
+      "Rate Details (Financial): 4 to 8 digits. Ignored without Financial.",
+    ),
 };
 
 export const ConstructionMastersMaterialResponseModel = z.object({
@@ -116,7 +124,13 @@ export const ListConstructionMastersMaterialsQueryModel = pagedListQuery({
 
 export const ListConstructionMastersMaterialsResponseModel = pagedListModel(
   ConstructionMastersMaterialResponseModel,
-);
+).extend({
+  financial: z
+    .boolean()
+    .describe(
+      "Whether the caller has Materials Financial: sees and sets Rate Details.",
+    ),
+});
 export type ListConstructionMastersMaterialsResponseModel = z.infer<
   typeof ListConstructionMastersMaterialsResponseModel
 >;

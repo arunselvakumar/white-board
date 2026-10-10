@@ -25,7 +25,12 @@ export const pagedListQueryShape = {
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
   after: z.string().min(1).optional(),
   before: z.string().min(1).optional(),
-  q: z.string().trim().max(120).optional().describe("Name contains, ignoring case."),
+  q: z
+    .string()
+    .trim()
+    .max(120)
+    .optional()
+    .describe("Name contains, ignoring case."),
   status: z
     .enum(["all", "enabled", "disabled"])
     .optional()
@@ -36,18 +41,16 @@ export const pagedListQueryShape = {
 };
 
 export function pagedListQuery<S extends z.ZodRawShape>(extra: S) {
-  return z
-    .object({ ...pagedListQueryShape, ...extra })
-    .refine(
-      (value) => {
-        const page = value as { after?: string; before?: string };
-        return page.after == null || page.before == null;
-      },
-      {
-        message: "after and before are mutually exclusive.",
-        path: ["after"],
-      },
-    );
+  return z.object({ ...pagedListQueryShape, ...extra }).refine(
+    (value) => {
+      const page = value as { after?: string; before?: string };
+      return page.after == null || page.before == null;
+    },
+    {
+      message: "after and before are mutually exclusive.",
+      path: ["after"],
+    },
+  );
 }
 
 /** `{ items, nextCursor, prevCursor, total }` of a paged master list. */
@@ -94,6 +97,8 @@ export type PagedMasterConfig<Item extends Listed, Query, Create, Update> = {
   listQuery: z.ZodType<Query>;
   createModel: z.ZodType<Create>;
   updateModel: z.ZodType<Update>;
+  /** Fields the list adds beside the page, e.g. `financial`. */
+  listExtra?: (session: AccessSession) => Record<string, unknown>;
   /** Response of one row; `session` decides Financial fields. */
   toResponse: (item: Item, session: AccessSession) => unknown;
   list(
@@ -168,6 +173,7 @@ export function pagedMasterRoutes<
           prevCursor:
             moreBefore && first != null ? encodeListCursor(first) : null,
           total: page.total,
+          ...config.listExtra?.(session),
         });
       } catch (error) {
         return mapError(error);

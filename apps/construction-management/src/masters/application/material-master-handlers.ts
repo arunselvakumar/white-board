@@ -48,7 +48,11 @@ function assertFresh(
 }
 
 function mapPage<T, R>(page: MasterPage<T>, map: (item: T) => R) {
-  return { items: page.items.map(map), total: page.total, hasMore: page.hasMore };
+  return {
+    items: page.items.map(map),
+    total: page.total,
+    hasMore: page.hasMore,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -292,7 +296,11 @@ export class MaterialCategoryHandlers {
   ) {
     const row = await this.load(input.workspaceId, input.id);
     const { category } = row;
-    assertFresh("material_category", category.updatedAt, input.expectedUpdatedAt);
+    assertFresh(
+      "material_category",
+      category.updatedAt,
+      input.expectedUpdatedAt,
+    );
     if (category.isSeed) throw seedIsReadOnly("Material Category");
     await this.checkParent({
       workspaceId: input.workspaceId,
@@ -537,10 +545,7 @@ export class MaterialHandlers {
     const before = material.snapshot();
     const now = this.clock();
     material.delete(input.by, now);
-    if (
-      this.usage != null &&
-      (await this.usage(input.workspaceId, input.id))
-    )
+    if (this.usage != null && (await this.usage(input.workspaceId, input.id)))
       throw masterInUse("material");
     await this.store.update(material, loadedAt, {
       action: "material.deleted",

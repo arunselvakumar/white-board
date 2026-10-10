@@ -45,6 +45,7 @@ export const materialRoutes = pagedMasterRoutes({
   listQuery: ListConstructionMastersMaterialsQueryModel,
   createModel: CreateConstructionMastersMaterialRequestModel,
   updateModel: UpdateConstructionMastersMaterialRequestModel,
+  listExtra: (session) => ({ financial: seesMaterialRates(session) }),
   toResponse: (item: MaterialReadModel, session) =>
     toMaterialResponse(item, seesMaterialRates(session)),
   list: (session, query) =>

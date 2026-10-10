@@ -67,7 +67,9 @@ async function write(
 
 function contains(search: string | undefined) {
   const value = search?.trim() ?? "";
-  return value === "" ? null : { contains: value, mode: "insensitive" as const };
+  return value === ""
+    ? null
+    : { contains: value, mode: "insensitive" as const };
 }
 
 function compact<T>(filters: (T | null | undefined | false)[]): T[] {
@@ -88,13 +90,12 @@ export class PrismaMeasurementUnitStore implements MeasurementUnitStore {
 
   async list(params: MasterListParams): Promise<MasterPage<MeasurementUnit>> {
     const name = contains(params.search);
-    const filters = compact<Prisma.ConstructionMastersMeasurementUnitWhereInput>(
-      [
+    const filters =
+      compact<Prisma.ConstructionMastersMeasurementUnitWhereInput>([
         { workspaceId: params.workspaceId, deletedAt: null },
         statusFilter(params.status),
         name == null ? null : { name },
-      ],
-    );
+      ]);
     const page = pageQuery(params);
     const [rows, total] = await Promise.all([
       this.db.constructionMastersMeasurementUnit.findMany({
@@ -303,8 +304,8 @@ export class PrismaMaterialCategoryStore implements MaterialCategoryStore {
     await write("material_category", () =>
       this.db.$transaction(async (tx) => {
         if (category.deletedAt == null) await recheckHierarchy(tx, category);
-        const updated =
-          await tx.constructionMastersMaterialCategory.updateMany({
+        const updated = await tx.constructionMastersMaterialCategory.updateMany(
+          {
             where: {
               id: category.id,
               workspaceId: category.workspaceId,
@@ -320,7 +321,8 @@ export class PrismaMaterialCategoryStore implements MaterialCategoryStore {
               deletedAt: category.deletedAt,
               deletedBy: category.deletedBy,
             },
-          });
+          },
+        );
         if (updated.count === 0) throw masterChanged("material_category");
         await recordAudit(tx, audit("material_category", category, change));
       }),
@@ -624,25 +626,23 @@ export class PrismaTermsConditionStore implements TermsConditionStore {
   async update(terms: TermsCondition, expected: Date, change: MasterChange) {
     await write("terms_condition", () =>
       this.db.$transaction(async (tx) => {
-        const updated = await tx.constructionMastersTermsCondition.updateMany(
-          {
-            where: {
-              id: terms.id,
-              workspaceId: terms.workspaceId,
-              deletedAt: null,
-              updatedAt: expected,
-            },
-            data: {
-              title: terms.title,
-              body: terms.body,
-              disabledAt: terms.disabledAt,
-              updatedAt: terms.updatedAt,
-              updatedBy: terms.updatedBy,
-              deletedAt: terms.deletedAt,
-              deletedBy: terms.deletedBy,
-            },
+        const updated = await tx.constructionMastersTermsCondition.updateMany({
+          where: {
+            id: terms.id,
+            workspaceId: terms.workspaceId,
+            deletedAt: null,
+            updatedAt: expected,
           },
-        );
+          data: {
+            title: terms.title,
+            body: terms.body,
+            disabledAt: terms.disabledAt,
+            updatedAt: terms.updatedAt,
+            updatedBy: terms.updatedBy,
+            deletedAt: terms.deletedAt,
+            deletedBy: terms.deletedBy,
+          },
+        });
         if (updated.count === 0) throw masterChanged("terms_condition");
         await recordAudit(tx, audit("terms_condition", terms, change));
       }),

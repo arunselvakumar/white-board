@@ -7,7 +7,9 @@ import { quotationRoutes } from "./quotation-routes";
  * One composition for quotation files (CM-501). Storage limits are the
  * organization context's plan; the routes are where contexts meet.
  */
-export const partyQuotations = createPartyQuotations({ plan: createPlanGate() });
+export const partyQuotations = createPartyQuotations({
+  plan: createPlanGate(),
+});
 
 export const supplierQuotationRoutes = quotationRoutes(
   "supplier",

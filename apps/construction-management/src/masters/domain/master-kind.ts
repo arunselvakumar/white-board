@@ -126,8 +126,7 @@ export function masterChanged(kind: MasterKind): DomainError {
 /** Why a row of each procurement master cannot be deleted. */
 const MATERIAL_MASTER_USERS: Record<MaterialMasterKind, string> = {
   measurement_unit: "Materials use this Measurement Unit",
-  material_category:
-    "Materials or sub-categories use this Material Category",
+  material_category: "Materials or sub-categories use this Material Category",
   material:
     "Purchase Requests, Purchase Orders, Goods Receipts, transfers, Material Requests or stock entries use this Material",
   terms_condition: "",

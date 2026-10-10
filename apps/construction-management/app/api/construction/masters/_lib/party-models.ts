@@ -94,7 +94,9 @@ export function partyModels(kind: PartyKind) {
     stateCode: z
       .string()
       .nullable()
-      .describe("GST state code: the GSTIN's first two digits, or the one picked."),
+      .describe(
+        "GST state code: the GSTIN's first two digits, or the one picked.",
+      ),
     stateName: z.string().nullable(),
     contactPerson2: z
       .string()

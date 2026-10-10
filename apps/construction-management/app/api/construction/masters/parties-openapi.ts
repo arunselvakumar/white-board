@@ -58,7 +58,11 @@ const WRITE = [
   StatusCodes.PAYMENT_REQUIRED,
 ] as const;
 
-function quotationOperations(path: string, label: string, menu: string): OpenApiOperation[] {
+function quotationOperations(
+  path: string,
+  label: string,
+  menu: string,
+): OpenApiOperation[] {
   const base = `${path}/{id}/quotations`;
   const params = ConstructionMastersIdParamsModel;
   const file = ConstructionMastersQuotationParamsModel;
@@ -89,7 +93,8 @@ function quotationOperations(path: string, label: string, menu: string): OpenApi
     {
       method: "post",
       path: `${base}/uploads/app`,
-      summary: "Development and tests: the raw file at `?key=` (404 when deployed)",
+      summary:
+        "Development and tests: the raw file at `?key=` (404 when deployed)",
       tags: MASTERS,
       params,
       bodyBinaryContentTypes: ["application/octet-stream"],
@@ -111,7 +116,8 @@ function quotationOperations(path: string, label: string, menu: string): OpenApi
     {
       method: "post",
       path: `${base}/uploads/presign`,
-      summary: "Deployed: the `uploadPresigned()` handshake for one key (404 with files on disk)",
+      summary:
+        "Deployed: the `uploadPresigned()` handshake for one key (404 with files on disk)",
       tags: MASTERS,
       params,
       successStatus: StatusCodes.OK,
@@ -121,7 +127,8 @@ function quotationOperations(path: string, label: string, menu: string): OpenApi
     {
       method: "post",
       path: base,
-      summary: "Finish an upload: record the file at `key` (201 new, 200 when already recorded)",
+      summary:
+        "Finish an upload: record the file at `key` (201 new, 200 when already recorded)",
       tags: MASTERS,
       params,
       body: AddConstructionMastersQuotationRequestModel,
@@ -138,7 +145,12 @@ function quotationOperations(path: string, label: string, menu: string): OpenApi
       params: file,
       successStatus: StatusCodes.OK,
       successDescription: "The file",
-      successBinaryContentTypes: ["application/pdf", "image/png", "image/jpeg", "image/webp"],
+      successBinaryContentTypes: [
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+      ],
       errors: [StatusCodes.BAD_REQUEST, ...SESSION, StatusCodes.NOT_FOUND],
     },
     {
@@ -285,7 +297,11 @@ export const partiesOpenApiOperations: OpenApiOperation[] = [
     create: CreateConstructionMastersSupplierRequestModel,
     update: UpdateConstructionMastersSupplierRequestModel,
   }),
-  ...quotationOperations(`${BASE}/contractors`, "Contractor", "masters.contractors"),
+  ...quotationOperations(
+    `${BASE}/contractors`,
+    "Contractor",
+    "masters.contractors",
+  ),
   ...quotationOperations(`${BASE}/suppliers`, "Supplier", "masters.suppliers"),
   {
     method: "get",

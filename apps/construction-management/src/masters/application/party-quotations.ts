@@ -15,7 +15,11 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
-import { PARTY_KIND_INFO, partyNotFound, type PartyKind } from "../domain/party";
+import {
+  PARTY_KIND_INFO,
+  partyNotFound,
+  type PartyKind,
+} from "../domain/party";
 import {
   QUOTATION_FILE_KIND,
   QUOTATION_POLICY,
@@ -60,7 +64,11 @@ export type QuotationStore = {
   /** Live quotations of live parties, newest first (View Quotations). */
   list(
     params: QuotationListParams,
-  ): Promise<{ items: (Quotation & { partyName: string })[]; total: number; hasMore: boolean }>;
+  ): Promise<{
+    items: (Quotation & { partyName: string })[];
+    total: number;
+    hasMore: boolean;
+  }>;
   count(kind: PartyKind, workspaceId: string, partyId: string): Promise<number>;
   find(
     kind: PartyKind,
@@ -191,8 +199,11 @@ export class PartyQuotations {
       bytes: input.bytes,
       check: async () => {
         if (
-          (await this.store.count(input.kind, input.workspaceId, input.partyId)) >=
-          QUOTATIONS_PER_PARTY_MAX
+          (await this.store.count(
+            input.kind,
+            input.workspaceId,
+            input.partyId,
+          )) >= QUOTATIONS_PER_PARTY_MAX
         )
           throw quotationsLimit(input.kind);
       },
@@ -320,7 +331,10 @@ export class PartyQuotations {
   async read(
     party: Party,
     id: string,
-  ): Promise<{ quotation: Quotation & { viewable: boolean }; object: StoredObject }> {
+  ): Promise<{
+    quotation: Quotation & { viewable: boolean };
+    object: StoredObject;
+  }> {
     const found = await this.live(party, id);
     const object = await this.uploads.read(found.fileKey);
     if (object == null) throw quotationNotFound();
