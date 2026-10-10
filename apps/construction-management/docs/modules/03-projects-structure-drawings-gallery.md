@@ -513,6 +513,20 @@ Dashboard widgets showing money (Payments, Value Earned, PO value, labour/vendor
 
 M4 answered the open questions below with recommended defaults in [ADR CM-0013](../adr/CM-0013-projects-structure-product-decisions.md) (product) and [ADR CM-0014](../adr/CM-0014-attachments-and-gallery-index.md) (attachments and the Gallery index). Rules the build settles are added here by ticket.
 
+### CM-401
+
+- **Project Type** is required on Add Project: missing or `null` is 400 `PROJECT_TYPE_REQUIRED`; an unknown key is 400 `VALIDATION_ERROR`. An edit that leaves `projectType` out keeps the stored type (so a pre-M4 Project stays "Not set"); an edit that sends `null` is 400 `PROJECT_TYPE_REQUIRED`, so a type, once set, can be changed but not removed. The form requires it on Add only; on Edit of a Project without one it may stay blank and is then left out of the request.
+- The Project response carries `projectType` (null only before M4) and `structure` (`"wings" | "locations"` from `projectStructure()`; no type means Wings). Options for pickers stay `{ id, name, status }`: pickers show names only, and the Projects list carries what the card needs.
+- **Budget** (`budgetValue`) is paise, 0 to ₹1,000 crore (the Order Value guard), 400 `PROJECT_BUDGET_INVALID` otherwise; omitted keeps it, `null` clears it. Without the Project menu's Financial flag it is `null` in every response and ignored in a create or edit, so the stored value survives — exactly the Order Value rule.
+- The Projects list response gains `financial` (the caller's Project menu Financial flag). The Add and Edit forms read it: without it the Budget field is not drawn, the Order value field is hidden, and neither is sent.
+- `useLogoInReports` defaults to false; omitted keeps it. Nothing reads it until M9.
+- **Logo**: `POST …/projects/{id}/logo` (raw image body, `projects.project` Update), `POST …/logo/remove` (Update; fine without a logo), `GET …/logo` (Read; streams privately). PNG, JPEG or WebP by content, at most 2 MB (`IMAGE_LIMITS.project_logo`), key `companies/<workspaceId>/project-logos/<projectId>/<uuid>.<ext>`, a `stored_files` row of kind `project_logo` written with the Project, the replaced file marked deleted and removed from storage, audited as `project.logo_changed` / `project.logo_removed`. The upload asks the plan for the storage first (402 when full). Project visibility applies: another Company's Project or one a Member is not on is 404. A logo change bumps the Project's `updatedAt`.
+- `logoUrl` is `/api/construction/projects/projects/{id}/logo?v=<file id>`, so it changes with the logo and browsers refetch.
+- **On the form** the Project card holds Project Type (beside Status), Budget (after the dates, Financial only) and, at its foot, the Project logo with "Use Project logo on reports". The Contract card is unchanged apart from hiding the Order value without Financial. A logo picked or removed on Add or Edit waits in the browser and is applied right after the Project is saved, so it never makes the form's `updatedAt` stale; if it fails the Project opens with "The logo couldn't be saved. Try again from Edit Project."
+- The Projects home row shows the logo (initials without one) and the Project Type label ("Project Type not set" before M4); the project shell header shows the logo when there is one and the type beside the status; the Overview's Details show Project Type and, with Financial, Budget.
+- **Seeds**: a new Project gets the albums Architect, Electrical, Plumbing, Structural Drawing and the testing items Rcc cube, Steel, Cement, Bricks (`project-seeds.ts`, `is_seed = true`) in the same transaction as the Project insert.
+- **Delete guard**: live Wings, Locations, drawings and testing reports now make 409 `PROJECT_IN_USE` (alongside labours, vendors, attendance, wage payments and documents). Albums and testing items, seeded or not, do not block on their own; deleting a Project leaves them with the tombstoned Project.
+
 ## Open questions
 
 1. What are the Project Type values (`Project/Combo`)?

@@ -34,6 +34,7 @@ export async function GET(request: Request): Promise<Response> {
       items: page.items.map((item) => toProjectResponse(item, financial)),
       total: page.total,
       counts: page.counts,
+      financial,
     };
     return Response.json(body);
   } catch (error) {
@@ -43,8 +44,10 @@ export async function GET(request: Request): Promise<Response> {
 
 /**
  * New Project (CM-204). 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118).
- * The creator is not assigned to it; the Owner assigns Team Members.
- * Without the Financial flag an `orderValue` in the body is ignored.
+ * The creator is not assigned to it; the Owner assigns Team Members. It
+ * starts with the seed drawing albums and testing items (CM-401). Without
+ * the Financial flag an `orderValue` or `budgetValue` in the body is
+ * ignored.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

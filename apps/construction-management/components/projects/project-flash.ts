@@ -23,3 +23,7 @@ export function failedUploadsMessage(count: number): string {
     ? "1 file couldn't upload. Add it again from Documents."
     : `${String(count)} files couldn't upload. Add them again from Documents.`;
 }
+
+/** The Project was saved but its picked logo was not. */
+export const LOGO_FAILED_MESSAGE =
+  "The logo couldn't be saved. Try again from Edit Project.";

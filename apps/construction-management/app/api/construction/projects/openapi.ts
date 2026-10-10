@@ -27,6 +27,8 @@ const SESSION_ERRORS = [
   StatusCodes.FORBIDDEN,
 ] as const;
 
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
 /** The projects context's Request and Response models (ADR CM-0001). */
 export const projectsOpenApiComponents: OpenApiComponents = {
   ListConstructionProjectsProjectsResponseModel,
@@ -37,7 +39,7 @@ export const projectsOpenApiComponents: OpenApiComponents = {
   ListConstructionProjectsCustomFieldLabelsResponseModel,
 };
 
-/** The projects context's routes (CM-204, CM-413). */
+/** The projects context's routes (CM-204, CM-413, CM-401). */
 export const projectsOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
@@ -55,7 +57,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: BASE,
     summary:
-      "Add a Project with optional contract details and custom fields (402 PLAN_LIMIT_EXCEEDED beyond the plan; 409 PROJECT_NAME_IN_USE)",
+      "Add a Project: Project Type required (400 PROJECT_TYPE_REQUIRED), optional budget, contract details and custom fields; it starts with the seed drawing albums and testing items (402 PLAN_LIMIT_EXCEEDED beyond the plan; 409 PROJECT_NAME_IN_USE)",
     tags: PROJECTS,
     body: CreateConstructionProjectsProjectRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -105,7 +107,7 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/update`,
     summary:
-      "Edit a Project; contract details or custom fields left out are kept (409 PROJECT_CHANGED when expectedUpdatedAt is stale, PROJECT_NAME_IN_USE)",
+      "Edit a Project; the Project Type, budget, contract details or custom fields left out are kept (409 PROJECT_CHANGED when expectedUpdatedAt is stale, PROJECT_NAME_IN_USE)",
     tags: PROJECTS,
     params: ConstructionProjectsProjectParamsModel,
     body: UpdateConstructionProjectsProjectRequestModel,
@@ -124,11 +126,60 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/delete`,
     summary:
-      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance, payments or documents point at it)",
+      "Delete a Project (409 PROJECT_IN_USE while labours, vendors, attendance, payments, documents, Wings, Locations, drawings or testing reports point at it; the seed albums and testing items do not count)",
     tags: PROJECTS,
     params: ConstructionProjectsProjectParamsModel,
     successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Deleted",
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+      StatusCodes.PAYMENT_REQUIRED,
+    ],
+  },
+  {
+    method: "get",
+    path: `${BASE}/{id}/logo`,
+    summary:
+      "The Project logo, for those who may see the Project (404 PROJECT_LOGO_NOT_FOUND without one)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The logo image",
+    successBinaryContentTypes: IMAGE_TYPES,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/logo`,
+    summary:
+      "Set or replace the Project logo: the image as the body, PNG, JPEG or WebP, at most 2 MB (Project update; 400 FILE_TOO_LARGE, FILE_TYPE_NOT_ALLOWED)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    bodyBinaryContentTypes: IMAGE_TYPES,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Project with its new logo",
+    successSchema: ConstructionProjectsProjectResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
+      StatusCodes.PAYMENT_REQUIRED,
+    ],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/logo/remove`,
+    summary:
+      "Remove the Project logo; fine when there is none (Project update)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Project without a logo",
+    successSchema: ConstructionProjectsProjectResponseModel,
     errors: [
       StatusCodes.BAD_REQUEST,
       ...SESSION_ERRORS,

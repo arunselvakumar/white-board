@@ -1,5 +1,8 @@
 import { createPlanGate } from "@/src/organization/infrastructure/create-subscription-handlers";
-import { createProjectHandlers } from "@/src/projects/infrastructure/create-project-handlers";
+import {
+  createProjectHandlers,
+  createProjectLogos,
+} from "@/src/projects/infrastructure/create-project-handlers";
 import { can, type MemberAccess } from "@/src/shared-kernel/access";
 
 /**
@@ -10,9 +13,13 @@ export const projectHandlers = createProjectHandlers({
   plan: createPlanGate(),
 });
 
+/** The Project logo (CM-401); its storage counts against the plan. */
+export const projectLogos = createProjectLogos({ plan: createPlanGate() });
+
 /**
- * The order value (CM-413) needs the Project menu's Financial flag: to see
- * it in a response and to set it on the form. The Owner has every flag.
+ * The order value (CM-413) and the budget (CM-401) need the Project menu's
+ * Financial flag: to see them in a response and to set them on the form.
+ * The Owner has every flag.
  */
 export function projectFinancial(access: MemberAccess): boolean {
   return can(access, "projects.project", "financial");

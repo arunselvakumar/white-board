@@ -103,6 +103,14 @@ Any other counter-party — a customer you raise a sales invoice to, a consultan
 A construction job. Almost everything hangs off a Project. One of the three top-level areas (**Projects**).
 _Avoid_: site (for the record), job
 
+**Project Type**:
+What kind of work a Project is, from a fixed list: Residential, Commercial, Mixed use, Villas / Bungalows, Plotting / Layout, Industrial, Institutional (built up as Wings) or Infrastructure, Interiors / Renovation, Other (kept as Locations). Required on a new Project; Projects from before M4 show "Not set" (ADR CM-0013 §1).
+_Avoid_: category, project kind, project category
+
+**Budget**:
+The Company's own figure for what a Project should cost, in rupees. Shown only to Team Members with the Project menu's Financial flag, like the Order Value; informational until later milestones compare against it (ADR CM-0013 §2).
+_Avoid_: estimate, project value, order value (that is the Client's)
+
 **Client**:
 Who gave the Company the work on a Project: a name and a mobile on the Project. Not a Party master (yet).
 _Avoid_: customer, owner (the Owner is the Company's)

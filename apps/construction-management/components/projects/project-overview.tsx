@@ -7,7 +7,12 @@ import { Alert, AlertAction, AlertTitle } from "@repo/ui/components/alert";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
-import { projectQuery, type ProjectResponse } from "@/src/queries/projects";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
+import {
+  projectQuery,
+  projectsQuery,
+  type ProjectResponse,
+} from "@/src/queries/projects";
 
 import {
   clientPhoneLabel,
@@ -180,6 +185,13 @@ export function ProjectOverview({ id }: { id: string }) {
           <Detail label="Status">
             <ProjectStatusBadge status={project.status} />
           </Detail>
+          <Detail label="Project Type">
+            {project.projectType == null ? (
+              <span className="text-muted-foreground font-normal">Not set</span>
+            ) : (
+              projectTypeLabel(project.projectType)
+            )}
+          </Detail>
           <Detail label="Added on">
             {DATE_TIME.format(new Date(project.createdAt))}
           </Detail>
@@ -193,6 +205,12 @@ export function ProjectOverview({ id }: { id: string }) {
               ? none
               : formatCalendarDate(project.endDate)}
           </Detail>
+          {/* Null without the Financial flag, so it hides too. */}
+          {project.budgetValue == null ? null : (
+            <Detail label="Budget">
+              {orderValueLabel(project.budgetValue)}
+            </Detail>
+          )}
           <Detail label="Project address" className="sm:col-span-2">
             {project.address == null ? (
               none
@@ -208,8 +226,18 @@ export function ProjectOverview({ id }: { id: string }) {
   );
 }
 
-/** `/app/projects/[id]/edit`, inside the project shell. */
+/**
+ * `/app/projects/[id]/edit`, inside the project shell. The Projects list
+ * says whether the viewer has the Financial flag.
+ */
 export function ProjectEditScreen({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
-  return <EditProjectForm key={project.updatedAt} project={project} />;
+  const { data: list } = useSuspenseQuery(projectsQuery);
+  return (
+    <EditProjectForm
+      key={project.updatedAt}
+      project={project}
+      financial={list.financial}
+    />
+  );
 }

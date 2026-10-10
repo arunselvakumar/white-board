@@ -3,6 +3,12 @@ import { z } from "zod";
 import type { ProjectReadModel } from "@/src/projects/application/project-read-model";
 import { PROJECT_STATUSES } from "@/src/projects/domain/project";
 import {
+  PROJECT_TYPE_KEYS,
+  PROJECT_TYPES,
+} from "@/src/projects/domain/project-type";
+import { fileVersion } from "@/src/shared-kernel/files";
+import {
+  PROJECT_BUDGET_MAX,
   PROJECT_CLIENT_NAME_MAX,
   PROJECT_CUSTOM_FIELD_LABEL_MAX,
   PROJECT_CUSTOM_FIELD_VALUE_MAX,
@@ -14,6 +20,35 @@ import {
 export const projectStatusModel = z
   .enum(PROJECT_STATUSES)
   .describe("ongoing, not_started, on_hold or completed.");
+
+export const projectTypeModel = z
+  .enum(PROJECT_TYPE_KEYS)
+  .describe(
+    `What kind of work the Project is (ADR CM-0013 §1): ${PROJECT_TYPES.map(
+      (type) => `${type.key} (${type.label}, ${type.structure})`,
+    ).join(", ")}.`,
+  );
+
+export const projectStructureModel = z
+  .enum(["wings", "locations"])
+  .describe(
+    "How the Project's places are kept, from its Project Type: a building's Wings, or a list of Locations. A Project without a type has Wings.",
+  );
+
+/** Where a Project's logo streams from; `{id}` is the Project. */
+export function projectLogoPath(id: string): string {
+  return `/api/construction/projects/projects/${id}/logo`;
+}
+
+/**
+ * The logo URL with the file's version, so a browser refetches after a
+ * change; null without a logo.
+ */
+export function projectLogoUrl(id: string, logoKey: string | null) {
+  return logoKey == null
+    ? null
+    : `${projectLogoPath(id)}?v=${fileVersion(logoKey)}`;
+}
 
 const calendarDate = z
   .string()
@@ -41,6 +76,12 @@ export const ConstructionProjectsProjectResponseModel = z.object({
   id: z.uuid(),
   name: z.string(),
   status: projectStatusModel,
+  projectType: projectTypeModel
+    .nullable()
+    .describe(
+      'The Project Type; null only on Projects added before M4 ("Not set").',
+    ),
+  structure: projectStructureModel,
   address: z.string().nullable(),
   startDate: calendarDate.nullable(),
   endDate: calendarDate
@@ -70,6 +111,23 @@ export const ConstructionProjectsProjectResponseModel = z.object({
     .nullable()
     .describe(
       "Client Order value excluding GST, in paise; null when not set or without the Project menu's Financial flag.",
+    ),
+  budgetValue: z
+    .int()
+    .nullable()
+    .describe(
+      "The Company's budget for the Project, in paise; null when not set or without the Project menu's Financial flag.",
+    ),
+  logoUrl: z
+    .string()
+    .nullable()
+    .describe(
+      "Streams the Project logo to those who may see the Project; carries the file's version, so it changes when the logo does. Null without a logo.",
+    ),
+  useLogoInReports: z
+    .boolean()
+    .describe(
+      "Report headers print the Project logo instead of the Company's (used from M9).",
     ),
   customFields: z
     .array(ConstructionProjectsCustomFieldModel)
@@ -114,6 +172,25 @@ const reference = (paper: string) =>
 export const projectDetailsFields = {
   name: z.string().describe("Required; at most 120 characters."),
   status: projectStatusModel.optional().describe("Defaults to ongoing."),
+  projectType: projectTypeModel
+    .nullable()
+    .optional()
+    .describe(
+      "Required on Add Project: 400 PROJECT_TYPE_REQUIRED when missing or null. On an edit, omitted keeps the stored type and null is 400 PROJECT_TYPE_REQUIRED.",
+    ),
+  budgetValue: z
+    .int()
+    .nullable()
+    .optional()
+    .describe(
+      `The Company's budget for the Project, in paise, 0 to ${String(PROJECT_BUDGET_MAX)}; 400 PROJECT_BUDGET_INVALID. Omitted keeps it, null clears it. Ignored without the Project menu's Financial flag.`,
+    ),
+  useLogoInReports: z
+    .boolean()
+    .optional()
+    .describe(
+      "Print the Project logo on report headers instead of the Company's. Defaults to false; omitted keeps it.",
+    ),
   address: z
     .string()
     .nullable()
@@ -163,7 +240,7 @@ export const projectDetailsFields = {
 
 /**
  * `financial` is whether the caller has the Project menu's Financial flag;
- * without it `orderValue` is null.
+ * without it `orderValue` and `budgetValue` are null.
  */
 export function toProjectResponse(
   item: ProjectReadModel,
@@ -173,6 +250,8 @@ export function toProjectResponse(
     id: item.id,
     name: item.name,
     status: item.status,
+    projectType: item.projectType,
+    structure: item.structure,
     address: item.address,
     startDate: item.startDate,
     endDate: item.endDate,
@@ -188,6 +267,9 @@ export function toProjectResponse(
     agreementNo: item.agreementNo,
     agreementDate: item.agreementDate,
     orderValue: financial ? item.orderValue : null,
+    budgetValue: financial ? item.budgetValue : null,
+    logoUrl: projectLogoUrl(item.id, item.logoKey),
+    useLogoInReports: item.useLogoInReports,
     customFields: item.customFields.map(({ label, value }) => ({
       label,
       value,

@@ -16,7 +16,14 @@ import {
   type HeldFile,
   type HeldUploadStatus,
 } from "./documents/document-attachments";
-import { ANUGRAHA, KUMARI, project } from "./project-fixtures";
+import {
+  ANUGRAHA,
+  KUMARI,
+  project,
+  projectList,
+  STORY_LOGO_URL,
+  STORY_PROJECTS,
+} from "./project-fixtures";
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { NewProjectScreen } from "./project-form";
 import { ProjectEditScreen } from "./project-overview";
@@ -30,7 +37,14 @@ function posts(): ApiCall[] {
   return calls.filter((call) => call.method === "POST");
 }
 
-function api(handler: (call: ApiCall) => Response | undefined) {
+/**
+ * `financial`: the viewer's Project menu Financial flag, which the form
+ * reads from the Projects list.
+ */
+function api(
+  handler: (call: ApiCall) => Response | undefined,
+  { financial = true }: { financial?: boolean } = {},
+) {
   calls = [];
   const mocked = mockApi((call) => {
     calls.push(call);
@@ -38,13 +52,43 @@ function api(handler: (call: ApiCall) => Response | undefined) {
       return Response.json({
         items: ["Site engineer", "Architect", "Structural consultant"],
       });
+    if (call.method === "GET" && call.path === BASE)
+      return Response.json(projectList(STORY_PROJECTS, financial));
     return handler(call);
   });
   return mocked.restore;
 }
 
+/** Picks a Project Type; options portal to the document body. */
+async function chooseType(
+  canvas: { findByLabelText: (text: string) => Promise<HTMLElement> },
+  body: {
+    findByRole: (
+      role: "option",
+      options: { name: string },
+    ) => Promise<HTMLElement>;
+  },
+  userEvent: { click: (element: Element) => Promise<void> },
+  label = "Residential",
+) {
+  await userEvent.click(await canvas.findByLabelText("Project Type"));
+  await userEvent.click(await body.findByRole("option", { name: label }));
+}
+
+/** A real 1×1 PNG, so the preview loads. */
+function logoFile(name = "logo.png"): File {
+  const bytes = Uint8Array.from(
+    atob(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+    ),
+    (char) => char.charCodeAt(0),
+  );
+  return new File([bytes], name, { type: "image/png" });
+}
+
 /** Every contract field blank, as Add Project sends it. */
 const NO_CONTRACT = {
+  useLogoInReports: false,
   clientName: null,
   clientPhone: null,
   tenderRef: null,
@@ -92,7 +136,7 @@ export const NewStartsWithOptionalCardsClosed: Story = {
   beforeEach: () => api(created),
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole("heading", { name: "New Project" }),
+      await canvas.findByRole("heading", { name: "New Project" }),
     ).toBeVisible();
     for (const title of ["Client", "Contract", "Additional details"]) {
       const button = cardButton(canvas, title);
@@ -108,11 +152,15 @@ export const NewValidatesAndSaves: Story = {
   beforeEach: () => api(created),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Add Project" }),
+    );
     await expect(
       await canvas.findByText("Enter the Project name"),
     ).toBeVisible();
+    await expect(canvas.getByText("Choose the Project Type")).toBeVisible();
     await expect(posts()).toHaveLength(0);
+    await chooseType(canvas, body, userEvent, "Commercial");
 
     await userEvent.type(
       canvas.getByLabelText("Project name"),
@@ -151,6 +199,7 @@ export const NewValidatesAndSaves: Story = {
     await expect(posts()[0]?.body).toEqual({
       name: "Anugraha Residency",
       status: "not_started",
+      projectType: "commercial",
       address: "Saravanampatti, Coimbatore",
       startDate: "2026-10-08",
       endDate: "2027-03-31",
@@ -161,10 +210,15 @@ export const NewValidatesAndSaves: Story = {
 
 export const NewWithClientAndContract: Story = {
   beforeEach: () => api(created),
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.type(
-      canvas.getByLabelText("Project name"),
+      await canvas.findByLabelText("Project name"),
       "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
     );
 
     await userEvent.click(cardButton(canvas, "Client"));
@@ -221,6 +275,7 @@ export const NewWithClientAndContract: Story = {
     await expect(posts()[0]?.body).toEqual({
       name: "Anugraha Residency",
       status: "ongoing",
+      projectType: "residential",
       address: null,
       startDate: null,
       endDate: null,
@@ -239,8 +294,16 @@ export const NewWithClientAndContract: Story = {
 
 export const NewOrderValueKeepsPaise: Story = {
   beforeEach: () => api(created),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Project name"), "Anugraha");
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
     await userEvent.click(cardButton(canvas, "Contract"));
     const value = canvas.getByLabelText("Order value");
     await userEvent.type(value, "18450000.5");
@@ -254,8 +317,16 @@ export const NewOrderValueKeepsPaise: Story = {
 
 export const NewErrorOpensItsCard: Story = {
   beforeEach: () => api(created),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Project name"), "Anugraha");
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
     await userEvent.click(cardButton(canvas, "Client"));
     await userEvent.type(canvas.getByLabelText("Client mobile"), "12345");
     await userEvent.click(cardButton(canvas, "Client"));
@@ -291,10 +362,15 @@ export const NewShowsNameInUse: Story = {
           )
         : undefined,
     ),
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.type(
-      canvas.getByLabelText("Project name"),
+      await canvas.findByLabelText("Project name"),
       "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
     );
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await expect(
@@ -307,6 +383,7 @@ export const NewShowsNameInUse: Story = {
     await expect(posts()[0]?.body).toEqual({
       name: "Anugraha Residency",
       status: "ongoing",
+      projectType: "residential",
       address: null,
       startDate: null,
       endDate: null,
@@ -331,8 +408,16 @@ export const NewShowsPlanLimit: Story = {
           )
         : undefined,
     ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText("Project name"), "Project 11");
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Project 11",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await expect(
       await canvas.findByText(
@@ -409,10 +494,15 @@ export const NewUploadsHeldFilesAfterCreate: Story = {
       mocked(useUploadHeldFiles).mockReset();
     };
   },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.type(
-      canvas.getByLabelText("Project name"),
+      await canvas.findByLabelText("Project name"),
       "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
     );
     await userEvent.click(cardButton(canvas, "Contract"));
     await userEvent.click(
@@ -455,7 +545,10 @@ const editRender = (id: string) =>
     );
   };
 
-function editApi(subject: typeof KUMARI) {
+function editApi(
+  subject: typeof KUMARI,
+  options: { financial?: boolean } = {},
+) {
   return api((call) => {
     if (call.method === "GET" && call.path === `${BASE}/${subject.id}`)
       return Response.json(subject);
@@ -466,7 +559,7 @@ function editApi(subject: typeof KUMARI) {
         updatedAt: "2026-10-08T07:00:00.000Z",
       });
     return undefined;
-  });
+  }, options);
 }
 
 export const EditOpensFilledCards: Story = {
@@ -548,6 +641,9 @@ export const EditSaves: Story = {
     await expect(posts()[0]?.body).toEqual({
       name: "Kumari Heights",
       status: "on_hold",
+      projectType: "residential",
+      useLogoInReports: false,
+      budgetValue: 4_20_00_000_00,
       address: null,
       startDate: "2026-04-01",
       endDate: "2027-03-31",
@@ -569,21 +665,26 @@ export const EditSaves: Story = {
   },
 };
 
-/** Order value comes back null without the Project menu's Financial flag. */
-const WITHOUT_FINANCIAL = { ...ANUGRAHA, orderValue: null };
+/**
+ * Order value and budget come back null without the Project menu's
+ * Financial flag.
+ */
+const WITHOUT_FINANCIAL = { ...ANUGRAHA, orderValue: null, budgetValue: null };
 
-export const EditWithoutFinancialNeverSendsOrderValue: Story = {
+export const EditWithoutFinancialHidesAmounts: Story = {
   render: editRender(ANUGRAHA.id),
-  beforeEach: () => editApi(WITHOUT_FINANCIAL),
+  beforeEach: () => editApi(WITHOUT_FINANCIAL, { financial: false }),
   play: async ({ canvas, userEvent }) => {
     await canvas.findByLabelText("Project name");
-    await expect(canvas.getByLabelText("Order value")).toHaveValue("");
+    await expect(canvas.queryByLabelText("Budget")).toBeNull();
+    await expect(canvas.getByLabelText("Order value")).not.toBeVisible();
     await userEvent.clear(canvas.getByLabelText("Quotation date"));
     await userEvent.type(canvas.getByLabelText("Quotation date"), "2026-02-14");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(posts()).toHaveLength(1));
     const sent = posts()[0]?.body as Record<string, unknown>;
     await expect(sent).not.toHaveProperty("orderValue");
+    await expect(sent).not.toHaveProperty("budgetValue");
     await expect(sent["quotationDate"]).toBe("2026-02-14");
   },
 };
@@ -757,7 +858,7 @@ export const DeleteRefusedWhileInUse: Story = {
           {
             code: "PROJECT_IN_USE",
             message:
-              "Labours, vendors, attendance, payments or documents are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
+              "Labours, vendors, attendance, payments, documents, Wings, Locations, drawings or testing reports are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
           },
           { status: 409 },
         );
@@ -774,5 +875,245 @@ export const DeleteRefusedWhileInUse: Story = {
       await canvas.findByText(/so it cannot be deleted/),
     ).toBeVisible();
     await expect(getRouter().push).not.toHaveBeenCalled();
+  },
+};
+
+export const NewRequiresProjectType: Story = {
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await expect(canvas.getByLabelText("Project Type")).toHaveTextContent(
+      "Choose a type",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await expect(
+      await canvas.findByText("Choose the Project Type"),
+    ).toBeVisible();
+    await expect(canvas.getByLabelText("Project Type")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Project Type")).toHaveFocus(),
+    );
+    await expect(posts()).toHaveLength(0);
+
+    await chooseType(canvas, body, userEvent, "Infrastructure");
+    await expect(canvas.getByLabelText("Project Type")).toHaveTextContent(
+      "Infrastructure",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      projectType: "infrastructure",
+    });
+  },
+};
+
+export const NewWithBudget: Story = {
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    const budget = canvas.getByLabelText("Budget");
+    await userEvent.type(budget, "32000000");
+    await userEvent.tab();
+    await expect(budget).toHaveValue("3,20,00,000");
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      budgetValue: 3_20_00_000_00,
+    });
+  },
+};
+
+export const NewWithoutFinancialHidesBudget: Story = {
+  beforeEach: () => api(created, { financial: false }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await expect(canvas.queryByLabelText("Budget")).toBeNull();
+    await userEvent.click(cardButton(canvas, "Contract"));
+    await expect(canvas.getByLabelText("Order value")).not.toBeVisible();
+    await expect(canvas.getByLabelText("Quotation number")).toBeVisible();
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    const sent = posts()[0]?.body as Record<string, unknown>;
+    await expect(sent).not.toHaveProperty("budgetValue");
+    await expect(sent).not.toHaveProperty("orderValue");
+  },
+};
+
+const LOGO_PATH = `${BASE}/${ANUGRAHA.id}/logo`;
+
+export const NewUploadsPickedLogoAfterCreate: Story = {
+  beforeEach: () => {
+    clearProjectFlash(ANUGRAHA.id);
+    return api((call) => {
+      if (call.method === "POST" && call.path === LOGO_PATH)
+        return Response.json({
+          ...ANUGRAHA,
+          logoUrl: `${LOGO_PATH}?v=1`,
+        });
+      return created(call);
+    });
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await expect(canvas.getByText("AR")).toBeVisible();
+    await userEvent.upload(
+      canvas.getByLabelText("Choose logo file"),
+      logoFile(),
+    );
+    await expect(
+      await canvas.findByRole("img", { name: "Your logo" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Replace logo" }),
+    ).toBeVisible();
+    // Nothing is sent until the Project is saved.
+    await expect(posts()).toHaveLength(0);
+    await userEvent.click(
+      canvas.getByRole("switch", { name: "Use Project logo on reports" }),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith(
+        `/app/projects/${ANUGRAHA.id}`,
+      ),
+    );
+    await expect(posts().map((call) => call.path)).toEqual([BASE, LOGO_PATH]);
+    await expect(posts()[0]?.body).toMatchObject({ useLogoInReports: true });
+    await expect(peekProjectFlash(ANUGRAHA.id)).toBeNull();
+  },
+};
+
+export const NewLogoThatFailsIsReported: Story = {
+  beforeEach: () => {
+    clearProjectFlash(ANUGRAHA.id);
+    return api((call) => {
+      if (call.method === "POST" && call.path === LOGO_PATH)
+        return Response.json(
+          { code: "PLAN_LIMIT_EXCEEDED", message: "No storage left." },
+          { status: 402 },
+        );
+      return created(call);
+    });
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await userEvent.upload(
+      canvas.getByLabelText("Choose logo file"),
+      logoFile(),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(getRouter().push).toHaveBeenCalled());
+    await expect(peekProjectFlash(ANUGRAHA.id)).toBe(
+      "The logo couldn't be saved. Try again from Edit Project.",
+    );
+  },
+};
+
+const KUMARI_LOGO = `${BASE}/${KUMARI.id}/logo`;
+
+export const EditRemovesLogoOnSave: Story = {
+  render: editRender(KUMARI.id),
+  beforeEach: () =>
+    api((call) => {
+      if (call.method === "GET" && call.path === `${BASE}/${KUMARI.id}`)
+        return Response.json({ ...KUMARI, logoUrl: STORY_LOGO_URL });
+      if (call.method === "POST" && call.path === `${BASE}/${KUMARI.id}/update`)
+        return Response.json({ ...KUMARI, ...(call.body as object) });
+      if (call.method === "POST" && call.path === `${KUMARI_LOGO}/remove`)
+        return Response.json({ ...KUMARI, logoUrl: null });
+      return undefined;
+    }),
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      await canvas.findByRole("img", { name: "Your logo" }),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Remove logo" }));
+    await expect(
+      canvas.getByRole("button", { name: "Upload logo" }),
+    ).toBeVisible();
+    await expect(posts()).toHaveLength(0);
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(getRouter().push).toHaveBeenCalled());
+    await expect(posts().map((call) => call.path)).toEqual([
+      `${BASE}/${KUMARI.id}/update`,
+      `${KUMARI_LOGO}/remove`,
+    ]);
+  },
+};
+
+export const EditOfProjectWithoutType: Story = {
+  render: editRender(ANUGRAHA.id),
+  beforeEach: () =>
+    editApi(
+      project({
+        id: ANUGRAHA.id,
+        name: "Anugraha Residency",
+        projectType: null,
+      }),
+    ),
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByLabelText("Project name");
+    await expect(canvas.getByLabelText("Project Type")).toHaveTextContent(
+      "Not set",
+    );
+    // A Project from before M4 may stay without a type.
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).not.toHaveProperty("projectType");
+  },
+};
+
+export const NewOnAPhone: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(await canvas.findByLabelText("Project Type")).toBeVisible();
+    await expect(canvas.getByLabelText("Budget")).toBeVisible();
+    await expect(
+      canvas.getByRole("switch", { name: "Use Project logo on reports" }),
+    ).toBeVisible();
+    // Nothing scrolls sideways.
+    const page = canvasElement.ownerDocument.documentElement;
+    await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };

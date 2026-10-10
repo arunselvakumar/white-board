@@ -27,18 +27,19 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { CheckInBanner } from "@/components/hrms/check-in-banner";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import {
   projectsQuery,
   type ProjectResponse,
   type ProjectStatus,
 } from "@/src/queries/projects";
 
+import { ProjectAvatar } from "./project-avatar";
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
   ProjectStatusBadge,
   projectDates,
-  projectInitials,
 } from "./project-status";
 
 export const PROJECTS_PATH = "/app/projects";
@@ -147,14 +148,14 @@ function ProjectRow({ project }: { project: ProjectResponse }) {
         className={`hover:bg-secondary/60 focus-visible:ring-ring/50 flex flex-col gap-3 rounded-xl px-3 py-3 transition-colors outline-none focus-visible:ring-3 ${ROW_GRID}`}
       >
         <div className="flex min-w-0 items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold"
-          >
-            {projectInitials(project.name)}
-          </span>
+          <ProjectAvatar name={project.name} logoUrl={project.logoUrl} />
           <div className="min-w-0 space-y-0.5">
             <p className="truncate font-semibold">{project.name}</p>
+            <p className="text-muted-foreground truncate text-xs">
+              {project.projectType == null
+                ? "Project Type not set"
+                : projectTypeLabel(project.projectType)}
+            </p>
             {project.address == null ? (
               dates == null ? (
                 <p className="text-muted-foreground text-sm">

@@ -6,10 +6,21 @@ import {
   calendarDateToDb,
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  markStoredFileDeleted,
+  recordStoredFile,
+} from "@/src/shared-kernel/files/stored-files";
 import { newId } from "@/src/shared-kernel/ids";
 
 import { Project } from "../domain/project";
-import type { ProjectRepository } from "../domain/project-repository";
+import type {
+  ProjectFileChange,
+  ProjectRepository,
+} from "../domain/project-repository";
+import {
+  SEED_DRAWING_ALBUMS,
+  SEED_TESTING_ITEMS,
+} from "../domain/project-seeds";
 
 /** Every read brings the custom fields, in their order on the form. */
 const withCustomFields = {
@@ -52,6 +63,11 @@ export function toProject(row: Row): Project {
     agreementDate: dateFromDb(row.agreementDate),
     // At most ₹1,000 crore in paise, well inside a safe integer.
     orderValue: row.orderValue == null ? null : Number(row.orderValue),
+    projectType: row.projectType,
+    // Capped at ₹1,000 crore in paise too.
+    budgetValue: row.budgetValue == null ? null : Number(row.budgetValue),
+    useLogoInReports: row.useLogoInReports,
+    logoKey: row.logoKey,
     customFields: row.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -66,7 +82,13 @@ export function toProject(row: Row): Project {
 
 function detailsData(project: Project) {
   const contract = project.contract;
+  const profile = project.profile;
   return {
+    projectType: profile.projectType,
+    budgetValue:
+      profile.budgetValue == null ? null : BigInt(profile.budgetValue),
+    useLogoInReports: profile.useLogoInReports,
+    logoKey: profile.logoKey,
     name: project.name,
     status: project.status,
     address: project.address,
@@ -104,6 +126,46 @@ async function writeCustomFields(tx: Tx, project: Project): Promise<void> {
       position,
     })),
   });
+}
+
+/**
+ * The drawing albums and testing items a new Project starts with (ADR
+ * CM-0013 §8–9), marked `is_seed`.
+ */
+async function writeSeeds(tx: Tx, project: Project): Promise<void> {
+  const seed = (name: string) => ({
+    id: newId(),
+    workspaceId: project.workspaceId,
+    projectId: project.id,
+    name,
+    isSeed: true,
+    createdAt: project.createdAt,
+    updatedAt: project.createdAt,
+    createdBy: project.createdBy,
+    updatedBy: project.createdBy,
+  });
+  await tx.constructionProjectsDrawingAlbum.createMany({
+    data: SEED_DRAWING_ALBUMS.map(seed),
+  });
+  await tx.constructionProjectsTestingItem.createMany({
+    data: SEED_TESTING_ITEMS.map(seed),
+  });
+}
+
+/** A logo's `stored_files` rows, in the Project's transaction. */
+async function writeFiles(
+  tx: Tx,
+  project: Project,
+  files: ProjectFileChange | undefined,
+): Promise<void> {
+  if (files?.removedKey != null)
+    await markStoredFileDeleted(
+      tx,
+      project.workspaceId,
+      files.removedKey,
+      project.updatedAt,
+    );
+  if (files?.added != null) await recordStoredFile(tx, files.added);
 }
 
 function nameInUse(error: unknown): unknown {
@@ -162,6 +224,7 @@ export class PrismaProjectRepository implements ProjectRepository {
           },
         });
         await writeCustomFields(tx, project);
+        await writeSeeds(tx, project);
         await recordAudit(tx, audit);
       });
     } catch (error) {
@@ -173,6 +236,7 @@ export class PrismaProjectRepository implements ProjectRepository {
     project: Project,
     expectedUpdatedAt: Date,
     audit: AuditEvent,
+    files?: ProjectFileChange,
   ): Promise<void> {
     try {
       await this.db.$transaction(async (tx) => {
@@ -196,6 +260,7 @@ export class PrismaProjectRepository implements ProjectRepository {
             "Someone else changed this Project after you opened it. Reload to see their changes.",
           );
         await writeCustomFields(tx, project);
+        await writeFiles(tx, project, files);
         await recordAudit(tx, audit);
       });
     } catch (error) {

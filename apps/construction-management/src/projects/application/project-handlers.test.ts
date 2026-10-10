@@ -113,7 +113,7 @@ function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
     handlers.create({
       workspaceId: "company-1",
       by: "owner",
-      details: { name, status },
+      details: { name, status, projectType: "residential" },
       financial: true,
     });
   return { handlers, repository, used, add, asked };
@@ -242,6 +242,7 @@ describe("ProjectHandlers", () => {
         by: "owner",
         details: {
           name: financial ? "Kumari Heights" : "Asaripallam Tower",
+          projectType: "residential",
           clientName: "Sri Balaji Developers",
           orderValue: 4_85_00_000_00,
         },
@@ -260,7 +261,11 @@ describe("ProjectHandlers", () => {
     const created = await handlers.create({
       workspaceId: "company-1",
       by: "owner",
-      details: { name: "Kumari Heights", orderValue: 4_85_00_000_00 },
+      details: {
+        name: "Kumari Heights",
+        projectType: "residential",
+        orderValue: 4_85_00_000_00,
+      },
       financial: true,
     });
     const kept = await handlers.update({
@@ -312,6 +317,7 @@ describe("ProjectHandlers", () => {
       by: "owner",
       details: {
         name: "Kumari Heights",
+        projectType: "commercial",
         clientPhone: "98431 22110",
         loaDate: "2026-03-05",
         customFields: [{ label: "Site engineer", value: "Prabhu Saravanan" }],
@@ -328,6 +334,88 @@ describe("ProjectHandlers", () => {
         customFields: [{ label: "Site engineer", value: "Prabhu Saravanan" }],
       },
     });
+  });
+
+  it("needs a Project Type on create and keeps it when an edit leaves it out", async () => {
+    const { handlers, repository } = setup();
+    await expect(
+      handlers.create({
+        workspaceId: "company-1",
+        by: "owner",
+        details: { name: "Kumari Heights" },
+        financial: true,
+      }),
+    ).rejects.toMatchObject({ code: "PROJECT_TYPE_REQUIRED" });
+    expect(repository.rows.size).toBe(0);
+    const created = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: { name: "Kumari Heights", projectType: "infrastructure" },
+      financial: true,
+    });
+    expect(created).toMatchObject({
+      projectType: "infrastructure",
+      structure: "locations",
+      budgetValue: null,
+      useLogoInReports: false,
+      logoKey: null,
+    });
+    const edited = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: { name: "Kumari Heights", status: "on_hold" },
+      financial: true,
+      expectedUpdatedAt: created.updatedAt,
+    });
+    expect(edited.projectType).toBe("infrastructure");
+    expect(repository.audits.at(-1)).toMatchObject({
+      after: { projectType: "infrastructure", useLogoInReports: false },
+    });
+  });
+
+  it("sets and keeps the budget like the order value: only with Financial", async () => {
+    const { handlers } = setup();
+    const create = (name: string, financial: boolean) =>
+      handlers.create({
+        workspaceId: "company-1",
+        by: "owner",
+        details: {
+          name,
+          projectType: "residential",
+          budgetValue: 3_20_00_000_00,
+        },
+        financial,
+      });
+    expect((await create("Kumari Heights", false)).budgetValue).toBeNull();
+    const created = await create("Asaripallam Tower", true);
+    expect(created.budgetValue).toBe(3_20_00_000_00);
+    const kept = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "member",
+      details: {
+        name: "Asaripallam Tower",
+        status: "ongoing",
+        budgetValue: null,
+      },
+      financial: false,
+      expectedUpdatedAt: created.updatedAt,
+    });
+    expect(kept.budgetValue).toBe(3_20_00_000_00);
+    const cleared = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: {
+        name: "Asaripallam Tower",
+        status: "ongoing",
+        budgetValue: null,
+      },
+      financial: true,
+      expectedUpdatedAt: kept.updatedAt,
+    });
+    expect(cleared.budgetValue).toBeNull();
   });
 
   it("asks for at most 50 custom-field labels of the Company", async () => {

@@ -106,7 +106,8 @@ export function ImageUploader({
           {fallback}
         </AvatarFallback>
       </Avatar>
-      <div className="min-w-0 flex-1 space-y-2">
+      {/* `relative`: the hidden file input stays inside, not off the page. */}
+      <div className="relative min-w-0 flex-1 space-y-2">
         <Input
           ref={input}
           type="file"

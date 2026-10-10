@@ -9,8 +9,10 @@ import { buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { projectQuery } from "@/src/queries/projects";
 
+import { ProjectAvatar } from "./project-avatar";
 import { PROJECTS_PATH, projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
 
@@ -31,8 +33,9 @@ function activeSegment(pathname: string, base: string): string {
 }
 
 /**
- * The project shell (CM-204): name, status and Edit above tab links for the
- * Project's sections. Tabs scroll sideways on a phone.
+ * The project shell (CM-204): the logo when there is one (CM-401), name,
+ * status, Project Type and Edit above tab links for the Project's
+ * sections. Tabs scroll sideways on a phone.
  */
 export function ProjectShell({
   id,
@@ -54,9 +57,21 @@ export function ProjectShell({
           <PageHeader
             back={{ label: "Projects", href: PROJECTS_PATH }}
             title={project.name}
+            leading={
+              project.logoUrl == null ? undefined : (
+                <ProjectAvatar
+                  name={project.name}
+                  logoUrl={project.logoUrl}
+                  className="size-12 sm:size-14"
+                />
+              )
+            }
             meta={
               <span className="flex flex-wrap items-center gap-2">
                 <ProjectStatusBadge status={project.status} />
+                {project.projectType == null ? null : (
+                  <span>{projectTypeLabel(project.projectType)}</span>
+                )}
                 {dates == null ? null : <span>{dates}</span>}
               </span>
             }
