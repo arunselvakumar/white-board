@@ -72,8 +72,10 @@ import {
  *
  * - Components, proration and overtime: half up to the paisa, per line.
  *   The absent and unpaid-leave deductions are what proration took off,
- *   so full-month gross − absent deduction − unpaid-leave deduction +
- *   overtime pay = gross earnings, exactly.
+ *   so full-month gross − not-employed deduction − absent deduction −
+ *   unpaid-leave deduction + overtime pay = gross earnings, exactly.
+ * - Days before the member's salary starts (`days.notEmployed`, a
+ *   mid-month joiner) are never paid, whatever the switches say.
  * - PF (employee, employer, EPS): half up to the whole rupee, as EPFO's
  *   ECR does. EPF employer = employer total − EPS.
  * - ESI (employee and employer): up to the next whole rupee, as ESIC does.
@@ -89,6 +91,12 @@ export type SalaryDayCounts = {
   unpaidLeave: number;
   weekOff: number;
   holidays: number;
+  /**
+   * Days of the month the member's salary does not cover: before their
+   * first salary configuration starts (a mid-month joiner). Never paid,
+   * whatever the switches say; 0 when left out.
+   */
+  notEmployed?: number;
 };
 
 /** Overtime on one day, with that day's shift (CM-307). */
@@ -214,6 +222,8 @@ export type SalaryBreakdown = {
   earnings: EarningsLine[];
   /** Sum of the components for a full month. */
   fullMonthGross: number;
+  /** What proration took off for days before the salary starts. */
+  notEmployedDeduction: number;
   /** What proration took off for absent days (0 with the switch off). */
   absentDeduction: number;
   /** What proration took off for unpaid leave (0 with the switch off). */
@@ -358,6 +368,7 @@ export function calculateSalary(
     unpaidLeave: halves(counts.unpaidLeave, "unpaidLeave"),
     weekOff: halves(counts.weekOff, "weekOff"),
     holidays: halves(counts.holidays, "holidays"),
+    notEmployed: halves(counts.notEmployed ?? 0, "notEmployed"),
   };
   if (!Number.isInteger(counts.halfDays))
     throw invalid(
@@ -372,7 +383,8 @@ export function calculateSalary(
     h.paidLeave +
     h.unpaidLeave +
     h.weekOff +
-    h.holidays;
+    h.holidays +
+    h.notEmployed;
   if (accounted > monthHalves || h.workingDays > monthHalves)
     throw invalid(
       "SALARY_DAYS_INVALID",
@@ -383,7 +395,11 @@ export function calculateSalary(
   // A half day is half absent (ADR CM-0012 §13).
   const absentOff = structure.deductAbsentDays ? h.absent + h.halfDays / 2 : 0;
   const unpaidOff = structure.deductUnpaidLeave ? h.unpaidLeave : 0;
-  const payableHalves = Math.max(0, monthHalves - absentOff - unpaidOff);
+  const notEmployedOff = h.notEmployed;
+  const payableHalves = Math.max(
+    0,
+    monthHalves - absentOff - unpaidOff - notEmployedOff,
+  );
 
   const components = componentAmounts(
     structure,
@@ -403,11 +419,25 @@ export function calculateSalary(
   }));
   const earned = earnings.reduce((sum, line) => sum + line.earned, 0);
   const prorated = fullMonthGross - earned;
+  // Days before the salary starts come off first; the rest is split
+  // between absent days and unpaid leave in proportion.
+  const notEmployedDeduction =
+    notEmployedOff === 0
+      ? 0
+      : mulDiv(
+          prorated,
+          notEmployedOff,
+          absentOff + unpaidOff + notEmployedOff,
+        );
   let absentDeduction = 0;
   let unpaidLeaveDeduction = 0;
   if (absentOff + unpaidOff > 0) {
-    absentDeduction = mulDiv(prorated, absentOff, absentOff + unpaidOff);
-    unpaidLeaveDeduction = prorated - absentDeduction;
+    absentDeduction = mulDiv(
+      prorated - notEmployedDeduction,
+      absentOff,
+      absentOff + unpaidOff,
+    );
+    unpaidLeaveDeduction = prorated - notEmployedDeduction - absentDeduction;
   }
 
   // Overtime (ADR CM-0012 §14): 2 × gross ÷ days ÷ the day's shift hours.
@@ -549,6 +579,7 @@ export function calculateSalary(
     baseMonthly: input.employee.baseMonthly,
     earnings,
     fullMonthGross,
+    notEmployedDeduction,
     absentDeduction,
     unpaidLeaveDeduction,
     overtimePay,

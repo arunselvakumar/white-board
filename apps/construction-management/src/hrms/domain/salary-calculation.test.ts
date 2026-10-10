@@ -694,6 +694,62 @@ describe("calculateSalary: proration and the deduction switches (golden, 31 days
   });
 });
 
+describe("calculateSalary: a mid-month joiner (CM-316)", () => {
+  const october = (
+    days: Partial<SalaryDayCounts>,
+    switches: Partial<SalaryStructureInput> = {},
+  ) =>
+    calculateSalary(
+      input({
+        structure: splitStructure(switches),
+        employee: {
+          baseMonthly: 3_100_000,
+          componentOverrides: {},
+          gender: null,
+        },
+        month: "2026-10",
+        days: { ...fullMonth(31), ...days },
+        statutory: { pf: PF, esi: ESI, ptStateCode: null, ptSlabs: [] },
+      }),
+    );
+
+  it("never pays the days before the salary starts, even with both switches off", () => {
+    const slip = october(
+      { present: 21, notEmployed: 10 },
+      { deductAbsentDays: false, deductUnpaidLeave: false },
+    );
+    expect(slip.days.payable).toBe(21);
+    expect(slip.grossEarnings).toBe(2_100_000);
+    expect(slip.notEmployedDeduction).toBe(1_000_000);
+    expect(slip.absentDeduction).toBe(0);
+  });
+
+  it("splits the rest between absent days and unpaid leave, to the paisa", () => {
+    const slip = october({
+      present: 17,
+      absent: 1,
+      unpaidLeave: 3,
+      notEmployed: 10,
+    });
+    expect(slip.days.payable).toBe(17);
+    expect(slip.notEmployedDeduction).toBe(1_000_000);
+    expect(slip.absentDeduction).toBe(100_000);
+    expect(slip.unpaidLeaveDeduction).toBe(300_000);
+    expect(
+      slip.fullMonthGross -
+        slip.notEmployedDeduction -
+        slip.absentDeduction -
+        slip.unpaidLeaveDeduction,
+    ).toBe(slip.grossEarnings);
+  });
+
+  it("counts the days not employed against the month", () => {
+    expect(codeOf(() => october({ present: 25, notEmployed: 10 })).code).toBe(
+      "SALARY_DAYS_INVALID",
+    );
+  });
+});
+
 describe("calculateSalary: an all-absent month", () => {
   it("earns nothing, charges nothing and reports what it could not take", () => {
     const slip = calculateSalary(
