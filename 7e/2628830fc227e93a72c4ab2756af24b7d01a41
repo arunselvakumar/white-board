@@ -1,0 +1,73 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_6838e51dc82487 81-88,801-806
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/delete/route.ts
+  s_7d8917753e260e::t_f0bd209856732c 1-37
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/move/route.ts
+  s_7d8917753e260e::t_fe271fd8c77b57 1-45
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/[locationId]/update/route.ts
+  s_7d8917753e260e::t_62042e94e5262b 1-46
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/handlers.ts
+  s_7d8917753e260e::t_378eccf03bedc0 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/location-models.ts
+  s_7d8917753e260e::t_22dabcbbe81cf6 1-99
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/location-openapi.ts
+  s_7d8917753e260e::t_dac8a030df245a 1-100
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/route.ts
+  s_7d8917753e260e::t_51904dc55d4b87 1-68
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/[phaseId]/delete/route.ts
+  s_7d8917753e260e::t_830cd04077c72a 1-33
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/[phaseId]/rename/route.ts
+  s_7d8917753e260e::t_58d75e00e75448 1-42
+apps/construction-management/app/api/construction/projects/projects/[id]/phases/route.ts
+  s_7d8917753e260e::t_7431eb790bc55e 1-64
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/delete/route.ts
+  s_7d8917753e260e::t_2442f0167a3f3a 1-33
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/route.ts
+  s_7d8917753e260e::t_2130bd32dfede5 1-30
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/[wingId]/update/route.ts
+  s_7d8917753e260e::t_28622425b299aa 1-47
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/handlers.ts
+  s_7d8917753e260e::t_7447dbc5563a7d 1-4
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/route.ts
+  s_7d8917753e260e::t_976f185524f8a4 1-71
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wing-models.ts
+  s_7d8917753e260e::t_5ec4e608e59216 1-348
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wing-openapi.ts
+  s_7d8917753e260e::t_cddcf3f44f8321 1-154
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/wings.http.test.ts
+  s_7d8917753e260e::t_3f79268721c768 1-709
+apps/construction-management/src/projects/application/structure-handlers.test.ts
+  s_7d8917753e260e::t_4196fd4577c794 1-414
+apps/construction-management/src/projects/domain/wing-floors.ts
+  s_7d8917753e260e::t_fc1a88fcaf9f3c 82
+apps/construction-management/src/projects/domain/wing.test.ts
+  s_7d8917753e260e::t_ea6db29304167f 15-21,259,302-303,306,312,349,355,376,384,387,412-416,447-451,491-495
+apps/construction-management/src/projects/infrastructure/prisma-location-repository.ts
+  s_7d8917753e260e::t_b559787f3540cd 1
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/locations.http.test.ts
+  s_388afeaeadf656::t_9f937006a0f2dd 1-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7e2628830fc227e93a72c4ab2756af24b7d01a41",
+  "prompts": {},
+  "sessions": {
+    "s_388afeaeadf656": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ade108c428deae4aa",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
