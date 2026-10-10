@@ -65,7 +65,8 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         href: "/app/masters/settings",
         label: "Settings",
         title: "Settings",
-        description: "Sequence IDs and Back-dated Entry rules.",
+        description:
+          "Sequence IDs, Back-dated Entry, billing addresses and GRN fields.",
         icon: Settings2,
       },
     ],
