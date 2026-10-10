@@ -4,6 +4,7 @@ import { expect, fireEvent, waitFor, within } from "storybook/test";
 import { browserToday, presetDuration } from "@/lib/dashboard-duration";
 import { DASHBOARD_SECTIONS } from "@/src/projects/domain/dashboard-sections";
 import type { ProjectLabourSummary } from "@/src/queries/labour-summary";
+import type { ProcurementDashboard } from "@/src/queries/procurement-dashboard";
 import type {
   DashboardLayout,
   ProjectSummary,
@@ -17,6 +18,29 @@ import { ProjectDashboard } from "./project-dashboard";
 const SUMMARY_PATH = `/api/construction/projects/projects/${KUMARI.id}/dashboard/summary`;
 const LAYOUT_PATH = "/api/construction/projects/dashboard-layout";
 const LABOUR_PATH = "/api/construction/labour/summary";
+const PROCUREMENT_PATH = "/api/construction/procurement/dashboard";
+
+function procurement(): ProcurementDashboard {
+  return {
+    materials: { total: 18, inStock: 12, lowStock: 4, outOfStock: 2 },
+    purchaseOrders: {
+      count: 7,
+      value: 48_75_000_00,
+      months: [
+        { month: "2026-04", value: 12_40_000_00 },
+        { month: "2026-05", value: 0 },
+        { month: "2026-06", value: 21_85_000_00 },
+        { month: "2026-07", value: 14_50_000_00 },
+      ],
+    },
+    approvals: {
+      purchaseRequests: 3,
+      purchaseOrders: 1,
+      transfers: null,
+      total: 4,
+    },
+  };
+}
 
 function layout(
   sections: { key: string; visible: boolean }[] = DASHBOARD_SECTIONS.map(
@@ -96,6 +120,7 @@ function serve(
     layout?: DashboardLayout;
     summary?: ProjectSummary;
     labour?: "ok" | "forbidden";
+    procurement?: ProcurementDashboard;
   } = {},
 ) {
   return () => {
@@ -120,6 +145,8 @@ function serve(
       }
       if (method === "GET" && path === SUMMARY_PATH)
         return Response.json(options.summary ?? summary());
+      if (method === "GET" && path.startsWith(PROCUREMENT_PATH))
+        return Response.json(options.procurement ?? procurement());
       if (method === "GET" && path.startsWith(LABOUR_PATH)) {
         if (options.labour === "forbidden")
           return Response.json(
@@ -163,10 +190,11 @@ export const WithFinancial: Story = {
     const kpis = within(
       await canvas.findByRole("list", { name: "Key figures" }),
     );
+    await kpis.findByText("Pending: 3 PR · 1 PO");
     await expect(
       kpis.getAllByRole("listitem").map((item) => item.textContent),
     ).toEqual([
-      "Material Approvals—Arrives with M5",
+      "Material Approvals4Pending: 3 PR · 1 PO",
       "Payment Approvals—Arrives with M7",
       "Pending Issues & Snags—Arrives with M8",
       "Pending Inspections—Arrives with M8",
@@ -192,12 +220,19 @@ export const WithFinancial: Story = {
     const year = presetDuration("last_12_months", browserToday());
     await expect(labourCalls()[0]).toContain(`from=${year.from}`);
 
-    // Every later section names the milestone that fills it.
+    // Materials has data (CM-510): summary, POs and the month-wise chart.
+    const materials = within(canvas.getByRole("region", { name: "Materials" }));
+    await expect(await materials.findByText("₹48,75,000.00")).toBeVisible();
     await expect(
-      within(canvas.getByRole("region", { name: "Materials" })).getByText(
-        "Arrives with Procurement & inventory (M5)",
-      ),
+      materials.getByText("Low stock").nextElementSibling,
+    ).toHaveTextContent("4");
+    await expect(
+      materials.getByRole("figure", { name: "Purchase order value per month" }),
     ).toBeVisible();
+    await expect(
+      materials.getByRole("link", { name: "Stock Register" }),
+    ).toBeVisible();
+    // Every later section names the milestone that fills it.
     await expect(
       within(canvas.getByRole("region", { name: "Booking" })).getByText(
         "Arrives with Sales (M10)",

@@ -12,6 +12,10 @@ import {
   centralInventoryOpenApiOperations,
 } from "./central-inventory/central-inventory-openapi";
 import {
+  procurementDashboardOpenApiComponents,
+  procurementDashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
+import {
   deliveryNoteOpenApiComponents,
   deliveryNoteOpenApiOperations,
 } from "./delivery-notes/delivery-notes-openapi";
@@ -61,6 +65,7 @@ export const procurementOpenApiComponents: OpenApiComponents = {
   ...deliveryNoteOpenApiComponents,
   ...centralInventoryOpenApiComponents,
   ...procurementDocumentOpenApiComponents,
+  ...procurementDashboardOpenApiComponents,
 };
 
 /** Every procurement operation (M5). */
@@ -76,4 +81,5 @@ export const procurementOpenApiOperations: OpenApiOperation[] = [
   ...deliveryNoteOpenApiOperations,
   ...centralInventoryOpenApiOperations,
   ...procurementDocumentOpenApiOperations,
+  ...procurementDashboardOpenApiOperations,
 ];
