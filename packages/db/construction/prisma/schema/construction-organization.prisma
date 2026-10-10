@@ -362,3 +362,38 @@ model ConstructionOrganizationSubscriptionInvoiceCounter {
   @@map("subscription_invoice_counters")
   @@schema("construction_organization")
 }
+
+/// An address the Company bills from, printed on Purchase Orders (CM-501,
+/// ADR CM-0015 §1). One is the default.
+model ConstructionOrganizationBillingAddress {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  address     String
+  /// GST state code; must match the GSTIN's first two digits.
+  stateCode   String    @map("state_code") @db.Char(2)
+  gstin       String?   @db.VarChar(15)
+  isDefault   Boolean   @default(false) @map("is_default")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("billing_addresses")
+  @@schema("construction_organization")
+}
+
+/// GRN fields a Company hides (Settings → GRN fields, ADR CM-0015 §9).
+/// Keys are the optional Supplier details and Delivery details fields.
+model ConstructionOrganizationGrnFieldSetting {
+  workspaceId  String   @id @map("workspace_id")
+  hiddenFields String[] @default([]) @map("hidden_fields")
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy    String   @map("updated_by")
+
+  @@map("grn_field_settings")
+  @@schema("construction_organization")
+}

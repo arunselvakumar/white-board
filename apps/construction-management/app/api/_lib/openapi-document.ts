@@ -151,6 +151,10 @@ import {
   hrmsOpenApiOperations,
 } from "@/app/api/construction/hrms/hrms-openapi";
 import {
+  procurementOpenApiComponents,
+  procurementOpenApiOperations,
+} from "@/app/api/construction/procurement/procurement-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -904,6 +908,10 @@ openApiOperations.push(...reportingOpenApiOperations);
 // The hrms context (M3) lists its own models and routes.
 Object.assign(openApiComponents, hrmsOpenApiComponents);
 openApiOperations.push(...hrmsOpenApiOperations);
+
+// The procurement context (M5) lists its own models and routes, one file per area.
+Object.assign(openApiComponents, procurementOpenApiComponents);
+openApiOperations.push(...procurementOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,
