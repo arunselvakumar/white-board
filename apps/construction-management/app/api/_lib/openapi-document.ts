@@ -87,6 +87,10 @@ import {
   testingReportOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/testing-reports/testing-report-openapi";
 import {
+  galleryOpenApiComponents,
+  galleryOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/gallery/gallery-openapi";
+import {
   vendorOpenApiComponents,
   vendorOpenApiOperations,
 } from "@/app/api/construction/labour/vendors/vendor-openapi";
@@ -805,6 +809,10 @@ openApiOperations.push(...drawingOpenApiOperations);
 // Testing Reports (CM-409) list their own models and routes.
 Object.assign(openApiComponents, testingReportOpenApiComponents);
 openApiOperations.push(...testingReportOpenApiOperations);
+
+// The Gallery (CM-410) lists its own models and routes.
+Object.assign(openApiComponents, galleryOpenApiComponents);
+openApiOperations.push(...galleryOpenApiOperations);
 
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);

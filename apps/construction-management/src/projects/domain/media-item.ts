@@ -1,3 +1,5 @@
+import type { MenuKey } from "@/src/shared-kernel/access";
+
 /**
  * The Gallery index (ADR CM-0014): one row per image or PDF attached
  * anywhere in a Project. The projects context writes the rows of its own
@@ -39,3 +41,15 @@ export type MediaType = "image" | "pdf";
 export function mediaTypeOf(contentType: string): MediaType {
   return contentType === "application/pdf" ? "pdf" : "image";
 }
+
+/**
+ * The menu whose Read flag shows a source's files (ADR CM-0014): the
+ * Gallery lists only sources the viewer may read, and each item links to
+ * its source's file route, which checks the same flag. A later source adds
+ * its menu here; a source with no entry is never shown.
+ */
+export const MEDIA_SOURCE_MENUS: Readonly<Record<string, MenuKey>> = {
+  document: "projects.project",
+  drawing: "projects.drawings",
+  testing_report: "projects.testing_reports",
+};
