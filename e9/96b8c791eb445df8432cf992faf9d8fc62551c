@@ -1,0 +1,63 @@
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/delete/route.ts
+  s_6604e2237b6922::t_986f5558f82937 1-48
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/pdf/route.ts
+  s_6604e2237b6922::t_76e8e56dbfb22f 1-48
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/route.ts
+  s_6604e2237b6922::t_6341188365994c 1-39
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/update/route.ts
+  s_6604e2237b6922::t_0e47810c6d0f07 1-64
+apps/construction-management/app/api/construction/procurement/goods-receipts/form-options/route.ts
+  s_6604e2237b6922::t_cd593fb1fb1972 1-52
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipt-models.ts
+  s_6604e2237b6922::t_56a18442029d68 1-440
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts-openapi.ts
+  s_6604e2237b6922::t_efe0cf7e475014 1-2,8-40,42-52,54-147
+apps/construction-management/app/api/construction/procurement/goods-receipts/route.ts
+  s_6604e2237b6922::t_bc393489b7a381 1-134
+apps/construction-management/next.config.ts
+  s_6604e2237b6922::t_cb13c2a3be9721 31-33
+apps/construction-management/src/procurement/domain/goods-receipt.ts
+  s_6604e2237b6922::t_28e4e76bbf33fc 1-323
+apps/construction-management/src/procurement/infrastructure/goods-receipt-factory.ts
+  s_6604e2237b6922::t_e1df8734046594 1-41
+apps/construction-management/src/procurement/infrastructure/goods-receipt-pdf.ts
+  s_6604e2237b6922::t_585e00342b2ebd 1-534
+apps/construction-management/src/procurement/infrastructure/prisma-goods-receipt-store.ts
+  s_6604e2237b6922::t_bad437d867ae91 1-577
+apps/construction-management/app/api/construction/procurement/goods-receipts/handlers.ts
+  s_467b5b095a3a86::t_1a854599a3e16e 1-95
+apps/construction-management/src/procurement/application/goods-receipt-handlers.ts
+  s_4ca43a567c5955::t_a9d7f5854a0276 1-1118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e996b8c791eb445df8432cf992faf9d8fc62551c",
+  "prompts": {},
+  "sessions": {
+    "s_467b5b095a3a86": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a9eb6dadd7e77cd0f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_4ca43a567c5955": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eb991c63013f969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
