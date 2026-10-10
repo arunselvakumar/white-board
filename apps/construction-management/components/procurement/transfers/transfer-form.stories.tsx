@@ -38,7 +38,9 @@ const meta = {
     defaultFrom: { kind: "project", id: TOWER.id },
     hrefFor: (id: string) => `${BASE}/${id}`,
   },
-  beforeEach: transferApi({ stock: { [CEMENT_ID]: "42.000", [STEEL_ID]: "2450.500" } }),
+  beforeEach: transferApi({
+    stock: { [CEMENT_ID]: "42.000", [STEEL_ID]: "2450.500" },
+  }),
   parameters: { nextjs: { navigation: { pathname: `${BASE}/new` } } },
   render: (args) => (
     <StoryQueries>
@@ -59,10 +61,16 @@ function body(canvasElement: HTMLElement) {
 /** Lines need a material and a quantity; the source and destination differ. */
 export const Validation: Story = {
   play: async ({ canvas, userEvent }) => {
-    const form = within(await canvas.findByRole("form", { name: "New Material Transfer" }));
-    await expect(form.getByRole("combobox", { name: "From" })).toHaveTextContent("Anugraha Towers");
+    const form = within(
+      await canvas.findByRole("form", { name: "New Material Transfer" }),
+    );
+    await expect(
+      form.getByRole("combobox", { name: "From" }),
+    ).toHaveTextContent("Anugraha Towers");
     await userEvent.click(form.getByRole("button", { name: "Save" }));
-    await expect(await form.findByText("Choose where the material goes to.")).toBeVisible();
+    await expect(
+      await form.findByText("Choose where the material goes to."),
+    ).toBeVisible();
     await expect(form.getByText("Choose a material.")).toBeVisible();
     await expect(posts(TRANSFERS_API)).toHaveLength(0);
   },
@@ -71,11 +79,17 @@ export const Validation: Story = {
 /** Save: pending, with available stock shown and a warning when short. */
 export const Save: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const form = within(await canvas.findByRole("form", { name: "New Material Transfer" }));
+    const form = within(
+      await canvas.findByRole("form", { name: "New Material Transfer" }),
+    );
     await userEvent.click(form.getByRole("combobox", { name: "To" }));
     const listbox = body(canvasElement);
-    await expect(listbox.queryByRole("option", { name: "Anugraha Towers" })).toBeNull();
-    await userEvent.click(await listbox.findByRole("option", { name: "Villa Phase 2" }));
+    await expect(
+      listbox.queryByRole("option", { name: "Anugraha Towers" }),
+    ).toBeNull();
+    await userEvent.click(
+      await listbox.findByRole("option", { name: "Villa Phase 2" }),
+    );
     await userEvent.selectOptions(form.getByLabelText("Material"), CEMENT_ID);
     await expect(await form.findByText("Available: 42 Bag")).toBeVisible();
     await userEvent.type(form.getByLabelText("Quantity (Bag)"), "50");
@@ -101,14 +115,22 @@ export const Save: Story = {
 export const SaveAndApprove: Story = {
   args: { materialIds: [STEEL_ID] },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const form = within(await canvas.findByRole("form", { name: "New Material Transfer" }));
+    const form = within(
+      await canvas.findByRole("form", { name: "New Material Transfer" }),
+    );
     await waitFor(async () => {
       await expect(form.getByLabelText("Material")).toHaveValue(STEEL_ID);
     });
     await userEvent.click(form.getByRole("combobox", { name: "To" }));
-    await userEvent.click(await body(canvasElement).findByRole("option", { name: "Ambattur Central Store" }));
+    await userEvent.click(
+      await body(canvasElement).findByRole("option", {
+        name: "Ambattur Central Store",
+      }),
+    );
     await userEvent.type(form.getByLabelText(/^Quantity/), "500");
-    await userEvent.click(await form.findByRole("button", { name: "Save & Approve" }));
+    await userEvent.click(
+      await form.findByRole("button", { name: "Save & Approve" }),
+    );
     await waitFor(async () => {
       await expect(posts(TRANSFERS_API)[0]?.body).toMatchObject({
         to: { kind: "store" },
@@ -120,11 +142,17 @@ export const SaveAndApprove: Story = {
 
 /** Without Approve at the source there is no Save & Approve. */
 export const NoApprove: Story = {
-  beforeEach: transferApi({ flags: { "procurement.material_transfers": ["read", "create"] } }),
+  beforeEach: transferApi({
+    flags: { "procurement.material_transfers": ["read", "create"] },
+  }),
   play: async ({ canvas }) => {
-    const form = within(await canvas.findByRole("form", { name: "New Material Transfer" }));
+    const form = within(
+      await canvas.findByRole("form", { name: "New Material Transfer" }),
+    );
     await expect(form.getByRole("button", { name: "Save" })).toBeVisible();
-    await expect(form.queryByRole("button", { name: "Save & Approve" })).toBeNull();
+    await expect(
+      form.queryByRole("button", { name: "Save & Approve" }),
+    ).toBeNull();
   },
 };
 
@@ -132,10 +160,16 @@ export const NoApprove: Story = {
 export const Edit: Story = {
   args: { transfer: transfer() },
   play: async ({ canvas, userEvent }) => {
-    const form = within(await canvas.findByRole("form", { name: "Edit MT/26-27/00004" }));
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit MT/26-27/00004" }),
+    );
     await expect(form.getAllByRole("listitem")).toHaveLength(2);
-    await expect(form.queryByRole("button", { name: "Save & Approve" })).toBeNull();
-    await userEvent.click(form.getByRole("button", { name: "Remove material 2" }));
+    await expect(
+      form.queryByRole("button", { name: "Save & Approve" }),
+    ).toBeNull();
+    await userEvent.click(
+      form.getByRole("button", { name: "Remove material 2" }),
+    );
     await userEvent.click(form.getByRole("button", { name: "Save" }));
     const path = `${TRANSFERS_API}/0199c4a0-0000-7000-8000-0000000a0001/update`;
     await waitFor(async () => {

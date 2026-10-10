@@ -1,7 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, PackageCheck, Pencil, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  PackageCheck,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -193,7 +200,9 @@ function DeliverDialog({
                 return;
               }
               if (deliveredOn < transfer.transferDate) {
-                setError("The delivery date cannot be before the transfer date.");
+                setError(
+                  "The delivery date cannot be before the transfer date.",
+                );
                 return;
               }
               action.mutate(
@@ -243,14 +252,17 @@ export function TransferDetail({
   const action = useTransferAction(transfer.id);
   const remove = useDeleteTransfer(transfer.id);
   const [error, setError] = useState<unknown>(null);
-  const [dialog, setDialog] = useState<"reject" | "deliver" | "delete" | null>(null);
+  const [dialog, setDialog] = useState<"reject" | "deliver" | "delete" | null>(
+    null,
+  );
 
   const pending = transfer.status === "pending";
   const canApprove = pending && atSource("approve");
   const canReject = pending && atSource("reject");
   const canEdit = pending && atSource("update");
   const canDelete = pending && atSource("delete");
-  const canDeliver = transfer.status === "in_transit" && atDestination("update");
+  const canDeliver =
+    transfer.status === "in_transit" && atDestination("update");
   const canAttach = atSource("update") || atDestination("update");
 
   return (
@@ -270,7 +282,8 @@ export function TransferDetail({
               <TransferStatusBadge status={transfer.status} />
             </h2>
             <p className="text-muted-foreground text-sm">
-              {TRANSFER_TYPE_LABELS[transfer.type]} · {formatDate(transfer.transferDate)}
+              {TRANSFER_TYPE_LABELS[transfer.type]} ·{" "}
+              {formatDate(transfer.transferDate)}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -282,7 +295,10 @@ export function TransferDetail({
                 onClick={() => {
                   setError(null);
                   action.mutate(
-                    { action: "approve", expectedUpdatedAt: transfer.updatedAt },
+                    {
+                      action: "approve",
+                      expectedUpdatedAt: transfer.updatedAt,
+                    },
                     { onError: setError },
                   );
                 }}
@@ -351,7 +367,13 @@ export function TransferDetail({
         <Fact label="Receiver Name">{transfer.receiverName ?? "—"}</Fact>
         <Fact label="Sent by">{person(transfer.createdBy)}</Fact>
         {transfer.decidedAt != null && (
-          <Fact label={transfer.approvalStatus === "rejected" ? "Rejected by" : "Approved by"}>
+          <Fact
+            label={
+              transfer.approvalStatus === "rejected"
+                ? "Rejected by"
+                : "Approved by"
+            }
+          >
             {person(transfer.decidedBy)}
           </Fact>
         )}
@@ -364,7 +386,9 @@ export function TransferDetail({
         {transfer.rejectionReason != null && (
           <Fact label="Reason">{transfer.rejectionReason}</Fact>
         )}
-        {transfer.remark != null && <Fact label="Remark">{transfer.remark}</Fact>}
+        {transfer.remark != null && (
+          <Fact label="Remark">{transfer.remark}</Fact>
+        )}
       </dl>
 
       <section aria-labelledby="transfer-materials" className="space-y-2">
@@ -373,9 +397,14 @@ export function TransferDetail({
         </h3>
         <ul aria-label="Materials" className="divide-y rounded-lg border">
           {transfer.lines.map((line) => (
-            <li key={line.id} className="flex items-start justify-between gap-3 px-3 py-2.5">
+            <li
+              key={line.id}
+              className="flex items-start justify-between gap-3 px-3 py-2.5"
+            >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{line.materialName}</p>
+                <p className="truncate text-sm font-medium">
+                  {line.materialName}
+                </p>
                 {line.remark != null && (
                   <p className="text-muted-foreground text-xs">{line.remark}</p>
                 )}
@@ -423,8 +452,8 @@ export function TransferDetail({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {transfer.number}?</AlertDialogTitle>
             <AlertDialogDescription>
-              It was never approved, so no stock moved. The number is not
-              used again.
+              It was never approved, so no stock moved. The number is not used
+              again.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

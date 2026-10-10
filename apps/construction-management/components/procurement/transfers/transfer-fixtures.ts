@@ -14,9 +14,21 @@ import type {
 
 export const TRANSFERS_API = "/api/construction/procurement/transfers";
 
-export const TOWER = { kind: "project" as const, id: "0199c4a0-0000-7000-8000-0000000d0001", name: "Anugraha Towers" };
-export const VILLA = { kind: "project" as const, id: "0199c4a0-0000-7000-8000-0000000d0002", name: "Villa Phase 2" };
-export const STORE = { kind: "store" as const, id: "0199c4a0-0000-7000-8000-0000000d0101", name: "Ambattur Central Store" };
+export const TOWER = {
+  kind: "project" as const,
+  id: "0199c4a0-0000-7000-8000-0000000d0001",
+  name: "Anugraha Towers",
+};
+export const VILLA = {
+  kind: "project" as const,
+  id: "0199c4a0-0000-7000-8000-0000000d0002",
+  name: "Villa Phase 2",
+};
+export const STORE = {
+  kind: "store" as const,
+  id: "0199c4a0-0000-7000-8000-0000000d0101",
+  name: "Ambattur Central Store",
+};
 
 export const CEMENT_ID = "0199c4a0-0000-7000-8000-00000000a001";
 export const STEEL_ID = "0199c4a0-0000-7000-8000-00000000a002";
@@ -29,7 +41,9 @@ export const LOCATIONS: TransferLocations = {
 const KARTHIK = { userId: "user-karthik", name: "Karthik R" };
 const ANITHA = { userId: "user-anitha", name: "Anitha S" };
 
-export function transfer(extra: Partial<MaterialTransfer> = {}): MaterialTransfer {
+export function transfer(
+  extra: Partial<MaterialTransfer> = {},
+): MaterialTransfer {
   return {
     id: "0199c4a0-0000-7000-8000-0000000a0001",
     number: "MT/26-27/00004",
@@ -138,7 +152,9 @@ export function transferHandler(
         (item) =>
           (status == null || item.status === status) &&
           (direction == null ||
-            (direction === "out" ? item.from.id === here : item.to.id === here)),
+            (direction === "out"
+              ? item.from.id === here
+              : item.to.id === here)),
       );
       return Response.json({
         items,
@@ -150,14 +166,19 @@ export function transferHandler(
     if (call.method === "GET" && path === `${TRANSFERS_API}/locations`)
       return Response.json(LOCATIONS);
     if (call.method === "GET" && path === `${TRANSFERS_API}/available-stock`) {
-      const ids = (url.searchParams.get("materialIds") ?? "").split(",").filter(Boolean);
+      const ids = (url.searchParams.get("materialIds") ?? "")
+        .split(",")
+        .filter(Boolean);
       return Response.json({
         stock: Object.fromEntries(
           ids.map((id) => [id, options.stock?.[id] ?? "100.000"]),
         ),
       });
     }
-    const item = /^\/api\/construction\/procurement\/transfers\/([^/]+)(?:\/([a-z]+))?$/.exec(path);
+    const item =
+      /^\/api\/construction\/procurement\/transfers\/([^/]+)(?:\/([a-z]+))?$/.exec(
+        path,
+      );
     if (item != null) {
       const [, id, action] = item;
       const found = transfers.find((entry) => entry.id === id) ?? transfers[0];
@@ -168,7 +189,8 @@ export function transferHandler(
           return Response.json(
             {
               code: "STOCK_INSUFFICIENT",
-              message: "Not enough TMT Steel Bar 12 mm in stock: 120 short on 2026-10-05.",
+              message:
+                "Not enough TMT Steel Bar 12 mm in stock: 120 short on 2026-10-05.",
               details: {
                 shortfalls: [
                   {
@@ -184,15 +206,24 @@ export function transferHandler(
             },
             { status: 409 },
           );
-        return Response.json({ ...found, status: "in_transit", approvalStatus: "approved" });
+        return Response.json({
+          ...found,
+          status: "in_transit",
+          approvalStatus: "approved",
+        });
       }
       if (call.method === "POST" && action === "reject")
-        return Response.json({ ...found, status: "rejected", approvalStatus: "rejected" });
+        return Response.json({
+          ...found,
+          status: "rejected",
+          approvalStatus: "rejected",
+        });
       if (call.method === "POST" && action === "deliver")
         return Response.json({ ...found, status: "delivered" });
       if (call.method === "POST" && action === "delete")
         return new Response(null, { status: 204 });
-      if (call.method === "POST" && action === "update") return Response.json(found);
+      if (call.method === "POST" && action === "update")
+        return Response.json(found);
     }
     if (call.method === "POST" && path === TRANSFERS_API)
       return Response.json(

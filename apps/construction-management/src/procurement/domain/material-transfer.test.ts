@@ -9,16 +9,28 @@ import {
   transferType,
 } from "./material-transfer";
 
-const A = { kind: "project", id: "0199c4a0-0000-7000-8000-000000000001" } as const;
-const B = { kind: "store", id: "0199c4a0-0000-7000-8000-000000000002" } as const;
+const A = {
+  kind: "project",
+  id: "0199c4a0-0000-7000-8000-000000000001",
+} as const;
+const B = {
+  kind: "store",
+  id: "0199c4a0-0000-7000-8000-000000000002",
+} as const;
 const M1 = "0199c4a0-0000-7000-8000-00000000a001";
 const M2 = "0199c4a0-0000-7000-8000-00000000a002";
 
 describe("Material Transfer (CM-507, ADR CM-0015 §4)", () => {
   it("derives its status from approval and delivery", () => {
-    expect(transferStatus({ approvalStatus: "pending", deliveredOn: null })).toBe("pending");
-    expect(transferStatus({ approvalStatus: "rejected", deliveredOn: null })).toBe("rejected");
-    expect(transferStatus({ approvalStatus: "approved", deliveredOn: null })).toBe("in_transit");
+    expect(
+      transferStatus({ approvalStatus: "pending", deliveredOn: null }),
+    ).toBe("pending");
+    expect(
+      transferStatus({ approvalStatus: "rejected", deliveredOn: null }),
+    ).toBe("rejected");
+    expect(
+      transferStatus({ approvalStatus: "approved", deliveredOn: null }),
+    ).toBe("in_transit");
     expect(
       transferStatus({ approvalStatus: "approved", deliveredOn: "2026-10-02" }),
     ).toBe("delivered");
@@ -62,17 +74,24 @@ describe("Material Transfer (CM-507, ADR CM-0015 §4)", () => {
     }).not.toThrow();
     expect(() => {
       assertTransferPending({ approvalStatus: "approved", deliveredOn: null });
-    }).toThrow(expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_PENDING" }));
+    }).toThrow(
+      expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_PENDING" }),
+    );
   });
 
   it("is delivered only in transit, on or after the transfer date, not after today", () => {
-    const inTransit = { approvalStatus: "approved", deliveredOn: null } as const;
+    const inTransit = {
+      approvalStatus: "approved",
+      deliveredOn: null,
+    } as const;
     expect(() => {
       assertDeliverable(inTransit, "2026-10-05", "2026-10-05", "2026-10-10");
     }).not.toThrow();
     expect(() => {
       assertDeliverable(inTransit, "2026-10-05", "2026-10-04", "2026-10-10");
-    }).toThrow(expect.objectContaining({ code: "DELIVERY_DATE_BEFORE_TRANSFER" }));
+    }).toThrow(
+      expect.objectContaining({ code: "DELIVERY_DATE_BEFORE_TRANSFER" }),
+    );
     expect(() => {
       assertDeliverable(inTransit, "2026-10-05", "2026-10-11", "2026-10-10");
     }).toThrow(expect.objectContaining({ code: "DELIVERY_DATE_IN_FUTURE" }));
@@ -83,7 +102,9 @@ describe("Material Transfer (CM-507, ADR CM-0015 §4)", () => {
         "2026-10-06",
         "2026-10-10",
       );
-    }).toThrow(expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_IN_TRANSIT" }));
+    }).toThrow(
+      expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_IN_TRANSIT" }),
+    );
     expect(() => {
       assertDeliverable(
         { approvalStatus: "approved", deliveredOn: "2026-10-06" },
@@ -91,6 +112,8 @@ describe("Material Transfer (CM-507, ADR CM-0015 §4)", () => {
         "2026-10-06",
         "2026-10-10",
       );
-    }).toThrow(expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_IN_TRANSIT" }));
+    }).toThrow(
+      expect.objectContaining({ code: "MATERIAL_TRANSFER_NOT_IN_TRANSIT" }),
+    );
   });
 });

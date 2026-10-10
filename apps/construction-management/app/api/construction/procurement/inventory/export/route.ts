@@ -34,7 +34,11 @@ export async function GET(request: Request): Promise<Response> {
       procurementDirectory,
       session.workspaceId,
       location,
-      { categoryId: query.categoryId, state: query.state, search: query.search },
+      {
+        categoryId: query.categoryId,
+        state: query.state,
+        search: query.search,
+      },
     );
     return xlsxResponse(
       await inventoryExport(named.name, list.items),

@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { INVENTORY_API, mockInventoryApi, SITE, type InventoryApiOptions } from "./inventory-fixtures";
+import {
+  INVENTORY_API,
+  mockInventoryApi,
+  SITE,
+  type InventoryApiOptions,
+} from "./inventory-fixtures";
 import { StockRegisterPage } from "./stock-register-page";
 
 let api: ReturnType<typeof mockInventoryApi>;
@@ -40,8 +45,12 @@ type Story = StoryObj<typeof meta>;
 /** Opening, movements by type and closing per material, with the download. */
 export const Register: Story = {
   play: async ({ canvas, canvasElement }) => {
-    const table = within(await canvas.findByRole("table", { name: "Stock Register" }));
-    await expect(table.getAllByRole("columnheader").map((cell) => cell.textContent)).toEqual([
+    const table = within(
+      await canvas.findByRole("table", { name: "Stock Register" }),
+    );
+    await expect(
+      table.getAllByRole("columnheader").map((cell) => cell.textContent),
+    ).toEqual([
       "Material",
       "Opening",
       "Received",
@@ -57,8 +66,12 @@ export const Register: Story = {
     const [cement] = table.getAllByRole("row").slice(1);
     await expect(cement).toHaveTextContent("Cement OPC 53 Grade");
     await expect(within(cement ?? canvasElement).getByText("42")).toBeVisible();
-    await expect(registerCalls()[0]?.path).toContain("from=2026-10-01&to=2026-10-10");
-    await expect(canvas.getByRole("link", { name: "Download Excel" })).toHaveAttribute(
+    await expect(registerCalls()[0]?.path).toContain(
+      "from=2026-10-01&to=2026-10-10",
+    );
+    await expect(
+      canvas.getByRole("link", { name: "Download Excel" }),
+    ).toHaveAttribute(
       "href",
       `${INVENTORY_API}/register/export?locationKind=project&locationId=${SITE.id}&from=2026-10-01&to=2026-10-10`,
     );
@@ -88,9 +101,16 @@ export const ChangeRange: Story = {
 /** Nothing held or moved in the range. */
 export const Empty: Story = {
   beforeEach: inventoryApi({
-    register: { location: SITE, from: "2026-10-01", to: "2026-10-10", items: [] },
+    register: {
+      location: SITE,
+      from: "2026-10-01",
+      to: "2026-10-10",
+      items: [],
+    },
   }),
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("Nothing in stock or moved")).toBeVisible();
+    await expect(
+      await canvas.findByText("Nothing in stock or moved"),
+    ).toBeVisible();
   },
 };

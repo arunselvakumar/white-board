@@ -95,8 +95,7 @@ export function movementQuantity(raw: string, field = "quantity"): string {
 /** A quantity that may be 0 (counted stock, Estimated Qty, a minimum). */
 export function nonNegativeQuantity(raw: string, field: string): string {
   const quantity = parse(raw, field);
-  if (quantity.isNegative())
-    throw quantityError(field, "Enter 0 or more.");
+  if (quantity.isNegative()) throw quantityError(field, "Enter 0 or more.");
   return quantity.toDecimalString();
 }
 

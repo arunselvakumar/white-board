@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { Suspense, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -25,7 +25,11 @@ import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { useRecordMovements } from "@/src/queries/inventory";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import { formatQuantity, localToday, QUANTITY_PATTERN } from "./inventory-format";
+import {
+  formatQuantity,
+  localToday,
+  QUANTITY_PATTERN,
+} from "./inventory-format";
 import { StockErrorAlert } from "./stock-error-alert";
 
 export type MovementKind = "consumed" | "missing";
@@ -76,7 +80,10 @@ function blankLine(materialId = ""): Values["lines"][number] {
 }
 
 /** Stock per material, for the "In stock" hint beside each line. */
-export type StockHints = ReadonlyMap<string, { inStock: string; uomName: string }>;
+export type StockHints = ReadonlyMap<
+  string,
+  { inStock: string; uomName: string }
+>;
 
 function MovementForm({
   location,
@@ -104,7 +111,7 @@ function MovementForm({
     },
   });
   const lines = useFieldArray({ control: form.control, name: "lines" });
-  const values = form.watch("lines");
+  const values = useWatch({ control: form.control, name: "lines" });
   const withSite = kind === "consumed" && location.kind === "project";
 
   const submit = async (input: Values) => {

@@ -1,6 +1,9 @@
 import { prisma } from "@repo/construction-db";
 
-import { requireInventoryAccess, procurementEvents } from "../inventory/handlers";
+import {
+  requireInventoryAccess,
+  procurementEvents,
+} from "../inventory/handlers";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import { MaterialTransferCommands } from "@/src/procurement/infrastructure/material-transfer-store";

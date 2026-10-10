@@ -30,7 +30,8 @@ export type InventoryRow = ConstructionProcurementInventoryRowResponseModel;
 export type StockEntry = ConstructionProcurementStockEntryResponseModel;
 export type InventoryHistory =
   GetConstructionProcurementInventoryHistoryResponseModel;
-export type StockRegister = GetConstructionProcurementStockRegisterResponseModel;
+export type StockRegister =
+  GetConstructionProcurementStockRegisterResponseModel;
 export type StockRegisterRow = StockRegister["items"][number];
 export type StockMovement = ConstructionProcurementStockMovementResponseModel;
 export type InventoryImportResult =
@@ -148,7 +149,11 @@ export function stockRegisterQuery(
 ) {
   const params = registerParams(location, range);
   return queryOptions({
-    queryKey: [...inventoryLocationKey(location), "register", params.toString()],
+    queryKey: [
+      ...inventoryLocationKey(location),
+      "register",
+      params.toString(),
+    ],
     queryFn: () =>
       apiJson<StockRegister>(`${INVENTORY_API}/register?${params}`),
   });
@@ -201,10 +206,7 @@ export function useEditMovement() {
   const invalidate = useInvalidateStock();
   return useMutation({
     mutationFn: ({ id, ...input }: EditMovementInput & { id: string }) =>
-      post<StockMovement>(
-        `/movements/${encodeURIComponent(id)}/update`,
-        input,
-      ),
+      post<StockMovement>(`/movements/${encodeURIComponent(id)}/update`, input),
     onSuccess: invalidate,
   });
 }

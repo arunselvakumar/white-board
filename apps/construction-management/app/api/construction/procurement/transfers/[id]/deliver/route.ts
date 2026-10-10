@@ -23,11 +23,21 @@ export async function POST(
         await context.params,
       ),
     );
-    const model = parseOrThrow(DeliverConstructionProcurementMaterialTransferRequestModel.safeParse(await request.json()));
+    const model = parseOrThrow(
+      DeliverConstructionProcurementMaterialTransferRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const session = await requireTransferSession(request, true);
     if (isResponse(session)) return session;
-    const transfer = await materialTransfers.deliver(session.caller, id, model.deliveredOn);
-    return Response.json(toTransferResponse(transfer), { status: StatusCodes.OK });
+    const transfer = await materialTransfers.deliver(
+      session.caller,
+      id,
+      model.deliveredOn,
+    );
+    return Response.json(toTransferResponse(transfer), {
+      status: StatusCodes.OK,
+    });
   } catch (error) {
     return mapError(error);
   }

@@ -24,7 +24,11 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
-    const session = await requireInventoryAccess(request, model.location, "create");
+    const session = await requireInventoryAccess(
+      request,
+      model.location,
+      "create",
+    );
     if (isResponse(session)) return session;
     const movements = await stockMovements.record(session.caller, {
       location: model.location,

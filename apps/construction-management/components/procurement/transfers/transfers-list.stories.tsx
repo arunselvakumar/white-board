@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockTransferApi, TOWER, TRANSFERS_API, type TransferApiOptions } from "./transfer-fixtures";
+import {
+  mockTransferApi,
+  TOWER,
+  TRANSFERS_API,
+  type TransferApiOptions,
+} from "./transfer-fixtures";
 import { TransfersList } from "./transfers-list";
 
 let api: ReturnType<typeof mockTransferApi>;
@@ -10,7 +15,10 @@ let api: ReturnType<typeof mockTransferApi>;
 function listCalls(): ApiCall[] {
   return api.calls.mock.calls
     .map(([call]) => call)
-    .filter((call) => call.method === "GET" && call.path.startsWith(`${TRANSFERS_API}?`));
+    .filter(
+      (call) =>
+        call.method === "GET" && call.path.startsWith(`${TRANSFERS_API}?`),
+    );
 }
 
 function transferApi(options: TransferApiOptions = {}) {
@@ -45,21 +53,26 @@ type Story = StoryObj<typeof meta>;
 /** Both directions, newest first, with status, other side and who. */
 export const List: Story = {
   play: async ({ canvas, canvasElement }) => {
-    const list = within(await canvas.findByRole("list", { name: "Material Transfers" }));
+    const list = within(
+      await canvas.findByRole("list", { name: "Material Transfers" }),
+    );
     const items = list.getAllByRole("listitem");
     await expect(items).toHaveLength(3);
     await expect(items[0]).toHaveTextContent("MT/26-27/00004");
     await expect(items[0]).toHaveTextContent("To Villa Phase 2");
     await expect(items[0]).toHaveTextContent("Pending");
-    await expect(items[0]).toHaveTextContent("Cement OPC 53 Grade · 40 Bag +1 more");
+    await expect(items[0]).toHaveTextContent(
+      "Cement OPC 53 Grade · 40 Bag +1 more",
+    );
     await expect(items[1]).toHaveTextContent("From Ambattur Central Store");
     await expect(items[1]).toHaveTextContent("In transit");
     await expect(items[2]).toHaveTextContent("Received by Anitha S");
-    await expect(list.getByRole("link", { name: "MT/26-27/00004" })).toHaveAttribute(
-      "href",
-      `${BASE}/0199c4a0-0000-7000-8000-0000000a0001`,
-    );
-    await expect(canvas.getByRole("link", { name: "New transfer" })).toHaveAttribute("href", `${BASE}/new`);
+    await expect(
+      list.getByRole("link", { name: "MT/26-27/00004" }),
+    ).toHaveAttribute("href", `${BASE}/0199c4a0-0000-7000-8000-0000000a0001`);
+    await expect(
+      canvas.getByRole("link", { name: "New transfer" }),
+    ).toHaveAttribute("href", `${BASE}/new`);
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
@@ -76,7 +89,9 @@ export const Filters: Story = {
     await expect(await canvas.findByText("1 transfer")).toBeVisible();
     await userEvent.click(canvas.getByRole("combobox", { name: "Status" }));
     await userEvent.click(
-      await within(canvasElement.ownerDocument.body).findByRole("option", { name: "Delivered" }),
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Delivered",
+      }),
     );
     await expect(await canvas.findByText("No transfers match")).toBeVisible();
     await expect(listCalls().at(-1)?.path).toContain("status=delivered");
@@ -87,16 +102,24 @@ export const Filters: Story = {
 export const Empty: Story = {
   beforeEach: transferApi({ transfers: [] }),
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No material transfers yet")).toBeVisible();
-    await expect(canvas.getAllByRole("link", { name: "New transfer" })).toHaveLength(2);
+    await expect(
+      await canvas.findByText("No material transfers yet"),
+    ).toBeVisible();
+    await expect(
+      canvas.getAllByRole("link", { name: "New transfer" }),
+    ).toHaveLength(2);
   },
 };
 
 /** Without Create, no New transfer. */
 export const ReadOnly: Story = {
-  beforeEach: transferApi({ flags: { "procurement.material_transfers": ["read"] } }),
+  beforeEach: transferApi({
+    flags: { "procurement.material_transfers": ["read"] },
+  }),
   play: async ({ canvas }) => {
     await canvas.findByRole("list", { name: "Material Transfers" });
-    await expect(canvas.queryByRole("link", { name: "New transfer" })).toBeNull();
+    await expect(
+      canvas.queryByRole("link", { name: "New transfer" }),
+    ).toBeNull();
   },
 };

@@ -119,7 +119,9 @@ function EntryItem({
             <p
               className={cn(
                 "text-sm font-semibold tabular-nums",
-                negative ? "text-destructive" : "text-emerald-700 dark:text-emerald-400",
+                negative
+                  ? "text-destructive"
+                  : "text-emerald-700 dark:text-emerald-400",
               )}
             >
               {formatSigned(entry.quantity)} {uomName}
@@ -128,7 +130,7 @@ function EntryItem({
               Balance {formatQuantity(entry.balance)}
             </p>
           </div>
-          {(editable || deletable) && movement != null && (
+          {(editable || deletable) && (
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -257,7 +259,8 @@ function Entries({
             size="sm"
             disabled={data.prevCursor == null}
             onClick={() => {
-              if (data.prevCursor != null) setCursor({ before: data.prevCursor });
+              if (data.prevCursor != null)
+                setCursor({ before: data.prevCursor });
             }}
           >
             Newer
@@ -267,7 +270,8 @@ function Entries({
             size="sm"
             disabled={data.nextCursor == null}
             onClick={() => {
-              if (data.nextCursor != null) setCursor({ after: data.nextCursor });
+              if (data.nextCursor != null)
+                setCursor({ after: data.nextCursor });
             }}
           >
             Older
@@ -295,7 +299,11 @@ function Entries({
             </AlertDialogTitle>
             <AlertDialogDescription>
               A reversal is posted and the stock goes back by{" "}
-              {deleting == null ? "" : formatQuantity(String(Math.abs(Number(deleting.quantity))))}{" "}
+              {deleting == null
+                ? ""
+                : formatQuantity(
+                    String(Math.abs(Number(deleting.quantity))),
+                  )}{" "}
               {current.uomName}. Both stay in the history.
             </AlertDialogDescription>
           </AlertDialogHeader>

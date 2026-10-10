@@ -43,10 +43,7 @@ import {
   type TransferType,
 } from "../domain/material-transfer";
 import type { StockPosting } from "../domain/stock-ledger";
-import {
-  stockLocationKey,
-  type StockLocation,
-} from "../domain/stock-location";
+import { stockLocationKey, type StockLocation } from "../domain/stock-location";
 import {
   requireStockLocation,
   stockLocationNames,
@@ -141,7 +138,9 @@ function changed(): DomainError {
   );
 }
 
-function statusFilter(status: TransferStatus): Prisma.ConstructionProcurementMaterialTransferWhereInput {
+function statusFilter(
+  status: TransferStatus,
+): Prisma.ConstructionProcurementMaterialTransferWhereInput {
   switch (status) {
     case "pending":
       return { approvalStatus: "pending" };
@@ -204,7 +203,10 @@ export class MaterialTransferCommands {
   }
 
   /** Whether the caller may read the transfer: Read on either side. */
-  private canRead(caller: InventoryCaller, transfer: MaterialTransfer): boolean {
+  private canRead(
+    caller: InventoryCaller,
+    transfer: MaterialTransfer,
+  ): boolean {
     return (
       canOnTransferSide(caller.access, transfer.from, "read") ||
       canOnTransferSide(caller.access, transfer.to, "read")
@@ -234,7 +236,10 @@ export class MaterialTransferCommands {
     ]);
     const person = (userId: string | null): Person | null =>
       userId == null ? null : { userId, name: people.get(userId) ?? null };
-    const named = (kind: "project" | "store", id: string): NamedStockLocation => ({
+    const named = (
+      kind: "project" | "store",
+      id: string,
+    ): NamedStockLocation => ({
       kind,
       id,
       name:
@@ -266,7 +271,10 @@ export class MaterialTransferCommands {
         deliveredOn,
         deliveredAt: row.deliveredAt,
         deliveredBy: person(row.deliveredBy),
-        createdBy: person(row.createdBy) ?? { userId: row.createdBy, name: null },
+        createdBy: person(row.createdBy) ?? {
+          userId: row.createdBy,
+          name: null,
+        },
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         lines: [...row.items]
@@ -327,18 +335,24 @@ export class MaterialTransferCommands {
   ): Promise<TransferListPage> {
     const { workspaceId } = caller.actor;
     const { location } = params;
-    await requireStockLocation(this.db, this.deps.directory, workspaceId, location);
+    await requireStockLocation(
+      this.db,
+      this.deps.directory,
+      workspaceId,
+      location,
+    );
     this.assertSide(caller, location, "read");
     const into = { toKind: location.kind, toId: location.id };
     const outOf = { fromKind: location.kind, fromId: location.id };
-    const filters: Prisma.ConstructionProcurementMaterialTransferWhereInput[] = [
-      { workspaceId, deletedAt: null },
-      params.direction === "in"
-        ? into
-        : params.direction === "out"
-          ? outOf
-          : { OR: [into, outOf] },
-    ];
+    const filters: Prisma.ConstructionProcurementMaterialTransferWhereInput[] =
+      [
+        { workspaceId, deletedAt: null },
+        params.direction === "in"
+          ? into
+          : params.direction === "out"
+            ? outOf
+            : { OR: [into, outOf] },
+      ];
     if (params.status != null) filters.push(statusFilter(params.status));
     if (params.from != null)
       filters.push({ transferDate: { gte: calendarDateToDb(params.from) } });
@@ -439,7 +453,10 @@ export class MaterialTransferCommands {
       on,
     );
     return new Map(
-      materialIds.map((id) => [id, new Prisma.Decimal(stock.get(id) ?? 0).toFixed(3)]),
+      materialIds.map((id) => [
+        id,
+        new Prisma.Decimal(stock.get(id) ?? 0).toFixed(3),
+      ]),
     );
   }
 
@@ -448,8 +465,20 @@ export class MaterialTransferCommands {
     const { workspaceId } = caller.actor;
     assertTransferRoute(input.from, input.to);
     const [from, to] = await Promise.all([
-      requireStockLocation(this.db, this.deps.directory, workspaceId, input.from, 400),
-      requireStockLocation(this.db, this.deps.directory, workspaceId, input.to, 400),
+      requireStockLocation(
+        this.db,
+        this.deps.directory,
+        workspaceId,
+        input.from,
+        400,
+      ),
+      requireStockLocation(
+        this.db,
+        this.deps.directory,
+        workspaceId,
+        input.to,
+        400,
+      ),
     ]);
     const lines = transferLines(input.lines);
     const materials = await this.deps.directory.materials(
@@ -515,24 +544,27 @@ export class MaterialTransferCommands {
       transferDate: CalendarDate;
       from: NamedStockLocation;
       to: NamedStockLocation;
-      lines: readonly { id: string; materialId: string; materialName: string; quantity: string }[];
+      lines: readonly {
+        id: string;
+        materialId: string;
+        materialName: string;
+        quantity: string;
+      }[];
     },
   ): Promise<DomainEvent[]> {
     const written = await stockLedger().post(
       tx,
       { workspaceId, by },
-      transfer.lines.map(
-        (line): StockPosting => ({
-          location: transfer.from,
-          materialId: line.materialId,
-          entryDate: transfer.transferDate,
-          type: "transferred_out",
-          quantity: line.quantity,
-          source: { type: "material_transfer", id: transfer.id },
-          sourceLineId: line.id,
-          counterpartyLabel: `To ${transfer.to.name}`,
-        }),
-      ),
+      transfer.lines.map((line): StockPosting => ({
+        location: transfer.from,
+        materialId: line.materialId,
+        entryDate: transfer.transferDate,
+        type: "transferred_out",
+        quantity: line.quantity,
+        source: { type: "material_transfer", id: transfer.id },
+        sourceLineId: line.id,
+        counterpartyLabel: `To ${transfer.to.name}`,
+      })),
       {
         materialNames: new Map(
           transfer.lines.map((line) => [line.materialId, line.materialName]),
@@ -683,26 +715,27 @@ export class MaterialTransferCommands {
     if (input.transferDate !== before.transferDate)
       check("material_transfer", "edit", input.transferDate);
     const transfer = await this.db.$transaction(async (tx) => {
-      const updated = await tx.constructionProcurementMaterialTransfer.updateMany({
-        where: {
-          id,
-          workspaceId,
-          deletedAt: null,
-          approvalStatus: "pending",
-          updatedAt: input.expectedUpdatedAt,
-        },
-        data: {
-          transferDate: calendarDateToDb(input.transferDate),
-          fromKind: form.from.kind,
-          fromId: form.from.id,
-          toKind: form.to.kind,
-          toId: form.to.id,
-          receiverName: form.receiverName,
-          remark: form.remark,
-          updatedAt: new Date(),
-          updatedBy: actor.userId,
-        },
-      });
+      const updated =
+        await tx.constructionProcurementMaterialTransfer.updateMany({
+          where: {
+            id,
+            workspaceId,
+            deletedAt: null,
+            approvalStatus: "pending",
+            updatedAt: input.expectedUpdatedAt,
+          },
+          data: {
+            transferDate: calendarDateToDb(input.transferDate),
+            fromKind: form.from.kind,
+            fromId: form.from.id,
+            toKind: form.to.kind,
+            toId: form.to.id,
+            receiverName: form.receiverName,
+            remark: form.remark,
+            updatedAt: new Date(),
+            updatedBy: actor.userId,
+          },
+        });
       if (updated.count === 0) throw changed();
       await tx.constructionProcurementMaterialTransferItem.deleteMany({
         where: { materialTransferId: id },
@@ -743,24 +776,30 @@ export class MaterialTransferCommands {
       throw changed();
     const { transfer, events } = await this.db.$transaction(async (tx) => {
       const now = new Date();
-      const updated = await tx.constructionProcurementMaterialTransfer.updateMany({
-        where: {
-          id,
-          workspaceId,
-          deletedAt: null,
-          approvalStatus: "pending",
-          updatedAt: before.updatedAt,
-        },
-        data: {
-          approvalStatus: "approved",
-          decidedAt: now,
-          decidedBy: actor.userId,
-          updatedAt: now,
-          updatedBy: actor.userId,
-        },
-      });
+      const updated =
+        await tx.constructionProcurementMaterialTransfer.updateMany({
+          where: {
+            id,
+            workspaceId,
+            deletedAt: null,
+            approvalStatus: "pending",
+            updatedAt: before.updatedAt,
+          },
+          data: {
+            approvalStatus: "approved",
+            decidedAt: now,
+            decidedBy: actor.userId,
+            updatedAt: now,
+            updatedBy: actor.userId,
+          },
+        });
       if (updated.count === 0) throw changed();
-      const ledgerEvents = await this.dispatchStock(tx, workspaceId, actor.userId, before);
+      const ledgerEvents = await this.dispatchStock(
+        tx,
+        workspaceId,
+        actor.userId,
+        before,
+      );
       const after = await this.load(tx, workspaceId, id);
       await recordAudit(tx, {
         workspaceId,
@@ -797,17 +836,23 @@ export class MaterialTransferCommands {
     const text = requiredText(reason, "REJECTION_REASON_REQUIRED", "reason");
     return this.db.$transaction(async (tx) => {
       const now = new Date();
-      const updated = await tx.constructionProcurementMaterialTransfer.updateMany({
-        where: { id, workspaceId, deletedAt: null, approvalStatus: "pending" },
-        data: {
-          approvalStatus: "rejected",
-          decidedAt: now,
-          decidedBy: actor.userId,
-          rejectionReason: text,
-          updatedAt: now,
-          updatedBy: actor.userId,
-        },
-      });
+      const updated =
+        await tx.constructionProcurementMaterialTransfer.updateMany({
+          where: {
+            id,
+            workspaceId,
+            deletedAt: null,
+            approvalStatus: "pending",
+          },
+          data: {
+            approvalStatus: "rejected",
+            decidedAt: now,
+            decidedBy: actor.userId,
+            rejectionReason: text,
+            updatedAt: now,
+            updatedBy: actor.userId,
+          },
+        });
       if (updated.count === 0) throw changed();
       const after = await this.load(tx, workspaceId, id);
       await recordAudit(tx, {
@@ -842,38 +887,37 @@ export class MaterialTransferCommands {
     check("material_transfer", "create", deliveredOn);
     const { transfer, events } = await this.db.$transaction(async (tx) => {
       const now = new Date();
-      const updated = await tx.constructionProcurementMaterialTransfer.updateMany({
-        where: {
-          id,
-          workspaceId,
-          deletedAt: null,
-          approvalStatus: "approved",
-          deliveredOn: null,
-        },
-        data: {
-          deliveredOn: calendarDateToDb(deliveredOn),
-          deliveredAt: now,
-          deliveredBy: actor.userId,
-          updatedAt: now,
-          updatedBy: actor.userId,
-        },
-      });
+      const updated =
+        await tx.constructionProcurementMaterialTransfer.updateMany({
+          where: {
+            id,
+            workspaceId,
+            deletedAt: null,
+            approvalStatus: "approved",
+            deliveredOn: null,
+          },
+          data: {
+            deliveredOn: calendarDateToDb(deliveredOn),
+            deliveredAt: now,
+            deliveredBy: actor.userId,
+            updatedAt: now,
+            updatedBy: actor.userId,
+          },
+        });
       if (updated.count === 0) throw changed();
       const written = await stockLedger().post(
         tx,
         { workspaceId, by: actor.userId },
-        before.lines.map(
-          (line): StockPosting => ({
-            location: before.to,
-            materialId: line.materialId,
-            entryDate: deliveredOn,
-            type: "transferred_in",
-            quantity: line.quantity,
-            source: { type: "material_transfer", id },
-            sourceLineId: line.id,
-            counterpartyLabel: `From ${before.from.name}`,
-          }),
-        ),
+        before.lines.map((line): StockPosting => ({
+          location: before.to,
+          materialId: line.materialId,
+          entryDate: deliveredOn,
+          type: "transferred_in",
+          quantity: line.quantity,
+          source: { type: "material_transfer", id },
+          sourceLineId: line.id,
+          counterpartyLabel: `From ${before.from.name}`,
+        })),
       );
       const after = await this.load(tx, workspaceId, id);
       await recordAudit(tx, {
@@ -908,16 +952,17 @@ export class MaterialTransferCommands {
     check("material_transfer", "edit", before.transferDate);
     await this.db.$transaction(async (tx) => {
       const now = new Date();
-      const updated = await tx.constructionProcurementMaterialTransfer.updateMany({
-        where: {
-          id,
-          workspaceId,
-          deletedAt: null,
-          approvalStatus: "pending",
-          updatedAt: expectedUpdatedAt,
-        },
-        data: { deletedAt: now, deletedBy: actor.userId },
-      });
+      const updated =
+        await tx.constructionProcurementMaterialTransfer.updateMany({
+          where: {
+            id,
+            workspaceId,
+            deletedAt: null,
+            approvalStatus: "pending",
+            updatedAt: expectedUpdatedAt,
+          },
+          data: { deletedAt: now, deletedBy: actor.userId },
+        });
       if (updated.count === 0) throw changed();
       await recordAudit(tx, {
         workspaceId,

@@ -1,6 +1,11 @@
 "use client";
 
-import { CircleAlert, CircleCheck, Download, FileSpreadsheet } from "lucide-react";
+import {
+  CircleAlert,
+  CircleCheck,
+  Download,
+  FileSpreadsheet,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -88,7 +93,8 @@ export function ImportInventoryDialog({
     );
   };
 
-  const posted = preview != null && (preview.imported > 0 || preview.estimatesSet > 0);
+  const posted =
+    preview != null && (preview.imported > 0 || preview.estimatesSet > 0);
   const busy = check.isPending || commit.isPending;
   const ready = preview == null ? 0 : preview.rows.length - preview.errorCount;
 

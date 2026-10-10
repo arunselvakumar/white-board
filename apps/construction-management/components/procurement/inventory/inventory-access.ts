@@ -15,7 +15,9 @@ import {
  * it (`canAtLocation`): Current Inventory on a Project, Central store on a
  * Store. Only for hiding actions; every route checks again.
  */
-export function useInventoryCan(location: StockLocation): (flag: Flag) => boolean {
+export function useInventoryCan(
+  location: StockLocation,
+): (flag: Flag) => boolean {
   const { data } = useSuspenseQuery(
     procurementAccessQuery(location.kind === "project" ? location.id : null),
   );

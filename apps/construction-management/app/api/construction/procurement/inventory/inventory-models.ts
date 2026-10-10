@@ -75,9 +75,8 @@ export const ListConstructionProcurementInventoryRequestModel = z.object({
 export const ExportConstructionProcurementInventoryRequestModel =
   ListConstructionProcurementInventoryRequestModel;
 
-export const SampleConstructionProcurementInventoryRequestModel = z.object(
-  locationQuery,
-);
+export const SampleConstructionProcurementInventoryRequestModel =
+  z.object(locationQuery);
 
 export const ImportConstructionProcurementInventoryRequestModel = z.object({
   ...locationQuery,
@@ -130,7 +129,8 @@ export const RecordConstructionProcurementStockMovementsRequestModel = z.object(
           materialId: z.uuid(),
           quantity: quantityInput,
           /** Where on the Project it was used; consumption at a Project only. */
-          siteLocation: ConstructionProcurementSiteLocationModel.nullable().optional(),
+          siteLocation:
+            ConstructionProcurementSiteLocationModel.nullable().optional(),
           remark: z.string().max(500).nullable().optional(),
         }),
       )
@@ -225,9 +225,10 @@ export type ConstructionProcurementStockMovementResponseModel = z.infer<
   typeof ConstructionProcurementStockMovementResponseModel
 >;
 
-export const RecordConstructionProcurementStockMovementsResponseModel = z.object(
-  { items: z.array(ConstructionProcurementStockMovementResponseModel) },
-);
+export const RecordConstructionProcurementStockMovementsResponseModel =
+  z.object({
+    items: z.array(ConstructionProcurementStockMovementResponseModel),
+  });
 export type RecordConstructionProcurementStockMovementsResponseModel = z.infer<
   typeof RecordConstructionProcurementStockMovementsResponseModel
 >;
@@ -274,13 +275,15 @@ export type ConstructionProcurementStockEntryResponseModel = z.infer<
   typeof ConstructionProcurementStockEntryResponseModel
 >;
 
-export const GetConstructionProcurementInventoryHistoryResponseModel = z.object({
-  material: ConstructionProcurementInventoryRowResponseModel.nullable(),
-  items: z.array(ConstructionProcurementStockEntryResponseModel),
-  nextCursor: z.string().nullable(),
-  prevCursor: z.string().nullable(),
-  total: z.int().nonnegative(),
-});
+export const GetConstructionProcurementInventoryHistoryResponseModel = z.object(
+  {
+    material: ConstructionProcurementInventoryRowResponseModel.nullable(),
+    items: z.array(ConstructionProcurementStockEntryResponseModel),
+    nextCursor: z.string().nullable(),
+    prevCursor: z.string().nullable(),
+    total: z.int().nonnegative(),
+  },
+);
 export type GetConstructionProcurementInventoryHistoryResponseModel = z.infer<
   typeof GetConstructionProcurementInventoryHistoryResponseModel
 >;
@@ -370,8 +373,7 @@ export function toStockMovementResponse(
     date: movement.date,
     materialId: movement.materialId,
     quantity: movement.quantity,
-    siteLocation:
-      movement.siteLocation as ConstructionProcurementStockMovementResponseModel["siteLocation"],
+    siteLocation: movement.siteLocation,
     remark: movement.remark,
     createdAt: movement.createdAt.toISOString(),
     updatedAt: movement.updatedAt.toISOString(),
@@ -383,8 +385,7 @@ export function toStockEntryResponse(
 ): ConstructionProcurementStockEntryResponseModel {
   return {
     ...entry,
-    siteLocation:
-      entry.siteLocation as ConstructionProcurementStockEntryResponseModel["siteLocation"],
+    siteLocation: entry.siteLocation,
     createdAt: entry.createdAt.toISOString(),
     movement:
       entry.movement == null

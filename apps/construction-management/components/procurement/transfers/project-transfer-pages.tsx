@@ -2,7 +2,10 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { projectTransfersPath, transferQuery } from "@/src/queries/material-transfers";
+import {
+  projectTransfersPath,
+  transferQuery,
+} from "@/src/queries/material-transfers";
 
 import { TransferDetail } from "./transfer-detail";
 import { TransferForm } from "./transfer-form";

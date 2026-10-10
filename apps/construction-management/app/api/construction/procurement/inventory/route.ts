@@ -40,7 +40,11 @@ export async function GET(request: Request): Promise<Response> {
       procurementDirectory,
       session.workspaceId,
       location,
-      { categoryId: query.categoryId, state: query.state, search: query.search },
+      {
+        categoryId: query.categoryId,
+        state: query.state,
+        search: query.search,
+      },
     );
     return Response.json(toInventoryListResponse(named, list));
   } catch (error) {

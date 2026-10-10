@@ -1,7 +1,12 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Plus } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowLeftRight,
+  ArrowUpRight,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -25,7 +30,10 @@ import {
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
-import { formatDate, formatQuantity } from "@/components/procurement/inventory/inventory-format";
+import {
+  formatDate,
+  formatQuantity,
+} from "@/components/procurement/inventory/inventory-format";
 import {
   TRANSFER_STATUS_LABELS,
   TRANSFER_STATUSES,
@@ -231,7 +239,9 @@ export function TransfersList({
           onValueChange={(value: string[]) => {
             const next = value[0];
             if (next == null) return;
-            change({ direction: next === "in" || next === "out" ? next : null });
+            change({
+              direction: next === "in" || next === "out" ? next : null,
+            });
           }}
           variant="outline"
           size="sm"
@@ -253,7 +263,9 @@ export function TransfersList({
           value={filters.status ?? ALL}
           onValueChange={(value) => {
             if (value == null) return;
-            change({ status: value === ALL ? null : (value as TransferStatus) });
+            change({
+              status: value === ALL ? null : (value as TransferStatus),
+            });
           }}
         >
           <SelectTrigger aria-label="Status" className="w-full sm:w-40">

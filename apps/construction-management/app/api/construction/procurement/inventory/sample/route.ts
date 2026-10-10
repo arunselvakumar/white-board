@@ -18,7 +18,10 @@ export async function GET(request: Request): Promise<Response> {
     const location = { kind: query.locationKind, id: query.locationId };
     const session = await requireInventoryAccess(request, location, "read");
     if (isResponse(session)) return session;
-    return xlsxResponse(await inventorySample([]), "inventory-import-sample.xlsx");
+    return xlsxResponse(
+      await inventorySample([]),
+      "inventory-import-sample.xlsx",
+    );
   } catch (error) {
     return mapError(error);
   }

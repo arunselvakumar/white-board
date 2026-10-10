@@ -75,7 +75,9 @@ export async function inventorySample(
     const target = sheet.getColumn(index + 1);
     target.width = column.width;
     target.numFmt =
-      column.key === "material" || column.key === "unit" ? "@" : QUANTITY_FORMAT;
+      column.key === "material" || column.key === "unit"
+        ? "@"
+        : QUANTITY_FORMAT;
   });
   addHeader(
     sheet,
@@ -83,7 +85,12 @@ export async function inventorySample(
   );
   const rows =
     materials.length > 0
-      ? materials.map((material) => [material.name, null, material.uomName, null])
+      ? materials.map((material) => [
+          material.name,
+          null,
+          material.uomName,
+          null,
+        ])
       : [
           ["Cement OPC 53 Grade", 120, "Bag", 500],
           ["TMT Steel Bar 12 mm", 1500, "kg", 8000],

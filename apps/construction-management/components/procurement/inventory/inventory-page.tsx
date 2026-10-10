@@ -80,8 +80,14 @@ import { ImportInventoryDialog } from "./import-inventory-dialog";
 import { useInventoryCan } from "./inventory-access";
 import { formatQuantity, inventoryPath } from "./inventory-format";
 import { StockHistorySheet } from "./stock-history-sheet";
-import { StockMovementDialog, type MovementKind } from "./stock-movement-dialog";
-import { StockSettingsDialog, type SettingsMode } from "./stock-settings-dialog";
+import {
+  StockMovementDialog,
+  type MovementKind,
+} from "./stock-movement-dialog";
+import {
+  StockSettingsDialog,
+  type SettingsMode,
+} from "./stock-settings-dialog";
 
 const STATE_BADGE: Record<
   StockState,
@@ -383,7 +389,10 @@ export function InventoryPage({
           {canExport && (
             <DropdownMenuItem
               render={
-                <a href={inventoryExportUrl(location, exportFilters)} download />
+                <a
+                  href={inventoryExportUrl(location, exportFilters)}
+                  download
+                />
               }
             >
               <Download aria-hidden="true" />
@@ -439,9 +448,9 @@ export function InventoryPage({
             </EmptyMedia>
             <EmptyTitle>No stock here yet</EmptyTitle>
             <EmptyDescription>
-              Stock comes in with goods receipts, transfers and deliveries
-              from a store. To start from today&apos;s count, import the
-              opening stock from the sample sheet.
+              Stock comes in with goods receipts, transfers and deliveries from
+              a store. To start from today&apos;s count, import the opening
+              stock from the sample sheet.
             </EmptyDescription>
           </EmptyHeader>
           {canCreate && (
@@ -506,7 +515,10 @@ export function InventoryPage({
                 if (value != null) setState(value);
               }}
             >
-              <SelectTrigger aria-label="Stock state" className="w-full sm:w-40">
+              <SelectTrigger
+                aria-label="Stock state"
+                className="w-full sm:w-40"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
@@ -587,7 +599,7 @@ export function InventoryPage({
                 role="region"
                 aria-label="Stock table, scrolls sideways"
                 tabIndex={0}
-                className="focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible hidden md:block"
+                className="focus-visible:ring-ring/50 hidden overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 md:block [&>[data-slot=table-container]]:overflow-visible"
               >
                 <Table aria-label="Stock">
                   <TableHeader>

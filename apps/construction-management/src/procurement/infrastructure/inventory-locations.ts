@@ -3,10 +3,7 @@ import { Prisma } from "@repo/construction-db";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 
 import type { ProcurementDirectory } from "../application/ports";
-import {
-  stockLocationKey,
-  type StockLocation,
-} from "../domain/stock-location";
+import { stockLocationKey, type StockLocation } from "../domain/stock-location";
 
 type Db = Prisma.TransactionClient;
 
@@ -24,7 +21,9 @@ export async function stockLocationNames(
 ): Promise<Map<string, string>> {
   const projectIds = [
     ...new Set(
-      locations.filter((item) => item.kind === "project").map((item) => item.id),
+      locations
+        .filter((item) => item.kind === "project")
+        .map((item) => item.id),
     ),
   ];
   const storeIds = [
@@ -43,7 +42,10 @@ export async function stockLocationNames(
   ]);
   const names = new Map<string, string>();
   for (const project of projects.values())
-    names.set(stockLocationKey({ kind: "project", id: project.id }), project.name);
+    names.set(
+      stockLocationKey({ kind: "project", id: project.id }),
+      project.name,
+    );
   for (const store of stores)
     names.set(stockLocationKey({ kind: "store", id: store.id }), store.name);
   return names;

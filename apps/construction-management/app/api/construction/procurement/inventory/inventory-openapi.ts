@@ -109,7 +109,8 @@ export const inventoryOpenApiOperations: OpenApiOperation[] = [
     query: ImportConstructionProcurementInventoryRequestModel,
     bodyBinaryContentTypes: [XLSX_CONTENT_TYPE],
     successStatus: StatusCodes.OK,
-    successDescription: "The row-by-row check (201 with `imported` when posted)",
+    successDescription:
+      "The row-by-row check (201 with `imported` when posted)",
     successSchema: ImportConstructionProcurementInventoryResponseModel,
     errors: WRITE,
   },

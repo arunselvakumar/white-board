@@ -20,7 +20,11 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
-    const session = await requireInventoryAccess(request, model.location, "update");
+    const session = await requireInventoryAccess(
+      request,
+      model.location,
+      "update",
+    );
     if (isResponse(session)) return session;
     const row = await stockSettings.update(
       session.caller,

@@ -22,10 +22,18 @@ export async function POST(
         await context.params,
       ),
     );
-    const model = parseOrThrow(DeleteConstructionProcurementMaterialTransferRequestModel.safeParse(await request.json()));
+    const model = parseOrThrow(
+      DeleteConstructionProcurementMaterialTransferRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const session = await requireTransferSession(request, true);
     if (isResponse(session)) return session;
-    await materialTransfers.remove(session.caller, id, new Date(model.expectedUpdatedAt));
+    await materialTransfers.remove(
+      session.caller,
+      id,
+      new Date(model.expectedUpdatedAt),
+    );
     return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {
     return mapError(error);

@@ -106,7 +106,10 @@ export function planInventoryImport(
     const material =
       name === "" ? undefined : materials.get(name.toLowerCase());
     if (name === "")
-      errors.push({ code: "MATERIAL_REQUIRED", message: "Write the material." });
+      errors.push({
+        code: "MATERIAL_REQUIRED",
+        message: "Write the material.",
+      });
     else if (material == null)
       errors.push({
         code: "MATERIAL_NOT_FOUND",

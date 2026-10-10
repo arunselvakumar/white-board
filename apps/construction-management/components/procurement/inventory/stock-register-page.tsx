@@ -36,7 +36,12 @@ import {
 } from "@/src/queries/inventory";
 
 import { useInventoryCan } from "./inventory-access";
-import { formatDate, formatQuantity, inventoryPath, localToday } from "./inventory-format";
+import {
+  formatDate,
+  formatQuantity,
+  inventoryPath,
+  localToday,
+} from "./inventory-format";
 
 function monthStart(today: string): string {
   return `${today.slice(0, 8)}01`;
@@ -59,8 +64,8 @@ function Register({
           </EmptyMedia>
           <EmptyTitle>Nothing in stock or moved</EmptyTitle>
           <EmptyDescription>
-            No material was held or moved here from {formatDate(range.from)}{" "}
-            to {formatDate(range.to)}.
+            No material was held or moved here from {formatDate(range.from)} to{" "}
+            {formatDate(range.to)}.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -89,10 +94,15 @@ function Register({
           {data.items.map((row) => (
             <TableRow key={row.materialId}>
               <TableCell className="bg-background sticky left-0 max-w-56">
-                <span className="block truncate font-medium" title={row.materialName}>
+                <span
+                  className="block truncate font-medium"
+                  title={row.materialName}
+                >
                   {row.materialName}
                 </span>
-                <span className="text-muted-foreground text-xs">{row.uomName}</span>
+                <span className="text-muted-foreground text-xs">
+                  {row.uomName}
+                </span>
               </TableCell>
               {STOCK_REGISTER_COLUMNS.map((column) => (
                 <TableCell
@@ -103,7 +113,9 @@ function Register({
                       : "text-right tabular-nums"
                   }
                 >
-                  {Number(row[column]) === 0 && column !== "opening" && column !== "closing"
+                  {Number(row[column]) === 0 &&
+                  column !== "opening" &&
+                  column !== "closing"
                     ? "—"
                     : formatQuantity(row[column])}
                 </TableCell>

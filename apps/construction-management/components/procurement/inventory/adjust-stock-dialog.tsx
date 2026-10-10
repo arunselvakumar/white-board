@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -59,8 +59,9 @@ function AdjustForm({
     defaultValues: { date: localToday(), countedQty: "", reason: "" },
   });
   const errors = form.formState.errors;
-  const counted = form.watch("countedQty");
-  const today = form.watch("date") === localToday();
+  const counted = useWatch({ control: form.control, name: "countedQty" });
+  const today =
+    useWatch({ control: form.control, name: "date" }) === localToday();
   const difference =
     today && QUANTITY_PATTERN.test(counted.trim())
       ? String(Number(counted) - Number(row.inStock))
@@ -112,7 +113,9 @@ function AdjustForm({
           <FieldError message={errors.date?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="adjust-counted">Counted quantity ({row.uomName})</Label>
+          <Label htmlFor="adjust-counted">
+            Counted quantity ({row.uomName})
+          </Label>
           <Input
             id="adjust-counted"
             inputMode="decimal"

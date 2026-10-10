@@ -13,16 +13,43 @@ describe("planInventoryImport (CM-506)", () => {
   it("matches names ignoring case and plans opening stock and estimates", () => {
     const plan = planInventoryImport(
       [
-        { row: 2, cells: { material: " cement OPC 53 ", quantity: 120, unit: "bag", estimatedQty: "500" } },
-        { row: 3, cells: { material: "TMT Steel 12 mm", quantity: null, estimatedQty: 2000 } },
+        {
+          row: 2,
+          cells: {
+            material: " cement OPC 53 ",
+            quantity: 120,
+            unit: "bag",
+            estimatedQty: "500",
+          },
+        },
+        {
+          row: 3,
+          cells: {
+            material: "TMT Steel 12 mm",
+            quantity: null,
+            estimatedQty: 2000,
+          },
+        },
       ],
       MATERIALS,
       new Set(["m-steel"]),
     );
     expect(plan.errorCount).toBe(0);
     expect(plan.rows).toEqual([
-      expect.objectContaining({ row: 2, materialId: "m-cement", quantity: "120.000", estimatedQty: "500.000", errors: [] }),
-      expect.objectContaining({ row: 3, materialId: "m-steel", quantity: null, estimatedQty: "2000.000", errors: [] }),
+      expect.objectContaining({
+        row: 2,
+        materialId: "m-cement",
+        quantity: "120.000",
+        estimatedQty: "500.000",
+        errors: [],
+      }),
+      expect.objectContaining({
+        row: 3,
+        materialId: "m-steel",
+        quantity: null,
+        estimatedQty: "2000.000",
+        errors: [],
+      }),
     ]);
   });
 
@@ -30,7 +57,10 @@ describe("planInventoryImport (CM-506)", () => {
     const plan = planInventoryImport(
       [
         { row: 2, cells: { material: "Granite", quantity: 1 } },
-        { row: 3, cells: { material: "Cement OPC 53", quantity: 1, unit: "kg" } },
+        {
+          row: 3,
+          cells: { material: "Cement OPC 53", quantity: 1, unit: "kg" },
+        },
         { row: 4, cells: { material: "TMT Steel 12 mm", quantity: 5 } },
         { row: 5, cells: { material: "Cement OPC 53", quantity: "1.2345" } },
         { row: 6, cells: { material: "", quantity: 2 } },

@@ -51,7 +51,9 @@ describe("stock movements (CM-506)", () => {
     expect(isEditableMovement("adjustment")).toBe(false);
     expect(() => {
       assertMovementDate("2026-10-11", "2026-10-10");
-    }).toThrow(expect.objectContaining({ code: "STOCK_MOVEMENT_DATE_IN_FUTURE" }));
+    }).toThrow(
+      expect.objectContaining({ code: "STOCK_MOVEMENT_DATE_IN_FUTURE" }),
+    );
     expect(() => {
       assertMovementDate("2026-10-10", "2026-10-10");
     }).not.toThrow();

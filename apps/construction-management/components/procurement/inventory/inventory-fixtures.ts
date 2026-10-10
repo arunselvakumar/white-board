@@ -32,7 +32,10 @@ export const PAINT_ID = "0199c4a0-0000-7000-8000-00000000a004";
 const CIVIL = "0199c4a0-0000-7000-8000-00000000c001";
 const PAINTS = "0199c4a0-0000-7000-8000-00000000c002";
 
-function row(extra: Partial<InventoryRow> & Pick<InventoryRow, "materialId" | "materialName">): InventoryRow {
+function row(
+  extra: Partial<InventoryRow> &
+    Pick<InventoryRow, "materialId" | "materialName">,
+): InventoryRow {
   return {
     categoryId: CIVIL,
     categoryName: "Civil Work Materials",
@@ -104,7 +107,12 @@ export const CEMENT_HISTORY: StockEntry[] = [
     typeLabel: "Consumed",
     quantity: "-18.000",
     balance: "42.000",
-    source: { type: "stock_movement", id: MOVEMENT_ID, number: null, href: null },
+    source: {
+      type: "stock_movement",
+      id: MOVEMENT_ID,
+      number: null,
+      href: null,
+    },
     counterpartyLabel: null,
     siteLocation: null,
     remark: "Plastering, 3rd floor",
@@ -233,7 +241,12 @@ export type InventoryApiOptions = {
   rows?: InventoryRow[];
   history?: StockEntry[];
   /** Refuse consume / missing with STOCK_INSUFFICIENT. */
-  shortfall?: { materialId: string; materialName: string; shortBy: string; onDate: string };
+  shortfall?: {
+    materialId: string;
+    materialName: string;
+    shortBy: string;
+    onDate: string;
+  };
   flags?: Partial<Record<ProcurementAccessMenu, Flag[]>>;
   importResult?: InventoryImportResult;
   register?: StockRegister;
@@ -268,7 +281,11 @@ export function inventoryHandler(
           options.flags,
         ),
       );
-    if (/\/api\/construction\/projects\/projects\/[^/]+\/location-options$/.test(path))
+    if (
+      /\/api\/construction\/projects\/projects\/[^/]+\/location-options$/.test(
+        path,
+      )
+    )
       return Response.json(LOCATION_OPTIONS_EMPTY);
     const material = materialOptionsHandler(call);
     if (material != null) return material;
@@ -279,8 +296,12 @@ export function inventoryHandler(
         summary: summaryOf(rows),
       } satisfies InventoryList);
     if (call.method === "GET" && path === `${INVENTORY_API}/history`) {
-      const materialId = new URL(call.path, "http://storybook.local").searchParams.get("materialId");
-      const items = materialId === CEMENT_ID ? (options.history ?? CEMENT_HISTORY) : [];
+      const materialId = new URL(
+        call.path,
+        "http://storybook.local",
+      ).searchParams.get("materialId");
+      const items =
+        materialId === CEMENT_ID ? (options.history ?? CEMENT_HISTORY) : [];
       return Response.json({
         material: rows.find((item) => item.materialId === materialId) ?? null,
         items,
@@ -299,13 +320,20 @@ export function inventoryHandler(
             message: `Not enough ${options.shortfall.materialName} in stock.`,
             details: {
               shortfalls: [
-                { locationKind: "project", locationId: SITE.id, ...options.shortfall },
+                {
+                  locationKind: "project",
+                  locationId: SITE.id,
+                  ...options.shortfall,
+                },
               ],
             },
           },
           { status: 409 },
         );
-      const body = call.body as { lines: { materialId: string }[]; kind: string };
+      const body = call.body as {
+        lines: { materialId: string }[];
+        kind: string;
+      };
       return Response.json(
         {
           items: body.lines.map((item, index) => ({
@@ -328,9 +356,14 @@ export function inventoryHandler(
       return Response.json({ id: MOVEMENT_ID }, { status: 201 });
     if (call.method === "POST" && path === `${INVENTORY_API}/settings`) {
       const body = call.body as { materialId: string };
-      return Response.json(rows.find((item) => item.materialId === body.materialId));
+      return Response.json(
+        rows.find((item) => item.materialId === body.materialId),
+      );
     }
-    if (call.method === "POST" && path.startsWith(`${INVENTORY_API}/movements/`))
+    if (
+      call.method === "POST" &&
+      path.startsWith(`${INVENTORY_API}/movements/`)
+    )
       return path.endsWith("/delete")
         ? new Response(null, { status: 204 })
         : Response.json({ id: MOVEMENT_ID });
@@ -348,8 +381,22 @@ export function inventoryHandler(
 
 export const IMPORT_PREVIEW: InventoryImportResult = {
   rows: [
-    { row: 2, material: "Cement OPC 53 Grade", materialId: CEMENT_ID, quantity: "120.000", estimatedQty: "500.000", errors: [] },
-    { row: 3, material: "M Sand", materialId: SAND_ID, quantity: null, estimatedQty: "300.000", errors: [] },
+    {
+      row: 2,
+      material: "Cement OPC 53 Grade",
+      materialId: CEMENT_ID,
+      quantity: "120.000",
+      estimatedQty: "500.000",
+      errors: [],
+    },
+    {
+      row: 3,
+      material: "M Sand",
+      materialId: SAND_ID,
+      quantity: null,
+      estimatedQty: "300.000",
+      errors: [],
+    },
   ],
   errorCount: 0,
   imported: 0,
@@ -365,7 +412,12 @@ export const IMPORT_WITH_ERRORS: InventoryImportResult = {
       materialId: null,
       quantity: "10.000",
       estimatedQty: null,
-      errors: [{ code: "MATERIAL_NOT_FOUND", message: "No material named “Granite slab” in Masters." }],
+      errors: [
+        {
+          code: "MATERIAL_NOT_FOUND",
+          message: "No material named “Granite slab” in Masters.",
+        },
+      ],
     },
   ],
   errorCount: 1,

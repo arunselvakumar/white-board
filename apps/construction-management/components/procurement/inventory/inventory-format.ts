@@ -36,7 +36,10 @@ export function localToday(now: Date = new Date()): string {
 export const QUANTITY_PATTERN = /^\d{1,11}(\.\d{1,3})?$/;
 
 /** Pages of a location's Current Inventory. */
-export function inventoryPath(location: StockLocation, page?: "register"): string {
+export function inventoryPath(
+  location: StockLocation,
+  page?: "register",
+): string {
   if (location.kind !== "project") return "";
   const base = `/app/projects/${encodeURIComponent(location.id)}/materials/inventory`;
   return page == null ? base : `${base}/${page}`;

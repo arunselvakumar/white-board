@@ -51,7 +51,12 @@ export const GetConstructionProcurementTransferStockRequestModel = z.object({
   materialIds: z
     .string()
     .max(4000)
-    .transform((value) => value.split(",").map((id) => id.trim()).filter(Boolean))
+    .transform((value) =>
+      value
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean),
+    )
     .pipe(z.array(z.uuid()).max(100)),
   /** Stock on this date (the transfer date); today and after when left out. */
   on: z.iso.date().optional(),

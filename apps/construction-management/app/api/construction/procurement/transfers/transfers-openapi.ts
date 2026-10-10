@@ -88,7 +88,8 @@ export const materialTransferOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: `${TRANSFERS_PATH}/locations`,
-    summary: "Every live Project and Store by name, for the transfer form's From and To (menu `procurement.material_transfers`, read)",
+    summary:
+      "Every live Project and Store by name, for the transfer form's From and To (menu `procurement.material_transfers`, read)",
     tags: TAGS,
     successStatus: StatusCodes.OK,
     successDescription: "Projects and Stores",

@@ -22,7 +22,9 @@ export default async function ProjectTransferNewRoute({
     }))
   )
     return <ProjectNoAccess what="new Material Transfers" />;
-  const materialIds = (Array.isArray(materials) ? materials.join(",") : (materials ?? ""))
+  const materialIds = (
+    Array.isArray(materials) ? materials.join(",") : (materials ?? "")
+  )
     .split(",")
     .map((value) => value.trim())
     .filter((value) => /^[0-9a-f-]{36}$/i.test(value))

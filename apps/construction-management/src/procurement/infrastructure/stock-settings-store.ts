@@ -49,7 +49,12 @@ export class StockSettingsCommands {
     const { actor, access } = caller;
     const { workspaceId } = actor;
     const { db, directory } = this.deps;
-    const named = await requireStockLocation(db, directory, workspaceId, location);
+    const named = await requireStockLocation(
+      db,
+      directory,
+      workspaceId,
+      location,
+    );
     assertCanAtLocation(access, named, "update");
     const materials = await directory.materials(db, workspaceId, [materialId]);
     if (!materials.has(materialId))
@@ -89,7 +94,14 @@ export class StockSettingsCommands {
           },
         },
       });
-      await upsertSetting(tx, workspaceId, location, materialId, actor.userId, data);
+      await upsertSetting(
+        tx,
+        workspaceId,
+        location,
+        materialId,
+        actor.userId,
+        data,
+      );
       await recordAudit(tx, {
         workspaceId,
         actorUserId: actor.userId,
@@ -119,7 +131,13 @@ export class StockSettingsCommands {
       return stockLevelWatcher().afterSettingChanged(tx, workspaceId, key);
     });
     if (events.length > 0) await this.deps.dispatcher.dispatch(events);
-    const row = await inventoryRowOf(db, directory, workspaceId, location, materialId);
+    const row = await inventoryRowOf(
+      db,
+      directory,
+      workspaceId,
+      location,
+      materialId,
+    );
     if (row == null)
       throw new DomainError(
         "MATERIAL_NOT_FOUND",

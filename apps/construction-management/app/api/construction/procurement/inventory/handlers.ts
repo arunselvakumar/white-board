@@ -88,7 +88,10 @@ export async function requireInventoryAccess(
 }
 
 /** The xlsx download headers. */
-export function xlsxResponse(bytes: Uint8Array<ArrayBuffer>, fileName: string): Response {
+export function xlsxResponse(
+  bytes: Uint8Array<ArrayBuffer>,
+  fileName: string,
+): Response {
   return new Response(bytes, {
     headers: {
       "content-type": XLSX_CONTENT_TYPE,

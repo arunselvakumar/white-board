@@ -104,7 +104,11 @@ export async function inTransit(
     map.set(id, new Prisma.Decimal(map.get(id) ?? 0).plus(quantity).toFixed(3));
   };
   for (const row of transfers)
-    add(row.direction === "in" ? inbound : outbound, row.materialId, row.quantity);
+    add(
+      row.direction === "in" ? inbound : outbound,
+      row.materialId,
+      row.quantity,
+    );
   for (const row of notes)
     add(
       location.kind === "project" ? inbound : outbound,

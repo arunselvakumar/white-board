@@ -5,7 +5,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -59,8 +59,14 @@ const schema = z
           quantity: z
             .string()
             .trim()
-            .regex(QUANTITY_PATTERN, "Enter a quantity with at most 3 decimals.")
-            .refine((value) => Number(value) > 0, "Enter a quantity more than 0."),
+            .regex(
+              QUANTITY_PATTERN,
+              "Enter a quantity with at most 3 decimals.",
+            )
+            .refine(
+              (value) => Number(value) > 0,
+              "Enter a quantity more than 0.",
+            ),
           remark: z.string().max(500, "Use at most 500 characters."),
         }),
       )
@@ -155,7 +161,7 @@ export function TransferForm({
           },
   });
   const lines = useFieldArray({ control: form.control, name: "lines" });
-  const values = form.watch();
+  const values = useWatch({ control: form.control }) as Values;
   const errors = form.formState.errors;
   const from = parseLocationValue(values.from);
   const chosen = values.lines.map((line) => line.materialId).filter(Boolean);
@@ -208,7 +214,8 @@ export function TransferForm({
         quantity: line.quantity.trim(),
         remark: line.remark.trim() === "" ? null : line.remark.trim(),
       })),
-      receiverName: input.receiverName.trim() === "" ? null : input.receiverName.trim(),
+      receiverName:
+        input.receiverName.trim() === "" ? null : input.receiverName.trim(),
       remark: input.remark.trim() === "" ? null : input.remark.trim(),
     };
     try {
@@ -222,9 +229,10 @@ export function TransferForm({
       router.push(hrefFor(saved.id));
     } catch (caught) {
       if (caught instanceof QueryHttpError) {
-        const field =
-          SERVER_FIELDS[caught.code as keyof typeof SERVER_FIELDS] ?? null;
-        if (field != null) {
+        const field: string | undefined = (
+          SERVER_FIELDS as Record<string, "to" | "transferDate" | undefined>
+        )[caught.code];
+        if (field === "to" || field === "transferDate") {
           form.setError(field, { message: caught.message });
           return;
         }
@@ -284,7 +292,9 @@ export function TransferForm({
   return (
     <form
       noValidate
-      aria-label={transfer == null ? "New Material Transfer" : `Edit ${transfer.number}`}
+      aria-label={
+        transfer == null ? "New Material Transfer" : `Edit ${transfer.number}`
+      }
       className="w-full max-w-4xl space-y-6"
       onSubmit={(event) => {
         event.preventDefault();
@@ -317,7 +327,9 @@ export function TransferForm({
             const lineErrors = errors.lines?.[index];
             const id = (name: string) => `transfer-${String(index)}-${name}`;
             const stock =
-              line == null || line.materialId === "" ? null : (available?.get(line.materialId) ?? null);
+              line == null || line.materialId === ""
+                ? null
+                : (available?.get(line.materialId) ?? null);
             const unit = line == null ? undefined : uomOf.get(line.materialId);
             const short =
               stock != null &&
@@ -339,7 +351,9 @@ export function TransferForm({
                       <MaterialPicker
                         id={id("material")}
                         value={control.value === "" ? null : control.value}
-                        excludeIds={chosen.filter((value) => value !== control.value)}
+                        excludeIds={chosen.filter(
+                          (value) => value !== control.value,
+                        )}
                         invalid={lineErrors?.materialId != null}
                         onChange={(material) => {
                           control.onChange(material?.id ?? "");
@@ -350,7 +364,11 @@ export function TransferForm({
                   <FieldError message={lineErrors?.materialId?.message} />
                   {stock != null && (
                     <p
-                      className={short ? "text-destructive text-xs" : "text-muted-foreground text-xs"}
+                      className={
+                        short
+                          ? "text-destructive text-xs"
+                          : "text-muted-foreground text-xs"
+                      }
                     >
                       Available: {formatQuantity(stock)}
                       {unit == null ? "" : ` ${unit}`}

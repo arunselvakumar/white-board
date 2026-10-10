@@ -44,7 +44,10 @@ import {
   type StockMovementKind,
 } from "../domain/stock-movement";
 import { requireStockLocation } from "./inventory-locations";
-import { loadBackdatedCheck, type ProcurementActor } from "./procurement-guards";
+import {
+  loadBackdatedCheck,
+  type ProcurementActor,
+} from "./procurement-guards";
 import { stockLedger } from "./stock-ledger-instance";
 
 type Tx = Prisma.TransactionClient;
@@ -68,7 +71,8 @@ export type StockMovement = {
   updatedAt: Date;
 };
 
-type MovementRow = Prisma.ConstructionProcurementStockMovementGetPayload<object>;
+type MovementRow =
+  Prisma.ConstructionProcurementStockMovementGetPayload<object>;
 
 function toMovement(row: MovementRow): StockMovement {
   return {
@@ -230,7 +234,7 @@ export class StockMovementCommands {
         (index) => `lines.${String(index)}.materialId`,
       ),
     ]);
-    const module = movementBackdatedModule(input.kind);
+    const backdatedModule = movementBackdatedModule(input.kind);
     const lines: {
       id: string;
       date: CalendarDate;
@@ -242,7 +246,7 @@ export class StockMovementCommands {
     for (const [index, line] of input.lines.entries()) {
       const at = (field: string) => `lines.${String(index)}.${field}`;
       assertMovementDate(line.date, today, at("date"));
-      check(module, "create", line.date);
+      check(backdatedModule, "create", line.date);
       lines.push({
         id: newId(),
         date: line.date,
@@ -288,18 +292,16 @@ export class StockMovementCommands {
       const written = await stockLedger().post(
         tx,
         { workspaceId, by: actor.userId },
-        lines.map(
-          (line): StockPosting => ({
-            location,
-            materialId: line.materialId,
-            entryDate: line.date,
-            type: input.kind,
-            quantity: line.quantity,
-            source: { type: "stock_movement", id: line.id },
-            siteLocation: line.siteLocation,
-            remark: line.remark,
-          }),
-        ),
+        lines.map((line): StockPosting => ({
+          location,
+          materialId: line.materialId,
+          entryDate: line.date,
+          type: input.kind,
+          quantity: line.quantity,
+          source: { type: "stock_movement", id: line.id },
+          siteLocation: line.siteLocation,
+          remark: line.remark,
+        })),
         { materialNames: names },
       );
       const created = await tx.constructionProcurementStockMovement.findMany({
@@ -352,7 +354,11 @@ export class StockMovementCommands {
     ]);
     assertMovementDate(input.date, today);
     check("current_inventory", "create", input.date);
-    const reason = requiredText(input.reason, "ADJUSTMENT_REASON_REQUIRED", "reason");
+    const reason = requiredText(
+      input.reason,
+      "ADJUSTMENT_REASON_REQUIRED",
+      "reason",
+    );
     const id = newId();
     const ledger = stockLedger();
     const names = new Map(
@@ -413,7 +419,10 @@ export class StockMovementCommands {
         action: "stock_movement.created",
         entityType: "stock_movement",
         entityId: id,
-        after: { ...snapshot(toMovement(created)), countedQty: input.countedQty },
+        after: {
+          ...snapshot(toMovement(created)),
+          countedQty: input.countedQty,
+        },
       });
       return { row: created, events: written.events };
     });
@@ -469,10 +478,10 @@ export class StockMovementCommands {
       companyToday(this.db, workspaceId),
       this.deps.directory.materials(this.db, workspaceId, [before.materialId]),
     ]);
-    const module = movementBackdatedModule(before.kind);
+    const backdatedModule = movementBackdatedModule(before.kind);
     assertMovementDate(input.date, today);
-    check(module, "edit", before.date);
-    if (input.date !== before.date) check(module, "edit", input.date);
+    check(backdatedModule, "edit", before.date);
+    if (input.date !== before.date) check(backdatedModule, "edit", input.date);
     const quantity = movementQuantity(input.quantity);
     const siteLocation = await this.siteLocation(
       workspaceId,
@@ -525,9 +534,10 @@ export class StockMovementCommands {
         ],
         { materialNames: names },
       );
-      const after = await tx.constructionProcurementStockMovement.findUniqueOrThrow(
-        { where: { id } },
-      );
+      const after =
+        await tx.constructionProcurementStockMovement.findUniqueOrThrow({
+          where: { id },
+        });
       await recordAudit(tx, {
         workspaceId,
         actorUserId: actor.userId,
@@ -566,7 +576,12 @@ export class StockMovementCommands {
     const events = await this.db.$transaction(async (tx) => {
       const now = new Date();
       const updated = await tx.constructionProcurementStockMovement.updateMany({
-        where: { id, workspaceId, deletedAt: null, updatedAt: expectedUpdatedAt },
+        where: {
+          id,
+          workspaceId,
+          deletedAt: null,
+          updatedAt: expectedUpdatedAt,
+        },
         data: {
           deletedAt: now,
           deletedBy: actor.userId,
@@ -626,7 +641,13 @@ export class StockMovementCommands {
       .filter((cell) => cell != null)
       .map((cell) => String(cell).trim().toLowerCase())
       .filter((name) => name !== "");
-    const plan = await this.plan(this.db, workspaceId, location, input.sheet, names);
+    const plan = await this.plan(
+      this.db,
+      workspaceId,
+      location,
+      input.sheet,
+      names,
+    );
     if (input.dryRun) return { ...plan, imported: 0, estimatesSet: 0 };
     if (plan.errorCount > 0)
       throw new DomainError(
@@ -650,7 +671,13 @@ export class StockMovementCommands {
         openings.map((row) => ({ location, materialId: row.materialId })),
       );
       // Checked again under the lock: another write may have landed.
-      const fresh = await this.plan(tx, workspaceId, location, input.sheet, names);
+      const fresh = await this.plan(
+        tx,
+        workspaceId,
+        location,
+        input.sheet,
+        names,
+      );
       if (fresh.errorCount > 0)
         throw new DomainError(
           "IMPORT_HAS_ERRORS",
@@ -679,26 +706,33 @@ export class StockMovementCommands {
       const written = await ledger.post(
         tx,
         { workspaceId, by: actor.userId },
-        movements.map(
-          ({ id, row }): StockPosting => ({
-            location,
-            materialId: row.materialId,
-            entryDate: openingDate,
-            type: "opening",
-            quantity: row.quantity,
-            source: { type: "stock_movement", id },
-            remark: "Imported opening stock",
-          }),
-        ),
+        movements.map(({ id, row }): StockPosting => ({
+          location,
+          materialId: row.materialId,
+          entryDate: openingDate,
+          type: "opening",
+          quantity: row.quantity,
+          source: { type: "stock_movement", id },
+          remark: "Imported opening stock",
+        })),
       );
       const estimates = fresh.rows.filter(
-        (row): row is typeof row & { materialId: string; estimatedQty: string } =>
+        (
+          row,
+        ): row is typeof row & { materialId: string; estimatedQty: string } =>
           row.materialId != null && row.estimatedQty != null,
       );
       for (const row of estimates)
-        await upsertSetting(tx, workspaceId, location, row.materialId, actor.userId, {
-          estimatedQty: new Prisma.Decimal(row.estimatedQty),
-        });
+        await upsertSetting(
+          tx,
+          workspaceId,
+          location,
+          row.materialId,
+          actor.userId,
+          {
+            estimatedQty: new Prisma.Decimal(row.estimatedQty),
+          },
+        );
       await recordAudit(tx, {
         workspaceId,
         actorUserId: actor.userId,
@@ -786,7 +820,10 @@ async function materialsByName(
       AND m.disabled_at IS NULL
       AND lower(m.name) = ANY(${unique}::text[])
     ORDER BY m.created_at ASC`;
-  const byName = new Map<string, { id: string; name: string; uomName: string }>();
+  const byName = new Map<
+    string,
+    { id: string; name: string; uomName: string }
+  >();
   for (const row of rows) {
     const key = row.name.toLowerCase();
     if (!byName.has(key)) byName.set(key, row);

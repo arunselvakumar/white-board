@@ -39,7 +39,10 @@ export async function GET(request: Request): Promise<Response> {
       before: query.before == null ? undefined : decodeListCursor(query.before),
     });
     return Response.json(
-      toTransferListResponse(page, { after: query.after, before: query.before }),
+      toTransferListResponse(page, {
+        after: query.after,
+        before: query.before,
+      }),
     );
   } catch (error) {
     return mapError(error);

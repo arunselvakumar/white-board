@@ -42,12 +42,21 @@ export async function GET(request: Request): Promise<Response> {
       location,
     );
     const [page, material] = await Promise.all([
-      inventoryHistory(prisma, session.workspaceId, location, query.materialId, {
-        limit: query.limit,
-        after: query.after == null ? undefined : decodeHistoryCursor(query.after),
-        before:
-          query.before == null ? undefined : decodeHistoryCursor(query.before),
-      }),
+      inventoryHistory(
+        prisma,
+        session.workspaceId,
+        location,
+        query.materialId,
+        {
+          limit: query.limit,
+          after:
+            query.after == null ? undefined : decodeHistoryCursor(query.after),
+          before:
+            query.before == null
+              ? undefined
+              : decodeHistoryCursor(query.before),
+        },
+      ),
       inventoryRowOf(
         prisma,
         procurementDirectory,
