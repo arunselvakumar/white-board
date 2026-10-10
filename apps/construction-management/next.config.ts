@@ -22,10 +22,21 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "26mb",
   },
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
-  // Payslip PDFs embed Noto fonts read from node_modules at run time
-  // (`src/shared-kernel/pdf/noto-text.ts`), which tracing cannot see.
+  // Payslip and procurement PDFs embed Noto fonts read from node_modules at
+  // run time (`src/shared-kernel/pdf/noto-text.ts`), which tracing cannot see.
   outputFileTracingIncludes: {
     "/api/construction/hrms/salaries/**/*": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+    // Procurement PDFs (M5): Purchase Request, Purchase Order and
+    // Goods Receipt.
+    "/api/construction/procurement/purchase-requests/**/*": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+    "/api/construction/procurement/purchase-orders/**/*": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+    "/api/construction/procurement/goods-receipts/[id]/pdf": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
   },

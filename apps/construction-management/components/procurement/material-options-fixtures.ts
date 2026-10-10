@@ -1,3 +1,5 @@
+import { within } from "storybook/test";
+
 import type { ApiCall } from "../../.storybook/mocks/api";
 import type {
   MaterialCategoryItem,
@@ -226,4 +228,40 @@ export function materialCreateHandler(
       { status: 409 },
     );
   return Response.json(createdMaterial(input), { status: 201 });
+}
+
+type PickerEvents = {
+  click: (element: Element) => Promise<void>;
+};
+
+/**
+ * Chooses a Material in a `MaterialPicker` from a story: opens the
+ * combobox labelled `label` in `scope` (a `within(…)` of the form or
+ * dialog) and clicks the option whose name starts with `name` (a fixture
+ * name, or a fixture id). Options render in a portal on the body.
+ */
+export async function pickMaterial(
+  scope: {
+    getByRole: (
+      role: "combobox",
+      options: { name: string | RegExp },
+    ) => HTMLElement;
+  },
+  userEvent: PickerEvents,
+  name: string,
+  label: string | RegExp = "Material",
+): Promise<void> {
+  const known = MATERIAL_OPTIONS.find((option) => option.id === name);
+  const prefix = (known?.name ?? name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  await userEvent.click(scope.getByRole("combobox", { name: label }));
+  await userEvent.click(
+    await within(document.body).findByRole("option", {
+      name: new RegExp(`^${prefix}`),
+    }),
+  );
+}
+
+/** The fixture name of a Material id, for asserting what a picker shows. */
+export function materialNameOf(id: string): string {
+  return MATERIAL_OPTIONS.find((option) => option.id === id)?.name ?? id;
 }
