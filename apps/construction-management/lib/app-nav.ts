@@ -15,7 +15,7 @@ export const APP_NAV = [
     label: "Workspace",
     title: "Workspace",
     description:
-      "Work across all Projects will show here: HRMS, Central Store, Central Payment and Central Reports.",
+      "Work across all your Projects: HRMS for your staff's attendance, leave and salary. Central Store, Central Payment and Central Reports will show here as they are built.",
   },
   {
     href: "/app/masters",
