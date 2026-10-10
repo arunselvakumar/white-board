@@ -32,6 +32,11 @@ export const ListConstructionProjectsProjectsResponseModel = z.object({
     .describe(
       "Visible Projects per status, ignoring `status`: the filter chips.",
     ),
+  financial: z
+    .boolean()
+    .describe(
+      "Whether the caller has the Project menu's Financial flag: sees and sets the order value and the budget. Without it they are null, and the forms leave them out.",
+    ),
 });
 
 export type ListConstructionProjectsProjectsResponseModel = z.infer<

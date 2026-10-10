@@ -48,11 +48,14 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
+/** Add Project; a Project Type is required since CM-401. */
 async function create(
   cookie: string,
   body: Record<string, unknown>,
 ): Promise<Project> {
-  const response = await createProject(jsonRequest(BASE, cookie, body));
+  const response = await createProject(
+    jsonRequest(BASE, cookie, { projectType: "residential", ...body }),
+  );
   expect(response.status).toBe(StatusCodes.CREATED);
   return json<Project>(response);
 }
@@ -86,6 +89,7 @@ describe("Projects HTTP (CM-204)", () => {
       items: [],
       total: 0,
       counts: { all: 0, ongoing: 0, not_started: 0, on_hold: 0, completed: 0 },
+      financial: true,
     });
 
     const kumari = await create(owner.cookie, {
@@ -198,7 +202,10 @@ describe("Projects HTTP (CM-204)", () => {
     await create(owner.cookie, { name: "Kumari Heights" });
     const attempt = async (body: Record<string, unknown>) => {
       const response = await createProject(
-        jsonRequest(BASE, owner.cookie, body),
+        jsonRequest(BASE, owner.cookie, {
+          projectType: "residential",
+          ...body,
+        }),
       );
       return {
         status: response.status,
@@ -292,7 +299,10 @@ describe("Projects HTTP (CM-204)", () => {
       })),
     });
     const refused = await createProject(
-      jsonRequest(BASE, owner.cookie, { name: "Project 11" }),
+      jsonRequest(BASE, owner.cookie, {
+        name: "Project 11",
+        projectType: "residential",
+      }),
     );
     expect(refused.status).toBe(StatusCodes.PAYMENT_REQUIRED);
     expect(await json(refused)).toMatchObject({
@@ -544,6 +554,9 @@ describe("Projects HTTP (CM-204)", () => {
       ["/api/construction/projects/projects/{id}", "get"],
       ["/api/construction/projects/projects/{id}/update", "post"],
       ["/api/construction/projects/projects/{id}/delete", "post"],
+      ["/api/construction/projects/projects/{id}/logo", "get"],
+      ["/api/construction/projects/projects/{id}/logo", "post"],
+      ["/api/construction/projects/projects/{id}/logo/remove", "post"],
     ] as const)
       expect(spec.paths[path]?.[method]?.tags).toEqual([
         "Construction · Projects",

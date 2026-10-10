@@ -1,8 +1,11 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import type { ObjectStorage } from "@/src/shared-kernel/files";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
 import { ProjectHandlers } from "../application/project-handlers";
+import { ProjectLogos } from "../application/project-logos";
 import { PrismaCustomFieldLabels } from "./prisma-custom-field-labels";
 import { PrismaProjectRepository } from "./prisma-project-repository";
 import { PrismaProjectUsage } from "./prisma-project-usage";
@@ -22,6 +25,21 @@ export function createProjectHandlers(deps: {
     deps.plan,
     new PrismaProjectUsage(db),
     new PrismaCustomFieldLabels(db),
+    deps.clock,
+  );
+}
+
+/** The Project logo's composition (CM-401); storage counts against the plan. */
+export function createProjectLogos(deps: {
+  plan: PlanGate;
+  prisma?: PrismaClient;
+  storage?: ObjectStorage;
+  clock?: () => Date;
+}): ProjectLogos {
+  return new ProjectLogos(
+    new PrismaProjectRepository(deps.prisma ?? prisma),
+    deps.storage ?? objectStorage(),
+    deps.plan,
     deps.clock,
   );
 }

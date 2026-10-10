@@ -17,7 +17,8 @@ export const dynamic = "force-dynamic";
 /**
  * Edit Project (CM-204): every field at once; a contract detail or the
  * custom-field list left out keeps what is stored (CM-413), and without
- * the Financial flag the order value is kept. 409 `PROJECT_CHANGED` when
+ * the Financial flag the order value and the budget are kept; the Project
+ * Type left out is kept too (CM-401). 409 `PROJECT_CHANGED` when
  * `expectedUpdatedAt` is stale; 404 for a Member not assigned to it.
  */
 export async function POST(

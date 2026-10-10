@@ -8,7 +8,10 @@ import {
   projectDetails,
   type ProjectDetailsInput,
 } from "./project";
-import { PROJECT_ORDER_VALUE_MAX } from "./project-contract-rules";
+import {
+  PROJECT_BUDGET_MAX,
+  PROJECT_ORDER_VALUE_MAX,
+} from "./project-contract-rules";
 
 const NOW = new Date("2026-10-08T00:00:00Z");
 const LATER = new Date("2026-10-09T00:00:00Z");
@@ -17,7 +20,7 @@ function project(details: Partial<ProjectDetailsInput> = {}) {
   return Project.create({
     id: "p1",
     workspaceId: "company-1",
-    details: { name: "Kumari Heights", ...details },
+    details: { name: "Kumari Heights", projectType: "residential", ...details },
     by: "user-1",
     now: NOW,
   });
@@ -436,5 +439,130 @@ describe("Project custom fields (CM-413)", () => {
       code: "PROJECT_CUSTOM_FIELDS_LIMIT",
       details: { max: 20 },
     });
+  });
+});
+
+describe("Project Type, Budget and logo (CM-401)", () => {
+  it("needs a Project Type on a new Project", () => {
+    expect(codeOf(() => project({ projectType: undefined }))).toBe(
+      "PROJECT_TYPE_REQUIRED",
+    );
+    expect(codeOf(() => project({ projectType: null }))).toBe(
+      "PROJECT_TYPE_REQUIRED",
+    );
+    expect(codeOf(() => project({ projectType: " " }))).toBe(
+      "PROJECT_TYPE_REQUIRED",
+    );
+    expect(codeOf(() => project({ projectType: "tower" }))).toBe(
+      "PROJECT_TYPE_INVALID",
+    );
+  });
+
+  it("starts with no budget, no logo and the Company logo on reports", () => {
+    const item = project({ projectType: "commercial" });
+    expect(item.profile).toEqual({
+      projectType: "commercial",
+      budgetValue: null,
+      useLogoInReports: false,
+      logoKey: null,
+    });
+  });
+
+  it("takes its structure from the type: Wings or Locations", () => {
+    expect(project({ projectType: "villas" }).structure).toBe("wings");
+    expect(project({ projectType: "infrastructure" }).structure).toBe(
+      "locations",
+    );
+    expect(project({ projectType: "interiors" }).structure).toBe("locations");
+  });
+
+  it("keeps the type, budget and report logo when an edit leaves them out", () => {
+    const item = project({
+      projectType: "residential",
+      budgetValue: 3_20_00_000_00,
+      useLogoInReports: true,
+    });
+    item.update({ name: "Kumari Heights", status: "on_hold" }, "user-2", LATER);
+    expect(item.profile).toMatchObject({
+      projectType: "residential",
+      budgetValue: 3_20_00_000_00,
+      useLogoInReports: true,
+    });
+    item.update(
+      {
+        name: "Kumari Heights",
+        projectType: "mixed_use",
+        budgetValue: null,
+        useLogoInReports: false,
+      },
+      "user-2",
+      LATER,
+    );
+    expect(item.profile).toMatchObject({
+      projectType: "mixed_use",
+      budgetValue: null,
+      useLogoInReports: false,
+    });
+  });
+
+  it("refuses an edit that takes the type away, but keeps a pre-M4 Project's none", () => {
+    const item = project();
+    expect(
+      codeOf(() => {
+        item.update({ name: "Kumari Heights", projectType: null }, "u", LATER);
+      }),
+    ).toBe("PROJECT_TYPE_REQUIRED");
+    const old = Project.reconstitute({
+      ...project().profile,
+      ...project().details,
+      ...project().contract,
+      customFields: [],
+      projectType: null,
+      id: "p0",
+      workspaceId: "company-1",
+      createdAt: NOW,
+      updatedAt: NOW,
+      createdBy: "user-1",
+      updatedBy: "user-1",
+      deletedAt: null,
+    });
+    old.update({ name: "Old Site", status: "completed" }, "user-2", LATER);
+    expect(old.projectType).toBeNull();
+    expect(old.structure).toBe("wings");
+  });
+
+  it("takes a budget of 0 to ₹1,000 crore in paise", () => {
+    expect(project({ budgetValue: 0 }).budgetValue).toBe(0);
+    expect(project({ budgetValue: PROJECT_BUDGET_MAX }).budgetValue).toBe(
+      PROJECT_BUDGET_MAX,
+    );
+    for (const budgetValue of [-1, 12.5, PROJECT_BUDGET_MAX + 1])
+      expect(codeOf(() => project({ budgetValue }))).toBe(
+        "PROJECT_BUDGET_INVALID",
+      );
+  });
+
+  it("sets, replaces and removes the logo, handing back the old key", () => {
+    const item = project();
+    expect(item.setLogo("companies/c/project-logos/p1/a.png", "u", LATER)).toBe(
+      null,
+    );
+    expect(item.setLogo("companies/c/project-logos/p1/b.png", "u", LATER)).toBe(
+      "companies/c/project-logos/p1/a.png",
+    );
+    expect(item.logoKey).toBe("companies/c/project-logos/p1/b.png");
+    expect(item.updatedAt).toEqual(LATER);
+    expect(item.removeLogo("u", LATER)).toBe(
+      "companies/c/project-logos/p1/b.png",
+    );
+    expect(item.logoKey).toBeNull();
+    expect(item.removeLogo("u", LATER)).toBeNull();
+  });
+
+  it("keeps the logo through an edit of the form", () => {
+    const item = project();
+    item.setLogo("companies/c/project-logos/p1/a.png", "u", NOW);
+    item.update({ name: "Kumari Heights" }, "u", LATER);
+    expect(item.logoKey).toBe("companies/c/project-logos/p1/a.png");
   });
 });

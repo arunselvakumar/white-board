@@ -8,6 +8,12 @@ export const PROJECT_CLIENT_NAME_MAX = 120;
 export const PROJECT_REFERENCE_MAX = 60;
 /** ₹1,000 crore in paise; a guard against typos, not a business rule. */
 export const PROJECT_ORDER_VALUE_MAX = 1_000_00_00_000 * 100;
+/**
+ * The Project's Budget (CM-401) is the Company's own figure, not a contract
+ * paper, but it has the same guard and the same Financial rule as the
+ * Order Value.
+ */
+export const PROJECT_BUDGET_MAX = PROJECT_ORDER_VALUE_MAX;
 
 export const PROJECT_CUSTOM_FIELDS_MAX = 20;
 export const PROJECT_CUSTOM_FIELD_LABEL_MAX = 60;

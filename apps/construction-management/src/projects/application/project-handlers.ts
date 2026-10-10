@@ -32,6 +32,25 @@ function visibleIds(viewer: ProjectViewer): ReadonlySet<string> | null {
   return viewer.role === "owner" ? null : viewer.projectIds;
 }
 
+/**
+ * A live Project the viewer may see; any other is "not found", so a
+ * Member cannot tell another Project exists.
+ */
+export async function loadVisibleProject(
+  projects: Pick<ProjectRepository, "findById">,
+  viewer: ProjectViewer,
+  id: string,
+): Promise<Project> {
+  const ids = visibleIds(viewer);
+  const found =
+    ids == null || ids.has(id)
+      ? await projects.findById(viewer.workspaceId, id)
+      : null;
+  if (found == null)
+    throw notFound("PROJECT_NOT_FOUND", "This Project was not found.");
+  return found;
+}
+
 function countByStatus(projects: readonly Project[]): ProjectStatusCounts {
   const counts: ProjectStatusCounts = {
     all: projects.length,
@@ -44,11 +63,12 @@ function countByStatus(projects: readonly Project[]): ProjectStatusCounts {
   return counts;
 }
 
-/** The audit row's before/after; plain JSON (orderValue is a number). */
-function snapshot(project: Project) {
+/** The audit row's before/after; plain JSON (amounts are numbers). */
+export function projectSnapshot(project: Project) {
   return {
     ...project.details,
     ...project.contract,
+    ...project.profile,
     customFields: project.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -60,16 +80,20 @@ function snapshot(project: Project) {
 export const CUSTOM_FIELD_LABELS_LIMIT = 50;
 
 /**
- * Without the Project menu's Financial flag the order value is not the
- * caller's to set: dropped, so a new Project has none and an edit keeps
- * the stored one.
+ * Without the Project menu's Financial flag the order value and the
+ * budget are not the caller's to set: dropped, so a new Project has none
+ * and an edit keeps the stored ones.
  */
-function withoutOrderValue(
+function withoutAmounts(
   details: ProjectDetailsInput,
   financial: boolean,
 ): ProjectDetailsInput {
   if (financial) return details;
-  const { orderValue: _ignored, ...rest } = details;
+  const {
+    orderValue: _orderValue,
+    budgetValue: _budgetValue,
+    ...rest
+  } = details;
   return rest;
 }
 
@@ -89,15 +113,8 @@ export class ProjectHandlers {
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
-  private async load(viewer: ProjectViewer, id: string): Promise<Project> {
-    const ids = visibleIds(viewer);
-    const found =
-      ids == null || ids.has(id)
-        ? await this.projects.findById(viewer.workspaceId, id)
-        : null;
-    if (found == null)
-      throw notFound("PROJECT_NOT_FOUND", "This Project was not found.");
-    return found;
+  private load(viewer: ProjectViewer, id: string): Promise<Project> {
+    return loadVisibleProject(this.projects, viewer, id);
   }
 
   private audit(
@@ -113,7 +130,7 @@ export class ProjectHandlers {
       entityType: "project",
       entityId: project.id,
       before,
-      after: project.deletedAt == null ? snapshot(project) : undefined,
+      after: project.deletedAt == null ? projectSnapshot(project) : undefined,
       occurredAt: project.updatedAt,
     };
   }
@@ -156,8 +173,10 @@ export class ProjectHandlers {
   }
 
   /**
-   * New Project; 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118).
-   * `financial`: whether the caller may set the order value.
+   * New Project with its seed drawing albums and testing items; 400
+   * `PROJECT_TYPE_REQUIRED` without a type, 402 `PLAN_LIMIT_EXCEEDED`
+   * beyond the plan (CM-118). `financial`: whether the caller may set the
+   * order value and the budget.
    */
   async create(input: {
     workspaceId: string;
@@ -169,7 +188,7 @@ export class ProjectHandlers {
     const project = Project.create({
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
-      details: withoutOrderValue(input.details, input.financial),
+      details: withoutAmounts(input.details, input.financial),
       by: input.by,
       now,
     });
@@ -183,7 +202,7 @@ export class ProjectHandlers {
 
   /**
    * Edit Project; 409 `PROJECT_CHANGED` when someone saved in between.
-   * Without `financial` the stored order value stays as it is.
+   * Without `financial` the stored order value and budget stay as they are.
    */
   async update(input: {
     viewer: ProjectViewer;
@@ -194,9 +213,9 @@ export class ProjectHandlers {
     expectedUpdatedAt: Date;
   }): Promise<ProjectReadModel> {
     const project = await this.load(input.viewer, input.id);
-    const before = snapshot(project);
+    const before = projectSnapshot(project);
     project.update(
-      withoutOrderValue(input.details, input.financial),
+      withoutAmounts(input.details, input.financial),
       input.by,
       this.clock(),
     );
@@ -208,7 +227,10 @@ export class ProjectHandlers {
     return toProjectReadModel(project);
   }
 
-  /** Tombstone; 409 `PROJECT_IN_USE` while site records point at it. */
+  /**
+   * Tombstone; 409 `PROJECT_IN_USE` while site records, documents, Wings,
+   * Locations, drawings or testing reports point at it.
+   */
   async delete(input: {
     viewer: ProjectViewer;
     id: string;
@@ -218,9 +240,9 @@ export class ProjectHandlers {
     if (await this.usage.isInUse(project.workspaceId, project.id))
       throw conflict(
         "PROJECT_IN_USE",
-        "Labours, vendors, attendance, payments or documents are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
+        "Labours, vendors, attendance, payments, documents, Wings, Locations, drawings or testing reports are recorded on this Project, so it cannot be deleted. Mark it Completed instead.",
       );
-    const before = snapshot(project);
+    const before = projectSnapshot(project);
     project.delete(input.by, this.clock());
     await this.projects.delete(
       project,

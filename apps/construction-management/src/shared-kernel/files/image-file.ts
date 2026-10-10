@@ -17,10 +17,14 @@ const EXTENSIONS: Record<ImageContentType, string> = {
 
 const MB = 1024 * 1024;
 
-/** Size limits per use (`modules/01`: profile photo ≤ 10 MB). */
+/**
+ * Size limits per use (`modules/01`: profile photo ≤ 10 MB; ADR CM-0013 §2:
+ * Project logo ≤ 2 MB like the Company's).
+ */
 export const IMAGE_LIMITS = {
   company_logo: 2 * MB,
   member_photo: 10 * MB,
+  project_logo: 2 * MB,
 } as const;
 
 export type ImageKind = keyof typeof IMAGE_LIMITS;
