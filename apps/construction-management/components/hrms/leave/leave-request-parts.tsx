@@ -110,7 +110,7 @@ export function LeaveRequestRow({
         summary
       )}
       {actions != null ? (
-        <div className="flex flex-wrap gap-2">{actions}</div>
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">{actions}</div>
       ) : null}
     </li>
   );
