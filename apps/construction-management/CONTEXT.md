@@ -216,6 +216,14 @@ A Wing's floors × units grid, top floor first.
 A named place on a non-building Project (road, pipeline, interiors): "Chainage 0+000 – 2+500", "Culvert C3", with an optional description, in the Team Member's order. Not a Unit, an Amenity or an office location.
 _Avoid_: site, area, zone
 
+**Location Type**:
+Where a site entry happened, chosen first on every entry form: Wing (with any of its Floors and Units), Amenities, Common Developments or Location. A Project offers only the types it has rows for (ADR CM-0013 §7).
+_Avoid_: location kind, place type
+
+**LocationRef**:
+The code name of a site entry's location: its Location Type and the ids it points at, checked against the entry's Project. On screens it is shown as one line ("Wing A · Ground Floor · Unit G01", "Amenity · Swimming Pool").
+_Avoid_: address, position (in UI copy)
+
 **Workspace (area)**:
 The cross-project area of the app: HRMS, Central Payment, Central Store, Central Reports, Central Inventory. One of the three top-level areas. Not the tenant — that is the Company.
 
