@@ -1,0 +1,53 @@
+apps/construction-management/app/app/workspace/hrms/configuration/employees/page.tsx
+  s_6a70f1cb429bb6::t_5e7c58ce9c39d4 3,10,12
+apps/construction-management/app/app/workspace/hrms/configuration/salary-structures/[id]/page.tsx
+  s_6a70f1cb429bb6::t_6fbc3648439806 1-15
+apps/construction-management/app/app/workspace/hrms/configuration/salary-structures/new/page.tsx
+  s_6a70f1cb429bb6::t_add87cb2f1cc0f 1-10
+apps/construction-management/app/app/workspace/hrms/configuration/salary-structures/page.tsx
+  s_6a70f1cb429bb6::t_a82d1946c440f8 3,10,12
+apps/construction-management/components/hrms/employee-salary-grid.stories.tsx
+  s_6a70f1cb429bb6::t_412cb3712c5ee7 1-364
+apps/construction-management/components/hrms/employee-salary-grid.tsx
+  s_6a70f1cb429bb6::t_676445eb401641 1-806
+apps/construction-management/components/hrms/salary-structure-form.stories.tsx
+  s_6a70f1cb429bb6::t_93e79784921a37 1-231
+apps/construction-management/components/hrms/salary-structure-form.tsx
+  s_6a70f1cb429bb6::t_74a3234fd95e4b 1-1044
+apps/construction-management/components/hrms/salary-structures-list.stories.tsx
+  s_6a70f1cb429bb6::t_63a6d5e2ae4b16 1-132
+apps/construction-management/components/hrms/salary-structures-list.tsx
+  s_6a70f1cb429bb6::t_b9c8b1f0be747a 1-248
+apps/construction-management/src/hrms/application/employee-salary-handlers.ts
+  s_6a70f1cb429bb6::t_4ec2d4eac7037e 300,329
+apps/construction-management/src/queries/hrms-salary-setup.ts
+  s_6a70f1cb429bb6::t_70d2bd33a8ed5e 1-117
+apps/construction-management/components/hrms/salary-sample.tsx
+  s_60825d835c0b42::t_d8d625b42929eb 1-197
+apps/construction-management/components/hrms/salary-setup-fixtures.ts
+  s_60825d835c0b42::t_fdfc567d54668f 1-186
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b67af669bc7e9685598c79f623c1994f1b249b80",
+  "prompts": {},
+  "sessions": {
+    "s_60825d835c0b42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac2b3ef6e4d561b0f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
