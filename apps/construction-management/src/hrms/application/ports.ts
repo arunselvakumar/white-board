@@ -2,7 +2,13 @@ import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
 import type { MonthKey } from "../domain/calendar";
 import type { HrmsSettings } from "../domain/hrms-settings";
-import type { EsiRate, PfRate, PtCharge, PtGender } from "../domain/statutory";
+import type {
+  EsiRate,
+  PfRate,
+  PtCharge,
+  PtGender,
+  PtSlab,
+} from "../domain/statutory";
 
 /**
  * What the hrms context reads from other contexts and from its own later
@@ -248,4 +254,10 @@ export type StatutoryRates = {
     gross: number,
     gender?: PtGender,
   ): Promise<PtCharge>;
+  /**
+   * A state's slabs with `effectiveFrom` on or before the month's last day,
+   * for the pure salary calculator (CM-316) and the structure preview
+   * (CM-314), which apply `ptFor` themselves.
+   */
+  ptSlabsFor(stateCode: string, month: MonthKey): Promise<PtSlab[]>;
 };

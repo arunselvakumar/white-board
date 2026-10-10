@@ -783,6 +783,10 @@ model ConstructionHrmsEmployeeSalaryConfig {
   componentOverrides Json                    @default("{}") @map("component_overrides")
   /// For PT slabs that depend on it; null = the general slab.
   gender             ConstructionHrmsGender?
+  /// Universal Account Number (EPFO), 12 digits; for the PF return (CM-320).
+  uan                String?                 @db.Char(12)
+  /// ESI Insurance Person number, 10 digits; for the ESI return (CM-320).
+  esiIpNumber        String?                 @map("esi_ip_number") @db.Char(10)
   effectiveFrom      DateTime                @map("effective_from") @db.Date
   createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime                @default(now()) @map("updated_at") @db.Timestamptz(3)
