@@ -188,7 +188,7 @@ export function decideCheckIn(
     const metres = Math.max(0, Math.round(nearest?.metres ?? 0));
     throw new DomainError(
       "OUTSIDE_FENCE",
-      `Outside Fence: you are about ${metres.toLocaleString("en-IN")} m outside ${nearest?.name ?? "your office"}. Move inside the fence to check in.`,
+      `You are about ${metres.toLocaleString("en-IN")} m outside ${nearest?.name ?? "your office"}. Move inside the fence to check in.`,
       {
         details: {
           field: "location",

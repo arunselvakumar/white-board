@@ -33,7 +33,7 @@ import { QueryHttpError } from "@/src/queries/http";
 import {
   AttendanceRead,
   EntryBadges,
-  LiveStateBadge,
+  LIVE_STATE_LABELS,
   LocationError,
   formatClock,
   formatDuration,
@@ -213,19 +213,16 @@ function CheckInCard({ data }: { data: HrmsAttendanceToday }) {
       aria-labelledby="hrms-check-in-title"
       className="bg-card space-y-5 rounded-2xl border p-5 shadow-xs sm:p-6"
     >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="space-y-0.5">
-          <p className="text-muted-foreground text-sm">
-            {formatWeekdayDate(data.today)}
-          </p>
-          <p className="text-sm font-medium">{shiftLine(data)}</p>
-        </div>
-        <LiveStateBadge state={data.state} />
+      <div className="space-y-0.5">
+        <p className="text-muted-foreground text-sm">
+          {formatWeekdayDate(data.today)}
+        </p>
+        <p className="text-sm font-medium">{shiftLine(data)}</p>
       </div>
 
       <div className="space-y-1 text-center">
         <h3 id="hrms-check-in-title" className="text-lg font-semibold">
-          {checkedIn ? "Checked in" : "Not checked in"}
+          {checkedIn ? "Checked in" : LIVE_STATE_LABELS[data.state]}
         </h3>
         {checkedIn ? (
           <>

@@ -136,7 +136,7 @@ export const OutsideFence: Story = {
         {
           code: "OUTSIDE_FENCE",
           message:
-            "Outside Fence: you are about 1,012 m outside Chennai HO. Move inside the fence to check in.",
+            "You are about 1,012 m outside Chennai HO. Move inside the fence to check in.",
           details: { field: "location" },
         },
         { status: 400 },
