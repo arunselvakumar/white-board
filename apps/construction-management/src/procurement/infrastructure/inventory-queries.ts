@@ -306,17 +306,28 @@ export async function inventoryRowOf(
 // History (CM-506)
 // ---------------------------------------------------------------------------
 
-export type HistoryCursor = { entryDate: CalendarDate; createdAt: Date; id: string };
+/**
+ * A history position: ledger order is entry date, then when recorded,
+ * then a reversal before the entry posted with it (an edit writes both
+ * at once), then id.
+ */
+export type HistoryCursor = {
+  entryDate: CalendarDate;
+  createdAt: Date;
+  /** `reverses_entry_id IS NULL`. */
+  posted: boolean;
+  id: string;
+};
 
 export function encodeHistoryCursor(cursor: HistoryCursor): string {
   return Buffer.from(
-    `${cursor.entryDate}|${cursor.createdAt.toISOString()}|${cursor.id}`,
+    `${cursor.entryDate}|${cursor.createdAt.toISOString()}|${cursor.posted ? "1" : "0"}|${cursor.id}`,
     "utf8",
   ).toString("base64url");
 }
 
 export function decodeHistoryCursor(raw: string): HistoryCursor {
-  const [entryDate = "", createdAt = "", id = ""] = Buffer.from(
+  const [entryDate = "", createdAt = "", posted = "", id = ""] = Buffer.from(
     raw,
     "base64url",
   )
@@ -326,10 +337,11 @@ export function decodeHistoryCursor(raw: string): HistoryCursor {
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(entryDate) ||
     Number.isNaN(at.getTime()) ||
+    (posted !== "0" && posted !== "1") ||
     !isUuid(id)
   )
     throw new DomainError("INVALID_CURSOR", "The page cursor is not valid.");
-  return { entryDate, createdAt: at, id };
+  return { entryDate, createdAt: at, posted: posted === "1", id };
 }
 
 export type HistorySource = {
@@ -411,11 +423,11 @@ export async function inventoryHistory(
     cursor == null
       ? Prisma.empty
       : backwards
-        ? Prisma.sql`AND (h.entry_date, h.created_at, h.id) > (${calendarDateToDb(cursor.entryDate)}::date, ${cursor.createdAt}, ${cursor.id}::uuid)`
-        : Prisma.sql`AND (h.entry_date, h.created_at, h.id) < (${calendarDateToDb(cursor.entryDate)}::date, ${cursor.createdAt}, ${cursor.id}::uuid)`;
+        ? Prisma.sql`AND (h.entry_date, h.created_at, h.reverses_entry_id IS NULL, h.id) > (${calendarDateToDb(cursor.entryDate)}::date, ${cursor.createdAt}, ${cursor.posted}, ${cursor.id}::uuid)`
+        : Prisma.sql`AND (h.entry_date, h.created_at, h.reverses_entry_id IS NULL, h.id) < (${calendarDateToDb(cursor.entryDate)}::date, ${cursor.createdAt}, ${cursor.posted}, ${cursor.id}::uuid)`;
   const order = backwards
-    ? Prisma.sql`ORDER BY h.entry_date ASC, h.created_at ASC, h.id ASC`
-    : Prisma.sql`ORDER BY h.entry_date DESC, h.created_at DESC, h.id DESC`;
+    ? Prisma.sql`ORDER BY h.entry_date ASC, h.created_at ASC, (h.reverses_entry_id IS NULL) ASC, h.id ASC`
+    : Prisma.sql`ORDER BY h.entry_date DESC, h.created_at DESC, (h.reverses_entry_id IS NULL) DESC, h.id DESC`;
   const rows = await db.$queryRaw<HistoryRow[]>`
     SELECT h.id::text AS id, h.entry_date AS "entryDate", h.type::text AS type,
            h.quantity::text AS quantity, h.balance::text AS balance,
@@ -429,7 +441,7 @@ export async function inventoryHistory(
            ) AS reversed
     FROM (
       SELECT e.*, SUM(e.quantity) OVER (
-               ORDER BY e.entry_date, e.created_at, e.id
+               ORDER BY e.entry_date, e.created_at, (e.reverses_entry_id IS NULL), e.id
              ) AS balance
       FROM construction_procurement.stock_entries e
       WHERE e.workspace_id = ${workspaceId}
@@ -457,6 +469,7 @@ export async function inventoryHistory(
     encodeHistoryCursor({
       entryDate: calendarDateFromDb(row.entryDate),
       createdAt: row.createdAt,
+      posted: row.reversesEntryId == null,
       id: row.id,
     });
   const moreAfter = backwards || hasMore;
