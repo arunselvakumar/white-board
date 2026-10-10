@@ -505,7 +505,8 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
               },
             ],
     };
-    const [page, total] = await Promise.all([
+    const base = filters.slice(0, params.createdBy == null ? 1 : 2);
+    const [page, total, suppliers] = await Promise.all([
       this.db.constructionProcurementGoodsReceipt.findMany({
         where,
         orderBy: backwards
@@ -516,6 +517,13 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
       }),
       this.db.constructionProcurementGoodsReceipt.count({
         where: { AND: filters },
+      }),
+      this.db.constructionProcurementGoodsReceipt.findMany({
+        where: { AND: base },
+        distinct: ["supplierId"],
+        select: { supplierId: true, supplierName: true },
+        orderBy: [{ supplierId: "asc" }, { createdAt: "desc" }],
+        take: 200,
       }),
     ]);
     const hasMore = page.length > params.limit;
@@ -559,6 +567,9 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
       })),
       total,
       hasMore,
+      suppliers: suppliers
+        .map((row) => ({ id: row.supplierId, name: row.supplierName }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
     };
   }
 

@@ -173,6 +173,8 @@ export type GoodsReceiptListPage = {
   items: GoodsReceiptListRow[];
   total: number;
   hasMore: boolean;
+  /** Suppliers of the GRNs the viewer may see at the location, for the filter. */
+  suppliers: { id: string; name: string }[];
 };
 
 /**

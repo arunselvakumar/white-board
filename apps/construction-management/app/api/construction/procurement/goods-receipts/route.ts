@@ -83,6 +83,7 @@ export async function GET(request: Request): Promise<Response> {
       nextCursor: moreAfter && last != null ? encodeListCursor(last) : null,
       prevCursor: moreBefore && first != null ? encodeListCursor(first) : null,
       total: page.total,
+      suppliers: page.suppliers,
       financial,
     };
     return Response.json(body);

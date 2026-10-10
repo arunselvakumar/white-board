@@ -311,6 +311,9 @@ describe("Goods Receipts (CM-505)", () => {
       }),
     );
     expect(all.total).toBe(2);
+    expect(all.suppliers).toEqual([
+      { id: f.supplierId, name: "Sri Murugan Traders" },
+    ]);
     expect(all.items[0]?.id).toBe(excess.id);
     expect(all.items[1]).toMatchObject({
       lineCount: 2,

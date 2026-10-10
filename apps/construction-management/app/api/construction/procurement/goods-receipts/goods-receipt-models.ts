@@ -239,6 +239,8 @@ export const ListConstructionProcurementGoodsReceiptsResponseModel = z.object({
   nextCursor: z.string().nullable(),
   prevCursor: z.string().nullable(),
   total: z.int().nonnegative(),
+  /** Suppliers of the GRNs the caller may see here, for the supplier filter. */
+  suppliers: z.array(z.object({ id: z.uuid(), name: z.string() })),
   financial: z.boolean(),
 });
 export type ListConstructionProcurementGoodsReceiptsResponseModel = z.infer<
