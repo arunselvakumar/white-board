@@ -7,7 +7,7 @@
 
 `modules/06` ends with seventeen open questions, and its "Rebuild recommendations" ask for more than the legacy product did. The owner answered four of them before M5 started (§3, §4, §6 and the delivery shape below). Every other question is answered here with the default we recommend; the M5 handoff lists them again for the owner.
 
-**Delivery.** M5 ships as one branch and one pull request (owner, 2026-10-10).
+**Delivery.** M5 was to ship as one pull request (owner, 2026-10-10). At 556 files it was over CodeRabbit's 300-file review limit, so the owner chose a native GitHub stack of four pull requests, merged bottom-up: schema, kernel and shared contracts (#48); masters (#49); documents, Purchase Requests, Purchase Orders and Goods Receipts (#50); inventory, transfers, Central Store, Central Inventory and the dashboard (#51). It replaced #47.
 
 ## Decisions
 

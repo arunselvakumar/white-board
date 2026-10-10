@@ -121,6 +121,28 @@ describe("PrismaStockLedger (ADR CM-0015 §3, §5)", () => {
     expect(entries).toHaveLength(3);
   });
 
+  it("lets two reversals of one source run at once: the second finds nothing live", async () => {
+    const { context, posting, write, stockOn } = setup();
+    const grn = randomUUID();
+    await write((tx) =>
+      ledger.post(tx, context, [posting("received", "25", "2026-10-01", grn)]),
+    );
+    const source = { type: "stock_movement" as const, id: grn };
+    const results = await Promise.allSettled([
+      write((tx) => ledger.reverseSource(tx, context, source)),
+      write((tx) => ledger.reverseSource(tx, context, source)),
+    ]);
+    expect(results.map((result) => result.status)).toEqual([
+      "fulfilled",
+      "fulfilled",
+    ]);
+    expect(await stockOn()).toBe("0.000");
+    const reversals = await prisma.constructionProcurementStockEntry.count({
+      where: { sourceId: grn, reversesEntryId: { not: null } },
+    });
+    expect(reversals).toBe(1);
+  });
+
   it("serialises concurrent writers to the same stock", async () => {
     const { context, posting, write, stockOn } = setup();
     await write((tx) =>
