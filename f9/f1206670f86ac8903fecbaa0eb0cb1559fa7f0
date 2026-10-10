@@ -1,0 +1,47 @@
+apps/construction-management/docs/03-target-architecture.md
+  s_7d8917753e260e::t_3e363905407823 160-175
+apps/construction-management/docs/adr/CM-0013-projects-structure-product-decisions.md
+  s_7d8917753e260e::t_c319eaf79f953d 1-125
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_7d8917753e260e::t_b977f41b6114ed 512-515
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_25b56cdfca5380 430-447,451-500
+apps/construction-management/src/masters/domain/development-seeds.ts
+  s_7d8917753e260e::t_4adb9cf81d5872 1-28
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_7d8917753e260e::t_a8a107840c8f6e 1-100
+apps/construction-management/src/projects/domain/project-seeds.ts
+  s_7d8917753e260e::t_26b8ca97bb4dc9 1-18
+apps/construction-management/src/projects/domain/project-type.ts
+  s_7d8917753e260e::t_fa133e8f7c7200 1-43
+apps/construction-management/src/shared-kernel/location-ref.ts
+  s_7d8917753e260e::t_df6b0d4b7c49ea 1-39
+packages/db/construction/prisma/migrations/20261010180000_construction_projects_structure/migration.sql
+  s_7d8917753e260e::t_a3103cc21b1176 1-415
+packages/db/construction/prisma/migrations/20261010180100_construction_masters_parties/migration.sql
+  s_7d8917753e260e::t_8ae9580f7a96a2 1-146
+packages/db/construction/prisma/migrations/20261010180200_construction_masters_development_seeds/migration.sql
+  s_7d8917753e260e::t_2f2c0f31be3863 1-37
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_7d8917753e260e::t_d5f3a686581b8e 3-5,45-46,75-219
+packages/db/construction/prisma/schema/construction-projects.prisma
+  s_7d8917753e260e::t_1c47f225249e44 2,4-5,17-34,38-44,46-47,50,52-57,60-63,65-78,80-91,146-147,159-520
+apps/construction-management/docs/adr/CM-0014-attachments-and-gallery-index.md
+  s_7d8917753e260e::t_322ebbba09fca2 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f9f1206670f86ac8903fecbaa0eb0cb1559fa7f0",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
