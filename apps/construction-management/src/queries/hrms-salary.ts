@@ -64,6 +64,16 @@ export function teamSalaryReportUrl(month: string): string {
   return `${BASE}/report/team?month=${encodeURIComponent(month)}`;
 }
 
+/** The PF ECR of an approved month (CM-320): the EPFO text file or Excel. */
+export function pfReturnUrl(month: string, format: "txt" | "xlsx"): string {
+  return `${BASE}/exports/pf?month=${encodeURIComponent(month)}&format=${format}`;
+}
+
+/** The ESIC monthly contribution workbook of an approved month (CM-320). */
+export function esiReturnUrl(month: string): string {
+  return `${BASE}/exports/esi?month=${encodeURIComponent(month)}`;
+}
+
 type Version = Pick<SalarySlipModel, "id" | "updatedAt">;
 
 const versions = (slips: readonly Version[]) =>

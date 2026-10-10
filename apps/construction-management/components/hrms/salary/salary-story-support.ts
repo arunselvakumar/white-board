@@ -71,7 +71,9 @@ export function storySlip(
       shortfall: null,
     },
     statutory: {
+      pfApplicable: true,
       esiEligible: false,
+      esiApplicable: false,
       esiBasisMonth: "2026-10",
       uan: "100200300400",
       esiIpNumber: null,
@@ -155,6 +157,7 @@ export function storyTeam(overrides: Partial<TeamSalaries> = {}): TeamSalaries {
       report: true,
       financial: true,
       viewAll: true,
+      exportReturns: true,
     },
     myMemberId: ME,
     ...overrides,

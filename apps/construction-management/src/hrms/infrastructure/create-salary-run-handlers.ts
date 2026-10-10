@@ -6,6 +6,7 @@ import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { HrmsPorts } from "./create-hrms-ports";
 import { createHrmsPorts } from "./create-hrms-ports";
 import { SalaryRunHandlers } from "../application/salary-run-handlers";
+import { StatutoryReturnHandlers } from "../application/statutory-return-handlers";
 import { pdfPayslipRenderer } from "./payslip-pdf";
 import { PrismaEmployeeSalaryStore } from "./prisma-employee-salary-store";
 import {
@@ -39,6 +40,22 @@ export function createSalaryRunHandlers(deps?: {
       company: new PrismaSalaryCompanyReader(db),
       payslips: new PrismaPayslipFiles(db, deps?.storage ?? objectStorage()),
       renderer: pdfPayslipRenderer,
+    },
+    deps?.clock,
+  );
+}
+
+/** PF and ESI exports of an approved month (CM-320) over Prisma. */
+export function createStatutoryReturnHandlers(deps?: {
+  prisma?: PrismaClient;
+  clock?: () => Date;
+}): StatutoryReturnHandlers {
+  const db = deps?.prisma ?? prisma;
+  return new StatutoryReturnHandlers(
+    new PrismaSalaryRunStore(db),
+    {
+      company: new PrismaSalaryCompanyReader(db),
+      configs: new PrismaEmployeeSalaryStore(db),
     },
     deps?.clock,
   );

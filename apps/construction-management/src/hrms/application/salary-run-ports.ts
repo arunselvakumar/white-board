@@ -76,6 +76,12 @@ export type SalarySlipDetails = {
     advance: number;
   } | null;
   esi: { basisMonth: MonthKey; basisGross: number };
+  /**
+   * The PF wage (earned PF components) and the wage PF was charged on
+   * after the ceiling, for the ECR (CM-320). Missing on slips calculated
+   * before CM-320.
+   */
+  pfWages?: { wage: number; contributory: number };
   employee: {
     name: string;
     designationName: string | null;

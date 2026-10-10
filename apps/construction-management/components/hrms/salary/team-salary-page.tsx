@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -9,14 +10,25 @@ import {
   Wallet,
 } from "lucide-react";
 import { Suspense, useState } from "react";
-import { Button, buttonVariants } from "@repo/ui/components/button";
+import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/dropdown-menu";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { HrmsEmpty } from "@/components/hrms/hrms-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
+  esiReturnUrl,
+  pfReturnUrl,
   teamSalariesQuery,
   teamSalaryReportUrl,
   useSalaryCommand,
@@ -245,17 +257,19 @@ function MonthSalaries({
             Pay Advance
           </Button>
         ) : null}
-        {can.report ? (
-          <a
-            href={teamSalaryReportUrl(month)}
-            download
-            className={buttonVariants({ variant: "outline" })}
-          >
-            <Download aria-hidden="true" />
-            Excel
-          </a>
+        {can.report || can.exportReturns ? (
+          <ExportMenu
+            month={month}
+            report={can.report}
+            returns={can.exportReturns}
+            approved={
+              regular.length > 0 &&
+              regular.every((slip) => slip.status !== "calculated")
+            }
+          />
         ) : null}
       </div>
+      {can.exportReturns ? <ReturnGaps regular={regular} /> : null}
       {notice != null ? (
         <p role="status" className="text-muted-foreground text-sm">
           {notice}
@@ -447,6 +461,97 @@ function MonthSalaries({
         }}
       />
     </div>
+  );
+}
+
+/**
+ * Export: the team salary workbook (report or export) and, with export
+ * and Financial, the PF ECR and ESI contribution files of an approved
+ * month (CM-320).
+ */
+function ExportMenu({
+  month,
+  report,
+  returns,
+  approved,
+}: {
+  month: string;
+  report: boolean;
+  returns: boolean;
+  approved: boolean;
+}) {
+  const files = [
+    { label: "PF ECR (.txt)", href: pfReturnUrl(month, "txt") },
+    { label: "PF ECR (Excel)", href: pfReturnUrl(month, "xlsx") },
+    { label: "ESI contribution (Excel)", href: esiReturnUrl(month) },
+  ];
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button type="button" variant="outline" />}>
+        <Download aria-hidden="true" />
+        Export
+        <ChevronDown aria-hidden="true" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-64">
+        {report ? (
+          <DropdownMenuItem
+            render={<a href={teamSalaryReportUrl(month)} download />}
+          >
+            Team salary (Excel)
+          </DropdownMenuItem>
+        ) : null}
+        {report && returns ? <DropdownMenuSeparator /> : null}
+        {returns ? (
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>
+              {approved
+                ? "PF and ESI challans"
+                : "PF and ESI: approve every salary of the month first"}
+            </DropdownMenuLabel>
+            {files.map((file) =>
+              approved ? (
+                <DropdownMenuItem
+                  key={file.label}
+                  render={<a href={file.href} download />}
+                >
+                  {file.label}
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem key={file.label} disabled>
+                  {file.label}
+                </DropdownMenuItem>
+              ),
+            )}
+          </DropdownMenuGroup>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** PF members without a UAN and ESI members without an IP number. */
+function ReturnGaps({ regular }: { regular: SalarySlipModel[] }) {
+  const noUan = regular.filter(
+    (slip) => slip.statutory.pfApplicable && slip.statutory.uan == null,
+  ).length;
+  const noIp = regular.filter(
+    (slip) =>
+      slip.statutory.esiApplicable && slip.statutory.esiIpNumber == null,
+  ).length;
+  if (noUan + noIp === 0) return null;
+  const parts = [
+    noUan > 0
+      ? `${String(noUan)} PF ${noUan === 1 ? "member has" : "members have"} no UAN`
+      : null,
+    noIp > 0
+      ? `${String(noIp)} ESI ${noIp === 1 ? "member has" : "members have"} no IP number`
+      : null,
+  ].filter((part) => part != null);
+  return (
+    <p className="text-muted-foreground text-sm">
+      {parts.join(" and ")}: they are left out of the upload files and listed in
+      the Excel. Add the numbers in Employees and export again.
+    </p>
   );
 }
 

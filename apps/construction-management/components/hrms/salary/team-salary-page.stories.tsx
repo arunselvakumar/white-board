@@ -259,6 +259,7 @@ export const HidesAmountsWithoutFinancial: Story = {
         report: false,
         financial: false,
         viewAll: true,
+        exportReturns: false,
       },
     }),
   }),

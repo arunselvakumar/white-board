@@ -21,6 +21,7 @@ import {
   salariesOpenApiComponents,
   salariesOpenApiOperations,
 } from "./salaries/salaries-openapi";
+import { statutoryExportsOpenApiOperations } from "./salaries/exports/statutory-exports-openapi";
 import {
   salarySetupOpenApiComponents,
   salarySetupOpenApiOperations,
@@ -82,5 +83,6 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
   ...leaveOpenApiOperations,
   ...salarySetupOpenApiOperations,
   ...salariesOpenApiOperations,
+  ...statutoryExportsOpenApiOperations,
   ...attendanceOpenApiOperations,
 ];

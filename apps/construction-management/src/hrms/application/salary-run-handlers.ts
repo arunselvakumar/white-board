@@ -103,6 +103,8 @@ export type SalaryCapabilities = {
   report: boolean;
   financial: boolean;
   viewAll: boolean;
+  /** PF ECR and ESI contribution exports: export and financial (CM-320). */
+  exportReturns: boolean;
 };
 
 export type TeamSalaryView = {
@@ -133,6 +135,8 @@ function capabilities(access: MemberAccess): SalaryCapabilities {
     report: can(access, MENU, "report") || can(access, MENU, "export"),
     financial: can(access, MENU, "financial"),
     viewAll: can(access, MENU, "view_all"),
+    exportReturns:
+      can(access, MENU, "export") && can(access, MENU, "financial"),
   };
 }
 
@@ -215,7 +219,8 @@ function dateIn(timezone: string, at: Date, withTime: boolean): string {
  * and Paid slips (My Salary); view_all = Team Salary; create = calculate
  * and recalculate; create + financial = pay an advance; approve = approve
  * (never one's own, except the Owner); update = Mark Paid; financial =
- * amounts of others' slips; report or export = the team salary workbook.
+ * amounts of others' slips; report or export = the team salary workbook;
+ * export and financial = the PF and ESI exports (`StatutoryReturnHandlers`).
  */
 export class SalaryRunHandlers {
   constructor(
@@ -613,6 +618,7 @@ export class SalaryRunHandlers {
       otherDeductions: b.otherDeductions,
       shortfall: b.shortfall,
       esi: input.esiBasis,
+      pfWages: { wage: b.pf.wage, contributory: b.pf.contributoryWage },
       employee: {
         name: input.employee.name,
         designationName: input.employee.designationName,

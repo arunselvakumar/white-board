@@ -96,7 +96,15 @@ export const ConstructionHrmsSalarySlipModel = z.object({
     .nullable()
     .describe("Null without `hrms.salaries` financial (others' slips)."),
   statutory: z.object({
+    pfApplicable: z
+      .boolean()
+      .describe("The slip has PF: its member belongs in the ECR."),
     esiEligible: z.boolean(),
+    esiApplicable: z
+      .boolean()
+      .describe(
+        "ESI was charged (on in the structure and eligible): the member belongs in the ESI upload.",
+      ),
     esiBasisMonth: z.string().nullable(),
     uan: z.string().nullable(),
     esiIpNumber: z.string().nullable(),
@@ -178,6 +186,9 @@ export const ListConstructionHrmsTeamSalariesResponseModel = z.object({
     report: z.boolean(),
     financial: z.boolean(),
     viewAll: z.boolean(),
+    exportReturns: z
+      .boolean()
+      .describe("PF ECR and ESI exports: `export` and `financial`."),
   }),
   myMemberId: z.uuid().nullable(),
 });
@@ -296,6 +307,16 @@ export function toSalarySlipModel(
     snapshotEsi != null &&
     typeof snapshotEsi === "object" &&
     (snapshotEsi as { eligible?: unknown }).eligible === true;
+  const esiApplicable =
+    esiEligible &&
+    (snapshotEsi as { applicable?: unknown }).applicable === true &&
+    (snapshotEsi as { rateEffectiveFrom?: unknown }).rateEffectiveFrom != null;
+  const snapshotPf = slip.statutorySnapshot["pf"];
+  const pfApplicable =
+    snapshotPf != null &&
+    typeof snapshotPf === "object" &&
+    (snapshotPf as { applicable?: unknown }).applicable === true &&
+    (snapshotPf as { rateEffectiveFrom?: unknown }).rateEffectiveFrom != null;
   return {
     id: slip.id,
     memberId: slip.memberId,
@@ -359,7 +380,9 @@ export function toSalarySlipModel(
         }
       : null,
     statutory: {
+      pfApplicable,
       esiEligible,
+      esiApplicable,
       esiBasisMonth: details?.esi.basisMonth ?? null,
       uan: details?.employee.uan ?? null,
       esiIpNumber: details?.employee.esiIpNumber ?? null,
