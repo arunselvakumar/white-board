@@ -1,0 +1,45 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_ed3d394c5f0412 101-104,839-843
+apps/construction-management/app/api/construction/projects/projects/[id]/location-options/handlers.ts
+  s_7d8917753e260e::t_38c531bb3ed04f 1-7
+apps/construction-management/app/api/construction/projects/projects/[id]/location-options/location-options-models.ts
+  s_7d8917753e260e::t_c9ac5a50d7cfd3 1-67
+apps/construction-management/app/api/construction/projects/projects/[id]/location-options/location-options-openapi.ts
+  s_7d8917753e260e::t_616a6283c2a8ab 1-35
+apps/construction-management/app/api/construction/projects/projects/[id]/location-options/location-options.http.test.ts
+  s_7d8917753e260e::t_9c9f7541a10de4 1-434
+apps/construction-management/app/api/construction/projects/projects/[id]/location-options/route.ts
+  s_7d8917753e260e::t_cd90f8f8dfddd8 1-37
+apps/construction-management/src/composition/location-resolver.test.ts
+  s_7d8917753e260e::t_398e84c0ee37c5 1-313
+apps/construction-management/src/masters/application/development-handlers.ts
+  s_7d8917753e260e::t_3309abf6eb694a 332-348
+apps/construction-management/src/projects/application/structure-handlers.test.ts
+  s_7d8917753e260e::t_9d69ff49c7e334 172
+apps/construction-management/src/projects/application/structure-read-model.ts
+  s_7d8917753e260e::t_abbe0345d074dd 99-104
+apps/construction-management/src/projects/infrastructure/prisma-project-structure-reader.ts
+  s_7d8917753e260e::t_3cf8efe7456788 1,14-43,106,108-120
+apps/construction-management/src/shared-kernel/location-ref.test.ts
+  s_7d8917753e260e::t_45187f07336a62 1-190
+apps/construction-management/src/shared-kernel/location-ref.ts
+  s_7d8917753e260e::t_3c3a5e29c9739b 1-3,31-198,202-203
+apps/construction-management/src/composition/location-resolver.ts
+  s_7d8917753e260e::t_f44c8773d90afc 1-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a6117b117aacc359f1e0e636fd94c508488dcac1",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
