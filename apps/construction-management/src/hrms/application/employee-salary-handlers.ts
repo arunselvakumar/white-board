@@ -297,7 +297,7 @@ export class EmployeeSalaryHandlers {
         );
       const overrides =
         row.componentOverrides ??
-        (unchangedStructure ? (current?.config.componentOverrides ?? {}) : {});
+        (unchangedStructure ? current.config.componentOverrides : {});
       let config: EmployeeSalaryConfig;
       try {
         config = createEmployeeSalaryConfig(structure.structure, {
@@ -326,8 +326,7 @@ export class EmployeeSalaryHandlers {
         current == null || config.effectiveFrom > current.config.effectiveFrom;
       return {
         memberId: row.memberId,
-        rowId:
-          insert || current == null ? newId(now.getTime() + index) : current.id,
+        rowId: insert ? newId(now.getTime() + index) : current.id,
         insert,
         config,
         before: current?.config ?? null,
