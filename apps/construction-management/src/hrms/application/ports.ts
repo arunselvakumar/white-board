@@ -17,10 +17,7 @@ import type {
  * imports another (ADR CM-0001, as M2 did). Every method is scoped to one
  * Company (`workspaceId`).
  *
- * Built now: `EmployeeDirectory`, `ProjectDirectory`, `HrmsSettingsReader`,
- * `MonthLock` (reader) and `StatutoryRates`. The others have stand-ins in
- * `stub-ports.ts`, each marked with the ticket that replaces it; swap them
- * in `infrastructure/create-hrms-ports.ts`.
+ * All of them are wired once in `infrastructure/create-hrms-ports.ts`.
  */
 
 // ---------------------------------------------------------------------------
@@ -182,17 +179,38 @@ export type EffectiveShiftResolver = {
 export type HrmsDayStatus =
   "present" | "half_day" | "absent" | "on_leave" | "holiday" | "week_off";
 
+/**
+ * One member's day (CM-308, `domain/attendance.ts` `attendanceDay`). CM-308
+ * added `overtimeAllowed`, `shiftWorkingHours` and `leave.otherHalf` so the
+ * salary run (CM-316) can price overtime per day and count a half-day
+ * leave's other half; `countDays` turns a month of these into the slip's
+ * day counts.
+ */
 export type AttendanceDay = {
   date: CalendarDate;
   status: HrmsDayStatus;
-  /** Hours from approved and approval-free entries. */
+  /** Hours from approved and approval-free closed entries. */
   workedHours: number;
-  /** Hours beyond the shift's working hours (shown even when unpaid). */
+  /**
+   * Hours beyond the shift's working hours (every hour on a holiday or
+   * week off), shown even when unpaid.
+   */
   overtimeHours: number;
+  /** The day's shift has Overtime Allowed: its overtime is paid (ADR CM-0012 §14). */
+  overtimeAllowed: boolean;
+  /** The day's shift working hours, for the overtime hourly rate. */
+  shiftWorkingHours: number;
   /** Checked in after the shift start plus grace; never changes the status. */
   late: boolean;
-  /** On `on_leave`: the leave is paid, and whether it is half the day. */
-  leave: { paid: boolean; half: boolean } | null;
+  /**
+   * On `on_leave`: the leave is paid, whether it is half the day, and for
+   * a half day whether the other half was worked (`present`) or not.
+   */
+  leave: {
+    paid: boolean;
+    half: boolean;
+    otherHalf: "present" | "absent" | null;
+  } | null;
 };
 
 export type AttendanceDaySource = {

@@ -173,7 +173,12 @@ function update(cookie: string, labour: Labour, body: Record<string, unknown>) {
 function openingEntries(labourId: string) {
   return prisma.constructionLabourLedgerEntry.findMany({
     where: { partyType: "labour", partyId: labourId },
-    orderBy: { createdAt: "asc" },
+    // A reversal and its repost share one transaction's timestamp; the
+    // reversal (it names the entry it reverses) comes first.
+    orderBy: [
+      { createdAt: "asc" },
+      { reversesEntryId: { sort: "asc", nulls: "last" } },
+    ],
   });
 }
 
