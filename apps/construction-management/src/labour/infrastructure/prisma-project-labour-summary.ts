@@ -19,16 +19,22 @@ import { companyToday } from "./prisma-labour-queries";
 
 /**
  * The labour numbers on a Project's Overview (CM-219): who is on site
- * today, the last two weeks, and what is owed (ADR CM-0004: balances are
- * sums of ledger entries, party-wide).
+ * today, the last two weeks (or `from` to `date` for the Project
+ * Dashboard, CM-412), and what is owed (ADR CM-0004: balances are sums of
+ * ledger entries, party-wide).
  */
 export async function projectLabourSummary(
-  input: { workspaceId: string; projectId: string; date?: CalendarDate },
+  input: {
+    workspaceId: string;
+    projectId: string;
+    date?: CalendarDate;
+    from?: CalendarDate;
+  },
   db: PrismaClient = defaultPrisma,
 ): Promise<ProjectLabourSummary> {
   const { workspaceId, projectId } = input;
   const date = input.date ?? (await companyToday(db, workspaceId));
-  const dates = seriesDates(date);
+  const dates = seriesDates(date, input.from);
   const from = calendarDateToDb(dates[0] ?? date);
   const to = calendarDateToDb(date);
 

@@ -10,6 +10,11 @@ import {
   UpdateConstructionProjectsProjectDevelopmentsRequestModel,
 } from "./projects/[id]/developments/developments-models";
 import {
+  ConstructionProjectsDashboardLayoutResponseModel,
+  UpdateConstructionProjectsDashboardLayoutRequestModel,
+} from "./dashboard-layout/dashboard-layout-models";
+import { ConstructionProjectsProjectSummaryResponseModel } from "./projects/[id]/dashboard/dashboard-models";
+import {
   ConstructionProjectsPinResponseModel,
   ConstructionProjectsProjectHomeResponseModel,
   UpdateConstructionProjectsHiddenModulesRequestModel,
@@ -43,6 +48,9 @@ export const projectHomeOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsPinResponseModel,
   UpdateConstructionProjectsTileOrderRequestModel,
   ConstructionProjectsTileOrderResponseModel,
+  ConstructionProjectsDashboardLayoutResponseModel,
+  UpdateConstructionProjectsDashboardLayoutRequestModel,
+  ConstructionProjectsProjectSummaryResponseModel,
 };
 
 /** Routes of CM-404 (Project side), CM-411 and CM-412. */
@@ -141,5 +149,40 @@ export const projectHomeOpenApiOperations: OpenApiOperation[] = [
     successDescription: "Your tile order",
     successSchema: ConstructionProjectsTileOrderResponseModel,
     errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
+  },
+  {
+    method: "get",
+    path: "/api/construction/projects/dashboard-layout",
+    summary:
+      "Your Project Dashboard layout: every section in your order with what shows (menu `reporting.project_dashboard`, read)",
+    tags: PROJECTS,
+    successStatus: StatusCodes.OK,
+    successDescription: "Sections in order",
+    successSchema: ConstructionProjectsDashboardLayoutResponseModel,
+    errors: [...SESSION_ERRORS],
+  },
+  {
+    method: "post",
+    path: "/api/construction/projects/dashboard-layout/update",
+    summary:
+      "Manage Dashboard: save your sections' order and what shows, for every Project (menu `reporting.project_dashboard`, read; 400 DASHBOARD_SECTION_UNKNOWN, DASHBOARD_SECTION_DUPLICATE)",
+    tags: PROJECTS,
+    body: UpdateConstructionProjectsDashboardLayoutRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Sections in order",
+    successSchema: ConstructionProjectsDashboardLayoutResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
+  },
+  {
+    method: "get",
+    path: `${BASE}/{id}/dashboard/summary`,
+    summary:
+      "The Project Dashboard's Project summary: dates, status, type, budget (Financial) and counts of Wings, Floors, Units, Locations, drawings, testing reports and documents (menu `reporting.project_dashboard`, read; 404 for a Project you are not on)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Project summary",
+    successSchema: ConstructionProjectsProjectSummaryResponseModel,
+    errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS, StatusCodes.NOT_FOUND],
   },
 ];

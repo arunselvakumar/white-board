@@ -21,7 +21,7 @@ export const labourSummaryOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: LABOUR_SUMMARY_PATH,
     summary:
-      "Labour tiles for a Project's Overview: present today, vendor headcount, the last 14 days, and payment status (amounts null without Financial)",
+      "Labour tiles for a Project's home and Dashboard: present today, vendor headcount, the last 14 days or `from` to `date` (at most 366 days), and payment status (amounts null without Financial)",
     tags: ["Construction · Labour"],
     query: GetConstructionLabourProjectSummaryRequestModel,
     successStatus: StatusCodes.OK,
