@@ -25,6 +25,8 @@ export type ProjectReadModel = {
   budgetValue: number | null;
   logoKey: string | null;
   useLogoInReports: boolean;
+  /** GST state code (CM-501), or null when not set. */
+  stateCode: string | null;
   customFields: ProjectCustomField[];
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +45,7 @@ export function toProjectReadModel(project: Project): ProjectReadModel {
     budgetValue: project.budgetValue,
     logoKey: project.logoKey,
     useLogoInReports: project.useLogoInReports,
+    stateCode: project.stateCode,
     ...project.contract,
     customFields: project.customFields.map(({ label, value }) => ({
       label,
