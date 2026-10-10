@@ -1,0 +1,47 @@
+import { prisma, type PrismaClient } from "@repo/construction-db";
+
+import type { ObjectStorage } from "@/src/shared-kernel/files";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
+
+import type { HrmsPorts } from "./create-hrms-ports";
+import { createHrmsPorts } from "./create-hrms-ports";
+import { SalaryRunHandlers } from "../application/salary-run-handlers";
+import { pdfPayslipRenderer } from "./payslip-pdf";
+import { PrismaEmployeeSalaryStore } from "./prisma-employee-salary-store";
+import {
+  PrismaPayslipFiles,
+  PrismaSalaryCompanyReader,
+} from "./prisma-payslip-files";
+import { PrismaSalaryRunStore } from "./prisma-salary-run-store";
+
+/**
+ * Salary runs (CM-316) over Prisma. Day counts come from the ports in
+ * `createHrmsPorts`, so the real attendance (CM-308) is picked up wherever
+ * it is swapped in; tests may pass their own `ports`.
+ */
+export function createSalaryRunHandlers(deps?: {
+  prisma?: PrismaClient;
+  storage?: ObjectStorage;
+  ports?: Partial<HrmsPorts>;
+  clock?: () => Date;
+}): SalaryRunHandlers {
+  const db = deps?.prisma ?? prisma;
+  const ports = { ...createHrmsPorts({ prisma: db }), ...deps?.ports };
+  return new SalaryRunHandlers(
+    new PrismaSalaryRunStore(db),
+    {
+      employees: ports.employees,
+      settings: ports.settings,
+      calendar: ports.calendar,
+      shifts: ports.shifts,
+      attendanceDays: ports.attendanceDays,
+      leaveDays: ports.leaveDays,
+      statutoryRates: ports.statutoryRates,
+      configs: new PrismaEmployeeSalaryStore(db),
+      company: new PrismaSalaryCompanyReader(db),
+      payslips: new PrismaPayslipFiles(db, deps?.storage ?? objectStorage()),
+      renderer: pdfPayslipRenderer,
+    },
+    deps?.clock,
+  );
+}
