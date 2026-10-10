@@ -51,7 +51,7 @@ type Po = {
   closeReason: string | null;
   billing: { id: string; name: string; gstin: string | null };
   terms: { title: string; body: string }[];
-  totals: Record<string, number>;
+  totals: { igstTotal: number; cgstTotal: number } & Record<string, number>;
   items: {
     cgst: number;
     sgst: number;
