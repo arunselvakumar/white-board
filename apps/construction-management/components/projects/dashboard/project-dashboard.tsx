@@ -401,7 +401,7 @@ function MaterialsSection({
       title="Materials"
       aside={
         <Link
-          href={`${materialsPath(projectId, "inventory")}/stock-register`}
+          href={`${materialsPath(projectId, "inventory")}/register`}
           className="text-primary text-sm font-medium underline-offset-4 hover:underline"
         >
           Stock Register
