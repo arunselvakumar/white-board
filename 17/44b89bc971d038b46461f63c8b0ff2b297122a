@@ -1,0 +1,41 @@
+apps/construction-management/app/app/masters/quotations/page.tsx
+  s_6604e2237b6922::t_a99373b413fafc 1-9
+apps/construction-management/components/parties/parties-page.stories.tsx
+  s_6604e2237b6922::t_3efb7e8802186a 67-68,148-189
+apps/construction-management/components/parties/parties-page.tsx
+  s_6604e2237b6922::t_30f9d68e51398b 257,280-282
+apps/construction-management/components/parties/party-fixtures.ts
+  s_6604e2237b6922::t_e59da6591cab9d 4,53-56,113-175
+apps/construction-management/components/parties/party-form-schema.ts
+  s_6604e2237b6922::t_7b8d23d0053359 6,11-35,49-56,77-78,111-112,117,128-131,134,136-138,145,147,149-155,167-170
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_6604e2237b6922::t_8fb066f28983cb 3,11,50-57,114-125,145-147,151-290,307,323-335,355-357,378
+apps/construction-management/components/parties/party-form.tsx
+  s_6604e2237b6922::t_f655a569f517b4 8,13-19,40-43,51,178-190,227-238,259-372,477-493,506,527
+apps/construction-management/components/parties/party-quotations.stories.tsx
+  s_6604e2237b6922::t_c40f34864250f0 1-320
+apps/construction-management/components/parties/party-quotations.tsx
+  s_6604e2237b6922::t_690bd0441c6b28 1-373
+apps/construction-management/components/parties/quotations-page.stories.tsx
+  s_6604e2237b6922::t_6442733ac3db95 1-201
+apps/construction-management/components/parties/quotations-page.tsx
+  s_6604e2237b6922::t_ebad2bef6780ec 1-279
+apps/construction-management/src/queries/quotations.ts
+  s_6604e2237b6922::t_7b6a037a29fbf0 1-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1744b89bc971d038b46461f63c8b0ff2b297122a",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
