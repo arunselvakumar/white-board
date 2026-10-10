@@ -23,7 +23,7 @@ export async function GET(
     );
     const session = await requireAccess(request, "hrms.salaries", "read");
     if (isResponse(session)) return session;
-    const { bytes, fileName } = await salaryHandlers.payslip(
+    const { bytes, fileName, unicodeFileName } = await salaryHandlers.payslip(
       session.access,
       id,
     );
@@ -31,7 +31,7 @@ export async function GET(
     return new Response(Uint8Array.from(bytes), {
       headers: {
         "content-type": PDF_CONTENT_TYPE,
-        "content-disposition": `${inline ? "inline" : "attachment"}; filename="${fileName}"`,
+        "content-disposition": `${inline ? "inline" : "attachment"}; filename="${fileName}"; filename*=UTF-8''${encodeURIComponent(unicodeFileName)}`,
         "cache-control": "private, no-store",
       },
     });

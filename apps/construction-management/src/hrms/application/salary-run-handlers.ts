@@ -1020,7 +1020,7 @@ export class SalaryRunHandlers {
   async payslip(
     access: MemberAccess,
     id: string,
-  ): Promise<{ bytes: Uint8Array; fileName: string }> {
+  ): Promise<{ bytes: Uint8Array; fileName: string; unicodeFileName: string }> {
     const record = await this.detail(access, id);
     if (!record.amountsVisible) assertCan(access, MENU, "financial");
     const { slip } = record;
@@ -1042,6 +1042,8 @@ export class SalaryRunHandlers {
     return {
       bytes,
       fileName: `payslip-${fileSlug(record.member.name)}-${slip.month}.pdf`,
+      // Names in Indian scripts keep their letters where browsers allow.
+      unicodeFileName: `payslip-${record.member.name.trim().replace(/[\\/:*?"<>|\s]+/g, "-")}-${slip.month}.pdf`,
     };
   }
 
