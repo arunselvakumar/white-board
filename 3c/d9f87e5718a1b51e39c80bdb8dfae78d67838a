@@ -1,0 +1,19 @@
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_7d8917753e260e::t_9b808db4bdb8a1 140-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3cd9f87e5718a1b51e39c80bdb8dfae78d67838a",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
