@@ -1,0 +1,23 @@
+apps/construction-management/components/hrms/hrms-dashboard-page.tsx
+  s_6a70f1cb429bb6::t_015fe1d57065f6 444-449,451-453,456-468,596,598,608-610
+apps/construction-management/components/hrms/hrms-workspace-tile.stories.tsx
+  s_6a70f1cb429bb6::t_3aa23a64096af9 51
+apps/construction-management/components/hrms/hrms-workspace-tile.tsx
+  s_6a70f1cb429bb6::t_a6b8f43d4dc820 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7346cf0dee7fe413bf57ada15e50a26187f7865f",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
