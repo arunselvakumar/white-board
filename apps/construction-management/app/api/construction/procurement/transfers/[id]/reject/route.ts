@@ -18,13 +18,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireTransferSession(request, true);
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionProcurementMaterialTransferParamsModel.safeParse(
         await context.params,
       ),
     );
-    const session = await requireTransferSession(request, true);
-    if (isResponse(session)) return session;
     const model = parseOrThrow(
       RejectConstructionProcurementMaterialTransferRequestModel.safeParse(
         await request.json(),

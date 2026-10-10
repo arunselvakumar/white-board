@@ -20,13 +20,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireInventoryAccess(request, null, "delete");
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionProcurementStockMovementParamsModel.safeParse(
         await context.params,
       ),
     );
-    const session = await requireInventoryAccess(request, null, "delete");
-    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementStockMovementRequestModel.safeParse(
         await request.json(),

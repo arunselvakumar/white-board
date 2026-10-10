@@ -15,13 +15,13 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireTransferSession(request, false);
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionProcurementMaterialTransferParamsModel.safeParse(
         await context.params,
       ),
     );
-    const session = await requireTransferSession(request, false);
-    if (isResponse(session)) return session;
     return Response.json(
       toTransferResponse(await materialTransfers.get(session.caller, id)),
     );
