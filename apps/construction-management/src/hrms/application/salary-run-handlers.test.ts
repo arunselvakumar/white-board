@@ -15,13 +15,10 @@ import {
   fakeCompany,
   FakeAttendanceDaySource,
   FakeEmployeeDirectory,
-  FakeLeaveDaySource,
   FakePayslipFiles,
   FakePayslipRenderer,
   FakeSalaryConfigSource,
   FakeSalaryRunStore,
-  FakeShiftResolver,
-  FakeWorkCalendar,
 } from "./salary-run-fakes";
 import { SalaryRunHandlers } from "./salary-run-handlers";
 
@@ -108,10 +105,7 @@ async function rejectsWith(promise: Promise<unknown>): Promise<string> {
 
 let store: FakeSalaryRunStore;
 let configs: FakeSalaryConfigSource;
-let calendar: FakeWorkCalendar;
 let attendance: FakeAttendanceDaySource;
-let leave: FakeLeaveDaySource;
-let shifts: FakeShiftResolver;
 let files: FakePayslipFiles;
 let renderer: FakePayslipRenderer;
 let directory: FakeEmployeeDirectory;
@@ -121,10 +115,7 @@ beforeEach(() => {
   store = new FakeSalaryRunStore();
   store.todayValue = "2026-11-05";
   configs = new FakeSalaryConfigSource();
-  calendar = new FakeWorkCalendar();
-  attendance = new FakeAttendanceDaySource(calendar);
-  leave = new FakeLeaveDaySource();
-  shifts = new FakeShiftResolver();
+  attendance = new FakeAttendanceDaySource();
   files = new FakePayslipFiles();
   renderer = new FakePayslipRenderer();
   directory = new FakeEmployeeDirectory([
@@ -138,10 +129,7 @@ beforeEach(() => {
   handlers = new SalaryRunHandlers(store, {
     employees: directory,
     settings: new FakeHrmsSettingsStore(),
-    calendar,
-    shifts,
     attendanceDays: attendance,
-    leaveDays: leave,
     statutoryRates: new InMemoryStatutoryRates({
       pf: [PF],
       esi: [ESI],
@@ -209,33 +197,19 @@ describe("calculate (CM-316)", () => {
 
   it("counts half days, absent days, paid and unpaid leave, holidays and week offs", async () => {
     configure("a", 3_100_000);
-    calendar.holidays.add("2026-10-02");
+    attendance.holidays.add("2026-10-02");
     attendance.set("a", "2026-10-05", { status: "absent", workedHours: 0 });
     attendance.set("a", "2026-10-06", { status: "half_day", workedHours: 4 });
-    attendance.set("a", "2026-10-07", { status: "on_leave", workedHours: 0 });
-    attendance.set("a", "2026-10-08", { status: "on_leave", workedHours: 0 });
-    leave.days.push(
-      {
-        memberId: "a",
-        date: "2026-10-07",
-        requestId: "r-1",
-        leaveTypeId: "cl",
-        leaveTypeName: "Casual Leave",
-        isPaid: true,
-        session: "full",
-        days: 1,
-      },
-      {
-        memberId: "a",
-        date: "2026-10-08",
-        requestId: "r-2",
-        leaveTypeId: "lop",
-        leaveTypeName: "Loss of Pay",
-        isPaid: false,
-        session: "full",
-        days: 1,
-      },
-    );
+    attendance.set("a", "2026-10-07", {
+      status: "on_leave",
+      workedHours: 0,
+      leave: { paid: true, half: false, otherHalf: null },
+    });
+    attendance.set("a", "2026-10-08", {
+      status: "on_leave",
+      workedHours: 0,
+      leave: { paid: false, half: false, otherHalf: null },
+    });
     await handlers.calculate(OWNER, { month: "2026-10" });
     const slip = await slipOf("a");
     expect(slip.days).toMatchObject({
@@ -257,9 +231,12 @@ describe("calculate (CM-316)", () => {
 
   it("pays overtime only on days whose shift allows it", async () => {
     configure("a", 3_100_000);
-    attendance.set("a", "2026-10-05", { workedHours: 10, overtimeHours: 2 });
+    attendance.set("a", "2026-10-05", {
+      workedHours: 10,
+      overtimeHours: 2,
+      overtimeAllowed: true,
+    });
     attendance.set("a", "2026-10-06", { workedHours: 9, overtimeHours: 1 });
-    shifts.overtimeAllowed.add("2026-10-05");
     await handlers.calculate(OWNER, { month: "2026-10" });
     const slip = await slipOf("a");
     expect(slip.days.overtimeHours).toBe(3);

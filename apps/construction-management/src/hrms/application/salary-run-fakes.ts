@@ -22,14 +22,8 @@ import type {
 import type {
   AttendanceDay,
   AttendanceDaySource,
-  EffectiveShift,
-  EffectiveShiftResolver,
   EmployeeDirectory,
   HrmsEmployee,
-  LeaveDay,
-  LeaveDaySource,
-  WorkCalendar,
-  WorkCalendarDay,
 } from "./ports";
 import type {
   AdvanceDueSource,
@@ -573,83 +567,40 @@ export class FakeSalaryConfigSource implements SalaryConfigSource {
   }
 }
 
-/** Monday–Friday working days, no holidays (for October 2026 tests). */
-export class FakeWorkCalendar implements WorkCalendar {
-  readonly holidays = new Set<CalendarDate>();
-
-  private kind(date: CalendarDate): WorkCalendarDay["kind"] {
-    if (this.holidays.has(date)) return "holiday";
-    const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
-    return weekday === 0 || weekday === 6 ? "week_off" : "working";
-  }
-
-  holidayFor() {
-    return Promise.resolve(null);
-  }
-
-  isHoliday(_workspaceId: string, _memberId: string, date: CalendarDate) {
-    return Promise.resolve(this.kind(date) === "holiday");
-  }
-
-  isWeekOff(_workspaceId: string, _memberId: string, date: CalendarDate) {
-    return Promise.resolve(this.kind(date) === "week_off");
-  }
-
-  monthFor(
-    _workspaceId: string,
-    memberIds: readonly string[],
-    month: MonthKey,
-  ) {
-    const days = datesOf(month).map((date) => ({
-      date,
-      kind: this.kind(date),
-      holiday: null,
-    }));
-    return Promise.resolve(new Map(memberIds.map((id) => [id, days])));
-  }
-}
-
-/** Attendance per member and date; present 8 h on working days unless set. */
+/**
+ * Attendance per member and date, as `AttendanceDaySource` gives it (leave,
+ * holidays and the day's shift folded in): Monday–Friday present 8 h,
+ * weekends week offs, unless set.
+ */
 export class FakeAttendanceDaySource implements AttendanceDaySource {
+  readonly holidays = new Set<CalendarDate>();
   readonly overrides = new Map<string, Partial<AttendanceDay>>();
-
-  constructor(private readonly calendar: FakeWorkCalendar) {}
 
   set(memberId: string, date: CalendarDate, day: Partial<AttendanceDay>) {
     this.overrides.set(`${memberId}:${date}`, day);
   }
 
-  async monthFor(
-    workspaceId: string,
-    memberIds: readonly string[],
-    month: MonthKey,
-  ) {
-    const calendar = await this.calendar.monthFor(
-      workspaceId,
-      memberIds,
-      month,
-    );
-    return new Map(
-      memberIds.map((memberId) => [
-        memberId,
-        (calendar.get(memberId) ?? []).map((day): AttendanceDay => ({
-          date: day.date,
-          status: day.kind === "working" ? "present" : day.kind,
-          workedHours: day.kind === "working" ? 8 : 0,
-          overtimeHours: 0,
-          late: false,
-          leave: null,
-          ...this.overrides.get(`${memberId}:${day.date}`),
-        })),
-      ]),
-    );
+  private day(memberId: string, date: CalendarDate): AttendanceDay {
+    const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
+    const status: AttendanceDay["status"] = this.holidays.has(date)
+      ? "holiday"
+      : weekday === 0 || weekday === 6
+        ? "week_off"
+        : "present";
+    return {
+      date,
+      status,
+      workedHours: status === "present" ? 8 : 0,
+      overtimeHours: 0,
+      overtimeAllowed: false,
+      shiftWorkingHours: 8,
+      late: false,
+      leave: null,
+      ...this.overrides.get(`${memberId}:${date}`),
+    };
   }
-}
 
-export class FakeLeaveDaySource implements LeaveDaySource {
-  readonly days: (LeaveDay & { memberId: string })[] = [];
-
-  approvedForMonth(
+  monthFor(
     _workspaceId: string,
     memberIds: readonly string[],
     month: MonthKey,
@@ -658,42 +609,9 @@ export class FakeLeaveDaySource implements LeaveDaySource {
       new Map(
         memberIds.map((memberId) => [
           memberId,
-          this.days.filter(
-            (day) => day.memberId === memberId && day.date.startsWith(month),
-          ),
+          datesOf(month).map((date) => this.day(memberId, date)),
         ]),
       ),
-    );
-  }
-}
-
-/** Every day an 8-hour shift; `overtime` dates allow overtime. */
-export class FakeShiftResolver implements EffectiveShiftResolver {
-  readonly overtimeAllowed = new Set<CalendarDate>();
-
-  private shift(date: CalendarDate): EffectiveShift {
-    return {
-      source: "shift",
-      shiftTemplateId: "shift-1",
-      rotationTemplateId: null,
-      name: "General",
-      startTime: "09:00",
-      endTime: "17:00",
-      workingHours: 8,
-      halfDayHours: 4,
-      graceMinutes: 15,
-      overtimeAllowed: this.overtimeAllowed.has(date),
-      isWorkingDay: true,
-    };
-  }
-
-  shiftFor(_workspaceId: string, _memberId: string, date: CalendarDate) {
-    return Promise.resolve(this.shift(date));
-  }
-
-  shiftsForMonth(_workspaceId: string, _memberId: string, month: MonthKey) {
-    return Promise.resolve(
-      new Map(datesOf(month).map((date) => [date, this.shift(date)])),
     );
   }
 }

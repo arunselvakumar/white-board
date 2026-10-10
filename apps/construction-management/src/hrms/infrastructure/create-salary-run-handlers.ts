@@ -15,9 +15,10 @@ import {
 import { PrismaSalaryRunStore } from "./prisma-salary-run-store";
 
 /**
- * Salary runs (CM-316) over Prisma. Day counts come from the ports in
- * `createHrmsPorts`, so the real attendance (CM-308) is picked up wherever
- * it is swapped in; tests may pass their own `ports`.
+ * Salary runs (CM-316) over Prisma. Day counts come from attendance
+ * (`createHrmsPorts().attendanceDays`, which folds in approved leave,
+ * holidays, week offs and each day's shift); tests may pass their own
+ * `ports`.
  */
 export function createSalaryRunHandlers(deps?: {
   prisma?: PrismaClient;
@@ -32,10 +33,7 @@ export function createSalaryRunHandlers(deps?: {
     {
       employees: ports.employees,
       settings: ports.settings,
-      calendar: ports.calendar,
-      shifts: ports.shifts,
       attendanceDays: ports.attendanceDays,
-      leaveDays: ports.leaveDays,
       statutoryRates: ports.statutoryRates,
       configs: new PrismaEmployeeSalaryStore(db),
       company: new PrismaSalaryCompanyReader(db),

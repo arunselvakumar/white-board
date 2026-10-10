@@ -38,13 +38,10 @@ import { componentAmounts } from "../domain/salary-structure";
 import type { SalaryConfigSource } from "./employee-salary-handlers";
 import type {
   AttendanceDaySource,
-  EffectiveShiftResolver,
   EmployeeDirectory,
   HrmsEmployee,
   HrmsSettingsReader,
-  LeaveDaySource,
   StatutoryRates,
-  WorkCalendar,
 } from "./ports";
 import type {
   CalculatedSlipWrite,
@@ -226,10 +223,7 @@ export class SalaryRunHandlers {
     private readonly deps: {
       employees: EmployeeDirectory;
       settings: HrmsSettingsReader;
-      calendar: WorkCalendar;
-      shifts: EffectiveShiftResolver;
       attendanceDays: AttendanceDaySource;
-      leaveDays: LeaveDaySource;
       statutoryRates: StatutoryRates;
       configs: SalaryConfigSource;
       company: SalaryCompanyReader;
@@ -494,27 +488,17 @@ export class SalaryRunHandlers {
     const calcIds = toCalculate.map((item) => item.memberId);
     const period = esiContributionPeriod(month);
     const settings = await this.deps.settings.settingsFor(workspaceId);
-    const [
-      calendar,
-      attendance,
-      leave,
-      firstSlips,
-      advances,
-      pf,
-      esi,
-      ptSlabs,
-    ] = await Promise.all([
-      this.deps.calendar.monthFor(workspaceId, calcIds, month),
-      this.deps.attendanceDays.monthFor(workspaceId, calcIds, month),
-      this.deps.leaveDays.approvedForMonth(workspaceId, calcIds, month),
-      this.store.periodFirstSlips(workspaceId, calcIds, period.start, month),
-      this.store.advancesDue(workspaceId, calcIds, month),
-      this.deps.statutoryRates.pfFor(month),
-      this.deps.statutoryRates.esiFor(month),
-      settings.ptStateCode == null
-        ? Promise.resolve([])
-        : this.deps.statutoryRates.ptSlabsFor(settings.ptStateCode, month),
-    ]);
+    const [attendance, firstSlips, advances, pf, esi, ptSlabs] =
+      await Promise.all([
+        this.deps.attendanceDays.monthFor(workspaceId, calcIds, month),
+        this.store.periodFirstSlips(workspaceId, calcIds, period.start, month),
+        this.store.advancesDue(workspaceId, calcIds, month),
+        this.deps.statutoryRates.pfFor(month),
+        this.deps.statutoryRates.esiFor(month),
+        settings.ptStateCode == null
+          ? Promise.resolve([])
+          : this.deps.statutoryRates.ptSlabsFor(settings.ptStateCode, month),
+      ]);
     const today = monthKeyOf(input.today) === month ? input.today : null;
 
     const writes: CalculatedSlipWrite[] = [];
@@ -523,20 +507,11 @@ export class SalaryRunHandlers {
       const config = configs.get(memberId);
       if (config == null) continue;
       try {
-        const shifts = await this.deps.shifts.shiftsForMonth(
-          workspaceId,
-          memberId,
-          month,
-        );
         const startsOn = starts.get(memberId) ?? null;
         const salaryStartsOn =
           startsOn != null && startsOn > firstDayOf(month) ? startsOn : null;
         const days = aggregateSalaryDays({
-          month,
-          calendar: calendar.get(memberId) ?? [],
-          attendance: attendance.get(memberId) ?? [],
-          leave: leave.get(memberId) ?? [],
-          shifts,
+          days: attendance.get(memberId) ?? [],
           salaryStartsOn,
           today,
         });
