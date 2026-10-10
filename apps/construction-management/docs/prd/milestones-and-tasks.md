@@ -432,10 +432,10 @@ Goal: office and supervisory staff (Team Members) get geo-fenced attendance, lea
 | ID     | Seq | Title                                                                                                                                                 | Status | Blocked by | Area        |
 | ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------- | ----------- |
 | CM-401 |   1 | Prisma `construction-projects.prisma`; grow Project (type, budget, logo, resources)                                                                   | done   | CM-204     | Data+Domain |
-| CM-402 |   2 | Phases, Wings (8 types), floor generation, Units; wing/unit editor screens                                                                            | todo   | CM-401     | Domain+UI   |
+| CM-402 |   2 | Phases, Wings (8 types), floor generation, Units; wing/unit editor screens                                                                            | done   | CM-401     | Domain+UI   |
 | CM-403 |   3 | `LocationRef` value object in the kernel + picker component (Wing/Floor/Unit, Amenity, Common Dev)                                                    | todo   | CM-402     | Kernel+UI   |
 | CM-404 |   4 | Amenities & Common Developments masters + project assignment                                                                                          | todo   | CM-402     | Domain+UI   |
-| CM-405 |   5 | Locations for non-building projects                                                                                                                   | todo   | CM-402     | Domain+UI   |
+| CM-405 |   5 | Locations for non-building projects                                                                                                                   | done   | CM-402     | Domain+UI   |
 | CM-406 |   6 | Project resources: assign team members, contractors, suppliers, vendors (needs CM-5xx masters for parties — or ship contractor/supplier masters here) | todo   | CM-401     | Domain+UI   |
 | CM-407 |   7 | Attachments service (Vercel Blob private uploads through our routes, quota, thumbnails) in the kernel                                                 | todo   | CM-008     | Kernel      |
 | CM-408 |   8 | Drawings: albums (seed 4) + files + viewer                                                                                                            | todo   | CM-407     | Domain+UI   |

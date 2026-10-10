@@ -143,6 +143,27 @@ _Avoid_: attachment (for these), upload
 The building structure inside a Project. A Wing has a type (Commercial, Residential, Bungalow scheme, Plotting scheme…) that drives Floor generation.
 _Avoid_: tower, block, flat (use Wing and Unit)
 
+**Phase**:
+A named stage of a Project with Wings ("Phase 1", "Phase 2"); Wings are grouped under it. A Project's first Wing brings "Phase 1".
+_Avoid_: stage, sector
+
+**Wing Type**:
+One of eight: Commercial, Residential, Bungalow scheme, Residential & Commercial, Plotting scheme, Institutional, Individual Unit, Industrial. It decides the configuration Add Wing asks for.
+
+**Continue to Units**:
+The Add Wing step that turns the configuration (floors, start number, units per floor, basements, terrace) into floors and units the Team Member then adjusts in the editor before Save.
+
+**Floor kinds**:
+Terrace Floor, typed floors (numbered: "Commercial Floor 5"), Ground Floor, Basement Floor N, a scheme's one row of plots or bungalows, and named floors (stilt, podium, mezzanine) added in the editor.
+_Avoid_: level, storey (in UI copy)
+
+**Wing chart**:
+A Wing's floors × units grid, top floor first.
+
+**Location**:
+A named place on a non-building Project (road, pipeline, interiors): "Chainage 0+000 – 2+500", "Culvert C3", with an optional description, in the Team Member's order. Not a Unit, an Amenity or an office location.
+_Avoid_: site, area, zone
+
 **Amenity / Common Development**:
 Locations that are not Units (Swimming Pool, Compound Wall).
 
