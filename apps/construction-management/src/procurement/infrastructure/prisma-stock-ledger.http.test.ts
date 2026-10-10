@@ -143,6 +143,40 @@ describe("PrismaStockLedger (ADR CM-0015 §3, §5)", () => {
     expect(reversals).toBe(1);
   });
 
+  it("makes a reversal wait for an uncommitted post of the same source", async () => {
+    const { context, posting, write, stockOn } = setup();
+    const grn = randomUUID();
+    const source = { type: "stock_movement" as const, id: grn };
+    let release = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let posted = () => {};
+    const hasPosted = new Promise<void>((resolve) => {
+      posted = resolve;
+    });
+    // The post holds its transaction open after writing…
+    const post = write(async (tx) => {
+      await ledger.post(tx, context, [
+        posting("received", "40", "2026-10-01", grn),
+      ]);
+      posted();
+      await held;
+    });
+    await hasPosted;
+    // …so the reversal must wait for it, then reverse what it wrote.
+    const reversal = write((tx) => ledger.reverseSource(tx, context, source));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    release();
+    await Promise.all([post, reversal]);
+    expect(await stockOn()).toBe("0.000");
+    expect(
+      await prisma.constructionProcurementStockEntry.count({
+        where: { sourceId: grn, reversesEntryId: { not: null } },
+      }),
+    ).toBe(1);
+  });
+
   it("serialises concurrent writers to the same stock", async () => {
     const { context, posting, write, stockOn } = setup();
     await write((tx) =>
