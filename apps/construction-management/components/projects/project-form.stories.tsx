@@ -193,7 +193,7 @@ export const NewValidatesAndSaves: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}`,
+        `/app/projects/${ANUGRAHA.id}/resources?step=resources`,
       ),
     );
     await expect(posts()[0]?.body).toEqual({
@@ -527,7 +527,7 @@ export const NewUploadsHeldFilesAfterCreate: Story = {
     releaseUploads();
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}`,
+        `/app/projects/${ANUGRAHA.id}/resources?step=resources`,
       ),
     );
     await expect(peekProjectFlash(ANUGRAHA.id)).toBe(
@@ -1006,7 +1006,7 @@ export const NewUploadsPickedLogoAfterCreate: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}`,
+        `/app/projects/${ANUGRAHA.id}/resources?step=resources`,
       ),
     );
     await expect(posts().map((call) => call.path)).toEqual([BASE, LOGO_PATH]);
