@@ -1,0 +1,77 @@
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/edit/page.tsx
+  s_6604e2237b6922::t_6eea87d4c6ea2c 1-14
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/page.tsx
+  s_6604e2237b6922::t_061438dfcbd949 1-15
+apps/construction-management/app/app/projects/[id]/materials/material-requests/new/page.tsx
+  s_6604e2237b6922::t_7e854e290d288a 1-18
+apps/construction-management/app/app/projects/[id]/materials/material-requests/page.tsx
+  s_6604e2237b6922::t_d96c93b0944ac4 3-5,9-19
+apps/construction-management/app/app/workspace/central-inventory/page.tsx
+  s_6604e2237b6922::t_5a5916578b18f7 1-14
+apps/construction-management/app/app/workspace/central-store/[id]/edit/page.tsx
+  s_6604e2237b6922::t_73d7a8e3af667a 1-14
+apps/construction-management/app/app/workspace/central-store/[id]/page.tsx
+  s_6604e2237b6922::t_49761b9067071c 1-15
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/edit/page.tsx
+  s_6604e2237b6922::t_606954ad7532ce 1-18
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/page.tsx
+  s_6604e2237b6922::t_49d708290acf23 1-18
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/delivery-notes/new/page.tsx
+  s_6604e2237b6922::t_29f75656cd12e3 1-19
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/page.tsx
+  s_6604e2237b6922::t_6a3dd449a4905b 1-19
+apps/construction-management/app/app/workspace/central-store/new/page.tsx
+  s_6604e2237b6922::t_9e4db9a6598449 1-14
+apps/construction-management/app/app/workspace/central-store/page.tsx
+  s_6604e2237b6922::t_2e823922a0feec 1-14
+apps/construction-management/app/app/workspace/page.tsx
+  s_6604e2237b6922::t_50cdb254481868 4,7-10,15-18,20-24,33-42,45
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.tsx
+  s_6604e2237b6922::t_ab70083a403f24 1-401
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.tsx
+  s_6604e2237b6922::t_5b44cba45fc25b 1-309
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.tsx
+  s_6604e2237b6922::t_8dad22a87857fc 1-315
+apps/construction-management/components/procurement/delivery-notes/delivery-notes-list.tsx
+  s_6604e2237b6922::t_6c41fed8a99b3e 1-108
+apps/construction-management/components/procurement/delivery-notes/edit-delivery-note-page.tsx
+  s_6604e2237b6922::t_876ddc86c2d9c5 1-19
+apps/construction-management/components/procurement/material-requests/edit-material-request-page.tsx
+  s_6604e2237b6922::t_89ca05a0b5303b 1-21
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_6604e2237b6922::t_201f238e6bb29f 1-364
+apps/construction-management/components/procurement/material-requests/material-request-form.tsx
+  s_6604e2237b6922::t_b869199c2a1ec0 1-449
+apps/construction-management/components/procurement/material-requests/material-requests-list.tsx
+  s_6604e2237b6922::t_4a1c86b4251953 1-153
+apps/construction-management/components/procurement/material-requests/project-material-requests-page.tsx
+  s_6604e2237b6922::t_a1c6c17b5b6422 1-25
+apps/construction-management/components/procurement/stores/central-store-workspace-tiles.tsx
+  s_6604e2237b6922::t_fef6d5eaeb7e69 1-54
+apps/construction-management/components/procurement/stores/edit-store-page.tsx
+  s_6604e2237b6922::t_d12da5e0e8e068 1-13
+apps/construction-management/components/procurement/stores/store-confirm-dialog.tsx
+  s_6604e2237b6922::t_19f4f988a08065 1-85
+apps/construction-management/components/procurement/stores/store-detail-page.tsx
+  s_6604e2237b6922::t_b8cac213e2d57e 1-261
+apps/construction-management/components/procurement/stores/store-form.tsx
+  s_6604e2237b6922::t_d7b5588ab78d4c 1-284
+apps/construction-management/lib/app-nav.ts
+  s_6604e2237b6922::t_324e0099ae6674 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ee2faeea7a64e3b36c132b7a0871eba15f66b666",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
