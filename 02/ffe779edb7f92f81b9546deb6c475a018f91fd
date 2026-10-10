@@ -1,0 +1,45 @@
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/edit/page.tsx
+  s_6604e2237b6922::t_65f08f09c4302a 1-19
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/page.tsx
+  s_6604e2237b6922::t_de0b9d02b2f335 1-28
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/new/page.tsx
+  s_6604e2237b6922::t_58da4b935151bd 1-31
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/page.tsx
+  s_6604e2237b6922::t_cee20e0e046736 3,7-14
+apps/construction-management/components/procurement/purchase-orders/edit-purchase-order.tsx
+  s_6604e2237b6922::t_deb77883032da7 1-53
+apps/construction-management/components/procurement/purchase-orders/purchase-order-actions.tsx
+  s_6604e2237b6922::t_8aaa6929a36dc8 1-277
+apps/construction-management/components/procurement/purchase-orders/purchase-order-detail.tsx
+  s_6604e2237b6922::t_0e6891bb58c8c9 1-412
+apps/construction-management/components/procurement/purchase-orders/purchase-order-fixtures.ts
+  s_6604e2237b6922::t_7beaf4a4b19bcd 1-283
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form-schema.ts
+  s_6604e2237b6922::t_985ee89daf3ee4 1-443
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_6604e2237b6922::t_03ac56470de23e 1-836
+apps/construction-management/components/procurement/purchase-orders/purchase-order-format.tsx
+  s_6604e2237b6922::t_4279eea28fe509 1-47
+apps/construction-management/components/procurement/purchase-orders/purchase-order-line-sheet.tsx
+  s_6604e2237b6922::t_e2d755ca3899fe 1-311
+apps/construction-management/components/procurement/purchase-orders/purchase-orders-page.tsx
+  s_6604e2237b6922::t_eb32f6466f2436 1-526
+apps/construction-management/components/procurement/purchase-orders/purchase-orders.stories.tsx
+  s_6604e2237b6922::t_70e44e9dc1dd72 1-376
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "02ffe779edb7f92f81b9546deb6c475a018f91fd",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
