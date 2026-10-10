@@ -1,0 +1,75 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_7d8917753e260e::t_556acacdf8dbe7 81-84,797-800
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/delete/route.ts
+  s_7d8917753e260e::t_782efb684c85b4 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/move/route.ts
+  s_7d8917753e260e::t_e1608abd46b22a 1-46
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/[revisionId]/file/route.ts
+  s_7d8917753e260e::t_4fb6233b4397cd 1-48
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/[revisionId]/thumbnail/route.ts
+  s_7d8917753e260e::t_02112a5ad83564 1-37
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/revisions/route.ts
+  s_7d8917753e260e::t_c14909be2ba259 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/route.ts
+  s_7d8917753e260e::t_feffbe42a9b69e 1-30
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/[drawingId]/update/route.ts
+  s_7d8917753e260e::t_5587fedb88cc48 1-42
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/delete/route.ts
+  s_7d8917753e260e::t_cb43bb1f6018f9 1-35
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/route.ts
+  s_7d8917753e260e::t_a7fc9427494d02 1-36
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/[albumId]/update/route.ts
+  s_7d8917753e260e::t_3fe75bd62e4152 1-52
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/albums/route.ts
+  s_7d8917753e260e::t_18b6b57af81dbf 1-62
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-models.ts
+  s_7d8917753e260e::t_c8f4ad23354988 1-219
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-openapi.ts
+  s_7d8917753e260e::t_1a52ffed55ec55 1-281
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-responses.ts
+  s_7d8917753e260e::t_2c080486edbd30 1-108
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawings.http.test.ts
+  s_7d8917753e260e::t_57e8656dd7f81a 1-851
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/handlers.ts
+  s_7d8917753e260e::t_9268085dd1865d 1-25
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/route.ts
+  s_7d8917753e260e::t_887ce99d9cdf10 1-49
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/app/route.ts
+  s_7d8917753e260e::t_4622ac1a123ccb 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/presign/route.ts
+  s_7d8917753e260e::t_7e22f86014ce37 1-6
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/route.ts
+  s_7d8917753e260e::t_30b6f544548bd8 1-10
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_77d6e09c36bb37 1-6
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_c7e9760f1599a1 441
+apps/construction-management/src/projects/application/project-drawings.ts
+  s_7d8917753e260e::t_29ccc3760b7a59 1-825
+apps/construction-management/src/projects/domain/drawing.test.ts
+  s_7d8917753e260e::t_138d4777b4253f 1-45
+apps/construction-management/src/projects/domain/drawing.ts
+  s_7d8917753e260e::t_54a95e78d46ed7 1-103
+apps/construction-management/src/projects/infrastructure/create-project-drawings.ts
+  s_7d8917753e260e::t_f42c0e8f1202ad 1-28
+apps/construction-management/src/projects/infrastructure/prisma-drawing-store.ts
+  s_7d8917753e260e::t_223b74afd8d2f7 1-503
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_7d8917753e260e::t_bf7799d0ee2e2e 10-12,56-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d7a6a0a181fa3f19afe19bb088eb5246661b0b27",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
