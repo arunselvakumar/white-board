@@ -158,7 +158,9 @@ async function receivedByLine(
   excludeReceiptId?: string,
 ): Promise<Map<string, string>> {
   if (orderIds.length === 0) return new Map();
-  const rows = await db.$queryRaw<{ itemId: string; received: string }[]>`
+  const rows = await db.$queryRaw<
+    { itemId: string; received: string }[]
+  >(Prisma.sql`
     SELECT gri.purchase_order_item_id::text AS "itemId",
            SUM(gri.received_qty)::text AS received
     FROM construction_procurement.goods_receipt_items gri
@@ -167,7 +169,7 @@ async function receivedByLine(
       AND gr.deleted_at IS NULL
       ${excludeReceiptId == null ? Prisma.empty : Prisma.sql`AND gr.id <> ${excludeReceiptId}::uuid`}
       AND gri.purchase_order_item_id IS NOT NULL
-    GROUP BY gri.purchase_order_item_id`;
+    GROUP BY gri.purchase_order_item_id`);
   return new Map(
     rows.map((row) => [
       row.itemId,
@@ -228,11 +230,11 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
     options: { lock?: boolean } = {},
   ): Promise<StoredGoodsReceipt | null> {
     if (options.lock === true) {
-      const locked = await db.$queryRaw<{ id: string }[]>`
+      const locked = await db.$queryRaw<{ id: string }[]>(Prisma.sql`
         SELECT id::text FROM construction_procurement.goods_receipts
         WHERE id = ${id}::uuid AND workspace_id = ${workspaceId}
           AND deleted_at IS NULL
-        FOR UPDATE`;
+        FOR UPDATE`);
       if (locked.length === 0) return null;
     }
     const row = await db.constructionProcurementGoodsReceipt.findFirst({
@@ -311,11 +313,11 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
     options: { lock?: boolean; excludeReceiptId?: string } = {},
   ): Promise<OrderFacts | null> {
     if (options.lock === true) {
-      const locked = await db.$queryRaw<{ id: string }[]>`
+      const locked = await db.$queryRaw<{ id: string }[]>(Prisma.sql`
         SELECT id::text FROM construction_procurement.purchase_orders
         WHERE id = ${id}::uuid AND workspace_id = ${workspaceId}
           AND deleted_at IS NULL
-        FOR UPDATE`;
+        FOR UPDATE`);
       if (locked.length === 0) return null;
     }
     const row = await db.constructionProcurementPurchaseOrder.findFirst({
@@ -424,7 +426,7 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
   }
 
   async recomputeOrderReceipt(tx: Db, purchaseOrderId: string): Promise<void> {
-    await tx.$executeRaw`
+    await tx.$executeRaw(Prisma.sql`
       UPDATE construction_procurement.purchase_order_items poi
       SET received_qty = COALESCE((
         SELECT SUM(gri.received_qty)
@@ -432,7 +434,7 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
         JOIN construction_procurement.goods_receipts gr ON gr.id = gri.goods_receipt_id
         WHERE gri.purchase_order_item_id = poi.id AND gr.deleted_at IS NULL
       ), 0)
-      WHERE poi.purchase_order_id = ${purchaseOrderId}::uuid`;
+      WHERE poi.purchase_order_id = ${purchaseOrderId}::uuid`);
     const items = await tx.constructionProcurementPurchaseOrderItem.findMany({
       where: { purchaseOrderId },
       select: { quantity: true, receivedQty: true },

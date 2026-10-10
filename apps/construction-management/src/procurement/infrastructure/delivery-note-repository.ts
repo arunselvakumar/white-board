@@ -610,10 +610,10 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
   }
 
   private async lock(tx: Tx, workspaceId: string, id: string): Promise<Row> {
-    const locked = await tx.$queryRaw<{ id: string }[]>`
+    const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
       SELECT id::text FROM "construction_procurement"."delivery_notes"
       WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL
-      FOR UPDATE`;
+      FOR UPDATE`);
     if (locked.length === 0) throw deliveryNoteNotFound();
     const row = await tx.constructionProcurementDeliveryNote.findFirst({
       where: { id, workspaceId, deletedAt: null },

@@ -127,13 +127,13 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
 
   async lock(db: Db, workspaceId: string, ids: readonly string[]) {
     if (ids.length === 0) return [];
-    await db.$queryRaw`
+    await db.$queryRaw(Prisma.sql`
       SELECT id FROM construction_procurement.purchase_requests
       WHERE workspace_id = ${workspaceId}
         AND id = ANY(${[...ids]}::uuid[])
         AND deleted_at IS NULL
       ORDER BY id
-      FOR UPDATE`;
+      FOR UPDATE`);
     const rows = await db.constructionProcurementPurchaseRequest.findMany({
       where: { id: { in: [...ids] }, workspaceId, deletedAt: null },
       include: withItems,
@@ -317,7 +317,7 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
 
   async facets(db: Db, workspaceId: string, projectId: string) {
     const [creators, materials] = await Promise.all([
-      db.$queryRaw<{ userId: string; name: string | null }[]>`
+      db.$queryRaw<{ userId: string; name: string | null }[]>(Prisma.sql`
         SELECT DISTINCT pr.created_by AS "userId",
           (SELECT tm.name FROM construction_organization.team_members tm
            WHERE tm.workspace_id = pr.workspace_id AND tm.user_id = pr.created_by
@@ -325,8 +325,10 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
         FROM construction_procurement.purchase_requests pr
         WHERE pr.workspace_id = ${workspaceId}
           AND pr.project_id = ${projectId}::uuid
-          AND pr.deleted_at IS NULL`,
-      db.$queryRaw<{ id: string; name: string; categoryId: string | null }[]>`
+          AND pr.deleted_at IS NULL`),
+      db.$queryRaw<
+        { id: string; name: string; categoryId: string | null }[]
+      >(Prisma.sql`
         SELECT DISTINCT ON (i.material_id)
           i.material_id::text AS id, i.material_name AS name,
           i.category_id::text AS "categoryId"
@@ -335,7 +337,7 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
         WHERE pr.workspace_id = ${workspaceId}
           AND pr.project_id = ${projectId}::uuid
           AND pr.deleted_at IS NULL
-        ORDER BY i.material_id, pr.created_at DESC`,
+        ORDER BY i.material_id, pr.created_at DESC`),
     ]);
     return {
       creators: creators
@@ -347,12 +349,14 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
 
   async names(db: Db, workspaceId: string, userIds: readonly string[]) {
     if (userIds.length === 0) return new Map<string, string>();
-    const rows = await db.$queryRaw<{ userId: string; name: string }[]>`
+    const rows = await db.$queryRaw<
+      { userId: string; name: string }[]
+    >(Prisma.sql`
       SELECT DISTINCT ON (user_id) user_id AS "userId", name
       FROM construction_organization.team_members
       WHERE workspace_id = ${workspaceId}
         AND user_id = ANY(${[...userIds]}::text[])
-      ORDER BY user_id, (deleted_at IS NULL) DESC, created_at DESC`;
+      ORDER BY user_id, (deleted_at IS NULL) DESC, created_at DESC`);
     return new Map(rows.map((row) => [row.userId, row.name]));
   }
 
@@ -363,7 +367,9 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
     materialIds: readonly string[],
     excludePurchaseRequestId: string | null,
   ) {
-    const rows = await db.$queryRaw<{ materialId: string; quantity: string }[]>`
+    const rows = await db.$queryRaw<
+      { materialId: string; quantity: string }[]
+    >(Prisma.sql`
       SELECT material_id::text AS "materialId", SUM(quantity)::text AS quantity
       FROM (
         SELECT i.material_id, GREATEST(i.quantity - i.ordered_qty, 0) AS quantity
@@ -388,7 +394,7 @@ export class PrismaPurchaseRequestStore implements PurchaseRequestStore {
           AND po.closed_at IS NULL
           AND poi.material_id = ANY(${[...materialIds]}::uuid[])
       ) AS way
-      GROUP BY material_id`;
+      GROUP BY material_id`);
     return new Map(rows.map((row) => [row.materialId, row.quantity]));
   }
 

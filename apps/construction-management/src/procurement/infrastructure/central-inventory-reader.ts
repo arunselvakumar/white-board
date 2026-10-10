@@ -96,13 +96,13 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     const { workspaceId } = filter;
     const [locations, stockRows, transitRows] = await Promise.all([
       this.locations(workspaceId),
-      this.db.$queryRaw<PositionRow[]>`
+      this.db.$queryRaw<PositionRow[]>(Prisma.sql`
         SELECT location_kind::text AS kind, location_id::text AS "locationId",
                material_id::text AS "materialId", SUM(quantity)::text AS quantity
         FROM "construction_procurement"."stock_entries"
         WHERE workspace_id = ${workspaceId}
           ${locationFilter(filter.locations, Prisma.sql`location_kind`, Prisma.sql`location_id`)}
-        GROUP BY 1, 2, 3`,
+        GROUP BY 1, 2, 3`),
       this.inTransit(workspaceId, filter.locations),
     ]);
 
@@ -226,19 +226,19 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     const where = Prisma.sql`workspace_id = ${workspaceId}
       ${locationFilter(filter.locations, Prisma.sql`location_kind`, Prisma.sql`location_id`)}`;
     const [openings, movements, locations] = await Promise.all([
-      this.db.$queryRaw<PositionRow[]>`
+      this.db.$queryRaw<PositionRow[]>(Prisma.sql`
         SELECT location_kind::text AS kind, location_id::text AS "locationId",
                material_id::text AS "materialId", SUM(quantity)::text AS quantity
         FROM "construction_procurement"."stock_entries"
         WHERE ${where} AND entry_date < ${from}::date
-        GROUP BY 1, 2, 3`,
-      this.db.$queryRaw<(PositionRow & { type: StockEntryType })[]>`
+        GROUP BY 1, 2, 3`),
+      this.db.$queryRaw<(PositionRow & { type: StockEntryType })[]>(Prisma.sql`
         SELECT location_kind::text AS kind, location_id::text AS "locationId",
                material_id::text AS "materialId", type::text AS type,
                SUM(quantity)::text AS quantity
         FROM "construction_procurement"."stock_entries"
         WHERE ${where} AND entry_date >= ${from}::date AND entry_date <= ${to}::date
-        GROUP BY 1, 2, 3, 4`,
+        GROUP BY 1, 2, 3, 4`),
       this.locations(workspaceId),
     ]);
 
@@ -328,7 +328,7 @@ export class PrismaCentralInventory implements CentralInventoryReader {
     workspaceId: string,
     locations: readonly StockLocation[] | undefined,
   ): Promise<PositionRow[]> {
-    return this.db.$queryRaw<PositionRow[]>`
+    return this.db.$queryRaw<PositionRow[]>(Prisma.sql`
       SELECT kind, "locationId", "materialId", SUM(quantity)::text AS quantity
       FROM (
         SELECT t.to_kind::text AS kind, t.to_id::text AS "locationId",
@@ -351,7 +351,7 @@ export class PrismaCentralInventory implements CentralInventoryReader {
           AND d.delivered_at IS NULL
           ${locationFilter(locations, Prisma.sql`'project'`, Prisma.sql`d.project_id`)}
       ) moving
-      GROUP BY kind, "locationId", "materialId"`;
+      GROUP BY kind, "locationId", "materialId"`);
   }
 
   /** Per-location minimum overrides, keyed `kind:locationId:materialId`. */

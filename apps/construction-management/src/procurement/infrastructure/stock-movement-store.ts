@@ -775,12 +775,12 @@ export class StockMovementCommands {
   ): Promise<InventoryImportPlan> {
     const [materials, moved] = await Promise.all([
       materialsByName(db, workspaceId, names),
-      db.$queryRaw<{ materialId: string }[]>`
+      db.$queryRaw<{ materialId: string }[]>(Prisma.sql`
         SELECT DISTINCT material_id::text AS "materialId"
         FROM construction_procurement.stock_entries
         WHERE workspace_id = ${workspaceId}
           AND location_kind = ${location.kind}::construction_procurement.location_kind
-          AND location_id = ${location.id}::uuid`,
+          AND location_id = ${location.id}::uuid`),
     ]);
     return planInventoryImport(
       sheet,
@@ -811,7 +811,7 @@ async function materialsByName(
   if (unique.length === 0) return new Map();
   const rows = await db.$queryRaw<
     { id: string; name: string; uomName: string }[]
-  >`
+  >(Prisma.sql`
     SELECT m.id::text AS id, m.name, u.name AS "uomName"
     FROM construction_masters.materials m
     JOIN construction_masters.measurement_units u ON u.id = m.uom_id
@@ -819,7 +819,7 @@ async function materialsByName(
       AND m.deleted_at IS NULL
       AND m.disabled_at IS NULL
       AND lower(m.name) = ANY(${unique}::text[])
-    ORDER BY m.created_at ASC`;
+    ORDER BY m.created_at ASC`);
   const byName = new Map<
     string,
     { id: string; name: string; uomName: string }

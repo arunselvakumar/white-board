@@ -108,14 +108,16 @@ export async function inFlightByItem(
   exceptNoteId: string | null = null,
 ): Promise<Map<string, string>> {
   if (materialRequestIds.length === 0) return new Map();
-  const rows = await db.$queryRaw<{ itemId: string; quantity: string }[]>`
+  const rows = await db.$queryRaw<
+    { itemId: string; quantity: string }[]
+  >(Prisma.sql`
     SELECT i.material_request_item_id::text AS "itemId", SUM(i.quantity)::text AS quantity
     FROM "construction_procurement"."delivery_note_items" i
     JOIN "construction_procurement"."delivery_notes" d ON d.id = i.delivery_note_id
     WHERE d.material_request_id = ANY(${[...materialRequestIds]}::uuid[])
       AND d.deleted_at IS NULL AND d.delivered_at IS NULL
       ${exceptNoteId == null ? Prisma.empty : Prisma.sql`AND d.id <> ${exceptNoteId}::uuid`}
-    GROUP BY 1`;
+    GROUP BY 1`);
   return new Map(rows.map((row) => [row.itemId, row.quantity]));
 }
 
@@ -411,10 +413,10 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
 
   /** The live request row, locked FOR UPDATE; 404 otherwise. */
   async lock(tx: Tx, workspaceId: string, id: string): Promise<Row> {
-    const locked = await tx.$queryRaw<{ id: string }[]>`
+    const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
       SELECT id::text FROM "construction_procurement"."material_requests"
       WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL
-      FOR UPDATE`;
+      FOR UPDATE`);
     if (locked.length === 0) throw materialRequestNotFound();
     const row = await tx.constructionProcurementMaterialRequest.findFirst({
       where: { id, workspaceId, deletedAt: null },
@@ -467,7 +469,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     projectId: string,
     draft: MaterialRequestDraft,
   ): Promise<void> {
-    const store = await tx.$queryRaw<{ serves: boolean }[]>`
+    const store = await tx.$queryRaw<{ serves: boolean }[]>(Prisma.sql`
       SELECT EXISTS (
         SELECT 1 FROM "construction_procurement"."store_projects" p
         WHERE p.store_id = s.id AND p.project_id = ${projectId}::uuid
@@ -475,7 +477,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
       FROM "construction_procurement"."stores" s
       WHERE s.id = ${draft.storeId}::uuid AND s.workspace_id = ${workspaceId}
         AND s.deleted_at IS NULL
-      FOR SHARE OF s`;
+      FOR SHARE OF s`);
     const [found] = store;
     if (found == null)
       throw new DomainError("STORE_NOT_FOUND", "This store was not found.", {

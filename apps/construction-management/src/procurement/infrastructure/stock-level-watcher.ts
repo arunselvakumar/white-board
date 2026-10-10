@@ -26,7 +26,7 @@ type Row = {
 
 /** Stock settings with their Material's minimum and the stock now. */
 function settings(tx: Tx, workspaceId: string, filter: Prisma.Sql) {
-  return tx.$queryRaw<Row[]>`
+  return tx.$queryRaw<Row[]>(Prisma.sql`
     SELECT s.id::text AS id,
            s.location_kind::text AS "locationKind",
            s.location_id::text AS "locationId",
@@ -47,7 +47,7 @@ function settings(tx: Tx, workspaceId: string, filter: Prisma.Sql) {
     LEFT JOIN construction_masters.materials m
       ON m.id = s.material_id AND m.workspace_id = s.workspace_id
     WHERE s.workspace_id = ${workspaceId}
-      ${filter}`;
+      ${filter}`);
 }
 
 /**

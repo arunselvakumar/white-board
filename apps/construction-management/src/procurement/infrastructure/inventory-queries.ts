@@ -71,7 +71,7 @@ export async function inTransit(
       : Prisma.sql`AND i.material_id = ANY(${[...materialIds]}::uuid[])`;
   const transfers = await db.$queryRaw<
     { direction: "in" | "out"; materialId: string; quantity: string }[]
-  >`
+  >(Prisma.sql`
     SELECT CASE WHEN t.to_kind = ${location.kind}::${LOCATION_KIND}
                  AND t.to_id = ${location.id}::uuid THEN 'in' ELSE 'out' END AS direction,
            i.material_id::text AS "materialId",
@@ -86,8 +86,10 @@ export async function inTransit(
       AND ((t.to_kind = ${location.kind}::${LOCATION_KIND} AND t.to_id = ${location.id}::uuid)
         OR (t.from_kind = ${location.kind}::${LOCATION_KIND} AND t.from_id = ${location.id}::uuid))
       ${materials}
-    GROUP BY 1, 2`;
-  const notes = await db.$queryRaw<{ materialId: string; quantity: string }[]>`
+    GROUP BY 1, 2`);
+  const notes = await db.$queryRaw<
+    { materialId: string; quantity: string }[]
+  >(Prisma.sql`
     SELECT i.material_id::text AS "materialId", SUM(i.quantity)::text AS quantity
     FROM construction_procurement.delivery_notes d
     JOIN construction_procurement.delivery_note_items i ON i.delivery_note_id = d.id
@@ -97,7 +99,7 @@ export async function inTransit(
       AND d.delivered_on IS NULL
       AND ${location.kind === "project" ? Prisma.sql`d.project_id` : Prisma.sql`d.store_id`} = ${location.id}::uuid
       ${materials}
-    GROUP BY 1`;
+    GROUP BY 1`);
   const inbound = new Map<string, string>();
   const outbound = new Map<string, string>();
   const add = (map: Map<string, string>, id: string, quantity: string) => {
@@ -159,13 +161,15 @@ async function stockByMaterial(
   workspaceId: string,
   location: StockLocation,
 ): Promise<Map<string, string>> {
-  const rows = await db.$queryRaw<{ materialId: string; quantity: string }[]>`
+  const rows = await db.$queryRaw<
+    { materialId: string; quantity: string }[]
+  >(Prisma.sql`
     SELECT material_id::text AS "materialId", SUM(quantity)::text AS quantity
     FROM construction_procurement.stock_entries
     WHERE workspace_id = ${workspaceId}
       AND location_kind = ${location.kind}::${LOCATION_KIND}
       AND location_id = ${location.id}::uuid
-    GROUP BY material_id`;
+    GROUP BY material_id`);
   return new Map(rows.map((row) => [row.materialId, q3(row.quantity)]));
 }
 
@@ -279,13 +283,13 @@ export async function inventoryRowOf(
 ): Promise<InventoryRow | null> {
   const [materials, stock, setting, transit] = await Promise.all([
     directory.materials(db, workspaceId, [materialId]),
-    db.$queryRaw<{ quantity: string | null }[]>`
+    db.$queryRaw<{ quantity: string | null }[]>(Prisma.sql`
       SELECT SUM(quantity)::text AS quantity
       FROM construction_procurement.stock_entries
       WHERE workspace_id = ${workspaceId}
         AND location_kind = ${location.kind}::${LOCATION_KIND}
         AND location_id = ${location.id}::uuid
-        AND material_id = ${materialId}::uuid`,
+        AND material_id = ${materialId}::uuid`),
     db.constructionProcurementStockSetting.findUnique({
       where: {
         workspaceId_locationKind_locationId_materialId: {
@@ -432,7 +436,7 @@ export async function inventoryHistory(
   const order = backwards
     ? Prisma.sql`ORDER BY h.entry_date ASC, h.created_at ASC, (h.reverses_entry_id IS NULL) ASC, h.id ASC`
     : Prisma.sql`ORDER BY h.entry_date DESC, h.created_at DESC, (h.reverses_entry_id IS NULL) DESC, h.id DESC`;
-  const rows = await db.$queryRaw<HistoryRow[]>`
+  const rows = await db.$queryRaw<HistoryRow[]>(Prisma.sql`
     SELECT h.id::text AS id, h.entry_date AS "entryDate", h.type::text AS type,
            h.quantity::text AS quantity, h.balance::text AS balance,
            h.source_type::text AS "sourceType", h.source_id::text AS "sourceId",
@@ -455,17 +459,17 @@ export async function inventoryHistory(
     ) h
     WHERE TRUE ${position}
     ${order}
-    LIMIT ${page.limit + 1}`;
+    LIMIT ${page.limit + 1}`);
   const hasMore = rows.length > page.limit;
   const shown = rows.slice(0, page.limit);
   if (backwards) shown.reverse();
-  const totalRows = await db.$queryRaw<{ total: number }[]>`
+  const totalRows = await db.$queryRaw<{ total: number }[]>(Prisma.sql`
     SELECT COUNT(*)::int AS total
     FROM construction_procurement.stock_entries
     WHERE workspace_id = ${workspaceId}
       AND location_kind = ${location.kind}::${LOCATION_KIND}
       AND location_id = ${location.id}::uuid
-      AND material_id = ${materialId}::uuid`;
+      AND material_id = ${materialId}::uuid`);
   const items = await describeEntries(db, workspaceId, location, shown);
   const first = shown[0];
   const last = shown.at(-1);
@@ -618,7 +622,7 @@ export async function stockRegister(
     );
   const rows = await db.$queryRaw<
     { materialId: string; type: StockEntryType | null; quantity: string }[]
-  >`
+  >(Prisma.sql`
     SELECT material_id::text AS "materialId",
            CASE WHEN entry_date < ${calendarDateToDb(range.from)}::date THEN NULL ELSE type::text END AS type,
            SUM(quantity)::text AS quantity
@@ -627,7 +631,7 @@ export async function stockRegister(
       AND location_kind = ${location.kind}::${LOCATION_KIND}
       AND location_id = ${location.id}::uuid
       AND entry_date <= ${calendarDateToDb(range.to)}::date
-    GROUP BY 1, 2`;
+    GROUP BY 1, 2`);
   const byMaterial = new Map<
     string,
     { before: string; moved: Partial<Record<StockEntryType, string>> }

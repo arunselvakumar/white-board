@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/construction-db";
+import { Prisma } from "@repo/construction-db";
 
 import { orderStatusOf } from "../domain/purchase-request";
 
@@ -24,12 +24,12 @@ export async function recomputePurchaseRequestOrdering(
     ...new Set(purchaseRequestIds.filter((id): id is string => id != null)),
   ].sort();
   if (ids.length === 0) return;
-  await tx.$queryRaw`
+  await tx.$queryRaw(Prisma.sql`
     SELECT id FROM construction_procurement.purchase_requests
     WHERE workspace_id = ${workspaceId} AND id = ANY(${ids}::uuid[])
     ORDER BY id
-    FOR UPDATE`;
-  await tx.$executeRaw`
+    FOR UPDATE`);
+  await tx.$executeRaw(Prisma.sql`
     UPDATE construction_procurement.purchase_request_items AS item
     SET ordered_qty = COALESCE((
       SELECT SUM(line.quantity)
@@ -39,7 +39,7 @@ export async function recomputePurchaseRequestOrdering(
         AND po.deleted_at IS NULL
         AND po.approval_status <> 'rejected'
     ), 0)
-    WHERE item.purchase_request_id = ANY(${ids}::uuid[])`;
+    WHERE item.purchase_request_id = ANY(${ids}::uuid[])`);
   const requests = await tx.constructionProcurementPurchaseRequest.findMany({
     where: { workspaceId, id: { in: ids } },
     select: {

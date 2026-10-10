@@ -274,13 +274,13 @@ export class PrismaStoreRepository implements StoreRepository {
           "STORE_CHANGED",
           "Someone changed this store after you opened it. Reload to see the latest.",
         );
-      const [stock] = await tx.$queryRaw<{ count: bigint }[]>`
+      const [stock] = await tx.$queryRaw<{ count: bigint }[]>(Prisma.sql`
         SELECT COUNT(*) AS count FROM (
           SELECT material_id FROM "construction_procurement"."stock_entries"
           WHERE workspace_id = ${actor.workspaceId}
             AND location_kind = 'store' AND location_id = ${id}::uuid
           GROUP BY material_id HAVING SUM(quantity) <> 0
-        ) held`;
+        ) held`);
       const [openRequests, notes, transfers] = await Promise.all([
         tx.constructionProcurementMaterialRequest.count({
           where: {
@@ -375,10 +375,10 @@ export class PrismaStoreRepository implements StoreRepository {
 
   /** The live store row, locked for the rest of the transaction; 404 otherwise. */
   private async lock(tx: Tx, workspaceId: string, id: string): Promise<Row> {
-    const locked = await tx.$queryRaw<{ id: string }[]>`
+    const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
       SELECT id::text FROM "construction_procurement"."stores"
       WHERE id = ${id}::uuid AND workspace_id = ${workspaceId} AND deleted_at IS NULL
-      FOR UPDATE`;
+      FOR UPDATE`);
     if (locked.length === 0) throw storeNotFound();
     const row = await tx.constructionProcurementStore.findFirst({
       where: { id, workspaceId, deletedAt: null },

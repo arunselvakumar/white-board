@@ -1,3 +1,4 @@
+import { Prisma } from "@repo/construction-db";
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { PartyUsage } from "@/src/masters/application/party-handlers";
@@ -14,7 +15,7 @@ export function procurementMaterialUsage(
   db: PrismaClient = prisma,
 ): MaterialUsage {
   return async (workspaceId, materialId) => {
-    const rows = await db.$queryRaw<{ used: boolean }[]>`
+    const rows = await db.$queryRaw<{ used: boolean }[]>(Prisma.sql`
       SELECT EXISTS (
         SELECT 1 FROM construction_procurement.stock_entries
         WHERE workspace_id = ${workspaceId} AND material_id = ${materialId}::uuid
@@ -49,7 +50,7 @@ export function procurementMaterialUsage(
         WHERE d.workspace_id = ${workspaceId} AND i.material_id = ${materialId}::uuid
           AND d.deleted_at IS NULL
       ) AS used
-    `;
+    `);
     return rows[0]?.used === true;
   };
 }
@@ -58,7 +59,7 @@ export function procurementPartyUsage(db: PrismaClient = prisma): PartyUsage {
   return async (kind, workspaceId, id) => {
     const rows =
       kind === "supplier"
-        ? await db.$queryRaw<{ used: boolean }[]>`
+        ? await db.$queryRaw<{ used: boolean }[]>(Prisma.sql`
             SELECT EXISTS (
               SELECT 1 FROM construction_procurement.purchase_orders
               WHERE workspace_id = ${workspaceId} AND supplier_id = ${id}::uuid
@@ -68,14 +69,14 @@ export function procurementPartyUsage(db: PrismaClient = prisma): PartyUsage {
               WHERE workspace_id = ${workspaceId} AND supplier_id = ${id}::uuid
                 AND deleted_at IS NULL
             ) AS used
-          `
-        : await db.$queryRaw<{ used: boolean }[]>`
+          `)
+        : await db.$queryRaw<{ used: boolean }[]>(Prisma.sql`
             SELECT EXISTS (
               SELECT 1 FROM construction_procurement.material_requests
               WHERE workspace_id = ${workspaceId} AND contractor_id = ${id}::uuid
                 AND deleted_at IS NULL
             ) AS used
-          `;
+          `);
     return rows[0]?.used === true;
   };
 }

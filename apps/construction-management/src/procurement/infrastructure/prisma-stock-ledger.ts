@@ -103,7 +103,9 @@ export class PrismaStockLedger {
     materialIds?: readonly string[],
     on?: CalendarDate,
   ): Promise<Map<string, string>> {
-    const rows = await db.$queryRaw<{ materialId: string; quantity: string }[]>`
+    const rows = await db.$queryRaw<
+      { materialId: string; quantity: string }[]
+    >(Prisma.sql`
       SELECT material_id::text AS "materialId", SUM(quantity)::text AS quantity
       FROM "construction_procurement"."stock_entries"
       WHERE workspace_id = ${workspaceId}
@@ -111,7 +113,7 @@ export class PrismaStockLedger {
         AND location_id = ${location.id}::uuid
         ${materialIds == null ? Prisma.empty : Prisma.sql`AND material_id = ANY(${[...materialIds]}::uuid[])`}
         ${on == null ? Prisma.empty : Prisma.sql`AND entry_date <= ${calendarDateToDb(on)}::date`}
-      GROUP BY material_id`;
+      GROUP BY material_id`);
     return new Map(rows.map((row) => [row.materialId, row.quantity]));
   }
 
@@ -130,7 +132,9 @@ export class PrismaStockLedger {
       ),
     ].sort();
     for (const name of names)
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${name}, 0))`;
+      await tx.$executeRaw(
+        Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${name}, 0))`,
+      );
   }
 
   private async write(
@@ -265,7 +269,7 @@ export class PrismaStockLedger {
   ): Promise<StockShortfall | null> {
     const rows = await tx.$queryRaw<
       { entryDate: Date | null; lowest: string | null }[]
-    >`
+    >(Prisma.sql`
       SELECT MIN(entry_date) AS "entryDate", MIN(running)::text AS lowest
       FROM (
         SELECT entry_date,
@@ -277,7 +281,7 @@ export class PrismaStockLedger {
           AND material_id = ${key.materialId}::uuid
         GROUP BY entry_date
       ) balances
-      WHERE entry_date >= ${calendarDateToDb(from)}::date AND running < 0`;
+      WHERE entry_date >= ${calendarDateToDb(from)}::date AND running < 0`);
     const [row] = rows;
     if (row?.entryDate == null || row.lowest == null) return null;
     return {

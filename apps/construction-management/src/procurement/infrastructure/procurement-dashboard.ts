@@ -49,7 +49,7 @@ export class ProcurementDashboard {
   ): Promise<MaterialSummary> {
     const rows = await this.db.$queryRaw<
       { materialId: string; stock: string | null; minimum: string | null }[]
-    >`
+    >(Prisma.sql`
       SELECT m.material_id::text AS "materialId",
              s.stock::text AS stock,
              st.min_stock_qty::text AS minimum
@@ -68,7 +68,7 @@ export class ProcurementDashboard {
       ) s ON s.material_id = m.material_id
       LEFT JOIN "construction_procurement"."stock_settings" st
         ON st.workspace_id = ${workspaceId} AND st.location_kind = 'project'
-       AND st.location_id = ${projectId}::uuid AND st.material_id = m.material_id`;
+       AND st.location_id = ${projectId}::uuid AND st.material_id = m.material_id`);
     const masters = await this.directory.materials(
       this.db,
       workspaceId,
@@ -104,7 +104,7 @@ export class ProcurementDashboard {
   ): Promise<PurchaseOrderSummary> {
     const rows = await this.db.$queryRaw<
       { month: string; count: bigint; value: bigint }[]
-    >`
+    >(Prisma.sql`
       SELECT to_char(order_date, 'YYYY-MM') AS month,
              COUNT(*)::bigint AS count,
              COALESCE(SUM(grand_total), 0)::bigint AS value
@@ -113,7 +113,7 @@ export class ProcurementDashboard {
         AND location_kind = 'project' AND location_id = ${projectId}::uuid
         AND deleted_at IS NULL AND approval_status <> 'rejected'
         AND order_date BETWEEN ${calendarDateToDb(from)}::date AND ${calendarDateToDb(to)}::date
-      GROUP BY 1 ORDER BY 1`;
+      GROUP BY 1 ORDER BY 1`);
     const values = new Map(rows.map((row) => [row.month, row.value]));
     return {
       count: rows.reduce((sum, row) => sum + Number(row.count), 0),

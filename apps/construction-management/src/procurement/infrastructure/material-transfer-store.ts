@@ -417,11 +417,11 @@ export class MaterialTransferCommands {
       throw permissionDenied();
     const { workspaceId } = caller.actor;
     const [projects, stores] = await Promise.all([
-      this.db.$queryRaw<{ id: string; name: string }[]>`
+      this.db.$queryRaw<{ id: string; name: string }[]>(Prisma.sql`
         SELECT id::text AS id, name
         FROM construction_projects.projects
         WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL
-        ORDER BY lower(name), id`,
+        ORDER BY lower(name), id`),
       this.db.constructionProcurementStore.findMany({
         where: { workspaceId, deletedAt: null },
         select: { id: true, name: true },

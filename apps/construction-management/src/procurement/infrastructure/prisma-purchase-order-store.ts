@@ -218,13 +218,13 @@ export class PrismaPurchaseOrderStore implements PurchaseOrderStore {
 
   async lock(db: Db, workspaceId: string, ids: readonly string[]) {
     if (ids.length === 0) return [];
-    await db.$queryRaw`
+    await db.$queryRaw(Prisma.sql`
       SELECT id FROM construction_procurement.purchase_orders
       WHERE workspace_id = ${workspaceId}
         AND id = ANY(${[...ids]}::uuid[])
         AND deleted_at IS NULL
       ORDER BY id
-      FOR UPDATE`;
+      FOR UPDATE`);
     const rows = await db.constructionProcurementPurchaseOrder.findMany({
       where: { id: { in: [...ids] }, workspaceId, deletedAt: null },
       include: withLines,
