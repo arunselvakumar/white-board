@@ -145,6 +145,20 @@ export class PrismaStockLedger {
     options: LedgerWriteOptions,
   ): Promise<LedgerWriteResult> {
     const { workspaceId, by } = context;
+    // One writer per source at a time: a second edit or delete of the same
+    // document waits, then finds the first one's reversal and no live
+    // entries, instead of failing on the unique reversal index.
+    const sources = [
+      ...new Set(
+        reverse.map(
+          (source) => `stock-source:${workspaceId}:${source.type}:${source.id}`,
+        ),
+      ),
+    ].sort();
+    for (const name of sources)
+      await tx.$executeRaw(
+        Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${name}, 0))`,
+      );
     const live = [];
     for (const source of reverse)
       live.push(...(await this.liveEntries(tx, workspaceId, source)));
