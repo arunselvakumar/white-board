@@ -1,0 +1,47 @@
+apps/construction-management/app/app/workspace/hrms/salary/my/page.tsx
+  s_6a70f1cb429bb6::t_3305611fbbe72f 2-3,5,12-25
+apps/construction-management/app/app/workspace/hrms/salary/team/page.tsx
+  s_6a70f1cb429bb6::t_6f97914574c44e 3,10-12
+apps/construction-management/components/hrms/salary/my-salary-page.stories.tsx
+  s_6a70f1cb429bb6::t_f63b26d2cb9088 1-96
+apps/construction-management/components/hrms/salary/my-salary-page.tsx
+  s_6a70f1cb429bb6::t_0425903be09e18 1-96
+apps/construction-management/components/hrms/salary/salary-dialogs.tsx
+  s_6a70f1cb429bb6::t_aa26b3104a6712 1-476
+apps/construction-management/components/hrms/salary/salary-slip-sheet.tsx
+  s_6a70f1cb429bb6::t_3aba88c63766f9 1-367
+apps/construction-management/components/hrms/salary/team-salary-page.stories.tsx
+  s_6a70f1cb429bb6::t_ededd409a66bf8 1-300
+apps/construction-management/components/hrms/salary/team-salary-page.tsx
+  s_6a70f1cb429bb6::t_990fd1eed8362d 1-520
+apps/construction-management/src/queries/hrms-salary.ts
+  s_6a70f1cb429bb6::t_5f435edc3312e4 1-150
+apps/construction-management/components/hrms/salary/salary-format.ts
+  s_553a74ef78f365::t_a6b2252f9f2449 1-74
+apps/construction-management/components/hrms/salary/salary-story-support.ts
+  s_553a74ef78f365::t_b338f04ff7e027 1-236
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6be88dd692bc40bd6baa68cd29eeaf1c633891d0",
+  "prompts": {},
+  "sessions": {
+    "s_553a74ef78f365": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa4f04e9bb83d7969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
