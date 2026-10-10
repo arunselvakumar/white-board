@@ -89,6 +89,7 @@ import {
   type ProjectFormValues,
 } from "./project-form-schema";
 import { PROJECTS_PATH, projectPath } from "./projects-home";
+import { resourcesStepPath } from "./resources/resources-step";
 import {
   formatCalendarDate,
   PROJECT_STATUS_LABELS,
@@ -668,7 +669,8 @@ function ProjectForm({
 /**
  * New Project (`/app/projects/new`). The logo and the files picked under
  * Contract wait until the Project exists, then upload; the Project opens
- * either way, and says what did not make it.
+ * either way, on its Resources as step 2 of 2 (CM-406), and its Overview
+ * says what did not make it.
  */
 export function NewProjectScreen() {
   const router = useRouter();
@@ -723,7 +725,7 @@ export function NewProjectScreen() {
             }
             if (messages.length > 0)
               setProjectFlash(created.id, messages.join(" "));
-            router.push(projectPath(created.id));
+            router.push(resourcesStepPath(created.id));
           }}
         />
       </div>

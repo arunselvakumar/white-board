@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { startUploadResponseModel } from "@/app/api/_lib/attachments";
+
 import {
   PROJECT_DOCUMENT_KINDS,
   PROJECT_DOCUMENT_MAX_BYTES,
@@ -35,6 +37,12 @@ export const ConstructionProjectsDocumentResponseModel = z.object({
   url: z
     .string()
     .describe("Our route that streams the file; add `?download=1` to save it."),
+  thumbUrl: z
+    .string()
+    .nullable()
+    .describe(
+      "Our route for the image's WebP thumbnail (CM-407), or null when none was made.",
+    ),
   createdAt: z.iso.datetime(),
   createdBy: z.string().describe("User id of the uploader."),
   createdByName: z
@@ -83,28 +91,8 @@ export type StartConstructionProjectsDocumentUploadRequestModel = z.infer<
   typeof StartConstructionProjectsDocumentUploadRequestModel
 >;
 
-export const StartConstructionProjectsDocumentUploadResponseModel = z.object({
-  key: z
-    .string()
-    .describe("Where the file goes; send it back to finish the upload."),
-  fileName: z.string().describe("The name as it will be shown."),
-  upload: z.discriminatedUnion("via", [
-    z
-      .object({
-        via: z.literal("blob"),
-        handleUploadUrl: z.string(),
-        multipart: z.boolean(),
-      })
-      .describe(
-        "Deployed: the browser sends the file straight to private storage with `uploadPresigned(key, file, { access: 'private', handleUploadUrl, multipart })` from `@vercel/blob/client`.",
-      ),
-    z
-      .object({ via: z.literal("app"), url: z.string() })
-      .describe(
-        "Development and tests: POST the raw file to `url` with its content-type.",
-      ),
-  ]),
-});
+export const StartConstructionProjectsDocumentUploadResponseModel =
+  startUploadResponseModel();
 
 export type StartConstructionProjectsDocumentUploadResponseModel = z.infer<
   typeof StartConstructionProjectsDocumentUploadResponseModel

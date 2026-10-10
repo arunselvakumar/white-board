@@ -75,6 +75,10 @@ import {
   developmentOpenApiOperations,
 } from "@/app/api/construction/masters/development-openapi";
 import {
+  partiesOpenApiComponents,
+  partiesOpenApiOperations,
+} from "@/app/api/construction/masters/parties-openapi";
+import {
   projectsOpenApiComponents,
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
@@ -86,6 +90,30 @@ import {
   projectDocumentOpenApiComponents,
   projectDocumentOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/documents/project-document-openapi";
+import {
+  wingOpenApiComponents,
+  wingOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/wings/wing-openapi";
+import {
+  locationOpenApiComponents,
+  locationOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/locations/location-openapi";
+import {
+  projectResourcesOpenApiComponents,
+  projectResourcesOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/resources/resources-openapi";
+import {
+  drawingOpenApiComponents,
+  drawingOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/drawings/drawing-openapi";
+import {
+  testingReportOpenApiComponents,
+  testingReportOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/testing-reports/testing-report-openapi";
+import {
+  galleryOpenApiComponents,
+  galleryOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/gallery/gallery-openapi";
 import {
   vendorOpenApiComponents,
   vendorOpenApiOperations,
@@ -798,6 +826,28 @@ openApiOperations.push(...projectsOpenApiOperations);
 Object.assign(openApiComponents, projectDocumentOpenApiComponents);
 openApiOperations.push(...projectDocumentOpenApiOperations);
 
+// Phases, Wings (CM-402) and Locations (CM-405) list their own models and routes.
+Object.assign(openApiComponents, wingOpenApiComponents);
+openApiOperations.push(...wingOpenApiOperations);
+Object.assign(openApiComponents, locationOpenApiComponents);
+openApiOperations.push(...locationOpenApiOperations);
+
+// Project Resources (CM-406): where four contexts' parties meet a Project.
+Object.assign(openApiComponents, projectResourcesOpenApiComponents);
+openApiOperations.push(...projectResourcesOpenApiOperations);
+
+// Project Drawings (CM-408) list their own models and routes.
+Object.assign(openApiComponents, drawingOpenApiComponents);
+openApiOperations.push(...drawingOpenApiOperations);
+
+// Testing Reports (CM-409) list their own models and routes.
+Object.assign(openApiComponents, testingReportOpenApiComponents);
+openApiOperations.push(...testingReportOpenApiOperations);
+
+// The Gallery (CM-410) lists its own models and routes.
+Object.assign(openApiComponents, galleryOpenApiComponents);
+openApiOperations.push(...galleryOpenApiOperations);
+
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
 openApiOperations.push(...mastersOpenApiOperations);
@@ -809,6 +859,10 @@ openApiOperations.push(...developmentOpenApiOperations);
 // A Project's Amenities, home, preferences and dashboard (CM-404, CM-411, CM-412).
 Object.assign(openApiComponents, projectHomeOpenApiComponents);
 openApiOperations.push(...projectHomeOpenApiOperations);
+
+// Contractors and Suppliers (CM-406) list their own models and routes.
+Object.assign(openApiComponents, partiesOpenApiComponents);
+openApiOperations.push(...partiesOpenApiOperations);
 
 // The Vendor register (CM-208, CM-209) lists its own models and routes.
 Object.assign(openApiComponents, vendorOpenApiComponents);
