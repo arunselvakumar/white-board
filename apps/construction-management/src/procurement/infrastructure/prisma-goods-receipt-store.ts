@@ -99,7 +99,9 @@ function headerData(receipt: StoredGoodsReceipt) {
     supplyType: receipt.supplyType,
     invoiceNo: details.invoiceNo,
     invoiceDate:
-      details.invoiceDate == null ? null : calendarDateToDb(details.invoiceDate),
+      details.invoiceDate == null
+        ? null
+        : calendarDateToDb(details.invoiceDate),
     invoiceAmount: details.invoiceAmount,
     deliveryChallanNo: details.deliveryChallanNo,
     grnDcNo: details.grnDcNo,
@@ -167,7 +169,10 @@ async function receivedByLine(
       AND gri.purchase_order_item_id IS NOT NULL
     GROUP BY gri.purchase_order_item_id`;
   return new Map(
-    rows.map((row) => [row.itemId, new Prisma.Decimal(row.received).toFixed(3)]),
+    rows.map((row) => [
+      row.itemId,
+      new Prisma.Decimal(row.received).toFixed(3),
+    ]),
   );
 }
 
@@ -382,7 +387,11 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
 
   async replace(tx: Db, receipt: StoredGoodsReceipt): Promise<void> {
     const updated = await tx.constructionProcurementGoodsReceipt.updateMany({
-      where: { id: receipt.id, workspaceId: receipt.workspaceId, deletedAt: null },
+      where: {
+        id: receipt.id,
+        workspaceId: receipt.workspaceId,
+        deletedAt: null,
+      },
       data: headerData(receipt),
     });
     if (updated.count === 0)
@@ -405,7 +414,11 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
     now: Date,
   ): Promise<void> {
     await tx.constructionProcurementGoodsReceipt.updateMany({
-      where: { id: receipt.id, workspaceId: receipt.workspaceId, deletedAt: null },
+      where: {
+        id: receipt.id,
+        workspaceId: receipt.workspaceId,
+        deletedAt: null,
+      },
       data: { deletedAt: now, deletedBy: by, updatedAt: now, updatedBy: by },
     });
   }
@@ -446,8 +459,7 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
         deletedAt: null,
       },
     ];
-    if (params.createdBy != null)
-      filters.push({ createdBy: params.createdBy });
+    if (params.createdBy != null) filters.push({ createdBy: params.createdBy });
     if (params.supplierId != null)
       filters.push({ supplierId: params.supplierId });
     if (params.purchaseOrderId != null)
@@ -562,7 +574,9 @@ export class PrismaGoodsReceiptStore implements GoodsReceiptStore {
     });
     return new Map(
       rows
-        .filter((row): row is { userId: string; name: string } => row.userId != null)
+        .filter(
+          (row): row is { userId: string; name: string } => row.userId != null,
+        )
         .map((row) => [row.userId, row.name]),
     );
   }

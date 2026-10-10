@@ -14,7 +14,8 @@ import {
   type GrnOptionalField,
 } from "@/src/procurement/domain/goods-receipt";
 
-export const GOODS_RECEIPTS_PATH = "/api/construction/procurement/goods-receipts";
+export const GOODS_RECEIPTS_PATH =
+  "/api/construction/procurement/goods-receipts";
 
 const locationKind = z.enum(["project", "store"]);
 const supplyType = z.enum(["intra_state", "inter_state"]);
@@ -285,12 +286,16 @@ export const GetConstructionProcurementGoodsReceiptFormOptionsResponseModel =
         stateCode: z.string().nullable(),
       }),
     ),
-    purchaseOrders: z.array(ConstructionProcurementReceivableOrderResponseModel),
+    purchaseOrders: z.array(
+      ConstructionProcurementReceivableOrderResponseModel,
+    ),
     hiddenFields: z.array(grnField),
     financial: z.boolean(),
   });
 export type GetConstructionProcurementGoodsReceiptFormOptionsResponseModel =
-  z.infer<typeof GetConstructionProcurementGoodsReceiptFormOptionsResponseModel>;
+  z.infer<
+    typeof GetConstructionProcurementGoodsReceiptFormOptionsResponseModel
+  >;
 
 function hiddenList(hidden: ReadonlySet<string>): GrnOptionalField[] {
   return GRN_OPTIONAL_FIELDS.filter((field) => hidden.has(field));

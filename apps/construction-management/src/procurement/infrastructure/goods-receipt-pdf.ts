@@ -126,7 +126,12 @@ function columns(input: GoodsReceiptPdfInput): Column[] {
       align: "right",
       value: (line) => qty(line.receivedQty),
     },
-    { heading: "Unit", width: 40, align: "left", value: (line) => line.uomName },
+    {
+      heading: "Unit",
+      width: 40,
+      align: "left",
+      value: (line) => line.uomName,
+    },
   );
   if (input.financial)
     fixed.push(

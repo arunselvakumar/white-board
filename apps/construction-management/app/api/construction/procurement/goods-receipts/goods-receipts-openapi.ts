@@ -92,7 +92,8 @@ export const goodsReceiptOpenApiOperations: OpenApiOperation[] = [
     query: GetConstructionProcurementGoodsReceiptFormOptionsRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "Form options",
-    successSchema: GetConstructionProcurementGoodsReceiptFormOptionsResponseModel,
+    successSchema:
+      GetConstructionProcurementGoodsReceiptFormOptionsResponseModel,
     errors: READ_ERRORS,
   },
   {

@@ -912,13 +912,7 @@ export class GoodsReceiptHandlers {
         { details: { field: "lines" } },
       );
     const supplier = await this.supplier(tx, input, location, stored);
-    const order = await this.linkedOrder(
-      tx,
-      input,
-      location,
-      supplier,
-      stored,
-    );
+    const order = await this.linkedOrder(tx, input, location, supplier, stored);
     const supplyType: SupplyType =
       input.supplyType ??
       (stored != null && stored.purchaseOrderId === (order?.id ?? null)
