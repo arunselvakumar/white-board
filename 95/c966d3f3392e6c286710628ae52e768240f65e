@@ -1,0 +1,211 @@
+apps/construction-management/.env.example
+  s_6a70f1cb429bb6::t_608ba1ecc11590 64-69
+apps/construction-management/app/api/construction/hrms/hrms-openapi.ts
+  s_6a70f1cb429bb6::t_31c861c3d961b7 12-15,38,72
+apps/construction-management/app/api/construction/hrms/leave-balances/accruals/route.ts
+  s_6a70f1cb429bb6::t_b351aa7072deab 1-42
+apps/construction-management/app/api/construction/hrms/leave-balances/accrue/route.ts
+  s_6a70f1cb429bb6::t_2f9209a4a593db 1-36
+apps/construction-management/app/api/construction/hrms/leave-balances/accrue/scheduled/route.ts
+  s_6a70f1cb429bb6::t_51e1e415310e57 1-51
+apps/construction-management/app/api/construction/hrms/leave-balances/adjust/route.ts
+  s_6a70f1cb429bb6::t_13472f70054c7a 1-34
+apps/construction-management/app/api/construction/hrms/leave-balances/initialize-by-structure/route.ts
+  s_6a70f1cb429bb6::t_ab6bcb6a55c53b 1-31
+apps/construction-management/app/api/construction/hrms/leave-balances/initialize/route.ts
+  s_6a70f1cb429bb6::t_e3cc48a721eaf5 1-35
+apps/construction-management/app/api/construction/hrms/leave-balances/leave-balance-models.ts
+  s_6a70f1cb429bb6::t_ba0b2d63624d95 1-234
+apps/construction-management/app/api/construction/hrms/leave-balances/leave-balances.http.test.ts
+  s_6a70f1cb429bb6::t_880a316981a066 1-507
+apps/construction-management/app/api/construction/hrms/leave-balances/route.ts
+  s_6a70f1cb429bb6::t_9ba40e9f5aff00 1-36
+apps/construction-management/app/api/construction/hrms/leave-balances/team/route.ts
+  s_6a70f1cb429bb6::t_e073a0cd9205ff 1-38
+apps/construction-management/app/api/construction/hrms/leave-http-support.ts
+  s_6a70f1cb429bb6::t_3b96ebdebeef52 1-122
+apps/construction-management/app/api/construction/hrms/leave-openapi.ts
+  s_6a70f1cb429bb6::t_9e6a93b76edddd 1-546
+apps/construction-management/app/api/construction/hrms/leave-route.ts
+  s_6a70f1cb429bb6::t_821b19d67c47b8 1-52
+apps/construction-management/app/api/construction/hrms/leave-structures/[id]/delete/route.ts
+  s_6a70f1cb429bb6::t_8213cfafcb71cb 1-43
+apps/construction-management/app/api/construction/hrms/leave-structures/[id]/route.ts
+  s_6a70f1cb429bb6::t_ff154300e5c7ad 1-35
+apps/construction-management/app/api/construction/hrms/leave-structures/[id]/update/route.ts
+  s_6a70f1cb429bb6::t_6e4aa2dfe60082 1-49
+apps/construction-management/app/api/construction/hrms/leave-structures/assignments/[id]/delete/route.ts
+  s_6a70f1cb429bb6::t_1ab0862b70c8b8 1-33
+apps/construction-management/app/api/construction/hrms/leave-structures/assignments/route.ts
+  s_6a70f1cb429bb6::t_067e7f66296699 1-66
+apps/construction-management/app/api/construction/hrms/leave-structures/leave-structure-models.ts
+  s_6a70f1cb429bb6::t_c7e972a94754df 1-148
+apps/construction-management/app/api/construction/hrms/leave-structures/route.ts
+  s_6a70f1cb429bb6::t_2f8e1e915ef907 1-58
+apps/construction-management/app/api/construction/hrms/leave-types/[id]/activate/route.ts
+  s_6a70f1cb429bb6::t_49c4f92e823429 1-43
+apps/construction-management/app/api/construction/hrms/leave-types/[id]/deactivate/route.ts
+  s_6a70f1cb429bb6::t_197e71ea3aaa2c 1-43
+apps/construction-management/app/api/construction/hrms/leave-types/[id]/delete/route.ts
+  s_6a70f1cb429bb6::t_8cf86f6f435b12 1-46
+apps/construction-management/app/api/construction/hrms/leave-types/[id]/route.ts
+  s_6a70f1cb429bb6::t_16c739f21349c3 1-35
+apps/construction-management/app/api/construction/hrms/leave-types/[id]/update/route.ts
+  s_6a70f1cb429bb6::t_c4cee70450ee14 1-45
+apps/construction-management/app/api/construction/hrms/leave-types/accrual-options/route.ts
+  s_6a70f1cb429bb6::t_4ba8b087b9b7e7 1-23
+apps/construction-management/app/api/construction/hrms/leave-types/leave-type-models.ts
+  s_6a70f1cb429bb6::t_474bb329f09911 1-163
+apps/construction-management/app/api/construction/hrms/leave-types/leave-types.http.test.ts
+  s_6a70f1cb429bb6::t_77d6e16c66edf9 1-326
+apps/construction-management/app/api/construction/hrms/leave-types/route.ts
+  s_6a70f1cb429bb6::t_cf9f8e3fc4c7f5 1-56
+apps/construction-management/app/api/construction/hrms/leaves/[id]/approve-cancellation/route.ts
+  s_6a70f1cb429bb6::t_9eff7a759cf5a9 1-43
+apps/construction-management/app/api/construction/hrms/leaves/[id]/approve/route.ts
+  s_6a70f1cb429bb6::t_bf3b70317e8a95 1-43
+apps/construction-management/app/api/construction/hrms/leaves/[id]/reject-cancellation/route.ts
+  s_6a70f1cb429bb6::t_516202b7e59f43 1-43
+apps/construction-management/app/api/construction/hrms/leaves/[id]/reject/route.ts
+  s_6a70f1cb429bb6::t_6641e4d7cabd60 1-43
+apps/construction-management/app/api/construction/hrms/leaves/[id]/request-cancellation/route.ts
+  s_6a70f1cb429bb6::t_1aee619ba3a5a0 1-45
+apps/construction-management/app/api/construction/hrms/leaves/[id]/route.ts
+  s_6a70f1cb429bb6::t_f7d62fbac0c74c 1-35
+apps/construction-management/app/api/construction/hrms/leaves/[id]/withdraw/route.ts
+  s_6a70f1cb429bb6::t_607d312bb26a9f 1-42
+apps/construction-management/app/api/construction/hrms/leaves/approvals/route.ts
+  s_6a70f1cb429bb6::t_ba5e2d0d3e1a2a 1-37
+apps/construction-management/app/api/construction/hrms/leaves/leave-models.ts
+  s_6a70f1cb429bb6::t_3583401f8c7788 1-346
+apps/construction-management/app/api/construction/hrms/leaves/leaves.http.test.ts
+  s_6a70f1cb429bb6::t_e9c2625fdee287 1-747
+apps/construction-management/app/api/construction/hrms/leaves/options/route.ts
+  s_6a70f1cb429bb6::t_6a075121a14f30 1-24
+apps/construction-management/app/api/construction/hrms/leaves/preview/route.ts
+  s_6a70f1cb429bb6::t_001d2399df354c 1-34
+apps/construction-management/app/api/construction/hrms/leaves/report/team/route.ts
+  s_6a70f1cb429bb6::t_ae5b91e3ef17a0 1-31
+apps/construction-management/app/api/construction/hrms/leaves/route.ts
+  s_6a70f1cb429bb6::t_e9984308e88c3e 1-62
+apps/construction-management/app/api/construction/hrms/leaves/team/route.ts
+  s_6a70f1cb429bb6::t_745f589e48cf84 1-35
+apps/construction-management/app/app/workspace/hrms/configuration/leave-balances/page.tsx
+  s_6a70f1cb429bb6::t_bbfb613ae38ad2 3,6-8,10-12
+apps/construction-management/app/app/workspace/hrms/configuration/leave-types/page.tsx
+  s_6a70f1cb429bb6::t_6a8b4cb3bba72a 3,6-8,10-12
+apps/construction-management/app/app/workspace/hrms/leave/approvals/page.tsx
+  s_6a70f1cb429bb6::t_8093c318fd1eb0 3,6-8,10-12
+apps/construction-management/app/app/workspace/hrms/leave/my/page.tsx
+  s_6a70f1cb429bb6::t_36ed233c5c5dee 3,6-8,10-12
+apps/construction-management/app/app/workspace/hrms/leave/team/page.tsx
+  s_6a70f1cb429bb6::t_7d27f6d72030fa 3,6-8,10-12
+apps/construction-management/components/hrms/leave/apply-leave-dialog.tsx
+  s_6a70f1cb429bb6::t_ce4bedf1ac21a5 1-480
+apps/construction-management/components/hrms/leave/leave-approvals-page.stories.tsx
+  s_6a70f1cb429bb6::t_22cb6c32b89b1f 1-176
+apps/construction-management/components/hrms/leave/leave-approvals-page.tsx
+  s_6a70f1cb429bb6::t_30c0f59b318171 1-237
+apps/construction-management/components/hrms/leave/leave-assign-dialog.tsx
+  s_6a70f1cb429bb6::t_51790567672c6a 1-218
+apps/construction-management/components/hrms/leave/leave-balance-dialogs.tsx
+  s_6a70f1cb429bb6::t_2c15b696f23739 1-606
+apps/construction-management/components/hrms/leave/leave-balances-page.stories.tsx
+  s_6a70f1cb429bb6::t_ce4e7c15d0637b 1-217
+apps/construction-management/components/hrms/leave/leave-balances-page.tsx
+  s_6a70f1cb429bb6::t_42b6cff6d6d06f 1-341
+apps/construction-management/components/hrms/leave/leave-configuration-page.stories.tsx
+  s_6a70f1cb429bb6::t_3b0d9befbc6b0f 1-285
+apps/construction-management/components/hrms/leave/leave-configuration-page.tsx
+  s_6a70f1cb429bb6::t_8ff000dd1431b1 1-522
+apps/construction-management/components/hrms/leave/leave-format.ts
+  s_6a70f1cb429bb6::t_0036b9280f4405 1-95
+apps/construction-management/components/hrms/leave/leave-request-parts.tsx
+  s_6a70f1cb429bb6::t_c4007bea86fb59 1-483
+apps/construction-management/components/hrms/leave/leave-story-support.ts
+  s_6a70f1cb429bb6::t_8a502d851d294e 1-522
+apps/construction-management/components/hrms/leave/leave-structure-dialog.tsx
+  s_6a70f1cb429bb6::t_e1ac55e0028c3d 1-279
+apps/construction-management/components/hrms/leave/leave-type-dialog.tsx
+  s_6a70f1cb429bb6::t_22d074df1f6ae7 1-553
+apps/construction-management/components/hrms/leave/member-checklist.tsx
+  s_6a70f1cb429bb6::t_2c38b8a187ac41 1-77
+apps/construction-management/components/hrms/leave/my-leaves-page.stories.tsx
+  s_6a70f1cb429bb6::t_c0ac8f59f57869 1-314
+apps/construction-management/components/hrms/leave/my-leaves-page.tsx
+  s_6a70f1cb429bb6::t_885ed671bfd041 1-251
+apps/construction-management/components/hrms/leave/team-leaves-page.stories.tsx
+  s_6a70f1cb429bb6::t_34c93a93fed233 1-143
+apps/construction-management/components/hrms/leave/team-leaves-page.tsx
+  s_6a70f1cb429bb6::t_e693e24f57a3da 1-314
+apps/construction-management/src/composition/company-created-listeners.ts
+  s_6a70f1cb429bb6::t_59f1ffc903938d 1,12-15
+apps/construction-management/src/hrms/application/leave-balance-handlers.ts
+  s_6a70f1cb429bb6::t_ca34ed29b6965a 1-761
+apps/construction-management/src/hrms/application/leave-configuration-handlers.ts
+  s_6a70f1cb429bb6::t_404163b7680e1d 1-401
+apps/construction-management/src/hrms/application/leave-entitlements.ts
+  s_6a70f1cb429bb6::t_e84f552f2f840e 1-117
+apps/construction-management/src/hrms/application/leave-ports.ts
+  s_6a70f1cb429bb6::t_d0aeacf4c6d9c9 1-302
+apps/construction-management/src/hrms/application/leave-request-handlers.ts
+  s_6a70f1cb429bb6::t_d0519f8d3da922 1-1052
+apps/construction-management/src/hrms/domain/leave-balance.test.ts
+  s_6a70f1cb429bb6::t_66e656822b90fd 1-418
+apps/construction-management/src/hrms/domain/leave-balance.ts
+  s_6a70f1cb429bb6::t_92342430c5116f 1-324
+apps/construction-management/src/hrms/domain/leave-days.ts
+  s_6a70f1cb429bb6::t_2cd26f21e269f2 1-54
+apps/construction-management/src/hrms/domain/leave-request.test.ts
+  s_6a70f1cb429bb6::t_dfc3debd8c9315 1-389
+apps/construction-management/src/hrms/domain/leave-request.ts
+  s_6a70f1cb429bb6::t_e0474879238479 1-479
+apps/construction-management/src/hrms/domain/leave-structure.test.ts
+  s_6a70f1cb429bb6::t_ac4263cdfbb75c 1-91
+apps/construction-management/src/hrms/domain/leave-structure.ts
+  s_6a70f1cb429bb6::t_4d3ea9872a6484 1-138
+apps/construction-management/src/hrms/domain/leave-type.test.ts
+  s_6a70f1cb429bb6::t_b7cd65b2151cbd 1-191
+apps/construction-management/src/hrms/domain/leave-type.ts
+  s_6a70f1cb429bb6::t_067b1351fdc9df 1-273
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_6a70f1cb429bb6::t_150ebd3ce2b25c 24,36,78
+apps/construction-management/src/hrms/infrastructure/create-leave-handlers.ts
+  s_6a70f1cb429bb6::t_2acb96112b1d28 1-68
+apps/construction-management/src/hrms/infrastructure/leave-type-seeds.test.ts
+  s_6a70f1cb429bb6::t_46ec746ccce6d9 1-92
+apps/construction-management/src/hrms/infrastructure/prisma-leave-day-source.ts
+  s_6a70f1cb429bb6::t_53d8c1ab91ce65 1-114
+apps/construction-management/src/hrms/infrastructure/prisma-leave-store.ts
+  s_6a70f1cb429bb6::t_e07cd57a9190d9 1-443
+apps/construction-management/src/hrms/infrastructure/prisma-leave-structure-store.ts
+  s_6a70f1cb429bb6::t_1f3d40d4c1f335 1-385
+apps/construction-management/src/hrms/infrastructure/prisma-leave-type-store.ts
+  s_6a70f1cb429bb6::t_405737b7e5e649 1-316
+apps/construction-management/src/hrms/infrastructure/seed-company-leave-types.ts
+  s_6a70f1cb429bb6::t_69023221e0ebba 1-46
+apps/construction-management/src/hrms/infrastructure/seeds/leave-types.json
+  s_6a70f1cb429bb6::t_f89e5ff31e6e41 1-90
+apps/construction-management/src/queries/hrms-leave.ts
+  s_6a70f1cb429bb6::t_fdafd8d1c79ab4 1-332
+packages/db/construction/prisma/migrations/20261010140000_construction_hrms_leave_type_seeds/migration.sql
+  s_6a70f1cb429bb6::t_b65d60cc77c7b1 1-32
+turbo.json
+  s_6a70f1cb429bb6::t_ab9469cb027835 53-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "95c966d3f3392e6c286710628ae52e768240f65e",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
