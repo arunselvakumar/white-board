@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/labour/labours/labours.http.test.ts
+  s_6a70f1cb429bb6::t_c3b7cb4d3c9684 176-181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0cadc20a65f06d898b0bfc1b3472618bceeda1b5",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
