@@ -46,11 +46,11 @@ export function MaterialPicker(props: MaterialPickerProps) {
       aria-invalid={props.invalid}
       disabled={props.disabled}
       value={props.value ?? ""}
-      onChange={(event) =>
+      onChange={(event) => {
         props.onChange(
           options.find((option) => option.id === event.target.value) ?? null,
-        )
-      }
+        );
+      }}
     >
       <NativeSelectOption value="">Choose a material</NativeSelectOption>
       {options.map((option) => (
