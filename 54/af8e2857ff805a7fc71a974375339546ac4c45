@@ -1,0 +1,75 @@
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_7d8917753e260e::t_a95aef1c6c4c97 2-5,16-18,20-22
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_7d8917753e260e::t_599f625f7b1639 30-31,42,60,110,129,142-190
+apps/construction-management/app/api/construction/projects/projects/[id]/logo/remove/route.ts
+  s_7d8917753e260e::t_98fcb3bbc66469 1-38
+apps/construction-management/app/api/construction/projects/projects/[id]/logo/route.ts
+  s_7d8917753e260e::t_786eb226a0e4a6 1-65
+apps/construction-management/app/api/construction/projects/projects/[id]/update/route.ts
+  s_7d8917753e260e::t_ba548037530394 20-21
+apps/construction-management/app/api/construction/projects/projects/contract-details.http.test.ts
+  s_7d8917753e260e::t_067072bbb0fbd2 70,75-77,250-254
+apps/construction-management/app/api/construction/projects/projects/list-projects-models.ts
+  s_7d8917753e260e::t_9da46cb7ad9cbc 35-39
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_7d8917753e260e::t_183ea727ae6ddc 6-11,24-52,79-84,115-131,175-193,243,253-254,270-272
+apps/construction-management/app/api/construction/projects/projects/project-profile.http.test.ts
+  s_7d8917753e260e::t_c293bd759476b6 1-605
+apps/construction-management/app/api/construction/projects/projects/projects.http.test.ts
+  s_7d8917753e260e::t_2ca777323695ad 51,56-58,92,205-208,302-305,557-559
+apps/construction-management/app/api/construction/projects/projects/route.ts
+  s_7d8917753e260e::t_15bca133f82e40 37,47-50
+apps/construction-management/components/projects/project-fixtures.ts
+  s_7d8917753e260e::t_cb0bde38ed8d71 1,10-11,16-20,58-59,66-69,93-94,103,112-113,120,127-131,144
+apps/construction-management/src/organization/application/company-images.ts
+  s_7d8917753e260e::t_ebadbe77d7eba3 11-14,29
+apps/construction-management/src/projects/application/project-handlers.test.ts
+  s_7d8917753e260e::t_ed6a8150bf9248 116,245,264-268,320,339-420
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_7d8917753e260e::t_0158992879856a 35-53,66-67,71,83-85,87,92-96,116-117,133,176-179,191,205,216,218,230-233,243,245
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_7d8917753e260e::t_894a9839a786e5 8,11-14,20-21,25-27,38-39,43-45
+apps/construction-management/src/projects/domain/project-contract-rules.ts
+  s_7d8917753e260e::t_684e2981ed26f6 11-16
+apps/construction-management/src/projects/domain/project-repository.ts
+  s_7d8917753e260e::t_f571d83973cc12 2,6-14,23-27,30-33,39,55-59
+apps/construction-management/src/projects/domain/project.test.ts
+  s_7d8917753e260e::t_4a0786e84e68a3 11-14,23,444-568
+apps/construction-management/src/projects/domain/project.ts
+  s_7d8917753e260e::t_a0df00d1e79360 16-22,47-48,57-60,63-74,116-164,198-199,214,229-241,278-297,346-354,357-359,366,376-398
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_7d8917753e260e::t_2cba9ddc1191aa 3-4,8,31-45
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_7d8917753e260e::t_95a470ff33021f 9-12,16-23,66-70,85,87-91,131-170,227,239,263
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_7d8917753e260e::t_be669c9b842cca 11-13,57-80
+apps/construction-management/src/shared-kernel/files/image-file.ts
+  s_7d8917753e260e::t_fd88d1ee14ad37 20-23,27
+apps/construction-management/src/projects/application/project-logos.ts
+  s_388afeaeadf656::t_e5dab4138d0fcc 1-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "54af8e2857ff805a7fc71a974375339546ac4c45",
+  "prompts": {},
+  "sessions": {
+    "s_388afeaeadf656": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ade108c428deae4aa",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
