@@ -21,6 +21,7 @@ import {
 } from "./purchase-request-fixtures";
 import { PurchaseRequestWizard } from "./purchase-request-wizard";
 import { PurchaseRequestsPage } from "./purchase-requests-page";
+import { pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -176,14 +177,9 @@ export const Wizard: StoryObj<typeof PurchaseRequestWizard> = {
     await expect(
       await canvas.findByText("Pick at least one material"),
     ).toBeVisible();
-    const picker = await canvas.findByLabelText("Add a material");
-    await waitFor(async () => {
-      await expect(
-        within(picker).getAllByRole("option").length,
-      ).toBeGreaterThan(2);
-    });
-    await userEvent.selectOptions(picker, CEMENT.id);
-    await userEvent.selectOptions(picker, STEEL.id);
+    await canvas.findByRole("combobox", { name: "Add a material" });
+    await pickMaterial(canvas, userEvent, CEMENT.id, "Add a material");
+    await pickMaterial(canvas, userEvent, STEEL.id, "Add a material");
     await userEvent.click(
       canvas.getByRole("button", { name: "View Selected (2)" }),
     );

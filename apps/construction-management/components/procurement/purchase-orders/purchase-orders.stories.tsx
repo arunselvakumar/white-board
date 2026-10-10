@@ -21,6 +21,7 @@ import {
 } from "./purchase-order-fixtures";
 import { PurchaseOrderForm } from "./purchase-order-form";
 import { PurchaseOrdersPage } from "./purchase-orders-page";
+import { pickMaterial } from "../material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -154,13 +155,7 @@ export const Form: StoryObj<typeof PurchaseOrderForm> = {
       canvas.getByRole("button", { name: "Add Materials" }),
     );
     const sheet = within(await body.findByRole("dialog"));
-    const picker = sheet.getByLabelText("Material");
-    await waitFor(async () => {
-      await expect(
-        within(picker).getAllByRole("option").length,
-      ).toBeGreaterThan(2);
-    });
-    await userEvent.selectOptions(picker, CEMENT.id);
+    await pickMaterial(sheet, userEvent, CEMENT.id);
     await expect(sheet.getByLabelText("Unit Rate (₹)")).toHaveValue("385");
     await expect(sheet.getByLabelText("GST Rate %")).toHaveValue("28");
     await expect(

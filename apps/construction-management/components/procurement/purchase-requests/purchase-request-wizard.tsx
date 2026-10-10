@@ -348,6 +348,7 @@ export function PurchaseRequestWizard({
             <Label htmlFor="pr-material-picker">Add a material</Label>
             <MaterialPicker
               id="pr-material-picker"
+              aria-label="Add a material"
               value={null}
               allowCreate
               excludeIds={items.map((item) => item.materialId)}
