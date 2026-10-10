@@ -1,4 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bash scripts/vercel-build.sh"
+  "buildCommand": "bash scripts/vercel-build.sh",
+  "crons": [
+    {
+      "path": "/api/construction/hrms/leave-balances/accrue/scheduled",
+      "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/api/construction/hrms/salaries/calculate-bulk/scheduled",
+      "schedule": "0 1 * * *"
+    }
+  ]
 }
