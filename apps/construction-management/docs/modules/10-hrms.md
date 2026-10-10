@@ -743,20 +743,24 @@ HRMS default set for HRMS-only members: HRMS read; Holiday read; Attendance crea
 
 ---
 
-## Open questions
+## Decisions for the build
 
-1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode?
-2. Full attendance day status enum (only Absent = 3 observed).
-3. Does a normal on-fence check-in ever need approval, or only manual / missed checkout entries?
-4. How does `my-fences` resolve: branch assignment per employee, projects assigned, or all fences?
-5. Leave year: calendar or financial year? When does carry forward run?
-6. `accrual_mode` values (from `leave-types/accrual-options`)?
-7. Do multi-level leave approvals have named approvers per level (reporting manager chain) or any holder of `approve`?
-8. Can a Pending leave be withdrawn by the employee without manager action?
-9. How are Compensatory Off credits earned (worked on holiday → credit)?
-10. Is an advance salary recovered automatically in the next run?
-11. Does "Mark Salaries as Paid" create accounting entries?
-12. Are salary components fixed amounts or percentages of CTC/Basic?
-13. Is overtime paid in HRMS salary, and at what rate (shift "Overtime Allowed" exists; payslip shows Overtime Hrs)?
-14. Does the Optional Holiday require employee selection, and is there a cap?
-15. Are HRMS employees ever also site labour (e.g. supervisors counted on worksheets)?
+M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-product-decisions.md). Statutory figures follow [ADR CM-0008](../adr/CM-0008-statutory-figures-are-dated-tables.md). Numbers in brackets point at the CM-0012 decision.
+
+## Open questions (answered in CM-0012)
+
+1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
+2. Full attendance day status enum (only Absent = 3 observed). → CM-0012 §2
+3. Does a normal on-fence check-in ever need approval, or only manual / missed checkout entries? → CM-0012 §3
+4. How does `my-fences` resolve: branch assignment per employee, projects assigned, or all fences? → CM-0012 §4
+5. Leave year: calendar or financial year? When does carry forward run? → CM-0012 §6
+6. `accrual_mode` values (from `leave-types/accrual-options`)? → CM-0012 §7
+7. Do multi-level leave approvals have named approvers per level (reporting manager chain) or any holder of `approve`? → CM-0012 §5
+8. Can a Pending leave be withdrawn by the employee without manager action? → CM-0012 §8
+9. How are Compensatory Off credits earned (worked on holiday → credit)? → CM-0012 §9
+10. Is an advance salary recovered automatically in the next run? → CM-0012 §15
+11. Does "Mark Salaries as Paid" create accounting entries? → CM-0012 §16
+12. Are salary components fixed amounts or percentages of CTC/Basic? → CM-0012 §12
+13. Is overtime paid in HRMS salary, and at what rate (shift "Overtime Allowed" exists; payslip shows Overtime Hrs)? → CM-0012 §14
+14. Does the Optional Holiday require employee selection, and is there a cap? → CM-0012 §11
+15. Are HRMS employees ever also site labour (e.g. supervisors counted on worksheets)? → CM-0012 §18
