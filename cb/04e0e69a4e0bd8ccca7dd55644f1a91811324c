@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_6604e2237b6922::t_d79d6824a8a4ab 25-28,52,197
+apps/construction-management/app/api/construction/masters/material-masters-openapi.ts
+  s_6604e2237b6922::t_64d2f040a3633f 1-241
+apps/construction-management/app/api/construction/masters/parties-openapi.ts
+  s_6604e2237b6922::t_e99bc2a5e0683c 11-20,46-51,61-167,252,288-301
+apps/construction-management/app/api/construction/masters/party-procurement.http.test.ts
+  s_6604e2237b6922::t_cb599db2bb4aef 1-390
+apps/construction-management/app/api/construction/masters/material-masters.http.test.ts
+  s_6604e2237b6922::t_0f358b8d4d2f06 1-902
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cb04e0e69a4e0bd8ccca7dd55644f1a91811324c",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
