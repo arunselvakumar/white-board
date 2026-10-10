@@ -1,0 +1,63 @@
+apps/construction-management/src/procurement/application/inventory-access.ts
+  s_6604e2237b6922::t_cfc3d242449f0d 1-63
+apps/construction-management/src/procurement/domain/inventory-import.test.ts
+  s_6604e2237b6922::t_30cf849a2e2304 1-68
+apps/construction-management/src/procurement/domain/inventory-import.ts
+  s_6604e2237b6922::t_0d1ff6215a9a84 1-157
+apps/construction-management/src/procurement/domain/inventory-stock-state.test.ts
+  s_6604e2237b6922::t_7ac00f7f6a929d 1-42
+apps/construction-management/src/procurement/domain/inventory-stock-state.ts
+  s_6604e2237b6922::t_0eb86f00d1112a 1-57
+apps/construction-management/src/procurement/domain/material-transfer.test.ts
+  s_6604e2237b6922::t_59d6cbc900bbdf 1-96
+apps/construction-management/src/procurement/domain/material-transfer.ts
+  s_6604e2237b6922::t_405d3f533a302c 1-196
+apps/construction-management/src/procurement/domain/stock-movement.test.ts
+  s_6604e2237b6922::t_590b9c60cbc1c6 1-59
+apps/construction-management/src/procurement/domain/stock-movement.ts
+  s_6604e2237b6922::t_41c00d010eed95 1-133
+apps/construction-management/src/procurement/domain/stock-register.test.ts
+  s_6604e2237b6922::t_d7dac062d5f602 1-39
+apps/construction-management/src/procurement/domain/stock-register.ts
+  s_6604e2237b6922::t_9eb8b22b55addc 1-93
+apps/construction-management/src/procurement/infrastructure/inventory-locations.ts
+  s_6604e2237b6922::t_e520d484e8d563 1-101
+apps/construction-management/src/procurement/infrastructure/inventory-queries.ts
+  s_6604e2237b6922::t_ac00775df0df51 1-647
+apps/construction-management/src/procurement/infrastructure/stock-ledger-instance.ts
+  s_6604e2237b6922::t_64c47062fca055 2-4,7-9,12-17
+apps/construction-management/src/procurement/infrastructure/stock-level-watcher.ts
+  s_6604e2237b6922::t_4101d1ddac7d55 1-149
+apps/construction-management/src/procurement/infrastructure/stock-movement-store.ts
+  s_6604e2237b6922::t_b3ecca98ef6005 1-834
+apps/construction-management/src/procurement/infrastructure/stock-settings-store.ts
+  s_6604e2237b6922::t_36eb73e6099c42 1-130
+apps/construction-management/src/procurement/infrastructure/inventory-workbook.ts
+  s_3e4bf03912e8a4::t_7c864fd194a762 1-289
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_6604e2237b6922::t_401ee5ad556ee1 1-900
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a8a93927c7bf5b184183e84e7b4148a6cdd4fe1e",
+  "prompts": {},
+  "sessions": {
+    "s_3e4bf03912e8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec76c7ed718a44cd",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
