@@ -1,0 +1,67 @@
+apps/construction-management/app/app/projects/[id]/drawings/[albumId]/page.tsx
+  s_7d8917753e260e::t_1f881574544ef7 1-32
+apps/construction-management/app/app/projects/[id]/drawings/page.tsx
+  s_7d8917753e260e::t_62670cfb38a0eb 1-31
+apps/construction-management/components/projects/drawings/album-form-dialog.tsx
+  s_7d8917753e260e::t_e6b6f3c0d82b79 1-165
+apps/construction-management/components/projects/drawings/drawing-album-page.stories.tsx
+  s_7d8917753e260e::t_84541f45d935b6 1-610
+apps/construction-management/components/projects/drawings/drawing-album-page.tsx
+  s_7d8917753e260e::t_17a13fdcf5c3a0 1-422
+apps/construction-management/components/projects/drawings/drawing-fixtures.ts
+  s_7d8917753e260e::t_c2a8ab3a24a3fe 1-456
+apps/construction-management/components/projects/drawings/drawing-history-sheet.tsx
+  s_7d8917753e260e::t_5380e995e38473 1-147
+apps/construction-management/components/projects/drawings/drawing-upload-row.tsx
+  s_7d8917753e260e::t_feb34ec689643b 1-99
+apps/construction-management/components/projects/drawings/drawings-page.stories.tsx
+  s_7d8917753e260e::t_220764f37121a0 1-275
+apps/construction-management/components/projects/drawings/drawings-page.tsx
+  s_7d8917753e260e::t_8a190276b47493 1-232
+apps/construction-management/components/projects/drawings/upload-drawings-dialog.tsx
+  s_7d8917753e260e::t_c703472a6cd88b 1-258
+apps/construction-management/components/projects/drawings/use-drawing-uploads.ts
+  s_7d8917753e260e::t_253e1451f5fb7f 1-43
+apps/construction-management/components/projects/drawings/delete-album-dialog.tsx
+  s_06415e8c2c8e1d::t_7462e17b213aba 1-84
+apps/construction-management/components/projects/drawings/delete-drawing-dialog.tsx
+  s_06415e8c2c8e1d::t_4a1fdfc7a5cb15 1-84
+apps/construction-management/components/projects/drawings/move-drawing-dialog.tsx
+  s_06415e8c2c8e1d::t_5d4452ee406a04 1-191
+apps/construction-management/components/projects/drawings/rename-drawing-dialog.tsx
+  s_06415e8c2c8e1d::t_553c713bc81d51 1-139
+apps/construction-management/components/projects/drawings/upload-revision-dialog.tsx
+  s_f77230b2be1af3::t_ee2952bc5d4e89 1-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a90cf5ee65ee872a8719c9828dbd575268323f05",
+  "prompts": {},
+  "sessions": {
+    "s_06415e8c2c8e1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a31afc8b0fcfa04f7",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f77230b2be1af3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad50ee5d268e7bbce",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
