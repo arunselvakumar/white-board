@@ -41,6 +41,7 @@ function document(
     bytes: Math.round(bytes),
     viewable: pdf,
     url: `${DOCUMENTS_API}/${docId}`,
+    thumbUrl: null,
     createdAt,
     createdBy: "user-karthik",
     createdByName: "Karthik R",

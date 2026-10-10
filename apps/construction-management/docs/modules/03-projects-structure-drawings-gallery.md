@@ -561,6 +561,39 @@ M4 answered the open questions below with recommended defaults in [ADR CM-0013](
 - **Add Project** opens the new Project on `…/resources?step=resources`: a "Step 2 of 2 · Assign resources" banner with **Skip** (nothing assigned yet) or **Done**, both to the Overview, where any upload message from step 1 is shown. Only Add Project's destination changed; the Project form is CM-401's.
 - Contacts are not built (ADR CM-0013 §6).
 
+### CM-407
+
+- The kernel service is `src/shared-kernel/attachments`: `UploadPolicy` (purpose = key folder, accept, largest file, multipart threshold 8 MB), `AttachmentUploads` (`start` → `answerDirectUpload` / `receive` → `receiveThumbnail` → `complete`), `CheckedUpload` and `storedFilesOf`. Owners keep their own rows and call `complete` with `recorded` (what they already have for the key) and `record` (their transaction); completion stays idempotent on the key, and a refused or failed completion deletes the object and any thumbnail sent for it.
+- Accept kinds: `images` (PNG, JPEG, WebP), `pdf_or_image`, `any_but_programs`, `drawing` (PDF, images, DWG, DXF). Names are checked at start (programs always refused; restricted kinds need an accepted extension) and content at completion. DWG is known by `AC10nn`; DXF has no magic number, so text counts as DXF only under a `.dxf` name (a `0`/`SECTION` pair or a `999` comment first; binary DXF by its sentinel). DWG and DXF are served as `application/octet-stream` and always download.
+- Keys: `companies/<workspaceId>/<purpose>/<ownerId>/<uuid>.<ext>`. In M4 every owner is the Project: purposes `project-documents` (unchanged keys), `drawings`, `testing-reports`.
+- Thumbnails go up **between sending the file and completing**, not after: `POST <owner>/uploads/thumbnail?key=` with a WebP ≤ 300 KB (sniffed), stored at `<key>.thumb.webp` once the file itself is in storage; completion records it (its own `stored_files` row, kind `<kind>_thumbnail`) in the owner's transaction, only for an image. A browser that can't make one (no `createImageBitmap`, no canvas, no WebP encoder) silently sends none; a thumbnail failure never fails the upload. Each owner has a `…/thumbnail` read route.
+- Every owner has the same four upload routes under its own path (`uploads`, `uploads/presign`, `uploads/app`, `uploads/thumbnail`), built by `projectUploadRoutes` in `app/api/construction/projects/project-upload-routes.ts`; `requireAnyAccess` lets either of two flags upload (Drawings and Testing Reports: create or update).
+- File routes stream the file as Documents always have (`storedFileResponse`: inline for PDFs and images, attachment otherwise, `nosniff`, CSP, `no-store`); there is no signed redirect yet.
+- The Gallery index is `media_items`, written by the projects context in the owner's transaction for every PDF or image (Documents: on add and delete, with the thumbnail key). `ProjectMediaAttached` / `ProjectMediaRemoved` (kernel types in `src/shared-kernel/project-media.ts`) feed the same index for later contexts through `ProjectMediaListener`, composed in `src/composition/project-media-listeners.ts`; a replayed event never adds a second row, and an event for another Company's Project writes nothing.
+- Browser: `directUpload` (`src/queries/direct-upload.ts`) runs one file; `useDirectUpload` (`components/uploads/use-direct-upload.ts`) runs many with progress, cancel and retry. Documents run on both with no change on screen.
+
+### CM-408
+
+- Albums are listed by name; names are unique in the Project ignoring case (409 `ALBUM_NAME_IN_USE`), at most 80 characters. Renames send `updatedAt` (409 `ALBUM_CHANGED`). An album with drawings answers 409 `ALBUM_NOT_EMPTY`.
+- A new drawing's name defaults to the file name without its extension (at most 120 characters). A drawing's album page lists drawings by most recent change, whole (an album holds tens of sheets, not thousands).
+- Revisions are numbered in the transaction that adds them (the drawing row is locked); a new revision moves the drawing's `updatedAt`, so a rename or move loaded before it gets 409 `DRAWING_CHANGED`.
+- Flags: read lists and opens files; create adds albums and new drawings; update renames albums, adds revisions, renames and moves drawings; delete removes albums and drawings. Uploading needs create or update.
+- Deleting a drawing tombstones every revision, their `stored_files` rows and Gallery rows, then deletes the files. Each PDF or image revision is its own Gallery row (source `drawing`, source id = the drawing); DWG and DXF are not in the Gallery.
+- A Project with live drawings or testing reports cannot be deleted (409 `PROJECT_IN_USE`, CM-0013 §13).
+
+### CM-409
+
+- Testing materials are listed by name, unique in the Project ignoring case (409 `TESTING_ITEM_NAME_IN_USE`), ≤ 80; rename with `updatedAt` (409 `TESTING_ITEM_CHANGED`); an item with reports answers 409 `TESTING_ITEM_NOT_EMPTY`.
+- A report: name (required, ≤ 120), report date (required), remark (optional, ≤ 500, blank is none), exactly one PDF or image ≤ 25 MB. Reports are listed newest report date first, then newest id, 25 a page with cursors both ways and the total; search matches the name ignoring case. The cursor is the kernel's `ListCursor` with the report date in place of `createdAt`.
+- Back-dated policy `material_testing_report`: `create` on the report date when adding; `edit` on the stored date and, when it changes, on the new one; `edit` on the stored date before deleting (as holidays do). A refused add drops the uploaded file.
+- Replacing a report's file retires the old one in the same transaction (its `stored_files` rows deleted, its Gallery row tombstoned, a new Gallery row for the new file uploaded by the editor) and then deletes the old object. A key that was replaced cannot be completed again.
+
+### CM-410
+
+- `GET …/projects/{id}/gallery`: live `media_items`, newest upload first, 48 a page, cursors both ways, total. Filters: `type` (image | pdf), `source` (any string; `document`, `drawing`, `testing_report` in M4), `uploadedBy` (User id), `from` / `to` (upload day in the Company time zone, inclusive), `q` (file name contains, case-insensitive, `%` and `_` literal). `GET …/gallery/uploaders` lists who uploaded what the viewer can see.
+- Visibility: the Gallery lists only sources whose menu the viewer may read (`MEDIA_SOURCE_MENUS`: documents → `projects.project`, drawings → `projects.drawings`, testing reports → `projects.testing_reports`); a source with no menu entry (a later module's, until it adds one) is never listed. Each item's `fileUrl` / `thumbUrl` are the source's own routes, which check that flag again — so a link opened by someone without it answers 403 (404 for a Project they are not on). The Gallery serves no file itself.
+- A drawing's Gallery row links to its revision's file route (joined by file key); a drawing row without a live revision is left out.
+
 ## Open questions
 
 1. What are the Project Type values (`Project/Combo`)?

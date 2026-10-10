@@ -3,9 +3,13 @@ import { notFound } from "@/src/shared-kernel/domain-error";
 import type { ProjectRepository } from "../domain/project-repository";
 import type { ProjectViewer } from "./project-handlers";
 
+export const projectNotFound = () =>
+  notFound("PROJECT_NOT_FOUND", "This Project was not found.");
+
 /**
- * 404 `PROJECT_NOT_FOUND` unless the Project is live and the viewer may
- * see it: the Owner every Project, a Member only those assigned to them.
+ * Throws 404 `PROJECT_NOT_FOUND` unless the viewer may see this live
+ * Project: the Owner sees every Project, a Member only those assigned to
+ * them. Routes check the Permission Matrix first.
  */
 export async function assertProjectVisible(
   projects: Pick<ProjectRepository, "findById">,
@@ -16,6 +20,5 @@ export async function assertProjectVisible(
   const found = visible
     ? await projects.findById(viewer.workspaceId, projectId)
     : null;
-  if (found == null)
-    throw notFound("PROJECT_NOT_FOUND", "This Project was not found.");
+  if (found == null) throw projectNotFound();
 }
