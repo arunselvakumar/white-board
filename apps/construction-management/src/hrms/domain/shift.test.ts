@@ -228,13 +228,17 @@ describe("createRotationTemplate", () => {
       [B, { isActive: false }],
     ]);
     expect(
-      codeOf(() => assertSlotShiftsUsable(rotation.slots, shifts)),
+      codeOf(() => {
+        assertSlotShiftsUsable(rotation.slots, shifts);
+      }),
     ).toEqual({ code: "ROTATION_SHIFT_INACTIVE", field: "slots" });
-    expect(() =>
-      assertSlotShiftsUsable(rotation.slots, shifts, new Set([B])),
-    ).not.toThrow();
+    expect(() => {
+      assertSlotShiftsUsable(rotation.slots, shifts, new Set([B]));
+    }).not.toThrow();
     expect(
-      codeOf(() => assertSlotShiftsUsable(rotation.slots, new Map())),
+      codeOf(() => {
+        assertSlotShiftsUsable(rotation.slots, new Map());
+      }),
     ).toEqual({ code: "ROTATION_SHIFT_NOT_FOUND", field: "slots" });
   });
 });

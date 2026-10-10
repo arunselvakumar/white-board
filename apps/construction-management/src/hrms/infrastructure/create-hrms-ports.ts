@@ -120,6 +120,7 @@ export function createHolidayHandlers(deps?: { prisma?: PrismaClient }) {
   return new HolidayHandlers(
     new PrismaHolidayStore(db),
     new PrismaHolidayBackdatedGuard(db),
+    (workspaceId) => companyToday(db, workspaceId),
   );
 }
 

@@ -176,8 +176,15 @@ export class HolidayHandlers {
   constructor(
     private readonly store: HolidayStore,
     private readonly guard: HolidayBackdatedGuard,
+    private readonly today: (workspaceId: string) => Promise<CalendarDate>,
     private readonly clock: () => Date = () => new Date(),
   ) {}
+
+  /** The year the sample sheet's example rows use: this year, Company time. */
+  async sampleYear(input: { access: MemberAccess }): Promise<number> {
+    assertCan(input.access, "hrms.holidays", "read");
+    return Number((await this.today(input.access.workspaceId)).slice(0, 4));
+  }
 
   async list(input: {
     access: MemberAccess;

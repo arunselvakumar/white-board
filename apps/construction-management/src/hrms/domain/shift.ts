@@ -202,7 +202,7 @@ export function createShiftTemplate(
     name,
     startTime: input.startTime,
     endTime: input.endTime,
-    workingDays: Object.freeze(workingDays as IsoWeekday[]),
+    workingDays: Object.freeze(workingDays),
     workingHours: hours(input.workingHours),
     halfDayHours: hours(input.halfDayHours),
     graceMinutes: input.graceMinutes,

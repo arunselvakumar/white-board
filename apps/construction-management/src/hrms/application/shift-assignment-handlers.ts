@@ -160,7 +160,7 @@ export class ShiftAssignmentHandlers {
               input.rotationTemplateId ?? "",
             ),
           };
-    if (template.found == null || !template.found.isActive)
+    if (!template.found?.isActive)
       throw new DomainError(
         "SHIFT_ASSIGNMENT_TEMPLATE_INACTIVE",
         template.found == null
