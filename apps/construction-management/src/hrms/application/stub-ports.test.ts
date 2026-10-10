@@ -1,51 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_HRMS_SETTINGS } from "../domain/hrms-settings";
-import { FakeHrmsSettingsStore } from "./hrms-fakes";
 import { InMemoryStatutoryRates } from "./in-memory-statutory-rates";
-import {
-  NoAttendanceDaySource,
-  NoLeaveDaySource,
-  SettingsShiftResolver,
-  SettingsWorkCalendar,
-} from "./stub-ports";
+import { NoLeaveDaySource } from "./stub-ports";
 
 const COMPANY = "company-1";
 
 describe("stand-in ports", () => {
-  it("work from the Settings until shifts, holidays and attendance exist", async () => {
-    const settings = new FakeHrmsSettingsStore();
-    const calendar = new SettingsWorkCalendar(settings);
-    const shifts = new SettingsShiftResolver(settings);
-
-    expect(await calendar.isWeekOff(COMPANY, "m1", "2026-10-10")).toBe(true);
-    expect(await calendar.isWeekOff(COMPANY, "m1", "2026-10-09")).toBe(false);
-    expect(await calendar.isHoliday(COMPANY, "m1", "2026-10-02")).toBe(false);
-
-    const friday = await shifts.shiftFor(COMPANY, "m1", "2026-10-09");
-    expect(friday).toMatchObject({
-      source: "settings",
-      workingHours: DEFAULT_HRMS_SETTINGS.workingHoursPerDay,
-      halfDayHours: DEFAULT_HRMS_SETTINGS.halfDayHours,
-      graceMinutes: 15,
-      overtimeAllowed: false,
-      isWorkingDay: true,
-    });
-    expect((await shifts.shiftsForMonth(COMPANY, "m1", "2026-02")).size).toBe(
-      28,
-    );
-
-    const days = await new NoAttendanceDaySource(calendar).monthFor(
-      COMPANY,
-      ["m1", "m2"],
-      "2026-10",
-    );
-    const october = days.get("m2") ?? [];
-    expect(october).toHaveLength(31);
-    // 1 October 2026 is a Thursday; the 3rd a Saturday.
-    expect(october[0]?.status).toBe("absent");
-    expect(october[2]?.status).toBe("week_off");
-
+  it("have no approved leave until CM-312", async () => {
     const leave = await new NoLeaveDaySource().approvedForMonth(
       COMPANY,
       ["m1"],

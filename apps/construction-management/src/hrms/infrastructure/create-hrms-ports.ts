@@ -1,5 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import { RecordedAttendanceDaySource } from "../application/attendance-days";
+import { AttendanceHandlers } from "../application/attendance-handlers";
 import { BranchHandlers } from "../application/branch-handlers";
 import {
   BookEffectiveShiftResolver,
@@ -21,10 +23,12 @@ import type {
 } from "../application/ports";
 import { ShiftAssignmentHandlers } from "../application/shift-assignment-handlers";
 import { ShiftTemplateHandlers } from "../application/shift-template-handlers";
+import { NoLeaveDaySource } from "../application/stub-ports";
 import {
-  NoAttendanceDaySource,
-  NoLeaveDaySource,
-} from "../application/stub-ports";
+  PrismaAttendanceBackdatedGuard,
+  PrismaAttendanceStore,
+  companyTimeZone,
+} from "./prisma-attendance-store";
 import { PrismaBranchStore } from "./prisma-branch-store";
 import { companyToday } from "./prisma-calendar-support";
 import {
@@ -68,17 +72,25 @@ export function createHrmsPorts(deps?: { prisma?: PrismaClient }): HrmsPorts {
   const settings = new PrismaHrmsSettingsStore(db);
   // Holidays (CM-305) and week offs from shifts and rotations (CM-307).
   const books = new PrismaShiftBookSource(db, settings);
-  const calendar = new ShiftWorkCalendar(new PrismaHolidayStore(db), books);
+  const holidays = new PrismaHolidayStore(db);
+  const calendar = new ShiftWorkCalendar(holidays, books);
+  // Replaced by CM-312.
+  const leaveDays = new NoLeaveDaySource();
   return {
     employees: new PrismaEmployeeDirectory(db),
     projects: new PrismaProjectDirectory(db),
     settings,
     calendar,
     shifts: new BookEffectiveShiftResolver(books),
-    // Replaced by CM-308.
-    attendanceDays: new NoAttendanceDaySource(calendar),
-    // Replaced by CM-312.
-    leaveDays: new NoLeaveDaySource(),
+    // Recorded entries, shifts, holidays and approved leave (CM-308).
+    attendanceDays: new RecordedAttendanceDaySource({
+      books,
+      holidays,
+      entries: new PrismaAttendanceStore(db),
+      leave: leaveDays,
+      timeZone: (workspaceId) => companyTimeZone(db, workspaceId),
+    }),
+    leaveDays,
     monthLock: new PrismaMonthLock(db),
     statutoryRates: new PrismaStatutoryRates(db),
   };
@@ -146,4 +158,35 @@ export function createShiftAssignmentHandlers(deps?: {
     new PrismaMonthLock(db),
     (workspaceId) => companyToday(db, workspaceId),
   );
+}
+
+/**
+ * Attendance (CM-308, CM-309): check in and out, missed checkout,
+ * back-dated days, approvals, Team Today and the monthly summary.
+ */
+export function createAttendanceHandlers(deps?: { prisma?: PrismaClient }) {
+  const db = deps?.prisma ?? prisma;
+  const ports = createHrmsPorts({ prisma: db });
+  const store = new PrismaAttendanceStore(db);
+  const timeZone = (workspaceId: string) => companyTimeZone(db, workspaceId);
+  // The same day source as `ports.attendanceDays`, typed for date ranges.
+  const days = new RecordedAttendanceDaySource({
+    books: new PrismaShiftBookSource(db, ports.settings),
+    holidays: new PrismaHolidayStore(db),
+    entries: store,
+    leave: ports.leaveDays,
+    timeZone,
+  });
+  return new AttendanceHandlers({
+    store,
+    employees: ports.employees,
+    settings: ports.settings,
+    fences: createMemberFences({ prisma: db }),
+    shifts: ports.shifts,
+    calendar: ports.calendar,
+    days,
+    monthLock: ports.monthLock,
+    guard: new PrismaAttendanceBackdatedGuard(db),
+    timeZone,
+  });
 }
