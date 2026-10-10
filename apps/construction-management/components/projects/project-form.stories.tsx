@@ -644,6 +644,7 @@ export const EditSaves: Story = {
       projectType: "residential",
       useLogoInReports: false,
       budgetValue: 4_20_00_000_00,
+      stateCode: "33",
       address: null,
       startDate: "2026-04-01",
       endDate: "2027-03-31",
@@ -662,6 +663,74 @@ export const EditSaves: Story = {
       customFields: KUMARI.customFields,
       expectedUpdatedAt: KUMARI.updatedAt,
     });
+  },
+};
+
+export const NewWithState: Story = {
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(canvas, body, userEvent);
+    const state = canvas.getByLabelText("State");
+    await expect(state).toHaveTextContent("Not set");
+    await userEvent.click(state);
+    await userEvent.click(
+      await body.findByRole("option", { name: "Tamil Nadu" }),
+    );
+    await expect(state).toHaveTextContent("Tamil Nadu");
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      name: "Anugraha Residency",
+      stateCode: "33",
+    });
+  },
+};
+
+export const EditClearsState: Story = {
+  render: editRender(KUMARI.id),
+  beforeEach: () => editApi(KUMARI),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByLabelText("Project name");
+    const state = canvas.getByLabelText("State");
+    await expect(state).toHaveTextContent("Tamil Nadu");
+    await userEvent.click(state);
+    await userEvent.click(await body.findByRole("option", { name: "Not set" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    // Taken away, it is sent as a clear.
+    await expect(posts()[0]?.body).toMatchObject({ stateCode: null });
+  },
+};
+
+export const EditShowsAStateRefusal: Story = {
+  render: editRender(KUMARI.id),
+  beforeEach: () =>
+    api((call) => {
+      if (call.method === "GET") return Response.json(KUMARI);
+      return Response.json(
+        {
+          code: "PROJECT_STATE_INVALID",
+          message: "Choose a state from the list.",
+        },
+        { status: 400 },
+      );
+    }),
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByLabelText("Project name");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      await canvas.findByText("Choose a state from the list."),
+    ).toBeVisible();
+    await expect(canvas.getByLabelText("State")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
   },
 };
 

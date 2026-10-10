@@ -15,11 +15,24 @@ export type LookupKind = (typeof LOOKUP_KINDS)[number];
 export const DEVELOPMENT_KINDS = ["amenity", "common_development"] as const;
 export type DevelopmentKind = (typeof DEVELOPMENT_KINDS)[number];
 
-/** Lists whose rows are a name, a seed mark and a disabled mark. */
-export type NamedMasterKind = LookupKind | DevelopmentKind;
+/**
+ * The procurement masters of M5 (CM-501, ADR CM-0015 §1): Measurement
+ * Units are name-only rows; Material Categories, Materials and Terms &
+ * Conditions have more fields and their own classes.
+ */
+export const MATERIAL_MASTER_KINDS = [
+  "measurement_unit",
+  "material_category",
+  "material",
+  "terms_condition",
+] as const;
+export type MaterialMasterKind = (typeof MATERIAL_MASTER_KINDS)[number];
 
-/** Every masters list this context owns (CM-203, CM-404). */
-export type MasterKind = NamedMasterKind | "supervisor";
+/** Lists whose rows are a name, a seed mark and a disabled mark. */
+export type NamedMasterKind = LookupKind | DevelopmentKind | "measurement_unit";
+
+/** Every masters list this context owns (CM-203, CM-404, CM-501). */
+export type MasterKind = NamedMasterKind | "supervisor" | MaterialMasterKind;
 
 type MasterKindInfo = {
   /** Prefix of the list's error codes: `LABOUR_CATEGORY_NAME_IN_USE`. */
@@ -54,6 +67,22 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     code: "COMMON_DEVELOPMENT",
     label: "Common Development",
     plural: "Common Developments",
+  },
+  measurement_unit: {
+    code: "MEASUREMENT_UNIT",
+    label: "Measurement Unit",
+    plural: "Measurement Units",
+  },
+  material_category: {
+    code: "MATERIAL_CATEGORY",
+    label: "Material Category",
+    plural: "Material Categories",
+  },
+  material: { code: "MATERIAL", label: "Material", plural: "Materials" },
+  terms_condition: {
+    code: "TERMS_CONDITION",
+    label: "Terms & Conditions",
+    plural: "Terms & Conditions",
   },
 };
 
@@ -94,8 +123,22 @@ export function masterChanged(kind: MasterKind): DomainError {
   );
 }
 
+/** Why a row of each procurement master cannot be deleted. */
+const MATERIAL_MASTER_USERS: Record<MaterialMasterKind, string> = {
+  measurement_unit: "Materials use this Measurement Unit",
+  material_category: "Materials or sub-categories use this Material Category",
+  material:
+    "Purchase Requests, Purchase Orders, Goods Receipts, transfers, Material Requests or stock entries use this Material",
+  terms_condition: "",
+};
+
 export function masterInUse(kind: MasterKind): DomainError {
   const { code, label } = MASTER_KINDS[kind];
+  if ((MATERIAL_MASTER_KINDS as readonly string[]).includes(kind))
+    return conflict(
+      `${code}_IN_USE`,
+      `${MATERIAL_MASTER_USERS[kind as MaterialMasterKind]}, so it cannot be deleted. Disable it instead.`,
+    );
   if (kind === "amenity" || kind === "common_development")
     return conflict(
       `${code}_IN_USE`,

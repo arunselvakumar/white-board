@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import type { PartyReadModel } from "@/src/masters/application/party-handlers";
 import type { PartyKind } from "@/src/masters/domain/party";
+import { gstStateName } from "@/src/shared-kernel/gst-states";
 
 import { expectedUpdatedAt } from "./master-models";
 
@@ -32,6 +33,14 @@ function writeFields(kind: PartyKind) {
       .optional()
       .describe("15 characters with a valid check character; holds the PAN."),
     pan: z.string().max(30).nullable().optional(),
+    stateCode: z
+      .string()
+      .max(10)
+      .nullable()
+      .optional()
+      .describe(
+        "GST state code from `GST_STATES` (400 GST_STATE_INVALID). With a GSTIN the state is its first two digits; a different one is 400 GSTIN_STATE_MISMATCH, and leaving it out follows the GSTIN.",
+      ),
     projectIds: z
       .array(z.uuid())
       .max(500)
@@ -42,6 +51,18 @@ function writeFields(kind: PartyKind) {
   if (kind === "supplier") return common;
   return {
     ...common,
+    contactPerson2: z
+      .string()
+      .max(1000)
+      .nullable()
+      .optional()
+      .describe("Second contact's name, at most 120 characters."),
+    mobile2: z
+      .string()
+      .max(40)
+      .nullable()
+      .optional()
+      .describe("Second contact's Indian mobile (400 MOBILE_2_INVALID)."),
     departmentIds: z
       .array(z.uuid())
       .max(100)
@@ -70,6 +91,19 @@ export function partyModels(kind: PartyKind) {
     address: z.string().nullable(),
     gstin: z.string().nullable(),
     pan: z.string().nullable(),
+    stateCode: z
+      .string()
+      .nullable()
+      .describe(
+        "GST state code: the GSTIN's first two digits, or the one picked.",
+      ),
+    stateName: z.string().nullable(),
+    contactPerson2: z
+      .string()
+      .nullable()
+      .describe("A Contractor's second contact; always null for a Supplier."),
+    /** E.164. */
+    mobile2: z.string().nullable(),
     isActive: z
       .boolean()
       .describe("Inactive ones leave pickers but stay on their Projects."),
@@ -131,6 +165,10 @@ export function toPartyResponse(item: PartyReadModel): PartyResponseModel {
     address: item.address,
     gstin: item.gstin,
     pan: item.pan,
+    stateCode: item.stateCode,
+    stateName: item.stateCode == null ? null : gstStateName(item.stateCode),
+    contactPerson2: item.contactPerson2,
+    mobile2: item.mobile2,
     isActive: item.isActive,
     departments: item.departments,
     projects: item.projects,

@@ -29,6 +29,7 @@ import type {
   ProjectStatus,
 } from "@/src/queries/projects";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
+import { isGstStateCode } from "@/src/shared-kernel/gst-states";
 
 import { groupRupees, PROJECT_PAPERS } from "./project-contract";
 import { PROJECT_STATUS_ORDER } from "./project-status";
@@ -83,6 +84,12 @@ export const projectFormSchema = z
       message: "Enter the amount in rupees, like 3,20,00,000",
     }),
     useLogoInReports: z.boolean(),
+    /** GST state code, or "" for Not set (CM-501). */
+    stateCode: z
+      .string()
+      .refine((value): boolean => value === "" || isGstStateCode(value), {
+        message: "Choose a state from the list",
+      }),
     address: z.string().trim().max(500, "Use at most 500 characters"),
     startDate: dateField,
     endDate: dateField,
@@ -204,6 +211,7 @@ export const FIELD_ORDER: readonly string[] = [
   "startDate",
   "endDate",
   "budgetValue",
+  "stateCode",
   "address",
   "clientName",
   "clientPhone",
@@ -230,6 +238,7 @@ export function projectFormValues(
     projectType: project?.projectType ?? "",
     budgetValue: groupRupees(paiseToRupees(project?.budgetValue)),
     useLogoInReports: project?.useLogoInReports ?? false,
+    stateCode: project?.stateCode ?? "",
     address: project?.address ?? "",
     startDate: project?.startDate ?? "",
     endDate: project?.endDate ?? "",
@@ -265,7 +274,7 @@ export type ProjectFormInput = ProjectInput & { status: ProjectStatus };
  * ignore them anyway. A value that came back null and is still blank is
  * left out of the request instead of being sent as a clear. A Project
  * Type left blank (a Project from before M4) is left out, so it stays
- * "Not set".
+ * "Not set". So is a State still "Not set"; one taken away is sent as null.
  */
 export function projectFormInput(
   values: ProjectFormValues,
@@ -288,6 +297,7 @@ export function projectFormInput(
   const budgetValue = rupeesToPaise(values.budgetValue);
   const sendBudget =
     financial && (budgetValue != null || project?.budgetValue != null);
+  const sendState = values.stateCode !== "" || project?.stateCode != null;
 
   const input: ProjectFormInput = {
     name: values.name,
@@ -296,6 +306,9 @@ export function projectFormInput(
       ? {}
       : { projectType: values.projectType as ProjectType }),
     useLogoInReports: values.useLogoInReports,
+    ...(sendState
+      ? { stateCode: values.stateCode === "" ? null : values.stateCode }
+      : {}),
     address: blankToNull(values.address),
     startDate: blankToNull(values.startDate),
     endDate: blankToNull(values.endDate),
@@ -328,6 +341,7 @@ const SERVER_FIELDS: Record<string, ProjectFormField> = {
   PROJECT_TYPE_REQUIRED: "projectType",
   PROJECT_TYPE_INVALID: "projectType",
   PROJECT_BUDGET_INVALID: "budgetValue",
+  PROJECT_STATE_INVALID: "stateCode",
   PROJECT_ADDRESS_TOO_LONG: "address",
   PROJECT_DATE_INVALID: "startDate",
   PROJECT_DATES_INVALID: "endDate",

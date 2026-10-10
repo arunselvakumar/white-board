@@ -155,6 +155,14 @@ import {
   procurementOpenApiOperations,
 } from "@/app/api/construction/procurement/procurement-openapi";
 import {
+  billingAddressOpenApiComponents,
+  billingAddressOpenApiOperations,
+} from "@/app/api/construction/organization/settings/billing-addresses/billing-address-openapi";
+import {
+  grnFieldOpenApiComponents,
+  grnFieldOpenApiOperations,
+} from "@/app/api/construction/organization/settings/grn-fields/grn-field-openapi";
+import {
   buildOpenApiDocument,
   type OpenApiComponents,
   type OpenApiOperation,
@@ -912,6 +920,12 @@ openApiOperations.push(...hrmsOpenApiOperations);
 // The procurement context (M5) lists its own models and routes, one file per area.
 Object.assign(openApiComponents, procurementOpenApiComponents);
 openApiOperations.push(...procurementOpenApiOperations);
+
+// Billing addresses and GRN fields (CM-501) are Company settings.
+Object.assign(openApiComponents, billingAddressOpenApiComponents);
+openApiOperations.push(...billingAddressOpenApiOperations);
+Object.assign(openApiComponents, grnFieldOpenApiComponents);
+openApiOperations.push(...grnFieldOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

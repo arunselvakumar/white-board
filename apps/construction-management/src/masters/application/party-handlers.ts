@@ -77,6 +77,17 @@ export type PartyStore = {
   updateProjects(changes: readonly PartyProjectChange[]): Promise<void>;
 };
 
+/**
+ * Whether documents of another context point at a party (CM-501): a
+ * Supplier on a Purchase Order or Goods Receipt, a Contractor on a
+ * Material Request. Implemented in `src/composition`.
+ */
+export type PartyUsage = (
+  kind: PartyKind,
+  workspaceId: string,
+  id: string,
+) => Promise<boolean>;
+
 /** Records other contexts own, read by id (no imports of their code). */
 export type PartyDirectory = {
   /** The live Projects among `ids`, with their names. */
@@ -103,6 +114,11 @@ export type PartyReadModel = {
   address: string | null;
   gstin: string | null;
   pan: string | null;
+  /** GST state code: the GSTIN's first two digits, or the one picked. */
+  stateCode: string | null;
+  /** A Contractor's second contact; null for a Supplier. */
+  contactPerson2: string | null;
+  mobile2: string | null;
   isActive: boolean;
   /** Live Departments, by name; empty for a Supplier. */
   departments: PartyRef[];
@@ -154,6 +170,8 @@ export class PartyHandlers {
     private readonly store: PartyStore,
     private readonly directory: PartyDirectory,
     private readonly clock: () => Date = () => new Date(),
+    /** Without it, delete does not look at documents (unit tests). */
+    private readonly usage?: PartyUsage,
   ) {}
 
   private get info() {
@@ -362,7 +380,8 @@ export class PartyHandlers {
 
   /**
    * Tombstones; 409 `<KIND>_ON_PROJECTS` while the party is on a live
-   * Project (take it off there first, or make it inactive).
+   * Project (take it off there first, or make it inactive), 409
+   * `<KIND>_IN_USE` while a document names it (CM-501).
    */
   async delete(input: {
     workspaceId: string;
@@ -382,6 +401,16 @@ export class PartyHandlers {
         { projectIds: [...live.keys()] },
       );
     }
+    if (
+      this.usage != null &&
+      (await this.usage(this.kind, input.workspaceId, input.id))
+    )
+      throw conflict(
+        `${this.info.code}_IN_USE`,
+        this.kind === "supplier"
+          ? "Purchase Orders or Goods Receipts name this Supplier, so it cannot be deleted. Make them inactive instead."
+          : "Material Requests name this Contractor, so it cannot be deleted. Make them inactive instead.",
+      );
     const loadedAt = party.updatedAt;
     const before = party.snapshot();
     const now = this.clock();

@@ -23,6 +23,10 @@ import {
   UpdateConstructionMastersLabourCategoryRequestModel,
 } from "./labour-categories/labour-category-models";
 import {
+  materialMastersOpenApiComponents,
+  materialMastersOpenApiOperations,
+} from "./material-masters-openapi";
+import {
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
   ListConstructionMastersSupervisorsResponseModel,
@@ -45,6 +49,7 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
   UpdateConstructionMastersSupervisorRequestModel,
+  ...materialMastersOpenApiComponents,
 };
 
 export const SESSION = [
@@ -189,4 +194,5 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     create: CreateConstructionMastersSupervisorRequestModel,
     update: UpdateConstructionMastersSupervisorRequestModel,
   }),
+  ...materialMastersOpenApiOperations,
 ];
