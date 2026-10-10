@@ -1,0 +1,41 @@
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_6604e2237b6922::t_47d7efd5414780 10,133-142,205-211,291-292
+apps/construction-management/app/api/construction/projects/projects/project-profile.http.test.ts
+  s_6604e2237b6922::t_eb7b78359219b9 29-30,608-673
+apps/construction-management/components/projects/project-fixtures.ts
+  s_6604e2237b6922::t_8cfa36ec04c5a4 21-22,62-63
+apps/construction-management/components/projects/project-form-schema.ts
+  s_6604e2237b6922::t_bbfb20d53bd8e0 32,87-92,214,241,277,300,309-311,344
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_6604e2237b6922::t_b18069f1791c34 647,669-736
+apps/construction-management/components/projects/project-form.tsx
+  s_6604e2237b6922::t_9dd3dc6d2bcf0c 62,111-118,501-546
+apps/construction-management/components/projects/project-overview.stories.tsx
+  s_6604e2237b6922::t_2ecbf887fabe00 73-95
+apps/construction-management/components/projects/project-overview.tsx
+  s_6604e2237b6922::t_2b12b1625d1f95 219
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_6604e2237b6922::t_e75c73c38a35e4 28-29,48
+apps/construction-management/src/projects/domain/project.test.ts
+  s_6604e2237b6922::t_5decd1d07c587d 468,570-597
+apps/construction-management/src/projects/domain/project.ts
+  s_6604e2237b6922::t_7d9e8f2443aec2 7,49,62-63,76-80,151-152,170-173,177-188,264,323-326,381,388-389
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_6604e2237b6922::t_d3ae0520c9c7b5 71,93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a3454d341febd1d157b2963ce11b2a14e5aa4b64",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
