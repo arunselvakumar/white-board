@@ -216,6 +216,7 @@ export function ProjectOverview({ id }: { id: string }) {
               {orderValueLabel(project.budgetValue)}
             </Detail>
           )}
+          <Detail label="State">{project.stateName ?? none}</Detail>
           <Detail label="Project address" className="sm:col-span-2">
             {project.address == null ? (
               none

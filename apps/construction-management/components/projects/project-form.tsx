@@ -59,6 +59,7 @@ import {
   type ProjectResponse,
 } from "@/src/queries/projects";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
+import { GST_STATES } from "@/src/shared-kernel/gst-states";
 
 import { ContractPapersField } from "./contract-papers-field";
 import { CustomFieldsField } from "./custom-fields-field";
@@ -106,6 +107,14 @@ const TYPE_ITEMS = PROJECT_TYPES.map((type) => ({
   value: type.key,
   label: type.label,
 }));
+
+/** The State select's "Not set" item; the form keeps "" for it. */
+const NO_STATE = "none";
+
+const STATE_ITEMS = [
+  { value: NO_STATE, label: "Not set" },
+  ...GST_STATES.map((state) => ({ value: state.code, label: state.name })),
+];
 
 const KEEP_LOGO: ProjectLogoChange = { kind: "keep" };
 
@@ -489,6 +498,52 @@ function ProjectForm({
               <FieldError message={errors.budgetValue?.message} />
             </div>
           ) : null}
+          <div className="space-y-1.5">
+            <Label htmlFor="project-state">State</Label>
+            <Controller
+              name="stateCode"
+              control={form.control}
+              render={({ field }) => (
+                <Select
+                  items={STATE_ITEMS}
+                  value={field.value === "" ? NO_STATE : field.value}
+                  onValueChange={(value) => {
+                    if (value != null)
+                      field.onChange(value === NO_STATE ? "" : value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="project-state"
+                    ref={field.ref}
+                    size="lg"
+                    className="w-full min-w-0"
+                    aria-invalid={errors.stateCode != null}
+                    aria-describedby="project-state-hint"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    align="start"
+                    alignItemWithTrigger={false}
+                    aria-label="States"
+                  >
+                    {STATE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <p
+              id="project-state-hint"
+              className="text-muted-foreground text-xs"
+            >
+              The place of supply on the Project&apos;s Purchase Orders.
+            </p>
+            <FieldError message={errors.stateCode?.message} />
+          </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="project-address">Project address</Label>
             <Textarea

@@ -26,6 +26,8 @@ type Project = {
   orderValue: number | null;
   logoUrl: string | null;
   useLogoInReports: boolean;
+  stateCode: string | null;
+  stateName: string | null;
   updatedAt: string;
 };
 
@@ -601,5 +603,71 @@ describe("Project logo HTTP (CM-401)", () => {
     expect(
       (await getLogo(new Request(`${BASE}/${id}/logo`), params(id))).status,
     ).toBe(StatusCodes.UNAUTHORIZED);
+  });
+});
+
+describe("Project GST State (CM-501)", () => {
+  it("is saved, kept when an edit leaves it out, cleared by null and refused off the list", async () => {
+    const owner = await ownerWithCompany();
+    const plain = await create(owner.cookie, {
+      name: "Anugraha Residency",
+      projectType: "residential",
+    });
+    expect(plain).toMatchObject({ stateCode: null, stateName: null });
+
+    const kumari = await create(owner.cookie, {
+      name: "Kumari Heights",
+      projectType: "residential",
+      stateCode: "33",
+    });
+    expect(kumari).toMatchObject({ stateCode: "33", stateName: "Tamil Nadu" });
+    expect(await read(owner.cookie, kumari.id)).toMatchObject({
+      stateCode: "33",
+      stateName: "Tamil Nadu",
+    });
+
+    const kept = await update(owner.cookie, kumari, { status: "on_hold" });
+    expect(kept.status).toBe(StatusCodes.OK);
+    const afterKeep = await json<Project>(kept);
+    expect(afterKeep).toMatchObject({ status: "on_hold", stateCode: "33" });
+
+    const bad = await update(owner.cookie, afterKeep, { stateCode: "99" });
+    expect(bad.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json<ErrorBody>(bad)).toMatchObject({
+      code: "PROJECT_STATE_INVALID",
+    });
+    const refused = await createProject(
+      jsonRequest(BASE, owner.cookie, {
+        name: "Nowhere",
+        projectType: "residential",
+        stateCode: "25",
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json<ErrorBody>(refused)).toMatchObject({
+      code: "PROJECT_STATE_INVALID",
+    });
+
+    const moved = await json<Project>(
+      await update(owner.cookie, afterKeep, { stateCode: "29" }),
+    );
+    expect(moved).toMatchObject({ stateCode: "29", stateName: "Karnataka" });
+
+    const cleared = await update(owner.cookie, moved, { stateCode: null });
+    expect(cleared.status).toBe(StatusCodes.OK);
+    expect(await json(cleared)).toMatchObject({
+      stateCode: null,
+      stateName: null,
+    });
+    const row = await prisma.constructionProjectsProject.findUnique({
+      where: { id: kumari.id },
+    });
+    expect(row?.stateCode).toBeNull();
+    const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
+      where: { entityId: kumari.id, action: "project.updated" },
+      orderBy: { occurredAt: "desc" },
+    });
+    expect(audit?.before).toMatchObject({ stateCode: "29" });
+    expect(audit?.after).toMatchObject({ stateCode: null });
   });
 });

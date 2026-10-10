@@ -465,6 +465,7 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       budgetValue: null,
       useLogoInReports: false,
       logoKey: null,
+      stateCode: null,
     });
   });
 
@@ -564,5 +565,33 @@ describe("Project Type, Budget and logo (CM-401)", () => {
     item.setLogo("companies/c/project-logos/p1/a.png", "u", NOW);
     item.update({ name: "Kumari Heights" }, "u", LATER);
     expect(item.logoKey).toBe("companies/c/project-logos/p1/a.png");
+  });
+});
+
+describe("GST State (CM-501)", () => {
+  it("starts with none, or the state chosen", () => {
+    expect(project().stateCode).toBeNull();
+    expect(project({ stateCode: "" }).stateCode).toBeNull();
+    expect(project({ stateCode: "33" }).stateCode).toBe("33");
+  });
+
+  it("refuses a code that is not a GST state", () => {
+    for (const stateCode of ["99", "25", "TN", "3"])
+      expect(codeOf(() => project({ stateCode }))).toBe(
+        "PROJECT_STATE_INVALID",
+      );
+  });
+
+  it("keeps the state when an edit leaves it out; null or blank clears it", () => {
+    const item = project({ stateCode: "33" });
+    item.update({ name: "Kumari Heights" }, "u", LATER);
+    expect(item.stateCode).toBe("33");
+    item.update({ name: "Kumari Heights", stateCode: "29" }, "u", LATER);
+    expect(item.profile.stateCode).toBe("29");
+    item.update({ name: "Kumari Heights", stateCode: null }, "u", LATER);
+    expect(item.stateCode).toBeNull();
+    item.update({ name: "Kumari Heights", stateCode: "33" }, "u", LATER);
+    item.update({ name: "Kumari Heights", stateCode: "" }, "u", LATER);
+    expect(item.stateCode).toBeNull();
   });
 });

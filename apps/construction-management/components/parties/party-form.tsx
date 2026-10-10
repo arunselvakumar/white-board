@@ -5,11 +5,18 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
@@ -30,6 +37,10 @@ import {
 import { projectOptionsQuery } from "@/src/queries/projects";
 
 import {
+  GST_STATE_ITEMS,
+  NO_STATE,
+  gstStateLabel,
+  gstinState,
   partyErrorField,
   partyFormDefaults,
   partyFormSchema,
@@ -37,6 +48,7 @@ import {
   type PartyFormValues,
 } from "./party-form-schema";
 import { PARTY_SCREENS, type PartyScreen } from "./party-screens";
+import { PartyQuotations } from "./party-quotations";
 
 type Choice = { id: string; label: string };
 
@@ -163,6 +175,19 @@ function PartyForm({
   });
   const errors = form.formState.errors;
   const id = (field: string) => `${screen.list}-${field}`;
+  // A valid GSTIN fixes the state: its first two digits (CM-501).
+  const lockedState = gstinState(
+    useWatch({ control: form.control, name: "gstin" }),
+  );
+  const gstinField = form.register("gstin", {
+    onChange: (event: { target: { value: string } }) => {
+      const state = gstinState(event.target.value);
+      if (state != null) {
+        form.setValue("stateCode", state, { shouldDirty: true });
+        form.clearErrors("stateCode");
+      }
+    },
+  });
 
   const submit = form.handleSubmit(async (values) => {
     try {
@@ -200,6 +225,18 @@ function PartyForm({
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
+            <Label htmlFor={id("email")}>Email</Label>
+            <Input
+              id={id("email")}
+              type="email"
+              className="h-10"
+              autoComplete="off"
+              aria-invalid={errors.email != null}
+              {...form.register("email")}
+            />
+            <FieldError message={errors.email?.message} />
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor={id("contact-person")}>Contact person</Label>
             <Input
               id={id("contact-person")}
@@ -219,41 +256,120 @@ function PartyForm({
             />
             <FieldError message={errors.mobile?.message} />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={id("email")}>Email</Label>
-            <Input
-              id={id("email")}
-              type="email"
-              className="h-10"
-              autoComplete="off"
-              aria-invalid={errors.email != null}
-              {...form.register("email")}
-            />
-            <FieldError message={errors.email?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={id("gstin")}>GSTIN</Label>
-            <Input
-              id={id("gstin")}
-              className="h-10 uppercase"
-              autoComplete="off"
-              maxLength={15}
-              aria-invalid={errors.gstin != null}
-              {...form.register("gstin")}
-            />
-            <FieldError message={errors.gstin?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={id("pan")}>PAN</Label>
-            <Input
-              id={id("pan")}
-              className="h-10 uppercase"
-              autoComplete="off"
-              maxLength={10}
-              aria-invalid={errors.pan != null}
-              {...form.register("pan")}
-            />
-            <FieldError message={errors.pan?.message} />
+          {screen.departments && (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor={id("contact-person-2")}>Contact person 2</Label>
+                <Input
+                  id={id("contact-person-2")}
+                  className="h-10"
+                  autoComplete="off"
+                  aria-invalid={errors.contactPerson2 != null}
+                  {...form.register("contactPerson2")}
+                />
+                <FieldError message={errors.contactPerson2?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor={id("mobile-2")}>Mobile 2</Label>
+                <MobileField
+                  id={id("mobile-2")}
+                  autoComplete="off"
+                  aria-invalid={errors.mobile2 != null}
+                  {...form.register("mobile2")}
+                />
+                <FieldError message={errors.mobile2?.message} />
+              </div>
+            </>
+          )}
+          <div className="grid gap-4 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor={id("gstin")}>GSTIN</Label>
+              <Input
+                id={id("gstin")}
+                className="h-10 uppercase"
+                autoCapitalize="characters"
+                autoComplete="off"
+                maxLength={15}
+                aria-invalid={errors.gstin != null}
+                {...gstinField}
+              />
+              <FieldError message={errors.gstin?.message} />
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor={id("state")}>GST state</Label>
+              <Controller
+                name="stateCode"
+                control={form.control}
+                render={({ field }) => {
+                  const value = lockedState ?? field.value;
+                  const items = GST_STATE_ITEMS.some(
+                    (item) => item.value === value,
+                  )
+                    ? GST_STATE_ITEMS
+                    : [
+                        ...GST_STATE_ITEMS,
+                        { value, label: gstStateLabel(value) },
+                      ];
+                  return (
+                    <Select
+                      items={items}
+                      value={value === "" ? NO_STATE : value}
+                      disabled={lockedState != null}
+                      onValueChange={(next) => {
+                        if (next != null)
+                          field.onChange(next === NO_STATE ? "" : next);
+                      }}
+                    >
+                      <SelectTrigger
+                        id={id("state")}
+                        ref={field.ref}
+                        size="lg"
+                        className="w-full min-w-0"
+                        aria-invalid={errors.stateCode != null}
+                        aria-describedby={
+                          lockedState == null ? undefined : id("state-hint")
+                        }
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent
+                        align="start"
+                        alignItemWithTrigger={false}
+                        aria-label="GST states"
+                      >
+                        {items.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  );
+                }}
+              />
+              {lockedState != null && (
+                <p
+                  id={id("state-hint")}
+                  className="text-muted-foreground text-xs"
+                >
+                  From the GSTIN
+                </p>
+              )}
+              <FieldError message={errors.stateCode?.message} />
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor={id("pan")}>PAN</Label>
+              <Input
+                id={id("pan")}
+                className="h-10 uppercase"
+                autoCapitalize="characters"
+                autoComplete="off"
+                maxLength={10}
+                aria-invalid={errors.pan != null}
+                {...form.register("pan")}
+              />
+              <FieldError message={errors.pan?.message} />
+            </div>
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor={id("address")}>Address</Label>
@@ -358,6 +474,23 @@ function FormPage({
   );
 }
 
+/** On Add, quotations wait until the party exists (CM-501). */
+function PartyQuotationsNote({ screen }: { screen: PartyScreen }) {
+  return (
+    <section
+      aria-labelledby={`${screen.list}-quotations`}
+      className="space-y-1 border-t pt-6"
+    >
+      <h2 id={`${screen.list}-quotations`} className="font-semibold">
+        Quotations
+      </h2>
+      <p className="text-muted-foreground text-sm">
+        Save the {screen.label} first to add quotations.
+      </p>
+    </section>
+  );
+}
+
 /** Add Contractor or Add Supplier (CM-406). */
 export function NewPartyScreen({ list }: { list: PartyList }) {
   const screen = PARTY_SCREENS[list];
@@ -370,6 +503,7 @@ export function NewPartyScreen({ list }: { list: PartyList }) {
         saving={create.isPending}
         onSave={(payload) => create.mutateAsync(payload)}
       />
+      <PartyQuotationsNote screen={screen} />
     </FormPage>
   );
 }
@@ -390,6 +524,7 @@ export function EditPartyScreen({ list, id }: { list: PartyList; id: string }) {
           update.mutateAsync({ ...payload, expectedUpdatedAt: data.updatedAt })
         }
       />
+      <PartyQuotations list={list} partyId={data.id} />
     </FormPage>
   );
 }

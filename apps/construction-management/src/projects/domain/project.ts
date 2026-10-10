@@ -4,6 +4,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
+import { isGstStateCode } from "@/src/shared-kernel/gst-states";
 
 import {
   NO_CONTRACT_DETAILS,
@@ -45,7 +46,7 @@ export function isProjectStatus(value: string): value is ProjectStatus {
  * What a Team Member types on the Project form. The contract details and
  * custom fields (CM-413) are optional; left out of an edit, they keep what
  * is stored. So do the Project Type, Budget and `useLogoInReports` (CM-401),
- * though a new Project must have a type.
+ * though a new Project must have a type, and the GST State (CM-501).
  */
 export type ProjectDetailsInput = {
   name: string;
@@ -58,6 +59,8 @@ export type ProjectDetailsInput = {
   /** Paise. */
   budgetValue?: number | null;
   useLogoInReports?: boolean;
+  /** GST state code (`GST_STATES`); blank or null clears it. */
+  stateCode?: string | null;
 } & ProjectContractInput;
 
 /**
@@ -70,6 +73,11 @@ export type ProjectProfile = {
   budgetValue: number | null;
   useLogoInReports: boolean;
   logoKey: string | null;
+  /**
+   * The GST state of the site (ADR CM-0015 §1, CM-501): two digits from
+   * `GST_STATES`, or null when not set.
+   */
+  stateCode: string | null;
 };
 
 export type ProjectDetails = {
@@ -140,8 +148,8 @@ function cleanBudget(raw: number | null | undefined): number | null {
 }
 
 /**
- * The Project Type, Budget and `useLogoInReports` as saved: a field left
- * out keeps `current`; `null` clears the Budget. The logo is not here: it
+ * The Project Type, Budget, `useLogoInReports` and GST State as saved: a
+ * field left out keeps `current`; `null` clears the Budget and the State. The logo is not here: it
  * changes through its own route.
  */
 function projectProfile(
@@ -159,7 +167,23 @@ function projectProfile(
         : cleanBudget(input.budgetValue),
     useLogoInReports: input.useLogoInReports ?? current.useLogoInReports,
     logoKey: current.logoKey,
+    stateCode:
+      input.stateCode === undefined
+        ? current.stateCode
+        : cleanStateCode(input.stateCode),
   };
+}
+
+/** Optional: one of `GST_STATES`; blank is none. */
+function cleanStateCode(raw: string | null | undefined): string | null {
+  const code = raw?.trim() ?? "";
+  if (code === "") return null;
+  if (!isGstStateCode(code))
+    throw new DomainError(
+      "PROJECT_STATE_INVALID",
+      "Choose a state from the list.",
+    );
+  return code;
 }
 
 function cleanDate(raw: string | null | undefined): CalendarDate | null {
@@ -237,6 +261,7 @@ export class Project {
           budgetValue: null,
           useLogoInReports: false,
           logoKey: null,
+          stateCode: null,
         },
       ),
       customFields: customFields(input.details.customFields ?? []),
@@ -295,6 +320,10 @@ export class Project {
   get logoKey(): string | null {
     return this.props.logoKey;
   }
+  /** GST state code of the site, or null when not set (CM-501). */
+  get stateCode(): string | null {
+    return this.props.stateCode;
+  }
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -349,14 +378,15 @@ export class Project {
       budgetValue: this.props.budgetValue,
       useLogoInReports: this.props.useLogoInReports,
       logoKey: this.props.logoKey,
+      stateCode: this.props.stateCode,
     };
   }
 
   /**
    * Edit Project: name, status, address and dates at once (the legacy app
    * allows any status change); a contract detail, the custom-field list,
-   * the Project Type, Budget or `useLogoInReports` left out keeps what is
-   * stored.
+   * the Project Type, Budget, `useLogoInReports` or GST State left out
+   * keeps what is stored.
    */
   update(details: ProjectDetailsInput, by: string, now: Date): void {
     this.props = {

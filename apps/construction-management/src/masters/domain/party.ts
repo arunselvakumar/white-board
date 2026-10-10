@@ -5,6 +5,7 @@ import {
   conflict,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import { isGstStateCode } from "@/src/shared-kernel/gst-states";
 import { isValidGstin, isValidPan } from "@/src/shared-kernel/tax-ids";
 
 /**
@@ -47,6 +48,14 @@ export type PartyDetailsInput = {
   address?: string | null;
   gstin?: string | null;
   pan?: string | null;
+  /**
+   * GST state picked on the form. With a GSTIN the state is its first two
+   * digits, and a different pick is 400 `GSTIN_STATE_MISMATCH` (CM-501).
+   */
+  stateCode?: string | null;
+  /** A Contractor's second contact; ignored for a Supplier. */
+  contactPerson2?: string | null;
+  mobile2?: string | null;
 };
 
 export type PartyDetails = {
@@ -60,6 +69,12 @@ export type PartyDetails = {
   /** Upper case, checksum valid. */
   gstin: string | null;
   pan: string | null;
+  /** GST state code: the GSTIN's first two digits, or the one picked. */
+  stateCode: string | null;
+  /** A Contractor's second contact; always null for a Supplier. */
+  contactPerson2: string | null;
+  /** E.164. */
+  mobile2: string | null;
 };
 
 export type PartyProps = PartyDetails & {
@@ -144,7 +159,51 @@ export function partyDetails(
       `The GSTIN must contain the ${label}'s PAN.`,
     );
 
-  return { name, contactPerson, mobile, email, address, gstin, pan };
+  const picked = optional(input.stateCode);
+  let stateCode: string | null = picked;
+  if (gstin != null) {
+    stateCode = gstin.slice(0, 2);
+    if (picked != null && picked !== stateCode)
+      throw new DomainError(
+        "GSTIN_STATE_MISMATCH",
+        `The GSTIN is registered in another state (code ${stateCode}). Pick that state, or leave the state to follow the GSTIN.`,
+      );
+  } else if (picked != null && !isGstStateCode(picked))
+    throw new DomainError("GST_STATE_INVALID", "Choose a state from the list.");
+
+  let contactPerson2: string | null = null;
+  let mobile2: string | null = null;
+  if (kind === "contractor") {
+    contactPerson2 = optional(input.contactPerson2);
+    if (
+      contactPerson2 != null &&
+      contactPerson2.length > PARTY_CONTACT_PERSON_MAX
+    )
+      throw new DomainError(
+        "CONTACT_PERSON_2_TOO_LONG",
+        `Contact person 2 must be at most ${String(PARTY_CONTACT_PERSON_MAX)} characters.`,
+      );
+    const rawMobile2 = optional(input.mobile2);
+    mobile2 = rawMobile2 == null ? null : normalizeMobile(rawMobile2);
+    if (rawMobile2 != null && mobile2 == null)
+      throw new DomainError(
+        "MOBILE_2_INVALID",
+        "Enter a valid mobile number for contact person 2, like 77081 65767.",
+      );
+  }
+
+  return {
+    name,
+    contactPerson,
+    mobile,
+    email,
+    address,
+    gstin,
+    pan,
+    stateCode,
+    contactPerson2,
+    mobile2,
+  };
 }
 
 function unique(ids: readonly string[]): string[] {
@@ -221,9 +280,30 @@ export class Party {
     return this.props.kind;
   }
   get details(): PartyDetails {
-    const { name, contactPerson, mobile, email, address, gstin, pan } =
-      this.props;
-    return { name, contactPerson, mobile, email, address, gstin, pan };
+    const {
+      name,
+      contactPerson,
+      mobile,
+      email,
+      address,
+      gstin,
+      pan,
+      stateCode,
+      contactPerson2,
+      mobile2,
+    } = this.props;
+    return {
+      name,
+      contactPerson,
+      mobile,
+      email,
+      address,
+      gstin,
+      pan,
+      stateCode,
+      contactPerson2,
+      mobile2,
+    };
   }
   get name(): string {
     return this.props.name;
