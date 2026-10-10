@@ -26,6 +26,23 @@ export async function addUnit(
   return id;
 }
 
+/** The Company's live unit of this name (a seed one if present), else a new one. */
+export async function unitNamed(
+  workspaceId: string,
+  by: string,
+  name: string,
+): Promise<string> {
+  const found = await prisma.constructionMastersMeasurementUnit.findFirst({
+    where: {
+      workspaceId,
+      name: { equals: name, mode: "insensitive" },
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+  return found?.id ?? addUnit(workspaceId, by, name);
+}
+
 export async function addMaterialCategory(
   workspaceId: string,
   by: string,
@@ -56,7 +73,7 @@ export async function addMaterial(
   fixture: MaterialFixture = {},
 ): Promise<{ id: string; uomId: string; name: string }> {
   const id = randomUUID();
-  const uomId = fixture.uomId ?? (await addUnit(workspaceId, by, "Bag"));
+  const uomId = fixture.uomId ?? (await unitNamed(workspaceId, by, "Bag"));
   const name = fixture.name ?? `Cement OPC 53 ${randomUUID().slice(0, 6)}`;
   await prisma.constructionMastersMaterial.create({
     data: {
