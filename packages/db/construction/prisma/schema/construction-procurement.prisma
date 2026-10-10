@@ -1,0 +1,786 @@
+/// Construction Management — procurement context (`modules/06`, ADR CM-0015):
+/// Purchase Requests, Purchase Orders, Goods Receipts, the stock ledger,
+/// Material Transfers, Central Stores, Material Requests and Delivery Notes.
+///
+/// Conventions:
+/// - Money is paise in `BIGINT`; quantities are `decimal(14,3)` in the
+///   material's unit; rates and GST % are `decimal(5,2)` where a percent.
+/// - A **stock location** is a Project or a Store: `location_kind` +
+///   `location_id` (no foreign key; Projects live in another schema).
+/// - A **site location** inside a Project is a `LocationRef` stored as JSON
+///   with its type copied to `site_location_type` for filters (CM-403).
+/// - Lines copy the master values a document must keep (material name,
+///   unit name, HSN, rate, GST %), so editing a master never rewrites one.
+/// - Stock is never stored: it is the sum of `stock_entries` (CM-0015 §5).
+/// - Document numbers come from the numbering rules (CM-114) and are
+///   unique per Company per document type, never reused.
+
+enum ConstructionProcurementApprovalStatus {
+  pending
+  approved
+  rejected
+
+  @@map("approval_status")
+  @@schema("construction_procurement")
+}
+
+enum ConstructionProcurementLocationKind {
+  project
+  store
+
+  @@map("location_kind")
+  @@schema("construction_procurement")
+}
+
+/// The documents that carry remarks, comments and files.
+enum ConstructionProcurementDocumentType {
+  purchase_request
+  purchase_order
+  goods_receipt
+  material_transfer
+  material_request
+  delivery_note
+
+  @@map("document_type")
+  @@schema("construction_procurement")
+}
+
+enum ConstructionProcurementDiscountType {
+  amount
+  percent
+
+  @@map("discount_type")
+  @@schema("construction_procurement")
+}
+
+/// CGST + SGST (intra-state) or IGST (inter-state), CM-0015 §6.
+enum ConstructionProcurementSupplyType {
+  intra_state
+  inter_state
+
+  @@map("supply_type")
+  @@schema("construction_procurement")
+}
+
+enum ConstructionProcurementPurchaseRequestSource {
+  manual
+  inventory
+
+  @@map("purchase_request_source")
+  @@schema("construction_procurement")
+}
+
+/// A Purchase Request's fulfilment, kept in step by every PO write.
+enum ConstructionProcurementOrderStatus {
+  not_ordered
+  partially_ordered
+  ordered
+  excess_ordered
+
+  @@map("order_status")
+  @@schema("construction_procurement")
+}
+
+/// A Purchase Order's fulfilment, kept in step by every GRN write.
+enum ConstructionProcurementReceiptStatus {
+  not_received
+  partially_received
+  received
+
+  @@map("receipt_status")
+  @@schema("construction_procurement")
+}
+
+enum ConstructionProcurementMaterialRequestStatus {
+  requested
+  partially_delivered
+  delivered
+  closed
+
+  @@map("material_request_status")
+  @@schema("construction_procurement")
+}
+
+/// Stock ledger entry types (CM-0015 §5). Quantity is signed: in-types are
+/// positive, out-types negative, a reversal negates its entry, and an
+/// adjustment is either.
+enum ConstructionProcurementStockEntryType {
+  opening
+  received
+  transferred_in
+  transferred_out
+  issued
+  received_from_store
+  consumed
+  missing
+  adjustment
+
+  @@map("stock_entry_type")
+  @@schema("construction_procurement")
+}
+
+/// What wrote a stock entry.
+enum ConstructionProcurementStockSource {
+  goods_receipt
+  material_transfer
+  delivery_note
+  stock_movement
+
+  @@map("stock_source")
+  @@schema("construction_procurement")
+}
+
+/// A hand-entered movement on Current Inventory.
+enum ConstructionProcurementStockMovementKind {
+  opening
+  consumed
+  missing
+  adjustment
+
+  @@map("stock_movement_kind")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Purchase Requests (CM-503)
+// ---------------------------------------------------------------------------
+
+model ConstructionProcurementPurchaseRequest {
+  id               String                                       @id @db.Uuid
+  workspaceId      String                                       @map("workspace_id")
+  projectId        String                                       @map("project_id") @db.Uuid
+  number           String
+  requestDate      DateTime                                     @map("request_date") @db.Date
+  requiredDate     DateTime?                                    @map("required_date") @db.Date
+  siteLocationType String?                                      @map("site_location_type")
+  siteLocation     Json?                                        @map("site_location")
+  remark           String?
+  /// "Separate remark for each item"; off means `commonRemark` applies.
+  separateRemarks  Boolean                                      @default(false) @map("separate_remarks")
+  commonRemark     String?                                      @map("common_remark")
+  source           ConstructionProcurementPurchaseRequestSource @default(manual)
+  approvalStatus   ConstructionProcurementApprovalStatus        @default(pending) @map("approval_status")
+  decidedAt        DateTime?                                    @map("decided_at") @db.Timestamptz(3)
+  decidedBy        String?                                      @map("decided_by")
+  rejectionReason  String?                                      @map("rejection_reason")
+  orderStatus      ConstructionProcurementOrderStatus           @default(not_ordered) @map("order_status")
+  /// Mark as Ordered (ordered outside the app); wins over PO quantities.
+  markedOrderedAt  DateTime?                                    @map("marked_ordered_at") @db.Timestamptz(3)
+  markedOrderedBy  String?                                      @map("marked_ordered_by")
+  createdAt        DateTime                                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                                       @map("created_by")
+  updatedBy        String                                       @map("updated_by")
+  deletedAt        DateTime?                                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                                      @map("deleted_by")
+
+  items ConstructionProcurementPurchaseRequestItem[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, projectId, approvalStatus])
+  @@map("purchase_requests")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementPurchaseRequestItem {
+  id                String  @id @db.Uuid
+  purchaseRequestId String  @map("purchase_request_id") @db.Uuid
+  position          Int
+  materialId        String  @map("material_id") @db.Uuid
+  materialName      String  @map("material_name")
+  /// The Material's category when the PR was saved (list filter).
+  categoryId        String? @map("category_id") @db.Uuid
+  uomId             String  @map("uom_id") @db.Uuid
+  uomName           String  @map("uom_name")
+  quantity          Decimal @db.Decimal(14, 3)
+  remark            String?
+  /// Σ quantity of live, non-rejected PO lines pointing here.
+  orderedQty        Decimal @default(0) @map("ordered_qty") @db.Decimal(14, 3)
+
+  purchaseRequest ConstructionProcurementPurchaseRequest     @relation(fields: [purchaseRequestId], references: [id], onDelete: Cascade)
+  poItems         ConstructionProcurementPurchaseOrderItem[]
+
+  @@index([purchaseRequestId])
+  @@index([materialId])
+  @@map("purchase_request_items")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Purchase Orders (CM-504)
+// ---------------------------------------------------------------------------
+
+model ConstructionProcurementPurchaseOrder {
+  id                     String                                @id @db.Uuid
+  workspaceId            String                                @map("workspace_id")
+  locationKind           ConstructionProcurementLocationKind   @map("location_kind")
+  locationId             String                                @map("location_id") @db.Uuid
+  number                 String
+  orderDate              DateTime                              @map("order_date") @db.Date
+  expectedDeliveryDate   DateTime                              @map("expected_delivery_date") @db.Date
+  purchaseRequestId      String?                               @map("purchase_request_id") @db.Uuid
+  supplierId             String                                @map("supplier_id") @db.Uuid
+  supplierName           String                                @map("supplier_name")
+  supplierGstin          String?                               @map("supplier_gstin") @db.VarChar(15)
+  /// GST state code of the supplier when the PO was saved.
+  supplierStateCode      String?                               @map("supplier_state_code") @db.Char(2)
+  siteLocationType       String?                               @map("site_location_type")
+  siteLocation           Json?                                 @map("site_location")
+  supplyType             ConstructionProcurementSupplyType     @default(intra_state) @map("supply_type")
+  placeOfSupplyStateCode String?                               @map("place_of_supply_state_code") @db.Char(2)
+  billingAddressId       String                                @map("billing_address_id") @db.Uuid
+  billingName            String                                @map("billing_name")
+  billingAddress         String                                @map("billing_address")
+  billingStateCode       String?                               @map("billing_state_code") @db.Char(2)
+  billingGstin           String?                               @map("billing_gstin") @db.VarChar(15)
+  supplierPocName        String?                               @map("supplier_poc_name")
+  supplierPocMobile      String?                               @map("supplier_poc_mobile")
+  sitePocName            String?                               @map("site_poc_name")
+  sitePocMobile          String?                               @map("site_poc_mobile")
+  paymentTermsDays       Int?                                  @map("payment_terms_days")
+  deliveryAddressDiffers Boolean                               @default(false) @map("delivery_address_differs")
+  deliveryAddress        String?                               @map("delivery_address")
+  deliveryStateCode      String?                               @map("delivery_state_code") @db.Char(2)
+  remark                 String?
+  /// Totals in paise, recomputed on every save from the lines (CM-0015 §6).
+  subTotal               BigInt                                @default(0) @map("sub_total")
+  discountTotal          BigInt                                @default(0) @map("discount_total")
+  taxableTotal           BigInt                                @default(0) @map("taxable_total")
+  cgstTotal              BigInt                                @default(0) @map("cgst_total")
+  sgstTotal              BigInt                                @default(0) @map("sgst_total")
+  igstTotal              BigInt                                @default(0) @map("igst_total")
+  itemsTotal             BigInt                                @default(0) @map("items_total")
+  additionalCharges      BigInt                                @default(0) @map("additional_charges")
+  deductionAmount        BigInt                                @default(0) @map("deduction_amount")
+  grandTotal             BigInt                                @default(0) @map("grand_total")
+  approvalStatus         ConstructionProcurementApprovalStatus @default(pending) @map("approval_status")
+  decidedAt              DateTime?                             @map("decided_at") @db.Timestamptz(3)
+  decidedBy              String?                               @map("decided_by")
+  rejectionReason        String?                               @map("rejection_reason")
+  /// Mark as Ordered: sent to the supplier.
+  orderedAt              DateTime?                             @map("ordered_at") @db.Timestamptz(3)
+  orderedBy              String?                               @map("ordered_by")
+  receiptStatus          ConstructionProcurementReceiptStatus  @default(not_received) @map("receipt_status")
+  /// Close: a short-supplied PO stops expecting more (CM-0015 §8).
+  closedAt               DateTime?                             @map("closed_at") @db.Timestamptz(3)
+  closedBy               String?                               @map("closed_by")
+  closeReason            String?                               @map("close_reason")
+  createdAt              DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime                              @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy              String                                @map("created_by")
+  updatedBy              String                                @map("updated_by")
+  deletedAt              DateTime?                             @map("deleted_at") @db.Timestamptz(3)
+  deletedBy              String?                               @map("deleted_by")
+
+  items ConstructionProcurementPurchaseOrderItem[]
+  terms ConstructionProcurementPurchaseOrderTerm[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, locationKind, locationId, createdAt])
+  @@index([workspaceId, supplierId])
+  @@index([purchaseRequestId])
+  @@map("purchase_orders")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementPurchaseOrderItem {
+  id                    String                               @id @db.Uuid
+  purchaseOrderId       String                               @map("purchase_order_id") @db.Uuid
+  purchaseRequestItemId String?                              @map("purchase_request_item_id") @db.Uuid
+  position              Int
+  materialId            String                               @map("material_id") @db.Uuid
+  materialName          String                               @map("material_name")
+  uomId                 String                               @map("uom_id") @db.Uuid
+  uomName               String                               @map("uom_name")
+  hsnCode               String?                              @map("hsn_code") @db.VarChar(8)
+  quantity              Decimal                              @db.Decimal(14, 3)
+  /// Paise per unit.
+  unitRate              BigInt                               @map("unit_rate")
+  discountType          ConstructionProcurementDiscountType? @map("discount_type")
+  /// Set when the discount is a percent (0–100).
+  discountPercent       Decimal?                             @map("discount_percent") @db.Decimal(5, 2)
+  /// The discount in paise (typed, or computed from the percent).
+  discountAmount        BigInt                               @default(0) @map("discount_amount")
+  gstRate               Decimal                              @default(0) @map("gst_rate") @db.Decimal(5, 2)
+  subTotal              BigInt                               @map("sub_total")
+  taxable               BigInt
+  cgst                  BigInt                               @default(0)
+  sgst                  BigInt                               @default(0)
+  igst                  BigInt                               @default(0)
+  total                 BigInt
+  remark                String?
+  /// Σ received quantity of live GRN lines pointing here.
+  receivedQty           Decimal                              @default(0) @map("received_qty") @db.Decimal(14, 3)
+
+  purchaseOrder       ConstructionProcurementPurchaseOrder        @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  purchaseRequestItem ConstructionProcurementPurchaseRequestItem? @relation(fields: [purchaseRequestItemId], references: [id], onDelete: SetNull)
+
+  @@index([purchaseOrderId])
+  @@index([purchaseRequestItemId])
+  @@index([materialId])
+  @@map("purchase_order_items")
+  @@schema("construction_procurement")
+}
+
+/// Terms & Conditions copied onto a PO at save (CM-0015 §8).
+model ConstructionProcurementPurchaseOrderTerm {
+  id              String  @id @db.Uuid
+  purchaseOrderId String  @map("purchase_order_id") @db.Uuid
+  position        Int
+  /// The master it was copied from, if it still matters to anyone.
+  termsId         String? @map("terms_id") @db.Uuid
+  title           String
+  body            String
+
+  purchaseOrder ConstructionProcurementPurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@map("purchase_order_terms")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Goods Receipts (CM-505)
+// ---------------------------------------------------------------------------
+
+model ConstructionProcurementGoodsReceipt {
+  id                String                              @id @db.Uuid
+  workspaceId       String                              @map("workspace_id")
+  locationKind      ConstructionProcurementLocationKind @map("location_kind")
+  locationId        String                              @map("location_id") @db.Uuid
+  number            String
+  receiptDate       DateTime                            @map("receipt_date") @db.Date
+  /// The date the stock is posted.
+  inventoryDate     DateTime                            @map("inventory_date") @db.Date
+  supplierId        String                              @map("supplier_id") @db.Uuid
+  supplierName      String                              @map("supplier_name")
+  purchaseOrderId   String?                             @map("purchase_order_id") @db.Uuid
+  supplyType        ConstructionProcurementSupplyType   @default(intra_state) @map("supply_type")
+  // Supplier details
+  invoiceNo         String?                             @map("invoice_no")
+  invoiceDate       DateTime?                           @map("invoice_date") @db.Date
+  invoiceAmount     BigInt?                             @map("invoice_amount")
+  // Delivery details
+  deliveryChallanNo String?                             @map("delivery_challan_no")
+  grnDcNo           String?                             @map("grn_dc_no")
+  vehicleNo         String?                             @map("vehicle_no")
+  driverName        String?                             @map("driver_name")
+  driverMobile      String?                             @map("driver_mobile")
+  ewayBillNo        String?                             @map("eway_bill_no")
+  remark            String?
+  taxableTotal      BigInt                              @default(0) @map("taxable_total")
+  cgstTotal         BigInt                              @default(0) @map("cgst_total")
+  sgstTotal         BigInt                              @default(0) @map("sgst_total")
+  igstTotal         BigInt                              @default(0) @map("igst_total")
+  /// Σ line totals including GST: the GRN value M7 pays against.
+  totalValue        BigInt                              @default(0) @map("total_value")
+  createdAt         DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                              @map("created_by")
+  updatedBy         String                              @map("updated_by")
+  deletedAt         DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                             @map("deleted_by")
+
+  items ConstructionProcurementGoodsReceiptItem[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, locationKind, locationId, createdAt])
+  @@index([workspaceId, supplierId])
+  @@index([purchaseOrderId])
+  @@map("goods_receipts")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementGoodsReceiptItem {
+  id                  String  @id @db.Uuid
+  goodsReceiptId      String  @map("goods_receipt_id") @db.Uuid
+  purchaseOrderItemId String? @map("purchase_order_item_id") @db.Uuid
+  position            Int
+  materialId          String  @map("material_id") @db.Uuid
+  materialName        String  @map("material_name")
+  uomId               String  @map("uom_id") @db.Uuid
+  uomName             String  @map("uom_name")
+  hsnCode             String? @map("hsn_code") @db.VarChar(8)
+  receivedQty         Decimal @map("received_qty") @db.Decimal(14, 3)
+  unitRate            BigInt  @map("unit_rate")
+  gstRate             Decimal @default(0) @map("gst_rate") @db.Decimal(5, 2)
+  taxable             BigInt
+  cgst                BigInt  @default(0)
+  sgst                BigInt  @default(0)
+  igst                BigInt  @default(0)
+  total               BigInt
+
+  goodsReceipt ConstructionProcurementGoodsReceipt @relation(fields: [goodsReceiptId], references: [id], onDelete: Cascade)
+
+  @@index([goodsReceiptId])
+  @@index([purchaseOrderItemId])
+  @@map("goods_receipt_items")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Stock (CM-506): settings per location and material, the ledger, and the
+// hand-entered movements that write to it.
+// ---------------------------------------------------------------------------
+
+/// Estimated quantity and minimum stock of a material at a location. A row
+/// exists only once someone sets one of them.
+model ConstructionProcurementStockSetting {
+  id              String                              @id @db.Uuid
+  workspaceId     String                              @map("workspace_id")
+  locationKind    ConstructionProcurementLocationKind @map("location_kind")
+  locationId      String                              @map("location_id") @db.Uuid
+  materialId      String                              @map("material_id") @db.Uuid
+  estimatedQty    Decimal?                            @map("estimated_qty") @db.Decimal(14, 3)
+  /// Overrides the Material's minimum stock here; null means use the master.
+  minStockQty     Decimal?                            @map("min_stock_qty") @db.Decimal(14, 3)
+  minAlertEnabled Boolean                             @default(false) @map("min_alert_enabled")
+  /// Last known side of the minimum, so `StockBelowMinimum` fires on crossing.
+  belowMinimum    Boolean                             @default(false) @map("below_minimum")
+  createdAt       DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String                              @map("created_by")
+  updatedBy       String                              @map("updated_by")
+
+  @@unique([workspaceId, locationKind, locationId, materialId])
+  @@map("stock_settings")
+  @@schema("construction_procurement")
+}
+
+/// The append-only stock ledger (CM-0015 §5). No updates, no deletes.
+model ConstructionProcurementStockEntry {
+  id                String                                @id @db.Uuid
+  workspaceId       String                                @map("workspace_id")
+  locationKind      ConstructionProcurementLocationKind   @map("location_kind")
+  locationId        String                                @map("location_id") @db.Uuid
+  materialId        String                                @map("material_id") @db.Uuid
+  entryDate         DateTime                              @map("entry_date") @db.Date
+  type              ConstructionProcurementStockEntryType
+  /// Signed, in the material's unit.
+  quantity          Decimal                               @db.Decimal(14, 3)
+  /// Paise per unit on Received entries (valuation later, CM-0015 §5).
+  unitRate          BigInt?                               @map("unit_rate")
+  sourceType        ConstructionProcurementStockSource    @map("source_type")
+  sourceId          String                                @map("source_id") @db.Uuid
+  sourceLineId      String?                               @map("source_line_id") @db.Uuid
+  /// Shown in history: "From Site A", "To Central Store", "Consumed by …".
+  counterpartyLabel String?                               @map("counterparty_label")
+  siteLocationType  String?                               @map("site_location_type")
+  siteLocation      Json?                                 @map("site_location")
+  remark            String?
+  reversesEntryId   String?                               @unique @map("reverses_entry_id") @db.Uuid
+  createdAt         DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy         String                                @map("created_by")
+
+  @@index([workspaceId, locationKind, locationId, materialId, entryDate])
+  @@index([workspaceId, materialId, entryDate])
+  @@index([sourceType, sourceId])
+  @@map("stock_entries")
+  @@schema("construction_procurement")
+}
+
+/// Consume, Missing, Adjust stock and imported opening stock (CM-506).
+/// Editing one reverses its entries and posts new ones.
+model ConstructionProcurementStockMovement {
+  id               String                                   @id @db.Uuid
+  workspaceId      String                                   @map("workspace_id")
+  locationKind     ConstructionProcurementLocationKind      @map("location_kind")
+  locationId       String                                   @map("location_id") @db.Uuid
+  kind             ConstructionProcurementStockMovementKind
+  movementDate     DateTime                                 @map("movement_date") @db.Date
+  materialId       String                                   @map("material_id") @db.Uuid
+  /// Positive, except an adjustment, which is signed.
+  quantity         Decimal                                  @db.Decimal(14, 3)
+  siteLocationType String?                                  @map("site_location_type")
+  siteLocation     Json?                                    @map("site_location")
+  remark           String?
+  createdAt        DateTime                                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                                 @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                                   @map("created_by")
+  updatedBy        String                                   @map("updated_by")
+  deletedAt        DateTime?                                @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                                  @map("deleted_by")
+
+  @@index([workspaceId, locationKind, locationId, movementDate])
+  @@map("stock_movements")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Material Transfers (CM-507)
+// ---------------------------------------------------------------------------
+
+model ConstructionProcurementMaterialTransfer {
+  id              String                                @id @db.Uuid
+  workspaceId     String                                @map("workspace_id")
+  number          String
+  transferDate    DateTime                              @map("transfer_date") @db.Date
+  fromKind        ConstructionProcurementLocationKind   @map("from_kind")
+  fromId          String                                @map("from_id") @db.Uuid
+  toKind          ConstructionProcurementLocationKind   @map("to_kind")
+  toId            String                                @map("to_id") @db.Uuid
+  receiverName    String?                               @map("receiver_name")
+  remark          String?
+  /// Approve dispatches: Transferred out at the source (CM-0015 §4).
+  approvalStatus  ConstructionProcurementApprovalStatus @default(pending) @map("approval_status")
+  decidedAt       DateTime?                             @map("decided_at") @db.Timestamptz(3)
+  decidedBy       String?                               @map("decided_by")
+  rejectionReason String?                               @map("rejection_reason")
+  /// Mark as Delivered: Transferred in at the destination.
+  deliveredOn     DateTime?                             @map("delivered_on") @db.Date
+  deliveredAt     DateTime?                             @map("delivered_at") @db.Timestamptz(3)
+  deliveredBy     String?                               @map("delivered_by")
+  createdAt       DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                              @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String                                @map("created_by")
+  updatedBy       String                                @map("updated_by")
+  deletedAt       DateTime?                             @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?                               @map("deleted_by")
+
+  items ConstructionProcurementMaterialTransferItem[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, fromKind, fromId, createdAt])
+  @@index([workspaceId, toKind, toId, createdAt])
+  @@map("material_transfers")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementMaterialTransferItem {
+  id                 String  @id @db.Uuid
+  materialTransferId String  @map("material_transfer_id") @db.Uuid
+  position           Int
+  materialId         String  @map("material_id") @db.Uuid
+  materialName       String  @map("material_name")
+  uomId              String  @map("uom_id") @db.Uuid
+  uomName            String  @map("uom_name")
+  quantity           Decimal @db.Decimal(14, 3)
+  remark             String?
+
+  materialTransfer ConstructionProcurementMaterialTransfer @relation(fields: [materialTransferId], references: [id], onDelete: Cascade)
+
+  @@index([materialTransferId])
+  @@map("material_transfer_items")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Central Stores, Material Requests, Delivery Notes (CM-508)
+// ---------------------------------------------------------------------------
+
+model ConstructionProcurementStore {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  address     String?
+  stateCode   String?   @map("state_code") @db.Char(2)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  projects  ConstructionProcurementStoreProject[]
+  keepers   ConstructionProcurementStoreKeeper[]
+  suppliers ConstructionProcurementStoreSupplier[]
+
+  @@index([workspaceId, name])
+  @@map("stores")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementStoreProject {
+  storeId   String @map("store_id") @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+
+  store ConstructionProcurementStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, projectId])
+  @@index([projectId])
+  @@map("store_projects")
+  @@schema("construction_procurement")
+}
+
+/// Store keepers: Team Members (organization context ids).
+model ConstructionProcurementStoreKeeper {
+  storeId      String @map("store_id") @db.Uuid
+  teamMemberId String @map("team_member_id") @db.Uuid
+
+  store ConstructionProcurementStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, teamMemberId])
+  @@index([teamMemberId])
+  @@map("store_keepers")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementStoreSupplier {
+  storeId    String @map("store_id") @db.Uuid
+  supplierId String @map("supplier_id") @db.Uuid
+
+  store ConstructionProcurementStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, supplierId])
+  @@index([supplierId])
+  @@map("store_suppliers")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementMaterialRequest {
+  id               String                                       @id @db.Uuid
+  workspaceId      String                                       @map("workspace_id")
+  projectId        String                                       @map("project_id") @db.Uuid
+  storeId          String                                       @map("store_id") @db.Uuid
+  number           String
+  requestDate      DateTime                                     @map("request_date") @db.Date
+  contractorId     String?                                      @map("contractor_id") @db.Uuid
+  departmentId     String?                                      @map("department_id") @db.Uuid
+  siteLocationType String?                                      @map("site_location_type")
+  siteLocation     Json?                                        @map("site_location")
+  receiverName     String?                                      @map("receiver_name")
+  remark           String?
+  status           ConstructionProcurementMaterialRequestStatus @default(requested)
+  /// Close: the store refuses what is left (CM-0015 §11).
+  closedAt         DateTime?                                    @map("closed_at") @db.Timestamptz(3)
+  closedBy         String?                                      @map("closed_by")
+  closeReason      String?                                      @map("close_reason")
+  createdAt        DateTime                                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                                       @map("created_by")
+  updatedBy        String                                       @map("updated_by")
+  deletedAt        DateTime?                                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                                      @map("deleted_by")
+
+  items         ConstructionProcurementMaterialRequestItem[]
+  deliveryNotes ConstructionProcurementDeliveryNote[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, storeId, createdAt])
+  @@map("material_requests")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementMaterialRequestItem {
+  id                String  @id @db.Uuid
+  materialRequestId String  @map("material_request_id") @db.Uuid
+  position          Int
+  materialId        String  @map("material_id") @db.Uuid
+  materialName      String  @map("material_name")
+  uomId             String  @map("uom_id") @db.Uuid
+  uomName           String  @map("uom_name")
+  askQty            Decimal @map("ask_qty") @db.Decimal(14, 3)
+  /// Σ quantity of Delivery Notes marked delivered.
+  deliveredQty      Decimal @default(0) @map("delivered_qty") @db.Decimal(14, 3)
+  remark            String?
+
+  materialRequest ConstructionProcurementMaterialRequest    @relation(fields: [materialRequestId], references: [id], onDelete: Cascade)
+  dnItems         ConstructionProcurementDeliveryNoteItem[]
+
+  @@index([materialRequestId])
+  @@map("material_request_items")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementDeliveryNote {
+  id                String                                @id @db.Uuid
+  workspaceId       String                                @map("workspace_id")
+  number            String
+  materialRequestId String                                @map("material_request_id") @db.Uuid
+  storeId           String                                @map("store_id") @db.Uuid
+  projectId         String                                @map("project_id") @db.Uuid
+  deliveryDate      DateTime                              @map("delivery_date") @db.Date
+  deliveredTo       String?                               @map("delivered_to")
+  remark            String?
+  /// pending → approved (dispatch, Issued at the store); never rejected.
+  approvalStatus    ConstructionProcurementApprovalStatus @default(pending) @map("approval_status")
+  decidedAt         DateTime?                             @map("decided_at") @db.Timestamptz(3)
+  decidedBy         String?                               @map("decided_by")
+  deliveredOn       DateTime?                             @map("delivered_on") @db.Date
+  deliveredAt       DateTime?                             @map("delivered_at") @db.Timestamptz(3)
+  deliveredBy       String?                               @map("delivered_by")
+  createdAt         DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                              @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                                @map("created_by")
+  updatedBy         String                                @map("updated_by")
+  deletedAt         DateTime?                             @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                               @map("deleted_by")
+
+  materialRequest ConstructionProcurementMaterialRequest    @relation(fields: [materialRequestId], references: [id], onDelete: Restrict)
+  items           ConstructionProcurementDeliveryNoteItem[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, storeId, createdAt])
+  @@index([materialRequestId])
+  @@map("delivery_notes")
+  @@schema("construction_procurement")
+}
+
+model ConstructionProcurementDeliveryNoteItem {
+  id                    String  @id @db.Uuid
+  deliveryNoteId        String  @map("delivery_note_id") @db.Uuid
+  materialRequestItemId String  @map("material_request_item_id") @db.Uuid
+  position              Int
+  materialId            String  @map("material_id") @db.Uuid
+  materialName          String  @map("material_name")
+  uomId                 String  @map("uom_id") @db.Uuid
+  uomName               String  @map("uom_name")
+  quantity              Decimal @db.Decimal(14, 3)
+
+  deliveryNote        ConstructionProcurementDeliveryNote        @relation(fields: [deliveryNoteId], references: [id], onDelete: Cascade)
+  materialRequestItem ConstructionProcurementMaterialRequestItem @relation(fields: [materialRequestItemId], references: [id], onDelete: Restrict)
+
+  @@index([deliveryNoteId])
+  @@index([materialRequestItemId])
+  @@map("delivery_note_items")
+  @@schema("construction_procurement")
+}
+
+// ---------------------------------------------------------------------------
+// Shared: remarks / comments and files on any procurement document.
+// ---------------------------------------------------------------------------
+
+/// Remarks (PR, PO) and comments (MT, MR, DN): one thread per document.
+model ConstructionProcurementRemark {
+  id           String                              @id @db.Uuid
+  workspaceId  String                              @map("workspace_id")
+  documentType ConstructionProcurementDocumentType @map("document_type")
+  documentId   String                              @map("document_id") @db.Uuid
+  body         String
+  createdAt    DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                              @map("created_by")
+
+  files ConstructionProcurementDocumentFile[]
+
+  @@index([workspaceId, documentType, documentId, createdAt])
+  @@map("remarks")
+  @@schema("construction_procurement")
+}
+
+/// A file on a document (PR materials list, PO / GRN / MT / MR / DN
+/// attachments), or on one of its remarks. Uploaded through the
+/// attachments service (CM-0014).
+model ConstructionProcurementDocumentFile {
+  id           String                              @id @db.Uuid
+  workspaceId  String                              @map("workspace_id")
+  documentType ConstructionProcurementDocumentType @map("document_type")
+  documentId   String                              @map("document_id") @db.Uuid
+  remarkId     String?                             @map("remark_id") @db.Uuid
+  fileKey      String                              @unique @map("file_key")
+  fileName     String                              @map("file_name")
+  contentType  String                              @map("content_type")
+  bytes        Int
+  thumbKey     String?                             @map("thumb_key")
+  createdAt    DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                              @map("created_by")
+  deletedAt    DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                             @map("deleted_by")
+
+  remark ConstructionProcurementRemark? @relation(fields: [remarkId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, documentType, documentId, deletedAt])
+  @@map("document_files")
+  @@schema("construction_procurement")
+}
