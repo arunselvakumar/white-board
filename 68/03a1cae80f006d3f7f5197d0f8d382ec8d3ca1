@@ -1,0 +1,21 @@
+apps/construction-management/docs/modules/10-hrms.md
+  s_7d8917753e260e::t_7f610555501aba 750-757
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_50b3fcff5aacb9 390-391
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6803a1cae80f006d3f7f5197d0f8d382ec8d3ca1",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
