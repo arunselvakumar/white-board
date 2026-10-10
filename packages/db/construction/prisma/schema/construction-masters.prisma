@@ -1,6 +1,8 @@
 /// Construction Management — masters context (ADR CM-0001, `modules/02`):
 /// the Company's lookup lists other contexts pick from. M2 adds the labour
-/// subset: Labour Categories, Departments and Supervisors. Each Company gets
+/// subset: Labour Categories, Departments and Supervisors; M4 adds Amenities
+/// and Common Developments and minimal Contractors and Suppliers with their
+/// Projects (ADR CM-0013 §5–6). Each Company gets
 /// its own copy of the seed sets when it is created (CM-203). Names are
 /// unique among live rows of a list (partial indexes in the migration).
 
@@ -40,6 +42,8 @@ model ConstructionMastersDepartment {
   deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
   deletedBy   String?   @map("deleted_by")
 
+  contractors ConstructionMastersContractorDepartment[]
+
   @@index([workspaceId])
   @@map("departments")
   @@schema("construction_masters")
@@ -66,5 +70,150 @@ model ConstructionMastersSupervisor {
 
   @@index([workspaceId])
   @@map("supervisors")
+  @@schema("construction_masters")
+}
+
+/// Amenity (Swimming Pool …) or Common Development (Compound Wall …): the
+/// legacy "Development Type" (ADR CM-0013 §5).
+enum ConstructionMastersDevelopmentKind {
+  amenity
+  common_development
+
+  @@map("development_kind")
+  @@schema("construction_masters")
+}
+
+/// An Amenity or Common Development a Project can be assigned and site
+/// entries can be located at (CM-404). Names are unique per kind among
+/// live rows (index in the migration). Seed rows can be disabled, not
+/// renamed or deleted.
+model ConstructionMastersDevelopmentType {
+  id          String                             @id @db.Uuid
+  workspaceId String                             @map("workspace_id")
+  kind        ConstructionMastersDevelopmentKind
+  name        String
+  isSeed      Boolean                            @default(false) @map("is_seed")
+  disabledAt  DateTime?                          @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                             @map("created_by")
+  updatedBy   String                             @map("updated_by")
+  deletedAt   DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                            @map("deleted_by")
+
+  projects ConstructionMastersDevelopmentProject[]
+
+  @@index([workspaceId, kind])
+  @@map("development_types")
+  @@schema("construction_masters")
+}
+
+/// Projects an Amenity or Common Development is assigned to.
+model ConstructionMastersDevelopmentProject {
+  developmentId String @map("development_id") @db.Uuid
+  projectId     String @map("project_id") @db.Uuid
+
+  development ConstructionMastersDevelopmentType @relation(fields: [developmentId], references: [id], onDelete: Cascade)
+
+  @@id([developmentId, projectId])
+  @@index([projectId])
+  @@map("development_projects")
+  @@schema("construction_masters")
+}
+
+/// A party the Company gives work to (CM-406, minimal; CM-501 adds
+/// quotations and opening balances). Names are unique among live rows.
+model ConstructionMastersContractor {
+  id            String    @id @db.Uuid
+  workspaceId   String    @map("workspace_id")
+  name          String
+  contactPerson String?   @map("contact_person")
+  /// E.164.
+  mobile        String?
+  email         String?
+  address       String?
+  gstin         String?   @db.VarChar(15)
+  pan           String?   @db.VarChar(10)
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String    @map("created_by")
+  updatedBy     String    @map("updated_by")
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?   @map("deleted_by")
+
+  departments ConstructionMastersContractorDepartment[]
+  projects    ConstructionMastersContractorProject[]
+
+  @@index([workspaceId, name])
+  @@map("contractors")
+  @@schema("construction_masters")
+}
+
+/// Departments (trades) a Contractor works in.
+model ConstructionMastersContractorDepartment {
+  contractorId String @map("contractor_id") @db.Uuid
+  departmentId String @map("department_id") @db.Uuid
+
+  contractor ConstructionMastersContractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  department ConstructionMastersDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@id([contractorId, departmentId])
+  @@index([departmentId])
+  @@map("contractor_departments")
+  @@schema("construction_masters")
+}
+
+/// Projects a Contractor is assigned to (Resources, CM-406).
+model ConstructionMastersContractorProject {
+  contractorId String @map("contractor_id") @db.Uuid
+  projectId    String @map("project_id") @db.Uuid
+
+  contractor ConstructionMastersContractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@id([contractorId, projectId])
+  @@index([projectId])
+  @@map("contractor_projects")
+  @@schema("construction_masters")
+}
+
+/// A party the Company buys material from (CM-406, minimal; CM-501 adds
+/// quotations and procurement fields). Names are unique among live rows.
+model ConstructionMastersSupplier {
+  id            String    @id @db.Uuid
+  workspaceId   String    @map("workspace_id")
+  name          String
+  contactPerson String?   @map("contact_person")
+  /// E.164.
+  mobile        String?
+  email         String?
+  address       String?
+  gstin         String?   @db.VarChar(15)
+  pan           String?   @db.VarChar(10)
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String    @map("created_by")
+  updatedBy     String    @map("updated_by")
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?   @map("deleted_by")
+
+  projects ConstructionMastersSupplierProject[]
+
+  @@index([workspaceId, name])
+  @@map("suppliers")
+  @@schema("construction_masters")
+}
+
+/// Projects a Supplier is assigned to (Resources, CM-406).
+model ConstructionMastersSupplierProject {
+  supplierId String @map("supplier_id") @db.Uuid
+  projectId  String @map("project_id") @db.Uuid
+
+  supplier ConstructionMastersSupplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@id([supplierId, projectId])
+  @@index([projectId])
+  @@map("supplier_projects")
   @@schema("construction_masters")
 }

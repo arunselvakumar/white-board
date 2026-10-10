@@ -509,6 +509,10 @@ Dashboard widgets showing money (Payments, Value Earned, PO value, labour/vendor
 
 ---
 
+## Decisions for the build
+
+M4 answered the open questions below with recommended defaults in [ADR CM-0013](../adr/CM-0013-projects-structure-product-decisions.md) (product) and [ADR CM-0014](../adr/CM-0014-attachments-and-gallery-index.md) (attachments and the Gallery index). Rules the build settles are added here by ticket.
+
 ## Open questions
 
 1. What are the Project Type values (`Project/Combo`)?
