@@ -131,6 +131,30 @@ _Avoid_: extra field, attribute, metadata
 A file kept on a Project, filed under the paper it is a copy of (Tender, Quotation, LOA, PO / WO, Agreement) or Other. Any type but programs, up to 25 MB.
 _Avoid_: attachment (for these), upload
 
+**Album**:
+A folder of Drawings on a Project. Every Project starts with Architect, Electrical, Plumbing and Structural Drawing; more can be added. An Album with Drawings cannot be deleted.
+_Avoid_: folder, category (in UI copy)
+
+**Drawing**:
+One drawing sheet in an Album ("GF Plan", "Column layout"), kept as a series of Revisions; the latest is shown. PDFs and images open in the viewer; DWG and DXF files download.
+_Avoid_: plan (for the record), blueprint, file
+
+**Revision**:
+One uploaded file of a Drawing, numbered R1, R2 … in the order they were uploaded. "Upload new revision" adds the next; older ones stay in the history.
+_Avoid_: version, rev (in UI copy)
+
+**Testing Item**:
+A material tested on a Project (Rcc cube, Steel, Cement, Bricks to start with); on screens "Testing material". It holds Testing Reports and cannot be deleted while it has any.
+_Avoid_: test type, material (alone)
+
+**Testing Report**:
+A lab report for a Testing Item: a name, the report date (under the Back-dated Entry policy for Material Testing Report), an optional remark and one PDF or image.
+_Avoid_: test certificate, lab result
+
+**Gallery**:
+Every image and PDF kept on a Project — Documents, Drawing Revisions and Testing Reports in M4, site photos from later modules — in one read-only grid. Files are added and removed where they belong, never in the Gallery.
+_Avoid_: media, photos (for the whole), album (that is for Drawings)
+
 **Phase / Wing / Floor / Unit**:
 The building structure inside a Project. A Wing has a type (Commercial, Residential, Bungalow scheme, Plotting scheme…) that drives Floor generation.
 _Avoid_: tower, block, flat (use Wing and Unit)
@@ -370,6 +394,10 @@ _Avoid_: price (unless it is a rate), cost
 | Rate Card             | price list                      |
 | Wage Payment          | salary (for Labours)            |
 | Client                | customer                        |
+| Album (Drawings)      | folder                          |
+| Revision (R1, R2 …)   | version                         |
+| Testing material      | test type                       |
+| Gallery               | media                           |
 | PO / WO (Client)      | purchase order (alone)          |
 | Tender / RFQ ref.     | enquiry ref.                    |
 | HRMS                  | HR, payroll (for the area)      |
