@@ -526,6 +526,11 @@ export const Move: Story = {
       updatedAt: "2026-04-02T11:00:00.000Z",
     });
     await expect(canvas.getByText("2 drawings")).toBeVisible();
+    // The closing dialog loses its name while it animates out; let it go
+    // before the story's accessibility check runs.
+    await waitFor(async () => {
+      await expect(body.queryByRole("dialog")).toBeNull();
+    });
   },
 };
 
