@@ -31,6 +31,7 @@ import type {
   SupplyType,
 } from "@/src/shared-kernel/gst-line";
 import { newId } from "@/src/shared-kernel/ids";
+import type { ProjectMediaRemoved } from "@/src/shared-kernel/project-media";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import {
   locationRef,
@@ -40,6 +41,7 @@ import {
 } from "@/src/shared-kernel/location-ref";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
+import { gallerySourceOf } from "../domain/document-thread";
 import { PROCUREMENT_DOCUMENTS } from "../domain/documents";
 import {
   assertCanMarkPurchaseOrderOrdered,
@@ -271,6 +273,8 @@ export type PurchaseOrderDeps = {
   backdated: (actor: MemberAccess) => Promise<BackdatedCheck>;
   today: (workspaceId: string) => Promise<CalendarDate>;
   events: EventDispatcher;
+  /** `ProjectMediaRemoved` for the document's Gallery tiles on delete (ADR CM-0014). */
+  media: EventDispatcher;
   clock?: () => Date;
 };
 
@@ -978,6 +982,17 @@ export class PurchaseOrderHandlers {
         occurredAt: at,
       });
     });
+    if (current.location.kind === "project")
+      await this.deps.media.dispatch([
+        removedMedia({
+          type: "ProjectMediaRemoved",
+          workspaceId: access.workspaceId,
+          occurredAt: at,
+          projectId: current.location.id,
+          source: gallerySourceOf(DOCUMENT.type),
+          sourceId: id,
+        }),
+      ]);
   }
 
   async decide(
@@ -1156,4 +1171,8 @@ export class PurchaseOrderHandlers {
       });
     });
   }
+}
+
+function removedMedia(event: ProjectMediaRemoved): ProjectMediaRemoved {
+  return event;
 }

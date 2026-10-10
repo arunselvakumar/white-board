@@ -7,6 +7,7 @@ import {
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
 import { createProjectLocations } from "@/src/composition/location-resolver";
+import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import {
   PurchaseRequestHandlers,
@@ -38,6 +39,7 @@ export const purchaseRequestHandlers = new PurchaseRequestHandlers({
   backdated: (access) => loadBackdatedCheck(prisma, access),
   today: (workspaceId) => companyToday(prisma, workspaceId),
   events: new InProcessEventDispatcher(),
+  media: projectMediaDispatcher(),
 });
 
 /**
