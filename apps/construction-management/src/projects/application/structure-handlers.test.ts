@@ -169,6 +169,7 @@ const reader: ProjectStructureReader = {
   phases: () => Promise.resolve([]),
   wingSummaries: () => Promise.resolve([]),
   wings: () => Promise.resolve([]),
+  wing: () => Promise.resolve(null),
   locations: () => Promise.resolve([]),
 };
 

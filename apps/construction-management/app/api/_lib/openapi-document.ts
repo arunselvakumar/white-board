@@ -99,6 +99,10 @@ import {
   locationOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/locations/location-openapi";
 import {
+  locationOptionsOpenApiComponents,
+  locationOptionsOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/location-options/location-options-openapi";
+import {
   projectResourcesOpenApiComponents,
   projectResourcesOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/resources/resources-openapi";
@@ -831,6 +835,11 @@ Object.assign(openApiComponents, wingOpenApiComponents);
 openApiOperations.push(...wingOpenApiOperations);
 Object.assign(openApiComponents, locationOpenApiComponents);
 openApiOperations.push(...locationOpenApiOperations);
+
+// The location picker's options (CM-403): where Wings, Locations and the
+// assigned Amenities and Common Developments meet.
+Object.assign(openApiComponents, locationOptionsOpenApiComponents);
+openApiOperations.push(...locationOptionsOpenApiOperations);
 
 // Project Resources (CM-406): where four contexts' parties meet a Project.
 Object.assign(openApiComponents, projectResourcesOpenApiComponents);

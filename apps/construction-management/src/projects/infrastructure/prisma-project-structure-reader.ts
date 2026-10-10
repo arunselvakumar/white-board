@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import type {
   LocationView,
@@ -10,6 +10,36 @@ import type {
 import { withLiveFloors } from "./prisma-wing-repository";
 
 const live = { deletedAt: null };
+
+const wingTreeInclude = {
+  ...withLiveFloors,
+  phase: { select: { name: true, position: true } },
+} satisfies Prisma.ConstructionProjectsWingInclude;
+
+type WingTreeRow = Prisma.ConstructionProjectsWingGetPayload<{
+  include: typeof wingTreeInclude;
+}>;
+
+function toWingTree(row: WingTreeRow): WingTree {
+  return {
+    id: row.id,
+    phaseId: row.phaseId,
+    phaseName: row.phase.name,
+    type: row.wingType,
+    name: row.name,
+    floors: row.floors.map((floor) => ({
+      id: floor.id,
+      kind: floor.kind,
+      name: floor.name,
+      level: floor.level,
+      units: floor.units.map((unit) => ({
+        id: unit.id,
+        name: unit.name,
+        position: unit.position,
+      })),
+    })),
+  };
+}
 
 function byPhaseThenWing(
   a: { phase: { position: number }; position: number; createdAt: Date },
@@ -73,29 +103,21 @@ export class PrismaProjectStructureReader implements ProjectStructureReader {
   async wings(workspaceId: string, projectId: string): Promise<WingTree[]> {
     const rows = await this.db.constructionProjectsWing.findMany({
       where: { workspaceId, projectId, ...live, phase: live },
-      include: {
-        ...withLiveFloors,
-        phase: { select: { name: true, position: true } },
-      },
+      include: wingTreeInclude,
     });
-    return rows.sort(byPhaseThenWing).map((row) => ({
-      id: row.id,
-      phaseId: row.phaseId,
-      phaseName: row.phase.name,
-      type: row.wingType,
-      name: row.name,
-      floors: row.floors.map((floor) => ({
-        id: floor.id,
-        kind: floor.kind,
-        name: floor.name,
-        level: floor.level,
-        units: floor.units.map((unit) => ({
-          id: unit.id,
-          name: unit.name,
-          position: unit.position,
-        })),
-      })),
-    }));
+    return rows.sort(byPhaseThenWing).map(toWingTree);
+  }
+
+  async wing(
+    workspaceId: string,
+    projectId: string,
+    wingId: string,
+  ): Promise<WingTree | null> {
+    const row = await this.db.constructionProjectsWing.findFirst({
+      where: { id: wingId, workspaceId, projectId, ...live, phase: live },
+      include: wingTreeInclude,
+    });
+    return row == null ? null : toWingTree(row);
   }
 
   async locations(

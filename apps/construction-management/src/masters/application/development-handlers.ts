@@ -329,6 +329,23 @@ export class ProjectDevelopmentHandlers {
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
+  /**
+   * Only the Project's live rows of each kind, disabled ones included, by
+   * name: what its site entries may be located at (CM-403).
+   */
+  async assigned(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<Record<DevelopmentKind, ProjectDevelopmentItem[]>> {
+    const rows = await this.store.listForProject(workspaceId, projectId);
+    const result = {} as Record<DevelopmentKind, ProjectDevelopmentItem[]>;
+    for (const kind of DEVELOPMENT_KINDS)
+      result[kind] = rows
+        .filter((entry) => entry.kind === kind)
+        .map((entry) => item(entry));
+    return result;
+  }
+
   /** The Project's rows of each kind, and the rows the picker offers. */
   async forProject(
     workspaceId: string,

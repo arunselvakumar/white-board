@@ -96,6 +96,12 @@ export type ProjectStructureReader = {
    * live floors top to bottom and their live units in order.
    */
   wings(workspaceId: string, projectId: string): Promise<WingTree[]>;
+  /** One live Wing of the Project as in `wings`, or null. */
+  wing(
+    workspaceId: string,
+    projectId: string,
+    wingId: string,
+  ): Promise<WingTree | null>;
   /** The Project's live Locations in their order. */
   locations(workspaceId: string, projectId: string): Promise<LocationView[]>;
 };
