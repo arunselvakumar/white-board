@@ -21,10 +21,7 @@ import type {
 } from "../application/ports";
 import { ShiftAssignmentHandlers } from "../application/shift-assignment-handlers";
 import { ShiftTemplateHandlers } from "../application/shift-template-handlers";
-import {
-  NoAttendanceDaySource,
-  NoLeaveDaySource,
-} from "../application/stub-ports";
+import { NoAttendanceDaySource } from "../application/stub-ports";
 import { PrismaBranchStore } from "./prisma-branch-store";
 import { companyToday } from "./prisma-calendar-support";
 import {
@@ -36,6 +33,7 @@ import {
   PrismaHolidayStore,
 } from "./prisma-holiday-store";
 import { PrismaHrmsSettingsStore } from "./prisma-hrms-settings-store";
+import { PrismaLeaveDaySource } from "./prisma-leave-day-source";
 import { PrismaMonthLock } from "./prisma-month-lock";
 import {
   PrismaShiftAssignmentStore,
@@ -77,8 +75,7 @@ export function createHrmsPorts(deps?: { prisma?: PrismaClient }): HrmsPorts {
     shifts: new BookEffectiveShiftResolver(books),
     // Replaced by CM-308.
     attendanceDays: new NoAttendanceDaySource(calendar),
-    // Replaced by CM-312.
-    leaveDays: new NoLeaveDaySource(),
+    leaveDays: new PrismaLeaveDaySource(db),
     monthLock: new PrismaMonthLock(db),
     statutoryRates: new PrismaStatutoryRates(db),
   };

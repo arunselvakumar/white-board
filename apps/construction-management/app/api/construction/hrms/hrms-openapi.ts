@@ -10,6 +10,10 @@ import {
   calendarOpenApiOperations,
 } from "./calendar-openapi";
 import {
+  leaveOpenApiComponents,
+  leaveOpenApiOperations,
+} from "./leave-openapi";
+import {
   salarySetupOpenApiComponents,
   salarySetupOpenApiOperations,
 } from "./salary-setup-openapi";
@@ -31,6 +35,7 @@ export const hrmsOpenApiComponents: OpenApiComponents = {
   UpdateConstructionHrmsSettingsRequestModel,
   UpdateConstructionHrmsSettingsResponseModel,
   ...calendarOpenApiComponents,
+  ...leaveOpenApiComponents,
   ...salarySetupOpenApiComponents,
 };
 
@@ -64,5 +69,6 @@ export const hrmsOpenApiOperations: OpenApiOperation[] = [
     ],
   },
   ...calendarOpenApiOperations,
+  ...leaveOpenApiOperations,
   ...salarySetupOpenApiOperations,
 ];
