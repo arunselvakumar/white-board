@@ -1,0 +1,69 @@
+apps/construction-management/app/api/construction/procurement/documents/remarks.http.test.ts
+  s_6604e2237b6922::t_9f5cd6cb3d5024 254-296
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/delete/route.ts
+  s_6604e2237b6922::t_16625db19da533 32-33
+apps/construction-management/app/api/construction/procurement/goods-receipts/[id]/update/route.ts
+  s_6604e2237b6922::t_5f293be393c7ae 34-35
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/approve/route.ts
+  s_6604e2237b6922::t_e1066b24864d75 28-29
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/close/route.ts
+  s_6604e2237b6922::t_e0a5403ced7922 28-29
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/delete/route.ts
+  s_6604e2237b6922::t_c5e7736b9b097b 32-33
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/mark-ordered/route.ts
+  s_6604e2237b6922::t_76ca9d12b3cea0 33-37
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/pdf/route.ts
+  s_6604e2237b6922::t_6817c16df6f698 40-41
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/reject/route.ts
+  s_6604e2237b6922::t_9b983a8b764652 28-29
+apps/construction-management/app/api/construction/procurement/purchase-orders/[id]/update/route.ts
+  s_6604e2237b6922::t_9c91d13c164d05 32-33
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/approve/route.ts
+  s_6604e2237b6922::t_3da0392b7f5d7c 28-29
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/delete/route.ts
+  s_6604e2237b6922::t_06befe80908b68 32-33
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/mark-ordered/route.ts
+  s_6604e2237b6922::t_03c396d5be6f47 48-52
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/pdf/route.ts
+  s_6604e2237b6922::t_d93dc69bf1ce1d 39-40
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/reject/route.ts
+  s_6604e2237b6922::t_bb6f902453a318 28-29
+apps/construction-management/app/api/construction/procurement/purchase-requests/[id]/update/route.ts
+  s_6604e2237b6922::t_22f6cc678394bb 32-33
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form-schema.ts
+  s_6604e2237b6922::t_75aaa8acae3799 191-201,220-222,236
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form.tsx
+  s_6604e2237b6922::t_fe759a12f6655b 59,552,835-841,843
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form-schema.ts
+  s_6604e2237b6922::t_9f338f3f02a4ca 356-357,359-362
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_6604e2237b6922::t_96e61e64754899 221-229
+apps/construction-management/components/procurement/purchase-requests/reason-dialog.tsx
+  s_6604e2237b6922::t_83d9997b461cd7 47-53,58-59,85,114
+apps/construction-management/src/procurement/application/document-access.ts
+  s_6604e2237b6922::t_79d5d4369ac479 1-7,30-45
+apps/construction-management/src/procurement/application/document-thread.ts
+  s_6604e2237b6922::t_28c7ba53818257 42,131-132
+apps/construction-management/src/procurement/domain/document-thread.ts
+  s_6604e2237b6922::t_18a2ab1cf27e99 33-34
+apps/construction-management/src/procurement/infrastructure/document-locator.ts
+  s_6604e2237b6922::t_ca12603e47a1ec 51,58,66-71,78,86-91,98,107,121,129,136,144,151
+apps/construction-management/src/procurement/infrastructure/prisma-goods-receipt-store.ts
+  s_6604e2237b6922::t_9a7f56d14f8b17 346-371
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "45d3a377a3df40a7c2aa63de83e816be67df8503",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
