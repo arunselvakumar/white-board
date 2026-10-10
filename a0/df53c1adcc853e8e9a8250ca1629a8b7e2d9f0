@@ -1,0 +1,39 @@
+apps/construction-management/components/procurement/documents/document-activity.tsx
+  s_6604e2237b6922::t_0031e1d4e1e1f6 5-7,9-12,22-28,30-43,56-69
+apps/construction-management/components/procurement/documents/document-file-parts.tsx
+  s_6604e2237b6922::t_2d4a376a6a92fd 1-207
+apps/construction-management/components/procurement/documents/document-files-view.tsx
+  s_6604e2237b6922::t_7708bae4f31a80 1-247
+apps/construction-management/components/procurement/documents/document-thread-view.tsx
+  s_6604e2237b6922::t_d948257fc792f5 1-335
+apps/construction-management/src/queries/procurement-documents.ts
+  s_6604e2237b6922::t_d8255ab08304eb 1-163
+apps/construction-management/components/procurement/documents/document-section.tsx
+  s_5e42b9b23c1483::t_6cfc72e780c28d 1-91
+apps/construction-management/components/procurement/documents/document-time.ts
+  s_5e42b9b23c1483::t_c69d36765307cf 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a0df53c1adcc853e8e9a8250ca1629a8b7e2d9f0",
+  "prompts": {},
+  "sessions": {
+    "s_5e42b9b23c1483": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8877b5f80981d4d3",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
