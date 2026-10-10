@@ -1,0 +1,69 @@
+apps/construction-management/app/app/projects/[id]/locations/page.tsx
+  s_7d8917753e260e::t_01a9bb6d2b24fc 1-20
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/edit/page.tsx
+  s_7d8917753e260e::t_148d7ef996764d 1-21
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/page.tsx
+  s_7d8917753e260e::t_7214c26662bcdf 1-20
+apps/construction-management/app/app/projects/[id]/wings/new/page.tsx
+  s_7d8917753e260e::t_2093d3d2fb70d2 1-29
+apps/construction-management/app/app/projects/[id]/wings/page.tsx
+  s_7d8917753e260e::t_5c10ec392d2d8b 1-20
+apps/construction-management/app/app/projects/[id]/wings/structure-access.ts
+  s_7d8917753e260e::t_d6e3fbc2aa8366 1-17
+apps/construction-management/components/projects/structure/add-wing-screen.stories.tsx
+  s_7d8917753e260e::t_14f86642926638 1-344
+apps/construction-management/components/projects/structure/add-wing-screen.tsx
+  s_7d8917753e260e::t_7699bc5967b740 1-472
+apps/construction-management/components/projects/structure/locations-page.tsx
+  s_7d8917753e260e::t_913d80c660f62d 1-389
+apps/construction-management/components/projects/structure/name-dialog.tsx
+  s_7d8917753e260e::t_663d2149659530 1-136
+apps/construction-management/components/projects/structure/structure-fixtures.ts
+  s_7d8917753e260e::t_dbf447b40c0952 1-403
+apps/construction-management/components/projects/structure/structure-parts.tsx
+  s_7d8917753e260e::t_ba852a6ce0bcf1 1-139
+apps/construction-management/components/projects/structure/wing-chart.stories.tsx
+  s_7d8917753e260e::t_d66f3c1d6c92e8 1-224
+apps/construction-management/components/projects/structure/wing-chart.tsx
+  s_7d8917753e260e::t_0057bffaacbae4 1-189
+apps/construction-management/components/projects/structure/wing-details-schema.ts
+  s_7d8917753e260e::t_fcafd247b8dc19 1-250
+apps/construction-management/components/projects/structure/wing-editor-state.ts
+  s_7d8917753e260e::t_1643925bde8793 1-236
+apps/construction-management/components/projects/structure/wing-editor.tsx
+  s_7d8917753e260e::t_9963ed16132b6b 1-422
+apps/construction-management/components/projects/structure/wings-page.stories.tsx
+  s_7d8917753e260e::t_a7b63b17229489 1-205
+apps/construction-management/components/projects/structure/wings-page.tsx
+  s_7d8917753e260e::t_a493dbf371e700 1-402
+apps/construction-management/src/queries/project-structure.ts
+  s_7d8917753e260e::t_804a5b6bfdb858 1-197
+apps/construction-management/components/projects/structure/edit-wing-screen.tsx
+  s_7d8917753e260e::t_74751207f44976 1-219
+apps/construction-management/components/projects/structure/locations-page.stories.tsx
+  s_a901dc77af0560::t_32e850a9e87a1b 1-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fed723a3b7ecaec3f9ddce76cece5c62e13f43ec",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a901dc77af0560": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7ac6639a7cad7718",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
