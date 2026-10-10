@@ -95,7 +95,7 @@ async function setup() {
   return { owner, projectId, cement, sand, site };
 }
 
-async function stockList(company: Company, query: string): Promise<List> {
+async function stockList(company: { cookie: string }, query: string): Promise<List> {
   const response = await list(jsonRequest(`${BASE}?${query}`, company.cookie));
   expect(response.status).toBe(StatusCodes.OK);
   return json<List>(response);

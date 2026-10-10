@@ -203,3 +203,10 @@ export function toTransferListResponse(
     total: page.total,
   };
 }
+
+export const ListConstructionProcurementTransferStoresResponseModel = z.object({
+  items: z.array(z.object({ id: z.uuid(), name: z.string() })),
+});
+export type ListConstructionProcurementTransferStoresResponseModel = z.infer<
+  typeof ListConstructionProcurementTransferStoresResponseModel
+>;

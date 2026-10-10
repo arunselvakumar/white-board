@@ -15,6 +15,7 @@ import {
   GetConstructionProcurementTransferStockRequestModel,
   GetConstructionProcurementTransferStockResponseModel,
   ListConstructionProcurementMaterialTransfersRequestModel,
+  ListConstructionProcurementTransferStoresResponseModel,
   ListConstructionProcurementMaterialTransfersResponseModel,
   RejectConstructionProcurementMaterialTransferRequestModel,
   TRANSFERS_PATH,
@@ -46,6 +47,7 @@ export const materialTransferOpenApiComponents: OpenApiComponents = {
   ConstructionProcurementMaterialTransferResponseModel,
   ListConstructionProcurementMaterialTransfersResponseModel,
   GetConstructionProcurementTransferStockResponseModel,
+  ListConstructionProcurementTransferStoresResponseModel,
 };
 
 /** Operations of `/api/construction/procurement/transfers` (M5). */
@@ -81,6 +83,16 @@ export const materialTransferOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Stock per material",
     successSchema: GetConstructionProcurementTransferStockResponseModel,
+    errors: READ,
+  },
+  {
+    method: "get",
+    path: `${TRANSFERS_PATH}/stores`,
+    summary: "Live Stores by name for the transfer form (menu `procurement.material_transfers`, read)",
+    tags: TAGS,
+    successStatus: StatusCodes.OK,
+    successDescription: "Stores",
+    successSchema: ListConstructionProcurementTransferStoresResponseModel,
     errors: READ,
   },
   {

@@ -1,6 +1,6 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
-import type { Flag } from "@/src/shared-kernel/access";
+import { can, type Flag } from "@/src/shared-kernel/access";
 import type { DocumentApproved } from "@/src/shared-kernel/approval";
 import {
   approvedState,
@@ -383,6 +383,22 @@ export class MaterialTransferCommands {
       hasMore,
       total,
     };
+  }
+
+  /**
+   * Live Stores by name, for a transfer's source and destination. Needs
+   * Material Transfer Read (on any Project).
+   */
+  async storeOptions(
+    caller: InventoryCaller,
+  ): Promise<{ id: string; name: string }[]> {
+    if (!can(caller.access, "procurement.material_transfers", "read"))
+      throw permissionDenied();
+    return this.db.constructionProcurementStore.findMany({
+      where: { workspaceId: caller.actor.workspaceId, deletedAt: null },
+      select: { id: true, name: true },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
   }
 
   /** Stock at the source for the form's "Available" column (create on the source). */

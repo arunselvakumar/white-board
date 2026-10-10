@@ -24,6 +24,7 @@ import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
 import { GET as availableStock } from "./available-stock/route";
 import { GET as list, POST as create } from "./route";
+import { GET as stores } from "./stores/route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/procurement/transfers`;
 const INVENTORY = `${TEST_ORIGIN}/api/construction/procurement/inventory`;
@@ -169,6 +170,8 @@ describe("Material Transfer (CM-507)", () => {
     expect(ok.status).toBe(StatusCodes.CREATED);
     expect(await json<Transfer>(ok)).toMatchObject({ status: "in_transit", type: "project_to_store", to: { name: "Ambattur Store" } });
 
+    const storeOptions = await json<{ items: { name: string }[] }>(await stores(jsonRequest(`${BASE}/stores`, owner.cookie)));
+    expect(storeOptions.items.map((item) => item.name)).toEqual(["Ambattur Store"]);
     const stock = await json<{ stock: Record<string, string> }>(await availableStock(jsonRequest(`${BASE}/available-stock?fromKind=project&fromId=${tower.id}&materialIds=${cement.id}`, owner.cookie)));
     expect(stock.stock[cement.id]).toBe("60.000");
   });
@@ -275,7 +278,7 @@ describe("Material Transfer (CM-507)", () => {
 
   it("is on /api/docs", async () => {
     const doc = await json<{ paths: Record<string, unknown> }>(await getOpenApi());
-    for (const path of ["", "/available-stock", "/{id}", "/{id}/update", "/{id}/approve", "/{id}/reject", "/{id}/deliver", "/{id}/delete"])
+    for (const path of ["", "/available-stock", "/stores", "/{id}", "/{id}/update", "/{id}/approve", "/{id}/reject", "/{id}/deliver", "/{id}/delete"])
       expect(Object.keys(doc.paths)).toContain(`/api/construction/procurement/transfers${path}`);
   });
 });
