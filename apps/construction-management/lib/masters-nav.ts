@@ -1,10 +1,12 @@
 import {
   BadgeCheck,
   Building,
+  Hammer,
   Handshake,
   HardHat,
   Settings2,
   Shovel,
+  Truck,
   UserCheck,
   Users,
   Wrench,
@@ -63,6 +65,26 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Settings",
         description: "Sequence IDs and Back-dated Entry rules.",
         icon: Settings2,
+      },
+    ],
+  },
+  {
+    label: "Parties",
+    sections: [
+      {
+        href: "/app/masters/contractors",
+        label: "Contractors",
+        title: "Contractors",
+        description:
+          "Parties that execute work, by Department, and their Projects.",
+        icon: Hammer,
+      },
+      {
+        href: "/app/masters/suppliers",
+        label: "Suppliers",
+        title: "Suppliers",
+        description: "Parties you buy material from, and their Projects.",
+        icon: Truck,
       },
     ],
   },

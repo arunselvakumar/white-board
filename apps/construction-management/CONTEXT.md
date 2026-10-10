@@ -67,11 +67,11 @@ A trade or work category (RCC, Plumbing, Painting, Excavation…). Classifies Co
 _Avoid_: trade, team
 
 **Contractor**:
-A party that executes work, labour-and-material or labour-only. Has invoices with TDS. Not a User.
+A party that executes work, labour-and-material or labour-only, in one or more Departments. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.
 _Avoid_: subcontractor
 
 **Supplier**:
-A party that sells material. Linked to POs and GRNs. Not a User.
+A party that sells material. Linked to POs and GRNs. Not a User. Inactive Suppliers leave the pickers but stay on their Projects.
 _Avoid_: vendor (for material sellers)
 
 **Vendor**:
@@ -130,6 +130,10 @@ _Avoid_: purchase order (alone), work order (alone), order
 **Order Value**:
 The Client Order's value excluding GST, shown only to Team Members with the Project menu's Financial flag.
 _Avoid_: contract value, budget (that is the Company's own figure)
+
+**Resources**:
+Who works on a Project: its Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master; a Project's Resources section shows and changes all four. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6).
+_Avoid_: team, members (for all four), assignment
 
 **Custom Field**:
 A field a Team Member names on one Project ("Site engineer", "Architect") and fills with text. Names already used on other Projects are offered so spelling stays the same.

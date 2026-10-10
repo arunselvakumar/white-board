@@ -374,6 +374,39 @@ export class Vendor {
     };
   }
 
+  /**
+   * Put on a Project from its Resources (CM-406). An inactive vendor stays
+   * on the Projects it is on but is not added to another one.
+   */
+  joinProject(projectId: string, by: string, now: Date): void {
+    this.assertLive();
+    if (this.props.projectIds.includes(projectId)) return;
+    if (!this.props.isActive)
+      throw new DomainError(
+        "VENDOR_INACTIVE",
+        `${this.props.name} is an inactive Vendor. Activate them in Masters to add them to a Project.`,
+        { details: { id: this.props.id } },
+      );
+    this.props = {
+      ...this.props,
+      projectIds: [...this.props.projectIds, projectId],
+      updatedAt: now,
+      updatedBy: by,
+    };
+  }
+
+  /** Taken off a Project from its Resources (CM-406). */
+  leaveProject(projectId: string, by: string, now: Date): void {
+    this.assertLive();
+    if (!this.props.projectIds.includes(projectId)) return;
+    this.props = {
+      ...this.props,
+      projectIds: this.props.projectIds.filter((id) => id !== projectId),
+      updatedAt: now,
+      updatedBy: by,
+    };
+  }
+
   setActive(isActive: boolean, by: string, now: Date): void {
     this.assertLive();
     this.props = { ...this.props, isActive, updatedAt: now, updatedBy: by };

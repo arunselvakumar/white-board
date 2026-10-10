@@ -549,6 +549,18 @@ M4 answered the open questions below with recommended defaults in [ADR CM-0013](
 - Delete is a tombstone, refused through `StructureUsage` (409 `LOCATION_IN_USE`); the name is free again.
 - Permissions: `projects.locations` (create / read / update, which covers moving, / delete) plus project visibility (404). Screen: `/app/projects/{id}/locations`.
 
+### CM-406
+
+- **Resources** is a Project section at `/app/projects/{id}/resources` (module `resources`, menu `projects.project`). It shows four sections — Team Members, Contractors, Suppliers, Vendors — each listing who is on the Project by name with a second line (Designation and "Joining Pending" for Team Members, Departments for Contractors, the contact person for Suppliers, otherwise the mobile) and an Inactive badge.
+- Each party keeps its Projects in its own context (ADR CM-0013 §6): Team Members in organization (`team_member_projects`), Vendors in labour (`vendor_projects`), Contractors and Suppliers in masters. `src/composition/project-resources.ts` is where the contexts meet: it checks the Project is visible (projects context) and calls the owning context's application layer; no context imports another.
+- `GET …/projects/{id}/resources` needs `projects.project` Read; `GET …/resources/{team-members|contractors|suppliers|vendors}/options` and `POST …/resources/{kind}` need Update. A Project of another Company, or one a Member is not on, is 404 `PROJECT_NOT_FOUND`.
+- `POST …/resources/{kind}` takes `{ ids, expectedIds }`: every party of that kind that should be on the Project, and the ones the screen loaded. If the Project's set moved since, 409 `PROJECT_RESOURCES_CHANGED` and nothing changes. Each changed party's `updatedAt` moves (so a master form open on it gets its own 409) and gets one audit row (`<kind>.projects_changed`, before/after Projects), all in one transaction per kind. The response is the whole Resources.
+- Ids that are not live parties of the Company (unknown, deleted, another Company's) are 400 `TEAM_MEMBER_NOT_FOUND` / `CONTRACTOR_NOT_FOUND` / `SUPPLIER_NOT_FOUND` / `VENDOR_NOT_FOUND` with the ids in `details` — 400 like every other unknown-id check in the app (Vendors' and Team Members' `PROJECT_NOT_FOUND`), not 422.
+- **Inactive** Contractors, Suppliers and Vendors already on the Project may stay (sent again in `ids`) and are shown in the Edit dialog to be taken off; adding one is 400 `<KIND>_INACTIVE`, and the options list only active ones. A Team Member who declined the Join Request is treated the same way (`TEAM_MEMBER_DECLINED`).
+- **Team Members** keep Assign Projects' rules: an HRMS Team Member is on no Project (400 `HRMS_MEMBER_HAS_NO_PROJECTS`, and they are not offered), and the **Owner** is on every Project without being assigned — listed first with an Owner badge, never in the dialog, and their id in `ids` is ignored. Joining Pending members can be added (as on Add Team Member). A Member who takes themselves off loses the Project.
+- **Add Project** opens the new Project on `…/resources?step=resources`: a "Step 2 of 2 · Assign resources" banner with **Skip** (nothing assigned yet) or **Done**, both to the Overview, where any upload message from step 1 is shown. Only Add Project's destination changed; the Project form is CM-401's.
+- Contacts are not built (ADR CM-0013 §6).
+
 ## Open questions
 
 1. What are the Project Type values (`Project/Combo`)?
