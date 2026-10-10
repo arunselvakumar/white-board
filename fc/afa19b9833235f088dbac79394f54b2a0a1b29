@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/procurement/stores/central-store-wiring.ts
+  s_6604e2237b6922::t_3547749af0b20c 8,35,50
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_6604e2237b6922::t_7fef2c091ee440 51,88-89,301-307
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_6604e2237b6922::t_db7ee335c7770b 16-19,26,141-142,343-349,642-670
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fcafa19b9833235f088dbac79394f54b2a0a1b29",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
