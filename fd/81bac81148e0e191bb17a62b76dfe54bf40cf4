@@ -1,0 +1,19 @@
+apps/construction-management/src/procurement/infrastructure/prisma-stock-ledger.http.test.ts
+  s_6604e2237b6922::t_9e0aee68b91ab3 150,154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fd81bac81148e0e191bb17a62b76dfe54bf40cf4",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
