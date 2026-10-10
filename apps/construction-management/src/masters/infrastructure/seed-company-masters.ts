@@ -6,7 +6,16 @@ import type {
 } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
-import { LOOKUP_KINDS, type LookupKind } from "../domain/master-kind";
+import {
+  SEED_AMENITIES,
+  SEED_COMMON_DEVELOPMENTS,
+} from "../domain/development-seeds";
+import {
+  DEVELOPMENT_KINDS,
+  LOOKUP_KINDS,
+  type DevelopmentKind,
+  type LookupKind,
+} from "../domain/master-kind";
 import { lookupTable } from "./prisma-lookup-store";
 import seeds from "./seeds/masters.json";
 
@@ -15,8 +24,14 @@ const SEED_NAMES: Record<LookupKind, readonly string[]> = {
   department: seeds.departments,
 };
 
+const SEED_DEVELOPMENTS: Record<DevelopmentKind, readonly string[]> = {
+  amenity: SEED_AMENITIES,
+  common_development: SEED_COMMON_DEVELOPMENTS,
+};
+
 /**
- * Copies the seed Labour Categories and Departments to a Company (CM-203).
+ * Copies the seed Labour Categories and Departments (CM-203) and the
+ * Amenities and Common Developments (CM-404) to a Company.
  * Idempotent: names the Company already has (live, any case) are skipped,
  * so running it twice, or after the M2 migration's backfill, adds nothing.
  */
@@ -47,6 +62,31 @@ export async function seedCompanyMasters(
         }));
       if (data.length > 0)
         await table.createMany({ data, skipDuplicates: true });
+    }
+    for (const kind of DEVELOPMENT_KINDS) {
+      const existing = await tx.constructionMastersDevelopmentType.findMany({
+        where: { workspaceId: input.workspaceId, kind, deletedAt: null },
+        select: { name: true },
+      });
+      const taken = new Set(existing.map((row) => row.name.toLowerCase()));
+      const data = SEED_DEVELOPMENTS[kind]
+        .filter((name) => !taken.has(name.toLowerCase()))
+        .map((name) => ({
+          id: newId(now.getTime()),
+          workspaceId: input.workspaceId,
+          kind,
+          name,
+          isSeed: true,
+          createdAt: now,
+          updatedAt: now,
+          createdBy: input.by,
+          updatedBy: input.by,
+        }));
+      if (data.length > 0)
+        await tx.constructionMastersDevelopmentType.createMany({
+          data,
+          skipDuplicates: true,
+        });
     }
   });
 }

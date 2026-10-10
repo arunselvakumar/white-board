@@ -8,6 +8,7 @@ import {
   masterChanged,
   masterNameInUse,
   type LookupKind,
+  type NamedMasterKind,
 } from "../domain/master-kind";
 
 type Row = Prisma.ConstructionMastersLabourCategoryGetPayload<object>;
@@ -43,7 +44,9 @@ function toEntry(kind: LookupKind, row: Row): LookupEntry {
   });
 }
 
-export function lookupEntryData(entry: LookupEntry) {
+export function lookupEntryData<K extends NamedMasterKind>(
+  entry: LookupEntry<K>,
+) {
   return {
     id: entry.id,
     workspaceId: entry.workspaceId,

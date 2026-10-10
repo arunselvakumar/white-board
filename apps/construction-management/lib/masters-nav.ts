@@ -1,12 +1,14 @@
 import {
   BadgeCheck,
   Building,
+  Fence,
   Handshake,
   HardHat,
   Settings2,
   Shovel,
   UserCheck,
   Users,
+  Waves,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -111,6 +113,27 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Departments",
         description: "Trades and work categories: RCC, Plumbing, Painting…",
         icon: Wrench,
+      },
+    ],
+  },
+  {
+    label: "Projects",
+    sections: [
+      {
+        href: "/app/masters/amenities",
+        label: "Amenities",
+        title: "Amenities",
+        description:
+          "Facilities a Project offers, like a pool or club house, and the Projects that have them.",
+        icon: Waves,
+      },
+      {
+        href: "/app/masters/common-developments",
+        label: "Common Developments",
+        title: "Common Developments",
+        description:
+          "Shared site works, like the compound wall or internal roads, and their Projects.",
+        icon: Fence,
       },
     ],
   },

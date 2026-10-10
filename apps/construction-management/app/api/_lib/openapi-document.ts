@@ -71,9 +71,17 @@ import {
   mastersOpenApiOperations,
 } from "@/app/api/construction/masters/masters-openapi";
 import {
+  developmentOpenApiComponents,
+  developmentOpenApiOperations,
+} from "@/app/api/construction/masters/development-openapi";
+import {
   projectsOpenApiComponents,
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
+import {
+  projectHomeOpenApiComponents,
+  projectHomeOpenApiOperations,
+} from "@/app/api/construction/projects/project-home-openapi";
 import {
   projectDocumentOpenApiComponents,
   projectDocumentOpenApiOperations,
@@ -793,6 +801,14 @@ openApiOperations.push(...projectDocumentOpenApiOperations);
 // The masters context (CM-203) lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
 openApiOperations.push(...mastersOpenApiOperations);
+
+// Amenities and Common Developments (CM-404).
+Object.assign(openApiComponents, developmentOpenApiComponents);
+openApiOperations.push(...developmentOpenApiOperations);
+
+// A Project's Amenities, home, preferences and dashboard (CM-404, CM-411, CM-412).
+Object.assign(openApiComponents, projectHomeOpenApiComponents);
+openApiOperations.push(...projectHomeOpenApiOperations);
 
 // The Vendor register (CM-208, CM-209) lists its own models and routes.
 Object.assign(openApiComponents, vendorOpenApiComponents);

@@ -5,11 +5,12 @@ import {
   cleanMasterName,
   masterNotFound,
   type LookupKind,
+  type NamedMasterKind,
 } from "./master-kind";
 
-export type LookupEntryProps = {
+export type LookupEntryProps<K extends NamedMasterKind = LookupKind> = {
   id: string;
-  kind: LookupKind;
+  kind: K;
   workspaceId: string;
   name: string;
   /** Copied from the seed set when the Company was created. */
@@ -32,22 +33,23 @@ export type LookupEntrySnapshot = {
 
 /**
  * One row of a name-only lookup list: a Labour Category or a Department
- * (`modules/02`, CM-203). Seed rows can be disabled and enabled, never
- * renamed or deleted. Disabled rows stay on old records but leave pickers.
+ * (`modules/02`, CM-203), or an Amenity or Common Development (CM-404).
+ * Seed rows can be disabled and enabled, never renamed or deleted.
+ * Disabled rows stay on old records but leave pickers.
  */
-export class LookupEntry {
-  private constructor(private props: LookupEntryProps) {}
+export class LookupEntry<K extends NamedMasterKind = LookupKind> {
+  private constructor(private props: LookupEntryProps<K>) {}
 
-  static create(input: {
+  static create<K extends NamedMasterKind>(input: {
     id: string;
-    kind: LookupKind;
+    kind: K;
     workspaceId: string;
     name: string;
     isSeed?: boolean;
     by: string;
     now: Date;
-  }): LookupEntry {
-    return new LookupEntry({
+  }): LookupEntry<K> {
+    return new LookupEntry<K>({
       id: input.id,
       kind: input.kind,
       workspaceId: input.workspaceId,
@@ -63,14 +65,16 @@ export class LookupEntry {
     });
   }
 
-  static reconstitute(props: LookupEntryProps): LookupEntry {
-    return new LookupEntry(props);
+  static reconstitute<K extends NamedMasterKind>(
+    props: LookupEntryProps<K>,
+  ): LookupEntry<K> {
+    return new LookupEntry<K>(props);
   }
 
   get id(): string {
     return this.props.id;
   }
-  get kind(): LookupKind {
+  get kind(): K {
     return this.props.kind;
   }
   get workspaceId(): string {

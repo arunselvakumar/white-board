@@ -143,8 +143,13 @@ _Avoid_: attachment (for these), upload
 The building structure inside a Project. A Wing has a type (Commercial, Residential, Bungalow scheme, Plotting scheme…) that drives Floor generation.
 _Avoid_: tower, block, flat (use Wing and Unit)
 
-**Amenity / Common Development**:
-Locations that are not Units (Swimming Pool, Compound Wall).
+**Amenity**:
+A facility a Project offers its buyers (Swimming Pool, Club House, Gymnasium), kept in Masters and assigned to the Projects that have it. Site entries can be located at an Amenity instead of a Unit.
+_Avoid_: facility, feature (in UI copy)
+
+**Common Development**:
+Work done for a whole site rather than a Unit (Compound Wall, Internal Roads, Sewage Treatment Plant), kept in Masters and assigned to Projects like an Amenity.
+_Avoid_: common area, external development, infrastructure (that is a Project Type)
 
 **Workspace (area)**:
 The cross-project area of the app: HRMS, Central Payment, Central Store, Central Reports, Central Inventory. One of the three top-level areas. Not the tenant — that is the Company.

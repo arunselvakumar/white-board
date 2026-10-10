@@ -29,7 +29,7 @@ import {
   UpdateConstructionMastersSupervisorRequestModel,
 } from "./supervisors/supervisor-models";
 
-const MASTERS = ["Construction · Masters"];
+export const MASTERS = ["Construction · Masters"];
 
 /** The masters context's Request and Response models (CM-203). */
 export const mastersOpenApiComponents: OpenApiComponents = {
@@ -47,14 +47,17 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   UpdateConstructionMastersSupervisorRequestModel,
 };
 
-const SESSION = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN] as const;
-const WRITE = [
+export const SESSION = [
+  StatusCodes.UNAUTHORIZED,
+  StatusCodes.FORBIDDEN,
+] as const;
+export const WRITE = [
   StatusCodes.BAD_REQUEST,
   ...SESSION,
   StatusCodes.PAYMENT_REQUIRED,
 ] as const;
 
-function masterOperations(input: {
+export function masterOperations(input: {
   path: string;
   label: string;
   plural: string;
