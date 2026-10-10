@@ -847,6 +847,15 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 12. Automatic calculation runs for last month on or after the salary day, as `system`, only when that month has no run yet; one Company failing does not stop the others (`CRON_SECRET` route).
 13. The team salary Excel has three sheets: Team salary (with totals), Advances and Not calculated; amounts are blank without Financial.
 
+**HRMS dashboard (CM-319)**
+
+1. The dashboard needs `hrms.hrms` read; each section needs its own flag and is hidden without it: team snapshot, breakdown and trend (attendance View All), approvals (approve or reject on attendance or leave), team leaves (leave View All), holidays (`hrms.holidays` read); the member's own day, balances and requests show to every Team Member with attendance or leave read.
+2. Today's breakdown and the trend follow the day status; today only, someone checked in right now counts as Present; "Absent" today includes everyone not checked in yet.
+3. The trend covers the last 14 Company dates including today; today's bar equals today's breakdown.
+4. Tiles: Present today (present + half day), On leave (half-day leave included), Not checked in, Employees (active Team Members, the Owner included).
+5. Pending approvals list only what the caller can decide now, oldest first, at most 5; upcoming team leaves run 14 days and include pending requests; the next 4 holidays are shown with optional ones flagged.
+6. The Workspace HRMS tile shows "Present today x of y", "On leave" and "To approve" to members with View All, their own day otherwise, and stays a plain link without HRMS access.
+
 ## Open questions (answered in CM-0012)
 
 1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
