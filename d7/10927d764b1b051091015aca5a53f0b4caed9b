@@ -1,0 +1,121 @@
+apps/construction-management/.storybook/mocks/geolocation.ts
+  s_6a70f1cb429bb6::t_2d5407e941b0bd 1-46
+apps/construction-management/app/api/construction/hrms/attendance/approvals/[id]/approve/route.ts
+  s_6a70f1cb429bb6::t_b41894bce35f8d 1-39
+apps/construction-management/app/api/construction/hrms/attendance/approvals/[id]/reject/route.ts
+  s_6a70f1cb429bb6::t_4bf0af97c42286 1-40
+apps/construction-management/app/api/construction/hrms/attendance/approvals/require-approver.ts
+  s_6a70f1cb429bb6::t_88658f328e1422 1-33
+apps/construction-management/app/api/construction/hrms/attendance/approvals/route.ts
+  s_6a70f1cb429bb6::t_658d55070a8b49 1-20
+apps/construction-management/app/api/construction/hrms/attendance/attendance-models.ts
+  s_6a70f1cb429bb6::t_b35af7a68ad011 1-434
+apps/construction-management/app/api/construction/hrms/attendance/attendance-openapi.ts
+  s_6a70f1cb429bb6::t_3134b98e3c9d27 1-200
+apps/construction-management/app/api/construction/hrms/attendance/attendance.http.test.ts
+  s_6a70f1cb429bb6::t_3bed58d965610e 1-839
+apps/construction-management/app/api/construction/hrms/attendance/check-in/route.ts
+  s_6a70f1cb429bb6::t_08263365f6a8d6 1-39
+apps/construction-management/app/api/construction/hrms/attendance/check-out/route.ts
+  s_6a70f1cb429bb6::t_6c4c405c6e82db 1-31
+apps/construction-management/app/api/construction/hrms/attendance/handlers.ts
+  s_6a70f1cb429bb6::t_7eb4928093b377 1-4
+apps/construction-management/app/api/construction/hrms/attendance/manual/route.ts
+  s_6a70f1cb429bb6::t_ba123a36227a58 1-38
+apps/construction-management/app/api/construction/hrms/attendance/missed-checkout/route.ts
+  s_6a70f1cb429bb6::t_b87e3dbe9e0df5 1-32
+apps/construction-management/app/api/construction/hrms/attendance/monthly-summary/route.ts
+  s_6a70f1cb429bb6::t_3d3065543aa5e9 1-34
+apps/construction-management/app/api/construction/hrms/attendance/report/monthly/route.ts
+  s_6a70f1cb429bb6::t_b7548f1ca540df 1-42
+apps/construction-management/app/api/construction/hrms/attendance/team-members/route.ts
+  s_6a70f1cb429bb6::t_71d2967de5449e 1-26
+apps/construction-management/app/api/construction/hrms/attendance/team-today/route.ts
+  s_6a70f1cb429bb6::t_e8e15f518f4d4c 1-20
+apps/construction-management/app/api/construction/hrms/attendance/today/route.ts
+  s_6a70f1cb429bb6::t_17227a595c72ad 1-20
+apps/construction-management/app/api/construction/hrms/hrms-openapi.ts
+  s_6a70f1cb429bb6::t_f692efb859b8b6 8-11,49,85
+apps/construction-management/app/api/construction/labour/labours/labours.http.test.ts
+  s_6a70f1cb429bb6::t_4e4cb190e2154c 176-181
+apps/construction-management/app/app/workspace/hrms/attendance/approvals/page.tsx
+  s_6a70f1cb429bb6::t_4d4f6c7ded03c6 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/monthly/page.tsx
+  s_6a70f1cb429bb6::t_6b6a4a51051f13 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/my/page.tsx
+  s_6a70f1cb429bb6::t_1125600a6181ac 3,10-12
+apps/construction-management/app/app/workspace/hrms/attendance/team/page.tsx
+  s_6a70f1cb429bb6::t_113f3a39b2a01f 3,10-12
+apps/construction-management/components/hrms/attendance-approvals-page.stories.tsx
+  s_6a70f1cb429bb6::t_de341fb04dd400 1-172
+apps/construction-management/components/hrms/attendance-approvals-page.tsx
+  s_6a70f1cb429bb6::t_f809b55ea9b50b 1-268
+apps/construction-management/components/hrms/attendance-fixtures.ts
+  s_6a70f1cb429bb6::t_8c5bf686b10610 1-312
+apps/construction-management/components/hrms/attendance-parts.tsx
+  s_6a70f1cb429bb6::t_dff78307d9323b 1-292
+apps/construction-management/components/hrms/backdated-attendance-dialog.tsx
+  s_6a70f1cb429bb6::t_1dbe557a680185 1-188
+apps/construction-management/components/hrms/check-in-banner.stories.tsx
+  s_6a70f1cb429bb6::t_69770e5a6c4c68 1-109
+apps/construction-management/components/hrms/check-in-banner.tsx
+  s_6a70f1cb429bb6::t_252bdf291cf43c 1-50
+apps/construction-management/components/hrms/missed-checkout-dialog.tsx
+  s_6a70f1cb429bb6::t_d2f2aeef4eb28d 1-168
+apps/construction-management/components/hrms/monthly-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_2170227bb34e12 1-134
+apps/construction-management/components/hrms/monthly-attendance-page.tsx
+  s_6a70f1cb429bb6::t_1a6fe270ba04bb 1-218
+apps/construction-management/components/hrms/my-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_d9491bf674470f 1-401
+apps/construction-management/components/hrms/my-attendance-page.tsx
+  s_6a70f1cb429bb6::t_4e35405a035d33 1-477
+apps/construction-management/components/hrms/team-attendance-page.stories.tsx
+  s_6a70f1cb429bb6::t_75e288fbf6e1bd 1-93
+apps/construction-management/components/hrms/team-attendance-page.tsx
+  s_6a70f1cb429bb6::t_f89847881241b4 1-193
+apps/construction-management/components/projects/projects-home.tsx
+  s_6a70f1cb429bb6::t_76ee12c33075fd 29,221
+apps/construction-management/docs/modules/10-hrms.md
+  s_6a70f1cb429bb6::t_a6b5dd730bf60b 758-814
+apps/construction-management/src/hrms/application/attendance-days.test.ts
+  s_6a70f1cb429bb6::t_12736ed251fe24 3-5,7,9-12,14-15,17-47,49-93,95,97-121,123,125-131,134-152,154-182
+apps/construction-management/src/hrms/application/attendance-days.ts
+  s_6a70f1cb429bb6::t_c8ff6443184702 1-5,8-24,31-38,40-42,44-48,50-59,62-78,80,84-90,93-94,97-98,100-113,115-116,118-133,135-171
+apps/construction-management/src/hrms/application/attendance-handlers.ts
+  s_6a70f1cb429bb6::t_f9d3d31e43a162 1-845
+apps/construction-management/src/hrms/application/ports.ts
+  s_6a70f1cb429bb6::t_cafdecb46c5eac 20,182-188,192,194-197,199-202,205-213
+apps/construction-management/src/hrms/domain/attendance.test.ts
+  s_6a70f1cb429bb6::t_85331894b52b46 1-674
+apps/construction-management/src/hrms/domain/attendance.ts
+  s_6a70f1cb429bb6::t_c43014826adf8a 1-753
+apps/construction-management/src/hrms/domain/company-time.test.ts
+  s_6a70f1cb429bb6::t_523bf16ba01d79 1-43
+apps/construction-management/src/hrms/domain/company-time.ts
+  s_6a70f1cb429bb6::t_bd010f986700af 1-120
+apps/construction-management/src/hrms/infrastructure/attendance-workbook.ts
+  s_6a70f1cb429bb6::t_1f51213ba6ec55 1-141
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_6a70f1cb429bb6::t_0ceef61ceff7dd 3-4,26-30,66,72-75,82-90,159-189
+apps/construction-management/src/hrms/infrastructure/prisma-attendance-store.ts
+  s_6a70f1cb429bb6::t_34ba6e9c81e48e 1-398
+apps/construction-management/src/queries/hrms-attendance.ts
+  s_6a70f1cb429bb6::t_5bbcf82aeacfa5 1-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d710927d764b1b051091015aca5a53f0b4caed9b",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
