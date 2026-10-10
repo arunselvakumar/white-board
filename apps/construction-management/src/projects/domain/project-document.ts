@@ -1,11 +1,15 @@
-import { DomainError } from "@/src/shared-kernel/domain-error";
-import { fileExtension } from "@/src/shared-kernel/files";
-import { newId } from "@/src/shared-kernel/ids";
-
 import {
-  BLOCKED_DOCUMENT_EXTENSIONS,
-  type ProjectDocumentKind,
-} from "./project-document-rules";
+  isAttachmentKey,
+  newAttachmentKey,
+  storedExtension as kernelStoredExtension,
+} from "@/src/shared-kernel/attachments/attachment-key";
+import { uploadKeyInvalid as kernelUploadKeyInvalid } from "@/src/shared-kernel/attachments/attachment-uploads";
+import { isProgramName } from "@/src/shared-kernel/attachments/program-names";
+import { programNotAllowed as kernelProgramNotAllowed } from "@/src/shared-kernel/attachments/upload-policy";
+import type { DomainError } from "@/src/shared-kernel/domain-error";
+
+import type { ProjectDocumentKind } from "./project-document-rules";
+import { PROJECT_DOCUMENT_POLICY } from "./project-upload-policies";
 
 /** A file kept on a Project (CM-414), as stored. */
 export type ProjectDocument = {
@@ -19,51 +23,25 @@ export type ProjectDocument = {
   /** What we serve it as: a sniffed PDF or image, else octet-stream. */
   contentType: string;
   bytes: number;
+  /** The browser-made WebP of an image (CM-407), if one was sent. */
+  thumbKey?: string | null;
   createdAt: Date;
   createdBy: string;
 };
 
-const FOLDER = "project-documents";
-
-/** Lowercase letters and digits only, so a key never carries a surprise. */
-const SAFE_EXTENSION = /^[a-z0-9]{1,10}$/;
-
-/** What `newId` and `crypto.randomUUID` produce. */
-const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-
-const KEY_FILE = new RegExp(`^(${UUID})\\.([a-z0-9]{1,10})$`);
-
-/** Workspace ids are Better Auth ids: letters, digits, `_` and `-`. */
-const SAFE_SEGMENT = /^[A-Za-z0-9_-]+$/;
+const FOLDER = PROJECT_DOCUMENT_POLICY.purpose;
 
 export function isBlockedDocumentName(fileName: string): boolean {
-  const extension = fileExtension(fileName);
-  return (
-    extension != null &&
-    (BLOCKED_DOCUMENT_EXTENSIONS as readonly string[]).includes(extension)
-  );
+  return isProgramName(fileName);
 }
 
 export function programNotAllowed(): DomainError {
-  return new DomainError(
-    "FILE_TYPE_NOT_ALLOWED",
-    "Programs cannot be kept on a Project. Choose a document, a picture, a drawing or a zip.",
-    { details: { blocked: BLOCKED_DOCUMENT_EXTENSIONS } },
-  );
+  return kernelProgramNotAllowed(PROJECT_DOCUMENT_POLICY);
 }
 
 /** The extension the stored object gets: the name's own when safe, else `bin`. */
 export function storedExtension(fileName: string): string {
-  const extension = fileExtension(fileName);
-  return extension != null && SAFE_EXTENSION.test(extension)
-    ? extension
-    : "bin";
-}
-
-function folderOf(workspaceId: string, projectId: string): string | null {
-  if (!SAFE_SEGMENT.test(workspaceId) || !SAFE_SEGMENT.test(projectId))
-    return null;
-  return `companies/${workspaceId}/${FOLDER}/${projectId}/`;
+  return kernelStoredExtension(fileName);
 }
 
 /**
@@ -76,9 +54,7 @@ export function projectDocumentKey(
   fileName: string,
   now: Date = new Date(),
 ): string {
-  const folder = folderOf(workspaceId, projectId);
-  if (folder == null) throw new Error("Unsafe workspace or Project id");
-  return `${folder}${newId(now.getTime())}.${storedExtension(fileName)}`;
+  return newAttachmentKey(workspaceId, FOLDER, projectId, fileName, now);
 }
 
 /**
@@ -91,19 +67,9 @@ export function isProjectDocumentKey(
   workspaceId: string,
   projectId: string,
 ): boolean {
-  const folder = folderOf(workspaceId, projectId);
-  if (folder == null || !key.startsWith(folder)) return false;
-  const match = KEY_FILE.exec(key.slice(folder.length));
-  const extension = match?.[2];
-  return (
-    extension != null &&
-    !(BLOCKED_DOCUMENT_EXTENSIONS as readonly string[]).includes(extension)
-  );
+  return isAttachmentKey(key, workspaceId, FOLDER, projectId);
 }
 
 export function uploadKeyInvalid(): DomainError {
-  return new DomainError(
-    "UPLOAD_KEY_INVALID",
-    "This upload does not belong to this Project. Start the upload again.",
-  );
+  return kernelUploadKeyInvalid();
 }

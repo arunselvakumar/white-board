@@ -1,6 +1,9 @@
 import { StatusCodes } from "http-status-codes";
-import { z } from "zod";
-
+import {
+  FILE_CONTENT_TYPES,
+  presignUploadRequestModel,
+  presignUploadResponseModel,
+} from "@/app/api/_lib/attachments";
 import type {
   OpenApiComponents,
   OpenApiOperation,
@@ -31,24 +34,11 @@ const ERRORS = [
   StatusCodes.NOT_FOUND,
 ] as const;
 
-/** The `uploadPresigned()` handshake body from `@vercel/blob/client`. */
-const PresignConstructionProjectsDocumentUploadRequestModel = z.object({
-  type: z.literal("blob.generate-presigned-url"),
-  payload: z.object({
-    pathname: z.string().describe("The `key` from starting the upload."),
-    multipart: z.boolean(),
-    clientPayload: z.string().nullable(),
-  }),
-});
+const PresignConstructionProjectsDocumentUploadRequestModel =
+  presignUploadRequestModel();
 
-const PresignConstructionProjectsDocumentUploadResponseModel = z.object({
-  type: z.literal("blob.generate-presigned-url"),
-  presignedUrlPayload: z.object({
-    delegationToken: z.string(),
-    signature: z.string(),
-    params: z.record(z.string(), z.string()),
-  }),
-});
+const PresignConstructionProjectsDocumentUploadResponseModel =
+  presignUploadResponseModel();
 
 /** Project documents' models (CM-414). */
 export const projectDocumentOpenApiComponents: OpenApiComponents = {
@@ -116,6 +106,19 @@ export const projectDocumentOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "post",
+    path: `${ITEM}/uploads/thumbnail`,
+    summary:
+      "An image's WebP thumbnail (≤ 300 KB), after the file and before finishing the upload (CM-407). 400 UPLOAD_NOT_FOUND, FILE_TOO_LARGE, FILE_TYPE_NOT_ALLOWED",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    query: ReceiveConstructionProjectsDocumentUploadQueryModel,
+    bodyBinaryContentTypes: ["image/webp"],
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Kept; finishing the upload records it",
+    errors: [...ERRORS, StatusCodes.PAYMENT_REQUIRED],
+  },
+  {
+    method: "post",
     path: ITEM,
     summary:
       "Finish an upload: records the file at `key` (201; 200 when already recorded). 400 UPLOAD_NOT_FOUND, FILE_TOO_LARGE, FILE_TYPE_NOT_ALLOWED (a program)",
@@ -137,13 +140,19 @@ export const projectDocumentOpenApiOperations: OpenApiOperation[] = [
     query: GetConstructionProjectsDocumentQueryModel,
     successStatus: StatusCodes.OK,
     successDescription: "The file",
-    successBinaryContentTypes: [
-      "application/pdf",
-      "image/png",
-      "image/jpeg",
-      "image/webp",
-      "application/octet-stream",
-    ],
+    successBinaryContentTypes: FILE_CONTENT_TYPES,
+    errors: [...ERRORS],
+  },
+  {
+    method: "get",
+    path: `${ITEM}/{docId}/thumbnail`,
+    summary:
+      "An image document's WebP thumbnail (CM-407); 404 THUMBNAIL_NOT_FOUND when none was made",
+    tags: PROJECTS,
+    params: ConstructionProjectsDocumentParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The thumbnail",
+    successBinaryContentTypes: ["image/webp"],
     errors: [...ERRORS],
   },
   {
