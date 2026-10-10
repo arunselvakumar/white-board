@@ -23,17 +23,17 @@ const XLSX =
 export async function GET(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
-    const model = parseOrThrow(
-      GetConstructionProcurementStockLedgerRequestModel.safeParse(
-        Object.fromEntries(url.searchParams),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_inventory",
       "print",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      GetConstructionProcurementStockLedgerRequestModel.safeParse(
+        Object.fromEntries(url.searchParams),
+      ),
+    );
     const [report, profile] = await Promise.all([
       centralStore.inventory.stockLedger({
         workspaceId: session.workspaceId,

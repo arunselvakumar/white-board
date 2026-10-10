@@ -19,12 +19,12 @@ import { loadBackdatedCheck } from "@/src/procurement/infrastructure/procurement
 import { stockLedger } from "@/src/procurement/infrastructure/stock-ledger-instance";
 import type { Flag } from "@/src/shared-kernel/access";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
 import {
   locationLabel,
   type LocationRef,
 } from "@/src/shared-kernel/location-ref";
 import { locationNames } from "@/src/queries/location-options";
+import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
 
 export const PURCHASE_REQUEST_MENU =
   PROCUREMENT_DOCUMENTS.purchase_request.menu;
@@ -38,7 +38,7 @@ export const purchaseRequestHandlers = new PurchaseRequestHandlers({
   stock: stockLedger(),
   backdated: (access) => loadBackdatedCheck(prisma, access),
   today: (workspaceId) => companyToday(prisma, workspaceId),
-  events: new InProcessEventDispatcher(),
+  events: procurementEvents,
   media: projectMediaDispatcher(),
 });
 

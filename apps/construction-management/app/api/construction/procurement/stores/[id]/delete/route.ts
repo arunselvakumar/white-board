@@ -23,15 +23,15 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const { id } = parseOrThrow(
-      ConstructionProcurementStoreParamsModel.safeParse(await context.params),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_store",
       "delete",
     );
     if (isResponse(session)) return session;
+    const { id } = parseOrThrow(
+      ConstructionProcurementStoreParamsModel.safeParse(await context.params),
+    );
     const model = parseOrThrow(
       DeleteConstructionProcurementStoreRequestModel.safeParse(
         await request.json(),

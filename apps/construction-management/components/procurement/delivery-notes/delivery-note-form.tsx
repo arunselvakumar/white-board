@@ -134,10 +134,16 @@ export function DeliveryNoteForm({
       deliveryDate: note?.deliveryDate ?? today(),
       deliveredTo: note?.deliveredTo ?? request.receiverName ?? "",
       remark: note?.remark ?? "",
+      // A new note offers each line's pending quantity; an edited note keeps
+      // what it carries and leaves the request's other lines empty.
       quantities: Object.fromEntries(
         lines.map((line) => [
           line.id,
-          trimmed(line.current ?? line.pendingQty),
+          line.current != null
+            ? trimmed(line.current)
+            : note == null
+              ? trimmed(line.pendingQty)
+              : "",
         ]),
       ),
     },

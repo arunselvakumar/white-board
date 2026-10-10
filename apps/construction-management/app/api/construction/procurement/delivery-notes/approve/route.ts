@@ -16,17 +16,17 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const model = parseOrThrow(
-      ApproveConstructionProcurementDeliveryNotesRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.delivery_notes",
       "approve",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      ApproveConstructionProcurementDeliveryNotesRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     await centralStore.deliveryNotes.approve(actorOf(session), model.ids);
     return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {

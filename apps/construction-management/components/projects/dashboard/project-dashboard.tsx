@@ -306,7 +306,9 @@ function MaterialApprovalsTile({
   projectId: string;
   duration: Duration;
 }) {
-  const { data } = useQuery(procurementDashboardQuery(projectId, duration));
+  const { data, error } = useQuery(
+    procurementDashboardQuery(projectId, duration),
+  );
   const approvals = data?.approvals;
   const any =
     approvals != null &&
@@ -337,11 +339,13 @@ function MaterialApprovalsTile({
         {any ? approvals.total : "—"}
       </span>
       <span className="text-muted-foreground text-xs">
-        {approvals == null
-          ? "Loading…"
-          : any
-            ? `Pending: ${parts.join(" · ")}`
-            : "Nothing here for you to approve"}
+        {error != null
+          ? "Could not be loaded"
+          : approvals == null
+            ? "Loading…"
+            : any
+              ? `Pending: ${parts.join(" · ")}`
+              : "Nothing here for you to approve"}
       </span>
     </li>
   );

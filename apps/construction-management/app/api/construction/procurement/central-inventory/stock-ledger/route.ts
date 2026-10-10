@@ -15,17 +15,17 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
-    const model = parseOrThrow(
-      GetConstructionProcurementStockLedgerRequestModel.safeParse(
-        Object.fromEntries(url.searchParams),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_inventory",
       "read",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      GetConstructionProcurementStockLedgerRequestModel.safeParse(
+        Object.fromEntries(url.searchParams),
+      ),
+    );
     const report = await centralStore.inventory.stockLedger({
       workspaceId: session.workspaceId,
       ...model,

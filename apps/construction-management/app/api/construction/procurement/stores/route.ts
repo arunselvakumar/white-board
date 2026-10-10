@@ -20,17 +20,17 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
-    const model = parseOrThrow(
-      ListConstructionProcurementStoresRequestModel.safeParse(
-        Object.fromEntries(url.searchParams),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_store",
       "read",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      ListConstructionProcurementStoresRequestModel.safeParse(
+        Object.fromEntries(url.searchParams),
+      ),
+    );
     const page = await centralStore.stores.list({
       workspaceId: session.workspaceId,
       search: model.search,
@@ -53,17 +53,17 @@ export async function GET(request: Request): Promise<Response> {
 /** Creates a Central Store (Central store create). */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const model = parseOrThrow(
-      CreateConstructionProcurementStoreRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_store",
       "create",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      CreateConstructionProcurementStoreRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const store = await centralStore.stores.create(actorOf(session), model);
     return Response.json(toStoreResponse(store), {
       status: StatusCodes.CREATED,

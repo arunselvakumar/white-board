@@ -129,14 +129,56 @@ export type GetConstructionProcurementStockLedgerResponseModel = z.infer<
   typeof GetConstructionProcurementStockLedgerResponseModel
 >;
 
+type Located = { kind: "project" | "store"; id: string; name: string };
+
+function locationOut(location: Located) {
+  return { kind: location.kind, id: location.id, name: location.name };
+}
+
+/** Field by field, so nothing of the read model leaks into the response. */
 export function toCentralInventoryResponse(
   inventory: CentralInventory,
 ): GetConstructionProcurementCentralInventoryResponseModel {
-  return inventory;
+  return {
+    locations: inventory.locations.map(locationOut),
+    categories: inventory.categories.map((category) => ({
+      id: category.id,
+      name: category.name,
+    })),
+    materials: inventory.materials.map((material) => ({
+      materialId: material.materialId,
+      materialName: material.materialName,
+      uomName: material.uomName,
+      categoryId: material.categoryId,
+      categoryName: material.categoryName,
+      totalStock: material.totalStock,
+      totalInTransit: material.totalInTransit,
+      positions: material.positions.map((position) => ({
+        location: locationOut(position.location),
+        stock: position.stock,
+        inTransit: position.inTransit,
+        minimum: position.minimum,
+        state: position.state,
+      })),
+    })),
+  };
 }
 
 export function toStockLedgerResponse(
   report: StockLedgerReport,
 ): GetConstructionProcurementStockLedgerResponseModel {
-  return report;
+  return {
+    from: report.from,
+    to: report.to,
+    rows: report.rows.map((row) => ({
+      location: locationOut(row.location),
+      materialId: row.materialId,
+      materialName: row.materialName,
+      uomName: row.uomName,
+      categoryName: row.categoryName,
+      opening: row.opening,
+      movements: { ...row.movements },
+      closing: row.closing,
+    })),
+  };
 }

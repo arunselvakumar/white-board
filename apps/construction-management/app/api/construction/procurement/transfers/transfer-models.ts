@@ -183,12 +183,47 @@ export type GetConstructionProcurementTransferStockResponseModel = z.infer<
 export function toTransferResponse(
   transfer: MaterialTransfer,
 ): ConstructionProcurementMaterialTransferResponseModel {
+  const place = (location: MaterialTransfer["from"]) => ({
+    kind: location.kind,
+    id: location.id,
+    name: location.name,
+  });
+  const who = (person: { userId: string; name: string | null } | null) =>
+    person == null ? null : { userId: person.userId, name: person.name };
+  // Field by field, so nothing of the read model leaks into the response.
   return {
-    ...transfer,
+    id: transfer.id,
+    number: transfer.number,
+    transferDate: transfer.transferDate,
+    type: transfer.type,
+    from: place(transfer.from),
+    to: place(transfer.to),
+    receiverName: transfer.receiverName,
+    remark: transfer.remark,
+    status: transfer.status,
+    approvalStatus: transfer.approvalStatus,
     decidedAt: transfer.decidedAt?.toISOString() ?? null,
+    decidedBy: who(transfer.decidedBy),
+    rejectionReason: transfer.rejectionReason,
+    deliveredOn: transfer.deliveredOn,
     deliveredAt: transfer.deliveredAt?.toISOString() ?? null,
+    deliveredBy: who(transfer.deliveredBy),
+    createdBy: {
+      userId: transfer.createdBy.userId,
+      name: transfer.createdBy.name,
+    },
     createdAt: transfer.createdAt.toISOString(),
     updatedAt: transfer.updatedAt.toISOString(),
+    lines: transfer.lines.map((line) => ({
+      id: line.id,
+      position: line.position,
+      materialId: line.materialId,
+      materialName: line.materialName,
+      uomId: line.uomId,
+      uomName: line.uomName,
+      quantity: line.quantity,
+      remark: line.remark,
+    })),
   };
 }
 

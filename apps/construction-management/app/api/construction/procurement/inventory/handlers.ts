@@ -23,10 +23,10 @@ import { StockSettingsCommands } from "@/src/procurement/infrastructure/stock-se
 import type { Flag } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
 
-/** Procurement events after commit; M9 adds the notification listeners. */
-export const procurementEvents = new InProcessEventDispatcher();
+/** Procurement events after commit (the one shared dispatcher). */
+export { procurementEvents };
 
 /** Consume, Missing, Adjust stock, edits, deletes and Import (CM-506). */
 export const stockMovements = new StockMovementCommands({

@@ -7,23 +7,14 @@ import { STOCK_ENTRY_TYPES, type StockEntryType } from "./stock-ledger";
  * Project and Store, and the Stock Ledger for a period.
  */
 
-export const STOCK_STATES = ["in_stock", "low_stock", "out_of_stock"] as const;
-export type StockState = (typeof STOCK_STATES)[number];
-
-export const STOCK_STATE_LABELS: Record<StockState, string> = {
-  in_stock: "In stock",
-  low_stock: "Low stock",
-  out_of_stock: "Out of stock",
-};
-
-/** At or below zero is Out of stock; at or below the minimum, Low stock. */
-export function stockState(stock: string, minimum: string | null): StockState {
-  const quantity = Quantity.of(stock, "unit");
-  if (!quantity.isPositive()) return "out_of_stock";
-  if (minimum != null && quantity.compare(Quantity.of(minimum, "unit")) <= 0)
-    return "low_stock";
-  return "in_stock";
-}
+// One stock-state rule for Current Inventory, Central Inventory and store
+// stock (the dashboard SQL mirrors it): defined in inventory-stock-state.
+export {
+  STOCK_STATES,
+  STOCK_STATE_LABELS,
+  stockState,
+  type StockState,
+} from "./inventory-stock-state";
 
 export function sumQuantities(values: readonly string[]): string {
   return values

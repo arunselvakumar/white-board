@@ -21,11 +21,8 @@ export const CENTRAL_INVENTORY_KEY = [
   "central-inventory",
 ] as const;
 
-export const STOCK_STATE_LABELS: Record<StockState, string> = {
-  in_stock: "In stock",
-  low_stock: "Low stock",
-  out_of_stock: "Out of stock",
-};
+/** The stock-state labels of the one rule (`inventory-stock-state`). */
+export { STOCK_STATE_LABELS } from "@/src/procurement/domain/inventory-stock-state";
 
 /** `project:<id>` / `store:<id>`. */
 export function locationKey(location: { kind: string; id: string }): string {

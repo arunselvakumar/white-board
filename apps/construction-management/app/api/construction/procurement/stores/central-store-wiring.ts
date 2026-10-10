@@ -15,7 +15,7 @@ import { PrismaDeliveryNoteRepository } from "@/src/procurement/infrastructure/d
 import { PrismaMaterialRequestRepository } from "@/src/procurement/infrastructure/material-request-repository";
 import { stockLedger } from "@/src/procurement/infrastructure/stock-ledger-instance";
 import { PrismaStoreRepository } from "@/src/procurement/infrastructure/store-repository";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
 
 /**
  * The Central Store handlers (CM-508, CM-509) wired over Prisma, the
@@ -46,7 +46,7 @@ export function createCentralStore(db: PrismaClient = prisma) {
         procurementDirectory,
         requests,
         stockLedger(),
-        new InProcessEventDispatcher(),
+        procurementEvents,
         projectMediaDispatcher(),
       ),
     ),
