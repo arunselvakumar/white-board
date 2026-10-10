@@ -1,0 +1,25 @@
+apps/construction-management/components/procurement/documents/document-activity.stories.tsx
+  s_6604e2237b6922::t_1a2b0bb206de11 1-289
+apps/construction-management/components/procurement/documents/document-files-view.tsx
+  s_6604e2237b6922::t_acea91e3cbdd93 199,205
+apps/construction-management/components/procurement/documents/document-fixtures.ts
+  s_6604e2237b6922::t_a63808d3f7af9e 1-245
+apps/construction-management/components/procurement/documents/document-thread-view.tsx
+  s_6604e2237b6922::t_e6197e83b7a2d2 222,225,307
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b5df1a44afd5a7fc5f63cd597929960eeb74a422",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
