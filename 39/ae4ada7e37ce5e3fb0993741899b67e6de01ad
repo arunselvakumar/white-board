@@ -1,0 +1,95 @@
+apps/construction-management/app/app/workspace/hrms/attendance/approvals/page.tsx
+  s_6a70f1cb429bb6::t_26b824f5149d79 1-13
+apps/construction-management/app/app/workspace/hrms/attendance/monthly/page.tsx
+  s_6a70f1cb429bb6::t_8c612fddc3d3f2 1-13
+apps/construction-management/app/app/workspace/hrms/attendance/my/page.tsx
+  s_6a70f1cb429bb6::t_329627298db6d1 1-13
+apps/construction-management/app/app/workspace/hrms/attendance/page.tsx
+  s_6a70f1cb429bb6::t_f0f93308fb8132 1-8
+apps/construction-management/app/app/workspace/hrms/attendance/team/page.tsx
+  s_6a70f1cb429bb6::t_044d7feb9c2a0a 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/branches/page.tsx
+  s_6a70f1cb429bb6::t_f827c87b8dbf30 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/employees/page.tsx
+  s_6a70f1cb429bb6::t_e193b0798e0e4e 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/holidays/page.tsx
+  s_6a70f1cb429bb6::t_58204522d0d7bc 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/leave-balances/page.tsx
+  s_6a70f1cb429bb6::t_e00b4606bc96a4 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/leave-types/page.tsx
+  s_6a70f1cb429bb6::t_77ac75f232340b 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/page.tsx
+  s_6a70f1cb429bb6::t_7184391b28fb7c 1-8
+apps/construction-management/app/app/workspace/hrms/configuration/salary-structures/page.tsx
+  s_6a70f1cb429bb6::t_7a904838066a03 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/settings/page.tsx
+  s_6a70f1cb429bb6::t_909019be9b2703 1-10
+apps/construction-management/app/app/workspace/hrms/configuration/shift-management/page.tsx
+  s_6a70f1cb429bb6::t_7abc60aa2530e6 1-13
+apps/construction-management/app/app/workspace/hrms/configuration/shifts/page.tsx
+  s_6a70f1cb429bb6::t_eddef6371667e1 1-13
+apps/construction-management/app/app/workspace/hrms/layout.tsx
+  s_6a70f1cb429bb6::t_fe110228050a07 1-10
+apps/construction-management/app/app/workspace/hrms/leave/approvals/page.tsx
+  s_6a70f1cb429bb6::t_ab0ffce9ca2dcb 1-13
+apps/construction-management/app/app/workspace/hrms/leave/my/page.tsx
+  s_6a70f1cb429bb6::t_b6fdaf308b9339 1-13
+apps/construction-management/app/app/workspace/hrms/leave/page.tsx
+  s_6a70f1cb429bb6::t_ada2537f3559da 1-8
+apps/construction-management/app/app/workspace/hrms/leave/team/page.tsx
+  s_6a70f1cb429bb6::t_e206e5ada2f88b 1-13
+apps/construction-management/app/app/workspace/hrms/page.tsx
+  s_6a70f1cb429bb6::t_67c9c69bc23539 1-13
+apps/construction-management/app/app/workspace/hrms/salary/my/page.tsx
+  s_6a70f1cb429bb6::t_0949ebc56c0486 1-13
+apps/construction-management/app/app/workspace/hrms/salary/page.tsx
+  s_6a70f1cb429bb6::t_20a529f197f652 1-8
+apps/construction-management/app/app/workspace/hrms/salary/team/page.tsx
+  s_6a70f1cb429bb6::t_e790ea0252bf6f 1-13
+apps/construction-management/app/app/workspace/page.tsx
+  s_6a70f1cb429bb6::t_bd02bfcd84a4d0 1,3-12,14-15,19-32,34-66
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_6a70f1cb429bb6::t_48af428d886df1 7,120-149
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_6a70f1cb429bb6::t_61f6785c41d5cd 33,87-94
+apps/construction-management/components/app-shell/area-nav-menu.tsx
+  s_6a70f1cb429bb6::t_69e26c1bd459c0 1-129
+apps/construction-management/components/app-shell/masters-nav-menu.tsx
+  s_6a70f1cb429bb6::t_e856584caeebb8 5,7,16-23
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_6a70f1cb429bb6::t_04ef39f7ce323f 1-25
+apps/construction-management/components/app-shell/workspace-nav-menu.tsx
+  s_6a70f1cb429bb6::t_d94c3a3732b82c 1-31
+apps/construction-management/components/hrms/hrms-coming-soon.tsx
+  s_6a70f1cb429bb6::t_6235516f8842bf 1-35
+apps/construction-management/components/hrms/hrms-settings-form.stories.tsx
+  s_6a70f1cb429bb6::t_68f49cd32743b7 1-238
+apps/construction-management/components/hrms/hrms-settings-form.tsx
+  s_6a70f1cb429bb6::t_58e41e2f0f198b 1-740
+apps/construction-management/components/hrms/hrms-shell.stories.tsx
+  s_6a70f1cb429bb6::t_a01bc70f2a2dc7 1-83
+apps/construction-management/components/hrms/hrms-shell.tsx
+  s_6a70f1cb429bb6::t_ee7b57dd19c34b 1-94
+apps/construction-management/lib/hrms-nav.test.ts
+  s_6a70f1cb429bb6::t_35a242b4fe4f80 1-77
+apps/construction-management/lib/hrms-nav.ts
+  s_6a70f1cb429bb6::t_c447bace177f65 1-309
+apps/construction-management/src/queries/hrms-settings.ts
+  s_6a70f1cb429bb6::t_36778012277a96 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "39ae4ada7e37ce5e3fb0993741899b67e6de01ad",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
