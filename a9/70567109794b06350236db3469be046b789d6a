@@ -1,0 +1,21 @@
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form.tsx
+  s_6604e2237b6922::t_a3f248817adc80 685
+apps/construction-management/src/procurement/application/goods-receipt-handlers.ts
+  s_6604e2237b6922::t_6d56b90c2c4064 939,956
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a970567109794b06350236db3469be046b789d6a",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
