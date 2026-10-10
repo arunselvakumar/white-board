@@ -25,13 +25,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireInventoryAccess(request, null, "update");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       EditConstructionProcurementStockMovementRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireInventoryAccess(request, null, "update");
-    if (isResponse(session)) return session;
     const movement = await stockMovements.edit(session.caller, id, {
       date: model.date,
       quantity: model.quantity,

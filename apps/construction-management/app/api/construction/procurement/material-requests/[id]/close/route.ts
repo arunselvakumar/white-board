@@ -27,13 +27,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireRequestAccess(request, id, "approve", "any");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       CloseConstructionProcurementMaterialRequestRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireRequestAccess(request, id, "approve", "any");
-    if (isResponse(session)) return session;
     const closed = await centralStore.materialRequests.close(
       actorOf(session),
       id,

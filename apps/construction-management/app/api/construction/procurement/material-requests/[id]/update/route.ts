@@ -26,11 +26,6 @@ export async function POST(
         await context.params,
       ),
     );
-    const { expectedUpdatedAt, ...input } = parseOrThrow(
-      UpdateConstructionProcurementMaterialRequestRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requireRequestAccess(
       request,
       id,
@@ -38,6 +33,11 @@ export async function POST(
       "project",
     );
     if (isResponse(session)) return session;
+    const { expectedUpdatedAt, ...input } = parseOrThrow(
+      UpdateConstructionProcurementMaterialRequestRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const updated = await centralStore.materialRequests.update(
       actorOf(session),
       id,

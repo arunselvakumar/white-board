@@ -25,13 +25,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireInventoryAccess(request, null, "delete");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementStockMovementRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireInventoryAccess(request, null, "delete");
-    if (isResponse(session)) return session;
     await stockMovements.remove(
       session.caller,
       id,

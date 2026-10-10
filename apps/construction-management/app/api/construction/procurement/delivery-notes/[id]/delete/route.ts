@@ -24,13 +24,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireNoteAccess(request, id, "delete");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementDeliveryNoteRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireNoteAccess(request, id, "delete");
-    if (isResponse(session)) return session;
     await centralStore.deliveryNotes.delete(
       actorOf(session),
       id,

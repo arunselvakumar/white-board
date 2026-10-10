@@ -24,17 +24,17 @@ export async function POST(
     const { id } = parseOrThrow(
       ConstructionProcurementStoreParamsModel.safeParse(await context.params),
     );
-    const { expectedUpdatedAt, ...input } = parseOrThrow(
-      UpdateConstructionProcurementStoreRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_store",
       "update",
     );
     if (isResponse(session)) return session;
+    const { expectedUpdatedAt, ...input } = parseOrThrow(
+      UpdateConstructionProcurementStoreRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     const store = await centralStore.stores.update(
       actorOf(session),
       id,

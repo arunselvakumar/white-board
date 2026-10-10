@@ -26,17 +26,17 @@ export async function POST(
     const { id } = parseOrThrow(
       ConstructionProcurementStoreParamsModel.safeParse(await context.params),
     );
-    const model = parseOrThrow(
-      DeleteConstructionProcurementStoreRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
     const session = await requireAccess(
       request,
       "procurement.central_store",
       "delete",
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      DeleteConstructionProcurementStoreRequestModel.safeParse(
+        await request.json(),
+      ),
+    );
     await centralStore.stores.delete(
       actorOf(session),
       id,

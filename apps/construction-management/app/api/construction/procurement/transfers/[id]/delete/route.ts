@@ -22,13 +22,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireTransferSession(request, true);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionProcurementMaterialTransferRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireTransferSession(request, true);
-    if (isResponse(session)) return session;
     await materialTransfers.remove(
       session.caller,
       id,

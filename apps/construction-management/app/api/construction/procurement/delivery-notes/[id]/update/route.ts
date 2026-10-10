@@ -23,13 +23,13 @@ export async function POST(
         await context.params,
       ),
     );
+    const session = await requireNoteAccess(request, id, "update");
+    if (isResponse(session)) return session;
     const { expectedUpdatedAt, ...input } = parseOrThrow(
       UpdateConstructionProcurementDeliveryNoteRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireNoteAccess(request, id, "update");
-    if (isResponse(session)) return session;
     const note = await centralStore.deliveryNotes.update(
       actorOf(session),
       id,
