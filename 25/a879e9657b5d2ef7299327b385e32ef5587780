@@ -1,0 +1,21 @@
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_6604e2237b6922::t_e01cae7bc9ba23 11,215-217,282-286,310-311
+apps/construction-management/components/procurement/purchase-requests/purchase-request-wizard.tsx
+  s_6604e2237b6922::t_1ef5ed947b1adb 208-210,265-269,299-300
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "25a879e9657b5d2ef7299327b385e32ef5587780",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
