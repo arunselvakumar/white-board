@@ -169,7 +169,7 @@ export const WithoutAccess: Story = {
   beforeEach: serve(null),
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("You do not have access"),
+      await canvas.findByText("You don't have access to the HRMS Dashboard"),
     ).toBeVisible();
   },
 };
