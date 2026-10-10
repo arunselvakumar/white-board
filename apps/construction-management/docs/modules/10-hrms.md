@@ -755,6 +755,63 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 - **Professional tax slabs** can differ for men and women (Maharashtra), so the member's gender sits on their salary configuration; without it the general slab applies (ADR CM-0008).
 - **Money on salary slips** is integer paise per column; one member's month fits 32 bits, and totals across members are summed in SQL as `bigint` (ADR CM-0004).
 
+**Branches, holidays and shifts (CM-304 … CM-307)**
+
+1. A fence radius is 25–5,000 whole metres; coordinates keep 6 decimals.
+2. A point is inside a fence when its distance is at most the radius plus the device's accuracy (accuracy allowance capped at 50 m; missing accuracy counts as 0); the boundary is inside.
+3. When several fences match, the nearest centre is the matched fence.
+4. One live site fence per Project; office branch names are unique per Company (ignoring case); a fence's kind never changes.
+5. Member links ("Members who check in here") exist only for office branches; removing a branch removes its links, so those members fall back to every office branch.
+6. `my-fences` needs `hrms.attendance` read; the other branch routes use `hrms.settings`.
+7. Holiday name ≤ 80 characters, description ≤ 500, year 2000–2100.
+8. Adding a holiday passes the Back-dated Entry check for `holiday`; editing or deleting checks the old date and, if it changes, the new one. Holidays are not month-locked.
+9. Holiday import: `.xlsx` only, ≤ 2 MB and 400 rows; dates `YYYY-MM-DD` or `DD/MM/YYYY`; Optional Yes/No (blank = No); duplicates, existing dates and back-dated rows are row errors; the import adds every row or none. It needs `create` (Holiday Management has no import flag).
+10. A shift's working hours cannot exceed its length; start equal to end is a 24-hour shift; a shift that crosses midnight belongs to the day it starts; names ≤ 60 characters.
+11. Rotations: Week has 7 slots from Monday, Month 31 slots from day 1 (days a month lacks are skipped), Custom Cycle 2–12 slots counted from the assignment's start; at least one slot is a shift. The slot decides whether a day is a working day; a Week Off slot carries the Settings hours and no overtime.
+12. A template named by a live rotation slot or by any assignment cannot be deleted (409); deactivating hides it from pickers and keeps existing rotations and assignments working.
+13. A new assignment closes the latest one the day before it starts; the same start date replaces it (a correction); an earlier start is refused (`SHIFT_ASSIGNMENT_BEFORE_LATEST`). Assignments are all-or-nothing across the chosen members and refused in a locked month.
+14. With no assignment (or a missing template) a member works the Settings day, shown as "Standard".
+15. A non-optional holiday wins over a week off; an optional holiday stays a working day.
+
+**Leave (CM-310 … CM-313)**
+
+1. Seeds: Casual Leave 12 days upfront; Compensatory Off (0, paid) and Loss of Pay (0, unpaid) have no credit; Maternity 182, Privilege Leave 15 and Sick 7 are credited monthly on day 1 at 15.17, 1.25 and 0.58 days; only Privilege Leave carries forward (up to 15); every seed needs approval and none allows advance use. Existing Companies got the seeds by migration, skipping names they already had.
+2. A leave type in a live structure, a ledger entry or a request cannot be deleted (`LEAVE_TYPE_IN_USE`); deactivate it instead. Seed types can be edited and deactivated.
+3. A monthly type needs a yearly limit above 0 and a monthly credit no larger than it; the credit day is 1–28.
+4. Without a structure a member gets every active type at its yearly limit. The structure used is the one in force today within the leave year, else the first assignment starting in that year.
+5. Initialise posts an `initial` entry on the balance's start (the later of the year start and the assignment date): the full entitlement for upfront types, 0 otherwise; no pro-rating; it is idempotent.
+6. Accrual credits each month from the balance's start up to today (never past the year end) once the accrual day has come, once per month, capped at the entitlement; the last credit is cut short (Maternity's December credit is 15.13).
+7. Accrual runs only when the Settings switch is on ("Accrue now" answers `LEAVE_ACCRUAL_DISABLED`); the scheduled route (`CRON_SECRET`) skips such Companies and is safe to run daily.
+8. Carry forward = min(unused, type cap, Company cap), posted once when the new year is initialised or accrued; pending requests of the old year count as taken; nothing is carried when the old year has no entries.
+9. Balance adjustments (how Comp Off is credited) need non-zero days (two decimals), a reason of at least 3 characters, and cannot take a balance below 0.
+10. A request stays within one leave year (`LEAVE_SPANS_YEARS`), covers at most 366 calendar days; "max consecutive days" counts leave days; the back-dated guard checks the first day; the month lock is checked on apply, decisions and cancellation requests.
+11. Two requests may share a date only as a Morning and an Afternoon (`LEAVE_OVERLAPS`).
+12. Unpaid types skip the balance check; advance use may go below zero by the credits still to come this year; pending days count as taken.
+13. A type that needs no approval is approved at once, and cancelling it is immediate.
+14. Approve and reject are separate flags (either shows Approvals); nobody decides their own request except the Owner; at level 2 the approver must differ from level 1 (except the Owner); racing approvers get one success and one 409 `LEAVE_REQUEST_CHANGED`.
+15. Withdraw (pending) and request cancellation (approved) are open to the member, whoever applied, or anyone with View All, and need create; refusing a cancellation needs a reason and the request stays approved.
+16. Leave screens show only what the caller may do (`GET /leaves/options`).
+
+**Salary structures, employee salary and the salary calculation (CM-314, CM-315, CM-316, CM-318)**
+
+1. A structure either has one balancing component (other percentages total ≤ 100%; fixed amounts are checked against each member's base) or is all percentages totalling exactly 100% (`SALARY_COMPONENTS_NOT_100_PERCENT`).
+2. Percentage components round half up to the paisa; without a balancing component the last component absorbs the rounding so components always sum to the base.
+3. Component ids survive edits so member overrides stay attached; overrides for removed components are dropped; the balancing component cannot be overridden.
+4. PF applicable needs at least one component that counts for PF wage (`PF_WAGE_COMPONENTS_REQUIRED`).
+5. Proration: each component earns monthly × payable days ÷ days in month (half-day steps). The absent and unpaid deductions are what proration took off, split in proportion.
+6. PF wage is the earned PF components only, never overtime; capped at the structure ceiling or else the table's; employee % from the structure or else the table; employer % always from the table; EPS is the table's EPS % on min(PF wage, table ceiling); EPF = employer − EPS.
+7. Rounding: earnings and overtime half up to the paisa; PF, EPF, EPS half up to the rupee; ESI up to the next rupee.
+8. ESI is on gross earnings including overtime, only when the structure has ESI on and the member is eligible for the contribution period (gross ≤ ceiling at its start; exactly ₹21,000 is eligible). The PwD ceiling and the low-wage exemption are not modelled.
+9. PT is the structure's flat amount (only in a month with earnings), else the Settings state slab on gross earnings and gender; no state means no PT.
+10. Overtime pay = 2 × full-month gross ÷ days in month ÷ that day's shift working hours, rounded per day; all overtime hours are reported, paid hours separately.
+11. Net is never negative: advance recovery is cut first, then other deductions, then PT, and the cut is shown as a shortfall. PF and ESI are never cut.
+12. Day counts are in 0.5 steps and together cannot exceed the month; days not accounted for are paid.
+13. A structure used by a live member configuration cannot be deleted (`SALARY_STRUCTURE_IN_USE`); an inactive structure stays on existing members but cannot be given to new ones; names are unique (`SALARY_STRUCTURE_NAME_TAKEN`).
+14. Employee salary configurations are effective-dated: the same start date updates in place, a later one adds a row (history kept), an earlier one is refused (`EFFECTIVE_FROM_BEFORE_CURRENT`).
+15. Save All is all or none; stale rows return 409 `EMPLOYEE_SALARY_CHANGED` with `details.memberIds`; other errors carry `details.memberId` (and `field`).
+16. Employee Management: a Not Set member needs create, a configured one update; amounts are null without Financial, and sending amounts without Financial is refused; without Financial a member can still change structure, start date, gender, UAN and ESI IP.
+17. An HRMS Team Member is sent from the Projects home to Workspace → HRMS.
+
 ## Open questions (answered in CM-0012)
 
 1. Full enum for `gps_requirement` (only 0 = Disabled observed). Is there an "optional / record only" mode? → CM-0012 §1
