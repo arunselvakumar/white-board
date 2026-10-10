@@ -48,7 +48,7 @@ export const TeamNumbers: Story = {
     const today = await canvas.findByLabelText("HRMS today");
     await expect(today).toHaveTextContent("Present today8 of 12");
     await expect(today).toHaveTextContent("On leave1");
-    await expect(today).toHaveTextContent("Pending approvals4");
+    await expect(today).toHaveTextContent("To approve4");
     await expect(canvas.getByRole("link", { name: /HRMS/ })).toHaveAttribute(
       "href",
       "/app/workspace/hrms",

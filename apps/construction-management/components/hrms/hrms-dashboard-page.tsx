@@ -441,29 +441,31 @@ function Trend({ team }: { team: Team }) {
           </li>
         ))}
       </ul>
-      <table className="sr-only">
-        <caption>Team Members per day by status</caption>
-        <thead>
-          <tr>
-            <th scope="col">Day</th>
-            {SERIES.map((item) => (
-              <th key={item.key} scope="col">
-                {item.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {series.map((day) => (
-            <tr key={day.date}>
-              <th scope="row">{formatDay(day.date)}</th>
+      <div className="sr-only">
+        <table>
+          <caption>Team Members per day by status</caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
               {SERIES.map((item) => (
-                <td key={item.key}>{seriesValue(day, item.key)}</td>
+                <th key={item.key} scope="col">
+                  {item.label}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {series.map((day) => (
+              <tr key={day.date}>
+                <th scope="row">{formatDay(day.date)}</th>
+                {SERIES.map((item) => (
+                  <td key={item.key}>{seriesValue(day, item.key)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Section>
   );
 }
@@ -591,9 +593,9 @@ function TeamLeaves({
           {leaves.items.map((leave) => (
             <li
               key={leave.id}
-              className="flex flex-wrap items-center justify-between gap-2 py-2"
+              className="flex items-center justify-between gap-3 py-2"
             >
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
                   {leave.memberName}
                 </p>
@@ -603,7 +605,9 @@ function TeamLeaves({
                 </p>
               </div>
               {leave.status === "approved" ? null : (
-                <Badge variant="secondary">{STATUS_LABELS[leave.status]}</Badge>
+                <Badge variant="secondary" className="shrink-0">
+                  {STATUS_LABELS[leave.status]}
+                </Badge>
               )}
             </li>
           ))}

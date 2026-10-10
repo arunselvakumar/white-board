@@ -41,7 +41,7 @@ function headline(data: HrmsDashboardModel): Stat[] {
     });
   if (data.approvals != null)
     stats.push({
-      label: "Pending approvals",
+      label: "To approve",
       value: String(data.approvals.total),
     });
   return stats;
