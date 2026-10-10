@@ -1,0 +1,47 @@
+apps/construction-management/app/app/projects/[id]/gallery/page.tsx
+  s_7d8917753e260e::t_6c2e446a1bc66c 1-23
+apps/construction-management/app/app/projects/[id]/testing-reports/[itemId]/page.tsx
+  s_7d8917753e260e::t_4d487ed58c2e08 1-32
+apps/construction-management/app/app/projects/[id]/testing-reports/page.tsx
+  s_7d8917753e260e::t_7a39c408db4599 1-31
+apps/construction-management/components/projects/files/project-no-access.tsx
+  s_7d8917753e260e::t_39bfd5c131aa09 1-31
+apps/construction-management/components/projects/gallery/gallery-fixtures.ts
+  s_7d8917753e260e::t_1e6ef46096e5f3 1-256
+apps/construction-management/components/projects/gallery/gallery-page.stories.tsx
+  s_7d8917753e260e::t_412004e51d875b 1-492
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_7d8917753e260e::t_465b08d7f9a4fb 1-607
+apps/construction-management/components/projects/testing-reports/testing-item-dialog.tsx
+  s_7d8917753e260e::t_947ac4fb9a6217 1-164
+apps/construction-management/components/projects/testing-reports/testing-item-page.stories.tsx
+  s_7d8917753e260e::t_8c3b46b3a0b394 1-315
+apps/construction-management/components/projects/testing-reports/testing-item-page.tsx
+  s_7d8917753e260e::t_fbf3510b46ccd7 1-535
+apps/construction-management/components/projects/testing-reports/testing-report-fixtures.ts
+  s_7d8917753e260e::t_deb8eb89edd68d 1-359
+apps/construction-management/components/projects/testing-reports/testing-report-sheet.stories.tsx
+  s_7d8917753e260e::t_1fba5297f1fde6 1-276
+apps/construction-management/components/projects/testing-reports/testing-report-sheet.tsx
+  s_7d8917753e260e::t_ebc0654e3326ba 1-365
+apps/construction-management/components/projects/testing-reports/testing-reports-page.stories.tsx
+  s_7d8917753e260e::t_d4ffda370a7841 1-306
+apps/construction-management/components/projects/testing-reports/testing-reports-page.tsx
+  s_7d8917753e260e::t_f961dab5952b51 1-316
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d50c95176c61513952544417584f0d14c38dad22",
+  "prompts": {},
+  "sessions": {
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
