@@ -16,7 +16,9 @@ import {
 /**
  * The HRMS area (M3): title, the five sections as tabs, and the current
  * section's pages as sub-tabs. Both rows scroll sideways on a phone. Pages
- * render below and keep their own padding and width.
+ * render below and keep their own padding and width. The tab rows are
+ * `contain: inline-size` so nine Configuration tabs scroll inside their row
+ * instead of widening the page.
  */
 export function HrmsShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || HRMS_PATH;
@@ -35,7 +37,7 @@ export function HrmsShell({ children }: { children: ReactNode }) {
         </div>
         <nav
           aria-label="HRMS sections"
-          className="-mx-6 overflow-x-auto border-b px-6"
+          className="-mx-6 overflow-x-auto border-b px-6 [contain:inline-size]"
         >
           <ul className="flex w-max gap-1">
             {HRMS_SECTIONS.map((item) => {
@@ -62,7 +64,7 @@ export function HrmsShell({ children }: { children: ReactNode }) {
         {section != null && section.pages.length > 1 && (
           <nav
             aria-label={section.label}
-            className="-mx-6 overflow-x-auto px-6"
+            className="-mx-6 overflow-x-auto px-6 [contain:inline-size]"
           >
             <ul className="bg-secondary/70 inline-flex w-max gap-1 rounded-xl border p-1">
               {section.pages.map((item) => {
