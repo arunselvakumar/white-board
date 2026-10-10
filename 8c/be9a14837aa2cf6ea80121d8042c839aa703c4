@@ -1,0 +1,29 @@
+apps/construction-management/src/hrms/domain/employee-salary.test.ts
+  s_6a70f1cb429bb6::t_81d69297cc6dab 1-150
+apps/construction-management/src/hrms/domain/employee-salary.ts
+  s_6a70f1cb429bb6::t_12114183d74f55 1-131
+apps/construction-management/src/hrms/domain/salary-calculation.test.ts
+  s_6a70f1cb429bb6::t_16d336f7d0eca6 1-947
+apps/construction-management/src/hrms/domain/salary-calculation.ts
+  s_6a70f1cb429bb6::t_99693c9f63f261 1-677
+apps/construction-management/src/hrms/domain/salary-structure.test.ts
+  s_6a70f1cb429bb6::t_033f8f2626151d 1-555
+apps/construction-management/src/hrms/domain/salary-structure.ts
+  s_6a70f1cb429bb6::t_d439309c33f015 1-585
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8cbe9a14837aa2cf6ea80121d8042c839aa703c4",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
