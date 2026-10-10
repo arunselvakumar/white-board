@@ -12,8 +12,8 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireApprover(request);
     if (isResponse(session)) return session;
-    const items = await attendance.approvals({ access: session.access });
-    return Response.json(toApprovalsResponse(items));
+    const list = await attendance.approvals({ access: session.access });
+    return Response.json(toApprovalsResponse(list));
   } catch (error) {
     return mapError(error);
   }

@@ -222,6 +222,7 @@ export type TeamTodayItem = {
 
 export type TeamToday = {
   today: CalendarDate;
+  timeZone: string;
   items: TeamTodayItem[];
   counts: Record<LiveState, number> & { all: number; late: number };
 };
@@ -605,7 +606,9 @@ export class AttendanceHandlers {
    * Attendance Approvals: pending entries, oldest first. A member who is
    * not the Owner does not see their own (they cannot decide them).
    */
-  async approvals(input: { access: MemberAccess }): Promise<PendingApproval[]> {
+  async approvals(input: {
+    access: MemberAccess;
+  }): Promise<{ timeZone: string; items: PendingApproval[] }> {
     const { access } = input;
     if (!can(access, MENU, "approve") && !can(access, MENU, "reject"))
       assertCan(access, MENU, "approve");
@@ -623,10 +626,13 @@ export class AttendanceHandlers {
       access.workspaceId,
       pending.map((entry) => entry.memberId),
     );
-    return pending.map((entry) => ({
-      entry,
-      member: members.get(entry.memberId) ?? null,
-    }));
+    return {
+      timeZone: await this.deps.timeZone(access.workspaceId),
+      items: pending.map((entry) => ({
+        entry,
+        member: members.get(entry.memberId) ?? null,
+      })),
+    };
   }
 
   private async decide(input: {
@@ -782,7 +788,7 @@ export class AttendanceHandlers {
       counts[state] += 1;
       if (day.late) counts.late += 1;
     }
-    return { today, items, counts };
+    return { today, timeZone: moment.timeZone, items, counts };
   }
 
   private async monthRows(

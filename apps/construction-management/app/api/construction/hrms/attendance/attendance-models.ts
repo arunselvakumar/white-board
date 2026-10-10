@@ -208,6 +208,8 @@ export type GetConstructionHrmsAttendanceTodayResponseModel = z.infer<
 >;
 
 export const ListConstructionHrmsAttendanceApprovalsResponseModel = z.object({
+  /** The Company's time zone, for showing times. */
+  timeZone: z.string(),
   items: z.array(
     z.object({
       entry: ConstructionHrmsAttendanceEntryResponseModel,
@@ -222,6 +224,8 @@ export type ListConstructionHrmsAttendanceApprovalsResponseModel = z.infer<
 
 export const GetConstructionHrmsTeamTodayResponseModel = z.object({
   today: z.iso.date(),
+  /** The Company's time zone, for showing times. */
+  timeZone: z.string(),
   counts: z.object({
     all: z.int(),
     late: z.int(),
@@ -378,11 +382,13 @@ export function toTodayResponse(
   };
 }
 
-export function toApprovalsResponse(
-  items: PendingApproval[],
-): ListConstructionHrmsAttendanceApprovalsResponseModel {
+export function toApprovalsResponse(list: {
+  timeZone: string;
+  items: PendingApproval[];
+}): ListConstructionHrmsAttendanceApprovalsResponseModel {
   return {
-    items: items.map((item) => ({
+    timeZone: list.timeZone,
+    items: list.items.map((item) => ({
       entry: toEntryResponse(item.entry),
       member: item.member == null ? null : toMemberResponse(item.member),
     })),
@@ -394,6 +400,7 @@ export function toTeamTodayResponse(
 ): GetConstructionHrmsTeamTodayResponseModel {
   return {
     today: team.today,
+    timeZone: team.timeZone,
     counts: team.counts,
     items: team.items.map((item) => ({
       member: toMemberResponse(item.member),

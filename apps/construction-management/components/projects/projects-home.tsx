@@ -26,6 +26,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { CheckInBanner } from "@/components/hrms/check-in-banner";
 import {
   projectsQuery,
   type ProjectResponse,
@@ -217,6 +218,7 @@ export function ProjectsHome() {
           meta="Every site your Company builds: labour, attendance and payments are kept per Project."
           actions={data.counts.all > 0 ? newProjectLink() : undefined}
         />
+        <CheckInBanner />
         {data.counts.all === 0 ? (
           <Empty className="border">
             <EmptyHeader>
