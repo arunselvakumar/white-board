@@ -1,0 +1,427 @@
+apps/construction-management/app/api/construction/procurement/central-inventory/central-inventory-models.ts
+  s_6604e2237b6922::t_15eda48cc4119c 1-142
+apps/construction-management/app/api/construction/procurement/central-inventory/central-inventory-openapi.ts
+  s_6604e2237b6922::t_821ce781a7bc63 1-2,8-16,18-21,23-62
+apps/construction-management/app/api/construction/procurement/central-inventory/route.ts
+  s_6604e2237b6922::t_63b8e3d312eb45 1-44
+apps/construction-management/app/api/construction/procurement/central-inventory/stock-ledger/route.ts
+  s_6604e2237b6922::t_78205c9b66aaab 1-38
+apps/construction-management/app/api/construction/procurement/central-inventory/stock-ledger/xlsx/route.ts
+  s_6604e2237b6922::t_d7cf9da2d64be2 1-74
+apps/construction-management/app/api/construction/procurement/dashboard/dashboard-models.ts
+  s_6604e2237b6922::t_1a2f6253d4344d 1-52
+apps/construction-management/app/api/construction/procurement/dashboard/dashboard-openapi.ts
+  s_6604e2237b6922::t_9da5382dfc5828 1-34
+apps/construction-management/app/api/construction/procurement/dashboard/dashboard.http.test.ts
+  s_6604e2237b6922::t_887530273e337c 1-200
+apps/construction-management/app/api/construction/procurement/dashboard/route.ts
+  s_6604e2237b6922::t_06b68f70dedcda 1-104
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/approve/route.ts
+  s_6604e2237b6922::t_7b88d4a7ccd19f 1-37
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/delete/route.ts
+  s_6604e2237b6922::t_96d48e90976810 1-43
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/mark-delivered/route.ts
+  s_6604e2237b6922::t_4c044b621b56eb 1-47
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/route.ts
+  s_6604e2237b6922::t_5e70d8ec38ab99 1-29
+apps/construction-management/app/api/construction/procurement/delivery-notes/[id]/update/route.ts
+  s_6604e2237b6922::t_e6bad61635357e 1-43
+apps/construction-management/app/api/construction/procurement/delivery-notes/approve/route.ts
+  s_6604e2237b6922::t_4d08f273f55119 1-35
+apps/construction-management/app/api/construction/procurement/delivery-notes/delivery-note-access.ts
+  s_6604e2237b6922::t_b9170713f939ef 1-49
+apps/construction-management/app/api/construction/procurement/delivery-notes/delivery-note-models.ts
+  s_6604e2237b6922::t_606af948ed2bcc 1-153
+apps/construction-management/app/api/construction/procurement/delivery-notes/delivery-notes-openapi.ts
+  s_6604e2237b6922::t_720e5581263987 1-2,8-27,29-37,39-136
+apps/construction-management/app/api/construction/procurement/delivery-notes/route.ts
+  s_6604e2237b6922::t_9fd2f89d8f405e 1-112
+apps/construction-management/app/api/construction/procurement/inventory/adjustments/route.ts
+  s_6604e2237b6922::t_0c6881ff87a30c 1-44
+apps/construction-management/app/api/construction/procurement/inventory/export/route.ts
+  s_6604e2237b6922::t_267d664c19b187 1-50
+apps/construction-management/app/api/construction/procurement/inventory/handlers.ts
+  s_6604e2237b6922::t_923b920a0aaf28 1-113
+apps/construction-management/app/api/construction/procurement/inventory/history/route.ts
+  s_6604e2237b6922::t_2d2dde57d76122 1-79
+apps/construction-management/app/api/construction/procurement/inventory/import/route.ts
+  s_6604e2237b6922::t_fbc272d84ae82f 1-50
+apps/construction-management/app/api/construction/procurement/inventory/inventory-models.ts
+  s_6604e2237b6922::t_cc07a62503d6d0 1-421
+apps/construction-management/app/api/construction/procurement/inventory/inventory-openapi.ts
+  s_6604e2237b6922::t_f97ffec42a548a 1-2,7-47,50-67,70-206
+apps/construction-management/app/api/construction/procurement/inventory/inventory.http.test.ts
+  s_6604e2237b6922::t_fd47f61aff633f 1-879
+apps/construction-management/app/api/construction/procurement/inventory/movements/[id]/delete/route.ts
+  s_6604e2237b6922::t_b4fcb3da432ab4 1-44
+apps/construction-management/app/api/construction/procurement/inventory/movements/[id]/update/route.ts
+  s_6604e2237b6922::t_6523a2709daeb0 1-46
+apps/construction-management/app/api/construction/procurement/inventory/movements/route.ts
+  s_6604e2237b6922::t_06c885608341fc 1-45
+apps/construction-management/app/api/construction/procurement/inventory/register/export/route.ts
+  s_6604e2237b6922::t_adb2e916aef7d9 1-47
+apps/construction-management/app/api/construction/procurement/inventory/register/route.ts
+  s_6604e2237b6922::t_32344124712bb4 1-50
+apps/construction-management/app/api/construction/procurement/inventory/route.ts
+  s_6604e2237b6922::t_30a9b4c476bcd5 1-53
+apps/construction-management/app/api/construction/procurement/inventory/sample/route.ts
+  s_6604e2237b6922::t_66cdc94b5c8017 1-28
+apps/construction-management/app/api/construction/procurement/inventory/settings/route.ts
+  s_6604e2237b6922::t_be8499b5e91e1e 1-43
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/close/route.ts
+  s_6604e2237b6922::t_c61de1ee770dcb 1-47
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/delete/route.ts
+  s_6604e2237b6922::t_0758fde092087a 1-48
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/pdf/route.ts
+  s_6604e2237b6922::t_2f1698452a0770 1-52
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/route.ts
+  s_6604e2237b6922::t_aadbcdc575a750 1-29
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/update/route.ts
+  s_6604e2237b6922::t_0d9172118f20b2 1-51
+apps/construction-management/app/api/construction/procurement/material-requests/central-store.http.test.ts
+  s_6604e2237b6922::t_8a961ce0800467 1-890
+apps/construction-management/app/api/construction/procurement/material-requests/form-options/route.ts
+  s_6604e2237b6922::t_660630ea2a645e 1-53
+apps/construction-management/app/api/construction/procurement/material-requests/material-request-access.ts
+  s_6604e2237b6922::t_732fc2a564bc70 1-54
+apps/construction-management/app/api/construction/procurement/material-requests/material-request-models.ts
+  s_6604e2237b6922::t_41e0e881f7b4be 1-204
+apps/construction-management/app/api/construction/procurement/material-requests/material-requests-openapi.ts
+  s_6604e2237b6922::t_6b5125831a1e72 1-2,8-28,30-38,40-143
+apps/construction-management/app/api/construction/procurement/material-requests/route.ts
+  s_6604e2237b6922::t_2d67ae4b26374d 1-107
+apps/construction-management/app/api/construction/procurement/procurement-openapi.ts
+  s_6604e2237b6922::t_627739553523d2 14-17,68,84
+apps/construction-management/app/api/construction/procurement/stores/[id]/delete/route.ts
+  s_6604e2237b6922::t_89a7538ebb1c1c 1-49
+apps/construction-management/app/api/construction/procurement/stores/[id]/route.ts
+  s_6604e2237b6922::t_bcdcc10b8431e5 1-35
+apps/construction-management/app/api/construction/procurement/stores/[id]/stock/route.ts
+  s_6604e2237b6922::t_0faeca22875df2 1-38
+apps/construction-management/app/api/construction/procurement/stores/[id]/update/route.ts
+  s_6604e2237b6922::t_5e870ef868fd10 1-48
+apps/construction-management/app/api/construction/procurement/stores/central-store-access.ts
+  s_6604e2237b6922::t_c58f884e53ddcb 1-91
+apps/construction-management/app/api/construction/procurement/stores/central-store-wiring.ts
+  s_6604e2237b6922::t_b45c0bca712bd9 1-59
+apps/construction-management/app/api/construction/procurement/stores/form-options/route.ts
+  s_6604e2237b6922::t_16438c29e0ae36 1-28
+apps/construction-management/app/api/construction/procurement/stores/options/route.ts
+  s_6604e2237b6922::t_e45bd6edc561d7 1-61
+apps/construction-management/app/api/construction/procurement/stores/route.ts
+  s_6604e2237b6922::t_1374395a0953fb 1-74
+apps/construction-management/app/api/construction/procurement/stores/store-models.ts
+  s_6604e2237b6922::t_ba035061d1b675 1-177
+apps/construction-management/app/api/construction/procurement/stores/stores-openapi.ts
+  s_6604e2237b6922::t_329987d9c66f8e 1-2,8-39,41-50,52-149
+apps/construction-management/app/api/construction/procurement/transfers/[id]/approve/route.ts
+  s_6604e2237b6922::t_d7f42f6d6103b9 1-46
+apps/construction-management/app/api/construction/procurement/transfers/[id]/delete/route.ts
+  s_6604e2237b6922::t_20b9785b49f6cc 1-41
+apps/construction-management/app/api/construction/procurement/transfers/[id]/deliver/route.ts
+  s_6604e2237b6922::t_bffb9f39dfaa3e 1-44
+apps/construction-management/app/api/construction/procurement/transfers/[id]/reject/route.ts
+  s_6604e2237b6922::t_673020b3e1eb66 1-44
+apps/construction-management/app/api/construction/procurement/transfers/[id]/route.ts
+  s_6604e2237b6922::t_f04b16270da888 1-31
+apps/construction-management/app/api/construction/procurement/transfers/[id]/update/route.ts
+  s_6604e2237b6922::t_afc623506f7510 1-43
+apps/construction-management/app/api/construction/procurement/transfers/available-stock/route.ts
+  s_6604e2237b6922::t_87175fa955fa58 1-35
+apps/construction-management/app/api/construction/procurement/transfers/handlers.ts
+  s_6604e2237b6922::t_94c14bd7b87eab 1-26
+apps/construction-management/app/api/construction/procurement/transfers/locations/route.ts
+  s_6604e2237b6922::t_384f720b34511c 1-20
+apps/construction-management/app/api/construction/procurement/transfers/route.ts
+  s_6604e2237b6922::t_b99b37573e31b5 1-73
+apps/construction-management/app/api/construction/procurement/transfers/transfer-models.ts
+  s_6604e2237b6922::t_effc1e9e54c693 1-223
+apps/construction-management/app/api/construction/procurement/transfers/transfers-openapi.ts
+  s_6604e2237b6922::t_68a3e8468954c1 1-2,8-38,40-51,54-169
+apps/construction-management/app/api/construction/procurement/transfers/transfers.http.test.ts
+  s_6604e2237b6922::t_6b0b0463958c3b 1-674
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_6604e2237b6922::t_e9072261c9097d 241,244-247
+apps/construction-management/app/app/projects/[id]/materials/inventory/page.tsx
+  s_6604e2237b6922::t_e5cf2411870090 3-5,9-22
+apps/construction-management/app/app/projects/[id]/materials/inventory/register/page.tsx
+  s_6604e2237b6922::t_a7b7fbd29b0dca 1-23
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/edit/page.tsx
+  s_6604e2237b6922::t_66300a5ecf15c6 1-14
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/page.tsx
+  s_6604e2237b6922::t_2f890930a31b0d 1-15
+apps/construction-management/app/app/projects/[id]/materials/material-requests/new/page.tsx
+  s_6604e2237b6922::t_b3072d406d8dc9 1-18
+apps/construction-management/app/app/projects/[id]/materials/material-requests/page.tsx
+  s_6604e2237b6922::t_e11b592d30cbb0 3-5,9-19
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/edit/page.tsx
+  s_6604e2237b6922::t_e314b699f35e43 1-15
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/page.tsx
+  s_6604e2237b6922::t_b50bc70e9dabb0 1-15
+apps/construction-management/app/app/projects/[id]/materials/transfers/new/page.tsx
+  s_6604e2237b6922::t_9e9eac2e3150ae 1-33
+apps/construction-management/app/app/projects/[id]/materials/transfers/page.tsx
+  s_6604e2237b6922::t_745879a0f926f5 3-5,9-22
+apps/construction-management/app/app/workspace/central-inventory/page.tsx
+  s_6604e2237b6922::t_1bd892f1071133 1-14
+apps/construction-management/app/app/workspace/central-store/[id]/edit/page.tsx
+  s_6604e2237b6922::t_4e35404ee28e4d 1-14
+apps/construction-management/app/app/workspace/central-store/[id]/page.tsx
+  s_6604e2237b6922::t_0c16d53db3595b 1-15
+apps/construction-management/app/app/workspace/central-store/[id]/register/page.tsx
+  s_6604e2237b6922::t_4236a67a590512 1-23
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/[transferId]/edit/page.tsx
+  s_6604e2237b6922::t_f989ee592fc6e9 1-18
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/[transferId]/page.tsx
+  s_6604e2237b6922::t_939b000ea05cd9 1-19
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/new/page.tsx
+  s_6604e2237b6922::t_5031ec7c8b703f 1-19
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/edit/page.tsx
+  s_6604e2237b6922::t_a7e82df5abfa44 1-18
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/page.tsx
+  s_6604e2237b6922::t_a8ebdfe3e86d37 1-18
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/delivery-notes/new/page.tsx
+  s_6604e2237b6922::t_207a7390d2b1ea 1-19
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/page.tsx
+  s_6604e2237b6922::t_4c930846c97c56 1-19
+apps/construction-management/app/app/workspace/central-store/new/page.tsx
+  s_6604e2237b6922::t_9dad5d1d5d251c 1-14
+apps/construction-management/app/app/workspace/central-store/page.tsx
+  s_6604e2237b6922::t_40b86588818a98 1-14
+apps/construction-management/app/app/workspace/page.tsx
+  s_6604e2237b6922::t_fe531c44a6a59f 3-4,8-13,15-18
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_6604e2237b6922::t_5991829bdc3f05 6-7,10-12,26-39
+apps/construction-management/components/app-shell/workspace-index.tsx
+  s_6604e2237b6922::t_127ca7a67b27af 1-48
+apps/construction-management/components/app-shell/workspace-nav-menu.tsx
+  s_6604e2237b6922::t_73ae2c7b8562b4 3-4,9-21,24,26-38,53
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.stories.tsx
+  s_6604e2237b6922::t_0fa0fa0d59a98b 1-60
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.tsx
+  s_6604e2237b6922::t_368fb8cdaf93ef 1-425
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.stories.tsx
+  s_6604e2237b6922::t_a076f8449405bd 1-84
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.tsx
+  s_6604e2237b6922::t_65a438895a4605 1-334
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.stories.tsx
+  s_6604e2237b6922::t_a3e68c26633ace 1-102
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.tsx
+  s_6604e2237b6922::t_0e2c5e6a62c29b 1-322
+apps/construction-management/components/procurement/delivery-notes/delivery-notes-list.tsx
+  s_6604e2237b6922::t_b1bf61a48ade5f 1-111
+apps/construction-management/components/procurement/delivery-notes/edit-delivery-note-page.tsx
+  s_6604e2237b6922::t_aa7cf2143f77de 1-19
+apps/construction-management/components/procurement/inventory/adjust-stock-dialog.tsx
+  s_6604e2237b6922::t_690ed717abdce8 1-187
+apps/construction-management/components/procurement/inventory/edit-movement-dialog.tsx
+  s_6604e2237b6922::t_e9408d027f95cc 1-199
+apps/construction-management/components/procurement/inventory/import-inventory-dialog.tsx
+  s_6604e2237b6922::t_fc5a6dae871ddd 1-282
+apps/construction-management/components/procurement/inventory/inventory-access.ts
+  s_6604e2237b6922::t_27d0623b4e78ba 1-28
+apps/construction-management/components/procurement/inventory/inventory-fixtures.ts
+  s_6604e2237b6922::t_792817ca90c4e3 1-431
+apps/construction-management/components/procurement/inventory/inventory-format.ts
+  s_6604e2237b6922::t_10ce85e2519240 1-46
+apps/construction-management/components/procurement/inventory/inventory-page.stories.tsx
+  s_6604e2237b6922::t_32f78e2244178b 1-567
+apps/construction-management/components/procurement/inventory/inventory-page.tsx
+  s_6604e2237b6922::t_f3d5bd74a795ce 1-786
+apps/construction-management/components/procurement/inventory/stock-error-alert.tsx
+  s_6604e2237b6922::t_d840882fc67a06 1-51
+apps/construction-management/components/procurement/inventory/stock-history-sheet.tsx
+  s_6604e2237b6922::t_02ffd271059e6f 1-401
+apps/construction-management/components/procurement/inventory/stock-movement-dialog.tsx
+  s_6604e2237b6922::t_fda4dec58ebfef 1-326
+apps/construction-management/components/procurement/inventory/stock-register-page.stories.tsx
+  s_6604e2237b6922::t_63df7bdf7ba4b4 1-116
+apps/construction-management/components/procurement/inventory/stock-register-page.tsx
+  s_6604e2237b6922::t_aeeb028ff319af 1-234
+apps/construction-management/components/procurement/inventory/stock-settings-dialog.tsx
+  s_6604e2237b6922::t_3019949c298c3d 1-225
+apps/construction-management/components/procurement/material-requests/edit-material-request-page.tsx
+  s_6604e2237b6922::t_4d893b9d25efae 1-25
+apps/construction-management/components/procurement/material-requests/material-request-detail.stories.tsx
+  s_6604e2237b6922::t_c24f47324a8ae4 1-98
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_6604e2237b6922::t_7b0a321c3a4f11 1-395
+apps/construction-management/components/procurement/material-requests/material-request-form.stories.tsx
+  s_6604e2237b6922::t_b59f191673e702 1-119
+apps/construction-management/components/procurement/material-requests/material-request-form.tsx
+  s_6604e2237b6922::t_d7c4830f93e575 1-494
+apps/construction-management/components/procurement/material-requests/material-requests-list.stories.tsx
+  s_6604e2237b6922::t_9a530f56ae3a9e 1-57
+apps/construction-management/components/procurement/material-requests/material-requests-list.tsx
+  s_6604e2237b6922::t_f8c80dee5fd50a 1-155
+apps/construction-management/components/procurement/material-requests/project-material-requests-page.tsx
+  s_6604e2237b6922::t_27f0327411ff6a 1-25
+apps/construction-management/components/procurement/stores/central-store-fixtures.ts
+  s_6604e2237b6922::t_939471a94f1300 1-463
+apps/construction-management/components/procurement/stores/central-store-parts.tsx
+  s_6604e2237b6922::t_aee0cf08899ec8 1-232
+apps/construction-management/components/procurement/stores/central-store-workspace-tiles.tsx
+  s_6604e2237b6922::t_bdb3a555047cf8 1-65
+apps/construction-management/components/procurement/stores/edit-store-page.tsx
+  s_6604e2237b6922::t_3fd4fd5578b8fd 1-13
+apps/construction-management/components/procurement/stores/store-confirm-dialog.tsx
+  s_6604e2237b6922::t_1fbc1d14a3fa09 1-85
+apps/construction-management/components/procurement/stores/store-detail-page.stories.tsx
+  s_6604e2237b6922::t_f477808e5359c0 1-86
+apps/construction-management/components/procurement/stores/store-detail-page.tsx
+  s_6604e2237b6922::t_138d05fe544162 1-203
+apps/construction-management/components/procurement/stores/store-form.stories.tsx
+  s_6604e2237b6922::t_080302ff7de3c8 1-108
+apps/construction-management/components/procurement/stores/store-form.tsx
+  s_6604e2237b6922::t_3bfbec92cfed1a 1-293
+apps/construction-management/components/procurement/stores/stores-page.stories.tsx
+  s_6604e2237b6922::t_fac2f2b9b07193 1-63
+apps/construction-management/components/procurement/stores/stores-page.tsx
+  s_6604e2237b6922::t_7dd763115969ea 1-128
+apps/construction-management/components/procurement/transfers/project-transfer-pages.tsx
+  s_6604e2237b6922::t_54734b6472b745 1-79
+apps/construction-management/components/procurement/transfers/store-transfer-pages.tsx
+  s_6604e2237b6922::t_c8186f791f3f0b 1-60
+apps/construction-management/components/procurement/transfers/transfer-detail.stories.tsx
+  s_6604e2237b6922::t_1dd064f035bf5f 1-219
+apps/construction-management/components/procurement/transfers/transfer-detail.tsx
+  s_6604e2237b6922::t_c70fa8875eea8c 1-483
+apps/construction-management/components/procurement/transfers/transfer-fixtures.ts
+  s_6604e2237b6922::t_71281e86c863eb 1-239
+apps/construction-management/components/procurement/transfers/transfer-form.stories.tsx
+  s_6604e2237b6922::t_0f8efae5ff9a6e 1-185
+apps/construction-management/components/procurement/transfers/transfer-form.tsx
+  s_6604e2237b6922::t_b5324fdf9b1a3d 1-487
+apps/construction-management/components/procurement/transfers/transfer-parts.tsx
+  s_6604e2237b6922::t_722dcd4337e39d 1-73
+apps/construction-management/components/procurement/transfers/transfers-list.stories.tsx
+  s_6604e2237b6922::t_7c1797362b22c1 1-125
+apps/construction-management/components/procurement/transfers/transfers-list.tsx
+  s_6604e2237b6922::t_92664ff6a859f7 1-334
+apps/construction-management/components/projects/dashboard/po-value-chart.tsx
+  s_6604e2237b6922::t_439d55d9a18d82 1-126
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_6604e2237b6922::t_5eea25ff6fb62b 7,21-43,123,148-149,193,197,223-225,227-230,232-235
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_6604e2237b6922::t_71d5f80c524acd 22,46-49,54,56-57,297-356,362-363,384-454,501,518-525
+apps/construction-management/docs/modules/06-procurement-inventory.md
+  s_6604e2237b6922::t_c8fcbe4ba6251f 819-903,906-907
+apps/construction-management/docs/prd/handoff/M5.md
+  s_6604e2237b6922::t_422ab68cfe3085 1-74
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_6604e2237b6922::t_3b2e8c4960869b 507,509-516,520-521
+apps/construction-management/lib/app-nav.ts
+  s_6604e2237b6922::t_51fdd1f21f5223 18
+apps/construction-management/next.config.ts
+  s_6604e2237b6922::t_4bbd753b9c78a7 31-32,42-44
+apps/construction-management/src/composition/central-store-options.ts
+  s_6604e2237b6922::t_7b03a820a193ae 1-68
+apps/construction-management/src/procurement/application/central-inventory-queries.ts
+  s_6604e2237b6922::t_a93fb4c05f235d 1-101
+apps/construction-management/src/procurement/application/delivery-note-handlers.ts
+  s_6604e2237b6922::t_1c0a2b1d11a35d 1-175
+apps/construction-management/src/procurement/application/inventory-access.ts
+  s_6604e2237b6922::t_8788c2cd703bfe 1-63
+apps/construction-management/src/procurement/application/material-request-handlers.ts
+  s_6604e2237b6922::t_711cff35919f8f 1-198
+apps/construction-management/src/procurement/application/store-handlers.ts
+  s_6604e2237b6922::t_01ca89d05f1133 1-142
+apps/construction-management/src/procurement/domain/central-inventory.test.ts
+  s_6604e2237b6922::t_7a90b257d7699f 1-26
+apps/construction-management/src/procurement/domain/central-inventory.ts
+  s_6604e2237b6922::t_50a05ab62715cd 1-65
+apps/construction-management/src/procurement/domain/delivery-note.test.ts
+  s_6604e2237b6922::t_72bbdcdc296b7a 1-79
+apps/construction-management/src/procurement/domain/delivery-note.ts
+  s_6604e2237b6922::t_c275023c1432ae 1-174
+apps/construction-management/src/procurement/domain/inventory-import.test.ts
+  s_6604e2237b6922::t_4ca0ab319ebda2 1-98
+apps/construction-management/src/procurement/domain/inventory-import.ts
+  s_6604e2237b6922::t_391404d5853937 1-160
+apps/construction-management/src/procurement/domain/inventory-stock-state.test.ts
+  s_6604e2237b6922::t_22e5adc4cc1949 1-42
+apps/construction-management/src/procurement/domain/inventory-stock-state.ts
+  s_6604e2237b6922::t_06680f07cd13f1 1-57
+apps/construction-management/src/procurement/domain/material-request.test.ts
+  s_6604e2237b6922::t_034cdfc393f214 1-67
+apps/construction-management/src/procurement/domain/material-request.ts
+  s_6604e2237b6922::t_8dc90dbbfa9657 1-210
+apps/construction-management/src/procurement/domain/material-transfer.test.ts
+  s_6604e2237b6922::t_35b616862ccfa4 1-119
+apps/construction-management/src/procurement/domain/material-transfer.ts
+  s_6604e2237b6922::t_adf880f9116e2a 1-196
+apps/construction-management/src/procurement/domain/stock-movement.test.ts
+  s_6604e2237b6922::t_b2004f21b037e9 1-61
+apps/construction-management/src/procurement/domain/stock-movement.ts
+  s_6604e2237b6922::t_016bb4d525828f 1-132
+apps/construction-management/src/procurement/domain/stock-register.test.ts
+  s_6604e2237b6922::t_3b730e7970f6b1 1-39
+apps/construction-management/src/procurement/domain/stock-register.ts
+  s_6604e2237b6922::t_f106cf5b6d32d5 1-93
+apps/construction-management/src/procurement/domain/store.test.ts
+  s_6604e2237b6922::t_e4f054afe32219 1-50
+apps/construction-management/src/procurement/domain/store.ts
+  s_6604e2237b6922::t_fa0d16bb5dc838 1-124
+apps/construction-management/src/procurement/infrastructure/central-inventory-reader.ts
+  s_6604e2237b6922::t_7997d1b5f682f9 1-435
+apps/construction-management/src/procurement/infrastructure/central-inventory-xlsx.ts
+  s_6604e2237b6922::t_c379e114cdbbcd 1-100
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_6604e2237b6922::t_279fcf89b7bcf4 1-749
+apps/construction-management/src/procurement/infrastructure/inventory-locations.ts
+  s_6604e2237b6922::t_0ef422c3bb5649 1-103
+apps/construction-management/src/procurement/infrastructure/inventory-queries.ts
+  s_6604e2237b6922::t_afd23c6361aebb 1-668
+apps/construction-management/src/procurement/infrastructure/inventory-workbook.ts
+  s_6604e2237b6922::t_072a992eaa0a35 1-296
+apps/construction-management/src/procurement/infrastructure/material-request-pdf.ts
+  s_6604e2237b6922::t_fa7ec4b31e3106 1-255
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_6604e2237b6922::t_d2739e168a0c78 1-730
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_6604e2237b6922::t_d4341476d09fec 1-995
+apps/construction-management/src/procurement/infrastructure/procurement-dashboard.ts
+  s_6604e2237b6922::t_79dd838298e47c 1-180
+apps/construction-management/src/procurement/infrastructure/stock-ledger-instance.ts
+  s_6604e2237b6922::t_6d6e1d10f6537c 2-4,7-9,12-17
+apps/construction-management/src/procurement/infrastructure/stock-level-watcher.ts
+  s_6604e2237b6922::t_77cd1cca09a911 1-149
+apps/construction-management/src/procurement/infrastructure/stock-movement-store.ts
+  s_6604e2237b6922::t_8139d102fede6b 1-871
+apps/construction-management/src/procurement/infrastructure/stock-settings-store.ts
+  s_6604e2237b6922::t_83323ffe665c0d 1-148
+apps/construction-management/src/procurement/infrastructure/store-repository.ts
+  s_6604e2237b6922::t_783db3d70646b1 1-534
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_6604e2237b6922::t_1f36f8420c6a2e 16
+apps/construction-management/src/queries/central-inventory.ts
+  s_6604e2237b6922::t_926642988cbc1b 1-103
+apps/construction-management/src/queries/delivery-notes.ts
+  s_6604e2237b6922::t_1ed051f3d66471 1-130
+apps/construction-management/src/queries/inventory.ts
+  s_6604e2237b6922::t_e54ddac62adb27 1-292
+apps/construction-management/src/queries/material-requests.ts
+  s_6604e2237b6922::t_689c0961c133ca 1-147
+apps/construction-management/src/queries/material-transfers.ts
+  s_6604e2237b6922::t_93984dd4bcec6d 1-172
+apps/construction-management/src/queries/procurement-dashboard.ts
+  s_6604e2237b6922::t_cbda218a423555 1-35
+apps/construction-management/src/queries/stores.ts
+  s_6604e2237b6922::t_5d34b3e74cd4eb 1-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8736722ccaea655048c88420b87a8b0f105b9632",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
