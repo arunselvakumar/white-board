@@ -10,6 +10,7 @@ import {
   type PfRate,
   type PtCharge,
   type PtGender,
+  type PtSlab,
 } from "../domain/statutory";
 
 type Db = Pick<
@@ -59,28 +60,39 @@ export class PrismaStatutoryRates implements StatutoryRates {
     };
   }
 
+  async ptSlabsFor(stateCode: string, month: MonthKey): Promise<PtSlab[]> {
+    const rows = await this.db.constructionHrmsStatutoryPtSlab.findMany({
+      where: { stateCode, effectiveFrom: { lte: monthEnd(month) } },
+      orderBy: [
+        { effectiveFrom: "asc" },
+        { appliesTo: "asc" },
+        { grossFrom: "asc" },
+      ],
+    });
+    return rows.map((row) => ({
+      stateCode: row.stateCode,
+      effectiveFrom: calendarDateFromDb(row.effectiveFrom),
+      appliesTo: row.appliesTo,
+      grossFrom: row.grossFrom,
+      grossTo: row.grossTo,
+      monthlyAmount: row.monthlyAmount,
+      specialMonth: row.specialMonth,
+      specialMonthAmount: row.specialMonthAmount,
+      source: row.source,
+    }));
+  }
+
   async ptFor(
     stateCode: string,
     month: MonthKey,
     gross: number,
     gender?: PtGender,
   ): Promise<PtCharge> {
-    const rows = await this.db.constructionHrmsStatutoryPtSlab.findMany({
-      where: { stateCode, effectiveFrom: { lte: monthEnd(month) } },
+    return ptFor(await this.ptSlabsFor(stateCode, month), {
+      stateCode,
+      month,
+      gross,
+      gender,
     });
-    return ptFor(
-      rows.map((row) => ({
-        stateCode: row.stateCode,
-        effectiveFrom: calendarDateFromDb(row.effectiveFrom),
-        appliesTo: row.appliesTo,
-        grossFrom: row.grossFrom,
-        grossTo: row.grossTo,
-        monthlyAmount: row.monthlyAmount,
-        specialMonth: row.specialMonth,
-        specialMonthAmount: row.specialMonthAmount,
-        source: row.source,
-      })),
-      { stateCode, month, gross, gender },
-    );
   }
 }

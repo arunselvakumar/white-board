@@ -1,4 +1,4 @@
-import type { MonthKey } from "../domain/calendar";
+import { lastDayOf, type MonthKey } from "../domain/calendar";
 import {
   ptFor,
   rateInForce,
@@ -30,6 +30,15 @@ export class InMemoryStatutoryRates implements StatutoryRates {
 
   esiFor(month: MonthKey): Promise<EsiRate | null> {
     return Promise.resolve(rateInForce(this.rows.esi, month));
+  }
+
+  ptSlabsFor(stateCode: string, month: MonthKey): Promise<PtSlab[]> {
+    const end = lastDayOf(month);
+    return Promise.resolve(
+      this.rows.pt.filter(
+        (slab) => slab.stateCode === stateCode && slab.effectiveFrom <= end,
+      ),
+    );
   }
 
   ptFor(
