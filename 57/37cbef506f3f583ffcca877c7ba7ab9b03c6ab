@@ -1,0 +1,27 @@
+apps/construction-management/src/hrms/application/holiday-handlers.ts
+  s_6a70f1cb429bb6::t_da5a16be8c6c5d 179,183-188
+apps/construction-management/src/hrms/application/shift-assignment-handlers.ts
+  s_6a70f1cb429bb6::t_5a9343143938ca 163
+apps/construction-management/src/hrms/domain/shift.test.ts
+  s_6a70f1cb429bb6::t_ea1fdc8d28ec30 231-233,235-237,239-241
+apps/construction-management/src/hrms/domain/shift.ts
+  s_6a70f1cb429bb6::t_6efb36ab970ae2 205
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_6a70f1cb429bb6::t_9cd1a0d30b9a6f 123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5737cbef506f3f583ffcca877c7ba7ab9b03c6ab",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
