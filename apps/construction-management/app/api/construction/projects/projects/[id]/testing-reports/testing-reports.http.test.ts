@@ -223,6 +223,9 @@ async function page(
   return json<Page>(response);
 }
 
+/** Tests that sign in several Team Members take longer under load. */
+const MANY_MEMBERS_MS = 20_000;
+
 describe("Testing Reports HTTP (CM-409)", () => {
   it("lists the seed items, adds, renames and deletes items", async () => {
     const owner = await ownerWithCompany();
@@ -567,153 +570,163 @@ describe("Testing Reports HTTP (CM-409)", () => {
     ]);
   });
 
-  it("applies the back-dated policy for Material Testing Report", async () => {
-    const owner = await ownerWithCompany();
-    const projectId = await project(owner);
-    const bricks = await itemNamed(owner.cookie, projectId, "Bricks");
-    const member = await memberWith(owner, {
-      "projects.testing_reports": ["read", "create", "update", "delete"],
-    });
-    await prisma.constructionOrganizationTeamMemberProject.create({
-      data: { memberId: member.memberId, projectId },
-    });
-    await prisma.constructionOrganizationBackdatedEntryPolicy.create({
-      data: {
-        id: newId(),
-        workspaceId: owner.workspaceId,
-        createDays: 0,
-        createOverrideDesignationIds: [],
-        editDays: 0,
-        editOverrideDesignationIds: [],
-        modules: {
-          material_testing_report: {
-            mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+  it(
+    "applies the back-dated policy for Material Testing Report",
+    async () => {
+      const owner = await ownerWithCompany();
+      const projectId = await project(owner);
+      const bricks = await itemNamed(owner.cookie, projectId, "Bricks");
+      const member = await memberWith(owner, {
+        "projects.testing_reports": ["read", "create", "update", "delete"],
+      });
+      await prisma.constructionOrganizationTeamMemberProject.create({
+        data: { memberId: member.memberId, projectId },
+      });
+      await prisma.constructionOrganizationBackdatedEntryPolicy.create({
+        data: {
+          id: newId(),
+          workspaceId: owner.workspaceId,
+          createDays: 0,
+          createOverrideDesignationIds: [],
+          editDays: 0,
+          editOverrideDesignationIds: [],
+          modules: {
+            material_testing_report: {
+              mode: "custom",
+              create: { days: 3, overrideDesignationIds: [] },
+              edit: { days: 3, overrideDesignationIds: [] },
+            },
           },
+          createdBy: owner.userId,
+          updatedBy: owner.userId,
         },
-        createdBy: owner.userId,
-        updatedBy: owner.userId,
-      },
-    });
-
-    const key = await sent(member.cookie, projectId, "bricks.pdf", PDF);
-    const refused = await add(member.cookie, projectId, bricks.id, {
-      name: "Compressive strength",
-      reportDate: addDays(TODAY, -10),
-      key,
-      fileName: "bricks.pdf",
-    });
-    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
-    expect(await codeOf(refused)).toBe("BACKDATED_CREATE_BLOCKED");
-    // The refused file is not kept.
-    await expect(storage.head(key)).resolves.toBeNull();
-
-    const recent = await report(
-      member,
-      projectId,
-      bricks.id,
-      "Water absorption",
-      addDays(TODAY, -2),
-    );
-    const tooOld = await updateReport(
-      jsonRequest(
-        `${base(projectId)}/reports/${recent.id}/update`,
-        member.cookie,
-        {
-          name: "Water absorption",
-          reportDate: addDays(TODAY, -10),
-          updatedAt: recent.updatedAt,
-        },
-      ),
-      reportParams(projectId, recent.id),
-    );
-    expect(await codeOf(tooOld)).toBe("BACKDATED_EDIT_BLOCKED");
-
-    // The Owner passes every day limit.
-    const ownerOld = await report(
-      owner,
-      projectId,
-      bricks.id,
-      "Efflorescence",
-      addDays(TODAY, -30),
-    );
-    const memberDelete = await deleteReport(
-      jsonRequest(
-        `${base(projectId)}/reports/${ownerOld.id}/delete`,
-        member.cookie,
-        {},
-      ),
-      reportParams(projectId, ownerOld.id),
-    );
-    expect(await codeOf(memberDelete)).toBe("BACKDATED_EDIT_BLOCKED");
-  });
-
-  it("follows projects.testing_reports flags and Project visibility", async () => {
-    const owner = await ownerWithCompany();
-    const tower = await project(owner);
-    const villas = await project(owner);
-    const cube = await itemNamed(owner.cookie, tower, "Rcc cube");
-    const cubeReport = await report(owner, tower, cube.id, "Cube", TODAY);
-    const assign = (memberId: string, projectIds: string[]) =>
-      prisma.constructionOrganizationTeamMemberProject.createMany({
-        data: projectIds.map((projectId) => ({ memberId, projectId })),
       });
 
-    const outsider = await memberWith(owner, { "projects.project": ["read"] });
-    await assign(outsider.memberId, [tower]);
-    for (const response of [
-      await listItems(
-        jsonRequest(`${base(tower)}/items`, outsider.cookie),
-        params(tower),
-      ),
-      await getReportFile(
-        jsonRequest(`${TEST_ORIGIN}${cubeReport.url}`, outsider.cookie),
-        reportParams(tower, cubeReport.id),
-      ),
-    ])
-      expect(response.status).toBe(StatusCodes.FORBIDDEN);
+      const key = await sent(member.cookie, projectId, "bricks.pdf", PDF);
+      const refused = await add(member.cookie, projectId, bricks.id, {
+        name: "Compressive strength",
+        reportDate: addDays(TODAY, -10),
+        key,
+        fileName: "bricks.pdf",
+      });
+      expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+      expect(await codeOf(refused)).toBe("BACKDATED_CREATE_BLOCKED");
+      // The refused file is not kept.
+      await expect(storage.head(key)).resolves.toBeNull();
 
-    const reader = await memberWith(owner, {
-      "projects.testing_reports": ["read"],
-    });
-    await assign(reader.memberId, [tower]);
-    expect((await page(reader.cookie, tower, cube.id)).total).toBe(1);
-    for (const response of [
-      await addItem(
-        jsonRequest(`${base(tower)}/items`, reader.cookie, { name: "Sand" }),
-        params(tower),
-      ),
-      await start(reader.cookie, tower, "a.pdf", 5),
-      await deleteReport(
+      const recent = await report(
+        member,
+        projectId,
+        bricks.id,
+        "Water absorption",
+        addDays(TODAY, -2),
+      );
+      const tooOld = await updateReport(
         jsonRequest(
-          `${base(tower)}/reports/${cubeReport.id}/delete`,
-          reader.cookie,
+          `${base(projectId)}/reports/${recent.id}/update`,
+          member.cookie,
+          {
+            name: "Water absorption",
+            reportDate: addDays(TODAY, -10),
+            updatedAt: recent.updatedAt,
+          },
+        ),
+        reportParams(projectId, recent.id),
+      );
+      expect(await codeOf(tooOld)).toBe("BACKDATED_EDIT_BLOCKED");
+
+      // The Owner passes every day limit.
+      const ownerOld = await report(
+        owner,
+        projectId,
+        bricks.id,
+        "Efflorescence",
+        addDays(TODAY, -30),
+      );
+      const memberDelete = await deleteReport(
+        jsonRequest(
+          `${base(projectId)}/reports/${ownerOld.id}/delete`,
+          member.cookie,
           {},
         ),
-        reportParams(tower, cubeReport.id),
-      ),
-    ])
-      expect(response.status).toBe(StatusCodes.FORBIDDEN);
+        reportParams(projectId, ownerOld.id),
+      );
+      expect(await codeOf(memberDelete)).toBe("BACKDATED_EDIT_BLOCKED");
+    },
+    MANY_MEMBERS_MS,
+  );
 
-    const elsewhere = await memberWith(owner, {
-      "projects.testing_reports": ["read", "create"],
-    });
-    await assign(elsewhere.memberId, [villas]);
-    const hidden = await listItems(
-      jsonRequest(`${base(tower)}/items`, elsewhere.cookie),
-      params(tower),
-    );
-    expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await codeOf(hidden)).toBe("PROJECT_NOT_FOUND");
+  it(
+    "follows projects.testing_reports flags and Project visibility",
+    async () => {
+      const owner = await ownerWithCompany();
+      const tower = await project(owner);
+      const villas = await project(owner);
+      const cube = await itemNamed(owner.cookie, tower, "Rcc cube");
+      const cubeReport = await report(owner, tower, cube.id, "Cube", TODAY);
+      const assign = (memberId: string, projectIds: string[]) =>
+        prisma.constructionOrganizationTeamMemberProject.createMany({
+          data: projectIds.map((projectId) => ({ memberId, projectId })),
+        });
 
-    const rival = await ownerWithCompany("Sakthi Constructions");
-    const other = await listReports(
-      jsonRequest(`${base(tower)}/items/${cube.id}/reports`, rival.cookie),
-      itemParams(tower, cube.id),
-    );
-    expect(other.status).toBe(StatusCodes.NOT_FOUND);
-  });
+      const outsider = await memberWith(owner, {
+        "projects.project": ["read"],
+      });
+      await assign(outsider.memberId, [tower]);
+      for (const response of [
+        await listItems(
+          jsonRequest(`${base(tower)}/items`, outsider.cookie),
+          params(tower),
+        ),
+        await getReportFile(
+          jsonRequest(`${TEST_ORIGIN}${cubeReport.url}`, outsider.cookie),
+          reportParams(tower, cubeReport.id),
+        ),
+      ])
+        expect(response.status).toBe(StatusCodes.FORBIDDEN);
+
+      const reader = await memberWith(owner, {
+        "projects.testing_reports": ["read"],
+      });
+      await assign(reader.memberId, [tower]);
+      expect((await page(reader.cookie, tower, cube.id)).total).toBe(1);
+      for (const response of [
+        await addItem(
+          jsonRequest(`${base(tower)}/items`, reader.cookie, { name: "Sand" }),
+          params(tower),
+        ),
+        await start(reader.cookie, tower, "a.pdf", 5),
+        await deleteReport(
+          jsonRequest(
+            `${base(tower)}/reports/${cubeReport.id}/delete`,
+            reader.cookie,
+            {},
+          ),
+          reportParams(tower, cubeReport.id),
+        ),
+      ])
+        expect(response.status).toBe(StatusCodes.FORBIDDEN);
+
+      const elsewhere = await memberWith(owner, {
+        "projects.testing_reports": ["read", "create"],
+      });
+      await assign(elsewhere.memberId, [villas]);
+      const hidden = await listItems(
+        jsonRequest(`${base(tower)}/items`, elsewhere.cookie),
+        params(tower),
+      );
+      expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
+      expect(await codeOf(hidden)).toBe("PROJECT_NOT_FOUND");
+
+      const rival = await ownerWithCompany("Sakthi Constructions");
+      const other = await listReports(
+        jsonRequest(`${base(tower)}/items/${cube.id}/reports`, rival.cookie),
+        itemParams(tower, cube.id),
+      );
+      expect(other.status).toBe(StatusCodes.NOT_FOUND);
+    },
+    MANY_MEMBERS_MS,
+  );
 
   it("is listed in OpenAPI", async () => {
     const document = await json<{

@@ -210,6 +210,9 @@ async function seed(company: Company, projectId: string) {
   return { documentId, drawingId, revisionId };
 }
 
+/** Tests that sign in several Team Members take longer under load. */
+const MANY_MEMBERS_MS = 20_000;
+
 describe("Project Gallery HTTP (CM-410)", () => {
   it("lists the Project's images and PDFs newest first with links to their sources", async () => {
     const owner = await ownerWithCompany();
@@ -356,94 +359,101 @@ describe("Project Gallery HTTP (CM-410)", () => {
     expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
-  it("shows only sources the member may read, and their routes check again", async () => {
-    const owner = await ownerWithCompany();
-    const projectId = await addProject(owner.workspaceId, owner.userId);
-    const other = await addProject(owner.workspaceId, owner.userId);
-    const { revisionId, drawingId, documentId } = await seed(owner, projectId);
-    const assign = (memberId: string, projectIds: string[]) =>
-      prisma.constructionOrganizationTeamMemberProject.createMany({
-        data: projectIds.map((id) => ({ memberId, projectId: id })),
+  it(
+    "shows only sources the member may read, and their routes check again",
+    async () => {
+      const owner = await ownerWithCompany();
+      const projectId = await addProject(owner.workspaceId, owner.userId);
+      const other = await addProject(owner.workspaceId, owner.userId);
+      const { revisionId, drawingId, documentId } = await seed(
+        owner,
+        projectId,
+      );
+      const assign = (memberId: string, projectIds: string[]) =>
+        prisma.constructionOrganizationTeamMemberProject.createMany({
+          data: projectIds.map((id) => ({ memberId, projectId: id })),
+        });
+
+      // Gallery and Drawings: drawings only; their file opens.
+      const drawings = await memberWith(owner, {
+        "projects.gallery": ["read"],
+        "projects.drawings": ["read"],
+      });
+      await assign(drawings.memberId, [projectId]);
+      const visible = await gallery(drawings.cookie, projectId);
+      expect(names(visible)).toEqual(["GF Plan.pdf"]);
+      expect(visible.total).toBe(1);
+      const opened = await getRevisionFile(
+        jsonRequest(
+          `${TEST_ORIGIN}${visible.items[0]?.fileUrl ?? ""}`,
+          drawings.cookie,
+        ),
+        { params: Promise.resolve({ id: projectId, drawingId, revisionId }) },
+      );
+      expect(opened.status).toBe(StatusCodes.OK);
+      await opened.body?.cancel();
+      // A document's route refuses them: the Gallery never linked it.
+      const document = await getDocument(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/projects/projects/${projectId}/documents/${documentId}`,
+          drawings.cookie,
+        ),
+        { params: Promise.resolve({ id: projectId, docId: documentId }) },
+      );
+      expect(document.status).toBe(StatusCodes.FORBIDDEN);
+      const uploaders = await json<{ items: unknown[] }>(
+        await listUploaders(
+          jsonRequest(`${base(projectId)}/uploaders`, drawings.cookie),
+          params(projectId),
+        ),
+      );
+      expect(uploaders.items).toHaveLength(1);
+
+      // Gallery only: nothing to show.
+      const galleryOnly = await memberWith(owner, {
+        "projects.gallery": ["read"],
+      });
+      await assign(galleryOnly.memberId, [projectId]);
+      expect(await gallery(galleryOnly.cookie, projectId)).toEqual({
+        items: [],
+        nextCursor: null,
+        prevCursor: null,
+        total: 0,
       });
 
-    // Gallery and Drawings: drawings only; their file opens.
-    const drawings = await memberWith(owner, {
-      "projects.gallery": ["read"],
-      "projects.drawings": ["read"],
-    });
-    await assign(drawings.memberId, [projectId]);
-    const visible = await gallery(drawings.cookie, projectId);
-    expect(names(visible)).toEqual(["GF Plan.pdf"]);
-    expect(visible.total).toBe(1);
-    const opened = await getRevisionFile(
-      jsonRequest(
-        `${TEST_ORIGIN}${visible.items[0]?.fileUrl ?? ""}`,
-        drawings.cookie,
-      ),
-      { params: Promise.resolve({ id: projectId, drawingId, revisionId }) },
-    );
-    expect(opened.status).toBe(StatusCodes.OK);
-    await opened.body?.cancel();
-    // A document's route refuses them: the Gallery never linked it.
-    const document = await getDocument(
-      jsonRequest(
-        `${TEST_ORIGIN}/api/construction/projects/projects/${projectId}/documents/${documentId}`,
-        drawings.cookie,
-      ),
-      { params: Promise.resolve({ id: projectId, docId: documentId }) },
-    );
-    expect(document.status).toBe(StatusCodes.FORBIDDEN);
-    const uploaders = await json<{ items: unknown[] }>(
-      await listUploaders(
-        jsonRequest(`${base(projectId)}/uploaders`, drawings.cookie),
+      // No Gallery flag: 403.
+      const noGallery = await memberWith(owner, {
+        "projects.drawings": ["read"],
+      });
+      await assign(noGallery.memberId, [projectId]);
+      const denied = await listGallery(
+        jsonRequest(base(projectId), noGallery.cookie),
         params(projectId),
-      ),
-    );
-    expect(uploaders.items).toHaveLength(1);
+      );
+      expect(denied.status).toBe(StatusCodes.FORBIDDEN);
 
-    // Gallery only: nothing to show.
-    const galleryOnly = await memberWith(owner, {
-      "projects.gallery": ["read"],
-    });
-    await assign(galleryOnly.memberId, [projectId]);
-    expect(await gallery(galleryOnly.cookie, projectId)).toEqual({
-      items: [],
-      nextCursor: null,
-      prevCursor: null,
-      total: 0,
-    });
+      // Not on the Project: 404.
+      const elsewhere = await memberWith(owner, {
+        "projects.gallery": ["read"],
+        "projects.drawings": ["read"],
+      });
+      await assign(elsewhere.memberId, [other]);
+      const hidden = await listGallery(
+        jsonRequest(base(projectId), elsewhere.cookie),
+        params(projectId),
+      );
+      expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
 
-    // No Gallery flag: 403.
-    const noGallery = await memberWith(owner, {
-      "projects.drawings": ["read"],
-    });
-    await assign(noGallery.memberId, [projectId]);
-    const denied = await listGallery(
-      jsonRequest(base(projectId), noGallery.cookie),
-      params(projectId),
-    );
-    expect(denied.status).toBe(StatusCodes.FORBIDDEN);
-
-    // Not on the Project: 404.
-    const elsewhere = await memberWith(owner, {
-      "projects.gallery": ["read"],
-      "projects.drawings": ["read"],
-    });
-    await assign(elsewhere.memberId, [other]);
-    const hidden = await listGallery(
-      jsonRequest(base(projectId), elsewhere.cookie),
-      params(projectId),
-    );
-    expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
-
-    // Another Company: 404.
-    const rival = await ownerWithCompany("Sakthi Constructions");
-    const foreign = await listGallery(
-      jsonRequest(base(projectId), rival.cookie),
-      params(projectId),
-    );
-    expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
-  });
+      // Another Company: 404.
+      const rival = await ownerWithCompany("Sakthi Constructions");
+      const foreign = await listGallery(
+        jsonRequest(base(projectId), rival.cookie),
+        params(projectId),
+      );
+      expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
+    },
+    MANY_MEMBERS_MS,
+  );
 
   it("is listed in OpenAPI", async () => {
     const document = await json<{

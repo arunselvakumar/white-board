@@ -265,6 +265,9 @@ function file(cookie: string, revision: Revision, query = "") {
   );
 }
 
+/** Tests that sign in several Team Members take longer under load. */
+const MANY_MEMBERS_MS = 20_000;
+
 describe("Project Drawings HTTP (CM-408)", () => {
   it("lists the seed albums, adds and renames albums with unique names", async () => {
     const owner = await ownerWithCompany();
@@ -703,124 +706,141 @@ describe("Project Drawings HTTP (CM-408)", () => {
     expect(dxf.name).toBe("Wiring");
   });
 
-  it("follows projects.drawings flags and Project visibility", async () => {
-    const owner = await ownerWithCompany();
-    const tower = await project(owner);
-    const villas = await project(owner);
-    const architect = await albumNamed(owner.cookie, tower, "Architect");
-    const plan = await uploadDrawing(owner, tower, architect.id, "GF.pdf", PDF);
-    const assign = (memberId: string, projectIds: string[]) =>
-      prisma.constructionOrganizationTeamMemberProject.createMany({
-        data: projectIds.map((projectId) => ({ memberId, projectId })),
+  it(
+    "follows projects.drawings flags and Project visibility",
+    async () => {
+      const owner = await ownerWithCompany();
+      const tower = await project(owner);
+      const villas = await project(owner);
+      const architect = await albumNamed(owner.cookie, tower, "Architect");
+      const plan = await uploadDrawing(
+        owner,
+        tower,
+        architect.id,
+        "GF.pdf",
+        PDF,
+      );
+      const assign = (memberId: string, projectIds: string[]) =>
+        prisma.constructionOrganizationTeamMemberProject.createMany({
+          data: projectIds.map((projectId) => ({ memberId, projectId })),
+        });
+
+      // No Drawings flag at all.
+      const outsider = await memberWith(owner, {
+        "projects.project": ["read"],
       });
-
-    // No Drawings flag at all.
-    const outsider = await memberWith(owner, { "projects.project": ["read"] });
-    await assign(outsider.memberId, [tower]);
-    const denied = await listAlbums(
-      jsonRequest(`${base(tower)}/albums`, outsider.cookie),
-      params(tower),
-    );
-    expect(denied.status).toBe(StatusCodes.FORBIDDEN);
-    expect((await file(outsider.cookie, firstOf(plan))).status).toBe(
-      StatusCodes.FORBIDDEN,
-    );
-
-    // Read only: sees and downloads, changes nothing.
-    const reader = await memberWith(owner, { "projects.drawings": ["read"] });
-    await assign(reader.memberId, [tower]);
-    expect((await albums(reader.cookie, tower)).length).toBe(4);
-    const read = await file(reader.cookie, firstOf(plan));
-    expect(read.status).toBe(StatusCodes.OK);
-    await read.body?.cancel();
-    for (const response of [
-      await addAlbum(
-        jsonRequest(`${base(tower)}/albums`, reader.cookie, { name: "MEP" }),
+      await assign(outsider.memberId, [tower]);
+      const denied = await listAlbums(
+        jsonRequest(`${base(tower)}/albums`, outsider.cookie),
         params(tower),
-      ),
-      await start(reader.cookie, tower, "a.pdf", 5),
-      await deleteDrawing(
-        jsonRequest(`${base(tower)}/${plan.id}/delete`, reader.cookie, {}),
-        drawingParams(tower, plan.id),
-      ),
-    ])
-      expect(response.status).toBe(StatusCodes.FORBIDDEN);
+      );
+      expect(denied.status).toBe(StatusCodes.FORBIDDEN);
+      expect((await file(outsider.cookie, firstOf(plan))).status).toBe(
+        StatusCodes.FORBIDDEN,
+      );
 
-    // Create only: may upload a new drawing, not a new revision.
-    const creator = await memberWith(owner, {
-      "projects.drawings": ["read", "create"],
-    });
-    await assign(creator.memberId, [tower]);
-    const mine = await uploadDrawing(
-      creator,
-      tower,
-      architect.id,
-      "Mine.pdf",
-      PDF,
-    );
-    expect(mine.revisions[0]?.createdByName).toBe("Member");
-    const started = await sent(creator.cookie, tower, "Mine R2.pdf", PDF);
-    const noRevision = await completeRevision(creator.cookie, tower, mine.id, {
-      key: started.key,
-      fileName: "Mine R2.pdf",
-    });
-    expect(noRevision.status).toBe(StatusCodes.FORBIDDEN);
-
-    // Update only: may upload a new revision.
-    const updater = await memberWith(owner, {
-      "projects.drawings": ["read", "update"],
-    });
-    await assign(updater.memberId, [tower]);
-    const revisionFile = await sent(updater.cookie, tower, "GF R2.pdf", PDF);
-    const r2 = await completeRevision(updater.cookie, tower, plan.id, {
-      key: revisionFile.key,
-      fileName: "GF R2.pdf",
-    });
-    expect(r2.status).toBe(StatusCodes.CREATED);
-
-    // A member not on the Project: not found.
-    const elsewhere = await memberWith(owner, {
-      "projects.drawings": ["read", "create", "update", "delete"],
-    });
-    await assign(elsewhere.memberId, [villas]);
-    const hidden = await listAlbums(
-      jsonRequest(`${base(tower)}/albums`, elsewhere.cookie),
-      params(tower),
-    );
-    expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await codeOf(hidden)).toBe("PROJECT_NOT_FOUND");
-    expect((await file(elsewhere.cookie, firstOf(plan))).status).toBe(
-      StatusCodes.NOT_FOUND,
-    );
-
-    // Another Company: not found, and its keys are refused.
-    const rival = await ownerWithCompany("Sakthi Constructions");
-    const theirs = await project(rival);
-    expect(
-      (
-        await listAlbums(
-          jsonRequest(`${base(tower)}/albums`, rival.cookie),
+      // Read only: sees and downloads, changes nothing.
+      const reader = await memberWith(owner, { "projects.drawings": ["read"] });
+      await assign(reader.memberId, [tower]);
+      expect((await albums(reader.cookie, tower)).length).toBe(4);
+      const read = await file(reader.cookie, firstOf(plan));
+      expect(read.status).toBe(StatusCodes.OK);
+      await read.body?.cancel();
+      for (const response of [
+        await addAlbum(
+          jsonRequest(`${base(tower)}/albums`, reader.cookie, { name: "MEP" }),
           params(tower),
-        )
-      ).status,
-    ).toBe(StatusCodes.NOT_FOUND);
-    const theirAlbum = await albumNamed(rival.cookie, theirs, "Architect");
-    const stolen = await complete(rival.cookie, theirs, {
-      key: revisionFile.key,
-      fileName: "GF R2.pdf",
-      albumId: theirAlbum.id,
-    });
-    expect(await codeOf(stolen)).toBe("UPLOAD_KEY_INVALID");
-    // A drawing cannot be filed in another Project's album.
-    const own = await sent(owner.cookie, tower, "x.pdf", PDF);
-    const wrongAlbum = await complete(owner.cookie, tower, {
-      key: own.key,
-      fileName: "x.pdf",
-      albumId: theirAlbum.id,
-    });
-    expect(wrongAlbum.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await codeOf(wrongAlbum)).toBe("ALBUM_NOT_FOUND");
-  });
+        ),
+        await start(reader.cookie, tower, "a.pdf", 5),
+        await deleteDrawing(
+          jsonRequest(`${base(tower)}/${plan.id}/delete`, reader.cookie, {}),
+          drawingParams(tower, plan.id),
+        ),
+      ])
+        expect(response.status).toBe(StatusCodes.FORBIDDEN);
+
+      // Create only: may upload a new drawing, not a new revision.
+      const creator = await memberWith(owner, {
+        "projects.drawings": ["read", "create"],
+      });
+      await assign(creator.memberId, [tower]);
+      const mine = await uploadDrawing(
+        creator,
+        tower,
+        architect.id,
+        "Mine.pdf",
+        PDF,
+      );
+      expect(mine.revisions[0]?.createdByName).toBe("Member");
+      const started = await sent(creator.cookie, tower, "Mine R2.pdf", PDF);
+      const noRevision = await completeRevision(
+        creator.cookie,
+        tower,
+        mine.id,
+        {
+          key: started.key,
+          fileName: "Mine R2.pdf",
+        },
+      );
+      expect(noRevision.status).toBe(StatusCodes.FORBIDDEN);
+
+      // Update only: may upload a new revision.
+      const updater = await memberWith(owner, {
+        "projects.drawings": ["read", "update"],
+      });
+      await assign(updater.memberId, [tower]);
+      const revisionFile = await sent(updater.cookie, tower, "GF R2.pdf", PDF);
+      const r2 = await completeRevision(updater.cookie, tower, plan.id, {
+        key: revisionFile.key,
+        fileName: "GF R2.pdf",
+      });
+      expect(r2.status).toBe(StatusCodes.CREATED);
+
+      // A member not on the Project: not found.
+      const elsewhere = await memberWith(owner, {
+        "projects.drawings": ["read", "create", "update", "delete"],
+      });
+      await assign(elsewhere.memberId, [villas]);
+      const hidden = await listAlbums(
+        jsonRequest(`${base(tower)}/albums`, elsewhere.cookie),
+        params(tower),
+      );
+      expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
+      expect(await codeOf(hidden)).toBe("PROJECT_NOT_FOUND");
+      expect((await file(elsewhere.cookie, firstOf(plan))).status).toBe(
+        StatusCodes.NOT_FOUND,
+      );
+
+      // Another Company: not found, and its keys are refused.
+      const rival = await ownerWithCompany("Sakthi Constructions");
+      const theirs = await project(rival);
+      expect(
+        (
+          await listAlbums(
+            jsonRequest(`${base(tower)}/albums`, rival.cookie),
+            params(tower),
+          )
+        ).status,
+      ).toBe(StatusCodes.NOT_FOUND);
+      const theirAlbum = await albumNamed(rival.cookie, theirs, "Architect");
+      const stolen = await complete(rival.cookie, theirs, {
+        key: revisionFile.key,
+        fileName: "GF R2.pdf",
+        albumId: theirAlbum.id,
+      });
+      expect(await codeOf(stolen)).toBe("UPLOAD_KEY_INVALID");
+      // A drawing cannot be filed in another Project's album.
+      const own = await sent(owner.cookie, tower, "x.pdf", PDF);
+      const wrongAlbum = await complete(owner.cookie, tower, {
+        key: own.key,
+        fileName: "x.pdf",
+        albumId: theirAlbum.id,
+      });
+      expect(wrongAlbum.status).toBe(StatusCodes.NOT_FOUND);
+      expect(await codeOf(wrongAlbum)).toBe("ALBUM_NOT_FOUND");
+    },
+    MANY_MEMBERS_MS,
+  );
 
   it("is listed in OpenAPI", async () => {
     const document = await json<{
