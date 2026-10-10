@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/procurement/purchase-orders/handlers.ts
+  s_6604e2237b6922::t_d5ca1d01bc7c12 12,41
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders.http.test.ts
+  s_6604e2237b6922::t_adcb4a53e6d158 1-717
+apps/construction-management/app/api/construction/procurement/purchase-requests/handlers.ts
+  s_6604e2237b6922::t_951e4e57be2283 10,42
+apps/construction-management/src/procurement/application/purchase-order-handlers.ts
+  s_6604e2237b6922::t_b8a4627da1e857 34,44,276-277,985-995,1175-1178
+apps/construction-management/src/procurement/application/purchase-request-handlers.ts
+  s_6604e2237b6922::t_a2ca8f36421830 29,40,267-268,712-721,927-930
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f9a5b45fdcbfb5c44be6215d345c8b7d7f132edf",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
