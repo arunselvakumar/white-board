@@ -373,7 +373,9 @@ export function purchaseOrderActions(
     can(access, MENU, "update", scope) || can(access, MENU, "approve", scope);
   return {
     edit: open && can(access, MENU, "update", scope),
-    delete: can(access, MENU, "delete", scope),
+    // A PO with goods received against it is not deleted (the route refuses).
+    delete:
+      po.receiptStatus === "not_received" && can(access, MENU, "delete", scope),
     approve: pending && can(access, MENU, "approve", scope),
     reject: pending && can(access, MENU, "reject", scope),
     markOrdered:
