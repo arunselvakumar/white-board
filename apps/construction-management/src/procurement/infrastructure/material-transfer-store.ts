@@ -389,19 +389,32 @@ export class MaterialTransferCommands {
   }
 
   /**
-   * Live Stores by name, for a transfer's source and destination. Needs
-   * Material Transfer Read (on any Project).
+   * Every live Project and Store of the Company by name, for a transfer's
+   * From and To: a site sends to any other site, not only those the
+   * sender is on. Needs Material Transfer Read (on any Project). Project
+   * names are a plain read of the projects table (the projects context is
+   * referred to by id only).
    */
-  async storeOptions(
-    caller: InventoryCaller,
-  ): Promise<{ id: string; name: string }[]> {
+  async locationOptions(caller: InventoryCaller): Promise<{
+    projects: { id: string; name: string }[];
+    stores: { id: string; name: string }[];
+  }> {
     if (!can(caller.access, "procurement.material_transfers", "read"))
       throw permissionDenied();
-    return this.db.constructionProcurementStore.findMany({
-      where: { workspaceId: caller.actor.workspaceId, deletedAt: null },
-      select: { id: true, name: true },
-      orderBy: [{ name: "asc" }, { id: "asc" }],
-    });
+    const { workspaceId } = caller.actor;
+    const [projects, stores] = await Promise.all([
+      this.db.$queryRaw<{ id: string; name: string }[]>`
+        SELECT id::text AS id, name
+        FROM construction_projects.projects
+        WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL
+        ORDER BY lower(name), id`,
+      this.db.constructionProcurementStore.findMany({
+        where: { workspaceId, deletedAt: null },
+        select: { id: true, name: true },
+        orderBy: [{ name: "asc" }, { id: "asc" }],
+      }),
+    ]);
+    return { projects, stores };
   }
 
   /** Stock at the source for the form's "Available" column (create on the source). */

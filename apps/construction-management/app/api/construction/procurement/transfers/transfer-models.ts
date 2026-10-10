@@ -204,9 +204,15 @@ export function toTransferListResponse(
   };
 }
 
-export const ListConstructionProcurementTransferStoresResponseModel = z.object({
-  items: z.array(z.object({ id: z.uuid(), name: z.string() })),
-});
-export type ListConstructionProcurementTransferStoresResponseModel = z.infer<
-  typeof ListConstructionProcurementTransferStoresResponseModel
+const named = z.object({ id: z.uuid(), name: z.string() });
+
+export const ListConstructionProcurementTransferLocationsResponseModel =
+  z.object({
+    /** Every live Project of the Company, by name. */
+    projects: z.array(named),
+    /** Every live Store, by name. */
+    stores: z.array(named),
+  });
+export type ListConstructionProcurementTransferLocationsResponseModel = z.infer<
+  typeof ListConstructionProcurementTransferLocationsResponseModel
 >;

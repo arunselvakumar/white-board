@@ -10,7 +10,7 @@ import type {
   CreateConstructionProcurementMaterialTransferRequestModel,
   GetConstructionProcurementTransferStockResponseModel,
   ListConstructionProcurementMaterialTransfersResponseModel,
-  ListConstructionProcurementTransferStoresResponseModel,
+  ListConstructionProcurementTransferLocationsResponseModel,
   UpdateConstructionProcurementMaterialTransferRequestModel,
 } from "@/app/api/construction/procurement/transfers/transfer-models";
 import type { TransferStatus } from "@/src/procurement/domain/material-transfer";
@@ -29,8 +29,8 @@ export type CreateTransferInput = z.input<
 export type UpdateTransferInput = z.input<
   typeof UpdateConstructionProcurementMaterialTransferRequestModel
 >;
-export type StoreOption =
-  ListConstructionProcurementTransferStoresResponseModel["items"][number];
+export type TransferLocations =
+  ListConstructionProcurementTransferLocationsResponseModel;
 
 export const TRANSFERS_API = `${PROCUREMENT_API}/transfers`;
 export const TRANSFERS_KEY = [...PROCUREMENT_KEY, "transfers"] as const;
@@ -75,15 +75,10 @@ export function transferQuery(id: string) {
   });
 }
 
-/** Stores for the form's From and To. */
-export const transferStoresQuery = queryOptions({
-  queryKey: [...TRANSFERS_KEY, "stores"],
-  queryFn: async () =>
-    (
-      await apiJson<ListConstructionProcurementTransferStoresResponseModel>(
-        `${TRANSFERS_API}/stores`,
-      )
-    ).items,
+/** Every Project and Store for the form's From and To. */
+export const transferLocationsQuery = queryOptions({
+  queryKey: [...TRANSFERS_KEY, "locations"],
+  queryFn: () => apiJson<TransferLocations>(`${TRANSFERS_API}/locations`),
   staleTime: 60_000,
 });
 
