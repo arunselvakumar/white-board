@@ -1,0 +1,33 @@
+apps/construction-management/src/hrms/application/dashboard-queries.test.ts
+  s_c7ca0f57b51211::t_c5673eb613b3a2 1-742
+apps/construction-management/src/hrms/application/dashboard-queries.ts
+  s_c7ca0f57b51211::t_f66233a28c8dbe 1-511
+apps/construction-management/src/hrms/domain/dashboard.test.ts
+  s_553a74ef78f365::t_464c3c5a86e263 1-93
+apps/construction-management/src/hrms/domain/dashboard.ts
+  s_c7ca0f57b51211::t_6c79cc45c188d3 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "74fad9cbf3a102cd644deaa0cb34fe4de4ececeb",
+  "prompts": {},
+  "sessions": {
+    "s_553a74ef78f365": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa4f04e9bb83d7969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c7ca0f57b51211": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a3ca50042ee3eb962",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
