@@ -652,6 +652,13 @@ describe("Procurement masters HTTP (CM-501)", () => {
       await listMaterials(jsonRequest(MATERIALS, owner.cookie)),
     );
     expect(ownerList.financial).toBe(true);
+    // HSN is a rate detail: only Financial readers may search by it.
+    const byHsn = async (cookie: string) =>
+      json<{ total: number }>(
+        await listMaterials(jsonRequest(`${MATERIALS}?q=7214`, cookie)),
+      );
+    expect((await byHsn(owner.cookie)).total).toBe(1);
+    expect((await byHsn(clerk.cookie)).total).toBe(0);
     const read = await getMaterial(
       jsonRequest(`${MATERIALS}/${material.id}`, clerk.cookie),
       params(material.id),

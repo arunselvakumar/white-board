@@ -439,7 +439,9 @@ export class PrismaMaterialStore implements MaterialStore {
             OR: [
               { name: text },
               { specification: text },
-              { hsnCode: { contains: params.search?.trim() ?? "" } },
+              ...(params.searchHsn === true
+                ? [{ hsnCode: { contains: params.search?.trim() ?? "" } }]
+                : []),
             ],
           },
       params.categoryId == null ? null : { categoryId: params.categoryId },
