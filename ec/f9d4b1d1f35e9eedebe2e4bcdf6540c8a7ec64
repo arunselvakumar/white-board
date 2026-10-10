@@ -1,0 +1,47 @@
+apps/construction-management/.env.example
+  s_6a70f1cb429bb6::t_a1b2b5b4a1c5c9 64-69
+apps/construction-management/app/api/construction/hrms/leave-balances/leave-balances.http.test.ts
+  s_6a70f1cb429bb6::t_50354d3df3ee96 1-507
+apps/construction-management/app/api/construction/hrms/leave-types/leave-types.http.test.ts
+  s_6a70f1cb429bb6::t_061e6959a57d6e 1-326
+apps/construction-management/app/api/construction/hrms/leaves/leaves.http.test.ts
+  s_6a70f1cb429bb6::t_08f699c336fc9c 1-744
+apps/construction-management/src/hrms/application/leave-configuration-handlers.ts
+  s_6a70f1cb429bb6::t_9ce3df2e3e9bd3 197-207
+apps/construction-management/src/hrms/application/leave-request-handlers.ts
+  s_6a70f1cb429bb6::t_64f5cc83a4e5fb 237
+apps/construction-management/src/hrms/domain/leave-balance.ts
+  s_6a70f1cb429bb6::t_b679e4c652dd7b 94-96
+apps/construction-management/src/hrms/domain/leave-request.test.ts
+  s_6a70f1cb429bb6::t_adfc0a6f776ebc 122-126,131-135,140-144,177-181,186-188
+apps/construction-management/src/hrms/domain/leave-request.ts
+  s_6a70f1cb429bb6::t_c27dbb91a8ed88 156
+turbo.json
+  s_6a70f1cb429bb6::t_c868cc25e8a50e 53-54
+apps/construction-management/app/api/construction/hrms/leave-http-support.ts
+  s_80aae475579836::t_c611a8ec5c0365 1-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ecf9d4b1d1f35e9eedebe2e4bcdf6540c8a7ec64",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_80aae475579836": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a679a4dbc88971ea4",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
