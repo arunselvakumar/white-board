@@ -773,6 +773,25 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 14. With no assignment (or a missing template) a member works the Settings day, shown as "Standard".
 15. A non-optional holiday wins over a week off; an optional holiday stays a working day.
 
+**Attendance (CM-308, CM-309)**
+
+1. GPS disabled: a location is stored if the phone sends one, with the nearest matching fence; no approval.
+2. Record only: a check-in inside a fence needs no approval; outside every fence, without a location or with no fence configured, it is accepted as pending and marked out of fence. The screen asks for a location and checks in without one if it is refused.
+3. Required: no location is `LOCATION_REQUIRED`; no fence is `OFFICE_LOCATION_NOT_CONFIGURED`; outside is `OUTSIDE_FENCE` with the nearest fence and how far outside.
+4. A check-in belongs to the Company date it happens on, except one before the end of the previous day's midnight-crossing shift, which belongs to that day.
+5. Check Out closes the open entry of its own date (or of the previous date for a midnight-crossing shift, within 24 h); otherwise `ATTENDANCE_OPEN_FROM_EARLIER_DAY`, or `NO_OPEN_ATTENDANCE`. The check-out location is stored but never refused.
+6. A missed checkout is only for an entry left open on an earlier day: after the check-in, within 24 h of it, not in the future, with a reason (3–500 characters); it goes to approvals; the month lock applies, the back-dated check does not.
+7. A back-dated day is before today, passes the Back-dated Entry check for `hrms_attendance`, may cross midnight (equal times refused), needs a reason, may not overlap the member's other non-rejected entries (touching is allowed), and goes to approvals.
+8. Approve and reject are separate flags; only a pending entry can be decided (`ATTENDANCE_NOT_PENDING`, `ATTENDANCE_CHANGED` when stale); nobody decides their own entry except the Owner (`ATTENDANCE_SELF_APPROVAL`); a rejection needs a reason. A rejected open entry no longer blocks check-in.
+9. Day status counts only closed entries that need no approval or are approved: Present at the shift's working hours, Half Day at its half-day hours, else Absent. Holiday wins over week off, which wins over leave, which wins over hours. Work on a holiday or week off keeps that status and counts every hour as overtime. A half-day leave reports the other half as present or absent.
+10. Overtime hours are always shown, with whether the day's shift pays them. Late = first non-rejected check-in after shift start plus grace; a member on the Settings "Standard" day has no start time and is never late.
+11. In the monthly summary and Excel, days after today are listed but not counted.
+12. Team Today states: checked in, checked out, not checked in, on leave, holiday, week off; an entry left open on an earlier day is flagged "Open from earlier".
+13. Permissions on `hrms.attendance`: read → today; create → own check-in, check-out, missed checkout and back-dated day; View All → Team Today; approve / reject → approvals; report → monthly summary; export → Excel. The summary and Excel show everyone with View All, otherwise only the member's own row.
+14. The monthly Excel (Summary and Days sheets) is a direct download built in the hrms context; there is no PDF version.
+15. The Projects home banner shows only to a member who may check in and has not checked in today on a working day; it links to My Attendance.
+16. Every change is audited with before/after and the reason; check-in and check-out both keep coordinates (6 decimals), accuracy and the matched fence.
+
 **Leave (CM-310 … CM-313)**
 
 1. Seeds: Casual Leave 12 days upfront; Compensatory Off (0, paid) and Loss of Pay (0, unpaid) have no credit; Maternity 182, Privilege Leave 15 and Sick 7 are credited monthly on day 1 at 15.17, 1.25 and 0.58 days; only Privilege Leave carries forward (up to 15); every seed needs approval and none allows advance use. Existing Companies got the seeds by migration, skipping names they already had.
