@@ -816,7 +816,94 @@ Back-dated limits: per-user `backdatedCreateDays`, `backdatedEditDays` and `fina
 
 ---
 
+## Decisions for the build
+
+Product rules are in [ADR CM-0015](../adr/CM-0015-procurement-inventory-product-decisions.md); what follows is every rule the M5 build settled that this spec or the ADR left open, by ticket. Material, Unit, Category, Terms & Conditions and party rules (CM-501) are in [`modules/02`](./02-master-records.md) → "Decisions for the build".
+
+### CM-502 — Schema, numbering and approval
+
+- One schema, `construction_procurement`, with every M5 table; lines copy the master values they must keep (material and unit names, HSN, rate, GST %). Stock lives only in `stock_entries` (append-only, signed quantities, reversals point at what they reverse); a write locks each (location, material) with a transaction-scoped advisory lock and is refused when the running balance would be below zero on its date or any later date.
+- Approve and reject work singly and in bulk (1–100 at a time, all or none: one refusal changes nothing and the 409 lists each refusal by id). A reason is required to reject; reasons, remarks and comments are at most 500 characters. Approving any document raises `document.approved`.
+- Document numbers come from the numbering rules (the Project's rule, else the default) inside the creating transaction; a store-side document (Store PO or GRN, Delivery Note, store-to-store transfer) numbers without a Project.
+- Document dates are not after the Company's today (400 `DATE_IN_FUTURE`) and pass the back-dated check of their module.
+- The procurement access read (`GET /api/construction/procurement/access`) tells screens which actions to show; every route checks again.
+
+### CM-503 — Purchase Request
+
+- Request dates are not after today (400 `DATE_IN_FUTURE`); a PR lists a material once (400 `MATERIAL_REPEATED`).
+- Mark as Ordered needs Update or Approve. Save & Approve is offered on edit as well as create.
+- A PR cannot be deleted while any live PO line points at it, a rejected PO's included (it can be resubmitted): 409 `PURCHASE_REQUEST_HAS_ORDERS`.
+- Balanced estimated qty = estimated qty − (stock + requested-not-ordered on non-rejected PRs not marked ordered + ordered-not-received on non-rejected, open POs), leaving out the PR being edited; empty without an estimate, and it can be negative.
+- The list returns its filter choices (creators, materials, categories) from the Project's live PRs. Files chosen in the wizard upload after the PR is saved.
+
+### CM-504 — Purchase Order
+
+- The Purchase Order menu has no Financial flag, so PO amounts show to everyone who can read POs; Financial stays on Material Received and Materials.
+- PO dates are not after today. A PR on a PO must be approved or partially ordered, and every line must be one of its pending items; editing a PO that keeps its PR skips that check, so going over the request shows as Excess ordered.
+- The supplier must be active and on the Project (Resources), or one of the Store's Suppliers. A Store PO carries no PR and no site location.
+- Close needs an ordered PO that is not fully received, and a reason. Edit and delete take `expectedUpdatedAt`; approve, reject, Mark as Ordered and Close take it optionally.
+- The PO form reads its own choices (suppliers on the location, billing addresses, Terms & Conditions, orderable PRs) from `form-options`, behind PO Create or Update, so a buyer needs no Masters access. The grand total prints in words (lakh / crore).
+
+### CM-505 — Goods Receipt
+
+- GR Date and Inventory Date are not after today; the Inventory Date is not before the GR Date; the `goods_receipt` back-dated check runs on both (an edit also checks the stored dates).
+- A rate loaded from a PO line is that line's taxable value per unit (its discount spread over the quantity, rounded half up): GRN lines carry no discount.
+- Without Material Received Financial: PO lines take that rate and the PO's GST %; lines without a PO take the Material's rate, or 0; a line kept on edit keeps its stored rate and GST. GST % shows to everyone and is editable only with Financial; HSN is editable by everyone.
+- With a linked PO every line is one of its lines, each at most once; without a PO a Material appears once. A linked PO is approved, not closed, not fully received, same supplier and location; a GRN keeps its PO on edit even after it is received or closed.
+- The location cannot change on edit; the supplier can (it must still match the PO), and an edit may keep a supplier since deactivated or taken off the location.
+- Supply type: as sent, else the PO's, else from supplier state vs location state; an edit on the same PO keeps the stored one.
+- Formats: driver mobile is an Indian mobile (E.164); e-way bill No is 12 digits; vehicle No is upper-cased; text fields ≤ 100, remark ≤ 500. An invoice amount that differs from the GRN value is a warning.
+- Deleting a GRN sends `GoodsReceiptPosted` with change `deleted` and value 0.
+- Store GRNs: Company-level menu check; the supplier must be one of the Store's Suppliers. The Store screens offer them (CM-508).
+
+### CM-506 — Current Inventory
+
+- Stock states: Out of stock at or below 0; Low stock at or below a minimum above 0 (the location's override, else the Material's); the alert toggle only decides the `StockBelowMinimum` alert. Changing the minimum or turning the alert on re-checks the crossing.
+- Back-dated modules: consumption `material_consumed`, missing `missing_material`, adjustment and opening stock `current_inventory`; an edit or delete checks the old and the new date. Movement and transfer dates are not after today.
+- Adjust stock compares the counted quantity with stock on the chosen date, needs a reason and the Update flag; an adjustment is deleted and redone, not edited. Consumed, Missing and Opening entries can be edited (not their material). A site location is accepted only on consumption at a Project.
+- Import is all or nothing: a preview lists every row's errors and a commit with any error is refused (400 `IMPORT_HAS_ERRORS`). Names match live, enabled Materials ignoring case; at most 1000 rows; a blank or 0 quantity only sets Estimated Qty (allowed for any material); a quantity for a material that already has movements is a row error (`MATERIAL_HAS_STOCK_MOVEMENTS`). Opening entries take the form's opening date (today by default).
+- The stock list is a position, not paged: every material with an entry, a setting or something in transit. History is ordered by entry date, then time recorded, with a running balance; reversals are marked.
+- Stock Register: Opening entries dated inside the range count towards Opening; materials with nothing held or moved are left out.
+- Store stock uses the same screens and routes with the Central Store menu (Print, Report and Notification ride on its Read).
+
+### CM-507 — Material Transfer
+
+- A transfer lists each material once, 1–100 lines; disabled Materials are refused. Saving does not check stock (the form warns "not enough to approve"); Approve does.
+- Flags are checked on the source for create, edit, approve, reject and delete, and on the destination for Mark as Delivered; a Store side needs the transfer menu Company-wide plus Central Store. An edit may change From and To (Update on the old and the new source).
+- Mark as Delivered: date on or after the transfer date, not after today, back-dated-checked as a create. Any live Project or Store of the Company can be a destination.
+- Files on a transfer can be edited with Update on either side. Bulk approval of transfers is not built.
+
+### CM-508 — Central Store, Material Requests, Delivery Notes
+
+- A Store needs at least one Project (400 `STORE_PROJECTS_REQUIRED`); a Project with open Material Requests to the Store cannot be taken off it (409 `STORE_PROJECT_IN_USE`); a Store with stock, open MRs or undelivered transfers / DNs cannot be deleted (409 `STORE_IN_USE`). A Supplier already on a Store stays after it is deactivated; only newly added ones must be active.
+- Material Request menu is Company-level in the matrix, so the Project side (raise, edit, delete) also needs the member on the Project; reading, Close and the PDF need the Project or Central Store Read. The store side lists every Store's MRs with MR Read plus Central Store Read.
+- An MR lists a material once (400 `MATERIAL_REPEATED`), at most 200 lines. Request date, delivery date and Delivered On are not after today (400 `DATE_IN_FUTURE`); Delivered On is not before the DN date and is checked against the `delivery_note` back-dated create limits.
+- A DN line's pending counts every live, undelivered DN as taken (pending ones too), so two pending DNs cannot over-commit a line (409 `DELIVERY_NOTE_EXCEEDS_PENDING`). On create the store-stock check uses the lower of stock on the DN date and stock now; Approve runs the ledger's full check.
+- Close is refused while any DN is pending or in transit (409 `MATERIAL_REQUEST_HAS_OPEN_DELIVERY_NOTES`), so what is closed was never sent.
+- The MR PDF leaves out the site location.
+
+### CM-509 — Central Inventory
+
+- One card per material with its locations (stock, in transit, state) and totals; filters by locations, category and stock state. In transit counts approved, undelivered transfers and DNs at the destination. The Stock Ledger (opening, movements by type, closing) for a date range and locations is on screen and downloads as xlsx; neither is paged.
+
+### CM-510 — Materials on the Project Dashboard
+
+- Material Summary counts the materials with movements or settings on the Project by stock state (the CM-0015 §10 rule); it needs Current Inventory Read. Purchase orders and their value count live, non-rejected POs of the Project dated in the dashboard's duration, by month of the order date; they need Purchase Order Read.
+- Material Approvals counts pending Purchase Requests, Purchase Orders and transfers out of the Project, each only when the viewer holds that document's Approve flag; "—" when they hold none.
+
+### Remarks, comments and files (shared by every document)
+
+- Anyone who can read a document can comment (legacy). Attaching files to a comment, or to the document, needs Create or Update; removing any file needs Update, Create alone removes only one's own uploads. Posting a remark is a write: refused on an ended plan (402).
+- Files: PDF, images, office files (`any_but_programs`), ≤ 25 MB each, ≤ 50 per document; browser thumbnails; streamed `private, no-store`; removal is a tombstone and deletes the object.
+- Comment files are uploaded to the document first, then attached to the comment by id; an attached-but-unposted file stays as a document attachment.
+- Images and PDFs on a Project-side document go into the Project Gallery with the document type as its source (PR, MR, DN: their Project; PO, GRN: when the location is a Project; MT: source Project, else destination). Deleting the document removes its Gallery tiles.
+- Headings: "Remarks" on PR, PO, GRN; "Comments" on MT, MR, DN. Threads are returned whole, oldest first; remarks are never edited or deleted. Authors are named from Team Members by user id; a missing one shows as "Former Team Member".
+
+---
+
 ## Open questions
+
+All seventeen are answered for M5 in [ADR CM-0015](../adr/CM-0015-procurement-inventory-product-decisions.md): the owner settled negative stock (9), transfer and Delivery Note timing (10, 11) and the GST depth; the rest take the recommended defaults listed there, for the owner to confirm.
 
 1. Is the PR "Upload Required Materials List" attachment only stored, or is it parsed into items? Does **Required Date** drive overdue alerts or PO expected-delivery defaults?
 2. What is the PR → PO quantity rule: are Ordered / Partially / Excess computed from PO line quantities, and does a Rejected or deleted PO roll the PR back?

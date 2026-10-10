@@ -28,8 +28,8 @@ const nextConfig: NextConfig = {
     "/api/construction/hrms/salaries/**/*": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
-    // Procurement PDFs (M5): Purchase Request, Purchase Order and
-    // Goods Receipt.
+    // Procurement PDFs (M5): Purchase Request, Purchase Order, Goods
+    // Receipt and Material Request.
     "/api/construction/procurement/purchase-requests/**/*": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
     "/api/construction/procurement/goods-receipts/[id]/pdf": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+    "/api/construction/procurement/material-requests/[id]/pdf": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
   },
