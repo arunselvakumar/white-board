@@ -52,4 +52,12 @@ export const MEDIA_SOURCE_MENUS: Readonly<Record<string, MenuKey>> = {
   document: "projects.project",
   drawing: "projects.drawings",
   testing_report: "projects.testing_reports",
+  // Procurement documents (M5): `source` is the document type, `sourceId`
+  // the document. A Store-side document is never on a Project's Gallery.
+  purchase_request: "procurement.purchase_requests",
+  purchase_order: "procurement.purchase_orders",
+  goods_receipt: "procurement.material_received",
+  material_transfer: "procurement.material_transfers",
+  material_request: "procurement.material_requests",
+  delivery_note: "procurement.delivery_notes",
 };

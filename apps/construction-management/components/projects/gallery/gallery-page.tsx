@@ -72,12 +72,24 @@ const SOURCE_FILTERS = [
   { value: "document", label: "Documents" },
   { value: "drawing", label: "Drawings" },
   { value: "testing_report", label: "Testing reports" },
+  { value: "purchase_request", label: "Purchase Requests" },
+  { value: "purchase_order", label: "Purchase Orders" },
+  { value: "goods_receipt", label: "Goods Receipts" },
+  { value: "material_transfer", label: "Material Transfers" },
+  { value: "material_request", label: "Material Requests" },
+  { value: "delivery_note", label: "Delivery Notes" },
 ];
 
 const SOURCE_LABELS: Record<string, string> = {
   document: "Document",
   drawing: "Drawing",
   testing_report: "Testing Report",
+  purchase_request: "Purchase Request",
+  purchase_order: "Purchase Order",
+  goods_receipt: "Goods Receipt",
+  material_transfer: "Material Transfer",
+  material_request: "Material Request",
+  delivery_note: "Delivery Note",
 };
 
 /** "Testing Report"; a later module's source reads from its key. */
