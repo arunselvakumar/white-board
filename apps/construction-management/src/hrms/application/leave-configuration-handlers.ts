@@ -194,15 +194,17 @@ export class LeaveConfigurationHandlers {
     );
     return structures.map((structure) => ({
       ...structure,
-      lines: structure.lines.map((line) => {
-        const type = types.get(line.leaveTypeId);
-        return {
-          leaveTypeId: line.leaveTypeId,
-          leaveTypeName: type?.name ?? "—",
-          entitlementDays: line.entitlementDays,
-          effectiveDays: line.entitlementDays ?? type?.yearlyLimit ?? 0,
-        };
-      }),
+      lines: structure.lines
+        .map((line) => {
+          const type = types.get(line.leaveTypeId);
+          return {
+            leaveTypeId: line.leaveTypeId,
+            leaveTypeName: type?.name ?? "—",
+            entitlementDays: line.entitlementDays,
+            effectiveDays: line.entitlementDays ?? type?.yearlyLimit ?? 0,
+          };
+        })
+        .sort((a, b) => a.leaveTypeName.localeCompare(b.leaveTypeName)),
     }));
   }
 

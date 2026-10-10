@@ -119,17 +119,29 @@ describe("leave dates and day breakdown (ADR CM-0012 §10)", () => {
     expect(() => {
       assertLeaveRange("2026-10-09", "2026-10-09");
     }).not.toThrow();
-    expect(fault(() => assertLeaveRange("2026-02-30", "2026-03-01"))).toEqual({
+    expect(
+      fault(() => {
+        assertLeaveRange("2026-02-30", "2026-03-01");
+      }),
+    ).toEqual({
       code: "LEAVE_DATE_INVALID",
       kind: "invalid",
       field: "fromDate",
     });
-    expect(fault(() => assertLeaveRange("2026-10-09", "2026-10-08"))).toEqual({
+    expect(
+      fault(() => {
+        assertLeaveRange("2026-10-09", "2026-10-08");
+      }),
+    ).toEqual({
       code: "LEAVE_TO_BEFORE_FROM",
       kind: "invalid",
       field: "toDate",
     });
-    expect(fault(() => assertLeaveRange("2026-01-01", "2027-01-02"))).toEqual({
+    expect(
+      fault(() => {
+        assertLeaveRange("2026-01-01", "2027-01-02");
+      }),
+    ).toEqual({
       code: "LEAVE_RANGE_TOO_LONG",
       kind: "invalid",
       field: "toDate",
@@ -162,12 +174,18 @@ describe("leave dates and day breakdown (ADR CM-0012 §10)", () => {
     expect(() => {
       assertTypeAllows(type, 3);
     }).not.toThrow();
-    expect(fault(() => assertTypeAllows(type, 3.5))).toMatchObject({
+    expect(
+      fault(() => {
+        assertTypeAllows(type, 3.5);
+      }),
+    ).toMatchObject({
       code: "LEAVE_MAX_CONSECUTIVE_EXCEEDED",
       field: "toDate",
     });
     expect(
-      fault(() => assertTypeAllows({ ...type, isActive: false }, 1)),
+      fault(() => {
+        assertTypeAllows({ ...type, isActive: false }, 1);
+      }),
     ).toMatchObject({ code: "LEAVE_TYPE_INACTIVE", field: "leaveTypeId" });
   });
 });

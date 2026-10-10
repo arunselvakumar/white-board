@@ -153,7 +153,7 @@ export function planLeaveDays(input: {
   const byDate = new Map(input.calendar.map((day) => [day.date, day]));
   for (const [date, session] of Object.entries(input.sessions ?? {})) {
     const day = byDate.get(date);
-    if (day == null || day.kind !== "working")
+    if (day?.kind !== "working")
       throw invalid(
         "LEAVE_DAY_NOT_WORKING",
         `${date} is not a working day in this request.`,

@@ -91,8 +91,9 @@ function sumOf(
 /** The balance the entries add up to. */
 export function balanceOf(lines: readonly LeaveLedgerLine[]): LeaveBalance {
   const periods = lines
-    .filter((line) => line.kind === "accrual" && line.periodKey != null)
-    .map((line) => line.periodKey as string)
+    .flatMap((line) =>
+      line.kind === "accrual" && line.periodKey != null ? [line.periodKey] : [],
+    )
     .sort();
   return Object.freeze({
     initialised: lines.some((line) => line.kind === "initial"),

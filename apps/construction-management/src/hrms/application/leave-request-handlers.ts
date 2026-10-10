@@ -234,7 +234,7 @@ export class LeaveRequestHandlers {
     const member = (
       await this.employees.find(access.workspaceId, [memberId])
     ).get(memberId);
-    if (member == null || !member.active)
+    if (member?.active !== true)
       throw new DomainError(
         "LEAVE_MEMBER_NOT_FOUND",
         "This Team Member was not found.",
