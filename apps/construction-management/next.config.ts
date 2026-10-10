@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
     "/api/construction/hrms/salaries/**/*": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
+    "/api/construction/procurement/goods-receipts/[id]/pdf": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
   },
   // The Prisma client is generated inside the db package (ADR-0040) and
   // bundled into the server chunks, so it looks for its query engine next to

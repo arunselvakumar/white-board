@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 
-import { MaterialsComingSoon } from "@/components/procurement/materials-hub/coming-soon";
+import { GoodsReceiptsList } from "@/components/procurement/goods-receipts/goods-receipts-list";
 
 export const metadata: Metadata = { title: "Goods Received" };
 
-export default function Page() {
-  return <MaterialsComingSoon title="Goods Received" ticket="CM-505" />;
+/** The Project's Goods Receipts (CM-505). */
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <GoodsReceiptsList projectId={id} />;
 }
