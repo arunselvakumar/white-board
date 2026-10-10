@@ -62,9 +62,7 @@ export type QuotationStore = {
     partyId: string,
   ): Promise<Quotation[]>;
   /** Live quotations of live parties, newest first (View Quotations). */
-  list(
-    params: QuotationListParams,
-  ): Promise<{
+  list(params: QuotationListParams): Promise<{
     items: (Quotation & { partyName: string })[];
     total: number;
     hasMore: boolean;
