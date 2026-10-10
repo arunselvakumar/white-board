@@ -219,10 +219,10 @@ function Composer({
   return (
     <form
       onSubmit={(event) => void submit(event)}
-      className="space-y-2"
+      className="relative space-y-2"
       noValidate
     >
-      <Label htmlFor={fieldId} className="sr-only">
+      <Label htmlFor={fieldId} className="sr-only top-0 left-0">
         Add a {word}
       </Label>
       <Textarea
@@ -304,7 +304,7 @@ function Composer({
               type="file"
               multiple
               aria-label={`Choose files for the ${word}`}
-              className="sr-only"
+              className="sr-only top-0 left-0"
               tabIndex={-1}
               onChange={(event) => {
                 const picked = Array.from(event.target.files ?? []).slice(

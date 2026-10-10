@@ -196,13 +196,13 @@ function FilesBody({ documentType, documentId, canEdit, heading }: Props) {
         </ul>
       )}
       {mayUpload ? (
-        <div>
+        <div className="relative">
           <Input
             ref={input}
             type="file"
             multiple
             aria-label={`Choose files for ${heading}`}
-            className="sr-only"
+            className="sr-only top-0 left-0"
             tabIndex={-1}
             onChange={(event) => {
               const picked = Array.from(event.target.files ?? []);
