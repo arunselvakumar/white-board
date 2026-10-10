@@ -1,0 +1,95 @@
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_6604e2237b6922::t_5fc1325070d1d5 1-38
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/[fileId]/route.ts
+  s_6604e2237b6922::t_e3b6ef545db12c 1-51
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_6604e2237b6922::t_e2a9bc48bcc139 1-29
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/route.ts
+  s_6604e2237b6922::t_89715ead82f958 1-79
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/uploads/app/route.ts
+  s_6604e2237b6922::t_1d871b91201335 1-10
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_6604e2237b6922::t_af74f2e87ef708 1-10
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/uploads/route.ts
+  s_6604e2237b6922::t_5d3faa676b25b6 1-11
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_6604e2237b6922::t_dbbdff72cb867e 1-9
+apps/construction-management/app/api/construction/procurement/documents/[type]/[id]/remarks/route.ts
+  s_6604e2237b6922::t_18af42e8d3f4ba 1-81
+apps/construction-management/app/api/construction/procurement/documents/document-models.ts
+  s_6604e2237b6922::t_3058d1471f39c5 1-204
+apps/construction-management/app/api/construction/procurement/documents/document-responses.ts
+  s_6604e2237b6922::t_88b757bcad6352 1-90
+apps/construction-management/app/api/construction/procurement/documents/document-test-fixtures.ts
+  s_6604e2237b6922::t_ecdac9de2b5f3a 1-313
+apps/construction-management/app/api/construction/procurement/documents/files.http.test.ts
+  s_6604e2237b6922::t_f2bf984760cde8 1-448
+apps/construction-management/app/api/construction/procurement/documents/handlers.ts
+  s_6604e2237b6922::t_2e717ffe0b8ca7 1-208
+apps/construction-management/app/api/construction/procurement/documents/remarks.http.test.ts
+  s_6604e2237b6922::t_8fc0609da836be 1-450
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_6604e2237b6922::t_421976968f0c86 8-9,65-66
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_6604e2237b6922::t_4b5d66c0667111 75-80,87-92
+apps/construction-management/src/procurement/application/document-access.test.ts
+  s_6604e2237b6922::t_bc2afa5d2236bc 1-99
+apps/construction-management/src/procurement/application/document-thread.ts
+  s_6604e2237b6922::t_3563b08dc509c2 1-622
+apps/construction-management/src/procurement/infrastructure/document-locator.ts
+  s_6604e2237b6922::t_7d210e98770c40 1-166
+apps/construction-management/src/procurement/infrastructure/document-thread-store.ts
+  s_6604e2237b6922::t_e802de6d9a7be6 1-296
+apps/construction-management/src/projects/domain/media-item.ts
+  s_6604e2237b6922::t_a443f42877c953 55-62
+apps/construction-management/app/api/construction/procurement/documents/documents-openapi.ts
+  s_4ca43a567c5955::t_b41b587ae18e39 1-3,9-44,46-57,59-203
+apps/construction-management/src/procurement/application/document-access.ts
+  s_5e42b9b23c1483::t_a42de427426cc5 1-62
+apps/construction-management/src/procurement/application/document-thread-ports.ts
+  s_3e4bf03912e8a4::t_b0b5106a81d5b2 1-101
+apps/construction-management/src/procurement/domain/document-thread.ts
+  s_5e42b9b23c1483::t_88dd5553927004 1-138
+apps/construction-management/src/procurement/infrastructure/document-thread-factory.ts
+  s_5e42b9b23c1483::t_954d5e9f2f14ea 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0954cf8f1f1d25be319bbaa85faf350f1e01ca33",
+  "prompts": {},
+  "sessions": {
+    "s_3e4bf03912e8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec76c7ed718a44cd",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_4ca43a567c5955": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eb991c63013f969",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_5e42b9b23c1483": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8877b5f80981d4d3",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
