@@ -1,0 +1,33 @@
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipt-models.ts
+  s_6604e2237b6922::t_28bd827b3a7bd0 17-18,289-291,296-298
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts-openapi.ts
+  s_6604e2237b6922::t_ac7b9a7901f0ae 95-96
+apps/construction-management/app/api/construction/procurement/goods-receipts/goods-receipts.http.test.ts
+  s_6604e2237b6922::t_8bf2de34bcc9ba 1-855
+apps/construction-management/src/procurement/application/goods-receipt-handlers.ts
+  s_6604e2237b6922::t_24dd45e2788e48 915
+apps/construction-management/src/procurement/domain/goods-receipt.test.ts
+  s_6604e2237b6922::t_5da25880241187 1-168
+apps/construction-management/src/procurement/infrastructure/goods-receipt-pdf.ts
+  s_6604e2237b6922::t_ce320ee69d0646 129-134
+apps/construction-management/src/procurement/infrastructure/prisma-goods-receipt-store.ts
+  s_6604e2237b6922::t_6c4992a39851ec 102-104,172-175,390-394,417-421,462,577-579
+apps/construction-management/test/procurement-orders.ts
+  s_6604e2237b6922::t_13df2f9bb7c17a 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ed9512aa062d4fa5260e96778c67ec5b044f3882",
+  "prompts": {},
+  "sessions": {
+    "s_6604e2237b6922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9917556-cce1-41ed-8a10-c8989d1b451b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
