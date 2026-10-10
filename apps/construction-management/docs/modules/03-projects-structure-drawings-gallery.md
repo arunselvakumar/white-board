@@ -513,6 +513,28 @@ Dashboard widgets showing money (Payments, Value Earned, PO value, labour/vendor
 
 M4 answered the open questions below with recommended defaults in [ADR CM-0013](../adr/CM-0013-projects-structure-product-decisions.md) (product) and [ADR CM-0014](../adr/CM-0014-attachments-and-gallery-index.md) (attachments and the Gallery index). Rules the build settles are added here by ticket.
 
+### CM-402
+
+- **Generator** (`src/projects/domain/wing-generator.ts`, pure, imported by the editor and the server): typed floors 0–150, start number 0–999, units per floor 1–50, basements 0–10 (default 0), terrace on by default, scheme units 1–2,000 (start number default 1); at most 5,000 units a Wing. Errors carry `details.field`. Typed floors are named after the Wing Type ("Commercial Floor 5", "Institutional Floor 2"; Individual Unit "Floor 3"); Terrace Floor, Ground Floor, Basement Floor N. Residential & Commercial: Ground takes the commercial units per floor; commercial and residential floors together ≤ 150. A scheme's row is "Plots" / "Bungalows".
+- **Stored configuration** keeps only the Wing Type's fields (`wingConfig`), shown read-only on Edit Wing. Edit Wing does not regenerate: the Wing Type and configuration stay; the editor changes floors and units.
+- **Save validation** (`wing-floors.ts`, browser and server): 1–200 floors; floor names ≤ 60 and unit names ≤ 30, spaces tidied, **both unique in the Wing ignoring case**; kinds in order Terrace → typed → Ground → basements (each of terrace and ground at most once; `other` anywhere); a scheme is exactly one `site` row and no other kind; `site` only in schemes. Errors name the row (`details.floorIndex`, `unitIndex`).
+- **Levels**: Ground 0, floors above count up, below count down; without Ground the floors above the first basement end at 1; a scheme row is 0.
+- **Edit**: the request carries every floor the Wing keeps, top to bottom; a row with an id is updated, without one created, a stored row left out is tombstoned (units on a removed floor go with it unless sent under another floor). A stored floor keeps its stored kind. An id not on the Wing (or sent twice) is 400 `WING_FLOOR_NOT_FOUND` / `WING_UNIT_NOT_FOUND`. Guarded by the Wing's `updatedAt` (409 `WING_CHANGED`, checked before and as compare-and-set in the write). Renamed units are parked on a placeholder name in the transaction so swaps pass the live-name index. Only changed rows are written.
+- **StructureUsage** port (`domain/structure-repository.ts`) is asked before removing floors, units, a Wing or a Location (409 `UNIT_IN_USE` with the unit names, `FLOOR_IN_USE`, `WING_IN_USE`, `LOCATION_IN_USE`). M4's `UnusedStructure` answers "not used"; M6 / M8 / M10 replace it with a reader of their tables by id.
+- **Phases**: names ≤ 60, unique in the Project ignoring case; new Phases go last; Add Phase suggests "Phase N". A Wing created without `phaseId` goes into the first Phase, and a Project with none gets "Phase 1" in the same transaction. Rename is guarded by `updatedAt` (409 `PHASE_CHANGED`); delete is refused while the Phase holds live Wings (409 `PHASE_NOT_EMPTY`, checked under a row lock). A Wing can move to another Phase on Edit (it goes last there). A `phaseId` of another Project is 400 `WING_PHASE_INVALID`.
+- **Wing name** ≤ 60, unique in the Project ignoring case (409 `WING_NAME_IN_USE`). Wing delete tombstones the Wing, its floors and units; the name is free again.
+- **Permissions**: phases and wings use `projects.wings` (create / read / update / delete); routes pass no `projectId` to `requireAccess`, so a Member not on the Project gets 404 `PROJECT_NOT_FOUND` from the handlers, like Documents.
+- **Project delete** (CM-0013 §13): live Wings and Locations now keep a Project from being deleted (`PrismaProjectUsage`).
+- **Read models for CM-403**: `ProjectStructureReader` (`src/projects/application/structure-read-model.ts`), built by `createProjectStructureReader()` (`src/projects/infrastructure/create-project-structure.ts`): `wings(workspaceId, projectId)` → live Wings (Phase order, then Wing order) with live floors top to bottom and live units in order; `locations(workspaceId, projectId)` → live Locations in order. No visibility check: callers check first.
+- **Screens**: Wings (`/app/projects/{id}/wings`), Add Wing (`…/wings/new?phase=`), the wing chart (`…/wings/{wingId}`, scrolls inside its own frame), Edit Wing (`…/wings/{wingId}/edit`). Add Wing returns to the details when Save answers `WING_NAME_IN_USE`; going back to the details and continuing again regenerates the floors. Removing a floor in the editor is offered only for named (`other`) floors.
+
+### CM-405
+
+- A Location's name ≤ 80 and unique in the Project ignoring case (409 `LOCATION_NAME_IN_USE`), description ≤ 300 (blank is none). New Locations go last.
+- **Reorder** is one Location at a time: `POST …/locations/{locationId}/move` with `up` / `down` swaps positions with the neighbour (both rows compare-and-set; nothing happens at the ends) and answers the list in its new order. Edit is guarded by `updatedAt` (409 `LOCATION_CHANGED`); a move bumps both rows' `updatedAt`.
+- Delete is a tombstone, refused through `StructureUsage` (409 `LOCATION_IN_USE`); the name is free again.
+- Permissions: `projects.locations` (create / read / update, which covers moving, / delete) plus project visibility (404). Screen: `/app/projects/{id}/locations`.
+
 ## Open questions
 
 1. What are the Project Type values (`Project/Combo`)?

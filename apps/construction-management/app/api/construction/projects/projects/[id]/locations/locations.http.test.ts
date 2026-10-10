@@ -273,9 +273,9 @@ describe("Locations HTTP (CM-405)", () => {
       "projects.locations": ["create"],
     });
     await assign(creator.memberId, [road]);
-    expect((await add(creator.cookie, road, { name: "Toll plaza" })).status).toBe(
-      StatusCodes.CREATED,
-    );
+    expect(
+      (await add(creator.cookie, road, { name: "Toll plaza" })).status,
+    ).toBe(StatusCodes.CREATED);
     expect((await remove(creator.cookie, road, culvert.id)).status).toBe(
       StatusCodes.FORBIDDEN,
     );
