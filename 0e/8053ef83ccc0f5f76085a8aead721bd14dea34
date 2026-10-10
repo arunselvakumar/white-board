@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/hrms/dashboard/dashboard-models.ts
+  s_6a70f1cb429bb6::t_ea3a3376f590e4 176-179
+apps/construction-management/app/api/construction/hrms/dashboard/dashboard.http.test.ts
+  s_6a70f1cb429bb6::t_5b5daf27452673 269
+apps/construction-management/app/app/workspace/hrms/page.tsx
+  s_6a70f1cb429bb6::t_646e07d53b4387 3,6,8-10
+apps/construction-management/app/app/workspace/page.tsx
+  s_6a70f1cb429bb6::t_5e3c3b71c3e6f6 2,5,11-12,20-22
+apps/construction-management/components/hrms/dashboard-fixtures.ts
+  s_6a70f1cb429bb6::t_730fa09b670183 1-300
+apps/construction-management/components/hrms/hrms-dashboard-page.stories.tsx
+  s_6a70f1cb429bb6::t_791b3d53cad866 1-175
+apps/construction-management/components/hrms/hrms-dashboard-page.tsx
+  s_6a70f1cb429bb6::t_11ef00d298b0c3 1-896
+apps/construction-management/components/hrms/hrms-workspace-tile.stories.tsx
+  s_6a70f1cb429bb6::t_9b8fc9c1fd8f8b 1-79
+apps/construction-management/lib/app-nav.ts
+  s_6a70f1cb429bb6::t_d7efeb83ef0b87 18
+apps/construction-management/src/hrms/application/dashboard-queries.test.ts
+  s_6a70f1cb429bb6::t_33db3d68162f08 688
+apps/construction-management/src/hrms/application/dashboard-queries.ts
+  s_6a70f1cb429bb6::t_28a20999afbb2a 434-436
+apps/construction-management/src/queries/hrms-dashboard.ts
+  s_6a70f1cb429bb6::t_0248e76d3832d5 1-15
+apps/construction-management/components/hrms/hrms-workspace-tile.tsx
+  s_c7ca0f57b51211::t_d5a1f90c41d422 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0e8053ef83ccc0f5f76085a8aead721bd14dea34",
+  "prompts": {},
+  "sessions": {
+    "s_6a70f1cb429bb6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5296ea4b-d098-482d-b1f1-30f343b71914",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c7ca0f57b51211": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a3ca50042ee3eb962",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
