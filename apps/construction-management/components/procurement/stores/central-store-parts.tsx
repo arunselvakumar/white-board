@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import {
   Combobox,
@@ -191,5 +191,30 @@ export function NamedMultiSelect({
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
+  );
+}
+
+/**
+ * A wide table on a phone: this box scrolls sideways (not the page), and
+ * takes keyboard focus so the scroll is reachable without a mouse.
+ */
+export function ScrollRegion({
+  label,
+  bordered = true,
+  children,
+}: {
+  label: string;
+  bordered?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+      className={`focus-visible:ring-ring overflow-x-auto outline-none focus-visible:ring-2 [&>[data-slot=table-container]]:overflow-visible ${bordered ? "rounded-xl border" : ""}`}
+    >
+      {children}
+    </div>
   );
 }

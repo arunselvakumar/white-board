@@ -41,6 +41,7 @@ import {
   CENTRAL_INVENTORY_PATH,
   centralStoreHref,
   formatQuantity,
+  ScrollRegion,
   StockStateBadge,
 } from "./central-store-parts";
 import { StoreConfirmDialog } from "./store-confirm-dialog";
@@ -65,7 +66,7 @@ export function StoreStock({ storeId }: { storeId: string }) {
       </Empty>
     );
   return (
-    <div className="overflow-x-auto rounded-xl border">
+    <ScrollRegion label="Store stock, scrolls sideways">
       <Table aria-label="Store stock">
         <TableHeader>
           <TableRow>
@@ -99,7 +100,7 @@ export function StoreStock({ storeId }: { storeId: string }) {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollRegion>
   );
 }
 

@@ -106,11 +106,9 @@ export function DeliveryNoteForm({
           quantities: z.record(z.string(), z.string()),
         })
         .superRefine((values, context) => {
-          let any = false;
           for (const line of lines) {
             const raw = (values.quantities[line.id] ?? "").trim();
             if (raw === "" || Number(raw) === 0) continue;
-            any = true;
             if (!QUANTITY.test(raw))
               context.addIssue({
                 code: "custom",
@@ -124,12 +122,6 @@ export function DeliveryNoteForm({
                 message: `At most ${formatQuantity(line.pendingQty)} is pending.`,
               });
           }
-          if (!any)
-            context.addIssue({
-              code: "custom",
-              path: ["quantities"],
-              message: "Enter a delivered quantity for at least one material.",
-            });
         }),
     [lines],
   );
@@ -159,6 +151,12 @@ export function DeliveryNoteForm({
         ? []
         : [{ materialRequestItemId: line.id, quantity: raw }];
     });
+    if (items.length === 0) {
+      form.setError("root", {
+        message: "Enter a delivered quantity for at least one material.",
+      });
+      return;
+    }
     const input = {
       deliveryDate: values.deliveryDate,
       deliveredTo: values.deliveredTo.trim() === "" ? null : values.deliveredTo,
@@ -279,9 +277,6 @@ export function DeliveryNoteForm({
           </ul>
         </section>
 
-        <FieldError
-          message={(errors.quantities as { message?: string } | undefined)?.message}
-        />
         <FormAlert message={errors.root?.message} />
         <div className="flex flex-wrap gap-2">
           <Button

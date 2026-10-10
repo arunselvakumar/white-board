@@ -37,6 +37,7 @@ import {
   centralStoreHref,
   formatDate,
   formatQuantity,
+  ScrollRegion,
   MaterialRequestStatusBadge,
   projectRequestHref,
 } from "@/components/procurement/stores/central-store-parts";
@@ -286,7 +287,7 @@ export function MaterialRequestDetail({
 
       <section className="space-y-3">
         <h2 className="font-semibold">Materials</h2>
-        <div className="overflow-x-auto rounded-xl border">
+        <ScrollRegion label="Requested materials, scrolls sideways">
           <Table aria-label="Requested materials">
             <TableHeader>
               <TableRow>
@@ -316,7 +317,7 @@ export function MaterialRequestDetail({
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollRegion>
       </section>
 
       <section className="space-y-3">

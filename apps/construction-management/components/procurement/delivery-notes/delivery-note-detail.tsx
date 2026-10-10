@@ -36,6 +36,7 @@ import {
   DeliveryNoteStatusBadge,
   formatDate,
   formatQuantity,
+  ScrollRegion,
 } from "@/components/procurement/stores/central-store-parts";
 import { StoreConfirmDialog } from "@/components/procurement/stores/store-confirm-dialog";
 import { fieldForCode } from "@/lib/server-errors";
@@ -236,7 +237,7 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
 
       <section className="space-y-3">
         <h2 className="font-semibold">Materials</h2>
-        <div className="overflow-x-auto rounded-xl border">
+        <ScrollRegion label="Delivered materials, scrolls sideways">
           <Table aria-label="Delivered materials">
             <TableHeader>
               <TableRow>
@@ -261,7 +262,7 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollRegion>
       </section>
 
       <DocumentFiles

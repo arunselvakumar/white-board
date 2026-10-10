@@ -33,6 +33,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import {
   CENTRAL_STORE_PATH,
   formatQuantity,
+  ScrollRegion,
   NamedMultiSelect,
   StockStateBadge,
 } from "@/components/procurement/stores/central-store-parts";
@@ -127,6 +128,8 @@ function Positions({ data }: { data: CentralInventory }) {
       </Empty>
     );
   return (
+    <>
+    <h2 className="sr-only">Stock by material</h2>
     <ul aria-label="Materials" className="space-y-3">
       {data.materials.map((material) => (
         <li key={material.materialId} className="bg-card space-y-2 rounded-xl border p-3">
@@ -149,7 +152,7 @@ function Positions({ data }: { data: CentralInventory }) {
               ) : null}
             </p>
           </div>
-          <div className="overflow-x-auto">
+          <ScrollRegion bordered={false} label={`Stock of ${material.materialName}, scrolls sideways`}>
             <Table aria-label={`Stock of ${material.materialName}`}>
               <TableHeader>
                 <TableRow>
@@ -181,10 +184,11 @@ function Positions({ data }: { data: CentralInventory }) {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </ScrollRegion>
         </li>
       ))}
     </ul>
+    </>
   );
 }
 
@@ -197,7 +201,7 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
       </p>
     );
   return (
-    <div className="overflow-x-auto rounded-xl border">
+    <ScrollRegion label="Stock Ledger, scrolls sideways">
       <Table aria-label="Stock Ledger">
         <TableHeader>
           <TableRow>
@@ -231,7 +235,7 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollRegion>
   );
 }
 
