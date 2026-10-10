@@ -1,0 +1,111 @@
+apps/construction-management/app/api/_lib/attachments.ts
+  s_7d8917753e260e::t_e976535ef2d43d 1-172
+apps/construction-management/app/api/_lib/require-access.ts
+  s_7d8917753e260e::t_655c06253d0486 52-80
+apps/construction-management/app/api/construction/projects/project-upload-routes.ts
+  s_7d8917753e260e::t_10a9588490bb58 1-172
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/[docId]/thumbnail/route.ts
+  s_7d8917753e260e::t_e13deda8348476 1-28
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/document-media.http.test.ts
+  s_7d8917753e260e::t_3e175cce0f5c38 1-308
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/handlers.ts
+  s_7d8917753e260e::t_1d4b3cbaebf007 1,5-8,16-25
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-models.ts
+  s_7d8917753e260e::t_2ea1abacf9cb5e 3-4,40-45,94-95
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-openapi.ts
+  s_7d8917753e260e::t_a62184f8df06a1 2-6,37-38,40-41,107-119,143-155
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/project-document-responses.ts
+  s_7d8917753e260e::t_9630196f38b305 1-5,16-17,19,32-35,43-45,52
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/app/route.ts
+  s_7d8917753e260e::t_32332c0105200b 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/presign/route.ts
+  s_7d8917753e260e::t_c5a09c3ed95071 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/route.ts
+  s_7d8917753e260e::t_03f4e8e1fd6128 1,10
+apps/construction-management/app/api/construction/projects/projects/[id]/documents/uploads/thumbnail/route.ts
+  s_7d8917753e260e::t_56df02ece3fbdd 1-9
+apps/construction-management/components/projects/documents/document-fixtures.ts
+  s_7d8917753e260e::t_c51964e6462b11 44
+apps/construction-management/components/projects/documents/use-document-uploads.ts
+  s_7d8917753e260e::t_8c05c158e34593 3,7-8,10-13,15,18-22,25-29,31-35,37,39,41
+apps/construction-management/components/uploads/use-direct-upload.ts
+  s_7d8917753e260e::t_4d5fef37f57e99 1-157
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_7d8917753e260e::t_eea42130971a79 440
+apps/construction-management/lib/thumbnail.test.ts
+  s_7d8917753e260e::t_31bd8c1fc35cc7 1-29
+apps/construction-management/lib/thumbnail.ts
+  s_7d8917753e260e::t_3e976e0caea77a 1-102
+apps/construction-management/src/composition/project-media-listeners.ts
+  s_7d8917753e260e::t_a47b6b209b9a65 1-21
+apps/construction-management/src/projects/application/project-documents.ts
+  s_7d8917753e260e::t_cb569d0fd12b8e 1-6,9,13-16,21,27,29-31,59-64,69,73,129-133,139-140,144-145,148-150,152-157,214-227,240-241,244,251,259-260,262-281,298-344,346-348,356,364,368-369,376-385,390-403,410-411,425-428,431-433
+apps/construction-management/src/projects/application/project-media-listener.test.ts
+  s_7d8917753e260e::t_1487d319fa302c 1-107
+apps/construction-management/src/projects/application/project-media-listener.ts
+  s_7d8917753e260e::t_fa70d881a77428 1-62
+apps/construction-management/src/projects/application/project-visibility.ts
+  s_7d8917753e260e::t_ab591c960b5e78 1-24
+apps/construction-management/src/projects/domain/media-item.ts
+  s_7d8917753e260e::t_e613f143e8e590 1-41
+apps/construction-management/src/projects/domain/project-document-rules.ts
+  s_7d8917753e260e::t_ad59bf9e476a67 1-3,34,36,39
+apps/construction-management/src/projects/domain/project-upload-policies.ts
+  s_7d8917753e260e::t_536fac6ddab7fe 1-39
+apps/construction-management/src/projects/infrastructure/create-project-media-listener.ts
+  s_7d8917753e260e::t_565c7d8cc27c8c 1-11
+apps/construction-management/src/projects/infrastructure/prisma-media-index.ts
+  s_7d8917753e260e::t_f1835f12011543 1-100
+apps/construction-management/src/projects/infrastructure/prisma-project-document-store.ts
+  s_7d8917753e260e::t_c3f97f813d3aad 10,28,44-45,117,123-137,168-180
+apps/construction-management/src/queries/project-documents.ts
+  s_7d8917753e260e::t_132c5446547f95 14-15,41-46,49-52,66-77
+apps/construction-management/src/shared-kernel/attachments/attachment-uploads.test.ts
+  s_7d8917753e260e::t_b62c67fb0e6f1a 1-277
+apps/construction-management/src/shared-kernel/attachments/attachment-uploads.ts
+  s_7d8917753e260e::t_6e102433e2d3a4 1-411
+apps/construction-management/src/shared-kernel/attachments/sniff.test.ts
+  s_7d8917753e260e::t_b551d64d4e7501 1-104
+apps/construction-management/src/shared-kernel/attachments/upload-policy.test.ts
+  s_7d8917753e260e::t_635c874ef38a73 1-142
+apps/construction-management/src/projects/domain/project-document.ts
+  s_65fd06774bf76d::t_7b27a3a1a166ae 2-12,26-27,32,35,39,44,57,70,74
+apps/construction-management/src/shared-kernel/attachments/attachment-key.ts
+  s_65fd06774bf76d::t_e25653ea3a4a4b 1-80
+apps/construction-management/src/shared-kernel/attachments/index.ts
+  s_65fd06774bf76d::t_6776daf6cca6b8 1-42
+apps/construction-management/src/shared-kernel/attachments/program-names.ts
+  s_65fd06774bf76d::t_152c96e19d0d14 1-49
+apps/construction-management/src/shared-kernel/attachments/sniff.ts
+  s_65fd06774bf76d::t_37043037c87582 1-102
+apps/construction-management/src/shared-kernel/attachments/upload-policy.ts
+  s_65fd06774bf76d::t_d251020f7b3775 1-100
+apps/construction-management/src/shared-kernel/project-media.ts
+  s_65fd06774bf76d::t_ffcbd6cf2e5b39 1-63
+apps/construction-management/src/queries/direct-upload.ts
+  s_7d8917753e260e::t_f393c53d0a74af 1-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "05fd5dcc2e8dea1504f4e923d8092e20472ec95b",
+  "prompts": {},
+  "sessions": {
+    "s_65fd06774bf76d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a0c8f60876755a368",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_7d8917753e260e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7c40982-e097-4ce4-b502-4e70aa678b56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
