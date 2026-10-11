@@ -9,6 +9,13 @@ enum ConstructionReportingReportKind {
   labour_month
   vendor_attendance
   muster_roll
+  /// Site work (CM-0016 §15, §16).
+  daily_progress_report
+  daily_work
+  owned_equipment_usage
+  rented_equipment_usage
+  equipment_maintenance
+  equipment_transfers
 
   @@map("report_kind")
   @@schema("construction_reporting")

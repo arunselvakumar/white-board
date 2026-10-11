@@ -60,4 +60,9 @@ export const MEDIA_SOURCE_MENUS: Readonly<Record<string, MenuKey>> = {
   material_transfer: "procurement.material_transfers",
   material_request: "procurement.material_requests",
   delivery_note: "procurement.delivery_notes",
+  // Site-work documents (M6, CM-0016 §8): their images only.
+  worksheet: "site_work.daily_worksheet",
+  equipment_usage: "site_work.equipment_usage",
+  site_diary: "site_work.site_diary",
+  hindrance: "site_work.hindrances",
 };

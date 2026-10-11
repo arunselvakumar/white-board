@@ -29,6 +29,8 @@ const STOCK_SOURCE_TYPES = [
   "material_transfer",
   "delivery_note",
   "stock_movement",
+  "daily_worksheet",
+  "equipment_usage",
 ] as const satisfies readonly StockSourceType[];
 
 /** Where stock is held: a Project or a Central Store. */

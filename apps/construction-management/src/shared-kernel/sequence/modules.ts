@@ -33,6 +33,22 @@ export const SEQUENCE_MODULES = [
     defaultPrefix: "IR",
   },
   {
+    key: "daily_worksheet",
+    label: "Daily Worksheet (WS)",
+    defaultPrefix: "WS",
+  },
+  {
+    key: "equipment_usage",
+    label: "Equipment Usage (EU)",
+    defaultPrefix: "EU",
+  },
+  {
+    key: "daily_progress_report",
+    label: "Daily Progress Report (DPR)",
+    defaultPrefix: "DPR",
+  },
+  { key: "hindrance", label: "Hindrance (HR)", defaultPrefix: "HR" },
+  {
     key: "other_party_sales_invoice",
     label: "Other Party Sales Invoice",
     defaultPrefix: "INV",

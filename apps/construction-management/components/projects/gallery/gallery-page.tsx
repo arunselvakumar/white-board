@@ -78,6 +78,10 @@ const SOURCE_FILTERS = [
   { value: "material_transfer", label: "Material Transfers" },
   { value: "material_request", label: "Material Requests" },
   { value: "delivery_note", label: "Delivery Notes" },
+  { value: "worksheet", label: "Worksheets" },
+  { value: "equipment_usage", label: "Equipment Usage" },
+  { value: "site_diary", label: "Site Diaries" },
+  { value: "hindrance", label: "Hindrances" },
 ];
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -90,6 +94,10 @@ const SOURCE_LABELS: Record<string, string> = {
   material_transfer: "Material Transfer",
   material_request: "Material Request",
   delivery_note: "Delivery Note",
+  worksheet: "Worksheet",
+  equipment_usage: "Equipment Usage",
+  site_diary: "Site Diary",
+  hindrance: "Hindrance",
 };
 
 /** "Testing Report"; a later module's source reads from its key. */

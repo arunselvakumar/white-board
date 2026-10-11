@@ -1,6 +1,10 @@
 import {
   Building2,
+  BookOpenText,
   CalendarCheck,
+  ClipboardList,
+  Construction,
+  FileChartColumn,
   DraftingCompass,
   FileBarChart,
   FileText,
@@ -8,6 +12,7 @@ import {
   Images,
   LayoutDashboard,
   MapPin,
+  OctagonPause,
   Package,
   Users,
   Wallet,
@@ -31,6 +36,11 @@ export const PROJECT_MODULE_ICONS: Record<ProjectModuleKey, LucideIcon> = {
   attendance: CalendarCheck,
   payments: Wallet,
   materials: Package,
+  daily_worksheet: ClipboardList,
+  equipment_usage: Construction,
+  site_diary: BookOpenText,
+  hindrances: OctagonPause,
+  progress_reports: FileChartColumn,
   reports: FileBarChart,
 };
 

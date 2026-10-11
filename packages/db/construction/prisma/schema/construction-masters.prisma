@@ -8,19 +8,30 @@
 
 /// A trade a labourer or a vendor's headcount is booked under (Carpenter,
 /// Mason, …). Seed rows can be disabled, not renamed or deleted.
+/// Whether a Labour Category's heads count as skilled or unskilled on a
+/// Daily Worksheet's prefill (CM-0016 §6).
+enum ConstructionMastersLabourSkill {
+  skilled
+  unskilled
+
+  @@map("labour_skill")
+  @@schema("construction_masters")
+}
+
 model ConstructionMastersLabourCategory {
-  id          String    @id @db.Uuid
-  workspaceId String    @map("workspace_id")
+  id          String                         @id @db.Uuid
+  workspaceId String                         @map("workspace_id")
   name        String
-  isSeed      Boolean   @default(false) @map("is_seed")
+  skill       ConstructionMastersLabourSkill @default(skilled)
+  isSeed      Boolean                        @default(false) @map("is_seed")
   /// Disabled categories stay on old records but leave the pickers.
-  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy   String    @map("created_by")
-  updatedBy   String    @map("updated_by")
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
-  deletedBy   String?   @map("deleted_by")
+  disabledAt  DateTime?                      @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                       @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                         @map("created_by")
+  updatedBy   String                         @map("updated_by")
+  deletedAt   DateTime?                      @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                        @map("deleted_by")
 
   @@index([workspaceId])
   @@map("labour_categories")
@@ -43,6 +54,7 @@ model ConstructionMastersDepartment {
   deletedBy   String?   @map("deleted_by")
 
   contractors ConstructionMastersContractorDepartment[]
+  workTypes   ConstructionMastersWorkType[]
 
   @@index([workspaceId])
   @@map("departments")
@@ -320,8 +332,9 @@ model ConstructionMastersMaterial {
   deletedAt       DateTime?                           @map("deleted_at") @db.Timestamptz(3)
   deletedBy       String?                             @map("deleted_by")
 
-  uom      ConstructionMastersMeasurementUnit   @relation(fields: [uomId], references: [id], onDelete: Restrict)
-  category ConstructionMastersMaterialCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  uom       ConstructionMastersMeasurementUnit    @relation(fields: [uomId], references: [id], onDelete: Restrict)
+  category  ConstructionMastersMaterialCategory?  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  workTypes ConstructionMastersWorkTypeMaterial[]
 
   @@index([workspaceId, name])
   @@index([categoryId])
@@ -374,5 +387,44 @@ model ConstructionMastersQuotation {
 
   @@index([workspaceId, partyKind, partyId, deletedAt])
   @@map("quotations")
+  @@schema("construction_masters")
+}
+
+/// A Work Type (`modules/02`, CM-601): what a crew does within a Department.
+/// Its assigned Materials are offered first on a worksheet (CM-0016 §5).
+model ConstructionMastersWorkType {
+  id           String    @id @db.Uuid
+  workspaceId  String    @map("workspace_id")
+  name         String
+  departmentId String    @map("department_id") @db.Uuid
+  isSeed       Boolean   @default(false) @map("is_seed")
+  /// Disabled Work Types stay on old worksheets but leave the pickers.
+  disabledAt   DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy    String    @map("created_by")
+  updatedBy    String    @map("updated_by")
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?   @map("deleted_by")
+
+  department ConstructionMastersDepartment         @relation(fields: [departmentId], references: [id])
+  materials  ConstructionMastersWorkTypeMaterial[]
+
+  @@index([workspaceId])
+  @@index([departmentId])
+  @@map("work_types")
+  @@schema("construction_masters")
+}
+
+model ConstructionMastersWorkTypeMaterial {
+  workTypeId String @map("work_type_id") @db.Uuid
+  materialId String @map("material_id") @db.Uuid
+
+  workType ConstructionMastersWorkType @relation(fields: [workTypeId], references: [id], onDelete: Cascade)
+  material ConstructionMastersMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@id([workTypeId, materialId])
+  @@index([materialId])
+  @@map("work_type_materials")
   @@schema("construction_masters")
 }

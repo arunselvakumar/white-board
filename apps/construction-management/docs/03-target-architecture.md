@@ -44,9 +44,9 @@ apps/construction-management/
   src/
     identity-bridge/        thin adapters over @repo/auth (session, membership)
     organization/           company, team members, designations, permission matrix, subscription
-    masters/                parties, materials, categories, units, equipment, accounts
+    masters/                parties, materials, categories, units, work types, accounts
     projects/               project, phases, wings, floors, units, locations, drawings, gallery, testing
-    site-work/              worksheets, equipment sheets, progress reports
+    site-work/              worksheets, equipment register + sheets, site diary, hindrances, progress reports
     tracking/               tasks, issues, inspections
     procurement/            PR, PO, GRN, inventory, transfers, stores, MR, DN
     finance/                accounts, transactions, petty cash, invoices, payments, TDS, GST

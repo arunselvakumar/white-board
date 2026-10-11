@@ -500,6 +500,9 @@ function documentHref(
   const base = `/app/projects/${encodeURIComponent(location.id)}/materials`;
   if (type === "goods_receipt") return `${base}/goods-received/${id}`;
   if (type === "material_transfer") return `${base}/transfers/${id}`;
+  const project = `/app/projects/${encodeURIComponent(location.id)}`;
+  if (type === "daily_worksheet") return `${project}/worksheets/${id}`;
+  if (type === "equipment_usage") return `${project}/equipment/sheets/${id}`;
   return null;
 }
 
@@ -514,38 +517,47 @@ async function describeEntries(
       rows.filter((row) => row.sourceType === type).map((row) => row.sourceId),
     ),
   ];
-  const [receipts, transfers, notes, movements, names] = await Promise.all([
-    db.constructionProcurementGoodsReceipt.findMany({
-      where: { workspaceId, id: { in: idsOf("goods_receipt") } },
-      select: { id: true, number: true, deletedAt: true },
-    }),
-    db.constructionProcurementMaterialTransfer.findMany({
-      where: { workspaceId, id: { in: idsOf("material_transfer") } },
-      select: { id: true, number: true, deletedAt: true },
-    }),
-    db.constructionProcurementDeliveryNote.findMany({
-      where: { workspaceId, id: { in: idsOf("delivery_note") } },
-      select: { id: true, number: true, deletedAt: true },
-    }),
-    db.constructionProcurementStockMovement.findMany({
-      where: {
+  const [receipts, transfers, notes, movements, names, worksheets, sheets] =
+    await Promise.all([
+      db.constructionProcurementGoodsReceipt.findMany({
+        where: { workspaceId, id: { in: idsOf("goods_receipt") } },
+        select: { id: true, number: true, deletedAt: true },
+      }),
+      db.constructionProcurementMaterialTransfer.findMany({
+        where: { workspaceId, id: { in: idsOf("material_transfer") } },
+        select: { id: true, number: true, deletedAt: true },
+      }),
+      db.constructionProcurementDeliveryNote.findMany({
+        where: { workspaceId, id: { in: idsOf("delivery_note") } },
+        select: { id: true, number: true, deletedAt: true },
+      }),
+      db.constructionProcurementStockMovement.findMany({
+        where: {
+          workspaceId,
+          id: { in: idsOf("stock_movement") },
+          deletedAt: null,
+        },
+        select: { id: true, kind: true, updatedAt: true },
+      }),
+      userNames(
+        db,
         workspaceId,
-        id: { in: idsOf("stock_movement") },
-        deletedAt: null,
-      },
-      select: { id: true, kind: true, updatedAt: true },
-    }),
-    userNames(
-      db,
-      workspaceId,
-      rows.map((row) => row.createdBy),
-    ),
-  ]);
+        rows.map((row) => row.createdBy),
+      ),
+      // Site-work sheets' numbers, for the history link (ADR CM-0016 §5).
+      db.constructionSiteWorkWorksheet.findMany({
+        where: { workspaceId, id: { in: idsOf("daily_worksheet") } },
+        select: { id: true, number: true, deletedAt: true },
+      }),
+      db.constructionSiteWorkEquipmentUsageSheet.findMany({
+        where: { workspaceId, id: { in: idsOf("equipment_usage") } },
+        select: { id: true, number: true, deletedAt: true },
+      }),
+    ]);
   const numbers = new Map<string, { number: string; live: boolean }>(
-    [...receipts, ...transfers, ...notes].map((row) => [
-      row.id,
-      { number: row.number, live: row.deletedAt == null },
-    ]),
+    [...receipts, ...transfers, ...notes, ...worksheets, ...sheets].map(
+      (row) => [row.id, { number: row.number, live: row.deletedAt == null }],
+    ),
   );
   const movementOf = new Map(movements.map((row) => [row.id, row]));
   return rows.map((row) => {

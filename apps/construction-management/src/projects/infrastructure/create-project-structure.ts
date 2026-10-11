@@ -13,7 +13,8 @@ import { UnusedStructure } from "./unused-structure";
 
 type Deps = {
   prisma?: PrismaClient;
-  /** Who points at floors, units, Wings and Locations; nobody in M4. */
+  /** Who points at floors, units, Wings and Locations; the routes pass
+   * `PrismaStructureUsage` (src/composition, M6). */
   usage?: StructureUsage;
   clock?: () => Date;
 };

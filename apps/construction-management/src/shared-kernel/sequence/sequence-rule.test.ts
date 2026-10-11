@@ -76,6 +76,10 @@ describe("formatSequenceNumber", () => {
       "MR",
       "DN",
       "IR",
+      "WS",
+      "EU",
+      "DPR",
+      "HR",
       "INV",
     ]);
     expect(

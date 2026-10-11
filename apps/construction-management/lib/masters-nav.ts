@@ -10,8 +10,10 @@ import {
   Hammer,
   Handshake,
   HardHat,
+  Layers,
   Settings2,
   Shovel,
+  Tractor,
   Truck,
   UserCheck,
   Users,
@@ -184,6 +186,22 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Departments",
         description: "Trades and work categories: RCC, Plumbing, Painting…",
         icon: Wrench,
+      },
+      {
+        href: "/app/masters/work-types",
+        label: "Work Types",
+        title: "Work Types",
+        description:
+          "What a crew does within a Department, and the materials it uses.",
+        icon: Layers,
+      },
+      {
+        href: "/app/masters/equipments",
+        label: "Equipments",
+        title: "Equipments",
+        description:
+          "Owned and rented plant: where it is, maintenance and hire rates.",
+        icon: Tractor,
       },
     ],
   },

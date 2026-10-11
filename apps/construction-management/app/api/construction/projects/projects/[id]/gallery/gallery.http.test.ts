@@ -189,7 +189,7 @@ async function seed(company: Company, projectId: string) {
   });
   // A later module's file: listed only once its source has a menu here.
   await media({
-    source: "worksheet",
+    source: "issue",
     sourceId: newId(),
     fileName: "Slab casting.jpg",
     contentType: "image/jpeg",
@@ -302,7 +302,7 @@ describe("Project Gallery HTTP (CM-410)", () => {
       names(await gallery(owner.cookie, projectId, "?source=drawing")),
     ).toEqual(["GF Plan.pdf"]);
     expect(
-      (await gallery(owner.cookie, projectId, "?source=worksheet")).total,
+      (await gallery(owner.cookie, projectId, "?source=issue")).total,
     ).toBe(0);
     const byMember = await gallery(
       owner.cookie,
