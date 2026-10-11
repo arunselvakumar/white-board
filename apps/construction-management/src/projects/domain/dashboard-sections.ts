@@ -10,7 +10,7 @@ export const DASHBOARD_SECTIONS = [
   { key: "summary", label: "Project summary", milestone: null },
   { key: "attendance", label: "Attendance", milestone: null },
   { key: "task", label: "Task", milestone: "M8" },
-  { key: "payments", label: "Payments", milestone: "M7" },
+  { key: "payments", label: "Payments", milestone: null },
   { key: "daily_work", label: "Daily Work", milestone: null },
   { key: "equipment_usage", label: "Equipment Usage", milestone: null },
   { key: "materials", label: "Materials", milestone: null },

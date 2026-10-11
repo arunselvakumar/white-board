@@ -87,6 +87,22 @@ export type PartyStatement = {
   openInvoices: InvoiceView[];
 };
 
+export type WorkspacePartyBalances = {
+  partyType: PartyType;
+  items: {
+    partyId: string;
+    partyName: string | null;
+    /** + the Company owes the party; − the party owes the Company. */
+    balance: bigint;
+    projects: {
+      projectId: string;
+      projectName: string | null;
+      balance: bigint;
+    }[];
+  }[];
+  totals: { owedByCompany: bigint; owedToCompany: bigint; net: bigint };
+};
+
 export type TdsLedger = {
   contractorId: string;
   contractorName: string;
@@ -329,6 +345,113 @@ export class PartyQueries {
       closing: running,
       openInvoices,
     };
+  }
+
+  /**
+   * Each party's balance across Projects with its per-Project split (CM-708
+   * Party Balance): every Project for the Owner; a member's Projects where
+   * they read Parties. Parties assigned to a Project in scope show even at
+   * zero.
+   */
+  async workspaceBalances(
+    access: MemberAccess,
+    partyType: PartyType,
+  ): Promise<WorkspacePartyBalances> {
+    const { db, store, directory } = this.deps;
+    const workspaceId = access.workspaceId;
+    const scope =
+      access.role === "owner"
+        ? null
+        : [...access.projectIds].filter((projectId) =>
+            canOnPlace(access, "read", { kind: "project", id: projectId }),
+          );
+    const inScope = (projectId: string) =>
+      scope == null || scope.includes(projectId);
+    const rows = await store.balancesByProject(
+      db,
+      workspaceId,
+      partyType,
+      scope,
+    );
+    const assigned =
+      partyType === "other_party"
+        ? await store.otherPartiesOn(db, workspaceId, null)
+        : partyType === "contractor"
+          ? [
+              ...(
+                await directory.contractors(
+                  db,
+                  workspaceId,
+                  rows.map((row) => row.partyId),
+                )
+              ).values(),
+            ]
+          : [
+              ...(
+                await directory.suppliers(
+                  db,
+                  workspaceId,
+                  rows.map((row) => row.partyId),
+                )
+              ).values(),
+            ];
+    const parties = new Map<
+      string,
+      { name: string | null; projects: Map<string, bigint> }
+    >();
+    for (const party of assigned) {
+      const projects = party.projectIds.filter(inScope);
+      if (scope != null && projects.length === 0) continue;
+      parties.set(party.id, {
+        name: party.name,
+        projects: new Map(projects.map((id) => [id, 0n])),
+      });
+    }
+    const missing = rows
+      .map((row) => row.partyId)
+      .filter((id) => !parties.has(id));
+    const names = await partyNames(
+      this.deps,
+      db,
+      workspaceId,
+      missing.map((partyId) => ({ partyType, partyId })),
+    );
+    for (const row of rows) {
+      const party = parties.get(row.partyId) ?? {
+        name: names.get(partyKey(partyType, row.partyId)) ?? null,
+        projects: new Map<string, bigint>(),
+      };
+      party.projects.set(row.projectId, row.amount);
+      parties.set(row.partyId, party);
+    }
+    const projectNames = await directory.projects(
+      db,
+      workspaceId,
+      [...parties.values()].flatMap((party) => [...party.projects.keys()]),
+    );
+    const totals = { owedByCompany: 0n, owedToCompany: 0n, net: 0n };
+    const items = [...parties.entries()].map(([partyId, party]) => {
+      const projects = [...party.projects.entries()]
+        .filter(([projectId]) => projectNames.has(projectId))
+        .map(([projectId, balance]) => ({
+          projectId,
+          projectName: projectNames.get(projectId)?.name ?? null,
+          balance,
+        }))
+        .sort((a, b) =>
+          (a.projectName ?? "").localeCompare(b.projectName ?? ""),
+        );
+      const balance = projects.reduce(
+        (sum, project) => sum + project.balance,
+        0n,
+      );
+      if (balance > 0n) totals.owedByCompany += balance;
+      else totals.owedToCompany -= balance;
+      totals.net += balance;
+      return { partyId, partyName: party.name, balance, projects };
+    });
+    items.sort((a, b) => (a.partyName ?? "").localeCompare(b.partyName ?? ""));
+    return { partyType, items, totals };
   }
 
   /** What the invoice form offers for a party: a Contractor's Departments. */

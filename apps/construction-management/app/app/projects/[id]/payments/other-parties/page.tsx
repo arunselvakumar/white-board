@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 
-import { FinanceComingSoon } from "@/components/finance/finance-coming-soon";
+import { PartyMoneyTab } from "@/components/finance/parties/party-money-tab";
 
 export const metadata: Metadata = { title: "Other Party payments" };
 
-/** Other Party payments of a Project (M7). */
-export default function ProjectOtherPartiesPage() {
-  return <FinanceComingSoon title="Other Party payments" ticket="CM-708" />;
+/** Other Party balances, purchase and sales invoices, payments and settlements on a Project (CM-708). */
+export default async function ProjectOtherPartiesPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <PartyMoneyTab projectId={id} partyType="other_party" />;
 }

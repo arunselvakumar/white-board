@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 
-import { FinanceComingSoon } from "@/components/finance/finance-coming-soon";
+import { viewerCan } from "@/app/app/_lib/viewer-can";
+import { CentralPaymentPage } from "@/components/finance/central-payment/central-payment-page";
+import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Central Payment" };
 
-/** Workspace → Central Payment (M7). */
-export default function CentralPaymentPage() {
-  return <FinanceComingSoon title="Central Payment" ticket="CM-709" />;
+/**
+ * Workspace → Central Payment (CM-709): party dues across Projects,
+ * account balances, petty cash and the central finance reports.
+ */
+export default async function CentralPaymentRoute() {
+  if (!(await viewerCan("finance.central_payment", "read")))
+    return <ProjectNoAccess what="Central Payment" />;
+  return <CentralPaymentPage />;
 }

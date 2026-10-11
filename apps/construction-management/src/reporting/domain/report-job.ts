@@ -1,7 +1,7 @@
 import { assertCalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import { checkRange, monthRange } from "./report-period";
+import { checkRange, financialYearRange, monthRange } from "./report-period";
 
 /** Every kind of report job (the Prisma enum `report_kind`). */
 export const REPORT_KINDS = [
@@ -17,6 +17,15 @@ export const REPORT_KINDS = [
   "rented_equipment_usage",
   "equipment_maintenance",
   "equipment_transfers",
+  // Finance reports (CM-709).
+  "account_ledger",
+  "petty_cash",
+  "transactions",
+  "contractor_payments",
+  "supplier_payments",
+  "other_expenses",
+  "tds_194c",
+  "due_payments",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -34,6 +43,58 @@ export const REPORT_TITLES: Record<ReportKind, string> = {
   rented_equipment_usage: "Rented Equipment Usage",
   equipment_maintenance: "Equipment Maintenance",
   equipment_transfers: "Equipment Transfers",
+  // Finance reports (CM-709).
+  account_ledger: "Ledger",
+  petty_cash: "Petty Cash",
+  transactions: "Transactions",
+  contractor_payments: "Contractor Payments",
+  supplier_payments: "Supplier Payments",
+  other_expenses: "Other Expenses",
+  tds_194c: "TDS 194C",
+  due_payments: "Due Payments",
+};
+
+/** The finance reports (CM-709, ADR CM-0017 §16): all about money. */
+export const FINANCE_REPORT_KINDS = [
+  "account_ledger",
+  "petty_cash",
+  "transactions",
+  "contractor_payments",
+  "supplier_payments",
+  "other_expenses",
+  "tds_194c",
+  "due_payments",
+] as const satisfies readonly ReportKind[];
+
+export type FinanceReportKind = (typeof FINANCE_REPORT_KINDS)[number];
+
+export function isFinanceReport(kind: ReportKind): kind is FinanceReportKind {
+  return (FINANCE_REPORT_KINDS as readonly ReportKind[]).includes(kind);
+}
+
+/** The Ledger's optional filters (legacy: category, mode, module, Paid To kind). */
+export type LedgerFilters = {
+  categoryId: string | null;
+  mode: "cash" | "cheque" | "online" | "upi" | null;
+  /** The module that wrote the entry (`account_entries.source_type`). */
+  module:
+    | "account"
+    | "transaction"
+    | "account_transfer"
+    | "petty_cash_voucher"
+    | "other_expense"
+    | "party_payment"
+    | "wage_payment"
+    | "salary_slip"
+    | null;
+  counterpartyKind:
+    | "contractor"
+    | "supplier"
+    | "other_party"
+    | "labour"
+    | "vendor"
+    | "team_member"
+    | null;
 };
 
 export type ReportFormat = "xlsx" | "pdf";
@@ -104,6 +165,49 @@ export type ReportParams =
       kind: "equipment_maintenance" | "equipment_transfers";
       from: string;
       to: string;
+    }
+  // Finance reports (CM-709). Central kinds fix the Projects the requester
+  // could see when they asked (`projectIds`, null for the Owner: every
+  // Project and Store).
+  | ({
+      kind: "account_ledger";
+      accountId: string;
+      from: string;
+      to: string;
+    } & LedgerFilters)
+  | {
+      kind: "petty_cash";
+      from: string;
+      to: string;
+      /** One account picked on the card; null for every account in scope. */
+      accountId: string | null;
+      /** The accounts the requester could see (own only without View all); null for all. */
+      accountIds: string[] | null;
+    }
+  | {
+      kind: "transactions" | "other_expenses";
+      from: string;
+      to: string;
+    }
+  | {
+      kind: "contractor_payments" | "supplier_payments";
+      from: string;
+      to: string;
+      partyId: string | null;
+    }
+  | {
+      kind: "tds_194c";
+      /** Financial year `2026-27` (1 Apr 2026 to 31 Mar 2027). */
+      fy: string;
+      contractorId: string | null;
+      projectIds: string[] | null;
+    }
+  | {
+      kind: "due_payments";
+      /** Balances and ageing on this day, `YYYY-MM-DD`. */
+      asOn: string;
+      /** Central only; unused on a Project's report. */
+      projectIds: string[] | null;
     };
 
 export type JobStatus = "queued" | "running" | "done" | "failed";
@@ -147,6 +251,20 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "muster_roll":
       monthRange(params.month);
       return params;
+    // Finance reports (CM-709).
+    case "account_ledger":
+    case "petty_cash":
+    case "transactions":
+    case "other_expenses":
+    case "contractor_payments":
+    case "supplier_payments":
+      return { ...params, ...checkRange(params) };
+    case "tds_194c":
+      financialYearRange(params.fy);
+      return params;
+    case "due_payments":
+      assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
+      return params;
     case "daily_progress_report":
       assertCalendarDate(params.date, "REPORT_DATE_INVALID");
       if (params.number.trim() === "")
@@ -167,6 +285,16 @@ export const CENTRAL_REPORT_KINDS: readonly ReportKind[] = [
   // Site work reports (CM-605).
   "equipment_maintenance",
   "equipment_transfers",
+  // Finance reports (CM-709): the Ledger and TDS 194C are always central.
+  "account_ledger",
+  "tds_194c",
+  "due_payments",
+];
+
+/** Kinds that are only central (they never take a Project). */
+export const CENTRAL_ONLY_KINDS: readonly ReportKind[] = [
+  "account_ledger",
+  "tds_194c",
 ];
 
 export function canBeCentral(kind: ReportKind): boolean {
@@ -183,11 +311,18 @@ export function checkReportScope(
       "REPORT_PROJECT_REQUIRED",
       "Choose a Project for this report.",
     );
+  if (projectId != null && CENTRAL_ONLY_KINDS.includes(kind))
+    throw new DomainError(
+      "REPORT_CENTRAL_ONLY",
+      "This report covers the whole Company; request it without a Project.",
+    );
 }
 
 /** Reports that are about money; refused without Financial. */
 export function isMoneyReport(kind: ReportKind): boolean {
-  return kind === "labour_payment" || kind === "muster_roll";
+  return (
+    kind === "labour_payment" || kind === "muster_roll" || isFinanceReport(kind)
+  );
 }
 
 /**
@@ -219,6 +354,10 @@ export function reportFileName(params: ReportParams): string {
       return `${slug}-${params.month}`;
     case "daily_progress_report":
       return `${params.number.replace(/[^A-Za-z0-9._-]+/g, "-")}-${params.date}`;
+    case "tds_194c":
+      return `${slug}-fy-${params.fy}`;
+    case "due_payments":
+      return `${slug}-${params.asOn}`;
     default:
       return params.from === params.to
         ? `${slug}-${params.from}`

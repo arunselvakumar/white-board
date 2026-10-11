@@ -4,10 +4,12 @@ import { expect, waitFor, within } from "storybook/test";
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import {
   AWAITING_GRNS,
+  OTHER_PARTY_ID,
   OVERDUE_INVOICE,
   partyMoneyHandler,
   PROJECT_ID,
   READ_ONLY_ACCESS,
+  SALES_INVOICE,
   TODAY,
 } from "./party-fixtures";
 import { PartyMoneyTab } from "./party-money-tab";
@@ -188,5 +190,63 @@ export const ReadOnly: Story = {
       canvas.queryByRole("link", { name: "Record payment" }),
     ).toBeNull();
     await expect(canvas.queryByRole("link", { name: /^Pay / })).toBeNull();
+  },
+};
+
+/**
+ * Other Parties (CM-708): bills and sales per party, a sales invoice
+ * numbered on save, and the Settlements view.
+ */
+export const OtherPartiesSalesInvoice: Story = {
+  args: { partyType: "other_party" },
+  beforeEach: () => {
+    api = mockApi(
+      partyMoneyHandler((call) =>
+        call.method === "POST" &&
+        call.path === "/api/construction/finance/invoices"
+          ? Response.json(SALES_INVOICE, { status: 201 })
+          : undefined,
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const balances = within(
+      await canvas.findByRole("list", { name: "Other Party balances" }),
+    );
+    await expect(balances.getAllByText("Sales")[0]).toBeVisible();
+    await expect(balances.getByText("₹25,000.00")).toBeVisible();
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "New invoice" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(await body.findByRole("dialog"));
+    await userEvent.click(
+      dialog.getByRole("combobox", { name: "Other Party" }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Kumaran Consultants" }),
+    );
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Sales (to party)" }),
+    );
+    await expect(dialog.getByText("Numbered on save (INV)")).toBeVisible();
+    await expect(dialog.queryByLabelText("Invoice number")).toBeNull();
+    await userEvent.type(dialog.getByLabelText("Amount"), "25000");
+    await userEvent.click(dialog.getByRole("button", { name: "Save invoice" }));
+    await waitFor(() =>
+      expect(posted("/api/construction/finance/invoices")).toMatchObject({
+        partyType: "other_party",
+        partyId: OTHER_PARTY_ID,
+        direction: "receivable",
+        invoiceNumber: null,
+        amount: 25_000_00,
+      }),
+    );
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    await userEvent.click(canvas.getByRole("tab", { name: "Settlements" }));
+    await expect(
+      await canvas.findByRole("list", { name: "Settlements" }),
+    ).toBeVisible();
   },
 };

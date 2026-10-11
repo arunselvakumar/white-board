@@ -619,7 +619,11 @@ export const prismaPartyStore: PartyStore = {
         workspaceId: filter.workspaceId,
         deletedAt: null,
         ...(filter.status == null ? {} : { approvalStatus: filter.status }),
-        invoice: { deletedAt: null, OR: placeFilter },
+        invoice: {
+          deletedAt: null,
+          OR: placeFilter,
+          ...(filter.partyType == null ? {} : { partyType: filter.partyType }),
+        },
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 500,
@@ -1007,6 +1011,25 @@ export const prismaPartyStore: PartyStore = {
           AND entry_date < ${date}::date`,
     );
     return rows[0]?.amount ?? 0n;
+  },
+
+  async balancesByProject(db, workspaceId, partyType, projectIds) {
+    if (projectIds?.length === 0) return [];
+    const scope =
+      projectIds == null
+        ? Prisma.sql`project_id IS NOT NULL`
+        : Prisma.sql`project_id = ANY(${[...projectIds]}::uuid[])`;
+    return db.$queryRaw<
+      { partyId: string; projectId: string; amount: bigint }[]
+    >(
+      Prisma.sql`SELECT party_id::text AS "partyId", project_id::text AS "projectId",
+          SUM(amount)::bigint AS amount
+        FROM construction_finance.party_entries
+        WHERE workspace_id = ${workspaceId}
+          AND party_type = ${partyTypeSql(partyType)}
+          AND ${scope}
+        GROUP BY party_id, project_id`,
+    );
   },
 
   async overdueByParty(db, workspaceId, partyType, place, today) {

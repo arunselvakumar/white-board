@@ -34,6 +34,7 @@ import type {
   ConstructionFinanceSettlementResponse,
   ListConstructionFinanceSettlementsResponse,
 } from "@/app/api/construction/finance/settlements/settlement-models";
+import type { ListConstructionFinanceWorkspacePartyBalancesResponse } from "@/app/api/construction/finance/party-balances/party-balance-workspace-models";
 import type { GetConstructionFinanceTdsLedgerResponse } from "@/app/api/construction/finance/tds/tds-models";
 
 import { FINANCE_API, FINANCE_KEY } from "./finance-access";
@@ -60,6 +61,8 @@ export type PartyStatement = GetConstructionFinancePartyStatementResponse;
 export type PartyOpening = ConstructionFinancePartyOpeningResponse;
 export type Settlement = ConstructionFinanceSettlementResponse;
 export type TdsLedger = GetConstructionFinanceTdsLedgerResponse;
+export type WorkspacePartyBalances =
+  ListConstructionFinanceWorkspacePartyBalancesResponse;
 export type TdsSuggestion = SuggestConstructionFinanceTdsResponse;
 export type CreateInvoiceInput = CreateConstructionFinanceInvoiceRequestModel;
 export type UpdateInvoiceInput = UpdateConstructionFinanceInvoiceRequestModel;
@@ -239,6 +242,7 @@ export function partyOpeningsQuery(projectId: string, partyType: PartyType) {
 export function settlementsQuery(filters: {
   status?: "pending" | "approved" | "rejected";
   projectId?: string;
+  partyType?: PartyType;
 }) {
   const query = search(filters);
   return queryOptions({
@@ -246,6 +250,19 @@ export function settlementsQuery(filters: {
     queryFn: () =>
       apiJson<ListConstructionFinanceSettlementsResponse>(
         `${FINANCE_API}/settlements?${query}`,
+      ),
+  });
+}
+
+/** Workspace → Party Balance: each party across the Projects in scope (CM-708). */
+export function workspacePartyBalancesQuery(
+  partyType: PartyType = "other_party",
+) {
+  return queryOptions({
+    queryKey: [...FINANCE_PARTIES_KEY, "workspace-balances", partyType],
+    queryFn: () =>
+      apiJson<WorkspacePartyBalances>(
+        `${FINANCE_API}/party-balances?partyType=${partyType}`,
       ),
   });
 }
@@ -327,6 +344,28 @@ export function useDecideSettlement() {
         : postJson<Settlement>(`/settlements/${input.id}/reject`, {
             reason: input.reason,
           }),
+    onSuccess: invalidate,
+  });
+}
+
+/** Approve or reject settlements all or none (409 `BULK_DECISION_REFUSED`). */
+export function useBulkDecideSettlements() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: (
+      input:
+        | { ids: string[]; approve: true }
+        | { ids: string[]; approve: false; reason: string },
+    ) =>
+      input.approve
+        ? postJson<ListConstructionFinanceSettlementsResponse>(
+            "/settlements/bulk-approve",
+            { ids: input.ids },
+          )
+        : postJson<ListConstructionFinanceSettlementsResponse>(
+            "/settlements/bulk-reject",
+            { ids: input.ids, reason: input.reason },
+          ),
     onSuccess: invalidate,
   });
 }

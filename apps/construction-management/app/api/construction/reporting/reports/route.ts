@@ -1,7 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
-import { requireAccess } from "@/app/api/_lib/require-access";
+import { jsonError } from "@/app/api/_lib/json-error";
+import {
+  requireAccess,
+  type AccessSession,
+} from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import {
   isMoneyReport,
@@ -11,6 +15,9 @@ import {
 
 import {
   canSeeMoney,
+  ledgerRefusal,
+  mayOpen,
+  pettyCashAccountScope,
   permissionDenied,
   REPORT_MENU,
   reportableKinds,
@@ -29,6 +36,7 @@ export const dynamic = "force-dynamic";
 function paramsOf(
   model: RequestConstructionReportingReportRequestModel,
   projectIds: string[] | null,
+  pettyCashAccounts: string[] | null,
 ): ReportParams {
   switch (model.kind) {
     case "labour_attendance":
@@ -65,7 +73,68 @@ function paramsOf(
     case "equipment_maintenance":
     case "equipment_transfers":
       return { kind: model.kind, from: model.params.from, to: model.params.to };
+    // Finance reports (CM-709).
+    case "account_ledger":
+      return {
+        kind: model.kind,
+        accountId: model.params.accountId,
+        from: model.params.from,
+        to: model.params.to,
+        categoryId: model.params.categoryId ?? null,
+        mode: model.params.mode ?? null,
+        module: model.params.module ?? null,
+        counterpartyKind: model.params.counterpartyKind ?? null,
+      };
+    case "petty_cash":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        accountId: model.params.accountId ?? null,
+        accountIds: pettyCashAccounts,
+      };
+    case "transactions":
+    case "other_expenses":
+      return { kind: model.kind, from: model.params.from, to: model.params.to };
+    case "contractor_payments":
+    case "supplier_payments":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        partyId: model.params.partyId ?? null,
+      };
+    case "tds_194c":
+      return {
+        kind: model.kind,
+        fy: model.params.fy,
+        contractorId: model.params.contractorId ?? null,
+        projectIds,
+      };
+    case "due_payments":
+      return { kind: model.kind, asOn: model.params.asOn, projectIds };
   }
+}
+
+/**
+ * The Session for a request, checked for `report` on the kind's menu and
+ * Project; the Ledger's menu depends on its account (`ledgerRefusal`).
+ */
+async function sessionFor(
+  request: Request,
+  model: RequestConstructionReportingReportRequestModel,
+): Promise<AccessSession | Response> {
+  if (model.kind === "account_ledger") {
+    const session = await requireReportSession(request);
+    if (isResponse(session)) return session;
+    return (await ledgerRefusal(session, model.params.accountId)) ?? session;
+  }
+  return requireAccess(
+    request,
+    REPORT_MENU[model.kind],
+    "report",
+    model.projectId == null ? {} : { projectId: model.projectId },
+  );
 }
 
 /**
@@ -74,7 +143,9 @@ function paramsOf(
  * with download links (or `failed` with a message). Needs `report` on the
  * kind's menu (`REPORT_MENU`) and Project; the payment report and the
  * muster roll are about money and are refused without Financial. Other
- * reports print amounts only with it.
+ * reports print amounts only with it. Finance reports (CM-709) need only
+ * Report on their finance menu; the Ledger checks its account's menu, and
+ * Petty Cash covers only the requester's account without View all.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -83,12 +154,7 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
-    const session = await requireAccess(
-      request,
-      REPORT_MENU[model.kind],
-      "report",
-      model.projectId == null ? {} : { projectId: model.projectId },
-    );
+    const session = await sessionFor(request, model);
     if (isResponse(session)) return session;
     const financial = canSeeMoney(session.access, model.kind, model.projectId);
     if (isMoneyReport(model.kind) && !financial)
@@ -100,11 +166,27 @@ export async function POST(request: Request): Promise<Response> {
       model.projectId == null && session.role !== "owner"
         ? [...session.access.projectIds]
         : null;
+    // Petty Cash: the accounts the requester may see, fixed with the job.
+    let pettyCashAccounts: string[] | null = null;
+    if (model.kind === "petty_cash") {
+      pettyCashAccounts = await pettyCashAccountScope(session);
+      const picked = model.params.accountId;
+      if (
+        picked != null &&
+        pettyCashAccounts != null &&
+        !pettyCashAccounts.includes(picked)
+      )
+        return jsonError(
+          StatusCodes.NOT_FOUND,
+          "PETTY_CASH_ACCOUNT_NOT_FOUND",
+          "There is no such petty-cash account.",
+        );
+    }
     const job = await reports.request({
       workspaceId: session.workspaceId,
       userId: session.userId,
       projectId: model.projectId,
-      params: paramsOf(model, projectIds),
+      params: paramsOf(model, projectIds, pettyCashAccounts),
       includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {
@@ -137,7 +219,9 @@ export async function GET(request: Request): Promise<Response> {
       requestedBy: projectId == null ? session.userId : undefined,
     });
     const body: ListConstructionReportingReportsResponseModel = {
-      items: jobs.map(toReportJobResponse),
+      items: jobs
+        .filter((job) => mayOpen(session, job))
+        .map(toReportJobResponse),
     };
     return Response.json(body);
   } catch (error) {

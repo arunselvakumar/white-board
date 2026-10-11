@@ -8,6 +8,7 @@ import {
   ConstructionFinancePartyRefResponseModel,
   InvoiceDirectionModel,
   Paise,
+  PartyTypeModel,
   money,
   placeResponse,
 } from "../parties/party-shared-models";
@@ -20,6 +21,8 @@ export const ListConstructionFinanceSettlementsRequestModel = z.object({
   status: Status.optional(),
   /** One Project; without it every Project the caller reads Parties on. */
   projectId: z.uuid().optional(),
+  /** Settlements of one party type's invoices. */
+  partyType: PartyTypeModel.optional(),
 });
 
 export const RejectConstructionFinanceSettlementRequestModel = z.object({
