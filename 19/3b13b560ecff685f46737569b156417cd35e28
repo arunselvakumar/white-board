@@ -1,0 +1,19 @@
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_0b536d2972a09b::t_cecbbcd6be73ad 62,720
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "193b13b560ecff685f46737569b156417cd35e28",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
