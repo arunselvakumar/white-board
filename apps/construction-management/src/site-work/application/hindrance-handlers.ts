@@ -37,6 +37,7 @@ import type {
   SiteWorkTx,
 } from "./ports";
 import type { SiteRecordBackdatedCheck } from "./site-diary-handlers";
+import { removeFromGallery } from "./gallery-index";
 
 const DOCUMENT = SITE_WORK_DOCUMENTS.hindrance;
 const MENU = DOCUMENT.menu;
@@ -462,7 +463,8 @@ export class HindranceHandlers {
         occurredAt: at,
       });
     });
-    await this.deps.media.dispatch([
+    await removeFromGallery(
+      this.deps.media,
       siteWorkDocumentMediaRemoved({
         workspaceId: access.workspaceId,
         projectId: current.projectId,
@@ -470,7 +472,7 @@ export class HindranceHandlers {
         documentId: id,
         at,
       }),
-    ]);
+    );
   }
 
   async find(workspaceId: string, id: string): Promise<StoredHindrance> {

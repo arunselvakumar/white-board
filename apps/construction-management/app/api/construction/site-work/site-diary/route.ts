@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { requestProjectId } from "@/app/api/construction/site-work/project-scope";
 import { siteDiaryActions } from "@/src/site-work/application/site-diary-handlers";
 
 import { SITE_DIARY_MENU, siteDiaryHandlers as handlers } from "./handlers";
@@ -22,16 +23,14 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const url = new URL(request.url);
-    const model = parseOrThrow(
-      ListConstructionSiteWorkSiteDiariesRequestModel.safeParse(
-        Object.fromEntries(url.searchParams),
-      ),
-    );
+    const query = Object.fromEntries(new URL(request.url).searchParams);
     const session = await requireAccess(request, SITE_DIARY_MENU, "read", {
-      projectId: model.projectId,
+      projectId: requestProjectId(query),
     });
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      ListConstructionSiteWorkSiteDiariesRequestModel.safeParse(query),
+    );
     const days = await handlers.days(
       session.workspaceId,
       model.projectId,
@@ -51,15 +50,14 @@ export async function GET(request: Request): Promise<Response> {
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const model = parseOrThrow(
-      CreateConstructionSiteWorkSiteDiaryRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
+    const raw: unknown = await request.json();
     const session = await requireAccess(request, SITE_DIARY_MENU, "create", {
-      projectId: model.projectId,
+      projectId: requestProjectId(raw),
     });
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      CreateConstructionSiteWorkSiteDiaryRequestModel.safeParse(raw),
+    );
     const id = await handlers.create(session.access, model);
     const diary = await handlers.get(session.workspaceId, id);
     return Response.json(

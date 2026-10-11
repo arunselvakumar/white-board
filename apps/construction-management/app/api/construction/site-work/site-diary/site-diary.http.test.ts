@@ -375,6 +375,10 @@ describe("Site Diary", () => {
     expect((await write(ctx, { diaryDate: addDays(TODAY, -1) })).status).toBe(
       StatusCodes.FORBIDDEN,
     );
+    // Access comes before validation: no details for a caller without it.
+    expect((await write(ctx, { weatherMorning: "snow" })).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
     const read = await json<Diary>(
       await getOne(get(`/${diary.id}`), params(diary.id)),
     );

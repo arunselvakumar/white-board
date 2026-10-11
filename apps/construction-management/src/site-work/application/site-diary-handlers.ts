@@ -23,6 +23,7 @@ import {
 import { siteWorkDocumentMediaRemoved } from "../domain/document-thread";
 import { SITE_WORK_DOCUMENTS } from "../domain/site-work-documents";
 import type { SiteRecordDirectory, SiteWorkTx } from "./ports";
+import { removeFromGallery } from "./gallery-index";
 
 const DOCUMENT = SITE_WORK_DOCUMENTS.site_diary;
 const MENU = DOCUMENT.menu;
@@ -297,7 +298,8 @@ export class SiteDiaryHandlers {
         occurredAt: at,
       });
     });
-    await this.deps.media.dispatch([
+    await removeFromGallery(
+      this.deps.media,
       siteWorkDocumentMediaRemoved({
         workspaceId: access.workspaceId,
         projectId: current.projectId,
@@ -305,7 +307,7 @@ export class SiteDiaryHandlers {
         documentId: id,
         at,
       }),
-    ]);
+    );
   }
 
   async find(workspaceId: string, id: string): Promise<StoredSiteDiary> {

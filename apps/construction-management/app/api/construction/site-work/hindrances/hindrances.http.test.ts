@@ -498,6 +498,9 @@ describe("Hindrance register", () => {
     actAs(await member(ctx, ["read"]));
     const denied = await record(ctx);
     expect(denied.status).toBe(StatusCodes.FORBIDDEN);
+    // Access comes before validation: no details for a caller without it.
+    const invalid = await record(ctx, { cause: "not-a-cause" });
+    expect(invalid.status).toBe(StatusCodes.FORBIDDEN);
     const read = await json<Hindrance>(
       await getOne(get(`/${h.id}`), params(h.id)),
     );
@@ -522,6 +525,9 @@ describe("Hindrance register", () => {
     expect((await list(get(`?projectId=${ctx.projectId}`))).status).toBe(
       StatusCodes.FORBIDDEN,
     );
+    expect(
+      (await list(get(`?projectId=${ctx.projectId}&status=bogus`))).status,
+    ).toBe(StatusCodes.FORBIDDEN);
   });
 
   it("gives the DPR the hindrances on a date", async () => {
