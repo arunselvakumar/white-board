@@ -1,0 +1,75 @@
+apps/construction-management/app/api/construction/site-work/equipment/[id]/availability/route.ts
+  s_0b536d2972a09b::t_8bbbf885e1f0e6 1-20
+apps/construction-management/app/api/construction/site-work/equipment/[id]/delete/route.ts
+  s_0b536d2972a09b::t_532f5c1187c448 1-39
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/close/route.ts
+  s_0b536d2972a09b::t_746ae71b957c05 1-24
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/delete/route.ts
+  s_0b536d2972a09b::t_7b9ef5469da848 1-19
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/update/route.ts
+  s_0b536d2972a09b::t_cd0b79a757e7ae 1-20
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/route.ts
+  s_0b536d2972a09b::t_4827dbd8155a13 1-15
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/remove/route.ts
+  s_0b536d2972a09b::t_f24795e7c86dc8 1-29
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/route.ts
+  s_0b536d2972a09b::t_1c9c2f38102566 1-68
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/thumbnail/route.ts
+  s_0b536d2972a09b::t_f9ec82b0ec32d0 1-28
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/app/route.ts
+  s_0b536d2972a09b::t_5dd3665dd946e9 1-39
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/presign/route.ts
+  s_0b536d2972a09b::t_61a8d6b4e77faa 1-30
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/route.ts
+  s_0b536d2972a09b::t_912a120deb7312 1-46
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/thumbnail/route.ts
+  s_0b536d2972a09b::t_5e0af09566b637 1-42
+apps/construction-management/app/api/construction/site-work/equipment/[id]/route.ts
+  s_0b536d2972a09b::t_b93648e9d47ff2 1-35
+apps/construction-management/app/api/construction/site-work/equipment/[id]/transfer/route.ts
+  s_0b536d2972a09b::t_adf9dc670aa7ec 1-17
+apps/construction-management/app/api/construction/site-work/equipment/[id]/update/route.ts
+  s_0b536d2972a09b::t_857b530419dea8 1-16
+apps/construction-management/app/api/construction/site-work/equipment/equipment-models.ts
+  s_0b536d2972a09b::t_9876bca2b0a2b4 1-555
+apps/construction-management/app/api/construction/site-work/equipment/equipment-openapi.ts
+  s_0b536d2972a09b::t_3bff18ba860a01 1-2,8-104,106-313
+apps/construction-management/app/api/construction/site-work/equipment/equipment.http.test.ts
+  s_0b536d2972a09b::t_14c3bfb4197b49 1-924
+apps/construction-management/app/api/construction/site-work/equipment/form-options/route.ts
+  s_0b536d2972a09b::t_f996c6c2b35de7 1-60
+apps/construction-management/app/api/construction/site-work/equipment/handlers.ts
+  s_0b536d2972a09b::t_1cd195df601108 1-166
+apps/construction-management/app/api/construction/site-work/equipment/sheet-options/route.ts
+  s_0b536d2972a09b::t_062efeefbf2c52 1-55
+apps/construction-management/src/site-work/application/equipment-handlers.ts
+  s_0b536d2972a09b::t_c6d10d6a532241 470-490
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_e90423af2eb823 1-241
+apps/construction-management/app/api/construction/site-work/equipment/route.ts
+  s_95b7ffb7dec9ad::t_a08a2d300b4109 1-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "44ea34be601561e13d981e2bb0d5672a6e312dc8",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_95b7ffb7dec9ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a507a10658e3d8c90",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
