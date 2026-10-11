@@ -1,0 +1,29 @@
+apps/construction-management/components/masters/lookup-list.stories.tsx
+  s_0b536d2972a09b::t_f6d3a1b68e9648 86-90,97,115-116
+apps/construction-management/components/masters/lookup-list.tsx
+  s_0b536d2972a09b::t_4811259a2c2a48 21,107-113,121,123
+apps/construction-management/components/masters/lookup-name-dialog.stories.tsx
+  s_0b536d2972a09b::t_0eb8639eba0907 82-136,174,185
+apps/construction-management/components/masters/lookup-name-dialog.tsx
+  s_0b536d2972a09b::t_47311de9e5ada1 4,17-23,30,34-43,60,62-63,74,80,83,87,89,117-119,131-132,135-142,145-181
+apps/construction-management/components/masters/lookup-screens.ts
+  s_0b536d2972a09b::t_8c2ce030b4e8bb 18-22,25-30,45
+apps/construction-management/components/masters/masters-story-support.tsx
+  s_0b536d2972a09b::t_378179b17788fc 23-28,112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f40f4357981dcb461dc24d978cbf7f3f7558d721",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
