@@ -1,0 +1,37 @@
+apps/construction-management/src/finance/application/account-handlers.ts
+  s_d85efaaff765fa::t_bed7aa65be56a3 35-38
+apps/construction-management/src/finance/application/transaction-common.ts
+  s_d85efaaff765fa::t_1f613536e7bde3 1-299
+apps/construction-management/src/finance/application/transaction-handlers.ts
+  s_d85efaaff765fa::t_a4b123124d5ba3 1-756
+apps/construction-management/src/finance/application/transaction-import.ts
+  s_d85efaaff765fa::t_df9e85e21aa7d2 1-269
+apps/construction-management/src/finance/application/transaction-register.ts
+  s_d85efaaff765fa::t_1791188c6eda02 1-188
+apps/construction-management/src/finance/application/transfer-handlers.ts
+  s_d85efaaff765fa::t_74974510daec94 1-650
+apps/construction-management/src/finance/infrastructure/transaction-register-store.ts
+  s_d85efaaff765fa::t_9f9cff41b2ea8c 1-176
+apps/construction-management/src/finance/infrastructure/transaction-store.ts
+  s_d85efaaff765fa::t_ef363fc4be616a 1-211
+apps/construction-management/src/finance/infrastructure/transaction-workbook.ts
+  s_d85efaaff765fa::t_801b26bffc64bf 1-188
+apps/construction-management/src/finance/infrastructure/transfer-store.ts
+  s_d85efaaff765fa::t_26d863a3de4c3e 1-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a4afab429879540f37f243fcc008d7f8916ee683",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
