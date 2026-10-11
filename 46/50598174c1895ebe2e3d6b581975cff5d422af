@@ -1,0 +1,31 @@
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_d85efaaff765fa::t_ec793529590c8e 54
+apps/construction-management/components/finance/accounts/account-list-fixtures.ts
+  s_d85efaaff765fa::t_3e5a460097b0c4 153,162-163,165
+apps/construction-management/components/finance/transactions/transaction-fixtures.ts
+  s_d85efaaff765fa::t_995df87939c337 236-237,240,245,312-314,326-327
+apps/construction-management/components/finance/transactions/transaction-form.tsx
+  s_d85efaaff765fa::t_245ab5bed6f404 212,427
+apps/construction-management/components/finance/transactions/transactions-page.stories.tsx
+  s_d85efaaff765fa::t_c995b7f1f4b617 111-113,117-119
+apps/construction-management/src/finance/application/transaction-common.ts
+  s_d85efaaff765fa::t_3b776fe48344e1 160
+apps/construction-management/src/finance/application/transaction-import.test.ts
+  s_d85efaaff765fa::t_9ec70eb1c95433 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4650598174c1895ebe2e3d6b581975cff5d422af",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
