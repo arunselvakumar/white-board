@@ -1,0 +1,49 @@
+apps/construction-management/src/composition/finance-directory.ts
+  s_d85efaaff765fa::t_1760f0a9802e06 304-316
+apps/construction-management/src/finance/application/goods-receipt-invoices.ts
+  s_d85efaaff765fa::t_dbca69a0519271 1-314
+apps/construction-management/src/finance/application/party-payment-handlers.ts
+  s_d85efaaff765fa::t_9fda984aa78a62 1-861
+apps/construction-management/src/finance/application/party-queries.ts
+  s_d85efaaff765fa::t_05e1b10f3598f1 1-406
+apps/construction-management/src/finance/application/ports.ts
+  s_d85efaaff765fa::t_83713f2947831e 148-153
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_d85efaaff765fa::t_fbf08f80f7b970 1-430
+apps/construction-management/src/finance/infrastructure/party-backdated.ts
+  s_d85efaaff765fa::t_3936ada2ee0d05 1-49
+apps/construction-management/src/finance/infrastructure/party-finance-factory.ts
+  s_d85efaaff765fa::t_194435ef0fb1d1 1-55
+apps/construction-management/src/finance/infrastructure/tds-rate-store.ts
+  s_d85efaaff765fa::t_999cbdc52d6276 1-20
+apps/construction-management/src/finance/application/invoice-handlers.ts
+  s_15cc27c8b260e0::t_5a04d14390203e 1-742
+apps/construction-management/src/finance/application/party-common.ts
+  s_15cc27c8b260e0::t_8e706b99100b5b 1-180
+apps/construction-management/src/finance/application/party-opening-handlers.ts
+  s_15cc27c8b260e0::t_1a9d43adde61b6 1-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "850c9e332cc3c5a518278f46614ec7f598c1ebbe",
+  "prompts": {},
+  "sessions": {
+    "s_15cc27c8b260e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2e56abce7eac96f5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
