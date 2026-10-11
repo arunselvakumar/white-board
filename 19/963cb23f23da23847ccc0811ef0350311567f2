@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/hrms/salaries/calculate-advance/route.ts
+  s_d85efaaff765fa::t_423011b9c6f5e2 20-21,41
+apps/construction-management/app/api/construction/hrms/salaries/mark-paid/route.ts
+  s_d85efaaff765fa::t_0b9e395224e2cd 16-19,38
+apps/construction-management/app/api/construction/hrms/salaries/salaries.http.test.ts
+  s_d85efaaff765fa::t_064223ea9a8fd6 10,332,354-371,377-389,391-407,467,486,488-491
+apps/construction-management/app/api/construction/hrms/salaries/salary-models.ts
+  s_d85efaaff765fa::t_f1e4f64e2e0b14 132-137,262-267,291-296
+apps/construction-management/app/api/construction/hrms/salaries/salary-route.ts
+  s_d85efaaff765fa::t_cb31b85627422b 1,4-10
+apps/construction-management/components/hrms/salary/my-salary-page.stories.tsx
+  s_d85efaaff765fa::t_860696f08df8ad 15-20
+apps/construction-management/components/hrms/salary/salary-dialogs.tsx
+  s_d85efaaff765fa::t_d5a2bc18e80152 4,29,45-81,121,128-132,163-164,187-193,196,203,218,245-257,314,379,385,402,422,528-540
+apps/construction-management/components/hrms/salary/salary-story-support.ts
+  s_d85efaaff765fa::t_6feb419e889095 2,111-116,133-138,207-209
+apps/construction-management/components/hrms/salary/team-salary-page.stories.tsx
+  s_d85efaaff765fa::t_2d07f125cdef2e 140-144,165,170-210,236-240,258
+apps/construction-management/src/hrms/application/salary-run-handlers.test.ts
+  s_d85efaaff765fa::t_222593f18d061c 378,401,429,519,533,540-544,678
+apps/construction-management/src/hrms/application/salary-run-handlers.ts
+  s_d85efaaff765fa::t_aec41e4cc3419a 29,837-838,851-855,860-867,900-901,926,943-944
+apps/construction-management/src/hrms/application/salary-run-ports.ts
+  s_d85efaaff765fa::t_6b93d26ff644a0 147-156,234-240,245-247,259-261
+apps/construction-management/src/hrms/domain/salary-slip.test.ts
+  s_d85efaaff765fa::t_a3ceea7ab53802 116-121
+apps/construction-management/src/hrms/domain/salary-slip.ts
+  s_d85efaaff765fa::t_8c931561e25438 120-124,160-165,170,175,179-190,215,253
+apps/construction-management/src/hrms/infrastructure/create-salary-run-handlers.ts
+  s_d85efaaff765fa::t_895c22133b9168 3-6,33-34,39
+apps/construction-management/src/hrms/infrastructure/prisma-salary-run-store.ts
+  s_d85efaaff765fa::t_34f9bdfe6ae123 3-6,23,92,214-218,681-682,687-690,709,721-741,759-760,766-768,806,848-866
+apps/construction-management/src/queries/hrms-salary.ts
+  s_d85efaaff765fa::t_2393e020455576 15,93-94,105,143,154,164-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "19963cb23f23da23847ccc0811ef0350311567f2",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
