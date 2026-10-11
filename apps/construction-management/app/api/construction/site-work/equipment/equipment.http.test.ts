@@ -496,6 +496,70 @@ describe("Equipment register (CM-603)", () => {
       (await photo(get(`/${added.id}/photo`), params(added.id))).status,
     ).toBe(StatusCodes.NOT_FOUND);
   });
+
+  it("keeps each Company's equipment to itself", async () => {
+    const ctx = await setup();
+    const added = await equipmentAdd(
+      ctx.owner,
+      equipmentOwnedInput({
+        projectId: ctx.tower,
+        placedOn: addDays(TODAY, -5),
+      }),
+    );
+    const logged = await equipmentLogMaintenance(ctx.owner, added, {
+      startDate: addDays(TODAY, -1),
+    });
+    const entryId = logged.openMaintenance?.id ?? "";
+
+    // Another Company's owner, with full rights in their own Company.
+    const other = await setup();
+    const hidden = async (response: Response) => {
+      expect(await error(response)).toMatchObject({
+        status: StatusCodes.NOT_FOUND,
+        code: "EQUIPMENT_NOT_FOUND",
+      });
+    };
+    await hidden(await getOne(get(`/${added.id}`), params(added.id)));
+    await hidden(
+      await update(
+        post(`/${added.id}/update`, {
+          ...equipmentOwnedInput({ equipmentNumber: "XC-01" }),
+          expectedUpdatedAt: logged.updatedAt,
+        }),
+        params(added.id),
+      ),
+    );
+    await hidden(
+      await transfer(
+        post(`/${added.id}/transfer`, {
+          expectedUpdatedAt: logged.updatedAt,
+          kind: "to_project",
+          toProjectId: other.tower,
+          movementDate: TODAY,
+          locationName: "Yard",
+        }),
+        params(added.id),
+      ),
+    );
+    await hidden(
+      await updateMaintenance(
+        post(`/${added.id}/maintenance/${entryId}/update`, {
+          expectedUpdatedAt: logged.updatedAt,
+          kind: "repair",
+          startDate: addDays(TODAY, -1),
+          workshop: "Elsewhere",
+        }),
+        entryParams(added.id, entryId),
+      ),
+    );
+    await hidden(await photo(get(`/${added.id}/photo`), params(added.id)));
+    // Nothing changed in the first Company.
+    actAs(ctx.owner);
+    expect(await detail(added.id)).toMatchObject({
+      updatedAt: logged.updatedAt,
+      currentProject: { id: ctx.tower },
+    });
+  });
 });
 
 describe("Equipment lifecycle (CM-605)", () => {
