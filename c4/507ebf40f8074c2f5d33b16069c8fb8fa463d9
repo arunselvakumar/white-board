@@ -1,0 +1,19 @@
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-form.stories.tsx
+  s_0b536d2972a09b::t_76bc22ff51443a 403-404,406-407
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c4507ebf40f8074c2f5d33b16069c8fb8fa463d9",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
