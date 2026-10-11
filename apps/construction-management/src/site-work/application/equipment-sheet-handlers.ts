@@ -57,6 +57,7 @@ import {
 } from "../domain/equipment-usage";
 import type {
   EquipmentFuelOverrun,
+  EquipmentHireAccrualVoided,
   EquipmentHireAccrued,
 } from "../domain/events";
 import type { SheetApprovalStatus } from "../domain/shift";
@@ -723,6 +724,26 @@ export class EquipmentSheetHandlers {
     return events;
   }
 
+  /** Voids an accrual the sheet raised before (CM-0016 §12; M7 payables). */
+  private hireVoided(
+    sheet: {
+      id: string;
+      workspaceId: string;
+      projectId: string;
+      equipmentId: string;
+    },
+    at: Date,
+  ): DomainEvent {
+    return {
+      type: "EquipmentHireAccrualVoided",
+      workspaceId: sheet.workspaceId,
+      occurredAt: at,
+      sheetId: sheet.id,
+      equipmentId: sheet.equipmentId,
+      projectId: sheet.projectId,
+    } satisfies EquipmentHireAccrualVoided as DomainEvent;
+  }
+
   private async dispatch(events: readonly DomainEvent[]) {
     if (events.length > 0) await this.deps.events.dispatch(events);
   }
@@ -972,12 +993,16 @@ export class EquipmentSheetHandlers {
       return posted;
     });
     await stock.dispatch(events);
-    await this.dispatch(
-      this.sheetEvents({ ...current, ...row, approval }, equipment, at, {
+    const voided =
+      accruesHire(current.ownership, current.approval.status) &&
+      !accruesHire(current.ownership, approval.status);
+    await this.dispatch([
+      ...(voided ? [this.hireVoided(current, at)] : []),
+      ...this.sheetEvents({ ...current, ...row, approval }, equipment, at, {
         saved: true,
         approvedBy: approval.status === "approved" ? access.userId : null,
       }),
-    );
+    ]);
   }
 
   /** Deletes a sheet: a tombstone, and its stock postings reversed. */
@@ -1023,6 +1048,8 @@ export class EquipmentSheetHandlers {
         at,
       }),
     ]);
+    if (accruesHire(current.ownership, current.approval.status))
+      await this.dispatch([this.hireVoided(current, at)]);
   }
 
   /** Approve or reject one (409 `EQUIPMENT_SHEET_NOT_PENDING` when not pending). */

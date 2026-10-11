@@ -660,9 +660,39 @@ describe("Equipment Usage sheets (CM-604)", () => {
       post(`${BASE}/${rented.id}/approve`, {}),
       params(rented.id),
     );
-    expect((await json<Sheet>(approved)).approvalStatus).toBe("approved");
+    const approvedSheet = await json<Sheet>(approved);
+    expect(approvedSheet.approvalStatus).toBe("approved");
     expect(dispatched(spy, "EquipmentHireAccrued")).toHaveLength(1);
     expect(dispatched(spy, "document.approved")).toHaveLength(1);
+    // Editing an approved rented sheet sends it back to pending: the
+    // accrual is voided until it is approved again; deleting voids it too.
+    const backToPending = await json<Sheet>(
+      await edit(ctx, approvedSheet, ctx.excavator, {
+        timeShifts: [],
+        openingReading: "10",
+        closingReading: "19",
+      }),
+    );
+    expect(backToPending.approvalStatus).toBe("pending");
+    expect(dispatched(spy, "EquipmentHireAccrualVoided")).toHaveLength(1);
+    expect(dispatched(spy, "EquipmentHireAccrued")).toHaveLength(1);
+    const reapproved = await json<Sheet>(
+      await approve(
+        post(`${BASE}/${rented.id}/approve`, {}),
+        params(rented.id),
+      ),
+    );
+    expect(
+      (
+        await remove(
+          post(`${BASE}/${rented.id}/delete`, {
+            expectedUpdatedAt: reapproved.updatedAt,
+          }),
+          params(rented.id),
+        )
+      ).status,
+    ).toBe(StatusCodes.NO_CONTENT);
+    expect(dispatched(spy, "EquipmentHireAccrualVoided")).toHaveLength(2);
 
     const owned = await saved(ctx, ctx.jcb);
     const noReason = await reject(
@@ -895,6 +925,19 @@ describe("Equipment Usage sheets (CM-604)", () => {
       departmentId: department,
     });
     expect((await refusal(departmentAlone)).code).toBe("CONTRACTOR_REQUIRED");
+
+    // The Contractor leaves the Project: the old sheet still saves with it.
+    await prisma.constructionMastersContractorProject.deleteMany({
+      where: { contractorId: contractor, projectId: ctx.projectId },
+    });
+    const kept = await edit(ctx, sheet, ctx.jcb, {
+      supervisorUserId: supervisor.userId,
+      contractorId: contractor,
+      departmentId: department,
+      remark: "Trench backfill",
+    });
+    expect(kept.status, await kept.clone().text()).toBe(StatusCodes.OK);
+    expect((await json<Sheet>(kept)).contractor?.id).toBe(contractor);
   });
 
   it("saves the settings; hidden fields are neither validated nor stored", async () => {

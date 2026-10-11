@@ -1,3 +1,5 @@
+import { todayIn, type CalendarDate } from "@/src/shared-kernel/calendar-date";
+
 import { buildLabourAttendanceReport } from "../domain/labour-attendance-report";
 import { buildMonthWiseLabourReport } from "../domain/labour-month-report";
 import { buildLabourPaymentReport } from "../domain/labour-payment-report";
@@ -46,6 +48,7 @@ function periodLabel(job: ReportJob): string {
 async function bodyFor(
   job: ReportJob,
   source: ReportSource,
+  today: CalendarDate,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -103,10 +106,19 @@ async function bodyFor(
     case "rented_equipment_usage":
     case "equipment_maintenance":
     case "equipment_transfers":
-      return siteWorkReportBody(job, params, source);
+      return siteWorkReportBody(job, params, source, today);
     case "daily_progress_report":
       // A PDF of its own, not a table report (`createReportExecutor`).
       throw new Error("The Daily Progress Report is not a table report.");
+  }
+}
+
+/** The calendar date of `now` in the Company's time zone (India if unknown). */
+function companyDate(timeZone: string, now: Date): CalendarDate {
+  try {
+    return todayIn(timeZone, now);
+  } catch {
+    return todayIn("Asia/Kolkata", now);
   }
 }
 
@@ -120,7 +132,7 @@ export async function buildReportDocument(
     job.workspaceId,
     job.projectId,
   );
-  const body = await bodyFor(job, source);
+  const body = await bodyFor(job, source, companyDate(facts.timezone, now));
   return {
     header: {
       company: facts.companyName,

@@ -7,8 +7,7 @@ import {
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import {
   locationLabel,
-  locationRef,
-  type LocationRef,
+  storedLocationRef,
   type LocationType,
 } from "@/src/shared-kernel/location-ref";
 
@@ -30,16 +29,6 @@ const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
   common_development: "Common Development",
   location: "Location",
 };
-
-/** A stored `site_location` as a LocationRef; null when absent or unreadable. */
-function storedRef(value: unknown): LocationRef | null {
-  if (value == null || typeof value !== "object") return null;
-  try {
-    return locationRef(value);
-  } catch {
-    return null;
-  }
-}
 
 function decimal(value: Prisma.Decimal | null): number | null {
   return value == null ? null : Number(value.toString());
@@ -109,7 +98,7 @@ export function prismaSiteWorkReportSource(
     workspaceId: string,
     stored: readonly unknown[],
   ): Promise<(value: unknown) => { type: string; label: string } | null> {
-    const refs = stored.map(storedRef);
+    const refs = stored.map(storedLocationRef);
     const ids = {
       wings: new Set<string>(),
       floors: new Set<string>(),
@@ -181,7 +170,7 @@ export function prismaSiteWorkReportSource(
     const named = (map: Map<string, string>, id: string) =>
       map.get(id) ?? "Removed";
     return (value) => {
-      const ref = storedRef(value);
+      const ref = storedLocationRef(value);
       if (ref == null) return null;
       const label =
         ref.type === "wing"

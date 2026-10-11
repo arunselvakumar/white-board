@@ -107,5 +107,14 @@ export function toEquipmentUsageDashboardResponse(
   summary: EquipmentUsageSummary,
   financial: boolean,
 ): GetConstructionSiteWorkEquipmentUsageDashboardResponseModel {
-  return { ...summary, hireCost: financial ? summary.hireCost : null };
+  return {
+    sheets: summary.sheets,
+    hours: summary.hours,
+    km: summary.km,
+    trips: summary.trips,
+    fuelOverruns: summary.fuelOverruns,
+    hireCost: financial ? summary.hireCost : null,
+    topEquipment: summary.topEquipment,
+    ownership: summary.ownership,
+  };
 }

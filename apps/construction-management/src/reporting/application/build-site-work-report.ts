@@ -1,3 +1,5 @@
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
+
 import { buildDailyWorkReport } from "../domain/daily-work-report";
 import {
   buildEquipmentMaintenanceReport,
@@ -32,6 +34,8 @@ export async function siteWorkReportBody(
   job: ReportJob,
   params: SiteWorkReportParams,
   source: SiteWorkReportSource,
+  /** The Company's today (open maintenance is not counted past it). */
+  today: CalendarDate,
 ): Promise<ReportBody> {
   const range = { from: params.from, to: params.to };
   const projectId = job.projectId ?? "";
@@ -70,6 +74,7 @@ export async function siteWorkReportBody(
       return buildEquipmentMaintenanceReport({
         range,
         entries,
+        today,
         financial: job.includesMoney,
         central: job.projectId == null,
       });

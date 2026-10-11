@@ -271,6 +271,14 @@ const SERVICE: ReportMaintenanceEntry = {
 describe("equipment maintenance and transfer reports", () => {
   it("counts days with both ends and an open entry to the period's end", () => {
     expect(maintenanceDays(SERVICE, "2026-09-30")).toBe(3);
+    // A period ending in the future counts an open entry only to today.
+    expect(
+      maintenanceDays(
+        { startDate: "2026-10-05", endDate: null },
+        "2026-10-31",
+        "2026-10-11",
+      ),
+    ).toBe(7);
     expect(
       maintenanceDays({ startDate: "2026-09-28", endDate: null }, "2026-09-30"),
     ).toBe(3);
@@ -279,6 +287,7 @@ describe("equipment maintenance and transfer reports", () => {
   it("central: a Project column, In maintenance for open entries, cost with Financial", () => {
     const body = buildEquipmentMaintenanceReport({
       range: { from: "2026-09-01", to: "2026-09-30" },
+      today: "2026-10-11",
       entries: [
         {
           ...SERVICE,
@@ -317,6 +326,7 @@ describe("equipment maintenance and transfer reports", () => {
   it("from a Project without Financial: no Project or Cost column", () => {
     const body = buildEquipmentMaintenanceReport({
       range: { from: "2026-09-01", to: "2026-09-30" },
+      today: "2026-10-11",
       entries: [SERVICE],
       financial: false,
       central: false,

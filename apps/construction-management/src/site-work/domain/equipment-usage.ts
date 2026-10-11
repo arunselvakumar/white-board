@@ -751,7 +751,8 @@ export function equipmentSheetContent(
       throw invalid("CONTRACTOR_NOT_FOUND", "This Contractor was not found.", {
         field: "contractorId",
       });
-    if (!contractor.onProject)
+    // A saved Contractor that has since left the Project stays on the sheet.
+    if (!contractor.onProject && !same)
       throw invalid(
         "CONTRACTOR_NOT_ON_PROJECT",
         "This Contractor is not assigned to the Project. Add them under Resources first.",

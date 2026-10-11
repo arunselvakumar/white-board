@@ -24,6 +24,17 @@ export type EquipmentHireAccrued = DomainEvent & {
   hireCost: bigint;
 };
 
+/**
+ * An earlier `EquipmentHireAccrued` no longer stands: the sheet was deleted,
+ * or edited back to pending. A listener drops its accrual for `sheetId`.
+ */
+export type EquipmentHireAccrualVoided = DomainEvent & {
+  type: "EquipmentHireAccrualVoided";
+  sheetId: string;
+  equipmentId: string;
+  projectId: string;
+};
+
 /** A usage sheet's fuel ÷ usage went above the Expected Fuel Efficiency. */
 export type EquipmentFuelOverrun = DomainEvent & {
   type: "EquipmentFuelOverrun";
@@ -36,4 +47,5 @@ export type EquipmentFuelOverrun = DomainEvent & {
   expectedFuelEfficiency: string;
 };
 
-export type SiteWorkEvent = EquipmentHireAccrued | EquipmentFuelOverrun;
+export type SiteWorkEvent =
+  EquipmentHireAccrued | EquipmentHireAccrualVoided | EquipmentFuelOverrun;

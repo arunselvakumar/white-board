@@ -243,10 +243,8 @@ export function worksheetHandler(options: WorksheetApiOptions = {}) {
           path,
         );
       if (decided != null) {
-        const found =
-          items.find((item) => item.id === decided[1]) ??
-          items[0] ??
-          worksheet();
+        const found = items.find((item) => item.id === decided[1]);
+        if (found == null) return new Response(null, { status: 404 });
         const approved = decided[2] === "approve";
         const next: Worksheet = {
           ...found,

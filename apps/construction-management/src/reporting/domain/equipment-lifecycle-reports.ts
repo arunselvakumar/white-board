@@ -29,12 +29,16 @@ export type ReportMaintenanceEntry = {
   projectName: string | null;
 };
 
-/** Days in maintenance, both ends counted; an open entry runs to `until`. */
+/**
+ * Days in maintenance, both ends counted; an open entry runs to `until` or
+ * today, whichever is earlier (a period may end in the future).
+ */
 export function maintenanceDays(
   entry: Pick<ReportMaintenanceEntry, "startDate" | "endDate">,
   until: CalendarDate,
+  today: CalendarDate = until,
 ): number {
-  const end = entry.endDate ?? until;
+  const end = entry.endDate ?? (today < until ? today : until);
   return end < entry.startDate ? 0 : daysBetween(entry.startDate, end) + 1;
 }
 
@@ -49,6 +53,8 @@ export function buildEquipmentMaintenanceReport(input: {
   range: DateRange;
   entries: readonly ReportMaintenanceEntry[];
   financial: boolean;
+  /** The Company's today: an open entry is not counted past it. */
+  today: CalendarDate;
   central: boolean;
 }): ReportBody {
   const columns: ReportColumn[] = [
@@ -79,7 +85,7 @@ export function buildEquipmentMaintenanceReport(input: {
       MAINTENANCE_KIND_LABELS[entry.kind] ?? entry.kind,
       dateLabel(entry.startDate),
       entry.endDate == null ? "In maintenance" : dateLabel(entry.endDate),
-      maintenanceDays(entry, input.range.to),
+      maintenanceDays(entry, input.range.to, input.today),
       entry.workshop,
       entry.description,
     );
