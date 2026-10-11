@@ -1,0 +1,35 @@
+apps/construction-management/app/api/construction/finance/parties/party-finance-openapi.ts
+  s_d85efaaff765fa::t_f578c5a2c6a32f 63-67,129,149-159
+apps/construction-management/app/api/construction/finance/party-balances/other-parties.http.test.ts
+  s_d85efaaff765fa::t_0ccb9c50689990 1-360
+apps/construction-management/app/api/construction/finance/party-balances/party-balance-workspace-models.ts
+  s_d85efaaff765fa::t_1dc21e3d19f047 1-72
+apps/construction-management/app/api/construction/finance/party-balances/route.ts
+  s_d85efaaff765fa::t_2becd57f66e7c3 1-35
+apps/construction-management/app/api/construction/finance/settlements/settlement-models.ts
+  s_d85efaaff765fa::t_140e5a93563274 11,24-25
+apps/construction-management/src/finance/application/party-ports.ts
+  s_d85efaaff765fa::t_cae78bf1481475 277-278,607-616
+apps/construction-management/src/finance/application/party-queries.ts
+  s_d85efaaff765fa::t_ad7e327c737aea 90-105,350-456
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_d85efaaff765fa::t_cc65010c2a6768 17,334,355
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_d85efaaff765fa::t_dda985405faf25 622-626,1016-1034
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3965f4dcf646c20aaa098dd104ebcaad434cc747",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
