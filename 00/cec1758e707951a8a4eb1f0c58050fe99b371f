@@ -1,0 +1,25 @@
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_d85efaaff765fa::t_3aca7bd59c0284 29,116-119,290-294
+apps/construction-management/components/finance/parties/party-fixtures.ts
+  s_d85efaaff765fa::t_f1efbd0f0423c8 3,492-493,497-498
+apps/construction-management/components/finance/parties/party-payment-detail.tsx
+  s_d85efaaff765fa::t_a69b1e3b48c6f4 29,32,73-77,220-224
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_d85efaaff765fa::t_e423ebf6d683ca 28-29,246-247,375-378,715-722,725-729,742-745
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "00cec1758e707951a8a4eb1f0c58050fe99b371f",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
