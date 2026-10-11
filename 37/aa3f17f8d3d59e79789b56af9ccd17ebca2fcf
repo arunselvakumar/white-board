@@ -1,0 +1,22 @@
+apps/construction-management/app/api/construction/masters/material-masters.http.test.ts
+  s_0b536d2972a09b::t_719ce40102c728 799-811
+apps/construction-management/app/api/construction/masters/materials/material-routes.ts
+  s_0b536d2972a09b::t_6d6a7cd01b477c 97-99
+  s_0b536d2972a09b::t_5f9757ec90d6a4 95-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "37aa3f17f8d3d59e79789b56af9ccd17ebca2fcf",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
