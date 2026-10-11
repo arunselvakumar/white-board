@@ -1,0 +1,63 @@
+apps/construction-management/app/app/projects/[id]/payments/petty-cash/[voucherId]/edit/page.tsx
+  s_d85efaaff765fa::t_0985368d02655f 1-19
+apps/construction-management/app/app/projects/[id]/payments/petty-cash/[voucherId]/page.tsx
+  s_d85efaaff765fa::t_39977bd78ca8dc 1-19
+apps/construction-management/app/app/projects/[id]/payments/petty-cash/new/page.tsx
+  s_d85efaaff765fa::t_005a77ae0413d1 1-43
+apps/construction-management/app/app/projects/[id]/payments/petty-cash/page.tsx
+  s_d85efaaff765fa::t_b37180b27e503d 3-5,9-18
+apps/construction-management/app/app/projects/[id]/payments/petty-cash/statement/[accountId]/page.tsx
+  s_d85efaaff765fa::t_db8e2aac8d963a 1-19
+apps/construction-management/components/finance/petty-cash/account-statement.stories.tsx
+  s_d85efaaff765fa::t_fe00688dc47849 1-96
+apps/construction-management/components/finance/petty-cash/account-statement.tsx
+  s_d85efaaff765fa::t_3f2fd489665455 1-273
+apps/construction-management/components/finance/petty-cash/close-account-button.tsx
+  s_d85efaaff765fa::t_a1737e96064f6a 1-76
+apps/construction-management/components/finance/petty-cash/export-receipts-dialog.tsx
+  s_d85efaaff765fa::t_662a26c65fe5ce 1-113
+apps/construction-management/components/finance/petty-cash/open-account-dialog.tsx
+  s_d85efaaff765fa::t_b9bc0ab630c28f 1-242
+apps/construction-management/components/finance/petty-cash/petty-cash-fixtures.ts
+  s_d85efaaff765fa::t_f982fe6100ea47 1-416
+apps/construction-management/components/finance/petty-cash/petty-cash-pages.tsx
+  s_d85efaaff765fa::t_66859c115a7930 1-68
+apps/construction-management/components/finance/petty-cash/petty-cash-parts.tsx
+  s_d85efaaff765fa::t_f730f943c664dc 1-80
+apps/construction-management/components/finance/petty-cash/petty-cash-screen.stories.tsx
+  s_d85efaaff765fa::t_97ecca9de8e5df 1-277
+apps/construction-management/components/finance/petty-cash/petty-cash-screen.tsx
+  s_d85efaaff765fa::t_ddd269d6f7110a 1-285
+apps/construction-management/components/finance/petty-cash/petty-cash-vouchers.tsx
+  s_d85efaaff765fa::t_f5737befecd833 1-551
+apps/construction-management/components/finance/petty-cash/voucher-detail.stories.tsx
+  s_d85efaaff765fa::t_3043d1d0d8d67b 1-164
+apps/construction-management/components/finance/petty-cash/voucher-detail.tsx
+  s_d85efaaff765fa::t_a96904f98ea9ad 1-284
+apps/construction-management/components/finance/petty-cash/voucher-form.stories.tsx
+  s_d85efaaff765fa::t_59f944e7693f80 1-204
+apps/construction-management/components/finance/petty-cash/voucher-form.tsx
+  s_d85efaaff765fa::t_ce252fcc2d1822 1-607
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_e0ffda902ee8d5 752-766
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_78bdbd1957dcad 705
+apps/construction-management/src/queries/finance-petty-cash.ts
+  s_d85efaaff765fa::t_116eea32eff578 1-268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "14e152fbb57552b98418f916472bd47677a1d286",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
