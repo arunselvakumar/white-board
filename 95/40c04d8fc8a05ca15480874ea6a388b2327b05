@@ -1,0 +1,41 @@
+apps/construction-management/app/app/masters/bank-accounts/[accountId]/page.tsx
+  s_d85efaaff765fa::t_da0dc069a1cf36 1-20
+apps/construction-management/app/app/masters/bank-accounts/page.tsx
+  s_d85efaaff765fa::t_c9881c551ee99c 3,7,9
+apps/construction-management/components/finance/accounts/account-dialog.stories.tsx
+  s_d85efaaff765fa::t_de4f5ed289afa6 1-124
+apps/construction-management/components/finance/accounts/account-dialog.tsx
+  s_d85efaaff765fa::t_e70a7901fdfb36 1-315
+apps/construction-management/components/finance/accounts/account-format.tsx
+  s_d85efaaff765fa::t_a132550f085b50 1-36
+apps/construction-management/components/finance/accounts/account-ledger.stories.tsx
+  s_d85efaaff765fa::t_cf7dca29b83f80 1-58
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_d85efaaff765fa::t_e7f61569953650 1-329
+apps/construction-management/components/finance/accounts/account-list-fixtures.ts
+  s_d85efaaff765fa::t_717a7ce68c94e5 1-295
+apps/construction-management/components/finance/accounts/bank-accounts-list.stories.tsx
+  s_d85efaaff765fa::t_2ca07cb0c6f0c5 1-136
+apps/construction-management/components/finance/accounts/bank-accounts-list.tsx
+  s_d85efaaff765fa::t_d33004c0b9a504 1-260
+apps/construction-management/src/queries/finance-accounts.ts
+  s_d85efaaff765fa::t_a81def192f5be8 1-6,8-15,22-33,44,49-117
+apps/construction-management/src/queries/finance-transactions.ts
+  s_d85efaaff765fa::t_0f07597e536dfe 1-230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9540c04d8fc8a05ca15480874ea6a388b2327b05",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
