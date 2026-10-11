@@ -1,0 +1,75 @@
+apps/construction-management/app/api/construction/site-work/hindrances/[id]/close/route.ts
+  s_0b536d2972a09b::t_f95b6d07f77f77 1-53
+apps/construction-management/app/api/construction/site-work/hindrances/[id]/delete/route.ts
+  s_0b536d2972a09b::t_934875d8a8e323 1-45
+apps/construction-management/app/api/construction/site-work/hindrances/[id]/route.ts
+  s_0b536d2972a09b::t_408d521bd2b3d9 1-37
+apps/construction-management/app/api/construction/site-work/hindrances/[id]/update/route.ts
+  s_0b536d2972a09b::t_34b50cabea7384 1-53
+apps/construction-management/app/api/construction/site-work/hindrances/form-options/route.ts
+  s_0b536d2972a09b::t_1d5149274e2ac8 1-38
+apps/construction-management/app/api/construction/site-work/hindrances/handlers.ts
+  s_0b536d2972a09b::t_4f09a86f257c43 1-35
+apps/construction-management/app/api/construction/site-work/hindrances/hindrance-models.ts
+  s_0b536d2972a09b::t_1704b02c8bdb39 1-250
+apps/construction-management/app/api/construction/site-work/hindrances/hindrances-openapi.ts
+  s_0b536d2972a09b::t_ec358edd664f3a 1-2,8-50,52-136
+apps/construction-management/app/api/construction/site-work/hindrances/route.ts
+  s_0b536d2972a09b::t_363638a8894b1e 1-101
+apps/construction-management/app/api/construction/site-work/site-diary/[id]/delete/route.ts
+  s_0b536d2972a09b::t_adca64a6cd02b7 1-45
+apps/construction-management/app/api/construction/site-work/site-diary/[id]/route.ts
+  s_0b536d2972a09b::t_adb10d5322b3fc 1-34
+apps/construction-management/app/api/construction/site-work/site-diary/[id]/update/route.ts
+  s_0b536d2972a09b::t_e0e9ef7bc25edd 1-50
+apps/construction-management/app/api/construction/site-work/site-diary/by-date/route.ts
+  s_0b536d2972a09b::t_43300a2a52b4b1 1-44
+apps/construction-management/app/api/construction/site-work/site-diary/handlers.ts
+  s_0b536d2972a09b::t_6772926c0ed0c9 1-35
+apps/construction-management/app/api/construction/site-work/site-diary/route.ts
+  s_0b536d2972a09b::t_412973f42ffa40 1-72
+apps/construction-management/app/api/construction/site-work/site-diary/site-diary-models.ts
+  s_0b536d2972a09b::t_2bb20fc27baa5c 1-201
+apps/construction-management/src/composition/site-record-directory.ts
+  s_0b536d2972a09b::t_b5e70e37befb6a 1-85
+apps/construction-management/src/site-work/application/hindrance-handlers.ts
+  s_0b536d2972a09b::t_3aa91886454eb3 1-559
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_80d19fd9a53eb4 70-120
+apps/construction-management/src/site-work/application/site-diary-handlers.ts
+  s_0b536d2972a09b::t_08b399004e0ab4 1-368
+apps/construction-management/src/site-work/application/site-record-queries.ts
+  s_0b536d2972a09b::t_c2f600dcdbf604 1-166
+apps/construction-management/src/site-work/infrastructure/prisma-hindrance-store.ts
+  s_0b536d2972a09b::t_72b802ee4aae8a 1-300
+apps/construction-management/src/site-work/infrastructure/prisma-site-diary-store.ts
+  s_0b536d2972a09b::t_005f9408ad5566 1-251
+apps/construction-management/app/api/construction/site-work/site-diary/site-diary-openapi.ts
+  s_ed81416643e4d1::t_67c86c9960e988 1-2,8-48,50-122
+apps/construction-management/src/composition/site-records.ts
+  s_ed81416643e4d1::t_3103bc7a198019 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "85e539c4a3164052f8cff6f0c4692eff9854bcc6",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ed81416643e4d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac069b3b53eca94fa",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
