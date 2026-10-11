@@ -1,0 +1,27 @@
+apps/construction-management/src/composition/equipment-directory.ts
+  s_0b536d2972a09b::t_c91147edfff56c 1-66
+apps/construction-management/src/site-work/application/equipment-handlers.ts
+  s_0b536d2972a09b::t_0d4fc1df0e2cb8 1-1273
+apps/construction-management/src/site-work/application/equipment-photos.ts
+  s_0b536d2972a09b::t_6c06fdabfe32f8 1-287
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_5ed5d62d7d971d 70-120
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-store.ts
+  s_0b536d2972a09b::t_757b15c4de273e 1-556
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8fe81a3b11a42f8821282a314fc06c980411488b",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
