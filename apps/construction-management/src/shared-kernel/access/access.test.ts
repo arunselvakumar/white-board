@@ -59,7 +59,8 @@ describe("the menu catalogue", () => {
         ).length;
     }
     expect(counts).toEqual({
-      project_management: 114,
+      // M6 (ADR CM-0016): Reject on two menus, Site Diary (5), Hindrance Register (6).
+      project_management: 127,
       payment_accounting: 30,
       materials: 46,
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13).

@@ -125,6 +125,9 @@ enum ConstructionProcurementStockSource {
   material_transfer
   delivery_note
   stock_movement
+  /// Material lines of site-work sheets (CM-0016 §5).
+  daily_worksheet
+  equipment_usage
 
   @@map("stock_source")
   @@schema("construction_procurement")

@@ -1,11 +1,9 @@
 import type { StructureUsage } from "../domain/structure-repository";
 
 /**
- * The `StructureUsage` of M4: nothing points at floors, units, Wings or
- * Locations yet, so every answer is "not used". Daily Work (M6), Tasks,
- * Issues and Inspections (M8) and Booking (M10) replace it with a reader
- * of their own tables by id, as `PrismaProjectUsage` reads the labour
- * context's, so removing a referenced row is refused.
+ * A `StructureUsage` that answers "not used": the default for unit tests.
+ * The routes use `PrismaStructureUsage` (src/composition), which reads
+ * every site record's `LocationRef` (ADR CM-0016 §7).
  */
 export class UnusedStructure implements StructureUsage {
   usedFloorsAndUnits(): Promise<{ floorIds: string[]; unitIds: string[] }> {

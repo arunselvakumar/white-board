@@ -37,7 +37,7 @@ const DEFINITIONS = [
     "site_work.daily_worksheet",
     "Daily Worksheet",
     "project_management",
-    "CRUDAPNO",
+    "CRUDAJPNO",
     true,
   ],
   [
@@ -89,7 +89,16 @@ const DEFINITIONS = [
     "site_work.equipment_usage",
     "Equipment Usage",
     "project_management",
-    "CRUDAPNOF",
+    "CRUDAJPNOF",
+    true,
+  ],
+  // Site Diary and the Hindrance register (ADR CM-0016 §13, §14).
+  ["site_work.site_diary", "Site Diary", "project_management", "CRUDP", true],
+  [
+    "site_work.hindrances",
+    "Hindrance Register",
+    "project_management",
+    "CRUDPO",
     true,
   ],
   // Payment & Accounting.

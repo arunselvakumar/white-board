@@ -1,0 +1,669 @@
+/// Construction Management — site-work context (`modules/04`, ADR CM-0016):
+/// Daily Worksheets, the Equipment register with its movements and
+/// maintenance, Equipment Usage sheets, Site Diaries, the Hindrance register
+/// and Daily Progress Report numbers.
+///
+/// Conventions:
+/// - Money is paise in `BIGINT`; quantities are `decimal(14,3)` in the
+///   material's unit; hours are `decimal(6,2)`.
+/// - Projects, Contractors, Departments, Work Types, Materials and Team
+///   Members live in other schemas: their ids are kept without foreign keys.
+/// - A **site location** inside a Project is a `LocationRef` stored as JSON
+///   with its type copied to `site_location_type` for filters (CM-403).
+/// - Material lines copy the material's name and unit, like procurement.
+///   Each line's stock lives in `construction_procurement.stock_entries`
+///   (source `daily_worksheet` / `equipment_usage`, CM-0016 §5).
+/// - Sheet numbers come from the numbering rules (CM-114, CM-0016 §4).
+/// - Rows are soft-deleted (`deleted_at`); unique rules hold among live rows
+///   through partial indexes in the migration.
+
+enum ConstructionSiteWorkShift {
+  shift_1
+  shift_2
+  shift_3
+
+  @@map("shift")
+  @@schema("construction_site_work")
+}
+
+/// `not_required` when the Project's approval setting was off at save
+/// (CM-0016 §3).
+enum ConstructionSiteWorkApprovalStatus {
+  not_required
+  pending
+  approved
+  rejected
+
+  @@map("approval_status")
+  @@schema("construction_site_work")
+}
+
+/// The documents that carry remarks and files.
+enum ConstructionSiteWorkDocumentType {
+  worksheet
+  equipment_usage
+  site_diary
+  hindrance
+
+  @@map("document_type")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkEquipmentOwnership {
+  owned
+  rented
+
+  @@map("equipment_ownership")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkUtilisationBasis {
+  hourly
+  km
+  trip
+
+  @@map("utilisation_basis")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkWorkingTimeMethod {
+  time_shifts
+  meter_reading
+  both
+
+  @@map("working_time_method")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkTargetUnit {
+  hours_per_day
+  days_per_month
+  km_per_day
+  trips_per_day
+
+  @@map("target_unit")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkFuelType {
+  cng
+  diesel
+  petrol
+
+  @@map("fuel_type")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkFuelUnit {
+  barrel
+  gallon
+  kg
+  litre
+  unit
+
+  @@map("fuel_unit")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkHireBasis {
+  hourly
+  daily
+  monthly
+  trip
+
+  @@map("hire_basis")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkFuelBorneBy {
+  company
+  hire_party
+
+  @@map("fuel_borne_by")
+  @@schema("construction_site_work")
+}
+
+/// `added` is the first placement (a Project or the warehouse).
+enum ConstructionSiteWorkEquipmentMovementKind {
+  added
+  to_project
+  to_warehouse
+
+  @@map("equipment_movement_kind")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkMaintenanceKind {
+  breakdown
+  service
+  repair
+  other
+
+  @@map("maintenance_kind")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkWeather {
+  sunny
+  cloudy
+  light_rain
+  heavy_rain
+  windy
+  foggy
+  very_hot
+
+  @@map("weather")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkHindranceCause {
+  weather
+  material_shortage
+  labour_shortage
+  drawing_delay
+  client_decision
+  payment_delay
+  equipment_breakdown
+  power_water
+  statutory_permit
+  other
+
+  @@map("hindrance_cause")
+  @@schema("construction_site_work")
+}
+
+enum ConstructionSiteWorkResponsibleParty {
+  company
+  contractor
+  client
+  consultant
+  supplier
+  force_majeure
+
+  @@map("responsible_party")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Settings (per Project, CM-0016 §2). A Project without a row uses the
+// defaults: everything shown, approval off.
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkWorksheetSettings {
+  workspaceId        String   @map("workspace_id")
+  projectId          String   @id @map("project_id") @db.Uuid
+  showLocation       Boolean  @default(true) @map("show_location")
+  showWorkType       Boolean  @default(true) @map("show_work_type")
+  showApproxWorkDone Boolean  @default(true) @map("show_approx_work_done")
+  showLabour         Boolean  @default(true) @map("show_labour")
+  showMaterials      Boolean  @default(true) @map("show_materials")
+  showRemark         Boolean  @default(true) @map("show_remark")
+  showPhotos         Boolean  @default(true) @map("show_photos")
+  /// The four sections in display order: location, basic, materials, other.
+  sectionOrder       String[] @default(["location", "basic", "materials", "other"]) @map("section_order")
+  approvalEnabled    Boolean  @default(false) @map("approval_enabled")
+  updatedAt          DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy          String   @map("updated_by")
+
+  @@index([workspaceId])
+  @@map("worksheet_settings")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkEquipmentSheetSettings {
+  workspaceId        String   @map("workspace_id")
+  projectId          String   @id @map("project_id") @db.Uuid
+  showOperator       Boolean  @default(true) @map("show_operator")
+  showSupervisor     Boolean  @default(true) @map("show_supervisor")
+  showLocation       Boolean  @default(true) @map("show_location")
+  showApproxWorkDone Boolean  @default(true) @map("show_approx_work_done")
+  /// Legacy "Rented hour": the billable quantity override on rented sheets.
+  showBillableQty    Boolean  @default(true) @map("show_billable_qty")
+  showFuel           Boolean  @default(true) @map("show_fuel")
+  showRemarks        Boolean  @default(true) @map("show_remarks")
+  showFiles          Boolean  @default(true) @map("show_files")
+  showMaterials      Boolean  @default(true) @map("show_materials")
+  showMeterReadings  Boolean  @default(true) @map("show_meter_readings")
+  showBreakdownHours Boolean  @default(true) @map("show_breakdown_hours")
+  approvalEnabled    Boolean  @default(false) @map("approval_enabled")
+  updatedAt          DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy          String   @map("updated_by")
+
+  @@index([workspaceId])
+  @@map("equipment_sheet_settings")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Daily Worksheets (CM-602).
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkWorksheet {
+  id               String                             @id @db.Uuid
+  workspaceId      String                             @map("workspace_id")
+  projectId        String                             @map("project_id") @db.Uuid
+  number           String
+  sheetDate        DateTime                           @map("sheet_date") @db.Date
+  shift            ConstructionSiteWorkShift
+  contractorId     String                             @map("contractor_id") @db.Uuid
+  departmentId     String                             @map("department_id") @db.Uuid
+  workTypeId       String?                            @map("work_type_id") @db.Uuid
+  skilledCount     Int?                               @map("skilled_count")
+  unskilledCount   Int?                               @map("unskilled_count")
+  approxWorkQty    Decimal?                           @map("approx_work_qty") @db.Decimal(14, 3)
+  approxWorkUnitId String?                            @map("approx_work_unit_id") @db.Uuid
+  siteLocationType String?                            @map("site_location_type")
+  siteLocation     Json?                              @map("site_location")
+  remark           String?
+  approvalStatus   ConstructionSiteWorkApprovalStatus @default(not_required) @map("approval_status")
+  decidedAt        DateTime?                          @map("decided_at") @db.Timestamptz(3)
+  decidedBy        String?                            @map("decided_by")
+  rejectionReason  String?                            @map("rejection_reason")
+  duplicatedFromId String?                            @map("duplicated_from_id") @db.Uuid
+  createdAt        DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                             @map("created_by")
+  updatedBy        String                             @map("updated_by")
+  deletedAt        DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                            @map("deleted_by")
+
+  materials ConstructionSiteWorkWorksheetMaterial[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, sheetDate])
+  @@index([workspaceId, contractorId])
+  @@map("worksheets")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkWorksheetMaterial {
+  id           String  @id @db.Uuid
+  worksheetId  String  @map("worksheet_id") @db.Uuid
+  materialId   String  @map("material_id") @db.Uuid
+  materialName String  @map("material_name")
+  unitName     String  @map("unit_name")
+  quantity     Decimal @db.Decimal(14, 3)
+  remark       String?
+  sortOrder    Int     @map("sort_order")
+
+  worksheet ConstructionSiteWorkWorksheet @relation(fields: [worksheetId], references: [id], onDelete: Cascade)
+
+  @@index([worksheetId])
+  @@index([materialId])
+  @@map("worksheet_materials")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Equipment register (CM-603, CM-605). Where it is now is cached on the row
+// (`current_project_id`, null = warehouse); the history is
+// `equipment_movements`.
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkEquipment {
+  id                     String                                 @id @db.Uuid
+  workspaceId            String                                 @map("workspace_id")
+  name                   String
+  equipmentNumber        String                                 @map("equipment_number")
+  ownership              ConstructionSiteWorkEquipmentOwnership
+  purchaseYear           Int?                                   @map("purchase_year")
+  fuelType               ConstructionSiteWorkFuelType?          @map("fuel_type")
+  fuelUnit               ConstructionSiteWorkFuelUnit?          @map("fuel_unit")
+  utilisationBasis       ConstructionSiteWorkUtilisationBasis   @map("utilisation_basis")
+  workingTimeMethod      ConstructionSiteWorkWorkingTimeMethod  @map("working_time_method")
+  targetValue            Decimal?                               @map("target_value") @db.Decimal(10, 2)
+  targetUnit             ConstructionSiteWorkTargetUnit?        @map("target_unit")
+  minUtilisationPct      Decimal?                               @map("min_utilisation_pct") @db.Decimal(5, 2)
+  /// Fuel units per hour, km or trip (the utilisation basis).
+  expectedFuelEfficiency Decimal?                               @map("expected_fuel_efficiency") @db.Decimal(10, 3)
+  photoKey               String?                                @map("photo_key")
+  photoThumbKey          String?                                @map("photo_thumb_key")
+  contactPersonName      String?                                @map("contact_person_name")
+  contactPersonNumber    String?                                @map("contact_person_number")
+  companyName            String?                                @map("company_name")
+  /// Rented only: the hire party (a Contractor, CM-0016 §10).
+  hirePartyId            String?                                @map("hire_party_id") @db.Uuid
+  hireBasis              ConstructionSiteWorkHireBasis?         @map("hire_basis")
+  /// Paise per hire-basis unit.
+  hireRate               BigInt?                                @map("hire_rate")
+  /// Legacy "Chargeable": idle hours count towards an hourly hire.
+  idleChargeable         Boolean                                @default(false) @map("idle_chargeable")
+  /// Null while at the warehouse / off system.
+  currentProjectId       String?                                @map("current_project_id") @db.Uuid
+  currentLocationName    String?                                @map("current_location_name")
+  availableForEntry      Boolean                                @default(true) @map("available_for_entry")
+  unavailableSince       DateTime?                              @map("unavailable_since") @db.Date
+  createdAt              DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy              String                                 @map("created_by")
+  updatedBy              String                                 @map("updated_by")
+  deletedAt              DateTime?                              @map("deleted_at") @db.Timestamptz(3)
+  deletedBy              String?                                @map("deleted_by")
+
+  movements   ConstructionSiteWorkEquipmentMovement[]
+  maintenance ConstructionSiteWorkEquipmentMaintenance[]
+  sheets      ConstructionSiteWorkEquipmentUsageSheet[]
+
+  @@index([workspaceId, currentProjectId])
+  @@map("equipment")
+  @@schema("construction_site_work")
+}
+
+/// Append-only: one row per placement or transfer (the Transfer Report).
+model ConstructionSiteWorkEquipmentMovement {
+  id            String                                    @id @db.Uuid
+  workspaceId   String                                    @map("workspace_id")
+  equipmentId   String                                    @map("equipment_id") @db.Uuid
+  kind          ConstructionSiteWorkEquipmentMovementKind
+  movementDate  DateTime                                  @map("movement_date") @db.Date
+  fromProjectId String?                                   @map("from_project_id") @db.Uuid
+  /// Null when the equipment goes to the warehouse.
+  toProjectId   String?                                   @map("to_project_id") @db.Uuid
+  locationName  String                                    @map("location_name")
+  remark        String?
+  createdAt     DateTime                                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy     String                                    @map("created_by")
+
+  equipment ConstructionSiteWorkEquipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId, movementDate])
+  @@index([workspaceId, movementDate])
+  @@map("equipment_movements")
+  @@schema("construction_site_work")
+}
+
+/// Log Maintenance opens a row; Return to Service sets `end_date`. At most
+/// one open row per equipment (partial unique index).
+model ConstructionSiteWorkEquipmentMaintenance {
+  id          String                              @id @db.Uuid
+  workspaceId String                              @map("workspace_id")
+  equipmentId String                              @map("equipment_id") @db.Uuid
+  kind        ConstructionSiteWorkMaintenanceKind
+  startDate   DateTime                            @map("start_date") @db.Date
+  endDate     DateTime?                           @map("end_date") @db.Date
+  description String?
+  workshop    String?
+  /// Paise; shown with Financial.
+  cost        BigInt?
+  remark      String?
+  createdAt   DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                              @map("created_by")
+  updatedBy   String                              @map("updated_by")
+  deletedAt   DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                             @map("deleted_by")
+
+  equipment ConstructionSiteWorkEquipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId, startDate])
+  @@index([workspaceId, startDate])
+  @@map("equipment_maintenance")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Equipment Usage sheets (CM-604). The equipment's ownership, basis and
+// method are copied at save, so editing the register never rewrites a sheet.
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkEquipmentUsageSheet {
+  id                String                                 @id @db.Uuid
+  workspaceId       String                                 @map("workspace_id")
+  projectId         String                                 @map("project_id") @db.Uuid
+  number            String
+  sheetDate         DateTime                               @map("sheet_date") @db.Date
+  shift             ConstructionSiteWorkShift
+  equipmentId       String                                 @map("equipment_id") @db.Uuid
+  ownership         ConstructionSiteWorkEquipmentOwnership
+  utilisationBasis  ConstructionSiteWorkUtilisationBasis   @map("utilisation_basis")
+  workingTimeMethod ConstructionSiteWorkWorkingTimeMethod  @map("working_time_method")
+  operatorName      String?                                @map("operator_name")
+  supervisorUserId  String?                                @map("supervisor_user_id")
+  contractorId      String?                                @map("contractor_id") @db.Uuid
+  departmentId      String?                                @map("department_id") @db.Uuid
+  workItem          String?                                @map("work_item")
+  siteLocationType  String?                                @map("site_location_type")
+  siteLocation      Json?                                  @map("site_location")
+  usageHours        Decimal?                               @map("usage_hours") @db.Decimal(6, 2)
+  distanceKm        Decimal?                               @map("distance_km") @db.Decimal(10, 2)
+  trips             Int?
+  openingReading    Decimal?                               @map("opening_reading") @db.Decimal(12, 2)
+  closingReading    Decimal?                               @map("closing_reading") @db.Decimal(12, 2)
+  idleHours         Decimal                                @default(0) @map("idle_hours") @db.Decimal(6, 2)
+  breakdownHours    Decimal                                @default(0) @map("breakdown_hours") @db.Decimal(6, 2)
+  approxWorkQty     Decimal?                               @map("approx_work_qty") @db.Decimal(14, 3)
+  approxWorkUnitId  String?                                @map("approx_work_unit_id") @db.Uuid
+  fuelQty           Decimal?                               @map("fuel_qty") @db.Decimal(10, 3)
+  fuelBorneBy       ConstructionSiteWorkFuelBorneBy?       @map("fuel_borne_by")
+  fuelOverrun       Boolean                                @default(false) @map("fuel_overrun")
+  /// Rented only. Paise per billable unit.
+  unitRate          BigInt?                                @map("unit_rate")
+  billableQty       Decimal?                               @map("billable_qty") @db.Decimal(10, 3)
+  /// Rented only. Paise: unit rate × billable quantity, half-up.
+  hireCost          BigInt?                                @map("hire_cost")
+  remark            String?
+  approvalStatus    ConstructionSiteWorkApprovalStatus     @default(not_required) @map("approval_status")
+  decidedAt         DateTime?                              @map("decided_at") @db.Timestamptz(3)
+  decidedBy         String?                                @map("decided_by")
+  rejectionReason   String?                                @map("rejection_reason")
+  duplicatedFromId  String?                                @map("duplicated_from_id") @db.Uuid
+  createdAt         DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                                 @map("created_by")
+  updatedBy         String                                 @map("updated_by")
+  deletedAt         DateTime?                              @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                                @map("deleted_by")
+
+  equipment  ConstructionSiteWorkEquipment                @relation(fields: [equipmentId], references: [id])
+  timeShifts ConstructionSiteWorkEquipmentTimeShift[]
+  materials  ConstructionSiteWorkEquipmentUsageMaterial[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, sheetDate])
+  @@index([equipmentId, sheetDate])
+  @@map("equipment_usage_sheets")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkEquipmentTimeShift {
+  id        String @id @db.Uuid
+  sheetId   String @map("sheet_id") @db.Uuid
+  /// `HH:MM`; an end before the start crosses midnight.
+  startTime String @map("start_time") @db.Char(5)
+  endTime   String @map("end_time") @db.Char(5)
+  minutes   Int
+  sortOrder Int    @map("sort_order")
+
+  sheet ConstructionSiteWorkEquipmentUsageSheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+
+  @@index([sheetId])
+  @@map("equipment_time_shifts")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkEquipmentUsageMaterial {
+  id           String  @id @db.Uuid
+  sheetId      String  @map("sheet_id") @db.Uuid
+  materialId   String  @map("material_id") @db.Uuid
+  materialName String  @map("material_name")
+  unitName     String  @map("unit_name")
+  quantity     Decimal @db.Decimal(14, 3)
+  remark       String?
+  sortOrder    Int     @map("sort_order")
+
+  sheet ConstructionSiteWorkEquipmentUsageSheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+
+  @@index([sheetId])
+  @@index([materialId])
+  @@map("equipment_usage_materials")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Site Diary (CM-607): one per Project per date.
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkSiteDiary {
+  id               String                       @id @db.Uuid
+  workspaceId      String                       @map("workspace_id")
+  projectId        String                       @map("project_id") @db.Uuid
+  diaryDate        DateTime                     @map("diary_date") @db.Date
+  weatherMorning   ConstructionSiteWorkWeather? @map("weather_morning")
+  weatherAfternoon ConstructionSiteWorkWeather? @map("weather_afternoon")
+  rainfallMm       Decimal?                     @map("rainfall_mm") @db.Decimal(6, 1)
+  siteCondition    String?                      @map("site_condition")
+  notes            String?
+  createdAt        DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                       @map("created_by")
+  updatedBy        String                       @map("updated_by")
+  deletedAt        DateTime?                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                      @map("deleted_by")
+
+  visitors     ConstructionSiteWorkSiteDiaryVisitor[]
+  instructions ConstructionSiteWorkSiteDiaryInstruction[]
+
+  @@index([workspaceId, projectId, diaryDate])
+  @@map("site_diaries")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkSiteDiaryVisitor {
+  id           String  @id @db.Uuid
+  diaryId      String  @map("diary_id") @db.Uuid
+  name         String
+  organisation String?
+  purpose      String?
+  timeIn       String? @map("time_in") @db.Char(5)
+  timeOut      String? @map("time_out") @db.Char(5)
+  sortOrder    Int     @map("sort_order")
+
+  diary ConstructionSiteWorkSiteDiary @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+
+  @@index([diaryId])
+  @@map("site_diary_visitors")
+  @@schema("construction_site_work")
+}
+
+model ConstructionSiteWorkSiteDiaryInstruction {
+  id          String  @id @db.Uuid
+  diaryId     String  @map("diary_id") @db.Uuid
+  givenBy     String  @map("given_by")
+  givenTo     String? @map("given_to")
+  instruction String
+  actionTaken String? @map("action_taken")
+  sortOrder   Int     @map("sort_order")
+
+  diary ConstructionSiteWorkSiteDiary @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+
+  @@index([diaryId])
+  @@map("site_diary_instructions")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Hindrance register (CM-607).
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkHindrance {
+  id                    String                               @id @db.Uuid
+  workspaceId           String                               @map("workspace_id")
+  projectId             String                               @map("project_id") @db.Uuid
+  number                String
+  startDate             DateTime                             @map("start_date") @db.Date
+  /// Null while the hindrance continues.
+  endDate               DateTime?                            @map("end_date") @db.Date
+  hoursLost             Decimal?                             @map("hours_lost") @db.Decimal(8, 2)
+  cause                 ConstructionSiteWorkHindranceCause
+  affectedActivity      String                               @map("affected_activity")
+  siteLocationType      String?                              @map("site_location_type")
+  siteLocation          Json?                                @map("site_location")
+  responsibleParty      ConstructionSiteWorkResponsibleParty @map("responsible_party")
+  /// When the responsible party is a Contractor.
+  contractorId          String?                              @map("contractor_id") @db.Uuid
+  description           String?
+  /// Raised from a usage sheet's breakdown hours (CM-0016 §14).
+  equipmentUsageSheetId String?                              @map("equipment_usage_sheet_id") @db.Uuid
+  /// Joint sign-off, recorded (not an approval).
+  signOffUserId         String?                              @map("sign_off_user_id")
+  signOffPartyName      String?                              @map("sign_off_party_name")
+  signOffPartyRole      String?                              @map("sign_off_party_role")
+  signedOn              DateTime?                            @map("signed_on") @db.Date
+  createdAt             DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy             String                               @map("created_by")
+  updatedBy             String                               @map("updated_by")
+  deletedAt             DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy             String?                              @map("deleted_by")
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, startDate])
+  @@map("hindrances")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Daily Progress Report numbers (CM-606): one per Project per date, taken
+// the first time that date's DPR is generated. The PDFs are reporting jobs.
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkProgressReportNumber {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  projectId   String   @map("project_id") @db.Uuid
+  reportDate  DateTime @map("report_date") @db.Date
+  number      String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  @@unique([projectId, reportDate])
+  @@unique([workspaceId, number])
+  @@index([workspaceId])
+  @@map("progress_report_numbers")
+  @@schema("construction_site_work")
+}
+
+// ---------------------------------------------------------------------------
+// Shared: remarks and files on any site-work document (CM-0016 §8).
+// ---------------------------------------------------------------------------
+
+model ConstructionSiteWorkRemark {
+  id           String                           @id @db.Uuid
+  workspaceId  String                           @map("workspace_id")
+  documentType ConstructionSiteWorkDocumentType @map("document_type")
+  documentId   String                           @map("document_id") @db.Uuid
+  body         String
+  createdAt    DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                           @map("created_by")
+
+  files ConstructionSiteWorkDocumentFile[]
+
+  @@index([workspaceId, documentType, documentId, createdAt])
+  @@map("remarks")
+  @@schema("construction_site_work")
+}
+
+/// Worksheet photos, usage-sheet files, site-diary photos, hindrance files,
+/// and files on remarks. Uploaded through the attachments service (CM-0014).
+model ConstructionSiteWorkDocumentFile {
+  id           String                           @id @db.Uuid
+  workspaceId  String                           @map("workspace_id")
+  documentType ConstructionSiteWorkDocumentType @map("document_type")
+  documentId   String                           @map("document_id") @db.Uuid
+  remarkId     String?                          @map("remark_id") @db.Uuid
+  fileKey      String                           @unique @map("file_key")
+  fileName     String                           @map("file_name")
+  contentType  String                           @map("content_type")
+  bytes        Int
+  thumbKey     String?                          @map("thumb_key")
+  createdAt    DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                           @map("created_by")
+  deletedAt    DateTime?                        @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                          @map("deleted_by")
+
+  remark ConstructionSiteWorkRemark? @relation(fields: [remarkId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, documentType, documentId, deletedAt])
+  @@map("document_files")
+  @@schema("construction_site_work")
+}

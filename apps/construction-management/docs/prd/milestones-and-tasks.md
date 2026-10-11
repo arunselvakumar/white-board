@@ -2,7 +2,7 @@
 title: Construction Management — milestones and tasks
 docs: ../README.md
 created: 2026-10-08
-updated: 2026-10-10
+updated: 2026-10-11
 status_values:
   - todo
   - in_progress
@@ -559,16 +559,140 @@ Goal: material from need to use — Purchase Request → Purchase Order (GST spl
 
 ---
 
-## M6 — Daily site work (board only)
+## M6 — Daily site work
 
-| ID     | Seq | Title                                                                                                                                                                                                                         | Status | Blocked by             | Area           |
-| ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------- | -------------- |
-| CM-601 |   1 | Prisma `construction-site-work.prisma`; Work Types master                                                                                                                                                                     | todo   | CM-203                 | Data+Domain    |
-| CM-602 |   2 | Daily Worksheet: form with configurable sections/order, location, shift, labour counts (prefilled from CM-210 attendance), approx work done, materials (→ `MaterialConsumed`), photos, approval setting & statuses, duplicate | todo   | CM-601, CM-506, CM-403 | Domain+HTTP+UI |
-| CM-603 |   3 | Equipment master (owned/rented, fuel, utilisation basis, targets) + Fuel types/units                                                                                                                                          | todo   | CM-501                 | Domain+HTTP+UI |
-| CM-604 |   4 | Equipment usage sheets (time shifts / meter readings, fuel & borne-by, breakdown/idle, hire details → vendor payable event, materials, approval, settings toggles)                                                            | todo   | CM-603                 | Domain+HTTP+UI |
-| CM-605 |   5 | Equipment lifecycle: transfer (project/warehouse), maintenance log, availability toggle, reports                                                                                                                              | todo   | CM-604                 | Domain+HTTP+UI |
-| CM-606 |   6 | Progress reports: Daily Progress Report & Task Progress Report jobs (PDF, include images)                                                                                                                                     | todo   | CM-602                 | HTTP+UI        |
+Goal: the record of each day on site — crews' Daily Worksheets that consume materials, the Equipment register and its usage sheets, the Site Diary and Hindrance register, and the Daily Progress Report built from all of them. Spec: `modules/04`. Product decisions: [ADR CM-0016](../adr/CM-0016-daily-site-work-product-decisions.md).
+
+| ID     | Seq | Title                                                                                                                                           | Status      | Blocked by             | Area           |
+| ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------------------- | -------------- |
+| CM-601 |   1 | Prisma `construction-site-work.prisma`; Work Types master; Labour Category skill; kernel wiring (menus, numbering, back-dated, ledger source)   | in_progress | CM-203                 | Data+Domain    |
+| CM-602 |   2 | Daily Worksheet: configurable form, location, shift, labour counts prefilled from attendance, materials (Consumed), photos, approval, duplicate | in_progress | CM-601, CM-506, CM-403 | Domain+HTTP+UI |
+| CM-603 |   3 | Equipment register (owned / rented, fuel, utilisation basis, targets, hire details) in Masters and on the Project                               | in_progress | CM-601                 | Domain+HTTP+UI |
+| CM-604 |   4 | Equipment Usage sheets (time shifts / meter readings, fuel and borne by, idle / breakdown, hire cost, materials, approval, settings)            | todo        | CM-603                 | Domain+HTTP+UI |
+| CM-605 |   5 | Equipment lifecycle: transfer (Project / warehouse), maintenance log, availability; maintenance and transfer reports                            | in_progress | CM-603                 | Domain+HTTP+UI |
+| CM-606 |   6 | Progress reports: Daily Progress Report (site diary PDF with images) as a report job; View Reports; Task Progress Report named for M8           | todo        | CM-602, CM-604, CM-607 | HTTP+UI        |
+| CM-607 |   7 | Site Diary (weather, visitors, instructions, photos) and Hindrance register (cause, duration, party, joint sign-off)                            | in_progress | CM-601                 | Domain+HTTP+UI |
+| CM-608 |   8 | Daily Work and Equipment Usage reports; Daily Work and Equipment Usage sections on the Project Dashboard                                        | todo        | CM-602, CM-604         | HTTP+UI        |
+
+CM-607 and CM-608 were added when the owner chose a full site diary for the DPR (CM-0016, 2026-10-11); CM-608 also holds the report and dashboard parts the legacy board folded into CM-605 / CM-606.
+
+### CM-601 — Site-work schema and Work Types
+
+**Done when:**
+
+- **Schema.** `construction-site-work.prisma` (schema `construction_site_work`) holds every M6 table in one migration, with the CHECKs and live-row unique indexes of CM-0016.
+- **Small migrations in other schemas**, each touching only its own schema:
+  - `construction_masters`: Work Types and their Materials, Labour Category `skill` with the unskilled backfill, the RCC seed;
+  - `construction_procurement`: the `daily_worksheet` and `equipment_usage` stock sources;
+  - `construction_reporting`: the six report kinds.
+- **Kernel wiring.**
+  - The Permission Matrix has Reject on Daily Worksheet and Equipment Usage, and the **Site Diary** and **Hindrance Register** menus.
+  - Numbering has WS / EU / DPR / HR; back-dated modules have `site_diary` and `hindrance`; the designation templates grant the new cells.
+  - `PrismaStructureUsage` replaces `UnusedStructure` on the Wing and Location routes, reading site work and procurement.
+  - The five Project modules (Daily Worksheet, Equipment, Site Diary, Hindrances, Progress Reports) and the Masters entries (Work Types, Equipments) exist.
+  - The `SiteStock` port with its composition adapter, the site-work access route, and the OpenAPI wiring exist.
+- **Work Types master.** Masters → **Work Types**: name, Department\* (live), assigned Materials (assign / unassign), disable for seeds. Names are unique among live rows ignoring case, and a Work Type used by a worksheet cannot be deleted. New Companies get RCC from the seed.
+- **Labour Categories** show and edit the skill.
+- **Tests:** HTTP tests for the master and the structure-usage refusals; stories for the list, the form and the empty state.
+
+### CM-602 — Daily Worksheet
+
+**Done when:**
+
+- **Settings.** A member with Update sets the Project's worksheet settings: section toggles, section order and approval (CM-0016 §2).
+- **The form.** A member with Create fills a worksheet:
+  - a date stepper under the back-dated rules;
+  - sections in the configured order;
+  - Location via `LocationPicker`;
+  - Contractor\* on the Project, then Department\* of that Contractor, then Work Type of that Department; Work Shift\*;
+  - skilled and unskilled counts with the attendance prefill panel and **Use remaining** (§6);
+  - Approx Work Done with a unit;
+  - material lines with available stock and Bulk Select (the Work Type's materials first);
+  - remark and photos.
+- **Saving.** **Save**, **Save & Add New** (keeps date, location, contractor and shift) and Save & Approve.
+  - Saving posts Consumed entries and is refused with `STOCK_INSUFFICIENT` (§5).
+  - Edit replaces the postings; delete reverses them.
+  - The number comes from the WS rule.
+- **List and detail.**
+  - The list filters by date, filled by, contractor, department and approval, with bulk approve / reject.
+  - The detail shows everything, with remarks and files.
+  - **Duplicate** opens a prefilled form (§9).
+  - Approve / Reject with a reason work, and editing an approved sheet returns it to pending (§3).
+- **Gallery.** Photos appear in the Gallery under Worksheet.
+- **Tests:** HTTP tests for each rule and refusal (stock, back-dated, contractor not on the Project, department not the contractor's, approval transitions, concurrency 409); stories for the form, list, detail, settings and empty state.
+
+### CM-603 — Equipment register
+
+**Done when:**
+
+- **Masters → Equipments** lists the Company's equipment: name, number, ownership, where it is, state (Available / In maintenance / Unavailable). It filters by ownership, Project and state.
+- **Add and edit** take the fields of CM-0016 §10:
+  - the hire party (a live Contractor), hire basis and rate for rented equipment;
+  - Both only with Hourly;
+  - an initial place — a Project or the warehouse — recorded as an `added` movement.
+- **Rules.** Equipment Number is unique among live equipment. Rates need Financial. Equipment with sheets cannot be deleted. The photo uploads through the attachments service.
+- **On a Project,** the Equipment module lists the equipment there, and "+" adds one to that Project.
+- **Tests:** HTTP tests for validation, uniqueness, Financial hiding and delete refusal; stories for the list, the owned and rented forms, and the empty state.
+
+### CM-604 — Equipment Usage sheets
+
+**Done when:**
+
+- **Settings.** The Project's equipment-sheet settings (field toggles, approval) are saved.
+- **The form.** A sheet is created from the Equipment module for equipment that may take one on that date (§11). Its inputs follow the basis and method:
+  - time shifts (crossing midnight, no overlap);
+  - meter readings (opening from the last closing, gap shown);
+  - km or trips;
+  - idle and breakdown, within 24 hours;
+  - fuel with borne by and the overrun flag;
+  - for rented equipment, unit rate, billable quantity and hire cost (Financial).
+  - Material lines post Consumed like worksheets.
+- **Rules.** One sheet per equipment, date and shift. Duplicate per §12. Approve / Reject as on worksheets. `EquipmentHireAccrued` and `EquipmentFuelOverrun` are raised.
+- **Tests:** golden tests for the hours, meter and hire-cost math; HTTP tests for availability refusals, the 24-hour cap, duplicate shift, stock refusal and approval; stories for the form per basis, the list and the detail.
+
+### CM-605 — Equipment lifecycle
+
+**Done when:**
+
+- **Transfer.** **Transfer to Project** / **Transfer to Warehouse** (Equipments T) records a movement under the date rules of §11. The equipment then appears on the destination and leaves the source's lists.
+- **Maintenance.** **Log Maintenance** opens one entry (kind, start date, description, workshop, cost with Financial). **Return to Service** closes it.
+- **Availability.** **Mark unavailable / Make available** shows "Unavailable for worksheet entry — Since <date>".
+- **Equipment detail** shows the movement history and the maintenance log.
+- **Reports.** **Equipment Maintenance** and **Equipment Transfers** reports (xlsx + PDF) are on the Project's Reports page and in Masters → Equipments.
+- **Tests:** HTTP tests for each transition and refusal (transfer before the last sheet, a second open maintenance, a sheet during maintenance); stories.
+
+### CM-606 — Progress reports
+
+**Done when:**
+
+- **Create.** The Progress Reports module's **Create new → Daily Progress Report** takes a date, an optional Filled By and Include images. It takes or reuses the date's DPR number and queues a `daily_progress_report` job.
+- **Contents.** The job builds the site-diary PDF of CM-0016 §15:
+  - Noto fonts and the Project logo when set;
+  - at most 60 images;
+  - hire cost only with Financial on Equipment Usage.
+- **Running.** The job runs inline with a 60-second limit, and a failure can be retried.
+- **View Reports.** It lists generated DPRs, polling while running, with download and delete (D).
+- **Task Progress Report** appears as "Coming with Tasks (M8)".
+- **Tests:** HTTP tests for numbering (the same number on regenerate), Filled By filtering, the Financial hiding and permissions; a unit test that the PDF loads and prints a Tamil and a Hindi line; stories.
+
+### CM-607 — Site Diary and Hindrance register
+
+**Done when:**
+
+- **Site Diary.** The Site Diary module shows one diary per date: a date stepper, weather morning and afternoon, rainfall, site condition, visitor rows, instruction rows, notes and photos.
+  - Create, Update and Delete follow the menu and the back-dated rules.
+  - A second diary for a date is refused.
+- **Hindrance register.** The Hindrances module lists hindrances, filtered by open / closed, cause, party and date. The form takes the fields of §14 (contractor required when the party is a Contractor; end ≥ start), files and the joint sign-off. **Close** sets the end date.
+- **From a usage sheet,** **Record hindrance** prefills Equipment breakdown.
+- **Tests:** HTTP tests for uniqueness, the back-dated rules and validation; stories for both screens and their empty states.
+
+### CM-608 — Daily Work and Equipment reports, dashboard
+
+**Done when:**
+
+- **Reports.** The Project's Reports page offers **Daily Work**, **Company Owned Equipment Usage** and **Rented Equipment Usage** for a date range (xlsx + PDF; hire cost only with Financial).
+- **Dashboard.** The Project Dashboard's **Daily Work** section (labour availability trend from worksheets vs attendance; contractor-wise skilled / unskilled) and **Equipment Usage** section (top equipment by work hours; owned vs rented hours) show data for the duration filter. The M6 stubs of CM-412 are gone.
+- **Tests:** HTTP tests for the figures across two contractors and two pieces of equipment; stories.
 
 ## M7 — Finance (board only)
 

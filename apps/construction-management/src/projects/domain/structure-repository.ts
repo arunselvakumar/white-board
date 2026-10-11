@@ -92,9 +92,9 @@ export type LocationRepository = {
 /**
  * Whether site records point at a piece of a Project's structure, asked
  * before a floor, unit, Wing or Location is removed (ADR CM-0013 §3–4).
- * Nothing points at them yet: Daily Work (M6), Tasks, Issues and
- * Inspections (M8) and Booking (M10) answer through this port when they
- * exist, so removing a referenced row is refused (409 `UNIT_IN_USE`,
+ * `PrismaStructureUsage` (src/composition) reads site work and procurement
+ * (M5, M6); Tasks, Issues and Inspections (M8) and Booking (M10) join it,
+ * so removing a referenced row is refused (409 `UNIT_IN_USE`,
  * `FLOOR_IN_USE`, `WING_IN_USE`, `LOCATION_IN_USE`).
  */
 export type StructureUsage = {

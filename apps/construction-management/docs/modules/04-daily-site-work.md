@@ -586,3 +586,40 @@ Back-dated limits come from the user permission row (`backdatedCreateDays`, `bac
 14. Does the DPR's "Report Filled By" filter worksheets by author, or only print the name of the person generating the report?
 15. Retention period and size limits for generated progress-report PDFs and included images.
 16. Does equipment-usage material consumption post to inventory like worksheet consumption does?
+
+---
+
+## Decisions for the build
+
+The open questions above are answered in [ADR CM-0016](../adr/CM-0016-daily-site-work-product-decisions.md); the owner settled approval (Approve / Reject), labour (two counts prefilled from attendance), the DPR (a full site diary with a Hindrance register) and fuel (recorded only). Rules each ticket settled while building are listed here.
+
+### CM-601
+
+- Equipment lives in the `site-work` context (CM-0016 §1); Work Types are a master with assigned Materials. Fuel Types and Units are fixed lists.
+- Labour Categories carry a skill (skilled / unskilled); Helper, Labour and Unskilled are unskilled.
+- A floor, unit, Wing or Location named by a worksheet, usage sheet, hindrance, or an M5 document, movement or ledger entry cannot be removed.
+
+### Shared — the site-work document thread (built under CM-602)
+
+- Every site-work document (worksheet, equipment_usage, site_diary, hindrance) has one remarks thread and one file list, ported from procurement's (CM-0015 §13) into `src/site-work` (`SiteWorkDocumentThread`). Routes: `/api/construction/site-work/documents/{type}/{id}/remarks|files/…`.
+- Rights: Read on the document's menu, on its Project, reads and comments; Create or Update uploads; Update removes any file, Create only one's own. A deleted, unknown or another Company's document is 404 `WORKSHEET_NOT_FOUND` / `EQUIPMENT_SHEET_NOT_FOUND` / `SITE_DIARY_NOT_FOUND` / `HINDRANCE_NOT_FOUND`; an unknown type is 404 `DOCUMENT_NOT_FOUND`.
+- Worksheets and Site Diaries take images only (PNG, JPEG, WebP); usage sheets and hindrances take a PDF or an image. 25 MB a file. **20 files a document counts its remarks' files too**; 10 a remark.
+- **Only images join the Project Gallery** (sources `worksheet`, `equipment_usage`, `site_diary`, `hindrance`, shown with Read on that menu); a usage sheet's or hindrance's PDF stays on the document. Removing a file takes it out of the Gallery. A document's own delete dispatches `siteWorkDocumentMediaRemoved(...)` after commit so its photos leave the Gallery.
+- A Site Diary is labelled by its date (`2026-10-08`) in audit events; the others by their number.
+- New forms hold picked photos as `File`s (`PendingFilesField`) and upload them after the create succeeds (`useUploadPendingFiles`). A failed upload never undoes the save: the page names the files that did not go up and the detail page's files section takes them again.
+
+### CM-607
+
+- **Site Diary.** One per Project per date (409 `SITE_DIARY_EXISTS`, also when an edit moves a diary onto a taken date; the live-date unique index backs it under races). The date is not after the Company's today. A deleted diary frees its date.
+- Weather (morning, afternoon) is optional; "Not recorded" is a choice. Rainfall is mm, 0–9999.9 with one decimal (trailing zeros are accepted: `12.50` is stored as `12.5`).
+- Visitors (≤ 50) need a name; organisation ≤ 120, purpose ≤ 200; times are `HH:MM` and time out may equal time in but not be before it. Instructions (≤ 50) need given by and the instruction (≤ 1000); given to ≤ 120, action taken ≤ 1000. Row errors name their field as `visitors.1.timeOut`. Rows are replaced as a set on edit.
+- The module opens on today (or `?date=`), steps a day at a time and never past today, and lists the month's diaries beside the day (`GET …/site-diary?projectId&from&to`, at most a year). The day's read is `GET …/site-diary/by-date?projectId&date` → `{ date, diary | null }`.
+- **Hindrances.** Numbered `HR/…` on the start date. Start and end dates are not after today; end ≥ start; hours lost ≥ 0 with two decimals. Status is derived: Open without an end date, Closed with one.
+- **Days lost** count both ends: end − start + 1, or up to today while open. The DPR read counts up to the report date and calls a hindrance Closed only when it ended on or before that date.
+- **Contractor** is required when the party is Contractor and must be live and assigned to the Project (400 `CONTRACTOR_NOT_ON_PROJECT`); for any other party the Contractor is dropped. The Contractor, the sign-off Team Member and the usage sheet are checked only when set or changed, so an old hindrance stays editable after the Contractor leaves the Project.
+- **Joint sign-off:** the other party's name and the signed-on date go together; the Team Member (on the Project, or the Owner; 400 `SIGN_OFF_MEMBER_NOT_FOUND`) and the party's role are optional but need them. The date is not before the start nor after today.
+- **Close** needs Update and sets the end date and, when given, the hours lost (null clears them, omitted keeps them). A closed hindrance cannot be closed again (409 `HINDRANCE_CLOSED`); edit it to change the end date. **Close checks the back-dated edit limit on the end date, not the start date**, so a long hindrance can still be closed; create, edit and delete check the start date.
+- The list filters by status, cause, party, Contractor, a date range it overlaps (started on or before `to`, not ended before `from`) and a search on the number or activity; newest recorded first.
+- **Record hindrance from a usage sheet:** link to `/app/projects/{id}/hindrances/new?cause=equipment_breakdown&date=YYYY-MM-DD&equipmentUsageSheetId=<id>&activity=<text>` (`newHindranceFromUsageSheetPath` in `src/queries/hindrances.ts`). The sheet must be live and on the Project (400 `EQUIPMENT_USAGE_SHEET_NOT_FOUND`).
+- **DPR reads** (`createSiteRecordQueries()` in `src/composition/site-records.ts`): `diaryForDate(workspaceId, projectId, date)` → `DprSiteDiary | null` and `hindrancesOn(workspaceId, projectId, date)` → `DprHindrance[]` (open on that date: start ≤ date and no end or end ≥ date), with labels resolved.
+- Diary photos and hindrance files use the shared document thread; picked on a new form, they upload after the save. Deleting a diary or hindrance removes its photos from the Gallery; a Gallery failure is logged and never fails the delete.

@@ -44,8 +44,15 @@ export const STOCK_ENTRY_LABELS: Record<StockEntryType, string> = {
   adjustment: "Adjustment",
 };
 
+/** `daily_worksheet` and `equipment_usage` are site-work sheets' material
+ * lines (ADR CM-0016 §5), posted through the composition root. */
 export type StockSourceType =
-  "goods_receipt" | "material_transfer" | "delivery_note" | "stock_movement";
+  | "goods_receipt"
+  | "material_transfer"
+  | "delivery_note"
+  | "stock_movement"
+  | "daily_worksheet"
+  | "equipment_usage";
 
 export type StockSource = {
   type: StockSourceType;

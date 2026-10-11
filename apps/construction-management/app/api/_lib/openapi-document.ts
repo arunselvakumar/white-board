@@ -155,6 +155,10 @@ import {
   procurementOpenApiOperations,
 } from "@/app/api/construction/procurement/procurement-openapi";
 import {
+  siteWorkOpenApiComponents,
+  siteWorkOpenApiOperations,
+} from "@/app/api/construction/site-work/site-work-openapi";
+import {
   billingAddressOpenApiComponents,
   billingAddressOpenApiOperations,
 } from "@/app/api/construction/organization/settings/billing-addresses/billing-address-openapi";
@@ -920,6 +924,10 @@ openApiOperations.push(...hrmsOpenApiOperations);
 // The procurement context (M5) lists its own models and routes, one file per area.
 Object.assign(openApiComponents, procurementOpenApiComponents);
 openApiOperations.push(...procurementOpenApiOperations);
+
+// The site-work context (M6) lists its own models and routes, one file per area.
+Object.assign(openApiComponents, siteWorkOpenApiComponents);
+openApiOperations.push(...siteWorkOpenApiOperations);
 
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);

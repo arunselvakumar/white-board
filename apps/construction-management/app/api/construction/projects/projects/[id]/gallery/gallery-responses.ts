@@ -6,6 +6,7 @@ import {
 import { can, type MemberAccess } from "@/src/shared-kernel/access";
 
 import { procurementGalleryRoutes } from "@/app/api/construction/procurement/documents/document-responses";
+import { siteWorkGalleryRoutes } from "@/app/api/construction/site-work/documents/document-responses";
 
 import { documentsPath } from "../documents/project-document-responses";
 import {
@@ -62,8 +63,9 @@ function routesOf(
         thumbnail: testingReportThumbnailPath(item.projectId, item.sourceId),
       };
     default:
-      // Procurement documents' files (M5) are served by their own routes.
-      return procurementGalleryRoutes(item);
+      // Procurement (M5) and site-work (M6) documents' files are served by
+      // their own routes.
+      return procurementGalleryRoutes(item) ?? siteWorkGalleryRoutes(item);
   }
 }
 
