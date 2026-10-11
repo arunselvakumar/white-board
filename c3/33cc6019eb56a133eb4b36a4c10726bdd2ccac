@@ -1,0 +1,37 @@
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_0b536d2972a09b::t_813c6e4caa5653 34,48-51,242-245,344-348
+apps/construction-management/components/site-work/hindrances/hindrance-form.tsx
+  s_0b536d2972a09b::t_c6e84c959ab43e 25-26,78-79,220,247,255-256,275,347-349,370,597-610
+apps/construction-management/components/site-work/site-diary/site-diary-fixtures.ts
+  s_0b536d2972a09b::t_540feb037eedf3 6,119,121-122
+apps/construction-management/components/site-work/site-diary/site-diary-form.stories.tsx
+  s_0b536d2972a09b::t_e1ef4e3da2f8f9 5-6,201-233
+apps/construction-management/components/site-work/site-diary/site-diary-form.tsx
+  s_0b536d2972a09b::t_19e689b7fe220f 28-29,97-98,172-173,189,204,226,271-273,296,569-582
+apps/construction-management/components/site-work/site-diary/site-diary-page.tsx
+  s_0b536d2972a09b::t_44627e0b068a9b 50,55,87,174-175,261
+apps/construction-management/components/site-work/site-diary/site-diary-view.tsx
+  s_0b536d2972a09b::t_ce2308beb72dc2 5,27-28,64,69-70,124-132,212-216
+apps/construction-management/src/composition/site-records.ts
+  s_0b536d2972a09b::t_807aab480ff372 4,29,41
+apps/construction-management/src/site-work/application/hindrance-handlers.ts
+  s_0b536d2972a09b::t_d32bb3315fee51 9,31,163-164,465-473
+apps/construction-management/src/site-work/application/site-diary-handlers.ts
+  s_0b536d2972a09b::t_1a63ed0de9ec09 14,23,119-120,300-308
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c333cc6019eb56a133eb4b36a4c10726bdd2ccac",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
