@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/finance/central-payment/central-payment.http.test.ts
+  s_d85efaaff765fa::t_1859f43fc8898f 23-24,153-200
+apps/construction-management/app/api/construction/reporting/reports/finance-reports.http.test.ts
+  s_d85efaaff765fa::t_5e2431b0e692c0 250,259-260,765,801,804
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_d85efaaff765fa::t_a78cd91c6e6fe3 188
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_a04a466031d3e2 832,837,849,852
+apps/construction-management/src/composition/finance-report-source.ts
+  s_d85efaaff765fa::t_76c2f4ebe8888b 11-14,105-111,114-126,134-136,138-153
+apps/construction-management/src/finance/domain/dues.test.ts
+  s_d85efaaff765fa::t_67e917e69e0c42 60-62
+apps/construction-management/src/finance/domain/dues.ts
+  s_d85efaaff765fa::t_edc2b2e7a1888c 56-60,62-67,91-92,95,98-99
+apps/construction-management/src/finance/infrastructure/central-payment.ts
+  s_d85efaaff765fa::t_9c095f91cb90ef 93
+apps/construction-management/src/reporting/domain/finance-reports.test.ts
+  s_d85efaaff765fa::t_189e4a91f6a512 84,87-88,100-101
+apps/construction-management/src/reporting/domain/finance-reports.ts
+  s_d85efaaff765fa::t_49b9e47087a20a 127,129,152-154,210,263,1019
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "48ce9f355b0edd4c17f7cc04b9022e378fd0b23b",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
