@@ -1,0 +1,21 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_e75cc645b3f492 697-807
+apps/construction-management/docs/adr/CM-0017-finance-product-decisions.md
+  s_d85efaaff765fa::t_a7964b091913c2 1-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6e568429569d154830245fdfd5f2b0d2d194b1ff",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
