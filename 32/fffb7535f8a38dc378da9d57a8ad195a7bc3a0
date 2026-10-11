@@ -1,0 +1,39 @@
+apps/construction-management/app/api/construction/site-work/dashboard/dashboard-models.ts
+  s_0b536d2972a09b::t_443f21cf66112a 110-119
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets.http.test.ts
+  s_0b536d2972a09b::t_eb07bb961b51e4 663-664,667-695,928-940
+apps/construction-management/components/site-work/worksheets/worksheet-fixtures.ts
+  s_0b536d2972a09b::t_2653b5bdf2fd42 246-247
+apps/construction-management/src/reporting/application/build-report.ts
+  s_0b536d2972a09b::t_f8f29c4a94b98d 1-2,51,109,116-124,135
+apps/construction-management/src/reporting/application/build-site-work-report.ts
+  s_0b536d2972a09b::t_7914436ef7dee7 1-2,37-38,77
+apps/construction-management/src/reporting/domain/equipment-lifecycle-reports.ts
+  s_0b536d2972a09b::t_9006a8b93e02df 32-35,39,41,56-57,88
+apps/construction-management/src/reporting/domain/site-work-reports.test.ts
+  s_0b536d2972a09b::t_ce73f956a82157 274-281,290,329
+apps/construction-management/src/reporting/infrastructure/prisma-site-work-report-source.ts
+  s_0b536d2972a09b::t_4ad3e28a2a24ea 10,101,173
+apps/construction-management/src/site-work/application/equipment-sheet-handlers.ts
+  s_0b536d2972a09b::t_0179e9a89f1418 60,727-746,996-1001,1005,1051-1052
+apps/construction-management/src/site-work/domain/equipment-usage.ts
+  s_0b536d2972a09b::t_ff1b4053efe226 754-755
+apps/construction-management/src/site-work/domain/events.ts
+  s_0b536d2972a09b::t_6582947789d0f5 27-37,50-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "32fffb7535f8a38dc378da9d57a8ad195a7bc3a0",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
