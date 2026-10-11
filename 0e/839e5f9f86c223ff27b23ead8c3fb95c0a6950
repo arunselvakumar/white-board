@@ -1,0 +1,57 @@
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_83959a9387dba7 18-21,28,35
+apps/construction-management/app/api/construction/finance/transactions/[id]/approve/route.ts
+  s_d85efaaff765fa::t_aab44b0fc55e95 1-50
+apps/construction-management/app/api/construction/finance/transactions/[id]/delete/route.ts
+  s_d85efaaff765fa::t_e9c874fe7d0aff 1-42
+apps/construction-management/app/api/construction/finance/transactions/[id]/reject/route.ts
+  s_d85efaaff765fa::t_80b418041fb8ff 1-46
+apps/construction-management/app/api/construction/finance/transactions/[id]/route.ts
+  s_d85efaaff765fa::t_70d97afdfad2a5 1-30
+apps/construction-management/app/api/construction/finance/transactions/[id]/update/route.ts
+  s_d85efaaff765fa::t_de4cc8d4fb4e5a 1-49
+apps/construction-management/app/api/construction/finance/transactions/bulk/route.ts
+  s_d85efaaff765fa::t_d8965d11d1831a 1-45
+apps/construction-management/app/api/construction/finance/transactions/handlers.ts
+  s_d85efaaff765fa::t_1b2d5ade414a45 1-208
+apps/construction-management/app/api/construction/finance/transactions/import-sample/route.ts
+  s_d85efaaff765fa::t_9eb5498b971856 1-58
+apps/construction-management/app/api/construction/finance/transactions/import/route.ts
+  s_d85efaaff765fa::t_1371f1b7db52da 1-47
+apps/construction-management/app/api/construction/finance/transactions/route.ts
+  s_d85efaaff765fa::t_006c994c85c741 1-132
+apps/construction-management/app/api/construction/finance/transactions/transaction-models.ts
+  s_d85efaaff765fa::t_e4a1b2accf3af3 1-258
+apps/construction-management/app/api/construction/finance/transactions/transactions-openapi.ts
+  s_d85efaaff765fa::t_41431e70b2e819 1-213
+apps/construction-management/app/api/construction/finance/transactions/transactions.http.test.ts
+  s_d85efaaff765fa::t_15bdb1172c6229 1-792
+apps/construction-management/app/api/construction/finance/transfers/[id]/approve/route.ts
+  s_d85efaaff765fa::t_948f3af4eae101 1-46
+apps/construction-management/app/api/construction/finance/transfers/[id]/delete/route.ts
+  s_d85efaaff765fa::t_dfba30fd2ac41c 1-42
+apps/construction-management/app/api/construction/finance/transfers/[id]/reject/route.ts
+  s_d85efaaff765fa::t_8beda598d63367 1-46
+apps/construction-management/app/api/construction/finance/transfers/[id]/route.ts
+  s_d85efaaff765fa::t_9e3619dd53ab45 1-30
+apps/construction-management/app/api/construction/finance/transfers/[id]/update/route.ts
+  s_d85efaaff765fa::t_515c9d7f9cdb56 1-47
+apps/construction-management/app/api/construction/finance/transfers/route.ts
+  s_d85efaaff765fa::t_3befbfb4135620 1-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0e839e5f9f86c223ff27b23ead8c3fb95c0a6950",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
