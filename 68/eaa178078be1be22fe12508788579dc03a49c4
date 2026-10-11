@@ -1,0 +1,35 @@
+apps/construction-management/app/app/projects/[id]/hindrances/[hindranceId]/edit/page.tsx
+  s_0b536d2972a09b::t_5ccd6214a8ad9a 1-19
+apps/construction-management/app/app/projects/[id]/hindrances/[hindranceId]/page.tsx
+  s_0b536d2972a09b::t_a101254547882a 1-19
+apps/construction-management/app/app/projects/[id]/hindrances/new/page.tsx
+  s_0b536d2972a09b::t_a23c05c1a96515 1-48
+apps/construction-management/app/app/projects/[id]/hindrances/page.tsx
+  s_0b536d2972a09b::t_015acf8925e5e2 3-5,9-18
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_0b536d2972a09b::t_bd4d4a878107fb 1-389
+apps/construction-management/components/site-work/hindrances/hindrance-form.tsx
+  s_0b536d2972a09b::t_9af8a5b76f989a 1-608
+apps/construction-management/components/site-work/hindrances/hindrance-pages.tsx
+  s_0b536d2972a09b::t_dad903d2d1ea6d 1-50
+apps/construction-management/components/site-work/hindrances/hindrance-parts.tsx
+  s_0b536d2972a09b::t_3212c13b761b60 1-51
+apps/construction-management/components/site-work/hindrances/hindrances-list.tsx
+  s_0b536d2972a09b::t_067675c374136f 1-366
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "68eaa178078be1be22fe12508788579dc03a49c4",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
