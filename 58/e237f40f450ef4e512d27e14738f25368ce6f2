@@ -1,0 +1,31 @@
+apps/construction-management/app/api/construction/site-work/hindrances/hindrances.http.test.ts
+  s_0b536d2972a09b::t_7740b719519bca 1-582
+apps/construction-management/app/api/construction/site-work/site-diary/site-diary.http.test.ts
+  s_0b536d2972a09b::t_1ae199281b839c 1-438
+apps/construction-management/test/site-work.ts
+  s_ed81416643e4d1::t_f9a7ce811a5d36 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "58e237f40f450ef4e512d27e14738f25368ce6f2",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ed81416643e4d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac069b3b53eca94fa",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
