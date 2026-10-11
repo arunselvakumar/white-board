@@ -1,0 +1,107 @@
+apps/construction-management/app/api/construction/site-work/settings/settings-openapi.ts
+  s_0b536d2972a09b::t_d87c7b54e86787 1-2,8-30,32-60
+apps/construction-management/app/api/construction/site-work/settings/worksheet-settings-models.ts
+  s_0b536d2972a09b::t_4eb11aabd93af6 1-34
+apps/construction-management/app/api/construction/site-work/settings/worksheets/route.ts
+  s_0b536d2972a09b::t_ec23e8995dd464 1-70
+apps/construction-management/app/api/construction/site-work/worksheets/[id]/approve/route.ts
+  s_0b536d2972a09b::t_af4a61b888c849 1-48
+apps/construction-management/app/api/construction/site-work/worksheets/[id]/delete/route.ts
+  s_0b536d2972a09b::t_7bb50c19280a8a 1-42
+apps/construction-management/app/api/construction/site-work/worksheets/[id]/reject/route.ts
+  s_0b536d2972a09b::t_4f4b0ddcf7539b 1-48
+apps/construction-management/app/api/construction/site-work/worksheets/[id]/route.ts
+  s_0b536d2972a09b::t_664181b7c999c8 1-34
+apps/construction-management/app/api/construction/site-work/worksheets/[id]/update/route.ts
+  s_0b536d2972a09b::t_47d2c142b7b89c 1-51
+apps/construction-management/app/api/construction/site-work/worksheets/attendance/route.ts
+  s_0b536d2972a09b::t_c388e95ba84282 1-41
+apps/construction-management/app/api/construction/site-work/worksheets/available-stock/route.ts
+  s_0b536d2972a09b::t_37a90c4ffb2da3 1-44
+apps/construction-management/app/api/construction/site-work/worksheets/bulk-approve/route.ts
+  s_0b536d2972a09b::t_8ddbae8f88ff22 1-43
+apps/construction-management/app/api/construction/site-work/worksheets/bulk-reject/route.ts
+  s_0b536d2972a09b::t_f773802531e807 1-43
+apps/construction-management/app/api/construction/site-work/worksheets/form-options/route.ts
+  s_0b536d2972a09b::t_aa8045a3c4b51a 1-39
+apps/construction-management/app/api/construction/site-work/worksheets/handlers.ts
+  s_0b536d2972a09b::t_da0ea5c3b5ac83 1-77
+apps/construction-management/app/api/construction/site-work/worksheets/route.ts
+  s_0b536d2972a09b::t_262e144f32bc11 1-98
+apps/construction-management/app/api/construction/site-work/worksheets/worksheet-models.ts
+  s_0b536d2972a09b::t_8054e51ccdd729 1-440
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets-openapi.ts
+  s_0b536d2972a09b::t_d7eceabc0a8bd8 1-2,8-72,74-221
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets.http.test.ts
+  s_0b536d2972a09b::t_20ab4b3542dd34 1-922
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/edit/page.tsx
+  s_0b536d2972a09b::t_28bba738deded7 1-30
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/page.tsx
+  s_0b536d2972a09b::t_727213ddd2780a 1-43
+apps/construction-management/app/app/projects/[id]/worksheets/new/page.tsx
+  s_0b536d2972a09b::t_e6d150123f7ff9 1-35
+apps/construction-management/app/app/projects/[id]/worksheets/page.tsx
+  s_0b536d2972a09b::t_2d73f1cafff46a 3-5,9-24
+apps/construction-management/components/site-work/worksheets/bulk-select-dialog.tsx
+  s_0b536d2972a09b::t_1f3bcee3934b10 1-188
+apps/construction-management/components/site-work/worksheets/worksheet-actions.tsx
+  s_0b536d2972a09b::t_08247b8f008e9e 1-241
+apps/construction-management/components/site-work/worksheets/worksheet-attendance-panel.tsx
+  s_0b536d2972a09b::t_299e00707c166e 1-99
+apps/construction-management/components/site-work/worksheets/worksheet-detail.stories.tsx
+  s_0b536d2972a09b::t_1898607ef831f0 1-150
+apps/construction-management/components/site-work/worksheets/worksheet-detail.tsx
+  s_0b536d2972a09b::t_415aeff5c7d8f2 1-199
+apps/construction-management/components/site-work/worksheets/worksheet-fixtures.ts
+  s_0b536d2972a09b::t_29869ba81170d1 1-303
+apps/construction-management/components/site-work/worksheets/worksheet-form-pages.tsx
+  s_0b536d2972a09b::t_5111adf78627a6 1-84
+apps/construction-management/components/site-work/worksheets/worksheet-form.stories.tsx
+  s_0b536d2972a09b::t_ef1966f9a2fcef 1-349
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_0b536d2972a09b::t_d1e89272bd3498 1-1042
+apps/construction-management/components/site-work/worksheets/worksheet-format.tsx
+  s_0b536d2972a09b::t_db2d022bef74fc 1-56
+apps/construction-management/components/site-work/worksheets/worksheet-settings-dialog.tsx
+  s_0b536d2972a09b::t_2f2f8dfb7a09f7 1-286
+apps/construction-management/components/site-work/worksheets/worksheets-page.stories.tsx
+  s_0b536d2972a09b::t_46e33eaf147e5f 1-254
+apps/construction-management/components/site-work/worksheets/worksheets-page.tsx
+  s_0b536d2972a09b::t_f7822bfd2c504a 1-583
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_9e7d53453435c8 626-642
+apps/construction-management/src/composition/worksheet-directory.ts
+  s_0b536d2972a09b::t_60758b2cc648fc 1-208
+apps/construction-management/src/queries/worksheets.ts
+  s_0b536d2972a09b::t_589ffdc30f9a4c 1-246
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_3b5a69510b2a7e 121-217
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_0b536d2972a09b::t_0837cbe263de58 1-1061
+apps/construction-management/src/site-work/application/worksheet-settings-handlers.ts
+  s_0b536d2972a09b::t_d490c3407e98c1 1-154
+apps/construction-management/src/site-work/domain/worksheet.test.ts
+  s_0b536d2972a09b::t_b1e71820ff498b 1-538
+apps/construction-management/src/site-work/domain/worksheet.ts
+  s_0b536d2972a09b::t_ecaa783a71c483 1-611
+apps/construction-management/src/site-work/infrastructure/prisma-worksheet-store.ts
+  s_0b536d2972a09b::t_aeff24a8ce4140 1-376
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_7dd4b45da84e34 194-408
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1bcd2c48a57dcc1ba02618f0b765f151a3957890",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
