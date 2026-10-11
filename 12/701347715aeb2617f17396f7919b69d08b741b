@@ -1,0 +1,137 @@
+apps/construction-management/app/api/construction/site-work/equipment/[id]/availability/route.ts
+  s_0b536d2972a09b::t_75ad650b879a9d 1-20
+apps/construction-management/app/api/construction/site-work/equipment/[id]/delete/route.ts
+  s_0b536d2972a09b::t_8ceead67bf88dc 1-39
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/close/route.ts
+  s_0b536d2972a09b::t_8cc91863f6e455 1-24
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/delete/route.ts
+  s_0b536d2972a09b::t_3c14cbd1b18cdf 1-19
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/[maintenanceId]/update/route.ts
+  s_0b536d2972a09b::t_2578a8a32c284e 1-20
+apps/construction-management/app/api/construction/site-work/equipment/[id]/maintenance/route.ts
+  s_0b536d2972a09b::t_ce44599d8131ae 1-15
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/remove/route.ts
+  s_0b536d2972a09b::t_fd6940327e88a2 1-29
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/route.ts
+  s_0b536d2972a09b::t_f85e24a2cfc206 1-68
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/thumbnail/route.ts
+  s_0b536d2972a09b::t_074f574f6d9e0a 1-28
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/app/route.ts
+  s_0b536d2972a09b::t_f1c47d15c32baa 1-39
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/presign/route.ts
+  s_0b536d2972a09b::t_984ed81e706ae1 1-30
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/route.ts
+  s_0b536d2972a09b::t_e81c2f4cf382d7 1-46
+apps/construction-management/app/api/construction/site-work/equipment/[id]/photo/uploads/thumbnail/route.ts
+  s_0b536d2972a09b::t_63ce2a12423ce1 1-42
+apps/construction-management/app/api/construction/site-work/equipment/[id]/route.ts
+  s_0b536d2972a09b::t_4ef0c5f554585d 1-35
+apps/construction-management/app/api/construction/site-work/equipment/[id]/transfer/route.ts
+  s_0b536d2972a09b::t_0270cb02181c0b 1-17
+apps/construction-management/app/api/construction/site-work/equipment/[id]/update/route.ts
+  s_0b536d2972a09b::t_fa09daf8a29318 1-16
+apps/construction-management/app/api/construction/site-work/equipment/equipment-models.ts
+  s_0b536d2972a09b::t_6a14e0cc473517 1-555
+apps/construction-management/app/api/construction/site-work/equipment/equipment-openapi.ts
+  s_0b536d2972a09b::t_1be530ae2c7ae2 1-2,8-104,106-313
+apps/construction-management/app/api/construction/site-work/equipment/equipment.http.test.ts
+  s_0b536d2972a09b::t_5d034f1f2f1ee8 1-924
+apps/construction-management/app/api/construction/site-work/equipment/form-options/route.ts
+  s_0b536d2972a09b::t_2cc2bd5b20d607 1-60
+apps/construction-management/app/api/construction/site-work/equipment/handlers.ts
+  s_0b536d2972a09b::t_d778c2d2fb891e 1-166
+apps/construction-management/app/api/construction/site-work/equipment/route.ts
+  s_0b536d2972a09b::t_bb1b39eb686925 1-117
+apps/construction-management/app/api/construction/site-work/equipment/sheet-options/route.ts
+  s_0b536d2972a09b::t_825aadff9e9b19 1-55
+apps/construction-management/app/app/masters/equipments/[id]/edit/page.tsx
+  s_0b536d2972a09b::t_64f030580b5965 1-18
+apps/construction-management/app/app/masters/equipments/[id]/page.tsx
+  s_0b536d2972a09b::t_18fd83e000a2a0 1-19
+apps/construction-management/app/app/masters/equipments/new/page.tsx
+  s_0b536d2972a09b::t_d885e8c9b8faf1 1-13
+apps/construction-management/app/app/masters/equipments/page.tsx
+  s_0b536d2972a09b::t_499133411b5366 3-5,9-13
+apps/construction-management/app/app/projects/[id]/equipment/layout.tsx
+  s_0b536d2972a09b::t_0e11db91778a37 1-20
+apps/construction-management/app/app/projects/[id]/equipment/page.tsx
+  s_0b536d2972a09b::t_ae93bee4ec4ea9 1,3,5-12
+apps/construction-management/app/app/projects/[id]/equipment/register/[equipmentId]/edit/page.tsx
+  s_0b536d2972a09b::t_7baac63e4bf306 1-18
+apps/construction-management/app/app/projects/[id]/equipment/register/[equipmentId]/page.tsx
+  s_0b536d2972a09b::t_422893ed5a2e82 1-23
+apps/construction-management/app/app/projects/[id]/equipment/register/new/page.tsx
+  s_0b536d2972a09b::t_d3c359d71911c3 1-23
+apps/construction-management/app/app/projects/[id]/equipment/register/page.tsx
+  s_0b536d2972a09b::t_90dcd0d181a8ef 1-24
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/page.tsx
+  s_0b536d2972a09b::t_114333bd2320d6 1-10
+apps/construction-management/components/site-work/equipment/equipment-detail.stories.tsx
+  s_0b536d2972a09b::t_90bdc3e5697423 1-210
+apps/construction-management/components/site-work/equipment/equipment-detail.tsx
+  s_0b536d2972a09b::t_17bec6acf982e8 1-598
+apps/construction-management/components/site-work/equipment/equipment-dialogs.stories.tsx
+  s_0b536d2972a09b::t_af684f559cfabe 1-236
+apps/construction-management/components/site-work/equipment/equipment-dialogs.tsx
+  s_0b536d2972a09b::t_0422370080acd8 1-687
+apps/construction-management/components/site-work/equipment/equipment-fixtures.ts
+  s_0b536d2972a09b::t_4781542d285a25 1-326
+apps/construction-management/components/site-work/equipment/equipment-form.stories.tsx
+  s_0b536d2972a09b::t_226e647940aa4b 1-284
+apps/construction-management/components/site-work/equipment/equipment-form.tsx
+  s_0b536d2972a09b::t_751dd2c31cebfa 1-982
+apps/construction-management/components/site-work/equipment/equipment-format.tsx
+  s_0b536d2972a09b::t_7b611f7153221e 1-93
+apps/construction-management/components/site-work/equipment/equipment-list.stories.tsx
+  s_0b536d2972a09b::t_fdb1f0ed4837fc 1-186
+apps/construction-management/components/site-work/equipment/equipment-list.tsx
+  s_0b536d2972a09b::t_9448c81e04b82a 1-383
+apps/construction-management/components/site-work/equipment/equipment-nav.tsx
+  s_0b536d2972a09b::t_ca8cdd59f62828 1-53
+apps/construction-management/components/site-work/equipment/equipment-pages.tsx
+  s_0b536d2972a09b::t_5c3cdd36908b41 1-112
+apps/construction-management/components/site-work/equipment/equipment-tabs.ts
+  s_0b536d2972a09b::t_6c8842be3dbf43 1-48
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_80b3454665b3c9 643-667
+apps/construction-management/src/composition/equipment-directory.ts
+  s_0b536d2972a09b::t_60dc23394736ed 1-66
+apps/construction-management/src/queries/equipment.ts
+  s_0b536d2972a09b::t_1a9b329ea997b1 1-250
+apps/construction-management/src/shared-kernel/files/image-file.ts
+  s_0b536d2972a09b::t_568ed4b794dc69 28-29
+apps/construction-management/src/site-work/application/equipment-handlers.ts
+  s_0b536d2972a09b::t_35b98b6d6df5db 1-1294
+apps/construction-management/src/site-work/application/equipment-photos.ts
+  s_0b536d2972a09b::t_80276beccc3372 1-289
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_06907aeecdee67 218-268
+apps/construction-management/src/site-work/domain/equipment-lifecycle.test.ts
+  s_0b536d2972a09b::t_597706a6832ad3 1-209
+apps/construction-management/src/site-work/domain/equipment-lifecycle.ts
+  s_0b536d2972a09b::t_ef61cbbbfc9261 1-315
+apps/construction-management/src/site-work/domain/equipment.test.ts
+  s_0b536d2972a09b::t_9aedbbf2997120 1-238
+apps/construction-management/src/site-work/domain/equipment.ts
+  s_0b536d2972a09b::t_9be19fd054cbda 1-481
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-store.ts
+  s_0b536d2972a09b::t_fefc5119f40f6e 1-556
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_4637ed58ba4594 5-12,15-16,419-646
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "12701347715aeb2617f17396f7919b69d08b741b",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
