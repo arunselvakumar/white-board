@@ -1,0 +1,21 @@
+apps/construction-management/src/site-work/domain/worksheet.test.ts
+  s_0b536d2972a09b::t_14497a9f6ef7a1 380-397
+apps/construction-management/src/site-work/domain/worksheet.ts
+  s_0b536d2972a09b::t_c2798f6c671ae2 326-327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b7a01b5e03e5e7c309bbc61d26a5b4ce1080beb5",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
