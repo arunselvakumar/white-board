@@ -98,7 +98,7 @@ export function buildEquipmentMaintenanceReport(input: {
       input.central
         ? "Every machine of the Company, at any Project or the warehouse."
         : "Machines that were at this Project when their maintenance started.",
-      "Entries that overlap the period; days count both ends, and an entry still open counts to the end of the period.",
+      "Entries that overlap the period; days count both ends, and an entry still open counts to the end of the period or today, whichever is earlier.",
       ...(input.financial
         ? []
         : ["Costs are left out: they need Financial on Equipments."]),

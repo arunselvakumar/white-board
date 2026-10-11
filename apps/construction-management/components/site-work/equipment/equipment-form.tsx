@@ -399,11 +399,13 @@ export function EquipmentForm({
   const errors = form.formState.errors;
   const rented = values.ownership === "rented";
   const basis = values.utilisationBasis;
-  // Rented equipment needs a rate, and a rate needs Financial: once access
-  // has loaded, without it new equipment and an owned machine cannot become
+  // Rented equipment needs a rate, and a rate needs Financial. On edit the
+  // rate visibility comes with the machine; on create from access, so
+  // Rented stays locked until access has loaded. A rented machine stays
   // rented.
+  const ratesKnown = equipment != null || access != null;
   const rentedLocked =
-    access != null && !seeRates && equipment?.ownership !== "rented";
+    equipment?.ownership !== "rented" && (!ratesKnown || !seeRates);
 
   useEffect(() => {
     if (!workingTimeMethodsFor(basis).includes(values.workingTimeMethod))
