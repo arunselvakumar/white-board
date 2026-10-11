@@ -1,0 +1,43 @@
+apps/construction-management/app/app/projects/[id]/site-diary/[diaryId]/edit/page.tsx
+  s_0b536d2972a09b::t_1e3f89acb11b02 1-19
+apps/construction-management/app/app/projects/[id]/site-diary/new/page.tsx
+  s_0b536d2972a09b::t_3d853e9fd0bd2a 1-28
+apps/construction-management/app/app/projects/[id]/site-diary/page.tsx
+  s_0b536d2972a09b::t_d964f4c2b855f2 3-5,9-26
+apps/construction-management/components/site-work/site-diary/site-diary-fixtures.ts
+  s_0b536d2972a09b::t_a2a328b0d5ff56 1-176
+apps/construction-management/components/site-work/site-diary/site-diary-form.stories.tsx
+  s_0b536d2972a09b::t_e10afb1734cc68 1-198
+apps/construction-management/components/site-work/site-diary/site-diary-form.tsx
+  s_0b536d2972a09b::t_d02bdf1d58cb88 1-580
+apps/construction-management/components/site-work/site-diary/site-diary-page.stories.tsx
+  s_0b536d2972a09b::t_2c5b6d3a991457 1-145
+apps/construction-management/components/site-work/site-diary/site-diary-page.tsx
+  s_0b536d2972a09b::t_33d5a92c2ce95b 1-305
+apps/construction-management/components/site-work/site-diary/site-diary-pages.tsx
+  s_0b536d2972a09b::t_77fbb48aae4a00 1-53
+apps/construction-management/components/site-work/site-diary/site-diary-parts.tsx
+  s_0b536d2972a09b::t_612ca8797705ea 1-116
+apps/construction-management/components/site-work/site-diary/site-diary-view.tsx
+  s_0b536d2972a09b::t_14044737c366d0 1-242
+apps/construction-management/src/queries/hindrances.ts
+  s_0b536d2972a09b::t_bdc70fecdac1f3 1-172
+apps/construction-management/src/queries/site-diary.ts
+  s_0b536d2972a09b::t_770c0ee7455647 1-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a4aaf157fe352eed571b786ca8ae203ccb28b680",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
