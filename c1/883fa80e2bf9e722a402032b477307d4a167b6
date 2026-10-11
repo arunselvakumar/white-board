@@ -1,0 +1,77 @@
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_0b536d2972a09b::t_b84adf39efed70 9,66-68
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_0b536d2972a09b::t_f1fd329500913c 1-38
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/route.ts
+  s_0b536d2972a09b::t_bc17dc86a843cb 1-51
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_0b536d2972a09b::t_e6dcf220e69942 1-29
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/route.ts
+  s_0b536d2972a09b::t_4a650960162158 1-79
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/app/route.ts
+  s_0b536d2972a09b::t_2e58b83cc348ec 1-10
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_0b536d2972a09b::t_bc774c77bfa004 1-10
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/route.ts
+  s_0b536d2972a09b::t_159cff420918c9 1-11
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_0b536d2972a09b::t_833d71fad5ed6d 1-9
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/remarks/route.ts
+  s_0b536d2972a09b::t_a66cfcf517b7fe 1-77
+apps/construction-management/app/api/construction/site-work/documents/document-models.ts
+  s_0b536d2972a09b::t_87ea61cd3bc5d3 1-204
+apps/construction-management/app/api/construction/site-work/documents/document-responses.ts
+  s_0b536d2972a09b::t_f9f9f7a5cd5055 1-90
+apps/construction-management/app/api/construction/site-work/documents/documents-openapi.ts
+  s_0b536d2972a09b::t_4fe4a454206004 1-3,9-57,59-202
+apps/construction-management/app/api/construction/site-work/documents/handlers.ts
+  s_0b536d2972a09b::t_498edc3acf0ada 1-211
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_0b536d2972a09b::t_66d056e676fce4 81-84,97-100
+apps/construction-management/src/composition/site-work-author-names.ts
+  s_0b536d2972a09b::t_aff73823f7b752 1-28
+apps/construction-management/src/projects/domain/media-item.ts
+  s_0b536d2972a09b::t_0068c0408e5b33 63-67
+apps/construction-management/src/site-work/application/document-access.test.ts
+  s_0b536d2972a09b::t_272929ea9de795 1-102
+apps/construction-management/src/site-work/application/document-thread.ts
+  s_0b536d2972a09b::t_b93f404d885307 1-628
+apps/construction-management/src/site-work/domain/document-thread.test.ts
+  s_0b536d2972a09b::t_861833ee3b8787 1-123
+apps/construction-management/src/site-work/domain/document-thread.ts
+  s_0b536d2972a09b::t_e38bd0a86c040d 1-178
+apps/construction-management/src/site-work/infrastructure/document-locator.ts
+  s_0b536d2972a09b::t_76a624176382be 1-108
+apps/construction-management/src/site-work/infrastructure/document-thread-factory.ts
+  s_0b536d2972a09b::t_9a3150688b7267 1-37
+apps/construction-management/src/site-work/infrastructure/document-thread-store.ts
+  s_0b536d2972a09b::t_ea3f7e5340bc35 1-270
+apps/construction-management/src/site-work/application/document-access.ts
+  s_f64fbd0ff01db5::t_efc71dbc9425cd 1-54
+apps/construction-management/src/site-work/application/document-thread-ports.ts
+  s_f64fbd0ff01db5::t_e3cc7b6a974d38 1-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c1883fa80e2bf9e722a402032b477307d4a167b6",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f64fbd0ff01db5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aba3e7fa7df5f869d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
