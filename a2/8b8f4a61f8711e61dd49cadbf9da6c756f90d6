@@ -1,0 +1,19 @@
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_27dd637a42123b 673-685
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a28b8f4a61f8711e61dd49cadbf9da6c756f90d6",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
