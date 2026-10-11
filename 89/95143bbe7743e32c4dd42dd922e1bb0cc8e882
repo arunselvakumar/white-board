@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/finance/party-payments/party-payments.http.test.ts
+  s_15cc27c8b260e0::t_a279dc049b8781 1-862
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8995143bbe7743e32c4dd42dd922e1bb0cc8e882",
+  "prompts": {},
+  "sessions": {
+    "s_15cc27c8b260e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2e56abce7eac96f5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
