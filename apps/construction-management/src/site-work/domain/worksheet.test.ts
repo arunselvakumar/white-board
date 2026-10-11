@@ -377,6 +377,24 @@ describe("worksheet content", () => {
     expect(moved.workTypeId).toBeNull();
   });
 
+  it("keeps a saved Contractor that has since left the Project", () => {
+    const previous = worksheetContent(input(), settings(), facts());
+    const left = facts({
+      contractor: {
+        id: CONTRACTOR,
+        isActive: true,
+        onProject: false,
+        departmentIds: [DEPARTMENT],
+      },
+    });
+    expect(
+      worksheetContent(input(), settings(), left, previous).contractorId,
+    ).toBe(CONTRACTOR);
+    expect(() => worksheetContent(input(), settings(), left)).toThrow(
+      "not assigned to the Project",
+    );
+  });
+
   it("keeps a disabled Department or Work Type the sheet already had", () => {
     const previous = worksheetContent(input(), settings(), facts());
     const disabled = facts({
