@@ -1,0 +1,31 @@
+apps/construction-management/src/reporting/domain/equipment-lifecycle-reports.ts
+  s_0b536d2972a09b::t_9eb7f7de75f3ce 135-136
+apps/construction-management/app/api/construction/reporting/reports/site-work-reports.http.test.ts
+  s_9c0ef36e877c94::t_cc43dad57df463 1-785
+apps/construction-management/test/site-work.ts
+  s_9c0ef36e877c94::t_a729251b16877f 647-912
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4aba7036ee9b269b97770d3b9d817304241de07c",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c0ef36e877c94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a64f9124101e2c715",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
