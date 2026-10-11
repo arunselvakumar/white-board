@@ -1,0 +1,21 @@
+apps/construction-management/components/site-work/hindrances/hindrance-form.stories.tsx
+  s_0b536d2972a09b::t_834f56e01f4ddd 59,65-67,76-79,85,106-115,123,130,137,186-189,201,235-238,240,247,264-267
+apps/construction-management/components/site-work/hindrances/hindrances-list.stories.tsx
+  s_0b536d2972a09b::t_8240be53ac4030 43-45,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e896d3489175ff2a62f1009ac69821e860d707e9",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
