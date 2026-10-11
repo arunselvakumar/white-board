@@ -1,0 +1,21 @@
+apps/construction-management/app/api/construction/labour/payments/payments.http.test.ts
+  s_d85efaaff765fa::t_317f2afc7541ac 533-534,536-537,665
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_d85efaaff765fa::t_e1ac334825ca1f 98-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bafca06117b97b1bd46c85d34b87786233f1f1fb",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
