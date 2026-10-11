@@ -1,0 +1,19 @@
+apps/construction-management/components/site-work/equipment/equipment-dialogs.stories.tsx
+  s_0b536d2972a09b::t_734a6d5198eff1 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aa14402e182ec9dd7c52dd03041fb50b17f1c582",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
