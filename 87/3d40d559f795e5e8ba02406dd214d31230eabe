@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets.http.test.ts
+  s_0b536d2972a09b::t_39a9d83746c90e 1-954
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "873d40d559f795e5e8ba02406dd214d31230eabe",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
