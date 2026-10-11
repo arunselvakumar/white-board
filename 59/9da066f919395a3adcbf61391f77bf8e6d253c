@@ -1,0 +1,21 @@
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_dfbb304a4b2167 712-737
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_e2c71298cb8394 704
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "599da066f919395a3adcbf61391f77bf8e6d253c",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
