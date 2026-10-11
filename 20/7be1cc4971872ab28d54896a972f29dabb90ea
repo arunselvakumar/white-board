@@ -1,0 +1,27 @@
+apps/construction-management/src/reporting/domain/daily-progress-report.ts
+  s_0b536d2972a09b::t_a6dfff078c268e 423,426,495,501
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_0b536d2972a09b::t_90fb9fdf9e4be5 5-9,15-16,32-35,40-44,52-58,63
+apps/construction-management/src/reporting/infrastructure/dpr-images.ts
+  s_0b536d2972a09b::t_f2e19919ecd17d 1-61
+apps/construction-management/src/reporting/infrastructure/dpr-pdf.test.ts
+  s_0b536d2972a09b::t_966a64bec254d0 1-155
+apps/construction-management/src/reporting/infrastructure/dpr-pdf.ts
+  s_0b536d2972a09b::t_c1fe7188e4d385 1-524
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "207be1cc4971872ab28d54896a972f29dabb90ea",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
