@@ -1,0 +1,129 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_0b536d2972a09b::t_3854f62b315e39 157-160,928-931
+apps/construction-management/app/api/construction/procurement/inventory/inventory-models.ts
+  s_0b536d2972a09b::t_752acecaa4e386 32-33
+apps/construction-management/app/api/construction/projects/projects/[id]/locations/handlers.ts
+  s_0b536d2972a09b::t_99686866d4bfd3 1-3,6-12
+apps/construction-management/app/api/construction/projects/projects/[id]/wings/handlers.ts
+  s_0b536d2972a09b::t_e5279cfc1419ef 1-3,6-12
+apps/construction-management/app/api/construction/site-work/access/access-models.ts
+  s_0b536d2972a09b::t_da3891c896acee 1-33
+apps/construction-management/app/api/construction/site-work/access/access-openapi.ts
+  s_0b536d2972a09b::t_61fc19b543d540 1-34
+apps/construction-management/app/api/construction/site-work/access/route.ts
+  s_0b536d2972a09b::t_0aea26c0d9a0c2 1-54
+apps/construction-management/app/api/construction/site-work/documents/documents-openapi.ts
+  s_0b536d2972a09b::t_975b8fea026734 1-9
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets-openapi.ts
+  s_0b536d2972a09b::t_7906341c570365 1-9
+apps/construction-management/app/api/construction/site-work/equipment/equipment-openapi.ts
+  s_0b536d2972a09b::t_21d2b0dcd61d93 1-9
+apps/construction-management/app/api/construction/site-work/hindrances/hindrances-openapi.ts
+  s_0b536d2972a09b::t_07260d96a4b9ba 1-9
+apps/construction-management/app/api/construction/site-work/progress-reports/progress-reports-openapi.ts
+  s_0b536d2972a09b::t_edcc21685e65be 1-9
+apps/construction-management/app/api/construction/site-work/settings/settings-openapi.ts
+  s_0b536d2972a09b::t_f672dba818796f 1-9
+apps/construction-management/app/api/construction/site-work/site-diary/site-diary-openapi.ts
+  s_0b536d2972a09b::t_a4c58052e0699a 1-9
+apps/construction-management/app/api/construction/site-work/site-work-openapi.ts
+  s_0b536d2972a09b::t_1971376df85c9f 1-67
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets-openapi.ts
+  s_0b536d2972a09b::t_b46d7c9ca65a34 1-9
+apps/construction-management/app/app/masters/equipments/page.tsx
+  s_0b536d2972a09b::t_3699ac1c26680d 1-9
+apps/construction-management/app/app/masters/work-types/page.tsx
+  s_0b536d2972a09b::t_5ea98c14d56775 1-9
+apps/construction-management/app/app/projects/[id]/equipment/page.tsx
+  s_0b536d2972a09b::t_8b92634c5e4116 1-9
+apps/construction-management/app/app/projects/[id]/hindrances/page.tsx
+  s_0b536d2972a09b::t_cc51ddcadd8bea 1-9
+apps/construction-management/app/app/projects/[id]/progress-reports/page.tsx
+  s_0b536d2972a09b::t_c8c4ce99be4936 1-9
+apps/construction-management/app/app/projects/[id]/site-diary/page.tsx
+  s_0b536d2972a09b::t_aa006a4effe33b 1-9
+apps/construction-management/app/app/projects/[id]/worksheets/page.tsx
+  s_0b536d2972a09b::t_716e7ae7d74943 1-9
+apps/construction-management/components/projects/project-module-icons.ts
+  s_0b536d2972a09b::t_89f4cc38d48c02 3,5-7,15,39-43
+apps/construction-management/components/site-work/site-work-coming-soon.tsx
+  s_0b536d2972a09b::t_f5d28c87906cb5 1-26
+apps/construction-management/lib/masters-nav.ts
+  s_0b536d2972a09b::t_ac1cef9e61dfa9 13,16,190-205
+apps/construction-management/src/composition/site-work-stock.ts
+  s_0b536d2972a09b::t_23258c0a8f77db 1-66
+apps/construction-management/src/composition/structure-usage.ts
+  s_0b536d2972a09b::t_84da74f3dc10fa 1-88
+apps/construction-management/src/organization/infrastructure/seeds/designations.json
+  s_0b536d2972a09b::t_f5e7e8f539bdfc 177,258,264-272,379-380,425-426
+apps/construction-management/src/procurement/domain/stock-ledger.ts
+  s_0b536d2972a09b::t_f9549babbe7e00 47-48,50-55
+apps/construction-management/src/procurement/infrastructure/inventory-queries.ts
+  s_0b536d2972a09b::t_3c189ef9b78d53 503-505,520-543,545-556,558-560
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_0b536d2972a09b::t_e44ddf4e6dd96f 98-132
+apps/construction-management/src/projects/domain/structure-repository.ts
+  s_0b536d2972a09b::t_e237efe798c834 95-97
+apps/construction-management/src/projects/infrastructure/create-project-structure.ts
+  s_0b536d2972a09b::t_be5f749b6b1706 16-17
+apps/construction-management/src/projects/infrastructure/unused-structure.ts
+  s_0b536d2972a09b::t_a0471be25c3f6d 4-6
+apps/construction-management/src/queries/site-work-access.ts
+  s_0b536d2972a09b::t_c8acf7831dacb6 1-39
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_0b536d2972a09b::t_8e3119c0661cf2 7-11,24-25
+apps/construction-management/src/shared-kernel/access/access.test.ts
+  s_0b536d2972a09b::t_cb1256577fb5b1 62-63
+apps/construction-management/src/shared-kernel/access/menus.ts
+  s_0b536d2972a09b::t_eeaef749423c58 40,92-101
+apps/construction-management/src/shared-kernel/backdated-policy.test.ts
+  s_0b536d2972a09b::t_03295d82696f94 39-41,50,57
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_0b536d2972a09b::t_ecc984cb712c55 101-102
+apps/construction-management/src/shared-kernel/sequence/modules.ts
+  s_0b536d2972a09b::t_ce16ba7c692892 35-50
+apps/construction-management/src/shared-kernel/sequence/sequence-rule.test.ts
+  s_0b536d2972a09b::t_2aa6b6673e8f9c 79-82
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_919ee836143d2f 1-69
+apps/construction-management/src/site-work/domain/shift.ts
+  s_0b536d2972a09b::t_7f7b376906cb66 1-28
+apps/construction-management/src/site-work/domain/site-work-documents.ts
+  s_0b536d2972a09b::t_6173176fa3a100 1-67
+apps/construction-management/src/site-work/infrastructure/site-work-guards.ts
+  s_0b536d2972a09b::t_9bba8125eac540 1-48
+packages/db/construction/prisma/migrations/20261012090000_construction_masters_work_types/migration.sql
+  s_0b536d2972a09b::t_a47e2f86b651bd 1-88
+packages/db/construction/prisma/migrations/20261012090100_construction_procurement_site_work_sources/migration.sql
+  s_0b536d2972a09b::t_4062d22df1babf 1-8
+packages/db/construction/prisma/migrations/20261012090200_construction_reporting_site_work_kinds/migration.sql
+  s_0b536d2972a09b::t_c33ae52ebc57f4 1-12
+packages/db/construction/prisma/migrations/20261012090300_construction_site_work/migration.sql
+  s_0b536d2972a09b::t_adfd5465badee9 1-620
+packages/db/construction/prisma/schema/base.prisma
+  s_0b536d2972a09b::t_72072e70981075 13
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_0b536d2972a09b::t_b51893060b5ba0 11-20,22-23,25-26,28-34,57,335-337,392-430
+packages/db/construction/prisma/schema/construction-procurement.prisma
+  s_0b536d2972a09b::t_8f7f1a0a72cef5 128-130
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_0b536d2972a09b::t_ae57829c9b3f86 12-18
+packages/db/construction/prisma/schema/construction-site-work.prisma
+  s_0b536d2972a09b::t_5677c63c4ebb83 1-669
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f4d7e8487482caa01836852b5c701005b7abc6b6",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
