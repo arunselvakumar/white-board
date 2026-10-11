@@ -16,6 +16,15 @@ enum ConstructionReportingReportKind {
   rented_equipment_usage
   equipment_maintenance
   equipment_transfers
+  /// Finance (CM-0017 §16).
+  account_ledger
+  petty_cash
+  transactions
+  contractor_payments
+  supplier_payments
+  other_expenses
+  tds_194c
+  due_payments
 
   @@map("report_kind")
   @@schema("construction_reporting")

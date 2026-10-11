@@ -21,8 +21,9 @@ function toJob(row: Row): ReportJob {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    // Every Prisma `report_kind` is in `REPORT_KINDS` now (CM-606, CM-608).
-    kind: row.kind,
+    // The finance kinds join `REPORT_KINDS` with CM-709; until then no job
+    // of theirs exists.
+    kind: row.kind as ReportJob["kind"],
     params: row.params as ReportParams,
     status: row.status,
     includesMoney: row.includesMoney,

@@ -694,19 +694,117 @@ CM-607 and CM-608 were added when the owner chose a full site diary for the DPR 
 - **Dashboard.** The Project Dashboard's **Daily Work** section (labour availability trend from worksheets vs attendance; contractor-wise skilled / unskilled) and **Equipment Usage** section (top equipment by work hours; owned vs rented hours) show data for the duration filter. The M6 stubs of CM-412 are gone.
 - **Tests:** HTTP tests for the figures across two contractors and two pieces of equipment; stories.
 
-## M7 — Finance (board only)
+## M7 — Finance
 
-| ID     | Seq | Title                                                                                                         | Status | Blocked by     | Area           |
-| ------ | --: | ------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
-| CM-701 |   1 | Prisma `construction-finance.prisma`; Company bank/cash accounts (seed 2) with opening ledger entries         | todo   | CM-201         | Data+Domain    |
-| CM-702 |   2 | Transactions: Payment In/Out, modes with reference, module/party, approval, transfer between accounts, import | todo   | CM-701, CM-502 | Domain+HTTP+UI |
-| CM-703 |   3 | Petty cash accounts per custodian; Payment/Receipt/Transfer vouchers; approval; export receipts ZIP           | todo   | CM-702         | Domain+HTTP+UI |
-| CM-704 |   4 | Payment categories, Other Parties, Other Expenses with approval                                               | todo   | CM-702         | Domain+HTTP+UI |
-| CM-705 |   5 | Supplier invoices from GRN (`GoodsReceiptPosted`) and payments; due dates                                     | todo   | CM-505, CM-702 | Domain+HTTP+UI |
-| CM-706 |   6 | Contractor invoices & payments with TDS section/threshold tracking (194C) and TDS ledger                      | todo   | CM-702, CM-301 | Domain+HTTP+UI |
-| CM-707 |   7 | Labour & vendor payments move onto the finance ledgers (replaces CM-215's minimal posting)                    | todo   | CM-215, CM-702 | Domain         |
-| CM-708 |   8 | Other-party purchase/sales invoices, settlement approval, sales invoice numbering                             | todo   | CM-704         | Domain+HTTP+UI |
-| CM-709 |   9 | Ledger report, petty cash report, due payments, module-wise payment widgets, Central payment view             | todo   | CM-705, CM-706 | HTTP+UI        |
+Goal: every rupee the Company moves is in one ledger — company cash and bank accounts, petty cash per Team Member, Transactions and transfers, Contractor, Supplier and Other Party invoices and payments with allocation, TDS under 194C, Other Expenses, and the wage and salary payments of M2 and M3 — with the Ledger Report, Due Payments, Central Payment and the Payments section of the Project Dashboard. Spec: `modules/07`. Product decisions: [ADR CM-0017](../adr/CM-0017-finance-product-decisions.md).
+
+| ID     | Seq | Title                                                                                                            | Status      | Blocked by     | Area           |
+| ------ | --: | ---------------------------------------------------------------------------------------------------------------- | ----------- | -------------- | -------------- |
+| CM-701 |   1 | Prisma `construction-finance.prisma`; accounts (seed 2) with opening entries; ledger writers; kernel wiring      | in_progress | CM-201         | Data+Domain    |
+| CM-702 |   2 | Transactions: Payment In/Out, modes with reference, party label, approval, transfer between accounts, import     | todo        | CM-701, CM-502 | Domain+HTTP+UI |
+| CM-703 |   3 | Petty cash accounts per custodian; Payment/Receipt/Transfer vouchers; approval; export receipts ZIP              | done        | CM-702         | Domain+HTTP+UI |
+| CM-704 |   4 | Payment categories, Other Parties, Other Expenses with approval                                                  | todo        | CM-702         | Domain+HTTP+UI |
+| CM-705 |   5 | Supplier invoices from GRN (`GoodsReceiptPosted`), party payments with allocation, opening balances; due dates   | todo        | CM-505, CM-702 | Domain+HTTP+UI |
+| CM-706 |   6 | Contractor invoices & payments with TDS 194C (PAN, thresholds, dated rates, override) and the TDS ledger         | todo        | CM-705, CM-301 | Domain+HTTP+UI |
+| CM-707 |   7 | Labour, vendor and salary payments name their account and post to the finance ledger (replaces CM-215's posting) | todo        | CM-215, CM-702 | Domain+UI      |
+| CM-708 |   8 | Other-party purchase/sales invoices, Payment In/Out, settlement approval, sales invoice numbering, Party Balance | todo        | CM-704, CM-705 | Domain+HTTP+UI |
+| CM-709 |   9 | Ledger and payment reports, due payments with ageing, Central Payment, Payments section on the Project Dashboard | todo        | CM-705, CM-706 | HTTP+UI        |
+
+### CM-701 — Finance schema, accounts and wiring
+
+**Done when:**
+
+- **Schema.** `construction-finance.prisma` (schema `construction_finance`) holds every M7 table in one migration, with the CHECKs and live-row unique indexes of CM-0017. Small migrations in other schemas, each touching only its own: masters (Contractor TDS settings), labour (`wage_payments.account_id`), HRMS (`salary_slips.paid_from_account_id`), reporting (the finance report kinds), and a data migration seeding the two company accounts and the Payment Categories for existing Companies.
+- **Ledger writers.** `account-ledger.ts` and `party-ledger.ts` post entries and reversals (append-only, `reverses_entry_id` unique, `SUM(amount)::bigint` balances), with unit and Postgres tests.
+- **Kernel wiring.**
+  - The `finance.other_expenses` menu; Accountant, Site Engineer and Site Supervisor templates (CM-0017 §14).
+  - Numbering modules TXN / PAY / EXP; back-dated modules `party_payment`, `party_invoice`, `other_expense`, `labour_payment`, `vendor_payment`.
+  - `CompanyCreated` seeds the two accounts and the Payment Categories.
+  - The finance access route, the OpenAPI wiring, the `AccountPosting` and `FinanceDirectory` ports with their composition adapters, the finance document thread (remarks and files).
+  - The Project's **Payments** module becomes a hub with a tab per menu; Masters gains Company's Bank A/C, Payment Categories and Other Party; the Workspace gains Central Payment and Party Balance (stub pages until their tickets).
+- **Company's Bank A/C.** Masters → Company's Bank A/C lists accounts with balances; add / edit (Cash or Bank with bank fields), opening balance and date, Set As Primary, delete refused when in use. A shared **account picker** (company accounts and the petty-cash accounts the member may use, filtered by mode) exists for every money form.
+- **Tests:** HTTP tests for the seed, uniqueness, primary, opening-balance change (reversal) and delete refusal; stories for the list, the form and the empty state.
+
+### CM-702 — Transactions and transfers
+
+**Done when:**
+
+- **Form.** A member with Transactions Create records a Transaction (CM-0017 §5): date under the back-dated rules, Payment In / Out, account via the picker (mode decides Cash or Bank), Payment Category, mode with cheque number or reference, Project or Store, Paid To / Received From (party picker or typed name), amount, description, files. Save and Save & Approve.
+- **Approval.** Approve / Reject with a reason, singly and in bulk; approval posts the account entry; editing an approved one reverses it and returns it to pending; a rejected one can be edited and resubmitted; delete reverses.
+- **Transfer.** Transfer between two accounts (company ↔ company, company ↔ petty cash) with approval posting two entries.
+- **Duplicate reference** is refused with 409 `DUPLICATE_REFERENCE` unless confirmed.
+- **List** per Project (and a company-wide list in Central Payment for the Owner) with filters (date, type, account, category, mode, party, status), the totals and bulk approve / reject; detail with remarks and files.
+- **Import.** Sample xlsx download and import, all or nothing with per-row errors; rows start pending.
+- **Tests:** HTTP tests for mode/account rules, approval transitions and their entries, closing-date refusal on approve, transfer, duplicate reference, import errors, concurrency 409; stories for the form, list, detail, import and empty state.
+
+### CM-703 — Petty Cash
+
+**Done when:**
+
+- **Accounts.** The Petty Cash tab lists petty-cash accounts with holder, balance (approved) and pending total; View all shows every account, otherwise only the member's own. Opening a new account for a Team Member (one each).
+- **Vouchers.** Payment, Receipt and Transfer vouchers (CM-0017 §9) numbered PC; Save / Save & Approve; approval singly and in bulk; edit, resubmit and delete with reversals as in CM-702.
+- **Account statement** with opening, each approved voucher, running balance and closing.
+- **Export Receipts** downloads a ZIP of voucher photos for an account and a date range (≤ 500 files).
+- **Tests:** HTTP tests for view-all scoping, voucher types, balances counting approved only, transfer both sides, ZIP contents; stories.
+
+### CM-704 — Payment Categories, Other Parties, Other Expenses
+
+**Done when:**
+
+- **Payment Categories** (Masters): seeded list per Company, add / rename / disable seeds / delete when unused.
+- **Other Parties** (Masters): name\*, mobile, email, GSTIN (fills the GST state), PAN, address, Projects; unique name among live rows; delete refused when in use.
+- **Other Expenses** tab on the Project: the form of CM-0017 §10 (EXP number), approval, edit / resubmit / delete with reversals, list with filters and bulk approve, detail with remarks and files.
+- **Tests:** HTTP tests for the masters' uniqueness and delete refusals, expense approval and entries; stories.
+
+### CM-705 — Supplier invoices and party payments
+
+**Done when:**
+
+- **From GRN.** A GRN posted with an invoice number creates its supplier invoice; edit and delete follow (CM-0017 §13); GRNs without one are listed as awaiting invoice and can be grouped into one invoice. `GoodsReceiptPayments` answers from finance.
+- **Invoices.** Supplier invoice list per Project with invoiced, paid, balance, due date, status (Open, Partly paid, Paid, Settled, Overdue), variance flag; manual invoice form; edit with reversal; delete refused when allocated.
+- **Opening balances** per party per Project.
+- **Party payments.** The payment form: party, account (required), mode and reference, amount, allocation across open invoices (oldest due first), advance for the rest, Payment Category, Paid By, remarks, files; PAY number; receipt PDF; Cancel with reversal; Apply advance.
+- **Party statement** per party per Project with running balance.
+- **Settle Invoice** raises a settlement for approval (CM-0017 §7).
+- **Tests:** HTTP tests for the GRN listener (post, edit, delete, idempotent), paid GRN refusal, allocation rules (over-allocation, other party's invoice, other Project), advance and Apply advance, cancel, settlement approval; stories.
+
+### CM-706 — Contractor invoices, payments and TDS 194C
+
+**Done when:**
+
+- **Masters.** Contractors show TDS settings (applies, lower-deduction rate, note) and the payee kind from the PAN.
+- **Rates.** `statutory_tds_rates` seeded from JSON (CM-0008 pattern) with the unit test that the migration matches the JSON.
+- **Invoices.** Contractor invoices per Project with Department, taxable value and GST amount, invoiced, TDS, paid, balance.
+- **Payments.** The party payment form for a Contractor suggests TDS (CM-0017 §8: rate by payee kind, single and aggregate thresholds across Projects in the financial year, catch-up on the crossing payment, GST share out of the base); overriding needs a reason; settled = paid + TDS.
+- **TDS ledger** per Contractor per financial year with quarterly totals, on screen and as a report.
+- **Tests:** golden tests for the suggestion (below thresholds, single above ₹30,000, aggregate crossing with catch-up, no PAN, lower rate, GST base); HTTP tests for override reason, entries and the ledger; stories.
+
+### CM-707 — Wage and salary payments post to accounts
+
+**Done when:**
+
+- **Wage payments** require an account (Cash → Cash or petty cash; Bank → Bank) and post an account entry through `AccountPosting` in the same transaction; Cancel reverses it. The pay dialog has the account picker. Back-dated checks use `labour_payment` / `vendor_payment`.
+- **Salary slips.** Mark Paid names the account and posts one entry per slip.
+- **Tests:** HTTP tests that a wage payment and its cancel move the account balance, a missing or wrong-kind account is refused, salary Mark Paid posts; stories updated.
+
+### CM-708 — Other Party invoices and settlement
+
+**Done when:**
+
+- **Invoices.** Purchase invoices (typed number) and sales invoices (INV number) per Other Party and Project; edit with reversal; delete when unallocated.
+- **Payments.** Payment Out against purchase invoices and Payment In against sales invoices, with allocation and advances, through the CM-705 form.
+- **Settlement** list for approvers: approve / reject with a reason, singly and in bulk.
+- **Party Balance** in the Workspace: each Other Party's balance across Projects and its statement.
+- **Tests:** HTTP tests for numbering, receivable signs, Payment In allocation, settlement transitions; stories.
+
+### CM-709 — Reports, Central Payment and the dashboard
+
+**Done when:**
+
+- **Reports** (xlsx + PDF report jobs, CM-0017 §16): Ledger, Petty Cash, Transactions, Contractor Payments, Supplier Payments, Other Expenses, TDS 194C and Due Payments with ageing.
+- **Central Payment** in the Workspace: party dues across Projects, account balances, petty-cash accounts.
+- **Project Dashboard** Payments section (In / Out / balance by month, Due Payments, Module Wise Payment) and the Payment Approvals KPI; the M7 stubs are gone.
+- **Tests:** HTTP tests for the ledger opening / closing across a period boundary, ageing buckets and the dashboard figures across two parties and two accounts; stories.
 
 ## M8 — Tasks, issues, inspections (board only)
 

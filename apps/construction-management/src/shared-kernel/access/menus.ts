@@ -125,6 +125,14 @@ const DEFINITIONS = [
     "CRUDAJPNVO",
     true,
   ],
+  // A Project's spend with no party bill (ADR CM-0017 §10); legacy had no menu.
+  [
+    "finance.other_expenses",
+    "Other Expenses",
+    "payment_accounting",
+    "CRUDAJPO",
+    true,
+  ],
   // Materials.
   ["procurement.manage_materials", "Manage Materials", "materials", "R", true],
   [

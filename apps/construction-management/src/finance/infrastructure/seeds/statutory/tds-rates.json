@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "section": "194C",
+      "label": "194C",
+      "payeeKind": "individual_huf",
+      "rate": "1.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2016-06-01",
+      "source": "Income-tax Act 1961 s.194C(1)(i) 1% for an individual or HUF; s.194C(5) as amended by Finance Act 2016: Rs 30,000 single, Rs 1,00,000 aggregate in a financial year, from 1 Jun 2016"
+    },
+    {
+      "section": "194C",
+      "label": "194C",
+      "payeeKind": "other",
+      "rate": "2.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2016-06-01",
+      "source": "Income-tax Act 1961 s.194C(1)(ii) 2% for any other person; s.194C(5) as amended by Finance Act 2016, from 1 Jun 2016"
+    },
+    {
+      "section": "194C",
+      "label": "194C",
+      "payeeKind": "no_pan",
+      "rate": "20.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2016-06-01",
+      "source": "Income-tax Act 1961 s.206AA: no PAN, the higher of twice the rate or 20%; s.194C(5) thresholds"
+    },
+    {
+      "section": "194C",
+      "label": "393 (194C)",
+      "payeeKind": "individual_huf",
+      "rate": "1.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2026-04-01",
+      "source": "Income-tax Act 2025 s.393 (payments to contractors, formerly 1961 Act s.194C), in force from 1 Apr 2026; figures unchanged"
+    },
+    {
+      "section": "194C",
+      "label": "393 (194C)",
+      "payeeKind": "other",
+      "rate": "2.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2026-04-01",
+      "source": "Income-tax Act 2025 s.393 (formerly 1961 Act s.194C), in force from 1 Apr 2026; figures unchanged"
+    },
+    {
+      "section": "194C",
+      "label": "393 (194C)",
+      "payeeKind": "no_pan",
+      "rate": "20.00",
+      "singleThreshold": 3000000,
+      "aggregateThreshold": 10000000,
+      "effectiveFrom": "2026-04-01",
+      "source": "Income-tax Act 2025 (no PAN: higher rate, formerly 1961 Act s.206AA), in force from 1 Apr 2026; figures unchanged"
+    }
+  ]
+}

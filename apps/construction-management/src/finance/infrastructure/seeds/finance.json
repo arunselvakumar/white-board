@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "source": "modules/07 'Company bank / cash accounts' and PaymentCategory seed list (legacy list cut off after Medical; the rest completed for M7, ADR CM-0017 §2)",
+  "accounts": [
+    { "name": "Company's Cash Account", "kind": "cash", "isPrimary": true },
+    { "name": "Company's Bank Account", "kind": "bank", "isPrimary": false }
+  ],
+  "paymentCategories": [
+    "Bonus",
+    "Canteen",
+    "Computer and software",
+    "Conveyance",
+    "Entertainment",
+    "Fuel",
+    "Hardware",
+    "Housekeeping",
+    "Internet",
+    "Labour",
+    "Labour Payment",
+    "Maintenance",
+    "Marketing and Advertising",
+    "Medical",
+    "Miscellaneous",
+    "Office Supplies",
+    "Postage and Courier",
+    "Printing and Stationery",
+    "Rent",
+    "Repairs",
+    "Salary",
+    "Site Expenses",
+    "Telephone",
+    "Travel",
+    "Utilities"
+  ]
+}

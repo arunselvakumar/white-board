@@ -1,3 +1,4 @@
+import { SeedCompanyFinanceListener } from "@/src/finance/infrastructure/seed-company-finance";
 import { SeedCompanyLeaveTypesListener } from "@/src/hrms/infrastructure/seed-company-leave-types";
 import { SeedCompanyMastersListener } from "@/src/masters/infrastructure/seed-company-masters";
 import type { DomainEventListener } from "@/src/shared-kernel/events";
@@ -12,5 +13,6 @@ export function companyCreatedListeners(): DomainEventListener[] {
   return [
     new SeedCompanyMastersListener(),
     new SeedCompanyLeaveTypesListener(),
+    new SeedCompanyFinanceListener(),
   ];
 }

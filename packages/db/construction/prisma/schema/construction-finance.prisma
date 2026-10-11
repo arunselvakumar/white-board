@@ -1,0 +1,766 @@
+/// Construction Management — finance context (`modules/07`, ADR CM-0017):
+/// company cash, bank and petty-cash accounts with one ledger of account
+/// entries; Payment Categories and Other Parties; Transactions, transfers,
+/// petty-cash vouchers and Other Expenses (each approved before it moves
+/// money); party invoices, payments, allocations, settlements and the party
+/// ledger; the dated TDS rate table.
+///
+/// Conventions:
+/// - Money is paise in `BIGINT`, signed only on ledger entries. Balances are
+///   `SUM(amount)::bigint` over append-only entries (ADR CM-0004); no
+///   balance column exists.
+/// - Projects, Stores, Contractors, Suppliers, Departments, Labours, Vendors
+///   and Team Members live in other schemas: their ids are kept without
+///   foreign keys.
+/// - Document numbers come from the numbering rules (CM-114, CM-0017 §15).
+/// - Rows are soft-deleted (`deleted_at`); unique rules hold among live rows
+///   through partial indexes in the migration.
+
+enum ConstructionFinanceAccountKind {
+  /// Company cash.
+  cash
+  /// Company bank account.
+  bank
+  /// A Team Member's petty cash.
+  petty_cash
+
+  @@map("account_kind")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceApprovalStatus {
+  pending
+  approved
+  rejected
+
+  @@map("approval_status")
+  @@schema("construction_finance")
+}
+
+/// Cash takes a Cash or Petty Cash account; Cheque, Online and UPI take a
+/// Bank account (CM-0017 §5).
+enum ConstructionFinancePaymentMode {
+  cash
+  cheque
+  online
+  upi
+
+  @@map("payment_mode")
+  @@schema("construction_finance")
+}
+
+/// Who a Paid To / Received From label names (CM-0017 §5). A label never
+/// moves the party's balance.
+enum ConstructionFinanceCounterpartyKind {
+  contractor
+  supplier
+  other_party
+  labour
+  vendor
+  team_member
+
+  @@map("counterparty_kind")
+  @@schema("construction_finance")
+}
+
+/// The parties whose balances live in this schema. Labours and Vendors keep
+/// theirs in `construction_labour.ledger_entries` (M2).
+enum ConstructionFinancePartyType {
+  contractor
+  supplier
+  other_party
+
+  @@map("party_type")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceAccountEntryKind {
+  opening
+  /// Money into the account.
+  receipt
+  /// Money out of the account.
+  payment
+  transfer_in
+  transfer_out
+
+  @@map("account_entry_kind")
+  @@schema("construction_finance")
+}
+
+/// What wrote an account entry; the Ledger Report's "Module" filter.
+enum ConstructionFinanceAccountEntrySource {
+  account
+  transaction
+  account_transfer
+  petty_cash_voucher
+  other_expense
+  party_payment
+  wage_payment
+  salary_slip
+
+  @@map("account_entry_source")
+  @@schema("construction_finance")
+}
+
+/// Positive amounts mean the Company owes the party (CM-0017 §7).
+enum ConstructionFinancePartyEntryKind {
+  /// What was owed (+) or advanced (−) before the app, per Project.
+  opening
+  /// A bill from the party (+).
+  invoice
+  /// A bill to the party (−).
+  sales_invoice
+  /// Money paid to the party (−).
+  payment
+  /// Money received from the party (+).
+  receipt
+  /// Tax deducted at source on a payment (−).
+  tds
+  /// What an approved settlement wrote off: − on a bill from the party,
+  /// + on a bill to the party.
+  write_off
+
+  @@map("party_entry_kind")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinancePartyEntrySource {
+  party_opening
+  invoice
+  party_payment
+  settlement
+
+  @@map("party_entry_source")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceTransactionType {
+  payment_in
+  payment_out
+
+  @@map("transaction_type")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceVoucherType {
+  /// Cash out.
+  payment
+  /// Cash in.
+  receipt
+  /// To another petty-cash or company account.
+  transfer
+
+  @@map("voucher_type")
+  @@schema("construction_finance")
+}
+
+/// A bill from the party (purchase, contractor or supplier invoice) or a
+/// bill to the party (an Other Party sales invoice).
+enum ConstructionFinanceInvoiceDirection {
+  payable
+  receivable
+
+  @@map("invoice_direction")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceInvoiceOrigin {
+  manual
+  /// Created from a GRN posted with an invoice number (CM-0017 §13).
+  goods_receipt
+
+  @@map("invoice_origin")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinancePaymentDirection {
+  /// Payment Out: money to the party.
+  out
+  /// Payment In: money from the party (Other Parties only).
+  in
+
+  @@map("payment_direction")
+  @@schema("construction_finance")
+}
+
+enum ConstructionFinanceDocumentType {
+  transaction
+  account_transfer
+  petty_cash_voucher
+  other_expense
+  invoice
+  party_payment
+  settlement
+
+  @@map("document_type")
+  @@schema("construction_finance")
+}
+
+/// Payee kinds of the TDS rate table: P and H in the PAN's fourth letter,
+/// every other holder, and a payee with no PAN (section 206AA).
+enum ConstructionFinanceTdsPayeeKind {
+  individual_huf
+  other
+  no_pan
+
+  @@map("tds_payee_kind")
+  @@schema("construction_finance")
+}
+
+/// A company Cash or Bank account (Masters → Company's Bank A/C) or a Team
+/// Member's petty cash (CM-0017 §2). The opening balance is an account
+/// entry, never a column.
+model ConstructionFinanceAccount {
+  id             String                         @id @db.Uuid
+  workspaceId    String                         @map("workspace_id")
+  kind           ConstructionFinanceAccountKind
+  name           String
+  bankName       String?                        @map("bank_name")
+  accountNumber  String?                        @map("account_number")
+  ifsc           String?
+  branch         String?
+  /// Petty cash only: the Team Member who holds it.
+  holderMemberId String?                        @map("holder_member_id") @db.Uuid
+  /// Company accounts only; exactly one live primary per Company.
+  isPrimary      Boolean                        @default(false) @map("is_primary")
+  /// The date the opening entry is dated.
+  openingDate    DateTime                       @map("opening_date") @db.Date
+  isSeed         Boolean                        @default(false) @map("is_seed")
+  createdAt      DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime                       @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy      String                         @map("created_by")
+  updatedBy      String                         @map("updated_by")
+  deletedAt      DateTime?                      @map("deleted_at") @db.Timestamptz(3)
+  deletedBy      String?                        @map("deleted_by")
+
+  entries ConstructionFinanceAccountEntry[]
+
+  @@index([workspaceId, kind])
+  @@map("accounts")
+  @@schema("construction_finance")
+}
+
+/// Every rupee into (+) or out of (−) an account (CM-0017 §3). Append-only:
+/// a change writes an entry reversing the old one and a new one. The
+/// columns the Ledger Report filters on are copied from the source.
+model ConstructionFinanceAccountEntry {
+  id                String                                @id @db.Uuid
+  workspaceId       String                                @map("workspace_id")
+  accountId         String                                @map("account_id") @db.Uuid
+  projectId         String?                               @map("project_id") @db.Uuid
+  storeId           String?                               @map("store_id") @db.Uuid
+  entryDate         DateTime                              @map("entry_date") @db.Date
+  kind              ConstructionFinanceAccountEntryKind
+  /// Paise, signed: + into the account, − out of it.
+  amount            BigInt
+  mode              ConstructionFinancePaymentMode?
+  /// Cheque number or transaction reference.
+  reference         String?
+  paymentCategoryId String?                               @map("payment_category_id") @db.Uuid
+  counterpartyKind  ConstructionFinanceCounterpartyKind?  @map("counterparty_kind")
+  counterpartyId    String?                               @map("counterparty_id") @db.Uuid
+  /// The name printed in the ledger (a party's name or a typed one).
+  counterpartyName  String?                               @map("counterparty_name")
+  /// The document's number (TXN/…, PC/…, PAY/…) when it has one.
+  documentNumber    String?                               @map("document_number")
+  narration         String?
+  sourceType        ConstructionFinanceAccountEntrySource @map("source_type")
+  sourceId          String                                @map("source_id") @db.Uuid
+  reversesEntryId   String?                               @unique @map("reverses_entry_id") @db.Uuid
+  createdAt         DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy         String                                @map("created_by")
+
+  account ConstructionFinanceAccount @relation(fields: [accountId], references: [id])
+
+  @@index([workspaceId, accountId, entryDate])
+  @@index([workspaceId, projectId, entryDate])
+  @@index([sourceType, sourceId])
+  @@map("account_entries")
+  @@schema("construction_finance")
+}
+
+/// Payment Categories (Masters, `masters.payment_categories`). Each Company
+/// gets the seed list; seeds are disabled, not deleted.
+model ConstructionFinancePaymentCategory {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("payment_categories")
+  @@schema("construction_finance")
+}
+
+/// A counter-party that is not a Contractor, Supplier, Labour or Vendor
+/// (Masters → Other Party, CM-0017 §11).
+model ConstructionFinanceOtherParty {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  mobile      String?
+  email       String?
+  gstin       String?   @db.VarChar(15)
+  pan         String?   @db.VarChar(10)
+  /// GST state code (two digits), from the GSTIN or picked.
+  stateCode   String?   @map("state_code") @db.Char(2)
+  address     String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  projects ConstructionFinanceOtherPartyProject[]
+
+  @@index([workspaceId])
+  @@map("other_parties")
+  @@schema("construction_finance")
+}
+
+model ConstructionFinanceOtherPartyProject {
+  otherPartyId String   @map("other_party_id") @db.Uuid
+  projectId    String   @map("project_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  otherParty ConstructionFinanceOtherParty @relation(fields: [otherPartyId], references: [id], onDelete: Cascade)
+
+  @@id([otherPartyId, projectId])
+  @@index([projectId])
+  @@map("other_party_projects")
+  @@schema("construction_finance")
+}
+
+/// Money in or out of a company account that is not a party payment
+/// (CM-0017 §5). Approval posts its account entry.
+model ConstructionFinanceTransaction {
+  id                String                               @id @db.Uuid
+  workspaceId       String                               @map("workspace_id")
+  number            String
+  projectId         String?                              @map("project_id") @db.Uuid
+  storeId           String?                              @map("store_id") @db.Uuid
+  transactionDate   DateTime                             @map("transaction_date") @db.Date
+  type              ConstructionFinanceTransactionType
+  accountId         String                               @map("account_id") @db.Uuid
+  paymentCategoryId String?                              @map("payment_category_id") @db.Uuid
+  mode              ConstructionFinancePaymentMode
+  chequeNumber      String?                              @map("cheque_number")
+  reference         String?
+  modeDate          DateTime?                            @map("mode_date") @db.Date
+  counterpartyKind  ConstructionFinanceCounterpartyKind? @map("counterparty_kind")
+  counterpartyId    String?                              @map("counterparty_id") @db.Uuid
+  counterpartyName  String?                              @map("counterparty_name")
+  /// Paise, positive.
+  amount            BigInt
+  description       String?
+  approvalStatus    ConstructionFinanceApprovalStatus    @default(pending) @map("approval_status")
+  decidedBy         String?                              @map("decided_by")
+  decidedAt         DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  rejectReason      String?                              @map("reject_reason")
+  /// Set on rows created by one xlsx import.
+  importBatchId     String?                              @map("import_batch_id") @db.Uuid
+  createdAt         DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                               @map("created_by")
+  updatedBy         String                               @map("updated_by")
+  deletedAt         DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                              @map("deleted_by")
+
+  @@index([workspaceId, projectId, transactionDate])
+  @@index([workspaceId, accountId])
+  @@index([workspaceId, approvalStatus])
+  @@map("transactions")
+  @@schema("construction_finance")
+}
+
+/// Money moved between two accounts from the Transactions screen (company
+/// ↔ company, company ↔ petty cash). Approval posts both entries.
+model ConstructionFinanceAccountTransfer {
+  id             String                            @id @db.Uuid
+  workspaceId    String                            @map("workspace_id")
+  number         String
+  projectId      String?                           @map("project_id") @db.Uuid
+  transferDate   DateTime                          @map("transfer_date") @db.Date
+  fromAccountId  String                            @map("from_account_id") @db.Uuid
+  toAccountId    String                            @map("to_account_id") @db.Uuid
+  mode           ConstructionFinancePaymentMode
+  reference      String?
+  /// Paise, positive.
+  amount         BigInt
+  description    String?
+  approvalStatus ConstructionFinanceApprovalStatus @default(pending) @map("approval_status")
+  decidedBy      String?                           @map("decided_by")
+  decidedAt      DateTime?                         @map("decided_at") @db.Timestamptz(3)
+  rejectReason   String?                           @map("reject_reason")
+  createdAt      DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy      String                            @map("created_by")
+  updatedBy      String                            @map("updated_by")
+  deletedAt      DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy      String?                           @map("deleted_by")
+
+  @@index([workspaceId, transferDate])
+  @@index([workspaceId, approvalStatus])
+  @@map("account_transfers")
+  @@schema("construction_finance")
+}
+
+/// A petty-cash Payment, Receipt or Transfer voucher (CM-0017 §9).
+model ConstructionFinancePettyCashVoucher {
+  id                String                               @id @db.Uuid
+  workspaceId       String                               @map("workspace_id")
+  number            String
+  accountId         String                               @map("account_id") @db.Uuid
+  voucherType       ConstructionFinanceVoucherType       @map("voucher_type")
+  voucherDate       DateTime                             @map("voucher_date") @db.Date
+  projectId         String?                              @map("project_id") @db.Uuid
+  counterpartyKind  ConstructionFinanceCounterpartyKind? @map("counterparty_kind")
+  counterpartyId    String?                              @map("counterparty_id") @db.Uuid
+  counterpartyName  String?                              @map("counterparty_name")
+  /// Transfer only: a petty-cash or company account.
+  toAccountId       String?                              @map("to_account_id") @db.Uuid
+  /// Required for Payment and Receipt vouchers.
+  paymentCategoryId String?                              @map("payment_category_id") @db.Uuid
+  /// Paise, positive.
+  amount            BigInt
+  paidFor           String?                              @map("paid_for")
+  reference         String?
+  description       String?
+  approvalStatus    ConstructionFinanceApprovalStatus    @default(pending) @map("approval_status")
+  decidedBy         String?                              @map("decided_by")
+  decidedAt         DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  rejectReason      String?                              @map("reject_reason")
+  createdAt         DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                               @map("created_by")
+  updatedBy         String                               @map("updated_by")
+  deletedAt         DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                              @map("deleted_by")
+
+  @@index([workspaceId, accountId, voucherDate])
+  @@index([workspaceId, projectId, voucherDate])
+  @@index([workspaceId, approvalStatus])
+  @@map("petty_cash_vouchers")
+  @@schema("construction_finance")
+}
+
+/// A Project's spend with no party bill (CM-0017 §10).
+model ConstructionFinanceOtherExpense {
+  id                String                            @id @db.Uuid
+  workspaceId       String                            @map("workspace_id")
+  number            String
+  projectId         String                            @map("project_id") @db.Uuid
+  expenseDate       DateTime                          @map("expense_date") @db.Date
+  paymentCategoryId String                            @map("payment_category_id") @db.Uuid
+  payeeName         String?                           @map("payee_name")
+  accountId         String                            @map("account_id") @db.Uuid
+  mode              ConstructionFinancePaymentMode
+  reference         String?
+  /// Paise, positive.
+  amount            BigInt
+  description       String?
+  approvalStatus    ConstructionFinanceApprovalStatus @default(pending) @map("approval_status")
+  decidedBy         String?                           @map("decided_by")
+  decidedAt         DateTime?                         @map("decided_at") @db.Timestamptz(3)
+  rejectReason      String?                           @map("reject_reason")
+  createdAt         DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                            @map("created_by")
+  updatedBy         String                            @map("updated_by")
+  deletedAt         DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                           @map("deleted_by")
+
+  @@index([workspaceId, projectId, expenseDate])
+  @@index([workspaceId, approvalStatus])
+  @@map("other_expenses")
+  @@schema("construction_finance")
+}
+
+/// A party's opening balance on a Project or Store (CM-0017 §7). Its money
+/// is a party entry; changing it posts a reversal and a new entry.
+model ConstructionFinancePartyOpening {
+  id          String                       @id @db.Uuid
+  workspaceId String                       @map("workspace_id")
+  partyType   ConstructionFinancePartyType @map("party_type")
+  partyId     String                       @map("party_id") @db.Uuid
+  projectId   String?                      @map("project_id") @db.Uuid
+  storeId     String?                      @map("store_id") @db.Uuid
+  asOfDate    DateTime                     @map("as_of_date") @db.Date
+  /// Paise, signed: + owed to the party, − an advance with them.
+  amount      BigInt
+  createdAt   DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                     @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                       @map("created_by")
+  updatedBy   String                       @map("updated_by")
+  deletedAt   DateTime?                    @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                      @map("deleted_by")
+
+  @@index([workspaceId, partyType, partyId])
+  @@map("party_openings")
+  @@schema("construction_finance")
+}
+
+/// A bill from a Contractor, Supplier or Other Party, or a sales invoice to
+/// an Other Party (CM-0017 §7, §11, §13). Its money is a party entry.
+model ConstructionFinanceInvoice {
+  id            String                              @id @db.Uuid
+  workspaceId   String                              @map("workspace_id")
+  partyType     ConstructionFinancePartyType        @map("party_type")
+  partyId       String                              @map("party_id") @db.Uuid
+  projectId     String?                             @map("project_id") @db.Uuid
+  storeId       String?                             @map("store_id") @db.Uuid
+  direction     ConstructionFinanceInvoiceDirection
+  origin        ConstructionFinanceInvoiceOrigin    @default(manual)
+  /// Typed for a bill from the party; the INV rule for a sales invoice.
+  invoiceNumber String                              @map("invoice_number")
+  invoiceDate   DateTime                            @map("invoice_date") @db.Date
+  dueDate       DateTime?                           @map("due_date") @db.Date
+  /// Contractor invoices: one of the Contractor's Departments.
+  departmentId  String?                             @map("department_id") @db.Uuid
+  /// Paise. Optional split for the TDS base and reports.
+  taxableAmount BigInt?                             @map("taxable_amount")
+  gstAmount     BigInt?                             @map("gst_amount")
+  /// Paise, positive: the invoice total.
+  amount        BigInt
+  remarks       String?
+  /// Set when an approved settlement wrote off the rest.
+  settledAt     DateTime?                           @map("settled_at") @db.Timestamptz(3)
+  createdAt     DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String                              @map("created_by")
+  updatedBy     String                              @map("updated_by")
+  deletedAt     DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?                             @map("deleted_by")
+
+  goodsReceipts ConstructionFinanceInvoiceGoodsReceipt[]
+  allocations   ConstructionFinancePaymentAllocation[]
+  settlements   ConstructionFinanceSettlement[]
+
+  @@index([workspaceId, partyType, partyId])
+  @@index([workspaceId, projectId, invoiceDate])
+  @@index([workspaceId, dueDate])
+  @@map("invoices")
+  @@schema("construction_finance")
+}
+
+/// The GRNs a supplier invoice pays for. A GRN belongs to at most one live
+/// invoice (enforced in the migration).
+model ConstructionFinanceInvoiceGoodsReceipt {
+  id             String    @id @db.Uuid
+  workspaceId    String    @map("workspace_id")
+  invoiceId      String    @map("invoice_id") @db.Uuid
+  goodsReceiptId String    @map("goods_receipt_id") @db.Uuid
+  /// The GRN's total value (paise) when linked, for the variance flag.
+  grnValue       BigInt    @map("grn_value")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  invoice ConstructionFinanceInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([goodsReceiptId])
+  @@index([invoiceId])
+  @@map("invoice_goods_receipts")
+  @@schema("construction_finance")
+}
+
+/// Money paid to or received from a Contractor, Supplier or Other Party
+/// (CM-0017 §6). It always names its account. No approval: it posts when
+/// recorded, and Cancel (`deleted_at`) reverses.
+model ConstructionFinancePartyPayment {
+  id                String                              @id @db.Uuid
+  workspaceId       String                              @map("workspace_id")
+  number            String
+  partyType         ConstructionFinancePartyType        @map("party_type")
+  partyId           String                              @map("party_id") @db.Uuid
+  projectId         String?                             @map("project_id") @db.Uuid
+  storeId           String?                             @map("store_id") @db.Uuid
+  direction         ConstructionFinancePaymentDirection
+  paymentDate       DateTime                            @map("payment_date") @db.Date
+  accountId         String                              @map("account_id") @db.Uuid
+  mode              ConstructionFinancePaymentMode
+  chequeNumber      String?                             @map("cheque_number")
+  reference         String?
+  modeDate          DateTime?                           @map("mode_date") @db.Date
+  /// Paise, positive: the money that moved.
+  amount            BigInt
+  /// Contractor payments (CM-0017 §8). Settled = amount + tds_amount.
+  tdsSection        String?                             @map("tds_section") @db.VarChar(8)
+  tdsBase           BigInt?                             @map("tds_base")
+  tdsRate           Decimal?                            @map("tds_rate") @db.Decimal(5, 2)
+  tdsAmount         BigInt                              @default(0) @map("tds_amount")
+  /// What the server suggested; differs from `tds_amount` when overridden.
+  tdsSuggested      BigInt?                             @map("tds_suggested")
+  tdsOverrideReason String?                             @map("tds_override_reason")
+  paymentCategoryId String?                             @map("payment_category_id") @db.Uuid
+  paidByMemberId    String?                             @map("paid_by_member_id") @db.Uuid
+  remarks           String?
+  createdAt         DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                              @map("created_by")
+  updatedBy         String                              @map("updated_by")
+  /// Cancelled.
+  deletedAt         DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                             @map("deleted_by")
+
+  allocations ConstructionFinancePaymentAllocation[]
+
+  @@index([workspaceId, partyType, partyId, paymentDate])
+  @@index([workspaceId, projectId, paymentDate])
+  @@map("party_payments")
+  @@schema("construction_finance")
+}
+
+/// Part of a payment's settled amount applied to one invoice of the same
+/// party and Project (CM-0017 §7). Removed (`deleted_at`) when its payment
+/// is cancelled.
+model ConstructionFinancePaymentAllocation {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  paymentId   String    @map("payment_id") @db.Uuid
+  invoiceId   String    @map("invoice_id") @db.Uuid
+  /// Paise, positive.
+  amount      BigInt
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  payment ConstructionFinancePartyPayment @relation(fields: [paymentId], references: [id])
+  invoice ConstructionFinanceInvoice      @relation(fields: [invoiceId], references: [id])
+
+  @@index([paymentId])
+  @@index([invoiceId])
+  @@map("payment_allocations")
+  @@schema("construction_finance")
+}
+
+/// Settle Invoice: a request to write off what is left of an invoice
+/// (CM-0017 §7). Approval posts the write-off.
+model ConstructionFinanceSettlement {
+  id             String                            @id @db.Uuid
+  workspaceId    String                            @map("workspace_id")
+  invoiceId      String                            @map("invoice_id") @db.Uuid
+  /// Paise, positive: the balance when it was raised; re-checked on approval.
+  amount         BigInt
+  reason         String
+  approvalStatus ConstructionFinanceApprovalStatus @default(pending) @map("approval_status")
+  decidedBy      String?                           @map("decided_by")
+  decidedAt      DateTime?                         @map("decided_at") @db.Timestamptz(3)
+  rejectReason   String?                           @map("reject_reason")
+  createdAt      DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy      String                            @map("created_by")
+  updatedBy      String                            @map("updated_by")
+  deletedAt      DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy      String?                           @map("deleted_by")
+
+  invoice ConstructionFinanceInvoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@index([workspaceId, approvalStatus])
+  @@map("settlements")
+  @@schema("construction_finance")
+}
+
+/// A Contractor's, Supplier's or Other Party's money trail on one Project or
+/// Store (CM-0017 §7). Append-only like the account entries.
+model ConstructionFinancePartyEntry {
+  id              String                              @id @db.Uuid
+  workspaceId     String                              @map("workspace_id")
+  partyType       ConstructionFinancePartyType        @map("party_type")
+  partyId         String                              @map("party_id") @db.Uuid
+  projectId       String?                             @map("project_id") @db.Uuid
+  storeId         String?                             @map("store_id") @db.Uuid
+  entryDate       DateTime                            @map("entry_date") @db.Date
+  kind            ConstructionFinancePartyEntryKind
+  /// Paise, signed: + the Company owes the party.
+  amount          BigInt
+  /// The invoice an invoice, sales-invoice or write-off entry belongs to.
+  invoiceId       String?                             @map("invoice_id") @db.Uuid
+  sourceType      ConstructionFinancePartyEntrySource @map("source_type")
+  sourceId        String                              @map("source_id") @db.Uuid
+  reversesEntryId String?                             @unique @map("reverses_entry_id") @db.Uuid
+  createdAt       DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy       String                              @map("created_by")
+
+  @@index([workspaceId, partyType, partyId, entryDate])
+  @@index([workspaceId, projectId, entryDate])
+  @@index([sourceType, sourceId])
+  @@map("party_entries")
+  @@schema("construction_finance")
+}
+
+/// Remarks on finance documents (the document thread, as in procurement and
+/// site work).
+model ConstructionFinanceRemark {
+  id           String                          @id @db.Uuid
+  workspaceId  String                          @map("workspace_id")
+  documentType ConstructionFinanceDocumentType @map("document_type")
+  documentId   String                          @map("document_id") @db.Uuid
+  body         String
+  createdAt    DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                          @map("created_by")
+
+  files ConstructionFinanceDocumentFile[]
+
+  @@index([workspaceId, documentType, documentId, createdAt])
+  @@map("remarks")
+  @@schema("construction_finance")
+}
+
+/// Voucher photos, receipts and invoice copies, and files on remarks.
+/// Uploaded through the attachments service (CM-0014).
+model ConstructionFinanceDocumentFile {
+  id           String                          @id @db.Uuid
+  workspaceId  String                          @map("workspace_id")
+  documentType ConstructionFinanceDocumentType @map("document_type")
+  documentId   String                          @map("document_id") @db.Uuid
+  remarkId     String?                         @map("remark_id") @db.Uuid
+  fileKey      String                          @unique @map("file_key")
+  fileName     String                          @map("file_name")
+  contentType  String                          @map("content_type")
+  bytes        Int
+  thumbKey     String?                         @map("thumb_key")
+  createdAt    DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                          @map("created_by")
+  deletedAt    DateTime?                       @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                         @map("deleted_by")
+
+  remark ConstructionFinanceRemark? @relation(fields: [remarkId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, documentType, documentId, deletedAt])
+  @@map("document_files")
+  @@schema("construction_finance")
+}
+
+/// TDS rates and thresholds by section and payee kind (CM-0008, CM-0017
+/// §8). Platform-wide; the row in force on a payment date is the latest
+/// whose `effective_from` is on or before it. Rows are never edited.
+model ConstructionFinanceStatutoryTdsRate {
+  id                 String                          @id @db.Uuid
+  /// Stable key, e.g. `194C`.
+  section            String                          @db.VarChar(8)
+  /// What to print, e.g. `393 (194C)` under the Income-tax Act, 2025.
+  label              String
+  payeeKind          ConstructionFinanceTdsPayeeKind @map("payee_kind")
+  rate               Decimal                         @db.Decimal(5, 2)
+  /// Paise: a single payment above this attracts TDS.
+  singleThreshold    BigInt                          @map("single_threshold")
+  /// Paise: a financial year's total above this attracts TDS.
+  aggregateThreshold BigInt                          @map("aggregate_threshold")
+  effectiveFrom      DateTime                        @map("effective_from") @db.Date
+  /// The notification or Act the row comes from.
+  source             String
+
+  @@unique([section, payeeKind, effectiveFrom])
+  @@map("statutory_tds_rates")
+  @@schema("construction_finance")
+}

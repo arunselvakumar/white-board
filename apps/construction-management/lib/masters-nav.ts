@@ -1,5 +1,8 @@
 import {
   BadgeCheck,
+  Landmark,
+  Tags,
+  UserRoundPlus,
   Building,
   FileText,
   Files,
@@ -95,6 +98,35 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Suppliers",
         description: "Parties you buy material from, and their Projects.",
         icon: Truck,
+      },
+      {
+        href: "/app/masters/other-parties",
+        label: "Other Parties",
+        title: "Other Parties",
+        description:
+          "Anyone else you buy from or bill: landlords, consultants, buyers.",
+        icon: UserRoundPlus,
+      },
+    ],
+  },
+  {
+    label: "Accounts",
+    sections: [
+      {
+        href: "/app/masters/bank-accounts",
+        label: "Company's Bank A/C",
+        title: "Company's Bank A/C",
+        description:
+          "Company cash and bank accounts, their opening balances and the primary one.",
+        icon: Landmark,
+      },
+      {
+        href: "/app/masters/payment-categories",
+        label: "Payment Categories",
+        title: "Payment Categories",
+        description:
+          "What money is spent on: fuel, rent, conveyance, and your own.",
+        icon: Tags,
       },
     ],
   },

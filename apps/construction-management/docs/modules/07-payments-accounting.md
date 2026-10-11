@@ -709,3 +709,34 @@ Reports render PDF or Excel with header (Organisation, Project, Address, Duratio
 14. What exactly does Central payment show beyond the centralized contractor/supplier reports?
 15. How does the labour Advance interact with the next period's To Pay (recovered fully or in instalments)?
 16. Is the financial closing date enforced per user (`financialClosingDate` on the permission row) or company-wide, and does it block approvals as well as entries?
+
+## Decisions for the build
+
+### CM-701 — Finance document thread
+
+- **One thread for every finance document.** Remarks and files on a Transaction, transfer, petty-cash voucher, Other Expense, invoice, party payment or settlement use `/api/construction/finance/documents/{type}/{id}/…` (remarks, files, uploads), copied from site work. Read on the document's menu sees the thread and may comment; Create or Update uploads; Update removes any file, Create only the member's own.
+- **Menus.** Transactions and transfers: `finance.transactions`; vouchers: `finance.petty_cash`; Other Expenses: `finance.other_expenses`; invoices, party payments and settlements: `finance.parties`. The menu is checked on the document's Project when it names one, and alone when it names none. A settlement takes its invoice's Project. A Store-located invoice or payment is the Owner's alone (CM-0017 §14).
+- **Petty-cash vouchers stay private.** A voucher on someone else's account answers 404 `PETTY_CASH_VOUCHER_NOT_FOUND` (thread and files included) unless the member has Petty Cash View all (CM-0017 §9).
+- **Files are receipts, not site photos.** Every finance document takes a PDF or an image (PNG, JPEG, WebP), 25 MB a file, 20 a document, 10 a remark. **Finance files never join the Project Gallery**: a receipt or invoice copy is not a picture of the work, and the Gallery is readable by members who may not see money.
+
+### CM-704 — Payment Categories
+
+- **The master is served from finance** at `/api/construction/finance/payment-categories` with the masters' route shape (list, add, `{id}`, `update`, `disable`, `enable`, `delete`) under the `masters.payment_categories` menu; the screen sits under Masters.
+- **Seeds can be renamed** (a Company may call "Fuel" "Fuel & diesel"); they are disabled, never deleted (409 `PAYMENT_CATEGORY_SEED`). Any category may be disabled; it leaves the pickers and old documents keep it.
+- **In use** means a live Transaction, petty-cash voucher, Other Expense or party payment names it, or any account entry carries it (entries are never deleted, so a reversed one still counts). The list shows "In use" and offers no Delete; the server refuses with 409 `PAYMENT_CATEGORY_IN_USE`.
+- Names are unique among the Company's live categories ignoring case (409 `PAYMENT_CATEGORY_NAME_TAKEN`); a deleted category frees its name.
+
+### CM-703 — Petty Cash
+
+- **API.** `/api/construction/finance/petty-cash/accounts` (list, open, `{id}`, `{id}/delete` to close, `{id}/receipts.zip`) and `/petty-cash/vouchers` (list, write, `{id}`, `update`, `approve`, `reject`, `delete`, `bulk-approve`, `bulk-reject`). The statement is the accounts' `GET /api/construction/finance/accounts/{id}/statement`.
+- **Who sees what.** Read on Petty Cash lists accounts; without View all only the account the member holds (none when they hold none). A voucher on a Project also needs Read on that Project; another holder's voucher is 404 (its thread and files too).
+- **Opening an account** needs Petty Cash Create, for any active Team Member (one live account each, 409 `PETTY_CASH_ACCOUNT_EXISTS`). The opening balance is zero or more and posts an `opening` entry; only the Financial Closing Date guards its date (it is a balance as of a day, not a back-dated voucher).
+- **Closing an account** (Petty Cash Delete) is refused while any live voucher names it (from or to) or any entry other than its opening exists (409 `PETTY_CASH_ACCOUNT_IN_USE`). The account is tombstoned; its opening entry stays, as every entry does.
+- **Paid To / Received From is optional** on a voucher; a picked party's name is read from its record. A Transfer carries no party and no Payment Category; it may go to any live company or petty-cash account.
+- **Entries.** Payment → `payment` −amount; Receipt → `receipt` +amount; Transfer → `transfer_out` on its account and `transfer_in` on the other. Every entry is mode `cash` and copies the Project, category, party, number and Paid For (or the description) as narration.
+- **Dates.** Writing checks back-dated module `petty_cash` (create); editing and deleting check its edit limit on the old date and on a new one; **approving and rejecting check only the Financial Closing Date** (an approver deciding last week's voucher is normal; the closing date still refuses it, 403 `FINANCIAL_PERIOD_CLOSED`).
+- **Approvers** need not hold the account, but approving re-checks that both accounts still exist. Bulk decisions run in one transaction, all or none, with each refusal listed.
+- **The account a voucher is written on cannot change** on edit; its type, date, Project, party, category, amount and texts can.
+- **Pending total** beside a balance is what the account's pending vouchers would do once approved: − for its Payments and Transfers out, + for its Receipts and Transfers in.
+- **Export Receipts** needs Petty Cash Download (the `print` flag) and streams a ZIP built while it downloads (stored, not deflated). Entries are named `<voucher number> <n>.<ext>` with the number's `/` as `-` (`PC-26-27-00012 1.jpg`), because a ZIP name cannot hold a slash. The `fflate` package (0.8.3, already in the lockfile) builds it.
+- **The Petty Cash tab** sits on a Project's Payments, so its voucher list starts on **This Project** with a switch to **All Projects**; balances are always the whole account's.
