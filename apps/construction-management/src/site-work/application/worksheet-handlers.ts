@@ -59,6 +59,7 @@ import type {
   WorksheetWorkTypeFacts,
 } from "./ports";
 import type { WorksheetSettingsHandlers } from "./worksheet-settings-handlers";
+import { removeFromGallery } from "./gallery-index";
 
 type Db = Prisma.TransactionClient;
 
@@ -716,7 +717,7 @@ export class WorksheetHandlers {
       documentId: id,
       at,
     });
-    await this.deps.media.dispatch([removed]);
+    await removeFromGallery(this.deps.media, removed);
   }
 
   /** Approve or reject one (409 `WORKSHEET_NOT_PENDING` when not pending). */
