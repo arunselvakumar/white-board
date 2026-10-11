@@ -1,0 +1,27 @@
+apps/construction-management/src/composition/finance-directory.ts
+  s_d85efaaff765fa::t_51d188bcfb25e9 1,6,42-83,267-303
+apps/construction-management/src/finance/application/party-ports.ts
+  s_d85efaaff765fa::t_b58bf668d60ffc 1-614
+apps/construction-management/src/finance/application/ports.ts
+  s_d85efaaff765fa::t_cc68613ee89a72 48-66,131-147
+apps/construction-management/src/finance/domain/party-payment.ts
+  s_d85efaaff765fa::t_bc349db5fadb3f 212-213
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_d85efaaff765fa::t_40b207b066e61e 1-1036
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7c676672020b8ba6d78e444619b486f40dac64a3",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
