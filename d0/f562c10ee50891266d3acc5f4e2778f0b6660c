@@ -1,0 +1,49 @@
+apps/construction-management/app/api/construction/labour/balances/balances.http.test.ts
+  s_d85efaaff765fa::t_cba1c17cb60fb8 24,142,147
+apps/construction-management/app/api/construction/labour/labours/delete-races.http.test.ts
+  s_d85efaaff765fa::t_edc90363375046 12,51,57,60
+apps/construction-management/app/api/construction/labour/payments/handlers.ts
+  s_d85efaaff765fa::t_43295c109a6cf2 11,23-34
+apps/construction-management/app/api/construction/labour/payments/large-totals.http.test.ts
+  s_d85efaaff765fa::t_9731c6e6f80cc2 20,96,105,209,212
+apps/construction-management/app/api/construction/labour/payments/payment-models.ts
+  s_d85efaaff765fa::t_d1a9e291aa064e 26-32,92-93,153
+apps/construction-management/app/api/construction/labour/payments/payment-openapi.ts
+  s_d85efaaff765fa::t_adb541d0941431 84,119
+apps/construction-management/app/api/construction/labour/payments/payments.http.test.ts
+  s_d85efaaff765fa::t_26992dc7095952 18,49,100-108,113,123,490-686
+apps/construction-management/app/api/construction/labour/payments/route.ts
+  s_d85efaaff765fa::t_958290edb31dae 19,101-102,125,134
+apps/construction-management/src/composition/account-posting.ts
+  s_d85efaaff765fa::t_ac9452acf13185 55-63
+apps/construction-management/src/labour/application/wage-payment-handlers.test.ts
+  s_d85efaaff765fa::t_fa8a241dc74760 60-61,139
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_d85efaaff765fa::t_46dd638fc25c79 92-96,98,102,123-127,140-150,154-156,182-183,200-201,253,266-271,292-298,354-357,374,422-425,430-431
+apps/construction-management/src/labour/domain/wage-payment.test.ts
+  s_d85efaaff765fa::t_703de7e4abf5cc 14,45-52
+apps/construction-management/src/labour/domain/wage-payment.ts
+  s_d85efaaff765fa::t_2cc98398911593 19-23,30-33,35-36,63,77-83,92
+apps/construction-management/src/labour/infrastructure/wage-payment-factory.ts
+  s_d85efaaff765fa::t_686f5a943f3898 3-6,19-23,27,32
+apps/construction-management/src/labour/infrastructure/wage-payment-store.ts
+  s_d85efaaff765fa::t_3a3a495414fc74 3,5-8,18,31,53,75,84-85,88-91,233-239,261,277-298,341-346,389-392,415-418,434-438
+apps/construction-management/src/shared-kernel/account-posting.ts
+  s_d85efaaff765fa::t_a16f9cda5eb4d0 31-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d0f562c10ee50891266d3acc5f4e2778f0b6660c",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
