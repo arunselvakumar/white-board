@@ -1,0 +1,169 @@
+apps/construction-management/app/api/construction/finance/accounts/[id]/delete/route.ts
+  s_d85efaaff765fa::t_ab10d0b4797d73 1-48
+apps/construction-management/app/api/construction/finance/accounts/[id]/route.ts
+  s_d85efaaff765fa::t_970413c7214766 1-31
+apps/construction-management/app/api/construction/finance/accounts/[id]/set-primary/route.ts
+  s_d85efaaff765fa::t_cff4a7d0cb2fc0 1-36
+apps/construction-management/app/api/construction/finance/accounts/[id]/statement/route.ts
+  s_d85efaaff765fa::t_6be4c1e8f147ad 1-91
+apps/construction-management/app/api/construction/finance/accounts/[id]/update/route.ts
+  s_d85efaaff765fa::t_7a8febcbb0bb67 1-52
+apps/construction-management/app/api/construction/finance/accounts/account-models.ts
+  s_d85efaaff765fa::t_e06817b512cf21 37-206
+apps/construction-management/app/api/construction/finance/accounts/accounts-openapi.ts
+  s_d85efaaff765fa::t_c3d4a52ab2273d 10-15,18-21,24-34,38-44,50,52,59-137
+apps/construction-management/app/api/construction/finance/accounts/accounts.http.test.ts
+  s_d85efaaff765fa::t_d62c89c4422531 1-407
+apps/construction-management/app/api/construction/finance/accounts/handlers.ts
+  s_d85efaaff765fa::t_d56493f570b700 1-72
+apps/construction-management/app/api/construction/finance/accounts/route.ts
+  s_d85efaaff765fa::t_78076412f96fc2 1-60
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_714ec39d8319dd 38-40,47,59
+apps/construction-management/app/api/construction/finance/transactions/[id]/approve/route.ts
+  s_d85efaaff765fa::t_5332b5e64fe3f7 1-50
+apps/construction-management/app/api/construction/finance/transactions/[id]/delete/route.ts
+  s_d85efaaff765fa::t_815fda68dafea7 1-42
+apps/construction-management/app/api/construction/finance/transactions/[id]/reject/route.ts
+  s_d85efaaff765fa::t_144ca213128607 1-46
+apps/construction-management/app/api/construction/finance/transactions/[id]/route.ts
+  s_d85efaaff765fa::t_88299f43333b93 1-30
+apps/construction-management/app/api/construction/finance/transactions/[id]/update/route.ts
+  s_d85efaaff765fa::t_883b919a14f205 1-49
+apps/construction-management/app/api/construction/finance/transactions/bulk/route.ts
+  s_d85efaaff765fa::t_068fae3b36b4a9 1-45
+apps/construction-management/app/api/construction/finance/transactions/handlers.ts
+  s_d85efaaff765fa::t_ff3fa220fdd9e0 1-208
+apps/construction-management/app/api/construction/finance/transactions/import-sample/route.ts
+  s_d85efaaff765fa::t_71a6b10c3c7e2f 1-58
+apps/construction-management/app/api/construction/finance/transactions/import/route.ts
+  s_d85efaaff765fa::t_d3a058698cde06 1-47
+apps/construction-management/app/api/construction/finance/transactions/route.ts
+  s_d85efaaff765fa::t_dd965e19a6b6fe 1-132
+apps/construction-management/app/api/construction/finance/transactions/transaction-models.ts
+  s_d85efaaff765fa::t_947eb705b0f22a 1-258
+apps/construction-management/app/api/construction/finance/transactions/transactions-openapi.ts
+  s_d85efaaff765fa::t_ae38bb4743d968 1-213
+apps/construction-management/app/api/construction/finance/transactions/transactions.http.test.ts
+  s_d85efaaff765fa::t_11996e16c2b9fe 1-792
+apps/construction-management/app/api/construction/finance/transfers/[id]/approve/route.ts
+  s_d85efaaff765fa::t_656ed60e970dcd 1-46
+apps/construction-management/app/api/construction/finance/transfers/[id]/delete/route.ts
+  s_d85efaaff765fa::t_a54322b792f58c 1-42
+apps/construction-management/app/api/construction/finance/transfers/[id]/reject/route.ts
+  s_d85efaaff765fa::t_27decd94d700be 1-46
+apps/construction-management/app/api/construction/finance/transfers/[id]/route.ts
+  s_d85efaaff765fa::t_3b67342e51d632 1-30
+apps/construction-management/app/api/construction/finance/transfers/[id]/update/route.ts
+  s_d85efaaff765fa::t_6f56d6d5379d09 1-47
+apps/construction-management/app/api/construction/finance/transfers/route.ts
+  s_d85efaaff765fa::t_faa15c92b7db06 1-51
+apps/construction-management/app/app/masters/bank-accounts/[accountId]/page.tsx
+  s_d85efaaff765fa::t_95b9f799888b3e 1-20
+apps/construction-management/app/app/masters/bank-accounts/page.tsx
+  s_d85efaaff765fa::t_504b1fe33828a9 3,7,9
+apps/construction-management/app/app/projects/[id]/payments/transactions/[transactionId]/page.tsx
+  s_d85efaaff765fa::t_5fabec9b9e886e 1-25
+apps/construction-management/app/app/projects/[id]/payments/transactions/page.tsx
+  s_d85efaaff765fa::t_6b116790e92cd9 3-5,9-18
+apps/construction-management/app/app/projects/[id]/payments/transactions/transfers/[transferId]/page.tsx
+  s_d85efaaff765fa::t_424d71c2dceec4 1-21
+apps/construction-management/components/finance/accounts/account-dialog.stories.tsx
+  s_d85efaaff765fa::t_b633bb5930db4c 1-124
+apps/construction-management/components/finance/accounts/account-dialog.tsx
+  s_d85efaaff765fa::t_8b53b2308d413d 1-315
+apps/construction-management/components/finance/accounts/account-format.tsx
+  s_d85efaaff765fa::t_956ce58f98fa7c 1-36
+apps/construction-management/components/finance/accounts/account-ledger.stories.tsx
+  s_d85efaaff765fa::t_6fba52b9735544 1-58
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_d85efaaff765fa::t_5dc18e21ff61c5 1-328
+apps/construction-management/components/finance/accounts/account-list-fixtures.ts
+  s_d85efaaff765fa::t_4eebafbcc2c65b 1-297
+apps/construction-management/components/finance/accounts/bank-accounts-list.stories.tsx
+  s_d85efaaff765fa::t_6219db190375b8 1-136
+apps/construction-management/components/finance/accounts/bank-accounts-list.tsx
+  s_d85efaaff765fa::t_4b033bd97ee419 1-260
+apps/construction-management/components/finance/transactions/import-transactions-dialog.stories.tsx
+  s_d85efaaff765fa::t_aee670b5e323f0 1-80
+apps/construction-management/components/finance/transactions/import-transactions-dialog.tsx
+  s_d85efaaff765fa::t_15ef2ab023fc76 1-181
+apps/construction-management/components/finance/transactions/transaction-actions.tsx
+  s_d85efaaff765fa::t_fbe36f0bd204d5 1-241
+apps/construction-management/components/finance/transactions/transaction-detail.stories.tsx
+  s_d85efaaff765fa::t_aad992a29a00d5 1-90
+apps/construction-management/components/finance/transactions/transaction-detail.tsx
+  s_d85efaaff765fa::t_27ffe334ffc771 1-261
+apps/construction-management/components/finance/transactions/transaction-fixtures.ts
+  s_d85efaaff765fa::t_bcbbdf0ab0de39 1-331
+apps/construction-management/components/finance/transactions/transaction-form-parts.tsx
+  s_d85efaaff765fa::t_4f9a9828855a87 1-158
+apps/construction-management/components/finance/transactions/transaction-form.stories.tsx
+  s_d85efaaff765fa::t_800b3935c4b0bb 1-184
+apps/construction-management/components/finance/transactions/transaction-form.tsx
+  s_d85efaaff765fa::t_e6825eba55452f 1-515
+apps/construction-management/components/finance/transactions/transaction-format.tsx
+  s_d85efaaff765fa::t_9e0fdd83ca5f01 1-92
+apps/construction-management/components/finance/transactions/transactions-page.stories.tsx
+  s_d85efaaff765fa::t_94b0cdcd5073f1 1-170
+apps/construction-management/components/finance/transactions/transactions-page.tsx
+  s_d85efaaff765fa::t_10a8e501530ec6 1-701
+apps/construction-management/components/finance/transactions/transfer-form.stories.tsx
+  s_d85efaaff765fa::t_dac21de5fb8957 1-90
+apps/construction-management/components/finance/transactions/transfer-form.tsx
+  s_d85efaaff765fa::t_89769885c7a07f 1-345
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_d2b017e1db0407 713-714,717-718,726-745
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_b730c53e57acbb 701-711
+apps/construction-management/src/finance/application/account-access.ts
+  s_d85efaaff765fa::t_e56f870649f2c1 1-65
+apps/construction-management/src/finance/application/account-handlers.ts
+  s_d85efaaff765fa::t_18e31b06d40db0 1-603
+apps/construction-management/src/finance/application/transaction-common.ts
+  s_d85efaaff765fa::t_25a212843c8c2f 1-295
+apps/construction-management/src/finance/application/transaction-handlers.ts
+  s_d85efaaff765fa::t_d5213e35e57fe3 1-756
+apps/construction-management/src/finance/application/transaction-import.test.ts
+  s_d85efaaff765fa::t_ff01385e045e02 1-41
+apps/construction-management/src/finance/application/transaction-import.ts
+  s_d85efaaff765fa::t_294fdcfc39f598 1-269
+apps/construction-management/src/finance/application/transaction-register.ts
+  s_d85efaaff765fa::t_44133954117cf3 1-188
+apps/construction-management/src/finance/application/transfer-handlers.ts
+  s_d85efaaff765fa::t_cf1b0803dc9f28 1-650
+apps/construction-management/src/finance/infrastructure/account-guards.ts
+  s_d85efaaff765fa::t_425c28cfb8c0d4 1-69
+apps/construction-management/src/finance/infrastructure/account-statement.ts
+  s_d85efaaff765fa::t_e62a1b19596c9c 1-225
+apps/construction-management/src/finance/infrastructure/account-store.ts
+  s_d85efaaff765fa::t_d5fe2bfcb9e20b 1-211
+apps/construction-management/src/finance/infrastructure/transaction-register-store.ts
+  s_d85efaaff765fa::t_bb9e376924b15f 1-176
+apps/construction-management/src/finance/infrastructure/transaction-store.ts
+  s_d85efaaff765fa::t_8531aae30f5fb8 1-211
+apps/construction-management/src/finance/infrastructure/transaction-workbook.ts
+  s_d85efaaff765fa::t_7c19e365f92982 1-188
+apps/construction-management/src/finance/infrastructure/transfer-store.ts
+  s_d85efaaff765fa::t_0580e3625f4917 1-104
+apps/construction-management/src/queries/finance-accounts.ts
+  s_d85efaaff765fa::t_453fa17944a13e 1-6,8-15,22-33,44,49-117
+apps/construction-management/src/queries/finance-transactions.ts
+  s_d85efaaff765fa::t_1465f3aca769c2 1-230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3fcddfdcfd13fba34cdbf462a3cf6d7df3cd5d84",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
