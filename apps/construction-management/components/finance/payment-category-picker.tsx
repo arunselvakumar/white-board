@@ -57,7 +57,11 @@ export function PaymentCategoryPicker({
       >
         <SelectValue placeholder="Choose a category" />
       </SelectTrigger>
-      <SelectContent align="start" alignItemWithTrigger={false}>
+      <SelectContent
+        align="start"
+        alignItemWithTrigger={false}
+        aria-label="Payment Categories"
+      >
         {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>
             {item.label}

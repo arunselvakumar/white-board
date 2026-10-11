@@ -124,7 +124,11 @@ export function AccountPicker({
           }
         />
       </SelectTrigger>
-      <SelectContent align="start" alignItemWithTrigger={false}>
+      <SelectContent
+        align="start"
+        alignItemWithTrigger={false}
+        aria-label="Accounts"
+      >
         {company.length > 0 && (
           <SelectGroup>
             <SelectLabel>Company accounts</SelectLabel>
