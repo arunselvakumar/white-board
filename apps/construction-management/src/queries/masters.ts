@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import type { ConstructionMastersLabourCategoryResponseModel } from "@/app/api/construction/masters/labour-categories/labour-category-models";
+import type { ConstructionMastersDepartmentResponseModel } from "@/app/api/construction/masters/departments/department-models";
 import type {
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
@@ -13,6 +13,8 @@ import type {
 } from "@/app/api/construction/masters/supervisors/supervisor-models";
 import type { ListConstructionOrganizationTeamMembersResponseModel } from "@/app/api/construction/organization/team-members/list-team-members-response-model";
 
+import type { LabourSkill } from "@/src/masters/domain/master-kind";
+
 import { apiJson } from "./http";
 
 const BASE = "/api/construction/masters";
@@ -20,7 +22,10 @@ const BASE = "/api/construction/masters";
 /** The name-only lists; Labour Categories and Departments share one shape. */
 export type LookupList = "labour-categories" | "departments";
 
-export type LookupItem = ConstructionMastersLabourCategoryResponseModel;
+/** A lookup row; Labour Categories carry their `skill` (CM-601). */
+export type LookupItem = ConstructionMastersDepartmentResponseModel & {
+  skill?: LabourSkill;
+};
 
 export type SupervisorItem = ConstructionMastersSupervisorResponseModel;
 
@@ -50,8 +55,14 @@ export function lookupListQuery(list: LookupList) {
 }
 
 export type LookupCommand =
-  | { kind: "create"; name: string }
-  | { kind: "rename"; id: string; name: string; expectedUpdatedAt: string }
+  | { kind: "create"; name: string; skill?: LabourSkill }
+  | {
+      kind: "rename";
+      id: string;
+      name: string;
+      expectedUpdatedAt: string;
+      skill?: LabourSkill;
+    }
   | { kind: "disable" | "enable" | "delete"; id: string };
 
 export function runLookupCommand(
@@ -60,11 +71,15 @@ export function runLookupCommand(
 ): Promise<LookupItem | undefined> {
   switch (command.kind) {
     case "create":
-      return postJson(`${BASE}/${list}`, { name: command.name });
+      return postJson(`${BASE}/${list}`, {
+        name: command.name,
+        ...(command.skill == null ? {} : { skill: command.skill }),
+      });
     case "rename":
       return postJson(itemUrl(list, command.id, "update"), {
         name: command.name,
         expectedUpdatedAt: command.expectedUpdatedAt,
+        ...(command.skill == null ? {} : { skill: command.skill }),
       });
     default:
       return postJson(itemUrl(list, command.id, command.kind));

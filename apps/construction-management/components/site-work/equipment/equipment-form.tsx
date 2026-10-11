@@ -24,7 +24,7 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
+import { RadioGroup } from "@repo/ui/components/radio-group";
 import {
   Select,
   SelectContent,
@@ -75,6 +75,8 @@ import {
   workingTimeMethodsFor,
   type EquipmentOwnership,
 } from "@/src/site-work/domain/equipment";
+
+import { RadioCard } from "./radio-card";
 
 const WAREHOUSE = "warehouse";
 const NONE = "none";
@@ -397,9 +399,11 @@ export function EquipmentForm({
   const errors = form.formState.errors;
   const rented = values.ownership === "rented";
   const basis = values.utilisationBasis;
-  // Rented equipment needs a rate, and a rate needs Financial: without it,
-  // new equipment and an owned machine cannot become rented.
-  const rentedLocked = !seeRates && equipment?.ownership !== "rented";
+  // Rented equipment needs a rate, and a rate needs Financial: once access
+  // has loaded, without it new equipment and an owned machine cannot become
+  // rented.
+  const rentedLocked =
+    access != null && !seeRates && equipment?.ownership !== "rented";
 
   useEffect(() => {
     if (!workingTimeMethodsFor(basis).includes(values.workingTimeMethod))
@@ -574,31 +578,22 @@ export function EquipmentForm({
               className="grid gap-3 sm:grid-cols-2"
             >
               {(["owned", "rented"] as const).map((ownership) => (
-                <div
+                <RadioCard
                   key={ownership}
-                  className="flex items-start gap-2 rounded-lg border p-3"
-                >
-                  <RadioGroupItem
-                    id={`equipment-${ownership}`}
-                    value={ownership}
-                    disabled={ownership === "rented" && rentedLocked}
-                  />
-                  <div className="space-y-0.5">
-                    <Label
-                      htmlFor={`equipment-${ownership}`}
-                      className="font-medium"
-                    >
-                      {ownershipLabel(ownership)}
-                    </Label>
-                    <p className="text-muted-foreground text-xs">
-                      {ownership === "owned"
-                        ? "The Company's own machine."
-                        : rentedLocked
-                          ? "Adding rented equipment needs Financial on Equipments, for its hire rate."
-                          : "Hired from a Contractor at a rate."}
-                    </p>
-                  </div>
-                </div>
+                  value={ownership}
+                  title={ownershipLabel(ownership)}
+                  disabled={ownership === "rented" && rentedLocked}
+                  onSelect={(value) => {
+                    field.onChange(value);
+                  }}
+                  hint={
+                    ownership === "owned"
+                      ? "The Company's own machine."
+                      : rentedLocked
+                        ? "Adding rented equipment needs Financial on Equipments, for its hire rate."
+                        : "Hired from a Contractor at a rate."
+                  }
+                />
               ))}
             </RadioGroup>
           )}

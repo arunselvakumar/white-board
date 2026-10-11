@@ -1,4 +1,4 @@
-import { prisma } from "@repo/construction-db";
+import { Prisma, prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it, vi } from "vitest";
 
@@ -385,6 +385,44 @@ describe("Hindrance register", () => {
     ]);
     expect(await filter(ctx, "search=draw")).toEqual(["C drawings"]);
     expect(await filter(ctx, "search=00001")).toEqual(["A rain"]);
+  });
+
+  it("stores no location as SQL NULL, on create and on edit", async () => {
+    const ctx = await setup();
+    const h = await json<Hindrance>(await record(ctx));
+    const isNull = async () => {
+      const [row] = await prisma.$queryRaw<{ empty: boolean }[]>(
+        Prisma.sql`SELECT site_location IS NULL AS empty
+          FROM construction_site_work.hindrances WHERE id = ${h.id}::uuid`,
+      );
+      return row?.empty;
+    };
+    expect(await isNull()).toBe(true);
+    // A location written earlier is cleared to NULL by an edit without one.
+    const stored = await prisma.constructionSiteWorkHindrance.update({
+      where: { id: h.id },
+      data: {
+        siteLocation: { type: "location", locationId: newId() },
+        siteLocationType: "location",
+      },
+    });
+    expect(await isNull()).toBe(false);
+    const saved = await update(
+      post(`/${h.id}/update`, {
+        startDate: h.startDate,
+        cause: "weather",
+        affectedActivity: "Roof slab shuttering",
+        responsibleParty: "force_majeure",
+        siteLocation: null,
+        expectedUpdatedAt: stored.updatedAt.toISOString(),
+      }),
+      params(h.id),
+    );
+    expect(saved.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<{ siteLocation: unknown }>(saved)).siteLocation,
+    ).toBeNull();
+    expect(await isNull()).toBe(true);
   });
 
   it("checks the concurrency token on update and delete", async () => {

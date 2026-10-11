@@ -9,6 +9,14 @@ export const LOOKUP_KINDS = ["labour_category", "department"] as const;
 export type LookupKind = (typeof LOOKUP_KINDS)[number];
 
 /**
+ * Whether a Labour Category's heads count as skilled or unskilled on a
+ * Daily Worksheet's labour prefill (CM-0016 §6). Only Labour Categories
+ * carry one.
+ */
+export const LABOUR_SKILLS = ["skilled", "unskilled"] as const;
+export type LabourSkill = (typeof LABOUR_SKILLS)[number];
+
+/**
  * Amenities and Common Developments (CM-404, ADR CM-0013 §5): name-only
  * rows of one table with a kind, each assigned to Projects.
  */
@@ -31,8 +39,9 @@ export type MaterialMasterKind = (typeof MATERIAL_MASTER_KINDS)[number];
 /** Lists whose rows are a name, a seed mark and a disabled mark. */
 export type NamedMasterKind = LookupKind | DevelopmentKind | "measurement_unit";
 
-/** Every masters list this context owns (CM-203, CM-404, CM-501). */
-export type MasterKind = NamedMasterKind | "supervisor" | MaterialMasterKind;
+/** Every masters list this context owns (CM-203, CM-404, CM-501, CM-601). */
+export type MasterKind =
+  NamedMasterKind | "supervisor" | MaterialMasterKind | "work_type";
 
 type MasterKindInfo = {
   /** Prefix of the list's error codes: `LABOUR_CATEGORY_NAME_IN_USE`. */
@@ -84,6 +93,7 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     label: "Terms & Conditions",
     plural: "Terms & Conditions",
   },
+  work_type: { code: "WORK_TYPE", label: "Work Type", plural: "Work Types" },
 };
 
 export const MASTER_NAME_MAX = 100;
@@ -128,7 +138,7 @@ const MATERIAL_MASTER_USERS: Record<MaterialMasterKind, string> = {
   measurement_unit: "Materials use this Measurement Unit",
   material_category: "Materials or sub-categories use this Material Category",
   material:
-    "Purchase Requests, Purchase Orders, Goods Receipts, transfers, Material Requests or stock entries use this Material",
+    "Purchase Requests, Purchase Orders, Goods Receipts, transfers, Material Requests, stock entries, Daily Worksheets or Equipment Usage sheets use this Material",
   terms_condition: "",
 };
 
@@ -138,6 +148,16 @@ export function masterInUse(kind: MasterKind): DomainError {
     return conflict(
       `${code}_IN_USE`,
       `${MATERIAL_MASTER_USERS[kind as MaterialMasterKind]}, so it cannot be deleted. Disable it instead.`,
+    );
+  if (kind === "work_type")
+    return conflict(
+      `${code}_IN_USE`,
+      "Daily Worksheets use this Work Type, so it cannot be deleted. Disable it instead.",
+    );
+  if (kind === "department")
+    return conflict(
+      `${code}_IN_USE`,
+      "Work Types, Daily Worksheets or Equipment Usage sheets use this Department, so it cannot be deleted. Disable it instead.",
     );
   if (kind === "amenity" || kind === "common_development")
     return conflict(

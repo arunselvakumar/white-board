@@ -155,25 +155,27 @@ export function AttendanceTrend({ series }: { series: readonly Day[] }) {
           ? "No labour was marked present in this period."
           : `${String(total)} labour-days in all; most on ${dayLabel(peak?.date ?? "")} (${String(peak?.present ?? 0)}).`}
       </p>
-      <table className="sr-only">
-        <caption>Labours present and vendor heads per day</caption>
-        <thead>
-          <tr>
-            <th scope="col">Day</th>
-            <th scope="col">Labours present</th>
-            <th scope="col">Vendor heads</th>
-          </tr>
-        </thead>
-        <tbody>
-          {series.map((day) => (
-            <tr key={day.date}>
-              <th scope="row">{dayLabel(day.date)}</th>
-              <td>{day.present}</td>
-              <td>{day.vendorHeadcount}</td>
+      <div className="sr-only">
+        <table>
+          <caption>Labours present and vendor heads per day</caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Labours present</th>
+              <th scope="col">Vendor heads</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {series.map((day) => (
+              <tr key={day.date}>
+                <th scope="row">{dayLabel(day.date)}</th>
+                <td>{day.present}</td>
+                <td>{day.vendorHeadcount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

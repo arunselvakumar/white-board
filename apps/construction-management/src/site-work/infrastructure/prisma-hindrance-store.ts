@@ -5,7 +5,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import { storedLocationRef } from "@/src/shared-kernel/location-ref";
 import { tombstone } from "@/src/shared-kernel/tombstone";
 
 import type {
@@ -36,7 +36,7 @@ function toStored(row: Row): StoredHindrance {
     hoursLost: hours(row.hoursLost),
     cause: row.cause,
     affectedActivity: row.affectedActivity,
-    siteLocation: (row.siteLocation as LocationRef | null) ?? null,
+    siteLocation: storedLocationRef(row.siteLocation),
     responsibleParty: row.responsibleParty,
     contractorId: row.contractorId,
     description: row.description,
@@ -66,12 +66,15 @@ function columns(content: HindranceContent) {
     cause: content.cause,
     affectedActivity: content.affectedActivity,
     siteLocationType: content.siteLocation?.type ?? null,
-    siteLocation:
-      content.siteLocation == null
-        ? Prisma.DbNull
-        : (JSON.parse(
+    // No location is left out here and written as SQL NULL by
+    // `clearSiteLocation`: `next dev` turns `Prisma.DbNull` into `{}`.
+    ...(content.siteLocation == null
+      ? {}
+      : {
+          siteLocation: JSON.parse(
             JSON.stringify(content.siteLocation),
-          ) as Prisma.InputJsonValue),
+          ) as Prisma.InputJsonValue,
+        }),
     responsibleParty: content.responsibleParty,
     contractorId: content.contractorId,
     description: content.description,
@@ -125,6 +128,14 @@ function where(
     deletedAt: null,
     AND: and,
   };
+}
+
+/** Writes SQL NULL to `site_location` (never `{}`, whatever the bundle). */
+async function clearSiteLocation(db: SiteWorkTx, id: string): Promise<void> {
+  await db.$executeRaw(Prisma.sql`
+    UPDATE construction_site_work.hindrances
+    SET site_location = NULL
+    WHERE id = ${id}::uuid`);
 }
 
 /**
@@ -182,6 +193,7 @@ export class PrismaHindranceStore implements HindranceStore {
         updatedBy: content.by,
       },
     });
+    if (content.siteLocation == null) await clearSiteLocation(db, id);
   }
 
   async close(

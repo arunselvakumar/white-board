@@ -2,7 +2,10 @@ import {
   assertCalendarDate,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import {
+  storedLocationRef,
+  type LocationRef,
+} from "@/src/shared-kernel/location-ref";
 
 import {
   daysLost,
@@ -146,7 +149,7 @@ export class SiteRecordQueries implements SiteRecordReads {
         cause: h.cause,
         causeLabel: HINDRANCE_CAUSE_LABELS[h.cause],
         affectedActivity: h.affectedActivity,
-        siteLocation: h.siteLocation,
+        siteLocation: storedLocationRef(h.siteLocation),
         responsibleParty: h.responsibleParty,
         responsiblePartyLabel: RESPONSIBLE_PARTY_LABELS[h.responsibleParty],
         contractorName: h.contractorName,

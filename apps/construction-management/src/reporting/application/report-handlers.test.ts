@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import type { StoredObject } from "@/src/shared-kernel/files";
 
+import { dprReadModel } from "../domain/daily-progress-report-fixtures";
 import type { ReportJob } from "../domain/report-job";
 import type {
+  DprSource,
   ReportFile,
   ReportJobStore,
   ReportRenderer,
@@ -60,20 +62,37 @@ function memoryStore() {
       return Promise.resolve();
     },
     markDone: (job, done, at) => {
-      files.push(done.xlsx, done.pdf);
+      if (jobs.get(job.id)?.status !== "running") return Promise.resolve(false);
+      if (done.xlsx != null) files.push(done.xlsx);
+      files.push(done.pdf);
       update(job.id, {
         status: "done",
-        xlsxKey: done.xlsx.key,
+        xlsxKey: done.xlsx?.key ?? null,
         pdfKey: done.pdf.key,
         fileName: done.fileName,
         finishedAt: at,
       });
       statuses.push("done");
-      return Promise.resolve();
+      return Promise.resolve(true);
     },
     markFailed: (id, error, at) => {
+      const status = jobs.get(id)?.status;
+      if (status !== "queued" && status !== "running")
+        return Promise.resolve(false);
       update(id, { status: "failed", error, finishedAt: at });
       statuses.push("failed");
+      return Promise.resolve(true);
+    },
+    requeue: (workspaceId, id) => {
+      const job = jobs.get(id);
+      if (job?.workspaceId !== workspaceId || job.status !== "failed")
+        return Promise.resolve(false);
+      update(id, { status: "queued", error: null, finishedAt: null });
+      statuses.push("queued");
+      return Promise.resolve(true);
+    },
+    remove: (job) => {
+      jobs.delete(job.id);
       return Promise.resolve();
     },
   };
@@ -129,6 +148,11 @@ function source(overrides: Partial<ReportSource> = {}): ReportSource {
     musterRoll: () => Promise.resolve({ labours: [], days: [], entries: [] }),
     vendorLines: () =>
       Promise.resolve({ lines: [], vendorName: null, categoryName: null }),
+    // Site work reports (CM-605, CM-608).
+    dailyWork: () => Promise.resolve({ worksheets: [], contractorName: null }),
+    equipmentUsage: () => Promise.resolve({ sheets: [], equipmentName: null }),
+    equipmentMaintenance: () => Promise.resolve([]),
+    equipmentTransfers: () => Promise.resolve([]),
     ...overrides,
   };
 }
@@ -139,7 +163,10 @@ const renderer: ReportRenderer = {
   pdf: () => Promise.resolve(new TextEncoder().encode("%PDF-1.7")),
 };
 
-function setup(reportSource: ReportSource = source()) {
+function setup(
+  reportSource: ReportSource = source(),
+  options: { dpr?: DprSource; timeLimitMs?: number } = {},
+) {
   const memory = memoryStore();
   const disk = memoryStorage();
   const executor: ReportExecutor = createReportExecutor({
@@ -147,6 +174,13 @@ function setup(reportSource: ReportSource = source()) {
     source: reportSource,
     renderer,
     storage: disk.storage,
+    dpr: {
+      source: options.dpr ?? {
+        read: () => Promise.resolve(dprReadModel()),
+      },
+      render: (document) =>
+        Promise.resolve(new TextEncoder().encode(`%PDF-${document.title}`)),
+    },
     clock: () => new Date("2026-10-09T10:30:00Z"),
   });
   let id = 0;
@@ -155,7 +189,7 @@ function setup(reportSource: ReportSource = source()) {
     projects: {
       exists: (_, projectId) => Promise.resolve(projectId === PROJECT),
     },
-    runner: inlineReportRunner(executor),
+    runner: inlineReportRunner(executor, { timeLimitMs: options.timeLimitMs }),
     storage: disk.storage,
     newId: () => `job-${String((id += 1))}`,
   });
@@ -280,6 +314,95 @@ describe("report jobs (inline runner)", () => {
     await expect(handlers.get("other", first.id)).rejects.toMatchObject({
       code: "REPORT_NOT_FOUND",
     });
+  });
+});
+
+const DPR = {
+  ...ATTENDANCE,
+  params: {
+    kind: "daily_progress_report" as const,
+    date: "2026-10-08",
+    filledBy: null,
+    includeImages: false,
+    number: "DPR/26-27/00001",
+  },
+};
+
+describe("report jobs: PDF only, retry, delete and the time limit", () => {
+  it("stores only a PDF for the Daily Progress Report and refuses its Excel", async () => {
+    const { handlers, files } = setup();
+    const job = await handlers.request(DPR);
+    expect(job.status).toBe("done");
+    expect(job.xlsxKey).toBeNull();
+    expect(job.fileName).toBe("DPR-26-27-00001-2026-10-08");
+    expect(files.map((file) => file.contentType)).toEqual(["application/pdf"]);
+    await expect(handlers.download(job, "xlsx")).rejects.toMatchObject({
+      code: "REPORT_FORMAT_UNAVAILABLE",
+    });
+    const pdf = await handlers.download(job, "pdf");
+    expect(await new Response(pdf.body).text()).toBe(
+      "%PDF-Daily Progress Report",
+    );
+  });
+
+  it("retries a failed job and refuses to retry one that did not fail", async () => {
+    let calls = 0;
+    const { handlers, statuses } = setup(source(), {
+      dpr: {
+        read: () => {
+          calls += 1;
+          return calls === 1
+            ? Promise.reject(new DomainError("BROKEN", "Not today."))
+            : Promise.resolve(dprReadModel());
+        },
+      },
+    });
+    const failed = await handlers.request(DPR);
+    expect(failed.status).toBe("failed");
+    const retried = await handlers.retry(failed);
+    expect(retried.status).toBe("done");
+    expect(retried.error).toBeNull();
+    expect(statuses).toEqual([
+      "queued",
+      "running",
+      "failed",
+      "queued",
+      "running",
+      "done",
+    ]);
+    await expect(handlers.retry(retried)).rejects.toMatchObject({
+      code: "REPORT_NOT_FAILED",
+    });
+  });
+
+  it("deletes a job and its file", async () => {
+    const { handlers, objects, jobs } = setup();
+    const job = await handlers.request(DPR);
+    expect(objects.size).toBe(1);
+    await handlers.remove(job, "user-1");
+    expect(objects.size).toBe(0);
+    expect(jobs.size).toBe(0);
+  });
+
+  it("fails a job that runs past its limit and keeps nothing it writes later", async () => {
+    let finish: () => void = () => undefined;
+    const slow = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    const { handlers, objects, files } = setup(source(), {
+      timeLimitMs: 20,
+      dpr: { read: () => slow.then(() => dprReadModel()) },
+    });
+    const job = await handlers.request(DPR);
+    expect(job.status).toBe("failed");
+    expect(job.error).toBe(
+      "The report took longer than 1 second and was stopped. Retry it, or generate it without images.",
+    );
+    finish();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(objects.size).toBe(0);
+    expect(files).toHaveLength(0);
+    expect((await handlers.get(WORKSPACE, job.id)).status).toBe("failed");
   });
 });
 

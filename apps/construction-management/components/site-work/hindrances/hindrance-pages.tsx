@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { hindranceQuery, hindrancesPath } from "@/src/queries/hindrances";
 
 import { HindranceForm, type HindrancePrefill } from "./hindrance-form";
@@ -17,7 +17,7 @@ export function HindranceNew({
 }) {
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PageHeader
+      <SiteRecordHeader
         back={{ label: "Hindrances", href: hindrancesPath(projectId) }}
         title="Record hindrance"
       />
@@ -37,7 +37,7 @@ export function HindranceEdit({
   const { data } = useSuspenseQuery(hindranceQuery(hindranceId));
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PageHeader
+      <SiteRecordHeader
         back={{
           label: data.number,
           href: hindrancesPath(projectId, hindranceId),

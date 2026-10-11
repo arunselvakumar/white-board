@@ -1,12 +1,15 @@
 import { Prisma } from "@repo/construction-db";
 
-import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
+import { attendanceHeadsBetween } from "@/src/composition/attendance-heads";
+import { createProjectLocations } from "@/src/composition/location-resolver";
 import type {
   AttendanceHeadcounts,
   WorksheetContractorFacts,
   WorksheetDirectory,
   WorksheetNamedFacts,
 } from "@/src/site-work/application/ports";
+
+const projectLocations = createProjectLocations();
 
 const live = (workspaceId: string, ids: readonly string[]) => ({
   workspaceId,
@@ -50,6 +53,11 @@ export const worksheetDirectory: WorksheetDirectory = {
       select: { name: true },
     });
     return row?.name ?? null;
+  },
+
+  async hasPlaces(workspaceId, projectId) {
+    const options = await projectLocations.options(workspaceId, projectId);
+    return options.types.length > 0;
   },
 
   async contractorsOnProject(db, workspaceId, projectId) {
@@ -166,43 +174,16 @@ export const worksheetDirectory: WorksheetDirectory = {
 
 /**
  * A Project's attendance heads on a date by Labour Category skill (CM-0016
- * §6), read from the labour context's tables: labourers present or on a
- * half day (one head each, live rows) and vendor gangs (full-day plus
- * half-day heads on live sheets). A labourer with no category has a null
+ * §6), through the shared reader the Project Dashboard also uses
+ * (`attendanceHeadsBetween`). A labourer with no category has a null
  * skill, which the domain counts as unskilled.
  */
 export const attendanceHeadcounts: AttendanceHeadcounts = {
   async onDate(db, workspaceId, projectId, date) {
-    const day = calendarDateToDb(date);
-    const rows = await db.$queryRaw<
-      { skill: "skilled" | "unskilled" | null; heads: number }[]
-    >(Prisma.sql`
-      SELECT skill, SUM(heads)::int AS heads FROM (
-        SELECT lc.skill::text AS skill, COUNT(*)::int AS heads
-        FROM construction_labour.labour_attendance a
-        JOIN construction_labour.labours l ON l.id = a.labour_id
-        LEFT JOIN construction_masters.labour_categories lc
-          ON lc.id = l.labour_category_id
-        WHERE a.workspace_id = ${workspaceId}
-          AND a.project_id = ${projectId}::uuid
-          AND a.attendance_date = ${day}::date
-          AND a.deleted_at IS NULL
-          AND a.status IN ('present', 'half_day')
-        GROUP BY lc.skill
-        UNION ALL
-        SELECT lc.skill::text, SUM(line.full_day_count + line.half_day_count)::int
-        FROM construction_labour.vendor_attendance va
-        JOIN construction_labour.vendor_attendance_lines line
-          ON line.attendance_id = va.id
-        LEFT JOIN construction_masters.labour_categories lc
-          ON lc.id = line.labour_category_id
-        WHERE va.workspace_id = ${workspaceId}
-          AND va.project_id = ${projectId}::uuid
-          AND va.attendance_date = ${day}::date
-          AND va.deleted_at IS NULL
-        GROUP BY lc.skill
-      ) AS heads
-      GROUP BY skill`);
+    const rows = await attendanceHeadsBetween(db, workspaceId, projectId, {
+      from: date,
+      to: date,
+    });
     return rows.map((row) => ({ skill: row.skill, heads: row.heads }));
   },
 };

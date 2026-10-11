@@ -2,9 +2,11 @@ import { newId } from "@/src/shared-kernel/ids";
 
 import { LookupEntry } from "../domain/lookup-entry";
 import {
+  cleanMasterName,
   masterChanged,
   masterInUse,
   masterNotFound,
+  type LabourSkill,
   type LookupKind,
 } from "../domain/master-kind";
 import type { LookupStore, MasterUsage } from "./ports";
@@ -12,6 +14,8 @@ import type { LookupStore, MasterUsage } from "./ports";
 export type LookupEntryReadModel = {
   id: string;
   name: string;
+  /** A Labour Category's skill; null for Departments. */
+  skill: LabourSkill | null;
   isSeed: boolean;
   disabled: boolean;
   createdAt: Date;
@@ -27,6 +31,7 @@ export function toLookupEntryReadModel(
   return {
     id: entry.id,
     name: entry.name,
+    skill: entry.skill,
     isSeed: entry.isSeed,
     disabled: entry.disabled,
     createdAt: entry.createdAt,
@@ -77,6 +82,8 @@ export class LookupHandlers {
   async create(input: {
     workspaceId: string;
     name: string;
+    /** Labour Categories only; skilled unless given. */
+    skill?: LabourSkill;
     by: string;
   }): Promise<LookupEntryReadModel> {
     const now = this.clock();
@@ -85,6 +92,7 @@ export class LookupHandlers {
       kind: this.kind,
       workspaceId: input.workspaceId,
       name: input.name,
+      ...(input.skill == null ? {} : { skill: input.skill }),
       by: input.by,
       now,
     });
@@ -97,11 +105,17 @@ export class LookupHandlers {
     return toLookupEntryReadModel(entry);
   }
 
-  /** Renames a Company-made row; 409 `<ENTITY>_CHANGED` on a stale `expectedUpdatedAt`. */
+  /**
+   * Renames a Company-made row and sets a Labour Category's skill; 409
+   * `<ENTITY>_CHANGED` on a stale `expectedUpdatedAt`. A seed row keeps its
+   * name (409 `SEED_IS_READ_ONLY` for a new one) but its skill may change.
+   */
   async rename(input: {
     workspaceId: string;
     id: string;
     name: string;
+    /** Labour Categories only; left as is when not given. */
+    skill?: LabourSkill;
     expectedUpdatedAt: Date;
     by: string;
   }): Promise<LookupEntryReadModel> {
@@ -110,13 +124,20 @@ export class LookupHandlers {
       throw masterChanged(this.kind);
     const before = entry.snapshot();
     const now = this.clock();
-    entry.rename(input.name, input.by, now);
-    await this.store.update(entry, input.expectedUpdatedAt, {
-      action: `${this.prefix}.updated`,
-      before,
-      by: input.by,
-      now,
-    });
+    let changed = false;
+    if (cleanMasterName(this.kind, input.name) !== entry.name) {
+      entry.rename(input.name, input.by, now);
+      changed = true;
+    }
+    if (input.skill != null && this.kind === "labour_category")
+      changed = entry.setSkill(input.skill, input.by, now) || changed;
+    if (changed)
+      await this.store.update(entry, input.expectedUpdatedAt, {
+        action: `${this.prefix}.updated`,
+        before,
+        by: input.by,
+        now,
+      });
     return toLookupEntryReadModel(entry);
   }
 

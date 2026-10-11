@@ -6,11 +6,18 @@ import type { MasterKind } from "../domain/master-kind";
 /**
  * Whether live labour-context rows point at a masters row (CM-203). The
  * labour context is referenced by id only, so these are plain reads of its
- * tables; Departments have no users until M5/M6. The procurement masters
- * of CM-501 check their own usage (`MaterialMasterUsage`).
+ * tables. A Department is used by the masters' own live Work Types here;
+ * site work's references are added by the routes (CM-601). The procurement
+ * masters of CM-501 check their own usage (`MaterialMasterUsage`).
  */
 export function prismaMasterUsage(db: PrismaClient): MasterUsage {
   return async (kind: MasterKind, workspaceId: string, id: string) => {
+    if (kind === "department")
+      return (
+        (await db.constructionMastersWorkType.count({
+          where: { workspaceId, departmentId: id, deletedAt: null },
+        })) > 0
+      );
     if (kind !== "labour_category" && kind !== "supervisor") return false;
     const rows =
       kind === "labour_category"

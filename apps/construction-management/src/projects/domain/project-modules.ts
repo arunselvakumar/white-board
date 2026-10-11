@@ -133,7 +133,7 @@ export const PROJECT_MODULES = [
   {
     key: "reports",
     label: "Reports",
-    description: "Attendance, muster roll and payment reports.",
+    description: "Labour, daily work and equipment reports.",
     segment: "reports",
     menu: "reporting.project_reports",
   },

@@ -348,6 +348,7 @@ export class WorksheetHandlers {
     workspaceId: string,
     projectId: string,
     input: WorksheetCommand,
+    needsPlaces: boolean,
   ): Promise<WorksheetFacts> {
     const { db, directory } = this.deps;
     const id = (value: string | null | undefined) =>
@@ -356,7 +357,7 @@ export class WorksheetHandlers {
     const departmentId = id(input.departmentId);
     const workTypeId = id(input.workTypeId);
     const unitId = id(input.approxWorkUnitId);
-    const [contractors, departments, workTypes, units, materials] =
+    const [contractors, departments, workTypes, units, materials, places] =
       await Promise.all([
         contractorId == null
           ? new Map<string, WorksheetContractorFacts>()
@@ -375,6 +376,10 @@ export class WorksheetHandlers {
           workspaceId,
           (input.materials ?? []).map((line) => line.materialId),
         ),
+        // Only asked when a shown Location section came back empty.
+        needsPlaces
+          ? directory.hasPlaces(workspaceId, projectId)
+          : Promise.resolve(true),
       ]);
     const contractor =
       contractorId == null ? null : contractors.get(contractorId);
@@ -405,6 +410,7 @@ export class WorksheetHandlers {
               disabled: workType.disabled,
             },
       unit: unit == null ? null : { id: unit.id, disabled: unit.disabled },
+      placesOffered: places,
       materials: new Map(
         [...materials.values()].map((material) => [
           material.id,
@@ -432,7 +438,12 @@ export class WorksheetHandlers {
       sheetDate,
       await this.deps.today(access.workspaceId),
     );
-    const facts = await this.facts(access.workspaceId, projectId, input);
+    const facts = await this.facts(
+      access.workspaceId,
+      projectId,
+      input,
+      settings.showLocation && input.siteLocation == null,
+    );
     // A hidden Location section is neither validated nor stored.
     const siteLocation =
       settings.showLocation && input.siteLocation != null

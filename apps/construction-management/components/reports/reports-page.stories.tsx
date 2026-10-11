@@ -9,13 +9,20 @@ import {
   type ApiCall,
 } from "../../.storybook/mocks/api";
 import {
+  CONTRACTOR_ID,
+  DONE_DAILY_WORK,
   DONE_MUSTER,
+  DONE_RENTED_USAGE,
   FAILED_PAYMENT,
   LIST_PATH,
   NEW_ATTENDANCE,
+  PROJECT_EQUIPMENT,
+  PROJECT_EQUIPMENT_PATH,
   PROJECT_ID,
   RUNNING_VENDOR,
   TODAY,
+  WORKSHEET_OPTIONS,
+  WORKSHEET_OPTIONS_PATH,
 } from "./report-fixtures";
 import { ReportsPage } from "./reports-page";
 
@@ -298,5 +305,108 @@ export const BackwardsPeriod: Story = {
     ).toBeVisible();
     await expect(card.getByRole("button", { name: "Generate" })).toBeDisabled();
     await expect(posted()).toHaveLength(0);
+  },
+};
+
+/** The Site work group: five cards, the filters from the Project's Contractors and equipment. */
+export const SiteWorkReports: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH)
+        return list([DONE_RENTED_USAGE]);
+      if (call.method === "GET" && call.path === WORKSHEET_OPTIONS_PATH)
+        return Response.json(WORKSHEET_OPTIONS);
+      if (call.method === "GET" && call.path === PROJECT_EQUIPMENT_PATH)
+        return Response.json(PROJECT_EQUIPMENT);
+      if (call.method === "POST" && call.path === API)
+        return Response.json(DONE_DAILY_WORK, { status: 201 });
+      return undefined;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const group = within(
+      await canvas.findByRole("region", { name: "Site work" }),
+    );
+    for (const name of [
+      "Daily Work",
+      "Company Owned Equipment Usage",
+      "Rented Equipment Usage",
+      "Equipment Maintenance",
+      "Equipment Transfers",
+    ])
+      await expect(group.getByRole("form", { name })).toBeVisible();
+    await expect(
+      group.getByText(
+        "Needs Equipment Usage Report; hire cost needs Financial.",
+      ),
+    ).toBeVisible();
+    // Maintenance and transfers have no filter.
+    await expect(
+      within(
+        group.getByRole("form", { name: "Equipment Transfers" }),
+      ).queryByRole("combobox"),
+    ).toBeNull();
+
+    const daily = within(group.getByRole("form", { name: "Daily Work" }));
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await daily.findByRole("combobox", { name: "Contractor" }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Velan Constructions" }),
+    );
+    await userEvent.click(daily.getByRole("button", { name: "Generate" }));
+    await expect(await daily.findByText("Ready to download")).toBeVisible();
+    await expect(posted()[0]?.body).toEqual({
+      kind: "daily_work",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY, contractorId: CONTRACTOR_ID },
+    });
+
+    const owned = within(
+      group.getByRole("form", { name: "Company Owned Equipment Usage" }),
+    );
+    await userEvent.click(
+      await owned.findByRole("combobox", { name: "Equipment" }),
+    );
+    await expect(
+      await body.findByRole("option", { name: "JCB 3DX (TN-09-AB-1234)" }),
+    ).toBeVisible();
+    await userEvent.click(body.getByRole("option", { name: "All equipment" }));
+
+    const recent = within(
+      await canvas.findByRole("list", { name: "Recent reports" }),
+    );
+    await expect(recent.getByText("Rented Equipment Usage")).toBeVisible();
+  },
+};
+
+/** Without Daily Worksheet or equipment read, the cards simply have no filter. */
+export const SiteWorkWithoutFilters: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+      if (call.method === "POST" && call.path === API)
+        return Response.json(DONE_RENTED_USAGE, { status: 201 });
+      return undefined;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const group = within(
+      await canvas.findByRole("region", { name: "Site work" }),
+    );
+    const rented = within(
+      group.getByRole("form", { name: "Rented Equipment Usage" }),
+    );
+    await expect(rented.queryByRole("combobox")).toBeNull();
+    await userEvent.click(rented.getByRole("button", { name: "Generate" }));
+    await expect(await rented.findByText("Ready to download")).toBeVisible();
+    await expect(posted()[0]?.body).toEqual({
+      kind: "rented_equipment_usage",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY },
+    });
   },
 };

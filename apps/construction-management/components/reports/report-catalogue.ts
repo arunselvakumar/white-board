@@ -1,13 +1,16 @@
-import type { ReportJob, ReportKind } from "@/src/queries/reports";
+import type { ReportJob, RequestReportInput } from "@/src/queries/reports";
 
 export type ReportDefinition = {
-  kind: ReportKind;
+  /** The kinds this page requests; the DPR has its own module (CM-606). */
+  kind: RequestReportInput["kind"];
   title: string;
   description: string;
   /** A date range or one month. */
   period: "range" | "month";
   /** Shown under the description: what the report needs. */
   needs: string;
+  /** An optional filter the card offers when it has options for it. */
+  filter?: "contractor" | "equipment";
 };
 
 /** The Project's reports (CM-217, CM-218), in the order the page shows them. */
@@ -51,6 +54,76 @@ export const REPORT_CATALOGUE: readonly ReportDefinition[] = [
       "The combined register of workmen, muster roll and wages for a month: father's name, days, wage rate, overtime, gross, deductions, net and a signature column.",
     period: "month",
     needs: "Needs Labour Report and Financial.",
+  },
+];
+
+/**
+ * The Project's site-work reports (CM-605, CM-608), in their own group on
+ * the Reports page.
+ */
+export const SITE_WORK_REPORT_CATALOGUE: readonly ReportDefinition[] = [
+  {
+    kind: "daily_work",
+    title: "Daily Work",
+    description:
+      "Every worksheet in the period: contractor, department, skilled and unskilled labour, location, work done, shift, photos and consumed material.",
+    period: "range",
+    needs: "Needs Daily Worksheet Report.",
+    filter: "contractor",
+  },
+  {
+    kind: "owned_equipment_usage",
+    title: "Company Owned Equipment Usage",
+    description:
+      "Usage sheets of owned equipment: operator, hours, km or trips, idle and breakdown hours, fuel and overruns, with totals per machine.",
+    period: "range",
+    needs: "Needs Equipment Usage Report.",
+    filter: "equipment",
+  },
+  {
+    kind: "rented_equipment_usage",
+    title: "Rented Equipment Usage",
+    description:
+      "Usage sheets of hired equipment with the hire party, basis and billable quantity; unit rate and hire cost with Financial.",
+    period: "range",
+    needs: "Needs Equipment Usage Report; hire cost needs Financial.",
+    filter: "equipment",
+  },
+  {
+    kind: "equipment_maintenance",
+    title: "Equipment Maintenance",
+    description:
+      "Maintenance of machines that were at this Project when it started: kind, dates, days, workshop; cost with Financial.",
+    period: "range",
+    needs: "Needs Equipments Report; cost needs Financial.",
+  },
+  {
+    kind: "equipment_transfers",
+    title: "Equipment Transfers",
+    description:
+      "Transfers out of or into this Project: location before, destination, latest location, remarks and who entered them.",
+    period: "range",
+    needs: "Needs Equipments Report.",
+  },
+];
+
+/** The central equipment reports of Masters → Equipments (CM-605). */
+export const EQUIPMENT_REPORT_CATALOGUE: readonly ReportDefinition[] = [
+  {
+    kind: "equipment_maintenance",
+    title: "Equipment Maintenance",
+    description:
+      "Maintenance of every machine in the period, with the Project it was at: kind, dates, days, workshop; cost with Financial.",
+    period: "range",
+    needs: "Needs Equipments Report; cost needs Financial.",
+  },
+  {
+    kind: "equipment_transfers",
+    title: "Equipment Transfers",
+    description:
+      "Every transfer to a Project or the warehouse in the period: location before, destination, latest location, remarks and who entered them.",
+    period: "range",
+    needs: "Needs Equipments Report.",
   },
 ];
 

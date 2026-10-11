@@ -27,6 +27,8 @@ const NUMBER_FORMATS: Record<ReportColumn["kind"], string | undefined> = {
   count: "0",
   days: "0.0",
   hours: "0.00",
+  // General: as many decimals as the quantity has (at most three).
+  quantity: undefined,
   money: "#,##0.00",
 };
 

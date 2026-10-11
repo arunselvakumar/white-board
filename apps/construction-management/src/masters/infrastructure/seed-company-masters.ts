@@ -24,6 +24,21 @@ const SEED_NAMES: Record<LookupKind, readonly string[]> = {
   department: seeds.departments,
 };
 
+/** Seed Labour Categories whose heads count as unskilled (CM-0016 §6). */
+export const SEED_UNSKILLED_CATEGORIES: readonly string[] =
+  seeds.unskilledLabourCategories;
+
+/**
+ * Every Company's seed Work Types, by Department name (CM-601; keep in step
+ * with migration `20261012090000_construction_masters_work_types`).
+ */
+export const SEED_WORK_TYPES: readonly { name: string; department: string }[] =
+  seeds.workTypes;
+
+const UNSKILLED = new Set(
+  SEED_UNSKILLED_CATEGORIES.map((name) => name.toLowerCase()),
+);
+
 const SEED_DEVELOPMENTS: Record<DevelopmentKind, readonly string[]> = {
   amenity: SEED_AMENITIES,
   common_development: SEED_COMMON_DEVELOPMENTS,
@@ -147,9 +162,53 @@ async function seedMaterialMasters(
 }
 
 /**
+ * The seed Work Types (RCC, CM-601) under the Company's live Department of
+ * that name, the seed Department first. A Company that already has a live
+ * Work Type of the name, or no such Department, gets none.
+ */
+async function seedWorkTypes(
+  tx: Tx,
+  input: { workspaceId: string; by: string; now: Date },
+): Promise<void> {
+  const live = { workspaceId: input.workspaceId, deletedAt: null };
+  const taken = takenNames(
+    await tx.constructionMastersWorkType.findMany({
+      where: live,
+      select: { name: true },
+    }),
+  );
+  for (const seed of SEED_WORK_TYPES) {
+    if (taken.has(seed.name.toLowerCase())) continue;
+    const department = await tx.constructionMastersDepartment.findFirst({
+      where: {
+        ...live,
+        name: { equals: seed.department, mode: "insensitive" },
+      },
+      orderBy: [{ isSeed: "desc" }, { createdAt: "asc" }],
+      select: { id: true },
+    });
+    if (department == null) continue;
+    await tx.constructionMastersWorkType.create({
+      data: {
+        id: newId(input.now.getTime()),
+        workspaceId: input.workspaceId,
+        name: seed.name,
+        departmentId: department.id,
+        isSeed: true,
+        createdAt: input.now,
+        updatedAt: input.now,
+        createdBy: input.by,
+        updatedBy: input.by,
+      },
+    });
+  }
+}
+
+/**
  * Copies the seed Labour Categories and Departments (CM-203), the
  * Amenities and Common Developments (CM-404) and the Measurement Units,
- * Material Categories and starter Materials (CM-501) to a Company.
+ * Material Categories and starter Materials (CM-501), and the Work Types
+ * (CM-601) to a Company. Labour Categories get their skill.
  * Idempotent: names the Company already has (live, any case) are skipped,
  * so running it twice, or after the M2 migration's backfill, adds nothing.
  */
@@ -172,6 +231,13 @@ export async function seedCompanyMasters(
           id: newId(now.getTime()),
           workspaceId: input.workspaceId,
           name,
+          ...(kind === "labour_category"
+            ? {
+                skill: UNSKILLED.has(name.toLowerCase())
+                  ? ("unskilled" as const)
+                  : ("skilled" as const),
+              }
+            : {}),
           isSeed: true,
           createdAt: now,
           updatedAt: now,
@@ -181,6 +247,11 @@ export async function seedCompanyMasters(
       if (data.length > 0)
         await table.createMany({ data, skipDuplicates: true });
     }
+    await seedWorkTypes(tx, {
+      workspaceId: input.workspaceId,
+      by: input.by,
+      now,
+    });
     for (const kind of DEVELOPMENT_KINDS) {
       const existing = await tx.constructionMastersDevelopmentType.findMany({
         where: { workspaceId: input.workspaceId, kind, deletedAt: null },

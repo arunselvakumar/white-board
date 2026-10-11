@@ -1,4 +1,5 @@
 import type { LookupEntryReadModel } from "@/src/masters/application/lookup-handlers";
+import type { MasterUsage } from "@/src/masters/application/ports";
 import type { LookupKind } from "@/src/masters/domain/master-kind";
 import { createLookupHandlers } from "@/src/masters/infrastructure/create-masters-handlers";
 import type { MenuKey } from "@/src/shared-kernel/access";
@@ -12,6 +13,7 @@ export function toLookupResponse(
   return {
     id: item.id,
     name: item.name,
+    ...(item.skill == null ? {} : { skill: item.skill }),
     isSeed: item.isSeed,
     disabled: item.disabled,
     createdAt: item.createdAt.toISOString(),
@@ -24,8 +26,13 @@ export function lookupRoutes(input: {
   kind: LookupKind;
   menu: MenuKey;
   models: LookupModels;
+  /** Other contexts' references that block a delete (site work's). */
+  usage?: MasterUsage;
 }) {
-  const handlers = createLookupHandlers(input.kind);
+  const handlers = createLookupHandlers(
+    input.kind,
+    input.usage == null ? undefined : { usage: input.usage },
+  );
   return masterRoutes({
     menu: input.menu,
     createModel: input.models.create,
@@ -37,12 +44,14 @@ export function lookupRoutes(input: {
       handlers.create({
         workspaceId: session.workspaceId,
         name: body.name,
+        ...(body.skill == null ? {} : { skill: body.skill }),
         by: session.userId,
       }),
     update: (target, body) =>
       handlers.rename({
         ...target,
         name: body.name,
+        ...(body.skill == null ? {} : { skill: body.skill }),
         expectedUpdatedAt: new Date(body.expectedUpdatedAt),
       }),
     disable: (target) => handlers.disable(target),

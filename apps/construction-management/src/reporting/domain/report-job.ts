@@ -1,13 +1,22 @@
+import { assertCalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import { checkRange, monthRange } from "./report-period";
 
+/** Every kind of report job (the Prisma enum `report_kind`). */
 export const REPORT_KINDS = [
   "labour_attendance",
   "labour_payment",
   "labour_month",
   "vendor_attendance",
   "muster_roll",
+  // Site work reports (CM-605, CM-606, CM-608).
+  "daily_progress_report",
+  "daily_work",
+  "owned_equipment_usage",
+  "rented_equipment_usage",
+  "equipment_maintenance",
+  "equipment_transfers",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -18,7 +27,33 @@ export const REPORT_TITLES: Record<ReportKind, string> = {
   labour_month: "Month-wise Labour",
   vendor_attendance: "Vendor Attendance",
   muster_roll: "Muster roll and wage register",
+  // Site work reports (CM-605, CM-606, CM-608).
+  daily_progress_report: "Daily Progress Report",
+  daily_work: "Daily Work",
+  owned_equipment_usage: "Company Owned Equipment Usage",
+  rented_equipment_usage: "Rented Equipment Usage",
+  equipment_maintenance: "Equipment Maintenance",
+  equipment_transfers: "Equipment Transfers",
 };
+
+export type ReportFormat = "xlsx" | "pdf";
+
+/**
+ * The files a kind produces. Table reports print an Excel and a PDF of the
+ * same document; the Daily Progress Report is a PDF only (CM-0016 §15).
+ */
+export function reportFormats(kind: ReportKind): readonly ReportFormat[] {
+  return kind === "daily_progress_report" ? ["pdf"] : ["xlsx", "pdf"];
+}
+
+/**
+ * Kinds requested, listed and deleted through their own module rather
+ * than the Reports page: the Daily Progress Report lives under the
+ * Project's Progress Reports (`/api/construction/site-work/progress-reports`).
+ */
+export function hasOwnModule(kind: ReportKind): boolean {
+  return kind === "daily_progress_report";
+}
 
 /** What each kind is filtered by. Dates are `YYYY-MM-DD`, months `YYYY-MM`. */
 export type ReportParams =
@@ -39,11 +74,41 @@ export type ReportParams =
        */
       projectIds: string[] | null;
     }
-  | { kind: "muster_roll"; month: string };
+  | { kind: "muster_roll"; month: string }
+  | {
+      kind: "daily_progress_report";
+      /** The report date, `YYYY-MM-DD`. */
+      date: string;
+      /** User id: only this author's worksheets and usage sheets; null for all. */
+      filledBy: string | null;
+      /** Photos of the day's worksheets, usage sheets and diary (≤ 60). */
+      includeImages: boolean;
+      /** The Project's DPR number for the date (`DPR/26-27/00001`). */
+      number: string;
+    }
+  // Site work reports (CM-605, CM-608).
+  | {
+      kind: "daily_work";
+      from: string;
+      to: string;
+      contractorId: string | null;
+    }
+  | {
+      kind: "owned_equipment_usage" | "rented_equipment_usage";
+      from: string;
+      to: string;
+      equipmentId: string | null;
+    }
+  /** Central (no Project on the job) covers every Project and the warehouse. */
+  | {
+      kind: "equipment_maintenance" | "equipment_transfers";
+      from: string;
+      to: string;
+    };
 
 export type JobStatus = "queued" | "running" | "done" | "failed";
 
-/** A requested report and, once done, its two files (CM-217). */
+/** A requested report and, once done, its files (CM-217). */
 export type ReportJob = {
   id: string;
   workspaceId: string;
@@ -71,19 +136,49 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "labour_payment":
     case "vendor_attendance":
       return { ...params, ...checkRange(params) };
+    // Site work reports (CM-605, CM-608).
+    case "daily_work":
+    case "owned_equipment_usage":
+    case "rented_equipment_usage":
+    case "equipment_maintenance":
+    case "equipment_transfers":
+      return { ...params, ...checkRange(params) };
     case "labour_month":
     case "muster_roll":
       monthRange(params.month);
       return params;
+    case "daily_progress_report":
+      assertCalendarDate(params.date, "REPORT_DATE_INVALID");
+      if (params.number.trim() === "")
+        throw new DomainError(
+          "REPORT_NUMBER_REQUIRED",
+          "A Daily Progress Report needs its number.",
+        );
+      return params;
   }
 }
 
-/** Only a vendor report can be central; the others need a Project. */
+/**
+ * Kinds that can also be central (no Project on the job): the vendor
+ * report, and the equipment reports of Masters → Equipments (CM-605).
+ */
+export const CENTRAL_REPORT_KINDS: readonly ReportKind[] = [
+  "vendor_attendance",
+  // Site work reports (CM-605).
+  "equipment_maintenance",
+  "equipment_transfers",
+];
+
+export function canBeCentral(kind: ReportKind): boolean {
+  return CENTRAL_REPORT_KINDS.includes(kind);
+}
+
+/** Only `CENTRAL_REPORT_KINDS` can be central; the others need a Project. */
 export function checkReportScope(
   kind: ReportKind,
   projectId: string | null,
 ): void {
-  if (projectId == null && kind !== "vendor_attendance")
+  if (projectId == null && !canBeCentral(kind))
     throw new DomainError(
       "REPORT_PROJECT_REQUIRED",
       "Choose a Project for this report.",
@@ -93,6 +188,23 @@ export function checkReportScope(
 /** Reports that are about money; refused without Financial. */
 export function isMoneyReport(kind: ReportKind): boolean {
   return kind === "labour_payment" || kind === "muster_roll";
+}
+
+/**
+ * Kinds whose files never print an amount, so a job of theirs never needs
+ * Financial to download (`includesMoney` stays false).
+ */
+const AMOUNT_FREE_KINDS: readonly ReportKind[] = [
+  "labour_attendance",
+  // Site work reports (CM-605, CM-608).
+  "daily_work",
+  "owned_equipment_usage",
+  "equipment_transfers",
+];
+
+/** Whether a job of this kind prints amounts when its requester has Financial. */
+export function printsAmounts(kind: ReportKind): boolean {
+  return !AMOUNT_FREE_KINDS.includes(kind);
 }
 
 /** The download name: `all-labour-attendance-2026-09-01-to-2026-09-30`. */
@@ -105,6 +217,8 @@ export function reportFileName(params: ReportParams): string {
     case "labour_month":
     case "muster_roll":
       return `${slug}-${params.month}`;
+    case "daily_progress_report":
+      return `${params.number.replace(/[^A-Za-z0-9._-]+/g, "-")}-${params.date}`;
     default:
       return params.from === params.to
         ? `${slug}-${params.from}`
@@ -118,6 +232,21 @@ export function reportFileName(params: ReportParams): string {
  * error) gets a generic message so internals never reach the screen.
  */
 export function failureMessage(error: unknown): string {
+  if (error instanceof ReportTimedOut) return error.message;
   if (error instanceof DomainError) return error.message;
   return "The report could not be generated. Try again; if it keeps failing, contact support.";
+}
+
+/** How long a job may run inline before it is stopped (CM-0016 §15). */
+export const REPORT_TIME_LIMIT_MS = 60_000;
+
+/** A job that ran past its time limit; its message is shown on screen. */
+export class ReportTimedOut extends Error {
+  constructor(limitMs: number) {
+    const seconds = Math.max(1, Math.round(limitMs / 1000));
+    super(
+      `The report took longer than ${String(seconds)} ${seconds === 1 ? "second" : "seconds"} and was stopped. Retry it, or generate it without images.`,
+    );
+    this.name = "ReportTimedOut";
+  }
 }

@@ -26,16 +26,25 @@ function isPending(job: ReportJob): boolean {
   return job.status === "queued" || job.status === "running";
 }
 
+function listKey(projectId: string | null) {
+  return projectId == null
+    ? ([...REPORTS_KEY, "central"] as const)
+    : ([...REPORTS_KEY, "project", projectId] as const);
+}
+
 /**
- * The newest reports of a Project. While one is queued or running (once M9
- * moves jobs onto a queue) the list polls every 3 seconds.
+ * The newest reports of a Project, or with `null` the viewer's own central
+ * reports. While one is queued or running (once M9 moves jobs onto a
+ * queue) the list polls every 3 seconds.
  */
-export function reportsQuery(projectId: string) {
+export function reportsQuery(projectId: string | null) {
   return queryOptions({
-    queryKey: [...REPORTS_KEY, "project", projectId],
+    queryKey: listKey(projectId),
     queryFn: () =>
       apiJson<ReportJobList>(
-        `${REPORTS_API}?${new URLSearchParams({ projectId }).toString()}`,
+        projectId == null
+          ? REPORTS_API
+          : `${REPORTS_API}?${new URLSearchParams({ projectId }).toString()}`,
       ),
     refetchInterval: (query) =>
       query.state.data?.items.some(isPending) === true ? 3_000 : false,
@@ -50,14 +59,11 @@ export function requestReport(input: RequestReportInput): Promise<ReportJob> {
   });
 }
 
-/** Requests a report and refreshes the Project's recent reports. */
-export function useRequestReport(projectId: string) {
+/** Requests a report and refreshes the Project's (or the central) recent reports. */
+export function useRequestReport(projectId: string | null) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: requestReport,
-    onSettled: () =>
-      client.invalidateQueries({
-        queryKey: [...REPORTS_KEY, "project", projectId],
-      }),
+    onSettled: () => client.invalidateQueries({ queryKey: listKey(projectId) }),
   });
 }

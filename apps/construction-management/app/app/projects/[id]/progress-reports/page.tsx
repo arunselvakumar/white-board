@@ -1,9 +1,21 @@
 import type { Metadata } from "next";
 
-import { SiteWorkComingSoon } from "@/components/site-work/site-work-coming-soon";
+import { viewerCan } from "@/app/app/_lib/viewer-can";
+import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProgressReportsPage } from "@/components/site-work/progress-reports/progress-reports-page";
 
 export const metadata: Metadata = { title: "Progress Reports" };
 
-export default function ProgressReportsPage() {
-  return <SiteWorkComingSoon title="Progress Reports" ticket="CM-606" />;
+/** The Project's Progress Reports: Daily Progress Reports (CM-606). */
+export default async function ProgressReportsRoute({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  if (
+    !(await viewerCan("site_work.progress_reports", "read", { projectId: id }))
+  )
+    return <ProjectNoAccess what="Progress Reports" />;
+  return <ProgressReportsPage projectId={id} />;
 }

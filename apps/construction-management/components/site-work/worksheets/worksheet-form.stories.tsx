@@ -12,6 +12,7 @@ import {
   LOCATION_ID,
   MASONRY_ID,
   mockWorksheetApi,
+  NO_PLACES,
   PROJECT_ID,
   SAND,
   SQM_ID,
@@ -243,6 +244,50 @@ export const StockRefusal: Story = {
     const alert = await form.findByRole("alert");
     await expect(alert).toHaveTextContent("Not enough stock");
     await expect(alert).toHaveTextContent("Cement OPC 53 Grade: 18 short");
+  },
+};
+
+/**
+ * A Project with nowhere to pick yet: the empty state is a hint and the
+ * sheet saves without a location.
+ */
+export const NoPlacesYet: Story = {
+  beforeEach: withApi({ locations: NO_PLACES }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const form = await newForm(canvas);
+    await expect(
+      await form.findByText("Nothing to locate this at yet"),
+    ).toBeVisible();
+    await expect(
+      form.getByText(/Optional until the Project has a Wing/),
+    ).toBeVisible();
+    await choose(
+      form,
+      canvasElement,
+      userEvent,
+      "Contractor",
+      "Velan Constructions",
+    );
+    await choose(
+      form,
+      canvasElement,
+      userEvent,
+      "Department",
+      "Masonry & Plaster",
+    );
+    await choose(form, canvasElement, userEvent, "Work Shift", "Shift 1");
+    await userEvent.type(form.getByLabelText("Skilled Labours"), "3");
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(posts(WORKSHEETS_API)).toHaveLength(1);
+    });
+    await expect(
+      form.queryByText("Choose where the work was done."),
+    ).toBeNull();
+    await expect(posts(WORKSHEETS_API)[0]?.body).toMatchObject({
+      siteLocation: null,
+      skilledCount: 3,
+    });
   },
 };
 

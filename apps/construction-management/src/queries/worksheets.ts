@@ -200,13 +200,23 @@ export type WorksheetCommand =
   | { kind: "reject"; id: string; reason: string; expectedUpdatedAt?: string }
   | { kind: "delete"; id: string; expectedUpdatedAt: string };
 
-/** Approve, reject or delete one Daily Worksheet. */
+/**
+ * Approve, reject or delete one Daily Worksheet. Approve and reject answer
+ * with the sheet, which goes straight into its detail cache, so the page
+ * shows the new status without waiting for the refetch.
+ */
 export function useWorksheetCommand() {
+  const client = useQueryClient();
   const invalidate = useInvalidate();
   return useMutation({
     mutationFn: async (command: WorksheetCommand): Promise<void> => {
       const { kind, id, ...body } = command;
-      await postJson<unknown>(itemUrl(id, kind), body);
+      if (kind === "delete") {
+        await postJson<unknown>(itemUrl(id, kind), body);
+        return;
+      }
+      const sheet = await postJson<Worksheet>(itemUrl(id, kind), body);
+      client.setQueryData(worksheetQuery(id).queryKey, sheet);
     },
     onSuccess: invalidate,
   });

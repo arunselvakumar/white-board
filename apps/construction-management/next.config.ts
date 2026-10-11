@@ -42,6 +42,14 @@ const nextConfig: NextConfig = {
     "/api/construction/procurement/material-requests/[id]/pdf": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
+    // The Daily Progress Report (CM-606) renders inline when it is
+    // generated or retried.
+    "/api/construction/site-work/progress-reports": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
+    "/api/construction/site-work/progress-reports/[id]/retry": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
   },
   // The Prisma client is generated inside the db package (ADR-0040) and
   // bundled into the server chunks, so it looks for its query engine next to

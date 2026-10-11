@@ -20,12 +20,12 @@ function lookup(n: number, name: string, extra: Partial<LookupItem> = {}) {
 }
 
 export const STORY_LABOUR_CATEGORIES: LookupItem[] = [
-  lookup(1, "Carpenter"),
-  lookup(2, "Electrician", { disabled: true }),
-  lookup(3, "Helper"),
-  lookup(4, "Mason"),
-  lookup(5, "Bar Bender", { isSeed: false }),
-  lookup(6, "Painter", { isSeed: false }),
+  lookup(1, "Carpenter", { skill: "skilled" }),
+  lookup(2, "Electrician", { disabled: true, skill: "skilled" }),
+  lookup(3, "Helper", { skill: "unskilled" }),
+  lookup(4, "Mason", { skill: "skilled" }),
+  lookup(5, "Bar Bender", { isSeed: false, skill: "skilled" }),
+  lookup(6, "Painter", { isSeed: false, skill: "skilled" }),
 ];
 
 export const STORY_DEPARTMENTS: LookupItem[] = [
@@ -109,6 +109,7 @@ export function serveMasters<T extends { id: string; name: string }>(input: {
           createdAt: AT,
         }),
         name: String(body["name"]).trim(),
+        ...(body["skill"] == null ? {} : { skill: body["skill"] }),
         updatedAt: LATER,
       }) as unknown as T);
 

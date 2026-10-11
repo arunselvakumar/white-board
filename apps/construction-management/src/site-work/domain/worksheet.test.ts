@@ -50,6 +50,7 @@ function facts(patch: Partial<WorksheetFacts> = {}): WorksheetFacts {
     department: { id: DEPARTMENT, disabled: false },
     workType: { id: WORK_TYPE, departmentId: DEPARTMENT, disabled: false },
     unit: { id: UNIT, disabled: false },
+    placesOffered: true,
     materials: new Map([
       [
         CEMENT,
@@ -226,6 +227,16 @@ describe("worksheet content", () => {
         input({ siteLocation: { type: "location", locationId: "x" } }),
         settings({ showLocation: false }),
         facts(),
+      ).siteLocation,
+    ).toBeNull();
+  });
+
+  it("leaves the location optional when the Project has nowhere to pick", () => {
+    expect(
+      worksheetContent(
+        input({ siteLocation: null }),
+        settings(),
+        facts({ placesOffered: false }),
       ).siteLocation,
     ).toBeNull();
   });

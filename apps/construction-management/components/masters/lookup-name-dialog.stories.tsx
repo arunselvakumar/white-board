@@ -79,6 +79,61 @@ export const AddValidatesAndSaves: Story = {
     await waitFor(() => expect(args.onClose).toHaveBeenCalled());
     await expect(sentTo(api.spy, CATEGORIES)).toEqual({
       name: "Bar Bender II",
+      skill: "skilled",
+    });
+  },
+};
+
+/** A new category counted as unskilled on worksheets. */
+export const AddUnskilled: Story = {
+  play: async ({ args, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(await body.findByRole("dialog"));
+    await userEvent.type(
+      dialog.getByLabelText("Labour Category name"),
+      "Coolie",
+    );
+    await expect(dialog.getByLabelText("Skill")).toHaveTextContent("Skilled");
+    await userEvent.click(dialog.getByLabelText("Skill"));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Unskilled" }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(args.onClose).toHaveBeenCalled());
+    await expect(sentTo(api.spy, CATEGORIES)).toEqual({
+      name: "Coolie",
+      skill: "unskilled",
+    });
+  },
+};
+
+const MASON = STORY_LABOUR_CATEGORIES.find((item) => item.name === "Mason");
+
+/** A Default category keeps its name; only its skill changes. */
+export const EditDefaultSkill: Story = {
+  args: { item: MASON ?? null },
+  play: async ({ args, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(await body.findByRole("dialog"));
+    await waitFor(() =>
+      expect(dialog.getByRole("heading", { name: "Edit Mason" })).toBeVisible(),
+    );
+    await expect(dialog.getByLabelText("Labour Category name")).toHaveAttribute(
+      "readonly",
+    );
+    await expect(
+      dialog.getByText("A Default Labour Category keeps its name."),
+    ).toBeVisible();
+    await userEvent.click(dialog.getByLabelText("Skill"));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Unskilled" }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(args.onClose).toHaveBeenCalled());
+    await expect(sentTo(api.spy, `${String(MASON?.id)}/update`)).toEqual({
+      name: "Mason",
+      expectedUpdatedAt: MASON?.updatedAt,
+      skill: "unskilled",
     });
   },
 };
@@ -116,7 +171,7 @@ export const RenameSendsLoadedUpdatedAt: Story = {
     );
     await waitFor(() =>
       expect(
-        dialog.getByRole("heading", { name: "Rename Bar Bender" }),
+        dialog.getByRole("heading", { name: "Edit Bar Bender" }),
       ).toBeVisible(),
     );
     const field = dialog.getByLabelText("Labour Category name");
@@ -127,6 +182,7 @@ export const RenameSendsLoadedUpdatedAt: Story = {
     await expect(sentTo(api.spy, `${String(BAR_BENDER?.id)}/update`)).toEqual({
       name: "Steel Fixer",
       expectedUpdatedAt: BAR_BENDER?.updatedAt,
+      skill: "skilled",
     });
   },
 };

@@ -18,6 +18,7 @@ import { LookupNameDialog } from "./lookup-name-dialog";
 import {
   DEPARTMENTS_SCREEN,
   LABOUR_CATEGORIES_SCREEN,
+  SKILL_LABELS,
   type LookupScreenConfig,
 } from "./lookup-screens";
 import {
@@ -103,6 +104,13 @@ export function LookupListScreen({ config }: { config: LookupScreenConfig }) {
                   <MasterRow
                     key={item.id}
                     name={item.name}
+                    details={
+                      config.withSkill === true && item.skill != null ? (
+                        <p className="text-muted-foreground text-sm">
+                          {SKILL_LABELS[item.skill]}
+                        </p>
+                      ) : undefined
+                    }
                     isSeed={item.isSeed}
                     disabled={item.disabled}
                     busy={
@@ -110,9 +118,9 @@ export function LookupListScreen({ config }: { config: LookupScreenConfig }) {
                       "id" in command.variables &&
                       command.variables.id === item.id
                     }
-                    editLabel="Rename"
+                    editLabel={config.withSkill === true ? "Edit" : "Rename"}
                     onEdit={
-                      item.isSeed
+                      item.isSeed && config.withSkill !== true
                         ? undefined
                         : () => {
                             setEditing(item);

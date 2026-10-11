@@ -55,6 +55,31 @@ describe("LookupEntry", () => {
     expect(made.isSeed).toBe(false);
     expect(made.snapshot()).toEqual({
       name: "Bar Bender",
+      skill: "skilled",
+      isSeed: false,
+      disabled: false,
+    });
+  });
+
+  it("gives a Labour Category a skill, a seed one too, and other lists none", () => {
+    const seed = entry(true);
+    expect(seed.skill).toBe("skilled");
+    expect(seed.setSkill("unskilled", "user_2", LATER)).toBe(true);
+    expect(seed.skill).toBe("unskilled");
+    expect(seed.updatedAt).toEqual(LATER);
+    expect(seed.setSkill("unskilled", "user_2", LATER)).toBe(false);
+    const department = LookupEntry.create({
+      id: "0199a1b2-0000-7000-8000-000000000002",
+      kind: "department",
+      workspaceId: "ws_1",
+      name: "RCC",
+      skill: "unskilled",
+      by: "user_1",
+      now: NOW,
+    });
+    expect(department.skill).toBeNull();
+    expect(department.snapshot()).toEqual({
+      name: "RCC",
       isSeed: false,
       disabled: false,
     });

@@ -5,7 +5,10 @@ import {
   ProjectDevelopmentHandlers,
 } from "../application/development-handlers";
 import { LookupHandlers } from "../application/lookup-handlers";
+import type { MasterUsage } from "../application/ports";
 import { SupervisorHandlers } from "../application/supervisor-handlers";
+import { WorkTypeHandlers } from "../application/work-type-handlers";
+import type { WorkTypeUsage } from "../application/work-type-ports";
 import type { DevelopmentKind, LookupKind } from "../domain/master-kind";
 import { PrismaDevelopmentStore } from "./prisma-development-store";
 import { PrismaLookupStore } from "./prisma-lookup-store";
@@ -13,18 +16,44 @@ import { prismaMasterUsage } from "./prisma-master-usage";
 import { PrismaProjectDirectory } from "./prisma-project-directory";
 import { PrismaSupervisorStore } from "./prisma-supervisor-store";
 import { PrismaTeamMemberDirectory } from "./prisma-team-member-directory";
+import { PrismaWorkTypeStore } from "./prisma-work-type-store";
 
-/** Labour Categories (`labour_category`) or Departments (`department`). */
+/**
+ * Labour Categories (`labour_category`) or Departments (`department`).
+ * `usage` adds other contexts' references (site work's, wired by the
+ * routes from `src/composition`) to the masters' own.
+ */
 export function createLookupHandlers(
   kind: LookupKind,
-  deps?: { prisma?: PrismaClient },
+  deps?: { prisma?: PrismaClient; usage?: MasterUsage },
 ) {
   const db = deps?.prisma ?? prisma;
+  const own = prismaMasterUsage(db);
+  const other = deps?.usage;
+  const usage: MasterUsage =
+    other == null
+      ? own
+      : async (...args) => (await own(...args)) || other(...args);
   return new LookupHandlers(
     kind,
     new PrismaLookupStore(db),
     () => new Date(),
-    prismaMasterUsage(db),
+    usage,
+  );
+}
+
+/**
+ * Work Types (CM-601). `usage` is site work's (live worksheets), wired by
+ * the routes from `src/composition`.
+ */
+export function createWorkTypeHandlers(deps?: {
+  prisma?: PrismaClient;
+  usage?: WorkTypeUsage;
+}) {
+  return new WorkTypeHandlers(
+    new PrismaWorkTypeStore(deps?.prisma ?? prisma),
+    () => new Date(),
+    deps?.usage,
   );
 }
 

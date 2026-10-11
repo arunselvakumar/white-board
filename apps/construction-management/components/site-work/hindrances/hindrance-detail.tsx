@@ -27,7 +27,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/components/locations/location-picker";
@@ -201,7 +201,7 @@ function SignOff({ hindrance }: { hindrance: Hindrance }) {
   const signOff = hindrance.signOff;
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-semibold">Joint sign-off</h2>
+      <h3 className="text-sm font-semibold">Joint sign-off</h3>
       {signOff == null ? (
         <p className="text-muted-foreground text-sm">
           Not signed off yet.
@@ -250,8 +250,9 @@ export function HindranceDetail({
 
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PageHeader
+      <SiteRecordHeader
         back={{ label: "Hindrances", href: listHref }}
+        size="detail"
         title={hindrance.number}
         meta={`${HINDRANCE_CAUSE_LABELS[hindrance.cause]} · ${hindrancePeriod(hindrance)}`}
         actions={

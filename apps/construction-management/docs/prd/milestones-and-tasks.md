@@ -563,16 +563,16 @@ Goal: material from need to use — Purchase Request → Purchase Order (GST spl
 
 Goal: the record of each day on site — crews' Daily Worksheets that consume materials, the Equipment register and its usage sheets, the Site Diary and Hindrance register, and the Daily Progress Report built from all of them. Spec: `modules/04`. Product decisions: [ADR CM-0016](../adr/CM-0016-daily-site-work-product-decisions.md).
 
-| ID     | Seq | Title                                                                                                                                           | Status      | Blocked by             | Area           |
-| ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------------------- | -------------- |
-| CM-601 |   1 | Prisma `construction-site-work.prisma`; Work Types master; Labour Category skill; kernel wiring (menus, numbering, back-dated, ledger source)   | in_progress | CM-203                 | Data+Domain    |
-| CM-602 |   2 | Daily Worksheet: configurable form, location, shift, labour counts prefilled from attendance, materials (Consumed), photos, approval, duplicate | in_progress | CM-601, CM-506, CM-403 | Domain+HTTP+UI |
-| CM-603 |   3 | Equipment register (owned / rented, fuel, utilisation basis, targets, hire details) in Masters and on the Project                               | in_progress | CM-601                 | Domain+HTTP+UI |
-| CM-604 |   4 | Equipment Usage sheets (time shifts / meter readings, fuel and borne by, idle / breakdown, hire cost, materials, approval, settings)            | todo        | CM-603                 | Domain+HTTP+UI |
-| CM-605 |   5 | Equipment lifecycle: transfer (Project / warehouse), maintenance log, availability; maintenance and transfer reports                            | in_progress | CM-603                 | Domain+HTTP+UI |
-| CM-606 |   6 | Progress reports: Daily Progress Report (site diary PDF with images) as a report job; View Reports; Task Progress Report named for M8           | in_progress | CM-602, CM-604, CM-607 | HTTP+UI        |
-| CM-607 |   7 | Site Diary (weather, visitors, instructions, photos) and Hindrance register (cause, duration, party, joint sign-off)                            | done        | CM-601                 | Domain+HTTP+UI |
-| CM-608 |   8 | Daily Work and Equipment Usage reports; Daily Work and Equipment Usage sections on the Project Dashboard                                        | todo        | CM-602, CM-604         | HTTP+UI        |
+| ID     | Seq | Title                                                                                                                                           | Status | Blocked by             | Area           |
+| ------ | --: | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------- | -------------- |
+| CM-601 |   1 | Prisma `construction-site-work.prisma`; Work Types master; Labour Category skill; kernel wiring (menus, numbering, back-dated, ledger source)   | done   | CM-203                 | Data+Domain    |
+| CM-602 |   2 | Daily Worksheet: configurable form, location, shift, labour counts prefilled from attendance, materials (Consumed), photos, approval, duplicate | done   | CM-601, CM-506, CM-403 | Domain+HTTP+UI |
+| CM-603 |   3 | Equipment register (owned / rented, fuel, utilisation basis, targets, hire details) in Masters and on the Project                               | done   | CM-601                 | Domain+HTTP+UI |
+| CM-604 |   4 | Equipment Usage sheets (time shifts / meter readings, fuel and borne by, idle / breakdown, hire cost, materials, approval, settings)            | done   | CM-603                 | Domain+HTTP+UI |
+| CM-605 |   5 | Equipment lifecycle: transfer (Project / warehouse), maintenance log, availability; maintenance and transfer reports                            | done   | CM-603                 | Domain+HTTP+UI |
+| CM-606 |   6 | Progress reports: Daily Progress Report (site diary PDF with images) as a report job; View Reports; Task Progress Report named for M8           | done   | CM-602, CM-604, CM-607 | HTTP+UI        |
+| CM-607 |   7 | Site Diary (weather, visitors, instructions, photos) and Hindrance register (cause, duration, party, joint sign-off)                            | done   | CM-601                 | Domain+HTTP+UI |
+| CM-608 |   8 | Daily Work and Equipment Usage reports; Daily Work and Equipment Usage sections on the Project Dashboard                                        | done   | CM-602, CM-604         | HTTP+UI        |
 
 CM-607 and CM-608 were added when the owner chose a full site diary for the DPR (CM-0016, 2026-10-11); CM-608 also holds the report and dashboard parts the legacy board folded into CM-605 / CM-606.
 

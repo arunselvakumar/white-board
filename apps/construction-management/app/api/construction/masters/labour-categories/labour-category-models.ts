@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
-import { lookupModels } from "../_lib/master-models";
+import { labourCategoryModels } from "../_lib/master-models";
 
-const models = lookupModels("LABOUR_CATEGORY");
+const models = labourCategoryModels();
 
 /** Labour Categories' models (CM-203); every route of the list uses these. */
 export const LABOUR_CATEGORY_MODELS = models;

@@ -5,7 +5,13 @@ import type {
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
 
+import { ConstructionSiteWorkEquipmentSheetSettingsResponseModel } from "../equipment-sheets/equipment-sheet-models";
 import { ConstructionSiteWorkWorksheetSettingsResponseModel } from "../worksheets/worksheet-models";
+import {
+  EQUIPMENT_SHEET_SETTINGS_PATH,
+  GetConstructionSiteWorkEquipmentSheetSettingsRequestModel,
+  SaveConstructionSiteWorkEquipmentSheetSettingsRequestModel,
+} from "./equipment-sheet-settings-models";
 import {
   GetConstructionSiteWorkWorksheetSettingsRequestModel,
   SaveConstructionSiteWorkWorksheetSettingsRequestModel,
@@ -27,6 +33,7 @@ const READ_ERRORS = [
  */
 export const siteWorkSettingsOpenApiComponents: OpenApiComponents = {
   SaveConstructionSiteWorkWorksheetSettingsRequestModel,
+  SaveConstructionSiteWorkEquipmentSheetSettingsRequestModel,
 };
 
 export const siteWorkSettingsOpenApiOperations: OpenApiOperation[] = [
@@ -51,6 +58,33 @@ export const siteWorkSettingsOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "The saved worksheet settings",
     successSchema: ConstructionSiteWorkWorksheetSettingsResponseModel,
+    errors: [
+      ...READ_ERRORS,
+      StatusCodes.CONFLICT,
+      StatusCodes.PAYMENT_REQUIRED,
+    ],
+  },
+  {
+    method: "get",
+    path: EQUIPMENT_SHEET_SETTINGS_PATH,
+    summary: "A Project's Equipment Usage sheet settings, or the defaults",
+    tags: TAGS,
+    query: GetConstructionSiteWorkEquipmentSheetSettingsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The equipment-sheet settings",
+    successSchema: ConstructionSiteWorkEquipmentSheetSettingsResponseModel,
+    errors: READ_ERRORS,
+  },
+  {
+    method: "post",
+    path: EQUIPMENT_SHEET_SETTINGS_PATH,
+    summary:
+      "Save a Project's Equipment Usage sheet settings: fields shown, approval",
+    tags: TAGS,
+    body: SaveConstructionSiteWorkEquipmentSheetSettingsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The saved equipment-sheet settings",
+    successSchema: ConstructionSiteWorkEquipmentSheetSettingsResponseModel,
     errors: [
       ...READ_ERRORS,
       StatusCodes.CONFLICT,

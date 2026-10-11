@@ -1,4 +1,4 @@
-import { prisma } from "@repo/construction-db";
+import { Prisma, prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it, vi } from "vitest";
 
@@ -500,6 +500,62 @@ describe("Daily Worksheets", () => {
     expect(await code(twice)).toBe("MATERIAL_REPEATED");
     const tooLong = await save(ctx, { remark: "x".repeat(501) });
     expect(tooLong.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("asks for a location only when the Project has a place to pick", async () => {
+    const ctx = await setup();
+    // A new Project: no Wings, Amenities, Common Developments or Locations.
+    const bare = await addProject(ctx.ws, ctx.by, "Compound wall, Guindy");
+    await prisma.constructionMastersContractorProject.create({
+      data: { contractorId: ctx.contractor, projectId: bare },
+    });
+    const free = await save(ctx, {
+      projectId: bare,
+      siteLocation: null,
+      materials: [],
+    });
+    expect(free.status, await free.clone().text()).toBe(StatusCodes.CREATED);
+    const freeSheet = await json<Sheet>(free);
+    expect(freeSheet.siteLocation).toBeNull();
+    // No location is SQL NULL, never `{}`.
+    const stored = await prisma.$queryRaw<{ empty: boolean }[]>(
+      Prisma.sql`SELECT site_location IS NULL AS empty
+        FROM construction_site_work.worksheets WHERE id = ${freeSheet.id}::uuid`,
+    );
+    expect(stored[0]?.empty).toBe(true);
+
+    // Once it has a Wing, the location is required again.
+    const config = {
+      floors: 1,
+      startNumber: 1,
+      unitsPerFloor: 1,
+      basements: 0,
+    };
+    const floors = generateWingFloors(
+      "commercial",
+      wingConfig("commercial", config),
+    ).map((floor) => ({
+      kind: floor.kind,
+      name: floor.name,
+      units: floor.units.map((name) => ({ name })),
+    }));
+    const wing = await createWing(
+      post(`${ORIGIN}/api/construction/projects/projects/${bare}/wings`, {
+        type: "commercial",
+        name: "Wing A",
+        config,
+        floors,
+      }),
+      params(bare),
+    );
+    expect(wing.status).toBe(StatusCodes.CREATED);
+    const required = await save(ctx, {
+      projectId: bare,
+      siteLocation: null,
+      materials: [],
+    });
+    expect(required.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await code(required)).toBe("LOCATION_REQUIRED");
   });
 
   it("neither validates nor stores hidden sections, and orders the sections", async () => {

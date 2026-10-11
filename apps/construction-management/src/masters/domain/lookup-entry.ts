@@ -4,6 +4,7 @@ import {
   MASTER_KINDS,
   cleanMasterName,
   masterNotFound,
+  type LabourSkill,
   type LookupKind,
   type NamedMasterKind,
 } from "./master-kind";
@@ -13,6 +14,11 @@ export type LookupEntryProps<K extends NamedMasterKind = LookupKind> = {
   kind: K;
   workspaceId: string;
   name: string;
+  /**
+   * A Labour Category's skill (CM-0016 §6); null (or left out) for every
+   * other list.
+   */
+  skill?: LabourSkill | null;
   /** Copied from the seed set when the Company was created. */
   isSeed: boolean;
   disabledAt: Date | null;
@@ -27,6 +33,8 @@ export type LookupEntryProps<K extends NamedMasterKind = LookupKind> = {
 /** What the audit log keeps of an entry. */
 export type LookupEntrySnapshot = {
   name: string;
+  /** Labour Categories only. */
+  skill?: LabourSkill;
   isSeed: boolean;
   disabled: boolean;
 };
@@ -45,6 +53,8 @@ export class LookupEntry<K extends NamedMasterKind = LookupKind> {
     kind: K;
     workspaceId: string;
     name: string;
+    /** Labour Categories only; skilled unless given. */
+    skill?: LabourSkill;
     isSeed?: boolean;
     by: string;
     now: Date;
@@ -54,6 +64,8 @@ export class LookupEntry<K extends NamedMasterKind = LookupKind> {
       kind: input.kind,
       workspaceId: input.workspaceId,
       name: cleanMasterName(input.kind, input.name),
+      skill:
+        input.kind === "labour_category" ? (input.skill ?? "skilled") : null,
       isSeed: input.isSeed ?? false,
       disabledAt: null,
       createdAt: input.now,
@@ -82,6 +94,10 @@ export class LookupEntry<K extends NamedMasterKind = LookupKind> {
   }
   get name(): string {
     return this.props.name;
+  }
+  /** A Labour Category's skill; null for other lists. */
+  get skill(): LabourSkill | null {
+    return this.props.skill ?? null;
   }
   get isSeed(): boolean {
     return this.props.isSeed;
@@ -114,6 +130,7 @@ export class LookupEntry<K extends NamedMasterKind = LookupKind> {
   snapshot(): LookupEntrySnapshot {
     return {
       name: this.props.name,
+      ...(this.props.skill == null ? {} : { skill: this.props.skill }),
       isSeed: this.props.isSeed,
       disabled: this.disabled,
     };
@@ -142,6 +159,19 @@ export class LookupEntry<K extends NamedMasterKind = LookupKind> {
       updatedAt: now,
       updatedBy: by,
     };
+  }
+
+  /**
+   * Changes a Labour Category's skill; false when it already had it. Seed
+   * categories too: the skill is how heads are counted, not the row's name.
+   */
+  setSkill(skill: LabourSkill, by: string, now: Date): boolean {
+    this.assertLive();
+    if (this.props.kind !== "labour_category")
+      throw new Error("Only Labour Categories have a skill.");
+    if (this.props.skill === skill) return false;
+    this.props = { ...this.props, skill, updatedAt: now, updatedBy: by };
+    return true;
   }
 
   /** Leaves the pickers; old records keep it. A no-op when already disabled. */

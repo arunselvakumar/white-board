@@ -151,6 +151,51 @@ export function locationRef(input: LocationRefInput): LocationRef {
   }
 }
 
+/**
+ * A LocationRef read back from a JSON column, or null. Anything without a
+ * known `type` and the id that type needs reads as no location: SQL NULL,
+ * JSON `null`, and the `{}` that `next dev` writes for `Prisma.DbNull`.
+ */
+export function storedLocationRef(json: unknown): LocationRef | null {
+  if (typeof json !== "object" || json == null || Array.isArray(json))
+    return null;
+  const value = json as Record<string, unknown>;
+  const text = (key: string): string | null =>
+    typeof value[key] === "string" && value[key] !== "" ? value[key] : null;
+  const ids = (key: string): string[] =>
+    Array.isArray(value[key])
+      ? (value[key] as unknown[]).filter(
+          (id): id is string => typeof id === "string",
+        )
+      : [];
+  switch (value["type"]) {
+    case "wing": {
+      const wingId = text("wingId");
+      return wingId == null
+        ? null
+        : {
+            type: "wing",
+            wingId,
+            floorIds: ids("floorIds"),
+            unitIds: ids("unitIds"),
+          };
+    }
+    case "amenity":
+    case "common_development": {
+      const developmentId = text("developmentId");
+      return developmentId == null
+        ? null
+        : { type: value["type"], developmentId };
+    }
+    case "location": {
+      const locationId = text("locationId");
+      return locationId == null ? null : { type: "location", locationId };
+    }
+    default:
+      return null;
+  }
+}
+
 /** The names a LocationRef points at, for its one-line label. */
 export type LocationNames =
   | {

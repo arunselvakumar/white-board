@@ -14,7 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Controller,
   useFieldArray,
@@ -48,6 +48,7 @@ import { siteLocationInput } from "@/components/procurement/purchase-requests/pu
 import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
 import { QueryHttpError } from "@/src/queries/http";
+import { locationOptionsQuery } from "@/src/queries/location-options";
 import { materialOptionsQuery } from "@/src/queries/material-options";
 import {
   canInSiteWork,
@@ -91,6 +92,8 @@ type Values = {
   remark: string;
   /** Work Photos picked on a new sheet, uploaded once it is saved. */
   photos: File[];
+  /** Not sent: whether the Project has a place to pick (Location required). */
+  placesOffered: boolean;
 };
 
 const COUNT_PATTERN = /^\d{1,5}$/;
@@ -114,12 +117,17 @@ function schemaFor(settings: Settings) {
       ),
       remark: z.string(),
       photos: z.array(z.custom<File>()),
+      placesOffered: z.boolean(),
     })
     .superRefine((value, ctx) => {
       const issue = (path: string, message: string) => {
         ctx.addIssue({ code: "custom", path: path.split("."), message });
       };
-      if (settings.showLocation && value.siteLocation == null)
+      if (
+        settings.showLocation &&
+        value.placesOffered &&
+        value.siteLocation == null
+      )
         issue("siteLocation", "Choose where the work was done.");
       if (settings.showLabour) {
         let total = 0;
@@ -189,6 +197,7 @@ function blank(sheetDate: string): Values {
     materials: [],
     remark: "",
     photos: [],
+    placesOffered: true,
   };
 }
 
@@ -213,6 +222,7 @@ function valuesFrom(sheet: Worksheet, sheetDate: string): Values {
     remark: sheet.remark ?? "",
     // Duplicate copies no photos (CM-0016 §9).
     photos: [],
+    placesOffered: true,
   };
 }
 
@@ -360,6 +370,14 @@ export function WorksheetForm({
     worksheetFormOptionsQuery(projectId),
   );
   const access = useQuery(siteWorkAccessQuery(projectId)).data;
+  // Location is required only once the Project has a place to pick (the
+  // server applies the same rule); until then the picker's empty state is
+  // a hint.
+  const places = useQuery({
+    ...locationOptionsQuery(projectId),
+    enabled: options.settings.showLocation,
+  }).data;
+  const placesOffered = places == null || places.types.length > 0;
   const settings = options.settings;
   const create = useCreateWorksheet();
   const update = useUpdateWorksheet(worksheet?.id ?? "");
@@ -382,6 +400,9 @@ export function WorksheetForm({
           : blank(today),
   });
   const lines = useFieldArray({ control: form.control, name: "materials" });
+  useEffect(() => {
+    form.setValue("placesOffered", placesOffered);
+  }, [form, placesOffered]);
   const values = useWatch({ control: form.control }) as Values;
   const errors = form.formState.errors;
   const current = worksheet ?? source;
@@ -495,6 +516,7 @@ export function WorksheetForm({
           siteLocation: input.siteLocation,
           contractorId: input.contractorId,
           shift: input.shift,
+          placesOffered: input.placesOffered,
         });
         setNotice(
           failed.length === 0
@@ -538,7 +560,7 @@ export function WorksheetForm({
                 projectId={projectId}
                 id={id("location")}
                 label="Location"
-                required
+                required={placesOffered}
                 value={field.value}
                 invalid={errors.siteLocation != null}
                 onChange={field.onChange}
@@ -546,6 +568,12 @@ export function WorksheetForm({
             )}
           />
           <FieldError message={errors.siteLocation?.message} />
+          {!placesOffered && (
+            <p className="text-muted-foreground text-xs">
+              Optional until the Project has a Wing, Amenity, Common Development
+              or Location.
+            </p>
+          )}
         </div>
       </section>
     ) : null,

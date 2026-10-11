@@ -6,6 +6,7 @@ import {
   LOCATION_REF_LIMITS,
   locationLabel,
   locationRef,
+  storedLocationRef,
   type LocationRefInput,
 } from "./location-ref";
 
@@ -186,5 +187,37 @@ describe("locationLabel", () => {
     expect(locationLabel({ type: "location", name: "Culvert C3" })).toBe(
       "Location · Culvert C3",
     );
+  });
+});
+
+describe("storedLocationRef", () => {
+  it("reads no location from NULL, JSON null and the {} next dev writes", () => {
+    for (const value of [null, undefined, {}, [], "wing", 3, { type: "tower" }])
+      expect(storedLocationRef(value)).toBeNull();
+  });
+
+  it("needs the id its type names", () => {
+    expect(storedLocationRef({ type: "wing" })).toBeNull();
+    expect(
+      storedLocationRef({ type: "amenity", developmentId: "" }),
+    ).toBeNull();
+    expect(storedLocationRef({ type: "location", wingId: "w" })).toBeNull();
+  });
+
+  it("reads each type back, dropping stray fields", () => {
+    expect(
+      storedLocationRef({ type: "wing", wingId: "w1", floorIds: ["f1", 2] }),
+    ).toEqual({ type: "wing", wingId: "w1", floorIds: ["f1"], unitIds: [] });
+    expect(
+      storedLocationRef({
+        type: "common_development",
+        developmentId: "d1",
+        locationId: "x",
+      }),
+    ).toEqual({ type: "common_development", developmentId: "d1" });
+    expect(storedLocationRef({ type: "location", locationId: "l1" })).toEqual({
+      type: "location",
+      locationId: "l1",
+    });
   });
 });

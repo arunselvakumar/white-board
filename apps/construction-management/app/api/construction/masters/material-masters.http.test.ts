@@ -796,6 +796,19 @@ describe("Procurement masters HTTP (CM-501)", () => {
     );
     expect(limited.items).toHaveLength(1);
 
+    // A site engineer who only fills worksheets or usage sheets picks
+    // materials too (CM-602, CM-604).
+    for (const menu of [
+      "site_work.daily_worksheet",
+      "site_work.equipment_usage",
+    ] as const) {
+      const engineer = await memberWith(owner, { [menu]: ["read"] });
+      const picked = await materialOptions(
+        jsonRequest(`${MATERIALS}/options`, engineer.cookie),
+      );
+      expect(picked.status).toBe(StatusCodes.OK);
+    }
+
     const outsider = await memberWith(owner, { "masters.units": ["read"] });
     const refused = await materialOptions(
       jsonRequest(`${MATERIALS}/options`, outsider.cookie),
