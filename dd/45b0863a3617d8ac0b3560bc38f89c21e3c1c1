@@ -1,0 +1,105 @@
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_0b536d2972a09b::t_514c8740198107 148
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_0b536d2972a09b::t_2da2491f5e801a 9,66-68
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery.http.test.ts
+  s_0b536d2972a09b::t_02162819181712 192,305
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_0b536d2972a09b::t_9d473dab88a061 1-38
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/route.ts
+  s_0b536d2972a09b::t_3aa0ea778f0cec 1-51
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_0b536d2972a09b::t_4a6a55ba6bcac9 1-29
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/route.ts
+  s_0b536d2972a09b::t_3a37cceb953ff1 1-79
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/app/route.ts
+  s_0b536d2972a09b::t_e14e536a37ad4c 1-10
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_0b536d2972a09b::t_64ebe1c23fb9fd 1-10
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/route.ts
+  s_0b536d2972a09b::t_db0eaed1aa80ed 1-11
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_0b536d2972a09b::t_a8e2e6cdcf0453 1-9
+apps/construction-management/app/api/construction/site-work/documents/[type]/[id]/remarks/route.ts
+  s_0b536d2972a09b::t_91677405aa0a29 1-77
+apps/construction-management/app/api/construction/site-work/documents/document-models.ts
+  s_0b536d2972a09b::t_899180cca467cb 1-204
+apps/construction-management/app/api/construction/site-work/documents/document-responses.ts
+  s_0b536d2972a09b::t_fca4ead4cba85e 1-90
+apps/construction-management/app/api/construction/site-work/documents/document-test-fixtures.ts
+  s_0b536d2972a09b::t_979842e25da0a2 1-123
+apps/construction-management/app/api/construction/site-work/documents/documents-openapi.ts
+  s_0b536d2972a09b::t_d9c6e66d1c0400 1-3,9-57,59-202
+apps/construction-management/app/api/construction/site-work/documents/documents.http.test.ts
+  s_0b536d2972a09b::t_2276986d9a045c 1-647
+apps/construction-management/app/api/construction/site-work/documents/handlers.ts
+  s_0b536d2972a09b::t_7be90d2e8337a0 1-211
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_0b536d2972a09b::t_2ffe654dd74541 81-84,97-100
+apps/construction-management/components/site-work/documents/pending-files-field.stories.tsx
+  s_0b536d2972a09b::t_f4d4abd6c96b83 1-198
+apps/construction-management/components/site-work/documents/pending-files-field.tsx
+  s_0b536d2972a09b::t_842345e0ed397e 1-219
+apps/construction-management/components/site-work/documents/site-work-document-activity.stories.tsx
+  s_0b536d2972a09b::t_38a0281d846f79 1-274
+apps/construction-management/components/site-work/documents/site-work-document-activity.tsx
+  s_0b536d2972a09b::t_f1ff39f0d0ae17 1-56
+apps/construction-management/components/site-work/documents/site-work-document-files.tsx
+  s_0b536d2972a09b::t_a18c88ee2ff46e 1-279
+apps/construction-management/components/site-work/documents/site-work-document-fixtures.ts
+  s_0b536d2972a09b::t_7eb8adb677e2c0 1-254
+apps/construction-management/components/site-work/documents/site-work-document-remarks.tsx
+  s_0b536d2972a09b::t_853f6f764583fe 1-345
+apps/construction-management/components/site-work/documents/site-work-file-parts.tsx
+  s_0b536d2972a09b::t_5065d82d3655b7 1-129
+apps/construction-management/components/site-work/documents/site-work-photo-strip.stories.tsx
+  s_0b536d2972a09b::t_8741fdef281f5f 1-66
+apps/construction-management/components/site-work/documents/site-work-photo-strip.tsx
+  s_0b536d2972a09b::t_dc053dc4d8032e 1-113
+apps/construction-management/components/site-work/documents/use-upload-pending-files.ts
+  s_0b536d2972a09b::t_6f612e3efacea9 1-66
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_1c6105698a6e74 601-609
+apps/construction-management/src/composition/site-work-author-names.ts
+  s_0b536d2972a09b::t_43e755ecf173b0 1-28
+apps/construction-management/src/projects/domain/media-item.ts
+  s_0b536d2972a09b::t_99d1093bb679e0 63-67
+apps/construction-management/src/queries/site-work-documents.ts
+  s_0b536d2972a09b::t_fd115c4475ac4d 1-191
+apps/construction-management/src/site-work/application/document-access.test.ts
+  s_0b536d2972a09b::t_4c4fa98c94d6da 1-102
+apps/construction-management/src/site-work/application/document-access.ts
+  s_0b536d2972a09b::t_f44b8f566fd9c4 1-54
+apps/construction-management/src/site-work/application/document-thread-ports.ts
+  s_0b536d2972a09b::t_3f015a6e73e6fa 1-109
+apps/construction-management/src/site-work/application/document-thread.ts
+  s_0b536d2972a09b::t_92f070c683c16d 1-628
+apps/construction-management/src/site-work/domain/document-thread.test.ts
+  s_0b536d2972a09b::t_760598e04b29cf 1-128
+apps/construction-management/src/site-work/domain/document-thread.ts
+  s_0b536d2972a09b::t_94691421e3e170 1-178
+apps/construction-management/src/site-work/infrastructure/document-locator.ts
+  s_0b536d2972a09b::t_d53d66ff8f421b 1-108
+apps/construction-management/src/site-work/infrastructure/document-thread-factory.ts
+  s_0b536d2972a09b::t_ce35ec9d3ce144 1-37
+apps/construction-management/src/site-work/infrastructure/document-thread-store.ts
+  s_0b536d2972a09b::t_dd6cd385796c0d 1-270
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_3944f98ebd2c86 5-197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dd45b0863a3617d8ac0b3560bc38f89c21e3c1c1",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
