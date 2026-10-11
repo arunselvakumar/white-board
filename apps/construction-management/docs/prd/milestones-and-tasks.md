@@ -570,8 +570,8 @@ Goal: the record of each day on site — crews' Daily Worksheets that consume ma
 | CM-603 |   3 | Equipment register (owned / rented, fuel, utilisation basis, targets, hire details) in Masters and on the Project                               | in_progress | CM-601                 | Domain+HTTP+UI |
 | CM-604 |   4 | Equipment Usage sheets (time shifts / meter readings, fuel and borne by, idle / breakdown, hire cost, materials, approval, settings)            | todo        | CM-603                 | Domain+HTTP+UI |
 | CM-605 |   5 | Equipment lifecycle: transfer (Project / warehouse), maintenance log, availability; maintenance and transfer reports                            | in_progress | CM-603                 | Domain+HTTP+UI |
-| CM-606 |   6 | Progress reports: Daily Progress Report (site diary PDF with images) as a report job; View Reports; Task Progress Report named for M8           | todo        | CM-602, CM-604, CM-607 | HTTP+UI        |
-| CM-607 |   7 | Site Diary (weather, visitors, instructions, photos) and Hindrance register (cause, duration, party, joint sign-off)                            | in_progress | CM-601                 | Domain+HTTP+UI |
+| CM-606 |   6 | Progress reports: Daily Progress Report (site diary PDF with images) as a report job; View Reports; Task Progress Report named for M8           | in_progress | CM-602, CM-604, CM-607 | HTTP+UI        |
+| CM-607 |   7 | Site Diary (weather, visitors, instructions, photos) and Hindrance register (cause, duration, party, joint sign-off)                            | done        | CM-601                 | Domain+HTTP+UI |
 | CM-608 |   8 | Daily Work and Equipment Usage reports; Daily Work and Equipment Usage sections on the Project Dashboard                                        | todo        | CM-602, CM-604         | HTTP+UI        |
 
 CM-607 and CM-608 were added when the owner chose a full site diary for the DPR (CM-0016, 2026-10-11); CM-608 also holds the report and dashboard parts the legacy board folded into CM-605 / CM-606.
