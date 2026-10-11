@@ -1,0 +1,21 @@
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_d85efaaff765fa::t_f0e3c5ed049a3b 236,238-242,244,381
+apps/construction-management/components/projects/dashboard/finance-sections.tsx
+  s_d85efaaff765fa::t_285647af1ebf1b 400-402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c266da57083e8cb2fdd29b4d3ff8e422e65469d1",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
