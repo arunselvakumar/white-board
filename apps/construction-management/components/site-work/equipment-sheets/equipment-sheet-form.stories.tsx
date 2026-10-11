@@ -456,9 +456,10 @@ export const SaveAndAddNew: Story = {
       await body.findByRole("option", { name: "Senthil Kumar" }),
     );
     await userEvent.click(form.getByRole("button", { name: "Save & Add New" }));
-    await expect(await form.findByRole("status")).toHaveTextContent(
-      /saved\. Fill in the next usage sheet/,
-    );
+    // The 24-hour line is a status region too: wait for the notice itself.
+    await expect(
+      await form.findByText(/saved\. Fill in the next usage sheet/),
+    ).toBeVisible();
     await expect(
       form.getByRole("combobox", { name: "Work Shift" }),
     ).toHaveTextContent("Shift 2");
