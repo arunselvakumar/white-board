@@ -119,6 +119,10 @@ export type PartyReadModel = {
   /** A Contractor's second contact; null for a Supplier. */
   contactPerson2: string | null;
   mobile2: string | null;
+  /** A Contractor's TDS settings (CM-706); defaults for a Supplier. */
+  tdsApplicable: boolean;
+  tdsLowerRate: string | null;
+  tdsNote: string | null;
   isActive: boolean;
   /** Live Departments, by name; empty for a Supplier. */
   departments: PartyRef[];
@@ -408,8 +412,8 @@ export class PartyHandlers {
       throw conflict(
         `${this.info.code}_IN_USE`,
         this.kind === "supplier"
-          ? "Purchase Orders or Goods Receipts name this Supplier, so it cannot be deleted. Make them inactive instead."
-          : "Material Requests, Daily Worksheets, Equipment Usage sheets, Hindrances or rented Equipment name this Contractor, so it cannot be deleted. Make them inactive instead.",
+          ? "Purchase Orders, Goods Receipts, invoices, payments or opening balances name this Supplier, so it cannot be deleted. Make them inactive instead."
+          : "Material Requests, Daily Worksheets, Equipment Usage sheets, Hindrances, rented Equipment, invoices, payments or opening balances name this Contractor, so it cannot be deleted. Make them inactive instead.",
       );
     const loadedAt = party.updatedAt;
     const before = party.snapshot();

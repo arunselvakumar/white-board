@@ -7,6 +7,7 @@ import { POST as createStructureRoute } from "@/app/api/construction/hrms/salary
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import { accountBalance, seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { ownerMemberId } from "../leave-http-support";
@@ -328,7 +329,7 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
     );
   });
 
-  it("marks paid only after approval, with mode, date and reference", async () => {
+  it("marks paid only after approval, with mode, date, reference and the account it was paid from", async () => {
     const { owner, member, slips } = await company(["read"]);
     const { member: slip } = await slips();
     const early = await markPaid(owner.cookie, [slip]);
@@ -350,14 +351,60 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
     expect(await json<{ details: unknown }>(bad)).toMatchObject({
       details: { field: "mode" },
     });
-    const paid = await markPaid(owner.cookie, [approved]);
+    // CM-707: the account it was paid from is required and fits the mode.
+    const { cashId, bankId } = await seededAccounts(owner.workspaceId);
+    const noAccount = await markPaid(owner.cookie, [approved]);
+    expect(noAccount.status).toBe(StatusCodes.BAD_REQUEST);
+    expect((await json<{ code: string }>(noAccount)).code).toBe(
+      "ACCOUNT_REQUIRED",
+    );
+    const wrongKind = await markPaid(owner.cookie, [approved], {
+      accountId: cashId,
+    });
+    expect(wrongKind.status).toBe(StatusCodes.BAD_REQUEST);
+    expect((await json<{ code: string }>(wrongKind)).code).toBe(
+      "ACCOUNT_MODE_MISMATCH",
+    );
+    expect(await accountBalance(owner.workspaceId, cashId)).toBe(0n);
+    const paid = await markPaid(owner.cookie, [approved], {
+      accountId: bankId,
+    });
     expect(paid.status).toBe(StatusCodes.OK);
     expect(
       (await json<{ items: ConstructionHrmsSalarySlipModel[] }>(paid)).items[0],
     ).toMatchObject({
       status: "paid",
-      payment: { mode: "bank", date: "2026-10-01", reference: "NEFT 42" },
+      payment: {
+        mode: "bank",
+        date: "2026-10-01",
+        reference: "NEFT 42",
+        accountId: bankId,
+      },
     });
+    // One account entry per slip: its net payable leaves the bank.
+    const net = BigInt(approved.amounts?.netPayable ?? 0);
+    expect(net).toBeGreaterThan(0n);
+    expect(await accountBalance(owner.workspaceId, bankId)).toBe(-net);
+    const entries = await prisma.constructionFinanceAccountEntry.findMany({
+      where: { sourceType: "salary_slip", sourceId: approved.id },
+    });
+    expect(entries).toEqual([
+      expect.objectContaining({
+        accountId: bankId,
+        projectId: null,
+        kind: "payment",
+        amount: -net,
+        reference: "NEFT 42",
+        counterpartyKind: "team_member",
+        counterpartyId: member.memberId,
+        counterpartyName: "Member",
+        narration: `Salary ${MONTH}`,
+      }),
+    ]);
+    const row = await prisma.constructionHrmsSalarySlip.findUniqueOrThrow({
+      where: { id: approved.id },
+    });
+    expect(row.paidFromAccountId).toBe(bankId);
   });
 
   it("serves the payslip PDF once approved, stored once; members see only their own", async () => {
@@ -417,6 +464,7 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
       advanceDate: "2026-09-20",
       mode: "cash",
       reason: "Festival",
+      accountId: (await seededAccounts(owner.workspaceId)).cashId,
     };
     // Needs financial too.
     expect(
@@ -435,7 +483,12 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
       kind: "advance",
       status: "paid",
       advance: { amount: 900_000, instalments: 3, firstRecoveryMonth: MONTH },
+      payment: { accountId: body.accountId },
     });
+    // The advance left the cash account (CM-707).
+    expect(await accountBalance(owner.workspaceId, body.accountId)).toBe(
+      -900_000n,
+    );
     const recalc = await recalculateRoute(
       jsonRequest(`${BASE}/recalculate`, owner.cookie, {
         id: slip.id,

@@ -89,15 +89,20 @@ export type WagePaymentStore = {
     ids: readonly string[],
   ): Promise<Map<string, string>>;
   /**
-   * The payment row, its negative ledger entry and the audit event, after
-   * locking the party's row (404 `LABOUR_NOT_FOUND` / `VENDOR_NOT_FOUND`
-   * when it was deleted meanwhile).
+   * The payment row, its negative ledger entry, its account entry (through
+   * `AccountPosting`, which checks the account: 404 `ACCOUNT_NOT_FOUND`,
+   * 403 `ACCOUNT_NOT_YOURS`, 400 `ACCOUNT_MODE_MISMATCH`) and the audit
+   * event, after locking the party's row (404 `LABOUR_NOT_FOUND` /
+   * `VENDOR_NOT_FOUND` when it was deleted meanwhile).
    */
-  insert(payment: StoredWagePayment): Promise<void>;
+  insert(
+    payment: StoredWagePayment,
+    posting: WagePaymentPosting,
+  ): Promise<void>;
   /**
    * Tombstones the payment (compare-and-set on `updatedAt`, else 409
    * `PAYMENT_CHANGED`; 404 when already cancelled) and reverses its ledger
-   * entry.
+   * entry and its account entry.
    */
   cancel(input: {
     payment: StoredWagePayment;
@@ -118,6 +123,11 @@ export type WagePaymentStore = {
     now: Date;
     audit: AuditEvent;
   }): Promise<void>;
+  /** Finance account names by id (deleted accounts included). */
+  accountNames(
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, string>>;
   /** Active Team Members by name, for "Paid by". */
   payers(workspaceId: string): Promise<{ id: string; name: string }[]>;
   /** The caller's own Team Member id, for the "Paid by" default. */
@@ -130,13 +140,23 @@ export type WagePaymentActor = {
   workspaceId: string;
   userId: string;
   role: "owner" | "member";
+  /**
+   * May pay from any petty-cash account (Owner, or Petty Cash View all);
+   * otherwise only the payer's own (ADR CM-0017 §2).
+   */
+  anyPettyCash?: boolean;
+};
+
+/** What the account entry of a payment needs beyond the payment itself. */
+export type WagePaymentPosting = {
+  partyName: string;
+  anyPettyCash: boolean;
 };
 
 /**
- * The kernel's back-dated entry policy for payments. The catalogue has no
- * `labour_payment` / `vendor_payment` module, so payments use the
- * Company's default limits (what every Labour & Vendor module uses in
- * global mode) and the Financial Closing Date.
+ * The kernel's back-dated entry policy for payments: the
+ * `labour_payment` / `vendor_payment` modules (ADR CM-0017 §12) and the
+ * Financial Closing Date.
  */
 export type WagePaymentBackdatedGuard = {
   assert(
@@ -162,6 +182,8 @@ export type WagePaymentReadModel = {
   /** Paise, > 0. */
   amount: number;
   paidBy: { id: string; name: string } | null;
+  /** The finance account it was paid from; null on payments before M7. */
+  account: { id: string; name: string } | null;
   remarks: string | null;
   /** The receipt file's id, which versions its URL; null without a receipt. */
   receiptVersion: string | null;
@@ -178,6 +200,8 @@ export type RecordWagePaymentInput = {
   kind: PaymentKind;
   mode: PaymentMode;
   amount: number;
+  /** Required (400 `ACCOUNT_REQUIRED`). */
+  accountId?: string | null;
   reference?: string | null;
   paidByMemberId?: string | null;
   remarks?: string | null;
@@ -229,7 +253,7 @@ export class WagePaymentHandlers {
   ): Promise<WagePaymentReadModel[]> {
     const ids = (type: PartyType) =>
       payments.filter((item) => item.partyType === type).map((p) => p.partyId);
-    const [labours, vendors, projects, members] = await Promise.all([
+    const [labours, vendors, projects, members, accounts] = await Promise.all([
       this.store.partyNames(workspaceId, "labour", ids("labour")),
       this.store.partyNames(workspaceId, "vendor", ids("vendor")),
       this.projects.find(
@@ -240,6 +264,12 @@ export class WagePaymentHandlers {
         workspaceId,
         payments.flatMap((item) =>
           item.paidByMemberId == null ? [] : [item.paidByMemberId],
+        ),
+      ),
+      this.store.accountNames(
+        workspaceId,
+        payments.flatMap((item) =>
+          item.accountId == null ? [] : [item.accountId],
         ),
       ),
     ]);
@@ -262,6 +292,13 @@ export class WagePaymentHandlers {
         reference: payment.reference,
         amount: payment.amount,
         paidBy: member == null ? null : { id: member.id, name: member.name },
+        account:
+          payment.accountId == null
+            ? null
+            : {
+                id: payment.accountId,
+                name: accounts.get(payment.accountId) ?? "—",
+              },
         remarks: payment.remarks,
         receiptVersion:
           payment.documentKey == null ? null : fileVersion(payment.documentKey),
@@ -317,9 +354,10 @@ export class WagePaymentHandlers {
    * Records a payment or an advance: the party must be live in the
    * Company, the Project live, a vendor assigned to the Project, "Paid by"
    * a live Team Member, the date not in the future and inside the
-   * back-dated limits. Inactive parties can still be paid (settling a
-   * labourer who left). Writes the payment, its ledger entry and the audit
-   * event in one transaction.
+   * back-dated limits, the account one the payer may use and fitting the
+   * mode (Cash → Cash or petty cash, Bank → Bank). Inactive parties can
+   * still be paid (settling a labourer who left). Writes the payment, its
+   * ledger entry, its account entry and the audit event in one transaction.
    */
   async record(input: RecordWagePaymentInput): Promise<WagePaymentReadModel> {
     const { actor } = input;
@@ -336,6 +374,7 @@ export class WagePaymentHandlers {
       kind: input.kind,
       mode: input.mode,
       amount: input.amount,
+      accountId: input.accountId,
       reference: input.reference,
       paidByMemberId: input.paidByMemberId,
       remarks: input.remarks,
@@ -383,13 +422,16 @@ export class WagePaymentHandlers {
       createdBy: actor.userId,
       updatedBy: actor.userId,
     };
-    await this.store.insert(stored);
+    await this.store.insert(stored, {
+      partyName: party.name,
+      anyPettyCash: actor.anyPettyCash ?? actor.role === "owner",
+    });
     return this.readModel(stored);
   }
 
   /**
-   * Cancels a payment: the row is tombstoned and its ledger entry
-   * reversed, so the balance is restored. The back-dated edit limit
+   * Cancels a payment: the row is tombstoned and its ledger entry and
+   * account entry reversed, so both balances are restored. The back-dated edit limit
    * applies to the payment date.
    */
   async cancel(input: {

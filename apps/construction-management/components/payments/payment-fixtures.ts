@@ -11,6 +11,16 @@ import type {
 
 /** Story data for the Payments screens (CM-216). Amounts are paise. */
 
+/** The accounts of `components/finance/account-fixtures.ts`. */
+export const CASH_ACCOUNT = {
+  id: "0199a000-0000-7000-8000-000000000001",
+  name: "Company's Cash Account",
+};
+export const BANK_ACCOUNT = {
+  id: "0199a000-0000-7000-8000-000000000002",
+  name: "HDFC Current A/c",
+};
+
 export const PROJECT_ID = "0199a000-0000-7000-8000-000000000001";
 export const VILLA_ID = "0199a000-0000-7000-8000-000000000002";
 export const TODAY = "2026-09-20";
@@ -204,6 +214,7 @@ export const DHURESH_STATEMENT: PartyStatement = {
         cancelled: false,
         updatedAt: "2026-09-12T10:00:00.000Z",
         hasReceipt: true,
+        account: BANK_ACCOUNT,
       },
     },
     {
@@ -226,6 +237,8 @@ export const DHURESH_STATEMENT: PartyStatement = {
         cancelled: true,
         updatedAt: "2026-09-13T10:00:00.000Z",
         hasReceipt: false,
+        // Recorded before M7: no account.
+        account: null,
       },
     },
   ],
@@ -251,6 +264,7 @@ export const DHURESH_PAYMENT: WagePayment = {
   reference: "UTR 88231",
   amount: 30_000,
   paidBy: { id: OWNER_MEMBER, name: "Arun Selva Kumar" },
+  account: BANK_ACCOUNT,
   remarks: "First week",
   receiptUrl: `/api/construction/labour/payments/0199a000-0000-7000-8000-0000000000d1/receipt?v=1`,
   createdAt: "2026-09-12T10:00:00.000Z",
@@ -267,6 +281,7 @@ export const GANG_ADVANCE: WagePayment = {
   mode: "cash",
   reference: null,
   amount: 500_000,
+  account: CASH_ACCOUNT,
   remarks: null,
   receiptUrl: null,
   paymentDate: "2026-09-14",

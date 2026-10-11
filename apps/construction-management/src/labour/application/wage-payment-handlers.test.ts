@@ -57,6 +57,8 @@ function fakes(options: { today?: string; parties?: PaymentParty[] } = {}) {
       payments.set(payment.id, { ...payment, documentKey: key });
       return Promise.resolve();
     },
+    accountNames: (_w, ids) =>
+      Promise.resolve(new Map(ids.map((id) => [id, `Account ${id}`]))),
     payers: () => Promise.resolve([{ id: "m1", name: "Owner" }]),
     memberIdOf: () => Promise.resolve("m1"),
     today: () => Promise.resolve(options.today ?? "2026-10-09"),
@@ -134,6 +136,7 @@ const input = {
   kind: "payment" as const,
   mode: "cash" as const,
   amount: 50_000,
+  accountId: "cash",
 };
 
 describe("WagePaymentHandlers", () => {

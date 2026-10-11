@@ -1,4 +1,5 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { financeLookupsHandler } from "../../finance/account-fixtures";
 import type {
   MySalaries,
   SalarySlipModel,
@@ -107,7 +108,12 @@ export const STORY_SLIPS: SalarySlipModel[] = [
     status: "paid",
     approvedAt: AT,
     paidAt: AT,
-    payment: { mode: "bank", date: "2026-11-01", reference: "NEFT 42" },
+    payment: {
+      mode: "bank",
+      date: "2026-11-01",
+      reference: "NEFT 42",
+      accountId: "0199a000-0000-7000-8000-000000000002",
+    },
     hasPayslip: true,
     own: true,
   }),
@@ -124,7 +130,12 @@ export const STORY_SLIPS: SalarySlipModel[] = [
       reason: "Festival",
       recovered: 300_000,
     },
-    payment: { mode: "cash", date: "2026-10-09", reference: null },
+    payment: {
+      mode: "cash",
+      date: "2026-10-09",
+      reference: null,
+      accountId: "0199a000-0000-7000-8000-000000000001",
+    },
   }),
 ];
 
@@ -193,6 +204,9 @@ export function serveSalary(state: SalaryApiState = {}) {
   const api = mockApi((call) => {
     calls.push(call);
     const path = call.path.split("?")[0] ?? "";
+    // The "Paid from" account picker (CM-707).
+    const lookup = financeLookupsHandler(call);
+    if (lookup != null) return lookup;
     if (call.method === "POST") {
       const answered = state.write?.(call);
       if (answered != null) return answered;

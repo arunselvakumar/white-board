@@ -6,6 +6,7 @@ import {
   StoryQueries,
   type ApiCall,
 } from "../../.storybook/mocks/api";
+import { financeLookupsHandler } from "../finance/account-fixtures";
 import {
   GANG_ADVANCE,
   LABOUR_SEPTEMBER,
@@ -34,6 +35,8 @@ function serve(options: { payments?: (typeof DHURESH_PAYMENT)[] } = {}) {
   return () => {
     api = mockApi((call) => {
       if (call.method !== "GET") return undefined;
+      const lookup = financeLookupsHandler(call);
+      if (lookup != null) return lookup;
       const url = new URL(call.path, "http://storybook.local");
       if (url.pathname === BALANCES) {
         const partyType = url.searchParams.get("partyType");
@@ -130,6 +133,11 @@ export const PayFromRow: Story = {
       await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
     );
     await expect(await dialog.findByLabelText("Amount")).toHaveValue("2000");
+    await waitFor(() =>
+      expect(
+        dialog.getByRole("combobox", { name: "Paid from" }),
+      ).toHaveTextContent("Company's Cash Account"),
+    );
   },
 };
 
@@ -153,6 +161,10 @@ export const PaymentsTab: Story = {
       await canvas.findByText("2 payments · ₹5,300.00"),
     ).toBeVisible();
     await expect(canvas.getAllByText("Prabhu Gang").length).toBeGreaterThan(0);
+    // The account each payment was paid from (CM-707).
+    await expect(
+      canvas.getAllByText("HDFC Current A/c").length,
+    ).toBeGreaterThan(0);
     await userEvent.click(canvas.getByRole("button", { name: "Advances" }));
     await expect(
       await canvas.findByText("1 payment · ₹5,000.00"),

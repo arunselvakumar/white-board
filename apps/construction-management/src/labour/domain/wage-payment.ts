@@ -16,14 +16,24 @@ export type WagePaymentInput = {
   mode: PaymentMode;
   /** Paise, > 0 and at most `MAX_PAISE` (₹2 crore). */
   amount: number;
+  /**
+   * The finance account the money left (ADR CM-0017 §12): required from
+   * M7 on (400 `ACCOUNT_REQUIRED`). Payments recorded before M7 have none.
+   */
+  accountId?: string | null;
   reference?: string | null;
   paidByMemberId?: string | null;
   remarks?: string | null;
 };
 
 export type WagePayment = Required<
-  Omit<WagePaymentInput, "reference" | "paidByMemberId" | "remarks">
+  Omit<
+    WagePaymentInput,
+    "accountId" | "reference" | "paidByMemberId" | "remarks"
+  >
 > & {
+  /** Null only on payments recorded before M7. */
+  accountId: string | null;
   reference: string | null;
   paidByMemberId: string | null;
   remarks: string | null;
@@ -50,7 +60,7 @@ function text(
 /**
  * Money paid to a labourer or a vendor (CM-215, `modules/08` "Decisions
  * for the build"): against wages earned (`payment`) or ahead of them
- * (`advance`), by cash or bank.
+ * (`advance`), by cash or bank, from a finance account (ADR CM-0017 §12).
  */
 export function wagePayment(input: WagePaymentInput): WagePayment {
   if (!Number.isSafeInteger(input.amount) || input.amount <= 0)
@@ -64,6 +74,13 @@ export function wagePayment(input: WagePaymentInput): WagePayment {
       "One payment is at most ₹2,00,00,000. Record a larger amount as more than one payment.",
       { details: { amount: input.amount, max: MAX_PAISE } },
     );
+  const accountId = input.accountId?.trim() ?? "";
+  if (accountId === "")
+    throw new DomainError(
+      "ACCOUNT_REQUIRED",
+      "Choose the account this was paid from.",
+      { details: { field: "accountId" } },
+    );
   return {
     partyType: input.partyType,
     partyId: input.partyId,
@@ -72,6 +89,7 @@ export function wagePayment(input: WagePaymentInput): WagePayment {
     kind: input.kind,
     mode: input.mode,
     amount: input.amount,
+    accountId,
     reference: text(
       input.reference,
       REFERENCE_MAX,

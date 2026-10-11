@@ -107,6 +107,8 @@ export const ConstructionLabourStatementLineResponseModel = z.object({
       /** Send as `expectedUpdatedAt` to cancel. */
       updatedAt: z.iso.datetime(),
       hasReceipt: z.boolean(),
+      /** The account it was paid from; null on payments before M7. */
+      account: z.object({ id: z.uuid(), name: z.string() }).nullable(),
     })
     .nullable(),
 });

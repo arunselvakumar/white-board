@@ -1,5 +1,9 @@
 import type { Prisma, PrismaClient } from "@repo/construction-db";
 
+import {
+  NO_ACCOUNT_POSTING,
+  type AccountPosting,
+} from "@/src/shared-kernel/account-posting";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   calendarDateFromDb,
@@ -16,6 +20,7 @@ import type {
   SalaryRunStore,
   SalarySlipComponent,
   SalarySlipDetails,
+  SalarySlipPosting,
   SlipVersion,
   StoredSalaryAdvance,
   StoredSalarySlip,
@@ -84,6 +89,7 @@ function payment(row: SlipRow): SalaryPayment | null {
     mode: row.paymentMode,
     date: calendarDateFromDb(row.paymentDate),
     reference: row.paymentReference,
+    accountId: row.paidFromAccountId,
   };
 }
 
@@ -205,7 +211,11 @@ function auditSummary(write: CalculatedSlipWrite, month: MonthKey) {
  * month's run is serialised with an advisory lock.
  */
 export class PrismaSalaryRunStore implements SalaryRunStore {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(
+    private readonly db: PrismaClient,
+    /** Finance's account ledger for Paid slips (CM-707). */
+    private readonly accounts: AccountPosting = NO_ACCOUNT_POSTING,
+  ) {}
 
   private async attachAdvances(
     db: PrismaClient | Tx,
@@ -668,10 +678,16 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
     workspaceId: string;
     items: readonly SlipVersion[];
     payment: SalaryPayment;
+    postings: readonly SalarySlipPosting[];
+    anyPettyCash: boolean;
     by: string;
     now: Date;
   }): Promise<void> {
     const { workspaceId, payment, by, now } = input;
+    const accountId = payment.accountId;
+    if (accountId == null)
+      throw new Error("A salary payment names its account.");
+    const postings = new Map(input.postings.map((item) => [item.slipId, item]));
     await this.db.$transaction(async (tx) => {
       for (const item of input.items) {
         const updated = await tx.constructionHrmsSalarySlip.updateMany({
@@ -690,6 +706,7 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
             paymentMode: payment.mode,
             paymentDate: calendarDateToDb(payment.date),
             paymentReference: payment.reference,
+            paidFromAccountId: accountId,
             updatedAt: now,
             updatedBy: by,
           },
@@ -701,6 +718,27 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
             item.id,
             "approved",
           );
+        const posting = postings.get(item.id);
+        if (posting != null)
+          await this.accounts.postPayment(tx, {
+            workspaceId,
+            by,
+            actor: { userId: by, anyPettyCash: input.anyPettyCash },
+            accountId,
+            mode: payment.mode,
+            projectId: null,
+            entryDate: payment.date,
+            amount: BigInt(posting.amount),
+            reference: payment.reference,
+            counterparty: {
+              kind: "team_member",
+              id: posting.memberId,
+              name: posting.memberName,
+            },
+            narration: `Salary ${posting.month}`,
+            sourceType: "salary_slip",
+            sourceId: item.id,
+          });
         await recordAudit(tx, {
           workspaceId,
           actorUserId: by,
@@ -718,11 +756,16 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
   async payAdvance(input: {
     workspaceId: string;
     memberId: string;
+    memberName: string;
+    anyPettyCash: boolean;
     terms: SalaryAdvanceTerms;
     by: string;
     now: Date;
   }): Promise<string> {
     const { workspaceId, memberId, terms, by, now } = input;
+    const accountId = terms.payment.accountId;
+    if (accountId == null)
+      throw new Error("A salary advance names its account.");
     const month = monthKeyOf(terms.advanceDate);
     return this.db.$transaction(async (tx) => {
       await lockKey(tx, `hrms-salary-run:${workspaceId}:${month}`);
@@ -760,6 +803,7 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
           paymentMode: terms.payment.mode,
           paymentDate: calendarDateToDb(terms.payment.date),
           paymentReference: terms.payment.reference,
+          paidFromAccountId: accountId,
           createdAt: now,
           updatedAt: now,
           createdBy: by,
@@ -800,6 +844,25 @@ export class PrismaSalaryRunStore implements SalaryRunStore {
           payment: terms.payment,
         },
         occurredAt: now,
+      });
+      await this.accounts.postPayment(tx, {
+        workspaceId,
+        by,
+        actor: { userId: by, anyPettyCash: input.anyPettyCash },
+        accountId,
+        mode: terms.payment.mode,
+        projectId: null,
+        entryDate: terms.payment.date,
+        amount: BigInt(terms.amount),
+        reference: terms.payment.reference,
+        counterparty: {
+          kind: "team_member",
+          id: memberId,
+          name: input.memberName,
+        },
+        narration: "Salary advance",
+        sourceType: "salary_slip",
+        sourceId: slipId,
       });
       return slipId;
     });

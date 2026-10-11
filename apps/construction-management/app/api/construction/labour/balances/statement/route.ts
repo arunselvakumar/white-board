@@ -1,6 +1,7 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { accountPosting } from "@/src/composition/account-posting";
 import { createBalanceHandlers } from "@/src/labour/infrastructure/wage-payment-factory";
 
 import { paymentFinancial, paymentMenu } from "../../payments/handlers";
@@ -11,7 +12,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const handlers = createBalanceHandlers();
+const handlers = createBalanceHandlers({ accounts: accountPosting });
 
 /**
  * One party's ledger between two dates with the running balance, the

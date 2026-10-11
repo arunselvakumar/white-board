@@ -28,6 +28,23 @@ export type AccountPosting = {
       sourceId: string;
     },
   ): Promise<void>;
+  /** Account names by id, deleted accounts included (names on old payments). */
+  names(
+    db: Prisma.TransactionClient,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, string>>;
+};
+
+/**
+ * Posts nothing and knows no names: for unit tests and factories that do
+ * not care about the account ledger (like `NOT_PAID` in procurement). The
+ * routes pass the real `accountPosting` from `src/composition`.
+ */
+export const NO_ACCOUNT_POSTING: AccountPosting = {
+  postPayment: () => Promise.resolve(),
+  reverse: () => Promise.resolve(),
+  names: () => Promise.resolve(new Map()),
 };
 
 export type AccountPostingSource = "wage_payment" | "salary_slip";

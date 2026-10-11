@@ -11,6 +11,7 @@ const base = {
   kind: "payment" as const,
   mode: "cash" as const,
   amount: 5_00_000,
+  accountId: "a1",
 };
 
 describe("wagePayment", () => {
@@ -39,6 +40,14 @@ describe("wagePayment", () => {
     expect(() => wagePayment({ ...base, reference: "x".repeat(101) })).toThrow(
       expect.objectContaining({ code: "PAYMENT_REFERENCE_TOO_LONG" }),
     );
+  });
+
+  it("needs the account it was paid from (ADR CM-0017 §12)", () => {
+    for (const accountId of [undefined, null, " "])
+      expect(() => wagePayment({ ...base, accountId })).toThrow(
+        expect.objectContaining({ code: "ACCOUNT_REQUIRED" }),
+      );
+    expect(wagePayment(base).accountId).toBe("a1");
   });
 
   it("keeps one payment within ₹2 crore so the row fits an integer", () => {

@@ -9,6 +9,7 @@ import { lockLiveParties } from "@/src/labour/infrastructure/party-locks";
 import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { addProject, jsonRequest, ownerWithCompany } from "@/test/companies";
+import { seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteLabour } from "./[id]/delete/route";
@@ -47,14 +48,16 @@ async function addLabour(company: Company, projectId: string) {
   return (await json<{ id: string }>(response)).id;
 }
 
-function pay(
+async function pay(
   company: Company,
   partyType: "labour" | "vendor",
   partyId: string,
   projectId: string,
 ) {
+  const { cashId } = await seededAccounts(company.workspaceId);
   return recordPayment(
     jsonRequest(`${API}/payments`, company.cookie, {
+      accountId: cashId,
       partyType,
       partyId,
       projectId,

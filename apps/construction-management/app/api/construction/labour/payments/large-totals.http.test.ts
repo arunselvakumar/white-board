@@ -17,6 +17,7 @@ import type { NewLedgerEntry } from "@/src/labour/domain/ledger";
 import { prismaLedger } from "@/src/labour/infrastructure/prisma-ledger";
 import { newId } from "@/src/shared-kernel/ids";
 import { addProject, jsonRequest, ownerWithCompany } from "@/test/companies";
+import { seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as listPayments, POST as recordPayment } from "./route";
@@ -92,6 +93,7 @@ async function seed() {
       earned("vendor", vendor.id, tower, "2026-09-11"),
     ]),
   );
+  const { bankId } = await seededAccounts(company.workspaceId);
   const pay = async (
     partyType: "labour" | "vendor",
     partyId: string,
@@ -100,6 +102,7 @@ async function seed() {
     json<{ id: string }>(
       await recordPayment(
         jsonRequest(`${API}/payments`, company.cookie, {
+          accountId: bankId,
           partyType,
           partyId,
           projectId: tower,
@@ -203,8 +206,10 @@ describe("amounts past ₹21.47 crore (32-bit) on one Project", () => {
 
   it("refuses one payment above ₹2 crore with AMOUNT_TOO_LARGE", async () => {
     const { company, tower, labourId } = await seed();
+    const { bankId } = await seededAccounts(company.workspaceId);
     const response = await recordPayment(
       jsonRequest(`${API}/payments`, company.cookie, {
+        accountId: bankId,
         partyType: "labour",
         partyId: labourId,
         projectId: tower,

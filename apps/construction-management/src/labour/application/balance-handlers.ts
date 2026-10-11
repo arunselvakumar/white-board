@@ -51,6 +51,8 @@ export type BalancePaymentInfo = {
   cancelled: boolean;
   updatedAt: Date;
   hasReceipt: boolean;
+  /** The finance account it was paid from; null before M7 (CM-707). */
+  account: { id: string; name: string } | null;
 };
 
 /** Reads for balances (Prisma in infrastructure). */

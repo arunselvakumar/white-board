@@ -1,7 +1,13 @@
+import { accountPosting } from "@/src/composition/account-posting";
 import { createSalaryRunHandlers } from "@/src/hrms/infrastructure/create-salary-run-handlers";
 
-/** Salary run handlers (CM-316, CM-317), wired once for every salary route. */
-export const salaryHandlers = createSalaryRunHandlers();
+/**
+ * Salary run handlers (CM-316, CM-317), wired once for every salary route.
+ * Paid slips post to finance's account ledger (CM-707).
+ */
+export const salaryHandlers = createSalaryRunHandlers({
+  accounts: accountPosting,
+});
 
 /** Query parameters as a plain object, for the Request models. */
 export function queryOf(request: Request): Record<string, string> {

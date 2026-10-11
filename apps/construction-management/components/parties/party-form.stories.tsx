@@ -147,6 +147,9 @@ export const AddContractor: Story = {
       mobile2: "98400 56789",
       projectIds: [TOWER_A.id],
       departmentIds: [RCC.id],
+      tdsApplicable: true,
+      tdsLowerRate: null,
+      tdsNote: null,
     });
     // Quotations wait until the Contractor is saved.
     await expect(
@@ -358,6 +361,70 @@ export const EditContractor: Story = {
       departmentIds: [PAINTING.id, RCC.id, PLUMBING.id],
       projectIds: [TOWER_A.id],
       expectedUpdatedAt: BALAJI.updatedAt,
+    });
+  },
+};
+
+/**
+ * TDS settings (CM-706): the payee kind follows the PAN as typed, a
+ * certificate's rate is checked, and the settings go with the form.
+ */
+export const ContractorTdsSettings: Story = {
+  render: () => (
+    <StoryQueryClient>
+      <EditPartyScreen list="contractors" id={BALAJI.id} />
+    </StoryQueryClient>
+  ),
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        path: `${CONTRACTORS}/${BALAJI.id}`,
+        respond: () => Response.json(BALAJI),
+      },
+      quotationsOf(`${CONTRACTORS}/${BALAJI.id}`),
+      {
+        method: "POST",
+        path: `${CONTRACTORS}/${BALAJI.id}/update`,
+        respond: () => Response.json(BALAJI),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const section = within(await canvas.findByRole("region", { name: "TDS" }));
+    await expect(
+      section.getByRole("switch", { name: "Deduct TDS" }),
+    ).toBeChecked();
+    // AAPFA0939F: a firm.
+    await expect(section.getByText("Firm/Company/other — 2%")).toBeVisible();
+    await userEvent.clear(canvas.getByLabelText("GSTIN"));
+    await userEvent.clear(canvas.getByLabelText("PAN"));
+    await expect(await section.findByText("No PAN — 20%")).toBeVisible();
+    await userEvent.type(canvas.getByLabelText("PAN"), "ABCPK1234F");
+    await expect(
+      await section.findByText("Individual / HUF — 1%"),
+    ).toBeVisible();
+
+    const rate = section.getByLabelText("Lower deduction rate % (certificate)");
+    await userEvent.type(rate, "101");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      await section.findByText("Enter a percent from 0 to 100, like 0.75"),
+    ).toBeVisible();
+    await expect(posts()).toBe(0);
+    await userEvent.clear(rate);
+    await userEvent.type(rate, "0.75");
+    await userEvent.type(section.getByLabelText("TDS note"), "197/2026-27");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/contractors"),
+    );
+    await expect(sent(`${CONTRACTORS}/${BALAJI.id}/update`)).toMatchObject({
+      pan: "ABCPK1234F",
+      tdsApplicable: true,
+      tdsLowerRate: "0.75",
+      tdsNote: "197/2026-27",
     });
   },
 };
