@@ -1,0 +1,35 @@
+apps/construction-management/components/projects/dashboard/dashboard-parts.tsx
+  s_0b536d2972a09b::t_51654177da9c87 1-76
+apps/construction-management/components/projects/dashboard/equipment-usage-charts.tsx
+  s_0b536d2972a09b::t_23fa4e2aadf2bc 1-146
+apps/construction-management/components/projects/dashboard/labour-availability-chart.tsx
+  s_0b536d2972a09b::t_5c9270ad3b6b5c 1-219
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_0b536d2972a09b::t_52c766dd1c2a35 17-23,131-132,159-180,281-374,542-548
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_0b536d2972a09b::t_b5c66ce0f66099 23,50,54,396-398,457-472
+apps/construction-management/components/projects/dashboard/site-work-dashboard-fixtures.ts
+  s_0b536d2972a09b::t_d0d23d5a4300e5 1-130
+apps/construction-management/components/projects/dashboard/site-work-sections.tsx
+  s_0b536d2972a09b::t_6f5aa0d1896da5 1-228
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_0b536d2972a09b::t_160e8cae0f121c 14-15
+apps/construction-management/src/queries/site-work-dashboard.ts
+  s_0b536d2972a09b::t_474598a5a88edd 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e716277afb9b5cd0969c5d2b762d389a669edc6b",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
