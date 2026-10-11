@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/masters/_lib/party-models.ts
+  s_d85efaaff765fa::t_1dc0d3f3f90db2 4-8,78-96,100-112,150,212-221
+apps/construction-management/app/api/construction/masters/contractors/contractor-tds.http.test.ts
+  s_d85efaaff765fa::t_8d359cb3fc4005 1-113
+apps/construction-management/components/parties/party-fixtures.ts
+  s_d85efaaff765fa::t_e6d962419ff6de 58-64,91-97,118
+apps/construction-management/components/parties/party-form-schema.ts
+  s_d85efaaff765fa::t_3d2b8762125ca1 79-90,130-132,169-171,192-193
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_d85efaaff765fa::t_0b524060e5fd32 150-152,368-433
+apps/construction-management/components/parties/party-form.tsx
+  s_d85efaaff765fa::t_98b06890cffdad 21,29-32,161-241,473-474
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_d85efaaff765fa::t_ae928e07773b54 122-125
+apps/construction-management/src/masters/domain/contractor-tds.ts
+  s_d85efaaff765fa::t_ccfd96c563c8ad 1-24
+apps/construction-management/src/masters/domain/party.ts
+  s_d85efaaff765fa::t_4c280485ad7fce 11-16,46-60,80-84,104-108,207-209,211-218,248-250,339-341,354-356,418-430,433
+apps/construction-management/src/masters/infrastructure/prisma-party-store.ts
+  s_d85efaaff765fa::t_1f5a772047a38f 36-38,78-80,144-146,174,176-183,185-192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2e8d79adab2eb9f58de540ca07e704c9132e1e40",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
