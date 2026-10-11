@@ -1,0 +1,45 @@
+apps/construction-management/app/api/construction/labour/balances/balance-models.ts
+  s_d85efaaff765fa::t_e0e12ff491cd57 110-111
+apps/construction-management/app/api/construction/labour/balances/statement/route.ts
+  s_d85efaaff765fa::t_d656034fbcd86b 4,15
+apps/construction-management/components/payments/pay-dialog.stories.tsx
+  s_d85efaaff765fa::t_12758adedee56c 5,8-9,33,67-69,84-85,88,119,128-185,246
+apps/construction-management/components/payments/pay-dialog.tsx
+  s_d85efaaff765fa::t_0219e3c54e615d 31,63-64,201-204,302-318
+apps/construction-management/components/payments/pay-form-schema.ts
+  s_d85efaaff765fa::t_feca55ef65c824 16-17,56-57,82
+apps/construction-management/components/payments/payment-fixtures.ts
+  s_d85efaaff765fa::t_3d25dba2e5781c 14-23,217,240-241,267,284
+apps/construction-management/components/payments/payments-list.tsx
+  s_d85efaaff765fa::t_08c12839cb7dd8 243,276-278,316-320,384
+apps/construction-management/components/payments/payments-page.stories.tsx
+  s_d85efaaff765fa::t_6c9c48f2608c3c 9,38-39,136-140,164-167
+apps/construction-management/components/payments/statement-sheet.stories.tsx
+  s_d85efaaff765fa::t_9bb4368e6befb3 66-67
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_d85efaaff765fa::t_156d7993a71e84 187-191
+apps/construction-management/src/labour/application/balance-handlers.ts
+  s_d85efaaff765fa::t_7505f59231153b 54-55
+apps/construction-management/src/labour/infrastructure/balance-store.ts
+  s_d85efaaff765fa::t_314ddb4af9229a 3-6,32-36,234,237-241,253-259
+apps/construction-management/src/labour/infrastructure/wage-payment-factory.ts
+  s_d85efaaff765fa::t_a6500074eb6fa4 43-44,48
+apps/construction-management/src/queries/payments.ts
+  s_d85efaaff765fa::t_e668ef9b561357 15,96,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f62183d0221e1f9ec306a7d59c3e0a5b7ae4e39c",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
