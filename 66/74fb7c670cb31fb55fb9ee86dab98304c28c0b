@@ -1,0 +1,45 @@
+apps/construction-management/app/api/construction/finance/dashboard/dashboard-models.ts
+  s_d85efaaff765fa::t_64135a788edb4f 1-91
+apps/construction-management/app/api/construction/finance/dashboard/dashboard-openapi.ts
+  s_d85efaaff765fa::t_04c643cc189801 1-35
+apps/construction-management/app/api/construction/finance/dashboard/dashboard.http.test.ts
+  s_d85efaaff765fa::t_02c2955529da5f 1-375
+apps/construction-management/app/api/construction/finance/dashboard/route.ts
+  s_d85efaaff765fa::t_0f47e796302e99 1-115
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_292ee1a1baf5f3 26-29,43,53
+apps/construction-management/src/composition/finance-directory.ts
+  s_d85efaaff765fa::t_2b71535a1f3d1b 224-242
+apps/construction-management/src/finance/application/ports.ts
+  s_d85efaaff765fa::t_ba3d4c51f5cb63 112-122
+apps/construction-management/src/finance/domain/payment-flows.test.ts
+  s_d85efaaff765fa::t_baf49933def24e 1-32
+apps/construction-management/src/finance/domain/payment-flows.ts
+  s_d85efaaff765fa::t_48f05c5aa93921 1-70
+apps/construction-management/src/finance/infrastructure/finance-dashboard.ts
+  s_07a51f2a6cde0a::t_8ebe00c278c376 1-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6674fb7c670cb31fb55fb9ee86dab98304c28c0b",
+  "prompts": {},
+  "sessions": {
+    "s_07a51f2a6cde0a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a31415357b5242f8c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
