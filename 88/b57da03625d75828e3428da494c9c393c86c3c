@@ -1,0 +1,25 @@
+apps/construction-management/components/finance/other-expenses/other-expense-form.tsx
+  s_d85efaaff765fa::t_b100c07473228f 79-81
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_d85efaaff765fa::t_81c0b17cd1b7b1 327,343
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_d85efaaff765fa::t_68a1990adc466d 177,280-286,421-428,729-731,755-762,766-770
+apps/construction-management/components/finance/petty-cash/voucher-form.tsx
+  s_d85efaaff765fa::t_8cdd7086e95f5c 292-298
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "88b57da03625d75828e3428da494c9c393c86c3c",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
