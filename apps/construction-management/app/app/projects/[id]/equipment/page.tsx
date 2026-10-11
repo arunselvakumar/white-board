@@ -1,9 +1,13 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { SiteWorkComingSoon } from "@/components/site-work/site-work-coming-soon";
+import { equipmentModulePath } from "@/components/site-work/equipment/equipment-tabs";
 
-export const metadata: Metadata = { title: "Equipment" };
-
-export default function EquipmentPage() {
-  return <SiteWorkComingSoon title="Equipment" ticket="CM-604" />;
+/** The Equipment module opens on its usage sheets. */
+export default async function EquipmentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  redirect(equipmentModulePath(id, "usage-sheets"));
 }

@@ -118,3 +118,151 @@ export type SiteRecordDirectory = {
     userIds: readonly string[],
   ): Promise<Map<string, string>>;
 };
+
+// ---------------------------------------------------------------------------
+// Daily Worksheets (CM-602): what the worksheet reads from masters, projects,
+// labour and organization. `src/composition/worksheet-directory.ts`
+// implements both ports by table, without importing those contexts.
+// ---------------------------------------------------------------------------
+
+/** A Contractor with its Projects and Departments (masters, CM-406). */
+export type WorksheetContractorFacts = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  projectIds: readonly string[];
+  departmentIds: readonly string[];
+};
+
+export type WorksheetNamedFacts = {
+  id: string;
+  name: string;
+  disabled: boolean;
+};
+
+/** A Work Type (masters, CM-601) with the Materials assigned to it. */
+export type WorksheetWorkTypeFacts = WorksheetNamedFacts & {
+  departmentId: string;
+  materialIds: readonly string[];
+};
+
+/** A Material as a worksheet line copies it. */
+export type WorksheetMaterialFact = WorksheetNamedFacts & { unitName: string };
+
+/**
+ * The masters, projects and organization facts a worksheet reads. Every
+ * method reads live rows of the Company only; `byIds` methods return what
+ * they find (disabled included) keyed by id.
+ */
+export type WorksheetDirectory = {
+  projectName(
+    db: SiteWorkTx,
+    workspaceId: string,
+    projectId: string,
+  ): Promise<string | null>;
+  /** Contractors assigned to the Project (Resources), with their Departments. */
+  contractorsOnProject(
+    db: SiteWorkTx,
+    workspaceId: string,
+    projectId: string,
+  ): Promise<WorksheetContractorFacts[]>;
+  contractors(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, WorksheetContractorFacts>>;
+  departments(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, WorksheetNamedFacts>>;
+  /** Work Types by id, or every Work Type of these Departments. */
+  workTypes(
+    db: SiteWorkTx,
+    workspaceId: string,
+    filter: { ids: readonly string[] } | { departmentIds: readonly string[] },
+  ): Promise<WorksheetWorkTypeFacts[]>;
+  materials(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, WorksheetMaterialFact>>;
+  /** Measurement Units by id, or every live one when `ids` is null. */
+  units(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[] | null,
+  ): Promise<WorksheetNamedFacts[]>;
+  /** Team Member names by User id (Filled By). */
+  memberNames(
+    db: SiteWorkTx,
+    workspaceId: string,
+    userIds: readonly string[],
+  ): Promise<Map<string, string>>;
+};
+
+/**
+ * The Project's attendance on a date, as heads by Labour Category skill
+ * (CM-0016 §6): labour attendance present or half day counts one head per
+ * live row; vendor attendance lines count full-day plus half-day heads.
+ * `skill` is null for a labourer with no category.
+ */
+export type AttendanceHeadcounts = {
+  onDate(
+    db: SiteWorkTx,
+    workspaceId: string,
+    projectId: string,
+    date: CalendarDate,
+  ): Promise<{ skill: "skilled" | "unskilled" | null; heads: number }[]>;
+};
+
+// ---------------------------------------------------------------------------
+// Equipment register (CM-603): what it reads from projects and masters.
+// ---------------------------------------------------------------------------
+
+/** A live Project of the Company, by name. */
+export type EquipmentProjectFacts = { id: string; name: string };
+
+/** A live Contractor of the Company: a hire party (CM-0016 §10). */
+export type EquipmentHirePartyFacts = {
+  id: string;
+  name: string;
+  /** Disabled Contractors stay readable but cannot be chosen anew. */
+  isActive: boolean;
+};
+
+/**
+ * Projects, Contractors and Team Member names for the Equipment register,
+ * without importing projects, masters or organization (ADR CM-0001).
+ * `src/composition/equipment-directory.ts` implements it.
+ */
+export type EquipmentDirectory = {
+  /** Live Projects among `ids`. */
+  projects(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, EquipmentProjectFacts>>;
+  /** Every live Project, by name (the transfer dialog). */
+  projectOptions(
+    db: SiteWorkTx,
+    workspaceId: string,
+  ): Promise<EquipmentProjectFacts[]>;
+  /** Live Contractors among `ids`. */
+  hireParties(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, EquipmentHirePartyFacts>>;
+  /** Live, enabled Contractors, by name (the hire party picker). */
+  hirePartyOptions(
+    db: SiteWorkTx,
+    workspaceId: string,
+  ): Promise<EquipmentHirePartyFacts[]>;
+  /** Team Member names by User id. */
+  memberNames(
+    db: SiteWorkTx,
+    workspaceId: string,
+    userIds: readonly string[],
+  ): Promise<Map<string, string>>;
+};

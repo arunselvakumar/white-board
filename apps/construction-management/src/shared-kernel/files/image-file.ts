@@ -25,6 +25,8 @@ export const IMAGE_LIMITS = {
   company_logo: 2 * MB,
   member_photo: 10 * MB,
   project_logo: 2 * MB,
+  /** CM-603: one photo per machine in the Equipment register. */
+  equipment_photo: 5 * MB,
 } as const;
 
 export type ImageKind = keyof typeof IMAGE_LIMITS;
