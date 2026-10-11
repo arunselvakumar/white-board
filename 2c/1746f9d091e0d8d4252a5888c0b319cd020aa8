@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets.http.test.ts
+  s_0b536d2972a09b::t_e2b2c61788038d 578,589-595,598
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2c1746f9d091e0d8d4252a5888c0b319cd020aa8",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
