@@ -1,0 +1,19 @@
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-sheet-store.ts
+  s_0b536d2972a09b::t_f2555bccf0fc53 9,69,132-137,139-140,160-167,280
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ba457969febc2f4691c895aab5adc4937c770086",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
