@@ -1,0 +1,21 @@
+apps/construction-management/components/projects/dashboard/labour-availability-chart.tsx
+  s_0b536d2972a09b::t_43dccf982789ef 198-206,208-219
+apps/construction-management/components/projects/dashboard/site-work-sections.tsx
+  s_0b536d2972a09b::t_14758216716665 72,75,78,81,97-100,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1807422238daf930e931761748a9a946d30ecd62",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
