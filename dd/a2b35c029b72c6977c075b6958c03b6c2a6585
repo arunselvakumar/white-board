@@ -1,0 +1,27 @@
+apps/construction-management/components/finance/petty-cash/account-statement.stories.tsx
+  s_d85efaaff765fa::t_eb519566ee4f83 1-96
+apps/construction-management/components/finance/petty-cash/petty-cash-fixtures.ts
+  s_d85efaaff765fa::t_eef1fcf3b81f58 104-108
+apps/construction-management/components/finance/petty-cash/petty-cash-screen.stories.tsx
+  s_d85efaaff765fa::t_83b57961f0e255 143,252-277
+apps/construction-management/components/finance/petty-cash/voucher-detail.stories.tsx
+  s_d85efaaff765fa::t_f778f7933197a2 1-164
+apps/construction-management/components/finance/petty-cash/voucher-form.stories.tsx
+  s_d85efaaff765fa::t_d570fcf47f4834 1-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dda2b35c029b72c6977c075b6958c03b6c2a6585",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
