@@ -1,0 +1,77 @@
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_0b536d2972a09b::t_248ca9644e1655 11,23-28,35-42,74
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_0b536d2972a09b::t_31659dd0a95f6c 30-32,65-92,126-127,161-193,204
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_0b536d2972a09b::t_a6b6837e876cba 8,49-67,72-77,108
+apps/construction-management/components/reports/recent-reports.tsx
+  s_0b536d2972a09b::t_f9b9e3ed8668f3 15-19,47-58,60-64,81
+apps/construction-management/components/reports/report-card.tsx
+  s_0b536d2972a09b::t_20208d8b266e0d 17-23,34-51,54,56,58-60,77-93,106,109-110,112-113,119,123-129,134-141,209-234
+apps/construction-management/components/reports/report-catalogue.ts
+  s_0b536d2972a09b::t_cc827c7f72be3c 11-12,59-128
+apps/construction-management/components/site-work/equipment/equipment-list.tsx
+  s_0b536d2972a09b::t_ec1f1d09dab0de 45,255-256,263-269,285
+apps/construction-management/components/site-work/equipment/equipment-reports-dialog.tsx
+  s_0b536d2972a09b::t_099747305aa594 1-112
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_0b536d2972a09b::t_050a20a758d3b1 136
+apps/construction-management/src/queries/reports.ts
+  s_0b536d2972a09b::t_37966128f2ee21 29-34,36-38,40,42,45-47,62-63,67
+apps/construction-management/src/reporting/application/build-report.ts
+  s_0b536d2972a09b::t_7c8580d1b9f1ee 9-13,94-100,127-130
+apps/construction-management/src/reporting/application/ports.ts
+  s_0b536d2972a09b::t_a83bfb87352e7b 9-15,62,109-145
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_0b536d2972a09b::t_cc646287b94fec 132-136
+apps/construction-management/src/reporting/domain/daily-work-report.ts
+  s_0b536d2972a09b::t_0f86a3186ad6e5 1-165
+apps/construction-management/src/reporting/domain/equipment-lifecycle-reports.ts
+  s_0b536d2972a09b::t_fd353b02ce979f 1-187
+apps/construction-management/src/reporting/domain/equipment-usage-report.ts
+  s_0b536d2972a09b::t_338b314edecfed 1-271
+apps/construction-management/src/reporting/domain/report-document.ts
+  s_0b536d2972a09b::t_9732c565389dcf 17-18,81-86,89-90,99,106,109
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_0b536d2972a09b::t_4655ad2084182f 11-16,27-32,54-73,105-111,119-134,139,151-167
+apps/construction-management/src/reporting/domain/site-work-reports.test.ts
+  s_0b536d2972a09b::t_ae7a28da29d65e 1-433
+apps/construction-management/src/reporting/infrastructure/pdf-report.ts
+  s_0b536d2972a09b::t_a417b338cc854e 53-55,64-65
+apps/construction-management/src/reporting/infrastructure/prisma-report-source.ts
+  s_0b536d2972a09b::t_dbd2db6621bfd9 17-18,168-170
+apps/construction-management/src/reporting/infrastructure/prisma-site-work-report-source.ts
+  s_0b536d2972a09b::t_47cff8d1df605b 1-567
+apps/construction-management/src/reporting/infrastructure/xlsx-report.ts
+  s_0b536d2972a09b::t_8cdff229e093a2 30-31
+apps/construction-management/src/reporting/application/build-site-work-report.ts
+  s_0b536d2972a09b::t_7a12bea2cbd4b7 1-88
+apps/construction-management/src/reporting/domain/site-work-labels.ts
+  s_9c0ef36e877c94::t_0fe85ac868a505 1-69
+apps/construction-management/components/reports/reports-page.tsx
+  s_0b536d2972a09b::t_fd161ba5544990 3,7-9,11-92,95-97,107,110-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "78e5fd122b8c58dd89b18ae9ba917c834bca8cff",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9c0ef36e877c94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a64f9124101e2c715",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
