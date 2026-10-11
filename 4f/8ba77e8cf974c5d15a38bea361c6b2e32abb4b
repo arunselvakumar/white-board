@@ -1,0 +1,25 @@
+apps/construction-management/app/app/projects/[id]/progress-reports/page.tsx
+  s_0b536d2972a09b::t_1fe1746cda8677 3-5,9-20
+apps/construction-management/components/site-work/progress-reports/create-progress-report-dialog.tsx
+  s_0b536d2972a09b::t_1d4264ba8bcd15 1-275
+apps/construction-management/components/site-work/progress-reports/progress-reports-page.tsx
+  s_0b536d2972a09b::t_ee0bfe1513c4c4 1-357
+apps/construction-management/src/queries/progress-reports.ts
+  s_0b536d2972a09b::t_ed0f8feff8541d 1-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4f8ba77e8cf974c5d15a38bea361c6b2e32abb4b",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
