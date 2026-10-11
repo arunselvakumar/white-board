@@ -81,7 +81,7 @@ export const paymentOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: PAYMENTS_PATH,
     summary:
-      "Record a payment or advance to a Labour or vendor, posting one negative ledger entry (PAYMENT_AMOUNT_INVALID, VENDOR_NOT_ON_PROJECT, PAYMENT_DATE_IN_FUTURE, TEAM_MEMBER_NOT_FOUND 400; party or Project 404; back-dated 403)",
+      "Record a payment or advance to a Labour or vendor from a finance account, posting one negative ledger entry and one account entry (ACCOUNT_REQUIRED, ACCOUNT_MODE_MISMATCH, PAYMENT_AMOUNT_INVALID, VENDOR_NOT_ON_PROJECT, PAYMENT_DATE_IN_FUTURE, TEAM_MEMBER_NOT_FOUND 400; ACCOUNT_NOT_YOURS 403; party, Project or ACCOUNT_NOT_FOUND 404; back-dated 403)",
     tags: LABOUR,
     body: RecordConstructionLabourWagePaymentRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -116,7 +116,7 @@ export const paymentOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/cancel`,
     summary:
-      "Cancel a payment: tombstone and ledger reversal; there is no edit, cancel and record again (PAYMENT_CHANGED 409; back-dated edit limit 403)",
+      "Cancel a payment: tombstone, ledger reversal and account entry reversal; there is no edit, cancel and record again (PAYMENT_CHANGED 409; back-dated edit limit or closed period 403)",
     tags: LABOUR,
     params: ConstructionLabourWagePaymentParamsModel,
     body: CancelConstructionLabourWagePaymentRequestModel,

@@ -1,6 +1,10 @@
 import type { PrismaClient } from "@repo/construction-db";
 
 import {
+  NO_ACCOUNT_POSTING,
+  type AccountPosting,
+} from "@/src/shared-kernel/account-posting";
+import {
   calendarDateFromDb,
   calendarDateToDb,
   type CalendarDate,
@@ -25,7 +29,11 @@ function byName<T extends { name: string }>(items: T[]): T[] {
 
 /** Plain reads of labourers, vendors, the ledger and payments for balances. */
 export class PrismaBalanceStore implements BalanceStore {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(
+    private readonly db: PrismaClient,
+    /** Account names for the statement (CM-707). */
+    private readonly accounts: AccountPosting = NO_ACCOUNT_POSTING,
+  ) {}
 
   /** Parties with an entry in this Project during the period. */
   private async partiesWithEntries(
@@ -223,8 +231,14 @@ export class PrismaBalanceStore implements BalanceStore {
         deletedAt: true,
         updatedAt: true,
         documentKey: true,
+        accountId: true,
       },
     });
+    const accounts = await this.accounts.names(
+      this.db,
+      workspaceId,
+      rows.flatMap((row) => (row.accountId == null ? [] : [row.accountId])),
+    );
     return new Map(
       rows.map((row) => [
         row.id,
@@ -236,6 +250,13 @@ export class PrismaBalanceStore implements BalanceStore {
           cancelled: row.deletedAt != null,
           updatedAt: row.updatedAt,
           hasReceipt: row.documentKey != null,
+          account:
+            row.accountId == null
+              ? null
+              : {
+                  id: row.accountId,
+                  name: accounts.get(row.accountId) ?? "—",
+                },
         },
       ]),
     );

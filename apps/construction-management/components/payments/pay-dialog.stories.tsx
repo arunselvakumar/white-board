@@ -2,8 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { financeLookupsHandler } from "../finance/account-fixtures";
 import { PayDialog } from "./pay-dialog";
 import {
+  BANK_ACCOUNT,
+  CASH_ACCOUNT,
   OWNER_MEMBER,
   PAYERS,
   PROJECT_ID,
@@ -27,7 +30,7 @@ function serve(
       if (call.method === "GET" && call.path === PAYERS_PATH)
         return Response.json(PAYERS);
       if (call.method === "POST" && call.path === API) return record();
-      return undefined;
+      return financeLookupsHandler(call);
     });
     return api.restore;
   };
@@ -61,8 +64,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The amount starts at the Final Amount and "Paid by" at the signed-in
- * Team Member; Bank asks for a reference; rupees go out as paise.
+ * The amount starts at the Final Amount, "Paid from" at the primary cash
+ * account and "Paid by" at the signed-in Team Member; Bank moves "Paid
+ * from" to a bank account and asks for a reference; rupees go out as paise.
  */
 export const DefaultsAndSendsPaise: Story = {
   beforeEach: serve(),
@@ -77,8 +81,11 @@ export const DefaultsAndSendsPaise: Story = {
     await expect(
       dialog.getByRole("combobox", { name: "Paid by" }),
     ).toHaveTextContent("Arun Selva Kumar");
+    const paidFrom = await dialog.findByRole("combobox", { name: "Paid from" });
+    await waitFor(() => expect(paidFrom).toHaveTextContent(CASH_ACCOUNT.name));
 
     await userEvent.click(dialog.getByRole("button", { name: "Bank" }));
+    await waitFor(() => expect(paidFrom).toHaveTextContent(BANK_ACCOUNT.name));
     await userEvent.click(
       dialog.getByRole("button", { name: "Record payment" }),
     );
@@ -109,11 +116,70 @@ export const DefaultsAndSendsPaise: Story = {
       kind: "advance",
       mode: "bank",
       amount: 150_050,
+      accountId: BANK_ACCOUNT.id,
       reference: "UTR 88231",
       paidByMemberId: SUNDAR_MEMBER,
       remarks: "Festival advance",
     });
     await expect(args.onOpenChange).toHaveBeenCalledWith(false);
+  },
+};
+
+/** Cash can come from your own petty cash; Bank lists no petty cash. */
+export const PaysFromPettyCash: Story = {
+  beforeEach: serve(),
+  play: async ({ args, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
+    );
+    const paidFrom = await dialog.findByRole("combobox", { name: "Paid from" });
+    await waitFor(() => expect(paidFrom).toHaveTextContent(CASH_ACCOUNT.name));
+    await userEvent.click(paidFrom);
+    await expect(
+      body.queryByRole("option", { name: /HDFC/ }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      await body.findByRole("option", { name: /My petty cash/ }),
+    );
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Record payment" }),
+    );
+    await waitFor(() => expect(args.onPaid).toHaveBeenCalled());
+    await expect(sent()).toMatchObject({
+      mode: "cash",
+      accountId: "0199a000-0000-7000-8000-000000000003",
+    });
+  },
+};
+
+/** The server's account refusal lands under "Paid from". */
+export const AccountRefused: Story = {
+  beforeEach: serve(() =>
+    Response.json(
+      {
+        code: "ACCOUNT_NOT_YOURS",
+        message: "You can only use your own petty-cash account.",
+        details: { field: "accountId" },
+      },
+      { status: 403 },
+    ),
+  ),
+  play: async ({ args, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(
+      await body.findByRole("dialog", { name: "Pay Dhuresh Nawin" }),
+    );
+    const paidFrom = await dialog.findByRole("combobox", { name: "Paid from" });
+    await waitFor(() => expect(paidFrom).toHaveTextContent(CASH_ACCOUNT.name));
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Record payment" }),
+    );
+    await expect(
+      await dialog.findByText("You can only use your own petty-cash account."),
+    ).toBeVisible();
+    await expect(paidFrom).toHaveAttribute("aria-invalid", "true");
+    await expect(args.onPaid).not.toHaveBeenCalled();
   },
 };
 
@@ -177,6 +243,7 @@ export const BackdatedRefused: Story = {
     await expect(sent()).toMatchObject({
       paymentDate: "2026-09-01",
       amount: 200_000,
+      accountId: CASH_ACCOUNT.id,
       paidByMemberId: OWNER_MEMBER,
     });
   },

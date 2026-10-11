@@ -129,6 +129,12 @@ export const ConstructionHrmsSalarySlipModel = z.object({
       mode: z.enum(PAYMENT_MODES),
       date: z.string(),
       reference: z.string().nullable(),
+      accountId: z
+        .uuid()
+        .nullable()
+        .describe(
+          "The finance account it was paid from (CM-707); null on slips paid before M7.",
+        ),
     })
     .nullable(),
   hasPayslip: z
@@ -253,6 +259,12 @@ export const MarkConstructionHrmsSalariesPaidRequestModel = z.object({
   mode: z.string().describe("`cash` or `bank`."),
   paymentDate: z.string().describe("`YYYY-MM-DD`, not after today."),
   reference: z.string().nullish(),
+  accountId: z
+    .uuid()
+    .nullish()
+    .describe(
+      "The finance account it was paid from (CM-707): Cash → a Cash or petty-cash account, Bank → a Bank account. Required (400 ACCOUNT_REQUIRED); 404 ACCOUNT_NOT_FOUND, 403 ACCOUNT_NOT_YOURS, 400 ACCOUNT_MODE_MISMATCH. Each slip posts its net payable.",
+    ),
 });
 
 export const ConstructionHrmsSalarySlipsResponseModel = z.object({
@@ -276,6 +288,12 @@ export const PayConstructionHrmsAdvanceSalaryRequestModel = z.object({
   mode: z.string().describe("`cash` or `bank`."),
   reference: z.string().nullish(),
   reason: z.string().nullish(),
+  accountId: z
+    .uuid()
+    .nullish()
+    .describe(
+      "The finance account it was paid from (CM-707), as on Mark Paid. Required (400 ACCOUNT_REQUIRED).",
+    ),
 });
 
 export const RunConstructionHrmsScheduledSalaryResponseModel = z.object({

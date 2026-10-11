@@ -240,6 +240,7 @@ function PaymentRows({
               <TableHead>Paid to</TableHead>
               <TableHead>Kind</TableHead>
               <TableHead>Mode</TableHead>
+              <TableHead>Paid from</TableHead>
               <TableHead>Paid by</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead className="w-32">
@@ -271,6 +272,9 @@ function PaymentRows({
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {modeText(payment)}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {payment.account?.name ?? "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {payment.paidBy?.name ?? "—"}
@@ -309,6 +313,11 @@ function PaymentRows({
                 <p className="text-muted-foreground text-xs">
                   {formatDate(payment.paymentDate)} · {modeText(payment)}
                 </p>
+                {payment.account != null && (
+                  <p className="text-muted-foreground truncate text-xs">
+                    From {payment.account.name}
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <p className="font-semibold tabular-nums">
@@ -372,7 +381,7 @@ function PaymentRows({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pending?.amount != null &&
-                `${money(pending.amount)} goes back onto their balance. `}
+                `${money(pending.amount)} goes back onto their balance${pending.account == null ? "" : ` and into ${pending.account.name}`}. `}
               The payment stays in the history as cancelled. To correct it,
               cancel and record it again.
             </AlertDialogDescription>

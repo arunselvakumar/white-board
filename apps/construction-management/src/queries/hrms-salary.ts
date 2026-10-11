@@ -12,6 +12,7 @@ import type {
   ListConstructionHrmsTeamSalariesResponseModel,
 } from "@/app/api/construction/hrms/salaries/salary-models";
 
+import { FINANCE_KEY } from "./finance-access";
 import { HRMS_KEY } from "./hrms-settings";
 import { apiJson, QueryHttpError } from "./http";
 
@@ -89,6 +90,8 @@ export type SalaryCommand =
       mode: "cash" | "bank";
       paymentDate: string;
       reference: string | null;
+      /** The finance account it was paid from (CM-707). */
+      accountId: string;
     }
   | {
       kind: "advance";
@@ -99,6 +102,7 @@ export type SalaryCommand =
       mode: "cash" | "bank";
       reference: string | null;
       reason: string | null;
+      accountId: string;
     };
 
 export type SalaryCommandResult =
@@ -136,6 +140,7 @@ export function runSalaryCommand(
         mode: command.mode,
         paymentDate: command.paymentDate,
         reference: command.reference,
+        accountId: command.accountId,
       });
     case "advance":
       return postJson("/calculate-advance", {
@@ -146,6 +151,7 @@ export function runSalaryCommand(
         mode: command.mode,
         reference: command.reference,
         reason: command.reason,
+        accountId: command.accountId,
       });
   }
 }
@@ -155,6 +161,11 @@ export function useSalaryCommand() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: runSalaryCommand,
-    onSettled: () => queryClient.invalidateQueries({ queryKey: SALARY_KEY }),
+    // Paying posts to finance's account ledger too (CM-707).
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: SALARY_KEY }),
+        queryClient.invalidateQueries({ queryKey: FINANCE_KEY }),
+      ]),
   });
 }

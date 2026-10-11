@@ -184,6 +184,11 @@ function StatementLines({
                         <Badge variant="secondary">Cancelled</Badge>
                       )}
                     </p>
+                    {line.payment?.account != null && !line.isReversal && (
+                      <p className="text-muted-foreground text-xs">
+                        From {line.payment.account.name}
+                      </p>
+                    )}
                     {line.payment?.reference != null && (
                       <p className="text-muted-foreground text-xs">
                         Ref. {line.payment.reference}

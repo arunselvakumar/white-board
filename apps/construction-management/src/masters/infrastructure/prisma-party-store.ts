@@ -33,6 +33,9 @@ type Row = {
   stateCode: string | null;
   contactPerson2?: string | null;
   mobile2?: string | null;
+  tdsApplicable?: boolean;
+  tdsLowerRate?: { toFixed(places: number): string } | null;
+  tdsNote?: string | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -72,6 +75,9 @@ type Data = {
   stateCode?: string | null;
   contactPerson2?: string | null;
   mobile2?: string | null;
+  tdsApplicable?: boolean;
+  tdsLowerRate?: string | null;
+  tdsNote?: string | null;
   isActive?: boolean;
   updatedAt?: Date;
   updatedBy?: string;
@@ -135,6 +141,9 @@ function toParty(kind: PartyKind, row: Row): Party {
     stateCode: row.stateCode,
     contactPerson2: row.contactPerson2 ?? null,
     mobile2: row.mobile2 ?? null,
+    tdsApplicable: row.tdsApplicable ?? true,
+    tdsLowerRate: row.tdsLowerRate?.toFixed(2) ?? null,
+    tdsNote: row.tdsNote ?? null,
     isActive: row.isActive,
     departmentIds: (row.departments ?? [])
       .map((item) => item.departmentId)
@@ -162,11 +171,25 @@ function audit(party: Party, change: MasterChange) {
   };
 }
 
-/** A Supplier has no second contact columns. */
+/** A Supplier has no second contact or TDS columns. */
 function detailColumns(party: Party) {
-  const { contactPerson2, mobile2, ...common } = party.details;
+  const {
+    contactPerson2,
+    mobile2,
+    tdsApplicable,
+    tdsLowerRate,
+    tdsNote,
+    ...common
+  } = party.details;
   return party.kind === "contractor"
-    ? { ...common, contactPerson2, mobile2 }
+    ? {
+        ...common,
+        contactPerson2,
+        mobile2,
+        tdsApplicable,
+        tdsLowerRate,
+        tdsNote,
+      }
     : common;
 }
 

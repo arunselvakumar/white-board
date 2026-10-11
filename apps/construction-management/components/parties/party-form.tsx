@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Skeleton } from "@repo/ui/components/skeleton";
+import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -25,6 +26,10 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { fieldForCode } from "@/lib/server-errors";
+import {
+  TDS_PAYEE_LABELS,
+  tdsPayeeKind,
+} from "@/src/masters/domain/contractor-tds";
 import { lookupListQuery } from "@/src/queries/masters";
 import {
   partyQuery,
@@ -150,6 +155,87 @@ function DepartmentsChecklist({
       value={value}
       onChange={onChange}
     />
+  );
+}
+
+/**
+ * A Contractor's TDS settings (CM-706, ADR CM-0017 §8): whether 194C is
+ * deducted, a lower-deduction certificate's rate and a note, with the
+ * payee kind the PAN gives.
+ */
+function TdsSettings({
+  id,
+  form,
+}: {
+  id: (field: string) => string;
+  form: ReturnType<typeof useForm<PartyFormValues>>;
+}) {
+  const errors = form.formState.errors;
+  const pan = useWatch({ control: form.control, name: "pan" });
+  const applicable = useWatch({ control: form.control, name: "tdsApplicable" });
+  const kind = tdsPayeeKind(pan.trim() === "" ? null : pan.trim());
+  return (
+    <section aria-labelledby={id("tds")} className="space-y-4">
+      <div className="space-y-1">
+        <h2 id={id("tds")} className="font-semibold">
+          TDS
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Tax deducted under section 194C on this Contractor&apos;s payments.
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <Controller
+          name="tdsApplicable"
+          control={form.control}
+          render={({ field }) => (
+            <Switch
+              id={id("tds-applicable")}
+              checked={field.value}
+              onCheckedChange={(next) => {
+                field.onChange(next);
+              }}
+            />
+          )}
+        />
+        <Label htmlFor={id("tds-applicable")} className="font-normal">
+          Deduct TDS
+        </Label>
+      </div>
+      <p className="text-sm" id={id("tds-payee")}>
+        <span className="text-muted-foreground">Payee kind from the PAN: </span>
+        <span className="font-medium">{TDS_PAYEE_LABELS[kind]}</span>
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="min-w-0 space-y-1.5">
+          <Label htmlFor={id("tds-lower-rate")}>
+            Lower deduction rate % (certificate)
+          </Label>
+          <Input
+            id={id("tds-lower-rate")}
+            className="h-10"
+            inputMode="decimal"
+            autoComplete="off"
+            placeholder="None"
+            disabled={!applicable}
+            aria-invalid={errors.tdsLowerRate != null}
+            {...form.register("tdsLowerRate")}
+          />
+          <FieldError message={errors.tdsLowerRate?.message} />
+        </div>
+        <div className="min-w-0 space-y-1.5">
+          <Label htmlFor={id("tds-note")}>TDS note</Label>
+          <Input
+            id={id("tds-note")}
+            className="h-10"
+            autoComplete="off"
+            aria-invalid={errors.tdsNote != null}
+            {...form.register("tdsNote")}
+          />
+          <FieldError message={errors.tdsNote?.message} />
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -383,6 +469,8 @@ function PartyForm({
           </div>
         </div>
       </section>
+
+      {screen.departments && <TdsSettings id={id} form={form} />}
 
       {screen.departments && (
         <section aria-labelledby={id("departments")} className="space-y-3">

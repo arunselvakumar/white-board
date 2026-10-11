@@ -8,6 +8,10 @@ import {
   isResponse,
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
+import {
+  financeGoodsReceiptPayments,
+  goodsReceiptDispatcher,
+} from "@/src/composition/party-finance";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import {
@@ -21,12 +25,13 @@ import { createGoodsReceiptHandlers } from "@/src/procurement/infrastructure/goo
 import { can, type Flag, type MemberAccess } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
 
 /** One set of Goods Receipt handlers for every route (CM-505). */
 export const goodsReceiptHandlers = createGoodsReceiptHandlers({
   directory: procurementDirectory,
-  dispatcher: procurementEvents,
+  // Events reach `procurementEvents` and finance's supplier invoices (CM-705).
+  dispatcher: goodsReceiptDispatcher(),
+  payments: financeGoodsReceiptPayments(),
   media: projectMediaDispatcher(),
 });
 

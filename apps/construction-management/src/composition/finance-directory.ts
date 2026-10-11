@@ -1,8 +1,9 @@
-import type { Prisma } from "@repo/construction-db";
+import { Prisma } from "@repo/construction-db";
 
 import type {
   ContractorFacts,
   FinanceDirectory,
+  GoodsReceiptFacts,
   NamedFacts,
   SupplierFacts,
   TeamMemberFacts,
@@ -35,6 +36,48 @@ function toMember(row: {
     name: row.name,
     userId: row.userId,
     active: row.status === "active" && row.deletedAt == null,
+  };
+}
+
+type GoodsReceiptRow = {
+  id: string;
+  number: string;
+  supplierId: string;
+  supplierName: string;
+  locationKind: "project" | "store";
+  locationId: string;
+  receiptDate: Date;
+  invoiceNo: string | null;
+  invoiceDate: Date | null;
+  invoiceAmount: bigint | null;
+  totalValue: bigint;
+  paymentTermsDays: number | null;
+  updatedBy: string;
+};
+
+const GOODS_RECEIPT_COLUMNS = Prisma.sql`g.id::text AS id, g.number,
+  g.supplier_id::text AS "supplierId", g.supplier_name AS "supplierName",
+  g.location_kind::text AS "locationKind", g.location_id::text AS "locationId",
+  g.receipt_date AS "receiptDate", g.invoice_no AS "invoiceNo",
+  g.invoice_date AS "invoiceDate", g.invoice_amount AS "invoiceAmount",
+  g.total_value AS "totalValue", o.payment_terms_days AS "paymentTermsDays",
+  g.updated_by AS "updatedBy"`;
+
+function toGoodsReceipt(row: GoodsReceiptRow): GoodsReceiptFacts {
+  const day = (value: Date) => value.toISOString().slice(0, 10);
+  return {
+    id: row.id,
+    number: row.number,
+    supplierId: row.supplierId,
+    supplierName: row.supplierName,
+    location: { kind: row.locationKind, id: row.locationId },
+    receiptDate: day(row.receiptDate),
+    invoiceNo: row.invoiceNo?.trim() === "" ? null : row.invoiceNo,
+    invoiceDate: row.invoiceDate == null ? null : day(row.invoiceDate),
+    invoiceAmount: row.invoiceAmount,
+    totalValue: row.totalValue,
+    paymentTermsDays: row.paymentTermsDays,
+    updatedBy: row.updatedBy,
   };
 }
 
@@ -220,5 +263,55 @@ export const financeDirectory: FinanceDirectory = {
           orderBy,
         });
     }
+  },
+
+  async goodsReceipts(db, workspaceId, ids) {
+    if (ids.length === 0) return new Map();
+    const rows = await db.$queryRaw<GoodsReceiptRow[]>(
+      Prisma.sql`SELECT ${GOODS_RECEIPT_COLUMNS}
+        FROM construction_procurement.goods_receipts g
+        LEFT JOIN construction_procurement.purchase_orders o
+          ON o.id = g.purchase_order_id
+        WHERE g.workspace_id = ${workspaceId}
+          AND g.id = ANY(${[...new Set(ids)]}::uuid[])
+          AND g.deleted_at IS NULL`,
+    );
+    return byId(rows.map(toGoodsReceipt));
+  },
+
+  async awaitingInvoiceGoodsReceipts(db, workspaceId, location, supplierId) {
+    const rows = await db.$queryRaw<GoodsReceiptRow[]>(
+      Prisma.sql`SELECT ${GOODS_RECEIPT_COLUMNS}
+        FROM construction_procurement.goods_receipts g
+        LEFT JOIN construction_procurement.purchase_orders o
+          ON o.id = g.purchase_order_id
+        WHERE g.workspace_id = ${workspaceId}
+          AND g.location_kind = ${location.kind}::construction_procurement.location_kind
+          AND g.location_id = ${location.id}::uuid
+          AND g.deleted_at IS NULL
+          AND (${supplierId}::uuid IS NULL OR g.supplier_id = ${supplierId}::uuid)
+          AND NOT EXISTS (
+            SELECT 1 FROM construction_finance.invoice_goods_receipts l
+            JOIN construction_finance.invoices i ON i.id = l.invoice_id
+            WHERE l.goods_receipt_id = g.id AND l.deleted_at IS NULL
+              AND i.deleted_at IS NULL
+          )
+        ORDER BY g.receipt_date, g.number
+        LIMIT 500`,
+    );
+    return rows.map(toGoodsReceipt);
+  },
+
+  async userNames(db, workspaceId, userIds) {
+    if (userIds.length === 0) return new Map();
+    const rows = await db.constructionOrganizationTeamMember.findMany({
+      where: { workspaceId, userId: { in: [...new Set(userIds)] } },
+      select: { userId: true, name: true },
+    });
+    return new Map(
+      rows.flatMap((row) =>
+        row.userId == null ? [] : [[row.userId, row.name] as const],
+      ),
+    );
   },
 };

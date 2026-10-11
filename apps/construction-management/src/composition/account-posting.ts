@@ -52,4 +52,13 @@ export const accountPosting: AccountPosting = {
       input.sourceId,
     );
   },
+
+  async names(db, workspaceId, ids) {
+    if (ids.length === 0) return new Map();
+    const rows = await db.constructionFinanceAccount.findMany({
+      where: { workspaceId, id: { in: [...new Set(ids)] } },
+      select: { id: true, name: true },
+    });
+    return new Map(rows.map((row) => [row.id, row.name]));
+  },
 };

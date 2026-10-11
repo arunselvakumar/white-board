@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -26,6 +26,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import { AccountPicker } from "@/components/finance/account-picker";
 import {
   isRupees,
   MoneyInput,
@@ -40,6 +41,43 @@ import {
 import { money } from "./salary-format";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Server refusals about the account, shown under "Paid from" (CM-707). */
+const ACCOUNT_CODES = {
+  ACCOUNT_REQUIRED: "accountId",
+  ACCOUNT_NOT_FOUND: "accountId",
+  ACCOUNT_NOT_YOURS: "accountId",
+  ACCOUNT_MODE_MISMATCH: "accountId",
+} as const;
+
+/** "Paid from": Cash → a Cash or petty-cash account, Bank → a Bank account. */
+function PaidFromField({
+  id,
+  mode,
+  value,
+  onChange,
+  error,
+}: {
+  id: string;
+  mode: "cash" | "bank";
+  value: string;
+  onChange: (accountId: string) => void;
+  error: string | undefined;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>Paid from</Label>
+      <AccountPicker
+        id={id}
+        value={value}
+        onChange={onChange}
+        mode={mode}
+        invalid={error != null}
+      />
+      <FieldError message={error} />
+    </div>
+  );
+}
 
 function ModeRadios({
   idPrefix,
@@ -80,13 +118,18 @@ function ModeRadios({
 
 const markPaidSchema = z.object({
   mode: z.enum(["cash", "bank"]),
+  accountId: z.string().min(1, "Choose the account it was paid from"),
   paymentDate: z.string().regex(DATE_RE, "Enter the date it was paid"),
   reference: z.string().trim().max(100, "Keep it to 100 characters"),
 });
 
 type MarkPaidValues = z.infer<typeof markPaidSchema>;
 
-/** Mark Salaries as Paid (CM-317): Approved slips, with mode, date and reference. */
+/**
+ * Mark Salaries as Paid (CM-317): Approved slips, with mode, the account it
+ * was paid from (CM-707), date and reference. Each slip's net payable
+ * leaves that account.
+ */
 export function MarkPaidDialog({
   open,
   slips,
@@ -117,8 +160,8 @@ export function MarkPaidDialog({
             {slips.length === 1
               ? "1 salary"
               : `${String(slips.length)} salaries`}
-            {total == null ? "" : ` · ${money(total)} net`}. This records the
-            payment; it does not post to company accounts.
+            {total == null ? "" : ` · ${money(total)} net`}. Each salary&apos;s
+            net payable is paid out of the account you choose.
           </DialogDescription>
         </DialogHeader>
         {open ? (
@@ -141,15 +184,23 @@ function MarkPaidForm({
   const command = useSalaryCommand();
   const form = useForm<MarkPaidValues>({
     resolver: zodResolver(markPaidSchema),
-    defaultValues: { mode: "bank", paymentDate: today, reference: "" },
+    defaultValues: {
+      mode: "bank",
+      // The account picker fills in the default for the mode.
+      accountId: "",
+      paymentDate: today,
+      reference: "",
+    },
   });
   const { errors } = form.formState;
+  const mode = useWatch({ control: form.control, name: "mode" });
   const submit = form.handleSubmit(async (values) => {
     try {
       await command.mutateAsync({
         kind: "mark-paid",
         slips,
         mode: values.mode,
+        accountId: values.accountId,
         paymentDate: values.paymentDate,
         reference: values.reference === "" ? null : values.reference,
       });
@@ -164,6 +215,7 @@ function MarkPaidForm({
         PAYMENT_DATE_IN_FUTURE: "paymentDate",
         PAYMENT_REFERENCE_TOO_LONG: "reference",
         PAYMENT_MODE_INVALID: "mode",
+        ...ACCOUNT_CODES,
       } as const);
       form.setError(field ?? "root", { message });
     }
@@ -190,6 +242,19 @@ function MarkPaidForm({
           )}
         />
       </div>
+      <Controller
+        name="accountId"
+        control={form.control}
+        render={({ field }) => (
+          <PaidFromField
+            id="salary-paid-account"
+            mode={mode}
+            value={field.value}
+            onChange={field.onChange}
+            error={errors.accountId?.message}
+          />
+        )}
+      />
       <div className="space-y-1.5">
         <Label htmlFor="salary-paid-date">Paid on</Label>
         <Input
@@ -246,6 +311,7 @@ const advanceSchema = z.object({
     }),
   advanceDate: z.string().regex(DATE_RE, "Enter the date it was paid"),
   mode: z.enum(["cash", "bank"]),
+  accountId: z.string().min(1, "Choose the account it was paid from"),
   reference: z.string().trim().max(100, "Keep it to 100 characters"),
   reason: z.string().trim().max(500, "Keep it to 500 characters"),
 });
@@ -310,11 +376,13 @@ function AdvanceForm({
       instalments: "1",
       advanceDate: today,
       mode: "cash",
+      accountId: "",
       reference: "",
       reason: "",
     },
   });
   const { errors } = form.formState;
+  const mode = useWatch({ control: form.control, name: "mode" });
   const items = members.map((member) => ({
     value: member.memberId,
     label:
@@ -331,6 +399,7 @@ function AdvanceForm({
         instalments: Number(values.instalments),
         advanceDate: values.advanceDate,
         mode: values.mode,
+        accountId: values.accountId,
         reference: values.reference === "" ? null : values.reference,
         reason: values.reason === "" ? null : values.reason,
       });
@@ -350,6 +419,7 @@ function AdvanceForm({
         PAYMENT_DATE_IN_FUTURE: "advanceDate",
         PAYMENT_REFERENCE_TOO_LONG: "reference",
         ADVANCE_REASON_TOO_LONG: "reason",
+        ...ACCOUNT_CODES,
       } as const);
       form.setError(field ?? "root", { message });
     }
@@ -455,6 +525,19 @@ function AdvanceForm({
           )}
         />
       </div>
+      <Controller
+        name="accountId"
+        control={form.control}
+        render={({ field }) => (
+          <PaidFromField
+            id="salary-advance-account"
+            mode={mode}
+            value={field.value}
+            onChange={field.onChange}
+            error={errors.accountId?.message}
+          />
+        )}
+      />
       <div className="space-y-1.5">
         <Label htmlFor="salary-advance-reason">Reason (optional)</Label>
         <Textarea

@@ -8,6 +8,7 @@ import {
   isResponse,
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
+import { accountPosting } from "@/src/composition/account-posting";
 import type { PartyType } from "@/src/labour/domain/ledger";
 import { createWagePaymentHandlers } from "@/src/labour/infrastructure/wage-payment-factory";
 import {
@@ -19,8 +20,18 @@ import {
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
 
-/** One set of wage payment handlers for every route (CM-215). */
-export const wagePaymentHandlers = createWagePaymentHandlers();
+/**
+ * One set of wage payment handlers for every route (CM-215), posting to
+ * finance's account ledger (CM-707).
+ */
+export const wagePaymentHandlers = createWagePaymentHandlers({
+  accounts: accountPosting,
+});
+
+/** May the caller pay from any petty-cash account, not only their own? */
+export function anyPettyCash(access: MemberAccess): boolean {
+  return can(access, "finance.petty_cash", "view_all");
+}
 
 /** Labour payments are under Labour, vendor payments under Vendor (`modules/08`). */
 export function paymentMenu(partyType: PartyType): MenuKey {

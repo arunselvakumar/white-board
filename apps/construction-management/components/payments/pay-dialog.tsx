@@ -28,6 +28,7 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import { AccountPicker } from "@/components/finance/account-picker";
 import { MoneyInput } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
 import type { PaymentPartyType } from "@/src/queries/balances";
@@ -59,7 +60,8 @@ const RECEIPT_MAX_BYTES = 10 * 1024 * 1024;
 
 /**
  * Pay a labourer or a vendor (CM-216): date (today), Payment or Advance,
- * Cash or Bank with a reference, the amount (the Final Amount when
+ * Cash or Bank with a reference, the account it was paid from (CM-707:
+ * Cash → a Cash or petty-cash account, Bank → a Bank account), the amount (the Final Amount when
  * something is owed), who paid, remarks and an optional receipt.
  */
 export function PayDialog({
@@ -196,6 +198,10 @@ function PayForm({
         PAYMENT_REFERENCE_TOO_LONG: "reference",
         PAYMENT_REMARKS_TOO_LONG: "remarks",
         TEAM_MEMBER_NOT_FOUND: "paidByMemberId",
+        ACCOUNT_REQUIRED: "accountId",
+        ACCOUNT_NOT_FOUND: "accountId",
+        ACCOUNT_NOT_YOURS: "accountId",
+        ACCOUNT_MODE_MISMATCH: "accountId",
       } as const);
       if (field == null) setProblem(message);
       else form.setError(field, { message });
@@ -292,6 +298,23 @@ function PayForm({
             )}
           />
         </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="pay-account">Paid from</Label>
+        <Controller
+          name="accountId"
+          control={form.control}
+          render={({ field }) => (
+            <AccountPicker
+              id="pay-account"
+              value={field.value}
+              onChange={field.onChange}
+              mode={mode}
+              invalid={errors.accountId != null}
+            />
+          )}
+        />
+        <FieldError message={errors.accountId?.message} />
       </div>
       {mode === "bank" && (
         <div className="space-y-1.5">

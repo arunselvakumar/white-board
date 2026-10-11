@@ -16,6 +16,7 @@ import {
 } from "@/src/shared-kernel/list-cursor";
 
 import {
+  anyPettyCash,
   paymentFinancial,
   paymentMenu,
   permissionDenied,
@@ -97,7 +98,8 @@ export async function GET(request: Request): Promise<Response> {
 /**
  * Records a payment or an advance to a labourer (Labour create on the
  * Project) or a vendor (Vendor create), posting one negative ledger entry
- * in the same transaction (CM-215). A payment is never edited: cancel it
+ * and one account entry on the account it was paid from in the same
+ * transaction (CM-215, CM-707). A payment is never edited: cancel it
  * and record it again. The amount may be entered without Financial; it is
  * null in the response.
  */
@@ -120,6 +122,7 @@ export async function POST(request: Request): Promise<Response> {
         workspaceId: session.workspaceId,
         userId: session.userId,
         role: session.role,
+        anyPettyCash: anyPettyCash(session.access),
       },
       partyType: model.partyType,
       partyId: model.partyId,
@@ -128,6 +131,7 @@ export async function POST(request: Request): Promise<Response> {
       kind: model.kind,
       mode: model.mode,
       amount: model.amount,
+      accountId: model.accountId,
       reference: model.reference,
       paidByMemberId: model.paidByMemberId,
       remarks: model.remarks,

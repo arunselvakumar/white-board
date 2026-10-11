@@ -698,17 +698,17 @@ CM-607 and CM-608 were added when the owner chose a full site diary for the DPR 
 
 Goal: every rupee the Company moves is in one ledger — company cash and bank accounts, petty cash per Team Member, Transactions and transfers, Contractor, Supplier and Other Party invoices and payments with allocation, TDS under 194C, Other Expenses, and the wage and salary payments of M2 and M3 — with the Ledger Report, Due Payments, Central Payment and the Payments section of the Project Dashboard. Spec: `modules/07`. Product decisions: [ADR CM-0017](../adr/CM-0017-finance-product-decisions.md).
 
-| ID     | Seq | Title                                                                                                            | Status      | Blocked by     | Area           |
-| ------ | --: | ---------------------------------------------------------------------------------------------------------------- | ----------- | -------------- | -------------- |
-| CM-701 |   1 | Prisma `construction-finance.prisma`; accounts (seed 2) with opening entries; ledger writers; kernel wiring      | in_progress | CM-201         | Data+Domain    |
-| CM-702 |   2 | Transactions: Payment In/Out, modes with reference, party label, approval, transfer between accounts, import     | todo        | CM-701, CM-502 | Domain+HTTP+UI |
-| CM-703 |   3 | Petty cash accounts per custodian; Payment/Receipt/Transfer vouchers; approval; export receipts ZIP              | done        | CM-702         | Domain+HTTP+UI |
-| CM-704 |   4 | Payment categories, Other Parties, Other Expenses with approval                                                  | todo        | CM-702         | Domain+HTTP+UI |
-| CM-705 |   5 | Supplier invoices from GRN (`GoodsReceiptPosted`), party payments with allocation, opening balances; due dates   | todo        | CM-505, CM-702 | Domain+HTTP+UI |
-| CM-706 |   6 | Contractor invoices & payments with TDS 194C (PAN, thresholds, dated rates, override) and the TDS ledger         | todo        | CM-705, CM-301 | Domain+HTTP+UI |
-| CM-707 |   7 | Labour, vendor and salary payments name their account and post to the finance ledger (replaces CM-215's posting) | todo        | CM-215, CM-702 | Domain+UI      |
-| CM-708 |   8 | Other-party purchase/sales invoices, Payment In/Out, settlement approval, sales invoice numbering, Party Balance | todo        | CM-704, CM-705 | Domain+HTTP+UI |
-| CM-709 |   9 | Ledger and payment reports, due payments with ageing, Central Payment, Payments section on the Project Dashboard | todo        | CM-705, CM-706 | HTTP+UI        |
+| ID     | Seq | Title                                                                                                            | Status | Blocked by     | Area           |
+| ------ | --: | ---------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
+| CM-701 |   1 | Prisma `construction-finance.prisma`; accounts (seed 2) with opening entries; ledger writers; kernel wiring      | done   | CM-201         | Data+Domain    |
+| CM-702 |   2 | Transactions: Payment In/Out, modes with reference, party label, approval, transfer between accounts, import     | done   | CM-701, CM-502 | Domain+HTTP+UI |
+| CM-703 |   3 | Petty cash accounts per custodian; Payment/Receipt/Transfer vouchers; approval; export receipts ZIP              | done   | CM-702         | Domain+HTTP+UI |
+| CM-704 |   4 | Payment categories, Other Parties, Other Expenses with approval                                                  | done   | CM-702         | Domain+HTTP+UI |
+| CM-705 |   5 | Supplier invoices from GRN (`GoodsReceiptPosted`), party payments with allocation, opening balances; due dates   | done   | CM-505, CM-702 | Domain+HTTP+UI |
+| CM-706 |   6 | Contractor invoices & payments with TDS 194C (PAN, thresholds, dated rates, override) and the TDS ledger         | done   | CM-705, CM-301 | Domain+HTTP+UI |
+| CM-707 |   7 | Labour, vendor and salary payments name their account and post to the finance ledger (replaces CM-215's posting) | done   | CM-215, CM-702 | Domain+UI      |
+| CM-708 |   8 | Other-party purchase/sales invoices, Payment In/Out, settlement approval, sales invoice numbering, Party Balance | todo   | CM-704, CM-705 | Domain+HTTP+UI |
+| CM-709 |   9 | Ledger and payment reports, due payments with ageing, Central Payment, Payments section on the Project Dashboard | todo   | CM-705, CM-706 | HTTP+UI        |
 
 ### CM-701 — Finance schema, accounts and wiring
 

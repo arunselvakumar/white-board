@@ -23,6 +23,13 @@ export const RecordConstructionLabourWagePaymentRequestModel = z.object({
   mode,
   /** Paise, > 0. */
   amount: z.int(),
+  /**
+   * The finance account it was paid from (ADR CM-0017 §12): Cash → a Cash
+   * or petty-cash account, Bank → a Bank account. Required: missing is 400
+   * `ACCOUNT_REQUIRED`; 404 `ACCOUNT_NOT_FOUND`, 403 `ACCOUNT_NOT_YOURS`
+   * (someone else's petty cash), 400 `ACCOUNT_MODE_MISMATCH`.
+   */
+  accountId: z.uuid().nullable().optional(),
   /** Cheque or transaction number; optional even for Bank (the screen asks for it). */
   reference: z.string().max(200).nullable().optional(),
   /** The Team Member who handed over the money. */
@@ -82,6 +89,8 @@ export const ConstructionLabourWagePaymentResponseModel = z.object({
   /** Paise; null without Financial. */
   amount: z.int().nullable(),
   paidBy: z.object({ id: z.uuid(), name: z.string() }).nullable(),
+  /** The account it was paid from; null on payments recorded before M7. */
+  account: z.object({ id: z.uuid(), name: z.string() }).nullable(),
   remarks: z.string().nullable(),
   /** Streams the receipt (PDF or image); null without one. */
   receiptUrl: z.string().nullable(),
@@ -141,6 +150,7 @@ export function toWagePaymentResponse(
     reference: payment.reference,
     amount: financial ? payment.amount : null,
     paidBy: payment.paidBy,
+    account: payment.account,
     remarks: payment.remarks,
     receiptUrl: receiptUrl(payment.id, payment.receiptVersion),
     createdAt: payment.createdAt.toISOString(),

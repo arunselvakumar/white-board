@@ -63,6 +63,8 @@ export const RunningBalance: Story = {
     await expect(items[1]).toHaveTextContent("Villa");
     await expect(items[1]).toHaveTextContent("Balance ₹2,400.00");
     await expect(items[3]).toHaveTextContent("Payment cancelled");
+    // Recorded after M7, the payment names its account (CM-707).
+    await expect(sheet.getByText("From HDFC Current A/c")).toBeVisible();
     await expect(sheet.getByText("₹2,300.00")).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Receipt" })).toHaveAttribute(
       "href",

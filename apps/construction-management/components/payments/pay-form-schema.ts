@@ -13,6 +13,8 @@ export const payFormSchema = z
     paymentDate: z.string().min(1, "Enter the payment date"),
     kind: z.enum(["payment", "advance"]),
     mode: z.enum(["cash", "bank"]),
+    /** The finance account it was paid from (CM-707). */
+    accountId: z.string().min(1, "Choose the account it was paid from"),
     reference: z.string().trim().max(100, "Use at most 100 characters"),
     /** Rupees as typed. */
     amount: z.string(),
@@ -51,6 +53,8 @@ export function payFormDefaults(input: {
     paymentDate: input.today,
     kind: "payment",
     mode: "cash",
+    // The account picker fills in the default for the mode.
+    accountId: "",
     reference: "",
     amount:
       input.finalAmount != null && input.finalAmount > 0
@@ -75,6 +79,7 @@ export function toRecordInput(
     kind: values.kind,
     mode: values.mode,
     amount: rupeesToPaise(values.amount) ?? 0,
+    accountId: values.accountId,
     reference: reference === "" ? null : reference,
     paidByMemberId: values.paidByMemberId === "" ? null : values.paidByMemberId,
     remarks: remarks === "" ? null : remarks,

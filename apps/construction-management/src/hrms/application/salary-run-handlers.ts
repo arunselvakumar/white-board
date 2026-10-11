@@ -26,6 +26,7 @@ import { aggregateSalaryDays } from "../domain/salary-days";
 import {
   advanceDue,
   assertApprovable,
+  assertPaidFrom,
   assertPayable,
   assertRecalculable,
   createSalaryAdvance,
@@ -833,6 +834,8 @@ export class SalaryRunHandlers {
       mode: string;
       paymentDate: string;
       reference?: string | null;
+      /** The finance account it was paid from (CM-707), required. */
+      accountId?: string | null;
     },
   ): Promise<SalarySlipRecord[]> {
     assertCan(access, MENU, "update");
@@ -845,10 +848,23 @@ export class SalaryRunHandlers {
       input,
       await this.store.today(workspaceId),
     );
+    assertPaidFrom(payment);
+    const employees = await this.deps.employees.find(
+      workspaceId,
+      slips.map((slip) => slip.memberId),
+    );
     await this.store.markPaid({
       workspaceId,
       items: input.slips,
       payment,
+      postings: slips.map((slip) => ({
+        slipId: slip.id,
+        memberId: slip.memberId,
+        memberName: employees.get(slip.memberId)?.name ?? "Team Member",
+        month: slip.month,
+        amount: slip.money.netPayable,
+      })),
+      anyPettyCash: can(access, "finance.petty_cash", "view_all"),
       by: access.userId,
       now: this.clock(),
     });
@@ -881,6 +897,8 @@ export class SalaryRunHandlers {
       mode: string;
       reference?: string | null;
       reason?: string | null;
+      /** The finance account it was paid from (CM-707), required. */
+      accountId?: string | null;
     },
   ): Promise<SalarySlipRecord> {
     assertCan(access, MENU, "create");
@@ -905,6 +923,7 @@ export class SalaryRunHandlers {
         "You cannot pay an advance to yourself. Ask another approver.",
       );
     const terms = createSalaryAdvance(input, today);
+    assertPaidFrom(terms.payment);
     const starts = await this.store.salaryStarts(workspaceId, [
       employee.memberId,
     ]);
@@ -921,6 +940,8 @@ export class SalaryRunHandlers {
     const id = await this.store.payAdvance({
       workspaceId,
       memberId: employee.memberId,
+      memberName: employee.name,
+      anyPettyCash: can(access, "finance.petty_cash", "view_all"),
       terms,
       by: access.userId,
       now: this.clock(),
