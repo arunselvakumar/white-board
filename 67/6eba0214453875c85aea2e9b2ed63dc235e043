@@ -1,0 +1,47 @@
+apps/construction-management/app/app/projects/[id]/payments/transactions/[transactionId]/page.tsx
+  s_d85efaaff765fa::t_94c6e578f8c5ac 1-25
+apps/construction-management/app/app/projects/[id]/payments/transactions/page.tsx
+  s_d85efaaff765fa::t_54378b37e7bada 3-5,9-18
+apps/construction-management/app/app/projects/[id]/payments/transactions/transfers/[transferId]/page.tsx
+  s_d85efaaff765fa::t_6c966af8886814 1-21
+apps/construction-management/components/finance/transactions/transaction-actions.tsx
+  s_d85efaaff765fa::t_9bfb9c009fd923 1-241
+apps/construction-management/components/finance/transactions/transaction-detail.tsx
+  s_d85efaaff765fa::t_2c366e2c5bd6c5 1-249
+apps/construction-management/components/finance/transactions/transaction-form-parts.tsx
+  s_d85efaaff765fa::t_9fa189da186034 1-158
+apps/construction-management/components/finance/transactions/transaction-form.tsx
+  s_d85efaaff765fa::t_1342eac833a1cc 1-485
+apps/construction-management/components/finance/transactions/transaction-format.tsx
+  s_d85efaaff765fa::t_5fc6c1c2a60d57 1-92
+apps/construction-management/components/finance/transactions/transactions-page.tsx
+  s_d85efaaff765fa::t_850362a0bce3a4 1-701
+apps/construction-management/components/finance/transactions/transfer-form.tsx
+  s_d85efaaff765fa::t_98a8d1fec70282 1-345
+apps/construction-management/components/finance/transactions/import-transactions-dialog.tsx
+  s_b96e6a2bd7a3b2::t_b7b58a545a38a2 1-181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "676eba0214453875c85aea2e9b2ed63dc235e043",
+  "prompts": {},
+  "sessions": {
+    "s_b96e6a2bd7a3b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af6acc6a257c6d98c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
