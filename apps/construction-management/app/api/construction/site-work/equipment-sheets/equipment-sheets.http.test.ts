@@ -575,7 +575,7 @@ describe("Equipment Usage sheets (CM-604)", () => {
     ).toMatchObject({ code: "EQUIPMENT_UNAVAILABLE" });
   });
 
-  it("refuses a transfer dated before the equipment's last sheet at the Project", async () => {
+  it("refuses a transfer dated on or before the equipment's last sheet at the Project", async () => {
     const ctx = await setup();
     await saved(ctx, ctx.jcb);
     const fresh = await json<EquipmentJson>(await fetchEquipment(ctx.jcb.id));
@@ -586,9 +586,16 @@ describe("Equipment Usage sheets (CM-604)", () => {
         movementDate: addDays(TODAY, -2),
       }),
     ).rejects.toThrow(/TRANSFER_BEFORE_LAST_SHEET/);
+    // The sheet's own day too: the machine was at this Project then.
+    await expect(
+      equipmentTransfer(ctx.owner, fresh, {
+        toProjectId: ctx.otherProject,
+        movementDate: YESTERDAY,
+      }),
+    ).rejects.toThrow(/TRANSFER_BEFORE_LAST_SHEET/);
     const done = await equipmentTransfer(ctx.owner, fresh, {
       toProjectId: ctx.otherProject,
-      movementDate: YESTERDAY,
+      movementDate: TODAY,
     });
     expect(done.currentProject?.id).toBe(ctx.otherProject);
   });
