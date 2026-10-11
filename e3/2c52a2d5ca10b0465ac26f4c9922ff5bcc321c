@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/site-work/documents/document-test-fixtures.ts
+  s_0b536d2972a09b::t_5974075059f878 1-123
+apps/construction-management/app/api/construction/site-work/documents/documents.http.test.ts
+  s_0b536d2972a09b::t_94d42fb0055721 1-647
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_07b74b98437d2c 1-193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e32c52a2d5ca10b0465ac26f4c9922ff5bcc321c",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
