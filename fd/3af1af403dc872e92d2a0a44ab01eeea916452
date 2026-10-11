@@ -1,0 +1,45 @@
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/edit/page.tsx
+  s_0b536d2972a09b::t_eefc2bdcd89163 1-30
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/page.tsx
+  s_0b536d2972a09b::t_950d69e7d1dba4 1-28
+apps/construction-management/app/app/projects/[id]/worksheets/new/page.tsx
+  s_0b536d2972a09b::t_501ce7ab711084 1-35
+apps/construction-management/app/app/projects/[id]/worksheets/page.tsx
+  s_0b536d2972a09b::t_9b17152f740332 3-5,9-24
+apps/construction-management/components/site-work/worksheets/bulk-select-dialog.tsx
+  s_0b536d2972a09b::t_7cf1fc84b4f62d 1-188
+apps/construction-management/components/site-work/worksheets/worksheet-actions.tsx
+  s_0b536d2972a09b::t_60bfbdd875cf15 1-241
+apps/construction-management/components/site-work/worksheets/worksheet-attendance-panel.tsx
+  s_0b536d2972a09b::t_c9ea71c66f6723 1-99
+apps/construction-management/components/site-work/worksheets/worksheet-detail.tsx
+  s_0b536d2972a09b::t_89c5c471275a4d 1-181
+apps/construction-management/components/site-work/worksheets/worksheet-form-pages.tsx
+  s_0b536d2972a09b::t_744b6151ee0798 1-71
+apps/construction-management/components/site-work/worksheets/worksheet-settings-dialog.tsx
+  s_0b536d2972a09b::t_3a0d045dc0654c 1-286
+apps/construction-management/components/site-work/worksheets/worksheets-page.tsx
+  s_0b536d2972a09b::t_f27bfbe5600536 1-583
+apps/construction-management/src/queries/worksheets.ts
+  s_0b536d2972a09b::t_b3399372f96036 1-246
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_0b536d2972a09b::t_b3ad3a04faadb8 1-1002
+apps/construction-management/components/site-work/worksheets/worksheet-format.tsx
+  s_0b536d2972a09b::t_23af9cd11cb626 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fd3af1af403dc872e92d2a0a44ab01eeea916452",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
