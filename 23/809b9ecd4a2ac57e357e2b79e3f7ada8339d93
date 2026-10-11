@@ -1,0 +1,77 @@
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_ce7e88f843c6e4 18-21,38,47
+apps/construction-management/app/api/construction/finance/petty-cash/accounts/[id]/delete/route.ts
+  s_d85efaaff765fa::t_ac07496702bef0 1-32
+apps/construction-management/app/api/construction/finance/petty-cash/accounts/[id]/receipts.zip/route.ts
+  s_d85efaaff765fa::t_e1fd39daeffb2c 1-56
+apps/construction-management/app/api/construction/finance/petty-cash/accounts/[id]/route.ts
+  s_d85efaaff765fa::t_fdbaea6c87f9c4 1-31
+apps/construction-management/app/api/construction/finance/petty-cash/accounts/route.ts
+  s_d85efaaff765fa::t_54e3a0b41ec106 1-64
+apps/construction-management/app/api/construction/finance/petty-cash/handlers.ts
+  s_d85efaaff765fa::t_5ac649f7fdaefe 1-98
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash-models.ts
+  s_d85efaaff765fa::t_31c5e3e2b25db2 1-377
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash-openapi.ts
+  s_d85efaaff765fa::t_bbf11d43372ec7 1-222
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash.http.test.ts
+  s_d85efaaff765fa::t_70da3f2a063948 1-861
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/[id]/approve/route.ts
+  s_d85efaaff765fa::t_19f98382fe9b4a 1-41
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/[id]/delete/route.ts
+  s_d85efaaff765fa::t_1f12c2b8895d17 1-37
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/[id]/reject/route.ts
+  s_d85efaaff765fa::t_0c4e057ac64a76 1-46
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/[id]/route.ts
+  s_d85efaaff765fa::t_e13b309e1532f3 1-35
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/[id]/update/route.ts
+  s_d85efaaff765fa::t_7e170b7bd8a7d7 1-51
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/bulk-approve/route.ts
+  s_d85efaaff765fa::t_fbd1a960daa16b 1-40
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/bulk-reject/route.ts
+  s_d85efaaff765fa::t_e17a1b36d13380 1-37
+apps/construction-management/app/api/construction/finance/petty-cash/vouchers/route.ts
+  s_d85efaaff765fa::t_894e9ebdfb5c04 1-125
+apps/construction-management/package.json
+  s_d85efaaff765fa::t_68050cd7a8d50e 37
+apps/construction-management/src/finance/domain/petty-cash.test.ts
+  s_d85efaaff765fa::t_8b59c4e0e6d189 1-151
+apps/construction-management/src/finance/domain/petty-cash.ts
+  s_d85efaaff765fa::t_8a2ddc7bf3eae5 1-294
+apps/construction-management/src/finance/infrastructure/petty-cash-guards.ts
+  s_d85efaaff765fa::t_be7cc5f8eb5904 1-97
+apps/construction-management/src/finance/infrastructure/petty-cash-vouchers.ts
+  s_d85efaaff765fa::t_40b76a0f6f5a2c 1-1015
+bun.lock
+  s_d85efaaff765fa::t_5cb0e95184a44e 38
+apps/construction-management/src/finance/application/petty-cash-access.ts
+  s_7ee90ae80c3082::t_f0cebb5ba41605 1-76
+apps/construction-management/src/finance/infrastructure/petty-cash-accounts.ts
+  s_7ee90ae80c3082::t_5fbfba5bc72501 1-406
+apps/construction-management/src/finance/infrastructure/petty-cash-receipts.ts
+  s_7ee90ae80c3082::t_79f6ad24277cdc 1-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "23809b9ecd4a2ac57e357e2b79e3f7ada8339d93",
+  "prompts": {},
+  "sessions": {
+    "s_7ee90ae80c3082": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa5d7cf094dd3854d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
