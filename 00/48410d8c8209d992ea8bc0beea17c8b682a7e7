@@ -1,0 +1,51 @@
+apps/construction-management/src/finance/domain/tds.test.ts
+  s_d85efaaff765fa::t_bbbf79c2ed340e 1-167
+apps/construction-management/src/finance/domain/tds.ts
+  s_d85efaaff765fa::t_0b90364094e9b9 1-162
+apps/construction-management/src/finance/infrastructure/finance-seeds.ts
+  s_d85efaaff765fa::t_b484ba676c8a10 1-81
+apps/construction-management/src/finance/infrastructure/seeds/finance.json
+  s_d85efaaff765fa::t_6150f0a206f11d 1-35
+apps/construction-management/src/finance/infrastructure/seeds/statutory/tds-rates.json
+  s_d85efaaff765fa::t_341a63e65bf70c 1-65
+packages/db/construction/prisma/migrations/20261013090000_construction_masters_contractor_tds/migration.sql
+  s_d85efaaff765fa::t_314646e04649e8 1-10
+packages/db/construction/prisma/migrations/20261013090100_construction_labour_wage_payment_account/migration.sql
+  s_d85efaaff765fa::t_7573f24afde09c 1-8
+packages/db/construction/prisma/migrations/20261013090200_construction_hrms_salary_slip_account/migration.sql
+  s_d85efaaff765fa::t_20bb735e896dc0 1-7
+packages/db/construction/prisma/migrations/20261013090300_construction_reporting_finance_kinds/migration.sql
+  s_d85efaaff765fa::t_e975a91d0e746c 1-14
+packages/db/construction/prisma/migrations/20261013090400_construction_finance/migration.sql
+  s_d85efaaff765fa::t_a9e7532228adaa 1-742
+packages/db/construction/prisma/migrations/20261013090500_construction_finance_seeds/migration.sql
+  s_d85efaaff765fa::t_650b616f119371 1-74
+packages/db/construction/prisma/schema/base.prisma
+  s_d85efaaff765fa::t_c20d19aa9f92e9 13
+packages/db/construction/prisma/schema/construction-finance.prisma
+  s_d85efaaff765fa::t_ffed87509254c5 1-766
+packages/db/construction/prisma/schema/construction-hrms.prisma
+  s_d85efaaff765fa::t_6174a72607008a 912-913
+packages/db/construction/prisma/schema/construction-labour.prisma
+  s_d85efaaff765fa::t_7e97ea866388d9 374-375,385-386
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_d85efaaff765fa::t_b1e254d0fa2dd5 156-160
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_d85efaaff765fa::t_fa5b7bfbdf740a 19-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0048410d8c8209d992ea8bc0beea17c8b682a7e7",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
