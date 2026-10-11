@@ -190,6 +190,26 @@ async function setUp() {
 }
 
 describe("Petty Cash accounts (CM-703)", () => {
+  it("lets Create alone open an account for another Team Member and get it back", async () => {
+    const company = await ownerWithCompany();
+    const clerk = await memberWith(company, {
+      "finance.petty_cash": ["read", "create"],
+    });
+    const engineer = await memberWith(company, {
+      "finance.petty_cash": ["read"],
+    });
+    const response = await open(clerk.cookie, {
+      holderMemberId: engineer.memberId,
+      openingBalance: 2_000_00,
+    });
+    // The account and its opening entry are written, and the answer says so
+    // (not a 404 for an account the clerk cannot list without View all).
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const account = await json<Account>(response);
+    expect(account).toMatchObject({ isOwn: false, balance: 2_000_00 });
+    expect(await balanceOf(company.workspaceId, account.id)).toBe(2_000_00);
+  });
+
   it("opens one account per Team Member with an opening balance entry", async () => {
     const company = await ownerWithCompany();
     const engineer = await memberWith(company, {

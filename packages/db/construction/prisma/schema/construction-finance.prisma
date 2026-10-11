@@ -463,6 +463,8 @@ model ConstructionFinanceOtherExpense {
   payeeName         String?                           @map("payee_name")
   accountId         String                            @map("account_id") @db.Uuid
   mode              ConstructionFinancePaymentMode
+  /// The cheque number for Cheque (there is no cheque column), else the
+  /// transaction reference.
   reference         String?
   /// Paise, positive.
   amount            BigInt

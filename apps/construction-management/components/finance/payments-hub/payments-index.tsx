@@ -9,6 +9,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { Button } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
@@ -33,6 +34,27 @@ export function PaymentsIndex({ projectId }: { projectId: string }) {
 
   if (query.isPending || first != null)
     return <Skeleton className="h-40 w-full" />;
+  // A failed read is not "no access": say so and offer to try again.
+  if (query.isError)
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Couldn&apos;t load Payments</EmptyTitle>
+          <EmptyDescription>
+            Check your connection and try again.
+          </EmptyDescription>
+        </EmptyHeader>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            void query.refetch();
+          }}
+        >
+          Try again
+        </Button>
+      </Empty>
+    );
   return (
     <Empty>
       <EmptyHeader>

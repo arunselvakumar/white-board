@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { buttonVariants } from "@repo/ui/components/button";
+import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
+import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
 import {
   receiptsZipUrl,
@@ -27,8 +28,8 @@ function monthStart(today: string): string {
 /**
  * Export Receipts (CM-0017 §9): the photos and receipts of the account's
  * vouchers between two dates as one ZIP, each named by its voucher number.
- * The browser downloads it; above 500 files the server says to choose
- * fewer days.
+ * It is fetched first and saved only when the server sends it; a refusal
+ * (above 500 files: choose fewer days) shows here and the dialog stays.
  */
 export function ExportReceiptsDialog({
   account,
@@ -48,8 +49,44 @@ export function ExportReceiptsDialog({
     from === "" || to === ""
       ? "Choose both dates."
       : from > to
-        ? "From is on or before To."
+        ? "Choose a From date on or before the To date."
         : undefined;
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | undefined>();
+
+  async function download() {
+    setBusy(true);
+    setFailure(undefined);
+    try {
+      const response = await fetch(receiptsZipUrl(account.id, from, to));
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        setFailure(
+          body?.message ?? "The receipts could not be exported. Try again.",
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const name =
+        /filename="?([^";]+)"?/.exec(
+          response.headers.get("content-disposition") ?? "",
+        )?.[1] ?? "receipts.zip";
+      const href = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = href;
+      link.download = name;
+      link.click();
+      URL.revokeObjectURL(href);
+      onOpenChange(false);
+    } catch {
+      setFailure("The receipts could not be exported. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -86,26 +123,17 @@ export function ExportReceiptsDialog({
           </div>
         </div>
         <FieldError message={problem} />
+        <FormAlert message={failure} />
         <DialogFooter>
-          {problem == null ? (
-            <a
-              href={receiptsZipUrl(account.id, from, to)}
-              download
-              className={buttonVariants()}
-              onClick={() => {
-                onOpenChange(false);
-              }}
-            >
-              Download ZIP
-            </a>
-          ) : (
-            <span
-              aria-disabled="true"
-              className={buttonVariants({ className: "opacity-50" })}
-            >
-              Download ZIP
-            </span>
-          )}
+          <Button
+            type="button"
+            disabled={problem != null || busy}
+            onClick={() => {
+              void download();
+            }}
+          >
+            {busy ? "Preparing…" : "Download ZIP"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

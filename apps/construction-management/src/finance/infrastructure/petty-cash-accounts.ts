@@ -205,6 +205,16 @@ export class PettyCashAccounts {
 
   /** One account the viewer may see; 404 otherwise. */
   async get(access: MemberAccess, id: string): Promise<PettyCashAccountView> {
+    const view = await this.load(access, id);
+    if (!seesPettyCashAccount(access, view)) throw pettyCashAccountNotFound();
+    return view;
+  }
+
+  /** One live petty-cash account of the Company, whoever may see it. */
+  private async load(
+    access: MemberAccess,
+    id: string,
+  ): Promise<PettyCashAccountView> {
     const row = await this.db.constructionFinanceAccount.findFirst({
       where: {
         id,
@@ -216,8 +226,7 @@ export class PettyCashAccounts {
     });
     if (row == null) throw pettyCashAccountNotFound();
     const [view] = await this.views(access.workspaceId, [row], access.userId);
-    if (view == null || !seesPettyCashAccount(access, view))
-      throw pettyCashAccountNotFound();
+    if (view == null) throw pettyCashAccountNotFound();
     return view;
   }
 
@@ -319,7 +328,9 @@ export class PettyCashAccounts {
         );
       throw error;
     }
-    return this.get(access, id);
+    // Create alone may open an account for another Team Member (CM-0017
+    // §2), so the one who opened it gets it back without View all.
+    return this.load(access, id);
   }
 
   private async assertFree(
