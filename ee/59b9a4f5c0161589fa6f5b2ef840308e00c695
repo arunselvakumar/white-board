@@ -1,0 +1,59 @@
+apps/construction-management/app/api/construction/site-work/equipment-sheets/[id]/approve/route.ts
+  s_0b536d2972a09b::t_1cb908526b2f0a 1-46
+apps/construction-management/app/api/construction/site-work/equipment-sheets/[id]/delete/route.ts
+  s_0b536d2972a09b::t_0a4663e62aacb0 1-44
+apps/construction-management/app/api/construction/site-work/equipment-sheets/[id]/reject/route.ts
+  s_0b536d2972a09b::t_6fb6b22c62a3c5 1-46
+apps/construction-management/app/api/construction/site-work/equipment-sheets/[id]/route.ts
+  s_0b536d2972a09b::t_e365d00262059b 1-32
+apps/construction-management/app/api/construction/site-work/equipment-sheets/[id]/update/route.ts
+  s_0b536d2972a09b::t_c613ddd3720aa9 1-49
+apps/construction-management/app/api/construction/site-work/equipment-sheets/available-stock/route.ts
+  s_0b536d2972a09b::t_cfb33a91353f13 1-48
+apps/construction-management/app/api/construction/site-work/equipment-sheets/bulk-approve/route.ts
+  s_0b536d2972a09b::t_187ff417653422 1-52
+apps/construction-management/app/api/construction/site-work/equipment-sheets/bulk-reject/route.ts
+  s_0b536d2972a09b::t_fde5fdf965c999 1-52
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheet-models.ts
+  s_0b536d2972a09b::t_e4f1333956cf0f 1-586
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets-openapi.ts
+  s_0b536d2972a09b::t_fb3a8f8a359ab1 1-2,8-65,67-206
+apps/construction-management/app/api/construction/site-work/equipment-sheets/form-options/route.ts
+  s_0b536d2972a09b::t_e738c10f7353cd 1-43
+apps/construction-management/app/api/construction/site-work/equipment-sheets/handlers.ts
+  s_0b536d2972a09b::t_d59c2bc8e8ba86 1-98
+apps/construction-management/app/api/construction/site-work/equipment-sheets/route.ts
+  s_0b536d2972a09b::t_14afa29d8f6dab 1-116
+apps/construction-management/app/api/construction/site-work/settings/equipment-sheet-settings-models.ts
+  s_0b536d2972a09b::t_eba01c8df4be00 1-37
+apps/construction-management/app/api/construction/site-work/settings/equipment-sheets/route.ts
+  s_0b536d2972a09b::t_1e118888838fee 1-72
+apps/construction-management/app/api/construction/site-work/settings/settings-openapi.ts
+  s_0b536d2972a09b::t_7397c38842f7e9 8,10-14,36,67-93
+apps/construction-management/src/site-work/application/equipment-sheet-handlers.ts
+  s_0b536d2972a09b::t_2b7db6ac461725 1-1410
+apps/construction-management/src/site-work/application/equipment-sheet-settings-handlers.ts
+  s_0b536d2972a09b::t_596f78544f95e9 1-148
+apps/construction-management/src/site-work/domain/equipment-usage.test.ts
+  s_0b536d2972a09b::t_d2ed9f87863277 248-257
+apps/construction-management/src/site-work/domain/equipment-usage.ts
+  s_0b536d2972a09b::t_fc86be53eae859 764-770,777
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-sheet-store.ts
+  s_0b536d2972a09b::t_ab8e94b3d56656 1-532
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ee59b9a4f5c0161589fa6f5b2ef840308e00c695",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
