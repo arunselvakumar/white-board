@@ -1,0 +1,27 @@
+apps/construction-management/src/composition/worksheet-directory.ts
+  s_0b536d2972a09b::t_43354682e8d5c1 1-208
+apps/construction-management/src/site-work/application/ports.ts
+  s_0b536d2972a09b::t_282adf327dcc94 70-166
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_0b536d2972a09b::t_4ec351498b49e2 1-1041
+apps/construction-management/src/site-work/application/worksheet-settings-handlers.ts
+  s_0b536d2972a09b::t_d56d0fb9859cee 1-154
+apps/construction-management/src/site-work/infrastructure/prisma-worksheet-store.ts
+  s_0b536d2972a09b::t_2f8f56b2c1c393 1-376
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d2078318254549ccf220941e48293ce1f1a13a83",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
