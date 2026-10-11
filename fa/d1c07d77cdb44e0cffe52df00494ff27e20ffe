@@ -1,0 +1,23 @@
+apps/construction-management/components/site-work/equipment/equipment-form.tsx
+  s_0b536d2972a09b::t_7494d6e1fd1af9 402-404,406,408
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_16318bf21a0dbd 675,695
+apps/construction-management/src/reporting/domain/equipment-lifecycle-reports.ts
+  s_0b536d2972a09b::t_2eef7bcebf4465 101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fad1c07d77cdb44e0cffe52df00494ff27e20ffe",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
