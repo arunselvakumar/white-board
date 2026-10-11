@@ -95,7 +95,11 @@ function PartySelect({
           }
         />
       </SelectTrigger>
-      <SelectContent align="start" alignItemWithTrigger={false}>
+      <SelectContent
+        align="start"
+        alignItemWithTrigger={false}
+        aria-label={`${COUNTERPARTY_KIND_LABELS[kind]}s`}
+      >
         {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>
             {item.label}
@@ -159,7 +163,11 @@ export function CounterpartyField({
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent align="start" alignItemWithTrigger={false}>
+        <SelectContent
+          align="start"
+          alignItemWithTrigger={false}
+          aria-label="Party kinds"
+        >
           {kindItems.map((item) => (
             <SelectItem key={item.value} value={item.value}>
               {item.label}

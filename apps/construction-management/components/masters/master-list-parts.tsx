@@ -117,7 +117,8 @@ export function MasterRow({
   editLabel: string;
   /** Menu items after the edit item, e.g. "Assign Projects". */
   moreActions?: readonly { label: string; onSelect: () => void }[];
-  onToggle: () => void;
+  /** Absent when the viewer may not disable or enable the row. */
+  onToggle?: () => void;
   /** Absent for seed rows, which cannot be deleted. */
   onDelete?: () => void;
 }) {
@@ -166,9 +167,11 @@ export function MasterRow({
               {action.label}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuItem onClick={onToggle}>
-            {disabled ? "Enable" : "Disable"}
-          </DropdownMenuItem>
+          {onToggle != null ? (
+            <DropdownMenuItem onClick={onToggle}>
+              {disabled ? "Enable" : "Disable"}
+            </DropdownMenuItem>
+          ) : null}
           {onDelete != null ? (
             <>
               <DropdownMenuSeparator />
