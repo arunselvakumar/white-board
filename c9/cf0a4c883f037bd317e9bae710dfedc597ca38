@@ -1,0 +1,49 @@
+apps/construction-management/components/site-work/documents/pending-files-field.stories.tsx
+  s_0b536d2972a09b::t_49ecb20d766b4f 1-195
+apps/construction-management/components/site-work/documents/pending-files-field.tsx
+  s_0b536d2972a09b::t_71e71f966c3c4b 1-210
+apps/construction-management/components/site-work/documents/site-work-document-activity.stories.tsx
+  s_0b536d2972a09b::t_315f37c4508912 1-271
+apps/construction-management/components/site-work/documents/site-work-document-activity.tsx
+  s_0b536d2972a09b::t_f5802a91105c13 1-56
+apps/construction-management/components/site-work/documents/site-work-document-files.tsx
+  s_0b536d2972a09b::t_86c372ecb3ebbe 1-279
+apps/construction-management/components/site-work/documents/site-work-document-remarks.tsx
+  s_0b536d2972a09b::t_5949fbcc44fde0 1-345
+apps/construction-management/components/site-work/documents/site-work-file-parts.tsx
+  s_0b536d2972a09b::t_32682a40f3048b 1-129
+apps/construction-management/components/site-work/documents/site-work-photo-strip.stories.tsx
+  s_0b536d2972a09b::t_9d305ef68f5c2d 1-66
+apps/construction-management/components/site-work/documents/site-work-photo-strip.tsx
+  s_0b536d2972a09b::t_4bb4e8e994e0fc 1-113
+apps/construction-management/components/site-work/documents/use-upload-pending-files.ts
+  s_0b536d2972a09b::t_89d813fbab7b7e 1-66
+apps/construction-management/src/queries/site-work-documents.ts
+  s_0b536d2972a09b::t_3531e8f3e54b4e 1-191
+apps/construction-management/components/site-work/documents/site-work-document-fixtures.ts
+  s_f64fbd0ff01db5::t_674eb11c987218 1-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c9cf0a4c883f037bd317e9bae710dfedc597ca38",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f64fbd0ff01db5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aba3e7fa7df5f869d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
