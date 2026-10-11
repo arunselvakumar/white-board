@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_3a0ef59f6c58c7 22-25,33,41
+apps/construction-management/app/api/construction/finance/other-parties/[id]/delete/route.ts
+  s_d85efaaff765fa::t_29d5201f09fd64 1-51
+apps/construction-management/app/api/construction/finance/other-parties/[id]/route.ts
+  s_d85efaaff765fa::t_083d1ea70c813a 1-30
+apps/construction-management/app/api/construction/finance/other-parties/[id]/update/route.ts
+  s_d85efaaff765fa::t_c501c931ea66c7 1-47
+apps/construction-management/app/api/construction/finance/other-parties/handlers.ts
+  s_d85efaaff765fa::t_1ca5729614d8dd 1-9
+apps/construction-management/app/api/construction/finance/other-parties/other-parties-openapi.ts
+  s_d85efaaff765fa::t_f174a21e760fea 1-107
+apps/construction-management/app/api/construction/finance/other-parties/other-parties.http.test.ts
+  s_d85efaaff765fa::t_c8dfca40ec8938 1-314
+apps/construction-management/app/api/construction/finance/other-parties/other-party-models.ts
+  s_d85efaaff765fa::t_8dc493788fc062 1-153
+apps/construction-management/app/api/construction/finance/other-parties/route.ts
+  s_d85efaaff765fa::t_01bc6f8c2dd8cc 1-76
+apps/construction-management/src/finance/application/other-party-handlers.ts
+  s_d85efaaff765fa::t_732fd1b2543c0f 1-255
+apps/construction-management/src/finance/domain/other-party.test.ts
+  s_d85efaaff765fa::t_838a9a2e52a15e 1-85
+apps/construction-management/src/finance/domain/other-party.ts
+  s_2d02b132156f0c::t_5204344db5bc3d 1-129
+apps/construction-management/src/finance/infrastructure/other-party-store.ts
+  s_2d02b132156f0c::t_030a815cbc770e 1-326
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f7a64c0750055af4901b2c2c7c56af75ec60090b",
+  "prompts": {},
+  "sessions": {
+    "s_2d02b132156f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4d9b8706f6b5edee",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
