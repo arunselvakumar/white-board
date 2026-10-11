@@ -1,0 +1,57 @@
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_d85efaaff765fa::t_fc8521abce2a15 15,53-63,80-84,94-96,137-142,145-205
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_d85efaaff765fa::t_9a2b5527d9820f 24-45,115-172,208-215,282-301
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_d85efaaff765fa::t_eb7e872b538246 4-8,18-20,39,76-115,119-139,146-148,157,169-184,189,222
+apps/construction-management/components/reports/report-card.tsx
+  s_d85efaaff765fa::t_f55f59d2e73009 31-35,46-47,56-65,71,110-147,163,173-176,184-193,197,202-203,257-292,316,335-340,380
+apps/construction-management/components/reports/report-catalogue.ts
+  s_d85efaaff765fa::t_f7f88242e6eeed 1,9-13,17-24,121-218,283,285-286,303-318
+apps/construction-management/components/reports/reports-page.tsx
+  s_d85efaaff765fa::t_0604179ca5751c 8-10,16,23-24,53-104,117-118,140,150-153,164,184-194
+apps/construction-management/src/composition/finance-report-source.ts
+  s_d85efaaff765fa::t_8bf343e5459388 1-699
+apps/construction-management/src/composition/report-jobs.ts
+  s_d85efaaff765fa::t_17f0f40bdcca17 3,5-8,14-15,19-23,27
+apps/construction-management/src/finance/domain/dues.test.ts
+  s_d85efaaff765fa::t_0823760009c078 1-130
+apps/construction-management/src/finance/domain/dues.ts
+  s_d85efaaff765fa::t_89f296a4521b3b 1-188
+apps/construction-management/src/finance/infrastructure/due-invoices.ts
+  s_d85efaaff765fa::t_2927251208ea73 1-188
+apps/construction-management/src/reporting/application/build-finance-report.ts
+  s_d85efaaff765fa::t_1b1fe898e7cf8a 1-103
+apps/construction-management/src/reporting/application/build-report.ts
+  s_d85efaaff765fa::t_2de88e817f8120 9-14,21-23,50-54,64,123-132,153-154,160-165,179-181
+apps/construction-management/src/reporting/application/ports.ts
+  s_d85efaaff765fa::t_452b9d662f0075 20-34,216-281
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_d85efaaff765fa::t_ac8678f1ed2375 23,77-78,97-102
+apps/construction-management/src/reporting/domain/finance-reports.ts
+  s_d85efaaff765fa::t_6fc4531fcdf179 1-1035
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_d85efaaff765fa::t_1664c1d03c6f36 4,20-28,46-97,168-210,254-267,288-297,314-318,323-325,357-360
+apps/construction-management/src/reporting/domain/report-period.ts
+  s_d85efaaff765fa::t_424256a9949b60 88-120
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_d85efaaff765fa::t_2a5586afb48c1b 7,43-44,62
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_d85efaaff765fa::t_764e34322e8bfe 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ac52ec4895c058d35fbffc98df73a7932c853b10",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
