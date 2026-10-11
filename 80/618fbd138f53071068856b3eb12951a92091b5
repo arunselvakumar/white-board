@@ -1,0 +1,45 @@
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_0b536d2972a09b::t_5044a71cb69725 11,23-29,36,43-46,52
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_0b536d2972a09b::t_5bf10bed4e0fd6 7,96-98,132-152,162
+apps/construction-management/components/reports/report-catalogue.ts
+  s_0b536d2972a09b::t_7eb6e088591d85 1,4-5
+apps/construction-management/package.json
+  s_0b536d2972a09b::t_96f6622009ec1b 47
+apps/construction-management/src/reporting/application/build-report.ts
+  s_0b536d2972a09b::t_ad1c2e284febeb 30-38,95-97
+apps/construction-management/src/reporting/application/ports.ts
+  s_0b536d2972a09b::t_b35b391782ce96 3-6,11,37-41,44,46-55,118-136
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_0b536d2972a09b::t_41b442d99a3cf3 6,9,65-67,70,76,79-81,84-95,161-164,172-178,187,315-403
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_0b536d2972a09b::t_1ac62256d43b7e 5,10-14,21-22,24,36,44-48,51-66,74-75,79-101,103,108-109,111-129,131,134-135,138-140,143-150,154-187,271-297,303-307
+apps/construction-management/src/reporting/domain/daily-progress-report-fixtures.ts
+  s_0b536d2972a09b::t_4eda31ba7b7155 1-138
+apps/construction-management/src/reporting/domain/daily-progress-report.test.ts
+  s_0b536d2972a09b::t_ff98e0d6556a74 1-230
+apps/construction-management/src/reporting/domain/daily-progress-report.ts
+  s_0b536d2972a09b::t_3c50eef0fbd0ea 1-728
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_0b536d2972a09b::t_d94217885614ce 1,6-10,17,28,31-49,69-80,84,116-123,154-155,169,173-186
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_0b536d2972a09b::t_cb5629b19727f9 3-7,11,24-25,91-103,105-116,118-122,126-127,130-169
+bun.lock
+  s_0b536d2972a09b::t_8d71bf2cd06a98 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "80618fbd138f53071068856b3eb12951a92091b5",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
