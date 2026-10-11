@@ -1,0 +1,21 @@
+apps/construction-management/app/api/construction/site-work/progress-reports/progress-reports.http.test.ts
+  s_0b536d2972a09b::t_b4f97089588594 1-862
+apps/construction-management/test/site-work.ts
+  s_0b536d2972a09b::t_89bf14f5fd3a28 194-363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b95caa4e3158ad0ca324c981a3ba3f9e85cc26ed",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
