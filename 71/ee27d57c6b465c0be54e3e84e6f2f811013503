@@ -1,0 +1,19 @@
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_a81d42b868755c::t_ba0d59bbc3119a 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "71ee27d57c6b465c0be54e3e84e6f2f811013503",
+  "prompts": {},
+  "sessions": {
+    "s_a81d42b868755c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2866d65f1bc535d1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
