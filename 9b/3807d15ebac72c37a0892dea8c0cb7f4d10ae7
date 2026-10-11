@@ -1,0 +1,31 @@
+apps/construction-management/components/projects/dashboard/finance-dashboard-fixtures.ts
+  s_d85efaaff765fa::t_1ce777076bc8aa 1-126
+apps/construction-management/components/projects/dashboard/finance-sections.tsx
+  s_d85efaaff765fa::t_4edbc400168a21 1-457
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_d85efaaff765fa::t_0b5008c966a940 16-21,139-140,167-183,250,255,307-404,673-676
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_d85efaaff765fa::t_0071f6efa671d3 51,56-59,301,397-398,474-481
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_d85efaaff765fa::t_9b12ef88b9c4d7 13
+apps/construction-management/src/queries/finance-central-payment.ts
+  s_d85efaaff765fa::t_50fcb8ae89d7e9 1-19
+apps/construction-management/src/queries/finance-dashboard.ts
+  s_d85efaaff765fa::t_5fe4cf6f713819 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9b3807d15ebac72c37a0892dea8c0cb7f4d10ae7",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
