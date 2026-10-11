@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  LABOUR_SKILLS,
+  type LabourSkill,
+} from "@/src/masters/domain/master-kind";
+
 /** `{id}` in every masters item route. */
 export const ConstructionMastersIdParamsModel = z.object({ id: z.uuid() });
 
@@ -53,6 +58,55 @@ export function lookupModels(code: string) {
   };
 }
 
-export type LookupModels = ReturnType<typeof lookupModels>;
+/** A lookup row as every list answers it; Labour Categories add `skill`. */
+export type LookupResponseModel = z.infer<
+  ReturnType<typeof lookupModels>["response"]
+> & { skill?: LabourSkill };
 
-export type LookupResponseModel = z.infer<LookupModels["response"]>;
+/** What the lookup routes read and write; `skill` is Labour Categories' only. */
+export type LookupModels = {
+  response: z.ZodType<LookupResponseModel>;
+  list: z.ZodType<{ items: LookupResponseModel[]; total: number }>;
+  create: z.ZodType<{ name: string; skill?: LabourSkill }>;
+  update: z.ZodType<{
+    name: string;
+    expectedUpdatedAt: string;
+    skill?: LabourSkill;
+  }>;
+};
+
+const skill = z
+  .enum(LABOUR_SKILLS)
+  .describe(
+    "How the category's heads count on a Daily Worksheet's labour prefill (CM-0016 §6).",
+  );
+
+/**
+ * Labour Categories' models (CM-203, CM-601): a lookup row with a skill.
+ * Create defaults it to skilled; update leaves it as is when left out, and
+ * a seed row may change it (not its name).
+ */
+export function labourCategoryModels() {
+  const base = lookupModels("LABOUR_CATEGORY");
+  const response = base.response.extend({ skill });
+  return {
+    response,
+    list: z.object({
+      items: z.array(response),
+      total: z.int().nonnegative(),
+    }),
+    create: z.object({
+      name,
+      skill: skill.optional().describe("Skilled unless given."),
+    }),
+    update: z.object({
+      name,
+      expectedUpdatedAt: expectedUpdatedAt("LABOUR_CATEGORY"),
+      skill: skill
+        .optional()
+        .describe(
+          "Left as is when left out. A seed category keeps its name but its skill may change.",
+        ),
+    }),
+  };
+}

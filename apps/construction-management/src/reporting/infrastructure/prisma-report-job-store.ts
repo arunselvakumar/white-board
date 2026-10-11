@@ -1,10 +1,14 @@
 import type { PrismaClient } from "@repo/construction-db";
 
-import { recordStoredFile } from "@/src/shared-kernel/files/stored-files";
+import { recordAudit } from "@/src/shared-kernel/audit";
+import {
+  markStoredFileDeleted,
+  recordStoredFile,
+} from "@/src/shared-kernel/files/stored-files";
 
 import { REPORT_FILE_KIND } from "../application/report-handlers";
 import type { ReportJobStore } from "../application/ports";
-import type { ReportJob, ReportKind, ReportParams } from "../domain/report-job";
+import type { ReportJob, ReportParams } from "../domain/report-job";
 
 type Row = NonNullable<
   Awaited<
@@ -17,8 +21,8 @@ function toJob(row: Row): ReportJob {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    // The site-work kinds (CM-606, CM-608) join `REPORT_KINDS` with their builders.
-    kind: row.kind as ReportKind,
+    // Every Prisma `report_kind` is in `REPORT_KINDS` now (CM-606, CM-608).
+    kind: row.kind,
     params: row.params as ReportParams,
     status: row.status,
     includesMoney: row.includesMoney,
@@ -83,34 +87,84 @@ export function prismaReportJobStore(db: PrismaClient): ReportJobStore {
     },
 
     async markDone(job, files, at) {
-      await db.$transaction(async (tx) => {
-        for (const file of [files.xlsx, files.pdf])
-          await recordStoredFile(tx, {
-            workspaceId: job.workspaceId,
-            key: file.key,
-            kind: REPORT_FILE_KIND,
-            contentType: file.contentType,
-            bytes: file.bytes,
-            createdBy: job.requestedBy,
-            createdAt: at,
+      /** Thrown inside the transaction to roll back a job no longer running. */
+      const notRunning = new Error("not running");
+      try {
+        await db.$transaction(async (tx) => {
+          const updated = await tx.constructionReportingReportJob.updateMany({
+            where: { id: job.id, status: "running" },
+            data: {
+              status: "done",
+              xlsxKey: files.xlsx?.key ?? null,
+              pdfKey: files.pdf.key,
+              fileName: files.fileName,
+              finishedAt: at,
+            },
           });
-        await tx.constructionReportingReportJob.update({
-          where: { id: job.id },
-          data: {
-            status: "done",
-            xlsxKey: files.xlsx.key,
-            pdfKey: files.pdf.key,
-            fileName: files.fileName,
-            finishedAt: at,
-          },
+          if (updated.count === 0) throw notRunning;
+          for (const file of [files.xlsx, files.pdf])
+            if (file != null)
+              await recordStoredFile(tx, {
+                workspaceId: job.workspaceId,
+                key: file.key,
+                kind: REPORT_FILE_KIND,
+                contentType: file.contentType,
+                bytes: file.bytes,
+                createdBy: job.requestedBy,
+                createdAt: at,
+              });
         });
-      });
+        return true;
+      } catch (error) {
+        if (error === notRunning) return false;
+        throw error;
+      }
     },
 
     async markFailed(id, error, at) {
-      await db.constructionReportingReportJob.update({
-        where: { id },
+      const updated = await db.constructionReportingReportJob.updateMany({
+        where: { id, status: { in: ["queued", "running"] } },
         data: { status: "failed", error, finishedAt: at },
+      });
+      return updated.count > 0;
+    },
+
+    async requeue(workspaceId, id) {
+      const updated = await db.constructionReportingReportJob.updateMany({
+        where: { id, workspaceId, status: "failed" },
+        data: {
+          status: "queued",
+          error: null,
+          startedAt: null,
+          finishedAt: null,
+        },
+      });
+      return updated.count > 0;
+    },
+
+    async remove(job, by, at) {
+      await db.$transaction(async (tx) => {
+        await tx.constructionReportingReportJob.deleteMany({
+          where: { id: job.id, workspaceId: job.workspaceId },
+        });
+        for (const key of [job.xlsxKey, job.pdfKey])
+          if (key != null)
+            await markStoredFileDeleted(tx, job.workspaceId, key, at);
+        await recordAudit(tx, {
+          workspaceId: job.workspaceId,
+          actorUserId: by,
+          action: "report_job.deleted",
+          entityType: "report_job",
+          entityId: job.id,
+          before: {
+            kind: job.kind,
+            projectId: job.projectId,
+            params: job.params,
+            status: job.status,
+            fileName: job.fileName,
+          },
+          occurredAt: at,
+        });
       });
     },
   };

@@ -12,7 +12,11 @@ import {
 } from "@repo/ui/components/empty";
 import { Spinner } from "@repo/ui/components/spinner";
 
-import { reportsQuery, type ReportJob } from "@/src/queries/reports";
+import {
+  reportsQuery,
+  type ReportJob,
+  type ReportKind,
+} from "@/src/queries/reports";
 
 import { jobPeriod } from "./report-catalogue";
 import { ReportDownloads } from "./report-downloads";
@@ -40,10 +44,24 @@ function StatusChip({ job }: { job: ReportJob }) {
   }
 }
 
-/** The Project's newest reports with their status and downloads. */
-export function RecentReports({ projectId }: { projectId: string }) {
+/**
+ * The Project's newest reports (or, with `projectId` null, the viewer's
+ * own central reports) with their status and downloads.
+ */
+export function RecentReports({
+  projectId,
+  kinds,
+}: {
+  projectId: string | null;
+  /** Only these kinds; every kind when left out. */
+  kinds?: readonly ReportKind[];
+}) {
   const { data } = useSuspenseQuery(reportsQuery(projectId));
-  if (data.items.length === 0)
+  const items =
+    kinds == null
+      ? data.items
+      : data.items.filter((job) => kinds.includes(job.kind));
+  if (items.length === 0)
     return (
       <Empty className="border">
         <EmptyHeader>
@@ -60,7 +78,7 @@ export function RecentReports({ projectId }: { projectId: string }) {
     );
   return (
     <ul className="divide-y rounded-xl border" aria-label="Recent reports">
-      {data.items.map((job) => (
+      {items.map((job) => (
         <li
           key={job.id}
           className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"

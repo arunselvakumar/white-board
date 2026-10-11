@@ -42,6 +42,7 @@ import {
   equipmentSummary,
   placeLabel,
 } from "./equipment-format";
+import { EquipmentReportsButton } from "./equipment-reports-dialog";
 import {
   EQUIPMENTS_PATH,
   equipmentModulePath,
@@ -251,12 +252,21 @@ export function EquipmentRegister() {
   const { data: options } = useQuery(equipmentFormOptionsQuery());
   const canAdd =
     access != null && canInSiteWork(access, "masters.equipments", "create");
+  const canReport =
+    access != null && canInSiteWork(access, "masters.equipments", "report");
   const addButton = canAdd ? (
     <Link href={`${EQUIPMENTS_PATH}/new`} className={buttonVariants()}>
       <Plus aria-hidden="true" />
       Add Equipment
     </Link>
   ) : null;
+  const actions =
+    canAdd || canReport ? (
+      <div className="flex flex-wrap gap-2">
+        {canReport ? <EquipmentReportsButton /> : null}
+        {addButton}
+      </div>
+    ) : null;
   const placeItems = [
     { value: ALL, label: "Anywhere" },
     { value: "warehouse", label: WAREHOUSE_LABEL },
@@ -272,7 +282,7 @@ export function EquipmentRegister() {
           back={{ label: "Masters", href: "/app/masters" }}
           title="Equipments"
           meta="Machines the Company owns or hires, where each one is, and whether it can take a usage sheet."
-          actions={addButton}
+          actions={actions}
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <MasterSearch

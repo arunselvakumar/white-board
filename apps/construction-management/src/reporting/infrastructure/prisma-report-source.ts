@@ -14,6 +14,8 @@ import {
 } from "../domain/labour-days";
 import type { ReportLedgerEntry } from "../domain/ledger-summary";
 import type { DateRange } from "../domain/report-period";
+// Site work reports (CM-605, CM-608).
+import { prismaSiteWorkReportSource } from "./prisma-site-work-report-source";
 
 /**
  * The reports' reads of other contexts' tables (labour, masters, projects,
@@ -163,6 +165,9 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
   }
 
   return {
+    // Site work reports (CM-605, CM-608).
+    ...prismaSiteWorkReportSource(db),
+
     async header(workspaceId, projectId) {
       const profile = await db.constructionOrganizationCompanyProfile.findFirst(
         { where: { workspaceId } },

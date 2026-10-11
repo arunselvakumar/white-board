@@ -50,6 +50,9 @@ function formatter(
   const decimal = new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 2,
   });
+  const quantity = new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 3,
+  });
   return (cell, col) => {
     if (cell == null) return "";
     if (typeof cell === "string") return printable(cell);
@@ -58,6 +61,8 @@ function formatter(
         return money.format(cell / 100);
       case "count":
         return String(cell);
+      case "quantity":
+        return quantity.format(cell);
       default:
         return decimal.format(cell);
     }

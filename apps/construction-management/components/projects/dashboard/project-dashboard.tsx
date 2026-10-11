@@ -20,9 +20,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { orderValueLabel } from "@/components/projects/project-contract";
 import {
@@ -36,7 +35,6 @@ import {
   type Duration,
 } from "@/lib/dashboard-duration";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
-import { QueryHttpError } from "@/src/queries/http";
 import {
   dashboardAttendanceQuery,
   dashboardLayoutQuery,
@@ -49,9 +47,11 @@ import { formatPaise } from "@/components/money/money-input";
 import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
 
 import { AttendanceTrend } from "./attendance-trend";
+import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
 import { DurationFilter } from "./duration-filter";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
+import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
 
 /** The KPI tiles still waiting for their milestone (Material Approvals has data). */
 const KPI_STUBS: readonly {
@@ -68,8 +68,6 @@ const KPI_STUBS: readonly {
 const STUB_TEXT: Record<string, string> = {
   task: "Project progress, value earned by tasks and tasks by status.",
   payments: "Payments in and out, due payments and the split by module.",
-  daily_work: "Labour availability and contractor-wise labour from worksheets.",
-  equipment_usage: "Top equipment by work hours, owned and rented.",
   issue_snag: "Issues and snags by status.",
   inspection_request: "Inspection requests by status and the success rate.",
   booking: "Units booked and available, and the booking report.",
@@ -77,7 +75,6 @@ const STUB_TEXT: Record<string, string> = {
 };
 
 const MILESTONE_NAMES: Record<string, string> = {
-  M6: "Daily site work (M6)",
   M7: "Finance (M7)",
   M8: "Tasks, issues and inspections (M8)",
   M10: "Sales (M10)",
@@ -85,69 +82,6 @@ const MILESTONE_NAMES: Record<string, string> = {
 
 function milestoneName(milestone: string): string {
   return MILESTONE_NAMES[milestone] ?? milestone;
-}
-
-function Section({
-  id,
-  title,
-  children,
-  aside,
-}: {
-  id: string;
-  title: string;
-  children: ReactNode;
-  aside?: ReactNode;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className="bg-card min-w-0 space-y-4 rounded-xl border p-4 sm:p-6"
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id={id} className="font-semibold">
-          {title}
-        </h2>
-        {aside}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function Fact({
-  label,
-  icon: Icon,
-  children,
-}: {
-  label: string;
-  icon?: LucideIcon;
-  children: ReactNode;
-}) {
-  return (
-    <div className="bg-muted/40 min-w-0 rounded-lg px-3 py-2.5">
-      <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        {Icon == null ? null : <Icon aria-hidden="true" className="size-3.5" />}
-        {label}
-      </dt>
-      <dd className="mt-0.5 text-sm font-medium break-words tabular-nums">
-        {children}
-      </dd>
-    </div>
-  );
-}
-
-function SectionSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-2 lg:grid-cols-4" aria-busy="true">
-      {[0, 1, 2, 3].map((index) => (
-        <Skeleton key={index} className="h-14 rounded-lg" />
-      ))}
-    </div>
-  );
-}
-
-function denied(error: unknown): boolean {
-  return error instanceof QueryHttpError && error.status === 403;
 }
 
 /** Dates, status, type, budget (Financial) and what the Project holds. */
@@ -459,8 +393,9 @@ function MaterialsSection({
 /**
  * The Project Dashboard (CM-412, ADR CM-0013 §12): the duration filter
  * (last 12 months by default), the four KPI tiles, and the member's
- * sections in their order. Project summary and Attendance have data;
- * the rest name the milestone that fills them. Manage Dashboard shows,
+ * sections in their order. Project summary, Attendance, Daily Work,
+ * Equipment Usage and Materials have data; the rest name the milestone
+ * that fills them. Manage Dashboard shows,
  * hides and reorders sections for the member on every Project.
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
@@ -514,6 +449,22 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
             if (section.key === "attendance")
               return problem == null ? (
                 <AttendanceSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "daily_work")
+              return problem == null ? (
+                <DailyWorkSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "equipment_usage")
+              return problem == null ? (
+                <EquipmentUsageSection
                   key={section.key}
                   projectId={projectId}
                   duration={duration}

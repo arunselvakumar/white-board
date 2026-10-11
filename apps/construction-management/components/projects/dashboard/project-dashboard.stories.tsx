@@ -14,6 +14,13 @@ import { addDays } from "@/src/shared-kernel/calendar-date";
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import { KUMARI } from "../project-fixtures";
 import { ProjectDashboard } from "./project-dashboard";
+import {
+  dailyWork,
+  EMPTY_EQUIPMENT_USAGE,
+  emptyDailyWork,
+  equipmentUsage,
+  SITE_WORK_DASHBOARD_PATH,
+} from "./site-work-dashboard-fixtures";
 
 const SUMMARY_PATH = `/api/construction/projects/projects/${KUMARI.id}/dashboard/summary`;
 const LAYOUT_PATH = "/api/construction/projects/dashboard-layout";
@@ -121,6 +128,8 @@ function serve(
     summary?: ProjectSummary;
     labour?: "ok" | "forbidden";
     procurement?: ProcurementDashboard;
+    /** The Daily Work and Equipment Usage sections (CM-608). */
+    siteWork?: "data" | "empty" | "without_financial" | "forbidden";
   } = {},
 ) {
   return () => {
@@ -147,6 +156,28 @@ function serve(
         return Response.json(options.summary ?? summary());
       if (method === "GET" && path.startsWith(PROCUREMENT_PATH))
         return Response.json(options.procurement ?? procurement());
+      if (method === "GET" && path.startsWith(SITE_WORK_DASHBOARD_PATH)) {
+        const siteWork = options.siteWork ?? "data";
+        if (siteWork === "forbidden")
+          return Response.json(
+            { code: "PERMISSION_DENIED", message: "No." },
+            { status: 403 },
+          );
+        const query = new URL(path, "http://storybook.local").searchParams;
+        const from = query.get("from") ?? "";
+        const to = query.get("to") ?? "";
+        if (path.startsWith(`${SITE_WORK_DASHBOARD_PATH}/daily-work`))
+          return Response.json(
+            siteWork === "empty"
+              ? emptyDailyWork(from, to)
+              : dailyWork(from, to),
+          );
+        return Response.json(
+          siteWork === "empty"
+            ? EMPTY_EQUIPMENT_USAGE
+            : equipmentUsage(siteWork === "data"),
+        );
+      }
       if (method === "GET" && path.startsWith(LABOUR_PATH)) {
         if (options.labour === "forbidden")
           return Response.json(
@@ -244,6 +275,100 @@ export const WithFinancial: Story = {
     await expect(regions).toEqual(
       DASHBOARD_SECTIONS.map((section) => section.label),
     );
+  },
+};
+
+/** Daily Work and Equipment Usage with data and Financial (CM-608). */
+export const SiteWorkSections: Story = {
+  play: async ({ canvas }) => {
+    const daily = within(
+      await canvas.findByRole("region", { name: "Daily Work" }),
+    );
+    await expect(await daily.findByText("214")).toBeVisible();
+    await expect(daily.getByText("Pending approval")).toBeVisible();
+    await expect(
+      daily.getByRole("figure", { name: "Labour availability per day" }),
+    ).toBeVisible();
+    const legend = within(daily.getByRole("list", { name: "Legend" }));
+    await expect(legend.getByText("On worksheets")).toBeVisible();
+    await expect(legend.getByText("In attendance")).toBeVisible();
+    const contractors = within(
+      daily.getByRole("table", { name: "Contractor-wise labour" }),
+    );
+    await expect(
+      contractors.getByRole("rowheader", { name: /Velan Constructions/ }),
+    ).toBeVisible();
+    await expect(contractors.getByText("1067")).toBeVisible();
+    await expect(contractors.getByText("A removed Contractor")).toBeVisible();
+    await expect(
+      daily.getByRole("link", { name: "Worksheets" }),
+    ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/worksheets`);
+
+    const equipment = within(
+      canvas.getByRole("region", { name: "Equipment Usage" }),
+    );
+    await expect(await equipment.findByText("612.5 hrs")).toBeVisible();
+    await expect(equipment.getByText("1,840.25 km")).toBeVisible();
+    await expect(equipment.getByText("Hire cost (rented)")).toBeVisible();
+    await expect(equipment.getByText("₹7,42,500.00")).toBeVisible();
+    const top = within(
+      equipment.getByRole("figure", { name: "Top equipment by work hours" }),
+    );
+    await expect(top.getAllByRole("listitem")).toHaveLength(4);
+    await expect(top.getByText("214.5 hrs")).toBeVisible();
+    const split = within(
+      equipment.getByRole("figure", { name: "Owned vs rented hours" }),
+    );
+    await expect(split.getByText("354.5 hrs")).toBeVisible();
+    await expect(split.getByText("258 hrs")).toBeVisible();
+  },
+};
+
+/** No worksheets or usage sheets in the period. */
+export const SiteWorkEmpty: Story = {
+  beforeEach: serve({ siteWork: "empty" }),
+  play: async ({ canvas }) => {
+    const daily = within(
+      await canvas.findByRole("region", { name: "Daily Work" }),
+    );
+    await expect(
+      await daily.findByText("No worksheets in this period."),
+    ).toBeVisible();
+    const equipment = within(
+      canvas.getByRole("region", { name: "Equipment Usage" }),
+    );
+    await expect(
+      await equipment.findAllByText(
+        "No hourly equipment worked in this period.",
+      ),
+    ).toHaveLength(2);
+  },
+};
+
+/** Without Financial on Equipment Usage the hire cost is not shown. */
+export const SiteWorkWithoutFinancial: Story = {
+  beforeEach: serve({ siteWork: "without_financial" }),
+  play: async ({ canvas }) => {
+    const equipment = within(
+      await canvas.findByRole("region", { name: "Equipment Usage" }),
+    );
+    await expect(await equipment.findByText("612.5 hrs")).toBeVisible();
+    await expect(equipment.queryByText("Hire cost (rented)")).toBeNull();
+  },
+};
+
+/** Without the Dashboard permission the sections say what is needed. */
+export const SiteWorkNeedsPermission: Story = {
+  beforeEach: serve({ siteWork: "forbidden" }),
+  play: async ({ canvas }) => {
+    const daily = within(
+      await canvas.findByRole("region", { name: "Daily Work" }),
+    );
+    await expect(
+      await daily.findByText(
+        "Daily Work needs the Dashboard permission on this Project.",
+      ),
+    ).toBeVisible();
   },
 };
 
@@ -414,6 +539,13 @@ export const Phone: Story = {
     await within(
       await canvas.findByRole("region", { name: "Attendance" }),
     ).findByRole("figure");
+    await within(canvas.getByRole("region", { name: "Daily Work" })).findByRole(
+      "table",
+      { name: "Contractor-wise labour" },
+    );
+    await within(
+      canvas.getByRole("region", { name: "Equipment Usage" }),
+    ).findByRole("figure", { name: "Top equipment by work hours" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

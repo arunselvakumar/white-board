@@ -742,6 +742,16 @@ Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projec
 - Project GST state: optional on the Project form; left out keeps what is stored, `null` clears it.
 - Retired GST state codes (25, 28) are refused on billing addresses and Projects; a party with a GSTIN keeps the GSTIN's state even if retired. A member with only View Quotations may open quotation files; quotations are not in a Project Gallery.
 
+### CM-601 — Work Types and Labour Category skill
+
+- Menu `masters.work_types` (CRUD, Company-level), Masters → **Work Types**. Routes `/api/construction/masters/work-types`: list (`?status=`), add, `{id}`, `{id}/update`, `{id}/disable`, `{id}/enable`, `{id}/delete`. The list is by name and not paged.
+- A Work Type has a name (at most 120, spaces collapsed, unique among live Work Types ignoring case — 409 `WORK_TYPE_NAME_IN_USE`), a **Department** (a live one, 400 `DEPARTMENT_NOT_FOUND`; a disabled one only if already chosen, `DEPARTMENT_DISABLED`) and **assigned Materials** (at most 200; 400 `MATERIAL_NOT_FOUND` / `MATERIAL_DISABLED`, a disabled one already assigned stays). Update replaces the whole list. The assignment is a filter only: no quantity or coefficient (open question 14).
+- The seed **RCC** (under the RCC department) keeps its name and Department (409 `SEED_IS_READ_ONLY`) and is never deleted, but can be disabled and given Materials.
+- Delete is refused while a live Daily Worksheet names the Work Type (409 `WORK_TYPE_IN_USE`). Deleting a Material simply unassigns it.
+- The screen needs Departments Read for its Department picker, as the Contractor form does. The material picker (`materials/options`) is also open to Work Types Read.
+- **Labour Categories carry a skill** (Skilled / Unskilled; seed Helper, Labour and Unskilled are unskilled). Create defaults to skilled; update leaves it when left out. A seed category keeps its name, but its skill may change (Edit on the row), because the skill is how worksheets count heads, not what the row is.
+- In use, so not deletable (site work, CM-0016 §7): a Department on a Work Type or a live worksheet or usage sheet (`DEPARTMENT_IN_USE`); a Contractor on a live worksheet, usage sheet or hindrance, or the hire party of live equipment (`CONTRACTOR_IN_USE`); a Material on a line of a live worksheet or usage sheet (`MATERIAL_IN_USE`). Site work is read through `src/composition/site-work-usage.ts`.
+
 ## Open questions
 
 1. Are Departments, Units and Categories per company or global with company additions only? Can a company rename a seed?

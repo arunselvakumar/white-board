@@ -1,4 +1,8 @@
 import { procurementPartyUsage } from "@/src/composition/procurement-usage";
+import {
+  anyUsage,
+  siteWorkPartyUsage,
+} from "@/src/composition/site-work-usage";
 import { createPartyHandlers } from "@/src/masters/infrastructure/create-party-handlers";
 
 import { partyRoutes } from "../_lib/party-routes";
@@ -11,7 +15,7 @@ import {
 export const contractorRoutes = partyRoutes({
   menu: "masters.contractors",
   handlers: createPartyHandlers("contractor", {
-    usage: procurementPartyUsage(),
+    usage: anyUsage(procurementPartyUsage(), siteWorkPartyUsage()),
   }),
   models: {
     create: CreateConstructionMastersContractorRequestModel,

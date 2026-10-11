@@ -5,7 +5,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import { storedLocationRef } from "@/src/shared-kernel/location-ref";
 
 import type {
   StoredWorksheet,
@@ -49,7 +49,7 @@ function toStored(row: Row): StoredWorksheet {
     unskilledCount: row.unskilledCount,
     approxWorkQty: row.approxWorkQty?.toFixed(3) ?? null,
     approxWorkUnitId: row.approxWorkUnitId,
-    siteLocation: (row.siteLocation as LocationRef | null) ?? null,
+    siteLocation: storedLocationRef(row.siteLocation),
     remark: row.remark,
     approval: {
       status: row.approvalStatus,
@@ -95,14 +95,25 @@ function contentColumns(row: WorksheetRow) {
       row.approxWorkQty == null ? null : new Prisma.Decimal(row.approxWorkQty),
     approxWorkUnitId: row.approxWorkUnitId,
     siteLocationType: row.siteLocation?.type ?? null,
-    siteLocation:
-      row.siteLocation == null
-        ? Prisma.DbNull
-        : (JSON.parse(
+    // No location is left out here and written as SQL NULL by
+    // `clearSiteLocation`: `next dev` turns `Prisma.DbNull` into `{}`.
+    ...(row.siteLocation == null
+      ? {}
+      : {
+          siteLocation: JSON.parse(
             JSON.stringify(row.siteLocation),
-          ) as Prisma.InputJsonValue),
+          ) as Prisma.InputJsonValue,
+        }),
     remark: row.remark,
   };
+}
+
+/** Writes SQL NULL to `site_location` (never `{}`, whatever the bundle). */
+async function clearSiteLocation(db: Db, id: string): Promise<void> {
+  await db.$executeRaw(Prisma.sql`
+    UPDATE construction_site_work.worksheets
+    SET site_location = NULL
+    WHERE id = ${id}::uuid`);
 }
 
 function lineRows(row: WorksheetRow) {
@@ -184,6 +195,7 @@ export class PrismaWorksheetStore implements WorksheetStore {
         materials: { create: lineRows(row) },
       },
     });
+    if (row.siteLocation == null) await clearSiteLocation(db, id);
   }
 
   async setApproval(

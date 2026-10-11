@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { siteDiaryPath, siteDiaryQuery } from "@/src/queries/site-diary";
 
 import { SiteDiaryForm } from "./site-diary-form";
@@ -19,7 +19,7 @@ export function SiteDiaryNew({
 }) {
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PageHeader
+      <SiteRecordHeader
         back={{ label: "Site Diary", href: siteDiaryPath(projectId, date) }}
         title="Write the diary"
       />
@@ -39,7 +39,7 @@ export function SiteDiaryEdit({
   const { data } = useSuspenseQuery(siteDiaryQuery(diaryId));
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PageHeader
+      <SiteRecordHeader
         back={{
           label: "Site Diary",
           href: siteDiaryPath(projectId, data.diaryDate),

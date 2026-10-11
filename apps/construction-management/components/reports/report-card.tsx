@@ -14,6 +14,13 @@ import {
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Spinner } from "@repo/ui/components/spinner";
 
 import {
@@ -24,11 +31,33 @@ import {
 import { monthStart, type ReportDefinition } from "./report-catalogue";
 import { ReportDownloads } from "./report-downloads";
 
+/** Options for a card's optional filter; "all" is no filter. */
+export type ReportFilterOption = { value: string; label: string };
+
+const ALL = "all";
+
+const FILTER_LABELS: Record<NonNullable<ReportDefinition["filter"]>, string> = {
+  contractor: "Contractor",
+  equipment: "Equipment",
+};
+
+const FILTER_ALL_LABELS: Record<
+  NonNullable<ReportDefinition["filter"]>,
+  string
+> = {
+  contractor: "All contractors",
+  equipment: "All equipment",
+};
+
 function requestFor(
   definition: ReportDefinition,
-  projectId: string,
+  scope: string | null,
   period: { from: string; to: string; month: string },
+  filter: string | null,
 ): RequestReportInput {
+  // Only the central kinds are ever shown without a Project.
+  const projectId = scope ?? "";
+  const range = { from: period.from, to: period.to };
   switch (definition.kind) {
     case "labour_month":
     case "muster_roll":
@@ -45,6 +74,23 @@ function requestFor(
         projectId,
         params: { from: period.from, to: period.to },
       };
+    // Site work reports (CM-605, CM-608).
+    case "daily_work":
+      return {
+        kind: definition.kind,
+        projectId,
+        params: filter == null ? range : { ...range, contractorId: filter },
+      };
+    case "owned_equipment_usage":
+    case "rented_equipment_usage":
+      return {
+        kind: definition.kind,
+        projectId,
+        params: filter == null ? range : { ...range, equipmentId: filter },
+      };
+    case "equipment_maintenance":
+    case "equipment_transfers":
+      return { kind: definition.kind, projectId: scope, params: range };
   }
 }
 
@@ -57,23 +103,42 @@ export function ReportCard({
   definition,
   projectId,
   today,
+  filterOptions = [],
 }: {
   definition: ReportDefinition;
-  projectId: string;
+  /** Null for a central report (Masters → Equipments). */
+  projectId: string | null;
   today: string;
+  /** Choices for `definition.filter`; the filter shows only with some. */
+  filterOptions?: readonly ReportFilterOption[];
 }) {
   const id = useId();
   const [from, setFrom] = useState(monthStart(today));
   const [to, setTo] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
+  const [filter, setFilter] = useState(ALL);
   const mutation = useRequestReport(projectId);
   const job = mutation.data;
   const rangeInvalid = definition.period === "range" && from > to;
+  const filterItems =
+    definition.filter == null || filterOptions.length === 0
+      ? null
+      : [
+          { value: ALL, label: FILTER_ALL_LABELS[definition.filter] },
+          ...filterOptions,
+        ];
 
   function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (rangeInvalid) return;
-    mutation.mutate(requestFor(definition, projectId, { from, to, month }));
+    mutation.mutate(
+      requestFor(
+        definition,
+        projectId,
+        { from, to, month },
+        filterItems == null || filter === ALL ? null : filter,
+      ),
+    );
   }
 
   return (
@@ -138,6 +203,32 @@ export function ReportCard({
                 }}
                 required
               />
+            </div>
+          )}
+
+          {filterItems == null || definition.filter == null ? null : (
+            <div className="space-y-1.5">
+              <Label htmlFor={`${id}-filter`}>
+                {FILTER_LABELS[definition.filter]}
+              </Label>
+              <Select
+                items={filterItems}
+                value={filter}
+                onValueChange={(next) => {
+                  if (next != null) setFilter(next);
+                }}
+              >
+                <SelectTrigger id={`${id}-filter`} className="h-10 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="start" alignItemWithTrigger={false}>
+                  {filterItems.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 

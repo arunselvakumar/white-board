@@ -16,7 +16,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
+import { RadioGroup } from "@repo/ui/components/radio-group";
 import {
   Select,
   SelectContent,
@@ -48,6 +48,8 @@ import {
   MAINTENANCE_KIND_LABELS,
   MAINTENANCE_KINDS,
 } from "@/src/site-work/domain/equipment-lifecycle";
+
+import { RadioCard } from "./radio-card";
 
 type Maintenance = EquipmentDetail["maintenance"][number];
 
@@ -201,25 +203,22 @@ export function TransferDialog({
                 }}
                 className="grid gap-2 sm:grid-cols-2"
               >
-                <div className="flex items-center gap-2 rounded-lg border p-3">
-                  <RadioGroupItem id="transfer-to-project" value="to_project" />
-                  <Label htmlFor="transfer-to-project" className="font-normal">
-                    Transfer to Project
-                  </Label>
-                </div>
-                <div className="flex items-center gap-2 rounded-lg border p-3">
-                  <RadioGroupItem
-                    id="transfer-to-warehouse"
-                    value="to_warehouse"
-                    disabled={atWarehouse}
-                  />
-                  <Label
-                    htmlFor="transfer-to-warehouse"
-                    className="font-normal"
-                  >
-                    Transfer to Warehouse
-                  </Label>
-                </div>
+                <RadioCard
+                  value="to_project"
+                  title="Transfer to Project"
+                  onSelect={(value) => {
+                    field.onChange(value);
+                  }}
+                />
+                <RadioCard
+                  value="to_warehouse"
+                  title="Transfer to Warehouse"
+                  hint={atWarehouse ? "It is already there." : undefined}
+                  disabled={atWarehouse}
+                  onSelect={(value) => {
+                    field.onChange(value);
+                  }}
+                />
               </RadioGroup>
             )}
           />

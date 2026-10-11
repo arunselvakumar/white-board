@@ -87,6 +87,19 @@ export const Pending: Story = {
   },
 };
 
+/** Approve: the badge turns Approved at once and the approve actions go. */
+export const Approve: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Approve" }),
+    );
+    await expect(await canvas.findByText("Approved")).toBeVisible();
+    await expect(canvas.queryByText("Pending")).toBeNull();
+    await expect(canvas.queryByRole("button", { name: "Approve" })).toBeNull();
+    await expect(canvas.getByText("Approved by")).toBeVisible();
+  },
+};
+
 /** Reject asks for a reason. */
 export const Reject: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {

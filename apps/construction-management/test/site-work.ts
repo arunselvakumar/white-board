@@ -39,11 +39,32 @@ const sharedAudit = (by: string) => ({ createdBy: by, updatedBy: by });
 
 export type SharedDocumentRow = { id: string; label: string };
 
+/** Masters a row names; random ids when left out. */
+export type SharedRefs = {
+  contractorId?: string;
+  departmentId?: string;
+  workTypeId?: string;
+  /** Material lines (worksheet and usage sheet). */
+  materialIds?: readonly string[];
+};
+
+function sharedLines(materialIds: readonly string[] = []) {
+  return materialIds.map((materialId, index) => ({
+    id: randomUUID(),
+    materialId,
+    materialName: "Cement OPC 53",
+    unitName: "Bag",
+    quantity: "1",
+    sortOrder: index,
+  }));
+}
+
 /** A live Daily Worksheet on the Project. */
 export async function sharedAddWorksheetRow(
   workspaceId: string,
   by: string,
   projectId: string,
+  refs: SharedRefs = {},
 ): Promise<SharedDocumentRow> {
   const id = randomUUID();
   const number = sharedNumber("WS");
@@ -55,20 +76,26 @@ export async function sharedAddWorksheetRow(
       number,
       sheetDate: SHARED_DAY,
       shift: "shift_1",
-      contractorId: randomUUID(),
-      departmentId: randomUUID(),
+      contractorId: refs.contractorId ?? randomUUID(),
+      departmentId: refs.departmentId ?? randomUUID(),
+      workTypeId: refs.workTypeId ?? null,
       ...sharedAudit(by),
+      materials: { create: sharedLines(refs.materialIds) },
     },
   });
   return { id, label: number };
 }
 
-/** A live Equipment Usage sheet on the Project, with its own equipment. */
-export async function sharedAddEquipmentUsageRow(
+/**
+ * Live owned equipment at the Project, or rented from `hirePartyId` (a
+ * Contractor) when given.
+ */
+export async function sharedAddEquipmentRow(
   workspaceId: string,
   by: string,
   projectId: string,
-): Promise<SharedDocumentRow> {
+  hirePartyId?: string,
+): Promise<string> {
   const equipmentId = randomUUID();
   await prisma.constructionSiteWorkEquipment.create({
     data: {
@@ -76,13 +103,27 @@ export async function sharedAddEquipmentUsageRow(
       workspaceId,
       name: "JCB 3DX",
       equipmentNumber: `TN-${randomUUID().slice(0, 8)}`,
-      ownership: "owned",
+      ownership: hirePartyId == null ? "owned" : "rented",
       utilisationBasis: "hourly",
       workingTimeMethod: "time_shifts",
       currentProjectId: projectId,
+      ...(hirePartyId == null
+        ? {}
+        : { hirePartyId, hireBasis: "hourly" as const, hireRate: 120_000n }),
       ...sharedAudit(by),
     },
   });
+  return equipmentId;
+}
+
+/** A live Equipment Usage sheet on the Project, with its own equipment. */
+export async function sharedAddEquipmentUsageRow(
+  workspaceId: string,
+  by: string,
+  projectId: string,
+  refs: SharedRefs = {},
+): Promise<SharedDocumentRow> {
+  const equipmentId = await sharedAddEquipmentRow(workspaceId, by, projectId);
   const id = randomUUID();
   const number = sharedNumber("EU");
   await prisma.constructionSiteWorkEquipmentUsageSheet.create({
@@ -97,7 +138,10 @@ export async function sharedAddEquipmentUsageRow(
       ownership: "owned",
       utilisationBasis: "hourly",
       workingTimeMethod: "time_shifts",
+      contractorId: refs.contractorId ?? null,
+      departmentId: refs.departmentId ?? null,
       ...sharedAudit(by),
+      materials: { create: sharedLines(refs.materialIds) },
     },
   });
   return { id, label: number };
@@ -123,11 +167,12 @@ export async function sharedAddSiteDiaryRow(
   return { id, label: date };
 }
 
-/** A live Hindrance on the Project. */
+/** A live Hindrance on the Project (the Contractor's when given). */
 export async function sharedAddHindranceRow(
   workspaceId: string,
   by: string,
   projectId: string,
+  refs: Pick<SharedRefs, "contractorId"> = {},
 ): Promise<SharedDocumentRow> {
   const id = randomUUID();
   const number = sharedNumber("HR");
@@ -140,7 +185,12 @@ export async function sharedAddHindranceRow(
       startDate: SHARED_DAY,
       cause: "weather",
       affectedActivity: "Slab casting, 3rd floor",
-      responsibleParty: "force_majeure",
+      ...(refs.contractorId == null
+        ? { responsibleParty: "force_majeure" as const }
+        : {
+            responsibleParty: "contractor" as const,
+            contractorId: refs.contractorId,
+          }),
       ...sharedAudit(by),
     },
   });
@@ -643,4 +693,440 @@ export async function equipmentSheetRow(
     },
   });
   return id;
+}
+
+// ---------------------------------------------------------------------------
+// Reports and dashboard (CM-605, CM-608): rows written straight to the
+// site-work tables with the figures the reports read.
+// ---------------------------------------------------------------------------
+
+function reportsAudit(by: string) {
+  const now = new Date();
+  return { createdAt: now, updatedAt: now, createdBy: by, updatedBy: by };
+}
+
+/** A live Daily Worksheet with labour counts, materials and photo rows. */
+export async function reportsWorksheet(
+  workspaceId: string,
+  by: string,
+  input: {
+    projectId: string;
+    sheetDate: CalendarDate;
+    contractorId: string;
+    departmentId: string;
+    skilled?: number | null;
+    unskilled?: number | null;
+    shift?: "shift_1" | "shift_2" | "shift_3";
+    approval?: "not_required" | "pending" | "approved" | "rejected";
+    location?: { type: "location"; locationId: string } | null;
+    approxWorkQty?: string | null;
+    approxWorkUnitId?: string | null;
+    materials?: readonly { name: string; unit: string; quantity: string }[];
+    photos?: number;
+    remark?: string | null;
+    deleted?: boolean;
+  },
+): Promise<{ id: string; number: string }> {
+  const id = randomUUID();
+  const number = `WS/${id.slice(0, 8)}`;
+  await prisma.constructionSiteWorkWorksheet.create({
+    data: {
+      id,
+      workspaceId,
+      projectId: input.projectId,
+      number,
+      sheetDate: calendarDateToDb(input.sheetDate),
+      shift: input.shift ?? "shift_1",
+      contractorId: input.contractorId,
+      departmentId: input.departmentId,
+      skilledCount: input.skilled ?? null,
+      unskilledCount: input.unskilled ?? null,
+      approvalStatus: input.approval ?? "not_required",
+      rejectionReason: input.approval === "rejected" ? "Counts wrong" : null,
+      siteLocationType: input.location?.type ?? null,
+      siteLocation: input.location == null ? undefined : { ...input.location },
+      approxWorkQty: input.approxWorkQty ?? null,
+      approxWorkUnitId: input.approxWorkUnitId ?? null,
+      remark: input.remark ?? null,
+      ...reportsAudit(by),
+      deletedAt: input.deleted === true ? new Date() : null,
+      deletedBy: input.deleted === true ? by : null,
+      materials: {
+        create: (input.materials ?? []).map((line, index) => ({
+          id: randomUUID(),
+          materialId: randomUUID(),
+          materialName: line.name,
+          unitName: line.unit,
+          quantity: line.quantity,
+          sortOrder: index,
+        })),
+      },
+    },
+  });
+  for (let index = 0; index < (input.photos ?? 0); index += 1)
+    await prisma.constructionSiteWorkDocumentFile.create({
+      data: {
+        id: randomUUID(),
+        workspaceId,
+        documentType: "worksheet",
+        documentId: id,
+        fileKey: `test/${randomUUID()}.png`,
+        fileName: `photo-${String(index + 1)}.png`,
+        contentType: "image/png",
+        bytes: 64,
+        createdBy: by,
+      },
+    });
+  return { id, number };
+}
+
+/**
+ * Equipment and its first movement (`added` at a Project or the
+ * warehouse on `placedOn`).
+ */
+export async function reportsEquipment(
+  workspaceId: string,
+  by: string,
+  input: {
+    name: string;
+    projectId: string | null;
+    placedOn: CalendarDate;
+    ownership?: "owned" | "rented";
+    utilisationBasis?: "hourly" | "km" | "trip";
+    purchaseYear?: number | null;
+    hirePartyId?: string | null;
+    hireBasis?: "hourly" | "daily" | "monthly" | "trip" | null;
+    hireRate?: bigint | null;
+  },
+): Promise<{ id: string; equipmentNumber: string }> {
+  const id = randomUUID();
+  const equipmentNumber = `TN-${id.slice(0, 8)}`;
+  await prisma.constructionSiteWorkEquipment.create({
+    data: {
+      id,
+      workspaceId,
+      name: input.name,
+      equipmentNumber,
+      ownership: input.ownership ?? "owned",
+      purchaseYear: input.purchaseYear ?? null,
+      fuelType: "diesel",
+      fuelUnit: "litre",
+      utilisationBasis: input.utilisationBasis ?? "hourly",
+      workingTimeMethod: "time_shifts",
+      hirePartyId: input.hirePartyId ?? null,
+      hireBasis: input.hireBasis ?? null,
+      hireRate: input.hireRate ?? null,
+      currentProjectId: input.projectId,
+      ...reportsAudit(by),
+    },
+  });
+  await reportsMovement(workspaceId, by, {
+    equipmentId: id,
+    kind: "added",
+    movementDate: input.placedOn,
+    fromProjectId: null,
+    toProjectId: input.projectId,
+    locationName: input.projectId == null ? "Warehouse / off system" : "Site",
+  });
+  return { id, equipmentNumber };
+}
+
+/** A movement row; `createdAt` follows the call order. */
+export async function reportsMovement(
+  workspaceId: string,
+  by: string,
+  input: {
+    equipmentId: string;
+    kind: "added" | "to_project" | "to_warehouse";
+    movementDate: CalendarDate;
+    fromProjectId: string | null;
+    toProjectId: string | null;
+    locationName: string;
+    remark?: string | null;
+  },
+): Promise<void> {
+  await prisma.constructionSiteWorkEquipmentMovement.create({
+    data: {
+      id: randomUUID(),
+      workspaceId,
+      equipmentId: input.equipmentId,
+      kind: input.kind,
+      movementDate: calendarDateToDb(input.movementDate),
+      fromProjectId: input.fromProjectId,
+      toProjectId: input.toProjectId,
+      locationName: input.locationName,
+      remark: input.remark ?? null,
+      createdAt: new Date(),
+      createdBy: by,
+    },
+  });
+  if (input.kind !== "added")
+    await prisma.constructionSiteWorkEquipment.update({
+      where: { id: input.equipmentId },
+      data: { currentProjectId: input.toProjectId },
+    });
+}
+
+/** A maintenance entry; open when `endDate` is left out. */
+export async function reportsMaintenance(
+  workspaceId: string,
+  by: string,
+  input: {
+    equipmentId: string;
+    startDate: CalendarDate;
+    endDate?: CalendarDate | null;
+    kind?: "breakdown" | "service" | "repair" | "other";
+    cost?: bigint | null;
+    workshop?: string | null;
+    description?: string | null;
+  },
+): Promise<void> {
+  await prisma.constructionSiteWorkEquipmentMaintenance.create({
+    data: {
+      id: randomUUID(),
+      workspaceId,
+      equipmentId: input.equipmentId,
+      kind: input.kind ?? "service",
+      startDate: calendarDateToDb(input.startDate),
+      endDate: input.endDate == null ? null : calendarDateToDb(input.endDate),
+      cost: input.cost ?? null,
+      workshop: input.workshop ?? "Sri Balaji Motors",
+      description: input.description ?? null,
+      ...reportsAudit(by),
+    },
+  });
+}
+
+/** A live Equipment Usage sheet with the figures the reports and dashboard read. */
+export async function reportsUsageSheet(
+  workspaceId: string,
+  by: string,
+  input: {
+    equipmentId: string;
+    projectId: string;
+    sheetDate: CalendarDate;
+    ownership?: "owned" | "rented";
+    utilisationBasis?: "hourly" | "km" | "trip";
+    shift?: "shift_1" | "shift_2" | "shift_3";
+    operatorName?: string | null;
+    contractorId?: string | null;
+    usageHours?: string | null;
+    distanceKm?: string | null;
+    trips?: number | null;
+    idleHours?: string;
+    breakdownHours?: string;
+    fuelQty?: string | null;
+    fuelOverrun?: boolean;
+    unitRate?: bigint | null;
+    billableQty?: string | null;
+    hireCost?: bigint | null;
+    approval?: "not_required" | "pending" | "approved" | "rejected";
+    deleted?: boolean;
+  },
+): Promise<{ id: string; number: string }> {
+  const id = randomUUID();
+  const number = `EU/${id.slice(0, 8)}`;
+  await prisma.constructionSiteWorkEquipmentUsageSheet.create({
+    data: {
+      id,
+      workspaceId,
+      projectId: input.projectId,
+      number,
+      sheetDate: calendarDateToDb(input.sheetDate),
+      shift: input.shift ?? "shift_1",
+      equipmentId: input.equipmentId,
+      ownership: input.ownership ?? "owned",
+      utilisationBasis: input.utilisationBasis ?? "hourly",
+      workingTimeMethod: "time_shifts",
+      operatorName: input.operatorName ?? null,
+      contractorId: input.contractorId ?? null,
+      usageHours: input.usageHours ?? null,
+      distanceKm: input.distanceKm ?? null,
+      trips: input.trips ?? null,
+      idleHours: input.idleHours ?? "0",
+      breakdownHours: input.breakdownHours ?? "0",
+      fuelQty: input.fuelQty ?? null,
+      fuelBorneBy: input.fuelQty == null ? null : "company",
+      fuelOverrun: input.fuelOverrun ?? false,
+      unitRate: input.unitRate ?? null,
+      billableQty: input.billableQty ?? null,
+      hireCost: input.hireCost ?? null,
+      approvalStatus: input.approval ?? "not_required",
+      rejectionReason: input.approval === "rejected" ? "Hours wrong" : null,
+      ...reportsAudit(by),
+      deletedAt: input.deleted === true ? new Date() : null,
+      deletedBy: input.deleted === true ? by : null,
+    },
+  });
+  return { id, number };
+}
+
+// ---------------------------------------------------------------------------
+// Progress reports (CM-606): rows for the Daily Progress Report's read
+// model, written straight to the tables with the columns it reads.
+// ---------------------------------------------------------------------------
+
+const progressDay = (date: string) => new Date(`${date}T00:00:00.000Z`);
+
+/** A live Department (masters). */
+export async function progressAddDepartment(
+  workspaceId: string,
+  by: string,
+  name = `RCC ${randomUUID().slice(0, 6)}`,
+): Promise<string> {
+  const id = randomUUID();
+  await prisma.constructionMastersDepartment.create({
+    data: { id, workspaceId, name, ...sharedAudit(by) },
+  });
+  return id;
+}
+
+/** A Labour Category with a skill (masters). */
+export async function progressAddLabourCategory(
+  workspaceId: string,
+  by: string,
+  skill: "skilled" | "unskilled",
+): Promise<string> {
+  const id = randomUUID();
+  await prisma.constructionMastersLabourCategory.create({
+    data: {
+      id,
+      workspaceId,
+      name: `${skill} ${id.slice(0, 6)}`,
+      skill,
+      ...sharedAudit(by),
+    },
+  });
+  return id;
+}
+
+/**
+ * A live Daily Worksheet on `date`, created by `createdBy`, with material
+ * lines. Contractor and Department are real rows so names resolve.
+ */
+export async function progressAddWorksheet(
+  workspaceId: string,
+  projectId: string,
+  input: {
+    date: string;
+    createdBy: string;
+    contractorId: string;
+    departmentId: string;
+    skilled?: number | null;
+    unskilled?: number | null;
+    shift?: "shift_1" | "shift_2" | "shift_3";
+    remark?: string | null;
+    approxWorkQty?: string | null;
+    approxWorkUnitId?: string | null;
+    materials?: {
+      materialId: string;
+      name: string;
+      unit: string;
+      quantity: string;
+    }[];
+  },
+): Promise<{ id: string; number: string }> {
+  const id = randomUUID();
+  const number = sharedNumber("WS");
+  await prisma.constructionSiteWorkWorksheet.create({
+    data: {
+      id,
+      workspaceId,
+      projectId,
+      number,
+      sheetDate: progressDay(input.date),
+      shift: input.shift ?? "shift_1",
+      contractorId: input.contractorId,
+      departmentId: input.departmentId,
+      skilledCount: input.skilled ?? null,
+      unskilledCount: input.unskilled ?? null,
+      approxWorkQty: input.approxWorkQty ?? null,
+      approxWorkUnitId: input.approxWorkUnitId ?? null,
+      remark: input.remark ?? null,
+      ...sharedAudit(input.createdBy),
+      materials: {
+        create: (input.materials ?? []).map((line, index) => ({
+          id: randomUUID(),
+          materialId: line.materialId,
+          materialName: line.name,
+          unitName: line.unit,
+          quantity: line.quantity,
+          sortOrder: index,
+        })),
+      },
+    },
+  });
+  return { id, number };
+}
+
+/**
+ * A live Equipment Usage sheet on `date`, created by `createdBy`, on its
+ * own equipment; rented sheets carry a hire cost in paise.
+ */
+export async function progressAddUsageSheet(
+  workspaceId: string,
+  projectId: string,
+  input: {
+    date: string;
+    createdBy: string;
+    ownership?: "owned" | "rented";
+    hireCost?: bigint | null;
+    usageHours?: string | null;
+    timeShiftMinutes?: number[];
+  },
+): Promise<{ id: string; number: string; equipmentId: string }> {
+  const ownership = input.ownership ?? "owned";
+  const equipmentId = randomUUID();
+  await prisma.constructionSiteWorkEquipment.create({
+    data: {
+      id: equipmentId,
+      workspaceId,
+      name: ownership === "rented" ? "Hired JCB 3DX" : "Mixer 10/7",
+      equipmentNumber: `TN-${randomUUID().slice(0, 8)}`,
+      ownership,
+      utilisationBasis: "hourly",
+      workingTimeMethod: "time_shifts",
+      fuelType: "diesel",
+      fuelUnit: "litre",
+      ...(ownership === "rented"
+        ? { hirePartyId: randomUUID(), hireBasis: "hourly", hireRate: 100_000n }
+        : {}),
+      currentProjectId: projectId,
+      ...sharedAudit(input.createdBy),
+    },
+  });
+  const id = randomUUID();
+  const number = sharedNumber("EU");
+  await prisma.constructionSiteWorkEquipmentUsageSheet.create({
+    data: {
+      id,
+      workspaceId,
+      projectId,
+      number,
+      sheetDate: progressDay(input.date),
+      shift: "shift_1",
+      equipmentId,
+      ownership,
+      utilisationBasis: "hourly",
+      workingTimeMethod: "time_shifts",
+      operatorName: "Murugan",
+      usageHours: input.usageHours ?? null,
+      idleHours: "1.00",
+      fuelQty: "18",
+      fuelBorneBy: "company",
+      hireCost: ownership === "rented" ? (input.hireCost ?? 650_000n) : null,
+      unitRate: ownership === "rented" ? 100_000n : null,
+      ...sharedAudit(input.createdBy),
+      timeShifts: {
+        create: (input.timeShiftMinutes ?? []).map((minutes, index) => ({
+          id: randomUUID(),
+          startTime: "08:00",
+          endTime: "12:00",
+          minutes,
+          sortOrder: index,
+        })),
+      },
+    },
+  });
+  return { id, number, equipmentId };
 }

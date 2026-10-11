@@ -409,7 +409,7 @@ export class PartyHandlers {
         `${this.info.code}_IN_USE`,
         this.kind === "supplier"
           ? "Purchase Orders or Goods Receipts name this Supplier, so it cannot be deleted. Make them inactive instead."
-          : "Material Requests name this Contractor, so it cannot be deleted. Make them inactive instead.",
+          : "Material Requests, Daily Worksheets, Equipment Usage sheets, Hindrances or rented Equipment name this Contractor, so it cannot be deleted. Make them inactive instead.",
       );
     const loadedAt = party.updatedAt;
     const before = party.snapshot();

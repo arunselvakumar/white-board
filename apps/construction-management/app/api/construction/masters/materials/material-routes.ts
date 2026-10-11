@@ -1,5 +1,9 @@
 import type { AccessSession } from "@/app/api/_lib/require-access";
 import { procurementMaterialUsage } from "@/src/composition/procurement-usage";
+import {
+  anyUsage,
+  siteWorkMaterialUsage,
+} from "@/src/composition/site-work-usage";
 import type { MaterialReadModel } from "@/src/masters/application/material-master-handlers";
 import { createMaterialHandlers } from "@/src/masters/infrastructure/create-material-handlers";
 import { can, type MenuKey } from "@/src/shared-kernel/access";
@@ -12,9 +16,9 @@ import {
   toMaterialResponse,
 } from "./material-models";
 
-/** Materials' handlers; delete asks procurement whether it is used. */
+/** Materials' handlers; delete asks procurement and site work whether it is used. */
 export const materialHandlers = createMaterialHandlers({
-  usage: procurementMaterialUsage(),
+  usage: anyUsage(procurementMaterialUsage(), siteWorkMaterialUsage()),
 });
 
 /** Whether the caller sees and sets Rate Details (Materials Financial). */
@@ -92,4 +96,9 @@ export const MATERIAL_PICKER_MENUS: readonly MenuKey[] = [
   "procurement.central_store",
   "procurement.material_requests",
   "procurement.delivery_notes",
+  // Work Types assign Materials (CM-601).
+  "masters.work_types",
+  // Daily Worksheets and Equipment Usage sheets consume Materials (CM-602, CM-604).
+  "site_work.daily_worksheet",
+  "site_work.equipment_usage",
 ];

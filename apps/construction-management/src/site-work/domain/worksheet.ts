@@ -178,6 +178,12 @@ export type WorksheetFacts = {
   workType: { id: string; departmentId: string; disabled: boolean } | null;
   unit: { id: string; disabled: boolean } | null;
   materials: ReadonlyMap<string, WorksheetMaterialFacts>;
+  /**
+   * Whether the Project has any place to pick (a Wing, an assigned Amenity
+   * or Common Development, or a Location). Without one, Location is
+   * optional even when its section is shown.
+   */
+  placesOffered: boolean;
 };
 
 function invalid(
@@ -347,14 +353,14 @@ export function worksheetContent(
       { field: "departmentId" },
     );
 
-  // Location: required when shown.
+  // Location: required when shown and the Project has somewhere to pick.
   let siteLocation = previous?.siteLocation ?? null;
   if (settings.showLocation) {
-    if (input.siteLocation == null)
+    if (input.siteLocation == null && facts.placesOffered)
       throw invalid("LOCATION_REQUIRED", "Choose where the work was done.", {
         field: "siteLocation",
       });
-    siteLocation = input.siteLocation;
+    siteLocation = input.siteLocation ?? null;
   }
 
   // Work Type: optional, of the Department. A hidden section keeps the

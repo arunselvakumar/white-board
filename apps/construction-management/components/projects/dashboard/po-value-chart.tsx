@@ -104,23 +104,25 @@ export function PoValueChart({ months }: { months: readonly Month[] }) {
           {months.at(-1) == null ? "" : monthLabel(months.at(-1)?.month ?? "")}
         </span>
       </div>
-      <table className="sr-only">
-        <caption>Purchase order value per month</caption>
-        <thead>
-          <tr>
-            <th scope="col">Month</th>
-            <th scope="col">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {months.map((month) => (
-            <tr key={month.month}>
-              <th scope="row">{monthLabel(month.month)}</th>
-              <td>{formatPaise(month.value)}</td>
+      <div className="sr-only">
+        <table>
+          <caption>Purchase order value per month</caption>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Value</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {months.map((month) => (
+              <tr key={month.month}>
+                <th scope="row">{monthLabel(month.month)}</th>
+                <td>{formatPaise(month.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

@@ -5,6 +5,7 @@ import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import {
   isMoneyReport,
+  printsAmounts,
   type ReportParams,
 } from "@/src/reporting/domain/report-job";
 
@@ -45,15 +46,35 @@ function paramsOf(
         labourCategoryId: model.params.categoryId ?? null,
         projectIds,
       };
+    // Site work reports (CM-605, CM-608).
+    case "daily_work":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        contractorId: model.params.contractorId ?? null,
+      };
+    case "owned_equipment_usage":
+    case "rented_equipment_usage":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        equipmentId: model.params.equipmentId ?? null,
+      };
+    case "equipment_maintenance":
+    case "equipment_transfers":
+      return { kind: model.kind, from: model.params.from, to: model.params.to };
   }
 }
 
 /**
- * Requests a report (CM-217, CM-218): the job is queued and, until M9's
- * queue, run inline, so the response is usually `done` with download links
- * (or `failed` with a message). Needs `report` on the kind's menu and
- * Project; the payment report and the muster roll are about money and are
- * refused without Financial. Other reports print amounts only with it.
+ * Requests a report (CM-217, CM-218, CM-605, CM-608): the job is queued
+ * and, until M9's queue, run inline, so the response is usually `done`
+ * with download links (or `failed` with a message). Needs `report` on the
+ * kind's menu (`REPORT_MENU`) and Project; the payment report and the
+ * muster roll are about money and are refused without Financial. Other
+ * reports print amounts only with it.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -84,7 +105,7 @@ export async function POST(request: Request): Promise<Response> {
       userId: session.userId,
       projectId: model.projectId,
       params: paramsOf(model, projectIds),
-      includesMoney: financial && model.kind !== "labour_attendance",
+      includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {
       status: StatusCodes.CREATED,

@@ -14,6 +14,8 @@ export type ColumnKind =
   | "days"
   /** Hours with two decimals. */
   | "hours"
+  /** Quantities with up to three decimals: fuel, billable quantity, material. */
+  | "quantity"
   /** Integer paise; printed as rupees. */
   | "money";
 
@@ -76,9 +78,16 @@ export function column(
   return { label, kind, width };
 }
 
+/** The integer scale a column is summed in, so decimals add exactly. */
+function scaleOf(kind: ColumnKind): number {
+  if (kind === "money" || kind === "count") return 1;
+  return kind === "quantity" ? 1000 : 100;
+}
+
 /**
  * Sums the numeric columns of `rows` (hours and days exactly, in
- * hundredths); text columns take `labels[index]` or stay empty.
+ * hundredths; quantities in thousandths); text columns take
+ * `labels[index]` or stay empty.
  */
 export function totalsOf(
   columns: readonly ReportColumn[],
@@ -87,18 +96,16 @@ export function totalsOf(
 ): Cell[] {
   return columns.map((col, index) => {
     if (col.kind === "text") return labels[index] ?? null;
+    const scale = scaleOf(col.kind);
     let sum = 0;
     let any = false;
     for (const row of rows) {
       const value = row[index];
       if (typeof value !== "number") continue;
       any = true;
-      sum +=
-        col.kind === "money" || col.kind === "count"
-          ? value
-          : Math.round(value * 100);
+      sum += scale === 1 ? value : Math.round(value * scale);
     }
     if (!any) return col.kind === "money" ? null : 0;
-    return col.kind === "money" || col.kind === "count" ? sum : sum / 100;
+    return scale === 1 ? sum : sum / scale;
   });
 }

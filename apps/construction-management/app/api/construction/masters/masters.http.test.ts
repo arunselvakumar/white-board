@@ -44,6 +44,7 @@ const SUPERVISORS = `${BASE}/supervisors`;
 type Lookup = {
   id: string;
   name: string;
+  skill?: string;
   isSeed: boolean;
   disabled: boolean;
   createdAt: string;
@@ -137,6 +138,15 @@ describe("Masters HTTP (CM-203)", () => {
     expect(categories.every((item) => item.isSeed && !item.disabled)).toBe(
       true,
     );
+    // Helper, Labour and Unskilled count as unskilled heads (CM-0016 §6).
+    expect(
+      categories
+        .filter((item) => item.skill === "unskilled")
+        .map((item) => item.name),
+    ).toEqual(["Helper", "Labour", "Unskilled"]);
+    expect(categories.filter((item) => item.skill === "skilled")).toHaveLength(
+      6,
+    );
     const departments = await listOf<Lookup>(
       listDepartments,
       DEPARTMENTS,
@@ -169,6 +179,13 @@ describe("Masters HTTP (CM-203)", () => {
         where: { workspaceId: owner.workspaceId },
       }),
     ).toBe(53);
+    // The RCC Work Type (CM-601), once.
+    expect(
+      await prisma.constructionMastersWorkType.findMany({
+        where: { workspaceId: owner.workspaceId },
+        select: { name: true, isSeed: true },
+      }),
+    ).toEqual([{ name: "RCC", isSeed: true }]);
   });
 
   it("creates, reads, renames, disables, enables and deletes a Labour Category, with audit", async () => {

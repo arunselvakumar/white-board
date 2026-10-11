@@ -124,25 +124,27 @@ function PresentChart({
         <span>{series[0] == null ? "" : dayLabel(series[0].date)}</span>
         <span>Today</span>
       </div>
-      <table className="sr-only">
-        <caption>Labours present and vendor heads per day</caption>
-        <thead>
-          <tr>
-            <th scope="col">Day</th>
-            <th scope="col">Labourers present</th>
-            <th scope="col">Vendor heads</th>
-          </tr>
-        </thead>
-        <tbody>
-          {series.map((day) => (
-            <tr key={day.date}>
-              <th scope="row">{dayLabel(day.date)}</th>
-              <td>{day.present}</td>
-              <td>{day.vendorHeadcount}</td>
+      <div className="sr-only">
+        <table>
+          <caption>Labours present and vendor heads per day</caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Labourers present</th>
+              <th scope="col">Vendor heads</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {series.map((day) => (
+              <tr key={day.date}>
+                <th scope="row">{dayLabel(day.date)}</th>
+                <td>{day.present}</td>
+                <td>{day.vendorHeadcount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

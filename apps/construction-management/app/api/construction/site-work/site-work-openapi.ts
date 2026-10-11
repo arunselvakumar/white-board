@@ -39,6 +39,10 @@ import {
   siteWorkDocumentOpenApiComponents,
   siteWorkDocumentOpenApiOperations,
 } from "./documents/documents-openapi";
+import {
+  siteWorkDashboardOpenApiComponents,
+  siteWorkDashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
 
 /** Every site-work model (M6); each area owns its own file. */
 export const siteWorkOpenApiComponents: OpenApiComponents = {
@@ -51,6 +55,7 @@ export const siteWorkOpenApiComponents: OpenApiComponents = {
   ...hindranceOpenApiComponents,
   ...progressReportOpenApiComponents,
   ...siteWorkDocumentOpenApiComponents,
+  ...siteWorkDashboardOpenApiComponents,
 };
 
 /** Every site-work operation (M6). */
@@ -64,4 +69,5 @@ export const siteWorkOpenApiOperations: OpenApiOperation[] = [
   ...hindranceOpenApiOperations,
   ...progressReportOpenApiOperations,
   ...siteWorkDocumentOpenApiOperations,
+  ...siteWorkDashboardOpenApiOperations,
 ];

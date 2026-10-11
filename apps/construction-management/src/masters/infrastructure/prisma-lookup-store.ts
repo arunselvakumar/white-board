@@ -7,6 +7,7 @@ import { LookupEntry } from "../domain/lookup-entry";
 import {
   masterChanged,
   masterNameInUse,
+  type LabourSkill,
   type LookupKind,
   type NamedMasterKind,
 } from "../domain/master-kind";
@@ -33,6 +34,8 @@ function toEntry(kind: LookupKind, row: Row): LookupEntry {
     kind,
     workspaceId: row.workspaceId,
     name: row.name,
+    // Departments have no skill column.
+    skill: kind === "labour_category" ? row.skill : null,
     isSeed: row.isSeed,
     disabledAt: row.disabledAt,
     createdAt: row.createdAt,
@@ -82,6 +85,13 @@ function audit(entry: LookupEntry, change: MasterChange) {
   };
 }
 
+/** A Labour Category's `skill` column; nothing for Departments. */
+function skillData(entry: LookupEntry): { skill?: LabourSkill } {
+  return entry.kind === "labour_category" && entry.skill != null
+    ? { skill: entry.skill }
+    : {};
+}
+
 /** Labour Categories and Departments in `construction_masters` (CM-203). */
 export class PrismaLookupStore implements LookupStore {
   constructor(private readonly db: PrismaClient) {}
@@ -109,7 +119,7 @@ export class PrismaLookupStore implements LookupStore {
     try {
       await this.db.$transaction(async (tx) => {
         await lookupTable(tx, entry.kind).create({
-          data: lookupEntryData(entry),
+          data: { ...lookupEntryData(entry), ...skillData(entry) },
         });
         await recordAudit(tx, audit(entry, change));
       });
@@ -136,6 +146,7 @@ export class PrismaLookupStore implements LookupStore {
           },
           data: {
             name: entry.name,
+            ...skillData(entry),
             disabledAt: entry.disabledAt,
             updatedAt: entry.updatedAt,
             updatedBy: entry.updatedBy,

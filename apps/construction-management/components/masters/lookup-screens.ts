@@ -15,7 +15,18 @@ export type LookupScreenConfig = {
   emptyDescription: string;
   deleteDescription: string;
   icon: LucideIcon;
+  /**
+   * Labour Categories: each row has a skill (CM-0016 §6), shown on the row
+   * and set in the dialog; a Default row can be edited for its skill only.
+   */
+  withSkill?: boolean;
 };
+
+/** The words for a Labour Category's skill. */
+export const SKILL_LABELS = {
+  skilled: "Skilled",
+  unskilled: "Unskilled",
+} as const;
 
 export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   list: "labour-categories",
@@ -31,6 +42,7 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   deleteDescription:
     "It will no longer be offered anywhere. A Labour Category that Labours, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
   icon: HardHat,
+  withSkill: true,
 };
 
 export const DEPARTMENTS_SCREEN: LookupScreenConfig = {

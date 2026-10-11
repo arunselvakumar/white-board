@@ -1,3 +1,5 @@
+import { todayIn, type CalendarDate } from "@/src/shared-kernel/calendar-date";
+
 import { buildLabourAttendanceReport } from "../domain/labour-attendance-report";
 import { buildMonthWiseLabourReport } from "../domain/labour-month-report";
 import { buildLabourPaymentReport } from "../domain/labour-payment-report";
@@ -6,6 +8,11 @@ import type { ReportBody, ReportDocument } from "../domain/report-document";
 import { reportFileName, type ReportJob } from "../domain/report-job";
 import { monthLabel, monthRange, rangeLabel } from "../domain/report-period";
 import { buildVendorAttendanceReport } from "../domain/vendor-attendance-report";
+// Site work reports (CM-605, CM-608).
+import {
+  SITE_WORK_A3_KINDS,
+  siteWorkReportBody,
+} from "./build-site-work-report";
 import type { HeaderFacts, ReportSource } from "./ports";
 
 /** `09 Oct 2026, 4:05 pm IST` in the Company's time zone. */
@@ -27,14 +34,21 @@ export function generatedAtLabel(at: Date, timeZone: string): string {
 
 function periodLabel(job: ReportJob): string {
   const params = job.params;
-  return params.kind === "labour_month" || params.kind === "muster_roll"
-    ? monthLabel(params.month)
-    : rangeLabel(params);
+  switch (params.kind) {
+    case "labour_month":
+    case "muster_roll":
+      return monthLabel(params.month);
+    case "daily_progress_report":
+      return rangeLabel({ from: params.date, to: params.date });
+    default:
+      return rangeLabel(params);
+  }
 }
 
 async function bodyFor(
   job: ReportJob,
   source: ReportSource,
+  today: CalendarDate,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -86,6 +100,25 @@ async function bodyFor(
         filters: { vendor: data.vendorName, category: data.categoryName },
       });
     }
+    // Site work reports (CM-605, CM-608).
+    case "daily_work":
+    case "owned_equipment_usage":
+    case "rented_equipment_usage":
+    case "equipment_maintenance":
+    case "equipment_transfers":
+      return siteWorkReportBody(job, params, source, today);
+    case "daily_progress_report":
+      // A PDF of its own, not a table report (`createReportExecutor`).
+      throw new Error("The Daily Progress Report is not a table report.");
+  }
+}
+
+/** The calendar date of `now` in the Company's time zone (India if unknown). */
+function companyDate(timeZone: string, now: Date): CalendarDate {
+  try {
+    return todayIn(timeZone, now);
+  } catch {
+    return todayIn("Asia/Kolkata", now);
   }
 }
 
@@ -99,7 +132,7 @@ export async function buildReportDocument(
     job.workspaceId,
     job.projectId,
   );
-  const body = await bodyFor(job, source);
+  const body = await bodyFor(job, source, companyDate(facts.timezone, now));
   return {
     header: {
       company: facts.companyName,
@@ -112,7 +145,10 @@ export async function buildReportDocument(
     },
     notes: body.notes,
     tables: body.tables,
-    pageSize: job.kind === "muster_roll" ? "a3" : "a4",
+    pageSize:
+      job.kind === "muster_roll" || SITE_WORK_A3_KINDS.includes(job.kind)
+        ? "a3"
+        : "a4",
     fileName: reportFileName(job.params),
   };
 }

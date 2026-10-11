@@ -27,6 +27,9 @@ const MonthParams = z.object({
  * One request per kind. Labour reports need Labour (`labour.labour`)
  * Report on the Project, the vendor report Vendor (`labour.vendor`)
  * Report; the payment report and the muster roll also need Financial.
+ * Site work: Daily Work needs Daily Worksheet Report, the usage reports
+ * Equipment Usage Report (hire cost with its Financial), maintenance and
+ * transfers Equipments Report (maintenance cost with its Financial).
  */
 export const RequestConstructionReportingReportRequestModel =
   z.discriminatedUnion("kind", [
@@ -58,6 +61,34 @@ export const RequestConstructionReportingReportRequestModel =
       kind: z.literal("muster_roll"),
       projectId: z.uuid(),
       params: MonthParams,
+    }),
+    // Site work reports (CM-605, CM-608).
+    z.object({
+      kind: z.literal("daily_work"),
+      projectId: z.uuid(),
+      params: DateRangeParams.extend({ contractorId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("owned_equipment_usage"),
+      projectId: z.uuid(),
+      params: DateRangeParams.extend({ equipmentId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("rented_equipment_usage"),
+      projectId: z.uuid(),
+      params: DateRangeParams.extend({ equipmentId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("equipment_maintenance"),
+      /** Null for the central report of Masters → Equipments (every machine). */
+      projectId: z.uuid().nullable(),
+      params: DateRangeParams,
+    }),
+    z.object({
+      kind: z.literal("equipment_transfers"),
+      /** Null for the central report of Masters → Equipments (every machine). */
+      projectId: z.uuid().nullable(),
+      params: DateRangeParams,
     }),
   ]);
 
@@ -92,6 +123,11 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     month: z.string().optional(),
     vendorId: z.string().nullable().optional(),
     categoryId: z.string().nullable().optional(),
+    contractorId: z.string().nullable().optional(),
+    equipmentId: z.string().nullable().optional(),
+    /** Daily Progress Report: its date and number. */
+    date: z.string().optional(),
+    number: z.string().optional(),
   }),
   status: z.enum(["queued", "running", "done", "failed"]),
   /** The files carry amounts; downloading them needs Financial. */
@@ -125,27 +161,51 @@ export function downloadPath(id: string, format: "xlsx" | "pdf"): string {
   return `${REPORTS_PATH}/${id}/download?format=${format}`;
 }
 
+function responseParams(
+  params: ReportJob["params"],
+): ConstructionReportingReportJobResponseModel["params"] {
+  switch (params.kind) {
+    case "labour_month":
+    case "muster_roll":
+      return { month: params.month };
+    case "vendor_attendance":
+      return {
+        from: params.from,
+        to: params.to,
+        vendorId: params.vendorId,
+        categoryId: params.labourCategoryId,
+      };
+    // Site work reports (CM-605, CM-608).
+    case "daily_work":
+      return {
+        from: params.from,
+        to: params.to,
+        contractorId: params.contractorId,
+      };
+    case "owned_equipment_usage":
+    case "rented_equipment_usage":
+      return {
+        from: params.from,
+        to: params.to,
+        equipmentId: params.equipmentId,
+      };
+    case "daily_progress_report":
+      return { date: params.date, number: params.number };
+    default:
+      return { from: params.from, to: params.to };
+  }
+}
+
 export function toReportJobResponse(
   job: ReportJob,
 ): ConstructionReportingReportJobResponseModel {
-  const params = job.params;
   const done = job.status === "done";
   return {
     id: job.id,
     kind: job.kind,
     title: REPORT_TITLES[job.kind],
     projectId: job.projectId,
-    params:
-      params.kind === "labour_month" || params.kind === "muster_roll"
-        ? { month: params.month }
-        : params.kind === "vendor_attendance"
-          ? {
-              from: params.from,
-              to: params.to,
-              vendorId: params.vendorId,
-              categoryId: params.labourCategoryId,
-            }
-          : { from: params.from, to: params.to },
+    params: responseParams(job.params),
     status: job.status,
     includesMoney: job.includesMoney,
     error: job.error,

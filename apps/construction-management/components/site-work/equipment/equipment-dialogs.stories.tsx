@@ -117,6 +117,9 @@ export const TransferRefused: Story = {
       form.getByRole("radio", { name: "Transfer to Warehouse" }),
     );
     await expect(
+      form.getByRole("radio", { name: "Transfer to Warehouse" }),
+    ).toBeChecked();
+    await expect(
       form.queryByRole("combobox", { name: "Destination Project" }),
     ).toBeNull();
     await userEvent.type(

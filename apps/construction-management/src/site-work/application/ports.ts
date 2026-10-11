@@ -160,6 +160,12 @@ export type WorksheetDirectory = {
     workspaceId: string,
     projectId: string,
   ): Promise<string | null>;
+  /**
+   * Whether the Project offers any place for a `LocationRef`: a Wing, an
+   * assigned Amenity or Common Development, or a Location (what the
+   * location picker offers).
+   */
+  hasPlaces(workspaceId: string, projectId: string): Promise<boolean>;
   /** Contractors assigned to the Project (Resources), with their Departments. */
   contractorsOnProject(
     db: SiteWorkTx,
@@ -264,5 +270,112 @@ export type EquipmentDirectory = {
     db: SiteWorkTx,
     workspaceId: string,
     userIds: readonly string[],
+  ): Promise<Map<string, string>>;
+};
+
+// ---------------------------------------------------------------------------
+// Progress reports (CM-606)
+// ---------------------------------------------------------------------------
+
+/**
+ * A Daily Progress Report as site work sees it: a reporting job (CM-217)
+ * with the DPR's number, date and filters. `ProgressReportJobs` maps the
+ * reporting context's jobs to and from it.
+ */
+export type ProgressReportJob = {
+  id: string;
+  projectId: string;
+  number: string;
+  date: CalendarDate;
+  /** User id of the Filled By Team Member; null for everyone. */
+  filledBy: string | null;
+  includeImages: boolean;
+  status: "queued" | "running" | "done" | "failed";
+  /** Why it failed, in words a screen can show. */
+  error: string | null;
+  /** Prints hire cost: downloading it needs Financial on Equipment Usage. */
+  includesMoney: boolean;
+  requestedBy: string;
+  createdAt: Date;
+  finishedAt: Date | null;
+};
+
+export type ProgressReportFile = {
+  body: ReadableStream<Uint8Array>;
+  contentType: string;
+  contentLength: number | null;
+  fileName: string;
+};
+
+/**
+ * The reporting context's job queue, for Daily Progress Reports only.
+ * `src/composition/progress-reports.ts` implements it over the report
+ * handlers. A job of another kind, or another Company's, is 404
+ * `PROGRESS_REPORT_NOT_FOUND`.
+ */
+export type ProgressReportJobs = {
+  /** Queues the job and runs it (inline until M9); returns it afterwards. */
+  request(input: {
+    workspaceId: string;
+    projectId: string;
+    userId: string;
+    number: string;
+    date: CalendarDate;
+    filledBy: string | null;
+    includeImages: boolean;
+    includesMoney: boolean;
+  }): Promise<ProgressReportJob>;
+  /** The Project's newest 50, newest first. */
+  list(workspaceId: string, projectId: string): Promise<ProgressReportJob[]>;
+  get(workspaceId: string, id: string): Promise<ProgressReportJob>;
+  /** 409 `REPORT_NOT_FAILED` unless it failed. */
+  retry(workspaceId: string, id: string): Promise<ProgressReportJob>;
+  remove(workspaceId: string, id: string, by: string): Promise<void>;
+  /** 409 `REPORT_NOT_READY` until it is done. */
+  pdf(workspaceId: string, id: string): Promise<ProgressReportFile>;
+};
+
+/**
+ * DPR numbers (`construction_site_work.progress_report_numbers`): the
+ * Project's number for a date, taken the first time and reused after.
+ */
+export type ProgressReportNumbers = {
+  take(input: {
+    workspaceId: string;
+    projectId: string;
+    date: CalendarDate;
+    by: string;
+  }): Promise<{ number: string; taken: boolean }>;
+};
+
+// ---------------------------------------------------------------------------
+// Project Dashboard (CM-608): attendance heads and names from other contexts.
+// ---------------------------------------------------------------------------
+
+/**
+ * A Project's attendance heads per date over a range (CM-0016 §6): labour
+ * present or on a half day (one head each, live rows) plus vendor full-day
+ * and half-day heads on live sheets. Dates with no heads are left out.
+ */
+export type DashboardAttendance = {
+  headsByDate(
+    db: SiteWorkTx,
+    workspaceId: string,
+    projectId: string,
+    range: { from: CalendarDate; to: CalendarDate },
+  ): Promise<{ date: CalendarDate; heads: number }[]>;
+};
+
+/** Contractor and Department names for the dashboard (removed ones too). */
+export type DashboardNames = {
+  contractors(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, string>>;
+  departments(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
   ): Promise<Map<string, string>>;
 };

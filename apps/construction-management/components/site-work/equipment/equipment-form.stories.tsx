@@ -146,7 +146,17 @@ export const Rented: Story = {
     const form = within(
       await canvas.findByRole("form", { name: "Add Equipment" }),
     );
-    await userEvent.click(form.getByRole("radio", { name: "Rented" }));
+    // A click anywhere on the card picks it, not only on the radio.
+    await userEvent.click(
+      await form.findByText("Hired from a Contractor at a rate."),
+    );
+    await expect(form.getByRole("radio", { name: "Rented" })).toBeChecked();
+    await expect(
+      form.getByRole("radio", { name: "Company owned" }),
+    ).not.toBeChecked();
+    await expect(
+      form.getByRole("radio", { name: "Rented" }),
+    ).toHaveAccessibleDescription("Hired from a Contractor at a rate.");
     await expect(form.queryByLabelText("Purchase Year")).toBeNull();
     await userEvent.type(form.getByLabelText("Equipment Name"), "Tipper 10 T");
     await userEvent.type(form.getByLabelText("Equipment Number"), "TN-10-X-9");

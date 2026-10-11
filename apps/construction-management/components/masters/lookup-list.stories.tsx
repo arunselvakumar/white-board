@@ -83,14 +83,18 @@ export const WithCategories: Story = {
     await expect(within(list).getAllByRole("listitem")).toHaveLength(4);
     await userEvent.clear(canvas.getByLabelText("Search Labour Categories"));
 
-    // A Default row offers Disable only; it cannot be renamed or deleted.
+    // Each category shows its skill.
+    await expect(
+      within(rowNamed(list, "Helper")).getByText("Unskilled"),
+    ).toBeVisible();
+    // A Default row is edited for its skill and disabled; never deleted.
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
       canvas.getByRole("button", { name: "Actions for Mason" }),
     );
     const disable = await body.findByRole("menuitem", { name: "Disable" });
     await waitFor(() => expect(disable).toBeVisible());
-    await expect(body.queryByRole("menuitem", { name: "Rename" })).toBeNull();
+    await expect(body.getByRole("menuitem", { name: "Edit" })).toBeVisible();
     await expect(body.queryByRole("menuitem", { name: "Delete" })).toBeNull();
     await userEvent.click(disable);
     await waitFor(() => expect(body.queryByRole("menu")).toBeNull());
@@ -108,8 +112,8 @@ export const WithCategories: Story = {
       ).toBeNull(),
     );
 
-    // A Company row renames in a dialog.
-    await chooseFromMenu(canvasElement, userEvent, "Bar Bender", "Rename");
+    // A Company row is edited in a dialog.
+    await chooseFromMenu(canvasElement, userEvent, "Bar Bender", "Edit");
     const dialog = await body.findByRole("dialog");
     await expect(
       within(dialog).getByLabelText("Labour Category name"),

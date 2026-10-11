@@ -32,6 +32,10 @@ import {
   ListConstructionMastersSupervisorsResponseModel,
   UpdateConstructionMastersSupervisorRequestModel,
 } from "./supervisors/supervisor-models";
+import {
+  workTypeOpenApiComponents,
+  workTypeOpenApiOperations,
+} from "./work-types/work-types-openapi";
 
 export const MASTERS = ["Construction · Masters"];
 
@@ -50,6 +54,7 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   CreateConstructionMastersSupervisorRequestModel,
   UpdateConstructionMastersSupervisorRequestModel,
   ...materialMastersOpenApiComponents,
+  ...workTypeOpenApiComponents,
 };
 
 export const SESSION = [
@@ -177,7 +182,8 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     label: "Department",
     plural: "Departments",
     menu: "masters.departments",
-    inUse: "409 SEED_IS_READ_ONLY for a seed row.",
+    inUse:
+      "409 SEED_IS_READ_ONLY for a seed row, DEPARTMENT_IN_USE while a Work Type or a live Daily Worksheet or Equipment Usage sheet uses it.",
     list: ListConstructionMastersDepartmentsResponseModel,
     item: ConstructionMastersDepartmentResponseModel,
     create: CreateConstructionMastersDepartmentRequestModel,
@@ -195,4 +201,5 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     update: UpdateConstructionMastersSupervisorRequestModel,
   }),
   ...materialMastersOpenApiOperations,
+  ...workTypeOpenApiOperations,
 ];

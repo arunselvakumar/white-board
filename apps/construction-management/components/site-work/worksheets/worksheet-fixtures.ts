@@ -53,6 +53,16 @@ export const LOCATION_OPTIONS: LocationOptions = {
   ],
 };
 
+/** A new Project: no Wings, Amenities, Common Developments or Locations. */
+export const NO_PLACES: LocationOptions = {
+  structure: "wings",
+  types: [],
+  wings: [],
+  amenities: [],
+  commonDevelopments: [],
+  locations: [],
+};
+
 export function worksheetSettings(
   patch: Partial<WorksheetSettings> = {},
 ): WorksheetSettings {
@@ -194,11 +204,14 @@ export type WorksheetApiOptions = {
   /** Answers a POST before the defaults (e.g. a refusal). */
   post?: (call: ApiCall) => Response | undefined;
   documents?: SiteWorkDocumentApiOptions;
+  /** What the location picker offers; the Pump house and Site office unless given. */
+  locations?: LocationOptions;
 };
 
 /** Every read and write the worksheet screens make, plus the document thread. */
 export function worksheetHandler(options: WorksheetApiOptions = {}) {
-  const items = options.items ?? [worksheet()];
+  // Stateful: approve and reject change the sheet that later reads return.
+  const items = [...(options.items ?? [worksheet()])];
   const documents = mockSiteWorkDocumentApi(options.documents);
   let settings = worksheetSettings(options.settings);
   return (call: ApiCall): Response | undefined => {
@@ -209,7 +222,7 @@ export function worksheetHandler(options: WorksheetApiOptions = {}) {
     if (path === "/api/construction/site-work/access")
       return Response.json(siteWorkAccess(options.flags));
     if (path.endsWith("/location-options"))
-      return Response.json(LOCATION_OPTIONS);
+      return Response.json(options.locations ?? LOCATION_OPTIONS);
     if (path === WORKSHEET_SETTINGS_API) {
       if (call.method === "POST") {
         const body = call.body as Omit<WorksheetSettings, "updatedAt">;
@@ -225,6 +238,28 @@ export function worksheetHandler(options: WorksheetApiOptions = {}) {
           decided: (call.body as { ids: string[] }).ids.length,
         });
       if (path.endsWith("/delete")) return new Response(null, { status: 204 });
+      const decided =
+        /^\/api\/construction\/site-work\/worksheets\/([^/]+)\/(approve|reject)$/.exec(
+          path,
+        );
+      if (decided != null) {
+        const found = items.find((item) => item.id === decided[1]);
+        if (found == null) return new Response(null, { status: 404 });
+        const approved = decided[2] === "approve";
+        const next: Worksheet = {
+          ...found,
+          approvalStatus: approved ? "approved" : "rejected",
+          decidedAt: AT,
+          decidedBy: { userId: "user-arun", name: "Arun Selva Kumar" },
+          rejectionReason: approved
+            ? null
+            : (call.body as { reason: string }).reason,
+          actions: { ...found.actions, approve: false, reject: false },
+        };
+        const at = items.indexOf(found);
+        if (at >= 0) items[at] = next;
+        return Response.json(next);
+      }
       return Response.json(items[0] ?? worksheet(), {
         status: path === WORKSHEETS_API ? 201 : 200,
       });

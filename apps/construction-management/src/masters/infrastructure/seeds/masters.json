@@ -11,6 +11,7 @@
     "Unskilled",
     "Welder"
   ],
+  "unskilledLabourCategories": ["Helper", "Labour", "Unskilled"],
   "departments": [
     "Surveying",
     "Departmental Work",
@@ -66,6 +67,7 @@
     "Masonry & Plaster",
     "RCC"
   ],
+  "workTypes": [{ "name": "RCC", "department": "RCC" }],
   "measurementUnits": [
     "%",
     "Bag",

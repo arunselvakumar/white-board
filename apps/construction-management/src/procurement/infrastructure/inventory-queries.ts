@@ -7,7 +7,10 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import { isUuid } from "@/src/shared-kernel/ids";
-import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import {
+  storedLocationRef,
+  type LocationRef,
+} from "@/src/shared-kernel/location-ref";
 
 import type { MaterialFacts, ProcurementDirectory } from "../application/ports";
 import {
@@ -581,7 +584,7 @@ async function describeEntries(
             : null,
       },
       counterpartyLabel: row.counterpartyLabel,
-      siteLocation: (row.siteLocation ?? null) as LocationRef | null,
+      siteLocation: storedLocationRef(row.siteLocation),
       remark: row.remark,
       createdBy: {
         userId: row.createdBy,
