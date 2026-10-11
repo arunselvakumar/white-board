@@ -1,0 +1,25 @@
+apps/construction-management/components/site-work/worksheets/worksheet-detail.stories.tsx
+  s_0b536d2972a09b::t_180aa673eeaa3f 1-148
+apps/construction-management/components/site-work/worksheets/worksheet-fixtures.ts
+  s_0b536d2972a09b::t_43bbdac45d3652 1-303
+apps/construction-management/components/site-work/worksheets/worksheet-form.stories.tsx
+  s_0b536d2972a09b::t_4bb86b57253cbc 1-345
+apps/construction-management/components/site-work/worksheets/worksheets-page.stories.tsx
+  s_0b536d2972a09b::t_3d80d908673a28 1-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0917569b712f3a875470c0a13a4d1623421ad405",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
