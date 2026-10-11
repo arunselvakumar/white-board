@@ -1,0 +1,29 @@
+apps/construction-management/app/api/construction/finance/central-payment/central-payment-models.ts
+  s_d85efaaff765fa::t_1f1e75890d10d7 1-89
+apps/construction-management/app/api/construction/finance/central-payment/central-payment-openapi.ts
+  s_d85efaaff765fa::t_ce073a865ff7f1 1-29
+apps/construction-management/app/api/construction/finance/central-payment/central-payment.http.test.ts
+  s_d85efaaff765fa::t_359a671e07c15e 1-345
+apps/construction-management/app/api/construction/finance/central-payment/route.ts
+  s_d85efaaff765fa::t_a52ecfee643714 1-110
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_bd1bdaa73ac99e 26-29,48,59
+apps/construction-management/src/finance/infrastructure/central-payment.ts
+  s_d85efaaff765fa::t_19e4231df32608 1-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f8813c8b72584cd6182e29f1bb09a6099a557731",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
