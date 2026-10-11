@@ -1,0 +1,45 @@
+apps/construction-management/app/app/masters/other-parties/[id]/page.tsx
+  s_d85efaaff765fa::t_c4304e50c65559 1-14
+apps/construction-management/app/app/masters/other-parties/new/page.tsx
+  s_d85efaaff765fa::t_b50a3bdaac00a4 1-9
+apps/construction-management/app/app/masters/other-parties/page.tsx
+  s_d85efaaff765fa::t_d7e22c4a6f4b40 3,7-9
+apps/construction-management/components/finance/other-parties/other-parties-page.stories.tsx
+  s_d85efaaff765fa::t_4b1e3850bc9aa5 1-125
+apps/construction-management/components/finance/other-parties/other-party-fixtures.ts
+  s_d85efaaff765fa::t_2bbd35ce168de6 1-60
+apps/construction-management/components/finance/other-parties/other-party-form-schema.ts
+  s_d85efaaff765fa::t_9d24ed9f6a0e1c 1-140
+apps/construction-management/components/finance/other-parties/other-party-form.stories.tsx
+  s_d85efaaff765fa::t_d8b02951532732 1-183
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_d85efaaff765fa::t_15a47e14060873 1-350
+apps/construction-management/src/queries/finance-other-parties.ts
+  s_d85efaaff765fa::t_3a78399324a55b 1-109
+apps/construction-management/components/finance/other-parties/other-parties-page.tsx
+  s_2d02b132156f0c::t_400dccc82fe01f 1-341
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ae67e1f3999b6ed37e59baf22cb4b6d0711f35e0",
+  "prompts": {},
+  "sessions": {
+    "s_2d02b132156f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4d9b8706f6b5edee",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
