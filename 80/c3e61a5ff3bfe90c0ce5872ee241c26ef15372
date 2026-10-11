@@ -1,0 +1,29 @@
+apps/construction-management/components/finance/transactions/import-transactions-dialog.stories.tsx
+  s_d85efaaff765fa::t_277a4fe40ac8c0 1-80
+apps/construction-management/components/finance/transactions/transaction-detail.stories.tsx
+  s_d85efaaff765fa::t_74acfb0113a592 1-80
+apps/construction-management/components/finance/transactions/transaction-fixtures.ts
+  s_d85efaaff765fa::t_13b571fb72b720 1-330
+apps/construction-management/components/finance/transactions/transaction-form.stories.tsx
+  s_d85efaaff765fa::t_daf4b14940a86f 1-149
+apps/construction-management/components/finance/transactions/transactions-page.stories.tsx
+  s_d85efaaff765fa::t_7fc7734e8e70d0 1-166
+apps/construction-management/components/finance/transactions/transfer-form.stories.tsx
+  s_d85efaaff765fa::t_241fbf6363aaad 1-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "80c3e61a5ff3bfe90c0ce5872ee241c26ef15372",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
