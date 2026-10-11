@@ -1,0 +1,19 @@
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_d85efaaff765fa::t_1fc12db164322e 104,125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3534758bdf44e501b401b3b864d7cb02d53c2c56",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
