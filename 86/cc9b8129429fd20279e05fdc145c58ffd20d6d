@@ -1,0 +1,31 @@
+apps/construction-management/src/site-work/domain/equipment-usage.test.ts
+  s_0b536d2972a09b::t_d5b9944a7568af 1-607
+apps/construction-management/src/site-work/domain/equipment-usage.ts
+  s_0b536d2972a09b::t_ae756a781741de 1-1194
+apps/construction-management/src/site-work/domain/events.ts
+  s_a81d42b868755c::t_d269e536003fe0 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "86cc9b8129429fd20279e05fdc145c58ffd20d6d",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a81d42b868755c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2866d65f1bc535d1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
