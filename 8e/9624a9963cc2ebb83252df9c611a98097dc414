@@ -1,0 +1,221 @@
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_2b006fbcc92491 30-37,47-48,58-59
+apps/construction-management/app/api/construction/finance/other-expenses/[id]/approve/route.ts
+  s_d85efaaff765fa::t_b6fcce6e58d678 1-51
+apps/construction-management/app/api/construction/finance/other-expenses/[id]/delete/route.ts
+  s_d85efaaff765fa::t_57202e3a430207 1-47
+apps/construction-management/app/api/construction/finance/other-expenses/[id]/reject/route.ts
+  s_d85efaaff765fa::t_82bf06387428bc 1-46
+apps/construction-management/app/api/construction/finance/other-expenses/[id]/route.ts
+  s_d85efaaff765fa::t_e5635e77e94f19 1-26
+apps/construction-management/app/api/construction/finance/other-expenses/[id]/update/route.ts
+  s_d85efaaff765fa::t_4b56b6149a62bf 1-49
+apps/construction-management/app/api/construction/finance/other-expenses/bulk-approve/route.ts
+  s_d85efaaff765fa::t_e3845a7ad4110f 1-51
+apps/construction-management/app/api/construction/finance/other-expenses/bulk-reject/route.ts
+  s_d85efaaff765fa::t_fc81cfeab3a074 1-46
+apps/construction-management/app/api/construction/finance/other-expenses/handlers.ts
+  s_d85efaaff765fa::t_4ceccdcc2b53b6 1-50
+apps/construction-management/app/api/construction/finance/other-expenses/other-expense-models.ts
+  s_d85efaaff765fa::t_f3deea1bc223de 1-234
+apps/construction-management/app/api/construction/finance/other-expenses/other-expenses-openapi.ts
+  s_d85efaaff765fa::t_ad87b44e6a9984 1-170
+apps/construction-management/app/api/construction/finance/other-expenses/other-expenses.http.test.ts
+  s_d85efaaff765fa::t_149dfe39c89dcc 1-557
+apps/construction-management/app/api/construction/finance/other-expenses/route.ts
+  s_d85efaaff765fa::t_45a0609ffa2f45 1-95
+apps/construction-management/app/api/construction/finance/other-parties/[id]/delete/route.ts
+  s_d85efaaff765fa::t_ee1d244d151270 1-51
+apps/construction-management/app/api/construction/finance/other-parties/[id]/route.ts
+  s_d85efaaff765fa::t_f6b66a944f6933 1-30
+apps/construction-management/app/api/construction/finance/other-parties/[id]/update/route.ts
+  s_d85efaaff765fa::t_d48bc4340c29d8 1-47
+apps/construction-management/app/api/construction/finance/other-parties/handlers.ts
+  s_d85efaaff765fa::t_7941cbca8f9735 1-9
+apps/construction-management/app/api/construction/finance/other-parties/other-parties-openapi.ts
+  s_d85efaaff765fa::t_01cc05ae7fbb83 1-107
+apps/construction-management/app/api/construction/finance/other-parties/other-parties.http.test.ts
+  s_d85efaaff765fa::t_05f4024d473c8d 1-314
+apps/construction-management/app/api/construction/finance/other-parties/other-party-models.ts
+  s_d85efaaff765fa::t_c98ce0c8e26eff 1-153
+apps/construction-management/app/api/construction/finance/other-parties/route.ts
+  s_d85efaaff765fa::t_17c077e2197d01 1-76
+apps/construction-management/app/api/construction/hrms/salaries/calculate-advance/route.ts
+  s_d85efaaff765fa::t_464e8d44894bca 20-21,41
+apps/construction-management/app/api/construction/hrms/salaries/mark-paid/route.ts
+  s_d85efaaff765fa::t_a5bb5d6b6b738d 16-19,38
+apps/construction-management/app/api/construction/hrms/salaries/salaries.http.test.ts
+  s_d85efaaff765fa::t_9580d3e281bd52 10,332,354-371,377-389,391-407,467,486,488-491
+apps/construction-management/app/api/construction/hrms/salaries/salary-models.ts
+  s_d85efaaff765fa::t_5bb10bac258805 132-137,262-267,291-296
+apps/construction-management/app/api/construction/hrms/salaries/salary-route.ts
+  s_d85efaaff765fa::t_23a01e3fac8d03 1,4-10
+apps/construction-management/app/api/construction/labour/balances/balance-models.ts
+  s_d85efaaff765fa::t_0f86759c514f5c 110-111
+apps/construction-management/app/api/construction/labour/balances/balances.http.test.ts
+  s_d85efaaff765fa::t_f21180378243f1 24,142,147
+apps/construction-management/app/api/construction/labour/balances/statement/route.ts
+  s_d85efaaff765fa::t_030b3a0559f92e 4,15
+apps/construction-management/app/api/construction/labour/labours/delete-races.http.test.ts
+  s_d85efaaff765fa::t_215b78a73544bf 12,51,57,60
+apps/construction-management/app/api/construction/labour/payments/handlers.ts
+  s_d85efaaff765fa::t_441e4e35c2951d 11,23-34
+apps/construction-management/app/api/construction/labour/payments/large-totals.http.test.ts
+  s_d85efaaff765fa::t_b7a5307faeec32 20,96,105,209,212
+apps/construction-management/app/api/construction/labour/payments/payment-models.ts
+  s_d85efaaff765fa::t_067311fe5c6cff 26-32,92-93,153
+apps/construction-management/app/api/construction/labour/payments/payment-openapi.ts
+  s_d85efaaff765fa::t_6e27e3c246227a 84,119
+apps/construction-management/app/api/construction/labour/payments/payments.http.test.ts
+  s_d85efaaff765fa::t_11a29281642789 18,49,100-108,113,123,490-684
+apps/construction-management/app/api/construction/labour/payments/route.ts
+  s_d85efaaff765fa::t_f00942809d3256 19,101-102,125,134
+apps/construction-management/app/app/masters/other-parties/[id]/page.tsx
+  s_d85efaaff765fa::t_871a6e8e5e2cd1 1-14
+apps/construction-management/app/app/masters/other-parties/new/page.tsx
+  s_d85efaaff765fa::t_cd86bbb730a518 1-9
+apps/construction-management/app/app/masters/other-parties/page.tsx
+  s_d85efaaff765fa::t_3ecd1a3f93766e 3,7-9
+apps/construction-management/app/app/projects/[id]/payments/other-expenses/[expenseId]/edit/page.tsx
+  s_d85efaaff765fa::t_01cbc2acd32e2a 1-19
+apps/construction-management/app/app/projects/[id]/payments/other-expenses/[expenseId]/page.tsx
+  s_d85efaaff765fa::t_04644706999825 1-19
+apps/construction-management/app/app/projects/[id]/payments/other-expenses/new/page.tsx
+  s_d85efaaff765fa::t_82c54fd35a44c7 1-19
+apps/construction-management/app/app/projects/[id]/payments/other-expenses/page.tsx
+  s_d85efaaff765fa::t_690525a6104c9e 3-5,9-18
+apps/construction-management/components/finance/other-expenses/other-expense-detail.stories.tsx
+  s_d85efaaff765fa::t_4bc04f62a568e1 1-165
+apps/construction-management/components/finance/other-expenses/other-expense-detail.tsx
+  s_d85efaaff765fa::t_68acf3ef845cdc 1-244
+apps/construction-management/components/finance/other-expenses/other-expense-fixtures.ts
+  s_d85efaaff765fa::t_a195b0c49a481f 1-138
+apps/construction-management/components/finance/other-expenses/other-expense-form-schema.ts
+  s_d85efaaff765fa::t_cfbf9c91f18005 1-112
+apps/construction-management/components/finance/other-expenses/other-expense-form.stories.tsx
+  s_d85efaaff765fa::t_6ceaf47f3c5304 1-229
+apps/construction-management/components/finance/other-expenses/other-expense-form.tsx
+  s_d85efaaff765fa::t_3f3220a3735567 1-310
+apps/construction-management/components/finance/other-expenses/other-expense-pages.tsx
+  s_d85efaaff765fa::t_43b16d2a4e1daa 1-60
+apps/construction-management/components/finance/other-expenses/other-expense-parts.tsx
+  s_d85efaaff765fa::t_8e7ab75ef0de11 1-34
+apps/construction-management/components/finance/other-expenses/other-expenses-list.stories.tsx
+  s_d85efaaff765fa::t_ee83dce1857218 1-160
+apps/construction-management/components/finance/other-expenses/other-expenses-list.tsx
+  s_d85efaaff765fa::t_b49e05cc281534 1-526
+apps/construction-management/components/finance/other-parties/other-parties-page.stories.tsx
+  s_d85efaaff765fa::t_e765e9fc03df78 1-125
+apps/construction-management/components/finance/other-parties/other-parties-page.tsx
+  s_d85efaaff765fa::t_a9059dde88e05b 1-341
+apps/construction-management/components/finance/other-parties/other-party-fixtures.ts
+  s_d85efaaff765fa::t_49fe494d7dc0ea 1-60
+apps/construction-management/components/finance/other-parties/other-party-form-schema.ts
+  s_d85efaaff765fa::t_03fc0a205ef12a 1-140
+apps/construction-management/components/finance/other-parties/other-party-form.stories.tsx
+  s_d85efaaff765fa::t_9970e5fb79d891 1-183
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_d85efaaff765fa::t_033bafbcebef53 1-350
+apps/construction-management/components/hrms/salary/my-salary-page.stories.tsx
+  s_d85efaaff765fa::t_6e93d665ebb34b 15-20
+apps/construction-management/components/hrms/salary/salary-dialogs.tsx
+  s_d85efaaff765fa::t_92550e3637dc97 4,29,45-81,121,128-132,163-164,187-193,196,203,218,245-257,314,379,385,402,422,528-540
+apps/construction-management/components/hrms/salary/salary-story-support.ts
+  s_d85efaaff765fa::t_24cb9f31137344 2,111-116,133-138,207-209
+apps/construction-management/components/hrms/salary/team-salary-page.stories.tsx
+  s_d85efaaff765fa::t_47699f6b337ad8 140-144,165,170-210,236-240,258
+apps/construction-management/components/payments/pay-dialog.stories.tsx
+  s_d85efaaff765fa::t_f52a46c848918b 5,8-9,33,67-69,84-85,88,119,128-185,246
+apps/construction-management/components/payments/pay-dialog.tsx
+  s_d85efaaff765fa::t_4930a5601129dd 31,63-64,201-204,302-318
+apps/construction-management/components/payments/pay-form-schema.ts
+  s_d85efaaff765fa::t_98fa3ad798f3c6 16-17,56-57,82
+apps/construction-management/components/payments/payment-fixtures.ts
+  s_d85efaaff765fa::t_26f60033a8f984 14-23,217,240-241,267,284
+apps/construction-management/components/payments/payments-list.tsx
+  s_d85efaaff765fa::t_077c8be1689a10 243,276-278,316-320,384
+apps/construction-management/components/payments/payments-page.stories.tsx
+  s_d85efaaff765fa::t_854491ac229b3d 9,38-39,136-140,164-167
+apps/construction-management/components/payments/statement-sheet.stories.tsx
+  s_d85efaaff765fa::t_2798fc8c810e1d 66-67
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_d85efaaff765fa::t_b5efedd24b9557 187-191
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_66bd3013d9760f 743-767
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_12b81d05bffc8d 706,709
+apps/construction-management/src/composition/account-posting.ts
+  s_d85efaaff765fa::t_8871b22b4df2ab 55-63
+apps/construction-management/src/finance/application/other-expense-handlers.ts
+  s_d85efaaff765fa::t_464c8d33563b1b 1-799
+apps/construction-management/src/finance/application/other-party-handlers.ts
+  s_d85efaaff765fa::t_a8869f8d21bc09 1-255
+apps/construction-management/src/finance/domain/other-expense.test.ts
+  s_d85efaaff765fa::t_3ded24ce17371d 1-95
+apps/construction-management/src/finance/domain/other-expense.ts
+  s_d85efaaff765fa::t_26b5a07c5661ce 1-157
+apps/construction-management/src/finance/domain/other-party.test.ts
+  s_d85efaaff765fa::t_b6d7bd0fdd8d27 1-85
+apps/construction-management/src/finance/domain/other-party.ts
+  s_d85efaaff765fa::t_99787b728b5e9c 1-129
+apps/construction-management/src/finance/infrastructure/other-expense-store.ts
+  s_d85efaaff765fa::t_20b4462ff21a41 1-369
+apps/construction-management/src/finance/infrastructure/other-party-store.ts
+  s_d85efaaff765fa::t_1da13c5431e7a7 1-326
+apps/construction-management/src/hrms/application/salary-run-handlers.test.ts
+  s_d85efaaff765fa::t_d08c0469375dad 378,401,429,519,533,540-544,678
+apps/construction-management/src/hrms/application/salary-run-handlers.ts
+  s_d85efaaff765fa::t_a0c0e889a85953 29,837-838,851-855,860-867,900-901,926,943-944
+apps/construction-management/src/hrms/application/salary-run-ports.ts
+  s_d85efaaff765fa::t_c58ddaf8a315c2 147-156,234-240,245-247,259-261
+apps/construction-management/src/hrms/domain/salary-slip.test.ts
+  s_d85efaaff765fa::t_68ef127bb15860 116-121
+apps/construction-management/src/hrms/domain/salary-slip.ts
+  s_d85efaaff765fa::t_f0489c88cec433 120-124,160-165,170,175,179-190,215,253
+apps/construction-management/src/hrms/infrastructure/create-salary-run-handlers.ts
+  s_d85efaaff765fa::t_a7f038a822b7bc 3-6,33-34,39
+apps/construction-management/src/hrms/infrastructure/prisma-salary-run-store.ts
+  s_d85efaaff765fa::t_19e5cd2a151702 3-6,23,92,214-218,681-682,687-690,709,721-741,759-760,766-768,806,848-866
+apps/construction-management/src/labour/application/balance-handlers.ts
+  s_d85efaaff765fa::t_5d28ccc2f84fa9 54-55
+apps/construction-management/src/labour/application/wage-payment-handlers.test.ts
+  s_d85efaaff765fa::t_69adc22189f970 60-61,139
+apps/construction-management/src/labour/application/wage-payment-handlers.ts
+  s_d85efaaff765fa::t_ce509fd63b31a7 92-96,98-101,105,126-130,143-153,157-159,185-186,203-204,256,269-274,295-301,357-360,377,425-428,433-434
+apps/construction-management/src/labour/domain/wage-payment.test.ts
+  s_d85efaaff765fa::t_60f6bcc7fba447 14,45-52
+apps/construction-management/src/labour/domain/wage-payment.ts
+  s_d85efaaff765fa::t_c09fb3fa5ec1c4 19-23,30-33,35-36,63,77-83,92
+apps/construction-management/src/labour/infrastructure/balance-store.ts
+  s_d85efaaff765fa::t_a768eb2358528f 3-6,32-36,234,237-241,253-259
+apps/construction-management/src/labour/infrastructure/wage-payment-factory.ts
+  s_d85efaaff765fa::t_28bd834a231b23 3-6,19-23,27,32,43-44,48
+apps/construction-management/src/labour/infrastructure/wage-payment-store.ts
+  s_d85efaaff765fa::t_344051cf7bbdd9 3,5-8,18,31,53,75,84-85,88-91,233-239,261,277-298,341-346,389-392,415-418,434-436
+apps/construction-management/src/queries/finance-other-expenses.ts
+  s_d85efaaff765fa::t_055f4c24202203 1-167
+apps/construction-management/src/queries/finance-other-parties.ts
+  s_d85efaaff765fa::t_55f6db68c0f606 1-109
+apps/construction-management/src/queries/hrms-salary.ts
+  s_d85efaaff765fa::t_7fa2fdb45c44e5 15,93-94,105,143,154,164-169
+apps/construction-management/src/queries/payments.ts
+  s_d85efaaff765fa::t_2cc856e6dcf279 15,96,103
+apps/construction-management/src/shared-kernel/account-posting.ts
+  s_d85efaaff765fa::t_6134607d6db39d 31-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8e9624a9963cc2ebb83252df9c611a98097dc414",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
