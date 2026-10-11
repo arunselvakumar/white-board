@@ -1,0 +1,21 @@
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash.http.test.ts
+  s_d85efaaff765fa::t_827e046de16bfe 327
+apps/construction-management/src/finance/infrastructure/petty-cash-accounts.ts
+  s_d85efaaff765fa::t_ea6c7036dc8007 158,249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "21655d89127b8e5312958b186ff628dd57c4779f",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
