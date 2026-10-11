@@ -104,7 +104,7 @@ export const TransferRefused: Story = {
     refuse: {
       code: "TRANSFER_BEFORE_LAST_SHEET",
       message:
-        "It has a usage sheet at this Project on 2026-10-10. Choose that date or later.",
+        "It has a usage sheet at this Project on 2026-10-10. Choose a later date.",
       field: "movementDate",
     },
   }),
