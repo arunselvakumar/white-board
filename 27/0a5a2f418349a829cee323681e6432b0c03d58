@@ -128,8 +128,10 @@ apps/construction-management/components/projects/project-module-icons.ts
   s_0b536d2972a09b::t_3d2a828b73a253 3,5-7,15,39-43
 apps/construction-management/components/projects/project-shell.stories.tsx
   s_0b536d2972a09b::t_28a9a3236a91bf 93-97
+  s_0b536d2972a09b::t_a9c78b47f86333 93-97
 apps/construction-management/components/settings/backdated-entry-form.stories.tsx
   s_0b536d2972a09b::t_e12e178d79399a 104,125
+  s_0b536d2972a09b::t_d3a00752261fcb 104,125
 apps/construction-management/components/site-work/documents/pending-files-field.stories.tsx
   s_0b536d2972a09b::t_c275c55189e076 1-198
 apps/construction-management/components/site-work/documents/pending-files-field.tsx
