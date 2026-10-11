@@ -1,0 +1,39 @@
+apps/construction-management/app/app/workspace/central-payment/page.tsx
+  s_d85efaaff765fa::t_a8ae6cc763c99a 3-5,9-16
+apps/construction-management/app/app/workspace/page.tsx
+  s_d85efaaff765fa::t_3ee6914aeedece 10,13,19
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_d85efaaff765fa::t_13bcae43a8669b 11,32-37,43
+apps/construction-management/components/app-shell/workspace-index.tsx
+  s_d85efaaff765fa::t_ea3158cf5ff4fe 4,13-15,20,24,44-48,51
+apps/construction-management/components/finance/central-payment/central-payment-fixtures.ts
+  s_d85efaaff765fa::t_00f7e9e1c2f8eb 1-184
+apps/construction-management/components/finance/central-payment/central-payment-page.stories.tsx
+  s_d85efaaff765fa::t_b5e0a87f0f0030 1-188
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_d85efaaff765fa::t_ec9926fdd371cb 1-568
+apps/construction-management/components/finance/central-payment/central-payment-workspace-tile.tsx
+  s_d85efaaff765fa::t_0ea4b3d0d1eda2 1-36
+apps/construction-management/components/reports/report-card.tsx
+  s_d85efaaff765fa::t_45ca0679789412 161,169-170,180
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_d85efaaff765fa::t_e2b471dba22d71 26,28-32,419-517
+apps/construction-management/components/reports/reports-page.tsx
+  s_d85efaaff765fa::t_01bf98397bc9bf 112,122-126,139,141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "858b102e1495fb09ad1c03246650e3ed99dad072",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
