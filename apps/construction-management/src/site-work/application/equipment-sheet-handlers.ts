@@ -72,6 +72,7 @@ import type {
   WorksheetDirectory,
   WorksheetNamedFacts,
 } from "./ports";
+import { removeFromGallery } from "./gallery-index";
 
 type Db = Prisma.TransactionClient;
 
@@ -1039,7 +1040,8 @@ export class EquipmentSheetHandlers {
       return reversed;
     });
     await stock.dispatch(events);
-    await this.deps.media.dispatch([
+    await removeFromGallery(
+      this.deps.media,
       siteWorkDocumentMediaRemoved({
         workspaceId: access.workspaceId,
         projectId: current.projectId,
@@ -1047,7 +1049,7 @@ export class EquipmentSheetHandlers {
         documentId: id,
         at,
       }),
-    ]);
+    );
     if (accruesHire(current.ownership, current.approval.status))
       await this.dispatch([this.hireVoided(current, at)]);
   }
