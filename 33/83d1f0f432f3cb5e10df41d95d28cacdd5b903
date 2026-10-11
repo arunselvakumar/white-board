@@ -1,0 +1,31 @@
+apps/construction-management/app/api/construction/site-work/hindrances/hindrances.http.test.ts
+  s_0b536d2972a09b::t_6b5b4062d5985b 1,390-427
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_0b536d2972a09b::t_91d5a4b052b9ac 30,204,253,255
+apps/construction-management/components/site-work/hindrances/hindrance-pages.tsx
+  s_0b536d2972a09b::t_b60585649eec6b 5,20,40
+apps/construction-management/components/site-work/site-diary/site-diary-pages.tsx
+  s_0b536d2972a09b::t_bfc01cea25da86 5,22,42
+apps/construction-management/components/site-work/site-record-header.tsx
+  s_0b536d2972a09b::t_e79108de91b867 1-53
+apps/construction-management/src/site-work/application/site-record-queries.ts
+  s_0b536d2972a09b::t_2d60ce88e39436 5-8,152
+apps/construction-management/src/site-work/infrastructure/prisma-hindrance-store.ts
+  s_0b536d2972a09b::t_d2d0558577d58e 8,39,69-74,76-77,133-140,196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3383d1f0f432f3cb5e10df41d95d28cacdd5b903",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
