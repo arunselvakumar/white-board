@@ -1,0 +1,43 @@
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/[sheetId]/edit/page.tsx
+  s_0b536d2972a09b::t_b0d0630578086e 1-28
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/[sheetId]/page.tsx
+  s_0b536d2972a09b::t_d1762f49a846e8 1-41
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/new/page.tsx
+  s_0b536d2972a09b::t_01afd8b8ce9a99 1-33
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/page.tsx
+  s_0b536d2972a09b::t_afe19bdb51d30e 3-5,10-20
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-actions.tsx
+  s_0b536d2972a09b::t_fa5cbca79004c1 1-243
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-detail.tsx
+  s_0b536d2972a09b::t_7937c361afd125 1-379
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-form-pages.tsx
+  s_0b536d2972a09b::t_9d20c5eb4f167d 1-86
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-form.tsx
+  s_0b536d2972a09b::t_bf337021d06624 1-1719
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-format.tsx
+  s_0b536d2972a09b::t_651066d957149f 1-78
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-live.ts
+  s_0b536d2972a09b::t_d1c169a7266946 1-365
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-settings-dialog.tsx
+  s_0b536d2972a09b::t_28998d21817deb 1-222
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheets-page.tsx
+  s_0b536d2972a09b::t_15ac1b3f9e3860 1-623
+apps/construction-management/src/queries/equipment-sheets.ts
+  s_0b536d2972a09b::t_0331e2711d5546 1-260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "708664517047e62c91a5cf82cdff5300ceb238a0",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
