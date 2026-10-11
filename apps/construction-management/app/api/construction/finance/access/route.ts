@@ -24,14 +24,15 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    // Who is asking comes first: an anonymous caller gets 401, not a 400.
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const url = new URL(request.url);
     const model = parseOrThrow(
       GetConstructionFinanceAccessRequestModel.safeParse(
         Object.fromEntries(url.searchParams),
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     const access = await loadMemberAccess(prisma, session);
     const scope = model.projectId == null ? {} : { projectId: model.projectId };
     const menus = Object.fromEntries(

@@ -45,7 +45,7 @@ export function CloseAccountButton({ account }: { account: PettyCashAccount }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Close {account.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              It has no vouchers. Its opening balance stays in the books;
+              It has no vouchers. Its opening balance stays in the books;{" "}
               {account.holderName} can have a new account later.
             </AlertDialogDescription>
           </AlertDialogHeader>

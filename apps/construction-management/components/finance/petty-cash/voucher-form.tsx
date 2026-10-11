@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -290,8 +290,6 @@ export function VoucherForm({
   };
 
   const busy = form.formState.isSubmitting || uploads.uploading;
-  /** Which submit button was pressed: set on click, read on submit. */
-  const approving = useRef(false);
 
   return (
     <form
@@ -299,9 +297,7 @@ export function VoucherForm({
       aria-label={voucher == null ? "New voucher" : `Edit ${voucher.number}`}
       className="w-full max-w-4xl space-y-6"
       onSubmit={(event) => {
-        void form.handleSubmit((values) => submit(values, approving.current))(
-          event,
-        );
+        void form.handleSubmit((values) => submit(values, false))(event);
       }}
     >
       {voucher?.approvalStatus === "approved" ? (
@@ -581,24 +577,19 @@ export function VoucherForm({
           Cancel
         </Button>
         {voucher == null && canApprove ? (
+          // Not a submit button: Enter in a field must Save, never approve.
           <Button
-            type="submit"
+            type="button"
             variant="outline"
             disabled={busy}
             onClick={() => {
-              approving.current = true;
+              void form.handleSubmit((values) => submit(values, true))();
             }}
           >
             Save &amp; Approve
           </Button>
         ) : null}
-        <Button
-          type="submit"
-          disabled={busy}
-          onClick={() => {
-            approving.current = false;
-          }}
-        >
+        <Button type="submit" disabled={busy}>
           {voucher == null ? "Save" : "Save changes"}
         </Button>
       </div>

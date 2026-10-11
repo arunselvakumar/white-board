@@ -129,22 +129,23 @@ export function PaymentCategoriesList() {
                             onEdit: () => {
                               setEditing(item);
                             },
+                            // Disable / Enable needs Update, like Rename.
+                            onToggle: () => {
+                              setListError(undefined);
+                              command.mutate(
+                                {
+                                  kind: item.disabled ? "enable" : "disable",
+                                  id: item.id,
+                                },
+                                {
+                                  onError: (error) => {
+                                    setListError(errorMessage(error));
+                                  },
+                                },
+                              );
+                            },
                           }
                         : {})}
-                      onToggle={() => {
-                        setListError(undefined);
-                        command.mutate(
-                          {
-                            kind: item.disabled ? "enable" : "disable",
-                            id: item.id,
-                          },
-                          {
-                            onError: (error) => {
-                              setListError(errorMessage(error));
-                            },
-                          },
-                        );
-                      }}
                       {...(item.isSeed || item.inUse || !can("delete")
                         ? {}
                         : {

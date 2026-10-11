@@ -250,28 +250,92 @@ export const Mobile: Story = {
   },
 };
 
-/** Export Receipts: a date range, then a ZIP link for that account. */
+const RECEIPTS_URL = `/api/construction/finance/petty-cash/accounts/${RAVI_ACCOUNT.id}/receipts.zip?from=2026-10-01&to=2026-10-10`;
+
+/** The petty-cash API, with the receipts ZIP answered by `zip`. */
+function serveReceipts(zip: () => Response) {
+  return () => {
+    const handler = pettyCashHandler({});
+    api = mockApi((call) =>
+      call.path.startsWith(
+        `/api/construction/finance/petty-cash/accounts/${RAVI_ACCOUNT.id}/receipts.zip`,
+      )
+        ? zip()
+        : handler(call),
+    );
+    return api.restore;
+  };
+}
+
+async function openExport(
+  canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"],
+  canvasElement: HTMLElement,
+  userEvent: Parameters<NonNullable<Story["play"]>>[0]["userEvent"],
+) {
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "Export Receipts" }),
+  );
+  const body = within(canvasElement.ownerDocument.body);
+  const dialog = within(
+    await body.findByRole("dialog", { name: "Export Receipts" }),
+  );
+  const from = dialog.getByLabelText("From");
+  await userEvent.clear(from);
+  await userEvent.type(from, "2026-10-01");
+  const to = dialog.getByLabelText("To");
+  await userEvent.clear(to);
+  await userEvent.type(to, "2026-10-10");
+  return { body, dialog };
+}
+
+/** Export Receipts: a date range, then the ZIP for that account is saved. */
 export const ExportReceipts: Story = {
-  beforeEach: serve(),
+  beforeEach: serveReceipts(
+    () =>
+      new Response(new Uint8Array([80, 75, 5, 6]), {
+        headers: {
+          "content-type": "application/zip",
+          "content-disposition": 'attachment; filename="receipts.zip"',
+        },
+      }),
+  ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Export Receipts" }),
+    const { body, dialog } = await openExport(canvas, canvasElement, userEvent);
+    await userEvent.click(dialog.getByRole("button", { name: "Download ZIP" }));
+    await waitFor(() =>
+      expect(api.calls.mock.calls.map(([call]) => call.path)).toContain(
+        RECEIPTS_URL,
+      ),
     );
-    const body = within(canvasElement.ownerDocument.body);
-    const dialog = within(
-      await body.findByRole("dialog", { name: "Export Receipts" }),
+    await waitFor(() =>
+      expect(
+        body.queryByRole("dialog", { name: "Export Receipts" }),
+      ).toBeNull(),
     );
-    const from = dialog.getByLabelText("From");
-    await userEvent.clear(from);
-    await userEvent.type(from, "2026-10-01");
-    const to = dialog.getByLabelText("To");
-    await userEvent.clear(to);
-    await userEvent.type(to, "2026-10-10");
+  },
+};
+
+/** Above 500 files the server refuses; the dialog says why and stays open. */
+export const ExportReceiptsRefused: Story = {
+  beforeEach: serveReceipts(() =>
+    Response.json(
+      {
+        code: "TOO_MANY_RECEIPTS",
+        message: "That is 612 files; choose fewer days (at most 500 files).",
+      },
+      { status: 409 },
+    ),
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const { dialog } = await openExport(canvas, canvasElement, userEvent);
+    await userEvent.click(dialog.getByRole("button", { name: "Download ZIP" }));
     await expect(
-      dialog.getByRole("link", { name: "Download ZIP" }),
-    ).toHaveAttribute(
-      "href",
-      `/api/construction/finance/petty-cash/accounts/${RAVI_ACCOUNT.id}/receipts.zip?from=2026-10-01&to=2026-10-10`,
-    );
+      await dialog.findByText(
+        "That is 612 files; choose fewer days (at most 500 files).",
+      ),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole("button", { name: "Download ZIP" }),
+    ).toBeEnabled();
   },
 };

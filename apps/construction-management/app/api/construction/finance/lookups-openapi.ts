@@ -27,7 +27,7 @@ export const financeLookupOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Live, enabled Payment Categories",
     successSchema: GetConstructionFinancePaymentCategoryOptionsResponseModel,
-    errors: [StatusCodes.UNAUTHORIZED],
+    errors: [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN],
   },
   {
     method: "get",
@@ -38,6 +38,10 @@ export const financeLookupOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Parties by name",
     successSchema: GetConstructionFinanceCounterpartyOptionsResponseModel,
-    errors: [StatusCodes.BAD_REQUEST, StatusCodes.UNAUTHORIZED],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+    ],
   },
 ];

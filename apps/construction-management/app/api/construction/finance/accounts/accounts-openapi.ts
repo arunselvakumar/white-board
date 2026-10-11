@@ -54,7 +54,11 @@ export const financeAccountOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Usable accounts, primary first",
     successSchema: GetConstructionFinanceAccountOptionsResponseModel,
-    errors: [StatusCodes.BAD_REQUEST, StatusCodes.UNAUTHORIZED],
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
+    ],
   },
   {
     method: "get",
