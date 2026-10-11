@@ -1,0 +1,25 @@
+apps/construction-management/docs/03-target-architecture.md
+  s_0b536d2972a09b::t_edb5dd24262c84 47,49
+apps/construction-management/docs/adr/CM-0016-daily-site-work-product-decisions.md
+  s_0b536d2972a09b::t_f42e9fdbbcb93e 1-233
+apps/construction-management/docs/modules/04-daily-site-work.md
+  s_0b536d2972a09b::t_ece8e804d557fa 589-600
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_0b536d2972a09b::t_6db62602201020 5,562-695
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7f65a0324a99dc45dc415dc2c7e4aa4f2874b1b6",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
