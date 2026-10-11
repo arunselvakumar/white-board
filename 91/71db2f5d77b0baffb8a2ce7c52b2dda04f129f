@@ -204,6 +204,10 @@ apps/construction-management/src/site-work/infrastructure/prisma-worksheet-store
   s_0b536d2972a09b::t_c7d9a51f02649e 1-376
 apps/construction-management/test/site-work.ts
   s_0b536d2972a09b::t_9a184a9f9cdaa4 5-12,15-16,204-646
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_0b536d2972a09b::t_a9c78b47f86333 93-97
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_0b536d2972a09b::t_d3a00752261fcb 104,125
 ---
 {
   "schema_version": "authorship/3.0.0",
