@@ -11,7 +11,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 import { Badge } from "@repo/ui/components/badge";
@@ -267,11 +267,14 @@ export function EquipmentDetailView({
   back,
   editHref,
   afterDeleteHref,
+  photoFailed = false,
 }: {
   equipment: EquipmentDetail;
   back: PageHeaderBack;
   editHref: string;
   afterDeleteHref: string;
+  /** The machine saved but its photo did not upload (`?photoFailed=1`). */
+  photoFailed?: boolean;
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState<DialogState>(null);
@@ -433,7 +436,14 @@ export function EquipmentDetailView({
             </AlertDescription>
           </Alert>
         ) : null}
-        <FormAlert message={error} />
+        <FormAlert
+          message={
+            error ??
+            (photoFailed
+              ? "The equipment was saved, but the photo did not upload. Add it again on Edit."
+              : undefined)
+          }
+        />
 
         <dl className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-3 sm:p-5">
           <Fact label="Where it is">{placeLabel(equipment)}</Fact>
@@ -587,12 +597,14 @@ export function EquipmentDetailScreen({
   afterDeleteHref: string;
 }) {
   const { data } = useSuspenseQuery(equipmentQuery(id));
+  const photoFailed = useSearchParams().get("photoFailed") === "1";
   return (
     <EquipmentDetailView
       equipment={data}
       back={back}
       editHref={editHref}
       afterDeleteHref={afterDeleteHref}
+      photoFailed={photoFailed}
     />
   );
 }

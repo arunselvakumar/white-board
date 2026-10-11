@@ -182,7 +182,7 @@ export type TransferCheck = {
  * maintenance (409 `EQUIPMENT_IN_MAINTENANCE`); to the warehouse only from
  * a Project (409 `EQUIPMENT_AT_WAREHOUSE`); to a Project other than the
  * current one; dated no later than today, and no earlier than its last
- * movement or the last usage sheet at the source Project.
+ * movement, and after the last usage sheet at the source Project.
  */
 export function assertTransfer(check: TransferCheck): void {
   if (check.inMaintenance)
@@ -225,10 +225,12 @@ export function assertTransfer(check: TransferCheck): void {
       "movementDate",
       { lastMovementDate: check.lastMovementDate },
     );
-  if (check.lastSheetDate != null && check.movementDate < check.lastSheetDate)
+  // A machine is at one Project on a date, so it leaves the day after its
+  // last sheet there: a same-day move would orphan that sheet.
+  if (check.lastSheetDate != null && check.movementDate <= check.lastSheetDate)
     throw invalid(
       "TRANSFER_BEFORE_LAST_SHEET",
-      `It has a usage sheet at this Project on ${check.lastSheetDate}. Choose that date or later.`,
+      `It has a usage sheet at this Project on ${check.lastSheetDate}. Choose a later date.`,
       "movementDate",
       { lastSheetDate: check.lastSheetDate },
     );

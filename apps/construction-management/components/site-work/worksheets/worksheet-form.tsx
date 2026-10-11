@@ -367,6 +367,10 @@ export function WorksheetForm({
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [bulkOpen, setBulkOpen] = useState(false);
+  // Save & Add New clears the copy, so later sheets are not marked duplicates.
+  const [duplicatedFrom, setDuplicatedFrom] = useState<string | null>(
+    source?.id ?? null,
+  );
   const editing = worksheet != null;
   const form = useForm<Values>({
     resolver: zodResolver(schemaFor(settings)),
@@ -473,7 +477,7 @@ export function WorksheetForm({
           ? await create.mutateAsync({
               ...body,
               projectId,
-              duplicatedFromId: source?.id ?? null,
+              duplicatedFromId: duplicatedFrom,
             })
           : await update.mutateAsync({
               ...body,
@@ -485,6 +489,7 @@ export function WorksheetForm({
           ? await uploads.uploadAll(saved.id, input.photos)
           : { failed: [] as string[] };
       if (mode === "add-new") {
+        setDuplicatedFrom(null);
         form.reset({
           ...blank(input.sheetDate),
           siteLocation: input.siteLocation,

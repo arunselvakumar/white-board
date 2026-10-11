@@ -363,7 +363,8 @@ export function EquipmentForm({
   equipment?: EquipmentDetail;
   /** Added from a Project's Equipment module: it starts there. */
   fixedProjectId?: string | null;
-  onSaved: (saved: EquipmentDetail) => void;
+  /** `photoFailed`: the machine saved but its photo did not upload. */
+  onSaved: (saved: EquipmentDetail, outcome: { photoFailed: boolean }) => void;
   onCancel: () => void;
 }) {
   const { data: options } = useSuspenseQuery(
@@ -396,8 +397,9 @@ export function EquipmentForm({
   const errors = form.formState.errors;
   const rented = values.ownership === "rented";
   const basis = values.utilisationBasis;
-  // Rented equipment needs a rate, and a rate needs Financial.
-  const rentedLocked = equipment == null && !seeRates;
+  // Rented equipment needs a rate, and a rate needs Financial: without it,
+  // new equipment and an owned machine cannot become rented.
+  const rentedLocked = !seeRates && equipment?.ownership !== "rented";
 
   useEffect(() => {
     if (!workingTimeMethodsFor(basis).includes(values.workingTimeMethod))
@@ -479,6 +481,7 @@ export function EquipmentForm({
               ...body,
               expectedUpdatedAt: equipment.updatedAt,
             });
+      let photoFailed = false;
       if (photo.kind !== "keep") {
         setSaving("Saving the photo…");
         try {
@@ -487,15 +490,21 @@ export function EquipmentForm({
               ? await uploadEquipmentPhoto(saved.id, photo.file)
               : await removeEquipmentPhoto(saved.id);
         } catch {
-          // The machine is saved; the photo can be tried again on Edit.
+          // The machine is saved; the detail page says the photo is missing.
+          photoFailed = true;
         }
       }
-      onSaved(saved);
+      onSaved(saved, { photoFailed });
     } catch (caught) {
       if (caught instanceof QueryHttpError) {
         const field = (caught.details as { field?: unknown } | undefined)
           ?.field;
-        if (typeof field === "string" && SERVER_FIELDS.has(field)) {
+        // The rate field is not shown without Financial: say it above the form.
+        if (
+          typeof field === "string" &&
+          SERVER_FIELDS.has(field) &&
+          !(field === "hireRate" && !seeRates)
+        ) {
           form.setError(field as FieldPath<Values>, {
             message: caught.message,
           });
@@ -971,8 +980,10 @@ export function EquipmentFormScreen({
     <EquipmentForm
       equipment={equipment}
       fixedProjectId={fixedProjectId ?? null}
-      onSaved={(saved) => {
-        router.push(hrefFor(saved.id));
+      onSaved={(saved, { photoFailed }) => {
+        router.push(
+          `${hrefFor(saved.id)}${photoFailed ? "?photoFailed=1" : ""}`,
+        );
       }}
       onCancel={() => {
         router.push(backHref);

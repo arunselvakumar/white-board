@@ -548,8 +548,12 @@ describe("Equipment lifecycle (CM-605)", () => {
       "EQUIPMENT_CHANGED",
     );
 
+    // The day of the last sheet is still refused: the machine was there.
+    expect(
+      (await error(await call({ movementDate: addDays(TODAY, -1) }))).code,
+    ).toBe("TRANSFER_BEFORE_LAST_SHEET");
     const moved = await json<EquipmentJson>(
-      await call({ movementDate: addDays(TODAY, -1), remark: "Slab work" }),
+      await call({ movementDate: TODAY, remark: "Slab work" }),
     );
     expect(moved.currentProject?.id).toBe(ctx.villa);
     expect(moved.currentLocationName).toBe("Block C yard");

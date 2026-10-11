@@ -139,9 +139,9 @@ function transferRefusal(patch: Partial<TransferCheck>): string {
 }
 
 describe("assertTransfer", () => {
-  it("allows a transfer on or after the last movement and sheet", () => {
+  it("allows a transfer on or after the last movement, after the last sheet", () => {
     expect(transferRefusal({})).toBe("allowed");
-    expect(transferRefusal({ movementDate: "2026-10-08" })).toBe("allowed");
+    expect(transferRefusal({ movementDate: "2026-10-09" })).toBe("allowed");
     expect(transferRefusal({ movementDate: "2026-10-11" })).toBe("allowed");
     expect(
       transferRefusal({
@@ -162,6 +162,10 @@ describe("assertTransfer", () => {
       transferRefusal({ movementDate: "2026-10-04", lastSheetDate: null }),
     ).toBe("TRANSFER_BEFORE_LAST_MOVEMENT");
     expect(transferRefusal({ movementDate: "2026-10-07" })).toBe(
+      "TRANSFER_BEFORE_LAST_SHEET",
+    );
+    // The machine was at the source Project that day.
+    expect(transferRefusal({ movementDate: "2026-10-08" })).toBe(
       "TRANSFER_BEFORE_LAST_SHEET",
     );
   });

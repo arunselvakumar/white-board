@@ -356,6 +356,27 @@ describe("worksheet content", () => {
     });
   });
 
+  it("drops a kept Work Type when the Department changes under a hidden section", () => {
+    const OTHER = "01a12900-0000-7000-8000-0000000000ff";
+    const previous = worksheetContent(input(), settings(), facts());
+    const moved = worksheetContent(
+      input({ departmentId: OTHER, workTypeId: null }),
+      settings({ showWorkType: false }),
+      facts({
+        contractor: {
+          id: CONTRACTOR,
+          isActive: true,
+          onProject: true,
+          departmentIds: [DEPARTMENT, OTHER],
+        },
+        department: { id: OTHER, disabled: false },
+      }),
+      previous,
+    );
+    expect(moved.departmentId).toBe(OTHER);
+    expect(moved.workTypeId).toBeNull();
+  });
+
   it("keeps a disabled Department or Work Type the sheet already had", () => {
     const previous = worksheetContent(input(), settings(), facts());
     const disabled = facts({

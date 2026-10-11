@@ -356,8 +356,12 @@ export function worksheetContent(
     siteLocation = input.siteLocation;
   }
 
-  // Work Type: optional, of the Department.
-  let workTypeId = previous?.workTypeId ?? null;
+  // Work Type: optional, of the Department. A hidden section keeps the
+  // sheet's Work Type only while the Department stays the same.
+  let workTypeId =
+    previous?.departmentId === department.id
+      ? (previous.workTypeId ?? null)
+      : null;
   if (settings.showWorkType) {
     workTypeId = null;
     if (!blank(input.workTypeId)) {

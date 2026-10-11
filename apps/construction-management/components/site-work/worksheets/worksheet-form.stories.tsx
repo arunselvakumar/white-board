@@ -251,7 +251,7 @@ export const Duplicate: Story = {
   args: {
     source: worksheet({ sheetDate: "2026-10-08", approvalStatus: "approved" }),
   },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ args, canvas, userEvent }) => {
     const form = within(
       await canvas.findByRole("form", { name: /^Duplicate of / }),
     );
@@ -268,6 +268,7 @@ export const Duplicate: Story = {
       sheetDate: TODAY,
       materials: [{ materialId: CEMENT.id, quantity: "12" }],
       approve: false,
+      duplicatedFromId: args.source?.id,
     });
   },
 };
