@@ -1,0 +1,187 @@
+apps/construction-management/app/api/construction/finance/central-payment/central-payment-models.ts
+  s_d85efaaff765fa::t_c2deb1b3cdecdd 1-89
+apps/construction-management/app/api/construction/finance/central-payment/central-payment-openapi.ts
+  s_d85efaaff765fa::t_906afff32528ec 1-29
+apps/construction-management/app/api/construction/finance/central-payment/central-payment.http.test.ts
+  s_d85efaaff765fa::t_e12e549e3ec87b 1-394
+apps/construction-management/app/api/construction/finance/central-payment/route.ts
+  s_d85efaaff765fa::t_2f1e893579e29e 1-110
+apps/construction-management/app/api/construction/finance/dashboard/dashboard-models.ts
+  s_d85efaaff765fa::t_737e59f1a8b634 1-91
+apps/construction-management/app/api/construction/finance/dashboard/dashboard-openapi.ts
+  s_d85efaaff765fa::t_e51a88af12fd07 1-35
+apps/construction-management/app/api/construction/finance/dashboard/dashboard.http.test.ts
+  s_d85efaaff765fa::t_bc4c8527fbefb4 1-375
+apps/construction-management/app/api/construction/finance/dashboard/route.ts
+  s_d85efaaff765fa::t_371c4d9f0a8875 1-115
+apps/construction-management/app/api/construction/finance/finance-openapi.ts
+  s_d85efaaff765fa::t_fa7ff746eabb1f 26-33,67-68,82-83
+apps/construction-management/app/api/construction/finance/parties/party-finance-openapi.ts
+  s_d85efaaff765fa::t_4d4cee3e277478 63-67,129,149-159
+apps/construction-management/app/api/construction/finance/party-balances/other-parties.http.test.ts
+  s_d85efaaff765fa::t_0fd9fd92951669 1-360
+apps/construction-management/app/api/construction/finance/party-balances/party-balance-workspace-models.ts
+  s_d85efaaff765fa::t_8dc1baabe8398e 1-72
+apps/construction-management/app/api/construction/finance/party-balances/route.ts
+  s_d85efaaff765fa::t_43619be487ba75 1-35
+apps/construction-management/app/api/construction/finance/settlements/settlement-models.ts
+  s_d85efaaff765fa::t_4332098958790b 11,24-25
+apps/construction-management/app/api/construction/reporting/reports/finance-reports.http.test.ts
+  s_d85efaaff765fa::t_ed1965849d09ea 1-856
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_d85efaaff765fa::t_d9658b593cbbae 15,53-63,80-84,94-96,137-142,145-205
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_d85efaaff765fa::t_974c96f84dbb4c 24-45,115-172,208-215,282-301
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_d85efaaff765fa::t_69cf7242acd41d 4-8,18-20,39,76-115,119-139,146-148,157,169-184,189,222-224
+apps/construction-management/app/app/projects/[id]/payments/other-parties/[partyId]/page.tsx
+  s_d85efaaff765fa::t_cbfe03d7912558 1-25
+apps/construction-management/app/app/projects/[id]/payments/other-parties/page.tsx
+  s_d85efaaff765fa::t_f02eba8e84c13f 3,7-14
+apps/construction-management/app/app/projects/[id]/payments/other-parties/pay/page.tsx
+  s_d85efaaff765fa::t_2c713baf472f94 1-25
+apps/construction-management/app/app/projects/[id]/payments/other-parties/payments/[paymentId]/page.tsx
+  s_d85efaaff765fa::t_bb33c16b6f9c0a 1-25
+apps/construction-management/app/app/workspace/central-payment/page.tsx
+  s_d85efaaff765fa::t_86f3545a1d0880 3-5,9-16
+apps/construction-management/app/app/workspace/page.tsx
+  s_d85efaaff765fa::t_9308040b5f250f 10,13,19
+apps/construction-management/app/app/workspace/party-balance/page.tsx
+  s_d85efaaff765fa::t_260818028d5223 3,7,9
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_d85efaaff765fa::t_f952e1c97f791e 11,32-37,43
+apps/construction-management/components/app-shell/workspace-index.tsx
+  s_d85efaaff765fa::t_b346d49805289c 4,13-15,20,24,44-48,51
+apps/construction-management/components/finance/central-payment/central-payment-fixtures.ts
+  s_d85efaaff765fa::t_4954aaef2a9638 1-184
+apps/construction-management/components/finance/central-payment/central-payment-page.stories.tsx
+  s_d85efaaff765fa::t_991666e9d07435 1-198
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_d85efaaff765fa::t_982a90b3acfd18 1-572
+apps/construction-management/components/finance/central-payment/central-payment-workspace-tile.tsx
+  s_d85efaaff765fa::t_849c41523c31d4 1-36
+apps/construction-management/components/finance/other-expenses/other-expense-form.tsx
+  s_d85efaaff765fa::t_33322728409655 79-81
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_d85efaaff765fa::t_6f75d4902488c0 327,343
+apps/construction-management/components/finance/parties/party-balance-workspace.stories.tsx
+  s_d85efaaff765fa::t_ee96c4240f5cf3 1-56
+apps/construction-management/components/finance/parties/party-balance-workspace.tsx
+  s_d85efaaff765fa::t_eb5b8feae6e54f 1-211
+apps/construction-management/components/finance/parties/party-fixtures.ts
+  s_d85efaaff765fa::t_e05fa5c30995dd 12,15,23-24,483-624,650-678,686-694,715-717,723-727
+apps/construction-management/components/finance/parties/party-money-tab.stories.tsx
+  s_d85efaaff765fa::t_84490c36089f30 7,12,195-252
+apps/construction-management/components/finance/parties/party-money-tab.tsx
+  s_d85efaaff765fa::t_686cbe348674af 23,39-41,104-114,118-119
+apps/construction-management/components/finance/parties/party-payment-form.stories.tsx
+  s_d85efaaff765fa::t_46a0c2f88ff973 14,20,261-289
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_d85efaaff765fa::t_96beb83f65889f 177,280-286,421-428,729-731,755-762,766-770
+apps/construction-management/components/finance/parties/settlement-list.stories.tsx
+  s_d85efaaff765fa::t_3504250eeb8019 1-189
+apps/construction-management/components/finance/parties/settlement-list.tsx
+  s_d85efaaff765fa::t_45957edac86225 1-445
+apps/construction-management/components/finance/petty-cash/voucher-form.tsx
+  s_d85efaaff765fa::t_0b067b2b6bb589 292-298
+apps/construction-management/components/projects/dashboard/finance-dashboard-fixtures.ts
+  s_d85efaaff765fa::t_7090e12ef8e0f2 1-126
+apps/construction-management/components/projects/dashboard/finance-sections.tsx
+  s_d85efaaff765fa::t_e9eedbde04f956 1-456
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_d85efaaff765fa::t_d524fd1f25dbcb 16-21,139-140,167-183,250,255,307-404,673-676
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_d85efaaff765fa::t_25bdb512d59773 51,56-59,301,397-398,474-481
+apps/construction-management/components/reports/report-card.tsx
+  s_d85efaaff765fa::t_44b105b36e5a01 31-35,46-47,56-133,139,141,179-216,230,233,238-239,245-254,261-270,274,279-281,335-370,394,413-459,499
+apps/construction-management/components/reports/report-catalogue.ts
+  s_d85efaaff765fa::t_0c325df2916fb9 1,9-13,17-24,121-219,284,286-287,304-319
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_d85efaaff765fa::t_d6efd64f1900b3 26,28-32,419-517
+apps/construction-management/components/reports/reports-page.tsx
+  s_d85efaaff765fa::t_8cefc65ee68560 8-10,16,23-24,53-104,112,118-119,122-126,139,141,147,157-160,171,191-201
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_d85efaaff765fa::t_ce52e58ad9d016 104,125
+apps/construction-management/docs/modules/07-payments-accounting.md
+  s_d85efaaff765fa::t_3e03c4bcbc785e 817-853
+apps/construction-management/docs/prd/handoff/M7.md
+  s_d85efaaff765fa::t_f59f30334ab3ea 1-112
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_d85efaaff765fa::t_7564f71b4eb632 710-711
+apps/construction-management/src/composition/finance-directory.ts
+  s_d85efaaff765fa::t_8b53b1af359364 317-335
+apps/construction-management/src/composition/finance-report-source.ts
+  s_d85efaaff765fa::t_897e9cb0861966 1-630
+apps/construction-management/src/composition/report-jobs.ts
+  s_d85efaaff765fa::t_50dd1d84b93429 3,5-8,14-15,19-23,27
+apps/construction-management/src/finance/application/party-ports.ts
+  s_d85efaaff765fa::t_82e2e42263fb56 277-278,607-616
+apps/construction-management/src/finance/application/party-queries.ts
+  s_d85efaaff765fa::t_d7ea27ce061c92 90-105,350-456
+apps/construction-management/src/finance/application/ports.ts
+  s_d85efaaff765fa::t_995468c3bc9924 154-164
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_d85efaaff765fa::t_a7e2ff740d7318 17,334,355
+apps/construction-management/src/finance/domain/dues.test.ts
+  s_d85efaaff765fa::t_c318644227b9b6 1-129
+apps/construction-management/src/finance/domain/dues.ts
+  s_d85efaaff765fa::t_dad25bc09f4e7c 1-199
+apps/construction-management/src/finance/domain/payment-flows.test.ts
+  s_d85efaaff765fa::t_228c8d387d0359 1-32
+apps/construction-management/src/finance/domain/payment-flows.ts
+  s_d85efaaff765fa::t_9aa7ba7042e58a 1-70
+apps/construction-management/src/finance/infrastructure/central-payment.ts
+  s_d85efaaff765fa::t_303b319bd6a10e 1-229
+apps/construction-management/src/finance/infrastructure/due-invoices.ts
+  s_d85efaaff765fa::t_9dddc4d70dc524 1-188
+apps/construction-management/src/finance/infrastructure/finance-dashboard.ts
+  s_d85efaaff765fa::t_4a684e2e265b88 1-231
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_d85efaaff765fa::t_019513e3079497 622-626,1016-1034
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_d85efaaff765fa::t_2889d62a7d27aa 13
+apps/construction-management/src/queries/finance-central-payment.ts
+  s_d85efaaff765fa::t_d811cde568182f 1-19
+apps/construction-management/src/queries/finance-dashboard.ts
+  s_d85efaaff765fa::t_e888c480729f69 1-37
+apps/construction-management/src/queries/finance-parties.ts
+  s_d85efaaff765fa::t_5406379b1e14e2 37,64-65,245,257-269,351-372
+apps/construction-management/src/reporting/application/build-finance-report.ts
+  s_d85efaaff765fa::t_368cc5884c4d7a 1-104
+apps/construction-management/src/reporting/application/build-report.ts
+  s_d85efaaff765fa::t_ae6baf6cb9370e 9-14,21-23,50-54,64,123-132,153-154,160-165,179-181
+apps/construction-management/src/reporting/application/ports.ts
+  s_d85efaaff765fa::t_200cc78d5f7407 20-34,216-281
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_d85efaaff765fa::t_ba4ab2aaed4a28 23,77-78,97-102
+apps/construction-management/src/reporting/domain/finance-reports.test.ts
+  s_d85efaaff765fa::t_773024dd5ea370 1-410
+apps/construction-management/src/reporting/domain/finance-reports.ts
+  s_d85efaaff765fa::t_eefa218d12a3e2 1-1041
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_d85efaaff765fa::t_847cf329b69ada 4,20-28,46-97,168-210,254-267,288-297,314-318,323-325,357-360
+apps/construction-management/src/reporting/domain/report-period.ts
+  s_d85efaaff765fa::t_f606e14e48b802 88-120
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_d85efaaff765fa::t_9c31556342cfb7 7,43-44,62
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_d85efaaff765fa::t_c03c2bb51cc529 24
+apps/construction-management/test/finance-reports.ts
+  s_d85efaaff765fa::t_844ce9b315f6e4 1-678
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dcd4e76cffc6900c6260a0d37fd24ab854271a0a",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
