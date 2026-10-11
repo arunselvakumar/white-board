@@ -1,0 +1,91 @@
+apps/construction-management/app/api/construction/masters/_lib/lookup-routes.ts
+  s_0b536d2972a09b::t_40445cd8cdcc65 2,16,29-30,32-35,47,54
+apps/construction-management/app/api/construction/masters/_lib/master-models.ts
+  s_0b536d2972a09b::t_52fdb11427c7da 3-7,61-76,78-112
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_0b536d2972a09b::t_15f044507c775b 2-5,18
+apps/construction-management/app/api/construction/masters/departments/department-routes.ts
+  s_0b536d2972a09b::t_201674f0654387 1-2,6-9,14
+apps/construction-management/app/api/construction/masters/labour-categories/labour-category-models.ts
+  s_0b536d2972a09b::t_a8efc79e2fb01f 3,5
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_0b536d2972a09b::t_1c24f8c14e4458 35-38,57,185-186,204
+apps/construction-management/app/api/construction/masters/materials/material-routes.ts
+  s_0b536d2972a09b::t_6841287b570cd2 3-6,19,21
+apps/construction-management/app/api/construction/masters/work-types/[id]/delete/route.ts
+  s_0b536d2972a09b::t_3c1b37f0fbf71b 1-6
+apps/construction-management/app/api/construction/masters/work-types/[id]/disable/route.ts
+  s_0b536d2972a09b::t_5b34d6974fa83c 1-6
+apps/construction-management/app/api/construction/masters/work-types/[id]/enable/route.ts
+  s_0b536d2972a09b::t_7b029074056e88 1-6
+apps/construction-management/app/api/construction/masters/work-types/[id]/route.ts
+  s_0b536d2972a09b::t_1db7e0af3a0f93 1-6
+apps/construction-management/app/api/construction/masters/work-types/[id]/update/route.ts
+  s_0b536d2972a09b::t_7a11722326019d 1-10
+apps/construction-management/app/api/construction/masters/work-types/route.ts
+  s_0b536d2972a09b::t_221f9602329a5b 1-9
+apps/construction-management/app/api/construction/masters/work-types/work-type-models.ts
+  s_0b536d2972a09b::t_1846fea0cebba8 1-84
+apps/construction-management/app/api/construction/masters/work-types/work-type-routes.ts
+  s_0b536d2972a09b::t_847b7a149cbec3 1-55
+apps/construction-management/app/api/construction/masters/work-types/work-types-openapi.ts
+  s_0b536d2972a09b::t_c1f05dc42b9959 1-121
+apps/construction-management/src/composition/site-work-usage.ts
+  s_0b536d2972a09b::t_0935b4f858c1c2 1-123
+apps/construction-management/src/masters/application/lookup-handlers.ts
+  s_0b536d2972a09b::t_3ac909f78b40be 5,9,17-18,34,85-86,95,108-112,117-118,127-140
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_0b536d2972a09b::t_00503663696078 412
+apps/construction-management/src/masters/application/work-type-handlers.ts
+  s_0b536d2972a09b::t_ec1b16f6a55b2e 1-221
+apps/construction-management/src/masters/application/work-type-ports.ts
+  s_0b536d2972a09b::t_134a70951280f2 1-56
+apps/construction-management/src/masters/domain/lookup-entry.test.ts
+  s_0b536d2972a09b::t_530a4ca1749bd7 58-82
+apps/construction-management/src/masters/domain/lookup-entry.ts
+  s_0b536d2972a09b::t_bba024496b6d5d 7,17-21,36-37,56-57,67-68,98-101,133,164-176
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_0b536d2972a09b::t_83c2d3236a773c 11-18,42-44,96,141,152-161
+apps/construction-management/src/masters/domain/work-type.test.ts
+  s_0b536d2972a09b::t_4b1e16ef732a24 1-133
+apps/construction-management/src/masters/domain/work-type.ts
+  s_0b536d2972a09b::t_e547f02dbb3906 1-216
+apps/construction-management/src/masters/infrastructure/create-masters-handlers.ts
+  s_0b536d2972a09b::t_ad70eade4dfe3c 8,10-11,19,21-25,28,31-36,41-56
+apps/construction-management/src/masters/infrastructure/prisma-lookup-store.ts
+  s_0b536d2972a09b::t_d0cae413fb53f4 10,37-38,88-94,122,149
+apps/construction-management/src/masters/infrastructure/prisma-master-usage.ts
+  s_0b536d2972a09b::t_23eb068cdca14c 9-11,15-20
+apps/construction-management/src/masters/infrastructure/seed-company-masters.ts
+  s_0b536d2972a09b::t_c7ab6ec8490ae7 27-41,164-206,210-211,234-240,250-254
+apps/construction-management/src/masters/infrastructure/seeds/masters.json
+  s_0b536d2972a09b::t_0210728705bf85 14,70
+apps/construction-management/src/queries/masters.ts
+  s_0b536d2972a09b::t_ef6dba49aa9279 7,16-17,25-28,58-65,74-77,82
+apps/construction-management/src/masters/infrastructure/prisma-work-type-store.ts
+  s_f64fbd0ff01db5::t_3e341c99b60761 1-211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f87862fb47288c7f6e79a83d9d5f11b7e682de74",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f64fbd0ff01db5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aba3e7fa7df5f869d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
