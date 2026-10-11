@@ -1,0 +1,27 @@
+apps/construction-management/components/site-work/hindrances/hindrance-detail.stories.tsx
+  s_0b536d2972a09b::t_1c4e992d92c918 1-128
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_0b536d2972a09b::t_3d52646890f5e7 204
+apps/construction-management/components/site-work/hindrances/hindrance-fixtures.ts
+  s_0b536d2972a09b::t_f9fee910a46bec 1-192
+apps/construction-management/components/site-work/hindrances/hindrance-form.stories.tsx
+  s_0b536d2972a09b::t_cfec56e3d480e7 1-270
+apps/construction-management/components/site-work/hindrances/hindrances-list.stories.tsx
+  s_0b536d2972a09b::t_7a5b591c293d45 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ba8981bffa8078e027dbb4b70c72d4bf7e505d8b",
+  "prompts": {},
+  "sessions": {
+    "s_0b536d2972a09b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01e55aa7-12d2-4a78-9fe0-a8a0c4dbfe32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
