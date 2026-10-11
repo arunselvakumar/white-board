@@ -1,0 +1,119 @@
+apps/construction-management/app/api/construction/finance/invoices/goods-receipt-invoices.http.test.ts
+  s_d85efaaff765fa::t_53ce2e80f3856e 37-43,81-86,236-241
+apps/construction-management/app/api/construction/finance/invoices/invoice-models.ts
+  s_d85efaaff765fa::t_418cccf8e6cede 46-56,98-105,140-142,189-191
+apps/construction-management/app/api/construction/finance/invoices/invoices.http.test.ts
+  s_d85efaaff765fa::t_02236952124646 43,65-67,458-459,486
+apps/construction-management/app/api/construction/finance/parties/form-options/route.ts
+  s_d85efaaff765fa::t_ddb54ceaa31340 1-37
+apps/construction-management/app/api/construction/finance/parties/handlers.ts
+  s_d85efaaff765fa::t_5a787b75e64ab0 100,123-127
+apps/construction-management/app/api/construction/finance/parties/party-balance-models.ts
+  s_d85efaaff765fa::t_5a949f15f98e39 56-61,89-103
+apps/construction-management/app/api/construction/finance/parties/party-finance-openapi.ts
+  s_d85efaaff765fa::t_55af2e9ef97a88 65-66,123,143-153
+apps/construction-management/app/api/construction/finance/parties/party-shared-models.ts
+  s_d85efaaff765fa::t_e99fd8c1082d0d 21-31
+apps/construction-management/app/api/construction/finance/party-payments/party-payment-models.ts
+  s_d85efaaff765fa::t_a5fba51e453de2 87-88,91-92
+apps/construction-management/app/api/construction/finance/party-payments/party-payments.http.test.ts
+  s_d85efaaff765fa::t_84ef5a8c7a7ad0 102,104,407-410,510-513
+apps/construction-management/app/api/construction/finance/party-statements/party-statement-models.ts
+  s_d85efaaff765fa::t_9dafed0db66b7e 51-56
+apps/construction-management/app/api/construction/finance/settlements/handlers.ts
+  s_d85efaaff765fa::t_b5d70afdb06a72 26-28
+apps/construction-management/app/api/construction/finance/tds/tds-models.ts
+  s_d85efaaff765fa::t_5e82a63933053d 30-32
+apps/construction-management/app/api/construction/masters/_lib/party-models.ts
+  s_d85efaaff765fa::t_dd83531311628b 111-113
+apps/construction-management/app/app/projects/[id]/payments/contractors/[partyId]/page.tsx
+  s_d85efaaff765fa::t_3da2963eb0d3d6 1-21
+apps/construction-management/app/app/projects/[id]/payments/contractors/page.tsx
+  s_d85efaaff765fa::t_64da0bb58f8ecd 3,7-14
+apps/construction-management/app/app/projects/[id]/payments/contractors/pay/page.tsx
+  s_d85efaaff765fa::t_4ac660c331c3cf 1-24
+apps/construction-management/app/app/projects/[id]/payments/contractors/payments/[paymentId]/page.tsx
+  s_d85efaaff765fa::t_4ea39ca6e25848 1-25
+apps/construction-management/app/app/projects/[id]/payments/suppliers/[partyId]/page.tsx
+  s_d85efaaff765fa::t_57f68626c9bc25 1-21
+apps/construction-management/app/app/projects/[id]/payments/suppliers/page.tsx
+  s_d85efaaff765fa::t_cd700a976b419b 3,7-14
+apps/construction-management/app/app/projects/[id]/payments/suppliers/pay/page.tsx
+  s_d85efaaff765fa::t_6adc7b9437677c 1-24
+apps/construction-management/app/app/projects/[id]/payments/suppliers/payments/[paymentId]/page.tsx
+  s_d85efaaff765fa::t_21ae6d13a8d0fc 1-25
+apps/construction-management/components/finance/parties/allocation-table.tsx
+  s_d85efaaff765fa::t_357722de3c2bfb 1-153
+apps/construction-management/components/finance/parties/awaiting-grns.tsx
+  s_d85efaaff765fa::t_27c3efa3700cd0 1-101
+apps/construction-management/components/finance/parties/invoice-dialog.tsx
+  s_d85efaaff765fa::t_5f9f5d5ead3da5 1-557
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_d85efaaff765fa::t_a00d6d98eca987 1-515
+apps/construction-management/components/finance/parties/opening-card.tsx
+  s_d85efaaff765fa::t_e0099ebb9ef3cc 1-322
+apps/construction-management/components/finance/parties/party-balances.tsx
+  s_d85efaaff765fa::t_30fc866e219c05 1-254
+apps/construction-management/components/finance/parties/party-lists.tsx
+  s_d85efaaff765fa::t_1b3c3e8387fd55 1-328
+apps/construction-management/components/finance/parties/party-money-page.tsx
+  s_d85efaaff765fa::t_29bba58437f921 1-175
+apps/construction-management/components/finance/parties/party-money-tab.tsx
+  s_d85efaaff765fa::t_da974e92459856 1-126
+apps/construction-management/components/finance/parties/party-money.ts
+  s_d85efaaff765fa::t_8333fdaa67af94 1-117
+apps/construction-management/components/finance/parties/party-payment-detail.tsx
+  s_d85efaaff765fa::t_f5bdbd0dd7e2b9 1-391
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_d85efaaff765fa::t_8218d8ab3c62ab 1-839
+apps/construction-management/components/finance/parties/party-status.tsx
+  s_d85efaaff765fa::t_9088c9b1ce0f1e 1-65
+apps/construction-management/components/finance/parties/tds-ledger.tsx
+  s_d85efaaff765fa::t_753817f6d2c925 1-274
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_d85efaaff765fa::t_b5e1213b3f68c9 395,397-400
+apps/construction-management/src/finance/application/goods-receipt-invoices.ts
+  s_d85efaaff765fa::t_cab18ff0cae1d5 7,73,82,85-90,131-133,185-187
+apps/construction-management/src/finance/application/invoice-handlers.ts
+  s_d85efaaff765fa::t_bc30cca715147d 123-124,209,541-543
+apps/construction-management/src/finance/application/party-common.ts
+  s_d85efaaff765fa::t_ad63f8d583b712 47,72
+apps/construction-management/src/finance/application/party-opening-handlers.ts
+  s_d85efaaff765fa::t_365356aa4a9c6a 11-15,77-81
+apps/construction-management/src/finance/application/party-payment-handlers.ts
+  s_d85efaaff765fa::t_1430caad236271 15,321-325,423,578
+apps/construction-management/src/finance/application/party-ports.ts
+  s_d85efaaff765fa::t_e1420addda28a1 90-94,465
+apps/construction-management/src/finance/application/party-queries.ts
+  s_d85efaaff765fa::t_e271758a7d830c 56-59,181-185,334-361
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_d85efaaff765fa::t_564d6069b2dbd0 169-171,194-198,386-388
+apps/construction-management/src/finance/domain/invoice.test.ts
+  s_d85efaaff765fa::t_dc25e2610e7391 105-110,142-145,162-166,181-183,186-188
+apps/construction-management/src/finance/domain/party-payment.test.ts
+  s_d85efaaff765fa::t_be1994fb683f7c 105-114,118-132
+apps/construction-management/src/finance/domain/party.ts
+  s_d85efaaff765fa::t_a7b3e05298d1e7 24,70,90
+apps/construction-management/src/finance/infrastructure/party-payment-receipt-pdf.ts
+  s_d85efaaff765fa::t_c6c35caef41b36 295-298,305-310
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_d85efaaff765fa::t_edbe9b686eb8f0 613-614,667,743-749,758-764
+apps/construction-management/src/queries/finance-parties.ts
+  s_d85efaaff765fa::t_8f18eefb1c4496 1-381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "70cde53e221260096912f70ea6ff7497fcc79356",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
