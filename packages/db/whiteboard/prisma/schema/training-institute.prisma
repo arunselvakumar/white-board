@@ -91,6 +91,8 @@ enum TrainingInstituteAttendanceStatus {
   absent
   late
   excused
+  /// Absent after an Absence Notice (ADR-0041). Counts as an absence, labelled apart.
+  informed_absent
 
   @@map("attendance_status")
   @@schema("training_institute")
@@ -159,6 +161,7 @@ model TrainingInstituteBatch {
   studyMaterials      TrainingInstituteStudyMaterial[]
   homework            TrainingInstituteHomework[]
   classTests          TrainingInstituteClassTest[]
+  absenceNotices      TrainingInstituteAbsenceNotice[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([courseId, deletedAt])
@@ -345,6 +348,7 @@ model TrainingInstituteStudent {
   homeworkSubmissions  TrainingInstituteHomeworkSubmission[]
   classTests           TrainingInstituteClassTest[]
   testResults          TrainingInstituteTestResult[]
+  absenceNotices       TrainingInstituteAbsenceNotice[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([workspaceId, phone])
@@ -384,6 +388,7 @@ model TrainingInstituteEnrollment {
   feeFollowUps           TrainingInstituteFeeFollowUp[]
   attendanceMarks        TrainingInstituteAttendanceMark[]
   convertedFromEnquiries TrainingInstituteEnquiry[]
+  absenceNotices         TrainingInstituteAbsenceNotice[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([studentId, deletedAt])
@@ -923,5 +928,78 @@ model TrainingInstituteTestResultChange {
 
   @@index([resultId, changedAt])
   @@map("test_result_changes")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteAbsenceReason {
+  sick
+  exam
+  travel
+  family
+  other
+
+  @@map("absence_reason")
+  @@schema("training_institute")
+}
+
+/// A Student or linked Parent saying the Student will miss one upcoming Class
+/// (ADR-0041). The Class is keyed like a Class Change: Batch, local date, and
+/// start time; a Moved Class is keyed by its new time. Whether the Notice still
+/// applies (the Class is still scheduled) is worked out on read. One live
+/// Notice per Enrollment and Class (partial unique index in the migration); a
+/// withdrawn Notice stays with withdrawn_at set.
+model TrainingInstituteAbsenceNotice {
+  id                String                          @id @db.Uuid
+  workspaceId       String                          @map("workspace_id")
+  studentId         String                          @map("student_id") @db.Uuid
+  enrollmentId      String                          @map("enrollment_id") @db.Uuid
+  batchId           String                          @map("batch_id") @db.Uuid
+  classDate         DateTime                        @map("class_date") @db.Date
+  startTime         String                          @map("start_time") @db.VarChar(5)
+  endTime           String                          @map("end_time") @db.VarChar(5)
+  reason            TrainingInstituteAbsenceReason
+  note              String?                         @db.VarChar(300)
+  givenAt           DateTime                        @map("given_at")
+  givenByUserId     String                          @map("given_by_user_id")
+  givenByRole       TrainingInstituteSubmitterRole  @map("given_by_role")
+  /// Display name of the User who gave it, as shown to Teachers.
+  givenByName       String                          @map("given_by_name") @db.VarChar(200)
+  withdrawnAt       DateTime?                       @map("withdrawn_at")
+  withdrawnByUserId String?                         @map("withdrawn_by_user_id")
+  withdrawnByRole   TrainingInstituteSubmitterRole? @map("withdrawn_by_role")
+  createdAt         DateTime                        @default(now()) @map("created_at")
+  updatedAt         DateTime                        @updatedAt @map("updated_at")
+
+  student    TrainingInstituteStudent    @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  enrollment TrainingInstituteEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  batch      TrainingInstituteBatch      @relation(fields: [batchId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, batchId, classDate])
+  @@index([workspaceId, studentId, classDate])
+  @@map("absence_notices")
+  @@schema("training_institute")
+}
+
+enum TrainingInstituteNotificationKind {
+  absence_notice_given
+  absence_notice_withdrawn
+
+  @@map("notification_kind")
+  @@schema("training_institute")
+}
+
+/// An in-app Notification for one User (ADR-0041), shown under the bell.
+/// `payload` is a snapshot of what to show, shaped by `kind`.
+model TrainingInstituteNotification {
+  id              String                            @id @db.Uuid
+  workspaceId     String                            @map("workspace_id")
+  recipientUserId String                            @map("recipient_user_id")
+  kind            TrainingInstituteNotificationKind
+  payload         Json
+  readAt          DateTime?                         @map("read_at")
+  createdAt       DateTime                          @default(now()) @map("created_at")
+
+  @@index([workspaceId, recipientUserId, createdAt, id])
+  @@map("notifications")
   @@schema("training_institute")
 }

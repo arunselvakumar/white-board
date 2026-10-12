@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-import type { AttendanceRegister } from "@/src/training-institute/domain/attendance-register";
+import type { AttendanceRegisterView } from "@/src/training-institute/application/attendance-handlers";
+import { ABSENCE_REASONS } from "@/src/training-institute/domain/absence-notice";
+import { ATTENDANCE_STATUSES } from "@/src/training-institute/domain/attendance-register";
 
 export const OpenTrainingInstituteAttendanceRegisterRequestModel = z.object({
   batchId: z.uuid(),
@@ -19,21 +21,37 @@ export const ListTrainingInstituteAttendanceRegistersRequestModel = z
 export const TrainingInstituteAttendanceRegisterParamsModel = z.object({
   id: z.uuid(),
 });
+/** The Absence Notice flag on a mark (RegisterNoticeView, ADR-0041). */
+export const TrainingInstituteAttendanceRegisterNoticeResponseModel = z.object({
+  noticeId: z.uuid(),
+  reason: z.enum(ABSENCE_REASONS),
+  note: z.string().nullable(),
+  givenAt: z.iso.datetime(),
+  givenBy: z.object({
+    role: z.enum(["student", "parent"]),
+    name: z.string(),
+  }),
+});
 export const TrainingInstituteAttendanceMarkResponseModel = z.object({
   id: z.uuid(),
   enrollmentId: z.uuid(),
   studentId: z.uuid(),
   studentName: z.string(),
-  status: z.enum(["unmarked", "present", "absent", "late", "excused"]),
+  status: z.enum(ATTENDANCE_STATUSES),
   note: z.string().nullable(),
   markedByUserId: z.string().nullable(),
   markedAt: z.iso.datetime().nullable(),
+  /** A live Absence Notice for one of the day's Classes that still applies. */
+  notice: TrainingInstituteAttendanceRegisterNoticeResponseModel.nullable(),
 });
 export const TrainingInstituteAttendanceSummaryResponseModel = z.object({
   total: z.number().int(),
   unmarked: z.number().int(),
   present: z.number().int(),
+  /** Uninformed absences. */
   absent: z.number().int(),
+  /** Absences after an Absence Notice; never counted as attended. */
+  informedAbsent: z.number().int(),
   late: z.number().int(),
   excused: z.number().int(),
   attended: z.number().int(),
@@ -56,9 +74,12 @@ export const ListTrainingInstituteAttendanceRegistersResponseModel = z.object({
   prevCursor: z.string().nullable(),
 });
 
-export function mapAttendanceRegister(
-  register: AttendanceRegister,
-): z.infer<typeof TrainingInstituteAttendanceRegisterResponseModel> {
+export function mapAttendanceRegister({
+  register,
+  notices,
+}: AttendanceRegisterView): z.infer<
+  typeof TrainingInstituteAttendanceRegisterResponseModel
+> {
   return {
     id: register.id,
     batchId: register.batchId,
@@ -76,6 +97,7 @@ export function mapAttendanceRegister(
       note: mark.note,
       markedByUserId: mark.markedByUserId,
       markedAt: mark.markedAt?.toISOString() ?? null,
+      notice: notices.get(mark.enrollmentId) ?? null,
     })),
   };
 }

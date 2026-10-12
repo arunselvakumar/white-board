@@ -31,6 +31,10 @@ export function getAppBreadcrumbs(
       : [homework, { label: "Homework details" }];
   }
   if (role === "teacher") {
+    if (pathname === "/teacher/absence-notices")
+      return [{ label: "Absence Notices", href: pathname }];
+    if (pathname === "/notifications")
+      return [{ label: "Notifications", href: pathname }];
     const myBatches = { label: "My Batches", href: "/teacher" };
     if (pathname === "/teacher") return [myBatches];
     const [, , , batchId, action, itemId] = pathname.split("/");
@@ -71,6 +75,8 @@ export function getAppBreadcrumbs(
   if (area === "fees") {
     return [dashboard, { label: "Fees" }];
   }
+  if (area === "absence-notices")
+    return [dashboard, { label: "Absence Notices" }];
   if (area === "attendance")
     return [
       dashboard,

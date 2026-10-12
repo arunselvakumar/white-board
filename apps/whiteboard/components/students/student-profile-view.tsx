@@ -14,6 +14,8 @@ import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";
 import { studentQueries, type StudentResponse } from "@/src/queries/students";
 import { attendanceQueries } from "@/src/queries/attendance";
+import { ATTENDANCE_STATUS_LABELS } from "@/src/training-institute/domain/attendance-register";
+import { summaryLine } from "@/components/attendance/attendance-summary";
 import { useAuth } from "@repo/auth/react";
 import { useState } from "react";
 
@@ -323,7 +325,15 @@ export function StudentProfileScreen({ studentId }: { studentId: string }) {
       />
       <section className="w-full px-6 pb-6">
         <div className="max-w-4xl rounded-2xl border p-5 sm:p-7">
-          <h2 className="mb-4 text-lg font-semibold">Attendance history</h2>
+          <div className="mb-4 space-y-1">
+            <h2 className="text-lg font-semibold">Attendance history</h2>
+            {attendance.summary.total > 0 && (
+              <p className="text-muted-foreground text-sm">
+                {attendance.summary.attended} of {attendance.summary.total}{" "}
+                attended · {summaryLine(attendance.summary)}
+              </p>
+            )}
+          </div>
           {attendance.items.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No Attendance recorded yet.
@@ -338,8 +348,8 @@ export function StudentProfileScreen({ studentId }: { studentId: string }) {
                   <span>
                     {item.date} · {item.batchName}
                   </span>
-                  <span className="capitalize">
-                    {item.status}
+                  <span>
+                    {ATTENDANCE_STATUS_LABELS[item.status]}
                     {item.note ? ` · ${item.note}` : ""}
                   </span>
                 </li>

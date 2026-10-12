@@ -121,6 +121,18 @@ _Avoid_: reschedule (as the entity name), make-up class (as the entity name)
 One date or a date range on which every Class in the Workspace is cancelled. Declared by the Owner, with an optional reason.
 _Avoid_: leave, vacation, closure, day off (as the entity name)
 
+**Absence Notice**:
+A Student or a linked Parent telling the institute ahead of time that the Student will miss one upcoming Class, with a reason (Sick, Exam, Travel, Family function, or Other) and an optional note. Given any time before the Class starts and withdrawable until then; nobody approves it. It applies only while its Class is still scheduled: a Cancelled Class, a Holiday, or a Moved Class drops it, and it never carries over to a Moved Class's new time. The Batch's Teachers get a Notification and an email. See ADR-0041.
+_Avoid_: leave, leave request, leave application (it isn't approved), excuse
+
+**Informed absent**:
+The Attendance status for a Student who was absent after giving an Absence Notice. It counts as an absence, labelled apart from Absent, which means an uninformed absence. The Register pre-selects it for a Student with a notice; the Teacher can change it.
+_Avoid_: excused (Excused is the Teacher's own judgement), approved absence
+
+**Notification**:
+An in-app message to one User under the bell, also sent by email, such as a Teacher being told about an Absence Notice. Marked read by its User. See ADR-0041.
+_Avoid_: alert, message, inbox item (as the entity name)
+
 **Enrollment**:
 The fact that a Student is taking a Course in a Batch, with Class Mode, Timings, and a Fee Plan. A Student may have many Enrollments.
 _Avoid_: admission (that is creating the Student), registration, mapping
@@ -262,6 +274,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - **Timings** produce **Classes**. A **Class** is a Batch, a date, and a start time.
 - A **Class** may be cancelled or moved once; restoring it brings back the original. Changing a **Class** never changes the Batch's weekly **Timings**.
 - A **Holiday** belongs to one **Workspace** and cancels every **Class** on its dates.
+- An **Absence Notice** belongs to one **Enrollment** and one of its upcoming **Classes**; there is at most one live Absence Notice per Enrollment and Class. A **Notification** belongs to one **User**.
 - The **Owner Dashboard** is the **In-app Home** for a Training Institute **Workspace**.
 - The **Student Home** and **Parent Home** are the **In-app Home** for Student and Parent Users. A Student or Parent may download a **Class** recording only from an active **Enrollment**, on or after the date it began.
 
@@ -330,4 +343,5 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Online vs offline — resolved: **Class Mode** on the **Batch**, overridable on the **Enrollment**. Hybrid is a valid mode.
 - Student-specific hours (home tuition) — resolved: **Timing** on the **Enrollment** may inherit the Batch or be Student-specific.
 - Enquiry, attendance, certificates, WhatsApp, GST, live classroom, franchise royalty — resolved: not P0. P1/P2.
+- Advance absence notice ([issue #61](https://github.com/arunselvakumar/white-board/issues/61)) — resolved: an **Absence Notice** per Class, given by the Student or a linked Parent, never approved; Teachers get a **Notification** under the bell and an email; the Register pre-selects **Informed absent**. See [ADR-0041](docs/adr/0041-absence-notice-product-decisions.md).
 - Cancellations, holidays, and moved classes ([issue #13](https://github.com/white-board-io/white-board-v3/issues/13)) — resolved: **Cancelled Class**, **Moved Class**, and **Holiday** are exceptions over weekly **Timings**, not a session calendar. Owner and assigned Teachers change Classes; Holidays are Owner-only and Workspace-wide. See [ADR-0028](docs/adr/0028-class-changes-are-exceptions-over-weekly-timings.md) and [ADR-0029](docs/adr/0029-class-change-product-decisions.md).

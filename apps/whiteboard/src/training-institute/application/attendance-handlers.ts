@@ -3,12 +3,15 @@ import {
   attendanceDate,
   localDateInTimezone,
 } from "../domain/attendance-register";
-import { classesOn } from "../domain/class-schedule";
+import { noticeStanding } from "../domain/absence-notice";
+import { classesOn, clockMinutes } from "../domain/class-schedule";
 import type {
   AttendanceHistoryItem,
+  AttendanceNoticeRecord,
   AttendanceRepository,
 } from "../domain/attendance-repository";
 import { DomainError } from "../domain/errors";
+import type { RegisterNoticeView } from "./absence-notice-views";
 import type { ClassExceptionsReader } from "./class-change-handlers";
 import { decodeListCursor, encodeListCursor } from "./list-cursor";
 
@@ -18,6 +21,16 @@ export type AttendanceActor = {
   role: "owner" | "teacher";
 };
 
+/**
+ * A Register with the Absence Notice flag for each Enrollment that has a live
+ * notice for one of that day's Classes that still applies (ADR-0041). The
+ * marks themselves are untouched: a notice never marks Attendance.
+ */
+export type AttendanceRegisterView = {
+  register: AttendanceRegister;
+  notices: ReadonlyMap<string, RegisterNoticeView>;
+};
+
 export class AttendanceHandlers {
   constructor(
     private readonly store: AttendanceRepository,
@@ -25,6 +38,15 @@ export class AttendanceHandlers {
   ) {}
 
   async open(
+    batchId: string,
+    actor: AttendanceActor,
+    requestedDate?: string,
+  ): Promise<AttendanceRegisterView> {
+    const register = await this.openRegister(batchId, actor, requestedDate);
+    return this.withNotices(register, actor.workspaceId);
+  }
+
+  private async openRegister(
     batchId: string,
     actor: AttendanceActor,
     requestedDate?: string,
@@ -100,7 +122,20 @@ export class AttendanceHandlers {
     );
   }
 
-  async get(id: string, actor: AttendanceActor): Promise<AttendanceRegister> {
+  async get(
+    id: string,
+    actor: AttendanceActor,
+  ): Promise<AttendanceRegisterView> {
+    return this.withNotices(
+      await this.registerFor(id, actor),
+      actor.workspaceId,
+    );
+  }
+
+  private async registerFor(
+    id: string,
+    actor: AttendanceActor,
+  ): Promise<AttendanceRegister> {
     const register = await this.store.findById(id, actor.workspaceId);
     if (register == null)
       throw new DomainError(
@@ -115,8 +150,8 @@ export class AttendanceHandlers {
     id: string,
     marks: { enrollmentId: string; status: string; note?: string | null }[],
     actor: AttendanceActor,
-  ): Promise<AttendanceRegister> {
-    const register = await this.get(id, actor);
+  ): Promise<AttendanceRegisterView> {
+    const register = await this.registerFor(id, actor);
     const saved = await this.store.saveMarks(
       register.id,
       actor.workspaceId,
@@ -128,7 +163,7 @@ export class AttendanceHandlers {
         "ATTENDANCE_REGISTER_NOT_FOUND",
         "Attendance Register not found.",
       );
-    return saved;
+    return this.withNotices(saved, actor.workspaceId);
   }
 
   async listBatch(
@@ -151,7 +186,18 @@ export class AttendanceHandlers {
       after,
       before,
     });
-    return pageWithCursors(page, query);
+    const notices = await this.noticesFor(
+      query.batchId,
+      actor.workspaceId,
+      page.items.map((register) => register.date),
+    );
+    return {
+      ...pageWithCursors(page, query),
+      items: page.items.map((register) => ({
+        register,
+        notices: notices.get(register.date) ?? new Map(),
+      })),
+    };
   }
 
   async studentHistory(
@@ -178,14 +224,81 @@ export class AttendanceHandlers {
       query.before == null
         ? undefined
         : decodeListCursor(query.before, (id) => ({ value: id }));
-    const page = await this.store.listStudentHistory({
-      studentId: query.studentId,
-      workspaceId: actor.workspaceId,
-      limit: query.limit,
-      after,
-      before,
-    });
-    return pageWithCursors(page, query);
+    const [page, summary] = await Promise.all([
+      this.store.listStudentHistory({
+        studentId: query.studentId,
+        workspaceId: actor.workspaceId,
+        limit: query.limit,
+        after,
+        before,
+      }),
+      this.store.studentSummary(query.studentId, actor.workspaceId),
+    ]);
+    return { ...pageWithCursors(page, query), summary };
+  }
+
+  private async withNotices(
+    register: AttendanceRegister,
+    workspaceId: string,
+  ): Promise<AttendanceRegisterView> {
+    const notices = await this.noticesFor(register.batchId, workspaceId, [
+      register.date,
+    ]);
+    return { register, notices: notices.get(register.date) ?? new Map() };
+  }
+
+  /**
+   * Notices that apply, by Register date and then Enrollment. A notice applies
+   * while its Enrollment is active and its Class is still scheduled at that
+   * date and start time; a Cancelled Class, a Holiday, or a Moved Class drops
+   * it. With notices for two Classes on one day, the earlier Class's is shown.
+   */
+  private async noticesFor(
+    batchId: string,
+    workspaceId: string,
+    dates: readonly string[],
+  ): Promise<Map<string, Map<string, RegisterNoticeView>>> {
+    const result = new Map<string, Map<string, RegisterNoticeView>>();
+    const records = await this.store.liveNotices(batchId, workspaceId, [
+      ...new Set(dates),
+    ]);
+    const candidates = records.filter(
+      (
+        record,
+      ): record is AttendanceNoticeRecord & {
+        timings: NonNullable<AttendanceNoticeRecord["timings"]>;
+      } => record.timings != null,
+    );
+    if (candidates.length === 0) return result;
+    const { changes, holidays } = await this.exceptions.forBatches(
+      workspaceId,
+      [batchId],
+    );
+    const applying = candidates
+      .filter(
+        (record) =>
+          noticeStanding(
+            { batchId, timings: record.timings },
+            record,
+            changes,
+            holidays,
+          ).status === "applies",
+      )
+      .sort((a, b) => clockMinutes(a.startTime) - clockMinutes(b.startTime));
+    for (const record of applying) {
+      const byEnrollment =
+        result.get(record.date) ?? new Map<string, RegisterNoticeView>();
+      result.set(record.date, byEnrollment);
+      if (byEnrollment.has(record.enrollmentId)) continue;
+      byEnrollment.set(record.enrollmentId, {
+        noticeId: record.id,
+        reason: record.reason,
+        note: record.note,
+        givenAt: record.givenAt.toISOString(),
+        givenBy: { role: record.givenByRole, name: record.givenByName },
+      });
+    }
+    return result;
   }
 
   private async batchForActor(batchId: string, actor: AttendanceActor) {

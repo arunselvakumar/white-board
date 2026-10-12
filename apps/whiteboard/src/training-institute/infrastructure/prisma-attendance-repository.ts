@@ -1,9 +1,14 @@
 import { Prisma, type PrismaClient } from "@repo/whiteboard-db";
 
-import { AttendanceRegister } from "../domain/attendance-register";
+import {
+  AttendanceRegister,
+  attendanceSummary,
+  type AttendanceSummary,
+} from "../domain/attendance-register";
 import type {
   AttendanceBatch,
   AttendanceHistoryItem,
+  AttendanceNoticeRecord,
   AttendanceRepository,
 } from "../domain/attendance-repository";
 import type { ListCursor, ListPage } from "../domain/list";
@@ -222,6 +227,80 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       total,
       hasMore,
     };
+  }
+
+  async liveNotices(
+    batchId: string,
+    workspaceId: string,
+    dates: readonly string[],
+  ): Promise<AttendanceNoticeRecord[]> {
+    if (dates.length === 0) return [];
+    const rows = await this.db.trainingInstituteAbsenceNotice.findMany({
+      where: {
+        workspaceId,
+        batchId,
+        classDate: { in: dates.map(dateValue) },
+        withdrawnAt: null,
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: { select: { deletedAt: true, droppedAt: true } },
+            batch: { select: { timings: true } },
+          },
+        },
+      },
+      orderBy: [{ classDate: "asc" }, { startTime: "asc" }, { id: "asc" }],
+    });
+    return rows.map((row) => {
+      const { enrollment } = row;
+      const active =
+        enrollment.workspaceId === workspaceId &&
+        enrollment.batchId === batchId &&
+        enrollment.deletedAt == null &&
+        enrollment.endedAt == null &&
+        enrollment.student.deletedAt == null &&
+        enrollment.student.droppedAt == null;
+      return {
+        id: row.id,
+        enrollmentId: row.enrollmentId,
+        date: row.classDate.toISOString().slice(0, 10),
+        startTime: row.startTime,
+        reason: row.reason,
+        note: row.note,
+        givenAt: row.givenAt,
+        givenByRole: row.givenByRole,
+        givenByName: row.givenByName,
+        timings: active
+          ? WeeklyTimings.create(
+              enrollment.timingSource === "student"
+                ? enrollment.studentTimings
+                : enrollment.batch.timings,
+            ).toJson()
+          : null,
+      };
+    });
+  }
+
+  async studentSummary(
+    studentId: string,
+    workspaceId: string,
+  ): Promise<AttendanceSummary> {
+    const groups = await this.db.trainingInstituteAttendanceMark.groupBy({
+      by: ["status"],
+      where: {
+        studentId,
+        workspaceId,
+        deletedAt: null,
+        register: { deletedAt: null },
+      },
+      _count: { _all: true },
+    });
+    return attendanceSummary(
+      groups.flatMap((group) =>
+        Array.from({ length: group._count._all }, () => group.status),
+      ),
+    );
   }
 
   async studentExists(

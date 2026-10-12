@@ -6,6 +6,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import { StudentProfileScreen } from "@/components/students/student-profile-view";
+import type { AttendanceHistory } from "@/src/queries/attendance";
 import type { BatchListResponse } from "@/src/queries/batches";
 import type { CourseListResponse } from "@/src/queries/courses";
 import type { StudentResponse } from "@/src/queries/students";
@@ -350,7 +351,20 @@ function profileRoutes(history: Reply): Record<string, Route> {
     "GET /courses": () => ({ json: emptyList satisfies CourseListResponse }),
     "GET /batches": () => ({ json: emptyList satisfies BatchListResponse }),
     [`GET /students/${HISTORY_STUDENT_ID}/attendance`]: () => ({
-      json: emptyList,
+      json: {
+        ...emptyList,
+        summary: {
+          total: 0,
+          unmarked: 0,
+          present: 0,
+          absent: 0,
+          informedAbsent: 0,
+          late: 0,
+          excused: 0,
+          attended: 0,
+          complete: true,
+        },
+      } satisfies AttendanceHistory,
     }),
     [HISTORY_ROUTE]: () => history,
   };

@@ -1,11 +1,13 @@
 import { z } from "zod";
 
+import { ATTENDANCE_STATUSES } from "@/src/training-institute/domain/attendance-register";
+
 export const SaveTrainingInstituteAttendanceMarksRequestModel = z.object({
   marks: z
     .array(
       z.object({
         enrollmentId: z.uuid(),
-        status: z.enum(["unmarked", "present", "absent", "late", "excused"]),
+        status: z.enum(ATTENDANCE_STATUSES),
         note: z.string().max(500).nullable().optional(),
       }),
     )

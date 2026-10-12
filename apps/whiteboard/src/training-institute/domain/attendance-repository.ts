@@ -1,4 +1,8 @@
-import type { AttendanceRegister } from "./attendance-register";
+import type { AbsenceGiverRole, AbsenceReason } from "./absence-notice";
+import type {
+  AttendanceRegister,
+  AttendanceSummary,
+} from "./attendance-register";
 import type { ListCursor, ListPage } from "./list";
 import type { WeeklySlot } from "./weekly-timings";
 
@@ -19,6 +23,24 @@ export type AttendanceHistoryItem = {
   status: string;
   note: string | null;
   createdAt: Date;
+};
+
+/**
+ * A live (not withdrawn) Absence Notice for a Register's date, with the
+ * Enrollment's effective weekly Timings while it is active in the Batch, or
+ * null once it isn't (then the notice no longer applies).
+ */
+export type AttendanceNoticeRecord = {
+  id: string;
+  enrollmentId: string;
+  date: string;
+  startTime: string;
+  reason: AbsenceReason;
+  note: string | null;
+  givenAt: Date;
+  givenByRole: AbsenceGiverRole;
+  givenByName: string;
+  timings: WeeklySlot[] | null;
 };
 
 export type AttendanceRepository = {
@@ -63,7 +85,18 @@ export type AttendanceRepository = {
     after?: ListCursor<{ value: string }>;
     before?: ListCursor<{ value: string }>;
   }): Promise<ListPage<AttendanceRegister>>;
+  /** Live Absence Notices for the Batch on any of these local dates. */
+  liveNotices(
+    batchId: string,
+    workspaceId: string,
+    dates: readonly string[],
+  ): Promise<AttendanceNoticeRecord[]>;
   studentExists(studentId: string, workspaceId: string): Promise<boolean>;
+  /** Counts over every mark of the Student, across all Registers. */
+  studentSummary(
+    studentId: string,
+    workspaceId: string,
+  ): Promise<AttendanceSummary>;
   listStudentHistory(params: {
     studentId: string;
     workspaceId: string;

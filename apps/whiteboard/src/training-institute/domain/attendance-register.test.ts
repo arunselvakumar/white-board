@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { AttendanceRegister, attendanceDate } from "./attendance-register";
+import {
+  AttendanceRegister,
+  attendanceDate,
+  attendanceSummary,
+} from "./attendance-register";
 
 const now = new Date("2026-09-25T08:00:00.000Z");
 const first = {
@@ -46,6 +50,7 @@ describe("Attendance Register", () => {
       unmarked: 2,
       present: 0,
       absent: 0,
+      informedAbsent: 0,
       late: 0,
       excused: 0,
       attended: 0,
@@ -147,5 +152,48 @@ describe("Attendance Register", () => {
     expect(() =>
       register.mark([{ ...mark, note: "x".repeat(501) }], "user_owner", now),
     ).toThrow();
+  });
+
+  it("counts Informed absent apart from Absent and never as attended", () => {
+    const register = create();
+    register.mark(
+      [
+        { enrollmentId: first.enrollmentId, status: "informed_absent" },
+        { enrollmentId: second.enrollmentId, status: "absent" },
+      ],
+      "user_teacher",
+      now,
+    );
+    expect(register.summary).toEqual({
+      total: 2,
+      unmarked: 0,
+      present: 0,
+      absent: 1,
+      informedAbsent: 1,
+      late: 0,
+      excused: 0,
+      attended: 0,
+      complete: true,
+    });
+    expect(
+      attendanceSummary([
+        "present",
+        "late",
+        "informed_absent",
+        "informed_absent",
+        "excused",
+        "unmarked",
+      ]),
+    ).toEqual({
+      total: 6,
+      unmarked: 1,
+      present: 1,
+      absent: 0,
+      informedAbsent: 2,
+      late: 1,
+      excused: 1,
+      attended: 2,
+      complete: false,
+    });
   });
 });
