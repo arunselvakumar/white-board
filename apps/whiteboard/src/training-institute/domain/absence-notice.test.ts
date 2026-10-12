@@ -267,14 +267,19 @@ describe("assertBeforeClassStarts", () => {
 
   it("allows ten minutes before and refuses from the start time", () => {
     expect(
-      domainCode(() => { assertBeforeClassStarts(key, tenBefore); }),
+      domainCode(() => {
+        assertBeforeClassStarts(key, tenBefore);
+      }),
     ).toBeNull();
-    expect(domainCode(() => { assertBeforeClassStarts(key, atStart); })).toBe(
-      "ABSENCE_NOTICE_CLASS_STARTED",
-    );
     expect(
-      domainCode(() => { assertBeforeClassStarts(key, { date: "2026-11-03", minutes: 0 }); },
-      ),
+      domainCode(() => {
+        assertBeforeClassStarts(key, atStart);
+      }),
+    ).toBe("ABSENCE_NOTICE_CLASS_STARTED");
+    expect(
+      domainCode(() => {
+        assertBeforeClassStarts(key, { date: "2026-11-03", minutes: 0 });
+      }),
     ).toBe("ABSENCE_NOTICE_CLASS_STARTED");
   });
 });
