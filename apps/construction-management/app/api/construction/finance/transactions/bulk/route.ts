@@ -1,14 +1,8 @@
-import { prisma } from "@repo/construction-db";
-
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
-import { requirePlanActive } from "@/app/api/_lib/require-plan-active";
-import {
-  isResponse,
-  requireCompanySession,
-} from "@/app/api/_lib/require-session";
-import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
+import { requireAnyAccess } from "@/app/api/_lib/require-access";
+import { isResponse } from "@/app/api/_lib/require-session";
 
-import { transactionRegister } from "../handlers";
+import { MENU, transactionRegister } from "../handlers";
 import { BulkDecideConstructionFinanceTransactionsRequestModel } from "../transaction-models";
 
 export const dynamic = "force-dynamic";
@@ -21,18 +15,20 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const session = await requireCompanySession(request);
+    // Approve or Reject somewhere first (401 / 403 before validation);
+    // each item is checked on its own Project in bulkDecide.
+    const session = await requireAnyAccess(request, MENU, [
+      "approve",
+      "reject",
+    ]);
     if (isResponse(session)) return session;
     const model = parseOrThrow(
       BulkDecideConstructionFinanceTransactionsRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const ended = await requirePlanActive(session);
-    if (ended != null) return ended;
-    const access = await loadMemberAccess(prisma, session);
     const result = await transactionRegister.bulkDecide(
-      access,
+      session.access,
       model.items,
       model.approve
         ? { approve: true }

@@ -404,4 +404,50 @@ describe("Account statement (CM-701)", () => {
     );
     expect(other.status).toBe(StatusCodes.FORBIDDEN);
   });
+
+  it("never reaches another Company's account", async () => {
+    const theirs = await newCompany();
+    const { bankId } = await seededAccounts(theirs.workspaceId);
+    await owner();
+    const missing = async (response: Response) => {
+      expect(response.status).toBe(StatusCodes.NOT_FOUND);
+      expect(((await response.json()) as { code: string }).code).toBe(
+        "ACCOUNT_NOT_FOUND",
+      );
+    };
+    await missing(
+      await getOne(new Request(`${BASE}/${bankId}`), params(bankId)),
+    );
+    await missing(
+      await statement(
+        new Request(`${BASE}/${bankId}/statement`),
+        params(bankId),
+      ),
+    );
+    await missing(
+      await update(
+        post(`${BASE}/${bankId}/update`, {
+          name: "Taken over",
+          openingBalance: 0,
+          openingDate: TODAY,
+          expectedUpdatedAt: new Date().toISOString(),
+        }),
+        params(bankId),
+      ),
+    );
+    await missing(
+      await remove(
+        post(`${BASE}/${bankId}/delete`, {
+          expectedUpdatedAt: new Date().toISOString(),
+        }),
+        params(bankId),
+      ),
+    );
+    // Their account is untouched.
+    const row = await prisma.constructionFinanceAccount.findUnique({
+      where: { id: bankId },
+    });
+    expect(row?.name).toBe("Company's Bank Account");
+    expect(row?.deletedAt).toBeNull();
+  });
 });

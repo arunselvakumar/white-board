@@ -4,6 +4,7 @@ import type { MemberAccess } from "@/src/shared-kernel/access";
 import {
   assertCanCreate,
   assertCanEdit,
+  assertPeriodOpen,
 } from "@/src/shared-kernel/backdated-policy";
 import {
   loadBackdatedActor,
@@ -12,10 +13,8 @@ import {
 import {
   calendarDateFromDb,
   calendarDateToDb,
-  daysBetween,
 } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { DomainError } from "@/src/shared-kernel/domain-error";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
 import type { FinanceAuthorNames } from "../application/document-thread-ports";
@@ -322,20 +321,10 @@ export async function otherExpenseGuard(
       assertCanEdit(policy, "other_expense", date, actor, today);
     },
     decide: (date) => {
-      const closing = policy.financialClosingDate;
-      if (closing != null && daysBetween(date, closing) >= 0)
-        throw new DomainError(
-          "FINANCIAL_PERIOD_CLOSED",
-          `The books are closed up to ${closing}. Entries dated on or before it cannot be approved or rejected.`,
-          {
-            kind: "forbidden",
-            details: {
-              module: "other_expense",
-              entryDate: date,
-              financialClosingDate: closing,
-            },
-          },
-        );
+      assertPeriodOpen(policy.financialClosingDate, date, {
+        cannot: "approved or rejected",
+        module: "other_expense",
+      });
     },
   };
 }
