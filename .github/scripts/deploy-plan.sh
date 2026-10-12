@@ -24,18 +24,19 @@ project_of() {
 # The commit of an app's latest production deploy if it succeeded, else
 # nothing (no deploy yet, or the newest one failed or never finished, which
 # deploys the app again). GitHub's list order is not guaranteed, so both
-# lists are read in full (every page) and sorted by creation time.
+# lists are read in full (every page) and sorted by creation time, then by
+# id for records created in the same second.
 last_deployed() {
   local environment="production/$1"
   local latest id sha state
   latest=$(gh api --paginate --slurp \
     "repos/$GITHUB_REPOSITORY/deployments?environment=$environment&per_page=100" |
-    jq -r 'add // [] | sort_by(.created_at) | last | select(. != null) | "\(.id) \(.sha)"')
+    jq -r 'add // [] | sort_by([.created_at, .id]) | last | select(. != null) | "\(.id) \(.sha)"')
   [ -z "$latest" ] && return
   read -r id sha <<< "$latest"
   state=$(gh api --paginate --slurp \
     "repos/$GITHUB_REPOSITORY/deployments/$id/statuses?per_page=100" |
-    jq -r 'add // [] | sort_by(.created_at) | last | .state // ""')
+    jq -r 'add // [] | sort_by([.created_at, .id]) | last | .state // ""')
   if [ "$state" = "success" ]; then echo "$sha"; fi
 }
 
