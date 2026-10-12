@@ -37,7 +37,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const mine = await companies.listForUser(auth.userId);
   const [only] = mine;
-  if (mine.length === 0) return redirectTo(request, `/choose-company${carry}`);
+  if (mine.length === 0) return redirectTo(request, "/create-company");
   if (mine.length === 1 && only != null) {
     const headers = await companies.activate(request.headers, only.id);
     return redirectTo(request, target, headers);

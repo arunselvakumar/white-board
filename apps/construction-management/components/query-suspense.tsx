@@ -43,17 +43,24 @@ function useIsClient(): boolean {
  * relative `/api/...` URLs with the browser's Session cookie, which the
  * server render has neither of. The shell around this renders on the server.
  */
-export function QuerySuspense({ children }: { children: ReactNode }) {
+export function QuerySuspense({
+  children,
+  fallback = <PageFallback />,
+}: {
+  children: ReactNode;
+  /** What shows while loading; `null` for a section that may stay empty. */
+  fallback?: ReactNode;
+}) {
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  if (!isClient) return <PageFallback />;
+  if (!isClient) return fallback;
 
   return (
     <QueryErrorResetBoundary key={pathname}>
       {({ reset }) => (
         <QueryErrorBoundary onReset={reset}>
-          <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          <Suspense fallback={fallback}>{children}</Suspense>
         </QueryErrorBoundary>
       )}
     </QueryErrorResetBoundary>
