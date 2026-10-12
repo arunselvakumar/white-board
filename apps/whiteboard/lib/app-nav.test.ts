@@ -21,6 +21,7 @@ describe("role navigation", () => {
     ]);
     expect(navForRole("teacher").map((item) => item.label)).toEqual([
       "My Batches",
+      "Absence Notices",
       "Enquiries",
       "Calendar",
       "Online Classes",
@@ -61,6 +62,7 @@ describe("appPageByHref", () => {
       "/batches",
       "/teachers",
       "/attendance",
+      "/absence-notices",
       "/fees",
     ]);
   });
@@ -91,5 +93,14 @@ describe("appPageByHref", () => {
     expect(isAppNavActive("/teacher/batches/b1/homework", "/teacher")).toBe(
       true,
     );
+  });
+
+  it("lights up Absence Notices, not My Batches, on the Teacher's list", () => {
+    expect(
+      isAppNavActive("/teacher/absence-notices", "/teacher/absence-notices"),
+    ).toBe(true);
+    expect(isAppNavActive("/teacher/absence-notices", "/teacher")).toBe(false);
+    expect(isAppNavActive("/teacher", "/teacher")).toBe(true);
+    expect(isAppNavActive("/absence-notices", "/absence-notices")).toBe(true);
   });
 });

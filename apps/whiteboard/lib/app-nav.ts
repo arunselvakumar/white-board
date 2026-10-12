@@ -57,6 +57,12 @@ export const APP_NAV = [
     description: "Daily Batch Attendance Registers.",
   },
   {
+    href: "/absence-notices",
+    label: "Absence Notices",
+    title: "Absence Notices",
+    description: "Students who gave notice for upcoming Classes.",
+  },
+  {
     href: "/fees",
     label: "Fees",
     title: "Fees",
@@ -139,6 +145,12 @@ export const TEACHER_NAV = [
     description: "Assigned Batches.",
   },
   {
+    href: "/teacher/absence-notices",
+    label: "Absence Notices",
+    title: "Absence Notices",
+    description: "Students in my Batches who gave notice for upcoming Classes.",
+  },
+  {
     href: "/enquiries",
     label: "Enquiries",
     title: "Enquiries",
@@ -177,6 +189,10 @@ export function isAppNavActive(pathname: string, href: string): boolean {
   // Family Homes have their own nav items beneath them (/student/homework).
   if (href === "/" || href === "/student" || href === "/parent") {
     return pathname === href;
+  }
+  // My Batches covers a Batch's pages, not the Teacher's Absence Notices.
+  if (href === "/teacher") {
+    return pathname === href || pathname.startsWith("/teacher/batches/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

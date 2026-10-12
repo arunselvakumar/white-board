@@ -24,6 +24,7 @@ import {
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
 
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { isAppNavActive, navForRole } from "@/lib/app-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
@@ -124,7 +125,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               Switch Workspace
             </Button>
           )}
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            {/* Only Teachers receive Notifications for now (ADR-0041 §1). */}
+            {role === "teacher" ? <NotificationBell /> : null}
             <UserMenu />
           </div>
         </header>

@@ -150,3 +150,16 @@ it("builds Test trails for Teachers and Results for families", () => {
     { label: "Results", href: "/parent/results" },
   ]);
 });
+
+it("trails Absence Notices and Notifications (ADR-0041)", () => {
+  expect(getAppBreadcrumbs("/absence-notices", "owner")).toEqual([
+    { label: "Dashboard", href: "/" },
+    { label: "Absence Notices" },
+  ]);
+  expect(getAppBreadcrumbs("/teacher/absence-notices", "teacher")).toEqual([
+    { label: "Absence Notices", href: "/teacher/absence-notices" },
+  ]);
+  expect(getAppBreadcrumbs("/notifications", "teacher")).toEqual([
+    { label: "Notifications", href: "/notifications" },
+  ]);
+});
