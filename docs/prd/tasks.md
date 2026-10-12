@@ -437,6 +437,6 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 
 ### WB-017 — Advance absence notice from Students and Parents
 
-**Issue:** [#61](https://github.com/arunselvakumar/white-board/issues/61). **Decisions:** [ADR-0041](../adr/0041-absence-notice-product-decisions.md). **Blocked by:** WB-004, WB-010, WB-012 (Attendance, Class Changes, and Student and Parent Home exist).
+**Issue:** [#61](https://github.com/arunselvakumar/white-board/issues/61). **Decisions:** [ADR-0041](../adr/0041-absence-notice-product-decisions.md). **Blocked by:** WB-004, WB-010, WB-012 (Attendance, Class Changes, and Student and Parent Home exist). **Tracking:** [GitHub project](https://github.com/users/arunselvakumar/projects/9).
 
 **Done when:** a Student, or a Parent for each linked child, can give an Absence Notice for one or more Classes in the next 60 days with a reason and optional note, see the notices given, and withdraw one before its Class starts; the Batch's assigned Teachers get a Notification under the bell and an email when a notice is given or withdrawn; the Owner and assigned Teachers see expected absentees per upcoming Class; the Register flags Students with a notice and pre-selects Informed absent; Cancelled, Holiday, and Moved Classes drop the notice; Attendance views count Informed absent and Absent separately. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
