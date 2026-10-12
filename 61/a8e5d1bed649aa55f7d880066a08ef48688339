@@ -1,0 +1,31 @@
+apps/whiteboard/components/app-shell/app-nav-icons.ts
+  s_c97675edcbbe15::t_4633ee1e6b1753 5,37-38
+apps/whiteboard/lib/app-breadcrumbs.test.ts
+  s_c97675edcbbe15::t_e26e0fe6411b2a 153-165
+apps/whiteboard/lib/app-breadcrumbs.ts
+  s_c97675edcbbe15::t_68813a60cb7b34 34-37,78-79
+apps/whiteboard/lib/app-nav.test.ts
+  s_c97675edcbbe15::t_e0aba1b7a1c1ba 24,65,97-105
+apps/whiteboard/lib/app-nav.ts
+  s_c97675edcbbe15::t_0d52af3468c920 59-64,147-152,193-196
+apps/whiteboard/lib/workspace-access.test.ts
+  s_c97675edcbbe15::t_518dcadbfca52d 131-148
+apps/whiteboard/lib/workspace-access.ts
+  s_c97675edcbbe15::t_6ec840e3b7cd86 72-75,99-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "61a8e5d1bed649aa55f7d880066a08ef48688339",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
