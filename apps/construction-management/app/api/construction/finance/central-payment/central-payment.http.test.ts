@@ -256,7 +256,7 @@ describe("Central Payment HTTP (CM-709)", () => {
     });
   });
 
-  it("counts no advance from a payment dated after today", async () => {
+  it("counts nothing from a payment dated after today", async () => {
     const company = await newCompany();
     const ws = company.workspaceId;
     const by = company.ownerId;
@@ -272,10 +272,9 @@ describe("Central Payment HTTP (CM-709)", () => {
       amount: 10_000_00n,
     });
     const today = await summary({ userId: by, workspaceId: ws, role: "owner" });
-    // Dues are as on today; so is the advance beside them.
-    expect(today.parties.contractor).toEqual([
-      expect.objectContaining({ partyId: velan, paid: 0, advance: 0 }),
-    ]);
+    // Dues, advance and balance are all as on today, so a payment dated
+    // ahead leaves nothing to show yet.
+    expect(today.parties.contractor).toEqual([]);
   });
 
   it("company accounts with today's balance and pending; petty cash by holder", async () => {

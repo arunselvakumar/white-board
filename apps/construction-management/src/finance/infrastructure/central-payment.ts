@@ -107,7 +107,9 @@ export class CentralPayment {
           COALESCE(SUM(e.amount), 0)::bigint AS balance,
           COUNT(DISTINCT e.project_id) AS projects
         FROM construction_finance.party_entries e
-        WHERE e.workspace_id = ${workspaceId} AND ${place("e")}
+        WHERE e.workspace_id = ${workspaceId}
+          AND e.entry_date <= ${today}::date
+          AND ${place("e")}
         GROUP BY 1, 2`),
     ]);
     const rows = new Map<string, CentralPartyDue>();
