@@ -1,0 +1,47 @@
+apps/whiteboard/app/(app)/absence-notices/page.tsx
+  s_c97675edcbbe15::t_26409811b4e40b 1-13
+apps/whiteboard/app/(app)/notifications/page.tsx
+  s_c97675edcbbe15::t_a96e958872ba2a 1-14
+apps/whiteboard/app/(app)/teacher/absence-notices/page.tsx
+  s_c97675edcbbe15::t_e3096ca4135095 1-13
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_c97675edcbbe15::t_8299f1c180c4d3 27,128-130
+apps/whiteboard/components/notifications/notification-bell.tsx
+  s_c97675edcbbe15::t_09ac7d0a8750cc 1-157
+apps/whiteboard/components/notifications/notification-item.tsx
+  s_c97675edcbbe15::t_b14f445d445f10 1-126
+apps/whiteboard/components/notifications/notifications-screen.tsx
+  s_c97675edcbbe15::t_cf2edbc00f543f 1-159
+apps/whiteboard/components/notifications/use-notification-actions.ts
+  s_c97675edcbbe15::t_d919eff5510665 1-25
+apps/whiteboard/lib/absence-notice-labels.test.ts
+  s_c97675edcbbe15::t_34bc3058b10f93 1-93
+apps/whiteboard/lib/absence-notice-labels.ts
+  s_c97675edcbbe15::t_5286ad0fdbf58f 1-136
+apps/whiteboard/components/absence-notices/staff/absence-notices-screen.tsx
+  s_35bdf7937f3783::t_9b799273a701c5 1-192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "236eb8540aa9e8a51524681bcf48d19949a3d19d",
+  "prompts": {},
+  "sessions": {
+    "s_35bdf7937f3783": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a1829094f03407de9",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
