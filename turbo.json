@@ -50,6 +50,7 @@
     "CONSTRUCTION_SELLER_SAC",
     "NEXT_PHASE",
     "BLOB_STORE_ID",
+    "VERCEL",
     "VERCEL_ENV",
     "CRON_SECRET"
   ],
