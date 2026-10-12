@@ -46,16 +46,16 @@ export function NotificationBell() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative rounded-full"
+            className="relative size-9 rounded-full"
             aria-label={bellLabel(unreadCount)}
           />
         }
       >
-        <Bell aria-hidden="true" />
+        <Bell aria-hidden="true" className="size-5" />
         {unreadCount > 0 ? (
           <span
             aria-hidden="true"
-            className="bg-destructive ring-card absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold text-white tabular-nums ring-2"
+            className="bg-destructive ring-card absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold text-white tabular-nums ring-2"
           >
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>

@@ -108,7 +108,11 @@ export function NotificationItem({
           >
             {reasonLabel(payload.reason)}
           </Badge>
-          {withdrawn ? <Badge variant="secondary">Withdrawn</Badge> : null}
+          {withdrawn ? (
+            <Badge variant="outline" className="text-muted-foreground">
+              Withdrawn
+            </Badge>
+          ) : null}
         </span>
         {payload.note == null || compact ? null : (
           <span className="block break-words whitespace-pre-line">
