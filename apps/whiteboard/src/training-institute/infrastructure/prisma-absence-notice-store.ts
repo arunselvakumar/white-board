@@ -325,7 +325,7 @@ export class PrismaAbsenceNoticeStore implements AbsenceNoticeStore {
         workspaceId,
         recipientUserId: notification.recipientUserId,
         kind: notification.kind,
-        payload: notification.payload as unknown as Prisma.InputJsonValue,
+        payload: notification.payload,
         createdAt: notification.createdAt,
       })),
     });

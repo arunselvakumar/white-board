@@ -97,13 +97,27 @@ describe("Absence Notices HTTP", () => {
       authStateFor({ userId, workspaceId: workspace, role, email }),
     );
   }
-  const asAsha = () => as("user_asha", "student", "asha@example.com");
-  const asDad = () => as("user_dad", "parent", "dad@example.com");
-  const asRavi = () => as("user_ravi", "student", "ravi@example.com");
-  const asBala = () => as("user_bala", "student", "bala@example.com");
-  const asMeera = () => as("user_meera", "teacher");
-  const asKiran = () => as("user_kiran", "teacher");
-  const asOwner = () => as("user_owner", "owner");
+  const asAsha = () => {
+    as("user_asha", "student", "asha@example.com");
+  };
+  const asDad = () => {
+    as("user_dad", "parent", "dad@example.com");
+  };
+  const asRavi = () => {
+    as("user_ravi", "student", "ravi@example.com");
+  };
+  const asBala = () => {
+    as("user_bala", "student", "bala@example.com");
+  };
+  const asMeera = () => {
+    as("user_meera", "teacher");
+  };
+  const asKiran = () => {
+    as("user_kiran", "teacher");
+  };
+  const asOwner = () => {
+    as("user_owner", "owner");
+  };
 
   async function give(body: unknown) {
     return read<GiveTrainingInstituteAbsenceNoticeResponseModel & ErrorBody>(
@@ -373,7 +387,7 @@ describe("Absence Notices HTTP", () => {
     expect(given.status).toBe(201);
     expect(given.body.notices).toEqual([
       {
-        id: expect.any(String),
+        id: expect.any(String) as unknown,
         studentId: ashaId,
         studentName: "Asha",
         class: expect.objectContaining({
@@ -382,7 +396,7 @@ describe("Absence Notices HTTP", () => {
           date: day(1),
           startTime: "17:00",
           endTime: "18:00",
-        }),
+        }) as unknown,
         reason: "sick",
         note: "Fever since last night",
         givenAt: NOW.toISOString(),
@@ -409,7 +423,7 @@ describe("Absence Notices HTTP", () => {
     expect(inbox.status).toBe(200);
     expect(inbox.body).toMatchObject({ total: 1, unreadCount: 1 });
     expect(inbox.body.items[0]).toEqual({
-      id: expect.any(String),
+      id: expect.any(String) as unknown,
       kind: "absence_notice_given",
       payload: {
         studentId: ashaId,
@@ -798,7 +812,7 @@ describe("Absence Notices HTTP", () => {
       { enrollmentId: ashaEvening, date: day(3), startTime: "17:00" },
       { enrollmentId: ashaEvening, date: day(5), startTime: "17:00" },
     ]);
-    const [cancelledId] = (given.body.notices ?? []).map((value) => value.id);
+    const [cancelledId] = given.body.notices.map((value) => value.id);
     const changeId = await changeClass(eveningId, day(3), "17:00", "18:00");
     await prisma.trainingInstituteHoliday.create({
       data: {
