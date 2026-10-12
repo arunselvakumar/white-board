@@ -44,7 +44,16 @@ env:
 jobs:
   plan:
     name: Plan
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    # Only main of this repository: a manual run from main, or CI that passed
+    # on a push to main here. A fork's pull request from a branch it named
+    # "main" also completes CI with head_branch "main"; it must never deploy.
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:

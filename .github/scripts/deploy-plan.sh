@@ -52,10 +52,15 @@ for app in construction-management whiteboard marketing; do
       reason="no successful deploy yet"
     elif ! git cat-file -e "$base^{commit}" 2>/dev/null; then
       reason="last deploy $base is not in this history"
-    elif TURBO_SCM_BASE="$base" TURBO_SCM_HEAD="$SHA" \
-      bunx turbo ls --affected --output json |
-      jq -e --arg app "$app" '.packages.items | any(.name == $app)' > /dev/null; then
-      reason="changed since ${base:0:8}"
+    else
+      # Outside any condition, so a turbo failure fails the plan instead of
+      # reading as "unchanged" and skipping a deploy.
+      affected=$(TURBO_SCM_BASE="$base" TURBO_SCM_HEAD="$SHA" \
+        bunx turbo ls --affected --output json)
+      if jq -e --arg app "$app" '.packages.items | any(.name == $app)' \
+        <<< "$affected" > /dev/null; then
+        reason="changed since ${base:0:8}"
+      fi
     fi
   fi
   if [ -n "$reason" ]; then
