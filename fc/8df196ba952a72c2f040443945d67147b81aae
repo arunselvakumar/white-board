@@ -1,0 +1,67 @@
+apps/construction-management/app/api/construction/finance/accounts/[id]/delete/route.ts
+  s_d85efaaff765fa::t_2483ecb07e8107 31-33
+apps/construction-management/app/api/construction/finance/accounts/[id]/route.ts
+  s_d85efaaff765fa::t_22cd945c4e8ce8 22-24
+apps/construction-management/app/api/construction/finance/accounts/[id]/set-primary/route.ts
+  s_d85efaaff765fa::t_88f730019bfeff 26-28
+apps/construction-management/app/api/construction/finance/accounts/[id]/statement/route.ts
+  s_d85efaaff765fa::t_37a4eb4484ddc1 41-42
+apps/construction-management/app/api/construction/finance/accounts/[id]/update/route.ts
+  s_d85efaaff765fa::t_497ebab7a811b4 29-31
+apps/construction-management/app/api/construction/finance/accounts/accounts.http.test.ts
+  s_d85efaaff765fa::t_350a9c5bc0cd90 407-452
+apps/construction-management/app/api/construction/finance/other-expenses/bulk-approve/route.ts
+  s_d85efaaff765fa::t_43d5a0facf67b9 5,25,30,33-35
+apps/construction-management/app/api/construction/finance/other-expenses/bulk-reject/route.ts
+  s_d85efaaff765fa::t_81a5b6c077da5b 5,25,27,30-32
+apps/construction-management/app/api/construction/finance/other-parties/[id]/delete/route.ts
+  s_d85efaaff765fa::t_75924454829fcb 29-30
+apps/construction-management/app/api/construction/finance/other-parties/[id]/update/route.ts
+  s_d85efaaff765fa::t_d793497459c5be 26-27
+apps/construction-management/app/api/construction/finance/other-parties/route.ts
+  s_d85efaaff765fa::t_71912b0e9efb7c 28-29,62-63
+apps/construction-management/app/api/construction/finance/project-scope.ts
+  s_d85efaaff765fa::t_b8469a880c1bf8 1-22
+apps/construction-management/app/api/construction/finance/settlements/route.ts
+  s_d85efaaff765fa::t_d43c217b6aafd0 5,23,28,31-33
+apps/construction-management/app/api/construction/finance/transactions/bulk/route.ts
+  s_d85efaaff765fa::t_6bc57f4607ec48 2-3,5,18-23,31
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_d85efaaff765fa::t_027635c0477d3d 23,31-32,35-37,142-156,178,180,183,200,203,211
+apps/construction-management/components/finance/other-expenses/other-expenses-list.tsx
+  s_d85efaaff765fa::t_0829c6d49b1dc4 347-349
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_d85efaaff765fa::t_b63beb9c4b89a2 250-253,280-284,365-374,401
+apps/construction-management/components/parties/party-form-schema.ts
+  s_d85efaaff765fa::t_b8cfdc9d8dc585 81-82,88-98,174-176
+apps/construction-management/components/parties/party-form.stories.tsx
+  s_d85efaaff765fa::t_d096631f4daf38 432-451
+apps/construction-management/src/finance/infrastructure/account-guards.ts
+  s_d85efaaff765fa::t_24f4bc61df64ef 6,59
+apps/construction-management/src/finance/infrastructure/account-store.ts
+  s_d85efaaff765fa::t_dc3f21c17661b1 144-149
+apps/construction-management/src/finance/infrastructure/other-expense-store.ts
+  s_d85efaaff765fa::t_399b6a455cea0b 7,324-327
+apps/construction-management/src/finance/infrastructure/party-backdated.ts
+  s_d85efaaff765fa::t_7ec14978bb0429 6,37-39
+apps/construction-management/src/finance/infrastructure/petty-cash-guards.ts
+  s_d85efaaff765fa::t_23d2613b1ee197 6,12,55-59,71-75
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_d85efaaff765fa::t_68b219069d7a12 421-446,457-460
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fc8df196ba952a72c2f040443945d67147b81aae",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
