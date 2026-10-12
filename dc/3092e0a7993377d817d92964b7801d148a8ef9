@@ -1,0 +1,61 @@
+apps/whiteboard/app/api/_lib/map-error.ts
+  s_c97675edcbbe15::t_6a9398914366a5 29-30,110-113
+apps/whiteboard/app/api/_lib/openapi-document.test.ts
+  s_c97675edcbbe15::t_1aece8fa283d63 29-42
+apps/whiteboard/app/api/_lib/openapi-document.ts
+  s_c97675edcbbe15::t_ded2ba944a3e32 192-207,1658-1756,1875-1883
+apps/whiteboard/app/api/training-institute/absence-notices/[id]/withdraw/route.ts
+  s_c97675edcbbe15::t_efe1b8d38fca6b 1-33
+apps/whiteboard/app/api/training-institute/absence-notices/absence-notice-models.ts
+  s_c97675edcbbe15::t_576250c8d5a6d3 1-142
+apps/whiteboard/app/api/training-institute/absence-notices/classes/route.ts
+  s_c97675edcbbe15::t_9fb3e34a1eaf68 1-22
+apps/whiteboard/app/api/training-institute/absence-notices/expected/route.ts
+  s_c97675edcbbe15::t_5ec1993cd5a301 1-29
+apps/whiteboard/app/api/training-institute/absence-notices/route.ts
+  s_c97675edcbbe15::t_68f3edff73d232 1-46
+apps/whiteboard/app/api/training-institute/notifications/[id]/read/route.ts
+  s_c97675edcbbe15::t_07e2ce2b92216e 1-35
+apps/whiteboard/app/api/training-institute/notifications/notification-models.ts
+  s_c97675edcbbe15::t_b0531cdd3d78bc 1-71
+apps/whiteboard/app/api/training-institute/notifications/notification-session.ts
+  s_c97675edcbbe15::t_71a0e10da32edf 1-14
+apps/whiteboard/app/api/training-institute/notifications/read-all/route.ts
+  s_c97675edcbbe15::t_f3d15f33b6ec69 1-22
+apps/whiteboard/app/api/training-institute/notifications/route.ts
+  s_c97675edcbbe15::t_8069d44e044c45 1-33
+apps/whiteboard/app/api/training-institute/notifications/unread-count/route.ts
+  s_c97675edcbbe15::t_fc2f0a38130ec9 1-22
+apps/whiteboard/src/training-institute/application/absence-notice-handlers.ts
+  s_c97675edcbbe15::t_bcdb159692e193 1-767
+apps/whiteboard/src/training-institute/application/absence-notice-ports.ts
+  s_c97675edcbbe15::t_84bfa43c653c7d 1-157
+apps/whiteboard/src/training-institute/application/notification-handlers.ts
+  s_c97675edcbbe15::t_9dc86c7dc06312 1-117
+apps/whiteboard/src/training-institute/application/notification-ports.ts
+  s_c97675edcbbe15::t_218954e92a070a 1-49
+apps/whiteboard/src/training-institute/infrastructure/absence-notice-mailer.ts
+  s_c97675edcbbe15::t_95ba60c206b739 1-44
+apps/whiteboard/src/training-institute/infrastructure/create-absence-notice-handlers.ts
+  s_c97675edcbbe15::t_4521c63f3ae66b 1-38
+apps/whiteboard/src/training-institute/infrastructure/prisma-absence-notice-store.ts
+  s_c97675edcbbe15::t_c42dbca27dd42d 1-333
+apps/whiteboard/src/training-institute/infrastructure/prisma-notification-store.ts
+  s_c97675edcbbe15::t_77ca05d10863c9 1-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dc3092e0a7993377d817d92964b7801d148a8ef9",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
