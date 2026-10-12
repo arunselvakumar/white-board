@@ -98,9 +98,7 @@ export function NotificationItem({
             </span>
           ))}
           {more > 0 ? (
-            <span className="text-muted-foreground block">
-              and {classCountLabel(more)} more
-            </span>
+            <span className="text-muted-foreground block">and {more} more</span>
           ) : null}
         </span>
         <span className="flex flex-wrap items-center gap-2">

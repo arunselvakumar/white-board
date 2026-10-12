@@ -104,6 +104,7 @@ function DaySection({ day }: { day: ExpectedAbsenceDay }) {
         className="flex flex-wrap items-baseline gap-x-2 text-lg font-semibold"
       >
         {day.heading}
+        {day.subheading == null ? null : " "}
         {day.subheading == null ? null : (
           <span className="text-muted-foreground text-sm font-normal">
             {day.subheading}
