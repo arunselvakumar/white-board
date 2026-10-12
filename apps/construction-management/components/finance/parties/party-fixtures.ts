@@ -9,8 +9,10 @@ import type {
   PartyOpening,
   PartyPayment,
   PartyStatement,
+  Settlement,
   TdsLedger,
   TdsSuggestion,
+  WorkspacePartyBalances,
 } from "@/src/queries/finance-parties";
 
 /** Story data for the party money screens (CM-705, CM-706). */
@@ -18,6 +20,8 @@ import type {
 export const PROJECT_ID = "0199b000-0000-7000-8000-000000000001";
 export const CONTRACTOR_ID = "0199a000-0000-7000-8000-0000000000d1";
 export const SUPPLIER_ID = "0199a000-0000-7000-8000-0000000000d2";
+export const OTHER_PARTY_ID = "0199a000-0000-7000-8000-0000000000d3";
+export const OTHER_PROJECT_ID = "0199b000-0000-7000-8000-000000000002";
 const AT = "2026-10-08T06:30:00.000Z";
 export const TODAY = "2026-10-11";
 
@@ -476,6 +480,148 @@ export function suggestionFor(settled: number): TdsSuggestion {
   };
 }
 
+export const SALES_INVOICE = invoice({
+  id: "0199c000-0000-7000-8000-000000000020",
+  party: {
+    type: "other_party",
+    id: OTHER_PARTY_ID,
+    name: "Kumaran Consultants",
+  },
+  direction: "receivable",
+  invoiceNumber: "INV/26-27/00003",
+  invoiceDate: "2026-09-25",
+  dueDate: "2026-10-25",
+  amount: 25_000_00,
+  balance: 25_000_00,
+  overdue: false,
+  daysOverdue: 0,
+});
+
+export const OTHER_PARTY_BALANCES: PartyBalances = {
+  partyType: "other_party",
+  items: [
+    {
+      party: {
+        type: "other_party",
+        id: OTHER_PARTY_ID,
+        name: "Kumaran Consultants",
+      },
+      assigned: true,
+      opening: 0,
+      invoiced: 8_000_00,
+      billed: 25_000_00,
+      paid: 0,
+      received: 10_000_00,
+      tds: 0,
+      writtenOff: 0,
+      balance: -7_000_00,
+      overdue: 0,
+      advance: 0,
+    },
+  ],
+  totals: {
+    opening: 0,
+    invoiced: 8_000_00,
+    billed: 25_000_00,
+    paid: 0,
+    received: 10_000_00,
+    tds: 0,
+    writtenOff: 0,
+    balance: -7_000_00,
+    overdue: 0,
+    advance: 0,
+  },
+};
+
+function settlement(
+  patch: Partial<Settlement> & Pick<Settlement, "id">,
+): Settlement {
+  return {
+    amount: 800_00,
+    reason: "Short supply agreed with the vendor",
+    status: "pending",
+    rejectReason: null,
+    raisedBy: { userId: "user-karthik", name: "Karthik R" },
+    decidedBy: null,
+    createdAt: AT,
+    decidedAt: null,
+    invoice: {
+      id: PARTLY_PAID_INVOICE.id,
+      party: { type: "supplier", id: SUPPLIER_ID, name: "Chennai Cements" },
+      place: PLACE,
+      direction: "payable",
+      invoiceNumber: PARTLY_PAID_INVOICE.invoiceNumber,
+      invoiceDate: PARTLY_PAID_INVOICE.invoiceDate,
+      amount: PARTLY_PAID_INVOICE.amount,
+      balance: 800_00,
+    },
+    actions: { approve: true, reject: true },
+    ...patch,
+  };
+}
+
+export const PENDING_SETTLEMENTS: Settlement[] = [
+  settlement({ id: "0199f000-0000-7000-8000-000000000011" }),
+  settlement({
+    id: "0199f000-0000-7000-8000-000000000012",
+    amount: 1_500_00,
+    reason: "Customer discount",
+    invoice: {
+      id: SALES_INVOICE.id,
+      party: {
+        type: "other_party",
+        id: OTHER_PARTY_ID,
+        name: "Kumaran Consultants",
+      },
+      place: PLACE,
+      direction: "receivable",
+      invoiceNumber: SALES_INVOICE.invoiceNumber,
+      invoiceDate: SALES_INVOICE.invoiceDate,
+      amount: SALES_INVOICE.amount,
+      balance: 1_500_00,
+    },
+  }),
+];
+
+export const DECIDED_SETTLEMENTS: Settlement[] = [
+  settlement({
+    id: "0199f000-0000-7000-8000-000000000013",
+    status: "rejected",
+    rejectReason: "Collect the balance",
+    decidedBy: { userId: "user-owner", name: "Arun Selva Kumar" },
+    decidedAt: AT,
+    actions: { approve: false, reject: false },
+  }),
+];
+
+export const WORKSPACE_BALANCES: WorkspacePartyBalances = {
+  partyType: "other_party",
+  items: [
+    {
+      party: {
+        type: "other_party",
+        id: OTHER_PARTY_ID,
+        name: "Kumaran Consultants",
+      },
+      balance: -7_000_00,
+      projects: [
+        { id: PROJECT_ID, name: "Tower A", balance: -10_000_00 },
+        { id: OTHER_PROJECT_ID, name: "Tower B", balance: 3_000_00 },
+      ],
+    },
+    {
+      party: {
+        type: "other_party",
+        id: "0199a000-0000-7000-8000-0000000000d4",
+        name: "Lakshmi Scrap Traders",
+      },
+      balance: 0,
+      projects: [],
+    },
+  ],
+  totals: { owedByCompany: 0, owedToCompany: 7_000_00, net: -7_000_00 },
+};
+
 const API = "/api/construction/finance";
 
 /**
@@ -496,13 +642,40 @@ export function partyMoneyHandler(
     if (answered != null) return answered;
     const thread = documents(call);
     if (thread != null) return thread;
-    const lookups = financeLookupsHandler(call);
-    if (lookups != null) return lookups;
     const path = call.path;
     const query = new URL(path, "http://storybook.local").searchParams;
     if (call.method !== "GET") return undefined;
     if (path.startsWith(`${API}/access`))
       return Response.json(options.access ?? FULL_ACCESS);
+    if (
+      path.startsWith(`${API}/counterparties/options`) &&
+      query.get("kind") === "other_party"
+    )
+      return Response.json({
+        items: [{ id: OTHER_PARTY_ID, name: "Kumaran Consultants" }],
+      });
+    if (path.startsWith(`${API}/party-balances`))
+      return Response.json(
+        options.empty === true
+          ? {
+              partyType: "other_party",
+              items: [],
+              totals: { owedByCompany: 0, owedToCompany: 0, net: 0 },
+            }
+          : WORKSPACE_BALANCES,
+      );
+    if (path.startsWith(`${API}/settlements`)) {
+      if (options.empty === true) return Response.json({ items: [] });
+      const status = query.get("status") ?? "pending";
+      return Response.json({
+        items:
+          status === "pending"
+            ? PENDING_SETTLEMENTS
+            : DECIDED_SETTLEMENTS.filter((item) => item.status === status),
+      });
+    }
+    const lookups = financeLookupsHandler(call);
+    if (lookups != null) return lookups;
     if (path.startsWith(`${API}/parties/form-options`))
       return Response.json({
         departments: [
@@ -510,6 +683,15 @@ export function partyMoneyHandler(
           { id: "0199a000-0000-7000-8000-0000000000e2", name: "Plumbing" },
         ],
       });
+    if (
+      path.startsWith(`${API}/parties`) &&
+      query.get("partyType") === "other_party"
+    )
+      return Response.json(
+        options.empty === true
+          ? { ...OTHER_PARTY_BALANCES, items: [] }
+          : OTHER_PARTY_BALANCES,
+      );
     if (path.startsWith(`${API}/parties`)) {
       const type =
         query.get("partyType") === "contractor" ? "contractor" : "supplier";
@@ -530,15 +712,19 @@ export function partyMoneyHandler(
             ? []
             : query.get("partyType") === "contractor"
               ? [CONTRACTOR_INVOICE]
-              : [OVERDUE_INVOICE, PARTLY_PAID_INVOICE],
+              : query.get("direction") === "receivable"
+                ? [SALES_INVOICE]
+                : [OVERDUE_INVOICE, PARTLY_PAID_INVOICE],
       });
     const one = /^\/api\/construction\/finance\/invoices\/([^/?]+)$/.exec(
       path.split("?")[0] ?? "",
     );
     if (one != null) {
-      const found = [...SUPPLIER_INVOICES, CONTRACTOR_INVOICE].find(
-        (item) => item.id === one[1],
-      );
+      const found = [
+        ...SUPPLIER_INVOICES,
+        CONTRACTOR_INVOICE,
+        SALES_INVOICE,
+      ].find((item) => item.id === one[1]);
       return found == null
         ? Response.json(
             { code: "INVOICE_NOT_FOUND", message: "Not found" },

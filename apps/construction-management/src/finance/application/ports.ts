@@ -151,4 +151,15 @@ export type FinanceDirectory = {
     workspaceId: string,
     userIds: readonly string[],
   ): Promise<Map<string, string>>;
+  /**
+   * Money paid to Labours and to Vendors on a Project between two dates
+   * (live wage payments and advances, M2; CM-709 Module Wise Payment), in
+   * paise.
+   */
+  wagesPaid(
+    db: Db,
+    workspaceId: string,
+    projectId: string,
+    range: { from: string; to: string },
+  ): Promise<{ labour: bigint; vendor: bigint }>;
 };

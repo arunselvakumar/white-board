@@ -13,6 +13,12 @@ import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import { KUMARI } from "../project-fixtures";
+import {
+  emptyFinanceDashboard,
+  FINANCE_DASHBOARD_PATH,
+  financeDashboard,
+  NO_PAYMENTS,
+} from "./finance-dashboard-fixtures";
 import { ProjectDashboard } from "./project-dashboard";
 import {
   dailyWork,
@@ -130,6 +136,8 @@ function serve(
     procurement?: ProcurementDashboard;
     /** The Daily Work and Equipment Usage sections (CM-608). */
     siteWork?: "data" | "empty" | "without_financial" | "forbidden";
+    /** The Payments section and Payment Approvals (CM-709). */
+    finance?: "data" | "empty" | "no_payments" | "forbidden";
   } = {},
 ) {
   return () => {
@@ -156,6 +164,23 @@ function serve(
         return Response.json(options.summary ?? summary());
       if (method === "GET" && path.startsWith(PROCUREMENT_PATH))
         return Response.json(options.procurement ?? procurement());
+      if (method === "GET" && path.startsWith(FINANCE_DASHBOARD_PATH)) {
+        const finance = options.finance ?? "data";
+        if (finance === "forbidden")
+          return Response.json(
+            { code: "PERMISSION_DENIED", message: "No." },
+            { status: 403 },
+          );
+        if (finance === "no_payments") return Response.json(NO_PAYMENTS);
+        const query = new URL(path, "http://storybook.local").searchParams;
+        const from = query.get("from") ?? "";
+        const to = query.get("to") ?? "";
+        return Response.json(
+          finance === "empty"
+            ? emptyFinanceDashboard(from, to)
+            : financeDashboard(from, to),
+        );
+      }
       if (method === "GET" && path.startsWith(SITE_WORK_DASHBOARD_PATH)) {
         const siteWork = options.siteWork ?? "data";
         if (siteWork === "forbidden")
@@ -222,11 +247,12 @@ export const WithFinancial: Story = {
       await canvas.findByRole("list", { name: "Key figures" }),
     );
     await kpis.findByText("Pending: 3 PR · 1 PO");
+    await kpis.findByText(/^Pending: 2 transactions/);
     await expect(
       kpis.getAllByRole("listitem").map((item) => item.textContent),
     ).toEqual([
       "Material Approvals4Pending: 3 PR · 1 PO",
-      "Payment Approvals—Arrives with M7",
+      "Payment Approvals7Pending: 2 transactions · 1 transfer · 3 vouchers · 1 settlement",
       "Pending Issues & Snags—Arrives with M8",
       "Pending Inspections—Arrives with M8",
     ]);
@@ -275,6 +301,104 @@ export const WithFinancial: Story = {
     await expect(regions).toEqual(
       DASHBOARD_SECTIONS.map((section) => section.label),
     );
+  },
+};
+
+/**
+ * Payments (CM-709): money in and out by month with the balance, Due
+ * Payments and Module Wise Payment.
+ */
+export const PaymentsSection: Story = {
+  play: async ({ canvas }) => {
+    const payments = within(
+      await canvas.findByRole("region", { name: "Payments" }),
+    );
+    await expect(
+      await payments.findByRole("figure", {
+        name: "Payment in and out per month",
+      }),
+    ).toBeVisible();
+    await expect(
+      payments.getByRole("slider", { name: "Month" }),
+    ).toHaveAttribute("aria-valuetext", expect.stringMatching(/, in ₹/));
+    const dues = within(payments.getByRole("table", { name: "Due payments" }));
+    await expect(
+      dues.getByRole("rowheader", { name: /Velan Constructions/ }),
+    ).toBeVisible();
+    await expect(dues.getByText("₹7,40,000.00")).toBeVisible();
+    await expect(dues.getByText("₹2,15,000.00")).toBeVisible();
+    const modules = within(
+      payments.getByRole("figure", { name: "Module wise payment" }),
+    );
+    await expect(modules.getAllByRole("listitem")).toHaveLength(6);
+    await expect(modules.getByText("₹14,00,000.00")).toBeVisible();
+    await expect(
+      payments.getByRole("link", { name: "Payments" }),
+    ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/payments`);
+    // The month table for screen readers sits in a hidden wrapper.
+    const table = payments.getByRole("table", {
+      name: "Payment in and out per month",
+    });
+    await expect(table.parentElement).toHaveClass("sr-only");
+    await expect(table).not.toHaveClass("sr-only");
+  },
+};
+
+/** No money on the Project in the period. */
+export const PaymentsEmpty: Story = {
+  beforeEach: serve({ finance: "empty" }),
+  play: async ({ canvas }) => {
+    const payments = within(
+      await canvas.findByRole("region", { name: "Payments" }),
+    );
+    await expect(
+      await payments.findByText("Nothing is due to any party on this Project."),
+    ).toBeVisible();
+    await expect(
+      payments.getByText(
+        "Nothing was paid out on this Project in this period.",
+      ),
+    ).toBeVisible();
+    const kpis = within(canvas.getByRole("list", { name: "Key figures" }));
+    await expect(
+      await kpis.findByText(
+        "Pending: 0 transactions · 0 transfers · 0 vouchers · 0 expenses · 0 settlements",
+      ),
+    ).toBeVisible();
+  },
+};
+
+/** Without Payments Read the section says so; nothing to approve. */
+export const PaymentsNeedPermission: Story = {
+  beforeEach: serve({ finance: "no_payments" }),
+  play: async ({ canvas }) => {
+    const payments = within(
+      await canvas.findByRole("region", { name: "Payments" }),
+    );
+    await expect(
+      await payments.findByText(
+        "Payments need the Payments permission on this Project.",
+      ),
+    ).toBeVisible();
+    const kpis = within(canvas.getByRole("list", { name: "Key figures" }));
+    await expect(
+      await kpis.findAllByText("Nothing here for you to approve"),
+    ).not.toHaveLength(0);
+  },
+};
+
+/** Without the Dashboard permission the section names it. */
+export const PaymentsRefused: Story = {
+  beforeEach: serve({ finance: "forbidden" }),
+  play: async ({ canvas }) => {
+    const payments = within(
+      await canvas.findByRole("region", { name: "Payments" }),
+    );
+    await expect(
+      await payments.findByText(
+        "Payments need the Dashboard permission on this Project.",
+      ),
+    ).toBeVisible();
   },
 };
 
@@ -546,6 +670,10 @@ export const Phone: Story = {
     await within(
       canvas.getByRole("region", { name: "Equipment Usage" }),
     ).findByRole("figure", { name: "Top equipment by work hours" });
+    await within(canvas.getByRole("region", { name: "Payments" })).findByRole(
+      "table",
+      { name: "Due payments" },
+    );
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

@@ -61,6 +61,11 @@ import {
   TDS_LEDGER_PATH,
 } from "../tds/tds-models";
 import {
+  ListConstructionFinanceWorkspacePartyBalancesRequestModel,
+  ListConstructionFinanceWorkspacePartyBalancesResponseModel,
+  PARTY_BALANCES_PATH,
+} from "../party-balances/party-balance-workspace-models";
+import {
   ConstructionFinancePartyBalanceResponseModel,
   GetConstructionFinancePartyFormOptionsRequestModel,
   GetConstructionFinancePartyFormOptionsResponseModel,
@@ -121,6 +126,7 @@ export const partyFinanceOpenApiComponents: OpenApiComponents = {
   ConstructionFinancePartyBalanceResponseModel,
   ListConstructionFinancePartyBalancesResponseModel,
   GetConstructionFinancePartyFormOptionsResponseModel,
+  ListConstructionFinanceWorkspacePartyBalancesResponseModel,
 };
 
 /**
@@ -138,6 +144,17 @@ export const partyFinanceOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Each party's figures and the totals",
     successSchema: ListConstructionFinancePartyBalancesResponseModel,
+    errors: READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: PARTY_BALANCES_PATH,
+    summary: "Each Other Party's balance across Projects (Party Balance)",
+    tags: TAGS,
+    query: ListConstructionFinanceWorkspacePartyBalancesRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Balances with the split by Project",
+    successSchema: ListConstructionFinanceWorkspacePartyBalancesResponseModel,
     errors: READ_ERRORS,
   },
   {

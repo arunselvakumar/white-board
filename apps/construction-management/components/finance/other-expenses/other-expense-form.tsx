@@ -76,7 +76,9 @@ export function OtherExpenseForm({
   });
   const { errors } = form.formState;
   const mode = useWatch({ control: form.control, name: "mode" });
-  const busy = command.isPending || uploads.uploading;
+  // Stays busy once saved: the page opens the expense next, and a second
+  // press would save it twice.
+  const busy = command.isPending || command.isSuccess || uploads.uploading;
 
   const save = (approve: boolean) =>
     form.handleSubmit(async (values) => {

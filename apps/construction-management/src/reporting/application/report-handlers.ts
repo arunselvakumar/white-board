@@ -20,6 +20,7 @@ import { buildReportDocument } from "./build-report";
 import type {
   DprRenderer,
   DprSource,
+  FinanceReportSource,
   ProjectLookup,
   ReportFile,
   ReportJobStore,
@@ -73,6 +74,8 @@ export function createReportExecutor(deps: {
   storage: ReportStorage;
   /** The Daily Progress Report's read model and PDF (CM-606). */
   dpr?: { source: DprSource; render: DprRenderer };
+  /** The finance reports' read model (CM-709). */
+  finance?: FinanceReportSource;
   clock?: Clock;
 }): ReportExecutor {
   const clock = deps.clock ?? (() => new Date());
@@ -91,7 +94,12 @@ export function createReportExecutor(deps: {
       const pdf = await deps.dpr.render(buildDailyProgressReport(model));
       return { fileName: reportFileName(params), pdf, xlsx: null };
     }
-    const document = await buildReportDocument(job, deps.source, clock());
+    const document = await buildReportDocument(
+      job,
+      deps.source,
+      clock(),
+      deps.finance,
+    );
     const [xlsx, pdf] = await Promise.all([
       deps.renderer.xlsx(document),
       deps.renderer.pdf(document),

@@ -17,6 +17,21 @@ import type {
   ReportTransfer,
 } from "../domain/equipment-lifecycle-reports";
 import type { ReportUsageSheet } from "../domain/equipment-usage-report";
+// Finance reports (CM-709).
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
+import type {
+  DueReportParty,
+  LedgerReportData,
+  OtherExpenseReportRow,
+  PartyReportInvoice,
+  PartyReportParty,
+  PartyReportPayment,
+  PettyCashReportAccount,
+  PettyCashReportVoucher,
+  TdsReportPayment,
+  TransactionsReportRow,
+  TransfersReportRow,
+} from "../domain/finance-reports";
 
 /** A rendered file written to storage for a job. */
 export type ReportFile = {
@@ -198,3 +213,69 @@ export type ReportRunner = {
 };
 
 export type ReportStorage = ObjectStorage;
+
+/**
+ * What the finance reports read (CM-709) from finance, masters, projects
+ * and organization tables. Implemented in
+ * `src/composition/finance-report-source.ts`, which may use finance's own
+ * rules (invoice balances, ageing); reporting only sees this port. An id
+ * that is not the Company's fails the job with a domain error naming it.
+ */
+export type FinanceReportSource = {
+  ledger(
+    workspaceId: string,
+    params: Extract<ReportParams, { kind: "account_ledger" }>,
+  ): Promise<LedgerReportData>;
+  /** Vouchers on the Project in the range, on the accounts in scope. */
+  pettyCash(
+    workspaceId: string,
+    projectId: string,
+    params: Extract<ReportParams, { kind: "petty_cash" }>,
+  ): Promise<{
+    vouchers: PettyCashReportVoucher[];
+    accounts: PettyCashReportAccount[];
+  }>;
+  transactions(
+    workspaceId: string,
+    projectId: string,
+    range: DateRange,
+  ): Promise<{
+    transactions: TransactionsReportRow[];
+    transfers: TransfersReportRow[];
+  }>;
+  partyPayments(
+    workspaceId: string,
+    projectId: string,
+    filter: {
+      partyType: "contractor" | "supplier";
+      range: DateRange;
+      partyId: string | null;
+    },
+  ): Promise<{
+    parties: PartyReportParty[];
+    invoices: PartyReportInvoice[];
+    payments: PartyReportPayment[];
+  }>;
+  otherExpenses(
+    workspaceId: string,
+    projectId: string,
+    range: DateRange,
+  ): Promise<OtherExpenseReportRow[]>;
+  /** Live Contractor payments of the year with TDS, on `projectIds` (null: all). */
+  tds(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      contractorId: string | null;
+      projectIds: string[] | null;
+    },
+  ): Promise<TdsReportPayment[]>;
+  /**
+   * Every party with invoices on `projectIds` (null: every Project and
+   * Store), as on `asOn`.
+   */
+  duePayments(
+    workspaceId: string,
+    filter: { asOn: CalendarDate; projectIds: string[] | null },
+  ): Promise<DueReportParty[]>;
+};

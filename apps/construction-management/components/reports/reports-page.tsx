@@ -5,20 +5,23 @@ import { Suspense } from "react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { equipmentListQuery } from "@/src/queries/equipment";
+import { financeAccessQuery } from "@/src/queries/finance-access";
+import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
+import { pettyCashAccountsQuery } from "@/src/queries/finance-petty-cash";
 import { worksheetFormOptionsQuery } from "@/src/queries/worksheets";
 
 import { RecentReports } from "./recent-reports";
 import {
   deviceToday,
+  FINANCE_REPORT_CATALOGUE,
   REPORT_CATALOGUE,
   SITE_WORK_REPORT_CATALOGUE,
   type ReportDefinition,
 } from "./report-catalogue";
 import { ReportCard, type ReportFilterOption } from "./report-card";
 
-type FilterOptions = Record<
-  NonNullable<ReportDefinition["filter"]>,
-  ReportFilterOption[]
+export type FilterOptions = Partial<
+  Record<NonNullable<ReportDefinition["filter"]>, ReportFilterOption[]>
 >;
 
 /**
@@ -47,7 +50,58 @@ function useSiteWorkFilters(projectId: string): FilterOptions {
   };
 }
 
-function ReportGroup({
+/**
+ * The finance cards the viewer may run on this Project (CM-709), by the
+ * Report flag on each card's menu, and their filter choices: the
+ * Contractors and Suppliers on the Project and the petty-cash accounts the
+ * viewer sees.
+ */
+function useFinanceReports(projectId: string): {
+  definitions: ReportDefinition[];
+  filters: FilterOptions;
+} {
+  const { data: access } = useQuery({
+    ...financeAccessQuery(projectId),
+    retry: false,
+  });
+  const definitions = FINANCE_REPORT_CATALOGUE.filter((definition) =>
+    (definition.menus ?? []).some(
+      (menu) => access?.menus[menu].includes("report") === true,
+    ),
+  );
+  const shows = (kind: ReportDefinition["kind"]) =>
+    definitions.some((definition) => definition.kind === kind);
+  const { data: contractors } = useQuery({
+    ...counterpartyOptionsQuery("contractor", projectId),
+    enabled: shows("contractor_payments"),
+    retry: false,
+  });
+  const { data: suppliers } = useQuery({
+    ...counterpartyOptionsQuery("supplier", projectId),
+    enabled: shows("supplier_payments"),
+    retry: false,
+  });
+  const { data: pettyCash } = useQuery({
+    ...pettyCashAccountsQuery(),
+    enabled: shows("petty_cash"),
+    retry: false,
+  });
+  const named = (items: { id: string; name: string }[] | undefined) =>
+    (items ?? []).map((item) => ({ value: item.id, label: item.name }));
+  return {
+    definitions,
+    filters: {
+      contractor: named(contractors?.items),
+      supplier: named(suppliers?.items),
+      account: (pettyCash?.items ?? []).map((account) => ({
+        value: account.id,
+        label: `${account.name} (${account.holderName})`,
+      })),
+    },
+  };
+}
+
+export function ReportGroup({
   id,
   title,
   description,
@@ -55,14 +109,21 @@ function ReportGroup({
   projectId,
   today,
   filters,
+  initialFilters,
 }: {
   id: string;
   title: string;
   description: string;
   definitions: readonly ReportDefinition[];
-  projectId: string;
+  /** Null for the central reports (Central Payment). */
+  projectId: string | null;
   today: string;
   filters?: FilterOptions;
+  /**
+   * A card's starting filter choice by kind; the card starts again when it
+   * changes.
+   */
+  initialFilters?: Partial<Record<ReportDefinition["kind"], string>>;
 }) {
   return (
     <section aria-labelledby={id} className="space-y-4">
@@ -75,14 +136,15 @@ function ReportGroup({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {definitions.map((definition) => (
           <ReportCard
-            key={definition.kind}
+            key={`${definition.kind}:${initialFilters?.[definition.kind] ?? ""}`}
             definition={definition}
+            initialFilter={initialFilters?.[definition.kind]}
             projectId={projectId}
             today={today}
             filterOptions={
               definition.filter == null || filters == null
                 ? []
-                : filters[definition.filter]
+                : (filters[definition.filter] ?? [])
             }
           />
         ))}
@@ -92,9 +154,10 @@ function ReportGroup({
 }
 
 /**
- * The Project's Reports tab (CM-217, CM-218, CM-605, CM-608): a card per
- * report with its period and Generate, grouped into labour and site work,
- * and the recent reports with Excel / PDF downloads.
+ * The Project's Reports tab (CM-217, CM-218, CM-605, CM-608, CM-709): a
+ * card per report with its period and Generate, grouped into labour, site
+ * work and payments (shown by the viewer's finance Report flags), and the
+ * recent reports with Excel / PDF downloads.
  */
 export function ReportsPage({
   projectId,
@@ -105,6 +168,7 @@ export function ReportsPage({
   today?: string;
 }) {
   const filters = useSiteWorkFilters(projectId);
+  const finance = useFinanceReports(projectId);
   return (
     <div className="space-y-8">
       <ReportGroup
@@ -124,6 +188,17 @@ export function ReportsPage({
         today={today}
         filters={filters}
       />
+      {finance.definitions.length === 0 ? null : (
+        <ReportGroup
+          id="finance-reports-heading"
+          title="Payments and accounts"
+          description="Transactions, petty cash, party payments, Other Expenses and due payments on this Project, as an Excel workbook and a PDF."
+          definitions={finance.definitions}
+          projectId={projectId}
+          today={today}
+          filters={finance.filters}
+        />
+      )}
       <section aria-labelledby="recent-reports-heading" className="space-y-3">
         <h2 id="recent-reports-heading" className="text-lg font-semibold">
           Recent reports

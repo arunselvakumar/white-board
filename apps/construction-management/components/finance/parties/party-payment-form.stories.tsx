@@ -11,11 +11,13 @@ import {
 } from "../../../.storybook/mocks/api";
 import {
   CONTRACTOR_ID,
+  OTHER_PARTY_ID,
   CONTRACTOR_PAYMENT,
   OVERDUE_INVOICE,
   PARTLY_PAID_INVOICE,
   partyMoneyHandler,
   PROJECT_ID,
+  SALES_INVOICE,
   suggestionFor,
   SUPPLIER_ID,
   TODAY,
@@ -254,5 +256,34 @@ export const AdvanceAndRefusal: Story = {
       await canvas.findByText(/The books are closed up to 2026-09-30/),
     ).toBeVisible();
     await expect(getRouter().push).not.toHaveBeenCalled();
+  },
+};
+
+/** Payment In from an Other Party settles its sales invoices (CM-708). */
+export const OtherPartyPaymentIn: Story = {
+  args: {
+    partyType: "other_party",
+    partyId: OTHER_PARTY_ID,
+    direction: "in",
+  },
+  play: async ({ canvas, userEvent }) => {
+    const invoices = within(
+      await canvas.findByRole("list", { name: "Open invoices" }),
+    );
+    await expect(invoices.getByText(SALES_INVOICE.invoiceNumber)).toBeVisible();
+    await expect(canvas.getByText("Received into")).toBeVisible();
+    await userEvent.type(canvas.getByLabelText("Amount"), "30000");
+    await userEvent.click(canvas.getByRole("button", { name: "Fill" }));
+    await expect(canvas.getByText(/advance/)).toHaveTextContent("₹5,000.00");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Record ₹30,000.00" }),
+    );
+    await waitFor(() => expect(recorded()).toHaveLength(1));
+    await expect(recorded()[0]).toMatchObject({
+      partyType: "other_party",
+      direction: "in",
+      amount: 30_000_00,
+      allocations: [{ invoiceId: SALES_INVOICE.id, amount: 25_000_00 }],
+    });
   },
 };

@@ -324,7 +324,7 @@ export function NewOtherPartyScreen() {
     <FormPage title="Add Other Party">
       <OtherPartyForm
         party={null}
-        saving={create.isPending}
+        saving={create.isPending || create.isSuccess}
         onSave={(payload) => create.mutateAsync(payload)}
       />
     </FormPage>
@@ -340,7 +340,7 @@ export function EditOtherPartyScreen({ id }: { id: string }) {
       <OtherPartyForm
         key={data.updatedAt}
         party={data}
-        saving={update.isPending}
+        saving={update.isPending || update.isSuccess}
         onSave={(payload) =>
           update.mutateAsync({ ...payload, expectedUpdatedAt: data.updatedAt })
         }

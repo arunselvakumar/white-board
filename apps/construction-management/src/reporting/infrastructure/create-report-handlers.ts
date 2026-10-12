@@ -4,6 +4,7 @@ import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
 import type {
   DprSource,
+  FinanceReportSource,
   ReportRenderer,
   ReportStorage,
 } from "../application/ports";
@@ -39,6 +40,8 @@ export function createReportingHandlers(
   storage: ReportStorage = objectStorage(),
   options: {
     dpr?: DprSource;
+    /** The finance reports' read model (CM-709). */
+    finance?: FinanceReportSource;
     /** Tests shorten the 60-second limit. */
     timeLimitMs?: number;
   } = {},
@@ -56,6 +59,7 @@ export function createReportingHandlers(
             source: options.dpr,
             render: createDprRenderer(storageImageLoader(storage)),
           },
+    finance: options.finance,
   });
   return createReportHandlers({
     store,

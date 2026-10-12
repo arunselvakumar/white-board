@@ -314,4 +314,23 @@ export const financeDirectory: FinanceDirectory = {
       ),
     );
   },
+
+  async wagesPaid(db, workspaceId, projectId, range) {
+    const rows = await db.constructionLabourWagePayment.groupBy({
+      by: ["partyType"],
+      where: {
+        workspaceId,
+        projectId,
+        deletedAt: null,
+        paymentDate: {
+          gte: new Date(`${range.from}T00:00:00.000Z`),
+          lte: new Date(`${range.to}T00:00:00.000Z`),
+        },
+      },
+      _sum: { amount: true },
+    });
+    const paid = (type: "labour" | "vendor") =>
+      BigInt(rows.find((row) => row.partyType === type)?._sum.amount ?? 0);
+    return { labour: paid("labour"), vendor: paid("vendor") };
+  },
 };

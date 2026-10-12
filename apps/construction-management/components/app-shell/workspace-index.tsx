@@ -1,6 +1,7 @@
 import { ItemGroup } from "@repo/ui/components/item";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { CentralPaymentWorkspaceTile } from "@/components/finance/central-payment/central-payment-workspace-tile";
 import { HrmsWorkspaceTile } from "@/components/hrms/hrms-workspace-tile";
 import {
   CentralInventoryWorkspaceTile,
@@ -9,16 +10,18 @@ import {
 
 /**
  * Work across all Projects (`docs/00-overview.md`): HRMS with today's
- * headline numbers (CM-319), Central Store (CM-508) and Central Inventory
- * (CM-509) for members who may read them; Central Payment and Central
- * Reports follow. The page decides which tiles the viewer may see.
+ * headline numbers (CM-319), Central Store (CM-508), Central Inventory
+ * (CM-509) and Central Payment (CM-709) for members who may read them;
+ * Central Reports follows. The page decides which tiles the viewer may see.
  */
 export function WorkspaceIndex({
   centralStore,
   centralInventory,
+  centralPayment = false,
 }: {
   centralStore: boolean;
   centralInventory: boolean;
+  centralPayment?: boolean;
 }) {
   return (
     <div className="w-full p-6">
@@ -38,9 +41,14 @@ export function WorkspaceIndex({
               <CentralInventoryWorkspaceTile />
             </div>
           ) : null}
+          {centralPayment ? (
+            <div role="listitem" className="flex">
+              <CentralPaymentWorkspaceTile />
+            </div>
+          ) : null}
         </ItemGroup>
         <p className="text-muted-foreground text-sm">
-          Central Payment and Central Reports will show here as they are built.
+          Central Reports will show here when it is built.
         </p>
       </div>
     </div>
