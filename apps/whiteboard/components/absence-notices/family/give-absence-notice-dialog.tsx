@@ -196,11 +196,21 @@ function GiveAbsenceNoticeForm({
       await give.mutateAsync(input);
     } catch (error) {
       if (error instanceof QueryHttpError && error.status === 409) {
-        // A Class started, changed, or was noticed meanwhile: show the latest.
-        setValue("classes", pickedNow);
+        // A Class started, changed, or was noticed meanwhile: show the latest,
+        // then drop picks the refreshed picker no longer offers.
         await queryClient.invalidateQueries({
           queryKey: absenceNoticeQueries.key.all,
         });
+        const fresh = queryClient
+          .getQueryData(absenceNoticeQueries.classes(sessionScope).queryKey)
+          ?.students.find((candidate) => candidate.id === student.id)
+          ?.classes.filter((item) => item.noticeId == null)
+          .map(pickKey);
+        const stillPickable = new Set(fresh ?? []);
+        setValue(
+          "classes",
+          values.classes.filter((key) => stillPickable.has(key)),
+        );
       }
       setError("root", {
         message:

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { getAuth, type WorkspaceRole } from "@repo/auth/server";
 import { authStateFor } from "@repo/auth/testing";
 import { prisma } from "@repo/whiteboard-db";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET as listRegisters, POST as openRegister } from "./registers/route";
 import { GET as getRegister } from "./registers/[id]/route";
@@ -17,12 +17,12 @@ vi.mock(import("@repo/auth/server"), async (importOriginal) => ({
 }));
 const mockedAuth = vi.mocked(getAuth);
 
-const TODAY = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "Asia/Kolkata",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-}).format(new Date());
+// Monday 2026-10-12, 12:00 in Asia/Kolkata. The clock is fixed so the
+// notices seeded for TODAY always match the Register the handler opens.
+const NOW = new Date("2026-10-12T06:30:00.000Z");
+const TODAY = "2026-10-12";
+/** Rows that must exist before TODAY; Prisma's now() uses the real clock. */
+const LAST_MONTH = new Date("2026-09-12T06:30:00.000Z");
 const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6];
 const day = (date: string) => new Date(`${date}T00:00:00.000Z`);
 
@@ -115,6 +115,7 @@ describe("Attendance and Absence Notices HTTP", () => {
         feePlanType: "one_time",
         feePlanAmountPaise: 1000,
         feePlanDueDates: [],
+        createdAt: LAST_MONTH,
       },
     });
     return { studentId, enrollmentId };
@@ -203,6 +204,9 @@ describe("Attendance and Absence Notices HTTP", () => {
   }
 
   beforeEach(async () => {
+    // Only Date is faked; Prisma's timers keep running.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
     workspaceId = `org_${randomUUID()}`;
     batchId = randomUUID();
     session("user_owner", workspaceId);
@@ -228,6 +232,7 @@ describe("Attendance and Absence Notices HTTP", () => {
         timings: [
           { daysOfWeek: EVERY_DAY, startTime: "10:00", endTime: "11:00" },
         ],
+        createdAt: LAST_MONTH,
       },
     });
     ({ studentId: ashaId, enrollmentId: ashaEnrollmentId } = await addStudent(
@@ -238,6 +243,10 @@ describe("Attendance and Absence Notices HTTP", () => {
       "Ravi",
       `ravi-${randomUUID()}@example.com`,
     ));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("flags a Student with a live notice and leaves every mark Unmarked", async () => {
