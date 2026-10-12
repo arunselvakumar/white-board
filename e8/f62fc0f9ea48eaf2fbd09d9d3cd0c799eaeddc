@@ -1,0 +1,19 @@
+apps/construction-management/image-types.d.ts
+  s_0b5256aebf5895::t_69090888bcad74 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e8f62fc0f9ea48eaf2fbd09d9d3cd0c799eaeddc",
+  "prompts": {},
+  "sessions": {
+    "s_0b5256aebf5895": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "979aef22-aa1f-4e75-9dd9-689d46706d58",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
