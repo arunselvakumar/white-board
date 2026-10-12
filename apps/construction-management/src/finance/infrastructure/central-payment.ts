@@ -91,6 +91,8 @@ export class CentralPayment {
         FROM construction_finance.party_payments p
         WHERE p.workspace_id = ${workspaceId}
           AND p.deleted_at IS NULL
+          -- As on the same day as the dues beside it (loadDueInvoices).
+          AND p.payment_date <= ${today}::date
           AND ${place("p")}
         GROUP BY 1, 2`),
       this.db.$queryRaw<

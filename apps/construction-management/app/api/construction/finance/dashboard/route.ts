@@ -7,6 +7,7 @@ import { financeDirectory } from "@/src/composition/finance-directory";
 import { FinanceDashboard } from "@/src/finance/infrastructure/finance-dashboard";
 import { can, type Flag, type MenuKey } from "@/src/shared-kernel/access";
 
+import { requestProjectId } from "../project-scope";
 import {
   GetConstructionFinanceDashboardRequestModel,
   type GetConstructionFinanceDashboardResponseModel,
@@ -31,18 +32,19 @@ function paise(value: bigint): number {
  */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const model = parseOrThrow(
-      GetConstructionFinanceDashboardRequestModel.safeParse(
-        Object.fromEntries(new URL(request.url).searchParams),
-      ),
-    );
+    // The Project first, for the access check; the rest of the query is
+    // validated only for a caller who may read it.
+    const query = Object.fromEntries(new URL(request.url).searchParams);
     const session = await requireAccess(
       request,
       "reporting.project_dashboard",
       "read",
-      { projectId: model.projectId },
+      { projectId: requestProjectId(query) },
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      GetConstructionFinanceDashboardRequestModel.safeParse(query),
+    );
     const { access, workspaceId } = session;
     const scope = { projectId: model.projectId };
     const may = (menu: MenuKey, flag: Flag) => can(access, menu, flag, scope);

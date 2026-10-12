@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
+import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { addAccount, seededAccounts } from "@/test/finance";
 import {
@@ -253,6 +254,28 @@ describe("Central Payment HTTP (CM-709)", () => {
       supplier: [],
       other_party: [],
     });
+  });
+
+  it("counts no advance from a payment dated after today", async () => {
+    const company = await newCompany();
+    const ws = company.workspaceId;
+    const by = company.ownerId;
+    const tower = await addProject(ws, by, "Tower A");
+    const { bankId } = await seededAccounts(ws);
+    const velan = await addContractor(ws, by, [tower]);
+    await reportPartyPayment(ws, by, {
+      partyType: "contractor",
+      partyId: velan,
+      projectId: tower,
+      accountId: bankId,
+      date: addDays(todayIn("Asia/Kolkata"), 3),
+      amount: 10_000_00n,
+    });
+    const today = await summary({ userId: by, workspaceId: ws, role: "owner" });
+    // Dues are as on today; so is the advance beside them.
+    expect(today.parties.contractor).toEqual([
+      expect.objectContaining({ partyId: velan, paid: 0, advance: 0 }),
+    ]);
   });
 
   it("company accounts with today's balance and pending; petty cash by holder", async () => {
