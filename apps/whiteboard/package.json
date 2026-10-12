@@ -22,6 +22,7 @@
     "@cloudflare/realtimekit-react-ui": "^2.0.2",
     "@hookform/resolvers": "^5.9.1",
     "@repo/auth": "*",
+    "@repo/email-templates": "*",
     "@repo/ui": "*",
     "@repo/whiteboard-db": "*",
     "@tanstack/react-query": "^5.102.8",

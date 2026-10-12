@@ -403,6 +403,23 @@ export const workspaces = {
     return user == null ? "User" : inviterDisplayName(user);
   },
 
+  /**
+   * Account email addresses of Users who are members of a Workspace, such as
+   * Teachers to email about an Absence Notice. Non-members are left out.
+   */
+  async memberEmails(
+    workspaceId: string,
+    userIds: string[],
+  ): Promise<Map<string, string>> {
+    const ids = [...new Set(userIds)];
+    if (ids.length === 0) return new Map();
+    const members = await prisma.identityWorkspaceMember.findMany({
+      where: { organizationId: workspaceId, userId: { in: ids } },
+      select: { user: { select: { id: true, email: true } } },
+    });
+    return new Map(members.map(({ user }) => [user.id, user.email]));
+  },
+
   /** Display names for many Users at once, such as who logged each entry. */
   async displayNames(userIds: string[]): Promise<Map<string, string>> {
     const ids = [...new Set(userIds)];

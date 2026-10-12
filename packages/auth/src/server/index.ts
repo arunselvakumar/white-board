@@ -12,6 +12,8 @@ export {
   type InvitationPreview,
   type InviteResult,
 } from "./workspaces";
+export { whiteboardMessaging } from "./messaging";
+export type { OutgoingEmail } from "../email/sender";
 export { isAllowedAuthPath } from "../allowed-paths";
 export {
   isFamily,

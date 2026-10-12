@@ -11,6 +11,11 @@ import {
   type WorkspaceInvitationEmailProps,
 } from "./emails/workspace-invitation";
 import {
+  AbsenceNoticeEmail,
+  absenceNoticeSubject,
+  type AbsenceNoticeEmailProps,
+} from "./emails/absence-notice";
+import {
   CompanyCodeEmail,
   type CompanyCodeEmailProps,
 } from "./emails/construction/company-code";
@@ -29,6 +34,12 @@ export {
   type InvitationRole,
   type WorkspaceInvitationEmailProps,
 } from "./emails/workspace-invitation";
+export {
+  AbsenceNoticeEmail,
+  formatNoticeClass,
+  type AbsenceNoticeEmailClass,
+  type AbsenceNoticeEmailProps,
+} from "./emails/absence-notice";
 
 export {
   CompanyCodeEmail,
@@ -96,5 +107,15 @@ export async function renderTeamInvitationEmail(
   return {
     subject: `Join ${props.companyName} on Construction Management`,
     ...(await renderBoth(createElement(TeamInvitationEmail, props))),
+  };
+}
+
+/** A Teacher told about an Absence Notice given or withdrawn (ADR-0041). */
+export async function renderAbsenceNoticeEmail(
+  props: AbsenceNoticeEmailProps,
+): Promise<RenderedEmail> {
+  return {
+    subject: absenceNoticeSubject(props),
+    ...(await renderBoth(createElement(AbsenceNoticeEmail, props))),
   };
 }
