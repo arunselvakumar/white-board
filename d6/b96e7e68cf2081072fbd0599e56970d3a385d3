@@ -1,0 +1,21 @@
+.github/scripts/deploy-plan.sh
+  s_d85efaaff765fa::t_9db2a3e9e757b2 55-63
+.github/workflows/deploy.yml
+  s_d85efaaff765fa::t_0b069321f5333f 47-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d6b96e7e68cf2081072fbd0599e56970d3a385d3",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
