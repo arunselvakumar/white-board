@@ -23,11 +23,7 @@ import {
 } from "@repo/ui/components/select";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
@@ -175,8 +171,7 @@ function GiveAbsenceNoticeForm({
   );
   // A Class noticed elsewhere since the picker loaded drops out of the pick.
   const pickedNow = picked.filter((key) => pickable.has(key));
-  const severalBatches =
-    new Set(classes.map((item) => item.batchId)).size > 1;
+  const severalBatches = new Set(classes.map((item) => item.batchId)).size > 1;
 
   async function submit(values: FormOutput) {
     const chosen = values.classes.flatMap((key) => {
@@ -290,7 +285,7 @@ function GiveAbsenceNoticeForm({
                 className="w-full"
                 aria-invalid={errors.reason != null}
               >
-                <SelectValue placeholder="Choose a reason" />
+                <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
                 {REASON_ITEMS.map((item) => (

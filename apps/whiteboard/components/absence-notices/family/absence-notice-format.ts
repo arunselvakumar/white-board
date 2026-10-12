@@ -49,8 +49,7 @@ export function givenByLabel(
   givenBy: FamilyAbsenceNoticeView["givenBy"],
   viewer: FamilyHomeRole,
 ): string {
-  if (viewer === "student" && givenBy.role === "student")
-    return "Given by you";
+  if (viewer === "student" && givenBy.role === "student") return "Given by you";
   const who = givenBy.role === "parent" ? "Parent" : "Student";
   return `Given by ${who} · ${givenBy.name}`;
 }
@@ -85,7 +84,9 @@ export function pickKey(item: {
 export type ClassDay = { date: string; classes: PickableClassView[] };
 
 /** Classes by date, keeping the API's date and time order. */
-export function classesByDay(classes: readonly PickableClassView[]): ClassDay[] {
+export function classesByDay(
+  classes: readonly PickableClassView[],
+): ClassDay[] {
   const days: ClassDay[] = [];
   for (const item of classes) {
     const last = days.at(-1);
