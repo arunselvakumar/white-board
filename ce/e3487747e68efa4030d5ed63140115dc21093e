@@ -1,0 +1,19 @@
+apps/whiteboard/src/training-institute/domain/absence-notice.test.ts
+  s_c97675edcbbe15::t_498851fc668b0c 270-272,275-282
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cee3487747e68efa4030d5ed63140115dc21093e",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
