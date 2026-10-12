@@ -16,6 +16,11 @@ import {
 import { Download } from "lucide-react";
 import Link from "next/link";
 
+import {
+  AbsenceNoticesHomeCard,
+  NO_ABSENCE_NOTICES,
+  type FamilyAbsenceNoticesView,
+} from "@/components/absence-notices/family/absence-notices-home-card";
 import { ResultsHomeCard } from "@/components/class-tests/family/results-home-card";
 import { HomeworkHomeCards } from "@/components/class-work/family/homework-home-cards";
 import { formatPaiseAsRupees } from "@/lib/money";
@@ -269,12 +274,14 @@ function StudentCards({
   student,
   classWork,
   results,
+  absenceNotices,
   role,
   now,
 }: {
   student: FamilyHomeStudent;
   classWork: FamilyClassWorkView;
   results: FamilyTestResultsView;
+  absenceNotices: FamilyAbsenceNoticesView;
   role: FamilyHomeRole;
   now: Date;
 }) {
@@ -293,6 +300,12 @@ function StudentCards({
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <NextClassCard nextClass={student.nextClass} now={now} />
+      <AbsenceNoticesHomeCard
+        student={student}
+        notices={absenceNotices}
+        role={role}
+        now={now}
+      />
       <DuesCard dues={student.dues} />
       <HomeworkHomeCards student={studentClassWork} role={role} now={now} />
       <ResultsHomeCard student={studentResults} role={role} />
@@ -307,6 +320,7 @@ export function FamilyHome({
   role,
   classWork = NO_CLASS_WORK,
   results = NO_RESULTS,
+  absenceNotices = NO_ABSENCE_NOTICES,
   now = new Date(),
 }: {
   home: FamilyHomeResponse;
@@ -315,6 +329,8 @@ export function FamilyHome({
   classWork?: FamilyClassWorkView;
   /** Published Test results for the same Students. */
   results?: FamilyTestResultsView;
+  /** Upcoming Absence Notices for the same Students. */
+  absenceNotices?: FamilyAbsenceNoticesView;
   now?: Date;
 }) {
   const title = role === "parent" ? "Parent Home" : "Student Home";
@@ -349,6 +365,7 @@ export function FamilyHome({
                 student={student}
                 classWork={classWork}
                 results={results}
+                absenceNotices={absenceNotices}
                 role={role}
                 now={now}
               />
@@ -361,6 +378,7 @@ export function FamilyHome({
               student={student}
               classWork={classWork}
               results={results}
+              absenceNotices={absenceNotices}
               role={role}
               now={now}
             />
