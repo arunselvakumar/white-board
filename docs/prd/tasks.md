@@ -329,24 +329,25 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 
 ## Changes after P0
 
-| ID     | Title                                                                                    | Status      | Area                           |
-| ------ | ---------------------------------------------------------------------------------------- | ----------- | ------------------------------ |
-| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                     | done        | Auth+HTTP+UI                   |
-| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces      | done        | Auth+UI                        |
-| WB-003 | Teacher profile, role, invitations, Batch assignments, and My Batches                    | done        | Domain+Data+Auth+HTTP+UI       |
-| WB-004 | Student Attendance Registers, marks, history, and Owner/Teacher access                   | done        | Domain+Data+Auth+HTTP+UI       |
-| WB-005 | Optional Batch Enrollment while adding a Student                                         | done        | UI+Enrollment                  |
-| WB-006 | Record Attendance for a missed earlier date                                              | in_progress | Domain+HTTP+UI                 |
-| WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                               | done        | Read+HTTP+UI                   |
-| WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI            |
-| WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare |
-| WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI            |
-| WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                 |
-| WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access            |
-| WB-015 | Replace Clerk with Better Auth (`@repo/auth`), Resend, and React Email invitations       | in_progress | Auth+Data+HTTP+UI+Email        |
-| WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI            |
-| WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access     |
-| WB-016 | Tests: create, enter marks, publish to families, correct with a logged history           | in_progress | Domain+Data+HTTP+UI+Access     |
+| ID     | Title                                                                                    | Status      | Area                             |
+| ------ | ---------------------------------------------------------------------------------------- | ----------- | -------------------------------- |
+| WB-001 | Invite Students and family contacts; gate Owner routes by Clerk role                     | done        | Auth+HTTP+UI                     |
+| WB-002 | Require Workspace selection after authentication for Users with multiple Workspaces      | done        | Auth+UI                          |
+| WB-003 | Teacher profile, role, invitations, Batch assignments, and My Batches                    | done        | Domain+Data+Auth+HTTP+UI         |
+| WB-004 | Student Attendance Registers, marks, history, and Owner/Teacher access                   | done        | Domain+Data+Auth+HTTP+UI         |
+| WB-005 | Optional Batch Enrollment while adding a Student                                         | done        | UI+Enrollment                    |
+| WB-006 | Record Attendance for a missed earlier date                                              | in_progress | Domain+HTTP+UI                   |
+| WB-007 | Read-only role-scoped Calendar for recurring Batch Timings                               | done        | Read+HTTP+UI                     |
+| WB-008 | Expand Teacher profiles, photo capture, private documents, availability, and pay records | done        | Domain+Data+HTTP+UI              |
+| WB-009 | Online class pre-join, external links, Whiteboard meetings, and recordings               | in_progress | Domain+Data+HTTP+UI+Cloudflare   |
+| WB-010 | Class cancellations, Holidays, and Moved Classes                                         | done        | Domain+Data+HTTP+UI              |
+| WB-011 | Training Institute Postgres schema, qualified model names, and API prefix                | done        | Data+HTTP+Docs                   |
+| WB-012 | Student and Parent Home: next Class, dues, Attendance, and recordings                    | in_progress | Read+HTTP+UI+Access              |
+| WB-015 | Replace Clerk with Better Auth (`@repo/auth`), Resend, and React Email invitations       | in_progress | Auth+Data+HTTP+UI+Email          |
+| WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI              |
+| WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access       |
+| WB-016 | Tests: create, enter marks, publish to families, correct with a logged history           | in_progress | Domain+Data+HTTP+UI+Access       |
+| WB-017 | Advance absence notice from Students and Parents                                         | in_progress | Domain+Data+HTTP+UI+Access+Email |
 
 ### WB-001 — Student and Parent Workspace invitations
 
@@ -433,3 +434,9 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 **Plan:** [2026-10-07-clerk-to-better-auth.md](../superpowers/plans/2026-10-07-clerk-to-better-auth.md). **Decisions:** [ADR-0034](../adr/0034-identity-on-better-auth.md). **Tracking:** [GitHub project](https://github.com/orgs/white-board-io/projects/10).
 
 **Done when:** Sign-up with Email Verification, Sign-in by Username or Email, Google Sign-in, Password Reset, Workspace Creation and Selection, and Teacher, Student, and Parent invitations work on Better Auth with Users, Workspaces, members, and invitations in the `identity` schema; roles are `owner`, `teacher`, `student`, `parent`; emails are React Email templates sent with Resend; no code imports Clerk; every existing 401/403/404 tenancy test passes unchanged in intent; identity flows have Postgres HTTP tests; Storybook play functions cover every auth form state; CI runs unit and Postgres HTTP tests; typecheck, lint, and build pass. Mark `done` after merge.
+
+### WB-017 — Advance absence notice from Students and Parents
+
+**Issue:** [#61](https://github.com/arunselvakumar/white-board/issues/61). **Decisions:** [ADR-0041](../adr/0041-absence-notice-product-decisions.md). **Blocked by:** WB-004, WB-010, WB-012 (Attendance, Class Changes, and Student and Parent Home exist).
+
+**Done when:** a Student, or a Parent for each linked child, can give an Absence Notice for one or more Classes in the next 60 days with a reason and optional note, see the notices given, and withdraw one before its Class starts; the Batch's assigned Teachers get a Notification under the bell and an email when a notice is given or withdrawn; the Owner and assigned Teachers see expected absentees per upcoming Class; the Register flags Students with a notice and pre-selects Informed absent; Cancelled, Holiday, and Moved Classes drop the notice; Attendance views count Informed absent and Absent separately. Role and Workspace isolation, OpenAPI, domain and Postgres HTTP tests, Storybook play functions, typecheck, lint, and build pass. Mark `done` after merge.
