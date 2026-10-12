@@ -444,7 +444,7 @@ describe("Absence Notices HTTP", () => {
     expect(email?.subject).toBe(
       "Absence Notice: Asha will miss Python Evening on Tue 13 Oct, 5:00–6:00 pm",
     );
-    expect(email?.text).toContain("Asha (Student) gave notice");
+    expect(email?.text).toContain("Notice given by Asha (Student)");
     expect(email?.text).toContain("Reason: Sick");
     expect(email?.text).toContain("Note: Fever since last night");
     expect(email?.text).toContain(
@@ -556,7 +556,7 @@ describe("Absence Notices HTTP", () => {
     const evening = emailsTo("user_meera@example.test").find((email) =>
       email.subject.includes("2 Classes of Python Evening"),
     );
-    expect(evening?.text).toContain("Kumar (Parent) gave notice");
+    expect(evening?.text).toContain("Notice given by Kumar (Parent)");
     expect(evening?.text).toContain("Reason: Family function");
 
     asKiran();
@@ -785,7 +785,7 @@ describe("Absence Notices HTTP", () => {
     });
     const [email] = emailsTo("user_meera@example.test");
     expect(email?.subject).toContain("Absence Notice withdrawn: Asha");
-    expect(email?.text).toContain("Kumar (Parent) withdrew the notice");
+    expect(email?.text).toContain("was withdrawn by Kumar (Parent)");
     expect((await expected()).body.classes).toEqual([]);
   });
 
