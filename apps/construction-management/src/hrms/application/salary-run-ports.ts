@@ -144,6 +144,16 @@ export type CalculatedSlipWrite = {
 
 export type SlipVersion = { id: string; expectedUpdatedAt: Date };
 
+/** What one slip's account entry names (CM-707). */
+export type SalarySlipPosting = {
+  slipId: string;
+  memberId: string;
+  memberName: string;
+  month: MonthKey;
+  /** Paise: the slip's net payable. */
+  amount: number;
+};
+
 /** Month totals; every sum is 64-bit in SQL. */
 export type SalaryMonthTotals = {
   slips: number;
@@ -221,11 +231,20 @@ export type SalaryRunStore = {
     by: string;
     now: Date;
   }): Promise<void>;
-  /** Marks Approved slips still as read Paid, all or none, with audit events. */
+  /**
+   * Marks Approved slips still as read Paid, all or none, with audit
+   * events, and posts one account entry per slip (its net payable) on the
+   * account it was paid from through `AccountPosting` (CM-707), in the
+   * same transaction: 404 `ACCOUNT_NOT_FOUND`, 403 `ACCOUNT_NOT_YOURS`,
+   * 400 `ACCOUNT_MODE_MISMATCH`.
+   */
   markPaid(input: {
     workspaceId: string;
     items: readonly SlipVersion[];
     payment: SalaryPayment;
+    postings: readonly SalarySlipPosting[];
+    /** May pay from any petty-cash account, not only the payer's own. */
+    anyPettyCash: boolean;
     by: string;
     now: Date;
   }): Promise<void>;
@@ -237,6 +256,9 @@ export type SalaryRunStore = {
   payAdvance(input: {
     workspaceId: string;
     memberId: string;
+    /** For the account entry's Paid To (CM-707). */
+    memberName: string;
+    anyPettyCash: boolean;
     terms: SalaryAdvanceTerms;
     by: string;
     now: Date;

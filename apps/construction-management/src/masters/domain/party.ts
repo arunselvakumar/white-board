@@ -8,6 +8,12 @@ import {
 import { isGstStateCode } from "@/src/shared-kernel/gst-states";
 import { isValidGstin, isValidPan } from "@/src/shared-kernel/tax-ids";
 
+export {
+  TDS_PAYEE_LABELS,
+  tdsPayeeKind,
+  type TdsPayeeKind,
+} from "./contractor-tds";
+
 /**
  * The two minimal party masters M4 ships for Project Resources (ADR
  * CM-0013 §6): Contractors (who execute work, by Department) and Suppliers
@@ -37,6 +43,21 @@ export const PARTY_NAME_MAX = 120;
 export const PARTY_CONTACT_PERSON_MAX = 120;
 export const PARTY_EMAIL_MAX = 254;
 export const PARTY_ADDRESS_MAX = 500;
+export const PARTY_TDS_NOTE_MAX = 500;
+
+const TDS_RATE = /^\d{1,3}(\.\d{1,2})?$/;
+
+/** A lower-deduction certificate's rate: 0–100, two places; empty is none. */
+function tdsLowerRate(raw: string | number | null | undefined): string | null {
+  const text = raw == null ? "" : String(raw).trim();
+  if (text === "") return null;
+  if (!TDS_RATE.test(text) || Number(text) > 100)
+    throw new DomainError(
+      "TDS_LOWER_RATE_INVALID",
+      "Enter the certificate's rate as a percent from 0 to 100, like 0.75.",
+    );
+  return Number(text).toFixed(2);
+}
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -56,6 +77,11 @@ export type PartyDetailsInput = {
   /** A Contractor's second contact; ignored for a Supplier. */
   contactPerson2?: string | null;
   mobile2?: string | null;
+  /** A Contractor's TDS settings (CM-706); ignored for a Supplier. Default on. */
+  tdsApplicable?: boolean | null;
+  /** Percent of a lower-deduction certificate (section 197). */
+  tdsLowerRate?: string | number | null;
+  tdsNote?: string | null;
 };
 
 export type PartyDetails = {
@@ -75,6 +101,11 @@ export type PartyDetails = {
   contactPerson2: string | null;
   /** E.164. */
   mobile2: string | null;
+  /** TDS 194C applies to the Contractor; always true for a Supplier. */
+  tdsApplicable: boolean;
+  /** Percent, two places; null without a certificate. */
+  tdsLowerRate: string | null;
+  tdsNote: string | null;
 };
 
 export type PartyProps = PartyDetails & {
@@ -173,7 +204,18 @@ export function partyDetails(
 
   let contactPerson2: string | null = null;
   let mobile2: string | null = null;
+  let tdsApplicable = true;
+  let lowerRate: string | null = null;
+  let tdsNote: string | null = null;
   if (kind === "contractor") {
+    tdsApplicable = input.tdsApplicable ?? true;
+    lowerRate = tdsLowerRate(input.tdsLowerRate);
+    tdsNote = optional(input.tdsNote);
+    if (tdsNote != null && tdsNote.length > PARTY_TDS_NOTE_MAX)
+      throw new DomainError(
+        "TDS_NOTE_TOO_LONG",
+        `The TDS note must be at most ${String(PARTY_TDS_NOTE_MAX)} characters.`,
+      );
     contactPerson2 = optional(input.contactPerson2);
     if (
       contactPerson2 != null &&
@@ -203,6 +245,9 @@ export function partyDetails(
     stateCode,
     contactPerson2,
     mobile2,
+    tdsApplicable,
+    tdsLowerRate: lowerRate,
+    tdsNote,
   };
 }
 
@@ -291,6 +336,9 @@ export class Party {
       stateCode,
       contactPerson2,
       mobile2,
+      tdsApplicable,
+      tdsLowerRate,
+      tdsNote,
     } = this.props;
     return {
       name,
@@ -303,6 +351,9 @@ export class Party {
       stateCode,
       contactPerson2,
       mobile2,
+      tdsApplicable,
+      tdsLowerRate,
+      tdsNote,
     };
   }
   get name(): string {
@@ -364,9 +415,22 @@ export class Party {
     now: Date,
   ): void {
     this.assertLive();
+    // A form that leaves the TDS settings out keeps them (CM-706).
+    const details: PartyDetailsInput = {
+      ...input.details,
+      tdsApplicable: input.details.tdsApplicable ?? this.props.tdsApplicable,
+      tdsLowerRate:
+        input.details.tdsLowerRate === undefined
+          ? this.props.tdsLowerRate
+          : input.details.tdsLowerRate,
+      tdsNote:
+        input.details.tdsNote === undefined
+          ? this.props.tdsNote
+          : input.details.tdsNote,
+    };
     this.props = {
       ...this.props,
-      ...partyDetails(this.props.kind, input.details),
+      ...partyDetails(this.props.kind, details),
       departmentIds:
         this.props.kind === "contractor" ? unique(input.departmentIds) : [],
       projectIds: unique(input.projectIds),

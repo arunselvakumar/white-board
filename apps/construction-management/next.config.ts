@@ -50,6 +50,11 @@ const nextConfig: NextConfig = {
     "/api/construction/site-work/progress-reports/[id]/retry": [
       "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
     ],
+    // A party payment's receipt (CM-705) prints the party's name in any
+    // script.
+    "/api/construction/finance/party-payments/[id]/receipt": [
+      "./node_modules/@expo-google-fonts/*/{400Regular,700Bold}/*.ttf",
+    ],
   },
   // The Prisma client is generated inside the db package (ADR-0040) and
   // bundled into the server chunks, so it looks for its query engine next to

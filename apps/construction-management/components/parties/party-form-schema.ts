@@ -76,10 +76,26 @@ export const partyFormSchema = z
       }),
     /** A GST state code, or "" for Not set. */
     stateCode: z.string(),
+    /** Contractors' TDS settings (CM-706). */
+    tdsApplicable: z.boolean(),
+    /** Checked only while TDS applies; ignored (and sent as null) when off. */
+    tdsLowerRate: z.string().trim(),
+    tdsNote: z.string().trim().max(500, "Use at most 500 characters"),
     departmentIds: z.array(z.string()),
     projectIds: z.array(z.string()),
   })
   .superRefine((values, ctx) => {
+    const rate = values.tdsLowerRate;
+    if (
+      values.tdsApplicable &&
+      rate !== "" &&
+      !(/^\d{1,3}(\.\d{1,2})?$/.test(rate) && Number(rate) <= 100)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["tdsLowerRate"],
+        message: "Enter a percent from 0 to 100, like 0.75",
+      });
     const gstin = values.gstin.trim().toUpperCase();
     const pan = values.pan.trim().toUpperCase();
     if (
@@ -115,6 +131,9 @@ export function partyFormDefaults(party: Party | null): PartyFormValues {
     gstin: party?.gstin ?? "",
     pan: party?.pan ?? "",
     stateCode: party?.stateCode ?? "",
+    tdsApplicable: party?.tds?.applicable ?? true,
+    tdsLowerRate: party?.tds?.lowerRate ?? "",
+    tdsNote: party?.tds?.note ?? "",
     departmentIds: party?.departments.map((item) => item.id) ?? [],
     projectIds: party?.projects.map((item) => item.id) ?? [],
   };
@@ -151,6 +170,11 @@ export function partyPayload(
           contactPerson2: orNull(values.contactPerson2),
           mobile2: orNull(values.mobile2),
           departmentIds: values.departmentIds,
+          tdsApplicable: values.tdsApplicable,
+          tdsLowerRate: values.tdsApplicable
+            ? orNull(values.tdsLowerRate)
+            : null,
+          tdsNote: orNull(values.tdsNote),
         }
       : {}),
   };
@@ -171,6 +195,8 @@ const FIELD_BY_CODE: Record<string, keyof PartyFormValues> = {
   DEPARTMENT_NOT_FOUND: "departmentIds",
   DEPARTMENT_DISABLED: "departmentIds",
   PROJECT_NOT_FOUND: "projectIds",
+  TDS_LOWER_RATE_INVALID: "tdsLowerRate",
+  TDS_NOTE_TOO_LONG: "tdsNote",
 };
 
 /** The field a server error belongs under, or null for the form. */

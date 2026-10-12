@@ -375,6 +375,7 @@ describe("recalculate and the state machine", () => {
       mode: "bank",
       paymentDate: "2026-11-01",
       reference: "UTR1",
+      accountId: "bank-1",
     };
     expect(
       await rejectsWith(
@@ -397,6 +398,7 @@ describe("recalculate and the state machine", () => {
       mode: "bank",
       date: "2026-11-01",
       reference: "UTR1",
+      accountId: "bank-1",
     });
     expect(
       await rejectsWith(
@@ -424,6 +426,7 @@ describe("advance salary (ADR CM-0012 §15)", () => {
       instalments: 3,
       advanceDate: "2026-10-09",
       mode: "cash",
+      accountId: "acct-1",
     });
     expect(advance.slip).toMatchObject({ kind: "advance", status: "paid" });
     expect(advance.slip.money.netPayable).toBe(900_000);
@@ -513,6 +516,7 @@ describe("advance salary (ADR CM-0012 §15)", () => {
       amount: 100_000,
       advanceDate: "2026-10-31",
       mode: "bank",
+      accountId: "acct-1",
       reference: "NEFT",
     });
     expect(store.advances[0]?.firstRecoveryMonth).toBe("2026-11");
@@ -526,12 +530,18 @@ describe("advance salary (ADR CM-0012 §15)", () => {
       amount: 100_000,
       advanceDate: "2026-10-10",
       mode: "cash",
+      accountId: "acct-1",
     };
     expect(
       await rejectsWith(
         handlers.payAdvance(memberAccess(["read", "create"]), input),
       ),
     ).toBe("PERMISSION_DENIED");
+    expect(
+      await rejectsWith(
+        handlers.payAdvance(OWNER, { ...input, accountId: null }),
+      ),
+    ).toBe("ACCOUNT_REQUIRED");
     expect(
       await rejectsWith(
         handlers.payAdvance(OWNER, { ...input, memberId: "b" }),
@@ -665,6 +675,7 @@ describe("reads, amounts and the payslip", () => {
       amount: 50_000,
       advanceDate: "2026-10-10",
       mode: "cash",
+      accountId: "acct-1",
     });
     expect(await rejectsWith(handlers.payslip(OWNER, advance.slip.id))).toBe(
       "PAYSLIP_NOT_AVAILABLE",

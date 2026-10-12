@@ -113,7 +113,12 @@ describe("createSalaryPayment", () => {
         { mode: "bank", paymentDate: "2026-10-01", reference: "  UTR 123 " },
         "2026-10-10",
       ),
-    ).toEqual({ mode: "bank", date: "2026-10-01", reference: "UTR 123" });
+    ).toEqual({
+      mode: "bank",
+      date: "2026-10-01",
+      reference: "UTR 123",
+      accountId: null,
+    });
     expect(
       createSalaryPayment(
         { mode: "cash", paymentDate: "2026-10-10", reference: " " },

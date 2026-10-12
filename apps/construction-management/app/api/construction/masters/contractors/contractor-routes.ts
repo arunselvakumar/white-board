@@ -1,3 +1,4 @@
+import { financePartyUsage } from "@/src/composition/party-finance";
 import { procurementPartyUsage } from "@/src/composition/procurement-usage";
 import {
   anyUsage,
@@ -15,7 +16,11 @@ import {
 export const contractorRoutes = partyRoutes({
   menu: "masters.contractors",
   handlers: createPartyHandlers("contractor", {
-    usage: anyUsage(procurementPartyUsage(), siteWorkPartyUsage()),
+    usage: anyUsage(
+      procurementPartyUsage(),
+      siteWorkPartyUsage(),
+      financePartyUsage(),
+    ),
   }),
   models: {
     create: CreateConstructionMastersContractorRequestModel,

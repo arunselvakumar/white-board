@@ -12,6 +12,7 @@ import type {
 } from "@/app/api/construction/labour/payments/payment-models";
 
 import { BALANCES_KEY, type PaymentPartyType } from "./balances";
+import { FINANCE_KEY } from "./finance-access";
 import { apiJson } from "./http";
 
 export type WagePayment = ConstructionLabourWagePaymentResponseModel;
@@ -92,13 +93,14 @@ export function attachReceipt(id: string, file: File): Promise<WagePayment> {
   });
 }
 
-/** Payments change balances and statements too. */
+/** Payments change balances, statements and account balances too. */
 function useInvalidatePayments() {
   const client = useQueryClient();
   return () =>
     Promise.all([
       client.invalidateQueries({ queryKey: PAYMENTS_KEY }),
       client.invalidateQueries({ queryKey: BALANCES_KEY }),
+      client.invalidateQueries({ queryKey: FINANCE_KEY }),
     ]);
 }
 

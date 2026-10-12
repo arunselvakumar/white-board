@@ -1,23 +1,21 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
+import type { AccountPosting } from "@/src/shared-kernel/account-posting";
 import { recordAudit } from "@/src/shared-kernel/audit";
-import type { BackdatedLimit } from "@/src/shared-kernel/backdated-policy";
+import {
+  assertCanCreate,
+  assertCanEdit,
+} from "@/src/shared-kernel/backdated-policy";
 import {
   loadBackdatedActor,
   loadBackdatedPolicy,
 } from "@/src/shared-kernel/backdated-policy-reader";
 import {
-  addDays,
   calendarDateFromDb,
   calendarDateToDb,
-  daysBetween,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import {
-  conflict,
-  DomainError,
-  notFound,
-} from "@/src/shared-kernel/domain-error";
+import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import {
   markStoredFileDeleted,
   recordStoredFile,
@@ -30,6 +28,7 @@ import type {
   WagePaymentBackdatedGuard,
   WagePaymentListPage,
   WagePaymentListParams,
+  WagePaymentPosting,
   WagePaymentStore,
 } from "../application/wage-payment-handlers";
 import type { PartyType } from "../domain/ledger";
@@ -51,6 +50,7 @@ function toStored(row: Row): StoredWagePayment {
     kind: row.kind,
     mode: row.mode,
     amount: row.amount,
+    accountId: row.accountId,
     reference: row.reference,
     paidByMemberId: row.paidByMemberId,
     remarks: row.remarks,
@@ -72,6 +72,7 @@ function snapshot(payment: StoredWagePayment) {
     kind: payment.kind,
     mode: payment.mode,
     amount: payment.amount,
+    accountId: payment.accountId,
     reference: payment.reference,
     paidByMemberId: payment.paidByMemberId,
     remarks: payment.remarks,
@@ -80,10 +81,14 @@ function snapshot(payment: StoredWagePayment) {
 
 /**
  * Wage payments in `construction_labour.wage_payments` (CM-215), each
- * write in one transaction with its ledger entries and audit event.
+ * write in one transaction with its ledger entries, its finance account
+ * entry (`AccountPosting`, ADR CM-0017 §12) and audit event.
  */
 export class PrismaWagePaymentStore implements WagePaymentStore {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(
+    private readonly db: PrismaClient,
+    private readonly accounts: AccountPosting,
+  ) {}
 
   async find(workspaceId: string, id: string) {
     const row = await this.db.constructionLabourWagePayment.findFirst({
@@ -225,7 +230,13 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     return new Map(rows.map((row) => [row.id, row.name]));
   }
 
-  async insert(payment: StoredWagePayment): Promise<void> {
+  async insert(
+    payment: StoredWagePayment,
+    posting: WagePaymentPosting,
+  ): Promise<void> {
+    const accountId = payment.accountId;
+    if (accountId == null)
+      throw new Error("A new wage payment names its account.");
     await this.db.$transaction(async (tx) => {
       // A party deleted meanwhile is refused; a delete waits for this.
       await lockLiveParties(
@@ -247,6 +258,7 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
           mode: payment.mode,
           reference: payment.reference,
           amount: payment.amount,
+          accountId,
           paidByMemberId: payment.paidByMemberId,
           remarks: payment.remarks,
           documentKey: payment.documentKey,
@@ -262,6 +274,28 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
         payment.createdBy,
         paymentLedgerEntries(payment, payment.id),
       );
+      await this.accounts.postPayment(tx, {
+        workspaceId: payment.workspaceId,
+        by: payment.createdBy,
+        actor: {
+          userId: payment.createdBy,
+          anyPettyCash: posting.anyPettyCash,
+        },
+        accountId,
+        mode: payment.mode,
+        projectId: payment.projectId,
+        entryDate: payment.paymentDate,
+        amount: BigInt(payment.amount),
+        reference: payment.reference,
+        counterparty: {
+          kind: payment.partyType,
+          id: payment.partyId,
+          name: posting.partyName,
+        },
+        narration: payment.kind === "advance" ? "Advance" : "Wage payment",
+        sourceType: "wage_payment",
+        sourceId: payment.id,
+      });
       await recordAudit(tx, {
         workspaceId: payment.workspaceId,
         actorUserId: payment.createdBy,
@@ -304,6 +338,12 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
         "wage_payment",
         payment.id,
       );
+      await this.accounts.reverse(tx, {
+        workspaceId: payment.workspaceId,
+        by,
+        sourceType: "wage_payment",
+        sourceId: payment.id,
+      });
       await recordAudit(tx, {
         workspaceId: payment.workspaceId,
         actorUserId: by,
@@ -346,6 +386,10 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     });
   }
 
+  accountNames(workspaceId: string, ids: readonly string[]) {
+    return this.accounts.names(this.db, workspaceId, ids);
+  }
+
   async payers(workspaceId: string) {
     return this.db.constructionOrganizationTeamMember.findMany({
       where: { workspaceId, deletedAt: null, status: "active" },
@@ -367,30 +411,11 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
   }
 }
 
-const LABELS: Record<PartyType, string> = {
-  labour: "Labour payment",
-  vendor: "Vendor payment",
-};
-
-function limitFor(
-  limit: BackdatedLimit,
-  actor: { designationId: string | null; isOwner: boolean },
-): number {
-  if (actor.isOwner) return 0;
-  if (
-    actor.designationId != null &&
-    limit.overrideDesignationIds.includes(actor.designationId)
-  )
-    return 0;
-  return limit.days;
-}
-
 /**
- * The back-dated guard for wage payments (`modules/08`: "otherwise the
- * Labour & Vendor group default"). The kernel catalogue has no payment
- * module and no per-group limits, so this applies the Company's default
- * create/edit limits (what a Labour & Vendor module uses in global mode)
- * and the Financial Closing Date, with the kernel's error codes.
+ * The back-dated guard for wage payments: the kernel's `labour_payment` /
+ * `vendor_payment` modules in the Labour & Vendor group (ADR CM-0017 §12),
+ * their own limits in custom mode, else the Company's defaults, and the
+ * Financial Closing Date, with the kernel's error codes.
  */
 export class PrismaWagePaymentBackdatedGuard implements WagePaymentBackdatedGuard {
   constructor(private readonly db: PrismaClient) {}
@@ -406,38 +431,8 @@ export class PrismaWagePaymentBackdatedGuard implements WagePaymentBackdatedGuar
       loadBackdatedActor(this.db, actor),
       companyToday(this.db, actor.workspaceId),
     ]);
-    const verb = action === "create" ? "created" : "edited";
-    const closing = policy.financialClosingDate;
-    if (closing != null && daysBetween(date, closing) >= 0)
-      throw new DomainError(
-        "FINANCIAL_PERIOD_CLOSED",
-        `The books are closed up to ${closing}. Entries dated on or before it cannot be ${verb}.`,
-        {
-          kind: "forbidden",
-          details: {
-            module: `${partyType}_payment`,
-            entryDate: date,
-            financialClosingDate: closing,
-          },
-        },
-      );
-    const days = limitFor(policy[action], who);
-    if (days === 0 || daysBetween(date, today) <= days) return;
-    const oldestAllowedDate = addDays(today, -days);
-    throw new DomainError(
-      action === "create"
-        ? "BACKDATED_CREATE_BLOCKED"
-        : "BACKDATED_EDIT_BLOCKED",
-      `${LABELS[partyType]} entries older than ${String(days)} ${days === 1 ? "day" : "days"} cannot be ${verb}. The earliest date allowed is ${oldestAllowedDate}.`,
-      {
-        kind: "forbidden",
-        details: {
-          module: `${partyType}_payment`,
-          entryDate: date,
-          limitDays: days,
-          oldestAllowedDate,
-        },
-      },
-    );
+    const key = partyType === "labour" ? "labour_payment" : "vendor_payment";
+    if (action === "create") assertCanCreate(policy, key, date, who, today);
+    else assertCanEdit(policy, key, date, who, today);
   }
 }

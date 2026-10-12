@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 import type { PartyReadModel } from "@/src/masters/application/party-handlers";
-import type { PartyKind } from "@/src/masters/domain/party";
+import {
+  TDS_PAYEE_LABELS,
+  tdsPayeeKind,
+  type PartyKind,
+} from "@/src/masters/domain/party";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
 import { expectedUpdatedAt } from "./master-models";
@@ -71,8 +75,42 @@ function writeFields(kind: PartyKind) {
       .describe(
         "Departments the Contractor works in: new ones must be live and enabled (400 DEPARTMENT_NOT_FOUND / DEPARTMENT_DISABLED).",
       ),
+    tdsApplicable: z
+      .boolean()
+      .optional()
+      .describe(
+        "TDS under section 194C is deducted from payments (CM-706). Default on; left out on edit keeps it.",
+      ),
+    tdsLowerRate: z
+      .union([z.string().max(10), z.number()])
+      .nullable()
+      .optional()
+      .describe(
+        "A lower-deduction certificate's rate (section 197), percent with two places (400 TDS_LOWER_RATE_INVALID).",
+      ),
+    tdsNote: z
+      .string()
+      .max(1000)
+      .nullable()
+      .optional()
+      .describe("At most 500 characters, e.g. the certificate number."),
   };
 }
+
+const tdsModel = z
+  .object({
+    applicable: z.boolean(),
+    /** Percent, two places. */
+    lowerRate: z.string().nullable(),
+    note: z.string().nullable(),
+    payeeKind: z.enum(["individual_huf", "other", "no_pan"]),
+    /** "Individual / HUF — 1%", "Firm/Company/other — 2%" or "No PAN — 20%". */
+    payeeLabel: z.string(),
+  })
+  .nullable()
+  .describe(
+    "A Contractor's TDS settings and payee kind from the PAN; null for a Supplier.",
+  );
 
 /**
  * Request and Response models of a Contractor or Supplier master. Each
@@ -111,6 +149,7 @@ export function partyModels(kind: PartyKind) {
       .array(ref)
       .describe("Live Departments, by name; always empty for a Supplier."),
     projects: z.array(ref).describe("Live Projects, by name."),
+    tds: tdsModel,
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime(),
   });
@@ -172,6 +211,16 @@ export function toPartyResponse(item: PartyReadModel): PartyResponseModel {
     isActive: item.isActive,
     departments: item.departments,
     projects: item.projects,
+    tds:
+      item.kind === "contractor"
+        ? {
+            applicable: item.tdsApplicable,
+            lowerRate: item.tdsLowerRate,
+            note: item.tdsNote,
+            payeeKind: tdsPayeeKind(item.pan),
+            payeeLabel: TDS_PAYEE_LABELS[tdsPayeeKind(item.pan)],
+          }
+        : null,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
   };

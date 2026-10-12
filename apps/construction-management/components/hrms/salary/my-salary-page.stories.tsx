@@ -12,7 +12,12 @@ const OCTOBER = storySlip({
   own: true,
   status: "paid",
   hasPayslip: true,
-  payment: { mode: "bank", date: "2026-11-01", reference: "NEFT 42" },
+  payment: {
+    mode: "bank",
+    date: "2026-11-01",
+    reference: "NEFT 42",
+    accountId: null,
+  },
 });
 const SEPTEMBER = storySlip({
   id: "0199c6b2-0000-7000-8000-000000000002",

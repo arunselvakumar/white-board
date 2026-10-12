@@ -15,6 +15,7 @@ import {
   ownerWithCompany,
 } from "@/test/companies";
 import { bytesOf, pngBytes } from "@/test/files";
+import { accountBalance, addAccount, seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as cancelPayment } from "./[id]/cancel/route";
@@ -45,6 +46,7 @@ type Payment = {
   reference: string | null;
   amount: number | null;
   paidBy: { id: string; name: string } | null;
+  account: { id: string; name: string } | null;
   remarks: string | null;
   receiptUrl: string | null;
   updatedAt: string;
@@ -95,11 +97,20 @@ async function fixtures(company: Company) {
       }),
     ),
   );
-  return { tower, villa, labourId: labour.id, vendorId: vendor.id };
+  const { cashId, bankId } = await seededAccounts(company.workspaceId);
+  return {
+    tower,
+    villa,
+    labourId: labour.id,
+    vendorId: vendor.id,
+    cashId,
+    bankId,
+  };
 }
 
 type Fixtures = Awaited<ReturnType<typeof fixtures>>;
 
+/** Cash from the Company's Cash Account, Bank from its Bank Account. */
 function payBody(f: Fixtures, overrides: Record<string, unknown> = {}) {
   return {
     partyType: "labour",
@@ -109,6 +120,7 @@ function payBody(f: Fixtures, overrides: Record<string, unknown> = {}) {
     kind: "payment",
     mode: "cash",
     amount: 30_000,
+    accountId: overrides["mode"] === "bank" ? f.bankId : f.cashId,
     ...overrides,
   };
 }
@@ -473,6 +485,201 @@ describe("wage payments HTTP", () => {
     );
     expect(editBlocked.status).toBe(StatusCodes.FORBIDDEN);
     expect(await errorCode(editBlocked)).toBe("BACKDATED_EDIT_BLOCKED");
+  });
+
+  it("moves the account it was paid from, and cancel puts the money back (CM-707)", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const paid = await record(
+      company.cookie,
+      payBody(f, { amount: 45_000, reference: "Sept wages" }),
+    );
+    expect(paid.status).toBe(StatusCodes.CREATED);
+    const payment = await json<Payment>(paid);
+    expect(payment.account).toEqual({
+      id: f.cashId,
+      name: "Company's Cash Account",
+    });
+    expect(await accountBalance(company.workspaceId, f.cashId)).toBe(-45_000n);
+    const entries = await prisma.constructionFinanceAccountEntry.findMany({
+      where: { sourceType: "wage_payment", sourceId: payment.id },
+    });
+    expect(entries).toEqual([
+      expect.objectContaining({
+        accountId: f.cashId,
+        projectId: f.tower,
+        kind: "payment",
+        amount: -45_000n,
+        mode: "cash",
+        counterpartyKind: "labour",
+        counterpartyId: f.labourId,
+        counterpartyName: "Dhuresh Nawin",
+        narration: "Wage payment",
+      }),
+    ]);
+
+    const advance = await json<Payment>(
+      await record(
+        company.cookie,
+        payBody(f, {
+          kind: "advance",
+          mode: "bank",
+          amount: 5_000,
+          reference: "UTR 99",
+        }),
+      ),
+    );
+    expect(await accountBalance(company.workspaceId, f.bankId)).toBe(-5_000n);
+    const advanceEntry = await prisma.constructionFinanceAccountEntry.findFirst(
+      {
+        where: { sourceType: "wage_payment", sourceId: advance.id },
+      },
+    );
+    expect(advanceEntry).toMatchObject({
+      mode: null,
+      reference: "UTR 99",
+      narration: "Advance",
+    });
+
+    const listed = await json<Page>(
+      await listPayments(
+        jsonRequest(`${BASE}?projectId=${f.tower}`, company.cookie),
+      ),
+    );
+    expect(listed.items.map((item) => item.account?.name)).toEqual([
+      "Company's Bank Account",
+      "Company's Cash Account",
+    ]);
+
+    const cancelled = await cancel(
+      company.cookie,
+      payment.id,
+      payment.updatedAt,
+    );
+    expect(cancelled.status).toBe(StatusCodes.NO_CONTENT);
+    expect(await accountBalance(company.workspaceId, f.cashId)).toBe(0n);
+    expect(await accountBalance(company.workspaceId, f.bankId)).toBe(-5_000n);
+  });
+
+  it("refuses a missing account, a wrong-kind account, someone else's petty cash and another Company's account", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const missing = await record(
+      company.cookie,
+      payBody(f, { accountId: undefined }),
+    );
+    expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await errorCode(missing)).toBe("ACCOUNT_REQUIRED");
+
+    const cashFromBank = await record(
+      company.cookie,
+      payBody(f, { accountId: f.bankId }),
+    );
+    expect(cashFromBank.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await errorCode(cashFromBank)).toBe("ACCOUNT_MODE_MISMATCH");
+    const bankFromCash = await record(
+      company.cookie,
+      payBody(f, { mode: "bank", accountId: f.cashId }),
+    );
+    expect(bankFromCash.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await errorCode(bankFromCash)).toBe("ACCOUNT_MODE_MISMATCH");
+
+    const clerk = await member(
+      company,
+      { "labour.labour": ["read", "create", "financial"] },
+      [f.tower],
+    );
+    const other = await member(company, {}, []);
+    const theirPetty = await addAccount(company.workspaceId, company.userId, {
+      kind: "petty_cash",
+      holderMemberId: other.memberId,
+    });
+    const myPetty = await addAccount(company.workspaceId, company.userId, {
+      kind: "petty_cash",
+      holderMemberId: clerk.memberId,
+    });
+    const notYours = await record(
+      clerk.cookie,
+      payBody(f, { accountId: theirPetty }),
+    );
+    expect(notYours.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await errorCode(notYours)).toBe("ACCOUNT_NOT_YOURS");
+    const own = await record(clerk.cookie, payBody(f, { accountId: myPetty }));
+    expect(own.status).toBe(StatusCodes.CREATED);
+    expect(await accountBalance(company.workspaceId, myPetty)).toBe(-30_000n);
+    // The Owner may pay from anyone's petty cash.
+    const byOwner = await record(
+      company.cookie,
+      payBody(f, { accountId: theirPetty }),
+    );
+    expect(byOwner.status).toBe(StatusCodes.CREATED);
+
+    const stranger = await ownerWithCompany("Other Builders");
+    const theirs = await seededAccounts(stranger.workspaceId);
+    const foreign = await record(
+      company.cookie,
+      payBody(f, { accountId: theirs.cashId }),
+    );
+    expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await errorCode(foreign)).toBe("ACCOUNT_NOT_FOUND");
+    // Nothing refused reached either ledger.
+    expect(await balance(f.labourId)).toBe(40_000);
+    expect(await accountBalance(company.workspaceId, f.cashId)).toBe(0n);
+  });
+
+  it("uses the Labour Payments back-dated module's own limits, and the closing date blocks cancel", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const owner = await json<Payment>(
+      await record(company.cookie, payBody(f, { paymentDate: "2026-09-01" })),
+    );
+    await prisma.constructionOrganizationBackdatedEntryPolicy.create({
+      data: {
+        id: newId(),
+        workspaceId: company.workspaceId,
+        createDays: 0,
+        createOverrideDesignationIds: [],
+        editDays: 0,
+        editOverrideDesignationIds: [],
+        financialClosingDate: new Date("2026-09-05T00:00:00Z"),
+        modules: {
+          labour_payment: {
+            mode: "custom",
+            create: { days: 1, overrideDesignationIds: [] },
+            edit: { days: 1, overrideDesignationIds: [] },
+          },
+        },
+        createdBy: company.userId,
+        updatedBy: company.userId,
+      },
+    });
+    const clerk = await member(
+      company,
+      {
+        "labour.labour": ["read", "create", "financial"],
+        "labour.vendor": ["read", "create", "financial"],
+      },
+      [f.tower, f.villa],
+    );
+    const old = addDays(TODAY, -3);
+    const labour = await record(clerk.cookie, payBody(f, { paymentDate: old }));
+    expect(labour.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await errorCode(labour)).toBe("BACKDATED_CREATE_BLOCKED");
+    // Vendor payments keep the Company's defaults (no limit here).
+    const vendor = await record(
+      clerk.cookie,
+      payBody(f, {
+        partyType: "vendor",
+        partyId: f.vendorId,
+        projectId: f.villa,
+        paymentDate: old,
+      }),
+    );
+    expect(vendor.status).toBe(StatusCodes.CREATED);
+
+    const closed = await cancel(company.cookie, owner.id, owner.updatedAt);
+    expect(closed.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await errorCode(closed)).toBe("FINANCIAL_PERIOD_CLOSED");
   });
 
   it("keeps one receipt per payment: upload, stream, replace and remove", async () => {

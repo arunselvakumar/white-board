@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 
-import { FinanceComingSoon } from "@/components/finance/finance-coming-soon";
+import { PartyMoneyTab } from "@/components/finance/parties/party-money-tab";
 
 export const metadata: Metadata = { title: "Contractor payments" };
 
-/** Contractor payments of a Project (M7). */
-export default function ProjectContractorsPage() {
-  return <FinanceComingSoon title="Contractor payments" ticket="CM-706" />;
+/** Contractor balances, invoices, payments and TDS on a Project (CM-706). */
+export default async function ProjectContractorsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <PartyMoneyTab projectId={id} partyType="contractor" />;
 }

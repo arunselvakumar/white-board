@@ -117,6 +117,11 @@ export type SalaryPayment = {
   mode: PaymentMode;
   date: CalendarDate;
   reference: string | null;
+  /**
+   * The finance account the money left (ADR CM-0017 §12): Cash → a Cash or
+   * petty-cash account, Bank → a Bank account. Null on slips paid before M7.
+   */
+  accountId: string | null;
 };
 
 function paymentDate(value: string, today: CalendarDate): CalendarDate {
@@ -152,16 +157,35 @@ function reference(value: string | null | undefined): string | null {
 
 /** Mode (Cash or Bank), a date not after today, an optional reference. */
 export function createSalaryPayment(
-  input: { mode: string; paymentDate: string; reference?: string | null },
+  input: {
+    mode: string;
+    paymentDate: string;
+    reference?: string | null;
+    accountId?: string | null;
+  },
   today: CalendarDate,
 ): SalaryPayment {
   if (!(PAYMENT_MODES as readonly string[]).includes(input.mode))
     throw invalid("PAYMENT_MODE_INVALID", "Choose Cash or Bank.", "mode");
+  const accountId = input.accountId?.trim() ?? "";
   return {
     mode: input.mode as PaymentMode,
     date: paymentDate(input.paymentDate, today),
     reference: reference(input.reference),
+    accountId: accountId === "" ? null : accountId,
   };
+}
+
+/** From M7 a payment names the account it was paid from (CM-707). */
+export function assertPaidFrom(
+  payment: SalaryPayment,
+): asserts payment is SalaryPayment & { accountId: string } {
+  if (payment.accountId == null)
+    throw invalid(
+      "ACCOUNT_REQUIRED",
+      "Choose the account it was paid from.",
+      "accountId",
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -188,6 +212,7 @@ export function createSalaryAdvance(
     reason?: string | null;
     mode: string;
     reference?: string | null;
+    accountId?: string | null;
   },
   today: CalendarDate,
 ): SalaryAdvanceTerms {
@@ -225,6 +250,7 @@ export function createSalaryAdvance(
       mode: input.mode,
       paymentDate: input.advanceDate,
       reference: input.reference,
+      accountId: input.accountId,
     },
     today,
   );

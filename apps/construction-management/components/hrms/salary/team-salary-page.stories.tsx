@@ -137,6 +137,11 @@ export const MarksApprovedSalariesPaid: Story = {
     const dialog = await screen.findByRole("dialog", {
       name: "Mark Salaries as Paid",
     });
+    // Bank moves "Paid from" to the bank account (CM-707).
+    const paidFrom = await within(dialog).findByRole("combobox", {
+      name: "Paid from",
+    });
+    await waitFor(() => expect(paidFrom).toHaveTextContent("HDFC Current A/c"));
     await userEvent.type(
       within(dialog).getByLabelText("Reference (optional)"),
       "UTR 991",
@@ -157,7 +162,49 @@ export const MarksApprovedSalariesPaid: Story = {
       mode: "bank",
       paymentDate: "2026-11-10",
       reference: "UTR 991",
+      accountId: "0199a000-0000-7000-8000-000000000002",
     });
+  },
+};
+
+/** A refusal about the account lands under "Paid from" (CM-707). */
+export const MarkPaidAccountRefused: Story = {
+  beforeEach: serve({
+    write: (call) =>
+      call.path.endsWith("/mark-paid")
+        ? Response.json(
+            {
+              code: "ACCOUNT_NOT_YOURS",
+              message: "You can only use your own petty-cash account.",
+              details: { field: "accountId" },
+            },
+            { status: 403 },
+          )
+        : undefined,
+  }),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("checkbox", { name: "Select Ravi Kumar" }),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Mark Paid (1)" }),
+    );
+    const dialog = await screen.findByRole("dialog", {
+      name: "Mark Salaries as Paid",
+    });
+    const paidFrom = await within(dialog).findByRole("combobox", {
+      name: "Paid from",
+    });
+    await waitFor(() => expect(paidFrom).toHaveTextContent("HDFC Current A/c"));
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Mark as Paid" }),
+    );
+    await expect(
+      await within(dialog).findByText(
+        "You can only use your own petty-cash account.",
+      ),
+    ).toBeVisible();
+    await expect(paidFrom).toHaveAttribute("aria-invalid", "true");
   },
 };
 
@@ -186,6 +233,11 @@ export const PaysAnAdvance: Story = {
       }),
     );
     await userEvent.type(within(dialog).getByLabelText("Amount"), "9000");
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole("combobox", { name: "Paid from" }),
+      ).toHaveTextContent("Company's Cash Account"),
+    );
     const instalments = within(dialog).getByLabelText("Instalments");
     await userEvent.clear(instalments);
     await userEvent.type(instalments, "3");
@@ -203,6 +255,7 @@ export const PaysAnAdvance: Story = {
       mode: "cash",
       reference: null,
       reason: null,
+      accountId: "0199a000-0000-7000-8000-000000000001",
     });
   },
 };

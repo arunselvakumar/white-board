@@ -21,6 +21,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getBalances } from "./route";
@@ -138,10 +139,12 @@ async function seed(company: Company) {
       earned("vendor", vendor.id, tower, "2026-09-10", "earned", 180_000),
     ]),
   );
+  const { cashId } = await seededAccounts(company.workspaceId);
   const pay = async (body: Record<string, unknown>) =>
     json<{ id: string; updatedAt: string }>(
       await recordPayment(
         jsonRequest(PAYMENTS, company.cookie, {
+          accountId: cashId,
           partyType: "labour",
           partyId: dhuresh,
           projectId: tower,

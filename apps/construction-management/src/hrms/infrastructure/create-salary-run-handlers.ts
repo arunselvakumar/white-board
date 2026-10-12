@@ -1,5 +1,9 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import {
+  NO_ACCOUNT_POSTING,
+  type AccountPosting,
+} from "@/src/shared-kernel/account-posting";
 import type { ObjectStorage } from "@/src/shared-kernel/files";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
@@ -26,11 +30,13 @@ export function createSalaryRunHandlers(deps?: {
   storage?: ObjectStorage;
   ports?: Partial<HrmsPorts>;
   clock?: () => Date;
+  /** Finance's account ledger for Paid slips (CM-707); the routes pass it. */
+  accounts?: AccountPosting;
 }): SalaryRunHandlers {
   const db = deps?.prisma ?? prisma;
   const ports = { ...createHrmsPorts({ prisma: db }), ...deps?.ports };
   return new SalaryRunHandlers(
-    new PrismaSalaryRunStore(db),
+    new PrismaSalaryRunStore(db, deps?.accounts ?? NO_ACCOUNT_POSTING),
     {
       employees: ports.employees,
       settings: ports.settings,

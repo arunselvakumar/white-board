@@ -45,6 +45,25 @@ export type TeamMemberFacts = {
   active: boolean;
 };
 
+/** A live Goods Receipt as a supplier invoice reads it (CM-0017 §13). */
+export type GoodsReceiptFacts = {
+  id: string;
+  number: string;
+  supplierId: string;
+  supplierName: string;
+  location: { kind: "project" | "store"; id: string };
+  receiptDate: string;
+  invoiceNo: string | null;
+  invoiceDate: string | null;
+  /** Paise. */
+  invoiceAmount: bigint | null;
+  /** Paise, GST included. */
+  totalValue: bigint;
+  /** The linked PO's payment terms; null without a PO. */
+  paymentTermsDays: number | null;
+  updatedBy: string;
+};
+
 export type FinanceDirectory = {
   contractors(
     db: Db,
@@ -109,4 +128,27 @@ export type FinanceDirectory = {
     kind: "contractor" | "supplier" | "labour" | "vendor" | "team_member",
     projectId: string | null,
   ): Promise<NamedFacts[]>;
+  /** Live GRNs by id (CM-705). */
+  goodsReceipts(
+    db: Db,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, GoodsReceiptFacts>>;
+  /**
+   * Live GRNs at a Project or Store that no live supplier invoice links
+   * ("awaiting invoice", CM-0017 §13), oldest first; one Supplier's when
+   * given.
+   */
+  awaitingInvoiceGoodsReceipts(
+    db: Db,
+    workspaceId: string,
+    location: { kind: "project" | "store"; id: string },
+    supplierId: string | null,
+  ): Promise<GoodsReceiptFacts[]>;
+  /** Names of Users by user id, from their Team Members (CM-705). */
+  userNames(
+    db: Db,
+    workspaceId: string,
+    userIds: readonly string[],
+  ): Promise<Map<string, string>>;
 };
