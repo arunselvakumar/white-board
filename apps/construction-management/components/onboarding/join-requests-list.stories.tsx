@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
+import { AuthDivider } from "@/components/auth/auth-divider";
 import { QuerySuspense } from "@/components/query-suspense";
 
 import { mockFetch } from "../../.storybook/mock-fetch";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
-import { ChooseCompanyForm } from "./choose-company-form";
+import { CreateCompanyWizard } from "./create-company-wizard";
 import { JoinRequestsList } from "./join-requests-list";
-import { OnboardingShell } from "./onboarding-shell";
+import { OnboardingSplitShell } from "./onboarding-shell";
 
 const REQUEST = {
   id: "0199c3a0-0000-7000-8000-000000000010",
@@ -25,17 +26,14 @@ const meta = {
     authMocks.workspaceId = null;
     authMocks.companies = [];
   },
+  // As on Create Company, where a User with no Company lands.
   render: () => (
-    <OnboardingShell>
-      <ChooseCompanyForm
-        redirectUrl={null}
-        joinRequests={
-          <QuerySuspense>
-            <JoinRequestsList />
-          </QuerySuspense>
-        }
-      />
-    </OnboardingShell>
+    <OnboardingSplitShell>
+      <QuerySuspense fallback={null}>
+        <JoinRequestsList after={<AuthDivider />} />
+      </QuerySuspense>
+      <CreateCompanyWizard />
+    </OnboardingSplitShell>
   ),
 } satisfies Meta<typeof JoinRequestsList>;
 
@@ -113,7 +111,7 @@ export const NoRequests: Story = {
   },
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByRole("heading", { name: "Get started" }),
+      await canvas.findByRole("heading", { name: "Your Company" }),
     ).toBeVisible();
     await waitFor(() =>
       expect(fetchMock?.spy).toHaveBeenCalledWith(LIST, expect.anything()),

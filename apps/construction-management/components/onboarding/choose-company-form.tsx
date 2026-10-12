@@ -22,7 +22,11 @@ import { safeAppPath } from "@/lib/safe-redirect";
 
 const ROLE_LABEL = { owner: "Owner", member: "Team Member" } as const;
 
-/** Your Companies, and creating another one (CM-103; join requests: CM-109). */
+/**
+ * Your Companies, and creating another one (CM-103; join requests: CM-109).
+ * Only a User with a Company lands here; one with none goes straight to
+ * Create Company.
+ */
 export function ChooseCompanyForm({
   redirectUrl,
   joinRequests,
@@ -37,12 +41,8 @@ export function ChooseCompanyForm({
   return (
     <>
       <AuthHeading
-        title={companies.length === 0 ? "Get started" : "Choose a Company"}
-        description={
-          companies.length === 0
-            ? "Create your Company, or accept a Join Request from one."
-            : "Pick the Company you want to work in. You can switch any time."
-        }
+        title="Choose a Company"
+        description="Pick the Company you want to work in. You can switch any time."
       />
       {companies.length > 0 && (
         <section aria-labelledby="your-companies" className="space-y-3">
@@ -88,7 +88,7 @@ export function ChooseCompanyForm({
       <Link
         href="/create-company"
         className={buttonVariants({
-          variant: companies.length === 0 ? "default" : "outline",
+          variant: "outline",
           className: "h-10 w-full",
         })}
       >

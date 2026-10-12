@@ -28,9 +28,9 @@ describe("GET /continue (CM-103)", () => {
     expect(location(response)).toBe("/sign-in?redirect_url=%2Fapp%2Fmasters");
   });
 
-  it("sends a User with no Company to Choose Company", async () => {
+  it("sends a User with no Company straight to Create Company", async () => {
     const { cookie } = await signInByEmail();
-    expect(location(await get("/continue", cookie))).toBe("/choose-company");
+    expect(location(await get("/continue", cookie))).toBe("/create-company");
   });
 
   it("opens the only Company straight away", async () => {

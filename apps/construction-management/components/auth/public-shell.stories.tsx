@@ -30,6 +30,13 @@ export const Default: Story = {
       await expect(
         canvas.getByRole("region", { name: "Construction Management" }),
       ).toBeVisible();
+      // The default photo, credited as Unsplash asks.
+      await expect(
+        canvas.getByRole("link", { name: "Hammilton Ojijo" }),
+      ).toHaveAttribute(
+        "href",
+        "https://unsplash.com/@ojijohammilton?utm_source=construction_management&utm_medium=referral",
+      );
     }
   },
 };

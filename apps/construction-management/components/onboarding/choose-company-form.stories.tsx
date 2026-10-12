@@ -34,6 +34,9 @@ export const SeveralCompanies: Story = {
       canvas.getByRole("heading", { name: "Choose a Company" }),
     ).toBeVisible();
     await expect(canvas.getByText("Team Member")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Create a Company" }),
+    ).toHaveAttribute("href", "/create-company");
     await userEvent.click(
       canvas.getByRole("button", { name: "Open Sri Infra" }),
     );
@@ -43,21 +46,5 @@ export const SeveralCompanies: Story = {
         "/app/masters",
       ),
     );
-  },
-};
-
-export const NoCompanies: Story = {
-  beforeEach() {
-    signInAs("owner");
-    authMocks.workspaceId = null;
-    authMocks.companies = [];
-  },
-  play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole("heading", { name: "Get started" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("link", { name: "Create a Company" }),
-    ).toHaveAttribute("href", "/create-company");
   },
 };

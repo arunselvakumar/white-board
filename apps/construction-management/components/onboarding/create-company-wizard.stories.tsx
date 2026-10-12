@@ -3,7 +3,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 import { CreateCompanyWizard } from "./create-company-wizard";
-import { OnboardingShell } from "./onboarding-shell";
+import { OnboardingSplitShell } from "./onboarding-shell";
 
 type FetchArgs = Parameters<typeof fetch>;
 
@@ -37,9 +37,9 @@ const meta = {
     authMocks.companies = [];
   },
   render: () => (
-    <OnboardingShell>
+    <OnboardingSplitShell>
       <CreateCompanyWizard />
-    </OnboardingShell>
+    </OnboardingSplitShell>
   ),
 } satisfies Meta<typeof CreateCompanyWizard>;
 

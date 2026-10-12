@@ -7,6 +7,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { MailOpen } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
   Item,
@@ -26,8 +27,11 @@ import {
   rejectJoinRequest,
 } from "@/src/queries/join-requests";
 
-/** Pending Join Requests for the signed-in User (CM-109). */
-export function JoinRequestsList() {
+/**
+ * Pending Join Requests for the signed-in User (CM-109). `after` renders
+ * below them, and only when there are some.
+ */
+export function JoinRequestsList({ after }: { after?: ReactNode }) {
   const { data } = useSuspenseQuery(joinRequestsQuery);
   const queryClient = useQueryClient();
   const acceptance = useMutation({
@@ -46,60 +50,63 @@ export function JoinRequestsList() {
   if (data.items.length === 0) return null;
 
   return (
-    <section aria-labelledby="join-requests" className="space-y-3">
-      <h2
-        id="join-requests"
-        className="text-muted-foreground text-xs font-semibold tracking-[0.12em] uppercase"
-      >
-        Join Requests
-      </h2>
-      <ItemGroup className="gap-2">
-        {data.items.map((request) => (
-          <Item key={request.id} variant="outline" role="listitem">
-            <ItemMedia variant="icon">
-              <MailOpen />
-            </ItemMedia>
-            <ItemContent>
-              <ItemTitle>{request.companyName}</ItemTitle>
-              <ItemDescription>
-                Invited you as {request.memberName}
-              </ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={busy}
-                aria-label={`Decline ${request.companyName}`}
-                onClick={() => {
-                  rejection.mutate(request.id);
-                }}
-              >
-                Decline
-              </Button>
-              <Button
-                size="sm"
-                disabled={busy}
-                aria-label={`Accept ${request.companyName}`}
-                onClick={() => {
-                  acceptance.mutate(request.id);
-                }}
-              >
-                Accept
-              </Button>
-            </ItemActions>
-          </Item>
-        ))}
-      </ItemGroup>
-      <FormAlert
-        message={
-          failure == null
-            ? undefined
-            : failure instanceof QueryHttpError
-              ? failure.message
-              : "Something went wrong. Please try again."
-        }
-      />
-    </section>
+    <>
+      <section aria-labelledby="join-requests" className="space-y-3">
+        <h2
+          id="join-requests"
+          className="text-muted-foreground text-xs font-semibold tracking-[0.12em] uppercase"
+        >
+          Join Requests
+        </h2>
+        <ItemGroup className="gap-2">
+          {data.items.map((request) => (
+            <Item key={request.id} variant="outline" role="listitem">
+              <ItemMedia variant="icon">
+                <MailOpen />
+              </ItemMedia>
+              <ItemContent>
+                <ItemTitle>{request.companyName}</ItemTitle>
+                <ItemDescription>
+                  Invited you as {request.memberName}
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={busy}
+                  aria-label={`Decline ${request.companyName}`}
+                  onClick={() => {
+                    rejection.mutate(request.id);
+                  }}
+                >
+                  Decline
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={busy}
+                  aria-label={`Accept ${request.companyName}`}
+                  onClick={() => {
+                    acceptance.mutate(request.id);
+                  }}
+                >
+                  Accept
+                </Button>
+              </ItemActions>
+            </Item>
+          ))}
+        </ItemGroup>
+        <FormAlert
+          message={
+            failure == null
+              ? undefined
+              : failure instanceof QueryHttpError
+                ? failure.message
+                : "Something went wrong. Please try again."
+          }
+        />
+      </section>
+      {after}
+    </>
   );
 }
