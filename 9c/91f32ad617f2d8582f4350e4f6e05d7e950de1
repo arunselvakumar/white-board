@@ -1,0 +1,53 @@
+apps/whiteboard/app/api/training-institute/attendance/registers/[id]/marks/save-attendance-marks-request-model.ts
+  s_c97675edcbbe15::t_896f712ef13410 3-4,10
+apps/whiteboard/app/api/training-institute/attendance/registers/attendance-models.ts
+  s_c97675edcbbe15::t_4faf34fe3ece60 3-5,24-34,40,44-45,51,53-54,77-82,100
+apps/whiteboard/app/api/training-institute/home/get-family-home-response-model.ts
+  s_c97675edcbbe15::t_c111b6a4c1787d 40-46
+apps/whiteboard/app/api/training-institute/students/[id]/attendance/student-attendance-models.ts
+  s_c97675edcbbe15::t_2b6803b8636c50 3-5,26,31-32
+apps/whiteboard/components/attendance/attendance-form.tsx
+  s_c97675edcbbe15::t_e7baf161fbac75 6,18,21,23-27,29-40,46,53-86,113,119-123,151-156,161-163,172-185,187-234,236-237
+apps/whiteboard/components/attendance/attendance-screens.tsx
+  s_c97675edcbbe15::t_ee3cb24cefe2d3 18,213,245-246
+apps/whiteboard/components/attendance/attendance-summary.ts
+  s_c97675edcbbe15::t_c8c8ef07ff3e02 1-13
+apps/whiteboard/components/attendance/attendance.stories.tsx
+  s_c97675edcbbe15::t_a061c53fe76108 26,42,75-183
+apps/whiteboard/components/class-tests/history/class-tests-history.stories.tsx
+  s_c97675edcbbe15::t_993ce530e95cb2 9,354-367
+apps/whiteboard/components/home/family-home.tsx
+  s_c97675edcbbe15::t_b2bc9d8c416a65 48,201-207
+apps/whiteboard/components/students/student-profile-view.tsx
+  s_c97675edcbbe15::t_6a48410eed2edd 17-18,328-336,351-352
+apps/whiteboard/src/queries/attendance.ts
+  s_c97675edcbbe15::t_64d577d86450df 2-5,8,10,20-21,31,44-45
+apps/whiteboard/src/training-institute/application/attendance-handlers.ts
+  s_c97675edcbbe15::t_9367f5b8941828 6-7,10,14,24-33,44-52,125-138,153-154,166,189-200,227-301
+apps/whiteboard/src/training-institute/application/family-home.ts
+  s_c97675edcbbe15::t_b466cca813284c 23-25
+apps/whiteboard/src/training-institute/domain/attendance-register.test.ts
+  s_c97675edcbbe15::t_59a8691d433dda 3-7,53,156-198
+apps/whiteboard/src/training-institute/domain/attendance-register.ts
+  s_c97675edcbbe15::t_c1d0bb8e936e75 10,14-63,247-248
+apps/whiteboard/src/training-institute/domain/attendance-repository.ts
+  s_c97675edcbbe15::t_8519df13e178e3 1-5,28-45,88-93,95-99
+apps/whiteboard/src/training-institute/infrastructure/prisma-attendance-repository.ts
+  s_c97675edcbbe15::t_7e06b1f72e31a3 3-8,12,233-309
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9c91f32ad617f2d8582f4350e4f6e05d7e950de1",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
