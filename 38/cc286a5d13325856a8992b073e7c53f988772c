@@ -1,0 +1,19 @@
+apps/whiteboard/components/absence-notices/family/give-absence-notice-dialog.tsx
+  s_c97675edcbbe15::t_8246cbc05cc649 102,226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "38cc286a5d13325856a8992b073e7c53f988772c",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
