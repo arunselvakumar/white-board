@@ -26,6 +26,20 @@ describe("openApiDocument", () => {
       openApiDocument.paths["/api/training-institute/home"]?.["get"],
     ).toBeDefined();
   });
+  it("documents Absence Notices and Notifications", () => {
+    const paths = openApiDocument.paths;
+    const notices = "/api/training-institute/absence-notices";
+    expect(paths[notices]?.["get"]).toBeDefined();
+    expect(paths[notices]?.["post"]).toBeDefined();
+    expect(paths[`${notices}/classes`]?.["get"]).toBeDefined();
+    expect(paths[`${notices}/expected`]?.["get"]).toBeDefined();
+    expect(paths[`${notices}/{id}/withdraw`]?.["post"]).toBeDefined();
+    const notifications = "/api/training-institute/notifications";
+    expect(paths[notifications]?.["get"]).toBeDefined();
+    expect(paths[`${notifications}/unread-count`]?.["get"]).toBeDefined();
+    expect(paths[`${notifications}/{id}/read`]?.["post"]).toBeDefined();
+    expect(paths[`${notifications}/read-all`]?.["post"]).toBeDefined();
+  });
   it("documents Tests for staff and published results for families", () => {
     const paths = openApiDocument.paths;
     const base = "/api/training-institute";
