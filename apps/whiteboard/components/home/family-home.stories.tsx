@@ -62,6 +62,12 @@ const asha: FamilyHomeStudent = {
       courseName: "Python",
       status: "absent",
     },
+    {
+      date: "2026-09-27",
+      batchName: "Python Evening",
+      courseName: "Python",
+      status: "informed_absent",
+    },
   ],
   recordings: [
     {
@@ -146,6 +152,8 @@ export const StudentHome: Story = {
     await expect(canvas.getByText("Present")).toBeVisible();
     // One Attendance mark and one Test result (Tally basics) say Absent.
     await expect(canvas.getAllByText("Absent")).toHaveLength(2);
+    // An absence after an Absence Notice is labelled apart from Absent.
+    await expect(canvas.getByText("Informed absent")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: /Download recording/ }),
     ).toHaveAttribute(
