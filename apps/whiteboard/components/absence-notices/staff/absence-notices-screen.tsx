@@ -75,7 +75,7 @@ export function AbsenceNoticesContent({
   const days = expectedAbsenceDays(view.classes, now);
   return (
     <main className="w-full min-w-0 p-4 sm:p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="max-w-4xl space-y-6">
         <PageHeader title="Absence Notices" meta={copy.meta} />
         {days.length === 0 ? (
           <Empty className="rounded-2xl border">

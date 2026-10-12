@@ -112,8 +112,8 @@ export function AbsenceNoticeEmail({
       </Heading>
       <Text style={styles.text}>
         {kind === "given"
-          ? `${who} gave notice that ${studentName} will miss ${count === 1 ? "this Class" : "these Classes"} of ${batchName} (${courseName}).`
-          : `${who} withdrew the notice that ${studentName} would miss ${count === 1 ? "this Class" : "these Classes"} of ${batchName} (${courseName}).`}
+          ? `${studentName} will miss ${count === 1 ? "this Class" : "these Classes"} of ${batchName} (${courseName}). Notice given by ${who}.`
+          : `The notice that ${studentName} would miss ${count === 1 ? "this Class" : "these Classes"} of ${batchName} (${courseName}) was withdrawn by ${who}.`}
       </Text>
       <Section style={styles.panel}>
         {classes.map((value) => (
