@@ -1,0 +1,19 @@
+.github/scripts/deploy-plan.sh
+  s_d85efaaff765fa::t_42dbb6adc1ac22 27,31-33,36-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b45156f9cc645f2e3312eec8c644417bac126a8b",
+  "prompts": {},
+  "sessions": {
+    "s_d85efaaff765fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a29e523c-f0a9-4ddd-bb50-8e39ab8c8bbc",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
