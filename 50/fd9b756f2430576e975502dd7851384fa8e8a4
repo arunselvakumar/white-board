@@ -1,0 +1,51 @@
+apps/construction-management/app/(onboarding)/choose-company/page.tsx
+  s_0b5256aebf5895::t_aaa0d29dd5e1f3 1,3,7,17-21,24-33
+apps/construction-management/app/(onboarding)/create-company/page.tsx
+  s_0b5256aebf5895::t_f2ba5d48783b98 3-4,6-8,12-15,17-24
+apps/construction-management/app/(onboarding)/layout.tsx
+  s_0b5256aebf5895::t_ce1377f0babbdb 4,11
+apps/construction-management/app/(public)/layout.tsx
+  s_0b5256aebf5895::t_f589c0fc30be9b 1,4,7,12-14
+apps/construction-management/app/continue/continue.http.test.ts
+  s_0b5256aebf5895::t_a30e14a9d7295c 31,33
+apps/construction-management/app/continue/route.ts
+  s_0b5256aebf5895::t_daeed2d63105da 40
+apps/construction-management/components/auth/public-shell.stories.tsx
+  s_0b5256aebf5895::t_e90aea2e4efe81 33-39
+apps/construction-management/components/auth/public-shell.tsx
+  s_0b5256aebf5895::t_db1671ad84da76 1,6-13,17,19-27,30,32,38,42-61,66-73,76
+apps/construction-management/components/onboarding/choose-company-form.stories.tsx
+  s_0b5256aebf5895::t_800298e416974d 37-39
+apps/construction-management/components/onboarding/choose-company-form.tsx
+  s_0b5256aebf5895::t_975c1c3eb1288e 25-29,44-45,91
+apps/construction-management/components/onboarding/create-company-wizard.stories.tsx
+  s_0b5256aebf5895::t_fc08388d2ef68d 6,40,42
+apps/construction-management/components/onboarding/join-requests-list.stories.tsx
+  s_0b5256aebf5895::t_69cee115cfa14f 4,9,11,29,31-36,114
+apps/construction-management/components/onboarding/join-requests-list.tsx
+  s_0b5256aebf5895::t_cdc76f8dc59179 10,30-34,53-110
+apps/construction-management/components/onboarding/onboarding-shell.tsx
+  s_0b5256aebf5895::t_768a8174c73c40 6,9-37,40-41,47-48,56-83
+apps/construction-management/components/query-suspense.tsx
+  s_0b5256aebf5895::t_d6e8b6ec930c3a 46-53,57,63
+apps/construction-management/components/auth/auth-photos.ts
+  s_0b5256aebf5895::t_5a360d191c81c5 1-81
+apps/construction-management/docs/adr/CM-0018-sign-in-photos-and-first-run.md
+  s_0b5256aebf5895::t_bd29fee4f0f8e5 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "50fd9b756f2430576e975502dd7851384fa8e8a4",
+  "prompts": {},
+  "sessions": {
+    "s_0b5256aebf5895": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "979aef22-aa1f-4e75-9dd9-689d46706d58",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
