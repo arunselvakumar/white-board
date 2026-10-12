@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "npx turbo-ignore@2.10.12",
+  "git": {
+    "deploymentEnabled": {
+      "main": false
+    }
+  }
+}
