@@ -37,7 +37,7 @@ export type BackdatedModuleGroup =
   (typeof BACKDATED_MODULE_GROUPS)[number]["key"];
 
 /**
- * The 24 modules a policy can override, in screen order. `entryDateField`
+ * The modules a policy can override, in screen order. `entryDateField`
  * names the field of the module's entry that is checked (never
  * `createdAt`); `menu` is the Permission Matrix menu the entries belong to.
  */
@@ -150,6 +150,28 @@ export const BACKDATED_MODULES = [
     "transactionDate",
     "finance.transactions",
   ),
+  // Finance (ADR CM-0017 §15).
+  m(
+    "party_payment",
+    "Party Payments",
+    "accounts",
+    "paymentDate",
+    "finance.parties",
+  ),
+  m(
+    "party_invoice",
+    "Party Invoices",
+    "accounts",
+    "invoiceDate",
+    "finance.parties",
+  ),
+  m(
+    "other_expense",
+    "Other Expenses",
+    "accounts",
+    "expenseDate",
+    "finance.other_expenses",
+  ),
   m(
     "labour_attendance",
     "Labour Attendance",
@@ -162,6 +184,21 @@ export const BACKDATED_MODULES = [
     "Vendor Attendance",
     "labour_vendor",
     "attendanceDate",
+    "labour.vendor",
+  ),
+  // Wage payments (CM-215; their own modules from M7, ADR CM-0017 §12).
+  m(
+    "labour_payment",
+    "Labour Payments",
+    "labour_vendor",
+    "paymentDate",
+    "labour.labour",
+  ),
+  m(
+    "vendor_payment",
+    "Vendor Payments",
+    "labour_vendor",
+    "paymentDate",
     "labour.vendor",
   ),
   m("inquiry", "Inquiry", "sales", "inquiryDate", "sales.inquiries"),

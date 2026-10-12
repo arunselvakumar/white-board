@@ -153,6 +153,11 @@ model ConstructionMastersContractor {
   contactPerson2 String?   @map("contact_person_2")
   /// E.164.
   mobile2        String?   @map("mobile_2")
+  /// TDS under 194C is deducted from payments to this Contractor (CM-0017 §8).
+  tdsApplicable  Boolean   @default(true) @map("tds_applicable")
+  /// A lower-deduction certificate's rate (section 197), in percent.
+  tdsLowerRate   Decimal?  @map("tds_lower_rate") @db.Decimal(5, 2)
+  tdsNote        String?   @map("tds_note")
   isActive       Boolean   @default(true) @map("is_active")
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)

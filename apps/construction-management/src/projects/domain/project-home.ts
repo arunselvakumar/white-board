@@ -68,7 +68,11 @@ export function homeModules(input: {
   tileOrder: readonly string[];
 }): HomeModule[] {
   return arrangeModules(input.tileOrder).flatMap((module) => {
-    if (!input.canRead(module.menu)) return [];
+    const menus = [
+      module.menu,
+      ...("alsoMenus" in module ? module.alsoMenus : []),
+    ];
+    if (!menus.some((menu) => input.canRead(menu))) return [];
     if (
       "structure" in module &&
       module.structure !== input.structure &&

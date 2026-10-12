@@ -74,7 +74,17 @@
         "hrms.holidays": ["read"],
         "hrms.attendance": ["create", "read", "notification"],
         "hrms.leaves": ["create", "read", "notification"],
-        "hrms.salaries": ["read", "report", "view_all", "financial"]
+        "hrms.salaries": ["read", "report", "view_all", "financial"],
+        "finance.other_expenses": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report"
+        ]
       }
     },
     {
@@ -330,7 +340,8 @@
           "view_all",
           "notification"
         ],
-        "hrms.salaries": ["read"]
+        "hrms.salaries": ["read"],
+        "finance.other_expenses": ["read"]
       }
     },
     {
@@ -404,7 +415,10 @@
         "hrms.holidays": ["read"],
         "hrms.attendance": ["create", "read", "notification"],
         "hrms.leaves": ["create", "read", "notification"],
-        "hrms.salaries": ["read"]
+        "hrms.salaries": ["read"],
+        "finance.payments": ["read"],
+        "finance.petty_cash": ["create", "read", "update"],
+        "finance.other_expenses": ["create", "read", "update"]
       }
     },
     {
@@ -431,7 +445,10 @@
         "hrms.holidays": ["read"],
         "hrms.attendance": ["create", "read", "notification"],
         "hrms.leaves": ["create", "read", "notification"],
-        "hrms.salaries": ["read"]
+        "hrms.salaries": ["read"],
+        "finance.payments": ["read"],
+        "finance.petty_cash": ["create", "read", "update"],
+        "finance.other_expenses": ["create", "read"]
       }
     },
     {

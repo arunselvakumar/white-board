@@ -36,9 +36,11 @@ function errorOf(run: () => void): DomainError {
 }
 
 describe("module catalogue", () => {
-  it("lists the 24 modules of modules/12 and M6's two in seven groups", () => {
-    // Site Diary and Hindrance joined the Site group in M6 (ADR CM-0016).
-    expect(BACKDATED_MODULES).toHaveLength(26);
+  it("lists the 24 modules of modules/12, M6's two and M7's five in seven groups", () => {
+    // Site Diary and Hindrance joined the Site group in M6 (ADR CM-0016);
+    // party payments, party invoices, Other Expenses and the two wage
+    // payment modules in M7 (ADR CM-0017 §15).
+    expect(BACKDATED_MODULES).toHaveLength(31);
     const counts = Object.fromEntries(
       BACKDATED_MODULE_GROUPS.map((group) => [
         group.label,
@@ -49,12 +51,12 @@ describe("module catalogue", () => {
       Procurement: 6,
       Site: 7,
       Inventory: 3,
-      Accounts: 2,
-      "Labour & Vendor": 2,
+      Accounts: 5,
+      "Labour & Vendor": 4,
       Sales: 3,
       HRMS: 3,
     });
-    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(26);
+    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(31);
   });
 });
 

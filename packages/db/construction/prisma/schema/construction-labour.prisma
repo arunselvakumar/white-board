@@ -371,8 +371,8 @@ enum ConstructionLabourPaymentMode {
 }
 
 /// Money paid to a labourer or a vendor (CM-215). Posts one ledger entry;
-/// cancelling posts its reversal. Full payment ledgers arrive with Finance
-/// (M7).
+/// cancelling posts its reversal. From M7 a payment names the finance account
+/// it was paid from and posts there too (CM-0017 §12).
 model ConstructionLabourWagePayment {
   id             String                        @id @db.Uuid
   workspaceId    String                        @map("workspace_id")
@@ -382,6 +382,8 @@ model ConstructionLabourWagePayment {
   paymentDate    DateTime                      @map("payment_date") @db.Date
   kind           ConstructionLabourPaymentKind
   mode           ConstructionLabourPaymentMode
+  /// `construction_finance.accounts`; required from M7, null on older rows.
+  accountId      String?                       @map("account_id") @db.Uuid
   reference      String?
   /// Paise, positive.
   amount         Int

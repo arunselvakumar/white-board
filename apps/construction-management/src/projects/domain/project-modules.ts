@@ -84,9 +84,20 @@ export const PROJECT_MODULES = [
   {
     key: "payments",
     label: "Payments",
-    description: "Labour and vendor wage payments and balances.",
+    description:
+      "Party bills and payments, transactions, petty cash, expenses and wages.",
     segment: "payments",
-    menu: "labour.attendance",
+    menu: "finance.payments",
+    // M2's wage payments came first; any tab's menu shows the module (M7).
+    alsoMenus: [
+      "labour.attendance",
+      "labour.labour",
+      "labour.vendor",
+      "finance.transactions",
+      "finance.parties",
+      "finance.petty_cash",
+      "finance.other_expenses",
+    ],
   },
   {
     key: "materials",
@@ -144,6 +155,8 @@ export const PROJECT_MODULES = [
   description: string;
   segment: string;
   menu: string;
+  /** Other menus whose Read also shows the module (a hub of tabs). */
+  alsoMenus?: readonly string[];
   structure?: "wings" | "locations";
 }[];
 

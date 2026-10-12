@@ -81,6 +81,9 @@ describe("formatSequenceNumber", () => {
       "DPR",
       "HR",
       "INV",
+      "TXN",
+      "PAY",
+      "EXP",
     ]);
     expect(
       formatSequenceNumber(

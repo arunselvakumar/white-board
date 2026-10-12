@@ -61,7 +61,8 @@ describe("the menu catalogue", () => {
     expect(counts).toEqual({
       // M6 (ADR CM-0016): Reject on two menus, Site Diary (5), Hindrance Register (6).
       project_management: 127,
-      payment_accounting: 30,
+      // M7 (ADR CM-0017 §10): Other Expenses (8).
+      payment_accounting: 38,
       materials: 46,
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13).
       master_records: 96,

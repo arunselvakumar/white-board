@@ -211,7 +211,7 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
               : formatPaise(data.labourBalance.toPay)
           }
           detail={balanceDetail(data.labourBalance)}
-          href={`${base}/payments`}
+          href={`${base}/payments/wages`}
         />
         <Tile
           icon={<IndianRupee className="size-4" />}
@@ -222,7 +222,7 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
               : formatPaise(data.vendorBalance.toPay)
           }
           detail={balanceDetail(data.vendorBalance)}
-          href={`${base}/payments`}
+          href={`${base}/payments/wages`}
         />
         <PresentChart series={data.presentSeries} />
       </div>

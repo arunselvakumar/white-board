@@ -909,6 +909,8 @@ model ConstructionHrmsSalarySlip {
   paymentMode          ConstructionHrmsPaymentMode?     @map("payment_mode")
   paymentDate          DateTime?                        @map("payment_date") @db.Date
   paymentReference     String?                          @map("payment_reference")
+  /// `construction_finance.accounts`: where a Paid slip's money left (CM-0017 §12).
+  paidFromAccountId    String?                          @map("paid_from_account_id") @db.Uuid
   /// Storage key of the payslip PDF; a `stored_files` row.
   payslipKey           String?                          @map("payslip_key")
   createdAt            DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)

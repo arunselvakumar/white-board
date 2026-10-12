@@ -53,6 +53,10 @@ export const SEQUENCE_MODULES = [
     label: "Other Party Sales Invoice",
     defaultPrefix: "INV",
   },
+  // Finance (ADR CM-0017 §15).
+  { key: "transaction", label: "Transaction (TXN)", defaultPrefix: "TXN" },
+  { key: "party_payment", label: "Party Payment (PAY)", defaultPrefix: "PAY" },
+  { key: "other_expense", label: "Other Expense (EXP)", defaultPrefix: "EXP" },
 ] as const;
 
 export type SequenceModuleKey = (typeof SEQUENCE_MODULES)[number]["key"];
