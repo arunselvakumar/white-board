@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries } from "../../../.storybook/mocks/api";
 import { mockCentralStoreApi } from "@/components/procurement/stores/central-store-fixtures";
@@ -38,14 +38,16 @@ export const Inventory: Story = {
     await userEvent.click(
       await body.findByRole("option", { name: "Out of stock" }),
     );
+    // The steel table is on screen before the filter too, so wait for the
+    // filtered list itself: Cement leaves it.
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("table", { name: "Stock of Cement OPC 53 Grade" }),
+      ).toBeNull(),
+    );
     await expect(
-      await canvas.findByRole("table", {
-        name: "Stock of TMT Steel Bar 12 mm",
-      }),
+      canvas.getByRole("table", { name: "Stock of TMT Steel Bar 12 mm" }),
     ).toHaveTextContent("Anugraha Towers");
-    await expect(
-      canvas.queryByRole("table", { name: "Stock of Cement OPC 53 Grade" }),
-    ).toBeNull();
 
     await userEvent.click(canvas.getByRole("button", { name: "Show ledger" }));
     const ledger = await canvas.findByRole("table", { name: "Stock Ledger" });

@@ -1,0 +1,137 @@
+name: Deploy
+
+# Production deploys of Whiteboard, the Marketing Site and Construction
+# Management run here, not on Vercel's builders. Once CI has passed on main,
+# the plan job works out which apps changed since each one's last successful
+# deploy (turbo's package graph, so a change to @repo/ui or @repo/auth
+# redeploys the apps that use it), and only those are built on GitHub
+# runners and uploaded to Vercel as prebuilt output. Vercel's own git
+# deploys of main are switched off in each app's vercel.json.
+#
+# Each deploy is recorded as a GitHub Deployment in the environment
+# `production/<app>`; the plan diffs against the last successful one, so a
+# failed deploy is retried by the next run. "Run workflow" deploys chosen
+# apps regardless.
+#
+# Needs the repository secret VERCEL_TOKEN (Vercel team below).
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: "Deploy these even if unchanged: all, or a comma list of construction-management, whiteboard, marketing"
+        required: false
+        default: ""
+
+# One production deploy run at a time, oldest first; never cancel one
+# midway (it may be applying migrations).
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: write
+
+env:
+  # The commit CI passed on, not whatever main is now.
+  SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  plan:
+    name: Plan
+    # Only main of this repository: a manual run from main, or CI that passed
+    # on a push to main here. A fork's pull request from a branch it named
+    # "main" also completes CI with head_branch "main"; it must never deploy.
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      apps: ${{ steps.plan.outputs.apps }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ env.SHA }}
+          # Every earlier deploy's commit, for turbo's diff.
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.13
+
+      - run: bun install --frozen-lockfile
+
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE: ${{ inputs.apps }}
+        run: bash .github/scripts/deploy-plan.sh
+
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs: plan
+    if: needs.plan.outputs.apps != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.apps) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERCEL_ORG_ID: team_82vD1GbgjRVfhL7RIgbvJb3O
+      VERCEL_PROJECT_ID: ${{ matrix.project }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ env.SHA }}
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.13
+
+      - run: bun install --frozen-lockfile
+
+      - name: Record the deployment
+        id: record
+        run: |
+          body=$(jq -n --arg ref "$SHA" --arg environment "production/${{ matrix.app }}" \
+            '{ref: $ref, environment: $environment, auto_merge: false,
+              production_environment: true, required_contexts: []}')
+          id=$(gh api "repos/$GITHUB_REPOSITORY/deployments" --input - --jq .id <<< "$body")
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" -f state=in_progress > /dev/null
+
+      # Production environment variables and project settings (root
+      # directory, build command) into .vercel/.
+      - name: Pull Vercel settings
+        run: bunx vercel@63.1.2 pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      # The project's build command: production migrations (Whiteboard and
+      # Construction Management), then the Next build, on this runner.
+      - name: Build
+        run: bunx vercel@63.1.2 build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy the prebuilt output
+        id: deploy
+        run: |
+          url=$(bunx vercel@63.1.2 deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Mark the deployment
+        if: always() && steps.record.outputs.id != ''
+        run: |
+          state=${{ job.status == 'success' && 'success' || 'failure' }}
+          gh api "repos/$GITHUB_REPOSITORY/deployments/${{ steps.record.outputs.id }}/statuses" \
+            -f state="$state" -f environment_url="${{ steps.deploy.outputs.url }}" > /dev/null
