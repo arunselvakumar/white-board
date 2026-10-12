@@ -21,20 +21,20 @@ project_of() {
   esac
 }
 
-# The commit of an app's latest successful production deploy, or nothing.
+# The commit of an app's latest production deploy if it succeeded, else
+# nothing (no deploy yet, or the newest one failed or never finished, which
+# deploys the app again). GitHub's list order is not guaranteed, so both
+# lists are sorted by creation time.
 last_deployed() {
   local environment="production/$1"
-  local ids
-  ids=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=$environment&per_page=30" \
-    --jq '.[] | "\(.id) \(.sha)"')
-  while read -r id sha; do
-    [ -z "${id:-}" ] && continue
-    state=$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses?per_page=1" --jq '.[0].state // ""')
-    if [ "$state" = "success" ]; then
-      echo "$sha"
-      return
-    fi
-  done <<< "$ids"
+  local latest id sha state
+  latest=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=$environment&per_page=100" \
+    --jq 'sort_by(.created_at) | last | select(. != null) | "\(.id) \(.sha)"')
+  [ -z "$latest" ] && return
+  read -r id sha <<< "$latest"
+  state=$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses?per_page=100" \
+    --jq 'sort_by(.created_at) | last | .state // ""')
+  if [ "$state" = "success" ]; then echo "$sha"; fi
 }
 
 forced() {
@@ -49,7 +49,7 @@ for app in construction-management whiteboard marketing; do
   else
     base=$(last_deployed "$app")
     if [ -z "$base" ]; then
-      reason="no successful deploy yet"
+      reason="no successful last deploy to compare with"
     elif ! git cat-file -e "$base^{commit}" 2>/dev/null; then
       reason="last deploy $base is not in this history"
     else
