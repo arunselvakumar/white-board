@@ -347,7 +347,7 @@ Empty states in sequence (Course → Batch → Student → Enroll → Pay). Dash
 | WB-013 | Enquiries, follow-ups, demo classes, and conversion to a Student                         | in_progress | Domain+Data+HTTP+UI              |
 | WB-014 | Study Material and Homework: share, set, submit, check with a remark                     | in_progress | Domain+Data+HTTP+UI+Access       |
 | WB-016 | Tests: create, enter marks, publish to families, correct with a logged history           | in_progress | Domain+Data+HTTP+UI+Access       |
-| WB-017 | Advance absence notice from Students and Parents                                         | in_progress | Domain+Data+HTTP+UI+Access+Email |
+| WB-017 | Advance absence notice from Students and Parents                                         | done        | Domain+Data+HTTP+UI+Access+Email |
 
 ### WB-001 — Student and Parent Workspace invitations
 
