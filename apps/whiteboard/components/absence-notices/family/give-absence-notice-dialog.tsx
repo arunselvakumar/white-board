@@ -374,7 +374,7 @@ function ClassPicker({
                   <li key={key}>
                     <Label
                       htmlFor={id}
-                      className="hover:bg-muted/60 flex min-h-10 items-center gap-3 rounded-md px-2 py-1.5 font-normal has-disabled:cursor-not-allowed has-disabled:hover:bg-transparent"
+                      className="hover:bg-muted/60 has-data-disabled:text-muted-foreground flex min-h-10 items-center gap-3 rounded-md px-2 py-1.5 font-normal has-data-disabled:cursor-not-allowed has-data-disabled:hover:bg-transparent"
                     >
                       <Checkbox
                         id={id}
