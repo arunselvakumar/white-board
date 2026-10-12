@@ -418,6 +418,32 @@ export function resolveBackdatedLimits(
   };
 }
 
+/**
+ * The Financial Closing Date (CM-113): anything dated on or before it is
+ * locked for everyone, the Owner too. 403 `FINANCIAL_PERIOD_CLOSED` naming
+ * what cannot be done ("edited", "approved or rejected", …). The one check
+ * every writer uses, so the rule and its message never drift.
+ */
+export function assertPeriodOpen(
+  financialClosingDate: CalendarDate | null,
+  entryDate: CalendarDate,
+  options: { cannot: string; what?: string; module?: string },
+): void {
+  if (financialClosingDate == null || entryDate > financialClosingDate) return;
+  throw new DomainError(
+    "FINANCIAL_PERIOD_CLOSED",
+    `The books are closed up to ${financialClosingDate}. ${options.what ?? "Entries"} dated on or before it cannot be ${options.cannot}.`,
+    {
+      kind: "forbidden",
+      details: {
+        ...(options.module == null ? {} : { module: options.module }),
+        entryDate,
+        financialClosingDate,
+      },
+    },
+  );
+}
+
 function check(
   action: "create" | "edit",
   policy: BackdatedPolicy,
@@ -428,16 +454,10 @@ function check(
 ): void {
   assertCalendarDate(entryDate, "ENTRY_DATE_INVALID");
   assertCalendarDate(today);
-  const closing = policy.financialClosingDate;
-  if (closing != null && daysBetween(entryDate, closing) >= 0)
-    throw new DomainError(
-      "FINANCIAL_PERIOD_CLOSED",
-      `The books are closed up to ${closing}. Entries dated on or before it cannot be ${action === "create" ? "created" : "edited"}.`,
-      {
-        kind: "forbidden",
-        details: { module, entryDate, financialClosingDate: closing },
-      },
-    );
+  assertPeriodOpen(policy.financialClosingDate, entryDate, {
+    cannot: action === "create" ? "created" : "edited",
+    module,
+  });
   const limits = effectiveLimits(policy, module);
   const days = limitFor(limits[action], actor);
   if (days === 0) return;

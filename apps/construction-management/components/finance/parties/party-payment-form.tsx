@@ -247,7 +247,10 @@ function PaymentForm({
   const [files, setFiles] = useState<File[]>([]);
   const [allocations, setAllocations] = useState<AllocationValues>({});
   const [problem, setProblem] = useState<string | undefined>();
-  const [duplicate, setDuplicate] = useState<string | null>(null);
+  const [duplicateWarning, setDuplicateWarning] = useState<{
+    message: string;
+    key: string;
+  } | null>(null);
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentFormSchema),
     defaultValues: {
@@ -274,6 +277,11 @@ function PaymentForm({
   const partyId = values.partyId ?? "";
   const mode = values.mode ?? "cash";
   const flow = values.direction ?? "out";
+  // "Save anyway" confirms the reference the warning was about; change the
+  // reference, account, mode or amount and the check runs again.
+  const duplicateKey = `${values.reference ?? ""}|${values.chequeNumber ?? ""}|${values.accountId ?? ""}|${mode}|${values.amount ?? ""}`;
+  const duplicate =
+    duplicateWarning?.key === duplicateKey ? duplicateWarning.message : null;
   const contractor = partyType === "contractor";
   const amountText = values.amount ?? "";
   const entered = isRupees(amountText) ? (rupeesToPaise(amountText) ?? 0) : 0;
@@ -354,8 +362,16 @@ function PaymentForm({
         accountId: input.accountId,
         mode: input.mode,
         chequeNumber: input.mode === "cheque" ? input.chequeNumber : null,
-        reference: input.reference === "" ? null : input.reference,
-        modeDate: input.modeDate === "" ? null : input.modeDate,
+        // Only what the chosen mode shows: Cheque hides the reference and
+        // Cash the date, and a value typed under another mode stays behind.
+        reference:
+          input.mode === "cheque" || input.reference === ""
+            ? null
+            : input.reference,
+        modeDate:
+          input.mode === "cash" || input.modeDate === ""
+            ? null
+            : input.modeDate,
         amount: paid,
         ...(contractor
           ? {
@@ -382,7 +398,7 @@ function PaymentForm({
         error instanceof QueryHttpError &&
         error.code === "DUPLICATE_REFERENCE"
       ) {
-        setDuplicate(error.message);
+        setDuplicateWarning({ message: error.message, key: duplicateKey });
         return;
       }
       const { field, message } = fieldForCode(error, ERROR_FIELDS);

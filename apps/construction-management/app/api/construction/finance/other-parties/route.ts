@@ -25,13 +25,13 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const session = await requireAccess(request, OTHER_PARTY_MENU, "read");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       ListConstructionFinanceOtherPartiesRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requireAccess(request, OTHER_PARTY_MENU, "read");
-    if (isResponse(session)) return session;
     const page = await handlers.list(session.access, {
       search: model.q,
       projectId: model.projectId,
@@ -59,13 +59,13 @@ export async function GET(request: Request): Promise<Response> {
 /** Adds an Other Party (CM-704); 409 when a live one has the name. */
 export async function POST(request: Request): Promise<Response> {
   try {
+    const session = await requireAccess(request, OTHER_PARTY_MENU, "create");
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       CreateConstructionFinanceOtherPartyRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireAccess(request, OTHER_PARTY_MENU, "create");
-    if (isResponse(session)) return session;
     const party = await handlers.create(session.access, model);
     return Response.json(toOtherPartyResponse(party), {
       status: StatusCodes.CREATED,

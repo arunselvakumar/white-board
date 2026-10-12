@@ -344,7 +344,9 @@ function ExpenseRows({
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "expense" : "expenses"} ·{" "}
         {money(data.totals.amount)}
-        {data.totals.pending > 0 && (
+        {/* The total counts pending and rejected expenses too; say what
+            actually left the account whenever the two differ. */}
+        {data.totals.approved !== data.totals.amount && (
           <> · Approved {money(data.totals.approved)}</>
         )}
         {data.totals.pending > 0 && (

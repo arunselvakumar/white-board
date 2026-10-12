@@ -3,17 +3,14 @@ import type { PrismaClient } from "@repo/construction-db";
 import {
   assertCanCreate,
   assertCanEdit,
+  assertPeriodOpen,
 } from "@/src/shared-kernel/backdated-policy";
 import {
   loadBackdatedActor,
   loadBackdatedPolicy,
 } from "@/src/shared-kernel/backdated-policy-reader";
-import {
-  daysBetween,
-  type CalendarDate,
-} from "@/src/shared-kernel/calendar-date";
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { DomainError } from "@/src/shared-kernel/domain-error";
 
 export type PettyCashActor = {
   workspaceId: string;
@@ -55,20 +52,11 @@ export async function loadPettyCashDates(
       assertCanEdit(policy, "petty_cash", date, who, today);
     },
     decide: (date, verb) => {
-      const closing = policy.financialClosingDate;
-      if (closing != null && daysBetween(date, closing) >= 0)
-        throw new DomainError(
-          "FINANCIAL_PERIOD_CLOSED",
-          `The books are closed up to ${closing}. Vouchers dated on or before it cannot be ${verb}.`,
-          {
-            kind: "forbidden",
-            details: {
-              module: "petty_cash",
-              entryDate: date,
-              financialClosingDate: closing,
-            },
-          },
-        );
+      assertPeriodOpen(policy.financialClosingDate, date, {
+        cannot: verb,
+        what: "Vouchers",
+        module: "petty_cash",
+      });
     },
   };
 }
@@ -80,18 +68,9 @@ export async function assertPettyCashPeriodOpen(
   date: CalendarDate,
 ): Promise<void> {
   const policy = await loadBackdatedPolicy(db, workspaceId);
-  const closing = policy.financialClosingDate;
-  if (closing != null && daysBetween(date, closing) >= 0)
-    throw new DomainError(
-      "FINANCIAL_PERIOD_CLOSED",
-      `The books are closed up to ${closing}. An opening balance dated on or before it cannot be entered.`,
-      {
-        kind: "forbidden",
-        details: {
-          module: "petty_cash",
-          entryDate: date,
-          financialClosingDate: closing,
-        },
-      },
-    );
+  assertPeriodOpen(policy.financialClosingDate, date, {
+    cannot: "entered",
+    what: "An opening balance",
+    module: "petty_cash",
+  });
 }

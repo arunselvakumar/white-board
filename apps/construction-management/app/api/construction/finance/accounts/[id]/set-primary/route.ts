@@ -17,15 +17,15 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const { id } = parseOrThrow(
-      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
-    );
     const session = await requireAccess(
       request,
       "masters.bank_accounts",
       "update",
     );
     if (isResponse(session)) return session;
+    const { id } = parseOrThrow(
+      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
+    );
     await handlers.setPrimary(session.access, id);
     return Response.json(
       toAccountResponse(await handlers.get(session.access, id)),

@@ -141,6 +141,12 @@ export const prismaAccountStore: AccountStore = {
   },
 
   async setPrimary(db, workspaceId, id, by, at) {
+    // One primary change at a time per Company: two Set As Primary on
+    // different accounts would otherwise both clear and set, and the
+    // loser would hit the one-primary index instead of finishing.
+    await db.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${`finance-primary:${workspaceId}`}, 0))`,
+    );
     await db.constructionFinanceAccount.updateMany({
       where: { workspaceId, isPrimary: true, deletedAt: null },
       data: { isPrimary: false, updatedAt: at, updatedBy: by },

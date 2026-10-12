@@ -429,6 +429,26 @@ export const ContractorTdsSettings: Story = {
   },
 };
 
+/** With TDS off, a rate left in the field is neither checked nor sent. */
+export const ContractorTdsOffIgnoresRate: Story = {
+  render: ContractorTdsSettings.render,
+  beforeEach: ContractorTdsSettings.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const section = within(await canvas.findByRole("region", { name: "TDS" }));
+    const rate = section.getByLabelText("Lower deduction rate % (certificate)");
+    await userEvent.type(rate, "101");
+    await userEvent.click(section.getByRole("switch", { name: "Deduct TDS" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/contractors"),
+    );
+    await expect(sent(`${CONTRACTORS}/${BALAJI.id}/update`)).toMatchObject({
+      tdsApplicable: false,
+      tdsLowerRate: null,
+    });
+  },
+};
+
 export const EditSupplierNameTaken: Story = {
   render: () => (
     <StoryQueryClient>

@@ -78,20 +78,24 @@ export const partyFormSchema = z
     stateCode: z.string(),
     /** Contractors' TDS settings (CM-706). */
     tdsApplicable: z.boolean(),
-    tdsLowerRate: z
-      .string()
-      .trim()
-      .refine(
-        (value) =>
-          value === "" ||
-          (/^\d{1,3}(\.\d{1,2})?$/.test(value) && Number(value) <= 100),
-        { message: "Enter a percent from 0 to 100, like 0.75" },
-      ),
+    /** Checked only while TDS applies; ignored (and sent as null) when off. */
+    tdsLowerRate: z.string().trim(),
     tdsNote: z.string().trim().max(500, "Use at most 500 characters"),
     departmentIds: z.array(z.string()),
     projectIds: z.array(z.string()),
   })
   .superRefine((values, ctx) => {
+    const rate = values.tdsLowerRate;
+    if (
+      values.tdsApplicable &&
+      rate !== "" &&
+      !(/^\d{1,3}(\.\d{1,2})?$/.test(rate) && Number(rate) <= 100)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["tdsLowerRate"],
+        message: "Enter a percent from 0 to 100, like 0.75",
+      });
     const gstin = values.gstin.trim().toUpperCase();
     const pan = values.pan.trim().toUpperCase();
     if (
@@ -167,7 +171,9 @@ export function partyPayload(
           mobile2: orNull(values.mobile2),
           departmentIds: values.departmentIds,
           tdsApplicable: values.tdsApplicable,
-          tdsLowerRate: orNull(values.tdsLowerRate),
+          tdsLowerRate: values.tdsApplicable
+            ? orNull(values.tdsLowerRate)
+            : null,
           tdsNote: orNull(values.tdsNote),
         }
       : {}),
