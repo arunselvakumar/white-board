@@ -1,0 +1,19 @@
+.github/workflows/ci.yml
+  s_0ab952fcfadfbe::t_bcc40ef48952b8 18-21,41,44-48,82-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7861f2d15c0658a4b6bc93d5181172a8791576f2",
+  "prompts": {},
+  "sessions": {
+    "s_0ab952fcfadfbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fcd314db-41c9-4e44-b084-42350c2d8a4f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
