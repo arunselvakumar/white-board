@@ -1,0 +1,21 @@
+apps/whiteboard/components/notifications/notification-bell.tsx
+  s_c97675edcbbe15::t_f0a2970d70acca 49,54,58
+apps/whiteboard/components/notifications/notification-item.tsx
+  s_c97675edcbbe15::t_fe7154e7a7d875 111-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "249c922c499fe33b9a584dcaf92e6afa15a55fad",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
