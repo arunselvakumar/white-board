@@ -1,0 +1,23 @@
+apps/whiteboard/components/absence-notices/staff/absence-notices-screen.tsx
+  s_c97675edcbbe15::t_0e25a0c7de0303 78
+apps/whiteboard/components/notifications/notifications-screen.tsx
+  s_c97675edcbbe15::t_0807569737d825 70
+packages/email-templates/src/emails/absence-notice.tsx
+  s_c97675edcbbe15::t_ae5ca8058b2daa 115-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d0fed2b506d4c7ccb5f669cf4b0caeb5f9ed4036",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
