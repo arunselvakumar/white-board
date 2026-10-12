@@ -15,8 +15,29 @@ permissions:
   contents: read
 
 jobs:
-  ci:
-    name: CI
+  # Four jobs run side by side: static checks, tests, build, and Storybook.
+  # Keep the steps in sync with the root `ci` script. Tests only need the
+  # generated Prisma clients (turbo's `^generate`), not the build.
+  checks:
+    name: Format, lint, types
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.13
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run check-versions
+      - run: bun run format:check
+      - run: bun run lint
+      - run: bun run check-types
+
+  test:
+    name: Tests
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -52,19 +73,35 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      # Keep this order in sync with the root `ci` script.
-      - run: bun run check-versions
-      - run: bun run format:check
-      - run: bun run lint
-      - run: bun run check-types
       - run: bun run test
       # Creates whiteboard_test and construction_test and applies migrations
       # itself (each app's vitest global setup).
       - run: bun run test:http
+
+  # No page reads the database at build time, so this job has no Postgres.
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      # CI-only values; nothing here is a real secret.
+      BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere
+      BETTER_AUTH_URL: http://localhost:3001
+      EMAIL_TRANSPORT: log
+      DATABASE_URL: postgresql://whiteboard:whiteboard@localhost:5433/whiteboard
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.13
+
+      - run: bun install --frozen-lockfile
+
       - run: bun run build
 
-  # The Storybook play tests run beside the job above: together they passed
-  # 20 minutes once M7's stories landed (main took 18 before them).
+  # The Storybook play tests got their own job once M7's stories pushed the
+  # single job past 20 minutes.
   storybook:
     name: Storybook
     runs-on: ubuntu-24.04
