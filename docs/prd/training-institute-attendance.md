@@ -17,7 +17,7 @@ An Owner or assigned Teacher can open an Attendance Register for a Batch on toda
 
 - An **Attendance Register** belongs to one Batch and one local calendar date in the Batch's timezone. This first release has one Register per Batch per date, not a session calendar or multiple meetings on one day.
 - An **Attendance Mark** belongs to one Enrollment in that Register and retains the Student ID and name shown when the Register was opened. A Student is not a Clerk User.
-- Status is Unmarked, Present, Absent, Late, or Excused. Unmarked never counts as Absent. Late counts as attended in summaries; Excused is reported separately.
+- Status is Unmarked, Present, Absent, Informed absent, Late, or Excused. Unmarked never counts as Absent. Late counts as attended in summaries; Excused is reported separately. Informed absent is an absence after an Absence Notice, counted apart from Absent (an uninformed absence) and never as attended; the Register flags a Student with a notice and pre-selects it ([ADR-0041](../adr/0041-absence-notice-product-decisions.md)).
 - Owner and active Teachers assigned to the Batch may open and mark its Register. Teachers see only their assigned Batches and the names needed for Attendance, with no contact or Fee information.
 
 ## Workflow

@@ -3,7 +3,6 @@ import { Prisma, type PrismaClient } from "@repo/whiteboard-db";
 import {
   AttendanceRegister,
   attendanceSummary,
-  type AttendanceStatus,
   type AttendanceSummary,
 } from "../domain/attendance-register";
 import type {
@@ -299,10 +298,7 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     });
     return attendanceSummary(
       groups.flatMap((group) =>
-        Array.from(
-          { length: group._count._all },
-          () => group.status as AttendanceStatus,
-        ),
+        Array.from({ length: group._count._all }, () => group.status),
       ),
     );
   }
