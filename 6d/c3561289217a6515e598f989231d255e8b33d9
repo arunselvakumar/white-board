@@ -1,0 +1,21 @@
+apps/whiteboard/app/api/training-institute/attendance/attendance-notices.http.test.ts
+  s_c97675edcbbe15::t_0ae8f8af37dd0b 1-412
+apps/whiteboard/components/home/family-home.stories.tsx
+  s_c97675edcbbe15::t_b3d35af812c780 65-70,155-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6dc3561289217a6515e598f989231d255e8b33d9",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
