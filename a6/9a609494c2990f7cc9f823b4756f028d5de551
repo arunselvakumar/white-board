@@ -1,0 +1,21 @@
+apps/whiteboard/src/training-institute/infrastructure/prisma-attendance-repository.ts
+  s_c97675edcbbe15::t_4ee4b287053bf9 301
+docs/prd/training-institute-attendance.md
+  s_c97675edcbbe15::t_c3abe54e6e5c39 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a69a609494c2990f7cc9f823b4756f028d5de551",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
