@@ -13,6 +13,14 @@ const TEST_DATABASE_URL =
   process.env["CONSTRUCTION_DATABASE_URL_TEST"] ??
   "postgresql://whiteboard:whiteboard@localhost:5433/construction_test";
 
+// HTTP test files run in parallel. Each worker holds one Prisma pool, so
+// HTTP_WORKERS × HTTP_CONNECTIONS must stay well under Postgres's default
+// max_connections of 100, on a laptop and on CI's 4-vCPU runner alike.
+const HTTP_WORKERS = 4;
+const HTTP_CONNECTIONS = 5;
+const httpDatabaseUrl = new URL(TEST_DATABASE_URL);
+httpDatabaseUrl.searchParams.set("connection_limit", String(HTTP_CONNECTIONS));
+
 export default defineConfig({
   resolve: { alias },
   test: {
@@ -33,7 +41,7 @@ export default defineConfig({
           environment: "node",
           include: ["app/**/*.http.test.ts", "src/**/*.http.test.ts"],
           env: {
-            DATABASE_URL: TEST_DATABASE_URL,
+            DATABASE_URL: httpDatabaseUrl.toString(),
             BETTER_AUTH_SECRET: "http-tests-only-secret-0123456789abcdef",
             BETTER_AUTH_URL: "http://localhost:3002",
             EMAIL_TRANSPORT: "outbox",
@@ -56,8 +64,10 @@ export default defineConfig({
             CONSTRUCTION_SELLER_STATE_CODE: "33",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
-          // One database; files must not interleave their writes.
-          fileParallelism: false,
+          // Files share one database: every file creates its own Companies,
+          // Users, and mobiles (test/companies.ts), and no file wipes tables
+          // or reads across Companies.
+          maxWorkers: HTTP_WORKERS,
         },
       },
       {
