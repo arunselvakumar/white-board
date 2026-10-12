@@ -1,0 +1,19 @@
+apps/construction-management/vitest.config.ts
+  s_0ab952fcfadfbe::t_17ed36d8540334 16-23,44,67-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ed59fb15e26688d10b9aa2b54f9b07cae9dcc05a",
+  "prompts": {},
+  "sessions": {
+    "s_0ab952fcfadfbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fcd314db-41c9-4e44-b084-42350c2d8a4f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
