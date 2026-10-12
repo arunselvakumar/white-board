@@ -99,7 +99,7 @@ export function GiveAbsenceNoticeDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] grid-cols-1 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Give absence notice</DialogTitle>
           <DialogDescription>
@@ -223,7 +223,7 @@ function GiveAbsenceNoticeForm({
       onSubmit={handleSubmit(submit)}
       aria-label="Give absence notice"
     >
-      <fieldset className="space-y-2">
+      <fieldset className="min-w-0 space-y-2">
         <legend className="text-sm font-medium">Classes</legend>
         {classesQuery.isPending ? (
           <div className="space-y-2" aria-busy="true">
