@@ -24,6 +24,14 @@ import {
   paymentCategoryOpenApiOperations,
 } from "./payment-categories/payment-categories-openapi";
 import {
+  centralPaymentOpenApiComponents,
+  centralPaymentOpenApiOperations,
+} from "./central-payment/central-payment-openapi";
+import {
+  financeDashboardOpenApiComponents,
+  financeDashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
+import {
   financeLookupOpenApiComponents,
   financeLookupOpenApiOperations,
 } from "./lookups-openapi";
@@ -56,6 +64,8 @@ export const financeOpenApiComponents: OpenApiComponents = {
   ...financeOtherPartyOpenApiComponents,
   ...financeOtherExpenseOpenApiComponents,
   ...partyFinanceOpenApiComponents,
+  ...financeDashboardOpenApiComponents,
+  ...centralPaymentOpenApiComponents,
 };
 
 export const financeOpenApiOperations: OpenApiOperation[] = [
@@ -69,4 +79,6 @@ export const financeOpenApiOperations: OpenApiOperation[] = [
   ...financeOtherPartyOpenApiOperations,
   ...financeOtherExpenseOpenApiOperations,
   ...partyFinanceOpenApiOperations,
+  ...financeDashboardOpenApiOperations,
+  ...centralPaymentOpenApiOperations,
 ];

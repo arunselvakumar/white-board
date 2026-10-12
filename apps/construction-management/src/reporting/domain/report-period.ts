@@ -85,3 +85,36 @@ export function rangeLabel({ from, to }: DateRange): string {
     ? dateLabel(from)
     : `${dateLabel(from)} to ${dateLabel(to)}`;
 }
+
+const FY_RE = /^(\d{4})-(\d{2})$/;
+
+/**
+ * An Indian financial year `2026-27` as 1 April 2026 to 31 March 2027
+ * (the TDS 194C report, CM-709).
+ */
+export function financialYearRange(fy: string): DateRange {
+  const match = FY_RE.exec(fy);
+  const start = Number(match?.[1]);
+  if (match == null || (start + 1) % 100 !== Number(match[2]))
+    throw new DomainError(
+      "REPORT_PERIOD_INVALID",
+      "Use a financial year as 2026-27.",
+    );
+  return { from: `${String(start)}-04-01`, to: `${String(start + 1)}-03-31` };
+}
+
+/** The financial year a date falls in: `2026-10-11` → `2026-27`. */
+export function financialYearOf(date: CalendarDate): string {
+  const year = Number(date.slice(0, 4));
+  const start = Number(date.slice(5, 7)) >= 4 ? year : year - 1;
+  return `${String(start)}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/** The quarter of a financial year a date falls in: April–June is Q1. */
+export function financialQuarterOf(date: CalendarDate): 1 | 2 | 3 | 4 {
+  const month = Number(date.slice(5, 7));
+  if (month >= 4 && month <= 6) return 1;
+  if (month >= 7 && month <= 9) return 2;
+  if (month >= 10) return 3;
+  return 4;
+}

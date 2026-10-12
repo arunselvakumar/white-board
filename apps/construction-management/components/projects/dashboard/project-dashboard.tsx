@@ -4,7 +4,6 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   Building2,
   ClipboardCheck,
-  CreditCard,
   FileText,
   FlaskConical,
   DraftingCompass,
@@ -49,17 +48,20 @@ import { materialsPath } from "@/components/procurement/materials-hub/materials-
 import { AttendanceTrend } from "./attendance-trend";
 import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
 import { DurationFilter } from "./duration-filter";
+import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
 
-/** The KPI tiles still waiting for their milestone (Material Approvals has data). */
+/**
+ * The KPI tiles still waiting for their milestone (Material Approvals and
+ * Payment Approvals have data).
+ */
 const KPI_STUBS: readonly {
   label: string;
   milestone: string;
   icon: LucideIcon;
 }[] = [
-  { label: "Payment Approvals", milestone: "M7", icon: CreditCard },
   { label: "Pending Issues & Snags", milestone: "M8", icon: TriangleAlert },
   { label: "Pending Inspections", milestone: "M8", icon: SearchCheck },
 ];
@@ -67,7 +69,6 @@ const KPI_STUBS: readonly {
 /** What each stub section will show once its milestone lands. */
 const STUB_TEXT: Record<string, string> = {
   task: "Project progress, value earned by tasks and tasks by status.",
-  payments: "Payments in and out, due payments and the split by module.",
   issue_snag: "Issues and snags by status.",
   inspection_request: "Inspection requests by status and the success rate.",
   booking: "Units booked and available, and the booking report.",
@@ -75,7 +76,6 @@ const STUB_TEXT: Record<string, string> = {
 };
 
 const MILESTONE_NAMES: Record<string, string> = {
-  M7: "Finance (M7)",
   M8: "Tasks, issues and inspections (M8)",
   M10: "Sales (M10)",
 };
@@ -298,6 +298,7 @@ function KpiTiles({
       className="grid grid-cols-2 gap-3 lg:grid-cols-4"
     >
       <MaterialApprovalsTile projectId={projectId} duration={duration} />
+      <PaymentApprovalsTile projectId={projectId} duration={duration} />
       {KPI_STUBS.map((kpi) => (
         <li
           key={kpi.label}
@@ -393,8 +394,8 @@ function MaterialsSection({
 /**
  * The Project Dashboard (CM-412, ADR CM-0013 §12): the duration filter
  * (last 12 months by default), the four KPI tiles, and the member's
- * sections in their order. Project summary, Attendance, Daily Work,
- * Equipment Usage and Materials have data; the rest name the milestone
+ * sections in their order. Project summary, Attendance, Payments, Daily
+ * Work, Equipment Usage and Materials have data; the rest name the milestone
  * that fills them. Manage Dashboard shows,
  * hides and reorders sections for the member on every Project.
  */
@@ -465,6 +466,14 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
             if (section.key === "equipment_usage")
               return problem == null ? (
                 <EquipmentUsageSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "payments")
+              return problem == null ? (
+                <PaymentsSection
                   key={section.key}
                   projectId={projectId}
                   duration={duration}

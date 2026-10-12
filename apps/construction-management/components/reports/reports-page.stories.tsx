@@ -23,7 +23,13 @@ import {
   TODAY,
   WORKSHEET_OPTIONS,
   WORKSHEET_OPTIONS_PATH,
+  job,
 } from "./report-fixtures";
+import {
+  COUNTERPARTY_OPTIONS,
+  financeLookupsHandler,
+} from "../finance/account-fixtures";
+import { financeAccessHandler } from "../finance/payment-categories/payment-category-fixtures";
 import { ReportsPage } from "./reports-page";
 
 const API = "/api/construction/reporting/reports";
@@ -408,5 +414,104 @@ export const SiteWorkWithoutFilters: Story = {
       projectId: PROJECT_ID,
       params: { from: "2026-10-01", to: TODAY },
     });
+  },
+};
+
+const FINANCE_ACCESS = financeAccessHandler(
+  {
+    "finance.transactions": ["read", "report"],
+    "finance.parties": ["read", "report"],
+    "finance.petty_cash": ["read"],
+  },
+  false,
+);
+
+/**
+ * Payments and accounts (CM-709): a card per finance report the viewer has
+ * Report on (here Transactions and the party reports; no Petty Cash or
+ * Other Expenses), with the Project's Contractors as a filter.
+ */
+export const FinanceReports: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+      if (call.method === "POST" && call.path === API)
+        return Response.json(
+          job({
+            id: "0190a000-0000-7000-8000-0000000000f1",
+            kind: (call.body as { kind: ReportJob["kind"] }).kind,
+            title: "Due Payments",
+            includesMoney: true,
+          }),
+          { status: 201 },
+        );
+      return FINANCE_ACCESS(call) ?? financeLookupsHandler(call);
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const group = within(
+      await canvas.findByRole("region", { name: "Payments and accounts" }),
+    );
+    for (const name of [
+      "Transactions",
+      "Contractor Payments",
+      "Supplier Payments",
+      "Due Payments",
+    ])
+      await expect(group.getByRole("form", { name })).toBeVisible();
+    await expect(group.queryByRole("form", { name: "Petty Cash" })).toBeNull();
+    await expect(
+      group.queryByRole("form", { name: "Other Expenses" }),
+    ).toBeNull();
+
+    const due = within(group.getByRole("form", { name: "Due Payments" }));
+    await expect(due.getByLabelText("As on")).toHaveValue(TODAY);
+    await userEvent.click(due.getByRole("button", { name: "Generate" }));
+    await expect(await due.findByText("Ready to download")).toBeVisible();
+    await expect(posted()[0]?.body).toEqual({
+      kind: "due_payments",
+      projectId: PROJECT_ID,
+      params: { asOn: TODAY },
+    });
+
+    const contractors = within(
+      group.getByRole("form", { name: "Contractor Payments" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await contractors.findByRole("combobox", { name: "Contractor" }),
+    );
+    const contractor = COUNTERPARTY_OPTIONS["contractor"]?.[0];
+    await userEvent.click(
+      await body.findByRole("option", { name: contractor?.name ?? "" }),
+    );
+    await userEvent.click(
+      contractors.getByRole("button", { name: "Generate" }),
+    );
+    await waitFor(() => expect(posted()).toHaveLength(2));
+    await expect(posted()[1]?.body).toEqual({
+      kind: "contractor_payments",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY, partyId: contractor?.id },
+    });
+  },
+};
+
+/** Without Report on any finance menu the group is not shown. */
+export const NoFinanceReports: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+      return financeAccessHandler({}, false)(call);
+    });
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Site work" });
+    await canvas.findByText("No reports yet");
+    await expect(
+      canvas.queryByRole("region", { name: "Payments and accounts" }),
+    ).toBeNull();
   },
 };

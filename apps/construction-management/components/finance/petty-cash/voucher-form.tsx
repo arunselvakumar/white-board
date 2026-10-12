@@ -289,7 +289,13 @@ export function VoucherForm({
     }
   };
 
-  const busy = form.formState.isSubmitting || uploads.uploading;
+  // Stays busy once saved: the page opens the voucher next, and a second
+  // press would save it twice.
+  const busy =
+    form.formState.isSubmitting ||
+    create.isSuccess ||
+    update.isSuccess ||
+    uploads.uploading;
 
   return (
     <form

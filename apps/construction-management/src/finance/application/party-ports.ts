@@ -274,6 +274,8 @@ export type SettlementListFilter = {
   /** Null: every Project (and Store) of the Company. */
   projectIds: readonly string[] | null;
   includeStores: boolean;
+  /** One party type's invoices only. */
+  partyType?: PartyType;
 };
 
 export type TdsLedgerRow = {
@@ -602,6 +604,16 @@ export type PartyStore = {
     place: PartyPlace,
     date: CalendarDate,
   ): Promise<bigint>;
+  /**
+   * Σ entries per party and Project, across Projects (null: every
+   * Project of the Company); Store balances left out.
+   */
+  balancesByProject(
+    db: FinanceTx,
+    workspaceId: string,
+    partyType: PartyType,
+    projectIds: readonly string[] | null,
+  ): Promise<{ partyId: string; projectId: string; amount: bigint }[]>;
   /** Σ balance of outstanding invoices due before `today`, per party. */
   overdueByParty(
     db: FinanceTx,

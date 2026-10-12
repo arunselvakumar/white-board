@@ -174,8 +174,7 @@ const REASON_LABELS: Record<TdsSuggestion["reason"], string> = {
   below_threshold: "Below ₹30,000 and the year is under ₹1,00,000",
   single: "This payment is above ₹30,000",
   aggregate: "The year's payments are above ₹1,00,000",
-  aggregate_crossed:
-    "This payment takes the year above ₹1,00,000: earlier payments are caught up",
+  aggregate_crossed: "This payment takes the year above ₹1,00,000",
 };
 
 /**
@@ -286,10 +285,13 @@ function PaymentForm({
   const amountText = values.amount ?? "";
   const entered = isRupees(amountText) ? (rupeesToPaise(amountText) ?? 0) : 0;
 
-  const parties = useQuery({
-    ...counterpartyOptionsQuery(partyType, projectId),
-    enabled: fixedPartyId == null,
-  });
+  // Also read when the party is fixed, to name it on the form.
+  const parties = useQuery(counterpartyOptionsQuery(partyType, projectId));
+  const fixedPartyName =
+    fixedPartyId == null
+      ? null
+      : (parties.data?.items.find((item) => item.id === fixedPartyId)?.name ??
+        null);
   const members = useQuery(counterpartyOptionsQuery("team_member", null));
   const outstanding = useQuery({
     ...outstandingInvoicesQuery(
@@ -432,7 +434,14 @@ function PaymentForm({
           Payment
         </h2>
         {fixedPartyId != null && (
-          <FieldError message={errors.partyId?.message} />
+          <div className="min-w-0 space-y-1">
+            <p className="text-muted-foreground text-sm">{screen.label}</p>
+            <p className="truncate font-medium">
+              {fixedPartyName ??
+                (parties.isPending ? "…" : "Not on this Project")}
+            </p>
+            <FieldError message={errors.partyId?.message} />
+          </div>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
           {fixedPartyId == null && (
@@ -733,7 +742,9 @@ function PaymentForm({
               documentType="party_payment"
               value={files}
               onChange={setFiles}
-              disabled={record.isPending || uploads.uploading}
+              disabled={
+                record.isPending || record.isSuccess || uploads.uploading
+              }
             />
           </div>
         </div>
@@ -757,13 +768,22 @@ function PaymentForm({
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="submit"
-          disabled={record.isPending || uploads.uploading || tdsStale}
+          // Stays off once saved: the form refreshes before the payment's
+          // page opens, and a second press would record it twice.
+          disabled={
+            record.isPending ||
+            record.isSuccess ||
+            uploads.uploading ||
+            tdsStale
+          }
         >
           {record.isPending
             ? "Saving…"
-            : duplicate != null
-              ? "Save anyway"
-              : `Record ${money(paid > 0 ? paid : 0)}`}
+            : record.isSuccess
+              ? "Opening the payment…"
+              : duplicate != null
+                ? "Save anyway"
+                : `Record ${money(paid > 0 ? paid : 0)}`}
         </Button>
         <p className="text-muted-foreground text-sm">
           {flow === "in" ? "Received into" : "Paid from"} the account:{" "}

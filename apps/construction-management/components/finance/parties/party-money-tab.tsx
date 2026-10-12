@@ -20,6 +20,7 @@ import { AwaitingGrns } from "./awaiting-grns";
 import { InvoiceDialog, type InvoiceDialogTarget } from "./invoice-dialog";
 import { PartyBalances } from "./party-balances";
 import { PARTY_SCREENS, partyPaths } from "./party-money";
+import { SettlementList } from "./settlement-list";
 import { TdsLedgerView } from "./tds-ledger";
 
 function TableSkeleton() {
@@ -35,8 +36,9 @@ function TableSkeleton() {
 /**
  * A party type's tab of the Project's Payments (CM-705 Suppliers, CM-706
  * Contractors; CM-708 reuses it for Other Parties): balances per party
- * with New invoice and Record payment; Suppliers add the GRNs awaiting an
- * invoice, Contractors the TDS ledger.
+ * with New invoice and Record payment, and the Settlements waiting for
+ * approval (CM-708); Suppliers add the GRNs awaiting an invoice,
+ * Contractors the TDS ledger.
  */
 export function PartyMoneyTab({
   projectId,
@@ -99,20 +101,22 @@ export function PartyMoneyTab({
           </div>
         )}
       </div>
-      {screen.tds ? (
-        <Tabs defaultValue="balances" className="gap-4">
-          <TabsList>
-            <TabsTrigger value="balances">Balances</TabsTrigger>
-            <TabsTrigger value="tds">TDS</TabsTrigger>
-          </TabsList>
-          <TabsContent value="balances">{balances}</TabsContent>
+      <Tabs defaultValue="balances" className="gap-4">
+        <TabsList>
+          <TabsTrigger value="balances">Balances</TabsTrigger>
+          <TabsTrigger value="settlements">Settlements</TabsTrigger>
+          {screen.tds && <TabsTrigger value="tds">TDS</TabsTrigger>}
+        </TabsList>
+        <TabsContent value="balances">{balances}</TabsContent>
+        <TabsContent value="settlements">
+          <SettlementList projectId={projectId} partyType={partyType} />
+        </TabsContent>
+        {screen.tds && (
           <TabsContent value="tds">
             <TdsLedgerView projectId={projectId} today={today} />
           </TabsContent>
-        </Tabs>
-      ) : (
-        balances
-      )}
+        )}
+      </Tabs>
       <InvoiceDialog
         projectId={projectId}
         partyType={partyType}

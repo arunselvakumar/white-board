@@ -1,3 +1,4 @@
+import type { FinanceAccessMenu } from "@/app/api/construction/finance/access/access-models";
 import type { ReportJob, RequestReportInput } from "@/src/queries/reports";
 
 export type ReportDefinition = {
@@ -5,12 +6,22 @@ export type ReportDefinition = {
   kind: RequestReportInput["kind"];
   title: string;
   description: string;
-  /** A date range or one month. */
-  period: "range" | "month";
+  /**
+   * A date range, one month, one day the balances are taken on, or a
+   * financial year.
+   */
+  period: "range" | "month" | "as_on" | "fy";
   /** Shown under the description: what the report needs. */
   needs: string;
   /** An optional filter the card offers when it has options for it. */
-  filter?: "contractor" | "equipment";
+  filter?: "contractor" | "equipment" | "supplier" | "account";
+  /** The filter must be picked (the Ledger's account); no "All". */
+  filterRequired?: boolean;
+  /**
+   * Finance reports (CM-709): the menu whose Report flag shows the card.
+   * The Ledger's card shows with either of its menus.
+   */
+  menus?: readonly FinanceAccessMenu[];
 };
 
 /** The Project's reports (CM-217, CM-218), in the order the page shows them. */
@@ -107,6 +118,105 @@ export const SITE_WORK_REPORT_CATALOGUE: readonly ReportDefinition[] = [
   },
 ];
 
+/**
+ * The Project's finance reports (CM-709, ADR CM-0017 §16), each shown by
+ * the viewer's Report flag on its finance menu.
+ */
+export const FINANCE_REPORT_CATALOGUE: readonly ReportDefinition[] = [
+  {
+    kind: "transactions",
+    title: "Transactions",
+    description:
+      "Transactions and transfers on this Project in the period: type, account, category, mode, reference, Paid To / Received From, amount and status.",
+    period: "range",
+    needs: "Needs Transactions Report.",
+    menus: ["finance.transactions"],
+  },
+  {
+    kind: "petty_cash",
+    title: "Petty Cash",
+    description:
+      "Vouchers on this Project: date, number, type, category, account, Paid To / Received From, credit, debit and status, with each account's closing balance.",
+    period: "range",
+    needs: "Needs Petty Cash Report; other holders' accounts need View all.",
+    filter: "account",
+    menus: ["finance.petty_cash"],
+  },
+  {
+    kind: "contractor_payments",
+    title: "Contractor Payments",
+    description:
+      "Per Contractor: opening, invoiced, paid, TDS, written off and closing balance; every invoice with what settled it and every payment.",
+    period: "range",
+    needs: "Needs Parties Report.",
+    filter: "contractor",
+    menus: ["finance.parties"],
+  },
+  {
+    kind: "supplier_payments",
+    title: "Supplier Payments",
+    description:
+      "Per Supplier: opening, invoiced, paid, written off and closing balance; every invoice with what settled it and every payment.",
+    period: "range",
+    needs: "Needs Parties Report.",
+    filter: "supplier",
+    menus: ["finance.parties"],
+  },
+  {
+    kind: "other_expenses",
+    title: "Other Expenses",
+    description:
+      "This Project's Other Expenses in the period: category, payee, account, mode, reference, amount and status.",
+    period: "range",
+    needs: "Needs Other Expenses Report.",
+    menus: ["finance.other_expenses"],
+  },
+  {
+    kind: "due_payments",
+    title: "Due Payments",
+    description:
+      "Per party with open invoices on this Project: invoiced, paid, due and the due by days past the due date (not due, 0–30, 31–60, 61–90, 90+).",
+    period: "as_on",
+    needs: "Needs Parties Report.",
+    menus: ["finance.parties"],
+  },
+];
+
+/** The Company-wide finance reports of Central Payment (CM-709). */
+export const CENTRAL_FINANCE_REPORT_CATALOGUE: readonly ReportDefinition[] = [
+  {
+    kind: "account_ledger",
+    title: "Ledger",
+    description:
+      "One account's opening balance, every entry in the period with its running balance, credit, debit and the closing balance.",
+    period: "range",
+    needs:
+      "Needs Company's Bank A/C Report, or Petty Cash Report for a petty-cash account.",
+    filter: "account",
+    filterRequired: true,
+    menus: ["masters.bank_accounts", "finance.petty_cash"],
+  },
+  {
+    kind: "tds_194c",
+    title: "TDS 194C",
+    description:
+      "Each Contractor's payments of the financial year with base, rate, TDS and overrides, and the totals by quarter for filing. PANs show the last four characters.",
+    period: "fy",
+    needs: "Needs Parties Report; a member sees the Projects they are on.",
+    filter: "contractor",
+    menus: ["finance.parties"],
+  },
+  {
+    kind: "due_payments",
+    title: "Due Payments",
+    description:
+      "Every party's open invoices across Projects: invoiced, paid, due and the ageing by days past the due date; receivables of Other Parties apart.",
+    period: "as_on",
+    needs: "Needs Parties Report; a member sees the Projects they are on.",
+    menus: ["finance.parties"],
+  },
+];
+
 /** The central equipment reports of Masters → Equipments (CM-605). */
 export const EQUIPMENT_REPORT_CATALOGUE: readonly ReportDefinition[] = [
   {
@@ -171,8 +281,10 @@ export function monthLabel(month: string): string {
 
 /** What a job covers, as the list shows it. */
 export function jobPeriod(job: ReportJob): string {
-  const { month, from, to } = job.params;
+  const { month, from, to, fy, asOn } = job.params;
   if (month != null) return monthLabel(month);
+  if (fy != null) return `FY ${fy}`;
+  if (asOn != null) return `As on ${dateLabel(asOn)}`;
   if (from == null || to == null) return "";
   return from === to
     ? dateLabel(from)
@@ -188,4 +300,20 @@ export function monthStart(today: string): string {
 export function deviceToday(now: Date = new Date()): string {
   const pad = (value: number) => String(value).padStart(2, "0");
   return `${String(now.getFullYear())}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/** The financial year `today` falls in, `2026-27`. */
+export function financialYearOf(today: string): string {
+  const year = Number(today.slice(0, 4));
+  const start = Number(today.slice(5, 7)) >= 4 ? year : year - 1;
+  return `${String(start)}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/** This financial year and the three before it, newest first. */
+export function recentFinancialYears(today: string): string[] {
+  const start = Number(financialYearOf(today).slice(0, 4));
+  return [0, 1, 2, 3].map((back) => {
+    const year = start - back;
+    return `${String(year)}-${String((year + 1) % 100).padStart(2, "0")}`;
+  });
 }

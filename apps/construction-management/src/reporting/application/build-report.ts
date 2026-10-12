@@ -6,14 +6,21 @@ import { buildLabourPaymentReport } from "../domain/labour-payment-report";
 import { buildMusterRoll } from "../domain/muster-roll";
 import type { ReportBody, ReportDocument } from "../domain/report-document";
 import { reportFileName, type ReportJob } from "../domain/report-job";
-import { monthLabel, monthRange, rangeLabel } from "../domain/report-period";
+import {
+  financialYearRange,
+  monthLabel,
+  monthRange,
+  rangeLabel,
+} from "../domain/report-period";
 import { buildVendorAttendanceReport } from "../domain/vendor-attendance-report";
 // Site work reports (CM-605, CM-608).
 import {
   SITE_WORK_A3_KINDS,
   siteWorkReportBody,
 } from "./build-site-work-report";
-import type { HeaderFacts, ReportSource } from "./ports";
+// Finance reports (CM-709).
+import { FINANCE_A3_KINDS, financeReportBody } from "./build-finance-report";
+import type { FinanceReportSource, HeaderFacts, ReportSource } from "./ports";
 
 /** `09 Oct 2026, 4:05 pm IST` in the Company's time zone. */
 export function generatedAtLabel(at: Date, timeZone: string): string {
@@ -40,6 +47,11 @@ function periodLabel(job: ReportJob): string {
       return monthLabel(params.month);
     case "daily_progress_report":
       return rangeLabel({ from: params.date, to: params.date });
+    // Finance reports (CM-709).
+    case "tds_194c":
+      return `FY ${params.fy} (${rangeLabel(financialYearRange(params.fy))})`;
+    case "due_payments":
+      return `As on ${rangeLabel({ from: params.asOn, to: params.asOn })}`;
     default:
       return rangeLabel(params);
   }
@@ -49,6 +61,7 @@ async function bodyFor(
   job: ReportJob,
   source: ReportSource,
   today: CalendarDate,
+  finance: FinanceReportSource | undefined,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -107,6 +120,16 @@ async function bodyFor(
     case "equipment_maintenance":
     case "equipment_transfers":
       return siteWorkReportBody(job, params, source, today);
+    // Finance reports (CM-709).
+    case "account_ledger":
+    case "petty_cash":
+    case "transactions":
+    case "contractor_payments":
+    case "supplier_payments":
+    case "other_expenses":
+    case "tds_194c":
+    case "due_payments":
+      return financeReportBody(job, params, finance);
     case "daily_progress_report":
       // A PDF of its own, not a table report (`createReportExecutor`).
       throw new Error("The Daily Progress Report is not a table report.");
@@ -127,12 +150,19 @@ export async function buildReportDocument(
   job: ReportJob,
   source: ReportSource,
   now: Date,
+  /** The finance reports' read model (CM-709), wired by the composition root. */
+  finance?: FinanceReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
     job.projectId,
   );
-  const body = await bodyFor(job, source, companyDate(facts.timezone, now));
+  const body = await bodyFor(
+    job,
+    source,
+    companyDate(facts.timezone, now),
+    finance,
+  );
   return {
     header: {
       company: facts.companyName,
@@ -146,7 +176,9 @@ export async function buildReportDocument(
     notes: body.notes,
     tables: body.tables,
     pageSize:
-      job.kind === "muster_roll" || SITE_WORK_A3_KINDS.includes(job.kind)
+      job.kind === "muster_roll" ||
+      SITE_WORK_A3_KINDS.includes(job.kind) ||
+      FINANCE_A3_KINDS.includes(job.kind)
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),

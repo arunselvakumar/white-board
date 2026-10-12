@@ -707,8 +707,8 @@ Goal: every rupee the Company moves is in one ledger — company cash and bank a
 | CM-705 |   5 | Supplier invoices from GRN (`GoodsReceiptPosted`), party payments with allocation, opening balances; due dates   | done   | CM-505, CM-702 | Domain+HTTP+UI |
 | CM-706 |   6 | Contractor invoices & payments with TDS 194C (PAN, thresholds, dated rates, override) and the TDS ledger         | done   | CM-705, CM-301 | Domain+HTTP+UI |
 | CM-707 |   7 | Labour, vendor and salary payments name their account and post to the finance ledger (replaces CM-215's posting) | done   | CM-215, CM-702 | Domain+UI      |
-| CM-708 |   8 | Other-party purchase/sales invoices, Payment In/Out, settlement approval, sales invoice numbering, Party Balance | todo   | CM-704, CM-705 | Domain+HTTP+UI |
-| CM-709 |   9 | Ledger and payment reports, due payments with ageing, Central Payment, Payments section on the Project Dashboard | todo   | CM-705, CM-706 | HTTP+UI        |
+| CM-708 |   8 | Other-party purchase/sales invoices, Payment In/Out, settlement approval, sales invoice numbering, Party Balance | done   | CM-704, CM-705 | Domain+HTTP+UI |
+| CM-709 |   9 | Ledger and payment reports, due payments with ageing, Central Payment, Payments section on the Project Dashboard | done   | CM-705, CM-706 | HTTP+UI        |
 
 ### CM-701 — Finance schema, accounts and wiring
 

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
-import { FinanceComingSoon } from "@/components/finance/finance-coming-soon";
+import { PartyBalanceWorkspace } from "@/components/finance/parties/party-balance-workspace";
 
 export const metadata: Metadata = { title: "Party Balance" };
 
-/** Workspace → Party Balance (M7). */
+/** Workspace → Party Balance: each Other Party's balance across Projects (CM-708). */
 export default function PartyBalancePage() {
-  return <FinanceComingSoon title="Party Balance" ticket="CM-708" />;
+  return <PartyBalanceWorkspace />;
 }

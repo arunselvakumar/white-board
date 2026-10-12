@@ -14,6 +14,7 @@ import {
 import { newId } from "@/src/shared-kernel/ids";
 
 import { invoiceProgress, writeOffEntry } from "../domain/invoice";
+import type { PartyType } from "../domain/ledger";
 import { PARTY_TEXT_LIMITS } from "../domain/party";
 import { invoiceNotFound, type InvoiceView } from "./invoice-handlers";
 import {
@@ -330,6 +331,7 @@ export class SettlementHandlers {
     filter: {
       status?: "pending" | "approved" | "rejected";
       projectId?: string | null;
+      partyType?: PartyType;
     },
   ): Promise<SettlementView[]> {
     const { db, store } = this.deps;
@@ -350,6 +352,7 @@ export class SettlementHandlers {
       status: filter.status,
       projectIds,
       includeStores: access.role === "owner" && filter.projectId == null,
+      partyType: filter.partyType,
     });
     return this.views(access, rows);
   }

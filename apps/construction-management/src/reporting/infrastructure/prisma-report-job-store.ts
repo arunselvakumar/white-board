@@ -21,9 +21,7 @@ function toJob(row: Row): ReportJob {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    // The finance kinds join `REPORT_KINDS` with CM-709; until then no job
-    // of theirs exists.
-    kind: row.kind as ReportJob["kind"],
+    kind: row.kind,
     params: row.params as ReportParams,
     status: row.status,
     includesMoney: row.includesMoney,

@@ -21,6 +21,28 @@ const MonthParams = z.object({
   month: z.string().regex(MONTH_RE, "Use YYYY-MM."),
 });
 
+const FY_RE = /^\d{4}-\d{2}$/;
+
+const PAYMENT_MODES = ["cash", "cheque", "online", "upi"] as const;
+const LEDGER_MODULES = [
+  "account",
+  "transaction",
+  "account_transfer",
+  "petty_cash_voucher",
+  "other_expense",
+  "party_payment",
+  "wage_payment",
+  "salary_slip",
+] as const;
+const COUNTERPARTY_KINDS = [
+  "contractor",
+  "supplier",
+  "other_party",
+  "labour",
+  "vendor",
+  "team_member",
+] as const;
+
 // Requests
 
 /**
@@ -90,6 +112,64 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.uuid().nullable(),
       params: DateRangeParams,
     }),
+    // Finance reports (CM-709). Finance menus have no Financial flag:
+    // Report on the menu is enough (ADR CM-0017 §14).
+    z.object({
+      kind: z.literal("account_ledger"),
+      /** Always central. A company account needs Company's Bank A/C Report; a petty-cash account Petty Cash Report (and View all unless it is yours). */
+      projectId: z.null(),
+      params: DateRangeParams.extend({
+        accountId: z.uuid(),
+        categoryId: z.uuid().optional(),
+        mode: z.enum(PAYMENT_MODES).optional(),
+        /** The module that wrote the entry. */
+        module: z.enum(LEDGER_MODULES).optional(),
+        /** Paid To / Received From kind. */
+        counterpartyKind: z.enum(COUNTERPARTY_KINDS).optional(),
+      }),
+    }),
+    z.object({
+      kind: z.literal("petty_cash"),
+      projectId: z.uuid(),
+      /** Petty Cash Report; without View all only your own account. */
+      params: DateRangeParams.extend({ accountId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("transactions"),
+      projectId: z.uuid(),
+      params: DateRangeParams,
+    }),
+    z.object({
+      kind: z.literal("contractor_payments"),
+      projectId: z.uuid(),
+      params: DateRangeParams.extend({ partyId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("supplier_payments"),
+      projectId: z.uuid(),
+      params: DateRangeParams.extend({ partyId: z.uuid().optional() }),
+    }),
+    z.object({
+      kind: z.literal("other_expenses"),
+      projectId: z.uuid(),
+      params: DateRangeParams,
+    }),
+    z.object({
+      kind: z.literal("tds_194c"),
+      /** Always central: the Owner's covers every Project, a member's the Projects they are on. */
+      projectId: z.null(),
+      params: z.object({
+        /** Financial year, `2026-27`. */
+        fy: z.string().regex(FY_RE, "Use a financial year as 2026-27."),
+        contractorId: z.uuid().optional(),
+      }),
+    }),
+    z.object({
+      kind: z.literal("due_payments"),
+      /** Null for the central report (Central Payment). */
+      projectId: z.uuid().nullable(),
+      params: z.object({ asOn: z.iso.date() }),
+    }),
   ]);
 
 export type RequestConstructionReportingReportRequestModel = z.infer<
@@ -125,6 +205,14 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     categoryId: z.string().nullable().optional(),
     contractorId: z.string().nullable().optional(),
     equipmentId: z.string().nullable().optional(),
+    /** Finance reports (CM-709). */
+    accountId: z.string().nullable().optional(),
+    mode: z.string().nullable().optional(),
+    module: z.string().nullable().optional(),
+    counterpartyKind: z.string().nullable().optional(),
+    partyId: z.string().nullable().optional(),
+    fy: z.string().optional(),
+    asOn: z.string().optional(),
     /** Daily Progress Report: its date and number. */
     date: z.string().optional(),
     number: z.string().optional(),
@@ -191,6 +279,26 @@ function responseParams(
       };
     case "daily_progress_report":
       return { date: params.date, number: params.number };
+    // Finance reports (CM-709).
+    case "account_ledger":
+      return {
+        from: params.from,
+        to: params.to,
+        accountId: params.accountId,
+        categoryId: params.categoryId,
+        mode: params.mode,
+        module: params.module,
+        counterpartyKind: params.counterpartyKind,
+      };
+    case "petty_cash":
+      return { from: params.from, to: params.to, accountId: params.accountId };
+    case "contractor_payments":
+    case "supplier_payments":
+      return { from: params.from, to: params.to, partyId: params.partyId };
+    case "tds_194c":
+      return { fy: params.fy, contractorId: params.contractorId };
+    case "due_payments":
+      return { asOn: params.asOn };
     default:
       return { from: params.from, to: params.to };
   }

@@ -12,6 +12,7 @@ import { createReportJobs } from "@/src/composition/report-jobs";
 import {
   canBeCentral,
   hasOwnModule,
+  isFinanceReport,
   REPORT_KINDS,
 } from "@/src/reporting/domain/report-job";
 import {
@@ -49,6 +50,17 @@ export const REPORT_MENU: Record<ReportKind, MenuKey> = {
   equipment_transfers: "masters.equipments",
   // CM-606: never through these routes (`hasOwnModule`).
   daily_progress_report: "site_work.progress_reports",
+  // Finance reports (CM-709, ADR CM-0017 §14): the Ledger of a company
+  // account under Company's Bank A/C (a petty-cash account's under Petty
+  // Cash, `canReport`), party reports under Parties.
+  account_ledger: "masters.bank_accounts",
+  petty_cash: "finance.petty_cash",
+  transactions: "finance.transactions",
+  contractor_payments: "finance.parties",
+  supplier_payments: "finance.parties",
+  other_expenses: "finance.other_expenses",
+  tds_194c: "finance.parties",
+  due_payments: "finance.parties",
 };
 
 function scope(projectId: string | null) {
@@ -65,6 +77,11 @@ export function canReport(
   projectId: string | null,
 ): boolean {
   if (hasOwnModule(kind)) return false;
+  if (kind === "account_ledger")
+    return (
+      can(access, "masters.bank_accounts", "report") ||
+      can(access, "finance.petty_cash", "report")
+    );
   return can(access, REPORT_MENU[kind], "report", scope(projectId));
 }
 
@@ -74,6 +91,9 @@ export function canSeeMoney(
   kind: ReportKind,
   projectId: string | null,
 ): boolean {
+  // Finance menus carry no Financial flag: Report is the right to see
+  // their money (ADR CM-0017 §14).
+  if (isFinanceReport(kind)) return canReport(access, kind, projectId);
   return can(access, REPORT_MENU[kind], "financial", scope(projectId));
 }
 
@@ -114,5 +134,72 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
   if (!canReport(session.access, job.kind, job.projectId)) return false;
   if (job.projectId == null)
     return session.role === "owner" || job.requestedBy === session.userId;
+  // A Petty Cash report may hold other holders' accounts (CM-0017 §9).
+  if (job.kind === "petty_cash")
+    return (
+      job.requestedBy === session.userId ||
+      can(session.access, "finance.petty_cash", "view_all")
+    );
   return true;
+}
+
+/**
+ * The petty-cash accounts the member may report on (CM-0017 §9): null
+ * (every one) with View all or as the Owner, otherwise the account they
+ * hold (none when they hold none).
+ */
+export async function pettyCashAccountScope(
+  session: AccessSession,
+): Promise<string[] | null> {
+  if (can(session.access, "finance.petty_cash", "view_all")) return null;
+  const member = await prisma.constructionOrganizationTeamMember.findFirst({
+    where: {
+      workspaceId: session.workspaceId,
+      userId: session.userId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+  if (member == null) return [];
+  const accounts = await prisma.constructionFinanceAccount.findMany({
+    where: {
+      workspaceId: session.workspaceId,
+      kind: "petty_cash",
+      holderMemberId: member.id,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+  return accounts.map((account) => account.id);
+}
+
+/**
+ * Whether the member may run the Ledger of this account (CM-709): a
+ * company account needs Company's Bank A/C Report; a petty-cash account
+ * Petty Cash Report and either View all or holding it. A refusal is the
+ * Response to send: 404 for an account that is not the Company's (or a
+ * petty-cash account the member may not see), 403 without the flag.
+ */
+export async function ledgerRefusal(
+  session: AccessSession,
+  accountId: string,
+): Promise<Response | null> {
+  const account = await prisma.constructionFinanceAccount.findFirst({
+    where: { workspaceId: session.workspaceId, id: accountId, deletedAt: null },
+    select: { kind: true },
+  });
+  const notFound = jsonError(
+    StatusCodes.NOT_FOUND,
+    "ACCOUNT_NOT_FOUND",
+    "There is no such account.",
+  );
+  if (account == null) return notFound;
+  if (account.kind !== "petty_cash")
+    return can(session.access, "masters.bank_accounts", "report")
+      ? null
+      : permissionDenied();
+  if (!can(session.access, "finance.petty_cash", "report"))
+    return permissionDenied();
+  const scope = await pettyCashAccountScope(session);
+  return scope == null || scope.includes(accountId) ? null : notFound;
 }
