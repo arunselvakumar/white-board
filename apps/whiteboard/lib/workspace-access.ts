@@ -69,6 +69,10 @@ export function isAllowedAppPath(
     )
   )
     return role === "teacher";
+  // Absence Notices (ADR-0041): a Teacher's expected absentees and the
+  // Notifications under the bell. The Owner's list is /absence-notices.
+  if (pathname === "/teacher/absence-notices") return role === "teacher";
+  if (pathname === "/notifications") return role === "teacher";
   // Checked before the Staff routes so "sources" and "summary" never read as an Enquiry id.
   if (OWNER_ENQUIRY_PATH.test(pathname)) return isOwnerRole(role);
   if (STAFF_ENQUIRY_PATH.test(pathname))
@@ -92,6 +96,8 @@ const ROLE_GATED_AREAS = new Set([
   "calendar",
   "classes",
   "enquiries",
+  "absence-notices",
+  "notifications",
 ]);
 
 /**

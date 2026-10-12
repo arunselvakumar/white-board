@@ -2,6 +2,7 @@ import {
   Banknote,
   BookOpen,
   CalendarClock,
+  CalendarX2,
   ClipboardCheck,
   ClipboardList,
   GraduationCap,
@@ -33,4 +34,6 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/teacher": BookOpen,
   "/teachers": UsersRound,
   "/attendance": CalendarClock,
+  "/absence-notices": CalendarX2,
+  "/teacher/absence-notices": CalendarX2,
 };

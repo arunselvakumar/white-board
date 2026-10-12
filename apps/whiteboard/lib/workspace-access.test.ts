@@ -128,6 +128,24 @@ describe("Workspace role access", () => {
   });
 });
 
+describe("Absence Notices and Notifications (ADR-0041)", () => {
+  it.each([
+    ["owner", "/absence-notices", false],
+    ["teacher", "/absence-notices", true],
+    ["student", "/absence-notices", true],
+    ["parent", "/absence-notices", true],
+    ["teacher", "/teacher/absence-notices", false],
+    ["owner", "/teacher/absence-notices", true],
+    ["student", "/teacher/absence-notices", true],
+    ["teacher", "/notifications", false],
+    ["owner", "/notifications", true],
+    ["student", "/notifications", true],
+    ["parent", "/notifications", true],
+  ] as const)("gates %s on %s", (role, path, leave) => {
+    expect(mustLeaveAppPath(path, role)).toBe(leave);
+  });
+});
+
 describe("Workspace Gate role redirect", () => {
   it.each(["student", "parent"] as const)(
     "sends %s away from Add Student",
