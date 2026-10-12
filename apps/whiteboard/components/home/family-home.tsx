@@ -45,6 +45,7 @@ const CLASS_MODE_LABELS = {
 const ATTENDANCE_LABELS = {
   present: "Present",
   absent: "Absent",
+  informed_absent: "Informed absent",
   late: "Late",
   excused: "Excused",
 } as const;
@@ -197,7 +198,13 @@ function AttendanceCard({
                   </span>
                 </span>
                 <Badge
-                  variant={mark.status === "absent" ? "destructive" : "outline"}
+                  variant={
+                    mark.status === "absent"
+                      ? "destructive"
+                      : mark.status === "informed_absent"
+                        ? "secondary"
+                        : "outline"
+                  }
                 >
                   {ATTENDANCE_LABELS[mark.status]}
                 </Badge>

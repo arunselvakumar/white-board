@@ -15,6 +15,7 @@ import {
   type AttendanceRegister,
 } from "@/src/queries/attendance";
 import { AttendanceForm } from "./attendance-form";
+import { summaryLine } from "./attendance-summary";
 import { BackdatedAttendanceForm } from "./backdated-attendance-form";
 
 type Cursor = { after?: string; before?: string };
@@ -209,10 +210,7 @@ export function BatchAttendanceScreen({
                     {current.summary.total} Students
                   </p>
                   <p className="text-muted-foreground mt-1">
-                    {current.summary.present} Present · {current.summary.absent}{" "}
-                    Absent · {current.summary.late} Late ·{" "}
-                    {current.summary.excused} Excused ·{" "}
-                    {current.summary.unmarked} Unmarked
+                    {summaryLine(current.summary)}
                   </p>
                 </div>
                 <AttendanceForm
@@ -244,7 +242,8 @@ export function BatchAttendanceScreen({
                         }}
                       >
                         {item.date} · {item.summary.attended}/
-                        {item.summary.total} attended
+                        {item.summary.total} attended · {item.summary.absent}{" "}
+                        Absent · {item.summary.informedAbsent} Informed absent
                       </Button>
                     </li>
                   ))}

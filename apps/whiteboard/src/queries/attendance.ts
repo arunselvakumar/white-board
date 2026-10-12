@@ -1,8 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
+
+import type { RegisterNoticeView } from "@/src/training-institute/application/absence-notice-views";
+import type { AttendanceSummary } from "@/src/training-institute/domain/attendance-register";
+
 import { apiJson } from "./http";
 
+export type { AttendanceSummary, RegisterNoticeView };
 export type AttendanceStatus =
-  "unmarked" | "present" | "absent" | "late" | "excused";
+  "unmarked" | "present" | "absent" | "informed_absent" | "late" | "excused";
 export type AttendanceMark = {
   id: string;
   enrollmentId: string;
@@ -12,6 +17,8 @@ export type AttendanceMark = {
   note: string | null;
   markedByUserId: string | null;
   markedAt: string | null;
+  /** A live Absence Notice for this Student on the Register's date, if any. */
+  notice: RegisterNoticeView | null;
 };
 export type AttendanceRegister = {
   id: string;
@@ -21,16 +28,7 @@ export type AttendanceRegister = {
   createdAt: string;
   updatedAt: string;
   marks: AttendanceMark[];
-  summary: {
-    total: number;
-    unmarked: number;
-    present: number;
-    absent: number;
-    late: number;
-    excused: number;
-    attended: number;
-    complete: boolean;
-  };
+  summary: AttendanceSummary;
 };
 export type AttendanceHistory = {
   items: {
@@ -43,6 +41,8 @@ export type AttendanceHistory = {
     note: string | null;
   }[];
   total: number;
+  /** Counts over all of the Student's marks. */
+  summary: AttendanceSummary;
   nextCursor: string | null;
   prevCursor: string | null;
 };

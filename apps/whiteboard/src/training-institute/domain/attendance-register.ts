@@ -7,8 +7,59 @@ export const ATTENDANCE_STATUSES = [
   "absent",
   "late",
   "excused",
+  "informed_absent",
 ] as const;
 export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
+
+export const ATTENDANCE_STATUS_LABELS: Record<AttendanceStatus, string> = {
+  unmarked: "Unmarked",
+  present: "Present",
+  absent: "Absent",
+  late: "Late",
+  excused: "Excused",
+  informed_absent: "Informed absent",
+};
+
+/**
+ * Counts per status. Absent is an uninformed absence; Informed absent (after an
+ * Absence Notice, ADR-0041) is counted apart. Attended is Present plus Late, so
+ * an Informed absent is never attended.
+ */
+export type AttendanceSummary = {
+  total: number;
+  unmarked: number;
+  present: number;
+  absent: number;
+  informedAbsent: number;
+  late: number;
+  excused: number;
+  attended: number;
+  complete: boolean;
+};
+
+export function attendanceSummary(
+  statuses: Iterable<AttendanceStatus>,
+): AttendanceSummary {
+  const counts: AttendanceSummary = {
+    total: 0,
+    unmarked: 0,
+    present: 0,
+    absent: 0,
+    informedAbsent: 0,
+    late: 0,
+    excused: 0,
+    attended: 0,
+    complete: false,
+  };
+  for (const value of statuses) {
+    counts.total += 1;
+    if (value === "informed_absent") counts.informedAbsent += 1;
+    else counts[value] += 1;
+  }
+  counts.attended = counts.present + counts.late;
+  counts.complete = counts.unmarked === 0;
+  return counts;
+}
 
 export type AttendanceMark = {
   id: string;
@@ -193,21 +244,8 @@ export class AttendanceRegister {
     return this.props.marks.map((item) => ({ ...item }));
   }
 
-  get summary() {
-    const counts = {
-      total: this.props.marks.length,
-      unmarked: 0,
-      present: 0,
-      absent: 0,
-      late: 0,
-      excused: 0,
-      attended: 0,
-      complete: false,
-    };
-    for (const mark of this.props.marks) counts[mark.status] += 1;
-    counts.attended = counts.present + counts.late;
-    counts.complete = counts.unmarked === 0;
-    return counts;
+  get summary(): AttendanceSummary {
+    return attendanceSummary(this.props.marks.map((mark) => mark.status));
   }
 
   mark(

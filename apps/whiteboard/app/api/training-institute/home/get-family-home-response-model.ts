@@ -37,7 +37,13 @@ export const TrainingInstituteFamilyHomeStudentModel = z.object({
       date: DateModel,
       batchName: z.string(),
       courseName: z.string(),
-      status: z.enum(["present", "absent", "late", "excused"]),
+      status: z.enum([
+        "present",
+        "absent",
+        "informed_absent",
+        "late",
+        "excused",
+      ]),
     }),
   ),
   recordings: z.array(

@@ -20,7 +20,9 @@ export const FAMILY_HOME_RECENT_LIMIT = 5;
 /** How far ahead to look for the next Class. */
 export const NEXT_CLASS_HORIZON_DAYS = 60;
 
-export type FamilyAttendanceStatus = "present" | "absent" | "late" | "excused";
+/** A marked status; Informed absent is an absence after an Absence Notice. */
+export type FamilyAttendanceStatus =
+  "present" | "absent" | "informed_absent" | "late" | "excused";
 
 /** One active Enrollment of a linked Student, with its Fee Plan totals. */
 export type FamilyEnrollment = CalendarItem & {
