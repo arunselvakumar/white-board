@@ -1,0 +1,35 @@
+CONTEXT.md
+  s_c97675edcbbe15::t_6d02659f58a664 124-135,277,346
+apps/whiteboard/src/queries/absence-notices.ts
+  s_c97675edcbbe15::t_316c3b30b70dbc 1-68
+apps/whiteboard/src/queries/notifications.ts
+  s_c97675edcbbe15::t_dd9befcba80526 1-63
+apps/whiteboard/src/training-institute/application/absence-notice-views.ts
+  s_c97675edcbbe15::t_541e4595dc1947 1-198
+docs/prd/tasks.md
+  s_c97675edcbbe15::t_ea671cfda66546 332-350,437-442
+packages/db/whiteboard/prisma/migrations/20261012142421_absence_notices/migration.sql
+  s_c97675edcbbe15::t_f56057629bc97a 1-73
+packages/db/whiteboard/prisma/schema/training-institute.prisma
+  s_c97675edcbbe15::t_ce8b03e6271217 94-95,164,351,391,933-1005
+apps/whiteboard/src/training-institute/domain/absence-notice.ts
+  s_c97675edcbbe15::t_2397d376a0e97a 1-157
+docs/adr/0041-absence-notice-product-decisions.md
+  s_c97675edcbbe15::t_a8b0ea311bcfc3 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ce5052f04508f4d0d154535b7ce4ca93d0b68cca",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
