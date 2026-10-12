@@ -389,7 +389,7 @@ export const Withdraw: Story = {
     );
     await expect(
       confirm.getByText(
-        "Python · Python Evening, Fri, 16 Oct · 18:00–19:00. The Teacher is notified that it’s withdrawn.",
+        "Python · Python Evening, Fri, 16 Oct · 18:00–19:00. The Batch’s Teachers are told it’s withdrawn.",
       ),
     ).toBeVisible();
     // Keeping it sends nothing.
@@ -471,7 +471,7 @@ export const GiveNoticeForSeveralClasses: Story = {
     );
 
     await expect(await canvas.findByRole("status")).toHaveTextContent(
-      "Absence notice sent to the Teacher for 2 Classes.",
+      "Absence notice given for 2 Classes.",
     );
     await waitFor(() =>
       expect(body(canvasElement).queryByRole("dialog")).toBeNull(),
@@ -703,7 +703,7 @@ export const ParentWithTwoChildren: Story = {
     );
 
     await expect(await raviSection.findByRole("status")).toHaveTextContent(
-      "Absence notice sent to the Teacher for 1 Class.",
+      "Absence notice given for 1 Class.",
     );
     await expect(callsTo(`POST ${NOTICES}`)[0]?.body).toMatchObject({
       studentId: RAVI_ID,

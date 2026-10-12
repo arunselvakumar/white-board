@@ -155,7 +155,7 @@ export function AbsenceNoticesHomeCard({
         onGiven={(count) => {
           setMessage({
             tone: "status",
-            text: `Absence notice sent to the Teacher for ${classCount(count)}.`,
+            text: `Absence notice given for ${classCount(count)}.`,
           });
         }}
       />
@@ -174,7 +174,7 @@ export function AbsenceNoticesHomeCard({
                 ? null
                 : `${withdrawing.class.courseName} · ${withdrawing.class.batchName}, ${noticeClassWhen(withdrawing.class, now)}. `}
               {withdrawing?.standing === "applies"
-                ? "The Teacher is notified that it’s withdrawn."
+                ? "The Batch’s Teachers are told it’s withdrawn."
                 : "It no longer applies, so nobody is notified."}
             </AlertDialogDescription>
           </AlertDialogHeader>
