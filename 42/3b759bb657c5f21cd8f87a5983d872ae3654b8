@@ -1,0 +1,29 @@
+apps/whiteboard/components/absence-notices/staff/absence-notices-screen.tsx
+  s_c97675edcbbe15::t_c1b15018b70fda 107
+apps/whiteboard/components/absence-notices/staff/absence-notices-staff.stories.tsx
+  s_c97675edcbbe15::t_ac177e71f1096a 1-302
+apps/whiteboard/components/notifications/notification-item.tsx
+  s_c97675edcbbe15::t_79adeecf909f3a 101
+apps/whiteboard/components/notifications/notifications.fixtures.ts
+  s_c97675edcbbe15::t_c3534217cffaf1 1-99
+apps/whiteboard/components/notifications/notifications.stories.tsx
+  s_c97675edcbbe15::t_a99f5f3cafba71 1-364
+apps/whiteboard/components/notifications/story-api.tsx
+  s_c97675edcbbe15::t_9b0d4b7500b053 1-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "423b759bb657c5f21cd8f87a5983d872ae3654b8",
+  "prompts": {},
+  "sessions": {
+    "s_c97675edcbbe15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "836b5d97-97b5-49e4-ae04-0c318c6adc80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
