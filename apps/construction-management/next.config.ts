@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
     "@repo/email-templates",
   ],
   serverExternalPackages: ["@prisma/client"],
+  // On Vercel, skip `next build`'s own type check: CI's `check-types` already
+  // gates every commit, and the check ran in the same process as the
+  // compile, pushing the build past the 8 GB build machine (SIGKILL on the
+  // M7 production deploy). Locally the build still type-checks.
+  typescript: { ignoreBuildErrors: process.env["VERCEL"] === "1" },
   experimental: {
     // The proxy buffers request bodies up to this size and cuts the rest.
     // Above the largest upload through our routes (a 25 MB Project
