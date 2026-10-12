@@ -2,6 +2,7 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
+import { requestProjectId } from "../../project-scope";
 import {
   OTHER_EXPENSE_MENU,
   otherExpenseHandlers as handlers,
@@ -21,20 +22,17 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const model = parseOrThrow(
-      BulkApproveConstructionFinanceOtherExpensesRequestModel.safeParse(
-        await request.json(),
-      ),
-    );
+    const raw: unknown = await request.json();
     const session = await requireAccess(
       request,
       OTHER_EXPENSE_MENU,
       "approve",
-      {
-        projectId: model.projectId,
-      },
+      { projectId: requestProjectId(raw) },
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      BulkApproveConstructionFinanceOtherExpensesRequestModel.safeParse(raw),
+    );
     const decided = await handlers.bulkDecide(
       session.access,
       model.projectId,

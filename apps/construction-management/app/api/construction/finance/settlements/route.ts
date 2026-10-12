@@ -2,6 +2,7 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
+import { optionalRequestProjectId } from "../project-scope";
 import { finance, PARTIES_MENU } from "../parties/handlers";
 import {
   ListConstructionFinanceSettlementsRequestModel,
@@ -19,16 +20,17 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request): Promise<Response> {
   try {
     const query = Object.fromEntries(new URL(request.url).searchParams);
-    const model = parseOrThrow(
-      ListConstructionFinanceSettlementsRequestModel.safeParse(query),
-    );
+    const projectId = optionalRequestProjectId(query);
     const session = await requireAccess(
       request,
       PARTIES_MENU,
       "read",
-      model.projectId == null ? {} : { projectId: model.projectId },
+      projectId == null ? {} : { projectId },
     );
     if (isResponse(session)) return session;
+    const model = parseOrThrow(
+      ListConstructionFinanceSettlementsRequestModel.safeParse(query),
+    );
     const items = await finance.settlements.list(session.access, model);
     const body: ListConstructionFinanceSettlementsResponse = {
       items: items.map(toSettlementResponse),

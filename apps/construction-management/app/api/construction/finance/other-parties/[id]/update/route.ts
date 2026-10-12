@@ -23,6 +23,8 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireAccess(request, OTHER_PARTY_MENU, "update");
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionFinanceOtherPartyParamsModel.safeParse(await context.params),
     );
@@ -31,8 +33,6 @@ export async function POST(
         await request.json(),
       ),
     );
-    const session = await requireAccess(request, OTHER_PARTY_MENU, "update");
-    if (isResponse(session)) return session;
     const { expectedUpdatedAt, ...input } = model;
     const party = await handlers.update(
       session.access,

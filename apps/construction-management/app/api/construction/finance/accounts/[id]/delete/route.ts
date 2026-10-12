@@ -22,15 +22,15 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const { id } = parseOrThrow(
-      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
-    );
     const session = await requireAccess(
       request,
       "masters.bank_accounts",
       "delete",
     );
     if (isResponse(session)) return session;
+    const { id } = parseOrThrow(
+      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
+    );
     const model = parseOrThrow(
       DeleteConstructionFinanceAccountRequestModel.safeParse(
         await request.json(),

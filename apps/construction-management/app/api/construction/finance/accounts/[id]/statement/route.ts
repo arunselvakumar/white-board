@@ -38,6 +38,8 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionFinanceAccountParamsModel.safeParse(await context.params),
     );
@@ -46,8 +48,6 @@ export async function GET(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     const access = await loadMemberAccess(prisma, session);
     const account = await statementAccount(
       prisma,

@@ -3,13 +3,13 @@ import type { PrismaClient } from "@repo/construction-db";
 import {
   assertCanCreate,
   assertCanEdit,
+  assertPeriodOpen,
 } from "@/src/shared-kernel/backdated-policy";
 import {
   loadBackdatedActor,
   loadBackdatedPolicy,
 } from "@/src/shared-kernel/backdated-policy-reader";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import type { PartyBackdated } from "../application/party-ports";
 
@@ -34,16 +34,9 @@ export async function loadPartyBackdated(
       else assertCanEdit(policy, module, date, backdatedActor, today);
     },
     closing(date) {
-      const closing = policy.financialClosingDate;
-      if (closing != null && date <= closing)
-        throw new DomainError(
-          "FINANCIAL_PERIOD_CLOSED",
-          `The books are closed up to ${closing}. Entries dated on or before it cannot be changed.`,
-          {
-            kind: "forbidden",
-            details: { entryDate: date, financialClosingDate: closing },
-          },
-        );
+      assertPeriodOpen(policy.financialClosingDate, date, {
+        cannot: "changed",
+      });
     },
   };
 }

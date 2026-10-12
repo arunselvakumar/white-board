@@ -20,6 +20,7 @@ import {
   PageHeader,
   type PageHeaderBack,
 } from "@/components/app-shell/page-header";
+import { FieldError } from "@/components/auth/field-error";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/components/payments/payment-format";
 import {
@@ -27,7 +28,12 @@ import {
   type AccountStatementLine,
 } from "@/src/queries/finance-accounts";
 
+import { addDays, daysBetween } from "@/src/shared-kernel/calendar-date";
+
 import { ACCOUNT_KIND_LABELS, SignedAmount } from "./account-format";
+
+/** The server's limit (`statementPeriod`): at most 366 days, from ≤ to. */
+const MAX_SPAN_DAYS = 365;
 
 export const ENTRY_SOURCE_LABELS: Record<
   AccountStatementLine["sourceType"],
@@ -133,6 +139,21 @@ function LedgerBody({
 }) {
   const { data } = useSuspenseQuery(accountStatementQuery(accountId, period));
   const kind = ACCOUNT_KIND_LABELS[data.account.kind];
+  const [problem, setProblem] = useState<string | undefined>();
+  // A period the server would refuse stays on screen as a message, so the
+  // Ledger keeps showing the last good one instead of failing.
+  const choose = (next: { from: string; to: string }) => {
+    if (next.from > next.to)
+      setProblem("Choose a From date on or before the To date.");
+    else if (daysBetween(next.from, next.to) > MAX_SPAN_DAYS)
+      setProblem(
+        `A Ledger covers at most 366 days: choose a From date on or after ${formatDate(addDays(next.to, -MAX_SPAN_DAYS))}.`,
+      );
+    else {
+      setProblem(undefined);
+      onPeriod(next);
+    }
+  };
   return (
     <>
       <PageHeader
@@ -154,10 +175,12 @@ function LedgerBody({
             type="date"
             className="h-9 w-40"
             value={period.from === "" ? data.from : period.from}
+            min={addDays(data.to, -MAX_SPAN_DAYS)}
             max={data.to}
+            aria-invalid={problem != null}
             onChange={(event) => {
               if (event.target.value !== "")
-                onPeriod({
+                choose({
                   from: event.target.value,
                   to: period.to === "" ? data.to : period.to,
                 });
@@ -174,9 +197,10 @@ function LedgerBody({
             className="h-9 w-40"
             value={period.to === "" ? data.to : period.to}
             min={data.from}
+            max={addDays(data.from, MAX_SPAN_DAYS)}
             onChange={(event) => {
               if (event.target.value !== "")
-                onPeriod({
+                choose({
                   from: period.from === "" ? data.from : period.from,
                   to: event.target.value,
                 });
@@ -184,6 +208,7 @@ function LedgerBody({
           />
         </div>
       </div>
+      <FieldError message={problem} />
       <section aria-label="Summary">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {(

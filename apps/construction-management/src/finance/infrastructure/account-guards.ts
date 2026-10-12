@@ -3,6 +3,7 @@ import type { PrismaClient } from "@repo/construction-db";
 import {
   assertCanCreate,
   assertCanEdit,
+  assertPeriodOpen,
   type BackdatedModuleKey,
 } from "@/src/shared-kernel/backdated-policy";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/src/shared-kernel/backdated-policy-reader";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import type { ClosingCheck } from "../application/account-handlers";
 
@@ -56,14 +56,6 @@ export async function loadClosingCheck(
   const policy = await loadBackdatedPolicy(db, workspaceId);
   const closing = policy.financialClosingDate;
   return (date, action) => {
-    if (closing == null || date > closing) return;
-    throw new DomainError(
-      "FINANCIAL_PERIOD_CLOSED",
-      `The books are closed up to ${closing}. Entries dated on or before it cannot be ${action}.`,
-      {
-        kind: "forbidden",
-        details: { entryDate: date, financialClosingDate: closing },
-      },
-    );
+    assertPeriodOpen(closing, date, { cannot: action });
   };
 }

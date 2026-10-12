@@ -13,15 +13,15 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const { id } = parseOrThrow(
-      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
-    );
     const session = await requireAccess(
       request,
       "masters.bank_accounts",
       "read",
     );
     if (isResponse(session)) return session;
+    const { id } = parseOrThrow(
+      ConstructionFinanceAccountParamsModel.safeParse(await context.params),
+    );
     return Response.json(
       toAccountResponse(await handlers.get(session.access, id)),
     );
