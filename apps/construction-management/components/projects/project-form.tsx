@@ -354,6 +354,65 @@ function ProjectForm({
     >
       <FormCard icon={<Building2 />} title="Project">
         <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-3 border-b pb-4 sm:col-span-2">
+            <div>
+              <h3 className="text-sm font-medium">Project logo</h3>
+              <p className="text-muted-foreground text-xs">
+                Shown on the Projects home and at the top of the Project.
+              </p>
+            </div>
+            <ImageUploader
+              kind="project_logo"
+              noun="logo"
+              shape="square"
+              imageUrl={logoUrl}
+              fallback={
+                values.name.trim() === "" ? (
+                  <Building2 aria-hidden="true" />
+                ) : (
+                  projectInitials(values.name.trim())
+                )
+              }
+              hint="PNG, JPEG or WebP, up to 2 MB. Saved with the Project."
+              disabled={saving}
+              onUpload={(file) => {
+                setLogo({ kind: "set", file });
+                return Promise.resolve();
+              }}
+              onRemove={() => {
+                setLogo(
+                  project?.logoUrl == null ? KEEP_LOGO : { kind: "remove" },
+                );
+                return Promise.resolve();
+              }}
+            />
+            <Controller
+              name="useLogoInReports"
+              control={form.control}
+              render={({ field }) => (
+                <div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+                  <div className="min-w-0 space-y-0.5">
+                    <Label htmlFor="project-logo-reports">
+                      Use Project logo on reports
+                    </Label>
+                    <p
+                      id="project-logo-reports-hint"
+                      className="text-muted-foreground text-xs"
+                    >
+                      Report headers print this logo instead of the
+                      Company&apos;s.
+                    </p>
+                  </div>
+                  <Switch
+                    id="project-logo-reports"
+                    aria-describedby="project-logo-reports-hint"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </div>
+              )}
+            />
+          </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="project-name">Project name</Label>
             <Input
@@ -554,65 +613,6 @@ function ProjectForm({
               {...form.register("address")}
             />
             <FieldError message={errors.address?.message} />
-          </div>
-          <div className="space-y-3 border-t pt-4 sm:col-span-2">
-            <div>
-              <h3 className="text-sm font-medium">Project logo</h3>
-              <p className="text-muted-foreground text-xs">
-                Shown on the Projects home and at the top of the Project.
-              </p>
-            </div>
-            <ImageUploader
-              kind="project_logo"
-              noun="logo"
-              shape="square"
-              imageUrl={logoUrl}
-              fallback={
-                values.name.trim() === "" ? (
-                  <Building2 aria-hidden="true" />
-                ) : (
-                  projectInitials(values.name.trim())
-                )
-              }
-              hint="PNG, JPEG or WebP, up to 2 MB. Saved with the Project."
-              disabled={saving}
-              onUpload={(file) => {
-                setLogo({ kind: "set", file });
-                return Promise.resolve();
-              }}
-              onRemove={() => {
-                setLogo(
-                  project?.logoUrl == null ? KEEP_LOGO : { kind: "remove" },
-                );
-                return Promise.resolve();
-              }}
-            />
-            <Controller
-              name="useLogoInReports"
-              control={form.control}
-              render={({ field }) => (
-                <div className="flex items-start justify-between gap-4 rounded-lg border p-3">
-                  <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="project-logo-reports">
-                      Use Project logo on reports
-                    </Label>
-                    <p
-                      id="project-logo-reports-hint"
-                      className="text-muted-foreground text-xs"
-                    >
-                      Report headers print this logo instead of the
-                      Company&apos;s.
-                    </p>
-                  </div>
-                  <Switch
-                    id="project-logo-reports"
-                    aria-describedby="project-logo-reports-hint"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </div>
-              )}
-            />
           </div>
         </div>
       </FormCard>
