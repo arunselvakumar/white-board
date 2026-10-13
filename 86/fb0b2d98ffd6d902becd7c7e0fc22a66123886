@@ -1,0 +1,19 @@
+apps/construction-management/components/projects/project-form.tsx
+  s_54fdcdc4b37128::t_f346dc431fe547 357-415
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "86fb0b2d98ffd6d902becd7c7e0fc22a66123886",
+  "prompts": {},
+  "sessions": {
+    "s_54fdcdc4b37128": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a95b6295-21ae-4b5e-9346-3281175492bf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
