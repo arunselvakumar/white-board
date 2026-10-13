@@ -104,10 +104,16 @@ async function paymentsIn(
 }
 
 async function paymentFilters(ctx: ReportContext, query: ReportQuery) {
-  const names =
-    query.recordedBy == null
-      ? new Map<string, string>()
-      : await ctx.source.userNames([query.recordedBy]);
+  // Only look up a name for someone who recorded a Payment in this Workspace.
+  const recorder = query.recordedBy;
+  const known =
+    recorder != null &&
+    (await ctx.source.payments(ctx.viewer.workspaceId)).some(
+      (payment) => payment.recordedByUserId === recorder,
+    );
+  const names = known
+    ? await ctx.source.userNames([recorder])
+    : new Map<string, string>();
   return [
     {
       label: "Method",

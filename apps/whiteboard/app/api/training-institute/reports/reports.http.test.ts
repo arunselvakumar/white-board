@@ -1029,26 +1029,30 @@ describe("R2–R5 attendance", () => {
         }),
       }),
     );
-    expect(update.status).toBe(200);
-    const after = await report("low-attendance", {
-      period: "last_month",
-      includeEnded: "true",
-    });
-    expect(rows(after.body, "below").map((item) => item["student"])).toEqual([
-      "Rohan",
-      "Priya",
-    ]);
-    await updateSettings(
-      new Request("http://localhost/api", {
-        method: "POST",
-        body: JSON.stringify({
-          thresholdPercent: 75,
-          absentInARow: 3,
-          minimumClasses: 4,
-          academicYearStartMonth: 6,
+    try {
+      expect(update.status).toBe(200);
+      const after = await report("low-attendance", {
+        period: "last_month",
+        includeEnded: "true",
+      });
+      expect(rows(after.body, "below").map((item) => item["student"])).toEqual([
+        "Rohan",
+        "Priya",
+      ]);
+    } finally {
+      as(OWNER, "owner");
+      await updateSettings(
+        new Request("http://localhost/api", {
+          method: "POST",
+          body: JSON.stringify({
+            thresholdPercent: 75,
+            absentInARow: 3,
+            minimumClasses: 4,
+            academicYearStartMonth: 6,
+          }),
         }),
-      }),
-    );
+      );
+    }
   });
 
   it("keeps Report settings to the Owner", async () => {

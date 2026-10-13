@@ -72,7 +72,23 @@ export class ReportForbiddenError extends DomainError {
 
 type Window = { from: string; to: string | null };
 
+/** The institute's time zone: the one most of its Batches use. */
+function institutionTimezone(batches: readonly { timezone: string }[]): string {
+  const counts = new Map<string, number>();
+  for (const batch of batches)
+    counts.set(batch.timezone, (counts.get(batch.timezone) ?? 0) + 1);
+  let best = DEFAULT_TIMEZONE;
+  let most = 0;
+  for (const [zone, count] of counts)
+    if (count > most) {
+      best = zone;
+      most = count;
+    }
+  return best;
+}
+
 export class ReportContext {
+  readonly timezone: string;
   readonly today: string;
   private readonly batchById: Map<string, ReportBatch>;
   private readonly studentById: Map<string, ReportStudent>;
@@ -99,6 +115,7 @@ export class ReportContext {
     this.enrollmentById = new Map(
       structure.enrollments.map((item) => [item.id, item]),
     );
+    this.timezone = institutionTimezone(structure.batches);
     this.today = localNow(now, this.timezone).date;
     for (const assignment of structure.assignments) {
       const batch = this.batchById.get(assignment.batchId);
@@ -116,21 +133,6 @@ export class ReportContext {
             : localNow(assignment.unassignedAt, batch.timezone).date,
       });
     }
-  }
-
-  /** The institute's time zone: the one most of its Batches use. */
-  get timezone(): string {
-    const counts = new Map<string, number>();
-    for (const batch of this.structure.batches)
-      counts.set(batch.timezone, (counts.get(batch.timezone) ?? 0) + 1);
-    let best = DEFAULT_TIMEZONE;
-    let most = 0;
-    for (const [zone, count] of counts)
-      if (count > most) {
-        best = zone;
-        most = count;
-      }
-    return best;
   }
 
   nowIn(timezone: string): LocalNow {

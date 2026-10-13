@@ -358,15 +358,20 @@ export class ClassService {
       { userId: input.userId, name, host: isHost },
     );
     if (input.role === "student" || input.role === "parent")
-      await this.deps.occurrences.recordJoin({
-        workspaceId: input.workspaceId,
-        occurrenceId: occurrence.id,
-        // A family's Calendar item is one of the Student's Enrollments.
-        enrollmentId: item.id,
-        userId: input.userId,
-        role: input.role,
-        at: this.deps.now(),
-      });
+      // Reports tracking must not block entry once the participant exists.
+      await this.deps.occurrences
+        .recordJoin({
+          workspaceId: input.workspaceId,
+          occurrenceId: occurrence.id,
+          // A family's Calendar item is one of the Student's Enrollments.
+          enrollmentId: item.id,
+          userId: input.userId,
+          role: input.role,
+          at: this.deps.now(),
+        })
+        .catch((error: unknown) => {
+          console.error(error);
+        });
     return { authToken };
   }
 

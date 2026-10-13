@@ -57,7 +57,12 @@ const schema = z.object({
   thresholdPercent: wholeNumber(1, 100, "Enter a whole % from 1 to 100."),
   absentInARow: wholeNumber(2, 30, "Enter a whole number from 2 to 30."),
   minimumClasses: wholeNumber(1, 60, "Enter a whole number from 1 to 60."),
-  academicYearStartMonth: z.string().min(1, "Choose a month."),
+  academicYearStartMonth: z
+    .string()
+    .refine(
+      (value) => MONTH_ITEMS.some((item) => item.value === value),
+      "Choose a month.",
+    ),
 });
 
 type Values = z.infer<typeof schema>;
