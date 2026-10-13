@@ -187,3 +187,24 @@ describe("Workspace Gate role redirect", () => {
     expect(mustLeaveAppPath(path, role)).toBe(leave);
   });
 });
+
+describe("Reports", () => {
+  it.each([
+    ["owner", "/reports", false],
+    ["teacher", "/reports", false],
+    ["student", "/reports", false],
+    ["parent", "/reports", false],
+    ["owner", "/reports/settings", false],
+    ["teacher", "/reports/settings", true],
+    ["parent", "/reports/settings", true],
+    ["owner", "/reports/dues", false],
+    ["teacher", "/reports/dues", true],
+    ["teacher", "/reports/attendance-register", false],
+    ["student", "/reports/attendance-register", true],
+    ["student", "/reports/student-attendance", false],
+    ["parent", "/reports/monthly-student", false],
+    ["owner", "/reports/not-a-report", true],
+  ] as const)("gates %s on %s", (role, path, leave) => {
+    expect(mustLeaveAppPath(path, role)).toBe(leave);
+  });
+});

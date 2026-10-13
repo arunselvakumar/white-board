@@ -68,6 +68,12 @@ export const APP_NAV = [
     title: "Fees",
     description: "Fee Payments and remaining dues will show here.",
   },
+  {
+    href: "/reports",
+    label: "Reports",
+    title: "Reports",
+    description: "Attendance, fees, enquiries, tests and monthly reports.",
+  },
 ] as const;
 
 export const STUDENT_NAV = [
@@ -100,6 +106,12 @@ export const STUDENT_NAV = [
     label: "Online Classes",
     title: "Online Classes",
     description: "My upcoming Online and Hybrid Batch Timings.",
+  },
+  {
+    href: "/reports",
+    label: "Reports",
+    title: "Reports",
+    description: "My attendance, fees, test results and monthly reports.",
   },
 ] as const;
 
@@ -135,6 +147,13 @@ export const PARENT_NAV = [
     title: "Online Classes",
     description: "Upcoming Online and Hybrid Batch Timings.",
   },
+  {
+    href: "/reports",
+    label: "Reports",
+    title: "Reports",
+    description:
+      "Attendance, fees, test results and monthly reports for each Student.",
+  },
 ] as const;
 
 export const TEACHER_NAV = [
@@ -167,6 +186,12 @@ export const TEACHER_NAV = [
     label: "Online Classes",
     title: "Online Classes",
     description: "Upcoming Online and Hybrid Batch Timings.",
+  },
+  {
+    href: "/reports",
+    label: "Reports",
+    title: "Reports",
+    description: "Attendance, classes, tests and homework for my Batches.",
   },
 ] as const;
 
