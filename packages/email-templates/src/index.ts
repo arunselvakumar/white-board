@@ -15,6 +15,7 @@ import {
   absenceNoticeSubject,
   type AbsenceNoticeEmailProps,
 } from "./emails/absence-notice";
+import { ReportEmail, type ReportEmailProps } from "./emails/report";
 import {
   CompanyCodeEmail,
   type CompanyCodeEmailProps,
@@ -50,6 +51,8 @@ export {
   TeamInvitationEmail,
   type TeamInvitationEmailProps,
 } from "./emails/construction/team-invitation";
+
+export { ReportEmail, type ReportEmailProps } from "./emails/report";
 
 /** A rendered email, ready for any transport. */
 export type RenderedEmail = {
@@ -117,5 +120,16 @@ export async function renderAbsenceNoticeEmail(
   return {
     subject: absenceNoticeSubject(props),
     ...(await renderBoth(createElement(AbsenceNoticeEmail, props))),
+  };
+}
+
+/** A Report the Owner emails, with the report attached (Reports §6.10). */
+export async function renderReportEmail(
+  props: ReportEmailProps & { subject: string },
+): Promise<RenderedEmail> {
+  const { subject, ...rest } = props;
+  return {
+    subject,
+    ...(await renderBoth(createElement(ReportEmail, rest))),
   };
 }

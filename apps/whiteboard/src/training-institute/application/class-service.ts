@@ -51,6 +51,18 @@ export type ClassOccurrenceStore = {
   findByMeetingId(meetingId: string): Promise<ClassOccurrenceRecord | null>;
   claimRecording(id: string): Promise<boolean>;
   markEnded(id: string): Promise<void>;
+  /**
+   * Notes that a Student, or a Parent for their child, joined a hosted Class
+   * (Reports R14). Joining never marks or fills in attendance.
+   */
+  recordJoin(input: {
+    workspaceId: string;
+    occurrenceId: string;
+    enrollmentId: string;
+    userId: string;
+    role: "student" | "parent";
+    at: Date;
+  }): Promise<void>;
   setRecordingStatus(
     id: string,
     status: ClassOccurrenceRecord["recordingStatus"],
@@ -341,12 +353,26 @@ export class ClassService {
         "Wait for the Teacher to start the recorded class.",
       );
     }
-    return {
-      authToken: await this.deps.meetings.addParticipant(
-        occurrence.providerMeetingId,
-        { userId: input.userId, name, host: isHost },
-      ),
-    };
+    const authToken = await this.deps.meetings.addParticipant(
+      occurrence.providerMeetingId,
+      { userId: input.userId, name, host: isHost },
+    );
+    if (input.role === "student" || input.role === "parent")
+      // Reports tracking must not block entry once the participant exists.
+      await this.deps.occurrences
+        .recordJoin({
+          workspaceId: input.workspaceId,
+          occurrenceId: occurrence.id,
+          // A family's Calendar item is one of the Student's Enrollments.
+          enrollmentId: item.id,
+          userId: input.userId,
+          role: input.role,
+          at: this.deps.now(),
+        })
+        .catch((error: unknown) => {
+          console.error(error);
+        });
+    return { authToken };
   }
 
   async meetingStarted(meetingId: string): Promise<void> {

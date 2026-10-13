@@ -1,5 +1,10 @@
 import type { WorkspaceRole as Role } from "@repo/auth/roles";
 
+import {
+  isReportKey,
+  reportDefinition,
+} from "@/src/training-institute/domain/report-catalogue";
+
 export type WorkspaceRole = Role | null | undefined;
 
 export function isOwnerRole(role: WorkspaceRole): boolean {
@@ -19,6 +24,16 @@ const OWNER_ENQUIRY_PATH = /^\/enquiries\/(?:sources|summary|[^/]+\/convert)$/;
 /** The Enquiries list, Add enquiry, an Enquiry, and Edit enquiry: Owner and Teachers. */
 const STAFF_ENQUIRY_PATH =
   /^\/enquiries(?:\/new|\/(?!(?:new|sources|summary)(?:\/|$))[^/]+(?:\/edit)?)?$/;
+
+const REPORT_PATH = /^\/reports\/([^/]+)$/;
+
+function canOpenReport(report: string, role: WorkspaceRole): boolean {
+  return (
+    role != null &&
+    isReportKey(report) &&
+    reportDefinition(report).roles.includes(role)
+  );
+}
 
 export function isAllowedAppPath(
   pathname: string,
@@ -73,6 +88,18 @@ export function isAllowedAppPath(
   // Notifications under the bell. The Owner's list is /absence-notices.
   if (pathname === "/teacher/absence-notices") return role === "teacher";
   if (pathname === "/notifications") return role === "teacher";
+  // Reports: the catalogue for every role, Report settings for the Owner,
+  // and each report for the roles the Reports catalogue lists.
+  if (pathname === "/reports")
+    return (
+      role === "owner" ||
+      role === "teacher" ||
+      role === "student" ||
+      role === "parent"
+    );
+  if (pathname === "/reports/settings") return isOwnerRole(role);
+  const report = REPORT_PATH.exec(pathname)?.[1];
+  if (report != null) return canOpenReport(report, role);
   // Checked before the Staff routes so "sources" and "summary" never read as an Enquiry id.
   if (OWNER_ENQUIRY_PATH.test(pathname)) return isOwnerRole(role);
   if (STAFF_ENQUIRY_PATH.test(pathname))
@@ -98,6 +125,7 @@ const ROLE_GATED_AREAS = new Set([
   "enquiries",
   "absence-notices",
   "notifications",
+  "reports",
 ]);
 
 /**

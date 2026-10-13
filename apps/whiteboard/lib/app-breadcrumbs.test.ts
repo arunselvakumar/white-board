@@ -47,6 +47,9 @@ describe("getAppBreadcrumbs", () => {
     ["/batches/123/tests/456", ["Dashboard", "Batches", "Tests", "Test"]],
     ["/payments/123/receipt", ["Dashboard", "Fees", "Receipt"]],
     ["/enquiries", ["Dashboard", "Enquiries"]],
+    ["/reports", ["Dashboard", "Reports"]],
+    ["/reports/settings", ["Dashboard", "Reports", "Report settings"]],
+    ["/reports/dues", ["Dashboard", "Reports", "Outstanding and overdue dues"]],
     ["/enquiries/new", ["Dashboard", "Enquiries", "Add enquiry"]],
     ["/enquiries/sources", ["Dashboard", "Enquiries", "Enquiry Sources"]],
     ["/enquiries/summary", ["Dashboard", "Enquiries", "Enquiry summary"]],
@@ -162,4 +165,14 @@ it("trails Absence Notices and Notifications (ADR-0041)", () => {
   expect(getAppBreadcrumbs("/notifications", "teacher")).toEqual([
     { label: "Notifications", href: "/notifications" },
   ]);
+});
+
+it("starts a Teacher's, Student's and Parent's Reports trail at Reports", () => {
+  for (const role of ["teacher", "student", "parent"] as const) {
+    expect(getAppBreadcrumbs("/reports", role)).toEqual([{ label: "Reports" }]);
+    expect(getAppBreadcrumbs("/reports/student-attendance", role)).toEqual([
+      { label: "Reports", href: "/reports" },
+      { label: "Student attendance" },
+    ]);
+  }
 });

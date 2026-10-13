@@ -11,6 +11,7 @@ describe("role navigation", () => {
       "Results",
       "Calendar",
       "Online Classes",
+      "Reports",
     ]);
     expect(navForRole("parent").map((item) => item.label)).toEqual([
       "Home",
@@ -18,6 +19,7 @@ describe("role navigation", () => {
       "Results",
       "Calendar",
       "Online Classes",
+      "Reports",
     ]);
     expect(navForRole("teacher").map((item) => item.label)).toEqual([
       "My Batches",
@@ -25,6 +27,7 @@ describe("role navigation", () => {
       "Enquiries",
       "Calendar",
       "Online Classes",
+      "Reports",
     ]);
     expect(navForRole(null)).toEqual([]);
     expect(navForRole("owner")).toEqual(APP_NAV);
@@ -64,6 +67,7 @@ describe("appPageByHref", () => {
       "/attendance",
       "/absence-notices",
       "/fees",
+      "/reports",
     ]);
   });
 
@@ -93,6 +97,20 @@ describe("appPageByHref", () => {
     expect(isAppNavActive("/teacher/batches/b1/homework", "/teacher")).toBe(
       true,
     );
+  });
+
+  it("offers Reports to every supported role and lights it up on a report", () => {
+    for (const role of WORKSPACE_ROLES) {
+      expect(navForRole(role).some((item) => item.href === "/reports")).toBe(
+        true,
+      );
+    }
+    expect(isAppNavActive("/reports", "/reports")).toBe(true);
+    expect(isAppNavActive("/reports/student-attendance", "/reports")).toBe(
+      true,
+    );
+    expect(isAppNavActive("/reports/settings", "/reports")).toBe(true);
+    expect(isAppNavActive("/reports", "/")).toBe(false);
   });
 
   it("lights up Absence Notices, not My Batches, on the Teacher's list", () => {

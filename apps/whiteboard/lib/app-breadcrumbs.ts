@@ -1,3 +1,8 @@
+import {
+  isReportKey,
+  reportDefinition,
+} from "@/src/training-institute/domain/report-catalogue";
+
 import type { WorkspaceRole } from "./workspace-access";
 
 export type AppBreadcrumb = {
@@ -15,6 +20,10 @@ export function getAppBreadcrumbs(
     return [{ label: "Calendar", href: "/calendar" }];
   if (pathname === "/online-classes")
     return [{ label: "Online Classes", href: "/online-classes" }];
+  if (pathname === "/reports" || pathname.startsWith("/reports/")) {
+    const trail = reportBreadcrumbs(pathname);
+    return role == null || role === "owner" ? [dashboard, ...trail] : trail;
+  }
   if (pathname === "/enquiries" || pathname.startsWith("/enquiries/")) {
     const trail = enquiryBreadcrumbs(pathname);
     return role === "teacher" ? trail : [dashboard, ...trail];
@@ -151,4 +160,15 @@ function enquiryBreadcrumbs(pathname: string): AppBreadcrumb[] {
   if (action === "convert")
     return [enquiries, enquiry, { label: "Convert to Student" }];
   return [enquiries, { label: "Enquiry" }];
+}
+
+function reportBreadcrumbs(pathname: string): AppBreadcrumb[] {
+  const [, report] = pathname.split("/").filter(Boolean);
+  if (report === undefined) return [{ label: "Reports" }];
+  const reports = { label: "Reports", href: "/reports" };
+  if (report === "settings") return [reports, { label: "Report settings" }];
+  return [
+    reports,
+    { label: isReportKey(report) ? reportDefinition(report).title : "Report" },
+  ];
 }

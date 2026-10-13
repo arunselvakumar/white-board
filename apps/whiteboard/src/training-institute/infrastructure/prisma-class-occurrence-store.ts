@@ -126,6 +126,30 @@ export class PrismaClassOccurrenceStore implements ClassOccurrenceStore {
     return result.count === 1;
   }
 
+  async recordJoin(
+    input: Parameters<ClassOccurrenceStore["recordJoin"]>[0],
+  ): Promise<void> {
+    await this.db.trainingInstituteClassJoin.upsert({
+      where: {
+        occurrenceId_enrollmentId: {
+          occurrenceId: input.occurrenceId,
+          enrollmentId: input.enrollmentId,
+        },
+      },
+      create: {
+        id: crypto.randomUUID(),
+        workspaceId: input.workspaceId,
+        occurrenceId: input.occurrenceId,
+        enrollmentId: input.enrollmentId,
+        userId: input.userId,
+        role: input.role,
+        firstJoinedAt: input.at,
+        lastJoinedAt: input.at,
+      },
+      update: { lastJoinedAt: input.at },
+    });
+  }
+
   async markEnded(id: string): Promise<void> {
     await this.db.trainingInstituteClassOccurrence.updateMany({
       where: { id, status: { in: ["starting", "live"] } },

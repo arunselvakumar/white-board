@@ -185,7 +185,8 @@ model TrainingInstituteClassOccurrence {
   startedAt          DateTime  @default(now()) @map("started_at")
   endedAt            DateTime? @map("ended_at")
 
-  batch TrainingInstituteBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  batch TrainingInstituteBatch       @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  joins TrainingInstituteClassJoin[]
 
   @@unique([batchId, classDate, startTime])
   @@index([workspaceId, batchId, classDate])
@@ -349,6 +350,7 @@ model TrainingInstituteStudent {
   classTests           TrainingInstituteClassTest[]
   testResults          TrainingInstituteTestResult[]
   absenceNotices       TrainingInstituteAbsenceNotice[]
+  monthlyReportRemarks TrainingInstituteMonthlyReportRemark[]
 
   @@index([workspaceId, deletedAt, createdAt, id])
   @@index([workspaceId, phone])
@@ -1001,5 +1003,61 @@ model TrainingInstituteNotification {
 
   @@index([workspaceId, recipientUserId, createdAt, id])
   @@map("notifications")
+  @@schema("training_institute")
+}
+
+/// A Student joining a Class hosted in Whiteboard (Reports R14). Written when a
+/// Student, or a Parent for their child, joins; never read by Attendance.
+model TrainingInstituteClassJoin {
+  id            String                         @id @db.Uuid
+  workspaceId   String                         @map("workspace_id")
+  occurrenceId  String                         @map("occurrence_id") @db.Uuid
+  enrollmentId  String                         @map("enrollment_id") @db.Uuid
+  userId        String                         @map("user_id")
+  role          TrainingInstituteSubmitterRole
+  firstJoinedAt DateTime                       @map("first_joined_at")
+  lastJoinedAt  DateTime                       @map("last_joined_at")
+
+  occurrence TrainingInstituteClassOccurrence @relation(fields: [occurrenceId], references: [id], onDelete: Restrict)
+
+  @@unique([occurrenceId, enrollmentId])
+  @@index([workspaceId, occurrenceId])
+  @@map("class_joins")
+  @@schema("training_institute")
+}
+
+/// The Owner's Report settings (Reports §6.11). No row means the defaults.
+model TrainingInstituteReportSettings {
+  workspaceId            String   @id @map("workspace_id")
+  thresholdPercent       Int      @map("threshold_percent")
+  absentInARow           Int      @map("absent_in_a_row")
+  minimumClasses         Int      @map("minimum_classes")
+  academicYearStartMonth Int      @map("academic_year_start_month")
+  updatedByUserId        String   @map("updated_by_user_id")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("report_settings")
+  @@schema("training_institute")
+}
+
+/// One remark per author, Student and month on the monthly student report (R18).
+model TrainingInstituteMonthlyReportRemark {
+  id           String                      @id @db.Uuid
+  workspaceId  String                      @map("workspace_id")
+  studentId    String                      @map("student_id") @db.Uuid
+  /// YYYY-MM
+  month        String                      @db.VarChar(7)
+  authorUserId String                      @map("author_user_id")
+  authorRole   TrainingInstitutePosterRole @map("author_role")
+  authorName   String                      @map("author_name") @db.VarChar(200)
+  text         String                      @db.VarChar(300)
+  createdAt    DateTime                    @default(now()) @map("created_at")
+  updatedAt    DateTime                    @updatedAt @map("updated_at")
+
+  student TrainingInstituteStudent @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, studentId, month, authorUserId])
+  @@index([workspaceId, month])
+  @@map("monthly_report_remarks")
   @@schema("training_institute")
 }

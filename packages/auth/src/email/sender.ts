@@ -3,8 +3,18 @@ import { Resend } from "resend";
 
 import { isLiveProduction } from "../runtime";
 
+/** A file sent with an email, such as a Report PDF. */
+export type EmailAttachment = {
+  filename: string;
+  contentType: string;
+  content: Uint8Array;
+};
+
 /** One email to one recipient. */
-export type OutgoingEmail = RenderedEmail & { to: string };
+export type OutgoingEmail = RenderedEmail & {
+  to: string;
+  attachments?: EmailAttachment[];
+};
 
 export type EmailSender = {
   send(email: OutgoingEmail): Promise<void>;
@@ -49,6 +59,11 @@ class ResendSender implements EmailSender {
       subject: email.subject,
       html: email.html,
       text: email.text,
+      attachments: email.attachments?.map((file) => ({
+        filename: file.filename,
+        content: Buffer.from(file.content),
+        contentType: file.contentType,
+      })),
     });
     if (error != null)
       throw new Error(`Resend rejected the email: ${error.message}`);
@@ -72,6 +87,11 @@ class MailpitSender implements EmailSender {
         Subject: email.subject,
         HTML: email.html,
         Text: email.text,
+        Attachments: email.attachments?.map((file) => ({
+          Filename: file.filename,
+          ContentType: file.contentType,
+          Content: Buffer.from(file.content).toString("base64"),
+        })),
       }),
     });
     if (!response.ok)

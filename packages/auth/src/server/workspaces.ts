@@ -394,6 +394,15 @@ export const workspaces = {
     };
   },
 
+  /** A Workspace's name, such as the institute name on a Report. */
+  async name(workspaceId: string): Promise<string> {
+    const workspace = await prisma.identityWorkspace.findUnique({
+      where: { id: workspaceId },
+      select: { name: true },
+    });
+    return workspace?.name ?? "Workspace";
+  },
+
   /** A User's display name for screens such as the Class pre-join page. */
   async displayName(userId: string): Promise<string> {
     const user = await prisma.identityUser.findUnique({

@@ -204,6 +204,24 @@ _Avoid_: exam, assessment, quiz (as the entity name)
 One listed Student's result on a Test: scored with marks (whole or half marks, from 0 to the maximum), absent, or exempt, with an optional remark. With a pass mark, a scored result is a pass or a fail. Changes after publishing are logged with the old and new values, who, and when.
 _Avoid_: grade, score card, mark sheet
 
+**Report**:
+A read-only view over a period of what Whiteboard already records, such as Student attendance (R1) or Collections (R8), that can be printed or downloaded. Each role sees only its own reports: Teachers their own Batches with no fees or contact details, Students and Parents only their own data. See ADR-0043.
+_Avoid_: analytics, dashboard (the Owner Dashboard is not a report), MIS
+
+**Attendance %**:
+Attended (Present + Late) ÷ (Attended + Informed absent + Uninformed absent), rounded to a whole number and always shown with the counts, such as "83% (15 of 18)". Excused and Not marked are left out; with nothing counted it is "–".
+_Avoid_: attendance rate, presence %
+
+**Report settings**:
+The Owner's low-attendance threshold (75%), absences in a row (3), minimum counted Classes (4) and academic year start month (June). They apply to every report straight away.
+
+**Class join**:
+A Student, or a Parent for their child, joining a Class hosted in Whiteboard. Recorded for Online class reports only; it never marks attendance.
+_Avoid_: check-in, presence
+
+**No record**:
+A held Class with no saved attendance and no hosted Class started, in the Teacher classes report. Never called "Missed".
+
 **P0**:
 The current product slice: replace the paper register. Student, Course, Batch, Enrollment (including Timings and Class Mode), Fee Plan, Fee Payment, Receipt, Owner Dashboard. Not attendance, enquiry CRM, certificates, WhatsApp, or live classroom.
 
