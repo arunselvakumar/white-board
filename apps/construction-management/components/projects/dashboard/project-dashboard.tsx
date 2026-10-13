@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
+import { MetricCard } from "@repo/ui/components/metric-card";
 
 import { orderValueLabel } from "@/components/projects/project-contract";
 import {
@@ -263,24 +264,40 @@ function MaterialApprovalsTile({
             ? null
             : `${String(approvals.transfers)} transfer`,
         ].filter((part) => part != null);
+  const pendingPath =
+    approvals == null
+      ? null
+      : (approvals.purchaseRequests ?? 0) > 0
+        ? materialsPath(projectId, "purchase-requests")
+        : (approvals.purchaseOrders ?? 0) > 0
+          ? materialsPath(projectId, "purchase-orders")
+          : (approvals.transfers ?? 0) > 0
+            ? materialsPath(projectId, "transfers")
+            : null;
   return (
-    <li className="bg-card flex min-w-0 flex-col gap-2 rounded-xl border p-4">
-      <span className="text-muted-foreground flex items-center gap-2 text-sm">
-        <Package aria-hidden="true" className="size-4 shrink-0" />
-        <span className="min-w-0">Material Approvals</span>
-      </span>
-      <span className="text-2xl font-semibold tabular-nums">
-        {any ? approvals.total : "—"}
-      </span>
-      <span className="text-muted-foreground text-xs">
-        {error != null
-          ? "Could not be loaded"
-          : approvals == null
-            ? "Loading…"
-            : any
-              ? `Pending: ${parts.join(" · ")}`
-              : "Nothing here for you to approve"}
-      </span>
+    <li className="flex min-w-0">
+      <MetricCard
+        className="w-full"
+        label="Material Approvals"
+        icon={Package}
+        value={
+          any ? (
+            approvals.total
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )
+        }
+        caption={
+          error != null
+            ? "Could not be loaded"
+            : approvals == null
+              ? "Loading…"
+              : any
+                ? `Pending: ${parts.join(" · ")}`
+                : "Nothing here for you to approve"
+        }
+        render={pendingPath == null ? undefined : <Link href={pendingPath} />}
+      />
     </li>
   );
 }
@@ -300,20 +317,14 @@ function KpiTiles({
       <MaterialApprovalsTile projectId={projectId} duration={duration} />
       <PaymentApprovalsTile projectId={projectId} duration={duration} />
       {KPI_STUBS.map((kpi) => (
-        <li
-          key={kpi.label}
-          className="bg-card flex min-w-0 flex-col gap-2 rounded-xl border border-dashed p-4"
-        >
-          <span className="text-muted-foreground flex items-center gap-2 text-sm">
-            <kpi.icon aria-hidden="true" className="size-4 shrink-0" />
-            <span className="min-w-0">{kpi.label}</span>
-          </span>
-          <span className="text-muted-foreground text-2xl font-semibold">
-            —
-          </span>
-          <span className="text-muted-foreground text-xs">
-            Arrives with {kpi.milestone}
-          </span>
+        <li key={kpi.label} className="flex min-w-0">
+          <MetricCard
+            className="w-full border border-dashed bg-transparent ring-0"
+            label={kpi.label}
+            icon={kpi.icon}
+            value={<span className="text-muted-foreground">—</span>}
+            caption={`Arrives with ${kpi.milestone}`}
+          />
         </li>
       ))}
     </ul>

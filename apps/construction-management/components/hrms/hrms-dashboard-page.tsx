@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
+import { MetricCard } from "@repo/ui/components/metric-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { HRMS_PATH } from "@/lib/hrms-nav";
@@ -150,8 +151,7 @@ function Tile({
   label,
   value,
   caption,
-  icon: Icon,
-  tone,
+  icon,
   href,
   className,
 }: {
@@ -159,43 +159,18 @@ function Tile({
   value: number;
   caption: string;
   icon: LucideIcon;
-  tone: string;
   href?: string;
   className?: string;
 }) {
-  const body = (
-    <>
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <div className="flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl",
-            tone,
-          )}
-        >
-          <Icon className="size-5" />
-        </span>
-        <span className="text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">
-          {value}
-        </span>
-      </div>
-      <p className="text-muted-foreground text-xs">{caption}</p>
-    </>
-  );
-  const style = cn(
-    "bg-card flex flex-col gap-3 rounded-2xl border p-4 shadow-xs",
-    href == null
-      ? ""
-      : "hover:bg-secondary/60 focus-visible:ring-ring/50 transition-colors outline-none focus-visible:ring-3",
-    className,
-  );
-  return href == null ? (
-    <div className={style}>{body}</div>
-  ) : (
-    <Link href={href} className={style}>
-      {body}
-    </Link>
+  return (
+    <MetricCard
+      label={label}
+      icon={icon}
+      value={value}
+      caption={caption}
+      className={className}
+      render={href == null ? undefined : <Link href={href} />}
+    />
   );
 }
 
@@ -278,7 +253,6 @@ function Snapshot({ data, team }: { data: HrmsDashboardModel; team: Team }) {
               : `of ${String(team.employees)} Team Members`
           }
           icon={UserCheck}
-          tone="bg-chart-3/12 text-chart-3"
           href={TEAM_ATTENDANCE}
         />
         <Tile
@@ -286,7 +260,6 @@ function Snapshot({ data, team }: { data: HrmsDashboardModel; team: Team }) {
           value={team.onLeave}
           caption="Approved leave today"
           icon={CalendarOff}
-          tone="bg-chart-4/12 text-chart-4"
           href={data.teamLeaves == null ? undefined : TEAM_LEAVES}
         />
         <Tile
@@ -294,7 +267,6 @@ function Snapshot({ data, team }: { data: HrmsDashboardModel; team: Team }) {
           value={team.notCheckedIn}
           caption="Working today, no check-in yet"
           icon={UserX}
-          tone="bg-destructive/10 text-destructive"
           href={TEAM_ATTENDANCE}
         />
         <Tile
@@ -302,7 +274,6 @@ function Snapshot({ data, team }: { data: HrmsDashboardModel; team: Team }) {
           value={team.employees}
           caption="Joined the Company"
           icon={Users}
-          tone="bg-primary/12 text-primary"
         />
         {approvals == null ? null : (
           <Tile
@@ -310,7 +281,6 @@ function Snapshot({ data, team }: { data: HrmsDashboardModel; team: Team }) {
             value={approvals.total}
             caption="Waiting for your decision"
             icon={ListChecks}
-            tone="bg-chart-2/12 text-chart-2"
             href={approvalsHref(data)}
             className="col-span-2 lg:col-span-1"
           />

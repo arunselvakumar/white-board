@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowUpRight,
   Banknote,
   BellRing,
   BookOpen,
@@ -16,9 +15,10 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
+import { MetricCard } from "@repo/ui/components/metric-card";
 
 import { classModeLabel } from "@/lib/class-mode";
-import { formatPaiseAsRupees } from "@/lib/money";
+import { paiseToRupees } from "@/lib/money";
 import {
   studentAvatarColor,
   studentInitials,
@@ -72,55 +72,6 @@ function Panel({
       </header>
       {children}
     </section>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  caption,
-  icon: Icon,
-  tone,
-  valueTone = "",
-  onClick,
-}: {
-  label: string;
-  value: ReactNode;
-  caption: string;
-  icon: LucideIcon;
-  tone: string;
-  valueTone?: string;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      className="group bg-card hover:bg-card hover:border-primary/35 dark:bg-card dark:hover:bg-card h-auto flex-col items-stretch gap-4 rounded-2xl p-4 text-left font-normal whitespace-normal shadow-xs sm:p-5"
-      onClick={onClick}
-    >
-      <span className="flex items-start justify-between gap-3">
-        <span className="text-muted-foreground text-sm">{label}</span>
-        <ArrowUpRight
-          aria-hidden="true"
-          className="text-muted-foreground group-hover:text-primary transition-colors"
-        />
-      </span>
-      <span className="flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11 ${tone}`}
-        >
-          <Icon className="size-5" />
-        </span>
-        <span
-          className={`truncate text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${valueTone}`}
-        >
-          {value}
-        </span>
-      </span>
-      <span className="text-muted-foreground text-xs">{caption}</span>
-    </Button>
   );
 }
 
@@ -188,41 +139,38 @@ export function OwnerDashboard({
 
       <div className="@container">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 @4xl:grid-cols-4">
-          <StatCard
+          <MetricCard
             label="Active Students"
+            icon={GraduationCap}
             value={dashboard.activeStudentCount}
             caption="Students on the register"
-            icon={GraduationCap}
-            tone="bg-primary/12 text-primary"
             onClick={onOpenStudents}
           />
-          <StatCard
+          <MetricCard
             label="Outstanding dues"
-            value={formatPaiseAsRupees(dashboard.outstandingDuesPaise)}
-            caption="Still to collect across Enrollments"
             icon={Wallet}
-            tone="bg-chart-4/12 text-chart-4"
+            value={paiseToRupees(dashboard.outstandingDuesPaise).toLocaleString(
+              "en-IN",
+            )}
+            unit="₹"
+            unitPlacement="start"
+            caption="Still to collect across Enrollments"
             onClick={onOpenFees}
           />
-          <StatCard
+          <MetricCard
             label="Follow-ups due today"
-            value={dashboard.feeFollowUpsDueCount}
-            caption={followUpsDue ? "Due today or overdue" : "Nothing to chase"}
             icon={BellRing}
-            tone={
-              followUpsDue
-                ? "bg-chart-5/12 text-chart-5"
-                : "bg-muted text-muted-foreground"
-            }
-            valueTone={followUpsDue ? "text-amber-700 dark:text-amber-200" : ""}
+            value={dashboard.feeFollowUpsDueCount}
+            badge={followUpsDue ? "Due" : undefined}
+            badgeTone="warning"
+            caption={followUpsDue ? "Due today or overdue" : "Nothing to chase"}
             onClick={onOpenFees}
           />
-          <StatCard
+          <MetricCard
             label="Batches today"
+            icon={CalendarClock}
             value={dashboard.todayBatches.length}
             caption="Running on today’s Calendar"
-            icon={CalendarClock}
-            tone="bg-chart-2/12 text-chart-2"
             onClick={onOpenCalendar}
           />
         </div>
