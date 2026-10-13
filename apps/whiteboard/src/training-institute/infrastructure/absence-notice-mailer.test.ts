@@ -20,7 +20,7 @@ describe("withTimeout", () => {
     const result = withTimeout(hanging, 8_000, "Absence Notice email");
     vi.advanceTimersByTime(8_000);
     await expect(result).rejects.toThrow(
-      "Absence Notice email timed out after 8000 ms.",
+      "Absence Notice email: no answer after 8000 ms; delivery unknown, it may still arrive.",
     );
   });
 
