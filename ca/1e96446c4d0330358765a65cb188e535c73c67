@@ -1,0 +1,45 @@
+apps/construction-management/.storybook/preview.tsx
+  s_69311bb7d7719f::t_74c10c5cd6338c 2,4,43,45
+apps/construction-management/app/layout.tsx
+  s_69311bb7d7719f::t_e114503196dd1a 4,6,37,40
+apps/construction-management/components/projects/dashboard/dashboard-parts.tsx
+  s_69311bb7d7719f::t_26d227ad28a2ee 7,12,43-47,58-66,69,76-92
+apps/construction-management/components/projects/dashboard/finance-sections.tsx
+  s_69311bb7d7719f::t_a06e0c8ce2d3ba 23-29,394,397,400,403
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_69311bb7d7719f::t_fe64913cd19829 263-265,273-275,285-287,440-445
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_69311bb7d7719f::t_8c9713fbb75c56 48-55,127-131,201-202,399
+apps/construction-management/components/projects/dashboard/site-work-sections.tsx
+  s_69311bb7d7719f::t_bfe04a472a84d7 25-32,216-217,225
+apps/whiteboard/.storybook/preview.tsx
+  s_69311bb7d7719f::t_1a6dc852e56be2 2,4,39,41
+apps/whiteboard/app/layout.tsx
+  s_69311bb7d7719f::t_188e38d27fa5cc 4,6,37,40
+docs/adr/0003-urbanist-three-weights.md
+  s_69311bb7d7719f::t_9a958a513f2716 4-5
+packages/ui/src/components/metric-card.tsx
+  s_69311bb7d7719f::t_a79464da224e55 37,68-73,75-83,85-89,122
+packages/ui/src/components/satoshi-stylesheet.tsx
+  s_69311bb7d7719f::t_4c44abe5e6a2f2 1-20
+packages/ui/src/styles/globals.css
+  s_69311bb7d7719f::t_11e00f4def5a54 32-40
+docs/adr/0042-satoshi-in-the-apps.md
+  s_69311bb7d7719f::t_64204215a7354f 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ca1e96446c4d0330358765a65cb188e535c73c67",
+  "prompts": {},
+  "sessions": {
+    "s_69311bb7d7719f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9206530-12cd-4a0a-8d62-972e9562a866",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
