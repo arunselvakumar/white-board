@@ -1023,6 +1023,14 @@ describe("Absence Notices HTTP", () => {
         back.body.items.map((item) => item.payload.classes[0]?.date),
       ).toEqual([day(3), day(2)]);
       expect((await notifications("?after=nope")).status).toBe(400);
+      // Both cursors are valid on their own (above); together they're refused.
+      expect(
+        (
+          await notifications(
+            `?after=${first.body.nextCursor ?? ""}&before=${second.body.prevCursor ?? ""}`,
+          )
+        ).status,
+      ).toBe(400);
     });
 
     it("marks one or all read, only for the recipient", async () => {
