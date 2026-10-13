@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/nextjs-vite";
-import { Geist_Mono, Urbanist } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+import { SatoshiStylesheet } from "@repo/ui/components/satoshi-stylesheet";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import { TooltipProvider } from "@repo/ui/components/tooltip";
 import { sb } from "storybook/test";
@@ -14,12 +15,6 @@ import { resetAuthMocks } from "./mocks/auth";
 // form's held-files story picks files without the real attachments UI).
 sb.mock("../components/projects/documents/document-attachments.tsx", {
   spy: true,
-});
-
-const fontSans = Urbanist({
-  subsets: ["latin"],
-  weight: ["300", "400", "600"],
-  variable: "--font-sans",
 });
 
 const fontMono = Geist_Mono({
@@ -45,8 +40,9 @@ function PreviewShell({
       <TooltipProvider>
         <QueryProvider>
           <div
-            className={`${fontSans.variable} ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
+            className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
           >
+            <SatoshiStylesheet />
             {children}
           </div>
         </QueryProvider>

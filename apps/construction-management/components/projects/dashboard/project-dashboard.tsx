@@ -23,7 +23,6 @@ import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { MetricCard } from "@repo/ui/components/metric-card";
 
-import { orderValueLabel } from "@/components/projects/project-contract";
 import {
   ProjectStatusBadge,
   formatCalendarDate,
@@ -43,11 +42,17 @@ import {
 } from "@/src/queries/project-dashboard";
 import { procurementDashboardQuery } from "@/src/queries/procurement-dashboard";
 
-import { formatPaise } from "@/components/money/money-input";
 import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
 
 import { AttendanceTrend } from "./attendance-trend";
-import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
+import {
+  Fact,
+  Rupees,
+  Section,
+  SectionSkeleton,
+  Unit,
+  denied,
+} from "./dashboard-parts";
 import { DurationFilter } from "./duration-filter";
 import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
@@ -119,9 +124,11 @@ function SummarySection({ projectId }: { projectId: string }) {
           </Fact>
           {data.financial ? (
             <Fact label="Budget">
-              {data.project.budgetValue == null
-                ? none
-                : orderValueLabel(data.project.budgetValue)}
+              {data.project.budgetValue == null ? (
+                none
+              ) : (
+                <Rupees paise={data.project.budgetValue} />
+              )}
             </Fact>
           ) : null}
           {data.project.structure === "wings" || data.counts.wings > 0 ? (
@@ -191,7 +198,8 @@ function AttendanceSection({
               }
               icon={HardHat}
             >
-              {`${String(data.labourers.present + data.labourers.halfDay)} of ${String(data.labourers.onProject)}`}
+              {data.labourers.present + data.labourers.halfDay}
+              <Unit>/{data.labourers.onProject}</Unit>
             </Fact>
             <Fact label="Absent" icon={UserX}>
               {data.labourers.absent}
@@ -388,7 +396,7 @@ function MaterialsSection({
                   {data.purchaseOrders.count}
                 </Fact>
                 <Fact label="Purchase order value">
-                  {formatPaise(data.purchaseOrders.value)}
+                  <Rupees paise={data.purchaseOrders.value} />
                 </Fact>
               </>
             )}
