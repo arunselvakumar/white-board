@@ -1,0 +1,19 @@
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_69311bb7d7719f::t_03a4822c1d74ac 113-114,116-122,124-125,127-158,161-162,164-203,206,209,211-212,215-218,221-225,227-228,231-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "94062e73ac36a98738a7344da1b9e6c4db8396f2",
+  "prompts": {},
+  "sessions": {
+    "s_69311bb7d7719f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9206530-12cd-4a0a-8d62-972e9562a866",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
