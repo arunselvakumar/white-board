@@ -44,6 +44,7 @@ function service(
     findByMeetingId: () => Promise.resolve(null),
     claimRecording: () => Promise.reject(new Error("unexpected recording")),
     markEnded: () => Promise.reject(new Error("unexpected ending")),
+    recordJoin: () => Promise.reject(new Error("unexpected join")),
   };
   const meetings: MeetingGateway = {
     ensureConfigured: () => {
@@ -203,6 +204,7 @@ describe("ClassService", () => {
     let occurrence: ClassOccurrenceRecord | null = null;
     let recordingClaims = 0;
     let deactivated = false;
+    const joins: { enrollmentId: string; role: string }[] = [];
     const store: ClassOccurrenceStore = {
       find: () => Promise.resolve(occurrence),
       claim: async (key, verify) => {
@@ -243,6 +245,10 @@ describe("ClassService", () => {
       },
       markEnded: () => {
         if (occurrence) occurrence.status = "ended";
+        return Promise.resolve();
+      },
+      recordJoin: (join) => {
+        joins.push({ enrollmentId: join.enrollmentId, role: join.role });
         return Promise.resolve();
       },
     };
@@ -286,6 +292,8 @@ describe("ClassService", () => {
     expect(await sut.join(student, "Asha")).toEqual({
       authToken: "participant_token",
     });
+    // The Student's join is noted for Reports; the host's start isn't.
+    expect(joins).toEqual([{ enrollmentId: hosted.id, role: "student" }]);
     await sut.recordingChanged({
       meetingId: "meeting_1",
       recordingId: "recording_1",

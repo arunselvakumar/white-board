@@ -28,6 +28,7 @@ const NOT_FOUND_CODES = new Set([
   "FEE_FOLLOW_UP_NOT_FOUND",
   "ABSENCE_NOTICE_NOT_FOUND",
   "NOTIFICATION_NOT_FOUND",
+  "REPORT_SUBJECT_NOT_FOUND",
 ]);
 const CONFLICT_CODES = new Set([
   "COURSE_CODE_IN_USE",
@@ -152,7 +153,8 @@ export function mapError(error: unknown): Response {
     (code === "ATTENDANCE_FORBIDDEN" ||
       code === "HOLIDAY_FORBIDDEN" ||
       code === "CLASS_WORK_FORBIDDEN" ||
-      code === "CLASS_TEST_FORBIDDEN") &&
+      code === "CLASS_TEST_FORBIDDEN" ||
+      code === "REPORT_FORBIDDEN") &&
     error instanceof Error
   ) {
     return jsonError(StatusCodes.FORBIDDEN, code, error.message);

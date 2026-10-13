@@ -27,6 +27,7 @@ export class GetOwnerDashboardHandler {
       recentStudents,
       batches,
       enrollments,
+      owing,
       payments,
       feeFollowUpsDueCount,
     ] = await Promise.all([
@@ -43,9 +44,14 @@ export class GetOwnerDashboardHandler {
       }),
       this.db.trainingInstituteEnrollment.findMany({
         where: { workspaceId, deletedAt: null, endedAt: null },
+        select: { id: true, batchId: true },
+      }),
+      // Outstanding dues count every Enrollment with money owed, ended ones
+      // too, as the dues list and the Reports do (ADR-0039, Reports §6.6).
+      this.db.trainingInstituteEnrollment.findMany({
+        where: { workspaceId, deletedAt: null, student: { deletedAt: null } },
         select: {
           id: true,
-          batchId: true,
           feePlanAmountPaise: true,
           feePlanConcessionPaise: true,
         },
@@ -61,7 +67,7 @@ export class GetOwnerDashboardHandler {
     const paidByEnrollment = new Map(
       payments.map((row) => [row.enrollmentId, row._sum.amountPaise ?? 0]),
     );
-    const outstandingDuesPaise = enrollments.reduce((total, enrollment) => {
+    const outstandingDuesPaise = owing.reduce((total, enrollment) => {
       const paid = paidByEnrollment.get(enrollment.id) ?? 0;
       const remaining = Math.max(
         0,
