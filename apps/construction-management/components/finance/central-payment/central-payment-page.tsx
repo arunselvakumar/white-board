@@ -67,7 +67,13 @@ function Amount({
     (tone === "warn-positive" && value > 0) ||
     (tone === "warn-negative" && value < 0);
   return (
-    <span className={cn("tabular-nums", warn && "text-destructive", className)}>
+    <span
+      className={cn(
+        "whitespace-nowrap tabular-nums",
+        warn && "text-destructive",
+        className,
+      )}
+    >
       {formatPaise(value)}
     </span>
   );
@@ -102,11 +108,20 @@ function PartyDuesTable({
       </p>
     );
   const wide = "hidden py-2 pl-2 text-right sm:table-cell";
+  // On a phone the table sizes Due and Balance to their amounts and the
+  // name column takes what is left (max-w-0 lets it shrink and truncate),
+  // so a long amount never pushes the page sideways.
   return (
-    <table aria-label={`${noun} dues`} className="w-full table-fixed text-sm">
+    <table
+      aria-label={`${noun} dues`}
+      className="w-full table-auto text-sm sm:table-fixed"
+    >
       <thead className="text-muted-foreground border-b text-left text-xs">
         <tr>
-          <th scope="col" className="w-[50%] py-2 pr-2 font-medium sm:w-[28%]">
+          <th
+            scope="col"
+            className="w-full max-w-0 py-2 pr-2 font-medium sm:w-[28%] sm:max-w-none"
+          >
             {noun}
           </th>
           <th scope="col" className={`${wide} font-medium`}>
@@ -134,7 +149,7 @@ function PartyDuesTable({
           <tr key={row.partyId}>
             <th
               scope="row"
-              className="py-2 pr-2 text-left align-top font-normal"
+              className="max-w-0 py-2 pr-2 text-left align-top font-normal sm:max-w-none"
             >
               <span className="block truncate font-medium">{row.name}</span>
               <span className="text-muted-foreground block text-xs">
@@ -179,7 +194,7 @@ function PartyDuesTable({
       </tbody>
       <tfoot className="border-t font-medium">
         <tr>
-          <th scope="row" className="py-2 pr-2 text-left">
+          <th scope="row" className="max-w-0 py-2 pr-2 text-left sm:max-w-none">
             Total
           </th>
           <td className={wide}>
