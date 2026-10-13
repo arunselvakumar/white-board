@@ -1,9 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { HardHat, Handshake, IndianRupee, Wallet } from "lucide-react";
+import {
+  HardHat,
+  Handshake,
+  IndianRupee,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { MetricCard } from "@repo/ui/components/metric-card";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -23,40 +30,41 @@ function dayLabel(date: string): string {
   return DAY.format(new Date(`${date}T00:00:00Z`));
 }
 
+/**
+ * An amount without its `₹`, which the tile shows as a grey unit, and
+ * without `.00` on whole rupees so the figure stays large.
+ */
+function rupeeFigure(paise: number): string {
+  return formatPaise(paise).replace("₹", "").replace(/\.00$/, "");
+}
+
 function Tile({
   icon,
   label,
   value,
+  unit,
+  unitPlacement,
   detail,
   href,
 }: {
-  icon: ReactNode;
+  icon: LucideIcon;
   label: string;
   value: ReactNode;
+  unit?: string;
+  unitPlacement?: "start" | "end";
   detail: ReactNode;
   href?: string;
 }) {
-  const body = (
-    <>
-      <div className="text-muted-foreground flex items-center gap-2 text-sm">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <p className="mt-2 text-2xl font-semibold tabular-nums">{value}</p>
-      <p className="text-muted-foreground mt-1 text-xs">{detail}</p>
-    </>
-  );
-  const className =
-    "bg-card block rounded-xl border p-4 transition-colors" +
-    (href == null
-      ? ""
-      : " hover:bg-accent/40 focus-visible:ring-2 outline-none");
-  return href == null ? (
-    <div className={className}>{body}</div>
-  ) : (
-    <Link href={href} className={className}>
-      {body}
-    </Link>
+  return (
+    <MetricCard
+      label={label}
+      icon={icon}
+      value={value}
+      unit={unit}
+      unitPlacement={unitPlacement}
+      caption={detail}
+      render={href == null ? undefined : <Link href={href} />}
+    />
   );
 }
 
@@ -185,9 +193,10 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Tile
-          icon={<HardHat className="size-4" />}
+          icon={HardHat}
           label="Labours present"
-          value={`${String(labourers.present + labourers.halfDay)} of ${String(labourers.onProject)}`}
+          value={labourers.present + labourers.halfDay}
+          unit={`/${String(labourers.onProject)}`}
           detail={
             labourers.unmarked > 0
               ? `${String(labourers.unmarked)} not marked yet`
@@ -196,31 +205,35 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
           href={`${base}/attendance/labour`}
         />
         <Tile
-          icon={<Handshake className="size-4" />}
+          icon={Handshake}
           label="Vendor heads"
           value={vendors.headcountToday}
           detail={`${String(vendors.recordedToday)} of ${String(vendors.assigned)} vendors recorded`}
           href={`${base}/attendance/vendors`}
         />
         <Tile
-          icon={<Wallet className="size-4" />}
+          icon={Wallet}
           label="Owed to Labours"
           value={
             data.labourBalance == null
               ? "—"
-              : formatPaise(data.labourBalance.toPay)
+              : rupeeFigure(data.labourBalance.toPay)
           }
+          unit={data.labourBalance == null ? undefined : "₹"}
+          unitPlacement="start"
           detail={balanceDetail(data.labourBalance)}
           href={`${base}/payments/wages`}
         />
         <Tile
-          icon={<IndianRupee className="size-4" />}
+          icon={IndianRupee}
           label="Owed to vendors"
           value={
             data.vendorBalance == null
               ? "—"
-              : formatPaise(data.vendorBalance.toPay)
+              : rupeeFigure(data.vendorBalance.toPay)
           }
+          unit={data.vendorBalance == null ? undefined : "₹"}
+          unitPlacement="start"
           detail={balanceDetail(data.vendorBalance)}
           href={`${base}/payments/wages`}
         />

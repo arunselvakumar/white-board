@@ -72,12 +72,16 @@ export const Today: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Labour today" }),
     ).toBeVisible();
-    await expect(canvas.getByText("19 of 24")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: /Labours present/ }),
+    ).toHaveTextContent("19/24");
     await expect(canvas.getByText("2 not marked yet")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: /Vendor heads\s*31/ }),
     ).toBeVisible();
-    await expect(canvas.getByText("₹1,84,500.00")).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: /Owed to Labours/ }),
+    ).toHaveTextContent("₹1,84,500");
     await expect(
       canvas.getByRole("link", { name: /Labours present/ }),
     ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/attendance/labour`);

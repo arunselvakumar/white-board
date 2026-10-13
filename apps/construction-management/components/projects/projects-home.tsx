@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
+import { MetricCard } from "@repo/ui/components/metric-card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,69 +83,32 @@ const STATS: readonly {
   label: string;
   caption: string;
   icon: LucideIcon;
-  tone: string;
 }[] = [
   {
     key: "all",
     label: "All Projects",
     caption: "Every site in this Company",
     icon: Building2,
-    tone: "bg-primary/12 text-primary",
   },
   {
     key: "ongoing",
     label: "Ongoing",
     caption: "Work on site now",
     icon: HardHat,
-    tone: "bg-chart-3/12 text-chart-3",
   },
   {
     key: "on_hold",
     label: "On hold",
     caption: "Paused for now",
     icon: PauseCircle,
-    tone: "bg-chart-4/12 text-chart-4",
   },
   {
     key: "completed",
     label: "Completed",
     caption: "Finished work",
     icon: CircleCheck,
-    tone: "bg-chart-2/12 text-chart-2",
   },
 ];
-
-function StatCard({
-  label,
-  value,
-  caption,
-  icon: Icon,
-  tone,
-}: {
-  label: string;
-  value: number;
-  caption: string;
-  icon: LucideIcon;
-  tone: string;
-}) {
-  return (
-    <div className="bg-card flex flex-col gap-4 rounded-2xl border p-4 shadow-xs sm:p-5">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <div className="flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11 ${tone}`}
-        >
-          <Icon className="size-5" />
-        </span>
-        <span className="text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">
-          {value}
-        </span>
-      </div>
-      <p className="text-muted-foreground text-xs">{caption}</p>
-    </div>
-  );
-}
 
 const ROW_GRID =
   "md:grid md:grid-cols-[minmax(0,2fr)_8rem_minmax(0,1.3fr)] md:items-center md:gap-4";
@@ -278,7 +242,7 @@ function ProjectRow({ project }: { project: ProjectItem }) {
 }
 
 /**
- * Projects home (CM-204, `modules/03`): status totals, then every Project
+ * Projects home (CM-204, `modules/03`): status totals (each one filters the list), then every Project
  * in one list with status chips to filter it, the member's pinned Projects
  * first (CM-411). The Owner sees every Project; a Member those assigned to
  * them.
@@ -321,13 +285,17 @@ export function ProjectsHome() {
             <div className="@container">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 @4xl:grid-cols-4">
                 {STATS.map((stat) => (
-                  <StatCard
+                  <MetricCard
                     key={stat.key}
                     label={stat.label}
+                    icon={stat.icon}
                     value={data.counts[stat.key]}
                     caption={stat.caption}
-                    icon={stat.icon}
-                    tone={stat.tone}
+                    active={filter === stat.key}
+                    aria-pressed={filter === stat.key}
+                    onClick={() => {
+                      setFilter(stat.key);
+                    }}
                   />
                 ))}
               </div>

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useId, useState } from "react";
+import { MetricCard } from "@repo/ui/components/metric-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -433,24 +434,41 @@ export function PaymentApprovalsTile({
           counted(approvals.settlements, "settlement", "settlements"),
         ].filter((part) => part != null);
   const any = parts.length > 0;
+  const base = `/app/projects/${encodeURIComponent(projectId)}/payments`;
   return (
-    <li className="bg-card flex min-w-0 flex-col gap-2 rounded-xl border p-4">
-      <span className="text-muted-foreground flex items-center gap-2 text-sm">
-        <CreditCard aria-hidden="true" className="size-4 shrink-0" />
-        <span className="min-w-0">Payment Approvals</span>
-      </span>
-      <span className="text-2xl font-semibold tabular-nums">
-        {any && approvals != null ? approvals.total : "—"}
-      </span>
-      <span className="text-muted-foreground text-xs">
-        {error != null
-          ? "Could not be loaded"
-          : approvals == null
-            ? "Loading…"
-            : any
-              ? `Pending: ${parts.join(" · ")}`
-              : "Nothing here for you to approve"}
-      </span>
+    <li className="flex min-w-0">
+      <MetricCard
+        className="w-full"
+        label="Payment Approvals"
+        icon={CreditCard}
+        value={
+          any && approvals != null ? (
+            approvals.total
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )
+        }
+        caption={
+          error != null
+            ? "Could not be loaded"
+            : approvals == null
+              ? "Loading…"
+              : any
+                ? `Pending: ${parts.join(" · ")}`
+                : "Nothing here for you to approve"
+        }
+        render={
+          any && approvals != null ? (
+            <Link
+              href={
+                (approvals.transactions ?? 0) > 0
+                  ? `${base}/transactions`
+                  : base
+              }
+            />
+          ) : undefined
+        }
+      />
     </li>
   );
 }

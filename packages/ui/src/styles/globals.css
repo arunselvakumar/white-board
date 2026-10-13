@@ -6,6 +6,29 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * A MetricCard that is hovered or focused (when it goes somewhere) or marked
+ * active: the card and every part inside it switch to the primary colour.
+ */
+@custom-variant metric-lit {
+  &:where(
+    [data-slot="metric-card"][data-active],
+    [data-slot="metric-card"][data-active] *,
+    [data-slot="metric-card"][data-interactive]:focus-visible,
+    [data-slot="metric-card"][data-interactive]:focus-visible *
+  ) {
+    @slot;
+  }
+  @media (hover: hover) {
+    &:where(
+      [data-slot="metric-card"][data-interactive]:hover,
+      [data-slot="metric-card"][data-interactive]:hover *
+    ) {
+      @slot;
+    }
+  }
+}
+
 :root {
   --background: #f6f7fb;
   --foreground: #16182a;

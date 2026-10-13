@@ -118,7 +118,9 @@ export const Populated: Story = {
     await expect(
       canvas.getByText(/Today 16:00–18:00 · Rescheduled/),
     ).toBeVisible();
-    await expect(canvas.getByText("₹4,000")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: /Outstanding dues/ }),
+    ).toHaveTextContent("₹4,000");
     const followUps = canvas.getByRole("button", {
       name: /Follow-ups due today/,
     });
