@@ -110,121 +110,127 @@ function PartyDuesTable({
   const wide = "hidden py-2 pl-2 text-right sm:table-cell";
   // On a phone the table sizes Due and Balance to their amounts and the
   // name column takes what is left (max-w-0 lets it shrink and truncate),
-  // so a long amount never pushes the page sideways.
+  // so a long amount never pushes the page sideways. An amount wider than the
+  // phone scrolls inside the wrapper instead of the page.
   return (
-    <table
-      aria-label={`${noun} dues`}
-      className="w-full table-auto text-sm sm:table-fixed"
-    >
-      <thead className="text-muted-foreground border-b text-left text-xs">
-        <tr>
-          <th
-            scope="col"
-            className="w-full max-w-0 py-2 pr-2 font-medium sm:w-[28%] sm:max-w-none"
-          >
-            {noun}
-          </th>
-          <th scope="col" className={`${wide} font-medium`}>
-            Invoiced
-          </th>
-          <th scope="col" className={`${wide} font-medium`}>
-            Paid
-          </th>
-          <th scope="col" className="py-2 pl-2 text-right font-medium">
-            Due
-          </th>
-          <th scope="col" className={`${wide} font-medium`}>
-            Overdue
-          </th>
-          <th scope="col" className={`${wide} font-medium`}>
-            {receivables ? "Receivable" : "Advance"}
-          </th>
-          <th scope="col" className="py-2 pl-2 text-right font-medium">
-            Balance
-          </th>
-        </tr>
-      </thead>
-      <tbody className="divide-y">
-        {rows.map((row) => (
-          <tr key={row.partyId}>
+    <div className="w-full min-w-0 overflow-x-auto">
+      <table
+        aria-label={`${noun} dues`}
+        className="w-full table-auto text-sm sm:table-fixed"
+      >
+        <thead className="text-muted-foreground border-b text-left text-xs">
+          <tr>
+            <th
+              scope="col"
+              className="w-full max-w-0 py-2 pr-2 font-medium sm:w-[28%] sm:max-w-none"
+            >
+              {noun}
+            </th>
+            <th scope="col" className={`${wide} font-medium`}>
+              Invoiced
+            </th>
+            <th scope="col" className={`${wide} font-medium`}>
+              Paid
+            </th>
+            <th scope="col" className="py-2 pl-2 text-right font-medium">
+              Due
+            </th>
+            <th scope="col" className={`${wide} font-medium`}>
+              Overdue
+            </th>
+            <th scope="col" className={`${wide} font-medium`}>
+              {receivables ? "Receivable" : "Advance"}
+            </th>
+            <th scope="col" className="py-2 pl-2 text-right font-medium">
+              Balance
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y">
+          {rows.map((row) => (
+            <tr key={row.partyId}>
+              <th
+                scope="row"
+                className="max-w-0 py-2 pr-2 text-left align-top font-normal sm:max-w-none"
+              >
+                <span className="block truncate font-medium">{row.name}</span>
+                <span className="text-muted-foreground block text-xs">
+                  {count(row.projectCount, "Project", "Projects")}
+                </span>
+                <span className="text-muted-foreground block text-xs sm:hidden">
+                  Invoiced {formatPaise(row.invoiced)} · Paid{" "}
+                  {formatPaise(row.paid)}
+                </span>
+                {row.overdue > 0 ? (
+                  <span className="text-destructive block text-xs sm:hidden">
+                    Overdue {formatPaise(row.overdue)}
+                  </span>
+                ) : null}
+                {(receivables ? row.receivable : row.advance) > 0 ? (
+                  <span className="text-muted-foreground block text-xs sm:hidden">
+                    {receivables ? "Receivable" : "Advance"}{" "}
+                    {formatPaise(receivables ? row.receivable : row.advance)}
+                  </span>
+                ) : null}
+              </th>
+              <td className={wide}>
+                <Amount value={row.invoiced} />
+              </td>
+              <td className={wide}>
+                <Amount value={row.paid} />
+              </td>
+              <td className="py-2 pl-2 text-right align-top font-medium">
+                <Amount value={row.due} />
+              </td>
+              <td className={wide}>
+                <Amount value={row.overdue} tone="warn-positive" />
+              </td>
+              <td className={wide}>
+                <Amount value={receivables ? row.receivable : row.advance} />
+              </td>
+              <td className="py-2 pl-2 text-right align-top">
+                <Amount value={row.balance} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot className="border-t font-medium">
+          <tr>
             <th
               scope="row"
-              className="max-w-0 py-2 pr-2 text-left align-top font-normal sm:max-w-none"
+              className="max-w-0 py-2 pr-2 text-left sm:max-w-none"
             >
-              <span className="block truncate font-medium">{row.name}</span>
-              <span className="text-muted-foreground block text-xs">
-                {count(row.projectCount, "Project", "Projects")}
-              </span>
-              <span className="text-muted-foreground block text-xs sm:hidden">
-                Invoiced {formatPaise(row.invoiced)} · Paid{" "}
-                {formatPaise(row.paid)}
-              </span>
-              {row.overdue > 0 ? (
-                <span className="text-destructive block text-xs sm:hidden">
-                  Overdue {formatPaise(row.overdue)}
-                </span>
-              ) : null}
-              {(receivables ? row.receivable : row.advance) > 0 ? (
-                <span className="text-muted-foreground block text-xs sm:hidden">
-                  {receivables ? "Receivable" : "Advance"}{" "}
-                  {formatPaise(receivables ? row.receivable : row.advance)}
-                </span>
-              ) : null}
+              Total
             </th>
             <td className={wide}>
-              <Amount value={row.invoiced} />
+              <Amount value={sum(rows, (row) => row.invoiced)} />
             </td>
             <td className={wide}>
-              <Amount value={row.paid} />
+              <Amount value={sum(rows, (row) => row.paid)} />
             </td>
-            <td className="py-2 pl-2 text-right align-top font-medium">
-              <Amount value={row.due} />
-            </td>
-            <td className={wide}>
-              <Amount value={row.overdue} tone="warn-positive" />
+            <td className="py-2 pl-2 text-right">
+              <Amount value={sum(rows, (row) => row.due)} />
             </td>
             <td className={wide}>
-              <Amount value={receivables ? row.receivable : row.advance} />
+              <Amount
+                value={sum(rows, (row) => row.overdue)}
+                tone="warn-positive"
+              />
             </td>
-            <td className="py-2 pl-2 text-right align-top">
-              <Amount value={row.balance} />
+            <td className={wide}>
+              <Amount
+                value={sum(rows, (row) =>
+                  receivables ? row.receivable : row.advance,
+                )}
+              />
+            </td>
+            <td className="py-2 pl-2 text-right">
+              <Amount value={sum(rows, (row) => row.balance)} />
             </td>
           </tr>
-        ))}
-      </tbody>
-      <tfoot className="border-t font-medium">
-        <tr>
-          <th scope="row" className="max-w-0 py-2 pr-2 text-left sm:max-w-none">
-            Total
-          </th>
-          <td className={wide}>
-            <Amount value={sum(rows, (row) => row.invoiced)} />
-          </td>
-          <td className={wide}>
-            <Amount value={sum(rows, (row) => row.paid)} />
-          </td>
-          <td className="py-2 pl-2 text-right">
-            <Amount value={sum(rows, (row) => row.due)} />
-          </td>
-          <td className={wide}>
-            <Amount
-              value={sum(rows, (row) => row.overdue)}
-              tone="warn-positive"
-            />
-          </td>
-          <td className={wide}>
-            <Amount
-              value={sum(rows, (row) =>
-                receivables ? row.receivable : row.advance,
-              )}
-            />
-          </td>
-          <td className="py-2 pl-2 text-right">
-            <Amount value={sum(rows, (row) => row.balance)} />
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+        </tfoot>
+      </table>
+    </div>
   );
 }
 
