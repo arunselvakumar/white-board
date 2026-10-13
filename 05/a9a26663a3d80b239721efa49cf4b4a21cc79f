@@ -1,0 +1,27 @@
+apps/whiteboard/app/api/training-institute/reports/reports.http.test.ts
+  s_4b3a4aac01ac51::t_bf298e08fcd472 1032-1052,1054-1055
+apps/whiteboard/components/reports/report-settings-screen.tsx
+  s_4b3a4aac01ac51::t_8a9dd69d64f486 60-65
+apps/whiteboard/src/training-institute/application/class-service.ts
+  s_4b3a4aac01ac51::t_4f5dcb352c1afa 361-374
+apps/whiteboard/src/training-institute/application/report-context.ts
+  s_4b3a4aac01ac51::t_9f854040ee6a66 75-89,91,118
+apps/whiteboard/src/training-institute/application/report-fees.ts
+  s_4b3a4aac01ac51::t_9b3206bdeac40a 107-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "05a9a26663a3d80b239721efa49cf4b4a21cc79f",
+  "prompts": {},
+  "sessions": {
+    "s_4b3a4aac01ac51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7f7270d8-eb81-4f26-856d-494f34d8f81a",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
