@@ -260,7 +260,9 @@ export const WithFinancial: Story = {
     const projectSummary = within(
       canvas.getByRole("region", { name: "Project summary" }),
     );
-    await expect(await projectSummary.findByText("₹4,20,00,000")).toBeVisible();
+    await expect(
+      (await projectSummary.findByText("Budget")).nextElementSibling,
+    ).toHaveTextContent("₹4,20,00,000");
     await expect(projectSummary.getByText("64")).toBeVisible();
     await expect(projectSummary.getByText("Residential")).toBeVisible();
     await expect(projectSummary.queryByText("Locations")).toBeNull();
@@ -268,8 +270,9 @@ export const WithFinancial: Story = {
     const attendance = within(
       canvas.getByRole("region", { name: "Attendance" }),
     );
-    await expect(await attendance.findByText("20 of 24")).toBeVisible();
-    await expect(attendance.getByText("Labours present today")).toBeVisible();
+    await expect(
+      (await attendance.findByText("Labours present today")).nextElementSibling,
+    ).toHaveTextContent("20/24");
     await expect(
       attendance.getByRole("figure", { name: "Labours present per day" }),
     ).toBeVisible();
@@ -279,7 +282,9 @@ export const WithFinancial: Story = {
 
     // Materials has data (CM-510): summary, POs and the month-wise chart.
     const materials = within(canvas.getByRole("region", { name: "Materials" }));
-    await expect(await materials.findByText("₹48,75,000.00")).toBeVisible();
+    await expect(
+      (await materials.findByText("Purchase order value")).nextElementSibling,
+    ).toHaveTextContent("₹48,75,000");
     await expect(
       materials.getByText("Low stock").nextElementSibling,
     ).toHaveTextContent("4");
@@ -432,9 +437,12 @@ export const SiteWorkSections: Story = {
       canvas.getByRole("region", { name: "Equipment Usage" }),
     );
     await expect(await equipment.findByText("612.5 hrs")).toBeVisible();
-    await expect(equipment.getByText("1,840.25 km")).toBeVisible();
-    await expect(equipment.getByText("Hire cost (rented)")).toBeVisible();
-    await expect(equipment.getByText("₹7,42,500.00")).toBeVisible();
+    await expect(
+      equipment.getByText("Distance").nextElementSibling,
+    ).toHaveTextContent("1,840.25 km");
+    await expect(
+      equipment.getByText("Hire cost (rented)").nextElementSibling,
+    ).toHaveTextContent("₹7,42,500");
     const top = within(
       equipment.getByRole("figure", { name: "Top equipment by work hours" }),
     );

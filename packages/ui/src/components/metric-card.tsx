@@ -34,7 +34,7 @@ function figureLength(value: ReactNode, unit: string | undefined): number {
 /**
  * A dashboard figure: icon and label at the top, the value large with its
  * unit in grey, and a caption underneath. Given `render` (a link) or
- * `onClick` it shows an arrow and turns the primary colour on hover and
+ * `onClick` it shows an arrow in the top-right corner and turns the primary colour on hover and
  * focus; without either it is a plain card.
  */
 function MetricCard({
@@ -65,25 +65,28 @@ function MetricCard({
         aria-hidden="true"
         className="metric-lit:opacity-100 pointer-events-none absolute inset-0 -z-10 bg-linear-to-br from-white/20 via-white/0 to-black/10 opacity-0 transition-opacity duration-200 motion-reduce:transition-none"
       />
-      <span className="flex items-start justify-between gap-3">
-        <span className="flex min-w-0 flex-col gap-2.5">
-          {Icon == null ? null : (
-            <Icon
-              aria-hidden="true"
-              strokeWidth={1.5}
-              className="text-muted-foreground metric-lit:text-primary-foreground/85 size-5 shrink-0"
-            />
-          )}
-          <span className="text-sm leading-snug sm:text-base">{label}</span>
+      {interactive ? (
+        <span
+          aria-hidden="true"
+          className="bg-background text-foreground metric-lit:bg-white/15 metric-lit:text-primary-foreground absolute top-1 right-1 flex size-9 items-center justify-center rounded-[0.375rem] transition-colors duration-200 motion-reduce:transition-none sm:size-10"
+        >
+          <ArrowUpRight className="size-4" />
         </span>
-        {interactive ? (
-          <span
+      ) : null}
+      <span
+        className={cn(
+          "flex min-w-0 flex-col gap-2.5",
+          interactive && "pr-9 sm:pr-10",
+        )}
+      >
+        {Icon == null ? null : (
+          <Icon
             aria-hidden="true"
-            className="bg-background text-foreground metric-lit:bg-white/15 metric-lit:text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 motion-reduce:transition-none sm:size-9"
-          >
-            <ArrowUpRight className="size-4" />
-          </span>
-        ) : null}
+            strokeWidth={1.5}
+            className="text-muted-foreground metric-lit:text-primary-foreground/85 size-5 shrink-0"
+          />
+        )}
+        <span className="text-sm leading-snug sm:text-base">{label}</span>
       </span>
       <span className="mt-auto flex flex-wrap items-center gap-x-2.5 gap-y-1 pt-4 sm:pt-6">
         <span className="text-[length:clamp(1.375rem,calc((100cqi_-_3rem)/(var(--metric-chars)*0.56)),3.25rem)] leading-none font-normal tracking-tight break-words tabular-nums">
@@ -116,7 +119,7 @@ function MetricCard({
     props: mergeProps<"div">(
       {
         className: cn(
-          "bg-card text-card-foreground ring-foreground/[0.06] metric-lit:bg-primary metric-lit:text-primary-foreground metric-lit:ring-transparent focus-visible:ring-ring/50 relative isolate @container flex min-h-40 sm:min-h-48 min-w-0 flex-col overflow-hidden rounded-2xl p-4 text-left ring-1 outline-none transition-colors duration-200 focus-visible:ring-3 motion-reduce:transition-none sm:p-5",
+          "bg-card text-card-foreground ring-foreground/[0.06] metric-lit:bg-primary metric-lit:text-primary-foreground metric-lit:ring-transparent focus-visible:ring-ring/50 relative isolate @container flex min-h-40 sm:min-h-48 min-w-0 flex-col overflow-hidden rounded-[0.625rem] p-4 text-left ring-1 outline-none transition-colors duration-200 focus-visible:ring-3 motion-reduce:transition-none sm:p-5",
           interactive && "cursor-pointer",
           className,
         ),

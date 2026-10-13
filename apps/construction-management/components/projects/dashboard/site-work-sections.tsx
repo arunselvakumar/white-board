@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { formatPaise } from "@/components/money/money-input";
 import { equipmentModulePath } from "@/components/site-work/equipment/equipment-tabs";
 import { worksheetsPath } from "@/components/site-work/worksheets/worksheet-format";
 import type { Duration } from "@/lib/dashboard-duration";
@@ -23,7 +22,14 @@ import {
   type DailyWorkDashboard,
 } from "@/src/queries/site-work-dashboard";
 
-import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
+import {
+  Fact,
+  Rupees,
+  Section,
+  SectionSkeleton,
+  Unit,
+  denied,
+} from "./dashboard-parts";
 import {
   hoursLabel,
   OwnershipSplit,
@@ -207,7 +213,8 @@ export function EquipmentUsageSection({
               {hoursLabel(data.hours)}
             </Fact>
             <Fact label="Distance" icon={Route}>
-              {`${NUMBER.format(data.km)} km`}
+              {NUMBER.format(data.km)}
+              <Unit> km</Unit>
             </Fact>
             <Fact label="Trips">{data.trips}</Fact>
             <Fact label="Fuel overruns" icon={Fuel}>
@@ -215,7 +222,7 @@ export function EquipmentUsageSection({
             </Fact>
             {data.hireCost == null ? null : (
               <Fact label="Hire cost (rented)" icon={IndianRupee}>
-                {formatPaise(data.hireCost)}
+                <Rupees paise={data.hireCost} />
               </Fact>
             )}
           </dl>

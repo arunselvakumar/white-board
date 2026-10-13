@@ -20,7 +20,13 @@ import {
   type PaymentsDashboard,
 } from "@/src/queries/finance-dashboard";
 
-import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
+import {
+  Fact,
+  Rupees,
+  Section,
+  SectionSkeleton,
+  denied,
+} from "./dashboard-parts";
 
 const MONTH = new Intl.DateTimeFormat("en-IN", {
   month: "short",
@@ -385,16 +391,16 @@ export function PaymentsSection({
         <div className="space-y-5">
           <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4">
             <Fact label="Payment in" icon={ArrowDownLeft}>
-              {formatPaise(payments.totals.in)}
+              <Rupees paise={payments.totals.in} />
             </Fact>
             <Fact label="Payment out" icon={ArrowUpRight}>
-              {formatPaise(payments.totals.out)}
+              <Rupees paise={payments.totals.out} />
             </Fact>
             <Fact label="Net" icon={Scale}>
-              {formatPaise(payments.totals.net)}
+              <Rupees paise={payments.totals.net} />
             </Fact>
             <Fact label="Balance" icon={Wallet}>
-              {formatPaise(payments.months.at(-1)?.balance ?? 0)}
+              <Rupees paise={payments.months.at(-1)?.balance ?? 0} />
             </Fact>
           </dl>
           <PaymentFlowChart months={payments.months} />

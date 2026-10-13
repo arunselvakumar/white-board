@@ -29,6 +29,15 @@
   }
 }
 
+/*
+ * Whiteboard and Construction Management set Satoshi (ADR-0042) by putting
+ * this class on <html> and rendering <SatoshiStylesheet />. The Marketing
+ * Site still sets --font-sans to Urbanist through next/font.
+ */
+.typeface-satoshi {
+  --font-sans: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
   --background: #f6f7fb;
   --foreground: #16182a;
