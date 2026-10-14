@@ -1,0 +1,35 @@
+apps/construction-management/app/api/construction/tracking/tasks/import-sample/route.ts
+  s_8821256d95b7ff::t_0bdb0f98aaa4a7 1-66
+apps/construction-management/app/api/construction/tracking/tasks/import.http.test.ts
+  s_8821256d95b7ff::t_8894fed448e71b 1-348
+apps/construction-management/app/api/construction/tracking/tasks/import/route.ts
+  s_8821256d95b7ff::t_06570173058809 1-51
+apps/construction-management/app/api/construction/tracking/tasks/tasks.http.test.ts
+  s_8821256d95b7ff::t_81d3cadc547c85 70
+apps/construction-management/src/composition/task-tags.ts
+  s_8821256d95b7ff::t_673ee033109a75 1-24
+apps/construction-management/src/composition/tracking-tasks.ts
+  s_8821256d95b7ff::t_ab37b162ef9b46 4,10,29-38
+apps/construction-management/src/tracking/application/ports.ts
+  s_8821256d95b7ff::t_1e47b73576ce32 211-228
+apps/construction-management/src/tracking/application/task-import.ts
+  s_8821256d95b7ff::t_70f84b688478da 1-506
+apps/construction-management/src/tracking/infrastructure/task-workbook.ts
+  s_8821256d95b7ff::t_7a275f97129c2f 1-203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a4054e95077430fbe7d6202fbbbc7174a31078a4",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
