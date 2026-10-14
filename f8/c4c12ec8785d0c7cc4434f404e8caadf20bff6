@@ -1,0 +1,35 @@
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_8821256d95b7ff::t_947b4d7ade28c5 58-64,314-315,394-397,480-503
+apps/construction-management/components/projects/dashboard/tracking-charts.tsx
+  s_8821256d95b7ff::t_83a4e71293fd4f 1-229
+apps/construction-management/components/projects/dashboard/tracking-sections.tsx
+  s_8821256d95b7ff::t_50b75b156400d8 1-690
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_24bc7d338986f6 813-818,820
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_8821256d95b7ff::t_6dfcb302182382 12,17,21
+apps/construction-management/src/queries/tracking-dashboard.ts
+  s_8821256d95b7ff::t_a97ea18164b9bd 1-40
+apps/construction-management/src/tracking/application/tracking-dashboard.ts
+  s_8821256d95b7ff::t_8ea842799d031a 2
+apps/construction-management/src/tracking/domain/tracking-dashboard.test.ts
+  s_8821256d95b7ff::t_442d6a2c463e67 36-39
+apps/construction-management/src/tracking/domain/tracking-dashboard.ts
+  s_8821256d95b7ff::t_f82322a6ba21b7 25-28,143-147,189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f8c4c12ec8785d0c7cc4434f404e8caadf20bff6",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
