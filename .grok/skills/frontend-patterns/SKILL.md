@@ -33,7 +33,7 @@ bunx --bun shadcn@latest add <name> -c apps/whiteboard
 
 ## App shell
 
-Authenticated chrome is `AppShell`: `Sidebar` + `SidebarInset` from `@repo/ui`. Nav items live in `lib/app-nav.ts` (Dashboard, Students, Courses, Batches, Fees). Wire each item with `SidebarMenuButton` and `render={<Link href={item.href} />}`. Do not use a native `<a>` or `<button>` for that nav.
+Authenticated chrome is `AppShell`: `Sidebar` + `SidebarInset` from `@repo/ui`. AppShell renders the page's only `<main id="main-content">` and a Skip to content link; a screen's outer element is a `<div>`, never `<main>` (ADR-0044). Nav items live in `lib/app-nav.ts` (Dashboard, Students, Courses, Batches, Fees). Wire each item with `SidebarMenuButton` and `render={<Link href={item.href} />}`. Do not use a native `<a>` or `<button>` for that nav.
 
 The shell stays mounted while a page loads. Put `QuerySuspense` around `{children}` in the in-app layout, not around the sidebar.
 
