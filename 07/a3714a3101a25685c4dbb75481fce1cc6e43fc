@@ -1,0 +1,25 @@
+apps/construction-management/app/api/construction/tracking/inspections/inspection-models.ts
+  s_8821256d95b7ff::t_109fa1335dadd3 7-8,23,121-130,326-327,453-460
+apps/construction-management/app/api/construction/tracking/inspections/inspections.http.test.ts
+  s_8821256d95b7ff::t_c9e31a3bc95350 16,19-20,794-809,811,816-818,822-827,838,845,856-860
+apps/construction-management/src/composition/tracking-inspections.ts
+  s_8821256d95b7ff::t_8afe35dc66ff06 4,10-14,36-63
+apps/construction-management/src/tracking/application/inspection-handlers.ts
+  s_8821256d95b7ff::t_4d3386aa10d130 15,27-31,264-267,271-302,358-359,762-770,774-786,975-977,982,994-995,1010-1016,1023,1039,1056-1062,1069-1073,1076,1078,1211-1220,1224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "07a3714a3101a25685c4dbb75481fce1cc6e43fc",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
