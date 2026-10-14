@@ -1,0 +1,29 @@
+apps/construction-management/app/api/construction/tracking/issues/handlers.ts
+  s_8821256d95b7ff::t_fb3641d1deb22e 6,32
+apps/construction-management/app/api/construction/tracking/issues/issue-models.ts
+  s_8821256d95b7ff::t_1e606232b57a3c 7-9,99,101-105,254-255,351-353
+apps/construction-management/app/api/construction/tracking/issues/issues.http.test.ts
+  s_8821256d95b7ff::t_394612cb09719c 16-17,77-82,677-683,686,691-700,704-710,713-716,723-732,734-738,752-755,821,827-831,870
+apps/construction-management/src/tracking/application/issue-handlers.ts
+  s_8821256d95b7ff::t_bb8db4d73e13d4 24-28,257-289,311-313,315,367-370,951-959,967-970,975,979-980,996-1002,1009,1025,1028,1038-1044,1054,1056-1057,1070-1075,1079-1084,1089-1090
+apps/construction-management/src/tracking/domain/issue.ts
+  s_8821256d95b7ff::t_aea0e8870d9fb1 137
+apps/construction-management/src/tracking/infrastructure/issue-store.ts
+  s_8821256d95b7ff::t_a17c20e6df79a7 19-23,421-462
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "acf75b36290475f80f1f21c038a27fe4a014dfa4",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
