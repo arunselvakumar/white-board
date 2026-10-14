@@ -121,6 +121,7 @@ export function ForgotPasswordForm() {
               id="email"
               type="email"
               autoComplete="email"
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- Resetting the password is this page's only task, so focus starts in its first field.
               autoFocus
               placeholder="Enter your email"
               className="h-10"
@@ -163,6 +164,7 @@ export function ForgotPasswordForm() {
               id="code"
               inputMode="numeric"
               autoComplete="one-time-code"
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.
               autoFocus
               placeholder="123456"
               className="h-10 tracking-[0.3em] placeholder:tracking-normal"

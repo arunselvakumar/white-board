@@ -381,6 +381,7 @@ export function InventoryPage({
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
+            // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
             render={<a href={inventorySampleUrl(location)} download />}
           >
             <FileSpreadsheet aria-hidden="true" />
@@ -389,6 +390,7 @@ export function InventoryPage({
           {canExport && (
             <DropdownMenuItem
               render={
+                // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
                 <a
                   href={inventoryExportUrl(location, exportFilters)}
                   download

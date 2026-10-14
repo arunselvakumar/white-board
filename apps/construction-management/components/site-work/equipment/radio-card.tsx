@@ -30,6 +30,7 @@ export function RadioCard({
   const titleId = `${id}-title`;
   const hintId = `${id}-hint`;
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- Widens the click target; keyboard users operate the radio inside.
     <label
       data-disabled={disabled ? "" : undefined}
       className={cn(

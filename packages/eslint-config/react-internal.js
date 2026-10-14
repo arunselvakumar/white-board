@@ -1,6 +1,7 @@
 import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
+import { a11yConfig } from "./a11y.js";
 import { config as baseConfig } from "./base.js";
 
 /**
@@ -33,4 +34,5 @@ export const config = [
     },
   },
   pluginReactHooks.configs.flat.recommended,
+  a11yConfig,
 ];

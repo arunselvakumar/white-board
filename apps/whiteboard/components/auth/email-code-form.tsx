@@ -63,6 +63,7 @@ export function EmailCodeForm({
           id="code"
           inputMode="numeric"
           autoComplete="one-time-code"
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.
           autoFocus
           placeholder="123456"
           className="h-10 tracking-[0.3em] placeholder:tracking-normal"

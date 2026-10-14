@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
+import { FieldTitle } from "@repo/ui/components/field";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -336,8 +337,14 @@ export function TeacherForm({
               "tel",
             )}
           </div>
-          <div className="space-y-3">
-            <Label>Teacher photo</Label>
+          <div
+            role="group"
+            aria-labelledby="teacher-photo"
+            className="space-y-3"
+          >
+            <FieldTitle id="teacher-photo" className="leading-none">
+              Teacher photo
+            </FieldTitle>
             <div className="bg-muted/40 flex h-36 items-center justify-center rounded-xl border border-dashed">
               <TeacherAvatar
                 name={teacher?.name ?? "Teacher"}

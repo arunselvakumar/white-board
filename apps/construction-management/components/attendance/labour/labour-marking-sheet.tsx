@@ -113,12 +113,14 @@ function overtimeTotal(draft: LabourRowDraft): string | null {
 }
 
 function SimpleSelect({
+  id,
   label,
   value,
   items,
   onChange,
   className,
 }: {
+  id?: string;
   label: string;
   value: string;
   items: { value: string; label: string }[];
@@ -134,6 +136,7 @@ function SimpleSelect({
       }}
     >
       <SelectTrigger
+        id={id}
         aria-label={label}
         className={cn("h-11 w-full", className)}
       >
@@ -210,8 +213,14 @@ function OvertimeLines({
             </p>
           ) : null}
           <div className="col-span-2 space-y-1 sm:col-span-1">
-            <Label className="text-xs">Labour Category</Label>
+            <Label
+              htmlFor={`ot-${row.labourId}-${String(line)}-category`}
+              className="text-xs"
+            >
+              Labour Category
+            </Label>
             <SimpleSelect
+              id={`ot-${row.labourId}-${String(line)}-category`}
               label={`${row.name} overtime ${String(line + 1)} category`}
               value={categoryValue(lines[line]?.labourCategoryId)}
               items={categories}
@@ -254,9 +263,19 @@ function OvertimeLines({
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Rate / hour</Label>
+            <Label
+              htmlFor={
+                financial
+                  ? `ot-${row.labourId}-${String(line)}-rate`
+                  : undefined
+              }
+              className="text-xs"
+            >
+              Rate / hour
+            </Label>
             {financial ? (
               <MoneyInput
+                id={`ot-${row.labourId}-${String(line)}-rate`}
                 aria-label={`${row.name} overtime ${String(line + 1)} rate`}
                 className="h-11"
                 value={lines[line]?.rate ?? ""}

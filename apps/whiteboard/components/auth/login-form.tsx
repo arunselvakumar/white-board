@@ -125,6 +125,7 @@ export function LoginForm({
           <Input
             id="identifier"
             autoComplete="username"
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
             autoFocus
             placeholder="Enter your email or username"
             className="h-10"

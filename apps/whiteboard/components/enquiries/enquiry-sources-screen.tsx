@@ -339,6 +339,7 @@ function RenameSourceForm({
           id={inputId}
           className="h-9 sm:max-w-sm"
           maxLength={80}
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- The field opens when the user chooses Rename, so focus goes into it.
           autoFocus
           aria-invalid={errors.name != null}
           {...register("name")}

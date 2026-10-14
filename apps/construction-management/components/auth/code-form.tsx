@@ -119,6 +119,7 @@ export function SixDigitCodeInput({
       maxLength={6}
       inputMode="numeric"
       autoComplete="one-time-code"
+      // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.
       autoFocus
       aria-label="6-digit code"
       value={value}
