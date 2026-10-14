@@ -1,0 +1,83 @@
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_a1d1afb4441a53::t_d419f4ca5a6d6b 8,51,154-156
+apps/construction-management/components/auth/public-shell.tsx
+  s_a1d1afb4441a53::t_204a4d23e7c079 77,79
+apps/whiteboard/components/absence-notices/staff/absence-notices-screen.tsx
+  s_a1d1afb4441a53::t_bdafc28656252a 77,94
+apps/whiteboard/components/app-shell/app-shell.stories.tsx
+  s_a1d1afb4441a53::t_1593ed7a6cb2fd 99,144
+apps/whiteboard/components/app-shell/app-shell.tsx
+  s_a1d1afb4441a53::t_9d432ca05228d5 10,49,139-141
+apps/whiteboard/components/attendance/attendance-screens.tsx
+  s_a1d1afb4441a53::t_e7a5c43ea14c5e 54,118,157,286
+apps/whiteboard/components/auth/public-shell.tsx
+  s_a1d1afb4441a53::t_179cd1f6ae46a4 10,14
+apps/whiteboard/components/calendar/calendar-view.tsx
+  s_a1d1afb4441a53::t_0a165defa3da2d 586,764
+apps/whiteboard/components/class-tests/family/family-results-screen.tsx
+  s_a1d1afb4441a53::t_22f8433ab3064e 129,160
+apps/whiteboard/components/class-tests/history/student-test-history-screen.tsx
+  s_a1d1afb4441a53::t_72c8bc441cc015 36,55
+apps/whiteboard/components/class-tests/staff/batch-tests-screen.tsx
+  s_a1d1afb4441a53::t_e998b77a75ed8e 61,117
+apps/whiteboard/components/class-tests/staff/test-detail-screen.tsx
+  s_a1d1afb4441a53::t_ec42246c609d6a 95,222
+apps/whiteboard/components/class-work/family/family-homework-screen.tsx
+  s_a1d1afb4441a53::t_cffb1256976c4e 202,238
+apps/whiteboard/components/class-work/family/homework-detail-screen.tsx
+  s_a1d1afb4441a53::t_149ca1b4ad7292 425,441,474,548
+apps/whiteboard/components/class-work/staff/batch-class-work-screen.tsx
+  s_a1d1afb4441a53::t_58d51b1be65fc0 129,322
+apps/whiteboard/components/class-work/staff/homework-submissions-screen.tsx
+  s_a1d1afb4441a53::t_bce099a7e1e905 64,171
+apps/whiteboard/components/classes/class-prejoin-screen.tsx
+  s_a1d1afb4441a53::t_677b2eccfe0ca7 89,251
+apps/whiteboard/components/enquiries/enquiries-screen.tsx
+  s_a1d1afb4441a53::t_96bfbf08113f18 114,215
+apps/whiteboard/components/enquiries/enquiry-create-screen.tsx
+  s_a1d1afb4441a53::t_267139db3cb44c 31,42
+apps/whiteboard/components/enquiries/enquiry-detail-screen.tsx
+  s_a1d1afb4441a53::t_11434418db8078 277,472
+apps/whiteboard/components/enquiries/enquiry-edit-screen.tsx
+  s_a1d1afb4441a53::t_f1ef6d4071a7c9 33,46
+apps/whiteboard/components/home/family-home.tsx
+  s_a1d1afb4441a53::t_bafd2e8db10749 338,388
+apps/whiteboard/components/notifications/notifications-screen.tsx
+  s_a1d1afb4441a53::t_3a31c13d003dab 69,157
+apps/whiteboard/components/notifications/notifications.stories.tsx
+  s_a1d1afb4441a53::t_40e686429d328b 69
+apps/whiteboard/components/onboarding/onboarding-shell.tsx
+  s_a1d1afb4441a53::t_d828a91af59e8b 11,15
+apps/whiteboard/components/online-classes/online-classes-view.tsx
+  s_a1d1afb4441a53::t_084746a61276d8 46,59,64,151
+apps/whiteboard/components/students/student-create-screen.tsx
+  s_a1d1afb4441a53::t_7fa5ee12fd7bbb 64,101,206,216,282,308
+apps/whiteboard/components/teachers/my-batches-screen.tsx
+  s_a1d1afb4441a53::t_9e72235bd44338 14,17,23,47,99
+apps/whiteboard/components/teachers/teacher-create-screen.tsx
+  s_a1d1afb4441a53::t_072bf82aa0514e 49,107
+apps/whiteboard/components/teachers/teacher-detail-screen.tsx
+  s_a1d1afb4441a53::t_193867639bea88 105,310
+apps/whiteboard/components/teachers/teachers-screen.tsx
+  s_a1d1afb4441a53::t_f5abb4c144b204 22,97
+packages/ui/src/components/sidebar.tsx
+  s_a1d1afb4441a53::t_f596c3bfff4160 311-313,315
+packages/ui/src/components/skip-link.tsx
+  s_a1d1afb4441a53::t_5a905adcbf66de 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "88a6ca5766005e1b817e674433c1070a1912f6dd",
+  "prompts": {},
+  "sessions": {
+    "s_a1d1afb4441a53": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "184c3213-8bce-41d2-8610-f53ce1adbf27",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
