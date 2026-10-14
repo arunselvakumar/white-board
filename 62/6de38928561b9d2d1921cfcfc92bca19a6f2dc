@@ -1,0 +1,37 @@
+apps/construction-management/src/tracking/application/issue-handlers.ts
+  s_8821256d95b7ff::t_657091a77ad7d5 1-1201
+apps/construction-management/src/tracking/domain/events.ts
+  s_8821256d95b7ff::t_ff2f9e750c0bb0 1-47
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.ts
+  s_8821256d95b7ff::t_c826495721c7ec 1-71
+apps/construction-management/src/tracking/infrastructure/issue-store.ts
+  s_8821256d95b7ff::t_bac655f6e947ec 1-396
+apps/construction-management/src/tracking/domain/issue.test.ts
+  s_64cdca525fc6d6::t_67c38e7cd9e4c9 1-200
+apps/construction-management/src/tracking/domain/issue.ts
+  s_64cdca525fc6d6::t_be1d3374435bf2 1-287
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "626de38928561b9d2d1921cfcfc92bca19a6f2dc",
+  "prompts": {},
+  "sessions": {
+    "s_64cdca525fc6d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a66057f10dea39046",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
