@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/site-work/worksheets/handlers.ts
+  s_8821256d95b7ff::t_52c3057f879b3c 12,52
+apps/construction-management/app/api/construction/site-work/worksheets/task-options/route.ts
+  s_8821256d95b7ff::t_11cdac0f91fb36 1-48
+apps/construction-management/app/api/construction/site-work/worksheets/worksheet-models.ts
+  s_8821256d95b7ff::t_9f2c92330486f1 99-104,217-263,277-278,428
+apps/construction-management/app/api/construction/site-work/worksheets/worksheet-tasks.http.test.ts
+  s_8821256d95b7ff::t_572dbc91762292 1-417
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets-openapi.ts
+  s_8821256d95b7ff::t_d1c654e7f50a21 28-30,57-58,120-130
+apps/construction-management/components/site-work/worksheets/worksheet-fixtures.ts
+  s_8821256d95b7ff::t_9411da0dd4b4fa 148
+apps/construction-management/components/tracking/tasks/task-detail.tsx
+  s_8821256d95b7ff::t_69a5e1ebca2c01 148-152
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_3c2368a7be5b6c 820
+apps/construction-management/src/composition/task-progress-posting.ts
+  s_8821256d95b7ff::t_5b71855ad0af88 1-90
+apps/construction-management/src/site-work/application/ports.ts
+  s_8821256d95b7ff::t_7cd31bcf8b7849 382-445
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_8821256d95b7ff::t_b618156771e76d 35-40,62,95-96,113,200-201,224-228,239-248,250,310,500-571,652-657,678-682,703-708,766-771,782-786,795-806,846-851,973-975,1021,1042-1046,1052-1070,1211-1225
+apps/construction-management/src/site-work/domain/worksheet-task.test.ts
+  s_8821256d95b7ff::t_f0b3e86b5b4bdb 1-85
+apps/construction-management/src/site-work/domain/worksheet-task.ts
+  s_8821256d95b7ff::t_647ece635b996a 1-79
+apps/construction-management/src/site-work/infrastructure/prisma-worksheet-store.ts
+  s_8821256d95b7ff::t_aa15c5e92aa705 52,98
+apps/construction-management/src/tracking/application/task-store.ts
+  s_8821256d95b7ff::t_f261dae1029931 273-274,279-283
+apps/construction-management/src/tracking/application/task-worksheet-progress.ts
+  s_8821256d95b7ff::t_b408bee43c2641 1-145
+apps/construction-management/src/tracking/infrastructure/prisma-task-store.ts
+  s_8821256d95b7ff::t_10b89a478094d8 484-486,495-501
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6cb0351080824515a85e4cda9a0b93958909c4fb",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
