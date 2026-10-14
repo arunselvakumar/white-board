@@ -1,0 +1,49 @@
+apps/construction-management/app/api/construction/projects/projects/contract-details.http.test.ts
+  s_8821256d95b7ff::t_2359924a60975b 148
+apps/construction-management/app/api/construction/projects/projects/list-projects-models.ts
+  s_8821256d95b7ff::t_9beb0a40738b41 22-34
+apps/construction-management/app/api/construction/projects/projects/route.ts
+  s_8821256d95b7ff::t_af082ae1eecc14 6,22-24,29,46-49,54
+apps/construction-management/components/projects/project-fixtures.ts
+  s_8821256d95b7ff::t_6cfb4a3d09d910 131-145,148-149,155,160-164
+apps/construction-management/components/projects/project-overview.stories.tsx
+  s_8821256d95b7ff::t_d1fe94804838f6 7-13,21-28,69-93
+apps/construction-management/components/projects/project-overview.tsx
+  s_8821256d95b7ff::t_24efa43d338808 3,26,173-174,178-180,218-222
+apps/construction-management/components/projects/project-progress.tsx
+  s_8821256d95b7ff::t_bbde628dfb3fc3 1-56
+apps/construction-management/components/projects/projects-home.stories.tsx
+  s_8821256d95b7ff::t_34e709abac9fcd 77-99
+apps/construction-management/components/projects/projects-home.tsx
+  s_8821256d95b7ff::t_8ddb7651f505e6 48,227-240,353
+apps/construction-management/src/composition/project-progress.ts
+  s_8821256d95b7ff::t_cdbccdff98c55b 1-72
+apps/construction-management/src/projects/application/project-progress.ts
+  s_8821256d95b7ff::t_8cdf96971a1b08 1-25
+apps/construction-management/app/api/construction/projects/projects/project-progress.http.test.ts
+  s_e2bb6c9b599f9f::t_c77a06aa33a969 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3536f73a14351c50b310e067a21967d563f4b803",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_e2bb6c9b599f9f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2046a041a1c3ced4",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
