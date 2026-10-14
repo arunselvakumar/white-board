@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@repo/ui/components/button";
+import { SkipLink } from "@repo/ui/components/skip-link";
 import { cn } from "@repo/ui/lib/utils";
 import {
   WHITEBOARD_SIGN_IN_URL,
@@ -41,12 +42,7 @@ export function SiteHeader() {
           : "border-transparent bg-transparent",
       )}
     >
-      <a
-        href="#main"
-        className="bg-primary text-primary-foreground focus-visible:ring-ring/50 sr-only rounded-md px-4 py-2 text-sm font-semibold focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-[60] focus-visible:ring-3 focus-visible:outline-none"
-      >
-        Skip to content
-      </a>
+      <SkipLink href="#main" />
       <div className="container-site flex h-16 items-center gap-6">
         <a
           href="#main"
@@ -94,6 +90,7 @@ export function SiteHeader() {
             Sign in
           </a>
           <Button
+            // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
             render={<a href={WHITEBOARD_SIGN_UP_URL} />}
             nativeButton={false}
             size="lg"

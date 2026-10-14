@@ -155,6 +155,7 @@ export function CreateWorkspaceForm({
           <Input
             id="name"
             autoComplete="organization"
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- Naming the Workspace is this page's only task.
             autoFocus
             placeholder="e.g. Apex Training Institute"
             className="h-10"

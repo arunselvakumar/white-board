@@ -61,7 +61,7 @@ export function HomeworkSubmissionsContent({
   const setAfter = setAfterPhrase(homework.classDate, today);
 
   return (
-    <main className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader
           back={{ label: "Homework and Study Material", href: basePath }}
@@ -168,7 +168,7 @@ export function HomeworkSubmissionsContent({
         batchId={view.batch.id}
         homeworkId={homework.id}
       />
-    </main>
+    </div>
   );
 }
 

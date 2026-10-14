@@ -66,7 +66,7 @@ function mockNotifications(
 }
 
 function Placeholder() {
-  return <main className="p-6">My Batches</main>;
+  return <div className="p-6">My Batches</div>;
 }
 
 const meta = {

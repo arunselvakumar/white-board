@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
+import { FieldTitle } from "@repo/ui/components/field";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -353,8 +354,10 @@ export function BatchForm({
           </div>
         )}
       </div>
-      <div className="space-y-3">
-        <Label>Timings</Label>
+      <div role="group" aria-labelledby="batch-timings" className="space-y-3">
+        <FieldTitle id="batch-timings" className="leading-none">
+          Timings
+        </FieldTitle>
         {timings.fields.map((field, index) => (
           <div key={field.id} className="space-y-3 rounded-lg border p-3">
             <fieldset className="space-y-2">

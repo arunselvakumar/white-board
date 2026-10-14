@@ -199,7 +199,7 @@ export function FamilyHomework({
   now?: Date;
 }) {
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-3xl space-y-6">
         <h1 className="text-2xl tracking-tight">Homework</h1>
         {classWork.students.length === 0 ? (
@@ -235,7 +235,7 @@ export function FamilyHomework({
           ))
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

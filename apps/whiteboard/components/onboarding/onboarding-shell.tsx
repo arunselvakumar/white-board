@@ -8,11 +8,11 @@ import { PageTransition } from "@/components/page-transition";
 export function OnboardingShell({ children }: { children: ReactNode }) {
   return (
     <div className="bg-background flex min-h-svh flex-col">
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-[352px]">
           <PageTransition className="space-y-8">{children}</PageTransition>
         </div>
-      </div>
+      </main>
       <div className="flex justify-center pb-8">
         <SignOutButton />
       </div>

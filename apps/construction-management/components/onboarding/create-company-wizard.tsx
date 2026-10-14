@@ -231,6 +231,7 @@ export function CreateCompanyWizard() {
             <Label htmlFor="company-name">Company name</Label>
             <Input
               id="company-name"
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- The Company name is the only question on this step.
               autoFocus
               placeholder="Anugraha Engineers"
               className="h-10"

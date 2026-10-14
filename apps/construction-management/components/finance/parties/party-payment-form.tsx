@@ -842,6 +842,7 @@ function TdsBlock({
           <dd className="font-semibold tabular-nums">{money(paid)}</dd>
         </div>
       </dl>
+      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- The Checkbox is nested through Controller's render prop. */}
       <Label className="flex items-center gap-2 font-normal">
         <Controller
           name="tdsOverride"

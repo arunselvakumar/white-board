@@ -295,6 +295,7 @@ function InvitationSignIn({
           <PasswordField
             id="invite-password"
             autoComplete="current-password"
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
             autoFocus
             {...form.register("password")}
           />
@@ -359,6 +360,7 @@ function InvitationSignUp({
         <Input
           id="invite-username"
           autoComplete="username"
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- Creating the account is this page's only task, so focus starts in its first field.
           autoFocus
           className="h-10"
           {...form.register("username")}

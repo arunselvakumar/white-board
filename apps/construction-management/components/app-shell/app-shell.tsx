@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
+import { SkipLink } from "@repo/ui/components/skip-link";
 import {
   Sidebar,
   SidebarContent,
@@ -47,6 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
+      <SkipLink />
       <CloseMobileSidebarOnNavigate pathname={pathname} />
       <Sidebar variant="sidebar" collapsible="offcanvas">
         <SidebarHeader className="px-4 pt-6 pb-2">
@@ -149,7 +151,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <PlanBanner />
-        {children}
+        {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-w-0 flex-1 flex-col outline-none"
+        >
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

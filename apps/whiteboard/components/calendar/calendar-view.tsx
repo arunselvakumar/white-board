@@ -583,7 +583,7 @@ export function CalendarView({
   };
 
   return (
-    <main className="w-full space-y-6 p-4 sm:p-6">
+    <div className="w-full space-y-6 p-4 sm:p-6">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#172554] via-[#3730a3] to-[#0f766e] px-6 py-7 text-white shadow-lg sm:px-8">
         <div className="pointer-events-none absolute -top-14 -right-8 size-56 rounded-full border border-white/20" />
         <div className="pointer-events-none absolute top-10 right-20 size-28 rounded-full bg-white/10 blur-2xl" />
@@ -761,6 +761,6 @@ export function CalendarView({
           actions={holidayActions}
         />
       )}
-    </main>
+    </div>
   );
 }

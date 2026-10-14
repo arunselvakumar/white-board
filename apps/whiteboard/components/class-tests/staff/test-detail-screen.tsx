@@ -92,7 +92,7 @@ export function TestDetailContent({
   });
 
   return (
-    <main className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader
           back={{ label: "Tests", href: testsPath }}
@@ -219,6 +219,6 @@ export function TestDetailContent({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </div>
   );
 }

@@ -422,7 +422,7 @@ function YourWorkCard({
 
 function NotAvailable({ role }: { role: FamilyHomeRole }) {
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-3xl">
         <Empty className="border">
           <EmptyHeader>
@@ -438,7 +438,7 @@ function NotAvailable({ role }: { role: FamilyHomeRole }) {
           </EmptyContent>
         </Empty>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -471,7 +471,7 @@ export function HomeworkDetail({
   const dueToday = homework.status === "due" && homework.dueOn === today;
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-3xl space-y-6">
         <Link
           href={homeworkPagePath(role)}
@@ -545,7 +545,7 @@ export function HomeworkDetail({
           role={role}
         />
       </div>
-    </main>
+    </div>
   );
 }
 

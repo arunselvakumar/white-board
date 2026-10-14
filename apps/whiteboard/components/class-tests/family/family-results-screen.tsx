@@ -126,7 +126,7 @@ export function FamilyResults({
   role: FamilyHomeRole;
 }) {
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-3xl space-y-6">
         <h1 className="text-2xl tracking-tight">Results</h1>
         {results.students.length === 0 ? (
@@ -157,7 +157,7 @@ export function FamilyResults({
           ))
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -495,6 +495,7 @@ function ExportMenu({
       <DropdownMenuContent align="end" className="w-64">
         {report ? (
           <DropdownMenuItem
+            // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
             render={<a href={teamSalaryReportUrl(month)} download />}
           >
             Team salary (Excel)
@@ -512,6 +513,7 @@ function ExportMenu({
               approved ? (
                 <DropdownMenuItem
                   key={file.label}
+                  // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
                   render={<a href={file.href} download />}
                 >
                   {file.label}

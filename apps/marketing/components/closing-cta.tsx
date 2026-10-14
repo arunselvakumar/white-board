@@ -21,6 +21,7 @@ export function ClosingCta() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Button
+              // eslint-disable-next-line jsx-a11y/anchor-has-content -- Base UI render prop: the parent's children become the link text.
               render={<a href={WHITEBOARD_SIGN_UP_URL} />}
               nativeButton={false}
               variant="secondary"

@@ -135,6 +135,7 @@ export function MobileOtpFlow({
         <Label htmlFor="mobile">Mobile number</Label>
         <MobileField
           id="mobile"
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
           autoFocus={mode === "sign-in"}
           {...form.register("mobile")}
         />

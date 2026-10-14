@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
+import { FieldTitle } from "@repo/ui/components/field";
 import { Label } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
@@ -229,7 +230,7 @@ function MarkPaidForm({
       }}
     >
       <div className="space-y-1.5">
-        <Label>Paid by</Label>
+        <FieldTitle className="leading-none">Paid by</FieldTitle>
         <Controller
           name="mode"
           control={form.control}
@@ -512,7 +513,7 @@ function AdvanceForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label>Paid by</Label>
+        <FieldTitle className="leading-none">Paid by</FieldTitle>
         <Controller
           name="mode"
           control={form.control}

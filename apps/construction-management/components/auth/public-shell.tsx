@@ -74,9 +74,9 @@ export function PublicShell({
   return (
     <div className="bg-background flex min-h-svh">
       <AuthBrandPanel photo={photo} />
-      <div className="flex min-h-svh w-full shrink-0 flex-col items-center justify-center overflow-y-auto px-8 py-12 lg:w-[min(46%,560px)]">
+      <main className="flex min-h-svh w-full shrink-0 flex-col items-center justify-center overflow-y-auto px-8 py-12 lg:w-[min(46%,560px)]">
         <div className="w-full max-w-[352px] space-y-8">{children}</div>
-      </div>
+      </main>
     </div>
   );
 }

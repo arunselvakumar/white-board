@@ -86,7 +86,7 @@ export function ClassPrejoinScreen({
           : "This class is cancelled";
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="mx-auto w-full max-w-4xl space-y-6">
         <Link
           href="/calendar"
@@ -248,6 +248,6 @@ export function ClassPrejoinScreen({
             </div>
           )}
       </div>
-    </main>
+    </div>
   );
 }

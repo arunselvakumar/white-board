@@ -28,7 +28,7 @@ export function EnquiryCreateScreen() {
   });
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <EnquiryForm
         options={options}
         back={{ href: "/enquiries", label: "Enquiries" }}
@@ -39,6 +39,6 @@ export function EnquiryCreateScreen() {
           await create.mutateAsync(input);
         }}
       />
-    </main>
+    </div>
   );
 }

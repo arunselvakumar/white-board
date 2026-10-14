@@ -30,7 +30,7 @@ export function EnquiryEditScreen({ enquiryId }: { enquiryId: string }) {
   });
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <EnquiryForm
         key={enquiry.updatedAt}
         options={options}
@@ -43,6 +43,6 @@ export function EnquiryEditScreen({ enquiryId }: { enquiryId: string }) {
           await update.mutateAsync(input);
         }}
       />
-    </main>
+    </div>
   );
 }
