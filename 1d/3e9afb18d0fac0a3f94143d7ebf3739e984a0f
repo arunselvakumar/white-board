@@ -1,0 +1,21 @@
+apps/construction-management/components/tracking/tasks/task-gantt.stories.tsx
+  s_8821256d95b7ff::t_83a38d90c204ca 2,119-139
+apps/construction-management/components/tracking/tasks/task-gantt.tsx
+  s_8821256d95b7ff::t_8709a4ea8b7045 7-14,200-212,253-255,259,311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1d3e9afb18d0fac0a3f94143d7ebf3739e984a0f",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
