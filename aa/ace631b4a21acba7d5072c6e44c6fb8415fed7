@@ -1,0 +1,21 @@
+.grok/skills/frontend-patterns/SKILL.md
+  s_a1d1afb4441a53::t_90e9f989337fd8 36
+docs/adr/0044-one-main-landmark-and-jsx-a11y.md
+  s_a1d1afb4441a53::t_56b73d58c1e0e4 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aaace631b4a21acba7d5072c6e44c6fb8415fed7",
+  "prompts": {},
+  "sessions": {
+    "s_a1d1afb4441a53": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "184c3213-8bce-41d2-8610-f53ce1adbf27",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
