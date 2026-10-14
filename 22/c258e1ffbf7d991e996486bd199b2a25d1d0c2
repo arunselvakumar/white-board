@@ -1,0 +1,179 @@
+apps/construction-management/app/api/construction/tracking/inspections/[id]/approve/route.ts
+  s_8821256d95b7ff::t_ab8332d80b427a 1-51
+apps/construction-management/app/api/construction/tracking/inspections/[id]/delete/route.ts
+  s_8821256d95b7ff::t_f212a99de13bd3 1-46
+apps/construction-management/app/api/construction/tracking/inspections/[id]/observations/[observationId]/delete/route.ts
+  s_8821256d95b7ff::t_a8509e4464794d 1-38
+apps/construction-management/app/api/construction/tracking/inspections/[id]/observations/route.ts
+  s_8821256d95b7ff::t_a21a5766cadaae 1-82
+apps/construction-management/app/api/construction/tracking/inspections/[id]/reinspection/route.ts
+  s_8821256d95b7ff::t_fc43bf90be2176 1-38
+apps/construction-management/app/api/construction/tracking/inspections/[id]/reject/route.ts
+  s_8821256d95b7ff::t_e9dfeed6905be4 1-53
+apps/construction-management/app/api/construction/tracking/inspections/[id]/remarks/route.ts
+  s_8821256d95b7ff::t_d0e18cc850c39e 1-69
+apps/construction-management/app/api/construction/tracking/inspections/[id]/route.ts
+  s_8821256d95b7ff::t_6d7a588152f7ec 1-27
+apps/construction-management/app/api/construction/tracking/inspections/[id]/update/route.ts
+  s_8821256d95b7ff::t_4a498d61d4ea43 1-46
+apps/construction-management/app/api/construction/tracking/inspections/bulk-approve/route.ts
+  s_8821256d95b7ff::t_9ae966d69ef670 1-43
+apps/construction-management/app/api/construction/tracking/inspections/bulk-reject/route.ts
+  s_8821256d95b7ff::t_bdd35c52cec666 1-44
+apps/construction-management/app/api/construction/tracking/inspections/form-options/route.ts
+  s_8821256d95b7ff::t_cf899752cea548 1-35
+apps/construction-management/app/api/construction/tracking/inspections/handlers.ts
+  s_8821256d95b7ff::t_b07459c8204b62 1-53
+apps/construction-management/app/api/construction/tracking/inspections/inspection-models.ts
+  s_8821256d95b7ff::t_9b1f87f9a5602e 1-474
+apps/construction-management/app/api/construction/tracking/inspections/inspections-openapi.ts
+  s_8821256d95b7ff::t_fb87c2c412e962 1-2,8-73,75-263
+apps/construction-management/app/api/construction/tracking/inspections/inspections.http.test.ts
+  s_8821256d95b7ff::t_2f600c2836adca 1-1017
+apps/construction-management/app/api/construction/tracking/inspections/route.ts
+  s_8821256d95b7ff::t_76328a8840ccc4 1-108
+apps/construction-management/app/api/construction/tracking/issues/[id]/delete/route.ts
+  s_8821256d95b7ff::t_4450dbcf276de0 1-43
+apps/construction-management/app/api/construction/tracking/issues/[id]/progress/[updateId]/delete/route.ts
+  s_8821256d95b7ff::t_45945f2cbe0da7 1-36
+apps/construction-management/app/api/construction/tracking/issues/[id]/progress/route.ts
+  s_8821256d95b7ff::t_dd787a2130c12e 1-69
+apps/construction-management/app/api/construction/tracking/issues/[id]/reopen/route.ts
+  s_8821256d95b7ff::t_80093b188b9d0a 1-43
+apps/construction-management/app/api/construction/tracking/issues/[id]/route.ts
+  s_8821256d95b7ff::t_867fdc61483a93 1-34
+apps/construction-management/app/api/construction/tracking/issues/[id]/solve/route.ts
+  s_8821256d95b7ff::t_9d999b76332e12 1-36
+apps/construction-management/app/api/construction/tracking/issues/[id]/update/route.ts
+  s_8821256d95b7ff::t_77c08327f38774 1-48
+apps/construction-management/app/api/construction/tracking/issues/[id]/verify/route.ts
+  s_8821256d95b7ff::t_955d015e135d09 1-35
+apps/construction-management/app/api/construction/tracking/issues/bulk-solve/route.ts
+  s_8821256d95b7ff::t_245d2a0abb7d80 1-40
+apps/construction-management/app/api/construction/tracking/issues/bulk-verify/route.ts
+  s_8821256d95b7ff::t_a76ede55b8d0b0 1-40
+apps/construction-management/app/api/construction/tracking/issues/form-options/route.ts
+  s_8821256d95b7ff::t_6fb3663bff0722 1-41
+apps/construction-management/app/api/construction/tracking/issues/handlers.ts
+  s_8821256d95b7ff::t_9543f3e3981662 1-53
+apps/construction-management/app/api/construction/tracking/issues/issue-models.ts
+  s_8821256d95b7ff::t_2c2fa54d871677 1-387
+apps/construction-management/app/api/construction/tracking/issues/issues-openapi.ts
+  s_8821256d95b7ff::t_c954bf35f8d7a2 1-2,8-85,87-216
+apps/construction-management/app/api/construction/tracking/issues/issues.http.test.ts
+  s_8821256d95b7ff::t_8e71a6121bcb9e 1-889
+apps/construction-management/app/api/construction/tracking/issues/route.ts
+  s_8821256d95b7ff::t_1b9a8b114913c6 1-110
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/edit/page.tsx
+  s_8821256d95b7ff::t_8a38e10969be15 1-28
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/page.tsx
+  s_8821256d95b7ff::t_3ebe099cc47ea5 1-28
+apps/construction-management/app/app/projects/[id]/inspections/new/page.tsx
+  s_8821256d95b7ff::t_f05dac5d0f7c12 1-45
+apps/construction-management/app/app/projects/[id]/inspections/page.tsx
+  s_8821256d95b7ff::t_569added9c8bee 3-5,9-21,23-25
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/edit/page.tsx
+  s_8821256d95b7ff::t_200742513a7e25 1-19
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/page.tsx
+  s_8821256d95b7ff::t_6da3b17139bb6b 1-19
+apps/construction-management/app/app/projects/[id]/issues/new/page.tsx
+  s_8821256d95b7ff::t_17f2529069aa09 1-19
+apps/construction-management/app/app/projects/[id]/issues/page.tsx
+  s_8821256d95b7ff::t_102d661f774727 3-5,9-18
+apps/construction-management/components/tracking/inspections/inspection-detail.stories.tsx
+  s_8821256d95b7ff::t_e8f0a5e219a246 1-243
+apps/construction-management/components/tracking/inspections/inspection-detail.tsx
+  s_8821256d95b7ff::t_56e011cf928e06 1-493
+apps/construction-management/components/tracking/inspections/inspection-fixtures.ts
+  s_8821256d95b7ff::t_c1403b5dcffb4a 1-427
+apps/construction-management/components/tracking/inspections/inspection-form.stories.tsx
+  s_8821256d95b7ff::t_59435ab423330c 1-238
+apps/construction-management/components/tracking/inspections/inspection-form.tsx
+  s_8821256d95b7ff::t_3ee7035a2ab185 1-586
+apps/construction-management/components/tracking/inspections/inspection-format.tsx
+  s_8821256d95b7ff::t_81444024146eac 1-218
+apps/construction-management/components/tracking/inspections/inspection-pages.tsx
+  s_8821256d95b7ff::t_02a641d76d2931 1-106
+apps/construction-management/components/tracking/inspections/inspection-reject-dialog.stories.tsx
+  s_8821256d95b7ff::t_1bade1bcb05c49 1-88
+apps/construction-management/components/tracking/inspections/inspection-thread.tsx
+  s_8821256d95b7ff::t_aceabbf070ffcd 1-301
+apps/construction-management/components/tracking/inspections/inspections-list.stories.tsx
+  s_8821256d95b7ff::t_58077fe5691003 1-234
+apps/construction-management/components/tracking/inspections/inspections-list.tsx
+  s_8821256d95b7ff::t_f95b95efe1dfae 1-622
+apps/construction-management/components/tracking/issues/issue-detail.stories.tsx
+  s_8821256d95b7ff::t_e612a4d8a44927 1-195
+apps/construction-management/components/tracking/issues/issue-detail.tsx
+  s_8821256d95b7ff::t_28ddc2a5c29764 1-552
+apps/construction-management/components/tracking/issues/issue-fixtures.ts
+  s_8821256d95b7ff::t_399afeb970c605 1-415
+apps/construction-management/components/tracking/issues/issue-form.stories.tsx
+  s_8821256d95b7ff::t_656712c9be8ff6 1-227
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_8821256d95b7ff::t_5438f18b28d2f6 1-532
+apps/construction-management/components/tracking/issues/issue-pages.tsx
+  s_8821256d95b7ff::t_db78440b700aef 1-61
+apps/construction-management/components/tracking/issues/issue-parts.tsx
+  s_8821256d95b7ff::t_92ac53b860c458 1-71
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.stories.tsx
+  s_8821256d95b7ff::t_260c481dd5170d 1-73
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.tsx
+  s_8821256d95b7ff::t_8b5591e24a0c3c 1-43
+apps/construction-management/components/tracking/issues/issues-list.stories.tsx
+  s_8821256d95b7ff::t_eaa61eaf13eabf 1-195
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_8821256d95b7ff::t_2779ca24d5fa18 1-623
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_d3e9ab2ba1062e 552-565,568-579
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_14895356c27875 813-820
+apps/construction-management/src/composition/tracking-drawing-links.ts
+  s_8821256d95b7ff::t_0139bc6d7e13de 1-45
+apps/construction-management/src/composition/tracking-inspections.ts
+  s_8821256d95b7ff::t_46e2d65cba9375 1-65
+apps/construction-management/src/queries/tracking-inspections.ts
+  s_8821256d95b7ff::t_fca6d392a91fee 1-320
+apps/construction-management/src/queries/tracking-issues.ts
+  s_8821256d95b7ff::t_f7174f40a52714 1-228
+apps/construction-management/src/tracking/application/inspection-handlers.ts
+  s_8821256d95b7ff::t_d36edd58ff4a3c 1-1339
+apps/construction-management/src/tracking/application/issue-handlers.ts
+  s_8821256d95b7ff::t_01dcf01a62ddd2 1-1262
+apps/construction-management/src/tracking/application/ports.ts
+  s_8821256d95b7ff::t_eaf5aaf1d1daeb 229-254
+apps/construction-management/src/tracking/domain/events.ts
+  s_8821256d95b7ff::t_88163b2a128a69 58-135
+apps/construction-management/src/tracking/domain/inspection.test.ts
+  s_8821256d95b7ff::t_6864615661a51a 1-238
+apps/construction-management/src/tracking/domain/inspection.ts
+  s_8821256d95b7ff::t_07c54342568c22 1-293
+apps/construction-management/src/tracking/domain/issue.test.ts
+  s_8821256d95b7ff::t_bd39556400fd8d 1-214
+apps/construction-management/src/tracking/domain/issue.ts
+  s_8821256d95b7ff::t_e0c3b9ae497fe0 1-298
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.http.test.ts
+  s_8821256d95b7ff::t_825d47686ba509 1-87
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.ts
+  s_8821256d95b7ff::t_ac7f4394322c3c 1-71
+apps/construction-management/src/tracking/infrastructure/issue-store.ts
+  s_8821256d95b7ff::t_dbae815afeaf10 1-464
+apps/construction-management/src/tracking/infrastructure/prisma-inspection-store.ts
+  s_8821256d95b7ff::t_77607336cc7a49 1-447
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "22c258e1ffbf7d991e996486bd199b2a25d1d0c2",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
