@@ -1,0 +1,59 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_37c2e934f89705 818
+apps/construction-management/src/tracking/application/ports.ts
+  s_8821256d95b7ff::t_9e1a065313ca85 193-218
+apps/construction-management/src/tracking/domain/inspection.ts
+  s_8821256d95b7ff::t_63e3196999c734 1-295
+apps/construction-management/src/composition/tracking-drawing-links.ts
+  s_ec52ca27153ec4::t_2cbc0f0a23478f 1-45
+apps/construction-management/src/tracking/domain/events.ts
+  s_1b8123156b368e::t_fc41267fad5e53 1-49
+apps/construction-management/src/tracking/domain/inspection.test.ts
+  s_16b2abd4e04c34::t_59916158a3d01c 1-224
+apps/construction-management/src/composition/tracking-inspections.ts
+  s_8821256d95b7ff::t_8af5b08981eaab 1-31
+apps/construction-management/src/tracking/application/inspection-handlers.ts
+  s_8821256d95b7ff::t_151ce78afb4527 1-1264
+apps/construction-management/src/tracking/infrastructure/prisma-inspection-store.ts
+  s_8821256d95b7ff::t_a33e06debc03e5 1-447
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "19e5be8a7ea073e7db9aeb0ae9ade62b2258e184",
+  "prompts": {},
+  "sessions": {
+    "s_16b2abd4e04c34": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a77db0db06a34cbf1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_1b8123156b368e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa7cc88b81f28e5b3",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_ec52ca27153ec4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a65f2657916571ca4",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
