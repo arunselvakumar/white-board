@@ -1,0 +1,27 @@
+apps/construction-management/components/tracking/inspections/inspection-detail.stories.tsx
+  s_8821256d95b7ff::t_64e914df05fc0d 1-243
+apps/construction-management/components/tracking/inspections/inspection-fixtures.ts
+  s_8821256d95b7ff::t_2b47b0ed68de2c 1-427
+apps/construction-management/components/tracking/inspections/inspection-form.stories.tsx
+  s_8821256d95b7ff::t_7de90e2b76801e 1-238
+apps/construction-management/components/tracking/inspections/inspection-reject-dialog.stories.tsx
+  s_8821256d95b7ff::t_fb7da4a3049641 1-88
+apps/construction-management/components/tracking/inspections/inspections-list.stories.tsx
+  s_8821256d95b7ff::t_3510870244cff7 1-234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d63dfebbc566d79c13b59c8086d89088f04961ed",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
