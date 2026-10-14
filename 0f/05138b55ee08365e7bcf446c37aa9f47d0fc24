@@ -1,0 +1,28 @@
+apps/marketing/package.json
+  s_911ba833b01881::t_73f56de58f8a9d 31
+  s_911ba833b01881::t_a49a0e117bc428 32
+package.json
+  s_911ba833b01881::t_12a7fac062435d 15
+apps/construction-management/package.json
+  s_911ba833b01881::t_9f4db6f2181e7e 70
+apps/whiteboard/package.json
+  s_911ba833b01881::t_2223c7f660f52a 72
+bun.lock
+  s_911ba833b01881::t_04d9a65ba38e4c 71,98,158,2532-2533,2564-2565,2636-2637
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0f05138b55ee08365e7bcf446c37aa9f47d0fc24",
+  "prompts": {},
+  "sessions": {
+    "s_911ba833b01881": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8efb1694-c643-4e72-aa66-c338c9e6bf58",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
