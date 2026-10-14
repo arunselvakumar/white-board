@@ -1,0 +1,81 @@
+apps/construction-management/components/attendance/labour/labour-marking-sheet.tsx
+  s_a1d1afb4441a53::t_c82999b25b0743 116,123,139,216-221,223,266-275,278
+apps/construction-management/components/auth/code-form.tsx
+  s_a1d1afb4441a53::t_722b189659560b 122
+apps/construction-management/components/auth/mobile-otp-flow.tsx
+  s_a1d1afb4441a53::t_d51b6161100ff7 138
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_a1d1afb4441a53::t_4116b189c146fa 845
+apps/construction-management/components/hrms/salary/salary-dialogs.tsx
+  s_a1d1afb4441a53::t_3766cca9450c47 16,233,516
+apps/construction-management/components/hrms/salary/team-salary-page.tsx
+  s_a1d1afb4441a53::t_9dce4dfcdb3927 498,516
+apps/construction-management/components/onboarding/create-company-wizard.tsx
+  s_a1d1afb4441a53::t_26ff4251ba6ef0 234
+apps/construction-management/components/procurement/inventory/inventory-page.tsx
+  s_a1d1afb4441a53::t_81ed9729c1b118 384,393
+apps/construction-management/components/projects/documents/project-documents-page.tsx
+  s_a1d1afb4441a53::t_fd08b544937ee9 136,145
+apps/construction-management/components/projects/drawings/drawing-album-page.tsx
+  s_a1d1afb4441a53::t_8dce38b0778931 158
+apps/construction-management/components/site-work/equipment/radio-card.tsx
+  s_a1d1afb4441a53::t_1fefa7846f14a9 33
+apps/marketing/components/closing-cta.tsx
+  s_a1d1afb4441a53::t_0b396ad2b9307e 24
+apps/marketing/components/hero.tsx
+  s_a1d1afb4441a53::t_ac431c01621005 37
+apps/marketing/components/site-header.tsx
+  s_a1d1afb4441a53::t_4eb041297cb0ec 6,45,93
+apps/whiteboard/components/auth/accept-invitation-form.tsx
+  s_a1d1afb4441a53::t_e1e682d4ee3b71 298,363
+apps/whiteboard/components/auth/email-code-form.tsx
+  s_a1d1afb4441a53::t_fb274507e68b36 66
+apps/whiteboard/components/auth/forgot-password-form.tsx
+  s_a1d1afb4441a53::t_7d7560d44760e8 124,167
+apps/whiteboard/components/auth/login-form.tsx
+  s_a1d1afb4441a53::t_a814931286ee4d 128
+apps/whiteboard/components/batches/batch-form.tsx
+  s_a1d1afb4441a53::t_d37bbc1a425af2 9,357-360
+apps/whiteboard/components/enquiries/enquiry-sources-screen.tsx
+  s_a1d1afb4441a53::t_40c33870c9565e 342
+apps/whiteboard/components/onboarding/create-workspace-form.tsx
+  s_a1d1afb4441a53::t_9be202edb1e467 158
+apps/whiteboard/components/teachers/teacher-profile-form.tsx
+  s_a1d1afb4441a53::t_3c97fb3713584d 9,340-347
+bun.lock
+  s_a1d1afb4441a53::t_3e0c37cdb51f97 250,1154,1174-1175,1192-1193,1324-1325,1404,1452-1453,1746-1749,2170-2171,2486-2489,2534-2535,2610-2611,2690-2691,2720-2721
+packages/eslint-config/README.md
+  s_a1d1afb4441a53::t_cc1132b660a42d 6-7
+packages/eslint-config/next.js
+  s_a1d1afb4441a53::t_0bb9faca1fc466 6,49
+packages/eslint-config/package.json
+  s_a1d1afb4441a53::t_17c43376f35bc2 9-10,17
+packages/eslint-config/react-internal.js
+  s_a1d1afb4441a53::t_428d946dcc510c 4,37
+packages/ui/src/components/field.tsx
+  s_a1d1afb4441a53::t_83413d6a45fce9 106
+packages/ui/src/components/input-group.tsx
+  s_a1d1afb4441a53::t_be71818b9f1f53 52
+packages/ui/src/components/label.tsx
+  s_a1d1afb4441a53::t_4771599c59b7d5 8
+packages/ui/src/components/pagination.tsx
+  s_a1d1afb4441a53::t_211a55d033d930 58
+packages/eslint-config/a11y.js
+  s_a1d1afb4441a53::t_6f69d2214e7d0e 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "138d98f6b433d224d6f6759b2fa6591bc56c4440",
+  "prompts": {},
+  "sessions": {
+    "s_a1d1afb4441a53": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "184c3213-8bce-41d2-8610-f53ce1adbf27",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
