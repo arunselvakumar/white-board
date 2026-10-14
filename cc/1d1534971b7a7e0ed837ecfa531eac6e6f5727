@@ -1,0 +1,29 @@
+apps/construction-management/components/tracking/tasks/task-detail.stories.tsx
+  s_8821256d95b7ff::t_d89361c9aa96d7 98
+apps/construction-management/components/tracking/tasks/task-fixtures.ts
+  s_8821256d95b7ff::t_ddf354accf7345 209-214,293,295
+apps/construction-management/components/tracking/tasks/task-form.tsx
+  s_8821256d95b7ff::t_e8f34acae089a4 37
+apps/construction-management/components/tracking/tasks/task-gantt.stories.tsx
+  s_8821256d95b7ff::t_b34e94e1a60d10 49-52,59
+apps/construction-management/components/tracking/tasks/task-gantt.tsx
+  s_8821256d95b7ff::t_e266f2d87fc8d9 346-348
+apps/construction-management/components/tracking/tasks/tasks-page.stories.tsx
+  s_8821256d95b7ff::t_55ffa081b55b73 97-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cc1d1534971b7a7e0ed837ecfa531eac6e6f5727",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
