@@ -1,0 +1,47 @@
+apps/construction-management/app/api/construction/tracking/issues/issue-models.ts
+  s_8821256d95b7ff::t_dc3122095f4c93 28,101-105,289-290
+apps/construction-management/app/api/construction/tracking/issues/issues.http.test.ts
+  s_8821256d95b7ff::t_f7ea976b630cc0 255,414,497-500
+apps/construction-management/components/tracking/issues/issue-detail.stories.tsx
+  s_8821256d95b7ff::t_7fa9a566fd25f1 1-195
+apps/construction-management/components/tracking/issues/issue-fixtures.ts
+  s_8821256d95b7ff::t_f5ccc75a616871 1-415
+apps/construction-management/components/tracking/issues/issue-form.stories.tsx
+  s_8821256d95b7ff::t_695291ad7ec7e8 1-227
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_8821256d95b7ff::t_562786d63b37ce 169-172
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.stories.tsx
+  s_8821256d95b7ff::t_fb83d2f5730597 1-73
+apps/construction-management/components/tracking/issues/issues-list.stories.tsx
+  s_8821256d95b7ff::t_bdea1c6614655c 1-195
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_8821256d95b7ff::t_02ab0170de63a8 162
+apps/construction-management/src/queries/tracking-issues.ts
+  s_8821256d95b7ff::t_c75f7278814d9c 231-234
+apps/construction-management/src/tracking/application/issue-handlers.ts
+  s_8821256d95b7ff::t_dced868c1aa0a7 1,139-142,191-194,827,1092-1095,1150
+apps/construction-management/src/tracking/domain/issue.test.ts
+  s_8821256d95b7ff::t_3c0b64d27bf8a4 111,139-143,147-151,155-159,163-167
+apps/construction-management/src/tracking/domain/issue.ts
+  s_8821256d95b7ff::t_d899b4a9ae9600 7-10,25-30,104-107
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.http.test.ts
+  s_8821256d95b7ff::t_4be6f0b8fdf711 56
+apps/construction-management/src/tracking/infrastructure/issue-store.ts
+  s_8821256d95b7ff::t_2029f367b8c949 352-353
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a08290d1fc13d2f517fb0f5100ae9b426b07611c",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
