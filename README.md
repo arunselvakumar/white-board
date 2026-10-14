@@ -76,4 +76,14 @@ import { Button } from "@repo/ui/components/button";
 
 ## TypeScript
 
-Type-checking uses TypeScript 7 (`tsc` via `@typescript/native`). ESLint still uses the TypeScript 6 compiler API because typescript-eslint does not support TypeScript 7.0 yet. Keep both packages as installed at the root.
+Type-checking uses TypeScript 7. ESLint still uses TypeScript 6 because typescript-eslint needs the compiler API, which TypeScript 7.0 does not have (ADR-0045).
+
+| Tool                                     | TypeScript | From                                                          |
+| ---------------------------------------- | ---------- | ------------------------------------------------------------- |
+| `bun run check-types` (`tsc`)            | 7.0.2      | `@typescript/native` alias at the root and in the packages    |
+| `next build` type check                  | 7.0.2      | `typescript` in each Next app; Next runs that package's `tsc` |
+| ESLint (typescript-eslint), Storybook, … | 6.0.2      | `typescript` at the root and in the packages                  |
+
+`check-versions` skips `typescript` because of this split. typescript-eslint loads `typescript` from the root, so the apps' lint still gets 6.0.2; check that it still does after changing either version.
+
+In VS Code, the built-in TypeScript uses 6.0.2 and keeps the `next` tsserver plugin. The [TypeScript (Native Preview)](https://marketplace.visualstudio.com/items?itemName=TypeScriptTeam.native-preview) extension gives you the TypeScript 7 language server, which is faster but does not load tsserver plugins. Run “Disable TypeScript 7 Language Server” to switch back.

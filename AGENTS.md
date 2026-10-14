@@ -71,6 +71,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - Domain unit tests (no Prisma) for invariants.
 - HTTP tests against real Postgres (`whiteboard_test`), not SQLite (ADR-0023).
 - `bun run test` and `bun run test:http`. Typecheck: `bun run check-types`.
+- TypeScript is split: `tsc` and `next build` use 7, ESLint uses 6 until typescript-eslint supports 7.1 (ADR-0045, README “TypeScript”). Do not change `typescript` versions on their own.
 - Verify UI in Storybook (and the browser when chrome-devtools is available). A screenshot is not verification.
 
 ## Commands
