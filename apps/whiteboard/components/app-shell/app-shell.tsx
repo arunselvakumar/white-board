@@ -136,7 +136,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="px-4 pt-4 sm:px-6 print:hidden">
           <AppBreadcrumbs />
         </div>
-        <main id="main-content" className="flex min-w-0 flex-1 flex-col">
+        {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-w-0 flex-1 flex-col outline-none"
+        >
           {children}
         </main>
       </SidebarInset>
