@@ -1,0 +1,107 @@
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_8821256d95b7ff::t_83acd2b36694c4 3,11,34-39,73-79
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_8821256d95b7ff::t_fe422034486def 1-39
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/route.ts
+  s_8821256d95b7ff::t_c205388d11ea67 1-53
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_8821256d95b7ff::t_536d9a42e1c9bf 1-31
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/route.ts
+  s_8821256d95b7ff::t_d19fe8688d6b84 1-83
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/app/route.ts
+  s_8821256d95b7ff::t_a018608db87c9b 1-10
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_8821256d95b7ff::t_b2c4c0a6a63238 1-10
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/route.ts
+  s_8821256d95b7ff::t_f75bb46a6307b8 1-11
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_8821256d95b7ff::t_93958e2cf98ca3 1-9
+apps/construction-management/app/api/construction/tracking/documents/document-models.ts
+  s_8821256d95b7ff::t_a673d1886cc0ad 1-147
+apps/construction-management/app/api/construction/tracking/documents/document-responses.ts
+  s_8821256d95b7ff::t_2458e94cf08079 1-114
+apps/construction-management/app/api/construction/tracking/documents/document-test-fixtures.ts
+  s_8821256d95b7ff::t_f270b223b31547 1-126
+apps/construction-management/app/api/construction/tracking/documents/documents-openapi.ts
+  s_8821256d95b7ff::t_ef1ff30cff0fcf 1-3,9-51,53-173
+apps/construction-management/app/api/construction/tracking/documents/handlers.ts
+  s_8821256d95b7ff::t_889cae36e4e227 1-227
+apps/construction-management/components/projects/gallery/gallery-page.stories.tsx
+  s_8821256d95b7ff::t_6c855525aca0a9 454-484
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_8821256d95b7ff::t_fd438bced89335 12,49-53,91-93,110-112,153-178,625-629
+apps/construction-management/components/tracking/documents/tracking-document-files.stories.tsx
+  s_8821256d95b7ff::t_0b41ccdf1b8905 1-167
+apps/construction-management/components/tracking/documents/tracking-document-files.tsx
+  s_8821256d95b7ff::t_516d13793ff397 1-203
+apps/construction-management/components/tracking/documents/tracking-document-fixtures.ts
+  s_8821256d95b7ff::t_9662f4d0ead129 1-176
+apps/construction-management/components/tracking/documents/tracking-entry-files-field.stories.tsx
+  s_8821256d95b7ff::t_304f8bf182f7cb 1-211
+apps/construction-management/components/tracking/documents/tracking-entry-files-field.tsx
+  s_8821256d95b7ff::t_8d02f2a298348f 1-214
+apps/construction-management/components/tracking/documents/tracking-file-parts.tsx
+  s_8821256d95b7ff::t_355165c88fd464 1-265
+apps/construction-management/components/tracking/documents/tracking-file-strip.tsx
+  s_8821256d95b7ff::t_d460d07372cca2 1-68
+apps/construction-management/components/tracking/documents/tracking-pending-files-field.stories.tsx
+  s_8821256d95b7ff::t_0c53f094592ffd 1-193
+apps/construction-management/components/tracking/documents/tracking-pending-files-field.tsx
+  s_8821256d95b7ff::t_078d9f5e9a2cfc 1-225
+apps/construction-management/components/tracking/documents/use-tracking-file-uploads.ts
+  s_8821256d95b7ff::t_64ca7ad61f2867 1-43
+apps/construction-management/components/tracking/documents/use-upload-pending-tracking-files.ts
+  s_8821256d95b7ff::t_cbed58b2fbd553 1-67
+apps/construction-management/lib/tracking-paths.ts
+  s_8821256d95b7ff::t_6a1f19e9567c93 1-34
+apps/construction-management/src/composition/tracking-directory.ts
+  s_8821256d95b7ff::t_92cd9f3c2032aa 261-263
+apps/construction-management/src/projects/domain/media-item.ts
+  s_8821256d95b7ff::t_9b490cc01ccf73 68-71,73-83
+apps/construction-management/src/queries/tracking-documents.ts
+  s_8821256d95b7ff::t_a21a45f6974272 1-173
+apps/construction-management/src/tracking/application/document-access.test.ts
+  s_8821256d95b7ff::t_5d608ad2ed2fe7 1-104
+apps/construction-management/src/tracking/application/document-access.ts
+  s_8821256d95b7ff::t_4393e0fc069def 1-73
+apps/construction-management/src/tracking/application/document-files-ports.ts
+  s_8821256d95b7ff::t_004ea738e27a1f 1-91
+apps/construction-management/src/tracking/application/document-files.ts
+  s_8821256d95b7ff::t_301d6309237712 1-528
+apps/construction-management/src/tracking/domain/document-files.ts
+  s_8821256d95b7ff::t_0d39f00410cce8 1-211
+apps/construction-management/src/tracking/infrastructure/document-files-factory.ts
+  s_8821256d95b7ff::t_1d42f282845c03 1-50
+apps/construction-management/src/tracking/infrastructure/document-files-store.ts
+  s_8821256d95b7ff::t_cbca69dc1e8d42 1-214
+apps/construction-management/src/tracking/infrastructure/document-locator.ts
+  s_8821256d95b7ff::t_722d50bd7109c9 1-121
+apps/construction-management/src/tracking/infrastructure/entry-files.ts
+  s_8821256d95b7ff::t_42cc54076a7666 1-130
+apps/construction-management/app/api/construction/tracking/documents/documents.http.test.ts
+  s_16b2abd4e04c34::t_f1bef934d3881b 1-488
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e27ac393b9522ee43448e0d8cc0722425303d871",
+  "prompts": {},
+  "sessions": {
+    "s_16b2abd4e04c34": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a77db0db06a34cbf1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
