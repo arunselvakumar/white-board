@@ -1,0 +1,55 @@
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/edit/page.tsx
+  s_8821256d95b7ff::t_f4b11a3fff4be8 1-19
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/page.tsx
+  s_8821256d95b7ff::t_d55ea0ef0c5063 1-19
+apps/construction-management/app/app/projects/[id]/issues/new/page.tsx
+  s_8821256d95b7ff::t_11987bc08c6db1 1-19
+apps/construction-management/app/app/projects/[id]/issues/page.tsx
+  s_8821256d95b7ff::t_3534f069ee32dc 3-5,9-18
+apps/construction-management/components/tracking/issues/issue-detail.tsx
+  s_8821256d95b7ff::t_327fd99e3e963b 1-552
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_8821256d95b7ff::t_1461d9439d9efa 1-529
+apps/construction-management/components/tracking/issues/issue-pages.tsx
+  s_8821256d95b7ff::t_b9bfb00c985e0b 1-61
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.tsx
+  s_8821256d95b7ff::t_4b1dc0a9c079e4 1-43
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_8821256d95b7ff::t_ac0098e50966ae 1-625
+apps/construction-management/components/tracking/issues/issue-parts.tsx
+  s_1b8123156b368e::t_49d6a8576b90d2 1-71
+apps/construction-management/src/queries/tracking-issues.ts
+  s_16b2abd4e04c34::t_694d2f39ca6291 1-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b93230244dcdbc157c607e6a26dd7822015978f3",
+  "prompts": {},
+  "sessions": {
+    "s_16b2abd4e04c34": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a77db0db06a34cbf1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_1b8123156b368e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa7cc88b81f28e5b3",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
