@@ -1,0 +1,39 @@
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-routes.ts
+  s_8821256d95b7ff::t_c9cfc220102b84 23,28
+apps/construction-management/app/app/masters/issue-categories/page.tsx
+  s_8821256d95b7ff::t_26c9f0230f3e59 1-10
+apps/construction-management/app/app/masters/tags/page.tsx
+  s_8821256d95b7ff::t_0402e8df9453fc 1-10
+apps/construction-management/components/masters/tracking-master-dialog.tsx
+  s_8821256d95b7ff::t_365a80370f24a3 1-153
+apps/construction-management/components/masters/tracking-master-fixtures.ts
+  s_8821256d95b7ff::t_fb4ea8308d0035 1-153
+apps/construction-management/components/masters/tracking-master-lists.stories.tsx
+  s_8821256d95b7ff::t_c20ca55d0b96bf 1-242
+apps/construction-management/components/masters/tracking-master-lists.tsx
+  s_8821256d95b7ff::t_32c4ce418e3c5a 1-283
+apps/construction-management/lib/masters-nav.ts
+  s_8821256d95b7ff::t_a8e556ad6dc0a0 3-4,242-261
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_8821256d95b7ff::t_561d273c9f7a14 140,143
+apps/construction-management/src/masters/infrastructure/prisma-tracking-master-store.ts
+  s_8821256d95b7ff::t_7e4ace575fd578 42-46
+apps/construction-management/src/queries/tracking-masters.ts
+  s_8821256d95b7ff::t_6e0991f183d604 1-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f8944ba3fc91fb22b7dac68b2ac95ae6f696d795",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
