@@ -1,0 +1,35 @@
+apps/construction-management/app/api/construction/tracking/inspections/inspections.http.test.ts
+  s_8821256d95b7ff::t_ad02aac8c6df2f 18,20-29,1012-1153
+apps/construction-management/components/tracking/inspections/inspection-detail.tsx
+  s_8821256d95b7ff::t_501ba879253b93 413-414
+apps/construction-management/components/tracking/inspections/inspection-thread.tsx
+  s_8821256d95b7ff::t_84493daf647b94 49
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_02fe56bd895a09 556-557
+apps/construction-management/src/tracking/application/document-access.test.ts
+  s_8821256d95b7ff::t_c13b2bff512ee6 13,31,39,94-137
+apps/construction-management/src/tracking/application/document-access.ts
+  s_8821256d95b7ff::t_26f09957296dbd 14-18,54,62-69,78-85
+apps/construction-management/src/tracking/application/document-files.ts
+  s_8821256d95b7ff::t_7ba86fa454341d 26,40,128-132,134,149-150,503-504
+apps/construction-management/src/tracking/domain/document-files.ts
+  s_8821256d95b7ff::t_f6fffd5c8fba57 6-10,50-62,65-76
+apps/construction-management/src/tracking/infrastructure/document-locator.ts
+  s_8821256d95b7ff::t_8becaab7ee0a60 56,78,84-90,100-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fb2865f3aa67ad4a0232f0185c00232d0e94e9dc",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
