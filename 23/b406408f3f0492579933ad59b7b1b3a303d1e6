@@ -1,0 +1,43 @@
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_4c6408e68186e4 512-529
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_b41832cc0f1aaa 5,809,811-883
+packages/db/construction/prisma/migrations/20261014090000_construction_masters_tracking/migration.sql
+  s_8821256d95b7ff::t_179a03cd03f821 1-48
+packages/db/construction/prisma/migrations/20261014090100_construction_masters_issue_category_seeds/migration.sql
+  s_8821256d95b7ff::t_b62e248693dcf7 1-35
+packages/db/construction/prisma/migrations/20261014090200_construction_site_work_worksheet_task/migration.sql
+  s_8821256d95b7ff::t_3a08404ef09f53 1-9
+packages/db/construction/prisma/migrations/20261014090300_construction_reporting_tracking_kinds/migration.sql
+  s_8821256d95b7ff::t_883d42da07d81f 1-8
+packages/db/construction/prisma/migrations/20261014090400_construction_tracking/migration.sql
+  s_8821256d95b7ff::t_c8915612b0cb51 1-479
+packages/db/construction/prisma/schema/base.prisma
+  s_8821256d95b7ff::t_a527ba573d7e37 13
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_8821256d95b7ff::t_41127450a1fab8 436-477
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_8821256d95b7ff::t_b9aab54507ee39 28-32
+packages/db/construction/prisma/schema/construction-site-work.prisma
+  s_8821256d95b7ff::t_75f6124af57a31 263-265,278
+packages/db/construction/prisma/schema/construction-tracking.prisma
+  s_8821256d95b7ff::t_ed30d04fb4406b 1-454
+apps/construction-management/docs/adr/CM-0019-tracking-product-decisions.md
+  s_8821256d95b7ff::t_afd54badcdcf26 1-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "23b406408f3f0492579933ad59b7b1b3a303d1e6",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
