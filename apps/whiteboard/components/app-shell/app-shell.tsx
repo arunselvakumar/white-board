@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
+import { SkipLink } from "@repo/ui/components/skip-link";
 import { Button } from "@repo/ui/components/button";
 import {
   Sidebar,
@@ -45,6 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
+      <SkipLink />
       <Sidebar variant="sidebar" collapsible="offcanvas">
         <SidebarHeader className="px-4 pt-6 pb-2">
           <SidebarMenu>
@@ -134,7 +136,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="px-4 pt-4 sm:px-6 print:hidden">
           <AppBreadcrumbs />
         </div>
-        {children}
+        <main id="main-content" className="flex min-w-0 flex-1 flex-col">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

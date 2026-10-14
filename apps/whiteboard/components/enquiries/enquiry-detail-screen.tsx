@@ -274,7 +274,7 @@ export function EnquiryDetailView({
   };
 
   return (
-    <main className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <div className="mx-auto max-w-6xl space-y-6">
         <PageHeader
           back={{ href: "/enquiries", label: "Enquiries" }}
@@ -469,6 +469,6 @@ export function EnquiryDetailView({
           setDialog(null);
         }}
       />
-    </main>
+    </div>
   );
 }

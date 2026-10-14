@@ -19,7 +19,7 @@ export function TeachersScreen() {
     teacherQueries.list(workspaceId, { limit: 20, ...cursor }),
   );
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="flex items-center justify-between">
           <PageHeader title="Teachers" />
@@ -94,6 +94,6 @@ export function TeachersScreen() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

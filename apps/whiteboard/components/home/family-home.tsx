@@ -335,7 +335,7 @@ export function FamilyHome({
 }) {
   const title = role === "parent" ? "Parent Home" : "Student Home";
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-5xl space-y-6">
         <h1 className="text-2xl tracking-tight">{title}</h1>
         {home.students.length === 0 ? (
@@ -385,6 +385,6 @@ export function FamilyHome({
           ))
         )}
       </div>
-    </main>
+    </div>
   );
 }

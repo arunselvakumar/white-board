@@ -102,7 +102,7 @@ export function TeacherDetailScreen({ id }: { id: string }) {
   );
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-7">
         <PageHeader
           back={{ href: "/teachers", label: "Teachers" }}
@@ -307,6 +307,6 @@ export function TeacherDetailScreen({ id }: { id: string }) {
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }

@@ -61,7 +61,7 @@ export function StudentEnrollmentRecovery({
   onViewStudent: () => void;
 }) {
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
         <PageHeader
           back={{ href: "/students", label: "Students" }}
@@ -98,7 +98,7 @@ export function StudentEnrollmentRecovery({
           </div>
         </section>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -203,7 +203,7 @@ export function StudentCreateScreen() {
 
   if (pending != null && create.isPending) {
     return (
-      <main className="w-full p-6">
+      <div className="w-full p-6">
         <div className="max-w-4xl space-y-6">
           <PageHeader
             back={{ href: "/students", label: "Students" }}
@@ -213,7 +213,7 @@ export function StudentCreateScreen() {
             Saving the Student and checking the Enrollment…
           </p>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -279,7 +279,7 @@ export function StudentCreateScreen() {
 
   if (pending != null) {
     return (
-      <main className="w-full p-6">
+      <div className="w-full p-6">
         <div className="max-w-4xl space-y-6">
           <PageHeader
             back={{ href: "/students", label: "Students" }}
@@ -305,7 +305,7 @@ export function StudentCreateScreen() {
             </Button>
           </section>
         </div>
-      </main>
+      </div>
     );
   }
 

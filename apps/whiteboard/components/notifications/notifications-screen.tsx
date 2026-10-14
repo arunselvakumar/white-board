@@ -66,7 +66,7 @@ export function NotificationsContent({
         : undefined;
 
   return (
-    <main className="w-full min-w-0 p-4 sm:p-6">
+    <div className="w-full min-w-0 p-4 sm:p-6">
       <div className="max-w-4xl space-y-6">
         <PageHeader
           title="Notifications"
@@ -154,6 +154,6 @@ export function NotificationsContent({
           </nav>
         )}
       </div>
-    </main>
+    </div>
   );
 }

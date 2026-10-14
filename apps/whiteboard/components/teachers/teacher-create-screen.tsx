@@ -46,7 +46,7 @@ export function TeacherCreateScreen() {
     router.push(`/teachers/${teacherId}`);
   }
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
         <PageHeader
           back={{ href: "/teachers", label: "Teachers" }}
@@ -104,6 +104,6 @@ export function TeacherCreateScreen() {
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

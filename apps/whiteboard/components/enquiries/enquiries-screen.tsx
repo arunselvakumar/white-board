@@ -111,7 +111,7 @@ export function EnquiriesScreen() {
   const dueCount = due.data?.total;
 
   return (
-    <main className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <div className="mx-auto max-w-6xl space-y-6">
         <PageHeader
           title="Enquiries"
@@ -212,7 +212,7 @@ export function EnquiriesScreen() {
           ))}
         </Tabs>
       </div>
-    </main>
+    </div>
   );
 }
 

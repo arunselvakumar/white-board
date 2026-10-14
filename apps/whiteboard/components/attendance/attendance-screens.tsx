@@ -51,7 +51,7 @@ export function AttendanceBatchesScreen() {
   );
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
         <h1 className="text-2xl font-semibold">Attendance</h1>
         <p className="text-muted-foreground">
@@ -115,7 +115,7 @@ export function AttendanceBatchesScreen() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -154,7 +154,7 @@ export function BatchAttendanceScreen({
   };
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
         <Link href={backHref} className="text-sm underline">
           {teacher ? "My Batches" : "Attendance"}
@@ -283,6 +283,6 @@ export function BatchAttendanceScreen({
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }

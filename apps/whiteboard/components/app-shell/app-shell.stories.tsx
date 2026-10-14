@@ -96,7 +96,7 @@ export const StudentNavigation: Story = {
   },
   render: () => (
     <AppShell>
-      <main className="p-6">Hello world</main>
+      <div className="p-6">Hello world</div>
     </AppShell>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -141,7 +141,7 @@ export const ParentNavigation: Story = {
   },
   render: () => (
     <AppShell>
-      <main className="p-6">Hello world</main>
+      <div className="p-6">Hello world</div>
     </AppShell>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {

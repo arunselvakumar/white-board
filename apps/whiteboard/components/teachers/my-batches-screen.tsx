@@ -11,16 +11,16 @@ export function MyBatchesScreen() {
   const { workspaceId, userId } = useAuth();
   const activation = useQuery(myBatchQueries.activation(workspaceId, userId));
   if (activation.isPending)
-    return <main className="p-6">Opening My Batches…</main>;
+    return <div className="p-6">Opening My Batches…</div>;
   if (activation.isError)
     return (
-      <main className="space-y-2 p-6">
+      <div className="space-y-2 p-6">
         <h1 className="text-2xl font-semibold">My Batches</h1>
         <p role="alert">
           Your Teacher invitation could not be linked. Ask the Owner to check
           your invitation.
         </p>
-      </main>
+      </div>
     );
   return <MyBatchesContent workspaceId={workspaceId} userId={userId} />;
 }
@@ -44,7 +44,7 @@ function MyBatchesContent({
 }) {
   const { data } = useSuspenseQuery(myBatchQueries.list(workspaceId, userId));
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
         <h1 className="text-2xl font-semibold">My Batches</h1>
         {data.items.length === 0 ? (
@@ -96,6 +96,6 @@ function MyBatchesContent({
         )}
         <UpcomingDemosCard />
       </div>
-    </main>
+    </div>
   );
 }

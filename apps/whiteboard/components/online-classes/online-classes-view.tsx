@@ -43,7 +43,7 @@ export function OnlineClassesView({
 
   if (classes.length === 0) {
     return (
-      <main className="w-full p-6">
+      <div className="w-full p-6">
         <div className="bg-card mx-auto w-full max-w-4xl rounded-2xl border px-6 py-14 text-center shadow-sm">
           <div className="bg-primary/10 text-primary mx-auto flex size-12 items-center justify-center rounded-xl">
             <MonitorPlay className="size-6" />
@@ -56,12 +56,12 @@ export function OnlineClassesView({
             here.
           </p>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="w-full p-6">
+    <div className="w-full p-6">
       <div className="mx-auto w-full max-w-4xl">
         <div className="mb-7">
           <p className="text-primary flex items-center gap-2 text-sm font-medium">
@@ -148,6 +148,6 @@ export function OnlineClassesView({
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

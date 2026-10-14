@@ -126,7 +126,7 @@ export function BatchClassWorkContent({
   });
 
   return (
-    <main className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader
           back={backLink(basePath)}
@@ -319,7 +319,7 @@ export function BatchClassWorkContent({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </div>
   );
 }
 
