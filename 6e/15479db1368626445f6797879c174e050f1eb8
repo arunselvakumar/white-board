@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/site-work/worksheets/worksheet-models.ts
+  s_8821256d95b7ff::t_403deb9b4e5b39 230
+apps/construction-management/components/site-work/worksheets/worksheet-detail.tsx
+  s_8821256d95b7ff::t_b4c2d93b68f490 29,135-141
+apps/construction-management/components/site-work/worksheets/worksheet-fixtures.ts
+  s_8821256d95b7ff::t_103e97c20b738f 21,117,122-149,299-310
+apps/construction-management/components/site-work/worksheets/worksheet-form.stories.tsx
+  s_8821256d95b7ff::t_d9dd847951ab6e 396-431
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_8821256d95b7ff::t_89fcc27ea64ec2 77-80,95-96,121,204,226-235,284-286,515,779-791
+apps/construction-management/components/site-work/worksheets/worksheet-task-picker.stories.tsx
+  s_8821256d95b7ff::t_37d380b5f9a725 1-109
+apps/construction-management/components/site-work/worksheets/worksheet-task-picker.tsx
+  s_8821256d95b7ff::t_a14399e470cf21 1-251
+apps/construction-management/components/site-work/worksheets/worksheets-page.tsx
+  s_8821256d95b7ff::t_642f3ea0b66d86 55,483-490,543-550
+apps/construction-management/src/queries/worksheets.ts
+  s_8821256d95b7ff::t_1e716bcbffcc7f 18,94-112
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_8821256d95b7ff::t_df2e6977361378 244,1061,1069
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6e15479db1368626445f6797879c174e050f1eb8",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
