@@ -1,0 +1,69 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_8821256d95b7ff::t_e40ea6e1549676 77-80,896-899
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-models.ts
+  s_8821256d95b7ff::t_2ce51a616c19aa 1-100
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-routes.ts
+  s_8821256d95b7ff::t_245f766b3a7bf4 1-111
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/delete/route.ts
+  s_8821256d95b7ff::t_f9e84a17fcbe3d 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/disable/route.ts
+  s_8821256d95b7ff::t_57320a411a60ed 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/enable/route.ts
+  s_8821256d95b7ff::t_9dbb839f4f783f 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/route.ts
+  s_8821256d95b7ff::t_4d32f53ba287fe 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/update/route.ts
+  s_8821256d95b7ff::t_a9f32c5a484302 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/issue-category-models.ts
+  s_8821256d95b7ff::t_a590ba72c997ca 1-26
+apps/construction-management/app/api/construction/masters/issue-categories/issue-category-routes.ts
+  s_8821256d95b7ff::t_e0d15a0a275bd6 1-19
+apps/construction-management/app/api/construction/masters/issue-categories/route.ts
+  s_8821256d95b7ff::t_e72495517978aa 1-9
+apps/construction-management/app/api/construction/masters/tags/[id]/delete/route.ts
+  s_8821256d95b7ff::t_0b34d906eb2054 1-6
+apps/construction-management/app/api/construction/masters/tags/[id]/route.ts
+  s_8821256d95b7ff::t_94d08daa3d15a1 1-6
+apps/construction-management/app/api/construction/masters/tags/[id]/update/route.ts
+  s_8821256d95b7ff::t_ad24a111be2cb7 1-6
+apps/construction-management/app/api/construction/masters/tags/ensure/route.ts
+  s_8821256d95b7ff::t_c8b758ce096e21 1-9
+apps/construction-management/app/api/construction/masters/tags/route.ts
+  s_8821256d95b7ff::t_26162b444fb784 1-9
+apps/construction-management/app/api/construction/masters/tags/tag-models.ts
+  s_8821256d95b7ff::t_3785cdf976bd19 1-26
+apps/construction-management/app/api/construction/masters/tags/tag-routes.ts
+  s_8821256d95b7ff::t_746df8e78f8be8 1-19
+apps/construction-management/app/api/construction/masters/tracking-masters-openapi.ts
+  s_8821256d95b7ff::t_b53497ad8a8993 1-80
+apps/construction-management/app/api/construction/masters/tracking-masters.http.test.ts
+  s_8821256d95b7ff::t_c115eebeebb4a0 1-352
+apps/construction-management/src/composition/tracking-usage.ts
+  s_8821256d95b7ff::t_d7605b9969ad09 1-34
+apps/construction-management/src/masters/application/tracking-master-handlers.ts
+  s_8821256d95b7ff::t_787d06caa99389 1-241
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_8821256d95b7ff::t_84b1317ea3f803 42-50,52-56,109-114,170-179
+apps/construction-management/src/masters/domain/tracking-master.ts
+  s_8821256d95b7ff::t_240a6f63d55055 1-65
+apps/construction-management/src/masters/infrastructure/create-masters-handlers.ts
+  s_8821256d95b7ff::t_34dd3689c79c11 3-4,12-15,18-22,29,102-118
+apps/construction-management/src/masters/infrastructure/prisma-tracking-master-store.ts
+  s_8821256d95b7ff::t_1543d2c5359896 1-205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ea51a471b1bd8719a9c452833b332d2b14618c9a",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
