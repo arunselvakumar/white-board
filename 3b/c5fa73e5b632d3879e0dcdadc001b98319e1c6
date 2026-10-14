@@ -1,0 +1,23 @@
+README.md
+  s_911ba833b01881::t_8cf9ec5fc7e61f 79-89
+docs/adr/0045-typescript-7-in-next-build.md
+  s_911ba833b01881::t_0e9896d451d03f 1-47
+AGENTS.md
+  s_911ba833b01881::t_55da23bf9610a3 74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3bc5fa73e5b632d3879e0dcdadc001b98319e1c6",
+  "prompts": {},
+  "sessions": {
+    "s_911ba833b01881": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8efb1694-c643-4e72-aa66-c338c9e6bf58",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
