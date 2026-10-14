@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/tracking/inspections/inspections.http.test.ts
+  s_8821256d95b7ff::t_a25b0a35ecb9df 69-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8621b23a3deeb1951e1e8ff1d6a905e8345546e4",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
