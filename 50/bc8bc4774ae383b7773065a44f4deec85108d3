@@ -1,0 +1,81 @@
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-routes.ts
+  s_8821256d95b7ff::t_045f4f8861c9bd 23,28
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_8821256d95b7ff::t_bdd6b7ccbd7300 7,24
+apps/construction-management/app/api/construction/masters/departments/department-routes.ts
+  s_8821256d95b7ff::t_f7cc9d6580cbb3 1-5,12-13,19
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_8821256d95b7ff::t_de35092014c395 186
+apps/construction-management/app/api/construction/masters/material-masters-openapi.ts
+  s_8821256d95b7ff::t_1c826b7e6ac24c 181
+apps/construction-management/app/api/construction/masters/measurement-units/measurement-unit-routes.ts
+  s_8821256d95b7ff::t_d0970d2b7cec6f 1,12,14-17
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-openapi.ts
+  s_8821256d95b7ff::t_0a3904015e80b6 249,254
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/handlers.ts
+  s_8821256d95b7ff::t_0d9d1161df135b 1,10-13,16
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery.http.test.ts
+  s_8821256d95b7ff::t_e9773fc114dace 190-191,193
+apps/construction-management/app/api/construction/tracking/delete-guards.http.test.ts
+  s_8821256d95b7ff::t_6ea58ff18aa417 1-210
+apps/construction-management/app/app/masters/issue-categories/page.tsx
+  s_8821256d95b7ff::t_88aef900e10d70 1-10
+apps/construction-management/app/app/masters/tags/page.tsx
+  s_8821256d95b7ff::t_4a754db62ec847 1-10
+apps/construction-management/components/masters/tracking-master-dialog.tsx
+  s_8821256d95b7ff::t_cf0b68fda86b04 1-153
+apps/construction-management/components/masters/tracking-master-fixtures.ts
+  s_8821256d95b7ff::t_3b7b328ee01e29 1-152
+apps/construction-management/components/masters/tracking-master-lists.stories.tsx
+  s_8821256d95b7ff::t_d81e749deeb2e7 1-242
+apps/construction-management/components/masters/tracking-master-lists.tsx
+  s_8821256d95b7ff::t_d865ff37cc650f 1-283
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_8821256d95b7ff::t_7741ba3769b9d4 97-99
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_d0b58f08782b22 521-530
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_e8d19636501f46 815,836-842
+apps/construction-management/lib/masters-nav.ts
+  s_8821256d95b7ff::t_dfd072a8587cff 3-4,242-261
+apps/construction-management/src/composition/structure-usage.ts
+  s_8821256d95b7ff::t_b9452d892f6995 12-14,20-22,30-34,37-39,44-51
+apps/construction-management/src/composition/tracking-usage.ts
+  s_8821256d95b7ff::t_1dbb0baf4d1f3f 3-5,7,11-14,40-122
+apps/construction-management/src/masters/application/material-master-handlers.ts
+  s_8821256d95b7ff::t_45c13ae90dc278 35,93-94,163,170-173
+apps/construction-management/src/masters/application/material-ports.ts
+  s_8821256d95b7ff::t_b07f3ef9b36812 140-148
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_8821256d95b7ff::t_fbfcc6cf4d7826 416
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_8821256d95b7ff::t_8508df48bd236c 140,143,157,189
+apps/construction-management/src/masters/infrastructure/create-material-handlers.ts
+  s_8821256d95b7ff::t_b1141c0018d9b1 9-12,20-23,26,30-31
+apps/construction-management/src/masters/infrastructure/prisma-tracking-master-store.ts
+  s_8821256d95b7ff::t_ab67d2ddcafde5 42-46
+apps/construction-management/src/projects/application/project-drawings.ts
+  s_8821256d95b7ff::t_8a08250986e967 9,179-197,232-233,763-768
+apps/construction-management/src/projects/infrastructure/create-project-drawings.ts
+  s_8821256d95b7ff::t_17029f628a65a8 7-10,15-18,21,34
+apps/construction-management/src/queries/tracking-masters.ts
+  s_8821256d95b7ff::t_9a999215dbdb60 1-105
+apps/construction-management/src/tracking/infrastructure/issue-rows.ts
+  s_8821256d95b7ff::t_f4378a5566aa61 129-131,141,146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "50bc8bc4774ae383b7773065a44f4deec85108d3",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
