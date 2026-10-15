@@ -82,6 +82,11 @@ describe("projectIdFromPath", () => {
     expect(projectIdFromPath("/app/projects/new")).toBeNull();
     expect(projectIdFromPath("/app/masters/suppliers")).toBeNull();
   });
+
+  it("is null, not a crash, for a malformed escape", () => {
+    expect(projectIdFromPath("/app/projects/%E0")).toBeNull();
+    expect(projectIdFromPath("/app/projects/%E0/payments")).toBeNull();
+  });
 });
 
 describe("activeProjectSegment", () => {

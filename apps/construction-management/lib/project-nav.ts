@@ -33,7 +33,12 @@ const PROJECT_PATH = /^\/app\/projects\/([^/]+)(?:\/|$)/;
 export function projectIdFromPath(pathname: string): string | null {
   const id = PROJECT_PATH.exec(pathname)?.[1];
   if (id == null || id === "new") return null;
-  return decodeURIComponent(id);
+  try {
+    return decodeURIComponent(id);
+  } catch {
+    // A bad escape (`/app/projects/%E0`): no Project menu; the page shows not found.
+    return null;
+  }
 }
 
 export function projectBasePath(id: string): string {
