@@ -476,3 +476,48 @@ export const UnavailableTaskKept: Story = {
     ).not.toHaveProperty("taskId");
   },
 };
+
+/**
+ * Picking a task and clearing it again is a change: the save sends
+ * `taskId: null`, even though the field ends where it started (CM-806).
+ */
+export const UnavailableTaskCleared: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00045",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7004",
+        taskNo: null,
+        name: null,
+        unitId: null,
+        unitName: null,
+        posting: "linked_unit",
+      },
+    }),
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00045" }),
+    );
+    await userEvent.type(form.getByLabelText("Task"), "slab");
+    const options = within(
+      await within(canvasElement.ownerDocument.body).findByRole("listbox", {
+        name: "Tasks",
+      }),
+    );
+    await userEvent.click(
+      options.getByRole("option", { name: /First floor slab/ }),
+    );
+    await userEvent.click(
+      await form.findByRole("button", { name: "Clear task" }),
+    );
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ taskId: null });
+    });
+  },
+};

@@ -411,6 +411,9 @@ export function WorksheetForm({
     source?.id ?? null,
   );
   const editing = worksheet != null;
+  // Whether the member picked or cleared the Task (CM-806). Not the field's
+  // dirtiness: clearing back to an empty default must still clear the link.
+  const [taskTouched, setTaskTouched] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schemaFor(settings)),
     defaultValues:
@@ -512,9 +515,10 @@ export function WorksheetForm({
           }))
         : [],
       approve: mode === "approve",
-      // An edit sends the Task only when it was changed: leaving it out
-      // keeps the sheet's link, even to a task that can no longer be picked.
-      ...(worksheet == null || form.getFieldState("task").isDirty
+      // An edit sends the Task only when the member used the field: leaving
+      // it out keeps the sheet's link, even to a task that can no longer be
+      // picked; clearing it sends null.
+      ...(worksheet == null || taskTouched
         ? { taskId: input.task?.id ?? null }
         : {}),
     };
@@ -785,6 +789,7 @@ export function WorksheetForm({
           projectId={projectId}
           value={values.task}
           onChange={(next) => {
+            setTaskTouched(true);
             form.setValue("task", next, {
               shouldValidate: true,
               shouldDirty: true,

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { POST as recordProgress } from "@/app/api/construction/tracking/tasks/[id]/progress/route";
 import { POST as createTask } from "@/app/api/construction/tracking/tasks/route";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
-import { actAs, addProject, newCompany } from "@/test/companies";
+import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as one } from "./[id]/progress/route";
@@ -128,5 +128,39 @@ describe("Project card progress (CM-805)", () => {
       "Other Company",
     );
     expect((await home(foreign)).status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it("guards one Project's progress like the Project: Read, assignment, a valid id", async () => {
+    const company = await newCompany();
+    const ws = company.workspaceId;
+    const by = company.ownerId;
+    const tower = await addProject(ws, by, "Tower A");
+    const home = (projectId: string) =>
+      one(
+        new Request(
+          `${TEST_ORIGIN}/api/construction/projects/projects/${projectId}/progress`,
+        ),
+        { params: Promise.resolve({ id: projectId }) },
+      );
+
+    actAs({ userId: by, workspaceId: ws, role: "owner" });
+    expect((await home("not-a-uuid")).status).toBe(StatusCodes.BAD_REQUEST);
+
+    // A Member with Project read sees only the Projects they are on.
+    const viewer = await addMember(ws, by, { "projects.project": ["read"] });
+    actAs({ userId: viewer.userId, workspaceId: ws, role: "member" });
+    expect((await home(tower)).status).toBe(StatusCodes.NOT_FOUND);
+    await prisma.constructionOrganizationTeamMemberProject.create({
+      data: { memberId: viewer.memberId, projectId: tower },
+    });
+    expect((await home(tower)).status).toBe(StatusCodes.OK);
+
+    // On the Project but without Project read: refused.
+    const outsider = await addMember(ws, by, { "labour.attendance": ["read"] });
+    await prisma.constructionOrganizationTeamMemberProject.create({
+      data: { memberId: outsider.memberId, projectId: tower },
+    });
+    actAs({ userId: outsider.userId, workspaceId: ws, role: "member" });
+    expect((await home(tower)).status).toBe(StatusCodes.FORBIDDEN);
   });
 });
