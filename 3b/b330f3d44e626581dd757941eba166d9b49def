@@ -1,0 +1,563 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_8821256d95b7ff::t_e7547e68f85763 77-80,169-172,896-899,952-955
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-models.ts
+  s_8821256d95b7ff::t_b14d0bf1555b8d 1-100
+apps/construction-management/app/api/construction/masters/_lib/tracking-master-routes.ts
+  s_8821256d95b7ff::t_23fe4c91efad54 1-111
+apps/construction-management/app/api/construction/masters/contractors/contractor-routes.ts
+  s_8821256d95b7ff::t_a9722fcd1a17ef 7,24
+apps/construction-management/app/api/construction/masters/departments/department-routes.ts
+  s_8821256d95b7ff::t_3d4d66d0c04a95 1-5,12-13,19
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/delete/route.ts
+  s_8821256d95b7ff::t_7023696af93230 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/disable/route.ts
+  s_8821256d95b7ff::t_01aaa7db424c94 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/enable/route.ts
+  s_8821256d95b7ff::t_9c52234e0fbfd8 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/route.ts
+  s_8821256d95b7ff::t_41703e0ab5881d 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/[id]/update/route.ts
+  s_8821256d95b7ff::t_251284853f6166 1-6
+apps/construction-management/app/api/construction/masters/issue-categories/issue-category-models.ts
+  s_8821256d95b7ff::t_77ce320adf7812 1-26
+apps/construction-management/app/api/construction/masters/issue-categories/issue-category-routes.ts
+  s_8821256d95b7ff::t_b1fcfff22d818b 1-19
+apps/construction-management/app/api/construction/masters/issue-categories/route.ts
+  s_8821256d95b7ff::t_4666cc8452d03c 1-9
+apps/construction-management/app/api/construction/masters/masters-openapi.ts
+  s_8821256d95b7ff::t_8e8680ff930e12 186
+apps/construction-management/app/api/construction/masters/material-masters-openapi.ts
+  s_8821256d95b7ff::t_b198f2229f16c9 181
+apps/construction-management/app/api/construction/masters/measurement-units/measurement-unit-routes.ts
+  s_8821256d95b7ff::t_a5a9a36fd8158f 1,12,14-17
+apps/construction-management/app/api/construction/masters/tags/[id]/delete/route.ts
+  s_8821256d95b7ff::t_11f039dfbe58e4 1-6
+apps/construction-management/app/api/construction/masters/tags/[id]/route.ts
+  s_8821256d95b7ff::t_a6322fa28eb365 1-6
+apps/construction-management/app/api/construction/masters/tags/[id]/update/route.ts
+  s_8821256d95b7ff::t_189154bc0b37de 1-6
+apps/construction-management/app/api/construction/masters/tags/ensure/route.ts
+  s_8821256d95b7ff::t_b141caf39b0001 1-9
+apps/construction-management/app/api/construction/masters/tags/route.ts
+  s_8821256d95b7ff::t_018116ef1fd628 1-9
+apps/construction-management/app/api/construction/masters/tags/tag-models.ts
+  s_8821256d95b7ff::t_6c37164a3b3d91 1-26
+apps/construction-management/app/api/construction/masters/tags/tag-routes.ts
+  s_8821256d95b7ff::t_18863d13d69068 1-19
+apps/construction-management/app/api/construction/masters/tracking-masters-openapi.ts
+  s_8821256d95b7ff::t_2516565ca9d760 1-80
+apps/construction-management/app/api/construction/masters/tracking-masters.http.test.ts
+  s_8821256d95b7ff::t_835bb14eb01f96 1-352
+apps/construction-management/app/api/construction/organization/settings/sequence-rules/sequence-rules.http.test.ts
+  s_8821256d95b7ff::t_8d4e751de7652c 256-288
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/drawing-openapi.ts
+  s_8821256d95b7ff::t_7d866880c72216 249,254
+apps/construction-management/app/api/construction/projects/projects/[id]/drawings/handlers.ts
+  s_8821256d95b7ff::t_1f1c808bbbceab 1,10-13,16
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery-responses.ts
+  s_8821256d95b7ff::t_d472832d265c17 3,11,34-39,73-79
+apps/construction-management/app/api/construction/projects/projects/[id]/gallery/gallery.http.test.ts
+  s_8821256d95b7ff::t_5f2cc0c92a4ba8 190-191,193
+apps/construction-management/app/api/construction/tracking/access/access-models.ts
+  s_8821256d95b7ff::t_26100f07a587b9 1-34
+apps/construction-management/app/api/construction/tracking/access/access-openapi.ts
+  s_8821256d95b7ff::t_c4ef96b1846cba 1-34
+apps/construction-management/app/api/construction/tracking/access/access.http.test.ts
+  s_8821256d95b7ff::t_e09c73d1b677ff 1-219
+apps/construction-management/app/api/construction/tracking/access/route.ts
+  s_8821256d95b7ff::t_f616d8e4b5f4ca 1-63
+apps/construction-management/app/api/construction/tracking/delete-guards.http.test.ts
+  s_8821256d95b7ff::t_55cfdcbe8fc6b9 1-210
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_8821256d95b7ff::t_a991a5d590f74a 1-39
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/route.ts
+  s_8821256d95b7ff::t_b02af3bf46c7ac 1-53
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_8821256d95b7ff::t_c0af04375a95d3 1-31
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/route.ts
+  s_8821256d95b7ff::t_c18b10c4a9717a 1-83
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/app/route.ts
+  s_8821256d95b7ff::t_a9f9aac591c5d3 1-10
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_8821256d95b7ff::t_ebdcdc54b48c29 1-10
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/route.ts
+  s_8821256d95b7ff::t_75e814ee65c029 1-11
+apps/construction-management/app/api/construction/tracking/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_8821256d95b7ff::t_446b369108bc05 1-9
+apps/construction-management/app/api/construction/tracking/documents/document-models.ts
+  s_8821256d95b7ff::t_49aed2af3ac2f6 1-147
+apps/construction-management/app/api/construction/tracking/documents/document-responses.ts
+  s_8821256d95b7ff::t_e84f97ca366ac9 1-114
+apps/construction-management/app/api/construction/tracking/documents/document-test-fixtures.ts
+  s_8821256d95b7ff::t_d912f14a42da95 1-126
+apps/construction-management/app/api/construction/tracking/documents/documents-openapi.ts
+  s_8821256d95b7ff::t_ee926119b6dc8d 1-173
+apps/construction-management/app/api/construction/tracking/documents/documents.http.test.ts
+  s_8821256d95b7ff::t_9e7c2127b31fca 1-488
+apps/construction-management/app/api/construction/tracking/documents/handlers.ts
+  s_8821256d95b7ff::t_f2b483e8618860 1-227
+apps/construction-management/app/api/construction/tracking/inspections/[id]/approve/route.ts
+  s_8821256d95b7ff::t_3005ac0e2ac255 1-51
+apps/construction-management/app/api/construction/tracking/inspections/[id]/delete/route.ts
+  s_8821256d95b7ff::t_ea00767c2d9adf 1-46
+apps/construction-management/app/api/construction/tracking/inspections/[id]/observations/[observationId]/delete/route.ts
+  s_8821256d95b7ff::t_600d0c3ade7077 1-38
+apps/construction-management/app/api/construction/tracking/inspections/[id]/observations/route.ts
+  s_8821256d95b7ff::t_81cb75bc0c32fa 1-82
+apps/construction-management/app/api/construction/tracking/inspections/[id]/reinspection/route.ts
+  s_8821256d95b7ff::t_8e76929dda8bd4 1-38
+apps/construction-management/app/api/construction/tracking/inspections/[id]/reject/route.ts
+  s_8821256d95b7ff::t_e6f5bba7322db9 1-53
+apps/construction-management/app/api/construction/tracking/inspections/[id]/remarks/route.ts
+  s_8821256d95b7ff::t_2c25834753660f 1-69
+apps/construction-management/app/api/construction/tracking/inspections/[id]/route.ts
+  s_8821256d95b7ff::t_da68d984f7f015 1-27
+apps/construction-management/app/api/construction/tracking/inspections/[id]/update/route.ts
+  s_8821256d95b7ff::t_cedb0b621af73e 1-46
+apps/construction-management/app/api/construction/tracking/inspections/bulk-approve/route.ts
+  s_8821256d95b7ff::t_69287553abe767 1-43
+apps/construction-management/app/api/construction/tracking/inspections/bulk-reject/route.ts
+  s_8821256d95b7ff::t_4e692f5fb105b9 1-44
+apps/construction-management/app/api/construction/tracking/inspections/form-options/route.ts
+  s_8821256d95b7ff::t_94f49df7e2122b 1-35
+apps/construction-management/app/api/construction/tracking/inspections/handlers.ts
+  s_8821256d95b7ff::t_e0a6ff5ba2695b 1-53
+apps/construction-management/app/api/construction/tracking/inspections/inspection-models.ts
+  s_8821256d95b7ff::t_7b0e6cab451c87 1-474
+apps/construction-management/app/api/construction/tracking/inspections/inspections-openapi.ts
+  s_8821256d95b7ff::t_92ed2570904235 1-263
+apps/construction-management/app/api/construction/tracking/inspections/inspections.http.test.ts
+  s_8821256d95b7ff::t_263883b0fe709d 1-1168
+apps/construction-management/app/api/construction/tracking/inspections/route.ts
+  s_8821256d95b7ff::t_17cf23db085292 1-108
+apps/construction-management/app/api/construction/tracking/issues/[id]/delete/route.ts
+  s_8821256d95b7ff::t_e03cd294f577f8 1-43
+apps/construction-management/app/api/construction/tracking/issues/[id]/progress/[updateId]/delete/route.ts
+  s_8821256d95b7ff::t_4f3a5da5d0eefa 1-36
+apps/construction-management/app/api/construction/tracking/issues/[id]/progress/route.ts
+  s_8821256d95b7ff::t_c525fa68f22656 1-69
+apps/construction-management/app/api/construction/tracking/issues/[id]/reopen/route.ts
+  s_8821256d95b7ff::t_6dfae870de3adb 1-43
+apps/construction-management/app/api/construction/tracking/issues/[id]/route.ts
+  s_8821256d95b7ff::t_0d54efcbc6e189 1-34
+apps/construction-management/app/api/construction/tracking/issues/[id]/solve/route.ts
+  s_8821256d95b7ff::t_a1828b63ff25cd 1-36
+apps/construction-management/app/api/construction/tracking/issues/[id]/update/route.ts
+  s_8821256d95b7ff::t_dc3abb4c6c7de5 1-48
+apps/construction-management/app/api/construction/tracking/issues/[id]/verify/route.ts
+  s_8821256d95b7ff::t_72f5e1603254f6 1-35
+apps/construction-management/app/api/construction/tracking/issues/bulk-solve/route.ts
+  s_8821256d95b7ff::t_20f9d6caf139b6 1-40
+apps/construction-management/app/api/construction/tracking/issues/bulk-verify/route.ts
+  s_8821256d95b7ff::t_66f1a55dfbefda 1-40
+apps/construction-management/app/api/construction/tracking/issues/form-options/route.ts
+  s_8821256d95b7ff::t_07dfc6818be1ef 1-41
+apps/construction-management/app/api/construction/tracking/issues/handlers.ts
+  s_8821256d95b7ff::t_3342d750e285af 1-53
+apps/construction-management/app/api/construction/tracking/issues/issue-models.ts
+  s_8821256d95b7ff::t_f3871fa5a08289 1-387
+apps/construction-management/app/api/construction/tracking/issues/issues-openapi.ts
+  s_8821256d95b7ff::t_c218f5823f9a7a 1-216
+apps/construction-management/app/api/construction/tracking/issues/issues.http.test.ts
+  s_8821256d95b7ff::t_4ced106ca86fe8 1-889
+apps/construction-management/app/api/construction/tracking/issues/route.ts
+  s_8821256d95b7ff::t_837b50103b0d2d 1-110
+apps/construction-management/app/api/construction/tracking/project-scope.ts
+  s_8821256d95b7ff::t_3e069e5afea0d3 1-15
+apps/construction-management/app/api/construction/tracking/tasks/[id]/activity/route.ts
+  s_8821256d95b7ff::t_7660cd1acc4c04 1-28
+apps/construction-management/app/api/construction/tracking/tasks/[id]/complete/route.ts
+  s_8821256d95b7ff::t_587d714f9927fc 1-39
+apps/construction-management/app/api/construction/tracking/tasks/[id]/copy/route.ts
+  s_8821256d95b7ff::t_3ed60b48551942 1-30
+apps/construction-management/app/api/construction/tracking/tasks/[id]/delete/route.ts
+  s_8821256d95b7ff::t_157f06294b9f26 1-44
+apps/construction-management/app/api/construction/tracking/tasks/[id]/progress/route.ts
+  s_8821256d95b7ff::t_baa1ca85d5f782 1-61
+apps/construction-management/app/api/construction/tracking/tasks/[id]/rebaseline/route.ts
+  s_8821256d95b7ff::t_bd1ea943be2754 1-46
+apps/construction-management/app/api/construction/tracking/tasks/[id]/route.ts
+  s_8821256d95b7ff::t_7e98c20fe86c54 1-33
+apps/construction-management/app/api/construction/tracking/tasks/[id]/update/route.ts
+  s_8821256d95b7ff::t_cbbe2151d08a45 1-45
+apps/construction-management/app/api/construction/tracking/tasks/bulk-delete/route.ts
+  s_8821256d95b7ff::t_3e99b2b25f47d4 1-36
+apps/construction-management/app/api/construction/tracking/tasks/form-options/route.ts
+  s_8821256d95b7ff::t_2d65d468a6e6b9 1-34
+apps/construction-management/app/api/construction/tracking/tasks/gantt/route.ts
+  s_8821256d95b7ff::t_0d4a21659d544a 1-42
+apps/construction-management/app/api/construction/tracking/tasks/handlers.ts
+  s_8821256d95b7ff::t_a0bfdaf5b9d512 1-51
+apps/construction-management/app/api/construction/tracking/tasks/import-sample/route.ts
+  s_8821256d95b7ff::t_67dd762fd7f99b 1-66
+apps/construction-management/app/api/construction/tracking/tasks/import.http.test.ts
+  s_8821256d95b7ff::t_ece3920f299fdd 1-348
+apps/construction-management/app/api/construction/tracking/tasks/import/route.ts
+  s_8821256d95b7ff::t_b4eda9e002c5a2 1-51
+apps/construction-management/app/api/construction/tracking/tasks/progress/[progressId]/delete/route.ts
+  s_8821256d95b7ff::t_afc50d44c2463e 1-33
+apps/construction-management/app/api/construction/tracking/tasks/progress/[progressId]/update/route.ts
+  s_8821256d95b7ff::t_18e7a1553ef58c 1-47
+apps/construction-management/app/api/construction/tracking/tasks/route.ts
+  s_8821256d95b7ff::t_caf0b66306a21f 1-72
+apps/construction-management/app/api/construction/tracking/tasks/task-models.ts
+  s_8821256d95b7ff::t_235a56f0085f24 1-545
+apps/construction-management/app/api/construction/tracking/tasks/tasks-openapi.ts
+  s_8821256d95b7ff::t_86b8af0f5fd105 1-294
+apps/construction-management/app/api/construction/tracking/tasks/tasks.http.test.ts
+  s_8821256d95b7ff::t_cc51a83c37227c 1-799
+apps/construction-management/app/api/construction/tracking/tracking-access.ts
+  s_8821256d95b7ff::t_f2fea53cfc22c4 1-79
+apps/construction-management/app/api/construction/tracking/tracking-openapi.ts
+  s_8821256d95b7ff::t_bb5f832696771c 1-43
+apps/construction-management/app/app/masters/issue-categories/page.tsx
+  s_8821256d95b7ff::t_c24a7f701a8fd9 1-10
+apps/construction-management/app/app/masters/tags/page.tsx
+  s_8821256d95b7ff::t_7047b55ea7d979 1-10
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/edit/page.tsx
+  s_8821256d95b7ff::t_bb0a3a4ed2cc66 1-28
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/page.tsx
+  s_8821256d95b7ff::t_48f6d0164930a1 1-28
+apps/construction-management/app/app/projects/[id]/inspections/new/page.tsx
+  s_8821256d95b7ff::t_233b02cd1d8560 1-45
+apps/construction-management/app/app/projects/[id]/inspections/page.tsx
+  s_8821256d95b7ff::t_08b61b1426621b 1-27
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/edit/page.tsx
+  s_8821256d95b7ff::t_162fcfbd27a138 1-19
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/page.tsx
+  s_8821256d95b7ff::t_fc7b67fd9a970b 1-19
+apps/construction-management/app/app/projects/[id]/issues/new/page.tsx
+  s_8821256d95b7ff::t_2c507f2d6c732e 1-19
+apps/construction-management/app/app/projects/[id]/issues/page.tsx
+  s_8821256d95b7ff::t_8a93891c2d839a 1-19
+apps/construction-management/app/app/projects/[id]/tasks/[taskId]/edit/page.tsx
+  s_8821256d95b7ff::t_256364e01af15b 1-19
+apps/construction-management/app/app/projects/[id]/tasks/[taskId]/page.tsx
+  s_8821256d95b7ff::t_f0c8c777c371ac 1-19
+apps/construction-management/app/app/projects/[id]/tasks/new/page.tsx
+  s_8821256d95b7ff::t_f0880f0091fce2 1-33
+apps/construction-management/app/app/projects/[id]/tasks/page.tsx
+  s_8821256d95b7ff::t_57534a9b223a73 1-27
+apps/construction-management/components/masters/tracking-master-dialog.tsx
+  s_8821256d95b7ff::t_7985702fbca17c 1-153
+apps/construction-management/components/masters/tracking-master-fixtures.ts
+  s_8821256d95b7ff::t_7e1fdc5ec936c6 1-152
+apps/construction-management/components/masters/tracking-master-lists.stories.tsx
+  s_8821256d95b7ff::t_94f31d5f6a4c7b 1-242
+apps/construction-management/components/masters/tracking-master-lists.tsx
+  s_8821256d95b7ff::t_a6c9de8819b40a 1-283
+apps/construction-management/components/projects/gallery/gallery-page.stories.tsx
+  s_8821256d95b7ff::t_3f80b2897f76ad 454-484
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_8821256d95b7ff::t_11fe0860e40b16 12,49-53,91-93,110-112,153-178,625-629
+apps/construction-management/components/projects/project-module-icons.ts
+  s_8821256d95b7ff::t_631be8748ec535 5-6,15,46-48
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_8821256d95b7ff::t_f82bc3d04b0afb 97-99
+apps/construction-management/components/tracking/documents/tracking-document-files.stories.tsx
+  s_8821256d95b7ff::t_53142534b030d7 1-167
+apps/construction-management/components/tracking/documents/tracking-document-files.tsx
+  s_8821256d95b7ff::t_0329bb74f1d657 1-203
+apps/construction-management/components/tracking/documents/tracking-document-fixtures.ts
+  s_8821256d95b7ff::t_f9902d3588dd39 1-176
+apps/construction-management/components/tracking/documents/tracking-entry-files-field.stories.tsx
+  s_8821256d95b7ff::t_dba29167299782 1-211
+apps/construction-management/components/tracking/documents/tracking-entry-files-field.tsx
+  s_8821256d95b7ff::t_bfef829a29f5fa 1-214
+apps/construction-management/components/tracking/documents/tracking-file-parts.tsx
+  s_8821256d95b7ff::t_51873cba9780fe 1-265
+apps/construction-management/components/tracking/documents/tracking-file-strip.tsx
+  s_8821256d95b7ff::t_210a3a1c3b246b 1-68
+apps/construction-management/components/tracking/documents/tracking-pending-files-field.stories.tsx
+  s_8821256d95b7ff::t_2bf9e62f285841 1-193
+apps/construction-management/components/tracking/documents/tracking-pending-files-field.tsx
+  s_8821256d95b7ff::t_b4b0d3f487c18b 1-225
+apps/construction-management/components/tracking/documents/use-tracking-file-uploads.ts
+  s_8821256d95b7ff::t_c2eafe4cb1463b 1-43
+apps/construction-management/components/tracking/documents/use-upload-pending-tracking-files.ts
+  s_8821256d95b7ff::t_d6c8a425a9b802 1-67
+apps/construction-management/components/tracking/inspections/inspection-detail.stories.tsx
+  s_8821256d95b7ff::t_dc8ada3e1cc4df 1-243
+apps/construction-management/components/tracking/inspections/inspection-detail.tsx
+  s_8821256d95b7ff::t_abd1f88c5b68b0 1-494
+apps/construction-management/components/tracking/inspections/inspection-fixtures.ts
+  s_8821256d95b7ff::t_b58d1dfb71e0c4 1-427
+apps/construction-management/components/tracking/inspections/inspection-form.stories.tsx
+  s_8821256d95b7ff::t_c0f69d0d85a125 1-238
+apps/construction-management/components/tracking/inspections/inspection-form.tsx
+  s_8821256d95b7ff::t_30452f0c2857fb 1-586
+apps/construction-management/components/tracking/inspections/inspection-format.tsx
+  s_8821256d95b7ff::t_6e9e611dc63ebb 1-218
+apps/construction-management/components/tracking/inspections/inspection-pages.tsx
+  s_8821256d95b7ff::t_075f2f625a2641 1-106
+apps/construction-management/components/tracking/inspections/inspection-reject-dialog.stories.tsx
+  s_8821256d95b7ff::t_370fecd95cdf65 1-88
+apps/construction-management/components/tracking/inspections/inspection-thread.tsx
+  s_8821256d95b7ff::t_ebdb8230039d73 1-301
+apps/construction-management/components/tracking/inspections/inspections-list.stories.tsx
+  s_8821256d95b7ff::t_dfc468fe3f02e6 1-234
+apps/construction-management/components/tracking/inspections/inspections-list.tsx
+  s_8821256d95b7ff::t_311a1ea6d1aa7a 1-622
+apps/construction-management/components/tracking/issues/issue-detail.stories.tsx
+  s_8821256d95b7ff::t_0a0c257cfc1b28 1-195
+apps/construction-management/components/tracking/issues/issue-detail.tsx
+  s_8821256d95b7ff::t_b174b266cf7b0f 1-552
+apps/construction-management/components/tracking/issues/issue-fixtures.ts
+  s_8821256d95b7ff::t_e3a6e8f6df9df0 1-415
+apps/construction-management/components/tracking/issues/issue-form.stories.tsx
+  s_8821256d95b7ff::t_fe5ef6006ea1f5 1-227
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_8821256d95b7ff::t_2e3fd32ed80cbb 1-532
+apps/construction-management/components/tracking/issues/issue-pages.tsx
+  s_8821256d95b7ff::t_888c53ff8d4911 1-61
+apps/construction-management/components/tracking/issues/issue-parts.tsx
+  s_8821256d95b7ff::t_c00b23f3e4db42 1-71
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.stories.tsx
+  s_8821256d95b7ff::t_9138052828d999 1-73
+apps/construction-management/components/tracking/issues/issue-reopen-dialog.tsx
+  s_8821256d95b7ff::t_9de059c7a9e07a 1-43
+apps/construction-management/components/tracking/issues/issues-list.stories.tsx
+  s_8821256d95b7ff::t_7c4c32824fdcca 1-195
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_8821256d95b7ff::t_bf6e4efd6f38b9 1-623
+apps/construction-management/components/tracking/tasks/chips-select.tsx
+  s_8821256d95b7ff::t_7c20415b18b7de 1-136
+apps/construction-management/components/tracking/tasks/import-tasks-dialog.stories.tsx
+  s_8821256d95b7ff::t_287fb65272613e 1-78
+apps/construction-management/components/tracking/tasks/import-tasks-dialog.tsx
+  s_8821256d95b7ff::t_a0bc260151826a 1-181
+apps/construction-management/components/tracking/tasks/task-detail.stories.tsx
+  s_8821256d95b7ff::t_7c43cf20f33902 1-258
+apps/construction-management/components/tracking/tasks/task-detail.tsx
+  s_8821256d95b7ff::t_0f680cc27463ac 1-719
+apps/construction-management/components/tracking/tasks/task-dialogs.tsx
+  s_8821256d95b7ff::t_291bef8c8f29e9 1-413
+apps/construction-management/components/tracking/tasks/task-filters.tsx
+  s_8821256d95b7ff::t_27570cafd72241 1-293
+apps/construction-management/components/tracking/tasks/task-fixtures.ts
+  s_8821256d95b7ff::t_4f76c6a2023f51 1-542
+apps/construction-management/components/tracking/tasks/task-form.stories.tsx
+  s_8821256d95b7ff::t_392b74a61e6a8f 1-232
+apps/construction-management/components/tracking/tasks/task-form.tsx
+  s_8821256d95b7ff::t_8376f8a0675943 1-704
+apps/construction-management/components/tracking/tasks/task-gantt.stories.tsx
+  s_8821256d95b7ff::t_94f89abf14272c 1-118
+apps/construction-management/components/tracking/tasks/task-gantt.tsx
+  s_8821256d95b7ff::t_2b3e6dd2543cf9 1-461
+apps/construction-management/components/tracking/tasks/task-pages.tsx
+  s_8821256d95b7ff::t_52232bd1f85b52 1-85
+apps/construction-management/components/tracking/tasks/task-parts.tsx
+  s_8821256d95b7ff::t_c928d42f83a58d 1-183
+apps/construction-management/components/tracking/tasks/task-tree.tsx
+  s_8821256d95b7ff::t_bde8ea2b904459 1-407
+apps/construction-management/components/tracking/tasks/tasks-page.stories.tsx
+  s_8821256d95b7ff::t_8f97265261d820 1-245
+apps/construction-management/components/tracking/tasks/tasks-page.tsx
+  s_8821256d95b7ff::t_872d074d90f168 1-123
+apps/construction-management/components/tracking/tracking-coming-soon.tsx
+  s_8821256d95b7ff::t_ed354966d5b555 1-31
+apps/construction-management/docs/adr/CM-0019-tracking-product-decisions.md
+  s_8821256d95b7ff::t_46398a4ae8af9f 1-147
+apps/construction-management/docs/modules/02-master-records.md
+  s_8821256d95b7ff::t_b24f008b59e1ca 231
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_efa0c46d4db7a1 512-583
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_8821256d95b7ff::t_79cd002374a048 5,809,811-890
+apps/construction-management/lib/masters-nav.ts
+  s_8821256d95b7ff::t_348d8b9dfef7bd 3-4,242-261
+apps/construction-management/lib/tracking-paths.ts
+  s_8821256d95b7ff::t_7c8459b90d280a 1-34
+apps/construction-management/src/composition/structure-usage.ts
+  s_8821256d95b7ff::t_6886ca2a0ac62d 12-14,20-22,30-34,37-39,44-51
+apps/construction-management/src/composition/task-tags.ts
+  s_8821256d95b7ff::t_184a4d083581a5 1-24
+apps/construction-management/src/composition/task-usage.ts
+  s_8821256d95b7ff::t_51197c423438f2 1-24
+apps/construction-management/src/composition/tracking-directory.ts
+  s_8821256d95b7ff::t_d87ca1b72c5e2a 1-419
+apps/construction-management/src/composition/tracking-drawing-links.ts
+  s_8821256d95b7ff::t_e7917446bf551d 1-45
+apps/construction-management/src/composition/tracking-inspections.ts
+  s_8821256d95b7ff::t_fe32566f648a2c 1-65
+apps/construction-management/src/composition/tracking-tasks.ts
+  s_8821256d95b7ff::t_f49c2578cfe8dc 1-40
+apps/construction-management/src/composition/tracking-usage.ts
+  s_8821256d95b7ff::t_2f8d6298210a7b 1-122
+apps/construction-management/src/masters/application/material-master-handlers.ts
+  s_8821256d95b7ff::t_653a0865aac99e 35,93-94,163,170-173
+apps/construction-management/src/masters/application/material-ports.ts
+  s_8821256d95b7ff::t_71849ccc9da086 140-148
+apps/construction-management/src/masters/application/party-handlers.ts
+  s_8821256d95b7ff::t_4e1661e2464a48 416
+apps/construction-management/src/masters/application/tracking-master-handlers.ts
+  s_8821256d95b7ff::t_d9b090cf1366f9 1-241
+apps/construction-management/src/masters/domain/master-kind.ts
+  s_8821256d95b7ff::t_76b5c74db63454 42-50,52-56,109-114,140,143,157,171-180,189
+apps/construction-management/src/masters/domain/tracking-master.ts
+  s_8821256d95b7ff::t_0832ba24cb47bd 1-65
+apps/construction-management/src/masters/infrastructure/create-masters-handlers.ts
+  s_8821256d95b7ff::t_1a115ca29c25d5 3-4,12-15,18-22,29,102-118
+apps/construction-management/src/masters/infrastructure/create-material-handlers.ts
+  s_8821256d95b7ff::t_04af2f2f31495a 9-12,20-23,26,30-31
+apps/construction-management/src/masters/infrastructure/issue-category-seeds.test.ts
+  s_8821256d95b7ff::t_8cb34a2ae9104b 1-41
+apps/construction-management/src/masters/infrastructure/prisma-tracking-master-store.ts
+  s_8821256d95b7ff::t_c083e3997dee34 1-207
+apps/construction-management/src/masters/infrastructure/seed-company-masters.ts
+  s_8821256d95b7ff::t_d1a4c1a795284c 20,62-69,216-248,253-254,328-332
+apps/construction-management/src/masters/infrastructure/seeds/issue-categories.json
+  s_8821256d95b7ff::t_92d5edf2ad25ab 1-19
+apps/construction-management/src/organization/infrastructure/designation-seeds.test.ts
+  s_8821256d95b7ff::t_afe77f272c84a1 14,23-24,28
+apps/construction-management/src/organization/infrastructure/seeds/designations.json
+  s_8821256d95b7ff::t_bfa973965b3141 3,325-326,350-382,448-449,468-470,480-481,567-599
+apps/construction-management/src/projects/application/project-drawings.ts
+  s_8821256d95b7ff::t_0fc1f08bf16b8a 9,179-197,232-233,763-768
+apps/construction-management/src/projects/domain/media-item.ts
+  s_8821256d95b7ff::t_69011b80d43400 68-71,73-83
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_8821256d95b7ff::t_9b1f9f991e9475 137-158
+apps/construction-management/src/projects/infrastructure/create-project-drawings.ts
+  s_8821256d95b7ff::t_0d7561983ddc36 7-10,15-18,21,34
+apps/construction-management/src/queries/tracking-access.ts
+  s_8821256d95b7ff::t_f1e039962b3f7f 1-39
+apps/construction-management/src/queries/tracking-documents.ts
+  s_8821256d95b7ff::t_19c3ba4627b800 1-173
+apps/construction-management/src/queries/tracking-inspections.ts
+  s_8821256d95b7ff::t_3d5b90906cfbc2 1-320
+apps/construction-management/src/queries/tracking-issues.ts
+  s_8821256d95b7ff::t_7f7e85e3ffdf49 1-228
+apps/construction-management/src/queries/tracking-masters.ts
+  s_8821256d95b7ff::t_237604f2b19e41 1-105
+apps/construction-management/src/queries/tracking-tasks.ts
+  s_8821256d95b7ff::t_0a16f3c8f3e2cc 1-295
+apps/construction-management/src/reporting/infrastructure/prisma-report-job-store.ts
+  s_8821256d95b7ff::t_594ca1383ba9fd 11,24-25
+apps/construction-management/src/shared-kernel/access/access.test.ts
+  s_8821256d95b7ff::t_1d346d59d4056a 67-69
+apps/construction-management/src/shared-kernel/access/menus.ts
+  s_8821256d95b7ff::t_3937cee814e1b2 257-258
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_8821256d95b7ff::t_f52eace9514fa1 103
+apps/construction-management/src/shared-kernel/sequence/modules.ts
+  s_8821256d95b7ff::t_909b3a201ad109 51-52
+apps/construction-management/src/shared-kernel/sequence/sequence-rule.test.ts
+  s_8821256d95b7ff::t_5111e4de9c3b2a 83
+apps/construction-management/src/tracking/application/document-access.test.ts
+  s_8821256d95b7ff::t_f7cf3bf89e5cff 1-151
+apps/construction-management/src/tracking/application/document-access.ts
+  s_8821256d95b7ff::t_f6462ddd7ec945 1-93
+apps/construction-management/src/tracking/application/document-files-ports.ts
+  s_8821256d95b7ff::t_7ac6515ffed772 1-91
+apps/construction-management/src/tracking/application/document-files.ts
+  s_8821256d95b7ff::t_d047818311eb26 1-539
+apps/construction-management/src/tracking/application/inspection-handlers.ts
+  s_8821256d95b7ff::t_6e819c87af3d86 1-1339
+apps/construction-management/src/tracking/application/issue-handlers.ts
+  s_8821256d95b7ff::t_fe354f72248512 1-1262
+apps/construction-management/src/tracking/application/ports.ts
+  s_8821256d95b7ff::t_25a365abaf0961 1-254
+apps/construction-management/src/tracking/application/task-handlers.ts
+  s_8821256d95b7ff::t_fa7769cd7f28af 1-1895
+apps/construction-management/src/tracking/application/task-import.ts
+  s_8821256d95b7ff::t_e9855652f86a09 1-506
+apps/construction-management/src/tracking/application/task-recompute.ts
+  s_8821256d95b7ff::t_8c754fe586eb21 1-120
+apps/construction-management/src/tracking/application/task-store.ts
+  s_8821256d95b7ff::t_d8737b12eae4f8 1-349
+apps/construction-management/src/tracking/application/task-views.ts
+  s_8821256d95b7ff::t_27134aed3ada7c 1-135
+apps/construction-management/src/tracking/domain/document-files.ts
+  s_8821256d95b7ff::t_a599857858e96d 1-240
+apps/construction-management/src/tracking/domain/events.ts
+  s_8821256d95b7ff::t_f49dce05cf097b 1-135
+apps/construction-management/src/tracking/domain/inspection.test.ts
+  s_8821256d95b7ff::t_2e3aec39d3bade 1-238
+apps/construction-management/src/tracking/domain/inspection.ts
+  s_8821256d95b7ff::t_fb006e3e8d1a23 1-293
+apps/construction-management/src/tracking/domain/issue.test.ts
+  s_8821256d95b7ff::t_f52fca814dd9ae 1-214
+apps/construction-management/src/tracking/domain/issue.ts
+  s_8821256d95b7ff::t_3aa7ecd54a1a24 1-298
+apps/construction-management/src/tracking/domain/task-progress.test.ts
+  s_8821256d95b7ff::t_628d70c31f8a4c 1-296
+apps/construction-management/src/tracking/domain/task-progress.ts
+  s_8821256d95b7ff::t_ef29b84e1e9923 1-404
+apps/construction-management/src/tracking/domain/task.test.ts
+  s_8821256d95b7ff::t_44fd454aaa2713 1-262
+apps/construction-management/src/tracking/domain/task.ts
+  s_8821256d95b7ff::t_c059db8c1b9c07 1-488
+apps/construction-management/src/tracking/domain/tracking-documents.ts
+  s_8821256d95b7ff::t_8f984463ec3567 1-80
+apps/construction-management/src/tracking/domain/tracking-errors.ts
+  s_8821256d95b7ff::t_e70f18d4cb590d 1-6
+apps/construction-management/src/tracking/infrastructure/document-files-factory.ts
+  s_8821256d95b7ff::t_c8c47b2ee3eb68 1-50
+apps/construction-management/src/tracking/infrastructure/document-files-store.ts
+  s_8821256d95b7ff::t_447dca9bccafd8 1-214
+apps/construction-management/src/tracking/infrastructure/document-locator.ts
+  s_8821256d95b7ff::t_107d22b4b7b549 1-133
+apps/construction-management/src/tracking/infrastructure/entry-files.ts
+  s_8821256d95b7ff::t_b0c7dd2e5ae249 1-130
+apps/construction-management/src/tracking/infrastructure/issue-rows.http.test.ts
+  s_8821256d95b7ff::t_eeb60f242dcdbc 1-76
+apps/construction-management/src/tracking/infrastructure/issue-rows.ts
+  s_8821256d95b7ff::t_25b4be01b2d00f 1-159
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.http.test.ts
+  s_8821256d95b7ff::t_f0d719d070249f 1-87
+apps/construction-management/src/tracking/infrastructure/issue-status-sql.ts
+  s_8821256d95b7ff::t_2bebc79da8082e 1-71
+apps/construction-management/src/tracking/infrastructure/issue-store.ts
+  s_8821256d95b7ff::t_70e1d0431848a4 1-464
+apps/construction-management/src/tracking/infrastructure/prisma-inspection-store.ts
+  s_8821256d95b7ff::t_79b68a9a21cf1c 1-447
+apps/construction-management/src/tracking/infrastructure/prisma-task-store.ts
+  s_8821256d95b7ff::t_c88f26ab03ca22 1-598
+apps/construction-management/src/tracking/infrastructure/task-status-sql.http.test.ts
+  s_8821256d95b7ff::t_3877cfd339532c 1-133
+apps/construction-management/src/tracking/infrastructure/task-status-sql.ts
+  s_8821256d95b7ff::t_4c569aa24be835 1-74
+apps/construction-management/src/tracking/infrastructure/task-workbook.ts
+  s_8821256d95b7ff::t_675068df35f511 1-203
+apps/construction-management/src/tracking/infrastructure/tracking-guards.ts
+  s_8821256d95b7ff::t_e2cca139daf461 1-48
+apps/construction-management/test/tracking.ts
+  s_8821256d95b7ff::t_c31a7efbc309d4 1-222
+packages/db/construction/prisma/migrations/20261014090000_construction_masters_tracking/migration.sql
+  s_8821256d95b7ff::t_53328f20ab366e 1-48
+packages/db/construction/prisma/migrations/20261014090100_construction_masters_issue_category_seeds/migration.sql
+  s_8821256d95b7ff::t_4551bbd8d07fec 1-35
+packages/db/construction/prisma/migrations/20261014090200_construction_site_work_worksheet_task/migration.sql
+  s_8821256d95b7ff::t_312c9b5e171cef 1-9
+packages/db/construction/prisma/migrations/20261014090300_construction_reporting_tracking_kinds/migration.sql
+  s_8821256d95b7ff::t_bbfdf43bf58e08 1-8
+packages/db/construction/prisma/migrations/20261014090400_construction_tracking/migration.sql
+  s_8821256d95b7ff::t_4cbbdabe54076d 1-479
+packages/db/construction/prisma/schema/base.prisma
+  s_8821256d95b7ff::t_ab7e2d75d68053 13
+packages/db/construction/prisma/schema/construction-masters.prisma
+  s_8821256d95b7ff::t_e9b91d41845368 436-477
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_8821256d95b7ff::t_4ce414d5f704d9 28-32
+packages/db/construction/prisma/schema/construction-site-work.prisma
+  s_8821256d95b7ff::t_41caa62270f379 263-265,278
+packages/db/construction/prisma/schema/construction-tracking.prisma
+  s_8821256d95b7ff::t_0f43de3b78a5f5 1-454
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3bb330f3d44e626581dd757941eba166d9b49def",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
