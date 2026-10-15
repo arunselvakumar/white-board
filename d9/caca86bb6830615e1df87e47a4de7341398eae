@@ -1,0 +1,19 @@
+.github/workflows/preview.yml
+  s_8821256d95b7ff::t_5246c4ae51f2a4 102-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d9caca86bb6830615e1df87e47a4de7341398eae",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
