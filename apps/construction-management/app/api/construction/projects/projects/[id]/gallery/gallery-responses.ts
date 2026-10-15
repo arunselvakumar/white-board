@@ -1,5 +1,6 @@
 import type { GalleryItemView } from "@/src/projects/application/project-gallery";
 import {
+  MEDIA_SOURCES_NEEDING_VIEW_ALL,
   MEDIA_SOURCE_MENUS,
   mediaTypeOf,
 } from "@/src/projects/domain/media-item";
@@ -7,6 +8,7 @@ import { can, type MemberAccess } from "@/src/shared-kernel/access";
 
 import { procurementGalleryRoutes } from "@/app/api/construction/procurement/documents/document-responses";
 import { siteWorkGalleryRoutes } from "@/app/api/construction/site-work/documents/document-responses";
+import { trackingGalleryRoutes } from "@/app/api/construction/tracking/documents/document-responses";
 
 import { documentsPath } from "../documents/project-document-responses";
 import {
@@ -29,7 +31,12 @@ export function readableSources(
   projectId: string,
 ): string[] {
   return Object.entries(MEDIA_SOURCE_MENUS)
-    .filter(([, menu]) => can(access, menu, "read", { projectId }))
+    .filter(
+      ([source, menu]) =>
+        can(access, menu, "read", { projectId }) &&
+        (!MEDIA_SOURCES_NEEDING_VIEW_ALL.has(source) ||
+          can(access, menu, "view_all", { projectId })),
+    )
     .map(([source]) => source);
 }
 
@@ -63,9 +70,13 @@ function routesOf(
         thumbnail: testingReportThumbnailPath(item.projectId, item.sourceId),
       };
     default:
-      // Procurement (M5) and site-work (M6) documents' files are served by
-      // their own routes.
-      return procurementGalleryRoutes(item) ?? siteWorkGalleryRoutes(item);
+      // Procurement (M5), site-work (M6) and tracking (M8) documents' files
+      // are served by their own routes.
+      return (
+        procurementGalleryRoutes(item) ??
+        siteWorkGalleryRoutes(item) ??
+        trackingGalleryRoutes(item)
+      );
   }
 }
 

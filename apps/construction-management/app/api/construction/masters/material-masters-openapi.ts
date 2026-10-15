@@ -178,7 +178,7 @@ export const materialMastersOpenApiOperations: OpenApiOperation[] = [
     menu: "masters.units",
     code: "MEASUREMENT_UNIT",
     deleteRule:
-      "409 SEED_IS_READ_ONLY for a seed unit, MEASUREMENT_UNIT_IN_USE while a Material is counted in it.",
+      "409 SEED_IS_READ_ONLY for a seed unit, MEASUREMENT_UNIT_IN_USE while a Material or a live Task is counted in it.",
     query: ListConstructionMastersMeasurementUnitsQueryModel,
     list: ListConstructionMastersMeasurementUnitsResponseModel,
     item: ConstructionMastersMeasurementUnitResponseModel,

@@ -183,7 +183,7 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     plural: "Departments",
     menu: "masters.departments",
     inUse:
-      "409 SEED_IS_READ_ONLY for a seed row, DEPARTMENT_IN_USE while a Work Type or a live Daily Worksheet or Equipment Usage sheet uses it.",
+      "409 SEED_IS_READ_ONLY for a seed row, DEPARTMENT_IN_USE while a Work Type, a live Daily Worksheet or Equipment Usage sheet, or a live Task, Issue or Inspection Request uses it.",
     list: ListConstructionMastersDepartmentsResponseModel,
     item: ConstructionMastersDepartmentResponseModel,
     create: CreateConstructionMastersDepartmentRequestModel,

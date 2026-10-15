@@ -80,6 +80,7 @@ describe("formatSequenceNumber", () => {
       "EU",
       "DPR",
       "HR",
+      "ISS",
       "INV",
       "TXN",
       "PAY",

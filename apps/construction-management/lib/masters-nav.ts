@@ -1,5 +1,7 @@
 import {
   BadgeCheck,
+  CircleAlert,
+  Tag,
   Landmark,
   Tags,
   UserRoundPlus,
@@ -234,6 +236,26 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Owned and rented plant: where it is, maintenance and hire rates.",
         icon: Tractor,
+      },
+    ],
+  },
+  {
+    label: "Tasks & Issues",
+    sections: [
+      {
+        href: "/app/masters/issue-categories",
+        label: "Issue Categories",
+        title: "Issue Categories",
+        description:
+          "What an issue or snag is about: Quality, Safety, Design, RFI…",
+        icon: CircleAlert,
+      },
+      {
+        href: "/app/masters/tags",
+        label: "Tags",
+        title: "Tags",
+        description: "Labels you put on Tasks to find and filter them.",
+        icon: Tag,
       },
     ],
   },

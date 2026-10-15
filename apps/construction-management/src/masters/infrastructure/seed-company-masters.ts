@@ -17,6 +17,7 @@ import {
   type LookupKind,
 } from "../domain/master-kind";
 import { lookupTable } from "./prisma-lookup-store";
+import issueCategorySeeds from "./seeds/issue-categories.json";
 import seeds from "./seeds/masters.json";
 
 const SEED_NAMES: Record<LookupKind, readonly string[]> = {
@@ -57,6 +58,14 @@ export const SEED_MATERIALS: readonly {
   category: string;
   unit: string;
 }[] = seeds.materials;
+
+/**
+ * Every Company's Issue Categories, the 14 of `modules/05` (CM-801, ADR
+ * CM-0019 §1; keep in step with migration
+ * `20261014090100_construction_masters_issue_category_seeds`).
+ */
+export const SEED_ISSUE_CATEGORIES: readonly string[] =
+  issueCategorySeeds.issueCategories;
 
 type Tx = Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0];
 
@@ -205,10 +214,44 @@ async function seedWorkTypes(
 }
 
 /**
+ * The seed Issue Categories (CM-801). A Company that already has a live
+ * category of the name (any case) keeps its own.
+ */
+async function seedIssueCategories(
+  tx: Tx,
+  input: { workspaceId: string; by: string; now: Date },
+): Promise<void> {
+  const taken = takenNames(
+    await tx.constructionMastersIssueCategory.findMany({
+      where: { workspaceId: input.workspaceId, deletedAt: null },
+      select: { name: true },
+    }),
+  );
+  const data = SEED_ISSUE_CATEGORIES.filter(
+    (name) => !taken.has(name.toLowerCase()),
+  ).map((name) => ({
+    id: newId(input.now.getTime()),
+    workspaceId: input.workspaceId,
+    name,
+    isSeed: true,
+    createdAt: input.now,
+    updatedAt: input.now,
+    createdBy: input.by,
+    updatedBy: input.by,
+  }));
+  if (data.length > 0)
+    await tx.constructionMastersIssueCategory.createMany({
+      data,
+      skipDuplicates: true,
+    });
+}
+
+/**
  * Copies the seed Labour Categories and Departments (CM-203), the
  * Amenities and Common Developments (CM-404) and the Measurement Units,
  * Material Categories and starter Materials (CM-501), and the Work Types
- * (CM-601) to a Company. Labour Categories get their skill.
+ * (CM-601) and the Issue Categories (CM-801) to a Company. Labour
+ * Categories get their skill.
  * Idempotent: names the Company already has (live, any case) are skipped,
  * so running it twice, or after the M2 migration's backfill, adds nothing.
  */
@@ -278,6 +321,11 @@ export async function seedCompanyMasters(
         });
     }
     await seedMaterialMasters(tx, {
+      workspaceId: input.workspaceId,
+      by: input.by,
+      now,
+    });
+    await seedIssueCategories(tx, {
       workspaceId: input.workspaceId,
       by: input.by,
       now,

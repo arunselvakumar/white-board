@@ -9,6 +9,7 @@ import {
   SearchX,
   SlidersHorizontal,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -46,6 +47,11 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { formatBytes } from "@/lib/project-documents";
 import {
+  isTrackingRecordType,
+  trackingRecordLinkLabel,
+  trackingRecordPath,
+} from "@/lib/tracking-paths";
+import {
   EMPTY_GALLERY_FILTER,
   galleryQuery,
   galleryUploadersQuery,
@@ -82,6 +88,9 @@ const SOURCE_FILTERS = [
   { value: "equipment_usage", label: "Equipment Usage" },
   { value: "site_diary", label: "Site Diaries" },
   { value: "hindrance", label: "Hindrances" },
+  { value: "task", label: "Tasks" },
+  { value: "issue", label: "Issues & Snags" },
+  { value: "inspection", label: "Inspections" },
 ];
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -98,6 +107,9 @@ const SOURCE_LABELS: Record<string, string> = {
   equipment_usage: "Equipment Usage",
   site_diary: "Site Diary",
   hindrance: "Hindrance",
+  task: "Task",
+  issue: "Issue & Snag",
+  inspection: "Inspection Request",
 };
 
 /** "Testing Report"; a later module's source reads from its key. */
@@ -136,6 +148,32 @@ function viewerMeta(item: GalleryItem): string {
   ]
     .filter((part) => part != null && part.length > 0)
     .join(" · ");
+}
+
+/**
+ * The viewer's line under the file name; a tracking record's file also
+ * links back to its Task, Issue or Inspection Request (M8).
+ */
+function ViewerDescription({
+  projectId,
+  item,
+}: {
+  projectId: string;
+  item: GalleryItem;
+}) {
+  const meta = viewerMeta(item);
+  if (!isTrackingRecordType(item.source)) return meta;
+  return (
+    <>
+      {meta} ·{" "}
+      <Link
+        href={trackingRecordPath(projectId, item.source, item.sourceId)}
+        className="text-foreground underline underline-offset-4"
+      >
+        {trackingRecordLinkLabel(item.source)}
+      </Link>
+    </>
+  );
 }
 
 function filesCount(count: number): string {
@@ -584,7 +622,11 @@ export function GalleryPage({ projectId }: { projectId: string }) {
                 contentType: viewing.contentType,
               }
         }
-        description={viewing == null ? undefined : viewerMeta(viewing)}
+        description={
+          viewing == null ? undefined : (
+            <ViewerDescription projectId={projectId} item={viewing} />
+          )
+        }
         onClose={() => {
           setViewingId(null);
         }}

@@ -65,4 +65,19 @@ export const MEDIA_SOURCE_MENUS: Readonly<Record<string, MenuKey>> = {
   equipment_usage: "site_work.equipment_usage",
   site_diary: "site_work.site_diary",
   hindrance: "site_work.hindrances",
+  // Tracking documents (M8, CM-0019 §11): their images and PDFs.
+  task: "tracking.tasks",
+  issue: "tracking.issues",
+  inspection: "tracking.inspection_requests",
 };
+
+/**
+ * Sources whose menus scope Read by View all (CM-0019 §5, §8): without it
+ * a member opens only the tasks and issues they created or are assigned
+ * to, so the Gallery lists these sources only to members with View all —
+ * it never shows a tile whose file route would refuse.
+ */
+export const MEDIA_SOURCES_NEEDING_VIEW_ALL: ReadonlySet<string> = new Set([
+  "task",
+  "issue",
+]);

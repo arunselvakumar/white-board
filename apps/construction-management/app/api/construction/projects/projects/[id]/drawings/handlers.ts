@@ -1,3 +1,4 @@
+import { trackingDrawingUsage } from "@/src/composition/tracking-usage";
 import { createPlanGate } from "@/src/organization/infrastructure/create-subscription-handlers";
 import { DRAWING_MAX_BYTES } from "@/src/projects/domain/project-upload-policies";
 import { createProjectDrawings } from "@/src/projects/infrastructure/create-project-drawings";
@@ -6,9 +7,13 @@ import { projectUploadRoutes } from "../../../project-upload-routes";
 import { StartConstructionProjectsDrawingUploadRequestModel } from "./drawing-models";
 import { drawingsPath } from "./drawing-responses";
 
-/** One composition for the Project Drawings routes (CM-408). */
+/**
+ * One composition for the Project Drawings routes (CM-408). A drawing a
+ * live Inspection Request links cannot be deleted (M8).
+ */
 export const projectDrawings = createProjectDrawings({
   plan: createPlanGate(),
+  usage: trackingDrawingUsage(),
 });
 
 /**

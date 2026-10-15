@@ -509,3 +509,75 @@ Flags from the "Menu / permission map" in `_working-notes.md`:
 14. Do issues have a user-visible number? There is no Sequence ID for them.
 15. Exact column sets for the Task, Issue & Snag and Inspection Request reports.
 16. Where are Tags managed? There is no Master tile in the permission map.
+
+---
+
+## Decisions for the build
+
+The open questions above are answered in [ADR CM-0019](../adr/CM-0019-tracking-product-decisions.md). Rules the M8 build settled beyond the ADR are listed here by ticket.
+
+### CM-801
+
+- **Issue Categories follow the ADR, not the older seed rule.** A Default (seed) category can be renamed and, when no live issue names it, deleted — unlike Departments or Units, whose seeds are read-only. A snag raised from a rejected inspection looks up the live, enabled category named "Quality" (any case); when the Company renamed, disabled or deleted it, the snag has no category.
+- **Tags are never disabled**; there is no disable route. `POST /api/construction/masters/tags/ensure` (Tags Create) returns the live tag of that name (200) or creates it (201): the Task form's inline create. Task and issue forms read their pickers (Tags, Issue Categories, Departments, Contractors, Units, Team Members, Drawings) through the tracking context's `TrackingDirectory.options`, so a member needs no Masters read to pick.
+- **Masters lists of Issue Categories and Tags are whole lists, by name** (with `total`), like Departments and Payment Categories, and say per row whether it is `inUse` and per list what the caller `can` do.
+- **Designation templates.** Project Manager: Issue Categories and Tags CRUD. Site Engineer: Issue Categories read, Tags create and read, Inspection Request CRU N. Site Supervisor: Task CRU N, Issues CRU N, Inspection Request CRU, Issue Categories and Tags read. **Quality Control** and **Structural Engineer** now carry templates: Inspection Request R U A J P report N, Issues and snags C R U A J P report V N, Task read, Drawings read, Testing Reports CRU.
+- **Back-dated entry** checks an issue's `issueDate` (the field was named `reportedDate` before M8).
+- **Files.** One table, `document_files`, for all three documents: task photos are images only and need Task **Update** (they come with progress); issue and inspection files take a PDF or an image and need Create or Update; Update removes any file, an uploader their own; Read serves them, with View all scoping on tasks and issues (own, created or assigned). An issue update's composer asks for photos only on the client; the server's policy for issues stays PDF-or-image. A document keeps at most 200 files (a task gathers every progress update's photos), an entry 10, 25 MB each. An entry's files are uploaded first and attached when the entry is posted (`attachEntryFiles`); deleting an entry tombstones its files (`tombstoneEntryFiles`) and takes them out of the Gallery.
+- **Gallery.** Images and PDFs of tasks, issues and inspections join it (sources `task`, `issue`, `inspection`), and the viewer links back to the record (`/app/projects/<id>/tasks|issues|inspections/<recordId>`). Because tasks and issues scope Read by View all, the Gallery lists their files only to members with **View all**; inspection files to anyone with Inspection Request read.
+- **Drawings.** A drawing a live Inspection Request links cannot be deleted (409 `DRAWING_IN_USE`, `details.inspectionCount`); a deleted request does not count. Albums need no check: only an empty album can be deleted.
+- **Tracking access route** takes a required `projectId` and answers 404 `PROJECT_NOT_FOUND` for a Project that is not a live Project of the Company; it also returns the caller's **Tags** flags (Company-level) for the inline create.
+
+### CM-802
+
+- **Progress is cached at every level; planned dates, baseline and price roll up on read.** `recomputeTaskAndAncestors` (in the same transaction as every change that moves progress, edits included) rewrites `progress_pct`, `completed_work_qty`, `actual_start` and `actual_end` on the leaf and each ancestor. A summary task's own planned dates, work and price columns are kept but ignored: its dates and baseline are the span of its live leaf tasks', its Total Price and Completed Price the sum of theirs. A summary's `completed_work_qty` stays 0 (its leaves may use different units). Recomputing never moves `updated_at`, so it never makes an open form stale.
+- **Price weighting needs every leaf priced and the prices to add up to more than ₹0**; otherwise duration weighting (planned days, both ends counted; a task without both dates weighs 1). A roll-up stays below 100 % until every leaf that weighs is at 100 %; percentages are rounded half up to two decimals.
+- **A quantity task's progress below its total never rounds up to 100 %** (it shows 99.99 %). Overrun is allowed; progress stays 100 %.
+- **Actual End is the date of the update from which the task has stayed at 100 %**; a percent task's progress is its latest update by date (same-day updates by when they were entered).
+- **A task with progress updates cannot get sub-tasks, switch between quantity and percent, or change its unit** (409 `TASK_HAS_PROGRESS`): the figures would mix. Delete the updates first.
+- **Re-baseline is for leaf tasks with both planned dates** (409 `TASK_IS_SUMMARY`, 400 `TASK_DATES_REQUIRED`); a summary's baseline is its sub-tasks' span. The automatic v1 has no reason ("Captured from the planned dates").
+- **Update Task Progress, Mark As Completed and Re-baseline need Task Update.** An update can be edited or deleted by its author or anyone with Task Update; the edit can add photos, and photos are removed through the file's own × (its uploader or Update). Mark As Completed records the remaining quantity (or 100 %) as an ordinary update, so deleting that update reopens the task.
+- **Without Financial, a Total Price sent on create, edit or import is not taken**: on create and edit it is ignored (an edit keeps the stored price); in the import it is a row error, so nobody sets prices they cannot see.
+- **Visibility without View all:** own (created) and assigned tasks match; their ancestors come along greyed ("shown for context") and cannot be opened (404) or acted on. Sub-tasks of an assigned task are not shown unless they are the member's too. Filters match any level and bring the ancestors along (`matched: false`).
+- **The list pages by top-level task** (bidirectional cursors on sort order and Task No.), each with its visible subtree; `total` counts matching tasks. The Gantt reads the whole visible tree in one call.
+- **Other locations** must be of the main location's Location Type, and in its Wing when it is a Wing (`TASK_LOCATION_MISMATCH`); there are at most 20. The location filter matches a Wing, Amenity, Common Development or Location id in the main or another location.
+- **The date-range filter** matches tasks whose planned span (rolled up for summaries) overlaps it; undated tasks do not match.
+- **Copy task below** keeps each copied sub-task's order and gives every copy a new Task No.; leaf copies with both dates get their own baseline v1. Each copy's feed starts with `copied` (the original's Task No.).
+- **Delete** (single and bulk) also tombstones the tasks' photos and takes them out of the Gallery. The 409 `TASK_IN_USE` lists each task in use with its worksheet count (`details.tasks`), and `details.worksheetCount` is the total. A rejected worksheet still names its task; deleting the worksheet frees it.
+- **Import:** Ref / Parent Ref may come in any order; duplicates, unknown parents, circles and a fourth level are row errors. Masters match the pickers' lists (enabled Departments and Units, active Contractors on the Project, active Team Members on the Project); an assignee name shared by two members is refused. Unknown tags are created through the masters' `ensure` only after every row checks out, so a refused sheet creates nothing. Priority is High / Medium / Low in any case; dates as DD/MM/YYYY, YYYY-MM-DD or an Excel date; Total Price in rupees.
+- **Events** `TaskAssigned` (newly added assignees, on create and edit), `TaskProgressRecorded` (record and edit), `TaskCompleted` (crossing to 100 %) carry the task's creator and assignees for M9.
+
+### CM-803
+
+- **Issue Date** cannot be after the Company's today (`ISSUE_DATE_IN_FUTURE`); back-dated control applies to it on create, edit (old and new date) and delete.
+- **Delayed** is open and the Company's today after the Due Date. An issue due today is Pending; one without a Due Date is never Delayed. `issueStatus` (domain), `issueStatusSql` and `issueStatusWhere` (infrastructure) are tested against each other on Postgres.
+- **Edit** only while open (Pending or Delayed); a solved or closed issue answers 409 `ISSUE_NOT_OPEN` until it is reopened. **Delete** works in any status with Delete.
+- **Mark As Solved, Verify and Reopen** record server time and do not check the back-dated policy (they are not entries on the Issue Date). Verify keeps Solved On / By; Reopen clears Solved and Closed.
+- **Bulk** Mark As Solved and Verify never refuse the batch: issues in another state, of another Project, deleted or hidden from the member are skipped and counted.
+- **Without View all**, an issue the member did not raise and is not assigned to answers 404 on every route, as if it did not exist.
+- Category, Department, Contractor and Assign To are checked only when set or changed: an unchanged disabled category or department, a Contractor taken off the Project, or an assignee who left stays on edit. A new Contractor must be active and on the Project; a new assignee an active Team Member on the Project (the Owner included).
+- **Progress updates** can be posted in any status (closed included) by anyone who sees the issue and holds Update. Images are uploaded to the issue first and posted by id (the tracking entry files); the composer takes images only. Only the author deletes an update, within 24 hours, with Read alone; its images leave the Gallery.
+- The issue's own **Images** and **Attachments** are both files of the issue (attachments also take PDFs). The new-issue form uploads them after the save; on an existing issue they are added and removed on its page, not on the edit form.
+- **Events:** `IssueAssigned` on create with an assignee and on edit when the assignee changes to someone; `IssueSolved` on Mark As Solved (single or bulk) and Save & Mark As Solved; `IssueUpdated` when a Progress update is posted; `IssueReopened` with the reason. Verify raises none (not in CM-0019 §11).
+- The list is newest recorded first. Status chips combine (Pending + Delayed); the Location filter picks a Wing, Amenity, Common Development or Location (any floor or unit of a Wing matches).
+- History rows written by one command share a time; they read created, edited, assigned, solved, closed, reopened.
+- The priority chip is filled with its colour and carries **black** text: white fails contrast on the red (#F90B0B) and the yellow (#FCF200).
+
+### CM-804
+
+- **Inspection Date may be a later day.** A request is often raised ahead of the visit; the back-dated policy (Site → Inspection Request) only limits how far back it goes. Edit checks the old and the new date; Delete checks the date under the edit limit; Approve and Reject are not back-dated entries and check nothing. Inspection Time is optional, `HH:MM` in 24 hours.
+- **References are checked when set or changed.** The inspector must be an active Team Member on the Project (the Owner counts), a Department enabled, a Contractor active and assigned to the Project, each drawing a live Drawing of the same Project; an edited request may keep an unchanged pick that has since been disabled or left the Project. At most 50 linked drawings; Description of work up to 2,000 characters.
+- **Bulk decisions skip and count** (CM-0019 §9), unlike the all-or-none bulk of Daily Worksheets: a selected request that is already decided, deleted or another Project's is skipped and counted, and the rest are decided in one transaction. A single Approve or Reject of a decided request is 409 `INSPECTION_NOT_PENDING`.
+- **A snag from a rejection** is raised by the person who rejects, in the same transaction, through the shared Issue & Snag writer: Issue Date = the Company's today, category Quality when that enabled category exists (else none), the request's contractor, department and location copied as they are, no priority, due date or assignee, details "Inspection IR/… rejected: <reason>". Without Issues & Snags Create the server answers 403 `SNAG_NOT_ALLOWED` and nothing is rejected.
+- **Re-inspection.** `GET /api/construction/tracking/inspections/{id}/reinspection` (Create) returns the prefill of a rejected request, keeping only what can still be picked (an inspector still on the Project, an enabled Department, a Contractor still assigned, live drawings, a location still on the Project); the Add page is `…/inspections/new?reinspect=<id>`. A rejected request has at most **one live re-inspection** (409 `INSPECTION_REINSPECTION_EXISTS`); a rejected re-inspection can be inspected again in turn, so they chain.
+- **Observations** are added by the request's inspector (the caller's own Team Member) or anyone with Update, while pending; text up to 2,000 characters, or files only. Files are uploaded to the request first and attached to the observation when it is posted. The request's **inspector may upload** for this even with Read only (the files service grants them the upload right on that request while it is pending, and they may remove their own uploads); no one else gains a right. The author may delete their own observation while the request is pending (its files leave the Gallery). Observations and remarks do not change the request's `updatedAt`, so an open edit form is not made stale by them.
+- **A decided request's files are final.** Once approved or rejected, the files service refuses uploading to the request or removing any of its files — its own and its observations' — with 409 `INSPECTION_DECIDED`, and reports `canUpload` / `canRemove` false. Task and issue files are not affected.
+- **Remarks** are text up to 500 characters, by anyone with Read, at any time; they are a log and cannot be edited or deleted.
+- **The list** is newest first (by when raised) and returns the counts by status under the other filters for the status chips; the location filter takes a Wing, Amenity, Common Development or Location.
+- **Linked drawings open their album** in Project Drawings (`/app/projects/<id>/drawings/<albumId>`); the tracking context reads the album through its own `TrackingDrawingLinks` port.
+- **Events:** `InspectionRequested` on every create (a re-inspection names the request it re-inspects); `InspectionDecided` once per decided request, with the snag's id when one was raised.
+- **`successRate(approved, rejected)`** (`src/tracking/domain/inspection.ts`) is a percentage 0–100, unrounded, and `null` with no decided request; pending requests do not count.
+
+### CM-805
+
+### CM-806

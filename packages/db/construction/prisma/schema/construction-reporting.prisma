@@ -25,6 +25,11 @@ enum ConstructionReportingReportKind {
   other_expenses
   tds_194c
   due_payments
+  /// Tracking (CM-0019 §14).
+  task_report
+  issue_snag_report
+  inspection_request_report
+  task_progress_report
 
   @@map("report_kind")
   @@schema("construction_reporting")

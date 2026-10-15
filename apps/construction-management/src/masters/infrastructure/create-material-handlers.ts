@@ -6,7 +6,10 @@ import {
   MeasurementUnitHandlers,
   TermsConditionHandlers,
 } from "../application/material-master-handlers";
-import type { MaterialUsage } from "../application/material-ports";
+import type {
+  MaterialUsage,
+  MeasurementUnitUsage,
+} from "../application/material-ports";
 import {
   PrismaMaterialCategoryStore,
   PrismaMaterialStore,
@@ -14,12 +17,18 @@ import {
   PrismaTermsConditionStore,
 } from "./prisma-material-master-stores";
 
-/** Measurement Units (CM-501). */
+/**
+ * Measurement Units (CM-501). `usage` adds other contexts' references
+ * (tracking's tasks, CM-801), wired by the routes from `src/composition`.
+ */
 export function createMeasurementUnitHandlers(deps?: {
   prisma?: PrismaClient;
+  usage?: MeasurementUnitUsage;
 }) {
   return new MeasurementUnitHandlers(
     new PrismaMeasurementUnitStore(deps?.prisma ?? prisma),
+    () => new Date(),
+    deps?.usage,
   );
 }
 

@@ -134,6 +134,28 @@ export const PROJECT_MODULES = [
     segment: "hindrances",
     menu: "site_work.hindrances",
   },
+  // Tracking (M8, ADR CM-0019).
+  {
+    key: "tasks",
+    label: "Tasks",
+    description: "The plan as a task tree: baseline, progress and a Gantt.",
+    segment: "tasks",
+    menu: "tracking.tasks",
+  },
+  {
+    key: "issues",
+    label: "Issues & Snags",
+    description: "Snags and issues to solve, verify or reopen.",
+    segment: "issues",
+    menu: "tracking.issues",
+  },
+  {
+    key: "inspections",
+    label: "Inspections",
+    description: "Inspection Requests with observations and decisions.",
+    segment: "inspections",
+    menu: "tracking.inspection_requests",
+  },
   {
     key: "progress_reports",
     label: "Progress Reports",

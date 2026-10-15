@@ -187,9 +187,10 @@ async function seed(company: Company, projectId: string) {
     contentType: "image/png",
     uploadedAt: at("2026-10-05", "20:00:00"),
   });
-  // A later module's file: listed only once its source has a menu here.
+  // A later module's file (Bookings, M10): listed only once its source
+  // has a menu here.
   await media({
-    source: "issue",
+    source: "booking",
     sourceId: newId(),
     fileName: "Slab casting.jpg",
     contentType: "image/jpeg",

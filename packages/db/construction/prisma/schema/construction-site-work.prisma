@@ -260,6 +260,9 @@ model ConstructionSiteWorkWorksheet {
   decidedBy        String?                            @map("decided_by")
   rejectionReason  String?                            @map("rejection_reason")
   duplicatedFromId String?                            @map("duplicated_from_id") @db.Uuid
+  /// The Task this work is for (ADR CM-0019 §6); a leaf task of the same
+  /// Project in `construction_tracking`, kept without a foreign key.
+  taskId           String?                            @map("task_id") @db.Uuid
   createdAt        DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
   createdBy        String                             @map("created_by")
@@ -272,6 +275,7 @@ model ConstructionSiteWorkWorksheet {
   @@unique([workspaceId, number])
   @@index([workspaceId, projectId, sheetDate])
   @@index([workspaceId, contractorId])
+  @@index([taskId])
   @@map("worksheets")
   @@schema("construction_site_work")
 }

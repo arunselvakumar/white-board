@@ -253,6 +253,39 @@ describe("Sequence ID rules HTTP (CM-114)", () => {
     });
   });
 
+  it("numbers Inspection Requests and Issues & Snags from their rules (CM-801)", async () => {
+    const company = owner();
+    const projectId = await addProject(company.workspaceId, company.userId);
+    for (const [module, prefix] of [
+      ["inspection_request", "IR"],
+      ["issue", "SNAG"],
+    ] as const) {
+      const created = await create({ module, prefix });
+      expect(created.status).toBe(StatusCodes.CREATED);
+      const project = await create({
+        module,
+        prefix,
+        projectId,
+        projectToken: "TA",
+      });
+      expect(project.status).toBe(StatusCodes.CREATED);
+      const issued = await prisma.$transaction((tx) =>
+        nextSequenceNumber(tx, {
+          workspaceId: company.workspaceId,
+          module,
+          projectId,
+          date: "2026-10-14",
+          by: company.userId,
+        }),
+      );
+      expect(issued.number).toBe(`${prefix}/26-27/TA/00001`);
+    }
+    const listed = await json<{ items: RuleBody[] }>(
+      await listRules(new Request(`${BASE}?module=issue`)),
+    );
+    expect(listed.items.map((item) => item.issued)).toEqual([false, true]);
+  });
+
   it("is on /api/docs with ConstructionOrganization components", async () => {
     const spec = await json<{
       paths: Record<string, Record<string, unknown>>;

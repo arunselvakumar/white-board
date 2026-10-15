@@ -100,7 +100,7 @@ export const BACKDATED_MODULES = [
   ),
   m("site_diary", "Site Diary", "site", "diaryDate", "site_work.site_diary"),
   m("hindrance", "Hindrance", "site", "startDate", "site_work.hindrances"),
-  m("issue", "Issues & Snags", "site", "reportedDate", "tracking.issues"),
+  m("issue", "Issues & Snags", "site", "issueDate", "tracking.issues"),
   m(
     "inspection_request",
     "Inspection Request",

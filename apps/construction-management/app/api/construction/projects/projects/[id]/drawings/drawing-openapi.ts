@@ -246,12 +246,12 @@ export const drawingOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{drawingId}/delete`,
     summary:
-      "Delete a drawing and every revision (delete); they leave the Gallery",
+      "Delete a drawing and every revision (delete); they leave the Gallery. 409 DRAWING_IN_USE (`details.inspectionCount`) while live Inspection Requests link it",
     tags: DRAWINGS,
     params: ConstructionProjectsDrawingParamsModel,
     successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Deleted",
-    errors: [...ERRORS, StatusCodes.PAYMENT_REQUIRED],
+    errors: [...ERRORS, StatusCodes.CONFLICT, StatusCodes.PAYMENT_REQUIRED],
   },
   {
     method: "get",

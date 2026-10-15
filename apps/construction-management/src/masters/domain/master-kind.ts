@@ -39,9 +39,21 @@ export type MaterialMasterKind = (typeof MATERIAL_MASTER_KINDS)[number];
 /** Lists whose rows are a name, a seed mark and a disabled mark. */
 export type NamedMasterKind = LookupKind | DevelopmentKind | "measurement_unit";
 
-/** Every masters list this context owns (CM-203, CM-404, CM-501, CM-601). */
+/**
+ * The tracking masters (CM-801, ADR CM-0019 §1): Issue Categories (seeded,
+ * renamed, disabled, deleted when unused) and Tags (renamed, deleted when
+ * unused).
+ */
+export const TRACKING_MASTER_KINDS = ["issue_category", "tag"] as const;
+export type TrackingMasterKind = (typeof TRACKING_MASTER_KINDS)[number];
+
+/** Every masters list this context owns (CM-203, CM-404, CM-501, CM-601, CM-801). */
 export type MasterKind =
-  NamedMasterKind | "supervisor" | MaterialMasterKind | "work_type";
+  | NamedMasterKind
+  | "supervisor"
+  | MaterialMasterKind
+  | "work_type"
+  | TrackingMasterKind;
 
 type MasterKindInfo = {
   /** Prefix of the list's error codes: `LABOUR_CATEGORY_NAME_IN_USE`. */
@@ -94,6 +106,12 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     plural: "Terms & Conditions",
   },
   work_type: { code: "WORK_TYPE", label: "Work Type", plural: "Work Types" },
+  issue_category: {
+    code: "ISSUE_CATEGORY",
+    label: "Issue Category",
+    plural: "Issue Categories",
+  },
+  tag: { code: "TAG", label: "Tag", plural: "Tags" },
 };
 
 export const MASTER_NAME_MAX = 100;
@@ -119,9 +137,10 @@ export function masterNotFound(kind: MasterKind): DomainError {
 
 export function masterNameInUse(kind: MasterKind): DomainError {
   const { code, label } = MASTER_KINDS[kind];
+  const article = /^[AEIOU]/.test(label) ? "An" : "A";
   return conflict(
     `${code}_NAME_IN_USE`,
-    `A ${label} with this name already exists.`,
+    `${article} ${label} with this name already exists.`,
   );
 }
 
@@ -135,7 +154,7 @@ export function masterChanged(kind: MasterKind): DomainError {
 
 /** Why a row of each procurement master cannot be deleted. */
 const MATERIAL_MASTER_USERS: Record<MaterialMasterKind, string> = {
-  measurement_unit: "Materials use this Measurement Unit",
+  measurement_unit: "Materials or Tasks use this Measurement Unit",
   material_category: "Materials or sub-categories use this Material Category",
   material:
     "Purchase Requests, Purchase Orders, Goods Receipts, transfers, Material Requests, stock entries, Daily Worksheets or Equipment Usage sheets use this Material",
@@ -149,6 +168,16 @@ export function masterInUse(kind: MasterKind): DomainError {
       `${code}_IN_USE`,
       `${MATERIAL_MASTER_USERS[kind as MaterialMasterKind]}, so it cannot be deleted. Disable it instead.`,
     );
+  if (kind === "issue_category")
+    return conflict(
+      `${code}_IN_USE`,
+      "Issues & Snags use this Issue Category, so it cannot be deleted. Disable it instead.",
+    );
+  if (kind === "tag")
+    return conflict(
+      `${code}_IN_USE`,
+      "Tasks use this Tag, so it cannot be deleted. Take it off those Tasks first.",
+    );
   if (kind === "work_type")
     return conflict(
       `${code}_IN_USE`,
@@ -157,7 +186,7 @@ export function masterInUse(kind: MasterKind): DomainError {
   if (kind === "department")
     return conflict(
       `${code}_IN_USE`,
-      "Work Types, Daily Worksheets or Equipment Usage sheets use this Department, so it cannot be deleted. Disable it instead.",
+      "Work Types, Daily Worksheets, Equipment Usage sheets, Tasks, Issues & Snags or Inspection Requests use this Department, so it cannot be deleted. Disable it instead.",
     );
   if (kind === "amenity" || kind === "common_development")
     return conflict(
