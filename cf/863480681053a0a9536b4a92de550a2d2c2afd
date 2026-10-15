@@ -1,0 +1,19 @@
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_0836829687bea4::t_30007f1fc606d8 105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cf863480681053a0a9536b4a92de550a2d2c2afd",
+  "prompts": {},
+  "sessions": {
+    "s_0836829687bea4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e59fdd6-fe47-482d-a517-56599bfe71a1",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
