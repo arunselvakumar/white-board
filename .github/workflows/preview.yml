@@ -1,22 +1,31 @@
 name: Preview
 
-# Pull-request previews of Construction Management are built here, not on
-# Vercel's builders: its `next build` no longer fits Vercel's 8 GB build
-# machine (ADR-0046), the reason production already deploys from the Deploy
-# workflow. Whiteboard and the Marketing Site keep Vercel's own previews.
+# Pull-request previews of Construction Management, built on a GitHub runner
+# and uploaded to Vercel as prebuilt output (ADR-0046): its `next build` does
+# not fit Vercel's 8 GB build machine. Whiteboard and the Marketing Site keep
+# Vercel's own previews.
 #
-# A pull request from a branch of this repository that changes Construction
-# Management (turbo's package graph, so @repo/ui or @repo/auth count) is built
-# on a GitHub runner against the project's Preview environment, which applies
-# migrations to the preview database first, and uploaded to Vercel as
-# prebuilt output. The preview is recorded as a GitHub Deployment in
-# `preview/construction-management`, so the pull request links to it.
+# Previews are on request, because every upload counts against Vercel's
+# daily file-upload allowance, which production deploys share (ADR-0046). A
+# pull request gets a preview when it carries the `preview` label and CI has
+# passed on its latest commit: when the label is added to a pull request
+# whose CI already passed, and after every later CI pass while the label
+# stays. Only branches of this repository are previewed (forks and Dependabot
+# get no secrets), and only when Construction Management is affected
+# (turbo's package graph, so @repo/ui or @repo/auth count).
+#
+# The build applies migrations to the preview database first. The preview is
+# recorded as a GitHub Deployment in `preview/construction-management`, so
+# the pull request links to it.
 #
 # Needs the repository secret VERCEL_TOKEN (Vercel team below).
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [labeled]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 # The previews share one preview database: one build at a time, oldest
 # first, never cancelled midway (it may be applying migrations).
@@ -27,20 +36,76 @@ concurrency:
 permissions:
   contents: read
   deployments: write
+  pull-requests: read
+  actions: read
 
 jobs:
+  plan:
+    name: Plan the preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      build: ${{ steps.plan.outputs.build }}
+      pr: ${{ steps.plan.outputs.pr }}
+      sha: ${{ steps.plan.outputs.sha }}
+      base: ${{ steps.plan.outputs.base }}
+      ref: ${{ steps.plan.outputs.ref }}
+    steps:
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          LABEL: ${{ github.event.label.name }}
+          LABELED_PR: ${{ github.event.pull_request.number }}
+          LABELED_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: |
+          skip() { echo "No preview: $1"; echo "build=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          if [ "$EVENT" = "pull_request" ]; then
+            [ "$LABEL" = "preview" ] || skip "another label ($LABEL) was added"
+            pr=$LABELED_PR
+            sha=$LABELED_SHA
+            runs="repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$sha&event=pull_request"
+            ci=$(gh api "$runs" --jq '[.workflow_runs[] | select(.name == "CI" and .status == "completed")]
+                | sort_by(.created_at) | last | .conclusion // ""')
+            [ "$ci" = "success" ] ||
+              skip "CI has not passed on $sha yet; the preview starts when it does"
+          else
+            [ "$RUN_EVENT" = "pull_request" ] || skip "CI ran for a $RUN_EVENT, not a pull request"
+            [ "$RUN_CONCLUSION" = "success" ] || skip "CI did not pass ($RUN_CONCLUSION)"
+            [ -n "$RUN_PR" ] || skip "the CI run names no pull request of this repository"
+            pr=$RUN_PR
+            sha=$RUN_SHA
+          fi
+          info=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr")
+          [ "$(jq -r .state <<< "$info")" = "open" ] || skip "pull request #$pr is not open"
+          [ "$(jq -r .head.sha <<< "$info")" = "$sha" ] || skip "$sha is no longer #$pr's latest commit"
+          [ "$(jq -r .head.repo.full_name <<< "$info")" = "$GITHUB_REPOSITORY" ] ||
+            skip "#$pr comes from a fork"
+          [ "$(jq -r .user.login <<< "$info")" != "dependabot[bot]" ] || skip "#$pr is Dependabot's"
+          jq -e '.labels | any(.name == "preview")' <<< "$info" > /dev/null ||
+            skip "#$pr has no preview label"
+          {
+            echo "build=true"
+            echo "pr=$pr"
+            echo "sha=$sha"
+            echo "base=$(jq -r .base.sha <<< "$info")"
+            echo "ref=$(jq -r .head.ref <<< "$info")"
+          } >> "$GITHUB_OUTPUT"
+          echo "Previewing #$pr at $sha."
+
   construction-management:
     name: Preview construction-management
-    # Forks and Dependabot get no secrets and a read-only token on
-    # pull_request runs; their pull requests are not previewed.
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.user.login != 'dependabot[bot]'
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
-      SHA: ${{ github.event.pull_request.head.sha }}
+      SHA: ${{ needs.plan.outputs.sha }}
       VERCEL_ORG_ID: team_82vD1GbgjRVfhL7RIgbvJb3O
       VERCEL_PROJECT_ID: prj_UqfGQZmmJ92d6RHb2oXun9aAy8Ky
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -60,7 +125,7 @@ jobs:
       - name: Is Construction Management affected?
         id: affected
         env:
-          BASE: ${{ github.event.pull_request.base.sha }}
+          BASE: ${{ needs.plan.outputs.base }}
         run: |
           affected=$(TURBO_SCM_BASE="$BASE" TURBO_SCM_HEAD="$SHA" \
             bunx turbo ls --affected --output json)
@@ -76,7 +141,7 @@ jobs:
         id: record
         if: steps.affected.outputs.build == 'true'
         env:
-          REF: ${{ github.event.pull_request.head.ref }}
+          REF: ${{ needs.plan.outputs.ref }}
         run: |
           body=$(jq -n --arg ref "$SHA" --arg environment "preview/construction-management" \
             --arg branch "$REF" \

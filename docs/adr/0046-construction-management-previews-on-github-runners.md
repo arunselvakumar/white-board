@@ -14,7 +14,7 @@ M8 (Tasks, Issues & Snags, Inspection Requests) added about 350 files to the app
 
 **Construction Management previews are built in a GitHub Actions workflow, `.github/workflows/preview.yml`, the same way production is.**
 
-- On a pull request from a branch of this repository, the workflow asks turbo whether Construction Management is affected (its own files, or a package it uses such as `@repo/ui`). If so, it pulls the project's **Preview** environment, runs `vercel build` (the project's build command: migrations to the preview database, then the Next build) on the runner, and uploads the output with `vercel deploy --prebuilt`.
+- On a pull request from a branch of this repository that carries the `preview` label, once CI has passed, the workflow asks turbo whether Construction Management is affected (its own files, or a package it uses such as `@repo/ui`). If so, it pulls the project's **Preview** environment, runs `vercel build` (the project's build command: migrations to the preview database, then the Next build) on the runner, and uploads the output with `vercel deploy --prebuilt`.
 - The preview is recorded as a GitHub Deployment in `preview/construction-management`, so the pull request shows its link.
 - One preview build runs at a time and is never cancelled midway, because all previews share one preview database and a build may be applying migrations.
 - Vercel's git deployments are switched off for the `construction-management` project (`git.deploymentEnabled: false` in its `vercel.json`); production and previews both arrive as prebuilt output. Whiteboard and the Marketing Site keep Vercel's own previews.
@@ -27,6 +27,10 @@ M8 (Tasks, Issues & Snags, Inspection Requests) added about 350 files to the app
 ### The build trace stays behind
 
 `vercel deploy --prebuilt` uploads every file of `.vercel/output`, and Vercel refuses a file over 100 MB. Next's build trace, which `vercel build` copies to `.vercel/output/diagnostics/trace`, is about 116 MB for Construction Management. It is only for Vercel's build diagnostics, so both workflows delete the `diagnostics` folder before uploading; the preview workflow then names any other file over 90 MB and stops.
+
+### Previews are on request
+
+A prebuilt deploy uploads every new file of the build output, and Vercel's free plan allows 5,000 file uploads a day, shared with production deploys. Construction Management's output is thousands of files, so previews on every push used up the day's allowance within hours (`api-upload-free`), which would also block a production deploy. So a pull request is previewed only when it carries the **`preview`** label and CI has passed on its latest commit: the workflow runs when the label is added (if CI already passed) and after every later CI pass while the label stays. Production deploys keep the rest of the allowance.
 
 ## Consequences
 
