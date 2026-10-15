@@ -1,0 +1,21 @@
+.github/workflows/preview.yml
+  s_8821256d95b7ff::t_7e46a886ba9ed4 34-38
+docs/adr/0046-construction-management-previews-on-github-runners.md
+  s_8821256d95b7ff::t_0d6b359c130fd5 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "06a1f109f79712fe6ebf28b51926a2e3afbcfbfa",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
