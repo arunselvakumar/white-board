@@ -2,6 +2,8 @@
 # Vercel build for Construction Management (the `construction-management`
 # project, Root Directory apps/construction-management; ADR CM-0001).
 # Production and preview deploys apply pending migrations before building.
+# Vercel's git builds are off for this project: the Deploy and Preview
+# workflows run this on GitHub runners through `vercel build` (ADR-0046).
 # Unlike Whiteboard (root ADR-0036), previews have their own Neon database,
 # so migrating it never touches production data.
 set -euo pipefail

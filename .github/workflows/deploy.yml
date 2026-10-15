@@ -123,6 +123,12 @@ jobs:
       - name: Build
         run: bunx vercel@63.1.2 build --prod --token="$VERCEL_TOKEN"
 
+      # Vercel refuses any uploaded file over 100 MB, and Next's build trace
+      # (diagnostics/trace) is over that for Construction Management; it is
+      # only for Vercel's build diagnostics (ADR-0046).
+      - name: Leave the build trace behind
+        run: find . -path '*/.vercel/output/diagnostics' -type d -prune -exec rm -rf {} +
+
       - name: Deploy the prebuilt output
         id: deploy
         run: |
