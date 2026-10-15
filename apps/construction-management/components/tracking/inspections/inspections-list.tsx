@@ -225,6 +225,9 @@ function FilterBar({
   filters: Filters;
   onChange: (next: Partial<Filters>) => void;
 }) {
+  // The query follows in a transition; the box shows every keystroke at
+  // once, or a slow list reload would drop characters.
+  const [search, setSearch] = useState(filters.search);
   const { data: options } = useSuspenseQuery(
     inspectionFormOptionsQuery(projectId),
   );
@@ -309,8 +312,9 @@ function FilterBar({
         aria-label="Search by Request No or work"
         placeholder="Request No or work"
         className="col-span-2 h-8 w-full sm:w-56"
-        value={filters.search}
+        value={search}
         onChange={(event) => {
+          setSearch(event.target.value);
           onChange({ search: event.target.value });
         }}
       />
