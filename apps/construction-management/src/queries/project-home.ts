@@ -28,8 +28,8 @@ function projectUrl(id: string, verb: string): string {
 
 /**
  * The member's modules on a Project in their tile order, the pin, and
- * whether they may hide modules (CM-411). Feeds the shell's section bar
- * and the home tiles.
+ * whether they may hide modules (CM-411). Feeds the Project sidebar
+ * (which modules) and the home tiles (which, in what order).
  */
 export function projectHomeQuery(id: string) {
   return queryOptions({

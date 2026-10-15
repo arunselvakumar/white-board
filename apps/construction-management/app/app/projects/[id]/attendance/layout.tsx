@@ -1,22 +1,10 @@
 import type { ReactNode } from "react";
 
-import { AttendanceTabs } from "./attendance-tabs";
-
-/** Attendance home: Labour and Vendor sub-tabs inside the project shell. */
-export default async function ProjectAttendanceLayout({
+/** Attendance inside the project shell. Labour and Vendor are in the sidebar (ADR CM-0020). */
+export default function ProjectAttendanceLayout({
   children,
-  params,
 }: Readonly<{
   children: ReactNode;
-  params: Promise<{ id: string }>;
 }>) {
-  const { id } = await params;
-  return (
-    <div className="flex min-h-0 w-full flex-1 flex-col">
-      <div className="px-6 pt-6">
-        <AttendanceTabs projectId={id} />
-      </div>
-      {children}
-    </div>
-  );
+  return <div className="flex min-h-0 w-full flex-1 flex-col">{children}</div>;
 }

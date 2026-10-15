@@ -96,14 +96,6 @@ export const WithFiles: Story = {
       await canvas.findByRole("heading", { level: 2, name: "Documents" }),
     ).toBeVisible();
     await expect(canvas.getByText("5 files · 6.8 MB")).toBeVisible();
-    const tabs = within(
-      canvas.getByRole("navigation", { name: "Project sections" }),
-    );
-    await expect(tabs.getByRole("link", { name: "Documents" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-
     const headings = canvas
       .getAllByRole("heading", { level: 3 })
       .map((heading) => heading.textContent);

@@ -7,7 +7,6 @@ import {
 } from "@tanstack/react-query";
 import { EllipsisVertical, Pencil, Pin } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
@@ -17,14 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
-import { PROJECT_MODULES } from "@/src/projects/domain/project-modules";
-import {
-  projectTypeLabel,
-  type ProjectStructure,
-} from "@/src/projects/domain/project-type";
+import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import {
   projectHomeQuery,
   usePinProject,
@@ -34,39 +27,8 @@ import { projectQuery } from "@/src/queries/projects";
 
 import { ProjectAvatar } from "./project-avatar";
 import { ArrangeTilesDialog, HideModulesDialog } from "./project-home-dialogs";
-import { PROJECTS_PATH, projectPath } from "./projects-home";
+import { projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
-
-/**
- * The section bar: Home, then the member's modules in their order. Until
- * the home loads (or if it cannot), every module of the Project's
- * structure in the default order; each page checks access itself.
- */
-export function projectSections(
-  home: ProjectHome | undefined,
-  structure: ProjectStructure,
-) {
-  const modules =
-    home?.modules.filter((module) => !module.hidden) ??
-    PROJECT_MODULES.filter(
-      (module) => !("structure" in module) || module.structure === structure,
-    );
-  return [
-    { segment: "", label: "Home" },
-    ...modules.map(({ segment, label }) => ({ segment, label })),
-  ];
-}
-
-function activeSegment(
-  pathname: string,
-  base: string,
-  segments: readonly string[],
-): string {
-  const rest = pathname.startsWith(base) ? pathname.slice(base.length) : "";
-  const segment = rest.split("/").find(Boolean) ?? "";
-  // Edit, and any page without a section, belong to Home.
-  return segments.includes(segment) ? segment : "";
-}
 
 type OptionsDialog = "hide" | "arrange" | null;
 
@@ -141,11 +103,11 @@ function ProjectOptions({ id, home }: { id: string; home: ProjectHome }) {
 }
 
 /**
- * The project shell (CM-204, CM-411): the logo when there is one, name,
- * status, Project Type, a pin mark, Edit and the Project options above a
- * section bar built from the member's Project home: Home and the modules
- * they may open, in their tile order. The bar scrolls sideways on a phone;
- * the page never does.
+ * The project shell (CM-204, CM-411, ADR CM-0020): a slim header with the
+ * Project's name, status, Project Type, dates, a pin mark, Edit and the
+ * Project options. The Project's modules are in the sidebar
+ * (`ProjectNavMenu`); on a phone, where the sidebar is a sheet, the header
+ * also shows the logo.
  */
 export function ProjectShell({
   id,
@@ -158,34 +120,25 @@ export function ProjectShell({
   usePrefetchQuery(projectHomeQuery(id));
   const { data: project } = useSuspenseQuery(projectQuery(id));
   const { data: home } = useQuery(projectHomeQuery(id));
-  const pathname = usePathname();
-  const base = projectPath(id);
-  const sections = projectSections(home, project.structure);
-  const current = activeSegment(
-    pathname,
-    base,
-    sections.map((section) => section.segment),
-  );
   const dates = projectDates(project);
 
   return (
     <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-      <div className="w-full min-w-0 space-y-4 px-6 pt-6">
-        <div className="w-full max-w-6xl">
-          <PageHeader
-            back={{ label: "Projects", href: PROJECTS_PATH }}
-            title={project.name}
-            leading={
-              project.logoUrl == null ? undefined : (
-                <ProjectAvatar
-                  name={project.name}
-                  logoUrl={project.logoUrl}
-                  className="size-12 sm:size-14"
-                />
-              )
-            }
-            meta={
-              <span className="flex flex-wrap items-center gap-2">
+      <header className="border-b px-6 py-3">
+        <div className="flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="flex min-w-0 items-center gap-3">
+            {project.logoUrl == null ? null : (
+              <ProjectAvatar
+                name={project.name}
+                logoUrl={project.logoUrl}
+                className="size-9 md:hidden"
+              />
+            )}
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+              <h1 className="text-lg font-semibold tracking-tight break-words">
+                {project.name}
+              </h1>
+              <span className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
                 <ProjectStatusBadge status={project.status} />
                 {project.projectType == null ? null : (
                   <span>{projectTypeLabel(project.projectType)}</span>
@@ -198,50 +151,20 @@ export function ProjectShell({
                   </span>
                 ) : null}
               </span>
-            }
-            actions={
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`${base}/edit`}
-                  className={buttonVariants({ variant: "outline" })}
-                >
-                  <Pencil aria-hidden="true" />
-                  Edit
-                </Link>
-                {home == null ? null : <ProjectOptions id={id} home={home} />}
-              </div>
-            }
-          />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`${projectPath(id)}/edit`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <Pencil aria-hidden="true" />
+              Edit
+            </Link>
+            {home == null ? null : <ProjectOptions id={id} home={home} />}
+          </div>
         </div>
-        <nav
-          aria-label="Project sections"
-          className="-mx-6 overflow-x-auto overscroll-x-contain border-b px-6"
-        >
-          <ul className="flex w-max gap-1">
-            {sections.map((section) => {
-              const href =
-                section.segment === "" ? base : `${base}/${section.segment}`;
-              const active = section.segment === current;
-              return (
-                <li key={section.label}>
-                  <Link
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "focus-visible:ring-ring/50 -mb-px inline-flex h-10 items-center border-b-2 px-3 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-3",
-                      active
-                        ? "border-primary text-foreground"
-                        : "text-muted-foreground hover:text-foreground border-transparent",
-                    )}
-                  >
-                    {section.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </div>
+      </header>
       {children}
     </div>
   );
