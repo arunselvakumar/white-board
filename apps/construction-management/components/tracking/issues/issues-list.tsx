@@ -221,6 +221,9 @@ function FilterBar({
   today: string;
   onChange: (next: Partial<Filters>) => void;
 }) {
+  // The query follows in a transition; the box shows every keystroke at
+  // once, or a slow list reload would drop characters.
+  const [search, setSearch] = useState(filters.search);
   const { data: options } = useSuspenseQuery(issueFormOptionsQuery(projectId));
   const places = useQuery(locationOptionsQuery(projectId)).data;
   const placeOptions =
@@ -340,8 +343,9 @@ function FilterBar({
           type="search"
           placeholder="Number or details"
           className="h-8 w-full sm:w-52"
-          value={filters.search}
+          value={search}
           onChange={(event) => {
+            setSearch(event.target.value);
             onChange({ search: event.target.value });
           }}
         />
