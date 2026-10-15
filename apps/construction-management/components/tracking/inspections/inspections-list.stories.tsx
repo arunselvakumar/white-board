@@ -130,6 +130,55 @@ export const BulkApprove: Story = {
   },
 };
 
+/** Leaving bulk mode or changing the filter drops the selection. */
+export const SelectionStartsOver: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("list", { name: "Inspection Requests" });
+    const box = () =>
+      within(
+        canvas.getByRole("list", { name: "Inspection Requests" }),
+      ).getByRole("checkbox", { name: "Select IR/26-27/00004" });
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Bulk approval" }),
+    );
+    await userEvent.click(box());
+    await expect(
+      canvas.getByRole("button", { name: "Approve (1)" }),
+    ).toBeEnabled();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Exit bulk approval" }),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Bulk approval" }),
+    );
+    await expect(box()).not.toBeChecked();
+    await expect(
+      canvas.getByRole("button", { name: "Approve (0)" }),
+    ).toBeDisabled();
+    await userEvent.click(box());
+    await userEvent.click(canvas.getByRole("button", { name: "Rejected (1)" }));
+    await waitFor(async () => {
+      await expect(
+        within(
+          canvas.getByRole("list", { name: "Inspection Requests" }),
+        ).getAllByRole("listitem"),
+      ).toHaveLength(1);
+    });
+    await userEvent.click(canvas.getByRole("button", { name: "All (3)" }));
+    await waitFor(async () => {
+      await expect(
+        within(
+          canvas.getByRole("list", { name: "Inspection Requests" }),
+        ).getAllByRole("listitem"),
+      ).toHaveLength(3);
+    });
+    await expect(box()).not.toBeChecked();
+    await expect(
+      canvas.getByRole("button", { name: "Approve (0)" }),
+    ).toBeDisabled();
+  },
+};
+
 /** Bulk reject takes one reason and can raise a snag for each. */
 export const BulkRejectWithSnags: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {

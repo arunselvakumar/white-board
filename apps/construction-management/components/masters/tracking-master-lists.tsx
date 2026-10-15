@@ -220,6 +220,11 @@ function TrackingMasterListScreen({ screen }: { screen: Screen }) {
                       {item.disabled === true ? (
                         <Badge variant="outline">Disabled</Badge>
                       ) : null}
+                      {item.inUse ? (
+                        <p className="text-muted-foreground w-full truncate text-sm">
+                          {screen.inUseLine}
+                        </p>
+                      ) : null}
                     </li>
                   ),
                 )}

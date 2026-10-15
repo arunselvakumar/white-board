@@ -350,6 +350,14 @@ function Rows({
   );
   const decide = useBulkDecideInspections();
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  // A selection belongs to the rows on screen: another filter, page or
+  // leaving bulk mode starts empty, so a hidden row never comes back chosen.
+  const view = JSON.stringify([filters, cursor, bulk]);
+  const [selectedIn, setSelectedIn] = useState(view);
+  if (selectedIn !== view) {
+    setSelectedIn(view);
+    setSelected(new Set());
+  }
   const [rejecting, setRejecting] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [notice, setNotice] = useState<string | undefined>();

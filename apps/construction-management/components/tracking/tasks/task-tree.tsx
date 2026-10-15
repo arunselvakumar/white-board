@@ -346,8 +346,11 @@ export function TaskTree({
             size="sm"
             disabled={data.prevCursor == null}
             onClick={() => {
-              if (data.prevCursor != null)
-                setCursor({ before: data.prevCursor });
+              if (data.prevCursor == null) return;
+              // A selection is of the page on screen: the confirmation
+              // counts it, and Delete removes it.
+              setSelected(new Set());
+              setCursor({ before: data.prevCursor });
             }}
           >
             Previous
@@ -357,8 +360,9 @@ export function TaskTree({
             size="sm"
             disabled={data.nextCursor == null}
             onClick={() => {
-              if (data.nextCursor != null)
-                setCursor({ after: data.nextCursor });
+              if (data.nextCursor == null) return;
+              setSelected(new Set());
+              setCursor({ after: data.nextCursor });
             }}
           >
             Next

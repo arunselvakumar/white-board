@@ -127,7 +127,8 @@ export function InspectionRejectDialog({
       open={open}
       onOpenChange={(next) => {
         if (next) onOpenChange(true);
-        else close();
+        // Stay open while the rejection is sent, to show its outcome.
+        else if (!busy) close();
       }}
     >
       <DialogContent className="grid-cols-1">
@@ -204,7 +205,12 @@ export function InspectionRejectDialog({
             </div>
           )}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={close}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={close}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="destructive" disabled={busy}>

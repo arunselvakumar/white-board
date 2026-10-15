@@ -136,6 +136,39 @@ export const BulkDelete: Story = {
   },
 };
 
+/** Another page starts with nothing selected: Delete takes only what is on screen. */
+export const PageClearsSelection: Story = {
+  beforeEach: taskApi({ paged: true }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const list = () => within(canvas.getByRole("list", { name: "Tasks" }));
+    await canvas.findByRole("list", { name: "Tasks" });
+    await userEvent.click(list().getByRole("checkbox", { name: "Select T-1" }));
+    await expect(canvas.getByText("1 selected")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Next" }));
+    const plaster = await canvas.findByRole("checkbox", {
+      name: "Select T-4",
+    });
+    await expect(canvas.queryByText(/selected$/)).toBeNull();
+    await userEvent.click(plaster);
+    await userEvent.click(canvas.getByRole("button", { name: "Delete" }));
+    const dialog = within(
+      await body(canvasElement).findByRole("alertdialog", {
+        name: "Delete 1 task?",
+      }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Delete" }));
+    await waitFor(async () => {
+      const posted = api.calls.mock.calls
+        .map(([call]) => call)
+        .filter((call) => call.path === `${TASKS_API}/bulk-delete`);
+      await expect(posted[0]?.body).toEqual({
+        projectId: TASK_PROJECT_ID,
+        ids: [TASKS[3]?.id],
+      });
+    });
+  },
+};
+
 /** A task a Daily Worksheet names stops the whole delete; each one is listed. */
 export const DeleteInUse: Story = {
   beforeEach: taskApi({

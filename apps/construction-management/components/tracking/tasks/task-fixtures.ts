@@ -389,6 +389,8 @@ export type TaskApiOptions = {
   };
   /** Refuse the import with these row errors. */
   importErrors?: { row: number; field: string; message: string }[];
+  /** Two pages: T-1 and its sub-tasks, then T-4 (`?after=`). */
+  paged?: boolean;
 };
 
 function error(e: {
@@ -458,6 +460,16 @@ export function taskHandler(
       );
       if (path.endsWith("/gantt"))
         return Response.json({ items, today: TODAY });
+      if (options.paged === true) {
+        const second = url.searchParams.has("after");
+        const onPage = second ? items.slice(3) : items.slice(0, 3);
+        return Response.json({
+          items: onPage,
+          nextCursor: second ? null : "page-2",
+          prevCursor: second ? "page-1" : null,
+          total: items.length,
+        } satisfies TaskPage);
+      }
       return Response.json({
         items,
         nextCursor: null,
