@@ -18,23 +18,38 @@ function alias(name: string): Prisma.Sql {
   return Prisma.raw(name);
 }
 
+/*
+ * A sub-task is always on its parent's Company and Project, so every
+ * sub-task lookup below names them too: the correlated sub-queries then use
+ * the (workspace_id, project_id, parent_id, sort_order) index instead of
+ * scanning every Company's tasks.
+ */
+
 /** True when the task has live sub-tasks. */
 export function taskIsSummarySql(taskAlias: string): Prisma.Sql {
   const t = alias(taskAlias);
   return Prisma.sql`EXISTS (
     SELECT 1 FROM construction_tracking.tasks sub_c
-    WHERE sub_c.parent_id = ${t}.id AND sub_c.deleted_at IS NULL)`;
+    WHERE sub_c.workspace_id = ${t}.workspace_id
+      AND sub_c.project_id = ${t}.project_id
+      AND sub_c.parent_id = ${t}.id AND sub_c.deleted_at IS NULL)`;
 }
 
 /** The live leaf tasks under a summary task (children and grandchildren). */
 function leafFilter(t: Prisma.Sql): Prisma.Sql {
-  return Prisma.sql`leaf.deleted_at IS NULL
+  return Prisma.sql`leaf.workspace_id = ${t}.workspace_id
+    AND leaf.project_id = ${t}.project_id
+    AND leaf.deleted_at IS NULL
     AND NOT EXISTS (
       SELECT 1 FROM construction_tracking.tasks leaf_c
-      WHERE leaf_c.parent_id = leaf.id AND leaf_c.deleted_at IS NULL)
+      WHERE leaf_c.workspace_id = leaf.workspace_id
+        AND leaf_c.project_id = leaf.project_id
+        AND leaf_c.parent_id = leaf.id AND leaf_c.deleted_at IS NULL)
     AND (leaf.parent_id = ${t}.id OR leaf.parent_id IN (
       SELECT mid.id FROM construction_tracking.tasks mid
-      WHERE mid.parent_id = ${t}.id AND mid.deleted_at IS NULL))`;
+      WHERE mid.workspace_id = ${t}.workspace_id
+        AND mid.project_id = ${t}.project_id
+        AND mid.parent_id = ${t}.id AND mid.deleted_at IS NULL))`;
 }
 
 /** The task's Due Date: its own, or the latest of its leaf tasks'. */

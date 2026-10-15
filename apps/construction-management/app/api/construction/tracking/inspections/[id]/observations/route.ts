@@ -67,10 +67,8 @@ export async function POST(
       model,
     );
     const viewer = await handlers.viewer(session.access);
-    const items = await handlers.observations(
-      viewer,
-      await handlers.find(session.workspaceId, id),
-    );
+    // `addObservation` leaves the request's status and id as they were.
+    const items = await handlers.observations(viewer, session.target);
     const added = items.find((item) => item.id === observationId);
     if (added == null) throw new Error("The observation was not saved.");
     return Response.json(toObservationResponse(added), {
