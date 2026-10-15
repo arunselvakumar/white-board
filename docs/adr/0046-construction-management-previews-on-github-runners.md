@@ -22,7 +22,7 @@ M8 (Tasks, Issues & Snags, Inspection Requests) added about 350 files to the app
 
 ### Sensitive variables are placeholders at build time
 
-`vercel pull` cannot read Vercel variables of the Secret (sensitive) type: it writes `[SENSITIVE]` in their place. The deployed functions still get the real values at runtime, but `next build` loads server modules on the runner with the placeholders. So nothing may read and validate a secret while a module loads: `@repo/auth`'s email sender now reads `EMAIL_TRANSPORT` when it sends the first email, not when it is created. (This is also why every production deploy of Construction Management from the Deploy workflow had failed since #63.) A build step that truly needs a secret, such as migrations against a database whose URL is a Secret, cannot run until that value reaches the runner another way.
+`vercel pull` cannot read Vercel variables of the Secret (sensitive) type: it writes `[SENSITIVE]` in their place. The deployed functions still get the real values at runtime, but `next build` loads server modules on the runner with the placeholders. So nothing may read and validate a secret while a module loads: `@repo/auth`'s email sender now reads `EMAIL_TRANSPORT` when it sends the first email, not when it is created. (This is also why every production deploy of Construction Management from the Deploy workflow had failed since #63.) A build step that truly needs a secret cannot read it from Vercel. Whiteboard's production migrations need its direct database URL, a Vercel Secret, so the owner stored it as the repository secret `WHITEBOARD_DATABASE_URL_UNPOOLED`, and the Deploy workflow writes it over the placeholder before `vercel build`.
 
 ### The build trace stays behind
 
