@@ -10,7 +10,7 @@ import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { addContractor, addUnit } from "@/test/procurement";
 import { sharedAddWorksheetRow } from "@/test/site-work";
-import { trackingMaster } from "@/test/tracking";
+import { failGalleryRemovals, trackingMaster } from "@/test/tracking";
 
 import { uploadTrackingFile, WEBP } from "../documents/document-test-fixtures";
 import { GET as activity } from "./[id]/activity/route";
@@ -782,6 +782,36 @@ describe("Tasks", () => {
         where: { id: photo.id },
       });
     expect(file.deletedAt).not.toBeNull();
+  });
+
+  it("keeps a committed delete when the Gallery cannot be told", async () => {
+    const ctx = await setup();
+    const id = await add(ctx, { name: "Tiling" });
+    const photo = await uploadTrackingFile("", "task", id, "tiles.webp", WEBP);
+    expect(
+      (
+        await progress(id, {
+          progressDate: TODAY,
+          progressPct: 20,
+          fileIds: [photo.id],
+        })
+      ).status,
+    ).toBe(StatusCodes.CREATED);
+    const gallery = failGalleryRemovals();
+    try {
+      const deleted = await removeOne(post(`/${id}/delete`, {}), params(id));
+      expect(deleted.status).toBe(StatusCodes.OK);
+      expect(await json<{ deleted: number }>(deleted)).toEqual({ deleted: 1 });
+      expect(gallery.logged).toHaveBeenCalledWith(
+        "Could not update the Project Gallery",
+        expect.any(Error),
+      );
+    } finally {
+      gallery.restore();
+    }
+    expect((await getOne(get(`/${id}`), params(id))).status).toBe(
+      StatusCodes.NOT_FOUND,
+    );
   });
 
   it("is on /api/docs", async () => {

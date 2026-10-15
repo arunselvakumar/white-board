@@ -15,7 +15,11 @@ import {
 } from "@/test/site-work";
 import { uploadTrackingFile } from "@/app/api/construction/tracking/documents/document-test-fixtures";
 import { pngBytes } from "@/test/files";
-import { trackingIssueRow, trackingMaster } from "@/test/tracking";
+import {
+  failGalleryRemovals,
+  trackingIssueRow,
+  trackingMaster,
+} from "@/test/tracking";
 
 import { POST as remove } from "./[id]/delete/route";
 import { POST as deleteUpdate } from "./[id]/progress/[updateId]/delete/route";
@@ -832,6 +836,29 @@ describe("Issues & Snags (CM-803)", () => {
       StatusCodes.NOT_FOUND,
     );
     expect(await numbers(ctx)).toEqual([]);
+  });
+
+  it("keeps a committed delete when the Gallery cannot be told", async () => {
+    const ctx = await setup();
+    const issue = await raised(ctx);
+    await uploadTrackingFile("", "issue", issue.id, "site.png", pngBytes());
+    const gallery = failGalleryRemovals();
+    try {
+      const deleted = await remove(
+        post(`/${issue.id}/delete`, { expectedUpdatedAt: issue.updatedAt }),
+        params(issue.id),
+      );
+      expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+      expect(gallery.logged).toHaveBeenCalledWith(
+        "Could not update the Project Gallery",
+        expect.any(Error),
+      );
+    } finally {
+      gallery.restore();
+    }
+    expect((await getOne(get(`/${issue.id}`), params(issue.id))).status).toBe(
+      StatusCodes.NOT_FOUND,
+    );
   });
 
   it("names the inspection a snag was raised from", async () => {

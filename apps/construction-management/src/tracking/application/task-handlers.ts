@@ -373,12 +373,21 @@ export class TaskHandlers {
     return this.find(workspaceId, row.taskId);
   }
 
+  /**
+   * Tells the Project Gallery photos went away, after commit. The Gallery
+   * is an index: a failure is logged, never turned into an error.
+   */
   private async removeFromGallery(
     files: readonly TrackingDocumentFile[],
     at: Date,
   ) {
     const events = trackingFilesMediaRemoved(files, at);
-    if (events.length > 0) await this.deps.media.dispatch(events);
+    if (events.length === 0) return;
+    try {
+      await this.deps.media.dispatch(events);
+    } catch (error) {
+      console.error("Could not update the Project Gallery", error);
+    }
   }
 
   private async dispatch(outcome: Outcome) {

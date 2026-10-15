@@ -1,8 +1,13 @@
 import { randomUUID } from "node:crypto";
 
 import { Prisma, prisma } from "@repo/construction-db";
+import { vi } from "vitest";
 
 import { calendarDateToDb, todayIn } from "@/src/shared-kernel/calendar-date";
+import {
+  InProcessEventDispatcher,
+  type DomainEvent,
+} from "@/src/shared-kernel/events";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import {
   insertIssueRow,
@@ -56,12 +61,23 @@ export async function trackingTaskRow(
     where: { projectId },
     _max: { taskNo: true, sortOrder: true },
   });
+  const taskNo = (last._max.taskNo ?? 0) + 1;
+  // Keep the Project's counter at least here, so a task created through the
+  // API afterwards takes the next number instead of colliding with this one.
+  await prisma.$executeRaw`
+    INSERT INTO construction_tracking.task_counters
+      (project_id, workspace_id, last_no, updated_at)
+    VALUES (${projectId}::uuid, ${workspaceId}, ${taskNo}, now())
+    ON CONFLICT (project_id) DO UPDATE
+      SET last_no = GREATEST(
+            construction_tracking.task_counters.last_no, EXCLUDED.last_no),
+          updated_at = now()`;
   await prisma.constructionTrackingTask.create({
     data: {
       id,
       workspaceId,
       projectId,
-      taskNo: (last._max.taskNo ?? 0) + 1,
+      taskNo,
       sortOrder: (last._max.sortOrder ?? 0) + 1,
       name: options.name ?? `Shuttering ${id.slice(0, 6)}`,
       ...json(options.siteLocation),
@@ -219,4 +235,32 @@ export async function trackingMaster(
       },
     });
   return id;
+}
+
+/**
+ * Makes every in-process `ProjectMediaRemoved` dispatch fail (the Gallery
+ * listener throwing) until `restore()`, and silences the error the
+ * handlers log for it; `logged` is that `console.error` spy.
+ */
+export function failGalleryRemovals() {
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- called with the dispatcher as `this` below
+  const original = InProcessEventDispatcher.prototype.dispatch;
+  const dispatch = vi
+    .spyOn(InProcessEventDispatcher.prototype, "dispatch")
+    .mockImplementation(function (
+      this: InProcessEventDispatcher,
+      events: readonly DomainEvent[],
+    ) {
+      if (events.some((event) => event.type === "ProjectMediaRemoved"))
+        return Promise.reject(new Error("The Gallery is down"));
+      return original.call(this, events);
+    });
+  const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  return {
+    logged,
+    restore: () => {
+      dispatch.mockRestore();
+      logged.mockRestore();
+    },
+  };
 }

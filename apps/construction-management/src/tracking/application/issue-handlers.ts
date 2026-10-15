@@ -6,7 +6,7 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
-import type { EventDispatcher } from "@/src/shared-kernel/events";
+import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import {
@@ -949,7 +949,7 @@ export class IssueHandlers {
         occurredAt: at,
       });
     });
-    await this.deps.media.dispatch([
+    await this.removeFromGallery([
       trackingDocumentMediaRemoved({
         workspaceId: access.workspaceId,
         projectId: current.projectId,
@@ -958,6 +958,19 @@ export class IssueHandlers {
         at,
       }),
     ]);
+  }
+
+  /**
+   * Tells the Project Gallery files went away, after commit. The Gallery is
+   * an index: a failure is logged, never turned into an error.
+   */
+  private async removeFromGallery(events: readonly DomainEvent[]) {
+    if (events.length === 0) return;
+    try {
+      await this.deps.media.dispatch(events);
+    } catch (error) {
+      console.error("Could not update the Project Gallery", error);
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -1054,8 +1067,7 @@ export class IssueHandlers {
       });
       return files;
     });
-    if (removed.length > 0)
-      await this.deps.media.dispatch(trackingFilesMediaRemoved(removed, at));
+    await this.removeFromGallery(trackingFilesMediaRemoved(removed, at));
   }
 
   async updates(

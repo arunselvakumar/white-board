@@ -17,6 +17,7 @@ import type {
 import { TASK_ACTIVITY_KINDS } from "@/src/tracking/application/task-store";
 import { TASK_LIMITS } from "@/src/tracking/domain/task";
 import {
+  baselineDuration,
   percentValue,
   quantityText,
   TASK_STATUSES,
@@ -476,10 +477,7 @@ export function toTaskDetailResponse(
       version: row.version,
       startDate: row.startDate,
       endDate: row.endDate,
-      duration:
-        Math.round(
-          (Date.parse(row.endDate) - Date.parse(row.startDate)) / 86_400_000,
-        ) + 1,
+      duration: baselineDuration(row.startDate, row.endDate) ?? 0,
       reason: row.reason,
       createdBy: { userId: row.createdBy, name: row.createdByName },
       createdAt: row.createdAt.toISOString(),
