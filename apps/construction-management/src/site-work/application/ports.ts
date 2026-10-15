@@ -438,6 +438,18 @@ export type TaskProgressPosting = {
     ids: readonly string[],
   ): Promise<Map<string, WorksheetTaskFacts>>;
   /**
+   * A newly named task, read under a share lock held until the worksheet's
+   * transaction ends. Adding a sub-task locks the parent for update, so the
+   * two wait for each other and the second sees the first: a sheet cannot
+   * link a task that just became a summary, nor a sub-task slip past a new
+   * link (CM-806).
+   */
+  lockTask(
+    tx: SiteWorkTx,
+    workspaceId: string,
+    taskId: string,
+  ): Promise<WorksheetTaskFacts | null>;
+  /**
    * Makes the worksheet's progress update say this: its task, date and
    * quantity (in the task's unit). Replaces the worksheet's earlier update,
    * on this task or another, and recomputes every task it touched.

@@ -519,6 +519,23 @@ export class WorksheetHandlers {
   }
 
   /**
+   * Checks a newly named task again inside the sheet's transaction, under a
+   * share lock (CM-806): it may have gained a sub-task since `taskOf` read
+   * it, and nobody can add one now until this sheet commits.
+   */
+  private async lockTask(
+    tx: Db,
+    workspaceId: string,
+    projectId: string,
+    taskId: string,
+  ): Promise<void> {
+    assertWorksheetTask(
+      await this.deps.tasks.lockTask(tx, workspaceId, taskId),
+      projectId,
+    );
+  }
+
+  /**
    * Makes the task progress match the sheet (CM-0019 §6): a leaf task in
    * the sheet's unit gets its Approx Work Done while the sheet is not
    * rejected; otherwise its update, if any, goes.
@@ -683,6 +700,8 @@ export class WorksheetHandlers {
     };
     const { events } = await db.$transaction(async (tx) => {
       check(DOCUMENT.backdated, "create", content.sheetDate);
+      if (taskId != null)
+        await this.lockTask(tx, access.workspaceId, input.projectId, taskId);
       const { number } = await nextSequenceNumber(tx, {
         workspaceId: access.workspaceId,
         module: "daily_worksheet",
@@ -792,6 +811,8 @@ export class WorksheetHandlers {
       check(DOCUMENT.backdated, "edit", locked.sheetDate);
       if (content.sheetDate !== locked.sheetDate)
         check(DOCUMENT.backdated, "edit", content.sheetDate);
+      if (taskId != null && taskId !== locked.taskId)
+        await this.lockTask(tx, access.workspaceId, current.projectId, taskId);
       await store.replace(tx, id, { ...row, approval, by: access.userId, at });
       await this.syncTask(
         tx,

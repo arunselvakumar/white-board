@@ -379,6 +379,53 @@ describe("Daily Worksheets feed task progress (CM-806)", () => {
     expect(done.status).toBe(StatusCodes.OK);
   });
 
+  it("waits for a sub-task being added to the named task, then refuses the link", async () => {
+    const ctx = await setup();
+    // Another member adds a sub-task to Plastering: the parent is locked for
+    // update and the child inserted, but not committed yet.
+    let commit!: () => void;
+    const held = new Promise<void>((resolve) => {
+      commit = resolve;
+    });
+    let lockedParent!: () => void;
+    const parentLocked = new Promise<void>((resolve) => {
+      lockedParent = resolve;
+    });
+    const subTask = prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`SELECT id FROM construction_tracking.tasks
+          WHERE id = ${ctx.plaster}::uuid FOR UPDATE`;
+        await tx.constructionTrackingTask.create({
+          data: {
+            id: crypto.randomUUID(),
+            workspaceId: ctx.ws,
+            projectId: ctx.projectId,
+            taskNo: 900,
+            parentId: ctx.plaster,
+            depth: 2,
+            sortOrder: 1,
+            name: "Internal plastering",
+            createdBy: ctx.by,
+            updatedBy: ctx.by,
+          },
+        });
+        lockedParent();
+        await held;
+      },
+      { timeout: 20_000 },
+    );
+    await parentLocked;
+    // The sheet reads Plastering as a leaf before its transaction, then has
+    // to wait for the share lock until the sub-task commits.
+    const saving = create(post(BASE, body(ctx, { taskId: ctx.plaster })));
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    commit();
+    await subTask;
+    const refused = await saving;
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await code(refused)).toBe("WORKSHEET_TASK_IS_SUMMARY");
+  });
+
   it("keeps a linked-only task from getting sub-tasks", async () => {
     const ctx = await setup();
     // Plastering tracks percent, so the sheet links it without progress.

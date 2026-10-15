@@ -82,6 +82,18 @@ export const trackingTaskProgressPosting: TaskProgressPosting = {
     return new Map(rows.map((row) => [row.id, facts(row)]));
   },
 
+  async lockTask(tx, workspaceId, taskId) {
+    await tx.$queryRaw(Prisma.sql`
+      SELECT id FROM construction_tracking.tasks
+      WHERE id = ${taskId}::uuid AND workspace_id = ${workspaceId}
+        AND deleted_at IS NULL
+      FOR SHARE`);
+    const found = await trackingTaskProgressPosting.tasks(tx, workspaceId, [
+      taskId,
+    ]);
+    return found.get(taskId) ?? null;
+  },
+
   post(tx, input) {
     return postWorksheetProgress(tx, prismaTaskStore, input);
   },
