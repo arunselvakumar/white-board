@@ -31,7 +31,8 @@ const SELECT = Prisma.sql`
   SELECT t.id::text AS id, t.project_id::text AS project_id, t.task_no, t.name,
     NOT EXISTS (
       SELECT 1 FROM construction_tracking.tasks c
-      WHERE c.parent_id = t.id AND c.deleted_at IS NULL) AS leaf,
+      WHERE c.workspace_id = t.workspace_id AND c.project_id = t.project_id
+        AND c.parent_id = t.id AND c.deleted_at IS NULL) AS leaf,
     t.total_work_unit_id::text AS unit_id, u.name AS unit_name
   FROM construction_tracking.tasks t
   LEFT JOIN construction_masters.measurement_units u
@@ -65,7 +66,8 @@ export const trackingTaskProgressPosting: TaskProgressPosting = {
         AND t.deleted_at IS NULL
         AND NOT EXISTS (
           SELECT 1 FROM construction_tracking.tasks c
-          WHERE c.parent_id = t.id AND c.deleted_at IS NULL)
+          WHERE c.workspace_id = t.workspace_id AND c.project_id = t.project_id
+            AND c.parent_id = t.id AND c.deleted_at IS NULL)
         ${match}
       ORDER BY t.task_no
       LIMIT ${limit}`);

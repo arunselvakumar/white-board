@@ -48,7 +48,8 @@ export function trackingProjectProgress(
           AND t.deleted_at IS NULL
           AND NOT EXISTS (
             SELECT 1 FROM construction_tracking.tasks c
-            WHERE c.parent_id = t.id AND c.deleted_at IS NULL)
+            WHERE c.workspace_id = t.workspace_id AND c.project_id = t.project_id
+              AND c.parent_id = t.id AND c.deleted_at IS NULL)
       `);
       const leaves = new Map<string, RollupLeaf[]>();
       for (const row of rows) {
