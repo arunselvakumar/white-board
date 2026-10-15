@@ -1,3 +1,4 @@
+import { trackingUnitUsage } from "@/src/composition/tracking-usage";
 import { createMeasurementUnitHandlers } from "@/src/masters/infrastructure/create-material-handlers";
 
 import { listParams, pagedMasterRoutes } from "../_lib/paged-master-routes";
@@ -8,9 +9,12 @@ import {
   toMeasurementUnitResponse,
 } from "./measurement-unit-models";
 
-const handlers = createMeasurementUnitHandlers();
+const handlers = createMeasurementUnitHandlers({ usage: trackingUnitUsage() });
 
-/** Measurement Units under the `masters.units` Menu (CM-501). */
+/**
+ * Measurement Units under the `masters.units` Menu (CM-501). Delete is
+ * refused while a Material or a live Task's Total work uses one (CM-801).
+ */
 export const measurementUnitRoutes = pagedMasterRoutes({
   menu: "masters.units",
   listQuery: ListConstructionMastersMeasurementUnitsQueryModel,

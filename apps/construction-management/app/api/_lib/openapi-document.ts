@@ -75,6 +75,10 @@ import {
   developmentOpenApiOperations,
 } from "@/app/api/construction/masters/development-openapi";
 import {
+  trackingMastersOpenApiComponents,
+  trackingMastersOpenApiOperations,
+} from "@/app/api/construction/masters/tracking-masters-openapi";
+import {
   partiesOpenApiComponents,
   partiesOpenApiOperations,
 } from "@/app/api/construction/masters/parties-openapi";
@@ -162,6 +166,10 @@ import {
   financeOpenApiComponents,
   financeOpenApiOperations,
 } from "@/app/api/construction/finance/finance-openapi";
+import {
+  trackingOpenApiComponents,
+  trackingOpenApiOperations,
+} from "@/app/api/construction/tracking/tracking-openapi";
 import {
   billingAddressOpenApiComponents,
   billingAddressOpenApiOperations,
@@ -885,6 +893,10 @@ openApiOperations.push(...mastersOpenApiOperations);
 Object.assign(openApiComponents, developmentOpenApiComponents);
 openApiOperations.push(...developmentOpenApiOperations);
 
+// Issue Categories and Tags (CM-801).
+Object.assign(openApiComponents, trackingMastersOpenApiComponents);
+openApiOperations.push(...trackingMastersOpenApiOperations);
+
 // A Project's Amenities, home, preferences and dashboard (CM-404, CM-411, CM-412).
 Object.assign(openApiComponents, projectHomeOpenApiComponents);
 openApiOperations.push(...projectHomeOpenApiOperations);
@@ -936,6 +948,10 @@ openApiOperations.push(...siteWorkOpenApiOperations);
 // The finance context (M7) lists its own models and routes, one file per area.
 Object.assign(openApiComponents, financeOpenApiComponents);
 openApiOperations.push(...financeOpenApiOperations);
+
+// The tracking context (M8) lists its own models and routes, one file per area.
+Object.assign(openApiComponents, trackingOpenApiComponents);
+openApiOperations.push(...trackingOpenApiOperations);
 
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);

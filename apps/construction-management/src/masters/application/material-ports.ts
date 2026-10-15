@@ -138,6 +138,15 @@ export type TermsConditionStore = {
 };
 
 /**
+ * Whether another context points at a Measurement Unit: a live task's
+ * Total work (CM-801). `src/composition` reads tracking's tables.
+ */
+export type MeasurementUnitUsage = (
+  workspaceId: string,
+  unitId: string,
+) => Promise<boolean>;
+
+/**
  * Whether procurement documents or stock entries point at a Material
  * (CM-501). The procurement context is not imported: `src/composition`
  * implements this with reads of its tables.

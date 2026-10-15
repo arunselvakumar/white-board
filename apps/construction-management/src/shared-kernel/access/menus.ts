@@ -254,6 +254,8 @@ const DEFINITIONS = [
     "CRUD",
     false,
   ],
+  // Tags on Tasks (ADR CM-0019 §1); legacy had no menu.
+  ["masters.tags", "Tags", "master_records", "CRUD", false],
   ["masters.other_parties", "Other Party", "master_records", "CRUD", false],
   // Central store.
   [

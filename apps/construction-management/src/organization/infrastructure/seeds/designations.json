@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Default Designations every new Company starts with (modules/01 seed list, 38 names). Six carry a starter Permission Template chosen for the role; Admin holds every supported cell. Companies edit their own copy.",
+  "source": "Default Designations every new Company starts with (modules/01 seed list, 38 names). Eight carry a starter Permission Template chosen for the role; Admin holds every supported cell. Companies edit their own copy.",
   "designations": [
     {
       "name": "Accountant",
@@ -322,6 +322,8 @@
         "masters.labours": ["read"],
         "masters.work_types": ["read"],
         "masters.units": ["read"],
+        "masters.issue_categories": ["create", "read", "update", "delete"],
+        "masters.tags": ["create", "read", "update", "delete"],
         "hrms.hrms": ["read"],
         "hrms.holidays": ["read"],
         "hrms.attendance": [
@@ -345,7 +347,39 @@
       }
     },
     {
-      "name": "Quality Control"
+      "name": "Quality Control",
+      "template": {
+        "projects.project": ["read"],
+        "projects.drawings": ["read"],
+        "projects.testing_reports": ["create", "read", "update"],
+        "tracking.tasks": ["read"],
+        "tracking.issues": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "tracking.inspection_requests": [
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.issue_categories": ["read"]
+      }
     },
     {
       "name": "Security Manager"
@@ -411,6 +445,8 @@
         "masters.labours": ["read"],
         "masters.work_types": ["read"],
         "masters.units": ["read"],
+        "masters.issue_categories": ["read"],
+        "masters.tags": ["create", "read"],
         "hrms.hrms": ["read"],
         "hrms.holidays": ["read"],
         "hrms.attendance": ["create", "read", "notification"],
@@ -429,7 +465,9 @@
       "template": {
         "projects.project": ["read"],
         "site_work.daily_worksheet": ["create", "read", "update"],
-        "tracking.issues": ["create", "read"],
+        "tracking.tasks": ["create", "read", "update", "notification"],
+        "tracking.issues": ["create", "read", "update", "notification"],
+        "tracking.inspection_requests": ["create", "read", "update"],
         "labour.attendance": ["create", "read", "update"],
         "labour.labour": ["create", "read", "update"],
         "labour.vendor": ["create", "read", "update"],
@@ -439,6 +477,8 @@
         "site_work.site_diary": ["create", "read", "update"],
         "site_work.hindrances": ["create", "read"],
         "masters.master_records": ["read"],
+        "masters.issue_categories": ["read"],
+        "masters.tags": ["read"],
         "masters.labours": ["read"],
         "masters.labour_categories": ["read"],
         "hrms.hrms": ["read"],
@@ -524,7 +564,39 @@
       }
     },
     {
-      "name": "Structural Engineer"
+      "name": "Structural Engineer",
+      "template": {
+        "projects.project": ["read"],
+        "projects.drawings": ["read", "notification"],
+        "projects.testing_reports": ["create", "read", "update"],
+        "tracking.tasks": ["read"],
+        "tracking.issues": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "tracking.inspection_requests": [
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.issue_categories": ["read"]
+      }
     }
   ]
 }

@@ -1,5 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import { newId } from "@/src/shared-kernel/ids";
+
 import {
   DevelopmentHandlers,
   ProjectDevelopmentHandlers,
@@ -7,15 +9,24 @@ import {
 import { LookupHandlers } from "../application/lookup-handlers";
 import type { MasterUsage } from "../application/ports";
 import { SupervisorHandlers } from "../application/supervisor-handlers";
+import {
+  TrackingMasterHandlers,
+  type TrackingMasterUsage,
+} from "../application/tracking-master-handlers";
 import { WorkTypeHandlers } from "../application/work-type-handlers";
 import type { WorkTypeUsage } from "../application/work-type-ports";
-import type { DevelopmentKind, LookupKind } from "../domain/master-kind";
+import type {
+  DevelopmentKind,
+  LookupKind,
+  TrackingMasterKind,
+} from "../domain/master-kind";
 import { PrismaDevelopmentStore } from "./prisma-development-store";
 import { PrismaLookupStore } from "./prisma-lookup-store";
 import { prismaMasterUsage } from "./prisma-master-usage";
 import { PrismaProjectDirectory } from "./prisma-project-directory";
 import { PrismaSupervisorStore } from "./prisma-supervisor-store";
 import { PrismaTeamMemberDirectory } from "./prisma-team-member-directory";
+import { PrismaTrackingMasterStore } from "./prisma-tracking-master-store";
 import { PrismaWorkTypeStore } from "./prisma-work-type-store";
 
 /**
@@ -86,5 +97,22 @@ export function createProjectDevelopmentHandlers(deps?: {
 }) {
   return new ProjectDevelopmentHandlers(
     new PrismaDevelopmentStore(deps?.prisma ?? prisma),
+  );
+}
+
+/**
+ * Issue Categories or Tags (CM-801). `usage` says which ids live tracking
+ * records name; the routes pass `src/composition`'s, which reads
+ * `construction_tracking`.
+ */
+export function createTrackingMasterHandlers(
+  kind: TrackingMasterKind,
+  deps: { usage: TrackingMasterUsage; prisma?: PrismaClient },
+) {
+  return new TrackingMasterHandlers(
+    kind,
+    new PrismaTrackingMasterStore(deps.prisma ?? prisma),
+    deps.usage,
+    (now) => newId(now.getTime()),
   );
 }

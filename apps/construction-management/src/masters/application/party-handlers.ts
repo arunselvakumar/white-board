@@ -413,7 +413,7 @@ export class PartyHandlers {
         `${this.info.code}_IN_USE`,
         this.kind === "supplier"
           ? "Purchase Orders, Goods Receipts, invoices, payments or opening balances name this Supplier, so it cannot be deleted. Make them inactive instead."
-          : "Material Requests, Daily Worksheets, Equipment Usage sheets, Hindrances, rented Equipment, invoices, payments or opening balances name this Contractor, so it cannot be deleted. Make them inactive instead.",
+          : "Material Requests, Daily Worksheets, Equipment Usage sheets, Hindrances, rented Equipment, Tasks, Issues & Snags, Inspection Requests, invoices, payments or opening balances name this Contractor, so it cannot be deleted. Make them inactive instead.",
       );
     const loadedAt = party.updatedAt;
     const before = party.snapshot();

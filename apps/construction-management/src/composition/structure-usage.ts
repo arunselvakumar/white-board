@@ -9,13 +9,17 @@ import type { StructureUsage } from "@/src/projects/domain/structure-repository"
  * Requests, Purchase Orders, stock movements, Material Requests and stock
  * ledger entries (M5). Live rows count; ledger entries are history and
  * always count. Read by table, without importing those contexts (ADR
- * CM-0001). Tasks, Issues and Inspections (M8) and Bookings (M10) add their
- * tables here.
+ * CM-0001). Tasks (their `site_location` and every ref of their
+ * `extra_locations`), Issues and Inspections (M8, ADR CM-0019 §11) count
+ * while live; Bookings (M10) add their tables here.
  */
 const SOURCES: readonly { table: string; live: boolean }[] = [
   { table: "construction_site_work.worksheets", live: true },
   { table: "construction_site_work.equipment_usage_sheets", live: true },
   { table: "construction_site_work.hindrances", live: true },
+  { table: "construction_tracking.tasks", live: true },
+  { table: "construction_tracking.issues", live: true },
+  { table: "construction_tracking.inspections", live: true },
   { table: "construction_procurement.purchase_requests", live: true },
   { table: "construction_procurement.purchase_orders", live: true },
   { table: "construction_procurement.stock_movements", live: true },
@@ -23,16 +27,28 @@ const SOURCES: readonly { table: string; live: boolean }[] = [
   { table: "construction_procurement.stock_entries", live: false },
 ];
 
-/** The `site_location` of every source in the Company, as one relation. */
+/**
+ * The `site_location` of every source in the Company, and each ref of a
+ * live task's `extra_locations` (a JSON array of `LocationRef`s), as one
+ * relation.
+ */
 function refs(workspaceId: string): Prisma.Sql {
   return Prisma.join(
-    SOURCES.map(
-      (source) => Prisma.sql`
+    [
+      ...SOURCES.map(
+        (source) => Prisma.sql`
         SELECT site_location AS ref FROM ${Prisma.raw(source.table)}
         WHERE workspace_id = ${workspaceId}
           AND site_location IS NOT NULL
           ${source.live ? Prisma.sql`AND deleted_at IS NULL` : Prisma.empty}`,
-    ),
+      ),
+      Prisma.sql`
+        SELECT extra.ref FROM construction_tracking.tasks t,
+          jsonb_array_elements(t.extra_locations) AS extra(ref)
+        WHERE t.workspace_id = ${workspaceId}
+          AND t.deleted_at IS NULL
+          AND jsonb_typeof(t.extra_locations) = 'array'`,
+    ],
     " UNION ALL ",
   );
 }

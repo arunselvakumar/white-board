@@ -2,7 +2,7 @@
 title: Construction Management — milestones and tasks
 docs: ../README.md
 created: 2026-10-08
-updated: 2026-10-11
+updated: 2026-10-14
 status_values:
   - todo
   - in_progress
@@ -806,15 +806,88 @@ Goal: every rupee the Company moves is in one ledger — company cash and bank a
 - **Project Dashboard** Payments section (In / Out / balance by month, Due Payments, Module Wise Payment) and the Payment Approvals KPI; the M7 stubs are gone.
 - **Tests:** HTTP tests for the ledger opening / closing across a period boundary, ageing buckets and the dashboard figures across two parties and two accounts; stories.
 
-## M8 — Tasks, issues, inspections (board only)
+## M8 — Tasks, issues, inspections
 
-| ID     | Seq | Title                                                                                                               | Status | Blocked by     | Area           |
-| ------ | --: | ------------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
-| CM-801 |   1 | Prisma `construction-tracking.prisma`; Tags, Issue Categories (seed 14)                                             | todo   | CM-403         | Data+Domain    |
-| CM-802 |   2 | Tasks: fields, sub-tasks, work quantity/price → earned value, baseline/actual, statuses, Gantt, import, bulk delete | todo   | CM-801         | Domain+HTTP+UI |
-| CM-803 |   3 | Issues & snags: priority, category, assignee, updates with images, Pending/Delayed/Solved, bulk resolve             | todo   | CM-801         | Domain+HTTP+UI |
-| CM-804 |   4 | Inspection requests: numbering, observations, approve/reject with reason, bulk, success-rate KPI                    | todo   | CM-801, CM-114 | Domain+HTTP+UI |
-| CM-805 |   5 | Task/issue/inspection dashboard sections and reports                                                                | todo   | CM-802–804     | UI             |
+Goal: a Project's plan and its quality control in one place — a task tree with a frozen baseline, progress by quantity or percent, earned value and a Gantt; Daily Worksheets that feed task progress; an Issues & Snags register with verify and reopen; numbered Inspection Requests with observations, approve / reject, re-inspection and snags; and the Task, Issue & Snag and Inspection sections of the Project Dashboard with their reports. Spec: `modules/05`. Product decisions: [ADR CM-0019](../adr/CM-0019-tracking-product-decisions.md).
+
+| ID     | Seq | Title                                                                                                                | Status | Blocked by     | Area           |
+| ------ | --: | -------------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
+| CM-801 |   1 | Prisma `construction-tracking.prisma`; Issue Categories (seed 14) and Tags masters; kernel wiring                    | done   | CM-403         | Data+Domain    |
+| CM-802 |   2 | Tasks: fields, sub-tasks, work quantity/price → earned value, baseline/actual, statuses, Gantt, import, bulk delete  | done   | CM-801         | Domain+HTTP+UI |
+| CM-803 |   3 | Issues & snags: priority, category, assignee, updates with images, Pending/Delayed/Solved/Closed, verify and reopen  | done   | CM-801         | Domain+HTTP+UI |
+| CM-804 |   4 | Inspection requests: numbering, observations, approve/reject with reason, bulk, re-inspection, snag from a rejection | done   | CM-801, CM-114 | Domain+HTTP+UI |
+| CM-805 |   5 | Task/issue/inspection dashboard sections, Project card progress, reports and the Task Progress Report                | todo   | CM-802–804     | HTTP+UI        |
+| CM-806 |   6 | Daily Worksheets name a Task; worksheet quantity in the task's unit posts task progress                              | todo   | CM-802, CM-602 | Domain+HTTP+UI |
+
+### CM-801 — Tracking schema, masters and wiring
+
+**Done when:**
+
+- **Schema.** `construction-tracking.prisma` (schema `construction_tracking`) holds every M8 table in one migration, with the CHECKs and live-row unique indexes of CM-0019. Small migrations in other schemas, each touching only its own: masters (Issue Categories, Tags), a data migration seeding the 14 Issue Categories for existing Companies, site-work (`worksheets.task_id`), reporting (the four tracking report kinds).
+- **Kernel wiring.**
+  - The `masters.tags` menu; designation templates for Task, Issues and snags, Inspection Request, Issue Categories and Tags (CM-0019 §1).
+  - The **Issue & Snag (ISS)** numbering module; the back-dated `issue` module reads `issueDate`.
+  - `CompanyCreated` seeds the Issue Categories.
+  - The tracking access route, the OpenAPI wiring, the tracking document files (attachments service, Gallery events with sources `task`, `issue`, `inspection`), `PrismaStructureUsage` and the masters delete guards counting tracking rows, the `DrawingUsage` port refusing to delete a drawing a live inspection links.
+  - Project modules **Tasks**, **Issues & Snags** and **Inspections** (stub pages until their tickets); Masters gains **Issue Categories** and **Tags**.
+- **Masters screens.** Issue Categories (rename, disable, delete when unused) and Tags (add, rename, delete when unused), with the case-insensitive unique name.
+- **Tests:** HTTP tests for the seed, uniqueness and delete refusals; stories for both lists, their forms and empty states.
+
+**Build notes (foundation, for CM-802…806):**
+
+- Ports and helpers: `TrackingDirectory` (`src/tracking/application/ports.ts`, adapter `src/composition/tracking-directory.ts`); `TRACKING_DOCUMENTS` (`src/tracking/domain/tracking-documents.ts`); `requireTrackingProjectAccess` / `requireTrackingRecordAccess` (`app/api/construction/tracking/tracking-access.ts`) and `requestProjectId` (`…/tracking/project-scope.ts`); `loadBackdatedCheck` (`src/tracking/infrastructure/tracking-guards.ts`); `insertIssueRow` (`src/tracking/infrastructure/issue-rows.ts`).
+- Files: routes under `/api/construction/tracking/documents/{task|issue|inspection}/{id}/files`; `attachEntryFiles` / `tombstoneEntryFiles` / `entryFiles` (`src/tracking/infrastructure/entry-files.ts`); `trackingFiles` (`…/tracking/documents/handlers.ts`); components in `components/tracking/documents/`.
+- Test helpers: `test/tracking.ts`; `uploadTrackingFile` (`…/tracking/documents/document-test-fixtures.ts`); story API `mockTrackingDocumentApi`.
+- Decisions: `modules/05` → "Decisions for the build" → CM-801.
+
+### CM-802 — Tasks
+
+**Done when:**
+
+- **Form** (CM-0019 §5): name\*, description, assignees (Team Members on the Project), Start / Due Date, Priority, location (`LocationPicker`) plus extra locations, Department, Contractor, Tags (inline create with Tags Create), Total work + unit, Total Price (Financial only). Add Sub-Task (three levels, `TASK_TOO_DEEP`), Copy task below.
+- **Tree list** per Project: Task No., name, assignees, planned dates, progress bar, status chip (derived: Not Started / In Progress / Delayed / Completed); expand / collapse; filters (status, assignee, priority, tag, department, contractor, location, date range, search by number or name); without V only own and assigned tasks (ancestors greyed); multi-select bulk delete (all or none, `TASK_IN_USE`) with the sub-task count in the confirmation.
+- **Detail:** Task No., status, progress, planned / baseline / actual dates, durations and variance, completed work and price (Financial), sub-tasks with roll-up, baseline history with **Re-baseline** (reason), progress updates with photos, the activity feed; actions Update Task Progress (quantity increment or new %), Mark As Completed, edit / delete an update, Edit, Delete.
+- **Rules:** summary tasks roll up (price else duration weighting); `TASK_IS_SUMMARY` on progress to a summary task; status and variance from `taskStatus` and its SQL twin, tested against each other; earned value in paise; prices null without Financial.
+- **Gantt** (CM-0019 §12): read-only, day / week / month, planned bar, baseline beneath, progress shading, Today line, rows open the task; the page never scrolls sideways at 375 px.
+- **Import:** sample xlsx, all or nothing, ≤ 1,000 rows, per-row errors (CM-0019 §13).
+- **Tests:** unit tests for status, roll-up, earned value and progress; HTTP tests for the hierarchy, progress paths, completion and reopening, re-baseline, visibility, Financial masking, bulk delete, import; stories for the form, list, detail, progress dialog, Gantt, import and empty state.
+
+### CM-803 — Issues & Snags
+
+**Done when:**
+
+- **Form** (CM-0019 §7): Issue Date\* (back-dated), details\*, priority (colour + label), Category (enabled), Department, Contractor, Assign To, Due Date ≥ Issue Date, location, images and attachments; Save and Save & Mark As Solved; ISS numbers.
+- **List** per Project with status chips Pending / Delayed / Solved / Closed (Delayed derived), filters (status, priority, category, assignee, department, contractor, location, date range, search), without V only own and assigned; bulk Mark As Solved, bulk Verify (Approve), each skipping and counting the rest.
+- **Detail:** fields, Created By, Solved On / By, Closed On / By, the source inspection when raised from one, the **Progress** thread (comment and images; delete own within 24 h), the lifecycle history; actions Mark As Solved, Verify (A), Reopen with reason (J), Edit, Delete.
+- **Tests:** HTTP tests for transitions and flags, back-dated refusal, Delayed derivation, visibility, bulk skipping, updates; stories for the form, list, detail, reopen dialog and empty state.
+
+### CM-804 — Inspection Requests
+
+**Done when:**
+
+- **Form** (CM-0019 §9): Inspection Date\* (back-dated), time, Department, Contractor, Inspector (optional), description of work\*, location, linked Project Drawings, drawings / photos as files; IR numbers from the numbering rules.
+- **List** per Project with status (Pending for approval / Approved / Rejected), filters (status, department, contractor, inspector, location, date range, search), bulk approve and bulk reject with one reason, skipping and counting non-pending ones.
+- **Detail:** fields, linked drawings (open the drawing), files, **Observations** (text, images, files; while pending), **Remarks** (any time), decided by / on and reason, the re-inspection links both ways, the snag raised from it; actions Approve (A), Reject (J) with reason and **Also raise a snag**, **Raise re-inspection** on a rejected one, Edit and Delete while pending (`INSPECTION_DECIDED`).
+- **Tests:** HTTP tests for numbering, flags, read-only after decision, bulk, re-inspection prefill and link, snag creation in the same transaction, drawing-delete refusal; stories for the form, list, detail, reject dialog and empty state.
+
+### CM-805 — Dashboard, Project card and reports
+
+**Done when:**
+
+- **Project Dashboard** (CM-0019 §14): KPI tiles Pending Issues & Snags and Pending Inspections; Task section (Project Progress % gauge naming its weighting, Value Earned By Task with Financial, counts by status, most delayed tasks); Issue & Snag section (status, priority, category, assignee-wise); Inspection section (totals and Success Rate, "—" without decisions); all on the duration filter. The M4 stubs for these sections are gone.
+- **Project card** shows Project Progress % (CM-0013 §2).
+- **Reports** (Excel + PDF, report jobs): Task Report (prices with Financial), Issue & Snag, Inspection Request.
+- **Task Progress Report** PDF in Progress Reports for a date range, grouped by location, replacing the M6 placeholder.
+- **Tests:** HTTP tests for each KPI and the weighting switch, report columns and Financial masking; stories for each section with data and empty.
+
+### CM-806 — Worksheets feed task progress
+
+**Done when:**
+
+- **Picker.** The Daily Worksheet form has an optional **Task** picker (live leaf tasks of the Project, by number and name) and states whether the sheet will post progress or is linked only, and why (CM-0019 §6).
+- **Posting.** Through the `TaskProgressPosting` port and its composition adapter, in the worksheet's transaction: create posts an update when the units match; edit replaces it; delete and reject remove it; editing a rejected sheet back to pending posts it again. Task totals and the feed follow.
+- **Display.** Worksheet detail and list show the task; the task's feed and progress list show the worksheet number (not editable there).
+- **Tests:** HTTP tests for each path (matching unit, other unit, percent task, edit, delete, reject, un-reject, summary task refused, task of another Project refused); stories for the picker states.
 
 ## M9 — Dashboards, reports, notifications, chat (board only)
 

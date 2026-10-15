@@ -94,6 +94,9 @@ export const Home: Story = {
       "Equipment",
       "Site Diary",
       "Hindrances",
+      "Tasks",
+      "Issues & Snags",
+      "Inspections",
       "Progress Reports",
       "Reports",
     ]);

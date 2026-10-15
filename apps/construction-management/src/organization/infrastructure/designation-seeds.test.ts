@@ -11,7 +11,7 @@ describe("designation seed set (CM-106)", () => {
     now: new Date("2026-10-08T00:00:00Z"),
   });
 
-  it("holds the 38 default names, six with templates", () => {
+  it("holds the 38 default names, eight with templates", () => {
     expect(seeded).toHaveLength(38);
     expect(new Set(seeded.map((item) => item.name)).size).toBe(38);
     expect(
@@ -20,9 +20,12 @@ describe("designation seed set (CM-106)", () => {
       "Accountant",
       "Admin",
       "Project Manager",
+      // Inspection approve / reject and issue verify (ADR CM-0019).
+      "Quality Control",
       "Site Engineer",
       "Site Supervisor",
       "Store Keeper",
+      "Structural Engineer",
     ]);
     expect(seeded.every((item) => item.isSeed)).toBe(true);
   });

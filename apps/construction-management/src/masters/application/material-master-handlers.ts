@@ -32,6 +32,7 @@ import type {
   MaterialStore,
   MaterialUsage,
   MeasurementUnitStore,
+  MeasurementUnitUsage,
   PickedMaster,
   TermsConditionStore,
 } from "./material-ports";
@@ -89,6 +90,8 @@ export class MeasurementUnitHandlers {
   constructor(
     private readonly store: MeasurementUnitStore,
     private readonly clock: Clock = () => new Date(),
+    /** Other contexts' references (tracking's tasks, CM-801). */
+    private readonly usage?: MeasurementUnitUsage,
   ) {}
 
   private async load(workspaceId: string, id: string) {
@@ -157,14 +160,17 @@ export class MeasurementUnitHandlers {
     return unitModel(unit);
   }
 
-  /** 409 `SEED_IS_READ_ONLY` for a seed unit, `MEASUREMENT_UNIT_IN_USE` while a Material uses it. */
+  /** 409 `SEED_IS_READ_ONLY` for a seed unit, `MEASUREMENT_UNIT_IN_USE` while a Material or a live Task uses it. */
   async delete(input: Target): Promise<void> {
     const unit = await this.load(input.workspaceId, input.id);
     const loadedAt = unit.updatedAt;
     const before = unit.snapshot();
     const now = this.clock();
     unit.delete(input.by, now);
-    if (await this.store.inUse(input.workspaceId, input.id))
+    if (
+      (await this.store.inUse(input.workspaceId, input.id)) ||
+      (await this.usage?.(input.workspaceId, input.id)) === true
+    )
       throw masterInUse("measurement_unit");
     await this.store.update(unit, loadedAt, {
       action: "measurement_unit.deleted",

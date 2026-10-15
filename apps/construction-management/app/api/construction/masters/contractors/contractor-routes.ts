@@ -4,6 +4,7 @@ import {
   anyUsage,
   siteWorkPartyUsage,
 } from "@/src/composition/site-work-usage";
+import { trackingPartyUsage } from "@/src/composition/tracking-usage";
 import { createPartyHandlers } from "@/src/masters/infrastructure/create-party-handlers";
 
 import { partyRoutes } from "../_lib/party-routes";
@@ -20,6 +21,7 @@ export const contractorRoutes = partyRoutes({
       procurementPartyUsage(),
       siteWorkPartyUsage(),
       financePartyUsage(),
+      trackingPartyUsage(),
     ),
   }),
   models: {

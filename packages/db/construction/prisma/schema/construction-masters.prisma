@@ -433,3 +433,45 @@ model ConstructionMastersWorkTypeMaterial {
   @@map("work_type_materials")
   @@schema("construction_masters")
 }
+
+// ---------------------------------------------------------------------------
+// Tracking masters (CM-801, ADR CM-0019 §1).
+// ---------------------------------------------------------------------------
+
+/// Issue & Snag categories. Every Company is seeded with the 14 of
+/// `modules/05`; disabled ones stay on old issues but leave the pickers.
+model ConstructionMastersIssueCategory {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("issue_categories")
+  @@schema("construction_masters")
+}
+
+/// Task tags (menu `masters.tags`). Names are unique per Company among live
+/// rows, case-insensitive (partial index in the migration).
+model ConstructionMastersTag {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("tags")
+  @@schema("construction_masters")
+}

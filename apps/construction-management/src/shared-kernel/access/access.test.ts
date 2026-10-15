@@ -64,8 +64,9 @@ describe("the menu catalogue", () => {
       // M7 (ADR CM-0017 §10): Other Expenses (8).
       payment_accounting: 38,
       materials: 46,
-      // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13).
-      master_records: 96,
+      // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13) + Tags
+      // CRUD (ADR CM-0019 §1).
+      master_records: 100,
       central_store: 20,
       hrms: 57,
       others: 1,

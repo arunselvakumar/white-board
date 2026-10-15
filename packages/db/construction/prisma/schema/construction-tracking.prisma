@@ -1,0 +1,454 @@
+/// Construction Management — tracking context (`modules/05`, ADR CM-0019):
+/// Tasks with their baselines, progress updates and activity feed, Issues &
+/// Snags with their update thread, and Inspection Requests with their
+/// observations and remarks.
+///
+/// Conventions:
+/// - Money is paise in `BIGINT`; work quantities are `decimal(14,3)` in the
+///   task's Measurement Unit; percentages are `decimal(5,2)`.
+/// - Projects, Contractors, Departments, Measurement Units, Issue
+///   Categories, Tags, Drawings and Team Members live in other schemas:
+///   their ids are kept without foreign keys. `*_member_id` columns are Team
+///   Member ids; `created_by` / `updated_by` / `deleted_by` are user ids, as
+///   in every other context.
+/// - A **site location** inside a Project is a `LocationRef` stored as JSON
+///   with its type copied to `site_location_type` for filters (CM-403).
+/// - Task status and an issue's "Delayed" are derived on read from the
+///   Company's today (CM-0019 §3, §7); they are never stored.
+/// - Rows are soft-deleted (`deleted_at`); unique rules hold among live rows
+///   through partial indexes in the migration.
+
+enum ConstructionTrackingPriority {
+  high
+  medium
+  low
+
+  @@map("priority")
+  @@schema("construction_tracking")
+}
+
+/// Stored issue states (CM-0019 §7, §8). "Delayed" is `open` past the due
+/// date and is derived.
+enum ConstructionTrackingIssueStatus {
+  open
+  solved
+  closed
+
+  @@map("issue_status")
+  @@schema("construction_tracking")
+}
+
+enum ConstructionTrackingInspectionStatus {
+  pending
+  approved
+  rejected
+
+  @@map("inspection_status")
+  @@schema("construction_tracking")
+}
+
+/// Where a task progress update came from (CM-0019 §6).
+enum ConstructionTrackingProgressSource {
+  manual
+  worksheet
+
+  @@map("progress_source")
+  @@schema("construction_tracking")
+}
+
+/// The documents that carry files (CM-0019 §11).
+enum ConstructionTrackingDocumentType {
+  task
+  issue
+  inspection
+
+  @@map("document_type")
+  @@schema("construction_tracking")
+}
+
+// ---------------------------------------------------------------------------
+// Tasks (CM-802). A task with live sub-tasks is a summary task: its dates,
+// price and progress roll up from them (CM-0019 §2).
+// ---------------------------------------------------------------------------
+
+/// The next Task No. per Project (CM-0019 §2). Taken under a row lock.
+model ConstructionTrackingTaskCounter {
+  projectId   String   @id @map("project_id") @db.Uuid
+  workspaceId String   @map("workspace_id")
+  lastNo      Int      @default(0) @map("last_no")
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  @@index([workspaceId])
+  @@map("task_counters")
+  @@schema("construction_tracking")
+}
+
+model ConstructionTrackingTask {
+  id               String                        @id @db.Uuid
+  workspaceId      String                        @map("workspace_id")
+  projectId        String                        @map("project_id") @db.Uuid
+  taskNo           Int                           @map("task_no")
+  parentId         String?                       @map("parent_id") @db.Uuid
+  /// 1 = top level, 3 = deepest (CM-0019 §2).
+  depth            Int                           @default(1)
+  sortOrder        Int                           @map("sort_order")
+  name             String
+  description      String?
+  startDate        DateTime?                     @map("start_date") @db.Date
+  dueDate          DateTime?                     @map("due_date") @db.Date
+  priority         ConstructionTrackingPriority?
+  siteLocationType String?                       @map("site_location_type")
+  siteLocation     Json?                         @map("site_location")
+  /// Further `LocationRef`s of the same Wing ("Locations", CM-0019 §5).
+  extraLocations   Json?                         @map("extra_locations")
+  departmentId     String?                       @map("department_id") @db.Uuid
+  contractorId     String?                       @map("contractor_id") @db.Uuid
+  /// "Total work"; leaf tasks only. A unit is required with a quantity.
+  totalWorkQty     Decimal?                      @map("total_work_qty") @db.Decimal(14, 3)
+  totalWorkUnitId  String?                       @map("total_work_unit_id") @db.Uuid
+  /// "Total Price" in paise; leaf tasks only.
+  totalPrice       BigInt?                       @map("total_price")
+  /// Cached from the progress updates in the same transaction as each
+  /// change: Σ quantity (quantity tasks) and the current % (all tasks).
+  completedWorkQty Decimal                       @default(0) @map("completed_work_qty") @db.Decimal(14, 3)
+  progressPct      Decimal                       @default(0) @map("progress_pct") @db.Decimal(5, 2)
+  actualStart      DateTime?                     @map("actual_start") @db.Date
+  actualEnd        DateTime?                     @map("actual_end") @db.Date
+  /// The latest baseline, copied from `task_baselines` (CM-0019 §3).
+  baselineStart    DateTime?                     @map("baseline_start") @db.Date
+  baselineEnd      DateTime?                     @map("baseline_end") @db.Date
+  baselineVersion  Int                           @default(0) @map("baseline_version")
+  copiedFromId     String?                       @map("copied_from_id") @db.Uuid
+  createdAt        DateTime                      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                      @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                        @map("created_by")
+  updatedBy        String                        @map("updated_by")
+  deletedAt        DateTime?                     @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                       @map("deleted_by")
+
+  parent     ConstructionTrackingTask?          @relation("TaskTree", fields: [parentId], references: [id])
+  children   ConstructionTrackingTask[]         @relation("TaskTree")
+  assignees  ConstructionTrackingTaskAssignee[]
+  tags       ConstructionTrackingTaskTag[]
+  baselines  ConstructionTrackingTaskBaseline[]
+  progress   ConstructionTrackingTaskProgress[]
+  activities ConstructionTrackingTaskActivity[]
+
+  @@unique([projectId, taskNo])
+  @@index([workspaceId, projectId, parentId, sortOrder])
+  @@index([workspaceId, projectId, dueDate])
+  @@index([workspaceId, contractorId])
+  @@index([workspaceId, departmentId])
+  @@map("tasks")
+  @@schema("construction_tracking")
+}
+
+model ConstructionTrackingTaskAssignee {
+  taskId   String @map("task_id") @db.Uuid
+  memberId String @map("member_id") @db.Uuid
+
+  task ConstructionTrackingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, memberId])
+  @@index([memberId])
+  @@map("task_assignees")
+  @@schema("construction_tracking")
+}
+
+model ConstructionTrackingTaskTag {
+  taskId String @map("task_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+
+  task ConstructionTrackingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, tagId])
+  @@index([tagId])
+  @@map("task_tags")
+  @@schema("construction_tracking")
+}
+
+/// Every baseline a task has had (CM-0019 §3). Version 1 is copied from the
+/// planned dates; later versions come from Re-baseline with a reason.
+model ConstructionTrackingTaskBaseline {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  taskId      String   @map("task_id") @db.Uuid
+  version     Int
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime @map("end_date") @db.Date
+  reason      String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  task ConstructionTrackingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, version])
+  @@map("task_baselines")
+  @@schema("construction_tracking")
+}
+
+/// A progress update (CM-0019 §4, §6). A quantity task records the work done
+/// in this update (`work_qty`); a percent task records the new percentage
+/// (`progress_pct`). Worksheet updates carry the worksheet's id and number
+/// and are replaced or removed with the worksheet.
+model ConstructionTrackingTaskProgress {
+  id              String                             @id @db.Uuid
+  workspaceId     String                             @map("workspace_id")
+  taskId          String                             @map("task_id") @db.Uuid
+  progressDate    DateTime                           @map("progress_date") @db.Date
+  workQty         Decimal?                           @map("work_qty") @db.Decimal(14, 3)
+  progressPct     Decimal?                           @map("progress_pct") @db.Decimal(5, 2)
+  remark          String?
+  source          ConstructionTrackingProgressSource @default(manual)
+  worksheetId     String?                            @map("worksheet_id") @db.Uuid
+  worksheetNumber String?                            @map("worksheet_number")
+  createdAt       DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy       String                             @map("created_by")
+  updatedBy       String                             @map("updated_by")
+  deletedAt       DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?                            @map("deleted_by")
+
+  task ConstructionTrackingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, taskId, progressDate])
+  @@index([worksheetId])
+  @@map("task_progress")
+  @@schema("construction_tracking")
+}
+
+/// The append-only activity feed (CM-0019 §4). `kind` is a TypeScript union
+/// (`created`, `edited`, `assignees_changed`, `rebaselined`, `progress_recorded`,
+/// `progress_edited`, `progress_deleted`, `completed`, `reopened`,
+/// `subtask_added`, `copied`, `worksheet_progress`); `payload` holds what
+/// changed.
+model ConstructionTrackingTaskActivity {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  taskId      String   @map("task_id") @db.Uuid
+  kind        String
+  payload     Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  task ConstructionTrackingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, taskId, createdAt])
+  @@map("task_activities")
+  @@schema("construction_tracking")
+}
+
+// ---------------------------------------------------------------------------
+// Issues & Snags (CM-803).
+// ---------------------------------------------------------------------------
+
+model ConstructionTrackingIssue {
+  id                 String                          @id @db.Uuid
+  workspaceId        String                          @map("workspace_id")
+  projectId          String                          @map("project_id") @db.Uuid
+  /// From the `issue` numbering module (CM-0019 §7).
+  number             String
+  issueDate          DateTime                        @map("issue_date") @db.Date
+  details            String
+  priority           ConstructionTrackingPriority?
+  categoryId         String?                         @map("category_id") @db.Uuid
+  departmentId       String?                         @map("department_id") @db.Uuid
+  contractorId       String?                         @map("contractor_id") @db.Uuid
+  assigneeMemberId   String?                         @map("assignee_member_id") @db.Uuid
+  dueDate            DateTime?                       @map("due_date") @db.Date
+  siteLocationType   String?                         @map("site_location_type")
+  siteLocation       Json?                           @map("site_location")
+  status             ConstructionTrackingIssueStatus @default(open)
+  solvedAt           DateTime?                       @map("solved_at") @db.Timestamptz(3)
+  solvedBy           String?                         @map("solved_by")
+  closedAt           DateTime?                       @map("closed_at") @db.Timestamptz(3)
+  closedBy           String?                         @map("closed_by")
+  /// Raised from a rejected inspection (CM-0019 §10).
+  sourceInspectionId String?                         @map("source_inspection_id") @db.Uuid
+  createdAt          DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                        @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy          String                          @map("created_by")
+  updatedBy          String                          @map("updated_by")
+  deletedAt          DateTime?                       @map("deleted_at") @db.Timestamptz(3)
+  deletedBy          String?                         @map("deleted_by")
+
+  sourceInspection ConstructionTrackingInspection?   @relation(fields: [sourceInspectionId], references: [id])
+  updates          ConstructionTrackingIssueUpdate[]
+  events           ConstructionTrackingIssueEvent[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, issueDate])
+  @@index([workspaceId, projectId, status, dueDate])
+  @@index([workspaceId, assigneeMemberId])
+  @@index([workspaceId, categoryId])
+  @@index([workspaceId, contractorId])
+  @@index([workspaceId, departmentId])
+  @@map("issues")
+  @@schema("construction_tracking")
+}
+
+/// The Progress thread: a comment, images, or both (CM-0019 §7).
+model ConstructionTrackingIssueUpdate {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  issueId     String    @map("issue_id") @db.Uuid
+  body        String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  issue ConstructionTrackingIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, issueId, createdAt])
+  @@map("issue_updates")
+  @@schema("construction_tracking")
+}
+
+/// Lifecycle history (CM-0019 §8): `created`, `edited`, `assigned`,
+/// `solved`, `closed`, `reopened` (with `reason`).
+model ConstructionTrackingIssueEvent {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  issueId     String   @map("issue_id") @db.Uuid
+  kind        String
+  reason      String?
+  payload     Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  issue ConstructionTrackingIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, issueId, createdAt])
+  @@map("issue_events")
+  @@schema("construction_tracking")
+}
+
+// ---------------------------------------------------------------------------
+// Inspection Requests (CM-804).
+// ---------------------------------------------------------------------------
+
+model ConstructionTrackingInspection {
+  id                String                               @id @db.Uuid
+  workspaceId       String                               @map("workspace_id")
+  projectId         String                               @map("project_id") @db.Uuid
+  /// From the `inspection_request` numbering module (CM-0019 §9).
+  number            String
+  inspectionDate    DateTime                             @map("inspection_date") @db.Date
+  /// "HH:MM", local time on site.
+  inspectionTime    String?                              @map("inspection_time")
+  departmentId      String?                              @map("department_id") @db.Uuid
+  contractorId      String?                              @map("contractor_id") @db.Uuid
+  inspectorMemberId String?                              @map("inspector_member_id") @db.Uuid
+  workDescription   String                               @map("work_description")
+  siteLocationType  String?                              @map("site_location_type")
+  siteLocation      Json?                                @map("site_location")
+  status            ConstructionTrackingInspectionStatus @default(pending)
+  decidedAt         DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  decidedBy         String?                              @map("decided_by")
+  rejectionReason   String?                              @map("rejection_reason")
+  /// The rejected request this one re-inspects (CM-0019 §10).
+  reinspectionOfId  String?                              @map("reinspection_of_id") @db.Uuid
+  createdAt         DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                               @map("created_by")
+  updatedBy         String                               @map("updated_by")
+  deletedAt         DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                              @map("deleted_by")
+
+  reinspectionOf ConstructionTrackingInspection?             @relation("Reinspection", fields: [reinspectionOfId], references: [id])
+  reinspections  ConstructionTrackingInspection[]            @relation("Reinspection")
+  drawings       ConstructionTrackingInspectionDrawing[]
+  observations   ConstructionTrackingInspectionObservation[]
+  remarks        ConstructionTrackingInspectionRemark[]
+  snags          ConstructionTrackingIssue[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, projectId, inspectionDate])
+  @@index([workspaceId, projectId, status])
+  @@index([workspaceId, contractorId])
+  @@index([workspaceId, departmentId])
+  @@index([workspaceId, inspectorMemberId])
+  @@map("inspections")
+  @@schema("construction_tracking")
+}
+
+/// Project Drawings linked to a request (CM-0019 §9). A linked drawing cannot
+/// be deleted while the request is live.
+model ConstructionTrackingInspectionDrawing {
+  inspectionId String @map("inspection_id") @db.Uuid
+  drawingId    String @map("drawing_id") @db.Uuid
+
+  inspection ConstructionTrackingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@id([inspectionId, drawingId])
+  @@index([drawingId])
+  @@map("inspection_drawings")
+  @@schema("construction_tracking")
+}
+
+/// "Observations": text, images, files (CM-0019 §9). Added while pending.
+model ConstructionTrackingInspectionObservation {
+  id           String    @id @db.Uuid
+  workspaceId  String    @map("workspace_id")
+  inspectionId String    @map("inspection_id") @db.Uuid
+  body         String?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String    @map("created_by")
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?   @map("deleted_by")
+
+  inspection ConstructionTrackingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, inspectionId, createdAt])
+  @@map("inspection_observations")
+  @@schema("construction_tracking")
+}
+
+/// The Remarks list: text only, any time (CM-0019 §9).
+model ConstructionTrackingInspectionRemark {
+  id           String   @id @db.Uuid
+  workspaceId  String   @map("workspace_id")
+  inspectionId String   @map("inspection_id") @db.Uuid
+  body         String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String   @map("created_by")
+
+  inspection ConstructionTrackingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, inspectionId, createdAt])
+  @@map("inspection_remarks")
+  @@schema("construction_tracking")
+}
+
+// ---------------------------------------------------------------------------
+// Shared: files on tasks, issues and inspections (CM-0019 §11).
+// ---------------------------------------------------------------------------
+
+/// Progress-update photos (`entry_id` = the progress update), issue images
+/// and attachments (`entry_id` null) and update images (`entry_id` = the
+/// update), inspection files (`entry_id` null) and observation files
+/// (`entry_id` = the observation). Uploaded through the attachments service
+/// (CM-0014); images and PDFs are indexed in the Project Gallery.
+model ConstructionTrackingDocumentFile {
+  id           String                           @id @db.Uuid
+  workspaceId  String                           @map("workspace_id")
+  projectId    String                           @map("project_id") @db.Uuid
+  documentType ConstructionTrackingDocumentType @map("document_type")
+  documentId   String                           @map("document_id") @db.Uuid
+  entryId      String?                          @map("entry_id") @db.Uuid
+  fileKey      String                           @unique @map("file_key")
+  fileName     String                           @map("file_name")
+  contentType  String                           @map("content_type")
+  bytes        Int
+  thumbKey     String?                          @map("thumb_key")
+  createdAt    DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                           @map("created_by")
+  deletedAt    DateTime?                        @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                          @map("deleted_by")
+
+  @@index([workspaceId, documentType, documentId, deletedAt])
+  @@index([entryId])
+  @@map("document_files")
+  @@schema("construction_tracking")
+}

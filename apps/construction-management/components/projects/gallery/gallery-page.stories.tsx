@@ -451,6 +451,37 @@ export const ViewPdf: Story = {
   },
 };
 
+/** A tracking record's file links back to its Issue (M8). */
+export const LinksBackToIssue: Story = {
+  beforeEach: galleryApi({
+    items: [
+      {
+        ...SLAB_PHOTO,
+        id: "0199c4a0-0000-7000-8000-0000000e9001",
+        source: "issue",
+        sourceId: "0199c4a0-0000-7000-8000-0000000f9001",
+        fileName: "Crack near column C4.jpg",
+      },
+    ],
+  }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Crack near column C4.jpg" }),
+    );
+    const viewer = within(
+      await body.findByRole("dialog", { name: "Crack near column C4.jpg" }),
+    );
+    await expect(viewer.getByText(/^Issue & Snag · Karthik R/)).toBeVisible();
+    await expect(
+      viewer.getByRole("link", { name: "Open Issue" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${GALLERY_PROJECT_ID}/issues/0199c4a0-0000-7000-8000-0000000f9001`,
+    );
+  },
+};
+
 /** Nothing on the Project yet: where the files come from. */
 export const Empty: Story = {
   beforeEach: galleryApi({ items: [], uploaders: [] }),

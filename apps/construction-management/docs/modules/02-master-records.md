@@ -228,7 +228,7 @@ Amenity: Swimming Pool. Common Development: Compound Wall.
 
 ### Designations
 
-See 01 (38 seeded designations; six carry permission templates).
+See 01 (38 seeded designations; eight carry permission templates — Quality Control and Structural Engineer since M8).
 
 ### Company Bank / Cash accounts (per company on creation)
 

@@ -6,7 +6,7 @@ import {
   type UploadTarget,
 } from "@/src/shared-kernel/attachments";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
-import { notFound } from "@/src/shared-kernel/domain-error";
+import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import type {
   NewStoredFile,
   ObjectStorage,
@@ -176,6 +176,25 @@ export const albumNotFound = () =>
 export const drawingNotFound = () =>
   notFound("DRAWING_NOT_FOUND", "This drawing was not found.");
 
+/**
+ * What links a Project Drawing from outside the projects context: live
+ * Inspection Requests (ADR CM-0019 §9). `src/composition` reads tracking's
+ * tables; the projects context never imports tracking.
+ */
+export type DrawingUsage = {
+  /** How many live Inspection Requests link the drawing. */
+  inspectionsLinking(workspaceId: string, drawingId: string): Promise<number>;
+};
+
+/** 409 while live Inspection Requests link the drawing (CM-0019 §9). */
+export function drawingInUse(inspectionCount: number) {
+  return conflict(
+    "DRAWING_IN_USE",
+    "Inspection Requests link this drawing, so it cannot be deleted.",
+    { inspectionCount },
+  );
+}
+
 function revisionView(
   revision: DrawingRevision,
   names: ReadonlyMap<string, string>,
@@ -210,6 +229,8 @@ export class ProjectDrawings {
     plan: PlanGate,
     private readonly names: UploaderNames,
     private readonly clock: () => Date = () => new Date(),
+    /** Inspection Requests' links (M8); none before tracking is wired. */
+    private readonly usage?: DrawingUsage,
   ) {
     this.uploads = new AttachmentUploads(storage, plan, clock);
   }
@@ -739,6 +760,12 @@ export class ProjectDrawings {
       input.projectId,
       input.drawingId,
     );
+    const linking =
+      (await this.usage?.inspectionsLinking(
+        input.viewer.workspaceId,
+        drawing.id,
+      )) ?? 0;
+    if (linking > 0) throw drawingInUse(linking);
     const now = this.clock();
     const removed = await this.store.deleteDrawing({
       drawing,

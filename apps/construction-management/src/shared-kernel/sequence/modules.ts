@@ -48,6 +48,8 @@ export const SEQUENCE_MODULES = [
     defaultPrefix: "DPR",
   },
   { key: "hindrance", label: "Hindrance (HR)", defaultPrefix: "HR" },
+  // Issues & Snags (ADR CM-0019 §7).
+  { key: "issue", label: "Issue & Snag (ISS)", defaultPrefix: "ISS" },
   {
     key: "other_party_sales_invoice",
     label: "Other Party Sales Invoice",

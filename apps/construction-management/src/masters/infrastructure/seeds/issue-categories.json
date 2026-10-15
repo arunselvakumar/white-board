@@ -1,0 +1,19 @@
+{
+  "source": "The 14 Issue Categories of modules/05 every Company starts with (ADR CM-0019 §1). Keep in step with migration 20261014090100_construction_masters_issue_category_seeds; a test checks the names.",
+  "issueCategories": [
+    "Client",
+    "Communication",
+    "Compliance",
+    "Design",
+    "Environmental",
+    "Financial",
+    "Management",
+    "Operational",
+    "Other",
+    "Quality",
+    "RFI",
+    "Safety",
+    "Supply",
+    "Technical"
+  ]
+}
