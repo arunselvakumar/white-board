@@ -24,6 +24,10 @@ M8 (Tasks, Issues & Snags, Inspection Requests) added about 350 files to the app
 
 `vercel pull` cannot read Vercel variables of the Secret (sensitive) type: it writes `[SENSITIVE]` in their place. The deployed functions still get the real values at runtime, but `next build` loads server modules on the runner with the placeholders. So nothing may read and validate a secret while a module loads: `@repo/auth`'s email sender now reads `EMAIL_TRANSPORT` when it sends the first email, not when it is created. (This is also why every production deploy of Construction Management from the Deploy workflow had failed since #63.) A build step that truly needs a secret, such as migrations against a database whose URL is a Secret, cannot run until that value reaches the runner another way.
 
+### The build trace stays behind
+
+`vercel deploy --prebuilt` uploads every file of `.vercel/output`, and Vercel refuses a file over 100 MB. Next's build trace, which `vercel build` copies to `.vercel/output/diagnostics/trace`, is about 116 MB for Construction Management. It is only for Vercel's build diagnostics, so both workflows delete the `diagnostics` folder before uploading; the preview workflow then names any other file over 90 MB and stops.
+
 ## Consequences
 
 - The "Vercel – construction-management" status disappears from pull requests; the "Preview construction-management" job and the deployment link take its place.
