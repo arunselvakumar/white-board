@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/site-work/worksheets/worksheet-tasks.http.test.ts
+  s_8821256d95b7ff::t_f1e1d42c7272de 382-428
+apps/construction-management/src/composition/task-progress-posting.ts
+  s_8821256d95b7ff::t_b03b99a0ccaa3c 85-96
+apps/construction-management/src/site-work/application/ports.ts
+  s_8821256d95b7ff::t_e2405bf5d798d6 440-451
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_8821256d95b7ff::t_3951bc3aee80c0 521-537,703-704,814-815
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_8821256d95b7ff::t_bd42edd5618414 604
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "74a5de0fa70cdff8eb692c00a1917552243a3320",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
