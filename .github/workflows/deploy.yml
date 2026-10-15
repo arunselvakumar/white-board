@@ -118,6 +118,21 @@ jobs:
       - name: Pull Vercel settings
         run: bunx vercel@63.1.2 pull --yes --environment=production --token="$VERCEL_TOKEN"
 
+      # Whiteboard's database URLs are Vercel Secrets, which `vercel pull`
+      # writes as "[SENSITIVE]"; its build-time migrations take the direct
+      # URL from the repository secret instead (ADR-0046). The deployed app
+      # still reads the real Vercel values at runtime.
+      - name: Database URL for Whiteboard's migrations
+        if: matrix.app == 'whiteboard'
+        env:
+          URL: ${{ secrets.WHITEBOARD_DATABASE_URL_UNPOOLED }}
+        run: |
+          [ -n "$URL" ] || { echo "The secret WHITEBOARD_DATABASE_URL_UNPOOLED is not set."; exit 1; }
+          file=.vercel/.env.production.local
+          { grep -v '^DATABASE_URL_UNPOOLED=' "$file" || true; } > "$file.next"
+          printf 'DATABASE_URL_UNPOOLED="%s"\n' "$URL" >> "$file.next"
+          mv "$file.next" "$file"
+
       # The project's build command: production migrations (Whiteboard and
       # Construction Management), then the Next build, on this runner.
       - name: Build
