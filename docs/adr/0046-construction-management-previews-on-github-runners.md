@@ -18,7 +18,7 @@ M8 (Tasks, Issues & Snags, Inspection Requests) added about 350 files to the app
 - The preview is recorded as a GitHub Deployment in `preview/construction-management`, so the pull request shows its link.
 - One preview build runs at a time and is never cancelled midway, because all previews share one preview database and a build may be applying migrations.
 - Vercel's git deployments are switched off for the `construction-management` project (`git.deploymentEnabled: false` in its `vercel.json`); production and previews both arrive as prebuilt output. Whiteboard and the Marketing Site keep Vercel's own previews.
-- Pull requests from forks get no secrets and are not previewed.
+- Pull requests from forks and from Dependabot get no secrets (and a read-only token) and are not previewed.
 
 ### Sensitive variables are placeholders at build time
 
