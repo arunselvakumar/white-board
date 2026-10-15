@@ -102,7 +102,7 @@ export function ProjectNavMenu({
     if (loading) return;
     navRef.current
       ?.querySelector("[aria-current=page]")
-      ?.scrollIntoView({ block: "nearest" });
+      ?.scrollIntoView({ block: "center" });
   }, [loading, projectId]);
 
   return (
