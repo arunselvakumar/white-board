@@ -1,0 +1,21 @@
+apps/construction-management/lib/project-nav.test.ts
+  s_0836829687bea4::t_c896cc4d13fc8c 85-89
+apps/construction-management/lib/project-nav.ts
+  s_0836829687bea4::t_a723b8e3605113 36-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e06a2b7daec468d493dec5f94771fbc3fa140e1f",
+  "prompts": {},
+  "sessions": {
+    "s_0836829687bea4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e59fdd6-fe47-482d-a517-56599bfe71a1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
