@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/projects/projects/project-progress.http.test.ts
+  s_8821256d95b7ff::t_b9c7fac9204d78 8,132-165
+apps/construction-management/components/site-work/worksheets/worksheet-form.stories.tsx
+  s_8821256d95b7ff::t_8beb3b1c2b62c6 479-523
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_8821256d95b7ff::t_64cac0cd9c2d9f 414-416,518-521,792
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0ccd9d8016aecfd9720f81e6b25b9463591c6db2",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
