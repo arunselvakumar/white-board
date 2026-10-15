@@ -1,0 +1,61 @@
+apps/construction-management/CONTEXT.md
+  s_0836829687bea4::t_3c4d3db1dc0967 183,186-189
+apps/construction-management/app/app/projects/[id]/attendance/layout.tsx
+  s_0836829687bea4::t_f1a4c127e10f66 3-4,9
+apps/construction-management/app/app/projects/[id]/equipment/layout.tsx
+  s_0836829687bea4::t_0d78c41e341fd0 3-4,10
+apps/construction-management/app/app/projects/[id]/materials/layout.tsx
+  s_0836829687bea4::t_f3cc9ff5259be8 3-4,10
+apps/construction-management/app/app/projects/[id]/payments/layout.tsx
+  s_0836829687bea4::t_ec8e430439e9ba 3-4,10
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_0836829687bea4::t_2165696804d53c 27,34,47-51,54,80-88,113,138-188
+apps/construction-management/components/app-shell/project-nav-menu.stories.tsx
+  s_0836829687bea4::t_8e7b4e7b7c2416 1-317
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_0836829687bea4::t_5745a905b505a4 1-343
+apps/construction-management/components/attendance/attendance-tabs.ts
+  s_0836829687bea4::t_de8a596ecd1981 7-8,10-13
+apps/construction-management/components/finance/payments-hub/payments-nav.ts
+  s_0836829687bea4::t_80072c60bdcb3e 10-12,14-16,20-23
+apps/construction-management/components/procurement/materials-hub/materials-nav.ts
+  s_0836829687bea4::t_ec967cf1a0a411 13-15,17-22,24-27
+apps/construction-management/components/projects/project-home-dialogs.tsx
+  s_0836829687bea4::t_7ab05763bdfb1a 132
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_0836829687bea4::t_03733918489125 2,73,83,95,126-127,137-138
+apps/construction-management/components/projects/project-shell.tsx
+  s_0836829687bea4::t_5bce81bda64d60 20,30,106-110,127-141,154-165,167
+apps/construction-management/components/site-work/equipment/equipment-nav.ts
+  s_0836829687bea4::t_b983c4809550d6 13-15,17-19,23-26
+apps/construction-management/docs/adr/CM-0020-project-sidebar-menu.md
+  s_0836829687bea4::t_5a7de47dab6763 1-55
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_0836829687bea4::t_89574711546268 620,623
+apps/construction-management/lib/project-nav.test.ts
+  s_0836829687bea4::t_7155f82cea034d 1-102
+apps/construction-management/lib/project-nav.ts
+  s_0836829687bea4::t_90a932e4ee049a 1-89
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_0836829687bea4::t_914e28e0cf3ede 2
+apps/construction-management/src/queries/project-home.ts
+  s_0836829687bea4::t_956ac9df668d79 31-32
+apps/construction-management/src/projects/domain/project-nav-groups.ts
+  s_0836829687bea4::t_4edbbb12b855cc 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f3936a67e1db21a3e8704b22ffd99990bca3199c",
+  "prompts": {},
+  "sessions": {
+    "s_0836829687bea4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e59fdd6-fe47-482d-a517-56599bfe71a1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
