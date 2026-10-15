@@ -1,0 +1,41 @@
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_8821256d95b7ff::t_c0db2abefa42f3 12,36,46-57
+apps/construction-management/app/api/construction/projects/projects/[id]/progress/route.ts
+  s_8821256d95b7ff::t_db226476258ca4 1-39
+apps/construction-management/app/api/construction/projects/projects/list-projects-models.ts
+  s_8821256d95b7ff::t_b247fabd355a06 16-35,42-44
+apps/construction-management/app/api/construction/projects/projects/project-progress.http.test.ts
+  s_8821256d95b7ff::t_817b201b402a8f 11-15,102-130
+apps/construction-management/components/projects/project-overview.stories.tsx
+  s_8821256d95b7ff::t_241b2e964a8251 24-29
+apps/construction-management/components/projects/project-overview.tsx
+  s_8821256d95b7ff::t_5cd3339ef6dd30 13,179-180
+apps/construction-management/components/site-work/worksheets/worksheet-form.stories.tsx
+  s_8821256d95b7ff::t_f212572059ebd1 397-400,431,433-476
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_8821256d95b7ff::t_6834951529f7f3 515-519,788-791
+apps/construction-management/src/queries/projects.ts
+  s_8821256d95b7ff::t_01d9664e4d9742 10-13,67-77
+apps/construction-management/src/tracking/application/task-store.ts
+  s_8821256d95b7ff::t_cbd5622da838bf 282
+apps/construction-management/src/tracking/application/task-worksheet-progress.ts
+  s_8821256d95b7ff::t_3b853cf6ba56f3 91-95,147-151
+apps/construction-management/src/tracking/infrastructure/prisma-task-store.ts
+  s_8821256d95b7ff::t_bd15eb3657171e 495,497
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1ce81c061f3d4c10bfdd7b2f7c62b4a830c3b6b9",
+  "prompts": {},
+  "sessions": {
+    "s_8821256d95b7ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "abe948f8-6241-471e-9ed0-e6d959d90f6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
