@@ -1,5 +1,5 @@
 /**
- * The modules of a Project's home and section links (ADR CM-0013 §11), in
+ * The modules of a Project's home and sidebar (ADR CM-0013 §11, CM-0020), in
  * the default order. A module is shown when it exists, the member may read
  * its menu, and nobody hid it on the Project; Wings and Locations also
  * follow the Project's structure. Later milestones add their modules here.

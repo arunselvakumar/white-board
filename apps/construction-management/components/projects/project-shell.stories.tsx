@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, waitFor, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
-import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
 import type { ProjectHome } from "@/src/queries/project-home";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
@@ -54,18 +53,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-async function sectionLinks(canvas: {
-  findByRole: (
-    role: "navigation",
-    options: { name: string },
-  ) => Promise<HTMLElement>;
-}) {
-  const nav = await canvas.findByRole("navigation", {
-    name: "Project sections",
-  });
-  return within(nav);
-}
-
 export const Home: Story = {
   play: async ({ canvas }) => {
     await expect(
@@ -75,37 +62,6 @@ export const Home: Story = {
       "href",
       `${PATH}/edit`,
     );
-    const tabs = await sectionLinks(canvas);
-    const links = tabs.getAllByRole("link");
-    await expect(links.map((link) => link.textContent)).toEqual([
-      "Home",
-      "Dashboard",
-      "Wings",
-      "Amenities",
-      "Drawings",
-      "Testing Reports",
-      "Gallery",
-      "Documents",
-      "Resources",
-      "Attendance",
-      "Payments",
-      "Materials",
-      "Daily Worksheet",
-      "Equipment",
-      "Site Diary",
-      "Hindrances",
-      "Tasks",
-      "Issues & Snags",
-      "Inspections",
-      "Progress Reports",
-      "Reports",
-    ]);
-    await expect(links[2]).toHaveAttribute("href", `${PATH}/wings`);
-    await expect(links[5]).toHaveAttribute("href", `${PATH}/testing-reports`);
-    await expect(tabs.getByRole("link", { name: "Home" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
     const details = within(canvas.getByRole("region", { name: "Details" }));
     await expect(details.getByText("1 Apr 2026")).toBeVisible();
     await expect(
@@ -114,7 +70,7 @@ export const Home: Story = {
   },
 };
 
-export const MemberSections: Story = {
+export const OptionsWithoutUpdateFlag: Story = {
   beforeEach: serve(
     storyHome({
       keys: ["documents", "attendance", "payments"],
@@ -122,15 +78,9 @@ export const MemberSections: Story = {
     }),
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const tabs = await sectionLinks(canvas);
-    await waitFor(() =>
-      expect(tabs.getAllByRole("link").map((link) => link.textContent)).toEqual(
-        ["Home", "Documents", "Attendance", "Payments"],
-      ),
-    );
     // Without the Update flag the options offer no Hide / show modules.
     await userEvent.click(
-      canvas.getByRole("button", { name: "Project options" }),
+      await canvas.findByRole("button", { name: "Project options" }),
     );
     const body = within(canvasElement.ownerDocument.body);
     await expect(
@@ -142,58 +92,12 @@ export const MemberSections: Story = {
   },
 };
 
-export const HiddenModulesLeaveTheBar: Story = {
+export const HiddenModulesNote: Story = {
   beforeEach: serve(storyHome({ hidden: ["gallery", "reports"] })),
   play: async ({ canvas }) => {
-    const tabs = await sectionLinks(canvas);
-    await waitFor(() =>
-      expect(tabs.queryByRole("link", { name: "Gallery" })).toBeNull(),
-    );
-    await expect(tabs.queryByRole("link", { name: "Reports" })).toBeNull();
     await expect(
       await canvas.findByText(/2 modules are hidden on this Project/),
     ).toBeVisible();
-  },
-};
-
-export const AttendanceSection: Story = {
-  parameters: {
-    nextjs: { navigation: { pathname: `${PATH}/attendance/labour` } },
-  },
-  render: () => (
-    <StoryQueries>
-      <ProjectShell id={KUMARI.id}>
-        <PagePlaceholder
-          title="Attendance"
-          description="Mark labour and vendor attendance for this Project."
-        />
-      </ProjectShell>
-    </StoryQueries>
-  ),
-  play: async ({ canvas }) => {
-    const tabs = await sectionLinks(canvas);
-    await waitFor(() =>
-      expect(tabs.getByRole("link", { name: "Attendance" })).toHaveAttribute(
-        "aria-current",
-        "page",
-      ),
-    );
-    await expect(tabs.getByRole("link", { name: "Home" })).not.toHaveAttribute(
-      "aria-current",
-    );
-  },
-};
-
-export const EditBelongsToHome: Story = {
-  parameters: {
-    nextjs: { navigation: { pathname: `${PATH}/edit` } },
-  },
-  play: async ({ canvas }) => {
-    const tabs = await sectionLinks(canvas);
-    await expect(tabs.getByRole("link", { name: "Home" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
   },
 };
 
@@ -219,10 +123,8 @@ export const PinFromOptions: Story = {
 export const WithoutHomeFallsBack: Story = {
   beforeEach: serve(null),
   play: async ({ canvas }) => {
-    const tabs = await sectionLinks(canvas);
-    // The home could not load: every module of the structure, no options.
-    await expect(tabs.getByRole("link", { name: "Wings" })).toBeVisible();
-    await expect(tabs.queryByRole("link", { name: "Locations" })).toBeNull();
+    // The home could not load: no options (the sidebar falls back, see ProjectNavMenu).
+    await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" });
     await expect(
       canvas.queryByRole("button", { name: "Project options" }),
     ).toBeNull();
@@ -232,14 +134,8 @@ export const WithoutHomeFallsBack: Story = {
 export const Phone: Story = {
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvas, canvasElement }) => {
-    const nav = await canvas.findByRole("navigation", {
-      name: "Project sections",
-    });
-    // The section bar scrolls sideways; the page does not.
-    await expect(getComputedStyle(nav).overflowX).toBe("auto");
-    await expect(
-      within(nav).getByRole("link", { name: "Reports" }),
-    ).toBeInTheDocument();
+    // The slim header wraps; the page never scrolls sideways.
+    await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" });
     await canvas.findByRole("list", { name: "Modules" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);

@@ -1,20 +1,12 @@
 import type { ReactNode } from "react";
 
-import { PaymentsNav } from "@/components/finance/payments-hub/payments-nav";
-
-/** The Payments module of a Project (M2 wages, M7 finance): its tabs, then the tab. */
-export default async function PaymentsLayout({
+/** The Payments module of a Project (M2 wages, M7 finance). Its tabs are in the sidebar (ADR CM-0020). */
+export default function PaymentsLayout({
   children,
-  params,
 }: Readonly<{
   children: ReactNode;
-  params: Promise<{ id: string }>;
 }>) {
-  const { id } = await params;
   return (
-    <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <PaymentsNav projectId={id} />
-      {children}
-    </div>
+    <div className="flex w-full max-w-6xl flex-col gap-4 p-6">{children}</div>
   );
 }

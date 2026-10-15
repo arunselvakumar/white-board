@@ -129,7 +129,7 @@ function HideModulesForm({
 /**
  * Hide / Show Modules (CM-411): tick the modules everyone on this Project
  * sees. Needs the Project menu's Update flag; hiding changes the home and
- * the section bar, never what anyone may open.
+ * the sidebar menu, never what anyone may open.
  */
 export function HideModulesDialog({
   projectId,
