@@ -167,6 +167,7 @@ function ObservationsBody({
               id="inspection-observation"
               rows={3}
               value={body}
+              maxLength={INSPECTION_LIMITS.observation}
               aria-invalid={problem != null}
               onChange={(event) => {
                 setBody(event.target.value);

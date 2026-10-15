@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { expect, fireEvent, waitFor, within } from "storybook/test";
+import { expect, fireEvent, spyOn, waitFor, within } from "storybook/test";
 import { Button } from "@repo/ui/components/button";
 
 import {
@@ -141,6 +141,42 @@ export const PickingPhotos: Story = {
     );
     await expect(tiles.getAllByRole("listitem")).toHaveLength(1);
     await expect(tiles.queryByText("Before.jpg")).toBeNull();
+  },
+};
+
+/** A photo's preview is released with its tile, not kept until the page goes. */
+export const PreviewsAreReleased: Story = {
+  beforeEach: withApi(),
+  play: async ({ canvas, userEvent }) => {
+    const revoke = spyOn(URL, "revokeObjectURL");
+    try {
+      await fireEvent.change(
+        canvas.getByLabelText("Choose photos for Photos"),
+        {
+          target: {
+            files: [
+              file("Before.jpg", 800_000, "image/jpeg"),
+              file("After.png", 600_000, "image/png"),
+            ],
+          },
+        },
+      );
+      const tiles = within(
+        canvas.getByRole("list", { name: "Photos to upload" }),
+      );
+      const url = tiles
+        .getByText("Before.jpg")
+        .closest("li")
+        ?.querySelector("img")
+        ?.getAttribute("src");
+      await expect(url).toMatch(/^blob:/);
+      await userEvent.click(
+        tiles.getByRole("button", { name: "Remove Before.jpg" }),
+      );
+      await expect(revoke).toHaveBeenCalledWith(url);
+    } finally {
+      revoke.mockRestore();
+    }
   },
 };
 

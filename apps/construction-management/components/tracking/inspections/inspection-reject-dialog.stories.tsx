@@ -86,3 +86,22 @@ export const Refused: Story = {
     ).toBeVisible();
   },
 };
+
+/** While the rejection is sent, Escape and Cancel do not close the dialog. */
+export const Sending: Story = {
+  args: {
+    onSubmit: fn(() => new Promise<void>(() => undefined)),
+  },
+  play: async ({ args, canvasElement, userEvent }) => {
+    const dialog = within(await dialogOf(canvasElement));
+    await userEvent.type(dialog.getByLabelText("Reason"), "Late");
+    await userEvent.click(dialog.getByRole("button", { name: "Reject" }));
+    await expect(
+      await dialog.findByRole("button", { name: "Rejecting…" }),
+    ).toBeDisabled();
+    await expect(dialog.getByRole("button", { name: "Cancel" })).toBeDisabled();
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onOpenChange).not.toHaveBeenCalledWith(false);
+    await expect(await dialogOf(canvasElement)).toBeVisible();
+  },
+};

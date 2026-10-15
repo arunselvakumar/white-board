@@ -1,7 +1,7 @@
 "use client";
 
 import { ImagePlus, Paperclip, X } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -36,26 +36,22 @@ export type TrackingPendingFilesFieldProps = {
 };
 
 /**
- * Preview URLs of picked images, one per `File`. A URL is revoked when its
- * tile is removed; the rest go with the page.
+ * Shows a picked image through an object URL that lives as long as its
+ * `<img>`: made when the tile mounts, revoked when it unmounts — the tile
+ * removed, the form saved or left — so no picked image stays in memory.
  */
-const previews = new WeakMap<File, string>();
-
-function previewUrl(file: File): string | null {
-  if (!file.type.startsWith("image/")) return null;
-  let url = previews.get(file);
-  if (url == null) {
-    url = URL.createObjectURL(file);
-    previews.set(file, url);
-  }
-  return url;
-}
-
-function forgetPreview(file: File): void {
-  const url = previews.get(file);
-  if (url == null) return;
-  URL.revokeObjectURL(url);
-  previews.delete(file);
+function usePreviewRef(file: File) {
+  return useCallback(
+    (img: HTMLImageElement | null) => {
+      if (img == null) return;
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    },
+    [file],
+  );
 }
 
 function PendingTile({
@@ -67,19 +63,19 @@ function PendingTile({
   disabled: boolean;
   onRemove: () => void;
 }) {
-  const preview = previewUrl(file);
+  const preview = usePreviewRef(file);
   return (
     <li className="relative min-w-0">
       <span className="bg-muted text-muted-foreground flex aspect-square items-center justify-center overflow-hidden rounded-md border">
-        {preview == null ? (
+        {file.type.startsWith("image/") ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a local object URL, not a served image
+          <img ref={preview} alt="" className="size-full object-cover" />
+        ) : (
           <DocumentFileIcon
             fileName={file.name}
             contentType={file.type}
             className="size-1/3 max-h-10 max-w-10"
           />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element -- a local object URL, not a served image
-          <img src={preview} alt="" className="size-full object-cover" />
         )}
       </span>
       <span className="mt-1.5 block truncate text-sm font-medium">
@@ -168,7 +164,6 @@ export function TrackingPendingFilesField({
               file={file}
               disabled={disabled}
               onRemove={() => {
-                forgetPreview(file);
                 setRefused([]);
                 onChange(value.filter((_, at) => at !== index));
               }}

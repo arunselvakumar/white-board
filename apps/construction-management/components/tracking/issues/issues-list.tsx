@@ -376,6 +376,14 @@ function IssueRows({
   );
   const bulk = useBulkIssueTransition();
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  // A selection belongs to the rows on screen: another filter or page
+  // starts empty, so a hidden row never comes back chosen.
+  const view = JSON.stringify([filters, cursor]);
+  const [selectedIn, setSelectedIn] = useState(view);
+  if (selectedIn !== view) {
+    setSelectedIn(view);
+    setSelected(new Set());
+  }
   const [error, setError] = useState<string | undefined>();
   const [notice, setNotice] = useState<string | undefined>();
   const selecting = canSolve || canVerify;

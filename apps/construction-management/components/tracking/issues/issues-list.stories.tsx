@@ -138,6 +138,39 @@ export const BulkMarkAsSolved: Story = {
   },
 };
 
+/** Another filter starts with nothing selected; going back does not bring it back. */
+export const FilterClearsSelection: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("list", { name: "Issues & Snags" });
+    const pick = () => {
+      const [box] = canvas.getAllByRole("checkbox", {
+        name: "Select ISS/26-27/00004",
+      });
+      if (box == null) throw new Error("checkbox");
+      return box;
+    };
+    const rows = () =>
+      within(canvas.getByRole("list", { name: "Issues & Snags" })).getAllByRole(
+        "listitem",
+      );
+    await userEvent.click(pick());
+    await expect(canvas.getByText("1 selected")).toBeVisible();
+    const status = within(canvas.getByRole("group", { name: "Status" }));
+    await userEvent.click(status.getByRole("button", { name: "Pending" }));
+    await waitFor(async () => {
+      await expect(rows()).toHaveLength(1);
+    });
+    await expect(canvas.queryByText("1 selected")).toBeNull();
+    await expect(pick()).not.toBeChecked();
+    await userEvent.click(status.getByRole("button", { name: "Pending" }));
+    await waitFor(async () => {
+      await expect(rows()).toHaveLength(4);
+    });
+    await expect(pick()).not.toBeChecked();
+    await expect(canvas.queryByText(/selected$/)).toBeNull();
+  },
+};
+
 /** Approvers verify solved issues together. */
 export const BulkVerify: Story = {
   beforeEach: issueApi({

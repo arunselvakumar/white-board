@@ -16,9 +16,10 @@ import { IssueCategoriesList, TagsList } from "./tracking-master-lists";
 
 let api: ReturnType<typeof mockApi>;
 
-function serve(handler: (call: ApiCall) => Response | undefined) {
+/** A fresh in-memory API on every run, so a re-run starts from `initial`. */
+function serve(handler: () => (call: ApiCall) => Response | undefined) {
   return () => {
-    api = mockApi(handler);
+    api = mockApi(handler());
     return api.restore;
   };
 }
@@ -26,7 +27,7 @@ function serve(handler: (call: ApiCall) => Response | undefined) {
 const categories = (
   options: Partial<Parameters<typeof trackingMastersHandler>[0]> = {},
 ) =>
-  serve(
+  serve(() =>
     trackingMastersHandler({
       list: "issue-categories",
       initial: STORY_ISSUE_CATEGORIES,
@@ -37,7 +38,7 @@ const categories = (
 const tags = (
   options: Partial<Parameters<typeof trackingMastersHandler>[0]> = {},
 ) =>
-  serve(
+  serve(() =>
     trackingMastersHandler({ list: "tags", initial: STORY_TAGS, ...options }),
   );
 
@@ -227,6 +228,8 @@ export const ReadOnly: Story = {
     await expect(
       canvas.queryByRole("button", { name: /^Actions for/ }),
     ).toBeNull();
+    // Read-only rows still say which categories issues use.
+    await expect(canvas.getAllByText("Used on issues")).toHaveLength(2);
   },
 };
 

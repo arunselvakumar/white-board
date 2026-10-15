@@ -80,17 +80,23 @@ export function TrackingEntryFilesField({
   const [refused, setRefused] = useState<string[]>([]);
   const [opened, setOpened] = useState<TrackingDocumentFile | null>(null);
   const [removing, setRemoving] = useState<TrackingDocumentFile | null>(null);
-  // The latest value, for uploads that finish after a re-render.
+  // The latest value, for uploads that finish after a re-render. Each
+  // change also writes it at once: two uploads can finish before the
+  // parent re-renders, and the second must not drop the first.
   const latest = useRef(value);
   useEffect(() => {
     latest.current = value;
   }, [value]);
+  const change = (next: TrackingDocumentFile[]) => {
+    latest.current = next;
+    onChange(next);
+  };
   const { uploads, add, retry, dismiss, canRetry } = useTrackingFileUploads({
     documentType,
     documentId,
     accept,
     onUploaded: (file, item) => {
-      onChange([...latest.current, file]);
+      change([...latest.current, file]);
       dismiss(item.id);
     },
   });
@@ -206,7 +212,7 @@ export function TrackingEntryFilesField({
           setRemoving(null);
         }}
         onRemoved={(fileId) => {
-          onChange(latest.current.filter((file) => file.id !== fileId));
+          change(latest.current.filter((file) => file.id !== fileId));
         }}
       />
     </div>
