@@ -8,7 +8,11 @@ import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { actAs, addProject, newCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
-import type { ListConstructionProjectsProjectsResponseModel } from "./list-projects-models";
+import { GET as one } from "./[id]/progress/route";
+import type {
+  ConstructionProjectsProjectProgressResponseModel,
+  ListConstructionProjectsProjectsResponseModel,
+} from "./list-projects-models";
 import { GET as list } from "./route";
 
 vi.mock(import("@repo/auth/construction/server"), async (importOriginal) => ({
@@ -95,5 +99,34 @@ describe("Project card progress (CM-805)", () => {
     });
     expect(await progressOf(tower)).toEqual({ pct: 30, weighting: "price" });
     expect(await progressOf(bare)).toBeNull();
+
+    // The Project home reads the same figure for one Project.
+    const home = async (projectId: string) => {
+      const response = await one(
+        new Request(
+          `${TEST_ORIGIN}/api/construction/projects/projects/${projectId}/progress`,
+        ),
+        { params: Promise.resolve({ id: projectId }) },
+      );
+      return {
+        status: response.status,
+        body: (await response.json()) as ConstructionProjectsProjectProgressResponseModel,
+      };
+    };
+    expect(await home(tower)).toEqual({
+      status: StatusCodes.OK,
+      body: { progress: { pct: 30, weighting: "price" } },
+    });
+    expect(await home(bare)).toEqual({
+      status: StatusCodes.OK,
+      body: { progress: null },
+    });
+    const elsewhere = await newCompany();
+    const foreign = await addProject(
+      elsewhere.workspaceId,
+      elsewhere.ownerId,
+      "Other Company",
+    );
+    expect((await home(foreign)).status).toBe(StatusCodes.NOT_FOUND);
   });
 });

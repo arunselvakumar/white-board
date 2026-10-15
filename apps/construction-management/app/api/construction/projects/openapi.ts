@@ -9,6 +9,7 @@ import { UpdateConstructionProjectsProjectRequestModel } from "./projects/[id]/u
 import { CreateConstructionProjectsProjectRequestModel } from "./projects/create-project-request-model";
 import { ListConstructionProjectsCustomFieldLabelsResponseModel } from "./projects/custom-field-labels/custom-field-labels-models";
 import {
+  ConstructionProjectsProjectProgressResponseModel,
   ListConstructionProjectsProjectsQueryModel,
   ListConstructionProjectsProjectsResponseModel,
 } from "./projects/list-projects-models";
@@ -32,6 +33,7 @@ const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 /** The projects context's Request and Response models (ADR CM-0001). */
 export const projectsOpenApiComponents: OpenApiComponents = {
   ListConstructionProjectsProjectsResponseModel,
+  ConstructionProjectsProjectProgressResponseModel,
   ConstructionProjectsProjectResponseModel,
   CreateConstructionProjectsProjectRequestModel,
   UpdateConstructionProjectsProjectRequestModel,
@@ -41,6 +43,18 @@ export const projectsOpenApiComponents: OpenApiComponents = {
 
 /** The projects context's routes (CM-204, CM-413, CM-401). */
 export const projectsOpenApiOperations: OpenApiOperation[] = [
+  {
+    method: "get",
+    path: `${BASE}/{id}/progress`,
+    summary:
+      "One Project's Project Progress % from Tasks (CM-805), for its home; null without tasks (404 for a Member not assigned to it)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Project's progress",
+    successSchema: ConstructionProjectsProjectProgressResponseModel,
+    errors: [...SESSION_ERRORS, StatusCodes.NOT_FOUND],
+  },
   {
     method: "get",
     path: BASE,

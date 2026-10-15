@@ -10,6 +10,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import {
   projectQuery,
+  projectProgressQuery,
   projectsQuery,
   type ProjectResponse,
 } from "@/src/queries/projects";
@@ -175,9 +176,8 @@ function ProjectFlash({ id }: { id: string }) {
  */
 export function ProjectOverview({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
-  // Project Progress % comes with the Projects list (CM-805).
-  const { data: list } = useQuery(projectsQuery);
-  const progress = list?.items.find((item) => item.id === id)?.progress;
+  // Project Progress % from Tasks (CM-805); the details show without it.
+  const progress = useQuery(projectProgressQuery(id)).data?.progress;
   const none = <span className="text-muted-foreground font-normal">—</span>;
   return (
     <div className="w-full max-w-5xl min-w-0 space-y-6 p-6">

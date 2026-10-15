@@ -512,7 +512,11 @@ export function WorksheetForm({
           }))
         : [],
       approve: mode === "approve",
-      taskId: input.task?.id ?? null,
+      // An edit sends the Task only when it was changed: leaving it out
+      // keeps the sheet's link, even to a task that can no longer be picked.
+      ...(worksheet == null || form.getFieldState("task").isDirty
+        ? { taskId: input.task?.id ?? null }
+        : {}),
     };
     try {
       const saved =
@@ -781,7 +785,10 @@ export function WorksheetForm({
           projectId={projectId}
           value={values.task}
           onChange={(next) => {
-            form.setValue("task", next, { shouldValidate: true });
+            form.setValue("task", next, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           }}
           work={{
             quantity: settings.showApproxWorkDone ? values.approxWorkQty : "",

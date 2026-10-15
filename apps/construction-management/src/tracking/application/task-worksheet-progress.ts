@@ -88,7 +88,11 @@ export async function postWorksheetProgress(
   input: WorksheetProgressInput,
 ): Promise<void> {
   const workMilli = parseQuantity(input.quantity, "approxWorkQty");
-  const existing = await store.worksheetProgress(tx, input.worksheetId);
+  const existing = await store.worksheetProgress(
+    tx,
+    input.workspaceId,
+    input.worksheetId,
+  );
   if (
     existing?.taskId === input.taskId &&
     existing.progressDate === input.date &&
@@ -140,6 +144,10 @@ export async function removeWorksheetProgress(
   store: TaskStore,
   input: { workspaceId: string; worksheetId: string; by: string; at: Date },
 ): Promise<void> {
-  const existing = await store.worksheetProgress(tx, input.worksheetId);
+  const existing = await store.worksheetProgress(
+    tx,
+    input.workspaceId,
+    input.worksheetId,
+  );
   if (existing != null) await dropUpdate(tx, store, existing, input);
 }

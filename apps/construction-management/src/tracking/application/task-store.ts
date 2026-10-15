@@ -279,6 +279,7 @@ export type TaskStore = {
   /** The live update a Daily Worksheet posted, if any. */
   worksheetProgress(
     db: TrackingTx,
+    workspaceId: string,
     worksheetId: string,
   ): Promise<ProgressRow | null>;
   updateProgress(

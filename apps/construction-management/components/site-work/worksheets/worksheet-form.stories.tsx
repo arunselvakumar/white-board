@@ -394,7 +394,10 @@ export const Edit: Story = {
   },
 };
 
-/** A Task in the sheet's unit: the form says the work will post, and the save names it (CM-806). */
+/**
+ * A Task in the sheet's unit: the form says the work will post. Saving
+ * without touching the Task leaves `taskId` out, which keeps the link (CM-806).
+ */
 export const WithTask: Story = {
   args: {
     worksheet: worksheet({
@@ -425,7 +428,51 @@ export const WithTask: Story = {
         api.calls.mock.calls
           .map(([call]) => call)
           .find((call) => call.path.endsWith("/update"))?.body,
-      ).toMatchObject({ taskId: "0199c4a0-0000-7000-8000-0000000f7002" });
+      ).toMatchObject({ expectedUpdatedAt: worksheet().updatedAt });
     });
+    await expect(
+      api.calls.mock.calls
+        .map(([call]) => call)
+        .find((call) => call.path.endsWith("/update"))?.body,
+    ).not.toHaveProperty("taskId");
+  },
+};
+
+/**
+ * The sheet's task can no longer be picked (deleted, or now a summary), so the
+ * picker starts empty; saving other changes still keeps the link (CM-806).
+ */
+export const UnavailableTaskKept: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00044",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7003",
+        taskNo: null,
+        name: null,
+        unitId: null,
+        unitName: null,
+        posting: "linked_unit",
+      },
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00044" }),
+    );
+    await expect(form.getByLabelText("Task")).toHaveValue("");
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ expectedUpdatedAt: worksheet().updatedAt });
+    });
+    await expect(
+      api.calls.mock.calls
+        .map(([call]) => call)
+        .find((call) => call.path.endsWith("/update"))?.body,
+    ).not.toHaveProperty("taskId");
   },
 };

@@ -492,9 +492,9 @@ export const prismaTaskStore: TaskStore = {
     });
   },
 
-  async worksheetProgress(db, worksheetId) {
+  async worksheetProgress(db, workspaceId, worksheetId) {
     const row = await db.constructionTrackingTaskProgress.findFirst({
-      where: { worksheetId, deletedAt: null },
+      where: { workspaceId, worksheetId, deletedAt: null },
     });
     return row == null ? null : toProgress(row);
   },

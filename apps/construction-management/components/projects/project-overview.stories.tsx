@@ -21,7 +21,12 @@ function serve(subject: ProjectResponse) {
     mockApi((call) => {
       if (call.method === "GET" && call.path === `${BASE}/${subject.id}`)
         return Response.json(subject);
-      // The list carries Project Progress % (CM-805).
+      // Project Progress % from Tasks (CM-805).
+      if (
+        call.method === "GET" &&
+        call.path === `${BASE}/${subject.id}/progress`
+      )
+        return Response.json({ progress: STORY_PROGRESS[subject.id] ?? null });
       if (call.method === "GET" && call.path === BASE)
         return Response.json(projectList([subject], true, [], STORY_PROGRESS));
       return undefined;
