@@ -27,12 +27,6 @@ on:
     workflows: [CI]
     types: [completed]
 
-# The previews share one preview database: one build at a time, oldest
-# first, never cancelled midway (it may be applying migrations).
-concurrency:
-  group: preview-construction-management
-  cancel-in-progress: false
-
 permissions:
   contents: read
   deployments: write
@@ -101,6 +95,13 @@ jobs:
     name: Preview construction-management
     needs: plan
     if: needs.plan.outputs.build == 'true'
+    # The previews share one preview database: one build at a time, never
+    # cancelled midway (it may be applying migrations). On the build job, not
+    # the workflow, so the many CI completions the plan turns away never
+    # queue here and push out a requested preview.
+    concurrency:
+      group: preview-construction-management
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
