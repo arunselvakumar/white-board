@@ -99,6 +99,18 @@ jobs:
         if: steps.affected.outputs.build == 'true'
         run: bunx vercel@63.1.2 build --token="$VERCEL_TOKEN"
 
+      # Vercel refuses any uploaded file over 100 MB; name them before the
+      # upload fails without saying which.
+      - name: Check output file sizes
+        if: steps.affected.outputs.build == 'true'
+        run: |
+          large=$(find . -path '*/.vercel/output/*' -type f -size +90M -printf '%s %p\n' | sort -rn)
+          if [ -n "$large" ]; then
+            echo "Files over 90 MB in the build output (Vercel's limit is 100 MB):"
+            echo "$large"
+            exit 1
+          fi
+
       - name: Deploy the prebuilt output
         id: deploy
         if: steps.affected.outputs.build == 'true'
