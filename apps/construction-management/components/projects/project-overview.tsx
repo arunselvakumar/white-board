@@ -1,6 +1,6 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { TriangleAlert, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Alert, AlertAction, AlertTitle } from "@repo/ui/components/alert";
@@ -23,6 +23,7 @@ import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { EditProjectForm } from "./project-form";
 import { ProjectHomeTiles } from "./project-home-tiles";
 import { ProjectLabourTiles } from "./project-labour-tiles";
+import { ProjectProgressBar } from "./project-progress";
 import { ProjectStatusBadge, formatCalendarDate } from "./project-status";
 
 const DATE_TIME = new Intl.DateTimeFormat("en-IN", {
@@ -169,10 +170,14 @@ function ProjectFlash({ id }: { id: string }) {
 
 /**
  * The Project home (CM-411): the member's module tiles, labour today
- * (CM-219) and the Project's details.
+ * (CM-219) and the Project's details, with its progress from Tasks
+ * (CM-805) when it has tasks.
  */
 export function ProjectOverview({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
+  // Project Progress % comes with the Projects list (CM-805).
+  const { data: list } = useQuery(projectsQuery);
+  const progress = list?.items.find((item) => item.id === id)?.progress;
   const none = <span className="text-muted-foreground font-normal">—</span>;
   return (
     <div className="w-full max-w-5xl min-w-0 space-y-6 p-6">
@@ -210,6 +215,11 @@ export function ProjectOverview({ id }: { id: string }) {
               ? none
               : formatCalendarDate(project.endDate)}
           </Detail>
+          {progress == null ? null : (
+            <Detail label="Progress">
+              <ProjectProgressBar progress={progress} className="pt-1" />
+            </Detail>
+          )}
           {/* Null without the Financial flag, so it hides too. */}
           {project.budgetValue == null ? null : (
             <Detail label="Budget">

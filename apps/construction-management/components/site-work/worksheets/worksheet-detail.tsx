@@ -26,6 +26,7 @@ import { worksheetQuery } from "@/src/queries/worksheets";
 import { SHEET_APPROVAL_LABELS } from "@/src/site-work/domain/shift";
 
 import { WorksheetActions } from "./worksheet-actions";
+import { WorksheetTaskLink } from "./worksheet-task-picker";
 import {
   headcountText,
   quantityText,
@@ -130,6 +131,13 @@ export function WorksheetDetailPage({
           {sheet.approxWorkQty == null
             ? "—"
             : `${quantityText(sheet.approxWorkQty)} ${sheet.approxWorkUnit?.name ?? ""}`.trim()}
+        </Fact>
+        <Fact label="Task">
+          {sheet.task == null ? (
+            "—"
+          ) : (
+            <WorksheetTaskLink projectId={projectId} task={sheet.task} detail />
+          )}
         </Fact>
         <Fact label="Filled By">{sheet.createdBy.name ?? "—"}</Fact>
         <Fact label="Filled on">{stamp(sheet.createdAt)}</Fact>

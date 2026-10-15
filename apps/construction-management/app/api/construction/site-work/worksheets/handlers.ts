@@ -9,6 +9,7 @@ import {
 import { createProjectLocations } from "@/src/composition/location-resolver";
 import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import { siteWorkStock } from "@/src/composition/site-work-stock";
+import { trackingTaskProgressPosting } from "@/src/composition/task-progress-posting";
 import {
   attendanceHeadcounts,
   worksheetDirectory,
@@ -48,6 +49,7 @@ export const worksheetHandlers = new WorksheetHandlers({
   attendance: attendanceHeadcounts,
   locations: createProjectLocations(),
   stock: siteWorkStock(),
+  tasks: trackingTaskProgressPosting,
   backdated: (access) => loadBackdatedCheck(prisma, access),
   today: (workspaceId) => companyToday(prisma, workspaceId),
   // Nothing listens to `document.approved` for worksheets yet (M9 notifies).

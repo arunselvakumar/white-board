@@ -52,6 +52,7 @@ import {
 } from "@/src/site-work/domain/shift";
 
 import { WorksheetActions } from "./worksheet-actions";
+import { WorksheetTaskLink } from "./worksheet-task-picker";
 import {
   headcountText,
   SheetApprovalBadge,
@@ -479,6 +480,14 @@ function WorksheetRows({
                     {sheet.workType?.name != null &&
                       ` · ${sheet.workType.name}`}
                   </div>
+                  {sheet.task != null && (
+                    <div className="truncate text-xs">
+                      <WorksheetTaskLink
+                        projectId={projectId}
+                        task={sheet.task}
+                      />
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {shiftLabel(sheet.shift)}
@@ -531,6 +540,14 @@ function WorksheetRows({
                 <p className="text-muted-foreground truncate text-xs">
                   {headcountText(sheet)} · {materialsLine(sheet)}
                 </p>
+                {sheet.task != null && (
+                  <p className="truncate text-xs">
+                    <WorksheetTaskLink
+                      projectId={projectId}
+                      task={sheet.task}
+                    />
+                  </p>
+                )}
                 {showApproval && (
                   <div className="mt-2">
                     <SheetApprovalBadge status={sheet.approvalStatus} />

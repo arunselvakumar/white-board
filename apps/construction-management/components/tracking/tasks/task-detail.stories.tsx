@@ -68,8 +68,11 @@ export const Leaf: Story = {
     );
     await expect(updates.getByText("C13–C18 cast")).toBeVisible();
     await expect(
-      updates.getByText("From Daily Worksheet WS/26-27/00012"),
-    ).toBeVisible();
+      updates.getByRole("link", { name: "WS/26-27/00012" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${TASK_PROJECT_ID}/worksheets/0199c4a0-0000-7000-8000-0000000d4001`,
+    );
     // Worksheet updates are read-only here: one edit and one delete button.
     await expect(
       updates.getAllByRole("button", { name: /^Edit the update/ }),

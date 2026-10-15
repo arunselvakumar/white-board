@@ -816,8 +816,8 @@ Goal: a Project's plan and its quality control in one place — a task tree with
 | CM-802 |   2 | Tasks: fields, sub-tasks, work quantity/price → earned value, baseline/actual, statuses, Gantt, import, bulk delete  | done   | CM-801         | Domain+HTTP+UI |
 | CM-803 |   3 | Issues & snags: priority, category, assignee, updates with images, Pending/Delayed/Solved/Closed, verify and reopen  | done   | CM-801         | Domain+HTTP+UI |
 | CM-804 |   4 | Inspection requests: numbering, observations, approve/reject with reason, bulk, re-inspection, snag from a rejection | done   | CM-801, CM-114 | Domain+HTTP+UI |
-| CM-805 |   5 | Task/issue/inspection dashboard sections, Project card progress, reports and the Task Progress Report                | todo   | CM-802–804     | HTTP+UI        |
-| CM-806 |   6 | Daily Worksheets name a Task; worksheet quantity in the task's unit posts task progress                              | todo   | CM-802, CM-602 | Domain+HTTP+UI |
+| CM-805 |   5 | Task/issue/inspection dashboard sections, Project card progress, reports and the Task Progress Report                | done   | CM-802–804     | HTTP+UI        |
+| CM-806 |   6 | Daily Worksheets name a Task; worksheet quantity in the task's unit posts task progress                              | done   | CM-802, CM-602 | Domain+HTTP+UI |
 
 ### CM-801 — Tracking schema, masters and wiring
 

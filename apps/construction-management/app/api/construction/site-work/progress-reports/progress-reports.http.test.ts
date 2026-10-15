@@ -15,6 +15,7 @@ import {
 } from "@/src/composition/progress-report-source";
 import { createProgressReportHandlers } from "@/src/composition/progress-reports";
 import { createReportJobs } from "@/src/composition/report-jobs";
+import { createTaskProgressSource } from "@/src/composition/tracking-report-source";
 import type { DprSource } from "@/src/reporting/application/ports";
 import type { Flag } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
@@ -22,7 +23,7 @@ import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { bytesOf } from "@/test/files";
-import { addContractor, addMaterial } from "@/test/procurement";
+import { addContractor, addMaterial, addUnit } from "@/test/procurement";
 import {
   progressAddDepartment,
   progressAddLabourCategory,
@@ -37,6 +38,8 @@ import { POST as retry } from "./[id]/retry/route";
 import { GET as getOne } from "./[id]/route";
 import { GET as formOptions } from "./form-options/route";
 import { GET as list, POST as create } from "./route";
+import { POST as recordTaskProgress } from "../../tracking/tasks/[id]/progress/route";
+import { POST as createTask } from "../../tracking/tasks/route";
 
 vi.mock(import("@repo/auth/construction/server"), async (importOriginal) => ({
   ...(await importOriginal()),
@@ -233,8 +236,8 @@ describe("Progress Reports: the Daily Progress Report", () => {
       {
         key: "task_progress_report",
         label: "Task Progress Report",
-        available: false,
-        note: "Coming with Tasks (M8)",
+        available: true,
+        note: null,
       },
     ]);
 
@@ -897,5 +900,238 @@ describe("Progress Reports: the Daily Progress Report", () => {
       "GetConstructionSiteWorkProgressReportFormOptionsResponse",
     ])
       expect(document.components.schemas[name], name).toBeDefined();
+  });
+});
+
+describe("Progress Reports: the Task Progress Report (CM-805)", () => {
+  const TASKS = "http://localhost/api/construction/tracking/tasks";
+  const FROM = addDays(TODAY, -6);
+
+  async function task(ctx: Ctx, body: Record<string, unknown>) {
+    actAs(ctx.owner);
+    const response = await createTask(
+      new Request(TASKS, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ projectId: ctx.projectId, ...body }),
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+    return (await json<{ id: string }>(response)).id;
+  }
+
+  async function update(id: string, body: Record<string, unknown>) {
+    const response = await recordTaskProgress(
+      new Request(`${TASKS}/${id}/progress`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      }),
+      params(id),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+  }
+
+  /**
+   * Slab (100 cum): 20 before the period, 30 in it, plus 10 from a Daily
+   * Worksheet in it; Plaster (percent): 10 % before, 45 % in it; Survey:
+   * planned and done long before; Paint: planned in the period, untouched.
+   */
+  async function seedTasks(ctx: Ctx) {
+    const unitId = await addUnit(
+      ctx.company.workspaceId,
+      ctx.company.ownerId,
+      "Cum",
+    );
+    const slab = await task(ctx, {
+      name: "Slab casting",
+      totalWorkQty: "100",
+      totalWorkUnitId: unitId,
+      startDate: addDays(TODAY, -20),
+      dueDate: addDays(TODAY, 10),
+    });
+    const plaster = await task(ctx, {
+      name: "Plastering",
+      startDate: addDays(TODAY, -20),
+      dueDate: addDays(TODAY, 5),
+    });
+    const survey = await task(ctx, {
+      name: "Survey",
+      startDate: addDays(TODAY, -60),
+      dueDate: addDays(TODAY, -50),
+    });
+    await task(ctx, {
+      name: "Painting",
+      startDate: addDays(TODAY, -1),
+      dueDate: addDays(TODAY, 20),
+    });
+    await task(ctx, { name: "Undated, untouched" });
+    await update(slab, { progressDate: addDays(TODAY, -10), workQty: "20" });
+    await update(slab, { progressDate: addDays(TODAY, -3), workQty: "30" });
+    await update(plaster, {
+      progressDate: addDays(TODAY, -9),
+      progressPct: 10,
+    });
+    await update(plaster, {
+      progressDate: addDays(TODAY, -1),
+      progressPct: 45,
+    });
+    await update(survey, {
+      progressDate: addDays(TODAY, -50),
+      progressPct: 100,
+    });
+    // A Daily Worksheet's posting (CM-0019 §6) counts like any update.
+    await prisma.constructionTrackingTaskProgress.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: ctx.company.workspaceId,
+        taskId: slab,
+        progressDate: new Date(`${addDays(TODAY, -2)}T00:00:00Z`),
+        workQty: "10",
+        source: "worksheet",
+        worksheetId: randomUUID(),
+        worksheetNumber: "WS/26-27/00007",
+        createdBy: ctx.company.ownerId,
+        updatedBy: ctx.company.ownerId,
+      },
+    });
+    return { slab, plaster, survey };
+  }
+
+  it("works out each leaf task's progress at the start and end of the period and the work done, worksheets included", async () => {
+    const ctx = await setup();
+    await seedTasks(ctx);
+    const model = await createTaskProgressSource().read({
+      workspaceId: ctx.company.workspaceId,
+      projectId: ctx.projectId,
+      range: { from: FROM, to: TODAY },
+    });
+    expect(model.project.name).toBe("Tower A");
+    const byName = new Map(model.tasks.map((line) => [line.name, line]));
+    // Survey ended before the period; the undated task never ran.
+    expect([...byName.keys()].sort()).toEqual([
+      "Painting",
+      "Plastering",
+      "Slab casting",
+    ]);
+    expect(byName.get("Slab casting")).toMatchObject({
+      kind: "quantity",
+      unit: "cum",
+      totalWork: "100",
+      startPct: 20,
+      endPct: 60,
+      workDone: "40",
+      updates: 2,
+      worksheetUpdates: 1,
+      location: null,
+    });
+    expect(byName.get("Plastering")).toMatchObject({
+      kind: "percent",
+      startPct: 10,
+      endPct: 45,
+      workDone: null,
+      updates: 1,
+      worksheetUpdates: 0,
+    });
+    expect(byName.get("Painting")).toMatchObject({
+      startPct: 0,
+      endPct: 0,
+      updates: 0,
+    });
+
+    // A period that ends before the second update reads the progress then.
+    const earlier = await createTaskProgressSource().read({
+      workspaceId: ctx.company.workspaceId,
+      projectId: ctx.projectId,
+      range: { from: addDays(TODAY, -12), to: addDays(TODAY, -4) },
+    });
+    expect(
+      earlier.tasks.find((line) => line.name === "Slab casting"),
+    ).toMatchObject({ startPct: 0, endPct: 20, workDone: "20", updates: 1 });
+  });
+
+  it("generates the PDF without a number, lists it beside the DPRs and checks the period", async () => {
+    const ctx = await setup();
+    await seedTasks(ctx);
+    actAs(ctx.owner);
+    const response = await generate(ctx, {
+      kind: "task_progress_report",
+      date: undefined,
+      from: FROM,
+      to: TODAY,
+    });
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const report = await json<
+      Report & { kind: string; from: string; to: string }
+    >(response);
+    expect(report).toMatchObject({
+      kind: "task_progress_report",
+      number: null,
+      date: null,
+      from: FROM,
+      to: TODAY,
+      status: "done",
+      includesMoney: false,
+      filledBy: null,
+    });
+    const file = await download(
+      get(`/${report.id}/download`),
+      params(report.id),
+    );
+    expect(file.status).toBe(StatusCodes.OK);
+    expect(file.headers.get("content-type")).toBe("application/pdf");
+    expect(new TextDecoder().decode((await bytesOf(file)).slice(0, 5))).toBe(
+      "%PDF-",
+    );
+
+    await generated(ctx);
+    const listed = await json<{ items: { kind: string }[] }>(
+      await list(get(`?projectId=${ctx.projectId}`)),
+    );
+    expect(listed.items.map((item) => item.kind).sort()).toEqual([
+      "daily_progress_report",
+      "task_progress_report",
+    ]);
+
+    const cases: [Record<string, unknown>, string, string][] = [
+      [
+        { from: FROM, to: addDays(TODAY, 1) },
+        "PROGRESS_REPORT_DATE_IN_FUTURE",
+        "to",
+      ],
+      [{ from: TODAY, to: FROM }, "PROGRESS_REPORT_PERIOD_INVALID", "to"],
+      [{ to: TODAY }, "PROGRESS_REPORT_PERIOD_INVALID", "from"],
+      [
+        { from: addDays(TODAY, -400), to: TODAY },
+        "PROGRESS_REPORT_PERIOD_TOO_LONG",
+        "from",
+      ],
+    ];
+    for (const [period, code, field] of cases) {
+      const refused = await generate(ctx, {
+        kind: "task_progress_report",
+        date: undefined,
+        ...period,
+      });
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(await json<ErrorBody>(refused)).toMatchObject({
+        code,
+        details: { field },
+      });
+    }
+
+    // Progress Report Create is the right to generate one.
+    const reader = await member(ctx, { [MENU]: ["read"] });
+    actAs(reader);
+    expect(
+      (
+        await generate(ctx, {
+          kind: "task_progress_report",
+          date: undefined,
+          from: FROM,
+          to: TODAY,
+        })
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
   });
 });

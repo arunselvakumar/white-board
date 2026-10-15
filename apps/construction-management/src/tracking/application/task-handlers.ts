@@ -643,6 +643,20 @@ export class TaskHandlers {
               "This task has progress updates, so it cannot get sub-tasks. Delete its updates first.",
               { field: "parentId" },
             );
+          // A worksheet's task must stay a leaf, or its work would post
+          // nowhere (CM-0019 §6).
+          const worksheets = await this.deps.usage.worksheetCounts(
+            tx,
+            workspaceId,
+            [parent.id],
+          );
+          const worksheetCount = worksheets.get(parent.id) ?? 0;
+          if (worksheetCount > 0)
+            throw conflict(
+              "TASK_IN_USE",
+              "Daily Worksheets name this task, so it cannot get sub-tasks. Point those worksheets at another task first.",
+              { field: "parentId", worksheetCount },
+            );
         }
       }
       taskNo = await store.allocateNumbers(tx, workspaceId, projectId, 1);

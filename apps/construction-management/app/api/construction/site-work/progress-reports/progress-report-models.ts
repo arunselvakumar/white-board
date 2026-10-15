@@ -12,16 +12,22 @@ export const PROGRESS_REPORTS_PATH =
 export const CreateConstructionSiteWorkProgressReportRequestModel = z
   .object({
     projectId: z.uuid(),
-    /** `YYYY-MM-DD`, not after the Company's today. */
-    date: z.iso.date(),
-    /** A Team Member of the Project (User id): only their worksheets and usage sheets. */
+    /** The Daily Progress Report when left out (CM-606, CM-805). */
+    kind: z.enum(["daily_progress_report", "task_progress_report"]).optional(),
+    /** Daily Progress Report: `YYYY-MM-DD`, not after the Company's today. */
+    date: z.iso.date().optional(),
+    /** Task Progress Report: the first day of the period. */
+    from: z.iso.date().optional(),
+    /** Task Progress Report: the last day, not after the Company's today; at most 366 days. */
+    to: z.iso.date().optional(),
+    /** Daily Progress Report: a Team Member of the Project (User id), only their worksheets and usage sheets. */
     filledBy: z.string().trim().min(1).max(64).nullish(),
-    /** Photos of the day's worksheets, usage sheets and Site Diary, at most 60. */
+    /** Daily Progress Report: photos of the day's worksheets, usage sheets and Site Diary, at most 60. */
     includeImages: z.boolean().optional(),
   })
   .meta({
     description:
-      "Generate a Daily Progress Report: takes or reuses the date's DPR number and queues the job (it runs inline until M9).",
+      "Generate a Daily Progress Report (takes or reuses the date's DPR number) or a Task Progress Report for a period, and queue the job (it runs inline until M9).",
   });
 export type CreateConstructionSiteWorkProgressReportRequestModel = z.infer<
   typeof CreateConstructionSiteWorkProgressReportRequestModel
@@ -53,10 +59,14 @@ export const ConstructionSiteWorkProgressReportActionsResponseModel = z.object({
 export const ConstructionSiteWorkProgressReportResponseModel = z.object({
   id: z.uuid(),
   projectId: z.uuid(),
-  kind: z.literal("daily_progress_report"),
-  /** `DPR/26-27/00001`: one per Project per date. */
-  number: z.string(),
-  date: z.iso.date(),
+  kind: z.enum(["daily_progress_report", "task_progress_report"]),
+  /** `DPR/26-27/00001`: one per Project per date; null for a Task Progress Report. */
+  number: z.string().nullable(),
+  /** The DPR's date; null for a Task Progress Report. */
+  date: z.iso.date().nullable(),
+  /** The period covered (a DPR's date twice). */
+  from: z.iso.date(),
+  to: z.iso.date(),
   /** Null when the report covers every Team Member. */
   filledBy: person.nullable(),
   includeImages: z.boolean(),
@@ -91,7 +101,7 @@ export const GetConstructionSiteWorkProgressReportFormOptionsResponseModel =
     teamMembers: z.array(
       z.object({ userId: z.string(), name: z.string(), isOwner: z.boolean() }),
     ),
-    /** Report types; the Task Progress Report comes with Tasks (M8). */
+    /** Report types: the Daily and the Task Progress Report (CM-805). */
     types: z.array(
       z.object({
         key: z.enum(["daily_progress_report", "task_progress_report"]),
@@ -115,9 +125,11 @@ export function toProgressReportResponse(
   return {
     id: report.id,
     projectId: report.projectId,
-    kind: "daily_progress_report",
+    kind: report.kind,
     number: report.number,
     date: report.date,
+    from: report.from,
+    to: report.to,
     filledBy:
       report.filledBy == null
         ? null
@@ -152,8 +164,8 @@ export function toProgressReportFormOptions(options: {
     types: PROGRESS_REPORT_TYPES.map((type) => ({
       key: type.key,
       label: type.label,
-      available: !("comingWith" in type),
-      note: "comingWith" in type ? type.comingWith : null,
+      available: true,
+      note: null,
     })),
   };
 }

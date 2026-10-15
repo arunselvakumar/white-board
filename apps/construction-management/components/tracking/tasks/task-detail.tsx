@@ -145,7 +145,11 @@ export function activityText(row: TaskActivity, unit: string | null): string {
     case "copied":
       return `Copied from T-${str(p["fromTaskNo"])}`;
     case "worksheet_progress":
-      return `Daily Worksheet ${str(p["worksheetNumber"])} recorded ${amount()}`;
+      if (p["removed"] === true)
+        return `Daily Worksheet ${str(p["worksheetNumber"])} no longer counts: its ${amount()} was taken off`;
+      return p["replaced"] === true
+        ? `Daily Worksheet ${str(p["worksheetNumber"])} now records ${amount()} on ${formatDate(str(p["progressDate"]))}`
+        : `Daily Worksheet ${str(p["worksheetNumber"])} recorded ${amount()} on ${formatDate(str(p["progressDate"]))}`;
   }
 }
 
@@ -169,7 +173,13 @@ function Section({
   );
 }
 
-function ProgressList({ task }: { task: Detail }) {
+function ProgressList({
+  task,
+  projectId,
+}: {
+  task: Detail;
+  projectId: string;
+}) {
   const { data } = useSuspenseQuery(taskProgressQuery(task.id));
   const remove = useDeleteProgress();
   const [editing, setEditing] = useState<TaskProgress | null>(null);
@@ -200,9 +210,19 @@ function ProgressList({ task }: { task: Detail }) {
                   </span>
                 </p>
                 <p className="text-muted-foreground text-xs">
-                  {item.worksheet != null
-                    ? `From Daily Worksheet ${item.worksheet.number ?? ""}`
-                    : `By ${item.createdBy.name ?? "a former member"}`}
+                  {item.worksheet != null ? (
+                    <>
+                      From Daily Worksheet{" "}
+                      <Link
+                        href={`/app/projects/${encodeURIComponent(projectId)}/worksheets/${encodeURIComponent(item.worksheet.id)}`}
+                        className="hover:underline"
+                      >
+                        {item.worksheet.number ?? ""}
+                      </Link>
+                    </>
+                  ) : (
+                    `By ${item.createdBy.name ?? "a former member"}`
+                  )}
                 </p>
               </div>
               {(item.actions.edit || item.actions.delete) && (
@@ -655,7 +675,7 @@ export function TaskDetail({
       {!task.isSummary && (
         <Section title="Progress">
           <Suspense fallback={<Loading />}>
-            <ProgressList task={task} />
+            <ProgressList task={task} projectId={projectId} />
           </Suspense>
         </Section>
       )}

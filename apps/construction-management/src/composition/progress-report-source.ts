@@ -518,7 +518,7 @@ export async function dprPhotos(
 // ---------------------------------------------------------------------------
 
 /** The Project logo, when its "Use Project logo on reports" is on. */
-async function reportLogo(
+export async function reportLogo(
   db: PrismaClient,
   workspaceId: string,
   projectId: string,

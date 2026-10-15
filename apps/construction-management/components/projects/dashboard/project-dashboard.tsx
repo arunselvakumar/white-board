@@ -12,11 +12,8 @@ import {
   Layers,
   MapPin,
   Package,
-  SearchCheck,
   SlidersHorizontal,
-  TriangleAlert,
   UserX,
-  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -58,31 +55,21 @@ import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
-
-/**
- * The KPI tiles still waiting for their milestone (Material Approvals and
- * Payment Approvals have data).
- */
-const KPI_STUBS: readonly {
-  label: string;
-  milestone: string;
-  icon: LucideIcon;
-}[] = [
-  { label: "Pending Issues & Snags", milestone: "M8", icon: TriangleAlert },
-  { label: "Pending Inspections", milestone: "M8", icon: SearchCheck },
-];
+import {
+  InspectionSection,
+  IssueSection,
+  PendingInspectionsTile,
+  PendingIssuesTile,
+  TaskSection,
+} from "./tracking-sections";
 
 /** What each stub section will show once its milestone lands. */
 const STUB_TEXT: Record<string, string> = {
-  task: "Project progress, value earned by tasks and tasks by status.",
-  issue_snag: "Issues and snags by status.",
-  inspection_request: "Inspection requests by status and the success rate.",
   booking: "Units booked and available, and the booking report.",
   inquiry: "The inquiry funnel.",
 };
 
 const MILESTONE_NAMES: Record<string, string> = {
-  M8: "Tasks, issues and inspections (M8)",
   M10: "Sales (M10)",
 };
 
@@ -324,17 +311,8 @@ function KpiTiles({
     >
       <MaterialApprovalsTile projectId={projectId} duration={duration} />
       <PaymentApprovalsTile projectId={projectId} duration={duration} />
-      {KPI_STUBS.map((kpi) => (
-        <li key={kpi.label} className="flex min-w-0">
-          <MetricCard
-            className="w-full border border-dashed bg-transparent ring-0"
-            label={kpi.label}
-            icon={kpi.icon}
-            value={<span className="text-muted-foreground">—</span>}
-            caption={`Arrives with ${kpi.milestone}`}
-          />
-        </li>
-      ))}
+      <PendingIssuesTile projectId={projectId} duration={duration} />
+      <PendingInspectionsTile projectId={projectId} duration={duration} />
     </ul>
   );
 }
@@ -413,9 +391,10 @@ function MaterialsSection({
 /**
  * The Project Dashboard (CM-412, ADR CM-0013 §12): the duration filter
  * (last 12 months by default), the four KPI tiles, and the member's
- * sections in their order. Project summary, Attendance, Payments, Daily
- * Work, Equipment Usage and Materials have data; the rest name the milestone
- * that fills them. Manage Dashboard shows,
+ * sections in their order. Project summary, Attendance, Task, Payments,
+ * Daily Work, Equipment Usage, Materials, Issue & Snag and Inspection
+ * Request have data (CM-805); Booking and Inquiry name the milestone that
+ * fills them. Manage Dashboard shows,
  * hides and reorders sections for the member on every Project.
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
@@ -493,6 +472,30 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
             if (section.key === "payments")
               return problem == null ? (
                 <PaymentsSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "task")
+              return problem == null ? (
+                <TaskSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "issue_snag")
+              return problem == null ? (
+                <IssueSection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            if (section.key === "inspection_request")
+              return problem == null ? (
+                <InspectionSection
                   key={section.key}
                   projectId={projectId}
                   duration={duration}

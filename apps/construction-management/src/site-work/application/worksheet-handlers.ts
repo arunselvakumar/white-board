@@ -32,6 +32,12 @@ import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-n
 
 import { siteWorkDocumentMediaRemoved } from "../domain/document-thread";
 import type { SheetApprovalStatus } from "../domain/shift";
+import {
+  assertWorksheetTask,
+  worksheetPostsProgress,
+  worksheetTaskPosting,
+  type WorksheetTaskPosting,
+} from "../domain/worksheet-task";
 import { SITE_WORK_DOCUMENTS } from "../domain/site-work-documents";
 import {
   assertSheetDateNotFuture,
@@ -53,6 +59,7 @@ import {
 import type {
   AttendanceHeadcounts,
   SiteStock,
+  TaskProgressPosting,
   WorksheetContractorFacts,
   WorksheetDirectory,
   WorksheetNamedFacts,
@@ -85,6 +92,8 @@ export const worksheetNotFound = () =>
 export type StoredWorksheetLine = WorksheetLine & { id: string };
 
 export type StoredWorksheet = Omit<WorksheetContent, "lines"> & {
+  /** The Task the sheet's work is for (CM-806); no foreign key. */
+  taskId: string | null;
   id: string;
   workspaceId: string;
   projectId: string;
@@ -101,6 +110,7 @@ export type StoredWorksheet = Omit<WorksheetContent, "lines"> & {
 /** What a save writes besides number, approval and bookkeeping. */
 export type WorksheetRow = Omit<WorksheetContent, "lines"> & {
   lines: StoredWorksheetLine[];
+  taskId: string | null;
 };
 
 export type WorksheetListParams = {
@@ -187,6 +197,8 @@ export type WorksheetDeps = {
   attendance: AttendanceHeadcounts;
   locations: LocationResolver;
   stock: SiteStock;
+  /** Task progress from the sheet's Approx Work Done (CM-806). */
+  tasks: TaskProgressPosting;
   backdated: (actor: MemberAccess) => Promise<BackdatedCheck>;
   today: (workspaceId: string) => Promise<CalendarDate>;
   /** `document.approved` (Save & Approve, approve). */
@@ -209,6 +221,11 @@ export type WorksheetCommand = Omit<
   materials?: readonly WorksheetLineInput[];
   /** Save & Approve: needs Approve, and only means something with approval on. */
   approve?: boolean;
+  /**
+   * A live leaf task of the Project (CM-806); null clears it, left out
+   * keeps the sheet's.
+   */
+  taskId?: string | null;
 };
 
 export type WorksheetActions = {
@@ -219,7 +236,19 @@ export type WorksheetActions = {
   duplicate: boolean;
 };
 
+/** The sheet's Task as screens show it (CM-806). */
+export type WorksheetTaskModel = {
+  id: string;
+  taskNo: number | null;
+  name: string | null;
+  unitId: string | null;
+  unitName: string | null;
+  /** Null when the task is no longer live. */
+  posting: WorksheetTaskPosting | null;
+};
+
 export type WorksheetReadModel = StoredWorksheet & {
+  task: WorksheetTaskModel | null;
   contractorName: string | null;
   departmentName: string | null;
   workTypeName: string | null;
@@ -279,6 +308,7 @@ function snapshot(
     approxWorkUnitId: sheet.approxWorkUnitId,
     siteLocation: sheet.siteLocation,
     remark: sheet.remark,
+    taskId: sheet.taskId,
     approvalStatus: sheet.approval?.status,
     materials: sheet.lines.map((line) => ({
       materialId: line.materialId,
@@ -468,6 +498,78 @@ export class WorksheetHandlers {
     return content;
   }
 
+  /**
+   * The sheet's Task: the one the command names (checked when it is new or
+   * changed: a live leaf task of the Project), or the sheet's own.
+   */
+  private async taskOf(
+    workspaceId: string,
+    projectId: string,
+    input: WorksheetCommand,
+    previous: string | null,
+  ): Promise<string | null> {
+    if (input.taskId === undefined) return previous;
+    const raw = input.taskId?.trim().toLowerCase() ?? "";
+    if (raw === "") return null;
+    if (raw === previous) return raw;
+    const task = (
+      await this.deps.tasks.tasks(this.deps.db, workspaceId, [raw])
+    ).get(raw);
+    return assertWorksheetTask(task, projectId).id;
+  }
+
+  /**
+   * Makes the task progress match the sheet (CM-0019 §6): a leaf task in
+   * the sheet's unit gets its Approx Work Done while the sheet is not
+   * rejected; otherwise its update, if any, goes.
+   */
+  private async syncTask(
+    tx: Db,
+    sheet: {
+      id: string;
+      workspaceId: string;
+      number: string;
+      taskId: string | null;
+      sheetDate: CalendarDate;
+      approxWorkQty: string | null;
+      approxWorkUnitId: string | null;
+      approval: { status: SheetApprovalStatus };
+    },
+    by: string,
+    at: Date,
+  ): Promise<void> {
+    const { tasks } = this.deps;
+    const task =
+      sheet.taskId == null
+        ? null
+        : ((await tasks.tasks(tx, sheet.workspaceId, [sheet.taskId])).get(
+            sheet.taskId,
+          ) ?? null);
+    const posts = worksheetPostsProgress(task, {
+      approxWorkQty: sheet.approxWorkQty,
+      approxWorkUnitId: sheet.approxWorkUnitId,
+      approvalStatus: sheet.approval.status,
+    });
+    if (posts && task != null && sheet.approxWorkQty != null)
+      await tasks.post(tx, {
+        workspaceId: sheet.workspaceId,
+        worksheetId: sheet.id,
+        worksheetNumber: sheet.number,
+        taskId: task.id,
+        date: sheet.sheetDate,
+        quantity: sheet.approxWorkQty,
+        by,
+        at,
+      });
+    else
+      await tasks.remove(tx, {
+        workspaceId: sheet.workspaceId,
+        worksheetId: sheet.id,
+        by,
+        at,
+      });
+  }
+
   private posting(
     access: MemberAccess,
     projectId: string,
@@ -548,6 +650,12 @@ export class WorksheetHandlers {
       settings,
       null,
     );
+    const taskId = await this.taskOf(
+      access.workspaceId,
+      input.projectId,
+      input,
+      null,
+    );
     let duplicatedFromId: string | null = null;
     if (input.duplicatedFromId != null) {
       const source = await store.find(
@@ -568,7 +676,11 @@ export class WorksheetHandlers {
         at,
       },
     );
-    const row: WorksheetRow = { ...content, lines: withLineIds(content.lines) };
+    const row: WorksheetRow = {
+      ...content,
+      lines: withLineIds(content.lines),
+      taskId,
+    };
     const { events } = await db.$transaction(async (tx) => {
       check(DOCUMENT.backdated, "create", content.sheetDate);
       const { number } = await nextSequenceNumber(tx, {
@@ -589,6 +701,12 @@ export class WorksheetHandlers {
         by: access.userId,
         at,
       });
+      await this.syncTask(
+        tx,
+        { ...row, id, workspaceId: access.workspaceId, number, approval },
+        access.userId,
+        at,
+      );
       const posted =
         row.lines.length === 0
           ? { events: [] }
@@ -646,6 +764,12 @@ export class WorksheetHandlers {
       settings,
       contentOf(current),
     );
+    const taskId = await this.taskOf(
+      access.workspaceId,
+      current.projectId,
+      input,
+      current.taskId,
+    );
     const check = await this.deps.backdated(access);
     const at = this.clock();
     const approval = savedApproval(
@@ -656,7 +780,11 @@ export class WorksheetHandlers {
         at,
       },
     );
-    const row: WorksheetRow = { ...content, lines: withLineIds(content.lines) };
+    const row: WorksheetRow = {
+      ...content,
+      lines: withLineIds(content.lines),
+      taskId,
+    };
     const { events } = await db.$transaction(async (tx) => {
       const [locked] = await store.lock(tx, access.workspaceId, [id]);
       if (locked == null) throw worksheetNotFound();
@@ -665,6 +793,18 @@ export class WorksheetHandlers {
       if (content.sheetDate !== locked.sheetDate)
         check(DOCUMENT.backdated, "edit", content.sheetDate);
       await store.replace(tx, id, { ...row, approval, by: access.userId, at });
+      await this.syncTask(
+        tx,
+        {
+          ...row,
+          id,
+          workspaceId: access.workspaceId,
+          number: locked.number,
+          approval,
+        },
+        access.userId,
+        at,
+      );
       const posted = await stock.replace(
         tx,
         { type: STOCK_SOURCE, id },
@@ -704,6 +844,12 @@ export class WorksheetHandlers {
       changed(locked, expectedUpdatedAt);
       check(DOCUMENT.backdated, "edit", locked.sheetDate);
       await store.tombstone(tx, id, access.userId, at);
+      await this.deps.tasks.remove(tx, {
+        workspaceId: access.workspaceId,
+        worksheetId: id,
+        by: access.userId,
+        at,
+      });
       const reversed = await stock.reverse(
         tx,
         { type: STOCK_SOURCE, id },
@@ -825,6 +971,9 @@ export class WorksheetHandlers {
       if (refusals.length > 0) throw bulkRefused(refusals);
       for (const [id, approval] of next) {
         await store.setApproval(tx, id, approval, access.userId, at);
+        const decided = locked.get(id);
+        if (decided != null)
+          await this.syncTask(tx, { ...decided, approval }, access.userId, at);
         await recordAudit(tx, {
           workspaceId: access.workspaceId,
           actorUserId: access.userId,
@@ -870,7 +1019,7 @@ export class WorksheetHandlers {
       userIds.add(row.createdBy);
       if (row.approval.decidedBy != null) userIds.add(row.approval.decidedBy);
     }
-    const [contractors, departments, workTypes, units, names] =
+    const [contractors, departments, workTypes, units, names, tasks] =
       await Promise.all([
         directory.contractors(
           db,
@@ -891,11 +1040,37 @@ export class WorksheetHandlers {
           ids((row) => row.approxWorkUnitId),
         ),
         directory.memberNames(db, workspaceId, [...userIds]),
+        this.deps.tasks.tasks(
+          db,
+          workspaceId,
+          ids((row) => row.taskId),
+        ),
       ]);
     const workTypeNames = new Map(workTypes.map((row) => [row.id, row.name]));
     const unitNames = new Map(units.map((row) => [row.id, row.name]));
     return rows.map((row) => ({
       ...row,
+      task: (() => {
+        if (row.taskId == null) return null;
+        const task = tasks.get(row.taskId);
+        return task == null
+          ? {
+              id: row.taskId,
+              taskNo: null,
+              name: null,
+              unitId: null,
+              unitName: null,
+              posting: null,
+            }
+          : {
+              id: task.id,
+              taskNo: task.taskNo,
+              name: task.name,
+              unitId: task.unitId,
+              unitName: task.unitName,
+              posting: worksheetTaskPosting(task, row),
+            };
+      })(),
       contractorName: contractors.get(row.contractorId)?.name ?? null,
       departmentName: departments.get(row.departmentId)?.name ?? null,
       workTypeName:
@@ -1034,6 +1209,21 @@ export class WorksheetHandlers {
       store.headcounts(db, workspaceId, projectId, date, excludeId),
     ]);
     return labourPrefill(attendanceHeadcount(rows), onWorksheets);
+  }
+
+  /** The Task picker (CM-806): live leaf tasks of the Project, searched. */
+  async taskOptions(
+    workspaceId: string,
+    projectId: string,
+    search: string | null,
+  ) {
+    return this.deps.tasks.options(
+      this.deps.db,
+      workspaceId,
+      projectId,
+      search,
+      50,
+    );
   }
 
   /**

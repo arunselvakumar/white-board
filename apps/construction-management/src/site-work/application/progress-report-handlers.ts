@@ -6,6 +6,7 @@ import {
   HIRE_COST_MENU,
   PROGRESS_REPORT_MENU,
   progressReportDate,
+  taskProgressPeriod,
 } from "../domain/progress-report";
 import type {
   ProgressReportFile,
@@ -31,14 +32,21 @@ export type ProgressReportView = ProgressReportJob & {
 
 export type RequestProgressReportInput = {
   projectId: string;
-  date: string;
+  /** The Daily Progress Report when left out. */
+  kind?: "daily_progress_report" | "task_progress_report";
+  /** The DPR's date. */
+  date?: string | null;
+  /** The Task Progress Report's period. */
+  from?: string | null;
+  to?: string | null;
   filledBy?: string | null;
   includeImages?: boolean;
 };
 
 /**
- * Progress Reports (CM-606): request a Daily Progress Report, list, read,
- * retry, delete and download them. Site work takes or reuses the date's
+ * Progress Reports (CM-606, CM-805): request a Daily Progress Report or a
+ * Task Progress Report, list, read, retry, delete and download them. A
+ * Task Progress Report has no number and no filters; it prints no money. Site work takes or reuses the date's
  * DPR number; the reporting context runs the job (`ProgressReportJobs`).
  * Access is the Progress Report menu on the job's Project: C to generate
  * and retry, R to list and download, D to delete. Hire cost prints only
@@ -83,10 +91,21 @@ export class ProgressReportHandlers {
     assertCan(access, MENU, "create", { projectId });
     const { workspaceId } = access;
     await this.assertProject(workspaceId, projectId);
-    const date = progressReportDate(
-      input.date,
-      await this.deps.today(workspaceId),
-    );
+    const today = await this.deps.today(workspaceId);
+    if (input.kind === "task_progress_report") {
+      // No number, no filters, no money (CM-805).
+      const period = taskProgressPeriod(input, today);
+      const job = await this.deps.jobs.request({
+        kind: "task_progress_report",
+        workspaceId,
+        projectId,
+        userId: access.userId,
+        ...period,
+        includesMoney: false,
+      });
+      return (await this.views(access, [job]))[0] ?? this.never();
+    }
+    const date = progressReportDate(input.date ?? "", today);
     const filledBy = input.filledBy ?? null;
     if (filledBy != null) {
       const members = await this.deps.directory.projectTeamMembers(
@@ -107,6 +126,7 @@ export class ProgressReportHandlers {
       by: access.userId,
     });
     const job = await this.deps.jobs.request({
+      kind: "daily_progress_report",
       workspaceId,
       projectId,
       userId: access.userId,
@@ -153,7 +173,7 @@ export class ProgressReportHandlers {
     return (await this.views(access, [retried]))[0] ?? this.never();
   }
 
-  /** Deletes a DPR and its file (Delete). The date keeps its number. */
+  /** Deletes a report and its file (Delete). A DPR's date keeps its number. */
   async delete(access: MemberAccess, id: string): Promise<void> {
     const job = await this.deps.jobs.get(access.workspaceId, id);
     assertCan(access, MENU, "delete", { projectId: job.projectId });

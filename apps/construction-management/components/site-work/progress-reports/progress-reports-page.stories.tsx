@@ -10,6 +10,7 @@ import {
   progressReportHandler,
   READY,
   RUNNING,
+  TASK_PROGRESS,
   type ProgressReportApiOptions,
 } from "./progress-report-fixtures";
 import { ProgressReportsPage } from "./progress-reports-page";
@@ -49,7 +50,7 @@ export const Empty: Story = {
   beforeEach: withApi({ reports: [] }),
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("No Daily Progress Reports yet"),
+      await canvas.findByText("No Progress Reports yet"),
     ).toBeVisible();
     await expect(
       canvas.getAllByRole("button", { name: "Create new" }),
@@ -61,12 +62,21 @@ export const Empty: Story = {
 export const Reports: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const list = within(
-      await canvas.findByRole("list", { name: "Daily Progress Reports" }),
+      await canvas.findByRole("list", { name: "Progress Reports" }),
     );
     const items = list.getAllByRole("listitem");
-    await expect(items).toHaveLength(3);
-    const [running, ready, failed] = items.map((item) => within(item));
-    await expect(running?.getByText(RUNNING.number)).toBeVisible();
+    await expect(items).toHaveLength(4);
+    const [running, task, ready, failed] = items.map((item) => within(item));
+    // A Task Progress Report names its period, not a number (CM-805).
+    await expect(task?.getByText("Task Progress Report")).toBeVisible();
+    await expect(task?.getByText("1 Oct 2026 – 10 Oct 2026")).toBeVisible();
+    await expect(task?.getByText(/Tasks by location/)).toBeVisible();
+    await expect(
+      task?.getByRole("link", {
+        name: "Download Task Progress Report 1 Oct 2026 – 10 Oct 2026",
+      }),
+    ).toHaveAttribute("href", TASK_PROGRESS.download ?? "");
+    await expect(running?.getByText(RUNNING.number ?? "")).toBeVisible();
     await expect(running?.getByText("Preparing")).toBeVisible();
     await expect(
       running?.getByText(/Filled by Prabhu Saravanan/),
@@ -105,9 +115,9 @@ export const Reports: Story = {
     await waitFor(async () => {
       await expect(
         within(
-          canvas.getByRole("list", { name: "Daily Progress Reports" }),
+          canvas.getByRole("list", { name: "Progress Reports" }),
         ).getAllByRole("listitem"),
-      ).toHaveLength(2);
+      ).toHaveLength(3);
     });
   },
 };
@@ -122,7 +132,7 @@ export const ReadOnly: Story = {
     flags: { "site_work.progress_reports": ["read"] },
   }),
   play: async ({ canvas }) => {
-    await canvas.findByRole("list", { name: "Daily Progress Reports" });
+    await canvas.findByRole("list", { name: "Progress Reports" });
     await expect(
       canvas.queryByRole("button", { name: "Create new" }),
     ).toBeNull();
@@ -147,8 +157,7 @@ export const CreateDialog: Story = {
     const task = await body.findByRole("option", {
       name: /Task Progress Report/,
     });
-    await expect(task).toHaveAttribute("aria-disabled", "true");
-    await expect(task).toHaveTextContent("Coming with Tasks (M8)");
+    await expect(task).not.toHaveAttribute("aria-disabled", "true");
     await userEvent.keyboard("{Escape}");
 
     await userEvent.clear(date);
@@ -179,7 +188,63 @@ export const CreateDialog: Story = {
       });
     });
     await expect(
-      await canvas.findByRole("list", { name: "Daily Progress Reports" }),
+      await canvas.findByRole("list", { name: "Progress Reports" }),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * A Task Progress Report (CM-805): From and To instead of the DPR's
+ * fields, To not after today, then the period is sent.
+ */
+export const CreateTaskProgressReport: Story = {
+  beforeEach: withApi({ reports: [] }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(
+      (await canvas.findAllByRole("button", { name: "Create new" }))[0] ??
+        canvas.getByRole("button", { name: "Create new" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(await body.findByRole("dialog"));
+    await userEvent.click(await dialog.findByLabelText("Report type"));
+    await userEvent.click(
+      await body.findByRole("option", { name: /Task Progress Report/ }),
+    );
+    await expect(dialog.queryByLabelText("Date")).toBeNull();
+    await expect(dialog.queryByLabelText("Report filled by")).toBeNull();
+    const from = dialog.getByLabelText("From");
+    const to = dialog.getByLabelText("To");
+    await expect(from).toHaveValue("2026-10-01");
+    await expect(to).toHaveValue(PROGRESS_TODAY);
+
+    await userEvent.clear(from);
+    await userEvent.type(from, "2026-10-09");
+    await userEvent.clear(to);
+    await userEvent.type(to, "2026-10-05");
+    await userEvent.click(dialog.getByRole("button", { name: "Generate" }));
+    await expect(
+      await dialog.findByText(
+        "The period must end on or after the day it starts.",
+      ),
+    ).toBeVisible();
+    await expect(posted()).toHaveLength(0);
+
+    await userEvent.clear(to);
+    await userEvent.type(to, "2026-10-10");
+    await userEvent.click(dialog.getByRole("button", { name: "Generate" }));
+    await waitFor(async () => {
+      await expect(posted()[0]?.body).toEqual({
+        projectId: PROGRESS_PROJECT_ID,
+        kind: "task_progress_report",
+        from: "2026-10-09",
+        to: "2026-10-10",
+      });
+    });
+    const list = within(
+      await canvas.findByRole("list", { name: "Progress Reports" }),
+    );
+    await expect(
+      await list.findByText("9 Oct 2026 – 10 Oct 2026"),
     ).toBeVisible();
   },
 };

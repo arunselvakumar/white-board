@@ -238,13 +238,17 @@ describe("Project Dashboard HTTP (CM-412)", () => {
       milestone: null,
       visible: true,
     });
-    // Materials has data since M5 (CM-510); Task still waits for M8.
+    // Materials has data since M5 (CM-510), Task since M8 (CM-805);
+    // Booking still waits for M10.
     expect(
       initial.sections.find((section) => section.key === "materials"),
     ).toMatchObject({ milestone: null });
     expect(
       initial.sections.find((section) => section.key === "task"),
-    ).toMatchObject({ milestone: "M8" });
+    ).toMatchObject({ milestone: null });
+    expect(
+      initial.sections.find((section) => section.key === "booking"),
+    ).toMatchObject({ milestone: "M10" });
 
     const saved = await save(owner.cookie, [
       { key: "attendance", visible: true },

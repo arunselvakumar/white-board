@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { trackingProjectProgress } from "@/src/composition/project-progress";
 
 import {
   projectHandlers as handlers,
@@ -18,11 +19,14 @@ import { toProjectResponse } from "./project-models";
 
 export const dynamic = "force-dynamic";
 
+/** Project Progress % on each card, from Tasks (CM-805). */
+const projectProgress = trackingProjectProgress();
+
 /**
  * Projects home (CM-204): the Projects the caller may see — every one for
  * the Owner, the assigned ones for a Member — the caller's pinned ones
  * first (CM-411), each group by status then name, with counts per status
- * for the filter chips.
+ * for the filter chips, and each Project's progress from Tasks (CM-805).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -39,10 +43,15 @@ export async function GET(request: Request): Promise<Response> {
       page.items,
     );
     const financial = projectFinancial(session.access);
+    const progress = await projectProgress.progressOf(
+      session.workspaceId,
+      items.map((item) => item.id),
+    );
     const body: ListConstructionProjectsProjectsResponseModel = {
       items: items.map((item) => ({
         ...toProjectResponse(item, financial),
         pinned: pinned.has(item.id),
+        progress: progress.get(item.id) ?? null,
       })),
       total: page.total,
       counts: page.counts,

@@ -2,9 +2,12 @@ import {
   PDFDocument,
   StandardFonts,
   rgb,
+  type Color,
   type PDFFont,
   type PDFPage,
 } from "pdf-lib";
+
+import { embedNotoText } from "@/src/shared-kernel/pdf/noto-text";
 
 import type {
   Cell,
@@ -42,6 +45,7 @@ export function printable(value: string): string {
 
 function formatter(
   currency: string,
+  clean: (text: string) => string = printable,
 ): (cell: Cell, col: ReportColumn) => string {
   const money = new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en", {
     minimumFractionDigits: 2,
@@ -55,7 +59,7 @@ function formatter(
   });
   return (cell, col) => {
     if (cell == null) return "";
-    if (typeof cell === "string") return printable(cell);
+    if (typeof cell === "string") return clean(cell);
     switch (col.kind) {
       case "money":
         return money.format(cell / 100);
@@ -69,35 +73,79 @@ function formatter(
   };
 }
 
+/**
+ * How the writer prints text: the standard Helvetica (WinAnsi, `printable`)
+ * or embedded Noto fonts (Indian scripts and ₹ print, CM-805).
+ */
+type Typeface = {
+  clean(text: string): string;
+  width(text: string, size: number, bold?: boolean): number;
+  draw(
+    page: PDFPage,
+    text: string,
+    options: {
+      x: number;
+      y: number;
+      size: number;
+      bold?: boolean;
+      color: Color;
+    },
+  ): void;
+};
+
+function standardFace(regular: PDFFont, bold: PDFFont): Typeface {
+  const font = (heavy?: boolean) => (heavy === true ? bold : regular);
+  return {
+    clean: printable,
+    width: (text, size, heavy) => font(heavy).widthOfTextAtSize(text, size),
+    draw: (page, text, options) => {
+      page.drawText(text, {
+        x: options.x,
+        y: options.y,
+        size: options.size,
+        font: font(options.bold),
+        color: options.color,
+      });
+    },
+  };
+}
+
 /** Cuts `text` to fit `width` at `size`, ending with "..". */
-function fit(text: string, font: PDFFont, size: number, width: number): string {
-  if (font.widthOfTextAtSize(text, size) <= width) return text;
-  let cut = text;
-  while (cut.length > 0 && font.widthOfTextAtSize(`${cut}..`, size) > width)
+function fit(
+  text: string,
+  face: Typeface,
+  size: number,
+  width: number,
+  bold = false,
+): string {
+  if (face.width(text, size, bold) <= width) return text;
+  // Code points: a cut never splits a surrogate pair.
+  let cut = Array.from(text);
+  while (cut.length > 0 && face.width(`${cut.join("")}..`, size, bold) > width)
     cut = cut.slice(0, -1);
-  return cut.length === 0 ? "" : `${cut}..`;
+  return cut.length === 0 ? "" : `${cut.join("")}..`;
 }
 
 /** Splits a header label into lines no wider than `width`. */
 function wrap(
   text: string,
-  font: PDFFont,
+  face: Typeface,
   size: number,
   width: number,
+  bold = false,
 ): string[] {
   const lines: string[] = [];
   let line = "";
   for (const word of text.split(" ")) {
     const next = line.length === 0 ? word : `${line} ${word}`;
-    if (font.widthOfTextAtSize(next, size) <= width || line.length === 0)
-      line = next;
+    if (face.width(next, size, bold) <= width || line.length === 0) line = next;
     else {
       lines.push(line);
       line = word;
     }
   }
   if (line.length > 0) lines.push(line);
-  return lines.map((item) => fit(item, font, size, width));
+  return lines.map((item) => fit(item, face, size, width, bold));
 }
 
 function hasMoney(document: ReportDocument): boolean {
@@ -132,8 +180,7 @@ class PdfWriter {
 
   constructor(
     private readonly pdf: PDFDocument,
-    private readonly regular: PDFFont,
-    private readonly bold: PDFFont,
+    private readonly face: Typeface,
     private readonly document: ReportDocument,
   ) {}
 
@@ -151,11 +198,11 @@ class PdfWriter {
     y: number,
     options: { size: number; bold?: boolean; muted?: boolean },
   ) {
-    this.page.drawText(printable(value), {
+    this.face.draw(this.page, this.face.clean(value), {
       x,
       y,
       size: options.size,
-      font: options.bold === true ? this.bold : this.regular,
+      bold: options.bold,
       color: options.muted === true ? MUTED : INK,
     });
   }
@@ -171,7 +218,7 @@ class PdfWriter {
     const right = `Generated at ${header.generatedAt}`;
     this.text(
       right,
-      width - MARGIN - this.regular.widthOfTextAtSize(printable(right), 8),
+      width - MARGIN - this.face.width(this.face.clean(right), 8),
       y + 2,
       { size: 8, muted: true },
     );
@@ -184,9 +231,14 @@ class PdfWriter {
       `Period: ${header.period}`,
       ...(hasMoney(this.document) ? [`Amounts in ${header.currency}`] : []),
     ].join("     ");
-    this.text(fit(printable(facts), this.regular, 8.5, this.width), MARGIN, y, {
-      size: 8.5,
-    });
+    this.text(
+      fit(this.face.clean(facts), this.face, 8.5, this.width),
+      MARGIN,
+      y,
+      {
+        size: 8.5,
+      },
+    );
     y -= 6;
     this.page.drawLine({
       start: { x: MARGIN, y },
@@ -199,7 +251,12 @@ class PdfWriter {
 
   notes(): void {
     for (const note of this.document.notes) {
-      for (const line of wrap(printable(note), this.regular, 7.5, this.width)) {
+      for (const line of wrap(
+        this.face.clean(note),
+        this.face,
+        7.5,
+        this.width,
+      )) {
         this.text(line, MARGIN, this.y, { size: 7.5, muted: true });
         this.y -= 10;
       }
@@ -210,10 +267,11 @@ class PdfWriter {
   private headerRow(table: ReportTable, grid: Layout): void {
     const lines = table.columns.map((col, index) =>
       wrap(
-        printable(col.label),
-        this.bold,
+        this.face.clean(col.label),
+        this.face,
         grid.size,
         (grid.widths[index] ?? 0) - 4,
+        true,
       ),
     );
     const count = Math.min(3, Math.max(...lines.map((item) => item.length)));
@@ -229,13 +287,13 @@ class PdfWriter {
     table.columns.forEach((col, index) => {
       const width = grid.widths[index] ?? 0;
       (lines[index] ?? []).slice(0, 3).forEach((line, lineIndex) => {
-        const textWidth = this.bold.widthOfTextAtSize(line, grid.size);
+        const textWidth = this.face.width(line, grid.size, true);
         const lineX = col.kind === "text" ? x + 2 : x + width - 2 - textWidth;
-        this.page.drawText(line, {
+        this.face.draw(this.page, line, {
           x: lineX,
           y: this.y - 3 - (lineIndex + 1) * (grid.size + 1.5) + 1.5,
           size: grid.size,
-          font: this.bold,
+          bold: true,
           color: INK,
         });
       });
@@ -250,7 +308,7 @@ class PdfWriter {
     values: readonly string[],
     style: { bold?: boolean; fill?: ReturnType<typeof rgb> },
   ): void {
-    const font = style.bold === true ? this.bold : this.regular;
+    const bold = style.bold === true;
     if (style.fill != null)
       this.page.drawRectangle({
         x: MARGIN,
@@ -262,14 +320,20 @@ class PdfWriter {
     let x = MARGIN;
     table.columns.forEach((col, index) => {
       const width = grid.widths[index] ?? 0;
-      const text = fit(values[index] ?? "", font, grid.size, width - 4);
+      const text = fit(
+        values[index] ?? "",
+        this.face,
+        grid.size,
+        width - 4,
+        bold,
+      );
       if (text.length > 0) {
-        const textWidth = font.widthOfTextAtSize(text, grid.size);
-        this.page.drawText(text, {
+        const textWidth = this.face.width(text, grid.size, bold);
+        this.face.draw(this.page, text, {
           x: col.kind === "text" ? x + 2 : x + width - 2 - textWidth,
           y: this.y - grid.rowHeight + 3.2,
           size: grid.size,
-          font,
+          bold,
           color: INK,
         });
       }
@@ -288,7 +352,9 @@ class PdfWriter {
     this.newPage();
     if (first) this.notes();
     const grid = layout(table.columns, this.width);
-    const format = formatter(this.document.header.currency);
+    const format = formatter(this.document.header.currency, (text) =>
+      this.face.clean(text),
+    );
     const cells = (values: readonly Cell[]) =>
       table.columns.map((col, index) => format(values[index] ?? null, col));
     const bottom = MARGIN + FOOTER;
@@ -331,28 +397,50 @@ class PdfWriter {
     const total = this.pages.length;
     this.pages.forEach((page, index) => {
       const label = `Page ${String(index + 1)} of ${String(total)}`;
-      page.drawText(label, {
-        x:
-          page.getWidth() - MARGIN - this.regular.widthOfTextAtSize(label, 7.5),
+      this.face.draw(page, label, {
+        x: page.getWidth() - MARGIN - this.face.width(label, 7.5),
         y: MARGIN - 6,
         size: 7.5,
-        font: this.regular,
         color: MUTED,
       });
-      page.drawText(
-        printable(
+      this.face.draw(
+        page,
+        this.face.clean(
           `${this.document.header.title} - ${this.document.header.project} - ${this.document.header.period}`,
         ),
-        {
-          x: MARGIN,
-          y: MARGIN - 6,
-          size: 7.5,
-          font: this.regular,
-          color: MUTED,
-        },
+        { x: MARGIN, y: MARGIN - 6, size: 7.5, color: MUTED },
       );
     });
   }
+}
+
+/** Noto text: whatever script a name is written in prints (CM-805). */
+function notoFace(noto: Awaited<ReturnType<typeof embedNotoText>>): Typeface {
+  return {
+    clean: (text) => text.replace(/\s/g, " "),
+    width: (text, size, bold) => noto.width(text, size, bold),
+    draw: (page, text, options) => {
+      noto.draw(page, text, options);
+    },
+  };
+}
+
+/** Every string the document prints, so the Noto fonts it needs are embedded. */
+export function reportTexts(document: ReportDocument): string[] {
+  const texts: string[] = [
+    ...Object.values(document.header).flatMap((value) =>
+      typeof value === "string" ? [value] : [],
+    ),
+    ...document.notes,
+    "Generated at",
+    "No records in this period.",
+  ];
+  for (const table of document.tables) {
+    texts.push(table.name, ...table.columns.map((col) => col.label));
+    for (const row of [...table.rows, table.totals ?? []])
+      for (const cell of row) if (typeof cell === "string") texts.push(cell);
+  }
+  return texts;
 }
 
 /**
@@ -367,9 +455,14 @@ export async function renderPdf(document: ReportDocument): Promise<Uint8Array> {
   );
   pdf.setAuthor(printable(document.header.company));
   pdf.setCreator("Construction Management");
-  const regular = await pdf.embedFont(StandardFonts.Helvetica);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const writer = new PdfWriter(pdf, regular, bold, document);
+  const face =
+    document.fonts === "noto"
+      ? notoFace(await embedNotoText(pdf, reportTexts(document)))
+      : standardFace(
+          await pdf.embedFont(StandardFonts.Helvetica),
+          await pdf.embedFont(StandardFonts.HelveticaBold),
+        );
+  const writer = new PdfWriter(pdf, face, document);
   document.tables.forEach((table, index) => {
     writer.table(table, index === 0);
   });

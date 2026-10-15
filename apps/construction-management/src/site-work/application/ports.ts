@@ -285,8 +285,15 @@ export type EquipmentDirectory = {
 export type ProgressReportJob = {
   id: string;
   projectId: string;
-  number: string;
-  date: CalendarDate;
+  /** A Daily Progress Report or a Task Progress Report (CM-805). */
+  kind: "daily_progress_report" | "task_progress_report";
+  /** The DPR's number; null for a Task Progress Report. */
+  number: string | null;
+  /** The DPR's date; null for a Task Progress Report. */
+  date: CalendarDate | null;
+  /** The period covered: a DPR's date twice. */
+  from: CalendarDate;
+  to: CalendarDate;
   /** User id of the Filled By Team Member; null for everyone. */
   filledBy: string | null;
   includeImages: boolean;
@@ -308,23 +315,35 @@ export type ProgressReportFile = {
 };
 
 /**
- * The reporting context's job queue, for Daily Progress Reports only.
+ * The reporting context's job queue, for Daily and Task Progress Reports
+ * only.
  * `src/composition/progress-reports.ts` implements it over the report
  * handlers. A job of another kind, or another Company's, is 404
  * `PROGRESS_REPORT_NOT_FOUND`.
  */
 export type ProgressReportJobs = {
   /** Queues the job and runs it (inline until M9); returns it afterwards. */
-  request(input: {
-    workspaceId: string;
-    projectId: string;
-    userId: string;
-    number: string;
-    date: CalendarDate;
-    filledBy: string | null;
-    includeImages: boolean;
-    includesMoney: boolean;
-  }): Promise<ProgressReportJob>;
+  request(
+    input: {
+      workspaceId: string;
+      projectId: string;
+      userId: string;
+      includesMoney: boolean;
+    } & (
+      | {
+          kind: "daily_progress_report";
+          number: string;
+          date: CalendarDate;
+          filledBy: string | null;
+          includeImages: boolean;
+        }
+      | {
+          kind: "task_progress_report";
+          from: CalendarDate;
+          to: CalendarDate;
+        }
+    ),
+  ): Promise<ProgressReportJob>;
   /** The Project's newest 50, newest first. */
   list(workspaceId: string, projectId: string): Promise<ProgressReportJob[]>;
   get(workspaceId: string, id: string): Promise<ProgressReportJob>;
@@ -378,4 +397,68 @@ export type DashboardNames = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, string>>;
+};
+
+// ---------------------------------------------------------------------------
+// TaskProgressPosting (CM-806, ADR CM-0019 §6): a Daily Worksheet names a
+// Task and, when its Approx Work Done is in the task's unit, posts task
+// progress in the worksheet's transaction. Site work never reads tracking
+// tables; `src/composition/task-progress-posting.ts` implements it.
+// ---------------------------------------------------------------------------
+
+/** A live task as the worksheet sees it. */
+export type WorksheetTaskFacts = {
+  id: string;
+  projectId: string;
+  taskNo: number;
+  name: string;
+  /** No live sub-tasks: only leaf tasks take progress. */
+  leaf: boolean;
+  /** Its Total work unit; null for a task that tracks percent. */
+  unitId: string | null;
+  unitName: string | null;
+};
+
+export type TaskProgressPosting = {
+  /**
+   * Live leaf tasks of the Project for the picker, by Task No. then name,
+   * matching `search` (a Task No. like `7` / `T-7`, or part of the name).
+   */
+  options(
+    db: SiteWorkTx,
+    workspaceId: string,
+    projectId: string,
+    search: string | null,
+    limit: number,
+  ): Promise<WorksheetTaskFacts[]>;
+  /** Live tasks of the Company by id, any Project (the caller checks). */
+  tasks(
+    db: SiteWorkTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, WorksheetTaskFacts>>;
+  /**
+   * Makes the worksheet's progress update say this: its task, date and
+   * quantity (in the task's unit). Replaces the worksheet's earlier update,
+   * on this task or another, and recomputes every task it touched.
+   */
+  post(
+    tx: SiteWorkTx,
+    input: {
+      workspaceId: string;
+      worksheetId: string;
+      worksheetNumber: string;
+      taskId: string;
+      date: CalendarDate;
+      /** Decimal string > 0. */
+      quantity: string;
+      by: string;
+      at: Date;
+    },
+  ): Promise<void>;
+  /** Removes the worksheet's progress update, if it has one, and recomputes its task. */
+  remove(
+    tx: SiteWorkTx,
+    input: { workspaceId: string; worksheetId: string; by: string; at: Date },
+  ): Promise<void>;
 };

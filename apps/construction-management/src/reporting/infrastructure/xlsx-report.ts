@@ -30,6 +30,7 @@ const NUMBER_FORMATS: Record<ReportColumn["kind"], string | undefined> = {
   // General: as many decimals as the quantity has (at most three).
   quantity: undefined,
   money: "#,##0.00",
+  percent: "0.00",
 };
 
 /** Paise as rupees for a money column; everything else as it is. */

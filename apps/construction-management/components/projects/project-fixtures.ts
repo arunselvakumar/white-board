@@ -128,19 +128,40 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   }),
 ];
 
+type StoryProgress = ProjectList["items"][number]["progress"];
+
+/**
+ * Project Progress % from Tasks (CM-805) by Project id; Projects without
+ * tasks are absent and show no bar.
+ */
+export const STORY_PROGRESS: Readonly<Record<string, StoryProgress>> = {
+  [KUMARI.id]: { pct: 42.5, weighting: "price" },
+  "0199c4a0-0000-7000-8000-000000000002": {
+    pct: 8.33,
+    weighting: "duration",
+  },
+  "0199c4a0-0000-7000-8000-000000000005": { pct: 100, weighting: "price" },
+};
+
 /**
  * `financial`: whether the viewer has the Project menu's Financial flag;
- * `pinned`: the ids the viewer pinned, listed first like the server does.
+ * `pinned`: the ids the viewer pinned, listed first like the server does;
+ * `progress`: each Project's progress (none for a Project without tasks).
  */
 export function projectList(
   projects: ProjectResponse[],
   financial = true,
   pinned: readonly string[] = [],
+  progress: Readonly<Record<string, StoryProgress>> = STORY_PROGRESS,
 ): ProjectList {
   const items = [
     ...projects.filter((item) => pinned.includes(item.id)),
     ...projects.filter((item) => !pinned.includes(item.id)),
-  ].map((item) => ({ ...item, pinned: pinned.includes(item.id) }));
+  ].map((item) => ({
+    ...item,
+    pinned: pinned.includes(item.id),
+    progress: progress[item.id] ?? null,
+  }));
   const count = (status: ProjectResponse["status"]) =>
     items.filter((item) => item.status === status).length;
   return {

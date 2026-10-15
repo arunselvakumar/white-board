@@ -7,7 +7,11 @@ import {
   isResponse,
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
-import type { ReportKind, ReportJob } from "@/src/reporting/domain/report-job";
+import type {
+  ReportKind,
+  ReportJob,
+  ReportOwnScope,
+} from "@/src/reporting/domain/report-job";
 import { createReportJobs } from "@/src/composition/report-jobs";
 import {
   canBeCentral,
@@ -61,6 +65,13 @@ export const REPORT_MENU: Record<ReportKind, MenuKey> = {
   other_expenses: "finance.other_expenses",
   tds_194c: "finance.parties",
   due_payments: "finance.parties",
+  // Tracking reports (CM-805, ADR CM-0019 §14): each under its menu, the
+  // Task Report's prices with Task Financial. The Task Progress Report is
+  // a Progress Report (`hasOwnModule`), never requested here.
+  task_report: "tracking.tasks",
+  issue_snag_report: "tracking.issues",
+  inspection_request_report: "tracking.inspection_requests",
+  task_progress_report: "site_work.progress_reports",
 };
 
 function scope(projectId: string | null) {
@@ -140,7 +151,42 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
       job.requestedBy === session.userId ||
       can(session.access, "finance.petty_cash", "view_all")
     );
+  // A Task or Issue & Snag report may hold others' rows (CM-0019 §5, §8).
+  if (job.kind === "task_report" || job.kind === "issue_snag_report")
+    return (
+      job.requestedBy === session.userId ||
+      can(session.access, REPORT_MENU[job.kind], "view_all", {
+        projectId: job.projectId,
+      })
+    );
   return true;
+}
+
+/**
+ * Who a Task or Issue & Snag report covers (CM-805): every row with View
+ * all on its menu (or as the Owner), else the rows the requester created
+ * or is assigned to (their Team Member), fixed with the job. The issue
+ * check matches the Issues & Snags list's.
+ */
+export async function trackingOwnScope(
+  session: AccessSession,
+  kind: "task_report" | "issue_snag_report",
+  projectId: string,
+): Promise<ReportOwnScope | null> {
+  const viewAll =
+    kind === "task_report"
+      ? can(session.access, "tracking.tasks", "view_all", { projectId })
+      : can(session.access, "tracking.issues", "view_all");
+  if (viewAll) return null;
+  const member = await prisma.constructionOrganizationTeamMember.findFirst({
+    where: {
+      workspaceId: session.workspaceId,
+      userId: session.userId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+  return { userId: session.userId, memberId: member?.id ?? null };
 }
 
 /**

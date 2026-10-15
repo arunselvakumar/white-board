@@ -27,6 +27,13 @@ import {
   equipmentUsage,
   SITE_WORK_DASHBOARD_PATH,
 } from "./site-work-dashboard-fixtures";
+import {
+  emptyTrackingDashboard,
+  FOOTINGS_TASK_ID,
+  NO_TRACKING,
+  TRACKING_DASHBOARD_PATH,
+  trackingDashboard,
+} from "./tracking-dashboard-fixtures";
 
 const SUMMARY_PATH = `/api/construction/projects/projects/${KUMARI.id}/dashboard/summary`;
 const LAYOUT_PATH = "/api/construction/projects/dashboard-layout";
@@ -138,6 +145,14 @@ function serve(
     siteWork?: "data" | "empty" | "without_financial" | "forbidden";
     /** The Payments section and Payment Approvals (CM-709). */
     finance?: "data" | "empty" | "no_payments" | "forbidden";
+    /** The Task, Issue & Snag and Inspection Request sections (CM-805). */
+    tracking?:
+      | "data"
+      | "empty"
+      | "without_financial"
+      | "own_only"
+      | "no_tracking"
+      | "forbidden";
   } = {},
 ) {
   return () => {
@@ -179,6 +194,23 @@ function serve(
           finance === "empty"
             ? emptyFinanceDashboard(from, to)
             : financeDashboard(from, to),
+        );
+      }
+      if (method === "GET" && path.startsWith(TRACKING_DASHBOARD_PATH)) {
+        const tracking = options.tracking ?? "data";
+        if (tracking === "forbidden")
+          return Response.json(
+            { code: "PERMISSION_DENIED", message: "No." },
+            { status: 403 },
+          );
+        if (tracking === "no_tracking") return Response.json(NO_TRACKING);
+        if (tracking === "empty")
+          return Response.json(emptyTrackingDashboard());
+        return Response.json(
+          trackingDashboard({
+            financial: tracking !== "without_financial",
+            viewAll: tracking !== "own_only",
+          }),
         );
       }
       if (method === "GET" && path.startsWith(SITE_WORK_DASHBOARD_PATH)) {
@@ -253,8 +285,8 @@ export const WithFinancial: Story = {
     ).toEqual([
       "Material Approvals4Pending: 3 PR · 1 PO",
       "Payment Approvals7Pending: 2 transactions · 1 transfer · 3 vouchers · 1 settlement",
-      "Pending Issues & Snags—Arrives with M8",
-      "Pending Inspections—Arrives with M8",
+      "Pending Issues & Snags5Open, delayed included",
+      "Pending Inspections2Pending for approval",
     ]);
 
     const projectSummary = within(
@@ -294,7 +326,7 @@ export const WithFinancial: Story = {
     await expect(
       materials.getByRole("link", { name: "Stock Register" }),
     ).toBeVisible();
-    // Every later section names the milestone that fills it.
+    // Booking and Inquiry name the milestone that fills them.
     await expect(
       within(canvas.getByRole("region", { name: "Booking" })).getByText(
         "Arrives with Sales (M10)",
@@ -402,6 +434,182 @@ export const PaymentsRefused: Story = {
     await expect(
       await payments.findByText(
         "Payments need the Dashboard permission on this Project.",
+      ),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * Task, Issue & Snag and Inspection Request with data and Financial
+ * (CM-805): the gauges, the bars and the most delayed tasks.
+ */
+export const TrackingSections: Story = {
+  play: async ({ canvas }) => {
+    const task = within(await canvas.findByRole("region", { name: "Task" }));
+    const progress = await task.findByRole("meter", {
+      name: "Project Progress",
+    });
+    await expect(progress).toHaveAttribute("aria-valuetext", "29.09%");
+    await expect(task.getByText("Weighted by Total Price")).toBeVisible();
+    await expect(
+      task.getByText("Every task of the Project, whatever the period."),
+    ).toBeVisible();
+    const statuses = within(
+      task.getByRole("figure", { name: "Tasks by status" }),
+    );
+    await expect(statuses.getAllByRole("listitem")).toHaveLength(4);
+    await expect(statuses.getByText("Delayed")).toBeVisible();
+    const value = within(
+      task.getByRole("figure", { name: "Value earned by task" }),
+    );
+    await expect(value.getByText("Tower A structure")).toBeVisible();
+    await expect(value.getByText("₹3,00,000.00")).toBeVisible();
+    await expect(
+      value.getByText("And 1 more task, counted in the totals."),
+    ).toBeVisible();
+    await expect(
+      task.getByText("Total earned value").nextElementSibling,
+    ).toHaveTextContent("₹3,32,500");
+    const delayed = within(
+      task.getByRole("list", { name: "Most delayed tasks" }),
+    );
+    await expect(delayed.getByText("10 days late")).toBeVisible();
+    await expect(
+      delayed.getByRole("link", { name: /Footings and plinth beams/ }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${KUMARI.id}/tasks/${FOOTINGS_TASK_ID}`,
+    );
+
+    const issues = within(canvas.getByRole("region", { name: "Issue & Snag" }));
+    const priority = within(
+      issues.getByRole("figure", { name: "Issues by priority" }),
+    );
+    await expect(priority.getByText("High")).toBeVisible();
+    await expect(priority.getByText("No priority")).toBeVisible();
+    const categories = within(
+      issues.getByRole("figure", { name: "Issues by category" }),
+    );
+    await expect(categories.getByText("Quality")).toBeVisible();
+    await expect(categories.getByText("No category")).toBeVisible();
+    const assignees = within(
+      issues.getByRole("figure", { name: "Issues by assignee" }),
+    );
+    await expect(assignees.getByText("Ravi Kumar")).toBeVisible();
+    await expect(
+      assignees.getByText("2 pending · 2 delayed · 1 solved"),
+    ).toBeVisible();
+    await expect(assignees.getByText("Not assigned")).toBeVisible();
+
+    const inspections = within(
+      canvas.getByRole("region", { name: "Inspection Request" }),
+    );
+    await expect(
+      inspections.getByRole("meter", { name: "Success Rate" }),
+    ).toHaveAttribute("aria-valuetext", "75%");
+    await expect(
+      inspections.getByText("Rejected").nextElementSibling,
+    ).toHaveTextContent("1");
+  },
+};
+
+/** Nothing in the period and no tasks: "—" gauges and empty states. */
+export const TrackingEmpty: Story = {
+  beforeEach: serve({ tracking: "empty" }),
+  play: async ({ canvas }) => {
+    const task = within(await canvas.findByRole("region", { name: "Task" }));
+    await expect(
+      await task.findByRole("img", {
+        name: "Project Progress: no figure yet",
+      }),
+    ).toBeVisible();
+    await expect(task.getByText("No tasks yet")).toBeVisible();
+    await expect(
+      task.getByText("No task was added in this period."),
+    ).toBeVisible();
+    await expect(
+      task.getByText("No priced task was added in this period."),
+    ).toBeVisible();
+    await expect(task.getByText("No task is past its Due Date.")).toBeVisible();
+    const issues = within(canvas.getByRole("region", { name: "Issue & Snag" }));
+    await expect(
+      issues.getAllByText("No issue was raised in this period."),
+    ).toHaveLength(4);
+    const inspections = within(
+      canvas.getByRole("region", { name: "Inspection Request" }),
+    );
+    await expect(
+      inspections.getByText(
+        "No request was approved or rejected in this period.",
+      ),
+    ).toBeVisible();
+    const kpis = within(canvas.getByRole("list", { name: "Key figures" }));
+    await expect(kpis.getByText("Open, delayed included")).toBeVisible();
+  },
+};
+
+/** Without Task Financial there is no Value Earned By Task. */
+export const TrackingWithoutFinancial: Story = {
+  beforeEach: serve({ tracking: "without_financial" }),
+  play: async ({ canvas }) => {
+    const task = within(await canvas.findByRole("region", { name: "Task" }));
+    await task.findByRole("meter", { name: "Project Progress" });
+    await expect(
+      task.queryByRole("figure", { name: "Value earned by task" }),
+    ).toBeNull();
+    await expect(task.queryByText("Total earned value")).toBeNull();
+  },
+};
+
+/** Without View all the sections say they count the member's own. */
+export const TrackingOwnOnly: Story = {
+  beforeEach: serve({ tracking: "own_only" }),
+  play: async ({ canvas }) => {
+    const task = within(await canvas.findByRole("region", { name: "Task" }));
+    await expect(
+      await task.findByText(/that you created or are assigned to/),
+    ).toBeVisible();
+    await expect(
+      within(canvas.getByRole("region", { name: "Issue & Snag" })).getByText(
+        /Only the issues you raised or are assigned to/,
+      ),
+    ).toBeVisible();
+  },
+};
+
+/** Without the tracking menus each section names what it needs. */
+export const TrackingNeedsPermission: Story = {
+  beforeEach: serve({ tracking: "no_tracking" }),
+  play: async ({ canvas }) => {
+    const task = within(await canvas.findByRole("region", { name: "Task" }));
+    await expect(
+      await task.findByText("Tasks need the Task permission on this Project."),
+    ).toBeVisible();
+    await expect(
+      within(
+        canvas.getByRole("region", { name: "Inspection Request" }),
+      ).getByText(
+        "Inspection Requests need the Inspection Request permission on this Project.",
+      ),
+    ).toBeVisible();
+    const kpis = within(canvas.getByRole("list", { name: "Key figures" }));
+    await expect(
+      await kpis.findByText("Needs Issues & Snags read"),
+    ).toBeVisible();
+    await expect(kpis.getByText("Needs Inspection Request read")).toBeVisible();
+  },
+};
+
+/** Without the Dashboard permission the sections say so. */
+export const TrackingRefused: Story = {
+  beforeEach: serve({ tracking: "forbidden" }),
+  play: async ({ canvas }) => {
+    const issues = within(
+      await canvas.findByRole("region", { name: "Issue & Snag" }),
+    );
+    await expect(
+      await issues.findByText(
+        "Issues & Snags need the Dashboard permission on this Project.",
       ),
     ).toBeVisible();
   },
@@ -682,6 +890,13 @@ export const Phone: Story = {
       "table",
       { name: "Due payments" },
     );
+    await within(canvas.getByRole("region", { name: "Task" })).findByRole(
+      "figure",
+      { name: "Value earned by task" },
+    );
+    await within(
+      canvas.getByRole("region", { name: "Issue & Snag" }),
+    ).findByRole("figure", { name: "Issues by assignee" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

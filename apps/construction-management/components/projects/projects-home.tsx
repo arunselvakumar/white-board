@@ -45,6 +45,7 @@ import {
 } from "@/src/queries/projects";
 
 import { ProjectAvatar } from "./project-avatar";
+import { ProjectProgressBar } from "./project-progress";
 import { HideModulesDialog } from "./project-home-dialogs";
 import {
   PROJECT_STATUS_LABELS,
@@ -223,17 +224,20 @@ function ProjectRow({ project }: { project: ProjectItem }) {
           <div>
             <ProjectStatusBadge status={project.status} />
           </div>
-          <p className="text-muted-foreground flex gap-1.5 text-sm">
-            {dates == null ? null : (
-              <>
-                <CalendarDays
-                  aria-hidden="true"
-                  className="mt-0.5 size-3.5 shrink-0 md:hidden"
-                />
-                <span>{dates}</span>
-              </>
-            )}
-          </p>
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-muted-foreground flex gap-1.5 text-sm">
+              {dates == null ? null : (
+                <>
+                  <CalendarDays
+                    aria-hidden="true"
+                    className="mt-0.5 size-3.5 shrink-0 md:hidden"
+                  />
+                  <span>{dates}</span>
+                </>
+              )}
+            </p>
+            <ProjectProgressBar progress={project.progress} />
+          </div>
         </div>
       </Link>
       <ProjectRowMenu project={project} />
@@ -346,7 +350,7 @@ export function ProjectsHome() {
                     >
                       <span>Project</span>
                       <span>Status</span>
-                      <span>Dates</span>
+                      <span>Dates and progress</span>
                     </div>
                     <span className="size-8 shrink-0" />
                   </div>

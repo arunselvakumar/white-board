@@ -393,3 +393,39 @@ export const Edit: Story = {
     });
   },
 };
+
+/** A Task in the sheet's unit: the form says the work will post, and the save names it (CM-806). */
+export const WithTask: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00043",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7002",
+        taskNo: 8,
+        name: "Brickwork east wall",
+        unitId: SQM_ID,
+        unitName: "sqm",
+        posting: "quantity",
+      },
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00043" }),
+    );
+    await expect(form.getByLabelText("Task")).toHaveValue(
+      "T-8 Brickwork east wall",
+    );
+    await expect(
+      form.getByText("Will add 42.5 sqm to T-8's progress"),
+    ).toBeVisible();
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ taskId: "0199c4a0-0000-7000-8000-0000000f7002" });
+    });
+  },
+};

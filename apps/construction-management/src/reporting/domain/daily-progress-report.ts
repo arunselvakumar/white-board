@@ -204,6 +204,14 @@ export type DprDocument = {
     date: string;
     filledBy: string;
     logo: DprImageRef | null;
+    /**
+     * The facts under the header; the DPR's number, date and Filled By
+     * when left out. Other PDFs on the DPR's layout (the Task Progress
+     * Report, CM-805) pass their own.
+     */
+    facts?: [label: string, value: string][];
+    /** What the running header and footer name; number and date by default. */
+    reference?: string;
   };
   sections: DprSection[];
 };
