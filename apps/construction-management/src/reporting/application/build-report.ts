@@ -20,7 +20,18 @@ import {
 } from "./build-site-work-report";
 // Finance reports (CM-709).
 import { FINANCE_A3_KINDS, financeReportBody } from "./build-finance-report";
-import type { FinanceReportSource, HeaderFacts, ReportSource } from "./ports";
+// Tracking reports (CM-805).
+import {
+  TRACKING_A3_KINDS,
+  TRACKING_TABLE_KINDS,
+  trackingReportBody,
+} from "./build-tracking-report";
+import type {
+  FinanceReportSource,
+  HeaderFacts,
+  ReportSource,
+  TrackingReportSource,
+} from "./ports";
 
 /** `09 Oct 2026, 4:05 pm IST` in the Company's time zone. */
 export function generatedAtLabel(at: Date, timeZone: string): string {
@@ -47,6 +58,8 @@ function periodLabel(job: ReportJob): string {
       return monthLabel(params.month);
     case "daily_progress_report":
       return rangeLabel({ from: params.date, to: params.date });
+    case "task_progress_report":
+      return rangeLabel(params);
     // Finance reports (CM-709).
     case "tds_194c":
       return `FY ${params.fy} (${rangeLabel(financialYearRange(params.fy))})`;
@@ -62,6 +75,7 @@ async function bodyFor(
   source: ReportSource,
   today: CalendarDate,
   finance: FinanceReportSource | undefined,
+  tracking: TrackingReportSource | undefined,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -130,9 +144,15 @@ async function bodyFor(
     case "tds_194c":
     case "due_payments":
       return financeReportBody(job, params, finance);
+    // Tracking reports (CM-805).
+    case "task_report":
+    case "issue_snag_report":
+    case "inspection_request_report":
+      return trackingReportBody(job, params, tracking, today);
     case "daily_progress_report":
-      // A PDF of its own, not a table report (`createReportExecutor`).
-      throw new Error("The Daily Progress Report is not a table report.");
+    case "task_progress_report":
+      // PDFs of their own, not table reports (`createReportExecutor`).
+      throw new Error("A Progress Report is not a table report.");
   }
 }
 
@@ -152,6 +172,8 @@ export async function buildReportDocument(
   now: Date,
   /** The finance reports' read model (CM-709), wired by the composition root. */
   finance?: FinanceReportSource,
+  /** The tracking reports' read model (CM-805). */
+  tracking?: TrackingReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
@@ -162,6 +184,7 @@ export async function buildReportDocument(
     source,
     companyDate(facts.timezone, now),
     finance,
+    tracking,
   );
   return {
     header: {
@@ -178,9 +201,14 @@ export async function buildReportDocument(
     pageSize:
       job.kind === "muster_roll" ||
       SITE_WORK_A3_KINDS.includes(job.kind) ||
-      FINANCE_A3_KINDS.includes(job.kind)
+      FINANCE_A3_KINDS.includes(job.kind) ||
+      TRACKING_A3_KINDS.includes(job.kind)
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),
+    // Tracking reports print names and remarks in any script (CM-805).
+    ...(TRACKING_TABLE_KINDS.includes(job.kind)
+      ? { fonts: "noto" as const }
+      : {}),
   };
 }

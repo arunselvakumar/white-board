@@ -8,7 +8,12 @@ import type { ReportLabour, ReportLabourDay } from "../domain/labour-days";
 import type { ReportLedgerEntry } from "../domain/ledger-summary";
 import type { ReportDocument } from "../domain/report-document";
 import type { DateRange } from "../domain/report-period";
-import type { ReportJob, ReportKind, ReportParams } from "../domain/report-job";
+import type {
+  ReportJob,
+  ReportKind,
+  ReportOwnScope,
+  ReportParams,
+} from "../domain/report-job";
 import type { ReportVendorLine } from "../domain/vendor-attendance-report";
 // Site work reports (CM-605, CM-608).
 import type { ReportWorksheet } from "../domain/daily-work-report";
@@ -32,6 +37,13 @@ import type {
   TransactionsReportRow,
   TransfersReportRow,
 } from "../domain/finance-reports";
+// Tracking reports (CM-805).
+import type { TaskProgressReadModel } from "../domain/task-progress-report";
+import type {
+  InspectionReportRow,
+  IssueReportRow,
+  TaskReportRow,
+} from "../domain/tracking-reports";
 
 /** A rendered file written to storage for a job. */
 export type ReportFile = {
@@ -278,4 +290,59 @@ export type FinanceReportSource = {
     workspaceId: string,
     filter: { asOn: CalendarDate; projectIds: string[] | null },
   ): Promise<DueReportParty[]>;
+};
+
+// ---------------------------------------------------------------------------
+// Tracking reports (CM-805)
+// ---------------------------------------------------------------------------
+
+/**
+ * What the tracking reports read (CM-805) from tracking, masters, projects
+ * and organization tables. Implemented in
+ * `src/composition/tracking-report-source.ts`, which uses tracking's own
+ * rules (derived status, roll-ups, variance); reporting only sees this
+ * port and printable words.
+ */
+export type TrackingReportSource = {
+  /** Live tasks of the Project added in the range, in tree order. */
+  tasks(
+    workspaceId: string,
+    projectId: string,
+    filter: {
+      range: DateRange;
+      own: ReportOwnScope | null;
+      /** Prices are read only when the job carries money. */
+      financial: boolean;
+      today: CalendarDate;
+    },
+  ): Promise<TaskReportRow[]>;
+  /** Live issues of the Project with an Issue Date in the range. */
+  issues(
+    workspaceId: string,
+    projectId: string,
+    filter: {
+      range: DateRange;
+      own: ReportOwnScope | null;
+      today: CalendarDate;
+    },
+  ): Promise<IssueReportRow[]>;
+  /** Live Inspection Requests of the Project with an Inspection Date in the range. */
+  inspections(
+    workspaceId: string,
+    projectId: string,
+    filter: { range: DateRange },
+  ): Promise<InspectionReportRow[]>;
+};
+
+/**
+ * The Task Progress Report's read model (CM-805): tracking, projects and
+ * organization for one Project and period. Implemented in
+ * `src/composition/tracking-report-source.ts`.
+ */
+export type TaskProgressSource = {
+  read(input: {
+    workspaceId: string;
+    projectId: string;
+    range: DateRange;
+  }): Promise<TaskProgressReadModel>;
 };

@@ -15,6 +15,7 @@ import type {
   GetConstructionSiteWorkWorksheetFormOptionsResponseModel,
   ListConstructionSiteWorkWorksheetsResponseModel,
   UpdateConstructionSiteWorkWorksheetRequestModel,
+  GetConstructionSiteWorkWorksheetTaskOptionsResponseModel,
 } from "@/app/api/construction/site-work/worksheets/worksheet-models";
 import type { SheetApprovalStatus } from "@/src/site-work/domain/shift";
 
@@ -90,6 +91,25 @@ export function worksheetQuery(id: string) {
 }
 
 /** Settings, Contractors with Departments, Work Types and units for the form. */
+/** A task the Daily Worksheet form's picker offers (CM-806). */
+export type WorksheetTaskOption =
+  GetConstructionSiteWorkWorksheetTaskOptionsResponseModel["items"][number];
+
+/** Live leaf tasks of the Project for the Task picker, searched. */
+export function worksheetTaskOptionsQuery(projectId: string, search = "") {
+  const params = new URLSearchParams({ projectId });
+  const trimmed = search.trim();
+  if (trimmed !== "") params.set("search", trimmed);
+  return queryOptions({
+    queryKey: [...WORKSHEETS_KEY, "task-options", params.toString()] as const,
+    queryFn: () =>
+      apiJson<GetConstructionSiteWorkWorksheetTaskOptionsResponseModel>(
+        `${WORKSHEETS_API}/task-options?${params}`,
+      ),
+    staleTime: 30_000,
+  });
+}
+
 export function worksheetFormOptionsQuery(projectId: string) {
   return queryOptions({
     queryKey: [...WORKSHEETS_KEY, "form-options", projectId] as const,

@@ -270,10 +270,18 @@ export type TaskStore = {
       workMilli: bigint | null;
       pct: number | null;
       remark: string | null;
+      /** A Daily Worksheet's update (CM-806); manual when left out. */
+      worksheet?: { id: string; number: string } | null;
       by: string;
       at: Date;
     },
   ): Promise<void>;
+  /** The live update a Daily Worksheet posted, if any. */
+  worksheetProgress(
+    db: TrackingTx,
+    workspaceId: string,
+    worksheetId: string,
+  ): Promise<ProgressRow | null>;
   updateProgress(
     db: TrackingTx,
     id: string,

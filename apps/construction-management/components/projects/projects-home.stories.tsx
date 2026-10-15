@@ -74,6 +74,29 @@ export const WithProjects: Story = {
   },
 };
 
+/**
+ * Project Progress % on the card (CM-805): a bar with the figure and the
+ * weighting; no bar for a Project without tasks.
+ */
+export const ProgressOnTheCard: Story = {
+  play: async ({ canvas }) => {
+    const cards = within(await canvas.findByRole("list", { name: "Projects" }));
+    const kumari = within(cards.getByRole("link", { name: /Kumari Heights/ }));
+    await expect(
+      kumari.getByRole("progressbar", { name: "Project Progress" }),
+    ).toHaveAttribute("aria-valuetext", "42.5%, weighted by Total Price");
+    await expect(kumari.getByText("42.5%")).toBeVisible();
+    const tower = within(
+      cards.getByRole("link", { name: /Asaripallam Tower/ }),
+    );
+    await expect(
+      tower.getByRole("progressbar", { name: "Project Progress" }),
+    ).toHaveAttribute("aria-valuetext", "8.33%, weighted by duration");
+    const plots = within(cards.getByRole("link", { name: /Vadasery Plots/ }));
+    await expect(plots.queryByRole("progressbar")).toBeNull();
+  },
+};
+
 export const FiltersByStatus: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Projects" });

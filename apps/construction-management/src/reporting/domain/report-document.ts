@@ -17,7 +17,9 @@ export type ColumnKind =
   /** Quantities with up to three decimals: fuel, billable quantity, material. */
   | "quantity"
   /** Integer paise; printed as rupees. */
-  | "money";
+  | "money"
+  /** A percentage with up to two decimals (42.5); never summed. */
+  | "percent";
 
 export type ReportColumn = {
   label: string;
@@ -68,6 +70,11 @@ export type ReportDocument = {
   pageSize: "a4" | "a3";
   /** Download name without extension. */
   fileName: string;
+  /**
+   * Noto fonts in the PDF, so names in Indian scripts and ₹ print (the
+   * tracking reports, CM-805); the standard fonts otherwise.
+   */
+  fonts?: "noto";
 };
 
 export function column(
@@ -96,6 +103,7 @@ export function totalsOf(
 ): Cell[] {
   return columns.map((col, index) => {
     if (col.kind === "text") return labels[index] ?? null;
+    if (col.kind === "percent") return null;
     const scale = scaleOf(col.kind);
     let sum = 0;
     let any = false;

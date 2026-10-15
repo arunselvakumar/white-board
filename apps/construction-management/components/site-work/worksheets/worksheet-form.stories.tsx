@@ -393,3 +393,131 @@ export const Edit: Story = {
     });
   },
 };
+
+/**
+ * A Task in the sheet's unit: the form says the work will post. Saving
+ * without touching the Task leaves `taskId` out, which keeps the link (CM-806).
+ */
+export const WithTask: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00043",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7002",
+        taskNo: 8,
+        name: "Brickwork east wall",
+        unitId: SQM_ID,
+        unitName: "sqm",
+        posting: "quantity",
+      },
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00043" }),
+    );
+    await expect(form.getByLabelText("Task")).toHaveValue(
+      "T-8 Brickwork east wall",
+    );
+    await expect(
+      form.getByText("Will add 42.5 sqm to T-8's progress"),
+    ).toBeVisible();
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ expectedUpdatedAt: worksheet().updatedAt });
+    });
+    await expect(
+      api.calls.mock.calls
+        .map(([call]) => call)
+        .find((call) => call.path.endsWith("/update"))?.body,
+    ).not.toHaveProperty("taskId");
+  },
+};
+
+/**
+ * The sheet's task can no longer be picked (deleted, or now a summary), so the
+ * picker starts empty; saving other changes still keeps the link (CM-806).
+ */
+export const UnavailableTaskKept: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00044",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7003",
+        taskNo: null,
+        name: null,
+        unitId: null,
+        unitName: null,
+        posting: "linked_unit",
+      },
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00044" }),
+    );
+    await expect(form.getByLabelText("Task")).toHaveValue("");
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ expectedUpdatedAt: worksheet().updatedAt });
+    });
+    await expect(
+      api.calls.mock.calls
+        .map(([call]) => call)
+        .find((call) => call.path.endsWith("/update"))?.body,
+    ).not.toHaveProperty("taskId");
+  },
+};
+
+/**
+ * Picking a task and clearing it again is a change: the save sends
+ * `taskId: null`, even though the field ends where it started (CM-806).
+ */
+export const UnavailableTaskCleared: Story = {
+  args: {
+    worksheet: worksheet({
+      number: "WS/26-27/00045",
+      task: {
+        id: "0199c4a0-0000-7000-8000-0000000f7004",
+        taskNo: null,
+        name: null,
+        unitId: null,
+        unitName: null,
+        posting: "linked_unit",
+      },
+    }),
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Edit WS/26-27/00045" }),
+    );
+    await userEvent.type(form.getByLabelText("Task"), "slab");
+    const options = within(
+      await within(canvasElement.ownerDocument.body).findByRole("listbox", {
+        name: "Tasks",
+      }),
+    );
+    await userEvent.click(
+      options.getByRole("option", { name: /First floor slab/ }),
+    );
+    await userEvent.click(
+      await form.findByRole("button", { name: "Clear task" }),
+    );
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(async () => {
+      await expect(
+        api.calls.mock.calls
+          .map(([call]) => call)
+          .find((call) => call.path.endsWith("/update"))?.body,
+      ).toMatchObject({ taskId: null });
+    });
+  },
+};

@@ -18,6 +18,7 @@ import {
   type WorksheetFormOptions,
   type WorksheetPage,
   type WorksheetSettings,
+  type WorksheetTaskOption,
 } from "@/src/queries/worksheets";
 import type { Flag } from "@/src/shared-kernel/access";
 
@@ -113,10 +114,38 @@ export function formOptions(
     ],
     units: [
       { id: SQM_ID, name: "sqm" },
-      { id: "0199c4a0-0000-7000-8000-0000000f0002", name: "cum" },
+      { id: CUM_ID, name: "cum" },
     ],
   };
 }
+
+export const CUM_ID = "0199c4a0-0000-7000-8000-0000000f0002";
+export const SLAB_TASK_ID = "0199c4a0-0000-7000-8000-0000000f7001";
+
+/** Leaf tasks the Task picker offers (CM-806). */
+export const WORKSHEET_TASKS: WorksheetTaskOption[] = [
+  {
+    id: SLAB_TASK_ID,
+    taskNo: 7,
+    name: "First floor slab",
+    unitId: CUM_ID,
+    unitName: "cum",
+  },
+  {
+    id: "0199c4a0-0000-7000-8000-0000000f7002",
+    taskNo: 8,
+    name: "Brickwork east wall",
+    unitId: SQM_ID,
+    unitName: "sqm",
+  },
+  {
+    id: "0199c4a0-0000-7000-8000-0000000f7003",
+    taskNo: 9,
+    name: "Waterproofing",
+    unitId: null,
+    unitName: null,
+  },
+];
 
 export const ATTENDANCE: WorksheetAttendance = {
   date: TODAY,
@@ -145,6 +174,7 @@ export function worksheet(patch: Partial<Worksheet> = {}): Worksheet {
     unskilledCount: 6,
     approxWorkQty: "42.500",
     approxWorkUnit: { id: SQM_ID, name: "sqm" },
+    task: null,
     siteLocation: { type: "location", locationId: LOCATION_ID },
     remark: "Brickwork on the east wall, ground floor.",
     approvalStatus: "not_required",
@@ -266,6 +296,18 @@ export function worksheetHandler(options: WorksheetApiOptions = {}) {
     }
     if (path === `${WORKSHEETS_API}/form-options`)
       return Response.json(formOptions(settings));
+    if (path === `${WORKSHEETS_API}/task-options`) {
+      const search = (url.searchParams.get("search") ?? "").toLowerCase();
+      return Response.json({
+        items: WORKSHEET_TASKS.filter(
+          (task) =>
+            search === "" ||
+            `t-${String(task.taskNo)} ${task.name}`
+              .toLowerCase()
+              .includes(search),
+        ),
+      });
+    }
     if (path === `${WORKSHEETS_API}/attendance`)
       return Response.json({
         ...ATTENDANCE,

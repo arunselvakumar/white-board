@@ -74,6 +74,10 @@ import {
 import { BulkSelectDialog } from "./bulk-select-dialog";
 import { WorksheetAttendancePanel } from "./worksheet-attendance-panel";
 import { quantityText } from "./worksheet-format";
+import {
+  WorksheetTaskPicker,
+  type WorksheetTaskChoice,
+} from "./worksheet-task-picker";
 
 type Settings = WorksheetFormOptions["settings"];
 
@@ -88,6 +92,8 @@ type Values = {
   unskilledCount: string;
   approxWorkQty: string;
   approxWorkUnitId: string;
+  /** The Task the work is for (CM-806). */
+  task: WorksheetTaskChoice | null;
   materials: { materialId: string; quantity: string }[];
   remark: string;
   /** Work Photos picked on a new sheet, uploaded once it is saved. */
@@ -112,6 +118,7 @@ function schemaFor(settings: Settings) {
       unskilledCount: z.string(),
       approxWorkQty: z.string(),
       approxWorkUnitId: z.string(),
+      task: z.custom<WorksheetTaskChoice | null>(),
       materials: z.array(
         z.object({ materialId: z.string(), quantity: z.string() }),
       ),
@@ -194,6 +201,7 @@ function blank(sheetDate: string): Values {
     unskilledCount: "",
     approxWorkQty: "",
     approxWorkUnitId: "",
+    task: null,
     materials: [],
     remark: "",
     photos: [],
@@ -215,6 +223,16 @@ function valuesFrom(sheet: Worksheet, sheetDate: string): Values {
     approxWorkQty:
       sheet.approxWorkQty == null ? "" : quantityText(sheet.approxWorkQty),
     approxWorkUnitId: sheet.approxWorkUnit?.id ?? "",
+    task:
+      sheet.task?.taskNo == null || sheet.task.name == null
+        ? null
+        : {
+            id: sheet.task.id,
+            taskNo: sheet.task.taskNo,
+            name: sheet.task.name,
+            unitId: sheet.task.unitId,
+            unitName: sheet.task.unitName,
+          },
     materials: sheet.materials.map((line) => ({
       materialId: line.materialId,
       quantity: quantityText(line.quantity),
@@ -263,6 +281,9 @@ function fieldFor(error: QueryHttpError): FieldPath<Values> | null {
     case "APPROX_WORK_UNIT_REQUIRED":
     case "UNIT_NOT_FOUND":
       return "approxWorkUnitId";
+    case "WORKSHEET_TASK_NOT_FOUND":
+    case "WORKSHEET_TASK_IS_SUMMARY":
+      return "task";
     case "TEXT_TOO_LONG":
       return details.field === "remark" ? "remark" : null;
     default:
@@ -390,6 +411,9 @@ export function WorksheetForm({
     source?.id ?? null,
   );
   const editing = worksheet != null;
+  // Whether the member picked or cleared the Task (CM-806). Not the field's
+  // dirtiness: clearing back to an empty default must still clear the link.
+  const [taskTouched, setTaskTouched] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schemaFor(settings)),
     defaultValues:
@@ -491,6 +515,12 @@ export function WorksheetForm({
           }))
         : [],
       approve: mode === "approve",
+      // An edit sends the Task only when the member used the field: leaving
+      // it out keeps the sheet's link, even to a task that can no longer be
+      // picked; clearing it sends null.
+      ...(worksheet == null || taskTouched
+        ? { taskId: input.task?.id ?? null }
+        : {}),
     };
     try {
       const saved =
@@ -754,6 +784,23 @@ export function WorksheetForm({
             />
           </div>
         )}
+        <WorksheetTaskPicker
+          id={id("task")}
+          projectId={projectId}
+          value={values.task}
+          onChange={(next) => {
+            setTaskTouched(true);
+            form.setValue("task", next, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          }}
+          work={{
+            quantity: settings.showApproxWorkDone ? values.approxWorkQty : "",
+            unitId: settings.showApproxWorkDone ? values.approxWorkUnitId : "",
+          }}
+          error={errors.task?.message}
+        />
       </section>
     ),
     materials: settings.showMaterials ? (

@@ -7,6 +7,8 @@ import type {
   FinanceReportSource,
   ReportRenderer,
   ReportStorage,
+  TaskProgressSource,
+  TrackingReportSource,
 } from "../application/ports";
 import {
   createReportExecutor,
@@ -42,11 +44,17 @@ export function createReportingHandlers(
     dpr?: DprSource;
     /** The finance reports' read model (CM-709). */
     finance?: FinanceReportSource;
+    /** The tracking reports' and Task Progress Report's read models (CM-805). */
+    tracking?: {
+      source: TrackingReportSource;
+      taskProgress: TaskProgressSource;
+    };
     /** Tests shorten the 60-second limit. */
     timeLimitMs?: number;
   } = {},
 ) {
   const store = prismaReportJobStore(db);
+  const renderDpr = createDprRenderer(storageImageLoader(storage));
   const executor = createReportExecutor({
     store,
     source: prismaReportSource(db),
@@ -57,9 +65,13 @@ export function createReportingHandlers(
         ? undefined
         : {
             source: options.dpr,
-            render: createDprRenderer(storageImageLoader(storage)),
+            render: renderDpr,
           },
     finance: options.finance,
+    tracking:
+      options.tracking == null
+        ? undefined
+        : { ...options.tracking, render: renderDpr },
   });
   return createReportHandlers({
     store,

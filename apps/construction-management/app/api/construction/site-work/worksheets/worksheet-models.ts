@@ -96,6 +96,12 @@ const WorksheetBody = z.object({
     .default([]),
   /** Save & Approve: needs Approve; only with the Project's approval on. */
   approve: z.boolean().default(false),
+  /**
+   * The Task the work is for (CM-806): a live leaf task of the Project.
+   * Its Approx Work Done posts as the task's progress when the units
+   * match. Null clears it; left out keeps the sheet's.
+   */
+  taskId: z.uuid().nullable().optional(),
 });
 
 export const CreateConstructionSiteWorkWorksheetRequestModel =
@@ -208,6 +214,54 @@ export const ConstructionSiteWorkWorksheetMaterialResponseModel = z.object({
   remark: z.string().nullable(),
 });
 
+export const WORKSHEET_TASK_POSTINGS = [
+  "quantity",
+  "linked_unit",
+  "linked_percent",
+  "linked_no_quantity",
+] as const;
+
+export const ConstructionSiteWorkWorksheetTaskResponseModel = z.object({
+  id: z.uuid(),
+  /** Null when the task is no longer live. */
+  taskNo: z.int().nullable(),
+  name: z.string().nullable(),
+  /** The task's Total work unit; null for a percent task. */
+  unitId: z.uuid().nullable(),
+  unitName: z.string().nullable(),
+  /**
+   * `quantity` posts Approx Work Done as progress; the others are linked
+   * only: the unit differs, the task tracks percent, or no work is entered.
+   */
+  posting: z.enum(WORKSHEET_TASK_POSTINGS).nullable(),
+});
+
+export const GetConstructionSiteWorkWorksheetTaskOptionsRequestModel = z.object(
+  {
+    projectId: z.uuid(),
+    /** A Task No. (`7`, `T-7`) or part of the name. */
+    search: z.string().trim().max(100).optional(),
+  },
+);
+
+export const GetConstructionSiteWorkWorksheetTaskOptionsResponseModel =
+  z.object({
+    /** Live leaf tasks of the Project, by Task No.; at most 50. */
+    items: z.array(
+      z.object({
+        id: z.uuid(),
+        taskNo: z.int(),
+        name: z.string(),
+        /** Null for a task that tracks percent. */
+        unitId: z.uuid().nullable(),
+        unitName: z.string().nullable(),
+      }),
+    ),
+  });
+export type GetConstructionSiteWorkWorksheetTaskOptionsResponseModel = z.infer<
+  typeof GetConstructionSiteWorkWorksheetTaskOptionsResponseModel
+>;
+
 export const ConstructionSiteWorkWorksheetResponseModel = z.object({
   id: z.uuid(),
   projectId: z.uuid(),
@@ -221,6 +275,8 @@ export const ConstructionSiteWorkWorksheetResponseModel = z.object({
   unskilledCount: z.int().nullable(),
   approxWorkQty: z.string().nullable(),
   approxWorkUnit: named.nullable(),
+  /** The Task the work is for (CM-806), and whether it posts progress. */
+  task: ConstructionSiteWorkWorksheetTaskResponseModel.nullable(),
   siteLocation: ConstructionSiteWorkWorksheetLocationResponseModel.nullable(),
   remark: z.string().nullable(),
   approvalStatus,
@@ -370,6 +426,7 @@ export function toWorksheetResponse(
       sheet.approxWorkUnitId == null
         ? null
         : { id: sheet.approxWorkUnitId, name: sheet.approxWorkUnitName },
+    task: sheet.task,
     siteLocation:
       sheet.siteLocation == null
         ? null

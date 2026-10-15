@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { localToday } from "@/components/payments/payment-format";
 import { addDays } from "@/src/shared-kernel/calendar-date";
@@ -114,5 +114,26 @@ export const NoDates: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Nothing to chart yet")).toBeVisible();
+  },
+};
+
+/** On a wide screen the time axis runs to the card's right edge. */
+export const FillsTheCard: Story = {
+  args: { initialScale: "month" },
+  render: (args) => (
+    <div style={{ width: 1200 }}>
+      <TaskGanttChart {...args} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const scroller = canvas.getByTestId("gantt-scroll");
+    await waitFor(async () => {
+      await expect(scroller.scrollWidth).toBeGreaterThanOrEqual(
+        scroller.clientWidth,
+      );
+      await expect(
+        Number(canvas.getByTestId("gantt-chart").getAttribute("width")),
+      ).toBeGreaterThanOrEqual(scroller.clientWidth - 168);
+    });
   },
 };

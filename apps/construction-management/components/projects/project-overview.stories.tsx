@@ -4,7 +4,13 @@ import { expect, within } from "storybook/test";
 import type { ProjectResponse } from "@/src/queries/projects";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { ANUGRAHA, project } from "./project-fixtures";
+import {
+  ANUGRAHA,
+  KUMARI,
+  project,
+  projectList,
+  STORY_PROGRESS,
+} from "./project-fixtures";
 import { setProjectFlash } from "./project-flash";
 import { ProjectOverview } from "./project-overview";
 
@@ -12,11 +18,19 @@ const BASE = "/api/construction/projects/projects";
 
 function serve(subject: ProjectResponse) {
   return () =>
-    mockApi((call) =>
-      call.method === "GET" && call.path === `${BASE}/${subject.id}`
-        ? Response.json(subject)
-        : undefined,
-    ).restore;
+    mockApi((call) => {
+      if (call.method === "GET" && call.path === `${BASE}/${subject.id}`)
+        return Response.json(subject);
+      // Project Progress % from Tasks (CM-805).
+      if (
+        call.method === "GET" &&
+        call.path === `${BASE}/${subject.id}/progress`
+      )
+        return Response.json({ progress: STORY_PROGRESS[subject.id] ?? null });
+      if (call.method === "GET" && call.path === BASE)
+        return Response.json(projectList([subject], true, [], STORY_PROGRESS));
+      return undefined;
+    }).restore;
 }
 
 const meta = {
@@ -54,6 +68,31 @@ export const ContractAndAdditionalDetails: Story = {
     );
     await expect(more.getByText("Site engineer")).toBeVisible();
     await expect(more.getByText("Prabhu Saravanan")).toBeVisible();
+  },
+};
+
+/** Project Progress % from Tasks (CM-805) in the Details. */
+export const ProgressFromTasks: Story = {
+  args: { id: KUMARI.id },
+  beforeEach: serve(KUMARI),
+  play: async ({ canvas }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    await expect(
+      await details.findByRole("progressbar", { name: "Project Progress" }),
+    ).toHaveAttribute("aria-valuetext", "42.5%, weighted by Total Price");
+  },
+};
+
+/** A Project without tasks shows no progress at all. */
+export const NoTasksNoProgress: Story = {
+  play: async ({ canvas }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    await expect(details.getByText("Project address")).toBeVisible();
+    await expect(details.queryByText("Progress")).toBeNull();
   },
 };
 

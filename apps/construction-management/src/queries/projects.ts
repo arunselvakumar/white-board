@@ -7,7 +7,10 @@ import {
 import type { UpdateConstructionProjectsProjectRequestModel } from "@/app/api/construction/projects/projects/[id]/update/update-project-request-model";
 import type { CreateConstructionProjectsProjectRequestModel } from "@/app/api/construction/projects/projects/create-project-request-model";
 import type { ListConstructionProjectsCustomFieldLabelsResponseModel } from "@/app/api/construction/projects/projects/custom-field-labels/custom-field-labels-models";
-import type { ListConstructionProjectsProjectsResponseModel } from "@/app/api/construction/projects/projects/list-projects-models";
+import type {
+  ConstructionProjectsProjectProgressResponseModel,
+  ListConstructionProjectsProjectsResponseModel,
+} from "@/app/api/construction/projects/projects/list-projects-models";
 import type { ListConstructionProjectsProjectOptionsResponseModel } from "@/app/api/construction/projects/projects/options/list-project-options-response-model";
 import type { ConstructionProjectsProjectResponseModel } from "@/app/api/construction/projects/projects/project-models";
 
@@ -58,6 +61,17 @@ export function projectQuery(id: string) {
     queryKey: [...PROJECTS_KEY, "detail", id],
     queryFn: () =>
       apiJson<ProjectResponse>(`${PROJECTS_API}/${encodeURIComponent(id)}`),
+  });
+}
+
+/** One Project's Project Progress % from Tasks (CM-805), for its home. */
+export function projectProgressQuery(id: string) {
+  return queryOptions({
+    queryKey: [...PROJECTS_KEY, "progress", id],
+    queryFn: () =>
+      apiJson<ConstructionProjectsProjectProgressResponseModel>(
+        `${PROJECTS_API}/${encodeURIComponent(id)}/progress`,
+      ),
   });
 }
 

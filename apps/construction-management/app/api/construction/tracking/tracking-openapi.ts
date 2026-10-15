@@ -23,6 +23,10 @@ import {
   trackingInspectionOpenApiComponents,
   trackingInspectionOpenApiOperations,
 } from "./inspections/inspections-openapi";
+import {
+  trackingDashboardOpenApiComponents,
+  trackingDashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
 
 /** Every tracking model (M8); each area owns its own file. */
 export const trackingOpenApiComponents: OpenApiComponents = {
@@ -31,6 +35,7 @@ export const trackingOpenApiComponents: OpenApiComponents = {
   ...trackingTaskOpenApiComponents,
   ...trackingIssueOpenApiComponents,
   ...trackingInspectionOpenApiComponents,
+  ...trackingDashboardOpenApiComponents,
 };
 
 /** Every tracking operation (M8). */
@@ -40,4 +45,5 @@ export const trackingOpenApiOperations: OpenApiOperation[] = [
   ...trackingTaskOpenApiOperations,
   ...trackingIssueOpenApiOperations,
   ...trackingInspectionOpenApiOperations,
+  ...trackingDashboardOpenApiOperations,
 ];

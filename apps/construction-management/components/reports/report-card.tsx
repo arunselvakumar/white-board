@@ -214,6 +214,11 @@ function requestFor(
         projectId: scope,
         params: { asOn: period.asOn },
       };
+    // Tracking reports (CM-805).
+    case "task_report":
+    case "issue_snag_report":
+    case "inspection_request_report":
+      return { kind: definition.kind, projectId, params: range };
   }
 }
 

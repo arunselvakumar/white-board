@@ -1,4 +1,5 @@
 import type { FinanceAccessMenu } from "@/app/api/construction/finance/access/access-models";
+import type { TrackingAccessMenu } from "@/app/api/construction/tracking/access/access-models";
 import type { ReportJob, RequestReportInput } from "@/src/queries/reports";
 
 export type ReportDefinition = {
@@ -22,6 +23,8 @@ export type ReportDefinition = {
    * The Ledger's card shows with either of its menus.
    */
   menus?: readonly FinanceAccessMenu[];
+  /** Tracking reports (CM-805): the menu whose Report flag shows the card. */
+  trackingMenu?: Exclude<TrackingAccessMenu, "masters.tags">;
 };
 
 /** The Project's reports (CM-217, CM-218), in the order the page shows them. */
@@ -179,6 +182,42 @@ export const FINANCE_REPORT_CATALOGUE: readonly ReportDefinition[] = [
     period: "as_on",
     needs: "Needs Parties Report.",
     menus: ["finance.parties"],
+  },
+];
+
+/**
+ * The Project's tracking reports (CM-805, ADR CM-0019 §14), each shown by
+ * the viewer's Report flag on its menu.
+ */
+export const TRACKING_REPORT_CATALOGUE: readonly ReportDefinition[] = [
+  {
+    kind: "task_report",
+    title: "Task Report",
+    description:
+      "Tasks added in the period in tree order: level, assignees, planned, baseline and actual dates, variance, progress, status, location, department and contractor; Total and Completed Price with Financial.",
+    period: "range",
+    needs:
+      "Needs Task Report; prices need Financial; without View all, your own and assigned tasks.",
+    trackingMenu: "tracking.tasks",
+  },
+  {
+    kind: "issue_snag_report",
+    title: "Issue & Snag Report",
+    description:
+      "Issues and snags by Issue Date: number, details, priority, category, department, contractor, assignee, due date, location, status, solved on and by, closed on.",
+    period: "range",
+    needs:
+      "Needs Issues and snags Report; without View all, your own and assigned issues.",
+    trackingMenu: "tracking.issues",
+  },
+  {
+    kind: "inspection_request_report",
+    title: "Inspection Request Report",
+    description:
+      "Inspection Requests by Inspection Date: number, date and time, department, contractor, inspector, description, location, status, decided by and on, reason and re-inspection of; the Success Rate.",
+    period: "range",
+    needs: "Needs Inspection Request Report.",
+    trackingMenu: "tracking.inspection_requests",
   },
 ];
 

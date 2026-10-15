@@ -8,6 +8,7 @@ import { equipmentListQuery } from "@/src/queries/equipment";
 import { financeAccessQuery } from "@/src/queries/finance-access";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 import { pettyCashAccountsQuery } from "@/src/queries/finance-petty-cash";
+import { trackingAccessQuery } from "@/src/queries/tracking-access";
 import { worksheetFormOptionsQuery } from "@/src/queries/worksheets";
 
 import { RecentReports } from "./recent-reports";
@@ -16,6 +17,7 @@ import {
   FINANCE_REPORT_CATALOGUE,
   REPORT_CATALOGUE,
   SITE_WORK_REPORT_CATALOGUE,
+  TRACKING_REPORT_CATALOGUE,
   type ReportDefinition,
 } from "./report-catalogue";
 import { ReportCard, type ReportFilterOption } from "./report-card";
@@ -101,6 +103,22 @@ function useFinanceReports(projectId: string): {
   };
 }
 
+/**
+ * The tracking cards the viewer may run on this Project (CM-805), by the
+ * Report flag on each card's menu.
+ */
+function useTrackingReports(projectId: string): ReportDefinition[] {
+  const { data: access } = useQuery({
+    ...trackingAccessQuery(projectId),
+    retry: false,
+  });
+  return TRACKING_REPORT_CATALOGUE.filter(
+    (definition) =>
+      definition.trackingMenu != null &&
+      access?.menus[definition.trackingMenu].includes("report") === true,
+  );
+}
+
 export function ReportGroup({
   id,
   title,
@@ -154,10 +172,11 @@ export function ReportGroup({
 }
 
 /**
- * The Project's Reports tab (CM-217, CM-218, CM-605, CM-608, CM-709): a
- * card per report with its period and Generate, grouped into labour, site
- * work and payments (shown by the viewer's finance Report flags), and the
- * recent reports with Excel / PDF downloads.
+ * The Project's Reports tab (CM-217, CM-218, CM-605, CM-608, CM-709,
+ * CM-805): a card per report with its period and Generate, grouped into
+ * labour, site work, tasks / issues / inspections (shown by the viewer's
+ * tracking Report flags) and payments (by the finance Report flags), and
+ * the recent reports with Excel / PDF downloads.
  */
 export function ReportsPage({
   projectId,
@@ -169,6 +188,7 @@ export function ReportsPage({
 }) {
   const filters = useSiteWorkFilters(projectId);
   const finance = useFinanceReports(projectId);
+  const tracking = useTrackingReports(projectId);
   return (
     <div className="space-y-8">
       <ReportGroup
@@ -188,6 +208,16 @@ export function ReportsPage({
         today={today}
         filters={filters}
       />
+      {tracking.length === 0 ? null : (
+        <ReportGroup
+          id="tracking-reports-heading"
+          title="Tasks, issues and inspections"
+          description="Tasks, Issues & Snags and Inspection Requests on this Project, as an Excel workbook and a PDF."
+          definitions={tracking}
+          projectId={projectId}
+          today={today}
+        />
+      )}
       {finance.definitions.length === 0 ? null : (
         <ReportGroup
           id="finance-reports-heading"

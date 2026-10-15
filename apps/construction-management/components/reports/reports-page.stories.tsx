@@ -30,6 +30,7 @@ import {
   financeLookupsHandler,
 } from "../finance/account-fixtures";
 import { financeAccessHandler } from "../finance/payment-categories/payment-category-fixtures";
+import { trackingAccess } from "../tracking/tasks/task-fixtures";
 import { ReportsPage } from "./reports-page";
 
 const API = "/api/construction/reporting/reports";
@@ -512,6 +513,95 @@ export const NoFinanceReports: Story = {
     await canvas.findByText("No reports yet");
     await expect(
       canvas.queryByRole("region", { name: "Payments and accounts" }),
+    ).toBeNull();
+  },
+};
+
+/**
+ * Tasks, issues and inspections (CM-805): a card per tracking report the
+ * viewer has Report on (here Task and Issue & Snag, not Inspection
+ * Request), each generating for its period.
+ */
+export const TrackingReports: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+      if (
+        call.method === "GET" &&
+        call.path.startsWith("/api/construction/tracking/access")
+      )
+        return Response.json(
+          trackingAccess(PROJECT_ID, {
+            "tracking.tasks": ["read", "report", "financial"],
+            "tracking.issues": ["read", "report"],
+            "tracking.inspection_requests": ["read"],
+          }),
+        );
+      if (call.method === "POST" && call.path === API)
+        return Response.json(
+          job({
+            id: "0190a000-0000-7000-8000-0000000000f2",
+            kind: (call.body as { kind: ReportJob["kind"] }).kind,
+            title: "Task Report",
+            includesMoney: true,
+          }),
+          { status: 201 },
+        );
+      return undefined;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const group = within(
+      await canvas.findByRole("region", {
+        name: "Tasks, issues and inspections",
+      }),
+    );
+    await expect(
+      await group.findByRole("form", { name: "Task Report" }),
+    ).toBeVisible();
+    await expect(
+      group.getByRole("form", { name: "Issue & Snag Report" }),
+    ).toBeVisible();
+    await expect(
+      group.queryByRole("form", { name: "Inspection Request Report" }),
+    ).toBeNull();
+    const tasks = within(group.getByRole("form", { name: "Task Report" }));
+    await userEvent.click(tasks.getByRole("button", { name: "Generate" }));
+    await expect(await tasks.findByText("Ready to download")).toBeVisible();
+    await expect(posted()[0]?.body).toEqual({
+      kind: "task_report",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY },
+    });
+  },
+};
+
+/** Without Report on any tracking menu the group is not shown. */
+export const NoTrackingReports: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+      if (
+        call.method === "GET" &&
+        call.path.startsWith("/api/construction/tracking/access")
+      )
+        return Response.json(
+          trackingAccess(PROJECT_ID, {
+            "tracking.tasks": ["read"],
+            "tracking.issues": ["read"],
+            "tracking.inspection_requests": ["read"],
+          }),
+        );
+      return undefined;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Site work" });
+    await canvas.findByText("No reports yet");
+    await expect(
+      canvas.queryByRole("region", { name: "Tasks, issues and inspections" }),
     ).toBeNull();
   },
 };

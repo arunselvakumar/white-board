@@ -26,6 +26,11 @@ export const REPORT_KINDS = [
   "other_expenses",
   "tds_194c",
   "due_payments",
+  // Tracking reports (CM-805).
+  "task_report",
+  "issue_snag_report",
+  "inspection_request_report",
+  "task_progress_report",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -52,7 +57,19 @@ export const REPORT_TITLES: Record<ReportKind, string> = {
   other_expenses: "Other Expenses",
   tds_194c: "TDS 194C",
   due_payments: "Due Payments",
+  // Tracking reports (CM-805).
+  task_report: "Task Report",
+  issue_snag_report: "Issue & Snag Report",
+  inspection_request_report: "Inspection Request Report",
+  task_progress_report: "Task Progress Report",
 };
+
+/**
+ * Who a Task or Issue & Snag report covers without View all (CM-805): the
+ * rows the requester created or is assigned to (their Team Member), fixed
+ * with the job. Null covers every row (View all or the Owner).
+ */
+export type ReportOwnScope = { userId: string; memberId: string | null };
 
 /** The finance reports (CM-709, ADR CM-0017 §16): all about money. */
 export const FINANCE_REPORT_KINDS = [
@@ -99,21 +116,34 @@ export type LedgerFilters = {
 
 export type ReportFormat = "xlsx" | "pdf";
 
+/** The Project's Progress Reports (CM-606, CM-805): PDFs of their own module. */
+export const PROGRESS_REPORT_KINDS = [
+  "daily_progress_report",
+  "task_progress_report",
+] as const satisfies readonly ReportKind[];
+
+export type ProgressReportKind = (typeof PROGRESS_REPORT_KINDS)[number];
+
+export function isProgressReport(kind: ReportKind): kind is ProgressReportKind {
+  return (PROGRESS_REPORT_KINDS as readonly ReportKind[]).includes(kind);
+}
+
 /**
  * The files a kind produces. Table reports print an Excel and a PDF of the
- * same document; the Daily Progress Report is a PDF only (CM-0016 §15).
+ * same document; the Progress Reports (the Daily Progress Report, CM-0016
+ * §15, and the Task Progress Report, CM-805) are a PDF only.
  */
 export function reportFormats(kind: ReportKind): readonly ReportFormat[] {
-  return kind === "daily_progress_report" ? ["pdf"] : ["xlsx", "pdf"];
+  return isProgressReport(kind) ? ["pdf"] : ["xlsx", "pdf"];
 }
 
 /**
  * Kinds requested, listed and deleted through their own module rather
- * than the Reports page: the Daily Progress Report lives under the
- * Project's Progress Reports (`/api/construction/site-work/progress-reports`).
+ * than the Reports page: the Progress Reports live under the Project's
+ * Progress Reports (`/api/construction/site-work/progress-reports`).
  */
 export function hasOwnModule(kind: ReportKind): boolean {
-  return kind === "daily_progress_report";
+  return isProgressReport(kind);
 }
 
 /** What each kind is filtered by. Dates are `YYYY-MM-DD`, months `YYYY-MM`. */
@@ -208,7 +238,26 @@ export type ReportParams =
       asOn: string;
       /** Central only; unused on a Project's report. */
       projectIds: string[] | null;
-    };
+    }
+  // Tracking reports (CM-805): tasks by created date, issues by Issue
+  // Date, inspections by Inspection Date; the Task Progress Report's
+  // progress at the start and end of the period.
+  | {
+      kind: "task_report";
+      from: string;
+      to: string;
+      /** Without View all: only the requester's own and assigned tasks. */
+      own: ReportOwnScope | null;
+    }
+  | {
+      kind: "issue_snag_report";
+      from: string;
+      to: string;
+      /** Without View all: only the requester's own and assigned issues. */
+      own: ReportOwnScope | null;
+    }
+  | { kind: "inspection_request_report"; from: string; to: string }
+  | { kind: "task_progress_report"; from: string; to: string };
 
 export type JobStatus = "queued" | "running" | "done" | "failed";
 
@@ -262,6 +311,12 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "tds_194c":
       financialYearRange(params.fy);
       return params;
+    // Tracking reports (CM-805).
+    case "task_report":
+    case "issue_snag_report":
+    case "inspection_request_report":
+    case "task_progress_report":
+      return { ...params, ...checkRange(params) };
     case "due_payments":
       assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
       return params;
@@ -335,6 +390,10 @@ const AMOUNT_FREE_KINDS: readonly ReportKind[] = [
   "daily_work",
   "owned_equipment_usage",
   "equipment_transfers",
+  // Tracking reports (CM-805): only the Task Report prints prices.
+  "issue_snag_report",
+  "inspection_request_report",
+  "task_progress_report",
 ];
 
 /** Whether a job of this kind prints amounts when its requester has Financial. */

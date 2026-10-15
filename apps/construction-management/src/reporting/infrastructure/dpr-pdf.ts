@@ -380,6 +380,8 @@ export function dprTexts(document: DprDocument): string[] {
   const texts: string[] = Object.values(document.header).flatMap((value) =>
     typeof value === "string" ? [value] : [],
   );
+  for (const [label, value] of document.header.facts ?? [])
+    texts.push(label, value);
   for (const section of document.sections) {
     texts.push(section.title);
     for (const block of section.blocks) texts.push(...blockTexts(block));
@@ -440,8 +442,9 @@ async function inBatches<T, R>(
 export function createDprRenderer(images: DprImageLoader): DprRenderer {
   return async (document) => {
     const header = document.header;
+    const reference = header.reference ?? header.number;
     const w = await DprPdfWriter.create(
-      `${document.title} ${header.number}`,
+      `${document.title} ${reference}`,
       dprTexts(document),
     );
     const logo =
@@ -474,7 +477,7 @@ export function createDprRenderer(images: DprImageLoader): DprRenderer {
       });
     w.y = Math.min(w.y, top - 52) - 6;
     w.facts(
-      [
+      header.facts ?? [
         ["DPR number", header.number],
         ["Date", header.date],
         ["Report filled by", header.filledBy],
@@ -516,8 +519,8 @@ export function createDprRenderer(images: DprImageLoader): DprRenderer {
     }
 
     w.finish(
-      `${header.company} · ${header.project} · ${header.number} · ${header.date}`,
-      `${document.title} ${header.number}`,
+      `${header.company} · ${header.project} · ${header.reference ?? `${header.number} · ${header.date}`}`,
+      `${document.title} ${reference}`,
     );
     return w.pdf.save();
   };

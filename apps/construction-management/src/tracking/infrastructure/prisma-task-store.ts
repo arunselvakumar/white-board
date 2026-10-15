@@ -481,13 +481,22 @@ export const prismaTaskStore: TaskStore = {
         progressDate: calendarDateToDb(row.progressDate),
         ...progressFigures(row),
         remark: row.remark,
-        source: "manual",
+        source: row.worksheet == null ? "manual" : "worksheet",
+        worksheetId: row.worksheet?.id ?? null,
+        worksheetNumber: row.worksheet?.number ?? null,
         createdAt: row.at,
         updatedAt: row.at,
         createdBy: row.by,
         updatedBy: row.by,
       },
     });
+  },
+
+  async worksheetProgress(db, workspaceId, worksheetId) {
+    const row = await db.constructionTrackingTaskProgress.findFirst({
+      where: { workspaceId, worksheetId, deletedAt: null },
+    });
+    return row == null ? null : toProgress(row);
   },
 
   async updateProgress(db, id, values) {

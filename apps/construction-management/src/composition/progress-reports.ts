@@ -3,7 +3,10 @@ import {
   type ReportJobs,
 } from "@/src/composition/report-jobs";
 import { siteRecordDirectory } from "@/src/composition/site-record-directory";
-import type { ReportJob } from "@/src/reporting/domain/report-job";
+import {
+  PROGRESS_REPORT_KINDS,
+  type ReportJob,
+} from "@/src/reporting/domain/report-job";
 import { ProgressReportHandlers } from "@/src/site-work/application/progress-report-handlers";
 import type {
   ProgressReportJob,
@@ -17,16 +20,43 @@ import { prisma } from "@repo/construction-db";
 const progressReportNotFound = () =>
   notFound("PROGRESS_REPORT_NOT_FOUND", "This Progress Report was not found.");
 
-/** A reporting job as a DPR; null when it is another kind of report. */
+/**
+ * A reporting job as a Progress Report (a DPR or a Task Progress Report);
+ * null when it is another kind of report.
+ */
 function toProgressReport(job: ReportJob): ProgressReportJob | null {
   const params = job.params;
-  if (params.kind !== "daily_progress_report" || job.projectId == null)
-    return null;
+  if (job.projectId == null) return null;
+  const common = {
+    id: job.id,
+    projectId: job.projectId,
+    status: job.status,
+    error: job.error,
+    includesMoney: job.includesMoney,
+    requestedBy: job.requestedBy,
+    createdAt: job.createdAt,
+    finishedAt: job.finishedAt,
+  };
+  if (params.kind === "task_progress_report")
+    return {
+      ...common,
+      kind: params.kind,
+      number: null,
+      date: null,
+      from: params.from,
+      to: params.to,
+      filledBy: null,
+      includeImages: false,
+    };
+  if (params.kind !== "daily_progress_report") return null;
   return {
     id: job.id,
     projectId: job.projectId,
+    kind: params.kind,
     number: params.number,
     date: params.date,
+    from: params.date,
+    to: params.date,
     filledBy: params.filledBy,
     includeImages: params.includeImages,
     status: job.status,
@@ -40,7 +70,7 @@ function toProgressReport(job: ReportJob): ProgressReportJob | null {
 
 /**
  * Site work's `ProgressReportJobs` port over the reporting context's job
- * handlers (CM-606): Daily Progress Report jobs only.
+ * handlers (CM-606, CM-805): Daily and Task Progress Report jobs only.
  */
 export function progressReportJobs(reports: ReportJobs): ProgressReportJobs {
   async function load(workspaceId: string, id: string) {
@@ -66,20 +96,23 @@ export function progressReportJobs(reports: ReportJobs): ProgressReportJobs {
           userId: input.userId,
           projectId: input.projectId,
           includesMoney: input.includesMoney,
-          params: {
-            kind: "daily_progress_report",
-            date: input.date,
-            filledBy: input.filledBy,
-            includeImages: input.includeImages,
-            number: input.number,
-          },
+          params:
+            input.kind === "task_progress_report"
+              ? { kind: input.kind, from: input.from, to: input.to }
+              : {
+                  kind: "daily_progress_report",
+                  date: input.date,
+                  filledBy: input.filledBy,
+                  includeImages: input.includeImages,
+                  number: input.number,
+                },
         }),
       );
     },
     async list(workspaceId, projectId) {
       const jobs = await reports.list(workspaceId, {
         projectId,
-        kinds: ["daily_progress_report"],
+        kinds: PROGRESS_REPORT_KINDS,
       });
       return jobs.flatMap((job) => toProgressReport(job) ?? []);
     },

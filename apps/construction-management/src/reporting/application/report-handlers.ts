@@ -3,6 +3,7 @@ import { companyFileKey, type StoredObject } from "@/src/shared-kernel/files";
 import { newId as defaultNewId } from "@/src/shared-kernel/ids";
 
 import { buildDailyProgressReport } from "../domain/daily-progress-report";
+import { buildTaskProgressReport } from "../domain/task-progress-report";
 import {
   checkReportParams,
   checkReportScope,
@@ -22,6 +23,8 @@ import type {
   DprSource,
   FinanceReportSource,
   ProjectLookup,
+  TaskProgressSource,
+  TrackingReportSource,
   ReportFile,
   ReportJobStore,
   ReportRenderer,
@@ -76,6 +79,15 @@ export function createReportExecutor(deps: {
   dpr?: { source: DprSource; render: DprRenderer };
   /** The finance reports' read model (CM-709). */
   finance?: FinanceReportSource;
+  /**
+   * The tracking reports' read model and the Task Progress Report's
+   * (CM-805), printed by the DPR's writer.
+   */
+  tracking?: {
+    source: TrackingReportSource;
+    taskProgress: TaskProgressSource;
+    render: DprRenderer;
+  };
   clock?: Clock;
 }): ReportExecutor {
   const clock = deps.clock ?? (() => new Date());
@@ -94,11 +106,23 @@ export function createReportExecutor(deps: {
       const pdf = await deps.dpr.render(buildDailyProgressReport(model));
       return { fileName: reportFileName(params), pdf, xlsx: null };
     }
+    if (params.kind === "task_progress_report") {
+      if (deps.tracking == null || job.projectId == null)
+        throw new Error("The Task Progress Report source is not wired.");
+      const model = await deps.tracking.taskProgress.read({
+        workspaceId: job.workspaceId,
+        projectId: job.projectId,
+        range: { from: params.from, to: params.to },
+      });
+      const pdf = await deps.tracking.render(buildTaskProgressReport(model));
+      return { fileName: reportFileName(params), pdf, xlsx: null };
+    }
     const document = await buildReportDocument(
       job,
       deps.source,
       clock(),
       deps.finance,
+      deps.tracking?.source,
     );
     const [xlsx, pdf] = await Promise.all([
       deps.renderer.xlsx(document),

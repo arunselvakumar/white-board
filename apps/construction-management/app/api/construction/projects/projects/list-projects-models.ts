@@ -13,12 +13,35 @@ export const ListConstructionProjectsProjectsQueryModel = z.object({
 
 const count = z.int().nonnegative();
 
+/** Project Progress % from Tasks (CM-0019 §4, CM-805). */
+export const ConstructionProjectsProgressModel = z.object({
+  pct: z.number().describe("0–100, two decimals."),
+  weighting: z
+    .enum(["price", "duration"])
+    .describe(
+      "Total Price when every leaf task has one, else planned duration.",
+    ),
+});
+
+/** One Project's progress, for its home (CM-805). */
+export const ConstructionProjectsProjectProgressResponseModel = z.object({
+  progress: ConstructionProjectsProgressModel.nullable().describe(
+    "Null when the Project has no tasks; the home shows no bar.",
+  ),
+});
+export type ConstructionProjectsProjectProgressResponseModel = z.infer<
+  typeof ConstructionProjectsProjectProgressResponseModel
+>;
+
 /** A Project on the Projects home: the Project and the caller's pin (CM-411). */
 export const ConstructionProjectsProjectListItemModel =
   ConstructionProjectsProjectResponseModel.extend({
     pinned: z
       .boolean()
       .describe("The caller pinned it; pinned Projects come first."),
+    progress: ConstructionProjectsProgressModel.nullable().describe(
+      "Project Progress % from Tasks (CM-0019 §4, CM-805); null when the Project has no tasks, and the card shows no bar.",
+    ),
   });
 
 export type ConstructionProjectsProjectListItemModel = z.infer<

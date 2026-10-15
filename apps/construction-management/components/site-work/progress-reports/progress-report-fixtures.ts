@@ -19,12 +19,15 @@ export function progressReport(
   extra: Partial<ProgressReport> = {},
 ): ProgressReport {
   const id = extra.id ?? "0199c4a0-0000-7000-8000-0000000d1001";
+  const date = extra.date === undefined ? "2026-10-10" : extra.date;
   return {
     id,
     projectId: PROGRESS_PROJECT_ID,
     kind: "daily_progress_report",
     number: "DPR/26-27/00003",
-    date: "2026-10-10",
+    date,
+    from: date ?? "2026-10-01",
+    to: date ?? "2026-10-10",
     filledBy: null,
     includeImages: true,
     status: "done",
@@ -61,6 +64,18 @@ export const FAILED = progressReport({
   actions: { download: false, retry: true, delete: true },
 });
 
+/** A Task Progress Report for the month so far (CM-805): no number, no filters. */
+export const TASK_PROGRESS = progressReport({
+  id: "0199c4a0-0000-7000-8000-0000000d1004",
+  kind: "task_progress_report",
+  number: null,
+  date: null,
+  from: "2026-10-01",
+  to: "2026-10-10",
+  includeImages: false,
+  includesMoney: false,
+});
+
 export const FORM_OPTIONS: ProgressReportFormOptions = {
   today: PROGRESS_TODAY,
   teamMembers: [
@@ -77,8 +92,8 @@ export const FORM_OPTIONS: ProgressReportFormOptions = {
     {
       key: "task_progress_report",
       label: "Task Progress Report",
-      available: false,
-      note: "Coming with Tasks (M8)",
+      available: true,
+      note: null,
     },
   ],
 };
@@ -92,7 +107,9 @@ export type ProgressReportApiOptions = {
 export function progressReportHandler(
   options: ProgressReportApiOptions = {},
 ): (call: ApiCall) => Response | undefined {
-  let reports = [...(options.reports ?? [RUNNING, READY, FAILED])];
+  let reports = [
+    ...(options.reports ?? [RUNNING, TASK_PROGRESS, READY, FAILED]),
+  ];
   return (call) => {
     const url = new URL(call.path, "http://storybook.local");
     const path = url.pathname;
@@ -105,12 +122,25 @@ export function progressReportHandler(
     if (call.method === "GET" && path === API)
       return Response.json({ items: reports });
     if (call.method === "POST" && path === API) {
-      const body = call.body as { date: string };
-      const created = progressReport({
-        id: "0199c4a0-0000-7000-8000-0000000d1009",
-        number: "DPR/26-27/00005",
-        date: body.date,
-      });
+      const body = call.body as {
+        kind?: string;
+        date?: string;
+        from?: string;
+        to?: string;
+      };
+      const created =
+        body.kind === "task_progress_report"
+          ? progressReport({
+              ...TASK_PROGRESS,
+              id: "0199c4a0-0000-7000-8000-0000000d1008",
+              from: body.from ?? "",
+              to: body.to ?? "",
+            })
+          : progressReport({
+              id: "0199c4a0-0000-7000-8000-0000000d1009",
+              number: "DPR/26-27/00005",
+              date: body.date ?? null,
+            });
       reports = [created, ...reports];
       return Response.json(created, { status: 201 });
     }
@@ -119,9 +149,11 @@ export function progressReportHandler(
       reports = reports.map((report) =>
         report.id === retry[1]
           ? progressReport({
-              id: report.id,
-              number: report.number,
-              date: report.date,
+              ...report,
+              status: "done",
+              error: null,
+              download: `${API}/${report.id}/download`,
+              actions: { download: true, retry: false, delete: true },
             })
           : report,
       );

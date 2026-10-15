@@ -10,6 +10,7 @@ import { isResponse } from "@/app/api/_lib/require-session";
 import {
   isMoneyReport,
   printsAmounts,
+  type ReportOwnScope,
   type ReportParams,
 } from "@/src/reporting/domain/report-job";
 
@@ -23,6 +24,7 @@ import {
   reportableKinds,
   reports,
   requireReportSession,
+  trackingOwnScope,
 } from "./handlers";
 import {
   ListConstructionReportingReportsRequestModel,
@@ -37,6 +39,7 @@ function paramsOf(
   model: RequestConstructionReportingReportRequestModel,
   projectIds: string[] | null,
   pettyCashAccounts: string[] | null,
+  own: ReportOwnScope | null,
 ): ReportParams {
   switch (model.kind) {
     case "labour_attendance":
@@ -113,6 +116,17 @@ function paramsOf(
       };
     case "due_payments":
       return { kind: model.kind, asOn: model.params.asOn, projectIds };
+    // Tracking reports (CM-805).
+    case "task_report":
+    case "issue_snag_report":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        own,
+      };
+    case "inspection_request_report":
+      return { kind: model.kind, from: model.params.from, to: model.params.to };
   }
 }
 
@@ -182,11 +196,16 @@ export async function POST(request: Request): Promise<Response> {
           "There is no such petty-cash account.",
         );
     }
+    // Task and Issue & Snag reports: without View all, own rows only.
+    const own =
+      model.kind === "task_report" || model.kind === "issue_snag_report"
+        ? await trackingOwnScope(session, model.kind, model.projectId)
+        : null;
     const job = await reports.request({
       workspaceId: session.workspaceId,
       userId: session.userId,
       projectId: model.projectId,
-      params: paramsOf(model, projectIds, pettyCashAccounts),
+      params: paramsOf(model, projectIds, pettyCashAccounts, own),
       includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {

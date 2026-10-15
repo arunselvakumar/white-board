@@ -64,6 +64,25 @@ function filledBy(report: ProgressReport): string {
   return report.filledBy.name ?? "a former member";
 }
 
+/** A DPR's number and date, or a Task Progress Report's period. */
+function reportLabel(report: ProgressReport): {
+  title: string;
+  when: string;
+} {
+  if (report.kind === "task_progress_report")
+    return {
+      title: "Task Progress Report",
+      when:
+        report.from === report.to
+          ? formatDate(report.from)
+          : `${formatDate(report.from)} – ${formatDate(report.to)}`,
+    };
+  return {
+    title: report.number ?? "Daily Progress Report",
+    when: formatDate(report.date ?? report.from),
+  };
+}
+
 function StatusBadge({ report }: { report: ProgressReport }) {
   if (report.status === "done") return <Badge variant="secondary">Ready</Badge>;
   if (report.status === "failed")
@@ -86,18 +105,21 @@ function ReportItem({
   onError: (message: string) => void;
 }) {
   const retry = useRetryProgressReport(report.projectId);
-  const label = `${report.number} ${formatDate(report.date)}`;
+  const { title, when } = reportLabel(report);
+  const label = `${title} ${when}`;
   return (
     <li className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium break-all">{report.number}</span>
-          <span className="text-sm">{formatDate(report.date)}</span>
+          <span className="font-medium break-all">{title}</span>
+          <span className="text-sm">{when}</span>
           <StatusBadge report={report} />
         </div>
         <p className="text-muted-foreground text-sm">
-          Filled by {filledBy(report)} · requested by{" "}
-          {report.requestedBy.name ?? "a former member"},{" "}
+          {report.kind === "task_progress_report"
+            ? "Tasks by location"
+            : `Filled by ${filledBy(report)}`}{" "}
+          · requested by {report.requestedBy.name ?? "a former member"},{" "}
           {requestedAt.format(new Date(report.createdAt))}
         </p>
         {report.status === "failed" && report.error != null ? (
@@ -184,10 +206,11 @@ function ReportList({
           <EmptyMedia variant="icon">
             <NotebookText />
           </EmptyMedia>
-          <EmptyTitle>No Daily Progress Reports yet</EmptyTitle>
+          <EmptyTitle>No Progress Reports yet</EmptyTitle>
           <EmptyDescription>
-            Generate one for a day: its weather, labour, worksheets, equipment,
-            materials, visitors and hindrances in one PDF.
+            Generate a Daily Progress Report for a day (its weather, labour,
+            worksheets, equipment, materials, visitors and hindrances) or a Task
+            Progress Report for a period, each as one PDF.
           </EmptyDescription>
         </EmptyHeader>
         {onCreate != null && (
@@ -203,10 +226,7 @@ function ReportList({
 
   return (
     <>
-      <ul
-        aria-label="Daily Progress Reports"
-        className="divide-y rounded-xl border"
-      >
+      <ul aria-label="Progress Reports" className="divide-y rounded-xl border">
         {data.items.map((report) => (
           <ReportItem
             key={report.id}
@@ -224,9 +244,19 @@ function ReportList({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {deleting?.number}?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Delete{" "}
+              {deleting == null
+                ? ""
+                : deleting.kind === "task_progress_report"
+                  ? `the Task Progress Report of ${reportLabel(deleting).when}`
+                  : deleting.number}
+              ?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              The PDF is deleted. Generating this date again keeps its number.
+              {deleting?.kind === "task_progress_report"
+                ? "The PDF is deleted."
+                : "The PDF is deleted. Generating this date again keeps its number."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -256,10 +286,11 @@ function ReportList({
 }
 
 /**
- * The Project's Progress Reports module (CM-606): **Create new** opens the
- * Daily Progress Report dialog; **View Reports** lists the generated DPRs
- * (number, date, filled by, requested by, status), polling while one is
- * being prepared, with Download, Retry for a failed one, and Delete.
+ * The Project's Progress Reports module (CM-606, CM-805): **Create new**
+ * opens the dialog for a Daily Progress Report or a Task Progress Report;
+ * **View Reports** lists the generated reports (a DPR's number and date or
+ * a Task Progress Report's period, requested by, status), polling while
+ * one is being prepared, with Download, Retry for a failed one, and Delete.
  */
 export function ProgressReportsPage({ projectId }: { projectId: string }) {
   const { data: access } = useSuspenseQuery(siteWorkAccessQuery(projectId));
@@ -293,7 +324,8 @@ export function ProgressReportsPage({ projectId }: { projectId: string }) {
         <div className="space-y-1">
           <h2 className="font-semibold">Progress Reports</h2>
           <p className="text-muted-foreground text-sm">
-            Daily Progress Reports: the site diary of a day as a PDF.
+            Daily Progress Reports (the site diary of a day) and Task Progress
+            Reports (each task&apos;s progress over a period), as PDFs.
           </p>
         </div>
         {canCreate && (

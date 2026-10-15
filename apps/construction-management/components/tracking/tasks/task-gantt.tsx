@@ -4,7 +4,14 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChartGantt, ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Button } from "@repo/ui/components/button";
 import {
   Empty,
@@ -190,6 +197,19 @@ export function TaskGanttChart({
   const router = useRouter();
   const [scale, setScale] = useState<GanttScale>(initialScale);
   const scroller = useRef<HTMLDivElement>(null);
+  // The card's width: the time axis runs at least that far.
+  const [cardWidth, setCardWidth] = useState(0);
+  const observer = useRef<ResizeObserver | null>(null);
+  const measure = useCallback((element: HTMLDivElement | null) => {
+    scroller.current = element;
+    observer.current?.disconnect();
+    observer.current = null;
+    if (element == null) return;
+    observer.current = new ResizeObserver(([entry]) => {
+      setCardWidth(entry?.contentRect.width ?? 0);
+    });
+    observer.current.observe(element);
+  }, []);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const rows = useMemo(() => {
     const byId = new Map(items.map((item) => [item.id, item]));
@@ -230,11 +250,13 @@ export function TaskGanttChart({
     );
 
   const unit = DAY_WIDTH[scale];
-  const span = daysBetween(range.start, range.end) + 1;
+  const fill = Math.ceil((cardWidth - NAME_WIDTH) / unit);
+  const span = Math.max(daysBetween(range.start, range.end) + 1, fill);
+  const end = addDays(range.start, span - 1);
   const width = span * unit;
   const x = (date: string) => daysBetween(range.start, date) * unit;
   const height = HEADER + rows.length * ROW;
-  const ticks = ganttTicks(range.start, range.end, scale);
+  const ticks = ganttTicks(range.start, end, scale);
   const todayX = x(today) + unit / 2;
 
   return (
@@ -286,7 +308,7 @@ export function TaskGanttChart({
       </div>
       <div className="bg-card overflow-hidden rounded-lg border">
         <div
-          ref={scroller}
+          ref={measure}
           className="overflow-x-auto"
           data-testid="gantt-scroll"
         >

@@ -8,7 +8,7 @@ import {
 
 import { REPORT_FILE_KIND } from "../application/report-handlers";
 import type { ReportJobStore } from "../application/ports";
-import type { ReportJob, ReportKind, ReportParams } from "../domain/report-job";
+import type { ReportJob, ReportParams } from "../domain/report-job";
 
 type Row = NonNullable<
   Awaited<
@@ -21,8 +21,7 @@ function toJob(row: Row): ReportJob {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    // The tracking kinds (CM-805) join `REPORT_KINDS` with their builders.
-    kind: row.kind as ReportKind,
+    kind: row.kind,
     params: row.params as ReportParams,
     status: row.status,
     includesMoney: row.includesMoney,

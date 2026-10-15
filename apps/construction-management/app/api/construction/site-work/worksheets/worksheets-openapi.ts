@@ -25,6 +25,9 @@ import {
   GetConstructionSiteWorkWorksheetAvailableStockResponseModel,
   GetConstructionSiteWorkWorksheetFormOptionsRequestModel,
   GetConstructionSiteWorkWorksheetFormOptionsResponseModel,
+  GetConstructionSiteWorkWorksheetTaskOptionsRequestModel,
+  GetConstructionSiteWorkWorksheetTaskOptionsResponseModel,
+  ConstructionSiteWorkWorksheetTaskResponseModel,
   ListConstructionSiteWorkWorksheetsRequestModel,
   ListConstructionSiteWorkWorksheetsResponseModel,
   RejectConstructionSiteWorkWorksheetRequestModel,
@@ -51,6 +54,8 @@ const ITEM = `${WORKSHEETS_PATH}/{id}`;
 
 /** Request and Response models of `/api/construction/site-work/worksheets` (CM-602). */
 export const worksheetOpenApiComponents: OpenApiComponents = {
+  ConstructionSiteWorkWorksheetTaskResponseModel,
+  GetConstructionSiteWorkWorksheetTaskOptionsResponseModel,
   ConstructionSiteWorkWorksheetLocationModel,
   ConstructionSiteWorkWorksheetLocationResponseModel,
   CreateConstructionSiteWorkWorksheetRequestModel,
@@ -110,6 +115,17 @@ export const worksheetOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "The form's options",
     successSchema: GetConstructionSiteWorkWorksheetFormOptionsResponseModel,
+    errors: READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${WORKSHEETS_PATH}/task-options`,
+    summary: "The Task picker: live leaf tasks of the Project, searched",
+    tags: TAGS,
+    query: GetConstructionSiteWorkWorksheetTaskOptionsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "Up to 50 tasks",
+    successSchema: GetConstructionSiteWorkWorksheetTaskOptionsResponseModel,
     errors: READ_ERRORS,
   },
   {

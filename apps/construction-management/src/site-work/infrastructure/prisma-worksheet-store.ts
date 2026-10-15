@@ -49,6 +49,7 @@ function toStored(row: Row): StoredWorksheet {
     unskilledCount: row.unskilledCount,
     approxWorkQty: row.approxWorkQty?.toFixed(3) ?? null,
     approxWorkUnitId: row.approxWorkUnitId,
+    taskId: row.taskId,
     siteLocation: storedLocationRef(row.siteLocation),
     remark: row.remark,
     approval: {
@@ -94,6 +95,7 @@ function contentColumns(row: WorksheetRow) {
     approxWorkQty:
       row.approxWorkQty == null ? null : new Prisma.Decimal(row.approxWorkQty),
     approxWorkUnitId: row.approxWorkUnitId,
+    taskId: row.taskId,
     siteLocationType: row.siteLocation?.type ?? null,
     // No location is left out here and written as SQL NULL by
     // `clearSiteLocation`: `next dev` turns `Prisma.DbNull` into `{}`.

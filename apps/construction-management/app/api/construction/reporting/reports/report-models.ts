@@ -52,6 +52,9 @@ const COUNTERPARTY_KINDS = [
  * Site work: Daily Work needs Daily Worksheet Report, the usage reports
  * Equipment Usage Report (hire cost with its Financial), maintenance and
  * transfers Equipments Report (maintenance cost with its Financial).
+ * Tracking: Task Report needs Task Report (prices with Task Financial),
+ * Issue & Snag Report Issues and snags Report, Inspection Request Report
+ * Inspection Request Report.
  */
 export const RequestConstructionReportingReportRequestModel =
   z.discriminatedUnion("kind", [
@@ -169,6 +172,26 @@ export const RequestConstructionReportingReportRequestModel =
       /** Null for the central report (Central Payment). */
       projectId: z.uuid().nullable(),
       params: z.object({ asOn: z.iso.date() }),
+    }),
+    // Tracking reports (CM-805, ADR CM-0019 §14). Without View all a Task
+    // or Issue & Snag report covers your own and assigned rows only.
+    z.object({
+      kind: z.literal("task_report"),
+      projectId: z.uuid(),
+      /** Tasks added in the period; prices need Task Financial. */
+      params: DateRangeParams,
+    }),
+    z.object({
+      kind: z.literal("issue_snag_report"),
+      projectId: z.uuid(),
+      /** Issues with an Issue Date in the period. */
+      params: DateRangeParams,
+    }),
+    z.object({
+      kind: z.literal("inspection_request_report"),
+      projectId: z.uuid(),
+      /** Requests with an Inspection Date in the period. */
+      params: DateRangeParams,
     }),
   ]);
 
