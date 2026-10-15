@@ -127,9 +127,25 @@ class LogSender implements EmailSender {
   }
 }
 
-export function createEmailSender(
-  transport: EmailTransport = transportFromEnv(),
-): EmailSender {
+/**
+ * The sender for `transport`, or with none given, for `EMAIL_TRANSPORT` read
+ * when the first email is sent. Auth modules create their sender as they
+ * load, and `next build` loads them on a runner where Vercel's sensitive
+ * variables are placeholders (ADR-0046): a misconfigured transport must fail
+ * the first send, not the build.
+ */
+export function createEmailSender(transport?: EmailTransport): EmailSender {
+  if (transport != null) return senderFor(transport);
+  let sender: EmailSender | null = null;
+  return {
+    async send(email) {
+      sender ??= senderFor(transportFromEnv());
+      await sender.send(email);
+    },
+  };
+}
+
+function senderFor(transport: EmailTransport): EmailSender {
   switch (transport) {
     case "resend":
       return new ResendSender();
