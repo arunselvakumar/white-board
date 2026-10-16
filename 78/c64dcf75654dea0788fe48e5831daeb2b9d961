@@ -1,0 +1,21 @@
+apps/construction-management/app/api/construction/organization/company-deletion/company-deletion.http.test.ts
+  s_fb0c94bf6be054::t_0073b12d015fc2 1-182
+apps/construction-management/src/composition/company-purge.http.test.ts
+  s_fb0c94bf6be054::t_21b9c8eca8eb51 1-265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "78c64dcf75654dea0788fe48e5831daeb2b9d961",
+  "prompts": {},
+  "sessions": {
+    "s_fb0c94bf6be054": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a838bb4e0c75b21e4",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
