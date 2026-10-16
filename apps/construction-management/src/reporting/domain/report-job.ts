@@ -1,6 +1,12 @@
 import { assertCalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
+import {
+  catalogueEntry,
+  catalogueKinds,
+  REPORT_CATALOGUE,
+  type CatalogueKindsWhere,
+} from "./report-catalogue";
 import { checkRange, financialYearRange, monthRange } from "./report-period";
 
 /** Every kind of report job (the Prisma enum `report_kind`). */
@@ -42,41 +48,10 @@ export const REPORT_KINDS = [
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
 
-export const REPORT_TITLES: Record<ReportKind, string> = {
-  labour_attendance: "All Labour Attendance",
-  labour_payment: "All Labour Payment",
-  labour_month: "Month-wise Labour",
-  vendor_attendance: "Vendor Attendance",
-  muster_roll: "Muster roll and wage register",
-  // Site work reports (CM-605, CM-606, CM-608).
-  daily_progress_report: "Daily Progress Report",
-  daily_work: "Daily Work",
-  owned_equipment_usage: "Company Owned Equipment Usage",
-  rented_equipment_usage: "Rented Equipment Usage",
-  equipment_maintenance: "Equipment Maintenance",
-  equipment_transfers: "Equipment Transfers",
-  // Finance reports (CM-709).
-  account_ledger: "Ledger",
-  petty_cash: "Petty Cash",
-  transactions: "Transactions",
-  contractor_payments: "Contractor Payments",
-  supplier_payments: "Supplier Payments",
-  other_expenses: "Other Expenses",
-  tds_194c: "TDS 194C",
-  due_payments: "Due Payments",
-  // Tracking reports (CM-805).
-  task_report: "Task Report",
-  issue_snag_report: "Issue & Snag Report",
-  inspection_request_report: "Inspection Request Report",
-  task_progress_report: "Task Progress Report",
-  // Procurement and central labour reports (CM-903).
-  purchase_requests: "Purchase Requests",
-  purchase_orders: "Purchase Orders",
-  material_received: "Material Received",
-  material_transfers: "Material Transfers",
-  stock_register: "Stock Register",
-  labour_attendance_central: "Central Labour Attendance",
-};
+/** Each kind's title, from the catalogue. */
+export const REPORT_TITLES = Object.fromEntries(
+  REPORT_CATALOGUE.map((entry) => [entry.kind, entry.title]),
+) as Record<ReportKind, string>;
 
 /**
  * Who a Task or Issue & Snag report covers without View all (CM-805): the
@@ -86,18 +61,11 @@ export const REPORT_TITLES: Record<ReportKind, string> = {
 export type ReportOwnScope = { userId: string; memberId: string | null };
 
 /** The finance reports (CM-709, ADR CM-0017 §16): all about money. */
-export const FINANCE_REPORT_KINDS = [
-  "account_ledger",
-  "petty_cash",
-  "transactions",
-  "contractor_payments",
-  "supplier_payments",
-  "other_expenses",
-  "tds_194c",
-  "due_payments",
-] as const satisfies readonly ReportKind[];
+export type FinanceReportKind = CatalogueKindsWhere<{ group: "finance" }>;
 
-export type FinanceReportKind = (typeof FINANCE_REPORT_KINDS)[number];
+export const FINANCE_REPORT_KINDS = catalogueKinds<FinanceReportKind>(
+  (entry) => entry.group === "finance",
+);
 
 export function isFinanceReport(kind: ReportKind): kind is FinanceReportKind {
   return (FINANCE_REPORT_KINDS as readonly ReportKind[]).includes(kind);
@@ -131,24 +99,23 @@ export type LedgerFilters = {
 export type ReportFormat = "xlsx" | "pdf";
 
 /** The Project's Progress Reports (CM-606, CM-805): PDFs of their own module. */
-export const PROGRESS_REPORT_KINDS = [
-  "daily_progress_report",
-  "task_progress_report",
-] as const satisfies readonly ReportKind[];
+export type ProgressReportKind = CatalogueKindsWhere<{ progressReport: true }>;
 
-export type ProgressReportKind = (typeof PROGRESS_REPORT_KINDS)[number];
+export const PROGRESS_REPORT_KINDS = catalogueKinds<ProgressReportKind>(
+  (entry) => entry.progressReport,
+);
 
 export function isProgressReport(kind: ReportKind): kind is ProgressReportKind {
-  return (PROGRESS_REPORT_KINDS as readonly ReportKind[]).includes(kind);
+  return catalogueEntry(kind).progressReport;
 }
 
 /**
- * The files a kind produces. Table reports print an Excel and a PDF of the
- * same document; the Progress Reports (the Daily Progress Report, CM-0016
- * §15, and the Task Progress Report, CM-805) are a PDF only.
+ * The files a kind produces (the catalogue's `formats`). Table reports
+ * print an Excel and a PDF of the same document; the Progress Reports are
+ * a PDF only.
  */
 export function reportFormats(kind: ReportKind): readonly ReportFormat[] {
-  return isProgressReport(kind) ? ["pdf"] : ["xlsx", "pdf"];
+  return catalogueEntry(kind).formats;
 }
 
 /**
@@ -158,6 +125,14 @@ export function reportFormats(kind: ReportKind): readonly ReportFormat[] {
  */
 export function hasOwnModule(kind: ReportKind): boolean {
   return isProgressReport(kind);
+}
+
+/**
+ * Whether the kind's builder exists (the catalogue's `available`):
+ * requesting one that does not is 409 `REPORT_NOT_AVAILABLE`.
+ */
+export function isReportAvailable(kind: ReportKind): boolean {
+  return catalogueEntry(kind).available;
 }
 
 /** What each kind is filtered by. Dates are `YYYY-MM-DD`, months `YYYY-MM`. */
@@ -346,26 +321,15 @@ export function checkReportParams(params: ReportParams): ReportParams {
   }
 }
 
-/**
- * Kinds that can also be central (no Project on the job): the vendor
- * report, and the equipment reports of Masters → Equipments (CM-605).
- */
-export const CENTRAL_REPORT_KINDS: readonly ReportKind[] = [
-  "vendor_attendance",
-  // Site work reports (CM-605).
-  "equipment_maintenance",
-  "equipment_transfers",
-  // Finance reports (CM-709): the Ledger and TDS 194C are always central.
-  "account_ledger",
-  "tds_194c",
-  "due_payments",
-];
+/** Kinds that can be central (no Project on the job), from the catalogue. */
+export const CENTRAL_REPORT_KINDS = catalogueKinds((entry) =>
+  entry.scopes.includes("central"),
+);
 
 /** Kinds that are only central (they never take a Project). */
-export const CENTRAL_ONLY_KINDS: readonly ReportKind[] = [
-  "account_ledger",
-  "tds_194c",
-];
+export const CENTRAL_ONLY_KINDS = catalogueKinds(
+  (entry) => !entry.scopes.includes("project"),
+);
 
 export function canBeCentral(kind: ReportKind): boolean {
   return CENTRAL_REPORT_KINDS.includes(kind);
@@ -390,30 +354,16 @@ export function checkReportScope(
 
 /** Reports that are about money; refused without Financial. */
 export function isMoneyReport(kind: ReportKind): boolean {
-  return (
-    kind === "labour_payment" || kind === "muster_roll" || isFinanceReport(kind)
-  );
+  return catalogueEntry(kind).money === "always";
 }
 
 /**
- * Kinds whose files never print an amount, so a job of theirs never needs
- * Financial to download (`includesMoney` stays false).
+ * Whether a job of this kind prints amounts when its requester has
+ * Financial; a kind that never does never needs Financial to download
+ * (`includesMoney` stays false).
  */
-const AMOUNT_FREE_KINDS: readonly ReportKind[] = [
-  "labour_attendance",
-  // Site work reports (CM-605, CM-608).
-  "daily_work",
-  "owned_equipment_usage",
-  "equipment_transfers",
-  // Tracking reports (CM-805): only the Task Report prints prices.
-  "issue_snag_report",
-  "inspection_request_report",
-  "task_progress_report",
-];
-
-/** Whether a job of this kind prints amounts when its requester has Financial. */
 export function printsAmounts(kind: ReportKind): boolean {
-  return !AMOUNT_FREE_KINDS.includes(kind);
+  return catalogueEntry(kind).money !== "never";
 }
 
 /** The download name: `all-labour-attendance-2026-09-01-to-2026-09-30`. */

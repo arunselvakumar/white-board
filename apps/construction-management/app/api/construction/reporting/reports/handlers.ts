@@ -14,9 +14,13 @@ import type {
 } from "@/src/reporting/domain/report-job";
 import { createReportJobs } from "@/src/composition/report-jobs";
 import {
+  canRequestReport,
+  canSeeReportMoney,
+} from "@/src/reporting/application/report-access";
+import { REPORT_CATALOGUE } from "@/src/reporting/domain/report-catalogue";
+import {
   canBeCentral,
   hasOwnModule,
-  isFinanceReport,
   REPORT_KINDS,
 } from "@/src/reporting/domain/report-job";
 import {
@@ -31,64 +35,21 @@ export const reports = createReportJobs();
 
 /**
  * The menu whose Report flag a kind needs (and whose Financial puts
- * amounts in its files). Labour reports sit under Labour, the vendor
- * report under Vendor (`modules/08` decisions); the Reports page that
- * lists them is behind Reports (`reporting.project_reports`) Read. The Daily Progress Report sits under Progress
- * Report, which has no Report flag: it is requested, listed and deleted
- * from the Project's Progress Reports module (C / R / D, CM-606), never
- * from these routes.
+ * amounts in its files), from the report catalogue
+ * (`src/reporting/domain/report-catalogue.ts`). Labour reports sit under
+ * Labour, the vendor report under Vendor; the Progress Reports under
+ * Progress Report, which has no Report flag: they are requested, listed
+ * and deleted from the Project's Progress Reports module (C / R / D,
+ * CM-606), never from these routes.
  */
-export const REPORT_MENU: Record<ReportKind, MenuKey> = {
-  labour_attendance: "labour.labour",
-  labour_payment: "labour.labour",
-  labour_month: "labour.labour",
-  muster_roll: "labour.labour",
-  vendor_attendance: "labour.vendor",
-  // Site work reports (CM-605, CM-608): Daily Work under Daily Worksheet,
-  // usage under Equipment Usage (hire cost with its Financial), maintenance
-  // and transfers under Equipments (maintenance cost with its Financial).
-  daily_work: "site_work.daily_worksheet",
-  owned_equipment_usage: "site_work.equipment_usage",
-  rented_equipment_usage: "site_work.equipment_usage",
-  equipment_maintenance: "masters.equipments",
-  equipment_transfers: "masters.equipments",
-  // CM-606: never through these routes (`hasOwnModule`).
-  daily_progress_report: "site_work.progress_reports",
-  // Finance reports (CM-709, ADR CM-0017 §14): the Ledger of a company
-  // account under Company's Bank A/C (a petty-cash account's under Petty
-  // Cash, `canReport`), party reports under Parties.
-  account_ledger: "masters.bank_accounts",
-  petty_cash: "finance.petty_cash",
-  transactions: "finance.transactions",
-  contractor_payments: "finance.parties",
-  supplier_payments: "finance.parties",
-  other_expenses: "finance.other_expenses",
-  tds_194c: "finance.parties",
-  due_payments: "finance.parties",
-  // Tracking reports (CM-805, ADR CM-0019 §14): each under its menu, the
-  // Task Report's prices with Task Financial. The Task Progress Report is
-  // a Progress Report (`hasOwnModule`), never requested here.
-  task_report: "tracking.tasks",
-  issue_snag_report: "tracking.issues",
-  inspection_request_report: "tracking.inspection_requests",
-  task_progress_report: "site_work.progress_reports",
-  // Procurement and central labour reports (CM-903): each under its
-  // module's menu, the Stock Register under Current Inventory.
-  purchase_requests: "procurement.purchase_requests",
-  purchase_orders: "procurement.purchase_orders",
-  material_received: "procurement.material_received",
-  material_transfers: "procurement.material_transfers",
-  stock_register: "procurement.current_inventory",
-  labour_attendance_central: "labour.labour",
-};
-
-function scope(projectId: string | null) {
-  return projectId == null ? {} : { projectId };
-}
+export const REPORT_MENU = Object.fromEntries(
+  REPORT_CATALOGUE.map((entry) => [entry.kind, entry.menu]),
+) as Record<ReportKind, MenuKey>;
 
 /**
- * The `report` flag on the kind's menu (and the Project). Never for a
- * kind with its own module: those routes check their own flags.
+ * The `report` flag on the kind's menu (and the Project); the Ledger's
+ * with either Company's Bank A/C or Petty Cash. Never for a kind with its
+ * own module: those routes check their own flags.
  */
 export function canReport(
   access: MemberAccess,
@@ -96,12 +57,7 @@ export function canReport(
   projectId: string | null,
 ): boolean {
   if (hasOwnModule(kind)) return false;
-  if (kind === "account_ledger")
-    return (
-      can(access, "masters.bank_accounts", "report") ||
-      can(access, "finance.petty_cash", "report")
-    );
-  return can(access, REPORT_MENU[kind], "report", scope(projectId));
+  return canRequestReport(access, kind, projectId);
 }
 
 /** Financial on the kind's menu: amounts in the files. */
@@ -110,10 +66,7 @@ export function canSeeMoney(
   kind: ReportKind,
   projectId: string | null,
 ): boolean {
-  // Finance menus carry no Financial flag: Report is the right to see
-  // their money (ADR CM-0017 §14).
-  if (isFinanceReport(kind)) return canReport(access, kind, projectId);
-  return can(access, REPORT_MENU[kind], "financial", scope(projectId));
+  return canSeeReportMoney(access, kind, projectId);
 }
 
 /** The kinds this Team Member may report on for a Project (or centrally). */

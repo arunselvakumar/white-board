@@ -8,7 +8,9 @@ import {
   checkReportParams,
   checkReportScope,
   failureMessage,
+  isReportAvailable,
   REPORT_TIME_LIMIT_MS,
+  REPORT_TITLES,
   reportFileName,
   reportFormats,
   ReportTimedOut,
@@ -293,6 +295,17 @@ export type RequestReport = {
 
 export type ReportDownload = StoredObject & { fileName: string };
 
+/**
+ * 409 `REPORT_NOT_AVAILABLE`: the kind is in the catalogue but its
+ * builder is not built yet (`available: false`).
+ */
+export function reportNotAvailable(kind: ReportKind) {
+  return conflict(
+    "REPORT_NOT_AVAILABLE",
+    `The ${REPORT_TITLES[kind]} report is not available yet.`,
+  );
+}
+
 /** A requester's limit of reports queued or running at once (CM-0021 §1). */
 export const MAX_UNFINISHED_REPORTS = 5;
 
@@ -324,6 +337,8 @@ export function createReportHandlers(deps: {
      * response), done or failed outside one (tests).
      */
     async request(input: RequestReport): Promise<ReportJob> {
+      if (!isReportAvailable(input.params.kind))
+        throw reportNotAvailable(input.params.kind);
       checkReportScope(input.params.kind, input.projectId);
       const params = checkReportParams(input.params);
       if (
