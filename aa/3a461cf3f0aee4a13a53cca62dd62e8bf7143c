@@ -1,0 +1,19 @@
+apps/whiteboard/components/absence-notices/family/absence-notices-family.stories.tsx
+  s_9b8b004c55c7f2::t_bf5ed2262d0686 633-653,659,676
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aa3a461cf3f0aee4a13a53cca62dd62e8bf7143c",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
