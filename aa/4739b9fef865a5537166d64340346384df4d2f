@@ -1,0 +1,63 @@
+apps/construction-management/app/app/notifications/page.tsx
+  s_9b8b004c55c7f2::t_1d8f697ea14521 1-9
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_9b8b004c55c7f2::t_57cec4e53f8899 26-27,122-123,136
+apps/construction-management/components/my-profile/my-profile-screen.tsx
+  s_9b8b004c55c7f2::t_56e8a531e77849 7,28
+apps/construction-management/components/notifications/notification-bell.stories.tsx
+  s_9b8b004c55c7f2::t_4cbf179e694543 1-188
+apps/construction-management/components/notifications/notification-bell.tsx
+  s_9b8b004c55c7f2::t_4e82fbcaf7c6fd 1-161
+apps/construction-management/components/notifications/notification-fixtures.ts
+  s_9b8b004c55c7f2::t_9ddd5036361160 1-278
+apps/construction-management/components/notifications/notification-item.tsx
+  s_9b8b004c55c7f2::t_f862cc2f9e4bda 1-229
+apps/construction-management/components/notifications/notifications-screen.stories.tsx
+  s_9b8b004c55c7f2::t_52203f9880ff06 1-214
+apps/construction-management/components/notifications/ready-download-toast.tsx
+  s_9b8b004c55c7f2::t_cdf96a2135ceab 1-166
+apps/construction-management/components/profile/notification-settings.stories.tsx
+  s_9b8b004c55c7f2::t_4e8b6ecd15515e 1-232
+apps/construction-management/components/profile/notification-settings.tsx
+  s_9b8b004c55c7f2::t_6391aa05361d03 1-239
+apps/construction-management/components/profile/push-device.ts
+  s_9b8b004c55c7f2::t_3961e1209f9b52 1-85
+apps/construction-management/eslint.config.js
+  s_9b8b004c55c7f2::t_9f963d28eaa922 103-104
+apps/construction-management/lib/notification-format.ts
+  s_9b8b004c55c7f2::t_b175f23f51f4da 1-57
+apps/construction-management/public/sw.js
+  s_9b8b004c55c7f2::t_012ce8fd203bee 1-80
+apps/construction-management/components/notifications/notification-queries.ts
+  s_755b698723fa29::t_652edbe399bc2b 1-177
+apps/construction-management/components/notifications/notifications-screen.tsx
+  s_755b698723fa29::t_ad12203592dd2d 1-124
+apps/construction-management/components/notifications/ready-download-toast.stories.tsx
+  s_755b698723fa29::t_713a91f67c1293 1-141
+apps/construction-management/lib/notification-format.test.ts
+  s_755b698723fa29::t_130da6ff5f2c77 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "aa4739b9fef865a5537166d64340346384df4d2f",
+  "prompts": {},
+  "sessions": {
+    "s_755b698723fa29": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a996c09efcb180556",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
