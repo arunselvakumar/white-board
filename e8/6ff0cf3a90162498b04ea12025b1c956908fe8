@@ -1,0 +1,37 @@
+apps/construction-management/app/app/dashboard/page.tsx
+  s_9b8b004c55c7f2::t_d05776e5f6c638 1-39
+apps/construction-management/app/app/layout.tsx
+  s_9b8b004c55c7f2::t_c4f9393935b7f6 8-9,17-21,24
+apps/construction-management/components/app-shell/app-nav-icons.ts
+  s_9b8b004c55c7f2::t_6e04cbb4a592b3 1-7,12-14,16
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_9b8b004c55c7f2::t_2e24063e423667 6,12,16,65,72-116
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_9b8b004c55c7f2::t_e93e560b656202 48-52,54-60,89,146-156,166-167
+apps/construction-management/components/dashboard/company-dashboard.stories.tsx
+  s_9b8b004c55c7f2::t_3674d743183d43 1-309
+apps/construction-management/components/dashboard/company-dashboard.tsx
+  s_9b8b004c55c7f2::t_daccab46582adf 1-434
+apps/construction-management/lib/app-nav.test.ts
+  s_9b8b004c55c7f2::t_84079a11ae3c47 6,8
+apps/construction-management/lib/app-nav.ts
+  s_9b8b004c55c7f2::t_86739a4d98bf73 2-5,8-14
+apps/construction-management/src/queries/company-dashboard.ts
+  s_9b8b004c55c7f2::t_29090593f541ad 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e86ff0cf3a90162498b04ea12025b1c956908fe8",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
