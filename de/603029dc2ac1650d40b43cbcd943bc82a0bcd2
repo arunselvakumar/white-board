@@ -1,0 +1,47 @@
+apps/construction-management/app/api/construction/reporting/backups/backup-models.ts
+  s_9b8b004c55c7f2::t_b2d6dc46a72487 38-42,68
+apps/construction-management/app/api/construction/reporting/backups/backups.http.test.ts
+  s_9b8b004c55c7f2::t_754682829a75fa 24-28,207-221,626,660-673,685-743,966,968-981
+apps/construction-management/app/api/construction/reporting/backups/handlers.ts
+  s_9b8b004c55c7f2::t_85a6adbcbb73c6 90
+apps/construction-management/app/api/construction/reporting/backups/route.ts
+  s_9b8b004c55c7f2::t_a94fc8f2225ea1 13,60-63,141-145,157
+apps/construction-management/components/backups/company-backup-screen.stories.tsx
+  s_9b8b004c55c7f2::t_0c63d4211f2ae4 25-41,52-53,108-151
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_9b8b004c55c7f2::t_a0ebce678dcd94 4,9,36,38-45,95,169-282,285-286,309-312
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_996b893a1d9665 512,524
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_2711280ea13176 1023-1026
+apps/construction-management/src/composition/backup-sources.ts
+  s_9b8b004c55c7f2::t_f0fa99d3012068 226-234,1559-1975
+apps/construction-management/src/queries/backups.ts
+  s_9b8b004c55c7f2::t_1d3af539af6b01 38
+apps/construction-management/src/reporting/application/backup-access.test.ts
+  s_9b8b004c55c7f2::t_a8706a25a14348 16,128-150
+apps/construction-management/src/reporting/application/backup-access.ts
+  s_9b8b004c55c7f2::t_b6ce7d44f36921 58,71,96-106,119,135
+apps/construction-management/src/reporting/application/backup-queue.ts
+  s_9b8b004c55c7f2::t_7a92fdc3b27a7a 23,172,374,408,417
+apps/construction-management/src/reporting/domain/backup-job.ts
+  s_9b8b004c55c7f2::t_0717cdbd514f24 3-4,110-118,125,160-163,170-174,176-180
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_9b8b004c55c7f2::t_98f756c0fa8987 12-17,383-438,462,487-495
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "de603029dc2ac1650d40b43cbcd943bc82a0bcd2",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
