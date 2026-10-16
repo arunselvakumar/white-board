@@ -1,0 +1,25 @@
+apps/construction-management/app/api/construction/reporting/company-dashboard/company-dashboard.http.test.ts
+  s_9b8b004c55c7f2::t_6e8c8246d325c4 1-316
+apps/construction-management/app/api/construction/reporting/company-dashboard/dashboard-views.http.test.ts
+  s_9b8b004c55c7f2::t_e3610699588aa2 1-489
+apps/construction-management/src/reporting/domain/company-dashboard.test.ts
+  s_9b8b004c55c7f2::t_a9c62839e92285 1-154
+apps/construction-management/test/dashboard-documents.ts
+  s_9b8b004c55c7f2::t_02f0d4952d1141 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3ab4aa326ac8eece70cb4d422d542ac4a286f62a",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
