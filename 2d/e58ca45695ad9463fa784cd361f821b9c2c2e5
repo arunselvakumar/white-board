@@ -1,0 +1,19 @@
+apps/construction-management/src/messaging/application/listeners.ts
+  s_9b8b004c55c7f2::t_1bc7923ecb390d 662-664,666-671,683-684
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2de58ca45695ad9463fa784cd361f821b9c2c2e5",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
