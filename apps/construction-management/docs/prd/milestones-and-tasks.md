@@ -900,7 +900,7 @@ Goal: reports that run on a real queue and stay downloadable, a catalogue every 
 | CM-903 |   3 | Central Reports workspace; procurement and central labour report kinds                                         | todo   | CM-901         | HTTP+UI        |
 | CM-904 |   4 | Notifications: `messaging` context, bell and list, web push, N flag, events from the modules, ready popups     | done   | CM-901         | Domain+HTTP+UI |
 | CM-905 |   5 | Chat: member, group, project; support tickets — **not in this delivery** (owner, 2026-10-16)                   | todo   | CM-904         | Domain+HTTP+UI |
-| CM-906 |   6 | Backups (data/media per module, date range; full Company with a code) and Download My Data                     | todo   | CM-901, CM-904 | HTTP+UI        |
+| CM-906 |   6 | Backups (data/media per module, date range; full Company with a code) and Download My Data                     | in_progress | CM-901, CM-904 | HTTP+UI        |
 | CM-907 |   7 | Devices; Transfer ownership; Delete My Account; Delete Company with cooling-off; code-gated Aadhaar/PAN reveal | done   | CM-901         | Domain+HTTP+UI |
 
 ### CM-901 — Job queue, catalogue, Downloads, retention

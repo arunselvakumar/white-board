@@ -29,6 +29,28 @@ type Db = Prisma.TransactionClient;
  * optional transaction so the caller's own changes commit with it.
  */
 export const accounts = {
+  /** The User's identity profile, for Download My Data (CM-906); null when gone. */
+  async profile(userId: string): Promise<{
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    phoneNumber: string | null;
+    createdAt: Date;
+  } | null> {
+    return prisma.identityUser.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        phoneNumber: true,
+        createdAt: true,
+      },
+    });
+  },
+
   /** The User's live sessions, most recently active first. */
   async listSessions(
     userId: string,

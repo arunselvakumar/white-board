@@ -139,3 +139,17 @@ export type InboundReportFinished = DomainEvent & {
   fileName: string | null;
   error: string | null;
 };
+
+// Backups and data exports (CM-906, ADR CM-0021 §8).
+export type InboundBackupFinished = DomainEvent & {
+  type: "BackupFinished";
+  backupJobId: string;
+  scope: "project" | "masters" | "company" | "my_data";
+  projectId: string | null;
+  requestedBy: string;
+  status: "done" | "failed";
+  title: string;
+  fileName: string | null;
+  downloadHref: string | null;
+  error: string | null;
+};
