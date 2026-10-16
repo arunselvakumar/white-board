@@ -231,12 +231,12 @@ export type PurgeDeps = {
 };
 
 /**
- * Purges one due Company: its rows (`purgeCompanyRows`), then its stored
- * objects, then its memberships, invitations and Workspace in
- * `@repo/auth`, and marks the `company_deletions` record completed with
- * the summary. An object that cannot be deleted is left for the daily
- * orphan clean-up (CM-901), which removes objects under
- * `companies/<id>/` that no `stored_files` row names.
+ * Purges one due Company: its rows (`purgeCompanyRows`), then every
+ * stored object under `companies/<id>/` (listed, plus the `stored_files`
+ * keys), then its memberships, invitations and Workspace in `@repo/auth`,
+ * and marks the `company_deletions` record completed with the summary. An
+ * object that cannot be deleted is left for the daily orphan clean-up
+ * (CM-901), which removes objects that no `stored_files` row names.
  */
 export async function purgeCompany(
   deletion: CompanyDeletion,
@@ -246,8 +246,19 @@ export async function purgeCompany(
   const storage = deps.storage ?? objectStorage();
   const store = deps.store ?? new PrismaCompanyDeletionStore(db);
   const clock = deps.clock ?? (() => new Date());
-  const keys = await storedKeys(deletion.workspaceId, db);
+  const recorded = await storedKeys(deletion.workspaceId, db);
   const summary = await purgeCompanyRows(deletion.workspaceId, db);
+  // Everything under the Company's prefix, recorded or not (report and
+  // backup outputs, orphans).
+  const keys = new Set(recorded);
+  let cursor: string | null = null;
+  do {
+    const page = await storage.list(`companies/${deletion.workspaceId}/`, {
+      cursor,
+    });
+    for (const object of page.objects) keys.add(object.key);
+    cursor = page.cursor;
+  } while (cursor != null);
   let objects = 0;
   for (const key of keys) {
     try {

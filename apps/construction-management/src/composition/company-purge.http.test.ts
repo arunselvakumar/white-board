@@ -136,7 +136,14 @@ async function busyCompany(name: string) {
     bytes: 5,
     createdBy: owner.userId,
   });
-  return { owner, member, key };
+  // An object no `stored_files` row names (a report output, say).
+  const unrecorded = companyFileKey(owner.workspaceId, "reports", "pdf");
+  await objectStorage().put(
+    unrecorded,
+    new Uint8Array([1, 2, 3]),
+    "application/pdf",
+  );
+  return { owner, member, key, unrecorded };
 }
 
 describe("deletionOrder", () => {
@@ -218,6 +225,7 @@ describe("organization.company_purge (CM-907)", () => {
 
     // Files, memberships and the Workspace are gone.
     await expect(objectStorage().head(doomed.key)).resolves.toBeNull();
+    await expect(objectStorage().head(doomed.unrecorded)).resolves.toBeNull();
     await expect(
       prisma.identityWorkspace.count({
         where: { id: doomed.owner.workspaceId },
@@ -247,7 +255,7 @@ describe("organization.company_purge (CM-907)", () => {
     const summary = record.summary as Record<string, number>;
     expect(summary["construction_projects.projects"]).toBe(1);
     expect(summary["construction_organization.sequence_counters"]).toBe(1);
-    expect(summary["storage.objects"]).toBe(1);
+    expect(summary["storage.objects"]).toBe(2);
     // Scheduling added its own audit and code rows since `before`.
     for (const [table, count] of Object.entries(nonZero(before)))
       if (!KEPT_TABLES.has(table))
