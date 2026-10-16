@@ -1,0 +1,339 @@
+apps/construction-management/.env.example
+  s_9b8b004c55c7f2::t_dd042e7e050b0f 74-82
+apps/construction-management/CONTEXT.md
+  s_9b8b004c55c7f2::t_3e5ee81b2765af 194-197
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_9b8b004c55c7f2::t_a27725423f6cf2 7-10,15-18,977-980,990-992
+apps/construction-management/app/api/construction/finance/dashboard/route.ts
+  s_9b8b004c55c7f2::t_13368f084df3cc 6,8-11,24,37-39,60-64,66-82,100,110
+apps/construction-management/app/api/construction/finance/invoices/invoices.http.test.ts
+  s_9b8b004c55c7f2::t_82c25f40265e76 5,10,89-92,449-500
+apps/construction-management/app/api/construction/finance/other-expenses/handlers.ts
+  s_9b8b004c55c7f2::t_d47806a2ad0281 9,25
+apps/construction-management/app/api/construction/finance/other-expenses/other-expenses.http.test.ts
+  s_9b8b004c55c7f2::t_8b507763ed8c29 3,19,130-133,432-480
+apps/construction-management/app/api/construction/finance/petty-cash/handlers.ts
+  s_9b8b004c55c7f2::t_74ce67e2acafb1 7,38
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash.http.test.ts
+  s_9b8b004c55c7f2::t_aec8afe88be96c 6,15,193-196,598-663
+apps/construction-management/app/api/construction/finance/transactions/handlers.ts
+  s_9b8b004c55c7f2::t_563b0382b26cbd 10,68
+apps/construction-management/app/api/construction/finance/transactions/transactions.http.test.ts
+  s_9b8b004c55c7f2::t_0831df6ee2d19a 6,15,104-107,461-519
+apps/construction-management/app/api/construction/hrms/attendance/attendance.http.test.ts
+  s_9b8b004c55c7f2::t_79c4d40429d6b0 6,18,194-197,491-564
+apps/construction-management/app/api/construction/hrms/attendance/handlers.ts
+  s_9b8b004c55c7f2::t_dfb53faba81847 1,5-7
+apps/construction-management/app/api/construction/hrms/leave-route.ts
+  s_9b8b004c55c7f2::t_57a0510c6017d3 12,18-20
+apps/construction-management/app/api/construction/hrms/leaves/leaves.http.test.ts
+  s_9b8b004c55c7f2::t_0be1ba1eab88a2 5,9,124-127,547-659
+apps/construction-management/app/api/construction/hrms/salaries/salary-route.ts
+  s_9b8b004c55c7f2::t_ffe463bdeeddbc 2,11
+apps/construction-management/app/api/construction/messaging/handlers.ts
+  s_9b8b004c55c7f2::t_256c11f6691773 1-23
+apps/construction-management/app/api/construction/messaging/messaging-models.ts
+  s_9b8b004c55c7f2::t_346c3452d476d1 1-153
+apps/construction-management/app/api/construction/messaging/messaging-openapi.ts
+  s_9b8b004c55c7f2::t_609c18cd33cde1 1-159
+apps/construction-management/app/api/construction/messaging/messaging.http.test.ts
+  s_9b8b004c55c7f2::t_49aa218c8e5cbe 1-760
+apps/construction-management/app/api/construction/messaging/notifications/[id]/delete/route.ts
+  s_9b8b004c55c7f2::t_8a4b2bf5f4079f 1-36
+apps/construction-management/app/api/construction/messaging/notifications/[id]/read/route.ts
+  s_9b8b004c55c7f2::t_db1a32c1e0c82b 1-38
+apps/construction-management/app/api/construction/messaging/notifications/read-all/route.ts
+  s_9b8b004c55c7f2::t_8ebcbd9ebde8ce 1-20
+apps/construction-management/app/api/construction/messaging/notifications/route.ts
+  s_9b8b004c55c7f2::t_cceee94a34462c 1-42
+apps/construction-management/app/api/construction/messaging/notifications/unread-count/route.ts
+  s_9b8b004c55c7f2::t_24258047091ffc 1-36
+apps/construction-management/app/api/construction/messaging/preferences/route.ts
+  s_9b8b004c55c7f2::t_5897efac8ac8ed 1-20
+apps/construction-management/app/api/construction/messaging/preferences/update/route.ts
+  s_9b8b004c55c7f2::t_961cbc7ff2d960 1-37
+apps/construction-management/app/api/construction/messaging/push-subscriptions/delete/route.ts
+  s_9b8b004c55c7f2::t_3a149239c6dbae 1-26
+apps/construction-management/app/api/construction/messaging/push-subscriptions/route.ts
+  s_9b8b004c55c7f2::t_b11f2abcdaa6bf 1-37
+apps/construction-management/app/api/construction/messaging/push/config/route.ts
+  s_9b8b004c55c7f2::t_dc170a9b7c7115 1-21
+apps/construction-management/app/api/construction/procurement/dashboard/route.ts
+  s_9b8b004c55c7f2::t_4af1a5c5308212 6,19,32-33,57,69,84
+apps/construction-management/app/api/construction/procurement/inventory/handlers.ts
+  s_9b8b004c55c7f2::t_a8ce96e038176e 26
+apps/construction-management/app/api/construction/procurement/material-requests/central-store.http.test.ts
+  s_9b8b004c55c7f2::t_1cd8a4d12c265b 3,22,139-142,594-657
+apps/construction-management/app/api/construction/procurement/purchase-orders/handlers.ts
+  s_9b8b004c55c7f2::t_5369f30cdfe4f2 26
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders.http.test.ts
+  s_9b8b004c55c7f2::t_d8e903fe9fba96 4,10,213-216,638-695
+apps/construction-management/app/api/construction/procurement/purchase-requests/handlers.ts
+  s_9b8b004c55c7f2::t_4fd53dc6c1a5e2 27
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-requests.http.test.ts
+  s_9b8b004c55c7f2::t_2880749e4ff797 3,10,132-135,434-493
+apps/construction-management/app/api/construction/procurement/stores/central-store-wiring.ts
+  s_9b8b004c55c7f2::t_2fa3bdbcb18259 18,36
+apps/construction-management/app/api/construction/procurement/transfers/handlers.ts
+  s_9b8b004c55c7f2::t_0930dfef4c19b1 7
+apps/construction-management/app/api/construction/procurement/transfers/transfers.http.test.ts
+  s_9b8b004c55c7f2::t_a328412d5f167d 3,21,132-135,270-330
+apps/construction-management/app/api/construction/projects/dashboard-layout/dashboard-layout-models.ts
+  s_9b8b004c55c7f2::t_64908db37a209e 6,10-19,22-23,37-41,75,85
+apps/construction-management/app/api/construction/projects/dashboard-layout/route.ts
+  s_9b8b004c55c7f2::t_f3d8dfaac1487a 1,6-9,16-18,22-26,31,34-40
+apps/construction-management/app/api/construction/projects/project-home-openapi.ts
+  s_9b8b004c55c7f2::t_c3ac7fe3c943b7 14,158,160,164
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_9b8b004c55c7f2::t_7cf6a3ce6e8fbd 15,27,242,325-388
+apps/construction-management/app/api/construction/reporting/company-dashboard/company-dashboard-models.ts
+  s_9b8b004c55c7f2::t_ede44876950e66 1-132
+apps/construction-management/app/api/construction/reporting/company-dashboard/company-dashboard-openapi.ts
+  s_9b8b004c55c7f2::t_b186055c309472 1-35
+apps/construction-management/app/api/construction/reporting/company-dashboard/company-dashboard.http.test.ts
+  s_9b8b004c55c7f2::t_e18b3871f1a699 1-317
+apps/construction-management/app/api/construction/reporting/company-dashboard/dashboard-views.http.test.ts
+  s_9b8b004c55c7f2::t_19d8736379d650 1-489
+apps/construction-management/app/api/construction/reporting/company-dashboard/route.ts
+  s_9b8b004c55c7f2::t_4015be6d955698 1-45
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets.http.test.ts
+  s_9b8b004c55c7f2::t_d0206d4e07cc22 742-820
+apps/construction-management/app/api/construction/site-work/equipment-sheets/handlers.ts
+  s_9b8b004c55c7f2::t_4063b89021c3a4 16,59
+apps/construction-management/app/api/construction/site-work/worksheets/handlers.ts
+  s_9b8b004c55c7f2::t_1f1407f800cc63 19,56
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets.http.test.ts
+  s_9b8b004c55c7f2::t_3e43c2edb8773f 3,15-18,240-249,751-818
+apps/construction-management/app/api/construction/tracking/dashboard/dashboard-models.ts
+  s_9b8b004c55c7f2::t_731763badc09e2 134-137,162,189
+apps/construction-management/app/api/construction/tracking/dashboard/route.ts
+  s_9b8b004c55c7f2::t_65effc3b1d10d7 4,16,23-24,41-46
+apps/construction-management/app/api/construction/tracking/issues/handlers.ts
+  s_9b8b004c55c7f2::t_e4faa933cabe3e 10,31
+apps/construction-management/app/app/dashboard/page.tsx
+  s_9b8b004c55c7f2::t_690246669a23fa 1-39
+apps/construction-management/app/app/layout.tsx
+  s_9b8b004c55c7f2::t_840175e9e1a995 8-9,17-21,24
+apps/construction-management/app/app/notifications/page.tsx
+  s_9b8b004c55c7f2::t_dfc224a2592f20 1-9
+apps/construction-management/components/app-shell/app-nav-icons.ts
+  s_9b8b004c55c7f2::t_f2857d84ec48f7 1-7,12-14,16
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_9b8b004c55c7f2::t_c08cb0fffd4ff4 6,12,16,65,72-116
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_9b8b004c55c7f2::t_988de915def2fc 26-27,50-54,56-62,91,130-131,144,150-160,170-171
+apps/construction-management/components/dashboard/company-dashboard.stories.tsx
+  s_9b8b004c55c7f2::t_9679efce3dc567 1-309
+apps/construction-management/components/dashboard/company-dashboard.tsx
+  s_9b8b004c55c7f2::t_17033526826844 1-434
+apps/construction-management/components/my-profile/my-profile-screen.tsx
+  s_9b8b004c55c7f2::t_5e85e509114931 7,28
+apps/construction-management/components/notifications/notification-bell.stories.tsx
+  s_9b8b004c55c7f2::t_2214d4016395da 1-188
+apps/construction-management/components/notifications/notification-bell.tsx
+  s_9b8b004c55c7f2::t_64c0d73c80738d 1-161
+apps/construction-management/components/notifications/notification-fixtures.ts
+  s_9b8b004c55c7f2::t_73dd0c740dcb25 1-278
+apps/construction-management/components/notifications/notification-item.tsx
+  s_9b8b004c55c7f2::t_03329dd6439359 1-229
+apps/construction-management/components/notifications/notification-queries.ts
+  s_9b8b004c55c7f2::t_c72613cf692537 1-177
+apps/construction-management/components/notifications/notifications-screen.stories.tsx
+  s_9b8b004c55c7f2::t_ec7309730dbdc7 1-214
+apps/construction-management/components/notifications/notifications-screen.tsx
+  s_9b8b004c55c7f2::t_bb63785b38820c 1-124
+apps/construction-management/components/notifications/ready-download-toast.stories.tsx
+  s_9b8b004c55c7f2::t_7e5c2e9eaebf65 1-141
+apps/construction-management/components/notifications/ready-download-toast.tsx
+  s_9b8b004c55c7f2::t_aa0874f7d0b63a 1-166
+apps/construction-management/components/profile/notification-settings.stories.tsx
+  s_9b8b004c55c7f2::t_e4246a78578f6e 1-232
+apps/construction-management/components/profile/notification-settings.tsx
+  s_9b8b004c55c7f2::t_72f8312356f32f 1-239
+apps/construction-management/components/profile/push-device.ts
+  s_9b8b004c55c7f2::t_c03fb9d5f07e2c 1-85
+apps/construction-management/components/projects/dashboard/manage-dashboard-dialog.tsx
+  s_9b8b004c55c7f2::t_16ab17ecc49359 17-18,38-40,99-100,106-145
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_9b8b004c55c7f2::t_b442bec2c4350d 69-70,80,164-167,172,182-189,889-938
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_9b8b004c55c7f2::t_31490c33e683fe 398-399,402,408-411
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_5c0d8c5a120000 465-466,469-485
+apps/construction-management/docs/modules/13-chat-notifications-support.md
+  s_9b8b004c55c7f2::t_f55a4482bd05a9 426-443
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_1753efc99658ef 899,901,953-954,990-999
+apps/construction-management/eslint.config.js
+  s_9b8b004c55c7f2::t_2a134d6a2c231e 103-104
+apps/construction-management/lib/app-nav.test.ts
+  s_9b8b004c55c7f2::t_dd62c7e92cbd7b 6,8
+apps/construction-management/lib/app-nav.ts
+  s_9b8b004c55c7f2::t_fbf383f658aa05 2-5,8-14
+apps/construction-management/lib/notification-format.test.ts
+  s_9b8b004c55c7f2::t_5ca7a9e51dd4ee 1-52
+apps/construction-management/lib/notification-format.ts
+  s_9b8b004c55c7f2::t_91e425d4cfbb59 1-57
+apps/construction-management/package.json
+  s_9b8b004c55c7f2::t_c2a3eb3da1db82 49,65
+apps/construction-management/public/sw.js
+  s_9b8b004c55c7f2::t_438e92181af0f0 1-80
+apps/construction-management/src/composition/dashboard-reads.ts
+  s_9b8b004c55c7f2::t_c5a42c22166b69 1-32
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_9b8b004c55c7f2::t_a3975a38f44e8f 1-57
+apps/construction-management/src/composition/messaging.ts
+  s_9b8b004c55c7f2::t_41bba57d88a4b5 1-333
+apps/construction-management/src/composition/party-finance.ts
+  s_9b8b004c55c7f2::t_bab7016bf9047e 10,19,25-28
+apps/construction-management/src/composition/procurement-events.ts
+  s_9b8b004c55c7f2::t_2c28f12f6288c1 1-3,8-10,13
+apps/construction-management/src/composition/queue.ts
+  s_9b8b004c55c7f2::t_f7c914e7c5a467 24-28,47-50,64-66
+apps/construction-management/src/composition/report-jobs.ts
+  s_9b8b004c55c7f2::t_40ab04fe332290 5,40-41
+apps/construction-management/src/composition/site-work-stock.ts
+  s_9b8b004c55c7f2::t_182435d5a589db 5
+apps/construction-management/src/composition/tracking-inspections.ts
+  s_9b8b004c55c7f2::t_068114e27ed12c 8,23,35
+apps/construction-management/src/composition/tracking-tasks.ts
+  s_9b8b004c55c7f2::t_c83abfec8ff4cc 9,27
+apps/construction-management/src/finance/application/other-expense-handlers.ts
+  s_9b8b004c55c7f2::t_75c25d590caf16 10-14,22,186-190,377-406,433,462,464-477,547-552,652,722-729
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_9b8b004c55c7f2::t_d012f9f85a287c 8-11,18,81-88,92-121,204-214,236,270,309,323-324,333,338,346-353
+apps/construction-management/src/finance/application/transaction-handlers.ts
+  s_9b8b004c55c7f2::t_b82ee427bd7486 10-14,25,140-144,394-402,406-438,557,615,617-622,700,703-710
+apps/construction-management/src/finance/application/transaction-register.ts
+  s_9b8b004c55c7f2::t_20fa98cf2c9867 151,157-166,189-197
+apps/construction-management/src/finance/infrastructure/finance-dashboard.ts
+  s_9b8b004c55c7f2::t_d3319b93f71d99 31-35,135
+apps/construction-management/src/finance/infrastructure/other-expense-store.ts
+  s_9b8b004c55c7f2::t_31d66a7643f826 18,337-338,360
+apps/construction-management/src/finance/infrastructure/party-finance-factory.ts
+  s_9b8b004c55c7f2::t_c0c852b77b934e 4-7,32-33,55-58
+apps/construction-management/src/finance/infrastructure/petty-cash-vouchers.ts
+  s_9b8b004c55c7f2::t_f764b42dd0820a 11-14,26,127-131,685-711,733,776,778-783,800,848,850-855,877,919-929,951-956
+apps/construction-management/src/hrms/application/attendance-handlers.ts
+  s_9b8b004c55c7f2::t_8c7afe771dd1de 12-16,39,286-291,298-328,582,599-602,629,650-651,718,736-743
+apps/construction-management/src/hrms/application/leave-request-handlers.ts
+  s_9b8b004c55c7f2::t_861e10f9dd5538 12-16,19-20,169-173,179-210,567-576,978,995-1002,1016,1032-1040,1058,1068-1074,1097,1112-1120
+apps/construction-management/src/hrms/application/salary-run-fakes.ts
+  s_9b8b004c55c7f2::t_a59fccaa937674 3,657-670
+apps/construction-management/src/hrms/application/salary-run-handlers.test.ts
+  s_9b8b004c55c7f2::t_b1073bb93f69ca 22,113,131,145,423-483
+apps/construction-management/src/hrms/application/salary-run-handlers.ts
+  s_9b8b004c55c7f2::t_732d027d4aa426 9,20,240-241,246-280,861-869,919
+apps/construction-management/src/hrms/domain/events.ts
+  s_9b8b004c55c7f2::t_7c1cd0e8478ece 1-44
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_9b8b004c55c7f2::t_bac0206b7c6254 3-7,169-173,197
+apps/construction-management/src/hrms/infrastructure/create-leave-handlers.ts
+  s_9b8b004c55c7f2::t_a0f481f5336790 3-7,33-34,72
+apps/construction-management/src/hrms/infrastructure/create-salary-run-handlers.ts
+  s_9b8b004c55c7f2::t_2dc43b29b523ee 7-10,39-40,55
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_9b8b004c55c7f2::t_29f31125f68a29 1-141
+apps/construction-management/src/messaging/application/listeners.test.ts
+  s_9b8b004c55c7f2::t_2a1fe8d78111e5 1-457
+apps/construction-management/src/messaging/application/listeners.ts
+  s_9b8b004c55c7f2::t_58d2e9651e5ae9 1-688
+apps/construction-management/src/messaging/application/maintenance.ts
+  s_9b8b004c55c7f2::t_ce1a5c8ca72344 1-88
+apps/construction-management/src/messaging/application/notification-handlers.ts
+  s_9b8b004c55c7f2::t_d5421ca19408dc 1-203
+apps/construction-management/src/messaging/application/notifier.ts
+  s_9b8b004c55c7f2::t_59d6bcc4babf5b 1-43
+apps/construction-management/src/messaging/application/ports.ts
+  s_9b8b004c55c7f2::t_68a54ffecccc6a 1-192
+apps/construction-management/src/messaging/application/push-delivery.test.ts
+  s_9b8b004c55c7f2::t_b3458230deb448 1-157
+apps/construction-management/src/messaging/application/push-delivery.ts
+  s_9b8b004c55c7f2::t_a05ed9c3cdb3e9 1-115
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_9b8b004c55c7f2::t_7cee9402088522 1-264
+apps/construction-management/src/messaging/domain/notification.test.ts
+  s_9b8b004c55c7f2::t_765ac6fb369d88 1-106
+apps/construction-management/src/messaging/domain/notification.ts
+  s_9b8b004c55c7f2::t_63657738b3cb66 1-135
+apps/construction-management/src/messaging/infrastructure/prisma-notification-store.ts
+  s_9b8b004c55c7f2::t_7d4628da03f736 1-252
+apps/construction-management/src/messaging/infrastructure/prisma-push-stores.ts
+  s_9b8b004c55c7f2::t_91f527c09472bd 1-111
+apps/construction-management/src/messaging/infrastructure/web-push-sender.ts
+  s_9b8b004c55c7f2::t_d3938d4014de7a 1-67
+apps/construction-management/src/procurement/application/purchase-order-handlers.ts
+  s_9b8b004c55c7f2::t_e19cefeff90fea 16-20,751-760,764,766-780,800,832,834-847,976-981,1080,1136,1146-1154
+apps/construction-management/src/procurement/application/purchase-request-handlers.ts
+  s_9b8b004c55c7f2::t_5b1fa7578d2abc 16-20,31,473-479,483-500,533,562,564-577,707-712,805,858,861-869
+apps/construction-management/src/procurement/domain/events.ts
+  s_9b8b004c55c7f2::t_1b4aeb86431555 29-94
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_9b8b004c55c7f2::t_3a566b7c6d36f9 3-7,38,480-491,565-567
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_9b8b004c55c7f2::t_e07f68a36eede7 18,41,147-148,209,263-275
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_9b8b004c55c7f2::t_c8b24284d4906d 45-48,583,594-621,723,851,966-972
+apps/construction-management/src/procurement/infrastructure/procurement-dashboard.ts
+  s_9b8b004c55c7f2::t_e101fe5ee10d61 28-30
+apps/construction-management/src/projects/application/project-home-handlers.ts
+  s_9b8b004c55c7f2::t_e35f34edfe7524 3,5,189-202
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_9b8b004c55c7f2::t_7f49f36881ae6d 3-4,8-11,15-47,52,54-62,152-167
+apps/construction-management/src/queries/company-dashboard.ts
+  s_9b8b004c55c7f2::t_c4c999560d857d 1-34
+apps/construction-management/src/queries/project-dashboard.ts
+  s_9b8b004c55c7f2::t_f4fca703499be5 23,25-46,57-67
+apps/construction-management/src/reporting/application/dashboard-ports.ts
+  s_9b8b004c55c7f2::t_c701bcb348513d 1-99
+apps/construction-management/src/reporting/application/dashboard-reads.ts
+  s_9b8b004c55c7f2::t_eefdb8f594caea 1-262
+apps/construction-management/src/reporting/domain/company-dashboard.test.ts
+  s_9b8b004c55c7f2::t_65b0c46af780f2 1-154
+apps/construction-management/src/reporting/domain/company-dashboard.ts
+  s_9b8b004c55c7f2::t_0a13b6d558b95a 1-121
+apps/construction-management/src/reporting/domain/dashboard-approvals.ts
+  s_9b8b004c55c7f2::t_6366e476abf991 1-107
+apps/construction-management/src/reporting/infrastructure/prisma-dashboard-source.ts
+  s_9b8b004c55c7f2::t_0ce48feb0a81cc 1-196
+apps/construction-management/src/shared-kernel/access/notification-recipients.ts
+  s_9b8b004c55c7f2::t_ef704eeac16c0d 1-101
+apps/construction-management/src/shared-kernel/approval-events.ts
+  s_9b8b004c55c7f2::t_048d96a4282fe2 1-73
+apps/construction-management/src/shared-kernel/approval.ts
+  s_9b8b004c55c7f2::t_a355026366aead 167-173,175-209
+apps/construction-management/src/site-work/application/equipment-sheet-handlers.ts
+  s_9b8b004c55c7f2::t_1614f8d8320a62 10-11,277-280,679-680,687-688,691,699-701,703-713,745-746,846,909,922-923,927,1026,1141,1189-1190,1193-1209,1225
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_9b8b004c55c7f2::t_46ab3755d25e26 10-14,25,208-211,619-629,633-650,725,770,773-786,879-884,999,1050,1053-1060
+apps/construction-management/src/site-work/domain/events.ts
+  s_9b8b004c55c7f2::t_201e021aedac6c 48-51
+apps/construction-management/src/tracking/application/tracking-dashboard.ts
+  s_9b8b004c55c7f2::t_97ca423192a286 173-174
+apps/construction-management/test/dashboard-documents.ts
+  s_9b8b004c55c7f2::t_7a3141bc81c161 1-145
+apps/construction-management/test/dispatched-events.ts
+  s_9b8b004c55c7f2::t_b3bc716b2e984f 1-24
+bun.lock
+  s_9b8b004c55c7f2::t_e99c4c3dfbf433 50,66,1036-1037,1142-1143,1176-1177,1220-1221,1234-1235,1404-1405,1618-1621,1758-1761,1884-1885,2112,2334-2335,2712-2713,2720-2721,2734-2735,2738-2739,2752-2753
+packages/db/construction/prisma/migrations/20261016110000_construction_reporting_dashboard_views/migration.sql
+  s_9b8b004c55c7f2::t_419cb119746f67 1-238
+turbo.json
+  s_9b8b004c55c7f2::t_9e6b8e9cd80490 55-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9a660d7a4347aac1a5cc9fd28af5006dd22dece1",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
