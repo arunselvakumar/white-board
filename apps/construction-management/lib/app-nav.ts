@@ -24,7 +24,7 @@ export const APP_NAV = [
     label: "Workspace",
     title: "Workspace",
     description:
-      "Work across all your Projects: HRMS for your staff's attendance, leave and salary, Central Store for your warehouses, Material Requests and Delivery Notes, and Central Inventory for stock everywhere. Central Payment and Central Reports will show here as they are built.",
+      "Work across all your Projects: HRMS for your staff's attendance, leave and salary, Central Store for your warehouses, Material Requests and Delivery Notes, and Central Inventory for stock everywhere, Central Payment for dues and balances, and Central Reports for reports across your Projects.",
   },
   {
     href: "/app/masters",

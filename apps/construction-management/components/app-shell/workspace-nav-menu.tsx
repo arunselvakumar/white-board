@@ -1,6 +1,6 @@
 "use client";
 
-import { Boxes, Scale, Wallet, Warehouse } from "lucide-react";
+import { Boxes, FileSpreadsheet, Scale, Wallet, Warehouse } from "lucide-react";
 
 import { HRMS_SECTIONS, activeHrmsSection } from "@/lib/hrms-nav";
 
@@ -32,19 +32,30 @@ const PAYMENT_SECTIONS = [
   },
 ] as const;
 
-/**
- * The Workspace submenu, one group per cross-project module. Central
- * Reports joins when it is built.
- */
+const REPORT_SECTIONS = [
+  {
+    href: "/app/workspace/central-reports",
+    label: "Central Reports",
+    icon: FileSpreadsheet,
+  },
+] as const;
+
+/** The Workspace submenu, one group per cross-project module. */
 const WORKSPACE_GROUPS = [
   { label: "HRMS", sections: HRMS_SECTIONS },
   { label: "Materials", sections: CENTRAL_STORE_SECTIONS },
   { label: "Payments", sections: PAYMENT_SECTIONS },
+  // Central Reports (CM-903).
+  { label: "Reports", sections: REPORT_SECTIONS },
 ];
 
 /** The submenu entry a Workspace page belongs to. */
 function activeWorkspaceHref(pathname: string): string | undefined {
-  const area = [...CENTRAL_STORE_SECTIONS, ...PAYMENT_SECTIONS].find(
+  const area = [
+    ...CENTRAL_STORE_SECTIONS,
+    ...PAYMENT_SECTIONS,
+    ...REPORT_SECTIONS,
+  ].find(
     (section) =>
       pathname === section.href || pathname.startsWith(`${section.href}/`),
   );
