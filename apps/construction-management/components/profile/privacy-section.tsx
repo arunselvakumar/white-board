@@ -15,6 +15,7 @@ import {
 } from "@repo/ui/components/item";
 
 import { DeleteAccountDialog } from "@/components/account/delete-account-dialog";
+import { DownloadMyDataAction } from "@/components/backups/download-my-data";
 import { accountQueries } from "@/src/queries/account";
 
 /** One action in My Profile → Privacy. */
@@ -76,9 +77,8 @@ function DeleteAccountAction() {
 }
 
 /**
- * My Profile → Privacy: a list of actions on the User's own data. Delete
- * My Account is here (CM-907); Download My Data (CM-906) is added as
- * another `PrivacyAction` in this list.
+ * My Profile → Privacy: a list of actions on the User's own data:
+ * Download My Data (CM-906) and Delete My Account (CM-907).
  */
 export function PrivacySection() {
   return (
@@ -92,6 +92,7 @@ export function PrivacySection() {
         </p>
       </div>
       <ItemGroup className="gap-2">
+        <DownloadMyDataAction />
         <DeleteAccountAction />
       </ItemGroup>
     </section>

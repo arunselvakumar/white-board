@@ -183,3 +183,48 @@ export const WithoutLogo: Story = {
     ).toBeNull();
   },
 };
+
+/** Project options → Backup… opens the Project backup dialog (CM-906). */
+export const BackupFromOptions: Story = {
+  beforeEach: () => {
+    const restore = serve()();
+    const original = globalThis.fetch;
+    globalThis.fetch = (input, init) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (href.includes("/api/construction/reporting/backups/options"))
+        return Promise.resolve(
+          Response.json({
+            modules: [
+              {
+                key: "site_work.daily_worksheet",
+                label: "Daily Worksheets",
+                group: "Daily Work",
+                includesMoney: false,
+                hasMedia: true,
+              },
+            ],
+          }),
+        );
+      return original(input, init);
+    };
+    return () => {
+      globalThis.fetch = original;
+      restore();
+    };
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" });
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Project options" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(await body.findByRole("menuitem", { name: "Backup…" }));
+    const dialog = within(await body.findByRole("dialog"));
+    await expect(
+      await dialog.findByText("Back up Kumari Heights"),
+    ).toBeVisible();
+    await expect(
+      await dialog.findByRole("checkbox", { name: "Daily Worksheets" }),
+    ).toBeVisible();
+  },
+};

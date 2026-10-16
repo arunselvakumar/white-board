@@ -5,7 +5,12 @@ import type { DownloadItem } from "@/src/queries/downloads";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import {
+  BACKUP_EXPIRED,
+  BACKUP_FAILED,
+  BACKUP_READY,
+  BACKUP_RUNNING,
   CENTRAL,
+  DATA_EXPORT,
   DOWNLOADS_PATH,
   downloadRow,
   downloadsPage,
@@ -287,5 +292,58 @@ export const Phone: Story = {
     await canvas.findByRole("list", { name: "Downloads" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+/** Backups and data exports (CM-906): status, the signed ZIP and Delete, never Retry. */
+export const BackupRows: Story = {
+  beforeEach: serve(() => [
+    BACKUP_RUNNING,
+    BACKUP_READY,
+    DATA_EXPORT,
+    BACKUP_FAILED,
+    BACKUP_EXPIRED,
+  ]),
+  play: async ({ canvas }) => {
+    const list = within(await canvas.findByRole("list", { name: "Downloads" }));
+    const rows = list.getAllByRole("listitem").map((row) => within(row));
+    await expect(rows).toHaveLength(5);
+    const [running, ready, exported, failed, expired] = rows;
+    await expect(running?.getByText("Generating")).toBeVisible();
+    await expect(
+      running?.getByText(
+        "Backup · Every Project, master records and settings · All projects",
+      ),
+    ).toBeVisible();
+    await expect(running?.queryByRole("link")).toBeNull();
+    await expect(
+      ready?.getByText(
+        "Backup · 3 modules · 01 Sep 2026 to 30 Sep 2026 · Tower A",
+      ),
+    ).toBeVisible();
+    await expect(
+      ready?.getByRole("link", {
+        name: "Project backup 3 modules · 01 Sep 2026 to 30 Sep 2026 ZIP",
+      }),
+    ).toHaveAttribute("href", BACKUP_READY.files[0]?.href ?? "");
+    await expect(ready?.queryByRole("button", { name: /Retry/ })).toBeNull();
+    await expect(
+      exported?.getByText(
+        "Data export · Your profile, Companies and activity · Your account",
+      ),
+    ).toBeVisible();
+    await expect(
+      exported?.getByRole("link", { name: /My data .* ZIP/ }),
+    ).toBeVisible();
+    await expect(
+      failed?.getByText("Too large — choose fewer modules or a shorter range"),
+    ).toBeVisible();
+    await expect(failed?.getByText(/Master records$/)).toBeVisible();
+    await expect(
+      expired?.getByText("Expired — make a new backup"),
+    ).toBeVisible();
+    await expect(
+      ready?.getByRole("button", { name: /^Delete Project backup/ }),
+    ).toBeVisible();
   },
 };

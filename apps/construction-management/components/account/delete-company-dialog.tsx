@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -98,8 +99,14 @@ export function DeleteCompanyDialog({
             </DialogDescription>
           </DialogHeader>
           <p className="bg-muted rounded-md p-3 text-sm">
-            Take a full Company backup first (Settings → Backup &amp; export) so
-            you keep a copy of your records.
+            Take a full Company backup first (
+            <Link
+              href="/app/masters/settings/backup"
+              className="font-medium underline"
+            >
+              Settings → Backup &amp; export
+            </Link>
+            ) so you keep a copy of your records.
           </p>
 
           <div className="space-y-1.5">

@@ -25,18 +25,29 @@ import {
 } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
 
+import { ProjectBackupDialog } from "@/components/backups/backup-dialog";
+
 import { ProjectAvatar } from "./project-avatar";
 import { ArrangeTilesDialog, HideModulesDialog } from "./project-home-dialogs";
 import { projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
 
-type OptionsDialog = "hide" | "arrange" | null;
+type OptionsDialog = "hide" | "arrange" | "backup" | null;
 
 /**
  * Project options next to Edit (CM-411): Pin / Unpin for the member, Hide /
- * show modules for the Project (Update flag only), Arrange tiles.
+ * show modules for the Project (Update flag only), Arrange tiles, and
+ * Backup (CM-906; the dialog offers the modules the member may view).
  */
-function ProjectOptions({ id, home }: { id: string; home: ProjectHome }) {
+function ProjectOptions({
+  id,
+  name,
+  home,
+}: {
+  id: string;
+  name: string;
+  home: ProjectHome;
+}) {
   const pin = usePinProject();
   const [dialog, setDialog] = useState<OptionsDialog>(null);
   return (
@@ -80,6 +91,14 @@ function ProjectOptions({ id, home }: { id: string; home: ProjectHome }) {
           >
             Arrange tiles
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => {
+              setDialog("backup");
+            }}
+          >
+            Backup…
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {dialog === "hide" ? (
@@ -93,6 +112,15 @@ function ProjectOptions({ id, home }: { id: string; home: ProjectHome }) {
       {dialog === "arrange" ? (
         <ArrangeTilesDialog
           projectId={id}
+          onClose={() => {
+            setDialog(null);
+          }}
+        />
+      ) : null}
+      {dialog === "backup" ? (
+        <ProjectBackupDialog
+          projectId={id}
+          projectName={name}
           onClose={() => {
             setDialog(null);
           }}
@@ -161,7 +189,7 @@ export function ProjectShell({
               <Pencil aria-hidden="true" />
               Edit
             </Link>
-            {home == null ? null : <ProjectOptions id={id} home={home} />}
+            {home == null ? null : <ProjectOptions id={id} name={project.name} home={home} />}
           </div>
         </div>
       </header>
