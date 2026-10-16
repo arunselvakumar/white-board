@@ -1,0 +1,111 @@
+apps/construction-management/app/api/construction/finance/invoices/invoices.http.test.ts
+  s_9b8b004c55c7f2::t_f9fbad0d2e6ebe 5,10,89-92,449-500
+apps/construction-management/app/api/construction/finance/other-expenses/handlers.ts
+  s_9b8b004c55c7f2::t_628b67143e1d42 9,25
+apps/construction-management/app/api/construction/finance/other-expenses/other-expenses.http.test.ts
+  s_9b8b004c55c7f2::t_5e855e1abd150c 3,19,130-133,432-480
+apps/construction-management/app/api/construction/finance/petty-cash/handlers.ts
+  s_9b8b004c55c7f2::t_b3c85ea38001d3 7,38
+apps/construction-management/app/api/construction/finance/petty-cash/petty-cash.http.test.ts
+  s_9b8b004c55c7f2::t_4deee027116f45 6,15,193-196,598-663
+apps/construction-management/app/api/construction/finance/transactions/handlers.ts
+  s_9b8b004c55c7f2::t_9c120338fe9971 10,68
+apps/construction-management/app/api/construction/finance/transactions/transactions.http.test.ts
+  s_9b8b004c55c7f2::t_247039f99bbc01 6,15,104-107,461-519
+apps/construction-management/app/api/construction/hrms/attendance/attendance.http.test.ts
+  s_9b8b004c55c7f2::t_f698eabbd96395 6,18,194-197,491-564
+apps/construction-management/app/api/construction/hrms/attendance/handlers.ts
+  s_9b8b004c55c7f2::t_e62818d45d89ff 1,5-7
+apps/construction-management/app/api/construction/hrms/leave-route.ts
+  s_9b8b004c55c7f2::t_fe4754cd9f151d 12,18-20
+apps/construction-management/app/api/construction/hrms/leaves/leaves.http.test.ts
+  s_9b8b004c55c7f2::t_a8a9a11ee6aa3f 5,9,124-127,547-659
+apps/construction-management/app/api/construction/hrms/salaries/salary-route.ts
+  s_9b8b004c55c7f2::t_d6a18f66cc7e71 2,11
+apps/construction-management/app/api/construction/procurement/material-requests/central-store.http.test.ts
+  s_9b8b004c55c7f2::t_242a76acb1c9e0 3,22,139-142,594-657
+apps/construction-management/app/api/construction/procurement/purchase-orders/purchase-orders.http.test.ts
+  s_9b8b004c55c7f2::t_72366fe8ae6482 4,10,213-216,638-695
+apps/construction-management/app/api/construction/procurement/purchase-requests/purchase-requests.http.test.ts
+  s_9b8b004c55c7f2::t_60e863eb48b49d 3,10,132-135,434-493
+apps/construction-management/app/api/construction/procurement/transfers/transfers.http.test.ts
+  s_9b8b004c55c7f2::t_c3eb619001f233 3,21,132-135,270-330
+apps/construction-management/app/api/construction/site-work/equipment-sheets/equipment-sheets.http.test.ts
+  s_9b8b004c55c7f2::t_854c18104548fa 742-820
+apps/construction-management/app/api/construction/site-work/equipment-sheets/handlers.ts
+  s_9b8b004c55c7f2::t_d70a0e4e1054f3 16,59
+apps/construction-management/app/api/construction/site-work/worksheets/handlers.ts
+  s_9b8b004c55c7f2::t_0cc43181b98cf6 19,56
+apps/construction-management/app/api/construction/site-work/worksheets/worksheets.http.test.ts
+  s_9b8b004c55c7f2::t_d0f0a0dce677d4 3,15-18,240-249,751-818
+apps/construction-management/src/finance/application/other-expense-handlers.ts
+  s_9b8b004c55c7f2::t_60c2db04b037d4 10-14,22,186-190,377-406,433,462,464-477,547-552,652,722-729
+apps/construction-management/src/finance/application/settlement-handlers.ts
+  s_9b8b004c55c7f2::t_35235f2cdab654 8-11,18,81-88,92-121,204-214,236,270,309,323-324,333,338,346-353
+apps/construction-management/src/finance/application/transaction-handlers.ts
+  s_9b8b004c55c7f2::t_bdf136f76f3224 10-14,25,140-144,394-402,406-438,557,615,617-622,700,703-710
+apps/construction-management/src/finance/application/transaction-register.ts
+  s_9b8b004c55c7f2::t_5858735b016f9b 151,157-166,189-197
+apps/construction-management/src/finance/infrastructure/other-expense-store.ts
+  s_9b8b004c55c7f2::t_d6d542fc9d8fa6 18,337-338,360
+apps/construction-management/src/finance/infrastructure/party-finance-factory.ts
+  s_9b8b004c55c7f2::t_fdb1d08e009844 4-7,32-33,55-58
+apps/construction-management/src/finance/infrastructure/petty-cash-vouchers.ts
+  s_9b8b004c55c7f2::t_f9ed4b2ce68026 11-14,26,127-131,685-711,733,776,778-783,800,848,850-855,877,919-929,951-956
+apps/construction-management/src/hrms/application/attendance-handlers.ts
+  s_9b8b004c55c7f2::t_fa7920fce7f7bf 12-16,39,286-291,298-328,582,599-602,629,650-651,718,736-743
+apps/construction-management/src/hrms/application/leave-request-handlers.ts
+  s_9b8b004c55c7f2::t_fb9306b9ee8f5e 12-16,19-20,169-173,179-210,567-576,978,995-1002,1016,1032-1040,1058,1068-1074,1097,1112-1120
+apps/construction-management/src/hrms/application/salary-run-fakes.ts
+  s_9b8b004c55c7f2::t_3ea5860b69e37d 3,657-670
+apps/construction-management/src/hrms/application/salary-run-handlers.test.ts
+  s_9b8b004c55c7f2::t_084818dd3676d6 22,113,131,145,423-483
+apps/construction-management/src/hrms/application/salary-run-handlers.ts
+  s_9b8b004c55c7f2::t_25f92c0d482278 9,20,240-241,246-280,861-869,919
+apps/construction-management/src/hrms/domain/events.ts
+  s_9b8b004c55c7f2::t_00a42efc083ba8 1-44
+apps/construction-management/src/hrms/infrastructure/create-hrms-ports.ts
+  s_9b8b004c55c7f2::t_76b63de0e6999a 3-7,169-173,197
+apps/construction-management/src/hrms/infrastructure/create-leave-handlers.ts
+  s_9b8b004c55c7f2::t_01aec37e45fff9 3-7,33-34,72
+apps/construction-management/src/hrms/infrastructure/create-salary-run-handlers.ts
+  s_9b8b004c55c7f2::t_7b517c8f55f557 7-10,39-40,55
+apps/construction-management/src/procurement/application/purchase-order-handlers.ts
+  s_9b8b004c55c7f2::t_6c5b752987ffc2 16-20,751-760,764,766-780,800,832,834-847,976-981,1080,1136,1146-1154
+apps/construction-management/src/procurement/application/purchase-request-handlers.ts
+  s_9b8b004c55c7f2::t_428aa27de31177 16-20,31,473-479,483-500,533,562,564-577,707-712,805,858,861-869
+apps/construction-management/src/procurement/domain/events.ts
+  s_9b8b004c55c7f2::t_fcae97778712da 29-94
+apps/construction-management/src/procurement/infrastructure/delivery-note-repository.ts
+  s_9b8b004c55c7f2::t_6933c8f3c029d9 3-7,38,480-491,565-567
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_9b8b004c55c7f2::t_b8995bd587b971 18,41,147-148,209,263-275
+apps/construction-management/src/procurement/infrastructure/material-transfer-store.ts
+  s_9b8b004c55c7f2::t_54fe87d13fb9ac 45-48,583,594-621,723,851,966-972
+apps/construction-management/src/shared-kernel/approval-events.ts
+  s_9b8b004c55c7f2::t_3caa57219c10ea 1-73
+apps/construction-management/src/site-work/application/equipment-sheet-handlers.ts
+  s_9b8b004c55c7f2::t_9942da2f653321 10-11,277-280,679-680,687-688,691,699-701,703-713,745-746,846,909,922-923,927,1026,1141,1189-1190,1193-1209,1225
+apps/construction-management/src/site-work/application/worksheet-handlers.ts
+  s_9b8b004c55c7f2::t_ce4313e965cc99 10-14,25,208-211,619-629,633-650,725,770,773-786,879-884,999,1050,1053-1060
+apps/construction-management/src/site-work/domain/events.ts
+  s_9b8b004c55c7f2::t_a96863721f3288 48-51
+apps/construction-management/test/dispatched-events.ts
+  s_9b8b004c55c7f2::t_0dd67734d8f26c 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "00aeb440b7f212af2b0d27df5f5d7422ebeb7ce6",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
