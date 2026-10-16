@@ -43,6 +43,26 @@ const COUNTERPARTY_KINDS = [
   "team_member",
 ] as const;
 
+const APPROVAL_STATUSES = ["pending", "approved", "rejected"] as const;
+const TRANSFER_STATUSES = [
+  "pending",
+  "in_transit",
+  "delivered",
+  "rejected",
+] as const;
+const TRANSFER_TYPES = [
+  "project_to_project",
+  "project_to_store",
+  "store_to_project",
+  "store_to_store",
+] as const;
+
+/**
+ * Central only (CM-903): the Projects to cover, among those you may see;
+ * left out for every one. Chosen Projects leave the Central Stores out.
+ */
+const ProjectIdsParam = z.array(z.uuid()).min(1).max(500).optional();
+
 // Requests
 
 /**
@@ -79,7 +99,9 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.uuid().nullable(),
       params: DateRangeParams.extend({
         vendorId: z.uuid().optional(),
+        /** A Labour Category. */
         categoryId: z.uuid().optional(),
+        projectIds: ProjectIdsParam,
       }),
     }),
     z.object({
@@ -193,6 +215,69 @@ export const RequestConstructionReportingReportRequestModel =
       /** Requests with an Inspection Date in the period. */
       params: DateRangeParams,
     }),
+    // Procurement and central labour reports (CM-903, ADR CM-0021 §5).
+    // Null `projectId` is the central report (Central Reports), which
+    // also needs Central Reports Read.
+    z.object({
+      kind: z.literal("purchase_requests"),
+      projectId: z.uuid().nullable(),
+      /** Requests with a Request Date in the period; Purchase Request Report. */
+      params: DateRangeParams.extend({
+        status: z.enum(APPROVAL_STATUSES).optional(),
+        materialCategoryId: z.uuid().optional(),
+        materialId: z.uuid().optional(),
+        /** A User id (Created By). */
+        createdBy: z.string().min(1).max(100).optional(),
+        projectIds: ProjectIdsParam,
+      }),
+    }),
+    z.object({
+      kind: z.literal("purchase_orders"),
+      projectId: z.uuid().nullable(),
+      /** Orders with a PO Date in the period; Purchase Order Report. */
+      params: DateRangeParams.extend({
+        status: z.enum(APPROVAL_STATUSES).optional(),
+        supplierId: z.uuid().optional(),
+        projectIds: ProjectIdsParam,
+      }),
+    }),
+    z.object({
+      kind: z.literal("material_received"),
+      projectId: z.uuid().nullable(),
+      /** Receipts with a GR Date in the period; amounts need Material Received Financial, others' receipts View all. */
+      params: DateRangeParams.extend({
+        supplierId: z.uuid().optional(),
+        projectIds: ProjectIdsParam,
+      }),
+    }),
+    z.object({
+      kind: z.literal("material_transfers"),
+      projectId: z.uuid().nullable(),
+      /** Transfers with a Transfer Date in the period; Material Transfer Report. */
+      params: DateRangeParams.extend({
+        status: z.enum(TRANSFER_STATUSES).optional(),
+        transferType: z.enum(TRANSFER_TYPES).optional(),
+        projectIds: ProjectIdsParam,
+      }),
+    }),
+    z.object({
+      kind: z.literal("stock_register"),
+      projectId: z.uuid().nullable(),
+      /** Current Inventory Report; a Store needs Central store Read. */
+      params: DateRangeParams.extend({
+        materialCategoryId: z.uuid().optional(),
+        materialId: z.uuid().optional(),
+        /** Central only: this Central Store (with any chosen Projects). */
+        storeId: z.uuid().optional(),
+        projectIds: ProjectIdsParam,
+      }),
+    }),
+    z.object({
+      kind: z.literal("labour_attendance_central"),
+      /** Always central: every Project you may see, or the chosen ones. */
+      projectId: z.null(),
+      params: DateRangeParams.extend({ projectIds: ProjectIdsParam }),
+    }),
   ]);
 
 export type RequestConstructionReportingReportRequestModel = z.infer<
@@ -239,6 +324,16 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     /** Daily Progress Report: its date and number. */
     date: z.string().optional(),
     number: z.string().optional(),
+    /** Procurement reports (CM-903). */
+    status: z.string().nullable().optional(),
+    supplierId: z.string().nullable().optional(),
+    materialId: z.string().nullable().optional(),
+    materialCategoryId: z.string().nullable().optional(),
+    createdBy: z.string().nullable().optional(),
+    transferType: z.string().nullable().optional(),
+    storeId: z.string().nullable().optional(),
+    /** The Projects the requester chose for a central report. */
+    projectIds: z.array(z.string()).optional(),
   }),
   status: z.enum(["queued", "running", "done", "failed", "expired"]),
   /** The files carry amounts; downloading them needs Financial. */
@@ -270,6 +365,16 @@ export type ListConstructionReportingReportsResponseModel = z.infer<
 
 export function downloadPath(id: string, format: "xlsx" | "pdf"): string {
   return `${REPORTS_PATH}/${id}/download?format=${format}`;
+}
+
+/** The Projects a central report was asked for, when they were chosen. */
+function chosenProjects(params: {
+  projectIds: string[] | null;
+  projectsChosen: boolean;
+}): { projectIds?: string[] } {
+  return params.projectsChosen && params.projectIds != null
+    ? { projectIds: params.projectIds }
+    : {};
 }
 
 function responseParams(
@@ -322,6 +427,52 @@ function responseParams(
       return { fy: params.fy, contractorId: params.contractorId };
     case "due_payments":
       return { asOn: params.asOn };
+    // Procurement and central labour reports (CM-903).
+    case "purchase_requests":
+      return {
+        from: params.from,
+        to: params.to,
+        status: params.status,
+        materialCategoryId: params.categoryId,
+        materialId: params.materialId,
+        createdBy: params.createdBy,
+        ...chosenProjects(params),
+      };
+    case "purchase_orders":
+      return {
+        from: params.from,
+        to: params.to,
+        status: params.status,
+        supplierId: params.supplierId,
+        ...chosenProjects(params),
+      };
+    case "material_received":
+      return {
+        from: params.from,
+        to: params.to,
+        supplierId: params.supplierId,
+        ...chosenProjects(params),
+      };
+    case "material_transfers":
+      return {
+        from: params.from,
+        to: params.to,
+        status: params.status,
+        transferType: params.transferType,
+        ...chosenProjects(params),
+      };
+    case "stock_register":
+      return {
+        from: params.from,
+        to: params.to,
+        materialCategoryId: params.categoryId,
+        materialId: params.materialId,
+        storeId:
+          params.storeIds?.length === 1 ? (params.storeIds[0] ?? null) : null,
+        ...chosenProjects(params),
+      };
+    case "labour_attendance_central":
+      return { from: params.from, to: params.to, ...chosenProjects(params) };
     default:
       return { from: params.from, to: params.to };
   }

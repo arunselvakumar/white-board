@@ -1,6 +1,7 @@
 import { prisma } from "@repo/construction-db";
 
 import { createFinanceReportSource } from "@/src/composition/finance-report-source";
+import { createProcurementReportSource } from "@/src/composition/procurement-report-source";
 import { createProgressReportSource } from "@/src/composition/progress-report-source";
 import { messagingEvents } from "@/src/composition/messaging";
 import { enqueue, kickQueue } from "@/src/composition/queue";
@@ -11,6 +12,7 @@ import {
 import type {
   DprSource,
   FinanceReportSource,
+  ProcurementReportSource,
   TaskProgressSource,
   TrackingReportSource,
 } from "@/src/reporting/application/ports";
@@ -30,6 +32,7 @@ import type { QueueHandler } from "@/src/shared-kernel/queue";
 type ReportJobsOptions = {
   dpr?: DprSource;
   finance?: FinanceReportSource;
+  procurement?: ProcurementReportSource;
   tracking?: TrackingReportSource;
   taskProgress?: TaskProgressSource;
   timeLimitMs?: number;
@@ -41,6 +44,8 @@ function reportQueueHandlerFor(options: ReportJobsOptions): QueueHandler {
     events: messagingEvents(),
     dpr: options.dpr ?? createProgressReportSource(),
     finance: options.finance ?? createFinanceReportSource(),
+    // The procurement reports (CM-903).
+    procurement: options.procurement ?? createProcurementReportSource(),
     tracking: {
       source: options.tracking ?? createTrackingReportSource(),
       taskProgress: options.taskProgress ?? createTaskProgressSource(),

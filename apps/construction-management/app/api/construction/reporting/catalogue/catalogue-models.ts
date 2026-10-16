@@ -24,6 +24,11 @@ const FILTER_KEYS = [
   "material",
   "filled_by",
   "include_images",
+  // The procurement reports' filters (CM-903).
+  "status",
+  "material_category",
+  "created_by",
+  "transfer_type",
 ] as const;
 
 // Requests

@@ -23,34 +23,57 @@ function menusOf(entry: ReportCatalogueEntry) {
   return [entry.menu, ...(entry.orMenus ?? [])];
 }
 
-/** The catalogue's `request` flag on the kind's menu (or one of its others) and Project. */
+/** The Central Reports menu (ADR CM-0021 §5, CM-903). */
+export const CENTRAL_REPORTS_MENU = "reporting.central_reports" as const;
+
+/**
+ * Central Reports Read, which a central report needs besides its own
+ * flag, unless it is one a module hosts (`centralHost`: Central Payment,
+ * Masters → Equipments), whose gate stays that module's (CM-903).
+ */
+function passesCentralGate(
+  access: MemberAccess,
+  entry: ReportCatalogueEntry,
+  projectId: string | null,
+): boolean {
+  if (projectId != null || entry.centralHost != null) return true;
+  return can(access, CENTRAL_REPORTS_MENU, "read");
+}
+
+/**
+ * The catalogue's `request` flag on the kind's menu (or one of its
+ * others) and Project; centrally also Central Reports Read unless a
+ * module hosts the report.
+ */
 export function canRequestReport(
   access: MemberAccess,
   kind: ReportKind,
   projectId: string | null,
 ): boolean {
   const entry = catalogueEntry(kind);
+  if (!passesCentralGate(access, entry, projectId)) return false;
   return menusOf(entry).some((menu) =>
     can(access, menu, entry.request, onProject(projectId)),
   );
 }
 
-/** The catalogue's `download` flag on the kind's menu (or one of its others) and Project. */
+/** The catalogue's `download` flag on the kind's menu (or one of its others) and Project, behind the same central gate. */
 export function canDownloadReport(
   access: MemberAccess,
   kind: ReportKind,
   projectId: string | null,
 ): boolean {
   const entry = catalogueEntry(kind);
+  if (!passesCentralGate(access, entry, projectId)) return false;
   return menusOf(entry).some((menu) =>
     can(access, menu, entry.download, onProject(projectId)),
   );
 }
 
 /**
- * The money right for the kind: Financial on its money menu; for a
- * finance report, Report on its menu (finance menus have no Financial,
- * CM-0017 §14).
+ * The money right for the kind: Financial (or the kind's `moneyFlag`) on
+ * its money menu; for a finance report, Report on its menu (finance
+ * menus have no Financial, CM-0017 §14).
  */
 export function canSeeReportMoney(
   access: MemberAccess,
@@ -63,7 +86,7 @@ export function canSeeReportMoney(
   return can(
     access,
     entry.moneyMenu ?? entry.menu,
-    "financial",
+    entry.moneyFlag ?? "financial",
     onProject(projectId),
   );
 }

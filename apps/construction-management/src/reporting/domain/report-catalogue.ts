@@ -54,7 +54,12 @@ export type ReportFilterKey =
   | "store"
   | "material"
   | "filled_by"
-  | "include_images";
+  | "include_images"
+  // The procurement reports' filters (CM-903).
+  | "status"
+  | "material_category"
+  | "created_by"
+  | "transfer_type";
 
 export type ReportFilter = {
   key: ReportFilterKey;
@@ -70,6 +75,15 @@ export type ReportFilter = {
  * when the requester has it), or `never`.
  */
 export type ReportMoney = "always" | "with_financial" | "never";
+
+/**
+ * A module that hosts a central report of its own besides Central
+ * Reports (CM-903): Central Payment (the Ledger, TDS 194C, Due Payments)
+ * and Masters → Equipments (maintenance and transfers). Their central
+ * requests keep that module's gate; every other central request also
+ * needs Central Reports Read (ADR CM-0021 §5).
+ */
+export type ReportCentralHost = "central_payment" | "masters_equipments";
 
 type Wording = {
   description: string;
@@ -99,6 +113,14 @@ export type ReportCatalogueDefinition = Wording & {
    */
   moneyMenu?: MenuKey;
   money: ReportMoney;
+  /**
+   * The flag on the money menu that is the money right, when not
+   * Financial: Purchase Order has no F, so its Report shows amounts, as
+   * its screens show them to everyone who reads POs (`modules/06`).
+   */
+  moneyFlag?: Flag;
+  /** Requested centrally from this module too; see `ReportCentralHost`. */
+  centralHost?: ReportCentralHost;
   formats: readonly ReportFormat[];
   period: ReportPeriod;
   filters: readonly ReportFilter[];
@@ -109,9 +131,10 @@ export type ReportCatalogueDefinition = Wording & {
    */
   progressReport: boolean;
   /**
-   * False until the report's builder exists (CM-903 builds the procurement
-   * and central labour kinds, then flips this): requesting it is 409
-   * `REPORT_NOT_AVAILABLE` and the catalogue route leaves it out.
+   * False while a catalogued kind has no builder: requesting it is 409
+   * `REPORT_NOT_AVAILABLE` and the catalogue route leaves it out. CM-903
+   * built the last six (procurement and central labour); every kind is
+   * available now.
    */
   available: boolean;
 };
@@ -202,7 +225,7 @@ const DEFINITIONS = {
     money: "with_financial",
     formats: TABLE,
     period: "range",
-    filters: [{ key: "vendor" }, { key: "labour_category" }],
+    filters: [{ key: "vendor" }, { key: "labour_category" }, PROJECTS_FILTER],
     progressReport: false,
     available: true,
   },
@@ -226,7 +249,7 @@ const DEFINITIONS = {
   labour_attendance_central: {
     title: "Central Labour Attendance",
     description:
-      "Every Project's labour days in the period: present, half day, absent, leave and overtime per Labour, with each Project's totals.",
+      "Every Project's labour days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours per Project and Labour, with each Project's totals.",
     needs: "Needs Labour Report; a member sees the Projects they are on.",
     group: "labour",
     scopes: CENTRAL,
@@ -238,7 +261,7 @@ const DEFINITIONS = {
     period: "range",
     filters: [PROJECTS_FILTER],
     progressReport: false,
-    available: false,
+    available: true,
   },
   // Site work reports (CM-605, CM-608).
   daily_work: {
@@ -304,6 +327,7 @@ const DEFINITIONS = {
     },
     group: "site_work",
     scopes: BOTH,
+    centralHost: "masters_equipments",
     menu: "masters.equipments",
     request: "report",
     download: "report",
@@ -326,6 +350,7 @@ const DEFINITIONS = {
     },
     group: "site_work",
     scopes: BOTH,
+    centralHost: "masters_equipments",
     menu: "masters.equipments",
     request: "report",
     download: "report",
@@ -485,6 +510,7 @@ const DEFINITIONS = {
       "Needs Company's Bank A/C Report, or Petty Cash Report for a petty-cash account.",
     group: "finance",
     scopes: CENTRAL,
+    centralHost: "central_payment",
     menu: "masters.bank_accounts",
     orMenus: ["finance.petty_cash"],
     request: "report",
@@ -509,6 +535,7 @@ const DEFINITIONS = {
     needs: "Needs Parties Report; a member sees the Projects they are on.",
     group: "finance",
     scopes: CENTRAL,
+    centralHost: "central_payment",
     menu: "finance.parties",
     request: "report",
     download: "report",
@@ -531,6 +558,7 @@ const DEFINITIONS = {
     },
     group: "finance",
     scopes: BOTH,
+    centralHost: "central_payment",
     menu: "finance.parties",
     request: "report",
     download: "report",
@@ -541,13 +569,20 @@ const DEFINITIONS = {
     progressReport: false,
     available: true,
   },
-  // Procurement reports (CM-903, ADR CM-0021 §5): catalogued now, built
-  // by CM-903, which flips `available` and settles their money rule.
+  // Procurement reports (CM-903, ADR CM-0021 §5). Centrally they cover
+  // the Projects the member may see and, unless Projects are chosen, the
+  // Central Stores.
   purchase_requests: {
     title: "Purchase Requests",
     description:
-      "Purchase Requests raised in the period: number, date, materials and quantities, required by, status and who decided them.",
+      "Purchase Requests by Request Date: number, material, category, quantity requested and ordered, required by, location, status, order status, who raised and who decided them.",
     needs: "Needs Purchase Request Report.",
+    central: {
+      description:
+        "Purchase Requests of every Project you may see, by Request Date: number, Project, material, quantity requested and ordered, required by, status and who raised and decided them.",
+      needs:
+        "Needs Purchase Request Report; a member sees the Projects they are on.",
+    },
     group: "procurement",
     scopes: BOTH,
     menu: "procurement.purchase_requests",
@@ -556,32 +591,53 @@ const DEFINITIONS = {
     money: "never",
     formats: TABLE,
     period: "range",
-    filters: [PROJECTS_FILTER],
+    filters: [
+      { key: "status" },
+      { key: "material_category" },
+      { key: "material" },
+      { key: "created_by" },
+      PROJECTS_FILTER,
+    ],
     progressReport: false,
-    available: false,
+    available: true,
   },
   purchase_orders: {
     title: "Purchase Orders",
     description:
-      "Purchase Orders in the period: number, date, supplier, materials, quantities ordered and received, value and status.",
+      "Purchase Orders by PO Date: number, supplier, expected delivery, status, receipt status, taxable value, GST and total; each line with its quantity ordered and received.",
     needs: "Needs Purchase Order Report.",
+    central: {
+      description:
+        "Purchase Orders of the Projects you may see and the Central Stores, by PO Date: number, Project or Store, supplier, status, value with GST, and each line ordered and received.",
+      needs:
+        "Needs Purchase Order Report; a member sees the Projects they are on.",
+    },
     group: "procurement",
     scopes: BOTH,
     menu: "procurement.purchase_orders",
     request: "report",
     download: "report",
-    money: "with_financial",
+    // The menu has no Financial: PO amounts show to everyone who reads POs.
+    money: "always",
+    moneyFlag: "report",
     formats: TABLE,
     period: "range",
-    filters: [{ key: "supplier" }, PROJECTS_FILTER],
+    filters: [{ key: "status" }, { key: "supplier" }, PROJECTS_FILTER],
     progressReport: false,
-    available: false,
+    available: true,
   },
   material_received: {
     title: "Material Received",
     description:
-      "Material received in the period: date, supplier, PO, challan, materials and quantities; amounts with Material Received Financial.",
-    needs: "Needs Material Received Report; amounts need Financial.",
+      "Goods received by GR Date: GRN number, supplier, PO, invoice, challan, vehicle and each material's quantity; rates, GST and value with Material Received Financial.",
+    needs:
+      "Needs Material Received Report; amounts need Financial; without View all, the receipts you entered.",
+    central: {
+      description:
+        "Goods received at the Projects you may see and the Central Stores, by GR Date: GRN number, Project or Store, supplier, PO, invoice and quantities; value with Material Received Financial.",
+      needs:
+        "Needs Material Received Report; amounts need Financial; a member sees the Projects they are on.",
+    },
     group: "procurement",
     scopes: BOTH,
     menu: "procurement.material_received",
@@ -592,13 +648,19 @@ const DEFINITIONS = {
     period: "range",
     filters: [{ key: "supplier" }, PROJECTS_FILTER],
     progressReport: false,
-    available: false,
+    available: true,
   },
   material_transfers: {
     title: "Material Transfers",
     description:
-      "Material Transfers in the period: number, from, to, materials, quantities sent and delivered, and status.",
+      "Material Transfers into or out of this Project by Transfer Date: number, type, from and to, status, sent by, received by, remark, and each material's quantity.",
     needs: "Needs Material Transfer Report.",
+    central: {
+      description:
+        "Material Transfers of the Projects you may see and the Central Stores, by Transfer Date: number, type, from and to, status, sent by, received by and remark.",
+      needs:
+        "Needs Material Transfer Report; Store transfers need Central store Read.",
+    },
     group: "procurement",
     scopes: BOTH,
     menu: "procurement.material_transfers",
@@ -607,15 +669,21 @@ const DEFINITIONS = {
     money: "never",
     formats: TABLE,
     period: "range",
-    filters: [PROJECTS_FILTER],
+    filters: [{ key: "status" }, { key: "transfer_type" }, PROJECTS_FILTER],
     progressReport: false,
-    available: false,
+    available: true,
   },
   stock_register: {
     title: "Stock Register",
     description:
-      "A ledger per material: opening, received, transferred in and out, consumed, missing and closing stock for the period.",
+      "Per material on this Project: opening, received, transferred in and out, issued, received from store, consumed, missing, adjustment and closing stock for the period, as on the Stock Register.",
     needs: "Needs Current Inventory Report.",
+    central: {
+      description:
+        "Per material at each Project you may see and each Central Store: opening, received, transferred in and out, consumed, missing and closing stock for the period.",
+      needs:
+        "Needs Current Inventory Report; Stores need Central store Read; a member sees the Projects they are on.",
+    },
     group: "procurement",
     scopes: BOTH,
     menu: "procurement.current_inventory",
@@ -624,9 +692,14 @@ const DEFINITIONS = {
     money: "never",
     formats: TABLE,
     period: "range",
-    filters: [{ key: "material" }, { key: "store" }, PROJECTS_FILTER],
+    filters: [
+      { key: "material_category" },
+      { key: "material" },
+      { key: "store", scopes: CENTRAL },
+      PROJECTS_FILTER,
+    ],
     progressReport: false,
-    available: false,
+    available: true,
   },
   // Progress Reports (CM-606, CM-805): requested from the Project's
   // Progress Reports module (Progress Report Add / View / Delete).

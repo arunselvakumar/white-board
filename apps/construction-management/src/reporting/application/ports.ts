@@ -15,6 +15,18 @@ import type {
   ReportParams,
 } from "../domain/report-job";
 import type { ReportVendorLine } from "../domain/vendor-attendance-report";
+// Procurement and central labour reports (CM-903).
+import type {
+  ReportProject,
+  ReportProjectLabourDay,
+} from "../domain/central-labour-attendance-report";
+import type {
+  MaterialReceivedReportRow,
+  MaterialTransferReportRow,
+  PurchaseOrderReportRow,
+  PurchaseRequestReportRow,
+  StockRegisterReportRow,
+} from "../domain/procurement-reports";
 // Site work reports (CM-605, CM-608).
 import type { ReportWorksheet } from "../domain/daily-work-report";
 import type {
@@ -162,6 +174,20 @@ export type ReportSource = SiteWorkReportSource & {
     labours: ReportLabour[];
     days: ReportLabourDay[];
     entries: ReportLedgerEntry[];
+  }>;
+  /**
+   * Central Labour Attendance (CM-903): the days marked in `projectIds`
+   * (null: every Project of the Company) in the range, with their
+   * Projects and Labours.
+   */
+  projectLabourDays(
+    workspaceId: string,
+    projectIds: string[] | null,
+    range: DateRange,
+  ): Promise<{
+    projects: ReportProject[];
+    labours: ReportLabour[];
+    days: ReportProjectLabourDay[];
   }>;
   vendorLines(
     workspaceId: string,
@@ -375,4 +401,105 @@ export type TaskProgressSource = {
     projectId: string;
     range: DateRange;
   }): Promise<TaskProgressReadModel>;
+};
+
+// ---------------------------------------------------------------------------
+// Procurement reports (CM-903)
+// ---------------------------------------------------------------------------
+
+/**
+ * Where a procurement report reads: Projects (null: every Project of the
+ * Company) and Central Stores (null: every Store; empty: none). A
+ * Project's report is `{ projectIds: [it], storeIds: [] }`.
+ */
+export type ProcurementReportPlaces = {
+  projectIds: string[] | null;
+  storeIds: string[] | null;
+};
+
+/** The names of the filters a job was asked with, for its notes. */
+export type ProcurementFilterNames = {
+  supplier?: string | null;
+  material?: string | null;
+  category?: string | null;
+  createdBy?: string | null;
+  store?: string | null;
+};
+
+/**
+ * What the procurement reports read (CM-903) from procurement, masters,
+ * projects and organization tables. Implemented in
+ * `src/composition/procurement-report-source.ts`, which uses
+ * procurement's own rules (statuses, the Stock Register's ledger
+ * figures); reporting only sees this port and printable words. A filter
+ * id that is not the Company's fails the job with a domain error naming
+ * it.
+ */
+export type ProcurementReportSource = {
+  /** Live Purchase Requests with a Request Date in the range, one row per matching line. */
+  purchaseRequests(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      projectIds: string[] | null;
+      status: "pending" | "approved" | "rejected" | null;
+      categoryId: string | null;
+      materialId: string | null;
+      createdBy: string | null;
+    },
+  ): Promise<{
+    rows: PurchaseRequestReportRow[];
+    names: ProcurementFilterNames;
+  }>;
+  /** Live Purchase Orders with a PO Date in the range at the places. */
+  purchaseOrders(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      places: ProcurementReportPlaces;
+      status: "pending" | "approved" | "rejected" | null;
+      supplierId: string | null;
+    },
+  ): Promise<{ rows: PurchaseOrderReportRow[]; names: ProcurementFilterNames }>;
+  /** Live Goods Received Notes with a GR Date in the range at the places. */
+  materialReceived(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      places: ProcurementReportPlaces;
+      supplierId: string | null;
+      /** Only the receipts this User entered; null for every one. */
+      ownBy: string | null;
+      /** Amounts are read only when the job carries money. */
+      financial: boolean;
+    },
+  ): Promise<{
+    rows: MaterialReceivedReportRow[];
+    names: ProcurementFilterNames;
+  }>;
+  /** Live Material Transfers with a Transfer Date in the range with either side at the places. */
+  materialTransfers(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      places: ProcurementReportPlaces;
+      status: "pending" | "in_transit" | "delivered" | "rejected" | null;
+      transferType:
+        | "project_to_project"
+        | "project_to_store"
+        | "store_to_project"
+        | "store_to_store"
+        | null;
+    },
+  ): Promise<MaterialTransferReportRow[]>;
+  /** The Stock Register of each place, as the Stock Register screen reads it. */
+  stockRegister(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      places: ProcurementReportPlaces;
+      categoryId: string | null;
+      materialId: string | null;
+    },
+  ): Promise<{ rows: StockRegisterReportRow[]; names: ProcurementFilterNames }>;
 };

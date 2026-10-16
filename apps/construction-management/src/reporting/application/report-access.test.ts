@@ -33,7 +33,8 @@ describe("the catalogue a viewer may request", () => {
     const project = viewerCatalogue(owner, "project", PROJECT);
     expect(kinds(project)).toContain("muster_roll");
     expect(kinds(project)).toContain("daily_progress_report");
-    expect(kinds(project)).not.toContain("purchase_orders");
+    expect(kinds(project)).toContain("purchase_orders");
+    expect(kinds(project)).not.toContain("labour_attendance_central");
     expect(kinds(project)).not.toContain("tds_194c");
     expect(
       project.find((entry) => entry.kind === "labour_month")?.includesMoney,
@@ -45,11 +46,17 @@ describe("the catalogue a viewer may request", () => {
     const central = viewerCatalogue(owner, "central", null);
     expect(kinds(central)).toEqual([
       "vendor_attendance",
+      "labour_attendance_central",
       "equipment_maintenance",
       "equipment_transfers",
       "account_ledger",
       "tds_194c",
       "due_payments",
+      "purchase_requests",
+      "purchase_orders",
+      "material_received",
+      "material_transfers",
+      "stock_register",
     ]);
   });
 
@@ -107,6 +114,56 @@ describe("the catalogue a viewer may request", () => {
     });
     expect(
       viewerCatalogue(withCost, "project", PROJECT)[0]?.includesMoney,
+    ).toBe(true);
+  });
+
+  it("needs Central Reports Read for a central report no module hosts (CM-903)", () => {
+    const grants: PermissionGrants = {
+      "procurement.purchase_orders": ["read", "report"],
+      "labour.labour": ["read", "report"],
+      "masters.equipments": ["read", "report"],
+    };
+    const without = member(grants);
+    expect(kinds(viewerCatalogue(without, "central", null))).toEqual([
+      "equipment_maintenance",
+      "equipment_transfers",
+    ]);
+    // The Project's own reports never need it.
+    expect(kinds(viewerCatalogue(without, "project", PROJECT))).toContain(
+      "purchase_orders",
+    );
+    const withCentral = member({
+      ...grants,
+      "reporting.central_reports": ["read"],
+    });
+    const central = viewerCatalogue(withCentral, "central", null);
+    expect(kinds(central)).toEqual([
+      "labour_attendance_central",
+      "equipment_maintenance",
+      "equipment_transfers",
+      "purchase_orders",
+    ]);
+    // Purchase Order has no Financial: Report shows its amounts.
+    expect(
+      central.find((entry) => entry.kind === "purchase_orders")?.includesMoney,
+    ).toBe(true);
+  });
+
+  it("puts Material Received amounts behind its Financial", () => {
+    const reporter = member({
+      "procurement.material_received": ["read", "report"],
+    });
+    const entry = viewerCatalogue(reporter, "project", PROJECT).find(
+      (item) => item.kind === "material_received",
+    );
+    expect(entry?.includesMoney).toBe(false);
+    const financial = member({
+      "procurement.material_received": ["read", "report", "financial"],
+    });
+    expect(
+      viewerCatalogue(financial, "project", PROJECT).find(
+        (item) => item.kind === "material_received",
+      )?.includesMoney,
     ).toBe(true);
   });
 });

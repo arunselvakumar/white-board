@@ -29,6 +29,7 @@ import type {
   DprRenderer,
   DprSource,
   FinanceReportSource,
+  ProcurementReportSource,
   ProjectLookup,
   TaskProgressSource,
   TrackingReportSource,
@@ -96,6 +97,8 @@ export function createReportExecutor(deps: {
   dpr?: { source: DprSource; render: DprRenderer };
   /** The finance reports' read model (CM-709). */
   finance?: FinanceReportSource;
+  /** The procurement reports' read model (CM-903). */
+  procurement?: ProcurementReportSource;
   /**
    * The tracking reports' read model and the Task Progress Report's
    * (CM-805), printed by the DPR's writer.
@@ -194,6 +197,7 @@ export function createReportExecutor(deps: {
       clock(),
       deps.finance,
       deps.tracking?.source,
+      deps.procurement,
     );
     const [xlsx, pdf] = await Promise.all([
       deps.renderer.xlsx(document),

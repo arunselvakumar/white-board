@@ -25,8 +25,10 @@ import {
   REPORT_GROUP_COPY,
   type CardFilter,
   type ReportDefinition,
+  type ReportPickerOptions,
 } from "./report-catalogue";
 import { ReportCard, type ReportFilterOption } from "./report-card";
+import { useReportPickerOptions } from "./report-pickers";
 
 export type FilterOptions = Partial<Record<CardFilter, ReportFilterOption[]>>;
 
@@ -115,15 +117,18 @@ export function ReportGroup({
   today,
   filters,
   initialFilters,
+  pickers,
 }: {
   id: string;
   title: string;
   description: string;
   definitions: readonly ReportDefinition[];
-  /** Null for the central reports (Central Payment). */
+  /** Null for the central reports (Central Reports, Central Payment). */
   projectId: string | null;
   today: string;
   filters?: FilterOptions;
+  /** The cards' other pickers and the central Projects (CM-903). */
+  pickers?: ReportPickerOptions;
   /**
    * A card's starting filter choice by kind; the card starts again when it
    * changes.
@@ -153,6 +158,7 @@ export function ReportGroup({
                   ? []
                   : (filters[filter.key] ?? [])
               }
+              pickerOptions={pickers}
             />
           );
         })}
@@ -171,7 +177,7 @@ const PAGE_GROUPS = [
 ] as const satisfies readonly ReportDefinition["group"][];
 
 /**
- * The Project's Reports tab (CM-217 … CM-805, CM-901): a card per report
+ * The Project's Reports tab (CM-217 … CM-805, CM-901, CM-903): a card per report
  * the viewer may request, from the server's catalogue trimmed to their
  * Permission Matrix, grouped into labour, site work, tasks / issues /
  * inspections, payments and materials, then the recent reports with Excel
@@ -191,6 +197,8 @@ export function ReportsPage({
     offered.filter((item) => item.group === group);
   const siteWork = useSiteWorkFilters(projectId, inGroup("site_work"));
   const finance = useFinanceFilters(projectId, inGroup("finance"));
+  // Vendor, Labour Category and the materials pickers (CM-903).
+  const pickers = useReportPickerOptions(projectId, offered);
   const filters: Partial<Record<ReportDefinition["group"], FilterOptions>> = {
     site_work: siteWork,
     finance,
@@ -225,6 +233,7 @@ export function ReportsPage({
             projectId={projectId}
             today={today}
             filters={filters[group]}
+            pickers={pickers}
           />
         );
       })}

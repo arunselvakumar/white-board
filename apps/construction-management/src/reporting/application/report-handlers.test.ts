@@ -176,6 +176,8 @@ function source(overrides: Partial<ReportSource> = {}): ReportSource {
     labourDays: () => Promise.resolve({ labours: [], days: [] }),
     labourLedger: () => Promise.resolve({ labours: [], entries: [] }),
     musterRoll: () => Promise.resolve({ labours: [], days: [], entries: [] }),
+    projectLabourDays: () =>
+      Promise.resolve({ projects: [], labours: [], days: [] }),
     vendorLines: () =>
       Promise.resolve({ lines: [], vendorName: null, categoryName: null }),
     // Site work reports (CM-605, CM-608).
