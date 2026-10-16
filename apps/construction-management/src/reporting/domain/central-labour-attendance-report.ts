@@ -56,7 +56,8 @@ export function buildCentralLabourAttendanceReport(input: {
   const daysOf = new Map<string, Map<string, ReportLabourDay[]>>();
   for (const day of inRange) {
     if (!laboursById.has(day.labourId)) continue;
-    const project = daysOf.get(day.projectId) ?? new Map();
+    const project =
+      daysOf.get(day.projectId) ?? new Map<string, ReportLabourDay[]>();
     const list = project.get(day.labourId) ?? [];
     list.push(day);
     project.set(day.labourId, list);

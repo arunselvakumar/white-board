@@ -430,9 +430,7 @@ export function ReportCard({
       { from, to, month, asOn, fy },
       filterItems == null || chosen === ALL ? null : chosen,
       extras,
-      Object.fromEntries(
-        pickers.map(({ key }) => [key, picks[key] ?? ALL]),
-      ) as Picks,
+      Object.fromEntries(pickers.map(({ key }) => [key, picks[key] ?? ALL])),
       projectIds,
     );
     if (input != null) mutation.mutate(input);
