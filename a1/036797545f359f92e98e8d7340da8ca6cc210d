@@ -1,0 +1,23 @@
+apps/construction-management/CONTEXT.md
+  s_9b8b004c55c7f2::t_6c41b10e285ce0 194-197
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_e4650dbc4b5cda 464-483
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_720c6b8a5e762a 896-904,945-946
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a1036797545f359f92e98e8d7340da8ca6cc210d",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
