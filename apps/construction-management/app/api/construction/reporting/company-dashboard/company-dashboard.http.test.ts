@@ -294,12 +294,13 @@ describe("Company Dashboard HTTP (CM-902)", () => {
 
   it("refuses half a duration or one that ends before it starts", async () => {
     const s = await setup();
-    for (const query of [
+    const queries: Record<string, string>[] = [
       { from: TODAY },
       { to: TODAY },
       { from: TODAY, to: addDays(TODAY, -1) },
       { from: "16-10-2026", to: TODAY },
-    ]) {
+    ];
+    for (const query of queries) {
       const response = await read(s.owner, query);
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     }
