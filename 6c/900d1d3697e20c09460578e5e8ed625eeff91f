@@ -1,0 +1,31 @@
+packages/db/construction/prisma/migrations/20261016090000_construction_organization_queue_and_deletion/migration.sql
+  s_9b8b004c55c7f2::t_909b9e1e490da7 1-102
+packages/db/construction/prisma/migrations/20261016090100_construction_reporting_m9/migration.sql
+  s_9b8b004c55c7f2::t_730b5e88b6bc1a 1-61
+packages/db/construction/prisma/migrations/20261016090200_construction_messaging/migration.sql
+  s_9b8b004c55c7f2::t_ade88d503e6d60 1-97
+packages/db/construction/prisma/schema/base.prisma
+  s_9b8b004c55c7f2::t_84ffd62f4ef9ce 13
+packages/db/construction/prisma/schema/construction-messaging.prisma
+  s_9b8b004c55c7f2::t_c4acac3a8106d5 1-105
+packages/db/construction/prisma/schema/construction-organization.prisma
+  s_9b8b004c55c7f2::t_404b92f0a1ebfb 133-134,402-506
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_9b8b004c55c7f2::t_cd5313bab12220 3-4,33-39,50-51,83,87-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6c900d1d3697e20c09460578e5e8ed625eeff91f",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
