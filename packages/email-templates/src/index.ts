@@ -98,7 +98,9 @@ export async function renderCompanyCodeEmail(
     subject:
       props.purpose === "verify-email"
         ? `${props.code} is your Construction Management verification code`
-        : `${props.code} is your Construction Management password reset code`,
+        : props.purpose === "reset-password"
+          ? `${props.code} is your Construction Management password reset code`
+          : `${props.code} is your Construction Management confirmation code`,
     ...(await renderBoth(createElement(CompanyCodeEmail, props))),
   };
 }

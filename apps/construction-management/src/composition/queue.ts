@@ -10,6 +10,7 @@ import {
   type QueueHandler,
 } from "@/src/shared-kernel/queue";
 
+import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
 import { reportQueueHandlerFromEnv } from "./report-jobs";
 
 /**
@@ -19,7 +20,7 @@ import { reportQueueHandlerFromEnv } from "./report-jobs";
  * `DAILY_JOB_TYPES`.
  */
 export function queueHandlers(): QueueHandler[] {
-  return [reportQueueHandlerFromEnv()];
+  return [reportQueueHandlerFromEnv(), companyPurgeQueueHandler()];
 }
 
 /**
@@ -27,7 +28,7 @@ export function queueHandlers(): QueueHandler[] {
  * `daily:<type>:<date>`): retention, orphan clean-up, "became delayed"
  * notifications, Company deletions that are due.
  */
-export const DAILY_JOB_TYPES: readonly string[] = [];
+export const DAILY_JOB_TYPES: readonly string[] = [COMPANY_PURGE_JOB];
 
 export const queueStore = prismaQueueStore(prisma);
 
