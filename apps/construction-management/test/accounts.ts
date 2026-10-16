@@ -179,3 +179,27 @@ export async function messagingCounts(userId: string): Promise<{
     preferences: Number(row?.preferences ?? 0),
   };
 }
+
+/**
+ * A verified `reveal_identifiers` code for the session, as if the User had
+ * entered it: reveals are open for 10 minutes (ADR CM-0021 §11). Mocked
+ * sessions (`actAs`) are `session_<userId>`.
+ */
+export async function openRevealWindow(
+  userId: string,
+  sessionId = `session_${userId}`,
+): Promise<void> {
+  const now = new Date();
+  await prisma.constructionOrganizationActionCode.create({
+    data: {
+      id: randomUUID(),
+      userId,
+      sessionId,
+      purpose: "reveal_identifiers",
+      codeHash: "verified-in-test",
+      expiresAt: new Date(now.getTime() + 600_000),
+      consumedAt: now,
+      verifiedUntil: new Date(now.getTime() + 600_000),
+    },
+  });
+}
