@@ -20,7 +20,7 @@ import {
   type BackupPart,
 } from "../domain/backup-job";
 import { buildBackupManifest } from "../domain/backup-manifest";
-import { backupModule } from "../domain/backup-modules";
+import { backupModule, isHrmsOnly } from "../domain/backup-modules";
 import type { BackupFinished } from "../domain/events";
 import {
   BACKUP_PART_JOB_TYPE,
@@ -169,7 +169,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
         projectId: failed.projectId,
         requestedBy: failed.requestedBy,
         status: "failed",
-        title: backupTitle(failed.scope),
+        title: backupTitle(failed.scope, failed.modules),
         fileName: null,
         downloadHref: null,
         error: message,
@@ -371,6 +371,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     const fileName = backupFileName(
       backup.scope,
       now.toISOString().slice(0, 10),
+      backup.modules,
     );
     await deps.storage.put(key, bytes, "application/zip");
     const finishedAt = clock();
@@ -404,7 +405,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
         projectId: backup.projectId,
         requestedBy: backup.requestedBy,
         status: "done",
-        title: backupTitle(backup.scope),
+        title: backupTitle(backup.scope, backup.modules),
         fileName,
         downloadHref: href,
         error: null,
@@ -413,6 +414,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     );
     if (
       backup.scope === "company" &&
+      !isHrmsOnly(backup.modules) &&
       notify.email != null &&
       deps.mailer != null
     )

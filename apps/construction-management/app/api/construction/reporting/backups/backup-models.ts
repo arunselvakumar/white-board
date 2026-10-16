@@ -35,6 +35,11 @@ export const CreateConstructionReportingBackupRequestModel =
       /** The six-digit code sent with purpose `company_backup`. */
       code: z.string().regex(/^\d{6}$/),
       includeMedia: z.boolean().default(false),
+      /**
+       * HRMS modules only (Settings → Backup & export → HRMS); left out,
+       * the backup holds every module of the Company.
+       */
+      modules: ModuleKeys.optional(),
     }),
     z.object({ scope: z.literal("my_data") }),
   ]);
@@ -60,7 +65,7 @@ export const DownloadConstructionReportingBackupRequestModel = z.object({
 
 export const ListConstructionReportingBackupOptionsRequestModel = z
   .object({
-    scope: z.enum(["project", "masters"]),
+    scope: z.enum(["project", "masters", "hrms"]),
     projectId: z.uuid().optional(),
   })
   .refine((query) => query.scope !== "project" || query.projectId != null, {

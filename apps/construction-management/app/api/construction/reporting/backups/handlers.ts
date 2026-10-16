@@ -87,7 +87,7 @@ export async function backupResponses(
   return jobs.map((job) => ({
     id: job.id,
     scope: job.scope,
-    title: backupTitle(job.scope),
+    title: backupTitle(job.scope, job.modules),
     detail: backupDetail(job),
     projectId: job.projectId,
     projectName:

@@ -9,7 +9,12 @@ import type { MenuKey } from "@/src/shared-kernel/access";
  * tables.
  */
 
-export type BackupModuleScope = "project" | "masters" | "company";
+/**
+ * `hrms` modules are Company-level and in no Project; a full Company
+ * backup holds them, and the Owner can back up HRMS alone from Settings →
+ * Backup & export.
+ */
+export type BackupModuleScope = "project" | "masters" | "hrms" | "company";
 
 /**
  * Who sees a module's amounts: Financial on `menu`, or (finance menus,
@@ -375,6 +380,62 @@ const MASTER_MODULES: readonly BackupModule[] = [
   master("masters.tags", "Tags", "tags", ["tags"]),
 ];
 
+function hrms(
+  key: MenuKey,
+  label: string,
+  folder: string,
+  entities: readonly string[],
+  money: BackupMoneyRule = null,
+): BackupModule {
+  return {
+    key,
+    label,
+    group: "HRMS",
+    scope: "hrms",
+    menu: key,
+    money,
+    folder: `hrms/${folder}`,
+    entities,
+    media: false,
+  };
+}
+
+const HRMS_MODULES: readonly BackupModule[] = [
+  hrms("hrms.employees", "Employees (HR data)", "employees", [
+    "hrms_employees",
+    "hrms_branches",
+    "hrms_settings",
+  ]),
+  hrms("hrms.shifts", "Shifts and assignments", "shifts", [
+    "hrms_shift_templates",
+    "hrms_rotation_templates",
+    "hrms_shift_assignments",
+  ]),
+  hrms("hrms.holidays", "Holidays", "holidays", ["hrms_holidays"]),
+  hrms("hrms.attendance", "Staff attendance", "attendance", [
+    "hrms_attendance_entries",
+  ]),
+  hrms("hrms.leaves", "Leave", "leave", [
+    "hrms_leave_types",
+    "hrms_leave_balances",
+    "hrms_leave_ledger",
+    "hrms_leave_requests",
+  ]),
+  hrms(
+    "hrms.salaries",
+    "Salary",
+    "salary",
+    [
+      "hrms_salary_structures",
+      "hrms_salary_components",
+      "hrms_employee_salary_configs",
+      "hrms_salary_slips",
+      "hrms_salary_payments",
+    ],
+    { menu: "hrms.salaries", flag: "financial" },
+  ),
+];
+
 const COMPANY_MODULES: readonly BackupModule[] = [
   {
     key: "company.settings",
@@ -398,6 +459,7 @@ const COMPANY_MODULES: readonly BackupModule[] = [
 export const BACKUP_MODULES: readonly BackupModule[] = [
   ...PROJECT_MODULES,
   ...MASTER_MODULES,
+  ...HRMS_MODULES,
   ...COMPANY_MODULES,
 ];
 
@@ -422,3 +484,12 @@ export const COMPANY_BACKUP_MODULES: readonly string[] = BACKUP_MODULES.map(
 export const BACKUP_ENTITY_KEYS: readonly string[] = BACKUP_MODULES.flatMap(
   (module) => module.entities,
 );
+
+/** A Company-scope backup of HRMS modules alone (not the full backup). */
+export function isHrmsOnly(modules: readonly string[]): boolean {
+  return (
+    modules.length > 0 &&
+    modules.length < BACKUP_MODULES.length &&
+    modules.every((key) => backupModule(key)?.scope === "hrms")
+  );
+}

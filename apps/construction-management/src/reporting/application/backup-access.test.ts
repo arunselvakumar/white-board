@@ -13,6 +13,7 @@ import {
   COMPANY_BACKUP_MODULES,
 } from "../domain/backup-modules";
 import {
+  allowHrmsBackup,
   allowMastersBackup,
   allowProjectBackup,
   backupOptions,
@@ -123,5 +124,28 @@ describe("backup access (CM-906)", () => {
       backupOptions(access, "masters", null).map((option) => option.module.key),
     ).toEqual(["masters.materials"]);
     expect(backupOptions(member({}, []), "project", PROJECT)).toEqual([]);
+  });
+
+  it("gates HRMS modules on their menus' View and salary amounts on Salary Management's Financial", () => {
+    const viewer = member({
+      "hrms.holidays": ["read"],
+      "hrms.salaries": ["read"],
+    });
+    expect(
+      allowHrmsBackup(viewer, ["hrms.holidays", "hrms.salaries"]).map(
+        (allowed) => [allowed.module.key, allowed.money],
+      ),
+    ).toEqual([
+      ["hrms.holidays", false],
+      ["hrms.salaries", false],
+    ]);
+    const financial = member({ "hrms.salaries": ["read", "financial"] });
+    expect(allowHrmsBackup(financial, ["hrms.salaries"])[0]?.money).toBe(true);
+    expect(
+      refusal(() => allowHrmsBackup(viewer, ["hrms.leaves"]))?.details,
+    ).toEqual({ module: "hrms.leaves" });
+    expect(refusal(() => allowHrmsBackup(viewer, ["masters.tags"]))?.code).toBe(
+      "BACKUP_MODULE_UNKNOWN",
+    );
   });
 });

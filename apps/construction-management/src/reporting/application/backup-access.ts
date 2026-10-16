@@ -55,7 +55,7 @@ function moduleDenied(module: BackupModule): DomainError {
 
 function checkedModules(
   keys: readonly string[],
-  scope: "project" | "masters",
+  scope: "project" | "masters" | "hrms",
 ): BackupModule[] {
   const unique = [...new Set(keys)];
   if (unique.length === 0)
@@ -68,7 +68,7 @@ function checkedModules(
     if (found?.scope !== scope)
       throw new DomainError(
         "BACKUP_MODULE_UNKNOWN",
-        `There is no ${scope === "project" ? "Project" : "master records"} module "${key}".`,
+        `There is no ${scope === "project" ? "Project" : scope === "hrms" ? "HRMS" : "master records"} module "${key}".`,
         { details: { module: key } },
       );
     return found;
@@ -93,6 +93,17 @@ export function allowProjectBackup(
   return allow(access, projectId, checkedModules(keys, "project"), "project");
 }
 
+/**
+ * An HRMS backup's modules (Settings → Backup & export): View on each
+ * HRMS menu; salary amounts with Salary Management's Financial.
+ */
+export function allowHrmsBackup(
+  access: MemberAccess,
+  keys: readonly string[],
+): AllowedModules {
+  return allow(access, null, checkedModules(keys, "hrms"), "hrms");
+}
+
 /** A master records backup's modules: View on each master. */
 export function allowMastersBackup(
   access: MemberAccess,
@@ -105,7 +116,7 @@ function allow(
   access: MemberAccess,
   projectId: string | null,
   chosen: readonly BackupModule[],
-  scope: "project" | "masters",
+  scope: "project" | "masters" | "hrms",
 ): AllowedModules {
   for (const entry of chosen)
     if (!canBackUpModule(access, entry, projectId)) throw moduleDenied(entry);
@@ -121,7 +132,7 @@ function allow(
 /** What the backup dialogs offer the member, with the money right per module. */
 export function backupOptions(
   access: MemberAccess,
-  scope: "project" | "masters",
+  scope: "project" | "masters" | "hrms",
   projectId: string | null,
 ): { module: BackupModule; money: boolean }[] {
   if (

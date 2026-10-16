@@ -1,5 +1,7 @@
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
+import { isHrmsOnly } from "./backup-modules";
+
 /**
  * Backups and data exports (ADR CM-0021 §8, CM-906): a ZIP of one CSV and
  * one JSON file per entity of the chosen modules, with a `manifest.json`
@@ -105,15 +107,22 @@ export function isUnfinished(job: Pick<BackupJob, "status">): boolean {
   return job.status === "queued" || job.status === "running";
 }
 
-/** What a backup is called on Downloads, in notifications and emails. */
-export function backupTitle(scope: BackupScope): string {
+/**
+ * What a backup is called on Downloads, in notifications and emails. A
+ * Company-scope backup of HRMS modules alone (Settings → Backup & export)
+ * is an "HRMS backup".
+ */
+export function backupTitle(
+  scope: BackupScope,
+  modules: readonly string[] = [],
+): string {
   switch (scope) {
     case "project":
       return "Project backup";
     case "masters":
       return "Master records backup";
     case "company":
-      return "Full Company backup";
+      return isHrmsOnly(modules) ? "HRMS backup" : "Full Company backup";
     case "my_data":
       return "My data";
   }
@@ -146,19 +155,29 @@ export function backupDetail(
   job: Pick<BackupJob, "scope" | "modules" | "fromDate" | "toDate">,
 ): string {
   if (job.scope === "my_data") return "Your profile, Companies and activity";
-  if (job.scope === "company")
-    return "Every Project, master records and settings";
   const count = job.modules.length;
   const modules = `${String(count)} ${count === 1 ? "module" : "modules"}`;
+  if (job.scope === "company")
+    return isHrmsOnly(job.modules)
+      ? `${modules} of HRMS`
+      : "Every Project, master records, HRMS and settings";
   return job.scope === "project"
     ? `${modules} · ${backupRangeLabel(job)}`
     : modules;
 }
 
 /** `project-backup-2026-10-16.zip`, from the scope and the day it finished. */
-export function backupFileName(scope: BackupScope, finishedOn: string): string {
+export function backupFileName(
+  scope: BackupScope,
+  finishedOn: string,
+  modules: readonly string[] = [],
+): string {
   const stem =
-    scope === "my_data" ? "my-data" : `${scope.replace("_", "-")}-backup`;
+    scope === "my_data"
+      ? "my-data"
+      : scope === "company" && isHrmsOnly(modules)
+        ? "hrms-backup"
+        : `${scope.replace("_", "-")}-backup`;
   return `${stem}-${finishedOn}.zip`;
 }
 

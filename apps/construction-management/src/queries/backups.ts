@@ -35,7 +35,7 @@ export function isPreparingBackup(backup: Pick<Backup, "status">): boolean {
 
 export const backupQueries = {
   /** What the dialog offers: a Project's modules or the masters. */
-  options: (scope: "project" | "masters", projectId?: string) =>
+  options: (scope: "project" | "masters" | "hrms", projectId?: string) =>
     queryOptions({
       queryKey: [...BACKUPS_KEY, "options", scope, projectId ?? null] as const,
       queryFn: () => {

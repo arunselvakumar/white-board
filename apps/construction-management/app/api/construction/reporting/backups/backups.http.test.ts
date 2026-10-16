@@ -21,7 +21,11 @@ import {
   MY_DATA_MODULE,
 } from "@/src/reporting/domain/backup-job";
 import { signedBackupPath } from "@/src/reporting/domain/backup-link";
-import { backupModule } from "@/src/reporting/domain/backup-modules";
+import {
+  BACKUP_ENTITY_KEYS,
+  backupModule,
+  backupModulesIn,
+} from "@/src/reporting/domain/backup-modules";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import { storedBytes } from "@/src/shared-kernel/files/stored-files";
 import { newId } from "@/src/shared-kernel/ids";
@@ -197,6 +201,21 @@ async function rentedSheet(
     unitRate: 150_000n,
     billableQty: "8",
     hireCost: 1_200_050n,
+  });
+}
+
+async function addHoliday(company: Company, name: string, deleted = false) {
+  await prisma.constructionHrmsHoliday.create({
+    data: {
+      id: randomUUID(),
+      workspaceId: company.workspaceId,
+      name,
+      holidayDate: new Date("2026-11-01T00:00:00.000Z"),
+      type: "festival",
+      createdBy: company.userId,
+      updatedBy: company.userId,
+      deletedAt: deleted ? new Date() : null,
+    },
   });
 }
 
@@ -604,6 +623,7 @@ describe("backups: full Company (CM-906)", () => {
     const owner = await ownerWithCompany("Full Builders");
     const site = await siteOf(owner);
     await rentedSheet(owner, site.projectId, site.contractorId);
+    await addHoliday(owner, "Diwali");
     const code = await codeFor(owner, "company_backup");
     const sentBefore = outbox.length;
     const backup = await done(owner.cookie, { scope: "company", code });
@@ -637,6 +657,20 @@ describe("backups: full Company (CM-906)", () => {
     );
     expect(sheets[0]).toContain("Hire Cost (₹)");
     expect(sheets[1]).toContain("12000.50");
+    // HRMS is part of the full backup.
+    for (const hrmsModule of backupModulesIn("hrms"))
+      expect(manifest.modules.map((entry) => entry.key)).toContain(
+        hrmsModule.key,
+      );
+    expect(
+      csvLines(files, "hrms/holidays/hrms_holidays.csv").join("\n"),
+    ).toContain("Diwali");
+    const employees = csvLines(files, "hrms/employees/hrms_employees.csv");
+    expect(employees[0]).toContain("Employee,Designation,Member Type");
+    expect(employees.length).toBeGreaterThan(1);
+    expect(csvLines(files, "hrms/salary/hrms_salary_slips.csv")[0]).toContain(
+      "Net Payable (₹)",
+    );
 
     const mail = outbox
       .slice(sentBefore)
@@ -645,6 +679,65 @@ describe("backups: full Company (CM-906)", () => {
     expect(mail?.text).toContain(
       `${BACKUPS_PATH}/${backup.id}/download?expires=`,
     );
+  });
+});
+
+describe("backups: HRMS alone (CM-906)", () => {
+  it("is the Owner's, behind the code, with HRMS modules only", async () => {
+    const owner = await ownerWithCompany("People Builders");
+    await addHoliday(owner, "Pongal");
+    await addHoliday(owner, "Removed day", true);
+    const member = await memberWith(owner, { "hrms.holidays": ["read"] });
+    const refused = await ask(member.cookie, {
+      scope: "company",
+      code: "123456",
+      modules: ["hrms.holidays"],
+    });
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+
+    const code = await codeFor(owner, "company_backup");
+    const notHrms = await ask(owner.cookie, {
+      scope: "company",
+      code,
+      modules: ["masters.tags"],
+    });
+    expect(notHrms.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(notHrms)).toMatchObject({
+      code: "BACKUP_MODULE_UNKNOWN",
+    });
+
+    // The refusal above did not use the code up.
+    const backup = await done(owner.cookie, {
+      scope: "company",
+      code,
+      modules: ["hrms.holidays", "hrms.salaries"],
+    });
+    expect(backup).toMatchObject({
+      title: "HRMS backup",
+      detail: "2 modules of HRMS",
+      includesMoney: true,
+    });
+    expect(backup.fileName).toMatch(/^hrms-backup-/);
+    const files = await zipOf(owner.cookie, backup);
+    const holidays = csvLines(files, "hrms/holidays/hrms_holidays.csv");
+    expect(holidays[0]).toContain("ID,Holiday,Date,Type");
+    expect(holidays.join("\n")).toContain("Pongal");
+    expect(holidays.join("\n")).not.toContain("Removed day");
+    expect(Object.keys(files).some((path) => path.startsWith("masters/"))).toBe(
+      false,
+    );
+    expect(Object.keys(files).some((path) => path.startsWith("project/"))).toBe(
+      false,
+    );
+
+    const options = await json<Options>(
+      await backupOptions(
+        jsonRequest(`${BASE}/options?scope=hrms`, member.cookie),
+      ),
+    );
+    expect(options.modules.map((module) => module.key)).toEqual([
+      "hrms.holidays",
+    ]);
   });
 });
 
@@ -870,8 +963,22 @@ describe("backup limits and retention (CM-906)", () => {
     expect(gone.status).toBe(StatusCodes.GONE);
   });
 
-  it("has a reader for every entity of the registry", () => {
+  it("has a reader for every entity of the registry, HRMS included", () => {
     expect(missingBackupReaders()).toEqual([]);
+    expect(BACKUP_ENTITY_KEYS).toEqual(
+      expect.arrayContaining([
+        "hrms_employees",
+        "hrms_shift_assignments",
+        "hrms_holidays",
+        "hrms_attendance_entries",
+        "hrms_leave_balances",
+        "hrms_leave_ledger",
+        "hrms_leave_requests",
+        "hrms_salary_structures",
+        "hrms_salary_slips",
+        "hrms_salary_payments",
+      ]),
+    );
   });
 
   it("refuses a fourth unfinished backup", async () => {

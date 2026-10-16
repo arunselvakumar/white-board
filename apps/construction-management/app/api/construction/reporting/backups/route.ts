@@ -10,6 +10,7 @@ import {
   encodeDownloadCursor,
 } from "@/app/api/construction/reporting/downloads/download-models";
 import {
+  allowHrmsBackup,
   allowMastersBackup,
   allowProjectBackup,
   type AllowedModules,
@@ -56,7 +57,10 @@ function projectNotFound(): Response {
  *   first module without it); amounts only with each module's money right.
  * - `masters`: View on each master.
  * - `company`: the Owner only, with a verified `company_backup` code;
- *   every module with amounts, and the link is emailed.
+ *   every module (HRMS included) with amounts, and the link is emailed.
+ *   With `modules` it is an HRMS backup: HRMS modules only, each needing
+ *   View on its HRMS menu, salary amounts with Salary Management's
+ *   Financial (not emailed).
  * - `my_data`: any signed-in User, with or without an Active Company.
  *
  * Never refused because the plan has ended (CM-118 keeps export open).
@@ -134,6 +138,11 @@ export async function POST(request: Request): Promise<Response> {
             "FORBIDDEN",
             "Only the Owner can take a full Company backup.",
           );
+        // Checked before the code is used up.
+        const chosen =
+          body.modules == null
+            ? ALL_MODULES
+            : allowHrmsBackup(session.access, body.modules);
         await verifyActionCode({
           userId: session.userId,
           purpose: "company_backup",
@@ -145,7 +154,7 @@ export async function POST(request: Request): Promise<Response> {
           ...base,
           projectId: null,
           scope: "company",
-          modules: ALL_MODULES,
+          modules: chosen,
           fromDate: null,
           toDate: null,
           includeData: true,
