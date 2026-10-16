@@ -517,19 +517,31 @@ export async function dprPhotos(
 // The whole read model
 // ---------------------------------------------------------------------------
 
-/** The Project logo, when its "Use Project logo on reports" is on. */
+/**
+ * The logo a Progress Report prints (ADR CM-0021 §2): the Project's when
+ * its "Use Project logo on reports" is on, else the Company's, else none.
+ * The same rule as the table reports' header (`prismaReportSource`).
+ */
 export async function reportLogo(
   db: PrismaClient,
   workspaceId: string,
   projectId: string,
 ): Promise<DprReadModel["logo"]> {
-  const project = await db.constructionProjectsProject.findFirst({
-    where: { id: projectId, workspaceId },
-    select: { logoKey: true, useLogoInReports: true },
-  });
-  if (project?.useLogoInReports !== true || project.logoKey == null)
-    return null;
-  return { key: project.logoKey, contentType: "image/*" };
+  const [project, profile] = await Promise.all([
+    db.constructionProjectsProject.findFirst({
+      where: { id: projectId, workspaceId },
+      select: { logoKey: true, useLogoInReports: true },
+    }),
+    db.constructionOrganizationCompanyProfile.findFirst({
+      where: { workspaceId },
+      select: { logoKey: true },
+    }),
+  ]);
+  const key =
+    project?.useLogoInReports === true && project.logoKey != null
+      ? project.logoKey
+      : (profile?.logoKey ?? null);
+  return key == null ? null : { key, contentType: "image/*" };
 }
 
 export function createProgressReportSource(

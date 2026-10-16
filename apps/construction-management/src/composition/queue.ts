@@ -10,12 +10,26 @@ import {
   type QueueHandler,
 } from "@/src/shared-kernel/queue";
 
+import { REPORT_RETENTION_JOB_TYPE } from "@/src/reporting/application/report-retention";
+import {
+  ORPHAN_FILES_JOB_TYPE,
+  orphanFilesHandler,
+} from "@/src/shared-kernel/files/orphan-files";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
+import {
+  QUEUE_CLEANUP_JOB_TYPE,
+  queueCleanupHandler,
+} from "@/src/shared-kernel/queue/cleanup";
+
 import {
   createMessagingDelayedHandler,
   createMessagingRetentionHandler,
   createPushQueueHandler,
 } from "./messaging";
-import { reportQueueHandlerFromEnv } from "./report-jobs";
+import {
+  reportQueueHandlerFromEnv,
+  reportRetentionHandlerFromEnv,
+} from "./report-jobs";
 
 /**
  * Every queue handler in the app (ADR CM-0021 §1). A context exports its
@@ -26,6 +40,10 @@ import { reportQueueHandlerFromEnv } from "./report-jobs";
 export function queueHandlers(): QueueHandler[] {
   return [
     reportQueueHandlerFromEnv(),
+    // Retention and clean-up (CM-901, ADR CM-0021 §3).
+    reportRetentionHandlerFromEnv(),
+    queueCleanupHandler(prisma),
+    orphanFilesHandler({ db: prisma, storage: objectStorage() }),
     // CM-904: one push per notification; daily retention and "became delayed".
     createPushQueueHandler(),
     createMessagingRetentionHandler(),
@@ -39,6 +57,10 @@ export function queueHandlers(): QueueHandler[] {
  * notifications, Company deletions that are due.
  */
 export const DAILY_JOB_TYPES: readonly string[] = [
+  // Retention and clean-up (CM-901, ADR CM-0021 §3).
+  REPORT_RETENTION_JOB_TYPE,
+  QUEUE_CLEANUP_JOB_TYPE,
+  ORPHAN_FILES_JOB_TYPE,
   // CM-904
   "messaging.retention",
   "messaging.delayed",

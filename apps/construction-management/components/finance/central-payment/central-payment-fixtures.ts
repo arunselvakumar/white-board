@@ -1,5 +1,6 @@
 import type { ApiCall } from "../../../.storybook/mocks/api";
 import { financeLookupsHandler } from "@/components/finance/account-fixtures";
+import { catalogueHandler } from "@/components/reports/report-fixtures";
 import type { CentralPaymentSummary } from "@/src/queries/finance-central-payment";
 import type { ReportJob } from "@/src/queries/reports";
 
@@ -179,6 +180,6 @@ export function centralPaymentHandler(
         status: 201,
       });
     }
-    return financeLookupsHandler(call);
+    return catalogueHandler()(call) ?? financeLookupsHandler(call);
   };
 }

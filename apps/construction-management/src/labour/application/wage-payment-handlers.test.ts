@@ -86,6 +86,7 @@ function fakes(options: { today?: string; parties?: PaymentParty[] } = {}) {
           : { bytes: bytes.byteLength, contentType: "application/pdf" },
       );
     },
+    list: () => Promise.resolve({ objects: [], cursor: null }),
     delete: (key) => {
       objects.delete(key);
       return Promise.resolve();
