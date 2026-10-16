@@ -5,6 +5,7 @@
  * if an event loses or renames a field, this file stops compiling.
  */
 import type {
+  InboundBackupFinished,
   InboundEquipmentFuelOverrun,
   InboundInspectionDecided,
   InboundInspectionRequested,
@@ -27,7 +28,10 @@ import type {
   StockBelowMinimum,
 } from "@/src/procurement/domain/events";
 import type { SalaryApproved, SalaryPaid } from "@/src/hrms/domain/events";
-import type { ReportFinished } from "@/src/reporting/domain/events";
+import type {
+  BackupFinished,
+  ReportFinished,
+} from "@/src/reporting/domain/events";
 import type { EquipmentFuelOverrun } from "@/src/site-work/domain/events";
 import type {
   InspectionDecided,
@@ -54,4 +58,5 @@ export type MessagingEventContracts = [
   Fits<SalaryApproved, InboundSalaryDecided>,
   Fits<SalaryPaid, InboundSalaryDecided>,
   Fits<ReportFinished, InboundReportFinished>,
+  Fits<BackupFinished, InboundBackupFinished>,
 ];

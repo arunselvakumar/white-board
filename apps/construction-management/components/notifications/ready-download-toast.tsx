@@ -15,6 +15,8 @@ import {
 } from "react";
 import { createToastManager, Toaster } from "@repo/ui/components/toast";
 
+import { BACKUPS_KEY } from "@/src/queries/backups";
+import { DOWNLOADS_KEY } from "@/src/queries/downloads";
 import { REPORTS_KEY } from "@/src/queries/reports";
 
 import {
@@ -57,30 +59,49 @@ function rememberShown(id: string): void {
   }
 }
 
-type JobList = { items?: { status?: string }[] };
+type Job = { status?: string };
+type JobList = { items?: Job[]; pages?: { items?: Job[] }[] } & Job;
+
+const unfinished = (job: Job) =>
+  job.status === "queued" || job.status === "running";
 
 /**
- * True while a cached reports list (Project or central) holds a queued or
- * running report, fetched within `windowMs` when given.
+ * Query keys whose cached reads may hold a job the member is waiting for:
+ * reports (CM-904), and backups, exports and Downloads (CM-906).
+ */
+const FAST_POLL_KEYS: readonly (readonly string[])[] = [
+  REPORTS_KEY,
+  BACKUPS_KEY,
+  DOWNLOADS_KEY,
+];
+
+/**
+ * True while a cached reports list (Project or central), backup or
+ * Downloads page holds a queued or running job, fetched within `windowMs`
+ * when given.
  */
 export function hasPendingReport(
   client: QueryClient,
   windowMs?: number,
 ): boolean {
   const now = Date.now();
-  return client
-    .getQueryCache()
-    .findAll({ queryKey: REPORTS_KEY })
-    .some((query) => {
-      if (windowMs != null && now - query.state.dataUpdatedAt > windowMs)
-        return false;
-      const data = query.state.data as JobList | undefined;
-      return (
-        data?.items?.some(
-          (job) => job.status === "queued" || job.status === "running",
-        ) === true
-      );
-    });
+  return FAST_POLL_KEYS.some((queryKey) =>
+    client
+      .getQueryCache()
+      .findAll({ queryKey })
+      .some((query) => {
+        if (windowMs != null && now - query.state.dataUpdatedAt > windowMs)
+          return false;
+        const data = query.state.data as JobList | undefined;
+        if (data == null) return false;
+        return (
+          unfinished(data) ||
+          data.items?.some(unfinished) === true ||
+          data.pages?.some((page) => page.items?.some(unfinished) === true) ===
+            true
+        );
+      }),
+  );
 }
 
 /** Starts a file download without leaving the page. */

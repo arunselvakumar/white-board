@@ -52,13 +52,23 @@ export async function markStoredFileDeleted(
   });
 }
 
-/** Bytes of the Company's live files. */
+/**
+ * `stored_files` kinds that do not count towards storage: backups and data
+ * exports (ADR CM-0021 §8), which expire after 7 days.
+ */
+export const UNMETERED_FILE_KINDS: readonly string[] = ["backup"];
+
+/** Bytes of the Company's live files (backups left out). */
 export async function storedBytes(
   db: FileWriter,
   workspaceId: string,
 ): Promise<number> {
   const result = await db.constructionOrganizationStoredFile.aggregate({
-    where: { workspaceId, deletedAt: null },
+    where: {
+      workspaceId,
+      deletedAt: null,
+      kind: { notIn: [...UNMETERED_FILE_KINDS] },
+    },
     _sum: { bytes: true },
   });
   return result._sum.bytes ?? 0;
