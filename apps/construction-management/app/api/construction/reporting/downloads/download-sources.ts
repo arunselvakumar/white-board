@@ -18,6 +18,7 @@ import { reportExpiresAt } from "@/src/reporting/domain/report-retention";
 import { prismaProjectNames } from "@/src/reporting/infrastructure/prisma-report-source";
 import { can } from "@/src/shared-kernel/access";
 
+import { backupResponses, backups } from "../backups/handlers";
 import { mayOpen, reports } from "../reports/handlers";
 import { downloadPath, REPORTS_PATH } from "../reports/report-models";
 import type {
@@ -126,9 +127,61 @@ export const reportDownloadSource: DownloadSource = {
 };
 
 /**
+ * Backups and data exports (CM-906): the member's own, with the signed
+ * ZIP link while done and Delete; a failed one is asked for again rather
+ * than retried. A read nudges a stuck one, as for reports.
+ */
+function backupSource(kind: "backups" | "exports"): DownloadSource {
+  return {
+    source: kind === "backups" ? "backup" : "export",
+    async list(session, page) {
+      const jobs = await backups.handlers.listOwn(
+        session.userId,
+        session.workspaceId,
+        { before: page.before, limit: page.limit, kind },
+      );
+      await backups.heal(jobs);
+      const rows = await backupResponses(jobs);
+      return rows.map((row) => {
+        const base = {
+          id: row.id,
+          title: row.title,
+          detail: row.detail,
+          projectId: row.projectId,
+          projectName: row.projectName,
+          status: row.status,
+          error: row.error,
+          createdAt: row.createdAt,
+          finishedAt: row.finishedAt,
+          expiresAt: row.expiresAt,
+          files:
+            row.downloadHref == null
+              ? []
+              : [{ format: "zip" as const, label: "ZIP", href: row.downloadHref }],
+          retryHref: null,
+          deleteHref: row.deleteHref,
+        };
+        return row.scope === "my_data"
+          ? { ...base, source: "export" as const, scope: "my_data" as const }
+          : {
+              ...base,
+              source: "backup" as const,
+              scope: row.scope,
+              includesMoney: row.includesMoney,
+              includeMedia: row.includeMedia,
+            };
+      });
+    },
+  };
+}
+
+export const backupDownloadSource = backupSource("backups");
+export const exportDownloadSource = backupSource("exports");
+
+/**
  * Every source Downloads merges. Append-only: CM-906 adds its backup and
  * data-export sources here.
  */
 export function downloadSources(): DownloadSource[] {
-  return [reportDownloadSource];
+  return [reportDownloadSource, backupDownloadSource, exportDownloadSource];
 }

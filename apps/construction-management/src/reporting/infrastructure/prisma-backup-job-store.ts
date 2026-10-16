@@ -130,12 +130,16 @@ export function prismaBackupJobStore(db: PrismaClient): BackupJobStore {
 
     async listOwn(userId, workspaceId, page) {
       const before = page.before;
+      const kind = page.kind ?? "all";
+      if (kind === "backups" && workspaceId == null) return [];
       const rows = await db.constructionReportingBackupJob.findMany({
         where: {
           requestedBy: userId,
           OR: [
-            { workspaceId: null },
-            ...(workspaceId == null ? [] : [{ workspaceId }]),
+            ...(kind === "backups" ? [] : [{ scope: "my_data" as const }]),
+            ...(workspaceId == null || kind === "exports"
+              ? []
+              : [{ workspaceId, scope: { not: "my_data" as const } }]),
           ],
           ...(before == null
             ? {}

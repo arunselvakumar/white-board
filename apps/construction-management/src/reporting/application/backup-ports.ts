@@ -4,6 +4,8 @@ import type { EnqueueInput } from "@/src/shared-kernel/queue";
 import type { BackupColumn, BackupRawValue } from "../domain/backup-csv";
 import type { BackupJob, BackupPart } from "../domain/backup-job";
 
+export type BackupListKind = "backups" | "exports" | "all";
+
 /** Where backup jobs live (`construction_reporting.backup_jobs`). */
 export type BackupJobStore = {
   /** Inserts the job and its part jobs in one transaction; the queue ids. */
@@ -11,12 +13,17 @@ export type BackupJobStore = {
   get(id: string): Promise<BackupJob | null>;
   /**
    * The User's own backups, newest first by `createdAt` then `id`, before
-   * `before`: those asked in `workspaceId`, and their data exports.
+   * `before`: `backups` asked in `workspaceId`, their data `exports`
+   * (which belong to no Company), or `all` of those.
    */
   listOwn(
     userId: string,
     workspaceId: string | null,
-    page: { before: { createdAt: Date; id: string } | null; limit: number },
+    page: {
+      before: { createdAt: Date; id: string } | null;
+      limit: number;
+      kind?: BackupListKind;
+    },
   ): Promise<BackupJob[]>;
   countUnfinished(userId: string): Promise<number>;
   /** queued → running (keeps `startedAt` once set); false when not unfinished. */

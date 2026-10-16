@@ -139,23 +139,29 @@ export function createBackupJobs(options: BackupJobsOptions = {}) {
     if (zip != null) await kickQueue([zip], own);
   }
 
+  /** A polling read nudges stuck parts or a stuck zip (ADR CM-0021 §1). */
+  async function heal(jobs: readonly BackupJob[]): Promise<void> {
+    const ids = await handlers.stalled(jobs);
+    if (ids.length > 0) await kickQueue(ids, own);
+  }
+
   return {
     handlers,
     queue,
+    heal,
     async request(input: BackupRequest): Promise<BackupJob> {
       const { job, queueIds } = await handlers.request(input);
       await kick(job.id, queueIds);
       return (await store.get(job.id)) ?? job;
     },
-    /** A polling read nudges stuck parts or a stuck zip (ADR CM-0021 §1). */
-    async heal(jobs: readonly BackupJob[]): Promise<void> {
-      const ids = await handlers.stalled(jobs);
-      if (ids.length > 0) await kickQueue(ids, own);
+    /** Any backup by id, for the signed link (which checks who may open it). */
+    get(id: string): Promise<BackupJob | null> {
+      return store.get(id);
     },
     async getOwn(id: string, userId: string): Promise<BackupJob> {
       const job = await handlers.getOwn(id, userId);
-      await this.heal([job]);
-      return job;
+      await heal([job]);
+      return (await store.get(id)) ?? job;
     },
   };
 }

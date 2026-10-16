@@ -5,6 +5,10 @@ import {
   reportingDownloadsOpenApiOperations,
 } from "@/app/api/construction/reporting/downloads-openapi";
 import {
+  reportingBackupsOpenApiComponents,
+  reportingBackupsOpenApiOperations,
+} from "@/app/api/construction/reporting/backups-openapi";
+import {
   messagingOpenApiComponents,
   messagingOpenApiOperations,
 } from "@/app/api/construction/messaging/messaging-openapi";
@@ -997,6 +1001,9 @@ openApiOperations.push(...companyDashboardOpenApiOperations);
 // Action codes, Devices, ownership and deletion (M9, CM-907).
 Object.assign(openApiComponents, accountOpenApiComponents);
 openApiOperations.push(...accountOpenApiOperations);
+// Backups and Download My Data (M9, CM-906).
+Object.assign(openApiComponents, reportingBackupsOpenApiComponents);
+openApiOperations.push(...reportingBackupsOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

@@ -166,7 +166,7 @@ export class BackupHandlers {
   listOwn(
     userId: string,
     workspaceId: string | null,
-    page: { before: { createdAt: Date; id: string } | null; limit: number },
+    page: Parameters<BackupJobStore["listOwn"]>[2],
   ): Promise<BackupJob[]> {
     return this.deps.store.listOwn(userId, workspaceId, page);
   }

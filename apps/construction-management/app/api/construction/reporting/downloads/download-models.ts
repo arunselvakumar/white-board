@@ -22,7 +22,7 @@ export const DOWNLOADS_PATH = "/api/construction/reporting/downloads";
  *    fields of any source; give the source a label in its
  *    `SOURCE_LABELS` (a missing one is a type error).
  */
-export const DOWNLOAD_SOURCES = ["report"] as const;
+export const DOWNLOAD_SOURCES = ["report", "backup", "export"] as const;
 
 export type DownloadSourceKey = (typeof DOWNLOAD_SOURCES)[number];
 
@@ -78,6 +78,19 @@ export const ConstructionReportingDownloadItemModel = z.discriminatedUnion(
       includesMoney: z.boolean(),
       /** A Daily or Task Progress Report (kept until deleted). */
       progressReport: z.boolean(),
+    }),
+    // CM-906: backups (Project, master records, full Company).
+    DownloadItemBase.extend({
+      source: z.literal("backup"),
+      scope: z.enum(["project", "masters", "company"]),
+      /** The ZIP carries amounts. */
+      includesMoney: z.boolean(),
+      includeMedia: z.boolean(),
+    }),
+    // CM-906: Download My Data.
+    DownloadItemBase.extend({
+      source: z.literal("export"),
+      scope: z.literal("my_data"),
     }),
   ],
 );
