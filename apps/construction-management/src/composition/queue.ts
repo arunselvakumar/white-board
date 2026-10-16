@@ -10,7 +10,21 @@ import {
   type QueueHandler,
 } from "@/src/shared-kernel/queue";
 
-import { reportQueueHandlerFromEnv } from "./report-jobs";
+import { REPORT_RETENTION_JOB_TYPE } from "@/src/reporting/application/report-retention";
+import {
+  ORPHAN_FILES_JOB_TYPE,
+  orphanFilesHandler,
+} from "@/src/shared-kernel/files/orphan-files";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
+import {
+  QUEUE_CLEANUP_JOB_TYPE,
+  queueCleanupHandler,
+} from "@/src/shared-kernel/queue/cleanup";
+
+import {
+  reportQueueHandlerFromEnv,
+  reportRetentionHandlerFromEnv,
+} from "./report-jobs";
 
 /**
  * Every queue handler in the app (ADR CM-0021 §1). A context exports its
@@ -19,7 +33,13 @@ import { reportQueueHandlerFromEnv } from "./report-jobs";
  * `DAILY_JOB_TYPES`.
  */
 export function queueHandlers(): QueueHandler[] {
-  return [reportQueueHandlerFromEnv()];
+  return [
+    reportQueueHandlerFromEnv(),
+    // Retention and clean-up (CM-901, ADR CM-0021 §3).
+    reportRetentionHandlerFromEnv(),
+    queueCleanupHandler(prisma),
+    orphanFilesHandler({ db: prisma, storage: objectStorage() }),
+  ];
 }
 
 /**
@@ -27,7 +47,12 @@ export function queueHandlers(): QueueHandler[] {
  * `daily:<type>:<date>`): retention, orphan clean-up, "became delayed"
  * notifications, Company deletions that are due.
  */
-export const DAILY_JOB_TYPES: readonly string[] = [];
+export const DAILY_JOB_TYPES: readonly string[] = [
+  // Retention and clean-up (CM-901, ADR CM-0021 §3).
+  REPORT_RETENTION_JOB_TYPE,
+  QUEUE_CLEANUP_JOB_TYPE,
+  ORPHAN_FILES_JOB_TYPE,
+];
 
 export const queueStore = prismaQueueStore(prisma);
 

@@ -17,10 +17,12 @@ import {
   queueReportRunner,
   reportQueueHandler,
 } from "@/src/reporting/application/report-queue";
+import { reportRetentionHandler } from "@/src/reporting/application/report-retention";
 import {
   createReportingExecutor,
   createReportingHandlers,
 } from "@/src/reporting/infrastructure/create-report-handlers";
+import { prismaReportRetentionStore } from "@/src/reporting/infrastructure/prisma-report-retention-store";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { QueueHandler } from "@/src/shared-kernel/queue";
 
@@ -42,6 +44,14 @@ function reportQueueHandlerFor(options: ReportJobsOptions): QueueHandler {
     },
   });
   return reportQueueHandler(executor, { limitMs: options.timeLimitMs });
+}
+
+/** `reporting.retention`: report files expire after 30 days (ADR CM-0021 §3). */
+export function reportRetentionHandlerFromEnv(): QueueHandler {
+  return reportRetentionHandler({
+    store: prismaReportRetentionStore(prisma),
+    storage: objectStorage(),
+  });
 }
 
 /** The `report` queue handler with the app's read models (ADR CM-0021 §1). */

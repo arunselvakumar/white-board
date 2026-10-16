@@ -153,6 +153,7 @@ function memoryStorage() {
           : { bytes: found.bytes.byteLength, contentType: found.contentType },
       );
     },
+    list: () => Promise.resolve({ objects: [], cursor: null }),
     delete: (key) => {
       objects.delete(key);
       return Promise.resolve();

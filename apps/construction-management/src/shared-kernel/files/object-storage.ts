@@ -10,6 +10,12 @@ export type StoredObject = {
 /** What storage knows about an object without reading it. */
 export type ObjectHead = { bytes: number; contentType: string };
 
+/** One object of a listing. */
+export type ListedObject = { key: string; bytes: number; uploadedAt: Date };
+
+/** A page of a listing; `cursor` continues it, null on the last page. */
+export type ObjectListing = { objects: ListedObject[]; cursor: string | null };
+
 /**
  * Lets a browser send one object straight to storage, so a large file
  * never passes through our functions (Vercel caps a request body at
@@ -42,6 +48,15 @@ export type ObjectStorage = {
   /** Size and stored type, or null when there is no such object. */
   head(key: string): Promise<ObjectHead | null>;
   delete(key: string): Promise<void>;
+  /**
+   * The objects whose keys start with `prefix`, a page at a time (at most
+   * `limit`, 1,000 by default), for the orphan clean-up (ADR CM-0021 §3).
+   * Pass the page's `cursor` back for the next one.
+   */
+  list(
+    prefix: string,
+    options?: { cursor?: string | null; limit?: number },
+  ): Promise<ObjectListing>;
   /** Present when browsers may upload straight to this storage. */
   readonly directUploads?: DirectUploads | undefined;
 };

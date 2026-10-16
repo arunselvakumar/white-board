@@ -51,6 +51,7 @@ function setup(options: { failSave?: boolean } = {}) {
     },
     get: () => Promise.resolve(null),
     head: () => Promise.resolve(null),
+    list: () => Promise.resolve({ objects: [], cursor: null }),
     delete: (key) => {
       objects.delete(key);
       return Promise.resolve();
