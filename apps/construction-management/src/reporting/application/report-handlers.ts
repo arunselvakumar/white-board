@@ -390,6 +390,18 @@ export function createReportHandlers(deps: {
     },
 
     /**
+     * The requester's own jobs across Projects and central, newest first
+     * (Downloads, CM-901), `limit` at a time before the cursor.
+     */
+    async listOwn(
+      workspaceId: string,
+      requestedBy: string,
+      page: { before: { createdAt: Date; id: string } | null; limit: number },
+    ): Promise<ReportJob[]> {
+      return deps.store.listRequestedBy(workspaceId, requestedBy, page);
+    },
+
+    /**
      * Nudges jobs a polling screen found stuck (queued over 15 s, or
      * running past their limit): hands them to the runner again, which
      * the queue deduplicates, and so starts a drain.
@@ -435,6 +447,11 @@ export function createReportHandlers(deps: {
         throw conflict(
           "REPORT_FORMAT_UNAVAILABLE",
           `This report has no ${format === "xlsx" ? "Excel" : "PDF"} file.`,
+        );
+      if (job.status === "expired")
+        throw conflict(
+          "REPORT_EXPIRED",
+          "This report expired after 30 days and its files were deleted; generate it again.",
         );
       const key = format === "xlsx" ? job.xlsxKey : job.pdfKey;
       if (job.status !== "done" || key == null)

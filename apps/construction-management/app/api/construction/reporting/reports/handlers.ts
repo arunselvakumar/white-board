@@ -210,3 +210,28 @@ export async function ledgerRefusal(
   const scope = await pettyCashAccountScope(session);
   return scope == null || scope.includes(accountId) ? null : notFound;
 }
+
+/**
+ * The Session and one report job its requester (or the Owner) may retry
+ * or delete (CM-901). Another Company's job, and a Progress Report (its
+ * own module's routes do that, CM-606), are 404; someone else's is 403.
+ */
+export async function requireOwnReport(
+  request: Request,
+  id: string,
+): Promise<(AccessSession & { job: ReportJob }) | Response> {
+  const session = await requireReportSession(request);
+  if (isResponse(session)) return session;
+  const job = await reports.get(session.workspaceId, id);
+  if (hasOwnModule(job.kind))
+    return jsonError(
+      StatusCodes.NOT_FOUND,
+      "REPORT_NOT_FOUND",
+      "There is no such report.",
+    );
+  if (job.requestedBy !== session.userId && session.role !== "owner")
+    return permissionDenied(
+      "Only the Team Member who asked for this report, or the Owner, can do this.",
+    );
+  return { ...session, job };
+}

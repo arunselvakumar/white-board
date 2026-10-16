@@ -67,6 +67,15 @@ export type ReportJobStore = {
       limit: number;
     },
   ): Promise<ReportJob[]>;
+  /**
+   * One requester's jobs across every Project and central (Downloads,
+   * CM-901), newest first, strictly before `before` when given.
+   */
+  listRequestedBy(
+    workspaceId: string,
+    requestedBy: string,
+    page: { before: { createdAt: Date; id: string } | null; limit: number },
+  ): Promise<ReportJob[]>;
   markRunning(id: string, at: Date): Promise<void>;
   /**
    * Marks a running job done and records its files as stored, in one

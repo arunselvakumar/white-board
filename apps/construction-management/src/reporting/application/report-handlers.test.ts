@@ -56,6 +56,17 @@ function memoryStore() {
           .reverse()
           .slice(0, filter.limit),
       ),
+    listRequestedBy: (workspaceId, requestedBy, page) =>
+      Promise.resolve(
+        [...jobs.values()]
+          .filter(
+            (job) =>
+              job.workspaceId === workspaceId &&
+              job.requestedBy === requestedBy,
+          )
+          .reverse()
+          .slice(0, page.limit),
+      ),
     markRunning: (id, at) => {
       update(id, { status: "running", startedAt: at });
       statuses.push("running");

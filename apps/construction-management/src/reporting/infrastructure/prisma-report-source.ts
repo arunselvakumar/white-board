@@ -33,6 +33,24 @@ export function prismaProjectLookup(db: PrismaClient): ProjectLookup {
   };
 }
 
+/** Project names by id (Downloads, CM-901); deleted Projects keep theirs. */
+export function prismaProjectNames(db: PrismaClient) {
+  return {
+    async names(
+      workspaceId: string,
+      ids: readonly string[],
+    ): Promise<Map<string, string>> {
+      const wanted = [...new Set(ids)];
+      if (wanted.length === 0) return new Map();
+      const rows = await db.constructionProjectsProject.findMany({
+        where: { workspaceId, id: { in: wanted } },
+        select: { id: true, name: true },
+      });
+      return new Map(rows.map((row) => [row.id, row.name]));
+    },
+  };
+}
+
 export function prismaReportSource(db: PrismaClient): ReportSource {
   function between({ from, to }: DateRange) {
     return { gte: calendarDateToDb(from), lte: calendarDateToDb(to) };

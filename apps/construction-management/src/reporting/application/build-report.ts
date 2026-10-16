@@ -50,7 +50,8 @@ export function generatedAtLabel(at: Date, timeZone: string): string {
   }
 }
 
-function periodLabel(job: ReportJob): string {
+/** What a job covers, as its header and Downloads print it. */
+export function periodLabel(job: Pick<ReportJob, "params">): string {
   const params = job.params;
   switch (params.kind) {
     case "labour_month":

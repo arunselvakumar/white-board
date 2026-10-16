@@ -1,6 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 
 import {
+  reportingDownloadsOpenApiComponents,
+  reportingDownloadsOpenApiOperations,
+} from "@/app/api/construction/reporting/downloads-openapi";
+import {
   queueOpenApiComponents,
   queueOpenApiOperations,
 } from "@/app/api/construction/queue/queue-openapi";
@@ -967,6 +971,10 @@ Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
+
+// The report catalogue and Downloads (CM-901, ADR CM-0021 §2).
+Object.assign(openApiComponents, reportingDownloadsOpenApiComponents);
+openApiOperations.push(...reportingDownloadsOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

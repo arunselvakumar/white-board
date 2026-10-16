@@ -82,6 +82,12 @@ export function createReportJobs(options: ReportJobsOptions = {}) {
       await heal(jobs);
       return jobs;
     },
+    /** Downloads polls too, so its read heals the same way. */
+    async listOwn(...args: Parameters<typeof handlers.listOwn>) {
+      const jobs = await handlers.listOwn(...args);
+      await heal(jobs);
+      return jobs;
+    },
   };
 }
 
