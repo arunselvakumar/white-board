@@ -12,8 +12,12 @@ import {
   type ApprovalState,
   type ApprovalStatus,
   type BulkRefusal,
-  type DocumentApproved,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  savedOutcome,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   assertCalendarDate,
@@ -24,7 +28,7 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
-import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ProjectMediaRemoved } from "@/src/shared-kernel/project-media";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
@@ -466,21 +470,34 @@ export class PurchaseRequestHandlers {
     };
   }
 
-  private async dispatchApproved(
-    pr: { id: string; workspaceId: string; projectId: string },
+  /** `document.submitted` / `approved` / `rejected` after commit (CM-904). */
+  private async dispatchApproval(
+    prs: readonly Pick<
+      StoredPurchaseRequest,
+      "id" | "workspaceId" | "projectId" | "number" | "createdBy"
+    >[],
+    outcome: ApprovalOutcome | null,
     by: string,
     at: Date,
   ) {
-    const event: DocumentApproved = {
-      type: "document.approved",
-      workspaceId: pr.workspaceId,
-      occurredAt: at,
-      documentType: DOCUMENT.type,
-      documentId: pr.id,
-      projectId: pr.projectId,
-      approvedBy: by,
-    };
-    await this.deps.events.dispatch([event]);
+    if (outcome == null || prs.length === 0) return;
+    await this.deps.events.dispatch(
+      prs.map((pr) =>
+        approvalEvent(
+          {
+            workspaceId: pr.workspaceId,
+            documentType: DOCUMENT.type,
+            documentId: pr.id,
+            projectId: pr.projectId,
+            number: pr.number,
+            createdBy: pr.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
+    );
   }
 
   async create(
@@ -513,7 +530,7 @@ export class PurchaseRequestHandlers {
       input.approve === true
         ? approvedState({ userId: access.userId, at })
         : pendingState();
-    await db.$transaction(async (tx) => {
+    const number = await db.$transaction(async (tx) => {
       check(DOCUMENT.backdated, "create", content.requestDate);
       const { number } = await nextSequenceNumber(tx, {
         workspaceId: access.workspaceId,
@@ -542,13 +559,22 @@ export class PurchaseRequestHandlers {
         after: { number, ...snapshot({ ...content, approval }) },
         occurredAt: at,
       });
+      return number;
     });
-    if (approval.status === "approved")
-      await this.dispatchApproved(
-        { id, workspaceId: access.workspaceId, projectId: input.projectId },
-        access.userId,
-        at,
-      );
+    await this.dispatchApproval(
+      [
+        {
+          id,
+          workspaceId: access.workspaceId,
+          projectId: input.projectId,
+          number,
+          createdBy: access.userId,
+        },
+      ],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
     return id;
   }
 
@@ -678,8 +704,12 @@ export class PurchaseRequestHandlers {
         occurredAt: at,
       });
     });
-    if (approval.status === "approved")
-      await this.dispatchApproved(current, access.userId, at);
+    await this.dispatchApproval(
+      [current],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
   }
 
   async delete(
@@ -772,7 +802,7 @@ export class PurchaseRequestHandlers {
     const { db, store } = this.deps;
     const at = this.clock();
     const by = { userId: access.userId, at };
-    const approved: StoredPurchaseRequest[] = [];
+    const decided: StoredPurchaseRequest[] = [];
     await db.$transaction(async (tx) => {
       const locked = new Map(
         (await store.lock(tx, access.workspaceId, ids)).map((pr) => [
@@ -825,19 +855,18 @@ export class PurchaseRequestHandlers {
           occurredAt: at,
         });
         const pr = locked.get(id);
-        if (decision.approve && pr != null) approved.push(pr);
+        if (pr != null) decided.push({ ...pr, approval });
       }
     });
-    const events: DomainEvent[] = approved.map((pr): DocumentApproved => ({
-      type: "document.approved",
-      workspaceId: pr.workspaceId,
-      occurredAt: at,
-      documentType: DOCUMENT.type,
-      documentId: pr.id,
-      projectId: pr.projectId,
-      approvedBy: access.userId,
-    }));
-    if (events.length > 0) await this.deps.events.dispatch(events);
+    for (const pr of decided)
+      await this.dispatchApproval(
+        [pr],
+        decision.approve
+          ? { kind: "approved" }
+          : { kind: "rejected", reason: pr.approval.rejectionReason },
+        access.userId,
+        at,
+      );
   }
 
   /** Mark as Ordered (ordered outside the app): approved or partially ordered. */

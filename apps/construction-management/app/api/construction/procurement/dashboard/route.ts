@@ -3,6 +3,7 @@ import { prisma } from "@repo/construction-db";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { requireAccess } from "@/app/api/_lib/require-access";
+import { projectDashboardKpis } from "@/src/composition/dashboard-reads";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import { ProcurementDashboard } from "@/src/procurement/infrastructure/procurement-dashboard";
 import { can } from "@/src/shared-kernel/access";
@@ -15,6 +16,7 @@ import {
 export const dynamic = "force-dynamic";
 
 const dashboard = new ProcurementDashboard(prisma, procurementDirectory);
+const kpis = projectDashboardKpis();
 
 function paise(value: bigint): number {
   const number = Number(value);
@@ -27,7 +29,8 @@ function paise(value: bigint): number {
  * Materials on the Project Dashboard (CM-510), behind its Read on the
  * Project. Each part also needs its own menu: Current Inventory read for
  * the stock states, Purchase Order read for PO figures, and each
- * document's Approve flag for its pending count.
+ * document's Approve flag for its pending count. The pending counts come
+ * from `construction_reporting.project_pending_approvals` (CM-902).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -51,7 +54,7 @@ export async function GET(request: Request): Promise<Response> {
       flag: Parameters<typeof can>[2],
     ) => can(access, menu, flag, scope);
 
-    const [materials, orders, pending] = await Promise.all([
+    const [materials, orders, approvals] = await Promise.all([
       may("procurement.current_inventory", "read")
         ? dashboard.materialSummary(workspaceId, model.projectId)
         : null,
@@ -63,19 +66,8 @@ export async function GET(request: Request): Promise<Response> {
             model.to,
           )
         : null,
-      dashboard.pendingApprovals(workspaceId, model.projectId),
+      kpis.materialApprovals(access, model.projectId),
     ]);
-    const approvals = {
-      purchaseRequests: may("procurement.purchase_requests", "approve")
-        ? pending.purchaseRequests
-        : null,
-      purchaseOrders: may("procurement.purchase_orders", "approve")
-        ? pending.purchaseOrders
-        : null,
-      transfers: may("procurement.material_transfers", "approve")
-        ? pending.transfers
-        : null,
-    };
     const body: GetConstructionProcurementDashboardResponseModel = {
       materials,
       purchaseOrders:
@@ -89,13 +81,7 @@ export async function GET(request: Request): Promise<Response> {
                 value: paise(month.value),
               })),
             },
-      approvals: {
-        ...approvals,
-        total:
-          (approvals.purchaseRequests ?? 0) +
-          (approvals.purchaseOrders ?? 0) +
-          (approvals.transfers ?? 0),
-      },
+      approvals,
     };
     return Response.json(body);
   } catch (error) {

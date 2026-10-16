@@ -2,10 +2,11 @@ import { randomUUID } from "node:crypto";
 
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createHrmsPorts } from "@/src/hrms/infrastructure/create-hrms-ports";
 import { memberWith, ownerWithCompany } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 
 import { POST as initialize } from "../leave-balances/initialize/route";
 import { GET as balances } from "../leave-balances/route";
@@ -119,6 +120,10 @@ async function casualBalance(cookie: string): Promise<BalanceRow> {
   if (row == null) throw new Error("no Casual Leave balance");
   return row;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Leave requests HTTP (CM-312, CM-313)", () => {
   it("skips the weekend, reserves on apply and uses on approval", async () => {
@@ -537,6 +542,119 @@ describe("Leave requests HTTP (CM-312, CM-313)", () => {
         ? ["released", "reserved", "used"]
         : ["released", "reserved"],
     );
+  });
+
+  it("raises leave and cancellation approval events for notifications (CM-904)", async () => {
+    const { owner, staff, approver, second, casual } = await company();
+    await setHrmsSettings(owner.workspaceId, { leaveApprovalLevels: 2 });
+    const events = watchEvents();
+    const leave = await applied(staff.cookie, {
+      leaveTypeId: casual,
+      fromDate: "2026-11-02",
+      toDate: "2026-11-02",
+    });
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "leave_request",
+        documentId: leave.id,
+        projectId: null,
+        number: null,
+        submittedBy: staff.userId,
+      }),
+    ]);
+    // The first of two levels decides nothing yet.
+    const levelOne = await json<Leave>(
+      await act(approve, "approve", leave, approver.cookie),
+    );
+    expect(events.of("document.approved")).toHaveLength(0);
+    await act(approve, "approve", levelOne, second.cookie);
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "leave_request",
+        documentId: leave.id,
+        approvedBy: second.userId,
+        createdBy: staff.userId,
+      }),
+    ]);
+
+    await setHrmsSettings(owner.workspaceId, { leaveApprovalLevels: 1 });
+    const refused = await applied(staff.cookie, {
+      leaveTypeId: casual,
+      fromDate: "2026-11-03",
+      toDate: "2026-11-03",
+    });
+    await act(reject, "reject", refused, approver.cookie, {
+      reason: "Month-end closing",
+    });
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "leave_request",
+        documentId: refused.id,
+        rejectedBy: approver.userId,
+        createdBy: staff.userId,
+        reason: "Month-end closing",
+      }),
+    ]);
+
+    const current = await json<Leave>(
+      await getItem(getLeave, `/leaves/${leave.id}`, leave.id, staff.cookie),
+    );
+    const asked = await json<Leave>(
+      await act(
+        requestCancellation,
+        "request-cancellation",
+        current,
+        staff.cookie,
+        {
+          reason: "Function postponed",
+        },
+      ),
+    );
+    expect(events.of("document.submitted").at(-1)).toMatchObject({
+      documentType: "leave_cancellation",
+      documentId: leave.id,
+      submittedBy: staff.userId,
+    });
+    const kept = await json<Leave>(
+      await act(
+        rejectCancellation,
+        "reject-cancellation",
+        asked,
+        approver.cookie,
+        {
+          reason: "Already planned cover",
+        },
+      ),
+    );
+    expect(events.of("document.rejected").at(-1)).toMatchObject({
+      documentType: "leave_cancellation",
+      documentId: leave.id,
+      createdBy: staff.userId,
+      reason: "Already planned cover",
+    });
+    const askedAgain = await json<Leave>(
+      await act(
+        requestCancellation,
+        "request-cancellation",
+        kept,
+        staff.cookie,
+        {
+          reason: "Function cancelled",
+        },
+      ),
+    );
+    await act(
+      approveCancellation,
+      "approve-cancellation",
+      askedAgain,
+      approver.cookie,
+    );
+    expect(events.of("document.approved").at(-1)).toMatchObject({
+      documentType: "leave_cancellation",
+      documentId: leave.id,
+      approvedBy: approver.userId,
+      createdBy: staff.userId,
+    });
   });
 
   it("approves at once and cancels at once when the type needs no approval", async () => {

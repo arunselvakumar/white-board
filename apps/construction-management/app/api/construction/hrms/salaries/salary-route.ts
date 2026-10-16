@@ -1,4 +1,5 @@
 import { accountPosting } from "@/src/composition/account-posting";
+import { messagingEvents } from "@/src/composition/messaging";
 import { createSalaryRunHandlers } from "@/src/hrms/infrastructure/create-salary-run-handlers";
 
 /**
@@ -7,6 +8,7 @@ import { createSalaryRunHandlers } from "@/src/hrms/infrastructure/create-salary
  */
 export const salaryHandlers = createSalaryRunHandlers({
   accounts: accountPosting,
+  events: messagingEvents(),
 });
 
 /** Query parameters as a plain object, for the Request models. */

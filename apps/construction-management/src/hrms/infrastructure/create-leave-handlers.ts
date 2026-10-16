@@ -1,5 +1,10 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import {
+  InProcessEventDispatcher,
+  type EventDispatcher,
+} from "@/src/shared-kernel/events";
+
 import { LeaveBalanceHandlers } from "../application/leave-balance-handlers";
 import { LeaveConfigurationHandlers } from "../application/leave-configuration-handlers";
 import { LeaveRequestHandlers } from "../application/leave-request-handlers";
@@ -25,6 +30,8 @@ export type LeaveHandlers = {
  */
 export function createLeaveHandlers(deps?: {
   prisma?: PrismaClient;
+  /** Leave approval events after commit (CM-904). */
+  events?: EventDispatcher;
   clock?: () => Date;
 }): LeaveHandlers {
   const db = deps?.prisma ?? prisma;
@@ -62,6 +69,7 @@ export function createLeaveHandlers(deps?: {
       ),
       queries,
       transactions,
+      deps?.events ?? new InProcessEventDispatcher(),
       clock,
     ),
   };

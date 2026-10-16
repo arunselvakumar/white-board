@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@repo/construction-db";
 import { unzipSync } from "fflate";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import {
@@ -12,6 +12,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import { accountBalance, seededAccounts } from "@/test/finance";
 import { pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -188,6 +189,10 @@ async function setUp() {
   const fuel = await categoryId(company.workspaceId);
   return { company, projectId, account, fuel };
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Petty Cash accounts (CM-703)", () => {
   it("lets Create alone open an account for another Team Member and get it back", async () => {
@@ -588,6 +593,72 @@ describe("Petty-cash vouchers (CM-703)", () => {
       }),
     );
     expect(rejected.status).toBe(StatusCodes.OK);
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const { company, projectId, account, fuel } = await setUp();
+    const events = watchEvents();
+    const voucher = await written(company.cookie, {
+      accountId: account.id,
+      voucherType: "payment",
+      projectId,
+      amount: 100_00,
+      paymentCategoryId: fuel,
+    });
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "petty_cash_voucher",
+        documentId: voucher.id,
+        projectId,
+        number: voucher.number,
+        submittedBy: company.userId,
+      }),
+    ]);
+    const rejected = await json<Voucher>(
+      await bulkReject(
+        jsonRequest(`${BASE}/vouchers/bulk-reject`, company.cookie, {
+          ids: [voucher.id],
+          reason: "No bill",
+        }),
+      ),
+    );
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "petty_cash_voucher",
+        documentId: voucher.id,
+        number: voucher.number,
+        rejectedBy: company.userId,
+        createdBy: company.userId,
+        reason: "No bill",
+      }),
+    ]);
+    const current = await json<Voucher>(
+      await getVoucher(
+        jsonRequest(`${BASE}/vouchers/${voucher.id}`, company.cookie),
+        params(voucher.id),
+      ),
+    );
+    expect(rejected).toBeDefined();
+    await act(updateVoucher, company.cookie, voucher.id, "update", {
+      voucherType: "payment",
+      voucherDate: "2026-10-08",
+      projectId,
+      amount: 120_00,
+      paymentCategoryId: fuel,
+      expectedUpdatedAt: current.updatedAt,
+    });
+    expect(events.of("document.submitted")).toHaveLength(2);
+    await act(approveVoucher, company.cookie, voucher.id, "approve");
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "petty_cash_voucher",
+        documentId: voucher.id,
+        projectId,
+        number: voucher.number,
+        approvedBy: company.userId,
+        createdBy: company.userId,
+      }),
+    ]);
   });
 
   it("refuses to approve a voucher dated in a closed period", async () => {

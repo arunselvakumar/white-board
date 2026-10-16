@@ -22,6 +22,11 @@ import {
 } from "@/src/shared-kernel/queue/cleanup";
 
 import {
+  createMessagingDelayedHandler,
+  createMessagingRetentionHandler,
+  createPushQueueHandler,
+} from "./messaging";
+import {
   reportQueueHandlerFromEnv,
   reportRetentionHandlerFromEnv,
 } from "./report-jobs";
@@ -39,6 +44,10 @@ export function queueHandlers(): QueueHandler[] {
     reportRetentionHandlerFromEnv(),
     queueCleanupHandler(prisma),
     orphanFilesHandler({ db: prisma, storage: objectStorage() }),
+    // CM-904: one push per notification; daily retention and "became delayed".
+    createPushQueueHandler(),
+    createMessagingRetentionHandler(),
+    createMessagingDelayedHandler(),
   ];
 }
 
@@ -52,6 +61,9 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   REPORT_RETENTION_JOB_TYPE,
   QUEUE_CLEANUP_JOB_TYPE,
   ORPHAN_FILES_JOB_TYPE,
+  // CM-904
+  "messaging.retention",
+  "messaging.delayed",
 ];
 
 export const queueStore = prismaQueueStore(prisma);

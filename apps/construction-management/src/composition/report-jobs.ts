@@ -2,6 +2,7 @@ import { prisma } from "@repo/construction-db";
 
 import { createFinanceReportSource } from "@/src/composition/finance-report-source";
 import { createProgressReportSource } from "@/src/composition/progress-report-source";
+import { messagingEvents } from "@/src/composition/messaging";
 import { enqueue, kickQueue } from "@/src/composition/queue";
 import {
   createTaskProgressSource,
@@ -36,6 +37,8 @@ type ReportJobsOptions = {
 
 function reportQueueHandlerFor(options: ReportJobsOptions): QueueHandler {
   const executor = createReportingExecutor(prisma, objectStorage(), {
+    // `ReportFinished` tells the requester (CM-904).
+    events: messagingEvents(),
     dpr: options.dpr ?? createProgressReportSource(),
     finance: options.finance ?? createFinanceReportSource(),
     tracking: {

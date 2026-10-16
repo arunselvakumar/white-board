@@ -23,7 +23,7 @@ import { StockSettingsCommands } from "@/src/procurement/infrastructure/stock-se
 import type { Flag } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 
 /** Procurement events after commit (the one shared dispatcher). */
 export { procurementEvents };

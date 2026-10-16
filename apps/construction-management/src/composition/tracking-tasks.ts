@@ -6,7 +6,7 @@ import { masterTaskTags } from "@/src/composition/task-tags";
 import { siteWorkTaskUsage } from "@/src/composition/task-usage";
 import { trackingDirectory } from "@/src/composition/tracking-directory";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { messagingEvents } from "@/src/composition/messaging";
 import { TaskHandlers } from "@/src/tracking/application/task-handlers";
 import type { TaskImportDeps } from "@/src/tracking/application/task-import";
 import { prismaTaskStore } from "@/src/tracking/infrastructure/prisma-task-store";
@@ -24,7 +24,7 @@ export function createTaskHandlers(): TaskHandlers {
     locations: createProjectLocations(),
     usage: siteWorkTaskUsage,
     today: (workspaceId) => companyToday(prisma, workspaceId),
-    events: new InProcessEventDispatcher(),
+    events: messagingEvents(),
     media: projectMediaDispatcher(),
   });
 }

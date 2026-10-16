@@ -462,9 +462,27 @@ Summary of all report outputs in one list (detail above):
 11. Does `Dashboard/PermissionsList` return section visibility, or the user's menu permissions generally?
 12. Excel output: one sheet per report, or include images as links?
 
+---
+
 ## Decisions for the build (M9)
 
-### CM-901
+Product rules are in [ADR CM-0021](../adr/CM-0021-reporting-notifications-backups-product-decisions.md); what follows is what the M9 build settled that the ADR left open, by ticket.
+
+### CM-902 — Reporting views and the Company Dashboard
+
+- **The KPI definitions** (open question 1). **Material Approvals** counts pending Purchase Requests of the Project, Purchase Orders for it and Material Transfers out of it (the Project approves a dispatch). **Payment Approvals** counts pending Transactions and account transfers (both decided on the Transactions menu), petty-cash vouchers, Other Expenses and settlements of the Project's live invoices. Each count shows only with its menu's Approve flag on the Project, and is not limited by View all: it is the approver's queue, as the M5 and M7 tiles had it. The Company Dashboard's **approvals waiting** also counts Daily Worksheets and Equipment Usage sheets waiting for approval.
+- **Pending approvals ignore the duration**; Issues & Snags and Inspection Requests follow it by Issue Date and Inspection Date, as on the Project Dashboard (CM-805).
+- **`party_dues` is a view over a function.** `party_dues_on(workspace, as_on)` holds the finance rule once; the Project Dashboard's Due Payments read it as on the duration's last day (unchanged from CM-709), and `party_dues` is that function on each Company's today, which the Company Dashboard reads. A filter on `workspace_id` reaches the inner list of Companies, so only that Company's invoices are read.
+- **Amount due** on the Company Dashboard is what is due on bills from parties (payables), per Project, on the Company's today. It needs Payments (`finance.payments`) Read on the Project: finance menus carry no Financial flag (CM-0017). Without it on any Project the amounts are null everywhere and the tile is not shown.
+- **Visible Projects:** every live Project for the Owner; for a Member, the assigned Projects where they hold Dashboard Read. `can()` limits every project menu to assigned Projects, so no other member sees all Projects today. A Member on no Project sees "No Projects to show", not a refusal.
+- **Active Projects** are the visible Projects whose status is Ongoing. The rows list every visible Project, in the Projects home order (status, then name).
+- **Labours present today** is Present plus Half Day on the Company's today, the Attendance section's "Labours present today"; vendor headcount is not added. It needs Attendance Read on the Project.
+- **Totals** sum the Projects where the member sees a figure, and are null when they see it on none.
+- **The duration** on `GET /api/construction/reporting/company-dashboard` is both `from` and `to` or neither (the last 12 months ending the Company's today); like the Project Dashboard's routes the server does not cap its length, and the screen's filter keeps a custom range within a year.
+- **The main menu** hides Dashboard without Dashboard Read: the app layout checks it on the server and passes it to `AppShell`, so the menu never flickers. The page shows "No access to the Dashboard" and the route answers 403. Dashboard takes the Project Dashboard's icon; Workspace moves to a briefcase so the two do not look alike.
+- **Sections and hidden modules.** Each dashboard section names its Project module: Attendance → Attendance, Task → Tasks, Payments → Payments, Daily Work → Daily Worksheet, Equipment Usage → Equipment, Materials → Materials, Issue & Snag → Issues & Snags, Inspection Request → Inspections. Project summary, Booking and Inquiry have none and always follow the member's layout. A hidden module's section is left out on that Project only; Manage Dashboard shows it disabled with "Hidden on this Project" and keeps the member's own tick for their other Projects. The four KPI tiles stay: hiding changes what the Project shows, not what anyone may open.
+
+### CM-901 — Job queue, catalogue, Downloads, retention
 
 - **Catalogue scope of today's rules.** The central catalogue trims by each report's own menu flags, as today's routes do; the Central Reports Read gate (CM-0021 §5) is CM-903's, because Central Payment and Masters → Equipments already host central reports without it.
 - **Downloads need Report today.** The catalogue records `request` and `download` flags per kind; both are Report for table reports, as the routes check now (Print, "Download" in the matrix, is not checked for reports). Progress Reports are Add and View on Progress Report.

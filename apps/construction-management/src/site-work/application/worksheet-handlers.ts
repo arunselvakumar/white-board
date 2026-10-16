@@ -6,8 +6,12 @@ import {
   bulkRefused,
   requiredText,
   type BulkRefusal,
-  type DocumentApproved,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  savedOutcome,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   assertCalendarDate,
@@ -18,7 +22,7 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
-import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import {
@@ -201,7 +205,10 @@ export type WorksheetDeps = {
   tasks: TaskProgressPosting;
   backdated: (actor: MemberAccess) => Promise<BackdatedCheck>;
   today: (workspaceId: string) => Promise<CalendarDate>;
-  /** `document.approved` (Save & Approve, approve). */
+  /**
+   * `document.submitted` (saved pending), `document.approved` (Save &
+   * Approve, approve) and `document.rejected`, after commit (CM-904).
+   */
   events: EventDispatcher;
   /** `ProjectMediaRemoved` for the sheet's photos on delete (ADR CM-0014). */
   media: EventDispatcher;
@@ -609,21 +616,38 @@ export class WorksheetHandlers {
     };
   }
 
-  private async dispatchApproved(
-    sheets: readonly { id: string; workspaceId: string; projectId: string }[],
+  /**
+   * The approval events of saved or decided sheets, after commit (ADR
+   * CM-0021 §6): `document.submitted` when a sheet waits for approval,
+   * `document.approved` / `document.rejected` when it is decided.
+   */
+  private async dispatchApproval(
+    sheets: readonly Pick<
+      StoredWorksheet,
+      "id" | "workspaceId" | "projectId" | "number" | "createdBy"
+    >[],
+    outcome: ApprovalOutcome | null,
     by: string,
     at: Date,
   ) {
-    const events: DomainEvent[] = sheets.map((sheet): DocumentApproved => ({
-      type: "document.approved",
-      workspaceId: sheet.workspaceId,
-      occurredAt: at,
-      documentType: DOCUMENT.type,
-      documentId: sheet.id,
-      projectId: sheet.projectId,
-      approvedBy: by,
-    }));
-    if (events.length > 0) await this.deps.events.dispatch(events);
+    if (outcome == null || sheets.length === 0) return;
+    await this.deps.events.dispatch(
+      sheets.map((sheet) =>
+        approvalEvent(
+          {
+            workspaceId: sheet.workspaceId,
+            documentType: DOCUMENT.type,
+            documentId: sheet.id,
+            projectId: sheet.projectId,
+            number: sheet.number,
+            createdBy: sheet.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
+    );
   }
 
   /**
@@ -698,7 +722,7 @@ export class WorksheetHandlers {
       lines: withLineIds(content.lines),
       taskId,
     };
-    const { events } = await db.$transaction(async (tx) => {
+    const { events, number } = await db.$transaction(async (tx) => {
       check(DOCUMENT.backdated, "create", content.sheetDate);
       if (taskId != null)
         await this.lockTask(tx, access.workspaceId, input.projectId, taskId);
@@ -743,15 +767,23 @@ export class WorksheetHandlers {
         after: { number, duplicatedFromId, ...snapshot({ ...row, approval }) },
         occurredAt: at,
       });
-      return posted;
+      return { ...posted, number };
     });
     await stock.dispatch(events);
-    if (approval.status === "approved")
-      await this.dispatchApproved(
-        [{ id, workspaceId: access.workspaceId, projectId: input.projectId }],
-        access.userId,
-        at,
-      );
+    await this.dispatchApproval(
+      [
+        {
+          id,
+          workspaceId: access.workspaceId,
+          projectId: input.projectId,
+          number,
+          createdBy: access.userId,
+        },
+      ],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
     return id;
   }
 
@@ -844,8 +876,12 @@ export class WorksheetHandlers {
       return posted;
     });
     await stock.dispatch(events);
-    if (approval.status === "approved")
-      await this.dispatchApproved([current], access.userId, at);
+    await this.dispatchApproval(
+      [current],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
   }
 
   /** Deletes a sheet: a tombstone, and its stock postings reversed. */
@@ -960,7 +996,7 @@ export class WorksheetHandlers {
     const { db, store } = this.deps;
     const at = this.clock();
     const by = { userId: access.userId, at };
-    const approved: StoredWorksheet[] = [];
+    const decidedSheets: StoredWorksheet[] = [];
     await db.$transaction(async (tx) => {
       const locked = new Map(
         (await store.lock(tx, access.workspaceId, ids)).map((sheet) => [
@@ -1011,10 +1047,17 @@ export class WorksheetHandlers {
           occurredAt: at,
         });
         const sheet = locked.get(id);
-        if (decision.approve && sheet != null) approved.push(sheet);
+        if (sheet != null) decidedSheets.push(sheet);
       }
     });
-    await this.dispatchApproved(approved, access.userId, at);
+    await this.dispatchApproval(
+      decidedSheets,
+      decision.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: decision.reason.trim() },
+      access.userId,
+      at,
+    );
   }
 
   // -------------------------------------------------------------------------

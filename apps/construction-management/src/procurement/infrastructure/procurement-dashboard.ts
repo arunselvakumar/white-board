@@ -24,16 +24,10 @@ export type PurchaseOrderSummary = {
   months: { month: string; value: bigint }[];
 };
 
-export type PendingApprovals = {
-  purchaseRequests: number;
-  purchaseOrders: number;
-  /** Pending transfers out of the Project (it approves them). */
-  transfers: number;
-};
-
 /**
- * The Project Dashboard's Materials section and Material Approvals KPI
- * (CM-510). Stock states follow ADR CM-0015 §10: out at or below zero, low
+ * The Project Dashboard's Materials section (CM-510); the Material
+ * Approvals KPI reads `construction_reporting.project_pending_approvals`
+ * since CM-902. Stock states follow ADR CM-0015 §10: out at or below zero, low
  * at or below a minimum above zero (the location's override, else the
  * Material's), whatever the alert toggle says.
  */
@@ -123,41 +117,6 @@ export class ProcurementDashboard {
         value: values.get(month) ?? 0n,
       })),
     };
-  }
-
-  async pendingApprovals(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<PendingApprovals> {
-    const [purchaseRequests, purchaseOrders, transfers] = await Promise.all([
-      this.db.constructionProcurementPurchaseRequest.count({
-        where: {
-          workspaceId,
-          projectId,
-          deletedAt: null,
-          approvalStatus: "pending",
-        },
-      }),
-      this.db.constructionProcurementPurchaseOrder.count({
-        where: {
-          workspaceId,
-          locationKind: "project",
-          locationId: projectId,
-          deletedAt: null,
-          approvalStatus: "pending",
-        },
-      }),
-      this.db.constructionProcurementMaterialTransfer.count({
-        where: {
-          workspaceId,
-          fromKind: "project",
-          fromId: projectId,
-          deletedAt: null,
-          approvalStatus: "pending",
-        },
-      }),
-    ]);
-    return { purchaseRequests, purchaseOrders, transfers };
   }
 }
 
