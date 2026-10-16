@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue.http.test.ts
+  s_9b8b004c55c7f2::t_4e0f02db9d42f1 1-244
+apps/construction-management/app/api/construction/reporting/downloads/downloads.http.test.ts
+  s_9b8b004c55c7f2::t_29fd9902c7c43d 1-423
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_9b8b004c55c7f2::t_df5559acce5e49 637-638
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "eadc64e921e4b8853ac9d388502798627e75f81e",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
