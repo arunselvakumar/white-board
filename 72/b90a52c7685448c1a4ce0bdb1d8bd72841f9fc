@@ -1,0 +1,43 @@
+apps/construction-management/app/api/construction/organization/me/account/account.http.test.ts
+  s_9b8b004c55c7f2::t_d0e64940172f8e 119-135,183-187
+apps/construction-management/app/api/construction/reporting/filter-options/route.ts
+  s_9b8b004c55c7f2::t_673f53781c9ec2 32-33
+apps/construction-management/components/account/reveal-code-dialog.tsx
+  s_9b8b004c55c7f2::t_88aa48f091d055 79-83
+apps/construction-management/components/app-shell/company-deletion-banner.tsx
+  s_9b8b004c55c7f2::t_dc1d34cd28b690 4,7-9,19,48-53
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_9b8b004c55c7f2::t_98e392367b7c73 135,239-241
+apps/construction-management/docs/adr/CM-0021-reporting-notifications-backups-product-decisions.md
+  s_9b8b004c55c7f2::t_0ddeca335e9ed0 132
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_d48a86416f9598 517,523
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_382a0facd75dac 1018
+apps/construction-management/src/composition/company-purge.ts
+  s_9b8b004c55c7f2::t_0852939016a19d 295-297,300-308,310-313
+apps/construction-management/src/composition/procurement-report-source.ts
+  s_9b8b004c55c7f2::t_85dbcb2d13ba86 26-28,615-632,634-637
+apps/construction-management/src/reporting/application/backup-queue.ts
+  s_9b8b004c55c7f2::t_09efa6e968615e 14,235-241
+apps/construction-management/src/reporting/domain/backup-job.ts
+  s_9b8b004c55c7f2::t_11c0f899ac465b 83-96
+packages/auth/src/construction/server/accounts.ts
+  s_9b8b004c55c7f2::t_d649b009283f4a 132-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "72b90a52c7685448c1a4ce0bdb1d8bd72841f9fc",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
