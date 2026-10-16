@@ -1,0 +1,63 @@
+apps/construction-management/app/api/construction/messaging/messaging-models.ts
+  s_9b8b004c55c7f2::t_754e3639e8286e 3-4,93-96
+apps/construction-management/app/api/construction/messaging/messaging.http.test.ts
+  s_9b8b004c55c7f2::t_fd5f8948a41c3d 404,544,555-567
+apps/construction-management/app/api/construction/messaging/notifications/[id]/delete/route.ts
+  s_9b8b004c55c7f2::t_a3e300ae6661ab 24-25
+apps/construction-management/app/api/construction/messaging/notifications/[id]/read/route.ts
+  s_9b8b004c55c7f2::t_44ec81fd4089ad 25-26
+apps/construction-management/app/api/construction/messaging/notifications/route.ts
+  s_9b8b004c55c7f2::t_ff89bf980ee45e 23-24
+apps/construction-management/app/api/construction/messaging/preferences/update/route.ts
+  s_9b8b004c55c7f2::t_5d47dcfd29a0b0 19-20
+apps/construction-management/app/api/construction/messaging/push-subscriptions/delete/route.ts
+  s_9b8b004c55c7f2::t_619903a59f1932 14-15
+apps/construction-management/app/api/construction/messaging/push-subscriptions/route.ts
+  s_9b8b004c55c7f2::t_8596ff55756ccf 18-19
+apps/construction-management/app/api/construction/reporting/catalogue/route.ts
+  s_9b8b004c55c7f2::t_187fd8003a66e5 31-32
+apps/construction-management/app/api/construction/reporting/downloads/route.ts
+  s_9b8b004c55c7f2::t_3c44aec80d7812 37-38
+apps/construction-management/src/composition/messaging.ts
+  s_9b8b004c55c7f2::t_34ce642f7dd020 18-21,149,159
+apps/construction-management/src/messaging/application/listeners.test.ts
+  s_9b8b004c55c7f2::t_e40e744638fc46 204,214-239
+apps/construction-management/src/messaging/application/listeners.ts
+  s_9b8b004c55c7f2::t_3ee74913da083e 47-54,106,362-364
+apps/construction-management/src/messaging/application/push-delivery.test.ts
+  s_9b8b004c55c7f2::t_9124e057350884 13-17,39,162-167
+apps/construction-management/src/messaging/application/push-delivery.ts
+  s_9b8b004c55c7f2::t_6bc89202788b5b 11,83-94,119-128,133
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_9b8b004c55c7f2::t_0ddfb203ce304c 93-97,158-159
+apps/construction-management/src/messaging/domain/push-endpoint.test.ts
+  s_9b8b004c55c7f2::t_c93aa4005dd41f 1-28
+apps/construction-management/src/messaging/domain/push-endpoint.ts
+  s_9b8b004c55c7f2::t_0e9b9d55b99f3c 1-33
+apps/construction-management/src/reporting/infrastructure/pdf-report.test.ts
+  s_9b8b004c55c7f2::t_4bd0e327621d68 5,17,112-131
+apps/construction-management/src/reporting/infrastructure/pdf-report.ts
+  s_9b8b004c55c7f2::t_3c53a001c5dcf7 468-483,538
+apps/construction-management/src/shared-kernel/access/notification-recipients.ts
+  s_9b8b004c55c7f2::t_215e3a1985112f 23-27,69
+apps/construction-management/src/shared-kernel/queue/drain.test.ts
+  s_9b8b004c55c7f2::t_eaf1c5d0ca2b04 286-320
+apps/construction-management/src/shared-kernel/queue/drain.ts
+  s_9b8b004c55c7f2::t_6234c781f0e6a7 62-76,128,130-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4ef49069460653b2664fe89b8502965385839936",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
