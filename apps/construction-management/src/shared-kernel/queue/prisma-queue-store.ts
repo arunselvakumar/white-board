@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { PrismaClient } from "@repo/construction-db";
 
 import { newId } from "../ids";
 import {
@@ -63,29 +63,29 @@ export function prismaQueueStore(db: PrismaClient): QueueStore {
 
     async claim(types, now, onlyIds) {
       if (types.size === 0) return null;
-      const only =
-        onlyIds == null
-          ? Prisma.empty
-          : Prisma.sql`AND id = ANY(${[...onlyIds]}::uuid[])`;
-      // One CASE per type gives each job its own lease.
-      const leases = Prisma.join(
-        [...types].map(
-          ([type, limit]) =>
-            Prisma.sql`WHEN ${type} THEN ${limit + LEASE_MARGIN_MS}::int`,
-        ),
-        " ",
-      );
+      // A null array means "any job". No nested Prisma.sql fragments:
+      // `next dev --webpack` binds them as values (a syntax error).
+      const only = onlyIds == null ? null : [...onlyIds];
+      // Each type's lease rides along as a parallel array, so the claim
+      // stays one statement however many handlers the drain has.
       const typeList = [...types.keys()];
+      const leaseMs = [...types.values()].map(
+        (limit) => limit + LEASE_MARGIN_MS,
+      );
       const rows = await db.$queryRaw<ClaimRow[]>`
         UPDATE construction_organization.queue_jobs AS q
            SET status = 'running',
                attempts = q.attempts + 1,
                started_at = ${now},
                lease_until = ${now}::timestamptz
-                 + make_interval(secs => (CASE q.type ${leases} END) / 1000.0)
-         WHERE q.id = (
+                 + make_interval(secs => l.lease_ms / 1000.0)
+          FROM unnest(${typeList}::text[], ${leaseMs}::int[])
+                 AS l(type, lease_ms)
+         WHERE l.type = q.type
+           AND q.id = (
            SELECT id FROM construction_organization.queue_jobs
-            WHERE type = ANY(${typeList}::text[]) ${only}
+            WHERE type = ANY(${typeList}::text[])
+              AND (${only}::uuid[] IS NULL OR id = ANY(${only}::uuid[]))
               AND ((status = 'queued' AND run_after <= ${now})
                 OR (status = 'running' AND lease_until < ${now}))
             ORDER BY run_after, created_at

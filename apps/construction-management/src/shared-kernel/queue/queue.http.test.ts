@@ -33,6 +33,34 @@ describe("the Postgres queue (ADR CM-0021 §1)", () => {
     const ids = claims.flatMap((job) => (job == null ? [] : [job.id]));
     expect(ids).toHaveLength(6);
     expect(new Set(ids).size).toBe(6);
+    // Eight connections open at once on a cold pool.
+  }, 20_000);
+
+  it("claims across several types, each job with its own lease", async () => {
+    const short = uniqueType();
+    const long = uniqueType();
+    await enqueueJob(prisma, { type: short, workspaceId: null, payload: null });
+    await enqueueJob(prisma, { type: long, workspaceId: null, payload: null });
+    const types = new Map([
+      [short, 1_000],
+      [long, 240_000],
+      [uniqueType(), 5_000],
+    ]);
+    const now = new Date();
+    const first = await store.claim(types, now);
+    const second = await store.claim(types, now);
+    expect(new Set([first?.type, second?.type])).toEqual(
+      new Set([short, long]),
+    );
+    const rows = await prisma.constructionOrganizationQueueJob.findMany({
+      where: { type: { in: [short, long] } },
+      select: { type: true, leaseUntil: true },
+    });
+    const lease = (type: string) =>
+      (rows.find((row) => row.type === type)?.leaseUntil?.getTime() ?? 0) -
+      now.getTime();
+    expect(lease(short)).toBe(31_000);
+    expect(lease(long)).toBe(270_000);
   });
 
   it("reclaims a running job whose lease has passed", async () => {
