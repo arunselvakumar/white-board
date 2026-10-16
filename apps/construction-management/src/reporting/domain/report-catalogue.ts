@@ -685,10 +685,10 @@ export function catalogueEntry(kind: ReportKind): ReportCatalogueEntry {
 }
 
 /** The kinds whose definition passes `test`, in display order. */
-export function catalogueKinds<Kind extends ReportKind = ReportKind>(
+export function catalogueKinds(
   test: (entry: ReportCatalogueEntry) => boolean,
-): readonly Kind[] {
-  return REPORT_CATALOGUE.filter(test).map((entry) => entry.kind as Kind);
+): readonly ReportKind[] {
+  return REPORT_CATALOGUE.filter(test).map((entry) => entry.kind);
 }
 
 /** The title, wording and filters as a scope shows them. */

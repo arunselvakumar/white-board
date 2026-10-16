@@ -1,4 +1,11 @@
-import type { ReportJob } from "@/src/queries/reports";
+import type { ReportCatalogueEntry } from "@/src/queries/report-catalogue";
+import type { ReportJob, ReportKind } from "@/src/queries/reports";
+import {
+  entriesIn,
+  type ReportScope,
+} from "@/src/reporting/domain/report-catalogue";
+
+import type { ApiCall } from "../../.storybook/mocks/api";
 
 export const PROJECT_ID = "0190a000-0000-7000-8000-0000000000a1";
 export const TODAY = "2026-10-09";
@@ -126,3 +133,78 @@ export const CENTRAL_VENDOR = job({
   title: "Vendor Attendance",
   projectId: null,
 });
+
+// The report catalogue (CM-901): built from the server's own catalogue, so
+// stories show the same cards, wording and filters as the app.
+
+export const CATALOGUE_API = "/api/construction/reporting/catalogue";
+export const PROJECT_CATALOGUE_PATH = `${CATALOGUE_API}?scope=project&projectId=${PROJECT_ID}`;
+export const CENTRAL_CATALOGUE_PATH = `${CATALOGUE_API}?scope=central`;
+
+/** The labour and site-work cards, which most stories show. */
+export const LABOUR_AND_SITE_WORK_KINDS: readonly ReportKind[] = [
+  "labour_attendance",
+  "labour_payment",
+  "labour_month",
+  "vendor_attendance",
+  "muster_roll",
+  "daily_work",
+  "owned_equipment_usage",
+  "rented_equipment_usage",
+  "equipment_maintenance",
+  "equipment_transfers",
+];
+
+/**
+ * Catalogue entries of `scope` as the route sends them: every built kind,
+ * or only `kinds`; `includesMoney` as for a viewer with every money right.
+ */
+export function catalogueItems(
+  scope: ReportScope,
+  kinds?: readonly ReportKind[],
+): ReportCatalogueEntry[] {
+  return entriesIn(scope)
+    .filter(
+      (entry) =>
+        entry.available && (kinds == null || kinds.includes(entry.kind)),
+    )
+    .map((entry) => ({
+      kind: entry.kind,
+      title: entry.title,
+      description: entry.description,
+      needs: entry.needs,
+      group: entry.group,
+      period: entry.period,
+      formats: [...entry.formats],
+      filters: entry.filters.map((filter) => ({
+        key: filter.key,
+        required: filter.required === true,
+      })),
+      money: entry.money,
+      includesMoney: entry.money !== "never",
+      progressReport: entry.progressReport,
+    }));
+}
+
+/** Answers the catalogue reads: the Project's and the central one. */
+export function catalogueHandler(
+  kinds: {
+    project?: readonly ReportKind[];
+    central?: readonly ReportKind[];
+  } = {},
+): (call: ApiCall) => Response | undefined {
+  return (call) => {
+    if (call.method !== "GET") return undefined;
+    if (call.path === PROJECT_CATALOGUE_PATH)
+      return Response.json({
+        scope: "project",
+        items: catalogueItems("project", kinds.project),
+      });
+    if (call.path === CENTRAL_CATALOGUE_PATH)
+      return Response.json({
+        scope: "central",
+        items: catalogueItems("central", kinds.central),
+      });
+    return undefined;
+  };
+}

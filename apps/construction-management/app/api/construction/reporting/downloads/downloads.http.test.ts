@@ -1,4 +1,4 @@
-import { prisma } from "@repo/construction-db";
+import { prisma, type Prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
@@ -67,7 +67,7 @@ async function addJob(
     kind?: ReportKind;
     status?: "queued" | "running" | "done" | "failed" | "expired";
     createdAt: Date;
-    params?: Record<string, unknown>;
+    params?: Prisma.InputJsonObject;
     error?: string;
   },
 ): Promise<string> {
@@ -263,9 +263,9 @@ describe("Downloads HTTP (CM-901)", () => {
   it("retries a failed report for its requester or the Owner, and refuses others", async () => {
     const company = await ownerWithCompany();
     const tower = await addProject(company.workspaceId, company.userId);
-    const grants = { "labour.labour": ["read", "report"] } as const;
-    const asha = await member(company, { ...grants }, [tower]);
-    const ravi = await member(company, { ...grants }, [tower]);
+    const grants: PermissionGrants = { "labour.labour": ["read", "report"] };
+    const asha = await member(company, grants, [tower]);
+    const ravi = await member(company, grants, [tower]);
     const failed = await addJob(company, {
       requestedBy: asha.userId,
       projectId: tower,

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import {
+  catalogueHandler,
   CENTRAL_LIST_PATH,
   CENTRAL_MAINTENANCE,
   CENTRAL_TRANSFERS,
@@ -33,7 +34,10 @@ function posted(): ApiCall[] {
 function serve(options: Pick<EquipmentApiOptions, "flags"> = {}) {
   return () => {
     const equipment = equipmentHandler({ flags: options.flags });
+    const catalogue = catalogueHandler();
     api = mockApi((call) => {
+      const entries = catalogue(call);
+      if (entries != null) return entries;
       if (call.method === "GET" && call.path === CENTRAL_LIST_PATH)
         return Response.json({
           items: [CENTRAL_TRANSFERS, CENTRAL_VENDOR],
@@ -72,7 +76,7 @@ export const CentralReports: Story = {
       await body.findByRole("dialog", { name: "Equipment reports" }),
     );
     const maintenance = within(
-      dialog.getByRole("form", { name: "Equipment Maintenance" }),
+      await dialog.findByRole("form", { name: "Equipment Maintenance" }),
     );
     await expect(
       dialog.getByRole("form", { name: "Equipment Transfers" }),

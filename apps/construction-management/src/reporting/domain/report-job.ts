@@ -63,9 +63,9 @@ export type ReportOwnScope = { userId: string; memberId: string | null };
 /** The finance reports (CM-709, ADR CM-0017 §16): all about money. */
 export type FinanceReportKind = CatalogueKindsWhere<{ group: "finance" }>;
 
-export const FINANCE_REPORT_KINDS = catalogueKinds<FinanceReportKind>(
+export const FINANCE_REPORT_KINDS = catalogueKinds(
   (entry) => entry.group === "finance",
-);
+) as readonly FinanceReportKind[];
 
 export function isFinanceReport(kind: ReportKind): kind is FinanceReportKind {
   return (FINANCE_REPORT_KINDS as readonly ReportKind[]).includes(kind);
@@ -101,9 +101,9 @@ export type ReportFormat = "xlsx" | "pdf";
 /** The Project's Progress Reports (CM-606, CM-805): PDFs of their own module. */
 export type ProgressReportKind = CatalogueKindsWhere<{ progressReport: true }>;
 
-export const PROGRESS_REPORT_KINDS = catalogueKinds<ProgressReportKind>(
+export const PROGRESS_REPORT_KINDS = catalogueKinds(
   (entry) => entry.progressReport,
-);
+) as readonly ProgressReportKind[];
 
 export function isProgressReport(kind: ReportKind): kind is ProgressReportKind {
   return catalogueEntry(kind).progressReport;

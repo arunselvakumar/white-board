@@ -29,8 +29,10 @@ import {
 } from "@/src/queries/reports";
 
 import {
+  cardFilter,
   monthStart,
   recentFinancialYears,
+  type CardFilter,
   type ReportDefinition,
 } from "./report-catalogue";
 import { ReportDownloads } from "./report-downloads";
@@ -40,17 +42,14 @@ export type ReportFilterOption = { value: string; label: string };
 
 const ALL = "all";
 
-const FILTER_LABELS: Record<NonNullable<ReportDefinition["filter"]>, string> = {
+const FILTER_LABELS: Record<CardFilter, string> = {
   contractor: "Contractor",
   equipment: "Equipment",
   supplier: "Supplier",
   account: "Account",
 };
 
-const FILTER_ALL_LABELS: Record<
-  NonNullable<ReportDefinition["filter"]>,
-  string
-> = {
+const FILTER_ALL_LABELS: Record<CardFilter, string> = {
   contractor: "All contractors",
   equipment: "All equipment",
   supplier: "All suppliers",
@@ -133,13 +132,17 @@ type Period = {
   fy: string;
 };
 
+/**
+ * The request for a card; null for a kind the Reports routes do not take
+ * (a Progress Report, or a report not built yet).
+ */
 function requestFor(
   definition: ReportDefinition,
   scope: string | null,
   period: Period,
   filter: string | null,
   extras: LedgerExtras = { module: ALL, mode: ALL, counterpartyKind: ALL },
-): RequestReportInput {
+): RequestReportInput | null {
   // Only the central kinds are ever shown without a Project.
   const projectId = scope ?? "";
   const range = { from: period.from, to: period.to };
@@ -219,13 +222,15 @@ function requestFor(
     case "issue_snag_report":
     case "inspection_request_report":
       return { kind: definition.kind, projectId, params: range };
+    default:
+      return null;
   }
 }
 
 /**
- * One report: what it contains, its period, and Generate. The job runs
- * while the request is open (until M9's queue), so the card shows progress
- * and then the downloads, or why it failed.
+ * One report of the catalogue: what it contains, its period, and
+ * Generate. The job goes on the queue; the card shows it queued, then the
+ * downloads (or why it failed) once the Recent reports poll sees it done.
  */
 export function ReportCard({
   definition,
@@ -238,7 +243,7 @@ export function ReportCard({
   /** Null for a central report (Masters → Equipments, Central Payment). */
   projectId: string | null;
   today: string;
-  /** Choices for `definition.filter`; the filter shows only with some. */
+  /** Choices for the card's filter; the picker shows only with some. */
   filterOptions?: readonly ReportFilterOption[];
   /** The filter's starting choice (Central Payment's account Ledger link). */
   initialFilter?: string;
@@ -250,7 +255,8 @@ export function ReportCard({
   const [asOn, setAsOn] = useState(today);
   const years = recentFinancialYears(today);
   const [fy, setFy] = useState(years[0] ?? "");
-  const required = definition.filterRequired === true;
+  const picker = cardFilter(definition);
+  const required = picker?.required === true;
   const [filter, setFilter] = useState(initialFilter ?? ALL);
   const [extras, setExtras] = useState<LedgerExtras>({
     module: ALL,
@@ -261,12 +267,12 @@ export function ReportCard({
   const job = mutation.data;
   const rangeInvalid = definition.period === "range" && from > to;
   const filterItems =
-    definition.filter == null || filterOptions.length === 0
+    picker == null || filterOptions.length === 0
       ? null
       : required
         ? [...filterOptions]
         : [
-            { value: ALL, label: FILTER_ALL_LABELS[definition.filter] },
+            { value: ALL, label: FILTER_ALL_LABELS[picker.key] },
             ...filterOptions,
           ];
   // A required filter starts on its first option.
@@ -277,15 +283,14 @@ export function ReportCard({
   function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (rangeInvalid || missingRequired) return;
-    mutation.mutate(
-      requestFor(
-        definition,
-        projectId,
-        { from, to, month, asOn, fy },
-        filterItems == null || picked === ALL ? null : picked,
-        extras,
-      ),
+    const input = requestFor(
+      definition,
+      projectId,
+      { from, to, month, asOn, fy },
+      filterItems == null || picked === ALL ? null : picked,
+      extras,
     );
+    if (input != null) mutation.mutate(input);
   }
 
   return (
@@ -389,10 +394,10 @@ export function ReportCard({
             </div>
           )}
 
-          {filterItems == null || definition.filter == null ? null : (
+          {filterItems == null || picker == null ? null : (
             <div className="space-y-1.5">
               <Label htmlFor={`${id}-filter`}>
-                {FILTER_LABELS[definition.filter]}
+                {FILTER_LABELS[picker.key]}
               </Label>
               <Select
                 items={filterItems}
@@ -457,9 +462,8 @@ export function ReportCard({
           ) : null}
           {missingRequired ? (
             <p className="text-muted-foreground text-sm">
-              There is no{" "}
-              {FILTER_LABELS[definition.filter ?? "account"].toLowerCase()} you
-              can report on yet.
+              There is no {FILTER_LABELS[picker.key].toLowerCase()} you can
+              report on yet.
             </p>
           ) : null}
           {mutation.isPending ? (
@@ -484,6 +488,13 @@ export function ReportCard({
               <AlertTitle>The report failed</AlertTitle>
               <AlertDescription>{job.error}</AlertDescription>
             </Alert>
+          ) : null}
+          {!mutation.isPending &&
+          (job?.status === "queued" || job?.status === "running") ? (
+            <p className="text-muted-foreground text-sm" role="status">
+              Generating. It appears under Recent reports and in Downloads when
+              it is ready; you can leave this page.
+            </p>
           ) : null}
           {!mutation.isPending && job?.status === "done" ? (
             <div className="space-y-2" role="status">
