@@ -15,6 +15,7 @@ import {
   calendarDateToDb,
 } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
 import type { FinanceAuthorNames } from "../application/document-thread-ports";
@@ -333,6 +334,8 @@ export async function otherExpenseGuard(
 export function createOtherExpenseHandlers(deps: {
   directory: Pick<FinanceDirectory, "projects" | "teamMembers">;
   authors: FinanceAuthorNames;
+  /** Approval events after commit (CM-904). */
+  events: EventDispatcher;
   prisma?: PrismaClient;
 }): OtherExpenseHandlers {
   const db = deps.prisma ?? prisma;
@@ -354,5 +357,6 @@ export function createOtherExpenseHandlers(deps: {
         })
       ).number,
     today: (workspaceId) => companyToday(db, workspaceId),
+    events: deps.events,
   });
 }

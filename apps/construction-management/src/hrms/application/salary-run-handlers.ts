@@ -6,6 +6,7 @@ import {
   forbidden,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { formatMinor } from "@/src/shared-kernel/money";
 
 import {
@@ -16,6 +17,7 @@ import {
   monthKeyOf,
   type MonthKey,
 } from "../domain/calendar";
+import type { SalaryApproved, SalaryPaid } from "../domain/events";
 import { buildPayslip, type PayslipDocument } from "../domain/payslip";
 import {
   calculateSalary,
@@ -235,9 +237,46 @@ export class SalaryRunHandlers {
       company: SalaryCompanyReader;
       payslips: PayslipFiles;
       renderer: PayslipRenderer;
+      /** `hrms.salary_approved` / `hrms.salary_paid` after commit (CM-904). */
+      events: EventDispatcher;
     },
     private readonly clock: () => Date = () => new Date(),
   ) {}
+
+  /**
+   * One `hrms.salary_approved` or `hrms.salary_paid` per month of the
+   * slips, after commit; each slip names its employee's User to tell.
+   */
+  private async dispatchSalary(
+    access: MemberAccess,
+    type: "hrms.salary_approved" | "hrms.salary_paid",
+    slips: readonly StoredSalarySlip[],
+    employees: Map<string, HrmsEmployee>,
+  ): Promise<void> {
+    const byMonth = new Map<
+      string,
+      { slipId: string; userId: string | null }[]
+    >();
+    for (const slip of slips) {
+      const recipients = byMonth.get(slip.month) ?? [];
+      recipients.push({
+        slipId: slip.id,
+        userId: employees.get(slip.memberId)?.userId ?? null,
+      });
+      byMonth.set(slip.month, recipients);
+    }
+    const occurredAt = this.clock();
+    await this.deps.events.dispatch(
+      [...byMonth].map(([month, recipients]): SalaryApproved | SalaryPaid => ({
+        type,
+        workspaceId: access.workspaceId,
+        occurredAt,
+        month,
+        slips: recipients,
+        by: access.userId,
+      })),
+    );
+  }
 
   private async me(access: MemberAccess): Promise<HrmsEmployee | null> {
     return this.deps.employees.findByUserId(access.workspaceId, access.userId);
@@ -819,6 +858,15 @@ export class SalaryRunHandlers {
       workspaceId,
       slips.map((slip) => slip.id),
     );
+    await this.dispatchSalary(
+      access,
+      "hrms.salary_approved",
+      slips,
+      await this.deps.employees.find(
+        workspaceId,
+        slips.map((slip) => slip.memberId),
+      ),
+    );
     return this.records(
       access,
       slips.map((slip) => after.get(slip.id) ?? slip),
@@ -868,6 +916,7 @@ export class SalaryRunHandlers {
       by: access.userId,
       now: this.clock(),
     });
+    await this.dispatchSalary(access, "hrms.salary_paid", slips, employees);
     const [after, me] = await Promise.all([
       this.store.findMany(
         workspaceId,

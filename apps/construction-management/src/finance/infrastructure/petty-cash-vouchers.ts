@@ -8,6 +8,10 @@ import {
   type ApprovalStatus,
   type BulkRefusal,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   calendarDateFromDb,
@@ -19,6 +23,7 @@ import {
   forbidden,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
@@ -119,6 +124,11 @@ type Deps = {
     | "vendors"
   >;
   names: FinanceAuthorNames;
+  /**
+   * `document.submitted` / `approved` / `rejected` after commit (CM-904,
+   * documentType `petty_cash_voucher`).
+   */
+  events: EventDispatcher;
   db?: PrismaClient;
   clock?: () => Date;
 };
@@ -672,6 +682,33 @@ export class PettyCashVouchers {
     };
   }
 
+  /** The approval events of saved or decided vouchers, after commit. */
+  private async dispatchApproval(
+    rows: readonly Row[],
+    outcome: ApprovalOutcome,
+    by: string,
+    at: Date,
+  ): Promise<void> {
+    if (rows.length === 0) return;
+    await this.deps.events.dispatch(
+      rows.map((row) =>
+        approvalEvent(
+          {
+            workspaceId: row.workspaceId,
+            documentType: "petty_cash_voucher",
+            documentId: row.id,
+            projectId: row.projectId,
+            number: row.number,
+            createdBy: row.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
+    );
+  }
+
   // -------------------------------------------------------------------------
   // Commands
   // -------------------------------------------------------------------------
@@ -693,7 +730,7 @@ export class PettyCashVouchers {
     dates.create(input.voucherDate);
     const now = this.clock();
     const id = newId(now.getTime());
-    await this.db.$transaction(async (tx) => {
+    const created = await this.db.$transaction(async (tx) => {
       const content = await this.checked(
         tx,
         access,
@@ -736,7 +773,14 @@ export class PettyCashVouchers {
         occurredAt: now,
         after: snapshot(row),
       });
+      return row;
     });
+    await this.dispatchApproval(
+      [created],
+      input.approve ? { kind: "approved" } : { kind: "submitted" },
+      access.userId,
+      now,
+    );
     return id;
   }
 
@@ -753,7 +797,7 @@ export class PettyCashVouchers {
     input: VoucherInput & { expectedUpdatedAt: Date },
   ): Promise<void> {
     const now = this.clock();
-    await this.db.$transaction(async (tx) => {
+    const saved = await this.db.$transaction(async (tx) => {
       const row = await this.visible(
         tx,
         access,
@@ -801,7 +845,14 @@ export class PettyCashVouchers {
         before: snapshot(row),
         after: snapshot(next),
       });
+      return next;
     });
+    await this.dispatchApproval(
+      [saved],
+      { kind: "submitted" },
+      access.userId,
+      now,
+    );
   }
 
   /**
@@ -823,6 +874,7 @@ export class PettyCashVouchers {
       ? null
       : requiredText(decision.reason, "REJECTION_REASON_REQUIRED", "reason");
     const now = this.clock();
+    const decided: Row[] = [];
     await this.db.$transaction(async (tx) => {
       const refusals: BulkRefusal[] = [];
       const refuse = (id: string, error: unknown) => {
@@ -864,15 +916,17 @@ export class PettyCashVouchers {
               await this.toAccount(tx, access.workspaceId, row.toAccountId);
             await this.post(tx, access.userId, row);
           }
-          await tx.constructionFinancePettyCashVoucher.update({
-            where: { id: row.id },
-            data: {
-              approvalStatus: decision.approve ? "approved" : "rejected",
-              decidedBy: access.userId,
-              decidedAt: now,
-              rejectReason: reason,
-            },
-          });
+          decided.push(
+            await tx.constructionFinancePettyCashVoucher.update({
+              where: { id: row.id },
+              data: {
+                approvalStatus: decision.approve ? "approved" : "rejected",
+                decidedBy: access.userId,
+                decidedAt: now,
+                rejectReason: reason,
+              },
+            }),
+          );
           await recordAudit(tx, {
             workspaceId: access.workspaceId,
             actorUserId: access.userId,
@@ -894,6 +948,12 @@ export class PettyCashVouchers {
       }
       if (refusals.length > 0) throw bulkRefused(refusals);
     });
+    await this.dispatchApproval(
+      decided,
+      decision.approve ? { kind: "approved" } : { kind: "rejected", reason },
+      access.userId,
+      now,
+    );
     return ids.length;
   }
 

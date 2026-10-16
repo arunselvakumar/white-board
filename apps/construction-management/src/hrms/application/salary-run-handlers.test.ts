@@ -19,6 +19,7 @@ import {
   FakePayslipRenderer,
   FakeSalaryConfigSource,
   FakeSalaryRunStore,
+  RecordingEventDispatcher,
 } from "./salary-run-fakes";
 import { SalaryRunHandlers } from "./salary-run-handlers";
 
@@ -109,6 +110,7 @@ let attendance: FakeAttendanceDaySource;
 let files: FakePayslipFiles;
 let renderer: FakePayslipRenderer;
 let directory: FakeEmployeeDirectory;
+let events: RecordingEventDispatcher;
 let handlers: SalaryRunHandlers;
 
 beforeEach(() => {
@@ -126,6 +128,7 @@ beforeEach(() => {
     employee("m9", { name: "Mani" }),
     employee("owner", { name: "Owner", userId: "user-1", isOwner: true }),
   ]);
+  events = new RecordingEventDispatcher();
   handlers = new SalaryRunHandlers(store, {
     employees: directory,
     settings: new FakeHrmsSettingsStore(),
@@ -139,6 +142,7 @@ beforeEach(() => {
     company: fakeCompany,
     payslips: files,
     renderer,
+    events,
   });
 });
 
@@ -413,6 +417,67 @@ describe("recalculate and the state machine", () => {
         }),
       ),
     ).toBe("SALARY_ALREADY_PAID");
+  });
+});
+
+describe("salary events for notifications (CM-904)", () => {
+  beforeEach(async () => {
+    configure("a", 3_100_000);
+    configure("b", 2_000_000);
+    await handlers.calculate(OWNER, { month: "2026-10" });
+  });
+
+  it("raises hrms.salary_approved and hrms.salary_paid per month, naming each employee's User", async () => {
+    const a = await slipOf("a");
+    const b = await slipOf("b");
+    const approved = await handlers.approve(OWNER, {
+      slips: [
+        { id: a.id, expectedUpdatedAt: a.updatedAt },
+        { id: b.id, expectedUpdatedAt: b.updatedAt },
+      ],
+    });
+    expect(events.of("hrms.salary_approved")).toEqual([
+      expect.objectContaining({
+        workspaceId: WS,
+        month: "2026-10",
+        by: OWNER.userId,
+        slips: [
+          { slipId: a.id, userId: "user-a" },
+          { slipId: b.id, userId: "user-b" },
+        ],
+      }),
+    ]);
+    expect(events.of("hrms.salary_paid")).toHaveLength(0);
+    await handlers.markPaid(OWNER, {
+      slips: approved.map((record) => ({
+        id: record.slip.id,
+        expectedUpdatedAt: record.slip.updatedAt,
+      })),
+      mode: "bank",
+      paymentDate: "2026-11-01",
+      reference: "UTR1",
+      accountId: "bank-1",
+    });
+    expect(events.of("hrms.salary_paid")).toEqual([
+      expect.objectContaining({
+        month: "2026-10",
+        by: OWNER.userId,
+        slips: [
+          { slipId: a.id, userId: "user-a" },
+          { slipId: b.id, userId: "user-b" },
+        ],
+      }),
+    ]);
+  });
+
+  it("raises nothing when the approval is refused", async () => {
+    const a = await slipOf("a");
+    await rejectsWith(
+      handlers.approve(memberAccess(["read", "view_all"]), {
+        slips: [{ id: a.id, expectedUpdatedAt: a.updatedAt }],
+      }),
+    );
+    expect(events.events).toHaveLength(0);
   });
 });
 

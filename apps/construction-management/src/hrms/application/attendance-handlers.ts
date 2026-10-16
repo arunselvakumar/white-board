@@ -9,6 +9,11 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import {
+  approvalEvent,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 
 import {
   assertCanCheckOut,
@@ -31,6 +36,7 @@ import {
   type ShiftTimes,
 } from "../domain/attendance";
 import { matchFence, type Fence } from "../domain/branch";
+import { HRMS_DOCUMENT_TYPES } from "../domain/events";
 import {
   assertMonthKey,
   firstDayOf,
@@ -277,10 +283,47 @@ export class AttendanceHandlers {
       monthLock: MonthLock;
       guard: AttendanceBackdatedGuard;
       timeZone: (workspaceId: string) => Promise<string>;
+      /**
+       * `document.submitted` / `approved` / `rejected` after commit
+       * (CM-904, documentType `attendance_correction`): a missed checkout
+       * or a back-dated day, told to the employee.
+       */
+      events: EventDispatcher;
       clock?: () => Date;
     },
   ) {
     this.clock = deps.clock ?? (() => new Date());
+  }
+
+  /**
+   * The approval event of an attendance correction (a missed checkout or
+   * a back-dated day). An out-of-fence check-in also waits for approval
+   * but is not a correction, so it raises nothing.
+   */
+  private async dispatchCorrection(
+    access: MemberAccess,
+    entry: StoredAttendanceEntry,
+    outcome: ApprovalOutcome,
+  ): Promise<void> {
+    if (entry.source !== "missed_checkout" && entry.source !== "manual") return;
+    const employee = (
+      await this.deps.employees.find(access.workspaceId, [entry.memberId])
+    ).get(entry.memberId);
+    await this.deps.events.dispatch([
+      approvalEvent(
+        {
+          workspaceId: access.workspaceId,
+          documentType: HRMS_DOCUMENT_TYPES.attendanceCorrection,
+          documentId: entry.id,
+          projectId: null,
+          number: null,
+          createdBy: employee?.userId ?? null,
+        },
+        outcome,
+        access.userId,
+        this.clock(),
+      ),
+    ]);
   }
 
   private async me(access: MemberAccess): Promise<HrmsEmployee> {
@@ -536,7 +579,7 @@ export class AttendanceHandlers {
       member.memberId,
       entry.date,
     );
-    return this.deps.store.update({
+    const corrected = await this.deps.store.update({
       workspaceId,
       id: entry.id,
       expectedUpdatedAt: input.expectedUpdatedAt,
@@ -553,6 +596,10 @@ export class AttendanceHandlers {
       by: userId,
       now,
     });
+    await this.dispatchCorrection(input.access, corrected, {
+      kind: "submitted",
+    });
+    return corrected;
   }
 
   /**
@@ -579,7 +626,7 @@ export class AttendanceHandlers {
       member.memberId,
       span.date,
     );
-    return this.deps.store.create({
+    const added = await this.deps.store.create({
       workspaceId,
       entry: {
         memberId: member.memberId,
@@ -600,6 +647,8 @@ export class AttendanceHandlers {
       by: userId,
       now,
     });
+    await this.dispatchCorrection(input.access, added, { kind: "submitted" });
+    return added;
   }
 
   /**
@@ -666,7 +715,7 @@ export class AttendanceHandlers {
       entry.date,
     );
     const now = this.clock();
-    return this.deps.store.update({
+    const decided = await this.deps.store.update({
       workspaceId: access.workspaceId,
       id: entry.id,
       expectedUpdatedAt: input.expectedUpdatedAt,
@@ -684,6 +733,14 @@ export class AttendanceHandlers {
       by: access.userId,
       now,
     });
+    await this.dispatchCorrection(
+      access,
+      decided,
+      input.outcome === "approved"
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: input.rejectionReason },
+    );
+    return decided;
   }
 
   approve(input: {

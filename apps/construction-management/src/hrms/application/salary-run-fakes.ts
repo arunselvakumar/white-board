@@ -1,5 +1,6 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import type { DomainEvent, EventDispatcher } from "@/src/shared-kernel/events";
 
 import {
   datesOf,
@@ -653,3 +654,17 @@ export const fakeCompany: SalaryCompanyReader = {
       timezone: "Asia/Kolkata",
     }),
 };
+
+/** Records the events a handler dispatches (CM-904). */
+export class RecordingEventDispatcher implements EventDispatcher {
+  readonly events: DomainEvent[] = [];
+
+  dispatch(events: readonly DomainEvent[]): Promise<void> {
+    this.events.push(...events);
+    return Promise.resolve();
+  }
+
+  of(type: string): DomainEvent[] {
+    return this.events.filter((event) => event.type === type);
+  }
+}

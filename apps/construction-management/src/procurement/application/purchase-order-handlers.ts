@@ -12,8 +12,12 @@ import {
   type ApprovalState,
   type ApprovalStatus,
   type BulkRefusal,
-  type DocumentApproved,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  savedOutcome,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   assertCalendarDate,
@@ -744,24 +748,36 @@ export class PurchaseOrderHandlers {
     };
   }
 
-  private async dispatchApproved(
-    pos:
-      | readonly StoredPurchaseOrder[]
-      | readonly { id: string; workspaceId: string; location: StockLocation }[],
+  /**
+   * `document.submitted` / `approved` / `rejected` after commit (CM-904);
+   * a Central Store PO has no Project.
+   */
+  private async dispatchApproval(
+    pos: readonly Pick<
+      StoredPurchaseOrder,
+      "id" | "workspaceId" | "location" | "number" | "createdBy"
+    >[],
+    outcome: ApprovalOutcome | null,
     by: string,
     at: Date,
   ) {
-    if (pos.length === 0) return;
+    if (outcome == null || pos.length === 0) return;
     await this.deps.events.dispatch(
-      pos.map((po): DocumentApproved => ({
-        type: "document.approved",
-        workspaceId: po.workspaceId,
-        occurredAt: at,
-        documentType: DOCUMENT.type,
-        documentId: po.id,
-        projectId: po.location.kind === "project" ? po.location.id : null,
-        approvedBy: by,
-      })),
+      pos.map((po) =>
+        approvalEvent(
+          {
+            workspaceId: po.workspaceId,
+            documentType: DOCUMENT.type,
+            documentId: po.id,
+            projectId: po.location.kind === "project" ? po.location.id : null,
+            number: po.number,
+            createdBy: po.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
     );
   }
 
@@ -781,7 +797,7 @@ export class PurchaseOrderHandlers {
       input.approve === true
         ? approvedState({ userId: access.userId, at })
         : pendingState();
-    await this.deps.db.$transaction(async (tx) => {
+    const number = await this.deps.db.$transaction(async (tx) => {
       const { content } = await this.content(access, located, input, null, tx);
       check(DOCUMENT.backdated, "create", content.orderDate);
       const { number } = await nextSequenceNumber(tx, {
@@ -813,13 +829,22 @@ export class PurchaseOrderHandlers {
         after: { number, location, ...snapshot(content, approval) },
         occurredAt: at,
       });
+      return number;
     });
-    if (approval.status === "approved")
-      await this.dispatchApproved(
-        [{ id, workspaceId: access.workspaceId, location }],
-        access.userId,
-        at,
-      );
+    await this.dispatchApproval(
+      [
+        {
+          id,
+          workspaceId: access.workspaceId,
+          location,
+          number,
+          createdBy: access.userId,
+        },
+      ],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
     return id;
   }
 
@@ -948,8 +973,12 @@ export class PurchaseOrderHandlers {
         occurredAt: at,
       });
     });
-    if (approval.status === "approved")
-      await this.dispatchApproved([current], access.userId, at);
+    await this.dispatchApproval(
+      [current],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
   }
 
   async delete(
@@ -1048,7 +1077,7 @@ export class PurchaseOrderHandlers {
   ): Promise<void> {
     const at = this.clock();
     const by = { userId: access.userId, at };
-    const approved: StoredPurchaseOrder[] = [];
+    const decided: StoredPurchaseOrder[] = [];
     await this.deps.db.$transaction(async (tx) => {
       const locked = new Map(
         (await this.deps.store.lock(tx, access.workspaceId, ids)).map((po) => [
@@ -1104,7 +1133,7 @@ export class PurchaseOrderHandlers {
           occurredAt: at,
         });
         const po = locked.get(id);
-        if (decision.approve && po != null) approved.push(po);
+        if (po != null) decided.push({ ...po, approval });
       }
       // A rejected PO stops counting towards its PR's ordered quantity.
       if (!decision.approve)
@@ -1114,7 +1143,15 @@ export class PurchaseOrderHandlers {
           [...next.keys()].map((id) => locked.get(id)?.purchaseRequestId),
         );
     });
-    await this.dispatchApproved(approved, access.userId, at);
+    for (const po of decided)
+      await this.dispatchApproval(
+        [po],
+        decision.approve
+          ? { kind: "approved" }
+          : { kind: "rejected", reason: po.approval.rejectionReason },
+        access.userId,
+        at,
+      );
   }
 
   /** Mark as Ordered: sent to the supplier; approved, not yet ordered. */

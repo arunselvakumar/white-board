@@ -1,6 +1,10 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
-import { bulkRefused, type BulkRefusal } from "@/src/shared-kernel/approval";
+import {
+  bulkRefused,
+  type BulkRefusal,
+  type DocumentApproved,
+} from "@/src/shared-kernel/approval";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   calendarDateFromDb,
@@ -31,6 +35,7 @@ import {
   type RequestLineAvailability,
 } from "../domain/delivery-note";
 import { PROCUREMENT_DOCUMENTS } from "../domain/documents";
+import type { MaterialRequestDelivered } from "../domain/events";
 import {
   deriveMaterialRequestStatus,
   isOpenMaterialRequest,
@@ -472,6 +477,18 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
           where: { id: request.id },
           data: { status, updatedAt: now, updatedBy: actor.userId },
         });
+      events.push({
+        type: "procurement.material_request_delivered",
+        workspaceId: actor.workspaceId,
+        occurredAt: now,
+        requestId: request.id,
+        number: request.number,
+        deliveryNoteId: id,
+        deliveryNoteNumber: before.number,
+        projectId: before.projectId,
+        requestedBy: request.createdBy,
+        by: actor.userId,
+      } satisfies MaterialRequestDelivered as DomainEvent);
       await recordAudit(tx, {
         workspaceId: actor.workspaceId,
         actorUserId: actor.userId,
@@ -545,7 +562,9 @@ export class PrismaDeliveryNoteRepository implements DeliveryNoteRepository {
         documentId: id,
         projectId: note.projectId,
         approvedBy: actor.userId,
-      } as DomainEvent,
+        number: note.number,
+        createdBy: note.createdBy,
+      } satisfies DocumentApproved as DomainEvent,
     ];
   }
 
