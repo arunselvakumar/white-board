@@ -1,0 +1,67 @@
+apps/construction-management/app/app/masters/page.tsx
+  s_9b8b004c55c7f2::t_bc8bc77f3524ba 15,24-28
+apps/construction-management/app/app/masters/settings/backup/page.tsx
+  s_9b8b004c55c7f2::t_f1d6734eda7d46 1-9
+apps/construction-management/components/account/company-ownership-screen.stories.tsx
+  s_9b8b004c55c7f2::t_792c6031b199cc 139-142
+apps/construction-management/components/account/delete-company-dialog.tsx
+  s_9b8b004c55c7f2::t_87c568cfcfab26 5,102-109
+apps/construction-management/components/backups/backup-fixtures.ts
+  s_9b8b004c55c7f2::t_e41fb42562c5eb 1-90
+apps/construction-management/components/backups/backup-module-picker.tsx
+  s_9b8b004c55c7f2::t_62581380854aa6 1-133
+apps/construction-management/components/backups/backup-progress.tsx
+  s_9b8b004c55c7f2::t_8acf694f7e39b5 1-106
+apps/construction-management/components/backups/company-backup-screen.stories.tsx
+  s_9b8b004c55c7f2::t_6c05ed0f4382d6 1-136
+apps/construction-management/components/backups/download-my-data.stories.tsx
+  s_9b8b004c55c7f2::t_03d1dbd76597de 1-107
+apps/construction-management/components/backups/download-my-data.tsx
+  s_9b8b004c55c7f2::t_712fb889cd58ce 1-131
+apps/construction-management/components/backups/masters-backup-button.tsx
+  s_9b8b004c55c7f2::t_744f08a504671d 1-33
+apps/construction-management/components/downloads/downloads-page.stories.tsx
+  s_9b8b004c55c7f2::t_67ffab4b8496ed 8-11,13,297-349
+apps/construction-management/components/notifications/ready-download-toast.tsx
+  s_9b8b004c55c7f2::t_cd56757fdf2350 18-19,62-76,79-81,88-104
+apps/construction-management/components/profile/privacy-section.tsx
+  s_9b8b004c55c7f2::t_1af6342ed962f9 18,80-81,95
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_9b8b004c55c7f2::t_e88884660f9825 186-230
+apps/construction-management/components/projects/project-shell.tsx
+  s_9b8b004c55c7f2::t_30206370fad379 28-29,35,39-40,42-50,94-101,120-128,192
+apps/construction-management/lib/settings-nav.ts
+  s_9b8b004c55c7f2::t_c72403c0f119b5 4,53-59
+apps/construction-management/src/queries/backups.ts
+  s_9b8b004c55c7f2::t_776cd4b11f2df6 1-90
+apps/construction-management/components/backups/backup-dialog.stories.tsx
+  s_404a52a8f29820::t_ac374d08dc12a2 1-274
+apps/construction-management/components/backups/backup-dialog.tsx
+  s_404a52a8f29820::t_52db587aa28eac 1-328
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_404a52a8f29820::t_e9fc832027d998 1-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b174455bc2ff0f6ec771c7e9be630b9ceb8db98b",
+  "prompts": {},
+  "sessions": {
+    "s_404a52a8f29820": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af092c058585385f2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
