@@ -110,10 +110,17 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
       "issue_snag_report",
     ]);
     expect(items.every((item) => !item.includesMoney)).toBe(true);
-    // Not on Villa: nothing to request there.
-    expect(
-      await kindsOf(reporter.cookie, `scope=project&projectId=${villa}`),
-    ).toEqual([]);
+    // Not on Villa: answered exactly like a Project that does not exist.
+    const offProject = await catalogue(
+      reporter.cookie,
+      `scope=project&projectId=${villa}`,
+    );
+    const missing = await catalogue(
+      reporter.cookie,
+      `scope=project&projectId=${crypto.randomUUID()}`,
+    );
+    expect(offProject.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await offProject.json()).toEqual(await missing.json());
 
     const financial = await member(
       company,

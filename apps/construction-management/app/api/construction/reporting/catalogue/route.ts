@@ -36,9 +36,13 @@ export async function GET(request: Request): Promise<Response> {
       ),
     );
     const projectId = model.projectId ?? null;
+    // A Project the member is not on answers like a missing one, so the
+    // route never tells whether an id exists in the Company.
     if (
       projectId != null &&
-      !(await projects.exists(session.workspaceId, projectId))
+      ((session.role !== "owner" &&
+        !session.access.projectIds.has(projectId)) ||
+        !(await projects.exists(session.workspaceId, projectId)))
     )
       return jsonError(
         StatusCodes.NOT_FOUND,
