@@ -11,6 +11,11 @@ import {
 } from "@/src/shared-kernel/queue";
 
 import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
+import {
+  createMessagingDelayedHandler,
+  createMessagingRetentionHandler,
+  createPushQueueHandler,
+} from "./messaging";
 import { reportQueueHandlerFromEnv } from "./report-jobs";
 
 /**
@@ -20,7 +25,15 @@ import { reportQueueHandlerFromEnv } from "./report-jobs";
  * `DAILY_JOB_TYPES`.
  */
 export function queueHandlers(): QueueHandler[] {
-  return [reportQueueHandlerFromEnv(), companyPurgeQueueHandler()];
+  return [
+    reportQueueHandlerFromEnv(),
+    // CM-904: one push per notification; daily retention and "became delayed".
+    createPushQueueHandler(),
+    createMessagingRetentionHandler(),
+    createMessagingDelayedHandler(),
+    // CM-907: purge Companies whose deletion came due.
+    companyPurgeQueueHandler(),
+  ];
 }
 
 /**
@@ -28,7 +41,13 @@ export function queueHandlers(): QueueHandler[] {
  * `daily:<type>:<date>`): retention, orphan clean-up, "became delayed"
  * notifications, Company deletions that are due.
  */
-export const DAILY_JOB_TYPES: readonly string[] = [COMPANY_PURGE_JOB];
+export const DAILY_JOB_TYPES: readonly string[] = [
+  // CM-904
+  "messaging.retention",
+  "messaging.delayed",
+  // CM-907
+  COMPANY_PURGE_JOB,
+];
 
 export const queueStore = prismaQueueStore(prisma);
 

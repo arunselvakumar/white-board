@@ -6,6 +6,7 @@ import {
 } from "@/app/api/_lib/require-session";
 import { financeAuthorNames } from "@/src/composition/finance-author-names";
 import { financeDirectory } from "@/src/composition/finance-directory";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   OTHER_EXPENSE_MENU,
   type StoredOtherExpense,
@@ -21,6 +22,7 @@ export { OTHER_EXPENSE_MENU };
 export const otherExpenseHandlers = createOtherExpenseHandlers({
   directory: financeDirectory,
   authors: financeAuthorNames(),
+  events: messagingEvents(),
 });
 
 /**

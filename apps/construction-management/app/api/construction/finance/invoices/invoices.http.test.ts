@@ -2,11 +2,12 @@ import { randomUUID } from "node:crypto";
 
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 import { actAs } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import {
   closeBooks,
   codeOf,
@@ -84,6 +85,10 @@ async function department(world: PartyWorld, linked: boolean) {
     });
   return id;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Party invoices (CM-705, CM-706, CM-708)", () => {
   it("records a supplier bill, posts it to the party and lists it as open", async () => {
@@ -439,6 +444,58 @@ describe("Party invoices (CM-705, CM-706, CM-708)", () => {
     );
     expect(done.status).toBe(StatusCodes.OK);
     expect((await invoiceOf(second.id)).status).toBe("settled");
+  });
+
+  it("raises the settlement's approval events for notifications (CM-904)", async () => {
+    const world = await partyWorld();
+    const first = await bill(world, { amount: 500_00 });
+    const second = await bill(world, { amount: 700_00 });
+    const events = watchEvents();
+    const raise = async (id: string) =>
+      (
+        await json<Invoice>(
+          await settleInvoice(
+            postTo(`/invoices/${id}/settle`, { reason: "Rounding" }),
+            idParams(id),
+          ),
+        )
+      ).pendingSettlement?.id ?? "";
+    const a = await raise(first.id);
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "invoice_settlement",
+        documentId: a,
+        projectId: world.projectId,
+        number: first.invoiceNumber,
+        submittedBy: world.ownerId,
+      }),
+    ]);
+    await rejectSettlement(
+      postTo(`/settlements/${a}/reject`, { reason: "Not agreed" }),
+      idParams(a),
+    );
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "invoice_settlement",
+        documentId: a,
+        number: first.invoiceNumber,
+        rejectedBy: world.ownerId,
+        createdBy: world.ownerId,
+        reason: "Not agreed",
+      }),
+    ]);
+    const b = await raise(second.id);
+    await bulkApprove(postTo("/settlements/bulk-approve", { ids: [b] }));
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "invoice_settlement",
+        documentId: b,
+        projectId: world.projectId,
+        number: second.invoiceNumber,
+        approvedBy: world.ownerId,
+        createdBy: world.ownerId,
+      }),
+    ]);
   });
 
   it("keeps the Financial Closing Date and the Permission Matrix", async () => {

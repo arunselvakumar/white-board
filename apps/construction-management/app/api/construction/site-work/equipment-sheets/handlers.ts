@@ -13,7 +13,7 @@ import { siteWorkStock } from "@/src/composition/site-work-stock";
 import { worksheetDirectory } from "@/src/composition/worksheet-directory";
 import type { Flag } from "@/src/shared-kernel/access";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   equipmentSheetActions,
   EquipmentSheetHandlers,
@@ -56,7 +56,7 @@ export const equipmentSheetHandlers = new EquipmentSheetHandlers({
   backdated: (access) => loadBackdatedCheck(prisma, access),
   today: (workspaceId) => companyToday(prisma, workspaceId),
   // Nothing listens yet: M7 takes EquipmentHireAccrued, M9 notifies.
-  events: new InProcessEventDispatcher(),
+  events: messagingEvents(),
   media: projectMediaDispatcher(),
 });
 

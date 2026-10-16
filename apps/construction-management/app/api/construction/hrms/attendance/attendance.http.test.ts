@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@repo/construction-db";
 import ExcelJS from "exceljs";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createHrmsPorts } from "@/src/hrms/infrastructure/create-hrms-ports";
@@ -15,6 +15,7 @@ import {
   todayIn,
 } from "@/src/shared-kernel/calendar-date";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as approveRoute } from "./approvals/[id]/approve/route";
@@ -189,6 +190,10 @@ const ALL: Flag[] = [
   "report",
   "export",
 ];
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Attendance HTTP (CM-308, CM-309)", () => {
   it("is 401 without a Session", async () => {
@@ -481,6 +486,80 @@ describe("Attendance HTTP (CM-308, CM-309)", () => {
     });
     expect(old.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(old)).toMatchObject({ code: "BACKDATED_CREATE_BLOCKED" });
+  });
+
+  it("raises attendance correction approval events for notifications (CM-904)", async () => {
+    const owner = await company("record_only");
+    await addOffice(owner.workspaceId, owner.userId);
+    const worker = await memberWith(owner, {
+      "hrms.attendance": ["create", "read"],
+    });
+    const manager = await memberWith(owner, {
+      "hrms.attendance": ["read", "approve", "reject"],
+    });
+    const events = watchEvents();
+    // An out-of-fence check-in waits for approval but is no correction.
+    const outside = await json<Entry>(
+      await checkIn(worker.cookie, { ...FAR, accuracyMetres: 5 }),
+    );
+    expect(outside.approvalStatus).toBe("pending");
+    expect(events.of("document.submitted")).toHaveLength(0);
+
+    const entry = await json<Entry>(
+      await manual(worker.cookie, {
+        date: addDays(TODAY, -2),
+        checkInTime: "09:00",
+        checkOutTime: "17:30",
+        reason: "Site visit",
+      }),
+    );
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "attendance_correction",
+        documentId: entry.id,
+        projectId: null,
+        number: null,
+        submittedBy: worker.userId,
+      }),
+    ]);
+    await approve(manager.cookie, entry.id, {
+      expectedUpdatedAt: entry.updatedAt,
+    });
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "attendance_correction",
+        documentId: entry.id,
+        approvedBy: manager.userId,
+        createdBy: worker.userId,
+      }),
+    ]);
+    await reject(manager.cookie, outside.id, {
+      expectedUpdatedAt: outside.updatedAt,
+      reason: "Not at the site",
+    });
+    expect(events.of("document.rejected")).toHaveLength(0);
+
+    const second = await json<Entry>(
+      await manual(worker.cookie, {
+        date: addDays(TODAY, -3),
+        checkInTime: "09:00",
+        checkOutTime: "12:00",
+        reason: "Morning at the bank",
+      }),
+    );
+    await reject(manager.cookie, second.id, {
+      expectedUpdatedAt: second.updatedAt,
+      reason: "No proof of the visit",
+    });
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "attendance_correction",
+        documentId: second.id,
+        rejectedBy: manager.userId,
+        createdBy: worker.userId,
+        reason: "No proof of the visit",
+      }),
+    ]);
   });
 
   it("approves and rejects with optimistic concurrency, never one's own unless the Owner", async () => {
