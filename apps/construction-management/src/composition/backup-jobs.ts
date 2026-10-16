@@ -27,6 +27,7 @@ import type { BackupJob } from "@/src/reporting/domain/backup-job";
 import { signedBackupPath } from "@/src/reporting/domain/backup-link";
 import { prismaBackupJobStore } from "@/src/reporting/infrastructure/prisma-backup-job-store";
 import { fflateArchiver } from "@/src/reporting/infrastructure/zip-archiver";
+import { companyTimezone } from "@/src/shared-kernel/company-today";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { QueueHandler } from "@/src/shared-kernel/queue";
 
@@ -63,11 +64,12 @@ const emailMailer: BackupMailer = {
       companyName: input.companyName,
       downloadUrl: input.downloadUrl,
       fileName: input.fileName,
+      // The link's last day on the Company's own calendar.
       expiresOn: new Intl.DateTimeFormat("en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
-        timeZone: "Asia/Kolkata",
+        timeZone: await companyTimezone(prisma, input.workspaceId),
       }).format(input.expiresAt),
     });
     await constructionMessaging.sendEmail({ to: input.to, ...rendered });

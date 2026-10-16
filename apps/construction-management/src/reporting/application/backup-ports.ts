@@ -156,6 +156,8 @@ export type BackupStorage = {
 /** The Owner's email with a full Company backup's link. */
 export type BackupMailer = {
   sendCompanyBackupReady(input: {
+    /** The Company: its time zone dates the link's last day. */
+    workspaceId: string;
     to: string;
     companyName: string;
     downloadUrl: string;

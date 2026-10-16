@@ -691,8 +691,10 @@ export class NotificationListeners implements DomainEventListener {
           title: done
             ? `Your ${title} is ready`
             : `Your ${title} could not be generated`,
-          // Which Project (or all of them); a failure says why.
-          body: done ? (project ?? "All Projects") : event.error,
+          // The Project for a project report; a central report may cover
+          // chosen Projects only, so it says no more than that. A failure
+          // says why.
+          body: done ? (project ?? "Central report") : event.error,
           href: LINKS.downloads,
           attachment: done
             ? { kind: "report", id: event.reportJobId, downloads }

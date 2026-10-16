@@ -24,7 +24,6 @@ export const WRITES_OPEN_DURING_COMPANY_DELETION: readonly RegExp[] = [
   /^\/api\/construction\/organization\/me\/profile\/reveal-identifiers$/,
   /^\/api\/construction\/organization\/team-members\/[^/]+\/reveal$/,
   /^\/api\/construction\/reporting\//,
-  /^\/api\/construction\/backups(\/|$)/,
   /^\/api\/construction\/messaging\//,
   /^\/api\/construction\/queue\//,
 ];

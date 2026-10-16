@@ -420,12 +420,14 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     );
     if (
       backup.scope === "company" &&
+      backup.workspaceId != null &&
       !isHrmsOnly(backup.modules) &&
       notify.email != null &&
       deps.mailer != null
     )
       await deps.mailer
         .sendCompanyBackupReady({
+          workspaceId: backup.workspaceId,
           to: notify.email,
           companyName: companyName ?? "your Company",
           downloadUrl: deps.absoluteUrl(href),

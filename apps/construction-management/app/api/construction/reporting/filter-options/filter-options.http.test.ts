@@ -144,6 +144,18 @@ describe("report filter options HTTP (CM-903)", () => {
       `scope=project&projectId=${ctx.tower}`,
     );
     expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
+    // A member on Tower only: Villa answers exactly like a missing Project.
+    const site = await ctx.member({ "labour.vendor": ["read", "report"] });
+    const offProject = await options(
+      site,
+      `scope=project&projectId=${ctx.villa}`,
+    );
+    const missing = await options(
+      site,
+      `scope=project&projectId=${randomUUID()}`,
+    );
+    expect(offProject.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await offProject.json()).toEqual(await missing.json());
     expect((await options(ctx.owner, "scope=project")).status).toBe(
       StatusCodes.BAD_REQUEST,
     );
