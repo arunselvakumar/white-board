@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@repo/construction-db";
 import ExcelJS from "exceljs";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { openApiDocument } from "@/app/api/_lib/openapi-document";
 import {
@@ -12,6 +12,7 @@ import {
   todayIn,
 } from "@/src/shared-kernel/calendar-date";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import { accountBalance, addAccount, seededAccounts } from "@/test/finance";
 import { addContractor } from "@/test/procurement";
 import { sharedAssign } from "@/test/site-work";
@@ -99,6 +100,10 @@ async function createTxn(
 async function code(response: Response): Promise<string> {
   return ((await response.json()) as Envelope).code;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Transactions (CM-702)", () => {
   it("is pending and moves nothing until approved; approval posts the entry", async () => {
@@ -451,6 +456,65 @@ describe("Transactions (CM-702)", () => {
       total: number;
     };
     expect(all.total).toBe(5);
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const s = await setup();
+    const events = watchEvents();
+    const txn = await createTxn(s);
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "transaction",
+        documentId: txn.id,
+        projectId: s.projectId,
+        number: txn.number,
+        submittedBy: s.ownerId,
+      }),
+    ]);
+    const rejected = (await (
+      await reject(
+        post(`${BASE}/${txn.id}/reject`, { reason: "Wrong account" }),
+        params(txn.id),
+      )
+    ).json()) as Txn;
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "transaction",
+        documentId: txn.id,
+        number: txn.number,
+        rejectedBy: s.ownerId,
+        createdBy: s.ownerId,
+        reason: "Wrong account",
+      }),
+    ]);
+    await update(
+      post(`${BASE}/${txn.id}/update`, {
+        ...body(s),
+        expectedUpdatedAt: rejected.updatedAt,
+      }),
+      params(txn.id),
+    );
+    expect(events.of("document.submitted")).toHaveLength(2);
+    await bulk(
+      post(`${BASE}/bulk`, {
+        approve: true,
+        items: [{ type: "transaction", id: txn.id }],
+      }),
+    );
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "transaction",
+        documentId: txn.id,
+        number: txn.number,
+        approvedBy: s.ownerId,
+        createdBy: s.ownerId,
+      }),
+    ]);
+    const direct = await createTxn(s, { approve: true });
+    expect(events.of("document.submitted")).toHaveLength(2);
+    expect(events.of("document.approved").at(-1)).toMatchObject({
+      documentId: direct.id,
+    });
   });
 
   it("needs Transactions flags on the Project", async () => {

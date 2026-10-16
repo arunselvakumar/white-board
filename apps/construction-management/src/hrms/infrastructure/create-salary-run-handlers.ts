@@ -4,6 +4,10 @@ import {
   NO_ACCOUNT_POSTING,
   type AccountPosting,
 } from "@/src/shared-kernel/account-posting";
+import {
+  InProcessEventDispatcher,
+  type EventDispatcher,
+} from "@/src/shared-kernel/events";
 import type { ObjectStorage } from "@/src/shared-kernel/files";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
@@ -32,6 +36,8 @@ export function createSalaryRunHandlers(deps?: {
   clock?: () => Date;
   /** Finance's account ledger for Paid slips (CM-707); the routes pass it. */
   accounts?: AccountPosting;
+  /** Salary approved / paid events after commit (CM-904). */
+  events?: EventDispatcher;
 }): SalaryRunHandlers {
   const db = deps?.prisma ?? prisma;
   const ports = { ...createHrmsPorts({ prisma: db }), ...deps?.ports };
@@ -46,6 +52,7 @@ export function createSalaryRunHandlers(deps?: {
       company: new PrismaSalaryCompanyReader(db),
       payslips: new PrismaPayslipFiles(db, deps?.storage ?? objectStorage()),
       renderer: pdfPayslipRenderer,
+      events: deps?.events ?? new InProcessEventDispatcher(),
     },
     deps?.clock,
   );

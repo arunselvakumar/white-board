@@ -100,6 +100,7 @@ export default [
   sharedKernelBoundary,
   ...storybook.configs["flat/recommended"],
   {
-    ignores: ["storybook-static/**", ".next-verify/**"],
+    // public/ holds static files served as-is (sw.js is plain browser JS).
+    ignores: ["storybook-static/**", ".next-verify/**", "public/**"],
   },
 ];

@@ -1,6 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 
 import {
+  messagingOpenApiComponents,
+  messagingOpenApiOperations,
+} from "@/app/api/construction/messaging/messaging-openapi";
+import {
   queueOpenApiComponents,
   queueOpenApiOperations,
 } from "@/app/api/construction/queue/queue-openapi";
@@ -961,6 +965,10 @@ openApiOperations.push(...trackingOpenApiOperations);
 // The kernel's job queue (M9, ADR CM-0021 §1).
 Object.assign(openApiComponents, queueOpenApiComponents);
 openApiOperations.push(...queueOpenApiOperations);
+
+// Notifications (CM-904, ADR CM-0021 §6).
+Object.assign(openApiComponents, messagingOpenApiComponents);
+openApiOperations.push(...messagingOpenApiOperations);
 
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);

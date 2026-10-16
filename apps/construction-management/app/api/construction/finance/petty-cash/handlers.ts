@@ -4,6 +4,7 @@ import { parseOrThrow } from "@/app/api/_lib/map-error";
 import type { AccessSession } from "@/app/api/_lib/require-access";
 import { financeAuthorNames } from "@/src/composition/finance-author-names";
 import { financeDirectory } from "@/src/composition/finance-directory";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   PETTY_CASH_MENU,
   voucherActions,
@@ -34,6 +35,7 @@ export const pettyCashAccounts = new PettyCashAccounts(financeDirectory);
 export const pettyCashVouchers = new PettyCashVouchers({
   directory: financeDirectory,
   names: financeAuthorNames(),
+  events: messagingEvents(),
 });
 
 /** The caller's date rules (back-dated limits, closing date) for one request. */

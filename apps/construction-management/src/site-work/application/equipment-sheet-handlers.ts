@@ -7,6 +7,8 @@ import {
   requiredText,
   type BulkRefusal,
   type DocumentApproved,
+  type DocumentRejected,
+  type DocumentSubmitted,
 } from "@/src/shared-kernel/approval";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -272,7 +274,10 @@ export type EquipmentSheetDeps = {
   stock: SiteStock;
   backdated: (actor: MemberAccess) => Promise<BackdatedCheck>;
   today: (workspaceId: string) => Promise<CalendarDate>;
-  /** `document.approved`, `EquipmentHireAccrued`, `EquipmentFuelOverrun`. */
+  /**
+   * `document.submitted` / `document.approved` / `document.rejected`,
+   * `EquipmentHireAccrued`, `EquipmentFuelOverrun` (after commit).
+   */
   events: EventDispatcher;
   /** `ProjectMediaRemoved` for the sheet's images on delete (ADR CM-0014). */
   media: EventDispatcher;
@@ -671,16 +676,19 @@ export class EquipmentSheetHandlers {
       fuelQty: string | null;
       fuelOverrun: boolean;
       approval: EquipmentSheetApproval;
+      number: string;
+      createdBy: string;
     },
     equipment: {
       hirePartyId: string | null;
       expectedFuelEfficiency: string | null;
     },
     at: Date,
-    options: { saved: boolean; approvedBy: string | null },
+    /** `by` saved (Save, Save & Approve) or approved the sheet. */
+    options: { saved: boolean; by: string },
   ): DomainEvent[] {
     const events: DomainEvent[] = [];
-    if (options.approvedBy != null)
+    if (sheet.approval.status === "approved")
       events.push({
         type: "document.approved",
         workspaceId: sheet.workspaceId,
@@ -688,8 +696,21 @@ export class EquipmentSheetHandlers {
         documentType: DOCUMENT.type,
         documentId: sheet.id,
         projectId: sheet.projectId,
-        approvedBy: options.approvedBy,
+        approvedBy: options.by,
+        number: sheet.number,
+        createdBy: sheet.createdBy,
       } satisfies DocumentApproved as DomainEvent);
+    if (options.saved && sheet.approval.status === "pending")
+      events.push({
+        type: "document.submitted",
+        workspaceId: sheet.workspaceId,
+        occurredAt: at,
+        documentType: DOCUMENT.type,
+        documentId: sheet.id,
+        projectId: sheet.projectId,
+        number: sheet.number,
+        submittedBy: options.by,
+      } satisfies DocumentSubmitted as DomainEvent);
     if (
       accruesHire(sheet.ownership, sheet.approval.status) &&
       sheet.hireCost != null
@@ -721,6 +742,8 @@ export class EquipmentSheetHandlers {
         date: sheet.sheetDate,
         fuelQty: sheet.fuelQty,
         expectedFuelEfficiency: equipment.expectedFuelEfficiency,
+        number: sheet.number,
+        by: options.by,
       } satisfies EquipmentFuelOverrun as DomainEvent);
     return events;
   }
@@ -820,7 +843,7 @@ export class EquipmentSheetHandlers {
       ...content,
       lines: content.lines.map((line) => ({ ...line, id: newId() })),
     };
-    const { events } = await db.$transaction(async (tx) => {
+    const { events, number } = await db.$transaction(async (tx) => {
       check(DOCUMENT.backdated, "create", content.sheetDate);
       await this.assertFree(
         tx,
@@ -883,7 +906,7 @@ export class EquipmentSheetHandlers {
         },
         occurredAt: at,
       });
-      return posted;
+      return { ...posted, number };
     });
     await stock.dispatch(events);
     await this.dispatch(
@@ -896,13 +919,12 @@ export class EquipmentSheetHandlers {
           equipmentId: equipment.id,
           ownership: facts.ownership,
           approval,
+          number,
+          createdBy: access.userId,
         },
         equipment,
         at,
-        {
-          saved: true,
-          approvedBy: approval.status === "approved" ? access.userId : null,
-        },
+        { saved: true, by: access.userId },
       ),
     );
     return id;
@@ -1001,7 +1023,7 @@ export class EquipmentSheetHandlers {
       ...(voided ? [this.hireVoided(current, at)] : []),
       ...this.sheetEvents({ ...current, ...row, approval }, equipment, at, {
         saved: true,
-        approvedBy: approval.status === "approved" ? access.userId : null,
+        by: access.userId,
       }),
     ]);
   }
@@ -1116,6 +1138,7 @@ export class EquipmentSheetHandlers {
     const at = this.clock();
     const by = { userId: access.userId, at };
     const approved: StoredEquipmentSheet[] = [];
+    const rejected: StoredEquipmentSheet[] = [];
     await db.$transaction(async (tx) => {
       const locked = new Map(
         (await store.lock(tx, access.workspaceId, ids)).map((sheet) => [
@@ -1163,10 +1186,27 @@ export class EquipmentSheetHandlers {
           occurredAt: at,
         });
         const sheet = locked.get(id);
-        if (decision.approve && sheet != null)
-          approved.push({ ...sheet, approval });
+        if (sheet != null)
+          (decision.approve ? approved : rejected).push({ ...sheet, approval });
       }
     });
+    await this.dispatch(
+      rejected.map(
+        (sheet) =>
+          ({
+            type: "document.rejected",
+            workspaceId: sheet.workspaceId,
+            occurredAt: at,
+            documentType: DOCUMENT.type,
+            documentId: sheet.id,
+            projectId: sheet.projectId,
+            number: sheet.number,
+            rejectedBy: access.userId,
+            createdBy: sheet.createdBy,
+            reason: sheet.approval.rejectionReason,
+          }) satisfies DocumentRejected as DomainEvent,
+      ),
+    );
     if (approved.length === 0) return;
     const equipment = await store.equipment(
       db,
@@ -1182,7 +1222,7 @@ export class EquipmentSheetHandlers {
             expectedFuelEfficiency: null,
           },
           at,
-          { saved: false, approvedBy: access.userId },
+          { saved: false, by: access.userId },
         ),
       ),
     );

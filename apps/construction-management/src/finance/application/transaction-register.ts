@@ -148,19 +148,22 @@ export class TransactionRegister {
       );
     const closing = await this.deps.closing(access.workspaceId);
     const at = this.clock();
+    const decided: StoredTransaction[] = [];
     await this.deps.db.$transaction(async (tx) => {
       const refusals: BulkRefusal[] = [];
       for (const item of unique) {
         try {
           if (item.type === "transaction")
-            await this.deps.transactions.decideIn(
-              tx,
-              access,
-              item.id,
-              decision,
-              closing,
-              null,
-              at,
+            decided.push(
+              await this.deps.transactions.decideIn(
+                tx,
+                access,
+                item.id,
+                decision,
+                closing,
+                null,
+                at,
+              ),
             );
           else
             await this.deps.transfers.decideIn(
@@ -183,6 +186,15 @@ export class TransactionRegister {
       }
       if (refusals.length > 0) throw bulkRefused(refusals);
     });
+    // CM-904: after commit; account transfers raise no approval events.
+    await this.deps.transactions.dispatchApproval(
+      decided,
+      decision.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: null },
+      access.userId,
+      at,
+    );
     return { decided: unique.length };
   }
 }

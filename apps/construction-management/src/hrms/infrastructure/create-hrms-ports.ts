@@ -1,5 +1,10 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import {
+  InProcessEventDispatcher,
+  type EventDispatcher,
+} from "@/src/shared-kernel/events";
+
 import { RecordedAttendanceDaySource } from "../application/attendance-days";
 import { AttendanceHandlers } from "../application/attendance-handlers";
 import { BranchHandlers } from "../application/branch-handlers";
@@ -161,7 +166,11 @@ export function createShiftAssignmentHandlers(deps?: {
  * Attendance (CM-308, CM-309): check in and out, missed checkout,
  * back-dated days, approvals, Team Today and the monthly summary.
  */
-export function createAttendanceHandlers(deps?: { prisma?: PrismaClient }) {
+export function createAttendanceHandlers(deps?: {
+  prisma?: PrismaClient;
+  /** Attendance correction approval events after commit (CM-904). */
+  events?: EventDispatcher;
+}) {
   const db = deps?.prisma ?? prisma;
   const ports = createHrmsPorts({ prisma: db });
   const store = new PrismaAttendanceStore(db);
@@ -185,5 +194,6 @@ export function createAttendanceHandlers(deps?: { prisma?: PrismaClient }) {
     monthLock: ports.monthLock,
     guard: new PrismaAttendanceBackdatedGuard(db),
     timeZone,
+    events: deps?.events ?? new InProcessEventDispatcher(),
   });
 }

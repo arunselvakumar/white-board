@@ -9,12 +9,15 @@ import {
   isResponse,
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
+import { messagingEvents } from "@/src/composition/messaging";
 import { createLeaveHandlers } from "@/src/hrms/infrastructure/create-leave-handlers";
 import type { Flag, MenuKey } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 
 /** Leave handlers (CM-310 … CM-313), wired once for every leave route. */
-export const leaveHandlers = createLeaveHandlers();
+export const leaveHandlers = createLeaveHandlers({
+  events: messagingEvents(),
+});
 
 /**
  * The Session and the caller's access. With a menu and flag it is
