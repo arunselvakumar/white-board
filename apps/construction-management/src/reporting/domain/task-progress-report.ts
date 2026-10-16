@@ -44,7 +44,7 @@ export type TaskProgressLine = {
 export type TaskProgressReadModel = {
   company: string;
   project: { name: string; address: string | null };
-  /** The Project logo, when "Use Project logo on reports" is on. */
+  /** The Project logo when it is used on reports, else the Company's. */
   logo: DprImageRef | null;
   range: DateRange;
   tasks: TaskProgressLine[];

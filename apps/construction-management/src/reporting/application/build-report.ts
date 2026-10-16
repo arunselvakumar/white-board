@@ -12,6 +12,7 @@ import {
   monthRange,
   rangeLabel,
 } from "../domain/report-period";
+import { generatedByLine } from "../domain/report-footer";
 import { buildVendorAttendanceReport } from "../domain/vendor-attendance-report";
 // Site work reports (CM-605, CM-608).
 import {
@@ -32,23 +33,6 @@ import type {
   ReportSource,
   TrackingReportSource,
 } from "./ports";
-
-/** `09 Oct 2026, 4:05 pm IST` in the Company's time zone. */
-export function generatedAtLabel(at: Date, timeZone: string): string {
-  try {
-    return new Intl.DateTimeFormat("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone,
-      timeZoneName: "short",
-    }).format(at);
-  } catch {
-    return `${at.toISOString().slice(0, 16).replace("T", " ")} UTC`;
-  }
-}
 
 /** What a job covers, as its header and Downloads print it. */
 export function periodLabel(job: Pick<ReportJob, "params">): string {
@@ -179,6 +163,7 @@ export async function buildReportDocument(
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
     job.projectId,
+    job.requestedBy,
   );
   const body = await bodyFor(
     job,
@@ -194,7 +179,8 @@ export async function buildReportDocument(
       project: facts.project?.name ?? "All projects",
       address: facts.project?.address ?? null,
       period: periodLabel(job),
-      generatedAt: generatedAtLabel(now, facts.timezone),
+      generated: generatedByLine(facts.requesterName, now, facts.timezone),
+      logo: facts.logo,
       currency: facts.currency,
     },
     notes: body.notes,

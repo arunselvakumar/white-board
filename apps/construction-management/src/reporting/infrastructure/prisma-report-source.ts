@@ -72,6 +72,27 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     return new Map(rows.map((row) => [row.id, row.name]));
   }
 
+  /**
+   * The requester's Team Member name in the Company (a member who left
+   * keeps theirs), else their account name; null when neither is known.
+   */
+  async function requesterName(
+    workspaceId: string,
+    userId: string,
+  ): Promise<string | null> {
+    const member = await db.constructionOrganizationTeamMember.findFirst({
+      where: { workspaceId, userId },
+      orderBy: { createdAt: "desc" },
+      select: { name: true },
+    });
+    if (member != null && member.name.trim() !== "") return member.name;
+    const user = await db.identityUser.findFirst({
+      where: { id: userId },
+      select: { name: true },
+    });
+    return user == null || user.name.trim() === "" ? null : user.name;
+  }
+
   async function laboursOf(
     workspaceId: string,
     ids: Iterable<string>,
@@ -186,24 +207,46 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     // Site work reports (CM-605, CM-608).
     ...prismaSiteWorkReportSource(db),
 
-    async header(workspaceId, projectId) {
+    async header(workspaceId, projectId, requestedBy) {
       const profile = await db.constructionOrganizationCompanyProfile.findFirst(
         { where: { workspaceId } },
       );
-      let project: { name: string; address: string | null } | null = null;
+      let project: {
+        name: string;
+        address: string | null;
+        logoKey: string | null;
+        useLogoInReports: boolean;
+      } | null = null;
       if (projectId != null) {
         project = await db.constructionProjectsProject.findFirst({
           where: { id: projectId, workspaceId, deletedAt: null },
-          select: { name: true, address: true },
+          select: {
+            name: true,
+            address: true,
+            logoKey: true,
+            useLogoInReports: true,
+          },
         });
         if (project == null)
           throw notFound("PROJECT_NOT_FOUND", "There is no such Project.");
       }
+      const logoKey =
+        project?.useLogoInReports === true && project.logoKey != null
+          ? project.logoKey
+          : (profile?.logoKey ?? null);
       return {
         companyName: profile?.name ?? "",
         timezone: profile?.timezone ?? "Asia/Kolkata",
         currency: profile?.currency ?? "INR",
-        project,
+        project:
+          project == null
+            ? null
+            : { name: project.name, address: project.address },
+        logo: logoKey == null ? null : { key: logoKey, contentType: "image/*" },
+        requesterName:
+          requestedBy == null
+            ? null
+            : await requesterName(workspaceId, requestedBy),
       };
     },
 
