@@ -75,6 +75,7 @@ export function ActionCodeStep({
         >
           {send.isPending ? "Sending…" : "Send code"}
         </Button>
+        <FieldError message={error} />
         <FormAlert message={sendError} />
       </div>
     );

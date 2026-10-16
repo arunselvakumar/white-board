@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, fireEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, waitFor, within } from "storybook/test";
 
 import { QuerySuspense } from "@/components/query-suspense";
 import type { MyProfileModel } from "@/src/queries/my-profile";
@@ -355,5 +355,73 @@ export const NoIdentityNumbersYet: Story = {
       canvas.getByRole("button", { name: "Add Aadhaar" }),
     ).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Add PAN" })).toBeVisible();
+  },
+};
+
+/** CM-907: a reveal first asks for a code sent to the member (ADR CM-0021 §11). */
+export const RevealNeedsACode: Story = {
+  beforeEach() {
+    let verified = false;
+    return server(myProfile(), (call) => {
+      const ORG = "/api/construction/organization";
+      if (
+        call.method === "POST" &&
+        call.path === `${BASE}/profile/reveal-identifiers`
+      )
+        return verified
+          ? Response.json({ aadhaar: "234123412346", pan: "ABCPE1234F" })
+          : apiError(
+              409,
+              "REVEAL_CODE_REQUIRED",
+              "Enter the code we send you to see full Aadhaar and PAN numbers.",
+            );
+      if (call.method === "POST" && call.path === `${ORG}/action-codes`)
+        return new Response(null, { status: 204 });
+      if (
+        call.method === "POST" &&
+        call.path === `${ORG}/action-codes/verify`
+      ) {
+        const body = sentJson(call.init) as { code: string };
+        if (body.code !== "482913")
+          return apiError(
+            400,
+            "ACTION_CODE_INVALID",
+            "That code is not right. Check it and try again.",
+          );
+        verified = true;
+        return new Response(null, { status: 204 });
+      }
+      return undefined;
+    }).restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Reveal" }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await expect(dialog.getByText("Confirm it is you")).toBeVisible();
+    await userEvent.click(dialog.getByRole("button", { name: "Send code" }));
+    await userEvent.type(
+      await dialog.findByLabelText("6-digit code"),
+      "111111",
+    );
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Verify and reveal" }),
+    );
+    await expect(
+      await dialog.findByText(
+        "That code is not right. Check it and try again.",
+      ),
+    ).toBeVisible();
+    await userEvent.clear(dialog.getByLabelText("6-digit code"));
+    await userEvent.type(dialog.getByLabelText("6-digit code"), "482913");
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Verify and reveal" }),
+    );
+    await expect(await canvas.findByText("234123412346")).toBeVisible();
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    // The profile itself was not saved by pressing Enter or verifying.
+    await expect(api?.calls("POST", `${BASE}/profile/update`)).toHaveLength(0);
   },
 };
