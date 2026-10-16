@@ -1,12 +1,13 @@
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { PDFDict, PDFDocument, PDFName } from "pdf-lib";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import {
   addBillingAddress,
   addMaterial,
@@ -208,6 +209,10 @@ function fromPr(pr: Pr, ctx: Ctx, quantities: [string, string]) {
     gstRate: "18",
   }));
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Purchase Orders", () => {
   it("prices CGST + SGST within the state and keeps the totals (golden)", async () => {
@@ -628,6 +633,64 @@ describe("Purchase Orders", () => {
     expect(await code(await create(post("", { ...body(ctx), storeId })))).toBe(
       "LOCATION_REQUIRED",
     );
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const ctx = await setup();
+    const events = watchEvents();
+    const po = await json<Po>(await raise(ctx));
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_order",
+        documentId: po.id,
+        projectId: ctx.projectId,
+        number: po.number,
+        submittedBy: ctx.by,
+      }),
+    ]);
+    await reject(
+      post(`/${po.id}/reject`, { reason: "Rate too high" }),
+      params(po.id),
+    );
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_order",
+        documentId: po.id,
+        number: po.number,
+        rejectedBy: ctx.by,
+        createdBy: ctx.by,
+        reason: "Rate too high",
+      }),
+    ]);
+
+    // A Central Store PO has no Project; Save & Approve is approved at once.
+    const storeId = await addStore(ctx.ws, ctx.by, [ctx.projectId], {
+      stateCode: "33",
+    });
+    await prisma.constructionProcurementStoreSupplier.create({
+      data: { storeId, supplierId: ctx.supplierId },
+    });
+    const storePo = await json<Po>(
+      await create(
+        post("", {
+          ...body(ctx),
+          projectId: undefined,
+          storeId,
+          approve: true,
+        }),
+      ),
+    );
+    expect(events.of("document.submitted")).toHaveLength(1);
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_order",
+        documentId: storePo.id,
+        projectId: null,
+        number: storePo.number,
+        approvedBy: ctx.by,
+        createdBy: ctx.by,
+      }),
+    ]);
   });
 
   it("needs the flags and hides other Companies' POs", async () => {

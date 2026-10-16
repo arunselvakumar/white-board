@@ -6,7 +6,7 @@ import {
   useCompanyUser,
 } from "@repo/auth/construction/react";
 import { useQuery } from "@tanstack/react-query";
-import { CreditCard, LogOut, UserRound } from "lucide-react";
+import { CreditCard, Download, LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import {
   Avatar,
@@ -36,7 +36,8 @@ export function initials(name: string): string {
 }
 
 /**
- * The signed-in User's name and email, My Profile and Sign out. The avatar
+ * The signed-in User's name and email, My Profile, Downloads (their
+ * reports across Projects, CM-901), Your Subscription and Sign out. The avatar
  * shows their My Profile photo in the Active Company when they have one;
  * pass `photoUrl` to skip loading it (null for initials).
  */
@@ -88,6 +89,10 @@ export function UserMenu({ photoUrl }: { photoUrl?: string | null } = {}) {
         <DropdownMenuItem render={<Link href="/app/profile" />}>
           <UserRound />
           My Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href="/app/downloads" />}>
+          <Download />
+          Downloads
         </DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/app/subscription" />}>
           <CreditCard />

@@ -42,6 +42,10 @@ import {
   type TransferStatus,
   type TransferType,
 } from "../domain/material-transfer";
+import type {
+  MaterialTransferDelivered,
+  MaterialTransferSent,
+} from "../domain/events";
 import type { StockPosting } from "../domain/stock-ledger";
 import { stockLocationKey, type StockLocation } from "../domain/stock-location";
 import {
@@ -576,7 +580,7 @@ export class MaterialTransferCommands {
 
   private approvedEvent(
     workspaceId: string,
-    transfer: { id: string; from: StockLocation },
+    transfer: Pick<MaterialTransfer, "id" | "from" | "number" | "createdBy">,
     by: string,
   ): DocumentApproved {
     return {
@@ -587,6 +591,34 @@ export class MaterialTransferCommands {
       documentId: transfer.id,
       projectId: transfer.from.kind === "project" ? transfer.from.id : null,
       approvedBy: by,
+      number: transfer.number,
+      createdBy: transfer.createdBy.userId,
+    };
+  }
+
+  /** Sent (approved) or delivered, for the notifications (CM-904). */
+  private movedEvent(
+    type: "sent" | "delivered",
+    workspaceId: string,
+    transfer: Pick<
+      MaterialTransfer,
+      "id" | "from" | "to" | "number" | "createdBy"
+    >,
+    by: string,
+  ): MaterialTransferSent | MaterialTransferDelivered {
+    return {
+      type:
+        type === "sent"
+          ? "procurement.material_transfer_sent"
+          : "procurement.material_transfer_delivered",
+      workspaceId,
+      occurredAt: new Date(),
+      transferId: transfer.id,
+      number: transfer.number,
+      from: { kind: transfer.from.kind, id: transfer.from.id },
+      to: { kind: transfer.to.kind, id: transfer.to.id },
+      by,
+      createdBy: transfer.createdBy.userId,
     };
   }
 
@@ -688,6 +720,7 @@ export class MaterialTransferCommands {
             : [
                 ...ledgerEvents,
                 this.approvedEvent(workspaceId, created, actor.userId),
+                this.movedEvent("sent", workspaceId, created, actor.userId),
               ],
       };
     });
@@ -815,6 +848,7 @@ export class MaterialTransferCommands {
         events: [
           ...ledgerEvents,
           this.approvedEvent(workspaceId, after, actor.userId),
+          this.movedEvent("sent", workspaceId, after, actor.userId),
         ],
       };
     });
@@ -929,7 +963,13 @@ export class MaterialTransferCommands {
         before: { status: before.status },
         after: { status: after.status, deliveredOn },
       });
-      return { transfer: after, events: written.events };
+      return {
+        transfer: after,
+        events: [
+          ...written.events,
+          this.movedEvent("delivered", workspaceId, after, actor.userId),
+        ],
+      };
     });
     await this.dispatch(events);
     return transfer;

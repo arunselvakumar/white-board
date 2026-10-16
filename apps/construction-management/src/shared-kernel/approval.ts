@@ -164,4 +164,46 @@ export type DocumentApproved = DomainEvent & {
   documentId: string;
   projectId: string | null;
   approvedBy: string;
+  /** The number as the screens show it ("PR-0012"), when known (M9). */
+  number?: string | null;
+  /**
+   * User id told of the decision (M9 notifications): the creator, or for
+   * HRMS the employee's User. Null or absent tells nobody.
+   */
+  createdBy?: string | null;
 };
+
+/**
+ * Generic approval events (ADR CM-0021 §6): every document with an
+ * approval step raises `document.submitted` when it starts (or returns
+ * to) waiting for approval, and `document.approved` or
+ * `document.rejected` when it is decided, after commit. Messaging turns
+ * them into "waiting for your approval" for the menu's approvers and
+ * "approved / rejected" for `createdBy`. `documentType` is the module's
+ * own name (`worksheet`, `purchase_request`, `leave_request`, …); the
+ * messaging catalogue maps it to its menu.
+ */
+export type DocumentSubmitted = DomainEvent & {
+  type: "document.submitted";
+  documentType: string;
+  documentId: string;
+  projectId: string | null;
+  number: string | null;
+  /** User id of who submitted it; never notified of it. */
+  submittedBy: string;
+};
+
+export type DocumentRejected = DomainEvent & {
+  type: "document.rejected";
+  documentType: string;
+  documentId: string;
+  projectId: string | null;
+  number: string | null;
+  rejectedBy: string;
+  /** As on `DocumentApproved`. */
+  createdBy: string | null;
+  reason: string | null;
+};
+
+export type DocumentApprovalEvent =
+  DocumentSubmitted | DocumentApproved | DocumentRejected;

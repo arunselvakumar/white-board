@@ -1,6 +1,6 @@
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
@@ -16,6 +16,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import { accountBalance, addAccount, seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -125,6 +126,10 @@ async function member(
     });
   return joined;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Other Expenses HTTP (CM-704)", () => {
   it("numbers a pending expense, posts nothing until approved, and approval posts one entry", async () => {
@@ -422,6 +427,55 @@ describe("Other Expenses HTTP (CM-704)", () => {
       status: "rejected",
       rejectReason: "Duplicate",
     });
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const company = await ownerWithCompany();
+    const s = await setup(company);
+    const events = watchEvents();
+    const expense = await json<Expense>(await create(company.cookie, body(s)));
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "other_expense",
+        documentId: expense.id,
+        projectId: s.tower,
+        number: expense.number,
+        submittedBy: company.userId,
+      }),
+    ]);
+    const rejected = await json<Expense>(
+      await reject(company.cookie, expense.id, { reason: "Duplicate" }),
+    );
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "other_expense",
+        documentId: expense.id,
+        number: expense.number,
+        rejectedBy: company.userId,
+        createdBy: company.userId,
+        reason: "Duplicate",
+      }),
+    ]);
+    await update(company.cookie, expense.id, {
+      ...body(s),
+      expectedUpdatedAt: rejected.updatedAt,
+    });
+    expect(events.of("document.submitted")).toHaveLength(2);
+    await bulkApproveRoute(
+      jsonRequest(`${BASE}/bulk-approve`, company.cookie, {
+        projectId: s.tower,
+        ids: [expense.id],
+      }),
+    );
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "other_expense",
+        documentId: expense.id,
+        number: expense.number,
+        approvedBy: company.userId,
+        createdBy: company.userId,
+      }),
+    ]);
   });
 
   it("lists a Project's expenses with filters, totals and cursors", async () => {

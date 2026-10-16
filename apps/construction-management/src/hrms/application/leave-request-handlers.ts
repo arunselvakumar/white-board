@@ -9,7 +9,14 @@ import {
   forbidden,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import {
+  approvalEvent,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
+
+import { HRMS_DOCUMENT_TYPES } from "../domain/events";
 
 import { addMonths, monthKeyOf } from "../domain/calendar";
 import {
@@ -159,9 +166,46 @@ export class LeaveRequestHandlers {
     private readonly guard: LeaveBackdatedGuard,
     private readonly queries: LeaveQueries,
     private readonly transactions: LeaveTransactions,
+    /**
+     * `document.submitted` / `approved` / `rejected` after commit (CM-904):
+     * `leave_request` and `leave_cancellation`, told to the employee.
+     */
+    private readonly events: EventDispatcher,
     private readonly clock: () => Date = () => new Date(),
   ) {
     this.entitlements = new LeaveEntitlements(types, structures);
+  }
+
+  /**
+   * One approval event about a leave request, after commit. `createdBy`
+   * is the employee's User (the person the leave is for).
+   */
+  private async dispatchApproval(
+    access: MemberAccess,
+    request: Pick<LeaveRequestReadModel, "id" | "memberId">,
+    documentType:
+      | typeof HRMS_DOCUMENT_TYPES.leaveRequest
+      | typeof HRMS_DOCUMENT_TYPES.leaveCancellation,
+    outcome: ApprovalOutcome,
+  ): Promise<void> {
+    const employee = (
+      await this.employees.find(access.workspaceId, [request.memberId])
+    ).get(request.memberId);
+    await this.events.dispatch([
+      approvalEvent(
+        {
+          workspaceId: access.workspaceId,
+          documentType,
+          documentId: request.id,
+          projectId: null,
+          number: null,
+          createdBy: employee?.userId ?? null,
+        },
+        outcome,
+        access.userId,
+        this.clock(),
+      ),
+    ]);
   }
 
   private me(access: MemberAccess): Promise<HrmsEmployee | null> {
@@ -520,7 +564,16 @@ export class LeaveRequestHandlers {
         });
       },
     );
-    return this.get(access, id);
+    const applied = await this.get(access, id);
+    // Waiting for its first approver; a type needing no approval is approved at once.
+    if (applied.status === "pending")
+      await this.dispatchApproval(
+        access,
+        applied,
+        HRMS_DOCUMENT_TYPES.leaveRequest,
+        { kind: "submitted" },
+      );
+    return applied;
   }
 
   // -------------------------------------------------------------------------
@@ -922,7 +975,7 @@ export class LeaveRequestHandlers {
       "Say why the leave is cancelled.",
     );
     let needsApproval = true;
-    return this.transition(access, id, expectedUpdatedAt, {
+    const requested = await this.transition(access, id, expectedUpdatedAt, {
       action: "leave_request.cancellation_requested",
       checkMonths: true,
       deciderMemberId: null,
@@ -939,6 +992,14 @@ export class LeaveRequestHandlers {
         fields: { cancellationReason: reason },
       }),
     });
+    if (requested.status === "cancellation_requested")
+      await this.dispatchApproval(
+        access,
+        requested,
+        HRMS_DOCUMENT_TYPES.leaveCancellation,
+        { kind: "submitted" },
+      );
+    return requested;
   }
 
   /** Approve the waiting level with optional remarks (`approve`). */
@@ -952,7 +1013,7 @@ export class LeaveRequestHandlers {
     const remarks = optionalRemarks(remarksInput);
     const me = await this.me(access);
     const decider = LeaveRequestHandlers.decider(access, me);
-    return this.transition(access, id, expectedUpdatedAt, {
+    const approved = await this.transition(access, id, expectedUpdatedAt, {
       action: "leave_request.approved",
       checkMonths: true,
       deciderMemberId: decider.memberId,
@@ -968,6 +1029,15 @@ export class LeaveRequestHandlers {
         };
       },
     });
+    // A level before the last leaves it pending for the next approver.
+    if (approved.status === "approved")
+      await this.dispatchApproval(
+        access,
+        approved,
+        HRMS_DOCUMENT_TYPES.leaveRequest,
+        { kind: "approved" },
+      );
+    return approved;
   }
 
   /** Reject with a reason (`reject`); the reservation is released. */
@@ -985,7 +1055,7 @@ export class LeaveRequestHandlers {
     );
     const me = await this.me(access);
     const decider = LeaveRequestHandlers.decider(access, me);
-    return this.transition(access, id, expectedUpdatedAt, {
+    const rejected = await this.transition(access, id, expectedUpdatedAt, {
       action: "leave_request.rejected",
       checkMonths: true,
       deciderMemberId: decider.memberId,
@@ -995,6 +1065,13 @@ export class LeaveRequestHandlers {
         fields: { rejectionReason: reason },
       }),
     });
+    await this.dispatchApproval(
+      access,
+      rejected,
+      HRMS_DOCUMENT_TYPES.leaveRequest,
+      { kind: "rejected", reason },
+    );
+    return rejected;
   }
 
   /**
@@ -1017,7 +1094,7 @@ export class LeaveRequestHandlers {
         );
     const me = await this.me(access);
     const decider = LeaveRequestHandlers.decider(access, me);
-    return this.transition(access, id, expectedUpdatedAt, {
+    const decided = await this.transition(access, id, expectedUpdatedAt, {
       action: input.approve
         ? "leave_request.cancelled"
         : "leave_request.cancellation_refused",
@@ -1032,6 +1109,15 @@ export class LeaveRequestHandlers {
         },
       }),
     });
+    await this.dispatchApproval(
+      access,
+      decided,
+      HRMS_DOCUMENT_TYPES.leaveCancellation,
+      input.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: remarks },
+    );
+    return decided;
   }
 }
 

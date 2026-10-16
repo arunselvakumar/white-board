@@ -15,6 +15,7 @@ import {
 } from "@/src/shared-kernel/domain-error";
 import {
   InProcessEventDispatcher,
+  type DomainEvent,
   type EventDispatcher,
 } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
@@ -37,6 +38,7 @@ import type {
 import type { ProcurementDirectory } from "../application/ports";
 import type { ProcurementCommandActor } from "../application/store-handlers";
 import { deliveryNoteStatus } from "../domain/delivery-note";
+import type { MaterialRequestRaised } from "../domain/events";
 import { PROCUREMENT_DOCUMENTS } from "../domain/documents";
 import {
   assertMaterialRequestDeletable,
@@ -142,6 +144,8 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     private readonly locations: LocationResolver,
     /** The Gallery's dispatcher: files of a deleted request leave it. */
     private readonly media: EventDispatcher = new InProcessEventDispatcher(),
+    /** `procurement.material_request_raised` after commit (CM-904). */
+    private readonly events: EventDispatcher = new InProcessEventDispatcher(),
   ) {}
 
   async list(
@@ -202,7 +206,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     backdated(DOC.backdated, "create", draft.requestDate);
     const id = newId();
     const now = new Date();
-    return this.db.$transaction(async (tx) => {
+    const created = await this.db.$transaction(async (tx) => {
       const projects = await this.directory.projects(tx, actor.workspaceId, [
         projectId,
       ]);
@@ -256,6 +260,19 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
       });
       return this.mustLoad(tx, actor.workspaceId, id);
     });
+    await this.events.dispatch([
+      {
+        type: "procurement.material_request_raised",
+        workspaceId: actor.workspaceId,
+        occurredAt: now,
+        requestId: created.id,
+        number: created.number,
+        projectId: created.projectId,
+        storeId: created.storeId,
+        by: actor.userId,
+      } satisfies MaterialRequestRaised as DomainEvent,
+    ]);
+    return created;
   }
 
   async update(

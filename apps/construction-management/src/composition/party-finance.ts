@@ -7,7 +7,7 @@ import {
 import type { PartyUsage } from "@/src/masters/application/party-handlers";
 import type { GoodsReceiptPayments } from "@/src/procurement/application/ports";
 import type { GoodsReceiptPosted } from "@/src/procurement/domain/events";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 import {
   InProcessEventDispatcher,
   type DomainEvent,
@@ -16,12 +16,16 @@ import {
 } from "@/src/shared-kernel/events";
 
 import { financeDirectory } from "./finance-directory";
+import { messagingEvents } from "./messaging";
 
 let shared: PartyFinance | null = null;
 
 /** The party money engine with the composition root's directory (CM-705). */
 export function partyFinance(): PartyFinance {
-  shared ??= createPartyFinance({ directory: financeDirectory });
+  shared ??= createPartyFinance({
+    directory: financeDirectory,
+    events: messagingEvents(),
+  });
   return shared;
 }
 

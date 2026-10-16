@@ -1,6 +1,6 @@
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { PermissionGrants } from "@/src/shared-kernel/access";
@@ -19,6 +19,7 @@ import {
   addStore,
   addSupplier,
 } from "@/test/procurement";
+import { watchEvents } from "@/test/dispatched-events";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getInventory } from "../central-inventory/route";
@@ -134,6 +135,10 @@ function raise(
 ) {
   return createRequest(jsonRequest(`${API}/material-requests`, cookie, body));
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Central Store HTTP (CM-508)", () => {
   it("adds, lists, edits and deletes stores with their rules", async () => {
@@ -584,6 +589,70 @@ describe("Central Store HTTP (CM-508)", () => {
     );
     expect(xlsx.status).toBe(StatusCodes.OK);
     expect(xlsx.headers.get("content-type")).toContain("spreadsheetml");
+  });
+
+  it("raises request raised, note approved and request delivered for notifications (CM-904)", async () => {
+    const company = await ownerWithCompany();
+    const { cookie } = company;
+    const { tower, cement, storeId } = await setup(company);
+    const events = watchEvents();
+    const request = await json<MaterialRequest>(
+      await raise(company, {
+        projectId: tower,
+        requestDate: TODAY,
+        storeId,
+        items: [{ materialId: cement.id, askQty: "4" }],
+      }),
+    );
+    expect(events.of("procurement.material_request_raised")).toEqual([
+      expect.objectContaining({
+        requestId: request.id,
+        number: request.number,
+        projectId: tower,
+        storeId,
+        by: company.userId,
+      }),
+    ]);
+    const [line] = request.items;
+    if (line == null) throw new Error("line");
+    const note = await json<Note>(
+      await createNote(
+        jsonRequest(`${API}/delivery-notes`, cookie, {
+          materialRequestId: request.id,
+          deliveryDate: TODAY,
+          approve: true,
+          items: [{ materialRequestItemId: line.id, quantity: "4" }],
+        }),
+      ),
+    );
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "delivery_note",
+        documentId: note.id,
+        projectId: tower,
+        number: note.number,
+        createdBy: company.userId,
+      }),
+    ]);
+    expect(events.of("procurement.material_request_delivered")).toHaveLength(0);
+    await markDelivered(
+      jsonRequest(`${API}/delivery-notes/${note.id}/mark-delivered`, cookie, {
+        deliveredOn: TODAY,
+        expectedUpdatedAt: note.updatedAt,
+      }),
+      ctx(note.id),
+    );
+    expect(events.of("procurement.material_request_delivered")).toEqual([
+      expect.objectContaining({
+        requestId: request.id,
+        number: request.number,
+        deliveryNoteId: note.id,
+        deliveryNoteNumber: note.number,
+        projectId: tower,
+        requestedBy: company.userId,
+        by: company.userId,
+      }),
+    ]);
   });
 
   it("closes what is left, refuses while a note is open, and approves in bulk", async () => {

@@ -7,6 +7,7 @@ import {
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
 import { financeDirectory } from "@/src/composition/finance-directory";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   scopeOf,
   TRANSACTIONS_MENU,
@@ -64,6 +65,7 @@ const shared = {
 export const transactionHandlers = new TransactionHandlers({
   ...shared,
   store: prismaTransactionStore,
+  events: messagingEvents(),
 });
 
 export const transferHandlers = new TransferHandlers({

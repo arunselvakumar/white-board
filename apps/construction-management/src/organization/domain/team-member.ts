@@ -10,7 +10,9 @@ import {
 
 import type { MemberType } from "./starting-permissions";
 
-export type TeamMemberStatus = "joining_pending" | "active" | "rejected";
+/** `left`: the User deleted their account; the record stays (CM-907). */
+export type TeamMemberStatus =
+  "joining_pending" | "active" | "rejected" | "left";
 
 const E164 = /^\+[1-9]\d{7,14}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

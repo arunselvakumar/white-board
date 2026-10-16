@@ -3,12 +3,24 @@ import { z } from "zod";
 import {
   DASHBOARD_SECTIONS,
   DASHBOARD_SECTION_KEYS,
+  type DashboardSectionKey,
   type DashboardSectionSetting,
 } from "@/src/projects/domain/dashboard-sections";
 
+/** The layout read for one Project's dashboard (CM-902). */
+export const GetConstructionProjectsDashboardLayoutRequestModel = z.object({
+  projectId: z
+    .uuid()
+    .optional()
+    .describe(
+      "Mark the sections whose module is hidden on this Project (needs Dashboard Read on it).",
+    ),
+});
+
 /**
  * The caller's Project Dashboard layout (CM-412): every section in their
- * order with whether it shows, for every Project.
+ * order with whether it shows, for every Project. With a Project, the
+ * sections whose module is hidden there are marked (CM-902).
  */
 export const ConstructionProjectsDashboardLayoutResponseModel = z.object({
   sections: z.array(
@@ -22,6 +34,11 @@ export const ConstructionProjectsDashboardLayoutResponseModel = z.object({
           "The milestone whose data fills a section that is still a stub; null when it has data.",
         ),
       visible: z.boolean(),
+      hiddenOnProject: z
+        .boolean()
+        .describe(
+          "The section's module is hidden on the Project asked for (Hide / Show Modules): the dashboard leaves it out whatever `visible` says. False without `projectId`.",
+        ),
     }),
   ),
 });
@@ -55,6 +72,7 @@ export type UpdateConstructionProjectsDashboardLayoutRequestModel = z.infer<
 
 export function toDashboardLayoutResponse(
   sections: readonly DashboardSectionSetting[],
+  hiddenOnProject: ReadonlySet<DashboardSectionKey> = new Set(),
 ): ConstructionProjectsDashboardLayoutResponseModel {
   return {
     sections: sections.map(({ key, visible }) => {
@@ -64,6 +82,7 @@ export function toDashboardLayoutResponse(
         label: section?.label ?? key,
         milestone: section?.milestone ?? null,
         visible,
+        hiddenOnProject: hiddenOnProject.has(key),
       };
     }),
   };

@@ -130,6 +130,8 @@ enum ConstructionOrganizationTeamMemberStatus {
   joining_pending
   active
   rejected
+  /// The User deleted their account; the record stays the Company's (CM-907).
+  left
 
   @@map("team_member_status")
   @@schema("construction_organization")
@@ -395,5 +397,110 @@ model ConstructionOrganizationGrnFieldSetting {
   updatedBy    String   @map("updated_by")
 
   @@map("grn_field_settings")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationQueueJobStatus {
+  queued
+  running
+  done
+  failed
+
+  @@map("queue_job_status")
+  @@schema("construction_organization")
+}
+
+/// The kernel's job queue (ADR CM-0021 §1). Claimed with FOR UPDATE SKIP
+/// LOCKED; a running job whose lease has passed is claimed again. Domain
+/// records (report_jobs, backup_jobs) carry the status screens show.
+model ConstructionOrganizationQueueJob {
+  id          String                                 @id @db.Uuid
+  /// Null for system jobs (retention, the daily sweep).
+  workspaceId String?                                @map("workspace_id")
+  /// Handler key, e.g. `report`, `backup.part`, `push`, `retention`.
+  type        String
+  payload     Json
+  status      ConstructionOrganizationQueueJobStatus @default(queued)
+  attempts    Int                                    @default(0)
+  maxAttempts Int                                    @default(3) @map("max_attempts")
+  runAfter    DateTime                               @default(now()) @map("run_after") @db.Timestamptz(3)
+  leaseUntil  DateTime?                              @map("lease_until") @db.Timestamptz(3)
+  lastError   String?                                @map("last_error")
+  /// At most one unfinished job per key (partial unique index in SQL).
+  dedupeKey   String?                                @map("dedupe_key")
+  createdAt   DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  startedAt   DateTime?                              @map("started_at") @db.Timestamptz(3)
+  finishedAt  DateTime?                              @map("finished_at") @db.Timestamptz(3)
+
+  @@index([status, runAfter])
+  @@index([status, leaseUntil])
+  @@map("queue_jobs")
+  @@schema("construction_organization")
+}
+
+enum ConstructionOrganizationActionCodePurpose {
+  company_backup
+  transfer_ownership
+  delete_account
+  delete_company
+  reveal_identifiers
+
+  @@map("action_code_purpose")
+  @@schema("construction_organization")
+}
+
+/// A six-digit code sent to the user before a sensitive action (ADR CM-0021
+/// §8, §10, §11). Stored hashed; 10 minutes, 5 attempts. A verified reveal
+/// code keeps `verifiedUntil` for its session.
+model ConstructionOrganizationActionCode {
+  id            String                                    @id @db.Uuid
+  userId        String                                    @map("user_id")
+  /// Null for account-level purposes (delete_account).
+  workspaceId   String?                                   @map("workspace_id")
+  sessionId     String?                                   @map("session_id")
+  purpose       ConstructionOrganizationActionCodePurpose
+  codeHash      String                                    @map("code_hash")
+  attempts      Int                                       @default(0)
+  expiresAt     DateTime                                  @map("expires_at") @db.Timestamptz(3)
+  consumedAt    DateTime?                                 @map("consumed_at") @db.Timestamptz(3)
+  verifiedUntil DateTime?                                 @map("verified_until") @db.Timestamptz(3)
+  createdAt     DateTime                                  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([userId, purpose, createdAt])
+  @@map("action_codes")
+  @@schema("construction_organization")
+}
+
+/// A Company the Owner asked to delete (CM-907). Kept after the purge: it is
+/// not "of" the Company, so its column is not called workspace_id.
+model ConstructionOrganizationCompanyDeletion {
+  id                 String    @id @db.Uuid
+  deletedWorkspaceId String    @map("deleted_workspace_id")
+  companyName        String    @map("company_name")
+  ownerUserId        String    @map("owner_user_id")
+  requestedAt        DateTime  @map("requested_at") @db.Timestamptz(3)
+  /// requestedAt + 30 days; the daily job purges on or after it.
+  scheduledFor       DateTime  @map("scheduled_for") @db.Timestamptz(3)
+  cancelledAt        DateTime? @map("cancelled_at") @db.Timestamptz(3)
+  cancelledBy        String?   @map("cancelled_by")
+  completedAt        DateTime? @map("completed_at") @db.Timestamptz(3)
+  /// Rows deleted per table, for the record.
+  summary            Json?
+
+  @@index([deletedWorkspaceId])
+  @@index([scheduledFor])
+  @@map("company_deletions")
+  @@schema("construction_organization")
+}
+
+/// A user who deleted their account (CM-907); kept for audit.
+model ConstructionOrganizationAccountDeletion {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id")
+  reason    String?
+  deletedAt DateTime @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account_deletions")
   @@schema("construction_organization")
 }

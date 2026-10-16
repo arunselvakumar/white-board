@@ -2,7 +2,7 @@ import { prisma } from "@repo/construction-db";
 
 import type { StockPosting } from "@/src/procurement/domain/stock-ledger";
 import { stockLocation } from "@/src/procurement/domain/stock-location";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 import { stockLedger } from "@/src/procurement/infrastructure/stock-ledger-instance";
 import type {
   SiteStock,

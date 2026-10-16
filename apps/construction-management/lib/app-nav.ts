@@ -1,8 +1,17 @@
 /**
- * The three top-level areas (`docs/00-overview.md`, "The shape of the
- * product"). Each area grows its own screens in later milestones.
+ * The main menu: the Company Dashboard (CM-902), then the three top-level
+ * areas (`docs/00-overview.md`, "The shape of the product"). Each area
+ * grows its own screens in later milestones. The Dashboard shows only
+ * with the Dashboard menu's Read flag (`AppShell`'s `canOpenDashboard`).
  */
 export const APP_NAV = [
+  {
+    href: "/app/dashboard",
+    label: "Dashboard",
+    title: "Dashboard",
+    description:
+      "Your Company at a glance: approvals waiting, open issues and inspections, labour on site today and amounts due, across your Projects.",
+  },
   {
     href: "/app/projects",
     label: "Projects",

@@ -131,7 +131,10 @@ export const GetConstructionTrackingDashboardResponseModel = z
         successRate: z.number().nullable(),
       })
       .nullable(),
-    /** The KPI tiles; a count is null without that menu's Read. */
+    /**
+     * The KPI tiles, from `construction_reporting.project_pending_tracking`
+     * (CM-902); a count is null without that menu's Read.
+     */
     kpis: z.object({
       /** Open issues in the duration, delayed included. */
       pendingIssues: count.nullable(),
@@ -156,6 +159,7 @@ function paiseNumber(value: bigint): number {
 
 export function toTrackingDashboardResponse(
   result: TrackingDashboardResult,
+  kpis: GetConstructionTrackingDashboardResponseModel["kpis"],
 ): GetConstructionTrackingDashboardResponseModel {
   const { tasks } = result;
   return {
@@ -182,6 +186,6 @@ export function toTrackingDashboardResponse(
           },
     issues: result.issues,
     inspections: result.inspections,
-    kpis: result.kpis,
+    kpis,
   };
 }

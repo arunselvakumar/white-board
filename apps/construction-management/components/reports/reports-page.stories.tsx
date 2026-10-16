@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import type { ReportJob } from "@/src/queries/reports";
+import type { ReportJob, ReportKind } from "@/src/queries/reports";
 
 import {
   mockApi,
@@ -9,6 +9,7 @@ import {
   type ApiCall,
 } from "../../.storybook/mocks/api";
 import {
+  catalogueHandler,
   CONTRACTOR_ID,
   DONE_DAILY_WORK,
   DONE_MUSTER,
@@ -24,18 +25,46 @@ import {
   WORKSHEET_OPTIONS,
   WORKSHEET_OPTIONS_PATH,
   job,
+  LABOUR_AND_SITE_WORK_KINDS,
+  PROJECT_CATALOGUE_PATH,
 } from "./report-fixtures";
 import {
   COUNTERPARTY_OPTIONS,
   financeLookupsHandler,
 } from "../finance/account-fixtures";
-import { financeAccessHandler } from "../finance/payment-categories/payment-category-fixtures";
-import { trackingAccess } from "../tracking/tasks/task-fixtures";
 import { ReportsPage } from "./reports-page";
 
 const API = "/api/construction/reporting/reports";
 
 let api: ReturnType<typeof mockApi>;
+
+/** The finance cards a Transactions and Parties reporter gets. */
+const FINANCE_KINDS: readonly ReportKind[] = [
+  "transactions",
+  "contractor_payments",
+  "supplier_payments",
+  "due_payments",
+];
+
+/** The tracking cards a Task and Issues reporter gets. */
+const TRACKING_KINDS: readonly ReportKind[] = [
+  "task_report",
+  "issue_snag_report",
+];
+
+/**
+ * The story's API with the Project's report catalogue in front: the
+ * labour and site-work cards, plus `extra`.
+ */
+function withCatalogue(
+  handler: (call: ApiCall) => Response | undefined,
+  extra: readonly ReportKind[] = [],
+): (call: ApiCall) => Response | undefined {
+  const catalogue = catalogueHandler({
+    project: [...LABOUR_AND_SITE_WORK_KINDS, ...extra],
+  });
+  return (call) => catalogue(call) ?? handler(call);
+}
 
 function posted(): ApiCall[] {
   return api.calls.mock.calls
@@ -92,11 +121,13 @@ type Story = StoryObj<typeof meta>;
 /** Five report cards and the recent list with ready, failed and running reports. */
 export const RecentStates: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH)
-        return list([RUNNING_VENDOR, FAILED_PAYMENT, DONE_MUSTER]);
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH)
+          return list([RUNNING_VENDOR, FAILED_PAYMENT, DONE_MUSTER]);
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas }) => {
@@ -107,7 +138,7 @@ export const RecentStates: Story = {
       "Vendor Attendance",
       "Muster roll and wage register",
     ])
-      await expect(canvas.getByRole("form", { name })).toBeVisible();
+      await expect(await canvas.findByRole("form", { name })).toBeVisible();
     // Range cards default to the month so far; month cards to this month.
     const attendance = within(
       canvas.getByRole("form", { name: "All Labour Attendance" }),
@@ -147,8 +178,10 @@ export const RecentStates: Story = {
 /** No reports yet. */
 export const Empty: Story = {
   beforeEach: () => {
-    api = mockApi((call) =>
-      call.method === "GET" && call.path === LIST_PATH ? list([]) : undefined,
+    api = mockApi(
+      withCatalogue((call) =>
+        call.method === "GET" && call.path === LIST_PATH ? list([]) : undefined,
+      ),
     );
     return api.restore;
   },
@@ -161,15 +194,17 @@ export const Empty: Story = {
 export const GenerateFlow: Story = {
   beforeEach: () => {
     let generated = false;
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH)
-        return list(generated ? [NEW_ATTENDANCE] : []);
-      if (call.method === "POST" && call.path === API) {
-        generated = true;
-        return Response.json(NEW_ATTENDANCE, { status: 201 });
-      }
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH)
+          return list(generated ? [NEW_ATTENDANCE] : []);
+        if (call.method === "POST" && call.path === API) {
+          generated = true;
+          return Response.json(NEW_ATTENDANCE, { status: 201 });
+        }
+        return undefined;
+      }),
+    );
     gate = gatePosts();
     return () => {
       gate.restore();
@@ -215,12 +250,14 @@ export const GenerateFlow: Story = {
 /** A month report sends the chosen month. */
 export const MonthReport: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (call.method === "POST" && call.path === API)
-        return Response.json(DONE_MUSTER, { status: 201 });
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(DONE_MUSTER, { status: 201 });
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
@@ -246,21 +283,23 @@ export const MonthReport: Story = {
 /** A job that fails shows its message; a refused request shows the server's words. */
 export const FailedAndRefused: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (call.method !== "POST") return undefined;
-      const body = call.body as { kind: string };
-      if (body.kind === "labour_attendance")
-        return Response.json(FAILED_PAYMENT, { status: 201 });
-      return Response.json(
-        {
-          code: "PERMISSION_DENIED",
-          message:
-            "This report is about amounts: it needs Financial on Labour. Ask the Owner to change your Permission Matrix.",
-        },
-        { status: 403 },
-      );
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method !== "POST") return undefined;
+        const body = call.body as { kind: string };
+        if (body.kind === "labour_attendance")
+          return Response.json(FAILED_PAYMENT, { status: 201 });
+        return Response.json(
+          {
+            code: "PERMISSION_DENIED",
+            message:
+              "This report is about amounts: it needs Financial on Labour. Ask the Owner to change your Permission Matrix.",
+          },
+          { status: 403 },
+        );
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
@@ -290,8 +329,10 @@ export const FailedAndRefused: Story = {
 /** A backwards period is caught before anything is sent. */
 export const BackwardsPeriod: Story = {
   beforeEach: () => {
-    api = mockApi((call) =>
-      call.method === "GET" && call.path === LIST_PATH ? list([]) : undefined,
+    api = mockApi(
+      withCatalogue((call) =>
+        call.method === "GET" && call.path === LIST_PATH ? list([]) : undefined,
+      ),
     );
     return api.restore;
   },
@@ -318,17 +359,19 @@ export const BackwardsPeriod: Story = {
 /** The Site work group: five cards, the filters from the Project's Contractors and equipment. */
 export const SiteWorkReports: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH)
-        return list([DONE_RENTED_USAGE]);
-      if (call.method === "GET" && call.path === WORKSHEET_OPTIONS_PATH)
-        return Response.json(WORKSHEET_OPTIONS);
-      if (call.method === "GET" && call.path === PROJECT_EQUIPMENT_PATH)
-        return Response.json(PROJECT_EQUIPMENT);
-      if (call.method === "POST" && call.path === API)
-        return Response.json(DONE_DAILY_WORK, { status: 201 });
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH)
+          return list([DONE_RENTED_USAGE]);
+        if (call.method === "GET" && call.path === WORKSHEET_OPTIONS_PATH)
+          return Response.json(WORKSHEET_OPTIONS);
+        if (call.method === "GET" && call.path === PROJECT_EQUIPMENT_PATH)
+          return Response.json(PROJECT_EQUIPMENT);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(DONE_DAILY_WORK, { status: 201 });
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -392,12 +435,14 @@ export const SiteWorkReports: Story = {
 /** Without Daily Worksheet or equipment read, the cards simply have no filter. */
 export const SiteWorkWithoutFilters: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (call.method === "POST" && call.path === API)
-        return Response.json(DONE_RENTED_USAGE, { status: 201 });
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(DONE_RENTED_USAGE, { status: 201 });
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
@@ -418,15 +463,6 @@ export const SiteWorkWithoutFilters: Story = {
   },
 };
 
-const FINANCE_ACCESS = financeAccessHandler(
-  {
-    "finance.transactions": ["read", "report"],
-    "finance.parties": ["read", "report"],
-    "finance.petty_cash": ["read"],
-  },
-  false,
-);
-
 /**
  * Payments and accounts (CM-709): a card per finance report the viewer has
  * Report on (here Transactions and the party reports; no Petty Cash or
@@ -434,20 +470,22 @@ const FINANCE_ACCESS = financeAccessHandler(
  */
 export const FinanceReports: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (call.method === "POST" && call.path === API)
-        return Response.json(
-          job({
-            id: "0190a000-0000-7000-8000-0000000000f1",
-            kind: (call.body as { kind: ReportJob["kind"] }).kind,
-            title: "Due Payments",
-            includesMoney: true,
-          }),
-          { status: 201 },
-        );
-      return FINANCE_ACCESS(call) ?? financeLookupsHandler(call);
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(
+            job({
+              id: "0190a000-0000-7000-8000-0000000000f1",
+              kind: (call.body as { kind: ReportJob["kind"] }).kind,
+              title: "Due Payments",
+              includesMoney: true,
+            }),
+            { status: 201 },
+          );
+        return financeLookupsHandler(call);
+      }, FINANCE_KINDS),
+    );
     return api.restore;
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -502,10 +540,12 @@ export const FinanceReports: Story = {
 /** Without Report on any finance menu the group is not shown. */
 export const NoFinanceReports: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      return financeAccessHandler({}, false)(call);
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas }) => {
@@ -524,31 +564,22 @@ export const NoFinanceReports: Story = {
  */
 export const TrackingReports: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (
-        call.method === "GET" &&
-        call.path.startsWith("/api/construction/tracking/access")
-      )
-        return Response.json(
-          trackingAccess(PROJECT_ID, {
-            "tracking.tasks": ["read", "report", "financial"],
-            "tracking.issues": ["read", "report"],
-            "tracking.inspection_requests": ["read"],
-          }),
-        );
-      if (call.method === "POST" && call.path === API)
-        return Response.json(
-          job({
-            id: "0190a000-0000-7000-8000-0000000000f2",
-            kind: (call.body as { kind: ReportJob["kind"] }).kind,
-            title: "Task Report",
-            includesMoney: true,
-          }),
-          { status: 201 },
-        );
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(
+            job({
+              id: "0190a000-0000-7000-8000-0000000000f2",
+              kind: (call.body as { kind: ReportJob["kind"] }).kind,
+              title: "Task Report",
+              includesMoney: true,
+            }),
+            { status: 201 },
+          );
+        return undefined;
+      }, TRACKING_KINDS),
+    );
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
@@ -580,21 +611,12 @@ export const TrackingReports: Story = {
 /** Without Report on any tracking menu the group is not shown. */
 export const NoTrackingReports: Story = {
   beforeEach: () => {
-    api = mockApi((call) => {
-      if (call.method === "GET" && call.path === LIST_PATH) return list([]);
-      if (
-        call.method === "GET" &&
-        call.path.startsWith("/api/construction/tracking/access")
-      )
-        return Response.json(
-          trackingAccess(PROJECT_ID, {
-            "tracking.tasks": ["read"],
-            "tracking.issues": ["read"],
-            "tracking.inspection_requests": ["read"],
-          }),
-        );
-      return undefined;
-    });
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        return undefined;
+      }),
+    );
     return api.restore;
   },
   play: async ({ canvas }) => {
@@ -603,5 +625,164 @@ export const NoTrackingReports: Story = {
     await expect(
       canvas.queryByRole("region", { name: "Tasks, issues and inspections" }),
     ).toBeNull();
+  },
+};
+
+/**
+ * The cards come from the server's catalogue (CM-901): a member with
+ * Labour Report and no Financial gets only the reports they may request.
+ */
+export const TrimmedByTheCatalogue: Story = {
+  beforeEach: () => {
+    const catalogue = catalogueHandler({
+      project: ["labour_attendance", "labour_month"],
+    });
+    api = mockApi(
+      (call) =>
+        catalogue(call) ??
+        (call.method === "GET" && call.path === LIST_PATH
+          ? list([])
+          : undefined),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    const labour = within(
+      await canvas.findByRole("region", { name: "Labour and vendor reports" }),
+    );
+    await expect(labour.getAllByRole("form")).toHaveLength(2);
+    await expect(
+      labour.getByRole("form", { name: "All Labour Attendance" }),
+    ).toBeVisible();
+    await expect(
+      labour.getByRole("form", { name: "Month-wise Labour" }),
+    ).toBeVisible();
+    await expect(
+      labour.queryByRole("form", { name: "All Labour Payment" }),
+    ).toBeNull();
+    await expect(
+      canvas.queryByRole("region", { name: "Site work" }),
+    ).toBeNull();
+    await expect(
+      api.calls.mock.calls.some(([call]) =>
+        call.path.startsWith(PROJECT_CATALOGUE_PATH),
+      ),
+    ).toBe(true);
+  },
+};
+
+/** A member with no Report flag on this Project: nothing to generate, no list. */
+export const NothingToGenerate: Story = {
+  beforeEach: () => {
+    api = mockApi(catalogueHandler({ project: [] }));
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("No reports you can generate here"),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("form")).toBeNull();
+    await expect(
+      canvas.queryByRole("heading", { name: "Recent reports" }),
+    ).toBeNull();
+  },
+};
+
+/** While the catalogue loads, the page waits behind its fallback. */
+export const Loading: Story = {
+  beforeEach: () => {
+    const inner = globalThis.fetch;
+    globalThis.fetch = () => new Promise<Response>(() => undefined);
+    return () => {
+      globalThis.fetch = inner;
+    };
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Loading…")).toBeVisible();
+    await expect(canvas.queryByRole("form")).toBeNull();
+  },
+};
+
+/** On the queue a request comes back queued: the card says where it will appear. */
+export const QueuedReport: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(
+            job({
+              id: "0190a000-0000-7000-8000-0000000000f3",
+              status: "queued",
+              startedAt: null,
+              finishedAt: null,
+            }),
+            { status: 201 },
+          );
+        return undefined;
+      }),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const card = within(
+      await canvas.findByRole("form", { name: "All Labour Attendance" }),
+    );
+    await userEvent.click(card.getByRole("button", { name: "Generate" }));
+    await expect(
+      await card.findByText(/It appears under Recent reports and in Downloads/),
+    ).toBeVisible();
+    await expect(card.queryByRole("link")).toBeNull();
+  },
+};
+
+/** A report past its 30 days says so and has no downloads. */
+export const ExpiredReport: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue((call) =>
+        call.method === "GET" && call.path === LIST_PATH
+          ? list([
+              job({
+                id: "0190a000-0000-7000-8000-0000000000f4",
+                status: "expired",
+                downloads: { xlsx: null, pdf: null },
+              }),
+            ])
+          : undefined,
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    const recent = within(
+      await canvas.findByRole("list", { name: "Recent reports" }),
+    );
+    await expect(recent.getByText("Expired")).toBeVisible();
+    await expect(recent.getByText("Expired — generate it again")).toBeVisible();
+    await expect(recent.queryByRole("link")).toBeNull();
+  },
+};
+
+/** At phone width the cards stack and nothing scrolls sideways. */
+export const Phone: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue(
+        (call) =>
+          call.method === "GET" && call.path === LIST_PATH
+            ? list([RUNNING_VENDOR, FAILED_PAYMENT, DONE_MUSTER])
+            : financeLookupsHandler(call),
+        FINANCE_KINDS,
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole("region", { name: "Payments and accounts" });
+    await canvas.findByRole("list", { name: "Recent reports" });
+    const page = canvasElement.ownerDocument.documentElement;
+    await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };

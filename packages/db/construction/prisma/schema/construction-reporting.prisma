@@ -1,7 +1,7 @@
 /// Construction Management — reporting context (ADR CM-0001, `modules/11`):
 /// report jobs and the files they produce. Reports read other contexts'
-/// tables (a read model); this schema holds only the jobs. A job runs inline
-/// in the request until M9 moves it onto a queue (CM-217).
+/// tables (a read model); this schema holds only the jobs. A job runs on
+/// the kernel's Postgres queue (ADR CM-0021 §1).
 
 enum ConstructionReportingReportKind {
   labour_attendance
@@ -30,6 +30,13 @@ enum ConstructionReportingReportKind {
   issue_snag_report
   inspection_request_report
   task_progress_report
+  /// Procurement and central labour (CM-903, ADR CM-0021 §5).
+  purchase_requests
+  purchase_orders
+  material_received
+  material_transfers
+  stock_register
+  labour_attendance_central
 
   @@map("report_kind")
   @@schema("construction_reporting")
@@ -40,6 +47,8 @@ enum ConstructionReportingJobStatus {
   running
   done
   failed
+  /// Its files were deleted by retention (ADR CM-0021 §3).
+  expired
 
   @@map("job_status")
   @@schema("construction_reporting")
@@ -71,6 +80,59 @@ model ConstructionReportingReportJob {
   finishedAt    DateTime?                       @map("finished_at") @db.Timestamptz(3)
 
   @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, requestedBy, createdAt])
   @@map("report_jobs")
+  @@schema("construction_reporting")
+}
+
+enum ConstructionReportingBackupScope {
+  /// One Project's chosen modules (Project → Backup).
+  project
+  /// The Company's master records (Masters → Backup).
+  masters
+  /// Everything; Owner only, behind a code (ADR CM-0021 §8).
+  company
+  /// One user's own data across Companies (Download My Data).
+  my_data
+
+  @@map("backup_scope")
+  @@schema("construction_reporting")
+}
+
+/// One requested backup or data export (CM-906): queued → running → done |
+/// failed, then expired after 7 days. It runs as one queue job per module
+/// part plus a zip step; `parts` records each part's object and row counts.
+model ConstructionReportingBackupJob {
+  id            String                           @id @db.Uuid
+  /// Null for Download My Data, which spans Companies.
+  workspaceId   String?                          @map("workspace_id")
+  projectId     String?                          @map("project_id") @db.Uuid
+  scope         ConstructionReportingBackupScope
+  /// Module keys chosen (e.g. `site_work.daily_worksheet`); empty for my_data.
+  modules       String[]
+  /// Inclusive period, null for "all time".
+  fromDate      DateTime?                        @map("from_date") @db.Date
+  toDate        DateTime?                        @map("to_date") @db.Date
+  includeData   Boolean                          @default(true) @map("include_data")
+  includeMedia  Boolean                          @default(false) @map("include_media")
+  /// Amounts are written only when the requester may see them.
+  includesMoney Boolean                          @default(false) @map("includes_money")
+  status        ConstructionReportingJobStatus   @default(queued)
+  /// [{ module, key, rows, bytes, done }] as each part finishes.
+  parts         Json                             @default("[]")
+  fileKey       String?                          @map("file_key")
+  fileName      String?                          @map("file_name")
+  bytes         BigInt?
+  error         String?
+  requestedBy   String                           @map("requested_by")
+  createdAt     DateTime                         @default(now()) @map("created_at") @db.Timestamptz(3)
+  startedAt     DateTime?                        @map("started_at") @db.Timestamptz(3)
+  finishedAt    DateTime?                        @map("finished_at") @db.Timestamptz(3)
+  /// The signed link stops working, and retention deletes the file, here.
+  expiresAt     DateTime?                        @map("expires_at") @db.Timestamptz(3)
+
+  @@index([workspaceId, requestedBy, createdAt])
+  @@index([requestedBy, createdAt])
+  @@map("backup_jobs")
   @@schema("construction_reporting")
 }

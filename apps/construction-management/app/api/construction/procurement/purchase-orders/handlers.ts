@@ -23,7 +23,7 @@ import { loadBackdatedCheck } from "@/src/procurement/infrastructure/procurement
 import { recomputePurchaseRequestOrdering } from "@/src/procurement/infrastructure/purchase-request-ordering";
 import type { Flag } from "@/src/shared-kernel/access";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 
 export const PURCHASE_ORDER_MENU = PROCUREMENT_DOCUMENTS.purchase_order.menu;
 

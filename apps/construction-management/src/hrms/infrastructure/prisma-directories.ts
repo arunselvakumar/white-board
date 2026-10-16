@@ -31,7 +31,7 @@ type MemberRow = {
   name: string;
   memberType: "normal" | "hrms";
   designationId: string;
-  status: "joining_pending" | "active" | "rejected";
+  status: "joining_pending" | "active" | "rejected" | "left";
   isOwner: boolean;
   projects: { projectId: string }[];
 };

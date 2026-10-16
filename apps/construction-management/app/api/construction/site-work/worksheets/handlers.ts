@@ -16,7 +16,7 @@ import {
 } from "@/src/composition/worksheet-directory";
 import type { Flag } from "@/src/shared-kernel/access";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   WorksheetHandlers,
   type StoredWorksheet,
@@ -53,7 +53,7 @@ export const worksheetHandlers = new WorksheetHandlers({
   backdated: (access) => loadBackdatedCheck(prisma, access),
   today: (workspaceId) => companyToday(prisma, workspaceId),
   // Nothing listens to `document.approved` for worksheets yet (M9 notifies).
-  events: new InProcessEventDispatcher(),
+  events: messagingEvents(),
   media: projectMediaDispatcher(),
 });
 
