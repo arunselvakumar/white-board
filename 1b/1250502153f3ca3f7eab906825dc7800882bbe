@@ -1,0 +1,29 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_9b8b004c55c7f2::t_e73e23a22f1111 19-22,997-999
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-models.ts
+  s_9b8b004c55c7f2::t_9db9e2f358aeae 1-59
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-openapi.ts
+  s_9b8b004c55c7f2::t_e4d280595d2503 1-36
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options.http.test.ts
+  s_9b8b004c55c7f2::t_ae01c16650c76f 1-157
+apps/construction-management/app/api/construction/reporting/filter-options/route.ts
+  s_9b8b004c55c7f2::t_376f3a93a4045c 1-66
+apps/construction-management/src/composition/report-filter-options.ts
+  s_9b8b004c55c7f2::t_0b37b9d694ab3c 1-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1b1250502153f3ca3f7eab906825dc7800882bbe",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
