@@ -1,0 +1,47 @@
+apps/construction-management/app/app/masters/settings/company/page.tsx
+  s_9b8b004c55c7f2::t_5819bbffe18a19 1-9
+apps/construction-management/app/app/profile/page.tsx
+  s_9b8b004c55c7f2::t_40c67bb0151810 4-6,11-26
+apps/construction-management/components/account/action-code-step.tsx
+  s_9b8b004c55c7f2::t_04f45f974081e1 1-115
+apps/construction-management/components/account/company-ownership-screen.tsx
+  s_9b8b004c55c7f2::t_5323b127ffd8d9 1-197
+apps/construction-management/components/account/delete-account-dialog.tsx
+  s_9b8b004c55c7f2::t_2da48508612073 1-227
+apps/construction-management/components/account/delete-company-dialog.tsx
+  s_9b8b004c55c7f2::t_91258141ff0eec 1-150
+apps/construction-management/components/account/reveal-code-dialog.tsx
+  s_9b8b004c55c7f2::t_ed14feb0d92879 1-105
+apps/construction-management/components/account/transfer-ownership-dialog.tsx
+  s_9b8b004c55c7f2::t_dd6e6478fea495 1-186
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_9b8b004c55c7f2::t_aa63580e75b469 35,129
+apps/construction-management/components/app-shell/company-deletion-banner.tsx
+  s_9b8b004c55c7f2::t_e76a875c3062e4 1-57
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_9b8b004c55c7f2::t_56884781bf17dc 16-19,148-159,328,349,354-364
+apps/construction-management/components/profile/devices-section.tsx
+  s_9b8b004c55c7f2::t_c203cec624fa37 1-213
+apps/construction-management/components/profile/privacy-section.tsx
+  s_9b8b004c55c7f2::t_ba68ccba94b3f0 1-99
+apps/construction-management/lib/settings-nav.ts
+  s_9b8b004c55c7f2::t_31208603397f9e 2,45-51
+apps/construction-management/src/queries/account.ts
+  s_9b8b004c55c7f2::t_0ca0fbdd331fcc 1-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "150ab368aeeee9c0a421f533760d6b2b35b0d324",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
