@@ -1,0 +1,411 @@
+apps/construction-management/app/api/_lib/company-deletion-guard.ts
+  s_9b8b004c55c7f2::t_d553e1d33a1ae2 1-77
+apps/construction-management/app/api/_lib/map-error.ts
+  s_9b8b004c55c7f2::t_b7139230f1d574 17
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_9b8b004c55c7f2::t_42092a81a38fad 7-10,23-30,1005-1013
+apps/construction-management/app/api/_lib/require-session.ts
+  s_9b8b004c55c7f2::t_9416ebf1bfd50c 8,13-14,24-26,44-48,51,58-62,78-82
+apps/construction-management/app/api/auth/[...all]/route.ts
+  s_9b8b004c55c7f2::t_7fb276da57b3da 1-4,6-27
+apps/construction-management/app/api/construction/organization/account-openapi.ts
+  s_9b8b004c55c7f2::t_df86a857d8bad8 1-210
+apps/construction-management/app/api/construction/organization/action-codes/action-code-models.ts
+  s_9b8b004c55c7f2::t_a97ad59cbb44b0 1-39
+apps/construction-management/app/api/construction/organization/action-codes/action-codes.http.test.ts
+  s_9b8b004c55c7f2::t_b201e06d27735b 1-235
+apps/construction-management/app/api/construction/organization/action-codes/route.ts
+  s_9b8b004c55c7f2::t_95ccc4e8fa0b23 1-51
+apps/construction-management/app/api/construction/organization/action-codes/verify/route.ts
+  s_9b8b004c55c7f2::t_a5166416edd7af 1-38
+apps/construction-management/app/api/construction/organization/company-deletion/cancel/route.ts
+  s_9b8b004c55c7f2::t_1d6a4688804ee5 1-26
+apps/construction-management/app/api/construction/organization/company-deletion/company-deletion-models.ts
+  s_9b8b004c55c7f2::t_1e1a094b0912b6 1-54
+apps/construction-management/app/api/construction/organization/company-deletion/company-deletion.http.test.ts
+  s_9b8b004c55c7f2::t_a0b96222bbb17d 1-182
+apps/construction-management/app/api/construction/organization/company-deletion/handlers.ts
+  s_9b8b004c55c7f2::t_5d84cf85c8f132 1-4
+apps/construction-management/app/api/construction/organization/company-deletion/route.ts
+  s_9b8b004c55c7f2::t_01df5fd6ffa827 1-66
+apps/construction-management/app/api/construction/organization/me/account/account-models.ts
+  s_9b8b004c55c7f2::t_7218afc6e58487 1-31
+apps/construction-management/app/api/construction/organization/me/account/account.http.test.ts
+  s_9b8b004c55c7f2::t_78f48bf79ffbdd 1-201
+apps/construction-management/app/api/construction/organization/me/account/delete/route.ts
+  s_9b8b004c55c7f2::t_6580e1a85d3bda 1-37
+apps/construction-management/app/api/construction/organization/me/account/route.ts
+  s_9b8b004c55c7f2::t_6c5174a266b465 1-20
+apps/construction-management/app/api/construction/organization/me/devices/[id]/sign-out/route.ts
+  s_9b8b004c55c7f2::t_d8901c7a42b829 1-34
+apps/construction-management/app/api/construction/organization/me/devices/device-models.ts
+  s_9b8b004c55c7f2::t_81fa5759006dfd 1-55
+apps/construction-management/app/api/construction/organization/me/devices/devices.http.test.ts
+  s_9b8b004c55c7f2::t_48f33640dd6903 1-169
+apps/construction-management/app/api/construction/organization/me/devices/route.ts
+  s_9b8b004c55c7f2::t_4e799e713b7390 1-21
+apps/construction-management/app/api/construction/organization/me/devices/sign-out-others/route.ts
+  s_9b8b004c55c7f2::t_09444282ada71f 1-25
+apps/construction-management/app/api/construction/organization/me/me.http.test.ts
+  s_9b8b004c55c7f2::t_abeb7bdab7450d 8,268-274,305-307
+apps/construction-management/app/api/construction/organization/me/profile/reveal-identifiers/route.ts
+  s_9b8b004c55c7f2::t_266dbc5fe451c9 7,17-18,24
+apps/construction-management/app/api/construction/organization/ownership/candidates/route.ts
+  s_9b8b004c55c7f2::t_a642961bf806dd 1-24
+apps/construction-management/app/api/construction/organization/ownership/handlers.ts
+  s_9b8b004c55c7f2::t_f5024bbc367225 1-4
+apps/construction-management/app/api/construction/organization/ownership/ownership-models.ts
+  s_9b8b004c55c7f2::t_00cee7926e78b4 1-42
+apps/construction-management/app/api/construction/organization/ownership/ownership.http.test.ts
+  s_9b8b004c55c7f2::t_08e2cbb73be807 1-154
+apps/construction-management/app/api/construction/organization/ownership/transfer/route.ts
+  s_9b8b004c55c7f2::t_559fea50ff35bc 1-42
+apps/construction-management/app/api/construction/organization/team-members/[id]/reveal/route.ts
+  s_9b8b004c55c7f2::t_898b5beaf1b083 6,15-16,28
+apps/construction-management/app/api/construction/organization/team-members/team-members.http.test.ts
+  s_9b8b004c55c7f2::t_459045b28161fc 6,140
+apps/construction-management/app/api/construction/reporting/backups-openapi.ts
+  s_9b8b004c55c7f2::t_68456834c31018 1-116
+apps/construction-management/app/api/construction/reporting/backups/[id]/delete/route.ts
+  s_9b8b004c55c7f2::t_aca653f8b4d1ac 1-30
+apps/construction-management/app/api/construction/reporting/backups/[id]/download/route.ts
+  s_9b8b004c55c7f2::t_52290a72975c7e 1-106
+apps/construction-management/app/api/construction/reporting/backups/[id]/route.ts
+  s_9b8b004c55c7f2::t_182c70150df722 1-30
+apps/construction-management/app/api/construction/reporting/backups/backup-models.ts
+  s_9b8b004c55c7f2::t_6e3dac900d47fe 1-138
+apps/construction-management/app/api/construction/reporting/backups/backups.http.test.ts
+  s_9b8b004c55c7f2::t_fe11dfa2942d12 1-1004
+apps/construction-management/app/api/construction/reporting/backups/handlers.ts
+  s_9b8b004c55c7f2::t_8023c2065212db 1-124
+apps/construction-management/app/api/construction/reporting/backups/options/route.ts
+  s_9b8b004c55c7f2::t_282f247218d7d5 1-44
+apps/construction-management/app/api/construction/reporting/backups/route.ts
+  s_9b8b004c55c7f2::t_f4bd46738ff74d 1-219
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue-models.ts
+  s_9b8b004c55c7f2::t_d4366d3e126a22 27-31
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue.http.test.ts
+  s_9b8b004c55c7f2::t_a6328bfa1d1216 69,71-80,155,161-173,221,223-244,246-263
+apps/construction-management/app/api/construction/reporting/downloads/download-models.ts
+  s_9b8b004c55c7f2::t_16d3c0b776f7bc 25,82-94
+apps/construction-management/app/api/construction/reporting/downloads/download-sources.ts
+  s_9b8b004c55c7f2::t_a4fecd0b2cf2f6 21,129-186,192
+apps/construction-management/app/api/construction/reporting/downloads/downloads.http.test.ts
+  s_9b8b004c55c7f2::t_0ba4105b3d649a 119-120
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-models.ts
+  s_9b8b004c55c7f2::t_ac3a769998db4c 1-59
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-openapi.ts
+  s_9b8b004c55c7f2::t_f6bb9404bdc1de 1-36
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options.http.test.ts
+  s_9b8b004c55c7f2::t_e0391f10db7337 1-157
+apps/construction-management/app/api/construction/reporting/filter-options/route.ts
+  s_9b8b004c55c7f2::t_bc0c46b598df96 1-66
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_9b8b004c55c7f2::t_43b32383491f99 115-122
+apps/construction-management/app/api/construction/reporting/reports/procurement-reports.http.test.ts
+  s_9b8b004c55c7f2::t_910f327825bc16 1-837
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_9b8b004c55c7f2::t_a91b8e2c6ca60e 46-65,102,104,218-280,327-336,370-379,430-475
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_9b8b004c55c7f2::t_a5892a478b880c 21-22,24,56-67,70,74-79,166-252,256-310,354-359,366-367,393
+apps/construction-management/app/app/masters/page.tsx
+  s_9b8b004c55c7f2::t_1147497b01cd75 15,24-28
+apps/construction-management/app/app/masters/settings/backup/page.tsx
+  s_9b8b004c55c7f2::t_4bab112d5ecd73 1-9
+apps/construction-management/app/app/masters/settings/company/page.tsx
+  s_9b8b004c55c7f2::t_053952d2092f7a 1-9
+apps/construction-management/app/app/profile/page.tsx
+  s_9b8b004c55c7f2::t_1d71b0ab2b4c8f 4-6,11-26
+apps/construction-management/app/app/workspace/central-reports/page.tsx
+  s_9b8b004c55c7f2::t_1d06d16501bfa4 1-18
+apps/construction-management/app/app/workspace/page.tsx
+  s_9b8b004c55c7f2::t_b9627c21bec1d3 10-16,22
+apps/construction-management/components/account/action-code-step.tsx
+  s_9b8b004c55c7f2::t_3159ecf2d9e8da 1-116
+apps/construction-management/components/account/company-ownership-screen.stories.tsx
+  s_9b8b004c55c7f2::t_cbbccc9c436799 1-205
+apps/construction-management/components/account/company-ownership-screen.tsx
+  s_9b8b004c55c7f2::t_96d3a205381067 1-197
+apps/construction-management/components/account/delete-account-dialog.tsx
+  s_9b8b004c55c7f2::t_121e31a13f7ee7 1-227
+apps/construction-management/components/account/delete-company-dialog.tsx
+  s_9b8b004c55c7f2::t_f59a1f11a4dce5 1-157
+apps/construction-management/components/account/reveal-code-dialog.tsx
+  s_9b8b004c55c7f2::t_ecfc52a05e6699 1-105
+apps/construction-management/components/account/transfer-ownership-dialog.tsx
+  s_9b8b004c55c7f2::t_37c45893afcd74 1-186
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_9b8b004c55c7f2::t_7812b9760fcccd 35,137
+apps/construction-management/components/app-shell/company-deletion-banner.stories.tsx
+  s_9b8b004c55c7f2::t_da3af2762380e0 1-94
+apps/construction-management/components/app-shell/company-deletion-banner.tsx
+  s_9b8b004c55c7f2::t_f8d81ee68a7443 1-57
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_9b8b004c55c7f2::t_aea75ca13effeb 11-16,41-42,48-53
+apps/construction-management/components/app-shell/workspace-index.tsx
+  s_9b8b004c55c7f2::t_8dca0596d7bab4 6,15-17,23,28,53-57
+apps/construction-management/components/app-shell/workspace-nav-menu.tsx
+  s_9b8b004c55c7f2::t_c9f806d1408d98 3,35-43,48-49,54-58
+apps/construction-management/components/backups/backup-dialog.stories.tsx
+  s_9b8b004c55c7f2::t_80c6a4fd5dcc8b 1-283
+apps/construction-management/components/backups/backup-dialog.tsx
+  s_9b8b004c55c7f2::t_b86351516d430b 1-329
+apps/construction-management/components/backups/backup-fixtures.ts
+  s_9b8b004c55c7f2::t_836ec1f3433b44 1-90
+apps/construction-management/components/backups/backup-module-picker.tsx
+  s_9b8b004c55c7f2::t_671bd61e01dc22 1-133
+apps/construction-management/components/backups/backup-progress.tsx
+  s_9b8b004c55c7f2::t_5626dcc2e10dc8 1-106
+apps/construction-management/components/backups/company-backup-screen.stories.tsx
+  s_9b8b004c55c7f2::t_f1b47e1132a642 1-209
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_9b8b004c55c7f2::t_333d42001b282e 1-331
+apps/construction-management/components/backups/download-my-data.stories.tsx
+  s_9b8b004c55c7f2::t_22586f5b366805 1-117
+apps/construction-management/components/backups/download-my-data.tsx
+  s_9b8b004c55c7f2::t_923de17fe9a625 1-131
+apps/construction-management/components/backups/masters-backup-button.tsx
+  s_9b8b004c55c7f2::t_5a6cc6e01c020e 1-33
+apps/construction-management/components/downloads/download-fixtures.ts
+  s_9b8b004c55c7f2::t_344a36412ac2b4 14,115-209
+apps/construction-management/components/downloads/download-row.tsx
+  s_9b8b004c55c7f2::t_362d74286f6b17 24-25,28-39,98,119-123,125-127
+apps/construction-management/components/downloads/downloads-page.stories.tsx
+  s_9b8b004c55c7f2::t_441d5ffe772db4 8-11,13,297-349
+apps/construction-management/components/my-profile/my-profile-form.stories.tsx
+  s_9b8b004c55c7f2::t_e8298573379c1c 2,360-427
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_9b8b004c55c7f2::t_57294d8b283b3d 16-19,148-159,328,349,354-364
+apps/construction-management/components/notifications/ready-download-toast.tsx
+  s_9b8b004c55c7f2::t_e33cf538808c78 18-19,62-76,79-81,88-104
+apps/construction-management/components/profile/devices-section.stories.tsx
+  s_9b8b004c55c7f2::t_d7b8185b75b6e8 1-192
+apps/construction-management/components/profile/devices-section.tsx
+  s_9b8b004c55c7f2::t_b9684de184ae31 1-213
+apps/construction-management/components/profile/privacy-section.stories.tsx
+  s_9b8b004c55c7f2::t_64dcf6381c628a 1-235
+apps/construction-management/components/profile/privacy-section.tsx
+  s_9b8b004c55c7f2::t_8f385cbbd2151c 1-100
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_9b8b004c55c7f2::t_51f4e8b33899fb 186-237
+apps/construction-management/components/projects/project-shell.tsx
+  s_9b8b004c55c7f2::t_81550e339252e4 28-29,35,39-40,42-50,94-101,120-128,192-194
+apps/construction-management/components/reports/central-reports-page.stories.tsx
+  s_9b8b004c55c7f2::t_32c80d0e61568d 1-261
+apps/construction-management/components/reports/central-reports-page.tsx
+  s_9b8b004c55c7f2::t_fa6fdd05735366 1-167
+apps/construction-management/components/reports/central-reports-workspace-tile.tsx
+  s_9b8b004c55c7f2::t_d25080324a3692 1-36
+apps/construction-management/components/reports/report-card.tsx
+  s_9b8b004c55c7f2::t_5359a39db29ecf 26-27,35,37-38,40,42,44,143-160,163,171-172,177-178,194-207,268-344,361,364,371-376,393-394,408,410-422,431,433-434,547,566-627
+apps/construction-management/components/reports/report-catalogue.ts
+  s_9b8b004c55c7f2::t_37d36930b3e611 33-128
+apps/construction-management/components/reports/report-fixtures.ts
+  s_9b8b004c55c7f2::t_9e480baae45c85 211-256
+apps/construction-management/components/reports/report-pickers.ts
+  s_9b8b004c55c7f2::t_88f8ee03246ea5 1-57
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_9b8b004c55c7f2::t_71feb54c1c60b9 30-33,793-947
+apps/construction-management/components/reports/reports-page.tsx
+  s_9b8b004c55c7f2::t_eccd2b7ca9529a 28,31,120,126,130-131,161,180,200-201,236
+apps/construction-management/docs/modules/01-organization-identity-access.md
+  s_9b8b004c55c7f2::t_1a1b6c443b9c30 636-648
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_4bcc6d175f3492 495-525
+apps/construction-management/docs/prd/handoff/M9.md
+  s_9b8b004c55c7f2::t_734b6874d7f971 1-108
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_8538e03e5e5578 900,903-904,968-974,1021-1027,1045-1054
+apps/construction-management/lib/app-nav.ts
+  s_9b8b004c55c7f2::t_9808470a81f4c0 27
+apps/construction-management/lib/settings-nav.ts
+  s_9b8b004c55c7f2::t_eb4fe8ed48b7ec 2,4,46-59
+apps/construction-management/src/composition/account.ts
+  s_9b8b004c55c7f2::t_13fee09fe59704 1-14
+apps/construction-management/src/composition/backup-jobs.ts
+  s_9b8b004c55c7f2::t_18b66b111c0497 1-169
+apps/construction-management/src/composition/backup-sources.ts
+  s_9b8b004c55c7f2::t_31cc4bb9989b8d 1-2353
+apps/construction-management/src/composition/company-purge.http.test.ts
+  s_9b8b004c55c7f2::t_e253c956deae1f 1-273
+apps/construction-management/src/composition/company-purge.ts
+  s_9b8b004c55c7f2::t_1b5121fd7864c4 1-301
+apps/construction-management/src/composition/finance-author-names.ts
+  s_9b8b004c55c7f2::t_5d60d8b4e89d52 1,4,16
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_9b8b004c55c7f2::t_e3513ac8b89447 8,31-34,61
+apps/construction-management/src/composition/procurement-report-source.ts
+  s_9b8b004c55c7f2::t_9f70b19c898699 1-650
+apps/construction-management/src/composition/push-subscriptions.ts
+  s_9b8b004c55c7f2::t_9c7ab6ef284126 1-65
+apps/construction-management/src/composition/queue.ts
+  s_9b8b004c55c7f2::t_f9d0769fd6d3fb 24-27,55-58,75-78
+apps/construction-management/src/composition/report-filter-options.ts
+  s_9b8b004c55c7f2::t_d5e89b399633bb 1-152
+apps/construction-management/src/composition/report-jobs.ts
+  s_9b8b004c55c7f2::t_af9b7ee3e9171b 4,15,35,47-48
+apps/construction-management/src/composition/site-work-author-names.ts
+  s_9b8b004c55c7f2::t_ef424a1ea610cb 1,4,16
+apps/construction-management/src/composition/tracking-directory.ts
+  s_9b8b004c55c7f2::t_2f71e2a465bd12 14,306-313
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_9b8b004c55c7f2::t_2553a3b6f286f8 142-155
+apps/construction-management/src/messaging/application/listeners.test.ts
+  s_9b8b004c55c7f2::t_9b1a7c24e7661d 451-515
+apps/construction-management/src/messaging/application/listeners.ts
+  s_9b8b004c55c7f2::t_16dbeb1cdafa88 21,150-151,662-664,666-671,683-684,694-734
+apps/construction-management/src/organization/application/account-deletion-handlers.ts
+  s_9b8b004c55c7f2::t_c1173289d01642 1-127
+apps/construction-management/src/organization/application/company-deletion-handlers.ts
+  s_9b8b004c55c7f2::t_d4f9df0c87d695 1-122
+apps/construction-management/src/organization/application/device-handlers.ts
+  s_9b8b004c55c7f2::t_7d763df43fa79b 1-103
+apps/construction-management/src/organization/application/my-profile-handlers.ts
+  s_9b8b004c55c7f2::t_6d675e5179c49e 150
+apps/construction-management/src/organization/application/ownership-handlers.ts
+  s_9b8b004c55c7f2::t_3925a817adccbe 1-169
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_9b8b004c55c7f2::t_6d999008c33b58 473-474
+apps/construction-management/src/organization/domain/company-deletion.test.ts
+  s_9b8b004c55c7f2::t_ca9b70f4192a7e 1-59
+apps/construction-management/src/organization/domain/company-deletion.ts
+  s_9b8b004c55c7f2::t_79ca4da4bd0b6c 1-119
+apps/construction-management/src/organization/domain/team-member.test.ts
+  s_9b8b004c55c7f2::t_240734bf69b625 172-241
+apps/construction-management/src/organization/domain/team-member.ts
+  s_9b8b004c55c7f2::t_fce5c4ccb930e1 385-464
+apps/construction-management/src/organization/domain/user-agent.test.ts
+  s_9b8b004c55c7f2::t_c0ec92a4cffadf 1-65
+apps/construction-management/src/organization/domain/user-agent.ts
+  s_9b8b004c55c7f2::t_14026004d9cdaa 1-60
+apps/construction-management/src/organization/infrastructure/auth-account-directories.ts
+  s_9b8b004c55c7f2::t_a81f50cb0b7368 1-21
+apps/construction-management/src/organization/infrastructure/create-account-handlers.ts
+  s_9b8b004c55c7f2::t_9af4e419561f46 1-69
+apps/construction-management/src/organization/infrastructure/prisma-account-deletion-store.ts
+  s_9b8b004c55c7f2::t_f3a5147ce46623 1-55
+apps/construction-management/src/organization/infrastructure/prisma-company-deletion-store.ts
+  s_9b8b004c55c7f2::t_ee8f8429f26a12 1-85
+apps/construction-management/src/organization/infrastructure/prisma-ownership-transfer-store.ts
+  s_9b8b004c55c7f2::t_9549329582d15c 1-36
+apps/construction-management/src/organization/infrastructure/storage-meter.ts
+  s_9b8b004c55c7f2::t_f8c79105c92728 3-4,12,35-36
+apps/construction-management/src/procurement/infrastructure/document-thread-store.ts
+  s_9b8b004c55c7f2::t_32a63c2da0b532 18,285
+apps/construction-management/src/projects/infrastructure/prisma-uploader-names.ts
+  s_9b8b004c55c7f2::t_9e45a03c14e57b 1,4,19
+apps/construction-management/src/queries/account.ts
+  s_9b8b004c55c7f2::t_1f140d67acc9f6 1-132
+apps/construction-management/src/queries/backups.ts
+  s_9b8b004c55c7f2::t_b7048108920e5a 1-90
+apps/construction-management/src/queries/report-filter-options.ts
+  s_9b8b004c55c7f2::t_208b3ffd1775c7 1-36
+apps/construction-management/src/reporting/application/backup-access.test.ts
+  s_9b8b004c55c7f2::t_31dfbc084b0433 1-151
+apps/construction-management/src/reporting/application/backup-access.ts
+  s_9b8b004c55c7f2::t_4786fba9d5e52e 1-150
+apps/construction-management/src/reporting/application/backup-handlers.ts
+  s_9b8b004c55c7f2::t_cd5e4e92a9b97a 1-193
+apps/construction-management/src/reporting/application/backup-ports.ts
+  s_9b8b004c55c7f2::t_5841fc4c006f0b 1-165
+apps/construction-management/src/reporting/application/backup-queue.ts
+  s_9b8b004c55c7f2::t_e320cf6945a270 1-487
+apps/construction-management/src/reporting/application/build-procurement-report.ts
+  s_9b8b004c55c7f2::t_74812d40ce29db 1-237
+apps/construction-management/src/reporting/application/build-report.ts
+  s_9b8b004c55c7f2::t_73807e791eb5ef 30-35,39,71,145-167,193-194,207,226-227,232-235
+apps/construction-management/src/reporting/application/ports.ts
+  s_9b8b004c55c7f2::t_e2bedcef3dc0ab 18-29,178-191,405-505
+apps/construction-management/src/reporting/application/report-access.test.ts
+  s_9b8b004c55c7f2::t_dbc867a0217796 36-37,49,55-59,119-168
+apps/construction-management/src/reporting/application/report-access.ts
+  s_9b8b004c55c7f2::t_56baf60a941fb6 26-47,54,60,67,74-76,89
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_9b8b004c55c7f2::t_b3f2255f37689f 179-180
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_9b8b004c55c7f2::t_ec57b353707712 32,100-101,200
+apps/construction-management/src/reporting/domain/backup-csv.test.ts
+  s_9b8b004c55c7f2::t_4958899b814ae9 1-94
+apps/construction-management/src/reporting/domain/backup-csv.ts
+  s_9b8b004c55c7f2::t_d5810f2a6be6e3 1-234
+apps/construction-management/src/reporting/domain/backup-job.ts
+  s_9b8b004c55c7f2::t_c0e8e080934459 1-220
+apps/construction-management/src/reporting/domain/backup-link.test.ts
+  s_9b8b004c55c7f2::t_9bc49386728bf4 1-92
+apps/construction-management/src/reporting/domain/backup-link.ts
+  s_9b8b004c55c7f2::t_6863fdcf9001be 1-89
+apps/construction-management/src/reporting/domain/backup-manifest.ts
+  s_9b8b004c55c7f2::t_1b732cb85a777f 1-89
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_9b8b004c55c7f2::t_d00b8ea63fdeff 1-495
+apps/construction-management/src/reporting/domain/central-labour-attendance-report.test.ts
+  s_9b8b004c55c7f2::t_a3777b302c6acf 1-106
+apps/construction-management/src/reporting/domain/central-labour-attendance-report.ts
+  s_9b8b004c55c7f2::t_6016987a220ee6 1-147
+apps/construction-management/src/reporting/domain/events.ts
+  s_9b8b004c55c7f2::t_9b5d68ffc3f376 26-49
+apps/construction-management/src/reporting/domain/procurement-reports.test.ts
+  s_9b8b004c55c7f2::t_c88e2900e79cb6 1-330
+apps/construction-management/src/reporting/domain/procurement-reports.ts
+  s_9b8b004c55c7f2::t_15e2b60d0caa68 1-731
+apps/construction-management/src/reporting/domain/report-catalogue.test.ts
+  s_9b8b004c55c7f2::t_c2f3110af68f18 93-98,118-189,206-207
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_9b8b004c55c7f2::t_e8ce4566877102 57-62,79-87,116-123,134-137,228,252,264,330,353,513,538,561,572-574,578,580-585,594-600,602,607,609-614,620-622,625,627,632-640,651,656,658-663,672,674,679,681-686,695-700,702
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_9b8b004c55c7f2::t_154393a35e1ec1 101-126,275-327,388-395
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_9b8b004c55c7f2::t_5b6bb8d3e18e41 9,47-48,81
+apps/construction-management/src/reporting/infrastructure/prisma-backup-job-store.ts
+  s_9b8b004c55c7f2::t_352ef421ae0b6a 1-342
+apps/construction-management/src/reporting/infrastructure/prisma-report-source.ts
+  s_9b8b004c55c7f2::t_329d7bceca54b8 15,132-141,145,158,265-284
+apps/construction-management/src/reporting/infrastructure/zip-archiver.ts
+  s_9b8b004c55c7f2::t_d0163c922a6450 1-131
+apps/construction-management/src/shared-kernel/action-code-rules.test.ts
+  s_9b8b004c55c7f2::t_4bf85a9639755f 1-131
+apps/construction-management/src/shared-kernel/action-code-rules.ts
+  s_9b8b004c55c7f2::t_0490ebcaf88907 1-185
+apps/construction-management/src/shared-kernel/action-codes.ts
+  s_9b8b004c55c7f2::t_f2ed832889dab4 1-319
+apps/construction-management/src/shared-kernel/company-deletion.ts
+  s_9b8b004c55c7f2::t_581d23f7803494 1-35
+apps/construction-management/src/shared-kernel/domain-error.ts
+  s_9b8b004c55c7f2::t_59c16a163b49db 4-5,8
+apps/construction-management/src/shared-kernel/files/stored-files.ts
+  s_9b8b004c55c7f2::t_d638b26722c956 55-61,67-71
+apps/construction-management/src/shared-kernel/user-names.ts
+  s_9b8b004c55c7f2::t_9f32c94192e7ac 1-56
+apps/construction-management/test/accounts.ts
+  s_9b8b004c55c7f2::t_92ad65b0f2b3e6 1-205
+apps/construction-management/test/procurement-reports.ts
+  s_9b8b004c55c7f2::t_602c92806132a9 1-231
+packages/auth/src/construction/server/accounts.ts
+  s_9b8b004c55c7f2::t_c44d3894bac6b7 1-160
+packages/auth/src/construction/server/companies.ts
+  s_9b8b004c55c7f2::t_e21b0cf949b622 3,121-204
+packages/auth/src/construction/server/index.ts
+  s_9b8b004c55c7f2::t_764ab4b5950b3b 6-11,42
+packages/email-templates/src/emails/construction/backup-ready.tsx
+  s_9b8b004c55c7f2::t_c50c6f2142fbc7 1-87
+packages/email-templates/src/emails/construction/company-code.tsx
+  s_9b8b004c55c7f2::t_3644e16db37ef3 7-8,14-18,35-39,47,50-53,59
+packages/email-templates/src/index.ts
+  s_9b8b004c55c7f2::t_f8e181fb290662 27-30,58-61,109-111,126-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "207995fa8b244bb07448f585ea174f70aac2bee0",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
