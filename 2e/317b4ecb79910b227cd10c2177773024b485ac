@@ -1,0 +1,25 @@
+apps/construction-management/app/api/construction/messaging/messaging.http.test.ts
+  s_9b8b004c55c7f2::t_e0b35397601222 1-760
+apps/construction-management/src/messaging/application/listeners.test.ts
+  s_9b8b004c55c7f2::t_9b4c81a29e7794 1-457
+apps/construction-management/src/messaging/application/push-delivery.test.ts
+  s_9b8b004c55c7f2::t_32f697ac541b87 1-157
+apps/construction-management/src/messaging/domain/notification.test.ts
+  s_9b8b004c55c7f2::t_a762e7bd22aa59 1-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2e317b4ecb79910b227cd10c2177773024b485ac",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
