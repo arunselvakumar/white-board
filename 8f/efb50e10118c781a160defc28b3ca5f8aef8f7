@@ -1,0 +1,29 @@
+apps/construction-management/components/account/action-code-step.tsx
+  s_9b8b004c55c7f2::t_ceaccb49c4382a 78
+apps/construction-management/components/account/company-ownership-screen.stories.tsx
+  s_9b8b004c55c7f2::t_000f0bc52b907e 1-201
+apps/construction-management/components/app-shell/company-deletion-banner.stories.tsx
+  s_9b8b004c55c7f2::t_b14bdcdfa24a06 1-94
+apps/construction-management/components/my-profile/my-profile-form.stories.tsx
+  s_9b8b004c55c7f2::t_924ab8c2737146 2,360-427
+apps/construction-management/components/profile/devices-section.stories.tsx
+  s_9b8b004c55c7f2::t_90a61bda800bca 1-192
+apps/construction-management/components/profile/privacy-section.stories.tsx
+  s_9b8b004c55c7f2::t_be4b572f7cbcca 1-235
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8fefb50e10118c781a160defc28b3ca5f8aef8f7",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
