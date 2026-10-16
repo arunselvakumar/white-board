@@ -14,6 +14,8 @@ import {
 } from "../../report-models";
 
 export const dynamic = "force-dynamic";
+/** A report runs after the response, in this invocation (ADR CM-0021 §1). */
+export const maxDuration = 300;
 
 /**
  * Streams a done report's Excel or PDF from private storage (CM-217),

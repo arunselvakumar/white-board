@@ -17,7 +17,11 @@ import {
   type ReportKind,
   type ReportParams,
 } from "../domain/report-job";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
+
+import type { ReportFinished } from "../domain/events";
 import { buildReportDocument } from "./build-report";
+import { stalledReports } from "./report-queue";
 import type {
   DprRenderer,
   DprSource,
@@ -52,9 +56,19 @@ type Clock = () => Date;
  * writes nothing once aborted.
  */
 export type ReportExecutor = {
+  /**
+   * `resume` runs a job a crashed attempt left running (the queue's retry);
+   * otherwise only a queued job runs.
+   */
   execute(
     job: Pick<ReportJob, "id" | "workspaceId">,
     signal?: AbortSignal,
+    options?: { resume?: boolean },
+  ): Promise<void>;
+  /** Fails a queued or running job with a message a screen can show. */
+  fail(
+    job: Pick<ReportJob, "id" | "workspaceId">,
+    message: string,
   ): Promise<void>;
   /** Fails a job that ran past `limitMs` with a message a screen can show. */
   timeOut(
@@ -88,9 +102,45 @@ export function createReportExecutor(deps: {
     taskProgress: TaskProgressSource;
     render: DprRenderer;
   };
+  /** Raises `ReportFinished` after a job is done or failed (CM-904). */
+  events?: EventDispatcher;
   clock?: Clock;
 }): ReportExecutor {
   const clock = deps.clock ?? (() => new Date());
+
+  async function finished(
+    job: ReportJob,
+    outcome: {
+      status: "done" | "failed";
+      fileName: string | null;
+      error: string | null;
+    },
+  ): Promise<void> {
+    if (deps.events == null) return;
+    const event: ReportFinished = {
+      type: "ReportFinished",
+      workspaceId: job.workspaceId,
+      occurredAt: clock(),
+      reportJobId: job.id,
+      kind: job.kind,
+      projectId: job.projectId,
+      requestedBy: job.requestedBy,
+      ...outcome,
+    };
+    try {
+      await deps.events.dispatch([event]);
+    } catch (error) {
+      console.error(`ReportFinished for ${job.id} was not delivered`, error);
+    }
+  }
+
+  /** Fails a job and tells its requester, once. */
+  async function failJob(id: string, workspaceId: string, message: string) {
+    if (!(await deps.store.markFailed(id, message, clock()))) return;
+    const job = await deps.store.get(workspaceId, id);
+    if (job != null)
+      await finished(job, { status: "failed", fileName: null, error: message });
+  }
 
   async function produce(job: ReportJob): Promise<ReportOutput> {
     const params = job.params;
@@ -132,7 +182,9 @@ export function createReportExecutor(deps: {
   }
 
   return {
-    async execute({ id, workspaceId }, signal) {
+    async execute({ id, workspaceId }, signal, options = {}) {
+      if (options.resume === true)
+        await deps.store.requeueRunning(workspaceId, id);
       const job = await deps.store.get(workspaceId, id);
       if (job?.status !== "queued") return;
       await deps.store.markRunning(id, clock());
@@ -165,27 +217,38 @@ export function createReportExecutor(deps: {
         );
         // Timed out or deleted while it ran: keep nothing.
         if (!done) await discard();
+        else
+          await finished(job, {
+            status: "done",
+            fileName: output.fileName,
+            error: null,
+          });
       } catch (error) {
         console.error(`Report job ${id} failed`, error);
         await discard();
         if (signal?.aborted !== true)
-          await deps.store.markFailed(id, failureMessage(error), clock());
+          await failJob(id, workspaceId, failureMessage(error));
       }
     },
 
-    async timeOut({ id }, limitMs) {
-      await deps.store.markFailed(
+    async fail({ id, workspaceId }, message) {
+      await failJob(id, workspaceId, message);
+    },
+
+    async timeOut({ id, workspaceId }, limitMs) {
+      await failJob(
         id,
+        workspaceId,
         failureMessage(new ReportTimedOut(limitMs)),
-        clock(),
       );
     },
   };
 }
 
 /**
- * A runner that runs the job before `enqueue` returns (M2), stopping it
- * after `timeLimitMs` (60 s, CM-0016 §15): the job is marked failed with a
+ * A runner that runs the job before `enqueue` returns, stopping it after
+ * `timeLimitMs` (CM-0016 §15). Unit tests use it; the app runs jobs on the
+ * queue (`report-queue.ts`, ADR CM-0021 §1): the job is marked failed with a
  * message and the run is aborted, so it writes no files when it ends.
  */
 export function inlineReportRunner(
@@ -230,6 +293,9 @@ export type RequestReport = {
 
 export type ReportDownload = StoredObject & { fileName: string };
 
+/** A requester's limit of reports queued or running at once (CM-0021 §1). */
+export const MAX_UNFINISHED_REPORTS = 5;
+
 /** Report jobs: request, read, list and download (CM-217). */
 export function createReportHandlers(deps: {
   store: ReportJobStore;
@@ -254,12 +320,20 @@ export function createReportHandlers(deps: {
 
     /**
      * Enqueues a job and hands it to the runner; returns the job as it
-     * stands afterwards (done or failed with the inline runner, queued
-     * with a real queue).
+     * stands afterwards: queued in a request (the run starts after the
+     * response), done or failed outside one (tests).
      */
     async request(input: RequestReport): Promise<ReportJob> {
       checkReportScope(input.params.kind, input.projectId);
       const params = checkReportParams(input.params);
+      if (
+        (await deps.store.countUnfinished(input.workspaceId, input.userId)) >=
+        MAX_UNFINISHED_REPORTS
+      )
+        throw conflict(
+          "TOO_MANY_REPORTS",
+          "Wait for one of your reports to finish.",
+        );
       if (
         input.projectId != null &&
         !(await deps.projects.exists(input.workspaceId, input.projectId))
@@ -298,6 +372,16 @@ export function createReportHandlers(deps: {
     ): Promise<ReportJob[]> {
       if (filter.kinds.length === 0) return [];
       return deps.store.list(workspaceId, { ...filter, limit: 50 });
+    },
+
+    /**
+     * Nudges jobs a polling screen found stuck (queued over 15 s, or
+     * running past their limit): hands them to the runner again, which
+     * the queue deduplicates, and so starts a drain.
+     */
+    async heal(jobs: readonly ReportJob[], limitMs?: number): Promise<void> {
+      for (const job of stalledReports(jobs, clock(), limitMs))
+        await deps.runner.enqueue(job);
     },
 
     /**

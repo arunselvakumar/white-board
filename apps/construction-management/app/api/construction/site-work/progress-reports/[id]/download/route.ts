@@ -8,6 +8,8 @@ import {
 import { ConstructionSiteWorkProgressReportParamsModel } from "../../progress-report-models";
 
 export const dynamic = "force-dynamic";
+/** A report runs after the response, in this invocation (ADR CM-0021 §1). */
+export const maxDuration = 300;
 
 /**
  * Streams a done Daily Progress Report's PDF from private storage (it has

@@ -72,6 +72,14 @@ export const REPORT_MENU: Record<ReportKind, MenuKey> = {
   issue_snag_report: "tracking.issues",
   inspection_request_report: "tracking.inspection_requests",
   task_progress_report: "site_work.progress_reports",
+  // Procurement and central labour reports (CM-903): each under its
+  // module's menu, the Stock Register under Current Inventory.
+  purchase_requests: "procurement.purchase_requests",
+  purchase_orders: "procurement.purchase_orders",
+  material_received: "procurement.material_received",
+  material_transfers: "procurement.material_transfers",
+  stock_register: "procurement.current_inventory",
+  labour_attendance_central: "labour.labour",
 };
 
 function scope(projectId: string | null) {

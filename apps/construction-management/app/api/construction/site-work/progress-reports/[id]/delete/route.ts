@@ -10,6 +10,8 @@ import {
 import { ConstructionSiteWorkProgressReportParamsModel } from "../../progress-report-models";
 
 export const dynamic = "force-dynamic";
+/** A report runs after the response, in this invocation (ADR CM-0021 §1). */
+export const maxDuration = 300;
 
 /**
  * Deletes a Daily Progress Report and its PDF. The date keeps its DPR

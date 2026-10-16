@@ -31,6 +31,13 @@ export const REPORT_KINDS = [
   "issue_snag_report",
   "inspection_request_report",
   "task_progress_report",
+  // Procurement and central labour reports (CM-903).
+  "purchase_requests",
+  "purchase_orders",
+  "material_received",
+  "material_transfers",
+  "stock_register",
+  "labour_attendance_central",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -62,6 +69,13 @@ export const REPORT_TITLES: Record<ReportKind, string> = {
   issue_snag_report: "Issue & Snag Report",
   inspection_request_report: "Inspection Request Report",
   task_progress_report: "Task Progress Report",
+  // Procurement and central labour reports (CM-903).
+  purchase_requests: "Purchase Requests",
+  purchase_orders: "Purchase Orders",
+  material_received: "Material Received",
+  material_transfers: "Material Transfers",
+  stock_register: "Stock Register",
+  labour_attendance_central: "Central Labour Attendance",
 };
 
 /**
@@ -259,7 +273,8 @@ export type ReportParams =
   | { kind: "inspection_request_report"; from: string; to: string }
   | { kind: "task_progress_report"; from: string; to: string };
 
-export type JobStatus = "queued" | "running" | "done" | "failed";
+/** `expired`: retention deleted its files after 30 days (CM-0021 §3). */
+export type JobStatus = "queued" | "running" | "done" | "failed" | "expired";
 
 /** A requested report and, once done, its files (CM-217). */
 export type ReportJob = {
@@ -435,8 +450,8 @@ export function failureMessage(error: unknown): string {
   return "The report could not be generated. Try again; if it keeps failing, contact support.";
 }
 
-/** How long a job may run inline before it is stopped (CM-0016 §15). */
-export const REPORT_TIME_LIMIT_MS = 60_000;
+/** How long a report job may run before it is stopped (CM-0021 §1). */
+export const REPORT_TIME_LIMIT_MS = 240_000;
 
 /** A job that ran past its time limit; its message is shown on screen. */
 export class ReportTimedOut extends Error {

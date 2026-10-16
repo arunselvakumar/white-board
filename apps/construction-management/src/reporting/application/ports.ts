@@ -83,6 +83,13 @@ export type ReportJobStore = {
   /** A failed job back to queued (Retry); false when it is not failed. */
   requeue(workspaceId: string, id: string): Promise<boolean>;
   /**
+   * A job left running by a run that crashed, back to queued so the
+   * queue's next attempt can run it; false when it is not running.
+   */
+  requeueRunning(workspaceId: string, id: string): Promise<boolean>;
+  /** How many of the requester's jobs are queued or running (CM-0021 §1). */
+  countUnfinished(workspaceId: string, requestedBy: string): Promise<number>;
+  /**
    * Deletes the job and stops counting its files as stored, with an audit
    * event, in one transaction. The caller deletes the objects after.
    */

@@ -1,5 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 
+import {
+  queueOpenApiComponents,
+  queueOpenApiOperations,
+} from "@/app/api/construction/queue/queue-openapi";
+
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
 import { CreateConstructionOrganizationCompanyRequestModel } from "@/app/api/construction/organization/companies/create-company-request-model";
@@ -952,6 +957,10 @@ openApiOperations.push(...financeOpenApiOperations);
 // The tracking context (M8) lists its own models and routes, one file per area.
 Object.assign(openApiComponents, trackingOpenApiComponents);
 openApiOperations.push(...trackingOpenApiOperations);
+
+// The kernel's job queue (M9, ADR CM-0021 §1).
+Object.assign(openApiComponents, queueOpenApiComponents);
+openApiOperations.push(...queueOpenApiOperations);
 
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);

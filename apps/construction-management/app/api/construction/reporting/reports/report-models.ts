@@ -240,7 +240,7 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     date: z.string().optional(),
     number: z.string().optional(),
   }),
-  status: z.enum(["queued", "running", "done", "failed"]),
+  status: z.enum(["queued", "running", "done", "failed", "expired"]),
   /** The files carry amounts; downloading them needs Financial. */
   includesMoney: z.boolean(),
   /** Why a failed report failed. */

@@ -724,4 +724,37 @@ describe("report jobs HTTP", () => {
     ])
       expect(document.components.schemas[name], name).toBeDefined();
   });
+
+  it("a requester may have five reports unfinished at once (ADR CM-0021 §1)", async () => {
+    const company = await ownerWithCompany("Five At Once Builders");
+    const projectId = await addProject(
+      company.workspaceId,
+      company.userId,
+      "Tower",
+    );
+    for (let i = 0; i < 5; i += 1)
+      await prisma.constructionReportingReportJob.create({
+        data: {
+          id: newId(),
+          workspaceId: company.workspaceId,
+          projectId,
+          kind: "labour_attendance",
+          params: {
+            kind: "labour_attendance",
+            from: "2026-08-01",
+            to: "2026-08-31",
+          },
+          status: i % 2 === 0 ? "queued" : "running",
+          includesMoney: false,
+          requestedBy: company.userId,
+        },
+      });
+    const refused = await request(company.cookie, {
+      kind: "labour_attendance",
+      projectId,
+      params: { from: "2026-08-01", to: "2026-08-31" },
+    });
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await errorCode(refused)).toBe("TOO_MANY_REPORTS");
+  });
 });

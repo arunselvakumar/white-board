@@ -43,7 +43,7 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   emergencyContact: z.string().nullable(),
   memberType: z.enum(["normal", "hrms"]),
   isOwner: z.boolean(),
-  status: z.enum(["joining_pending", "active", "rejected"]),
+  status: z.enum(["joining_pending", "active", "rejected", "left"]),
   mobileLocked: z
     .boolean()
     .describe(

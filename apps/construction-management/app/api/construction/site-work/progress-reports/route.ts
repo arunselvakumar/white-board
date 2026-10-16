@@ -13,6 +13,8 @@ import {
 } from "./progress-report-models";
 
 export const dynamic = "force-dynamic";
+/** A report runs after the response, in this invocation (ADR CM-0021 §1). */
+export const maxDuration = 300;
 
 /**
  * A Project's Daily Progress Reports, newest first (the latest 50), with

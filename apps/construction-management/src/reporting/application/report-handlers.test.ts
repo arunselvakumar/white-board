@@ -91,6 +91,22 @@ function memoryStore() {
       statuses.push("queued");
       return Promise.resolve(true);
     },
+    requeueRunning: (workspaceId, id) => {
+      const job = jobs.get(id);
+      if (job?.workspaceId !== workspaceId || job.status !== "running")
+        return Promise.resolve(false);
+      update(id, { status: "queued", startedAt: null });
+      return Promise.resolve(true);
+    },
+    countUnfinished: (workspaceId, requestedBy) =>
+      Promise.resolve(
+        [...jobs.values()].filter(
+          (job) =>
+            job.workspaceId === workspaceId &&
+            job.requestedBy === requestedBy &&
+            (job.status === "queued" || job.status === "running"),
+        ).length,
+      ),
     remove: (job) => {
       jobs.delete(job.id);
       return Promise.resolve();

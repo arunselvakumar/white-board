@@ -141,6 +141,24 @@ export function prismaReportJobStore(db: PrismaClient): ReportJobStore {
       return updated.count > 0;
     },
 
+    async requeueRunning(workspaceId, id) {
+      const updated = await db.constructionReportingReportJob.updateMany({
+        where: { id, workspaceId, status: "running" },
+        data: { status: "queued", startedAt: null },
+      });
+      return updated.count > 0;
+    },
+
+    countUnfinished(workspaceId, requestedBy) {
+      return db.constructionReportingReportJob.count({
+        where: {
+          workspaceId,
+          requestedBy,
+          status: { in: ["queued", "running"] },
+        },
+      });
+    },
+
     async remove(job, by, at) {
       await db.$transaction(async (tx) => {
         await tx.constructionReportingReportJob.deleteMany({
