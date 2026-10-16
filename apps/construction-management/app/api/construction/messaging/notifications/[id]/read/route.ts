@@ -22,13 +22,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionMessagingNotificationParamsModel.safeParse(
         await context.params,
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     return Response.json(
       toNotificationResponse(await notifications.markRead(session, id)),
     );

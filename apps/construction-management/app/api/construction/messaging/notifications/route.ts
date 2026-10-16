@@ -20,13 +20,13 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       ListConstructionMessagingNotificationsRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     const page = await notifications.list(session, {
       cursor: model.cursor ?? null,
       limit: model.limit,

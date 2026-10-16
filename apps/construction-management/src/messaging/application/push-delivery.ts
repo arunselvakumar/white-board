@@ -8,6 +8,7 @@ import type {
   PushSender,
   PushSubscriptionStore,
 } from "./ports";
+import { isPushServiceEndpoint } from "../domain/push-endpoint";
 
 /** The queue type of one notification's push (ADR CM-0021 §6). */
 export const PUSH_QUEUE_TYPE = "push";
@@ -79,6 +80,18 @@ export async function deliverPush(
   const gone: string[] = [];
   const sent: string[] = [];
   for (const subscription of subscriptions) {
+    // Stored before the endpoint check existed, or written another way:
+    // never post to a host that is not a browser push service.
+    if (!isPushServiceEndpoint(subscription.endpoint)) {
+      gone.push(subscription.id);
+      logs.push({
+        ...base,
+        status: "failed",
+        pushSubscriptionId: subscription.id,
+        error: "Not a browser push service; the subscription was removed.",
+      });
+      continue;
+    }
     const result = await deps.sender.send(subscription, payload);
     if (result.ok) {
       sent.push(subscription.id);
@@ -103,11 +116,21 @@ export async function deliverPush(
   return logs;
 }
 
+/** How long one push job may take: every device of one recipient. */
+export const PUSH_TIME_LIMIT_MS = 20_000;
+
+/**
+ * The budget of the drain started right after a notifying request. A
+ * drain claims a job only when the job's limit fits in what is left, so
+ * this must exceed `PUSH_TIME_LIMIT_MS`; it leaves room for two jobs.
+ */
+export const PUSH_DRAIN_BUDGET_MS = 2 * PUSH_TIME_LIMIT_MS + 5_000;
+
 /** The `push` queue handler: one job per notification. */
 export function pushQueueHandler(deps: PushDeliveryDeps): QueueHandler {
   return {
     type: PUSH_QUEUE_TYPE,
-    timeLimitMs: 30_000,
+    timeLimitMs: PUSH_TIME_LIMIT_MS,
     async run(job) {
       await deliverPush(deps, payloadOf(job.payload).notificationId);
     },

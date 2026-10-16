@@ -15,7 +15,10 @@ import type {
   PushSender,
   RecipientDirectory,
 } from "@/src/messaging/application/ports";
-import { pushQueueHandler } from "@/src/messaging/application/push-delivery";
+import {
+  PUSH_DRAIN_BUDGET_MS,
+  pushQueueHandler,
+} from "@/src/messaging/application/push-delivery";
 import { prismaNotificationStore } from "@/src/messaging/infrastructure/prisma-notification-store";
 import {
   prismaPreferenceStore,
@@ -143,7 +146,7 @@ export function createPushQueueHandler(
 
 /**
  * Sends new push jobs right after the response, in this invocation, with
- * a short budget. Outside a request (HTTP tests) nothing runs: the daily
+ * a short budget that still fits a push job's limit. Outside a request (HTTP tests) nothing runs: the daily
  * drain, or the test itself, drains them.
  */
 function kickPush(ids: readonly string[]): Promise<void> {
@@ -153,7 +156,7 @@ function kickPush(ids: readonly string[]): Promise<void> {
         await createQueueDrain({
           store: prismaQueueStore(prisma),
           handlers: [createPushQueueHandler()],
-        }).drain({ budgetMs: 25_000, ids });
+        }).drain({ budgetMs: PUSH_DRAIN_BUDGET_MS, ids });
       } catch (error) {
         console.error("Push drain failed", error);
       }

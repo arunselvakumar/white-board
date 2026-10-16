@@ -16,13 +16,13 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: Request): Promise<Response> {
   try {
+    const session = await requireUserSession(request);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       UpdateConstructionMessagingPreferencesRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireUserSession(request);
-    if (isResponse(session)) return session;
     return Response.json(
       toPreferencesResponse(
         await notifications.updatePreferences(

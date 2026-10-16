@@ -21,13 +21,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const { id } = parseOrThrow(
       ConstructionMessagingNotificationParamsModel.safeParse(
         await context.params,
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     await notifications.delete(session, id);
     return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {

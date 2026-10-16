@@ -44,7 +44,14 @@ export type NotificationListenerDeps = {
 /** Who a draft goes to, before the matrix check. */
 type Audience =
   /** Every holder of the menu's N flag and `flag` (on the Project). */
-  | { kind: "holders"; menu: MenuKey; flag: Flag; projectId: string | null }
+  | {
+      kind: "holders";
+      menu: MenuKey;
+      flag: Flag;
+      projectId: string | null;
+      /** Only the Owner may act on it (a Store's invoice settlement). */
+      ownerOnly?: boolean;
+    }
   /** These users only, if they hold N and `flag` (assignees, creators). */
   | {
       kind: "direct";
@@ -96,6 +103,7 @@ export class NotificationListeners implements DomainEventListener {
         projectId: audience.projectId,
         exceptUserId: plan.except,
         among,
+        ownerOnly: audience.kind === "holders" && audience.ownerOnly === true,
       });
     }
     await this.deps.notifier.notify(event.workspaceId, recipients, plan.draft);
@@ -351,6 +359,9 @@ export class NotificationListeners implements DomainEventListener {
           menu: document.menu,
           flag: "approve",
           projectId: event.projectId,
+          ownerOnly:
+            event.projectId == null &&
+            document.ownerOnlyWithoutProject === true,
         },
         except: event.submittedBy,
         draft: {

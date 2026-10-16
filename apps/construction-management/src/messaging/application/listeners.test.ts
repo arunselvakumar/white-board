@@ -201,6 +201,7 @@ describe("notification listeners (CM-904)", () => {
       projectId: PROJECT,
       exceptUserId: "creator",
       among: undefined,
+      ownerOnly: false,
     });
     expect(sent[0]?.draft).toMatchObject({
       type: "approval.requested",
@@ -208,6 +209,32 @@ describe("notification listeners (CM-904)", () => {
       title: "Purchase Request PR-0012 is waiting for your approval",
       href: `/app/projects/${PROJECT}/materials/purchase-requests/pr-1`,
     });
+  });
+
+  it("asks only the Owner about a Store's invoice settlement, which only the Owner may approve", async () => {
+    const { listeners, queries } = setup();
+    await listeners.handle(
+      event("document.submitted", {
+        documentType: "invoice_settlement",
+        documentId: "set-1",
+        projectId: null,
+        number: null,
+        submittedBy: "clerk",
+      }),
+    );
+    await listeners.handle(
+      event("document.submitted", {
+        documentType: "invoice_settlement",
+        documentId: "set-2",
+        projectId: PROJECT,
+        number: null,
+        submittedBy: "clerk",
+      }),
+    );
+    expect(queries.map((query) => [query.projectId, query.ownerOnly])).toEqual([
+      [null, true],
+      [PROJECT, false],
+    ]);
   });
 
   it("tells the creator (or employee) of a decision, with the reason for a rejection", async () => {

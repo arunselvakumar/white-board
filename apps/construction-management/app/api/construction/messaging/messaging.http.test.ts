@@ -401,7 +401,7 @@ describe("Notifications HTTP (CM-904)", () => {
     ]);
     ctx.as(me.userId);
     const endpoint = (name: string) =>
-      `https://push.example.test/${name}-${randomUUID()}`;
+      `https://fcm.googleapis.com/fcm/send/${name}-${randomUUID()}`;
     const live = endpoint("live");
     const gone = endpoint("gone");
     for (const url of [live, gone]) {
@@ -541,7 +541,7 @@ describe("Notifications HTTP (CM-904)", () => {
     const ctx = await setup();
     const me = await ctx.member("tracking.tasks", ["read"]);
     ctx.as(me.userId);
-    const url = `https://push.example.test/${randomUUID()}`;
+    const url = `https://fcm.googleapis.com/fcm/send/${randomUUID()}`;
     await subscribe(
       post("/push-subscriptions", {
         endpoint: url,
@@ -552,6 +552,19 @@ describe("Notifications HTTP (CM-904)", () => {
       post("/push-subscriptions", { endpoint: "not a url", keys: {} }),
     );
     expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
+    // Only a browser push service over HTTPS: never an address a user typed.
+    for (const endpoint of [
+      "https://169.254.169.254/latest/meta-data",
+      "http://fcm.googleapis.com/fcm/send/plain-http",
+    ]) {
+      const refused = await subscribe(
+        post("/push-subscriptions", {
+          endpoint,
+          keys: { p256dh: "k", auth: "a" },
+        }),
+      );
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    }
     expect(
       (await unsubscribe(post("/push-subscriptions/delete", { endpoint: url })))
         .status,

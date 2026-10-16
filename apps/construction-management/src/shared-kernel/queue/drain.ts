@@ -59,6 +59,21 @@ export function createQueueDrain(deps: {
     await handler.onGiveUp?.(job, message);
   }
 
+  async function completeAfterRun(job: QueueJob): Promise<void> {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        await deps.store.complete(job.id, clock());
+        return;
+      } catch (error) {
+        if (attempt === 2)
+          console.error(
+            `Queue job ${job.type} ${job.id} ran but was not marked done`,
+            error,
+          );
+      }
+    }
+  }
+
   return {
     /**
      * Drains until nothing is due or `budgetMs` is spent. `types` limits
@@ -107,11 +122,16 @@ export function createQueueDrain(deps: {
         }
         try {
           await runOne(handler, job);
-          await deps.store.complete(job.id, clock());
         } catch (error) {
           result.failed += 1;
           await fail(handler, job, error);
+          continue;
         }
+        // The work is done: a failure to record that is not a failure of
+        // the job, so it is never retried with backoff. Try once more; if
+        // the row still cannot be marked, it stays running until its lease
+        // passes and is logged here.
+        await completeAfterRun(job);
       }
     },
   };

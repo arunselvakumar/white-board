@@ -90,6 +90,11 @@ export type ApprovalDocument = {
   approverHref: (document: DocumentRef) => string | null;
   /** Where its creator (or the employee) reads the decision. */
   creatorHref: (document: DocumentRef) => string | null;
+  /**
+   * Without a Project (at a Store), only the Owner may approve it, so only
+   * the Owner is asked to.
+   */
+  ownerOnlyWithoutProject?: boolean;
 };
 
 function inProject(path: string) {
@@ -150,6 +155,8 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
     menu: "finance.parties",
     label: "Invoice settlement",
     ...same(projectPage("payments")),
+    // A Store's supplier invoices are the Owner's alone (`canOnPlace`).
+    ownerOnlyWithoutProject: true,
   },
   other_expense: {
     menu: "finance.other_expenses",

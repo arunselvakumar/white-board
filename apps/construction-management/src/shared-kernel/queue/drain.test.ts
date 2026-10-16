@@ -283,4 +283,39 @@ describe("createQueueDrain", () => {
     expect(rows[0]?.status).toBe("failed");
     expect(gaveUp).toEqual(["job-1"]);
   });
+
+  it("never retries a job that ran when marking it done fails", async () => {
+    const { store, rows } = memoryStore(() => new Date());
+    let runs = 0;
+    let completes = 0;
+    const flaky: QueueStore = {
+      ...store,
+      complete: (id, now) => {
+        completes += 1;
+        return completes === 1
+          ? Promise.reject(new Error("connection reset"))
+          : store.complete(id, now);
+      },
+    };
+    const handler: QueueHandler = {
+      type: "echo",
+      timeLimitMs: 1_000,
+      run: () => {
+        runs += 1;
+        return Promise.resolve();
+      },
+    };
+    await store.enqueue(
+      { type: "echo", workspaceId: null, payload: null },
+      new Date(),
+    );
+    const drain = createQueueDrain({ store: flaky, handlers: [handler] });
+
+    expect(await drain.drain({ budgetMs: 10_000 })).toEqual({
+      ran: 1,
+      failed: 0,
+    });
+    expect(runs).toBe(1);
+    expect(rows[0]?.status).toBe("done");
+  });
 });

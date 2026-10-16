@@ -20,6 +20,11 @@ export type NotificationRecipientsQuery = {
    * every member of the Company.
    */
   among?: readonly string[];
+  /**
+   * Only the Owner: for actions the matrix cannot grant anyone else, such
+   * as a Store's supplier invoices (`canOnPlace` in finance).
+   */
+  ownerOnly?: boolean;
 };
 
 /**
@@ -61,6 +66,7 @@ export async function notificationRecipients(
   const recipients = new Set<string>();
   for (const member of members) {
     if (member.userId == null || member.userId === query.exceptUserId) continue;
+    if (query.ownerOnly === true && !member.isOwner) continue;
     if (!member.isOwner) {
       const mask = member.permissions[0]?.flags ?? 0;
       if ((mask & needed) !== needed) continue;

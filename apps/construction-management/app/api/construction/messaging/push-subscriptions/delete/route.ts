@@ -11,13 +11,13 @@ export const dynamic = "force-dynamic";
 /** Turns notifications off on this device: removes the User's subscription. */
 export async function POST(request: Request): Promise<Response> {
   try {
+    const session = await requireUserSession(request);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       DeleteConstructionMessagingPushSubscriptionRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const session = await requireUserSession(request);
-    if (isResponse(session)) return session;
     await notifications.unsubscribe(session.userId, model.endpoint);
     return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {

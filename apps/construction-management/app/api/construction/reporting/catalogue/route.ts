@@ -28,13 +28,13 @@ const projects = prismaProjectLookup(prisma);
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const session = await requireReportSession(request);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       ListConstructionReportingCatalogueRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requireReportSession(request);
-    if (isResponse(session)) return session;
     const projectId = model.projectId ?? null;
     if (
       projectId != null &&

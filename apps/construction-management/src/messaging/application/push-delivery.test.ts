@@ -10,7 +10,11 @@ import type {
   PushSubscriptionRecord,
   PushSubscriptionStore,
 } from "./ports";
-import { deliverPush } from "./push-delivery";
+import {
+  deliverPush,
+  PUSH_DRAIN_BUDGET_MS,
+  PUSH_TIME_LIMIT_MS,
+} from "./push-delivery";
 
 const NOTIFICATION: NotificationRecord = {
   id: "n-1",
@@ -32,7 +36,7 @@ function subscription(id: string): PushSubscriptionRecord {
   return {
     id,
     userId: "user-1",
-    endpoint: `https://push.example/${id}`,
+    endpoint: `https://fcm.googleapis.com/fcm/send/${id}`,
     p256dh: "k",
     auth: "a",
   };
@@ -153,5 +157,11 @@ describe("push delivery (CM-904)", () => {
     expect(ctx.logs).toEqual([]);
     const gone = setup({ notification: null });
     expect(await gone.run()).toEqual([]);
+  });
+});
+
+describe("the push drain budget", () => {
+  it("fits a push job, so the drain after a request claims it", () => {
+    expect(PUSH_DRAIN_BUDGET_MS).toBeGreaterThan(PUSH_TIME_LIMIT_MS);
   });
 });

@@ -34,13 +34,13 @@ function newestFirst(
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const session = await requireReportSession(request);
+    if (isResponse(session)) return session;
     const model = parseOrThrow(
       ListConstructionReportingDownloadsRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const session = await requireReportSession(request);
-    if (isResponse(session)) return session;
     const before =
       model.cursor == null ? null : decodeDownloadCursor(model.cursor);
     if (model.cursor != null && before == null)

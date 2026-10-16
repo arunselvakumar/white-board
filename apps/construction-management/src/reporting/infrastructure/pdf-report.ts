@@ -465,6 +465,22 @@ function notoFace(noto: Awaited<ReturnType<typeof embedNotoText>>): Typeface {
   };
 }
 
+/**
+ * Whether any text would lose characters in the standard fonts: a name in
+ * an Indian script (the requester in the footer, a Labour, the Company)
+ * prints as "?" there, so such a report uses the Noto face instead.
+ */
+export function needsNoto(texts: readonly string[]): boolean {
+  return texts.some((text) =>
+    /[^\x20-\x7e\xa0-\xff]/.test(
+      text
+        .replace(/₹/g, "")
+        .replace(/[–—‘’“”]/g, "")
+        .replace(/\s/g, " "),
+    ),
+  );
+}
+
 /** Every string the document prints, so the Noto fonts it needs are embedded. */
 export function reportTexts(document: ReportDocument): string[] {
   const texts: string[] = [
@@ -519,7 +535,7 @@ export async function renderPdf(
   pdf.setAuthor(printable(document.header.company));
   pdf.setCreator("Construction Management");
   const face =
-    document.fonts === "noto"
+    document.fonts === "noto" || needsNoto(reportTexts(document))
       ? notoFace(await embedNotoText(pdf, reportTexts(document)))
       : standardFace(
           await pdf.embedFont(StandardFonts.Helvetica),

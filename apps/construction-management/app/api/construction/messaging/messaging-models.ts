@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isPushServiceEndpoint } from "@/src/messaging/domain/push-endpoint";
+
 import type {
   NotificationPreferences,
   NotificationReadModel,
@@ -88,7 +90,10 @@ export const MarkAllConstructionMessagingNotificationsReadResponseModel =
 
 export const CreateConstructionMessagingPushSubscriptionRequestModel = z.object(
   {
-    endpoint: z.url().max(2000),
+    /** HTTPS on a browser push service only (Chrome, Firefox, Safari, Edge). */
+    endpoint: z.url().max(2000).refine(isPushServiceEndpoint, {
+      message: "Use the endpoint of a browser push service, over HTTPS.",
+    }),
     keys: z.object({
       p256dh: z.string().min(1).max(500),
       auth: z.string().min(1).max(200),
