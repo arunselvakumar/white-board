@@ -634,7 +634,8 @@ const DEFINITIONS = {
     title: "Daily Progress Report",
     description:
       "One day on the Project: diary and weather, labour, worksheets, equipment usage, materials received and consumed, hindrances and photos.",
-    needs: "Needs Progress Report Add; hire cost needs Equipment Usage Financial.",
+    needs:
+      "Needs Progress Report Add; hire cost needs Equipment Usage Financial.",
     group: "progress",
     scopes: PROJECT,
     menu: "site_work.progress_reports",
