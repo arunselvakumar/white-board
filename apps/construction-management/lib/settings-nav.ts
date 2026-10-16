@@ -1,5 +1,7 @@
 import {
+  Building2,
   CalendarClock,
+  DatabaseBackup,
   ClipboardCheck,
   Hash,
   MapPinned,
@@ -40,5 +42,19 @@ export const SETTINGS_SECTIONS: readonly {
     description:
       "Which optional invoice and delivery fields a Goods Receipt shows and prints.",
     icon: ClipboardCheck,
+  },
+  {
+    href: "/app/masters/settings/company",
+    title: "Company",
+    description:
+      "Transfer ownership to another Team Member, or delete the Company. Owner only.",
+    icon: Building2,
+  },
+  {
+    href: "/app/masters/settings/backup",
+    title: "Backup & export",
+    description:
+      "A full backup of every Project, master record and setting, as a ZIP. Owner only.",
+    icon: DatabaseBackup,
   },
 ];

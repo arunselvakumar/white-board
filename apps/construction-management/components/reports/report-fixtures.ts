@@ -208,3 +208,49 @@ export function catalogueHandler(
     return undefined;
   };
 }
+
+// Central Reports and the cards' pickers (CM-903).
+
+export const FILTER_OPTIONS_API = "/api/construction/reporting/filter-options";
+export const PROJECT_FILTER_OPTIONS_PATH = `${FILTER_OPTIONS_API}?scope=project&projectId=${PROJECT_ID}`;
+export const CENTRAL_FILTER_OPTIONS_PATH = `${FILTER_OPTIONS_API}?scope=central`;
+
+export const TOWER_ID = PROJECT_ID;
+export const VILLA_ID = "0190a000-0000-7000-8000-0000000000a2";
+export const STORE_ID = "0190a000-0000-7000-8000-0000000000d1";
+export const VENDOR_ID = "0190a000-0000-7000-8000-0000000000f1";
+export const MASON_ID = "0190a000-0000-7000-8000-0000000000f2";
+
+/** The pickers' choices as the filter options route answers. */
+export const FILTER_OPTIONS = {
+  projects: [
+    { id: TOWER_ID, name: "Kumari Heights, Tower A" },
+    { id: VILLA_ID, name: "Villa Phase 2" },
+  ],
+  stores: [{ id: STORE_ID, name: "Central Store Ambattur" }],
+  vendors: [{ id: VENDOR_ID, name: "Ganesh Labour Supply" }],
+  labourCategories: [{ id: MASON_ID, name: "Mason" }],
+  suppliers: [
+    {
+      id: "0190a000-0000-7000-8000-0000000000f3",
+      name: "Sri Murugan Traders",
+    },
+  ],
+  materialCategories: [
+    { id: "0190a000-0000-7000-8000-0000000000f4", name: "Cement" },
+  ],
+  materials: [
+    { id: "0190a000-0000-7000-8000-0000000000f5", name: "Cement OPC 53" },
+  ],
+  creators: [{ id: "user-1", name: "Prabhu Saravanan" }],
+};
+
+export const CENTRAL_REPORTS_LIST_PATH = API;
+
+export const DONE_CENTRAL_STOCK = job({
+  id: "0190a000-0000-7000-8000-0000000000b9",
+  kind: "stock_register",
+  title: "Stock Register",
+  projectId: null,
+  params: { from: "2026-10-01", to: "2026-10-09" },
+});

@@ -112,6 +112,14 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
       job.requestedBy === session.userId ||
       can(session.access, "finance.petty_cash", "view_all")
     );
+  // A Material Received report may hold others' receipts (View all, CM-903).
+  if (job.kind === "material_received")
+    return (
+      job.requestedBy === session.userId ||
+      can(session.access, "procurement.material_received", "view_all", {
+        projectId: job.projectId,
+      })
+    );
   // A Task or Issue & Snag report may hold others' rows (CM-0019 §5, §8).
   if (job.kind === "task_report" || job.kind === "issue_snag_report")
     return (

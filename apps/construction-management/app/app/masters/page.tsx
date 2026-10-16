@@ -12,6 +12,7 @@ import {
 } from "@repo/ui/components/item";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { MastersBackupButton } from "@/components/backups/masters-backup-button";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
 export const metadata: Metadata = { title: "Masters" };
@@ -20,7 +21,11 @@ export default function MastersPage() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeader title="Masters" meta="Your Company's lists and settings." />
+        <PageHeader
+          title="Masters"
+          meta="Your Company's lists and settings."
+          actions={<MastersBackupButton />}
+        />
         {MASTERS_GROUPS.map((group) => (
           <section
             key={group.label}

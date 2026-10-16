@@ -24,6 +24,10 @@ import {
   TeamInvitationEmail,
   type TeamInvitationEmailProps,
 } from "./emails/construction/team-invitation";
+import {
+  BackupReadyEmail,
+  type BackupReadyEmailProps,
+} from "./emails/construction/backup-ready";
 
 export {
   VerificationCodeEmail,
@@ -51,6 +55,10 @@ export {
   TeamInvitationEmail,
   type TeamInvitationEmailProps,
 } from "./emails/construction/team-invitation";
+export {
+  BackupReadyEmail,
+  type BackupReadyEmailProps,
+} from "./emails/construction/backup-ready";
 
 export { ReportEmail, type ReportEmailProps } from "./emails/report";
 
@@ -98,7 +106,9 @@ export async function renderCompanyCodeEmail(
     subject:
       props.purpose === "verify-email"
         ? `${props.code} is your Construction Management verification code`
-        : `${props.code} is your Construction Management password reset code`,
+        : props.purpose === "reset-password"
+          ? `${props.code} is your Construction Management password reset code`
+          : `${props.code} is your Construction Management confirmation code`,
     ...(await renderBoth(createElement(CompanyCodeEmail, props))),
   };
 }
@@ -110,6 +120,16 @@ export async function renderTeamInvitationEmail(
   return {
     subject: `Join ${props.companyName} on Construction Management`,
     ...(await renderBoth(createElement(TeamInvitationEmail, props))),
+  };
+}
+
+/** A full Company backup's signed link, emailed to the Owner (CM-906). */
+export async function renderBackupReadyEmail(
+  props: BackupReadyEmailProps,
+): Promise<RenderedEmail> {
+  return {
+    subject: `Your full backup of ${props.companyName} is ready`,
+    ...(await renderBoth(createElement(BackupReadyEmail, props))),
   };
 }
 

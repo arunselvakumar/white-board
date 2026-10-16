@@ -1,5 +1,7 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
+import { UNMETERED_FILE_KINDS } from "@/src/shared-kernel/files/stored-files";
+
 /** Bytes a Company stores (CM-116 usage, CM-118 limit). */
 export type StorageMeter = {
   bytesUsed(workspaceId: string): Promise<number>;
@@ -7,7 +9,7 @@ export type StorageMeter = {
 
 /**
  * Sums live rows of `construction_organization.stored_files`
- * (`workspace_id`, `bytes`, `deleted_at`), which the Company profile work
+ * (`workspace_id`, `bytes`, `deleted_at`), backups left out (CM-906), which the Company profile work
  * adds. Until that table exists in the database it reports 0, so this file
  * is the one place to change when uploads land.
  */
@@ -30,7 +32,8 @@ export class PrismaStoredFilesMeter implements StorageMeter {
     const rows = await this.db.$queryRaw<{ bytes: bigint | null }[]>(
       Prisma.sql`SELECT COALESCE(SUM(bytes), 0)::bigint AS "bytes"
         FROM construction_organization.stored_files
-        WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL`,
+        WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL
+          AND kind <> ALL(${[...UNMETERED_FILE_KINDS]}::text[])`,
     );
     return Number(rows[0]?.bytes ?? 0n);
   }
