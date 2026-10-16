@@ -1,6 +1,8 @@
 import {
   cleanDashboardLayout,
+  sectionsHiddenOnProject,
   storedDashboardLayout,
+  type DashboardSectionKey,
   type DashboardSectionSetting,
 } from "../domain/dashboard-sections";
 import {
@@ -184,6 +186,20 @@ export class ProjectHomeHandlers {
       viewer.userId,
     );
     return storedDashboardLayout(member.dashboardSections);
+  }
+
+  /**
+   * The dashboard sections whose module is hidden on the Project (CM-902);
+   * another Project is "not found".
+   */
+  async dashboardSectionsHidden(
+    viewer: ProjectViewer,
+    projectId: string,
+  ): Promise<Set<DashboardSectionKey>> {
+    const project = await loadVisibleProject(this.projects, viewer, projectId);
+    return sectionsHiddenOnProject(
+      await this.preferences.hiddenModules(project.workspaceId, project.id),
+    );
   }
 
   /**

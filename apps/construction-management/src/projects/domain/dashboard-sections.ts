@@ -1,28 +1,65 @@
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
+import type { ProjectModuleKey } from "./project-modules";
+
 /**
  * The Project Dashboard's sections (ADR CM-0013 §12), in the default
  * order. `milestone` names the milestone whose data fills a section that
- * is still a stub; null for sections with data today. Keys are stored in
+ * is still a stub; null for sections with data today. `module` is the
+ * Project module (`project-modules.ts`) a section belongs to: hiding that
+ * module on a Project leaves the section out of its dashboard (CM-902,
+ * ADR CM-0021 §4); null for sections of no module. Keys are stored in
  * `member_preferences.dashboard_sections`: never rename one.
  */
 export const DASHBOARD_SECTIONS = [
-  { key: "summary", label: "Project summary", milestone: null },
-  { key: "attendance", label: "Attendance", milestone: null },
-  { key: "task", label: "Task", milestone: null },
-  { key: "payments", label: "Payments", milestone: null },
-  { key: "daily_work", label: "Daily Work", milestone: null },
-  { key: "equipment_usage", label: "Equipment Usage", milestone: null },
-  { key: "materials", label: "Materials", milestone: null },
-  { key: "issue_snag", label: "Issue & Snag", milestone: null },
+  { key: "summary", label: "Project summary", milestone: null, module: null },
+  {
+    key: "attendance",
+    label: "Attendance",
+    milestone: null,
+    module: "attendance",
+  },
+  { key: "task", label: "Task", milestone: null, module: "tasks" },
+  { key: "payments", label: "Payments", milestone: null, module: "payments" },
+  {
+    key: "daily_work",
+    label: "Daily Work",
+    milestone: null,
+    module: "daily_worksheet",
+  },
+  {
+    key: "equipment_usage",
+    label: "Equipment Usage",
+    milestone: null,
+    module: "equipment_usage",
+  },
+  {
+    key: "materials",
+    label: "Materials",
+    milestone: null,
+    module: "materials",
+  },
+  {
+    key: "issue_snag",
+    label: "Issue & Snag",
+    milestone: null,
+    module: "issues",
+  },
   {
     key: "inspection_request",
     label: "Inspection Request",
     milestone: null,
+    module: "inspections",
   },
-  { key: "booking", label: "Booking", milestone: "M10" },
-  { key: "inquiry", label: "Inquiry", milestone: "M10" },
-] as const;
+  // Sales modules arrive with M10.
+  { key: "booking", label: "Booking", milestone: "M10", module: null },
+  { key: "inquiry", label: "Inquiry", milestone: "M10", module: null },
+] as const satisfies readonly {
+  key: string;
+  label: string;
+  milestone: string | null;
+  module: ProjectModuleKey | null;
+}[];
 
 export type DashboardSectionKey = (typeof DASHBOARD_SECTIONS)[number]["key"];
 
@@ -110,5 +147,21 @@ export function cleanDashboardLayout(
       key: section.key as DashboardSectionKey,
       visible: section.visible,
     })),
+  );
+}
+
+/**
+ * The sections left out of a Project's dashboard because their module is
+ * hidden on it (CM-902): Manage Dashboard shows them disabled with
+ * "Hidden on this Project".
+ */
+export function sectionsHiddenOnProject(
+  hiddenModules: Iterable<string>,
+): Set<DashboardSectionKey> {
+  const hidden = new Set(hiddenModules);
+  return new Set(
+    DASHBOARD_SECTIONS.filter(
+      (section) => section.module != null && hidden.has(section.module),
+    ).map((section) => section.key),
   );
 }

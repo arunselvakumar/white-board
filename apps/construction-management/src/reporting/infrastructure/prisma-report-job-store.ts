@@ -78,6 +78,27 @@ export function prismaReportJobStore(db: PrismaClient): ReportJobStore {
       return rows.map(toJob);
     },
 
+    async listRequestedBy(workspaceId, requestedBy, page) {
+      const before = page.before;
+      const rows = await db.constructionReportingReportJob.findMany({
+        where: {
+          workspaceId,
+          requestedBy,
+          ...(before == null
+            ? {}
+            : {
+                OR: [
+                  { createdAt: { lt: before.createdAt } },
+                  { createdAt: before.createdAt, id: { lt: before.id } },
+                ],
+              }),
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: page.limit,
+      });
+      return rows.map(toJob);
+    },
+
     async markRunning(id, at) {
       await db.constructionReportingReportJob.update({
         where: { id },

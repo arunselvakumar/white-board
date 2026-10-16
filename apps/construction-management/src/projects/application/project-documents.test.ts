@@ -70,6 +70,7 @@ function memoryStorage(direct: boolean) {
           : { bytes: bytes.byteLength, contentType: "application/pdf" },
       );
     },
+    list: () => Promise.resolve({ objects: [], cursor: null }),
     delete: (key) => {
       deleted.push(key);
       objects.delete(key);

@@ -1,43 +1,61 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { FileSpreadsheet } from "lucide-react";
 import { Suspense } from "react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@repo/ui/components/empty";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { equipmentListQuery } from "@/src/queries/equipment";
-import { financeAccessQuery } from "@/src/queries/finance-access";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 import { pettyCashAccountsQuery } from "@/src/queries/finance-petty-cash";
-import { trackingAccessQuery } from "@/src/queries/tracking-access";
+import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
 import { worksheetFormOptionsQuery } from "@/src/queries/worksheets";
 
 import { RecentReports } from "./recent-reports";
 import {
+  cardFilter,
   deviceToday,
-  FINANCE_REPORT_CATALOGUE,
-  REPORT_CATALOGUE,
-  SITE_WORK_REPORT_CATALOGUE,
-  TRACKING_REPORT_CATALOGUE,
+  REPORT_GROUP_COPY,
+  type CardFilter,
   type ReportDefinition,
 } from "./report-catalogue";
 import { ReportCard, type ReportFilterOption } from "./report-card";
 
-export type FilterOptions = Partial<
-  Record<NonNullable<ReportDefinition["filter"]>, ReportFilterOption[]>
->;
+export type FilterOptions = Partial<Record<CardFilter, ReportFilterOption[]>>;
+
+const shows = (
+  definitions: readonly ReportDefinition[],
+  ...kinds: ReportDefinition["kind"][]
+) => definitions.some((definition) => kinds.includes(definition.kind));
 
 /**
  * Filter choices for the site-work cards: the Contractors on the Project
  * (Daily Worksheet read) and the equipment at it now (Equipments or
  * Equipment Usage read). Without the read, the card simply has no filter.
  */
-function useSiteWorkFilters(projectId: string): FilterOptions {
+function useSiteWorkFilters(
+  projectId: string,
+  definitions: readonly ReportDefinition[],
+): FilterOptions {
   const { data: worksheetOptions } = useQuery({
     ...worksheetFormOptionsQuery(projectId),
+    enabled: shows(definitions, "daily_work"),
     retry: false,
   });
   const { data: equipment } = useQuery({
     ...equipmentListQuery({ place: projectId }),
+    enabled: shows(
+      definitions,
+      "owned_equipment_usage",
+      "rented_equipment_usage",
+    ),
     retry: false,
   });
   return {
@@ -53,70 +71,39 @@ function useSiteWorkFilters(projectId: string): FilterOptions {
 }
 
 /**
- * The finance cards the viewer may run on this Project (CM-709), by the
- * Report flag on each card's menu, and their filter choices: the
- * Contractors and Suppliers on the Project and the petty-cash accounts the
- * viewer sees.
+ * Filter choices for the finance cards: the Contractors and Suppliers on
+ * the Project and the petty-cash accounts the viewer sees, read only for
+ * the cards the catalogue offers.
  */
-function useFinanceReports(projectId: string): {
-  definitions: ReportDefinition[];
-  filters: FilterOptions;
-} {
-  const { data: access } = useQuery({
-    ...financeAccessQuery(projectId),
-    retry: false,
-  });
-  const definitions = FINANCE_REPORT_CATALOGUE.filter((definition) =>
-    (definition.menus ?? []).some(
-      (menu) => access?.menus[menu].includes("report") === true,
-    ),
-  );
-  const shows = (kind: ReportDefinition["kind"]) =>
-    definitions.some((definition) => definition.kind === kind);
+function useFinanceFilters(
+  projectId: string,
+  definitions: readonly ReportDefinition[],
+): FilterOptions {
   const { data: contractors } = useQuery({
     ...counterpartyOptionsQuery("contractor", projectId),
-    enabled: shows("contractor_payments"),
+    enabled: shows(definitions, "contractor_payments"),
     retry: false,
   });
   const { data: suppliers } = useQuery({
     ...counterpartyOptionsQuery("supplier", projectId),
-    enabled: shows("supplier_payments"),
+    enabled: shows(definitions, "supplier_payments"),
     retry: false,
   });
   const { data: pettyCash } = useQuery({
     ...pettyCashAccountsQuery(),
-    enabled: shows("petty_cash"),
+    enabled: shows(definitions, "petty_cash"),
     retry: false,
   });
   const named = (items: { id: string; name: string }[] | undefined) =>
     (items ?? []).map((item) => ({ value: item.id, label: item.name }));
   return {
-    definitions,
-    filters: {
-      contractor: named(contractors?.items),
-      supplier: named(suppliers?.items),
-      account: (pettyCash?.items ?? []).map((account) => ({
-        value: account.id,
-        label: `${account.name} (${account.holderName})`,
-      })),
-    },
+    contractor: named(contractors?.items),
+    supplier: named(suppliers?.items),
+    account: (pettyCash?.items ?? []).map((account) => ({
+      value: account.id,
+      label: `${account.name} (${account.holderName})`,
+    })),
   };
-}
-
-/**
- * The tracking cards the viewer may run on this Project (CM-805), by the
- * Report flag on each card's menu.
- */
-function useTrackingReports(projectId: string): ReportDefinition[] {
-  const { data: access } = useQuery({
-    ...trackingAccessQuery(projectId),
-    retry: false,
-  });
-  return TRACKING_REPORT_CATALOGUE.filter(
-    (definition) =>
-      definition.trackingMenu != null &&
-      access?.menus[definition.trackingMenu].includes("report") === true,
-  );
 }
 
 export function ReportGroup({
@@ -152,31 +139,43 @@ export function ReportGroup({
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {definitions.map((definition) => (
-          <ReportCard
-            key={`${definition.kind}:${initialFilters?.[definition.kind] ?? ""}`}
-            definition={definition}
-            initialFilter={initialFilters?.[definition.kind]}
-            projectId={projectId}
-            today={today}
-            filterOptions={
-              definition.filter == null || filters == null
-                ? []
-                : (filters[definition.filter] ?? [])
-            }
-          />
-        ))}
+        {definitions.map((definition) => {
+          const filter = cardFilter(definition);
+          return (
+            <ReportCard
+              key={`${definition.kind}:${initialFilters?.[definition.kind] ?? ""}`}
+              definition={definition}
+              initialFilter={initialFilters?.[definition.kind]}
+              projectId={projectId}
+              today={today}
+              filterOptions={
+                filter == null || filters == null
+                  ? []
+                  : (filters[filter.key] ?? [])
+              }
+            />
+          );
+        })}
       </div>
     </section>
   );
 }
 
+/** The groups the Reports page shows, in order; Progress Reports have their own module. */
+const PAGE_GROUPS = [
+  "labour",
+  "site_work",
+  "tracking",
+  "finance",
+  "procurement",
+] as const satisfies readonly ReportDefinition["group"][];
+
 /**
- * The Project's Reports tab (CM-217, CM-218, CM-605, CM-608, CM-709,
- * CM-805): a card per report with its period and Generate, grouped into
- * labour, site work, tasks / issues / inspections (shown by the viewer's
- * tracking Report flags) and payments (by the finance Report flags), and
- * the recent reports with Excel / PDF downloads.
+ * The Project's Reports tab (CM-217 … CM-805, CM-901): a card per report
+ * the viewer may request, from the server's catalogue trimmed to their
+ * Permission Matrix, grouped into labour, site work, tasks / issues /
+ * inspections, payments and materials, then the recent reports with Excel
+ * / PDF downloads.
  */
 export function ReportsPage({
   projectId,
@@ -186,64 +185,66 @@ export function ReportsPage({
   /** `YYYY-MM-DD`; the default periods end today. */
   today?: string;
 }) {
-  const filters = useSiteWorkFilters(projectId);
-  const finance = useFinanceReports(projectId);
-  const tracking = useTrackingReports(projectId);
+  const { data: catalogue } = useSuspenseQuery(reportCatalogueQuery(projectId));
+  const offered = catalogue.items.filter((item) => !item.progressReport);
+  const inGroup = (group: ReportDefinition["group"]) =>
+    offered.filter((item) => item.group === group);
+  const siteWork = useSiteWorkFilters(projectId, inGroup("site_work"));
+  const finance = useFinanceFilters(projectId, inGroup("finance"));
+  const filters: Partial<Record<ReportDefinition["group"], FilterOptions>> = {
+    site_work: siteWork,
+    finance,
+  };
   return (
     <div className="space-y-8">
-      <ReportGroup
-        id="reports-heading"
-        title="Labour and vendor reports"
-        description="Each report is an Excel workbook and a PDF with the Company header, the period and totals."
-        definitions={REPORT_CATALOGUE}
-        projectId={projectId}
-        today={today}
-      />
-      <ReportGroup
-        id="site-work-reports-heading"
-        title="Site work"
-        description="Daily Worksheets, Equipment Usage sheets, maintenance and transfers, as an Excel workbook and a PDF."
-        definitions={SITE_WORK_REPORT_CATALOGUE}
-        projectId={projectId}
-        today={today}
-        filters={filters}
-      />
-      {tracking.length === 0 ? null : (
-        <ReportGroup
-          id="tracking-reports-heading"
-          title="Tasks, issues and inspections"
-          description="Tasks, Issues & Snags and Inspection Requests on this Project, as an Excel workbook and a PDF."
-          definitions={tracking}
-          projectId={projectId}
-          today={today}
-        />
+      {offered.length === 0 ? (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileSpreadsheet />
+            </EmptyMedia>
+            <EmptyTitle>No reports you can generate here</EmptyTitle>
+            <EmptyDescription>
+              Reports need the Report flag on their menu for this Project. Ask
+              the Owner to change your Permission Matrix.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : null}
+      {PAGE_GROUPS.map((group) => {
+        const definitions = inGroup(group);
+        if (definitions.length === 0) return null;
+        const copy = REPORT_GROUP_COPY[group];
+        return (
+          <ReportGroup
+            key={group}
+            id={`${group.replace("_", "-")}-reports-heading`}
+            title={copy.title}
+            description={copy.description}
+            definitions={definitions}
+            projectId={projectId}
+            today={today}
+            filters={filters[group]}
+          />
+        );
+      })}
+      {offered.length === 0 ? null : (
+        <section aria-labelledby="recent-reports-heading" className="space-y-3">
+          <h2 id="recent-reports-heading" className="text-lg font-semibold">
+            Recent reports
+          </h2>
+          <Suspense
+            fallback={
+              <div className="space-y-2" aria-hidden="true">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            }
+          >
+            <RecentReports projectId={projectId} />
+          </Suspense>
+        </section>
       )}
-      {finance.definitions.length === 0 ? null : (
-        <ReportGroup
-          id="finance-reports-heading"
-          title="Payments and accounts"
-          description="Transactions, petty cash, party payments, Other Expenses and due payments on this Project, as an Excel workbook and a PDF."
-          definitions={finance.definitions}
-          projectId={projectId}
-          today={today}
-          filters={finance.filters}
-        />
-      )}
-      <section aria-labelledby="recent-reports-heading" className="space-y-3">
-        <h2 id="recent-reports-heading" className="text-lg font-semibold">
-          Recent reports
-        </h2>
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-hidden="true">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-            </div>
-          }
-        >
-          <RecentReports projectId={projectId} />
-        </Suspense>
-      </section>
     </div>
   );
 }

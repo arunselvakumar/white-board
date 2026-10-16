@@ -12,14 +12,40 @@ import {
 } from "@repo/ui/components/dialog";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { RecentReports } from "@/components/reports/recent-reports";
 import {
   deviceToday,
-  EQUIPMENT_REPORT_CATALOGUE,
+  type ReportDefinition,
 } from "@/components/reports/report-catalogue";
 import { ReportCard } from "@/components/reports/report-card";
+import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
 
-const KINDS = EQUIPMENT_REPORT_CATALOGUE.map((definition) => definition.kind);
+/** The central reports of Masters → Equipments. */
+const KINDS: readonly ReportDefinition["kind"][] = [
+  "equipment_maintenance",
+  "equipment_transfers",
+];
+
+/** The equipment cards the viewer may run, worded by the report catalogue. */
+function EquipmentReportCards({ today }: { today: string }) {
+  const { data } = useSuspenseQuery(reportCatalogueQuery(null));
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {data.items
+        .filter((definition) => KINDS.includes(definition.kind))
+        .map((definition) => (
+          <ReportCard
+            key={definition.kind}
+            definition={definition}
+            projectId={null}
+            today={today}
+          />
+        ))}
+    </div>
+  );
+}
 
 /**
  * Masters → Equipments → Reports (CM-605): the central Equipment
@@ -51,16 +77,16 @@ export function EquipmentReportsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-0.5">
-          <div className="grid gap-4 md:grid-cols-2">
-            {EQUIPMENT_REPORT_CATALOGUE.map((definition) => (
-              <ReportCard
-                key={definition.kind}
-                definition={definition}
-                projectId={null}
-                today={today}
-              />
-            ))}
-          </div>
+          <Suspense
+            fallback={
+              <div className="grid gap-4 md:grid-cols-2" aria-hidden="true">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-64 w-full" />
+              </div>
+            }
+          >
+            <EquipmentReportCards today={today} />
+          </Suspense>
           <section
             aria-labelledby="equipment-recent-reports"
             className="space-y-3"

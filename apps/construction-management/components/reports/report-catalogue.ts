@@ -1,280 +1,71 @@
-import type { FinanceAccessMenu } from "@/app/api/construction/finance/access/access-models";
-import type { TrackingAccessMenu } from "@/app/api/construction/tracking/access/access-models";
-import type { ReportJob, RequestReportInput } from "@/src/queries/reports";
+import type { ReportJob } from "@/src/queries/reports";
+import type { ReportCatalogueEntry } from "@/src/queries/report-catalogue";
 
-export type ReportDefinition = {
-  /** The kinds this page requests; the DPR has its own module (CM-606). */
-  kind: RequestReportInput["kind"];
-  title: string;
-  description: string;
-  /**
-   * A date range, one month, one day the balances are taken on, or a
-   * financial year.
-   */
-  period: "range" | "month" | "as_on" | "fy";
-  /** Shown under the description: what the report needs. */
-  needs: string;
-  /** An optional filter the card offers when it has options for it. */
-  filter?: "contractor" | "equipment" | "supplier" | "account";
-  /** The filter must be picked (the Ledger's account); no "All". */
-  filterRequired?: boolean;
-  /**
-   * Finance reports (CM-709): the menu whose Report flag shows the card.
-   * The Ledger's card shows with either of its menus.
-   */
-  menus?: readonly FinanceAccessMenu[];
-  /** Tracking reports (CM-805): the menu whose Report flag shows the card. */
-  trackingMenu?: Exclude<TrackingAccessMenu, "masters.tags">;
+/**
+ * A report card's definition: one entry of the server's report catalogue
+ * (`GET /api/construction/reporting/catalogue`, ADR CM-0021 §2), which
+ * holds every title, description, period and filter. Nothing about a
+ * report is listed in the UI.
+ */
+export type ReportDefinition = ReportCatalogueEntry;
+
+/** The filters a card can offer a picker for. */
+export const CARD_FILTERS = [
+  "contractor",
+  "equipment",
+  "supplier",
+  "account",
+] as const;
+
+export type CardFilter = (typeof CARD_FILTERS)[number];
+
+/** The card's picker: the first filter it can offer, and whether it is required. */
+export function cardFilter(
+  definition: Pick<ReportDefinition, "filters">,
+): { key: CardFilter; required: boolean } | null {
+  for (const filter of definition.filters) {
+    const key = CARD_FILTERS.find((item) => item === filter.key);
+    if (key != null) return { key, required: filter.required };
+  }
+  return null;
+}
+
+/** The Reports page's groups: heading and what they hold. */
+export const REPORT_GROUP_COPY: Record<
+  ReportDefinition["group"],
+  { title: string; description: string }
+> = {
+  labour: {
+    title: "Labour and vendor reports",
+    description:
+      "Each report is an Excel workbook and a PDF with the Company header, the period and totals.",
+  },
+  site_work: {
+    title: "Site work",
+    description:
+      "Daily Worksheets, Equipment Usage sheets, maintenance and transfers, as an Excel workbook and a PDF.",
+  },
+  tracking: {
+    title: "Tasks, issues and inspections",
+    description:
+      "Tasks, Issues & Snags and Inspection Requests on this Project, as an Excel workbook and a PDF.",
+  },
+  finance: {
+    title: "Payments and accounts",
+    description:
+      "Transactions, petty cash, party payments, Other Expenses and due payments on this Project, as an Excel workbook and a PDF.",
+  },
+  procurement: {
+    title: "Materials",
+    description:
+      "Purchase Requests, Purchase Orders, material received and transferred, and the Stock Register, as an Excel workbook and a PDF.",
+  },
+  progress: {
+    title: "Progress Reports",
+    description:
+      "Daily and Task Progress Reports, generated from the Project's Progress Reports.",
+  },
 };
-
-/** The Project's reports (CM-217, CM-218), in the order the page shows them. */
-export const REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "labour_attendance",
-    title: "All Labour Attendance",
-    description:
-      "Every Labour's days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours, with a day-by-day list.",
-    period: "range",
-    needs: "Needs Labour Report.",
-  },
-  {
-    kind: "labour_payment",
-    title: "All Labour Payment",
-    description:
-      "Previous Balance, To Pay, Advance, Paid and Final Amount for each Labour, from the ledger.",
-    period: "range",
-    needs: "Needs Labour Report and Financial.",
-  },
-  {
-    kind: "labour_month",
-    title: "Month-wise Labour",
-    description:
-      "Labour × day grid for a month (P, ½, A, L, PL, H) with totals; wages earned with Financial.",
-    period: "month",
-    needs: "Needs Labour Report.",
-  },
-  {
-    kind: "vendor_attendance",
-    title: "Vendor Attendance",
-    description:
-      "Each vendor's full days, half days and overtime by shift and Labour Category; rates and pay with Vendor Financial.",
-    period: "range",
-    needs: "Needs Vendor Report.",
-  },
-  {
-    kind: "muster_roll",
-    title: "Muster roll and wage register",
-    description:
-      "The combined register of workmen, muster roll and wages for a month: father's name, days, wage rate, overtime, gross, deductions, net and a signature column.",
-    period: "month",
-    needs: "Needs Labour Report and Financial.",
-  },
-];
-
-/**
- * The Project's site-work reports (CM-605, CM-608), in their own group on
- * the Reports page.
- */
-export const SITE_WORK_REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "daily_work",
-    title: "Daily Work",
-    description:
-      "Every worksheet in the period: contractor, department, skilled and unskilled labour, location, work done, shift, photos and consumed material.",
-    period: "range",
-    needs: "Needs Daily Worksheet Report.",
-    filter: "contractor",
-  },
-  {
-    kind: "owned_equipment_usage",
-    title: "Company Owned Equipment Usage",
-    description:
-      "Usage sheets of owned equipment: operator, hours, km or trips, idle and breakdown hours, fuel and overruns, with totals per machine.",
-    period: "range",
-    needs: "Needs Equipment Usage Report.",
-    filter: "equipment",
-  },
-  {
-    kind: "rented_equipment_usage",
-    title: "Rented Equipment Usage",
-    description:
-      "Usage sheets of hired equipment with the hire party, basis and billable quantity; unit rate and hire cost with Financial.",
-    period: "range",
-    needs: "Needs Equipment Usage Report; hire cost needs Financial.",
-    filter: "equipment",
-  },
-  {
-    kind: "equipment_maintenance",
-    title: "Equipment Maintenance",
-    description:
-      "Maintenance of machines that were at this Project when it started: kind, dates, days, workshop; cost with Financial.",
-    period: "range",
-    needs: "Needs Equipments Report; cost needs Financial.",
-  },
-  {
-    kind: "equipment_transfers",
-    title: "Equipment Transfers",
-    description:
-      "Transfers out of or into this Project: location before, destination, latest location, remarks and who entered them.",
-    period: "range",
-    needs: "Needs Equipments Report.",
-  },
-];
-
-/**
- * The Project's finance reports (CM-709, ADR CM-0017 §16), each shown by
- * the viewer's Report flag on its finance menu.
- */
-export const FINANCE_REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "transactions",
-    title: "Transactions",
-    description:
-      "Transactions and transfers on this Project in the period: type, account, category, mode, reference, Paid To / Received From, amount and status.",
-    period: "range",
-    needs: "Needs Transactions Report.",
-    menus: ["finance.transactions"],
-  },
-  {
-    kind: "petty_cash",
-    title: "Petty Cash",
-    description:
-      "Vouchers on this Project: date, number, type, category, account, Paid To / Received From, credit, debit and status, with each account's closing balance.",
-    period: "range",
-    needs: "Needs Petty Cash Report; other holders' accounts need View all.",
-    filter: "account",
-    menus: ["finance.petty_cash"],
-  },
-  {
-    kind: "contractor_payments",
-    title: "Contractor Payments",
-    description:
-      "Per Contractor: opening, invoiced, paid, TDS, written off and closing balance; every invoice with what settled it and every payment.",
-    period: "range",
-    needs: "Needs Parties Report.",
-    filter: "contractor",
-    menus: ["finance.parties"],
-  },
-  {
-    kind: "supplier_payments",
-    title: "Supplier Payments",
-    description:
-      "Per Supplier: opening, invoiced, paid, written off and closing balance; every invoice with what settled it and every payment.",
-    period: "range",
-    needs: "Needs Parties Report.",
-    filter: "supplier",
-    menus: ["finance.parties"],
-  },
-  {
-    kind: "other_expenses",
-    title: "Other Expenses",
-    description:
-      "This Project's Other Expenses in the period: category, payee, account, mode, reference, amount and status.",
-    period: "range",
-    needs: "Needs Other Expenses Report.",
-    menus: ["finance.other_expenses"],
-  },
-  {
-    kind: "due_payments",
-    title: "Due Payments",
-    description:
-      "Per party with open invoices on this Project: invoiced, paid, due and the due by days past the due date (not due, 0–30, 31–60, 61–90, 90+).",
-    period: "as_on",
-    needs: "Needs Parties Report.",
-    menus: ["finance.parties"],
-  },
-];
-
-/**
- * The Project's tracking reports (CM-805, ADR CM-0019 §14), each shown by
- * the viewer's Report flag on its menu.
- */
-export const TRACKING_REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "task_report",
-    title: "Task Report",
-    description:
-      "Tasks added in the period in tree order: level, assignees, planned, baseline and actual dates, variance, progress, status, location, department and contractor; Total and Completed Price with Financial.",
-    period: "range",
-    needs:
-      "Needs Task Report; prices need Financial; without View all, your own and assigned tasks.",
-    trackingMenu: "tracking.tasks",
-  },
-  {
-    kind: "issue_snag_report",
-    title: "Issue & Snag Report",
-    description:
-      "Issues and snags by Issue Date: number, details, priority, category, department, contractor, assignee, due date, location, status, solved on and by, closed on.",
-    period: "range",
-    needs:
-      "Needs Issues and snags Report; without View all, your own and assigned issues.",
-    trackingMenu: "tracking.issues",
-  },
-  {
-    kind: "inspection_request_report",
-    title: "Inspection Request Report",
-    description:
-      "Inspection Requests by Inspection Date: number, date and time, department, contractor, inspector, description, location, status, decided by and on, reason and re-inspection of; the Success Rate.",
-    period: "range",
-    needs: "Needs Inspection Request Report.",
-    trackingMenu: "tracking.inspection_requests",
-  },
-];
-
-/** The Company-wide finance reports of Central Payment (CM-709). */
-export const CENTRAL_FINANCE_REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "account_ledger",
-    title: "Ledger",
-    description:
-      "One account's opening balance, every entry in the period with its running balance, credit, debit and the closing balance.",
-    period: "range",
-    needs:
-      "Needs Company's Bank A/C Report, or Petty Cash Report for a petty-cash account.",
-    filter: "account",
-    filterRequired: true,
-    menus: ["masters.bank_accounts", "finance.petty_cash"],
-  },
-  {
-    kind: "tds_194c",
-    title: "TDS 194C",
-    description:
-      "Each Contractor's payments of the financial year with base, rate, TDS and overrides, and the totals by quarter for filing. PANs show the last four characters.",
-    period: "fy",
-    needs: "Needs Parties Report; a member sees the Projects they are on.",
-    filter: "contractor",
-    menus: ["finance.parties"],
-  },
-  {
-    kind: "due_payments",
-    title: "Due Payments",
-    description:
-      "Every party's open invoices across Projects: invoiced, paid, due and the ageing by days past the due date; receivables of Other Parties apart.",
-    period: "as_on",
-    needs: "Needs Parties Report; a member sees the Projects they are on.",
-    menus: ["finance.parties"],
-  },
-];
-
-/** The central equipment reports of Masters → Equipments (CM-605). */
-export const EQUIPMENT_REPORT_CATALOGUE: readonly ReportDefinition[] = [
-  {
-    kind: "equipment_maintenance",
-    title: "Equipment Maintenance",
-    description:
-      "Maintenance of every machine in the period, with the Project it was at: kind, dates, days, workshop; cost with Financial.",
-    period: "range",
-    needs: "Needs Equipments Report; cost needs Financial.",
-  },
-  {
-    kind: "equipment_transfers",
-    title: "Equipment Transfers",
-    description:
-      "Every transfer to a Project or the warehouse in the period: location before, destination, latest location, remarks and who entered them.",
-    period: "range",
-    needs: "Needs Equipments Report.",
-  },
-];
 
 const MONTHS = [
   "Jan",

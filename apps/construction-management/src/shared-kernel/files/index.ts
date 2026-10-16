@@ -14,7 +14,9 @@ export {
   fileVersion,
   firstBytes,
   type DirectUploads,
+  type ListedObject,
   type ObjectHead,
+  type ObjectListing,
   type ObjectStorage,
   type StoredObject,
 } from "./object-storage";

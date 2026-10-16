@@ -1,6 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 
 import {
+  reportingDownloadsOpenApiComponents,
+  reportingDownloadsOpenApiOperations,
+} from "@/app/api/construction/reporting/downloads-openapi";
+import {
   messagingOpenApiComponents,
   messagingOpenApiOperations,
 } from "@/app/api/construction/messaging/messaging-openapi";
@@ -8,6 +12,10 @@ import {
   queueOpenApiComponents,
   queueOpenApiOperations,
 } from "@/app/api/construction/queue/queue-openapi";
+import {
+  companyDashboardOpenApiComponents,
+  companyDashboardOpenApiOperations,
+} from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
 import {
   accountOpenApiComponents,
   accountOpenApiOperations,
@@ -980,6 +988,12 @@ openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
 
+// The report catalogue and Downloads (CM-901, ADR CM-0021 §2).
+Object.assign(openApiComponents, reportingDownloadsOpenApiComponents);
+openApiOperations.push(...reportingDownloadsOpenApiOperations);
+// The Company Dashboard (CM-902) over the reporting views.
+Object.assign(openApiComponents, companyDashboardOpenApiComponents);
+openApiOperations.push(...companyDashboardOpenApiOperations);
 // Action codes, Devices, ownership and deletion (M9, CM-907).
 Object.assign(openApiComponents, accountOpenApiComponents);
 openApiOperations.push(...accountOpenApiOperations);

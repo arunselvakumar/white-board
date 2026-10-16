@@ -20,7 +20,6 @@ import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/components/payments/payment-format";
 import { RecentReports } from "@/components/reports/recent-reports";
 import {
-  CENTRAL_FINANCE_REPORT_CATALOGUE,
   deviceToday,
   type ReportDefinition,
 } from "@/components/reports/report-catalogue";
@@ -34,6 +33,7 @@ import {
   type CentralPaymentSummary,
 } from "@/src/queries/finance-central-payment";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
+import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
 
 /** Workspace → Central Payment (CM-709). */
 export const CENTRAL_PAYMENT_PATH = "/app/workspace/central-payment";
@@ -449,12 +449,41 @@ function PettyCash({
   );
 }
 
+/** The central reports Central Payment hosts, in the catalogue's order. */
+const CENTRAL_PAYMENT_KINDS: readonly ReportDefinition["kind"][] = [
+  "account_ledger",
+  "tds_194c",
+  "due_payments",
+];
+
 /**
  * The central reports the viewer may run (Ledger, TDS 194C, Due
  * Payments), with the accounts for the Ledger and the Contractors for TDS
- * as filter choices, then their recent central reports.
+ * as filter choices, then their recent central reports. The cards'
+ * wording comes from the report catalogue.
  */
 function CentralReports({
+  summary,
+  today,
+  ledgerAccount,
+}: {
+  summary: CentralPaymentSummary;
+  today: string;
+  ledgerAccount: string | null;
+}) {
+  const { ledger, tds194c, duePayments } = summary.reports;
+  if (!(ledger.company || ledger.pettyCash || tds194c || duePayments))
+    return null;
+  return (
+    <CentralReportCards
+      summary={summary}
+      today={today}
+      ledgerAccount={ledgerAccount}
+    />
+  );
+}
+
+function CentralReportCards({
   summary,
   today,
   ledgerAccount,
@@ -469,10 +498,12 @@ function CentralReports({
     tds_194c: tds194c,
     due_payments: duePayments,
   };
-  const definitions: ReportDefinition[] =
-    CENTRAL_FINANCE_REPORT_CATALOGUE.filter(
-      (definition) => shows[definition.kind] === true,
-    );
+  const { data: catalogue } = useSuspenseQuery(reportCatalogueQuery(null));
+  const definitions: ReportDefinition[] = catalogue.items.filter(
+    (definition) =>
+      CENTRAL_PAYMENT_KINDS.includes(definition.kind) &&
+      shows[definition.kind] === true,
+  );
   const { data: contractors } = useQuery({
     ...counterpartyOptionsQuery("contractor", null),
     enabled: tds194c,

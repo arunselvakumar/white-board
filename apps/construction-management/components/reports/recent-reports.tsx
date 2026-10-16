@@ -21,6 +21,9 @@ import {
 import { jobPeriod } from "./report-catalogue";
 import { ReportDownloads } from "./report-downloads";
 
+/** What an expired report says (ADR CM-0021 §3). */
+export const EXPIRED_MESSAGE = "Expired — generate it again";
+
 const requestedAt = new Intl.DateTimeFormat("en-IN", {
   day: "2-digit",
   month: "short",
@@ -34,6 +37,8 @@ function StatusChip({ job }: { job: ReportJob }) {
       return <Badge variant="secondary">Ready</Badge>;
     case "failed":
       return <Badge variant="destructive">Failed</Badge>;
+    case "expired":
+      return <Badge variant="outline">Expired</Badge>;
     default:
       return (
         <Badge variant="outline" className="gap-1">
@@ -94,6 +99,9 @@ export function RecentReports({
             </p>
             {job.status === "failed" && job.error != null ? (
               <p className="text-destructive text-sm">{job.error}</p>
+            ) : null}
+            {job.status === "expired" ? (
+              <p className="text-muted-foreground text-sm">{EXPIRED_MESSAGE}</p>
             ) : null}
           </div>
           <ReportDownloads job={job} label={`${job.title} ${jobPeriod(job)}`} />

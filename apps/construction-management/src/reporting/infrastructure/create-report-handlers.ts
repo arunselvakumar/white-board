@@ -28,10 +28,14 @@ import {
 } from "./prisma-report-source";
 import { renderXlsx } from "./xlsx-report";
 
-export const reportRenderer: ReportRenderer = {
-  xlsx: renderXlsx,
-  pdf: renderPdf,
-};
+/** The Excel and PDF writers; the PDF loads its header logo from `storage`. */
+export function reportRenderer(storage: ReportStorage): ReportRenderer {
+  const images = storageImageLoader(storage);
+  return {
+    xlsx: renderXlsx,
+    pdf: (document) => renderPdf(document, images),
+  };
+}
 
 type ReportingOptions = {
   /** `ReportFinished` listeners (messaging, CM-904). */
@@ -61,7 +65,7 @@ export function createReportingExecutor(
   return createReportExecutor({
     store: prismaReportJobStore(db),
     source: prismaReportSource(db),
-    renderer: reportRenderer,
+    renderer: reportRenderer(storage),
     storage,
     dpr:
       options.dpr == null

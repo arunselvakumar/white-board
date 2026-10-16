@@ -46,6 +46,7 @@ export function objectStorage(): ObjectStorage {
     get: (key) => shared().get(key),
     head: (key) => shared().head(key),
     delete: (key) => shared().delete(key),
+    list: (prefix, options) => shared().list(prefix, options),
     get directUploads() {
       return shared().directUploads;
     },
