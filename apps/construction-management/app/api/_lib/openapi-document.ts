@@ -4,6 +4,10 @@ import {
   queueOpenApiComponents,
   queueOpenApiOperations,
 } from "@/app/api/construction/queue/queue-openapi";
+import {
+  accountOpenApiComponents,
+  accountOpenApiOperations,
+} from "@/app/api/construction/organization/account-openapi";
 
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
@@ -967,6 +971,10 @@ Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
+
+// Action codes, Devices, ownership and deletion (M9, CM-907).
+Object.assign(openApiComponents, accountOpenApiComponents);
+openApiOperations.push(...accountOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

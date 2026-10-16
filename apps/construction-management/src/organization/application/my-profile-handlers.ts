@@ -147,7 +147,7 @@ export class MyProfileHandlers {
 
   /**
    * A member may always see their own Aadhaar and PAN. Logged every time;
-   * an OTP step arrives with M9, as for reveals by others (CM-108).
+   * the route first checks a reveal code (ADR CM-0021 §11).
    */
   async revealIdentifiers(input: {
     workspaceId: string;
