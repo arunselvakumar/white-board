@@ -1,0 +1,47 @@
+apps/construction-management/app/api/construction/reporting/downloads/downloads.http.test.ts
+  s_9b8b004c55c7f2::t_fffa437b792abe 1,70,266-268
+apps/construction-management/components/finance/central-payment/central-payment-fixtures.ts
+  s_9b8b004c55c7f2::t_df8fbb33a2b116 3,183
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_9b8b004c55c7f2::t_d1fb124500c55d 36,452-458,462-463,473-493,501-506
+apps/construction-management/components/reports/recent-reports.tsx
+  s_9b8b004c55c7f2::t_0c03df18c3fcca 24-26,40-41,103-105
+apps/construction-management/components/reports/report-card.tsx
+  s_9b8b004c55c7f2::t_6fef7f2fe253f2 32,35,45,52,135-138,145,225-226,231-233,246,258-259,270,275,286-291,293,397,400,465-466,492-498
+apps/construction-management/components/reports/report-catalogue.ts
+  s_9b8b004c55c7f2::t_d701f567bd7ebc 1-2,5-8,10,12-18,20-39,41,43-44,46,48-49,51,53-54,56,58-59,61,63-64,66,68
+apps/construction-management/components/reports/report-fixtures.ts
+  s_9b8b004c55c7f2::t_abffc17219ed9d 1-8,136-210
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_9b8b004c55c7f2::t_37f587701253e7 4,12,28-29,41-68,124-130,141,181-184,197-207,253-260,286-302,332-335,362-374,438-445,473-488,543-548,567-582,614-619,630-788
+apps/construction-management/components/reports/reports-page.tsx
+  s_9b8b004c55c7f2::t_0ee2a2ca3726d8 3-4,6-12,18,23,25-26,31-36,43-46,49,54-58,74-76,78-81,84,89,94,100-105,142-158,164-172,174-178,188-197,200-246
+apps/construction-management/components/site-work/equipment/equipment-reports-dialog.stories.tsx
+  s_9b8b004c55c7f2::t_48ebfa6863bb8d 5,37,39-40,79
+apps/construction-management/components/site-work/equipment/equipment-reports-dialog.tsx
+  s_9b8b004c55c7f2::t_9c4ba0fae6b05a 15-16,20,23-29,31-48,80-89
+apps/construction-management/src/queries/downloads.ts
+  s_9b8b004c55c7f2::t_2b328fedb6b977 1-78
+apps/construction-management/src/queries/report-catalogue.ts
+  s_9b8b004c55c7f2::t_b213adb0f422c1 1-32
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_9b8b004c55c7f2::t_9cf63a732a6646 688,690-691
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_9b8b004c55c7f2::t_afbb37654b0502 66,68,104,106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "56273e2cffb83cabe8c2ca30aa7944186284d495",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
