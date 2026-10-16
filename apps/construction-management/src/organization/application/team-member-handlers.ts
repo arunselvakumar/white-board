@@ -470,8 +470,8 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * The full Aadhaar and PAN. Logged every time; OTP-gating arrives with M9
-   * (CM-108 "reveal").
+   * The full Aadhaar and PAN. Logged every time; the route first checks a
+   * reveal code verified in the session (CM-108, ADR CM-0021 §11).
    */
   async revealIdentifiers(input: {
     workspaceId: string;

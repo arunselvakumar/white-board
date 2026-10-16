@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import { openRevealWindow, sessionIdOf } from "@/test/accounts";
 import {
   addProject,
   jsonRequest,
@@ -136,6 +137,7 @@ describe("Team Members HTTP (CM-110)", () => {
     );
     expect(resent.invitePath).not.toBe(prabhu.invitePath);
 
+    await openRevealWindow(owner.userId, await sessionIdOf(owner.cookie));
     const revealed = await reveal(
       jsonRequest(`${BASE}/${prabhu.id}/reveal`, owner.cookie, {}),
       params(prabhu.id),

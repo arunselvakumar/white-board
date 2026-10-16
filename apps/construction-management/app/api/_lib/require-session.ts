@@ -5,10 +5,13 @@ import {
 } from "@repo/auth/construction/server";
 import { StatusCodes } from "http-status-codes";
 
+import { requireCompanyNotBeingDeleted } from "./company-deletion-guard";
 import { jsonError } from "./json-error";
 
 export type CompanySession = {
   userId: string;
+  /** The Better Auth session behind the request (Devices, reveal codes). */
+  sessionId: string;
   /** The Active Company. */
   workspaceId: string;
   role: CompanyRole;
@@ -18,7 +21,9 @@ export type CompanySession = {
 /**
  * The API gate (root ADR-0013, ADR-0014): no Session → 401
  * `UNAUTHENTICATED`, no Active Company → 403 `NO_ACTIVE_COMPANY`. The role
- * is read from the member row on every request.
+ * is read from the member row on every request. A write to a Company that
+ * waits to be deleted answers 409 `COMPANY_DELETION_SCHEDULED` unless it
+ * is one of the writes left open (CM-907, `company-deletion-guard.ts`).
  */
 export async function requireCompanySession(
   request: Request,
@@ -36,15 +41,25 @@ export async function requireCompanySession(
       "NO_ACTIVE_COMPANY",
       "An active Company is required.",
     );
+  const deleting = await requireCompanyNotBeingDeleted(
+    request,
+    state.workspaceId,
+  );
+  if (deleting != null) return deleting;
   return {
     userId: state.userId,
+    sessionId: state.sessionId,
     workspaceId: state.workspaceId,
     role: state.role,
     user: state.user,
   };
 }
 
-export type UserSession = { userId: string; user: CompanyAuthUser };
+export type UserSession = {
+  userId: string;
+  sessionId: string;
+  user: CompanyAuthUser;
+};
 
 /**
  * A signed-in User, with or without an Active Company: creating, listing
@@ -60,7 +75,11 @@ export async function requireUserSession(
       "UNAUTHENTICATED",
       "Authentication required.",
     );
-  return { userId: state.userId, user: state.user };
+  return {
+    userId: state.userId,
+    sessionId: state.sessionId,
+    user: state.user,
+  };
 }
 
 /** The Owner of the Active Company. Used until the Permission Matrix exists. */

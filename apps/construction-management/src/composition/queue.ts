@@ -21,6 +21,7 @@ import {
   queueCleanupHandler,
 } from "@/src/shared-kernel/queue/cleanup";
 
+import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
 import {
   createMessagingDelayedHandler,
   createMessagingRetentionHandler,
@@ -48,6 +49,8 @@ export function queueHandlers(): QueueHandler[] {
     createPushQueueHandler(),
     createMessagingRetentionHandler(),
     createMessagingDelayedHandler(),
+    // CM-907: purge Companies whose deletion came due.
+    companyPurgeQueueHandler(),
   ];
 }
 
@@ -64,6 +67,8 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   // CM-904
   "messaging.retention",
   "messaging.delayed",
+  // CM-907
+  COMPANY_PURGE_JOB,
 ];
 
 export const queueStore = prismaQueueStore(prisma);

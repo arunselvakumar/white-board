@@ -16,6 +16,10 @@ import {
   companyDashboardOpenApiComponents,
   companyDashboardOpenApiOperations,
 } from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
+import {
+  accountOpenApiComponents,
+  accountOpenApiOperations,
+} from "@/app/api/construction/organization/account-openapi";
 
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
@@ -990,6 +994,9 @@ openApiOperations.push(...reportingDownloadsOpenApiOperations);
 // The Company Dashboard (CM-902) over the reporting views.
 Object.assign(openApiComponents, companyDashboardOpenApiComponents);
 openApiOperations.push(...companyDashboardOpenApiOperations);
+// Action codes, Devices, ownership and deletion (M9, CM-907).
+Object.assign(openApiComponents, accountOpenApiComponents);
+openApiOperations.push(...accountOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

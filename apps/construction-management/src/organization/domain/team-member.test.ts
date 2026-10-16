@@ -169,3 +169,73 @@ describe("TeamMember", () => {
     expect(member.details.mobile).toBe("+919812345678");
   });
 });
+
+describe("ownership and leaving (CM-907)", () => {
+  function joined(memberType: "normal" | "hrms" = "normal") {
+    const member = invite(memberType);
+    member.accept("user-2", NOW);
+    return member;
+  }
+
+  function owner() {
+    return TeamMember.owner({
+      id: "owner-member",
+      workspaceId: "company-1",
+      userId: "owner",
+      details,
+      now: NOW,
+    });
+  }
+
+  it("makes a joined Normal member the Owner with every right", () => {
+    const member = joined();
+    member.assignToProjects(["project-1"], "owner", NOW);
+    member.becomeOwner("designation-owner", "owner", NOW);
+    expect(member).toMatchObject({ isOwner: true, projectIds: [] });
+    expect(member.details.designationId).toBe("designation-owner");
+    expect(member.permissions.size).toBe(PermissionSet.everything().size);
+  });
+
+  it("refuses a member who has not joined, an HRMS member and the Owner", () => {
+    expect(() => {
+      invite().becomeOwner(null, "owner", NOW);
+    }).toThrow(
+      expect.objectContaining({ code: "NEW_OWNER_NOT_ACTIVE" }) as Error,
+    );
+    expect(() => {
+      joined("hrms").becomeOwner(null, "owner", NOW);
+    }).toThrow(expect.objectContaining({ code: "OWNER_IS_NORMAL" }) as Error);
+    expect(() => {
+      owner().becomeOwner(null, "owner", NOW);
+    }).toThrow(expect.objectContaining({ code: "ALREADY_OWNER" }) as Error);
+  });
+
+  it("makes the old Owner a member with the given matrix, keeping the Designation when none is given", () => {
+    const old = owner();
+    const admin = hrmsDefaultPermissions();
+    old.stepDownAsOwner(null, admin, "owner", NOW);
+    expect(old.isOwner).toBe(false);
+    expect(old.details.designationId).toBe("designation-1");
+    expect(old.permissions.toGrants()).toEqual(admin.toGrants());
+    expect(() => {
+      old.stepDownAsOwner(null, admin, "owner", NOW);
+    }).toThrow(expect.objectContaining({ code: "NOT_OWNER" }) as Error);
+  });
+
+  it("leaves: the record stays, Left and unlinked; the Owner cannot", () => {
+    const member = joined();
+    member.leave(NOW);
+    expect(member).toMatchObject({
+      status: "left",
+      userId: null,
+      inviteToken: null,
+      deletedAt: null,
+      updatedBy: "user-2",
+    });
+    expect(() => {
+      owner().leave(NOW);
+    }).toThrow(
+      expect.objectContaining({ code: "OWNER_MUST_HAND_OVER" }) as Error,
+    );
+  });
+});

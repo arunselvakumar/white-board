@@ -11,6 +11,7 @@ import type {
   TrackingReferences,
   TrackingTx,
 } from "@/src/tracking/application/ports";
+import { fillDeletedUserNames } from "@/src/shared-kernel/user-names";
 
 const unique = (ids: readonly string[] | undefined): string[] => [
   ...new Set(ids ?? []),
@@ -302,9 +303,14 @@ export const trackingDirectory: TrackingDirectory = {
     ]);
     const result: TrackingNames = {
       members: nameMap(members),
-      users: new Map(
-        users.flatMap((row) =>
-          row.userId == null ? [] : [[row.userId, row.name] as const],
+      // A User who deleted their account reads "Deleted user" (CM-907).
+      users: await fillDeletedUserNames(
+        db,
+        unique(ids.userIds),
+        new Map(
+          users.flatMap((row) =>
+            row.userId == null ? [] : [[row.userId, row.name] as const],
+          ),
         ),
       ),
       departments: nameMap(departments),

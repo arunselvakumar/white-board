@@ -4,12 +4,18 @@ import { brand } from "../../components/brand";
 import { EmailLayout } from "../../components/email-layout";
 import { CONSTRUCTION } from "./product";
 
-export type CompanyCodePurpose = "verify-email" | "reset-password";
+export type CompanyCodePurpose =
+  "verify-email" | "reset-password" | "confirm-action";
 
 export type CompanyCodeEmailProps = {
   code: string;
   purpose: CompanyCodePurpose;
   expiresInMinutes: number;
+  /**
+   * For `confirm-action`: what the code allows, finishing "Enter this code
+   * to …", e.g. "transfer ownership of Anugraha Engineers" (CM-907).
+   */
+  action?: string;
 };
 
 const COPY: Record<
@@ -26,6 +32,11 @@ const COPY: Record<
     heading: "Reset your password",
     body: "Enter this code to choose a new password.",
   },
+  "confirm-action": {
+    preview: "Your Construction Management confirmation code",
+    heading: "Confirm it is you",
+    body: "Enter this code to continue.",
+  },
 };
 
 /** The emailed 6-digit code for Construction Management (CM-119). */
@@ -33,14 +44,19 @@ export function CompanyCodeEmail({
   code,
   purpose,
   expiresInMinutes,
+  action,
 }: CompanyCodeEmailProps) {
   const copy = COPY[purpose];
+  const body =
+    purpose === "confirm-action" && action != null
+      ? `Enter this code to ${action}. If you did not ask for it, ignore this email.`
+      : copy.body;
   return (
     <EmailLayout preview={copy.preview} product={CONSTRUCTION}>
       <Heading as="h1" style={styles.heading}>
         {copy.heading}
       </Heading>
-      <Text style={styles.text}>{copy.body}</Text>
+      <Text style={styles.text}>{body}</Text>
       <Section style={styles.codeBox}>
         <Text style={styles.code}>{code}</Text>
       </Section>
