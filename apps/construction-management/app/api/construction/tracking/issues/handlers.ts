@@ -7,7 +7,7 @@ import { projectMediaDispatcher } from "@/src/composition/project-media-listener
 import { trackingDirectory } from "@/src/composition/tracking-directory";
 import type { Flag } from "@/src/shared-kernel/access";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
+import { messagingEvents } from "@/src/composition/messaging";
 import {
   IssueHandlers,
   type StoredIssue,
@@ -28,7 +28,7 @@ export function createIssueHandlers(): IssueHandlers {
     backdated: (access) => loadBackdatedCheck(prisma, access),
     today: (workspaceId) => companyToday(prisma, workspaceId),
     // IssueAssigned / IssueUpdated / IssueSolved / IssueReopened: no listeners until M9.
-    events: new InProcessEventDispatcher(),
+    events: messagingEvents(),
     media: projectMediaDispatcher(),
   });
 }
