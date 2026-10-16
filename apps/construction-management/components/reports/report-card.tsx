@@ -23,6 +23,8 @@ import {
 } from "@repo/ui/components/select";
 import { Spinner } from "@repo/ui/components/spinner";
 
+import { ChipsSelect } from "@/components/tracking/tasks/chips-select";
+
 import {
   useRequestReport,
   type RequestReportInput,
@@ -30,10 +32,16 @@ import {
 
 import {
   cardFilter,
+  cardPickers,
   monthStart,
+  PICKER_COPY,
+  pickerStatuses,
   recentFinancialYears,
+  takesProjects,
   type CardFilter,
+  type PickerKey,
   type ReportDefinition,
+  type ReportPickerOptions,
 } from "./report-catalogue";
 import { ReportDownloads } from "./report-downloads";
 
@@ -132,9 +140,27 @@ type Period = {
   fy: string;
 };
 
+/** A picker's choice, or nothing for "All …". */
+type Picks = Partial<Record<PickerKey, string>>;
+
+/** The chosen Projects of a central card; nothing when all. */
+function projectsParam(projectIds: readonly string[]) {
+  return projectIds.length === 0 ? {} : { projectIds: [...projectIds] };
+}
+
+/** Only the picks that are set, for a request's params. */
+function onlySet<T extends Record<string, string | undefined>>(
+  values: T,
+): Partial<Record<keyof T, string>> {
+  const out: Partial<Record<keyof T, string>> = {};
+  for (const [key, value] of Object.entries(values))
+    if (value != null && value !== ALL) out[key as keyof T] = value;
+  return out;
+}
+
 /**
  * The request for a card; null for a kind the Reports routes do not take
- * (a Progress Report, or a report not built yet).
+ * (a Progress Report).
  */
 function requestFor(
   definition: ReportDefinition,
@@ -142,10 +168,14 @@ function requestFor(
   period: Period,
   filter: string | null,
   extras: LedgerExtras = { module: ALL, mode: ALL, counterpartyKind: ALL },
+  picks: Picks = {},
+  projectIds: readonly string[] = [],
 ): RequestReportInput | null {
   // Only the central kinds are ever shown without a Project.
   const projectId = scope ?? "";
   const range = { from: period.from, to: period.to };
+  // The Projects filter is central only.
+  const projects = scope == null ? projectsParam(projectIds) : {};
   switch (definition.kind) {
     case "labour_month":
     case "muster_roll":
@@ -156,11 +186,24 @@ function requestFor(
       };
     case "labour_attendance":
     case "labour_payment":
-    case "vendor_attendance":
       return {
         kind: definition.kind,
         projectId,
         params: { from: period.from, to: period.to },
+      };
+    // Vendor Attendance takes a Vendor and a Labour Category (CM-903).
+    case "vendor_attendance":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...onlySet({
+            vendorId: picks.vendor,
+            categoryId: picks.labour_category,
+          }),
+          ...projects,
+        },
       };
     // Site work reports (CM-605, CM-608).
     case "daily_work":
@@ -222,6 +265,83 @@ function requestFor(
     case "issue_snag_report":
     case "inspection_request_report":
       return { kind: definition.kind, projectId, params: range };
+    // Procurement and central labour reports (CM-903).
+    case "purchase_requests":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...(onlySet({
+            status: picks.status,
+            materialCategoryId: picks.material_category,
+            materialId: picks.material,
+            createdBy: picks.created_by,
+          }) as { status?: "pending" | "approved" | "rejected" }),
+          ...projects,
+        },
+      };
+    case "purchase_orders":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...(onlySet({ status: picks.status, supplierId: picks.supplier }) as {
+            status?: "pending" | "approved" | "rejected";
+          }),
+          ...projects,
+        },
+      };
+    case "material_received":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...onlySet({ supplierId: picks.supplier }),
+          ...projects,
+        },
+      };
+    case "material_transfers":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...(onlySet({
+            status: picks.status,
+            transferType: picks.transfer_type,
+          }) as Pick<
+            Extract<
+              RequestReportInput,
+              { kind: "material_transfers" }
+            >["params"],
+            "status" | "transferType"
+          >),
+          ...projects,
+        },
+      };
+    case "stock_register":
+      return {
+        kind: definition.kind,
+        projectId: scope,
+        params: {
+          ...range,
+          ...onlySet({
+            materialCategoryId: picks.material_category,
+            materialId: picks.material,
+            ...(scope == null ? { storeId: picks.store } : {}),
+          }),
+          ...projects,
+        },
+      };
+    case "labour_attendance_central":
+      return {
+        kind: definition.kind,
+        projectId: null,
+        params: { ...range, ...projectsParam(projectIds) },
+      };
     default:
       return null;
   }
@@ -238,15 +358,22 @@ export function ReportCard({
   today,
   filterOptions = [],
   initialFilter,
+  pickerOptions = {},
 }: {
   definition: ReportDefinition;
-  /** Null for a central report (Masters → Equipments, Central Payment). */
+  /** Null for a central report (Central Reports, Masters → Equipments, Central Payment). */
   projectId: string | null;
   today: string;
   /** Choices for the card's filter; the picker shows only with some. */
   filterOptions?: readonly ReportFilterOption[];
   /** The filter's starting choice (Central Payment's account Ledger link). */
   initialFilter?: string;
+  /**
+   * Choices for the card's other pickers (CM-903): Vendor, Labour
+   * Category, Supplier, Material Category, Material, Created By, Store and
+   * the central Projects. A picker shows only with some.
+   */
+  pickerOptions?: ReportPickerOptions;
 }) {
   const id = useId();
   const [from, setFrom] = useState(monthStart(today));
@@ -263,6 +390,8 @@ export function ReportCard({
     mode: ALL,
     counterpartyKind: ALL,
   });
+  const [picks, setPicks] = useState<Picks>({});
+  const [projectIds, setProjectIds] = useState<string[]>([]);
   const mutation = useRequestReport(projectId);
   const job = mutation.data;
   const rangeInvalid = definition.period === "range" && from > to;
@@ -276,9 +405,21 @@ export function ReportCard({
             ...filterOptions,
           ];
   // A required filter starts on its first option.
-  const picked =
+  const chosen =
     required && filter === ALL ? (filterOptions[0]?.value ?? ALL) : filter;
-  const missingRequired = required && picked === ALL;
+  const missingRequired = required && chosen === ALL;
+  // The other pickers (CM-903): the single filter above keeps its own.
+  const pickers = cardPickers(definition)
+    .filter((key) => filterItems == null || key !== picker?.key)
+    .flatMap((key) => {
+      const statuses = pickerStatuses(definition.kind, key);
+      const options = statuses ?? pickerOptions[key] ?? [];
+      return options.length === 0 ? [] : [{ key, options }];
+    });
+  const projectChoices =
+    projectId == null && takesProjects(definition)
+      ? (pickerOptions.projects ?? [])
+      : [];
 
   function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -287,8 +428,10 @@ export function ReportCard({
       definition,
       projectId,
       { from, to, month, asOn, fy },
-      filterItems == null || picked === ALL ? null : picked,
+      filterItems == null || chosen === ALL ? null : chosen,
       extras,
+      Object.fromEntries(pickers.map(({ key }) => [key, picks[key] ?? ALL])),
+      projectIds,
     );
     if (input != null) mutation.mutate(input);
   }
@@ -401,7 +544,7 @@ export function ReportCard({
               </Label>
               <Select
                 items={filterItems}
-                value={picked}
+                value={chosen}
                 onValueChange={(next) => {
                   if (next != null) setFilter(next);
                 }}
@@ -417,6 +560,68 @@ export function ReportCard({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {pickers.length === 0 ? null : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {pickers.map(({ key, options }) => {
+                const copy = PICKER_COPY[key];
+                const items = [{ value: ALL, label: copy.all }, ...options];
+                return (
+                  <div key={key} className="min-w-0 space-y-1.5">
+                    <Label htmlFor={`${id}-${key}`}>{copy.label}</Label>
+                    <Select
+                      items={items}
+                      value={picks[key] ?? ALL}
+                      onValueChange={(next) => {
+                        if (next != null)
+                          setPicks((current) => ({ ...current, [key]: next }));
+                      }}
+                    >
+                      <SelectTrigger
+                        id={`${id}-${key}`}
+                        className="h-10 w-full"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent align="start" alignItemWithTrigger={false}>
+                        {items.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {projectChoices.length === 0 ? null : (
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor={`${id}-projects`}>Projects</Label>
+              <ChipsSelect
+                id={`${id}-projects`}
+                label="Projects"
+                options={projectChoices.map((option) => ({
+                  id: option.value,
+                  name: option.label,
+                }))}
+                value={projectIds}
+                onChange={setProjectIds}
+                placeholder="All your Projects"
+                emptyText="No Project matches."
+              />
+              <p className="text-muted-foreground text-xs">
+                {projectIds.length === 0
+                  ? "Every Project you may see."
+                  : definition.group === "procurement" &&
+                      (picks.store ?? ALL) === ALL
+                    ? "Only these Projects; Central Stores are left out."
+                    : "Only these Projects."}
+              </p>
             </div>
           )}
 

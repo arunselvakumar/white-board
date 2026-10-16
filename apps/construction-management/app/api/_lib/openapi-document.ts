@@ -17,6 +17,10 @@ import {
   companyDashboardOpenApiOperations,
 } from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
 import {
+  reportingFilterOptionsOpenApiComponents,
+  reportingFilterOptionsOpenApiOperations,
+} from "@/app/api/construction/reporting/filter-options/filter-options-openapi";
+import {
   accountOpenApiComponents,
   accountOpenApiOperations,
 } from "@/app/api/construction/organization/account-openapi";
@@ -994,6 +998,9 @@ openApiOperations.push(...reportingDownloadsOpenApiOperations);
 // The Company Dashboard (CM-902) over the reporting views.
 Object.assign(openApiComponents, companyDashboardOpenApiComponents);
 openApiOperations.push(...companyDashboardOpenApiOperations);
+// The report cards' picker choices (CM-903).
+Object.assign(openApiComponents, reportingFilterOptionsOpenApiComponents);
+openApiOperations.push(...reportingFilterOptionsOpenApiOperations);
 // Action codes, Devices, ownership and deletion (M9, CM-907).
 Object.assign(openApiComponents, accountOpenApiComponents);
 openApiOperations.push(...accountOpenApiOperations);
