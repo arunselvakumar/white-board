@@ -1,0 +1,87 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_9b8b004c55c7f2::t_419e4f45dc1e63 7-10,975-978
+apps/construction-management/app/api/construction/organization/account-openapi.ts
+  s_9b8b004c55c7f2::t_386af3ba892f73 1-210
+apps/construction-management/app/api/construction/organization/action-codes/action-code-models.ts
+  s_9b8b004c55c7f2::t_4fdbf82ae6a673 1-39
+apps/construction-management/app/api/construction/organization/action-codes/action-codes.http.test.ts
+  s_9b8b004c55c7f2::t_1d5b13081ab1a1 1-235
+apps/construction-management/app/api/construction/organization/action-codes/route.ts
+  s_9b8b004c55c7f2::t_76e7ebd6ab83ec 1-51
+apps/construction-management/app/api/construction/organization/action-codes/verify/route.ts
+  s_9b8b004c55c7f2::t_09e95f18f95a05 1-38
+apps/construction-management/app/api/construction/organization/company-deletion/cancel/route.ts
+  s_9b8b004c55c7f2::t_d937551a5b6789 1-26
+apps/construction-management/app/api/construction/organization/company-deletion/company-deletion-models.ts
+  s_9b8b004c55c7f2::t_5475fde77ffb67 1-54
+apps/construction-management/app/api/construction/organization/company-deletion/handlers.ts
+  s_9b8b004c55c7f2::t_9ebd76939d286a 1-4
+apps/construction-management/app/api/construction/organization/company-deletion/route.ts
+  s_9b8b004c55c7f2::t_39a1f4ff2783e9 1-66
+apps/construction-management/app/api/construction/organization/me/account/account-models.ts
+  s_9b8b004c55c7f2::t_041192ef0d9ea2 1-31
+apps/construction-management/app/api/construction/organization/me/account/account.http.test.ts
+  s_9b8b004c55c7f2::t_af4facf7c119b4 1-201
+apps/construction-management/app/api/construction/organization/me/account/delete/route.ts
+  s_9b8b004c55c7f2::t_980e8a5a4efe21 1-37
+apps/construction-management/app/api/construction/organization/me/account/route.ts
+  s_9b8b004c55c7f2::t_dc9cbc556bc295 1-20
+apps/construction-management/app/api/construction/organization/me/devices/[id]/sign-out/route.ts
+  s_9b8b004c55c7f2::t_4d8ccd1ad3babe 1-34
+apps/construction-management/app/api/construction/organization/me/devices/device-models.ts
+  s_9b8b004c55c7f2::t_3d71f541295b32 1-55
+apps/construction-management/app/api/construction/organization/me/devices/devices.http.test.ts
+  s_9b8b004c55c7f2::t_a380bab46c8c6e 1-169
+apps/construction-management/app/api/construction/organization/me/devices/route.ts
+  s_9b8b004c55c7f2::t_b7c9b5b497700a 1-21
+apps/construction-management/app/api/construction/organization/me/devices/sign-out-others/route.ts
+  s_9b8b004c55c7f2::t_0c7ae73cd10f9c 1-25
+apps/construction-management/app/api/construction/organization/me/profile/reveal-identifiers/route.ts
+  s_9b8b004c55c7f2::t_2604c43101d2a2 7,17-18,24
+apps/construction-management/app/api/construction/organization/ownership/candidates/route.ts
+  s_9b8b004c55c7f2::t_ae050e08eab705 1-24
+apps/construction-management/app/api/construction/organization/ownership/handlers.ts
+  s_9b8b004c55c7f2::t_6fb661e0912797 1-4
+apps/construction-management/app/api/construction/organization/ownership/ownership-models.ts
+  s_9b8b004c55c7f2::t_67d213ca037da2 1-42
+apps/construction-management/app/api/construction/organization/ownership/ownership.http.test.ts
+  s_9b8b004c55c7f2::t_fb9dcb20f886a9 1-154
+apps/construction-management/app/api/construction/organization/ownership/transfer/route.ts
+  s_9b8b004c55c7f2::t_02dace38b7ad1b 1-42
+apps/construction-management/app/api/construction/organization/team-members/[id]/reveal/route.ts
+  s_9b8b004c55c7f2::t_b7b2dab411cbbf 6,15-16,28
+apps/construction-management/src/composition/finance-author-names.ts
+  s_9b8b004c55c7f2::t_88b970096f23bd 1,4,16
+apps/construction-management/src/composition/site-work-author-names.ts
+  s_9b8b004c55c7f2::t_c7e1e8366bdd1d 1,4,16
+apps/construction-management/src/composition/tracking-directory.ts
+  s_9b8b004c55c7f2::t_712a6b3c432c4e 14,306-313
+apps/construction-management/src/organization/application/my-profile-handlers.ts
+  s_9b8b004c55c7f2::t_7e23c8e7ef8b96 150
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_9b8b004c55c7f2::t_dd0dd61c2d7c9a 473-474
+apps/construction-management/src/procurement/infrastructure/document-thread-store.ts
+  s_9b8b004c55c7f2::t_33416f3deeea51 18,285
+apps/construction-management/src/projects/infrastructure/prisma-uploader-names.ts
+  s_9b8b004c55c7f2::t_a1fb060bfb526b 1,4,19
+apps/construction-management/src/shared-kernel/user-names.ts
+  s_9b8b004c55c7f2::t_78220be00b8cf4 1-56
+apps/construction-management/test/accounts.ts
+  s_9b8b004c55c7f2::t_7f041bfd271b78 1-181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ed041377bd62d0dbe4d8c09906ff5a8bb9d8006f",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
