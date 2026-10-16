@@ -1,0 +1,117 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_9b8b004c55c7f2::t_03999431ad7268 23-26,1005-1007
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue-models.ts
+  s_9b8b004c55c7f2::t_6e0dc93bdf60c5 27-31
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue.http.test.ts
+  s_9b8b004c55c7f2::t_44bb5914a16e20 69,71-80,155,161-173,221,223-244,246-263
+apps/construction-management/app/api/construction/reporting/downloads/downloads.http.test.ts
+  s_9b8b004c55c7f2::t_ccd9251f6c8355 119-120
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-models.ts
+  s_9b8b004c55c7f2::t_03c507c941db9e 1-59
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-openapi.ts
+  s_9b8b004c55c7f2::t_c847a478fd1015 1-36
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options.http.test.ts
+  s_9b8b004c55c7f2::t_25da746e05e4c3 1-157
+apps/construction-management/app/api/construction/reporting/filter-options/route.ts
+  s_9b8b004c55c7f2::t_4ae9beb552ace9 1-66
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_9b8b004c55c7f2::t_c431d0170b7fc0 115-122
+apps/construction-management/app/api/construction/reporting/reports/procurement-reports.http.test.ts
+  s_9b8b004c55c7f2::t_baa1755656247b 1-837
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_9b8b004c55c7f2::t_1190491232ab9c 46-65,102,104,218-280,327-336,370-379,430-475
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_9b8b004c55c7f2::t_bb7821650f6479 21-22,24,56-67,70,74-79,166-252,256-310,354-359,366-367,393
+apps/construction-management/app/app/workspace/central-reports/page.tsx
+  s_9b8b004c55c7f2::t_e11ccaff156202 1-18
+apps/construction-management/app/app/workspace/page.tsx
+  s_9b8b004c55c7f2::t_ac85044884d488 10-16,22
+apps/construction-management/components/app-shell/workspace-index.stories.tsx
+  s_9b8b004c55c7f2::t_22000e3ac968b9 11-16,41-42,48-53
+apps/construction-management/components/app-shell/workspace-index.tsx
+  s_9b8b004c55c7f2::t_3fd45f06f3f169 6,15-17,23,28,53-57
+apps/construction-management/components/app-shell/workspace-nav-menu.tsx
+  s_9b8b004c55c7f2::t_070795ac2df0d4 3,35-43,48-49,54-58
+apps/construction-management/components/reports/central-reports-page.stories.tsx
+  s_9b8b004c55c7f2::t_254dd6114c5b98 1-261
+apps/construction-management/components/reports/central-reports-page.tsx
+  s_9b8b004c55c7f2::t_33e0f599779430 1-167
+apps/construction-management/components/reports/central-reports-workspace-tile.tsx
+  s_9b8b004c55c7f2::t_6a447aba292cce 1-36
+apps/construction-management/components/reports/report-card.tsx
+  s_9b8b004c55c7f2::t_1adfb76d63ee0e 26-27,35,37-38,40,42,44,143-160,163,171-172,177-178,194-207,268-344,361,364,371-376,393-394,408,410-422,431,433-434,547,566-627
+apps/construction-management/components/reports/report-catalogue.ts
+  s_9b8b004c55c7f2::t_1a080820d6b87f 33-128
+apps/construction-management/components/reports/report-fixtures.ts
+  s_9b8b004c55c7f2::t_a78f1b2f6144cc 211-256
+apps/construction-management/components/reports/report-pickers.ts
+  s_9b8b004c55c7f2::t_9bd644483b57a8 1-57
+apps/construction-management/components/reports/reports-page.stories.tsx
+  s_9b8b004c55c7f2::t_9ff4021dad8a89 30-33,793-947
+apps/construction-management/components/reports/reports-page.tsx
+  s_9b8b004c55c7f2::t_cdaf3b13840bcd 28,31,120,126,130-131,161,180,200-201,236
+apps/construction-management/docs/modules/11-reports-dashboards-backup.md
+  s_9b8b004c55c7f2::t_3ee81063826d62 496-509
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_9b8b004c55c7f2::t_78432cd2c7afa4 900,968-974
+apps/construction-management/lib/app-nav.ts
+  s_9b8b004c55c7f2::t_72ce0225446924 27
+apps/construction-management/src/composition/procurement-report-source.ts
+  s_9b8b004c55c7f2::t_32bf943eb14bf0 1-650
+apps/construction-management/src/composition/report-filter-options.ts
+  s_9b8b004c55c7f2::t_f2823bff906a2c 1-152
+apps/construction-management/src/composition/report-jobs.ts
+  s_9b8b004c55c7f2::t_d969b6b639ba4b 4,15,35,47-48
+apps/construction-management/src/queries/report-filter-options.ts
+  s_9b8b004c55c7f2::t_6bf88758e43cdc 1-36
+apps/construction-management/src/reporting/application/build-procurement-report.ts
+  s_9b8b004c55c7f2::t_0a6714665cd063 1-237
+apps/construction-management/src/reporting/application/build-report.ts
+  s_9b8b004c55c7f2::t_e0ac49daa592bd 30-35,39,71,145-167,193-194,207,226-227,232-235
+apps/construction-management/src/reporting/application/ports.ts
+  s_9b8b004c55c7f2::t_5e33f461926a15 18-29,178-191,405-505
+apps/construction-management/src/reporting/application/report-access.test.ts
+  s_9b8b004c55c7f2::t_c14684c1fd1e8f 36-37,49,55-59,119-168
+apps/construction-management/src/reporting/application/report-access.ts
+  s_9b8b004c55c7f2::t_89eed81c484c92 26-47,54,60,67,74-76,89
+apps/construction-management/src/reporting/application/report-handlers.test.ts
+  s_9b8b004c55c7f2::t_7274dd6ec37d39 179-180
+apps/construction-management/src/reporting/application/report-handlers.ts
+  s_9b8b004c55c7f2::t_2185a12e57d8c7 32,100-101,200
+apps/construction-management/src/reporting/domain/central-labour-attendance-report.test.ts
+  s_9b8b004c55c7f2::t_ef818d1c3538cf 1-106
+apps/construction-management/src/reporting/domain/central-labour-attendance-report.ts
+  s_9b8b004c55c7f2::t_93607133cef9aa 1-147
+apps/construction-management/src/reporting/domain/procurement-reports.test.ts
+  s_9b8b004c55c7f2::t_a6a367109a4e4a 1-330
+apps/construction-management/src/reporting/domain/procurement-reports.ts
+  s_9b8b004c55c7f2::t_570d5bd5a9f958 1-731
+apps/construction-management/src/reporting/domain/report-catalogue.test.ts
+  s_9b8b004c55c7f2::t_a6173cc8f1279d 93-98,118-189,206-207
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_9b8b004c55c7f2::t_4a5cd412866f56 57-62,79-87,116-123,134-137,228,252,264,330,353,513,538,561,572-574,578,580-585,594-600,602,607,609-614,620-622,625,627,632-640,651,656,658-663,672,674,679,681-686,695-700,702
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_9b8b004c55c7f2::t_468416ee2051bb 101-126,275-327,388-395
+apps/construction-management/src/reporting/infrastructure/create-report-handlers.ts
+  s_9b8b004c55c7f2::t_3397d573fcf4f1 9,47-48,81
+apps/construction-management/src/reporting/infrastructure/prisma-report-source.ts
+  s_9b8b004c55c7f2::t_0e3427eb2ad902 15,132-141,145,158,265-284
+apps/construction-management/test/procurement-reports.ts
+  s_9b8b004c55c7f2::t_7aef2f2f000fc7 1-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "546a8dc877c1f36caabafb39d7c0ed6859b24c8c",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
