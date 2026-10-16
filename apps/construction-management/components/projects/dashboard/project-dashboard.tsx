@@ -395,16 +395,20 @@ function MaterialsSection({
  * Daily Work, Equipment Usage, Materials, Issue & Snag and Inspection
  * Request have data (CM-805); Booking and Inquiry name the milestone that
  * fills them. Manage Dashboard shows,
- * hides and reorders sections for the member on every Project.
+ * hides and reorders sections for the member on every Project; sections
+ * whose module is hidden on this Project are left out (CM-902).
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
-  const { data: layout } = useSuspenseQuery(dashboardLayoutQuery);
+  const { data: layout } = useSuspenseQuery(dashboardLayoutQuery(projectId));
   const [duration, setDuration] = useState<Duration>(() =>
     presetDuration("last_12_months", browserToday()),
   );
   const [managing, setManaging] = useState(false);
   const problem = durationProblem(duration);
-  const shown = layout.sections.filter((section) => section.visible);
+  // A module hidden on the Project takes its section with it (CM-902).
+  const shown = layout.sections.filter(
+    (section) => section.visible && !section.hiddenOnProject,
+  );
 
   return (
     <div className="w-full min-w-0 p-6">

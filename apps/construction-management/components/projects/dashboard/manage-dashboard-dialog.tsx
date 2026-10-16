@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 
+import { cn } from "@repo/ui/lib/utils";
+
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { DASHBOARD_SECTION_KEYS } from "@/src/projects/domain/dashboard-sections";
@@ -33,7 +35,9 @@ function byDefault(sections: readonly DashboardSection[]) {
 /**
  * Manage Dashboard (CM-412): tick the sections to show and move them up or
  * down (keyboard friendly), or reset. Saved for the member on every
- * Project.
+ * Project. A section whose module is hidden on this Project (Hide / Show
+ * Modules) cannot be ticked and says why (CM-902); its tick is kept for
+ * the member's other Projects.
  */
 export function ManageDashboardDialog({
   sections: initial,
@@ -92,29 +96,53 @@ export function ManageDashboardDialog({
           className="bg-card max-h-[55vh] divide-y overflow-y-auto rounded-xl border"
         >
           {sections.map((section, index) => {
+            const hiddenHere = section.hiddenOnProject;
+            const reasonId = `manage-dashboard-${section.key}-reason`;
             return (
               <li
                 key={section.key}
                 className="flex items-center gap-2 px-3 py-2"
               >
-                <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2">
-                  <Checkbox
-                    checked={section.visible}
-                    onCheckedChange={(checked) => {
-                      setReset(false);
-                      setSections((current) =>
-                        current.map((item) =>
-                          item.key === section.key
-                            ? { ...item, visible: checked }
-                            : item,
-                        ),
-                      );
-                    }}
-                  />
-                  <span className="min-w-0 truncate text-sm font-medium">
-                    {section.label}
-                  </span>
-                </label>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <label
+                    className={cn(
+                      "flex min-w-0 items-center gap-2",
+                      hiddenHere ? "cursor-not-allowed" : "cursor-pointer",
+                    )}
+                  >
+                    <Checkbox
+                      checked={section.visible && !hiddenHere}
+                      disabled={hiddenHere}
+                      aria-describedby={hiddenHere ? reasonId : undefined}
+                      onCheckedChange={(checked) => {
+                        setReset(false);
+                        setSections((current) =>
+                          current.map((item) =>
+                            item.key === section.key
+                              ? { ...item, visible: checked }
+                              : item,
+                          ),
+                        );
+                      }}
+                    />
+                    <span
+                      className={cn(
+                        "min-w-0 truncate text-sm font-medium",
+                        hiddenHere && "text-muted-foreground",
+                      )}
+                    >
+                      {section.label}
+                    </span>
+                  </label>
+                  {hiddenHere ? (
+                    <span
+                      id={reasonId}
+                      className="text-muted-foreground pl-6 text-xs"
+                    >
+                      Hidden on this Project
+                    </span>
+                  ) : null}
+                </div>
                 {section.milestone == null ? null : (
                   <Badge variant="outline">{section.milestone}</Badge>
                 )}

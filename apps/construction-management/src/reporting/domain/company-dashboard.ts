@@ -1,3 +1,5 @@
+import { addDays, type CalendarDate } from "@/src/shared-kernel/calendar-date";
+
 /**
  * The Company Dashboard (CM-902, ADR CM-0021 §4): one row per Project the
  * member can see, and totals across them. A figure is null on a row when
@@ -93,4 +95,27 @@ export function compareDashboardProjects(
     DASHBOARD_PROJECT_STATUSES.indexOf(a.status) -
     DASHBOARD_PROJECT_STATUSES.indexOf(b.status);
   return byStatus !== 0 ? byStatus : byName.compare(a.name, b.name);
+}
+
+/** `YYYY-MM-DD` arithmetic on the calendar month, clamped to its last day. */
+function monthsBefore(date: CalendarDate, months: number): CalendarDate {
+  const [year = 0, month = 1, dayOfMonth = 1] = date.split("-").map(Number);
+  const target = new Date(Date.UTC(year, month - 1 - months, 1));
+  const last = new Date(
+    Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  target.setUTCDate(Math.min(dayOfMonth, last));
+  return target.toISOString().slice(0, 10);
+}
+
+/**
+ * The dashboards' default duration (ADR CM-0021 §4): the last 12 months
+ * ending `today`, the day after the same date a year ago through today —
+ * the duration filter's "Last 12 months".
+ */
+export function lastTwelveMonths(today: CalendarDate): {
+  from: CalendarDate;
+  to: CalendarDate;
+} {
+  return { from: addDays(monthsBefore(today, 12), 1), to: today };
 }

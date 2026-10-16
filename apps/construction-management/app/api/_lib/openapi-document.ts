@@ -4,6 +4,10 @@ import {
   queueOpenApiComponents,
   queueOpenApiOperations,
 } from "@/app/api/construction/queue/queue-openapi";
+import {
+  companyDashboardOpenApiComponents,
+  companyDashboardOpenApiOperations,
+} from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
 
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
@@ -967,6 +971,10 @@ Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
+
+// The Company Dashboard (CM-902) over the reporting views.
+Object.assign(openApiComponents, companyDashboardOpenApiComponents);
+openApiOperations.push(...companyDashboardOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

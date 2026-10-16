@@ -7,6 +7,7 @@ import {
   type CompanyDashboardRow,
   type CompanyDashboardTotals,
   type DashboardProgress,
+  lastTwelveMonths,
 } from "../domain/company-dashboard";
 import {
   APPROVAL_MODULE_MENUS,
@@ -165,13 +166,15 @@ export class CompanyDashboardReader {
     },
   ) {}
 
+  /** `range` defaults to the last 12 months ending the Company's today. */
   async read(
     access: MemberAccess,
-    range: DashboardRange,
+    asked: DashboardRange | null,
   ): Promise<CompanyDashboard> {
     const { source } = this.deps;
     const { workspaceId } = access;
     const today = await source.today(workspaceId);
+    const range = asked ?? lastTwelveMonths(today);
     const candidates = await source.projects(
       workspaceId,
       access.role === "owner" ? null : [...access.projectIds],
