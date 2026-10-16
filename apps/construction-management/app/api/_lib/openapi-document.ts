@@ -20,6 +20,10 @@ import {
   reportingFilterOptionsOpenApiComponents,
   reportingFilterOptionsOpenApiOperations,
 } from "@/app/api/construction/reporting/filter-options/filter-options-openapi";
+import {
+  accountOpenApiComponents,
+  accountOpenApiOperations,
+} from "@/app/api/construction/organization/account-openapi";
 
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
@@ -997,6 +1001,9 @@ openApiOperations.push(...companyDashboardOpenApiOperations);
 // The report cards' picker choices (CM-903).
 Object.assign(openApiComponents, reportingFilterOptionsOpenApiComponents);
 openApiOperations.push(...reportingFilterOptionsOpenApiOperations);
+// Action codes, Devices, ownership and deletion (M9, CM-907).
+Object.assign(openApiComponents, accountOpenApiComponents);
+openApiOperations.push(...accountOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

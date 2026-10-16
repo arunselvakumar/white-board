@@ -1,4 +1,5 @@
 import {
+  Building2,
   CalendarClock,
   ClipboardCheck,
   Hash,
@@ -40,5 +41,12 @@ export const SETTINGS_SECTIONS: readonly {
     description:
       "Which optional invoice and delivery fields a Goods Receipt shows and prints.",
     icon: ClipboardCheck,
+  },
+  {
+    href: "/app/masters/settings/company",
+    title: "Company",
+    description:
+      "Transfer ownership to another Team Member, or delete the Company. Owner only.",
+    icon: Building2,
   },
 ];

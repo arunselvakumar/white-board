@@ -382,6 +382,86 @@ export class TeamMember {
     this.touch(by, now);
   }
 
+  /**
+   * Transfer ownership (CM-907): this joined, active, Normal Team Member
+   * becomes the Owner, with the Owner Designation (kept when the Company
+   * has none) and every right. The Owner is on every Project, so the
+   * assignments go.
+   */
+  becomeOwner(ownerDesignationId: string | null, by: string, now: Date): void {
+    if (this.props.isOwner)
+      throw conflict("ALREADY_OWNER", "This Team Member is already the Owner.");
+    if (
+      this.props.status !== "active" ||
+      this.props.userId == null ||
+      this.props.deletedAt != null
+    )
+      throw conflict(
+        "NEW_OWNER_NOT_ACTIVE",
+        "Choose an active Team Member who has joined the Company.",
+      );
+    if (this.props.memberType === "hrms")
+      throw conflict(
+        "OWNER_IS_NORMAL",
+        "The Owner cannot be an HRMS Team Member.",
+      );
+    this.props = {
+      ...this.props,
+      isOwner: true,
+      permissions: PermissionSet.everything(),
+      projectIds: [],
+      details: {
+        ...this.props.details,
+        designationId: ownerDesignationId ?? this.props.details.designationId,
+      },
+    };
+    this.touch(by, now);
+  }
+
+  /**
+   * The Owner after handing the Company over (CM-907): a member with the
+   * Admin Designation (kept when the Company has none) and its matrix.
+   */
+  stepDownAsOwner(
+    designationId: string | null,
+    permissions: PermissionSet,
+    by: string,
+    now: Date,
+  ): void {
+    if (!this.props.isOwner)
+      throw conflict("NOT_OWNER", "Only the Owner can hand the Company over.");
+    this.props = {
+      ...this.props,
+      isOwner: false,
+      permissions,
+      details: {
+        ...this.props.details,
+        designationId: designationId ?? this.props.details.designationId,
+      },
+    };
+    this.touch(by, now);
+  }
+
+  /**
+   * The User deleted their account (CM-907). The record stays as the
+   * Company's own, marked Left and no longer linked to a User.
+   */
+  leave(now: Date): void {
+    if (this.props.isOwner)
+      throw conflict(
+        "OWNER_MUST_HAND_OVER",
+        "The Owner must hand the Company over or delete it first.",
+      );
+    const by = this.props.userId ?? this.props.updatedBy;
+    this.props = {
+      ...this.props,
+      userId: null,
+      status: "left",
+      inviteToken: null,
+    };
+    this.touch(by, now);
+  }
+
   /** Soft delete (root ADR-0019). The Owner stays. */
   remove(by: string, now: Date): void {
     if (this.props.isOwner)

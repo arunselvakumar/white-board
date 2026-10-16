@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { prisma } from "@repo/construction-db";
+import { prisma, type Prisma } from "@repo/construction-db";
 
 import { COMPANY_WORKSPACE_KIND, parseCompanyRole } from "../roles";
 import type { CompanySummary } from "../types";
@@ -115,6 +115,90 @@ export const companies = {
         role: "member",
         organizationId: input.workspaceId,
       },
+    });
+  },
+
+  /** The Companies the User is the Owner of, by name. */
+  async ownedBy(userId: string): Promise<CompanySummary[]> {
+    const all = await companies.listForUser(userId);
+    return all.filter((company) => company.role === "owner");
+  },
+
+  /**
+   * Makes `toUserId` the Company's `owner` and `fromUserId` a `member`
+   * (Transfer ownership, CM-907). There is one Owner at a time (ADR
+   * CM-0002). Pass the caller's transaction so the Team Member changes
+   * commit with it. Throws unless `fromUserId` is the Owner and
+   * `toUserId` a member.
+   */
+  async transferOwnership(
+    input: { workspaceId: string; fromUserId: string; toUserId: string },
+    db: Prisma.TransactionClient = prisma,
+  ): Promise<void> {
+    const demoted = await db.identityWorkspaceMember.updateMany({
+      where: {
+        organizationId: input.workspaceId,
+        userId: input.fromUserId,
+        role: "owner",
+      },
+      data: { role: "member" },
+    });
+    const promoted = await db.identityWorkspaceMember.updateMany({
+      where: {
+        organizationId: input.workspaceId,
+        userId: input.toUserId,
+        role: "member",
+      },
+      data: { role: "owner" },
+    });
+    if (demoted.count !== 1 || promoted.count !== 1)
+      throw new Error("Ownership can pass only from the Owner to a member.");
+  },
+
+  /**
+   * Takes the User out of every Company they are a `member` of (Delete My
+   * Account, CM-907); an Owner's memberships stay. Returns those
+   * Companies' ids.
+   */
+  async leaveAll(
+    userId: string,
+    db: Prisma.TransactionClient = prisma,
+  ): Promise<string[]> {
+    const memberships = await db.identityWorkspaceMember.findMany({
+      where: {
+        userId,
+        role: { not: "owner" },
+        workspace: { institutionType: COMPANY_WORKSPACE_KIND },
+      },
+      select: { id: true, organizationId: true },
+    });
+    if (memberships.length === 0) return [];
+    await db.identityWorkspaceMember.deleteMany({
+      where: { id: { in: memberships.map((row) => row.id) } },
+    });
+    return memberships.map((row) => row.organizationId);
+  },
+
+  /**
+   * Deletes a Company's Workspace for good (its deletion came due,
+   * CM-907): its memberships and invitations go with it, and no Session
+   * points at it any more.
+   */
+  async purge(workspaceId: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      await tx.identitySession.updateMany({
+        where: { activeOrganizationId: workspaceId },
+        data: { activeOrganizationId: null },
+      });
+      await tx.identityWorkspaceInvitation.deleteMany({
+        where: { organizationId: workspaceId },
+      });
+      await tx.identityWorkspaceMember.deleteMany({
+        where: { organizationId: workspaceId },
+      });
+      await tx.identityWorkspace.deleteMany({
+        where: { id: workspaceId, institutionType: COMPANY_WORKSPACE_KIND },
+      });
     });
   },
 
