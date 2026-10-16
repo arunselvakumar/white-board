@@ -1,0 +1,29 @@
+apps/construction-management/docs/modules/13-chat-notifications-support.md
+  s_9b8b004c55c7f2::t_788909c96d188a 426-441
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_d6e60556ca70c6::t_4d866c694fc52a 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8b3edd28c982eea72ddcaf8367ed9914aebba756",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_d6e60556ca70c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4eaf043243efc48f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
