@@ -659,14 +659,16 @@ export class NotificationListeners implements DomainEventListener {
   // -------------------------------------------------------------------------
 
   private async reportFinished(event: InboundReportFinished): Promise<Plan[]> {
-    const title = this.deps.names.reportTitle(event.kind);
+    const name = this.deps.names.reportTitle(event.kind);
+    // "Your Task Report is ready", "Your Purchase Requests report is ready".
+    const title = /report$/i.test(name) ? name : `${name} report`;
     const done = event.status === "done";
-    const downloads = done
-      ? await this.deps.names.reportDownloads(
-          event.workspaceId,
-          event.reportJobId,
-        )
-      : [];
+    const [downloads, project] = await Promise.all([
+      done
+        ? this.deps.names.reportDownloads(event.workspaceId, event.reportJobId)
+        : Promise.resolve([]),
+      this.projectName(event, event.projectId),
+    ]);
     return [
       {
         audience: { kind: "requester", userId: event.requestedBy },
@@ -678,7 +680,8 @@ export class NotificationListeners implements DomainEventListener {
           title: done
             ? `Your ${title} is ready`
             : `Your ${title} could not be generated`,
-          body: done ? event.fileName : event.error,
+          // Which Project (or all of them); a failure says why.
+          body: done ? (project ?? "All Projects") : event.error,
           href: LINKS.downloads,
           attachment: done
             ? { kind: "report", id: event.reportJobId, downloads }
