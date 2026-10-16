@@ -66,10 +66,18 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
     expect(kinds).toContain("task_report");
     expect(kinds).toContain("due_payments");
     expect(kinds).toContain("daily_progress_report");
-    // Central-only and not-yet-built reports are left out.
+    // Central-only reports are left out; the procurement ones are in (CM-903).
     expect(kinds).not.toContain("tds_194c");
-    expect(kinds).not.toContain("purchase_orders");
-    expect(kinds).not.toContain("stock_register");
+    expect(kinds).not.toContain("labour_attendance_central");
+    expect(kinds).toEqual(
+      expect.arrayContaining([
+        "purchase_requests",
+        "purchase_orders",
+        "material_received",
+        "material_transfers",
+        "stock_register",
+      ]),
+    );
     const month = items.find((item) => item.kind === "labour_month");
     expect(month).toMatchObject({
       title: "Month-wise Labour",
@@ -144,11 +152,25 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
     const owner = await kindsOf(company.cookie, "scope=central");
     expect(owner.map((item) => item.kind)).toEqual([
       "vendor_attendance",
+      "labour_attendance_central",
       "equipment_maintenance",
       "equipment_transfers",
       "account_ledger",
       "tds_194c",
       "due_payments",
+      "purchase_requests",
+      "purchase_orders",
+      "material_received",
+      "material_transfers",
+      "stock_register",
+    ]);
+    expect(
+      owner.find((item) => item.kind === "stock_register")?.filters,
+    ).toEqual([
+      { key: "material_category", required: false },
+      { key: "material", required: false },
+      { key: "store", required: false },
+      { key: "projects", required: false },
     ]);
     expect(
       owner.find((item) => item.kind === "due_payments")?.description,
@@ -196,31 +218,49 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
     expect(anonymous.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
-  it("refuses a catalogued report that is not built yet with 409 REPORT_NOT_AVAILABLE", async () => {
+  it("offers a central report no module hosts only with Central Reports Read (CM-903)", async () => {
     const company = await ownerWithCompany();
-    const projectId = await addProject(company.workspaceId, company.userId);
-    for (const kind of ["purchase_orders", "labour_attendance_central"]) {
-      const response = await requestReport(
-        jsonRequest(
-          `${TEST_ORIGIN}/api/construction/reporting/reports`,
-          company.cookie,
-          {
-            kind,
-            projectId: kind === "purchase_orders" ? projectId : null,
-            params: { from: "2026-09-01", to: "2026-09-30" },
-          },
-        ),
-      );
-      expect(response.status, kind).toBe(StatusCodes.CONFLICT);
-      expect((await json<{ code: string }>(response)).code).toBe(
-        "REPORT_NOT_AVAILABLE",
-      );
-    }
+    const grants: PermissionGrants = {
+      "procurement.purchase_orders": ["read", "report"],
+      "labour.vendor": ["read", "report"],
+      "masters.equipments": ["read", "report"],
+    };
+    const without = await member(company, grants, []);
     expect(
-      await prisma.constructionReportingReportJob.count({
-        where: { workspaceId: company.workspaceId },
-      }),
-    ).toBe(0);
+      (await kindsOf(without.cookie, "scope=central")).map((item) => item.kind),
+    ).toEqual(["equipment_maintenance", "equipment_transfers"]);
+    const withCentral = await member(
+      company,
+      { ...grants, "reporting.central_reports": ["read"] },
+      [],
+    );
+    const items = await kindsOf(withCentral.cookie, "scope=central");
+    expect(items.map((item) => item.kind)).toEqual([
+      "vendor_attendance",
+      "equipment_maintenance",
+      "equipment_transfers",
+      "purchase_orders",
+    ]);
+    // Purchase Order has no Financial: its Report shows the amounts.
+    expect(
+      items.find((item) => item.kind === "purchase_orders")?.includesMoney,
+    ).toBe(true);
+    // And the request is refused without it.
+    const response = await requestReport(
+      jsonRequest(
+        `${TEST_ORIGIN}/api/construction/reporting/reports`,
+        without.cookie,
+        {
+          kind: "purchase_orders",
+          projectId: null,
+          params: { from: "2026-09-01", to: "2026-09-30" },
+        },
+      ),
+    );
+    expect(response.status).toBe(StatusCodes.FORBIDDEN);
+    expect((await json<{ message: string }>(response)).message).toMatch(
+      /Central Reports Read/,
+    );
   });
 
   it("is on /api/docs", async () => {

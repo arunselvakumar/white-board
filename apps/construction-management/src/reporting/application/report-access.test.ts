@@ -118,11 +118,11 @@ describe("the catalogue a viewer may request", () => {
   });
 
   it("needs Central Reports Read for a central report no module hosts (CM-903)", () => {
-    const grants = {
+    const grants: PermissionGrants = {
       "procurement.purchase_orders": ["read", "report"],
       "labour.labour": ["read", "report"],
       "masters.equipments": ["read", "report"],
-    } as const;
+    };
     const without = member(grants);
     expect(kinds(viewerCatalogue(without, "central", null))).toEqual([
       "equipment_maintenance",
