@@ -16,6 +16,10 @@ import {
   companyDashboardOpenApiComponents,
   companyDashboardOpenApiOperations,
 } from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
+import {
+  reportingFilterOptionsOpenApiComponents,
+  reportingFilterOptionsOpenApiOperations,
+} from "@/app/api/construction/reporting/filter-options/filter-options-openapi";
 
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
@@ -990,6 +994,9 @@ openApiOperations.push(...reportingDownloadsOpenApiOperations);
 // The Company Dashboard (CM-902) over the reporting views.
 Object.assign(openApiComponents, companyDashboardOpenApiComponents);
 openApiOperations.push(...companyDashboardOpenApiOperations);
+// The report cards' picker choices (CM-903).
+Object.assign(openApiComponents, reportingFilterOptionsOpenApiComponents);
+openApiOperations.push(...reportingFilterOptionsOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,
