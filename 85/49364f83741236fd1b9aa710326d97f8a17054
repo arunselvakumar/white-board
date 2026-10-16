@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/reporting/company-dashboard/dashboard-views.http.test.ts
+  s_9b8b004c55c7f2::t_36033428b8c3d2 98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8549364f83741236fd1b9aa710326d97f8a17054",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
