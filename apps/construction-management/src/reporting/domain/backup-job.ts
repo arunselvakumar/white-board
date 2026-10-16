@@ -7,7 +7,12 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
  * queue job per module ("part"), then a zip step.
  */
 
-export const BACKUP_SCOPES = ["project", "masters", "company", "my_data"] as const;
+export const BACKUP_SCOPES = [
+  "project",
+  "masters",
+  "company",
+  "my_data",
+] as const;
 
 export type BackupScope = (typeof BACKUP_SCOPES)[number];
 
@@ -94,8 +99,7 @@ export function backupTooLarge(): DomainError {
   });
 }
 
-export const BACKUP_FAILED_MESSAGE =
-  "The backup could not be made. Try again.";
+export const BACKUP_FAILED_MESSAGE = "The backup could not be made. Try again.";
 
 export function isUnfinished(job: Pick<BackupJob, "status">): boolean {
   return job.status === "queued" || job.status === "running";
@@ -142,7 +146,8 @@ export function backupDetail(
   job: Pick<BackupJob, "scope" | "modules" | "fromDate" | "toDate">,
 ): string {
   if (job.scope === "my_data") return "Your profile, Companies and activity";
-  if (job.scope === "company") return "Every Project, master records and settings";
+  if (job.scope === "company")
+    return "Every Project, master records and settings";
   const count = job.modules.length;
   const modules = `${String(count)} ${count === 1 ? "module" : "modules"}`;
   return job.scope === "project"

@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { signInAs } from "../../.storybook/mocks/auth";
-import { mockApi, StoryQueries, type ApiCall } from "../../.storybook/mocks/api";
+import {
+  mockApi,
+  StoryQueries,
+  type ApiCall,
+} from "../../.storybook/mocks/api";
 import { BACKUP_ID, BACKUPS, backupResponse } from "./backup-fixtures";
 import { CompanyBackupScreen } from "./company-backup-screen";
 
@@ -27,9 +31,7 @@ function serve(answer?: (body: unknown) => Response | undefined) {
     if (call.method === "POST" && call.path === CODES)
       return new Response(null, { status: 204 });
     if (call.method === "POST" && call.path === BACKUPS)
-      return (
-        answer?.(call.body) ?? Response.json(COMPANY, { status: 201 })
-      );
+      return answer?.(call.body) ?? Response.json(COMPANY, { status: 201 });
     if (call.method === "GET" && call.path === `${BACKUPS}/${BACKUP_ID}`)
       return Response.json({ ...COMPANY, status: "running", partsDone: 12 });
     return undefined;
@@ -63,10 +65,14 @@ export const OwnerWithCode: Story = {
     const form = within(
       await canvas.findByRole("form", { name: "Full Company backup" }),
     );
-    await userEvent.click(form.getByRole("checkbox", { name: /Include media/ }));
+    await userEvent.click(
+      form.getByRole("checkbox", { name: /Include media/ }),
+    );
     await userEvent.click(form.getByRole("button", { name: "Send code" }));
     await userEvent.type(await form.findByLabelText("6-digit code"), "482913");
-    await userEvent.click(form.getByRole("button", { name: "Generate backup" }));
+    await userEvent.click(
+      form.getByRole("button", { name: "Generate backup" }),
+    );
     await expect(
       await canvas.findByText(/Making your backup… 0 of 41 parts/),
     ).toBeVisible();
@@ -97,11 +103,15 @@ export const CodeRequiredAndWrong: Story = {
     const form = within(
       await canvas.findByRole("form", { name: "Full Company backup" }),
     );
-    await userEvent.click(form.getByRole("button", { name: "Generate backup" }));
+    await userEvent.click(
+      form.getByRole("button", { name: "Generate backup" }),
+    );
     await expect(await form.findByText("Enter the 6-digit code")).toBeVisible();
     await userEvent.click(form.getByRole("button", { name: "Send code" }));
     await userEvent.type(await form.findByLabelText("6-digit code"), "111111");
-    await userEvent.click(form.getByRole("button", { name: "Generate backup" }));
+    await userEvent.click(
+      form.getByRole("button", { name: "Generate backup" }),
+    );
     await expect(
       await form.findByText("That code is not right. 4 tries left."),
     ).toBeVisible();

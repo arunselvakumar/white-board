@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi, StoryQueries, type ApiCall } from "../../.storybook/mocks/api";
+import {
+  mockApi,
+  StoryQueries,
+  type ApiCall,
+} from "../../.storybook/mocks/api";
 import {
   BACKUP_ID,
   BACKUPS,
@@ -26,11 +30,12 @@ function serve(input: {
       return Response.json({ modules: input.modules ?? PROJECT_MODULES });
     if (call.method === "POST" && call.path === BACKUPS)
       return (
-        input.answer?.() ??
-        Response.json(backupResponse(), { status: 201 })
+        input.answer?.() ?? Response.json(backupResponse(), { status: 201 })
       );
     if (call.method === "GET" && call.path === `${BACKUPS}/${BACKUP_ID}`)
-      return input.reads?.() ?? Response.json(backupResponse({ status: "done" }));
+      return (
+        input.reads?.() ?? Response.json(backupResponse({ status: "done" }))
+      );
     return undefined;
   });
   return api.restore;
@@ -93,9 +98,7 @@ export const ProjectBackup: Story = {
     await expect(
       await dialog.findByText(/Making your backup… 0 of 2 parts/),
     ).toBeVisible();
-    await expect(
-      calls.find((call) => call.method === "POST")?.body,
-    ).toEqual({
+    await expect(calls.find((call) => call.method === "POST")?.body).toEqual({
       scope: "project",
       projectId: TOWER,
       modules: ["site_work.daily_worksheet", "site_work.equipment_usage"],
@@ -113,8 +116,12 @@ export const ProjectBackup: Story = {
       "href",
       backupResponse({ status: "done" }).downloadHref ?? "",
     );
-    await expect(dialog.getByText(/Your backup is ready \(1\.2 MB\)/)).toBeVisible();
-    await expect(dialog.getByText(/The link works until 23 Oct 2026/)).toBeVisible();
+    await expect(
+      dialog.getByText(/Your backup is ready \(1\.2 MB\)/),
+    ).toBeVisible();
+    await expect(
+      dialog.getByText(/The link works until 23 Oct 2026/),
+    ).toBeVisible();
   },
 };
 
@@ -211,7 +218,9 @@ export const TooLarge: Story = {
         { timeout: 10_000 },
       ),
     ).toBeVisible();
-    await expect(dialog.getByText("The backup could not be made.")).toBeVisible();
+    await expect(
+      dialog.getByText("The backup could not be made."),
+    ).toBeVisible();
   },
 };
 

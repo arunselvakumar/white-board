@@ -157,7 +157,13 @@ function backupSource(kind: "backups" | "exports"): DownloadSource {
           files:
             row.downloadHref == null
               ? []
-              : [{ format: "zip" as const, label: "ZIP", href: row.downloadHref }],
+              : [
+                  {
+                    format: "zip" as const,
+                    label: "ZIP",
+                    href: row.downloadHref,
+                  },
+                ],
           retryHref: null,
           deleteHref: row.deleteHref,
         };

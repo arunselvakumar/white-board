@@ -113,9 +113,9 @@ describe("backup access (CM-906)", () => {
 
   it("checks masters without a Project and offers only what may be backed up", () => {
     const access = member({ "masters.materials": ["read"] });
-    expect(
-      allowMastersBackup(access, ["masters.materials"])[0]?.money,
-    ).toBe(false);
+    expect(allowMastersBackup(access, ["masters.materials"])[0]?.money).toBe(
+      false,
+    );
     expect(
       refusal(() => allowMastersBackup(access, ["masters.suppliers"]))?.details,
     ).toEqual({ module: "masters.suppliers" });

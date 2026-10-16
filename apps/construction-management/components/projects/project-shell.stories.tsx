@@ -190,7 +190,12 @@ export const BackupFromOptions: Story = {
     const restore = serve()();
     const original = globalThis.fetch;
     globalThis.fetch = (input, init) => {
-      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const href =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
       if (href.includes("/api/construction/reporting/backups/options"))
         return Promise.resolve(
           Response.json({
@@ -218,7 +223,9 @@ export const BackupFromOptions: Story = {
       await canvas.findByRole("button", { name: "Project options" }),
     );
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(await body.findByRole("menuitem", { name: "Backup…" }));
+    await userEvent.click(
+      await body.findByRole("menuitem", { name: "Backup…" }),
+    );
     const dialog = within(await body.findByRole("dialog"));
     await expect(
       await dialog.findByText("Back up Kumari Heights"),

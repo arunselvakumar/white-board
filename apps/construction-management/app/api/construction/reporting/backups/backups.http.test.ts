@@ -85,7 +85,10 @@ function download(cookie: string, href: string): Promise<Response> {
   });
 }
 
-async function zipOf(cookie: string, backup: Backup): Promise<Record<string, string | Uint8Array>> {
+async function zipOf(
+  cookie: string,
+  backup: Backup,
+): Promise<Record<string, string | Uint8Array>> {
   expect(backup.downloadHref).not.toBeNull();
   const response = await download(cookie, backup.downloadHref ?? "");
   expect(response.status).toBe(StatusCodes.OK);
@@ -99,32 +102,56 @@ async function zipOf(cookie: string, backup: Backup): Promise<Record<string, str
   );
 }
 
-function text(files: Record<string, string | Uint8Array>, path: string): string {
+function text(
+  files: Record<string, string | Uint8Array>,
+  path: string,
+): string {
   const value = files[path];
   if (typeof value !== "string") throw new Error(`No text file ${path}`);
   return value;
 }
 
-function csvLines(files: Record<string, string | Uint8Array>, path: string): string[] {
-  return text(files, path).replace(/^\uFEFF/, "").trimEnd().split("\r\n");
+function csvLines(
+  files: Record<string, string | Uint8Array>,
+  path: string,
+): string[] {
+  return text(files, path)
+    .replace(/^\uFEFF/, "")
+    .trimEnd()
+    .split("\r\n");
 }
 
 /** A Project with a Contractor and a Department for worksheets. */
 async function siteOf(company: Company) {
-  const projectId = await addProject(company.workspaceId, company.userId, "Tower A");
-  const departmentId = await worksheetDepartment(company.workspaceId, company.userId, {
-    name: "Masonry",
-  });
-  const contractorId = await worksheetContractor(company.workspaceId, company.userId, {
-    name: "Velan Constructions",
-    projectIds: [projectId],
-    departmentIds: [departmentId],
-  });
+  const projectId = await addProject(
+    company.workspaceId,
+    company.userId,
+    "Tower A",
+  );
+  const departmentId = await worksheetDepartment(
+    company.workspaceId,
+    company.userId,
+    {
+      name: "Masonry",
+    },
+  );
+  const contractorId = await worksheetContractor(
+    company.workspaceId,
+    company.userId,
+    {
+      name: "Velan Constructions",
+      projectIds: [projectId],
+      departmentIds: [departmentId],
+    },
+  );
   return { projectId, departmentId, contractorId };
 }
 
 /** A worksheet photo stored for real, as the document thread stores one. */
-async function attachPhoto(company: Company, worksheetId: string): Promise<string> {
+async function attachPhoto(
+  company: Company,
+  worksheetId: string,
+): Promise<string> {
   const key = `companies/${company.workspaceId}/site-work/${randomUUID()}.png`;
   await objectStorage().put(key, pngBytes(), "image/png");
   await prisma.constructionSiteWorkDocumentFile.create({
@@ -148,15 +175,19 @@ async function rentedSheet(
   projectId: string,
   hirePartyId: string,
 ) {
-  const equipment = await reportsEquipment(company.workspaceId, company.userId, {
-    name: "JCB 3DX",
-    projectId,
-    placedOn: "2026-09-01",
-    ownership: "rented",
-    hirePartyId,
-    hireBasis: "hourly",
-    hireRate: 150_000n,
-  });
+  const equipment = await reportsEquipment(
+    company.workspaceId,
+    company.userId,
+    {
+      name: "JCB 3DX",
+      projectId,
+      placedOn: "2026-09-01",
+      ownership: "rented",
+      hirePartyId,
+      hireBasis: "hourly",
+      hireRate: 150_000n,
+    },
+  );
   return reportsUsageSheet(company.workspaceId, company.userId, {
     equipmentId: equipment.id,
     projectId,
@@ -190,12 +221,18 @@ describe("backups: Project scope (CM-906)", () => {
       modules: ["site_work.daily_worksheet", "site_work.equipment_usage"],
     });
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
-    const body = await json<{ code: string; message: string; details: unknown }>(refused);
+    const body = await json<{
+      code: string;
+      message: string;
+      details: unknown;
+    }>(refused);
     expect(body.code).toBe("PERMISSION_DENIED");
     expect(body.message).toContain("Equipment Usage");
     expect(body.details).toEqual({ module: "site_work.equipment_usage" });
 
-    const noProject = await memberWith(owner, { "site_work.daily_worksheet": ["read"] });
+    const noProject = await memberWith(owner, {
+      "site_work.daily_worksheet": ["read"],
+    });
     await sharedAssign(noProject.memberId, projectId);
     const withoutProject = await ask(noProject.cookie, {
       scope: "project",
@@ -210,17 +247,22 @@ describe("backups: Project scope (CM-906)", () => {
       "site_work.daily_worksheet": ["read"],
     });
     expect(
-      (await ask(elsewhere.cookie, {
-        scope: "project",
-        projectId,
-        modules: ["site_work.daily_worksheet"],
-      })).status,
+      (
+        await ask(elsewhere.cookie, {
+          scope: "project",
+          projectId,
+          modules: ["site_work.daily_worksheet"],
+        })
+      ).status,
     ).toBe(StatusCodes.FORBIDDEN);
 
     // The options offer only what may be backed up.
     const options = await json<Options>(
       await backupOptions(
-        jsonRequest(`${BASE}/options?scope=project&projectId=${projectId}`, member.cookie),
+        jsonRequest(
+          `${BASE}/options?scope=project&projectId=${projectId}`,
+          member.cookie,
+        ),
       ),
     );
     expect(options.modules.map((module) => module.key)).toEqual([
@@ -306,7 +348,11 @@ describe("backups: Project scope (CM-906)", () => {
       project: { name: string };
       range: { from: string; to: string };
       requestedBy: { userId: string };
-      modules: { key: string; entities: { entity: string; rows: number }[]; mediaFiles: number }[];
+      modules: {
+        key: string;
+        entities: { entity: string; rows: number }[];
+        mediaFiles: number;
+      }[];
     };
     expect(manifest.company.name).toBe("Backup Builders");
     expect(manifest.project.name).toBe("Tower A");
@@ -323,7 +369,9 @@ describe("backups: Project scope (CM-906)", () => {
     expect(manifest.modules[0]?.mediaFiles).toBe(1);
 
     const sheets = csvLines(files, "daily-worksheets/worksheets.csv");
-    expect(sheets[0]).toContain("Worksheet No.,Date,Shift,Contractor,Department");
+    expect(sheets[0]).toContain(
+      "Worksheet No.,Date,Shift,Contractor,Department",
+    );
     expect(sheets).toHaveLength(2);
     expect(sheets[1]).toContain(live.number);
     expect(sheets[1]).toContain("2026-09-12");
@@ -334,7 +382,9 @@ describe("backups: Project scope (CM-906)", () => {
       .join("\n");
     expect(all).not.toContain(gone.number);
     expect(all).not.toContain(early.number);
-    const json = JSON.parse(text(files, "daily-worksheets/worksheets.json")) as Record<string, unknown>[];
+    const json = JSON.parse(
+      text(files, "daily-worksheets/worksheets.json"),
+    ) as Record<string, unknown>[];
     expect(json).toHaveLength(1);
     expect(json[0]).toMatchObject({
       id: live.id,
@@ -343,11 +393,15 @@ describe("backups: Project scope (CM-906)", () => {
       skilledCount: 4,
       contractor: "Velan Constructions",
     });
-    expect(csvLines(files, "daily-worksheets/worksheet_materials.csv")[1]).toContain(
-      "Cement OPC 53,Bag,12",
+    expect(
+      csvLines(files, "daily-worksheets/worksheet_materials.csv")[1],
+    ).toContain("Cement OPC 53,Bag,12");
+    const media = Object.keys(files).filter((path) =>
+      path.startsWith("media/"),
     );
-    const media = Object.keys(files).filter((path) => path.startsWith("media/"));
-    expect(media).toEqual([`media/daily-worksheets/${live.number.replace("/", "-")}/slab-pour.png`]);
+    expect(media).toEqual([
+      `media/daily-worksheets/${live.number.replace("/", "-")}/slab-pour.png`,
+    ]);
     expect(files[media[0] ?? ""]).toEqual(pngBytes());
     expect(csvLines(files, "issues/issues.csv")).toHaveLength(1);
 
@@ -358,12 +412,18 @@ describe("backups: Project scope (CM-906)", () => {
       modules: ["site_work.daily_worksheet"],
     });
     const plain = await zipOf(owner.cookie, dataOnly);
-    expect(Object.keys(plain).some((path) => path.startsWith("media/"))).toBe(false);
+    expect(Object.keys(plain).some((path) => path.startsWith("media/"))).toBe(
+      false,
+    );
 
     // Backups never count as storage.
     const before = await storedBytes(prisma, owner.workspaceId);
     const rows = await prisma.constructionOrganizationStoredFile.findMany({
-      where: { workspaceId: owner.workspaceId, kind: "backup", deletedAt: null },
+      where: {
+        workspaceId: owner.workspaceId,
+        kind: "backup",
+        deletedAt: null,
+      },
     });
     expect(rows.length).toBe(2);
     expect(await storedBytes(prisma, owner.workspaceId)).toBe(before);
@@ -393,15 +453,23 @@ describe("backups: Project scope (CM-906)", () => {
     const without = await done(viewer.cookie, body);
     expect(without.includesMoney).toBe(false);
     const plain = await zipOf(viewer.cookie, without);
-    const header = csvLines(plain, "equipment-usage/equipment_usage_sheets.csv")[0];
+    const header = csvLines(
+      plain,
+      "equipment-usage/equipment_usage_sheets.csv",
+    )[0];
     expect(header).toContain("Billable Qty");
     expect(header).not.toContain("Hire Cost");
-    expect(text(plain, "equipment-usage/equipment_usage_sheets.json")).not.toContain("hireCost");
+    expect(
+      text(plain, "equipment-usage/equipment_usage_sheets.json"),
+    ).not.toContain("hireCost");
 
     const withMoney = await done(financial.cookie, body);
     expect(withMoney.includesMoney).toBe(true);
     const priced = await zipOf(financial.cookie, withMoney);
-    const lines = csvLines(priced, "equipment-usage/equipment_usage_sheets.csv");
+    const lines = csvLines(
+      priced,
+      "equipment-usage/equipment_usage_sheets.csv",
+    );
     expect(lines[0]).toContain("Unit Rate (₹),Hire Cost (₹)");
     expect(lines[1]).toContain("1500.00,12000.50");
   });
@@ -414,7 +482,9 @@ describe("backups: Project scope (CM-906)", () => {
       "site_work.daily_worksheet": ["read", "notification"],
     });
     await sharedAssign(member.memberId, projectId);
-    await givePlan(owner.workspaceId, { endsAt: new Date(Date.now() - DAY_MS) });
+    await givePlan(owner.workspaceId, {
+      endsAt: new Date(Date.now() - DAY_MS),
+    });
 
     const backup = await done(member.cookie, {
       scope: "project",
@@ -437,7 +507,12 @@ describe("backups: Project scope (CM-906)", () => {
 
     // Downloads lists it with its ZIP; another member's list does not.
     const page = await json<DownloadsPage>(
-      await listDownloads(jsonRequest(`${TEST_ORIGIN}/api/construction/reporting/downloads`, member.cookie)),
+      await listDownloads(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/reporting/downloads`,
+          member.cookie,
+        ),
+      ),
     );
     const row = page.items.find((item) => item.id === backup.id);
     expect(row).toMatchObject({
@@ -449,7 +524,12 @@ describe("backups: Project scope (CM-906)", () => {
       deleteHref: `${BACKUPS_PATH}/${backup.id}/delete`,
     });
     const ownersPage = await json<DownloadsPage>(
-      await listDownloads(jsonRequest(`${TEST_ORIGIN}/api/construction/reporting/downloads`, owner.cookie)),
+      await listDownloads(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/reporting/downloads`,
+          owner.cookie,
+        ),
+      ),
     );
     expect(ownersPage.items.some((item) => item.id === backup.id)).toBe(false);
   });
@@ -458,20 +538,27 @@ describe("backups: Project scope (CM-906)", () => {
 describe("backups: master records (CM-906)", () => {
   it("needs View on each master", async () => {
     const owner = await ownerWithCompany();
-    await worksheetContractor(owner.workspaceId, owner.userId, { name: "Ganesh Builders" });
+    await worksheetContractor(owner.workspaceId, owner.userId, {
+      name: "Ganesh Builders",
+    });
     const member = await memberWith(owner, { "masters.contractors": ["read"] });
     const refused = await ask(member.cookie, {
       scope: "masters",
       modules: ["masters.contractors", "masters.suppliers"],
     });
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
-    expect(await json(refused)).toMatchObject({ details: { module: "masters.suppliers" } });
+    expect(await json(refused)).toMatchObject({
+      details: { module: "masters.suppliers" },
+    });
 
     const backup = await done(member.cookie, {
       scope: "masters",
       modules: ["masters.contractors"],
     });
-    expect(backup).toMatchObject({ title: "Master records backup", detail: "1 module" });
+    expect(backup).toMatchObject({
+      title: "Master records backup",
+      detail: "1 module",
+    });
     const files = await zipOf(member.cookie, backup);
     const lines = csvLines(files, "masters/contractors/contractors.csv");
     expect(lines[0]).toContain("ID,Contractor,Contact Person");
@@ -483,7 +570,10 @@ describe("backups: full Company (CM-906)", () => {
   it("is the Owner's alone and needs the company_backup code", async () => {
     const owner = await ownerWithCompany("Code Builders");
     const member = await memberWith(owner, { "masters.contractors": ["read"] });
-    const forbidden = await ask(member.cookie, { scope: "company", code: "123456" });
+    const forbidden = await ask(member.cookie, {
+      scope: "company",
+      code: "123456",
+    });
     expect(forbidden.status).toBe(StatusCodes.FORBIDDEN);
 
     const missing = await ask(owner.cookie, { scope: "company" });
@@ -505,9 +595,9 @@ describe("backups: full Company (CM-906)", () => {
 
     // A code for another purpose does not do.
     const other = await codeFor(owner, "delete_company");
-    expect((await ask(owner.cookie, { scope: "company", code: other })).status).toBe(
-      StatusCodes.BAD_REQUEST,
-    );
+    expect(
+      (await ask(owner.cookie, { scope: "company", code: other })).status,
+    ).toBe(StatusCodes.BAD_REQUEST);
   });
 
   it("holds every module with amounts, and emails the Owner the link", async () => {
@@ -517,7 +607,10 @@ describe("backups: full Company (CM-906)", () => {
     const code = await codeFor(owner, "company_backup");
     const sentBefore = outbox.length;
     const backup = await done(owner.cookie, { scope: "company", code });
-    expect(backup).toMatchObject({ title: "Full Company backup", includesMoney: true });
+    expect(backup).toMatchObject({
+      title: "Full Company backup",
+      includesMoney: true,
+    });
     expect(backup.modules.length).toBeGreaterThan(30);
 
     const files = await zipOf(owner.cookie, backup);
@@ -526,19 +619,32 @@ describe("backups: full Company (CM-906)", () => {
       project: unknown;
     };
     expect(manifest.project).toBeNull();
-    expect(manifest.modules.map((module) => module.key)).toContain("company.settings");
-    expect(csvLines(files, "company/company_profile.csv").join("\n")).toContain("Full Builders");
-    expect(csvLines(files, "project/projects.csv").join("\n")).toContain("Tower A");
-    expect(csvLines(files, "masters/contractors/contractors.csv").join("\n")).toContain(
-      "Velan Constructions",
+    expect(manifest.modules.map((module) => module.key)).toContain(
+      "company.settings",
     );
-    const sheets = csvLines(files, "equipment-usage/equipment_usage_sheets.csv");
+    expect(csvLines(files, "company/company_profile.csv").join("\n")).toContain(
+      "Full Builders",
+    );
+    expect(csvLines(files, "project/projects.csv").join("\n")).toContain(
+      "Tower A",
+    );
+    expect(
+      csvLines(files, "masters/contractors/contractors.csv").join("\n"),
+    ).toContain("Velan Constructions");
+    const sheets = csvLines(
+      files,
+      "equipment-usage/equipment_usage_sheets.csv",
+    );
     expect(sheets[0]).toContain("Hire Cost (₹)");
     expect(sheets[1]).toContain("12000.50");
 
-    const mail = outbox.slice(sentBefore).find((sent) => sent.to === owner.email);
+    const mail = outbox
+      .slice(sentBefore)
+      .find((sent) => sent.to === owner.email);
     expect(mail?.subject).toBe("Your full backup of Full Builders is ready");
-    expect(mail?.text).toContain(`${BACKUPS_PATH}/${backup.id}/download?expires=`);
+    expect(mail?.text).toContain(
+      `${BACKUPS_PATH}/${backup.id}/download?expires=`,
+    );
   });
 });
 
@@ -546,7 +652,11 @@ describe("Download My Data (CM-906)", () => {
   it("holds the User's profile, Companies, devices, notifications and own audit events", async () => {
     const owner = await ownerWithCompany("Data Builders");
     const backup = await done(owner.cookie, { scope: "my_data" });
-    expect(backup).toMatchObject({ scope: "my_data", title: "My data", projectId: null });
+    expect(backup).toMatchObject({
+      scope: "my_data",
+      title: "My data",
+      projectId: null,
+    });
     const row = await prisma.constructionReportingBackupJob.findUniqueOrThrow({
       where: { id: backup.id },
     });
@@ -559,21 +669,30 @@ describe("Download My Data (CM-906)", () => {
     expect(companies[0]).toContain("Company,Role,Team Member ID,Name");
     expect(companies.join("\n")).toContain("Data Builders");
     expect(csvLines(files, "my-data/devices.csv")).toHaveLength(2);
-    expect(text(files, "my-data/audit_events.json")).toContain("company.created");
+    expect(text(files, "my-data/audit_events.json")).toContain(
+      "company.created",
+    );
     expect(Object.keys(files)).toContain("my-data/notifications.csv");
     const manifest = JSON.parse(text(files, "manifest.json")) as {
       company: unknown;
       modules: { key: string }[];
     };
     expect(manifest.company).toBeNull();
-    expect(manifest.modules.map((module) => module.key)).toEqual([MY_DATA_MODULE]);
+    expect(manifest.modules.map((module) => module.key)).toEqual([
+      MY_DATA_MODULE,
+    ]);
 
     const ready = await notificationsOf(owner.userId, "export.ready");
     expect(ready).toHaveLength(1);
-    expect(ready[0]?.attachment).toMatchObject({ kind: "export", id: backup.id });
+    expect(ready[0]?.attachment).toMatchObject({
+      kind: "export",
+      id: backup.id,
+    });
 
     // Listed with the User's own backups, in any Company.
-    const list = await json<BackupsPage>(await listBackups(jsonRequest(BASE, owner.cookie)));
+    const list = await json<BackupsPage>(
+      await listBackups(jsonRequest(BASE, owner.cookie)),
+    );
     expect(list.items.map((item) => item.id)).toContain(backup.id);
   });
 });
@@ -588,12 +707,20 @@ describe("signed links (CM-906)", () => {
     const href = backup.downloadHref ?? "";
     expect((await download(owner.cookie, href)).status).toBe(StatusCodes.OK);
 
-    const tamperedSig = href.replace(/sig=([^&]+)/, (_, sig: string) => `sig=${sig.slice(0, -2)}AA`);
+    const tamperedSig = href.replace(
+      /sig=([^&]+)/,
+      (_, sig: string) => `sig=${sig.slice(0, -2)}AA`,
+    );
     const refused = await download(owner.cookie, tamperedSig);
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(refused)).toMatchObject({ code: "BACKUP_LINK_INVALID" });
-    const later = href.replace(/expires=(\d+)/, (_, at: string) => `expires=${String(Number(at) + 86_400)}`);
-    expect((await download(owner.cookie, later)).status).toBe(StatusCodes.FORBIDDEN);
+    const later = href.replace(
+      /expires=(\d+)/,
+      (_, at: string) => `expires=${String(Number(at) + 86_400)}`,
+    );
+    expect((await download(owner.cookie, later)).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
 
     // Another User with the Owner's link.
     const member = await memberWith(owner, { "masters.tags": ["read"] });
@@ -602,11 +729,21 @@ describe("signed links (CM-906)", () => {
     expect(await json(notYours)).toMatchObject({ code: "BACKUP_LINK_INVALID" });
     // Nor is it theirs to read or delete.
     const params = { params: Promise.resolve({ id: backup.id }) };
-    expect((await getBackup(jsonRequest(`${BASE}/${backup.id}`, member.cookie), params)).status).toBe(
-      StatusCodes.NOT_FOUND,
-    );
     expect(
-      (await deleteBackup(jsonRequest(`${BASE}/${backup.id}/delete`, member.cookie, {}), params)).status,
+      (
+        await getBackup(
+          jsonRequest(`${BASE}/${backup.id}`, member.cookie),
+          params,
+        )
+      ).status,
+    ).toBe(StatusCodes.NOT_FOUND);
+    expect(
+      (
+        await deleteBackup(
+          jsonRequest(`${BASE}/${backup.id}/delete`, member.cookie, {}),
+          params,
+        )
+      ).status,
     ).toBe(StatusCodes.NOT_FOUND);
 
     // A link signed with a passed expiry.
@@ -640,12 +777,22 @@ describe("signed links (CM-906)", () => {
     expect(await json(notReady)).toMatchObject({ code: "BACKUP_NOT_READY" });
 
     // The requester reads and deletes it; the link then stops working.
-    const read = await getBackup(jsonRequest(`${BASE}/${backup.id}`, owner.cookie), params);
+    const read = await getBackup(
+      jsonRequest(`${BASE}/${backup.id}`, owner.cookie),
+      params,
+    );
     expect(read.status).toBe(StatusCodes.OK);
     expect(
-      (await deleteBackup(jsonRequest(`${BASE}/${backup.id}/delete`, owner.cookie, {}), params)).status,
+      (
+        await deleteBackup(
+          jsonRequest(`${BASE}/${backup.id}/delete`, owner.cookie, {}),
+          params,
+        )
+      ).status,
     ).toBe(StatusCodes.NO_CONTENT);
-    expect((await download(owner.cookie, href)).status).toBe(StatusCodes.NOT_FOUND);
+    expect((await download(owner.cookie, href)).status).toBe(
+      StatusCodes.NOT_FOUND,
+    );
   });
 });
 
@@ -676,7 +823,10 @@ describe("backup limits and retention (CM-906)", () => {
       requestedBy: owner.userId,
       notify: { workspaceId: owner.workspaceId, email: null },
     });
-    expect(job).toMatchObject({ status: "failed", error: BACKUP_TOO_LARGE_MESSAGE });
+    expect(job).toMatchObject({
+      status: "failed",
+      error: BACKUP_TOO_LARGE_MESSAGE,
+    });
     const failed = await notificationsOf(owner.userId, "backup.failed");
     expect(failed.map((row) => row.body)).toContain(BACKUP_TOO_LARGE_MESSAGE);
   });
@@ -684,7 +834,10 @@ describe("backup limits and retention (CM-906)", () => {
   it("expires a backup after 7 days: file deleted, row expired, link gone", async () => {
     expect(DAILY_JOB_TYPES).toContain(BACKUP_RETENTION_JOB_TYPE);
     const owner = await ownerWithCompany();
-    const backup = await done(owner.cookie, { scope: "masters", modules: ["masters.tags"] });
+    const backup = await done(owner.cookie, {
+      scope: "masters",
+      modules: ["masters.tags"],
+    });
     const row = await prisma.constructionReportingBackupJob.findUniqueOrThrow({
       where: { id: backup.id },
     });
@@ -701,12 +854,17 @@ describe("backup limits and retention (CM-906)", () => {
       dedupeKey: `test:backup-retention:${newId()}`,
     });
     expect((await drainQueue({ ids: [id] })).failed).toBe(0);
-    const after = await prisma.constructionReportingBackupJob.findUniqueOrThrow({
-      where: { id: backup.id },
-    });
+    const after = await prisma.constructionReportingBackupJob.findUniqueOrThrow(
+      {
+        where: { id: backup.id },
+      },
+    );
     expect(after).toMatchObject({ status: "expired", fileKey: null });
     expect(await objectStorage().head(key)).toBeNull();
-    const file = await prisma.constructionOrganizationStoredFile.findFirstOrThrow({ where: { key } });
+    const file =
+      await prisma.constructionOrganizationStoredFile.findFirstOrThrow({
+        where: { key },
+      });
     expect(file.deletedAt).not.toBeNull();
     const gone = await download(owner.cookie, backup.downloadHref ?? "");
     expect(gone.status).toBe(StatusCodes.GONE);
@@ -729,7 +887,10 @@ describe("backup limits and retention (CM-906)", () => {
           status: "running",
         },
       });
-    const refused = await ask(owner.cookie, { scope: "masters", modules: ["masters.tags"] });
+    const refused = await ask(owner.cookie, {
+      scope: "masters",
+      modules: ["masters.tags"],
+    });
     expect(refused.status).toBe(StatusCodes.CONFLICT);
     expect(await json(refused)).toMatchObject({ code: "TOO_MANY_BACKUPS" });
   });

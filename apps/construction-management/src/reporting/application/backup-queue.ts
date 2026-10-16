@@ -102,7 +102,8 @@ export function zipSegment(raw: string, fallback: string): string {
   let text = "";
   for (const char of raw) {
     const code = char.codePointAt(0) ?? 0;
-    text += code < 0x20 || code === 0x7f || '/\\:*?"<>|'.includes(char) ? "-" : char;
+    text +=
+      code < 0x20 || code === 0x7f || '/\\:*?"<>|'.includes(char) ? "-" : char;
   }
   text = text.trim().slice(0, 120);
   return text.length === 0 || /^\.+$/.test(text) ? fallback : text;
@@ -128,7 +129,10 @@ export function createBackupQueue(deps: BackupQueueDeps) {
   const pageSize = deps.pageSize ?? BACKUP_PAGE_SIZE;
   const limit = deps.timeLimitMs ?? BACKUP_TIME_LIMIT_MS;
 
-  async function announce(event: Omit<BackupFinished, "type" | "workspaceId" | "occurredAt">, notify: BackupNotify) {
+  async function announce(
+    event: Omit<BackupFinished, "type" | "workspaceId" | "occurredAt">,
+    notify: BackupNotify,
+  ) {
     if (deps.events == null || notify.workspaceId == null) return;
     await deps.events.dispatch([
       {
@@ -320,11 +324,18 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     },
     async onGiveUp(job) {
       const payload = partPayload(job);
-      await failBackup(payload.backupJobId, BACKUP_FAILED_MESSAGE, payload.notify);
+      await failBackup(
+        payload.backupJobId,
+        BACKUP_FAILED_MESSAGE,
+        payload.notify,
+      );
     },
   };
 
-  async function zipBackup(backup: BackupJob, notify: BackupNotify): Promise<void> {
+  async function zipBackup(
+    backup: BackupJob,
+    notify: BackupNotify,
+  ): Promise<void> {
     if (backup.parts.some((p) => !p.done || p.key == null))
       throw new Error("The backup's parts are not all written yet.");
     const partBytes = backup.parts.reduce((sum, p) => sum + p.bytes, 0);
@@ -357,7 +368,10 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     }
     const bytes = archive.finish();
     const key = backupZipKey(backup);
-    const fileName = backupFileName(backup.scope, now.toISOString().slice(0, 10));
+    const fileName = backupFileName(
+      backup.scope,
+      now.toISOString().slice(0, 10),
+    );
     await deps.storage.put(key, bytes, "application/zip");
     const finishedAt = clock();
     const expiresAt = backupExpiresAt(finishedAt);
@@ -397,7 +411,11 @@ export function createBackupQueue(deps: BackupQueueDeps) {
       },
       notify,
     );
-    if (backup.scope === "company" && notify.email != null && deps.mailer != null)
+    if (
+      backup.scope === "company" &&
+      notify.email != null &&
+      deps.mailer != null
+    )
       await deps.mailer
         .sendCompanyBackupReady({
           to: notify.email,
@@ -427,7 +445,11 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     },
     async onGiveUp(job) {
       const payload = zipPayload(job);
-      await failBackup(payload.backupJobId, BACKUP_FAILED_MESSAGE, payload.notify);
+      await failBackup(
+        payload.backupJobId,
+        BACKUP_FAILED_MESSAGE,
+        payload.notify,
+      );
     },
   };
 

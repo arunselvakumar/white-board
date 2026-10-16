@@ -43,7 +43,8 @@ function isoDate(value: Date): string {
 }
 
 function dateOf(value: BackupRawValue): Date | null {
-  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (value instanceof Date)
+    return Number.isNaN(value.getTime()) ? null : value;
   if (typeof value === "string" && value.length > 0) {
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -136,7 +137,10 @@ const FORMULA_START = /^[=+\-@\t\r]/;
  * break, or starts or ends with a space; quotes doubled. Text that would
  * start a formula is prefixed with `'` (CSV injection).
  */
-export function csvField(value: string, type: BackupColumnType = "text"): string {
+export function csvField(
+  value: string,
+  type: BackupColumnType = "text",
+): string {
   let text = value;
   if (
     (type === "text" || type === "enum" || type === "json") &&
@@ -224,9 +228,7 @@ export class BackupEntityWriter {
     return {
       csv: this.csv.join(""),
       json:
-        this.json.length === 0
-          ? "[]\n"
-          : `[\n${this.json.join(",\n")}\n]\n`,
+        this.json.length === 0 ? "[]\n" : `[\n${this.json.join(",\n")}\n]\n`,
     };
   }
 }

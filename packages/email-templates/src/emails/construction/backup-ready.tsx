@@ -37,8 +37,8 @@ export function BackupReadyEmail({
         Download the backup
       </Button>
       <Text style={styles.small}>
-        If you did not ask for this backup, sign in and change your password.
-        If the button does not work, open {downloadUrl}
+        If you did not ask for this backup, sign in and change your password. If
+        the button does not work, open {downloadUrl}
       </Text>
     </EmailLayout>
   );

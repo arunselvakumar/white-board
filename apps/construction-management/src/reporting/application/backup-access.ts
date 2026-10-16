@@ -59,7 +59,10 @@ function checkedModules(
 ): BackupModule[] {
   const unique = [...new Set(keys)];
   if (unique.length === 0)
-    throw new DomainError("BACKUP_MODULES_REQUIRED", "Choose at least one module.");
+    throw new DomainError(
+      "BACKUP_MODULES_REQUIRED",
+      "Choose at least one module.",
+    );
   return unique.map((key) => {
     const found = backupModule(key);
     if (found?.scope !== scope)
@@ -121,7 +124,11 @@ export function backupOptions(
   scope: "project" | "masters",
   projectId: string | null,
 ): { module: BackupModule; money: boolean }[] {
-  if (scope === "project" && projectId != null && !can(access, "projects.project", "read", { projectId }))
+  if (
+    scope === "project" &&
+    projectId != null &&
+    !can(access, "projects.project", "read", { projectId })
+  )
     return [];
   return backupModulesIn(scope)
     .filter((module) => canBackUpModule(access, module, projectId))

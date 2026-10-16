@@ -48,7 +48,11 @@ export function buildBackupManifest(input: {
     "JSON files keep the raw field names and ids.",
     "Deleted records are not included.",
   ];
-  if (input.parts.some((part) => !part.money && backupModule(part.module)?.money != null))
+  if (
+    input.parts.some(
+      (part) => !part.money && backupModule(part.module)?.money != null,
+    )
+  )
     notes.push(
       "Amounts are left out of modules you have no Financial right on.",
     );

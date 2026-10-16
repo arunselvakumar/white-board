@@ -20,7 +20,9 @@ import {
 } from "../domain/backup-job";
 
 type Row = Awaited<
-  ReturnType<PrismaClient["constructionReportingBackupJob"]["findUniqueOrThrow"]>
+  ReturnType<
+    PrismaClient["constructionReportingBackupJob"]["findUniqueOrThrow"]
+  >
 >;
 
 const UNFINISHED: BackupStatus[] = ["queued", "running"];
@@ -84,11 +86,15 @@ export function prismaBackupJobStore(db: PrismaClient): BackupJobStore {
     tx: Prisma.TransactionClient,
     job: BackupJob,
     at: Date,
-    keys: readonly (string | null)[] = [job.fileKey, ...job.parts.map((p) => p.key)],
+    keys: readonly (string | null)[] = [
+      job.fileKey,
+      ...job.parts.map((p) => p.key),
+    ],
   ): Promise<void> {
     if (job.workspaceId == null) return;
     for (const key of keys)
-      if (key != null) await markStoredFileDeleted(tx, job.workspaceId, key, at);
+      if (key != null)
+        await markStoredFileDeleted(tx, job.workspaceId, key, at);
   }
 
   return {
@@ -176,7 +182,12 @@ export function prismaBackupJobStore(db: PrismaClient): BackupJobStore {
     async completePart(id, part, zip, now) {
       return db.$transaction(async (tx) => {
         const locked = await tx.$queryRaw<
-          { status: string; parts: unknown; workspace_id: string | null; requested_by: string }[]
+          {
+            status: string;
+            parts: unknown;
+            workspace_id: string | null;
+            requested_by: string;
+          }[]
         >(Prisma.sql`
           SELECT status::text AS status, parts, workspace_id, requested_by
             FROM construction_reporting.backup_jobs
@@ -301,7 +312,11 @@ export function prismaBackupJobStore(db: PrismaClient): BackupJobStore {
             action: "backup_job.expired",
             entityType: "backup_job",
             entityId: job.id,
-            before: { status: "done", fileKey: job.fileKey, fileName: job.fileName },
+            before: {
+              status: "done",
+              fileKey: job.fileKey,
+              fileName: job.fileName,
+            },
             after: { status: "expired" },
             occurredAt: now,
           });

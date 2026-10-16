@@ -44,7 +44,8 @@ const schema = z
     path: ["includeData"],
   })
   .refine(
-    (values) => values.from === "" || values.to === "" || values.from <= values.to,
+    (values) =>
+      values.from === "" || values.to === "" || values.from <= values.to,
     { message: "To must be on or after From", path: ["to"] },
   );
 

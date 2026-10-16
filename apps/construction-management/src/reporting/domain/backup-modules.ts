@@ -79,7 +79,11 @@ const PROJECT_MODULES: readonly BackupModule[] = [
     menu: "site_work.site_diary",
     money: null,
     folder: "site-diary",
-    entities: ["site_diaries", "site_diary_visitors", "site_diary_instructions"],
+    entities: [
+      "site_diaries",
+      "site_diary_visitors",
+      "site_diary_instructions",
+    ],
     media: true,
   },
   {
@@ -350,12 +354,9 @@ const MASTER_MODULES: readonly BackupModule[] = [
   }),
   master("masters.units", "Measurement Units", "units", ["measurement_units"]),
   master("masters.work_types", "Work Types", "work-types", ["work_types"]),
-  master(
-    "masters.terms_conditions",
-    "Terms & Conditions",
-    "terms-conditions",
-    ["terms_conditions"],
-  ),
+  master("masters.terms_conditions", "Terms & Conditions", "terms-conditions", [
+    "terms_conditions",
+  ]),
   master("masters.bank_accounts", "Company's Bank A/C", "bank-accounts", [
     "bank_accounts",
   ]),
@@ -368,12 +369,9 @@ const MASTER_MODULES: readonly BackupModule[] = [
   master("masters.other_parties", "Other Parties", "other-parties", [
     "other_parties",
   ]),
-  master(
-    "masters.issue_categories",
-    "Issue Categories",
-    "issue-categories",
-    ["issue_categories"],
-  ),
+  master("masters.issue_categories", "Issue Categories", "issue-categories", [
+    "issue_categories",
+  ]),
   master("masters.tags", "Tags", "tags", ["tags"]),
 ];
 

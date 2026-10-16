@@ -104,9 +104,17 @@ function locationName(sql: string): string {
 }
 
 const contractor = (sql = "t.contractor_id") =>
-  col("contractor", "Contractor", nameIn("construction_masters.contractors", sql));
+  col(
+    "contractor",
+    "Contractor",
+    nameIn("construction_masters.contractors", sql),
+  );
 const department = (sql = "t.department_id") =>
-  col("department", "Department", nameIn("construction_masters.departments", sql));
+  col(
+    "department",
+    "Department",
+    nameIn("construction_masters.departments", sql),
+  );
 const unit = (field: string, label: string, sql: string) =>
   col(field, label, nameIn("construction_masters.measurement_units", sql));
 const account = (field: string, label: string, sql: string) =>
@@ -120,14 +128,22 @@ const paymentCategory = (sql = "t.payment_category_id") =>
 
 function stamps(alias = "t"): Column[] {
   return [
-    col("createdBy", "Created by", who(`${alias}.created_by`, `${alias}.workspace_id`)),
+    col(
+      "createdBy",
+      "Created by",
+      who(`${alias}.created_by`, `${alias}.workspace_id`),
+    ),
     col("createdAt", "Created on", `${alias}.created_at`, "datetime"),
   ];
 }
 
 function updated(alias = "t"): Column[] {
   return [
-    col("updatedBy", "Updated by", who(`${alias}.updated_by`, `${alias}.workspace_id`)),
+    col(
+      "updatedBy",
+      "Updated by",
+      who(`${alias}.updated_by`, `${alias}.workspace_id`),
+    ),
     col("updatedAt", "Updated on", `${alias}.updated_at`, "datetime"),
   ];
 }
@@ -180,7 +196,11 @@ function child(
   table: string,
   parentTable: string,
   parentKey: string,
-  parent: { project: string | null; date: string | null; number: string | null },
+  parent: {
+    project: string | null;
+    date: string | null;
+    number: string | null;
+  },
   columns: readonly Column[],
 ): EntitySpec {
   return {
@@ -299,7 +319,11 @@ const SPECS: Record<string, EntitySpec> = {
       col("shift", "Shift", "t.shift::text", "enum"),
       contractor(),
       department(),
-      col("workType", "Work Type", nameIn(`${MS}.work_types`, "t.work_type_id")),
+      col(
+        "workType",
+        "Work Type",
+        nameIn(`${MS}.work_types`, "t.work_type_id"),
+      ),
       col("skilledCount", "Skilled", "t.skilled_count", "number"),
       col("unskilledCount", "Unskilled", "t.unskilled_count", "number"),
       col("approxWorkQty", "Approx. Work Done", "t.approx_work_qty", "number"),
@@ -339,7 +363,11 @@ const SPECS: Record<string, EntitySpec> = {
       col("number", "Sheet No.", "t.number"),
       col("sheetDate", "Date", "t.sheet_date", "date"),
       col("shift", "Shift", "t.shift::text", "enum"),
-      col("equipment", "Equipment", nameIn(`${SW}.equipment`, "t.equipment_id")),
+      col(
+        "equipment",
+        "Equipment",
+        nameIn(`${SW}.equipment`, "t.equipment_id"),
+      ),
       col("ownership", "Ownership", "t.ownership::text", "enum"),
       col("operatorName", "Operator", "t.operator_name"),
       contractor(),
@@ -391,8 +419,18 @@ const SPECS: Record<string, EntitySpec> = {
       id(),
       projectName(),
       col("diaryDate", "Date", "t.diary_date", "date"),
-      col("weatherMorning", "Weather (morning)", "t.weather_morning::text", "enum"),
-      col("weatherAfternoon", "Weather (afternoon)", "t.weather_afternoon::text", "enum"),
+      col(
+        "weatherMorning",
+        "Weather (morning)",
+        "t.weather_morning::text",
+        "enum",
+      ),
+      col(
+        "weatherAfternoon",
+        "Weather (afternoon)",
+        "t.weather_afternoon::text",
+        "enum",
+      ),
       col("rainfallMm", "Rainfall (mm)", "t.rainfall_mm", "number"),
       col("siteCondition", "Site Condition", "t.site_condition"),
       col("notes", "Notes", "t.notes"),
@@ -447,7 +485,12 @@ const SPECS: Record<string, EntitySpec> = {
       col("cause", "Cause", "t.cause::text", "enum"),
       col("affectedActivity", "Affected Activity", "t.affected_activity"),
       ...siteLocation(),
-      col("responsibleParty", "Responsible", "t.responsible_party::text", "enum"),
+      col(
+        "responsibleParty",
+        "Responsible",
+        "t.responsible_party::text",
+        "enum",
+      ),
       contractor(),
       col("description", "Description", "t.description"),
       col("signOffPartyName", "Signed Off By", "t.sign_off_party_name"),
@@ -512,12 +555,22 @@ const SPECS: Record<string, EntitySpec> = {
       col("location", "Project / Store", locationName("t.location_id")),
       col("number", "PO No.", "t.number"),
       col("orderDate", "PO Date", "t.order_date", "date"),
-      col("expectedDeliveryDate", "Expected Delivery", "t.expected_delivery_date", "date"),
+      col(
+        "expectedDeliveryDate",
+        "Expected Delivery",
+        "t.expected_delivery_date",
+        "date",
+      ),
       col("supplierName", "Supplier", "t.supplier_name"),
       col("supplierGstin", "Supplier GSTIN", "t.supplier_gstin"),
       col("supplyType", "Supply Type", "t.supply_type::text", "enum"),
       col("billingName", "Bill To", "t.billing_name"),
-      col("paymentTermsDays", "Payment Terms (days)", "t.payment_terms_days", "number"),
+      col(
+        "paymentTermsDays",
+        "Payment Terms (days)",
+        "t.payment_terms_days",
+        "number",
+      ),
       col("remark", "Remark", "t.remark"),
       money("subTotal", "Sub Total (₹)", "t.sub_total"),
       money("discountTotal", "Discount (₹)", "t.discount_total"),
@@ -525,7 +578,11 @@ const SPECS: Record<string, EntitySpec> = {
       money("cgstTotal", "CGST (₹)", "t.cgst_total"),
       money("sgstTotal", "SGST (₹)", "t.sgst_total"),
       money("igstTotal", "IGST (₹)", "t.igst_total"),
-      money("additionalCharges", "Additional Charges (₹)", "t.additional_charges"),
+      money(
+        "additionalCharges",
+        "Additional Charges (₹)",
+        "t.additional_charges",
+      ),
       money("deductionAmount", "Deduction (₹)", "t.deduction_amount"),
       money("grandTotal", "Grand Total (₹)", "t.grand_total"),
       approval(),
@@ -574,7 +631,11 @@ const SPECS: Record<string, EntitySpec> = {
       col("receiptDate", "Received On", "t.receipt_date", "date"),
       col("inventoryDate", "Inventory Date", "t.inventory_date", "date"),
       col("supplierName", "Supplier", "t.supplier_name"),
-      col("purchaseOrder", "PO No.", nameIn(`${PR}.purchase_orders`, "t.purchase_order_id", "number")),
+      col(
+        "purchaseOrder",
+        "PO No.",
+        nameIn(`${PR}.purchase_orders`, "t.purchase_order_id", "number"),
+      ),
       col("invoiceNo", "Invoice No.", "t.invoice_no"),
       col("invoiceDate", "Invoice Date", "t.invoice_date", "date"),
       money("invoiceAmount", "Invoice Amount (₹)", "t.invoice_amount"),
@@ -640,7 +701,12 @@ const SPECS: Record<string, EntitySpec> = {
     { project: null, date: "p.transfer_date", number: "p.number" },
     [
       id(),
-      col("materialTransferId", "Transfer ID", "t.material_transfer_id::text", "id"),
+      col(
+        "materialTransferId",
+        "Transfer ID",
+        "t.material_transfer_id::text",
+        "id",
+      ),
       col("transferNumber", "Transfer No.", "p.number"),
       col("materialName", "Material", "t.material_name"),
       col("unit", "Unit", "t.uom_name"),
@@ -708,16 +774,29 @@ const SPECS: Record<string, EntitySpec> = {
       col("status", "Attendance", "t.status::text", "enum"),
       col("isPaidLeave", "Paid Leave", "t.is_paid_leave", "bool"),
       col("shift", "Shift", "t.shift"),
-      col("supervisor", "Supervisor", nameIn(`${MS}.supervisors`, "t.supervisor_id")),
+      col(
+        "supervisor",
+        "Supervisor",
+        nameIn(`${MS}.supervisors`, "t.supervisor_id"),
+      ),
       col("checkIn", "Check In", "t.check_in"),
       col("checkOut", "Check Out", "t.check_out"),
       col("breakMinutes", "Break (min)", "t.break_minutes", "number"),
       col("workingHours", "Working Hours", "t.working_hours", "number"),
-      col("overtimeHours", "OT Hours", `(SELECT COALESCE(SUM(o.hours), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`, "number"),
+      col(
+        "overtimeHours",
+        "OT Hours",
+        `(SELECT COALESCE(SUM(o.hours), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`,
+        "number",
+      ),
       col("wageType", "Wage Type", "t.wage_type::text", "enum"),
       money("wageRate", "Wage Rate (₹)", "t.wage_rate"),
       money("earned", "Earned (₹)", "t.earned"),
-      money("overtimeAmount", "OT Amount (₹)", `(SELECT COALESCE(SUM(o.amount), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`),
+      money(
+        "overtimeAmount",
+        "OT Amount (₹)",
+        `(SELECT COALESCE(SUM(o.amount), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`,
+      ),
       ...stamps(),
     ],
   },
@@ -784,7 +863,11 @@ const SPECS: Record<string, EntitySpec> = {
       col("attendanceDate", "Date", "p.attendance_date", "date"),
       col("vendor", "Vendor", nameIn(`${LB}.vendors`, "p.vendor_id")),
       col("shiftName", "Shift", "t.shift_name"),
-      col("labourCategory", "Labour Category", nameIn(`${MS}.labour_categories`, "t.labour_category_id")),
+      col(
+        "labourCategory",
+        "Labour Category",
+        nameIn(`${MS}.labour_categories`, "t.labour_category_id"),
+      ),
       col("fullDayCount", "Full Day", "t.full_day_count", "number"),
       col("halfDayCount", "Half Day", "t.half_day_count", "number"),
       col("overtimeHours", "OT Hours", "t.overtime_hours", "number"),
@@ -988,7 +1071,12 @@ const SPECS: Record<string, EntitySpec> = {
       id(),
       projectName(),
       col("taskNo", "Task No.", "t.task_no", "number"),
-      col("parentTaskNo", "Parent Task No.", `(SELECT x.task_no FROM ${TR}.tasks x WHERE x.id = t.parent_id)`, "number"),
+      col(
+        "parentTaskNo",
+        "Parent Task No.",
+        `(SELECT x.task_no FROM ${TR}.tasks x WHERE x.id = t.parent_id)`,
+        "number",
+      ),
       col("name", "Task", "t.name"),
       col("description", "Description", "t.description"),
       col("priority", "Priority", "t.priority::text", "enum"),
@@ -1053,7 +1141,11 @@ const SPECS: Record<string, EntitySpec> = {
       col("number", "Issue No.", "t.number"),
       col("issueDate", "Issue Date", "t.issue_date", "date"),
       col("details", "Details", "t.details"),
-      col("category", "Category", nameIn(`${MS}.issue_categories`, "t.category_id")),
+      col(
+        "category",
+        "Category",
+        nameIn(`${MS}.issue_categories`, "t.category_id"),
+      ),
       col("priority", "Priority", "t.priority::text", "enum"),
       col("status", "Status", "t.status::text", "enum"),
       department(),
@@ -1221,12 +1313,24 @@ const SPECS: Record<string, EntitySpec> = {
   team_members: master(`${OG}.team_members t`, [
     id(),
     col("name", "Name", "t.name"),
-    col("designation", "Designation", nameIn(`${OG}.designations`, "t.designation_id")),
+    col(
+      "designation",
+      "Designation",
+      nameIn(`${OG}.designations`, "t.designation_id"),
+    ),
     col("mobile", "Mobile", "t.mobile"),
     col("email", "Email", "t.email"),
     col("address", "Address", "t.address"),
-    col("aadhaar", "Aadhaar", "CASE WHEN t.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || t.aadhaar_last4 END"),
-    col("pan", "PAN", "CASE WHEN t.pan_last4 IS NULL THEN NULL ELSE 'XXXXXX' || t.pan_last4 END"),
+    col(
+      "aadhaar",
+      "Aadhaar",
+      "CASE WHEN t.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || t.aadhaar_last4 END",
+    ),
+    col(
+      "pan",
+      "PAN",
+      "CASE WHEN t.pan_last4 IS NULL THEN NULL ELSE 'XXXXXX' || t.pan_last4 END",
+    ),
     col("emergencyContact", "Emergency Contact", "t.emergency_contact"),
     col("memberType", "Member Type", "t.member_type::text", "enum"),
     col("isOwner", "Owner", "t.is_owner", "bool"),
@@ -1290,14 +1394,31 @@ const SPECS: Record<string, EntitySpec> = {
     col("fatherName", "Father's Name", "t.father_name"),
     col("gender", "Gender", "t.gender::text", "enum"),
     col("joiningDate", "Joining Date", "t.joining_date", "date"),
-    col("labourCategory", "Labour Category", nameIn(`${MS}.labour_categories`, "t.labour_category_id")),
-    col("currentProject", "Current Project", nameIn(`${PJ}.projects`, "t.current_project_id")),
+    col(
+      "labourCategory",
+      "Labour Category",
+      nameIn(`${MS}.labour_categories`, "t.labour_category_id"),
+    ),
+    col(
+      "currentProject",
+      "Current Project",
+      nameIn(`${PJ}.projects`, "t.current_project_id"),
+    ),
     col("wageType", "Wage Type", "t.wage_type::text", "enum"),
     money("wagePerDay", "Wage / Day (₹)", "t.wage_per_day"),
     money("wagePerMonth", "Wage / Month (₹)", "t.wage_per_month"),
     money("overtimeWagePerHour", "OT / Hour (₹)", "t.overtime_wage_per_hour"),
-    col("workingHoursPerDay", "Working Hours / Day", "t.working_hours_per_day", "number"),
-    col("aadhaar", "Aadhaar", "CASE WHEN t.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || t.aadhaar_last4 END"),
+    col(
+      "workingHoursPerDay",
+      "Working Hours / Day",
+      "t.working_hours_per_day",
+      "number",
+    ),
+    col(
+      "aadhaar",
+      "Aadhaar",
+      "CASE WHEN t.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || t.aadhaar_last4 END",
+    ),
     col("uanNumber", "UAN", "t.uan_number"),
     col("esicNumber", "ESIC", "t.esic_number"),
     col("contactNumber", "Contact Number", "t.contact_number"),
@@ -1318,19 +1439,37 @@ const SPECS: Record<string, EntitySpec> = {
     col("ownership", "Ownership", "t.ownership::text", "enum"),
     col("purchaseYear", "Purchase Year", "t.purchase_year", "number"),
     col("fuelType", "Fuel", "t.fuel_type::text", "enum"),
-    col("utilisationBasis", "Utilisation Basis", "t.utilisation_basis::text", "enum"),
-    col("workingTimeMethod", "Working Time", "t.working_time_method::text", "enum"),
+    col(
+      "utilisationBasis",
+      "Utilisation Basis",
+      "t.utilisation_basis::text",
+      "enum",
+    ),
+    col(
+      "workingTimeMethod",
+      "Working Time",
+      "t.working_time_method::text",
+      "enum",
+    ),
     col("companyName", "Hired From", "t.company_name"),
     col("hireBasis", "Hire Basis", "t.hire_basis::text", "enum"),
     money("hireRate", "Hire Rate (₹)", "t.hire_rate"),
-    col("currentProject", "Current Project", nameIn(`${PJ}.projects`, "t.current_project_id")),
+    col(
+      "currentProject",
+      "Current Project",
+      nameIn(`${PJ}.projects`, "t.current_project_id"),
+    ),
     col("currentLocationName", "Location", "t.current_location_name"),
     ...stamps(),
   ]),
   material_categories: master(`${MS}.material_categories t`, [
     id(),
     col("name", "Material Category", "t.name"),
-    col("parent", "Parent Category", nameIn(`${MS}.material_categories`, "t.parent_id")),
+    col(
+      "parent",
+      "Parent Category",
+      nameIn(`${MS}.material_categories`, "t.parent_id"),
+    ),
     col("disabled", "Disabled", "t.disabled_at IS NOT NULL", "bool"),
     ...stamps(),
   ]),
@@ -1339,7 +1478,11 @@ const SPECS: Record<string, EntitySpec> = {
     col("name", "Material", "t.name"),
     col("specification", "Specification", "t.specification"),
     unit("unit", "Unit", "t.uom_id"),
-    col("category", "Category", nameIn(`${MS}.material_categories`, "t.category_id")),
+    col(
+      "category",
+      "Category",
+      nameIn(`${MS}.material_categories`, "t.category_id"),
+    ),
     col("itemType", "Item Type", "t.item_type::text", "enum"),
     money("unitRate", "Rate (₹)", "t.unit_rate"),
     col("discountType", "Discount Type", "t.discount_type::text", "enum"),
@@ -1351,7 +1494,10 @@ const SPECS: Record<string, EntitySpec> = {
     col("disabled", "Disabled", "t.disabled_at IS NOT NULL", "bool"),
     ...stamps(),
   ]),
-  measurement_units: simpleMaster(`${MS}.measurement_units`, "Measurement Unit"),
+  measurement_units: simpleMaster(
+    `${MS}.measurement_units`,
+    "Measurement Unit",
+  ),
   work_types: master(`${MS}.work_types t`, [
     id(),
     col("name", "Work Type", "t.name"),
@@ -1379,7 +1525,10 @@ const SPECS: Record<string, EntitySpec> = {
     col("openingDate", "Opening Date", "t.opening_date", "date"),
     ...stamps(),
   ]),
-  payment_categories: simpleMaster(`${FN}.payment_categories`, "Payment Category"),
+  payment_categories: simpleMaster(
+    `${FN}.payment_categories`,
+    "Payment Category",
+  ),
   other_parties: master(`${FN}.other_parties t`, [
     id(),
     col("name", "Party", "t.name"),
@@ -1399,22 +1548,19 @@ const SPECS: Record<string, EntitySpec> = {
   ]),
 
   // Company settings --------------------------------------------------------
-  company_profile: master(
-    `${OG}.company_profiles t`,
-    [
-      id(),
-      col("name", "Company Name", "t.name"),
-      col("mobile", "Mobile", "t.mobile"),
-      col("email", "Email", "t.email"),
-      col("country", "Country", "t.country"),
-      col("gstin", "GSTIN", "t.gstin"),
-      col("pan", "PAN", "t.pan"),
-      col("address", "Address", "t.address"),
-      col("currency", "Currency", "t.currency"),
-      col("timezone", "Time Zone", "t.timezone"),
-      ...stamps(),
-    ],
-  ),
+  company_profile: master(`${OG}.company_profiles t`, [
+    id(),
+    col("name", "Company Name", "t.name"),
+    col("mobile", "Mobile", "t.mobile"),
+    col("email", "Email", "t.email"),
+    col("country", "Country", "t.country"),
+    col("gstin", "GSTIN", "t.gstin"),
+    col("pan", "PAN", "t.pan"),
+    col("address", "Address", "t.address"),
+    col("currency", "Currency", "t.currency"),
+    col("timezone", "Time Zone", "t.timezone"),
+    ...stamps(),
+  ]),
   billing_addresses: master(`${OG}.billing_addresses t`, [
     id(),
     col("name", "Name", "t.name"),
@@ -1441,7 +1587,12 @@ const SPECS: Record<string, EntitySpec> = {
       id(),
       col("createDays", "Create up to (days back)", "t.create_days", "number"),
       col("editDays", "Edit up to (days back)", "t.edit_days", "number"),
-      col("financialClosingDate", "Financial Closing Date", "t.financial_closing_date", "date"),
+      col(
+        "financialClosingDate",
+        "Financial Closing Date",
+        "t.financial_closing_date",
+        "date",
+      ),
       col("modules", "Per module", "t.modules", "json"),
       ...updated(),
     ]),
@@ -1493,7 +1644,9 @@ function specOf(entity: string): EntitySpec {
 }
 
 function columnsOf(spec: EntitySpec, includesMoney: boolean): Column[] {
-  return spec.columns.filter((column) => includesMoney || column.money !== true);
+  return spec.columns.filter(
+    (column) => includesMoney || column.money !== true,
+  );
 }
 
 type PageRow = Record<string, BackupRawValue> & {
@@ -1533,7 +1686,10 @@ export function createBackupEntityReader(
         conditions.push(
           Prisma.sql`(${Prisma.raw(spec.project)})::text = ${scope.projectId}`,
         );
-      if (entity === "material_transfers" || entity === "material_transfer_items") {
+      if (
+        entity === "material_transfers" ||
+        entity === "material_transfer_items"
+      ) {
         if (scope.projectId != null) {
           const alias = entity === "material_transfers" ? "t" : "p";
           conditions.push(
@@ -1566,7 +1722,9 @@ export function createBackupEntityReader(
     async media(entity, workspaceId, recordIds) {
       const spec = specOf(entity);
       if (spec.media == null || recordIds.length === 0) return [];
-      return db.$queryRaw<BackupMediaFile[]>(spec.media(workspaceId, recordIds));
+      return db.$queryRaw<BackupMediaFile[]>(
+        spec.media(workspaceId, recordIds),
+      );
     },
   };
 }

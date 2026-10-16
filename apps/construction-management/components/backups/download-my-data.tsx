@@ -45,8 +45,8 @@ export function DownloadMyDataDialog({ onClose }: { onClose: () => void }) {
           <DialogTitle>Download my data</DialogTitle>
           <DialogDescription>
             A ZIP of your profile, your Team Member record in each Company
-            (Aadhaar and PAN masked), your signed-in devices, your
-            notifications and the changes you made.
+            (Aadhaar and PAN masked), your signed-in devices, your notifications
+            and the changes you made.
           </DialogDescription>
         </DialogHeader>
         {requested == null ? (

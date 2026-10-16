@@ -175,10 +175,9 @@ export class BackupHandlers {
   async delete(id: string, userId: string): Promise<void> {
     const job = await this.getOwn(id, userId);
     await this.deps.store.delete(job, this.now());
-    const keys = [
-      job.fileKey,
-      ...job.parts.map((part) => part.key),
-    ].filter((key): key is string => key != null);
+    const keys = [job.fileKey, ...job.parts.map((part) => part.key)].filter(
+      (key): key is string => key != null,
+    );
     for (const key of keys)
       await this.deps.storage.delete(key).catch((error: unknown) => {
         console.error(`Backup file ${key} could not be deleted`, error);

@@ -117,7 +117,9 @@ export function DownloadRow({
         ) : null}
         {item.status === "expired" ? (
           <p className="text-muted-foreground text-sm">
-            {item.source === "report" ? EXPIRED_MESSAGE : BACKUP_EXPIRED_MESSAGE}
+            {item.source === "report"
+              ? EXPIRED_MESSAGE
+              : BACKUP_EXPIRED_MESSAGE}
           </p>
         ) : null}
         {item.status === "done" &&

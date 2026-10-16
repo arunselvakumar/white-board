@@ -459,7 +459,8 @@ describe("notification listeners (CM-904)", () => {
         status: "done",
         title: "Project backup",
         fileName: "project-backup-2026-10-16.zip",
-        downloadHref: "/api/construction/reporting/backups/backup-1/download?expires=1&sig=s",
+        downloadHref:
+          "/api/construction/reporting/backups/backup-1/download?expires=1&sig=s",
         error: null,
         ...fields,
       });

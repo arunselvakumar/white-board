@@ -18,7 +18,10 @@ function payload(claims: BackupLinkClaims): string {
   return `backup-link\n${claims.backupId}\n${claims.requestedBy}\n${String(claims.expires)}`;
 }
 
-export function signBackupLink(secret: string, claims: BackupLinkClaims): string {
+export function signBackupLink(
+  secret: string,
+  claims: BackupLinkClaims,
+): string {
   return createHmac("sha256", secret)
     .update(payload(claims))
     .digest("base64url");
@@ -36,8 +39,7 @@ export function backupSignatureMatches(
 }
 
 export type BackupLinkCheck =
-  | { ok: true }
-  | { ok: false; reason: "invalid" | "expired" | "not_yours" };
+  { ok: true } | { ok: false; reason: "invalid" | "expired" | "not_yours" };
 
 /**
  * Checks a link's query against the backup it names: tampered or for

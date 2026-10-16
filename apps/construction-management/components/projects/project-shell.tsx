@@ -189,7 +189,9 @@ export function ProjectShell({
               <Pencil aria-hidden="true" />
               Edit
             </Link>
-            {home == null ? null : <ProjectOptions id={id} name={project.name} home={home} />}
+            {home == null ? null : (
+              <ProjectOptions id={id} name={project.name} home={home} />
+            )}
           </div>
         </div>
       </header>
