@@ -23,6 +23,9 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
+/** Stock Register queries run at once, one per location. */
+const STOCK_CONCURRENCY = 4;
+
 const APPROVAL_LABELS = {
   pending: "Pending",
   approved: "Approved",
@@ -609,16 +612,29 @@ export function createProcurementReportSource(
           name,
         })),
       ];
-      const rows = [];
-      // One location at a time: the screen's query, so the figures match.
-      for (const { location, name } of locations) {
-        const register = await stockRegister(
-          db,
-          procurementDirectory,
-          workspaceId,
-          location,
-          filter.range,
+      // The screen's query per location, so the figures match; four at a
+      // time so a Company with many Projects stays inside the job's limit.
+      const registers: Awaited<ReturnType<typeof stockRegister>>[] = [];
+      for (let at = 0; at < locations.length; at += STOCK_CONCURRENCY) {
+        registers.push(
+          ...(await Promise.all(
+            locations
+              .slice(at, at + STOCK_CONCURRENCY)
+              .map(({ location }) =>
+                stockRegister(
+                  db,
+                  procurementDirectory,
+                  workspaceId,
+                  location,
+                  filter.range,
+                ),
+              ),
+          )),
         );
+      }
+      const rows = [];
+      for (const [index, { name }] of locations.entries()) {
+        const register = registers[index] ?? [];
         for (const row of register) {
           if (filter.materialId != null && row.materialId !== filter.materialId)
             continue;

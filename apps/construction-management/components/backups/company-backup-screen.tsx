@@ -132,7 +132,7 @@ function FullBackupForm({ companyName }: { companyName: string }) {
                       Include media
                     </span>
                     <span className="text-muted-foreground block text-sm">
-                      Photos, drawings and receipts. A backup over 2 GB fails;
+                      Photos, drawings and receipts. A backup over 512 MB fails;
                       leave this off for a data-only copy.
                     </span>
                   </span>
@@ -236,7 +236,9 @@ function HrmsBackupForm() {
           }}
         >
           <CardContent className="min-w-0 space-y-5">
-            {options.data == null ? (
+            {options.isError ? (
+              <FormAlert message={fieldForCode(options.error, {}).message} />
+            ) : options.data == null ? (
               <Skeleton className="h-40 w-full" />
             ) : (
               <Controller

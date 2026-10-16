@@ -129,7 +129,7 @@ Approve and Reject buttons inside a push (`modules/13` recommendation 4) are lef
   - The download route checks the signature and expiry, and that the link belongs to the signed-in user.
   - Backups are **not refused when the plan has expired** (CM-118 keeps export open), and they do not count against storage.
 - **Download My Data** (My Profile → Privacy): any user can download a ZIP of their own data. It holds their profile, their memberships and Team Member records in each Company, their sign-in devices, notifications and the audit events they caused. It is delivered the same way, with a 7-day link.
-- **Size and time:** a backup job runs in parts. One queue job per module writes its part to storage; a final job zips the parts, so no single run exceeds 240 s. A backup over 2 GB fails with "Too large — choose fewer modules or a shorter range".
+- **Size and time:** a backup job runs in parts. One queue job per module writes its part to storage; a final job zips the parts, so no single run exceeds 240 s. A backup over 512 MB fails with "Too large — choose fewer modules or a shorter range". (Lowered from 2 GB in review: the final ZIP is held in memory twice inside a 2 GB Vercel function; streaming the upload to storage would lift the cap.)
 
 ### 9. Devices (CM-906)
 

@@ -129,18 +129,14 @@ export const accounts = {
     if (user == null) return;
     await db.identitySession.deleteMany({ where: { userId } });
     await db.identityAccount.deleteMany({ where: { userId } });
-    const identifiers = [user.email, user.phoneNumber].filter(
-      (value): value is string => value != null,
-    );
-    // Codes are keyed by the mobile, or by `<type>-otp-<email>`.
-    if (identifiers.length > 0)
-      await db.identityVerification.deleteMany({
-        where: {
-          OR: identifiers.map((identifier) => ({
-            identifier: { endsWith: identifier },
-          })),
-        },
-      });
+    // Codes are keyed by the mobile, or by `<type>-otp-<email>`. Match those
+    // forms exactly: a bare suffix would also catch `ba@x.com` for `a@x.com`.
+    const keys = [
+      ...(user.phoneNumber == null ? [] : [{ identifier: user.phoneNumber }]),
+      { identifier: user.email },
+      { identifier: { endsWith: `-otp-${user.email}` } },
+    ];
+    await db.identityVerification.deleteMany({ where: { OR: keys } });
     await db.identityWorkspaceInvitation.deleteMany({
       where: { email: user.email, status: "pending" },
     });

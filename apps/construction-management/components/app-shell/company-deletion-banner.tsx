@@ -1,14 +1,12 @@
 "use client";
 
 import { useCompanyAuth } from "@repo/auth/construction/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@repo/ui/components/button";
 
-import {
-  accountQueries,
-  cancelCompanyDeletion,
-  formatDay,
-} from "@/src/queries/account";
+import { useCancelCompanyDeletion } from "@/components/account/company-ownership-screen";
+import { fieldForCode } from "@/lib/server-errors";
+import { accountQueries, formatDay } from "@/src/queries/account";
 
 /**
  * The banner under the shell header while the Company waits to be deleted
@@ -17,13 +15,8 @@ import {
  */
 export function CompanyDeletionBanner() {
   const { role } = useCompanyAuth();
-  const queryClient = useQueryClient();
   const { data } = useQuery({ ...accountQueries.deletion(), retry: false });
-  const cancel = useMutation({
-    mutationFn: cancelCompanyDeletion,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: accountQueries.key.deletion }),
-  });
+  const cancel = useCancelCompanyDeletion();
   const deletion = data?.deletion;
   if (deletion == null) return null;
 
@@ -51,6 +44,12 @@ export function CompanyDeletionBanner() {
         </Button>
       ) : (
         <span>Ask the Owner if this is a mistake.</span>
+      )}
+      {cancel.error == null ? null : (
+        <span role="alert" className="text-destructive">
+          {fieldForCode(cancel.error, {}).message} The Company is still
+          scheduled for deletion.
+        </span>
       )}
     </div>
   );

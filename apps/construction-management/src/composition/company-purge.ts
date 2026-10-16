@@ -292,10 +292,25 @@ export function companyPurgeQueueHandler(deps: PurgeDeps = {}): QueueHandler {
       const store = deps.store ?? new PrismaCompanyDeletionStore(db);
       const clock = deps.clock ?? (() => new Date());
       const due = await store.listDue(clock(), 20);
+      // One Company that cannot be purged must not hold back the others,
+      // which are due after it every day: purge each, then report failures.
+      const failed: string[] = [];
       for (const deletion of due) {
         if (signal.aborted) break;
-        await purgeCompany(deletion, { ...deps, prisma: db, store });
+        try {
+          await purgeCompany(deletion, { ...deps, prisma: db, store });
+        } catch (error) {
+          console.error(
+            `Company ${deletion.workspaceId} could not be purged`,
+            error,
+          );
+          failed.push(deletion.workspaceId);
+        }
       }
+      if (failed.length > 0)
+        throw new Error(
+          `${String(failed.length)} Company deletion(s) could not be completed: ${failed.join(", ")}`,
+        );
     },
   };
 }

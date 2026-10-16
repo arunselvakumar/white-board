@@ -76,7 +76,11 @@ export function RevealCodeDialog({
         <div
           className="min-w-0"
           onKeyDown={(event) => {
-            if (event.key === "Enter") {
+            // Only from the code input: Enter on "Send code" must send it.
+            if (
+              event.key === "Enter" &&
+              event.target instanceof HTMLInputElement
+            ) {
               event.preventDefault();
               submit();
             }

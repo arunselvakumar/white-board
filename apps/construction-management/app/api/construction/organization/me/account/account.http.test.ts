@@ -116,6 +116,23 @@ describe("Delete My Account (CM-907)", () => {
     const world = await memberOfTwoCompanies();
     const { member } = world;
     const code = await codeFor(member, "delete_account");
+    // Codes of other people whose address merely ends like this one's stay.
+    const memberEmail = (
+      await prisma.identityUser.findUniqueOrThrow({
+        where: { id: member.userId },
+      })
+    ).email;
+    const lookalike = `email-otp-x${memberEmail}`;
+    await prisma.identityVerification.create({
+      data: {
+        id: crypto.randomUUID(),
+        identifier: lookalike,
+        value: "123456:0",
+        expiresAt: new Date(Date.now() + 600_000),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
     const response = await remove(member.cookie, {
       reason: "Changed jobs",
       confirmation: "DELETE",
@@ -163,6 +180,11 @@ describe("Delete My Account (CM-907)", () => {
     await expect(
       prisma.identityAccount.count({ where: { userId: member.userId } }),
     ).resolves.toBe(0);
+    await expect(
+      prisma.identityVerification.count({
+        where: { identifier: lookalike },
+      }),
+    ).resolves.toBe(1);
 
     // The identity is erased; the row stays.
     const user = await prisma.identityUser.findUniqueOrThrow({

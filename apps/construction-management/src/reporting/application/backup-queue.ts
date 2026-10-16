@@ -11,6 +11,7 @@ import {
   backupTooLarge,
   backupZipKey,
   BACKUP_FAILED_MESSAGE,
+  BACKUP_ENTITY_MAX_CHARS,
   BACKUP_MAX_BYTES,
   BACKUP_PAGE_SIZE,
   BACKUP_TIME_LIMIT_MS,
@@ -231,8 +232,13 @@ export function createBackupQueue(deps: BackupQueueDeps) {
         const page = await deps.reader.page(entity, scope, after, pageSize);
         if (backup.includeData) {
           writer.add(page.map((row) => row.values));
-          // Not exact (compression), but stops a runaway part early.
-          if (writer.approximateBytes > maxBytes * 4) throw backupTooLarge();
+          // Not exact (compression), but stops a runaway part early, and
+          // always before one entity's text outgrows a JavaScript string.
+          if (
+            writer.approximateBytes >
+            Math.min(maxBytes * 4, BACKUP_ENTITY_MAX_CHARS)
+          )
+            throw backupTooLarge();
         }
         if (backup.includeMedia && found.media && page.length > 0) {
           const numbers = new Map(page.map((row) => [row.id, row.number]));

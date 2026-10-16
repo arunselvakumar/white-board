@@ -80,8 +80,20 @@ export function backupExpiresAt(finishedAt: Date): Date {
   return new Date(finishedAt.getTime() + BACKUP_RETENTION_DAYS * DAY_MS);
 }
 
-/** The largest backup we make (ADR CM-0021 §8): 2 GB. */
-export const BACKUP_MAX_BYTES = 2_000_000_000;
+/**
+ * The largest backup we make (ADR CM-0021 §8): 512 MB. The final ZIP is
+ * held in memory (its chunks, then one copy for storage), so it must fit
+ * twice in a 2 GB Vercel function with room to spare. Streaming the upload
+ * would lift this.
+ */
+export const BACKUP_MAX_BYTES = 512 * 1024 * 1024;
+
+/**
+ * The most characters one entity's CSV (or JSON) may grow to in a part,
+ * well under V8's ~536 million-character string limit, so a huge table
+ * fails as "too large" rather than as an engine error that is retried.
+ */
+export const BACKUP_ENTITY_MAX_CHARS = 200_000_000;
 
 /** Each part and the zip step must finish inside the queue's 240 s. */
 export const BACKUP_TIME_LIMIT_MS = 240_000;

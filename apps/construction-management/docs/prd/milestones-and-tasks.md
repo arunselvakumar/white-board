@@ -1015,7 +1015,7 @@ Goal: reports that run on a real queue and stay downloadable, a catalogue every 
   - **Full Company backup** (Settings → Backup & export, Owner only): needs a six-digit code by email (or SMS) before queuing, and the link is emailed.
 - **Signed links** valid for 7 days, shown in Downloads and in the "backup ready" notification. The route checks the signature, expiry and owner. Backups are allowed after the plan expires and are not counted as storage.
 - **Download My Data** (My Profile → Privacy): profile, memberships and Team Member records, devices, notifications and own audit events, delivered the same way.
-- **Limits and expiry:** a ZIP over 2 GB fails with the size message, and the retention job expires backups and exports after 7 days.
+- **Limits and expiry:** a ZIP over 512 MB fails with the size message, and the retention job expires backups and exports after 7 days.
 - **Tests:** HTTP tests for each scope's permissions, the code gate, link expiry and tampering, and a ZIP's contents. Storybook covers each form and state.
 
 **Delivered:** backups in the reporting context over the existing `construction_reporting.backup_jobs`, with the cross-context reads in the composition root.
