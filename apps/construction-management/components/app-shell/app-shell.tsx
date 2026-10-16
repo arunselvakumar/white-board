@@ -32,6 +32,7 @@ import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
 import { MastersNavMenu } from "./masters-nav-menu";
+import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { UserMenu } from "./user-menu";
@@ -125,6 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <PlanBanner />
+        <CompanyDeletionBanner />
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
         <main
           id="main-content"
