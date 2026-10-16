@@ -1,0 +1,39 @@
+apps/construction-management/app/app/downloads/page.tsx
+  s_9b8b004c55c7f2::t_e9aa7a3cd126a1 1-10
+apps/construction-management/components/app-shell/user-menu.stories.tsx
+  s_9b8b004c55c7f2::t_bbf0b4a448d49b 38-40
+apps/construction-management/components/app-shell/user-menu.tsx
+  s_9b8b004c55c7f2::t_e90fbd74eff03a 9,39-40,93-96
+apps/construction-management/components/downloads/download-row.tsx
+  s_9b8b004c55c7f2::t_038222a38292ed 1-169
+apps/construction-management/components/downloads/downloads-page.stories.tsx
+  s_9b8b004c55c7f2::t_ae2791d8528ddb 1-291
+apps/construction-management/components/downloads/downloads-page.tsx
+  s_9b8b004c55c7f2::t_443e971c9b620f 1-165
+apps/construction-management/components/downloads/download-fixtures.ts
+  s_bbdb3e8535149d::t_6b7756dd363a4b 1-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b592ebc63b99702cb2353b4214fb5f9f4ff64883",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_bbdb3e8535149d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-acca02336238ab1a4",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
