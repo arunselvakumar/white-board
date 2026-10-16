@@ -24,7 +24,7 @@ import {
   type LocationRef,
 } from "@/src/shared-kernel/location-ref";
 import { locationNames } from "@/src/queries/location-options";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 
 export const PURCHASE_REQUEST_MENU =
   PROCUREMENT_DOCUMENTS.purchase_request.menu;

@@ -1,12 +1,13 @@
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
+import { watchEvents } from "@/test/dispatched-events";
 import { addMaterial, addOpeningStock } from "@/test/procurement";
 
 import { POST as approve } from "./[id]/approve/route";
@@ -127,6 +128,10 @@ async function raise(
     }),
   );
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Purchase Requests", () => {
   it("raises, numbers, reads and lists a request", async () => {
@@ -424,6 +429,66 @@ describe("Purchase Requests", () => {
       }),
     );
     expect(noReject.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const ctx = await setup();
+    const clerk = await member(ctx, ["read", "create", "update"]);
+    actAs(clerk);
+    const events = watchEvents();
+    const pr = await json<Pr>(await raise(ctx));
+    expect(events.of("document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_request",
+        documentId: pr.id,
+        projectId: ctx.projectId,
+        number: pr.number,
+        submittedBy: clerk.userId,
+      }),
+    ]);
+
+    actAs({ ...ctx.owner, role: "owner" });
+    const rejected = await json<Pr>(
+      await reject(
+        post(`/${pr.id}/reject`, { reason: "Wrong grade" }),
+        params(pr.id),
+      ),
+    );
+    expect(events.of("document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_request",
+        documentId: pr.id,
+        number: pr.number,
+        rejectedBy: ctx.owner.userId,
+        createdBy: clerk.userId,
+        reason: "Wrong grade",
+      }),
+    ]);
+
+    actAs(clerk);
+    await update(
+      post(`/${pr.id}/update`, {
+        expectedUpdatedAt: rejected.updatedAt,
+        requestDate: TODAY,
+        items: [{ materialId: ctx.sand.id, quantity: "4" }],
+      }),
+      params(pr.id),
+    );
+    expect(events.of("document.submitted")).toHaveLength(2);
+
+    actAs({ ...ctx.owner, role: "owner" });
+    await bulkApprove(
+      post("/bulk-approve", { projectId: ctx.projectId, ids: [pr.id] }),
+    );
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "purchase_request",
+        documentId: pr.id,
+        number: pr.number,
+        approvedBy: ctx.owner.userId,
+        createdBy: clerk.userId,
+      }),
+    ]);
   });
 
   it("deletes a request; it is gone from reads", async () => {

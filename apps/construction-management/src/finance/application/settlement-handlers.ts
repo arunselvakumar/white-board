@@ -5,12 +5,17 @@ import {
   requiredText,
   type BulkRefusal,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   conflict,
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
 import { invoiceProgress, writeOffEntry } from "../domain/invoice";
@@ -73,8 +78,45 @@ function reasonOf(raw: string | null | undefined, field: string): string {
 export class SettlementHandlers {
   private readonly clock: () => Date;
 
-  constructor(private readonly deps: PartyFinanceDeps) {
+  constructor(
+    private readonly deps: PartyFinanceDeps,
+    /**
+     * `document.submitted` / `approved` / `rejected` after commit (CM-904,
+     * documentType `invoice_settlement`; its number is the invoice's).
+     */
+    private readonly events: EventDispatcher,
+  ) {
     this.clock = deps.clock ?? (() => new Date());
+  }
+
+  private async dispatchApproval(
+    decided: readonly {
+      settlement: Pick<StoredSettlement, "id" | "workspaceId" | "createdBy">;
+      invoice: Pick<StoredInvoice, "place" | "invoiceNumber">;
+    }[],
+    outcome: ApprovalOutcome,
+    by: string,
+    at: Date,
+  ): Promise<void> {
+    if (decided.length === 0) return;
+    await this.events.dispatch(
+      decided.map(({ settlement, invoice }) =>
+        approvalEvent(
+          {
+            workspaceId: settlement.workspaceId,
+            documentType: "invoice_settlement",
+            documentId: settlement.id,
+            projectId:
+              invoice.place.kind === "project" ? invoice.place.id : null,
+            number: invoice.invoiceNumber,
+            createdBy: settlement.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
+    );
   }
 
   async find(workspaceId: string, id: string): Promise<StoredSettlement> {
@@ -159,6 +201,17 @@ export class SettlementHandlers {
         occurredAt: at,
       });
     });
+    await this.dispatchApproval(
+      [
+        {
+          settlement: { id, workspaceId, createdBy: access.userId },
+          invoice,
+        },
+      ],
+      { kind: "submitted" },
+      access.userId,
+      at,
+    );
     return id;
   }
 
@@ -180,7 +233,7 @@ export class SettlementHandlers {
     settlement: StoredSettlement,
     decision: { approve: true } | { approve: false; reason: string },
     context: { check: PartyBackdated; today: string; at: Date },
-  ): Promise<void> {
+  ): Promise<StoredInvoice> {
     const { store, ledgers } = this.deps;
     const workspaceId = access.workspaceId;
     if (settlement.approvalStatus !== "pending")
@@ -214,7 +267,7 @@ export class SettlementHandlers {
         after: { reason: decision.reason },
         occurredAt: context.at,
       });
-      return;
+      return invoice;
     }
     if (invoice.settledAt != null)
       throw conflict("INVOICE_SETTLED", "This invoice is already settled.");
@@ -253,6 +306,7 @@ export class SettlementHandlers {
       after: { invoiceId: invoice.id, writtenOff: Number(balance) },
       occurredAt: context.at,
     });
+    return invoice;
   }
 
   private async run(
@@ -266,6 +320,8 @@ export class SettlementHandlers {
     const check = await this.deps.backdated(access);
     const today = await this.deps.today(workspaceId);
     const at = this.clock();
+    const decided: { settlement: StoredSettlement; invoice: StoredInvoice }[] =
+      [];
     await db.$transaction(async (tx) => {
       const locked = await store.lockSettlements(tx, workspaceId, ids);
       const byId = new Map(locked.map((row) => [row.id, row]));
@@ -274,11 +330,12 @@ export class SettlementHandlers {
         const settlement = byId.get(id);
         try {
           if (settlement == null) throw settlementNotFound();
-          await this.decide(tx, access, settlement, decision, {
+          const invoice = await this.decide(tx, access, settlement, decision, {
             check,
             today,
             at,
           });
+          decided.push({ settlement, invoice });
         } catch (error) {
           if (!bulk || !(error instanceof DomainError)) throw error;
           refusals.push({ id, code: error.code, message: error.message });
@@ -286,6 +343,14 @@ export class SettlementHandlers {
       }
       if (refusals.length > 0) throw bulkRefused(refusals);
     });
+    await this.dispatchApproval(
+      decided,
+      decision.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: decision.reason },
+      access.userId,
+      at,
+    );
   }
 
   async approve(access: MemberAccess, id: string): Promise<void> {

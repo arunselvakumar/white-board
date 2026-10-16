@@ -23,6 +23,8 @@ import {
   useSidebar,
 } from "@repo/ui/components/sidebar";
 
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { ReadyDownloadToast } from "@/components/notifications/ready-download-toast";
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
 
@@ -125,7 +127,8 @@ export function AppShell({
           <SidebarTrigger />
           <Separator orientation="vertical" className="mr-1 h-4" />
           <CompanySwitcher />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            <NotificationBell />
             <UserMenu />
           </div>
         </header>
@@ -138,6 +141,7 @@ export function AppShell({
         >
           {children}
         </main>
+        <ReadyDownloadToast />
       </SidebarInset>
     </SidebarProvider>
   );

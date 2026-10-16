@@ -7,6 +7,11 @@ import {
   requiredText,
   type BulkRefusal,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  savedOutcome,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import {
@@ -14,6 +19,7 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
@@ -177,6 +183,11 @@ export type OtherExpenseDeps = {
     },
   ) => Promise<string>;
   today: (workspaceId: string) => Promise<CalendarDate>;
+  /**
+   * `document.submitted` / `approved` / `rejected` after commit (CM-904,
+   * documentType `other_expense`).
+   */
+  events: EventDispatcher;
   clock?: () => Date;
 };
 
@@ -363,6 +374,36 @@ export class OtherExpenseHandlers {
     });
   }
 
+  /** The approval events of saved or decided expenses, after commit. */
+  private async dispatchApproval(
+    expenses: readonly Pick<
+      StoredOtherExpense,
+      "id" | "workspaceId" | "projectId" | "number" | "createdBy"
+    >[],
+    outcome: ApprovalOutcome | null,
+    by: string,
+    at: Date,
+  ): Promise<void> {
+    if (outcome == null || expenses.length === 0) return;
+    await this.deps.events.dispatch(
+      expenses.map((expense) =>
+        approvalEvent(
+          {
+            workspaceId: expense.workspaceId,
+            documentType: "other_expense",
+            documentId: expense.id,
+            projectId: expense.projectId,
+            number: expense.number,
+            createdBy: expense.createdBy,
+          },
+          outcome,
+          by,
+          at,
+        ),
+      ),
+    );
+  }
+
   /**
    * Saves a new expense: Save (pending), or Save & Approve (needs
    * Approve; posts its account entry). The EXP number comes from the
@@ -389,7 +430,7 @@ export class OtherExpenseHandlers {
             rejectReason: null,
           }
         : PENDING;
-    await this.deps.db.$transaction(async (tx) => {
+    const number = await this.deps.db.$transaction(async (tx) => {
       guard.create(content.expenseDate);
       await this.account(tx, access.workspaceId, content, this.actor(access));
       const number = await this.deps.number(tx, {
@@ -418,7 +459,22 @@ export class OtherExpenseHandlers {
       await this.audit(tx, access, id, "created", at, {
         after: { number, ...snapshot(content), status: approval.status },
       });
+      return number;
     });
+    await this.dispatchApproval(
+      [
+        {
+          id,
+          workspaceId: access.workspaceId,
+          projectId: input.projectId,
+          number,
+          createdBy: access.userId,
+        },
+      ],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
     return id;
   }
 
@@ -488,6 +544,12 @@ export class OtherExpenseHandlers {
         after: { ...snapshot(content), status: approval.status },
       });
     });
+    await this.dispatchApproval(
+      [current],
+      savedOutcome(approval.status),
+      access.userId,
+      at,
+    );
   }
 
   /** Deletes an expense: a tombstone, and an approved one's entry reversed. */
@@ -587,6 +649,7 @@ export class OtherExpenseHandlers {
   ): Promise<void> {
     const guard = await this.deps.guard(access);
     const at = this.clock();
+    const decided: StoredOtherExpense[] = [];
     await this.deps.db.$transaction(async (tx) => {
       const locked = new Map(
         (await this.deps.store.lock(tx, access.workspaceId, ids)).map(
@@ -594,7 +657,6 @@ export class OtherExpenseHandlers {
         ),
       );
       const refusals: BulkRefusal[] = [];
-      const decided: StoredOtherExpense[] = [];
       for (const id of ids) {
         const expense = locked.get(id);
         try {
@@ -657,6 +719,14 @@ export class OtherExpenseHandlers {
         );
       }
     });
+    await this.dispatchApproval(
+      decided,
+      decision.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: decision.reason },
+      access.userId,
+      at,
+    );
   }
 
   // -------------------------------------------------------------------------

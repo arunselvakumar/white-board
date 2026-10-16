@@ -10,6 +10,11 @@ import {
   type QueueHandler,
 } from "@/src/shared-kernel/queue";
 
+import {
+  createMessagingDelayedHandler,
+  createMessagingRetentionHandler,
+  createPushQueueHandler,
+} from "./messaging";
 import { reportQueueHandlerFromEnv } from "./report-jobs";
 
 /**
@@ -19,7 +24,13 @@ import { reportQueueHandlerFromEnv } from "./report-jobs";
  * `DAILY_JOB_TYPES`.
  */
 export function queueHandlers(): QueueHandler[] {
-  return [reportQueueHandlerFromEnv()];
+  return [
+    reportQueueHandlerFromEnv(),
+    // CM-904: one push per notification; daily retention and "became delayed".
+    createPushQueueHandler(),
+    createMessagingRetentionHandler(),
+    createMessagingDelayedHandler(),
+  ];
 }
 
 /**
@@ -27,7 +38,11 @@ export function queueHandlers(): QueueHandler[] {
  * `daily:<type>:<date>`): retention, orphan clean-up, "became delayed"
  * notifications, Company deletions that are due.
  */
-export const DAILY_JOB_TYPES: readonly string[] = [];
+export const DAILY_JOB_TYPES: readonly string[] = [
+  // CM-904
+  "messaging.retention",
+  "messaging.delayed",
+];
 
 export const queueStore = prismaQueueStore(prisma);
 

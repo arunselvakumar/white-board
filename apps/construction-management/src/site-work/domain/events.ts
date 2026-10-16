@@ -45,6 +45,10 @@ export type EquipmentFuelOverrun = DomainEvent & {
   /** Decimal strings: fuel in the equipment's fuel unit, efficiency per hour, km or trip. */
   fuelQty: string;
   expectedFuelEfficiency: string;
+  /** The sheet's number as the screens show it (CM-904). */
+  number?: string | null;
+  /** User id of who saved the sheet; never notified of it (CM-904). */
+  by?: string;
 };
 
 export type SiteWorkEvent =

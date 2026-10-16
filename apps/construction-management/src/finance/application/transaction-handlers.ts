@@ -7,6 +7,11 @@ import {
   type ApprovalState,
   type ApprovalStatus,
 } from "@/src/shared-kernel/approval";
+import {
+  approvalEvent,
+  savedOutcome,
+  type ApprovalOutcome,
+} from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   isCalendarDate,
@@ -17,6 +22,7 @@ import {
   DomainError,
   notFound,
 } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
@@ -131,6 +137,11 @@ export type TransactionDeps = {
   accountFacts: AccountFactsPort;
   backdated: (access: MemberAccess) => Promise<BackdatedCheck>;
   closing: (workspaceId: string) => Promise<ClosingCheck>;
+  /**
+   * `document.submitted` / `approved` / `rejected` after commit (CM-904,
+   * documentType `transaction`).
+   */
+  events: EventDispatcher;
   clock?: () => Date;
 };
 
@@ -380,10 +391,49 @@ export class TransactionHandlers {
     if (input.approve === true) assertCan(access, MENU, "approve", scope);
     const check = await this.deps.backdated(access);
     const id = newId();
-    await this.deps.db.$transaction(async (tx) => {
-      await this.createIn(tx, access, input, check, { id, importBatchId });
-    });
+    const row = await this.deps.db.$transaction((tx) =>
+      this.createIn(tx, access, input, check, { id, importBatchId }),
+    );
+    await this.dispatchApproval(
+      [row],
+      savedOutcome(row.approvalStatus),
+      access.userId,
+      row.createdAt,
+    );
     return id;
+  }
+
+  /**
+   * The approval events of saved or decided Transactions, after commit
+   * (ADR CM-0021 §6). Callers that save or decide inside their own
+   * transaction (the register's bulk decision) dispatch through this.
+   */
+  async dispatchApproval(
+    rows: readonly StoredTransaction[],
+    outcome: ApprovalOutcome | null,
+    by: string,
+    at: Date,
+  ): Promise<void> {
+    if (outcome == null || rows.length === 0) return;
+    await this.deps.events.dispatch(
+      rows.map((row) =>
+        approvalEvent(
+          {
+            workspaceId: row.workspaceId,
+            documentType: "transaction",
+            documentId: row.id,
+            projectId: row.projectId,
+            number: row.number,
+            createdBy: row.createdBy,
+          },
+          outcome.kind === "rejected"
+            ? { kind: "rejected", reason: row.rejectReason }
+            : outcome,
+          by,
+          at,
+        ),
+      ),
+    );
   }
 
   /**
@@ -504,7 +554,7 @@ export class TransactionHandlers {
     if (input.approve === true) assertCan(access, MENU, "approve", scope);
     const check = await this.deps.backdated(access);
     const at = this.clock();
-    await db.$transaction(async (tx) => {
+    const saved = await db.$transaction(async (tx) => {
       const locked = await store.lock(tx, access.workspaceId, id);
       if (locked == null) throw transactionNotFound();
       changed(locked, expectedUpdatedAt);
@@ -562,7 +612,14 @@ export class TransactionHandlers {
         after: snapshot(next),
         occurredAt: at,
       });
+      return next;
     });
+    await this.dispatchApproval(
+      [saved],
+      savedOutcome(saved.approvalStatus),
+      access.userId,
+      at,
+    );
   }
 
   /**
@@ -640,8 +697,16 @@ export class TransactionHandlers {
   ): Promise<void> {
     const closing = await this.deps.closing(access.workspaceId);
     const at = this.clock();
-    await this.deps.db.$transaction((tx) =>
+    const decided = await this.deps.db.$transaction((tx) =>
       this.decideIn(tx, access, id, decision, closing, expectedUpdatedAt, at),
+    );
+    await this.dispatchApproval(
+      [decided],
+      decision.approve
+        ? { kind: "approved" }
+        : { kind: "rejected", reason: null },
+      access.userId,
+      at,
     );
   }
 

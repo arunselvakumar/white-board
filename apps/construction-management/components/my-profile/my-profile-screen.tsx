@@ -4,6 +4,7 @@ import { useActiveCompany } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { NotificationSettings } from "@/components/profile/notification-settings";
 import { myProfileQuery } from "@/src/queries/my-profile";
 
 import { MyProfileForm } from "./my-profile-form";
@@ -24,6 +25,7 @@ export function MyProfileScreen() {
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader title="My Profile" meta={meta} />
         <MyProfileForm profile={profile} />
+        <NotificationSettings />
       </div>
     </div>
   );
