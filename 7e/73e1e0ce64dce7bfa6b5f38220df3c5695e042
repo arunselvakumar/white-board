@@ -1,0 +1,83 @@
+apps/construction-management/app/api/_lib/company-deletion-guard.ts
+  s_9b8b004c55c7f2::t_35a8ddf5ba0529 1-77
+apps/construction-management/app/api/_lib/map-error.ts
+  s_9b8b004c55c7f2::t_1e195cfa026a8f 17
+apps/construction-management/app/api/_lib/require-session.ts
+  s_9b8b004c55c7f2::t_3c13d243ae3716 8,13-14,24-26,44-48,51,58-62,78-82
+apps/construction-management/app/api/auth/[...all]/route.ts
+  s_9b8b004c55c7f2::t_08607fabe2f040 1-4,6-27
+apps/construction-management/src/composition/account.ts
+  s_9b8b004c55c7f2::t_f998e928f1e72c 1-14
+apps/construction-management/src/composition/company-purge.ts
+  s_9b8b004c55c7f2::t_85db30237622c6 1-290
+apps/construction-management/src/composition/push-subscriptions.ts
+  s_9b8b004c55c7f2::t_d42cbccd9add5f 1-68
+apps/construction-management/src/composition/queue.ts
+  s_9b8b004c55c7f2::t_cd1879d26f3c36 13,23,31
+apps/construction-management/src/organization/application/account-deletion-handlers.ts
+  s_9b8b004c55c7f2::t_7d17cd03452fb4 1-127
+apps/construction-management/src/organization/application/company-deletion-handlers.ts
+  s_9b8b004c55c7f2::t_e2cd70ac1c3e81 1-122
+apps/construction-management/src/organization/application/device-handlers.ts
+  s_9b8b004c55c7f2::t_89734cb467dd84 1-103
+apps/construction-management/src/organization/application/ownership-handlers.ts
+  s_9b8b004c55c7f2::t_0d2c4dc8faa840 1-169
+apps/construction-management/src/organization/domain/company-deletion.ts
+  s_9b8b004c55c7f2::t_c0b17a7867c796 1-119
+apps/construction-management/src/organization/domain/user-agent.ts
+  s_9b8b004c55c7f2::t_bae480519373ca 1-60
+apps/construction-management/src/organization/infrastructure/auth-account-directories.ts
+  s_9b8b004c55c7f2::t_fda4106c7ebfae 1-21
+apps/construction-management/src/organization/infrastructure/create-account-handlers.ts
+  s_9b8b004c55c7f2::t_b10793388766e1 1-69
+apps/construction-management/src/organization/infrastructure/prisma-account-deletion-store.ts
+  s_9b8b004c55c7f2::t_33632dd275e0db 1-55
+apps/construction-management/src/organization/infrastructure/prisma-company-deletion-store.ts
+  s_9b8b004c55c7f2::t_fcda17b4311db4 1-85
+apps/construction-management/src/organization/infrastructure/prisma-ownership-transfer-store.ts
+  s_9b8b004c55c7f2::t_d4de0b8b312058 1-36
+apps/construction-management/src/shared-kernel/action-code-rules.ts
+  s_9b8b004c55c7f2::t_32a1107bb05969 1-185
+apps/construction-management/src/shared-kernel/action-codes.ts
+  s_9b8b004c55c7f2::t_7830e090b57729 1-319
+apps/construction-management/src/shared-kernel/company-deletion.ts
+  s_9b8b004c55c7f2::t_b6bc0d43f60abd 1-35
+apps/construction-management/src/shared-kernel/domain-error.ts
+  s_9b8b004c55c7f2::t_15dcbb6a6559dc 4-5,8
+packages/auth/src/construction/server/companies.ts
+  s_9b8b004c55c7f2::t_512f1c4ff9e094 3,121-204
+packages/auth/src/construction/server/index.ts
+  s_9b8b004c55c7f2::t_2243dc645b8eb7 6-11,42
+packages/email-templates/src/emails/construction/company-code.tsx
+  s_9b8b004c55c7f2::t_bac885ee3b5dab 7-8,14-18,35-39,47,50-53,59
+packages/email-templates/src/index.ts
+  s_9b8b004c55c7f2::t_35d7a4caf4ea44 101-103
+apps/construction-management/src/organization/domain/team-member.ts
+  s_b4b439e0356c99::t_b9671313443e2d 385-464
+packages/auth/src/construction/server/accounts.ts
+  s_b4b439e0356c99::t_70f43cd6725149 1-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7e73e1e0ce64dce7bfa6b5f38220df3c5695e042",
+  "prompts": {},
+  "sessions": {
+    "s_9b8b004c55c7f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2ce1bc2-2678-4ddb-9507-b340b4caba16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_b4b439e0356c99": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af94be5349bb6d426",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
