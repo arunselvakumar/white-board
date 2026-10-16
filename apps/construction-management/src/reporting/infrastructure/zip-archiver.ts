@@ -88,21 +88,22 @@ async function copyEntries(
   if (!(into instanceof FflateArchive))
     throw new Error("Entries can only be copied into an fflate archive.");
   let copied = 0;
-  let failure: unknown = null;
+  const state: { failure: Error | null } = { failure: null };
   const unzip = new Unzip((file: UnzipFile) => {
     // Stored entries stay stored (media); deflated ones are deflated again.
     const out = into.entry(file.name, file.compression !== 0);
     file.ondata = (error, data, final) => {
-      if (failure != null) return;
+      if (state.failure != null) return;
       if (error != null) {
-        failure = error;
+        state.failure = error;
         return;
       }
       try {
         out.push(data, final);
         if (final) copied += 1;
       } catch (pushError) {
-        failure = pushError;
+        state.failure =
+          pushError instanceof Error ? pushError : new Error(String(pushError));
       }
     };
     file.start();
@@ -114,10 +115,10 @@ async function copyEntries(
       const { done, value } = await reader.read();
       if (done) break;
       unzip.push(value, false);
-      if (failure != null) throw failure;
+      if (state.failure != null) throw state.failure;
     }
     unzip.push(new Uint8Array(0), true);
-    if (failure != null) throw failure;
+    if (state.failure != null) throw state.failure;
   } finally {
     reader.releaseLock();
   }

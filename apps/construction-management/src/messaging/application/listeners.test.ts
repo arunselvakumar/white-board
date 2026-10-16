@@ -448,6 +448,70 @@ describe("notification listeners (CM-904)", () => {
     });
   });
 
+  it("tells only the requester that a backup or data export is ready, with its ZIP link, or that it failed (CM-906)", async () => {
+    const { listeners, sent, queries } = setup();
+    const finished = (fields: Record<string, unknown>) =>
+      event("BackupFinished", {
+        backupJobId: "backup-1",
+        scope: "project",
+        projectId: PROJECT,
+        requestedBy: "requester",
+        status: "done",
+        title: "Project backup",
+        fileName: "project-backup-2026-10-16.zip",
+        downloadHref: "/api/construction/reporting/backups/backup-1/download?expires=1&sig=s",
+        error: null,
+        ...fields,
+      });
+    await listeners.handle(finished({}));
+    await listeners.handle(
+      finished({
+        backupJobId: "backup-2",
+        status: "failed",
+        fileName: null,
+        downloadHref: null,
+        error: "Too large — choose fewer modules or a shorter range",
+      }),
+    );
+    await listeners.handle(
+      finished({ backupJobId: "export-1", scope: "my_data", projectId: null }),
+    );
+    expect(queries).toEqual([]);
+    expect(sent.map((one) => one.recipients)).toEqual([
+      ["requester"],
+      ["requester"],
+      ["requester"],
+    ]);
+    expect(sent[0]?.draft).toMatchObject({
+      type: "backup.ready",
+      menu: null,
+      title: "Your Project backup is ready",
+      href: "/app/downloads",
+      attachment: {
+        kind: "backup",
+        id: "backup-1",
+        downloads: [
+          {
+            label: "ZIP",
+            href: "/api/construction/reporting/backups/backup-1/download?expires=1&sig=s",
+          },
+        ],
+      },
+      sourceKey: "backup:backup-1:done",
+    });
+    expect(sent[1]?.draft).toMatchObject({
+      type: "backup.failed",
+      title: "Your Project backup could not be made",
+      body: "Too large — choose fewer modules or a shorter range",
+      attachment: null,
+    });
+    expect(sent[2]?.draft).toMatchObject({
+      type: "export.ready",
+      title: "Your data export is ready",
+      attachment: { kind: "export", id: "export-1" },
+    });
+  });
+
   it("ignores events it does not know", async () => {
     const { listeners, sent } = setup();
     await listeners.handle(event("TaskProgressRecorded", { taskId: "t" }));

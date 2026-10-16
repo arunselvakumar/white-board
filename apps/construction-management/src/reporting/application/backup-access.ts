@@ -61,14 +61,14 @@ function checkedModules(
   if (unique.length === 0)
     throw new DomainError("BACKUP_MODULES_REQUIRED", "Choose at least one module.");
   return unique.map((key) => {
-    const module = backupModule(key);
-    if (module?.scope !== scope)
+    const found = backupModule(key);
+    if (found?.scope !== scope)
       throw new DomainError(
         "BACKUP_MODULE_UNKNOWN",
         `There is no ${scope === "project" ? "Project" : "master records"} module "${key}".`,
         { details: { module: key } },
       );
-    return module;
+    return found;
   });
 }
 
@@ -104,9 +104,9 @@ function allow(
   chosen: readonly BackupModule[],
   scope: "project" | "masters",
 ): AllowedModules {
-  for (const module of chosen)
-    if (!canBackUpModule(access, module, projectId)) throw moduleDenied(module);
-  const keys = new Set(chosen.map((module) => module.key));
+  for (const entry of chosen)
+    if (!canBackUpModule(access, entry, projectId)) throw moduleDenied(entry);
+  const keys = new Set(chosen.map((entry) => entry.key));
   return backupModulesIn(scope)
     .filter((module) => keys.has(module.key))
     .map((module) => ({

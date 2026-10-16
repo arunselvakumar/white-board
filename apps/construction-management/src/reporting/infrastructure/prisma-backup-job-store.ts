@@ -16,7 +16,6 @@ import {
   BACKUP_FILE_KIND,
   type BackupJob,
   type BackupPart,
-  type BackupScope,
   type BackupStatus,
 } from "../domain/backup-job";
 
@@ -54,7 +53,7 @@ function toJob(row: Row): BackupJob {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    scope: row.scope as BackupScope,
+    scope: row.scope,
     modules: row.modules,
     fromDate: row.fromDate == null ? null : calendarDateFromDb(row.fromDate),
     toDate: row.toDate == null ? null : calendarDateFromDb(row.toDate),
@@ -76,7 +75,7 @@ function toJob(row: Row): BackupJob {
 }
 
 function partsJson(parts: readonly BackupPart[]): Prisma.InputJsonValue {
-  return parts as unknown as Prisma.InputJsonValue;
+  return parts.map((part) => ({ ...part, entities: [...part.entities] }));
 }
 
 /** `construction_reporting.backup_jobs` (CM-906). */

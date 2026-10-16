@@ -67,13 +67,9 @@ function plainText(value: BackupRawValue): string {
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) return value.map(plainText).join(", ");
-  // Prisma's Decimal and similar print themselves.
-  if (
-    typeof value === "object" &&
-    "toString" in value &&
-    value.toString !== Object.prototype.toString
-  )
-    return String(value as { toString(): string });
+  // Prisma's Decimal (numeric columns) prints itself.
+  if (typeof value === "object" && "toFixed" in value && "toString" in value)
+    return (value as { toString(): string }).toString();
   return JSON.stringify(value);
 }
 
@@ -155,7 +151,7 @@ export function csvField(value: string, type: BackupColumnType = "text"): string
 export const CSV_LINE_END = "\r\n";
 
 /** UTF-8 byte order mark: Excel then reads ₹ and Indian scripts right. */
-export const CSV_BOM = "﻿";
+export const CSV_BOM = "\uFEFF";
 
 export function csvHeader(columns: readonly BackupColumn[]): string {
   return (

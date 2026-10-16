@@ -78,7 +78,7 @@ const id = (alias = "t") => col("id", "ID", `${alias}.id::text`, "id");
 
 /** A name looked up by id in another table. */
 function nameIn(table: string, idSql: string, name = "name"): string {
-  return `(SELECT x.${name} FROM ${table} x WHERE x.id = ${idSql})`;
+  return `(SELECT x.${name} FROM ${table} x WHERE x.id = (${idSql})::uuid)`;
 }
 
 /** Who did it: the Company's Team Member with that User, "Deleted user" otherwise. */
@@ -1234,7 +1234,7 @@ const SPECS: Record<string, EntitySpec> = {
     col(
       "projects",
       "Projects",
-      `(SELECT string_agg(x.name, ', ' ORDER BY x.name) FROM ${OG}.team_member_projects a JOIN ${PJ}.projects x ON x.id = a.project_id WHERE a.member_id = t.id AND x.deleted_at IS NULL)`,
+      `(SELECT string_agg(x.name, ', ' ORDER BY x.name) FROM ${OG}.team_member_projects a JOIN ${PJ}.projects x ON x.id = a.project_id::uuid WHERE a.member_id = t.id AND x.deleted_at IS NULL)`,
     ),
     col("joinedAt", "Joined On", "t.joined_at", "datetime"),
     ...stamps(),

@@ -204,13 +204,13 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     part: BackupPart,
     signal: AbortSignal,
   ): Promise<BackupPart> {
-    const module = backupModule(part.module);
-    if (module == null || backup.workspaceId == null)
+    const found = backupModule(part.module);
+    if (found == null || backup.workspaceId == null)
       throw new Error(`Unknown backup module ${part.module}.`);
     const scope = {
       workspaceId: backup.workspaceId,
       // A Company backup reads every Project.
-      projectId: module.scope === "project" ? backup.projectId : null,
+      projectId: found.scope === "project" ? backup.projectId : null,
       fromDate: backup.fromDate,
       toDate: backup.toDate,
     };
@@ -218,7 +218,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     const mediaPaths = new Set<string>();
     let rows = 0;
     let mediaFiles = 0;
-    for (const entity of module.entities) {
+    for (const entity of found.entities) {
       const columns = deps.reader.columns(entity, part.money);
       const writer = new BackupEntityWriter(columns);
       let after: string | null = null;
@@ -230,7 +230,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
           // Not exact (compression), but stops a runaway part early.
           if (writer.approximateBytes > maxBytes * 4) throw backupTooLarge();
         }
-        if (backup.includeMedia && module.media && page.length > 0) {
+        if (backup.includeMedia && found.media && page.length > 0) {
           const numbers = new Map(page.map((row) => [row.id, row.number]));
           const files = await deps.reader.media(
             entity,
@@ -245,7 +245,7 @@ export function createBackupQueue(deps: BackupQueueDeps) {
               numbers.get(file.recordId) ?? file.recordId,
               file.recordId,
             );
-            const base = `media/${module.folder.replace(/^masters\//, "")}/${record}/`;
+            const base = `media/${found.folder.replace(/^masters\//, "")}/${record}/`;
             const name = zipSegment(file.fileName, "file");
             let path = `${base}${name}`;
             for (let copy = 2; mediaPaths.has(path); copy += 1)
@@ -261,8 +261,8 @@ export function createBackupQueue(deps: BackupQueueDeps) {
       }
       if (backup.includeData) {
         const files = writer.finish();
-        addText(archive, `${module.folder}/${entity}.csv`, files.csv);
-        addText(archive, `${module.folder}/${entity}.json`, files.json);
+        addText(archive, `${found.folder}/${entity}.csv`, files.csv);
+        addText(archive, `${found.folder}/${entity}.json`, files.json);
         counts.push({ entity, rows: writer.rows });
         rows += writer.rows;
       }
