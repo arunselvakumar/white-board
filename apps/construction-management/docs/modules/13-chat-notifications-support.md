@@ -423,3 +423,19 @@ Chat and support have no menu flag in the permission matrix (available to all me
 7. Support contact values and Help Center URL.
 8. Can a closed support ticket be reopened?
 9. Is Firebase Auth used for anything beyond RTDB access?
+
+## Decisions for the build (M9)
+
+### CM-904 — Notifications
+
+- **Who receives what.** `notificationRecipients` (`src/shared-kernel/access/notification-recipients.ts`) returns active Team Members with a User holding the menu's Notification flag plus Read (Approve for "waiting for your approval"), assigned to the Project when the menu is Project-scoped, never the actor. The **Owner passes the matrix and the assignment check**, as in `can()`, so the Owner hears of every event of the Company's menus. Direct recipients (assignees, creators, the employee) go through the same check (`among`), so a creator who lost N or Read hears nothing.
+- **Approvals are one generic event family** in the kernel (`src/shared-kernel/approval.ts`): `document.submitted`, `document.approved`, `document.rejected`, each with `documentType`, `number` and `createdBy` (for HRMS, the employee's User). Messaging's catalogue (`src/messaging/domain/notification-kinds.ts` → `APPROVAL_DOCUMENTS`) maps the document type to its menu, label and links. Material Transfers and Delivery Notes are announced by their own events (sent, delivered), not as approvals.
+- **Other Expenses has no Notification flag** in the matrix (`CRUDAJPO`), so only the Owner receives its approval notifications. Adding N to the menu is a matrix change left to the owner.
+- **Central Store stock alerts** ("stock below minimum" at a Store) go to holders of N on **Central Store (MR)**, the Central Store's only menu with an N flag; Project stock alerts go to holders of N on Current Inventory on that Project. A material's alert is sent at most once a day per place.
+- **Inspection Requests** "requested of you" need Read (not Approve) for the named inspector.
+- **Push** is one `push` queue job per notification (`maxAttempts` 1: a device that got it is never sent it twice). Each attempt is logged in `notification_deliveries` (`in_app` sent when written; `web_push` sent, failed or skipped). Skipped when the VAPID keys are unset, the group is muted, the notification was already read, or no device is on. 404/410 deletes the subscription. Pushes start right after the response in `after()` with a 25-second budget; the daily drain sends any left over.
+- **Menu groups for muting** are the Permission Matrix categories plus "Reports and backups" (`downloads`) for ready notifications, which carry no menu.
+- **Subscriptions are per browser endpoint**: subscribing again (or as another User on the same browser) updates the row; each row keeps the Better Auth session id, and `deletePushSubscriptionsForSessions(sessionIds)` (`src/messaging/infrastructure/prisma-push-stores.ts`) removes a signed-out device's (CM-907 calls it).
+- **The Download toast** reads `latestReadyDownload` from the unread-count poll: the newest unread report/backup/export-ready notification of the last hour. It is shown once per notification per browser tab session.
+- **"Became delayed"** (`messaging.delayed`, daily) uses tracking's own status rules (`taskStatus`, `issueStatus`) for leaf tasks and open issues whose due date was yesterday in their Company's today; the source key is per record and due date, so reruns add nothing.
+- **Routes are POST for writes** like the rest of the API (`…/{id}/read`, `…/{id}/delete`, `…/read-all`, `push-subscriptions/delete`, `preferences/update`), instead of the `DELETE` / `PUT` the ticket sketched.
