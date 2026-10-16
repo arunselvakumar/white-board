@@ -191,6 +191,10 @@ _Avoid_: tabs, section bar
 A Project's figures over a chosen period (last 12 months by default): key figures, the Project summary, attendance, and the sections later milestones fill. Each Team Member chooses which sections they see and in what order (Manage dashboard).
 _Avoid_: analytics, reports (those are files), home (that is the Project home)
 
+**Company Dashboard**:
+The main menu's Dashboard: across the Projects a Team Member can see, the approvals waiting for them, open Issues & Snags, pending inspections, Labours present today and amounts due, with one row per Project leading to its Project Dashboard (ADR CM-0021 §4).
+_Avoid_: home, overview, analytics
+
 **Hidden module**:
 A module someone with the Project's Update permission took off a Project's home for everyone on it. Hiding changes the home, not what anyone may open.
 _Avoid_: disabled module, removed module

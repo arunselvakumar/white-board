@@ -8,7 +8,6 @@ import { percentValue } from "../domain/task-progress";
 import {
   countByStatus,
   mostDelayed,
-  pendingIssues,
   summariseInspections,
   summariseIssues,
   valueEarnedByTask,
@@ -97,12 +96,6 @@ export type TrackingDashboardResult = {
   issues: IssueDashboard | null;
   /** Null without Inspection Request Read on the Project. */
   inspections: InspectionSummary | null;
-  kpis: {
-    /** Open issues in the period, delayed included; null without Read. */
-    pendingIssues: number | null;
-    /** Pending requests in the period; null without Read. */
-    pendingInspections: number | null;
-  };
 };
 
 /**
@@ -177,15 +170,8 @@ export class TrackingDashboard {
         ? this.inspections(workspaceId, projectId, range)
         : null,
     ]);
-    return {
-      tasks,
-      issues,
-      inspections,
-      kpis: {
-        pendingIssues: issues == null ? null : pendingIssues(issues.byStatus),
-        pendingInspections: inspections?.pending ?? null,
-      },
-    };
+    // The KPI tiles read the reporting views since CM-902.
+    return { tasks, issues, inspections };
   }
 
   private async tasks(

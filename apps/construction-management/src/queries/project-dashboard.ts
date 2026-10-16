@@ -20,13 +20,30 @@ export type ProjectSummary = ConstructionProjectsProjectSummaryResponseModel;
 
 const LAYOUT_API = "/api/construction/projects/dashboard-layout";
 
-/** The member's dashboard sections in order (CM-412), for every Project. */
-export const dashboardLayoutQuery = queryOptions({
-  queryKey: [...PROJECTS_KEY, "dashboard-layout"],
-  queryFn: () => apiJson<DashboardLayout>(LAYOUT_API),
-});
+const LAYOUT_KEY = [...PROJECTS_KEY, "dashboard-layout"] as const;
 
-/** Manage Dashboard: the sections in order with what shows; `[]` resets. */
+/**
+ * The member's dashboard sections in order (CM-412), for every Project;
+ * on a Project, the sections whose module is hidden there are marked
+ * (CM-902).
+ */
+export function dashboardLayoutQuery(projectId: string | null) {
+  return queryOptions({
+    queryKey: [...LAYOUT_KEY, projectId ?? "all"],
+    queryFn: () =>
+      apiJson<DashboardLayout>(
+        projectId == null
+          ? LAYOUT_API
+          : `${LAYOUT_API}?projectId=${encodeURIComponent(projectId)}`,
+      ),
+  });
+}
+
+/**
+ * Manage Dashboard: the sections in order with what shows; `[]` resets.
+ * Every cached layout takes the new order and keeps its Project's hidden
+ * marks.
+ */
 export function useSaveDashboardLayout() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -37,7 +54,17 @@ export function useSaveDashboardLayout() {
         body: JSON.stringify({ sections }),
       }),
     onSuccess: (layout) => {
-      queryClient.setQueryData(dashboardLayoutQuery.queryKey, layout);
+      queryClient.setQueriesData<DashboardLayout>(
+        { queryKey: LAYOUT_KEY },
+        (old) => ({
+          sections: layout.sections.map((section) => ({
+            ...section,
+            hiddenOnProject:
+              old?.sections.find((item) => item.key === section.key)
+                ?.hiddenOnProject ?? false,
+          })),
+        }),
+      );
     },
   });
 }

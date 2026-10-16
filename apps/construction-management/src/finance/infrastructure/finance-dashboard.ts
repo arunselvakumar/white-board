@@ -3,7 +3,6 @@ import { Prisma, type PrismaClient } from "@repo/construction-db";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
 import type { FinanceDirectory } from "../application/ports";
-import { partyDues, type PartyDue } from "../domain/dues";
 import type { PartyType } from "../domain/ledger";
 import {
   monthlyFlows,
@@ -11,34 +10,13 @@ import {
   type MonthFlow,
   type PaymentModule,
 } from "../domain/payment-flows";
-import { loadDueInvoices, nameOfParty, partyNames } from "./due-invoices";
 
 type Range = { from: CalendarDate; to: CalendarDate };
-
-export type DashboardDue = {
-  partyType: PartyType;
-  partyId: string;
-  name: string;
-  invoiced: bigint;
-  /** Allocated (money and TDS) plus written off. */
-  paid: bigint;
-  due: bigint;
-  overdue: bigint;
-};
 
 export type PaymentsSection = {
   months: MonthFlow[];
   totals: { in: bigint; out: bigint; net: bigint };
-  dues: DashboardDue[];
   modules: Record<PaymentModule, bigint>;
-};
-
-export type PendingPaymentApprovals = {
-  transactions: number;
-  transfers: number;
-  vouchers: number;
-  otherExpenses: number;
-  settlements: number;
 };
 
 /**
@@ -50,10 +28,11 @@ const FLOW = Prisma.sql`kind NOT IN ('opening', 'transfer_in', 'transfer_out')`;
 const SIDE = Prisma.sql`CASE WHEN reverses_entry_id IS NULL THEN sign(amount) ELSE -sign(amount) END`;
 
 /**
- * The Project Dashboard's Payments section and Payment Approvals KPI
- * (CM-709, ADR CM-0017 §16), read from the account ledger, invoices and
- * allocations, party payments, Other Expenses and (through the directory)
- * M2's wage payments.
+ * The Project Dashboard's Payments section (CM-709, ADR CM-0017 §16),
+ * read from the account ledger, party payments, Other Expenses and
+ * (through the directory) M2's wage payments. Due Payments and the Payment
+ * Approvals KPI read the reporting views since CM-902
+ * (`src/reporting/infrastructure/prisma-dashboard-source.ts`).
  */
 export class FinanceDashboard {
   constructor(
@@ -96,34 +75,6 @@ export class FinanceDashboard {
       sums,
       before[0]?.amount ?? 0n,
     );
-  }
-
-  /** Parties with something due on bills from them on the Project, on `asOn`. */
-  async dues(
-    workspaceId: string,
-    projectId: string,
-    asOn: CalendarDate,
-  ): Promise<DashboardDue[]> {
-    const invoices = await loadDueInvoices(this.db, workspaceId, {
-      projectIds: [projectId],
-      asOn,
-      direction: "payable",
-    });
-    const dues = partyDues(invoices, asOn).filter((due) => due.due > 0n);
-    const names = await partyNames(this.db, this.directory, workspaceId, dues);
-    return dues
-      .map((due: PartyDue) => ({
-        partyType: due.partyType,
-        partyId: due.partyId,
-        name: nameOfParty(names, due),
-        invoiced: due.invoiced,
-        paid: due.paid + due.writtenOff,
-        due: due.due,
-        overdue: due.overdue,
-      }))
-      .sort((a, b) =>
-        b.due === a.due ? a.name.localeCompare(b.name) : b.due > a.due ? 1 : -1,
-      );
   }
 
   /**
@@ -181,9 +132,8 @@ export class FinanceDashboard {
     projectId: string,
     range: Range,
   ): Promise<PaymentsSection> {
-    const [months, dues, modules] = await Promise.all([
+    const [months, modules] = await Promise.all([
       this.flows(workspaceId, projectId, range),
-      this.dues(workspaceId, projectId, range.to),
       this.modules(workspaceId, projectId, range),
     ]);
     const totalIn = months.reduce((sum, month) => sum + month.in, 0n);
@@ -191,41 +141,7 @@ export class FinanceDashboard {
     return {
       months,
       totals: { in: totalIn, out: totalOut, net: totalIn - totalOut },
-      dues,
       modules,
     };
-  }
-
-  /**
-   * Pending documents on the Project waiting for a decision: Transactions,
-   * transfers and petty-cash vouchers that name it, its Other Expenses, and
-   * settlements of its invoices.
-   */
-  async pendingApprovals(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<PendingPaymentApprovals> {
-    const pending = {
-      workspaceId,
-      projectId,
-      approvalStatus: "pending",
-      deletedAt: null,
-    } as const;
-    const [transactions, transfers, vouchers, otherExpenses, settlements] =
-      await Promise.all([
-        this.db.constructionFinanceTransaction.count({ where: pending }),
-        this.db.constructionFinanceAccountTransfer.count({ where: pending }),
-        this.db.constructionFinancePettyCashVoucher.count({ where: pending }),
-        this.db.constructionFinanceOtherExpense.count({ where: pending }),
-        this.db.constructionFinanceSettlement.count({
-          where: {
-            workspaceId,
-            approvalStatus: "pending",
-            deletedAt: null,
-            invoice: { projectId, deletedAt: null },
-          },
-        }),
-      ]);
-    return { transactions, transfers, vouchers, otherExpenses, settlements };
   }
 }

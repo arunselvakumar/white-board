@@ -11,6 +11,7 @@ import {
 } from "./projects/[id]/developments/developments-models";
 import {
   ConstructionProjectsDashboardLayoutResponseModel,
+  GetConstructionProjectsDashboardLayoutRequestModel,
   UpdateConstructionProjectsDashboardLayoutRequestModel,
 } from "./dashboard-layout/dashboard-layout-models";
 import { ConstructionProjectsProjectSummaryResponseModel } from "./projects/[id]/dashboard/dashboard-models";
@@ -154,12 +155,13 @@ export const projectHomeOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: "/api/construction/projects/dashboard-layout",
     summary:
-      "Your Project Dashboard layout: every section in your order with what shows (menu `reporting.project_dashboard`, read)",
+      "Your Project Dashboard layout: every section in your order with what shows; with a Project, the sections whose module is hidden there are marked (menu `reporting.project_dashboard`, read)",
     tags: PROJECTS,
+    query: GetConstructionProjectsDashboardLayoutRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "Sections in order",
     successSchema: ConstructionProjectsDashboardLayoutResponseModel,
-    errors: [...SESSION_ERRORS],
+    errors: [StatusCodes.BAD_REQUEST, StatusCodes.NOT_FOUND, ...SESSION_ERRORS],
   },
   {
     method: "post",

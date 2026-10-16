@@ -12,6 +12,7 @@ import { TEST_ORIGIN } from "@/test/sessions";
 import { GET as getLayout } from "../dashboard-layout/route";
 import { POST as updateLayout } from "../dashboard-layout/update/route";
 import { GET as getSummary } from "./[id]/dashboard/summary/route";
+import { POST as updateHiddenModules } from "./[id]/hidden-modules/update/route";
 import { POST as createProject } from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/projects/projects`;
@@ -23,6 +24,7 @@ type Layout = {
     label: string;
     milestone: string | null;
     visible: boolean;
+    hiddenOnProject: boolean;
   }[];
 };
 
@@ -237,6 +239,7 @@ describe("Project Dashboard HTTP (CM-412)", () => {
       label: "Project summary",
       milestone: null,
       visible: true,
+      hiddenOnProject: false,
     });
     // Materials has data since M5 (CM-510), Task since M8 (CM-805);
     // Booking still waits for M10.
@@ -317,6 +320,70 @@ describe("Project Dashboard HTTP (CM-412)", () => {
       },
     });
     expect(audit).toBe(3);
+  });
+
+  it("marks the sections whose module is hidden on the Project (CM-902)", async () => {
+    const owner = await ownerWithCompany();
+    const created = await createProject(
+      jsonRequest(BASE, owner.cookie, {
+        name: "Kumari Heights",
+        projectType: "residential",
+      }),
+    );
+    const { id } = await json<{ id: string }>(created);
+    const hidden = await updateHiddenModules(
+      jsonRequest(`${BASE}/${id}/hidden-modules/update`, owner.cookie, {
+        hiddenModules: ["issues", "payments", "gallery"],
+      }),
+      params(id),
+    );
+    expect(hidden.status).toBe(StatusCodes.OK);
+    const onProject = (cookie: string, projectId: string) =>
+      getLayout(jsonRequest(`${LAYOUT}?projectId=${projectId}`, cookie));
+
+    const marked = await json<Layout>(await onProject(owner.cookie, id));
+    expect(
+      marked.sections
+        .filter((section) => section.hiddenOnProject)
+        .map((section) => section.key),
+    ).toEqual(["payments", "issue_snag"]);
+    // The member's own choice is kept for their other Projects.
+    expect(
+      marked.sections.find((section) => section.key === "issue_snag"),
+    ).toMatchObject({ visible: true, hiddenOnProject: true });
+    // Without a Project nothing is marked.
+    expect(
+      (await layout(owner.cookie)).sections.some(
+        (section) => section.hiddenOnProject,
+      ),
+    ).toBe(false);
+    // Saving answers without a Project.
+    const saved = await json<Layout>(await save(owner.cookie, []));
+    expect(saved.sections.some((section) => section.hiddenOnProject)).toBe(
+      false,
+    );
+
+    // A member not on the Project is refused; a Project of no one is 404.
+    const viewer = await memberWith(owner, {
+      "reporting.project_dashboard": ["read"],
+    });
+    expect((await onProject(viewer.cookie, id)).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
+    await prisma.constructionOrganizationTeamMemberProject.create({
+      data: { memberId: viewer.memberId, projectId: id },
+    });
+    expect(
+      (await json<Layout>(await onProject(viewer.cookie, id))).sections
+        .filter((section) => section.hiddenOnProject)
+        .map((section) => section.key),
+    ).toEqual(["payments", "issue_snag"]);
+    expect((await onProject(owner.cookie, randomUUID())).status).toBe(
+      StatusCodes.NOT_FOUND,
+    );
+    expect((await onProject(owner.cookie, "nope")).status).toBe(
+      StatusCodes.BAD_REQUEST,
+    );
   });
 
   it("summarises the Project: details, budget with Financial, live rows only", async () => {
