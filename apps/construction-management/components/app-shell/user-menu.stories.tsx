@@ -36,6 +36,9 @@ export const InitialsAndMyProfile: Story = {
       menu.getByRole("menuitem", { name: "My Profile" }),
     ).toHaveAttribute("href", "/app/profile");
     await expect(
+      menu.getByRole("menuitem", { name: "Downloads" }),
+    ).toHaveAttribute("href", "/app/downloads");
+    await expect(
       menu.getByRole("menuitem", { name: "Your Subscription" }),
     ).toHaveAttribute("href", "/app/subscription");
   },
