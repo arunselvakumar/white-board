@@ -95,7 +95,7 @@ async function world() {
     kind: "petty_cash",
     holderMemberId: holder.memberId,
   });
-  const supplierId = await addSupplier(ws, by, [tower]);
+  const supplierId = await addSupplier(ws, by, { projectIds: [tower] });
   const contractor = await addContractor(ws, by, [tower]);
 
   for (const projectId of [tower, villa]) {
