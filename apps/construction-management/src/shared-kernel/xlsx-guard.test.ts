@@ -43,6 +43,10 @@ describe("xlsx expansion guard (review of #92, CWE-409)", () => {
 
   it("counts what really inflates when the declared sizes are falsified", async () => {
     const bytes = await workbook(2_000, "a".repeat(200));
+    // The real workbook unpacks past the test's limit, so a refusal below
+    // comes from counting, not from a smaller workbook than expected.
+    expect(zipUnpackedBytes(bytes)).toBeGreaterThan(100_000);
+    expect(inflatesWithin(bytes, 100_000)).toBe(false);
     const doctored = bytes.slice();
     const view = new DataView(doctored.buffer);
     let eocd = doctored.byteLength - 22;
