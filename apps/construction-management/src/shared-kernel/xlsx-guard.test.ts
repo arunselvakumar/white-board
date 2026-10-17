@@ -24,6 +24,19 @@ describe("xlsx expansion guard (review of #92, CWE-409)", () => {
     expect(xlsxUnpacksWithin(bytes, 100_000)).toBe(false);
   });
 
+  it("refuses a workbook whose entry count was changed to hide entries", async () => {
+    const bytes = await workbook(10);
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    let eocd = bytes.byteLength - 22;
+    while (eocd > 0 && view.getUint32(eocd, true) !== 0x06054b50) eocd -= 1;
+    const doctored = bytes.slice();
+    const edit = new DataView(doctored.buffer);
+    edit.setUint16(eocd + 8, 0, true);
+    edit.setUint16(eocd + 10, 0, true);
+    expect(zipUnpackedBytes(doctored)).toBeNull();
+    expect(xlsxUnpacksWithin(doctored)).toBe(false);
+  });
+
   it("refuses bytes that are not a ZIP", () => {
     expect(
       zipUnpackedBytes(new Uint8Array([0x50, 0x4b, 3, 4, 0, 0])),
