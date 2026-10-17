@@ -36,6 +36,7 @@ import {
 
 import { InquiryDuplicatePrompt } from "./inquiry-duplicate-prompt";
 import { InquirySelect, withCurrentOption } from "./inquiry-select";
+import { withUploadFailed } from "@/components/sales/documents/upload-failed";
 
 const max = (limit: number, words: string) =>
   z
@@ -234,12 +235,16 @@ export function InquiryForm({
         setMatches(null);
         setLeaving(true);
         // A file that does not go up can be added again on the inquiry's page.
-        if (inquiry == null)
-          await uploads.uploadAll(saved.id, [
-            { role: "visiting_card", files: input.visitingCard },
-            { role: "photo", files: input.photos },
-          ]);
-        router.push(inquiriesPath(projectId, saved.id));
+        const { failed } =
+          inquiry == null
+            ? await uploads.uploadAll(saved.id, [
+                { role: "visiting_card", files: input.visitingCard },
+                { role: "photo", files: input.photos },
+              ])
+            : { failed: [] };
+        router.push(
+          withUploadFailed(inquiriesPath(projectId, saved.id), failed),
+        );
       } catch (caught) {
         setLeaving(false);
         const duplicates = duplicateMatches(caught);

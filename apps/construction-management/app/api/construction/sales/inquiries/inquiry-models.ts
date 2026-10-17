@@ -40,7 +40,10 @@ const commaSeparated = z
 const optionalText = (max: number) => z.string().max(max).nullable().optional();
 
 const InquiryBody = z.object({
-  /** `YYYY-MM-DD`; today when left out; not in the future; back-dated window `inquiry`. */
+  /**
+   * `YYYY-MM-DD`; not in the future; back-dated window `inquiry`. Create:
+   * today when left out. Edit: left out keeps it.
+   */
   inquiryDate: z.iso.date().nullable().optional(),
   /** Required, at most 120 characters. */
   name: z.string().max(SALES_LIMITS.name * 2),

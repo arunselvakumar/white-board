@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm, type FieldPath } from "react-hook-form";
 import { z } from "zod";
@@ -29,6 +30,7 @@ import {
   useCreateInquiry,
   type InquiryDetail,
   type InquiryDuplicateMatch,
+  inquiriesPath,
 } from "@/src/queries/sales-inquiries";
 import {
   INTEREST_TYPE_LABELS,
@@ -39,6 +41,7 @@ import {
 
 import { InquiryDuplicatePrompt } from "./inquiry-duplicate-prompt";
 import { InquirySelect } from "./inquiry-select";
+import { withUploadFailed } from "@/components/sales/documents/upload-failed";
 
 const schema = z.object({
   name: z
@@ -108,6 +111,7 @@ export function InquiryQuickAddDialog({
   const { data: options } = useSuspenseQuery(
     inquiryFormOptionsQuery(projectId),
   );
+  const router = useRouter();
   const create = useCreateInquiry();
   const uploads = useUploadPendingSalesFiles("inquiry");
   const [error, setError] = useState<string | null>(null);
@@ -141,11 +145,16 @@ export function InquiryQuickAddDialog({
           remarks: orNull(input.remarks),
           allowDuplicate,
         });
-        await uploads.uploadAll(saved.id, [
+        const { failed } = await uploads.uploadAll(saved.id, [
           { role: "visiting_card", files: input.visitingCard },
         ]);
         onCreated?.(saved);
         close();
+        // The card can be added again on the inquiry's page, which names it.
+        if (failed.length > 0)
+          router.push(
+            withUploadFailed(inquiriesPath(projectId, saved.id), failed),
+          );
       } catch (caught) {
         const duplicates = duplicateMatches(caught);
         if (duplicates != null) {

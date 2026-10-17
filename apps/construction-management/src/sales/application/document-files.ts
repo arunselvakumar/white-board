@@ -241,6 +241,18 @@ export class SalesDocumentFiles {
     return { document, rights };
   }
 
+  /**
+   * 404 / 403 as an upload would answer, without the upload: routes call it
+   * before they read a request body (review of #92).
+   */
+  async assertCanUpload(
+    viewer: MemberAccess,
+    type: SalesDocumentType,
+    documentId: string,
+  ): Promise<void> {
+    await this.openFor(viewer, type, documentId, "upload");
+  }
+
   private async openFor(
     viewer: MemberAccess,
     type: SalesDocumentType,

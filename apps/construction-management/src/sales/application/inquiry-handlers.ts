@@ -167,6 +167,11 @@ export type InquiryStore = {
       at: Date;
     },
   ): Promise<void>;
+  /** Many new inquiries in one statement (the import, CM-1007). */
+  insertMany(
+    db: SalesTx,
+    rows: readonly Parameters<InquiryStore["insert"]>[1][],
+  ): Promise<void>;
   replace(
     db: SalesTx,
     id: string,
@@ -533,7 +538,12 @@ export class InquiryHandlers {
       this.deps.today(ws),
       this.deps.timeZone(ws),
     ]);
-    const fields = inquiryFields(input, today);
+    // An edit that leaves the Inquiry Date out keeps the stored one, like
+    // the Stage, Assignee and Lead Owner (review of #93).
+    const fields = inquiryFields(
+      { ...input, inquiryDate: input.inquiryDate ?? current?.inquiryDate },
+      today,
+    );
     const project = await directory.project(db, ws, projectId);
     if (project == null) throw salesProjectNotFound();
 

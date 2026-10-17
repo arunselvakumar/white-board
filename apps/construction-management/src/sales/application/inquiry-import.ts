@@ -425,29 +425,28 @@ export async function importInquiries(
   const at = options.now;
   const ids: string[] = [];
   await db.$transaction(async (tx) => {
-    const events: NewInquiryEvent[] = [];
-    for (const { content } of planned) {
-      const id = newId(at.getTime());
-      ids.push(id);
-      await store.insert(tx, {
-        ...content,
-        id,
-        workspaceId: ws,
-        projectId,
-        by: access.userId,
-        at,
-      });
-      events.push({
-        inquiryId: id,
-        type: "created",
-        details: {
-          stageId: content.funnelStageId,
-          assigneeMemberId: content.assigneeMemberId,
-          leadOwnerMemberId: content.leadOwnerMemberId,
-          imported: true,
-        },
-      });
-    }
+    // One statement for the rows and one for their history, so a 1,000-row
+    // import stays well inside the transaction's time limit.
+    const rows = planned.map(({ content }) => ({
+      ...content,
+      id: newId(at.getTime()),
+      workspaceId: ws,
+      projectId,
+      by: access.userId,
+      at,
+    }));
+    ids.push(...rows.map((row) => row.id));
+    await store.insertMany(tx, rows);
+    const events: NewInquiryEvent[] = rows.map((row) => ({
+      inquiryId: row.id,
+      type: "created",
+      details: {
+        stageId: row.funnelStageId,
+        assigneeMemberId: row.assigneeMemberId,
+        leadOwnerMemberId: row.leadOwnerMemberId,
+        imported: true,
+      },
+    }));
     await store.appendEvents(tx, ws, events, access.userId, at);
     await recordAudit(tx, {
       workspaceId: ws,

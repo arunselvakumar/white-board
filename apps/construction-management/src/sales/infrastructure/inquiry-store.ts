@@ -219,6 +219,26 @@ export class PrismaInquiryStore implements InquiryStore {
     });
   }
 
+  async insertMany(
+    db: SalesTx,
+    rows: readonly Parameters<InquiryStore["insert"]>[1][],
+  ) {
+    if (rows.length === 0) return;
+    await db.constructionSalesInquiry.createMany({
+      data: rows.map((row) => ({
+        id: row.id,
+        workspaceId: row.workspaceId,
+        projectId: row.projectId,
+        ...columns(row),
+        status: "open" as const,
+        createdAt: row.at,
+        updatedAt: row.at,
+        createdBy: row.by,
+        updatedBy: row.by,
+      })),
+    });
+  }
+
   async replace(
     db: SalesTx,
     id: string,

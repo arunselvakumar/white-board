@@ -2,6 +2,7 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it, vi } from "vitest";
 
+import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
 import { actAs, addMember, newCompany } from "@/test/companies";
 import { pngBytes } from "@/test/files";
@@ -222,5 +223,23 @@ describe("Sales document files (CM-1003)", () => {
     const other = await newCompany();
     actAs({ userId: other.ownerId, workspaceId: other.workspaceId });
     expect((await list(ctx.inquiryId)).status).toBe(StatusCodes.NOT_FOUND);
+  });
+});
+
+describe("Sales document files in the OpenAPI document (review of #93)", () => {
+  it("lists every step of an upload", async () => {
+    const document = (await getOpenApi().json()) as {
+      paths: Record<string, unknown>;
+    };
+    const files = "/api/construction/sales/documents/{type}/{id}/files";
+    for (const path of [
+      files,
+      `${files}/uploads`,
+      `${files}/uploads/presign`,
+      `${files}/uploads/app`,
+      `${files}/uploads/thumbnail`,
+      `${files}/{fileId}/delete`,
+    ])
+      expect(document.paths, path).toHaveProperty([path]);
   });
 });

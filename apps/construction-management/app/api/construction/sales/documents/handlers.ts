@@ -114,6 +114,7 @@ export const salesFileUploadRoutes = {
       });
       if (isResponse(session)) return session;
       const { type, id } = await salesDocumentParams(context);
+      await salesFiles.assertCanUpload(session.access, type, id);
       const body = parseOrThrow(
         StartConstructionSalesDocumentFileUploadRequestModel.safeParse(
           await request.json(),
@@ -146,6 +147,7 @@ export const salesFileUploadRoutes = {
       });
       if (isResponse(session)) return session;
       const { type, id } = await salesDocumentParams(context);
+      await salesFiles.assertCanUpload(session.access, type, id);
       const body: unknown = await request.json();
       return Response.json(
         await salesFiles.answerDirectUpload({
@@ -169,6 +171,8 @@ export const salesFileUploadRoutes = {
       if (isResponse(session)) return session;
       const { type, id } = await salesDocumentParams(context);
       const key = keyOf(request);
+      // Rights first: never buffer a body for someone who may not upload.
+      await salesFiles.assertCanUpload(session.access, type, id);
       const upload = await readUpload(request, SALES_FILE_MAX_BYTES);
       await salesFiles.receive({
         viewer: session.access,
@@ -191,6 +195,8 @@ export const salesFileUploadRoutes = {
       if (isResponse(session)) return session;
       const { type, id } = await salesDocumentParams(context);
       const key = keyOf(request);
+      // Rights first: never buffer a body for someone who may not upload.
+      await salesFiles.assertCanUpload(session.access, type, id);
       const upload = await readUpload(request, THUMBNAIL_MAX_BYTES);
       await salesFiles.receiveThumbnail({
         viewer: session.access,

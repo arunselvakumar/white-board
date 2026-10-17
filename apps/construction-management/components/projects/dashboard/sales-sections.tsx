@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   AlarmClock,
   Ban,
@@ -380,9 +380,12 @@ export function InquirySection({
   duration: Duration;
 }) {
   const [period, setPeriod] = useState<CallActivityPeriod>("today");
-  const { data, isPending, error } = useQuery(
-    inquiryDashboardQuery(projectId, duration, period),
-  );
+  // Keep the section on screen while another Call Activity period loads,
+  // so the period buttons keep focus.
+  const { data, isPending, error } = useQuery({
+    ...inquiryDashboardQuery(projectId, duration, period),
+    placeholderData: keepPreviousData,
+  });
   return (
     <Section
       id="dashboard-inquiry"

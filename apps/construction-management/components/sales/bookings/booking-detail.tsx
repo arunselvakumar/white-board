@@ -41,8 +41,10 @@ import {
   useDeleteBooking,
   type BookingDetail as Booking,
 } from "@/src/queries/sales-bookings";
+import { inquiriesPath } from "@/src/queries/sales-inquiries";
 
 import { BookingActionDialog, type BookingDialogKind } from "./booking-dialogs";
+import { uploadFailedNotice } from "@/components/sales/documents/upload-failed";
 
 function Fact({
   label,
@@ -90,10 +92,13 @@ export function BookingDetail({
   projectId,
   id,
   today = localToday(),
+  uploadFailed = [],
 }: {
   projectId: string;
   id: string;
   today?: string;
+  /** Files the form could not upload after saving (`?uploadFailed=`). */
+  uploadFailed?: readonly string[];
 }) {
   const router = useRouter();
   const { data: booking } = useSuspenseQuery(bookingQuery(id));
@@ -106,7 +111,9 @@ export function BookingDetail({
   const [dialog, setDialog] = useState<BookingDialogKind | "delete" | null>(
     null,
   );
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    uploadFailedNotice("booking", uploadFailed),
+  );
   const listHref = bookingsPath(projectId);
   const title = `${booking.wing.name} · ${booking.unit.name}`;
   const area = areaLabel(booking.carpetArea, booking.areaUnit);
@@ -193,7 +200,7 @@ export function BookingDetail({
           <p className="bg-muted/50 rounded-lg border px-3 py-2 text-sm">
             Converted from the inquiry of{" "}
             <Link
-              href={`/app/projects/${encodeURIComponent(projectId)}/inquiries/${encodeURIComponent(booking.inquiry.id)}`}
+              href={inquiriesPath(projectId, booking.inquiry.id)}
               className="font-medium underline-offset-4 hover:underline"
             >
               {booking.inquiry.name === ""

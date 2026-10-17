@@ -42,6 +42,7 @@ import { InquiryActivity } from "./inquiry-activity";
 import { InquiryCloseDialog } from "./inquiry-close-dialog";
 import { InquiryReopenDialog } from "./inquiry-reopen-dialog";
 import { InquiryTasksPanel } from "./inquiry-tasks-panel";
+import { uploadFailedNotice } from "@/components/sales/documents/upload-failed";
 
 function Fact({
   label,
@@ -76,10 +77,13 @@ export function InquiryDetail({
   projectId,
   id,
   today = localToday(),
+  uploadFailed = [],
 }: {
   projectId: string;
   id: string;
   today?: string;
+  /** Files the form could not upload after saving (`?uploadFailed=`). */
+  uploadFailed?: readonly string[];
 }) {
   const router = useRouter();
   const { data: inquiry } = useSuspenseQuery(inquiryQuery(id));
@@ -90,7 +94,9 @@ export function InquiryDetail({
   const remove = useDeleteInquiry(inquiry.id);
   const [deleting, setDeleting] = useState(false);
   const [dialog, setDialog] = useState<"close" | "reopen" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    uploadFailedNotice("inquiry", uploadFailed),
+  );
   const listHref = inquiriesPath(projectId);
   const person = (value: { name: string | null } | null) =>
     value == null ? "—" : (value.name ?? "A former member");

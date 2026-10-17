@@ -35,6 +35,7 @@ import {
   type BookingFormOptions,
 } from "@/src/queries/sales-bookings";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
+import { withUploadFailed } from "@/components/sales/documents/upload-failed";
 
 const limit = (max: number) =>
   z
@@ -249,12 +250,13 @@ export function BookingForm({
           });
       setLeaving(true);
       // A file that does not go up can be added again on the booking's page.
-      if (!editing)
-        await uploads.uploadAll(saved.id, [
-          { role: "booking_form", files: input.bookingForm },
-          { role: "photo", files: input.photos },
-        ]);
-      router.push(bookingsPath(projectId, saved.id));
+      const { failed } = editing
+        ? { failed: [] }
+        : await uploads.uploadAll(saved.id, [
+            { role: "booking_form", files: input.bookingForm },
+            { role: "photo", files: input.photos },
+          ]);
+      router.push(withUploadFailed(bookingsPath(projectId, saved.id), failed));
     } catch (caught) {
       setLeaving(false);
       if (caught instanceof QueryHttpError) {

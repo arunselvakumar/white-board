@@ -551,3 +551,11 @@ Reports render PDF/Excel with the standard header (module 11).
 - **CM-1007** A closed inquiry keeps its stage and its next follow-up (Due is null while closed). Reopen puts back the stage it had, or the first stage when that one was deleted, and clears the closing fields (unit, booking, Lost Reason, remarks, closed at/by). The `reopened` history row keeps `{ from, stageId, bookingId }`.
 - **CM-1007** Actions now carry `close` (Lost: Update, while Open), `convert` (Update and Booking Create, while Open) and `reopen`. Without Booking Create the Close dialog offers Lost only. The unit picker reads the bookings' `GET /bookings/form-options` (bookable units by Wing).
 - **CM-1007** Import: `GET …/inquiries/import-sample` (the headers and a Lists sheet of the Project's live Lead Sources, Funnel Stages, Wings and Team Members) and `POST …/inquiries/import?projectId=&allowDuplicates=` with the .xlsx as the body. Over 1,000 rows is `IMPORT_TOO_MANY`, like the unit import. As on the form, a blank Inquiry Date is today, a blank stage is the first stage, the importer is the Lead Owner and (when the row names none) the Assignee. "Next follow-up" takes a date and an optional `HH:MM`. Imported leads raise no `inquiry.assigned` notices; their `created` history rows carry `imported: true`.
+
+<!-- Review of the M10 PRs (#92, #93) -->
+
+- **CM-1008** The **Inquiries** backup needs Inquiry **View all** as well as View: the lists hide others' inquiries without it, and a backup exports every row of the Project (`BackupModule.viewAll`). Bookings still need only View.
+- **CM-1003** An edit that leaves Inquiry Date out keeps the stored one, like Stage, Assignee and Lead Owner.
+- **CM-1006** Booking a unit or marking it Unavailable locks the active booking row and judges it again, so a hold confirmed or extended in the meantime is kept rather than cancelled as "Hold expired".
+- **CM-1005 / CM-1007** Both imports refuse a workbook that unpacks past 40 MB (read from the ZIP before parsing) and stop reading at the row limit.
+- **CM-1006 / CM-1003** A form whose files did not all upload opens the saved booking or inquiry with a notice naming them (`?uploadFailed=`), as the Daily Worksheet does.

@@ -750,3 +750,27 @@ describe("Inquiries (CM-1003)", () => {
     });
   });
 });
+
+describe("Edit keeps what it leaves out (review of #93)", () => {
+  it("keeps the stored Inquiry Date when the edit sends none", async () => {
+    const ctx = await setup();
+    const date = addDays(TODAY, -3);
+    const created = await json<Inquiry>(
+      await create(
+        post("", { projectId: ctx.projectId, name: "Ravi", inquiryDate: date }),
+      ),
+    );
+    expect(created.inquiryDate).toBe(date);
+    const response = await update(
+      post(`/${created.id}/update`, {
+        name: "Ravi Kumar",
+        expectedUpdatedAt: created.updatedAt,
+      }),
+      params(created.id),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const edited = await json<Inquiry>(response);
+    expect(edited.name).toBe("Ravi Kumar");
+    expect(edited.inquiryDate).toBe(date);
+  });
+});

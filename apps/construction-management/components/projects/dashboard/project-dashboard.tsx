@@ -523,10 +523,9 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
                   duration={duration}
                 />
               ) : null;
+            // A snapshot as on today: a bad duration does not hide it.
             if (section.key === "booking")
-              return problem == null ? (
-                <BookingSection key={section.key} projectId={projectId} />
-              ) : null;
+              return <BookingSection key={section.key} projectId={projectId} />;
             return <StubSection key={section.key} section={section} />;
           })
         )}

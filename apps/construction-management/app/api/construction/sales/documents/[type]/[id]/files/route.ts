@@ -56,6 +56,7 @@ export async function POST(
     });
     if (isResponse(session)) return session;
     const { type, id } = await salesDocumentParams(context);
+    await salesFiles.assertCanUpload(session.access, type, id);
     const body = parseOrThrow(
       AddConstructionSalesDocumentFileRequestModel.safeParse(
         await request.json(),

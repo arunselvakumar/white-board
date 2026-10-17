@@ -355,24 +355,10 @@ export function createMessagingDelayedHandler(
  * or due today on their Company's clock, counted per assignee and
  * Project, with sales' own Due rule (`followUpDue`).
  */
+const FOLLOW_UPS_DUE_PAGE = 2_000;
+
 export const salesFollowUpsDue: FollowUpsDueSource = {
   async due(now) {
-    // Anything due today anywhere lies before now plus a day and a half.
-    const rows = await prisma.constructionSalesInquiry.findMany({
-      where: {
-        deletedAt: null,
-        status: "open",
-        assigneeMemberId: { not: null },
-        nextFollowUpAt: { lt: new Date(now.getTime() + 36 * 3_600_000) },
-      },
-      select: {
-        workspaceId: true,
-        projectId: true,
-        assigneeMemberId: true,
-        nextFollowUpAt: true,
-        nextFollowUpHasTime: true,
-      },
-    });
     const bounds = new Map<string, { date: string; due: DueBounds }>();
     const boundsOf = async (workspaceId: string) => {
       const known = bounds.get(workspaceId);
@@ -386,27 +372,54 @@ export const salesFollowUpsDue: FollowUpsDueSource = {
       return made;
     };
     const found = new Map<string, FollowUpsDue>();
-    for (const row of rows) {
-      if (row.assigneeMemberId == null || row.nextFollowUpAt == null) continue;
-      const { date, due } = await boundsOf(row.workspaceId);
-      const state = followUpDue(
-        "open",
-        { at: row.nextFollowUpAt, hasTime: row.nextFollowUpHasTime },
-        due,
-      );
-      if (state !== "overdue" && state !== "today") continue;
-      const key = `${row.workspaceId}:${row.projectId}:${row.assigneeMemberId}`;
-      const item = found.get(key) ?? {
-        workspaceId: row.workspaceId,
-        projectId: row.projectId,
-        assigneeMemberId: row.assigneeMemberId,
-        date,
-        overdue: 0,
-        today: 0,
-      };
-      if (state === "overdue") item.overdue += 1;
-      else item.today += 1;
-      found.set(key, item);
+    // Anything due today anywhere lies before now plus a day and a half.
+    // Read in pages so memory stays bounded however many are overdue.
+    let after: string | undefined;
+    for (;;) {
+      const rows = await prisma.constructionSalesInquiry.findMany({
+        where: {
+          deletedAt: null,
+          status: "open",
+          assigneeMemberId: { not: null },
+          nextFollowUpAt: { lt: new Date(now.getTime() + 36 * 3_600_000) },
+        },
+        select: {
+          id: true,
+          workspaceId: true,
+          projectId: true,
+          assigneeMemberId: true,
+          nextFollowUpAt: true,
+          nextFollowUpHasTime: true,
+        },
+        orderBy: { id: "asc" },
+        take: FOLLOW_UPS_DUE_PAGE,
+        ...(after == null ? {} : { cursor: { id: after }, skip: 1 }),
+      });
+      for (const row of rows) {
+        if (row.assigneeMemberId == null || row.nextFollowUpAt == null)
+          continue;
+        const { date, due } = await boundsOf(row.workspaceId);
+        const state = followUpDue(
+          "open",
+          { at: row.nextFollowUpAt, hasTime: row.nextFollowUpHasTime },
+          due,
+        );
+        if (state !== "overdue" && state !== "today") continue;
+        const key = `${row.workspaceId}:${row.projectId}:${row.assigneeMemberId}`;
+        const item = found.get(key) ?? {
+          workspaceId: row.workspaceId,
+          projectId: row.projectId,
+          assigneeMemberId: row.assigneeMemberId,
+          date,
+          overdue: 0,
+          today: 0,
+        };
+        if (state === "overdue") item.overdue += 1;
+        else item.today += 1;
+        found.set(key, item);
+      }
+      if (rows.length < FOLLOW_UPS_DUE_PAGE) break;
+      after = rows[rows.length - 1]?.id;
     }
     return [...found.values()];
   },

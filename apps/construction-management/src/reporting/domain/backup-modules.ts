@@ -40,6 +40,11 @@ export type BackupModule = {
   entities: readonly string[];
   /** Whether "Media" adds its stored files. */
   media: boolean;
+  /**
+   * The module's lists hide others' rows without View all, and its backup
+   * exports every row: so it needs View all as well as View (CM-1008).
+   */
+  viewAll?: true;
 };
 
 const PROJECT_MODULES: readonly BackupModule[] = [
@@ -325,6 +330,7 @@ const PROJECT_MODULES: readonly BackupModule[] = [
     folder: "inquiries",
     entities: ["inquiries", "inquiry_events", "follow_ups", "inquiry_tasks"],
     media: true,
+    viewAll: true,
   },
 ];
 
