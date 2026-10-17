@@ -1,0 +1,21 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_417ac0cbaefc98 1057-1146
+apps/construction-management/docs/adr/CM-0022-sales-crm-product-decisions.md
+  s_415949558e694b::t_c3ac1f18a600e1 1-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "54b1905395340afcd295fa8cc577338bc7c033cc",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
