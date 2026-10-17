@@ -1,0 +1,59 @@
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue-models.ts
+  s_415949558e694b::t_d761e0b90f96b1 34-39
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-models.ts
+  s_415949558e694b::t_4aca53d23b60ff 51-56
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_415949558e694b::t_dd3a93c35353f8 131-138,142-164
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_415949558e694b::t_ed0bc41f71100d 281-296,365-370,513-523
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_415949558e694b::t_4de0f5e06c699b 34,224-236,407,411-413
+apps/construction-management/app/api/construction/sales/bookings/booking-report.http.test.ts
+  s_415949558e694b::t_6f98b76e7626ed 232,260-261
+apps/construction-management/app/api/construction/sales/reports/inquiry-report.http.test.ts
+  s_415949558e694b::t_36b2c3d1af0fb1 1-269
+apps/construction-management/components/reports/report-card.tsx
+  s_415949558e694b::t_bdec3536c27a6e 346-368
+apps/construction-management/components/reports/report-catalogue.ts
+  s_415949558e694b::t_21f3aec0be7d3d 47,49-53,72,87-91,139-150,157,160
+apps/construction-management/components/reports/report-fixtures.ts
+  s_415949558e694b::t_c90970251b9740 248-256
+apps/construction-management/components/reports/report-pickers.ts
+  s_415949558e694b::t_78dafc5f3d8ede 35-38
+apps/construction-management/src/composition/report-filter-options.ts
+  s_415949558e694b::t_a1a95da77639ab 21-25,84-87,143-176,188-192
+apps/construction-management/src/composition/sales-report-source.ts
+  s_415949558e694b::t_79ab5a8d871436 9-14,22-46,49-51,126-267
+apps/construction-management/src/reporting/application/build-report.ts
+  s_415949558e694b::t_c19585f6b99d72 173
+apps/construction-management/src/reporting/application/build-sales-report.ts
+  s_415949558e694b::t_b7c81cbe0ec806 5-8,13,18,38-58
+apps/construction-management/src/reporting/application/ports.ts
+  s_415949558e694b::t_784f78fb4e7996 60-68,535-553
+apps/construction-management/src/reporting/domain/report-catalogue.test.ts
+  s_415949558e694b::t_a6725cd21d1ca2 118,120
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_415949558e694b::t_ffabb46f2a5586 66-72,146-147,718,720,729-736,738
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_415949558e694b::t_2002c0f5c2738a 104-107,340-357,436
+apps/construction-management/src/reporting/domain/sales-reports.ts
+  s_415949558e694b::t_e9e195ad6008c4 110-214
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_fd66c30a81e1eb 249-336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "be17b0dad4fa441d98096b1ab0efa66ff34ee57c",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
