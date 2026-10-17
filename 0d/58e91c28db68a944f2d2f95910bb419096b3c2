@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/sales/inquiries/[id]/convert/route.ts
+  s_415949558e694b::t_20ae001aa024e3 1-48
+apps/construction-management/app/api/construction/sales/inquiries/[id]/lose/route.ts
+  s_415949558e694b::t_f4033366a84f23 1-44
+apps/construction-management/app/api/construction/sales/inquiries/[id]/reopen/route.ts
+  s_415949558e694b::t_da678f54d29744 1-47
+apps/construction-management/app/api/construction/sales/inquiries/close.http.test.ts
+  s_415949558e694b::t_d5a9c688e0f190 1-521
+apps/construction-management/app/api/construction/sales/inquiries/import-sample/route.ts
+  s_415949558e694b::t_92d4812c50407c 1-48
+apps/construction-management/app/api/construction/sales/inquiries/import/route.ts
+  s_415949558e694b::t_1d61901f8bf57f 1-49
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_9333ade8cddaf4 32,35-39,65-67,81-85,268-322
+apps/construction-management/app/api/construction/sales/inquiries/inquiry-models.ts
+  s_415949558e694b::t_98d1c8c4c546d5 101-140,194-199,228-229,249-252,372
+apps/construction-management/components/sales/inquiries/inquiry-activity.stories.tsx
+  s_415949558e694b::t_89266c831d2af8 106-114
+apps/construction-management/components/sales/inquiries/inquiry-fixtures.ts
+  s_415949558e694b::t_f30fb3fdb29ca6 84-92,117,191-197
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_68768e22bbceb7 1069
+apps/construction-management/src/composition/sales-inquiries.ts
+  s_415949558e694b::t_42ac4d48919d2c 17,39-40
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_415949558e694b::t_19d7bb09c8b513 10,12,19-22,41-46,217-241,252,269-270,288-314,324-329,345-346,378-383,914-1185,1264-1268,1289-1295,1345,1353-1354,1358-1363
+apps/construction-management/src/sales/application/inquiry-import.ts
+  s_415949558e694b::t_5788f81449dbf3 1-467
+apps/construction-management/src/sales/domain/inquiry.ts
+  s_415949558e694b::t_4d5a4efde98586 312-357
+apps/construction-management/src/sales/infrastructure/inquiry-store.ts
+  s_415949558e694b::t_498b559df1b72d 385-433
+apps/construction-management/src/sales/infrastructure/inquiry-workbook.ts
+  s_415949558e694b::t_ae7cb810f5b13e 1-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0d58e91c28db68a944f2d2f95910bb419096b3c2",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
