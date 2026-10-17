@@ -1,0 +1,67 @@
+apps/construction-management/app/api/construction/sales/inquiries/[id]/activity/route.ts
+  s_415949558e694b::t_71aad3c05402ff 1-33
+apps/construction-management/app/api/construction/sales/inquiries/[id]/follow-ups/[followUpId]/delete/route.ts
+  s_415949558e694b::t_180b4344e4cd1a 1-33
+apps/construction-management/app/api/construction/sales/inquiries/[id]/follow-ups/route.ts
+  s_415949558e694b::t_ee787a342af191 1-56
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/delete/route.ts
+  s_415949558e694b::t_fedb0db4a2305b 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/done/route.ts
+  s_415949558e694b::t_65de22ef433c7e 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/reopen/route.ts
+  s_415949558e694b::t_14d2372fb535b3 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/update/route.ts
+  s_415949558e694b::t_1c191dd2c0af94 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/route.ts
+  s_415949558e694b::t_e97c3dfa3c254d 1-76
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/task-routes.ts
+  s_415949558e694b::t_4abbda38d13128 1-86
+apps/construction-management/app/api/construction/sales/inquiries/activity-models.ts
+  s_415949558e694b::t_9533fc14d275e9 1-231
+apps/construction-management/app/api/construction/sales/inquiries/follow-ups.http.test.ts
+  s_415949558e694b::t_8dd4a349d0e9b3 1-504
+apps/construction-management/app/api/construction/sales/inquiries/handlers.ts
+  s_415949558e694b::t_a7d49b0a87e22c 26-28
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_cbeb2811ebe5b4 12-23,72-80,160-253
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_985fc41dc0a455 1065-1066
+apps/construction-management/src/composition/messaging.ts
+  s_415949558e694b::t_09a601c5c919f1 6-7,16-18,46-52,348-425
+apps/construction-management/src/composition/queue.ts
+  s_415949558e694b::t_91642313f92a31 30-31,57-58,79-80
+apps/construction-management/src/composition/sales-inquiries.ts
+  s_415949558e694b::t_32ce5bf23b5338 3,5-8,43-58
+apps/construction-management/src/messaging/application/maintenance.ts
+  s_415949558e694b::t_04dc0ce665b571 8-9,91-164
+apps/construction-management/src/messaging/application/ports.ts
+  s_415949558e694b::t_64064f78648366 193-212
+apps/construction-management/src/sales/application/inquiry-activity-handlers.ts
+  s_415949558e694b::t_e16a33e8efe613 1-695
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_415949558e694b::t_de158516cf5e5c 190-204
+apps/construction-management/src/sales/domain/follow-up.test.ts
+  s_415949558e694b::t_d3ff4b43625181 1-84
+apps/construction-management/src/sales/domain/follow-up.ts
+  s_415949558e694b::t_956a2370e06da9 1-149
+apps/construction-management/src/sales/infrastructure/inquiry-activity-store.ts
+  s_415949558e694b::t_fda9c000c2fa2f 1-171
+apps/construction-management/src/sales/infrastructure/inquiry-store.ts
+  s_415949558e694b::t_36bd71fe99bb7e 368-384
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c37a1bd79123ae8ca23696346a3c8c59aeab11ea",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
