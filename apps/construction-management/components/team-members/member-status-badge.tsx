@@ -6,12 +6,14 @@ const LABELS: Record<TeamMemberStatus, string> = {
   joining_pending: "Joining Pending",
   active: "Active",
   rejected: "Declined",
+  left: "Left",
 };
 
 const VARIANTS = {
   joining_pending: "secondary",
   active: "default",
   rejected: "outline",
+  left: "outline",
 } as const satisfies Record<TeamMemberStatus, string>;
 
 export function MemberStatusBadge({ status }: { status: TeamMemberStatus }) {

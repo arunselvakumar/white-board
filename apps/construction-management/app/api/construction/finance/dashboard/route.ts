@@ -3,7 +3,12 @@ import { prisma } from "@repo/construction-db";
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { projectDashboardKpis } from "@/src/composition/dashboard-reads";
 import { financeDirectory } from "@/src/composition/finance-directory";
+import {
+  nameOfParty,
+  partyNames,
+} from "@/src/finance/infrastructure/due-invoices";
 import { FinanceDashboard } from "@/src/finance/infrastructure/finance-dashboard";
 import { can, type Flag, type MenuKey } from "@/src/shared-kernel/access";
 
@@ -16,6 +21,7 @@ import {
 export const dynamic = "force-dynamic";
 
 const dashboard = new FinanceDashboard(prisma, financeDirectory);
+const kpis = projectDashboardKpis();
 
 function paise(value: bigint): number {
   const number = Number(value);
@@ -28,7 +34,9 @@ function paise(value: bigint): number {
  * Payments on the Project Dashboard (CM-709), behind Dashboard Read on
  * the Project (ADR CM-0013 §12). The section itself needs Payments
  * (`finance.payments`) Read on the Project (ADR CM-0017 §14); each
- * Payment Approvals count needs its menu's Approve flag.
+ * Payment Approvals count needs its menu's Approve flag. Due Payments and
+ * the pending counts come from the reporting views (`party_dues_on`,
+ * `project_pending_approvals`, CM-902).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -49,24 +57,29 @@ export async function GET(request: Request): Promise<Response> {
     const scope = { projectId: model.projectId };
     const may = (menu: MenuKey, flag: Flag) => can(access, menu, flag, scope);
 
-    const [payments, pending] = await Promise.all([
-      may("finance.payments", "read")
-        ? dashboard.payments(workspaceId, model.projectId, model)
-        : null,
-      dashboard.pendingApprovals(workspaceId, model.projectId),
+    const reads = may("finance.payments", "read");
+    const [payments, dues, approvals] = await Promise.all([
+      reads ? dashboard.payments(workspaceId, model.projectId, model) : null,
+      reads ? kpis.duePayments(workspaceId, model.projectId, model.to) : null,
+      kpis.paymentApprovals(access, model.projectId),
     ]);
-    const decides = may("finance.transactions", "approve");
-    const approvals = {
-      transactions: decides ? pending.transactions : null,
-      transfers: decides ? pending.transfers : null,
-      vouchers: may("finance.petty_cash", "approve") ? pending.vouchers : null,
-      otherExpenses: may("finance.other_expenses", "approve")
-        ? pending.otherExpenses
-        : null,
-      settlements: may("finance.parties", "approve")
-        ? pending.settlements
-        : null,
-    };
+    const names =
+      dues == null
+        ? new Map<string, string>()
+        : await partyNames(prisma, financeDirectory, workspaceId, dues);
+    const shownDues = (dues ?? [])
+      .map((due) => ({
+        partyType: due.partyType,
+        partyId: due.partyId,
+        name: nameOfParty(names, due),
+        invoiced: paise(due.invoiced),
+        paid: paise(due.paid + due.writtenOff),
+        due: paise(due.due),
+        overdue: paise(due.overdue),
+      }))
+      .sort((a, b) =>
+        b.due === a.due ? a.name.localeCompare(b.name) : b.due - a.due,
+      );
     const body: GetConstructionFinanceDashboardResponseModel = {
       payments:
         payments == null
@@ -84,15 +97,7 @@ export async function GET(request: Request): Promise<Response> {
                 out: paise(payments.totals.out),
                 net: paise(payments.totals.net),
               },
-              dues: payments.dues.map((due) => ({
-                partyType: due.partyType,
-                partyId: due.partyId,
-                name: due.name,
-                invoiced: paise(due.invoiced),
-                paid: paise(due.paid),
-                due: paise(due.due),
-                overdue: paise(due.overdue),
-              })),
+              dues: shownDues,
               modules: {
                 contractor: paise(payments.modules.contractor),
                 supplier: paise(payments.modules.supplier),
@@ -102,13 +107,7 @@ export async function GET(request: Request): Promise<Response> {
                 other_expense: paise(payments.modules.other_expense),
               },
             },
-      approvals: {
-        ...approvals,
-        total: Object.values(approvals).reduce<number>(
-          (sum, count) => sum + (count ?? 0),
-          0,
-        ),
-      },
+      approvals,
     };
     return Response.json(body);
   } catch (error) {

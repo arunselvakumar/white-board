@@ -1,0 +1,105 @@
+/// Construction Management — messaging context (ADR CM-0021 §6, `modules/13`):
+/// notifications, their delivery log, web push subscriptions and per-user
+/// preferences. Chat and support tickets arrive later (CM-905).
+
+/// One notification for one member (CM-904). Deleting hides it from the
+/// list; retention removes it after 90 days.
+model ConstructionMessagingNotification {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  recipientUserId String    @map("recipient_user_id")
+  /// The menu whose Notification flag allowed it; null for "your report is
+  /// ready", which needs none.
+  menu            String?
+  projectId       String?   @map("project_id") @db.Uuid
+  /// e.g. `task.assigned`, `approval.requested`, `report.ready`.
+  type            String
+  title           String
+  body            String?
+  /// { href } — a path inside the app.
+  link            Json?
+  /// { kind: "report" | "backup", id } when it carries a download.
+  attachment      Json?
+  /// The event that raised it, so a listener run twice adds nothing.
+  sourceKey       String?   @map("source_key")
+  readAt          DateTime? @map("read_at") @db.Timestamptz(3)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  deliveries ConstructionMessagingNotificationDelivery[]
+
+  @@unique([recipientUserId, sourceKey])
+  @@index([workspaceId, recipientUserId, createdAt])
+  @@index([createdAt])
+  @@map("notifications")
+  @@schema("construction_messaging")
+}
+
+enum ConstructionMessagingDeliveryChannel {
+  in_app
+  web_push
+
+  @@map("delivery_channel")
+  @@schema("construction_messaging")
+}
+
+enum ConstructionMessagingDeliveryStatus {
+  sent
+  failed
+  skipped
+
+  @@map("delivery_status")
+  @@schema("construction_messaging")
+}
+
+/// Every delivery attempt, kept a year for audit (ADR CM-0021 §3). Kept when
+/// the notification itself is deleted.
+model ConstructionMessagingNotificationDelivery {
+  id                 String                               @id @db.Uuid
+  notificationId     String?                              @map("notification_id") @db.Uuid
+  workspaceId        String                               @map("workspace_id")
+  recipientUserId    String                               @map("recipient_user_id")
+  channel            ConstructionMessagingDeliveryChannel
+  status             ConstructionMessagingDeliveryStatus
+  pushSubscriptionId String?                              @map("push_subscription_id") @db.Uuid
+  error              String?
+  createdAt          DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  notification ConstructionMessagingNotification? @relation(fields: [notificationId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+  @@index([createdAt])
+  @@map("notification_deliveries")
+  @@schema("construction_messaging")
+}
+
+/// One browser's web push subscription (CM-904), tied to the session that
+/// turned it on so signing out of that device removes it (CM-907).
+model ConstructionMessagingPushSubscription {
+  id         String    @id @db.Uuid
+  userId     String    @map("user_id")
+  sessionId  String?   @map("session_id")
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("push_subscriptions")
+  @@schema("construction_messaging")
+}
+
+/// Per-user push mutes by menu group (CM-904). In-app notifications are not
+/// mutable: the Notification flag is the Company's switch.
+model ConstructionMessagingNotificationPreference {
+  userId      String   @id @map("user_id")
+  /// Menu category keys whose push is muted, e.g. ["procurement"].
+  mutedGroups String[] @default([]) @map("muted_groups")
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  @@map("notification_preferences")
+  @@schema("construction_messaging")
+}

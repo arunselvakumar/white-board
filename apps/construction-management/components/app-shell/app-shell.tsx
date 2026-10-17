@@ -23,6 +23,8 @@ import {
   useSidebar,
 } from "@repo/ui/components/sidebar";
 
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { ReadyDownloadToast } from "@/components/notifications/ready-download-toast";
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
 
@@ -45,11 +47,19 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Authenticated chrome: the three areas, the Active Company, the account
- * menu. Inside a Project the areas give way to the Project's own menu
- * (ADR CM-0020).
+ * Authenticated chrome: the Company Dashboard and the three areas, the
+ * Active Company, the account menu. Inside a Project the areas give way to
+ * the Project's own menu (ADR CM-0020). `canOpenDashboard` is the
+ * Dashboard menu's Read flag (CM-902): without it the Dashboard is not in
+ * the menu.
  */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  canOpenDashboard = false,
+}: {
+  children: ReactNode;
+  canOpenDashboard?: boolean;
+}) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
 
@@ -78,7 +88,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           {projectId == null ? (
-            <MainMenu pathname={pathname} />
+            <MainMenu pathname={pathname} canOpenDashboard={canOpenDashboard} />
           ) : (
             <ProjectNavMenu
               projectId={projectId}
@@ -117,7 +127,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarTrigger />
           <Separator orientation="vertical" className="mr-1 h-4" />
           <CompanySwitcher />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            <NotificationBell />
             <UserMenu />
           </div>
         </header>
@@ -130,13 +141,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         >
           {children}
         </main>
+        <ReadyDownloadToast />
       </SidebarInset>
     </SidebarProvider>
   );
 }
 
-/** The three areas: Projects, Workspace (with its submenu) and Masters. */
-function MainMenu({ pathname }: { pathname: string }) {
+/**
+ * The Company Dashboard (with Dashboard Read), then the three areas:
+ * Projects, Workspace (with its submenu) and Masters.
+ */
+function MainMenu({
+  pathname,
+  canOpenDashboard,
+}: {
+  pathname: string;
+  canOpenDashboard: boolean;
+}) {
   return (
     <SidebarGroup className="px-3 pt-4">
       <SidebarGroupLabel className="text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
@@ -146,6 +167,8 @@ function MainMenu({ pathname }: { pathname: string }) {
         <nav aria-label="Main">
           <SidebarMenu className="gap-1">
             {APP_NAV.map((item) => {
+              if (item.href === "/app/dashboard" && !canOpenDashboard)
+                return null;
               if (item.href === "/app/masters")
                 return (
                   <MastersNavMenu

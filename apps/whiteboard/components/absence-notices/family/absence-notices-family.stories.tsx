@@ -630,11 +630,33 @@ const homeStudent = (id: string, name: string): FamilyHomeStudent => ({
   recordings: [],
 });
 
+/**
+ * Freezes `new Date()` and `Date.now()` at `now` for a story whose screen
+ * reads the clock itself (the Family Home has no `now` prop), so day labels
+ * ("Sat, 17 Oct", not "Tomorrow") do not depend on the day the tests run.
+ */
+function pinClock(now: Date): () => void {
+  const RealDate = Date;
+  class PinnedDate extends RealDate {
+    constructor(value?: number | string | Date) {
+      super(value ?? now.getTime());
+    }
+    static override now(): number {
+      return now.getTime();
+    }
+  }
+  globalThis.Date = PinnedDate as DateConstructor;
+  return () => {
+    globalThis.Date = RealDate;
+  };
+}
+
 export const ParentWithTwoChildren: Story = {
   parameters: { nextjs: { navigation: { pathname: "/parent" } } },
   beforeEach() {
     storyRole = "parent";
     signInAs("parent", { name: "Riverside Centre" });
+    const restoreClock = pinClock(NOTICE_NOW);
     const restoreNotices = mockNoticeApi([asha([travelNotice]), ravi()]);
     const restoreHome = mockApi({
       "GET /home": () => ({
@@ -651,6 +673,7 @@ export const ParentWithTwoChildren: Story = {
     return () => {
       restoreHome();
       restoreNotices();
+      restoreClock();
     };
   },
   render: () => (

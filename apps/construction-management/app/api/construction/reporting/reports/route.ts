@@ -7,9 +7,13 @@ import {
   type AccessSession,
 } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
+import { reportNotAvailable } from "@/src/reporting/application/report-handlers";
 import {
   isMoneyReport,
+  isReportAvailable,
   printsAmounts,
+  REPORT_KINDS,
+  type ReportKind,
   type ReportOwnScope,
   type ReportParams,
 } from "@/src/reporting/domain/report-job";
@@ -34,6 +38,17 @@ import {
 } from "./report-models";
 
 export const dynamic = "force-dynamic";
+/** A report runs after the response, in this invocation (ADR CM-0021 §1). */
+export const maxDuration = 300;
+
+function unavailableKind(body: unknown): ReportKind | null {
+  const kind =
+    typeof body === "object" && body != null && "kind" in body
+      ? body.kind
+      : null;
+  const known = REPORT_KINDS.find((item) => item === kind);
+  return known == null || isReportAvailable(known) ? null : known;
+}
 
 function paramsOf(
   model: RequestConstructionReportingReportRequestModel,
@@ -163,10 +178,13 @@ async function sessionFor(
  */
 export async function POST(request: Request): Promise<Response> {
   try {
+    const body: unknown = await request.json();
+    // A catalogued kind whose builder is not there yet (CM-903) is 409,
+    // before its params are checked.
+    const unavailable = unavailableKind(body);
+    if (unavailable != null) throw reportNotAvailable(unavailable);
     const model = parseOrThrow(
-      RequestConstructionReportingReportRequestModel.safeParse(
-        await request.json(),
-      ),
+      RequestConstructionReportingReportRequestModel.safeParse(body),
     );
     const session = await sessionFor(request, model);
     if (isResponse(session)) return session;

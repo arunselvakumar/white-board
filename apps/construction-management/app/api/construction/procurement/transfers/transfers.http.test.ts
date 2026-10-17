@@ -1,6 +1,6 @@
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { PermissionGrants } from "@/src/shared-kernel/access";
@@ -18,6 +18,7 @@ import {
   addStore,
   addUnit,
 } from "@/test/procurement";
+import { watchEvents } from "@/test/dispatched-events";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as inventory } from "../inventory/route";
@@ -127,6 +128,10 @@ async function memberOn(
     });
   return member;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Material Transfer (CM-507)", () => {
   it("moves nothing while pending, dispatches on approve and receives on delivery", async () => {
@@ -260,6 +265,67 @@ describe("Material Transfer (CM-507)", () => {
       ),
     );
     expect(atVilla.total).toBe(1);
+  });
+
+  it("raises sent on approve and delivered on delivery for notifications (CM-904)", async () => {
+    const { owner, tower, store, cement } = await setup();
+    const events = watchEvents();
+    const pending = await json<Transfer>(
+      await raise(owner.cookie, {
+        transferDate: TODAY,
+        from: tower,
+        to: store,
+        lines: [{ materialId: cement.id, quantity: "10" }],
+      }),
+    );
+    expect(events.of("procurement.material_transfer_sent")).toHaveLength(0);
+    await approve(
+      jsonRequest(`${BASE}/${pending.id}/approve`, owner.cookie, {}),
+      params(pending.id),
+    );
+    const moved = {
+      transferId: pending.id,
+      number: pending.number,
+      from: tower,
+      to: store,
+      by: owner.userId,
+      createdBy: owner.userId,
+    };
+    expect(events.of("procurement.material_transfer_sent")).toEqual([
+      expect.objectContaining(moved),
+    ]);
+    expect(events.of("document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "material_transfer",
+        documentId: pending.id,
+        projectId: tower.id,
+        number: pending.number,
+        createdBy: owner.userId,
+      }),
+    ]);
+    await deliver(
+      jsonRequest(`${BASE}/${pending.id}/deliver`, owner.cookie, {
+        deliveredOn: TODAY,
+      }),
+      params(pending.id),
+    );
+    expect(events.of("procurement.material_transfer_delivered")).toEqual([
+      expect.objectContaining(moved),
+    ]);
+
+    // Save & Approve sends at once.
+    const direct = await json<Transfer>(
+      await raise(owner.cookie, {
+        transferDate: TODAY,
+        from: tower,
+        to: store,
+        lines: [{ materialId: cement.id, quantity: "5" }],
+        approve: true,
+      }),
+    );
+    expect(
+      events.of("procurement.material_transfer_sent").at(-1),
+    ).toMatchObject({ transferId: direct.id });
   });
 
   it("refuses a dispatch the source cannot cover, and Save & Approve likewise", async () => {

@@ -2,7 +2,7 @@
 title: Construction Management — milestones and tasks
 docs: ../README.md
 created: 2026-10-08
-updated: 2026-10-14
+updated: 2026-10-16
 status_values:
   - todo
   - in_progress
@@ -53,7 +53,7 @@ Ticket ids are `CM-<milestone><nn>`: `CM-105` is milestone 1, ticket 5.
 | **M6**    | Daily site work                    | [modules/04](../modules/04-daily-site-work.md)                                                                      | Daily worksheet with material consumption, equipment usage, progress reports                                    | 2        |
 | **M7**    | Finance                            | [modules/07](../modules/07-payments-accounting.md)                                                                  | Bank/cash ledgers, petty cash, party invoices & payments with TDS, ledger report                                | 2        |
 | **M8**    | Tasks, issues, inspections         | [modules/05](../modules/05-tasks-issues-inspections.md)                                                             | Gantt tasks with earned value, snag list, inspection approvals                                                  | 2        |
-| **M9**    | Dashboards, reports, notifications | [modules/11](../modules/11-reports-dashboards-backup.md), [modules/13](../modules/13-chat-notifications-support.md) | Project & company dashboards, report jobs, push, chat                                                           | 2        |
+| **M9**    | Dashboards, reports, notifications | [modules/11](../modules/11-reports-dashboards-backup.md), [modules/13](../modules/13-chat-notifications-support.md) | Company dashboard, reports on a queue, Central Reports, notifications and web push, backups (chat later)        | 2        |
 | **M10**   | Sales CRM                          | [modules/09](../modules/09-sales-crm-inquiry-booking.md)                                                            | Inquiries, funnel, follow-ups, unit bookings                                                                    | 2        |
 | **M11**   | India compliance                   | [04-gaps-and-roadmap §Phase 3](../04-gaps-and-roadmap.md)                                                           | BOQ/RA bills, GST engine, TDS ledger, muster rolls, RERA ledger, IS 456 registers                               | 2        |
 | **M12**   | Differentiators                    | [04-gaps-and-roadmap §Phase 4](../04-gaps-and-roadmap.md)                                                           | WhatsApp bot, offline outbox, Tally sync, allottee & vendor portals                                             | 2        |
@@ -889,16 +889,144 @@ Goal: a Project's plan and its quality control in one place — a task tree with
 - **Display.** Worksheet detail and list show the task; the task's feed and progress list show the worksheet number (not editable there).
 - **Tests:** HTTP tests for each path (matching unit, other unit, percent task, edit, delete, reject, un-reject, summary task refused, task of another Project refused); stories for the picker states.
 
-## M9 — Dashboards, reports, notifications, chat (board only)
+## M9 — Dashboards, reports, notifications
 
-| ID     | Seq | Title                                                                                    | Status | Blocked by | Area           |
-| ------ | --: | ---------------------------------------------------------------------------------------- | ------ | ---------- | -------------- |
-| CM-901 |   1 | Job queue (SQS + worker entrypoint), `jobs` table, report catalogue, Excel/PDF renderers | todo   | CM-007     | Infra+Kernel   |
-| CM-902 |   2 | `construction_reporting` views; project dashboard complete with Manage Dashboard reorder | todo   | CM-901     | Data+UI        |
-| CM-903 |   3 | Central Reports workspace                                                                | todo   | CM-902     | HTTP+UI        |
-| CM-904 |   4 | Notifications: web push, in-app list, per-menu notification flag, job-complete delivery  | todo   | CM-901     | Domain+HTTP+UI |
-| CM-905 |   5 | Chat: member, group, project; support tickets                                            | todo   | CM-904     | Domain+HTTP+UI |
-| CM-906 |   6 | Backups (data/media per module, date range), devices list, data export, account deletion | todo   | CM-901     | HTTP+UI        |
+Goal: reports that run on a real queue and stay downloadable, a catalogue every report screen reads, a Company Dashboard beside the Project Dashboard, a Central Reports workspace, notifications in the app and by web push for approvals and assignments, and backups, devices, data export and account deletion. Spec: `modules/11`, `modules/13`. Product decisions: [ADR CM-0021](../adr/CM-0021-reporting-notifications-backups-product-decisions.md). Chat and support tickets (CM-905) are left out of this delivery by the owner.
+
+| ID     | Seq | Title                                                                                                          | Status | Blocked by     | Area           |
+| ------ | --: | -------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
+| CM-901 |   1 | Postgres job queue and drains; report catalogue; Downloads; logo and "Generated by" in reports; retention      | done   | CM-007         | Infra+Kernel   |
+| CM-902 |   2 | `construction_reporting` views for KPIs; Company Dashboard; Manage Dashboard respects hidden modules           | done   | CM-901         | Data+UI        |
+| CM-903 |   3 | Central Reports workspace; procurement and central labour report kinds                                         | todo   | CM-901         | HTTP+UI        |
+| CM-904 |   4 | Notifications: `messaging` context, bell and list, web push, N flag, events from the modules, ready popups     | done   | CM-901         | Domain+HTTP+UI |
+| CM-905 |   5 | Chat: member, group, project; support tickets — **not in this delivery** (owner, 2026-10-16)                   | todo   | CM-904         | Domain+HTTP+UI |
+| CM-906 |   6 | Backups (data/media per module, date range; full Company with a code) and Download My Data                     | todo   | CM-901, CM-904 | HTTP+UI        |
+| CM-907 |   7 | Devices; Transfer ownership; Delete My Account; Delete Company with cooling-off; code-gated Aadhaar/PAN reveal | todo   | CM-901         | Domain+HTTP+UI |
+
+### CM-901 — Job queue, catalogue, Downloads, retention
+
+**Done when:**
+
+- **Queue** (CM-0021 §1). `construction_organization.queue_jobs` and a kernel module `src/shared-kernel/queue/` with these parts:
+  - `enqueue` (inside the caller's transaction, `dedupeKey` honoured);
+  - `claim` (`FOR UPDATE SKIP LOCKED`, leases, reclaiming expired leases);
+  - `complete`, and `fail` with 30 s / 2 min / 10 min backoff, then `onGiveUp`;
+  - `drainQueue({ budgetMs })`;
+  - a handler registry wired in `src/composition/queue.ts`.
+    Unit tests cover backoff and budget; HTTP tests cover two concurrent claims never taking the same job, and an expired lease being reclaimed.
+- **Reports run on it.** Requesting or retrying a report enqueues a `report` job and drains in `after()`; the response is the queued job. The inline runner remains for unit tests only.
+  - A poll of a job queued for more than 15 s, or with an expired lease, starts a drain.
+  - The limit is 240 s; the routes declare `maxDuration = 300`.
+  - At most five unfinished reports per requester: 409 `TOO_MANY_REPORTS`.
+  - Progress Reports use the same path.
+- **Daily cron** `/api/construction/queue/drain/scheduled` (`CRON_SECRET`, `vercel.json`): sweeps stragglers, then runs the daily jobs registered by other tickets.
+- **Catalogue** (§2): `src/reporting/domain/report-catalogue.ts` with title, scope, menu, flags, formats, money and filters. `GET /api/construction/reporting/catalogue` is trimmed to the viewer. The project Reports page reads it, and the hand-kept kind lists derive from it.
+- **Downloads** page `/app/downloads`: the member's reports (and later backups and exports) across Projects, with status, Download, Retry and Delete. It is linked from the user menu.
+- **Headers and footers:** the Project logo when `useLogoInReports` is on, else the Company logo. Every PDF and Excel says "Generated by <name> on <date, time>" in the Company's timezone.
+- **Retention** (§3), all run by the daily job:
+  - report files expire after 30 days (new status `expired`, files deleted, stored bytes released), except Progress Reports;
+  - finished queue rows are deleted after 14 days;
+  - orphan objects older than 24 h are deleted, using a new `ObjectStorage.list(prefix)` implemented for Blob and local disk.
+
+**Delivered:** the queue and report jobs on it are in the orchestrator's commits (`src/shared-kernel/queue/`, `src/composition/queue.ts`, `src/reporting/application/report-queue.ts`). The rest:
+
+- **Catalogue.** `src/reporting/domain/report-catalogue.ts` describes every kind once (title, wording per scope, group, scopes, menu and its `request` / `download` flags, money menu, money rule, formats, period, filters, Progress Report, `available`). `REPORT_TITLES`, `CENTRAL_REPORT_KINDS`, `CENTRAL_ONLY_KINDS`, `PROGRESS_REPORT_KINDS`, `FINANCE_REPORT_KINDS`, `reportFormats`, `isMoneyReport`, `printsAmounts` and the routes' `REPORT_MENU` derive from it; the access rules read it (`src/reporting/application/report-access.ts`). The six CM-903 kinds are catalogued with `available: false`: requesting one is 409 `REPORT_NOT_AVAILABLE`. `GET /api/construction/reporting/catalogue?scope=project&projectId=…|scope=central` returns what the viewer may request, with `includesMoney`; reports about money are left out without the money right. The project Reports page, Central Payment's reports and Masters → Equipments → Reports read it; `components/reports/report-catalogue.ts` keeps only the type and helpers.
+- **Downloads.** `/app/downloads` (user menu → Downloads) lists the member's own report jobs across Projects and central, newest first, 20 a page with **Show older**, status chips (Generating / Ready / Failed / Expired), Project, Excel / PDF, Retry and Delete, polling every 3 s while one is generating. `GET /api/construction/reporting/downloads` returns rows with a `source` discriminator (`report` now; how CM-906 adds `backup` and `export` is written in `downloads/download-models.ts`); each row carries its own file, retry and delete links, so a Progress Report's go to its module. New `POST /api/construction/reporting/reports/{id}/retry` and `…/{id}/delete` (requester or Owner; retry also needs Report and goes back on the queue).
+- **Headers and footers.** The header logo is the Project's when `useLogoInReports` is on, else the Company's, else none (`prismaReportSource.header()`, loaded from private storage), on table reports, the DPR and the Task Progress Report. Every PDF page's footer and every Excel sheet (a line under the header block) says "Generated by <name> on 16 Oct 2026, 14:05" in the Company's timezone (`src/reporting/domain/report-footer.ts`); the old "Generated at" header line is gone.
+- **Retention**, daily jobs in `DAILY_JOB_TYPES`: `reporting.retention` expires report jobs done over 30 days ago (not Progress Reports): status `expired`, keys cleared, stored files released, audit `report_job.expired`, files deleted; a download is then 409 `REPORT_EXPIRED` and screens say "Expired — generate it again". `queue.cleanup` deletes queue rows finished over 14 days ago. `files.orphans` lists `companies/` with the new `ObjectStorage.list(prefix)` (Vercel Blob and local disk) and deletes objects over 24 h old with no live `stored_files` row, at most 1,000 a run.
+- **Tests:** unit (catalogue derivations, viewer catalogue, footer text, PDF footer and logo, Excel line, disk and Blob listing); HTTP (catalogue scoping by flags, Financial and Project; `REPORT_NOT_AVAILABLE`; Downloads only own across Projects with paging; retry and delete permissions; expired downloads; logos on table reports and the DPR; retention, queue clean-up and orphan clean-up on local disk); stories for Downloads and the Reports page reading the catalogue.
+
+### CM-902 — Reporting views and the Company Dashboard
+
+**Done when:**
+
+- **Views** `construction_reporting.project_pending_approvals`, `project_pending_tracking` (through a function that takes the Company's today) and `party_dues` (bigint paise) are created in a migration, each commented with its readers.
+- **Who reads them:** the Project Dashboard's Material Approvals, Payment Approvals, Pending Issues & Snags and Pending Inspections tiles, and Due Payments. HTTP tests prove each tile equals the matching report or list count on the same data.
+- **Company Dashboard** `/app/dashboard`, the first item of the main menu, gated on `reporting.project_dashboard` Read:
+  - totals (active Projects, approvals waiting, pending issues, pending inspections, labour present today, amount due with Financial);
+  - one row per visible Project (status, progress %, approvals, pending issues, labour today, due), each linking to its Dashboard;
+  - View all and Financial honoured;
+  - Storybook stories for loading, empty, a member without Financial, and a phone layout;
+  - an HTTP test of each scoping rule.
+- **Manage Dashboard** leaves out sections whose module is hidden on the Project, with the reason shown. The duration filter defaults to the last 12 months.
+
+**Delivered:** migration `20261016110000_construction_reporting_dashboard_views` creates, in `construction_reporting` only, the view `project_pending_approvals` (live `approval_status = 'pending'` rows per Company, Project and module: purchase requests, purchase orders for the Project, Material Transfers out of it, Daily Worksheets, Equipment Usage sheets, Transactions, account transfers, petty-cash vouchers, Other Expenses, settlements of its live invoices), the function `project_pending_tracking(workspace, today, from?, to?, own user?, own member?)` (open Issues & Snags split into pending and delayed by M8's rule, Inspection Requests pending, by Issue / Inspection Date), the function `party_dues_on(workspace, as_on)` (finance's `loadDueInvoices` + `partyDues` rule: invoiced, paid, written off, due and overdue per Project or Store, direction and party, bigint paise) and the view `party_dues` (that function on each Company's today). Each has a `COMMENT ON` naming its readers. `src/reporting/infrastructure/prisma-dashboard-source.ts` reads them; `src/reporting/application/dashboard-reads.ts` (`ProjectDashboardKpis`, `CompanyDashboardReader`) applies the permissions, wired in `src/composition/dashboard-reads.ts`. **Project Dashboard:** the Material Approvals (`/api/construction/procurement/dashboard`), Payment Approvals and Due Payments (`/api/construction/finance/dashboard`) and Pending Issues & Snags / Pending Inspections (`/api/construction/tracking/dashboard`) keep their response shapes and read the views; the old per-module counts (`ProcurementDashboard.pendingApprovals`, `FinanceDashboard.pendingApprovals` and `dues`, the tracking dashboard's `kpis`) are gone. `dashboard-views.http.test.ts` proves each tile equals the PR, PO, Material Transfer, Transactions, petty-cash voucher, Other Expense, settlement, issue and inspection lists' Pending, Due Payments equals Central Payment, and the Company Dashboard row equals them all plus the worksheet and equipment-sheet lists and the labour summary, on one seeded Company. **Company Dashboard:** `GET /api/construction/reporting/company-dashboard?from=&to=` (Dashboard Read, 403 without; last 12 months ending the Company's today by default; 400 for half a range or one ending before it starts) and the page `/app/dashboard` (`components/dashboard/company-dashboard.tsx`), first in `lib/app-nav.ts` and shown by `AppShell` only with Dashboard Read (`app/app/layout.tsx`). Totals (active Projects, approvals waiting, pending Issues & Snags, pending inspections, Labours present today, amount due) as tiles; one row per visible Project (status, progress, approvals, pending and delayed issues, labour today, due) as cards on a phone and a table from 768 px, each linking to the Project's Dashboard. **Manage Dashboard:** `GET /api/construction/projects/dashboard-layout?projectId=` marks `hiddenOnProject` from the Project's hidden modules (`DASHBOARD_SECTIONS[].module`); the dashboard leaves those sections out and the dialog shows them disabled with "Hidden on this Project", keeping the member's tick for other Projects. The duration filter already defaulted to the last 12 months. Rules settled in the build are in `modules/11` → "Decisions for the build (M9)" → CM-902.
+
+### CM-903 — Central Reports
+
+**Done when:**
+
+- **The page:** `/app/workspace/central-reports` (menu `reporting.central_reports` Read) lists the central-scope catalogue entries the member may request, with the filter sheet (period, Projects, and Store, Vendor or Labour Category where the report takes one), and the member's recent central jobs.
+- **New kinds** `purchase_requests`, `purchase_orders`, `material_received`, `material_transfers`, `stock_register` (project and central) and `labour_attendance_central` (central only), each with:
+  - a pure builder and unit tests;
+  - Excel and PDF output;
+  - money gated on the module's Financial flag;
+  - rows limited to the Projects the member may see;
+  - an HTTP test.
+- **The project Reports page** shows the new project-scope kinds. Vendor attendance gains its Vendor and Labour Category pickers.
+
+### CM-904 — Notifications
+
+**Done when:**
+
+- **The context:** `src/messaging` and schema `construction_messaging`, with tables `notifications`, `notification_deliveries` (channel, status, error), `push_subscriptions` (user, session, endpoint, keys, user agent) and `notification_preferences` (muted menu groups).
+- **Endpoints:** `GET /api/construction/messaging/notifications` (cursor), `GET …/unread-count`, `POST …/{id}/read`, `POST …/read-all`, `DELETE …/{id}`, `POST/DELETE …/push-subscriptions`, `GET/PUT …/preferences`.
+- **Recipients:** a `notificationRecipients(workspaceId, menu, flag, projectId?)` kernel query returns members holding the menu's Notification flag plus the needed flag, assigned to the Project when the menu is Project-scoped, and never the actor.
+- **Events:** every row of CM-0021 §6 raises an event after commit (new events added where a module had none) and messaging's listeners write notifications. Each listener has a test; each module test proves its new event is raised.
+- **Delivery:**
+  - one `push` queue job per notification, sent with `web-push` and VAPID keys (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` in `.env.example`);
+  - a 404 or 410 deletes the subscription;
+  - each attempt is logged in `notification_deliveries`;
+  - a daily job raises "became delayed" for tasks and issues;
+  - retention runs: 90 days for notifications, 1 year for deliveries.
+- **UI:**
+  - a bell with an unread badge in the top bar, and a dropdown of the latest ten;
+  - `/app/notifications` with read, mark all read and delete;
+  - My Profile → Notifications ("Turn on notifications on this device", and mute per menu group);
+  - `public/sw.js` handles `push` and `notificationclick`, opening the link;
+  - a toast with Download when the member's report, backup or export finishes.
+  - Storybook covers each state, and the HTTP tests cover N-flag filtering and the project assignment check.
+
+**Delivered:** the `messaging` context (`src/messaging`) over the existing `construction_messaging` tables.
+
+- **Domain:** `notification-kinds.ts` holds the catalogue of types with their menu and needed flag, `APPROVAL_DOCUMENTS` (document type → menu, label, approver and creator links) and the wording; `notification.ts` holds the menu groups (the matrix categories plus "Reports and backups"), 90-day / 1-year retention and the push payload.
+- **Recipients:** the kernel's `notificationRecipients` (`src/shared-kernel/access/notification-recipients.ts`) returns active members with N plus Read (Approve for approval requests), on the Project for a Project-scoped menu, never the actor; the Owner passes like `can()`. `userIdsOfTeamMembers` maps assignees. Direct recipients go through the same check.
+- **Events:** the kernel's generic `document.submitted` / `approved` / `rejected` (`approval.ts`, built by `approval-events.ts`) are raised after commit by worksheets, Equipment Usage sheets, PRs, POs, transactions, petty cash vouchers, invoice settlements, other expenses, leave requests and cancellations, and attendance corrections. Procurement adds `material_transfer_sent|delivered` and `material_request_raised|delivered`; HRMS adds `hrms.salary_approved|paid`; `EquipmentFuelOverrun` gains `number` and `by`. The tracking events and `ReportFinished` are wired as they were. Every dispatcher is `messagingEvents()` (`src/composition/messaging.ts`), which logs a listener failure and never fails the command. The procurement event hub moved to `src/composition/procurement-events.ts`, and `messaging-event-contracts.ts` checks at compile time that the real events still fit what the listeners read.
+- **Delivery:** one insert per event (a repeated `(recipient, source_key)` adds nothing) logs `in_app` and enqueues one `push` job per notification. The job sends with `web-push` (VAPID from `.env.example`; unset → skipped), skips muted groups, already-read notifications and users with no device, deletes subscriptions on 404/410, and logs every attempt in `notification_deliveries`. Daily jobs `messaging.retention` and `messaging.delayed` ("became delayed" for leaf tasks and open issues due yesterday in the Company's today, once per record and due date).
+- **HTTP** under `/api/construction/messaging`: `GET notifications` (cursor), `GET notifications/unread-count` (with `latestReadyDownload`), `POST notifications/{id}/read`, `POST notifications/read-all`, `POST notifications/{id}/delete`, `POST push-subscriptions` (tied to the Better Auth session), `POST push-subscriptions/delete`, `GET preferences`, `POST preferences/update`, `GET push/config`. `deletePushSubscriptionsForSessions` is exported for Devices (CM-907).
+- **UI:** the bell with unread badge and latest-ten dropdown in the top bar; `/app/notifications` (load more, mark read, mark all read, delete, downloads); My Profile → Notifications (turn on this device, with unsupported / blocked / off / on / not configured states, and a push switch per menu group); `public/sw.js` (`push`, `notificationclick`); the Download toast driven by the unread-count poll (30 s; 3 s while a report is queued or running).
+- **Tests:** HTTP tests for N-flag and Approve filtering, the Project assignment check, the actor and the Owner, report-ready to the requester only, read / read-all / delete scoped to the user and Company, push jobs with a fake sender (410, muted, no VAPID), retention, and the idempotent delayed job, plus one test per new module event. Unit tests for the listeners, push delivery and rules; Storybook play functions for the bell, the list, the toast and the settings states. Decisions the build made are in `modules/13` → "Decisions for the build (M9)".
+
+### CM-906 — Backups and Download My Data
+
+**Done when:**
+
+- **Backup jobs** (CM-0021 §8) run on the queue as a part per module, then a zip step. The ZIP holds CSV and JSON per entity, `manifest.json`, and media under `media/<module>/` when Media is ticked; tombstoned rows are left out.
+- **Scopes:**
+  - **Project backup** (Project → Backup): modules, date range, data and/or media; per-module Read, and Financial for amounts.
+  - **Master records** backup (Masters → Backup).
+  - **Full Company backup** (Settings → Backup & export, Owner only): needs a six-digit code by email (or SMS) before queuing, and the link is emailed.
+- **Signed links** valid for 7 days, shown in Downloads and in the "backup ready" notification. The route checks the signature, expiry and owner. Backups are allowed after the plan expires and are not counted as storage.
+- **Download My Data** (My Profile → Privacy): profile, memberships and Team Member records, devices, notifications and own audit events, delivered the same way.
+- **Limits and expiry:** a ZIP over 2 GB fails with the size message, and the retention job expires backups and exports after 7 days.
+- **Tests:** HTTP tests for each scope's permissions, the code gate, link expiry and tampering, and a ZIP's contents. Storybook covers each form and state.
+
+### CM-907 — Devices, ownership and deletion
+
+**Done when:**
+
+- **Devices** (My Profile → Devices) lists the user's sessions (browser and OS from the user agent, signed in, last active, This device, push on), with **Sign out** and **Sign out of all other devices** through Better Auth. Both delete those sessions' push subscriptions.
+- **Transfer ownership** (Owner only, with a code): the target becomes `owner` with the Owner designation and full matrix; the old Owner becomes a `member` with the Admin template. It is audited.
+- **Delete My Account** (reason, type DELETE, code):
+  - refused for an Owner with 409 `OWNER_MUST_HAND_OVER`;
+  - otherwise the user leaves every Company (Team Members kept, marked Left, unlinked), and their sessions, subscriptions, notifications and preferences are deleted;
+  - the identity is erased, an `account_deleted` record is kept, and names show "Deleted user".
+- **Delete Company** (Owner only; type the name, enter a code):
+  - a 30-day cooling-off during which writes return 409 `COMPANY_DELETION_SCHEDULED`;
+  - a banner with the date, and Cancel deletion;
+  - on the day the daily job deletes the Company's rows in every `construction_*` schema in foreign-key order, then its files, its memberships and its workspace, keeping a `company_deletions` record and the GST invoices.
+  - An HTTP test counts the Company's rows in every schema before and after.
+- **Aadhaar/PAN reveal** needs a code sent to the viewer, after which reveals are allowed for 10 minutes in that session (CM-0021 §11); it is still audited.
 
 ## M10 — Sales CRM (board only)
 

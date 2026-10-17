@@ -1,11 +1,13 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
 import type {
   DprSource,
   FinanceReportSource,
   ReportRenderer,
+  ReportRunner,
   ReportStorage,
   TaskProgressSource,
   TrackingReportSource,
@@ -14,6 +16,7 @@ import {
   createReportExecutor,
   createReportHandlers,
   inlineReportRunner,
+  type ReportExecutor,
 } from "../application/report-handlers";
 import { storageImageLoader } from "./dpr-images";
 import { createDprRenderer } from "./dpr-pdf";
@@ -25,40 +28,44 @@ import {
 } from "./prisma-report-source";
 import { renderXlsx } from "./xlsx-report";
 
-export const reportRenderer: ReportRenderer = {
-  xlsx: renderXlsx,
-  pdf: renderPdf,
+/** The Excel and PDF writers; the PDF loads its header logo from `storage`. */
+export function reportRenderer(storage: ReportStorage): ReportRenderer {
+  const images = storageImageLoader(storage);
+  return {
+    xlsx: renderXlsx,
+    pdf: (document) => renderPdf(document, images),
+  };
+}
+
+type ReportingOptions = {
+  /** `ReportFinished` listeners (messaging, CM-904). */
+  events?: EventDispatcher;
+  dpr?: DprSource;
+  /** The finance reports' read model (CM-709). */
+  finance?: FinanceReportSource;
+  /** The tracking reports' and Task Progress Report's read models (CM-805). */
+  tracking?: {
+    source: TrackingReportSource;
+    taskProgress: TaskProgressSource;
+  };
 };
 
 /**
- * Report jobs wired to Postgres and private storage. The runner is inline
- * (the job runs inside the request, stopped after 60 seconds) until M9
- * swaps in an SQS runner whose worker calls the same executor. The Daily
- * Progress Report's read model crosses contexts, so the composition root
- * passes it in (`src/composition/report-jobs.ts`).
+ * The executor that runs one report job: reads, renders, stores. The
+ * queue's `report` handler calls it (ADR CM-0021 §1). The Daily Progress
+ * Report's and other cross-context read models are passed in by the
+ * composition root (`src/composition/report-jobs.ts`).
  */
-export function createReportingHandlers(
+export function createReportingExecutor(
   db: PrismaClient = prisma,
   storage: ReportStorage = objectStorage(),
-  options: {
-    dpr?: DprSource;
-    /** The finance reports' read model (CM-709). */
-    finance?: FinanceReportSource;
-    /** The tracking reports' and Task Progress Report's read models (CM-805). */
-    tracking?: {
-      source: TrackingReportSource;
-      taskProgress: TaskProgressSource;
-    };
-    /** Tests shorten the 60-second limit. */
-    timeLimitMs?: number;
-  } = {},
-) {
-  const store = prismaReportJobStore(db);
+  options: ReportingOptions = {},
+): ReportExecutor {
   const renderDpr = createDprRenderer(storageImageLoader(storage));
-  const executor = createReportExecutor({
-    store,
+  return createReportExecutor({
+    store: prismaReportJobStore(db),
     source: prismaReportSource(db),
-    renderer: reportRenderer,
+    renderer: reportRenderer(storage),
     storage,
     dpr:
       options.dpr == null
@@ -72,11 +79,33 @@ export function createReportingHandlers(
       options.tracking == null
         ? undefined
         : { ...options.tracking, render: renderDpr },
+    events: options.events,
   });
+}
+
+/**
+ * Report jobs wired to Postgres and private storage. `runner` hands each
+ * job to the queue (`queueReportRunner`); without one the job runs in the
+ * request (unit-test style).
+ */
+export function createReportingHandlers(
+  db: PrismaClient = prisma,
+  storage: ReportStorage = objectStorage(),
+  options: ReportingOptions & {
+    runner?: ReportRunner;
+    /** Tests shorten the 240-second limit. */
+    timeLimitMs?: number;
+  } = {},
+) {
+  const runner =
+    options.runner ??
+    inlineReportRunner(createReportingExecutor(db, storage, options), {
+      timeLimitMs: options.timeLimitMs,
+    });
   return createReportHandlers({
-    store,
+    store: prismaReportJobStore(db),
     projects: prismaProjectLookup(db),
-    runner: inlineReportRunner(executor, { timeLimitMs: options.timeLimitMs }),
+    runner,
     storage,
   });
 }

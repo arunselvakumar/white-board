@@ -1,0 +1,57 @@
+/**
+ * Compile-time checks that the modules' real events still fit what
+ * messaging's listeners read (`src/messaging/application/inbound-events.ts`).
+ * Messaging cannot import another context, so its copies are structural;
+ * if an event loses or renames a field, this file stops compiling.
+ */
+import type {
+  InboundEquipmentFuelOverrun,
+  InboundInspectionDecided,
+  InboundInspectionRequested,
+  InboundIssueEvent,
+  InboundMaterialRequestDelivered,
+  InboundMaterialRequestRaised,
+  InboundMaterialTransferDelivered,
+  InboundMaterialTransferSent,
+  InboundReportFinished,
+  InboundSalaryDecided,
+  InboundStockBelowMinimum,
+  InboundTaskAssigned,
+  InboundTaskCompleted,
+} from "@/src/messaging/application/inbound-events";
+import type {
+  MaterialRequestDelivered,
+  MaterialRequestRaised,
+  MaterialTransferDelivered,
+  MaterialTransferSent,
+  StockBelowMinimum,
+} from "@/src/procurement/domain/events";
+import type { SalaryApproved, SalaryPaid } from "@/src/hrms/domain/events";
+import type { ReportFinished } from "@/src/reporting/domain/events";
+import type { EquipmentFuelOverrun } from "@/src/site-work/domain/events";
+import type {
+  InspectionDecided,
+  InspectionRequested,
+  IssueEvent,
+  TaskAssigned,
+  TaskCompleted,
+} from "@/src/tracking/domain/events";
+
+type Fits<Real extends Inbound, Inbound> = Real;
+
+export type MessagingEventContracts = [
+  Fits<TaskAssigned, InboundTaskAssigned>,
+  Fits<TaskCompleted, InboundTaskCompleted>,
+  Fits<IssueEvent, InboundIssueEvent>,
+  Fits<InspectionRequested, InboundInspectionRequested>,
+  Fits<InspectionDecided, InboundInspectionDecided>,
+  Fits<EquipmentFuelOverrun, InboundEquipmentFuelOverrun>,
+  Fits<StockBelowMinimum, InboundStockBelowMinimum>,
+  Fits<MaterialTransferSent, InboundMaterialTransferSent>,
+  Fits<MaterialTransferDelivered, InboundMaterialTransferDelivered>,
+  Fits<MaterialRequestRaised, InboundMaterialRequestRaised>,
+  Fits<MaterialRequestDelivered, InboundMaterialRequestDelivered>,
+  Fits<SalaryApproved, InboundSalaryDecided>,
+  Fits<SalaryPaid, InboundSalaryDecided>,
+  Fits<ReportFinished, InboundReportFinished>,
+];

@@ -1,6 +1,6 @@
 import { Prisma, prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET as inventory } from "@/app/api/construction/procurement/inventory/route";
 import { POST as updateWing } from "@/app/api/construction/projects/projects/[id]/wings/[wingId]/update/route";
@@ -12,6 +12,10 @@ import {
 } from "@/src/projects/domain/wing-generator";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
+import {
+  InProcessEventDispatcher,
+  type DomainEvent,
+} from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { addMaterial, addOpeningStock, addUnit } from "@/test/procurement";
@@ -232,6 +236,16 @@ async function setApproval(ctx: Ctx, approvalEnabled: boolean) {
   );
   expect(response.status).toBe(StatusCodes.OK);
 }
+
+function dispatched(spy: { mock: { calls: unknown[][] } }, type: string) {
+  return spy.mock.calls
+    .flatMap(([events]) => events as DomainEvent[])
+    .filter((event) => event.type === type);
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Daily Worksheets", () => {
   it("saves a sheet, numbers it, posts Consumed stock and lowers Current Inventory", async () => {
@@ -733,6 +747,74 @@ describe("Daily Worksheets", () => {
     actAs(await member(ctx, ["read", "create"], false));
     const offProject = await save(ctx, { materials: [] });
     expect(offProject.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("raises document.submitted, approved and rejected for notifications (CM-904)", async () => {
+    const ctx = await setup();
+    await setApproval(ctx, true);
+    const clerk = await member(ctx, ["read", "create", "update"]);
+    actAs(clerk);
+    const spy = vi.spyOn(InProcessEventDispatcher.prototype, "dispatch");
+    const sheet = await saved(ctx, { materials: [] });
+    expect(dispatched(spy, "document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "worksheet",
+        documentId: sheet.id,
+        projectId: ctx.projectId,
+        number: sheet.number,
+        submittedBy: clerk.userId,
+      }),
+    ]);
+
+    actAs(ctx.owner);
+    const rejected = await json<Sheet>(
+      await reject(
+        post(`${BASE}/${sheet.id}/reject`, { reason: " Wrong floor " }),
+        params(sheet.id),
+      ),
+    );
+    expect(dispatched(spy, "document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "worksheet",
+        documentId: sheet.id,
+        number: sheet.number,
+        rejectedBy: ctx.by,
+        createdBy: clerk.userId,
+        reason: "Wrong floor",
+      }),
+    ]);
+
+    actAs(clerk);
+    const back = await json<Sheet>(
+      await edit(ctx, rejected, { materials: [], remark: "Fixed" }),
+    );
+    expect(back.approvalStatus).toBe("pending");
+    expect(dispatched(spy, "document.submitted")).toHaveLength(2);
+
+    actAs(ctx.owner);
+    await bulkApprove(
+      post(`${BASE}/bulk-approve`, {
+        projectId: ctx.projectId,
+        ids: [sheet.id],
+      }),
+    );
+    expect(dispatched(spy, "document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "worksheet",
+        documentId: sheet.id,
+        number: sheet.number,
+        approvedBy: ctx.by,
+        createdBy: clerk.userId,
+      }),
+    ]);
+
+    // Save & Approve is approved at once: nobody waits for it.
+    const direct = await saved(ctx, { materials: [], approve: true });
+    expect(dispatched(spy, "document.submitted")).toHaveLength(2);
+    expect(dispatched(spy, "document.approved").at(-1)).toMatchObject({
+      documentId: direct.id,
+      createdBy: ctx.by,
+    });
   });
 
   it("decides in bulk, all or none", async () => {

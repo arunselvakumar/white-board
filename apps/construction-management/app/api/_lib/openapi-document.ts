@@ -1,5 +1,22 @@
 import { StatusCodes } from "http-status-codes";
 
+import {
+  reportingDownloadsOpenApiComponents,
+  reportingDownloadsOpenApiOperations,
+} from "@/app/api/construction/reporting/downloads-openapi";
+import {
+  messagingOpenApiComponents,
+  messagingOpenApiOperations,
+} from "@/app/api/construction/messaging/messaging-openapi";
+import {
+  queueOpenApiComponents,
+  queueOpenApiOperations,
+} from "@/app/api/construction/queue/queue-openapi";
+import {
+  companyDashboardOpenApiComponents,
+  companyDashboardOpenApiOperations,
+} from "@/app/api/construction/reporting/company-dashboard/company-dashboard-openapi";
+
 import { SwitchConstructionOrganizationCompanyParamsModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-params-model";
 import { SwitchConstructionOrganizationCompanyResponseModel } from "@/app/api/construction/organization/companies/[id]/switch/switch-company-response-model";
 import { CreateConstructionOrganizationCompanyRequestModel } from "@/app/api/construction/organization/companies/create-company-request-model";
@@ -953,11 +970,26 @@ openApiOperations.push(...financeOpenApiOperations);
 Object.assign(openApiComponents, trackingOpenApiComponents);
 openApiOperations.push(...trackingOpenApiOperations);
 
+// The kernel's job queue (M9, ADR CM-0021 §1).
+Object.assign(openApiComponents, queueOpenApiComponents);
+openApiOperations.push(...queueOpenApiOperations);
+
+// Notifications (CM-904, ADR CM-0021 §6).
+Object.assign(openApiComponents, messagingOpenApiComponents);
+openApiOperations.push(...messagingOpenApiOperations);
+
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
+
+// The report catalogue and Downloads (CM-901, ADR CM-0021 §2).
+Object.assign(openApiComponents, reportingDownloadsOpenApiComponents);
+openApiOperations.push(...reportingDownloadsOpenApiOperations);
+// The Company Dashboard (CM-902) over the reporting views.
+Object.assign(openApiComponents, companyDashboardOpenApiComponents);
+openApiOperations.push(...companyDashboardOpenApiOperations);
 
 export const openApiDocument = buildOpenApiDocument(
   openApiOperations,

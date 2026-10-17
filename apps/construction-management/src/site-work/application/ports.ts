@@ -297,7 +297,7 @@ export type ProgressReportJob = {
   /** User id of the Filled By Team Member; null for everyone. */
   filledBy: string | null;
   includeImages: boolean;
-  status: "queued" | "running" | "done" | "failed";
+  status: "queued" | "running" | "done" | "failed" | "expired";
   /** Why it failed, in words a screen can show. */
   error: string | null;
   /** Prints hire cost: downloading it needs Financial on Equipment Usage. */

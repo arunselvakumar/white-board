@@ -66,6 +66,8 @@ function layout(
   sections: { key: string; visible: boolean }[] = DASHBOARD_SECTIONS.map(
     (section) => ({ key: section.key, visible: true }),
   ),
+  /** Sections whose module is hidden on the Project (CM-902). */
+  hiddenOnProject: readonly string[] = [],
 ): DashboardLayout {
   return {
     sections: sections.map(({ key, visible }) => {
@@ -75,6 +77,7 @@ function layout(
         label: section?.label ?? key,
         milestone: section?.milestone ?? null,
         visible,
+        hiddenOnProject: hiddenOnProject.includes(key),
       };
     }),
   };
@@ -158,12 +161,15 @@ function serve(
   return () => {
     let current = options.layout ?? layout();
     api = mockApi(({ method, path, body }) => {
-      if (method === "GET" && path === LAYOUT_PATH)
+      if (
+        method === "GET" &&
+        (path === LAYOUT_PATH || path.startsWith(`${LAYOUT_PATH}?`))
+      )
         return Response.json(current);
       if (method === "POST" && path === `${LAYOUT_PATH}/update`) {
         const sent = (body as { sections: { key: string; visible: boolean }[] })
           .sections;
-        current = layout(
+        const saved = layout(
           sent.length === 0
             ? undefined
             : [
@@ -173,7 +179,14 @@ function serve(
                 ).map((section) => ({ key: section.key, visible: true })),
               ],
         );
-        return Response.json(current);
+        // The update route answers without a Project: nothing is marked.
+        current = layout(
+          saved.sections,
+          current.sections
+            .filter((section) => section.hiddenOnProject)
+            .map((section) => section.key),
+        );
+        return Response.json(saved);
       }
       if (method === "GET" && path === SUMMARY_PATH)
         return Response.json(options.summary ?? summary());
@@ -870,6 +883,56 @@ export const EverySectionHidden: Story = {
     await expect(
       canvas.getByRole("list", { name: "Key figures" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * Issues & Snags is hidden on this Project (Hide / Show Modules, CM-902):
+ * its section is left out, and Manage Dashboard shows it disabled with
+ * the reason. Saving keeps the member's tick for other Projects.
+ */
+export const ModuleHiddenOnProject: Story = {
+  beforeEach: serve({
+    layout: layout(undefined, ["issue_snag"]),
+  }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(
+      await canvas.findByRole("region", { name: "Inspection Request" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("region", { name: "Issue & Snag" }),
+    ).toBeNull();
+    await expect(
+      api.calls.mock.calls.some(
+        ([call]) =>
+          call.path ===
+          `${LAYOUT_PATH}?projectId=${encodeURIComponent(KUMARI.id)}`,
+      ),
+    ).toBe(true);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Manage dashboard" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(await body.findByRole("dialog"));
+    const issues = dialog.getByRole("checkbox", { name: "Issue & Snag" });
+    await expect(issues).toHaveAttribute("aria-disabled", "true");
+    await expect(issues).not.toBeChecked();
+    await expect(issues).toHaveAccessibleDescription("Hidden on this Project");
+    await expect(
+      dialog.getByRole("checkbox", { name: "Task" }),
+    ).not.toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    const saved = api.calls.mock.calls.find(
+      ([call]) => call.method === "POST",
+    )?.[0].body as { sections: { key: string; visible: boolean }[] };
+    await expect(
+      saved.sections.find((section) => section.key === "issue_snag"),
+    ).toEqual({ key: "issue_snag", visible: true });
+    await expect(
+      canvas.queryByRole("region", { name: "Issue & Snag" }),
+    ).toBeNull();
   },
 };
 

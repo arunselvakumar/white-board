@@ -739,6 +739,85 @@ describe("Equipment Usage sheets (CM-604)", () => {
     expect(born.approvalStatus).toBe("approved");
   });
 
+  it("raises the approval and fuel overrun events notifications need (CM-904)", async () => {
+    const ctx = await setup();
+    await setSettings(ctx, { approvalEnabled: true });
+    const clerk = await member(ctx, ["read", "create", "update"]);
+    actAs(clerk);
+    const spy = vi.spyOn(InProcessEventDispatcher.prototype, "dispatch");
+    const sheet = await saved(ctx, ctx.jcb, { fuelQty: "60" });
+    expect(sheet.fuelOverrun).toBe(true);
+    expect(dispatched(spy, "document.submitted")).toEqual([
+      expect.objectContaining({
+        documentType: "equipment_usage",
+        documentId: sheet.id,
+        projectId: ctx.projectId,
+        number: sheet.number,
+        submittedBy: clerk.userId,
+      }),
+    ]);
+    expect(dispatched(spy, "EquipmentFuelOverrun")).toEqual([
+      expect.objectContaining({
+        sheetId: sheet.id,
+        number: sheet.number,
+        by: clerk.userId,
+      }),
+    ]);
+
+    actAs(ctx.owner);
+    const rejected = await json<Sheet>(
+      await reject(
+        post(`${BASE}/${sheet.id}/reject`, { reason: "Log book missing" }),
+        params(sheet.id),
+      ),
+    );
+    expect(dispatched(spy, "document.rejected")).toEqual([
+      expect.objectContaining({
+        documentType: "equipment_usage",
+        documentId: sheet.id,
+        number: sheet.number,
+        rejectedBy: ctx.by,
+        createdBy: clerk.userId,
+        reason: "Log book missing",
+      }),
+    ]);
+
+    actAs(clerk);
+    expect((await edit(ctx, rejected, ctx.jcb, { fuelQty: "10" })).status).toBe(
+      StatusCodes.OK,
+    );
+    expect(dispatched(spy, "document.submitted")).toHaveLength(2);
+
+    actAs(ctx.owner);
+    await approve(post(`${BASE}/${sheet.id}/approve`, {}), params(sheet.id));
+    expect(dispatched(spy, "document.approved")).toEqual([
+      expect.objectContaining({
+        documentType: "equipment_usage",
+        documentId: sheet.id,
+        number: sheet.number,
+        approvedBy: ctx.by,
+        createdBy: clerk.userId,
+      }),
+    ]);
+
+    const other = await saved(ctx, ctx.jcb, {
+      shift: "shift_2",
+      timeShifts: [{ startTime: "18:00", endTime: "20:00" }],
+    });
+    await bulkReject(
+      post(`${BASE}/bulk-reject`, {
+        projectId: ctx.projectId,
+        ids: [other.id],
+        reason: "Wrong shift",
+      }),
+    );
+    expect(dispatched(spy, "document.rejected").at(-1)).toMatchObject({
+      documentId: other.id,
+      createdBy: ctx.by,
+      reason: "Wrong shift",
+    });
+  });
+
   it("decides in bulk, all or none", async () => {
     const ctx = await setup();
     await setSettings(ctx, { approvalEnabled: true });

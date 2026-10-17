@@ -4,7 +4,7 @@ import { requireInventoryAccess } from "../inventory/handlers";
 import { procurementDirectory } from "@/src/composition/procurement-directory";
 import { projectMediaDispatcher } from "@/src/composition/project-media-listeners";
 import { MaterialTransferCommands } from "@/src/procurement/infrastructure/material-transfer-store";
-import { procurementEvents } from "@/src/procurement/infrastructure/procurement-events";
+import { procurementEvents } from "@/src/composition/procurement-events";
 
 /** Material Transfers (CM-507). */
 export const materialTransfers = new MaterialTransferCommands({

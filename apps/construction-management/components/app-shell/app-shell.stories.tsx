@@ -3,17 +3,17 @@ import { expect, fn, waitFor, within } from "storybook/test";
 
 import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
-import { APP_NAV, type AppNavHref } from "@/lib/app-nav";
+import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_SECTIONS } from "@/lib/hrms-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
-function shellAt(href: AppNavHref) {
+function shellAt(href: AppNavHref, canOpenDashboard = true) {
   return {
     parameters: { nextjs: { navigation: { pathname: href } } },
     render: () => (
-      <AppShell>
+      <AppShell canOpenDashboard={canOpenDashboard}>
         <AppAreaPage href={href} />
       </AppShell>
     ),
@@ -62,14 +62,58 @@ async function expectArea(
 export const Projects: Story = {
   ...shellAt("/app/projects"),
   play: async ({ canvasElement }) => {
-    await expectArea(canvasElement, APP_NAV[0]);
+    await expectArea(canvasElement, appPageByHref("/app/projects"));
   },
 };
 
 export const Workspace: Story = {
   ...shellAt("/app/workspace"),
   play: async ({ canvasElement }) => {
-    await expectArea(canvasElement, APP_NAV[1]);
+    await expectArea(canvasElement, appPageByHref("/app/workspace"));
+  },
+};
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+/**
+ * The main menu: docked on a wide screen; on a phone (where the tests run)
+ * inside the Sidebar sheet, opened with Toggle Sidebar.
+ */
+async function mainMenu({ canvas, canvasElement, userEvent }: PlayContext) {
+  const view = canvasElement.ownerDocument.defaultView;
+  let sidebar = within(canvasElement);
+  if (view != null && view.innerWidth < 768) {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Toggle Sidebar" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const sheets = await body.findAllByRole("dialog", { name: "Sidebar" });
+    const sheet = sheets[sheets.length - 1];
+    if (sheet == null) throw new Error("The Sidebar sheet did not open");
+    await waitFor(() => expect(sheet).toBeVisible());
+    sidebar = within(sheet);
+  }
+  return within(await sidebar.findByRole("navigation", { name: "Main" }));
+}
+
+/** The Company Dashboard leads the main menu (CM-902). */
+export const DashboardFirst: Story = {
+  ...shellAt("/app/projects"),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const links = nav.getAllByRole("link");
+    await expect(links[0]).toHaveAccessibleName("Dashboard");
+    await expect(links[0]).toHaveAttribute("href", "/app/dashboard");
+  },
+};
+
+/** Without the Dashboard menu's Read the Dashboard is not in the menu. */
+export const WithoutDashboard: Story = {
+  ...shellAt("/app/projects", false),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    await expect(nav.queryByRole("link", { name: "Dashboard" })).toBeNull();
+    await expect(nav.getAllByRole("link")[0]).toHaveAccessibleName("Projects");
   },
 };
 

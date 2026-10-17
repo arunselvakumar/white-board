@@ -78,6 +78,27 @@ export function prismaReportJobStore(db: PrismaClient): ReportJobStore {
       return rows.map(toJob);
     },
 
+    async listRequestedBy(workspaceId, requestedBy, page) {
+      const before = page.before;
+      const rows = await db.constructionReportingReportJob.findMany({
+        where: {
+          workspaceId,
+          requestedBy,
+          ...(before == null
+            ? {}
+            : {
+                OR: [
+                  { createdAt: { lt: before.createdAt } },
+                  { createdAt: before.createdAt, id: { lt: before.id } },
+                ],
+              }),
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: page.limit,
+      });
+      return rows.map(toJob);
+    },
+
     async markRunning(id, at) {
       await db.constructionReportingReportJob.update({
         where: { id },
@@ -139,6 +160,24 @@ export function prismaReportJobStore(db: PrismaClient): ReportJobStore {
         },
       });
       return updated.count > 0;
+    },
+
+    async requeueRunning(workspaceId, id) {
+      const updated = await db.constructionReportingReportJob.updateMany({
+        where: { id, workspaceId, status: "running" },
+        data: { status: "queued", startedAt: null },
+      });
+      return updated.count > 0;
+    },
+
+    countUnfinished(workspaceId, requestedBy) {
+      return db.constructionReportingReportJob.count({
+        where: {
+          workspaceId,
+          requestedBy,
+          status: { in: ["queued", "running"] },
+        },
+      });
     },
 
     async remove(job, by, at) {

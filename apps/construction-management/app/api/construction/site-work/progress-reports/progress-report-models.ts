@@ -70,7 +70,7 @@ export const ConstructionSiteWorkProgressReportResponseModel = z.object({
   /** Null when the report covers every Team Member. */
   filledBy: person.nullable(),
   includeImages: z.boolean(),
-  status: z.enum(["queued", "running", "done", "failed"]),
+  status: z.enum(["queued", "running", "done", "failed", "expired"]),
   /** Why a failed report failed. */
   error: z.string().nullable(),
   /** Prints hire cost (the requester held Financial on Equipment Usage). */

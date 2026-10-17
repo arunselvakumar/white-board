@@ -4,6 +4,7 @@ import {
   get,
   head,
   issueSignedToken,
+  list,
   put,
 } from "@vercel/blob";
 import {
@@ -15,6 +16,7 @@ import { DomainError } from "../domain-error";
 import type {
   DirectUploads,
   ObjectHead,
+  ObjectListing,
   ObjectStorage,
   StoredObject,
 } from "./object-storage";
@@ -101,6 +103,27 @@ export class VercelBlobStorage implements ObjectStorage {
 
   async delete(key: string): Promise<void> {
     await del(key, this.credentials());
+  }
+
+  /** Blob's own listing by pathname prefix, paged by its cursor. */
+  async list(
+    prefix: string,
+    options: { cursor?: string | null; limit?: number } = {},
+  ): Promise<ObjectListing> {
+    const result = await list({
+      prefix,
+      limit: options.limit ?? 1000,
+      ...(options.cursor == null ? {} : { cursor: options.cursor }),
+      ...this.credentials(),
+    });
+    return {
+      objects: result.blobs.map((blob) => ({
+        key: blob.pathname,
+        bytes: blob.size,
+        uploadedAt: new Date(blob.uploadedAt),
+      })),
+      cursor: result.hasMore ? (result.cursor ?? null) : null,
+    };
   }
 
   /**

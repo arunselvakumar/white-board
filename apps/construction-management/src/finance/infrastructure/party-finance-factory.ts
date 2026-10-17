@@ -1,6 +1,10 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import { companyToday } from "@/src/shared-kernel/company-today";
+import {
+  InProcessEventDispatcher,
+  type EventDispatcher,
+} from "@/src/shared-kernel/events";
 
 import { GoodsReceiptInvoices } from "../application/goods-receipt-invoices";
 import { InvoiceHandlers } from "../application/invoice-handlers";
@@ -25,6 +29,8 @@ import { loadTdsRates } from "./tds-rate-store";
  */
 export function createPartyFinance(deps: {
   directory: FinanceDirectory;
+  /** Settlement approval events after commit (CM-904). */
+  events?: EventDispatcher;
   prisma?: PrismaClient;
   clock?: () => Date;
 }) {
@@ -46,7 +52,10 @@ export function createPartyFinance(deps: {
     invoices,
     payments: new PartyPaymentHandlers(base),
     openings: new PartyOpeningHandlers(base),
-    settlements: new SettlementHandlers(base),
+    settlements: new SettlementHandlers(
+      base,
+      deps.events ?? new InProcessEventDispatcher(),
+    ),
     queries: new PartyQueries(base, invoices),
     goodsReceipts: new GoodsReceiptInvoices(base),
   };
