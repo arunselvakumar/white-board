@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/sales/units/[unitId]/available/route.ts
+  s_415949558e694b::t_fac5c568964acc 1-18
+apps/construction-management/app/api/construction/sales/units/[unitId]/details/route.ts
+  s_415949558e694b::t_ecd6435fdb4803 1-23
+apps/construction-management/app/api/construction/sales/units/[unitId]/route.ts
+  s_415949558e694b::t_270854d923d5bd 1-46
+apps/construction-management/app/api/construction/sales/units/[unitId]/unavailable/route.ts
+  s_415949558e694b::t_8757c555a5fbe5 1-24
+apps/construction-management/app/api/construction/sales/units/import-sample/route.ts
+  s_415949558e694b::t_80565ec95e4b5c 1-54
+apps/construction-management/app/api/construction/sales/units/import/route.ts
+  s_415949558e694b::t_746834654447d8 1-51
+apps/construction-management/app/api/construction/sales/units/route.ts
+  s_415949558e694b::t_8e72e85f887795 1-50
+apps/construction-management/app/api/construction/sales/units/unit-route-parts.ts
+  s_415949558e694b::t_a76912be70a0fe 1-65
+apps/construction-management/app/api/construction/sales/units/units.http.test.ts
+  s_415949558e694b::t_089a1cfbd00b2c 1-568
+apps/construction-management/src/sales/infrastructure/unit-workbook.ts
+  s_415949558e694b::t_abd441ec46e9e5 1-158
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_a3cbe5f47fae54 109-175
+apps/construction-management/app/api/construction/sales/units/unit-models.ts
+  s_f92effab5c9481::t_8a18f1fd7e0da5 1-269
+apps/construction-management/app/api/construction/sales/units/units-openapi.ts
+  s_f92effab5c9481::t_d27b8ad426df6c 1-2,8-35,37-65,67-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2dbc6a0ec8100a9f62faa90d4569ad558689943f",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f92effab5c9481": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a59a3a31b725a6d0c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
