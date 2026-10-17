@@ -1,0 +1,67 @@
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/route.ts
+  s_415949558e694b::t_a684468df8f710 59
+apps/construction-management/app/api/construction/sales/documents/documents.http.test.ts
+  s_415949558e694b::t_9c68ebacbf7dda 5,228-245
+apps/construction-management/app/api/construction/sales/documents/handlers.ts
+  s_415949558e694b::t_27034506ac353b 117,150,174-175,198-199
+apps/construction-management/app/api/construction/sales/inquiries/inquiries.http.test.ts
+  s_415949558e694b::t_a7d541d9664297 753-776
+apps/construction-management/app/api/construction/sales/inquiries/inquiry-models.ts
+  s_415949558e694b::t_c0955e97da6527 43-46
+apps/construction-management/app/app/projects/[id]/bookings/list/[bookingId]/page.tsx
+  s_415949558e694b::t_512e21d9e4d3c6 4,13,16,19,22-28
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/page.tsx
+  s_415949558e694b::t_3cb38bea9ed785 4,13,16,19,22-28
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_415949558e694b::t_1dde7efc82543a 526,528
+apps/construction-management/components/projects/dashboard/sales-sections.tsx
+  s_415949558e694b::t_6e596412f31ea2 3,383-388
+apps/construction-management/components/sales/bookings/booking-detail.tsx
+  s_415949558e694b::t_d247cd88790a44 44,47,95,100-101,114-116,203
+apps/construction-management/components/sales/bookings/booking-form.tsx
+  s_415949558e694b::t_a2a8e8bf1347a6 38,253-259
+apps/construction-management/components/sales/documents/upload-failed.ts
+  s_415949558e694b::t_6b5dccaa3b0ff6 1-36
+apps/construction-management/components/sales/inquiries/inquiry-detail.tsx
+  s_415949558e694b::t_6ea5640b2d4b5b 45,80,85-86,97-99
+apps/construction-management/components/sales/inquiries/inquiry-form.tsx
+  s_415949558e694b::t_8d9ddc878d1cdb 39,238-247
+apps/construction-management/components/sales/inquiries/inquiry-quick-add-dialog.tsx
+  s_415949558e694b::t_913342198ce5b0 5,33,44,114,148,153-157
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_415949558e694b::t_8735fe95167a55 554-561
+apps/construction-management/src/composition/messaging.ts
+  s_415949558e694b::t_cf812aeeb575c5 358-359,375-422
+apps/construction-management/src/reporting/application/backup-access.test.ts
+  s_415949558e694b::t_aee699b9a0ae25 11,17,154-187
+apps/construction-management/src/reporting/application/backup-access.ts
+  s_415949558e694b::t_e9c0a4ac861735 45-48
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_415949558e694b::t_6f07a3e5c46682 43-47,333
+apps/construction-management/src/sales/application/document-files.ts
+  s_415949558e694b::t_e6651c85d45a84 244-255
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_415949558e694b::t_61cb792f7e0fa1 170-174,541-546
+apps/construction-management/src/sales/application/inquiry-import.ts
+  s_415949558e694b::t_8a7b1eb6c4ebce 428-449
+apps/construction-management/src/sales/infrastructure/inquiry-store.ts
+  s_415949558e694b::t_3e2b2c9e860690 222-241
+apps/construction-management/src/sales/infrastructure/inquiry-workbook.ts
+  s_415949558e694b::t_3d0f5d2fbb3780 4,13,139-144,177-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1811e357d00256f04990ab2c67279f6790d052c4",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
