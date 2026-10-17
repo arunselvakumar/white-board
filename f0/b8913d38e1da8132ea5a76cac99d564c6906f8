@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/sales/bookings/booking-backup.http.test.ts
+  s_415949558e694b::t_7de12e8e692401 1-150
+apps/construction-management/src/composition/backup-sources.ts
+  s_415949558e694b::t_122daccc922cc6 227,1188-1280
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_415949558e694b::t_09adf6068c4d2a 303-315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f0b8913d38e1da8132ea5a76cac99d564c6906f8",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
