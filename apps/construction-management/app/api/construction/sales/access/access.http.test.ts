@@ -129,6 +129,12 @@ describe("GET /api/construction/sales/access (CM-1001)", () => {
     expect(bad.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
+  it("answers 401 before it reads the query (review of #92)", async () => {
+    actAs({ userId: null, workspaceId: null });
+    const response = await getAccess(new Request(`${BASE}?projectId=nope`));
+    expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
+  });
+
   it("is in the OpenAPI document", async () => {
     const document = await json<{ paths: Record<string, unknown> }>(
       getOpenApi(),

@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 
 import { DomainError } from "@/src/shared-kernel/domain-error";
+import { xlsxUnpacksWithin } from "@/src/shared-kernel/xlsx-guard";
 
 import {
   UNIT_IMPORT_COLUMNS,
@@ -9,6 +10,7 @@ import {
   type UnitSampleRow,
   type UnitSheetRow,
 } from "../application/unit-import";
+import { SALES_LIMITS } from "../domain/sales-terms";
 
 /**
  * The unit import sample and its reader (CM-1005, ADR CM-0022 §8), like
@@ -119,6 +121,12 @@ export async function readUnitSheet(
     bytes[3] !== 0x04
   )
     throw fileInvalid("Upload the Excel (.xlsx) sample sheet.");
+  // Refuse a workbook that would unpack to more than any sheet needs
+  // before the parser inflates it.
+  if (!xlsxUnpacksWithin(bytes))
+    throw fileInvalid(
+      "This workbook is too large to import. Download the sample and fill it in.",
+    );
   const workbook = new ExcelJS.Workbook();
   try {
     await workbook.xlsx.load(Uint8Array.from(bytes).buffer);
@@ -152,7 +160,14 @@ export async function readUnitSheet(
       if (!empty) blank = false;
       cells[key] = empty ? null : value;
     }
-    if (!blank) rows.push({ row: rowNumber, cells });
+    if (blank) return;
+    // Stop at the limit rather than holding every row of a huge sheet.
+    if (rows.length >= SALES_LIMITS.unitImportRows)
+      throw new DomainError(
+        "IMPORT_TOO_MANY",
+        `Import at most ${SALES_LIMITS.unitImportRows.toLocaleString("en-IN")} rows at a time.`,
+      );
+    rows.push({ row: rowNumber, cells });
   });
   return rows;
 }

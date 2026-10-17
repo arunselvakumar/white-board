@@ -34,7 +34,7 @@ import type {
 import type { SalesTx, SalesUnitFacts } from "./ports";
 import {
   BOOKING_MENU,
-  cancelExpiredHold,
+  releaseExpiredHold,
   type SalesBookingDeps,
 } from "./sales-booking-deps";
 
@@ -198,8 +198,14 @@ export class BookingHandlers {
       await bookings.active(tx, workspaceId, projectId, [unit.id])
     ).get(unit.id);
     if (active != null) {
-      if (!isHoldExpired(active, input.today)) throw unitBooked(active.id);
-      await cancelExpiredHold(this.deps, tx, active, input.today, at);
+      const holding = await releaseExpiredHold(
+        this.deps,
+        tx,
+        active,
+        input.today,
+        at,
+      );
+      if (holding != null) throw unitBooked(holding.id);
     }
     const id = newId(at.getTime());
     const confirmedOn =
