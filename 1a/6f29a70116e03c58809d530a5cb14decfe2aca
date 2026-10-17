@@ -1,0 +1,63 @@
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_415949558e694b::t_e315fe28189132 1-36
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/route.ts
+  s_415949558e694b::t_299c5c329e1255 1-52
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_415949558e694b::t_eab831c4fd3aed 1-31
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/route.ts
+  s_415949558e694b::t_d2ba0cd3af5094 1-78
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/app/route.ts
+  s_415949558e694b::t_18f1b914405c15 1-6
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_415949558e694b::t_ba2c08f4b0c68f 1-6
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/route.ts
+  s_415949558e694b::t_66302b5496d4ba 1-9
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_415949558e694b::t_a7c6b66324a6b0 1-6
+apps/construction-management/app/api/construction/sales/documents/document-test-fixtures.ts
+  s_415949558e694b::t_03651bbf6d46c2 1-113
+apps/construction-management/app/api/construction/sales/documents/documents-openapi.ts
+  s_415949558e694b::t_0b62c81b63700e 1-168
+apps/construction-management/app/api/construction/sales/documents/handlers.ts
+  s_415949558e694b::t_8563acc81deed4 1-207
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_eb6a337e0621e5 7-10,60-61,139
+apps/construction-management/src/sales/infrastructure/document-files-factory.ts
+  s_415949558e694b::t_0c563f5e585c24 1-48
+apps/construction-management/src/sales/infrastructure/document-locator.ts
+  s_415949558e694b::t_b919c5bfbf83f7 1-92
+apps/construction-management/app/api/construction/sales/documents/document-models.ts
+  s_3e202948d44f95::t_c336ac46993666 1-134
+apps/construction-management/app/api/construction/sales/documents/documents.http.test.ts
+  s_3e202948d44f95::t_cef5107efcc4cb 1-226
+apps/construction-management/src/sales/application/document-files.ts
+  s_3e202948d44f95::t_d444eac2a5aa8b 1-579
+apps/construction-management/src/sales/domain/document-files.ts
+  s_3e202948d44f95::t_bbca62ef64cebf 1-175
+apps/construction-management/src/sales/infrastructure/document-files-store.ts
+  s_3e202948d44f95::t_604e8c7edfe6c4 1-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1a6f29a70116e03c58809d530a5cb14decfe2aca",
+  "prompts": {},
+  "sessions": {
+    "s_3e202948d44f95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aff499469bc4571e8",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
