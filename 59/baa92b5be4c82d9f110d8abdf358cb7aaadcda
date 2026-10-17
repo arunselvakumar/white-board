@@ -1,0 +1,23 @@
+apps/construction-management/docs/04-gaps-and-roadmap.md
+  s_415949558e694b::t_65b3d416aa2958 81
+apps/construction-management/docs/prd/milestone-kickoff-prompt.md
+  s_415949558e694b::t_06bd782ec32d65 39-53
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_0230af39629d4c 5,11,28,61,896,904,1066,1068-1076
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "59baa92b5be4c82d9f110d8abdf358cb7aaadcda",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
