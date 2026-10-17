@@ -1,0 +1,273 @@
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/delete/route.ts
+  s_415949558e694b::t_cbc616cd7c191d 1-36
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/route.ts
+  s_415949558e694b::t_8011336b5e014c 1-52
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/thumbnail/route.ts
+  s_415949558e694b::t_c1afa47c46c657 1-31
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/route.ts
+  s_415949558e694b::t_ba2e003546e7b7 1-78
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/app/route.ts
+  s_415949558e694b::t_cde8c3053aae18 1-6
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/presign/route.ts
+  s_415949558e694b::t_e97f72d63233d0 1-6
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/route.ts
+  s_415949558e694b::t_7a994b5cee6a33 1-9
+apps/construction-management/app/api/construction/sales/documents/[type]/[id]/files/uploads/thumbnail/route.ts
+  s_415949558e694b::t_eca03a00417b8c 1-6
+apps/construction-management/app/api/construction/sales/documents/document-models.ts
+  s_415949558e694b::t_322deabc2a3bb4 1-134
+apps/construction-management/app/api/construction/sales/documents/document-test-fixtures.ts
+  s_415949558e694b::t_27cba83ed83a23 1-113
+apps/construction-management/app/api/construction/sales/documents/documents-openapi.ts
+  s_415949558e694b::t_7b573808235381 1-168
+apps/construction-management/app/api/construction/sales/documents/documents.http.test.ts
+  s_415949558e694b::t_f363c65605691a 1-226
+apps/construction-management/app/api/construction/sales/documents/handlers.ts
+  s_415949558e694b::t_9d59ab2f039199 1-207
+apps/construction-management/app/api/construction/sales/inquiries/[id]/activity/route.ts
+  s_415949558e694b::t_578c7367c68078 1-33
+apps/construction-management/app/api/construction/sales/inquiries/[id]/delete/route.ts
+  s_415949558e694b::t_b1b31a723152e0 1-46
+apps/construction-management/app/api/construction/sales/inquiries/[id]/follow-ups/[followUpId]/delete/route.ts
+  s_415949558e694b::t_913d3e32e362c6 1-33
+apps/construction-management/app/api/construction/sales/inquiries/[id]/follow-ups/route.ts
+  s_415949558e694b::t_3294613b8b06ea 1-56
+apps/construction-management/app/api/construction/sales/inquiries/[id]/route.ts
+  s_415949558e694b::t_ed38994c294c84 1-35
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/delete/route.ts
+  s_415949558e694b::t_ca35c811623278 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/done/route.ts
+  s_415949558e694b::t_484186782564e1 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/reopen/route.ts
+  s_415949558e694b::t_f22f4080be8b3a 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/[taskId]/update/route.ts
+  s_415949558e694b::t_cf1326df40f665 1-6
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/route.ts
+  s_415949558e694b::t_8e80ff14d126a6 1-76
+apps/construction-management/app/api/construction/sales/inquiries/[id]/tasks/task-routes.ts
+  s_415949558e694b::t_4913399659249b 1-86
+apps/construction-management/app/api/construction/sales/inquiries/[id]/update/route.ts
+  s_415949558e694b::t_4baf53901ec5cb 1-51
+apps/construction-management/app/api/construction/sales/inquiries/activity-models.ts
+  s_415949558e694b::t_6ce449bbc97bfa 1-231
+apps/construction-management/app/api/construction/sales/inquiries/follow-ups.http.test.ts
+  s_415949558e694b::t_99a04f4c5d35bb 1-504
+apps/construction-management/app/api/construction/sales/inquiries/form-options/route.ts
+  s_415949558e694b::t_5fa8c2d5647685 1-36
+apps/construction-management/app/api/construction/sales/inquiries/handlers.ts
+  s_415949558e694b::t_32395c0a129c32 1-28
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_7338fbd561a128 1-2,7-57,60-83,85-255
+apps/construction-management/app/api/construction/sales/inquiries/inquiries.http.test.ts
+  s_415949558e694b::t_a6f09c04d58ae0 1-752
+apps/construction-management/app/api/construction/sales/inquiries/inquiry-models.ts
+  s_415949558e694b::t_02a67886a1d9dc 1-369
+apps/construction-management/app/api/construction/sales/inquiries/route.ts
+  s_415949558e694b::t_394ebf51a38084 1-111
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/delete/route.ts
+  s_415949558e694b::t_9ceb0096d6f0f9 1-6
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/move/route.ts
+  s_415949558e694b::t_83bd5d288f5c89 1-9
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/update/route.ts
+  s_415949558e694b::t_e26f3d1665c11f 1-6
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/route.ts
+  s_415949558e694b::t_d259b06a4c5aae 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/delete/route.ts
+  s_415949558e694b::t_afbd2508a31d49 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/disable/route.ts
+  s_415949558e694b::t_c9ac08c474ebdc 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/enable/route.ts
+  s_415949558e694b::t_59c5f64443334e 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/update/route.ts
+  s_415949558e694b::t_3048671773e012 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/route.ts
+  s_415949558e694b::t_4dc42737a247b9 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/delete/route.ts
+  s_415949558e694b::t_1f553359b61ce5 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/disable/route.ts
+  s_415949558e694b::t_e72523b8d9cf41 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/enable/route.ts
+  s_415949558e694b::t_0da3a58870198f 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/update/route.ts
+  s_415949558e694b::t_646dd614ede631 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/route.ts
+  s_415949558e694b::t_6a67be08a79e5c 1-6
+apps/construction-management/app/api/construction/sales/settings/route.ts
+  s_415949558e694b::t_fe64283876cb7f 1-38
+apps/construction-management/app/api/construction/sales/settings/settings-models.ts
+  s_415949558e694b::t_8a18fd95785428 1-136
+apps/construction-management/app/api/construction/sales/settings/settings-openapi.ts
+  s_415949558e694b::t_2f1a883f2057a6 1-2,8-35,37-131,133-164
+apps/construction-management/app/api/construction/sales/settings/settings-routes.ts
+  s_415949558e694b::t_8c8b6f2a423d32 1-166
+apps/construction-management/app/api/construction/sales/settings/settings.http.test.ts
+  s_415949558e694b::t_ab4af5def831fb 1-479
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/edit/page.tsx
+  s_415949558e694b::t_9fe3e7d1310d90 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/page.tsx
+  s_415949558e694b::t_f33a67ad7f7c3c 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/new/page.tsx
+  s_415949558e694b::t_25b33282a58825 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/page.tsx
+  s_415949558e694b::t_80d367a251174f 1-25
+apps/construction-management/app/app/projects/[id]/inquiries/page.tsx
+  s_415949558e694b::t_1eba87884398ff 1-13
+apps/construction-management/app/app/projects/[id]/inquiries/settings/page.tsx
+  s_415949558e694b::t_9a9eb234934c31 1-19
+apps/construction-management/components/app-shell/project-nav-menu.stories.tsx
+  s_415949558e694b::t_3efdbc0f9d1a32 133
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_415949558e694b::t_0470c380172f7d 34-35,204-206,273-284
+apps/construction-management/components/sales/documents/sales-document-files.stories.tsx
+  s_415949558e694b::t_b7019ac3e63aeb 1-119
+apps/construction-management/components/sales/documents/sales-document-files.tsx
+  s_415949558e694b::t_749aea7ce1143a 1-394
+apps/construction-management/components/sales/documents/sales-document-fixtures.ts
+  s_415949558e694b::t_5eb95373492b0b 1-128
+apps/construction-management/components/sales/documents/sales-pending-files-field.stories.tsx
+  s_415949558e694b::t_eed8fb49706856 1-175
+apps/construction-management/components/sales/documents/sales-pending-files-field.tsx
+  s_415949558e694b::t_1b025b5c5febf7 1-214
+apps/construction-management/components/sales/documents/use-upload-pending-sales-files.ts
+  s_415949558e694b::t_11aabea9b4c74c 1-73
+apps/construction-management/components/sales/inquiries/inquiries-list.stories.tsx
+  s_415949558e694b::t_8b4f2a9b89a570 1-176
+apps/construction-management/components/sales/inquiries/inquiries-list.tsx
+  s_415949558e694b::t_bed3d5fd55491d 1-500
+apps/construction-management/components/sales/inquiries/inquiry-activity.stories.tsx
+  s_415949558e694b::t_1e1e985288e1bc 1-115
+apps/construction-management/components/sales/inquiries/inquiry-activity.tsx
+  s_415949558e694b::t_155b5474661994 1-201
+apps/construction-management/components/sales/inquiries/inquiry-detail.stories.tsx
+  s_415949558e694b::t_6e4c431d905c47 1-112
+apps/construction-management/components/sales/inquiries/inquiry-detail.tsx
+  s_415949558e694b::t_b3679a0c480d6a 1-239
+apps/construction-management/components/sales/inquiries/inquiry-duplicate-prompt.tsx
+  s_415949558e694b::t_fd682f6da349d3 1-91
+apps/construction-management/components/sales/inquiries/inquiry-fixtures.ts
+  s_415949558e694b::t_c411bd5eb6154e 1-505
+apps/construction-management/components/sales/inquiries/inquiry-follow-up-dialog.stories.tsx
+  s_415949558e694b::t_5d9177a101f315 1-136
+apps/construction-management/components/sales/inquiries/inquiry-follow-up-dialog.tsx
+  s_415949558e694b::t_d0b088d9458a81 1-313
+apps/construction-management/components/sales/inquiries/inquiry-form.stories.tsx
+  s_415949558e694b::t_28acc5133233bb 1-245
+apps/construction-management/components/sales/inquiries/inquiry-form.tsx
+  s_415949558e694b::t_6d44d76af388a1 1-592
+apps/construction-management/components/sales/inquiries/inquiry-nav.ts
+  s_415949558e694b::t_b2f0131a5be12b 1-22
+apps/construction-management/components/sales/inquiries/inquiry-pages.tsx
+  s_415949558e694b::t_43b4236dd453ad 1-51
+apps/construction-management/components/sales/inquiries/inquiry-parts.tsx
+  s_415949558e694b::t_d776de88dcaba5 1-148
+apps/construction-management/components/sales/inquiries/inquiry-quick-add-dialog.stories.tsx
+  s_415949558e694b::t_edc8222bbf7e5e 1-120
+apps/construction-management/components/sales/inquiries/inquiry-quick-add-dialog.tsx
+  s_415949558e694b::t_886a2fcfe35194 1-321
+apps/construction-management/components/sales/inquiries/inquiry-select.tsx
+  s_415949558e694b::t_3dd778d1caabde 1-77
+apps/construction-management/components/sales/inquiries/inquiry-tabs.ts
+  s_415949558e694b::t_4d35055bc47068 1-18
+apps/construction-management/components/sales/inquiries/inquiry-task-dialog.tsx
+  s_415949558e694b::t_d11d49f59dc281 1-190
+apps/construction-management/components/sales/inquiries/inquiry-tasks-panel.stories.tsx
+  s_415949558e694b::t_82b55a6a0fa206 1-130
+apps/construction-management/components/sales/inquiries/inquiry-tasks-panel.tsx
+  s_415949558e694b::t_ac76ee6524516e 1-246
+apps/construction-management/components/sales/settings/sales-list-dialog.stories.tsx
+  s_415949558e694b::t_dfd0634f1018ea 1-75
+apps/construction-management/components/sales/settings/sales-list-dialog.tsx
+  s_415949558e694b::t_a04be5f817547c 1-162
+apps/construction-management/components/sales/settings/sales-settings-fixtures.ts
+  s_415949558e694b::t_a962db5bb7b301 1-223
+apps/construction-management/components/sales/settings/sales-settings.stories.tsx
+  s_415949558e694b::t_d03de4e411c5b4 1-274
+apps/construction-management/components/sales/settings/sales-settings.tsx
+  s_415949558e694b::t_e94c794d5454ab 1-498
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_415949558e694b::t_59849f0067538d 531-546
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_4a8782e5a5e54b 1064-1066
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_415949558e694b::t_edc4ad7f7bcc1e 45-47,69-70
+apps/construction-management/src/composition/messaging.ts
+  s_415949558e694b::t_d3d2f55bb60314 6-7,16-18,46-52,348-425
+apps/construction-management/src/composition/queue.ts
+  s_415949558e694b::t_04b28d14a42d6c 30-31,57-58,79-80
+apps/construction-management/src/composition/sales-inquiries.ts
+  s_415949558e694b::t_f2cbec96d075f2 1-58
+apps/construction-management/src/composition/sales-settings.ts
+  s_415949558e694b::t_54408d8134a11d 1-15
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_415949558e694b::t_b409d995469f6f 173-182
+apps/construction-management/src/messaging/application/listeners.ts
+  s_415949558e694b::t_42aa2b8a67a62d 36-37,168-170,812-853
+apps/construction-management/src/messaging/application/maintenance.ts
+  s_415949558e694b::t_451fbd2406fdb1 8-9,91-164
+apps/construction-management/src/messaging/application/ports.ts
+  s_415949558e694b::t_de16aecf83c239 193-212
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_415949558e694b::t_46da31e25b0aec 72-74,238-242
+apps/construction-management/src/queries/sales-documents.ts
+  s_415949558e694b::t_c6241d258a5ac7 1-142
+apps/construction-management/src/queries/sales-inquiries.ts
+  s_415949558e694b::t_62b95a60a45a01 1-264
+apps/construction-management/src/queries/sales-settings.ts
+  s_415949558e694b::t_f0f47a341ce754 1-123
+apps/construction-management/src/sales/application/document-files.ts
+  s_415949558e694b::t_e1093027b1f370 1-579
+apps/construction-management/src/sales/application/inquiry-activity-handlers.ts
+  s_415949558e694b::t_7f3ee939e315c7 1-695
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_415949558e694b::t_4256dd6d14ca1b 1-1059
+apps/construction-management/src/sales/application/sales-settings-handlers.ts
+  s_415949558e694b::t_1435f7f26e7564 1-473
+apps/construction-management/src/sales/domain/document-files.ts
+  s_415949558e694b::t_30d3be9c42c6b3 1-175
+apps/construction-management/src/sales/domain/follow-up.test.ts
+  s_415949558e694b::t_bcc454f234e4af 1-84
+apps/construction-management/src/sales/domain/follow-up.ts
+  s_415949558e694b::t_581d90b9b389ff 1-149
+apps/construction-management/src/sales/domain/inquiry-events.ts
+  s_415949558e694b::t_1674befee7f539 1-20
+apps/construction-management/src/sales/domain/inquiry.test.ts
+  s_415949558e694b::t_46cecd4e4c2627 1-107
+apps/construction-management/src/sales/domain/inquiry.ts
+  s_415949558e694b::t_affd7ffe1e006e 1-311
+apps/construction-management/src/sales/domain/sales-lists.test.ts
+  s_415949558e694b::t_8e4a1be775039e 1-31
+apps/construction-management/src/sales/domain/sales-lists.ts
+  s_415949558e694b::t_56bd34c15f26f0 1-143
+apps/construction-management/src/sales/domain/sales-time.ts
+  s_415949558e694b::t_205e5f847d740f 1-145
+apps/construction-management/src/sales/infrastructure/document-files-factory.ts
+  s_415949558e694b::t_11ddef3217e901 1-48
+apps/construction-management/src/sales/infrastructure/document-files-store.ts
+  s_415949558e694b::t_8c52e769d23348 1-196
+apps/construction-management/src/sales/infrastructure/document-locator.ts
+  s_415949558e694b::t_c066d3415c8b5e 1-92
+apps/construction-management/src/sales/infrastructure/inquiry-activity-store.ts
+  s_415949558e694b::t_1492c5b12cc06b 1-171
+apps/construction-management/src/sales/infrastructure/inquiry-store.ts
+  s_415949558e694b::t_4eac2b2a812f2e 1-397
+apps/construction-management/src/sales/infrastructure/sales-list-store.ts
+  s_415949558e694b::t_5e029b6608f928 1-290
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_34717da131123e 176-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ffd8be94d14b4f9ca3fa9e1c1b3d84d9cc3274bd",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
