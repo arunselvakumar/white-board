@@ -1,0 +1,31 @@
+apps/construction-management/src/sales/infrastructure/seeds/project-sales.json
+  s_415949558e694b::t_7925c7e0ae7df8 1-19
+packages/db/construction/prisma/migrations/20261017090000_construction_sales/migration.sql
+  s_415949558e694b::t_13603ccb4707a3 1-379
+packages/db/construction/prisma/migrations/20261017090100_construction_reporting_sales_kinds/migration.sql
+  s_415949558e694b::t_72329a719a3e7c 1-5
+packages/db/construction/prisma/migrations/20261017090200_construction_sales_project_seeds/migration.sql
+  s_415949558e694b::t_5e2c88583b0650 1-62
+packages/db/construction/prisma/schema/base.prisma
+  s_415949558e694b::t_5a2d5b0a9e72ed 13
+packages/db/construction/prisma/schema/construction-reporting.prisma
+  s_415949558e694b::t_f23832305a4d8b 40-42
+packages/db/construction/prisma/schema/construction-sales.prisma
+  s_415949558e694b::t_6c1c755cd23013 1-432
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "733a39f50b578fc4a06ac1f87e881f56a693cf1d",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
