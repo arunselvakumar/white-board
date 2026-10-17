@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/sales/access/access.http.test.ts
+  s_415949558e694b::t_26fbdcdb9dd9d5 132-137
+apps/construction-management/app/api/construction/sales/access/route.ts
+  s_415949558e694b::t_f7f79f69ec3570 30-31
+apps/construction-management/components/sales/units/unit-dialogs.tsx
+  s_415949558e694b::t_4c724d8fd7d0b2 283-284
+apps/construction-management/src/sales/application/booking-handlers.ts
+  s_415949558e694b::t_f9a2e2e7a5aa16 37,201-208
+apps/construction-management/src/sales/application/release-expired-hold.test.ts
+  s_415949558e694b::t_6db418748dae2b 1-78
+apps/construction-management/src/sales/application/sales-booking-deps.ts
+  s_415949558e694b::t_218265165885f1 7,88-108
+apps/construction-management/src/sales/application/unit-sales-handlers.ts
+  s_415949558e694b::t_fb15ef37244a0c 33,464-471
+apps/construction-management/src/sales/infrastructure/unit-workbook.ts
+  s_415949558e694b::t_b26d8251801b00 4,13,124-129,163-170
+apps/construction-management/src/shared-kernel/xlsx-guard.test.ts
+  s_415949558e694b::t_c9bea25ac80278 1-33
+apps/construction-management/src/shared-kernel/xlsx-guard.ts
+  s_415949558e694b::t_7c1167187b165a 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "909f754cf285b8b51fd426605e9453cc95769530",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
