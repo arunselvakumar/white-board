@@ -1,9 +1,11 @@
 import type { MemberAccess } from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
+import type { ProjectCreated } from "../domain/events";
 import {
   Project,
   compareProjects,
@@ -21,6 +23,8 @@ import {
   type ProjectReadModel,
   type ProjectStatusCounts,
 } from "./project-read-model";
+
+const NO_EVENTS: EventDispatcher = { dispatch: () => Promise.resolve() };
 
 /** Who is looking: the Owner sees every Project, a Member only theirs. */
 export type ProjectViewer = Pick<
@@ -111,6 +115,7 @@ export class ProjectHandlers {
     private readonly usage: ProjectUsage,
     private readonly labels: ProjectCustomFieldLabels,
     private readonly clock: () => Date = () => new Date(),
+    private readonly events: EventDispatcher = NO_EVENTS,
   ) {}
 
   private load(viewer: ProjectViewer, id: string): Promise<Project> {
@@ -173,7 +178,8 @@ export class ProjectHandlers {
   }
 
   /**
-   * New Project with its seed drawing albums and testing items; 400
+   * New Project with its seed drawing albums and testing items, then
+   * `ProjectCreated` for the other contexts' seeds (CM-0022 §2); 400
    * `PROJECT_TYPE_REQUIRED` without a type, 402 `PLAN_LIMIT_EXCEEDED`
    * beyond the plan (CM-118). `financial`: whether the caller may set the
    * order value and the budget.
@@ -197,6 +203,14 @@ export class ProjectHandlers {
       project,
       this.audit(project, input.by, "project.created"),
     );
+    const created: ProjectCreated = {
+      type: "ProjectCreated",
+      workspaceId: project.workspaceId,
+      occurredAt: now,
+      projectId: project.id,
+      createdBy: input.by,
+    };
+    await this.events.dispatch([created]);
     return toProjectReadModel(project);
   }
 

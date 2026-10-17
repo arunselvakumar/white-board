@@ -43,6 +43,7 @@ describe("projectNavGroups", () => {
       ],
       ["Materials & money", ["Materials", "Payments"]],
       ["Quality", ["Issues & Snags", "Inspections", "Testing Reports"]],
+      ["Sales", ["Inquiries", "Bookings"]],
       ["Files", ["Drawings", "Documents", "Gallery"]],
       ["Reports", ["Progress Reports", "Reports"]],
     ]);
@@ -51,6 +52,8 @@ describe("projectNavGroups", () => {
       "Setup",
       ["Locations", "Amenities", "Resources"],
     ]);
+    // A Project without Wings has nothing to book (CM-0022 §1).
+    expect(labels(locations)).toContainEqual(["Sales", ["Inquiries"]]);
   });
 
   it("shows the member's modules under fixed headings, not in tile order", () => {

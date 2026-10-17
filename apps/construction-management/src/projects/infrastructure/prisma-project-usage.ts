@@ -11,6 +11,8 @@ import type { ProjectUsage } from "../domain/project-repository";
  * leave their files in storage with nothing to show them. So do its live
  * Wings and Locations, drawings and testing reports (M4, ADR CM-0013 §13);
  * the seed albums and testing items, empty or not, do not by themselves.
+ * Live inquiries and bookings count too (M10, ADR CM-0022 §7); the seeded
+ * Funnel Stages, Lead Sources and Lost Reasons do not.
  */
 export class PrismaProjectUsage implements ProjectUsage {
   constructor(private readonly db: PrismaClient) {}
@@ -75,6 +77,18 @@ export class PrismaProjectUsage implements ProjectUsage {
         )
         OR EXISTS (
           SELECT 1 FROM construction_projects.testing_reports
+          WHERE workspace_id = ${workspaceId}
+            AND project_id = ${projectId}::uuid
+            AND deleted_at IS NULL
+        )
+        OR EXISTS (
+          SELECT 1 FROM construction_sales.inquiries
+          WHERE workspace_id = ${workspaceId}
+            AND project_id = ${projectId}::uuid
+            AND deleted_at IS NULL
+        )
+        OR EXISTS (
+          SELECT 1 FROM construction_sales.bookings
           WHERE workspace_id = ${workspaceId}
             AND project_id = ${projectId}::uuid
             AND deleted_at IS NULL

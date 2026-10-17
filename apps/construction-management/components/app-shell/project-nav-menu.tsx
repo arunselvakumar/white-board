@@ -29,6 +29,8 @@ import { useMaterialsNavLinks } from "@/components/procurement/materials-hub/mat
 import { ProjectAvatar } from "@/components/projects/project-avatar";
 import { PROJECT_MODULE_ICONS } from "@/components/projects/project-module-icons";
 import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
+// Sales (CM-1006)
+import { bookingsNavLinks } from "@/components/sales/bookings/bookings-nav";
 import {
   activeProjectSegment,
   projectBasePath,
@@ -194,6 +196,9 @@ function ProjectNavEntry(props: EntryProps) {
       return <MaterialsEntry {...props} />;
     case "equipment_usage":
       return <EquipmentEntry {...props} />;
+    // Sales (CM-1006)
+    case "bookings":
+      return <BookingsEntry {...props} />;
     default:
       return <ProjectNavItem {...props} />;
   }
@@ -339,5 +344,20 @@ function ProjectNavItem({
         </CollapsibleContent>
       </Collapsible>
     </SidebarMenuItem>
+  );
+}
+
+// Sales (CM-1006): Bookings → Units, Bookings.
+function BookingsEntry(props: EntryProps) {
+  const [open, setOpen] = useSubmenuOpen(props.active);
+  return (
+    <ProjectNavItem
+      {...props}
+      submenu={{
+        open,
+        onOpenChange: setOpen,
+        links: bookingsNavLinks(props.projectId),
+      }}
+    />
   );
 }

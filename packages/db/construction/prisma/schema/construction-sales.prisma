@@ -1,0 +1,432 @@
+/// Construction Management — sales context (`modules/09`, ADR CM-0022):
+/// per-Project Funnel Stages, Lead Sources and Lost Reasons; Inquiries with
+/// their history, follow-ups, tasks and files; a sales profile per Unit; and
+/// Bookings on Units with their status history and files.
+///
+/// Conventions:
+/// - Projects, Wings, Units and Team Members live in other schemas: their ids
+///   are kept without foreign keys. `*_member_id` columns are Team Member
+///   ids; `created_by` / `updated_by` / `deleted_by` are user ids, as in
+///   every other context.
+/// - Every table has `workspace_id`, so the Company purge finds it (CM-907).
+/// - Rows are soft-deleted (`deleted_at`); unique rules hold among live rows
+///   through partial indexes in the migration, including "one active
+///   booking per unit" (CM-0022 §7).
+/// - Mobile numbers are stored normalised (`+91…`, CM-0022 §3); emails in
+///   the case typed, compared ignoring case.
+/// - No money: legacy had no unit price and Booking has no Financial flag
+///   (CM-0022 §7).
+
+enum ConstructionSalesInterestType {
+  hot
+  warm
+  cold
+
+  @@map("interest_type")
+  @@schema("construction_sales")
+}
+
+/// Stored inquiry states (CM-0022 §3, §6). "Overdue" is `open` with the next
+/// follow-up before now and is derived.
+enum ConstructionSalesInquiryStatus {
+  open
+  converted
+  lost
+
+  @@map("inquiry_status")
+  @@schema("construction_sales")
+}
+
+/// What happened to an inquiry, for its history (CM-0022 §3).
+enum ConstructionSalesInquiryEventType {
+  created
+  assigned
+  lead_owner_changed
+  stage_moved
+  converted
+  lost
+  reopened
+
+  @@map("inquiry_event_type")
+  @@schema("construction_sales")
+}
+
+/// A follow-up's activity (CM-0022 §4). Call Activity counts `call`.
+enum ConstructionSalesFollowUpActivity {
+  call
+  site_visit
+  meeting
+  whatsapp
+  email
+  other
+
+  @@map("follow_up_activity")
+  @@schema("construction_sales")
+}
+
+enum ConstructionSalesInquiryTaskStatus {
+  open
+  done
+
+  @@map("inquiry_task_status")
+  @@schema("construction_sales")
+}
+
+/// Why a unit is not for sale (CM-0022 §8).
+enum ConstructionSalesUnavailableReason {
+  landowner_share
+  reserved
+  not_for_sale
+  other
+
+  @@map("unavailable_reason")
+  @@schema("construction_sales")
+}
+
+enum ConstructionSalesAreaUnit {
+  sq_ft
+  sq_m
+
+  @@map("area_unit")
+  @@schema("construction_sales")
+}
+
+/// Stored booking states (CM-0022 §7). "Available" is a unit's sales status
+/// with no active booking; "Hold expired" is `on_hold` past `hold_until`.
+enum ConstructionSalesBookingStatus {
+  on_hold
+  booked
+  cancelled
+
+  @@map("booking_status")
+  @@schema("construction_sales")
+}
+
+/// The documents that carry files (CM-0022 §3, §7).
+enum ConstructionSalesDocumentType {
+  inquiry
+  booking
+
+  @@map("document_type")
+  @@schema("construction_sales")
+}
+
+/// A file's role on its document.
+enum ConstructionSalesFileRole {
+  visiting_card
+  booking_form
+  photo
+
+  @@map("file_role")
+  @@schema("construction_sales")
+}
+
+// ---------------------------------------------------------------------------
+// Per-Project lists (CM-1002, CM-0022 §2). Seeded on `ProjectCreated`.
+// ---------------------------------------------------------------------------
+
+model ConstructionSalesFunnelStage {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  /// Funnel and list order; renumbered 1…n on every move.
+  sortOrder   Int       @map("sort_order")
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId, projectId, sortOrder])
+  @@map("funnel_stages")
+  @@schema("construction_sales")
+}
+
+model ConstructionSalesLeadSource {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  /// Disabled sources leave the pickers; old inquiries keep them.
+  isActive    Boolean   @default(true) @map("is_active")
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId, projectId])
+  @@map("lead_sources")
+  @@schema("construction_sales")
+}
+
+model ConstructionSalesLostReason {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  name        String
+  isActive    Boolean   @default(true) @map("is_active")
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId, projectId])
+  @@map("lost_reasons")
+  @@schema("construction_sales")
+}
+
+// ---------------------------------------------------------------------------
+// Inquiries (CM-1003, CM-1004, CM-1007; CM-0022 §3–§6).
+// ---------------------------------------------------------------------------
+
+model ConstructionSalesInquiry {
+  id                  String                         @id @db.Uuid
+  workspaceId         String                         @map("workspace_id")
+  projectId           String                         @map("project_id") @db.Uuid
+  inquiryDate         DateTime                       @map("inquiry_date") @db.Date
+  name                String
+  /// Normalised: `+91XXXXXXXXXX` or `+` and 8–15 digits (CM-0022 §3).
+  mobile              String?
+  email               String?
+  address             String?
+  occupation          String?
+  interestType        ConstructionSalesInterestType? @map("interest_type")
+  /// "Interested In": a Wing of the Project and/or a unit type in words.
+  interestedWingId    String?                        @map("interested_wing_id") @db.Uuid
+  interestedUnitType  String?                        @map("interested_unit_type")
+  leadSourceId        String?                        @map("lead_source_id") @db.Uuid
+  /// The stage while Open; kept as it was when closed.
+  funnelStageId       String?                        @map("funnel_stage_id") @db.Uuid
+  status              ConstructionSalesInquiryStatus @default(open)
+  /// The next follow-up; `next_follow_up_has_time` says whether the time
+  /// part was given (otherwise the date counts as the whole day).
+  nextFollowUpAt      DateTime?                      @map("next_follow_up_at") @db.Timestamptz(3)
+  nextFollowUpHasTime Boolean                        @default(false) @map("next_follow_up_has_time")
+  assigneeMemberId    String?                        @map("assignee_member_id") @db.Uuid
+  leadOwnerMemberId   String?                        @map("lead_owner_member_id") @db.Uuid
+  remarks             String?
+  /// Set while Converted (CM-0022 §6).
+  convertedUnitId     String?                        @map("converted_unit_id") @db.Uuid
+  convertedBookingId  String?                        @map("converted_booking_id") @db.Uuid
+  /// Set while Lost.
+  lostReasonId        String?                        @map("lost_reason_id") @db.Uuid
+  lostRemarks         String?                        @map("lost_remarks")
+  closedAt            DateTime?                      @map("closed_at") @db.Timestamptz(3)
+  closedBy            String?                        @map("closed_by")
+  createdAt           DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime                       @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy           String                         @map("created_by")
+  updatedBy           String                         @map("updated_by")
+  deletedAt           DateTime?                      @map("deleted_at") @db.Timestamptz(3)
+  deletedBy           String?                        @map("deleted_by")
+
+  events    ConstructionSalesInquiryEvent[]
+  followUps ConstructionSalesFollowUp[]
+  tasks     ConstructionSalesInquiryTask[]
+
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, projectId, inquiryDate])
+  @@index([workspaceId, projectId, status, nextFollowUpAt])
+  @@index([workspaceId, projectId, mobile])
+  @@index([workspaceId, assigneeMemberId])
+  @@map("inquiries")
+  @@schema("construction_sales")
+}
+
+/// Append-only history of an inquiry (CM-0022 §3). Follow-ups are their own
+/// table; the detail page merges both.
+model ConstructionSalesInquiryEvent {
+  id          String                            @id @db.Uuid
+  workspaceId String                            @map("workspace_id")
+  inquiryId   String                            @map("inquiry_id") @db.Uuid
+  type        ConstructionSalesInquiryEventType
+  /// e.g. `{ fromMemberId, toMemberId }`, `{ fromStageId, toStageId }`,
+  /// `{ unitId, bookingId }`, `{ lostReasonId, remarks }`.
+  details     Json?
+  occurredAt  DateTime                          @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  actorUserId String                            @map("actor_user_id")
+
+  inquiry ConstructionSalesInquiry @relation(fields: [inquiryId], references: [id])
+
+  @@index([workspaceId, inquiryId, occurredAt])
+  @@map("inquiry_events")
+  @@schema("construction_sales")
+}
+
+/// Append-only (CM-0022 §4); removed only by soft delete.
+model ConstructionSalesFollowUp {
+  id                  String                            @id @db.Uuid
+  workspaceId         String                            @map("workspace_id")
+  projectId           String                            @map("project_id") @db.Uuid
+  inquiryId           String                            @map("inquiry_id") @db.Uuid
+  activity            ConstructionSalesFollowUpActivity
+  doneAt              DateTime                          @map("done_at") @db.Timestamptz(3)
+  remarks             String?
+  fromStageId         String?                           @map("from_stage_id") @db.Uuid
+  toStageId           String?                           @map("to_stage_id") @db.Uuid
+  nextFollowUpAt      DateTime?                         @map("next_follow_up_at") @db.Timestamptz(3)
+  nextFollowUpHasTime Boolean                           @default(false) @map("next_follow_up_has_time")
+  /// The Team Member who did it (the creator's member id), for the team
+  /// performance figures.
+  memberId            String?                           @map("member_id") @db.Uuid
+  createdAt           DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy           String                            @map("created_by")
+  deletedAt           DateTime?                         @map("deleted_at") @db.Timestamptz(3)
+  deletedBy           String?                           @map("deleted_by")
+
+  inquiry ConstructionSalesInquiry @relation(fields: [inquiryId], references: [id])
+
+  @@index([workspaceId, inquiryId, doneAt])
+  @@index([workspaceId, projectId, doneAt])
+  @@map("follow_ups")
+  @@schema("construction_sales")
+}
+
+model ConstructionSalesInquiryTask {
+  id               String                             @id @db.Uuid
+  workspaceId      String                             @map("workspace_id")
+  inquiryId        String                             @map("inquiry_id") @db.Uuid
+  title            String
+  dueDate          DateTime?                          @map("due_date") @db.Date
+  assigneeMemberId String?                            @map("assignee_member_id") @db.Uuid
+  status           ConstructionSalesInquiryTaskStatus @default(open)
+  doneAt           DateTime?                          @map("done_at") @db.Timestamptz(3)
+  doneBy           String?                            @map("done_by")
+  createdAt        DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                             @map("created_by")
+  updatedBy        String                             @map("updated_by")
+  deletedAt        DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                            @map("deleted_by")
+
+  inquiry ConstructionSalesInquiry @relation(fields: [inquiryId], references: [id])
+
+  @@index([workspaceId, inquiryId])
+  @@map("inquiry_tasks")
+  @@schema("construction_sales")
+}
+
+// ---------------------------------------------------------------------------
+// Units and Bookings (CM-1005, CM-1006; CM-0022 §7, §8).
+// ---------------------------------------------------------------------------
+
+/// The sales details of one Unit of `construction_projects.units`. A unit
+/// without a row has no details and is not unavailable.
+model ConstructionSalesUnitProfile {
+  unitId            String                              @id @map("unit_id") @db.Uuid
+  workspaceId       String                              @map("workspace_id")
+  projectId         String                              @map("project_id") @db.Uuid
+  wingId            String                              @map("wing_id") @db.Uuid
+  unitType          String?                             @map("unit_type")
+  carpetArea        Decimal?                            @map("carpet_area") @db.Decimal(12, 2)
+  builtUpArea       Decimal?                            @map("built_up_area") @db.Decimal(12, 2)
+  superBuiltUpArea  Decimal?                            @map("super_built_up_area") @db.Decimal(12, 2)
+  areaUnit          ConstructionSalesAreaUnit           @default(sq_ft) @map("area_unit")
+  unavailable       Boolean                             @default(false)
+  unavailableReason ConstructionSalesUnavailableReason? @map("unavailable_reason")
+  unavailableNote   String?                             @map("unavailable_note")
+  createdAt         DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                              @map("created_by")
+  updatedBy         String                              @map("updated_by")
+
+  @@index([workspaceId, projectId, wingId])
+  @@map("unit_profiles")
+  @@schema("construction_sales")
+}
+
+model ConstructionSalesBooking {
+  id                String                         @id @db.Uuid
+  workspaceId       String                         @map("workspace_id")
+  projectId         String                         @map("project_id") @db.Uuid
+  wingId            String                         @map("wing_id") @db.Uuid
+  unitId            String                         @map("unit_id") @db.Uuid
+  status            ConstructionSalesBookingStatus
+  bookingDate       DateTime                       @map("booking_date") @db.Date
+  /// On Hold only; after it the unit counts as Available (CM-0022 §7).
+  holdUntil         DateTime?                      @map("hold_until") @db.Date
+  customerName      String                         @map("customer_name")
+  customerMobile    String?                        @map("customer_mobile")
+  customerEmail     String?                        @map("customer_email")
+  customerAddress   String?                        @map("customer_address")
+  referredByName    String?                        @map("referred_by_name")
+  referredByContact String?                        @map("referred_by_contact")
+  remarks           String?
+  /// Set when the booking came from closing an inquiry as Converted.
+  inquiryId         String?                        @map("inquiry_id") @db.Uuid
+  confirmedOn       DateTime?                      @map("confirmed_on") @db.Date
+  cancelledOn       DateTime?                      @map("cancelled_on") @db.Date
+  cancelReason      String?                        @map("cancel_reason")
+  createdAt         DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                       @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                         @map("created_by")
+  updatedBy         String                         @map("updated_by")
+  deletedAt         DateTime?                      @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                        @map("deleted_by")
+
+  events ConstructionSalesBookingEvent[]
+
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, projectId, bookingDate])
+  @@index([workspaceId, unitId])
+  @@index([workspaceId, wingId])
+  @@index([inquiryId])
+  @@map("bookings")
+  @@schema("construction_sales")
+}
+
+/// Every status a booking took, with date, who and reason (CM-0022 §7).
+model ConstructionSalesBookingEvent {
+  id          String                         @id @db.Uuid
+  workspaceId String                         @map("workspace_id")
+  bookingId   String                         @map("booking_id") @db.Uuid
+  status      ConstructionSalesBookingStatus
+  /// The business date of the change (booking, confirm or cancel date).
+  onDate      DateTime                       @map("on_date") @db.Date
+  holdUntil   DateTime?                      @map("hold_until") @db.Date
+  reason      String?
+  occurredAt  DateTime                       @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  /// A user id, or `system` for "Hold expired".
+  actorUserId String                         @map("actor_user_id")
+
+  booking ConstructionSalesBooking @relation(fields: [bookingId], references: [id])
+
+  @@index([workspaceId, bookingId, occurredAt])
+  @@map("booking_events")
+  @@schema("construction_sales")
+}
+
+// ---------------------------------------------------------------------------
+// Files (CM-0014). Personal data: not indexed in the Project Gallery.
+// ---------------------------------------------------------------------------
+
+model ConstructionSalesDocumentFile {
+  id           String                        @id @db.Uuid
+  workspaceId  String                        @map("workspace_id")
+  projectId    String                        @map("project_id") @db.Uuid
+  documentType ConstructionSalesDocumentType @map("document_type")
+  documentId   String                        @map("document_id") @db.Uuid
+  role         ConstructionSalesFileRole
+  fileKey      String                        @unique @map("file_key")
+  fileName     String                        @map("file_name")
+  contentType  String                        @map("content_type")
+  bytes        Int
+  thumbKey     String?                       @map("thumb_key")
+  createdAt    DateTime                      @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy    String                        @map("created_by")
+  deletedAt    DateTime?                     @map("deleted_at") @db.Timestamptz(3)
+  deletedBy    String?                       @map("deleted_by")
+
+  @@index([workspaceId, documentType, documentId, deletedAt])
+  @@map("document_files")
+  @@schema("construction_sales")
+}

@@ -22,6 +22,7 @@ export const PROJECT_NAV_GROUPS = [
   },
   { label: "Materials & money", keys: ["materials", "payments"] },
   { label: "Quality", keys: ["issues", "inspections", "testing_reports"] },
+  { label: "Sales", keys: ["inquiries", "bookings"] },
   { label: "Files", keys: ["drawings", "documents", "gallery"] },
   { label: "Reports", keys: ["progress_reports", "reports"] },
 ] as const satisfies readonly {

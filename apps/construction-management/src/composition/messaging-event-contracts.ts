@@ -6,6 +6,7 @@
  */
 import type {
   InboundBackupFinished,
+  InboundBookingEvent,
   InboundEquipmentFuelOverrun,
   InboundInspectionDecided,
   InboundInspectionRequested,
@@ -33,6 +34,7 @@ import type {
   ReportFinished,
 } from "@/src/reporting/domain/events";
 import type { EquipmentFuelOverrun } from "@/src/site-work/domain/events";
+import type { BookingEvent } from "@/src/sales/domain/booking-events";
 import type {
   InspectionDecided,
   InspectionRequested,
@@ -59,4 +61,6 @@ export type MessagingEventContracts = [
   Fits<SalaryPaid, InboundSalaryDecided>,
   Fits<ReportFinished, InboundReportFinished>,
   Fits<BackupFinished, InboundBackupFinished>,
+  // Sales (CM-1006)
+  Fits<BookingEvent, InboundBookingEvent>,
 ];

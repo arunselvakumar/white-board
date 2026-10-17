@@ -1,5 +1,7 @@
 import {
   Building2,
+  BookUser,
+  Handshake,
   BookOpenText,
   CalendarCheck,
   CircleAlert,
@@ -46,6 +48,8 @@ export const PROJECT_MODULE_ICONS: Record<ProjectModuleKey, LucideIcon> = {
   tasks: ListTodo,
   issues: CircleAlert,
   inspections: ClipboardCheck,
+  inquiries: BookUser,
+  bookings: Handshake,
   progress_reports: FileChartColumn,
   reports: FileBarChart,
 };
