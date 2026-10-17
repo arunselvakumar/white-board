@@ -1,0 +1,77 @@
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/delete/route.ts
+  s_415949558e694b::t_9c921b387265c5 1-6
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/move/route.ts
+  s_415949558e694b::t_8ecf266a41203c 1-9
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/[id]/update/route.ts
+  s_415949558e694b::t_974642d1f0bc7d 1-6
+apps/construction-management/app/api/construction/sales/settings/funnel-stages/route.ts
+  s_415949558e694b::t_2be8a0d42c3a94 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/delete/route.ts
+  s_415949558e694b::t_025e9a77b4628d 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/disable/route.ts
+  s_415949558e694b::t_2e9738c5c3ea81 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/enable/route.ts
+  s_415949558e694b::t_5d9d68b043b6d3 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/[id]/update/route.ts
+  s_415949558e694b::t_cb00b6e17a15d6 1-6
+apps/construction-management/app/api/construction/sales/settings/lead-sources/route.ts
+  s_415949558e694b::t_a713df97c5a28a 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/delete/route.ts
+  s_415949558e694b::t_8fc34d3d11c133 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/disable/route.ts
+  s_415949558e694b::t_c55503a1b6609a 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/enable/route.ts
+  s_415949558e694b::t_17596aee84c0e8 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/[id]/update/route.ts
+  s_415949558e694b::t_db7e54e21ab98e 1-6
+apps/construction-management/app/api/construction/sales/settings/lost-reasons/route.ts
+  s_415949558e694b::t_24659085f646cf 1-6
+apps/construction-management/app/api/construction/sales/settings/route.ts
+  s_415949558e694b::t_7d22e3e3c03033 1-38
+apps/construction-management/app/api/construction/sales/settings/settings-routes.ts
+  s_415949558e694b::t_02870e9cb331ac 1-166
+apps/construction-management/app/api/construction/sales/settings/settings.http.test.ts
+  s_415949558e694b::t_8fb3b366f2ccee 1-478
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_411e0caa4e663a 1061-1070
+apps/construction-management/src/composition/sales-settings.ts
+  s_415949558e694b::t_9c08ad3a998b7f 1-15
+apps/construction-management/src/sales/application/sales-settings-handlers.ts
+  s_415949558e694b::t_901c3a6f3923e4 1-473
+apps/construction-management/src/sales/domain/sales-lists.test.ts
+  s_415949558e694b::t_238dbc44f1e6f6 1-31
+apps/construction-management/src/sales/domain/sales-lists.ts
+  s_415949558e694b::t_a2707c2156b2de 1-143
+apps/construction-management/src/sales/infrastructure/sales-list-store.ts
+  s_415949558e694b::t_1d8c6c549add55 1-290
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_d9a88a1d5bc74d 109-181
+apps/construction-management/app/api/construction/sales/settings/settings-models.ts
+  s_3e202948d44f95::t_b3221c9b0e12d4 1-136
+apps/construction-management/app/api/construction/sales/settings/settings-openapi.ts
+  s_3e202948d44f95::t_affb62d7776027 1-2,8-35,37-131,133-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dd15acc5f62462ad61eba9eff3f00ceb29f17dc6",
+  "prompts": {},
+  "sessions": {
+    "s_3e202948d44f95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aff499469bc4571e8",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
