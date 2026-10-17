@@ -1,3 +1,4 @@
+import { projectCreatedListeners } from "@/src/composition/project-created-listeners";
 import { createPlanGate } from "@/src/organization/infrastructure/create-subscription-handlers";
 import type { ProjectHomeReadModel } from "@/src/projects/application/project-home-handlers";
 import {
@@ -6,13 +7,16 @@ import {
   createProjectLogos,
 } from "@/src/projects/infrastructure/create-project-handlers";
 import { can, isMenuKey, type MemberAccess } from "@/src/shared-kernel/access";
+import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
 
 /**
  * One composition for every projects route. The plan limits (CM-118) are
- * the organization context's; the routes are where contexts meet.
+ * the organization context's and `ProjectCreated` reaches the other
+ * contexts' seeds (CM-0022 §2); the routes are where contexts meet.
  */
 export const projectHandlers = createProjectHandlers({
   plan: createPlanGate(),
+  events: new InProcessEventDispatcher(projectCreatedListeners()),
 });
 
 /** The Project logo (CM-401); its storage counts against the plan. */

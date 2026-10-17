@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "funnelStages": ["New", "Contacted", "Site Visit", "Negotiation"],
+  "leadSources": [
+    "Walk-in",
+    "Referral",
+    "Website",
+    "Property portal",
+    "Hoarding",
+    "Social media"
+  ],
+  "lostReasons": [
+    "Budget",
+    "Location",
+    "Bought elsewhere",
+    "Not reachable",
+    "Not interested"
+  ]
+}

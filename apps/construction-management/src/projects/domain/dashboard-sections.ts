@@ -51,9 +51,9 @@ export const DASHBOARD_SECTIONS = [
     milestone: null,
     module: "inspections",
   },
-  // Sales modules arrive with M10.
-  { key: "booking", label: "Booking", milestone: "M10", module: null },
-  { key: "inquiry", label: "Inquiry", milestone: "M10", module: null },
+  // Sales (M10, ADR CM-0022 §11); CM-1008 replaces the stubs.
+  { key: "booking", label: "Booking", milestone: "M10", module: "bookings" },
+  { key: "inquiry", label: "Inquiry", milestone: "M10", module: "inquiries" },
 ] as const satisfies readonly {
   key: string;
   label: string;

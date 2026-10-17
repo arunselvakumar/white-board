@@ -153,3 +153,20 @@ export type InboundBackupFinished = DomainEvent & {
   downloadHref: string | null;
   error: string | null;
 };
+
+// Sales (CM-1006, ADR CM-0022 §10).
+type InboundBookingBase = DomainEvent & {
+  bookingId: string;
+  projectId: string;
+  unitLabel: string;
+  customerName: string;
+  by: string;
+};
+
+export type InboundBookingEvent =
+  | (InboundBookingBase & {
+      type: "BookingCreated";
+      status: "on_hold" | "booked";
+    })
+  | (InboundBookingBase & { type: "BookingConfirmed" })
+  | (InboundBookingBase & { type: "BookingCancelled"; reason: string });

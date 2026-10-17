@@ -78,6 +78,7 @@ Each phase is a shippable product. Build order inside a phase follows [`02-modul
 
 ### Phase 4 — Differentiators
 
+- Chat (member, group, project) on Postgres + SSE, and support tickets with email (moved from M9, CM-1201).
 - WhatsApp Business bot (attendance, DPR photos, MR, approvals).
 - Offline outbox hardening; native shell.
 - Allottee portal: price sheet, payment plan, demand letters, UPI collection, receipts, construction photos.
