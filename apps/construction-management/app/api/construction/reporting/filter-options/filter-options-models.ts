@@ -46,6 +46,14 @@ export const ListConstructionReportingFilterOptionsResponseModel = z.object({
   materials: z.array(Choice),
   /** Who raised the Purchase Requests in scope; `id` is a User id. */
   creators: z.array(Choice),
+  /** A Project's live Wings (the Booking Report, CM-1008). */
+  wings: z.array(Choice),
+  /** The Inquiry Report's choices on a Project (CM-1008); stages in funnel order. */
+  leadSources: z.array(Choice),
+  funnelStages: z.array(Choice),
+  lostReasons: z.array(Choice),
+  /** Active Team Members on the Project; `id` is a Team Member id. */
+  assignees: z.array(Choice),
 });
 
 export type ListConstructionReportingFilterOptionsResponseModel = z.infer<

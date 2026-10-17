@@ -33,6 +33,8 @@ import type {
   InboundStockBelowMinimum,
   InboundTaskAssigned,
   InboundTaskCompleted,
+  // Sales (CM-1004)
+  InboundInquiryAssigned,
 } from "./inbound-events";
 import type { Notifier } from "./notifier";
 import type { NotificationNames, RecipientDirectory } from "./ports";
@@ -163,6 +165,9 @@ export class NotificationListeners implements DomainEventListener {
       case "BookingConfirmed":
       case "BookingCancelled":
         return this.booking(event as InboundBookingEvent);
+      // Sales (CM-1004)
+      case "InquiryAssigned":
+        return this.inquiryAssigned(event as InboundInquiryAssigned);
       default:
         return [];
     }
@@ -800,6 +805,48 @@ export class NotificationListeners implements DomainEventListener {
           projectId: event.projectId,
           href: LINKS.booking(event.projectId, event.bookingId),
           sourceKey: key(event, draft.type, event.bookingId),
+        },
+      },
+    ];
+  }
+
+  // -------------------------------------------------------------------------
+  // Sales (CM-1004, ADR CM-0022 §10)
+  // -------------------------------------------------------------------------
+
+  /** `inquiry.assigned`: to the new Assignee, unless they assigned it themselves. */
+  private async inquiryAssigned(
+    event: InboundInquiryAssigned,
+  ): Promise<Plan[]> {
+    const [assignees, project] = await Promise.all([
+      this.deps.recipients.usersOfMembers(event.workspaceId, [
+        event.assigneeMemberId,
+      ]),
+      this.projectName(event, event.projectId),
+    ]);
+    return [
+      {
+        audience: {
+          kind: "direct",
+          menu: "sales.inquiries",
+          flag: "read",
+          projectId: event.projectId,
+          userIds: assignees,
+        },
+        except: event.by,
+        draft: {
+          type: "inquiry.assigned",
+          menu: "sales.inquiries",
+          projectId: event.projectId,
+          title: `Inquiry from ${event.name} was assigned to you`,
+          body: project,
+          href: LINKS.inquiry(event.projectId, event.inquiryId),
+          sourceKey: key(
+            event,
+            "inquiry.assigned",
+            event.inquiryId,
+            event.assigneeMemberId,
+          ),
         },
       },
     ];

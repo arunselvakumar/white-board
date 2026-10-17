@@ -31,6 +31,8 @@ import { PROJECT_MODULE_ICONS } from "@/components/projects/project-module-icons
 import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
 // Sales (CM-1006)
 import { bookingsNavLinks } from "@/components/sales/bookings/bookings-nav";
+// Sales (CM-1002)
+import { useInquiryNavLinks } from "@/components/sales/inquiries/inquiry-nav";
 import {
   activeProjectSegment,
   projectBasePath,
@@ -199,6 +201,9 @@ function ProjectNavEntry(props: EntryProps) {
     // Sales (CM-1006)
     case "bookings":
       return <BookingsEntry {...props} />;
+    // Sales (CM-1002)
+    case "inquiries":
+      return <InquiriesEntry {...props} />;
     default:
       return <ProjectNavItem {...props} />;
   }
@@ -257,6 +262,18 @@ function MaterialsEntry(props: EntryProps) {
 function EquipmentEntry(props: EntryProps) {
   const [open, setOpen] = useSubmenuOpen(props.active);
   const links = useEquipmentNavLinks(props.projectId, open);
+  return (
+    <ProjectNavItem
+      {...props}
+      submenu={{ open, onOpenChange: setOpen, links }}
+    />
+  );
+}
+
+// Sales (CM-1002): the Inquiries module's tabs.
+function InquiriesEntry(props: EntryProps) {
+  const [open, setOpen] = useSubmenuOpen(props.active);
+  const links = useInquiryNavLinks(props.projectId, open);
   return (
     <ProjectNavItem
       {...props}

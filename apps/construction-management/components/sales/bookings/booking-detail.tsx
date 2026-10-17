@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { formatMobile } from "@repo/auth/construction/mobile";
 import {
   BadgeCheck,
   CalendarClock,
@@ -24,6 +25,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import { SalesDocumentFiles } from "@/components/sales/documents/sales-document-files";
 import { formatDate, localToday } from "@/components/payments/payment-format";
 import {
   areaLabel,
@@ -32,6 +34,7 @@ import {
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { formatDateTime } from "@/components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
+import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import {
   bookingQuery,
   bookingsPath,
@@ -40,7 +43,6 @@ import {
 } from "@/src/queries/sales-bookings";
 
 import { BookingActionDialog, type BookingDialogKind } from "./booking-dialogs";
-import { BookingFiles } from "./booking-files";
 
 function Fact({
   label,
@@ -95,6 +97,11 @@ export function BookingDetail({
 }) {
   const router = useRouter();
   const { data: booking } = useSuspenseQuery(bookingQuery(id));
+  const { data: access } = useSuspenseQuery(salesAccessQuery(projectId));
+  // Booking Create or Update adds files; the server checks again.
+  const canAttach =
+    canInSales(access, "sales.bookings", "create") ||
+    canInSales(access, "sales.bookings", "update");
   const remove = useDeleteBooking(booking);
   const [dialog, setDialog] = useState<BookingDialogKind | "delete" | null>(
     null,
@@ -215,13 +222,22 @@ export function BookingDetail({
             </Fact>
           )}
           <Fact label="Customer">{booking.customerName}</Fact>
-          <Fact label="Mobile">{booking.customerMobile ?? "—"}</Fact>
+          <Fact label="Mobile">
+            {booking.customerMobile == null
+              ? "—"
+              : formatMobile(booking.customerMobile)}
+          </Fact>
           <Fact label="Email">{booking.customerEmail ?? "—"}</Fact>
           <Fact label="Address" className="sm:col-span-3">
             {booking.customerAddress ?? "—"}
           </Fact>
           <Fact label="Referred By">
-            {[booking.referredByName, booking.referredByContact]
+            {[
+              booking.referredByName,
+              booking.referredByContact == null
+                ? null
+                : formatMobile(booking.referredByContact),
+            ]
               .filter((part) => part != null)
               .join(" · ") || "—"}
           </Fact>
@@ -234,7 +250,16 @@ export function BookingDetail({
           </Fact>
         </dl>
 
-        <BookingFiles bookingId={booking.id} />
+        <SalesDocumentFiles
+          documentType="booking"
+          documentId={booking.id}
+          roles={[
+            { role: "booking_form", label: "Booking Form" },
+            { role: "photo", label: "Photos" },
+          ]}
+          canEdit={canAttach}
+          heading="Booking Form and photos"
+        />
 
         <section
           aria-labelledby="booking-history"

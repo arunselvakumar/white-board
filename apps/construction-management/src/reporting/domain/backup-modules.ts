@@ -300,6 +300,32 @@ const PROJECT_MODULES: readonly BackupModule[] = [
     entities: ["gallery"],
     media: true,
   },
+  // Sales (CM-1008, ADR CM-0022 §11): bookings with their status history
+  // and the units' sales details; the Booking Form and photos as media.
+  {
+    key: "sales.bookings",
+    label: "Bookings",
+    group: "Sales",
+    scope: "project",
+    menu: "sales.bookings",
+    money: null,
+    folder: "bookings",
+    entities: ["bookings", "booking_events", "unit_profiles"],
+    media: true,
+  },
+  // Inquiries with their history, follow-ups and tasks; the Visiting Card
+  // and photos as media (CM-1008).
+  {
+    key: "sales.inquiries",
+    label: "Inquiries",
+    group: "Sales",
+    scope: "project",
+    menu: "sales.inquiries",
+    money: null,
+    folder: "inquiries",
+    entities: ["inquiries", "inquiry_events", "follow_ups", "inquiry_tasks"],
+    media: true,
+  },
 ];
 
 function master(

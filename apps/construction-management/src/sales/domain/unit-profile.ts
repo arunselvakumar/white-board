@@ -2,6 +2,7 @@ import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict, DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
+  AREA_UNIT_LABELS,
   AREA_UNITS,
   SALES_LIMITS,
   UNAVAILABLE_REASONS,
@@ -184,6 +185,17 @@ export function unitSalesStatus(
   if (profile?.unavailable === true) return "unavailable";
   if (booking == null || isHoldExpired(booking, today)) return "available";
   return booking.status;
+}
+
+/** "1,050.5 sq ft" (Indian grouping), or null without an area. */
+export function areaWithUnit(
+  area: string | null,
+  unit: AreaUnit,
+): string | null {
+  if (area == null) return null;
+  const [whole = "0", decimals] = area.split(".");
+  const grouped = Number(whole).toLocaleString("en-IN");
+  return `${decimals == null ? grouped : `${grouped}.${decimals}`} ${AREA_UNIT_LABELS[unit]}`;
 }
 
 export const unitProfileChanged = (updatedAt: Date | null) =>

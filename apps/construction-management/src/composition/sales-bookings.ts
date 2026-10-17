@@ -1,9 +1,7 @@
 import { prisma } from "@repo/construction-db";
 
 import { messagingEvents } from "@/src/composition/messaging";
-import { createPlanGate } from "@/src/organization/infrastructure/create-subscription-handlers";
 import { salesDirectory } from "@/src/composition/sales-directory";
-import { BookingFiles } from "@/src/sales/application/booking-files";
 import {
   BookingHandlers,
   type BookableWing,
@@ -12,11 +10,9 @@ import {
 import type { SalesTx } from "@/src/sales/application/ports";
 import type { SalesBookingDeps } from "@/src/sales/application/sales-booking-deps";
 import { UnitSalesHandlers } from "@/src/sales/application/unit-sales-handlers";
-import { PrismaBookingFileStore } from "@/src/sales/infrastructure/booking-files-store";
 import { PrismaBookingStore } from "@/src/sales/infrastructure/prisma-booking-store";
 import { PrismaUnitProfileStore } from "@/src/sales/infrastructure/prisma-unit-profile-store";
 import { companyToday } from "@/src/shared-kernel/company-today";
-import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import { loadBackdatedCheck } from "@/src/site-work/infrastructure/site-work-guards";
 
 /**
@@ -41,16 +37,6 @@ export const salesBookingDeps = createSalesBookingDeps();
 /** One set of handlers for every units and bookings route. */
 export const unitSalesHandlers = new UnitSalesHandlers(salesBookingDeps);
 export const bookingHandlers = new BookingHandlers(salesBookingDeps);
-
-/**
- * A booking's Booking Form and photos (personal data: not in the Gallery).
- * Storage limits are the organization context's plan.
- */
-export const bookingFiles = new BookingFiles(
-  new PrismaBookingFileStore(prisma, salesDirectory),
-  objectStorage(),
-  createPlanGate(),
-);
 
 /**
  * Creates a **Booked** booking inside the caller's transaction (CM-1007:

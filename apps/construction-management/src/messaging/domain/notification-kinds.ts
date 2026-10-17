@@ -69,6 +69,9 @@ export const NOTIFICATION_KINDS = {
   "booking.created": { menu: "sales.bookings", flag: "read" },
   "booking.confirmed": { menu: "sales.bookings", flag: "read" },
   "booking.cancelled": { menu: "sales.bookings", flag: "read" },
+  // Sales (CM-1004, ADR CM-0022 §10).
+  "inquiry.assigned": { menu: "sales.inquiries", flag: "read" },
+  "inquiry.follow_ups_due": { menu: "sales.inquiries", flag: "read" },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;
@@ -232,6 +235,11 @@ export const LINKS = {
   // Sales (CM-1006)
   booking: (projectId: string, id: string) =>
     `/app/projects/${projectId}/bookings/list/${id}`,
+  // Sales (CM-1004)
+  inquiry: (projectId: string, id: string) =>
+    `/app/projects/${projectId}/inquiries/list/${id}`,
+  inquiriesDue: (projectId: string, due: "overdue" | "today") =>
+    `/app/projects/${projectId}/inquiries/list?due=${due}`,
 } as const;
 
 // ---------------------------------------------------------------------------

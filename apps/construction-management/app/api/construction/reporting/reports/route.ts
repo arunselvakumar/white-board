@@ -31,6 +31,7 @@ import {
   reportableKinds,
   reports,
   requireReportSession,
+  inquiryOwnScope,
   trackingOwnScope,
 } from "./handlers";
 import {
@@ -219,6 +220,28 @@ function paramsOf(
         projectIds,
         projectsChosen: scope.projectsChosen,
       };
+    // Sales reports (CM-1008).
+    case "inquiry_report":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        interestType: model.params.interestType ?? null,
+        leadSourceId: model.params.leadSourceId ?? null,
+        funnelStageId: model.params.funnelStageId ?? null,
+        status: model.params.status ?? null,
+        lostReasonId: model.params.lostReasonId ?? null,
+        assigneeMemberId: model.params.assigneeMemberId ?? null,
+        own,
+      };
+    case "booking_report":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        status: model.params.status ?? null,
+        wingId: model.params.wingId ?? null,
+      };
   }
 }
 
@@ -381,11 +404,13 @@ export async function POST(request: Request): Promise<Response> {
           "There is no such petty-cash account.",
         );
     }
-    // Task and Issue & Snag reports: without View all, own rows only.
+    // Task, Issue & Snag and Inquiry reports: without View all, own rows only.
     const own =
       model.kind === "task_report" || model.kind === "issue_snag_report"
         ? await trackingOwnScope(session, model.kind, model.projectId)
-        : null;
+        : model.kind === "inquiry_report"
+          ? await inquiryOwnScope(session, model.projectId)
+          : null;
     const job = await reports.request({
       workspaceId: session.workspaceId,
       userId: session.userId,

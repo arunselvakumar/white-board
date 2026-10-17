@@ -37,6 +37,9 @@ enum ConstructionReportingReportKind {
   material_transfers
   stock_register
   labour_attendance_central
+  /// Sales (CM-0022 §11).
+  inquiry_report
+  booking_report
 
   @@map("report_kind")
   @@schema("construction_reporting")

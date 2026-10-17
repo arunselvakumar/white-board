@@ -278,6 +278,34 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.null(),
       params: DateRangeParams.extend({ projectIds: ProjectIdsParam }),
     }),
+    // Sales reports (CM-1008, ADR CM-0022 §11). Without Inquiry View all
+    // an Inquiry Report covers your own, assigned and Lead Owner inquiries.
+    z.object({
+      kind: z.literal("inquiry_report"),
+      projectId: z.uuid(),
+      /** Inquiries with an Inquiry Date in the period; Inquiry Report. */
+      params: DateRangeParams.extend({
+        interestType: z.enum(["hot", "warm", "cold"]).optional(),
+        leadSourceId: z.uuid().optional(),
+        funnelStageId: z.uuid().optional(),
+        status: z.enum(["open", "converted", "lost"]).optional(),
+        lostReasonId: z.uuid().optional(),
+        /** A Team Member id. */
+        assigneeMemberId: z.uuid().optional(),
+      }),
+    }),
+    z.object({
+      kind: z.literal("booking_report"),
+      projectId: z.uuid(),
+      /** Bookings with a Booking Date in the period; Booking Report. */
+      params: DateRangeParams.extend({
+        /** Hold expired is On Hold past Hold until on the Company's today. */
+        status: z
+          .enum(["on_hold", "hold_expired", "booked", "cancelled"])
+          .optional(),
+        wingId: z.uuid().optional(),
+      }),
+    }),
   ]);
 
 export type RequestConstructionReportingReportRequestModel = z.infer<
@@ -332,6 +360,14 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     createdBy: z.string().nullable().optional(),
     transferType: z.string().nullable().optional(),
     storeId: z.string().nullable().optional(),
+    /** The Booking Report's Wing (CM-1008). */
+    wingId: z.string().nullable().optional(),
+    /** The Inquiry Report's filters (CM-1008). */
+    interestType: z.string().nullable().optional(),
+    leadSourceId: z.string().nullable().optional(),
+    funnelStageId: z.string().nullable().optional(),
+    lostReasonId: z.string().nullable().optional(),
+    assigneeMemberId: z.string().nullable().optional(),
     /** The Projects the requester chose for a central report. */
     projectIds: z.array(z.string()).optional(),
   }),
@@ -473,6 +509,25 @@ function responseParams(
       };
     case "labour_attendance_central":
       return { from: params.from, to: params.to, ...chosenProjects(params) };
+    // Sales reports (CM-1008).
+    case "inquiry_report":
+      return {
+        from: params.from,
+        to: params.to,
+        interestType: params.interestType,
+        leadSourceId: params.leadSourceId,
+        funnelStageId: params.funnelStageId,
+        status: params.status,
+        lostReasonId: params.lostReasonId,
+        assigneeMemberId: params.assigneeMemberId,
+      };
+    case "booking_report":
+      return {
+        from: params.from,
+        to: params.to,
+        status: params.status,
+        wingId: params.wingId,
+      };
     default:
       return { from: params.from, to: params.to };
   }

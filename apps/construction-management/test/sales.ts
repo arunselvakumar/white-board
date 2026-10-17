@@ -173,3 +173,164 @@ export async function salesBookingRow(
   });
   return id;
 }
+
+// ---------------------------------------------------------------------------
+// CM-1002 Sales settings / CM-1003 Inquiries
+// ---------------------------------------------------------------------------
+
+/** The Project's live sales list rows by name (stages in funnel order). */
+export async function salesLists(projectId: string) {
+  const where = { projectId, deletedAt: null };
+  const [stages, sources, reasons] = await Promise.all([
+    prisma.constructionSalesFunnelStage.findMany({
+      where,
+      orderBy: { sortOrder: "asc" },
+    }),
+    prisma.constructionSalesLeadSource.findMany({ where }),
+    prisma.constructionSalesLostReason.findMany({ where }),
+  ]);
+  const byName = (rows: readonly { name: string; id: string }[]) =>
+    Object.fromEntries(rows.map((row) => [row.name, row.id]));
+  return {
+    stages,
+    sources,
+    reasons,
+    stageId: byName(stages),
+    sourceId: byName(sources),
+    reasonId: byName(reasons),
+  };
+}
+
+/**
+ * An inquiry written straight to `construction_sales.inquiries` for tests
+ * that only need one to exist (in a stage, naming a source or reason).
+ */
+export async function salesInquiryRow(
+  workspaceId: string,
+  projectId: string,
+  by: string,
+  patch: Partial<{
+    name: string;
+    status: "open" | "converted" | "lost";
+    funnelStageId: string | null;
+    leadSourceId: string | null;
+    lostReasonId: string | null;
+    mobile: string | null;
+    email: string | null;
+    convertedBookingId: string | null;
+    deletedAt: Date | null;
+  }> = {},
+): Promise<string> {
+  const id = randomUUID();
+  const now = new Date();
+  await prisma.constructionSalesInquiry.create({
+    data: {
+      id,
+      workspaceId,
+      projectId,
+      inquiryDate: new Date(now.toISOString().slice(0, 10)),
+      name: patch.name ?? "Lakshmi Narayanan",
+      status: patch.status ?? "open",
+      funnelStageId: patch.funnelStageId ?? null,
+      leadSourceId: patch.leadSourceId ?? null,
+      lostReasonId: patch.lostReasonId ?? null,
+      mobile: patch.mobile ?? null,
+      email: patch.email ?? null,
+      convertedBookingId: patch.convertedBookingId ?? null,
+      deletedAt: patch.deletedAt ?? null,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
+}
+
+// ---------------------------------------------------------------------------
+// CM-1008 Reports, dashboard, backups
+// ---------------------------------------------------------------------------
+
+/** An inquiry with every report and dashboard field, written straight to the table. */
+export async function salesInquiryFull(
+  workspaceId: string,
+  projectId: string,
+  by: string,
+  fields: {
+    name: string;
+    inquiryDate?: string;
+    status?: "open" | "converted" | "lost";
+    interestType?: "hot" | "warm" | "cold" | null;
+    leadSourceId?: string | null;
+    funnelStageId?: string | null;
+    lostReasonId?: string | null;
+    assigneeMemberId?: string | null;
+    leadOwnerMemberId?: string | null;
+    nextFollowUpAt?: Date | null;
+    nextFollowUpHasTime?: boolean;
+    interestedUnitType?: string | null;
+    remarks?: string | null;
+    mobile?: string | null;
+  },
+): Promise<string> {
+  const id = randomUUID();
+  const now = new Date();
+  await prisma.constructionSalesInquiry.create({
+    data: {
+      id,
+      workspaceId,
+      projectId,
+      inquiryDate: new Date(
+        `${fields.inquiryDate ?? now.toISOString().slice(0, 10)}T00:00:00.000Z`,
+      ),
+      name: fields.name,
+      status: fields.status ?? "open",
+      interestType: fields.interestType ?? null,
+      leadSourceId: fields.leadSourceId ?? null,
+      funnelStageId: fields.funnelStageId ?? null,
+      lostReasonId: fields.lostReasonId ?? null,
+      assigneeMemberId: fields.assigneeMemberId ?? null,
+      leadOwnerMemberId: fields.leadOwnerMemberId ?? null,
+      nextFollowUpAt: fields.nextFollowUpAt ?? null,
+      nextFollowUpHasTime: fields.nextFollowUpHasTime ?? false,
+      interestedUnitType: fields.interestedUnitType ?? null,
+      remarks: fields.remarks ?? null,
+      mobile: fields.mobile ?? null,
+      closedAt: (fields.status ?? "open") === "open" ? null : now,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
+}
+
+/** A follow-up of an inquiry, written straight to the table. */
+export async function salesFollowUpRow(
+  workspaceId: string,
+  projectId: string,
+  inquiryId: string,
+  by: string,
+  fields: {
+    activity?:
+      "call" | "site_visit" | "meeting" | "whatsapp" | "email" | "other";
+    doneAt?: Date;
+    memberId?: string | null;
+  } = {},
+): Promise<string> {
+  const id = randomUUID();
+  await prisma.constructionSalesFollowUp.create({
+    data: {
+      id,
+      workspaceId,
+      projectId,
+      inquiryId,
+      activity: fields.activity ?? "call",
+      doneAt: fields.doneAt ?? new Date(),
+      memberId: fields.memberId ?? null,
+      createdBy: by,
+    },
+  });
+  return id;
+}

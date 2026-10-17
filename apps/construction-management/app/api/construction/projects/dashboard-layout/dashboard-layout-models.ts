@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   DASHBOARD_SECTIONS,
+  sectionMilestone,
   DASHBOARD_SECTION_KEYS,
   type DashboardSectionKey,
   type DashboardSectionSetting,
@@ -80,7 +81,7 @@ export function toDashboardLayoutResponse(
       return {
         key,
         label: section?.label ?? key,
-        milestone: section?.milestone ?? null,
+        milestone: sectionMilestone(key),
         visible,
         hiddenOnProject: hiddenOnProject.has(key),
       };

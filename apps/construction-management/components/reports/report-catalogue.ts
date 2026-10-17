@@ -44,6 +44,13 @@ export const PICKER_KEYS = [
   "material",
   "created_by",
   "store",
+  // The sales reports (CM-1008).
+  "wing",
+  "interest_type",
+  "lead_source",
+  "funnel_stage",
+  "lost_reason",
+  "assignee",
 ] as const;
 
 export type PickerKey = (typeof PICKER_KEYS)[number];
@@ -62,6 +69,8 @@ const PICKER_KINDS: readonly ReportDefinition["kind"][] = [
   "material_transfers",
   "stock_register",
   "labour_attendance_central",
+  "inquiry_report",
+  "booking_report",
 ];
 
 export const PICKER_COPY: Record<PickerKey, { label: string; all: string }> = {
@@ -74,6 +83,12 @@ export const PICKER_COPY: Record<PickerKey, { label: string; all: string }> = {
   material: { label: "Material", all: "All materials" },
   created_by: { label: "Created By", all: "Anyone" },
   store: { label: "Store", all: "All Stores" },
+  wing: { label: "Wing", all: "All Wings" },
+  interest_type: { label: "Interest Type", all: "Any interest" },
+  lead_source: { label: "Lead Source", all: "All sources" },
+  funnel_stage: { label: "Stage", all: "All stages" },
+  lost_reason: { label: "Lost Reason", all: "All reasons" },
+  assignee: { label: "Assignee", all: "Anyone" },
 };
 
 /** The pickers a card offers, in its catalogue filters' order. */
@@ -114,13 +129,35 @@ const TRANSFER_TYPE_OPTIONS = [
   { value: "store_to_store", label: "Store to Store" },
 ];
 
+const BOOKING_STATUS_OPTIONS = [
+  { value: "on_hold", label: "On Hold" },
+  { value: "hold_expired", label: "Hold expired" },
+  { value: "booked", label: "Booked" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const INQUIRY_STATUS_OPTIONS = [
+  { value: "open", label: "Open" },
+  { value: "converted", label: "Converted" },
+  { value: "lost", label: "Lost" },
+];
+
+const INTEREST_TYPE_OPTIONS = [
+  { value: "hot", label: "Hot" },
+  { value: "warm", label: "Warm" },
+  { value: "cold", label: "Cold" },
+];
+
 /** The fixed choices of a status or type picker; null for the others. */
 export function pickerStatuses(
   kind: ReportDefinition["kind"],
   key: PickerKey,
 ): { value: string; label: string }[] | null {
   if (key === "transfer_type") return TRANSFER_TYPE_OPTIONS;
+  if (key === "interest_type") return INTEREST_TYPE_OPTIONS;
   if (key !== "status") return null;
+  if (kind === "booking_report") return BOOKING_STATUS_OPTIONS;
+  if (kind === "inquiry_report") return INQUIRY_STATUS_OPTIONS;
   return kind === "material_transfers"
     ? TRANSFER_STATUS_OPTIONS
     : APPROVAL_STATUS_OPTIONS;
@@ -155,6 +192,11 @@ export const REPORT_GROUP_COPY: Record<
     title: "Materials",
     description:
       "Purchase Requests, Purchase Orders, material received and transferred, and the Stock Register, as an Excel workbook and a PDF.",
+  },
+  sales: {
+    title: "Sales",
+    description:
+      "Inquiries and bookings on this Project, as an Excel workbook and a PDF.",
   },
   progress: {
     title: "Progress Reports",

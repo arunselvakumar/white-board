@@ -16,6 +16,13 @@ export type ReportFilterChoices = {
   materialCategories: ReportFilterChoice[];
   materials: ReportFilterChoice[];
   creators: ReportFilterChoice[];
+  /** The Project's live Wings (the Booking Report, CM-1008). */
+  wings: ReportFilterChoice[];
+  /** The Project's sales lists and Team Members (the Inquiry Report, CM-1008). */
+  leadSources: ReportFilterChoice[];
+  funnelStages: ReportFilterChoice[];
+  lostReasons: ReportFilterChoice[];
+  assignees: ReportFilterChoice[];
 };
 
 const byName = (a: ReportFilterChoice, b: ReportFilterChoice) =>
@@ -38,6 +45,7 @@ const NAMED = { id: true, name: true } as const;
  *   scope.
  * - Labour Categories, Suppliers, Material Categories and Materials:
  *   every live one of the Company.
+ * - **Wings**: the Project's live Wings (the Booking Report, CM-1008).
  */
 export async function reportFilterChoices(
   input: {
@@ -72,6 +80,11 @@ export async function reportFilterChoices(
     materialCategories,
     materials,
     creators,
+    wings,
+    leadSources,
+    funnelStages,
+    lostReasons,
+    assignees,
   ] = await Promise.all([
     wants("projects") && input.projectId == null
       ? db.constructionProjectsProject.findMany({
@@ -117,6 +130,50 @@ export async function reportFilterChoices(
     wants("created_by")
       ? purchaseRequestCreators(db, workspaceId, inScope)
       : none,
+    wants("wing") && input.projectId != null
+      ? db.constructionProjectsWing.findMany({
+          where: {
+            ...live,
+            projectId: input.projectId,
+            phase: { deletedAt: null },
+          },
+          select: NAMED,
+        })
+      : none,
+    // The Inquiry Report (CM-1008): the Project's live lists, stages in
+    // funnel order, and its active Team Members.
+    wants("lead_source") && input.projectId != null
+      ? db.constructionSalesLeadSource.findMany({
+          where: { ...live, projectId: input.projectId },
+          select: NAMED,
+        })
+      : none,
+    wants("funnel_stage") && input.projectId != null
+      ? db.constructionSalesFunnelStage.findMany({
+          where: { ...live, projectId: input.projectId },
+          select: NAMED,
+          orderBy: { sortOrder: "asc" },
+        })
+      : none,
+    wants("lost_reason") && input.projectId != null
+      ? db.constructionSalesLostReason.findMany({
+          where: { ...live, projectId: input.projectId },
+          select: NAMED,
+        })
+      : none,
+    wants("assignee") && input.projectId != null
+      ? db.constructionOrganizationTeamMember.findMany({
+          where: {
+            ...live,
+            status: "active",
+            OR: [
+              { isOwner: true },
+              { projects: { some: { projectId: input.projectId } } },
+            ],
+          },
+          select: NAMED,
+        })
+      : none,
   ]);
   return {
     projects: projects.sort(byName),
@@ -127,6 +184,12 @@ export async function reportFilterChoices(
     materialCategories: materialCategories.sort(byName),
     materials: materials.sort(byName),
     creators: creators.sort(byName),
+    wings: wings.sort(byName),
+    leadSources: leadSources.sort(byName),
+    // In funnel order.
+    funnelStages,
+    lostReasons: lostReasons.sort(byName),
+    assignees: assignees.sort(byName),
   };
 }
 

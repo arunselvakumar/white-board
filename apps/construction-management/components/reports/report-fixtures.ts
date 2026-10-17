@@ -243,6 +243,17 @@ export const FILTER_OPTIONS = {
     { id: "0190a000-0000-7000-8000-0000000000f5", name: "Cement OPC 53" },
   ],
   creators: [{ id: "user-1", name: "Prabhu Saravanan" }],
+  // The Booking Report's Wings (CM-1008).
+  wings: [{ id: "0190a000-0000-7000-8000-0000000000f6", name: "Tower A" }],
+  // The Inquiry Report's choices (CM-1008).
+  leadSources: [
+    { id: "0190a000-0000-7000-8000-0000000000f7", name: "Walk-in" },
+  ],
+  funnelStages: [{ id: "0190a000-0000-7000-8000-0000000000f8", name: "New" }],
+  lostReasons: [{ id: "0190a000-0000-7000-8000-0000000000f9", name: "Budget" }],
+  assignees: [
+    { id: "0190a000-0000-7000-8000-0000000000fa", name: "Karthik R" },
+  ],
 };
 
 export const CENTRAL_REPORTS_LIST_PATH = API;
