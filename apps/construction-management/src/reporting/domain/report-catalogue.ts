@@ -27,6 +27,8 @@ export const REPORT_GROUPS = [
   "tracking",
   "finance",
   "procurement",
+  // Sales (CM-1008, ADR CM-0022 §11).
+  "sales",
   "progress",
 ] as const;
 
@@ -59,7 +61,15 @@ export type ReportFilterKey =
   | "status"
   | "material_category"
   | "created_by"
-  | "transfer_type";
+  | "transfer_type"
+  // The Booking Report's Wing (CM-1008).
+  | "wing"
+  // The Inquiry Report's filters (CM-1008).
+  | "interest_type"
+  | "lead_source"
+  | "funnel_stage"
+  | "lost_reason"
+  | "assignee";
 
 export type ReportFilter = {
   key: ReportFilterKey;
@@ -698,6 +708,49 @@ const DEFINITIONS = {
       { key: "store", scopes: CENTRAL },
       PROJECTS_FILTER,
     ],
+    progressReport: false,
+    available: true,
+  },
+  // Sales reports (CM-1008, ADR CM-0022 §11): no money in M10.
+  inquiry_report: {
+    title: "Inquiry Report",
+    description:
+      "Inquiries by Inquiry Date: name, mobile, interest type, interested in, lead source, stage, status, next follow-up, assignee, lead owner, lost reason and remarks.",
+    needs:
+      "Needs Inquiry Report; without View all, the inquiries you created, are assigned to or own as Lead Owner.",
+    group: "sales",
+    scopes: PROJECT,
+    menu: "sales.inquiries",
+    request: "report",
+    download: "report",
+    money: "never",
+    formats: TABLE,
+    period: "range",
+    filters: [
+      { key: "interest_type" },
+      { key: "lead_source" },
+      { key: "funnel_stage" },
+      { key: "status" },
+      { key: "lost_reason" },
+      { key: "assignee" },
+    ],
+    progressReport: false,
+    available: true,
+  },
+  booking_report: {
+    title: "Booking Report",
+    description:
+      "Bookings by Booking Date: customer, Wing, unit, unit type, carpet area, status, Referred By and remarks.",
+    needs: "Needs Booking Report.",
+    group: "sales",
+    scopes: PROJECT,
+    menu: "sales.bookings",
+    request: "report",
+    download: "report",
+    money: "never",
+    formats: TABLE,
+    period: "range",
+    filters: [{ key: "status" }, { key: "wing" }],
     progressReport: false,
     available: true,
   },

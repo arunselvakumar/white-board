@@ -3,6 +3,8 @@ import { after } from "next/server";
 
 import {
   delayedQueueHandler,
+  // Sales (CM-1004)
+  followUpsDueQueueHandler,
   retentionQueueHandler,
 } from "@/src/messaging/application/maintenance";
 import { NotificationHandlers } from "@/src/messaging/application/notification-handlers";
@@ -11,6 +13,9 @@ import { Notifier } from "@/src/messaging/application/notifier";
 import type {
   BecameDelayed,
   DelayedWorkSource,
+  // Sales (CM-1004)
+  FollowUpsDue,
+  FollowUpsDueSource,
   NotificationNames,
   PushSender,
   RecipientDirectory,
@@ -38,7 +43,13 @@ import {
   calendarDateFromDb,
   calendarDateToDb,
 } from "@/src/shared-kernel/calendar-date";
-import { companyToday } from "@/src/shared-kernel/company-today";
+import {
+  companyTimezone,
+  companyToday,
+} from "@/src/shared-kernel/company-today";
+// Sales (CM-1004)
+import { followUpDue } from "@/src/sales/domain/inquiry";
+import { dueBounds, type DueBounds } from "@/src/sales/domain/sales-time";
 import {
   InProcessEventDispatcher,
   type DomainEvent,
@@ -329,6 +340,97 @@ export function createMessagingDelayedHandler(
 ): QueueHandler {
   return delayedQueueHandler({
     source: trackingDelayedWork,
+    recipients: notificationRecipientDirectory,
+    notifier: createNotifier(),
+    clock,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Sales (CM-1004, ADR CM-0022 §10)
+// ---------------------------------------------------------------------------
+
+/**
+ * Sales' open inquiries with an Assignee whose next follow-up is overdue
+ * or due today on their Company's clock, counted per assignee and
+ * Project, with sales' own Due rule (`followUpDue`).
+ */
+const FOLLOW_UPS_DUE_PAGE = 2_000;
+
+export const salesFollowUpsDue: FollowUpsDueSource = {
+  async due(now) {
+    const bounds = new Map<string, { date: string; due: DueBounds }>();
+    const boundsOf = async (workspaceId: string) => {
+      const known = bounds.get(workspaceId);
+      if (known != null) return known;
+      const [date, timeZone] = await Promise.all([
+        companyToday(prisma, workspaceId, now),
+        companyTimezone(prisma, workspaceId),
+      ]);
+      const made = { date, due: dueBounds(now, date, timeZone) };
+      bounds.set(workspaceId, made);
+      return made;
+    };
+    const found = new Map<string, FollowUpsDue>();
+    // Anything due today anywhere lies before now plus a day and a half.
+    // Read in pages so memory stays bounded however many are overdue.
+    let after: string | undefined;
+    for (;;) {
+      const rows = await prisma.constructionSalesInquiry.findMany({
+        where: {
+          deletedAt: null,
+          status: "open",
+          assigneeMemberId: { not: null },
+          nextFollowUpAt: { lt: new Date(now.getTime() + 36 * 3_600_000) },
+        },
+        select: {
+          id: true,
+          workspaceId: true,
+          projectId: true,
+          assigneeMemberId: true,
+          nextFollowUpAt: true,
+          nextFollowUpHasTime: true,
+        },
+        orderBy: { id: "asc" },
+        take: FOLLOW_UPS_DUE_PAGE,
+        ...(after == null ? {} : { cursor: { id: after }, skip: 1 }),
+      });
+      for (const row of rows) {
+        if (row.assigneeMemberId == null || row.nextFollowUpAt == null)
+          continue;
+        const { date, due } = await boundsOf(row.workspaceId);
+        const state = followUpDue(
+          "open",
+          { at: row.nextFollowUpAt, hasTime: row.nextFollowUpHasTime },
+          due,
+        );
+        if (state !== "overdue" && state !== "today") continue;
+        const key = `${row.workspaceId}:${row.projectId}:${row.assigneeMemberId}`;
+        const item = found.get(key) ?? {
+          workspaceId: row.workspaceId,
+          projectId: row.projectId,
+          assigneeMemberId: row.assigneeMemberId,
+          date,
+          overdue: 0,
+          today: 0,
+        };
+        if (state === "overdue") item.overdue += 1;
+        else item.today += 1;
+        found.set(key, item);
+      }
+      if (rows.length < FOLLOW_UPS_DUE_PAGE) break;
+      after = rows[rows.length - 1]?.id;
+    }
+    return [...found.values()];
+  },
+};
+
+/** `messaging.follow_ups_due`: the daily `inquiry.follow_ups_due` notices. */
+export function createMessagingFollowUpsDueHandler(
+  clock?: () => Date,
+): QueueHandler {
+  return followUpsDueQueueHandler({
+    source: salesFollowUpsDue,
     recipients: notificationRecipientDirectory,
     notifier: createNotifier(),
     clock,

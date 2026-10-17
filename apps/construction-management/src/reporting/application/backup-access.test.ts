@@ -8,11 +8,13 @@ import {
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
+  backupModule,
   BACKUP_ENTITY_KEYS,
   BACKUP_MODULES,
   COMPANY_BACKUP_MODULES,
 } from "../domain/backup-modules";
 import {
+  canBackUpModule,
   allowHrmsBackup,
   allowMastersBackup,
   allowProjectBackup,
@@ -147,5 +149,39 @@ describe("backup access (CM-906)", () => {
     expect(refusal(() => allowHrmsBackup(viewer, ["masters.tags"]))?.code).toBe(
       "BACKUP_MODULE_UNKNOWN",
     );
+  });
+});
+
+describe("Inquiries backup needs View all (review of #93)", () => {
+  const inquiries = backupModule("sales.inquiries");
+
+  it("is refused to a member who only sees their own inquiries", () => {
+    if (inquiries == null) throw new Error("no Inquiries module");
+    expect(
+      canBackUpModule(
+        member({ "sales.inquiries": ["read"] }),
+        inquiries,
+        PROJECT,
+      ),
+    ).toBe(false);
+    expect(
+      canBackUpModule(
+        member({ "sales.inquiries": ["read", "view_all"] }),
+        inquiries,
+        PROJECT,
+      ),
+    ).toBe(true);
+  });
+
+  it("still needs only View for Bookings", () => {
+    const bookings = backupModule("sales.bookings");
+    if (bookings == null) throw new Error("no Bookings module");
+    expect(
+      canBackUpModule(
+        member({ "sales.bookings": ["read"] }),
+        bookings,
+        PROJECT,
+      ),
+    ).toBe(true);
   });
 });

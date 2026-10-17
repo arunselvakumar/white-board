@@ -44,6 +44,9 @@ export const REPORT_KINDS = [
   "material_transfers",
   "stock_register",
   "labour_attendance_central",
+  // Sales reports (CM-1008).
+  "inquiry_report",
+  "booking_report",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -97,6 +100,14 @@ export type LedgerFilters = {
 };
 
 export type ReportFormat = "xlsx" | "pdf";
+
+/** An inquiry's status and interest as the Inquiry Report filters them (CM-0022 §11). */
+export type InquiryStatusFilter = "open" | "converted" | "lost";
+export type InterestTypeFilter = "hot" | "warm" | "cold";
+
+/** A booking's status as the Booking Report filters it (CM-0022 §7, §11). */
+export type BookingStatusFilter =
+  "on_hold" | "hold_expired" | "booked" | "cancelled";
 
 /** A procurement document's approval status (Purchase Requests and Orders). */
 export type ProcurementApprovalFilter = "pending" | "approved" | "rejected";
@@ -324,6 +335,34 @@ export type ReportParams =
       /** The Projects covered; null for every Project (the Owner). */
       projectIds: string[] | null;
       projectsChosen: boolean;
+    }
+  // Sales reports (CM-1008, ADR CM-0022 §11).
+  | {
+      kind: "inquiry_report";
+      /** Inquiries with an Inquiry Date in the range. */
+      from: string;
+      to: string;
+      interestType: InterestTypeFilter | null;
+      leadSourceId: string | null;
+      funnelStageId: string | null;
+      status: InquiryStatusFilter | null;
+      lostReasonId: string | null;
+      /** A Team Member id. */
+      assigneeMemberId: string | null;
+      /**
+       * Without View all: only the inquiries the requester created, is
+       * assigned to or owns as Lead Owner (their Team Member).
+       */
+      own: ReportOwnScope | null;
+    }
+  | {
+      kind: "booking_report";
+      /** Bookings with a Booking Date in the range. */
+      from: string;
+      to: string;
+      /** Hold expired is On Hold past Hold until on the Company's today. */
+      status: BookingStatusFilter | null;
+      wingId: string | null;
     };
 
 /** `expired`: retention deleted its files after 30 days (CM-0021 §3). */
@@ -392,6 +431,10 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "material_transfers":
     case "stock_register":
     case "labour_attendance_central":
+      return { ...params, ...checkRange(params) };
+    // Sales reports (CM-1008).
+    case "inquiry_report":
+    case "booking_report":
       return { ...params, ...checkRange(params) };
     case "due_payments":
       assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");

@@ -42,7 +42,10 @@ export function canBackUpModule(
   projectId: string | null,
 ): boolean {
   if (module.menu == null) return access.role === "owner";
-  return can(access, module.menu, "read", onProject(module, projectId));
+  const scope = onProject(module, projectId);
+  if (module.viewAll === true && !can(access, module.menu, "view_all", scope))
+    return false;
+  return can(access, module.menu, "read", scope);
 }
 
 function moduleDenied(module: BackupModule): DomainError {

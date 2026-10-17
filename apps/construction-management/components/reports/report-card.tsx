@@ -342,6 +342,42 @@ function requestFor(
         projectId: null,
         params: { ...range, ...projectsParam(projectIds) },
       };
+    // Sales reports (CM-1008).
+    case "inquiry_report":
+      return {
+        kind: definition.kind,
+        projectId,
+        params: {
+          ...range,
+          ...(onlySet({
+            interestType: picks.interest_type,
+            leadSourceId: picks.lead_source,
+            funnelStageId: picks.funnel_stage,
+            status: picks.status,
+            lostReasonId: picks.lost_reason,
+            assigneeMemberId: picks.assignee,
+          }) as {
+            interestType?: "hot" | "warm" | "cold";
+            leadSourceId?: string;
+            funnelStageId?: string;
+            status?: "open" | "converted" | "lost";
+            lostReasonId?: string;
+            assigneeMemberId?: string;
+          }),
+        },
+      };
+    case "booking_report":
+      return {
+        kind: definition.kind,
+        projectId,
+        params: {
+          ...range,
+          ...(onlySet({ status: picks.status, wingId: picks.wing }) as {
+            status?: "on_hold" | "hold_expired" | "booked" | "cancelled";
+            wingId?: string;
+          }),
+        },
+      };
     default:
       return null;
   }

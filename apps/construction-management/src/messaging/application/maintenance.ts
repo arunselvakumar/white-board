@@ -5,6 +5,8 @@ import { dateLabel, LINKS } from "../domain/notification-kinds";
 import type { Notifier } from "./notifier";
 import type {
   DelayedWorkSource,
+  // Sales (CM-1004)
+  FollowUpsDueSource,
   NotificationStore,
   RecipientDirectory,
 } from "./ports";
@@ -83,6 +85,80 @@ export function delayedQueueHandler(deps: DelayedDeps): QueueHandler {
     timeLimitMs: 240_000,
     async run() {
       await raiseBecameDelayed(deps);
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Sales (CM-1004, ADR CM-0022 §10)
+// ---------------------------------------------------------------------------
+
+/** Daily: each assignee's follow-ups due today and overdue. */
+export const FOLLOW_UPS_DUE_QUEUE_TYPE = "messaging.follow_ups_due";
+
+export type FollowUpsDueDeps = {
+  source: FollowUpsDueSource;
+  recipients: RecipientDirectory;
+  notifier: Notifier;
+  clock?: () => Date;
+};
+
+function count(n: number, one: string, many: string): string {
+  return `${String(n)} ${n === 1 ? one : many}`;
+}
+
+/**
+ * `inquiry.follow_ups_due`: one notice per assignee and Project (holding
+ * Inquiry Notification and Read on it) with how many of their open
+ * inquiries are overdue or due today, linking the Overdue list (or
+ * Today's when none is overdue). The source key is per Project, member
+ * and date, so a second run that day adds nothing.
+ */
+export async function raiseFollowUpsDue(
+  deps: FollowUpsDueDeps,
+): Promise<number> {
+  const now = (deps.clock ?? (() => new Date()))();
+  let written = 0;
+  for (const item of await deps.source.due(now)) {
+    if (item.overdue + item.today === 0) continue;
+    const users = await deps.recipients.usersOfMembers(item.workspaceId, [
+      item.assigneeMemberId,
+    ]);
+    if (users.length === 0) continue;
+    const recipients = await deps.recipients.holders({
+      workspaceId: item.workspaceId,
+      menu: "sales.inquiries",
+      flag: "read",
+      projectId: item.projectId,
+      among: users,
+    });
+    const parts = [
+      item.overdue > 0 ? `${String(item.overdue)} overdue` : null,
+      item.today > 0 ? `${String(item.today)} due today` : null,
+    ].filter((part): part is string => part != null);
+    const ids = await deps.notifier.notify(item.workspaceId, recipients, {
+      type: "inquiry.follow_ups_due",
+      menu: "sales.inquiries",
+      projectId: item.projectId,
+      title: `You have ${count(item.overdue + item.today, "follow-up", "follow-ups")} to do`,
+      body: `${parts.join(", ")}.`,
+      href: LINKS.inquiriesDue(
+        item.projectId,
+        item.overdue > 0 ? "overdue" : "today",
+      ),
+      sourceKey: `inquiry.follow_ups_due:${item.projectId}:${item.assigneeMemberId}:${item.date}`,
+    });
+    written += ids.length;
+  }
+  return written;
+}
+
+export function followUpsDueQueueHandler(deps: FollowUpsDueDeps): QueueHandler {
+  return {
+    type: FOLLOW_UPS_DUE_QUEUE_TYPE,
+    timeLimitMs: 240_000,
+    async run() {
+      await raiseFollowUpsDue(deps);
     },
   };
 }

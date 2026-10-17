@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { formatMobile } from "@repo/auth/construction/mobile";
 import { CircleCheck, Pencil, Ban, Lock, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
@@ -184,7 +185,7 @@ export function UnitPanel({
               : ` · Hold until ${formatDate(unit.booking.holdUntil)}`}
             {unit.booking.customerMobile == null
               ? ""
-              : ` · ${unit.booking.customerMobile}`}
+              : ` · ${formatMobile(unit.booking.customerMobile)}`}
           </p>
           {unit.booking.status === "hold_expired" && (
             <p className="text-sm">

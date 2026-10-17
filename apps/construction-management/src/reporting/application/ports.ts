@@ -57,6 +57,16 @@ import type {
   TaskReportRow,
 } from "../domain/tracking-reports";
 
+import type {
+  BookingReportRow,
+  InquiryReportRow,
+} from "../domain/sales-reports";
+import type {
+  BookingStatusFilter,
+  InquiryStatusFilter,
+  InterestTypeFilter,
+} from "../domain/report-job";
+
 /** A rendered file written to storage for a job. */
 export type ReportFile = {
   key: string;
@@ -502,4 +512,43 @@ export type ProcurementReportSource = {
       materialId: string | null;
     },
   ): Promise<{ rows: StockRegisterReportRow[]; names: ProcurementFilterNames }>;
+};
+
+/**
+ * The sales reports' read model (CM-1008, ADR CM-0022 §11): sales and
+ * projects for one Project and period. Implemented in
+ * `src/composition/sales-report-source.ts`.
+ */
+export type SalesReportSource = {
+  /** Live bookings of the Project with a Booking Date in the range. */
+  bookings(
+    workspaceId: string,
+    projectId: string,
+    filter: {
+      range: DateRange;
+      status: BookingStatusFilter | null;
+      wingId: string | null;
+      /** The Company's today: Hold expired is derived from it. */
+      today: CalendarDate;
+    },
+  ): Promise<{ rows: BookingReportRow[]; wingName: string | null }>;
+  /**
+   * Live inquiries of the Project with an Inquiry Date in the range; with
+   * `own`, only those the requester created, is assigned to or owns as
+   * Lead Owner. `filterNames` names the picked filters for the notes.
+   */
+  inquiries(
+    workspaceId: string,
+    projectId: string,
+    filter: {
+      range: DateRange;
+      interestType: InterestTypeFilter | null;
+      leadSourceId: string | null;
+      funnelStageId: string | null;
+      status: InquiryStatusFilter | null;
+      lostReasonId: string | null;
+      assigneeMemberId: string | null;
+      own: ReportOwnScope | null;
+    },
+  ): Promise<{ rows: InquiryReportRow[]; filterNames: string[] }>;
 };

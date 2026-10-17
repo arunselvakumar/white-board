@@ -33,11 +33,14 @@ import {
   procurementReportBody,
 } from "./build-procurement-report";
 import { buildCentralLabourAttendanceReport } from "../domain/central-labour-attendance-report";
+// Sales reports (CM-1008).
+import { salesReportBody, SALES_TABLE_KINDS } from "./build-sales-report";
 import type {
   FinanceReportSource,
   HeaderFacts,
   ProcurementReportSource,
   ReportSource,
+  SalesReportSource,
   TrackingReportSource,
 } from "./ports";
 
@@ -69,6 +72,7 @@ async function bodyFor(
   finance: FinanceReportSource | undefined,
   tracking: TrackingReportSource | undefined,
   procurement: ProcurementReportSource | undefined,
+  sales: SalesReportSource | undefined,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -165,6 +169,10 @@ async function bodyFor(
             : "assigned",
       });
     }
+    // Sales reports (CM-1008).
+    case "inquiry_report":
+    case "booking_report":
+      return salesReportBody(job, params, sales, today);
     case "daily_progress_report":
     case "task_progress_report":
       // PDFs of their own, not table reports (`createReportExecutor`).
@@ -192,6 +200,8 @@ export async function buildReportDocument(
   tracking?: TrackingReportSource,
   /** The procurement reports' read model (CM-903). */
   procurement?: ProcurementReportSource,
+  /** The sales reports' read model (CM-1008). */
+  sales?: SalesReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
@@ -205,6 +215,7 @@ export async function buildReportDocument(
     finance,
     tracking,
     procurement,
+    sales,
   );
   return {
     header: {
@@ -224,14 +235,17 @@ export async function buildReportDocument(
       SITE_WORK_A3_KINDS.includes(job.kind) ||
       FINANCE_A3_KINDS.includes(job.kind) ||
       TRACKING_A3_KINDS.includes(job.kind) ||
-      PROCUREMENT_A3_KINDS.includes(job.kind)
+      PROCUREMENT_A3_KINDS.includes(job.kind) ||
+      SALES_TABLE_KINDS.includes(job.kind)
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),
     // Tracking reports print names and remarks in any script (CM-805).
     // So do the procurement reports: material and party names (CM-903).
+    // And the sales reports: customers' names (CM-1008).
     ...(TRACKING_TABLE_KINDS.includes(job.kind) ||
     PROCUREMENT_A3_KINDS.includes(job.kind) ||
+    SALES_TABLE_KINDS.includes(job.kind) ||
     job.kind === "labour_attendance_central"
       ? { fonts: "noto" as const }
       : {}),

@@ -54,6 +54,8 @@ import { DurationFilter } from "./duration-filter";
 import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
+// Sales (CM-1008)
+import { BookingSection, InquirySection } from "./sales-sections";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
 import {
   InspectionSection,
@@ -63,15 +65,14 @@ import {
   TaskSection,
 } from "./tracking-sections";
 
-/** What each stub section will show once its milestone lands. */
-const STUB_TEXT: Record<string, string> = {
-  booking: "Units booked and available, and the booking report.",
-  inquiry: "The inquiry funnel.",
-};
+/**
+ * What each stub section will show once its milestone lands, and the
+ * milestones' names. Empty since M10 filled the last stubs; a later
+ * section waiting for its milestone adds its words here.
+ */
+const STUB_TEXT: Record<string, string> = {};
 
-const MILESTONE_NAMES: Record<string, string> = {
-  M10: "Sales (M10)",
-};
+const MILESTONE_NAMES: Record<string, string> = {};
 
 function milestoneName(milestone: string): string {
   return MILESTONE_NAMES[milestone] ?? milestone;
@@ -513,6 +514,18 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
                   duration={duration}
                 />
               ) : null;
+            // Sales (CM-1008): Booking is a snapshot, so no duration.
+            if (section.key === "inquiry")
+              return problem == null ? (
+                <InquirySection
+                  key={section.key}
+                  projectId={projectId}
+                  duration={duration}
+                />
+              ) : null;
+            // A snapshot as on today: a bad duration does not hide it.
+            if (section.key === "booking")
+              return <BookingSection key={section.key} projectId={projectId} />;
             return <StubSection key={section.key} section={section} />;
           })
         )}

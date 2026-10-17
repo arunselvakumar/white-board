@@ -128,7 +128,38 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
         projectId: job.projectId,
       })
     );
+  // An Inquiry Report may hold others' inquiries (CM-0022 §3, CM-1008).
+  if (job.kind === "inquiry_report")
+    return (
+      job.requestedBy === session.userId ||
+      can(session.access, "sales.inquiries", "view_all", {
+        projectId: job.projectId,
+      })
+    );
   return true;
+}
+
+/**
+ * Who an Inquiry Report covers (CM-1008): every inquiry with Inquiry View
+ * all on the Project (or as the Owner), else those the requester created,
+ * is assigned to or owns as Lead Owner (their Team Member), fixed with
+ * the job, as the Inquiries list scopes them.
+ */
+export async function inquiryOwnScope(
+  session: AccessSession,
+  projectId: string,
+): Promise<ReportOwnScope | null> {
+  if (can(session.access, "sales.inquiries", "view_all", { projectId }))
+    return null;
+  const member = await prisma.constructionOrganizationTeamMember.findFirst({
+    where: {
+      workspaceId: session.workspaceId,
+      userId: session.userId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+  return { userId: session.userId, memberId: member?.id ?? null };
 }
 
 /**

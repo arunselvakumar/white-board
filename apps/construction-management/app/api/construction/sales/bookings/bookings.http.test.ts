@@ -20,11 +20,16 @@ import { POST as cancel } from "./[id]/cancel/route";
 import { POST as confirm } from "./[id]/confirm/route";
 import { POST as remove } from "./[id]/delete/route";
 import { POST as extendHold } from "./[id]/extend-hold/route";
-import { POST as removeFile } from "./[id]/files/[fileId]/delete/route";
-import { GET as readFile } from "./[id]/files/[fileId]/route";
-import { GET as listFiles, POST as completeUpload } from "./[id]/files/route";
-import { POST as receiveUpload } from "./[id]/files/uploads/app/route";
-import { POST as startUpload } from "./[id]/files/uploads/route";
+import { POST as removeFile } from "@/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/delete/route";
+import { GET as readFile } from "@/app/api/construction/sales/documents/[type]/[id]/files/[fileId]/route";
+import { GET as listFiles } from "@/app/api/construction/sales/documents/[type]/[id]/files/route";
+import {
+  salesDocumentBase,
+  salesDocumentParams,
+  salesFileParams,
+  startSalesUpload,
+  uploadSalesFile,
+} from "@/app/api/construction/sales/documents/document-test-fixtures";
 import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
 import { GET as formOptions } from "./form-options/route";
@@ -622,86 +627,101 @@ describe("Bookings (CM-1006, CM-0022 §7)", () => {
 });
 
 describe("Booking files (CM-1006): Booking Form and photos, not in the Gallery", () => {
-  async function upload(
-    bookingId: string,
-    role: string,
-    fileName: string,
-    bytes: Uint8Array,
-  ): Promise<Response> {
-    const context = params(bookingId);
-    const started = await startUpload(
-      post(`/${bookingId}/files/uploads`, {
-        role,
-        fileName,
-        bytes: bytes.byteLength,
-      }),
-      context,
-    );
-    if (started.status !== 201) return started;
-    const body = await json<{
-      key: string;
-      fileName: string;
-      upload: { via: string; url: string };
-    }>(started);
-    const sent = await receiveUpload(
-      new Request(`${ORIGIN}${body.upload.url}`, {
-        method: "POST",
-        headers: { "content-type": "application/octet-stream" },
-        body: Uint8Array.from(bytes),
-      }),
-      context,
-    );
-    expect(sent.status).toBe(StatusCodes.NO_CONTENT);
-    return completeUpload(
-      post(`/${bookingId}/files`, { role, key: body.key, fileName }),
-      context,
-    );
-  }
-
-  it("keeps one Booking Form and photos, serves them, and removes them", async () => {
+  it("keeps one Booking Form and photos on the sales document routes", async () => {
     const ctx = await setup();
     const hold = await booked(ctx);
-    const form = await upload(hold.id, "booking_form", "form.pdf", PDF);
-    expect(form.status).toBe(StatusCodes.CREATED);
-    const formBody = await json<BookingFile>(form);
-    expect(formBody).toMatchObject({
+    const form = await uploadSalesFile(
+      "booking",
+      hold.id,
+      "booking_form",
+      "form.pdf",
+      PDF,
+    );
+    expect(form).toMatchObject({
       role: "booking_form",
       contentType: "application/pdf",
       canRemove: true,
     });
-    const second = await upload(hold.id, "booking_form", "again.pdf", PDF);
+    const second = await startSalesUpload(
+      "booking",
+      hold.id,
+      "booking_form",
+      "again.pdf",
+      PDF.byteLength,
+    );
+    expect(second.status).toBe(StatusCodes.CONFLICT);
     expect((await json<ErrorBody>(second)).code).toBe("BOOKING_FORM_EXISTS");
-    const pdfPhoto = await upload(hold.id, "photo", "scan.pdf", PDF);
+    const pdfPhoto = await startSalesUpload(
+      "booking",
+      hold.id,
+      "photo",
+      "scan.pdf",
+      PDF.byteLength,
+    );
     expect((await json<ErrorBody>(pdfPhoto)).code).toBe(
       "FILE_TYPE_NOT_ALLOWED",
     );
-    const photo = await upload(hold.id, "photo", "site.png", pngBytes());
-    expect(photo.status).toBe(StatusCodes.CREATED);
+    const card = await startSalesUpload(
+      "booking",
+      hold.id,
+      "visiting_card",
+      "card.png",
+      64,
+    );
+    expect((await json<ErrorBody>(card)).code).toBe("FILE_ROLE_NOT_ALLOWED");
+    await uploadSalesFile("booking", hold.id, "photo", "site.png", pngBytes());
     const listed = await json<{ items: BookingFile[]; canUpload: boolean }>(
-      await listFiles(get(`/${hold.id}/files`), params(hold.id)),
+      await listFiles(
+        get(`/${hold.id}/files`),
+        salesDocumentParams("booking", hold.id),
+      ),
     );
     expect(listed.items.map((file) => file.role)).toEqual([
       "booking_form",
       "photo",
     ]);
     expect(listed.canUpload).toBe(true);
-    const served = await readFile(new Request(`${ORIGIN}${formBody.url}`), {
-      params: Promise.resolve({ id: hold.id, fileId: formBody.id }),
-    });
+    const served = await readFile(
+      new Request(`${salesDocumentBase("booking", hold.id)}/files/${form.id}`),
+      salesFileParams("booking", hold.id, form.id),
+    );
     expect(served.status).toBe(StatusCodes.OK);
     expect(served.headers.get("content-type")).toContain("application/pdf");
-    const gallery = await prisma.constructionProjectsMediaItem.count({
-      where: { workspaceId: ctx.ws, projectId: ctx.projectId },
-    });
-    expect(gallery).toBe(0);
+    expect(
+      await prisma.constructionProjectsMediaItem.count({
+        where: { workspaceId: ctx.ws, projectId: ctx.projectId },
+      }),
+    ).toBe(0);
     const removed = await removeFile(
-      post(`/${hold.id}/files/${formBody.id}/delete`, {}),
-      { params: Promise.resolve({ id: hold.id, fileId: formBody.id }) },
+      post(`/${hold.id}/files/${form.id}/delete`, {}),
+      salesFileParams("booking", hold.id, form.id),
     );
     expect(removed.status).toBe(StatusCodes.NO_CONTENT);
+    // A Create holder (without Update) uploads too; Read alone does not.
+    actAs(await member(ctx, ["read", "create"]));
+    expect(
+      (
+        await startSalesUpload(
+          "booking",
+          hold.id,
+          "photo",
+          "x.png",
+          pngBytes().byteLength,
+        )
+      ).status,
+    ).toBe(StatusCodes.CREATED);
     actAs(await member(ctx, ["read"]));
-    const readOnly = await upload(hold.id, "photo", "x.png", pngBytes());
-    expect(readOnly.status).toBe(StatusCodes.FORBIDDEN);
+    expect(
+      (
+        await startSalesUpload(
+          "booking",
+          hold.id,
+          "photo",
+          "x.png",
+          pngBytes().byteLength,
+        )
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
   });
 });
 
@@ -768,7 +788,6 @@ describe("Structure and Project usage (CM-1006)", () => {
     for (const path of [
       "/api/construction/sales/bookings",
       "/api/construction/sales/bookings/{id}/cancel",
-      "/api/construction/sales/bookings/{id}/files/uploads",
       "/api/construction/sales/bookings/form-options",
     ])
       expect(document.paths).toHaveProperty(path);

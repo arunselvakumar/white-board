@@ -51,9 +51,9 @@ export const DASHBOARD_SECTIONS = [
     milestone: null,
     module: "inspections",
   },
-  // Sales (M10, ADR CM-0022 §11); CM-1008 replaces the stubs.
-  { key: "booking", label: "Booking", milestone: "M10", module: "bookings" },
-  { key: "inquiry", label: "Inquiry", milestone: "M10", module: "inquiries" },
+  // Sales (M10, ADR CM-0022 §11, CM-1008).
+  { key: "booking", label: "Booking", milestone: null, module: "bookings" },
+  { key: "inquiry", label: "Inquiry", milestone: null, module: "inquiries" },
 ] as const satisfies readonly {
   key: string;
   label: string;
@@ -62,6 +62,16 @@ export const DASHBOARD_SECTIONS = [
 }[];
 
 export type DashboardSectionKey = (typeof DASHBOARD_SECTIONS)[number]["key"];
+
+/**
+ * The milestone a stub section waits for, or null when it shows data. No
+ * section is a stub since M10; later modules may add one again.
+ */
+export function sectionMilestone(key: string): string | null {
+  const section: { milestone: string | null } | undefined =
+    DASHBOARD_SECTIONS.find((item) => item.key === key);
+  return section?.milestone ?? null;
+}
 
 export const DASHBOARD_SECTION_KEYS: readonly DashboardSectionKey[] =
   DASHBOARD_SECTIONS.map((section) => section.key);

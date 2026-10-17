@@ -318,7 +318,7 @@ export function UnitUnavailableDialog({
         <DialogHeader>
           <DialogTitle>Mark {unit.name} unavailable</DialogTitle>
           <DialogDescription>
-            It leaves the units for sale until it is made available again.
+            It takes the unit off sale until it is made available again.
           </DialogDescription>
         </DialogHeader>
         <form
