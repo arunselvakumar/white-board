@@ -1,0 +1,91 @@
+apps/construction-management/app/api/construction/sales/bookings/[id]/cancel/route.ts
+  s_415949558e694b::t_ba50b619cbaafb 1-18
+apps/construction-management/app/api/construction/sales/bookings/[id]/confirm/route.ts
+  s_415949558e694b::t_1fb4b0c558c1ba 1-22
+apps/construction-management/app/api/construction/sales/bookings/[id]/delete/route.ts
+  s_415949558e694b::t_283df4046e9b54 1-19
+apps/construction-management/app/api/construction/sales/bookings/[id]/extend-hold/route.ts
+  s_415949558e694b::t_dbb23c247ddca0 1-23
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/delete/route.ts
+  s_415949558e694b::t_9140e0f16c760e 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/route.ts
+  s_415949558e694b::t_7eff9146c0d11c 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/thumbnail/route.ts
+  s_415949558e694b::t_93bfa18e84a0e4 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/route.ts
+  s_415949558e694b::t_49068a08ca82f5 1-9
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/app/route.ts
+  s_415949558e694b::t_c84b7f18d12269 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/presign/route.ts
+  s_415949558e694b::t_6d5f566ec24d3b 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/route.ts
+  s_415949558e694b::t_70d7b9037eca56 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/thumbnail/route.ts
+  s_415949558e694b::t_b26303cc253bb4 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/route.ts
+  s_415949558e694b::t_a2e516ba74f040 1-26
+apps/construction-management/app/api/construction/sales/bookings/[id]/update/route.ts
+  s_415949558e694b::t_f1b329efd73af0 1-19
+apps/construction-management/app/api/construction/sales/bookings/booking-file-models.ts
+  s_415949558e694b::t_664eba37eadb34 1-105
+apps/construction-management/app/api/construction/sales/bookings/booking-file-routes.ts
+  s_415949558e694b::t_089e5f1cfdea08 1-241
+apps/construction-management/app/api/construction/sales/bookings/booking-route-parts.ts
+  s_415949558e694b::t_a22dbabbd78862 1-71
+apps/construction-management/app/api/construction/sales/bookings/bookings-openapi.ts
+  s_415949558e694b::t_ce23a3a28b3389 1-6,12-54,56-95,97-282
+apps/construction-management/app/api/construction/sales/bookings/bookings.http.test.ts
+  s_415949558e694b::t_e6d87a9549ea53 1-762
+apps/construction-management/app/api/construction/sales/bookings/form-options/route.ts
+  s_415949558e694b::t_64ba51feaf6fe8 1-43
+apps/construction-management/app/api/construction/sales/bookings/route.ts
+  s_415949558e694b::t_943113a9e43267 1-101
+apps/construction-management/app/api/construction/sales/units/units.http.test.ts
+  s_415949558e694b::t_bcdfd4c03c2273 31-37
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_415949558e694b::t_d73bebaa8a7c89 9,37,64-65
+apps/construction-management/src/composition/sales-bookings.ts
+  s_415949558e694b::t_951168462d82ed 4,6,15,19,45-54
+apps/construction-management/src/composition/structure-usage.ts
+  s_415949558e694b::t_b29f956e719d7a 14-17,59-79,99-101,114-118
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_415949558e694b::t_d66ab7d15d7019 156-169
+apps/construction-management/src/messaging/application/listeners.ts
+  s_415949558e694b::t_5ffd58209087d4 22,161-165,754-806
+apps/construction-management/src/messaging/application/sales-booking-listeners.test.ts
+  s_415949558e694b::t_929d16e0f127cc 1-86
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_415949558e694b::t_d19bb88aa7db3f 68-71,232-234
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_415949558e694b::t_2b43dc16c92c03 14-15,83-94
+apps/construction-management/src/sales/application/booking-files.ts
+  s_415949558e694b::t_251f888da58a01 1-484
+apps/construction-management/app/api/construction/sales/bookings/booking-models.ts
+  s_f92effab5c9481::t_c400f87f827954 1-279
+apps/construction-management/src/sales/infrastructure/booking-files-store.ts
+  s_f92effab5c9481::t_726556e6ccc636 1-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f368c450d5401723a5cb54aa224cee0e56ad0b2c",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f92effab5c9481": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a59a3a31b725a6d0c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
