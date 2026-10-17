@@ -1,0 +1,53 @@
+apps/construction-management/app/api/construction/sales/settings/settings.http.test.ts
+  s_415949558e694b::t_0f026836cc2aca 135-136,278,325,350,366,387,422,445,467
+apps/construction-management/app/app/projects/[id]/inquiries/page.tsx
+  s_415949558e694b::t_c0ff07996f6427 1-13
+apps/construction-management/app/app/projects/[id]/inquiries/settings/page.tsx
+  s_415949558e694b::t_309c95a537c5c6 1-19
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_415949558e694b::t_94859c467687b2 32-33,199-201,268-279
+apps/construction-management/components/sales/inquiries/inquiry-nav.ts
+  s_415949558e694b::t_d374aa758cf080 1-22
+apps/construction-management/components/sales/inquiries/inquiry-tabs.ts
+  s_415949558e694b::t_80480eff297cc4 1-18
+apps/construction-management/components/sales/settings/sales-list-dialog.tsx
+  s_415949558e694b::t_bafcca246a0cd8 1-162
+apps/construction-management/src/sales/infrastructure/sales-list-store.ts
+  s_415949558e694b::t_1f5b2e56c3d0bc 64,66,68
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_ce1366a7f7abea 125
+apps/construction-management/src/queries/sales-settings.ts
+  s_3e202948d44f95::t_71d47a70defe10 1-123
+apps/construction-management/components/sales/settings/sales-list-dialog.stories.tsx
+  s_415949558e694b::t_d1e10def1d0688 1-75
+apps/construction-management/components/sales/settings/sales-settings-fixtures.ts
+  s_415949558e694b::t_2f342c4ea084bc 1-223
+apps/construction-management/components/sales/settings/sales-settings.stories.tsx
+  s_415949558e694b::t_d0b843b7acae6b 1-274
+apps/construction-management/components/sales/settings/sales-settings.tsx
+  s_415949558e694b::t_52406ba49cb311 1-498
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cfe0cbca471948f6f5af638ee126245d9e09f733",
+  "prompts": {},
+  "sessions": {
+    "s_3e202948d44f95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aff499469bc4571e8",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
