@@ -1,0 +1,61 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_154207c08ba4df 1067-1068
+apps/construction-management/src/sales/application/booking-handlers.ts
+  s_415949558e694b::t_320965b307d607 1-846
+apps/construction-management/src/sales/application/booking-ports.ts
+  s_415949558e694b::t_fe81d5f25c2903 1-204
+apps/construction-management/src/sales/application/unit-import.ts
+  s_415949558e694b::t_9c413f33760091 1-338
+apps/construction-management/src/sales/application/unit-sales-handlers.ts
+  s_415949558e694b::t_00029de0bb21ef 1-494
+apps/construction-management/src/sales/domain/booking.test.ts
+  s_415949558e694b::t_8485ea5c64cf38 1-108
+apps/construction-management/src/sales/domain/unit-profile.test.ts
+  s_415949558e694b::t_4e15229a2910a0 1-99
+apps/construction-management/src/sales/infrastructure/prisma-unit-profile-store.ts
+  s_415949558e694b::t_7a1f145135efd2 1-101
+apps/construction-management/src/sales/application/sales-booking-deps.ts
+  s_f92effab5c9481::t_f3c502972ac667 1-86
+apps/construction-management/src/sales/domain/booking-events.ts
+  s_f92effab5c9481::t_a8cc8f2f353083 1-32
+apps/construction-management/src/sales/domain/booking.ts
+  s_f92effab5c9481::t_8823be071fd080 1-373
+apps/construction-management/src/sales/domain/unit-profile.ts
+  s_3e202948d44f95::t_6cff56d0b73459 1-209
+apps/construction-management/src/sales/infrastructure/prisma-booking-store.ts
+  s_f92effab5c9481::t_60851b0cd73fca 1-347
+apps/construction-management/src/composition/sales-bookings.ts
+  s_415949558e694b::t_5f2db9c03f7666 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8269c4117aaf160e85a6afbb3932a40d0961c3fc",
+  "prompts": {},
+  "sessions": {
+    "s_3e202948d44f95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aff499469bc4571e8",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f92effab5c9481": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a59a3a31b725a6d0c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
