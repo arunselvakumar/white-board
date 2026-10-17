@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import { openRevealWindow } from "@/test/accounts";
 import { actAs, addMember, newCompany } from "@/test/companies";
 import { bytesOf, gifBytes, pngBytes } from "@/test/files";
 import { withSms } from "@/test/sessions";
@@ -264,6 +265,13 @@ describe("POST /api/construction/organization/me/profile/reveal-identifiers", ()
       { aadhaar: "234123412346", pan: "ABCPE1234F" },
     );
     actAs({ userId, workspaceId, role: "member" });
+    const refused = await revealIdentifiers(
+      post("/profile/reveal-identifiers"),
+    );
+    expect(await json(refused)).toMatchObject({
+      code: "REVEAL_CODE_REQUIRED",
+    });
+    await openRevealWindow(userId);
     const response = await revealIdentifiers(
       post("/profile/reveal-identifiers"),
     );
@@ -294,11 +302,9 @@ describe("POST /api/construction/organization/me/profile/reveal-identifiers", ()
         aadhaar: "234123412346",
       },
     );
-    actAs({
-      userId: randomUUID(),
-      workspaceId: mine.workspaceId,
-      role: "member",
-    });
+    const userId = randomUUID();
+    actAs({ userId, workspaceId: mine.workspaceId, role: "member" });
+    await openRevealWindow(userId);
     const response = await revealIdentifiers(
       post("/profile/reveal-identifiers"),
     );

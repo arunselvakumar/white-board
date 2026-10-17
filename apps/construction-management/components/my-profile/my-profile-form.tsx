@@ -13,6 +13,10 @@ import { Label } from "@repo/ui/components/label";
 import { Separator } from "@repo/ui/components/separator";
 import { Textarea } from "@repo/ui/components/textarea";
 
+import {
+  needsRevealCode,
+  RevealCodeDialog,
+} from "@/components/account/reveal-code-dialog";
 import { initials } from "@/components/app-shell/user-menu";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -141,6 +145,18 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
   });
   const mutation = useMutation({ mutationFn: updateMyProfile });
   const reveal = useMutation({ mutationFn: revealMyIdentifiers });
+  // A reveal needs a code verified on this device (ADR CM-0021 §11).
+  const [askingCode, setAskingCode] = useState(false);
+  const revealNow = () => {
+    reveal.mutate(undefined, {
+      onSuccess: (values) => {
+        setRevealed(values);
+      },
+      onError: (error) => {
+        if (needsRevealCode(error)) setAskingCode(true);
+      },
+    });
+  };
   const errors = form.formState.errors;
 
   const accept = (updated: MyProfileModel) => {
@@ -309,13 +325,7 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
                   variant="outline"
                   size="sm"
                   disabled={reveal.isPending}
-                  onClick={() => {
-                    reveal.mutate(undefined, {
-                      onSuccess: (values) => {
-                        setRevealed(values);
-                      },
-                    });
-                  }}
+                  onClick={revealNow}
                 >
                   <Eye />
                   {reveal.isPending ? "Revealing…" : "Reveal"}
@@ -336,11 +346,22 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
           </div>
           <FormAlert
             message={
-              reveal.error == null
+              reveal.error == null || needsRevealCode(reveal.error)
                 ? undefined
                 : fieldForCode(reveal.error, {}).message
             }
           />
+          {askingCode && (
+            <RevealCodeDialog
+              onClose={() => {
+                setAskingCode(false);
+              }}
+              onVerified={() => {
+                setAskingCode(false);
+                revealNow();
+              }}
+            />
+          )}
           <dl className="grid gap-4 md:grid-cols-2">
             {IDENTIFIERS.map((identifier) => {
               const masked = identifier.masked(profile);

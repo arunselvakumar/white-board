@@ -7,16 +7,19 @@ export const metadata: Metadata = { title: "Workspace" };
 
 /** The Workspace index, with the tiles the viewer may read. */
 export default async function WorkspacePage() {
-  const [centralStore, centralInventory, centralPayment] = await Promise.all([
-    viewerCan("procurement.central_store", "read"),
-    viewerCan("procurement.central_inventory", "read"),
-    viewerCan("finance.central_payment", "read"),
-  ]);
+  const [centralStore, centralInventory, centralPayment, centralReports] =
+    await Promise.all([
+      viewerCan("procurement.central_store", "read"),
+      viewerCan("procurement.central_inventory", "read"),
+      viewerCan("finance.central_payment", "read"),
+      viewerCan("reporting.central_reports", "read"),
+    ]);
   return (
     <WorkspaceIndex
       centralStore={centralStore}
       centralInventory={centralInventory}
       centralPayment={centralPayment}
+      centralReports={centralReports}
     />
   );
 }

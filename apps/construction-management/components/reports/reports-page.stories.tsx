@@ -27,6 +27,10 @@ import {
   job,
   LABOUR_AND_SITE_WORK_KINDS,
   PROJECT_CATALOGUE_PATH,
+  FILTER_OPTIONS,
+  MASON_ID,
+  PROJECT_FILTER_OPTIONS_PATH,
+  VENDOR_ID,
 } from "./report-fixtures";
 import {
   COUNTERPARTY_OPTIONS,
@@ -784,5 +788,160 @@ export const Phone: Story = {
     await canvas.findByRole("list", { name: "Recent reports" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+/** The pickers' choices on this Project, as the filter options route answers. */
+function filterOptions(call: ApiCall): Response | undefined {
+  if (call.method === "GET" && call.path === PROJECT_FILTER_OPTIONS_PATH)
+    return Response.json({ ...FILTER_OPTIONS, projects: [], stores: [] });
+  return undefined;
+}
+
+/** Vendor Attendance takes a Vendor and a Labour Category (CM-903). */
+export const VendorPickers: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue((call) => {
+        if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+        if (call.method === "POST" && call.path === API)
+          return Response.json(
+            job({
+              id: "0190a000-0000-7000-8000-0000000000bb",
+              kind: "vendor_attendance",
+              title: "Vendor Attendance",
+            }),
+            { status: 201 },
+          );
+        return filterOptions(call);
+      }),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const card = within(
+      await canvas.findByRole("form", { name: "Vendor Attendance" }),
+    );
+    await waitFor(() =>
+      expect(card.getByRole("combobox", { name: "Vendor" })).toBeVisible(),
+    );
+    // A Project's report has no Projects filter.
+    await expect(card.queryByLabelText("Projects")).toBeNull();
+    await userEvent.click(card.getByRole("combobox", { name: "Vendor" }));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Ganesh Labour Supply" }),
+    );
+    await userEvent.click(
+      card.getByRole("combobox", { name: "Labour Category" }),
+    );
+    await userEvent.click(await body.findByRole("option", { name: "Mason" }));
+    await userEvent.click(card.getByRole("button", { name: "Generate" }));
+    await waitFor(() => expect(posted()).toHaveLength(1));
+    await expect(posted()[0]?.body).toEqual({
+      kind: "vendor_attendance",
+      projectId: PROJECT_ID,
+      params: {
+        from: "2026-10-01",
+        to: TODAY,
+        vendorId: VENDOR_ID,
+        categoryId: MASON_ID,
+      },
+    });
+  },
+};
+
+/** Without its choices (no read), the Vendor Attendance card has its period only. */
+export const VendorPickersWithoutChoices: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue((call) =>
+        call.method === "GET" && call.path === LIST_PATH ? list([]) : undefined,
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    const card = within(
+      await canvas.findByRole("form", { name: "Vendor Attendance" }),
+    );
+    await expect(card.getByLabelText("From")).toBeVisible();
+    await expect(card.queryByRole("combobox", { name: "Vendor" })).toBeNull();
+  },
+};
+
+/** The Materials group: the five procurement cards and their pickers (CM-903). */
+export const MaterialsReports: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue(
+        (call) => {
+          if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+          if (call.method === "POST" && call.path === API)
+            return Response.json(
+              job({
+                id: "0190a000-0000-7000-8000-0000000000bc",
+                kind: "purchase_requests",
+                title: "Purchase Requests",
+              }),
+              { status: 201 },
+            );
+          return filterOptions(call);
+        },
+        [
+          "purchase_requests",
+          "purchase_orders",
+          "material_received",
+          "material_transfers",
+          "stock_register",
+        ],
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      await canvas.findByRole("heading", { name: "Materials" }),
+    ).toBeVisible();
+    for (const name of [
+      "Purchase Requests",
+      "Purchase Orders",
+      "Material Received",
+      "Material Transfers",
+      "Stock Register",
+    ])
+      await expect(canvas.getByRole("form", { name })).toBeVisible();
+    // A Project's Stock Register has no Store picker.
+    const stock = within(canvas.getByRole("form", { name: "Stock Register" }));
+    await waitFor(() =>
+      expect(stock.getByRole("combobox", { name: "Material" })).toBeVisible(),
+    );
+    await expect(stock.queryByRole("combobox", { name: "Store" })).toBeNull();
+    const transfers = within(
+      canvas.getByRole("form", { name: "Material Transfers" }),
+    );
+    await userEvent.click(transfers.getByRole("combobox", { name: "Status" }));
+    await expect(
+      await body.findByRole("option", { name: "In transit" }),
+    ).toBeVisible();
+    await userEvent.keyboard("{Escape}");
+
+    const requests = within(
+      canvas.getByRole("form", { name: "Purchase Requests" }),
+    );
+    await userEvent.click(
+      requests.getByRole("combobox", { name: "Created By" }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Prabhu Saravanan" }),
+    );
+    await userEvent.click(requests.getByRole("button", { name: "Generate" }));
+    await waitFor(() => expect(posted()).toHaveLength(1));
+    await expect(posted()[0]?.body).toEqual({
+      kind: "purchase_requests",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY, createdBy: "user-1" },
+    });
   },
 };

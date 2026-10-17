@@ -14,6 +14,7 @@ const STATUS_BY_KIND: Record<DomainErrorKind, StatusCodes> = {
   conflict: StatusCodes.CONFLICT,
   forbidden: StatusCodes.FORBIDDEN,
   limit: StatusCodes.PAYMENT_REQUIRED,
+  too_many: StatusCodes.TOO_MANY_REQUESTS,
 };
 
 /** Any thrown value as the `{ code, message, details? }` envelope (root ADR-0017). */

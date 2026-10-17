@@ -30,6 +30,102 @@ export function cardFilter(
   return null;
 }
 
+/**
+ * The other pickers a card can offer (CM-903), besides its one filter
+ * above: each "All …" until a choice is made.
+ */
+export const PICKER_KEYS = [
+  "status",
+  "transfer_type",
+  "supplier",
+  "vendor",
+  "labour_category",
+  "material_category",
+  "material",
+  "created_by",
+  "store",
+] as const;
+
+export type PickerKey = (typeof PICKER_KEYS)[number];
+
+/** Choices per picker, and the central Projects. */
+export type ReportPickerOptions = Partial<
+  Record<PickerKey | "projects", { value: string; label: string }[]>
+>;
+
+/** The kinds whose cards offer the pickers (CM-903). */
+const PICKER_KINDS: readonly ReportDefinition["kind"][] = [
+  "vendor_attendance",
+  "purchase_requests",
+  "purchase_orders",
+  "material_received",
+  "material_transfers",
+  "stock_register",
+  "labour_attendance_central",
+];
+
+export const PICKER_COPY: Record<PickerKey, { label: string; all: string }> = {
+  status: { label: "Status", all: "All statuses" },
+  transfer_type: { label: "Type", all: "All types" },
+  supplier: { label: "Supplier", all: "All suppliers" },
+  vendor: { label: "Vendor", all: "All vendors" },
+  labour_category: { label: "Labour Category", all: "All categories" },
+  material_category: { label: "Material Category", all: "All categories" },
+  material: { label: "Material", all: "All materials" },
+  created_by: { label: "Created By", all: "Anyone" },
+  store: { label: "Store", all: "All Stores" },
+};
+
+/** The pickers a card offers, in its catalogue filters' order. */
+export function cardPickers(
+  definition: Pick<ReportDefinition, "kind" | "filters">,
+): PickerKey[] {
+  if (!PICKER_KINDS.includes(definition.kind)) return [];
+  return definition.filters.flatMap((filter) => {
+    const key = PICKER_KEYS.find((item) => item === filter.key);
+    return key == null ? [] : [key];
+  });
+}
+
+/** Whether a card takes the central Projects filter. */
+export function takesProjects(
+  definition: Pick<ReportDefinition, "filters">,
+): boolean {
+  return definition.filters.some((filter) => filter.key === "projects");
+}
+
+const APPROVAL_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+];
+
+const TRANSFER_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "in_transit", label: "In transit" },
+  { value: "delivered", label: "Delivered" },
+  { value: "rejected", label: "Rejected" },
+];
+
+const TRANSFER_TYPE_OPTIONS = [
+  { value: "project_to_project", label: "Project to Project" },
+  { value: "project_to_store", label: "Project to Store" },
+  { value: "store_to_project", label: "Store to Project" },
+  { value: "store_to_store", label: "Store to Store" },
+];
+
+/** The fixed choices of a status or type picker; null for the others. */
+export function pickerStatuses(
+  kind: ReportDefinition["kind"],
+  key: PickerKey,
+): { value: string; label: string }[] | null {
+  if (key === "transfer_type") return TRANSFER_TYPE_OPTIONS;
+  if (key !== "status") return null;
+  return kind === "material_transfers"
+    ? TRANSFER_STATUS_OPTIONS
+    : APPROVAL_STATUS_OPTIONS;
+}
+
 /** The Reports page's groups: heading and what they hold. */
 export const REPORT_GROUP_COPY: Record<
   ReportDefinition["group"],

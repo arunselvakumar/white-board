@@ -27,9 +27,16 @@ import {
   TRACKING_TABLE_KINDS,
   trackingReportBody,
 } from "./build-tracking-report";
+// Procurement and central labour reports (CM-903).
+import {
+  PROCUREMENT_A3_KINDS,
+  procurementReportBody,
+} from "./build-procurement-report";
+import { buildCentralLabourAttendanceReport } from "../domain/central-labour-attendance-report";
 import type {
   FinanceReportSource,
   HeaderFacts,
+  ProcurementReportSource,
   ReportSource,
   TrackingReportSource,
 } from "./ports";
@@ -61,6 +68,7 @@ async function bodyFor(
   today: CalendarDate,
   finance: FinanceReportSource | undefined,
   tracking: TrackingReportSource | undefined,
+  procurement: ProcurementReportSource | undefined,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -134,6 +142,29 @@ async function bodyFor(
     case "issue_snag_report":
     case "inspection_request_report":
       return trackingReportBody(job, params, tracking, today);
+    // Procurement and central labour reports (CM-903).
+    case "purchase_requests":
+    case "purchase_orders":
+    case "material_received":
+    case "material_transfers":
+    case "stock_register":
+      return procurementReportBody(job, params, procurement);
+    case "labour_attendance_central": {
+      const data = await source.projectLabourDays(
+        job.workspaceId,
+        params.projectIds,
+        params,
+      );
+      return buildCentralLabourAttendanceReport({
+        range: params,
+        ...data,
+        covers: params.projectsChosen
+          ? "chosen"
+          : params.projectIds == null
+            ? "all"
+            : "assigned",
+      });
+    }
     case "daily_progress_report":
     case "task_progress_report":
       // PDFs of their own, not table reports (`createReportExecutor`).
@@ -159,6 +190,8 @@ export async function buildReportDocument(
   finance?: FinanceReportSource,
   /** The tracking reports' read model (CM-805). */
   tracking?: TrackingReportSource,
+  /** The procurement reports' read model (CM-903). */
+  procurement?: ProcurementReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
@@ -171,6 +204,7 @@ export async function buildReportDocument(
     companyDate(facts.timezone, now),
     finance,
     tracking,
+    procurement,
   );
   return {
     header: {
@@ -189,12 +223,16 @@ export async function buildReportDocument(
       job.kind === "muster_roll" ||
       SITE_WORK_A3_KINDS.includes(job.kind) ||
       FINANCE_A3_KINDS.includes(job.kind) ||
-      TRACKING_A3_KINDS.includes(job.kind)
+      TRACKING_A3_KINDS.includes(job.kind) ||
+      PROCUREMENT_A3_KINDS.includes(job.kind)
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),
     // Tracking reports print names and remarks in any script (CM-805).
-    ...(TRACKING_TABLE_KINDS.includes(job.kind)
+    // So do the procurement reports: material and party names (CM-903).
+    ...(TRACKING_TABLE_KINDS.includes(job.kind) ||
+    PROCUREMENT_A3_KINDS.includes(job.kind) ||
+    job.kind === "labour_attendance_central"
       ? { fonts: "noto" as const }
       : {}),
   };

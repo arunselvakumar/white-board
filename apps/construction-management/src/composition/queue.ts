@@ -21,6 +21,10 @@ import {
   queueCleanupHandler,
 } from "@/src/shared-kernel/queue/cleanup";
 
+import { BACKUP_RETENTION_JOB_TYPE } from "@/src/reporting/application/backup-queue";
+
+import { backupQueueHandlersFromEnv } from "./backup-jobs";
+import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
 import {
   createMessagingDelayedHandler,
   createMessagingRetentionHandler,
@@ -48,6 +52,10 @@ export function queueHandlers(): QueueHandler[] {
     createPushQueueHandler(),
     createMessagingRetentionHandler(),
     createMessagingDelayedHandler(),
+    // CM-907: purge Companies whose deletion came due.
+    companyPurgeQueueHandler(),
+    // CM-906: backup parts, the zip step and the daily 7-day expiry.
+    ...backupQueueHandlersFromEnv(),
   ];
 }
 
@@ -64,6 +72,10 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   // CM-904
   "messaging.retention",
   "messaging.delayed",
+  // CM-907
+  COMPANY_PURGE_JOB,
+  // CM-906
+  BACKUP_RETENTION_JOB_TYPE,
 ];
 
 export const queueStore = prismaQueueStore(prisma);

@@ -1,11 +1,11 @@
 /**
  * Why a command or query cannot proceed, in words a screen can show. `kind`
  * is domain meaning, not HTTP: the route maps `not_found` to 404,
- * `conflict` to 409, `forbidden` to 403, `limit` to 402 and `invalid` to 400
- * (root ADR-0017).
+ * `conflict` to 409, `forbidden` to 403, `limit` to 402, `too_many` to 429
+ * and `invalid` to 400 (root ADR-0017).
  */
 export type DomainErrorKind =
-  "invalid" | "not_found" | "conflict" | "forbidden" | "limit";
+  "invalid" | "not_found" | "conflict" | "forbidden" | "limit" | "too_many";
 
 export class DomainError extends Error {
   readonly code: string;

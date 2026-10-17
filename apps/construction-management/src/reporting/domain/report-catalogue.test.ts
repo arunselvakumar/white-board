@@ -90,7 +90,12 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
     ]);
     const about = REPORT_KINDS.filter(isMoneyReport);
     expect([...about].sort()).toEqual(
-      ["labour_payment", "muster_roll", ...FINANCE_REPORT_KINDS].sort(),
+      [
+        "labour_payment",
+        "muster_roll",
+        "purchase_orders",
+        ...FINANCE_REPORT_KINDS,
+      ].sort(),
     );
     const amountFree = REPORT_KINDS.filter((kind) => !printsAmounts(kind));
     expect(amountFree).toEqual(
@@ -110,16 +115,78 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
     );
   });
 
-  it("catalogues the six CM-903 kinds as not available yet", () => {
-    for (const kind of NEW_KINDS) expect(isReportAvailable(kind)).toBe(false);
-    expect(
-      REPORT_CATALOGUE.filter((entry) => !entry.available).map(
-        (entry) => entry.kind,
-      ),
-    ).toEqual(expect.arrayContaining([...NEW_KINDS]));
-    expect(REPORT_CATALOGUE.filter((entry) => !entry.available)).toHaveLength(
-      NEW_KINDS.length,
-    );
+  it("builds the six CM-903 kinds: every catalogued kind is available", () => {
+    for (const kind of NEW_KINDS) expect(isReportAvailable(kind)).toBe(true);
+    expect(REPORT_CATALOGUE.filter((entry) => !entry.available)).toEqual([]);
+    // Project and central, but the central labour report is central only.
+    for (const kind of NEW_KINDS.filter(
+      (item) => item !== "labour_attendance_central",
+    ))
+      expect(catalogueEntry(kind).scopes, kind).toEqual(["project", "central"]);
+  });
+
+  it("settles the procurement money rules (CM-903)", () => {
+    // Purchase Order has no Financial: its Report shows the amounts.
+    expect(catalogueEntry("purchase_orders").money).toBe("always");
+    expect(catalogueEntry("purchase_orders").moneyFlag).toBe("report");
+    expect(catalogueEntry("material_received").money).toBe("with_financial");
+    for (const kind of [
+      "purchase_requests",
+      "material_transfers",
+      "stock_register",
+      "labour_attendance_central",
+    ] as const)
+      expect(printsAmounts(kind), kind).toBe(false);
+  });
+
+  it("marks the central reports a module hosts, which keep that module's gate", () => {
+    const hosted = REPORT_CATALOGUE.filter(
+      (entry) => entry.centralHost != null,
+    ).map((entry) => [entry.kind, entry.centralHost]);
+    expect(hosted).toEqual([
+      ["equipment_maintenance", "masters_equipments"],
+      ["equipment_transfers", "masters_equipments"],
+      ["account_ledger", "central_payment"],
+      ["tds_194c", "central_payment"],
+      ["due_payments", "central_payment"],
+    ]);
+  });
+
+  it("gives each new kind its filters, the Store and Projects central only", () => {
+    const keys = (scope: "project" | "central", kind: string) =>
+      entriesIn(scope)
+        .find((entry) => entry.kind === kind)
+        ?.filters.map((filter) => filter.key);
+    expect(keys("project", "purchase_requests")).toEqual([
+      "status",
+      "material_category",
+      "material",
+      "created_by",
+    ]);
+    expect(keys("central", "stock_register")).toEqual([
+      "material_category",
+      "material",
+      "store",
+      "projects",
+    ]);
+    expect(keys("project", "stock_register")).toEqual([
+      "material_category",
+      "material",
+    ]);
+    expect(keys("central", "material_transfers")).toEqual([
+      "status",
+      "transfer_type",
+      "projects",
+    ]);
+    expect(keys("central", "vendor_attendance")).toEqual([
+      "vendor",
+      "labour_category",
+      "projects",
+    ]);
+    expect(keys("project", "vendor_attendance")).toEqual([
+      "vendor",
+      "labour_category",
+    ]);
   });
 
   it("words central entries for the whole Company and keeps the Projects filter central", () => {
@@ -136,8 +203,8 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
       scope
         .find((entry) => entry.kind === "purchase_orders")
         ?.filters.map((filter) => filter.key);
-    expect(orders(central)).toEqual(["supplier", "projects"]);
-    expect(orders(project)).toEqual(["supplier"]);
+    expect(orders(central)).toEqual(["status", "supplier", "projects"]);
+    expect(orders(project)).toEqual(["status", "supplier"]);
   });
 
   it("lists the Project's finance cards in the Reports page's order", () => {

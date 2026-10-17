@@ -12,6 +12,7 @@ import {
   type ReportLabour,
   type ReportLabourDay,
 } from "../domain/labour-days";
+import type { ReportProjectLabourDay } from "../domain/central-labour-attendance-report";
 import type { ReportLedgerEntry } from "../domain/ledger-summary";
 import type { DateRange } from "../domain/report-period";
 // Site work reports (CM-605, CM-608).
@@ -128,10 +129,20 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     projectId: string,
     range: DateRange,
   ): Promise<ReportLabourDay[]> {
+    return markedDays(workspaceId, [projectId], range);
+  }
+
+  /** Days marked in the Projects (null: every one) in the range. */
+  async function markedDays(
+    workspaceId: string,
+    projectIds: string[] | null,
+    range: DateRange,
+  ): Promise<ReportProjectLabourDay[]> {
+    if (projectIds?.length === 0) return [];
     const rows = await db.constructionLabourAttendance.findMany({
       where: {
         workspaceId,
-        projectId,
+        ...(projectIds == null ? {} : { projectId: { in: projectIds } }),
         deletedAt: null,
         attendanceDate: between(range),
       },
@@ -144,6 +155,7 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       rows.map((row) => row.supervisorId),
     );
     return rows.map((row) => ({
+      projectId: row.projectId,
       labourId: row.labourId,
       date: calendarDateFromDb(row.attendanceDate),
       status: row.status,
@@ -248,6 +260,26 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
             ? null
             : await requesterName(workspaceId, requestedBy),
       };
+    },
+
+    async projectLabourDays(workspaceId, projectIds, range) {
+      if (projectIds?.length === 0)
+        return { projects: [], labours: [], days: [] };
+      const projects = await db.constructionProjectsProject.findMany({
+        where: {
+          workspaceId,
+          deletedAt: null,
+          ...(projectIds == null ? {} : { id: { in: projectIds } }),
+        },
+        select: { id: true, name: true },
+      });
+      const live = projects.map((project) => project.id);
+      const days = await markedDays(workspaceId, live, range);
+      const labours = await laboursOf(
+        workspaceId,
+        days.map((day) => day.labourId),
+      );
+      return { projects, labours, days };
     },
 
     async labourDays(workspaceId, projectId, range) {

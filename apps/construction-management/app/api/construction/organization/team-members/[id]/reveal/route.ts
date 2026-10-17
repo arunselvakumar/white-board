@@ -3,6 +3,7 @@ import {
   isResponse,
   requireOwnerSession,
 } from "@/app/api/_lib/require-session";
+import { assertRevealAllowed } from "@/src/shared-kernel/action-codes";
 
 import { teamMemberHandlers as handlers } from "../../handlers";
 import { TeamMemberIdParamsModel } from "../../team-member-models";
@@ -11,7 +12,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * The full Aadhaar and PAN of a Team Member, Owner only and logged
- * (CM-108). An OTP check before revealing arrives with M9.
+ * (CM-108). Needs a `reveal_identifiers` code verified in this session in
+ * the last 10 minutes (409 `REVEAL_CODE_REQUIRED`, ADR CM-0021 §11).
  */
 export async function POST(
   request: Request,
@@ -23,6 +25,7 @@ export async function POST(
     const { id } = parseOrThrow(
       TeamMemberIdParamsModel.safeParse(await context.params),
     );
+    await assertRevealAllowed(session);
     const revealed = await handlers.revealIdentifiers({
       workspaceId: session.workspaceId,
       id,

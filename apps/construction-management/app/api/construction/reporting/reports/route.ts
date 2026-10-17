@@ -18,7 +18,10 @@ import {
   type ReportParams,
 } from "@/src/reporting/domain/report-job";
 
+import { can } from "@/src/shared-kernel/access";
+
 import {
+  canReport,
   canSeeMoney,
   ledgerRefusal,
   mayOpen,
@@ -50,12 +53,30 @@ function unavailableKind(body: unknown): ReportKind | null {
   return known == null || isReportAvailable(known) ? null : known;
 }
 
+/** Where a request reads, fixed with the job (central reports, CM-903). */
+type Scope = {
+  /** The Projects (null: every Project of the Company). */
+  projectIds: string[] | null;
+  /** The Central Stores (null: every Store; empty: none). */
+  storeIds: string[] | null;
+  /** The requester chose the Projects. */
+  projectsChosen: boolean;
+  /** Material Received without View all: only this User's receipts. */
+  ownBy: string | null;
+};
+
 function paramsOf(
   model: RequestConstructionReportingReportRequestModel,
-  projectIds: string[] | null,
+  scope: Scope,
   pettyCashAccounts: string[] | null,
   own: ReportOwnScope | null,
 ): ReportParams {
+  const { projectIds } = scope;
+  const places = {
+    projectIds: scope.projectIds,
+    storeIds: scope.storeIds,
+    projectsChosen: scope.projectsChosen,
+  };
   switch (model.kind) {
     case "labour_attendance":
     case "labour_payment":
@@ -142,7 +163,149 @@ function paramsOf(
       };
     case "inspection_request_report":
       return { kind: model.kind, from: model.params.from, to: model.params.to };
+    // Procurement and central labour reports (CM-903).
+    case "purchase_requests":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        status: model.params.status ?? null,
+        categoryId: model.params.materialCategoryId ?? null,
+        materialId: model.params.materialId ?? null,
+        createdBy: model.params.createdBy ?? null,
+        ...places,
+      };
+    case "purchase_orders":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        status: model.params.status ?? null,
+        supplierId: model.params.supplierId ?? null,
+        ...places,
+      };
+    case "material_received":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        supplierId: model.params.supplierId ?? null,
+        ownBy: scope.ownBy,
+        ...places,
+      };
+    case "material_transfers":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        status: model.params.status ?? null,
+        transferType: model.params.transferType ?? null,
+        ...places,
+      };
+    case "stock_register":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        categoryId: model.params.materialCategoryId ?? null,
+        materialId: model.params.materialId ?? null,
+        ...places,
+      };
+    case "labour_attendance_central":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        projectIds,
+        projectsChosen: scope.projectsChosen,
+      };
   }
+}
+
+/** The Projects the request chose (central only), when it takes the filter. */
+function chosenProjectIds(
+  model: RequestConstructionReportingReportRequestModel,
+): string[] | null {
+  if (model.projectId != null || !("projectIds" in model.params)) return null;
+  const ids = model.params.projectIds;
+  return ids == null ? null : [...new Set(ids)];
+}
+
+/**
+ * Whether a central report of this kind reads the Central Stores: Purchase
+ * Orders and Material Received on a Store follow their own Company-level
+ * menu (CM-0015); a Store's transfers and stock also need Central store
+ * Read (`canOnTransferSide`, `canAtLocation`).
+ */
+function readsStores(
+  session: AccessSession,
+  kind: RequestConstructionReportingReportRequestModel["kind"],
+): boolean {
+  switch (kind) {
+    case "purchase_orders":
+    case "material_received":
+      return true;
+    case "material_transfers":
+    case "stock_register":
+      return can(session.access, "procurement.central_store", "read");
+    default:
+      return false;
+  }
+}
+
+/**
+ * Where the request reads (CM-903). A Project's report reads the Project.
+ * A central one reads the Projects the requester may see now (every one
+ * for the Owner) or the chosen ones among them, and, unless Projects were
+ * chosen, the Central Stores the kind reads; the Stock Register's Store
+ * filter reads that Store (with any chosen Projects).
+ */
+function scopeOf(
+  session: AccessSession,
+  model: RequestConstructionReportingReportRequestModel,
+): Scope | Response {
+  const visible =
+    session.role === "owner" ? null : [...session.access.projectIds];
+  const chosen = chosenProjectIds(model);
+  let projectIds =
+    model.projectId != null
+      ? null
+      : chosen == null
+        ? visible
+        : visible == null
+          ? chosen
+          : chosen.filter((id) => visible.includes(id));
+  const stores = model.projectId == null && readsStores(session, model.kind);
+  const storeId =
+    model.kind === "stock_register" && model.projectId == null
+      ? (model.params.storeId ?? null)
+      : null;
+  if (storeId != null && !stores)
+    return permissionDenied(
+      "A Store's stock needs Central store Read. Ask the Owner to change your Permission Matrix.",
+    );
+  let storeIds: string[] | null = !stores
+    ? []
+    : storeId != null
+      ? [storeId]
+      : chosen != null
+        ? []
+        : null;
+  // A Store picked alone reads that Store only.
+  if (storeId != null && chosen == null) projectIds = [];
+  if (model.projectId != null) storeIds = [];
+  // Without View all on Material Received: the requester's own receipts.
+  const ownBy =
+    model.kind === "material_received" &&
+    !can(
+      session.access,
+      "procurement.material_received",
+      "view_all",
+      model.projectId == null ? {} : { projectId: model.projectId },
+    )
+      ? session.userId
+      : null;
+  return { projectIds, storeIds, projectsChosen: chosen != null, ownBy };
 }
 
 /**
@@ -188,16 +351,20 @@ export async function POST(request: Request): Promise<Response> {
     );
     const session = await sessionFor(request, model);
     if (isResponse(session)) return session;
+    // A central report also needs Central Reports Read unless a module
+    // hosts it (Central Payment, Masters → Equipments; CM-903).
+    if (model.projectId == null && !canReport(session.access, model.kind, null))
+      return permissionDenied(
+        "Central reports need Central Reports Read. Ask the Owner to change your Permission Matrix.",
+      );
     const financial = canSeeMoney(session.access, model.kind, model.projectId);
     if (isMoneyReport(model.kind) && !financial)
       return permissionDenied(
         "This report is about amounts: it needs Financial on Labour. Ask the Owner to change your Permission Matrix.",
       );
     // A central report covers the Projects the requester may see now.
-    const projectIds =
-      model.projectId == null && session.role !== "owner"
-        ? [...session.access.projectIds]
-        : null;
+    const scope = scopeOf(session, model);
+    if (isResponse(scope)) return scope;
     // Petty Cash: the accounts the requester may see, fixed with the job.
     let pettyCashAccounts: string[] | null = null;
     if (model.kind === "petty_cash") {
@@ -223,7 +390,7 @@ export async function POST(request: Request): Promise<Response> {
       workspaceId: session.workspaceId,
       userId: session.userId,
       projectId: model.projectId,
-      params: paramsOf(model, projectIds, pettyCashAccounts, own),
+      params: paramsOf(model, scope, pettyCashAccounts, own),
       includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {

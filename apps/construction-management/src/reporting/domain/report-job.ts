@@ -98,6 +98,32 @@ export type LedgerFilters = {
 
 export type ReportFormat = "xlsx" | "pdf";
 
+/** A procurement document's approval status (Purchase Requests and Orders). */
+export type ProcurementApprovalFilter = "pending" | "approved" | "rejected";
+
+/** A Material Transfer's status: pending → in transit → delivered, or rejected. */
+export type TransferStatusFilter =
+  "pending" | "in_transit" | "delivered" | "rejected";
+
+export type TransferTypeFilter =
+  | "project_to_project"
+  | "project_to_store"
+  | "store_to_project"
+  | "store_to_store";
+
+/**
+ * Where a central procurement report reads (CM-903), fixed with the job
+ * when it is requested: the Projects (null for every Project of the
+ * Company: the Owner with none chosen) and the Central Stores (null for
+ * every Store, empty for none). Unused on a Project's report.
+ */
+export type ReportPlaces = {
+  projectIds: string[] | null;
+  storeIds: string[] | null;
+  /** The requester chose the Projects (the card's Projects filter). */
+  projectsChosen: boolean;
+};
+
 /** The Project's Progress Reports (CM-606, CM-805): PDFs of their own module. */
 export type ProgressReportKind = CatalogueKindsWhere<{ progressReport: true }>;
 
@@ -246,7 +272,59 @@ export type ReportParams =
       own: ReportOwnScope | null;
     }
   | { kind: "inspection_request_report"; from: string; to: string }
-  | { kind: "task_progress_report"; from: string; to: string };
+  | { kind: "task_progress_report"; from: string; to: string }
+  // Procurement and central labour reports (CM-903, ADR CM-0021 §5).
+  | ({
+      kind: "purchase_requests";
+      from: string;
+      to: string;
+      /** Approval status; null for every one. */
+      status: ProcurementApprovalFilter | null;
+      categoryId: string | null;
+      materialId: string | null;
+      /** A User id (Created By). */
+      createdBy: string | null;
+    } & ReportPlaces)
+  | ({
+      kind: "purchase_orders";
+      from: string;
+      to: string;
+      status: ProcurementApprovalFilter | null;
+      supplierId: string | null;
+    } & ReportPlaces)
+  | ({
+      kind: "material_received";
+      from: string;
+      to: string;
+      supplierId: string | null;
+      /**
+       * Without View all on Material Received: only the receipts this
+       * User entered, fixed with the job; null for every one.
+       */
+      ownBy: string | null;
+    } & ReportPlaces)
+  | ({
+      kind: "material_transfers";
+      from: string;
+      to: string;
+      status: TransferStatusFilter | null;
+      transferType: TransferTypeFilter | null;
+    } & ReportPlaces)
+  | ({
+      kind: "stock_register";
+      from: string;
+      to: string;
+      categoryId: string | null;
+      materialId: string | null;
+    } & ReportPlaces)
+  | {
+      kind: "labour_attendance_central";
+      from: string;
+      to: string;
+      /** The Projects covered; null for every Project (the Owner). */
+      projectIds: string[] | null;
+      projectsChosen: boolean;
+    };
 
 /** `expired`: retention deleted its files after 30 days (CM-0021 §3). */
 export type JobStatus = "queued" | "running" | "done" | "failed" | "expired";
@@ -306,6 +384,14 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "issue_snag_report":
     case "inspection_request_report":
     case "task_progress_report":
+      return { ...params, ...checkRange(params) };
+    // Procurement and central labour reports (CM-903).
+    case "purchase_requests":
+    case "purchase_orders":
+    case "material_received":
+    case "material_transfers":
+    case "stock_register":
+    case "labour_attendance_central":
       return { ...params, ...checkRange(params) };
     case "due_payments":
       assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");

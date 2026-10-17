@@ -11,7 +11,7 @@ export function downloadRow(
   overrides: Partial<Extract<DownloadItem, { source: "report" }>> & {
     id: string;
   },
-): DownloadItem {
+): Extract<DownloadItem, { source: "report" }> {
   const status = overrides.status ?? "done";
   return {
     source: "report",
@@ -112,3 +112,98 @@ export function downloadsPage(
 ): DownloadPage {
   return { items, nextCursor };
 }
+
+const BACKUPS = "/api/construction/reporting/backups";
+
+/** A backup row (CM-906) as the route sends it; ready by default. */
+export function backupDownloadRow(
+  overrides: Partial<Extract<DownloadItem, { source: "backup" }>> & {
+    id: string;
+  },
+): Extract<DownloadItem, { source: "backup" }> {
+  const status = overrides.status ?? "done";
+  return {
+    source: "backup",
+    scope: "project",
+    title: "Project backup",
+    detail: "3 modules · 01 Sep 2026 to 30 Sep 2026",
+    projectId: TOWER,
+    projectName: "Tower A",
+    status,
+    error: null,
+    createdAt: "2026-10-09T06:00:00.000Z",
+    finishedAt: status === "queued" ? null : "2026-10-09T06:00:20.000Z",
+    expiresAt: status === "done" ? "2026-10-16T06:00:20.000Z" : null,
+    includesMoney: false,
+    includeMedia: true,
+    files:
+      status === "done"
+        ? [
+            {
+              format: "zip",
+              label: "ZIP",
+              href: `${BACKUPS}/${overrides.id}/download?expires=1792130420&sig=c2lnbmVk`,
+            },
+          ]
+        : [],
+    retryHref: null,
+    deleteHref: `${BACKUPS}/${overrides.id}/delete`,
+    ...overrides,
+  };
+}
+
+export const BACKUP_READY = backupDownloadRow({
+  id: "0190a000-0000-7000-8000-0000000000e1",
+});
+
+export const BACKUP_RUNNING = backupDownloadRow({
+  id: "0190a000-0000-7000-8000-0000000000e2",
+  scope: "company",
+  title: "Full Company backup",
+  detail: "Every Project, master records and settings",
+  projectId: null,
+  projectName: null,
+  status: "running",
+  includesMoney: true,
+});
+
+export const BACKUP_FAILED = backupDownloadRow({
+  id: "0190a000-0000-7000-8000-0000000000e3",
+  scope: "masters",
+  title: "Master records backup",
+  detail: "4 modules",
+  projectId: null,
+  projectName: null,
+  status: "failed",
+  error: "Too large — choose fewer modules or a shorter range",
+});
+
+export const BACKUP_EXPIRED = backupDownloadRow({
+  id: "0190a000-0000-7000-8000-0000000000e4",
+  status: "expired",
+  createdAt: "2026-09-20T06:00:00.000Z",
+});
+
+export const DATA_EXPORT: DownloadItem = {
+  source: "export",
+  scope: "my_data",
+  id: "0190a000-0000-7000-8000-0000000000e5",
+  title: "My data",
+  detail: "Your profile, Companies and activity",
+  projectId: null,
+  projectName: null,
+  status: "done",
+  error: null,
+  createdAt: "2026-10-09T07:00:00.000Z",
+  finishedAt: "2026-10-09T07:00:03.000Z",
+  expiresAt: "2026-10-16T07:00:03.000Z",
+  files: [
+    {
+      format: "zip",
+      label: "ZIP",
+      href: `${BACKUPS}/0190a000-0000-7000-8000-0000000000e5/download?expires=1792134003&sig=bXlkYXRh`,
+    },
+  ],
+  retryHref: null,
+  deleteHref: `${BACKUPS}/0190a000-0000-7000-8000-0000000000e5/delete`,
+};

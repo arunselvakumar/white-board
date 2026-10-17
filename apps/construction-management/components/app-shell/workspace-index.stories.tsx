@@ -8,7 +8,12 @@ import { WorkspaceIndex } from "./workspace-index";
 const meta = {
   title: "App/WorkspaceIndex",
   component: WorkspaceIndex,
-  args: { centralStore: true, centralInventory: true, centralPayment: true },
+  args: {
+    centralStore: true,
+    centralInventory: true,
+    centralPayment: true,
+    centralReports: true,
+  },
 } satisfies Meta<typeof WorkspaceIndex>;
 
 export default meta;
@@ -33,14 +38,19 @@ export const Default: Story = {
       canvas.getByRole("link", { name: /^Central Payment/ }),
     ).toHaveAttribute("href", "/app/workspace/central-payment");
     await expect(
-      canvas.getByText("Central Reports will show here when it is built."),
-    ).toBeVisible();
+      canvas.getByRole("link", { name: /^Central Reports/ }),
+    ).toHaveAttribute("href", "/app/workspace/central-reports");
   },
 };
 
 /** Without the Central Store menus only HRMS shows. */
 export const HrmsOnly: Story = {
-  args: { centralStore: false, centralInventory: false, centralPayment: false },
+  args: {
+    centralStore: false,
+    centralInventory: false,
+    centralPayment: false,
+    centralReports: false,
+  },
   play: async ({ canvas }) => {
     await expect(canvas.queryByRole("link", { name: /^Central/ })).toBeNull();
   },

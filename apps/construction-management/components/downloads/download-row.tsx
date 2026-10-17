@@ -21,7 +21,21 @@ import type { DownloadItem } from "@/src/queries/downloads";
  */
 export const SOURCE_LABELS: Record<DownloadItem["source"], string> = {
   report: "Report",
+  backup: "Backup",
+  export: "Data export",
 };
+
+/** What an expired backup or export says (its link and file are gone). */
+export const BACKUP_EXPIRED_MESSAGE = "Expired — make a new backup";
+
+/** Where a row's contents come from, when it names no Project. */
+function placeOf(item: DownloadItem): string {
+  if (item.projectName != null) return item.projectName;
+  if (item.source === "export") return "Your account";
+  if (item.source === "backup" && item.scope === "masters")
+    return "Master records";
+  return item.projectId == null ? "All projects" : "A deleted Project";
+}
 
 const FILE_ICONS: Record<
   DownloadItem["files"][number]["format"],
@@ -81,9 +95,7 @@ export function DownloadRow({
   onDelete: (item: DownloadItem) => void;
 }) {
   const label = `${item.title} ${item.detail}`;
-  const where =
-    item.projectName ??
-    (item.projectId == null ? "All projects" : "A deleted Project");
+  const where = placeOf(item);
   return (
     <li className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 space-y-1">
@@ -104,9 +116,15 @@ export function DownloadRow({
           <p className="text-destructive text-sm">{item.error}</p>
         ) : null}
         {item.status === "expired" ? (
-          <p className="text-muted-foreground text-sm">{EXPIRED_MESSAGE}</p>
+          <p className="text-muted-foreground text-sm">
+            {item.source === "report"
+              ? EXPIRED_MESSAGE
+              : BACKUP_EXPIRED_MESSAGE}
+          </p>
         ) : null}
-        {item.status === "done" && item.files.length === 0 ? (
+        {item.status === "done" &&
+        item.files.length === 0 &&
+        item.source === "report" ? (
           <p className="text-muted-foreground text-xs">
             You can no longer open this: it needs the Report flag (and Financial
             for amounts) that you no longer have.
