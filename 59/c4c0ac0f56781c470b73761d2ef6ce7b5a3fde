@@ -1,0 +1,117 @@
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_415949558e694b::t_6bb96d73b4fa40 245,257
+apps/construction-management/app/api/construction/reporting/catalogue/catalogue-models.ts
+  s_415949558e694b::t_df9f3475008ace 34-39
+apps/construction-management/app/api/construction/reporting/filter-options/filter-options-models.ts
+  s_415949558e694b::t_0cf94fdcac4571 51-56
+apps/construction-management/app/api/construction/reporting/reports/handlers.ts
+  s_415949558e694b::t_0f2d1f4d72000b 131-138,142-164
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_415949558e694b::t_8451674a4ed22d 281-296,365-370,513-523
+apps/construction-management/app/api/construction/reporting/reports/route.ts
+  s_415949558e694b::t_1ec6554daf81bd 34,224-236,407,411-413
+apps/construction-management/app/api/construction/sales/bookings/booking-report.http.test.ts
+  s_415949558e694b::t_14fb39edb5a435 232,260-261
+apps/construction-management/app/api/construction/sales/bookings/bookings-openapi.ts
+  s_415949558e694b::t_269843c7f44f19 77-78
+apps/construction-management/app/api/construction/sales/bookings/bookings.http.test.ts
+  s_415949558e694b::t_a2c754877d6302 23-32,630,633-640,645-652,654-660,664-672,674-677,684-687,690-694,696-697,700-712,714-724
+apps/construction-management/app/api/construction/sales/dashboard/dashboard-openapi.ts
+  s_415949558e694b::t_07bb78d4a02a9f 14-19,25-26,49-66
+apps/construction-management/app/api/construction/sales/dashboard/inquiry-dashboard-models.ts
+  s_415949558e694b::t_b12a76954ae2f3 4-7,9-10,12-24,26,28-91,94-98
+apps/construction-management/app/api/construction/sales/dashboard/inquiry-dashboard.http.test.ts
+  s_415949558e694b::t_96584f9168e6b7 1-2,4-7,9-26,28-55,57-58,61-68,70-131,133-150,152-214,216-217
+apps/construction-management/app/api/construction/sales/dashboard/inquiry/route.ts
+  s_415949558e694b::t_3f088302fe69d4 1-6,8-11,13,15-57
+apps/construction-management/app/api/construction/sales/reports/inquiry-report.http.test.ts
+  s_415949558e694b::t_50d6cffa63c5d0 1-269
+apps/construction-management/app/api/construction/sales/reports/sales-backups.http.test.ts
+  s_415949558e694b::t_f6fc0665a61237 17-24,158-265
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_415949558e694b::t_8b528c20646239 26-27,84-85,222-223,354,362-364
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_415949558e694b::t_a391065afa00af 58,68-73,75,517-525
+apps/construction-management/components/projects/dashboard/sales-dashboard-fixtures.ts
+  s_415949558e694b::t_40e81935446d36 1-4,88-221
+apps/construction-management/components/projects/dashboard/sales-sections.stories.tsx
+  s_415949558e694b::t_c9e7c1ea968d30 2,9-11,14,119-234
+apps/construction-management/components/projects/dashboard/sales-sections.tsx
+  s_415949558e694b::t_be574281005839 4-15,17-18,25,29,31,33-37,40,46,205-414
+apps/construction-management/components/reports/report-card.tsx
+  s_415949558e694b::t_69e771d3f3a4da 346-368
+apps/construction-management/components/reports/report-catalogue.ts
+  s_415949558e694b::t_9fcbb61db44345 47,49-53,72,87-91,139-150,157,160
+apps/construction-management/components/reports/report-fixtures.ts
+  s_415949558e694b::t_2c119feee028e3 248-256
+apps/construction-management/components/reports/report-pickers.ts
+  s_415949558e694b::t_9a3f228f0a9103 35-38
+apps/construction-management/components/sales/bookings/booking-detail.stories.tsx
+  s_415949558e694b::t_1e6459345455c8 71,171
+apps/construction-management/components/sales/bookings/booking-detail.tsx
+  s_415949558e694b::t_ea432b5271acbf 27,36,99-103,243-252
+apps/construction-management/components/sales/bookings/booking-fixtures.ts
+  s_415949558e694b::t_f33d6aab4ddbb9 2-5,14,184,186-190,192-194,203,224-227,230-231
+apps/construction-management/components/sales/bookings/booking-form.tsx
+  s_415949558e694b::t_72463b9015e49b 25-26,65-67,143-144,200,251-256,539-556,559,561-564
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_415949558e694b::t_f2524ad41e5b78 525,527,531-533
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_ecc05100dfc4ae 1061-1070
+apps/construction-management/src/composition/backup-sources.ts
+  s_415949558e694b::t_9700de66198922 1246-1384
+apps/construction-management/src/composition/report-filter-options.ts
+  s_415949558e694b::t_b8ef4887058182 21-25,84-87,143-176,188-192
+apps/construction-management/src/composition/sales-dashboard.ts
+  s_415949558e694b::t_291ae64b945a43 3-4,6-12,14,16-18,20,23-25,27-52
+apps/construction-management/src/composition/sales-report-source.ts
+  s_415949558e694b::t_a02afcad128247 9-14,22-46,49-51,126-267
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_415949558e694b::t_f18c7190636113 54,56
+apps/construction-management/src/queries/sales-bookings.ts
+  s_415949558e694b::t_477d120f86ff6e 18
+apps/construction-management/src/queries/sales-dashboard.ts
+  s_415949558e694b::t_d1cd2917dd2d75 4-5,30-61
+apps/construction-management/src/reporting/application/build-report.ts
+  s_415949558e694b::t_6ab7334e234f7d 173
+apps/construction-management/src/reporting/application/build-sales-report.ts
+  s_415949558e694b::t_57ca270bc42b8b 5-8,13,18,38-58
+apps/construction-management/src/reporting/application/ports.ts
+  s_415949558e694b::t_dd66e3a6183c98 60-68,535-553
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_415949558e694b::t_4cbd80b8a03600 316-328
+apps/construction-management/src/reporting/domain/report-catalogue.test.ts
+  s_415949558e694b::t_52f7293c76e3e1 118,120
+apps/construction-management/src/reporting/domain/report-catalogue.ts
+  s_415949558e694b::t_00b264b4cae8c4 66-72,146-147,718,720,729-736,738
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_415949558e694b::t_96ab3c7983d7cf 104-107,340-357,436
+apps/construction-management/src/reporting/domain/sales-reports.ts
+  s_415949558e694b::t_334ef8af1eb625 110-214
+apps/construction-management/src/sales/application/sales-dashboard.test.ts
+  s_415949558e694b::t_51b8c061dd0277 1-28
+apps/construction-management/src/sales/application/sales-dashboard.ts
+  s_415949558e694b::t_1a244d56f5b1d3 1,3-7,10-15,18-32,35-61,63-70,72-78,81-87,90-110,113-115,118-131,134-138,140-154
+apps/construction-management/src/sales/domain/document-files.ts
+  s_415949558e694b::t_c74ed3e8f1cbc1 157-160,163-169
+apps/construction-management/src/sales/infrastructure/sales-dashboard-store.ts
+  s_415949558e694b::t_fbe9cce51a4bf5 1,3-7,9-13,15,17,19-20,23-25,27,33-45,47-53,55-93,95-96,99-157,159-227
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_e928549fe83c8d 249-336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "59c4c0ac0f56781c470b73761d2ef6ce7b5a3fde",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
