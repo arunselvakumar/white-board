@@ -1,0 +1,39 @@
+apps/construction-management/components/sales/inquiries/inquiry-activity.stories.tsx
+  s_415949558e694b::t_c2a3a7b8dbc20e 1-115
+apps/construction-management/components/sales/inquiries/inquiry-activity.tsx
+  s_415949558e694b::t_88114c6ad8532c 3-20,22-32,34,37-148,150-154,157,159,163,165,167-198
+apps/construction-management/components/sales/inquiries/inquiry-detail.stories.tsx
+  s_415949558e694b::t_91ec608fb90407 51,58-60,62-64,69-72
+apps/construction-management/components/sales/inquiries/inquiry-detail.tsx
+  s_415949558e694b::t_49e2203a4624e9 41,193-197
+apps/construction-management/components/sales/inquiries/inquiry-fixtures.ts
+  s_415949558e694b::t_3dee42fe5b967a 6,8,12,186-359,368,370-372,393-400,424
+apps/construction-management/components/sales/inquiries/inquiry-follow-up-dialog.stories.tsx
+  s_415949558e694b::t_b229f7b1bc1833 1-136
+apps/construction-management/components/sales/inquiries/inquiry-follow-up-dialog.tsx
+  s_415949558e694b::t_7a3d3a7372b417 1-313
+apps/construction-management/components/sales/inquiries/inquiry-task-dialog.tsx
+  s_415949558e694b::t_bbd19c4740effe 1-190
+apps/construction-management/components/sales/inquiries/inquiry-tasks-panel.stories.tsx
+  s_415949558e694b::t_264c9ee4531fa7 1-130
+apps/construction-management/components/sales/inquiries/inquiry-tasks-panel.tsx
+  s_415949558e694b::t_6a7dc9ad59d076 1-246
+apps/construction-management/src/queries/sales-inquiries.ts
+  s_415949558e694b::t_a6208a1bb6ccfa 8-15,173-264
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5d2713a26e64c2fbbf3edd2cca9b869df93467e7",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
