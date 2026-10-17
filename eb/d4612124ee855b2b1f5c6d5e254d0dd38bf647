@@ -1,0 +1,49 @@
+apps/construction-management/app/api/construction/projects/projects/project-dashboard.http.test.ts
+  s_415949558e694b::t_e0fc1010328f46 245,257
+apps/construction-management/app/api/construction/sales/dashboard/dashboard-openapi.ts
+  s_415949558e694b::t_f52435dbf2309b 14-19,25-26,49-66
+apps/construction-management/app/api/construction/sales/dashboard/inquiry-dashboard-models.ts
+  s_415949558e694b::t_16a0df2d44e473 1-99
+apps/construction-management/app/api/construction/sales/dashboard/inquiry-dashboard.http.test.ts
+  s_415949558e694b::t_44d29973f5c429 1-217
+apps/construction-management/app/api/construction/sales/dashboard/inquiry/route.ts
+  s_415949558e694b::t_49cc050c6fa52d 1-57
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_415949558e694b::t_5233b7a9c52dd7 26-27,84-85,222-223,354,362-364
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_415949558e694b::t_b20f24ddf3d0b3 58,68-73,75,517-525
+apps/construction-management/components/projects/dashboard/sales-dashboard-fixtures.ts
+  s_415949558e694b::t_52c08732e61d8f 1-4,88-221
+apps/construction-management/components/projects/dashboard/sales-sections.stories.tsx
+  s_415949558e694b::t_feb27dd19e575c 2,9-11,14,119-234
+apps/construction-management/components/projects/dashboard/sales-sections.tsx
+  s_415949558e694b::t_8fdd41ea773018 4-15,17-18,25,29,31,33-37,40,46,205-414
+apps/construction-management/src/composition/sales-dashboard.ts
+  s_415949558e694b::t_dcb3df3532b399 1-53
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_415949558e694b::t_9d3cdf05d00df8 54,56
+apps/construction-management/src/queries/sales-dashboard.ts
+  s_415949558e694b::t_52564e37e73194 4-5,30-61
+apps/construction-management/src/sales/application/sales-dashboard.test.ts
+  s_415949558e694b::t_1e8b5d49814eba 1-28
+apps/construction-management/src/sales/application/sales-dashboard.ts
+  s_415949558e694b::t_43d10b74e5340d 1-156
+apps/construction-management/src/sales/infrastructure/sales-dashboard-store.ts
+  s_415949558e694b::t_583056553a44fa 1-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ebd4612124ee855b2b1f5c6d5e254d0dd38bf647",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
