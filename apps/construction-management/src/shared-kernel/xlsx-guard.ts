@@ -1,9 +1,16 @@
+import { Unzip, UnzipInflate } from "fflate";
+
 /**
- * How much an uploaded .xlsx (a ZIP) unpacks to, read from its central
- * directory before any parser inflates it. A small upload can expand to
- * gigabytes (a "zip bomb", CWE-409), so imports refuse a workbook whose
- * entries add up to more than they could ever need.
+ * How much an uploaded .xlsx (a ZIP) unpacks to, checked before any parser
+ * loads it. A small upload can expand to gigabytes (a "zip bomb", CWE-409),
+ * so imports refuse a workbook whose entries add up to more than they
+ * could ever need. The central directory's declared sizes are checked
+ * first (cheap); then the entries are actually inflated in small slices
+ * and counted, so a falsified declared size cannot slip past.
  */
+
+/** Compressed bytes fed to the inflater at a time; deflate expands at most ~1,032×. */
+const SLICE = 16 * 1024;
 
 /** Room for a 2,000-row import sheet many times over. */
 export const XLSX_MAX_UNPACKED_BYTES = 40 * 1024 * 1024;
@@ -56,11 +63,52 @@ export function zipUnpackedBytes(bytes: Uint8Array): number | null {
   return total;
 }
 
-/** Whether the workbook unpacks to at most `max` bytes (false when unreadable). */
+/**
+ * Whether inflating every entry yields at most `max` bytes. Streams the
+ * ZIP in small slices and stops at the first byte over the limit, so it
+ * never holds more than a slice's worth of output. False when the data
+ * cannot be inflated.
+ */
+export function inflatesWithin(bytes: Uint8Array, max: number): boolean {
+  // Changed inside the inflater's callbacks.
+  const state = { total: 0, over: false, broken: false };
+  const unzip = new Unzip((file) => {
+    file.ondata = (error, data) => {
+      if (error != null) {
+        state.broken = true;
+        return;
+      }
+      state.total += data.byteLength;
+      if (state.total > max && !state.over) {
+        state.over = true;
+        file.terminate();
+      }
+    };
+    file.start();
+  });
+  unzip.register(UnzipInflate);
+  try {
+    for (let at = 0; at < bytes.byteLength; at += SLICE) {
+      if (state.over || state.broken) break;
+      const end = Math.min(at + SLICE, bytes.byteLength);
+      unzip.push(bytes.subarray(at, end), end === bytes.byteLength);
+    }
+  } catch {
+    return false;
+  }
+  return !state.over && !state.broken;
+}
+
+/**
+ * Whether the workbook unpacks to at most `max` bytes: its central
+ * directory is sound and declares no more, and its entries really inflate
+ * to no more (false when unreadable).
+ */
 export function xlsxUnpacksWithin(
   bytes: Uint8Array,
   max = XLSX_MAX_UNPACKED_BYTES,
 ): boolean {
-  const total = zipUnpackedBytes(bytes);
-  return total != null && total <= max;
+  const declared = zipUnpackedBytes(bytes);
+  if (declared == null || declared > max) return false;
+  return inflatesWithin(bytes, max);
 }
