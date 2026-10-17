@@ -1,0 +1,61 @@
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/edit/page.tsx
+  s_415949558e694b::t_8b4eb37bcc0172 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/page.tsx
+  s_415949558e694b::t_2a92ac29de1b32 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/new/page.tsx
+  s_415949558e694b::t_2dfb5e562bbea7 1-19
+apps/construction-management/app/app/projects/[id]/inquiries/list/page.tsx
+  s_415949558e694b::t_a2349fccd5345f 1-25
+apps/construction-management/components/sales/inquiries/inquiry-activity.tsx
+  s_415949558e694b::t_9b29763086ed99 1-35
+apps/construction-management/components/sales/inquiries/inquiry-detail.tsx
+  s_415949558e694b::t_cd1863a61831af 1-233
+apps/construction-management/components/sales/inquiries/inquiry-duplicate-prompt.tsx
+  s_415949558e694b::t_f9b9273b026f43 1-91
+apps/construction-management/components/sales/inquiries/inquiry-pages.tsx
+  s_415949558e694b::t_1d4f4d84de86bb 1-51
+apps/construction-management/components/sales/inquiries/inquiries-list.stories.tsx
+  s_f92effab5c9481::t_305f42bc49a601 1-176
+apps/construction-management/components/sales/inquiries/inquiries-list.tsx
+  s_f92effab5c9481::t_47f6b661c0eb88 1-500
+apps/construction-management/components/sales/inquiries/inquiry-detail.stories.tsx
+  s_f92effab5c9481::t_453f58995326a9 1-103
+apps/construction-management/components/sales/inquiries/inquiry-fixtures.ts
+  s_f92effab5c9481::t_58cff03e390761 1-317
+apps/construction-management/components/sales/inquiries/inquiry-form.stories.tsx
+  s_f92effab5c9481::t_e490a55b31f618 1-245
+apps/construction-management/components/sales/inquiries/inquiry-form.tsx
+  s_f92effab5c9481::t_ffa6b5fc719c6c 1-592
+apps/construction-management/components/sales/inquiries/inquiry-parts.tsx
+  s_f92effab5c9481::t_a4c150d6c233ed 1-148
+apps/construction-management/components/sales/inquiries/inquiry-quick-add-dialog.stories.tsx
+  s_f92effab5c9481::t_3f425a8c1280a2 1-120
+apps/construction-management/components/sales/inquiries/inquiry-quick-add-dialog.tsx
+  s_f92effab5c9481::t_ab03e6bac5d0da 1-321
+apps/construction-management/components/sales/inquiries/inquiry-select.tsx
+  s_f92effab5c9481::t_911b1af151088b 1-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4287f10bae717c7b8eced88743c54156b3e7a8af",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f92effab5c9481": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a59a3a31b725a6d0c",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
