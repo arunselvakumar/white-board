@@ -1,0 +1,19 @@
+apps/construction-management/src/shared-kernel/xlsx-guard.test.ts
+  s_415949558e694b::t_af8f557f3ed63c 46-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bbb22530d2d866c183350b28438a175d1734b24c",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
