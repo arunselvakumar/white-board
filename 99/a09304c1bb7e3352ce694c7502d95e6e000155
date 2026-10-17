@@ -1,0 +1,279 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_415949558e694b::t_c8d081f9efb9df 202-205,989-992
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_415949558e694b::t_2978721307d0e6 1,10,14-15,19
+apps/construction-management/app/api/construction/sales/access/access-models.ts
+  s_415949558e694b::t_df0cf20a5b422a 1-30
+apps/construction-management/app/api/construction/sales/access/access-openapi.ts
+  s_415949558e694b::t_35a49ca83a7369 1-34
+apps/construction-management/app/api/construction/sales/access/access.http.test.ts
+  s_415949558e694b::t_e7ce7a54169b0e 1-138
+apps/construction-management/app/api/construction/sales/access/route.ts
+  s_415949558e694b::t_abeca1491c9bc8 1-64
+apps/construction-management/app/api/construction/sales/bookings/[id]/cancel/route.ts
+  s_415949558e694b::t_96cdba737b15dd 1-23
+apps/construction-management/app/api/construction/sales/bookings/[id]/confirm/route.ts
+  s_415949558e694b::t_1a44502198e4c7 1-22
+apps/construction-management/app/api/construction/sales/bookings/[id]/delete/route.ts
+  s_415949558e694b::t_73cad84db1c3f5 1-19
+apps/construction-management/app/api/construction/sales/bookings/[id]/extend-hold/route.ts
+  s_415949558e694b::t_deb283a0e7364e 1-23
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/delete/route.ts
+  s_415949558e694b::t_db3a03bbd8e069 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/route.ts
+  s_415949558e694b::t_077bbc6f4701f5 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/[fileId]/thumbnail/route.ts
+  s_415949558e694b::t_3eff11f851f8b7 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/route.ts
+  s_415949558e694b::t_54ee424e592698 1-9
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/app/route.ts
+  s_415949558e694b::t_145b3e291e6060 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/presign/route.ts
+  s_415949558e694b::t_f3828d3339495b 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/route.ts
+  s_415949558e694b::t_a2b45cc615a944 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/files/uploads/thumbnail/route.ts
+  s_415949558e694b::t_5c54bb3e013887 1-6
+apps/construction-management/app/api/construction/sales/bookings/[id]/route.ts
+  s_415949558e694b::t_f8a88c58b42d6c 1-26
+apps/construction-management/app/api/construction/sales/bookings/[id]/update/route.ts
+  s_415949558e694b::t_0539bd3680e8e0 1-19
+apps/construction-management/app/api/construction/sales/bookings/booking-file-models.ts
+  s_415949558e694b::t_657a402bb0f615 1-105
+apps/construction-management/app/api/construction/sales/bookings/booking-file-routes.ts
+  s_415949558e694b::t_db9eb1cb30f9ca 1-241
+apps/construction-management/app/api/construction/sales/bookings/booking-models.ts
+  s_415949558e694b::t_afac7434d52135 1-281
+apps/construction-management/app/api/construction/sales/bookings/booking-route-parts.ts
+  s_415949558e694b::t_af115829d77e52 1-73
+apps/construction-management/app/api/construction/sales/bookings/bookings-openapi.ts
+  s_415949558e694b::t_e3e26c94fb4341 1-282
+apps/construction-management/app/api/construction/sales/bookings/bookings.http.test.ts
+  s_415949558e694b::t_9d33fc527445bc 1-776
+apps/construction-management/app/api/construction/sales/bookings/form-options/route.ts
+  s_415949558e694b::t_becf1557e10879 1-43
+apps/construction-management/app/api/construction/sales/bookings/route.ts
+  s_415949558e694b::t_cc657f3c2d4fa3 1-101
+apps/construction-management/app/api/construction/sales/dashboard/dashboard-openapi.ts
+  s_415949558e694b::t_178eaeba3afe0f 1-10
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_03d3f702ea4750 1-10
+apps/construction-management/app/api/construction/sales/project-scope.ts
+  s_415949558e694b::t_3b5aa937cd9f2a 1-15
+apps/construction-management/app/api/construction/sales/sales-access.ts
+  s_415949558e694b::t_889ee559ab87f1 1-77
+apps/construction-management/app/api/construction/sales/sales-openapi.ts
+  s_415949558e694b::t_cdafa504287c8f 1-49
+apps/construction-management/app/api/construction/sales/seeds.http.test.ts
+  s_415949558e694b::t_356c9df1174927 1-60
+apps/construction-management/app/api/construction/sales/settings/settings-openapi.ts
+  s_415949558e694b::t_3262ff339c5ed7 1-10
+apps/construction-management/app/api/construction/sales/units/[unitId]/available/route.ts
+  s_415949558e694b::t_58f46f3393b199 1-18
+apps/construction-management/app/api/construction/sales/units/[unitId]/details/route.ts
+  s_415949558e694b::t_edc1c0aa67bc93 1-23
+apps/construction-management/app/api/construction/sales/units/[unitId]/route.ts
+  s_415949558e694b::t_b6e36a941f959d 1-46
+apps/construction-management/app/api/construction/sales/units/[unitId]/unavailable/route.ts
+  s_415949558e694b::t_ab55c39a848a2e 1-24
+apps/construction-management/app/api/construction/sales/units/import-sample/route.ts
+  s_415949558e694b::t_70b907f832f486 1-54
+apps/construction-management/app/api/construction/sales/units/import/route.ts
+  s_415949558e694b::t_02250b3271a4da 1-51
+apps/construction-management/app/api/construction/sales/units/route.ts
+  s_415949558e694b::t_e990b96d429e5b 1-50
+apps/construction-management/app/api/construction/sales/units/unit-models.ts
+  s_415949558e694b::t_f69bbb25ebc88d 1-275
+apps/construction-management/app/api/construction/sales/units/unit-route-parts.ts
+  s_415949558e694b::t_6888653165dc98 1-65
+apps/construction-management/app/api/construction/sales/units/units-openapi.ts
+  s_415949558e694b::t_e78f8779f836a9 1-135
+apps/construction-management/app/api/construction/sales/units/units.http.test.ts
+  s_415949558e694b::t_f5001fdcbb0be3 1-589
+apps/construction-management/app/app/projects/[id]/bookings/layout.tsx
+  s_415949558e694b::t_e2304c74b4fc91 1-14
+apps/construction-management/app/app/projects/[id]/bookings/list/[bookingId]/edit/page.tsx
+  s_415949558e694b::t_3d6b80fb78e365 1-19
+apps/construction-management/app/app/projects/[id]/bookings/list/[bookingId]/page.tsx
+  s_415949558e694b::t_3ddf09ee045f1f 1-19
+apps/construction-management/app/app/projects/[id]/bookings/list/new/page.tsx
+  s_415949558e694b::t_35d58e0fac49fc 1-28
+apps/construction-management/app/app/projects/[id]/bookings/list/page.tsx
+  s_415949558e694b::t_3c0974ecbe88ec 1-19
+apps/construction-management/app/app/projects/[id]/bookings/page.tsx
+  s_415949558e694b::t_3b87a49a6c1bc4 1-13
+apps/construction-management/app/app/projects/[id]/bookings/units/page.tsx
+  s_415949558e694b::t_821ac4853482ae 1-19
+apps/construction-management/components/app-shell/project-nav-menu.stories.tsx
+  s_415949558e694b::t_9f74a6fadca337 133
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_415949558e694b::t_85aef86a01ac90 32-33,199-201,349-363
+apps/construction-management/components/projects/project-module-icons.ts
+  s_415949558e694b::t_d9587c1e7c4ced 3-4,51-52
+apps/construction-management/components/sales/bookings/booking-detail.stories.tsx
+  s_415949558e694b::t_923305e60aad14 1-176
+apps/construction-management/components/sales/bookings/booking-detail.tsx
+  s_415949558e694b::t_3c4a917e83c8f0 1-311
+apps/construction-management/components/sales/bookings/booking-dialogs.tsx
+  s_415949558e694b::t_ac1722da79a5e0 1-196
+apps/construction-management/components/sales/bookings/booking-files-field.stories.tsx
+  s_415949558e694b::t_c51e64b4247b74 1-64
+apps/construction-management/components/sales/bookings/booking-files-field.tsx
+  s_415949558e694b::t_e193e073381687 1-249
+apps/construction-management/components/sales/bookings/booking-files.tsx
+  s_415949558e694b::t_12819944bbba45 1-225
+apps/construction-management/components/sales/bookings/booking-fixtures.ts
+  s_415949558e694b::t_c7a425f507b1ea 1-318
+apps/construction-management/components/sales/bookings/booking-form.stories.tsx
+  s_415949558e694b::t_5b310c7bc20635 1-159
+apps/construction-management/components/sales/bookings/booking-form.tsx
+  s_415949558e694b::t_5bca962679acfd 1-574
+apps/construction-management/components/sales/bookings/booking-pages.tsx
+  s_415949558e694b::t_1e488097c13436 1-60
+apps/construction-management/components/sales/bookings/bookings-list.stories.tsx
+  s_415949558e694b::t_1b99044716b4c8 1-111
+apps/construction-management/components/sales/bookings/bookings-list.tsx
+  s_415949558e694b::t_f2dc00abe57066 1-317
+apps/construction-management/components/sales/bookings/bookings-nav.ts
+  s_415949558e694b::t_e710395cb01887 1-13
+apps/construction-management/components/sales/units/import-units-dialog.stories.tsx
+  s_415949558e694b::t_428dfdab265cc9 1-96
+apps/construction-management/components/sales/units/import-units-dialog.tsx
+  s_415949558e694b::t_984b21a0d7fdb9 1-182
+apps/construction-management/components/sales/units/sales-status.tsx
+  s_415949558e694b::t_36749c944ee0d0 1-83
+apps/construction-management/components/sales/units/sales-units-chart.tsx
+  s_415949558e694b::t_560350f9cb3bd6 1-150
+apps/construction-management/components/sales/units/unit-dialogs.stories.tsx
+  s_415949558e694b::t_796f054bc3ce29 1-148
+apps/construction-management/components/sales/units/unit-dialogs.tsx
+  s_415949558e694b::t_1d821e44713ada 1-384
+apps/construction-management/components/sales/units/unit-panel.tsx
+  s_415949558e694b::t_917705ef1a1ae3 1-252
+apps/construction-management/components/sales/units/units-fixtures.ts
+  s_415949558e694b::t_95434b436cde98 1-316
+apps/construction-management/components/sales/units/units-tab.stories.tsx
+  s_415949558e694b::t_9c962f7b6ed9e7 1-172
+apps/construction-management/components/sales/units/units-tab.tsx
+  s_415949558e694b::t_6b6a820937b797 1-222
+apps/construction-management/docs/04-gaps-and-roadmap.md
+  s_415949558e694b::t_d9560a0e1ee7e4 81
+apps/construction-management/docs/adr/CM-0022-sales-crm-product-decisions.md
+  s_415949558e694b::t_005b4fb75404a4 1-121
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_415949558e694b::t_647164835024c2 507-526
+apps/construction-management/docs/prd/milestone-kickoff-prompt.md
+  s_415949558e694b::t_99a6b244c5000f 39-53
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_64fb69dfd6e2b6 5,11,28,61,896,904,1057,1059,1061-1070,1072-1158
+apps/construction-management/lib/project-nav.test.ts
+  s_415949558e694b::t_fd710437482959 46,55-56
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_415949558e694b::t_376d2756b871a6 9,37,64-65
+apps/construction-management/src/composition/project-created-listeners.ts
+  s_415949558e694b::t_8c55dc313ab15a 1-11
+apps/construction-management/src/composition/sales-bookings.ts
+  s_415949558e694b::t_d94d5285a3c184 1-84
+apps/construction-management/src/composition/sales-directory.ts
+  s_415949558e694b::t_35767b9250bead 1-225
+apps/construction-management/src/composition/structure-usage.ts
+  s_415949558e694b::t_db3d24513734db 14-17,59-79,99-101,114-118
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_415949558e694b::t_6a15c3933f9668 156-172
+apps/construction-management/src/messaging/application/listeners.ts
+  s_415949558e694b::t_bc1f6a9b3b9236 22,161-165,754-806
+apps/construction-management/src/messaging/application/sales-booking-listeners.test.ts
+  s_415949558e694b::t_d396fa0003aeb5 1-86
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_415949558e694b::t_54ac12f570e8ba 68-71,232-234
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_415949558e694b::t_279244b9052309 4,8,27-28,118,181-182,206-213
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_415949558e694b::t_e9d961b4a8a652 54-56
+apps/construction-management/src/projects/domain/events.ts
+  s_415949558e694b::t_a1cdaf04b76196 1-13
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_415949558e694b::t_e56f3fc4022a85 159-175
+apps/construction-management/src/projects/domain/project-nav-groups.ts
+  s_415949558e694b::t_1894a2fcf2aa5b 25
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_415949558e694b::t_34e9319823951e 3-4,22-24,30,39
+apps/construction-management/src/projects/infrastructure/prisma-project-usage.ts
+  s_415949558e694b::t_921816b7ab39d1 14-15,83-94
+apps/construction-management/src/queries/sales-access.ts
+  s_415949558e694b::t_fcfd1eacb5bdcc 1-39
+apps/construction-management/src/queries/sales-bookings.ts
+  s_415949558e694b::t_78d5a30e67d253 1-269
+apps/construction-management/src/queries/sales-units.ts
+  s_415949558e694b::t_35ad7b31670192 1-140
+apps/construction-management/src/sales/application/booking-files.ts
+  s_415949558e694b::t_ee0cd4571745ed 1-500
+apps/construction-management/src/sales/application/booking-handlers.ts
+  s_415949558e694b::t_edb061bcf0487e 1-855
+apps/construction-management/src/sales/application/booking-ports.ts
+  s_415949558e694b::t_facade62048e95 1-198
+apps/construction-management/src/sales/application/ports.ts
+  s_415949558e694b::t_383809c572fd15 1-119
+apps/construction-management/src/sales/application/sales-booking-deps.ts
+  s_415949558e694b::t_0a03f9d36c3866 1-86
+apps/construction-management/src/sales/application/unit-import.ts
+  s_415949558e694b::t_63db95d78a4b7c 1-343
+apps/construction-management/src/sales/application/unit-sales-handlers.ts
+  s_415949558e694b::t_3b998cd1ddc56c 1-500
+apps/construction-management/src/sales/domain/booking-events.ts
+  s_415949558e694b::t_3046b7fa808d43 1-32
+apps/construction-management/src/sales/domain/booking.test.ts
+  s_415949558e694b::t_c8e85729dc54a6 1-115
+apps/construction-management/src/sales/domain/booking.ts
+  s_415949558e694b::t_52b126f00c90e9 1-374
+apps/construction-management/src/sales/domain/sales-errors.ts
+  s_415949558e694b::t_d2c3e4a5535c27 1-6
+apps/construction-management/src/sales/domain/sales-terms.test.ts
+  s_415949558e694b::t_2483badd1e9b25 1-19
+apps/construction-management/src/sales/domain/sales-terms.ts
+  s_415949558e694b::t_75786a57c628f6 1-151
+apps/construction-management/src/sales/domain/unit-profile.test.ts
+  s_415949558e694b::t_40dc9d6dd2922f 1-99
+apps/construction-management/src/sales/domain/unit-profile.ts
+  s_415949558e694b::t_e0467246766096 1-207
+apps/construction-management/src/sales/infrastructure/booking-files-store.ts
+  s_415949558e694b::t_5d1cfa30940efe 1-199
+apps/construction-management/src/sales/infrastructure/prisma-booking-store.ts
+  s_415949558e694b::t_da518029dff472 1-349
+apps/construction-management/src/sales/infrastructure/prisma-unit-profile-store.ts
+  s_415949558e694b::t_1e4e51a86de60e 1-101
+apps/construction-management/src/sales/infrastructure/project-sales-seeds.test.ts
+  s_415949558e694b::t_080de0723088f1 1-40
+apps/construction-management/src/sales/infrastructure/seed-project-sales.ts
+  s_415949558e694b::t_971037b63776a3 1-143
+apps/construction-management/src/sales/infrastructure/seeds/project-sales.json
+  s_415949558e694b::t_c876a4bfc2358e 1-19
+apps/construction-management/src/sales/infrastructure/unit-workbook.ts
+  s_415949558e694b::t_5055b230a08b72 1-158
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_dd041202fcbf9f 1-175
+packages/db/construction/prisma/migrations/20261017090000_construction_sales/migration.sql
+  s_415949558e694b::t_018fe509810de5 1-379
+packages/db/construction/prisma/migrations/20261017090200_construction_sales_project_seeds/migration.sql
+  s_415949558e694b::t_d4b1b6ef215f23 1-62
+packages/db/construction/prisma/schema/base.prisma
+  s_415949558e694b::t_5e9d5cc7b10672 13
+packages/db/construction/prisma/schema/construction-sales.prisma
+  s_415949558e694b::t_17238c1ebc3406 1-432
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "99a09304c1bb7e3352ce694c7502d95e6e000155",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
