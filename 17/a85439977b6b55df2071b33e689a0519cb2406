@@ -1,0 +1,85 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_415949558e694b::t_f82e9ab39aafe1 202-205,989-992
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_415949558e694b::t_6409bc37af9e2d 1,10,14-15,19
+apps/construction-management/app/api/construction/sales/access/access-models.ts
+  s_415949558e694b::t_5575f886b711aa 1-30
+apps/construction-management/app/api/construction/sales/access/access-openapi.ts
+  s_415949558e694b::t_2b55a02a7435a3 1-34
+apps/construction-management/app/api/construction/sales/access/access.http.test.ts
+  s_415949558e694b::t_ae2d157034de95 1-138
+apps/construction-management/app/api/construction/sales/access/route.ts
+  s_415949558e694b::t_f55250f38ccec2 1-64
+apps/construction-management/app/api/construction/sales/bookings/bookings-openapi.ts
+  s_415949558e694b::t_c658af50a80127 1-10
+apps/construction-management/app/api/construction/sales/dashboard/dashboard-openapi.ts
+  s_415949558e694b::t_35bf8521e707e4 1-10
+apps/construction-management/app/api/construction/sales/inquiries/inquiries-openapi.ts
+  s_415949558e694b::t_70eb82cf2c721e 1-10
+apps/construction-management/app/api/construction/sales/project-scope.ts
+  s_415949558e694b::t_955e4e39adde88 1-15
+apps/construction-management/app/api/construction/sales/sales-access.ts
+  s_415949558e694b::t_d1764f5a7fe770 1-77
+apps/construction-management/app/api/construction/sales/sales-openapi.ts
+  s_415949558e694b::t_9c2b26c02dfe32 1-49
+apps/construction-management/app/api/construction/sales/seeds.http.test.ts
+  s_415949558e694b::t_b75e720f2683b9 1-60
+apps/construction-management/app/api/construction/sales/settings/settings-openapi.ts
+  s_415949558e694b::t_34138d70aba011 1-10
+apps/construction-management/app/api/construction/sales/units/units-openapi.ts
+  s_415949558e694b::t_72fa6c01d6cca0 1-10
+apps/construction-management/components/projects/project-module-icons.ts
+  s_415949558e694b::t_f056c2642faf5f 3-4,51-52
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_415949558e694b::t_4b3c9e513d97d0 1061-1070,1079
+apps/construction-management/lib/project-nav.test.ts
+  s_415949558e694b::t_98748d93cd7ec7 46,55-56
+apps/construction-management/src/composition/project-created-listeners.ts
+  s_415949558e694b::t_f8ed0a61c0ab2a 1-11
+apps/construction-management/src/composition/sales-directory.ts
+  s_415949558e694b::t_35565e33e3dc0e 1-225
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_415949558e694b::t_0c2127ad9de959 4,8,27-28,118,181-182,206-213
+apps/construction-management/src/projects/domain/dashboard-sections.ts
+  s_415949558e694b::t_3540b365897ea6 54-56
+apps/construction-management/src/projects/domain/events.ts
+  s_415949558e694b::t_79aaf1d8d26743 1-13
+apps/construction-management/src/projects/domain/project-modules.ts
+  s_415949558e694b::t_03aa5f6badc4f0 159-175
+apps/construction-management/src/projects/domain/project-nav-groups.ts
+  s_415949558e694b::t_477e5df3803221 25
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_415949558e694b::t_dee0eb4670516f 3-4,22-24,30,39
+apps/construction-management/src/queries/sales-access.ts
+  s_415949558e694b::t_034384e7f9aed6 1-39
+apps/construction-management/src/sales/application/ports.ts
+  s_415949558e694b::t_f748709342c862 1-119
+apps/construction-management/src/sales/domain/sales-errors.ts
+  s_415949558e694b::t_5d31158e282161 1-6
+apps/construction-management/src/sales/domain/sales-terms.test.ts
+  s_415949558e694b::t_df7dd0ca23e7b0 1-19
+apps/construction-management/src/sales/domain/sales-terms.ts
+  s_415949558e694b::t_42fa79861884a7 1-151
+apps/construction-management/src/sales/infrastructure/project-sales-seeds.test.ts
+  s_415949558e694b::t_c01331a756fef0 1-40
+apps/construction-management/src/sales/infrastructure/seed-project-sales.ts
+  s_415949558e694b::t_ace428e8a855e6 1-143
+apps/construction-management/test/sales.ts
+  s_415949558e694b::t_ce7b05760d2a2e 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "17a85439977b6b55df2071b33e689a0519cb2406",
+  "prompts": {},
+  "sessions": {
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
