@@ -1,0 +1,41 @@
+apps/construction-management/components/sales/documents/sales-pending-files-field.stories.tsx
+  s_415949558e694b::t_337c9591437390 1-175
+apps/construction-management/components/sales/documents/sales-pending-files-field.tsx
+  s_415949558e694b::t_fee006f6ff75be 1-214
+apps/construction-management/components/sales/documents/use-upload-pending-sales-files.ts
+  s_415949558e694b::t_09522964a59799 1-73
+apps/construction-management/components/sales/documents/sales-document-fixtures.ts
+  s_3e202948d44f95::t_d7b71796b18261 1-128
+apps/construction-management/src/queries/sales-documents.ts
+  s_3e202948d44f95::t_4a448f81ad6296 1-142
+apps/construction-management/components/sales/documents/sales-document-files.stories.tsx
+  s_415949558e694b::t_cf5ac0d880bf24 1-119
+apps/construction-management/components/sales/documents/sales-document-files.tsx
+  s_415949558e694b::t_7d30cc6a8e973e 1-394
+apps/construction-management/src/queries/sales-inquiries.ts
+  s_415949558e694b::t_78c25104236dd7 1-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "20fcf5b759e7a6ca886d51f23b31c30257d3560d",
+  "prompts": {},
+  "sessions": {
+    "s_3e202948d44f95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aff499469bc4571e8",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_415949558e694b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52e7626c-4311-4045-9be7-137fec35927c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
