@@ -13,7 +13,6 @@ import {
   type UnitSalesStatus,
 } from "../domain/sales-terms";
 import {
-  isHoldExpired,
   unavailableFields,
   unitHasBooking,
   unitNotFound,
@@ -31,7 +30,7 @@ import type {
 import type { SalesTx, SalesUnitFacts, SalesWingTree } from "./ports";
 import {
   BOOKING_MENU,
-  cancelExpiredHold,
+  releaseExpiredHold,
   type SalesBookingDeps,
 } from "./sales-booking-deps";
 
@@ -462,8 +461,14 @@ export class UnitSalesHandlers {
           ])
         ).get(unitId);
         if (booking != null) {
-          if (!isHoldExpired(booking, today)) throw unitHasBooking(booking.id);
-          await cancelExpiredHold(this.deps, tx, booking, today, at);
+          const holding = await releaseExpiredHold(
+            this.deps,
+            tx,
+            booking,
+            today,
+            at,
+          );
+          if (holding != null) throw unitHasBooking(holding.id);
         }
         return {
           ...current,

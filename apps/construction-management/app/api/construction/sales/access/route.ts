@@ -27,14 +27,14 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const session = await requireCompanySession(request);
+    if (isResponse(session)) return session;
     const url = new URL(request.url);
     const model = parseOrThrow(
       GetConstructionSalesAccessRequestModel.safeParse(
         Object.fromEntries(url.searchParams),
       ),
     );
-    const session = await requireCompanySession(request);
-    if (isResponse(session)) return session;
     const project = await salesDirectory.project(
       prisma,
       session.workspaceId,

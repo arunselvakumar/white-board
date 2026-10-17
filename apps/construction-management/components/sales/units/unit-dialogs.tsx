@@ -280,7 +280,8 @@ export function UnitUnavailableDialog({
   const [error, setError] = useState<string | undefined>();
   const form = useForm<UnavailableValues>({
     resolver: zodResolver(unavailableSchema),
-    defaultValues: {
+    // `values`, so a reopened dialog shows the unit's current reason.
+    values: {
       reason: unit.profile.unavailableReason ?? "",
       note: unit.profile.unavailableNote ?? "",
     },
