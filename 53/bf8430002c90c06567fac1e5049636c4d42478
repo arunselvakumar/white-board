@@ -1,0 +1,27 @@
+apps/construction-management/app/api/construction/sales/settings/settings.http.test.ts
+  s_a8678b94facc4f::t_06b23aa97abf71 7,126-154
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_a8678b94facc4f::t_15153c59ecb2a5 1453
+apps/construction-management/src/sales/application/inquiry-import.ts
+  s_a8678b94facc4f::t_368b5ba2c50f37 177
+apps/construction-management/src/sales/application/sales-settings-handlers.ts
+  s_a8678b94facc4f::t_fef938d9b42d3b 75-80,215
+apps/construction-management/src/sales/infrastructure/sales-list-store.ts
+  s_a8678b94facc4f::t_3a7ddbf188d6f5 1,13-14,98-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "53bf8430002c90c06567fac1e5049636c4d42478",
+  "prompts": {},
+  "sessions": {
+    "s_a8678b94facc4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7790fc35-b9f4-479d-8a40-d5cadaae189e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
