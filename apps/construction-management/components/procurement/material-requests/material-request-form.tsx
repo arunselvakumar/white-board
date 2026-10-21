@@ -35,6 +35,7 @@ import {
   type MaterialRequestInput,
 } from "@/src/queries/material-requests";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "none";
 const QUANTITY = /^\d{1,11}(\.\d{1,3})?$/;
@@ -337,7 +338,9 @@ export function MaterialRequestForm({
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <QuietBoundary>
-                <Suspense fallback={null}>
+                <Suspense
+                  fallback={<LocationPickerSkeleton label="Site location" />}
+                >
                   <Controller
                     name="siteLocation"
                     control={form.control}

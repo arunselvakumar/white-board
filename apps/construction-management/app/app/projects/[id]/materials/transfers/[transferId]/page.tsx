@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { ProjectTransferDetail } from "@/components/procurement/transfers/project-transfer-pages";
+import { TransferDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Transfer" };
 
@@ -11,5 +13,15 @@ export default async function ProjectTransferRoute({
   params: Promise<{ id: string; transferId: string }>;
 }) {
   const { id, transferId } = await params;
-  return <ProjectTransferDetail projectId={id} transferId={transferId} />;
+  return (
+    <QuerySuspense
+      fallback={
+        <TransferDetailSkeleton
+          backHref={`/app/projects/${encodeURIComponent(id)}/materials/transfers`}
+        />
+      }
+    >
+      <ProjectTransferDetail projectId={id} transferId={transferId} />
+    </QuerySuspense>
+  );
 }

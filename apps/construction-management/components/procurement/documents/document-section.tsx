@@ -3,7 +3,7 @@
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { Component, Suspense, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
+import { DocumentSectionSkeleton } from "@/components/procurement/procurement-skeletons";
 
 /**
  * The frame of a document's Remarks / Attachments section: a heading, an
@@ -36,14 +36,7 @@ export function DocumentSection({
       <QueryErrorResetBoundary>
         {({ reset }) => (
           <SectionErrorBoundary heading={heading} onReset={reset}>
-            <Suspense
-              fallback={
-                <div className="space-y-3" aria-busy="true">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-2/3" />
-                </div>
-              }
-            >
+            <Suspense fallback={<DocumentSectionSkeleton />}>
               {children}
             </Suspense>
           </SectionErrorBoundary>

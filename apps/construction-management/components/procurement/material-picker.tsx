@@ -22,6 +22,7 @@ import {
 } from "@/src/queries/material-options";
 
 import { CreateMaterialDialog } from "./material-picker-create-dialog";
+import { PickerOptionsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 /**
  * Picks one Material for a procurement line (M5). Contract shared by every
@@ -167,7 +168,7 @@ export function MaterialPicker({
   const status = results.isError
     ? "Materials could not be loaded. Close and try again."
     : results.isPending
-      ? "Loading materials…"
+      ? null
       : options.length > 0
         ? null
         : typed !== ""
@@ -243,6 +244,7 @@ export function MaterialPicker({
           </InputGroupAddon>
         </ComboboxInput>
         <ComboboxContent>
+          {results.isPending ? <PickerOptionsSkeleton /> : null}
           {status == null ? null : (
             <p
               role="status"

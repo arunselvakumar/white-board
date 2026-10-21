@@ -26,8 +26,11 @@ import { storeQuery, useDeleteStore, type Store } from "@/src/queries/stores";
 
 import { centralStoreHref } from "./central-store-parts";
 import { StoreConfirmDialog } from "./store-confirm-dialog";
-
-const loading = <p className="text-muted-foreground text-sm">Loading…</p>;
+import {
+  InventorySkeleton,
+  RequestRowsSkeleton,
+  TransferRowsSkeleton,
+} from "@/components/procurement/procurement-skeletons";
 
 function Assigned({
   title,
@@ -119,7 +122,7 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
             </TabsList>
           </div>
           <TabsContent value="stock">
-            <Suspense fallback={loading}>
+            <Suspense fallback={<InventorySkeleton />}>
               <InventoryPage
                 location={{ kind: "store", id: store.id }}
                 registerHref={centralStoreHref.register(store.id)}
@@ -145,7 +148,11 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
           </TabsContent>
           <TabsContent value="requests">
             {may("procurement.material_requests", "read") ? (
-              <Suspense fallback={loading}>
+              <Suspense
+                fallback={
+                  <RequestRowsSkeleton label="Loading Material Requests" />
+                }
+              >
                 <MaterialRequestsList
                   storeId={store.id}
                   hrefFor={(request) => centralStoreHref.request(request.id)}
@@ -160,7 +167,14 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
           </TabsContent>
           <TabsContent value="notes">
             {may("procurement.delivery_notes", "read") ? (
-              <Suspense fallback={loading}>
+              <Suspense
+                fallback={
+                  <RequestRowsSkeleton
+                    label="Loading Delivery Notes"
+                    count={false}
+                  />
+                }
+              >
                 <DeliveryNotesList storeId={store.id} />
               </Suspense>
             ) : (
@@ -171,7 +185,7 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
             )}
           </TabsContent>
           <TabsContent value="transfers">
-            <Suspense fallback={loading}>
+            <Suspense fallback={<TransferRowsSkeleton />}>
               <TransfersList
                 location={{ kind: "store", id: store.id }}
                 hrefFor={(transferId) =>

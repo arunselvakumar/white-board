@@ -37,6 +37,7 @@ import {
   OrderBadge,
   quantityText,
 } from "./purchase-request-format";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -119,7 +120,7 @@ export function PurchaseRequestDetailPage({
           {pr.siteLocation == null ? (
             "—"
           ) : (
-            <Suspense fallback="…">
+            <Suspense fallback={<FactValueSkeleton />}>
               <LocationLabel projectId={projectId} value={pr.siteLocation} />
             </Suspense>
           )}

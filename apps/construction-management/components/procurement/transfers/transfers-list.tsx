@@ -8,7 +8,7 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -27,8 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import {
   formatDate,
@@ -50,6 +50,7 @@ import {
 } from "@/src/queries/material-transfers";
 
 import { TransferStatusBadge, useTransferSideCan } from "./transfer-parts";
+import { TransferRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const DIRECTIONS = [
   { value: "all", label: "All" },
@@ -117,14 +118,17 @@ function Transfers({
   hrefFor,
   newHref,
   onPage,
+  className,
 }: {
   location: StockLocation;
   filters: TransferFilters;
   hrefFor: (id: string) => string;
-  newHref: string | null;
+  newHref: string;
   onPage: (cursor: TransferFilters["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(transfersQuery(location, filters));
+  const canCreate = useTransferSideCan(location)("create");
   const filtered =
     filters.direction != null ||
     filters.status != null ||
@@ -146,7 +150,7 @@ function Transfers({
               : "Material sent to or received from another site or store shows here."}
           </EmptyDescription>
         </EmptyHeader>
-        {!filtered && newHref != null && (
+        {!filtered && canCreate && (
           <EmptyContent>
             <Link href={newHref} className={buttonVariants()}>
               <Plus aria-hidden="true" />
@@ -157,7 +161,7 @@ function Transfers({
       </Empty>
     );
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "transfer" : "transfers"}
       </p>
@@ -199,6 +203,23 @@ function Transfers({
   );
 }
 
+function NewTransferLink({
+  location,
+  href,
+}: {
+  location: StockLocation;
+  href: string;
+}) {
+  const can = useTransferSideCan(location);
+  if (!can("create")) return null;
+  return (
+    <Link href={href} className={buttonVariants({ size: "sm" })}>
+      <Plus aria-hidden="true" />
+      New transfer
+    </Link>
+  );
+}
+
 /**
  * Material Transfers into and out of a Project or Store (CM-507), newest
  * first, by direction, status and transfer date. The Central Store reuses
@@ -215,22 +236,23 @@ export function TransfersList({
   /** The new transfer page, from this location. */
   newHref: string;
 }) {
-  const can = useTransferSideCan(location);
   const [filters, setFilters] = useState<TransferFilters>({});
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<TransferFilters>) => {
-    setFilters((current) => ({ ...current, ...next, cursor: null }));
+    startTransition(() => {
+      setFilters((current) => ({ ...current, ...next, cursor: null }));
+    });
   };
-  const canCreate = can("create");
   return (
     <div className="w-full space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">Material Transfers</h2>
-        {canCreate && (
-          <Link href={newHref} className={buttonVariants({ size: "sm" })}>
-            <Plus aria-hidden="true" />
-            New transfer
-          </Link>
-        )}
+        {/* The viewer's rights load on their own; the heading and filters
+            don't wait for them. Without Create there is no link. */}
+        <Suspense fallback={null}>
+          <NewTransferLink location={location} href={newHref} />
+        </Suspense>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         <ToggleGroup
@@ -311,22 +333,18 @@ export function TransfersList({
           </div>
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<TransferRowsSkeleton />}>
         <Transfers
           location={location}
           filters={filters}
           hrefFor={hrefFor}
-          newHref={canCreate ? newHref : null}
+          newHref={newHref}
           onPage={(cursor) => {
-            setFilters((current) => ({ ...current, cursor }));
+            startTransition(() => {
+              setFilters((current) => ({ ...current, cursor }));
+            });
           }}
+          className={cn(isPending && "opacity-60 transition-opacity")}
         />
       </Suspense>
     </div>

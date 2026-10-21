@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
 import { PurchaseRequestDetailPage } from "@/components/procurement/purchase-requests/purchase-request-detail";
+import { PurchaseRequestDetailSkeleton } from "@/components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Purchase Request" };
 
@@ -15,7 +16,7 @@ export default async function Page({
   const { id, prId } = await params;
   const { uploadFailed } = await searchParams;
   return (
-    <QuerySuspense>
+    <QuerySuspense fallback={<PurchaseRequestDetailSkeleton projectId={id} />}>
       <PurchaseRequestDetailPage
         projectId={id}
         id={prId}

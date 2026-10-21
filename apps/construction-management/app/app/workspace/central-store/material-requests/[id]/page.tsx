@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { MaterialRequestDetail } from "@/components/procurement/material-requests/material-request-detail";
+import { MaterialRequestDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Request" };
 
@@ -13,7 +15,18 @@ export default async function StoreMaterialRequestRoute({
   const { id } = await params;
   return (
     <div className="w-full p-6">
-      <MaterialRequestDetail requestId={id} side="store" />
+      <QuerySuspense
+        fallback={
+          <MaterialRequestDetailSkeleton
+            back={{
+              label: "Central Store",
+              href: "/app/workspace/central-store",
+            }}
+          />
+        }
+      >
+        <MaterialRequestDetail requestId={id} side="store" />
+      </QuerySuspense>
     </div>
   );
 }

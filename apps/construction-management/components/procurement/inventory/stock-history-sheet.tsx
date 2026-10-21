@@ -35,7 +35,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { LocationLabel } from "@/components/locations/location-picker";
@@ -50,6 +49,10 @@ import {
 import { EditMovementDialog, type EditableEntry } from "./edit-movement-dialog";
 import { formatDate, formatQuantity, formatSigned } from "./inventory-format";
 import { StockErrorAlert } from "./stock-error-alert";
+import {
+  SmallLineSkeleton,
+  StockHistorySkeleton,
+} from "@/components/procurement/procurement-skeletons";
 
 function Source({ entry }: { entry: StockEntry }) {
   const { source } = entry;
@@ -172,7 +175,7 @@ function EntryItem({
         </div>
       </div>
       {entry.siteLocation != null && location.kind === "project" && (
-        <Suspense fallback={null}>
+        <Suspense fallback={<SmallLineSkeleton label="Loading location" />}>
           <LocationLabel
             projectId={location.id}
             value={entry.siteLocation}
@@ -377,14 +380,7 @@ export function StockHistorySheet({
         </SheetHeader>
         <div className="px-4 pb-6">
           {shown == null ? null : (
-            <Suspense
-              fallback={
-                <div className="space-y-2">
-                  <Skeleton className="h-20 w-full" />
-                  <Skeleton className="h-20 w-full" />
-                </div>
-              }
-            >
+            <Suspense fallback={<StockHistorySkeleton />}>
               <Entries
                 key={shown.materialId}
                 location={location}

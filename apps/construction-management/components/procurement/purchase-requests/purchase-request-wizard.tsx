@@ -16,7 +16,6 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
 import { cn } from "@repo/ui/lib/utils";
@@ -43,6 +42,8 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import { purchaseRequestsPath } from "./purchase-request-actions";
 import { quantityText, siteLocationInput } from "./purchase-request-format";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { StockLineSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const QUANTITY_RE = /^\d{1,11}(\.\d{1,3})?$/;
 
@@ -434,13 +435,13 @@ export function PurchaseRequestWizard({
                   <div className="grid gap-3 sm:grid-cols-[1fr_12rem] sm:items-start">
                     <div className="min-w-0">
                       <p className="font-medium">{field.materialName}</p>
-                      <p
+                      <div
                         className="text-muted-foreground text-xs"
                         data-testid={`stock-${field.materialId}`}
                       >
                         {row == null ? (
                           quantities.isLoading ? (
-                            "Loading stock…"
+                            <StockLineSkeleton />
                           ) : (
                             "Stock not known"
                           )
@@ -454,7 +455,7 @@ export function PurchaseRequestWizard({
                               : `${quantityText(row.balancedEstimatedQty)} ${field.uomName}`}
                           </>
                         )}
-                      </p>
+                      </div>
                     </div>
                     <div className="space-y-1">
                       <Label
@@ -551,7 +552,7 @@ export function PurchaseRequestWizard({
             <FieldError message={errors.requiredDate?.message} />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+            <Suspense fallback={<LocationPickerSkeleton />}>
               <Controller
                 name="siteLocation"
                 control={form.control}
