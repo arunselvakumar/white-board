@@ -170,6 +170,16 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
     label: "Other Expense",
     ...same(inProject("payments/other-expenses")),
   },
+  // Contracts (CM-1103): a BOQ Variation, decided on the BOQ's Variations tab.
+  variation: {
+    menu: "contracts.boq",
+    label: "Variation",
+    ...same((document: DocumentRef): string | null =>
+      document.projectId == null
+        ? null
+        : `/app/projects/${document.projectId}/boq?tab=variations`,
+    ),
+  },
   leave_request: {
     menu: "hrms.leaves",
     label: "Leave request",

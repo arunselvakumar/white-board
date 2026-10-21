@@ -8,6 +8,10 @@ import {
   contractsAccessOpenApiOperations,
 } from "./access/access-openapi";
 import {
+  contractsBoqOpenApiComponents,
+  contractsBoqOpenApiOperations,
+} from "./boq/boq-openapi";
+import {
   contractsItemsOpenApiComponents,
   contractsItemsOpenApiOperations,
 } from "./items/items-openapi";
@@ -16,10 +20,12 @@ import {
 export const contractsOpenApiComponents: OpenApiComponents = {
   ...contractsAccessOpenApiComponents,
   ...contractsItemsOpenApiComponents,
+  ...contractsBoqOpenApiComponents,
 };
 
 /** Every contracts operation (M11). */
 export const contractsOpenApiOperations: OpenApiOperation[] = [
   ...contractsAccessOpenApiOperations,
   ...contractsItemsOpenApiOperations,
+  ...contractsBoqOpenApiOperations,
 ];
