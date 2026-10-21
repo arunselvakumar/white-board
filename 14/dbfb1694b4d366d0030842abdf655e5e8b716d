@@ -1,0 +1,117 @@
+apps/construction-management/app/app/projects/[id]/materials/goods-received/[grnId]/edit/page.tsx
+  s_353c13142e25d9::t_95cab8d0ff0854 4-5,16-22
+apps/construction-management/app/app/projects/[id]/materials/goods-received/[grnId]/page.tsx
+  s_353c13142e25d9::t_3267ba2e0951a6 4-5,16-20
+apps/construction-management/app/app/projects/[id]/materials/goods-received/new/page.tsx
+  s_353c13142e25d9::t_5227a17b568623 4-5,16-24
+apps/construction-management/app/app/projects/[id]/materials/inventory/page.tsx
+  s_353c13142e25d9::t_299bb2395e2db3 6-7,24-28
+apps/construction-management/app/app/projects/[id]/materials/inventory/register/page.tsx
+  s_353c13142e25d9::t_5462f7f6637c14 6-7,24-34
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/edit/page.tsx
+  s_353c13142e25d9::t_2dc1fdc1aaa47e 4-5,15-19
+apps/construction-management/app/app/projects/[id]/materials/material-requests/[requestId]/page.tsx
+  s_353c13142e25d9::t_329b6080351aa1 4-5,13,15-29
+apps/construction-management/app/app/projects/[id]/materials/material-requests/new/page.tsx
+  s_353c13142e25d9::t_acc42dfe4d128d 6-7,19-30
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/edit/page.tsx
+  s_353c13142e25d9::t_ab8dc81e934497 5-8,19-25
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/[poId]/page.tsx
+  s_353c13142e25d9::t_f2eaa2caa8ac46 5,19
+apps/construction-management/app/app/projects/[id]/materials/purchase-orders/new/page.tsx
+  s_353c13142e25d9::t_b6d439e4ffc93a 5,22
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/[prId]/edit/page.tsx
+  s_353c13142e25d9::t_6b2957ba5220e7 5-8,19-25
+apps/construction-management/app/app/projects/[id]/materials/purchase-requests/[prId]/page.tsx
+  s_353c13142e25d9::t_91887b192adbf2 5,19
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/edit/page.tsx
+  s_353c13142e25d9::t_bef669eec0e937 4-5,16-20
+apps/construction-management/app/app/projects/[id]/materials/transfers/[transferId]/page.tsx
+  s_353c13142e25d9::t_aacb9789ad3a07 4-5,16-26
+apps/construction-management/app/app/projects/[id]/materials/transfers/new/page.tsx
+  s_353c13142e25d9::t_27db511feb911c 6-7,34-40
+apps/construction-management/app/app/workspace/central-inventory/page.tsx
+  s_353c13142e25d9::t_d6c13ef544d798 6-7,15-19
+apps/construction-management/app/app/workspace/central-store/[id]/edit/page.tsx
+  s_353c13142e25d9::t_ee7ec33e568970 4-5,15-19
+apps/construction-management/app/app/workspace/central-store/[id]/page.tsx
+  s_353c13142e25d9::t_04f1df828e5905 4-5,16-20
+apps/construction-management/app/app/workspace/central-store/[id]/register/page.tsx
+  s_353c13142e25d9::t_cea1642bb5d5b8 5-6,19-30
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/[transferId]/edit/page.tsx
+  s_353c13142e25d9::t_99ce43fcb95c70 4-5,17-19
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/[transferId]/page.tsx
+  s_353c13142e25d9::t_a262fb5082b932 4-5,18-26
+apps/construction-management/app/app/workspace/central-store/[id]/transfers/new/page.tsx
+  s_353c13142e25d9::t_04b99a6954a90b 4-5,18-22
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/edit/page.tsx
+  s_353c13142e25d9::t_6a79dc03bd1f92 4-5,17-19
+apps/construction-management/app/app/workspace/central-store/delivery-notes/[id]/page.tsx
+  s_353c13142e25d9::t_54f4830722e2c0 4-5,17-19
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/delivery-notes/new/page.tsx
+  s_353c13142e25d9::t_b6b7a4cd56fa18 4-5,18-22
+apps/construction-management/app/app/workspace/central-store/material-requests/[id]/page.tsx
+  s_353c13142e25d9::t_dd592432bc8c43 4-5,18-29
+apps/construction-management/app/app/workspace/central-store/new/page.tsx
+  s_353c13142e25d9::t_a2e0433527305b 6-7,15-19
+apps/construction-management/app/app/workspace/central-store/page.tsx
+  s_353c13142e25d9::t_8b4ab1e0734090 6-7,15-19
+apps/construction-management/components/locations/locations-skeletons.tsx
+  s_353c13142e25d9::t_bf38eac27c9f2d 1-31
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.tsx
+  s_353c13142e25d9::t_faa6e867ed1a42 31,55,269-271,361-363,420-426
+apps/construction-management/components/procurement/documents/document-section.tsx
+  s_353c13142e25d9::t_75c8bb54e6542c 6,39
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.tsx
+  s_353c13142e25d9::t_e6c6166d0e4f7d 27,44,72-73,159,169,181,187,218,239
+apps/construction-management/components/procurement/inventory/edit-movement-dialog.tsx
+  s_353c13142e25d9::t_75e46a0370852c 27,130
+apps/construction-management/components/procurement/inventory/stock-history-sheet.tsx
+  s_353c13142e25d9::t_8ece5d261b8c88 52-55,178,383
+apps/construction-management/components/procurement/inventory/stock-movement-dialog.tsx
+  s_353c13142e25d9::t_5b1b8bd7ce5682 33,213
+apps/construction-management/components/procurement/inventory/stock-register-page.tsx
+  s_353c13142e25d9::t_b2178ca096795b 44,217
+apps/construction-management/components/procurement/material-picker.tsx
+  s_353c13142e25d9::t_d4f41f025cd52b 25,171,247
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_353c13142e25d9::t_e4272636fbec33 58-61,285,357-361
+apps/construction-management/components/procurement/material-requests/material-request-form.tsx
+  s_353c13142e25d9::t_b8acd5e4e2e06c 38,341-343
+apps/construction-management/components/procurement/material-requests/project-material-requests-page.tsx
+  s_353c13142e25d9::t_4b42f7fc949461 3,7,20-30
+apps/construction-management/components/procurement/procurement-skeletons.tsx
+  s_353c13142e25d9::t_33f5d235aaeeef 1-1225
+apps/construction-management/components/procurement/purchase-orders/purchase-order-detail.tsx
+  s_353c13142e25d9::t_c46c74ab9d60f0 42,169
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_353c13142e25d9::t_95529669506949 71,459
+apps/construction-management/components/procurement/purchase-orders/purchase-orders-page.tsx
+  s_353c13142e25d9::t_7088c6d29be761 26,60,103-104,157,173,191,203,291,339
+apps/construction-management/components/procurement/purchase-requests/purchase-request-detail.tsx
+  s_353c13142e25d9::t_e4857280984b36 40,123
+apps/construction-management/components/procurement/purchase-requests/purchase-request-wizard.tsx
+  s_353c13142e25d9::t_47d2445ef9f25a 45-46,438,444,458,555
+apps/construction-management/components/procurement/purchase-requests/purchase-requests-page.tsx
+  s_353c13142e25d9::t_8bcc64a956553f 26,63,127-129,182,198,216,228,333,378
+apps/construction-management/components/procurement/stores/store-detail-page.tsx
+  s_353c13142e25d9::t_527aae0922b328 29-33,125,151-155,170-177,188
+apps/construction-management/components/procurement/transfers/transfers-list.tsx
+  s_353c13142e25d9::t_9f641adb0988ca 11,31,53,121,126,128,131,153,164,206-222,240-241,243-245,251-255,336,341,343-345,347
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "14dbfb1694b4d366d0030842abdf655e5e8b716d",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
