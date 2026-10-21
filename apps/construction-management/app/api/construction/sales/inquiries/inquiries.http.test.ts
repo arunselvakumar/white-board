@@ -429,7 +429,11 @@ describe("Inquiries (CM-1003)", () => {
   it("edits with history for the Assignee, Lead Owner and stage, and tells the new Assignee", async () => {
     const ctx = await setup();
     const seller = await member(ctx, ["read", "notification"]);
-    const inquiry = await added(ctx, { name: "Priya" });
+    const inquiry = await added(ctx, {
+      name: "Priya",
+      mobile: mobile(),
+      remarks: "Wants a corner flat",
+    });
     const edited = await edit(inquiry, {
       assigneeMemberId: seller.memberId,
       leadOwnerMemberId: seller.memberId,
@@ -480,7 +484,7 @@ describe("Inquiries (CM-1003)", () => {
     const stale = await edit(inquiry, { remarks: "Late" });
     expect(stale.status).toBe(StatusCodes.CONFLICT);
     expect((await json<ErrorBody>(stale)).code).toBe("INQUIRY_CHANGED");
-    // Leaving funnelStageId and assigneeMemberId out keeps them.
+    // A field left out keeps what is stored …
     const kept = await update(
       post(`/${inquiry.id}/update`, {
         name: "Priya S",
@@ -488,11 +492,30 @@ describe("Inquiries (CM-1003)", () => {
       }),
       params(inquiry.id),
     );
-    expect(await json<Inquiry>(kept)).toMatchObject({
+    const keptBody = await json<Inquiry>(kept);
+    expect(keptBody).toMatchObject({
       name: "Priya S",
+      mobile: inquiry.mobile,
+      remarks: "Wants a corner flat",
       funnelStage: { name: "Contacted" },
       assignee: { id: seller.memberId },
+      interestType: "cold",
+    });
+    expect(inquiry.mobile).not.toBeNull();
+    // … and null clears it.
+    const cleared = await update(
+      post(`/${inquiry.id}/update`, {
+        name: "Priya S",
+        mobile: null,
+        interestType: null,
+        expectedUpdatedAt: keptBody.updatedAt,
+      }),
+      params(inquiry.id),
+    );
+    expect(await json<Inquiry>(cleared)).toMatchObject({
+      mobile: null,
       interestType: null,
+      remarks: "Wants a corner flat",
     });
   });
 

@@ -280,6 +280,7 @@ export type InquiryDeps = {
 // Inputs and read models
 // ---------------------------------------------------------------------------
 
+/** Edit: a field left out keeps the stored value; `null` clears it. */
 export type InquiryWriteInput = InquiryInput & {
   interestedWingId?: string | null;
   leadSourceId?: string | null;
@@ -546,8 +547,20 @@ export class InquiryHandlers {
     );
     const project = await directory.project(db, ws, projectId);
     if (project == null) throw salesProjectNotFound();
+    // An edit keeps every field it leaves out; `null` clears it (the
+    // Project edit rule, review of #93).
+    const keep = <T>(
+      key: keyof InquiryWriteInput,
+      value: T,
+      stored: (row: StoredInquiry) => T,
+    ): T =>
+      current != null && input[key] === undefined ? stored(current) : value;
 
-    const wingId = clean(input.interestedWingId);
+    const wingId = keep(
+      "interestedWingId",
+      clean(input.interestedWingId),
+      (row) => row.interestedWingId,
+    );
     if (wingId != null && wingId !== current?.interestedWingId) {
       const wing = (await directory.wingsById(db, ws, projectId, [wingId])).get(
         wingId,
@@ -560,7 +573,11 @@ export class InquiryHandlers {
         );
     }
 
-    const leadSourceId = clean(input.leadSourceId);
+    const leadSourceId = keep(
+      "leadSourceId",
+      clean(input.leadSourceId),
+      (row) => row.leadSourceId,
+    );
     if (leadSourceId != null && leadSourceId !== current?.leadSourceId) {
       const source = (
         await lists.byIds(db, ws, "lead_source", [leadSourceId])
@@ -608,17 +625,36 @@ export class InquiryHandlers {
         );
     }
 
-    const next = toStoredFollowUpAt(fields.nextFollowUp, timeZone);
+    const next = keep(
+      "nextFollowUp",
+      toStoredFollowUpAt(fields.nextFollowUp, timeZone),
+      (row) =>
+        row.nextFollowUpAt == null
+          ? null
+          : { at: row.nextFollowUpAt, hasTime: row.nextFollowUpHasTime },
+    );
     return {
       inquiryDate: fields.inquiryDate,
       name: fields.name,
-      mobile: fields.mobile,
-      email: fields.email,
-      address: fields.address,
-      occupation: fields.occupation,
-      interestType: fields.interestType,
+      mobile: keep("mobile", fields.mobile, (row) => row.mobile),
+      email: keep("email", fields.email, (row) => row.email),
+      address: keep("address", fields.address, (row) => row.address),
+      occupation: keep(
+        "occupation",
+        fields.occupation,
+        (row) => row.occupation,
+      ),
+      interestType: keep(
+        "interestType",
+        fields.interestType,
+        (row) => row.interestType,
+      ),
       interestedWingId: wingId,
-      interestedUnitType: fields.interestedUnitType,
+      interestedUnitType: keep(
+        "interestedUnitType",
+        fields.interestedUnitType,
+        (row) => row.interestedUnitType,
+      ),
       leadSourceId,
       funnelStageId,
       nextFollowUpAt: next?.at ?? null,
@@ -637,7 +673,7 @@ export class InquiryHandlers {
         current?.leadOwnerMemberId,
         "leadOwner",
       ),
-      remarks: fields.remarks,
+      remarks: keep("remarks", fields.remarks, (row) => row.remarks),
     };
   }
 
@@ -775,7 +811,7 @@ export class InquiryHandlers {
 
   /**
    * Edits an inquiry (Update), any status; the stage moves only while it
-   * is Open. 409 `INQUIRY_CHANGED` when `expectedUpdatedAt` is stale; the
+   * is Open. A field left out keeps what is stored; `null` clears it. 409 `INQUIRY_CHANGED` when `expectedUpdatedAt` is stale; the
    * duplicate check runs when the mobile or email changes. History rows
    * record a new Assignee, Lead Owner or stage.
    */

@@ -39,6 +39,11 @@ const commaSeparated = z
 
 const optionalText = (max: number) => z.string().max(max).nullable().optional();
 
+/**
+ * Create: a field left out is empty (or its default, as noted). Edit
+ * (`…/update`): a field left out keeps what is stored and `null` clears it;
+ * Name is always sent.
+ */
 const InquiryBody = z.object({
   /**
    * `YYYY-MM-DD`; not in the future; back-dated window `inquiry`. Create:
@@ -68,8 +73,13 @@ const InquiryBody = z.object({
    * out. Edit: left out or null keeps it; it moves only while Open.
    */
   funnelStageId: z.uuid().nullable().optional(),
-  /** The next follow-up's date; with `nextFollowUpTime` or for the whole day. */
+  /**
+   * The next follow-up's date; with `nextFollowUpTime` or for the whole
+   * day. Edit: left out keeps the next follow-up (date and time); null
+   * clears it.
+   */
   nextFollowUpDate: z.iso.date().nullable().optional(),
+  /** Read only with `nextFollowUpDate`. */
   nextFollowUpTime: time.nullable().optional(),
   /**
    * A Team Member on the Project. Create: the creator (when on the
@@ -334,9 +344,14 @@ export function toInquiryWriteInput(body: Body): InquiryWriteInput {
     leadSourceId: body.leadSourceId,
     funnelStageId: body.funnelStageId,
     nextFollowUp:
-      body.nextFollowUpDate == null
-        ? null
-        : { date: body.nextFollowUpDate, time: body.nextFollowUpTime ?? null },
+      body.nextFollowUpDate === undefined
+        ? undefined
+        : body.nextFollowUpDate === null
+          ? null
+          : {
+              date: body.nextFollowUpDate,
+              time: body.nextFollowUpTime ?? null,
+            },
     assigneeMemberId: body.assigneeMemberId,
     leadOwnerMemberId: body.leadOwnerMemberId,
     remarks: body.remarks,

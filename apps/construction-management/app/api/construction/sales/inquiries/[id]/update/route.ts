@@ -16,7 +16,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits an inquiry (CM-1003; Inquiry update on its Project). 409
+ * Edits an inquiry (CM-1003; Inquiry update on its Project). A field left
+ * out keeps what is stored; `null` clears it. 409
  * `INQUIRY_CHANGED` when `expectedUpdatedAt` is stale; 409
  * `INQUIRY_DUPLICATE` when a changed mobile or email matches another live
  * inquiry, unless `allowDuplicate`. The back-dated window applies to the

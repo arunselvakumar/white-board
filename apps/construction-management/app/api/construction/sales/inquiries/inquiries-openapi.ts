@@ -151,7 +151,7 @@ export const salesInquiryOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${ITEM}/update`,
-    summary: "Edit an inquiry",
+    summary: "Edit an inquiry (a field left out is kept; null clears it)",
     tags: SALES_TAGS,
     params: ConstructionSalesInquiryParamsModel,
     body: UpdateConstructionSalesInquiryRequestModel,
