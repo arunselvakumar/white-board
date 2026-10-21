@@ -17,6 +17,7 @@ import type {
   ProjectFileChange,
   ProjectRepository,
 } from "../domain/project-repository";
+import { defaultHiddenModules } from "../domain/project-role";
 import {
   SEED_DRAWING_ALBUMS,
   SEED_TESTING_ITEMS,
@@ -69,6 +70,8 @@ export function toProject(row: Row): Project {
     useLogoInReports: row.useLogoInReports,
     logoKey: row.logoKey,
     stateCode: row.stateCode,
+    clientId: row.clientId,
+    role: row.role,
     customFields: row.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -97,6 +100,8 @@ function detailsData(project: Project) {
     startDate: dateToDb(project.startDate),
     endDate: dateToDb(project.endDate),
     clientName: contract.clientName,
+    clientId: project.clientId,
+    role: project.role,
     clientPhone: contract.clientPhone,
     tenderRef: contract.tenderRef,
     quotationNo: contract.quotationNo,
@@ -132,7 +137,7 @@ async function writeCustomFields(tx: Tx, project: Project): Promise<void> {
 
 /**
  * The drawing albums and testing items a new Project starts with (ADR
- * CM-0013 §8–9), marked `is_seed`.
+ * CM-0013 §8–9), marked `is_seed`, and the modules its Role hides.
  */
 async function writeSeeds(tx: Tx, project: Project): Promise<void> {
   const seed = (name: string) => ({
@@ -152,6 +157,18 @@ async function writeSeeds(tx: Tx, project: Project): Promise<void> {
   await tx.constructionProjectsTestingItem.createMany({
     data: SEED_TESTING_ITEMS.map(seed),
   });
+  // The Role's default hidden modules (ADR CM-0023 §22).
+  const hidden = defaultHiddenModules(project.role);
+  if (hidden.length > 0)
+    await tx.constructionProjectsHiddenModule.createMany({
+      data: hidden.map((moduleKey) => ({
+        workspaceId: project.workspaceId,
+        projectId: project.id,
+        moduleKey,
+        hiddenBy: project.createdBy,
+        hiddenAt: project.createdAt,
+      })),
+    });
 }
 
 /** A logo's `stored_files` rows, in the Project's transaction. */

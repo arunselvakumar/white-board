@@ -1,3 +1,4 @@
+import { masterProjectClients } from "@/src/composition/project-clients";
 import { projectCreatedListeners } from "@/src/composition/project-created-listeners";
 import { createPlanGate } from "@/src/organization/infrastructure/create-subscription-handlers";
 import type { ProjectHomeReadModel } from "@/src/projects/application/project-home-handlers";
@@ -12,10 +13,12 @@ import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
 /**
  * One composition for every projects route. The plan limits (CM-118) are
  * the organization context's and `ProjectCreated` reaches the other
- * contexts' seeds (CM-0022 §2); the routes are where contexts meet.
+ * contexts' seeds (CM-0022 §2); a Project's Client is read from masters
+ * (ADR CM-0023 §2). The routes are where contexts meet.
  */
 export const projectHandlers = createProjectHandlers({
   plan: createPlanGate(),
+  clients: masterProjectClients(),
   events: new InProcessEventDispatcher(projectCreatedListeners()),
 });
 

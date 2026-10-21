@@ -10,6 +10,8 @@ import {
 
 import type { Project } from "../domain/project";
 import type {
+  ProjectClientRecord,
+  ProjectClients,
   ProjectCustomFieldLabels,
   ProjectRepository,
   ProjectUsage,
@@ -89,7 +91,27 @@ const OWNER: ProjectViewer = {
 let tick = Date.parse("2026-10-08T00:00:00Z");
 const clock = () => new Date((tick += 1000));
 
+const BALAJI: ProjectClientRecord = {
+  id: "0199a1b2-0000-7000-8000-0000000000c1",
+  name: "Sri Balaji Developers",
+  isActive: true,
+};
+const DORMANT: ProjectClientRecord = {
+  id: "0199a1b2-0000-7000-8000-0000000000c2",
+  name: "Dormant Infra",
+  isActive: false,
+};
+
 function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
+  const clientRows = new Map(
+    [BALAJI, DORMANT].map((client) => [client.id, { ...client }]),
+  );
+  const clients: ProjectClients = {
+    find: (workspaceId, id) =>
+      Promise.resolve(
+        workspaceId === "company-1" ? (clientRows.get(id) ?? null) : null,
+      ),
+  };
   const repository = new MemoryProjects();
   const used = options.used ?? new Set<string>();
   const usage: ProjectUsage = {
@@ -107,6 +129,7 @@ function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
     options.plan ?? UNLIMITED_PLAN,
     usage,
     labels,
+    clients,
     clock,
   );
   const add = (name: string, status?: string) =>
@@ -116,7 +139,7 @@ function setup(options: { plan?: PlanGate; used?: Set<string> } = {}) {
       details: { name, status, projectType: "residential" },
       financial: true,
     });
-  return { handlers, repository, used, add, asked };
+  return { handlers, repository, used, add, asked, clientRows };
 }
 
 describe("ProjectHandlers", () => {
@@ -425,5 +448,118 @@ describe("ProjectHandlers", () => {
       "Client architect",
     ]);
     expect(asked).toEqual([{ workspaceId: "company-1", limit: 50 }]);
+  });
+
+  it("links a Client, takes its name and defaults the Role to Contract work", async () => {
+    const { handlers } = setup();
+    const created = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: {
+        name: "Balaji Towers",
+        projectType: "residential",
+        clientId: BALAJI.id,
+        clientName: "typed over",
+      },
+      financial: true,
+    });
+    expect(created).toMatchObject({
+      clientId: BALAJI.id,
+      clientName: "Sri Balaji Developers",
+      role: "contract",
+    });
+    const own = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: { name: "Own Villas", projectType: "villas" },
+      financial: true,
+    });
+    expect(own).toMatchObject({ clientId: null, role: "own" });
+    const typed = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: {
+        name: "Road Work",
+        projectType: "infrastructure",
+        clientName: "Highways Dept",
+      },
+      financial: true,
+    });
+    expect(typed).toMatchObject({ clientId: null, role: "contract" });
+  });
+
+  it("refuses an unknown Client and an inactive one linked anew", async () => {
+    const { handlers, add } = setup();
+    for (const [clientId, code] of [
+      ["0199a1b2-0000-7000-8000-0000000000ff", "CLIENT_NOT_FOUND"],
+      [DORMANT.id, "CLIENT_INACTIVE"],
+    ] as const)
+      await expect(
+        handlers.create({
+          workspaceId: "company-1",
+          by: "owner",
+          details: { name: "X", projectType: "residential", clientId },
+          financial: true,
+        }),
+      ).rejects.toMatchObject({ code, details: { field: "clientId" } });
+    const created = await add("Kumari Heights");
+    await expect(
+      handlers.update({
+        viewer: OWNER,
+        id: created.id,
+        by: "owner",
+        details: { name: "Kumari Heights", clientId: DORMANT.id },
+        financial: true,
+        expectedUpdatedAt: created.updatedAt,
+      }),
+    ).rejects.toMatchObject({ code: "CLIENT_INACTIVE" });
+  });
+
+  it("keeps the link when an edit leaves it out, re-reads the name, and keeps an inactive Client", async () => {
+    const { handlers, clientRows } = setup();
+    const created = await handlers.create({
+      workspaceId: "company-1",
+      by: "owner",
+      details: {
+        name: "Balaji Towers",
+        projectType: "residential",
+        clientId: BALAJI.id,
+      },
+      financial: true,
+    });
+    const row = clientRows.get(BALAJI.id);
+    if (row == null) throw new Error("missing");
+    row.name = "Sri Balaji Developers LLP";
+    row.isActive = false;
+    const kept = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: { name: "Balaji Towers", clientName: "ignored", role: "own" },
+      financial: true,
+      expectedUpdatedAt: created.updatedAt,
+    });
+    expect(kept).toMatchObject({
+      clientId: BALAJI.id,
+      clientName: "Sri Balaji Developers LLP",
+      role: "own",
+    });
+    const unlinked = await handlers.update({
+      viewer: OWNER,
+      id: created.id,
+      by: "owner",
+      details: {
+        name: "Balaji Towers",
+        clientId: null,
+        clientName: "Balaji (old)",
+      },
+      financial: true,
+      expectedUpdatedAt: kept.updatedAt,
+    });
+    expect(unlinked).toMatchObject({
+      clientId: null,
+      clientName: "Balaji (old)",
+      role: "own",
+    });
   });
 });

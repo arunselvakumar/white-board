@@ -16,6 +16,11 @@ import {
 } from "./project-contract";
 import { PROJECT_BUDGET_MAX } from "./project-contract-rules";
 import {
+  cleanProjectRole,
+  defaultProjectRole,
+  type ProjectRole,
+} from "./project-role";
+import {
   isProjectType,
   projectStructure,
   type ProjectStructure,
@@ -61,7 +66,29 @@ export type ProjectDetailsInput = {
   useLogoInReports?: boolean;
   /** GST state code (`GST_STATES`); blank or null clears it. */
   stateCode?: string | null;
+  /**
+   * The Client master record (ADR CM-0023 §2). Omitted keeps the link,
+   * null removes it. While a Client is linked, the client name is its name.
+   */
+  clientId?: string | null;
+  /**
+   * `contract` or `own`. On a new Project, left out is Contract work when
+   * it names a Client, else Own development; on an edit, left out keeps it.
+   */
+  role?: string | null;
 } & ProjectContractInput;
+
+/**
+ * The Client a Project links after a command, as the masters context has
+ * it now; the handlers look it up through `ProjectClients`.
+ */
+export type ProjectClientRef = { id: string; name: string };
+
+/** Whose work it is and for whom (ADR CM-0023 §2). */
+export type ProjectClientLink = {
+  clientId: string | null;
+  role: ProjectRole;
+};
 
 /**
  * What M4 adds to a Project (CM-401). `projectType` is null only on
@@ -220,7 +247,8 @@ export function projectDetails(input: ProjectDetailsInput): ProjectDetails {
 
 export type ProjectProps = ProjectDetails &
   ProjectContractDetails &
-  ProjectProfile & {
+  ProjectProfile &
+  ProjectClientLink & {
     customFields: ProjectCustomField[];
     id: string;
     workspaceId: string;
@@ -244,12 +272,23 @@ export class Project {
     id: string;
     workspaceId: string;
     details: ProjectDetailsInput;
+    /** The Client `details.clientId` names, looked up by the handlers. */
+    client?: ProjectClientRef | null;
     by: string;
     now: Date;
   }): Project {
+    const client = input.client ?? null;
+    const contract = withClientName(
+      contractDetails(input.details, NO_CONTRACT_DETAILS),
+      client,
+    );
     return new Project({
       ...projectDetails(input.details),
-      ...contractDetails(input.details, NO_CONTRACT_DETAILS),
+      ...contract,
+      clientId: client?.id ?? null,
+      role:
+        cleanProjectRole(input.details.role) ??
+        defaultProjectRole(client != null || contract.clientName != null),
       ...projectProfile(
         // Left out on create is "none chosen", not "keep".
         {
@@ -324,6 +363,14 @@ export class Project {
   get stateCode(): string | null {
     return this.props.stateCode;
   }
+  /** The linked Client master record, or null (ADR CM-0023 §2). */
+  get clientId(): string | null {
+    return this.props.clientId;
+  }
+  /** Contract work or Own development (ADR CM-0023 §2). */
+  get role(): ProjectRole {
+    return this.props.role;
+  }
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -388,12 +435,23 @@ export class Project {
    * the Project Type, Budget, `useLogoInReports` or GST State left out
    * keeps what is stored.
    */
-  update(details: ProjectDetailsInput, by: string, now: Date): void {
+  update(
+    details: ProjectDetailsInput,
+    by: string,
+    now: Date,
+    /**
+     * The Client linked after the edit (`details.clientId`, or the stored
+     * link when it is left out), looked up by the handlers; null for none.
+     */
+    client: ProjectClientRef | null,
+  ): void {
     this.props = {
       ...this.props,
       ...projectDetails(details),
-      ...contractDetails(details, this.contract),
+      ...withClientName(contractDetails(details, this.contract), client),
       ...projectProfile(details, this.profile),
+      clientId: client?.id ?? null,
+      role: cleanProjectRole(details.role) ?? this.props.role,
       customFields:
         details.customFields === undefined
           ? this.props.customFields
@@ -436,6 +494,14 @@ export class Project {
       updatedBy: by,
     };
   }
+}
+
+/** A linked Client's name is the client name (ADR CM-0023 §2). */
+function withClientName(
+  contract: ProjectContractDetails,
+  client: ProjectClientRef | null,
+): ProjectContractDetails {
+  return client == null ? contract : { ...contract, clientName: client.name };
 }
 
 const byName = new Intl.Collator("en", { sensitivity: "base", numeric: true });

@@ -7,6 +7,7 @@ import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type { PlanGate } from "@/src/shared-kernel/plan";
 
 import { ProjectHandlers } from "../application/project-handlers";
+import type { ProjectClients } from "../domain/project-repository";
 import { ProjectHomeHandlers } from "../application/project-home-handlers";
 import { ProjectLogos } from "../application/project-logos";
 import { PrismaCustomFieldLabels } from "./prisma-custom-field-labels";
@@ -21,10 +22,12 @@ import { PrismaProjectUsage } from "./prisma-project-usage";
  * The projects context's composition. The plan limits come from the
  * organization context, so the caller (the routes) passes its `PlanGate`,
  * and the dispatcher that takes `ProjectCreated` to the other contexts'
- * seed listeners (CM-0022 §2).
+ * seed listeners (CM-0022 §2). Clients are the masters context's, read
+ * through `ProjectClients` (ADR CM-0023 §2).
  */
 export function createProjectHandlers(deps: {
   plan: PlanGate;
+  clients: ProjectClients;
   prisma?: PrismaClient;
   clock?: () => Date;
   events?: EventDispatcher;
@@ -35,6 +38,7 @@ export function createProjectHandlers(deps: {
     deps.plan,
     new PrismaProjectUsage(db),
     new PrismaCustomFieldLabels(db),
+    deps.clients,
     deps.clock,
     deps.events,
   );

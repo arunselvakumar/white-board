@@ -406,6 +406,7 @@ const MASTER_MODULES: readonly BackupModule[] = [
   master("masters.other_parties", "Other Parties", "other-parties", [
     "other_parties",
   ]),
+  master("masters.clients", "Clients", "clients", ["clients"]),
   master("masters.issue_categories", "Issue Categories", "issue-categories", [
     "issue_categories",
   ]),

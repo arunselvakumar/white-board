@@ -112,6 +112,10 @@ import {
   partiesOpenApiOperations,
 } from "@/app/api/construction/masters/parties-openapi";
 import {
+  clientsOpenApiComponents,
+  clientsOpenApiOperations,
+} from "@/app/api/construction/masters/clients/clients-openapi";
+import {
   projectsOpenApiComponents,
   projectsOpenApiOperations,
 } from "@/app/api/construction/projects/openapi";
@@ -937,6 +941,10 @@ openApiOperations.push(...projectHomeOpenApiOperations);
 // Contractors and Suppliers (CM-406) list their own models and routes.
 Object.assign(openApiComponents, partiesOpenApiComponents);
 openApiOperations.push(...partiesOpenApiOperations);
+
+// Clients (CM-1101, ADR CM-0023 §2).
+Object.assign(openApiComponents, clientsOpenApiComponents);
+openApiOperations.push(...clientsOpenApiOperations);
 
 // The Vendor register (CM-208, CM-209) lists its own models and routes.
 Object.assign(openApiComponents, vendorOpenApiComponents);

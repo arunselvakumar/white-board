@@ -61,3 +61,20 @@ export type ProjectCustomFieldLabels = {
 export type ProjectUsage = {
   isInUse(workspaceId: string, projectId: string): Promise<boolean>;
 };
+
+/** A Client of the masters context as a Project form sees it. */
+export type ProjectClientRecord = {
+  id: string;
+  name: string;
+  /** Inactive Clients stay on their Projects but are not linked anew. */
+  isActive: boolean;
+};
+
+/**
+ * The Company's live Clients by id (ADR CM-0023 §2). The masters context
+ * owns them; `src/composition` reads its table, so projects never imports
+ * masters.
+ */
+export type ProjectClients = {
+  find(workspaceId: string, id: string): Promise<ProjectClientRecord | null>;
+};

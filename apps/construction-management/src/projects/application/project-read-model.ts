@@ -5,6 +5,7 @@ import type {
   ProjectContractDetails,
   ProjectCustomField,
 } from "../domain/project-contract";
+import type { ProjectRole } from "../domain/project-role";
 import type { ProjectStructure, ProjectType } from "../domain/project-type";
 
 /**
@@ -27,6 +28,9 @@ export type ProjectReadModel = {
   useLogoInReports: boolean;
   /** GST state code (CM-501), or null when not set. */
   stateCode: string | null;
+  /** The linked Client master record (ADR CM-0023 §2), or null. */
+  clientId: string | null;
+  role: ProjectRole;
   customFields: ProjectCustomField[];
   createdAt: Date;
   updatedAt: Date;
@@ -46,6 +50,8 @@ export function toProjectReadModel(project: Project): ProjectReadModel {
     logoKey: project.logoKey,
     useLogoInReports: project.useLogoInReports,
     stateCode: project.stateCode,
+    clientId: project.clientId,
+    role: project.role,
     ...project.contract,
     customFields: project.customFields.map(({ label, value }) => ({
       label,
