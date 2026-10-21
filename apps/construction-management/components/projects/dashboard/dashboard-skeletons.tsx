@@ -84,7 +84,10 @@ export function MetricCaptionSkeleton() {
   return <SkeletonText width="75%" />;
 }
 
-/** The section cards under the KPI tiles while the member's layout loads. */
+/**
+ * The section cards under the KPI tiles while the member's layout loads,
+ * with the header's icon chip and collapse toggle where `Section` puts them.
+ */
 export function DashboardSectionsSkeleton() {
   return (
     <SkeletonGroup label="Loading dashboard" className="space-y-6">
@@ -93,8 +96,12 @@ export function DashboardSectionsSkeleton() {
           key={index}
           className="bg-card min-w-0 space-y-4 rounded-xl border p-4 sm:p-6"
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <SkeletonText size="base" width={index === 1 ? "7rem" : "9rem"} />
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <Skeleton className="size-8 shrink-0 rounded-lg" />
+              <SkeletonText size="base" width={index === 1 ? "7rem" : "9rem"} />
+            </div>
+            <Skeleton className="size-8 shrink-0 rounded-lg" />
           </div>
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
             {[0, 1, 2, 3].map((fact) => (
