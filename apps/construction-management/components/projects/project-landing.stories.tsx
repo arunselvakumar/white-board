@@ -73,7 +73,9 @@ export const NoModules: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("No modules to open")).toBeVisible();
     await expect(
-      canvas.getByText("Ask the Owner for access to this Project's modules."),
+      canvas.getByText(
+        "Ask the Owner to grant you access to a module or show a hidden module on this Project.",
+      ),
     ).toBeVisible();
     await expect(getRouter().replace).not.toHaveBeenCalled();
   },

@@ -192,7 +192,7 @@ The main menu's Dashboard: across the Projects a Team Member can see, the approv
 _Avoid_: home, overview, analytics
 
 **Hidden module**:
-A module someone with the Project's Update permission took off a Project's home for everyone on it. Hiding changes the home, not what anyone may open.
+A module someone with the Project's Update permission took off a Project's sidebar menu for everyone on it. Hiding changes the menu (and the Dashboard's sections), not what anyone may open.
 _Avoid_: disabled module, removed module
 
 **Pin**:

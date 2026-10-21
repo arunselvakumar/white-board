@@ -43,7 +43,7 @@ export function ProjectLanding({ id }: { id: string }) {
             {/* Hidden modules only come marked to those who may show them. */}
             {home.modules.some((module) => module.hidden)
               ? "The modules you may open are hidden on this Project. Show them from Project options → Hide / show modules."
-              : "Ask the Owner for access to this Project's modules."}
+              : "Ask the Owner to grant you access to a module or show a hidden module on this Project."}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
