@@ -1,0 +1,35 @@
+apps/construction-management/docs/adr/CM-0022-sales-crm-product-decisions.md
+  s_a8678b94facc4f::t_e02c1a4fb83cfc 55
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_a8678b94facc4f::t_85ff2f94511048 546
+apps/construction-management/src/sales/application/inquiry-activity-handlers.ts
+  s_a8678b94facc4f::t_1d7511eedde173 68-73,202-206,271-277,294-301
+apps/construction-management/src/sales/infrastructure/inquiry-activity-store.ts
+  s_a8678b94facc4f::t_dc6a0013e13302 76-84
+apps/construction-management/app/api/construction/sales/inquiries/follow-ups.http.test.ts
+  s_4465195d2faea3::t_0446b71b388fd8 188-216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b6d94400ad1d5af2c89a6d15ebd6d011f4ae48f3",
+  "prompts": {},
+  "sessions": {
+    "s_4465195d2faea3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af71900d6f0067e31",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a8678b94facc4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7790fc35-b9f4-479d-8a40-d5cadaae189e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
