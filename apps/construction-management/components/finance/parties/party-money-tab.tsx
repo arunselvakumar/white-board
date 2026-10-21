@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -22,16 +21,7 @@ import { PartyBalances } from "./party-balances";
 import { PARTY_SCREENS, partyPaths } from "./party-money";
 import { SettlementList } from "./settlement-list";
 import { TdsLedgerView } from "./tds-ledger";
-
-function TableSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
+import { PartyBalancesSkeleton } from "./parties-skeletons";
 
 /**
  * A party type's tab of the Project's Payments (CM-705 Suppliers, CM-706
@@ -70,7 +60,11 @@ export function PartyMoneyTab({
           />
         </Suspense>
       )}
-      <Suspense fallback={<TableSkeleton />}>
+      <Suspense
+        fallback={
+          <PartyBalancesSkeleton partyType={partyType} canPay={canCreate} />
+        }
+      >
         <PartyBalances
           projectId={projectId}
           partyType={partyType}

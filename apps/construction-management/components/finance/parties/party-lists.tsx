@@ -38,6 +38,7 @@ import {
   partyPaths,
 } from "./party-money";
 import { InvoiceStatusChips } from "./party-status";
+import { PARTY_STATEMENT_COLUMNS } from "./parties-skeletons";
 
 type Cursor = { after?: string; before?: string } | null;
 
@@ -259,11 +260,11 @@ export function PartyStatementTable({
         <Table aria-label="Statement">
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Entry</TableHead>
-              <TableHead>Document</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
+              {PARTY_STATEMENT_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

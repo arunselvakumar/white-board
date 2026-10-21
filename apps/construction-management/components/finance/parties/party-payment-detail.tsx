@@ -23,7 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
@@ -53,6 +52,7 @@ import {
   PARTY_SCREENS,
   partyPaths,
 } from "./party-money";
+import { AllocationSkeleton } from "./parties-skeletons";
 
 /**
  * One party payment (CM-705): what moved and from which account, the TDS,
@@ -360,7 +360,7 @@ function ApplyAdvanceForm({
   const [values, setValues] = useState<AllocationValues>({});
   const [problem, setProblem] = useState<string | undefined>();
   const total = allocatedTotal(values);
-  if (outstanding.data == null) return <Skeleton className="h-20 w-full" />;
+  if (outstanding.data == null) return <AllocationSkeleton />;
   return (
     <div className="space-y-4">
       <AllocationTable

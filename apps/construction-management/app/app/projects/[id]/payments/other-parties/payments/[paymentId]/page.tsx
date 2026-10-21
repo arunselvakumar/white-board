@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { PartyPaymentDetail } from "@/components/finance/parties/party-payment-detail";
+import { PartyPaymentDetailSkeleton } from "@/components/finance/parties/parties-skeletons";
 
 export const metadata: Metadata = { title: "Other Party payment" };
 
@@ -14,7 +14,11 @@ export default async function OtherPartyPaymentPage({
 }) {
   const { id, paymentId } = await params;
   return (
-    <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+    <Suspense
+      fallback={
+        <PartyPaymentDetailSkeleton projectId={id} partyType="other_party" />
+      }
+    >
       <PartyPaymentDetail
         projectId={id}
         partyType="other_party"

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { CentralPaymentPage } from "@/components/finance/central-payment/central-payment-page";
+import { CentralPaymentSkeleton } from "@/components/finance/central-payment/central-payment-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Central Payment" };
@@ -13,5 +15,9 @@ export const metadata: Metadata = { title: "Central Payment" };
 export default async function CentralPaymentRoute() {
   if (!(await viewerCan("finance.central_payment", "read")))
     return <ProjectNoAccess what="Central Payment" />;
-  return <CentralPaymentPage />;
+  return (
+    <QuerySuspense fallback={<CentralPaymentSkeleton />}>
+      <CentralPaymentPage />
+    </QuerySuspense>
+  );
 }

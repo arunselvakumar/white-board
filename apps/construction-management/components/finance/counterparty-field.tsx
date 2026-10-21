@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 import type { CounterpartyKindModel } from "@/app/api/construction/finance/lookup-models";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 
@@ -65,7 +65,7 @@ function PartySelect({
   invalid: boolean;
 }) {
   const query = useQuery(counterpartyOptionsQuery(kind, projectId));
-  if (query.isPending) return <Skeleton className="h-10 w-full" />;
+  if (query.isPending) return <SelectControlSkeleton label="Loading parties" />;
   const parties = query.data?.items ?? [];
   const items = parties.map((party) => ({
     value: party.id,

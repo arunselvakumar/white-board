@@ -11,8 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 import {
   accountOptionsQuery,
   type AccountOption,
@@ -90,7 +90,8 @@ export function AccountPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.data, mode, fits, value, exclude]);
 
-  if (query.isPending) return <Skeleton className="h-10 w-full" />;
+  if (query.isPending)
+    return <SelectControlSkeleton label="Loading accounts" />;
 
   const company = fitting.filter((account) => account.kind !== "petty_cash");
   const petty = fitting.filter((account) => account.kind === "petty_cash");

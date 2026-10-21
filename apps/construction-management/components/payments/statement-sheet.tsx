@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -34,6 +33,7 @@ import {
 import { PAYMENTS_API, useCancelPayment } from "@/src/queries/payments";
 
 import { formatDate, KIND_LABELS, money, sourceLabel } from "./payment-format";
+import { StatementLinesSkeleton } from "./payments-skeletons";
 
 export type StatementTarget = { id: string; name: string };
 
@@ -70,15 +70,7 @@ export function StatementSheet({
         </SheetHeader>
         <div className="px-4 pb-6">
           {party != null && (
-            <Suspense
-              fallback={
-                <div className="space-y-2" aria-busy="true">
-                  <Skeleton className="h-14 w-full" />
-                  <Skeleton className="h-14 w-full" />
-                  <Skeleton className="h-14 w-full" />
-                </div>
-              }
-            >
+            <Suspense fallback={<StatementLinesSkeleton />}>
               <StatementLines
                 projectId={projectId}
                 partyType={partyType}

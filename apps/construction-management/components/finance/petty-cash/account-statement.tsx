@@ -5,7 +5,6 @@ import { Suspense, useId, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -15,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate, localToday } from "@/components/payments/payment-format";
@@ -26,6 +26,10 @@ import {
 } from "@/src/queries/finance-petty-cash";
 
 import { Amount, pettyCashPath } from "./petty-cash-parts";
+import {
+  STATEMENT_COLUMNS,
+  StatementLinesSkeleton,
+} from "./petty-cash-skeletons";
 
 type Entry = AccountStatement["entries"][number];
 
@@ -87,12 +91,11 @@ function Lines({
             <Table aria-label="Statement">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Voucher</TableHead>
-                  <TableHead>Particulars</TableHead>
-                  <TableHead className="text-right">In</TableHead>
-                  <TableHead className="text-right">Out</TableHead>
-                  <TableHead className="text-right">Balance</TableHead>
+                  {STATEMENT_COLUMNS.map((column, index) => (
+                    <TableHead key={index} className={column.className}>
+                      {column.header}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -200,7 +203,7 @@ export function AccountStatementView({
     from: `${today.slice(0, 8)}01`,
     to: today,
   });
-  const [, startTransition] = useTransition();
+  const [updating, startTransition] = useTransition();
   const valid = range.from !== "" && range.to !== "" && range.from <= range.to;
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
@@ -253,16 +256,11 @@ export function AccountStatementView({
         </div>
       </div>
       {valid ? (
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-40 w-full" />
-            </div>
-          }
-        >
-          <Lines accountId={accountId} from={range.from} to={range.to} />
-        </Suspense>
+        <div className={cn(updating && "opacity-60 transition-opacity")}>
+          <Suspense fallback={<StatementLinesSkeleton />}>
+            <Lines accountId={accountId} from={range.from} to={range.to} />
+          </Suspense>
+        </div>
       ) : (
         <p className="text-destructive text-sm">
           Choose a From date on or before the To date.

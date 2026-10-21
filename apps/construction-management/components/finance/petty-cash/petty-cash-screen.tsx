@@ -15,7 +15,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatDate } from "@/components/payments/payment-format";
@@ -30,6 +29,7 @@ import { ExportReceiptsDialog } from "./export-receipts-dialog";
 import { OpenAccountDialog } from "./open-account-dialog";
 import { Amount, pettyCashPath } from "./petty-cash-parts";
 import { PettyCashVouchers } from "./petty-cash-vouchers";
+import { PettyCashVouchersSkeleton } from "./petty-cash-skeletons";
 
 function AccountCard({
   account,
@@ -152,14 +152,7 @@ function AccountPanel({
           ) : null}
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<PettyCashVouchersSkeleton />}>
         <PettyCashVouchers
           key={account.id}
           projectId={projectId}

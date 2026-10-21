@@ -14,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -64,6 +63,10 @@ import {
   STATUS_LABELS,
 } from "./transaction-format";
 import { TransferDialog } from "./transfer-form";
+import {
+  TRANSACTION_COLUMNS,
+  TransactionRowsSkeleton,
+} from "./transactions-skeletons";
 
 const MENU = "finance.transactions";
 
@@ -114,7 +117,7 @@ export function TransactionsPage({
   const [bulk, setBulk] = useState(false);
   const [editing, setEditing] = useState<Editing>(null);
   const [importing, setImporting] = useState(false);
-  const [, startTransition] = useTransition();
+  const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -177,25 +180,27 @@ export function TransactionsPage({
           )}
         </div>
       </div>
-      <Suspense fallback={<ListSkeleton />}>
-        <TransactionRows
-          projectId={projectId}
-          today={today}
-          filters={filters}
-          cursor={cursor}
-          bulk={bulk}
-          canApprove={may("approve")}
-          canReject={may("reject")}
-          canCreate={may("create")}
-          onFilters={change}
-          onEdit={setEditing}
-          onPage={(next) => {
-            startTransition(() => {
-              setCursor(next);
-            });
-          }}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<TransactionRowsSkeleton />}>
+          <TransactionRows
+            projectId={projectId}
+            today={today}
+            filters={filters}
+            cursor={cursor}
+            bulk={bulk}
+            canApprove={may("approve")}
+            canReject={may("reject")}
+            canCreate={may("create")}
+            onFilters={change}
+            onEdit={setEditing}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
       {editing?.kind === "transaction" ? (
         <TransactionDialog
           projectId={projectId}
@@ -227,16 +232,6 @@ export function TransactionsPage({
           setImporting(false);
         }}
       />
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -573,16 +568,11 @@ function TransactionRows({
                   <span className="sr-only">Select</span>
                 </TableHead>
               )}
-              <TableHead>Number</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Account</TableHead>
-              <TableHead>Paid To / Received From</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-12">
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              {TRANSACTION_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { HandCoins } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -23,9 +23,9 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -40,6 +40,7 @@ import {
 import { QueryHttpError } from "@/src/queries/http";
 
 import { formatDate, money, PARTY_SCREENS } from "./party-money";
+import { SettlementsSkeleton } from "./parties-skeletons";
 
 type Status = "pending" | "approved" | "rejected";
 
@@ -81,6 +82,7 @@ export function SettlementList({
   partyType: PartyType;
 }) {
   const [status, setStatus] = useState<Status>("pending");
+  const [updating, startTransition] = useTransition();
   return (
     <div className="space-y-4">
       <ToggleGroup
@@ -89,7 +91,9 @@ export function SettlementList({
         onValueChange={(value: string[]) => {
           const next = value[0];
           if (next === "pending" || next === "approved" || next === "rejected")
-            setStatus(next);
+            startTransition(() => {
+              setStatus(next);
+            });
         }}
         variant="outline"
       >
@@ -99,21 +103,16 @@ export function SettlementList({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        }
-      >
-        <Settlements
-          key={status}
-          projectId={projectId}
-          partyType={partyType}
-          status={status}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<SettlementsSkeleton />}>
+          <Settlements
+            key={status}
+            projectId={projectId}
+            partyType={partyType}
+            status={status}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }

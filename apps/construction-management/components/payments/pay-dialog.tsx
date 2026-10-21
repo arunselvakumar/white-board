@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
@@ -46,6 +45,7 @@ import {
   toRecordInput,
   type PayFormValues,
 } from "./pay-form-schema";
+import { PayFormSkeleton } from "./payments-skeletons";
 
 export type PayTarget = {
   id: string;
@@ -99,15 +99,7 @@ export function PayDialog({
           </DialogDescription>
         </DialogHeader>
         {party != null && (
-          <Suspense
-            fallback={
-              <div className="space-y-3" aria-busy="true">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<PayFormSkeleton />}>
             <PayForm
               key={party.id}
               projectId={projectId}

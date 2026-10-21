@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { Skeleton } from "@repo/ui/components/skeleton";
+import { Suspense, useState, useTransition } from "react";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 import type {
   BalancePeriod,
@@ -21,6 +21,7 @@ import { localToday, rangeOf } from "./payment-format";
 import { PaymentsList } from "./payments-list";
 import { PeriodSwitcher } from "./period-switcher";
 import { StatementSheet, type StatementTarget } from "./statement-sheet";
+import { BalancesSkeleton } from "./payments-skeletons";
 
 export type PaymentsTab = "labour" | "vendor" | "payments";
 
@@ -42,6 +43,8 @@ export function PaymentsPage({
     kind: "monthly",
     anchor: today ?? localToday(),
   }));
+  // Keep the old balances on screen, dimmed, while another period loads.
+  const [updating, startTransition] = useTransition();
   return (
     <Tabs defaultValue={initialTab} className="gap-4">
       <TabsList>
@@ -55,7 +58,12 @@ export function PaymentsPage({
             projectId={projectId}
             partyType={partyType}
             period={period}
-            onPeriod={setPeriod}
+            onPeriod={(next) => {
+              startTransition(() => {
+                setPeriod(next);
+              });
+            }}
+            updating={updating}
             today={today}
           />
         </TabsContent>
@@ -72,12 +80,14 @@ function BalancesPanel({
   partyType,
   period,
   onPeriod,
+  updating,
   today,
 }: {
   projectId: string;
   partyType: PaymentPartyType;
   period: BalancePeriod;
   onPeriod: (next: BalancePeriod) => void;
+  updating: boolean;
   today?: string;
 }) {
   const [paying, setPaying] = useState<PayTarget | null>(null);
@@ -90,27 +100,27 @@ function BalancesPanel({
   return (
     <>
       <PeriodSwitcher value={period} onChange={onPeriod} />
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
-        <BalancesTable
-          projectId={projectId}
-          partyType={partyType}
-          period={period}
-          onPay={(row) => {
-            setPaying(toTarget(row));
-          }}
-          onStatement={(row) => {
-            setStatement(toTarget(row));
-          }}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense
+          fallback={
+            <BalancesSkeleton
+              noun={partyType === "labour" ? "Labours" : "Vendors"}
+            />
+          }
+        >
+          <BalancesTable
+            projectId={projectId}
+            partyType={partyType}
+            period={period}
+            onPay={(row) => {
+              setPaying(toTarget(row));
+            }}
+            onStatement={(row) => {
+              setStatement(toTarget(row));
+            }}
+          />
+        </Suspense>
+      </div>
       <PayDialog
         projectId={projectId}
         partyType={partyType}

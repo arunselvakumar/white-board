@@ -14,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
@@ -59,6 +59,7 @@ import {
   voucherSign,
   voucherSummary,
 } from "./petty-cash-parts";
+import { VOUCHER_COLUMNS, VoucherRowsSkeleton } from "./petty-cash-skeletons";
 
 type Scope = "project" | "all";
 
@@ -301,12 +302,11 @@ function VoucherRows({
                   <span className="sr-only">Select</span>
                 </TableHead>
               )}
-              <TableHead>Voucher</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Paid to / received from</TableHead>
-              <TableHead>Project</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Status</TableHead>
+              {VOUCHER_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -437,7 +437,7 @@ export function PettyCashVouchers({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<VoucherFilters["cursor"]>(null);
   const [bulk, setBulk] = useState(false);
-  const [, startTransition] = useTransition();
+  const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -522,30 +522,25 @@ export function PettyCashVouchers({
           }}
         />
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
-        <VoucherRows
-          projectId={projectId}
-          account={account}
-          filters={filters}
-          cursor={cursor}
-          bulk={bulk}
-          canApprove={may("approve")}
-          canReject={may("reject")}
-          canCreate={canCreate}
-          onPage={(next) => {
-            startTransition(() => {
-              setCursor(next);
-            });
-          }}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<VoucherRowsSkeleton />}>
+          <VoucherRows
+            projectId={projectId}
+            account={account}
+            filters={filters}
+            cursor={cursor}
+            bulk={bulk}
+            canApprove={may("approve")}
+            canReject={may("reject")}
+            canCreate={canCreate}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }

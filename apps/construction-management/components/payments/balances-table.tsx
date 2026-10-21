@@ -30,14 +30,9 @@ import {
 } from "@/src/queries/balances";
 
 import { money, PARTY_NOUNS } from "./payment-format";
+import { BALANCE_FIGURES } from "./payments-skeletons";
 
-const FIGURES = [
-  { key: "previousBalance", label: "Previous Balance" },
-  { key: "toPay", label: "To Pay" },
-  { key: "advance", label: "Advance" },
-  { key: "paid", label: "Paid" },
-  { key: "finalAmount", label: "Final Amount" },
-] as const;
+const FIGURES = BALANCE_FIGURES;
 
 /**
  * The legacy payment figures per party for a period (CM-216): a table on

@@ -10,11 +10,11 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Button } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 
 import { PAYMENTS_TABS, paymentsPath } from "./payments-tabs";
+import { PaymentsIndexSkeleton } from "./payments-hub-skeletons";
 
 /** `/payments` opens the first tab the viewer may read. */
 export function PaymentsIndex({ projectId }: { projectId: string }) {
@@ -32,8 +32,7 @@ export function PaymentsIndex({ projectId }: { projectId: string }) {
     if (first != null) router.replace(paymentsPath(projectId, first.segment));
   }, [first, projectId, router]);
 
-  if (query.isPending || first != null)
-    return <Skeleton className="h-40 w-full" />;
+  if (query.isPending || first != null) return <PaymentsIndexSkeleton />;
   // A failed read is not "no access": say so and offer to try again.
   if (query.isError)
     return (
