@@ -322,7 +322,10 @@ export class InquiryActivityHandlers {
     return id;
   }
 
-  /** Removes a follow-up entered by mistake (Inquiry Delete). */
+  /**
+   * Removes a follow-up entered by mistake (Inquiry Delete). The back-dated
+   * edit limit applies to its Done on.
+   */
   async deleteFollowUp(
     access: MemberAccess,
     inquiryId: string,
@@ -331,6 +334,10 @@ export class InquiryActivityHandlers {
     const { db, followUps } = this.deps;
     const inquiry = await this.deps.inquiries.visible(access, inquiryId);
     assertCan(access, MENU, "delete", { projectId: inquiry.projectId });
+    const [timeZone, check] = await Promise.all([
+      this.deps.timeZone(access.workspaceId),
+      this.deps.backdated(access),
+    ]);
     const at = this.clock();
     await db.$transaction(async (tx) => {
       const row = await followUps.find(
@@ -340,6 +347,7 @@ export class InquiryActivityHandlers {
         followUpId,
       );
       if (row == null) throw followUpNotFound();
+      check("inquiry_follow_up", "edit", salesLocal(row.doneAt, timeZone).date);
       await followUps.tombstone(tx, followUpId, access.userId, at);
       await recordAudit(tx, {
         workspaceId: access.workspaceId,

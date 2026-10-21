@@ -272,6 +272,38 @@ describe("Follow-ups (CM-1004)", () => {
     expect(old.status).toBe(StatusCodes.FORBIDDEN);
     expect((await json<ErrorBody>(old)).code).toBe("BACKDATED_CREATE_BLOCKED");
     expect((await followUp(ctx.inquiry.id)).status).toBe(StatusCodes.CREATED);
+    // Removing an old follow-up is an edit of it: the Owner may key one in,
+    // a Team Member outside the window cannot remove it.
+    actAs(ctx.owner);
+    expect(
+      (
+        await followUp(ctx.inquiry.id, {
+          doneOnDate: addDays(TODAY, -5),
+          doneOnTime: "10:00",
+        })
+      ).status,
+    ).toBe(StatusCodes.CREATED);
+    const oldItem = (await timeline(ctx.inquiry.id)).items.find(
+      (entry) =>
+        entry.kind === "follow_up" &&
+        entry.followUp.doneOn.date === addDays(TODAY, -5),
+    );
+    if (oldItem?.kind !== "follow_up") throw new Error("an old follow-up");
+    const deleter = await member(ctx, ["read", "delete", "view_all"]);
+    actAs(deleter.actor);
+    const removeOld = await removeFollowUp(
+      post(`/${ctx.inquiry.id}/follow-ups/${oldItem.followUp.id}/delete`),
+      {
+        params: Promise.resolve({
+          id: ctx.inquiry.id,
+          followUpId: oldItem.followUp.id,
+        }),
+      },
+    );
+    expect(removeOld.status).toBe(StatusCodes.FORBIDDEN);
+    expect((await json<ErrorBody>(removeOld)).code).toBe(
+      "BACKDATED_EDIT_BLOCKED",
+    );
   });
 
   it("removes one entered by mistake (Inquiry Delete), leaving the next follow-up", async () => {
