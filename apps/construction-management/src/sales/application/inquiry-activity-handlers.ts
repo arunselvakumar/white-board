@@ -29,6 +29,7 @@ import type {
   InquiryStore,
   StoredInquiry,
 } from "./inquiry-handlers";
+import { assertPickedStage, lockPickedLists } from "./picked-lists";
 import type { SalesDirectory, SalesTx } from "./ports";
 import type { SalesListStore } from "./sales-settings-handlers";
 
@@ -249,16 +250,7 @@ export class InquiryActivityHandlers {
       const stage = (
         await lists.byIds(db, ws, "funnel_stage", [toStageId])
       ).get(toStageId);
-      if (
-        stage == null ||
-        stage.deletedAt != null ||
-        stage.projectId !== inquiry.projectId
-      )
-        throw refused(
-          "FUNNEL_STAGE_NOT_FOUND",
-          "This Funnel Stage was not found.",
-          "toStageId",
-        );
+      assertPickedStage(stage, inquiry.projectId, "toStageId");
     }
     const check = await this.deps.backdated(access);
     check("inquiry_follow_up", "create", fields.doneOnDate);
@@ -275,6 +267,12 @@ export class InquiryActivityHandlers {
         latest == null || fields.doneAt.getTime() >= latest.getTime();
       const moves =
         newest && toStageId != null && toStageId !== row.funnelStageId;
+      if (moves)
+        await lockPickedLists(lists, tx, ws, row.projectId, {
+          funnelStageId: toStageId,
+          leadSourceId: null,
+          stageField: "toStageId",
+        });
       await followUps.insert(tx, {
         id,
         workspaceId: ws,

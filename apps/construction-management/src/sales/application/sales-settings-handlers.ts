@@ -62,6 +62,16 @@ export type SalesListStore = {
     kind: SalesListKind,
     ids: readonly string[],
   ): Promise<Map<string, StoredSalesListItem>>;
+  /**
+   * Locks these rows `FOR SHARE` (a Settings change of them waits) and
+   * reads them, deleted ones included (an inquiry write's picks).
+   */
+  share(
+    db: SalesTx,
+    workspaceId: string,
+    kind: SalesListKind,
+    ids: readonly string[],
+  ): Promise<Map<string, StoredSalesListItem>>;
   /** Locks the Project's live rows of the list `FOR UPDATE` and reads them. */
   lockProject(
     db: SalesTx,

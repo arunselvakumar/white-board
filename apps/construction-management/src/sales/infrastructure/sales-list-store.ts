@@ -131,6 +131,23 @@ export class PrismaSalesListStore implements SalesListStore {
     return new Map(rows.map((row) => [row.id, toStored(row)]));
   }
 
+  async share(
+    db: SalesTx,
+    workspaceId: string,
+    kind: SalesListKind,
+    ids: readonly string[],
+  ) {
+    const unique = [...new Set(ids)];
+    if (unique.length === 0) return new Map<string, StoredSalesListItem>();
+    await db.$queryRaw(Prisma.sql`
+      SELECT id FROM construction_sales.${Prisma.raw(TABLES[kind])}
+      WHERE workspace_id = ${workspaceId}
+        AND id::text = ANY(${unique}::text[])
+      ORDER BY id
+      FOR SHARE`);
+    return this.byIds(db, workspaceId, kind, unique);
+  }
+
   async lockProject(
     db: SalesTx,
     workspaceId: string,

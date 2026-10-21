@@ -37,6 +37,11 @@ import {
   type DueBounds,
   type SalesDateTime,
 } from "../domain/sales-time";
+import {
+  assertPickedLeadSource,
+  assertPickedStage,
+  lockPickedLists,
+} from "./picked-lists";
 import type { SalesDirectory, SalesMemberFacts, SalesTx } from "./ports";
 import {
   importInquiries,
@@ -582,22 +587,7 @@ export class InquiryHandlers {
       const source = (
         await lists.byIds(db, ws, "lead_source", [leadSourceId])
       ).get(leadSourceId);
-      if (
-        source == null ||
-        source.deletedAt != null ||
-        source.projectId !== projectId
-      )
-        throw refused(
-          "LEAD_SOURCE_NOT_FOUND",
-          "This Lead Source was not found.",
-          "leadSourceId",
-        );
-      if (!source.isActive)
-        throw refused(
-          "LEAD_SOURCE_DISABLED",
-          "This Lead Source is disabled. Choose another.",
-          "leadSourceId",
-        );
+      assertPickedLeadSource(source, projectId);
     }
 
     let funnelStageId = clean(input.funnelStageId);
@@ -613,16 +603,7 @@ export class InquiryHandlers {
       const stage = (
         await lists.byIds(db, ws, "funnel_stage", [funnelStageId])
       ).get(funnelStageId);
-      if (
-        stage == null ||
-        stage.deletedAt != null ||
-        stage.projectId !== projectId
-      )
-        throw refused(
-          "FUNNEL_STAGE_NOT_FOUND",
-          "This Funnel Stage was not found.",
-          "funnelStageId",
-        );
+      assertPickedStage(stage, projectId, "funnelStageId");
     }
 
     const next = keep(
@@ -749,6 +730,11 @@ export class InquiryHandlers {
     const at = this.clock();
     const ws = access.workspaceId;
     await this.deps.db.$transaction(async (tx) => {
+      await lockPickedLists(this.deps.lists, tx, ws, input.projectId, {
+        funnelStageId: content.funnelStageId,
+        leadSourceId: content.leadSourceId,
+        stageField: "funnelStageId",
+      });
       if (input.allowDuplicate !== true)
         await this.assertNoDuplicate(
           tx,
@@ -841,6 +827,17 @@ export class InquiryHandlers {
       check("inquiry", "edit", row.inquiryDate);
       if (content.inquiryDate !== row.inquiryDate)
         check("inquiry", "edit", content.inquiryDate);
+      await lockPickedLists(this.deps.lists, tx, ws, row.projectId, {
+        funnelStageId:
+          content.funnelStageId === row.funnelStageId
+            ? null
+            : content.funnelStageId,
+        leadSourceId:
+          content.leadSourceId === row.leadSourceId
+            ? null
+            : content.leadSourceId,
+        stageField: "funnelStageId",
+      });
       const keysChanged =
         content.mobile !== row.mobile ||
         clean(content.email) !== clean(row.email);
