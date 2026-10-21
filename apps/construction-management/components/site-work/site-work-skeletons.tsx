@@ -475,7 +475,7 @@ export function HindrancesPageSkeleton() {
 }
 
 /** A back link and the `h2` of a site record, with the title a bar when it is data. */
-function SiteRecordHeaderSkeleton({
+export function SiteRecordHeaderSkeleton({
   back,
   title,
   size = "form",

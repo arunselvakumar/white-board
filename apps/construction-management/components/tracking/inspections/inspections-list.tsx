@@ -15,7 +15,6 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -25,6 +24,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
@@ -62,6 +62,10 @@ import {
   InspectionStatusBadge,
   inspectionWhen,
 } from "./inspection-format";
+import {
+  InspectionFiltersSkeleton,
+  InspectionRowsSkeleton,
+} from "@/components/tracking/tracking-skeletons";
 
 const MENU = "tracking.inspection_requests" as const;
 const ALL = "all";
@@ -139,7 +143,8 @@ export function InspectionsList({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<InspectionFilters["cursor"]>(null);
   const [bulk, setBulk] = useState(false);
-  const [, startTransition] = useTransition();
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -173,7 +178,7 @@ export function InspectionsList({
           )}
         </div>
       </div>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<InspectionFiltersSkeleton />}>
         <FilterBar
           projectId={projectId}
           today={today}
@@ -181,8 +186,9 @@ export function InspectionsList({
           onChange={change}
         />
       </Suspense>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<InspectionRowsSkeleton bulk={bulk} />}>
         <Rows
+          className={cn(isPending && "opacity-60 transition-opacity")}
           projectId={projectId}
           filters={filters}
           cursor={cursor}
@@ -201,15 +207,6 @@ export function InspectionsList({
           }}
         />
       </Suspense>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -333,6 +330,7 @@ function Rows({
   newHref,
   onStatus,
   onPage,
+  className,
 }: {
   projectId: string;
   filters: Filters;
@@ -344,6 +342,7 @@ function Rows({
   newHref: string | null;
   onStatus: (status: InspectionStatus | null) => void;
   onPage: (cursor: InspectionFilters["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(
     inspectionsQuery(projectId, { ...toQuery(filters), cursor }),
@@ -466,7 +465,7 @@ function Rows({
   const href = (row: Inspection) => inspectionsPath(projectId, `/${row.id}`);
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className={cn("min-w-0 space-y-3", className)}>
       {chips}
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "request" : "requests"}

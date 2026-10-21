@@ -4,6 +4,7 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { InspectionDetail } from "@/components/tracking/inspections/inspection-detail";
+import { InspectionDetailSkeleton } from "@/components/tracking/tracking-skeletons";
 
 export const metadata: Metadata = { title: "Inspection Request" };
 
@@ -21,7 +22,7 @@ export default async function InspectionRoute({
   )
     return <ProjectNoAccess what="Inspection Requests" />;
   return (
-    <QuerySuspense>
+    <QuerySuspense fallback={<InspectionDetailSkeleton projectId={id} />}>
       <InspectionDetail projectId={id} id={inspectionId} />
     </QuerySuspense>
   );

@@ -16,7 +16,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -26,6 +25,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate, localToday } from "@/components/payments/payment-format";
@@ -61,6 +61,10 @@ import {
 } from "@/src/tracking/domain/tracking-documents";
 
 import { IssueStatusBadge, PriorityChip } from "./issue-parts";
+import {
+  IssueFiltersSkeleton,
+  IssueRowsSkeleton,
+} from "@/components/tracking/tracking-skeletons";
 
 type Filters = {
   statuses: IssueStatus[];
@@ -131,7 +135,8 @@ export function IssuesList({
     access != null && canInTracking(access, "tracking.issues", flag);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<IssueFilters["cursor"]>(null);
-  const [, startTransition] = useTransition();
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -169,7 +174,7 @@ export function IssuesList({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <Suspense fallback={<FiltersSkeleton />}>
+      <Suspense fallback={<IssueFiltersSkeleton />}>
         <FilterBar
           projectId={projectId}
           filters={filters}
@@ -177,7 +182,11 @@ export function IssuesList({
           onChange={change}
         />
       </Suspense>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense
+        fallback={
+          <IssueRowsSkeleton selecting={may("update") || may("approve")} />
+        }
+      >
         <IssueRows
           projectId={projectId}
           filters={filters}
@@ -190,22 +199,9 @@ export function IssuesList({
               setCursor(next);
             });
           }}
+          className={cn(isPending && "opacity-60 transition-opacity")}
         />
       </Suspense>
-    </div>
-  );
-}
-
-function FiltersSkeleton() {
-  return <Skeleton className="h-14 w-full" />;
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-14 w-full" />
-      <Skeleton className="h-14 w-full" />
-      <Skeleton className="h-14 w-full" />
     </div>
   );
 }
@@ -362,6 +358,7 @@ function IssueRows({
   canVerify,
   newHref,
   onPage,
+  className,
 }: {
   projectId: string;
   filters: Filters;
@@ -370,6 +367,7 @@ function IssueRows({
   canVerify: boolean;
   newHref: string | null;
   onPage: (cursor: IssueFilters["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(
     issuesQuery(projectId, { ...toQuery(filters), cursor }),
@@ -466,7 +464,7 @@ function IssueRows({
   const href = (issue: Issue) => issuesPath(projectId, issue.id);
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className={cn("min-w-0 space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {plural(data.total, "issue")}
       </p>

@@ -53,6 +53,7 @@ import { TASK_LIMITS } from "@/src/tracking/domain/task";
 import { TRACKING_PRIORITIES } from "@/src/tracking/domain/tracking-documents";
 
 import { ChipsSelect } from "./chips-select";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "none";
 const QUANTITY = /^\d{1,11}(\.\d{1,3})?$/;
@@ -561,7 +562,7 @@ export function TaskForm({
 
       <fieldset className="min-w-0 space-y-3">
         <legend className="text-sm font-semibold">Location</legend>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LocationPickerSkeleton />}>
           <Controller
             control={form.control}
             name="siteLocation"
