@@ -1,0 +1,23 @@
+apps/construction-management/docs/README.md
+  s_f49615d4431370::t_148073d1fe31d7 38
+apps/construction-management/docs/modules/14-contracts-and-billing.md
+  s_f49615d4431370::t_bfc8982ccec3db 1-28
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_f49615d4431370::t_cfe52b436d0f6f 1158-1170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e2b1e9a7917661c564e0647520f4b05ddc07f2c4",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
