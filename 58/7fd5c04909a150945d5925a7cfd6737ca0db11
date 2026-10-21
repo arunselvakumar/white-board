@@ -1,0 +1,31 @@
+apps/construction-management/app/app/projects/[id]/bookings/list/[bookingId]/edit/page.tsx
+  s_353c13142e25d9::t_0a2ce4cdd10a1c 6-7,20-26
+apps/construction-management/app/app/projects/[id]/inquiries/list/[inquiryId]/edit/page.tsx
+  s_353c13142e25d9::t_4754953c2be931 6-7,20-26
+apps/construction-management/components/sales/bookings/bookings-skeletons.tsx
+  s_353c13142e25d9::t_3c3303556299ef 10-14,17,101-148
+apps/construction-management/components/sales/inquiries/inquiries-skeletons.tsx
+  s_353c13142e25d9::t_ce352779051383 14-19,30,218-270
+apps/construction-management/components/sales/inquiries/inquiry-pages.tsx
+  s_353c13142e25d9::t_ecaf1a1f5dffdf 4,10,22-24,47-49
+apps/construction-management/components/sales/sales-form-skeletons.tsx
+  s_353c13142e25d9::t_88e96cdcd32764 1-89
+apps/construction-management/components/sales/units/units-skeletons.tsx
+  s_353c13142e25d9::t_cdc05cf7613c3f 12,42,77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "587fd5c04909a150945d5925a7cfd6737ca0db11",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
