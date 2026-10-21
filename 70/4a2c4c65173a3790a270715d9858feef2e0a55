@@ -1,0 +1,115 @@
+apps/construction-management/app/app/masters/company/page.tsx
+  s_353c13142e25d9::t_901cbc38814e92 4-5,10-14
+apps/construction-management/app/app/masters/contractors/[id]/page.tsx
+  s_353c13142e25d9::t_fab99cc0f2db54 3,5-6,16-22
+apps/construction-management/app/app/masters/designations/[id]/page.tsx
+  s_353c13142e25d9::t_46d55bc7214dfd 4-5,15-19
+apps/construction-management/app/app/masters/labours/[id]/page.tsx
+  s_353c13142e25d9::t_7d526e7353e83d 4-5,15-19
+apps/construction-management/app/app/masters/materials/[id]/page.tsx
+  s_353c13142e25d9::t_cb92ed1da445a6 4-5,15-19
+apps/construction-management/app/app/masters/materials/new/page.tsx
+  s_353c13142e25d9::t_2b0e704e14ccff 4-5,10-14
+apps/construction-management/app/app/masters/settings/backdated-entry/page.tsx
+  s_353c13142e25d9::t_5ab50668c198f1 4-5,10-14
+apps/construction-management/app/app/masters/settings/billing-addresses/page.tsx
+  s_353c13142e25d9::t_88cc2df6eff66c 4-5,10-14
+apps/construction-management/app/app/masters/settings/grn-fields/page.tsx
+  s_353c13142e25d9::t_517d96c1f18559 4-5,10-14
+apps/construction-management/app/app/masters/settings/sequence-ids/page.tsx
+  s_353c13142e25d9::t_7b7f1aa2eccc46 4-5,10-14
+apps/construction-management/app/app/masters/suppliers/[id]/page.tsx
+  s_353c13142e25d9::t_f89a38bfdeac91 3,5-6,16-22
+apps/construction-management/app/app/masters/team-members/[id]/page.tsx
+  s_353c13142e25d9::t_055a9d4fa53909 4-5,15-19
+apps/construction-management/app/app/masters/team-members/new/page.tsx
+  s_353c13142e25d9::t_c62af45777ae58 4-5,10-14
+apps/construction-management/app/app/masters/vendors/[id]/page.tsx
+  s_353c13142e25d9::t_0ba8db69b37dce 3,5,15-19
+apps/construction-management/app/app/subscription/checkout/page.tsx
+  s_353c13142e25d9::t_d5b91fc89873c7 4-5,16-20
+apps/construction-management/app/app/subscription/page.tsx
+  s_353c13142e25d9::t_f63d4fe3c4faba 4-5,10-14
+apps/construction-management/components/backups/backup-dialog.tsx
+  s_353c13142e25d9::t_eddcbb778c9a1f 32,169
+apps/construction-management/components/backups/backup-progress.tsx
+  s_353c13142e25d9::t_7a1815bddfc277 15,40
+apps/construction-management/components/backups/backups-skeletons.tsx
+  s_353c13142e25d9::t_93cfe7d1793270 1-48
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_353c13142e25d9::t_c9c6ab27fa0227 46,242
+apps/construction-management/components/company-profile/company-profile-skeletons.tsx
+  s_353c13142e25d9::t_694fa62d210885 1-60
+apps/construction-management/components/designations/designations-list.tsx
+  s_353c13142e25d9::t_f8ae36f6e8ca74 7,42,130-157,174,182
+apps/construction-management/components/designations/designations-skeletons.tsx
+  s_353c13142e25d9::t_332f6a45a54e53 1-32
+apps/construction-management/components/labours/labour-files.tsx
+  s_353c13142e25d9::t_d711bf5fbc5326 22,127
+apps/construction-management/components/labours/labours-page.tsx
+  s_353c13142e25d9::t_8e02967cb51e1b 14-20,69,89,167-168,172-175,227-230,274,277-281,283,333,339,408
+apps/construction-management/components/labours/labours-skeletons.tsx
+  s_353c13142e25d9::t_4719465efe2e84 1-138
+apps/construction-management/components/labours/transfer-history-sheet.tsx
+  s_353c13142e25d9::t_15bfaab4488ebc 17-18,50
+apps/construction-management/components/masters/developments-list.stories.tsx
+  s_353c13142e25d9::t_7eb03cb22e3623 257-260,262
+apps/construction-management/components/masters/developments-list.tsx
+  s_353c13142e25d9::t_bfa585df04f344 5,34-37,62-82
+apps/construction-management/components/masters/lookup-list.tsx
+  s_353c13142e25d9::t_c170a3f351d55e 5,31-34,46-62
+apps/construction-management/components/masters/masters-skeletons.tsx
+  s_353c13142e25d9::t_35dfa6ae770bc1 1-216
+apps/construction-management/components/masters/paged-master-list.tsx
+  s_353c13142e25d9::t_c1db07ad75986c 7-14,17,36,90-99,104,106-108,158-161,174-182,184,186-191,216,223,255
+apps/construction-management/components/masters/supervisors-list.tsx
+  s_353c13142e25d9::t_8c4a9645d5fac2 6,26-29,50-69,109
+apps/construction-management/components/masters/tracking-master-lists.tsx
+  s_353c13142e25d9::t_52d045e3d24018 5,27,90-105
+apps/construction-management/components/masters/work-types-list.tsx
+  s_353c13142e25d9::t_1819486d18c006 5,25-28,51-70,109
+apps/construction-management/components/parties/parties-page.tsx
+  s_353c13142e25d9::t_26bd0e4f40eb38 6-12,54,73,100-101,131-133,143-146,158,162-167,213,219,257
+apps/construction-management/components/parties/parties-skeletons.tsx
+  s_353c13142e25d9::t_5c5ad1052c89af 1-126
+apps/construction-management/components/parties/party-form.tsx
+  s_353c13142e25d9::t_e249baeb49d353 24,481-483
+apps/construction-management/components/parties/party-quotations.tsx
+  s_353c13142e25d9::t_0aa6f07a8ad8f3 42,355
+apps/construction-management/components/parties/quotations-page.tsx
+  s_353c13142e25d9::t_f713a423cc9871 6,29,42,76-77,99-101,112-115,127,130-135,146,150,176
+apps/construction-management/components/permissions/permissions-skeletons.tsx
+  s_353c13142e25d9::t_9bea706554fbff 1-88
+apps/construction-management/components/settings/settings-skeletons.tsx
+  s_353c13142e25d9::t_5544eeab7d04ec 1-237
+apps/construction-management/components/subscription/subscription-skeletons.tsx
+  s_353c13142e25d9::t_2faaa47237bc75 1-102
+apps/construction-management/components/team-members/projects-step.tsx
+  s_353c13142e25d9::t_90363510d6e3a5 32,124
+apps/construction-management/components/team-members/team-members-page.tsx
+  s_353c13142e25d9::t_c1849ff7fe42e4 11,44,60,68-69,99-101,112-115,127,130-135,150,154,211
+apps/construction-management/components/team-members/team-members-skeletons.tsx
+  s_353c13142e25d9::t_0bd043cc797ea1 1-129
+apps/construction-management/components/vendors/vendor-form.tsx
+  s_353c13142e25d9::t_91ebd5ed4e6a08 16,234
+apps/construction-management/components/vendors/vendors-page.tsx
+  s_353c13142e25d9::t_2277c7080516b7 6,54,69-70,92-93,123-125,135-138,149,153-156,161,164-168,170,248,253,293
+apps/construction-management/components/vendors/vendors-skeletons.tsx
+  s_353c13142e25d9::t_a9d490eb490e4c 1-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "704a2c4c65173a3790a270715d9858feef2e0a55",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
