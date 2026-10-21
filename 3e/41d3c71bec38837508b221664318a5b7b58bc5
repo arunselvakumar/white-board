@@ -1,0 +1,89 @@
+apps/construction-management/app/app/masters/equipments/[id]/edit/page.tsx
+  s_353c13142e25d9::t_4866ecef9a218e 6-7,19-23
+apps/construction-management/app/app/masters/equipments/[id]/page.tsx
+  s_353c13142e25d9::t_3024cef17b315c 6-7,20-30
+apps/construction-management/app/app/projects/[id]/equipment/register/[equipmentId]/edit/page.tsx
+  s_353c13142e25d9::t_752f0ce5e8d469 6-7,19-23
+apps/construction-management/app/app/projects/[id]/equipment/register/[equipmentId]/page.tsx
+  s_353c13142e25d9::t_d405e0d0de4231 6-7,24-37
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/[sheetId]/edit/page.tsx
+  s_353c13142e25d9::t_955769ec2e1ce3 7-8,26-32
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/[sheetId]/page.tsx
+  s_353c13142e25d9::t_00c23348f250c3 7,34
+apps/construction-management/app/app/projects/[id]/equipment/usage-sheets/new/page.tsx
+  s_353c13142e25d9::t_f9f61f4cd84d47 7-10,33-41
+apps/construction-management/app/app/projects/[id]/hindrances/[hindranceId]/edit/page.tsx
+  s_353c13142e25d9::t_ba1126b8118f9d 6-7,20-24
+apps/construction-management/app/app/projects/[id]/hindrances/[hindranceId]/page.tsx
+  s_353c13142e25d9::t_e49c75bb2e57c8 6-7,20-24
+apps/construction-management/app/app/projects/[id]/hindrances/page.tsx
+  s_353c13142e25d9::t_3b0343e21e19bf 6-7,20-24
+apps/construction-management/app/app/projects/[id]/progress-reports/page.tsx
+  s_353c13142e25d9::t_e304e30b303194 6-7,22-26
+apps/construction-management/app/app/projects/[id]/site-diary/[diaryId]/edit/page.tsx
+  s_353c13142e25d9::t_03ddc8bbfbbf2c 6-7,20-24
+apps/construction-management/app/app/projects/[id]/site-diary/page.tsx
+  s_353c13142e25d9::t_84f5e1106a749c 6-7,24-29
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/edit/page.tsx
+  s_353c13142e25d9::t_8622725b84d410 7-8,27-33
+apps/construction-management/app/app/projects/[id]/worksheets/[worksheetId]/page.tsx
+  s_353c13142e25d9::t_dc801cd2906bbc 7,35
+apps/construction-management/app/app/projects/[id]/worksheets/new/page.tsx
+  s_353c13142e25d9::t_992f5f699f0f21 7-10,34-42
+apps/construction-management/components/reports/reports-skeletons.tsx
+  s_353c13142e25d9::t_23df2134ff01eb 1-105
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-detail.tsx
+  s_353c13142e25d9::t_1f75f4156ffe2f 54,189
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-settings-dialog.tsx
+  s_353c13142e25d9::t_de42e8b51ff2e2 32,75
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheets-page.tsx
+  s_353c13142e25d9::t_9854385f9b0b65 25,74,140-141,190-197,214,238,251,365,410
+apps/construction-management/components/site-work/equipment/equipment-list.tsx
+  s_353c13142e25d9::t_547f5a49330899 6,15,52,114,121,138,206-207,211-214,217,219-224,232-236,322,328,386,392
+apps/construction-management/components/site-work/equipment/equipment-pages.tsx
+  s_353c13142e25d9::t_31a80eb6b4a02f 4,7,29-34,78-84
+apps/construction-management/components/site-work/equipment/equipment-reports-dialog.tsx
+  s_353c13142e25d9::t_0baf136061d889 23-26,83,93
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_353c13142e25d9::t_afdc69d5520340 59,320
+apps/construction-management/components/site-work/hindrances/hindrance-form.tsx
+  s_353c13142e25d9::t_ef0c85fda8c0b9 49,508
+apps/construction-management/components/site-work/hindrances/hindrance-pages.tsx
+  s_353c13142e25d9::t_1ab4c3d3e349f8 3,10,26-28
+apps/construction-management/components/site-work/hindrances/hindrances-list.tsx
+  s_353c13142e25d9::t_72a61db592e062 6,26,54,100,106,144,234-236,353,356-357
+apps/construction-management/components/site-work/progress-reports/create-progress-report-dialog.tsx
+  s_353c13142e25d9::t_7b3a953d22c5ab 34,340
+apps/construction-management/components/site-work/progress-reports/progress-reports-page.tsx
+  s_353c13142e25d9::t_2948cd980112e2 45,358
+apps/construction-management/components/site-work/site-diary/site-diary-page.tsx
+  s_353c13142e25d9::t_1662f663187560 7,44-47,54,60,89-95,104,110,121-124,197-200,264,267-270,303,306-309
+apps/construction-management/components/site-work/site-work-skeletons.tsx
+  s_353c13142e25d9::t_de3414a1da75eb 1-785
+apps/construction-management/components/site-work/worksheets/bulk-select-dialog.tsx
+  s_353c13142e25d9::t_42bba88e0e3292 23,163-177
+apps/construction-management/components/site-work/worksheets/worksheet-attendance-panel.tsx
+  s_353c13142e25d9::t_b8aa1620933371 11,35
+apps/construction-management/components/site-work/worksheets/worksheet-detail.tsx
+  s_353c13142e25d9::t_2dc693edbe66ee 37,122
+apps/construction-management/components/site-work/worksheets/worksheet-settings-dialog.tsx
+  s_353c13142e25d9::t_3e9aea4cfd2639 32,82
+apps/construction-management/components/site-work/worksheets/worksheets-page.tsx
+  s_353c13142e25d9::t_272257621f69b6 25,63,123-124,173-177,194,218,231,343,386
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3e41d3c71bec38837508b221664318a5b7b58bc5",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
