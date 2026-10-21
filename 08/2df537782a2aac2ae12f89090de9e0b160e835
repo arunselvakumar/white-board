@@ -1,0 +1,33 @@
+apps/construction-management/src/contracts/domain/boq.test.ts
+  s_f49615d4431370::t_01a4e8c29d7a1d 1-282
+apps/construction-management/src/contracts/domain/boq.ts
+  s_f49615d4431370::t_5bbbcd5ae08073 1-365
+apps/construction-management/src/contracts/domain/variation.ts
+  s_f49615d4431370::t_c2aacc6432d3b5 1-226
+apps/construction-management/src/contracts/domain/deviation.ts
+  s_de2f896f0baf64::t_4c083110bd45a6 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "082df537782a2aac2ae12f89090de9e0b160e835",
+  "prompts": {},
+  "sessions": {
+    "s_de2f896f0baf64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7f51ed63dafb352d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
