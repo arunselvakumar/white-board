@@ -164,7 +164,9 @@ jobs:
             whiteboard) origin=https://app.white-board.io ;;
           esac
           for attempt in 1 2 3 4 5 6; do
-            status=$(curl -s -o /dev/null -w '%{http_code}' "$origin/api/auth/get-session")
+            # A connection failure prints 000 and exits non-zero; under
+            # bash -e that would end the loop, so it counts as a retry.
+            status=$(curl -s -o /dev/null --max-time 15 -w '%{http_code}' "$origin/api/auth/get-session" || true)
             echo "Attempt $attempt: $origin/api/auth/get-session → $status"
             [ "$status" = "200" ] && exit 0
             sleep 10
