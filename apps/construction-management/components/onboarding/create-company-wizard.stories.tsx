@@ -88,11 +88,13 @@ export const CreatesACompany: Story = {
         canvas.getByRole("button", { name: "Create Company" }),
       );
 
+      // The new Owner goes straight to Projects; no "is ready" screen.
+      await waitFor(() =>
+        expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
+      );
       await expect(
-        await canvas.findByRole("heading", {
-          name: "Anugraha Engineers is ready",
-        }),
-      ).toBeVisible();
+        canvas.getByRole("button", { name: "Creating…" }),
+      ).toBeDisabled();
       const sent = spy.mock.calls[0]?.[1]?.body;
       const body = JSON.parse(typeof sent === "string" ? sent : "{}") as Record<
         string,
@@ -106,12 +108,6 @@ export const CreatesACompany: Story = {
         gstin: "33AAPFA0939F1ZM",
         pan: null,
       });
-      await userEvent.click(
-        canvas.getByRole("button", { name: "Open Projects" }),
-      );
-      await waitFor(() =>
-        expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
-      );
     } finally {
       restore();
     }

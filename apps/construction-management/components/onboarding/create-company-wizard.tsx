@@ -7,7 +7,6 @@ import {
 } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -108,11 +107,12 @@ const CURRENCY_ITEMS = CURRENCIES.map((currency) => ({
   label: currency,
 }));
 
-/** The first-run wizard (CM-105): name → contact → country and tax → done. */
+/** The first-run wizard (CM-105): name → contact → country and tax → Projects. */
 export function CreateCompanyWizard() {
   const { user } = useCompanyUser();
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState<{ name: string } | null>(null);
+  // Set once the Company exists, so the button stays disabled while the page leaves.
+  const [created, setCreated] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -140,7 +140,7 @@ export function CreateCompanyWizard() {
 
   const submit = async (values: Values) => {
     try {
-      const created = await mutation.mutateAsync({
+      await mutation.mutateAsync({
         name: values.name,
         mobile: values.mobile === "" ? null : normalizeMobile(values.mobile),
         email: values.email === "" ? null : values.email,
@@ -149,7 +149,8 @@ export function CreateCompanyWizard() {
         gstin: isIndia && values.gstin !== "" ? values.gstin : null,
         pan: isIndia && values.pan !== "" ? values.pan : null,
       });
-      setDone({ name: created.name });
+      setCreated(true);
+      navigateInApp("/app/projects");
     } catch (error) {
       const { field, message } = fieldForCode(error, SERVER_FIELDS);
       if (field == null) {
@@ -163,29 +164,6 @@ export function CreateCompanyWizard() {
       if (fieldStep >= 0) setStep(fieldStep);
     }
   };
-
-  if (done != null) {
-    return (
-      <div className="space-y-6 text-center">
-        <CheckCircle2
-          aria-hidden="true"
-          className="text-primary mx-auto size-12"
-        />
-        <AuthHeading
-          title={`${done.name} is ready`}
-          description="You are its Owner. Add your first Project to get started."
-        />
-        <Button
-          className="h-10 w-full"
-          onClick={() => {
-            navigateInApp("/app/projects");
-          }}
-        >
-          Open Projects
-        </Button>
-      </div>
-    );
-  }
 
   const errors = form.formState.errors;
   const current = STEPS[step] ?? STEPS[0];
@@ -388,10 +366,10 @@ export function CreateCompanyWizard() {
           <Button
             type="submit"
             className="h-10 flex-1"
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || created}
           >
             {last
-              ? mutation.isPending
+              ? mutation.isPending || created
                 ? "Creating…"
                 : "Create Company"
               : "Continue"}
