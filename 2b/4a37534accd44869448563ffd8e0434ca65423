@@ -1,0 +1,53 @@
+apps/construction-management/app/app/masters/item-library/[id]/page.tsx
+  s_f49615d4431370::t_aff93b2161766f 1-14
+apps/construction-management/app/app/masters/item-library/new/page.tsx
+  s_f49615d4431370::t_54c92eb83a9ffd 1-9
+apps/construction-management/app/app/masters/item-library/page.tsx
+  s_f49615d4431370::t_df7f79ccccf135 1-10
+apps/construction-management/components/contracts/items/import-items-dialog.stories.tsx
+  s_f49615d4431370::t_8b68d748676c67 1-103
+apps/construction-management/components/contracts/items/import-items-dialog.tsx
+  s_f49615d4431370::t_27454fdafb5dbd 1-200
+apps/construction-management/components/contracts/items/item-fixtures.ts
+  s_f49615d4431370::t_7cad5ded8ac83e 1-193
+apps/construction-management/components/contracts/items/item-form-schema.ts
+  s_f49615d4431370::t_a7e06266608beb 1-364
+apps/construction-management/components/contracts/items/item-form.stories.tsx
+  s_f49615d4431370::t_faff568883ab16 1-328
+apps/construction-management/components/contracts/items/item-form.tsx
+  s_f49615d4431370::t_1ebe85ba4e5b96 1-365
+apps/construction-management/components/contracts/items/items-page.stories.tsx
+  s_f49615d4431370::t_9c87e4c772a1cf 1-214
+apps/construction-management/components/contracts/items/items-page.tsx
+  s_f49615d4431370::t_43e4c8026991df 1-482
+apps/construction-management/components/contracts/items/items-skeletons.tsx
+  s_f49615d4431370::t_67691685d78281 1-26
+apps/construction-management/components/contracts/items/rate-analysis-table.tsx
+  s_f49615d4431370::t_b3433e8658d237 1-444
+apps/construction-management/components/contracts/items/rate-summary.stories.tsx
+  s_f49615d4431370::t_10f4f2f9834186 1-92
+apps/construction-management/components/contracts/items/rate-summary.tsx
+  s_f49615d4431370::t_e73589fc92dfa5 1-113
+apps/construction-management/components/contracts/items/resource-picker.tsx
+  s_f49615d4431370::t_b90f8553478205 1-267
+apps/construction-management/lib/masters-nav.ts
+  s_f49615d4431370::t_5bbf1017e05f40 3,252-264
+apps/construction-management/src/queries/contracts-items.ts
+  s_f49615d4431370::t_5c6f08714fdfce 1-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2b4a37534accd44869448563ffd8e0434ca65423",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
