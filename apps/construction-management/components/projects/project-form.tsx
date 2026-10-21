@@ -27,6 +27,7 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import { RadioGroup } from "@repo/ui/components/radio-group";
 import {
   Select,
   SelectContent,
@@ -47,7 +48,12 @@ import {
   useUploadHeldFiles,
   type HeldFile,
 } from "@/components/projects/documents/document-attachments";
+import { RadioCard } from "@/components/site-work/equipment/radio-card";
 import { fieldForCode } from "@/lib/server-errors";
+import {
+  PROJECT_ROLES,
+  projectRoleLabel,
+} from "@/src/projects/domain/project-role";
 import { PROJECT_TYPES } from "@/src/projects/domain/project-type";
 import {
   projectsQuery,
@@ -64,6 +70,7 @@ import { GST_STATES } from "@/src/shared-kernel/gst-states";
 import { ContractPapersField } from "./contract-papers-field";
 import { CustomFieldsField } from "./custom-fields-field";
 import { CollapsibleFormCard, FormCard } from "./form-card";
+import { ProjectClientPicker } from "./project-client-picker";
 import {
   clientPhoneLabel,
   groupRupees,
@@ -84,6 +91,7 @@ import {
   projectFormSchema,
   projectFormValues,
   serverField,
+  shownRole,
   type ProjectFormCard,
   type ProjectFormField,
   type ProjectFormInput,
@@ -140,7 +148,13 @@ const filled = (value: string) => value.trim() !== "";
 
 function clientSummary(values: ProjectFormValues): string | null {
   const phone = normalizeMobile(values.clientPhone);
+  // The Role once chosen, or once a Client decides it.
+  const role =
+    values.role !== "" || values.clientId !== "" || filled(values.clientName)
+      ? projectRoleLabel(shownRole(values))
+      : "";
   const parts = [
+    role,
     values.clientName.trim(),
     phone == null ? values.clientPhone.trim() : clientPhoneLabel(phone),
   ].filter(filled);
@@ -275,7 +289,9 @@ function ProjectForm({
   const [open, setOpen] = useState<Record<OptionalCard, boolean>>(() => ({
     client:
       project != null &&
-      (filled(initial.clientName) || filled(initial.clientPhone)),
+      (filled(initial.clientName) ||
+        filled(initial.clientPhone) ||
+        filled(initial.clientId)),
     contract: project != null && hasContract(initial),
     more: project != null && customFieldCount(initial) > 0,
   }));
@@ -625,16 +641,94 @@ function ProjectForm({
         onOpenChange={toggle("client")}
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
+          <fieldset className="min-w-0 space-y-2 sm:col-span-2">
+            <legend className="text-sm font-medium">Role</legend>
+            <Controller
+              name="role"
+              control={form.control}
+              render={({ field }) => (
+                <RadioGroup
+                  aria-label="Role"
+                  value={shownRole(values)}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                  }}
+                  className="grid gap-3 sm:grid-cols-2"
+                >
+                  {PROJECT_ROLES.map((role) => (
+                    <RadioCard
+                      key={role.key}
+                      value={role.key}
+                      title={role.label}
+                      hint={role.help}
+                      onSelect={field.onChange}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            {project != null && (
+              <p className="text-muted-foreground text-xs">
+                Changing the Role does not show or hide modules; do that from
+                the Project home.
+              </p>
+            )}
+            <FieldError message={errors.role?.message} />
+          </fieldset>
+          <div className="min-w-0 space-y-1.5">
+            <Label htmlFor="project-client">Client</Label>
+            <Controller
+              name="clientId"
+              control={form.control}
+              render={({ field }) => (
+                <ProjectClientPicker
+                  id="project-client"
+                  aria-describedby="project-client-hint"
+                  value={field.value === "" ? null : field.value}
+                  invalid={errors.clientId != null}
+                  disabled={saving}
+                  onChange={(client) => {
+                    field.onChange(client?.id ?? "");
+                    if (client != null) {
+                      form.setValue("clientName", client.name, {
+                        shouldDirty: true,
+                      });
+                      form.clearErrors("clientName");
+                    }
+                  }}
+                />
+              )}
+            />
+            <p
+              id="project-client-hint"
+              className="text-muted-foreground text-xs"
+            >
+              From Master records → Clients; its name fills the client name.
+            </p>
+            <FieldError message={errors.clientId?.message} />
+          </div>
+          <div className="min-w-0 space-y-1.5">
             <Label htmlFor="project-client-name">Client name</Label>
             <Input
               id="project-client-name"
               className="h-10"
               autoComplete="off"
               placeholder="Sri Balaji Developers"
+              readOnly={values.clientId !== ""}
+              aria-describedby={
+                values.clientId === "" ? undefined : "project-client-name-hint"
+              }
               aria-invalid={errors.clientName != null}
               {...form.register("clientName")}
             />
+            {values.clientId === "" ? null : (
+              <p
+                id="project-client-name-hint"
+                className="text-muted-foreground text-xs"
+              >
+                From the Client. Clear the Client to type another name.
+              </p>
+            )}
             <FieldError message={errors.clientName?.message} />
           </div>
           <div className="space-y-1.5">

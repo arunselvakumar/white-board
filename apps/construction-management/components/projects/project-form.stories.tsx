@@ -10,6 +10,11 @@ import {
   type ApiCall,
 } from "../../.storybook/mocks/api";
 import {
+  BALAJI,
+  HIGHWAYS,
+  clientOption,
+} from "../masters/clients/client-fixtures";
+import {
   DocumentAttachments,
   useUploadHeldFiles,
   type DocumentAttachmentsProps,
@@ -30,6 +35,7 @@ import { ProjectEditScreen } from "./project-overview";
 
 const BASE = "/api/construction/projects/projects";
 const LABELS = `${BASE}/custom-field-labels`;
+const CLIENT_OPTIONS = "/api/construction/masters/clients/options";
 
 let calls: ApiCall[] = [];
 
@@ -54,6 +60,18 @@ function api(
       });
     if (call.method === "GET" && call.path === BASE)
       return Response.json(projectList(STORY_PROJECTS, financial));
+    // The Client picker (CM-1101): active Clients, or the ones asked by id.
+    if (call.method === "GET" && call.path.startsWith(CLIENT_OPTIONS)) {
+      const url = new URL(call.path, "http://storybook.local");
+      const ids = url.searchParams.get("ids")?.split(",") ?? [];
+      const search = url.searchParams.get("search")?.toLowerCase() ?? "";
+      const clients = [BALAJI, HIGHWAYS].filter((client) =>
+        ids.length > 0
+          ? ids.includes(client.id)
+          : client.isActive && client.name.toLowerCase().includes(search),
+      );
+      return Response.json({ items: clients.map(clientOption) });
+    }
     return handler(call);
   });
   return mocked.restore;
@@ -1184,5 +1202,136 @@ export const NewOnAPhone: Story = {
     // Nothing scrolls sideways.
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+/** The Role follows the Client until picked; picking a Client fills and locks the name (CM-1101). */
+export const NewWithClientAndRole: Story = {
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Balaji Towers",
+    );
+    await chooseType(canvas, body, userEvent);
+    await userEvent.click(cardButton(canvas, "Client"));
+    const own = canvas.getByRole("radio", { name: "Own development" });
+    const contract = canvas.getByRole("radio", { name: "Contract work" });
+    await expect(own).toBeChecked();
+
+    await userEvent.click(canvas.getByRole("combobox", { name: "Client" }));
+    const list = within(await body.findByRole("listbox", { name: "Clients" }));
+    // Inactive Clients are not offered.
+    await expect(
+      await list.findByRole("option", { name: /^Sri Balaji Developers/ }),
+    ).toHaveTextContent("Sri Balaji Developers33AAPFA0939F1ZM");
+    await expect(list.getAllByRole("option")).toHaveLength(1);
+    await userEvent.click(
+      list.getByRole("option", { name: /^Sri Balaji Developers/ }),
+    );
+    await expect(canvas.getByLabelText("Client name")).toHaveValue(
+      "Sri Balaji Developers",
+    );
+    await expect(canvas.getByLabelText("Client name")).toHaveAttribute(
+      "readonly",
+    );
+    await expect(contract).toBeChecked();
+
+    // Built for the Client but kept: Own development, chosen on purpose.
+    await userEvent.click(canvas.getByText("Own development"));
+    await expect(own).toBeChecked();
+    await userEvent.click(cardButton(canvas, "Client"));
+    await expect(cardButton(canvas, "Client")).toHaveTextContent(
+      "Own development · Sri Balaji Developers",
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(getRouter().push).toHaveBeenCalled());
+    await expect(posts()[0]?.body).toEqual({
+      name: "Balaji Towers",
+      status: "ongoing",
+      projectType: "residential",
+      address: null,
+      startDate: null,
+      endDate: null,
+      ...NO_CONTRACT,
+      role: "own",
+      clientId: BALAJI.id,
+      clientName: "Sri Balaji Developers",
+    });
+  },
+};
+
+/** A linked Client shows by name even when inactive; clearing it frees the name and sends null. */
+export const EditUnlinksClient: Story = {
+  render: editRender(KUMARI.id),
+  beforeEach: () =>
+    editApi({
+      ...KUMARI,
+      clientId: HIGHWAYS.id,
+      clientName: HIGHWAYS.name,
+    }),
+  play: async ({ canvas, userEvent }) => {
+    const picker = await canvas.findByRole("combobox", { name: "Client" });
+    await waitFor(() => expect(picker).toHaveValue("Highways Department"));
+    await expect(
+      canvas.getByRole("radio", { name: "Contract work" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByText(/Changing the Role does not show or hide modules/),
+    ).toBeVisible();
+    await expect(canvas.getByLabelText("Client name")).toHaveAttribute(
+      "readonly",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Clear Client" }));
+    const name = canvas.getByLabelText("Client name");
+    await expect(name).not.toHaveAttribute("readonly");
+    await userEvent.clear(name);
+    await userEvent.type(name, "Highways (old papers)");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      clientId: null,
+      clientName: "Highways (old papers)",
+    });
+    await expect(posts()[0]?.body).not.toHaveProperty("role");
+  },
+};
+
+/** A Client that is no longer active comes back under the Client field. */
+export const EditShowsAnInactiveClientRefusal: Story = {
+  render: editRender(ANUGRAHA.id),
+  beforeEach: () =>
+    api((call) => {
+      if (call.method === "GET" && call.path === `${BASE}/${ANUGRAHA.id}`)
+        return Response.json(ANUGRAHA);
+      if (call.method === "POST")
+        return Response.json(
+          {
+            code: "CLIENT_INACTIVE",
+            message:
+              "Sri Balaji Developers is an inactive Client. Make them active in Masters to link them to a Project.",
+            details: { field: "clientId" },
+          },
+          { status: 400 },
+        );
+      return undefined;
+    }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByLabelText("Project name");
+    // It has a client name, so the Client card starts open.
+    await userEvent.click(canvas.getByRole("combobox", { name: "Client" }));
+    await userEvent.click(
+      await body.findByRole("option", { name: /^Sri Balaji Developers/ }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      await canvas.findByText(/is an inactive Client/),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("combobox", { name: "Client" }),
+    ).toHaveAttribute("aria-invalid", "true");
   },
 };

@@ -120,6 +120,30 @@ export const ShowsTheState: Story = {
   },
 };
 
+/** The Role in the Details, and a linked Client opening its master record (CM-1101). */
+export const RoleAndLinkedClient: Story = {
+  beforeEach: serve({
+    ...ANUGRAHA,
+    role: "contract",
+    clientId: "0199a1b2-0000-7000-8000-0000000000c1",
+  }),
+  play: async ({ canvas }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    await expect(
+      details.getByText("Role").nextElementSibling,
+    ).toHaveTextContent("Contract work");
+    const contract = within(canvas.getByRole("region", { name: "Contract" }));
+    await expect(
+      contract.getByRole("link", { name: "Sri Balaji Developers" }),
+    ).toHaveAttribute(
+      "href",
+      "/app/masters/clients/0199a1b2-0000-7000-8000-0000000000c1",
+    );
+  },
+};
+
 export const StateNotSet: Story = {
   beforeEach: serve(PLAIN),
   play: async ({ canvas }) => {

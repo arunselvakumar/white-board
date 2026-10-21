@@ -19,6 +19,11 @@ import {
   PROJECT_REFERENCE_MAX,
 } from "@/src/projects/domain/project-contract-rules";
 import {
+  defaultProjectRole,
+  isProjectRole,
+  type ProjectRole,
+} from "@/src/projects/domain/project-role";
+import {
   isProjectType,
   type ProjectType,
 } from "@/src/projects/domain/project-type";
@@ -93,6 +98,17 @@ export const projectFormSchema = z
     address: z.string().trim().max(500, "Use at most 500 characters"),
     startDate: dateField,
     endDate: dateField,
+    /**
+     * Contract work or Own development (ADR CM-0023 §2); "" on Add Project
+     * until chosen, when the Client decides it (`shownRole`).
+     */
+    role: z
+      .string()
+      .refine((value): boolean => value === "" || isProjectRole(value), {
+        message: "Choose Contract work or Own development",
+      }),
+    /** The linked Client master record, or "" for none. */
+    clientId: z.string(),
     clientName: z
       .string()
       .trim()
@@ -192,7 +208,13 @@ export type ProjectFormField = FieldPath<ProjectFormValues>;
 export type ProjectFormCard = "project" | "client" | "contract" | "more";
 
 export function cardOf(field: string): ProjectFormCard {
-  if (field === "clientName" || field === "clientPhone") return "client";
+  if (
+    field === "role" ||
+    field === "clientId" ||
+    field === "clientName" ||
+    field === "clientPhone"
+  )
+    return "client";
   if (field.startsWith("customFields")) return "more";
   if (
     field === "orderValue" ||
@@ -213,6 +235,8 @@ export const FIELD_ORDER: readonly string[] = [
   "budgetValue",
   "stateCode",
   "address",
+  "role",
+  "clientId",
   "clientName",
   "clientPhone",
   "orderValue",
@@ -242,6 +266,8 @@ export function projectFormValues(
     address: project?.address ?? "",
     startDate: project?.startDate ?? "",
     endDate: project?.endDate ?? "",
+    role: project?.role ?? "",
+    clientId: project?.clientId ?? "",
     clientName: project?.clientName ?? "",
     clientPhone: phoneForInput(project?.clientPhone ?? null),
     orderValue: groupRupees(paiseToRupees(project?.orderValue)),
@@ -266,6 +292,20 @@ const blankToNull = (value: string): string | null => {
 export type ProjectFormInput = ProjectInput & { status: ProjectStatus };
 
 /**
+ * The Role the form shows: the one chosen, or on Add Project before one
+ * is, what the server would pick: Contract work when a Client or a client
+ * name is filled in, else Own development.
+ */
+export function shownRole(
+  values: Pick<ProjectFormValues, "role" | "clientId" | "clientName">,
+): ProjectRole {
+  if (isProjectRole(values.role)) return values.role;
+  return defaultProjectRole(
+    values.clientId !== "" || values.clientName.trim() !== "",
+  );
+}
+
+/**
  * The request body, plus where each sent custom field sat on the form
  * (fully blank rows are dropped, so a server `details.index` maps back).
  *
@@ -275,6 +315,8 @@ export type ProjectFormInput = ProjectInput & { status: ProjectStatus };
  * left out of the request instead of being sent as a clear. A Project
  * Type left blank (a Project from before M4) is left out, so it stays
  * "Not set". So is a State still "Not set"; one taken away is sent as null.
+ * Likewise the Client link (CM-1101): sent while one is linked or once one
+ * is taken away, and the Role only once picked or changed.
  */
 export function projectFormInput(
   values: ProjectFormValues,
@@ -298,6 +340,9 @@ export function projectFormInput(
   const sendBudget =
     financial && (budgetValue != null || project?.budgetValue != null);
   const sendState = values.stateCode !== "" || project?.stateCode != null;
+  // Sent once picked or changed; left out, Add defaults it and Edit keeps it.
+  const sendRole = values.role !== "" && values.role !== project?.role;
+  const sendClient = values.clientId !== "" || project?.clientId != null;
 
   const input: ProjectFormInput = {
     name: values.name,
@@ -312,6 +357,10 @@ export function projectFormInput(
     address: blankToNull(values.address),
     startDate: blankToNull(values.startDate),
     endDate: blankToNull(values.endDate),
+    ...(sendRole ? { role: values.role as ProjectRole } : {}),
+    ...(sendClient
+      ? { clientId: values.clientId === "" ? null : values.clientId }
+      : {}),
     clientName: blankToNull(values.clientName),
     clientPhone:
       values.clientPhone.trim() === ""
@@ -345,6 +394,9 @@ const SERVER_FIELDS: Record<string, ProjectFormField> = {
   PROJECT_ADDRESS_TOO_LONG: "address",
   PROJECT_DATE_INVALID: "startDate",
   PROJECT_DATES_INVALID: "endDate",
+  PROJECT_ROLE_INVALID: "role",
+  CLIENT_NOT_FOUND: "clientId",
+  CLIENT_INACTIVE: "clientId",
   PROJECT_CLIENT_NAME_TOO_LONG: "clientName",
   PROJECT_CLIENT_PHONE_INVALID: "clientPhone",
   PROJECT_ORDER_VALUE_INVALID: "orderValue",
