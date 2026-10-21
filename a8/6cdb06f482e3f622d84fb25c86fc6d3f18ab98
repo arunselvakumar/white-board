@@ -1,0 +1,43 @@
+apps/construction-management/app/api/construction/contracts/access/access.http.test.ts
+  s_f49615d4431370::t_d2fa861e4d068c 56,66
+apps/construction-management/docs/adr/CM-0023-india-compliance-product-decisions.md
+  s_f49615d4431370::t_ee26f7a0a11032 69
+apps/construction-management/docs/modules/14-contracts-and-billing.md
+  s_f49615d4431370::t_a9eb9e7b755ac8 45
+apps/construction-management/src/contracts/application/boq-handlers.ts
+  s_f49615d4431370::t_74ab9e7dd55869 172
+apps/construction-management/src/messaging/domain/notification.test.ts
+  s_f49615d4431370::t_b504f3757316ff 77,81
+apps/construction-management/src/organization/infrastructure/seeds/designations.json
+  s_f49615d4431370::t_8f99004710d00a 382
+apps/construction-management/src/shared-kernel/access/access.test.ts
+  s_6777d2a5cecb3e::t_139876333526dd 68,70
+apps/construction-management/src/shared-kernel/access/menus.ts
+  s_f49615d4431370::t_6cc423f4c422ea 164
+packages/db/construction/prisma/migrations/20261021090500_construction_organization_m11_menus/migration.sql
+  s_f49615d4431370::t_402c3051543c7a 24,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a86cdb06f482e3f622d84fb25c86fc6d3f18ab98",
+  "prompts": {},
+  "sessions": {
+    "s_6777d2a5cecb3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2a324d2-7ae1-42bd-aac6-fea145cd917d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
