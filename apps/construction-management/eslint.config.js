@@ -16,6 +16,7 @@ const BOUNDED_CONTEXTS = [
   "finance",
   "labour",
   "sales",
+  "contracts",
   "hrms",
   "reporting",
   "messaging",
