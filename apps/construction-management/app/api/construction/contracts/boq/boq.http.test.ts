@@ -633,8 +633,8 @@ describe("BOQ items (CM-1103)", () => {
           params(libraryId),
         ),
       ]);
-      const copied = copy.status === StatusCodes.CREATED;
-      const deleted = removal.status === StatusCodes.NO_CONTENT;
+      const copied = copy.status === 201;
+      const deleted = removal.status === 204;
       expect(copied !== deleted, `round ${String(round)}`).toBe(true);
       if (copied)
         expect(await errorOf(removal)).toMatchObject({ code: "ITEM_IN_USE" });

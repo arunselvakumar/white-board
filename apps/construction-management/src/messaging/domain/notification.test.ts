@@ -74,11 +74,12 @@ describe("notification rules (CM-904)", () => {
     );
     for (const kind of Object.values(NOTIFICATION_KINDS))
       if (kind.menu != null) expect(withN.has(kind.menu)).toBe(true);
-    // Other Expenses has no N in the matrix: only the Owner hears of them.
+    // Other Expenses and the BOQ (CM-0023 §4: CRUDAJPOFEI) have no N in
+    // the matrix: only the Owner hears of them.
     const withoutN = Object.entries(APPROVAL_DOCUMENTS)
       .filter(([, document]) => !withN.has(document.menu))
       .map(([type]) => type);
-    expect(withoutN).toEqual(["other_expense"]);
+    expect(withoutN).toEqual(["other_expense", "variation"]);
   });
 
   it("names and links documents in plain words", () => {
