@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { InquiryEdit } from "@/components/sales/inquiries/inquiry-pages";
+import { QuerySuspense } from "@/components/query-suspense";
+import { InquiryEditSkeleton } from "@/components/sales/inquiries/inquiries-skeletons";
 
 export const metadata: Metadata = { title: "Edit Inquiry" };
 
@@ -15,5 +17,11 @@ export default async function InquiryEditPage({
   const { id, inquiryId } = await params;
   if (!(await viewerCan("sales.inquiries", "update", { projectId: id })))
     return <ProjectNoAccess what="editing inquiries" />;
-  return <InquiryEdit projectId={id} inquiryId={inquiryId} />;
+  return (
+    <QuerySuspense
+      fallback={<InquiryEditSkeleton projectId={id} inquiryId={inquiryId} />}
+    >
+      <InquiryEdit projectId={id} inquiryId={inquiryId} />
+    </QuerySuspense>
+  );
 }

@@ -11,6 +11,12 @@ import {
   FilterBarSkeleton,
   ResponsiveListSkeleton,
 } from "@/components/finance/finance-skeletons";
+import {
+  FieldGridSkeleton,
+  FormActionsSkeleton,
+  RecordHeaderSkeleton,
+  type SalesSkeletonField,
+} from "@/components/sales/sales-form-skeletons";
 import { inquiriesPath } from "@/src/queries/sales-inquiries";
 import {
   FOLLOW_UP_DUE_LABELS,
@@ -21,10 +27,7 @@ import {
 
 /*
  * Inquiries while they load (ADR-0047): the real heading, chips, filter
- * labels and column headers; bars where the inquiries go.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
+ * labels, column headers and form labels; bars where the inquiries go.
  */
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
@@ -209,6 +212,59 @@ export function InquiryDetailSkeleton({ projectId }: { projectId: string }) {
           <InquiryTasksSkeleton />
         </aside>
       </div>
+    </div>
+  );
+}
+
+const INQUIRY_FIELDS: SalesSkeletonField[] = [
+  { label: "Inquiry Date" },
+  { label: "Name" },
+  { label: "Mobile" },
+  { label: "Email" },
+  { label: "Occupation" },
+  { label: "Interest Type" },
+  { label: "Unit type" },
+  { label: "Lead Source" },
+  { label: "Funnel Stage" },
+  { label: "Assignee" },
+  { label: "Lead Owner" },
+  { label: "Next follow-up", className: "sm:col-span-2 lg:col-span-1" },
+  { label: "Address", rows: 2, className: "sm:col-span-2 lg:col-span-3" },
+  { label: "Remarks", rows: 3, className: "sm:col-span-2 lg:col-span-3" },
+];
+
+/** The inquiry form while its options load: every field's real label. */
+export function InquiryFormSkeleton() {
+  return (
+    <SkeletonGroup
+      label="Loading the inquiry form"
+      className="w-full max-w-4xl space-y-6"
+    >
+      <FieldGridSkeleton
+        fields={INQUIRY_FIELDS}
+        className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      />
+      <FormActionsSkeleton />
+    </SkeletonGroup>
+  );
+}
+
+/** Edit an inquiry while it loads: its name is data, so the header is bars. */
+export function InquiryEditSkeleton({
+  projectId,
+  inquiryId,
+}: {
+  projectId: string;
+  inquiryId: string;
+}) {
+  return (
+    <div className="flex w-full flex-col gap-4 p-6">
+      <div className="w-full max-w-4xl">
+        <RecordHeaderSkeleton
+          back={{ href: inquiriesPath(projectId, inquiryId) }}
+        />
+      </div>
+      <InquiryFormSkeleton />
     </div>
   );
 }

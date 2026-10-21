@@ -7,12 +7,14 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 
 import { ResponsiveListSkeleton } from "@/components/finance/finance-skeletons";
+import {
+  FieldGridSkeleton,
+  FormActionsSkeleton,
+  RecordHeaderSkeleton,
+} from "@/components/sales/sales-form-skeletons";
 import { bookingsPath } from "@/src/queries/sales-bookings";
 
-/*
- * Bookings while they load (ADR-0047). `SkeletonGroup` wraps its bars in a
- * `display: contents` box, so spacing between them uses flex `gap`.
- */
+/* Bookings while they load (ADR-0047). */
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
 
@@ -93,6 +95,54 @@ export function BookingDetailSkeleton({ projectId }: { projectId: string }) {
           </SkeletonGroup>
         </section>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Edit a booking while it loads: the unit line, the dates, the customer
+ * details with their real labels. The booking's name is data, so the
+ * header is bars.
+ */
+export function BookingEditSkeleton({
+  projectId,
+  bookingId,
+}: {
+  projectId: string;
+  bookingId: string;
+}) {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="w-full max-w-4xl">
+        <RecordHeaderSkeleton
+          back={{ href: bookingsPath(projectId, bookingId) }}
+        />
+      </div>
+      <SkeletonGroup
+        label="Loading the booking"
+        className="w-full max-w-4xl space-y-6"
+      >
+        <section className="space-y-4 rounded-lg border p-4">
+          <SkeletonText width="12rem" />
+          <FieldGridSkeleton
+            className="grid gap-4 sm:grid-cols-2"
+            fields={[{ label: "Booking Date" }, { label: "Hold until" }]}
+          />
+        </section>
+        <FieldGridSkeleton
+          className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
+          fields={[
+            { label: "Customer name" },
+            { label: "Mobile" },
+            { label: "Email" },
+            { label: "Address", rows: 2, className: "sm:col-span-2" },
+            { label: "Referred By" },
+            { label: "Referred By contact" },
+            { label: "Remarks", rows: 2, className: "sm:col-span-2" },
+          ]}
+        />
+        <FormActionsSkeleton />
+      </SkeletonGroup>
     </div>
   );
 }

@@ -9,8 +9,7 @@ import {
 import { UNIT_STATUS_DOTS } from "./sales-status";
 
 /*
- * Units while they load (ADR-0047). `SkeletonGroup` wraps its bars in a
- * `display: contents` box, so spacing between them uses flex `gap`.
+ * Units while they load (ADR-0047).
  */
 
 function CountsSkeleton() {
@@ -40,7 +39,7 @@ export function UnitsTabSkeleton() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Units</h2>
       </div>
-      <SkeletonGroup label="Loading units" className="flex flex-col gap-4">
+      <SkeletonGroup label="Loading units" className="space-y-4">
         <section className="bg-muted/40 space-y-1 rounded-lg border p-3">
           <SkeletonText width="9rem" />
           <CountsSkeleton />
@@ -75,7 +74,7 @@ export function UnitsTabSkeleton() {
 /** A unit's panel in the sheet: status chips, actions, then its facts. */
 export function UnitPanelSkeleton() {
   return (
-    <SkeletonGroup label="Loading the unit" className="flex flex-col gap-5">
+    <SkeletonGroup label="Loading the unit" className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
         <Skeleton className="h-5 w-20 rounded-full" />
         <SkeletonText width="8rem" />
