@@ -1450,6 +1450,7 @@ export class InquiryHandlers {
   ): Promise<InquiryFormOptions> {
     const { db, directory, lists } = this.deps;
     const ws = access.workspaceId;
+    await lists.ensureSeeded(ws, projectId);
     const [members, wings, stages, sources, reasons, viewer] =
       await Promise.all([
         directory.membersOnProject(db, ws, projectId),

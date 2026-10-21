@@ -1,4 +1,4 @@
-import { Prisma } from "@repo/construction-db";
+import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { SalesTx } from "../application/ports";
 import type {
@@ -10,6 +10,8 @@ import {
   type SalesListKind,
   type SalesPickList,
 } from "../domain/sales-lists";
+import { SYSTEM_ACTOR } from "../domain/sales-terms";
+import { seedProjectSales } from "./seed-project-sales";
 
 const TABLES: Record<SalesListKind, string> = {
   funnel_stage: "funnel_stages",
@@ -93,6 +95,20 @@ function isUniqueViolation(error: unknown): boolean {
  * the caller's transaction.
  */
 export class PrismaSalesListStore implements SalesListStore {
+  constructor(private readonly root: PrismaClient = prisma) {}
+
+  async ensureSeeded(workspaceId: string, projectId: string) {
+    const stages = await this.root.constructionSalesFunnelStage.count({
+      where: { workspaceId, projectId },
+    });
+    if (stages > 0) return;
+    await seedProjectSales(this.root, {
+      workspaceId,
+      projectId,
+      by: SYSTEM_ACTOR,
+    });
+  }
+
   async list(
     db: SalesTx,
     workspaceId: string,

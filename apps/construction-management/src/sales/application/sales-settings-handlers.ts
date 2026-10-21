@@ -72,6 +72,12 @@ export type SalesListStore = {
     kind: SalesListKind,
     ids: readonly string[],
   ): Promise<Map<string, StoredSalesListItem>>;
+  /**
+   * Seeds a Project whose `ProjectCreated` seed failed after the Project was
+   * saved. A Project that ever had a Funnel Stage, live or deleted, is left
+   * alone, so an Owner's emptied list is not refilled.
+   */
+  ensureSeeded(workspaceId: string, projectId: string): Promise<void>;
   /** Locks the Project's live rows of the list `FOR UPDATE` and reads them. */
   lockProject(
     db: SalesTx,
@@ -206,6 +212,7 @@ export class SalesSettingsHandlers {
   ): Promise<SalesSettings> {
     assertCan(access, MENU, "read", { projectId });
     const ws = access.workspaceId;
+    await this.deps.store.ensureSeeded(ws, projectId);
     const [funnelStages, leadSources, lostReasons] = await Promise.all([
       this.withUsage(ws, projectId, "funnel_stage"),
       this.withUsage(ws, projectId, "lead_source"),

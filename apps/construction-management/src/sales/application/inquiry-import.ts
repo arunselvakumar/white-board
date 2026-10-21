@@ -174,6 +174,7 @@ export async function inquiryImportLists(
 ): Promise<InquiryImportLists> {
   assertCan(access, "sales.inquiries", "create", { projectId });
   const ws = access.workspaceId;
+  await deps.lists.ensureSeeded(ws, projectId);
   const [sources, stages, wings, members] = await Promise.all([
     deps.lists.list(deps.db, ws, projectId, "lead_source"),
     deps.lists.list(deps.db, ws, projectId, "funnel_stage"),

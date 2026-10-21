@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
-import { actAs, addMember, newCompany } from "@/test/companies";
+import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { salesInquiryRow, salesLists, salesProject } from "@/test/sales";
 import { sharedAssign } from "@/test/site-work";
 
@@ -121,6 +121,35 @@ describe("Sales settings (CM-1002)", () => {
       openCount: 0,
     });
     expect(settings.canManage).toBe(true);
+  });
+
+  it("seeds a Project whose seed failed when its lists are read, but never refills them", async () => {
+    const ctx = await setup();
+    const unseeded = await addProject(ctx.ws, ctx.by, "Seed failed");
+    const read = (projectId: string) =>
+      getSettings(new Request(`${BASE}?projectId=${projectId}`)).then((r) =>
+        json<Settings>(r),
+      );
+    const healed = await read(unseeded);
+    expect(stageNames(healed)).toEqual([
+      "New",
+      "Contacted",
+      "Site Visit",
+      "Negotiation",
+    ]);
+    expect(healed.leadSources).toHaveLength(6);
+    expect(healed.lostReasons).toHaveLength(5);
+    expect(
+      await prisma.constructionSalesFunnelStage.count({
+        where: { projectId: unseeded },
+      }),
+    ).toBe(4);
+
+    await prisma.constructionSalesLeadSource.updateMany({
+      where: { projectId: unseeded },
+      data: { deletedAt: new Date() },
+    });
+    expect((await read(unseeded)).leadSources).toEqual([]);
   });
 
   it("needs Inquiry read to see them and Update to change them", async () => {
