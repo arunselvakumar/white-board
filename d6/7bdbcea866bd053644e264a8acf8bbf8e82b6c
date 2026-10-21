@@ -1,0 +1,19 @@
+.github/workflows/deploy.yml
+  s_89c39be62ab7cf::t_595dab519190b5 167-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d67bdbcea866bd053644e264a8acf8bbf8e82b6c",
+  "prompts": {},
+  "sessions": {
+    "s_89c39be62ab7cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c56243e-2634-4b50-a8dc-fa96ba6afe53",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
