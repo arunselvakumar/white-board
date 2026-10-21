@@ -10,8 +10,8 @@ function percent(value: number): string {
 }
 
 /**
- * Project Progress % on the Project card and the Project home (ADR CM-0013
- * §2, CM-0019 §4, CM-805): a thin bar with the figure beside it, and the
+ * Project Progress % on the Project card and the Company Dashboard (ADR
+ * CM-0013 §2, CM-0019 §4, CM-805): a thin bar with the figure beside it, and the
  * weighting for screen readers and on hover. Nothing at all for a Project
  * without tasks: no bar rather than a made-up number.
  */

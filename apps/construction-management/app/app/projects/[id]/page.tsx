@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 
-import { ProjectOverview } from "@/components/projects/project-overview";
+import { ProjectLanding } from "@/components/projects/project-landing";
 
 export const metadata: Metadata = { title: "Project" };
 
-export default async function ProjectOverviewPage({
+/** Opening a Project lands on the first module in its menu (#99). */
+export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <ProjectOverview id={id} />;
+  return <ProjectLanding id={id} />;
 }

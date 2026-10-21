@@ -10,11 +10,12 @@ import type {
   DashboardLayout,
   ProjectSummary,
 } from "@/src/queries/project-dashboard";
+import type { ProjectResponse } from "@/src/queries/projects";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import { signInAs, storyUser } from "../../../.storybook/mocks/auth";
-import { KUMARI } from "../project-fixtures";
+import { KUMARI, project } from "../project-fixtures";
 import {
   emptyFinanceDashboard,
   FINANCE_DASHBOARD_PATH,
@@ -43,7 +44,8 @@ import {
   trackingDashboard,
 } from "./tracking-dashboard-fixtures";
 
-const SUMMARY_PATH = `/api/construction/projects/projects/${KUMARI.id}/dashboard/summary`;
+const PROJECT_PATH = `/api/construction/projects/projects/${KUMARI.id}`;
+const SUMMARY_PATH = `${PROJECT_PATH}/dashboard/summary`;
 const LAYOUT_PATH = "/api/construction/projects/dashboard-layout";
 const LABOUR_PATH = "/api/construction/labour/summary";
 const PROCUREMENT_PATH = "/api/construction/procurement/dashboard";
@@ -151,6 +153,8 @@ function serve(
   options: {
     layout?: DashboardLayout;
     summary?: ProjectSummary;
+    /** The Project the shell loaded: address, Contract, custom fields. */
+    project?: ProjectResponse;
     labour?: "ok" | "forbidden";
     procurement?: ProcurementDashboard;
     /** The Daily Work and Equipment Usage sections (CM-608). */
@@ -199,6 +203,8 @@ function serve(
       }
       if (method === "GET" && path === SUMMARY_PATH)
         return Response.json(options.summary ?? summary());
+      if (method === "GET" && path === PROJECT_PATH)
+        return Response.json(options.project ?? KUMARI);
       if (method === "GET" && path.startsWith(PROCUREMENT_PATH))
         return Response.json(options.procurement ?? procurement());
       if (method === "GET" && path.startsWith(FINANCE_DASHBOARD_PATH)) {
@@ -747,13 +753,73 @@ export const SiteWorkNeedsPermission: Story = {
 };
 
 export const WithoutFinancial: Story = {
-  beforeEach: serve({ summary: summary({ financial: false }) }),
+  beforeEach: serve({
+    summary: summary({ financial: false }),
+    // The Project read leaves out the Order value too.
+    project: { ...KUMARI, orderValue: null, budgetValue: null },
+  }),
   play: async ({ canvas }) => {
     const projectSummary = within(
       await canvas.findByRole("region", { name: "Project summary" }),
     );
     await expect(await projectSummary.findByText("Drawings")).toBeVisible();
     await expect(projectSummary.queryByText("Budget")).toBeNull();
+    const contract = within(
+      await projectSummary.findByRole("group", { name: "Contract" }),
+    );
+    await expect(contract.getByText("SBD/Q/2026/114")).toBeVisible();
+    await expect(contract.queryByText("Order value")).toBeNull();
+  },
+};
+
+/**
+ * The details that were on Project Home (#99) sit under the summary: the
+ * address and State, the Contract and the Additional details.
+ */
+export const ContractAndAdditionalDetails: Story = {
+  play: async ({ canvas }) => {
+    const projectSummary = within(
+      await canvas.findByRole("region", { name: "Project summary" }),
+    );
+    const site = within(
+      await projectSummary.findByRole("group", { name: "Site" }),
+    );
+    await expect(
+      site.getByText("Project address").nextElementSibling,
+    ).toHaveTextContent("Plot 12, Survey No. 45, Vadasery, Nagercoil 629001");
+    await expect(site.getByText("State").nextElementSibling).toHaveTextContent(
+      "Tamil Nadu",
+    );
+
+    const contract = within(
+      projectSummary.getByRole("group", { name: "Contract" }),
+    );
+    await expect(contract.getByText("Sri Balaji Developers")).toBeVisible();
+    await expect(contract.getByText("+91 98431 22110")).toBeVisible();
+    await expect(contract.getByText("₹4,85,00,000 excl. GST")).toBeVisible();
+    await expect(contract.getByText("SBD/Q/2026/114")).toBeVisible();
+    await expect(contract.getByText("10 Feb 2026")).toBeVisible();
+    await expect(contract.getByText("SBD/AGR/2026/009")).toBeVisible();
+
+    const more = within(
+      projectSummary.getByRole("group", { name: "Additional details" }),
+    );
+    await expect(more.getByText("Site engineer")).toBeVisible();
+    await expect(more.getByText("Prabhu Saravanan")).toBeVisible();
+  },
+};
+
+/** Only what is filled in: a bare Project adds nothing under the summary. */
+export const NothingFilledAddsNoDetails: Story = {
+  beforeEach: serve({
+    project: project({ id: KUMARI.id, address: null }),
+  }),
+  play: async ({ canvas }) => {
+    const projectSummary = within(
+      await canvas.findByRole("region", { name: "Project summary" }),
+    );
+    await expect(await projectSummary.findByText("Drawings")).toBeVisible();
+    await expect(projectSummary.queryByRole("group")).toBeNull();
   },
 };
 

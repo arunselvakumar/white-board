@@ -3,10 +3,16 @@ import { expect, within } from "storybook/test";
 
 import type { ProjectHome } from "@/src/queries/project-home";
 
+import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
+
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import { KUMARI, STORY_LOGO_URL } from "./project-fixtures";
+import {
+  clearProjectFlash,
+  peekProjectFlash,
+  setProjectFlash,
+} from "./project-flash";
 import { storyHome } from "./project-home-fixtures";
-import { ProjectOverview } from "./project-overview";
 import { ProjectShell } from "./project-shell";
 
 const BASE = "/api/construction/projects/projects";
@@ -40,11 +46,11 @@ const meta = {
   component: ProjectShell,
   args: { id: KUMARI.id, children: null },
   beforeEach: serve(),
-  parameters: { nextjs: { navigation: { pathname: PATH } } },
+  parameters: { nextjs: { navigation: { pathname: `${PATH}/dashboard` } } },
   render: () => (
     <StoryQueries>
       <ProjectShell id={KUMARI.id}>
-        <ProjectOverview id={KUMARI.id} />
+        <PagePlaceholder title="Dashboard" description="The module's page." />
       </ProjectShell>
     </StoryQueries>
   ),
@@ -53,7 +59,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Home: Story = {
+export const Header: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" }),
@@ -62,11 +68,25 @@ export const Home: Story = {
       "href",
       `${PATH}/edit`,
     );
-    const details = within(canvas.getByRole("region", { name: "Details" }));
-    await expect(details.getByText("1 Apr 2026")).toBeVisible();
+    await expect(canvas.getByText("1 Apr 2026 – 31 Mar 2027")).toBeVisible();
+    // The page sits under the header.
     await expect(
-      details.getByText("Plot 12, Survey No. 45, Vadasery, Nagercoil 629001"),
+      canvas.getByRole("heading", { name: "Dashboard" }),
     ).toBeVisible();
+  },
+};
+
+/** Pin, Hide / show modules and Backup; no Arrange tiles (#99). */
+export const OptionsWithUpdateFlag: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Project options" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await body.findByRole("menuitem", { name: "Backup…" });
+    await expect(
+      body.getAllByRole("menuitem").map((item) => item.textContent),
+    ).toEqual(["Pin to top", "Hide / show modules", "Backup…"]);
   },
 };
 
@@ -83,21 +103,56 @@ export const OptionsWithoutUpdateFlag: Story = {
       await canvas.findByRole("button", { name: "Project options" }),
     );
     const body = within(canvasElement.ownerDocument.body);
+    await body.findByRole("menuitem", { name: "Backup…" });
     await expect(
-      await body.findByRole("menuitem", { name: "Arrange tiles" }),
-    ).toBeVisible();
-    await expect(
-      body.queryByRole("menuitem", { name: "Hide / show modules" }),
-    ).toBeNull();
+      body.getAllByRole("menuitem").map((item) => item.textContent),
+    ).toEqual(["Pin to top", "Backup…"]);
   },
 };
 
-export const HiddenModulesNote: Story = {
-  beforeEach: serve(storyHome({ hidden: ["gallery", "reports"] })),
+/** A message from the screen before (Edit Project) shows on the next page. */
+export const MessageFromTheScreenBefore: Story = {
+  beforeEach: () => {
+    setProjectFlash(
+      KUMARI.id,
+      "The logo couldn't be saved. Try again from Edit Project.",
+    );
+    return serve()();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const alert = await canvas.findByRole("alert");
+    await expect(alert).toHaveTextContent(
+      "The logo couldn't be saved. Try again from Edit Project.",
+    );
+    await expect(peekProjectFlash(KUMARI.id)).toBeNull();
+    await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
+    await expect(canvas.queryByRole("alert")).toBeNull();
+  },
+};
+
+/**
+ * The bare Project path only forwards to the first module, so the message
+ * waits for that page instead of flashing past.
+ */
+export const MessageWaitsOutTheLanding: Story = {
+  parameters: { nextjs: { navigation: { pathname: PATH } } },
+  beforeEach: () => {
+    setProjectFlash(
+      KUMARI.id,
+      "1 file couldn't upload. Add it again from Documents.",
+    );
+    const restore = serve()();
+    return () => {
+      restore();
+      clearProjectFlash(KUMARI.id);
+    };
+  },
   play: async ({ canvas }) => {
-    await expect(
-      await canvas.findByText(/2 modules are hidden on this Project/),
-    ).toBeVisible();
+    await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" });
+    await expect(canvas.queryByRole("alert")).toBeNull();
+    await expect(peekProjectFlash(KUMARI.id)).toBe(
+      "1 file couldn't upload. Add it again from Documents.",
+    );
   },
 };
 
@@ -136,7 +191,7 @@ export const Phone: Story = {
   play: async ({ canvas, canvasElement }) => {
     // The slim header wraps; the page never scrolls sideways.
     await canvas.findByRole("heading", { level: 1, name: "Kumari Heights" });
-    await canvas.findByRole("list", { name: "Modules" });
+    await canvas.findByRole("button", { name: "Project options" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
@@ -164,9 +219,6 @@ export const WithLogoAndType: Story = {
     await expect(
       header.querySelector("[data-slot=avatar-image]"),
     ).toHaveAttribute("src", STORY_LOGO_URL);
-    const details = within(canvas.getByRole("region", { name: "Details" }));
-    await expect(details.getByText("Project Type")).toBeVisible();
-    await expect(details.getByText("₹4,20,00,000")).toBeVisible();
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

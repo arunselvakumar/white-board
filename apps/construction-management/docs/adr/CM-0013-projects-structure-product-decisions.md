@@ -99,6 +99,8 @@ The Gallery is an **index over attachments**, not a copy and not an upload scree
 - **Tile order** is per member and applies to every Project (rebuild recommendation 1; legacy kept one order in the browser).
 - **Pin** is per member per Project; pinned Projects come first on the Projects home.
 
+Since [CM-0020 §5](CM-0020-project-sidebar-menu.md) (2026-10-21) there is no Project home page and no Arrange tiles: opening a Project lands on the first module in its sidebar menu, and hiding a module takes it off the menu.
+
 ### 12. Project Dashboard
 
 The dashboard shell has a duration filter (default the last 12 months), the four KPI tiles and the sections of `modules/03`. Sections whose data comes from later milestones (Task, Payments, Materials, Issue & Snag, Inspection Request, Booking, Inquiry, Daily Work, Equipment Usage) render a stub that names the module that fills it. Sections with data today: Project summary (dates, budget with the Financial flag, structure counts, drawings, testing reports, documents) and Attendance (from M2). **Manage Dashboard** shows, hides and reorders sections per member for every Project (open question 13).
