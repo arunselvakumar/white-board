@@ -1,0 +1,51 @@
+apps/construction-management/app/(onboarding)/choose-company/page.tsx
+  s_353c13142e25d9::t_f2bee4ef137706 28-30
+apps/construction-management/app/app/downloads/page.tsx
+  s_353c13142e25d9::t_1d8cf33dc8e5da 4-5,11-15
+apps/construction-management/app/app/notifications/page.tsx
+  s_353c13142e25d9::t_c6d3a41cc97ec2 4-5,10-14
+apps/construction-management/app/app/profile/page.tsx
+  s_353c13142e25d9::t_125a58b9fce3cb 6-10,18-20,24,27
+apps/construction-management/app/app/projects/[id]/reports/page.tsx
+  s_353c13142e25d9::t_8e1190438f4953 4-5,18-20
+apps/construction-management/components/account/account-skeletons.tsx
+  s_353c13142e25d9::t_a78b3c4313000b 1-29
+apps/construction-management/components/account/company-ownership-screen.tsx
+  s_353c13142e25d9::t_244527fa903da1 13,43,180-182
+apps/construction-management/components/account/transfer-ownership-dialog.tsx
+  s_353c13142e25d9::t_b5aefdcd07a463 32,117
+apps/construction-management/components/downloads/downloads-skeletons.tsx
+  s_353c13142e25d9::t_62b60f9db2e78f 1-17
+apps/construction-management/components/notifications/notification-bell.tsx
+  s_353c13142e25d9::t_ae105042ea567d 24,120
+apps/construction-management/components/notifications/notifications-skeletons.tsx
+  s_353c13142e25d9::t_13d8eaaa844369 1-55
+apps/construction-management/components/profile/notification-settings.tsx
+  s_353c13142e25d9::t_b8a9f62396468c 20,197
+apps/construction-management/components/profile/profile-skeletons.tsx
+  s_353c13142e25d9::t_ea3fe2d8a06253 1-123
+apps/construction-management/components/reports/central-reports-page.stories.tsx
+  s_353c13142e25d9::t_03b2f95b91e488 150-153
+apps/construction-management/components/reports/central-reports-page.tsx
+  s_353c13142e25d9::t_294b5b963b1297 21-24,116,146
+apps/construction-management/components/reports/reports-page.tsx
+  s_353c13142e25d9::t_6b909dd673ec7e 31,247
+apps/construction-management/components/reports/reports-skeletons.tsx
+  s_353c13142e25d9::t_320d469a26fbe8 70,74,77,105-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5ba0493aa0e032effcd319077467d1e12132c51f",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
