@@ -104,4 +104,21 @@ describe("Due (CM-0022 §4)", () => {
     expect(instant.toISOString()).toBe("2026-10-17T05:00:00.000Z");
     expect(salesLocal(instant, ZONE)).toEqual({ date: TODAY, time: "10:30" });
   });
+
+  it("keeps a day on its date where daylight saving starts at midnight", () => {
+    const santiago = "America/Santiago";
+    const start = salesInstant("2026-09-06", null, santiago);
+    expect(salesLocal(start, santiago)).toEqual({
+      date: "2026-09-06",
+      time: "01:00",
+    });
+    const day = dueBounds(start, "2026-09-06", santiago);
+    expect(day.todayStart.toISOString()).toBe("2026-09-06T04:00:00.000Z");
+    expect(day.tomorrowStart.toISOString()).toBe("2026-09-07T03:00:00.000Z");
+    // A skipped 02:30 in New York is 03:00.
+    const newYork = "America/New_York";
+    expect(
+      salesLocal(salesInstant("2026-03-08", "02:30", newYork), newYork),
+    ).toEqual({ date: "2026-03-08", time: "03:00" });
+  });
 });
