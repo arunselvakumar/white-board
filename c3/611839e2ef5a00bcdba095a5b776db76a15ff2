@@ -1,0 +1,81 @@
+apps/construction-management/app/app/projects/[id]/amenities/page.tsx
+  s_353c13142e25d9::t_69bfcb5e0ce8f3 5-6,20-24
+apps/construction-management/app/app/projects/[id]/documents/page.tsx
+  s_353c13142e25d9::t_0855db32b06de6 5-6,20-24
+apps/construction-management/app/app/projects/[id]/drawings/[albumId]/page.tsx
+  s_353c13142e25d9::t_2b338556a9fac8 6-7,26-34
+apps/construction-management/app/app/projects/[id]/drawings/page.tsx
+  s_353c13142e25d9::t_22e9830246bc86 6-7,26-33
+apps/construction-management/app/app/projects/[id]/gallery/page.tsx
+  s_353c13142e25d9::t_5fb2843a170bed 6-7,24-28
+apps/construction-management/app/app/projects/[id]/locations/page.tsx
+  s_353c13142e25d9::t_0971c07838c6c3 7-8,21-25
+apps/construction-management/app/app/projects/[id]/resources/page.tsx
+  s_353c13142e25d9::t_a7dbd4f58a0fde 6-7,27-33
+apps/construction-management/app/app/projects/[id]/testing-reports/[itemId]/page.tsx
+  s_353c13142e25d9::t_e9b6c1dc6d48e4 6-7,26-34
+apps/construction-management/app/app/projects/[id]/testing-reports/page.tsx
+  s_353c13142e25d9::t_5e5af313e3e5b4 6-7,26-33
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/edit/page.tsx
+  s_353c13142e25d9::t_de58cc12cdb3e6 7-8,22-28
+apps/construction-management/app/app/projects/[id]/wings/[wingId]/page.tsx
+  s_353c13142e25d9::t_110c6273497427 7-8,21-25
+apps/construction-management/app/app/projects/[id]/wings/new/page.tsx
+  s_353c13142e25d9::t_882f83640942f0 7-8,26-31
+apps/construction-management/app/app/projects/[id]/wings/page.tsx
+  s_353c13142e25d9::t_5c57c94733d868 7-8,21-25
+apps/construction-management/components/attendance/attendance-skeletons.tsx
+  s_353c13142e25d9::t_c51c0955db839c 76,132
+apps/construction-management/components/dashboard/dashboard-skeletons.tsx
+  s_353c13142e25d9::t_6ba03828ec53a7 56
+apps/construction-management/components/finance/accounts/accounts-skeletons.tsx
+  s_353c13142e25d9::t_77c5e85bbcccdd 34
+apps/construction-management/components/finance/finance-skeletons.tsx
+  s_353c13142e25d9::t_26e9f94cc6e6fe 145
+apps/construction-management/components/finance/parties/parties-skeletons.tsx
+  s_353c13142e25d9::t_67de1854db691a 189,222,241,261
+apps/construction-management/components/finance/payments-hub/payments-hub-skeletons.tsx
+  s_353c13142e25d9::t_d3c7638ad2b47c 13
+apps/construction-management/components/finance/petty-cash/petty-cash-skeletons.tsx
+  s_353c13142e25d9::t_833f4349cb7af1 46,60
+apps/construction-management/components/finance/transactions/transactions-skeletons.tsx
+  s_353c13142e25d9::t_b9c836b395eb55 29
+apps/construction-management/components/hrms/hrms-skeletons.tsx
+  s_353c13142e25d9::t_298cd487041693 83,146
+apps/construction-management/components/payments/payments-skeletons.tsx
+  s_353c13142e25d9::t_ef8c55df2b10a5 73,106
+apps/construction-management/components/projects/dashboard/dashboard-skeletons.tsx
+  s_353c13142e25d9::t_64cb31bc88f93c 62,90
+apps/construction-management/components/projects/documents/documents-skeletons.tsx
+  s_353c13142e25d9::t_a5d936d7b3ec54 1-39
+apps/construction-management/components/projects/drawings/drawings-skeletons.tsx
+  s_353c13142e25d9::t_d316ba2507f4b7 1-3,7-79,107
+apps/construction-management/components/projects/gallery/gallery-skeletons.tsx
+  s_353c13142e25d9::t_59995a17c07700 1-52
+apps/construction-management/components/projects/project-amenities.tsx
+  s_353c13142e25d9::t_4025d437448878 29
+apps/construction-management/components/projects/projects-skeletons.tsx
+  s_353c13142e25d9::t_9288c28ed3b194 1-2,16-17,23,57,202-207,209,241-272
+apps/construction-management/components/projects/resources/resources-skeletons.tsx
+  s_353c13142e25d9::t_326c779430d4bf 4-6,13,29-63
+apps/construction-management/components/projects/structure/structure-skeletons.tsx
+  s_353c13142e25d9::t_112197e747a1f7 1-185
+apps/construction-management/components/projects/testing-reports/testing-reports-skeletons.tsx
+  s_353c13142e25d9::t_1eabd0f0258564 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c3611839e2ef5a00bcdba095a5b776db76a15ff2",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
