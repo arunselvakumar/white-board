@@ -60,13 +60,18 @@ describe("the menu catalogue", () => {
     }
     expect(counts).toEqual({
       // M6 (ADR CM-0016): Reject on two menus, Site Diary (5), Hindrance Register (6).
-      project_management: 127,
-      // M7 (ADR CM-0017 §10): Other Expenses (8).
-      payment_accounting: 38,
+      // M11 (ADR CM-0023 §16–§23): Collections (10), RERA (6), Labour
+      // Compliance (5), Concrete Register (7).
+      project_management: 155,
+      // M7 (ADR CM-0017 §10): Other Expenses (8). M11: GST (2), TDS (5).
+      payment_accounting: 45,
+      // M11 (ADR CM-0023 §3–§7): BOQ (9), Work Order (10), Measurement Book
+      // (7), Contractor Bills (10), Client Bills (10).
+      contracts: 46,
       materials: 46,
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13) + Tags
-      // CRUD (ADR CM-0019 §1).
-      master_records: 100,
+      // CRUD (ADR CM-0019 §1) + M11 Clients CRUD and Item Library CRUD.
+      master_records: 108,
       central_store: 20,
       hrms: 57,
       others: 1,

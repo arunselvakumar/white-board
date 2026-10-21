@@ -204,6 +204,10 @@ import {
   salesOpenApiOperations,
 } from "@/app/api/construction/sales/sales-openapi";
 import {
+  contractsOpenApiComponents,
+  contractsOpenApiOperations,
+} from "@/app/api/construction/contracts/contracts-openapi";
+import {
   billingAddressOpenApiComponents,
   billingAddressOpenApiOperations,
 } from "@/app/api/construction/organization/settings/billing-addresses/billing-address-openapi";
@@ -989,6 +993,10 @@ openApiOperations.push(...trackingOpenApiOperations);
 // The sales context (M10) lists its own models and routes, one file per area.
 Object.assign(openApiComponents, salesOpenApiComponents);
 openApiOperations.push(...salesOpenApiOperations);
+
+// The contracts context (M11) lists its own models and routes, one file per area.
+Object.assign(openApiComponents, contractsOpenApiComponents);
+openApiOperations.push(...contractsOpenApiOperations);
 
 // The kernel's job queue (M9, ADR CM-0021 §1).
 Object.assign(openApiComponents, queueOpenApiComponents);

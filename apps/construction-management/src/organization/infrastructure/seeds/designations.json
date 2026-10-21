@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "source": "Default Designations every new Company starts with (modules/01 seed list, 38 names). Eight carry a starter Permission Template chosen for the role; Admin holds every supported cell. Companies edit their own copy.",
   "designations": [
     {
@@ -84,7 +84,32 @@
           "reject",
           "print",
           "report"
-        ]
+        ],
+        "masters.clients": ["create", "read", "update", "delete"],
+        "finance.gst": ["read", "report", "export"],
+        "finance.tds": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "report",
+          "export"
+        ],
+        "contracts.boq": ["read", "financial"],
+        "contracts.work_orders": ["read", "financial"],
+        "contracts.contractor_bills": ["read", "print", "report", "financial"],
+        "contracts.client_bills": ["read", "print", "report", "financial"],
+        "contracts.items": ["read"],
+        "labour.compliance": ["create", "read", "update", "report"],
+        "sales.collections": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "financial"
+        ],
+        "sales.rera": ["read", "print", "report"]
       }
     },
     {
@@ -343,7 +368,71 @@
           "notification"
         ],
         "hrms.salaries": ["read"],
-        "finance.other_expenses": ["read"]
+        "finance.other_expenses": ["read"],
+        "masters.clients": ["read"],
+        "contracts.items": ["create", "read", "update"],
+        "contracts.boq": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "financial",
+          "export",
+          "import"
+        ],
+        "contracts.work_orders": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification",
+          "financial"
+        ],
+        "contracts.measurements": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "print",
+          "report"
+        ],
+        "contracts.contractor_bills": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification",
+          "financial"
+        ],
+        "contracts.client_bills": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification",
+          "financial"
+        ],
+        "labour.compliance": ["read", "report"],
+        "site_work.concrete": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "print",
+          "report"
+        ]
       }
     },
     {
@@ -378,7 +467,15 @@
         "masters.master_records": ["read"],
         "masters.departments": ["read"],
         "masters.contractors": ["read"],
-        "masters.issue_categories": ["read"]
+        "masters.issue_categories": ["read"],
+        "site_work.concrete": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "print",
+          "report"
+        ]
       }
     },
     {
@@ -454,7 +551,18 @@
         "hrms.salaries": ["read"],
         "finance.payments": ["read"],
         "finance.petty_cash": ["create", "read", "update"],
-        "finance.other_expenses": ["create", "read", "update"]
+        "finance.other_expenses": ["create", "read", "update"],
+        "contracts.boq": ["read"],
+        "contracts.work_orders": ["read"],
+        "contracts.measurements": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report"
+        ],
+        "contracts.items": ["read"],
+        "site_work.concrete": ["create", "read", "update", "print", "report"]
       }
     },
     {
@@ -488,7 +596,8 @@
         "hrms.salaries": ["read"],
         "finance.payments": ["read"],
         "finance.petty_cash": ["create", "read", "update"],
-        "finance.other_expenses": ["create", "read"]
+        "finance.other_expenses": ["create", "read"],
+        "site_work.concrete": ["create", "read", "update"]
       }
     },
     {
@@ -595,7 +704,8 @@
         "masters.master_records": ["read"],
         "masters.departments": ["read"],
         "masters.contractors": ["read"],
-        "masters.issue_categories": ["read"]
+        "masters.issue_categories": ["read"],
+        "site_work.concrete": ["read", "approve", "print", "report"]
       }
     }
   ]

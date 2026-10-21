@@ -1,8 +1,47 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
-import { MENUS, PermissionSet } from "@/src/shared-kernel/access";
+import { MENUS, PermissionSet, type MenuKey } from "@/src/shared-kernel/access";
 
-import { seedDesignations, seedTemplates } from "./designation-seeds";
+import {
+  DESIGNATION_SEED_VERSION,
+  seedDesignations,
+  seedTemplates,
+} from "./designation-seeds";
+
+const M11_MIGRATION = join(
+  __dirname,
+  "../../../../../packages/db/construction/prisma/migrations/20261021090500_construction_organization_m11_menus/migration.sql",
+);
+
+/** The menus M11 added (ADR CM-0023 §22); the migration grants only these. */
+const M11_MENUS: readonly MenuKey[] = [
+  "contracts.boq",
+  "contracts.work_orders",
+  "contracts.measurements",
+  "contracts.contractor_bills",
+  "contracts.client_bills",
+  "contracts.items",
+  "masters.clients",
+  "finance.gst",
+  "finance.tds",
+  "labour.compliance",
+  "sales.collections",
+  "sales.rera",
+  "site_work.concrete",
+];
+
+/** `designation → menu → mask` from the migration's VALUES list. */
+function migrationGrants(sql: string): Record<string, Record<string, number>> {
+  const grants: Record<string, Record<string, number>> = {};
+  for (const [, designation = "", menu = "", flags = ""] of sql.matchAll(
+    /\('([^']+)', '([^']+)', (\d+)\)/g,
+  ))
+    (grants[designation] ??= {})[menu] = Number(flags);
+  return grants;
+}
 
 describe("designation seed set (CM-106)", () => {
   const seeded = seedDesignations({
@@ -35,6 +74,35 @@ describe("designation seed set (CM-106)", () => {
       const sanitized = PermissionSet.fromGrants(grants).toGrants();
       expect(sanitized, name).toEqual(grants);
     }
+  });
+
+  it("is version 2 since M11 added the Contracts & Billing menus", () => {
+    expect(DESIGNATION_SEED_VERSION).toBe(2);
+  });
+
+  it("grants existing Companies' seeded Designations the same M11 cells as new ones (CM-1101)", () => {
+    const fromSeeds: Record<string, Record<string, number>> = {};
+    for (const designation of seeded) {
+      const template = designation.template;
+      if (template == null) continue;
+      for (const menu of M11_MENUS) {
+        const mask = template.mask(menu);
+        if (mask !== 0) (fromSeeds[designation.name] ??= {})[menu] = mask;
+      }
+    }
+    expect(migrationGrants(readFileSync(M11_MIGRATION, "utf8"))).toEqual(
+      fromSeeds,
+    );
+    // Starter cells chosen per role (ADR CM-0023 §22).
+    expect(Object.keys(fromSeeds).sort()).toEqual([
+      "Accountant",
+      "Admin",
+      "Project Manager",
+      "Quality Control",
+      "Site Engineer",
+      "Site Supervisor",
+      "Structural Engineer",
+    ]);
   });
 
   it("gives Admin every supported cell", () => {
