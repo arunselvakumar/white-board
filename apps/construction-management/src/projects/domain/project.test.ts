@@ -12,6 +12,7 @@ import {
   PROJECT_BUDGET_MAX,
   PROJECT_ORDER_VALUE_MAX,
 } from "./project-contract-rules";
+import { defaultHiddenModules } from "./project-role";
 
 const NOW = new Date("2026-10-08T00:00:00Z");
 const LATER = new Date("2026-10-09T00:00:00Z");
@@ -133,6 +134,7 @@ describe("Project", () => {
       },
       "user-2",
       LATER,
+      null,
     );
     expect(item.details).toEqual({
       name: "Kumari Heights Phase 2",
@@ -295,7 +297,12 @@ describe("Project contract details (CM-413)", () => {
       ...FULL_CONTRACT,
       customFields: [{ label: "Site engineer", value: "Prabhu Saravanan" }],
     });
-    item.update({ name: "Kumari Heights", status: "on_hold" }, "user-2", LATER);
+    item.update(
+      { name: "Kumari Heights", status: "on_hold" },
+      "user-2",
+      LATER,
+      null,
+    );
     expect(item.contract).toEqual(project(FULL_CONTRACT).contract);
     expect(item.customFields).toEqual([
       { label: "Site engineer", value: "Prabhu Saravanan" },
@@ -313,6 +320,7 @@ describe("Project contract details (CM-413)", () => {
       },
       "user-2",
       LATER,
+      null,
     );
     expect(item.contract).toMatchObject({
       clientName: null,
@@ -335,6 +343,7 @@ describe("Project contract details (CM-413)", () => {
           { name: "Kumari Heights", loaNo: "x".repeat(61) },
           "user-2",
           LATER,
+          null,
         );
       }),
     ).toEqual({
@@ -483,7 +492,12 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       budgetValue: 3_20_00_000_00,
       useLogoInReports: true,
     });
-    item.update({ name: "Kumari Heights", status: "on_hold" }, "user-2", LATER);
+    item.update(
+      { name: "Kumari Heights", status: "on_hold" },
+      "user-2",
+      LATER,
+      null,
+    );
     expect(item.profile).toMatchObject({
       projectType: "residential",
       budgetValue: 3_20_00_000_00,
@@ -498,6 +512,7 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       },
       "user-2",
       LATER,
+      null,
     );
     expect(item.profile).toMatchObject({
       projectType: "mixed_use",
@@ -510,7 +525,12 @@ describe("Project Type, Budget and logo (CM-401)", () => {
     const item = project();
     expect(
       codeOf(() => {
-        item.update({ name: "Kumari Heights", projectType: null }, "u", LATER);
+        item.update(
+          { name: "Kumari Heights", projectType: null },
+          "u",
+          LATER,
+          null,
+        );
       }),
     ).toBe("PROJECT_TYPE_REQUIRED");
     const old = Project.reconstitute({
@@ -519,6 +539,8 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       ...project().contract,
       customFields: [],
       projectType: null,
+      clientId: null,
+      role: "own",
       id: "p0",
       workspaceId: "company-1",
       createdAt: NOW,
@@ -527,7 +549,12 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       updatedBy: "user-1",
       deletedAt: null,
     });
-    old.update({ name: "Old Site", status: "completed" }, "user-2", LATER);
+    old.update(
+      { name: "Old Site", status: "completed" },
+      "user-2",
+      LATER,
+      null,
+    );
     expect(old.projectType).toBeNull();
     expect(old.structure).toBe("wings");
   });
@@ -563,7 +590,7 @@ describe("Project Type, Budget and logo (CM-401)", () => {
   it("keeps the logo through an edit of the form", () => {
     const item = project();
     item.setLogo("companies/c/project-logos/p1/a.png", "u", NOW);
-    item.update({ name: "Kumari Heights" }, "u", LATER);
+    item.update({ name: "Kumari Heights" }, "u", LATER, null);
     expect(item.logoKey).toBe("companies/c/project-logos/p1/a.png");
   });
 });
@@ -584,14 +611,72 @@ describe("GST State (CM-501)", () => {
 
   it("keeps the state when an edit leaves it out; null or blank clears it", () => {
     const item = project({ stateCode: "33" });
-    item.update({ name: "Kumari Heights" }, "u", LATER);
+    item.update({ name: "Kumari Heights" }, "u", LATER, null);
     expect(item.stateCode).toBe("33");
-    item.update({ name: "Kumari Heights", stateCode: "29" }, "u", LATER);
+    item.update({ name: "Kumari Heights", stateCode: "29" }, "u", LATER, null);
     expect(item.profile.stateCode).toBe("29");
-    item.update({ name: "Kumari Heights", stateCode: null }, "u", LATER);
+    item.update({ name: "Kumari Heights", stateCode: null }, "u", LATER, null);
     expect(item.stateCode).toBeNull();
-    item.update({ name: "Kumari Heights", stateCode: "33" }, "u", LATER);
-    item.update({ name: "Kumari Heights", stateCode: "" }, "u", LATER);
+    item.update({ name: "Kumari Heights", stateCode: "33" }, "u", LATER, null);
+    item.update({ name: "Kumari Heights", stateCode: "" }, "u", LATER, null);
     expect(item.stateCode).toBeNull();
+  });
+});
+
+describe("Project Client and Role (ADR CM-0023 §2)", () => {
+  const BALAJI = { id: "0199a1b2-0000-7000-8000-0000000000c1", name: "Balaji" };
+
+  it("defaults to Contract work with a Client or a client name, else Own development", () => {
+    expect(project().role).toBe("own");
+    expect(project({ clientName: "  " }).role).toBe("own");
+    expect(project({ clientName: "Highways Dept" }).role).toBe("contract");
+    const linked = Project.create({
+      id: "p2",
+      workspaceId: "company-1",
+      details: { name: "Towers", projectType: "residential" },
+      client: BALAJI,
+      by: "user-1",
+      now: NOW,
+    });
+    expect(linked.role).toBe("contract");
+    expect(linked.clientId).toBe(BALAJI.id);
+    expect(project({ clientName: "Highways Dept", role: "own" }).role).toBe(
+      "own",
+    );
+  });
+
+  it("takes a linked Client's name over the typed one", () => {
+    const item = project({ clientName: "Typed" });
+    item.update({ name: "Kumari Heights", clientName: "Other" }, "u", LATER, {
+      id: BALAJI.id,
+      name: "Balaji",
+    });
+    expect(item.contract.clientName).toBe("Balaji");
+    expect(item.clientId).toBe(BALAJI.id);
+    item.update(
+      { name: "Kumari Heights", clientName: "Free text" },
+      "u",
+      LATER,
+      null,
+    );
+    expect(item.clientId).toBeNull();
+    expect(item.contract.clientName).toBe("Free text");
+  });
+
+  it("keeps the Role when an edit leaves it out, and refuses an unknown one", () => {
+    const item = project({ clientName: "Highways Dept" });
+    item.update({ name: "Kumari Heights", clientName: null }, "u", LATER, null);
+    expect(item.role).toBe("contract");
+    item.update({ name: "Kumari Heights", role: "own" }, "u", LATER, null);
+    expect(item.role).toBe("own");
+    expect(errorOf(() => project({ role: "builder" }))).toEqual({
+      code: "PROJECT_ROLE_INVALID",
+      details: { field: "role" },
+    });
+  });
+
+  it("starts Own development with Client Bills hidden and Contract work with every module shown", () => {
+    expect(defaultHiddenModules("own")).toEqual(["client_bills"]);
+    expect(defaultHiddenModules("contract")).toEqual([]);
   });
 });

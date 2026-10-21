@@ -1,6 +1,10 @@
 import type { MemberAccess } from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
-import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  DomainError,
+  conflict,
+  notFound,
+} from "@/src/shared-kernel/domain-error";
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 import type { PlanGate } from "@/src/shared-kernel/plan";
@@ -9,10 +13,12 @@ import type { ProjectCreated } from "../domain/events";
 import {
   Project,
   compareProjects,
+  type ProjectClientRef,
   type ProjectDetailsInput,
   type ProjectStatus,
 } from "../domain/project";
 import type {
+  ProjectClients,
   ProjectCustomFieldLabels,
   ProjectRepository,
   ProjectUsage,
@@ -73,6 +79,8 @@ export function projectSnapshot(project: Project) {
     ...project.details,
     ...project.contract,
     ...project.profile,
+    clientId: project.clientId,
+    role: project.role,
     customFields: project.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -114,12 +122,41 @@ export class ProjectHandlers {
     private readonly plan: PlanGate,
     private readonly usage: ProjectUsage,
     private readonly labels: ProjectCustomFieldLabels,
+    private readonly clients: ProjectClients,
     private readonly clock: () => Date = () => new Date(),
     private readonly events: EventDispatcher = NO_EVENTS,
   ) {}
 
   private load(viewer: ProjectViewer, id: string): Promise<Project> {
     return loadVisibleProject(this.projects, viewer, id);
+  }
+
+  /**
+   * The Client a Project links after a command (ADR CM-0023 §2): a live
+   * Client of the Company, 400 `CLIENT_NOT_FOUND` otherwise. A Client
+   * linked anew must be active (400 `CLIENT_INACTIVE`); one already linked
+   * stays when Masters made it inactive since.
+   */
+  private async linkedClient(
+    workspaceId: string,
+    clientId: string | null,
+    current: string | null,
+  ): Promise<ProjectClientRef | null> {
+    if (clientId == null) return null;
+    const client = await this.clients.find(workspaceId, clientId);
+    if (client == null)
+      throw new DomainError(
+        "CLIENT_NOT_FOUND",
+        "Choose the Client from the list. This one was not found.",
+        { details: { field: "clientId" } },
+      );
+    if (!client.isActive && clientId !== current)
+      throw new DomainError(
+        "CLIENT_INACTIVE",
+        `${client.name} is an inactive Client. Make them active in Masters to link them to a Project.`,
+        { details: { field: "clientId" } },
+      );
+    return { id: client.id, name: client.name };
   }
 
   private audit(
@@ -182,7 +219,8 @@ export class ProjectHandlers {
    * `ProjectCreated` for the other contexts' seeds (CM-0022 §2); 400
    * `PROJECT_TYPE_REQUIRED` without a type, 402 `PLAN_LIMIT_EXCEEDED`
    * beyond the plan (CM-118). `financial`: whether the caller may set the
-   * order value and the budget.
+   * order value and the budget. An Own development Project starts with
+   * Client Bills hidden (ADR CM-0023 §22).
    */
   async create(input: {
     workspaceId: string;
@@ -190,11 +228,17 @@ export class ProjectHandlers {
     details: ProjectDetailsInput;
     financial: boolean;
   }): Promise<ProjectReadModel> {
+    const client = await this.linkedClient(
+      input.workspaceId,
+      input.details.clientId ?? null,
+      null,
+    );
     const now = this.clock();
     const project = Project.create({
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details: withoutAmounts(input.details, input.financial),
+      client,
       by: input.by,
       now,
     });
@@ -228,10 +272,20 @@ export class ProjectHandlers {
   }): Promise<ProjectReadModel> {
     const project = await this.load(input.viewer, input.id);
     const before = projectSnapshot(project);
+    // The stored link, or the one sent; a linked Client's name is re-read,
+    // so a Client renamed in Masters reaches the Project on its next save.
+    const client = await this.linkedClient(
+      project.workspaceId,
+      input.details.clientId === undefined
+        ? project.clientId
+        : input.details.clientId,
+      project.clientId,
+    );
     project.update(
       withoutAmounts(input.details, input.financial),
       input.by,
       this.clock(),
+      client,
     );
     await this.projects.update(
       project,

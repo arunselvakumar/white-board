@@ -3,6 +3,10 @@ import { z } from "zod";
 import type { ProjectReadModel } from "@/src/projects/application/project-read-model";
 import { PROJECT_STATUSES } from "@/src/projects/domain/project";
 import {
+  PROJECT_ROLE_KEYS,
+  PROJECT_ROLES,
+} from "@/src/projects/domain/project-role";
+import {
   PROJECT_TYPE_KEYS,
   PROJECT_TYPES,
 } from "@/src/projects/domain/project-type";
@@ -27,6 +31,14 @@ export const projectTypeModel = z
   .describe(
     `What kind of work the Project is (ADR CM-0013 §1): ${PROJECT_TYPES.map(
       (type) => `${type.key} (${type.label}, ${type.structure})`,
+    ).join(", ")}.`,
+  );
+
+export const projectRoleModel = z
+  .enum(PROJECT_ROLE_KEYS)
+  .describe(
+    `Whose work the Project is (ADR CM-0023 §2): ${PROJECT_ROLES.map(
+      (role) => `${role.key} (${role.label})`,
     ).join(", ")}.`,
   );
 
@@ -88,7 +100,19 @@ export const ConstructionProjectsProjectResponseModel = z.object({
   endDate: calendarDate
     .nullable()
     .describe("Expected completion, YYYY-MM-DD; not before the start date."),
-  clientName: z.string().nullable(),
+  role: projectRoleModel,
+  clientId: z
+    .uuid()
+    .nullable()
+    .describe(
+      "The Client master record (Masters → Clients) the Project is built for; null when none is linked.",
+    ),
+  clientName: z
+    .string()
+    .nullable()
+    .describe(
+      "The linked Client's name as of the Project's last save, or the client name typed when no Client is linked.",
+    ),
   clientPhone: z
     .string()
     .nullable()
@@ -226,8 +250,20 @@ export const projectDetailsFields = {
     .describe(
       "Expected completion, YYYY-MM-DD; 400 PROJECT_DATES_INVALID before the start date.",
     ),
+  role: projectRoleModel
+    .optional()
+    .describe(
+      "contract (Contract work) or own (Own development). On Add Project, omitted is contract when a Client or client name is given, else own; an Own development Project starts with Client Bills hidden. On an edit, omitted keeps it; changing it does not change which modules are hidden.",
+    ),
+  clientId: z
+    .uuid()
+    .nullable()
+    .optional()
+    .describe(
+      "A live Client of the Active Company (400 CLIENT_NOT_FOUND); one linked anew must be active (400 CLIENT_INACTIVE). While linked, the server sets `clientName` to the Client's name. Omitted keeps the link, null removes it.",
+    ),
   clientName: optionalText(
-    `At most ${String(PROJECT_CLIENT_NAME_MAX)} characters; 400 PROJECT_CLIENT_NAME_TOO_LONG. Omitted keeps it, blank or null clears it.`,
+    `At most ${String(PROJECT_CLIENT_NAME_MAX)} characters; 400 PROJECT_CLIENT_NAME_TOO_LONG. Ignored while a Client is linked. Omitted keeps it, blank or null clears it.`,
   ),
   clientPhone: optionalText(
     "An Indian mobile as typed (`98431 22110`, `+91 98431 22110`); stored as E.164. 400 PROJECT_CLIENT_PHONE_INVALID. Omitted keeps it, blank or null clears it.",
@@ -273,6 +309,8 @@ export function toProjectResponse(
     address: item.address,
     startDate: item.startDate,
     endDate: item.endDate,
+    role: item.role,
+    clientId: item.clientId,
     clientName: item.clientName,
     clientPhone: item.clientPhone,
     tenderRef: item.tenderRef,

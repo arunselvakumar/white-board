@@ -1,5 +1,6 @@
 import {
   BadgeCheck,
+  Briefcase,
   CircleAlert,
   Tag,
   Landmark,
@@ -100,6 +101,14 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         title: "Suppliers",
         description: "Parties you buy material from, and their Projects.",
         icon: Truck,
+      },
+      {
+        href: "/app/masters/clients",
+        label: "Clients",
+        title: "Clients",
+        description:
+          "Who you build for and bill: GSTIN, PAN, TAN and billing address.",
+        icon: Briefcase,
       },
       {
         href: "/app/masters/other-parties",

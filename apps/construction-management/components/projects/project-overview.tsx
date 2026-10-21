@@ -2,11 +2,14 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { TriangleAlert, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { Alert, AlertAction, AlertTitle } from "@repo/ui/components/alert";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
+import { clientEditPath } from "@/components/masters/clients/client-form-schema";
+import { projectRoleLabel } from "@/src/projects/domain/project-role";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import {
   projectQuery,
@@ -55,15 +58,26 @@ function Tile({
   label,
   value,
   note,
+  href,
 }: {
   label: string;
   value: string;
   note?: string | null;
+  /** Where the value links to, e.g. the Client's master record. */
+  href?: string;
 }) {
   return (
     <div className="bg-muted/40 min-w-0 rounded-lg px-3 py-2.5">
       <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="mt-0.5 text-sm font-medium break-words">{value}</dd>
+      <dd className="mt-0.5 text-sm font-medium break-words">
+        {href == null ? (
+          value
+        ) : (
+          <Link href={href} className="hover:underline">
+            {value}
+          </Link>
+        )}
+      </dd>
       {note == null ? null : (
         <dd className="text-muted-foreground text-xs">{note}</dd>
       )}
@@ -77,10 +91,19 @@ function Tile({
  * Financial flag, so it hides too.
  */
 function ContractCard({ project }: { project: ProjectResponse }) {
-  const tiles: { label: string; value: string; note?: string | null }[] = [];
+  const tiles: {
+    label: string;
+    value: string;
+    note?: string | null;
+    href?: string;
+  }[] = [];
   if (project.clientName != null || project.clientPhone != null)
     tiles.push({
       label: "Client",
+      // A linked Client opens its master record (CM-1101).
+      ...(project.clientId == null
+        ? {}
+        : { href: clientEditPath(project.clientId) }),
       value: project.clientName ?? clientPhoneLabel(project.clientPhone ?? ""),
       note:
         project.clientName != null && project.clientPhone != null
@@ -195,6 +218,7 @@ export function ProjectOverview({ id }: { id: string }) {
           <Detail label="Status">
             <ProjectStatusBadge status={project.status} />
           </Detail>
+          <Detail label="Role">{projectRoleLabel(project.role)}</Detail>
           <Detail label="Project Type">
             {project.projectType == null ? (
               <span className="text-muted-foreground font-normal">Not set</span>

@@ -23,6 +23,8 @@ export function project(
     address: "Plot 12, Survey No. 45, Vadasery, Nagercoil 629001",
     startDate: "2026-04-01",
     endDate: "2027-03-31",
+    role: "own",
+    clientId: null,
     clientName: null,
     clientPhone: null,
     tenderRef: null,
@@ -44,6 +46,7 @@ export function project(
 
 /** A Project with its contract details filled in (CM-413). */
 export const KUMARI = project({
+  role: "contract",
   clientName: "Sri Balaji Developers",
   clientPhone: "+919843122110",
   tenderRef: "SBD/T/2026/031",
