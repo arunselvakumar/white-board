@@ -1,0 +1,75 @@
+apps/construction-management/CONTEXT.md
+  s_6777d2a5cecb3e::t_aab320cc62348d 183,188
+apps/construction-management/app/app/projects/[id]/edit/page.tsx
+  s_6777d2a5cecb3e::t_064aef90980eb5 6
+apps/construction-management/app/app/projects/[id]/page.tsx
+  s_6777d2a5cecb3e::t_5c5f1dddf5d342 3,7-8,14
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_6777d2a5cecb3e::t_a25d0cf5f11a8f 194-240
+apps/construction-management/components/app-shell/area-nav-menu.tsx
+  s_6777d2a5cecb3e::t_25399668f55d29 3,21,64-75,77-79
+apps/construction-management/components/app-shell/project-nav-menu.stories.tsx
+  s_6777d2a5cecb3e::t_b78d28137ee4ca 54,106,118,138-140,223-225,265-266,268-281,284-306
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_6777d2a5cecb3e::t_8e6b5354654c0c 4,43,56,294-295,319
+apps/construction-management/components/app-shell/submenu-row.tsx
+  s_6777d2a5cecb3e::t_e1e7e0b5fbfd34 3-6,9-11,13-14,17-19,21-24,26-28,31-35,37-39
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_6777d2a5cecb3e::t_1b5dd44cf4be31 12,16,45-46,154-155,204-205,754-758,765-820
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_6777d2a5cecb3e::t_4b35fc73c2919a 59,81-84,163
+apps/construction-management/components/projects/dashboard/summary-details.tsx
+  s_6777d2a5cecb3e::t_8f0426a84fa8df 3,10-12,14,16-22,24-36,41-44,46-48,50,52-61,66-78,80-81,83-84,109,113-115,117-119,121-136
+apps/construction-management/components/projects/project-edit-screen.tsx
+  s_6777d2a5cecb3e::t_69fdeb3809e1c7 1-23
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_6777d2a5cecb3e::t_dcfb93dbf9c72a 29
+apps/construction-management/components/projects/project-home-dialogs.stories.tsx
+  s_6777d2a5cecb3e::t_745990ec6a6a5b 9,16,51-53,57,60,65-66,68,70-73,75-78
+apps/construction-management/components/projects/project-home-dialogs.tsx
+  s_6777d2a5cecb3e::t_71d3b0df50d5b7 4,18,25-36,88,128-129,142
+apps/construction-management/components/projects/project-landing.stories.tsx
+  s_6777d2a5cecb3e::t_409af85ba732cf 2-3,5,9-10,12-13,15-21,25-29,32,35,40-54,59-72,74,76-78,82-89,92-94
+apps/construction-management/components/projects/project-landing.tsx
+  s_6777d2a5cecb3e::t_0e0a4684720570 3-13,15-16,20-22,24-33,35-50
+apps/construction-management/components/projects/project-progress.tsx
+  s_6777d2a5cecb3e::t_3aee6b55d97cf2 13-14
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_6777d2a5cecb3e::t_5e4cd05bbd1908 6-7,10-14,49,53,62,71-72,74,79-92,106,108-109,113-149,151-155,194
+apps/construction-management/components/projects/project-shell.tsx
+  s_6777d2a5cecb3e::t_0b51ce7905dfcc 8,10-12,36-37,41,45-46,93,124-156,160-163,174,182-186
+apps/construction-management/components/projects/projects-skeletons.tsx
+  s_6777d2a5cecb3e::t_771ee3a2e2c852 22
+apps/construction-management/docs/adr/CM-0013-projects-structure-product-decisions.md
+  s_6777d2a5cecb3e::t_c9021297d8e5ef 102-103
+apps/construction-management/docs/adr/CM-0020-project-sidebar-menu.md
+  s_6777d2a5cecb3e::t_e46930d8cec591 3,26,36,48,52-62
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_6777d2a5cecb3e::t_5129eb59719127 621,623-624
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_6777d2a5cecb3e::t_5d2d408c985b21 589
+apps/construction-management/lib/project-nav.test.ts
+  s_6777d2a5cecb3e::t_ff841fe1ace086 8,32,77-113,133,141-150
+apps/construction-management/lib/project-nav.ts
+  s_6777d2a5cecb3e::t_1c2b3a13c8a2d4 9-10,47-48,71,75-88,91,97,100-101
+apps/construction-management/src/projects/domain/project-nav-groups.ts
+  s_6777d2a5cecb3e::t_9ae85304365093 5-6
+apps/construction-management/src/queries/project-home.ts
+  s_6777d2a5cecb3e::t_2268bbe64b1a52 30-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a8efe8b4afb31c2f3a6d1efed5752838842badf0",
+  "prompts": {},
+  "sessions": {
+    "s_6777d2a5cecb3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2a324d2-7ae1-42bd-aac6-fea145cd917d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
