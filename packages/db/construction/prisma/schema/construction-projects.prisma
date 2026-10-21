@@ -32,6 +32,17 @@ enum ConstructionProjectsProjectType {
   @@schema("construction_projects")
 }
 
+/// Whose work a Project is (ADR CM-0023 §2): built for a Client who is
+/// billed, or built by the Company to sell or keep. Drives ITC defaults and
+/// which modules start shown.
+enum ConstructionProjectsProjectRole {
+  contract
+  own
+
+  @@map("project_role")
+  @@schema("construction_projects")
+}
+
 /// A site the Company builds. Names are unique among a Company's live
 /// Projects (partial index in the migration).
 model ConstructionProjectsProject {
@@ -51,6 +62,9 @@ model ConstructionProjectsProject {
   /// Contract details (CM-413): who gave the work and the papers that
   /// gave it — all optional. Dates are calendar dates.
   clientName       String?                           @map("client_name")
+  /// The Client master record (CM-0023 §2); picking one fills `client_name`.
+  clientId         String?                           @map("client_id") @db.Uuid
+  role             ConstructionProjectsProjectRole   @default(own)
   /// E.164 Indian mobile, `+91…`.
   clientPhone      String?                           @map("client_phone")
   tenderRef        String?                           @map("tender_ref")
@@ -94,6 +108,7 @@ model ConstructionProjectsProject {
   pins           ConstructionProjectsPin[]
 
   @@index([workspaceId, status])
+  @@index([workspaceId, clientId])
   @@map("projects")
   @@schema("construction_projects")
 }

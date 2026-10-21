@@ -201,6 +201,39 @@ model ConstructionMastersContractorProject {
   @@schema("construction_masters")
 }
 
+/// A Client the Company works for and bills (ADR CM-0023 §2). Projects of
+/// Role `contract` may link one; client RA bills are addressed to it.
+model ConstructionMastersClient {
+  id            String    @id @db.Uuid
+  workspaceId   String    @map("workspace_id")
+  name          String
+  contactPerson String?   @map("contact_person")
+  /// E.164.
+  mobile        String?
+  email         String?
+  /// Billing address, printed on tax invoices.
+  address       String?
+  pinCode       String?   @map("pin_code") @db.Char(6)
+  gstin         String?   @db.VarChar(15)
+  pan           String?   @db.VarChar(10)
+  /// Tax deduction account number, when the Client deducts TDS.
+  tan           String?   @db.VarChar(10)
+  /// GST state code: the GSTIN's first two digits, or picked on the form
+  /// when there is no GSTIN.
+  stateCode     String?   @map("state_code") @db.Char(2)
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String    @map("created_by")
+  updatedBy     String    @map("updated_by")
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?   @map("deleted_by")
+
+  @@index([workspaceId, name])
+  @@map("clients")
+  @@schema("construction_masters")
+}
+
 /// A party the Company buys material from (CM-406, minimal; CM-501 adds
 /// quotations and procurement fields). Names are unique among live rows.
 model ConstructionMastersSupplier {

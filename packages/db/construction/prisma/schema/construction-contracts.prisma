@@ -1,0 +1,876 @@
+/// Construction Management — contracts context (M11 part 1, ADR CM-0023
+/// §1–§10): the Company's Item library with rate analysis; a Project's BOQ
+/// with sections, items and Variations; Work Orders to Contractors with
+/// their revisions, lines and issued materials; the Measurement Book; RA
+/// bills both ways (client and contractor) with lines and deductions;
+/// advances, bank guarantees and retention releases; price indices and
+/// escalation clauses.
+///
+/// Conventions:
+/// - Projects, Wings, Locations, Contractors, Departments, Clients,
+///   Materials, Labour Categories, Equipment and UoMs live in other schemas:
+///   their ids are kept without foreign keys. `created_by` / `updated_by` /
+///   `deleted_by` / `*_by` are user ids, as in every other context.
+/// - Every table has `workspace_id`, so the Company purge finds it (CM-907).
+/// - Money is integer paise in `BIGINT` (a BOQ passes ₹21.47 crore);
+///   quantities are `DECIMAL(16,4)` in the row's UoM; percentages are
+///   `DECIMAL(5,2)`; coefficients `DECIMAL(14,4)`.
+/// - Rows are soft-deleted (`deleted_at`) where the UI deletes them; unique
+///   rules hold among live rows through partial indexes in the migration.
+/// - A bill's finance invoice is created through the `PartyInvoicing` port;
+///   `invoice_id` keeps its id without a foreign key (CM-0023 §7).
+
+/// A rate analysis line's resource (CM-0023 §3).
+enum ConstructionContractsAnalysisKind {
+  material
+  labour
+  equipment
+  lump_sum
+
+  @@map("analysis_kind")
+  @@schema("construction_contracts")
+}
+
+/// Which way a measurement or bill goes (CM-0023 §6, §7): `client` is
+/// against the BOQ and billed to the Project's Client; `contractor` is
+/// against a Work Order and billed by its Contractor.
+enum ConstructionContractsSide {
+  client
+  contractor
+
+  @@map("side")
+  @@schema("construction_contracts")
+}
+
+/// What a Variation changes (CM-0023 §4).
+enum ConstructionContractsVariationKind {
+  extra_item
+  quantity
+  rate
+
+  @@map("variation_kind")
+  @@schema("construction_contracts")
+}
+
+/// Variations need the BOQ menu's Approve flag (CM-0023 §4).
+enum ConstructionContractsVariationStatus {
+  pending_approval
+  approved
+  rejected
+
+  @@map("variation_status")
+  @@schema("construction_contracts")
+}
+
+/// A Work Order's life (CM-0023 §5). Amendments keep it `issued` and add
+/// a revision.
+enum ConstructionContractsWorkOrderStatus {
+  draft
+  pending_approval
+  issued
+  closed
+  cancelled
+
+  @@map("work_order_status")
+  @@schema("construction_contracts")
+}
+
+enum ConstructionContractsWorkOrderLineKind {
+  /// A BOQ item at the work-order rate.
+  boq
+  /// Labour-only or extra work outside the BOQ.
+  non_boq
+
+  @@map("work_order_line_kind")
+  @@schema("construction_contracts")
+}
+
+/// How the Company issues a material to a Contractor (CM-0023 §10).
+enum ConstructionContractsIssueBasis {
+  free
+  at_cost
+
+  @@map("issue_basis")
+  @@schema("construction_contracts")
+}
+
+/// A measurement sheet's state; `checked` is the joint measurement (JMR,
+/// CM-0023 §6).
+enum ConstructionContractsMeasurementStatus {
+  draft
+  submitted
+  checked
+
+  @@map("measurement_status")
+  @@schema("construction_contracts")
+}
+
+/// RA bills and escalation bills share one engine (CM-0023 §7, §9).
+enum ConstructionContractsBillType {
+  running
+  escalation
+
+  @@map("bill_type")
+  @@schema("construction_contracts")
+}
+
+/// A bill's life (CM-0023 §7). `reversed` keeps the row and frees its
+/// measurements.
+enum ConstructionContractsBillStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  reversed
+
+  @@map("bill_status")
+  @@schema("construction_contracts")
+}
+
+/// Typed deductions on a bill (CM-0023 §7). TDS is not one of them: finance
+/// deducts it at payment (CM-0017).
+enum ConstructionContractsDeductionKind {
+  retention
+  mobilisation_recovery
+  secured_advance_recovery
+  material_at_cost
+  material_reconciliation
+  other
+
+  @@map("deduction_kind")
+  @@schema("construction_contracts")
+}
+
+/// `given` to a Contractor on a Work Order; `received` from the Client on
+/// the client contract (CM-0023 §8).
+enum ConstructionContractsAdvanceDirection {
+  given
+  received
+
+  @@map("advance_direction")
+  @@schema("construction_contracts")
+}
+
+enum ConstructionContractsAdvanceKind {
+  mobilisation
+  secured
+
+  @@map("advance_kind")
+  @@schema("construction_contracts")
+}
+
+enum ConstructionContractsRecoveryMode {
+  /// A percentage of each bill's gross.
+  percent
+  /// A fixed amount per bill.
+  fixed
+
+  @@map("recovery_mode")
+  @@schema("construction_contracts")
+}
+
+/// What a bank guarantee secures (CM-0023 §8).
+enum ConstructionContractsGuaranteePurpose {
+  advance
+  retention
+  performance
+
+  @@map("guarantee_purpose")
+  @@schema("construction_contracts")
+}
+
+/// When retention was released (CM-0023 §8).
+enum ConstructionContractsRetentionStage {
+  completion
+  dlp_end
+  bank_guarantee
+  other
+
+  @@map("retention_stage")
+  @@schema("construction_contracts")
+}
+
+/// The cost components of an escalation clause (CM-0023 §9).
+enum ConstructionContractsEscalationComponent {
+  labour
+  material
+  cement
+  steel
+  bitumen
+  pol
+  other
+
+  @@map("escalation_component")
+  @@schema("construction_contracts")
+}
+
+/// Company-wide contracts settings (CM-0023 §4).
+model ConstructionContractsSettings {
+  workspaceId           String   @id @map("workspace_id")
+  /// Client-side measurements beyond the BOQ quantity by more than this are
+  /// listed as needing a Variation.
+  deviationLimitPercent Decimal  @default(25) @map("deviation_limit_percent") @db.Decimal(5, 2)
+  updatedAt             DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  updatedBy             String   @map("updated_by")
+
+  @@map("settings")
+  @@schema("construction_contracts")
+}
+
+/// An Item of the Company's library (CM-0023 §3). Code is unique in the
+/// Company among live rows, ignoring case.
+model ConstructionContractsItem {
+  id               String    @id @db.Uuid
+  workspaceId      String    @map("workspace_id")
+  code             String
+  shortDescription String    @map("short_description")
+  description      String?
+  uomId            String    @map("uom_id") @db.Uuid
+  /// SAC for services, HSN for goods (CM-0023 §11).
+  sacHsn           String?   @map("sac_hsn") @db.VarChar(8)
+  /// Free text: "CPWD DSR 2023", "TN PWD SoR 2025-26", "Own".
+  schedule         String?
+  /// Paise per UoM: the rate the Company uses.
+  adoptedRate      BigInt    @map("adopted_rate")
+  overheadPercent  Decimal?  @map("overhead_percent") @db.Decimal(5, 2)
+  /// Paise per UoM, computed from the analysis lines and overhead; null
+  /// without an analysis.
+  analysedRate     BigInt?   @map("analysed_rate")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String    @map("created_by")
+  updatedBy        String    @map("updated_by")
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?   @map("deleted_by")
+
+  analysis ConstructionContractsItemAnalysisLine[]
+
+  @@index([workspaceId, code])
+  @@index([workspaceId, schedule])
+  @@map("items")
+  @@schema("construction_contracts")
+}
+
+/// One resource of an Item's rate analysis, per unit of the Item.
+model ConstructionContractsItemAnalysisLine {
+  id               String                            @id @db.Uuid
+  workspaceId      String                            @map("workspace_id")
+  itemId           String                            @map("item_id") @db.Uuid
+  position         Int
+  kind             ConstructionContractsAnalysisKind
+  materialId       String?                           @map("material_id") @db.Uuid
+  labourCategoryId String?                           @map("labour_category_id") @db.Uuid
+  equipmentId      String?                           @map("equipment_id") @db.Uuid
+  description      String?
+  /// Resource units per Item unit (kg per m³, days per m³, hours per m³);
+  /// 1 for a lump sum.
+  coefficient      Decimal                           @db.Decimal(14, 4)
+  resourceUomId    String?                           @map("resource_uom_id") @db.Uuid
+  /// Paise per resource unit.
+  rate             BigInt
+  /// Paise per Item unit: coefficient × rate, rounded.
+  amount           BigInt
+
+  item ConstructionContractsItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, position])
+  @@index([workspaceId, materialId])
+  @@map("item_analysis_lines")
+  @@schema("construction_contracts")
+}
+
+/// A Project's client contract terms (CM-0023 §7, §8): one row per Project,
+/// created when the BOQ is first opened.
+model ConstructionContractsClientContract {
+  id                         String    @id @db.Uuid
+  workspaceId                String    @map("workspace_id")
+  projectId                  String    @unique @map("project_id") @db.Uuid
+  retentionPercent           Decimal   @default(0) @map("retention_percent") @db.Decimal(5, 2)
+  /// Retention stops once this % of the contract value is held; null = no cap.
+  retentionCapPercent        Decimal?  @map("retention_cap_percent") @db.Decimal(5, 2)
+  /// Released at completion; the rest at the DLP end (CM-0023 §8).
+  retentionCompletionPercent Decimal   @default(50) @map("retention_completion_percent") @db.Decimal(5, 2)
+  dlpMonths                  Int?      @map("dlp_months")
+  handoverOn                 DateTime? @map("handover_on") @db.Date
+  sacCode                    String?   @map("sac_code") @db.VarChar(8)
+  gstRate                    Decimal?  @map("gst_rate") @db.Decimal(5, 2)
+  createdAt                  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy                  String    @map("created_by")
+  updatedBy                  String    @map("updated_by")
+
+  @@index([workspaceId])
+  @@map("client_contracts")
+  @@schema("construction_contracts")
+}
+
+/// A heading of a Project's BOQ, in order.
+model ConstructionContractsBoqSection {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  projectId   String    @map("project_id") @db.Uuid
+  title       String
+  position    Int
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  items ConstructionContractsBoqItem[]
+
+  @@index([workspaceId, projectId, position])
+  @@map("boq_sections")
+  @@schema("construction_contracts")
+}
+
+/// A line of a Project's BOQ (CM-0023 §4). `original_quantity` is what the
+/// contract said; `quantity` and `rate` follow approved Variations.
+model ConstructionContractsBoqItem {
+  id               String    @id @db.Uuid
+  workspaceId      String    @map("workspace_id")
+  projectId        String    @map("project_id") @db.Uuid
+  sectionId        String    @map("section_id") @db.Uuid
+  /// Library Item it was copied from; null when typed.
+  itemId           String?   @map("item_id") @db.Uuid
+  /// As the contract prints it: "2.1.3".
+  itemNo           String    @map("item_no")
+  description      String
+  uomId            String    @map("uom_id") @db.Uuid
+  sacHsn           String?   @map("sac_hsn") @db.VarChar(8)
+  originalQuantity Decimal   @map("original_quantity") @db.Decimal(16, 4)
+  quantity         Decimal   @db.Decimal(16, 4)
+  /// Paise per UoM.
+  originalRate     BigInt    @map("original_rate")
+  rate             BigInt
+  wingId           String?   @map("wing_id") @db.Uuid
+  locationId       String?   @map("location_id") @db.Uuid
+  position         Int
+  /// Set by the Variation that added it (an extra item).
+  variationId      String?   @map("variation_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String    @map("created_by")
+  updatedBy        String    @map("updated_by")
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?   @map("deleted_by")
+
+  section ConstructionContractsBoqSection @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, projectId, sectionId, position])
+  @@index([workspaceId, itemId])
+  @@map("boq_items")
+  @@schema("construction_contracts")
+}
+
+/// A change to the BOQ after work was measured (CM-0023 §4). An approved
+/// extra item creates its BOQ item; a quantity or rate change updates it.
+model ConstructionContractsVariation {
+  id               String                               @id @db.Uuid
+  workspaceId      String                               @map("workspace_id")
+  projectId        String                               @map("project_id") @db.Uuid
+  /// Sequence rule `variation`.
+  number           String
+  kind             ConstructionContractsVariationKind
+  status           ConstructionContractsVariationStatus
+  /// The item changed; for an extra item, the item created on approval.
+  boqItemId        String?                              @map("boq_item_id") @db.Uuid
+  /// Extra item only: where and what it adds.
+  sectionId        String?                              @map("section_id") @db.Uuid
+  itemNo           String?                              @map("item_no")
+  description      String?
+  uomId            String?                              @map("uom_id") @db.Uuid
+  sacHsn           String?                              @map("sac_hsn") @db.VarChar(8)
+  previousQuantity Decimal?                             @map("previous_quantity") @db.Decimal(16, 4)
+  newQuantity      Decimal?                             @map("new_quantity") @db.Decimal(16, 4)
+  previousRate     BigInt?                              @map("previous_rate")
+  newRate          BigInt?                              @map("new_rate")
+  reason           String
+  decidedAt        DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  decidedBy        String?                              @map("decided_by")
+  rejectReason     String?                              @map("reject_reason")
+  createdAt        DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                               @map("created_by")
+  updatedBy        String                               @map("updated_by")
+  deletedAt        DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                              @map("deleted_by")
+
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, boqItemId])
+  @@map("variations")
+  @@schema("construction_contracts")
+}
+
+/// A Work Order to a Contractor (CM-0023 §5). The row holds the current
+/// revision's terms; `work_order_revisions` keeps every earlier one.
+model ConstructionContractsWorkOrder {
+  id                         String                               @id @db.Uuid
+  workspaceId                String                               @map("workspace_id")
+  projectId                  String                               @map("project_id") @db.Uuid
+  contractorId               String                               @map("contractor_id") @db.Uuid
+  departmentId               String?                              @map("department_id") @db.Uuid
+  /// Sequence rule `work_order`.
+  number                     String
+  orderDate                  DateTime                             @map("order_date") @db.Date
+  validUntil                 DateTime?                            @map("valid_until") @db.Date
+  scope                      String?
+  status                     ConstructionContractsWorkOrderStatus
+  /// 0 until the first amendment.
+  revision                   Int                                  @default(0)
+  retentionPercent           Decimal                              @default(0) @map("retention_percent") @db.Decimal(5, 2)
+  retentionCapPercent        Decimal?                             @map("retention_cap_percent") @db.Decimal(5, 2)
+  retentionCompletionPercent Decimal                              @default(50) @map("retention_completion_percent") @db.Decimal(5, 2)
+  dlpMonths                  Int?                                 @map("dlp_months")
+  /// Finance TDS nature key (CM-0023 §14); null = no TDS.
+  tdsNature                  String?                              @map("tds_nature")
+  sacCode                    String?                              @map("sac_code") @db.VarChar(8)
+  gstRate                    Decimal?                             @map("gst_rate") @db.Decimal(5, 2)
+  reverseCharge              Boolean                              @default(false) @map("reverse_charge")
+  completedOn                DateTime?                            @map("completed_on") @db.Date
+  decidedAt                  DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  decidedBy                  String?                              @map("decided_by")
+  rejectReason               String?                              @map("reject_reason")
+  closedOn                   DateTime?                            @map("closed_on") @db.Date
+  cancelledOn                DateTime?                            @map("cancelled_on") @db.Date
+  cancelReason               String?                              @map("cancel_reason")
+  createdAt                  DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                  DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy                  String                               @map("created_by")
+  updatedBy                  String                               @map("updated_by")
+  deletedAt                  DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy                  String?                              @map("deleted_by")
+
+  lines     ConstructionContractsWorkOrderLine[]
+  revisions ConstructionContractsWorkOrderRevision[]
+  materials ConstructionContractsWorkOrderMaterial[]
+
+  @@index([workspaceId, projectId, createdAt])
+  @@index([workspaceId, contractorId])
+  @@index([workspaceId, projectId, status])
+  @@map("work_orders")
+  @@schema("construction_contracts")
+}
+
+/// An earlier revision of a Work Order, kept whole (CM-0023 §5).
+model ConstructionContractsWorkOrderRevision {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  workOrderId String   @map("work_order_id") @db.Uuid
+  revision    Int
+  reason      String?
+  /// The terms and lines as they were.
+  snapshot    Json
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  workOrder ConstructionContractsWorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([workOrderId, revision])
+  @@map("work_order_revisions")
+  @@schema("construction_contracts")
+}
+
+/// A line of a Work Order. A billed line cannot be removed or cut below
+/// what was billed (CM-0023 §5).
+model ConstructionContractsWorkOrderLine {
+  id          String                                 @id @db.Uuid
+  workspaceId String                                 @map("workspace_id")
+  workOrderId String                                 @map("work_order_id") @db.Uuid
+  kind        ConstructionContractsWorkOrderLineKind
+  boqItemId   String?                                @map("boq_item_id") @db.Uuid
+  itemNo      String?                                @map("item_no")
+  description String
+  uomId       String                                 @map("uom_id") @db.Uuid
+  sacHsn      String?                                @map("sac_hsn") @db.VarChar(8)
+  quantity    Decimal                                @db.Decimal(16, 4)
+  /// Paise per UoM: the work-order rate.
+  rate        BigInt
+  position    Int
+  createdAt   DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime?                              @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                                @map("deleted_by")
+
+  workOrder    ConstructionContractsWorkOrder                      @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  coefficients ConstructionContractsWorkOrderMaterialCoefficient[]
+
+  @@index([workOrderId, position])
+  @@index([workspaceId, boqItemId])
+  @@map("work_order_lines")
+  @@schema("construction_contracts")
+}
+
+/// A material the Company issues to the Contractor under a Work Order
+/// (CM-0023 §10).
+model ConstructionContractsWorkOrderMaterial {
+  id             String                          @id @db.Uuid
+  workspaceId    String                          @map("workspace_id")
+  workOrderId    String                          @map("work_order_id") @db.Uuid
+  materialId     String                          @map("material_id") @db.Uuid
+  issueBasis     ConstructionContractsIssueBasis @map("issue_basis")
+  /// Paise per material UoM, for material issued at cost.
+  issueRate      BigInt?                         @map("issue_rate")
+  wastagePercent Decimal                         @default(0) @map("wastage_percent") @db.Decimal(5, 2)
+  /// Paise per material UoM charged on the excess.
+  penalRate      BigInt?                         @map("penal_rate")
+
+  workOrder    ConstructionContractsWorkOrder                      @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  coefficients ConstructionContractsWorkOrderMaterialCoefficient[]
+
+  @@unique([workOrderId, materialId])
+  @@map("work_order_materials")
+  @@schema("construction_contracts")
+}
+
+/// Material per unit of a Work Order line, from the Item's rate analysis or
+/// typed (CM-0023 §10).
+model ConstructionContractsWorkOrderMaterialCoefficient {
+  workOrderMaterialId String  @map("work_order_material_id") @db.Uuid
+  workOrderLineId     String  @map("work_order_line_id") @db.Uuid
+  workspaceId         String  @map("workspace_id")
+  coefficient         Decimal @db.Decimal(14, 4)
+
+  material ConstructionContractsWorkOrderMaterial @relation(fields: [workOrderMaterialId], references: [id], onDelete: Cascade)
+  line     ConstructionContractsWorkOrderLine     @relation(fields: [workOrderLineId], references: [id], onDelete: Cascade)
+
+  @@id([workOrderMaterialId, workOrderLineId])
+  @@index([workOrderLineId])
+  @@map("work_order_material_coefficients")
+  @@schema("construction_contracts")
+}
+
+/// One date's measurements for one side and party (CM-0023 §6). Checking
+/// records the joint measurement.
+model ConstructionContractsMeasurementSheet {
+  id          String                                 @id @db.Uuid
+  workspaceId String                                 @map("workspace_id")
+  projectId   String                                 @map("project_id") @db.Uuid
+  side        ConstructionContractsSide
+  /// Contractor side only.
+  workOrderId String?                                @map("work_order_id") @db.Uuid
+  measuredOn  DateTime                               @map("measured_on") @db.Date
+  status      ConstructionContractsMeasurementStatus
+  title       String?
+  remarks     String?
+  submittedAt DateTime?                              @map("submitted_at") @db.Timestamptz(3)
+  submittedBy String?                                @map("submitted_by")
+  /// Our engineer: the user who checked it.
+  checkedAt   DateTime?                              @map("checked_at") @db.Timestamptz(3)
+  checkedBy   String?                                @map("checked_by")
+  /// The other party at the joint measurement.
+  partyName   String?                                @map("party_name")
+  partyRole   String?                                @map("party_role")
+  jointOn     DateTime?                              @map("joint_on") @db.Date
+  createdAt   DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                                 @map("created_by")
+  updatedBy   String                                 @map("updated_by")
+  deletedAt   DateTime?                              @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                                @map("deleted_by")
+
+  rows ConstructionContractsMeasurementRow[]
+
+  @@index([workspaceId, projectId, side, measuredOn])
+  @@index([workspaceId, workOrderId])
+  @@map("measurement_sheets")
+  @@schema("construction_contracts")
+}
+
+/// A Measurement Book row (CM-0023 §6). `quantity` is nos × L × B × D, or
+/// typed when `direct`; negative for deductions such as openings. `bill_id`
+/// is set when a bill takes the row and cleared when that bill is deleted,
+/// rejected or reversed.
+model ConstructionContractsMeasurementRow {
+  id              String   @id @db.Uuid
+  workspaceId     String   @map("workspace_id")
+  sheetId         String   @map("sheet_id") @db.Uuid
+  /// Client side: the BOQ item.
+  boqItemId       String?  @map("boq_item_id") @db.Uuid
+  /// Contractor side: the Work Order line.
+  workOrderLineId String?  @map("work_order_line_id") @db.Uuid
+  description     String?
+  /// `LocationRef` (CM-403), with its type copied for filters.
+  locationType    String?  @map("location_type")
+  location        Json?
+  nos             Decimal? @db.Decimal(16, 4)
+  length          Decimal? @db.Decimal(16, 4)
+  breadth         Decimal? @db.Decimal(16, 4)
+  depth           Decimal? @db.Decimal(16, 4)
+  direct          Boolean  @default(false)
+  quantity        Decimal  @db.Decimal(16, 4)
+  position        Int
+  billId          String?  @map("bill_id") @db.Uuid
+
+  sheet ConstructionContractsMeasurementSheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+
+  @@index([sheetId, position])
+  @@index([workspaceId, boqItemId])
+  @@index([workspaceId, workOrderLineId])
+  @@index([billId])
+  @@map("measurement_rows")
+  @@schema("construction_contracts")
+}
+
+/// An RA bill or escalation bill, client or contractor side (CM-0023 §7,
+/// §9). Amounts are paise. `gross` = `cumulative_value` − `previous_value`;
+/// `net` = `gross` + GST − `deductions_total`.
+model ConstructionContractsBill {
+  id                     String                          @id @db.Uuid
+  workspaceId            String                          @map("workspace_id")
+  projectId              String                          @map("project_id") @db.Uuid
+  side                   ConstructionContractsSide
+  type                   ConstructionContractsBillType
+  /// Contractor side.
+  workOrderId            String?                         @map("work_order_id") @db.Uuid
+  /// Client side: the Project's Client when the bill was drafted.
+  clientId               String?                         @map("client_id") @db.Uuid
+  /// Sequence rules `client_bill` / `contractor_bill`.
+  number                 String
+  /// 1 for the first RA bill on its work order or BOQ.
+  ordinal                Int
+  billDate               DateTime                        @map("bill_date") @db.Date
+  measuredUpTo           DateTime?                       @map("measured_up_to") @db.Date
+  /// Escalation bills: the period of work the escalation is on.
+  periodFrom             DateTime?                       @map("period_from") @db.Date
+  periodTo               DateTime?                       @map("period_to") @db.Date
+  isFinal                Boolean                         @default(false) @map("is_final")
+  status                 ConstructionContractsBillStatus
+  cumulativeValue        BigInt                          @default(0) @map("cumulative_value")
+  previousValue          BigInt                          @default(0) @map("previous_value")
+  gross                  BigInt                          @default(0)
+  sacCode                String?                         @map("sac_code") @db.VarChar(8)
+  gstRate                Decimal?                        @map("gst_rate") @db.Decimal(5, 2)
+  placeOfSupplyStateCode String?                         @map("place_of_supply_state_code") @db.Char(2)
+  supplierGstin          String?                         @map("supplier_gstin") @db.VarChar(15)
+  recipientGstin         String?                         @map("recipient_gstin") @db.VarChar(15)
+  reverseCharge          Boolean                         @default(false) @map("reverse_charge")
+  cgst                   BigInt                          @default(0)
+  sgst                   BigInt                          @default(0)
+  igst                   BigInt                          @default(0)
+  deductionsTotal        BigInt                          @default(0) @map("deductions_total")
+  net                    BigInt                          @default(0)
+  /// Escalation bills: the working (indices, weights, amounts).
+  working                Json?
+  remarks                String?
+  /// The finance invoice the approval created.
+  invoiceId              String?                         @map("invoice_id") @db.Uuid
+  submittedAt            DateTime?                       @map("submitted_at") @db.Timestamptz(3)
+  submittedBy            String?                         @map("submitted_by")
+  decidedAt              DateTime?                       @map("decided_at") @db.Timestamptz(3)
+  decidedBy              String?                         @map("decided_by")
+  rejectReason           String?                         @map("reject_reason")
+  reversedAt             DateTime?                       @map("reversed_at") @db.Timestamptz(3)
+  reversedBy             String?                         @map("reversed_by")
+  reverseReason          String?                         @map("reverse_reason")
+  createdAt              DateTime                        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime                        @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy              String                          @map("created_by")
+  updatedBy              String                          @map("updated_by")
+  deletedAt              DateTime?                       @map("deleted_at") @db.Timestamptz(3)
+  deletedBy              String?                         @map("deleted_by")
+
+  lines      ConstructionContractsBillLine[]
+  deductions ConstructionContractsBillDeduction[]
+
+  @@index([workspaceId, projectId, side, billDate])
+  @@index([workspaceId, workOrderId])
+  @@index([workspaceId, clientId])
+  @@index([workspaceId, projectId, status])
+  @@map("bills")
+  @@schema("construction_contracts")
+}
+
+/// One item of a bill's abstract: cumulative to date, previous, this bill.
+model ConstructionContractsBillLine {
+  id                 String  @id @db.Uuid
+  workspaceId        String  @map("workspace_id")
+  billId             String  @map("bill_id") @db.Uuid
+  boqItemId          String? @map("boq_item_id") @db.Uuid
+  workOrderLineId    String? @map("work_order_line_id") @db.Uuid
+  itemNo             String? @map("item_no")
+  description        String
+  uomId              String  @map("uom_id") @db.Uuid
+  rate               BigInt
+  cumulativeQuantity Decimal @map("cumulative_quantity") @db.Decimal(16, 4)
+  previousQuantity   Decimal @map("previous_quantity") @db.Decimal(16, 4)
+  quantity           Decimal @db.Decimal(16, 4)
+  amount             BigInt
+  position           Int
+
+  bill ConstructionContractsBill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@index([billId, position])
+  @@index([workspaceId, boqItemId])
+  @@index([workspaceId, workOrderLineId])
+  @@map("bill_lines")
+  @@schema("construction_contracts")
+}
+
+/// A deduction on a bill (CM-0023 §7).
+model ConstructionContractsBillDeduction {
+  id          String                             @id @db.Uuid
+  workspaceId String                             @map("workspace_id")
+  billId      String                             @map("bill_id") @db.Uuid
+  kind        ConstructionContractsDeductionKind
+  description String?
+  amount      BigInt
+  /// Recoveries name the advance they recover.
+  advanceId   String?                            @map("advance_id") @db.Uuid
+  position    Int
+
+  bill ConstructionContractsBill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@index([billId, position])
+  @@index([workspaceId, advanceId])
+  @@map("bill_deductions")
+  @@schema("construction_contracts")
+}
+
+/// A mobilisation or secured advance (CM-0023 §8). What is recovered is the
+/// sum of the bill deductions that name it.
+model ConstructionContractsAdvance {
+  id            String                                @id @db.Uuid
+  workspaceId   String                                @map("workspace_id")
+  projectId     String                                @map("project_id") @db.Uuid
+  direction     ConstructionContractsAdvanceDirection
+  kind          ConstructionContractsAdvanceKind
+  /// `given` only.
+  workOrderId   String?                               @map("work_order_id") @db.Uuid
+  /// `received` only.
+  clientId      String?                               @map("client_id") @db.Uuid
+  amount        BigInt
+  advanceOn     DateTime                              @map("advance_on") @db.Date
+  recoveryMode  ConstructionContractsRecoveryMode     @map("recovery_mode")
+  /// A % of gross for `percent`; paise for `fixed`.
+  recoveryValue Decimal                               @map("recovery_value") @db.Decimal(16, 4)
+  /// The finance party payment or receipt that moved the money.
+  paymentId     String?                               @map("payment_id") @db.Uuid
+  remarks       String?
+  createdAt     DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime                              @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy     String                                @map("created_by")
+  updatedBy     String                                @map("updated_by")
+  deletedAt     DateTime?                             @map("deleted_at") @db.Timestamptz(3)
+  deletedBy     String?                               @map("deleted_by")
+
+  @@index([workspaceId, projectId])
+  @@index([workspaceId, workOrderId])
+  @@map("advances")
+  @@schema("construction_contracts")
+}
+
+/// A bank guarantee held against an advance, retention or performance
+/// (CM-0023 §8). The daily notice warns 30 days before `expires_on`.
+model ConstructionContractsBankGuarantee {
+  id          String                                @id @db.Uuid
+  workspaceId String                                @map("workspace_id")
+  projectId   String                                @map("project_id") @db.Uuid
+  side        ConstructionContractsSide
+  purpose     ConstructionContractsGuaranteePurpose
+  workOrderId String?                               @map("work_order_id") @db.Uuid
+  advanceId   String?                               @map("advance_id") @db.Uuid
+  number      String
+  bank        String
+  amount      BigInt
+  issuedOn    DateTime?                             @map("issued_on") @db.Date
+  expiresOn   DateTime                              @map("expires_on") @db.Date
+  releasedOn  DateTime?                             @map("released_on") @db.Date
+  remarks     String?
+  createdAt   DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                              @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String                                @map("created_by")
+  updatedBy   String                                @map("updated_by")
+  deletedAt   DateTime?                             @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?                               @map("deleted_by")
+
+  @@index([workspaceId, expiresOn])
+  @@index([workspaceId, projectId])
+  @@map("bank_guarantees")
+  @@schema("construction_contracts")
+}
+
+/// Retention moved from held to due (CM-0023 §8).
+model ConstructionContractsRetentionRelease {
+  id              String                              @id @db.Uuid
+  workspaceId     String                              @map("workspace_id")
+  projectId       String                              @map("project_id") @db.Uuid
+  side            ConstructionContractsSide
+  workOrderId     String?                             @map("work_order_id") @db.Uuid
+  stage           ConstructionContractsRetentionStage
+  amount          BigInt
+  releasedOn      DateTime                            @map("released_on") @db.Date
+  reason          String?
+  bankGuaranteeId String?                             @map("bank_guarantee_id") @db.Uuid
+  createdAt       DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy       String                              @map("created_by")
+  deletedAt       DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy       String?                             @map("deleted_by")
+
+  @@index([workspaceId, projectId, side])
+  @@index([workspaceId, workOrderId])
+  @@map("retention_releases")
+  @@schema("construction_contracts")
+}
+
+/// A month's value of a price index the Company tracks (CM-0023 §9). We do
+/// not fetch indices; the accountant types or imports them.
+model ConstructionContractsPriceIndex {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  /// "WPI", "CPI-IW", "Cement", …
+  series      String
+  /// The first day of the month.
+  month       DateTime @db.Date
+  value       Decimal  @db.Decimal(12, 4)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+  updatedBy   String   @map("updated_by")
+
+  @@unique([workspaceId, series, month])
+  @@map("price_indices")
+  @@schema("construction_contracts")
+}
+
+/// A price variation clause on a Work Order, or on the client contract when
+/// `work_order_id` is null (CM-0023 §9).
+model ConstructionContractsEscalationClause {
+  id                  String                    @id @db.Uuid
+  workspaceId         String                    @map("workspace_id")
+  projectId           String                    @map("project_id") @db.Uuid
+  side                ConstructionContractsSide
+  workOrderId         String?                   @map("work_order_id") @db.Uuid
+  baseMonth           DateTime                  @map("base_month") @db.Date
+  nonEscalablePercent Decimal                   @default(15) @map("non_escalable_percent") @db.Decimal(5, 2)
+  createdAt           DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime                  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy           String                    @map("created_by")
+  updatedBy           String                    @map("updated_by")
+  deletedAt           DateTime?                 @map("deleted_at") @db.Timestamptz(3)
+  deletedBy           String?                   @map("deleted_by")
+
+  components ConstructionContractsEscalationClauseComponent[]
+
+  @@index([workspaceId, projectId])
+  @@index([workspaceId, workOrderId])
+  @@map("escalation_clauses")
+  @@schema("construction_contracts")
+}
+
+/// A component's weight and index series; weights sum to 100.
+model ConstructionContractsEscalationClauseComponent {
+  id            String                                   @id @db.Uuid
+  workspaceId   String                                   @map("workspace_id")
+  clauseId      String                                   @map("clause_id") @db.Uuid
+  component     ConstructionContractsEscalationComponent
+  weightPercent Decimal                                  @map("weight_percent") @db.Decimal(5, 2)
+  series        String
+
+  clause ConstructionContractsEscalationClause @relation(fields: [clauseId], references: [id], onDelete: Cascade)
+
+  @@unique([clauseId, component])
+  @@map("escalation_clause_components")
+  @@schema("construction_contracts")
+}

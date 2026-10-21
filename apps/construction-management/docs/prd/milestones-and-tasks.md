@@ -1157,7 +1157,7 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 
 | ID      | Seq | Title                                                                                                                          | Status | Blocked by                | Area           |
 | ------- | --: | ------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------- | -------------- |
-| CM-1101 |   1 | ADR CM-0023; `construction_contracts` schema; Clients master; Project Client and Role; menus, Contracts modules, access, ports | todo   | CM-1008                   | Data+Domain    |
+| CM-1101 |   1 | ADR CM-0023; `construction_contracts` schema; Clients master; Project Client and Role; menus, Contracts modules, access, ports | in_progress | CM-1008                   | Data+Domain    |
 | CM-1102 |   2 | Item library with rate analysis; Excel import and sample                                                                       | todo   | CM-1101                   | Domain+HTTP+UI |
 | CM-1103 |   3 | Project BOQ: sections, items, import; Variations and deviations                                                                | todo   | CM-1102                   | Domain+HTTP+UI |
 | CM-1104 |   4 | Work Orders: BOQ and non-BOQ lines, terms, approval, amendments, PDF                                                           | todo   | CM-1103                   | Domain+HTTP+UI |
@@ -1200,7 +1200,7 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 
 - **ADR CM-0023** is accepted and this board is written.
 - **Schema.** `construction-contracts.prisma` (`construction_contracts`, `ConstructionContracts…`) with every table part 1 needs: items, rate-analysis lines, BOQ sections, BOQ items, variations, work orders (with revisions and lines), work-order materials, measurement sheets and rows, bills, bill lines, bill deductions, advances, bank guarantees, retention releases, price indices and escalation clauses. Every table has `workspace_id`. One migration.
-- **Clients.** `ConstructionMastersClient` with GSTIN/PAN checks, the Clients master list, form and delete guard; finance party type `client`. Project gains `client_id` and **Role** (`contract` / `own`) with the backfill described in CM-0023 §2, and the Project form shows both.
+- **Clients.** `ConstructionMastersClient` with GSTIN/PAN checks, the Clients master list, form and delete guard (a Client named by a live Project cannot be deleted). Project gains `client_id` and **Role** (`contract` / `own`) with the backfill described in CM-0023 §2, and the Project form shows both.
 - **Access.** The `contracts.*`, `masters.clients`, `finance.gst`, `finance.tds`, `labour.compliance`, `sales.collections`, `sales.rera` and `site_work.concrete` menus in a new **Contracts & Billing** category where CM-0023 §22 says. A migration grants them to the seeded designation templates. `GET /api/construction/contracts/access?projectId=`.
 - **Modules.** BOQ, Work Orders, Measurements, Contractor Bills and Client Bills in `PROJECT_MODULES` under a **Contracts** heading, with the Role defaults; stub pages that say what is coming.
 - **Ports.** `ContractsDirectory` (Project facts and Role, Contractors and Departments, Clients, Materials, Labour Categories, Equipment, UoMs, Wings and Locations) and `PartyInvoicing` (create and reverse an invoice in finance from a bill) with their composition adapters; domain constants and labels for every enum.
@@ -1258,6 +1258,7 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 **Done when:**
 
 - The same bill engine on the client side, from the BOQ: place of supply the Project's state, the Company GSTIN for that state (`GSTIN_NOT_IN_STATE` warning), CGST/SGST or IGST.
+- Finance party type `client` (enum value, `PartyType`, API models, balances, statements, reports); the Client appears in Parties.
 - Approval creates the receivable invoice to the Client and posts retention receivable.
 - Receipts from Clients record TDS deducted by the client and GST-TDS 2 %; the Client's balance shows due, retention receivable and TDS receivable.
 - Client Bills list, bill page, tax-invoice PDF (GSTIN, place of supply, SAC, tax split).
