@@ -70,6 +70,10 @@ _Avoid_: trade, team
 A party that executes work, labour-and-material or labour-only, in one or more Departments. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.
 _Avoid_: subcontractor
 
+**Client**:
+Who a Contract work Project is built for and billed: a master record with GSTIN, PAN, state and billing address (ADR CM-0023 §2). Client Bills are addressed to it. Not a User.
+_Avoid_: customer, employer, principal
+
 **Supplier**:
 A party that sells material. Linked to POs and GRNs. Not a User. Inactive Suppliers leave the pickers but stay on their Projects.
 _Avoid_: vendor (for material sellers)
@@ -435,6 +439,44 @@ _Avoid_: PF number, PF account number
 Electronic Challan cum Return: the EPFO's monthly PF upload, exported with the ESI contribution file from an approved month on Team Salary (Export → PF ECR). Members without a UAN, or without an IP number for ESI, are listed in the Excel instead of the upload.
 _Avoid_: PF challan (that is the payment), PF return file
 
+### Contracts and billing
+
+**Project Role**:
+Whose work a Project is: **Contract work** (built for a Client, who is billed) or **Own development** (built by the Company to sell or keep). Drives ITC defaults and which Contracts modules start shown.
+_Avoid_: project kind, ownership
+
+**Item Library / Item**:
+The Company's priced work items (code, description, UoM, SAC/HSN, schedule, adopted rate), optionally with a **Rate Analysis** of material, labour, equipment and overhead.
+_Avoid_: DSR (that is one schedule), rate master
+
+**BOQ**:
+A Project's bill of quantities in sections: the client contract on Contract work, the budget on Own development. Changed after measurement only by a **Variation**.
+_Avoid_: estimate, schedule of quantities
+
+**Variation**:
+An approved change to the BOQ: an extra item, or a new quantity or rate, with a reason. A measurement beyond the BOQ quantity is a **deviation** until a Variation covers it.
+_Avoid_: change order, amendment (that is a Work Order's)
+
+**Work Order**:
+What the Company gives a Contractor: BOQ items or non-BOQ lines at work-order rates, with retention, advance, DLP, TDS and GST terms. Changed by an **Amendment**, which keeps the earlier revision.
+_Avoid_: subcontract, PO (a Purchase Order is for material), WO (in UI copy, except numbers)
+
+**Measurement Book**:
+Measurement sheets of nos × length × breadth × depth against BOQ items (client side) or Work Order lines (contractor side). Checking a sheet is the **Joint measurement**: our engineer and the other party.
+_Avoid_: MB (in UI copy), JMR (in UI copy, except as "Joint measurement (JMR)")
+
+**Contractor Bill / Client Bill**:
+Running account (RA) bills: from a Contractor against a Work Order, or to the Client against the BOQ. Cumulative value to date minus previous bills, less deductions, plus GST. An **Escalation bill** is the price-variation kind.
+_Avoid_: invoice (the finance record a bill creates), running bill
+
+**Retention**:
+Part of each bill held back until completion and the end of the **DLP** (defect liability period), or released against a bank guarantee.
+_Avoid_: security deposit, holdback
+
+**Advance**:
+Mobilisation or secured money paid to a Contractor or received from the Client, recovered from later bills.
+_Avoid_: loan, imprest
+
 ### Money
 
 **Amount**:
@@ -464,6 +506,9 @@ _Avoid_: price (unless it is a rate), cost
 | Rate Card             | price list                      |
 | Wage Payment          | salary (for Labours)            |
 | Client                | customer                        |
+| Work Order            | subcontract, PO                 |
+| Contractor Bill       | running bill, RA invoice        |
+| Joint measurement     | JMR (alone)                     |
 | Album (Drawings)      | folder                          |
 | Revision (R1, R2 …)   | version                         |
 | Testing material      | test type                       |
