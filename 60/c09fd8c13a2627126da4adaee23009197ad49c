@@ -1,0 +1,87 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_f49615d4431370::t_5bb40fd7dd8f37 114-117,945-948
+apps/construction-management/app/api/construction/masters/clients/[id]/delete/route.ts
+  s_f49615d4431370::t_c5551a087f15a4 1-46
+apps/construction-management/app/api/construction/masters/clients/[id]/route.ts
+  s_f49615d4431370::t_58a2efad935984 1-30
+apps/construction-management/app/api/construction/masters/clients/[id]/update/route.ts
+  s_f49615d4431370::t_4e99256f3bbbff 1-45
+apps/construction-management/app/api/construction/masters/clients/client-models.ts
+  s_f49615d4431370::t_1d73c69ed35dc6 1-243
+apps/construction-management/app/api/construction/masters/clients/clients-openapi.ts
+  s_f49615d4431370::t_0443d7565f341c 1-125
+apps/construction-management/app/api/construction/masters/clients/clients.http.test.ts
+  s_f49615d4431370::t_21e57bb27c5fed 1-385
+apps/construction-management/app/api/construction/masters/clients/handlers.ts
+  s_f49615d4431370::t_9609fdb3720601 1-12
+apps/construction-management/app/api/construction/masters/clients/options/route.ts
+  s_f49615d4431370::t_2afc2fdf7597fb 1-65
+apps/construction-management/app/api/construction/masters/clients/route.ts
+  s_f49615d4431370::t_7fdcad18ce032b 1-76
+apps/construction-management/app/api/construction/projects/handlers.ts
+  s_f49615d4431370::t_a8aabb5ddc281b 1,16-17,21
+apps/construction-management/app/api/construction/projects/projects/project-client.http.test.ts
+  s_f49615d4431370::t_2fb5b2cf62df4c 1-257
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_f49615d4431370::t_41e49131b1e971 5-8,37-44,103-115,253-264,266,312-313
+apps/construction-management/components/projects/project-fixtures.ts
+  s_f49615d4431370::t_6eac80c72edda8 26-27,49
+apps/construction-management/src/composition/backup-sources.ts
+  s_f49615d4431370::t_1e5ee463d41102 267-268,1787-1801
+apps/construction-management/src/masters/domain/client.test.ts
+  s_f49615d4431370::t_e07c28a2884df7 1-108
+apps/construction-management/src/projects/application/project-handlers.test.ts
+  s_f49615d4431370::t_0339538b91e36c 13-14,94-104,106-114,132,142,452-564
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_f49615d4431370::t_f46f9b6530904d 3-7,16,21,82-83,125,134-161,222-223,231-235,241,275-283,288
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_f49615d4431370::t_dc125148c3ede9 8,31-33,53-54
+apps/construction-management/src/projects/domain/project-repository.ts
+  s_f49615d4431370::t_05fa8e3886c79a 64-80
+apps/construction-management/src/projects/domain/project-role.ts
+  s_f49615d4431370::t_553ace36e5c4ec 1-71
+apps/construction-management/src/projects/domain/project.test.ts
+  s_f49615d4431370::t_fd9686918ca7a7 15,137,300-305,323,346,495-500,515,528-533,542-543,552-557,593,614,616,618,620-621,625-682
+apps/construction-management/src/projects/domain/project.ts
+  s_f49615d4431370::t_993542f5bd8ac2 18-22,69-78,81-92,250-251,275-276,280-284,287-291,366-373,438-447,451,453-454,499-506
+apps/construction-management/src/projects/infrastructure/create-project-handlers.ts
+  s_f49615d4431370::t_191f425df6cbeb 10,25-26,30,41
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_f49615d4431370::t_c7faf00ffc2006 20,73-74,103-104,140,160-171
+apps/construction-management/src/reporting/domain/backup-modules.ts
+  s_f49615d4431370::t_03ee455044ddf3 409
+packages/db/construction/prisma/migrations/20261021090400_construction_projects_own_hides_client_bills/migration.sql
+  s_f49615d4431370::t_9896110b827a87 1-16
+apps/construction-management/src/composition/project-clients.ts
+  s_6dba54f5ec43e9::t_b0ac0f27aae5aa 1-36
+apps/construction-management/src/masters/application/client-handlers.ts
+  s_6dba54f5ec43e9::t_745caccd0572bb 1-202
+apps/construction-management/src/masters/domain/client.ts
+  s_6dba54f5ec43e9::t_5730243253d369 1-202
+apps/construction-management/src/masters/infrastructure/prisma-client-store.ts
+  s_6dba54f5ec43e9::t_ba3054036ae52a 1-318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "60c09fd8c13a2627126da4adaee23009197ad49c",
+  "prompts": {},
+  "sessions": {
+    "s_6dba54f5ec43e9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ab3a275850ce1a86b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
