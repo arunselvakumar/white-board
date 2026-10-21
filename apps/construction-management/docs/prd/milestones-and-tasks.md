@@ -181,7 +181,7 @@ Goal: a builder can sign up, create a Company, invite staff, decide what each on
 
 ### CM-105 — Company HTTP + screens
 
-**Done when:** `POST /api/construction/organization/companies`, `GET …/companies/me`, `POST …/companies/{id}/switch`; the first-run wizard (Company name → contact → country/currency → done) and the company switcher in the shell header.
+**Done when:** `POST /api/construction/organization/companies`, `GET …/companies/me`, `POST …/companies/{id}/switch`; the first-run wizard (Company name → contact → country/currency → straight to Projects, with no "is ready" screen) and the company switcher in the shell header.
 
 ### CM-106 — Designations
 
