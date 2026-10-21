@@ -1,0 +1,47 @@
+apps/construction-management/app/app/projects/[id]/boq/page.tsx
+  s_f49615d4431370::t_a982bd6120286a 2,4-6,10-24
+apps/construction-management/components/contracts/boq/boq-format.ts
+  s_f49615d4431370::t_2fbae07b11b5af 1-53
+apps/construction-management/components/contracts/boq/boq-item-dialog.tsx
+  s_f49615d4431370::t_54fbdef5ec3508 1-488
+apps/construction-management/components/contracts/boq/boq-page.tsx
+  s_f49615d4431370::t_c3609b5f36c15f 1-322
+apps/construction-management/components/contracts/boq/boq-sections.tsx
+  s_f49615d4431370::t_c4ddc56621ffbd 1-586
+apps/construction-management/components/contracts/boq/deviation-panel.tsx
+  s_f49615d4431370::t_b4afe341fc0a62 1-232
+apps/construction-management/components/contracts/boq/import-boq-dialog.tsx
+  s_f49615d4431370::t_57af1e461ffa24 1-206
+apps/construction-management/components/contracts/boq/variation-dialog.tsx
+  s_f49615d4431370::t_743946d3fb6f55 1-466
+apps/construction-management/components/contracts/boq/variations-tab.tsx
+  s_f49615d4431370::t_ce56cacb2b0ef7 1-475
+apps/construction-management/src/queries/contracts-boq.ts
+  s_f49615d4431370::t_941f5b7fba3688 1-310
+apps/construction-management/components/contracts/boq/section-dialog.tsx
+  s_de2f896f0baf64::t_89fd81efad829d 1-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4b13cde635319207f3c1791339220ba7602d8a96",
+  "prompts": {},
+  "sessions": {
+    "s_de2f896f0baf64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7f51ed63dafb352d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
