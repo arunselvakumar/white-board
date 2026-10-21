@@ -49,9 +49,10 @@ export function canBackUpModule(
 }
 
 function moduleDenied(module: BackupModule): DomainError {
+  const needs = module.viewAll === true ? "View and View all" : "View";
   return new DomainError(
     "PERMISSION_DENIED",
-    `You cannot back up ${module.label}: it needs View on ${module.label}. Ask the Owner to change your Permission Matrix.`,
+    `You cannot back up ${module.label}: it needs ${needs} on ${module.label}. Ask the Owner to change your Permission Matrix.`,
     { kind: "forbidden", details: { module: module.key } },
   );
 }

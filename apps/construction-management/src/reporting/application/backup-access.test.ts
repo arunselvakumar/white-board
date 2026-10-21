@@ -173,6 +173,30 @@ describe("Inquiries backup needs View all (review of #93)", () => {
     ).toBe(true);
   });
 
+  it("says it needs View all when it refuses", () => {
+    const refused = refusal(() =>
+      allowProjectBackup(
+        member({
+          "projects.project": ["read"],
+          "sales.inquiries": ["read"],
+        }),
+        PROJECT,
+        ["sales.inquiries"],
+      ),
+    );
+    expect(refused?.code).toBe("PERMISSION_DENIED");
+    expect(refused?.message).toBe(
+      "You cannot back up Inquiries: it needs View and View all on Inquiries. Ask the Owner to change your Permission Matrix.",
+    );
+    expect(refused?.details).toEqual({ module: "sales.inquiries" });
+    const bookings = refusal(() =>
+      allowProjectBackup(member({ "projects.project": ["read"] }), PROJECT, [
+        "sales.bookings",
+      ]),
+    );
+    expect(bookings?.message).toContain("it needs View on Bookings.");
+  });
+
   it("still needs only View for Bookings", () => {
     const bookings = backupModule("sales.bookings");
     if (bookings == null) throw new Error("no Bookings module");
