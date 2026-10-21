@@ -59,6 +59,15 @@ export const SEQUENCE_MODULES = [
   { key: "transaction", label: "Transaction (TXN)", defaultPrefix: "TXN" },
   { key: "party_payment", label: "Party Payment (PAY)", defaultPrefix: "PAY" },
   { key: "other_expense", label: "Other Expense (EXP)", defaultPrefix: "EXP" },
+  // Contracts (ADR CM-0023 §4, §5, §7).
+  { key: "variation", label: "Variation (VAR)", defaultPrefix: "VAR" },
+  { key: "work_order", label: "Work Order (WO)", defaultPrefix: "WO" },
+  { key: "client_bill", label: "Client Bill (RA)", defaultPrefix: "RA" },
+  {
+    key: "contractor_bill",
+    label: "Contractor Bill (CB)",
+    defaultPrefix: "CB",
+  },
 ] as const;
 
 export type SequenceModuleKey = (typeof SEQUENCE_MODULES)[number]["key"];

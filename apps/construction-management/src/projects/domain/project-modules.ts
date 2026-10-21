@@ -173,6 +173,43 @@ export const PROJECT_MODULES = [
     menu: "sales.bookings",
     structure: "wings",
   },
+  // Contracts (M11, ADR CM-0023 §22). Client Bills starts hidden on Own
+  // development Projects.
+  {
+    key: "boq",
+    label: "BOQ",
+    description: "The bill of quantities, its sections and Variations.",
+    segment: "boq",
+    menu: "contracts.boq",
+  },
+  {
+    key: "work_orders",
+    label: "Work Orders",
+    description: "Contractors' work at item rates, with terms.",
+    segment: "work-orders",
+    menu: "contracts.work_orders",
+  },
+  {
+    key: "measurements",
+    label: "Measurements",
+    description: "The Measurement Book and joint measurements.",
+    segment: "measurements",
+    menu: "contracts.measurements",
+  },
+  {
+    key: "contractor_bills",
+    label: "Contractor Bills",
+    description: "RA bills from Contractors against Work Orders.",
+    segment: "contractor-bills",
+    menu: "contracts.contractor_bills",
+  },
+  {
+    key: "client_bills",
+    label: "Client Bills",
+    description: "RA bills to the Client against the BOQ.",
+    segment: "client-bills",
+    menu: "contracts.client_bills",
+  },
   {
     key: "progress_reports",
     label: "Progress Reports",

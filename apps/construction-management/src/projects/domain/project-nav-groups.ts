@@ -22,6 +22,16 @@ export const PROJECT_NAV_GROUPS = [
   },
   { label: "Materials & money", keys: ["materials", "payments"] },
   { label: "Quality", keys: ["issues", "inspections", "testing_reports"] },
+  {
+    label: "Contracts",
+    keys: [
+      "boq",
+      "work_orders",
+      "measurements",
+      "contractor_bills",
+      "client_bills",
+    ],
+  },
   { label: "Sales", keys: ["inquiries", "bookings"] },
   { label: "Files", keys: ["drawings", "documents", "gallery"] },
   { label: "Reports", keys: ["progress_reports", "reports"] },

@@ -4,6 +4,7 @@ import { maskFromLetters } from "./flags";
 export const MENU_CATEGORIES = [
   { key: "project_management", label: "Project Management" },
   { key: "payment_accounting", label: "Payment & Accounting" },
+  { key: "contracts", label: "Contracts & Billing" },
   { key: "materials", label: "Materials" },
   { key: "master_records", label: "Master records" },
   { key: "central_store", label: "Central store" },
@@ -75,6 +76,29 @@ const DEFINITIONS = [
   ["labour.vendor", "Vendor", "project_management", "CRUDPOF", true],
   ["sales.bookings", "Booking Details", "project_management", "CRUDPNO", true],
   ["sales.inquiries", "Inquiry", "project_management", "CRUDPNVO", true],
+  // M11 (ADR CM-0023 §16, §17, §18, §20, §23): legacy had none of these.
+  [
+    "sales.collections",
+    "Collections",
+    "project_management",
+    "CRUDAJPNOF",
+    true,
+  ],
+  ["sales.rera", "RERA", "project_management", "CRUDPO", true],
+  [
+    "labour.compliance",
+    "Labour Compliance",
+    "project_management",
+    "CRUDO",
+    true,
+  ],
+  [
+    "site_work.concrete",
+    "Concrete Register",
+    "project_management",
+    "CRUDAPO",
+    true,
+  ],
   ["projects.gallery", "Gallery", "project_management", "R", true],
   ["reporting.project_dashboard", "Dashboard", "project_management", "R", true],
   [
@@ -133,6 +157,21 @@ const DEFINITIONS = [
     "CRUDAJPO",
     true,
   ],
+  // Company-level tax registers and returns (ADR CM-0023 §11, §14).
+  ["finance.gst", "GST", "payment_accounting", "ROE", false],
+  ["finance.tds", "TDS", "payment_accounting", "CRUDOE", false],
+  // Contracts & Billing (ADR CM-0023 §3–§7): legacy had no BOQ or RA bills.
+  ["contracts.boq", "BOQ", "contracts", "CRUDAJPOFEI", true],
+  ["contracts.work_orders", "Work Order", "contracts", "CRUDAJPNOF", true],
+  ["contracts.measurements", "Measurement Book", "contracts", "CRUDAPO", true],
+  [
+    "contracts.contractor_bills",
+    "Contractor Bills",
+    "contracts",
+    "CRUDAJPNOF",
+    true,
+  ],
+  ["contracts.client_bills", "Client Bills", "contracts", "CRUDAJPNOF", true],
   // Materials.
   ["procurement.manage_materials", "Manage Materials", "materials", "R", true],
   [
@@ -257,6 +296,9 @@ const DEFINITIONS = [
   // Tags on Tasks (ADR CM-0019 §1); legacy had no menu.
   ["masters.tags", "Tags", "master_records", "CRUD", false],
   ["masters.other_parties", "Other Party", "master_records", "CRUD", false],
+  // ADR CM-0023 §2, §3.
+  ["masters.clients", "Clients", "master_records", "CRUD", false],
+  ["contracts.items", "Item Library", "master_records", "CRUDEI", false],
   // Central store.
   [
     "procurement.central_store",
