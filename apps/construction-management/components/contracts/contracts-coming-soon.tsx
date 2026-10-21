@@ -12,7 +12,6 @@ import {
 
 /** The Contracts modules (ADR CM-0023 §22) and the ticket that builds each. */
 export const CONTRACTS_MODULE_TICKETS = {
-  boq: "CM-1103",
   work_orders: "CM-1104",
   measurements: "CM-1105",
   contractor_bills: "CM-1106",
