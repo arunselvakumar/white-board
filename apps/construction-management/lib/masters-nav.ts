@@ -1,5 +1,6 @@
 import {
   BadgeCheck,
+  BookOpenText,
   Briefcase,
   CircleAlert,
   Tag,
@@ -245,6 +246,19 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Owned and rented plant: where it is, maintenance and hire rates.",
         icon: Tractor,
+      },
+    ],
+  },
+  {
+    label: "Contracts",
+    sections: [
+      {
+        href: "/app/masters/item-library",
+        label: "Item Library",
+        title: "Item Library",
+        description:
+          "Items you quote and bill, with adopted rates, rate analysis and Excel import.",
+        icon: BookOpenText,
       },
     ],
   },
