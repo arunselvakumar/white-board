@@ -1,0 +1,53 @@
+apps/construction-management/app/app/workspace/hrms/salary/my/page.tsx
+  s_353c13142e25d9::t_8397662fe6615e 4,15
+apps/construction-management/components/attendance/attendance-skeletons.tsx
+  s_353c13142e25d9::t_e7e630d3024095 1-184
+apps/construction-management/components/attendance/labour/labour-attendance-page.tsx
+  s_353c13142e25d9::t_0583dc132719ea 6,24,31,102-103,160-161,163-166
+apps/construction-management/components/attendance/labour/labour-month-grid.tsx
+  s_353c13142e25d9::t_23c53f0d1aa0b1 4,23-26,31-33,88,106-110,196,211-227
+apps/construction-management/components/attendance/labour/labour-recorded-list.tsx
+  s_353c13142e25d9::t_b5784b9f34d151 4,24,39-42,223-227,309-313,318-319,328-331,344-347,359-360,395-411
+apps/construction-management/components/attendance/vendor/vendor-attendance-page.tsx
+  s_353c13142e25d9::t_5bcb389c37b9f3 6,24,32,113-114,158-164
+apps/construction-management/components/attendance/vendor/vendor-month-view.tsx
+  s_353c13142e25d9::t_cf055c5d4d63f7 4,16,23-26,219,235-250
+apps/construction-management/components/attendance/vendor/vendor-overtime-view.tsx
+  s_353c13142e25d9::t_11c8fae42e4f58 4,16,20-23,64-68,128-133,163-180
+apps/construction-management/components/finance/finance-skeletons.tsx
+  s_353c13142e25d9::t_e24f245df2c40d 147,155-156,162-164,167-173
+apps/construction-management/components/hrms/attendance-parts.tsx
+  s_353c13142e25d9::t_5f7f2202fe1786 12,242,246-247,252
+apps/construction-management/components/hrms/fence-map-picker.tsx
+  s_353c13142e25d9::t_ca6ac3c4cb225b 11,17
+apps/construction-management/components/hrms/holidays-page.tsx
+  s_353c13142e25d9::t_47142ecc520237 32,314
+apps/construction-management/components/hrms/hrms-shell.tsx
+  s_353c13142e25d9::t_658514d65a1e80 16,98-100
+apps/construction-management/components/hrms/hrms-skeletons.tsx
+  s_353c13142e25d9::t_4a35ff2a6e4adf 1-225
+apps/construction-management/components/hrms/leave/leave-balance-dialogs.tsx
+  s_353c13142e25d9::t_d5daca7070c1a9 48,552
+apps/construction-management/components/hrms/leave/team-leaves-page.tsx
+  s_353c13142e25d9::t_8bc84789153128 5,21,37,89,110-112,129-131,148-151,153-162
+apps/construction-management/components/hrms/monthly-attendance-page.tsx
+  s_353c13142e25d9::t_aae2829dadbe54 5,33,186-187,216-225
+apps/construction-management/components/hrms/salary/team-salary-page.tsx
+  s_353c13142e25d9::t_7d0fec17f42895 12,24,53,65,86-88,106-108,115-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cc78eebe3fb28b9151033e0768ceeaf628695d97",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
