@@ -72,7 +72,7 @@ _Avoid_: subcontractor
 
 **Client**:
 Who a Contract work Project is built for and billed: a master record with GSTIN, PAN, state and billing address (ADR CM-0023 §2). Client Bills are addressed to it. Not a User.
-_Avoid_: customer, employer, principal
+_Avoid_: customer, employer, principal, owner (the Owner is the Company's)
 
 **Supplier**:
 A party that sells material. Linked to POs and GRNs. Not a User. Inactive Suppliers leave the pickers but stay on their Projects.
@@ -115,8 +115,8 @@ _Avoid_: category, project kind, project category
 The Company's own figure for what a Project should cost, in rupees. Shown only to Team Members with the Project menu's Financial flag, like the Order Value; informational until later milestones compare against it (ADR CM-0013 §2).
 _Avoid_: estimate, project value, order value (that is the Client's)
 
-**Client**:
-Who gave the Company the work on a Project: a name and a mobile on the Project. Not a Party master (yet).
+**Client** (on a Project):
+Who gave the Company the work: a linked Client master record (see Masters and parties), or, on Projects without one, just a name and a mobile.
 _Avoid_: customer, owner (the Owner is the Company's)
 
 **Contract Details**:
