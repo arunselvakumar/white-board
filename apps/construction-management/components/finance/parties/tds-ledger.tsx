@@ -2,7 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Receipt } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import {
   Empty,
@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -28,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 import { tdsLedgerQuery } from "@/src/queries/finance-parties";
@@ -39,6 +39,9 @@ import {
   localToday,
   money,
 } from "./party-money";
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+
+import { TDS_COLUMNS, TdsLedgerSkeleton } from "./parties-skeletons";
 
 const PAYEE_LABELS = {
   individual_huf: "Individual / HUF — 1%",
@@ -65,6 +68,7 @@ export function TdsLedgerView({
   const years = [current, current - 1, current - 2];
   const [contractorId, setContractorId] = useState<string>("");
   const [year, setYear] = useState(current);
+  const [updating, startTransition] = useTransition();
   const items = (contractors.data?.items ?? []).map((item) => ({
     value: item.id,
     label: item.name,
@@ -79,13 +83,16 @@ export function TdsLedgerView({
         <div className="min-w-0 space-y-1.5">
           <Label htmlFor="tds-contractor">Contractor</Label>
           {contractors.isPending ? (
-            <Skeleton className="h-10 w-full" />
+            <SelectControlSkeleton label="Loading Contractors" />
           ) : (
             <Select
               items={items}
               value={contractorId === "" ? null : contractorId}
               onValueChange={(next) => {
-                if (typeof next === "string") setContractorId(next);
+                if (typeof next === "string")
+                  startTransition(() => {
+                    setContractorId(next);
+                  });
               }}
             >
               <SelectTrigger
@@ -111,7 +118,10 @@ export function TdsLedgerView({
             items={yearItems}
             value={String(year)}
             onValueChange={(next) => {
-              if (typeof next === "string") setYear(Number(next));
+              if (typeof next === "string")
+                startTransition(() => {
+                  setYear(Number(next));
+                });
             }}
           >
             <SelectTrigger id="tds-year" size="lg" className="w-full min-w-0">
@@ -132,16 +142,11 @@ export function TdsLedgerView({
           Choose a Contractor to see the TDS deducted from their payments.
         </p>
       ) : (
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          }
-        >
-          <Ledger contractorId={contractorId} year={year} />
-        </Suspense>
+        <div className={cn(updating && "opacity-60 transition-opacity")}>
+          <Suspense fallback={<TdsLedgerSkeleton />}>
+            <Ledger contractorId={contractorId} year={year} />
+          </Suspense>
+        </div>
       )}
     </div>
   );
@@ -208,13 +213,11 @@ function Ledger({
             <Table aria-label="TDS ledger">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Project</TableHead>
-                  <TableHead className="text-right">Paid</TableHead>
-                  <TableHead className="text-right">Base</TableHead>
-                  <TableHead className="text-right">Rate</TableHead>
-                  <TableHead className="text-right">TDS</TableHead>
+                  {TDS_COLUMNS.map((column, index) => (
+                    <TableHead key={index} className={column.className}>
+                      {column.header}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>

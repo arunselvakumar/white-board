@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { PartyMoneyPage } from "@/components/finance/parties/party-money-page";
+import { PartyMoneyPageSkeleton } from "@/components/finance/parties/parties-skeletons";
 
 export const metadata: Metadata = { title: "Contractor" };
 
@@ -14,7 +14,11 @@ export default async function ProjectContractorPage({
 }) {
   const { id, partyId } = await params;
   return (
-    <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+    <Suspense
+      fallback={
+        <PartyMoneyPageSkeleton projectId={id} partyType="contractor" />
+      }
+    >
       <PartyMoneyPage projectId={id} partyType="contractor" partyId={partyId} />
     </Suspense>
   );

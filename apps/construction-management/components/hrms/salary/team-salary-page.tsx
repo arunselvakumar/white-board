@@ -9,7 +9,7 @@ import {
   IndianRupee,
   Wallet,
 } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import {
@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import { Skeleton } from "@repo/ui/components/skeleton";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { HrmsEmpty } from "@/components/hrms/hrms-parts";
@@ -50,6 +50,7 @@ import {
   shiftMonth,
 } from "./salary-format";
 import { SalarySlipSheet, SalaryStatusBadge } from "./salary-slip-sheet";
+import { TeamSalaryMonthSkeleton } from "@/components/hrms/hrms-skeletons";
 
 /**
  * Team Salary (CM-317): a month's salaries for everyone. Calculate the
@@ -61,6 +62,7 @@ export function TeamSalaryPage({ today }: { today?: string }) {
   const now = today ?? localToday();
   // Salaries are usually run for the month just ended.
   const [month, setMonth] = useState(shiftMonth(now.slice(0, 7), -1));
+  const [updating, startTransition] = useTransition();
   const current = now.slice(0, 7);
   return (
     <div className="w-full p-6">
@@ -81,7 +83,9 @@ export function TeamSalaryPage({ today }: { today?: string }) {
               size="icon"
               aria-label="Previous month"
               onClick={() => {
-                setMonth(shiftMonth(month, -1));
+                startTransition(() => {
+                  setMonth(shiftMonth(month, -1));
+                });
               }}
             >
               <ChevronLeft />
@@ -99,24 +103,20 @@ export function TeamSalaryPage({ today }: { today?: string }) {
               aria-label="Next month"
               disabled={month >= current}
               onClick={() => {
-                setMonth(shiftMonth(month, 1));
+                startTransition(() => {
+                  setMonth(shiftMonth(month, 1));
+                });
               }}
             >
               <ChevronRight />
             </Button>
           </div>
         </div>
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-            </div>
-          }
-        >
-          <Month key={month} month={month} today={now} />
-        </Suspense>
+        <div className={cn(updating && "opacity-60 transition-opacity")}>
+          <Suspense fallback={<TeamSalaryMonthSkeleton />}>
+            <Month key={month} month={month} today={now} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

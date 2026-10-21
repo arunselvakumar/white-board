@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { GalleryPage } from "@/components/projects/gallery/gallery-page";
+import { QuerySuspense } from "@/components/query-suspense";
+import { GallerySkeleton } from "@/components/projects/gallery/gallery-skeletons";
 
 export const metadata: Metadata = { title: "Gallery" };
 
@@ -19,5 +21,9 @@ export default async function ProjectGalleryRoute({
   const { id } = await params;
   if (!(await viewerCan("projects.gallery", "read")))
     return <ProjectNoAccess what="the Gallery" />;
-  return <GalleryPage projectId={id} />;
+  return (
+    <QuerySuspense fallback={<GallerySkeleton />}>
+      <GalleryPage projectId={id} />
+    </QuerySuspense>
+  );
 }

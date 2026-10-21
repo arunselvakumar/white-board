@@ -56,6 +56,7 @@ import {
   lostSummary,
   partyLabel,
 } from "./hindrance-parts";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function Fact({
   label,
@@ -316,7 +317,7 @@ export function HindranceDetail({
             {hindrance.siteLocation == null ? (
               "—"
             ) : (
-              <Suspense fallback="…">
+              <Suspense fallback={<FactValueSkeleton />}>
                 <LocationLabel
                   projectId={projectId}
                   value={hindrance.siteLocation}

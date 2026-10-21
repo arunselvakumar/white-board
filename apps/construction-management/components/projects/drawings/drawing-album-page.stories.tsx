@@ -504,6 +504,8 @@ export const Move: Story = {
     const dialog = within(
       await body.findByRole("dialog", { name: "Move to album" }),
     );
+    // The albums load behind the real header and footer.
+    await dialog.findByRole("combobox", { name: "Album" });
     await userEvent.click(dialog.getByRole("button", { name: "Move" }));
     await expect(await dialog.findByText("Choose an album.")).toBeVisible();
 

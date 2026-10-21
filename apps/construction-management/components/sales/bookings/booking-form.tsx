@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { SkeletonText } from "@repo/ui/components/skeleton-kit";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -339,11 +340,13 @@ export function BookingForm({
                       >
                         <SelectValue
                           placeholder={
-                            options == null
-                              ? "Loading…"
-                              : wings.length === 0
-                                ? "No unit can be booked"
-                                : "Choose a Wing"
+                            options == null ? (
+                              <SkeletonText width="6rem" />
+                            ) : wings.length === 0 ? (
+                              "No unit can be booked"
+                            ) : (
+                              "Choose a Wing"
+                            )
                           }
                         />
                       </SelectTrigger>

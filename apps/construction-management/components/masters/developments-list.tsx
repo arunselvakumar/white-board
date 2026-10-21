@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -31,6 +31,10 @@ import {
   MasterSearch,
   byName,
 } from "./master-list-parts";
+import {
+  MasterAddButtonSkeleton,
+  MasterListPageSkeleton,
+} from "./masters-skeletons";
 
 function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;
@@ -52,6 +56,27 @@ type Dialog =
  * which Projects have it.
  */
 export function DevelopmentListScreen({
+  config,
+}: {
+  config: DevelopmentScreenConfig;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title={config.plural}
+          meta={config.description}
+          actions={<MasterAddButtonSkeleton label={`Add ${config.singular}`} />}
+          details
+        />
+      }
+    >
+      <DevelopmentListContent config={config} />
+    </Suspense>
+  );
+}
+
+function DevelopmentListContent({
   config,
 }: {
   config: DevelopmentScreenConfig;

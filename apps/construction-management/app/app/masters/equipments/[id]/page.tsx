@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { MastersEquipmentDetailPage } from "@/components/site-work/equipment/equipment-pages";
+import { EquipmentDetailSkeleton } from "@/components/site-work/site-work-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Equipment" };
 
@@ -15,5 +17,15 @@ export default async function EquipmentRoute({
   const { id } = await params;
   if (!(await viewerCan("masters.equipments", "read")))
     return <ProjectNoAccess what="Equipments" />;
-  return <MastersEquipmentDetailPage id={id} />;
+  return (
+    <QuerySuspense
+      fallback={
+        <EquipmentDetailSkeleton
+          back={{ label: "Equipments", href: "/app/masters/equipments" }}
+        />
+      }
+    >
+      <MastersEquipmentDetailPage id={id} />
+    </QuerySuspense>
+  );
 }

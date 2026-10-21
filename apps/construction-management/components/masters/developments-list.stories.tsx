@@ -254,10 +254,13 @@ export const CommonDevelopments: Story = {
     </StoryQueries>
   ),
   play: async ({ canvas }) => {
+    // The heading renders while the rows load (ADR-0047); wait for the rows.
+    const list = await canvas.findByRole("list", {
+      name: "Common Developments",
+    });
     await expect(
-      await canvas.findByRole("heading", { name: "Common Developments" }),
+      canvas.getByRole("heading", { name: "Common Developments" }),
     ).toBeVisible();
-    const list = canvas.getByRole("list", { name: "Common Developments" });
     await expect(rowNamed(list, "Compound Wall")).toHaveTextContent(
       "On Kumari Heights",
     );

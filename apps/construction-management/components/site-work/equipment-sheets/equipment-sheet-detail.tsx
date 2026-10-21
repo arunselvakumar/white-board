@@ -51,6 +51,7 @@ import {
   usageText,
 } from "./equipment-sheet-format";
 import { trimDecimal } from "./equipment-sheet-live";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -185,7 +186,7 @@ export function EquipmentSheetDetailPage({
           {sheet.siteLocation == null ? (
             "—"
           ) : (
-            <Suspense fallback="…">
+            <Suspense fallback={<FactValueSkeleton />}>
               <LocationLabel projectId={projectId} value={sheet.siteLocation} />
             </Suspense>
           )}

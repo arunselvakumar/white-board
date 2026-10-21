@@ -10,7 +10,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
@@ -19,6 +18,10 @@ import { RecentReports } from "./recent-reports";
 import { deviceToday, type ReportDefinition } from "./report-catalogue";
 import { useReportPickerOptions } from "./report-pickers";
 import { ReportGroup } from "./reports-page";
+import {
+  RecentReportsSkeleton,
+  ReportGroupsSkeleton,
+} from "./reports-skeletons";
 
 /** Central Reports' groups, in order, worded for the whole Company. */
 const CENTRAL_GROUPS: {
@@ -110,14 +113,7 @@ function RecentCentralReports() {
       <h2 id="central-recent-reports-heading" className="text-lg font-semibold">
         Your recent central reports
       </h2>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-hidden="true">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<RecentReportsSkeleton rows={2} />}>
         <RecentReports projectId={null} />
       </Suspense>
     </section>
@@ -147,17 +143,7 @@ export function CentralReportsPage({
           meta="Reports across your Projects and the Central Stores. Only you and the Owner can open the central reports you generate."
         />
         <Suspense
-          fallback={
-            <div
-              className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
-              aria-hidden="true"
-              data-testid="central-reports-loading"
-            >
-              <Skeleton className="h-64 w-full" />
-              <Skeleton className="h-64 w-full" />
-              <Skeleton className="h-64 w-full" />
-            </div>
-          }
+          fallback={<ReportGroupsSkeleton label="Loading central reports" />}
         >
           <CentralReportCards today={today} />
         </Suspense>

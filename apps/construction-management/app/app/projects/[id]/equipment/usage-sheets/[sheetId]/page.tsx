@@ -4,6 +4,7 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { EquipmentSheetDetailPage } from "@/components/site-work/equipment-sheets/equipment-sheet-detail";
+import { EquipmentSheetDetailSkeleton } from "@/components/site-work/site-work-skeletons";
 
 export const metadata: Metadata = { title: "Equipment Usage sheet" };
 
@@ -30,7 +31,7 @@ export default async function EquipmentSheetRoute({
   )
     return <ProjectNoAccess what="Equipment Usage sheets" />;
   return (
-    <QuerySuspense>
+    <QuerySuspense fallback={<EquipmentSheetDetailSkeleton projectId={id} />}>
       <EquipmentSheetDetailPage
         projectId={id}
         id={sheetId}

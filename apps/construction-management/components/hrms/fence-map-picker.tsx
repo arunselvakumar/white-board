@@ -6,15 +6,15 @@ import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
+import { FenceMapSkeleton } from "@/components/hrms/hrms-skeletons";
 
 import type { FenceMapProps } from "./fence-map";
 
 const FenceMap = dynamic<FenceMapProps>(() => import("./fence-map"), {
   ssr: false,
-  loading: () => <Skeleton className="h-64 w-full rounded-lg sm:h-72" />,
+  loading: () => <FenceMapSkeleton />,
 });
 
 /** Parsed coordinates, or null while a field is blank or not a number. */

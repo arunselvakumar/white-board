@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { DrawingsPage } from "@/components/projects/drawings/drawings-page";
+import { QuerySuspense } from "@/components/query-suspense";
+import { DrawingsSkeleton } from "@/components/projects/drawings/drawings-skeletons";
 
 export const metadata: Metadata = { title: "Drawings" };
 
@@ -21,11 +23,13 @@ export default async function ProjectDrawingsRoute({
     viewerCan("projects.drawings", "delete", { projectId: id }),
   ]);
   return (
-    <DrawingsPage
-      projectId={id}
-      canCreate={canCreate}
-      canUpdate={canUpdate}
-      canDelete={canDelete}
-    />
+    <QuerySuspense fallback={<DrawingsSkeleton />}>
+      <DrawingsPage
+        projectId={id}
+        canCreate={canCreate}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+      />
+    </QuerySuspense>
   );
 }

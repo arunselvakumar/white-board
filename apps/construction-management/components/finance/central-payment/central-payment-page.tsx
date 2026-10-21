@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -34,18 +33,16 @@ import {
 } from "@/src/queries/finance-central-payment";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
+import {
+  PARTY_TABS,
+  RecentCentralReportsSkeleton,
+} from "./central-payment-skeletons";
 
 /** Workspace → Central Payment (CM-709). */
 export const CENTRAL_PAYMENT_PATH = "/app/workspace/central-payment";
 
 /** Masters → Company's Bank A/C, where the accounts are kept (CM-701). */
 const BANK_ACCOUNTS_PATH = "/app/masters/bank-accounts";
-
-const PARTY_TABS = [
-  { value: "contractor", label: "Contractors", noun: "Contractor" },
-  { value: "supplier", label: "Suppliers", noun: "Supplier" },
-  { value: "other_party", label: "Other Parties", noun: "Other Party" },
-] as const;
 
 type PartyTab = (typeof PARTY_TABS)[number]["value"];
 
@@ -544,13 +541,7 @@ function CentralReportCards({
         <h2 id="central-recent-heading" className="text-lg font-semibold">
           Your recent central reports
         </h2>
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-hidden="true">
-              <Skeleton className="h-16 w-full" />
-            </div>
-          }
-        >
+        <Suspense fallback={<RecentCentralReportsSkeleton />}>
           <RecentReports projectId={null} />
         </Suspense>
       </section>

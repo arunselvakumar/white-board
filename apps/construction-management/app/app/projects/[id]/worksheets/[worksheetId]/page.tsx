@@ -4,6 +4,7 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { WorksheetDetailPage } from "@/components/site-work/worksheets/worksheet-detail";
+import { WorksheetDetailSkeleton } from "@/components/site-work/site-work-skeletons";
 
 export const metadata: Metadata = { title: "Daily Worksheet" };
 
@@ -31,7 +32,7 @@ export default async function WorksheetRoute({
     return <ProjectNoAccess what="the Daily Worksheet" />;
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <QuerySuspense>
+      <QuerySuspense fallback={<WorksheetDetailSkeleton projectId={id} />}>
         <WorksheetDetailPage
           projectId={id}
           id={worksheetId}

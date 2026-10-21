@@ -14,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import {
@@ -57,6 +57,7 @@ import {
   ReceiptBadge,
   StageBadge,
 } from "./purchase-order-format";
+import { PurchaseOrderRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const APPROVAL_CHIPS = [
   { key: "all", label: "All" },
@@ -99,7 +100,8 @@ export function PurchaseOrdersPage({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<PurchaseOrderFilter["cursor"]>(null);
   const [bulk, setBulk] = useState(false);
-  const [, startTransition] = useTransition();
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -152,14 +154,7 @@ export function PurchaseOrdersPage({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<PurchaseOrderRowsSkeleton bulk={bulk} />}>
         <PurchaseOrderRows
           projectId={projectId}
           today={today}
@@ -175,6 +170,7 @@ export function PurchaseOrdersPage({
               setCursor(next);
             });
           }}
+          className={cn(isPending && "opacity-60 transition-opacity")}
         />
       </Suspense>
     </div>
@@ -192,6 +188,7 @@ function PurchaseOrderRows({
   canCreate,
   onFilters,
   onPage,
+  className,
 }: {
   projectId: string;
   today: string;
@@ -203,6 +200,7 @@ function PurchaseOrderRows({
   canCreate: boolean;
   onFilters: (next: Partial<Filters>) => void;
   onPage: (cursor: PurchaseOrderFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(
     purchaseOrdersQuery({
@@ -290,7 +288,7 @@ function PurchaseOrderRows({
 
   if (data.items.length === 0)
     return (
-      <div className="space-y-4">
+      <div className={cn("space-y-4", className)}>
         {filterBar}
         <Empty className="border">
           <EmptyHeader>
@@ -338,7 +336,7 @@ function PurchaseOrderRows({
     ) : null;
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       {filterBar}
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "Purchase Order" : "Purchase Orders"}

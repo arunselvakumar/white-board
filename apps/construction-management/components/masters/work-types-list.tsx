@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Hammer, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -22,6 +22,10 @@ import {
   byName,
 } from "./master-list-parts";
 import { WorkTypeDialog } from "./work-type-dialog";
+import {
+  MasterAddButtonSkeleton,
+  MasterListPageSkeleton,
+} from "./masters-skeletons";
 
 function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;
@@ -44,6 +48,26 @@ function detailsOf(item: WorkTypeItem): string {
  * listed, muted.
  */
 export function WorkTypesList() {
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title="Work Types"
+          meta={WORK_TYPES_META}
+          actions={<MasterAddButtonSkeleton label="Add Work Type" />}
+          details
+        />
+      }
+    >
+      <WorkTypesListContent />
+    </Suspense>
+  );
+}
+
+const WORK_TYPES_META =
+  "What crews do within a Department, with the Materials they use.";
+
+function WorkTypesListContent() {
   const { data } = useSuspenseQuery(workTypesQuery());
   const command = useWorkTypeCommand();
   const [query, setQuery] = useState("");
@@ -82,7 +106,7 @@ export function WorkTypesList() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Work Types"
-          meta="What crews do within a Department, with the Materials they use."
+          meta={WORK_TYPES_META}
           actions={addButton}
         />
         {data.items.length === 0 ? (

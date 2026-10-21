@@ -4,6 +4,8 @@ import { AddWingScreen } from "@/components/projects/structure/add-wing-screen";
 import { StructureNoAccess } from "@/components/projects/structure/structure-parts";
 
 import { structureAccess } from "../structure-access";
+import { QuerySuspense } from "@/components/query-suspense";
+import { AddWingSkeleton } from "@/components/projects/structure/structure-skeletons";
 
 export const metadata: Metadata = { title: "Add Wing" };
 
@@ -21,9 +23,11 @@ export default async function AddWingRoute({
   if (!access.read || !access.create)
     return <StructureNoAccess what="adding Wings" />;
   return (
-    <AddWingScreen
-      projectId={id}
-      phaseId={typeof phase === "string" ? phase : undefined}
-    />
+    <QuerySuspense fallback={<AddWingSkeleton projectId={id} />}>
+      <AddWingScreen
+        projectId={id}
+        phaseId={typeof phase === "string" ? phase : undefined}
+      />
+    </QuerySuspense>
   );
 }

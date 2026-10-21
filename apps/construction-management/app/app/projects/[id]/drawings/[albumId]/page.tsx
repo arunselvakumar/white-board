@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { DrawingAlbumPage } from "@/components/projects/drawings/drawing-album-page";
+import { QuerySuspense } from "@/components/query-suspense";
+import { DrawingAlbumSkeleton } from "@/components/projects/drawings/drawings-skeletons";
 
 export const metadata: Metadata = { title: "Drawings" };
 
@@ -21,12 +23,14 @@ export default async function ProjectDrawingAlbumRoute({
     viewerCan("projects.drawings", "delete", { projectId: id }),
   ]);
   return (
-    <DrawingAlbumPage
-      projectId={id}
-      albumId={albumId}
-      canCreate={canCreate}
-      canUpdate={canUpdate}
-      canDelete={canDelete}
-    />
+    <QuerySuspense fallback={<DrawingAlbumSkeleton projectId={id} />}>
+      <DrawingAlbumPage
+        projectId={id}
+        albumId={albumId}
+        canCreate={canCreate}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+      />
+    </QuerySuspense>
   );
 }

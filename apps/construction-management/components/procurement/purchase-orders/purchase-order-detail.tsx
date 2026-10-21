@@ -39,6 +39,7 @@ import {
   StageBadge,
   STAGE_LABELS,
 } from "./purchase-order-format";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -165,7 +166,7 @@ export function PurchaseOrderDetailPage({
           {po.siteLocation == null ? (
             "—"
           ) : (
-            <Suspense fallback="…">
+            <Suspense fallback={<FactValueSkeleton />}>
               <LocationLabel projectId={projectId} value={po.siteLocation} />
             </Suspense>
           )}

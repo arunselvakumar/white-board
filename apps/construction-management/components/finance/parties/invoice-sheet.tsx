@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -41,6 +40,7 @@ import {
 import { InvoiceDialog } from "./invoice-dialog";
 import { formatDate, money, partyPaths } from "./party-money";
 import { InvoiceStatusChips } from "./party-status";
+import { InvoiceDetailSkeleton } from "./parties-skeletons";
 
 /**
  * One invoice (CM-705): its figures, GRNs and variance, the payments that
@@ -77,10 +77,7 @@ export function InvoiceSheet({
         </SheetHeader>
         <div className="px-4 pb-6">
           {invoice == null ? (
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-14 w-full" />
-              <Skeleton className="h-14 w-full" />
-            </div>
+            <InvoiceDetailSkeleton />
           ) : (
             <InvoiceDetail
               projectId={projectId}

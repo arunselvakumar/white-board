@@ -4,6 +4,8 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { uploadFailedNames } from "@/components/sales/documents/upload-failed";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { InquiryDetail } from "@/components/sales/inquiries/inquiry-detail";
+import { QuerySuspense } from "@/components/query-suspense";
+import { InquiryDetailSkeleton } from "@/components/sales/inquiries/inquiries-skeletons";
 
 export const metadata: Metadata = { title: "Inquiry" };
 
@@ -20,10 +22,12 @@ export default async function InquiryPage({
   if (!(await viewerCan("sales.inquiries", "read", { projectId: id })))
     return <ProjectNoAccess what="Inquiries" />;
   return (
-    <InquiryDetail
-      projectId={id}
-      id={inquiryId}
-      uploadFailed={uploadFailedNames(uploadFailed)}
-    />
+    <QuerySuspense fallback={<InquiryDetailSkeleton projectId={id} />}>
+      <InquiryDetail
+        projectId={id}
+        id={inquiryId}
+        uploadFailed={uploadFailedNames(uploadFailed)}
+      />
+    </QuerySuspense>
   );
 }

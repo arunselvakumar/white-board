@@ -15,7 +15,6 @@ import {
 import { Suspense, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { fieldForCode } from "@/lib/server-errors";
@@ -30,6 +29,7 @@ import {
 import { HolidayDialog } from "./holiday-dialog";
 import { HolidayImportDialog } from "./holiday-import-dialog";
 import { ConfirmDialog, HrmsEmpty, HrmsPage, RowMenu } from "./hrms-parts";
+import { HolidayYearSkeleton } from "@/components/hrms/hrms-skeletons";
 
 const MONTHS = Array.from({ length: 12 }, (_, index) => index);
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -311,14 +311,7 @@ export function HolidaysPage({ initialYear }: { initialYear?: number }) {
           <ChevronRight />
         </Button>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-3" aria-busy="true">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-40 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<HolidayYearSkeleton />}>
         <HolidayYear
           year={year}
           onAdd={() => {

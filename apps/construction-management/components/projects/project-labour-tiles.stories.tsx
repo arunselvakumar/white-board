@@ -70,10 +70,10 @@ export const Today: Story = {
   beforeEach: () => serve(summary()),
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByRole("heading", { name: "Labour today" }),
+      canvas.getByRole("heading", { name: "Labour today" }),
     ).toBeVisible();
     await expect(
-      canvas.getByRole("link", { name: /Labours present/ }),
+      await canvas.findByRole("link", { name: /Labours present/ }),
     ).toHaveTextContent("19/24");
     await expect(canvas.getByText("2 not marked yet")).toBeVisible();
     await expect(

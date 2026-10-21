@@ -25,6 +25,7 @@ import {
 } from "@/src/queries/sales-inquiries";
 
 import { InquiryTaskDialog } from "./inquiry-task-dialog";
+import { InquiryTasksSkeleton } from "./inquiries-skeletons";
 
 function message(caught: unknown): string {
   return caught instanceof QueryHttpError
@@ -238,7 +239,7 @@ export function InquiryTasksPanel({
       aria-labelledby="inquiry-tasks"
       className="bg-card h-fit min-w-0 rounded-lg border p-4"
     >
-      <Suspense fallback={<p className="text-sm">Loading tasks…</p>}>
+      <Suspense fallback={<InquiryTasksSkeleton />}>
         <TaskList projectId={projectId} inquiry={inquiry} today={today} />
       </Suspense>
     </aside>

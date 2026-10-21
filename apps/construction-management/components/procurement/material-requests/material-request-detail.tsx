@@ -55,8 +55,10 @@ import {
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
-
-const loading = <p className="text-muted-foreground text-sm">Loading…</p>;
+import {
+  FactValueSkeleton,
+  RequestRowsSkeleton,
+} from "@/components/procurement/procurement-skeletons";
 
 class Quiet extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -280,7 +282,7 @@ export function MaterialRequestDetail({
         {request.siteLocation == null ? null : (
           <Fact label="Site location">
             <Quiet fallback="—">
-              <Suspense fallback="…">
+              <Suspense fallback={<FactValueSkeleton />}>
                 <LocationLabel
                   projectId={request.projectId}
                   value={request.siteLocation as LocationRef}
@@ -352,7 +354,11 @@ export function MaterialRequestDetail({
 
       <section className="space-y-3">
         <h2 className="font-semibold">Delivery Notes</h2>
-        <Suspense fallback={loading}>
+        <Suspense
+          fallback={
+            <RequestRowsSkeleton label="Loading Delivery Notes" count={false} />
+          }
+        >
           <DeliveryNotesList materialRequestId={request.id} />
         </Suspense>
       </section>

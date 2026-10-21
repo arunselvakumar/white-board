@@ -42,7 +42,8 @@ import {
   UNIT_SALES_STATUSES,
 } from "@/src/sales/domain/sales-terms";
 
-import { Fact, Section, SectionSkeleton, denied } from "./dashboard-parts";
+import { Fact, Section, denied } from "./dashboard-parts";
+import { SectionSkeleton } from "./dashboard-skeletons";
 import { CountBars, Legend, StackedBar } from "./tracking-charts";
 
 /** "1 inquiry", "3 inquiries". */
@@ -190,7 +191,14 @@ export function BookingSection({ projectId }: { projectId: string }) {
         As on today; the duration above does not apply.
       </p>
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Bookings"
+          chart
+          facts={UNIT_SALES_STATUSES.map((status) => ({
+            label: UNIT_SALES_STATUS_LABELS[status],
+            icon: ICONS[status],
+          }))}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -400,7 +408,19 @@ export function InquirySection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Inquiries"
+          className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6"
+          chart
+          facts={[
+            { label: "Total", icon: Inbox },
+            { label: "Open", icon: UserRoundSearch },
+            { label: "Converted", icon: CircleCheck },
+            { label: "Lost", icon: CircleX },
+            { label: "Conv. Rate", icon: Percent },
+            { label: "Overdue", icon: AlarmClock },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)

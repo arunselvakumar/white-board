@@ -13,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 import { accountLabel } from "@/components/finance/account-picker";
 import { accountOptionsQuery } from "@/src/queries/finance-accounts";
 
@@ -105,7 +105,8 @@ export function ToAccountSelect({
   invalid: boolean;
 }) {
   const query = useQuery(accountOptionsQuery());
-  if (query.isPending) return <Skeleton className="h-10 w-full" />;
+  if (query.isPending)
+    return <SelectControlSkeleton label="Loading accounts" />;
   const accounts = (query.data?.items ?? []).filter(
     (account) => account.id !== exclude,
   );

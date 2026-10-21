@@ -28,7 +28,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -38,6 +37,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { localToday } from "@/components/payments/payment-format";
 import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
@@ -69,6 +69,11 @@ import {
 } from "./inquiry-parts";
 import { ImportInquiriesDialog } from "./import-inquiries-dialog";
 import { InquiryQuickAddDialog } from "./inquiry-quick-add-dialog";
+import {
+  INQUIRY_COLUMNS,
+  InquiryFilterBarSkeleton,
+  InquiryRowsSkeleton,
+} from "./inquiries-skeletons";
 
 type Filters = {
   statuses: InquiryStatus[];
@@ -139,7 +144,7 @@ export function InquiriesList({
   const [cursor, setCursor] = useState<InquiryFilters["cursor"]>(null);
   const [quickAdd, setQuickAdd] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [, startTransition] = useTransition();
+  const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -235,24 +240,28 @@ export function InquiriesList({
           ))}
         </ToggleGroup>
       </div>
-      <Suspense fallback={<Skeleton className="h-14 w-full" />}>
+      <Suspense fallback={<InquiryFilterBarSkeleton />}>
         <FilterBar projectId={projectId} filters={filters} onChange={change} />
       </Suspense>
-      <Suspense fallback={<ListSkeleton />}>
-        <InquiryRows
-          projectId={projectId}
-          filters={filters}
-          cursor={cursor}
-          today={today}
-          canCreate={canCreate}
-          newHref={newHref}
-          onPage={(next) => {
-            startTransition(() => {
-              setCursor(next);
-            });
-          }}
-        />
-      </Suspense>
+      <div
+        className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
+      >
+        <Suspense fallback={<InquiryRowsSkeleton />}>
+          <InquiryRows
+            projectId={projectId}
+            filters={filters}
+            cursor={cursor}
+            today={today}
+            canCreate={canCreate}
+            newHref={newHref}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
       {canCreate && (
         <ImportInquiriesDialog
           projectId={projectId}
@@ -271,16 +280,6 @@ export function InquiriesList({
           />
         </Suspense>
       )}
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-14 w-full" />
-      <Skeleton className="h-14 w-full" />
-      <Skeleton className="h-14 w-full" />
     </div>
   );
 }
@@ -424,12 +423,11 @@ function InquiryRows({
         <Table aria-label="Inquiries">
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Interest</TableHead>
-              <TableHead>Funnel Stage</TableHead>
-              <TableHead>Next follow-up</TableHead>
-              <TableHead>Assignee</TableHead>
-              <TableHead>Status</TableHead>
+              {INQUIRY_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

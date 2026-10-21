@@ -12,6 +12,7 @@ import {
   isPreparingBackup,
   type Backup,
 } from "@/src/queries/backups";
+import { BackupProgressSkeleton } from "./backups-skeletons";
 
 const until = new Intl.DateTimeFormat("en-IN", {
   day: "numeric",
@@ -36,12 +37,7 @@ export function BackupProgress({
     ...backupQueries.one(backupId),
     ...(initial == null ? {} : { initialData: initial }),
   });
-  if (data == null)
-    return (
-      <p className="text-muted-foreground flex items-center gap-2 text-sm">
-        <Spinner aria-hidden="true" /> Loading…
-      </p>
-    );
+  if (data == null) return <BackupProgressSkeleton />;
   const mine = data.scope === "my_data";
   if (isPreparingBackup(data)) {
     const percent =

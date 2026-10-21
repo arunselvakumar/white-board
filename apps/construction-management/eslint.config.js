@@ -34,6 +34,34 @@ const AUTH_VENDOR_PATTERNS = [
   },
 ];
 
+// Loading states mimic the page they stand in for (root ADR-0047): a bare
+// Skeleton bar is drawn only in an area's `*-skeletons.tsx` file, so a new
+// generic box has to become a named skeleton there.
+const skeletonGuard = {
+  files: ["app/**/*.tsx", "components/**/*.tsx"],
+  ignores: [
+    "**/*-skeleton.tsx",
+    "**/*-skeletons.tsx",
+    "**/*.stories.tsx",
+    "**/*.test.tsx",
+  ],
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      {
+        patterns: AUTH_VENDOR_PATTERNS,
+        paths: [
+          {
+            name: "@repo/ui/components/skeleton",
+            message:
+              "Draw skeleton bars in this area's *-skeletons.tsx, shaped like the loaded page, or use @repo/ui/components/skeleton-kit (ADR-0047).",
+          },
+        ],
+      },
+    ],
+  },
+};
+
 const contextBoundaries = BOUNDED_CONTEXTS.map((context) => ({
   files: [`src/${context}/**/*.{ts,tsx}`],
   rules: {
@@ -98,6 +126,7 @@ export default [
   },
   ...contextBoundaries,
   sharedKernelBoundary,
+  skeletonGuard,
   ...storybook.configs["flat/recommended"],
   {
     // public/ holds static files served as-is (sw.js is plain browser JS).

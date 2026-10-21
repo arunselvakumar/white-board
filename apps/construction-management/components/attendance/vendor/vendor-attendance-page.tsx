@@ -3,7 +3,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, HardHat } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -15,13 +15,13 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
 import { vendorAttendanceDayQuery } from "@/src/queries/vendor-attendance";
@@ -29,6 +29,7 @@ import { vendorAttendanceDayQuery } from "@/src/queries/vendor-attendance";
 import { VENDOR_MASTERS_PATH, VendorDayCard } from "./vendor-day-card";
 import { VendorMonthView } from "./vendor-month-view";
 import { VendorOvertimeView } from "./vendor-overtime-view";
+import { VendorDayGridSkeleton } from "@/components/attendance/attendance-skeletons";
 
 /** Today on this device, `YYYY-MM-DD`. */
 export function localToday(now: Date = new Date()): string {
@@ -39,15 +40,6 @@ export function localToday(now: Date = new Date()): string {
 export function shiftDate(date: string, days: number): string {
   const time = Date.parse(`${date}T00:00:00Z`) + days * 86_400_000;
   return new Date(time).toISOString().slice(0, 10);
-}
-
-function GridSkeleton() {
-  return (
-    <div className="space-y-4" aria-hidden="true">
-      <Skeleton className="h-48 w-full" />
-      <Skeleton className="h-48 w-full" />
-    </div>
-  );
 }
 
 function NoVendors() {
@@ -118,6 +110,8 @@ function DayTab({
   initialDate: string;
 }) {
   const [date, setDate] = useState(initialDate);
+  // The last day's cards stay on screen, dimmed, while the next day loads.
+  const shownDate = useDeferredValue(date);
   const today = localToday();
   return (
     <div className="space-y-4">
@@ -161,9 +155,13 @@ function DayTab({
           <ChevronRight />
         </Button>
       </div>
-      <Suspense fallback={<GridSkeleton />}>
-        <DayGrid projectId={projectId} date={date} />
-      </Suspense>
+      <div
+        className={cn(shownDate !== date && "opacity-60 transition-opacity")}
+      >
+        <Suspense fallback={<VendorDayGridSkeleton />}>
+          <DayGrid projectId={projectId} date={shownDate} />
+        </Suspense>
+      </div>
     </div>
   );
 }

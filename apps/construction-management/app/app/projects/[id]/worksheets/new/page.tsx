@@ -4,6 +4,10 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { NewWorksheetPage } from "@/components/site-work/worksheets/worksheet-form-pages";
+import {
+  TitledFormSkeleton,
+  WorksheetFormSkeleton,
+} from "@/components/site-work/site-work-skeletons";
 
 export const metadata: Metadata = { title: "Add Worksheet" };
 
@@ -27,7 +31,15 @@ export default async function NewWorksheetRoute({
     typeof from === "string" && /^[0-9a-f-]{36}$/i.test(from) ? from : null;
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
-      <QuerySuspense>
+      <QuerySuspense
+        fallback={
+          <TitledFormSkeleton
+            title={fromId == null ? "Add Worksheet" : "Duplicate Worksheet"}
+          >
+            <WorksheetFormSkeleton />
+          </TitledFormSkeleton>
+        }
+      >
         <NewWorksheetPage projectId={id} fromId={fromId} />
       </QuerySuspense>
     </div>

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { StockRegisterPage } from "@/components/procurement/inventory/stock-register-page";
 import { centralStoreHref } from "@/components/procurement/stores/central-store-parts";
+import { StockRegisterSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Stock Register" };
 
@@ -14,10 +16,18 @@ export default async function StoreStockRegisterRoute({
   const { id } = await params;
   return (
     <div className="w-full max-w-6xl p-6">
-      <StockRegisterPage
-        location={{ kind: "store", id }}
-        backHref={centralStoreHref.store(id)}
-      />
+      <QuerySuspense
+        fallback={
+          <StockRegisterSkeleton
+            backHref={`/app/workspace/central-store/${encodeURIComponent(id)}`}
+          />
+        }
+      >
+        <StockRegisterPage
+          location={{ kind: "store", id }}
+          backHref={centralStoreHref.store(id)}
+        />
+      </QuerySuspense>
     </div>
   );
 }

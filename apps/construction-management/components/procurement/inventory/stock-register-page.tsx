@@ -14,7 +14,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -42,6 +41,7 @@ import {
   inventoryPath,
   localToday,
 } from "./inventory-format";
+import { StockRegisterTableSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function monthStart(today: string): string {
   return `${today.slice(0, 8)}01`;
@@ -214,14 +214,7 @@ export function StockRegisterPage({
           The Stock Register needs the Report permission on Current Inventory.
         </p>
       ) : valid ? (
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          }
-        >
+        <Suspense fallback={<StockRegisterTableSkeleton />}>
           <Register location={location} range={range} />
         </Suspense>
       ) : (

@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FileText, Wallet } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -23,7 +23,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -33,6 +32,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
@@ -44,6 +44,7 @@ import {
 } from "@/src/queries/payments";
 
 import { formatDate, money } from "./payment-format";
+import { PAYMENT_COLUMNS, PaymentRowsSkeleton } from "./payments-skeletons";
 
 const TYPES = [
   { value: "all", label: "All" },
@@ -67,8 +68,11 @@ export function PaymentsList({ projectId }: { projectId: string }) {
     to: "",
     cursor: null,
   });
+  const [updating, startTransition] = useTransition();
   const change = (next: Partial<PaymentListFilter>) => {
-    setFilter((current) => ({ ...current, ...next, cursor: null }));
+    startTransition(() => {
+      setFilter((current) => ({ ...current, ...next, cursor: null }));
+    });
   };
   return (
     <div className="space-y-4">
@@ -142,21 +146,18 @@ export function PaymentsList({ projectId }: { projectId: string }) {
           </div>
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
-        <PaymentRows
-          filter={filter}
-          onPage={(cursor) => {
-            setFilter((current) => ({ ...current, cursor }));
-          }}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<PaymentRowsSkeleton />}>
+          <PaymentRows
+            filter={filter}
+            onPage={(cursor) => {
+              startTransition(() => {
+                setFilter((current) => ({ ...current, cursor }));
+              });
+            }}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }
@@ -236,16 +237,11 @@ function PaymentRows({
         <Table aria-label="Payments">
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Paid to</TableHead>
-              <TableHead>Kind</TableHead>
-              <TableHead>Mode</TableHead>
-              <TableHead>Paid from</TableHead>
-              <TableHead>Paid by</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="w-32">
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              {PAYMENT_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

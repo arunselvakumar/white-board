@@ -1,10 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -14,9 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
 import { vendorAttendanceOvertimeQuery } from "@/src/queries/vendor-attendance";
+import {
+  VENDOR_OVERTIME_COLUMNS,
+  VendorOvertimeSkeleton,
+} from "@/components/attendance/attendance-skeletons";
 
 /**
  * One focusable scroll area around a wide table (keyboard users can scroll
@@ -57,13 +61,11 @@ function OvertimeTable({
       <Table aria-label="Vendor overtime">
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Vendor</TableHead>
-            <TableHead>Shift</TableHead>
-            <TableHead>Labour Category</TableHead>
-            <TableHead className="text-right">Hours</TableHead>
-            <TableHead className="text-right">Rate/h</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            {VENDOR_OVERTIME_COLUMNS.map((column, index) => (
+              <TableHead key={index} className={column.className}>
+                {column.header}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -123,6 +125,12 @@ export function VendorOvertimeView({
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
   const valid = from.length > 0 && to.length > 0 && from <= to;
+  // Typed dates keep the old lines, dimmed, until the new ones arrive.
+  const shownFrom = useDeferredValue(from);
+  const shownTo = useDeferredValue(to);
+  // The deferred pair can be one the form showed as invalid; don't ask for it.
+  const shownValid =
+    shownFrom.length > 0 && shownTo.length > 0 && shownFrom <= shownTo;
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
@@ -152,9 +160,24 @@ export function VendorOvertimeView({
         </div>
       </div>
       {valid ? (
-        <Suspense fallback={<Skeleton className="h-40 w-full" />}>
-          <OvertimeTable projectId={projectId} from={from} to={to} />
-        </Suspense>
+        <div
+          className={cn(
+            (shownFrom !== from || shownTo !== to) &&
+              "opacity-60 transition-opacity",
+          )}
+        >
+          {shownValid ? (
+            <Suspense fallback={<VendorOvertimeSkeleton />}>
+              <OvertimeTable
+                projectId={projectId}
+                from={shownFrom}
+                to={shownTo}
+              />
+            </Suspense>
+          ) : (
+            <VendorOvertimeSkeleton />
+          )}
+        </div>
       ) : (
         <p role="alert" className="text-destructive text-sm">
           Choose a From date on or before the To date.

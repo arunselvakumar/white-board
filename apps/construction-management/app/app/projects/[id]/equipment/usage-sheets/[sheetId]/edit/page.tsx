@@ -4,6 +4,8 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { EditEquipmentSheetPage } from "@/components/site-work/equipment-sheets/equipment-sheet-form-pages";
+import { EquipmentSheetFormSkeleton } from "@/components/site-work/site-work-skeletons";
+import { EditDocumentSkeleton } from "@/components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Edit usage sheet" };
 
@@ -21,7 +23,13 @@ export default async function EditEquipmentSheetRoute({
   )
     return <ProjectNoAccess what="editing Equipment Usage sheets" />;
   return (
-    <QuerySuspense>
+    <QuerySuspense
+      fallback={
+        <EditDocumentSkeleton>
+          <EquipmentSheetFormSkeleton />
+        </EditDocumentSkeleton>
+      }
+    >
       <EditEquipmentSheetPage projectId={id} id={sheetId} />
     </QuerySuspense>
   );

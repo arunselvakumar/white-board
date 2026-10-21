@@ -10,10 +10,10 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { ChecklistSkeleton } from "@/components/masters/masters-skeletons";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
@@ -231,7 +231,7 @@ function VendorForm({
             The Vendor appears on the attendance screen of these Projects.
           </p>
         </div>
-        <Suspense fallback={<Skeleton className="h-11 w-full" />}>
+        <Suspense fallback={<ChecklistSkeleton />}>
           <Controller
             name="projectIds"
             control={form.control}

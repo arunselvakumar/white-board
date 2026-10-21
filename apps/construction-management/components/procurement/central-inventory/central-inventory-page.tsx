@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import {
@@ -51,6 +52,7 @@ import {
   canIn,
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
+import { StockLedgerSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const ALL = "all";
 
@@ -70,8 +72,6 @@ const MOVEMENTS = [
 function today(): string {
   return new Date().toLocaleDateString("en-CA");
 }
-
-const loading = <p className="text-muted-foreground text-sm">Loading…</p>;
 
 function FilterSelect({
   id,
@@ -266,8 +266,9 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
  * and as an Excel file (Central Inventory print).
  */
 export function CentralInventoryPage() {
-  // Filter changes keep the current list on screen while the next loads.
-  const [, startTransition] = useTransition();
+  // Filter changes keep the current list on screen, dimmed, while the next
+  // loads.
+  const [isPending, startTransition] = useTransition();
   const [locations, setLocationsNow] = useState<string[]>([]);
   const [categoryId, setCategoryNow] = useState(ALL);
   const [state, setStateNow] = useState(ALL);
@@ -357,7 +358,9 @@ export function CentralInventoryPage() {
           />
         </section>
 
-        <Positions data={data} />
+        <div className={cn(isPending && "opacity-60 transition-opacity")}>
+          <Positions data={data} />
+        </div>
 
         <section className="space-y-4">
           <h2 className="font-semibold">Stock Ledger</h2>
@@ -414,7 +417,13 @@ export function CentralInventoryPage() {
             chosen locations and category.
           </p>
           {shown == null ? null : (
-            <Suspense fallback={loading}>
+            <Suspense
+              fallback={
+                <StockLedgerSkeleton
+                  movements={MOVEMENTS.map(([, label]) => label)}
+                />
+              }
+            >
               <Ledger filter={shown} />
             </Suspense>
           )}

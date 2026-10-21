@@ -41,6 +41,7 @@ import {
 } from "@/src/tracking/domain/tracking-documents";
 
 import { PriorityChip } from "./issue-parts";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "none";
 
@@ -440,7 +441,7 @@ export function IssueForm({
           <FieldError message={errors.assigneeMemberId?.message} />
         </div>
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Suspense fallback={null}>
+          <Suspense fallback={<LocationPickerSkeleton />}>
             <Controller
               control={form.control}
               name="siteLocation"

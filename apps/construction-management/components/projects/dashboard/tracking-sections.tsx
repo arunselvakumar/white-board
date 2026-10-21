@@ -36,13 +36,12 @@ import {
 } from "@/src/tracking/domain/task-progress";
 import { TRACKING_PRIORITIES } from "@/src/tracking/domain/tracking-documents";
 
+import { Fact, Rupees, Section, denied } from "./dashboard-parts";
 import {
-  Fact,
-  Rupees,
-  Section,
+  MetricCaptionSkeleton,
+  MetricFigureSkeleton,
   SectionSkeleton,
-  denied,
-} from "./dashboard-parts";
+} from "./dashboard-skeletons";
 import {
   CountBars,
   Gauge,
@@ -311,7 +310,15 @@ export function TaskSection({
       aside={<SectionLink href={tasksPath(projectId)}>Tasks</SectionLink>}
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Tasks"
+          className="grid grid-cols-2 gap-2"
+          chart
+          facts={[
+            { label: "Tasks added", icon: ListChecks },
+            { label: "Delayed", icon: TriangleAlert },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -492,7 +499,14 @@ export function IssueSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Issues & Snags"
+          chart
+          facts={[
+            { label: "Issues raised", icon: ClipboardList },
+            { label: "Pending, delayed included", icon: Clock },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -575,7 +589,16 @@ export function InspectionSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Inspection Requests"
+          className="grid grid-cols-2 gap-2"
+          facts={[
+            { label: "Total", icon: SearchCheck },
+            { label: "Approved", icon: CircleCheck },
+            { label: "Pending for approval", icon: Clock },
+            { label: "Rejected", icon: CircleX },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -625,15 +648,24 @@ function TrackingTile({
         className="w-full"
         label={label}
         icon={icon}
-        value={count ?? <span className="text-muted-foreground">—</span>}
+        value={
+          count ??
+          (data == null && error == null ? (
+            <MetricFigureSkeleton />
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ))
+        }
         caption={
-          error != null
-            ? "Could not be loaded"
-            : data == null
-              ? "Loading…"
-              : count == null
-                ? needs
-                : caption
+          error != null ? (
+            "Could not be loaded"
+          ) : data == null ? (
+            <MetricCaptionSkeleton />
+          ) : count == null ? (
+            needs
+          ) : (
+            caption
+          )
         }
         render={
           count == null ? undefined : (

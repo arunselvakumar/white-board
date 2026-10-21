@@ -206,9 +206,13 @@ export const ChangeDuration: Story = {
 export const Loading: Story = {
   beforeEach: serve(() => new Promise<Response>(() => undefined)),
   play: async ({ canvas }) => {
-    await expect(
-      await canvas.findByLabelText("Loading dashboard"),
-    ).toHaveAttribute("aria-busy", "true");
+    await expect(await canvas.findByRole("status")).toHaveTextContent(
+      "Loading dashboard",
+    );
+    await expect(canvas.getByRole("status")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
     await expect(
       canvas.getByRole("heading", { name: "Dashboard" }),
     ).toBeVisible();

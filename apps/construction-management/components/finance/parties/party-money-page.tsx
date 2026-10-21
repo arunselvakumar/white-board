@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -29,15 +28,11 @@ import {
   PartyStatementTable,
 } from "./party-lists";
 import { money, PARTY_SCREENS, partyPaths } from "./party-money";
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-16 w-full" />
-    </div>
-  );
-}
+import {
+  OpeningCardSkeleton,
+  PartyCardsSkeleton,
+  PartyStatementSkeleton,
+} from "./parties-skeletons";
 
 /**
  * One party's money on the Project (CM-705, CM-706; CM-708 reuses it for
@@ -112,7 +107,7 @@ export function PartyMoneyPage({
           )
         }
       />
-      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+      <Suspense fallback={<OpeningCardSkeleton />}>
         <OpeningCard
           projectId={projectId}
           partyType={partyType}
@@ -126,7 +121,7 @@ export function PartyMoneyPage({
           <TabsTrigger value="statement">Statement</TabsTrigger>
         </TabsList>
         <TabsContent value="invoices">
-          <Suspense fallback={<ListSkeleton />}>
+          <Suspense fallback={<PartyCardsSkeleton label="Loading invoices" />}>
             <PartyInvoices
               projectId={projectId}
               partyType={partyType}
@@ -136,7 +131,7 @@ export function PartyMoneyPage({
           </Suspense>
         </TabsContent>
         <TabsContent value="payments">
-          <Suspense fallback={<ListSkeleton />}>
+          <Suspense fallback={<PartyCardsSkeleton label="Loading payments" />}>
             <PartyPayments
               projectId={projectId}
               partyType={partyType}
@@ -145,7 +140,7 @@ export function PartyMoneyPage({
           </Suspense>
         </TabsContent>
         <TabsContent value="statement">
-          <Suspense fallback={<ListSkeleton />}>
+          <Suspense fallback={<PartyStatementSkeleton />}>
             <PartyStatementTable
               projectId={projectId}
               partyType={partyType}

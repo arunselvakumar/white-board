@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 import { paymentCategoryOptionsQuery } from "@/src/queries/finance-lookups";
 
 const NONE = "__none__";
@@ -34,7 +34,8 @@ export function PaymentCategoryPicker({
   disabled?: boolean;
 }) {
   const query = useQuery(paymentCategoryOptionsQuery());
-  if (query.isPending) return <Skeleton className="h-10 w-full" />;
+  if (query.isPending)
+    return <SelectControlSkeleton label="Loading Payment Categories" />;
   const categories = query.data?.items ?? [];
   const items = [
     ...(optional ? [{ value: NONE, label: "No category" }] : []),

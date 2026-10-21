@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -40,6 +39,7 @@ import {
   useOpenPettyCashAccount,
   type PettyCashAccount,
 } from "@/src/queries/finance-petty-cash";
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 
 const schema = z.object({
   holderMemberId: z.string().min(1, "Choose the Team Member"),
@@ -152,7 +152,7 @@ export function OpenAccountDialog({
           <div className="space-y-1.5">
             <Label htmlFor={`${id}-holder`}>Team Member</Label>
             {members.isPending || accounts.isPending ? (
-              <Skeleton className="h-10 w-full" />
+              <SelectControlSkeleton label="Loading Team Members" />
             ) : (
               <Controller
                 control={form.control}

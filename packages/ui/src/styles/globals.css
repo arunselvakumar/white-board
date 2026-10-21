@@ -71,6 +71,9 @@
   --sidebar-accent-foreground: #16182a;
   --sidebar-border: #e8e9f1;
   --sidebar-ring: #595fae;
+  /* Skeleton bars: a light tint of the primary, so loading matches the palette (ADR-0047). */
+  --skeleton: color-mix(in srgb, var(--primary) 16%, transparent);
+  --skeleton-highlight: color-mix(in oklab, var(--card) 75%, transparent);
 }
 
 .dark {
@@ -105,6 +108,8 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #262a3a;
   --sidebar-ring: #7b82c4;
+  --skeleton: color-mix(in srgb, var(--primary) 20%, transparent);
+  --skeleton-highlight: color-mix(in oklab, var(--primary) 16%, transparent);
 }
 
 @theme inline {
@@ -139,6 +144,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-skeleton: var(--skeleton);
+  --color-skeleton-highlight: var(--skeleton-highlight);
   --color-brand-50: #f4f6fa;
   --color-brand-100: #e5e7f4;
   --color-brand-200: #d1d6ec;
@@ -161,6 +168,26 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Bars wait 150 ms before showing, so a fast load shows no flash. */
+  --animate-skeleton:
+    skeleton-in 200ms ease-out 150ms both,
+    skeleton-shimmer 1.8s ease-in-out 150ms infinite;
+
+  @keyframes skeleton-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* The band is fixed to the viewport, so every bar on a page sweeps as one wave. */
+  @keyframes skeleton-shimmer {
+    from {
+      background-position: -120vw 0;
+    }
+    to {
+      background-position: 20vw 0;
+    }
+  }
 }
 
 @layer base {

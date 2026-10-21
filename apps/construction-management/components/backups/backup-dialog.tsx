@@ -17,7 +17,6 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -30,6 +29,7 @@ import {
 
 import { BackupModulePicker } from "./backup-module-picker";
 import { BackupProgress } from "./backup-progress";
+import { BackupModulesSkeleton } from "./backups-skeletons";
 
 const schema = z
   .object({
@@ -57,16 +57,6 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   BACKUP_RANGE_INVALID: "to",
   BACKUP_CONTENT_REQUIRED: "includeData",
 };
-
-function OptionsSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-24 w-full" />
-    </div>
-  );
-}
 
 function CheckField({
   id,
@@ -176,7 +166,7 @@ export function BackupDialog({
             </DialogFooter>
           </>
         ) : options.isPending ? (
-          <OptionsSkeleton />
+          <BackupModulesSkeleton />
         ) : options.isError ? (
           <FormAlert message={fieldForCode(options.error, {}).message} />
         ) : modules.length === 0 ? (

@@ -46,6 +46,7 @@ import {
 } from "@/src/site-work/domain/hindrance";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "none";
 const max = (n: number) =>
@@ -504,7 +505,7 @@ export function HindranceForm({
           </div>
         )}
         <div className="space-y-1.5 sm:col-span-3">
-          <Suspense fallback={null}>
+          <Suspense fallback={<LocationPickerSkeleton />}>
             <Controller
               control={form.control}
               name="siteLocation"

@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { BadgeCheck, MoreHorizontal, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -39,6 +39,7 @@ import {
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
+import { MasterListPageSkeleton } from "@/components/masters/masters-skeletons";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   designationsQuery,
@@ -126,6 +127,34 @@ function DesignationRow({
 
 /** Masters → Designations (CM-112): search, Add, and Edit / Duplicate / Delete. */
 export function DesignationsList() {
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title="Designations"
+          meta={DESIGNATIONS_META}
+          actions={<AddDesignationLink />}
+        />
+      }
+    >
+      <DesignationsListContent />
+    </Suspense>
+  );
+}
+
+const DESIGNATIONS_META =
+  "Job titles and the Permission Template each one starts with.";
+
+function AddDesignationLink() {
+  return (
+    <Link href={`${DESIGNATIONS_PATH}/new`} className={buttonVariants()}>
+      <Plus aria-hidden="true" />
+      Add Designation
+    </Link>
+  );
+}
+
+function DesignationsListContent() {
   const { data } = useSuspenseQuery(designationsQuery);
   const duplicate = useDuplicateDesignation();
   const remove = useDeleteDesignation();
@@ -142,12 +171,7 @@ export function DesignationsList() {
       .sort((a, b) => byName.compare(a.name, b.name));
   }, [data.items, query]);
 
-  const addLink = (
-    <Link href={`${DESIGNATIONS_PATH}/new`} className={buttonVariants()}>
-      <Plus aria-hidden="true" />
-      Add Designation
-    </Link>
-  );
+  const addLink = <AddDesignationLink />;
 
   return (
     <div className="w-full p-6">
@@ -155,7 +179,7 @@ export function DesignationsList() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Designations"
-          meta="Job titles and the Permission Template each one starts with."
+          meta={DESIGNATIONS_META}
           actions={addLink}
         />
         {data.items.length === 0 ? (

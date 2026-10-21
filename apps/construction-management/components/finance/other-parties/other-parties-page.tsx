@@ -3,7 +3,13 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Handshake, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  useDeferredValue,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { formatMobile } from "@repo/auth/construction/react";
 import {
   AlertDialog,
@@ -28,7 +34,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -37,6 +42,8 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -53,6 +60,10 @@ import {
   OTHER_PARTIES_PATH,
   otherPartyEditPath,
 } from "./other-party-form-schema";
+import {
+  OTHER_PARTY_COLUMNS,
+  OtherPartyRowsSkeleton,
+} from "./other-parties-skeletons";
 
 /**
  * Masters → Other Parties (CM-704, ADR CM-0017 §11): parties that are not
@@ -63,6 +74,7 @@ export function OtherPartiesPage() {
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState<OtherPartyListFilter["cursor"]>(null);
   const deferredSearch = useDeferredValue(search);
+  const [paging, startPaging] = useTransition();
 
   const addLink = (
     <Link href={`${OTHER_PARTIES_PATH}/new`} className={buttonVariants()}>
@@ -95,21 +107,19 @@ export function OtherPartiesPage() {
             }}
           />
         </InputGroup>
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          }
-        >
-          <OtherPartyRows
-            filter={{ search: deferredSearch, cursor }}
-            onPage={setCursor}
-            addLink={addLink}
-          />
-        </Suspense>
+        <div className={cn(paging && "opacity-60 transition-opacity")}>
+          <Suspense fallback={<OtherPartyRowsSkeleton />}>
+            <OtherPartyRows
+              filter={{ search: deferredSearch, cursor }}
+              onPage={(next) => {
+                startPaging(() => {
+                  setCursor(next);
+                });
+              }}
+              addLink={addLink}
+            />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
@@ -173,13 +183,11 @@ function OtherPartyRows({
         <Table aria-label="Other Parties">
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>GSTIN</TableHead>
-              <TableHead>Projects</TableHead>
-              <TableHead className="w-32">
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              {OTHER_PARTY_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

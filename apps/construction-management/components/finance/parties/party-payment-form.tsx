@@ -17,9 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { SkeletonText } from "@repo/ui/components/skeleton-kit";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
@@ -58,6 +58,7 @@ import {
   PARTY_SCREENS,
   partyPaths,
 } from "./party-money";
+import { AllocationSkeleton } from "./parties-skeletons";
 
 const MODES = ["cash", "cheque", "online", "upi"] as const;
 type Mode = (typeof MODES)[number];
@@ -436,10 +437,13 @@ function PaymentForm({
         {fixedPartyId != null && (
           <div className="min-w-0 space-y-1">
             <p className="text-muted-foreground text-sm">{screen.label}</p>
-            <p className="truncate font-medium">
-              {fixedPartyName ??
-                (parties.isPending ? "…" : "Not on this Project")}
-            </p>
+            {fixedPartyName == null && parties.isPending ? (
+              <SkeletonText size="base" width="10rem" />
+            ) : (
+              <p className="truncate font-medium">
+                {fixedPartyName ?? "Not on this Project"}
+              </p>
+            )}
             <FieldError message={errors.partyId?.message} />
           </div>
         )}
@@ -658,7 +662,7 @@ function PaymentForm({
             Choose the {screen.label} to see their open invoices.
           </p>
         ) : outstanding.data == null ? (
-          <Skeleton className="h-16 w-full" />
+          <AllocationSkeleton />
         ) : (
           <AllocationTable
             invoices={outstanding.data.items}

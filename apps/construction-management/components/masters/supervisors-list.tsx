@@ -3,7 +3,7 @@
 import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, UserCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -23,6 +23,10 @@ import {
   byName,
 } from "./master-list-parts";
 import { SupervisorDialog } from "./supervisor-dialog";
+import {
+  MasterAddButtonSkeleton,
+  MasterListPageSkeleton,
+} from "./masters-skeletons";
 
 function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;
@@ -43,6 +47,26 @@ function details(supervisor: SupervisorItem): string | null {
  * Enable / Delete. Disabled Supervisors stay listed, muted.
  */
 export function SupervisorsList() {
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title="Supervisors"
+          meta={SUPERVISORS_META}
+          actions={<MasterAddButtonSkeleton label="Add Supervisor" />}
+          details
+        />
+      }
+    >
+      <SupervisorsListContent />
+    </Suspense>
+  );
+}
+
+const SUPERVISORS_META =
+  "The people on site who look after a group of Labours.";
+
+function SupervisorsListContent() {
   const { data } = useSuspenseQuery(supervisorsQuery);
   const command = useSupervisorCommand();
   const [query, setQuery] = useState("");
@@ -82,7 +106,7 @@ export function SupervisorsList() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Supervisors"
-          meta="The people on site who look after a group of Labours."
+          meta={SUPERVISORS_META}
           actions={addButton}
         />
         {data.items.length === 0 ? (

@@ -33,7 +33,7 @@ import { money, PARTY_SCREENS, partyPaths } from "./party-money";
 
 type Figure = Exclude<keyof PartyBalance, "party" | "assigned">;
 
-const COLUMNS: Record<PartyType, { key: Figure; label: string }[]> = {
+export const COLUMNS: Record<PartyType, { key: Figure; label: string }[]> = {
   contractor: [
     { key: "opening", label: "Opening" },
     { key: "invoiced", label: "Invoiced" },

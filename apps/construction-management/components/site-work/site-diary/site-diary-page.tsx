@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { BookOpen, ChevronLeft, ChevronRight, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -15,7 +15,6 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import {
@@ -42,17 +41,23 @@ import {
   WeatherIcon,
 } from "./site-diary-parts";
 import { SiteDiaryView } from "./site-diary-view";
+import {
+  DiaryDaySkeleton,
+  DiaryMonthSkeleton,
+} from "@/components/site-work/site-work-skeletons";
 
 function DiaryForDate({
   projectId,
   date,
   canCreate,
   canAttach,
+  className,
 }: {
   projectId: string;
   date: string;
   canCreate: boolean;
   canAttach: boolean;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(siteDiaryOnDateQuery(projectId, date));
   if (data.diary == null)
@@ -81,11 +86,13 @@ function DiaryForDate({
       </Empty>
     );
   return (
-    <SiteDiaryView
-      diary={data.diary}
-      editHref={`${siteDiaryPath(projectId)}/${data.diary.id}/edit`}
-      canAttach={canAttach}
-    />
+    <div className={cn("min-w-0", className)}>
+      <SiteDiaryView
+        diary={data.diary}
+        editHref={`${siteDiaryPath(projectId)}/${data.diary.id}/edit`}
+        canAttach={canAttach}
+      />
+    </div>
   );
 }
 
@@ -94,11 +101,13 @@ function MonthDays({
   month,
   selected,
   onSelect,
+  className,
 }: {
   projectId: string;
   month: string;
   selected: string;
   onSelect: (date: string) => void;
+  className?: string;
 }) {
   const { from, to } = monthRange(month);
   const { data } = useSuspenseQuery(siteDiaryDaysQuery(projectId, from, to));
@@ -109,7 +118,10 @@ function MonthDays({
       </p>
     );
   return (
-    <ul aria-label={`Diaries in ${formatMonth(month)}`} className="space-y-1">
+    <ul
+      aria-label={`Diaries in ${formatMonth(month)}`}
+      className={cn("space-y-1", className)}
+    >
       {data.items.map((day) => (
         <li key={day.id}>
           <Button
@@ -182,6 +194,10 @@ export function SiteDiaryPage({
     router.replace(siteDiaryPath(projectId, clamped), { scroll: false });
   };
 
+  // A new day or month keeps the old one on screen, dimmed, until it loads.
+  const shownDate = useDeferredValue(date);
+  const shownMonth = useDeferredValue(month);
+
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -245,18 +261,13 @@ export function SiteDiaryPage({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-        <Suspense
-          fallback={
-            <div className="space-y-3" aria-busy="true">
-              <Skeleton className="h-8 w-64" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-32 w-full" />
-            </div>
-          }
-        >
+        <Suspense fallback={<DiaryDaySkeleton />}>
           <DiaryForDate
             projectId={projectId}
-            date={date}
+            date={shownDate}
+            className={cn(
+              shownDate !== date && "opacity-60 transition-opacity",
+            )}
             canCreate={canCreate}
             canAttach={canAttach}
           />
@@ -289,17 +300,13 @@ export function SiteDiaryPage({
               <ChevronRight aria-hidden="true" />
             </Button>
           </div>
-          <Suspense
-            fallback={
-              <div className="space-y-1" aria-busy="true">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<DiaryMonthSkeleton />}>
             <MonthDays
               projectId={projectId}
-              month={month}
+              month={shownMonth}
+              className={cn(
+                shownMonth !== month && "opacity-60 transition-opacity",
+              )}
               selected={date}
               onSelect={go}
             />

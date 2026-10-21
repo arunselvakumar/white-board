@@ -8,6 +8,7 @@ import {
   worksheetAttendanceQuery,
   type WorksheetAttendance,
 } from "@/src/queries/worksheets";
+import { AttendancePanelSkeleton } from "@/components/site-work/site-work-skeletons";
 
 /**
  * "Attendance on <date>" beside the headcounts (CM-0016 §6): the
@@ -31,12 +32,7 @@ export function WorksheetAttendancePanel({
     worksheetAttendanceQuery(projectId, date, excludeId),
   );
   const title = `Attendance on ${formatDate(date)}`;
-  if (isPending)
-    return (
-      <p className="text-muted-foreground rounded-lg border p-3 text-sm">
-        Loading attendance…
-      </p>
-    );
+  if (isPending) return <AttendancePanelSkeleton title={title} />;
   if (isError)
     return (
       <p className="text-muted-foreground rounded-lg border p-3 text-sm">

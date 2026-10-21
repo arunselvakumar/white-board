@@ -1,11 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { inquiriesPath, inquiryQuery } from "@/src/queries/sales-inquiries";
 
 import { InquiryForm } from "./inquiry-form";
+import { InquiryFormSkeleton } from "./inquiries-skeletons";
 
 /** Add an inquiry with the full form (CM-1003). */
 export function InquiryNew({ projectId }: { projectId: string }) {
@@ -17,7 +19,9 @@ export function InquiryNew({ projectId }: { projectId: string }) {
           title="Add Inquiry"
         />
       </div>
-      <InquiryForm projectId={projectId} />
+      <Suspense fallback={<InquiryFormSkeleton />}>
+        <InquiryForm projectId={projectId} />
+      </Suspense>
     </div>
   );
 }
@@ -40,7 +44,9 @@ export function InquiryEdit({
         />
       </div>
       {data.actions.edit ? (
-        <InquiryForm projectId={projectId} inquiry={data} />
+        <Suspense fallback={<InquiryFormSkeleton />}>
+          <InquiryForm projectId={projectId} inquiry={data} />
+        </Suspense>
       ) : (
         <p className="text-muted-foreground max-w-4xl text-sm">
           You can see this inquiry but not edit it.

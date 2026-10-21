@@ -3,7 +3,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, ReceiptText } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import {
@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -32,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { accountLabel } from "@/components/finance/account-picker";
@@ -56,6 +56,10 @@ import {
   modeText,
   STATUS_LABELS,
 } from "./other-expense-parts";
+import {
+  OTHER_EXPENSE_COLUMNS,
+  OtherExpenseRowsSkeleton,
+} from "./other-expenses-skeletons";
 
 const ALL = "all";
 
@@ -116,9 +120,12 @@ export function OtherExpensesList({ projectId }: { projectId: string }) {
     useState<OtherExpenseFilters>(NO_EXPENSE_FILTERS);
   const [cursor, setCursor] = useState<OtherExpenseCursor>(null);
   const [bulk, setBulk] = useState(false);
+  const [updating, startTransition] = useTransition();
   const update = (next: Partial<OtherExpenseFilters>) => {
-    setFilters((current) => ({ ...current, ...next }));
-    setCursor(null);
+    startTransition(() => {
+      setFilters((current) => ({ ...current, ...next }));
+      setCursor(null);
+    });
   };
   const newHref = can("create") ? otherExpensesPath(projectId, "/new") : null;
 
@@ -216,26 +223,24 @@ export function OtherExpensesList({ projectId }: { projectId: string }) {
           }}
         />
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
-        <ExpenseRows
-          projectId={projectId}
-          filters={filters}
-          cursor={cursor}
-          bulk={bulk}
-          canApprove={can("approve")}
-          canReject={can("reject")}
-          newHref={newHref}
-          onPage={setCursor}
-        />
-      </Suspense>
+      <div className={cn(updating && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<OtherExpenseRowsSkeleton />}>
+          <ExpenseRows
+            projectId={projectId}
+            filters={filters}
+            cursor={cursor}
+            bulk={bulk}
+            canApprove={can("approve")}
+            canReject={can("reject")}
+            newHref={newHref}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }
@@ -411,12 +416,11 @@ function ExpenseRows({
                   <span className="sr-only">Select</span>
                 </TableHead>
               )}
-              <TableHead>Expense</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Paid to</TableHead>
-              <TableHead>Paid from</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Status</TableHead>
+              {OTHER_EXPENSE_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

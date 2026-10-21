@@ -5,7 +5,6 @@ import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -31,6 +30,7 @@ import {
 import { addDays, daysBetween } from "@/src/shared-kernel/calendar-date";
 
 import { ACCOUNT_KIND_LABELS, SignedAmount } from "./account-format";
+import { LEDGER_COLUMNS, LedgerSkeleton } from "./accounts-skeletons";
 
 /** The server's limit (`statementPeriod`): at most 366 days, from ≤ to. */
 const MAX_SPAN_DAYS = 365;
@@ -99,7 +99,7 @@ export function AccountLedger({
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-5xl space-y-6">
-        <Suspense fallback={<LedgerSkeleton />}>
+        <Suspense fallback={<LedgerSkeleton back={back} />}>
           <LedgerBody
             accountId={accountId}
             back={back}
@@ -112,16 +112,6 @@ export function AccountLedger({
           />
         </Suspense>
       </div>
-    </div>
-  );
-}
-
-function LedgerSkeleton() {
-  return (
-    <div className="space-y-3" aria-busy="true">
-      <Skeleton className="h-10 w-64" />
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-64 w-full" />
     </div>
   );
 }
@@ -243,12 +233,11 @@ function LedgerBody({
             <Table aria-label="Ledger">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Particulars</TableHead>
-                  <TableHead>Mode</TableHead>
-                  <TableHead className="text-right">Credit</TableHead>
-                  <TableHead className="text-right">Debit</TableHead>
-                  <TableHead className="text-right">Balance</TableHead>
+                  {LEDGER_COLUMNS.map((column, index) => (
+                    <TableHead key={index} className={column.className}>
+                      {column.header}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>

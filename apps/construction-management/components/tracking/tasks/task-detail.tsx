@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/components/locations/location-picker";
@@ -63,6 +62,11 @@ import {
   TaskStatusBadge,
   varianceText,
 } from "./task-parts";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import {
+  FeedSkeleton,
+  UpdatesSkeleton,
+} from "@/components/tracking/tracking-skeletons";
 
 function problemOf(caught: unknown): string {
   return caught instanceof QueryHttpError
@@ -347,10 +351,6 @@ function ActivityFeed({ task }: { task: Detail }) {
   );
 }
 
-function Loading() {
-  return <Skeleton className="h-16 w-full" />;
-}
-
 /**
  * One task (CM-802): Task No., status and progress; planned, baseline and
  * actual dates with durations and variance; completed work and earned
@@ -553,7 +553,7 @@ export function TaskDetail({
             {task.siteLocation == null ? (
               "—"
             ) : (
-              <Suspense fallback="…">
+              <Suspense fallback={<FactValueSkeleton />}>
                 <span className="flex flex-col">
                   <LocationLabel
                     projectId={projectId}
@@ -674,14 +674,14 @@ export function TaskDetail({
 
       {!task.isSummary && (
         <Section title="Progress">
-          <Suspense fallback={<Loading />}>
+          <Suspense fallback={<UpdatesSkeleton label="Loading progress" />}>
             <ProgressList task={task} projectId={projectId} />
           </Suspense>
         </Section>
       )}
 
       <Section title="Activity">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<FeedSkeleton />}>
           <ActivityFeed task={task} />
         </Suspense>
       </Section>

@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -48,6 +47,7 @@ import {
   otherPartyPayload,
   type OtherPartyFormValues,
 } from "./other-party-form-schema";
+import { ProjectsChecklistSkeleton } from "./other-parties-skeletons";
 
 function ProjectsChecklist({
   value,
@@ -272,7 +272,7 @@ export function OtherPartyForm({
             recorded on these Projects.
           </p>
         </div>
-        <Suspense fallback={<Skeleton className="h-11 w-full" />}>
+        <Suspense fallback={<ProjectsChecklistSkeleton />}>
           <Controller
             name="projectIds"
             control={form.control}

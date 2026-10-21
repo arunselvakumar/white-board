@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { SiteDiaryPage } from "@/components/site-work/site-diary/site-diary-page";
+import { SiteDiaryPageSkeleton } from "@/components/site-work/site-work-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Site Diary" };
 
@@ -19,9 +21,11 @@ export default async function SiteDiaryRoute({
   if (!(await viewerCan("site_work.site_diary", "read", { projectId: id })))
     return <ProjectNoAccess what="the Site Diary" />;
   return (
-    <SiteDiaryPage
-      projectId={id}
-      initialDate={typeof date === "string" ? date : undefined}
-    />
+    <QuerySuspense fallback={<SiteDiaryPageSkeleton />}>
+      <SiteDiaryPage
+        projectId={id}
+        initialDate={typeof date === "string" ? date : undefined}
+      />
+    </QuerySuspense>
   );
 }

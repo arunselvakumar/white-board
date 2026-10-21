@@ -28,7 +28,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
@@ -39,6 +38,8 @@ import {
   useSetProjectResources,
   type ProjectResource,
 } from "@/src/queries/project-resources";
+
+import { ResourcePickerSkeleton } from "./resources-skeletons";
 
 import type { ResourceSectionInfo } from "./resource-sections";
 
@@ -216,16 +217,6 @@ function PickerBody({
   );
 }
 
-function PickerSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-9 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
 /**
  * Edit one section of a Project's Resources (CM-406): a searchable list
  * of the Company's active parties of that kind, ticked for those on the
@@ -254,7 +245,7 @@ export function ResourcePickerDialog({
           <DialogDescription>{section.description}</DialogDescription>
         </DialogHeader>
         {open && (
-          <Suspense fallback={<PickerSkeleton />}>
+          <Suspense fallback={<ResourcePickerSkeleton label={section.title} />}>
             <PickerBody
               projectId={projectId}
               section={section}

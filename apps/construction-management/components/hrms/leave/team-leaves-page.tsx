@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -12,13 +12,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 import { LEAVE_SESSION_LABELS } from "@/src/hrms/domain/leave-request";
 import {
@@ -34,6 +34,7 @@ import {
   LeaveRequestRow,
   StatusBadge,
 } from "./leave-request-parts";
+import { TeamLeavesSkeleton } from "@/components/hrms/hrms-skeletons";
 
 function monthRange(month: string): { from: string; to: string } {
   const [year, number] = month.split("-").map(Number) as [number, number];
@@ -85,6 +86,7 @@ function Nothing({
 export function TeamLeavesPage({ today }: { today?: string }) {
   const { data: options } = useSuspenseQuery(leaveOptionsQuery);
   const [month, setMonth] = useState((today ?? localToday()).slice(0, 7));
+  const [updating, startTransition] = useTransition();
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
@@ -105,7 +107,9 @@ export function TeamLeavesPage({ today }: { today?: string }) {
                 size="icon"
                 aria-label="Previous month"
                 onClick={() => {
-                  setMonth(shiftMonth(month, -1));
+                  startTransition(() => {
+                    setMonth(shiftMonth(month, -1));
+                  });
                 }}
               >
                 <ChevronLeft />
@@ -122,7 +126,9 @@ export function TeamLeavesPage({ today }: { today?: string }) {
                 size="icon"
                 aria-label="Next month"
                 onClick={() => {
-                  setMonth(shiftMonth(month, 1));
+                  startTransition(() => {
+                    setMonth(shiftMonth(month, 1));
+                  });
                 }}
               >
                 <ChevronRight />
@@ -139,26 +145,21 @@ export function TeamLeavesPage({ today }: { today?: string }) {
                 <TabsTrigger value="report">Report</TabsTrigger>
               ) : null}
             </TabsList>
-            <Suspense
-              fallback={
-                <div className="space-y-2" aria-busy="true">
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                </div>
-              }
-            >
-              <TabsContent value="calendar">
-                <ByDay month={month} />
-              </TabsContent>
-              <TabsContent value="list">
-                <TeamList month={month} />
-              </TabsContent>
-              {options.permissions.report ? (
-                <TabsContent value="report">
-                  <Report month={month} />
+            <div className={cn(updating && "opacity-60 transition-opacity")}>
+              <Suspense fallback={<TeamLeavesSkeleton />}>
+                <TabsContent value="calendar">
+                  <ByDay month={month} />
                 </TabsContent>
-              ) : null}
-            </Suspense>
+                <TabsContent value="list">
+                  <TeamList month={month} />
+                </TabsContent>
+                {options.permissions.report ? (
+                  <TabsContent value="report">
+                    <Report month={month} />
+                  </TabsContent>
+                ) : null}
+              </Suspense>
+            </div>
           </Tabs>
         ) : (
           <Nothing

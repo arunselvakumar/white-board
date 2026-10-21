@@ -18,7 +18,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -29,6 +28,10 @@ import {
 
 import { PartyStatementTable } from "./party-lists";
 import { money } from "./party-money";
+import {
+  PartyBalancesWorkspaceSkeleton,
+  PartyStatementSkeleton,
+} from "./parties-skeletons";
 
 type StatementTarget = {
   partyId: string;
@@ -61,14 +64,7 @@ export function PartyBalanceWorkspace({
         What each Other Party owes the Company, or is owed, across Projects. You
         see the Projects where you can view Parties.
       </p>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<PartyBalancesWorkspaceSkeleton />}>
         <Balances partyType={partyType} />
       </Suspense>
     </div>
@@ -195,7 +191,7 @@ function Balances({ partyType }: { partyType: PartyType }) {
           </SheetHeader>
           <div className="px-4 pb-6">
             {statement != null && (
-              <Suspense fallback={<Skeleton className="h-24 w-full" />}>
+              <Suspense fallback={<PartyStatementSkeleton />}>
                 <PartyStatementTable
                   projectId={statement.projectId}
                   partyType={partyType}
