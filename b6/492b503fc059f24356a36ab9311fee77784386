@@ -1,0 +1,23 @@
+packages/db/construction/prisma/schema/base.prisma
+  s_89c39be62ab7cf::t_c3bedc96c78140 4-9
+packages/db/whiteboard/prisma/schema/base.prisma
+  s_89c39be62ab7cf::t_82e50d21bd6843 4-9
+.github/workflows/deploy.yml
+  s_89c39be62ab7cf::t_410427add3dab2 153-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b6492b503fc059f24356a36ab9311fee77784386",
+  "prompts": {},
+  "sessions": {
+    "s_89c39be62ab7cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c56243e-2634-4b50-a8dc-fa96ba6afe53",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
