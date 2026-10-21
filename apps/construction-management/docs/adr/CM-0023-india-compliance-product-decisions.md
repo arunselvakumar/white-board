@@ -66,7 +66,7 @@ Parts 2 and 3 depend on part 1's foundation (CM-1101), not on its billing ticket
 - The BOQ can be **imported from Excel** (sections and items in one sheet).
 - A BOQ item can be edited freely until a **checked measurement** names it. After that, quantity and rate change only through a **Variation**: an extra item, or a change of quantity or rate with a reason, numbered by a sequence rule and approved with the menu's Approve flag. The BOQ shows the original and the current quantity, and each item lists its variations.
 - Measuring more than an item's current quantity is allowed on the client side and is flagged as a **deviation**, with a list of the items that need a variation. Contracts usually allow ±25 %, and the figure is a setting.
-- Menu **`contracts.boq`** ("BOQ", Project, CRUDAJPOFEI). Rates and amounts need **Financial**; without it the BOQ shows quantities only.
+- Menu **`contracts.boq`** ("BOQ", Project, CRUDAJPNOFEI). Rates and amounts need **Financial**; without it the BOQ shows quantities only.
 
 ### 5. Work orders
 

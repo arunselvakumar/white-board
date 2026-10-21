@@ -161,7 +161,7 @@ const DEFINITIONS = [
   ["finance.gst", "GST", "payment_accounting", "ROE", false],
   ["finance.tds", "TDS", "payment_accounting", "CRUDOE", false],
   // Contracts & Billing (ADR CM-0023 §3–§7): legacy had no BOQ or RA bills.
-  ["contracts.boq", "BOQ", "contracts", "CRUDAJPOFEI", true],
+  ["contracts.boq", "BOQ", "contracts", "CRUDAJPNOFEI", true],
   ["contracts.work_orders", "Work Order", "contracts", "CRUDAJPNOF", true],
   ["contracts.measurements", "Measurement Book", "contracts", "CRUDAPO", true],
   [

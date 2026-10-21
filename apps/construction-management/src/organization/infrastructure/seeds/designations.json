@@ -379,6 +379,7 @@
           "reject",
           "print",
           "report",
+          "notification",
           "financial",
           "export",
           "import"

@@ -53,7 +53,7 @@ describe("GET /api/construction/contracts/access (CM-1101)", () => {
       "contracts.client_bills",
       "contracts.items",
     ]);
-    // BOQ is CRUDAJPOFEI (CM-0023 §4); Measurement Book has no Financial.
+    // BOQ is CRUDAJPNOFEI (CM-0023 §4); Measurement Book has no Financial.
     expect(body.menus["contracts.boq"]).toEqual([
       "create",
       "read",
@@ -63,6 +63,7 @@ describe("GET /api/construction/contracts/access (CM-1101)", () => {
       "reject",
       "print",
       "report",
+      "notification",
       "financial",
       "export",
       "import",

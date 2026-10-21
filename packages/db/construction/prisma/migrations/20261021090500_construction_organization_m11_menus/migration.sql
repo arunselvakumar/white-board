@@ -21,7 +21,7 @@
 -- ever removed and running it again changes nothing.
 
 WITH "grants" ("designation", "menu", "flags") AS (VALUES
-  ('Admin', 'contracts.boq', 14591),
+  ('Admin', 'contracts.boq', 15103),
   ('Admin', 'contracts.work_orders', 2815),
   ('Admin', 'contracts.measurements', 223),
   ('Admin', 'contracts.contractor_bills', 2815),
@@ -47,7 +47,7 @@ WITH "grants" ("designation", "menu", "flags") AS (VALUES
   ('Accountant', 'sales.rera', 194),
   ('Project Manager', 'masters.clients', 2),
   ('Project Manager', 'contracts.items', 7),
-  ('Project Manager', 'contracts.boq', 14583),
+  ('Project Manager', 'contracts.boq', 15095),
   ('Project Manager', 'contracts.work_orders', 2807),
   ('Project Manager', 'contracts.measurements', 215),
   ('Project Manager', 'contracts.contractor_bills', 2807),

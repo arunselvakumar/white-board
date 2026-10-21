@@ -169,7 +169,7 @@ function viewerFlags(access: MemberAccess, projectId: string): Flag[] {
 
 /**
  * A Project's BOQ (CM-1103, ADR CM-0023 §4; menu `contracts.boq`,
- * CRUDAJPOFEI, Project-level): sections and items, totals beside the Order
+ * CRUDAJPNOFEI, Project-level): sections and items, totals beside the Order
  * Value, the deviation list, the Company's deviation limit and the Excel
  * import. Variations are in `variation-handlers.ts`. UoMs, Wings and
  * Locations come through the `ContractsDirectory`.
