@@ -1,0 +1,59 @@
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/edit/page.tsx
+  s_353c13142e25d9::t_1718537aad1509 7,25-27
+apps/construction-management/app/app/projects/[id]/inspections/[inspectionId]/page.tsx
+  s_353c13142e25d9::t_02f8c1b01e0efb 7,25
+apps/construction-management/app/app/projects/[id]/inspections/new/page.tsx
+  s_353c13142e25d9::t_b80e084eca05de 10,38-50
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/edit/page.tsx
+  s_353c13142e25d9::t_6715ae32dc9cf2 6-7,20-26
+apps/construction-management/app/app/projects/[id]/issues/[issueId]/page.tsx
+  s_353c13142e25d9::t_64b5b20e778d99 6-7,20-24
+apps/construction-management/app/app/projects/[id]/issues/new/page.tsx
+  s_353c13142e25d9::t_60137324f3500c 6-7,20-28
+apps/construction-management/app/app/projects/[id]/tasks/[taskId]/edit/page.tsx
+  s_353c13142e25d9::t_c37bab7e4cb5de 6-7,20-26
+apps/construction-management/app/app/projects/[id]/tasks/[taskId]/page.tsx
+  s_353c13142e25d9::t_e7ed9e0a0eaa3b 6-7,20-24
+apps/construction-management/app/app/projects/[id]/tasks/new/page.tsx
+  s_353c13142e25d9::t_7dd8c848215333 6-7,26-32,34-43
+apps/construction-management/app/app/projects/[id]/tasks/page.tsx
+  s_353c13142e25d9::t_57019340f8c9e6 6-7,24-33
+apps/construction-management/components/site-work/site-work-skeletons.tsx
+  s_353c13142e25d9::t_62cb38d18546d9 478
+apps/construction-management/components/tracking/inspections/inspection-detail.tsx
+  s_353c13142e25d9::t_aa82dfda4f6de9 55,388
+apps/construction-management/components/tracking/inspections/inspection-form.tsx
+  s_353c13142e25d9::t_5bde91b38b5c6b 53,515
+apps/construction-management/components/tracking/inspections/inspections-list.tsx
+  s_353c13142e25d9::t_b84a46c856acc3 27,65-68,146-147,181,189,191,333,345,468
+apps/construction-management/components/tracking/issues/issue-detail.tsx
+  s_353c13142e25d9::t_daa3586d1ea138 61-62,469,499-506
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_353c13142e25d9::t_97a4b7c14d1c20 44,444
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_353c13142e25d9::t_59669b58a95cea 28,64-67,138-139,177,185-189,202,361,370,467
+apps/construction-management/components/tracking/tasks/task-detail.tsx
+  s_353c13142e25d9::t_d0403d76a62170 65-69,556,677,684
+apps/construction-management/components/tracking/tasks/task-form.tsx
+  s_353c13142e25d9::t_f70be9ddd10732 56,565
+apps/construction-management/components/tracking/tasks/tasks-page.tsx
+  s_353c13142e25d9::t_68646caf35f92c 6,14,26-30,48-52,81,95-99,103,109-114
+apps/construction-management/components/tracking/tracking-skeletons.tsx
+  s_353c13142e25d9::t_c651344b91dc98 1-489
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ceab23f813a239489b7de14982be60b3942fece6",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
