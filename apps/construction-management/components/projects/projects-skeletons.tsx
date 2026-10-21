@@ -5,6 +5,7 @@ import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
+  FormSkeleton,
   MetricCardSkeleton,
   MetricGridSkeleton,
   SkeletonGroup,
@@ -266,6 +267,109 @@ export function ProjectAmenitiesSkeleton() {
             </section>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+const FORM_CARD = "bg-card rounded-xl border";
+
+/** A `FormCard` / `CollapsibleFormCard` header: icon square and the real title. */
+function FormCardHeaderSkeleton({
+  title,
+  closed = false,
+}: {
+  title: string;
+  closed?: boolean;
+}) {
+  return (
+    <div
+      className={
+        closed
+          ? "flex items-center gap-3 px-4 py-3 sm:px-5"
+          : "flex items-center gap-3 border-b px-4 py-3 sm:px-5"
+      }
+    >
+      <Skeleton className="size-8 shrink-0 rounded-lg" />
+      <span className="text-base font-semibold">{title}</span>
+      {closed ? <SkeletonText width="5rem" className="ml-auto" /> : null}
+    </div>
+  );
+}
+
+/**
+ * The Project form while the Project or the Projects list loads: the open
+ * Project card with its real labels, the closed Client, Contract and
+ * Additional details cards, and the buttons.
+ */
+export function ProjectFormSkeleton() {
+  return (
+    <SkeletonGroup label="Loading the Project" className="space-y-4">
+      <div className={FORM_CARD}>
+        <FormCardHeaderSkeleton title="Project" />
+        <div className="space-y-4 px-4 pt-4 pb-5 sm:px-5">
+          <div className="flex items-center gap-3 border-b pb-4">
+            <Skeleton className="size-16 shrink-0 rounded-lg" />
+            <div className="flex-1 space-y-1">
+              <span className="text-sm font-medium">Project logo</span>
+              <SkeletonText size="xs" width="60%" />
+            </div>
+          </div>
+          <FormSkeleton
+            columns={2}
+            actions={0}
+            gridClassName="gap-4"
+            controlClassName="h-10"
+            fields={[
+              { label: "Project name", wide: true },
+              { label: "Project Type", control: "select" },
+              { label: "Status", control: "select" },
+              { label: "Start date" },
+              { label: "Expected completion" },
+              { label: "State", control: "select" },
+              { label: "Project address", wide: true },
+            ]}
+          />
+        </div>
+      </div>
+      {["Client", "Contract", "Additional details"].map((title) => (
+        <div key={title} className={FORM_CARD}>
+          <FormCardHeaderSkeleton title={title} closed />
+        </div>
+      ))}
+      <div className="flex flex-wrap gap-2 pt-2">
+        <Skeleton className="h-9 w-28" />
+        <Skeleton className="h-9 w-20" />
+      </div>
+    </SkeletonGroup>
+  );
+}
+
+/** New Project: the real header over the form skeleton. */
+export function NewProjectSkeleton() {
+  return (
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl space-y-6">
+        <PageHeader
+          back={{ label: "Projects", href: PROJECTS_PATH }}
+          title="New Project"
+          meta="Name it now; client, contract and dates can follow."
+        />
+        <ProjectFormSkeleton />
+      </div>
+    </div>
+  );
+}
+
+/** Edit Project inside the project shell: the real heading over the form skeleton. */
+export function EditProjectSkeleton() {
+  return (
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl space-y-8">
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold">Edit Project</h2>
+          <ProjectFormSkeleton />
+        </section>
       </div>
     </div>
   );

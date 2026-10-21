@@ -367,8 +367,10 @@ type SkeletonField = {
 
 function FormSkeletonControl({
   control,
+  className,
 }: {
   control: NonNullable<SkeletonField["control"]>;
+  className?: string;
 }) {
   switch (control) {
     case "textarea":
@@ -379,7 +381,7 @@ function FormSkeletonControl({
       return null;
     case "input":
     case "select":
-      return <Skeleton className="h-9 w-full" />;
+      return <Skeleton className={cn("h-9 w-full", className)} />;
   }
 }
 
@@ -391,11 +393,17 @@ function FormSkeleton({
   fields,
   columns = 1,
   actions = 1,
+  gridClassName,
+  controlClassName,
   label,
   className,
 }: {
   fields: number | SkeletonField[];
-  columns?: 1 | 2;
+  columns?: 1 | 2 | 3;
+  /** The loaded form's field grid gap, e.g. "gap-4". */
+  gridClassName?: string;
+  /** The loaded inputs' height, e.g. "h-10" or "h-8". */
+  controlClassName?: string;
   /** Buttons in the footer; 0 for none. */
   actions?: number;
   label?: string;
@@ -407,7 +415,14 @@ function FormSkeleton({
       : fields;
   return (
     <SkeletonGroup label={label} className={cn("space-y-6", className)}>
-      <div className={cn("grid gap-5", columns === 2 && "sm:grid-cols-2")}>
+      <div
+        className={cn(
+          "grid gap-5",
+          columns === 2 && "sm:grid-cols-2",
+          columns === 3 && "sm:grid-cols-2 lg:grid-cols-3",
+          gridClassName,
+        )}
+      >
         {list.map((field, index) => {
           const control = field.control ?? "input";
           const inline =
@@ -442,7 +457,10 @@ function FormSkeleton({
                 />
               ) : null}
               {text}
-              <FormSkeletonControl control={control} />
+              <FormSkeletonControl
+                control={control}
+                className={controlClassName}
+              />
             </div>
           );
         })}
