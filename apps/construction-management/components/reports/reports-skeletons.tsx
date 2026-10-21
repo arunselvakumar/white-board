@@ -67,15 +67,14 @@ export function ReportCardGridSkeleton({
 export function RecentReportsSkeleton({
   rows = 3,
   className,
+  label = "Loading recent reports",
 }: {
   rows?: number;
   className?: string;
+  label?: string;
 }) {
   return (
-    <SkeletonGroup
-      label="Loading recent reports"
-      className={cn("block", className)}
-    >
+    <SkeletonGroup label={label} className={cn("block", className)}>
       <ul className="divide-y rounded-xl border">
         {Array.from({ length: rows }, (_, row) => (
           <li
@@ -100,6 +99,37 @@ export function RecentReportsSkeleton({
           </li>
         ))}
       </ul>
+    </SkeletonGroup>
+  );
+}
+
+/** A report group while the catalogue loads: heading, description, cards. */
+function ReportGroupSkeleton({ cards }: { cards: number }) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <SkeletonText size="lg" width="10rem" />
+        <SkeletonText width="min(28rem, 80%)" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: cards }, (_, index) => (
+          <ReportCardSkeleton key={index} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The Reports tab or Central Reports while the catalogue loads. */
+export function ReportGroupsSkeleton({
+  label = "Loading reports",
+}: {
+  label?: string;
+}) {
+  return (
+    <SkeletonGroup label={label} className="block space-y-8">
+      <ReportGroupSkeleton cards={3} />
+      <ReportGroupSkeleton cards={2} />
     </SkeletonGroup>
   );
 }

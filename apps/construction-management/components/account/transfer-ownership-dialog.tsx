@@ -29,6 +29,7 @@ import { fieldForCode } from "@/lib/server-errors";
 import { accountQueries, transferOwnership } from "@/src/queries/account";
 
 import { ActionCodeStep } from "./action-code-step";
+import { CandidateSelectSkeleton } from "./account-skeletons";
 
 const schema = z.object({
   memberId: z.string().min(1, "Choose the new Owner"),
@@ -113,7 +114,7 @@ export function TransferOwnershipDialog({
           <div className="min-w-0 space-y-1.5">
             <Label htmlFor="new-owner">New Owner</Label>
             {candidates.isPending ? (
-              <p className="text-muted-foreground text-sm">Loading…</p>
+              <CandidateSelectSkeleton />
             ) : items.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 No one can take over yet. The new Owner must be an active Team
