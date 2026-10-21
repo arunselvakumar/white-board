@@ -1,0 +1,37 @@
+apps/construction-management/src/hrms/domain/company-time.test.ts
+  s_a8678b94facc4f::t_71143c90f1d9ed 38-52
+apps/construction-management/src/hrms/domain/company-time.ts
+  s_a8678b94facc4f::t_db6a4af0ccb57b 5,25,41,48
+apps/construction-management/src/sales/domain/inquiry.test.ts
+  s_a8678b94facc4f::t_9d7ee6f89aff6e 107-123
+apps/construction-management/src/sales/domain/sales-time.ts
+  s_a8678b94facc4f::t_a1df856de774b1 1-2,17-21,29,37
+apps/construction-management/src/shared-kernel/zone-time.test.ts
+  s_4465195d2faea3::t_4c3f822eedde4c 1-63
+apps/construction-management/src/shared-kernel/zone-time.ts
+  s_4465195d2faea3::t_165ee2757fdfe1 1-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ceace4d77d22b69dff26f1cd2b2bf4f82e2d9431",
+  "prompts": {},
+  "sessions": {
+    "s_4465195d2faea3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af71900d6f0067e31",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_a8678b94facc4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7790fc35-b9f4-479d-8a40-d5cadaae189e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
