@@ -52,6 +52,7 @@ Every other question is answered here with the default we recommend; the M10 han
 ### 4. Follow-ups, Overdue and Call Activity (open questions 9, 10)
 
 - A **follow-up** records something that happened: an **Activity** (Call, Site visit, Meeting, WhatsApp, Email, Other), **Done on** (date and time, not in the future, back-dated window `inquiry_follow_up`), **Remarks**, an optional **stage move**, and the **next follow-up** (date and optional time after Done on, or none). Saving it sets the inquiry's next follow-up and stage.
+- **The newest follow-up decides the next step.** A follow-up whose Done on is before another live follow-up's (an older call keyed in late) is recorded, but it does not change the inquiry's next follow-up or stage.
 - Follow-ups are added only to Open inquiries. They are **append-only**: no edit. An Inquiry Delete holder can remove one entered by mistake (soft, audited); the inquiry's next follow-up does not change.
 - **Overdue** = Open inquiries whose next follow-up is before now. The list filters by **Overdue / Today / Upcoming / None**, so Overdue is a list, not only a KPI (rebuild recommendation 9).
 - **Call Activity** counts follow-ups whose Activity is **Call**, by Done on (rebuild recommendation 10). The dashboard shows all activities too.

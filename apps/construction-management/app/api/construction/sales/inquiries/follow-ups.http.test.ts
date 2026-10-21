@@ -185,6 +185,35 @@ describe("Follow-ups (CM-1004)", () => {
     expect(cleared.funnelStage?.name).toBe("Site Visit");
   });
 
+  it("lets the newest follow-up decide the next step", async () => {
+    const ctx = await setup();
+    await followUp(ctx.inquiry.id, {
+      toStageId: ctx.lists.stageId["Site Visit"],
+      nextFollowUpDate: addDays(TODAY, 2),
+      nextFollowUpTime: "11:00",
+    });
+    // A call from yesterday keyed in late, with no next follow-up and
+    // another stage: it is recorded, the inquiry keeps the newer next step.
+    const yesterday = minutesAgo(24 * 60);
+    const late = await followUp(ctx.inquiry.id, {
+      doneOnDate: yesterday.date,
+      doneOnTime: yesterday.time,
+      toStageId: ctx.lists.stageId["Negotiation"],
+    });
+    expect(late.status).toBe(StatusCodes.CREATED);
+    expect(await json<Inquiry>(late)).toMatchObject({
+      funnelStage: { name: "Site Visit" },
+      nextFollowUp: { date: addDays(TODAY, 2), time: "11:00" },
+      due: "upcoming",
+    });
+    const items = (await timeline(ctx.inquiry.id)).items;
+    expect(items.filter((item) => item.kind === "follow_up")).toHaveLength(2);
+    const events = await prisma.constructionSalesInquiryEvent.findMany({
+      where: { inquiryId: ctx.inquiry.id, type: "stage_moved" },
+    });
+    expect(events).toHaveLength(1);
+  });
+
   it("refuses a closed inquiry, a future Done on and a next follow-up before it", async () => {
     const ctx = await setup();
     const future = minutesAgo(-120);

@@ -73,6 +73,15 @@ export class PrismaFollowUpStore implements FollowUpStore {
     });
   }
 
+  async latestDoneAt(db: SalesTx, workspaceId: string, inquiryId: string) {
+    const row = await db.constructionSalesFollowUp.findFirst({
+      where: { workspaceId, inquiryId, deletedAt: null },
+      orderBy: { doneAt: "desc" },
+      select: { doneAt: true },
+    });
+    return row?.doneAt ?? null;
+  }
+
   async list(db: SalesTx, workspaceId: string, inquiryId: string) {
     const rows = await db.constructionSalesFollowUp.findMany({
       where: { workspaceId, inquiryId, deletedAt: null },

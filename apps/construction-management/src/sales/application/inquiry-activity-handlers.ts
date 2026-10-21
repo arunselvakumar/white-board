@@ -65,6 +65,12 @@ export type FollowUpStore = {
     id: string,
   ): Promise<StoredFollowUp | null>;
   tombstone(db: SalesTx, id: string, by: string, at: Date): Promise<void>;
+  /** The latest Done on of the inquiry's live follow-ups, or null. */
+  latestDoneAt(
+    db: SalesTx,
+    workspaceId: string,
+    inquiryId: string,
+  ): Promise<Date | null>;
   /** Live follow-ups of the inquiry, newest Done on first. */
   list(
     db: SalesTx,
@@ -193,9 +199,11 @@ const clean = (value: string | null | undefined): string | null => {
  *
  * A follow-up needs Inquiry Update and an Open inquiry (409
  * `INQUIRY_NOT_OPEN`); its Done on is inside the back-dated window
- * `inquiry_follow_up`. Saving it sets the inquiry's next follow-up (or
- * clears it) and, with a stage move, its stage and a `stage_moved` history
- * row — all in one transaction. Follow-ups are append-only; an Inquiry
+ * `inquiry_follow_up`. The newest follow-up decides the next step: saving
+ * one whose Done on is on or after every other live follow-up's sets the
+ * inquiry's next follow-up (or clears it) and, with a stage move, its stage
+ * and a `stage_moved` history row — all in one transaction. An older one
+ * keyed in late is only recorded. Follow-ups are append-only; an Inquiry
  * Delete holder removes one entered by mistake, and the inquiry's next
  * follow-up stays as it is.
  *
@@ -260,7 +268,13 @@ export class InquiryActivityHandlers {
       const row = await inquiryStore.lock(tx, ws, inquiryId);
       if (row == null) throw inquiryNotFound();
       assertInquiryOpen(row.status);
-      const moves = toStageId != null && toStageId !== row.funnelStageId;
+      // The inquiry row lock serialises follow-ups of one inquiry, so the
+      // latest Done on cannot change under us.
+      const latest = await followUps.latestDoneAt(tx, ws, inquiryId);
+      const newest =
+        latest == null || fields.doneAt.getTime() >= latest.getTime();
+      const moves =
+        newest && toStageId != null && toStageId !== row.funnelStageId;
       await followUps.insert(tx, {
         id,
         workspaceId: ws,
@@ -277,13 +291,14 @@ export class InquiryActivityHandlers {
         createdAt: now,
         createdBy: access.userId,
       });
-      await inquiryStore.setProgress(tx, inquiryId, {
-        funnelStageId: moves ? toStageId : row.funnelStageId,
-        nextFollowUpAt: fields.next?.at ?? null,
-        nextFollowUpHasTime: fields.next?.hasTime ?? false,
-        by: access.userId,
-        at: now,
-      });
+      if (newest)
+        await inquiryStore.setProgress(tx, inquiryId, {
+          funnelStageId: moves ? toStageId : row.funnelStageId,
+          nextFollowUpAt: fields.next?.at ?? null,
+          nextFollowUpHasTime: fields.next?.hasTime ?? false,
+          by: access.userId,
+          at: now,
+        });
       if (moves)
         await inquiryStore.appendEvents(
           tx,
