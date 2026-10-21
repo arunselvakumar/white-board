@@ -1,0 +1,37 @@
+apps/construction-management/app/api/construction/sales/inquiries/import.http.test.ts
+  s_a8678b94facc4f::t_55e2b974ce9c75 74-76,131,135,165-176
+apps/construction-management/docs/adr/CM-0022-sales-crm-product-decisions.md
+  s_a8678b94facc4f::t_d9f14c58eb04ec 98
+apps/construction-management/docs/modules/09-sales-crm-inquiry-booking.md
+  s_a8678b94facc4f::t_468ae6abb1ac78 553
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_a8678b94facc4f::t_3ec8e39f6ef7be 46-53,77
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_a8678b94facc4f::t_a283343eedaa3f 183-190
+apps/construction-management/src/messaging/application/listeners.ts
+  s_a8678b94facc4f::t_dd3504603fb202 37,172-175,859-903
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_a8678b94facc4f::t_c35182577a0009 241
+apps/construction-management/src/sales/application/inquiry-handlers.ts
+  s_a8678b94facc4f::t_d394fa35c41a57 277
+apps/construction-management/src/sales/application/inquiry-import.ts
+  s_a8678b94facc4f::t_87bcd2cc3cbb96 11,200-201,467-492
+apps/construction-management/src/sales/domain/inquiry-events.ts
+  s_a8678b94facc4f::t_6a95d7538391a8 20-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5676c7a0cc28ac661de6d30a965797fb3c5743c5",
+  "prompts": {},
+  "sessions": {
+    "s_a8678b94facc4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7790fc35-b9f4-479d-8a40-d5cadaae189e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
