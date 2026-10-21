@@ -14,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -23,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate, localToday } from "@/components/payments/payment-format";
@@ -71,6 +71,7 @@ import {
 } from "./equipment-sheet-format";
 import { trimDecimal } from "./equipment-sheet-live";
 import { EquipmentSheetSettingsDialog } from "./equipment-sheet-settings-dialog";
+import { EquipmentSheetRowsSkeleton } from "@/components/site-work/site-work-skeletons";
 
 type Filters = {
   date: DateFilterValue;
@@ -136,7 +137,8 @@ export function EquipmentSheetsPage({
   const [cursor, setCursor] = useState<EquipmentSheetFilter["cursor"]>(null);
   const [bulk, setBulk] = useState(false);
   const [configuring, setConfiguring] = useState(false);
-  const [, startTransition] = useTransition();
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -185,7 +187,14 @@ export function EquipmentSheetsPage({
           )}
         </div>
       </div>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense
+        fallback={
+          <EquipmentSheetRowsSkeleton
+            approval={approval}
+            bulk={bulk && approval}
+          />
+        }
+      >
         <SheetRows
           projectId={projectId}
           today={today}
@@ -202,6 +211,7 @@ export function EquipmentSheetsPage({
               setCursor(next);
             });
           }}
+          className={cn(isPending && "opacity-60 transition-opacity")}
         />
       </Suspense>
       <EquipmentSheetSettingsDialog
@@ -209,16 +219,6 @@ export function EquipmentSheetsPage({
         open={configuring}
         onOpenChange={setConfiguring}
       />
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -235,6 +235,7 @@ function SheetRows({
   canCreate,
   onFilters,
   onPage,
+  className,
 }: {
   projectId: string;
   today: string;
@@ -247,6 +248,7 @@ function SheetRows({
   canCreate: boolean;
   onFilters: (next: Partial<Filters>) => void;
   onPage: (cursor: EquipmentSheetFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(
     equipmentSheetsQuery({ ...toQuery(projectId, filters), cursor }),
@@ -360,7 +362,7 @@ function SheetRows({
 
   if (data.items.length === 0)
     return (
-      <div className="space-y-4">
+      <div className={cn("space-y-4", className)}>
         {(filtered || data.total > 0) && filterBar}
         <Empty className="border">
           <EmptyHeader>
@@ -405,7 +407,7 @@ function SheetRows({
     equipmentSheetsPath(projectId, `/${sheet.id}`);
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       {filterBar}
       <p className="text-muted-foreground text-sm">
         {data.total} usage {data.total === 1 ? "sheet" : "sheets"} ·{" "}

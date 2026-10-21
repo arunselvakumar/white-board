@@ -22,7 +22,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Spinner } from "@repo/ui/components/spinner";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -43,6 +42,7 @@ import {
 } from "@/src/queries/site-work-access";
 
 import { CreateProgressReportDialog } from "./create-progress-report-dialog";
+import { ProgressReportRowsSkeleton } from "@/components/site-work/site-work-skeletons";
 
 const MENU = "site_work.progress_reports";
 
@@ -355,14 +355,7 @@ export function ProgressReportsPage({ projectId }: { projectId: string }) {
         <h3 id="view-reports" className="text-sm font-medium">
           View Reports
         </h3>
-        <Suspense
-          fallback={
-            <div className="space-y-2" aria-busy="true">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-            </div>
-          }
-        >
+        <Suspense fallback={<ProgressReportRowsSkeleton />}>
           <ReportList
             projectId={projectId}
             onCreate={

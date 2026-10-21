@@ -147,7 +147,10 @@ export const Loading: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Central Reports" }),
     ).toBeVisible();
-    await expect(canvas.getByTestId("central-reports-loading")).toBeVisible();
+    // The report cards are a skeleton until the catalogue arrives (ADR-0047).
+    await expect(
+      canvas.getByText("Loading central reports"),
+    ).toBeInTheDocument();
     await expect(canvas.queryByRole("form")).toBeNull();
   },
 };

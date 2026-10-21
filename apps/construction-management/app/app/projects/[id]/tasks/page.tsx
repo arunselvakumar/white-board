@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { TasksPage } from "@/components/tracking/tasks/tasks-page";
+import { TasksPageSkeleton } from "@/components/tracking/tracking-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Tasks" };
 
@@ -19,9 +21,15 @@ export default async function TasksRoute({
   if (!(await viewerCan("tracking.tasks", "read", { projectId: id })))
     return <ProjectNoAccess what="Tasks" />;
   return (
-    <TasksPage
-      projectId={id}
-      initialView={view === "gantt" ? "gantt" : "list"}
-    />
+    <QuerySuspense
+      fallback={
+        <TasksPageSkeleton initialView={view === "gantt" ? "gantt" : "list"} />
+      }
+    >
+      <TasksPage
+        projectId={id}
+        initialView={view === "gantt" ? "gantt" : "list"}
+      />
+    </QuerySuspense>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CircleAlert, Plus, Tag, type LucideIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
@@ -24,6 +24,7 @@ import {
   byName,
 } from "./master-list-parts";
 import { TrackingMasterDialog } from "./tracking-master-dialog";
+import { MasterListPageSkeleton } from "./masters-skeletons";
 
 type Row = {
   id: string;
@@ -86,6 +87,22 @@ function errorMessage(error: unknown): string {
 }
 
 function TrackingMasterListScreen({ screen }: { screen: Screen }) {
+  // The Add button waits for the viewer's rights, which come with the rows.
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title={screen.plural}
+          meta={screen.description}
+        />
+      }
+    >
+      <TrackingMasterListContent screen={screen} />
+    </Suspense>
+  );
+}
+
+function TrackingMasterListContent({ screen }: { screen: Screen }) {
   const { data } = useSuspenseQuery(trackingMasterListQuery(screen.list));
   const rows: Row[] = data.items;
   const command = useTrackingMasterCommand(screen.list);

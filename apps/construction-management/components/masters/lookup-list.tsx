@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -28,6 +28,10 @@ import {
   MasterSearch,
   byName,
 } from "./master-list-parts";
+import {
+  MasterAddButtonSkeleton,
+  MasterListPageSkeleton,
+} from "./masters-skeletons";
 
 function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;
@@ -39,6 +43,23 @@ function errorMessage(error: unknown): string {
  * enabled; disabled rows stay listed, muted.
  */
 export function LookupListScreen({ config }: { config: LookupScreenConfig }) {
+  return (
+    <Suspense
+      fallback={
+        <MasterListPageSkeleton
+          title={config.plural}
+          meta={config.description}
+          actions={<MasterAddButtonSkeleton label={`Add ${config.singular}`} />}
+          details={config.withSkill === true}
+        />
+      }
+    >
+      <LookupListContent config={config} />
+    </Suspense>
+  );
+}
+
+function LookupListContent({ config }: { config: LookupScreenConfig }) {
   const { data } = useSuspenseQuery(lookupListQuery(config.list));
   const command = useLookupCommand(config.list);
   const [query, setQuery] = useState("");

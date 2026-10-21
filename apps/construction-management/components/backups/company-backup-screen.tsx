@@ -33,7 +33,6 @@ import { ActionCodeStep } from "@/components/account/action-code-step";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import {
@@ -44,6 +43,7 @@ import {
 
 import { BackupModulePicker } from "./backup-module-picker";
 import { BackupProgress } from "./backup-progress";
+import { BackupModulesSkeleton } from "./backups-skeletons";
 
 const schema = z.object({
   code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
@@ -239,7 +239,7 @@ function HrmsBackupForm() {
             {options.isError ? (
               <FormAlert message={fieldForCode(options.error, {}).message} />
             ) : options.data == null ? (
-              <Skeleton className="h-40 w-full" />
+              <BackupModulesSkeleton />
             ) : (
               <Controller
                 name="modules"

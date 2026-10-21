@@ -7,6 +7,7 @@ import {
   InspectionNew,
   InspectionReinspect,
 } from "@/components/tracking/inspections/inspection-pages";
+import { TrackingFormSkeleton } from "@/components/tracking/tracking-skeletons";
 
 export const metadata: Metadata = { title: "Add Inspection Request" };
 
@@ -34,7 +35,19 @@ export default async function NewInspectionRoute({
       ? reinspect
       : null;
   return (
-    <QuerySuspense>
+    <QuerySuspense
+      fallback={
+        <TrackingFormSkeleton
+          kind="inspection"
+          projectId={id}
+          title={
+            originalId == null
+              ? "Add Inspection Request"
+              : "Raise re-inspection"
+          }
+        />
+      }
+    >
       {originalId == null ? (
         <InspectionNew projectId={id} />
       ) : (

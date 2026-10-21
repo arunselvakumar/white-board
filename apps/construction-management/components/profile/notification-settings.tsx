@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Switch } from "@repo/ui/components/switch";
 
 import {
@@ -18,6 +17,7 @@ import {
   PushPermissionError,
   type PushDevice,
 } from "./push-device";
+import { PushMenuListSkeleton } from "./profile-skeletons";
 
 const DEVICE_KEY = ["messaging", "push-device"] as const;
 const DEVICE_SWITCH_ID = "push-this-device";
@@ -194,7 +194,7 @@ function MutedGroups() {
         devices.
       </p>
       {preferences.isPending ? (
-        <Skeleton className="h-24 w-full" />
+        <PushMenuListSkeleton />
       ) : preferences.isError ? (
         <p role="alert" className="text-destructive text-sm">
           Couldn’t load your notification settings. Please try again.

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { CheckoutWizard } from "@/components/subscription/checkout-wizard";
+import { CheckoutSkeleton } from "@/components/subscription/subscription-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Choose a plan" };
 
@@ -11,5 +13,9 @@ export default async function CheckoutPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { kind } = await searchParams;
-  return <CheckoutWizard kind={typeof kind === "string" ? kind : null} />;
+  return (
+    <QuerySuspense fallback={<CheckoutSkeleton />}>
+      <CheckoutWizard kind={typeof kind === "string" ? kind : null} />
+    </QuerySuspense>
+  );
 }

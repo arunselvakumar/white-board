@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { OctagonPause, Plus } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -22,8 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import {
   HINDRANCE_CAUSE_LABELS,
@@ -51,6 +51,7 @@ import {
   lostSummary,
   partyLabel,
 } from "./hindrance-parts";
+import { HindranceRowsSkeleton } from "@/components/site-work/site-work-skeletons";
 
 const ALL = "all";
 
@@ -96,11 +97,13 @@ function Hindrances({
   filters,
   newHref,
   onPage,
+  className,
 }: {
   projectId: string;
   filters: HindranceFilters;
   newHref: string | null;
   onPage: (cursor: HindranceFilters["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(hindrancesQuery(projectId, filters));
   const filtered =
@@ -138,7 +141,7 @@ function Hindrances({
       </Empty>
     );
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "hindrance" : "hindrances"}
       </p>
@@ -228,6 +231,9 @@ export function HindrancesList({ projectId }: { projectId: string }) {
     hindranceFormOptionsQuery(projectId),
   );
   const [filters, setFilters] = useState<HindranceFilters>({});
+  // Filter, search and page changes keep the old rows on screen, dimmed,
+  // while the next ones load (ADR-0047).
+  const shown = useDeferredValue(filters);
   const change = (next: Partial<HindranceFilters>) => {
     setFilters((current) => ({ ...current, ...next, cursor: null }));
   };
@@ -344,17 +350,11 @@ export function HindrancesList({ projectId }: { projectId: string }) {
           }}
         />
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<HindranceRowsSkeleton />}>
         <Hindrances
           projectId={projectId}
-          filters={filters}
+          filters={shown}
+          className={cn(shown !== filters && "opacity-60 transition-opacity")}
           newHref={canCreate ? newHref : null}
           onPage={(cursor) => {
             setFilters((current) => ({ ...current, cursor }));

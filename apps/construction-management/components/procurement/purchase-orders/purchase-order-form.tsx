@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -69,6 +68,7 @@ import {
 } from "./purchase-order-form-schema";
 import { purchaseOrdersPath } from "./purchase-order-format";
 import { PurchaseOrderLineSheet } from "./purchase-order-line-sheet";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "__none";
 
@@ -456,7 +456,7 @@ function PurchaseOrderFields({
             <FieldError message={errors.expectedDeliveryDate?.message} />
           </div>
           <div className="sm:col-span-2">
-            <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+            <Suspense fallback={<LocationPickerSkeleton />}>
               <Controller
                 name="siteLocation"
                 control={form.control}

@@ -15,7 +15,6 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import { LocationPicker } from "@/components/locations/location-picker";
@@ -25,6 +24,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import { localToday, QUANTITY_PATTERN } from "./inventory-format";
 import { StockErrorAlert } from "./stock-error-alert";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const schema = z.object({
   date: z.string().min(1, "Choose the date."),
@@ -127,7 +127,7 @@ function EditForm({
         </div>
       </div>
       {withSite && (
-        <Suspense fallback={<Skeleton className="h-8 w-full" />}>
+        <Suspense fallback={<LocationPickerSkeleton />}>
           <Controller
             control={form.control}
             name="siteLocation"

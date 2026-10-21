@@ -3,7 +3,13 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { MoreHorizontal, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState, type ReactNode } from "react";
+import {
+  type ReactNode,
+  Suspense,
+  useDeferredValue,
+  useState,
+  useTransition,
+} from "react";
 import { formatMobile } from "@repo/auth/construction/react";
 import {
   AlertDialog,
@@ -36,7 +42,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -46,6 +51,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -64,6 +70,7 @@ import {
   partyEditPath,
   type PartyScreen,
 } from "./party-screens";
+import { PartyRowsSkeleton } from "./parties-skeletons";
 
 const STATUS_FILTERS: { value: PartyListFilter["status"]; label: string }[] = [
   { value: "all", label: "All" },
@@ -90,6 +97,8 @@ export function PartiesPage({ list }: { list: PartyList }) {
   const [status, setStatus] = useState<PartyListFilter["status"]>("all");
   const [cursor, setCursor] = useState<PartyListFilter["cursor"]>(null);
   const deferredSearch = useDeferredValue(search);
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
 
   const addLink = (
     <Link href={`${screen.path}/new`} className={buttonVariants()}>
@@ -119,7 +128,9 @@ export function PartiesPage({ list }: { list: PartyList }) {
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
-                setCursor(null);
+                startTransition(() => {
+                  setCursor(null);
+                });
               }}
             />
           </InputGroup>
@@ -129,8 +140,10 @@ export function PartiesPage({ list }: { list: PartyList }) {
             onValueChange={(value: string[]) => {
               const next = value[0] as PartyListFilter["status"] | undefined;
               if (next == null) return;
-              setStatus(next);
-              setCursor(null);
+              startTransition(() => {
+                setStatus(next);
+                setCursor(null);
+              });
             }}
             variant="outline"
             size="sm"
@@ -142,25 +155,20 @@ export function PartiesPage({ list }: { list: PartyList }) {
             ))}
           </ToggleGroup>
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<PartyRowsSkeleton screen={screen} />}>
           <PartyRows
             screen={screen}
             filter={{ search: deferredSearch, status, cursor }}
-            onPage={setCursor}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+            className={cn(isPending && "opacity-60 transition-opacity")}
             addLink={addLink}
           />
         </Suspense>
       </div>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -202,11 +210,13 @@ function PartyRows({
   filter,
   onPage,
   addLink,
+  className,
 }: {
   screen: PartyScreen;
   filter: PartyListFilter;
   onPage: (cursor: PartyListFilter["cursor"]) => void;
   addLink: ReactNode;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(partiesQuery(screen.list, filter));
   const command = usePartyCommand(screen.list);
@@ -244,7 +254,7 @@ function PartyRows({
       : confirmText(screen, pending.kind, pending.party.name);
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? screen.label : screen.plural}
       </p>

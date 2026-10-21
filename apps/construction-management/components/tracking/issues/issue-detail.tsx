@@ -58,6 +58,8 @@ import { ISSUE_LIMITS } from "@/src/tracking/domain/issue";
 
 import { IssueReopenDialog } from "./issue-reopen-dialog";
 import { formatDateTime, IssueStatusBadge, PriorityChip } from "./issue-parts";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { UpdatesSkeleton } from "@/components/tracking/tracking-skeletons";
 
 function Fact({
   label,
@@ -464,7 +466,7 @@ export function IssueDetail({
             {issue.siteLocation == null ? (
               "—"
             ) : (
-              <Suspense fallback="…">
+              <Suspense fallback={<FactValueSkeleton />}>
                 <LocationLabel
                   projectId={projectId}
                   value={issue.siteLocation}
@@ -494,7 +496,14 @@ export function IssueDetail({
           heading="Images and attachments"
         />
 
-        <Suspense fallback={<p className="text-sm">Loading updates…</p>}>
+        <Suspense
+          fallback={
+            <section className="min-w-0 space-y-3">
+              <h3 className="text-sm font-semibold">Progress</h3>
+              <UpdatesSkeleton />
+            </section>
+          }
+        >
           <ProgressThread issue={issue} />
         </Suspense>
 

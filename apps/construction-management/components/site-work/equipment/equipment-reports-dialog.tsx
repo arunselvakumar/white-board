@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -21,6 +20,10 @@ import {
 } from "@/components/reports/report-catalogue";
 import { ReportCard } from "@/components/reports/report-card";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
+import {
+  RecentReportsSkeleton,
+  ReportCardGridSkeleton,
+} from "@/components/reports/reports-skeletons";
 
 /** The central reports of Masters → Equipments. */
 const KINDS: readonly ReportDefinition["kind"][] = [
@@ -77,14 +80,7 @@ export function EquipmentReportsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-0.5">
-          <Suspense
-            fallback={
-              <div className="grid gap-4 md:grid-cols-2" aria-hidden="true">
-                <Skeleton className="h-64 w-full" />
-                <Skeleton className="h-64 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<ReportCardGridSkeleton count={2} />}>
             <EquipmentReportCards today={today} />
           </Suspense>
           <section
@@ -94,13 +90,7 @@ export function EquipmentReportsDialog({
             <h3 id="equipment-recent-reports" className="font-semibold">
               Your recent equipment reports
             </h3>
-            <Suspense
-              fallback={
-                <div className="space-y-2" aria-hidden="true">
-                  <Skeleton className="h-16 w-full" />
-                </div>
-              }
-            >
+            <Suspense fallback={<RecentReportsSkeleton rows={1} />}>
               <RecentReports projectId={null} kinds={KINDS} />
             </Suspense>
           </section>

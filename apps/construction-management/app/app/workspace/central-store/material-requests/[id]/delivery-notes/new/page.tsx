@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { DeliveryNoteForm } from "@/components/procurement/delivery-notes/delivery-note-form";
+import { DeliveryNoteFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Create Delivery Note" };
 
@@ -13,7 +15,11 @@ export default async function NewDeliveryNoteRoute({
   const { id } = await params;
   return (
     <div className="w-full p-6">
-      <DeliveryNoteForm materialRequestId={id} />
+      <QuerySuspense
+        fallback={<DeliveryNoteFormSkeleton title="Create Delivery Note" />}
+      >
+        <DeliveryNoteForm materialRequestId={id} />
+      </QuerySuspense>
     </div>
   );
 }

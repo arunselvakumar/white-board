@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
 import { PurchaseOrderForm } from "@/components/procurement/purchase-orders/purchase-order-form";
+import { PurchaseOrderFormSkeleton } from "@/components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Add Purchase Order" };
 
@@ -18,7 +19,7 @@ export default async function Page({
   return (
     <div className="w-full space-y-4">
       <h2 className="text-lg font-semibold">Add Purchase Order</h2>
-      <QuerySuspense>
+      <QuerySuspense fallback={<PurchaseOrderFormSkeleton />}>
         <PurchaseOrderForm
           projectId={id}
           {...(typeof purchaseRequestId === "string"

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { EditGoodsReceiptScreen } from "@/components/procurement/goods-receipts/goods-receipt-form";
+import { GoodsReceiptFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Goods Receipt" };
 
@@ -11,5 +13,11 @@ export default async function Page({
   params: Promise<{ id: string; grnId: string }>;
 }) {
   const { id, grnId } = await params;
-  return <EditGoodsReceiptScreen projectId={id} id={grnId} />;
+  return (
+    <QuerySuspense
+      fallback={<GoodsReceiptFormSkeleton projectId={id} receiptId={grnId} />}
+    >
+      <EditGoodsReceiptScreen projectId={id} id={grnId} />
+    </QuerySuspense>
+  );
 }

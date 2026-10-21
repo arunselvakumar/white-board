@@ -34,6 +34,7 @@ import {
   shiftLabel,
   worksheetsPath,
 } from "./worksheet-format";
+import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -118,7 +119,7 @@ export function WorksheetDetailPage({
           {sheet.siteLocation == null ? (
             "—"
           ) : (
-            <Suspense fallback="…">
+            <Suspense fallback={<FactValueSkeleton />}>
               <LocationLabel projectId={projectId} value={sheet.siteLocation} />
             </Suspense>
           )}

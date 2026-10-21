@@ -15,7 +15,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -25,6 +24,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import {
   goodsReceiptsQuery,
@@ -41,6 +41,7 @@ import {
   goodsReceivedPath,
   money,
 } from "./goods-receipt-parts";
+import { GoodsReceiptRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const PO_FILTERS = [
   { value: "all", label: "All" },
@@ -68,7 +69,8 @@ export function GoodsReceiptsList({ projectId }: { projectId: string }) {
     search: "",
     cursor: null,
   });
-  // Typing in search keeps the last rows on screen while the next page loads.
+  // Filter and page changes keep the last rows on screen, dimmed, while
+  // the next page loads.
   const shown = useDeferredValue(filter);
   const change = (next: Partial<GoodsReceiptListFilter>) => {
     setFilter((current) => ({ ...current, ...next, cursor: null }));
@@ -154,14 +156,7 @@ export function GoodsReceiptsList({ projectId }: { projectId: string }) {
           ))}
         </ToggleGroup>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={<GoodsReceiptRowsSkeleton />}>
         <ReceiptRows
           projectId={projectId}
           filter={shown}
@@ -171,6 +166,7 @@ export function GoodsReceiptsList({ projectId }: { projectId: string }) {
           onPage={(cursor) => {
             setFilter((current) => ({ ...current, cursor }));
           }}
+          className={cn(shown !== filter && "opacity-60 transition-opacity")}
         />
       </Suspense>
     </div>
@@ -182,11 +178,13 @@ function ReceiptRows({
   filter,
   onSupplier,
   onPage,
+  className,
 }: {
   projectId: string;
   filter: GoodsReceiptListFilter;
   onSupplier: (supplierId: string | null) => void;
   onPage: (cursor: GoodsReceiptListFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(goodsReceiptsQuery(filter));
   const filtered =
@@ -217,7 +215,7 @@ function ReceiptRows({
 
   if (data.items.length === 0)
     return (
-      <div className="space-y-3">
+      <div className={cn("space-y-3", className)}>
         {supplierFilter}
         <Empty className="border">
           <EmptyHeader>
@@ -238,7 +236,7 @@ function ReceiptRows({
     );
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       {supplierFilter}
       <p className="text-muted-foreground text-sm">
         {data.total === 1

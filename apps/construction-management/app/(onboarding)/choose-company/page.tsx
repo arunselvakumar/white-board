@@ -25,7 +25,9 @@ export default async function ChooseCompanyPage({
       <ChooseCompanyForm
         redirectUrl={redirectUrl}
         joinRequests={
-          <QuerySuspense>
+          // Most Users have no pending Join Request; the list renders
+          // nothing then, so a skeleton would only flash and vanish.
+          <QuerySuspense fallback={null}>
             <JoinRequestsList />
           </QuerySuspense>
         }

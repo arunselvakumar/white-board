@@ -21,6 +21,7 @@ import {
   unreadCountQuery,
   useNotificationActions,
 } from "./notification-queries";
+import { BellListSkeleton } from "./notifications-skeletons";
 
 export const NOTIFICATIONS_PAGE = "/app/notifications";
 
@@ -116,9 +117,7 @@ function BellPanel({
       </div>
       <div className="max-h-[min(28rem,60svh)] overflow-y-auto p-1.5">
         {list.isPending ? (
-          <p className="text-muted-foreground p-3 text-sm">
-            Loading notifications…
-          </p>
+          <BellListSkeleton />
         ) : list.isError ? (
           <p role="alert" className="text-destructive p-3 text-sm">
             Couldn’t load notifications. Please try again.

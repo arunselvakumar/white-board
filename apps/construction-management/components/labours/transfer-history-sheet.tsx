@@ -9,11 +9,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { labourTransfersQuery } from "@/src/queries/labours";
+
+import { TransferHistorySkeleton } from "./labours-skeletons";
 
 /** `2026-10-04` → `4 Oct 2026`. */
 export function formatDate(date: string): string {
@@ -46,12 +47,7 @@ export function TransferHistorySheet({
           <SheetDescription>{labour?.name}</SheetDescription>
         </SheetHeader>
         <div className="space-y-3 px-4 pb-6">
-          {history.isPending && (
-            <>
-              <Skeleton className="h-14 w-full" />
-              <Skeleton className="h-14 w-full" />
-            </>
-          )}
+          {history.isPending && <TransferHistorySkeleton />}
           {history.error != null && (
             <FormAlert message={fieldForCode(history.error, {}).message} />
           )}

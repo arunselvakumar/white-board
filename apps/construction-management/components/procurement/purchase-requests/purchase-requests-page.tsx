@@ -14,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
@@ -60,6 +60,7 @@ import {
   type StatusChip,
 } from "./purchase-request-format";
 import { ReasonDialog } from "./reason-dialog";
+import { PurchaseRequestRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 type Filters = {
   date: DateFilterValue;
@@ -123,9 +124,9 @@ export function PurchaseRequestsPage({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<PurchaseRequestFilter["cursor"]>(null);
   const [bulk, setBulk] = useState(false);
-  // A transition keeps the current rows (and the filter bar) on screen
-  // while the next page loads, instead of the Suspense fallback.
-  const [, startTransition] = useTransition();
+  // A transition keeps the current rows (and the filter bar) on screen,
+  // dimmed, while the next page loads, instead of the Suspense fallback.
+  const [isPending, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -178,7 +179,7 @@ export function PurchaseRequestsPage({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<PurchaseRequestRowsSkeleton bulk={bulk} />}>
         <PurchaseRequestRows
           projectId={projectId}
           today={today}
@@ -194,18 +195,9 @@ export function PurchaseRequestsPage({
               setCursor(next);
             });
           }}
+          className={cn(isPending && "opacity-60 transition-opacity")}
         />
       </Suspense>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -221,6 +213,7 @@ function PurchaseRequestRows({
   canCreate,
   onFilters,
   onPage,
+  className,
 }: {
   projectId: string;
   today: string;
@@ -232,6 +225,7 @@ function PurchaseRequestRows({
   canCreate: boolean;
   onFilters: (next: Partial<Filters>) => void;
   onPage: (cursor: PurchaseRequestFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(
     purchaseRequestsQuery({ ...toQuery(projectId, filters), cursor }),
@@ -336,7 +330,7 @@ function PurchaseRequestRows({
 
   if (data.items.length === 0)
     return (
-      <div className="space-y-4">
+      <div className={cn("space-y-4", className)}>
         {filterBar}
         <Empty className="border">
           <EmptyHeader>
@@ -381,7 +375,7 @@ function PurchaseRequestRows({
     ) : null;
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       {filterBar}
       <p className="text-muted-foreground text-sm">
         {data.total}{" "}

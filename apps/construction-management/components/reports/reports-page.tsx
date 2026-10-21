@@ -10,7 +10,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { equipmentListQuery } from "@/src/queries/equipment";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
@@ -29,6 +28,7 @@ import {
 } from "./report-catalogue";
 import { ReportCard, type ReportFilterOption } from "./report-card";
 import { useReportPickerOptions } from "./report-pickers";
+import { RecentReportsSkeleton } from "./reports-skeletons";
 
 export type FilterOptions = Partial<Record<CardFilter, ReportFilterOption[]>>;
 
@@ -244,14 +244,7 @@ export function ReportsPage({
           <h2 id="recent-reports-heading" className="text-lg font-semibold">
             Recent reports
           </h2>
-          <Suspense
-            fallback={
-              <div className="space-y-2" aria-hidden="true">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<RecentReportsSkeleton rows={2} />}>
             <RecentReports projectId={projectId} />
           </Suspense>
         </section>

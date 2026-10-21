@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { MaterialRequestDetail } from "@/components/procurement/material-requests/material-request-detail";
+import { MaterialRequestDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Request" };
 
@@ -8,8 +10,21 @@ export const metadata: Metadata = { title: "Material Request" };
 export default async function MaterialRequestRoute({
   params,
 }: {
-  params: Promise<{ requestId: string }>;
+  params: Promise<{ id: string; requestId: string }>;
 }) {
-  const { requestId } = await params;
-  return <MaterialRequestDetail requestId={requestId} side="project" />;
+  const { id, requestId } = await params;
+  return (
+    <QuerySuspense
+      fallback={
+        <MaterialRequestDetailSkeleton
+          back={{
+            label: "Material Requests",
+            href: `/app/projects/${encodeURIComponent(id)}/materials/material-requests`,
+          }}
+        />
+      }
+    >
+      <MaterialRequestDetail requestId={requestId} side="project" />
+    </QuerySuspense>
+  );
 }

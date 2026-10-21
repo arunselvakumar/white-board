@@ -17,11 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { ChecklistSkeleton } from "@/components/masters/masters-skeletons";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
@@ -237,10 +237,6 @@ function TdsSettings({
       </div>
     </section>
   );
-}
-
-function ChecklistSkeleton() {
-  return <Skeleton className="h-11 w-full" />;
 }
 
 function PartyForm({
@@ -482,7 +478,9 @@ function PartyForm({
               The trades this Contractor works in.
             </p>
           </div>
-          <Suspense fallback={<ChecklistSkeleton />}>
+          <Suspense
+            fallback={<ChecklistSkeleton label="Loading Departments" />}
+          >
             <Controller
               name="departmentIds"
               control={form.control}

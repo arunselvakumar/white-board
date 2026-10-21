@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { MoreHorizontal, Plus, Search, Users } from "lucide-react";
 import Link from "next/link";
-import { useDeferredValue, useState, Suspense } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,8 +40,8 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -57,6 +57,7 @@ import {
 
 import { MemberStatusBadge, STATUS_FILTERS } from "./member-status-badge";
 import { ShareInviteDialog } from "./share-invite-dialog";
+import { TeamMemberRowsSkeleton } from "./team-members-skeletons";
 
 /** Team Members under Masters (CM-111): search, status chips, row actions. */
 export function TeamMembersPage() {
@@ -64,6 +65,8 @@ export function TeamMembersPage() {
   const [status, setStatus] = useState<TeamMemberListFilter["status"]>("all");
   const [cursor, setCursor] = useState<TeamMemberListFilter["cursor"]>(null);
   const deferredSearch = useDeferredValue(search);
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div className="w-full p-6">
@@ -93,7 +96,9 @@ export function TeamMembersPage() {
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
-                setCursor(null);
+                startTransition(() => {
+                  setCursor(null);
+                });
               }}
             />
           </InputGroup>
@@ -104,8 +109,10 @@ export function TeamMembersPage() {
               const next = value[0] as
                 TeamMemberListFilter["status"] | undefined;
               if (next == null) return;
-              setStatus(next);
-              setCursor(null);
+              startTransition(() => {
+                setStatus(next);
+                setCursor(null);
+              });
             }}
             variant="outline"
             size="sm"
@@ -117,23 +124,18 @@ export function TeamMembersPage() {
             ))}
           </ToggleGroup>
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<TeamMemberRowsSkeleton />}>
           <TeamMemberRows
             filter={{ search: deferredSearch, status, cursor }}
-            onPage={setCursor}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+            className={cn(isPending && "opacity-60 transition-opacity")}
           />
         </Suspense>
       </div>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-16 w-full" />
     </div>
   );
 }
@@ -145,9 +147,11 @@ function contactLine(member: TeamMember): string {
 function TeamMemberRows({
   filter,
   onPage,
+  className,
 }: {
   filter: TeamMemberListFilter;
   onPage: (cursor: TeamMemberListFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(teamMembersQuery(filter));
   const { company } = useActiveCompany();
@@ -204,7 +208,7 @@ function TeamMemberRows({
     );
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "Team Member" : "Team Members"}
       </p>

@@ -50,6 +50,7 @@ import {
 } from "@/src/queries/tracking-inspections";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import { INSPECTION_LIMITS } from "@/src/tracking/domain/inspection";
+import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
 
 const NONE = "none";
 
@@ -511,7 +512,7 @@ export function InspectionForm({
           <FieldError message={errors.workDescription?.message} />
         </div>
         <div className="min-w-0 space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Suspense fallback={null}>
+          <Suspense fallback={<LocationPickerSkeleton />}>
             <Controller
               control={form.control}
               name="siteLocation"

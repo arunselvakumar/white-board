@@ -3,15 +3,15 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FileSpreadsheet, Plus } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 import {
   canInTracking,
@@ -23,15 +23,11 @@ import { ImportTasksDialog } from "./import-tasks-dialog";
 import { TaskFilterBar } from "./task-filters";
 import { TaskGantt } from "./task-gantt";
 import { TaskTree } from "./task-tree";
-
-function Loading() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-20 w-full" />
-    </div>
-  );
-}
+import {
+  TaskFilterBarSkeleton,
+  TaskGanttSkeleton,
+  TaskTreeSkeleton,
+} from "@/components/tracking/tracking-skeletons";
 
 /**
  * The Project's Tasks (CM-802): the task tree with filters, the Gantt, Add
@@ -49,7 +45,11 @@ export function TasksPage({
   const [importing, setImporting] = useState(false);
   const canCreate = canInTracking(access, "tracking.tasks", "create");
   const canDelete = canInTracking(access, "tracking.tasks", "delete");
-  const key = JSON.stringify(filters);
+  // Filter changes keep the old tree on screen, dimmed, until the new one
+  // loads (ADR-0047); the search box stays live.
+  const shown = useDeferredValue(filters);
+  const key = JSON.stringify(shown);
+  const stale = shown !== filters;
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-4 p-6">
@@ -78,7 +78,7 @@ export function TasksPage({
           </div>
         )}
       </div>
-      <Suspense fallback={<Skeleton className="h-8 w-full" />}>
+      <Suspense fallback={<TaskFilterBarSkeleton />}>
         <TaskFilterBar
           projectId={projectId}
           filters={filters}
@@ -92,20 +92,26 @@ export function TasksPage({
           <TabsTrigger value="list">List</TabsTrigger>
           <TabsTrigger value="gantt">Gantt</TabsTrigger>
         </TabsList>
-        <TabsContent value="list" className="min-w-0">
-          <Suspense fallback={<Loading />}>
+        <TabsContent
+          value="list"
+          className={cn("min-w-0", stale && "opacity-60 transition-opacity")}
+        >
+          <Suspense fallback={<TaskTreeSkeleton />}>
             <TaskTree
               key={key}
               projectId={projectId}
-              filters={filters}
+              filters={shown}
               canCreate={canCreate}
               canDelete={canDelete}
             />
           </Suspense>
         </TabsContent>
-        <TabsContent value="gantt" className="min-w-0">
-          <Suspense fallback={<Loading />}>
-            <TaskGantt projectId={projectId} filters={filters} />
+        <TabsContent
+          value="gantt"
+          className={cn("min-w-0", stale && "opacity-60 transition-opacity")}
+        >
+          <Suspense fallback={<TaskGanttSkeleton />}>
+            <TaskGantt projectId={projectId} filters={shown} />
           </Suspense>
         </TabsContent>
       </Tabs>

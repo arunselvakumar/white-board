@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { EditTeamMember } from "@/components/team-members/edit-team-member";
+import { EditTeamMemberSkeleton } from "@/components/team-members/team-members-skeletons";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Team Member" };
 
@@ -10,5 +12,9 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <EditTeamMember id={id} />;
+  return (
+    <QuerySuspense fallback={<EditTeamMemberSkeleton />}>
+      <EditTeamMember id={id} />
+    </QuerySuspense>
+  );
 }

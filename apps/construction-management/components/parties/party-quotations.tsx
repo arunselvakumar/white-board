@@ -23,7 +23,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
@@ -40,6 +39,7 @@ import {
 } from "@/src/queries/quotations";
 
 import { PARTY_SCREENS, type PartyScreen } from "./party-screens";
+import { PartyQuotationListSkeleton } from "./parties-skeletons";
 
 /** Where a quotation opens: in the browser when it can, else a download. */
 export function quotationOpenUrl(quotation: Quotation): string {
@@ -352,7 +352,7 @@ export function PartyQuotations({
         </div>
       ) : null}
 
-      <Suspense fallback={<Skeleton className="h-14 w-full" />}>
+      <Suspense fallback={<PartyQuotationListSkeleton />}>
         <QuotationList
           screen={screen}
           partyId={partyId}

@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { HardHat, MoreHorizontal, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -42,7 +42,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -52,6 +51,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -65,6 +65,8 @@ import {
   type VendorListFilter,
   type VendorSummary,
 } from "@/src/queries/vendors";
+
+import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
 
 export const VENDORS_PATH = "/app/masters/vendors";
 
@@ -87,6 +89,8 @@ export function VendorsPage() {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<VendorListFilter["cursor"]>(null);
   const deferredSearch = useDeferredValue(search);
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
 
   const addLink = (
     <Link href={`${VENDORS_PATH}/new`} className={buttonVariants()}>
@@ -116,7 +120,9 @@ export function VendorsPage() {
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
-                setCursor(null);
+                startTransition(() => {
+                  setCursor(null);
+                });
               }}
             />
           </InputGroup>
@@ -126,8 +132,10 @@ export function VendorsPage() {
             onValueChange={(value: string[]) => {
               const next = value[0] as VendorListFilter["status"] | undefined;
               if (next == null) return;
-              setStatus(next);
-              setCursor(null);
+              startTransition(() => {
+                setStatus(next);
+                setCursor(null);
+              });
             }}
             variant="outline"
             size="sm"
@@ -138,21 +146,28 @@ export function VendorsPage() {
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
-          <Suspense fallback={<Skeleton className="h-9 w-48" />}>
+          <Suspense fallback={<ProjectFilterSkeleton />}>
             <ProjectFilter
               value={projectId}
               onChange={(next) => {
-                setProjectId(next);
-                setCursor(null);
+                startTransition(() => {
+                  setProjectId(next);
+                  setCursor(null);
+                });
               }}
             />
           </Suspense>
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<VendorRowsSkeleton />}>
           <VendorRows
             filter={{ search: deferredSearch, status, projectId, cursor }}
-            onPage={setCursor}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
             addLink={addLink}
+            className={cn(isPending && "opacity-60 transition-opacity")}
           />
         </Suspense>
       </div>
@@ -197,16 +212,6 @@ function ProjectFilter({
   );
 }
 
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
 const CONFIRM: Record<
   VendorCommand["kind"],
   { title: (name: string) => string; body: string; action: string }
@@ -240,10 +245,12 @@ function VendorRows({
   filter,
   onPage,
   addLink,
+  className,
 }: {
   filter: VendorListFilter;
   onPage: (cursor: VendorListFilter["cursor"]) => void;
   addLink: React.ReactNode;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(vendorsQuery(filter));
   const command = useVendorCommand();
@@ -283,7 +290,7 @@ function VendorRows({
   const confirm = pending == null ? null : CONFIRM[pending.kind];
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "Vendor" : "Vendors"}
       </p>

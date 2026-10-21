@@ -10,7 +10,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { Lock, Trash2, UserRoundCog } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
   Empty,
@@ -40,6 +40,7 @@ import {
 
 import { DeleteCompanyDialog } from "./delete-company-dialog";
 import { TransferOwnershipDialog } from "./transfer-ownership-dialog";
+import { OwnerActionsSkeleton } from "./account-skeletons";
 
 /** Cancel deletion, for the Owner (also in the shell banner). */
 export function useCancelCompanyDeletion() {
@@ -176,7 +177,9 @@ export function CompanyOwnershipScreen() {
           meta="Who owns the Company, and deleting it."
         />
         {role === "owner" ? (
-          <OwnerActions companyName={companyName} />
+          <Suspense fallback={<OwnerActionsSkeleton />}>
+            <OwnerActions companyName={companyName} />
+          </Suspense>
         ) : (
           <Empty className="border">
             <EmptyHeader>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { EquipmentFormSkeleton } from "@/components/site-work/site-work-skeletons";
 import { equipmentQuery } from "@/src/queries/equipment";
 
 import { EquipmentDetailScreen } from "./equipment-detail";
@@ -24,10 +26,12 @@ export function NewEquipmentPage() {
           title="Add Equipment"
           meta="A machine the Company owns or hires, at a Project or the warehouse."
         />
-        <EquipmentFormScreen
-          backHref={EQUIPMENTS_PATH}
-          hrefFor={equipmentPath}
-        />
+        <Suspense fallback={<EquipmentFormSkeleton />}>
+          <EquipmentFormScreen
+            backHref={EQUIPMENTS_PATH}
+            hrefFor={equipmentPath}
+          />
+        </Suspense>
       </div>
     </div>
   );
@@ -71,11 +75,13 @@ export function ProjectNewEquipmentPage({ projectId }: { projectId: string }) {
         title="Add equipment"
         meta="It starts at this Project."
       />
-      <EquipmentFormScreen
-        fixedProjectId={projectId}
-        backHref={listHref}
-        hrefFor={(id) => projectEquipmentPath(projectId, id)}
-      />
+      <Suspense fallback={<EquipmentFormSkeleton />}>
+        <EquipmentFormScreen
+          fixedProjectId={projectId}
+          backHref={listHref}
+          hrefFor={(id) => projectEquipmentPath(projectId, id)}
+        />
+      </Suspense>
     </div>
   );
 }
