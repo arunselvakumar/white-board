@@ -1,0 +1,41 @@
+apps/construction-management/components/projects/dashboard/dashboard-parts.stories.tsx
+  s_69de4bf19c310d::t_2b72955ff93722 1-108
+apps/construction-management/components/projects/dashboard/dashboard-parts.tsx
+  s_69de4bf19c310d::t_7202408f60c654 3-11,14-17,20-22,30-65,74,77-82,84-90,93-119,121-124
+apps/construction-management/components/projects/dashboard/dashboard-skeletons.tsx
+  s_69de4bf19c310d::t_8f6ae30306c496 87-90,99-104
+apps/construction-management/components/projects/dashboard/manage-dashboard-dialog.tsx
+  s_69de4bf19c310d::t_7962a8a4c2a704 21-24,30-31,133-141
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_69de4bf19c310d::t_e6351f2daa17ed 2,4,16,988-1154
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_69de4bf19c310d::t_2cd292cdaecb81 6-7,35,59-62,429-460,470,472,482-487,491,497,499,505,507,513,515,521,523,529,531,537,539,545,547,553-554,556,562,571-601,622-623,633-657,659-667,669-678,680
+apps/construction-management/components/projects/dashboard/section-appearance.ts
+  s_69de4bf19c310d::t_9c54a0b274b0de 1-73
+apps/construction-management/components/projects/dashboard/section-collapse.tsx
+  s_69de4bf19c310d::t_e1d4f5e29c585d 1-102
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_69de4bf19c310d::t_2696e50de41e1a 635
+apps/construction-management/lib/dashboard-collapsed.test.ts
+  s_69de4bf19c310d::t_daa0dec2b32296 1-133
+apps/construction-management/lib/dashboard-collapsed.ts
+  s_69de4bf19c310d::t_f65d2b3dd38823 1-94
+apps/construction-management/docs/adr/CM-0025-dashboard-section-collapse.md
+  s_69de4bf19c310d::t_1f48833d6ee12c 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1b9c637b9d9675b9f19754d9691d1d976db1c70e",
+  "prompts": {},
+  "sessions": {
+    "s_69de4bf19c310d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31ece4ff-c978-4801-b0bd-f1de5b927a7e",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
