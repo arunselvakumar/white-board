@@ -35,6 +35,7 @@ Each spec has the same sections: Legacy behaviour · Entities & fields · Workfl
 | 11  | [Reports, Dashboards & Backup](./modules/11-reports-dashboards-backup.md)                      | Dashboards, the report catalogue, central reports, async generation, backups                                                                               |
 | 12  | [Settings & Configuration](./modules/12-settings-configuration.md)                             | Numbering sequences, back-dated entry control, currency, form configuration, module visibility                                                             |
 | 13  | [Chat, Notifications & Support](./modules/13-chat-notifications-support.md)                    | Member/group/project chat, push notifications, support tickets, announcements                                                                              |
+| 14  | [Contracts & Billing](./modules/14-contracts-and-billing.md)                                   | M11 part 1 build spec: Item Library, BOQ, work orders, measurements, RA bills; decisions beyond ADR CM-0023                                                |
 
 ### Research
 
