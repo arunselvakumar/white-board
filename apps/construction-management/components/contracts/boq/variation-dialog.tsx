@@ -253,7 +253,7 @@ export function VariationDialog({
               className="w-full min-w-0"
               aria-invalid={errors[name] != null}
             >
-              <SelectValue placeholder={`Pick the ${label.toLowerCase()}`} />
+              <SelectValue placeholder="Select…" />
             </SelectTrigger>
             <SelectContent align="start" alignItemWithTrigger={false}>
               {choices.map((choice) => (

@@ -395,7 +395,7 @@ export function BoqItemDialog({
             </div>
           ) : null}
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-            {select("sectionId", "Section", sectionItems, "Pick the section")}
+            {select("sectionId", "Section", sectionItems, "Select…")}
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor={`${id}-itemNo`}>Item no</Label>
               <Input
@@ -420,7 +420,7 @@ export function BoqItemDialog({
             <FieldError message={errors.description?.message} />
           </div>
           <div className="grid min-w-0 gap-4 sm:grid-cols-3">
-            {select("uomId", "UoM", uomItems, "Pick the UoM")}
+            {select("uomId", "UoM", uomItems, "Select…")}
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor={`${id}-sacHsn`}>SAC/HSN</Label>
               <Input
