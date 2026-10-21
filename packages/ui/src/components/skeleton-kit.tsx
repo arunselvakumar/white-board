@@ -134,7 +134,7 @@ function TableSkeletonCell({
     case "badge":
       return <Skeleton className="h-5 w-16 rounded-full" />;
     case "actions":
-      return <Skeleton className="size-9 rounded-md" />;
+      return <Skeleton className="size-8 rounded-md" />;
     case "checkbox":
       return <Skeleton className="size-4 rounded-[4px]" />;
     case "avatar":
@@ -164,6 +164,7 @@ function TableSkeleton({
   label,
   count = false,
   bordered = true,
+  tableClassName,
   className,
 }: {
   columns: SkeletonColumn[];
@@ -172,10 +173,12 @@ function TableSkeleton({
   count?: boolean;
   /** The `rounded-lg border` frame list pages put around their table. */
   bordered?: boolean;
+  /** The loaded `<Table>`'s own classes, e.g. "min-w-[76rem] table-fixed". */
+  tableClassName?: string;
   className?: string;
 }) {
   const table = (
-    <Table>
+    <Table className={tableClassName}>
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           {columns.map((column, index) => (
@@ -264,7 +267,7 @@ function ItemListSkeleton({
               {trailing === "badge" ? (
                 <Skeleton className="h-5 w-16 rounded-full" />
               ) : trailing === "action" ? (
-                <Skeleton className="size-9 rounded-md" />
+                <Skeleton className="size-8 rounded-md" />
               ) : (
                 <SkeletonText width="4.5rem" />
               )}
