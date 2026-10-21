@@ -65,7 +65,8 @@ export function MonthGridSkeleton({
         <CalendarGridSkeleton
           label={label}
           nameHeader={nameHeader}
-          headers={[...dayHeaders(month), ...totals]}
+          headers={dayHeaders(month)}
+          totals={totals}
         />
       </div>
     </div>

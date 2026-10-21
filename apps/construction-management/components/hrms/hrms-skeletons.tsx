@@ -121,7 +121,8 @@ export function MonthlyAttendanceSkeleton({ month }: { month: string }) {
         <CalendarGridSkeleton
           label="Loading the monthly attendance"
           nameHeader="Team Member"
-          headers={[...dayHeaders(month), ...MONTH_TOTALS]}
+          headers={dayHeaders(month)}
+          totals={MONTH_TOTALS}
         />
       </div>
     </div>

@@ -1,9 +1,11 @@
+"use client";
+
 import { cn } from "cn";
-import type { ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 
 import { Card, CardContent, CardHeader } from "./card";
 import { Item, ItemActions, ItemContent, ItemMedia } from "./item";
-import { Skeleton } from "./skeleton";
+import { Skeleton, skeletonClassName } from "./skeleton";
 import {
   Table,
   TableBody,
@@ -27,9 +29,14 @@ function widthAt(index: number, offset = 0): string {
 }
 
 /**
- * Wraps a skeleton: one "Loading" for screen readers, the bars hidden from
- * them.
+ * Wraps a skeleton with one "Loading" for screen readers. The bars carry no
+ * text; real chrome inside (headers, labels) stays readable. The label comes
+ * first and is out of flow, so `space-y-*`, `gap-*` and grids lay out the
+ * children as if it weren't there.
  */
+/** True inside a `SkeletonGroup`, so a nested one doesn't announce again. */
+const InSkeletonGroup = createContext(false);
+
 function SkeletonGroup({
   label = "Loading",
   className,
@@ -40,12 +47,12 @@ function SkeletonGroup({
   className?: string;
   children: ReactNode;
 }) {
+  const nested = useContext(InSkeletonGroup);
+  if (nested) return <div className={className}>{children}</div>;
   return (
     <div role="status" aria-busy="true" className={className}>
       <span className="sr-only">{label}</span>
-      <div aria-hidden="true" className="contents">
-        {children}
-      </div>
+      <InSkeletonGroup value={true}>{children}</InSkeletonGroup>
     </div>
   );
 }
@@ -62,7 +69,8 @@ const TEXT_SIZES = {
 
 /**
  * One line of text. The wrapper takes the line height of that text size, so
- * the layout doesn't shift when the real text arrives.
+ * the layout doesn't shift when the real text arrives. Spans only, so it can
+ * sit inside a heading, paragraph or button.
  */
 function SkeletonText({
   size = "sm",
@@ -81,7 +89,10 @@ function SkeletonText({
       className={cn("flex items-center", line, className)}
       style={{ width }}
     >
-      <Skeleton className={cn("w-full rounded-sm", bar)} />
+      <span
+        data-slot="skeleton"
+        className={cn(skeletonClassName, "block w-full rounded-sm", bar)}
+      />
     </span>
   );
 }
@@ -195,7 +206,10 @@ function TableSkeleton({
   return (
     <SkeletonGroup label={label} className={cn("space-y-3", className)}>
       {count ? <SkeletonText width="5rem" /> : null}
-      {bordered ? <div className="rounded-lg border">{table}</div> : table}
+      {/* Hidden from screen readers: a scrollable table with nothing to focus fails axe, and the group's label says it all. */}
+      <div aria-hidden="true" className={cn(bordered && "rounded-lg border")}>
+        {table}
+      </div>
     </SkeletonGroup>
   );
 }
@@ -274,7 +288,8 @@ function MetricCardSkeleton({
 }: {
   label?: ReactNode;
   icon?: boolean;
-  caption?: boolean;
+  /** `true` for a caption bar, or the real caption when it needs no data. */
+  caption?: ReactNode;
   className?: string;
 }) {
   return (
@@ -296,7 +311,13 @@ function MetricCardSkeleton({
       <span className="mt-auto pt-4 sm:pt-6">
         <Skeleton className="h-8 w-24 rounded-sm sm:h-10" />
       </span>
-      {caption ? <SkeletonText width="75%" className="mt-3" /> : null}
+      {caption === true ? (
+        <SkeletonText width="75%" className="mt-3" />
+      ) : caption === false || caption == null ? null : (
+        <span className="text-muted-foreground mt-3 line-clamp-2 text-sm leading-snug">
+          {caption}
+        </span>
+      )}
     </div>
   );
 }
@@ -307,6 +328,7 @@ function MetricGridSkeleton({
   labels,
   icon,
   caption,
+  captions,
   label,
   className = "grid grid-cols-2 gap-3 lg:grid-cols-4",
 }: {
@@ -315,6 +337,8 @@ function MetricGridSkeleton({
   labels?: ReactNode[];
   icon?: boolean;
   caption?: boolean;
+  /** Real captions, card by card; overrides `caption`. */
+  captions?: ReactNode[];
   label?: string;
   className?: string;
 }) {
@@ -326,7 +350,7 @@ function MetricGridSkeleton({
           key={index}
           label={labels?.[index]}
           icon={icon}
-          caption={caption}
+          caption={captions?.[index] ?? caption}
         />
       ))}
     </SkeletonGroup>
@@ -516,6 +540,7 @@ function CardGridSkeleton({
  */
 function CalendarGridSkeleton({
   headers,
+  totals = [],
   rows = 6,
   nameHeader,
   label,
@@ -523,6 +548,8 @@ function CalendarGridSkeleton({
 }: {
   /** One per day column, e.g. ["1", "2", …] or weekday labels. */
   headers: ReactNode[];
+  /** Totals columns after the days, e.g. ["P", "A", "OT h"]: figures, not day squares. */
+  totals?: ReactNode[];
   rows?: number;
   /** The first column's header, e.g. "Labour". */
   nameHeader?: ReactNode;
@@ -531,32 +558,47 @@ function CalendarGridSkeleton({
 }) {
   return (
     <SkeletonGroup label={label} className={cn("rounded-lg border", className)}>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="min-w-40">{nameHeader}</TableHead>
-            {headers.map((header, index) => (
-              <TableHead key={index} className="px-1 text-center">
-                {header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: rows }, (_, row) => (
-            <TableRow key={row} className="hover:bg-transparent">
-              <TableCell>
-                <SkeletonText width={widthAt(row)} />
-              </TableCell>
-              {headers.map((_, index) => (
-                <TableCell key={index} className="px-1">
-                  <Skeleton className="mx-auto size-7 rounded-md" />
-                </TableCell>
+      <div aria-hidden="true">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="min-w-40">{nameHeader}</TableHead>
+              {headers.map((header, index) => (
+                <TableHead key={index} className="px-1 text-center">
+                  {header}
+                </TableHead>
+              ))}
+              {totals.map((header, index) => (
+                <TableHead
+                  key={`total-${String(index)}`}
+                  className="text-right"
+                >
+                  {header}
+                </TableHead>
               ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: rows }, (_, row) => (
+              <TableRow key={row} className="hover:bg-transparent">
+                <TableCell>
+                  <SkeletonText width={widthAt(row)} />
+                </TableCell>
+                {headers.map((_, index) => (
+                  <TableCell key={index} className="px-1">
+                    <Skeleton className="mx-auto size-7 rounded-md" />
+                  </TableCell>
+                ))}
+                {totals.map((_, index) => (
+                  <TableCell key={`total-${String(index)}`}>
+                    <SkeletonText width="1.75rem" className="ml-auto" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </SkeletonGroup>
   );
 }
