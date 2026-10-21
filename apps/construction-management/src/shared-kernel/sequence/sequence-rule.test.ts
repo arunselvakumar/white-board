@@ -85,6 +85,11 @@ describe("formatSequenceNumber", () => {
       "TXN",
       "PAY",
       "EXP",
+      // Contracts (ADR CM-0023 §4, §5, §7).
+      "VAR",
+      "WO",
+      "RA",
+      "CB",
     ]);
     expect(
       formatSequenceNumber(

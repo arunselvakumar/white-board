@@ -43,6 +43,17 @@ describe("projectNavGroups", () => {
       ],
       ["Materials & money", ["Materials", "Payments"]],
       ["Quality", ["Issues & Snags", "Inspections", "Testing Reports"]],
+      // M11 (ADR CM-0023 §22).
+      [
+        "Contracts",
+        [
+          "BOQ",
+          "Work Orders",
+          "Measurements",
+          "Contractor Bills",
+          "Client Bills",
+        ],
+      ],
       ["Sales", ["Inquiries", "Bookings"]],
       ["Files", ["Drawings", "Documents", "Gallery"]],
       ["Reports", ["Progress Reports", "Reports"]],
