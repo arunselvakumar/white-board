@@ -1,0 +1,25 @@
+apps/construction-management/components/attendance/attendance-skeletons.tsx
+  s_353c13142e25d9::t_ea2939627548d3 68-69
+apps/construction-management/components/hrms/hrms-skeletons.tsx
+  s_353c13142e25d9::t_83953b31d2433f 124-125
+packages/ui/src/components/skeleton-kit.tsx
+  s_353c13142e25d9::t_da030f015b86f1 1-2,4,8,32-35,37-39,50-51,55,72-73,92-95,209-212,291-292,314-320,331,340-341,353,543,551-552,561-577,580-601
+packages/ui/src/components/skeleton.tsx
+  s_353c13142e25d9::t_2f9b242f28f86b 3-6,15,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bf699a883f5594c045b766b06daa52d4f4d7ede0",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
