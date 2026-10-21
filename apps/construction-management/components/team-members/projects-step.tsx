@@ -18,7 +18,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
@@ -30,6 +29,7 @@ import {
   teamMemberQuery,
   type TeamMember,
 } from "@/src/queries/team-members";
+import { ProjectChecklistSkeleton } from "./team-members-skeletons";
 
 type Selection = {
   /** The chosen Project ids. Without it the step keeps its own choice. */
@@ -114,15 +114,6 @@ function ProjectChecklist({ value, onChange }: Selection) {
   );
 }
 
-function ChecklistSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
 /**
  * Select Projects (wizard step 2, CM-204): a checklist of the Company's
  * Projects from `/projects/options`. Pass `value`/`onChange` to send the
@@ -130,7 +121,7 @@ function ChecklistSkeleton() {
  */
 export function ProjectsStep(props: Selection) {
   return (
-    <Suspense fallback={<ChecklistSkeleton />}>
+    <Suspense fallback={<ProjectChecklistSkeleton />}>
       <ProjectChecklist {...props} />
     </Suspense>
   );

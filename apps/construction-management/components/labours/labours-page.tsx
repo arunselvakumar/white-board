@@ -11,7 +11,13 @@ import {
   Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState, type ReactNode } from "react";
+import {
+  type ReactNode,
+  Suspense,
+  useDeferredValue,
+  useState,
+  useTransition,
+} from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -51,7 +57,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -61,6 +66,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -80,6 +86,7 @@ import { ImportDialog } from "./import-dialog";
 import { LABOURS_PATH } from "./labour-form";
 import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
+import { LabourRowsSkeleton } from "./labours-skeletons";
 
 const STATUS_FILTERS: { value: LabourListFilter["status"]; label: string }[] = [
   { value: "all", label: "All" },
@@ -157,11 +164,15 @@ export function LaboursPage() {
     categoryId,
     supervisorId,
   };
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const set =
     <T,>(setter: (value: T) => void) =>
     (value: T) => {
-      setter(value);
-      setCursor(null);
+      startTransition(() => {
+        setter(value);
+        setCursor(null);
+      });
     };
 
   const addLink = (
@@ -213,7 +224,10 @@ export function LaboursPage() {
               placeholder="Search name, Labour Id or contact"
               value={search}
               onChange={(event) => {
-                set(setSearch)(event.target.value);
+                setSearch(event.target.value);
+                startTransition(() => {
+                  setCursor(null);
+                });
               }}
             />
           </InputGroup>
@@ -257,11 +271,16 @@ export function LaboursPage() {
             onChange={set(setSupervisorId)}
           />
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<LabourRowsSkeleton />}>
           <LabourRows
             filter={{ ...filter, cursor }}
-            onPage={setCursor}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
             addLink={addLink}
+            className={cn(isPending && "opacity-60 transition-opacity")}
             onImport={() => {
               setImporting(true);
             }}
@@ -269,16 +288,6 @@ export function LaboursPage() {
         </Suspense>
         <ImportDialog open={importing} onOpenChange={setImporting} />
       </div>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
     </div>
   );
 }
@@ -321,11 +330,13 @@ function LabourRows({
   onPage,
   addLink,
   onImport,
+  className,
 }: {
   filter: LabourListFilter;
   onPage: (cursor: LabourListFilter["cursor"]) => void;
   addLink: ReactNode;
   onImport: () => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(laboursQuery(filter));
   const command = useLabourCommand();
@@ -394,7 +405,7 @@ function LabourRows({
   const confirm = pending == null ? null : CONFIRM[pending.kind];
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
         <p className="text-muted-foreground text-sm">
           {data.total} {data.total === 1 ? "Labour" : "Labours"}

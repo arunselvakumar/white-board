@@ -5,7 +5,6 @@ import { FileText, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { ImageUploader } from "@/components/profile/image-uploader";
@@ -20,6 +19,7 @@ import {
   type LabourResponse,
 } from "@/src/queries/labours";
 import { DOCUMENT_CONTENT_TYPES } from "@/src/shared-kernel/files/document-file";
+import { LabourFilesSkeleton } from "./labours-skeletons";
 
 const MB = 1024 * 1024;
 
@@ -124,7 +124,7 @@ export function LabourFiles({ labour }: { labour: LabourResponse }) {
           </Button>
         </div>
         {documents.isPending ? (
-          <Skeleton className="h-12 w-full" />
+          <LabourFilesSkeleton />
         ) : (documents.data?.items.length ?? 0) === 0 ? (
           <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
             No documents yet. Add an ID card, bank passbook or licence (PDF,

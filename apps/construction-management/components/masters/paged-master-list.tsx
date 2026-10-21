@@ -4,10 +4,17 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useDeferredValue, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  useDeferredValue,
+  useMemo,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -26,6 +33,7 @@ import {
   MasterRow,
   MasterSearch,
 } from "./master-list-parts";
+import { MasterRowsSkeleton } from "./masters-skeletons";
 
 const STATUS_FILTERS: {
   value: MaterialMasterFilter["status"];
@@ -78,15 +86,26 @@ export function PagedMasterListScreen<L extends MaterialMasterList>({
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<MaterialMasterFilter["status"]>("all");
-  // A page cursor belongs to the filters it was read with; new filters start over.
   const extraKey = JSON.stringify(extra ?? {});
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  // The extra filters live in the parent, so they are deferred here.
+  const [isPending, startTransition] = useTransition();
+  const deferredExtraKey = useDeferredValue(extraKey);
+  const deferredExtra = useMemo(
+    () => JSON.parse(deferredExtraKey) as Record<string, string | undefined>,
+    [deferredExtraKey],
+  );
+  const stale = isPending || deferredExtraKey !== extraKey;
+  // A page cursor belongs to the filters it was read with; new filters start over.
   const [paging, setPaging] = useState<{
     key: string;
     cursor: MaterialMasterFilter["cursor"];
   }>({ key: extraKey, cursor: null });
-  const cursor = paging.key === extraKey ? paging.cursor : null;
+  const cursor = paging.key === deferredExtraKey ? paging.cursor : null;
   const setCursor = (next: MaterialMasterFilter["cursor"]) => {
-    setPaging({ key: extraKey, cursor: next });
+    startTransition(() => {
+      setPaging({ key: deferredExtraKey, cursor: next });
+    });
   };
   const [editing, setEditing] = useState<MaterialMasterItem<L> | "new" | null>(
     null,
@@ -136,8 +155,10 @@ export function PagedMasterListScreen<L extends MaterialMasterList>({
               const next = value[0] as
                 MaterialMasterFilter["status"] | undefined;
               if (next == null) return;
-              setStatus(next);
-              setCursor(null);
+              startTransition(() => {
+                setStatus(next);
+                setCursor(null);
+              });
             }}
             variant="outline"
             size="sm"
@@ -150,10 +171,24 @@ export function PagedMasterListScreen<L extends MaterialMasterList>({
           </ToggleGroup>
           {filters}
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense
+          fallback={
+            <MasterRowsSkeleton
+              count
+              details={screen.details != null}
+              label={`Loading ${screen.plural}`}
+            />
+          }
+        >
           <PagedRows
+            className={cn(stale && "opacity-60 transition-opacity")}
             screen={screen}
-            filter={{ search: deferredSearch, status, cursor, extra }}
+            filter={{
+              search: deferredSearch,
+              status,
+              cursor,
+              extra: extra == null ? undefined : deferredExtra,
+            }}
             onPage={setCursor}
             onEdit={setEditing}
             addButton={addButton}
@@ -172,28 +207,20 @@ export function PagedMasterListScreen<L extends MaterialMasterList>({
   );
 }
 
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
 function PagedRows<L extends MaterialMasterList>({
   screen,
   filter,
   onPage,
   onEdit,
   addButton,
+  className,
 }: {
   screen: PagedMasterScreen<L>;
   filter: MaterialMasterFilter;
   onPage: (cursor: MaterialMasterFilter["cursor"]) => void;
   onEdit: (item: MaterialMasterItem<L>) => void;
   addButton: ReactNode;
+  className?: string;
 }) {
   const router = useRouter();
   const { data } = useSuspenseQuery(
@@ -225,7 +252,7 @@ function PagedRows<L extends MaterialMasterList>({
     );
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? screen.singular : screen.plural}
       </p>

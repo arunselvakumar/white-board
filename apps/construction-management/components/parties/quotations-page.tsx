@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ExternalLink, FileText, Search } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -17,7 +17,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -27,6 +26,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
@@ -39,6 +39,7 @@ import {
 
 import { quotationOpenUrl } from "./party-quotations";
 import { PARTY_SCREENS, partyEditPath } from "./party-screens";
+import { QuotationRowsSkeleton } from "./parties-skeletons";
 
 const KIND_FILTERS: { value: QuotationsFilter["partyKind"]; label: string }[] =
   [
@@ -72,6 +73,8 @@ export function QuotationsPage() {
     useState<QuotationsFilter["partyKind"]>("all");
   const [cursor, setCursor] = useState<QuotationsFilter["cursor"]>(null);
   const deferredSearch = useDeferredValue(search);
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div className="w-full p-6">
@@ -93,7 +96,9 @@ export function QuotationsPage() {
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
-                setCursor(null);
+                startTransition(() => {
+                  setCursor(null);
+                });
               }}
             />
           </InputGroup>
@@ -104,8 +109,10 @@ export function QuotationsPage() {
               const next = value[0] as
                 QuotationsFilter["partyKind"] | undefined;
               if (next == null) return;
-              setPartyKind(next);
-              setCursor(null);
+              startTransition(() => {
+                setPartyKind(next);
+                setCursor(null);
+              });
             }}
             variant="outline"
             size="sm"
@@ -117,10 +124,15 @@ export function QuotationsPage() {
             ))}
           </ToggleGroup>
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<QuotationRowsSkeleton />}>
           <QuotationRows
             filter={{ search: deferredSearch, partyKind, cursor }}
-            onPage={setCursor}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+            className={cn(isPending && "opacity-60 transition-opacity")}
           />
         </Suspense>
       </div>
@@ -128,22 +140,14 @@ export function QuotationsPage() {
   );
 }
 
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
 function QuotationRows({
   filter,
   onPage,
+  className,
 }: {
   filter: QuotationsFilter;
   onPage: (cursor: QuotationsFilter["cursor"]) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(quotationsQuery(filter));
   const filtered =
@@ -169,7 +173,7 @@ function QuotationRows({
     );
 
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "quotation" : "quotations"}
       </p>
