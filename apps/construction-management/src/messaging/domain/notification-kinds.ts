@@ -65,6 +65,10 @@ export const NOTIFICATION_KINDS = {
   // HRMS.
   "salary.approved": { menu: "hrms.salaries", flag: "read" },
   "salary.paid": { menu: "hrms.salaries", flag: "read" },
+  // Sales (CM-1006): Booking Read + Notification holders on the Project.
+  "booking.created": { menu: "sales.bookings", flag: "read" },
+  "booking.confirmed": { menu: "sales.bookings", flag: "read" },
+  "booking.cancelled": { menu: "sales.bookings", flag: "read" },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;
@@ -225,6 +229,9 @@ export const LINKS = {
       ? `/app/projects/${location.id}/materials/inventory`
       : `/app/workspace/central-store/${location.id}`,
   mySalary: "/app/workspace/hrms/salary/my",
+  // Sales (CM-1006)
+  booking: (projectId: string, id: string) =>
+    `/app/projects/${projectId}/bookings/list/${id}`,
 } as const;
 
 // ---------------------------------------------------------------------------

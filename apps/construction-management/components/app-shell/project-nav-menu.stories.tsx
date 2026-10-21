@@ -130,6 +130,7 @@ export const Home: Story = {
         ],
         ["Materials & money", ["Materials", "Payments"]],
         ["Quality", ["Issues & Snags", "Inspections", "Testing Reports"]],
+        ["Sales", ["Inquiries", "Bookings"]],
         ["Files", ["Drawings", "Documents", "Gallery"]],
         ["Reports", ["Progress Reports", "Reports"]],
       ]),

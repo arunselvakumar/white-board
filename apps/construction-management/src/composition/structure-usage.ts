@@ -11,7 +11,10 @@ import type { StructureUsage } from "@/src/projects/domain/structure-repository"
  * always count. Read by table, without importing those contexts (ADR
  * CM-0001). Tasks (their `site_location` and every ref of their
  * `extra_locations`), Issues and Inspections (M8, ADR CM-0019 §11) count
- * while live; Bookings (M10) add their tables here.
+ * while live. Bookings (M10, ADR CM-0022 §7) name a unit and its Wing by
+ * plain `unit_id` / `wing_id` columns, not a `LocationRef`: every booking
+ * that is not deleted counts — cancelled ones too, they are the unit's
+ * history (`bookingUnits`).
  */
 const SOURCES: readonly { table: string; live: boolean }[] = [
   { table: "construction_site_work.worksheets", live: true },
@@ -53,6 +56,27 @@ function refs(workspaceId: string): Prisma.Sql {
   );
 }
 
+/**
+ * The units named by a booking that is not deleted (any status), with
+ * their floors, among `unitIds` / `floorIds` (CM-1006).
+ */
+function bookedFloorsAndUnits(
+  workspaceId: string,
+  ids: { floorIds: readonly string[]; unitIds: readonly string[] },
+): Prisma.Sql {
+  return Prisma.sql`
+      SELECT DISTINCT 'floor' AS kind, u.floor_id::text AS id
+      FROM construction_sales.bookings b
+      JOIN construction_projects.units u ON u.id = b.unit_id
+      WHERE b.workspace_id = ${workspaceId} AND b.deleted_at IS NULL
+        AND u.floor_id::text = ANY(${[...ids.floorIds]}::text[])
+      UNION
+      SELECT DISTINCT 'unit' AS kind, b.unit_id::text AS id
+      FROM construction_sales.bookings b
+      WHERE b.workspace_id = ${workspaceId} AND b.deleted_at IS NULL
+        AND b.unit_id::text = ANY(${[...ids.unitIds]}::text[])`;
+}
+
 export class PrismaStructureUsage implements StructureUsage {
   constructor(private readonly db: PrismaClient) {}
 
@@ -72,7 +96,9 @@ export class PrismaStructureUsage implements StructureUsage {
       UNION
       SELECT DISTINCT 'unit' AS kind, u.id
       FROM refs, jsonb_array_elements_text(refs.ref -> 'unitIds') AS u(id)
-      WHERE refs.ref ->> 'type' = 'wing' AND u.id = ANY(${[...ids.unitIds]}::text[])`);
+      WHERE refs.ref ->> 'type' = 'wing' AND u.id = ANY(${[...ids.unitIds]}::text[])
+      UNION
+      ${bookedFloorsAndUnits(workspaceId, ids)}`);
     return {
       floorIds: rows.filter((row) => row.kind === "floor").map((row) => row.id),
       unitIds: rows.filter((row) => row.kind === "unit").map((row) => row.id),
@@ -85,6 +111,11 @@ export class PrismaStructureUsage implements StructureUsage {
       SELECT EXISTS (
         SELECT 1 FROM refs
         WHERE ref ->> 'type' = 'wing' AND ref ->> 'wingId' = ${wingId}
+      ) OR EXISTS (
+        SELECT 1 FROM construction_sales.bookings
+        WHERE workspace_id = ${workspaceId}
+          AND wing_id::text = ${wingId}
+          AND deleted_at IS NULL
       ) AS used`);
     return rows[0]?.used === true;
   }

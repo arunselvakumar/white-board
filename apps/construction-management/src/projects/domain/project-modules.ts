@@ -156,6 +156,23 @@ export const PROJECT_MODULES = [
     segment: "inspections",
     menu: "tracking.inspection_requests",
   },
+  // Sales (M10, ADR CM-0022 §1). A Project without Wings has no units to
+  // book, so Bookings follows the Wings structure.
+  {
+    key: "inquiries",
+    label: "Inquiries",
+    description: "Leads followed up through the funnel to a booking.",
+    segment: "inquiries",
+    menu: "sales.inquiries",
+  },
+  {
+    key: "bookings",
+    label: "Bookings",
+    description: "Units on hold, booked and available.",
+    segment: "bookings",
+    menu: "sales.bookings",
+    structure: "wings",
+  },
   {
     key: "progress_reports",
     label: "Progress Reports",

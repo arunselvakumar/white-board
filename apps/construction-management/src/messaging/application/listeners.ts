@@ -19,6 +19,7 @@ import {
 } from "../domain/notification-kinds";
 import type {
   InboundBackupFinished,
+  InboundBookingEvent,
   InboundEquipmentFuelOverrun,
   InboundInspectionDecided,
   InboundInspectionRequested,
@@ -157,6 +158,11 @@ export class NotificationListeners implements DomainEventListener {
         return this.reportFinished(event as InboundReportFinished);
       case "BackupFinished":
         return this.backupFinished(event as InboundBackupFinished);
+      // Sales (CM-1006)
+      case "BookingCreated":
+      case "BookingConfirmed":
+      case "BookingCancelled":
+        return this.booking(event as InboundBookingEvent);
       default:
         return [];
     }
@@ -741,6 +747,59 @@ export class NotificationListeners implements DomainEventListener {
                 }
               : null,
           sourceKey: `backup:${event.backupJobId}:${event.status}`,
+        },
+      },
+    ];
+  }
+
+  // -------------------------------------------------------------------------
+  // Sales (CM-1006, ADR CM-0022 §10)
+  // -------------------------------------------------------------------------
+
+  /** A booking made, confirmed or cancelled: Booking Read + N holders on the Project. */
+  private async booking(event: InboundBookingEvent): Promise<Plan[]> {
+    const project = await this.projectName(event, event.projectId);
+    const at = project == null ? "" : ` in ${project}`;
+    const draft = (() => {
+      switch (event.type) {
+        case "BookingCreated":
+          return {
+            type: "booking.created" as const,
+            title:
+              event.status === "on_hold"
+                ? `${event.unitLabel} is on hold`
+                : `${event.unitLabel} is booked`,
+            body: `For ${event.customerName}${at}.`,
+          };
+        case "BookingConfirmed":
+          return {
+            type: "booking.confirmed" as const,
+            title: `${event.unitLabel}'s hold is confirmed`,
+            body: `Booked for ${event.customerName}${at}.`,
+          };
+        case "BookingCancelled":
+          return {
+            type: "booking.cancelled" as const,
+            title: `${event.unitLabel}'s booking is cancelled`,
+            body: `${event.customerName}: ${event.reason}`,
+          };
+      }
+    })();
+    return [
+      {
+        audience: {
+          kind: "holders",
+          menu: "sales.bookings",
+          flag: "read",
+          projectId: event.projectId,
+        },
+        except: event.by,
+        draft: {
+          ...draft,
+          menu: "sales.bookings",
+          projectId: event.projectId,
+          href: LINKS.booking(event.projectId, event.bookingId),
+          sourceKey: key(event, draft.type, event.bookingId),
         },
       },
     ];

@@ -129,9 +129,13 @@ describe("mobile OTP sign-in while SMS is on (CM-102)", () => {
       code,
     });
     expect(response.status).toBe(400);
-    expect(await json<ErrorJson>(response)).toMatchObject({
-      code: "OTP_EXPIRED",
-    });
+    // Better Auth deletes every expired verification whenever any code is
+    // looked up, so a sign-in in another test worker may remove this row
+    // first: the code is then "not found" rather than "expired". Either way
+    // it is refused.
+    expect((await json<ErrorJson>(response)).code).toMatch(
+      /^OTP_(EXPIRED|NOT_FOUND)$/,
+    );
   });
 
   it("locks the code after five wrong attempts", async () => {

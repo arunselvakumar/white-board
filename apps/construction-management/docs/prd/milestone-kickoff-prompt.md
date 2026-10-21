@@ -36,21 +36,21 @@ You are implementing milestone <MILESTONE> of the Construction Management app in
 
 ## Milestones (one PR each, in this order)
 
-| Session | Milestone                                       | Branch name                        | Reads specs                             | Unblocks    |
-| ------- | ----------------------------------------------- | ---------------------------------- | --------------------------------------- | ----------- |
-| 1       | **M0 Project setup**                            | `feat/cm-m0-project-setup`         | 03-target-architecture                  | everything  |
-| 2       | **M1 SaaS onboarding & access**                 | `feat/cm-m1-onboarding-access`     | modules/01, modules/12                  | M2, M3, M4  |
-| 3       | **M2 Site workforce (labour & vendor)**         | `feat/cm-m2-site-workforce`        | modules/08, modules/02 (labour subset)  | M7          |
-| 4       | **M3 Staff HRMS**                               | `feat/cm-m3-hrms`                  | modules/10                              | —           |
-| 5       | **M4 Projects & structure**                     | `feat/cm-m4-projects-structure`    | modules/03                              | M5, M8, M10 |
-| 6       | **M5 Procurement & inventory**                  | `feat/cm-m5-procurement-inventory` | modules/06, modules/02                  | M6, M7      |
-| 7       | **M6 Daily site work**                          | `feat/cm-m6-daily-site-work`       | modules/04                              | M9          |
-| 8       | **M7 Finance**                                  | `feat/cm-m7-finance`               | modules/07                              | M9, M11     |
-| 9       | **M8 Tasks, issues, inspections**               | `feat/cm-m8-tracking`              | modules/05                              | —           |
-| 10      | **M9 Dashboards, reports, notifications, chat** | `feat/cm-m9-reporting-messaging`   | modules/11, modules/13                  | M12         |
-| 11      | **M10 Sales CRM**                               | `feat/cm-m10-sales-crm`            | modules/09                              | —           |
-| 12      | **M11 India compliance**                        | `feat/cm-m11-india-compliance`     | 04-gaps-and-roadmap §Phase 3, research/ | —           |
-| 13      | **M12 Differentiators**                         | `feat/cm-m12-differentiators`      | 04-gaps-and-roadmap §Phase 4            | —           |
+| Session | Milestone                                 | Branch name                        | Reads specs                              | Unblocks    |
+| ------- | ----------------------------------------- | ---------------------------------- | ---------------------------------------- | ----------- |
+| 1       | **M0 Project setup**                      | `feat/cm-m0-project-setup`         | 03-target-architecture                   | everything  |
+| 2       | **M1 SaaS onboarding & access**           | `feat/cm-m1-onboarding-access`     | modules/01, modules/12                   | M2, M3, M4  |
+| 3       | **M2 Site workforce (labour & vendor)**   | `feat/cm-m2-site-workforce`        | modules/08, modules/02 (labour subset)   | M7          |
+| 4       | **M3 Staff HRMS**                         | `feat/cm-m3-hrms`                  | modules/10                               | —           |
+| 5       | **M4 Projects & structure**               | `feat/cm-m4-projects-structure`    | modules/03                               | M5, M8, M10 |
+| 6       | **M5 Procurement & inventory**            | `feat/cm-m5-procurement-inventory` | modules/06, modules/02                   | M6, M7      |
+| 7       | **M6 Daily site work**                    | `feat/cm-m6-daily-site-work`       | modules/04                               | M9          |
+| 8       | **M7 Finance**                            | `feat/cm-m7-finance`               | modules/07                               | M9, M11     |
+| 9       | **M8 Tasks, issues, inspections**         | `feat/cm-m8-tracking`              | modules/05                               | —           |
+| 10      | **M9 Dashboards, reports, notifications** | `feat/cm-m9-reporting-messaging`   | modules/11, modules/13                   | M12         |
+| 11      | **M10 Sales CRM**                         | `feat/cm-m10-sales-crm`            | modules/09                               | —           |
+| 12      | **M11 India compliance**                  | `feat/cm-m11-india-compliance`     | 04-gaps-and-roadmap §Phase 3, research/  | —           |
+| 13      | **M12 Differentiators**                   | `feat/cm-m12-differentiators`      | 04-gaps-and-roadmap §Phase 4, modules/13 | —           |
 
 Before starting session N+1, merge (or at least rebase onto) the PR from session N; the kickoff prompt branches from `main`. M4–M10 boards have no "Done when" sections yet — the session that starts one of those milestones writes them first (from the module spec) as its opening commit, then implements.
 

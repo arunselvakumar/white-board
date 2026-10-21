@@ -2,12 +2,13 @@
 title: Construction Management — milestones and tasks
 docs: ../README.md
 created: 2026-10-08
-updated: 2026-10-16
+updated: 2026-10-17
 status_values:
   - todo
   - in_progress
   - blocked
   - done
+  - moved
 ---
 
 # Construction Management — milestones and tasks
@@ -24,6 +25,7 @@ Priority 1 is **M0 → M3** (project setup, SaaS login/signup and company onboar
 | `in_progress` | Someone is implementing it                                         |
 | `blocked`     | Cannot proceed; note why in the ticket                             |
 | `done`        | Merged and verified (tests + Storybook/UI where the ticket has UI) |
+| `moved`       | Moved to another milestone; the title names the new ticket         |
 
 | Area   | Meaning                                                               |
 | ------ | --------------------------------------------------------------------- |
@@ -56,7 +58,7 @@ Ticket ids are `CM-<milestone><nn>`: `CM-105` is milestone 1, ticket 5.
 | **M9**    | Dashboards, reports, notifications | [modules/11](../modules/11-reports-dashboards-backup.md), [modules/13](../modules/13-chat-notifications-support.md) | Company dashboard, reports on a queue, Central Reports, notifications and web push, backups (chat later)        | 2        |
 | **M10**   | Sales CRM                          | [modules/09](../modules/09-sales-crm-inquiry-booking.md)                                                            | Inquiries, funnel, follow-ups, unit bookings                                                                    | 2        |
 | **M11**   | India compliance                   | [04-gaps-and-roadmap §Phase 3](../04-gaps-and-roadmap.md)                                                           | BOQ/RA bills, GST engine, TDS ledger, muster rolls, RERA ledger, IS 456 registers                               | 2        |
-| **M12**   | Differentiators                    | [04-gaps-and-roadmap §Phase 4](../04-gaps-and-roadmap.md)                                                           | WhatsApp bot, offline outbox, Tally sync, allottee & vendor portals                                             | 2        |
+| **M12**   | Differentiators                    | [04-gaps-and-roadmap §Phase 4](../04-gaps-and-roadmap.md)                                                           | Chat and support tickets, WhatsApp bot, offline outbox, Tally sync, allottee & vendor portals                   | 2        |
 
 Dependency between milestones:
 
@@ -891,7 +893,7 @@ Goal: a Project's plan and its quality control in one place — a task tree with
 
 ## M9 — Dashboards, reports, notifications
 
-Goal: reports that run on a real queue and stay downloadable, a catalogue every report screen reads, a Company Dashboard beside the Project Dashboard, a Central Reports workspace, notifications in the app and by web push for approvals and assignments, and backups, devices, data export and account deletion. Spec: `modules/11`, `modules/13`. Product decisions: [ADR CM-0021](../adr/CM-0021-reporting-notifications-backups-product-decisions.md). Chat and support tickets (CM-905) are left out of this delivery by the owner.
+Goal: reports that run on a real queue and stay downloadable, a catalogue every report screen reads, a Company Dashboard beside the Project Dashboard, a Central Reports workspace, notifications in the app and by web push for approvals and assignments, and backups, devices, data export and account deletion. Spec: `modules/11`, `modules/13`. Product decisions: [ADR CM-0021](../adr/CM-0021-reporting-notifications-backups-product-decisions.md). Chat and support tickets (CM-905) are left out of this delivery by the owner and moved to M12 as CM-1201 (2026-10-17).
 
 | ID     | Seq | Title                                                                                                          | Status | Blocked by     | Area           |
 | ------ | --: | -------------------------------------------------------------------------------------------------------------- | ------ | -------------- | -------------- |
@@ -899,7 +901,7 @@ Goal: reports that run on a real queue and stay downloadable, a catalogue every 
 | CM-902 |   2 | `construction_reporting` views for KPIs; Company Dashboard; Manage Dashboard respects hidden modules           | done   | CM-901         | Data+UI        |
 | CM-903 |   3 | Central Reports workspace; procurement and central labour report kinds                                         | done   | CM-901         | HTTP+UI        |
 | CM-904 |   4 | Notifications: `messaging` context, bell and list, web push, N flag, events from the modules, ready popups     | done   | CM-901         | Domain+HTTP+UI |
-| CM-905 |   5 | Chat: member, group, project; support tickets — **not in this delivery** (owner, 2026-10-16)                   | todo   | CM-904         | Domain+HTTP+UI |
+| CM-905 |   5 | Chat: member, group, project; support tickets — **moved to M12 as CM-1201** (owner, 2026-10-17)                | moved  | CM-904         | Domain+HTTP+UI |
 | CM-906 |   6 | Backups (data/media per module, date range; full Company with a code) and Download My Data                     | done   | CM-901, CM-904 | HTTP+UI        |
 | CM-907 |   7 | Devices; Transfer ownership; Delete My Account; Delete Company with cooling-off; code-gated Aadhaar/PAN reveal | done   | CM-901         | Domain+HTTP+UI |
 
@@ -1052,18 +1054,108 @@ Goal: reports that run on a real queue and stay downloadable, a catalogue every 
 - **Reveal needs a code:** both reveal routes call `assertRevealAllowed` (409 `REVEAL_CODE_REQUIRED`); a verified `reveal_identifiers` code opens 10 minutes for that session. My Profile's Reveal opens "Confirm it is you" (`components/account/reveal-code-dialog.tsx`). Labour has no Aadhaar/PAN reveal yet.
 - **Tests:** HTTP tests for codes (send, hash, one a minute, Owner-only purposes, SMS, wrong / used / expired / locked, test code), reveal gating, devices (list, push, sign out one, others, another User's, account-menu sign-out), transfer (Owner only, code, roles, Designations, matrix, audit), account deletion (Owner refusal, DELETE, every effect, Deleted user) and Company deletion (Owner only, name, cooling-off guard, open writes, cancel) plus the purge counting rows in every schema before and after with another Company untouched. Unit tests for the user-agent parser, the code rules, Company deletion and the Team Member ownership rules; Storybook play functions for Devices, Privacy, Settings → Company, the banner and the reveal code step. Decisions the build made are in `modules/01` → "Decisions for the build (M9)".
 
-## M10 — Sales CRM (board only)
+## M10 — Sales CRM
 
-| ID      | Seq | Title                                                                            | Status | Blocked by | Area           |
-| ------- | --: | -------------------------------------------------------------------------------- | ------ | ---------- | -------------- |
-| CM-1001 |   1 | Prisma `construction-sales.prisma`; lead sources and funnel statuses per project | todo   | CM-402     | Data+Domain    |
-| CM-1002 |   2 | Inquiries, follow-ups, inquiry tasks, converted/lost, reopen, import             | todo   | CM-1001    | Domain+HTTP+UI |
-| CM-1003 |   3 | Bookings on units, unit areas, unavailable units, unit import, booking report    | todo   | CM-1002    | Domain+HTTP+UI |
-| CM-1004 |   4 | Inquiry dashboard (funnel, source performance, team performance, call activity)  | todo   | CM-1002    | UI             |
+Goal: a Project's sales desk — inquiries followed up through a per-Project funnel until they convert to a unit or are lost, bookings on units with their history, unit sales details, reports and the dashboard's Inquiry and Booking sections. Spec: `modules/09`. Product decisions: [ADR CM-0022](../adr/CM-0022-sales-crm-product-decisions.md).
 
-## M11 — India compliance and M12 — Differentiators
+| ID      | Seq | Title                                                                                                                | Status | Blocked by       | Area           |
+| ------- | --: | -------------------------------------------------------------------------------------------------------------------- | ------ | ---------------- | -------------- |
+| CM-1001 |   1 | ADR CM-0022; `construction_sales` schema; `ProjectCreated` seeds and backfill; Sales modules, heading, access, ports | done   | CM-402           | Data+Domain    |
+| CM-1002 |   2 | Sales settings: Funnel Stages (reorder), Lead Sources, Lost Reasons                                                  | todo   | CM-1001          | Domain+HTTP+UI |
+| CM-1003 |   3 | Inquiries: full and quick add, edit, delete, duplicates, View all, list and filters, detail, files, history          | todo   | CM-1002          | Domain+HTTP+UI |
+| CM-1004 |   4 | Follow-ups, Overdue, Inquiry Tasks; assigned and follow-ups-due notifications                                        | todo   | CM-1003          | Domain+HTTP+UI |
+| CM-1005 |   5 | Unit sales details (type, areas, unavailable), unit import, Units chart by sales status                              | done   | CM-1001          | Domain+HTTP+UI |
+| CM-1006 |   6 | Bookings: hold, book, confirm, extend, cancel, delete, history, files; `StructureUsage`; booking notifications       | done   | CM-1005          | Domain+HTTP+UI |
+| CM-1007 |   7 | Close as Converted (creates the booking) or Lost, Reopen; inquiry import and sample                                  | todo   | CM-1004, CM-1006 | Domain+HTTP+UI |
+| CM-1008 |   8 | Inquiry and Booking reports; Inquiry and Booking dashboard sections; backups                                         | todo   | CM-1007          | HTTP+UI        |
 
-Boards are written when M7 is `done`; scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phases 3 and 4.
+### CM-1001 — Foundation
+
+**Done when:**
+
+- **ADR CM-0022** is accepted and this board is written.
+- **Schema.** `construction-sales.prisma` (`construction_sales`, `ConstructionSales…`) with funnel stages, lead sources, lost reasons, inquiries, inquiry events, follow-ups, inquiry tasks, inquiry files, unit profiles, bookings, booking events and booking files; every table has `workspace_id`; the partial unique index "one active booking per unit". One migration for the schema and one data migration seeding every live Project.
+- **Seeds.** `ProjectCreated` is dispatched by `ProjectHandlers.create` after commit; `SeedProjectSalesListener` seeds the three lists idempotently (CM-0022 §2). Unit tests keep the seed JSON and the backfill SQL in step.
+- **Modules.** `inquiries` and `bookings` in `PROJECT_MODULES` (Bookings with the Wings structure rule), a **Sales** sidebar heading and icons; the dashboard's `inquiry` / `booking` sections belong to them.
+- **Access and ports.** `GET /api/construction/sales/access?projectId=` and `src/queries/sales-access.ts`; a `SalesDirectory` port (Project facts, members on the Project, Wings with units) and its composition adapter; domain constants and labels for every enum.
+
+### CM-1002 — Sales settings
+
+**Done when:**
+
+- Commands and HTTP for Funnel Stages (create, rename, move up/down, delete with `FUNNEL_STAGE_IN_USE` / `FUNNEL_STAGE_LAST`), Lead Sources and Lost Reasons (create, rename, disable/enable, delete with `*_IN_USE`), all needing Inquiry Update, names unique per Project ignoring case, audited.
+- Inquiries → **Settings** tab with three lists; reorder by buttons that keep focus.
+- HTTP tests per rule; stories for each list, its dialogs and empty states.
+
+### CM-1003 — Inquiries
+
+**Done when:**
+
+- Create (full and quick), edit, delete per CM-0022 §3: mobile normalising, `INQUIRY_DUPLICATE` with `allowDuplicate`, back-dated `inquiry` window, members on the Project, first stage by default, `INQUIRY_HAS_BOOKING`.
+- **View all** scoping on list, detail, edit and delete (others' inquiries are 404).
+- **History**: `inquiry_events` for created, assigned, lead owner changed, stage moved (closed and reopened arrive with CM-1007).
+- Visiting card and photos (attachments, not the Gallery).
+- List: search (name, mobile, email), filters Status, Stage, Interest Type, Lead Source, Assignee, Due (Overdue / Today / Upcoming / None), cursor pages and total; card layout at phone width. Detail page; full form and quick-add dialog with the duplicate prompt.
+- HTTP tests for each rule and scope; stories for the list, both forms, the duplicate prompt and empty states.
+
+### CM-1004 — Follow-ups and Inquiry Tasks
+
+**Done when:**
+
+- Follow-ups per CM-0022 §4: Open inquiries only, Done on not in the future and inside `inquiry_follow_up`, next follow-up after Done on, stage move recorded in history; remove by Inquiry Delete holders.
+- Inquiry Tasks per §5: create, edit, done/undone, delete.
+- Detail page: add follow-up dialog, merged history, tasks panel.
+- Notifications `inquiry.assigned` and the daily `inquiry.follow_ups_due` notice through messaging.
+- HTTP tests; stories for the dialog, the history and the tasks panel.
+
+### CM-1005 — Unit sales details
+
+**Done when:**
+
+- Unit profile commands (type, areas, area unit; unavailable with reason and note; available again) per CM-0022 §8 with `UNIT_HAS_BOOKING` (once CM-1006 lands, through the booking store).
+- Unit import (sample prefilled with the Project's units; update only; matched by Wing and Unit No; all or nothing).
+- Bookings → **Units** tab: Wing picker, floors × units grid coloured by sales status with counts, unit panel with details.
+- HTTP tests; stories for the chart, the unit panel and the import dialog.
+
+### CM-1006 — Bookings
+
+**Done when:**
+
+- Hold, book, confirm, extend hold, cancel, edit, delete per CM-0022 §7: one active booking per unit, expired holds cancelled on rebooking, `UNIT_UNAVAILABLE`, back-dated `booking` window, booking history, booking form and photos.
+- `StructureUsage` reports units, floors and Wings named by any booking; the Project delete guard counts inquiries and bookings.
+- Notifications `booking.created`, `booking.confirmed`, `booking.cancelled`.
+- Bookings → **Bookings** tab: list with filters (status, Wing, search) and cursors, form, detail with history and actions; the unit panel offers Hold / Book.
+- HTTP tests per transition and guard; stories.
+
+### CM-1007 — Close, Reopen, import
+
+**Done when:**
+
+- Close as Converted creates the Booked booking in the same transaction (needs Inquiry Update and Booking Create); Lost needs a live Lost Reason; Reopen with `INQUIRY_BOOKING_ACTIVE`; history entries.
+- Inquiry import and sample per CM-0022 §9 with **Import duplicates too**.
+- Close and reopen dialogs (unit picker shows only bookable units), import dialog.
+- HTTP tests; stories.
+
+### CM-1008 — Reports, dashboard, backups
+
+**Done when:**
+
+- `inquiry_report` and `booking_report` kinds in a **Sales** catalogue group (Excel and PDF, View all honoured, filters per CM-0022 §11).
+- Dashboard Inquiry and Booking sections replace the stubs, with Call Activity's own period.
+- Backup modules for Inquiries and Bookings; the backup reader check passes.
+- HTTP tests proving section figures equal the lists; stories for both sections.
+
+## M11 — India compliance (board not written)
+
+The board is written when M11 starts; scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 3.
+
+## M12 — Differentiators
+
+Scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 4. Chat and support tickets moved here from M9 (owner, 2026-10-17); the rest of the board is written when M12 starts.
+
+| ID      | Seq | Title                                                                                      | Status | Blocked by | Area           |
+| ------- | --: | ------------------------------------------------------------------------------------------ | ------ | ---------- | -------------- |
+| CM-1201 |   1 | Chat: member, group, project (Postgres + SSE); support tickets with email (was CM-905, M9) | todo   | CM-904     | Domain+HTTP+UI |
 
 ---
 

@@ -504,3 +504,23 @@ Reports render PDF/Excel with the standard header (module 11).
 17. Is a booking cancellation recorded (date, reason, refund) or is the row simply edited back to Available?
 18. Can an inquiry be moved between projects of the same company (buyer interested in another project)?
 19. Are bookings and inquiries visible on a company-wide (cross-project) sales view, or only per project?
+
+## Decisions for the build (M10)
+
+<!-- Units and Bookings (CM-1005, CM-1006) -->
+
+- **CM-1005** Unit routes take the Project (`?projectId=` on reads, `projectId` in bodies) and answer 404 `UNIT_NOT_FOUND` for a unit that is not a live unit of it. A unit's profile has no row until it gets details; its `expectedUpdatedAt` is `null` until then (409 `UNIT_PROFILE_CHANGED` when stale).
+- **CM-1005** Areas are typed as text or numbers (`"1,250.50"`), more than 0, at most two decimals, stored `numeric(12, 2)` and sent back as decimal strings. The Unavailable note is optional, at most 500 characters.
+- **CM-1005** Marking a unit Unavailable while an **expired** hold names it cancels that hold in the same transaction ("Hold expired", by `system`), as booking it again does; a live hold or a booking is 409 `UNIT_HAS_BOOKING`. The import applies the same rule per row.
+- **CM-1005** A unit import row is the unit's **whole** profile: a blank cell clears it, Area unit blank is sq ft, Unavailable blank is No. The sample is filled with today's values, so an untouched row changes nothing; the Unavailable note is not a column and is kept while the reason is unchanged. Two units with the same Unit No in one Wing are a row error (rename them in the Wing editor). Area unit accepts "sq ft", "sqft", "sq m", "sqm".
+- **CM-1005** Bookings → **Units** shows one Wing's grid at a time (the first without a pick) and every Wing's counts; the unit panel is a side sheet. Unit cells say their status in words as well as colour.
+- **CM-1006** Flags: Booking **Create** holds and books (and uploads files to a booking); **Update** confirms, extends, cancels, edits and removes files; **Delete** deletes. The menu has no Approve step.
+- **CM-1006** Writers on one unit queue on a transaction advisory lock (`construction_sales.unit:<ws>:<unitId>`) before the "one active booking" check; a race past it still meets `bookings_unit_active_key`, mapped to 409 `UNIT_BOOKED`.
+- **CM-1006** The back-dated window `booking` applies to the Booking Date on create (create limit) and on edit and delete (edit limit, old and new date). Confirm and cancel dates are new dated entries: they are checked against the create limit, not the booking's own date, so an old booking can still be cancelled today. Confirm and cancel dates are not before the Booking Date nor after today.
+- **CM-1006** Extend hold needs a Hold until of today or later and works on an expired hold too (nobody else can have booked the unit, or the hold would be cancelled). Confirm clears Hold until. An **edit** keeps the unit, the status and Hold until; a booking is cancelled and made again to change its unit. Cancelled bookings cannot be edited, only deleted.
+- **CM-1006** History rows are statuses (`booking_events.status`); their kind is read from the row before: the first is _created_, On Hold after On Hold is _hold extended_, Booked is _confirmed_, Cancelled is _cancelled_. Edits and deletes are in the audit log only.
+- **CM-1006** "Referred By contact" is a mobile number, normalised like the customer's. The list search covers the customer's name, email and mobile (3+ digits) and the Referred By name; not unit names, which live in `construction_projects`.
+- **CM-1006** The system's "Hold expired" cancel sends no notification; `booking.created` / `booking.confirmed` / `booking.cancelled` go to Booking Read + Notification holders on the Project, never the actor.
+- **CM-1006** `StructureUsage`: every booking that is not deleted names its unit, the unit's floor and its Wing (cancelled ones too: they are the unit's history). The Project delete guard counts live inquiries and bookings.
+- **CM-1006** Booking files: one **Booking Form** (PDF or image; a second is 409 `BOOKING_FORM_EXISTS`) and photos (images), at most 30 files, 25 MB each, under `/api/construction/sales/bookings/{id}/files`; never in the Gallery. A deleted booking keeps its file rows (the Company purge removes them). Built as a booking-only module to fold into CM-1003's generic sales files.
+- **CM-1006** For CM-1007: `bookUnitInTx(tx, input)` and `bookableUnits(db, ws, projectId)` in `src/composition/sales-bookings.ts`.
