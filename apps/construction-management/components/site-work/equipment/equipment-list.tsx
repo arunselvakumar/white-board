@@ -3,7 +3,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronRight, Plus, Truck } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useDeferredValue, useState } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Select,
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import {
@@ -49,6 +49,7 @@ import {
   equipmentPath,
   projectEquipmentPath,
 } from "./equipment-tabs";
+import { EquipmentRowsSkeleton } from "@/components/site-work/site-work-skeletons";
 
 const ALL = "all";
 
@@ -104,28 +105,20 @@ function FilterSelect({
   );
 }
 
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-16 w-full" />
-    </div>
-  );
-}
-
 function Rows({
   filters,
   filtered,
   hrefFor,
   empty,
   onPage,
+  className,
 }: {
   filters: EquipmentFilters;
   filtered: boolean;
   hrefFor: (id: string) => string;
   empty: { description: string; action: React.ReactNode };
   onPage: (after: string | null) => void;
+  className?: string;
 }) {
   const { data } = useSuspenseQuery(equipmentListQuery(filters));
   if (data.items.length === 0)
@@ -142,7 +135,7 @@ function Rows({
       />
     );
   return (
-    <div className="space-y-3">
+    <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
         {data.total === 1 ? "1 machine" : `${String(data.total)} machines`}
       </p>
@@ -210,15 +203,25 @@ function useFilterState() {
   const [place, setPlace] = useState(ALL);
   const [after, setAfter] = useState<string | null>(null);
   const deferredSearch = useDeferredValue(search);
+  // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
+  const [isPending, startTransition] = useTransition();
   const reset =
     <T,>(set: (value: T) => void) =>
     (value: T) => {
-      set(value);
-      setAfter(null);
+      startTransition(() => {
+        set(value);
+        setAfter(null);
+      });
     };
   return {
+    isPending,
     search,
-    setSearch: reset(setSearch),
+    setSearch: (value: string) => {
+      setSearch(value);
+      startTransition(() => {
+        setAfter(null);
+      });
+    },
     ownership,
     setOwnership: reset(setOwnership),
     state,
@@ -226,7 +229,11 @@ function useFilterState() {
     place,
     setPlace: reset(setPlace),
     after,
-    setAfter,
+    setAfter: (value: string | null) => {
+      startTransition(() => {
+        setAfter(value);
+      });
+    },
     filters: {
       search: deferredSearch,
       ownership: ownership === ALL ? null : (ownership as EquipmentOwnership),
@@ -312,12 +319,13 @@ export function EquipmentRegister() {
             />
           </div>
         </div>
-        <Suspense fallback={<ListSkeleton />}>
+        <Suspense fallback={<EquipmentRowsSkeleton />}>
           <Rows
             filters={filter.filters}
             filtered={filter.filtered}
             hrefFor={equipmentPath}
             onPage={filter.setAfter}
+            className={cn(filter.isPending && "opacity-60 transition-opacity")}
             empty={{
               description:
                 "Add the JCBs, mixers, tippers and cranes you own or hire, at a Project or the warehouse.",
@@ -375,12 +383,13 @@ export function ProjectEquipmentList({ projectId }: { projectId: string }) {
         </div>
         <div className="sm:ml-auto">{addButton}</div>
       </div>
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<EquipmentRowsSkeleton />}>
         <Rows
           filters={{ ...filter.filters, place: projectId }}
           filtered={filter.filtered}
           hrefFor={(id) => projectEquipmentPath(projectId, id)}
           onPage={filter.setAfter}
+          className={cn(filter.isPending && "opacity-60 transition-opacity")}
           empty={{
             description:
               "Add the machines working at this Project, or transfer one here from Masters → Equipments.",

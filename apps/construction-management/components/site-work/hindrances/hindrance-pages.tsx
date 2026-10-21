@@ -1,11 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { hindranceQuery, hindrancesPath } from "@/src/queries/hindrances";
 
 import { HindranceForm, type HindrancePrefill } from "./hindrance-form";
+import { HindranceFormFieldsSkeleton } from "@/components/site-work/site-work-skeletons";
 
 /** Record a hindrance; a usage sheet's link prefills it (CM-607). */
 export function HindranceNew({
@@ -21,7 +23,9 @@ export function HindranceNew({
         back={{ label: "Hindrances", href: hindrancesPath(projectId) }}
         title="Record hindrance"
       />
-      <HindranceForm projectId={projectId} prefill={prefill} />
+      <Suspense fallback={<HindranceFormFieldsSkeleton />}>
+        <HindranceForm projectId={projectId} prefill={prefill} />
+      </Suspense>
     </div>
   );
 }

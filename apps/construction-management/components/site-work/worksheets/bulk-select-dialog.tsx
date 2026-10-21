@@ -20,6 +20,7 @@ import {
   materialOptionsQuery,
   type MaterialOption,
 } from "@/src/queries/material-options";
+import { MaterialChecklistSkeleton } from "@/components/site-work/site-work-skeletons";
 
 function useDebounced<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -159,10 +160,21 @@ export function BulkSelectDialog({
               first,
               "None left to add.",
             )}
-          {group(
-            workTypeMaterialIds.length > 0 ? "Other materials" : "Materials",
-            rest,
-            others.isPending ? "Loading…" : "No materials match.",
+          {others.isPending ? (
+            <section className="space-y-1">
+              <h4 className="text-muted-foreground text-xs font-medium">
+                {workTypeMaterialIds.length > 0
+                  ? "Other materials"
+                  : "Materials"}
+              </h4>
+              <MaterialChecklistSkeleton />
+            </section>
+          ) : (
+            group(
+              workTypeMaterialIds.length > 0 ? "Other materials" : "Materials",
+              rest,
+              "No materials match.",
+            )
           )}
         </div>
         <DialogFooter>

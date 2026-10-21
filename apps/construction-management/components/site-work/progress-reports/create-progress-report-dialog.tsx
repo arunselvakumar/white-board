@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import {
@@ -32,6 +31,7 @@ import {
   type CreateProgressReportInput,
   type ProgressReportFormOptions,
 } from "@/src/queries/progress-reports";
+import { ProgressReportFormSkeleton } from "@/components/site-work/site-work-skeletons";
 
 const EVERYONE = "everyone";
 
@@ -337,14 +337,7 @@ export function CreateProgressReportDialog({
           </DialogDescription>
         </DialogHeader>
         {open ? (
-          <Suspense
-            fallback={
-              <div className="space-y-3" aria-busy="true">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<ProgressReportFormSkeleton />}>
             <LoadedForm
               projectId={projectId}
               onSubmit={onSubmit}

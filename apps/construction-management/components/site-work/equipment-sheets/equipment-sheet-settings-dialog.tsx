@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Switch } from "@repo/ui/components/switch";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -30,6 +29,7 @@ import {
   EQUIPMENT_SHEET_TOGGLE_LABELS,
   type EquipmentSheetFieldToggle,
 } from "@/src/site-work/domain/equipment-usage";
+import { SettingsListSkeleton } from "@/components/site-work/site-work-skeletons";
 
 const schema = z.object({
   showOperator: z.boolean(),
@@ -72,14 +72,7 @@ export function EquipmentSheetSettingsDialog({
           </DialogDescription>
         </DialogHeader>
         {open && (
-          <Suspense
-            fallback={
-              <div className="space-y-2" aria-busy="true">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<SettingsListSkeleton />}>
             <SettingsForm
               projectId={projectId}
               onDone={() => {
