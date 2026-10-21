@@ -73,12 +73,13 @@ Each phase is a shippable product. Build order inside a phase follows [`02-modul
 - GST engine: CGST/SGST/IGST, ITC flags, promoter 80/20 & RCM, e-invoice and e-way bill via GSP.
 - Labour compliance: Form XVI/XVII, minimum-wage cards, PF/ESI inputs, BOCW cess.
 - RERA: 70% ledger, quarterly progress by wing, Forms 1–3 inputs.
-- IS 456 sampling/acceptance; site diary; hindrance register.
-- Tally/Zoho Books sync in the base plan.
+- IS 456 sampling/acceptance (the site diary and hindrance register shipped in M6, CM-607).
+- Unit prices, payment plans, demand letters and receipts recorded by hand, feeding the RERA 70% ledger (owner, ADR CM-0023).
 
 ### Phase 4 — Differentiators
 
 - Chat (member, group, project) on Postgres + SSE, and support tickets with email (moved from M9, CM-1201).
+- Tally/Zoho Books sync in the base plan (moved from Phase 3 / M11, ADR CM-0023).
 - WhatsApp Business bot (attendance, DPR photos, MR, approvals).
 - Offline outbox hardening; native shell.
 - Allottee portal: price sheet, payment plan, demand letters, UPI collection, receipts, construction photos.

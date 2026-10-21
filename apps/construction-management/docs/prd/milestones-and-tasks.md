@@ -2,7 +2,7 @@
 title: Construction Management — milestones and tasks
 docs: ../README.md
 created: 2026-10-08
-updated: 2026-10-17
+updated: 2026-10-21
 status_values:
   - todo
   - in_progress
@@ -44,21 +44,21 @@ Ticket ids are `CM-<milestone><nn>`: `CM-105` is milestone 1, ticket 5.
 
 ## Milestones at a glance
 
-| Milestone | Name                               | Spec                                                                                                                | Outcome the owner can see                                                                                       | Priority |
-| --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- |
-| **M0**    | Project setup                      | [03-target-architecture](../03-target-architecture.md)                                                              | App boots on :3002 against Postgres, CI green, `/api/docs` serves, first `construction_*` schema migrates       | 1        |
-| **M1**    | SaaS onboarding & access           | [modules/01](../modules/01-organization-identity-access.md), [modules/12](../modules/12-settings-configuration.md)  | Sign up by mobile OTP or email, create a Company, invite team members, set the permission matrix, choose a plan | 1        |
-| **M2**    | Site workforce (labour & vendor)   | [modules/08](../modules/08-labour-vendor-attendance.md), [modules/02](../modules/02-master-records.md)              | Register labour and vendor gangs, mark daily attendance with OT, see running balances, pay wages                | 1        |
-| **M3**    | Staff HRMS                         | [modules/10](../modules/10-hrms.md)                                                                                 | Office staff check in within a geo-fence, apply for leave, HR runs shifts, holidays and monthly salary          | 1        |
-| **M4**    | Projects & structure               | [modules/03](../modules/03-projects-structure-drawings-gallery.md)                                                  | Full project wizard, phases → wings → floors → units, drawings, gallery, testing reports                        | 2        |
-| **M5**    | Procurement & inventory            | [modules/06](../modules/06-procurement-inventory.md)                                                                | PR → PO (GST) → GRN → stock → consume/transfer; central store                                                   | 2        |
-| **M6**    | Daily site work                    | [modules/04](../modules/04-daily-site-work.md)                                                                      | Daily worksheet with material consumption, equipment usage, progress reports                                    | 2        |
-| **M7**    | Finance                            | [modules/07](../modules/07-payments-accounting.md)                                                                  | Bank/cash ledgers, petty cash, party invoices & payments with TDS, ledger report                                | 2        |
-| **M8**    | Tasks, issues, inspections         | [modules/05](../modules/05-tasks-issues-inspections.md)                                                             | Gantt tasks with earned value, snag list, inspection approvals                                                  | 2        |
-| **M9**    | Dashboards, reports, notifications | [modules/11](../modules/11-reports-dashboards-backup.md), [modules/13](../modules/13-chat-notifications-support.md) | Company dashboard, reports on a queue, Central Reports, notifications and web push, backups (chat later)        | 2        |
-| **M10**   | Sales CRM                          | [modules/09](../modules/09-sales-crm-inquiry-booking.md)                                                            | Inquiries, funnel, follow-ups, unit bookings                                                                    | 2        |
-| **M11**   | India compliance                   | [04-gaps-and-roadmap §Phase 3](../04-gaps-and-roadmap.md)                                                           | BOQ/RA bills, GST engine, TDS ledger, muster rolls, RERA ledger, IS 456 registers                               | 2        |
-| **M12**   | Differentiators                    | [04-gaps-and-roadmap §Phase 4](../04-gaps-and-roadmap.md)                                                           | Chat and support tickets, WhatsApp bot, offline outbox, Tally sync, allottee & vendor portals                   | 2        |
+| Milestone | Name                               | Spec                                                                                                                | Outcome the owner can see                                                                                           | Priority |
+| --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------- |
+| **M0**    | Project setup                      | [03-target-architecture](../03-target-architecture.md)                                                              | App boots on :3002 against Postgres, CI green, `/api/docs` serves, first `construction_*` schema migrates           | 1        |
+| **M1**    | SaaS onboarding & access           | [modules/01](../modules/01-organization-identity-access.md), [modules/12](../modules/12-settings-configuration.md)  | Sign up by mobile OTP or email, create a Company, invite team members, set the permission matrix, choose a plan     | 1        |
+| **M2**    | Site workforce (labour & vendor)   | [modules/08](../modules/08-labour-vendor-attendance.md), [modules/02](../modules/02-master-records.md)              | Register labour and vendor gangs, mark daily attendance with OT, see running balances, pay wages                    | 1        |
+| **M3**    | Staff HRMS                         | [modules/10](../modules/10-hrms.md)                                                                                 | Office staff check in within a geo-fence, apply for leave, HR runs shifts, holidays and monthly salary              | 1        |
+| **M4**    | Projects & structure               | [modules/03](../modules/03-projects-structure-drawings-gallery.md)                                                  | Full project wizard, phases → wings → floors → units, drawings, gallery, testing reports                            | 2        |
+| **M5**    | Procurement & inventory            | [modules/06](../modules/06-procurement-inventory.md)                                                                | PR → PO (GST) → GRN → stock → consume/transfer; central store                                                       | 2        |
+| **M6**    | Daily site work                    | [modules/04](../modules/04-daily-site-work.md)                                                                      | Daily worksheet with material consumption, equipment usage, progress reports                                        | 2        |
+| **M7**    | Finance                            | [modules/07](../modules/07-payments-accounting.md)                                                                  | Bank/cash ledgers, petty cash, party invoices & payments with TDS, ledger report                                    | 2        |
+| **M8**    | Tasks, issues, inspections         | [modules/05](../modules/05-tasks-issues-inspections.md)                                                             | Gantt tasks with earned value, snag list, inspection approvals                                                      | 2        |
+| **M9**    | Dashboards, reports, notifications | [modules/11](../modules/11-reports-dashboards-backup.md), [modules/13](../modules/13-chat-notifications-support.md) | Company dashboard, reports on a queue, Central Reports, notifications and web push, backups (chat later)            | 2        |
+| **M10**   | Sales CRM                          | [modules/09](../modules/09-sales-crm-inquiry-booking.md)                                                            | Inquiries, funnel, follow-ups, unit bookings                                                                        | 2        |
+| **M11**   | India compliance                   | [04-gaps-and-roadmap §Phase 3](../04-gaps-and-roadmap.md)                                                           | BOQ, work orders and RA bills; GST, TDS, minimum wages, PF/ESI, BOCW; unit collections, RERA ledger and QPR; IS 456 | 2        |
+| **M12**   | Differentiators                    | [04-gaps-and-roadmap §Phase 4](../04-gaps-and-roadmap.md)                                                           | Chat and support tickets, WhatsApp bot, offline outbox, Tally sync, allottee & vendor portals                       | 2        |
 
 Dependency between milestones:
 
@@ -1145,13 +1145,280 @@ Goal: a Project's sales desk — inquiries followed up through a per-Project fun
 - Backup modules for Inquiries and Bookings; the backup reader check passes.
 - HTTP tests proving section figures equal the lists; stories for both sections.
 
-## M11 — India compliance (board not written)
+## M11 — India compliance
 
-The board is written when M11 starts; scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 3.
+Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally do today. Contract billing comes first, for a contractor who bills a client against a BOQ and pays sub-contractors against work orders. GST and TDS come next, then labour law, RERA and concrete quality. Spec: [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 3 and [`research/market-and-compliance.md`](../research/market-and-compliance.md) §2–3. Product decisions: [ADR CM-0023](../adr/CM-0023-india-compliance-product-decisions.md).
+
+> **Owner, 2026-10-21:** contractor first; unit money (prices, plans, demands, receipts) in M11, recorded by hand; e-invoice and e-way bill as NIC JSON export; Tamil Nadu, Maharashtra and Karnataka first. Tally / Zoho sync moved to M12. M11 ships in three parts, each a native stack of ≤ 300-file pull requests.
+
+**Statutory figures** are seeded as dated rows with their source (CM-0008). Every row is checked against the notification in force on the day it is coded.
+
+### M11 (1/3) — Contract billing
+
+| ID      | Seq | Title                                                                                                                          | Status | Blocked by                | Area           |
+| ------- | --: | ------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------- | -------------- |
+| CM-1101 |   1 | ADR CM-0023; `construction_contracts` schema; Clients master; Project Client and Role; menus, Contracts modules, access, ports | todo   | CM-1008                   | Data+Domain    |
+| CM-1102 |   2 | Item library with rate analysis; Excel import and sample                                                                       | todo   | CM-1101                   | Domain+HTTP+UI |
+| CM-1103 |   3 | Project BOQ: sections, items, import; Variations and deviations                                                                | todo   | CM-1102                   | Domain+HTTP+UI |
+| CM-1104 |   4 | Work Orders: BOQ and non-BOQ lines, terms, approval, amendments, PDF                                                           | todo   | CM-1103                   | Domain+HTTP+UI |
+| CM-1105 |   5 | Measurement Book: sheets, rows, joint measurement (check), locking                                                             | todo   | CM-1104                   | Domain+HTTP+UI |
+| CM-1106 |   6 | Contractor bills (inward RA bills): deductions, approval → payable invoice, retention held, reverse, PDF                       | todo   | CM-1105                   | Domain+HTTP+UI |
+| CM-1107 |   7 | Client bills (outward RA bills): place of supply, client retention, approval → receivable invoice, receipts with client TDS    | todo   | CM-1105                   | Domain+HTTP+UI |
+| CM-1108 |   8 | Advances, bank guarantees, retention release, DLP; expiry notices                                                              | todo   | CM-1106, CM-1107          | Domain+HTTP+UI |
+| CM-1109 |   9 | Price indices and escalation bills (10CC / 10CA)                                                                               | todo   | CM-1106, CM-1107          | Domain+HTTP+UI |
+| CM-1110 |  10 | Material reconciliation per work order per bill; recovery on the next bill                                                     | todo   | CM-1106                   | Domain+HTTP+UI |
+| CM-1111 |  11 | Contracts reports, Project Dashboard section, backups                                                                          | todo   | CM-1108, CM-1109, CM-1110 | HTTP+UI        |
+
+### M11 (2/3) — GST and TDS
+
+| ID      | Seq | Title                                                                                                     | Status | Blocked by       | Area           |
+| ------- | --: | --------------------------------------------------------------------------------------------------------- | ------ | ---------------- | -------------- |
+| CM-1112 |  12 | Dated HSN/SAC rate table; rate in force on Materials, Items, POs, GRNs and invoices; override with reason | todo   | CM-1101          | Data+Domain    |
+| CM-1113 |  13 | Invoice CGST/SGST/IGST split, ITC eligibility, RCM, GST registers, GSTR-1 / 3B summaries                  | todo   | CM-1112, CM-1107 | Domain+HTTP+UI |
+| CM-1114 |  14 | Promoter scheme: 80/20 registered-supplier test per Project per financial year                            | todo   | CM-1113          | Domain+HTTP+UI |
+| CM-1115 |  15 | E-invoice and e-way bill JSON export; IRN, QR and EWB recorded back                                       | todo   | CM-1113          | Domain+HTTP+UI |
+| CM-1116 |  16 | TDS natures and dated sections (194C/J/I/Q, Income-tax Act 2025 numbering); party defaults                | todo   | CM-1101          | Domain+HTTP+UI |
+| CM-1117 |  17 | TDS challans, Form 26Q export, Form 16A register, TDS receivable from clients                             | todo   | CM-1116, CM-1107 | Domain+HTTP+UI |
+
+### M11 (3/3) — Labour, RERA and quality
+
+| ID      | Seq | Title                                                                                                             | Status | Blocked by                                           | Area           |
+| ------- | --: | ----------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------- | -------------- |
+| CM-1118 |  18 | Minimum-wage rate cards (TN, MH, KA); four skill levels; Project zone; below-minimum warnings and report          | todo   | CM-1101                                              | Data+Domain+UI |
+| CM-1119 |  19 | PF / ESI for site labour; contractor licences and codes; muster roll deductions; wage slips; state register forms | todo   | CM-1118                                              | Domain+HTTP+UI |
+| CM-1120 |  20 | BOCW registration and cess per Project                                                                            | todo   | CM-1101                                              | Domain+HTTP+UI |
+| CM-1121 |  21 | Price sheet, payment plans, agreement value; allottee PAN and co-applicants                                       | todo   | CM-1101                                              | Domain+HTTP+UI |
+| CM-1122 |  22 | Wing stages, demands and demand letters, receipts, allottee ledger, refunds on cancellation                       | todo   | CM-1121                                              | Domain+HTTP+UI |
+| CM-1123 |  23 | RERA registration, booking gate, designated account and the 70 % ledger                                           | todo   | CM-1122                                              | Domain+HTTP+UI |
+| CM-1124 |  24 | RERA quarterly progress per Wing (MahaRERA, TNRERA, K-RERA) and Form 1–3 inputs                                   | todo   | CM-1123                                              | Domain+HTTP+UI |
+| CM-1125 |  25 | Concrete pour and cube registers: IS 456 sampling and acceptance; tests-due notice                                | todo   | CM-1101                                              | Domain+HTTP+UI |
+| CM-1126 |  26 | Compliance calendar, Company Dashboard Compliance section, daily digest, backups                                  | todo   | CM-1111, CM-1117, CM-1119, CM-1120, CM-1124, CM-1125 | Domain+HTTP+UI |
+
+### CM-1101 — Foundation
+
+**Done when:**
+
+- **ADR CM-0023** is accepted and this board is written.
+- **Schema.** `construction-contracts.prisma` (`construction_contracts`, `ConstructionContracts…`) with every table part 1 needs: items, rate-analysis lines, BOQ sections, BOQ items, variations, work orders (with revisions and lines), work-order materials, measurement sheets and rows, bills, bill lines, bill deductions, advances, bank guarantees, retention releases, price indices and escalation clauses. Every table has `workspace_id`. One migration.
+- **Clients.** `ConstructionMastersClient` with GSTIN/PAN checks, the Clients master list, form and delete guard; finance party type `client`. Project gains `client_id` and **Role** (`contract` / `own`) with the backfill described in CM-0023 §2, and the Project form shows both.
+- **Access.** The `contracts.*`, `masters.clients`, `finance.gst`, `finance.tds`, `labour.compliance`, `sales.collections`, `sales.rera` and `site_work.concrete` menus in a new **Contracts & Billing** category where CM-0023 §22 says. A migration grants them to the seeded designation templates. `GET /api/construction/contracts/access?projectId=`.
+- **Modules.** BOQ, Work Orders, Measurements, Contractor Bills and Client Bills in `PROJECT_MODULES` under a **Contracts** heading, with the Role defaults; stub pages that say what is coming.
+- **Ports.** `ContractsDirectory` (Project facts and Role, Contractors and Departments, Clients, Materials, Labour Categories, Equipment, UoMs, Wings and Locations) and `PartyInvoicing` (create and reverse an invoice in finance from a bill) with their composition adapters; domain constants and labels for every enum.
+
+### CM-1102 — Item library
+
+**Done when:**
+
+- Item commands per CM-0023 §3: code unique in the Company ignoring case, UoM, SAC/HSN, schedule, adopted rate; rate analysis lines (material, labour, equipment, lump sum) and overhead %, analysed rate computed; `ITEM_IN_USE` delete guard.
+- Excel import with a sample: creates new codes, updates existing ones, all or nothing, row errors listed.
+- Master records → **Item Library**: list with search and schedule filter, item form with the rate analysis table and the analysed vs adopted gap.
+- HTTP tests per rule; stories for the list, form, rate analysis and import dialog.
+
+### CM-1103 — BOQ
+
+**Done when:**
+
+- Sections (add, rename, reorder, delete when empty) and BOQ items (from the library or typed; item no, description, UoM, SAC/HSN, quantity, rate, Wing or Location) per CM-0023 §4; BOQ total beside Order Value; Financial hides rates and amounts.
+- Excel import of sections and items.
+- **Variations**: extra item or change of quantity or rate, with reason, numbered, approved; free edits refused once a checked measurement names the item (409 `BOQ_ITEM_MEASURED`); original and current quantity shown; the deviation % setting and the list of items over it.
+- BOQ page with sections, totals, the variations list and an Excel export.
+- HTTP tests; stories.
+
+### CM-1104 — Work Orders
+
+**Done when:**
+
+- Work Order commands per CM-0023 §5: Contractor and Department, number, dates, BOQ lines at work-order rate and non-BOQ lines, terms (retention %, cap, mobilisation advance and recovery %, DLP months, TDS nature, SAC and GST rate, RCM), approval through the approval kernel, amendments as revisions with reasons, close and cancel.
+- The warning when a line exceeds the BOQ's remaining quantity; billed lines cannot be removed or cut below billed.
+- Work Orders list (status, Contractor, search), form, detail with revisions, PDF.
+- Notifications `work_order.pending_approval` and `work_order.issued`.
+- HTTP tests per transition and guard; stories.
+
+### CM-1105 — Measurement Book
+
+**Done when:**
+
+- Measurement sheets per CM-0023 §6 for both sides: rows with nos × L × B × D or a direct quantity, negative rows, location, photos; submit; **check** records the joint measurement (our user, the other party's name and role, date); rows in an approved bill are locked (409 `MEASUREMENT_BILLED`).
+- Client-side rows over the BOQ item's current quantity are marked as deviation.
+- Measurements page: sheets by date, side and party; sheet form that computes as you type; the cumulative quantity per item.
+- HTTP tests; stories, including the 375 px row layout.
+
+### CM-1106 — Contractor bills
+
+**Done when:**
+
+- Bill commands per CM-0023 §7 on the contractor side: draft from checked measurements up to a date, cumulative − previous, deductions (retention with its cap, mobilisation recovery suggestions, material at cost, other), GST from the work order's terms, net; approval and rejection; Final closes the work order; reverse while latest and unsettled.
+- Approval creates the payable invoice through `PartyInvoicing` (origin `ra_bill`) and posts retention held; the Contractor's balance shows payable and held separately.
+- `WORK_ORDER_QUANTITY_EXCEEDED` on draft and approval.
+- Contractor Bills list, bill page (abstract, measurements, deductions), PDF.
+- HTTP tests proving the invoice, ledger entries and reversal; stories.
+
+### CM-1107 — Client bills
+
+**Done when:**
+
+- The same bill engine on the client side, from the BOQ: place of supply the Project's state, the Company GSTIN for that state (`GSTIN_NOT_IN_STATE` warning), CGST/SGST or IGST.
+- Approval creates the receivable invoice to the Client and posts retention receivable.
+- Receipts from Clients record TDS deducted by the client and GST-TDS 2 %; the Client's balance shows due, retention receivable and TDS receivable.
+- Client Bills list, bill page, tax-invoice PDF (GSTIN, place of supply, SAC, tax split).
+- HTTP tests; stories.
+
+### CM-1108 — Advances, retention release, DLP
+
+**Done when:**
+
+- Advances per CM-0023 §8, given and received, with bank guarantees; recoveries suggested on each bill; given advances paid as on-account party payments.
+- Retention release in two configurable stages, or against a bank guarantee, with reasons; ledger moves from held to payable (or receivable retention to due).
+- DLP start and end per work order and per Project; the daily notice 30 days before a bank guarantee expires or a DLP ends.
+- Panels on the work order and the BOQ page; HTTP tests; stories.
+
+### CM-1109 — Escalation bills
+
+**Done when:**
+
+- Price indices table (series, month, value) with import; escalation clause on a work order or client contract (component weights summing to 100, base month, non-escalable %).
+- Escalation bill type computing the 10CC-style amount for a period with the working shown; 10CA cement and steel quantities from reconciliation; approval like an RA bill.
+- HTTP tests with worked examples; stories.
+
+### CM-1110 — Material reconciliation
+
+**Done when:**
+
+- Work-order materials (issue basis, coefficient per line, wastage %, penal rate) per CM-0023 §10, defaulted from rate analysis.
+- Statement per work order per bill: theoretical, issued (Delivery Notes to the Contractor net of returns), allowed, excess, under-use; excess suggested as a recovery on the next bill.
+- Statement page and PDF; HTTP tests with worked examples; stories.
+
+### CM-1111 — Contracts reports, dashboard, backups
+
+**Done when:**
+
+- Report kinds in a new **Contracts** catalogue group: BOQ vs executed, Work Order register, RA bill register (both sides), Deductions register, Retention register, Material reconciliation, Variations (Excel and PDF, Financial honoured).
+- A **Contracts** section on the Project Dashboard: billed to date vs BOQ, receivable and payable, retention held both ways, work orders open, bills pending approval.
+- Backup modules for the Contracts modules; the backup reader check passes.
+- HTTP tests proving the section figures equal the lists; stories.
+
+### CM-1112 — GST rate table
+
+**Done when:**
+
+- The dated HSN/SAC rate table (finance statutory table, JSON seed with sources, unit test keeping JSON and SQL in step) per CM-0023 §11, verified against the notifications in force when coded.
+- `GstRates` port; Materials, Items, PO lines, GRN lines and invoice lines take the rate in force on the document date; override with reason, audited; the static Material rate is a fallback.
+- HTTP tests per date boundary (21 vs 22 Sep 2025); stories for the override.
+
+### CM-1113 — GST on invoices, ITC, RCM, registers
+
+**Done when:**
+
+- Finance invoices carry CGST, SGST, IGST and cess (old rows keep only the total); ITC eligibility per purchase invoice with Role defaults and reason on change; RCM flag and liability.
+- **GST** page (menu `finance.gst`): output register, input register (eligible, blocked, RCM), GSTR-1 tables and GSTR-3B 3.1 / 4 / 5 for a month, Excel export.
+- HTTP tests proving the registers equal the invoices; stories.
+
+### CM-1114 — Promoter 80/20 test
+
+**Done when:**
+
+- Promoter scheme opt-in on Own development residential Projects (affordable 1 % / other 5 %); per Project per financial year: registered vs unregistered purchases with the exclusions in CM-0023 §12, shortfall, RCM at 18 %, cement under RCM at its rate.
+- Report and a warning on the Project when the year to date is under 80 %.
+- HTTP tests with worked examples; stories.
+
+### CM-1115 — E-invoice and e-way bill JSON
+
+**Done when:**
+
+- Company setting for e-invoicing (applies, from date); NIC IRP JSON for client bills, sales invoices and credit notes; bulk e-way bill JSON for Delivery Notes, transfers and sales over ₹50,000; validation per document before export.
+- IRN, acknowledgement, QR text, EWB number and validity recorded back; the printed invoice shows IRN and QR; IRN cancellation recorded.
+- Unit tests against the schema's sample payloads; HTTP tests; stories.
+
+### CM-1116 — TDS natures and sections
+
+**Done when:**
+
+- Dated TDS rows per nature and payee kind with section labels for both Acts (verified when seeded); default nature on Contractors, Suppliers and Other Parties; the payment form picks a nature and shows the section; the hard-coded 194C is gone.
+- 194Q gated by the Company turnover setting, on value above ₹50 lakh per seller per financial year; thresholds per nature per financial year.
+- The TDS ledger and its report kind cover every nature; HTTP tests per nature and threshold; stories.
+
+### CM-1117 — Challans, 26Q, 16A, TDS receivable
+
+**Done when:**
+
+- **TDS** page (menu `finance.tds`): challans with allocation to deductions, due and late flags with interest; quarterly 26Q export in the RPU column order; Form 16A uploads per deductee per quarter; TDS receivable register from client receipts.
+- HTTP tests; stories.
+
+### CM-1118 — Minimum wages
+
+**Done when:**
+
+- Dated rate cards for TN, MH and KA construction per zone and skill (basic + VDA), JSON seeds with sources; Labour Category skill with four levels; Project minimum-wage zone.
+- Warnings on the labour form, vendor rates and attendance; **Minimum wage check** report.
+- HTTP tests per state and date; stories for each warning.
+
+### CM-1119 — PF / ESI and statutory registers for site labour
+
+**Done when:**
+
+- PF and ESI applicability per Labour; contributions per wage month with the HRMS dated rates through a port; employee share deducted on wage payments; muster roll Deductions filled; ECR and ESI inputs for site labour.
+- Contractor licence, PF and ESI codes, BOCW registration fields; **Principal employer check** report.
+- Electronic wage slips; register titles and form numbers as dated data per state, checked for TN, MH and KA.
+- HTTP tests; stories.
+
+### CM-1120 — BOCW cess
+
+**Done when:**
+
+- Company BOCW registration per state; Project BOCW details with estimated cost, cess at 1 % and the exemption; cess payments; due vs paid register with construction spend to date.
+- **Labour Compliance** Project module (menu `labour.compliance`) holding this and CM-1119's reports.
+- HTTP tests; stories.
+
+### CM-1121 — Prices and payment plans
+
+**Done when:**
+
+- Price sheet per CM-0023 §17 (carpet-area base rate, floor rise, PLC, parking and other charges, GST from the Project's scheme); agreement value on booking with Financial and reason to change; allottee PAN and co-applicants on bookings.
+- Payment plan templates with stage triggers; the 10 % before-agreement warning.
+- HTTP tests with worked examples; stories.
+
+### CM-1122 — Demands and receipts
+
+**Done when:**
+
+- Wing stages reached raise demands for every booked unit on the Wing; single demands; demand letter PDF.
+- Receipts by hand with allocation, 194-IA TDS, receipt PDF, posting through `AccountPosting`; allottee ledger per booking; refund due on cancellation and refund payments.
+- **Collections** Project module (menu `sales.collections`): demands, receipts, overdue; HTTP tests; stories.
+
+### CM-1123 — RERA registration and 70 % ledger
+
+**Done when:**
+
+- Project RERA details per CM-0023 §18 with the registration-needed warning; `RERA_NOT_REGISTERED` on Book and Confirm.
+- Designated (and collection) accounts; the 70 % ledger report with shortfall and excess flags.
+- **RERA** Project module (menu `sales.rera`); HTTP tests; stories.
+
+### CM-1124 — RERA quarterly progress
+
+**Done when:**
+
+- Per-Wing physical % from the tracking rollup with override and reason; stages, cost incurred (land vs construction via Payment Category mapping), receipts, designated balance, sold and unsold units.
+- MahaRERA, TNRERA and K-RERA templates as Excel exports with due days as dated data; reminders from 15 days before due; Forms 1–3 inputs export.
+- HTTP tests proving the figures equal their sources; stories.
+
+### CM-1125 — Concrete registers
+
+**Done when:**
+
+- Pour register and cube register per CM-0023 §20; required samples per IS 456 cl. 15.2.2; acceptance per Table 11 as amended (verified when coded); pass / fail / pending per sample and pour; raise an Issue from a failed pour; tests-due daily notice.
+- **Concrete** Project module (menu `site_work.concrete`); HTTP tests with worked examples; stories.
+
+### CM-1126 — Compliance calendar and dashboard
+
+**Done when:**
+
+- Due-date rules as dated data per regime (CM-0023 §21); a **Compliance** section on the Company Dashboard (due and overdue, each item behind its menu); one daily compliance digest per member.
+- Backup modules for Collections, RERA, Labour Compliance and the Concrete Register.
+- HTTP tests; stories.
 
 ## M12 — Differentiators
 
-Scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 4. Chat and support tickets moved here from M9 (owner, 2026-10-17); the rest of the board is written when M12 starts.
+Scope is fixed in [`04-gaps-and-roadmap.md`](../04-gaps-and-roadmap.md) Phase 4. Chat and support tickets moved here from M9 (owner, 2026-10-17), and Tally / Zoho Books sync from M11 (ADR CM-0023); the rest of the board is written when M12 starts.
 
 | ID      | Seq | Title                                                                                      | Status | Blocked by | Area           |
 | ------- | --: | ------------------------------------------------------------------------------------------ | ------ | ---------- | -------------- |
