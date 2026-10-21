@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { EditProjectSkeleton } from "@/components/projects/projects-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
-import { ProjectEditScreen } from "@/components/projects/project-overview";
+import { ProjectEditScreen } from "@/components/projects/project-edit-screen";
 
 export const metadata: Metadata = { title: "Edit Project" };
 

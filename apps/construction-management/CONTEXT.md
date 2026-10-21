@@ -179,17 +179,13 @@ _Avoid_: facility, feature (in UI copy)
 Work done for a whole site rather than a Unit (Compound Wall, Internal Roads, Sewage Treatment Plant), kept in Masters and assigned to Projects like an Amenity.
 _Avoid_: common area, external development, infrastructure (that is a Project Type)
 
-**Project home**:
-The first page of a Project: a tile for each module the Team Member may open, in their own tile order, then the Project's details.
-_Avoid_: dashboard (that is the Project Dashboard), project menu
-
 **Project sidebar**:
-The sidebar while a Project is open: Back to projects, the Project's name, then the modules the Team Member may open under fixed headings (Overview, Setup, Site work, Materials & money, Quality, Files, Reports). Modules with tabs fold out into a submenu. Arrange tiles does not reorder it; Hide / show modules does remove modules from it (ADR CM-0020).
+The sidebar while a Project is open: Back to projects, the Project's name, then the modules the Team Member may open under fixed headings (Overview, Setup, Site work, Materials & money, Quality, Sales, Files, Reports). Modules with tabs fold out into a submenu. Hide / show modules removes modules from it. Opening a Project lands on its first module, Dashboard for most; there is no Project home page (ADR CM-0020 §5).
 _Avoid_: tabs, section bar
 
 **Project Dashboard**:
 A Project's figures over a chosen period (last 12 months by default): key figures, the Project summary, attendance, and the sections later milestones fill. Each Team Member chooses which sections they see and in what order (Manage dashboard).
-_Avoid_: analytics, reports (those are files), home (that is the Project home)
+_Avoid_: analytics, reports (those are files), Project home (there is none)
 
 **Company Dashboard**:
 The main menu's Dashboard: across the Projects a Team Member can see, the approvals waiting for them, open Issues & Snags, pending inspections, Labours present today and amounts due, with one row per Project leading to its Project Dashboard (ADR CM-0021 §4).

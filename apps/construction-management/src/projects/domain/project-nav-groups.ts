@@ -2,8 +2,8 @@ import type { ProjectModuleKey } from "./project-modules";
 
 /**
  * The headings of a Project's sidebar menu (ADR CM-0020) and the modules
- * under each, in menu order. Home sits under Overview, first. The groups
- * are fixed: Arrange tiles orders the Project home's tiles, not this menu.
+ * under each, in menu order; the groups are fixed. Opening a Project lands
+ * on the first module the member may open (§5), so Dashboard comes first.
  * A new module goes under one heading here.
  */
 export const PROJECT_NAV_GROUPS = [

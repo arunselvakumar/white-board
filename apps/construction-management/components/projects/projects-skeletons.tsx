@@ -6,7 +6,6 @@ import { buttonVariants } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
-  MetricCardSkeleton,
   MetricGridSkeleton,
   SkeletonGroup,
   SkeletonText,
@@ -20,8 +19,7 @@ const PROJECTS_PATH = "/app/projects";
 
 /*
  * Projects while they load (ADR-0047): the Projects home, the project
- * shell's header, a Project's home tiles and labour tiles, and the home
- * dialogs, Amenities. What is known without fetching renders for real.
+ * shell's header, Hide / show modules, Amenities. What is known without fetching renders for real.
  */
 
 /** The Projects home list's columns: name, status, dates and progress. */
@@ -147,59 +145,6 @@ export function ProjectShellHeaderSkeleton({ id }: { id: string }) {
   );
 }
 
-/** A Project home's module tiles: icon, label and two lines of description. */
-export function ProjectHomeTilesSkeleton() {
-  return (
-    <SkeletonGroup
-      label="Loading modules"
-      className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-    >
-      {Array.from({ length: 8 }, (_, index) => (
-        <div
-          key={index}
-          className="bg-card flex w-full min-w-0 flex-col gap-3 rounded-xl border p-4"
-        >
-          <Skeleton className="size-9 rounded-lg" />
-          <span className="min-w-0 space-y-1">
-            <SkeletonText size="base" width={WIDTHS[index % WIDTHS.length]} />
-            <SkeletonText size="xs" width="90%" />
-            <SkeletonText size="xs" width="60%" />
-          </span>
-        </div>
-      ))}
-    </SkeletonGroup>
-  );
-}
-
-const LABOUR_TILES = [
-  "Labours present",
-  "Vendor heads",
-  "Owed to Labours",
-  "Owed to vendors",
-];
-
-/** Labour today on a Project's home: four figures, then the 14-day chart. */
-export function ProjectLabourTilesSkeleton() {
-  return (
-    <section className="space-y-3">
-      <h2 className="font-semibold">Labour today</h2>
-      <SkeletonGroup
-        label="Loading labour today"
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {LABOUR_TILES.map((label) => (
-          <MetricCardSkeleton key={label} label={label} />
-        ))}
-        <div className="bg-card rounded-xl border p-4 sm:col-span-2 lg:col-span-4">
-          <p className="text-sm font-semibold">Labours present, last 14 days</p>
-          <Skeleton className="mt-4 h-28 w-full rounded-md" />
-          <SkeletonText size="xs" width="100%" className="mt-1" />
-        </div>
-      </SkeletonGroup>
-    </section>
-  );
-}
-
 /** A ticked check list: Hide / show modules, Amenities. */
 export function ModuleCheckListSkeleton({
   label = "Loading modules",
@@ -216,26 +161,6 @@ export function ModuleCheckListSkeleton({
           </li>
         ))}
       </ul>
-    </SkeletonGroup>
-  );
-}
-
-/** The Arrange tiles list: icon, label, move up and down. */
-export function TileOrderSkeleton() {
-  return (
-    <SkeletonGroup label="Loading tiles">
-      <ol className="bg-card divide-y rounded-xl border">
-        {WIDTHS.slice(0, 4).map((width, row) => (
-          <li key={row} className="flex items-center gap-3 px-3 py-2">
-            <Skeleton className="size-4 shrink-0 rounded-sm" />
-            <span className="min-w-0 flex-1">
-              <SkeletonText width={width} />
-            </span>
-            <Skeleton className="size-7 rounded-md" />
-            <Skeleton className="size-7 rounded-md" />
-          </li>
-        ))}
-      </ol>
     </SkeletonGroup>
   );
 }
