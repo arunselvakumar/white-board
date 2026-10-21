@@ -1,0 +1,19 @@
+apps/construction-management/app/api/construction/messaging/messaging.http.test.ts
+  s_f49615d4431370::t_763d2bec66766b 604
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2aa9697d7bef41e54dea38a7915ce6889287468e",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
