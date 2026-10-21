@@ -1,0 +1,37 @@
+apps/construction-management/components/contracts/boq/boq-fixtures.ts
+  s_f49615d4431370::t_ebf9fc2b31b8a8 1-330
+apps/construction-management/components/contracts/boq/boq-item-dialog.stories.tsx
+  s_f49615d4431370::t_dd7c9c33090eb2 1-198
+apps/construction-management/components/contracts/boq/boq-page.stories.tsx
+  s_f49615d4431370::t_418830b4d5fcd1 1-350
+apps/construction-management/components/contracts/boq/import-boq-dialog.stories.tsx
+  s_f49615d4431370::t_5be93a5e68717c 1-112
+apps/construction-management/components/contracts/boq/variation-dialog.stories.tsx
+  s_f49615d4431370::t_4b6cf2b662f389 1-227
+apps/construction-management/components/contracts/boq/boq-stories-api.ts
+  s_de2f896f0baf64::t_58573213eb20e5 1-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "dc0dc72987403a8be1fe763c9d8980bf48b7b6a2",
+  "prompts": {},
+  "sessions": {
+    "s_de2f896f0baf64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7f51ed63dafb352d",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
