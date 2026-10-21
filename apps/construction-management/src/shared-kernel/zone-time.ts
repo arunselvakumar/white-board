@@ -6,6 +6,8 @@ import { assertCalendarDate, type CalendarDate } from "./calendar-date";
  * back, so every context resolves a daylight-saving change the same way.
  */
 
+const DAY = 86_400_000;
+
 const FORMATS = new Map<string, Intl.DateTimeFormat>();
 
 function format(timeZone: string): Intl.DateTimeFormat {
@@ -85,9 +87,16 @@ export function zoneInstant(
   ];
   // The wall time read as if it were UTC.
   const wall = Date.UTC(year, month - 1, day, 0, minutes);
+  // Every offset in force around it; a repeated time matches two of them.
+  const offsets = new Set(
+    [wall - DAY, wall, wall + DAY].map((at) => offsetAt(at, timeZone)),
+  );
+  const matches = [...offsets]
+    .map((offset) => wall - offset)
+    .filter((instant) => instant + offsetAt(instant, timeZone) === wall);
+  if (matches.length > 0) return new Date(Math.min(...matches));
   const first = wall - offsetAt(wall, timeZone);
   const second = wall - offsetAt(first, timeZone);
-  if (second + offsetAt(second, timeZone) === wall) return new Date(second);
   // Skipped: the change lies between the two guesses. Find its instant,
   // the first one on the later offset, to the second.
   let before = Math.min(first, second);

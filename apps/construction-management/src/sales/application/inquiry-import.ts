@@ -17,6 +17,7 @@ import {
   type InterestType,
 } from "../domain/sales-terms";
 import { toStoredFollowUpAt, type SalesDateTime } from "../domain/sales-time";
+import { assertPickedLeadSource, assertPickedStage } from "./picked-lists";
 import type {
   InquiryContent,
   InquiryDeps,
@@ -428,6 +429,21 @@ export async function importInquiries(
   const at = options.now;
   const ids: string[] = [];
   await db.$transaction(async (tx) => {
+    // The picked stages and sources, locked `FOR SHARE` and checked again
+    // so a Settings delete or disable cannot slip in before the insert.
+    const distinct = (ids: (string | null)[]) => [
+      ...new Set(ids.filter((id): id is string => id != null)),
+    ];
+    const sourceIds = distinct(planned.map((p) => p.content.leadSourceId));
+    const stageIds = distinct(planned.map((p) => p.content.funnelStageId));
+    const [sources, stages] = await Promise.all([
+      lists.share(tx, ws, "lead_source", sourceIds),
+      lists.share(tx, ws, "funnel_stage", stageIds),
+    ]);
+    for (const id of sourceIds)
+      assertPickedLeadSource(sources.get(id), projectId);
+    for (const id of stageIds)
+      assertPickedStage(stages.get(id), projectId, "funnelStageId");
     // One statement for the rows and one for their history, so a 1,000-row
     // import stays well inside the transaction's time limit.
     const rows = planned.map(({ content }) => ({

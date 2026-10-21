@@ -59,5 +59,10 @@ describe("zoneInstant", () => {
     expect(at("2026-11-01", 60 + 30, "America/New_York")).toBe(
       "2026-11-01T05:30:00.000Z",
     );
+    // 27 October 2024: Berlin's 02:30 is first CEST, then CET. The guess
+    // from the wall time lands after the change; the earlier one still wins.
+    expect(at("2024-10-27", 2 * 60 + 30, "Europe/Berlin")).toBe(
+      "2024-10-27T00:30:00.000Z",
+    );
   });
 });

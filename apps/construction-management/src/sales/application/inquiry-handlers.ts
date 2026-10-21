@@ -49,7 +49,10 @@ import {
   type InquiryImportLists,
   type InquirySheetRow,
 } from "./inquiry-import";
-import type { SalesListStore } from "./sales-settings-handlers";
+import type {
+  SalesListStore,
+  StoredSalesListItem,
+} from "./sales-settings-handlers";
 
 const MENU = "sales.inquiries";
 
@@ -1059,31 +1062,42 @@ export class InquiryHandlers {
     inquiryTransition(current.status, "lose");
     const remarks = lostRemarks(input.remarks);
     const ws = access.workspaceId;
-    const reason = (
-      await this.deps.lists.byIds(this.deps.db, ws, "lost_reason", [
-        input.lostReasonId,
-      ])
-    ).get(input.lostReasonId);
-    if (
-      reason == null ||
-      reason.deletedAt != null ||
-      reason.projectId !== current.projectId
-    )
-      throw refused(
-        "LOST_REASON_NOT_FOUND",
-        "This Lost Reason was not found.",
-        "lostReasonId",
-      );
-    if (!reason.isActive)
-      throw refused(
-        "LOST_REASON_DISABLED",
-        "This Lost Reason is disabled. Choose another.",
-        "lostReasonId",
-      );
+    const assertReason = (reason: StoredSalesListItem | undefined) => {
+      if (
+        reason == null ||
+        reason.deletedAt != null ||
+        reason.projectId !== current.projectId
+      )
+        throw refused(
+          "LOST_REASON_NOT_FOUND",
+          "This Lost Reason was not found.",
+          "lostReasonId",
+        );
+      if (!reason.isActive)
+        throw refused(
+          "LOST_REASON_DISABLED",
+          "This Lost Reason is disabled. Choose another.",
+          "lostReasonId",
+        );
+      return reason;
+    };
+    const reason = assertReason(
+      (
+        await this.deps.lists.byIds(this.deps.db, ws, "lost_reason", [
+          input.lostReasonId,
+        ])
+      ).get(input.lostReasonId),
+    );
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const row = await this.lockUnchanged(tx, ws, id, expectedUpdatedAt);
       inquiryTransition(row.status, "lose");
+      // Again under a `FOR SHARE` lock, as for a picked stage (picked-lists).
+      assertReason(
+        (await this.deps.lists.share(tx, ws, "lost_reason", [reason.id])).get(
+          reason.id,
+        ),
+      );
       await this.close(
         tx,
         access,
@@ -1133,9 +1147,20 @@ export class InquiryHandlers {
         row.projectId,
         "funnel_stage",
       );
-      const stageId = stages.some((stage) => stage.id === row.funnelStageId)
+      // Locked `FOR SHARE`, so a stage deleted since the read is skipped and
+      // one the reopened inquiry lands in cannot be deleted under it.
+      const locked = await this.deps.lists.share(
+        tx,
+        ws,
+        "funnel_stage",
+        stages.map((stage) => stage.id),
+      );
+      const live = stages.filter(
+        (stage) => locked.get(stage.id)?.deletedAt == null,
+      );
+      const stageId = live.some((stage) => stage.id === row.funnelStageId)
         ? row.funnelStageId
-        : (stages[0]?.id ?? null);
+        : (live[0]?.id ?? null);
       await this.close(
         tx,
         access,
