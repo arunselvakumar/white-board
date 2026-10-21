@@ -56,6 +56,7 @@ import { PoValueChart } from "./po-value-chart";
 // Sales (CM-1008)
 import { BookingSection, InquirySection } from "./sales-sections";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
+import { SummaryDetails } from "./summary-details";
 import {
   InspectionSection,
   IssueSection,
@@ -77,7 +78,10 @@ function milestoneName(milestone: string): string {
   return MILESTONE_NAMES[milestone] ?? milestone;
 }
 
-/** Dates, status, type, budget (Financial) and what the Project holds. */
+/**
+ * Dates, status, type, budget (Financial) and what the Project holds, then
+ * its address, Contract and Additional details (from Project Home, #99).
+ */
 function SummarySection({ projectId }: { projectId: string }) {
   const { data, isPending, error } = useQuery(projectSummaryQuery(projectId));
   const none = <span className="text-muted-foreground font-normal">—</span>;
@@ -156,6 +160,7 @@ function SummarySection({ projectId }: { projectId: string }) {
           </Fact>
         </dl>
       )}
+      {error == null ? <SummaryDetails projectId={projectId} /> : null}
     </Section>
   );
 }

@@ -5,9 +5,11 @@ import {
   useQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { EllipsisVertical, Pencil, Pin } from "lucide-react";
+import { EllipsisVertical, Pencil, Pin, TriangleAlert, X } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
+import { Alert, AlertAction, AlertTitle } from "@repo/ui/components/alert";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -31,16 +33,17 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 import { ProjectAvatar } from "./project-avatar";
 import { ProjectShellHeaderSkeleton } from "./projects-skeletons";
-import { ArrangeTilesDialog, HideModulesDialog } from "./project-home-dialogs";
+import { clearProjectFlash, peekProjectFlash } from "./project-flash";
+import { HideModulesDialog } from "./project-home-dialogs";
 import { projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
 
-type OptionsDialog = "hide" | "arrange" | "backup" | null;
+type OptionsDialog = "hide" | "backup" | null;
 
 /**
  * Project options next to Edit (CM-411): Pin / Unpin for the member, Hide /
- * show modules for the Project (Update flag only), Arrange tiles, and
- * Backup (CM-906; the dialog offers the modules the member may view).
+ * show modules for the Project (Update flag only), and Backup (CM-906; the
+ * dialog offers the modules the member may view).
  */
 function ProjectOptions({
   id,
@@ -87,14 +90,7 @@ function ProjectOptions({
               Hide / show modules
             </DropdownMenuItem>
           ) : null}
-          <DropdownMenuItem
-            onClick={() => {
-              setDialog("arrange");
-            }}
-          >
-            Arrange tiles
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          {home.canHideModules ? <DropdownMenuSeparator /> : null}
           <DropdownMenuItem
             onClick={() => {
               setDialog("backup");
@@ -106,14 +102,6 @@ function ProjectOptions({
       </DropdownMenu>
       {dialog === "hide" ? (
         <HideModulesDialog
-          projectId={id}
-          onClose={() => {
-            setDialog(null);
-          }}
-        />
-      ) : null}
-      {dialog === "arrange" ? (
-        <ArrangeTilesDialog
           projectId={id}
           onClose={() => {
             setDialog(null);
@@ -134,11 +122,45 @@ function ProjectOptions({
 }
 
 /**
+ * A message left by the screen before, e.g. files that failed to upload,
+ * shown on the next page of the Project and then forgotten.
+ */
+function ProjectFlash({ id }: { id: string }) {
+  const [message, setMessage] = useState(() => peekProjectFlash(id));
+  useEffect(() => {
+    clearProjectFlash(id);
+  }, [id]);
+  if (message == null) return null;
+  return (
+    <div className="px-6 pt-4">
+      <Alert className="max-w-4xl">
+        <TriangleAlert aria-hidden="true" />
+        <AlertTitle>{message}</AlertTitle>
+        <AlertAction className="top-1.5 right-1.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            aria-label="Dismiss"
+            onClick={() => {
+              setMessage(null);
+            }}
+          >
+            <X aria-hidden="true" />
+          </Button>
+        </AlertAction>
+      </Alert>
+    </div>
+  );
+}
+
+/**
  * The project shell (CM-204, CM-411, ADR CM-0020): a slim header with the
  * Project's name, status, Project Type, dates, a pin mark, Edit and the
- * Project options. The Project's modules are in the sidebar
- * (`ProjectNavMenu`); on a phone, where the sidebar is a sheet, the header
- * also shows the logo.
+ * Project options, and any message from the screen before. The Project's
+ * modules are in the sidebar (`ProjectNavMenu`); on a phone, where the
+ * sidebar is a sheet, the header also shows the logo. There is no Project
+ * home: opening a Project lands on the first module in the menu.
  */
 export function ProjectShell({
   id,
@@ -149,6 +171,7 @@ export function ProjectShell({
 }) {
   // Both reads start together; the header waits for the Project only.
   usePrefetchQuery(projectHomeQuery(id));
+  const pathname = usePathname();
   // The header and the page load side by side: a page that suspends
   // keeps the header on screen (ADR-0047).
   return (
@@ -156,6 +179,11 @@ export function ProjectShell({
       <Suspense fallback={<ProjectShellHeaderSkeleton id={id} />}>
         <ProjectShellHeader id={id} />
       </Suspense>
+      {/* Read on each page, but not on the bare Project path, which only
+          forwards to the first module: the message waits for that page. */}
+      {pathname === projectPath(id) ? null : (
+        <ProjectFlash key={pathname} id={id} />
+      )}
       <QuerySuspense>{children}</QuerySuspense>
     </div>
   );

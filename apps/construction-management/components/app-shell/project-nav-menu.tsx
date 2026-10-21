@@ -1,20 +1,18 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ChevronRight, House } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@repo/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -42,6 +40,7 @@ import {
   MenuSkeleton,
   SKELETON_WIDTHS,
 } from "@/components/app-shell/app-shell-skeletons";
+import { SubmenuRow } from "@/components/app-shell/submenu-row";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { projectHomeQuery } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
@@ -54,7 +53,7 @@ type SubLink = { href: string; label: string };
 type EntryProps = {
   projectId: string;
   section: ProjectNavSection;
-  /** The page is this module's (or, for Home, belongs to Home). */
+  /** The page is this module's. */
   active: boolean;
   pathname: string;
   buttonClassName: string;
@@ -292,9 +291,8 @@ function ProjectNavItem({
   };
 }) {
   const base = projectBasePath(projectId);
-  const href = section.segment === "" ? base : `${base}/${section.segment}`;
-  const Icon =
-    section.key === "home" ? House : PROJECT_MODULE_ICONS[section.key];
+  const href = `${base}/${section.segment}`;
+  const Icon = PROJECT_MODULE_ICONS[section.key];
   const currentLink = submenu?.links.find((link) => isOn(pathname, link.href));
 
   const button = (
@@ -318,19 +316,7 @@ function ProjectNavItem({
   return (
     <SidebarMenuItem>
       <Collapsible open={submenu.open} onOpenChange={submenu.onOpenChange}>
-        {button}
-        <CollapsibleTrigger
-          aria-label={
-            submenu.open
-              ? `Hide ${section.label} list`
-              : `Show ${section.label} list`
-          }
-          render={
-            <SidebarMenuAction className="top-3 right-2 data-panel-open:[&>svg]:rotate-90" />
-          }
-        >
-          <ChevronRight className="transition-transform" />
-        </CollapsibleTrigger>
+        <SubmenuRow button={button} label={section.label} open={submenu.open} />
         <CollapsibleContent>
           <SidebarMenuSub aria-label={section.label} className="mt-1">
             {submenu.links.map((link) => {

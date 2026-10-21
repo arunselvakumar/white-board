@@ -26,7 +26,7 @@ import {
 } from "./project-fixtures";
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { NewProjectScreen } from "./project-form";
-import { ProjectEditScreen } from "./project-overview";
+import { ProjectEditScreen } from "./project-edit-screen";
 
 const BASE = "/api/construction/projects/projects";
 const LABELS = `${BASE}/custom-field-labels`;

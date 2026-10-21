@@ -1,15 +1,13 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@repo/ui/components/collapsible";
 import {
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -20,6 +18,7 @@ import {
 import { isAppNavActive, type AppNavHref } from "@/lib/app-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
+import { SubmenuRow } from "./submenu-row";
 
 export type AreaNavGroup = {
   label: string;
@@ -62,24 +61,22 @@ export function AreaNavMenu({
   return (
     <SidebarMenuItem>
       <Collapsible open={open} onOpenChange={setOpen}>
-        <SidebarMenuButton
-          isActive={inArea && currentHref == null}
-          tooltip={label}
-          aria-current={onIndex ? "page" : undefined}
-          className={buttonClassName}
-          render={<Link href={href} />}
-        >
-          <Icon />
-          <span>{label}</span>
-        </SidebarMenuButton>
-        <CollapsibleTrigger
-          aria-label={open ? `Hide ${label} list` : `Show ${label} list`}
-          render={
-            <SidebarMenuAction className="top-3 right-2 data-panel-open:[&>svg]:rotate-90" />
+        <SubmenuRow
+          button={
+            <SidebarMenuButton
+              isActive={inArea && currentHref == null}
+              tooltip={label}
+              aria-current={onIndex ? "page" : undefined}
+              className={buttonClassName}
+              render={<Link href={href} />}
+            >
+              <Icon />
+              <span>{label}</span>
+            </SidebarMenuButton>
           }
-        >
-          <ChevronRight className="transition-transform" />
-        </CollapsibleTrigger>
+          label={label}
+          open={open}
+        />
         <CollapsibleContent>
           <SidebarMenuSub aria-label={label} className="mt-1">
             {groups.map((group) => (
