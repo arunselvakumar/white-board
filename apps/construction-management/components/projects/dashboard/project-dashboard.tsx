@@ -16,7 +16,7 @@ import {
   UserX,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { MetricCard } from "@repo/ui/components/metric-card";
 
@@ -42,14 +42,13 @@ import { procurementDashboardQuery } from "@/src/queries/procurement-dashboard";
 import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
 
 import { AttendanceTrend } from "./attendance-trend";
+import { Fact, Rupees, Section, Unit, denied } from "./dashboard-parts";
 import {
-  Fact,
-  Rupees,
-  Section,
+  DashboardSectionsSkeleton,
+  MetricCaptionSkeleton,
+  MetricFigureSkeleton,
   SectionSkeleton,
-  Unit,
-  denied,
-} from "./dashboard-parts";
+} from "./dashboard-skeletons";
 import { DurationFilter } from "./duration-filter";
 import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
@@ -85,7 +84,15 @@ function SummarySection({ projectId }: { projectId: string }) {
   return (
     <Section id="dashboard-summary" title="Project summary">
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading the Project summary"
+          facts={[
+            { label: "Status" },
+            { label: "Project Type" },
+            { label: "Start date" },
+            { label: "Expected completion" },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           The Project summary could not be loaded.
@@ -168,7 +175,21 @@ function AttendanceSection({
   return (
     <Section id="dashboard-attendance" title="Attendance">
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Attendance"
+          chart
+          facts={[
+            {
+              label: today
+                ? "Labours present today"
+                : `Present on ${formatCalendarDate(duration.to)}`,
+              icon: HardHat,
+            },
+            { label: "Absent", icon: UserX },
+            { label: "Not marked", icon: ClipboardCheck },
+            { label: "Vendor heads", icon: Handshake },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -279,18 +300,22 @@ function MaterialApprovalsTile({
         value={
           any ? (
             approvals.total
+          ) : approvals == null && error == null ? (
+            <MetricFigureSkeleton />
           ) : (
             <span className="text-muted-foreground">—</span>
           )
         }
         caption={
-          error != null
-            ? "Could not be loaded"
-            : approvals == null
-              ? "Loading…"
-              : any
-                ? `Pending: ${parts.join(" · ")}`
-                : "Nothing here for you to approve"
+          error != null ? (
+            "Could not be loaded"
+          ) : approvals == null ? (
+            <MetricCaptionSkeleton />
+          ) : any ? (
+            `Pending: ${parts.join(" · ")}`
+          ) : (
+            "Nothing here for you to approve"
+          )
         }
         render={pendingPath == null ? undefined : <Link href={pendingPath} />}
       />
@@ -346,7 +371,12 @@ function MaterialsSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Materials"
+          className="grid grid-cols-2 gap-2 lg:grid-cols-3"
+          facts={3}
+          chart
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           Materials could not be loaded.
@@ -389,6 +419,125 @@ function MaterialsSection({
   );
 }
 
+/** The member's sections in their order; suspends on the layout read. */
+function DashboardSections({
+  projectId,
+  duration,
+}: {
+  projectId: string;
+  duration: Duration;
+}) {
+  const { data: layout } = useSuspenseQuery(dashboardLayoutQuery(projectId));
+  const problem = durationProblem(duration);
+  // A module hidden on the Project takes its section with it (CM-902).
+  const shown = layout.sections.filter(
+    (section) => section.visible && !section.hiddenOnProject,
+  );
+  if (shown.length === 0)
+    return (
+      <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+        Every section is hidden. Use Manage dashboard to show some.
+      </p>
+    );
+  return (
+    <>
+      {shown.map((section) => {
+        if (section.key === "summary")
+          return <SummarySection key={section.key} projectId={projectId} />;
+        if (section.key === "attendance")
+          return problem == null ? (
+            <AttendanceSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "daily_work")
+          return problem == null ? (
+            <DailyWorkSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "equipment_usage")
+          return problem == null ? (
+            <EquipmentUsageSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "payments")
+          return problem == null ? (
+            <PaymentsSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "task")
+          return problem == null ? (
+            <TaskSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "issue_snag")
+          return problem == null ? (
+            <IssueSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "inspection_request")
+          return problem == null ? (
+            <InspectionSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        if (section.key === "materials")
+          return problem == null ? (
+            <MaterialsSection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        // Sales (CM-1008): Booking is a snapshot, so no duration.
+        if (section.key === "inquiry")
+          return problem == null ? (
+            <InquirySection
+              key={section.key}
+              projectId={projectId}
+              duration={duration}
+            />
+          ) : null;
+        // A snapshot as on today: a bad duration does not hide it.
+        if (section.key === "booking")
+          return <BookingSection key={section.key} projectId={projectId} />;
+        return <StubSection key={section.key} section={section} />;
+      })}
+    </>
+  );
+}
+
+/** Manage Dashboard, on the layout the sections already read. */
+function ManageDashboard({
+  projectId,
+  onClose,
+}: {
+  projectId: string;
+  onClose: () => void;
+}) {
+  const { data: layout } = useSuspenseQuery(dashboardLayoutQuery(projectId));
+  return <ManageDashboardDialog sections={layout.sections} onClose={onClose} />;
+}
+
 /**
  * The Project Dashboard (CM-412, ADR CM-0013 §12): the duration filter
  * (last 12 months by default), the four KPI tiles, and the member's
@@ -400,16 +549,11 @@ function MaterialsSection({
  * whose module is hidden on this Project are left out (CM-902).
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
-  const { data: layout } = useSuspenseQuery(dashboardLayoutQuery(projectId));
   const [duration, setDuration] = useState<Duration>(() =>
     presetDuration("last_12_months", browserToday()),
   );
   const [managing, setManaging] = useState(false);
   const problem = durationProblem(duration);
-  // A module hidden on the Project takes its section with it (CM-902).
-  const shown = layout.sections.filter(
-    (section) => section.visible && !section.hiddenOnProject,
-  );
 
   return (
     <div className="w-full min-w-0 p-6">
@@ -442,101 +586,19 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
           </p>
         )}
         <KpiTiles projectId={projectId} duration={duration} />
-        {shown.length === 0 ? (
-          <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-            Every section is hidden. Use Manage dashboard to show some.
-          </p>
-        ) : (
-          shown.map((section) => {
-            if (section.key === "summary")
-              return <SummarySection key={section.key} projectId={projectId} />;
-            if (section.key === "attendance")
-              return problem == null ? (
-                <AttendanceSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "daily_work")
-              return problem == null ? (
-                <DailyWorkSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "equipment_usage")
-              return problem == null ? (
-                <EquipmentUsageSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "payments")
-              return problem == null ? (
-                <PaymentsSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "task")
-              return problem == null ? (
-                <TaskSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "issue_snag")
-              return problem == null ? (
-                <IssueSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "inspection_request")
-              return problem == null ? (
-                <InspectionSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            if (section.key === "materials")
-              return problem == null ? (
-                <MaterialsSection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            // Sales (CM-1008): Booking is a snapshot, so no duration.
-            if (section.key === "inquiry")
-              return problem == null ? (
-                <InquirySection
-                  key={section.key}
-                  projectId={projectId}
-                  duration={duration}
-                />
-              ) : null;
-            // A snapshot as on today: a bad duration does not hide it.
-            if (section.key === "booking")
-              return <BookingSection key={section.key} projectId={projectId} />;
-            return <StubSection key={section.key} section={section} />;
-          })
-        )}
+        <Suspense fallback={<DashboardSectionsSkeleton />}>
+          <DashboardSections projectId={projectId} duration={duration} />
+        </Suspense>
       </div>
       {managing ? (
-        <ManageDashboardDialog
-          sections={layout.sections}
-          onClose={() => {
-            setManaging(false);
-          }}
-        />
+        <Suspense fallback={null}>
+          <ManageDashboard
+            projectId={projectId}
+            onClose={() => {
+              setManaging(false);
+            }}
+          />
+        </Suspense>
       ) : null}
     </div>
   );

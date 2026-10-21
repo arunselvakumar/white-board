@@ -22,14 +22,8 @@ import {
   type DailyWorkDashboard,
 } from "@/src/queries/site-work-dashboard";
 
-import {
-  Fact,
-  Rupees,
-  Section,
-  SectionSkeleton,
-  Unit,
-  denied,
-} from "./dashboard-parts";
+import { Fact, Rupees, Section, Unit, denied } from "./dashboard-parts";
+import { SectionSkeleton } from "./dashboard-skeletons";
 import {
   hoursLabel,
   OwnershipSplit,
@@ -142,7 +136,16 @@ export function DailyWorkSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Daily Work"
+          className="grid grid-cols-2 gap-2 lg:grid-cols-3"
+          chart
+          facts={[
+            { label: "Worksheets", icon: ClipboardList },
+            { label: "Labour-days", icon: HardHat },
+            { label: "Pending approval", icon: Hourglass },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -196,7 +199,17 @@ export function EquipmentUsageSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Equipment Usage"
+          className="grid grid-cols-2 gap-2 lg:grid-cols-3"
+          facts={[
+            { label: "Usage sheets", icon: Truck },
+            { label: "Work hours", icon: Clock },
+            { label: "Distance", icon: Route },
+            { label: "Trips" },
+            { label: "Fuel overruns", icon: Fuel },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)

@@ -2,15 +2,15 @@
 
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { formatPaise } from "@/components/money/money-input";
 import { QueryHttpError } from "@/src/queries/http";
 
 /**
  * The Project Dashboard's building blocks (CM-412): a section card, a
- * labelled figure with its grey units, the loading skeleton, and the 403 check sections use to
- * name the permission they need.
+ * labelled figure with its grey units, and the 403 check sections use to
+ * name the permission they need. Their loading skeletons are in
+ * `dashboard-skeletons.tsx`.
  */
 
 export function Section({
@@ -87,16 +87,6 @@ export function Rupees({ paise }: { paise: number }) {
       <Unit>₹</Unit>
       {text.replace(/^-?₹/, "")}
     </>
-  );
-}
-
-export function SectionSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-2 lg:grid-cols-4" aria-busy="true">
-      {[0, 1, 2, 3].map((index) => (
-        <Skeleton key={index} className="h-14 rounded-lg" />
-      ))}
-    </div>
   );
 }
 

@@ -11,13 +11,14 @@ import {
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { MetricCard } from "@repo/ui/components/metric-card";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { formatPaise } from "@/components/money/money-input";
 import {
   projectLabourSummaryQuery,
   type ProjectLabourSummary,
 } from "@/src/queries/labour-summary";
+
+import { ProjectLabourTilesSkeleton } from "./projects-skeletons";
 
 const DAY = new Intl.DateTimeFormat("en-IN", {
   weekday: "short",
@@ -176,14 +177,7 @@ export function ProjectLabourTiles({ projectId }: { projectId: string }) {
     projectLabourSummaryQuery(projectId),
   );
   if (isError) return null;
-  if (isPending)
-    return (
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[0, 1, 2, 3].map((index) => (
-          <Skeleton key={index} className="h-28 rounded-xl" />
-        ))}
-      </div>
-    );
+  if (isPending) return <ProjectLabourTilesSkeleton />;
   const { labourers, vendors } = data;
   const base = `/app/projects/${projectId}`;
   return (

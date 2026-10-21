@@ -20,13 +20,12 @@ import {
   type PaymentsDashboard,
 } from "@/src/queries/finance-dashboard";
 
+import { Fact, Rupees, Section, denied } from "./dashboard-parts";
 import {
-  Fact,
-  Rupees,
-  Section,
+  MetricCaptionSkeleton,
+  MetricFigureSkeleton,
   SectionSkeleton,
-  denied,
-} from "./dashboard-parts";
+} from "./dashboard-skeletons";
 
 const MONTH = new Intl.DateTimeFormat("en-IN", {
   month: "short",
@@ -376,7 +375,16 @@ export function PaymentsSection({
       }
     >
       {isPending ? (
-        <SectionSkeleton />
+        <SectionSkeleton
+          label="Loading Payments"
+          chart
+          facts={[
+            { label: "Payment in", icon: ArrowDownLeft },
+            { label: "Payment out", icon: ArrowUpRight },
+            { label: "Net", icon: Scale },
+            { label: "Balance", icon: Wallet },
+          ]}
+        />
       ) : error != null ? (
         <p className="text-muted-foreground text-sm">
           {denied(error)
@@ -450,18 +458,22 @@ export function PaymentApprovalsTile({
         value={
           any && approvals != null ? (
             approvals.total
+          ) : approvals == null && error == null ? (
+            <MetricFigureSkeleton />
           ) : (
             <span className="text-muted-foreground">—</span>
           )
         }
         caption={
-          error != null
-            ? "Could not be loaded"
-            : approvals == null
-              ? "Loading…"
-              : any
-                ? `Pending: ${parts.join(" · ")}`
-                : "Nothing here for you to approve"
+          error != null ? (
+            "Could not be loaded"
+          ) : approvals == null ? (
+            <MetricCaptionSkeleton />
+          ) : any ? (
+            `Pending: ${parts.join(" · ")}`
+          ) : (
+            "Nothing here for you to approve"
+          )
         }
         render={
           any && approvals != null ? (

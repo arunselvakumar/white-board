@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -32,6 +31,8 @@ import {
   useMoveDrawing,
   type DrawingSummary,
 } from "@/src/queries/project-drawings";
+
+import { AlbumSelectSkeleton } from "./drawings-skeletons";
 
 const schema = z.object({
   albumId: z.string().min(1, "Choose an album."),
@@ -172,8 +173,21 @@ export function MoveDrawingDialog({
           <Suspense
             fallback={
               <div className="space-y-4">
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-10 w-full" />
+                <DialogHeader className="min-w-0">
+                  <DialogTitle>Move to album</DialogTitle>
+                  <DialogDescription className="break-words">
+                    {drawing.name} and all its revisions move together.
+                  </DialogDescription>
+                </DialogHeader>
+                <AlbumSelectSkeleton />
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button type="button" disabled>
+                    Move
+                  </Button>
+                </DialogFooter>
               </div>
             }
           >

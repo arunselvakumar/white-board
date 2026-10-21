@@ -315,7 +315,7 @@ export const WithFinancial: Story = {
     ]);
 
     const projectSummary = within(
-      canvas.getByRole("region", { name: "Project summary" }),
+      await canvas.findByRole("region", { name: "Project summary" }),
     );
     await expect(
       (await projectSummary.findByText("Budget")).nextElementSibling,

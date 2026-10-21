@@ -12,13 +12,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { documentMeta } from "@/lib/project-documents";
 import {
   drawingQuery,
   type DrawingRevision,
 } from "@/src/queries/project-drawings";
+
+import { DrawingRevisionsSkeleton } from "./drawings-skeletons";
 
 import { downloadUrl } from "../files/file-viewer";
 
@@ -125,14 +126,7 @@ export function DrawingHistorySheet({
         </SheetHeader>
         <div className="px-4 pb-6">
           {shown == null ? null : (
-            <Suspense
-              fallback={
-                <div className="space-y-2">
-                  <Skeleton className="h-24 w-full" />
-                  <Skeleton className="h-24 w-full" />
-                </div>
-              }
-            >
+            <Suspense fallback={<DrawingRevisionsSkeleton />}>
               <Revisions
                 projectId={projectId}
                 drawingId={shown.id}

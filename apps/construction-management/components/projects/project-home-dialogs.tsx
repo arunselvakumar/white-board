@@ -13,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { CheckList } from "@/components/masters/check-list";
@@ -27,6 +26,10 @@ import {
 } from "@/src/queries/project-home";
 
 import { projectModuleIcon } from "./project-module-icons";
+import {
+  ModuleCheckListSkeleton,
+  TileOrderSkeleton,
+} from "./projects-skeletons";
 
 function DialogShell({
   title,
@@ -54,16 +57,6 @@ function DialogShell({
         {children}
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true">
-      <Skeleton className="h-11 w-full" />
-      <Skeleton className="h-11 w-full" />
-      <Skeleton className="h-11 w-full" />
-    </div>
   );
 }
 
@@ -146,7 +139,7 @@ export function HideModulesDialog({
       onClose={onClose}
     >
       {isPending ? (
-        <ListSkeleton />
+        <ModuleCheckListSkeleton />
       ) : isError ? (
         <FormAlert message="The modules could not be loaded. Try again." />
       ) : !data.canHideModules ? (
@@ -335,7 +328,7 @@ export function ArrangeTilesDialog({
       onClose={onClose}
     >
       {isPending ? (
-        <ListSkeleton />
+        <TileOrderSkeleton />
       ) : isError ? (
         <FormAlert message="The tiles could not be loaded. Try again." />
       ) : (

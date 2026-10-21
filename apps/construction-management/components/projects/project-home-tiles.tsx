@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { projectHomeQuery } from "@/src/queries/project-home";
 
 import { projectModuleIcon } from "./project-module-icons";
 import { projectPath } from "./projects-home";
+import { ProjectHomeTilesSkeleton } from "./projects-skeletons";
 
 /**
  * The Project home's tiles (CM-411, ADR CM-0013 §11): one per module the
@@ -18,17 +18,7 @@ import { projectPath } from "./projects-home";
 export function ProjectHomeTiles({ projectId }: { projectId: string }) {
   const { data, isPending, isError } = useQuery(projectHomeQuery(projectId));
   if (isError) return null;
-  if (isPending)
-    return (
-      <div
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-        aria-busy="true"
-      >
-        {[0, 1, 2, 3].map((index) => (
-          <Skeleton key={index} className="h-28 rounded-xl" />
-        ))}
-      </div>
-    );
+  if (isPending) return <ProjectHomeTilesSkeleton />;
   const shown = data.modules.filter((module) => !module.hidden);
   const hidden = data.modules.length - shown.length;
   const base = projectPath(projectId);

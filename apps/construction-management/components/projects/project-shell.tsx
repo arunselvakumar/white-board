@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { EllipsisVertical, Pencil, Pin } from "lucide-react";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { Suspense, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -27,7 +27,10 @@ import { projectQuery } from "@/src/queries/projects";
 
 import { ProjectBackupDialog } from "@/components/backups/backup-dialog";
 
+import { QuerySuspense } from "@/components/query-suspense";
+
 import { ProjectAvatar } from "./project-avatar";
+import { ProjectShellHeaderSkeleton } from "./projects-skeletons";
 import { ArrangeTilesDialog, HideModulesDialog } from "./project-home-dialogs";
 import { projectPath } from "./projects-home";
 import { ProjectStatusBadge, projectDates } from "./project-status";
@@ -144,58 +147,68 @@ export function ProjectShell({
   id: string;
   children: ReactNode;
 }) {
-  // Both reads start together; the shell waits for the Project only.
+  // Both reads start together; the header waits for the Project only.
   usePrefetchQuery(projectHomeQuery(id));
+  // The header and the page load side by side: a page that suspends
+  // keeps the header on screen (ADR-0047).
+  return (
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
+      <Suspense fallback={<ProjectShellHeaderSkeleton id={id} />}>
+        <ProjectShellHeader id={id} />
+      </Suspense>
+      <QuerySuspense>{children}</QuerySuspense>
+    </div>
+  );
+}
+
+function ProjectShellHeader({ id }: { id: string }) {
   const { data: project } = useSuspenseQuery(projectQuery(id));
   const { data: home } = useQuery(projectHomeQuery(id));
   const dates = projectDates(project);
 
   return (
-    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-      <header className="border-b px-6 py-3">
-        <div className="flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <div className="flex min-w-0 items-center gap-3">
-            {project.logoUrl == null ? null : (
-              <ProjectAvatar
-                name={project.name}
-                logoUrl={project.logoUrl}
-                className="size-9 md:hidden"
-              />
-            )}
-            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-              <h1 className="text-lg font-semibold tracking-tight break-words">
-                {project.name}
-              </h1>
-              <span className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
-                <ProjectStatusBadge status={project.status} />
-                {project.projectType == null ? null : (
-                  <span>{projectTypeLabel(project.projectType)}</span>
-                )}
-                {dates == null ? null : <span>{dates}</span>}
-                {home?.pinned === true ? (
-                  <span className="inline-flex items-center gap-1">
-                    <Pin aria-hidden="true" className="size-3.5" />
-                    Pinned
-                  </span>
-                ) : null}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`${projectPath(id)}/edit`}
-              className={buttonVariants({ variant: "outline" })}
-            >
-              <Pencil aria-hidden="true" />
-              Edit
-            </Link>
-            {home == null ? null : (
-              <ProjectOptions id={id} name={project.name} home={home} />
-            )}
+    <header className="border-b px-6 py-3">
+      <div className="flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex min-w-0 items-center gap-3">
+          {project.logoUrl == null ? null : (
+            <ProjectAvatar
+              name={project.name}
+              logoUrl={project.logoUrl}
+              className="size-9 md:hidden"
+            />
+          )}
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="text-lg font-semibold tracking-tight break-words">
+              {project.name}
+            </h1>
+            <span className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
+              <ProjectStatusBadge status={project.status} />
+              {project.projectType == null ? null : (
+                <span>{projectTypeLabel(project.projectType)}</span>
+              )}
+              {dates == null ? null : <span>{dates}</span>}
+              {home?.pinned === true ? (
+                <span className="inline-flex items-center gap-1">
+                  <Pin aria-hidden="true" className="size-3.5" />
+                  Pinned
+                </span>
+              ) : null}
+            </span>
           </div>
         </div>
-      </header>
-      {children}
-    </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`${projectPath(id)}/edit`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <Pencil aria-hidden="true" />
+            Edit
+          </Link>
+          {home == null ? null : (
+            <ProjectOptions id={id} name={project.name} home={home} />
+          )}
+        </div>
+      </div>
+    </header>
   );
 }

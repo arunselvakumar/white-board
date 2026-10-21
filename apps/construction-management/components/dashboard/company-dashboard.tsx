@@ -22,10 +22,15 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { MetricCard } from "@repo/ui/components/metric-card";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import {
+  COMPANY_DASHBOARD_COLUMNS,
+  COMPANY_DASHBOARD_HEAD as HEAD,
+  COMPANY_DASHBOARD_NUMBER as NUMBER,
+  CompanyDashboardSkeleton,
+} from "@/components/dashboard/dashboard-skeletons";
 import { formatPaise } from "@/components/money/money-input";
 import { DurationFilter } from "@/components/projects/dashboard/duration-filter";
 import { ProjectProgressBar } from "@/components/projects/project-progress";
@@ -185,10 +190,6 @@ function Issues({ row }: { row: CompanyDashboardProject }) {
   );
 }
 
-const HEAD =
-  "text-muted-foreground px-3 py-2 text-left text-[11px] font-semibold tracking-[0.08em] uppercase";
-const NUMBER = "px-3 py-3 text-right tabular-nums";
-
 /** Desktop: one table row per Project, the name linking to its Dashboard. */
 function ProjectsTable({ data }: { data: Dashboard }) {
   return (
@@ -196,24 +197,15 @@ function ProjectsTable({ data }: { data: Dashboard }) {
       <caption className="sr-only">Your Projects</caption>
       <thead className="border-b">
         <tr>
-          <th scope="col" className={cn(HEAD, "w-[28%]")}>
-            Project
-          </th>
-          <th scope="col" className={HEAD}>
-            Status
-          </th>
-          <th scope="col" className={cn(HEAD, "w-[16%]")}>
-            Progress
-          </th>
-          <th scope="col" className={cn(HEAD, "text-right")}>
-            Approvals
-          </th>
-          <th scope="col" className={cn(HEAD, "text-right")}>
-            Pending issues
-          </th>
-          <th scope="col" className={cn(HEAD, "text-right")}>
-            Labour today
-          </th>
+          {COMPANY_DASHBOARD_COLUMNS.map((column) => (
+            <th
+              key={column.header}
+              scope="col"
+              className={cn(HEAD, column.className)}
+            >
+              {column.header}
+            </th>
+          ))}
           {data.financial ? (
             <th scope="col" className={cn(HEAD, "text-right")}>
               Due
@@ -357,25 +349,6 @@ function Body({ duration }: { duration: Duration }) {
           <ProjectsTable data={data} />
         </div>
       </section>
-    </div>
-  );
-}
-
-/** What shows while the figures load. */
-export function CompanyDashboardSkeleton() {
-  return (
-    <div
-      role="status"
-      className="space-y-6"
-      aria-busy="true"
-      aria-label="Loading dashboard"
-    >
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
-        {[0, 1, 2, 3, 4, 5].map((index) => (
-          <Skeleton key={index} className="h-28 rounded-xl" />
-        ))}
-      </div>
-      <Skeleton className="h-64 w-full rounded-2xl" />
     </div>
   );
 }

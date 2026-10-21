@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectsHome } from "@/components/projects/projects-home";
+import { ProjectsHomeSkeleton } from "@/components/projects/projects-skeletons";
 import { APP_HOME } from "@/lib/safe-redirect";
 
 import { viewerHomePath } from "../_lib/viewer-home";
@@ -12,5 +14,9 @@ export const metadata: Metadata = { title: "Projects" };
 export default async function ProjectsPage() {
   const home = await viewerHomePath();
   if (home !== APP_HOME) redirect(home);
-  return <ProjectsHome />;
+  return (
+    <QuerySuspense fallback={<ProjectsHomeSkeleton />}>
+      <ProjectsHome />
+    </QuerySuspense>
+  );
 }

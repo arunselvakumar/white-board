@@ -47,6 +47,7 @@ import {
 import { ProjectAvatar } from "./project-avatar";
 import { ProjectProgressBar } from "./project-progress";
 import { HideModulesDialog } from "./project-home-dialogs";
+import { PROJECT_ROW_GRID } from "./projects-skeletons";
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
@@ -111,8 +112,7 @@ const STATS: readonly {
   },
 ];
 
-const ROW_GRID =
-  "md:grid md:grid-cols-[minmax(0,2fr)_8rem_minmax(0,1.3fr)] md:items-center md:gap-4";
+const ROW_GRID = PROJECT_ROW_GRID;
 
 type ProjectItem = ProjectList["items"][number];
 
