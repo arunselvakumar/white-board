@@ -1,0 +1,23 @@
+apps/construction-management/CONTEXT.md
+  s_6777d2a5cecb3e::t_0b4b0aa153a3f8 195
+apps/construction-management/components/projects/project-landing.stories.tsx
+  s_6777d2a5cecb3e::t_a0200b8fbf58d9 76-78
+apps/construction-management/components/projects/project-landing.tsx
+  s_6777d2a5cecb3e::t_059cc4a3c1957f 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "85db07c55a950623deed092c7c47900b4199f4bd",
+  "prompts": {},
+  "sessions": {
+    "s_6777d2a5cecb3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2a324d2-7ae1-42bd-aac6-fea145cd917d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
