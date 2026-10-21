@@ -312,7 +312,7 @@ function MetricCardSkeleton({
         )}
       </span>
       <span className="mt-auto pt-4 sm:pt-6">
-        <Skeleton className="h-8 w-24 rounded-sm sm:h-10" />
+        <Skeleton className="h-9 w-24 rounded-sm sm:h-12" />
       </span>
       {caption === true ? (
         <SkeletonText width="75%" className="mt-3" />
