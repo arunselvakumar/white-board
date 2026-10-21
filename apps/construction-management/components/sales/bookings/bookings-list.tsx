@@ -16,7 +16,6 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -26,6 +25,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatDate } from "@/components/payments/payment-format";
 import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
@@ -43,6 +43,7 @@ import {
   BOOKING_DISPLAY_STATUSES,
   type BookingDisplayStatus,
 } from "@/src/sales/domain/booking";
+import { BOOKING_COLUMNS, BookingRowsSkeleton } from "./bookings-skeletons";
 
 type Filters = {
   statuses: BookingDisplayStatus[];
@@ -69,7 +70,7 @@ export function BookingsList({ projectId }: { projectId: string }) {
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState<BookingFilters["cursor"]>(null);
-  const [, startTransition] = useTransition();
+  const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -143,26 +144,23 @@ export function BookingsList({ projectId }: { projectId: string }) {
           />
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-busy="true">
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-14 w-full" />
-          </div>
-        }
+      <div
+        className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
       >
-        <BookingRows
-          projectId={projectId}
-          filters={filters}
-          cursor={cursor}
-          newHref={canCreate ? newHref : null}
-          onPage={(next) => {
-            startTransition(() => {
-              setCursor(next);
-            });
-          }}
-        />
-      </Suspense>
+        <Suspense fallback={<BookingRowsSkeleton />}>
+          <BookingRows
+            projectId={projectId}
+            filters={filters}
+            cursor={cursor}
+            newHref={canCreate ? newHref : null}
+            onPage={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }
@@ -223,13 +221,11 @@ function BookingRows({
         <Table aria-label="Bookings">
           <TableHeader>
             <TableRow>
-              <TableHead>Unit</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Unit type</TableHead>
-              <TableHead>Booking Date</TableHead>
-              <TableHead>Hold until</TableHead>
-              <TableHead>Referred By</TableHead>
-              <TableHead>Status</TableHead>
+              {BOOKING_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -4,6 +4,8 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { uploadFailedNames } from "@/components/sales/documents/upload-failed";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { BookingDetail } from "@/components/sales/bookings/booking-detail";
+import { QuerySuspense } from "@/components/query-suspense";
+import { BookingDetailSkeleton } from "@/components/sales/bookings/bookings-skeletons";
 
 export const metadata: Metadata = { title: "Booking" };
 
@@ -20,10 +22,12 @@ export default async function BookingPage({
   if (!(await viewerCan("sales.bookings", "read", { projectId: id })))
     return <ProjectNoAccess what="Bookings" />;
   return (
-    <BookingDetail
-      projectId={id}
-      id={bookingId}
-      uploadFailed={uploadFailedNames(uploadFailed)}
-    />
+    <QuerySuspense fallback={<BookingDetailSkeleton projectId={id} />}>
+      <BookingDetail
+        projectId={id}
+        id={bookingId}
+        uploadFailed={uploadFailedNames(uploadFailed)}
+      />
+    </QuerySuspense>
   );
 }

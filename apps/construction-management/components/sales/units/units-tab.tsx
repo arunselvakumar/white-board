@@ -28,7 +28,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { wingsPath } from "@/components/projects/structure/structure-parts";
 import { isWingType } from "@/src/projects/domain/wing-generator";
@@ -42,6 +41,7 @@ import { ImportUnitsDialog } from "./import-units-dialog";
 import { SalesUnitsChart } from "./sales-units-chart";
 import { UNIT_STATUS_DOTS } from "./sales-status";
 import { UnitPanel } from "./unit-panel";
+import { UnitPanelSkeleton } from "./units-skeletons";
 
 function Counts({
   label,
@@ -200,7 +200,7 @@ export function UnitsTab({ projectId }: { projectId: string }) {
           </SheetHeader>
           <div className="px-4 pb-6">
             {unitId != null && (
-              <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+              <Suspense fallback={<UnitPanelSkeleton />}>
                 <UnitPanel projectId={projectId} unitId={unitId} />
               </Suspense>
             )}

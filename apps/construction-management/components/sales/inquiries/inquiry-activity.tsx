@@ -35,6 +35,7 @@ import {
 
 import { InquiryFollowUpDialog } from "./inquiry-follow-up-dialog";
 import { inquiryHistoryLine } from "./inquiry-parts";
+import { TimelineSkeleton } from "./inquiries-skeletons";
 
 const ACTIVITY_ICONS: Record<FollowUpActivity, LucideIcon> = {
   call: Phone,
@@ -205,7 +206,7 @@ export function InquiryActivity({
           </Button>
         )}
       </div>
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<TimelineSkeleton />}>
         <Timeline projectId={projectId} inquiry={inquiry} />
       </Suspense>
       {inquiry.actions.followUp && (

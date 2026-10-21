@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -42,6 +41,7 @@ import {
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
 
 import { InquirySelect } from "./inquiry-select";
+import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
 
 const schema = z
   .object({
@@ -292,7 +292,14 @@ export function InquiryCloseDialog({
             <div className="grid min-w-0 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="close-unit">Unit</Label>
-                <Suspense fallback={<Skeleton className="h-8 w-full" />}>
+                <Suspense
+                  fallback={
+                    <SelectControlSkeleton
+                      label="Loading units"
+                      className="h-8 w-full"
+                    />
+                  }
+                >
                   <Controller
                     control={form.control}
                     name="unitId"
