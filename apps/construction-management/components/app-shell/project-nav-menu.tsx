@@ -21,7 +21,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@repo/ui/components/sidebar";
-import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { attendanceNavLinks } from "@/components/attendance/attendance-tabs";
 import { usePaymentsNavLinks } from "@/components/finance/payments-hub/payments-nav";
@@ -39,6 +38,10 @@ import {
   projectNavGroups,
   type ProjectNavSection,
 } from "@/lib/project-nav";
+import {
+  MenuSkeleton,
+  SKELETON_WIDTHS,
+} from "@/components/app-shell/app-shell-skeletons";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { projectHomeQuery } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
@@ -47,18 +50,6 @@ const GROUP_LABEL_CLASS =
   "text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase";
 
 type SubLink = { href: string; label: string };
-
-/** Fixed widths: the sidebar's own skeleton picks random ones, which breaks hydration. */
-const SKELETON_WIDTHS = ["70%", "55%", "80%", "60%", "75%", "50%"];
-
-function MenuSkeleton({ width }: { width: string }) {
-  return (
-    <div className="flex h-8 items-center gap-2 px-2">
-      <Skeleton className="size-4 rounded-md" />
-      <Skeleton className="h-4" style={{ width }} />
-    </div>
-  );
-}
 
 type EntryProps = {
   projectId: string;

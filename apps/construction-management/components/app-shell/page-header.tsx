@@ -50,7 +50,8 @@ export function PageHeader({
   actions,
 }: {
   back?: PageHeaderBack;
-  title: string;
+  /** A string, or `PageHeaderSkeleton`'s placeholder while it loads. */
+  title: ReactNode;
   meta?: ReactNode;
   leading?: ReactNode;
   actions?: ReactNode;
