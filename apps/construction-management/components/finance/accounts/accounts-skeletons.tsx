@@ -31,7 +31,7 @@ export function LedgerSkeleton({ back }: { back: PageHeaderBack }) {
   return (
     <>
       <PageHeaderSkeleton back={back} />
-      <SkeletonGroup label="Loading the Ledger" className="flex flex-col gap-6">
+      <SkeletonGroup label="Loading the Ledger" className="space-y-6">
         <div className="flex flex-wrap items-end gap-3">
           {["From", "To"].map((label) => (
             <div key={label} className="space-y-1">

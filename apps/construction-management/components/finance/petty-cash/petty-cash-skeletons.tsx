@@ -43,7 +43,7 @@ export function VoucherRowsSkeleton() {
 /** The whole vouchers panel: scope toggle, filters, then the rows. */
 export function PettyCashVouchersSkeleton() {
   return (
-    <SkeletonGroup label="Loading vouchers" className="flex flex-col gap-3">
+    <SkeletonGroup label="Loading vouchers" className="space-y-3">
       <Skeleton className="h-8 w-56 rounded-md" />
       <FilterBarSkeleton
         size="sm"
@@ -57,10 +57,7 @@ export function PettyCashVouchersSkeleton() {
 /** A statement's four figures and its lines, under the real From and To. */
 export function StatementLinesSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the statement"
-      className="flex flex-col gap-3"
-    >
+    <SkeletonGroup label="Loading the statement" className="space-y-3">
       <SummaryTilesSkeleton
         labels={["Opening", "Money in", "Money out", "Closing"]}
       />

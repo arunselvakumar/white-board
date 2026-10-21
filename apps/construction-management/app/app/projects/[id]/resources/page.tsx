@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectResourcesPage } from "@/components/projects/resources/project-resources-page";
 import { RESOURCES_STEP } from "@/components/projects/resources/resources-step";
+import { QuerySuspense } from "@/components/query-suspense";
+import { ProjectResourcesSkeleton } from "@/components/projects/resources/resources-skeletons";
 
 export const metadata: Metadata = { title: "Resources" };
 
@@ -22,10 +24,12 @@ export default async function ProjectResourcesRoute({
     projectId: id,
   });
   return (
-    <ProjectResourcesPage
-      projectId={id}
-      canEdit={canEdit}
-      wizard={step === RESOURCES_STEP}
-    />
+    <QuerySuspense fallback={<ProjectResourcesSkeleton />}>
+      <ProjectResourcesPage
+        projectId={id}
+        canEdit={canEdit}
+        wizard={step === RESOURCES_STEP}
+      />
+    </QuerySuspense>
   );
 }

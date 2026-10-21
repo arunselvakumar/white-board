@@ -13,9 +13,6 @@ import { ResponsiveListSkeleton } from "@/components/finance/finance-skeletons";
 /*
  * Labour and vendor attendance while they load (ADR-0047). Month grids keep
  * their real day and totals columns, so nothing moves when the codes land.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
@@ -76,10 +73,7 @@ export function MonthGridSkeleton({
 /** Mark: one card per Labour with the status buttons and the shift. */
 export function LabourMarkingSheetSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the day's sheet"
-      className="flex flex-col gap-3"
-    >
+    <SkeletonGroup label="Loading the day's sheet" className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <SkeletonText width="10rem" />
         <Skeleton className="h-9 w-32 rounded-md" />
@@ -135,7 +129,7 @@ export function LabourRecordedSkeleton() {
 /** Vendor Day: the day's totals line, then a card per vendor in two columns. */
 export function VendorDayGridSkeleton() {
   return (
-    <SkeletonGroup label="Loading vendors" className="flex flex-col gap-4">
+    <SkeletonGroup label="Loading vendors" className="space-y-4">
       <SkeletonText width="14rem" />
       <div className="grid gap-4 lg:grid-cols-2">
         {WIDTHS.slice(0, 2).map((width, card) => (

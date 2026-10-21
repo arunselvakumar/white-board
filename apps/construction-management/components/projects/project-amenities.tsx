@@ -26,7 +26,7 @@ import {
 
 type Kind = "amenities" | "commonDevelopments";
 
-const KINDS: readonly {
+export const KINDS: readonly {
   kind: Kind;
   title: string;
   singular: string;

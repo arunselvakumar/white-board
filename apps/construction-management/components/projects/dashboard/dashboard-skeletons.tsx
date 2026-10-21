@@ -1,12 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
-import { cn } from "@repo/ui/lib/utils";
 
 /*
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
- *
  * The Project Dashboard while its figures load (ADR-0047). Section cards
  * render their real title; inside, `SectionSkeleton` draws `Fact` tiles with
  * the real labels the section knows without fetching.
@@ -63,7 +59,7 @@ export function SectionSkeleton({
     </dl>
   );
   return (
-    <SkeletonGroup label={label} className={cn(chart && "flex flex-col gap-5")}>
+    <SkeletonGroup label={label} className={chart ? "space-y-5" : undefined}>
       {grid}
       {chart ? <Skeleton className="h-40 w-full rounded-md" /> : null}
     </SkeletonGroup>
@@ -91,7 +87,7 @@ export function MetricCaptionSkeleton() {
 /** The section cards under the KPI tiles while the member's layout loads. */
 export function DashboardSectionsSkeleton() {
   return (
-    <SkeletonGroup label="Loading dashboard" className="flex flex-col gap-6">
+    <SkeletonGroup label="Loading dashboard" className="space-y-6">
       {[0, 1, 2].map((index) => (
         <div
           key={index}

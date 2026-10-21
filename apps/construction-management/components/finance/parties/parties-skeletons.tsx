@@ -22,9 +22,6 @@ import { PARTY_SCREENS, partyPaths } from "./party-money";
 /*
  * A party's money while it loads (ADR-0047). Real headings, tab names and
  * column headers; bars where the figures go.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 const WIDTHS = ["62%", "48%", "70%", "55%"];
@@ -189,10 +186,7 @@ export function PartyPaymentDetailSkeleton({
           href: partyPaths(projectId, partyType).tab,
         }}
       />
-      <SkeletonGroup
-        label="Loading the payment"
-        className="flex flex-col gap-6"
-      >
+      <SkeletonGroup label="Loading the payment" className="space-y-6">
         <div className="grid gap-x-6 gap-y-3 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="min-w-0">
@@ -225,10 +219,7 @@ export function SettlementsSkeleton() {
 /** A Contractor's TDS for a year: PAN, the four quarters, the ledger. */
 export function TdsLedgerSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the TDS ledger"
-      className="flex flex-col gap-4"
-    >
+    <SkeletonGroup label="Loading the TDS ledger" className="space-y-4">
       <SkeletonText width="10rem" />
       <section className="space-y-2">
         <h3 className="text-sm font-semibold">By quarter</h3>
@@ -247,7 +238,7 @@ export function TdsLedgerSkeleton() {
 /** An invoice's facts while it loads: status chips, then label and value pairs. */
 export function InvoiceDetailSkeleton() {
   return (
-    <SkeletonGroup label="Loading the invoice" className="flex flex-col gap-5">
+    <SkeletonGroup label="Loading the invoice" className="space-y-5">
       <div className="flex gap-2">
         <Skeleton className="h-5 w-16 rounded-full" />
         <Skeleton className="h-5 w-20 rounded-full" />
@@ -267,10 +258,7 @@ export function InvoiceDetailSkeleton() {
 /** Party Balance in Workspace: the three totals, then a card per party. */
 export function PartyBalancesWorkspaceSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading Party Balance"
-      className="flex flex-col gap-4"
-    >
+    <SkeletonGroup label="Loading Party Balance" className="space-y-4">
       <SummaryTilesSkeleton
         labels={["Owed by the Company", "Owed to the Company", "Net"]}
         className="grid gap-3 sm:grid-cols-3"

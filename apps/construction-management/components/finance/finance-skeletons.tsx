@@ -12,9 +12,6 @@ import { cn } from "@repo/ui/lib/utils";
  * Pieces Finance's list screens share while they load (ADR-0047): a filter
  * bar with its real labels, figure tiles with their real labels, and a list
  * that is a table on wider screens and cards on a phone.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
@@ -145,7 +142,7 @@ export function ResponsiveListSkeleton({
   cardLines = 2,
   label = "Loading",
   breakpoint = "md",
-  className = "flex flex-col gap-3",
+  className = "space-y-3",
 }: {
   columns: SkeletonColumn[];
   rows?: number;

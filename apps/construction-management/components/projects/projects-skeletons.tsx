@@ -1,3 +1,5 @@
+"use client";
+
 import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
@@ -11,15 +13,14 @@ import {
 
 import { PageHeader } from "@/components/app-shell/page-header";
 
+import { KINDS } from "./project-amenities";
+
 const PROJECTS_PATH = "/app/projects";
 
 /*
  * Projects while they load (ADR-0047): the Projects home, the project
  * shell's header, a Project's home tiles and labour tiles, and the home
- * dialogs. What is known without fetching renders for real.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
+ * dialogs, Amenities. What is known without fetching renders for real.
  */
 
 /** The Projects home list's columns: name, status, dates and progress. */
@@ -53,7 +54,7 @@ export function ProjectsHomeSkeleton() {
             </Link>
           }
         />
-        <SkeletonGroup label="Loading Projects" className="flex flex-col gap-6">
+        <SkeletonGroup label="Loading Projects" className="space-y-6">
           <div className="@container">
             <MetricGridSkeleton
               labels={PROJECT_STATS}
@@ -198,10 +199,14 @@ export function ProjectLabourTilesSkeleton() {
   );
 }
 
-/** The Hide / show modules check list. */
-export function ModuleCheckListSkeleton() {
+/** A ticked check list: Hide / show modules, Amenities. */
+export function ModuleCheckListSkeleton({
+  label = "Loading modules",
+}: {
+  label?: string;
+}) {
   return (
-    <SkeletonGroup label="Loading modules">
+    <SkeletonGroup label={label}>
       <ul className="bg-card divide-y rounded-xl border">
         {WIDTHS.slice(0, 4).map((width, row) => (
           <li key={row} className="flex items-center gap-3 px-4 py-3">
@@ -231,5 +236,37 @@ export function TileOrderSkeleton() {
         ))}
       </ol>
     </SkeletonGroup>
+  );
+}
+
+/** Amenities and Common Developments: the real headings over tick lists. */
+export function ProjectAmenitiesSkeleton() {
+  return (
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">
+            Amenities and Common Developments
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Site entries on this Project can be located at what you tick here.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {KINDS.map((kind) => (
+            <section
+              key={kind.kind}
+              className="bg-card min-w-0 space-y-3 rounded-xl border p-4 sm:p-6"
+            >
+              <div className="space-y-1">
+                <h2 className="font-semibold">{kind.title}</h2>
+                <p className="text-muted-foreground text-sm">{kind.hint}</p>
+              </div>
+              <ModuleCheckListSkeleton label={`Loading ${kind.title}`} />
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

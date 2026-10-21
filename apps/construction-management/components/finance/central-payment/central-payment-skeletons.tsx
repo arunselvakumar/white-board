@@ -9,9 +9,6 @@ import { PageHeader } from "@/components/app-shell/page-header";
 /*
  * Central Payment while it loads (ADR-0047): the real title, the Party
  * dues heading, its tabs and column headers; bars where the figures go.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 export const PARTY_TABS = [

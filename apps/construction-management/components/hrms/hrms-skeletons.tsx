@@ -11,9 +11,6 @@ import { SummaryTilesSkeleton } from "@/components/finance/finance-skeletons";
 /*
  * HRMS pages while they load (ADR-0047), under the real HRMS tabs. The
  * page's own title is known from the HRMS menu, so it renders for real.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
@@ -83,7 +80,7 @@ export function HrmsPageFallback({ title }: { title?: string }) {
 /** An HRMS read inside its page, under the page's real heading. */
 export function AttendanceReadSkeleton({ what }: { what: string }) {
   return (
-    <SkeletonGroup label={`Loading ${what}`} className="flex flex-col gap-3">
+    <SkeletonGroup label={`Loading ${what}`} className="space-y-3">
       <SkeletonText width="12rem" />
       <TableSkeleton
         bordered
@@ -146,10 +143,7 @@ export function HolidayYearSkeleton() {
 /** Team Salary's month: the four totals, then a row per member. */
 export function TeamSalaryMonthSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the month's salaries"
-      className="flex flex-col gap-4"
-    >
+    <SkeletonGroup label="Loading the month's salaries" className="space-y-4">
       <SummaryTilesSkeleton
         labels={["Gross", "Deductions", "Net payable", "Employer PF / ESI"]}
       />

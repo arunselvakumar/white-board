@@ -26,7 +26,7 @@ export const TRANSACTION_COLUMNS: SkeletonColumn[] = [
 /** The Transactions register while it loads: filters, totals, the list. */
 export function TransactionRowsSkeleton() {
   return (
-    <SkeletonGroup label="Loading Transactions" className="flex flex-col gap-3">
+    <SkeletonGroup label="Loading Transactions" className="space-y-3">
       <FilterBarSkeleton
         size="sm"
         filters={[

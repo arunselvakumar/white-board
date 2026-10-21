@@ -14,9 +14,6 @@ import {
 /*
  * Wages payments while they load (ADR-0047): real column headers and
  * field labels; bars where the figures go.
- *
- * `SkeletonGroup` wraps its bars in a `display: contents` box, so spacing
- * between them uses flex `gap`, which reaches through it; `space-y` doesn't.
  */
 
 export const BALANCE_FIGURES = [
@@ -73,10 +70,7 @@ export function PaymentRowsSkeleton() {
 /** A party's statement in the sheet: the balances card, then the entries. */
 export function StatementLinesSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the statement"
-      className="flex flex-col gap-3"
-    >
+    <SkeletonGroup label="Loading the statement" className="space-y-3">
       <dl className="grid grid-cols-2 gap-2 rounded-lg border p-3 text-sm">
         <div>
           <dt className="text-muted-foreground">Previous Balance</dt>
@@ -109,10 +103,7 @@ export function StatementLinesSkeleton() {
 /** The Pay form while its accounts and members load. */
 export function PayFormSkeleton() {
   return (
-    <SkeletonGroup
-      label="Loading the payment form"
-      className="flex flex-col gap-4"
-    >
+    <SkeletonGroup label="Loading the payment form" className="space-y-4">
       <FormSkeleton
         columns={2}
         actions={0}

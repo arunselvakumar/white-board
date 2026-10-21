@@ -10,7 +10,7 @@ import {
  */
 export function PaymentsIndexSkeleton() {
   return (
-    <SkeletonGroup label="Loading Payments" className="flex flex-col gap-4">
+    <SkeletonGroup label="Loading Payments" className="space-y-4">
       <SkeletonText size="lg" width="10rem" />
       <TableSkeleton
         columns={[

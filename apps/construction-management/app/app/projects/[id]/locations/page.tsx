@@ -4,6 +4,8 @@ import { LocationsPage } from "@/components/projects/structure/locations-page";
 import { StructureNoAccess } from "@/components/projects/structure/structure-parts";
 
 import { structureAccess } from "../wings/structure-access";
+import { QuerySuspense } from "@/components/query-suspense";
+import { LocationsSkeleton } from "@/components/projects/structure/structure-skeletons";
 
 export const metadata: Metadata = { title: "Locations" };
 
@@ -16,5 +18,9 @@ export default async function ProjectLocationsRoute({
   const { id } = await params;
   const access = await structureAccess("projects.locations", id);
   if (!access.read) return <StructureNoAccess what="Locations" />;
-  return <LocationsPage projectId={id} access={access} />;
+  return (
+    <QuerySuspense fallback={<LocationsSkeleton />}>
+      <LocationsPage projectId={id} access={access} />
+    </QuerySuspense>
+  );
 }

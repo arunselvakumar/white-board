@@ -53,7 +53,7 @@ function ProgressBarSkeleton() {
 
 export function CompanyDashboardSkeleton() {
   return (
-    <SkeletonGroup label="Loading dashboard" className="flex flex-col gap-6">
+    <SkeletonGroup label="Loading dashboard" className="space-y-6">
       <MetricGridSkeleton
         labels={TOTAL_LABELS}
         className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6"

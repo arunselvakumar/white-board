@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
 import { TestingItemPage } from "@/components/projects/testing-reports/testing-item-page";
+import { QuerySuspense } from "@/components/query-suspense";
+import { TestingItemSkeleton } from "@/components/projects/testing-reports/testing-reports-skeletons";
 
 export const metadata: Metadata = { title: "Testing reports" };
 
@@ -21,12 +23,14 @@ export default async function ProjectTestingItemRoute({
     viewerCan("projects.testing_reports", "delete", { projectId: id }),
   ]);
   return (
-    <TestingItemPage
-      projectId={id}
-      itemId={itemId}
-      canCreate={canCreate}
-      canUpdate={canUpdate}
-      canDelete={canDelete}
-    />
+    <QuerySuspense fallback={<TestingItemSkeleton projectId={id} />}>
+      <TestingItemPage
+        projectId={id}
+        itemId={itemId}
+        canCreate={canCreate}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+      />
+    </QuerySuspense>
   );
 }
