@@ -1,10 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -21,10 +20,17 @@ import {
   labourAttendanceMonthQuery,
   type LabourAttendanceMonth,
 } from "@/src/queries/labour-attendance";
+import {
+  LABOUR_MONTH_TOTALS,
+  MonthGridSkeleton,
+} from "@/components/attendance/attendance-skeletons";
 
 type Totals = LabourAttendanceMonth["totals"];
 
 /** One focusable scroll area around the wide grid. */
+const MONTH_LEGEND =
+  "P Present · H Half Day · A Absent · L Leave · PL Paid Leave · HO Holiday · a number under the code is overtime hours.";
+
 const SCROLL =
   "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
 
@@ -79,10 +85,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   const counts = new Map(data.dayCounts.map((row) => [row.date, row]));
   return (
     <div className="space-y-2">
-      <p className="text-muted-foreground text-xs">
-        P Present · H Half Day · A Absent · L Leave · PL Paid Leave · HO Holiday
-        · a number under the code is overtime hours.
-      </p>
+      <p className="text-muted-foreground text-xs">{MONTH_LEGEND}</p>
       <div
         role="region"
         aria-label="Labour attendance by day, scrolls sideways"
@@ -100,14 +103,11 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
                   {Number(date.slice(8))}
                 </TableHead>
               ))}
-              <TableHead className="text-right">P</TableHead>
-              <TableHead className="text-right">H</TableHead>
-              <TableHead className="text-right">A</TableHead>
-              <TableHead className="text-right">L</TableHead>
-              <TableHead className="text-right">PL</TableHead>
-              <TableHead className="text-right">HO</TableHead>
-              <TableHead className="text-right">OT h</TableHead>
-              <TableHead className="text-right">Earned</TableHead>
+              {LABOUR_MONTH_TOTALS.map((total) => (
+                <TableHead key={total} className="text-right">
+                  {total}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -193,6 +193,7 @@ export function LabourMonthGrid({
   initialMonth: string;
 }) {
   const [month, setMonth] = useState(initialMonth);
+  const shownMonth = useDeferredValue(month);
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
@@ -207,9 +208,23 @@ export function LabourMonthGrid({
           }}
         />
       </div>
-      <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-        <Grid projectId={projectId} month={month} />
-      </Suspense>
+      <div
+        className={cn(shownMonth !== month && "opacity-60 transition-opacity")}
+      >
+        <Suspense
+          fallback={
+            <MonthGridSkeleton
+              label="Loading the month"
+              month={shownMonth}
+              nameHeader="Labour"
+              totals={LABOUR_MONTH_TOTALS}
+              legend={MONTH_LEGEND}
+            />
+          }
+        >
+          <Grid projectId={projectId} month={shownMonth} />
+        </Suspense>
+      </div>
     </div>
   );
 }

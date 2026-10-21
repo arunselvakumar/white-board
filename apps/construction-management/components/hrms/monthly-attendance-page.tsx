@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Download } from "lucide-react";
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -30,6 +30,7 @@ import {
   hoursText,
 } from "./attendance-parts";
 import { HrmsEmpty, HrmsPage } from "./hrms-parts";
+import { MonthlyAttendanceSkeleton } from "@/components/hrms/hrms-skeletons";
 
 /** One focusable scroll area around the wide grid. */
 const SCROLL =
@@ -182,6 +183,8 @@ export function MonthlyAttendancePage({
   initialMonth?: string;
 }) {
   const [month, setMonth] = useState(() => initialMonth ?? thisMonth());
+  // The last month stays on screen, dimmed, while the next one loads.
+  const shownMonth = useDeferredValue(month);
   return (
     <HrmsPage
       wide
@@ -210,9 +213,16 @@ export function MonthlyAttendancePage({
           }}
         />
       </div>
-      <AttendanceRead what="the monthly attendance">
-        <Grid month={month} />
-      </AttendanceRead>
+      <div
+        className={cn(shownMonth !== month && "opacity-60 transition-opacity")}
+      >
+        <AttendanceRead
+          what="the monthly attendance"
+          fallback={<MonthlyAttendanceSkeleton month={shownMonth} />}
+        >
+          <Grid month={shownMonth} />
+        </AttendanceRead>
+      </div>
     </HrmsPage>
   );
 }

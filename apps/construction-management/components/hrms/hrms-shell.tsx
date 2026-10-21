@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -14,6 +13,7 @@ import {
   activeHrmsPage,
   activeHrmsSection,
 } from "@/lib/hrms-nav";
+import { HrmsPageFallback } from "@/components/hrms/hrms-skeletons";
 
 /**
  * The HRMS area (M3): title, the five sections as tabs, and the current
@@ -95,21 +95,10 @@ export function HrmsShell({ children }: { children: ReactNode }) {
         )}
       </div>
       <HrmsAccessBoundary key={pathname} what={page?.title ?? "this page"}>
-        <Suspense fallback={<HrmsPageFallback />}>{children}</Suspense>
+        <Suspense fallback={<HrmsPageFallback title={page?.title} />}>
+          {children}
+        </Suspense>
       </HrmsAccessBoundary>
-    </div>
-  );
-}
-
-/** A page loading under the tabs: the page frame's width and padding. */
-function HrmsPageFallback() {
-  return (
-    <div className="w-full p-6" aria-busy="true">
-      <div className="w-full max-w-4xl space-y-4">
-        <Skeleton className="h-7 w-48" />
-        <Skeleton className="h-4 w-full max-w-sm" />
-        <Skeleton className="h-40 w-full" />
-      </div>
     </div>
   );
 }

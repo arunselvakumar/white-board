@@ -2,7 +2,6 @@
 
 import { Suspense, type ReactNode } from "react";
 import { Badge } from "@repo/ui/components/badge";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
 import type { HrmsDayStatus } from "@/src/hrms/application/ports";
@@ -10,6 +9,7 @@ import type { LiveState } from "@/src/hrms/domain/attendance";
 import type { HrmsAttendanceEntry } from "@/src/queries/hrms-attendance";
 
 import { HrmsAccessBoundary } from "./hrms-parts";
+import { AttendanceReadSkeleton } from "@/components/hrms/hrms-skeletons";
 
 /**
  * Shared pieces of the attendance screens (CM-309): labels and tones for
@@ -239,21 +239,17 @@ export function getDeviceLocation(timeoutMs = 15_000): Promise<DeviceLocation> {
 /** A Suspense with a skeleton and the "no access" boundary around a page read. */
 export function AttendanceRead({
   what,
+  fallback,
   children,
 }: {
   what: string;
+  /** The read's own skeleton; a generic list when left out. */
+  fallback?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <HrmsAccessBoundary what={what}>
-      <Suspense
-        fallback={
-          <div className="space-y-3" aria-busy="true">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-40 w-full" />
-          </div>
-        }
-      >
+      <Suspense fallback={fallback ?? <AttendanceReadSkeleton what={what} />}>
         {children}
       </Suspense>
     </HrmsAccessBoundary>

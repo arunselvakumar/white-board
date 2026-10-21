@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -15,19 +15,20 @@ import {
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 import { labourSheetQuery } from "@/src/queries/labour-attendance";
 
 import { LabourMarkingSheet } from "./labour-marking-sheet";
 import { LabourMonthGrid } from "./labour-month-grid";
 import { LabourRecordedList } from "./labour-recorded-list";
+import { LabourMarkingSheetSkeleton } from "@/components/attendance/attendance-skeletons";
 
 export const LABOUR_MASTERS_PATH = "/app/masters/labours";
 
@@ -98,6 +99,8 @@ function MarkTab({
   initialDate: string;
 }) {
   const [date, setDate] = useState(initialDate);
+  // The last day's sheet stays on screen, dimmed, while the next one loads.
+  const shownDate = useDeferredValue(date);
   const [message, setMessage] = useState<string>();
   const today = localToday();
   const move = (next: string) => {
@@ -154,16 +157,13 @@ function MarkTab({
           </p>
         )}
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-2" aria-hidden="true">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </div>
-        }
+      <div
+        className={cn(shownDate !== date && "opacity-60 transition-opacity")}
       >
-        <Sheet projectId={projectId} date={date} onSaved={setMessage} />
-      </Suspense>
+        <Suspense fallback={<LabourMarkingSheetSkeleton />}>
+          <Sheet projectId={projectId} date={shownDate} onSaved={setMessage} />
+        </Suspense>
+      </div>
     </div>
   );
 }

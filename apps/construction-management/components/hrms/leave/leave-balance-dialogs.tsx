@@ -31,7 +31,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -46,6 +45,7 @@ import {
 
 import { formatDate, formatDays, LEDGER_KIND_LABELS } from "./leave-format";
 import { MemberChecklist, type PickableMember } from "./member-checklist";
+import { CreditListSkeleton } from "@/components/hrms/hrms-skeletons";
 
 type Choice = { value: string; label: string };
 
@@ -549,14 +549,7 @@ export function CreditHistorySheet({
         </SheetHeader>
         <div className="px-4 pb-6">
           {member != null ? (
-            <Suspense
-              fallback={
-                <div className="space-y-2" aria-busy="true">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              }
-            >
+            <Suspense fallback={<CreditListSkeleton />}>
               <CreditList memberId={member.memberId} leaveYear={leaveYear} />
             </Suspense>
           ) : null}

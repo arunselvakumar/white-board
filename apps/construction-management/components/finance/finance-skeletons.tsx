@@ -144,6 +144,7 @@ export function ResponsiveListSkeleton({
   count = false,
   cardLines = 2,
   label = "Loading",
+  breakpoint = "md",
   className = "flex flex-col gap-3",
 }: {
   columns: SkeletonColumn[];
@@ -151,15 +152,25 @@ export function ResponsiveListSkeleton({
   count?: boolean;
   cardLines?: number;
   label?: string;
+  /** Where the loaded list turns from cards into a table. */
+  breakpoint?: "md" | "lg";
   className?: string;
 }) {
   return (
     <SkeletonGroup label={label} className={className}>
       {count ? <SkeletonText width="6rem" /> : null}
-      <div className="hidden md:block">
+      <div
+        className={breakpoint === "lg" ? "hidden lg:block" : "hidden md:block"}
+      >
         <TableSkeleton columns={columns} rows={rows} />
       </div>
-      <RowCardsSkeleton rows={Math.min(rows, 3)} lines={cardLines} />
+      <RowCardsSkeleton
+        rows={Math.min(rows, 3)}
+        lines={cardLines}
+        className={
+          breakpoint === "lg" ? "space-y-2 lg:hidden" : "space-y-2 md:hidden"
+        }
+      />
     </SkeletonGroup>
   );
 }

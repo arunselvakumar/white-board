@@ -1,10 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState } from "react";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -14,12 +13,17 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
 import {
   vendorAttendanceMonthQuery,
   type VendorAttendanceMonth,
 } from "@/src/queries/vendor-attendance";
+import {
+  MonthGridSkeleton,
+  VENDOR_MONTH_TOTALS,
+} from "@/components/attendance/attendance-skeletons";
 
 type Counts = VendorAttendanceMonth["totals"];
 
@@ -212,6 +216,7 @@ export function VendorMonthView({
   initialMonth: string;
 }) {
   const [month, setMonth] = useState(initialMonth);
+  const shownMonth = useDeferredValue(month);
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
@@ -227,9 +232,22 @@ export function VendorMonthView({
           }}
         />
       </div>
-      <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-        <MonthTable projectId={projectId} month={month} />
-      </Suspense>
+      <div
+        className={cn(shownMonth !== month && "opacity-60 transition-opacity")}
+      >
+        <Suspense
+          fallback={
+            <MonthGridSkeleton
+              label="Loading the month"
+              month={shownMonth}
+              nameHeader="Vendor"
+              totals={VENDOR_MONTH_TOTALS}
+            />
+          }
+        >
+          <MonthTable projectId={projectId} month={shownMonth} />
+        </Suspense>
+      </div>
     </div>
   );
 }

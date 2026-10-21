@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -22,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
@@ -36,6 +36,10 @@ import {
 } from "@/src/queries/labour-attendance";
 
 import { STATUS_LABELS } from "./labour-sheet-form";
+import {
+  LABOUR_RECORDED_COLUMNS,
+  LabourRecordedSkeleton,
+} from "@/components/attendance/attendance-skeletons";
 
 const ALL = "all";
 
@@ -216,17 +220,11 @@ function Results({
         <Table aria-label="Recorded labour attendance">
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Labour</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Shift</TableHead>
-              <TableHead>Supervisor</TableHead>
-              <TableHead>In</TableHead>
-              <TableHead>Out</TableHead>
-              <TableHead className="text-right">Worked h</TableHead>
-              <TableHead className="text-right">OT h</TableHead>
-              <TableHead className="text-right">Wages</TableHead>
-              <TableHead />
+              {LABOUR_RECORDED_COLUMNS.map((column, index) => (
+                <TableHead key={index} className={column.className}>
+                  {column.header}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -308,12 +306,17 @@ export function LabourRecordedList({
   const [status, setStatus] = useState(ALL);
   const [cursor, setCursor] =
     useState<LabourAttendanceListFilter["cursor"]>(null);
+  const [paging, startTransition] = useTransition();
+  // Typed dates and picked filters keep the old rows, dimmed, until the new
+  // ones arrive.
+  const shownFrom = useDeferredValue(from);
+  const shownTo = useDeferredValue(to);
   // Labourers and supervisors on the Project, for the pickers.
   const options = useQuery(labourSheetQuery(projectId, initialTo));
   const filter: LabourAttendanceListFilter = {
     projectId,
-    from: from || undefined,
-    to: to || undefined,
+    from: shownFrom || undefined,
+    to: shownTo || undefined,
     labourId: labourId === ALL ? undefined : labourId,
     supervisorId: supervisorId === ALL ? undefined : supervisorId,
     status: status === ALL ? undefined : status,
@@ -322,8 +325,10 @@ export function LabourRecordedList({
   const reset =
     <T,>(set: (value: T) => void) =>
     (value: T) => {
-      set(value);
-      setCursor(null);
+      startTransition(() => {
+        set(value);
+        setCursor(null);
+      });
     };
   return (
     <div className="space-y-4">
@@ -336,7 +341,10 @@ export function LabourRecordedList({
             className="h-10 sm:w-44"
             value={from}
             onChange={(event) => {
-              reset(setFrom)(event.target.value);
+              // A controlled input updates at once; the rows follow
+              // through `shownFrom`.
+              setFrom(event.target.value);
+              setCursor(null);
             }}
           />
         </div>
@@ -348,7 +356,8 @@ export function LabourRecordedList({
             className="h-10 sm:w-44"
             value={to}
             onChange={(event) => {
-              reset(setTo)(event.target.value);
+              setTo(event.target.value);
+              setCursor(null);
             }}
           />
         </div>
@@ -383,9 +392,23 @@ export function LabourRecordedList({
           onChange={reset(setStatus)}
         />
       </div>
-      <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-        <Results filter={filter} onCursor={setCursor} />
-      </Suspense>
+      <div
+        className={cn(
+          (paging || shownFrom !== from || shownTo !== to) &&
+            "opacity-60 transition-opacity",
+        )}
+      >
+        <Suspense fallback={<LabourRecordedSkeleton />}>
+          <Results
+            filter={filter}
+            onCursor={(next) => {
+              startTransition(() => {
+                setCursor(next);
+              });
+            }}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }
