@@ -71,7 +71,9 @@ async function setup() {
   const projectId = await salesProject(ws, by);
   const lists = await salesLists(projectId);
   await salesWing(ws, projectId, by, { name: "A Wing" });
-  const seller = await addMember(ws, by, { "sales.inquiries": ["read"] });
+  const seller = await addMember(ws, by, {
+    "sales.inquiries": ["read", "notification"],
+  });
   await sharedAssign(seller.memberId, projectId);
   const sellerMobile =
     (
@@ -126,10 +128,11 @@ describe("Inquiry import (CM-1007, CM-0022 §9)", () => {
           Assignee: ctx.sellerMobile,
           "Interest Type": "Warm",
         }),
+        row({ "Name*": "Chitra" }),
       ]),
     );
     expect(response.status).toBe(StatusCodes.OK);
-    expect(await json<{ imported: number }>(response)).toEqual({ imported: 2 });
+    expect(await json<{ imported: number }>(response)).toEqual({ imported: 3 });
     const [anand, bhavana] = await inquiriesOf(ctx);
     expect(anand).toMatchObject({
       name: "Anand Kumar",
@@ -159,6 +162,18 @@ describe("Inquiry import (CM-1007, CM-0022 §9)", () => {
       where: { workspaceId: ctx.ws, action: "inquiry.imported" },
     });
     expect(audit).not.toBeNull();
+    // One summary for the seller's two rows; the importer's own row
+    // (Chitra) tells no one.
+    const notices = await prisma.constructionMessagingNotification.findMany({
+      where: { workspaceId: ctx.ws, type: "inquiry.assigned" },
+    });
+    expect(notices).toMatchObject([
+      {
+        recipientUserId: ctx.seller.userId,
+        title: "2 imported inquiries were assigned to you",
+        link: { href: `/app/projects/${ctx.projectId}/inquiries/list` },
+      },
+    ]);
   });
 
   it("saves nothing when any row is wrong, and says which", async () => {

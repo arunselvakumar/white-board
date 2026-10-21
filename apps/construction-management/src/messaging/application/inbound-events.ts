@@ -180,3 +180,11 @@ export type InboundInquiryAssigned = DomainEvent & {
   assigneeMemberId: string;
   by: string;
 };
+
+export type InboundImportedInquiriesAssigned = DomainEvent & {
+  type: "ImportedInquiriesAssigned";
+  projectId: string;
+  assigneeMemberId: string;
+  count: number;
+  by: string;
+};

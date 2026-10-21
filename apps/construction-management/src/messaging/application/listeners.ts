@@ -34,6 +34,7 @@ import type {
   InboundTaskAssigned,
   InboundTaskCompleted,
   // Sales (CM-1004)
+  InboundImportedInquiriesAssigned,
   InboundInquiryAssigned,
 } from "./inbound-events";
 import type { Notifier } from "./notifier";
@@ -168,6 +169,10 @@ export class NotificationListeners implements DomainEventListener {
       // Sales (CM-1004)
       case "InquiryAssigned":
         return this.inquiryAssigned(event as InboundInquiryAssigned);
+      case "ImportedInquiriesAssigned":
+        return this.importedInquiriesAssigned(
+          event as InboundImportedInquiriesAssigned,
+        );
       default:
         return [];
     }
@@ -845,6 +850,51 @@ export class NotificationListeners implements DomainEventListener {
             event,
             "inquiry.assigned",
             event.inquiryId,
+            event.assigneeMemberId,
+          ),
+        },
+      },
+    ];
+  }
+
+  /**
+   * `inquiry.assigned` for an import: one notice to the Assignee with how
+   * many imported inquiries are theirs, linking the Inquiries list.
+   */
+  private async importedInquiriesAssigned(
+    event: InboundImportedInquiriesAssigned,
+  ): Promise<Plan[]> {
+    const [assignees, project] = await Promise.all([
+      this.deps.recipients.usersOfMembers(event.workspaceId, [
+        event.assigneeMemberId,
+      ]),
+      this.projectName(event, event.projectId),
+    ]);
+    return [
+      {
+        audience: {
+          kind: "direct",
+          menu: "sales.inquiries",
+          flag: "read",
+          projectId: event.projectId,
+          userIds: assignees,
+        },
+        except: event.by,
+        draft: {
+          type: "inquiry.assigned",
+          menu: "sales.inquiries",
+          projectId: event.projectId,
+          title:
+            event.count === 1
+              ? "1 imported inquiry was assigned to you"
+              : `${String(event.count)} imported inquiries were assigned to you`,
+          body: project,
+          href: LINKS.inquiries(event.projectId),
+          sourceKey: key(
+            event,
+            "inquiry.assigned",
+            "import",
+            event.projectId,
             event.assigneeMemberId,
           ),
         },

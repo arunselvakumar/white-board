@@ -238,6 +238,7 @@ export const LINKS = {
   // Sales (CM-1004)
   inquiry: (projectId: string, id: string) =>
     `/app/projects/${projectId}/inquiries/list/${id}`,
+  inquiries: (projectId: string) => `/app/projects/${projectId}/inquiries/list`,
   inquiriesDue: (projectId: string, due: "overdue" | "today") =>
     `/app/projects/${projectId}/inquiries/list?due=${due}`,
 } as const;

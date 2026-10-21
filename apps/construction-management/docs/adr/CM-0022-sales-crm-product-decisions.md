@@ -95,7 +95,7 @@ Every other question is answered here with the default we recommend; the M10 han
 
 ### 10. Notifications (messaging, CM-904)
 
-- **`inquiry.assigned`** to the new assignee when someone else assigns an inquiry (Inquiry Read and Notification).
+- **`inquiry.assigned`** to the new assignee when someone else assigns an inquiry (Inquiry Read and Notification). An **import** sends each assignee other than the importer one summary instead of a notice per row ("12 imported inquiries were assigned to you", linking the Inquiries list).
 - **`inquiry.follow_ups_due`**: the daily scheduled drain sends each assignee one notice with the count of their follow-ups due today and overdue, linking the Overdue filter.
 - **`booking.created`**, **`booking.confirmed`** and **`booking.cancelled`** to Booking Read + Notification holders on the Project (open question 16).
 - Follow-up reminders at the exact time, WhatsApp and telephony are not in M10 (Vercel Hobby has daily crons only).

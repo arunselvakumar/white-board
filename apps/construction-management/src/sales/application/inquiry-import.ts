@@ -8,6 +8,7 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
 import { inquiryFields } from "../domain/inquiry";
+import type { ImportedInquiriesAssigned } from "../domain/inquiry-events";
 import {
   INTEREST_TYPE_LABELS,
   INTEREST_TYPES,
@@ -196,7 +197,8 @@ export async function inquiryImportLists(
  * — already has is a row error unless `allowDuplicates`. The back-dated
  * `inquiry` window applies to each row's date. As on the form, the
  * importer is the Lead Owner and, when the row names none, the Assignee.
- * Needs Inquiry Create.
+ * After the commit each other Assignee gets one `inquiry.assigned` notice
+ * with their count (ADR CM-0022 §10). Needs Inquiry Create.
  */
 export async function importInquiries(
   deps: InquiryDeps,
@@ -462,5 +464,31 @@ export async function importInquiries(
       occurredAt: at,
     });
   });
+  // One summary per Assignee, not one notice per row; the importer's own
+  // rows tell no one.
+  const assigned = new Map<string, number>();
+  for (const { content } of planned)
+    if (
+      content.assigneeMemberId != null &&
+      content.assigneeMemberId !== viewerMemberId
+    )
+      assigned.set(
+        content.assigneeMemberId,
+        (assigned.get(content.assigneeMemberId) ?? 0) + 1,
+      );
+  if (assigned.size > 0)
+    await deps.events.dispatch(
+      [...assigned].map(
+        ([assigneeMemberId, count]): ImportedInquiriesAssigned => ({
+          type: "ImportedInquiriesAssigned",
+          workspaceId: ws,
+          occurredAt: at,
+          projectId,
+          assigneeMemberId,
+          count,
+          by: access.userId,
+        }),
+      ),
+    );
   return { imported: ids.length };
 }

@@ -17,4 +17,19 @@ export type InquiryAssigned = DomainEvent & {
   by: string;
 };
 
-export type InquiryEvent = InquiryAssigned;
+/**
+ * An import (CM-1007) assigned `count` new inquiries of the Project to
+ * one Team Member: one summary notice instead of one per row. Not raised
+ * for the importer's own rows.
+ */
+export type ImportedInquiriesAssigned = DomainEvent & {
+  type: "ImportedInquiriesAssigned";
+  projectId: string;
+  /** The Assignee (a Team Member id). */
+  assigneeMemberId: string;
+  count: number;
+  /** User id of who imported them. */
+  by: string;
+};
+
+export type InquiryEvent = InquiryAssigned | ImportedInquiriesAssigned;

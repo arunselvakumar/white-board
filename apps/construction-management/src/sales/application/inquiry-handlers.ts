@@ -274,7 +274,7 @@ export type InquiryDeps = {
   backdated: (access: MemberAccess) => Promise<InquiryBackdatedCheck>;
   today: (workspaceId: string) => Promise<CalendarDate>;
   timeZone: (workspaceId: string) => Promise<string>;
-  /** `InquiryAssigned`, to messaging (CM-0022 §10). */
+  /** `InquiryAssigned` and the import's `ImportedInquiriesAssigned`, to messaging (CM-0022 §10). */
   events: EventDispatcher;
   /** Books a unit inside the convert transaction (the bookings' `bookUnitInTx`). */
   bookings: InquiryBookingPort;
