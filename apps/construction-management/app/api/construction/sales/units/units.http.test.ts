@@ -517,6 +517,46 @@ describe("Unit import (CM-1005, CM-0022 §8)", () => {
     });
   });
 
+  it("cancels an expired hold on a unit the sheet marks unavailable", async () => {
+    const ctx = await setup();
+    const id = ctx.wing.units["201"] ?? "";
+    const bookingId = await salesBookingRow(
+      ctx.ws,
+      ctx.projectId,
+      ctx.wing.wingId,
+      id,
+      ctx.by,
+      {
+        status: "on_hold",
+        bookingDate: addDays(TODAY, -4),
+        holdUntil: addDays(TODAY, -1),
+      },
+    );
+    const response = await upload(
+      ctx,
+      await workbook([
+        ["Tower A", "201", "", "", "", "", "", "Yes", "Reserved"],
+      ]),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const after = await unit(ctx, id);
+    expect(after.status).toBe("unavailable");
+    expect(after.bookings[0]).toMatchObject({
+      id: bookingId,
+      status: "cancelled",
+      cancelReason: "Hold expired",
+    });
+    const events = await prisma.constructionSalesBookingEvent.findMany({
+      where: { bookingId },
+      orderBy: { occurredAt: "asc" },
+    });
+    expect(events.at(-1)).toMatchObject({
+      status: "cancelled",
+      reason: "Hold expired",
+      actorUserId: "system",
+    });
+  });
+
   it("saves nothing when any row is wrong and names each problem by row", async () => {
     const ctx = await setup();
     await salesBookingRow(

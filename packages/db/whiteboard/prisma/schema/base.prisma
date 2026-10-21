@@ -1,8 +1,12 @@
 /// Whiteboard's own client (ADR-0040). It is generated inside this package so
 /// it never overwrites Construction Management's client.
 generator client {
-  provider = "prisma-client-js"
-  output   = "../../generated/client"
+  provider      = "prisma-client-js"
+  output        = "../../generated/client"
+  // Production builds run on GitHub's Ubuntu runners (ADR-0046) but serve
+  // from Vercel's Amazon Linux functions, so the client must also carry the
+  // RHEL query engine; "native" alone ships only the runner's Debian one.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 /// One Postgres schema per bounded context (ADR-0030). `public` holds only

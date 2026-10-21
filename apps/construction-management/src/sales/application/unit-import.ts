@@ -11,11 +11,11 @@ import {
   type AreaUnit,
   type UnavailableReason,
 } from "../domain/sales-terms";
-import { isHoldExpired, parseArea } from "../domain/unit-profile";
+import { parseArea } from "../domain/unit-profile";
 import type { UnitProfileRow } from "./booking-ports";
 import {
   BOOKING_MENU,
-  cancelExpiredHold,
+  releaseExpiredHold,
   type SalesBookingDeps,
 } from "./sales-booking-deps";
 
@@ -297,7 +297,11 @@ export async function importUnitProfiles(
     for (const row of planned) {
       const booking = active.get(row.unitId);
       if (!row.unavailable || booking == null) continue;
-      if (!isHoldExpired(booking, today))
+      // Confirm and Extend hold lock only the booking row, so the hold is
+      // read again under its lock before it is cancelled as expired; any
+      // cancellation is rolled back if a row has a problem.
+      const holding = await releaseExpiredHold(deps, tx, booking, today, at);
+      if (holding != null)
         errors.push({
           row: row.row,
           field: HEADER_OF.unavailable,
@@ -312,9 +316,6 @@ export async function importUnitProfiles(
         { details: { errors: sorted() } },
       );
     for (const row of planned) {
-      const booking = active.get(row.unitId);
-      if (row.unavailable && booking != null)
-        await cancelExpiredHold(deps, tx, booking, today, at);
       // An unchanged unit keeps its note.
       const before = stored.get(row.unitId);
       if (

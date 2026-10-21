@@ -106,23 +106,29 @@ export async function seedProjectSales(
   });
 }
 
-type ProjectCreatedEvent = DomainEvent & {
+/**
+ * What this listener reads from projects' `ProjectCreated`. Sales cannot
+ * import the projects context, so `src/composition/project-created-listeners.ts`
+ * checks at compile time that the real event still fits this copy.
+ */
+export type InboundProjectCreated = DomainEvent & {
   type: "ProjectCreated";
   projectId: string;
   createdBy: string;
 };
 
-function isProjectCreated(event: DomainEvent): event is ProjectCreatedEvent {
+function isProjectCreated(event: DomainEvent): event is InboundProjectCreated {
   return (
     event.type === "ProjectCreated" &&
-    typeof (event as Partial<ProjectCreatedEvent>).projectId === "string"
+    typeof (event as Partial<InboundProjectCreated>).projectId === "string"
   );
 }
 
 /**
  * On `ProjectCreated`, gives the new Project its own copy of the sales
  * lists. The Project is already committed, so a failure is logged rather
- * than failing the creation; the seed is idempotent and can be run again.
+ * than failing the creation; the log names the Project so the seed, which
+ * is idempotent, can be run again for it.
  */
 export class SeedProjectSalesListener implements DomainEventListener {
   constructor(private readonly db: PrismaClient = prisma) {}
@@ -137,7 +143,10 @@ export class SeedProjectSalesListener implements DomainEventListener {
         now: event.occurredAt,
       });
     } catch (error) {
-      console.error("Seeding sales lists for a new Project failed", error);
+      console.error(
+        `Seeding sales lists for a new Project failed (workspaceId ${event.workspaceId}, projectId ${event.projectId})`,
+        error,
+      );
     }
   }
 }

@@ -38,13 +38,6 @@ CREATE TYPE "construction_sales"."document_type" AS ENUM ('inquiry', 'booking');
 -- CreateEnum
 CREATE TYPE "construction_sales"."file_role" AS ENUM ('visiting_card', 'booking_form', 'photo');
 
--- AlterEnum
--- This migration adds more than one value to an enum.
--- With PostgreSQL versions 11 and earlier, this is not possible
--- in a single migration. This can be worked around by creating
--- multiple migrations, each migration adding only one value to
--- the enum.
-
 -- CreateTable
 CREATE TABLE "construction_sales"."funnel_stages" (
     "id" UUID NOT NULL,
