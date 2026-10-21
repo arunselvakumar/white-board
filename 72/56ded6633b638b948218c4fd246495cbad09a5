@@ -1,0 +1,21 @@
+apps/construction-management/components/contracts/boq/boq-item-dialog.tsx
+  s_f49615d4431370::t_e10818472d7fca 398,423
+apps/construction-management/components/contracts/boq/variation-dialog.tsx
+  s_f49615d4431370::t_e209b727c26711 256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7256ded6633b638b948218c4fd246495cbad09a5",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
