@@ -1,0 +1,119 @@
+apps/construction-management/app/app/projects/[id]/payments/contractors/[partyId]/page.tsx
+  s_353c13142e25d9::t_0fbbb22202acc0 5,17-21
+apps/construction-management/app/app/projects/[id]/payments/contractors/payments/[paymentId]/page.tsx
+  s_353c13142e25d9::t_80e5d4a8efeccc 5,17-21
+apps/construction-management/app/app/projects/[id]/payments/other-parties/[partyId]/page.tsx
+  s_353c13142e25d9::t_e99af004c7d6a7 5,17-21
+apps/construction-management/app/app/projects/[id]/payments/other-parties/payments/[paymentId]/page.tsx
+  s_353c13142e25d9::t_cfa35b7b28edda 5,17-21
+apps/construction-management/app/app/projects/[id]/payments/suppliers/[partyId]/page.tsx
+  s_353c13142e25d9::t_98a0d52e3dc696 5,17-19
+apps/construction-management/app/app/projects/[id]/payments/suppliers/payments/[paymentId]/page.tsx
+  s_353c13142e25d9::t_d1df07040a8f5e 5,17-21
+apps/construction-management/app/app/workspace/central-payment/page.tsx
+  s_353c13142e25d9::t_4a1e32530a5682 5-6,18-22
+apps/construction-management/components/finance/account-picker.tsx
+  s_353c13142e25d9::t_583e76e69f5e89 15,93-94
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_353c13142e25d9::t_795add2f42b636 33,102,236-240
+apps/construction-management/components/finance/accounts/accounts-skeletons.tsx
+  s_353c13142e25d9::t_ad054d97803c87 1-50
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_353c13142e25d9::t_b32306b32520c3 36-39,544
+apps/construction-management/components/finance/central-payment/central-payment-skeletons.tsx
+  s_353c13142e25d9::t_df679196ff559a 1-128
+apps/construction-management/components/finance/counterparty-field.tsx
+  s_353c13142e25d9::t_adc9fc75246adf 13,68
+apps/construction-management/components/finance/other-expenses/other-expenses-list.tsx
+  s_353c13142e25d9::t_573dc5dae68f63 6,34,59-62,123,125-128,226-243,419-423
+apps/construction-management/components/finance/other-expenses/other-expenses-skeletons.tsx
+  s_353c13142e25d9::t_02ed8d0f4197ff 1-24
+apps/construction-management/components/finance/other-parties/other-parties-page.tsx
+  s_353c13142e25d9::t_4b919a42ce40e9 6-12,46-47,63-66,77,110-122,186-190
+apps/construction-management/components/finance/other-parties/other-parties-skeletons.tsx
+  s_353c13142e25d9::t_83a80111aaf6a8 1-46
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_353c13142e25d9::t_edb1b1b3d221ac 50,275
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_353c13142e25d9::t_f570abcecba86b 43,80
+apps/construction-management/components/finance/parties/parties-skeletons.tsx
+  s_353c13142e25d9::t_a454184f942ace 1-326
+apps/construction-management/components/finance/parties/party-balance-workspace.tsx
+  s_353c13142e25d9::t_6ce2c14423e170 31-34,67,194
+apps/construction-management/components/finance/parties/party-balances.tsx
+  s_353c13142e25d9::t_2ed88fe2159f78 36
+apps/construction-management/components/finance/parties/party-lists.tsx
+  s_353c13142e25d9::t_68ed49c02a1c3b 41,263-267
+apps/construction-management/components/finance/parties/party-money-page.tsx
+  s_353c13142e25d9::t_96aa8f3d638d79 31-35,110,124,134,143
+apps/construction-management/components/finance/parties/party-money-tab.tsx
+  s_353c13142e25d9::t_491d6745c6b740 24,63-67
+apps/construction-management/components/finance/parties/party-payment-detail.tsx
+  s_353c13142e25d9::t_981973120433db 55,363
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_353c13142e25d9::t_5ea6074796a88f 22,61,440-446,665
+apps/construction-management/components/finance/parties/settlement-list.tsx
+  s_353c13142e25d9::t_1b95becc7d5458 5,28,43,85,94-96,106-115
+apps/construction-management/components/finance/parties/tds-ledger.tsx
+  s_353c13142e25d9::t_c10750c2203469 5,30,42-44,71,86,92-95,121-124,145-149,216-220
+apps/construction-management/components/finance/payment-category-picker.tsx
+  s_353c13142e25d9::t_2ae9af0c8b79b8 12,37-38
+apps/construction-management/components/finance/payments-hub/payments-hub-skeletons.tsx
+  s_353c13142e25d9::t_42be2b1401f3d5 1-29
+apps/construction-management/components/finance/payments-hub/payments-index.tsx
+  s_353c13142e25d9::t_93411319b74efd 17,35
+apps/construction-management/components/finance/petty-cash/account-statement.tsx
+  s_353c13142e25d9::t_7c476f432680e3 17,29-32,94-98,206,259-263
+apps/construction-management/components/finance/petty-cash/open-account-dialog.tsx
+  s_353c13142e25d9::t_e53e8e67b899c2 42,155
+apps/construction-management/components/finance/petty-cash/petty-cash-screen.tsx
+  s_353c13142e25d9::t_c5522884dc3a16 32,155
+apps/construction-management/components/finance/petty-cash/petty-cash-skeletons.tsx
+  s_353c13142e25d9::t_cc44e6b762376a 1-70
+apps/construction-management/components/finance/petty-cash/petty-cash-vouchers.tsx
+  s_353c13142e25d9::t_0d4516b41c31e9 26,62,305-309,440,525-543
+apps/construction-management/components/finance/transactions/transaction-form-parts.tsx
+  s_353c13142e25d9::t_9903a16e74e3b9 18,108-109
+apps/construction-management/components/finance/transactions/transactions-page.tsx
+  s_353c13142e25d9::t_a25874d9340dcf 66-69,120,183-203,571-575
+apps/construction-management/components/finance/transactions/transactions-skeletons.tsx
+  s_353c13142e25d9::t_3661efb736890d 1-49
+apps/construction-management/components/payments/balances-table.tsx
+  s_353c13142e25d9::t_2ec183b7fcc7c9 33,35
+apps/construction-management/components/payments/pay-dialog.tsx
+  s_353c13142e25d9::t_2b00c644687817 48,102
+apps/construction-management/components/payments/payments-list.tsx
+  s_353c13142e25d9::t_d139752caea57d 5,35,47,71,73-75,149-160,240-244
+apps/construction-management/components/payments/payments-page.tsx
+  s_353c13142e25d9::t_dc987ddfdcd52b 3,10,24,46-47,61-66,83,90,103-123
+apps/construction-management/components/payments/payments-skeletons.tsx
+  s_353c13142e25d9::t_5901deece891c2 1-133
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_353c13142e25d9::t_a94f4566dc7623 36,73
+apps/construction-management/components/finance/finance-skeletons.tsx
+  s_41ed0a468abdb4::t_a3edd0a51a1fe5 1-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "99177f076d33213dbaeadf42fb315c1d18d97864",
+  "prompts": {},
+  "sessions": {
+    "s_353c13142e25d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c93645da-c513-494a-9c00-0ed9029a0166",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_41ed0a468abdb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aabc0c2daebc24bcf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
