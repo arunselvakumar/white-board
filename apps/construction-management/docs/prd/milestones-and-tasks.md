@@ -1061,13 +1061,13 @@ Goal: a Project's sales desk — inquiries followed up through a per-Project fun
 | ID      | Seq | Title                                                                                                                | Status | Blocked by       | Area           |
 | ------- | --: | -------------------------------------------------------------------------------------------------------------------- | ------ | ---------------- | -------------- |
 | CM-1001 |   1 | ADR CM-0022; `construction_sales` schema; `ProjectCreated` seeds and backfill; Sales modules, heading, access, ports | done   | CM-402           | Data+Domain    |
-| CM-1002 |   2 | Sales settings: Funnel Stages (reorder), Lead Sources, Lost Reasons                                                  | todo   | CM-1001          | Domain+HTTP+UI |
-| CM-1003 |   3 | Inquiries: full and quick add, edit, delete, duplicates, View all, list and filters, detail, files, history          | todo   | CM-1002          | Domain+HTTP+UI |
-| CM-1004 |   4 | Follow-ups, Overdue, Inquiry Tasks; assigned and follow-ups-due notifications                                        | todo   | CM-1003          | Domain+HTTP+UI |
+| CM-1002 |   2 | Sales settings: Funnel Stages (reorder), Lead Sources, Lost Reasons                                                  | done   | CM-1001          | Domain+HTTP+UI |
+| CM-1003 |   3 | Inquiries: full and quick add, edit, delete, duplicates, View all, list and filters, detail, files, history          | done   | CM-1002          | Domain+HTTP+UI |
+| CM-1004 |   4 | Follow-ups, Overdue, Inquiry Tasks; assigned and follow-ups-due notifications                                        | done   | CM-1003          | Domain+HTTP+UI |
 | CM-1005 |   5 | Unit sales details (type, areas, unavailable), unit import, Units chart by sales status                              | done   | CM-1001          | Domain+HTTP+UI |
 | CM-1006 |   6 | Bookings: hold, book, confirm, extend, cancel, delete, history, files; `StructureUsage`; booking notifications       | done   | CM-1005          | Domain+HTTP+UI |
-| CM-1007 |   7 | Close as Converted (creates the booking) or Lost, Reopen; inquiry import and sample                                  | todo   | CM-1004, CM-1006 | Domain+HTTP+UI |
-| CM-1008 |   8 | Inquiry and Booking reports; Inquiry and Booking dashboard sections; backups                                         | todo   | CM-1007          | HTTP+UI        |
+| CM-1007 |   7 | Close as Converted (creates the booking) or Lost, Reopen; inquiry import and sample                                  | done   | CM-1004, CM-1006 | Domain+HTTP+UI |
+| CM-1008 |   8 | Inquiry and Booking reports; Inquiry and Booking dashboard sections; backups                                         | done   | CM-1007          | HTTP+UI        |
 
 ### CM-1001 — Foundation
 

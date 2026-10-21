@@ -42,6 +42,15 @@ import type {
   TaskAssigned,
   TaskCompleted,
 } from "@/src/tracking/domain/events";
+// Sales (CM-1004)
+import type {
+  InboundImportedInquiriesAssigned,
+  InboundInquiryAssigned,
+} from "@/src/messaging/application/inbound-events";
+import type {
+  ImportedInquiriesAssigned,
+  InquiryAssigned,
+} from "@/src/sales/domain/inquiry-events";
 
 type Fits<Real extends Inbound, Inbound> = Real;
 
@@ -63,4 +72,7 @@ export type MessagingEventContracts = [
   Fits<BackupFinished, InboundBackupFinished>,
   // Sales (CM-1006)
   Fits<BookingEvent, InboundBookingEvent>,
+  // Sales (CM-1004)
+  Fits<InquiryAssigned, InboundInquiryAssigned>,
+  Fits<ImportedInquiriesAssigned, InboundImportedInquiriesAssigned>,
 ];

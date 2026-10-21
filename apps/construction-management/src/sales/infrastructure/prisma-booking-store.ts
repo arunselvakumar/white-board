@@ -65,7 +65,7 @@ function isUniqueViolation(error: unknown): boolean {
 const ACTIVE = { in: [...ACTIVE_BOOKING_STATUSES] };
 
 /** The display-status filter as SQL on the stored status and Hold until. */
-function statusWhere(
+export function bookingStatusWhere(
   statuses: BookingListParams["statuses"],
   today: CalendarDate,
 ): Prisma.ConstructionSalesBookingWhereInput | null {
@@ -94,7 +94,7 @@ function where(
   params: BookingListParams,
 ): Prisma.ConstructionSalesBookingWhereInput {
   const and: Prisma.ConstructionSalesBookingWhereInput[] = [];
-  const status = statusWhere(params.statuses, params.today);
+  const status = bookingStatusWhere(params.statuses, params.today);
   if (status != null) and.push(status);
   if (params.wingId != null) and.push({ wingId: params.wingId });
   if (params.unitId != null) and.push({ unitId: params.unitId });

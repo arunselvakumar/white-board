@@ -21,6 +21,12 @@ import {
 } from "./finance-dashboard-fixtures";
 import { ProjectDashboard } from "./project-dashboard";
 import {
+  BOOKING_DASHBOARD_PATH,
+  bookingDashboard,
+  INQUIRY_DASHBOARD_PATH,
+  inquiryDashboard,
+} from "./sales-dashboard-fixtures";
+import {
   dailyWork,
   EMPTY_EQUIPMENT_USAGE,
   emptyDailyWork,
@@ -75,7 +81,8 @@ function layout(
       return {
         key,
         label: section?.label ?? key,
-        milestone: section?.milestone ?? null,
+        // Every section has data since M10; a later stub names its milestone.
+        milestone: (section?.milestone as string | null | undefined) ?? null,
         visible,
         hiddenOnProject: hiddenOnProject.includes(key),
       };
@@ -209,6 +216,11 @@ function serve(
             : financeDashboard(from, to),
         );
       }
+      // The Booking section (CM-1008).
+      if (method === "GET" && path.startsWith(BOOKING_DASHBOARD_PATH))
+        return Response.json(bookingDashboard(KUMARI.id));
+      if (method === "GET" && path.startsWith(INQUIRY_DASHBOARD_PATH))
+        return Response.json(inquiryDashboard(KUMARI.id));
       if (method === "GET" && path.startsWith(TRACKING_DASHBOARD_PATH)) {
         const tracking = options.tracking ?? "data";
         if (tracking === "forbidden")
@@ -339,10 +351,17 @@ export const WithFinancial: Story = {
     await expect(
       materials.getByRole("link", { name: "Stock Register" }),
     ).toBeVisible();
-    // Booking and Inquiry name the milestone that fills them.
+    // Booking and Inquiry have data (CM-1008).
     await expect(
-      within(canvas.getByRole("region", { name: "Booking" })).getByText(
-        "Arrives with Sales (M10)",
+      await within(canvas.getByRole("region", { name: "Booking" })).findByRole(
+        "list",
+        { name: "Latest bookings" },
+      ),
+    ).toBeVisible();
+    await expect(
+      await within(canvas.getByRole("region", { name: "Inquiry" })).findByRole(
+        "figure",
+        { name: "Funnel" },
       ),
     ).toBeVisible();
     const regions = canvas

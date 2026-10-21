@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { formatMobile } from "@repo/auth/construction/mobile";
 import { Plus, Receipt } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
@@ -242,7 +243,9 @@ function BookingRows({
                 <TableCell className="max-w-56">
                   <div className="truncate">{booking.customerName}</div>
                   <div className="text-muted-foreground truncate text-xs">
-                    {booking.customerMobile ?? ""}
+                    {booking.customerMobile == null
+                      ? ""
+                      : formatMobile(booking.customerMobile)}
                   </div>
                 </TableCell>
                 <TableCell>{booking.unitType ?? "—"}</TableCell>

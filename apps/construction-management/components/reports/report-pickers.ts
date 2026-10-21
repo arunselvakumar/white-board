@@ -31,6 +31,11 @@ export function pickerOptionsOf(
     material_category: choices(options.materialCategories),
     material: choices(options.materials),
     created_by: choices(options.creators),
+    wing: choices(options.wings),
+    lead_source: choices(options.leadSources),
+    funnel_stage: choices(options.funnelStages),
+    lost_reason: choices(options.lostReasons),
+    assignee: choices(options.assignees),
   };
 }
 

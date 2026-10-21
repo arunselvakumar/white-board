@@ -68,7 +68,7 @@ export const OnHold: Story = {
     await expect(canvas.getByRole("link", { name: "Edit" })).toBeVisible();
     await expect(canvas.getByText("850 sq ft")).toBeVisible();
     await expect(
-      await canvas.findByRole("link", { name: "booking-form.pdf" }),
+      await canvas.findByRole("link", { name: "Open booking-form.pdf" }),
     ).toBeVisible();
     const history = within(canvas.getByRole("list", { name: "History" }));
     await expect(
@@ -168,7 +168,7 @@ export const ReadOnly: Story = {
     ).toBeVisible();
     await expect(canvas.queryByRole("button", { name: "Confirm" })).toBeNull();
     await expect(canvas.queryByRole("button", { name: "Delete" })).toBeNull();
-    await expect(await canvas.findByText("None yet.")).toBeVisible();
+    await expect(await canvas.findByText("No booking form yet.")).toBeVisible();
     await expect(
       canvas.queryByRole("button", { name: "Add photos" }),
     ).toBeNull();

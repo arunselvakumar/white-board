@@ -29,6 +29,14 @@ const FILTER_KEYS = [
   "material_category",
   "created_by",
   "transfer_type",
+  // The Booking Report's Wing (CM-1008).
+  "wing",
+  // The Inquiry Report's filters (CM-1008).
+  "interest_type",
+  "lead_source",
+  "funnel_stage",
+  "lost_reason",
+  "assignee",
 ] as const;
 
 // Requests

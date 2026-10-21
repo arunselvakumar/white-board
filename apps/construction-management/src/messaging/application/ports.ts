@@ -190,3 +190,23 @@ export type BecameDelayed = {
 export type DelayedWorkSource = {
   becameDelayed(now: Date): Promise<BecameDelayed[]>;
 };
+
+// ---------------------------------------------------------------------------
+// Sales (CM-1004, ADR CM-0022 §10)
+// ---------------------------------------------------------------------------
+
+/** One assignee's open inquiries due on a Project, on the Company's today. */
+export type FollowUpsDue = {
+  workspaceId: string;
+  projectId: string;
+  assigneeMemberId: string;
+  /** The Company's today. */
+  date: CalendarDate;
+  overdue: number;
+  today: number;
+};
+
+/** Sales' open inquiries with a next follow-up, read across contexts in composition. */
+export type FollowUpsDueSource = {
+  due(now: Date): Promise<FollowUpsDue[]>;
+};

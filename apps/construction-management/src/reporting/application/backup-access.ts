@@ -42,13 +42,17 @@ export function canBackUpModule(
   projectId: string | null,
 ): boolean {
   if (module.menu == null) return access.role === "owner";
-  return can(access, module.menu, "read", onProject(module, projectId));
+  const scope = onProject(module, projectId);
+  if (module.viewAll === true && !can(access, module.menu, "view_all", scope))
+    return false;
+  return can(access, module.menu, "read", scope);
 }
 
 function moduleDenied(module: BackupModule): DomainError {
+  const needs = module.viewAll === true ? "View and View all" : "View";
   return new DomainError(
     "PERMISSION_DENIED",
-    `You cannot back up ${module.label}: it needs View on ${module.label}. Ask the Owner to change your Permission Matrix.`,
+    `You cannot back up ${module.label}: it needs ${needs} on ${module.label}. Ask the Owner to change your Permission Matrix.`,
     { kind: "forbidden", details: { module: module.key } },
   );
 }

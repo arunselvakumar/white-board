@@ -174,6 +174,8 @@ const PAGE_GROUPS = [
   "tracking",
   "finance",
   "procurement",
+  // Sales (CM-1008).
+  "sales",
 ] as const satisfies readonly ReportDefinition["group"][];
 
 /**

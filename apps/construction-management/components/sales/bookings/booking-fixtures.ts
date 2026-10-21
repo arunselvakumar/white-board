@@ -1,13 +1,17 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import {
+  mockSalesDocumentApi,
+  salesFile,
+} from "@/components/sales/documents/sales-document-fixtures";
 import { unitsHandler } from "@/components/sales/units/units-fixtures";
 import type { SalesAccess } from "@/src/queries/sales-access";
 import type {
   Booking,
   BookingDetail,
-  BookingFile,
   BookingFormOptions,
   BookingPage,
 } from "@/src/queries/sales-bookings";
+import type { SalesDocumentFile } from "@/src/queries/sales-documents";
 import type { Flag } from "@/src/shared-kernel/access";
 
 /** Story fixtures for Bookings (CM-1006). */
@@ -177,26 +181,17 @@ export const FORM_OPTIONS: BookingFormOptions = {
   ],
 };
 
+/** A saved file of the hold (the generic sales files' answer). */
 export function bookingFile(
-  role: BookingFile["role"],
-  patch: Partial<BookingFile> = {},
-): BookingFile {
-  const id = patch.id ?? "0199c4a0-0000-7000-8000-00000000f101";
-  return {
-    id,
+  role: "booking_form" | "photo",
+  patch: Partial<SalesDocumentFile> = {},
+): SalesDocumentFile {
+  return salesFile(
+    role === "booking_form" ? "booking-form.pdf" : "site.jpg",
     role,
-    fileName: role === "booking_form" ? "booking-form.pdf" : "site.jpg",
-    contentType: role === "booking_form" ? "application/pdf" : "image/jpeg",
-    bytes: 245_000,
-    viewable: true,
-    url: `${BOOKINGS_API}/${HOLD_ID}/files/${id}`,
-    thumbUrl: null,
-    createdAt: "2026-10-12T05:10:00.000Z",
-    createdBy: OWNER.userId,
-    createdByName: OWNER.name,
-    canRemove: true,
-    ...patch,
-  };
+    { thumbUrl: null, ...patch },
+    { type: "booking", id: HOLD_ID },
+  );
 }
 
 export type BookingApiOptions = {
@@ -205,7 +200,7 @@ export type BookingApiOptions = {
   empty?: boolean;
   /** Refuse the create, update and actions with this error. */
   refuse?: { status: number; code: string; message: string; details?: unknown };
-  files?: BookingFile[];
+  files?: SalesDocumentFile[];
 };
 
 export function bookingHandler(options: BookingApiOptions = {}) {
@@ -226,8 +221,14 @@ export function bookingHandler(options: BookingApiOptions = {}) {
           },
           { status: options.refuse.status },
         );
+  const documents = mockSalesDocumentApi({
+    files: options.files ?? [bookingFile("booking_form")],
+    canUpload: flags.includes("update") || flags.includes("create"),
+  });
   return (call: ApiCall): Response | undefined => {
     const path = call.path.split("?")[0] ?? "";
+    const file = documents(call);
+    if (file != null) return file;
     if (path === "/api/construction/sales/access")
       return Response.json(bookingAccess(flags));
     if (path.startsWith("/api/construction/sales/units")) return units(call);
@@ -254,18 +255,6 @@ export function bookingHandler(options: BookingApiOptions = {}) {
         refuse() ??
         Response.json(booking({ id: NEW_ID }, flags), { status: 201 })
       );
-    const files =
-      /^\/api\/construction\/sales\/bookings\/([^/]+)\/files(?:\/([^/]+)\/delete)?$/.exec(
-        path,
-      );
-    if (files != null) {
-      if (call.method === "GET")
-        return Response.json({
-          items: options.files ?? [bookingFile("booking_form")],
-          canUpload: flags.includes("update") || flags.includes("create"),
-        });
-      if (call.method === "POST") return new Response(null, { status: 204 });
-    }
     const item =
       /^\/api\/construction\/sales\/bookings\/([^/]+)(?:\/([a-z-]+))?$/.exec(
         path,

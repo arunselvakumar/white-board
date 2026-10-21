@@ -22,6 +22,8 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
+import { SalesPendingFilesField } from "@/components/sales/documents/sales-pending-files-field";
+import { useUploadPendingSalesFiles } from "@/components/sales/documents/use-upload-pending-sales-files";
 import { RadioCard } from "@/components/site-work/equipment/radio-card";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -33,13 +35,7 @@ import {
   type BookingFormOptions,
 } from "@/src/queries/sales-bookings";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
-
-import {
-  BookingFilesField,
-  NO_PENDING_BOOKING_FILES,
-  useUploadPendingBookingFiles,
-  type PendingBookingFiles,
-} from "./booking-files-field";
+import { withUploadFailed } from "@/components/sales/documents/upload-failed";
 
 const limit = (max: number) =>
   z
@@ -67,7 +63,9 @@ const schema = z
     referredByName: limit(SALES_LIMITS.referredBy),
     referredByContact: z.string().trim().max(30),
     remarks: limit(SALES_LIMITS.remarks),
-    files: z.custom<PendingBookingFiles>(),
+    /** Picked on a new booking; uploaded once it is saved. */
+    bookingForm: z.custom<File[]>(),
+    photos: z.custom<File[]>(),
   })
   .superRefine((value, ctx) => {
     if (value.unitId === "")
@@ -143,7 +141,8 @@ function defaults(
     referredByName: booking?.referredByName ?? "",
     referredByContact: booking?.referredByContact ?? "",
     remarks: booking?.remarks ?? "",
-    files: NO_PENDING_BOOKING_FILES,
+    bookingForm: [],
+    photos: [],
   };
 }
 
@@ -199,7 +198,7 @@ export function BookingForm({
   }).data;
   const create = useCreateBooking();
   const update = useUpdateBooking(booking?.id ?? "");
-  const uploads = useUploadPendingBookingFiles();
+  const uploads = useUploadPendingSalesFiles("booking");
   const [error, setError] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
   const form = useForm<Values>({
@@ -250,8 +249,14 @@ export function BookingForm({
               input.status === "on_hold" ? orNull(input.holdUntil) : null,
           });
       setLeaving(true);
-      if (!editing) await uploads.uploadAll(saved.id, input.files);
-      router.push(bookingsPath(projectId, saved.id));
+      // A file that does not go up can be added again on the booking's page.
+      const { failed } = editing
+        ? { failed: [] }
+        : await uploads.uploadAll(saved.id, [
+            { role: "booking_form", files: input.bookingForm },
+            { role: "photo", files: input.photos },
+          ]);
+      router.push(withUploadFailed(bookingsPath(projectId, saved.id), failed));
     } catch (caught) {
       setLeaving(false);
       if (caught instanceof QueryHttpError) {
@@ -533,12 +538,32 @@ export function BookingForm({
       </section>
 
       {!editing && (
-        <section aria-label="Files" className="rounded-lg border p-4">
+        <section
+          aria-label="Files"
+          className="grid min-w-0 gap-4 rounded-lg border p-4 lg:grid-cols-2"
+        >
           <Controller
             control={form.control}
-            name="files"
+            name="bookingForm"
             render={({ field }) => (
-              <BookingFilesField
+              <SalesPendingFilesField
+                documentType="booking"
+                role="booking_form"
+                label="Booking Form"
+                value={field.value}
+                onChange={field.onChange}
+                disabled={busy}
+              />
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="photos"
+            render={({ field }) => (
+              <SalesPendingFilesField
+                documentType="booking"
+                role="photo"
+                label="Photos"
                 value={field.value}
                 onChange={field.onChange}
                 disabled={busy}

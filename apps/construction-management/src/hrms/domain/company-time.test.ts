@@ -35,6 +35,21 @@ describe("Company time", () => {
     ).toBe("2026-01-05T09:00:00.000Z");
   });
 
+  it("resolves a time skipped by daylight saving to the instant after it", () => {
+    expect(
+      instantAt("2026-03-08", "02:30", "America/New_York").toISOString(),
+    ).toBe("2026-03-08T07:00:00.000Z");
+    expect(
+      localTime(
+        instantAt("2026-03-08", "02:30", "America/New_York"),
+        "America/New_York",
+      ),
+    ).toBe("03:00");
+    expect(
+      instantAt("2026-09-06", "00:00", "America/Santiago").toISOString(),
+    ).toBe("2026-09-06T04:00:00.000Z");
+  });
+
   it("counts minutes into a day past midnight", () => {
     const at = instantAt("2026-10-11", "02:00", IST);
     expect(minutesIntoDay("2026-10-10", at, IST)).toBe(26 * 60);

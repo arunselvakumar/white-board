@@ -170,3 +170,21 @@ export type InboundBookingEvent =
     })
   | (InboundBookingBase & { type: "BookingConfirmed" })
   | (InboundBookingBase & { type: "BookingCancelled"; reason: string });
+
+// Sales (CM-1004, ADR CM-0022 §10).
+export type InboundInquiryAssigned = DomainEvent & {
+  type: "InquiryAssigned";
+  inquiryId: string;
+  projectId: string;
+  name: string;
+  assigneeMemberId: string;
+  by: string;
+};
+
+export type InboundImportedInquiriesAssigned = DomainEvent & {
+  type: "ImportedInquiriesAssigned";
+  projectId: string;
+  assigneeMemberId: string;
+  count: number;
+  by: string;
+};
