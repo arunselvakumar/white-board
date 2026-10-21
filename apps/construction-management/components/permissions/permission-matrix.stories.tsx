@@ -76,6 +76,9 @@ export const SelectsAColumn: Story = {
       "Approve — Issues and snags",
       "Approve — Inspection Request",
       "Approve — Equipment Usage",
+      // M11 (ADR CM-0023 §17, §20).
+      "Approve — Collections",
+      "Approve — Concrete Register",
     ])
       await expect(canvas.getByRole("checkbox", { name: label })).toBeChecked();
     // Other categories are untouched.
@@ -83,7 +86,7 @@ export const SelectsAColumn: Story = {
       canvas.getByRole("checkbox", { name: "Approve — Purchase Request" }),
     ).not.toBeChecked();
     await expect(
-      canvas.getByRole("button", { name: /Project Management 5 granted/ }),
+      canvas.getByRole("button", { name: /Project Management 7 granted/ }),
     ).toBeVisible();
 
     await userEvent.click(
