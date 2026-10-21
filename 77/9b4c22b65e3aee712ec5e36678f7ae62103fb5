@@ -1,0 +1,61 @@
+apps/construction-management/app/app/masters/clients/[id]/page.tsx
+  s_f49615d4431370::t_e7a7ef5bb906d3 1-14
+apps/construction-management/app/app/masters/clients/new/page.tsx
+  s_f49615d4431370::t_cdac94711638c8 1-9
+apps/construction-management/app/app/masters/clients/page.tsx
+  s_f49615d4431370::t_0f9d0e68c00f32 1-10
+apps/construction-management/components/masters/clients/client-fixtures.ts
+  s_f49615d4431370::t_1b4025e9db0492 1-59
+apps/construction-management/components/masters/clients/client-form.stories.tsx
+  s_f49615d4431370::t_f645aea7e4869d 1-188
+apps/construction-management/components/masters/clients/client-form.tsx
+  s_f49615d4431370::t_88901d267fb655 1-372
+apps/construction-management/components/masters/clients/clients-page.stories.tsx
+  s_f49615d4431370::t_9afbb499ca327a 1-141
+apps/construction-management/components/masters/clients/clients-page.tsx
+  s_f49615d4431370::t_0ec7cdb7ee1e8f 1-336
+apps/construction-management/components/masters/clients/clients-skeletons.tsx
+  s_f49615d4431370::t_7484e7edbc4137 1-25
+apps/construction-management/components/projects/project-client-picker.tsx
+  s_f49615d4431370::t_c81429dfa51832 1-216
+apps/construction-management/components/projects/project-form-schema.ts
+  s_f49615d4431370::t_4b434959f4453b 21-25,101-111,211-217,238-239,269-270,294-307,318-319,343-345,360-363,397-399
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_f49615d4431370::t_9aec1d9d8a47f5 12-16,38,63-74,1207-1337
+apps/construction-management/components/projects/project-form.tsx
+  s_f49615d4431370::t_0b53c23ade9c76 30,51,53-56,73,94,151-155,157,292-294,644-710,717-720,724-731
+apps/construction-management/components/projects/project-overview.stories.tsx
+  s_f49615d4431370::t_1a3b2c8d9ef540 123-146
+apps/construction-management/components/projects/project-overview.tsx
+  s_f49615d4431370::t_801b19c79142cd 5,11-12,61,66-67,72-80,94-99,103-106,221
+apps/construction-management/lib/masters-nav.ts
+  s_f49615d4431370::t_ab4d9bc5f8b5dc 3,105-112
+apps/construction-management/src/queries/masters-clients.ts
+  s_f49615d4431370::t_0a6aeff9c49bc4 1-119
+apps/construction-management/components/masters/clients/client-form-schema.ts
+  s_6dba54f5ec43e9::t_081e2395120268 1-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "779b4c22b65e3aee712ec5e36678f7ae62103fb5",
+  "prompts": {},
+  "sessions": {
+    "s_6dba54f5ec43e9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ab3a275850ce1a86b",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
