@@ -1,0 +1,19 @@
+apps/construction-management/components/contracts/advances/advance-dialogs.tsx
+  s_f49615d4431370::t_af1a32070148c3 964-966,968-970
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2d4d48418400755b4f927d30478723bcc6c13035",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
