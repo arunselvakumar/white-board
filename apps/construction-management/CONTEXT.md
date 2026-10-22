@@ -473,6 +473,14 @@ _Avoid_: security deposit, holdback
 Mobilisation or secured money paid to a Contractor or received from the Client, recovered from later bills.
 _Avoid_: loan, imprest
 
+**Retention release**:
+Retention moved from held (or receivable) to due: on completion, at the end of the DLP, early against a bank guarantee, or for another reason. It becomes an invoice in Payments.
+_Avoid_: refund, security deposit return
+
+**Bank guarantee**:
+A bank's guarantee for an advance, for retention (retention can then be released early against it) or for performance, with a number, amount and expiry.
+_Avoid_: BG (in UI copy, except numbers), surety
+
 ### Money
 
 **Amount**:
