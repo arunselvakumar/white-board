@@ -141,7 +141,9 @@ describe("remaining BOQ quantity (CM-1104)", () => {
         remaining: 60_0000n,
       },
     ]);
-    expect(overRemainingMessage(over[0]!)).toBe(
+    const [first] = over;
+    if (first == null) throw new Error("No warning");
+    expect(overRemainingMessage(first)).toBe(
       "BOQ item 1.1: ordering 70, the BOQ has 60 left after other Work Orders.",
     );
     expect(
@@ -360,48 +362,60 @@ describe("transitions (CM-1104)", () => {
     });
     for (const status of ["closed", "cancelled"] as const)
       expect(Object.values(workOrderActions(status)).some(Boolean)).toBe(false);
-    expect(codeOf(() => assertWorkOrderAction("issued", "edit"))).toBe(
-      "WORK_ORDER_STATUS_INVALID",
-    );
-    expect(detailsOf(() => assertWorkOrderAction("closed", "cancel"))).toEqual({
+    expect(
+      codeOf(() => {
+        assertWorkOrderAction("issued", "edit");
+      }),
+    ).toBe("WORK_ORDER_STATUS_INVALID");
+    expect(
+      detailsOf(() => {
+        assertWorkOrderAction("closed", "cancel");
+      }),
+    ).toEqual({
       status: "closed",
       action: "cancel",
     });
-    expect(codeOf(() => assertWorkOrderAction("draft", "amend"))).toBe(
-      "WORK_ORDER_STATUS_INVALID",
-    );
-    expect(codeOf(() => assertWorkOrderAction("issued", "close"))).toBe("none");
+    expect(
+      codeOf(() => {
+        assertWorkOrderAction("draft", "amend");
+      }),
+    ).toBe("WORK_ORDER_STATUS_INVALID");
+    expect(
+      codeOf(() => {
+        assertWorkOrderAction("issued", "close");
+      }),
+    ).toBe("none");
   });
 
   it("keeps billed lines at or above what was billed", () => {
     const billed = new Map([["line-1", 40_0000n]]);
     const itemNos = new Map([["line-1", "1.1"]]);
     expect(
-      codeOf(() =>
+      codeOf(() => {
         assertBilledLinesKept(
           [{ id: "line-1", quantity: 40_0000n }],
           billed,
           itemNos,
-        ),
-      ),
+        );
+      }),
     ).toBe("none");
     expect(
-      codeOf(() =>
+      codeOf(() => {
         assertBilledLinesKept(
           [{ id: "line-2", quantity: 1n }],
           billed,
           itemNos,
-        ),
-      ),
+        );
+      }),
     ).toBe("WORK_ORDER_LINE_BILLED");
     expect(
-      detailsOf(() =>
+      detailsOf(() => {
         assertBilledLinesKept(
           [{ id: "line-1", quantity: 39_0000n }],
           billed,
           itemNos,
-        ),
-      ),
+        );
+      }),
     ).toEqual({ lineId: "line-1", billed: "40.0000" });
   });
 });
