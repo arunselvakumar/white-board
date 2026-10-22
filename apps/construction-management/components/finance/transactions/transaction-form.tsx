@@ -70,6 +70,7 @@ const schema = z
           "labour",
           "vendor",
           "team_member",
+          "client",
         ])
         .nullable(),
       id: z.string().nullable(),

@@ -989,7 +989,7 @@ const SPECS: Record<string, EntitySpec> = {
       col(
         "party",
         "Party",
-        `COALESCE(${nameIn(`${MS}.contractors`, "t.party_id")}, ${nameIn(`${MS}.suppliers`, "t.party_id")}, ${nameIn(`${FN}.other_parties`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
+        `COALESCE(${nameIn(`${MS}.contractors`, "t.party_id")}, ${nameIn(`${MS}.suppliers`, "t.party_id")}, ${nameIn(`${FN}.other_parties`, "t.party_id")}, ${nameIn(`${MS}.clients`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
       ),
       col("direction", "Direction", "t.direction::text", "enum"),
       col("origin", "Origin", "t.origin::text", "enum"),
@@ -1024,7 +1024,7 @@ const SPECS: Record<string, EntitySpec> = {
       col(
         "party",
         "Party",
-        `COALESCE(${nameIn(`${MS}.contractors`, "t.party_id")}, ${nameIn(`${MS}.suppliers`, "t.party_id")}, ${nameIn(`${FN}.other_parties`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
+        `COALESCE(${nameIn(`${MS}.contractors`, "t.party_id")}, ${nameIn(`${MS}.suppliers`, "t.party_id")}, ${nameIn(`${FN}.other_parties`, "t.party_id")}, ${nameIn(`${MS}.clients`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
       ),
       col("direction", "Direction", "t.direction::text", "enum"),
       account("account", "Account", "t.account_id"),
@@ -1035,6 +1035,8 @@ const SPECS: Record<string, EntitySpec> = {
       col("tdsSection", "TDS Section", "t.tds_section"),
       col("tdsRate", "TDS %", "t.tds_rate", "number"),
       money("tdsAmount", "TDS (₹)", "t.tds_amount"),
+      money("clientTdsAmount", "TDS by Client (₹)", "t.client_tds_amount"),
+      money("gstTdsAmount", "GST-TDS by Client (₹)", "t.gst_tds_amount"),
       paymentCategory(),
       col("paidBy", "Paid By", memberName("t.paid_by_member_id")),
       col("remarks", "Remarks", "t.remarks"),

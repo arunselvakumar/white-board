@@ -146,6 +146,7 @@ export const GetConstructionFinanceAccountStatementRequestModel = z.object({
       "labour",
       "vendor",
       "team_member",
+      "client",
     ])
     .optional(),
 });

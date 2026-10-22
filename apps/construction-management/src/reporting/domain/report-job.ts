@@ -96,6 +96,7 @@ export type LedgerFilters = {
     | "labour"
     | "vendor"
     | "team_member"
+    | "client"
     | null;
 };
 

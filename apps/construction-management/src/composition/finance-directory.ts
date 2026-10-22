@@ -1,6 +1,7 @@
 import { Prisma } from "@repo/construction-db";
 
 import type {
+  ClientFacts,
   ContractorFacts,
   FinanceDirectory,
   GoodsReceiptFacts,
@@ -132,6 +133,31 @@ export const financeDirectory: FinanceDirectory = {
     );
   },
 
+  async clients(db, workspaceId, ids) {
+    if (ids.length === 0) return new Map();
+    const unique = [...new Set(ids)];
+    const [rows, projects] = await Promise.all([
+      db.constructionMastersClient.findMany({ where: live(workspaceId, ids) }),
+      db.constructionProjectsProject.findMany({
+        where: { workspaceId, deletedAt: null, clientId: { in: unique } },
+        select: { id: true, clientId: true },
+      }),
+    ]);
+    return byId(
+      rows.map((row): ClientFacts => ({
+        id: row.id,
+        name: row.name,
+        pan: row.pan,
+        gstin: row.gstin,
+        stateCode: row.stateCode ?? row.gstin?.slice(0, 2) ?? null,
+        isActive: row.isActive,
+        projectIds: projects
+          .filter((project) => project.clientId === row.id)
+          .map((project) => project.id),
+      })),
+    );
+  },
+
   async projects(db, workspaceId, ids) {
     if (ids.length === 0) return new Map();
     return named(
@@ -256,6 +282,25 @@ export const financeDirectory: FinanceDirectory = {
           select,
           orderBy,
         });
+      case "client": {
+        // The Project's Client (CM-1107); every active Client Company-wide.
+        if (projectId == null)
+          return db.constructionMastersClient.findMany({
+            where: { ...base, isActive: true },
+            select,
+            orderBy,
+          });
+        const project = await db.constructionProjectsProject.findFirst({
+          where: { ...base, id: projectId },
+          select: { clientId: true },
+        });
+        if (project?.clientId == null) return [];
+        return db.constructionMastersClient.findMany({
+          where: { ...base, id: project.clientId },
+          select,
+          orderBy,
+        });
+      }
       case "team_member":
         return db.constructionOrganizationTeamMember.findMany({
           where: { ...base, status: "active" },

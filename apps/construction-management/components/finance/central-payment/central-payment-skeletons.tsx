@@ -15,6 +15,7 @@ export const PARTY_TABS = [
   { value: "contractor", label: "Contractors", noun: "Contractor" },
   { value: "supplier", label: "Suppliers", noun: "Supplier" },
   { value: "other_party", label: "Other Parties", noun: "Other Party" },
+  { value: "client", label: "Clients", noun: "Client" },
 ] as const;
 
 const WIDE = "hidden py-2 pl-2 text-right sm:table-cell";

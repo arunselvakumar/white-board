@@ -71,6 +71,7 @@ export const COUNTERPARTY_LABELS: Record<CounterpartyKind, string> = {
   labour: "Labour",
   vendor: "Vendor",
   team_member: "Team Member",
+  client: "Client",
 };
 
 const ENTRY_KIND_LABELS = {
@@ -941,6 +942,7 @@ const PARTY_TYPE_LABELS = {
   contractor: "Contractor",
   supplier: "Supplier",
   other_party: "Other Party",
+  client: "Client",
 } as const;
 
 export type DueReportParty = {
@@ -958,8 +960,8 @@ export type DueReportParty = {
  * Due Payments (CM-0017 §16): per party with something left on its
  * invoices on the day asked, what was invoiced, paid (with TDS) and
  * written off, what is due, and the due split by days past the due date.
- * Bills from parties are payables; Other Party sales invoices are
- * receivables, in a second table.
+ * Bills from parties are payables; Other Party sales invoices and Client
+ * Bills' invoices (CM-1107) are receivables, in a second table.
  */
 export function buildDuePaymentsReport(input: {
   asOn: CalendarDate;

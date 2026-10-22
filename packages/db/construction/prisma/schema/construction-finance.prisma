@@ -58,17 +58,21 @@ enum ConstructionFinanceCounterpartyKind {
   labour
   vendor
   team_member
+  /// A Client receipt's account entry (CM-1107).
+  client
 
   @@map("counterparty_kind")
   @@schema("construction_finance")
 }
 
 /// The parties whose balances live in this schema. Labours and Vendors keep
-/// theirs in `construction_labour.ledger_entries` (M2).
+/// theirs in `construction_labour.ledger_entries` (M2). Clients (CM-1107)
+/// are billed by Client Bills and pay by Payment In.
 enum ConstructionFinancePartyType {
   contractor
   supplier
   other_party
+  client
 
   @@map("party_type")
   @@schema("construction_finance")
@@ -119,6 +123,10 @@ enum ConstructionFinancePartyEntryKind {
   /// What an approved settlement wrote off: − on a bill from the party,
   /// + on a bill to the party.
   write_off
+  /// Income-tax TDS a Client deducted from a receipt (+, CM-1107).
+  client_tds
+  /// GST-TDS (s.51) a Client deducted from a receipt (+, CM-1107).
+  gst_tds
 
   @@map("party_entry_kind")
   @@schema("construction_finance")
@@ -178,7 +186,7 @@ enum ConstructionFinanceInvoiceOrigin {
 enum ConstructionFinancePaymentDirection {
   /// Payment Out: money to the party.
   out
-  /// Payment In: money from the party (Other Parties only).
+  /// Payment In: money from the party (Other Parties and Clients).
   in
 
   @@map("payment_direction")
@@ -523,7 +531,7 @@ model ConstructionFinanceInvoice {
   storeId       String?                             @map("store_id") @db.Uuid
   direction     ConstructionFinanceInvoiceDirection
   origin        ConstructionFinanceInvoiceOrigin    @default(manual)
-  /// `ra_bill`: the Contractor Bill's id (construction_contracts.bills).
+  /// `ra_bill`: the Contractor or Client Bill's id (construction_contracts.bills).
   sourceId      String?                             @map("source_id") @db.Uuid
   /// Typed for a bill from the party; the INV rule for a sales invoice.
   invoiceNumber String                              @map("invoice_number")
@@ -606,6 +614,11 @@ model ConstructionFinancePartyPayment {
   /// What the server suggested; differs from `tds_amount` when overridden.
   tdsSuggested      BigInt?                             @map("tds_suggested")
   tdsOverrideReason String?                             @map("tds_override_reason")
+  /// Client receipts (CM-1107): income-tax TDS the Client deducted. Settled
+  /// = amount + client TDS + GST-TDS.
+  clientTdsAmount   BigInt                              @default(0) @map("client_tds_amount")
+  /// Client receipts: GST-TDS (s.51, 2 %) a government Client deducted.
+  gstTdsAmount      BigInt                              @default(0) @map("gst_tds_amount")
   paymentCategoryId String?                             @map("payment_category_id") @db.Uuid
   paidByMemberId    String?                             @map("paid_by_member_id") @db.Uuid
   remarks           String?

@@ -99,8 +99,24 @@ export type PartyFinanceDeps = {
     accountId: string,
   ) => Promise<AccountFacts | null>;
   tdsRates: (db: FinanceTx) => Promise<TdsRate[]>;
+  /**
+   * Retention the Client holds back on approved Client Bills, less what it
+   * released, per Client (CM-1107, ADR CM-0023 §7). Derived in contracts
+   * and read through this port, never a party-ledger entry: on one Project,
+   * or every Project when `projectIds` is null.
+   */
+  retentionReceivable: ClientRetentionReceivable;
   clock?: () => Date;
 };
+
+export type ClientRetentionReceivable = (
+  db: FinanceTx,
+  input: {
+    workspaceId: string;
+    clientIds: readonly string[];
+    projectIds: readonly string[] | null;
+  },
+) => Promise<Map<string, bigint>>;
 
 export type PartyActor = MemberAccess;
 
@@ -116,7 +132,7 @@ export type StoredInvoice = {
   place: PartyPlace;
   direction: InvoiceDirection;
   origin: InvoiceOrigin;
-  /** `ra_bill`: the Contractor Bill it came from (construction_contracts). */
+  /** `ra_bill`: the Contractor or Client Bill it came from (construction_contracts). */
   sourceId: string | null;
   invoiceNumber: string;
   invoiceDate: CalendarDate;
@@ -181,6 +197,10 @@ export type StoredPartyPayment = {
   tdsAmount: bigint;
   tdsSuggested: bigint | null;
   tdsOverrideReason: string | null;
+  /** Client receipts (CM-1107): income-tax TDS the Client deducted. */
+  clientTdsAmount: bigint;
+  /** Client receipts: GST-TDS (s.51) the Client deducted. */
+  gstTdsAmount: bigint;
   paymentCategoryId: string | null;
   paidByMemberId: string | null;
   remarks: string | null;

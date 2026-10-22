@@ -253,6 +253,7 @@ describe("Central Payment HTTP (CM-709)", () => {
       contractor: [],
       supplier: [],
       other_party: [],
+      client: [],
     });
   });
 

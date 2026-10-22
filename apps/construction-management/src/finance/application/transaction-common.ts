@@ -128,7 +128,12 @@ export async function resolveCounterparty(
   db: Tx,
   directory: Pick<
     FinanceDirectory,
-    "contractors" | "suppliers" | "labours" | "vendors" | "teamMembers"
+    | "contractors"
+    | "suppliers"
+    | "labours"
+    | "vendors"
+    | "teamMembers"
+    | "clients"
   >,
   lookups: Pick<TransactionLookups, "otherParties">,
   workspaceId: string,
@@ -182,6 +187,9 @@ export async function resolveCounterparty(
     }
     case "other_party":
       found = (await lookups.otherParties(db, workspaceId, [id])).get(id);
+      break;
+    case "client":
+      found = (await directory.clients(db, workspaceId, [id])).get(id);
       break;
   }
   if (found == null)

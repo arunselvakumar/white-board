@@ -36,7 +36,10 @@ export const RecordConstructionFinancePartyPaymentRequestModel = z.object({
   /** One of the two: a Project, or a Store for a store Supplier (Owner only). */
   projectId: z.uuid().nullable().optional(),
   storeId: z.uuid().nullable().optional(),
-  /** `in` (Payment In) only from an Other Party. Default `out`. */
+  /**
+   * `in` (Payment In) from an Other Party or a Client; a Client only pays in
+   * (400 `PAYMENT_OUT_NOT_FOR_CLIENTS`). Default `out`.
+   */
   direction: PaymentDirectionModel.optional(),
   paymentDate: z.iso.date(),
   /** The account paid from or received into (the account picker). */
@@ -67,11 +70,19 @@ export const RecordConstructionFinancePartyPaymentRequestModel = z.object({
     .max(PARTY_TEXT_LIMITS.reason)
     .nullable()
     .optional(),
+  /**
+   * Clients, Payment In (CM-1107): paise of income-tax TDS the Client
+   * deducted (194C, or 393 from 1 April 2026). Settles the invoice like
+   * money; the account moves only by `amount`.
+   */
+  clientTdsAmount: Paise.min(0).nullable().optional(),
+  /** Clients, Payment In: paise of GST-TDS (s.51, 2 %) a government Client deducted. */
+  gstTdsAmount: Paise.min(0).nullable().optional(),
   paymentCategoryId: z.uuid().nullable().optional(),
   /** A Team Member; defaults to the caller's. */
   paidByMemberId: z.uuid().nullable().optional(),
   remarks: z.string().max(PARTY_TEXT_LIMITS.remarks).nullable().optional(),
-  /** Σ at most amount + TDS; the rest is an advance. */
+  /** Σ at most amount + TDS (+ the Client's TDS and GST-TDS); the rest is an advance. */
   allocations: z.array(Allocation).max(200).optional(),
   /** Save even when the cheque number or reference is already used (409 `DUPLICATE_REFERENCE`). */
   confirmDuplicateReference: z.boolean().optional(),
@@ -183,7 +194,19 @@ export const ConstructionFinancePartyPaymentResponseModel = z.object({
       overrideReason: z.string().nullable(),
     })
     .nullable(),
-  /** Paid + TDS. */
+  /**
+   * Clients (CM-1107): what the Client deducted from this receipt; null
+   * for other parties.
+   */
+  clientDeductions: z
+    .object({
+      /** Income-tax TDS (194C / 393). */
+      tds: Paise,
+      /** GST-TDS (s.51). */
+      gstTds: Paise,
+    })
+    .nullable(),
+  /** Paid + TDS (out); received + the Client's TDS and GST-TDS (in). */
   settled: Paise,
   allocated: Paise,
   /** The advance left to apply. */
@@ -252,6 +275,13 @@ export function toPartyPaymentResponse(
             suggested: moneyOrNull(view.tdsSuggested),
             overridden: view.tdsOverridden,
             overrideReason: view.tdsOverrideReason,
+          },
+    clientDeductions:
+      view.partyType !== "client"
+        ? null
+        : {
+            tds: money(view.clientTdsAmount),
+            gstTds: money(view.gstTdsAmount),
           },
     settled: money(view.settled),
     allocated: money(view.allocated),

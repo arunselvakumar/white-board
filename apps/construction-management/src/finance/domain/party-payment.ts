@@ -18,22 +18,36 @@ import {
 
 /**
  * Party payments (ADR CM-0017 §6, §7): money paid to a party (out) or
- * received from an Other Party (in), with no approval. One payment can
+ * received from an Other Party or a Client (in), with no approval. One payment can
  * settle several open invoices of the same party and place; its settled
  * amount is what moved plus TDS, and what is not allocated is an advance.
  */
 
 export type PaymentDirection = "out" | "in";
 
-/** Payment Out for every party; Payment In only from an Other Party. */
+/**
+ * Payment Out to a Contractor, Supplier or Other Party; Payment In from an
+ * Other Party or a Client (CM-1107). A Client is never paid: its money
+ * comes in against the Client Bills' receivable invoices.
+ */
 export function assertDirection(
   partyType: PartyType,
   direction: PaymentDirection,
 ): void {
-  if (direction === "in" && partyType !== "other_party")
+  if (direction === "out" && partyType === "client")
+    throw new DomainError(
+      "PAYMENT_OUT_NOT_FOR_CLIENTS",
+      "A Client pays the Company: record a Payment In (receipt) from them.",
+      { details: { field: "direction" } },
+    );
+  if (
+    direction === "in" &&
+    partyType !== "other_party" &&
+    partyType !== "client"
+  )
     throw new DomainError(
       "PAYMENT_IN_ONLY_FOR_OTHER_PARTIES",
-      "Only an Other Party pays the Company (Payment In).",
+      "Only an Other Party or a Client pays the Company (Payment In).",
       { details: { field: "direction" } },
     );
 }
@@ -184,14 +198,39 @@ export type PaymentPosting = {
   amount: bigint;
   /** Paise deducted (Contractors, out only). */
   tdsAmount: bigint;
+  /** Paise of income-tax TDS the Client deducted (Client receipts only). */
+  clientTdsAmount: bigint;
+  /** Paise of GST-TDS (s.51) the Client deducted (Client receipts only). */
+  gstTdsAmount: bigint;
   remarks: string | null;
 };
 
 /**
+ * What a payment settles on its invoices (CM-0017 §7, CM-1107): the money
+ * that moved plus the TDS the Company deducted (out), or plus the TDS and
+ * GST-TDS the Client deducted (in).
+ */
+export function settledAmount(payment: {
+  amount: bigint;
+  tdsAmount: bigint;
+  clientTdsAmount: bigint;
+  gstTdsAmount: bigint;
+}): bigint {
+  return (
+    payment.amount +
+    payment.tdsAmount +
+    payment.clientTdsAmount +
+    payment.gstTdsAmount
+  );
+}
+
+/**
  * What a recorded payment posts (CM-0017 §6, §8): on the party, out:
  * `payment` −amount and `tds` −TDS (the party is settled by both); in:
- * `receipt` +amount. On the account, only the money that moved, with the
- * party and the PAY number on the entry.
+ * `receipt` +amount, and from a Client `client_tds` +TDS and `gst_tds`
+ * +GST-TDS it deducted (CM-1107), so the Client's due falls by all three.
+ * On the account, only the money that moved, with the party and the PAY
+ * number on the entry.
  */
 export function paymentEntries(payment: PaymentPosting): {
   party: NewPartyEntry[];
@@ -212,7 +251,15 @@ export function paymentEntries(payment: PaymentPosting): {
           { ...base, kind: "payment" as const, amount: -payment.amount },
           { ...base, kind: "tds" as const, amount: -payment.tdsAmount },
         ].filter((entry) => entry.amount !== 0n)
-      : [{ ...base, kind: "receipt", amount: payment.amount }];
+      : [
+          { ...base, kind: "receipt" as const, amount: payment.amount },
+          {
+            ...base,
+            kind: "client_tds" as const,
+            amount: payment.clientTdsAmount,
+          },
+          { ...base, kind: "gst_tds" as const, amount: payment.gstTdsAmount },
+        ].filter((entry) => entry.amount !== 0n);
   const account: NewAccountEntry = {
     accountId: payment.accountId,
     ...placeColumns(payment.place),
@@ -247,6 +294,31 @@ export function assertTdsAllowed(
       { details: { field: "tdsAmount" } },
     );
   assertAmount(tdsAmount, "tdsAmount");
+}
+
+/**
+ * TDS and GST-TDS the Client deducted are recorded on receipts from a
+ * Client only (400 `CLIENT_TDS_ONLY_FOR_CLIENTS`), and together with the
+ * money they are at most ₹100 crore like any amount.
+ */
+export function assertClientDeductionsAllowed(
+  partyType: PartyType,
+  direction: PaymentDirection,
+  amounts: { clientTdsAmount: bigint; gstTdsAmount: bigint },
+): void {
+  for (const [field, value] of [
+    ["clientTdsAmount", amounts.clientTdsAmount],
+    ["gstTdsAmount", amounts.gstTdsAmount],
+  ] as const) {
+    if (value === 0n) continue;
+    if (partyType !== "client" || direction !== "in")
+      throw new DomainError(
+        "CLIENT_TDS_ONLY_FOR_CLIENTS",
+        "TDS and GST-TDS deducted by the payer are recorded on receipts from a Client.",
+        { details: { field } },
+      );
+    assertAmount(value, field);
+  }
 }
 
 /** The reference the duplicate check and the ledger use for a mode. */

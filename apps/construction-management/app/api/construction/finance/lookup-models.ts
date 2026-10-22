@@ -8,6 +8,7 @@ export const COUNTERPARTY_KINDS = [
   "labour",
   "vendor",
   "team_member",
+  "client",
 ] as const;
 export type CounterpartyKindModel = (typeof COUNTERPARTY_KINDS)[number];
 

@@ -43,6 +43,8 @@ export const GetConstructionFinancePartyStatementResponseModel = z.object({
         "payment",
         "receipt",
         "tds",
+        "client_tds",
+        "gst_tds",
         "write_off",
       ]),
       amount: Paise,

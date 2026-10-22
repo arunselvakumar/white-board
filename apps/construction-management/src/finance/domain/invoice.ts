@@ -22,15 +22,16 @@ import {
 /**
  * Party invoices (ADR CM-0017 §7, §11, §13): a bill from a Contractor,
  * Supplier or Other Party (payable, + on the party's balance) or a sales
- * invoice to an Other Party (receivable, −). The status is derived from
+ * invoice to an Other Party or, from a Client Bill, a Client (receivable,
+ * −; CM-1107). The status is derived from
  * the live allocations and an approved settlement; nothing is stored.
  */
 
 export type InvoiceDirection = "payable" | "receivable";
 /**
  * `manual`: typed in finance; `goods_receipt`: from a GRN (CM-0017 §13);
- * `ra_bill`: from an approved Contractor Bill (CM-1106, CM-0023 §7),
- * read-only here.
+ * `ra_bill`: from an approved Contractor Bill (CM-1106) or Client Bill
+ * (CM-1107, CM-0023 §7), read-only here.
  */
 export type InvoiceOrigin = "manual" | "goods_receipt" | "ra_bill";
 
@@ -80,6 +81,12 @@ export function invoiceFields(
   direction: InvoiceDirection,
   input: InvoiceFieldsInput,
 ): InvoiceFields {
+  if (partyType === "client")
+    throw new DomainError(
+      "CLIENT_INVOICES_FROM_CLIENT_BILLS",
+      "Invoices to a Client come from approved Client Bills (Contracts).",
+      { details: { field: "partyType" } },
+    );
   if (direction === "receivable" && partyType !== "other_party")
     throw new DomainError(
       "SALES_INVOICE_ONLY_FOR_OTHER_PARTIES",

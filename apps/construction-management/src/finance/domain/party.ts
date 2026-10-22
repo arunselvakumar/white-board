@@ -3,16 +3,23 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
 import type { PartyType } from "./ledger";
 
 /**
- * The parties whose balances finance keeps (ADR CM-0017 §7): Contractors
- * and Suppliers (masters) and Other Parties (finance). One engine serves
- * all three; only the rules below differ by type.
+ * The parties whose balances finance keeps (ADR CM-0017 §7): Contractors,
+ * Suppliers and Clients (masters; Clients from CM-1107) and Other Parties
+ * (finance). One engine serves all four; only the rules below differ by
+ * type.
  */
-export const PARTY_TYPES = ["contractor", "supplier", "other_party"] as const;
+export const PARTY_TYPES = [
+  "contractor",
+  "supplier",
+  "other_party",
+  "client",
+] as const;
 
 export const PARTY_TYPE_LABELS: Record<PartyType, string> = {
   contractor: "Contractor",
   supplier: "Supplier",
   other_party: "Other Party",
+  client: "Client",
 };
 
 /**
@@ -84,11 +91,21 @@ export type PartyFacts = {
 
 /**
  * Contractors and Suppliers must be assigned to the Project (Resources)
- * before money is recorded for them there (CM-705). Other Parties and
- * Store suppliers are not checked.
+ * before money is recorded for them there (CM-705); a Client must be the
+ * Client the Project links (CM-1107). Other Parties and Store suppliers are
+ * not checked.
  */
 export function assertPartyOnPlace(party: PartyFacts, place: PartyPlace): void {
   if (party.type === "other_party" || place.kind === "store") return;
+  if (party.type === "client") {
+    if (!party.projectIds.includes(place.id))
+      throw new DomainError(
+        "PARTY_NOT_ON_PROJECT",
+        "This Client is not the Project's Client. Pick it on the Project first.",
+        { details: { field: "partyId" } },
+      );
+    return;
+  }
   if (!party.projectIds.includes(place.id))
     throw new DomainError(
       "PARTY_NOT_ON_PROJECT",

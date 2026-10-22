@@ -53,7 +53,9 @@ export async function GET(request: Request): Promise<Response> {
           })
         : Promise.resolve(projectIds.length),
     ]);
-    const ofType = (type: "contractor" | "supplier" | "other_party") =>
+    const ofType = (
+      type: "contractor" | "supplier" | "other_party" | "client",
+    ) =>
       parties
         .filter((party) => party.partyType === type)
         .map((party) => ({
@@ -76,6 +78,7 @@ export async function GET(request: Request): Promise<Response> {
         contractor: ofType("contractor"),
         supplier: ofType("supplier"),
         other_party: ofType("other_party"),
+        client: ofType("client"),
       },
       accounts:
         accounts?.map((account) => ({

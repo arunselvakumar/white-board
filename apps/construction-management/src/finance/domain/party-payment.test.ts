@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
+  assertClientDeductionsAllowed,
   assertDirection,
   assertTdsAllowed,
   checkAllocations,
   paymentEntries,
+  settledAmount,
   type AllocatableInvoice,
 } from "./party-payment";
 
@@ -149,6 +151,8 @@ describe("payment entries", () => {
     paymentCategoryId: null,
     amount: 99_000n,
     tdsAmount: 1_000n,
+    clientTdsAmount: 0n,
+    gstTdsAmount: 0n,
     remarks: null,
   };
 
@@ -179,5 +183,61 @@ describe("payment entries", () => {
       ["receipt", 99_000n],
     ]);
     expect(entries.account).toMatchObject({ kind: "receipt", amount: 99_000n });
+  });
+
+  it("posts a Client's TDS and GST-TDS beside the receipt, the account only the cash (CM-1107)", () => {
+    const entries = paymentEntries({
+      ...payment,
+      partyType: "client",
+      direction: "in",
+      tdsAmount: 0n,
+      amount: 9_600_00n,
+      clientTdsAmount: 2_00_00n,
+      gstTdsAmount: 2_00_00n,
+    });
+    expect(entries.party.map((entry) => [entry.kind, entry.amount])).toEqual([
+      ["receipt", 9_600_00n],
+      ["client_tds", 2_00_00n],
+      ["gst_tds", 2_00_00n],
+    ]);
+    expect(entries.account).toMatchObject({
+      kind: "receipt",
+      amount: 9_600_00n,
+      counterpartyKind: "client",
+    });
+    expect(
+      settledAmount({
+        amount: 9_600_00n,
+        tdsAmount: 0n,
+        clientTdsAmount: 2_00_00n,
+        gstTdsAmount: 2_00_00n,
+      }),
+    ).toBe(10_000_00n);
+  });
+
+  it("refuses Payment Out to a Client and client deductions on other payments", () => {
+    expect(code(() => assertDirection("client", "out"))).toBe(
+      "PAYMENT_OUT_NOT_FOR_CLIENTS",
+    );
+    expect(code(() => assertDirection("client", "in"))).toBeNull();
+    expect(code(() => assertDirection("supplier", "in"))).toBe(
+      "PAYMENT_IN_ONLY_FOR_OTHER_PARTIES",
+    );
+    expect(
+      code(() =>
+        assertClientDeductionsAllowed("other_party", "in", {
+          clientTdsAmount: 100n,
+          gstTdsAmount: 0n,
+        }),
+      ),
+    ).toBe("CLIENT_TDS_ONLY_FOR_CLIENTS");
+    expect(
+      code(() =>
+        assertClientDeductionsAllowed("client", "in", {
+          clientTdsAmount: 100n,
+          gstTdsAmount: 200n,
+        }),
+      ),
+    ).toBeNull();
   });
 });

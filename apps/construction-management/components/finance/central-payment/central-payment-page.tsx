@@ -270,7 +270,9 @@ function PartyDues({ summary }: { summary: CentralPaymentSummary }) {
             <PartyDuesTable
               rows={summary.parties[item.value]}
               noun={item.noun}
-              receivables={item.value === "other_party"}
+              receivables={
+                item.value === "other_party" || item.value === "client"
+              }
             />
           </TabsContent>
         ))}

@@ -39,6 +39,7 @@ export const COUNTERPARTY_KIND_LABELS: Record<CounterpartyKindModel, string> = {
   labour: "Labour",
   vendor: "Vendor",
   team_member: "Team Member",
+  client: "Client",
 };
 
 const KIND_ITEMS = [

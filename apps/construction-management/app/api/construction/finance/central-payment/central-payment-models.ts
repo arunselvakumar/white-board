@@ -19,7 +19,7 @@ const PartyDueModel = z.object({
   overdue: paise,
   /** Payments out not yet allocated to a bill (money and TDS). */
   advance: paise,
-  /** Left on sales invoices to the party (Other Parties only). */
+  /** Left on sales invoices to the party (Other Parties) or on Client Bills' invoices (Clients). */
   receivable: paise,
   /** + the Company owes the party; − the party owes the Company or holds an advance. */
   balance: paise,
@@ -37,6 +37,8 @@ export const GetConstructionFinanceCentralPaymentResponseModel = z
       contractor: z.array(PartyDueModel),
       supplier: z.array(PartyDueModel),
       other_party: z.array(PartyDueModel),
+      /** Clients (CM-1107): what is left on their Client Bills' invoices is `receivable`. */
+      client: z.array(PartyDueModel),
     }),
     /** Company Cash and Bank accounts; null without Company's Bank A/C Read. */
     accounts: z

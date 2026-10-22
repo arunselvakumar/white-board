@@ -188,12 +188,23 @@ export function partyDues(
 /**
  * The TDS share of an allocation: a payment settles amount + TDS, so each
  * rupee allocated carries TDS in that proportion (half up to the paisa).
+ * A Client's receipt (CM-1107) settles amount + the TDS and GST-TDS the
+ * Client deducted, and both count as its deduction here.
  */
 export function tdsShare(
   allocated: bigint,
-  payment: { amount: bigint; tdsAmount: bigint },
+  payment: {
+    amount: bigint;
+    tdsAmount: bigint;
+    clientTdsAmount?: bigint;
+    gstTdsAmount?: bigint;
+  },
 ): bigint {
-  const settled = payment.amount + payment.tdsAmount;
-  if (settled <= 0n || payment.tdsAmount === 0n) return 0n;
-  return (allocated * payment.tdsAmount * 2n + settled) / (settled * 2n);
+  const deducted =
+    payment.tdsAmount +
+    (payment.clientTdsAmount ?? 0n) +
+    (payment.gstTdsAmount ?? 0n);
+  const settled = payment.amount + deducted;
+  if (settled <= 0n || deducted === 0n) return 0n;
+  return (allocated * deducted * 2n + settled) / (settled * 2n);
 }

@@ -24,12 +24,14 @@ import {
   type PartyPlace,
 } from "../domain/party";
 import {
+  assertClientDeductionsAllowed,
   assertDirection,
   assertTdsAllowed,
   checkAllocations,
   directionOfInvoices,
   paymentEntries,
   paymentReference,
+  settledAmount,
   type AllocatableInvoice,
   type PaymentDirection,
 } from "../domain/party-payment";
@@ -91,6 +93,10 @@ export type RecordPaymentInput = {
   tdsBase?: number | null;
   tdsRate?: string | null;
   tdsOverrideReason?: string | null;
+  /** Paise of income-tax TDS the Client deducted (Client receipts, CM-1107). */
+  clientTdsAmount?: number | null;
+  /** Paise of GST-TDS (s.51) the Client deducted (Client receipts). */
+  gstTdsAmount?: number | null;
   paymentCategoryId?: string | null;
   paidByMemberId?: string | null;
   remarks?: string | null;
@@ -126,7 +132,7 @@ export type PaymentView = StoredPartyPayment & {
   accountKind: string | null;
   paymentCategoryName: string | null;
   paidByName: string | null;
-  /** Paid + TDS. */
+  /** Paid + TDS (out), or received + the TDS and GST-TDS the Client deducted (in). */
   settled: bigint;
   allocated: bigint;
   /** The advance: settled − allocated. */
@@ -171,6 +177,8 @@ function snapshot(payment: StoredPartyPayment) {
     tdsBase: payment.tdsBase,
     tdsRate: payment.tdsRate,
     tdsOverrideReason: payment.tdsOverrideReason,
+    clientTdsAmount: payment.clientTdsAmount,
+    gstTdsAmount: payment.gstTdsAmount,
     paymentCategoryId: payment.paymentCategoryId,
     paidByMemberId: payment.paidByMemberId,
   });
@@ -385,6 +393,18 @@ export class PartyPaymentHandlers {
       allowZero: true,
     });
     assertTdsAllowed(party.type, direction, tdsAmount);
+    const clientTdsAmount = paiseFrom(
+      input.clientTdsAmount ?? 0,
+      "clientTdsAmount",
+      { allowZero: true },
+    );
+    const gstTdsAmount = paiseFrom(input.gstTdsAmount ?? 0, "gstTdsAmount", {
+      allowZero: true,
+    });
+    assertClientDeductionsAllowed(party.type, direction, {
+      clientTdsAmount,
+      gstTdsAmount,
+    });
     const chequeNumber =
       input.mode === "cheque"
         ? optionalText(
@@ -468,7 +488,12 @@ export class PartyPaymentHandlers {
             },
           );
       }
-      const settled = amount + tdsAmount;
+      const settled = settledAmount({
+        amount,
+        tdsAmount,
+        clientTdsAmount,
+        gstTdsAmount,
+      });
       const { invoices, rows } = await this.allocatable(
         tx,
         workspaceId,
@@ -537,6 +562,8 @@ export class PartyPaymentHandlers {
         tdsAmount,
         tdsSuggested: tds?.suggested ?? null,
         tdsOverrideReason: tds?.overrideReason ?? null,
+        clientTdsAmount,
+        gstTdsAmount,
         paymentCategoryId,
         paidByMemberId,
         remarks,
@@ -681,7 +708,7 @@ export class PartyPaymentHandlers {
       changed(locked, expectedUpdatedAt);
       const existing = await store.allocationsOfPayments(tx, [id]);
       const allocated = existing.reduce((sum, row) => sum + row.amount, 0n);
-      const available = locked.amount + locked.tdsAmount - allocated;
+      const available = settledAmount(locked) - allocated;
       const { invoices } = await this.allocatable(
         tx,
         workspaceId,
@@ -769,7 +796,7 @@ export class PartyPaymentHandlers {
         (allocation) => allocation.paymentId === row.id,
       );
       const allocated = own.reduce((sum, item) => sum + item.amount, 0n);
-      const settled = row.amount + row.tdsAmount;
+      const settled = settledAmount(row);
       const account = accounts.get(row.accountId);
       return {
         ...row,

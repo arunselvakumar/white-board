@@ -15,6 +15,7 @@ import {
   type EventDispatcher,
 } from "@/src/shared-kernel/events";
 
+import { clientRetentionReceivable } from "./contracts-client-retention";
 import { financeDirectory } from "./finance-directory";
 import { messagingEvents } from "./messaging";
 
@@ -24,6 +25,7 @@ let shared: PartyFinance | null = null;
 export function partyFinance(): PartyFinance {
   shared ??= createPartyFinance({
     directory: financeDirectory,
+    retentionReceivable: clientRetentionReceivable,
     events: messagingEvents(),
   });
   return shared;

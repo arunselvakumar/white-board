@@ -19,11 +19,20 @@ const Figures = {
   opening: Paise,
   /** Bills from the party. */
   invoiced: Paise,
-  /** Sales invoices to the party (Other Parties). */
+  /** Sales invoices to the party (Other Parties) and Client Bills' invoices (Clients). */
   billed: Paise,
   paid: Paise,
   received: Paise,
   tds: Paise,
+  /** Clients (CM-1107): income-tax TDS the Client deducted from receipts, the TDS receivable. */
+  clientTds: Paise,
+  /** Clients: GST-TDS (s.51) the Client deducted from receipts, the GST-TDS receivable. */
+  gstTds: Paise,
+  /**
+   * Clients: retention held back on approved Client Bills less releases,
+   * derived in contracts; not part of `balance`. 0 for other parties.
+   */
+  retentionReceivable: Paise,
   /** Signed as posted: − on bills, + on sales invoices. */
   writtenOff: Paise,
   /** + the Company owes the party; − the party owes the Company. */
@@ -66,6 +75,9 @@ function figures(
     paid: money(row.paid),
     received: money(row.received),
     tds: money(row.tds),
+    clientTds: money(row.clientTds),
+    gstTds: money(row.gstTds),
+    retentionReceivable: money(row.retentionReceivable),
     writtenOff: money(row.writtenOff),
     balance: money(row.balance),
     overdue: money(row.overdue),

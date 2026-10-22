@@ -85,6 +85,8 @@ function toPayment(row: PaymentRow): StoredPartyPayment {
     tdsAmount: row.tdsAmount,
     tdsSuggested: row.tdsSuggested,
     tdsOverrideReason: row.tdsOverrideReason,
+    clientTdsAmount: row.clientTdsAmount,
+    gstTdsAmount: row.gstTdsAmount,
     paymentCategoryId: row.paymentCategoryId,
     paidByMemberId: row.paidByMemberId,
     remarks: row.remarks,
@@ -674,6 +676,8 @@ export const prismaPartyStore: PartyStore = {
         tdsAmount: row.tdsAmount,
         tdsSuggested: row.tdsSuggested,
         tdsOverrideReason: row.tdsOverrideReason,
+        clientTdsAmount: row.clientTdsAmount,
+        gstTdsAmount: row.gstTdsAmount,
         paymentCategoryId: row.paymentCategoryId,
         paidByMemberId: row.paidByMemberId,
         remarks: row.remarks,
@@ -828,7 +832,8 @@ export const prismaPartyStore: PartyStore = {
   async advances(db, workspaceId, partyType, place) {
     const rows = await db.$queryRaw<{ partyId: string; advance: bigint }[]>(
       Prisma.sql`SELECT p.party_id::text AS "partyId",
-          SUM(p.amount + p.tds_amount - COALESCE((SELECT SUM(a.amount)
+          SUM(p.amount + p.tds_amount + p.client_tds_amount + p.gst_tds_amount
+            - COALESCE((SELECT SUM(a.amount)
             FROM construction_finance.payment_allocations a
             WHERE a.payment_id = p.id AND a.deleted_at IS NULL), 0))::bigint AS advance
         FROM construction_finance.party_payments p

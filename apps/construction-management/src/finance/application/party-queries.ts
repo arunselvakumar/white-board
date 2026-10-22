@@ -39,6 +39,15 @@ export type PartyBalanceRow = {
   paid: bigint;
   received: bigint;
   tds: bigint;
+  /** Income-tax TDS the Client deducted from receipts: TDS receivable (CM-1107). */
+  clientTds: bigint;
+  /** GST-TDS (s.51) the Client deducted from receipts: GST-TDS receivable. */
+  gstTds: bigint;
+  /**
+   * Retention the Client holds on approved Client Bills, less releases,
+   * derived in contracts (CM-1107); 0 for other parties. Not in `balance`.
+   */
+  retentionReceivable: bigint;
   /** Signed as posted: − on bills, + on sales invoices. */
   writtenOff: bigint;
   /** + the Company owes the party. */
@@ -143,6 +152,9 @@ const EMPTY = {
   paid: 0n,
   received: 0n,
   tds: 0n,
+  clientTds: 0n,
+  gstTds: 0n,
+  retentionReceivable: 0n,
   writtenOff: 0n,
   balance: 0n,
   overdue: 0n,
@@ -193,6 +205,14 @@ export class PartyQueries {
       others.map((partyId) => ({ partyType, partyId })),
     );
     const byParty = new Map(totals.map((row) => [row.partyId, row]));
+    const retention =
+      partyType === "client" && projectId != null
+        ? await this.deps.retentionReceivable(db, {
+            workspaceId,
+            clientIds: [...assigned.map((row) => row.id), ...others],
+            projectIds: [projectId],
+          })
+        : new Map<string, bigint>();
     const rows: PartyBalanceRow[] = [
       ...assigned.map((row) => ({
         id: row.id,
@@ -217,6 +237,9 @@ export class PartyQueries {
         paid: -(kinds.payment ?? 0n),
         received: kinds.receipt ?? 0n,
         tds: -(kinds.tds ?? 0n),
+        clientTds: kinds.client_tds ?? 0n,
+        gstTds: kinds.gst_tds ?? 0n,
+        retentionReceivable: retention.get(party.id) ?? 0n,
         writtenOff: kinds.write_off ?? 0n,
         balance: byParty.get(party.id)?.total ?? 0n,
         overdue: overdue.get(party.id) ?? 0n,
@@ -317,13 +340,15 @@ export class PartyQueries {
       };
     });
     const openInvoices = [
-      ...(await this.invoices.outstanding(
-        workspaceId,
-        party,
-        input.place,
-        directionOfInvoices("out"),
-      )),
-      ...(party.type === "other_party"
+      ...(party.type === "client"
+        ? []
+        : await this.invoices.outstanding(
+            workspaceId,
+            party,
+            input.place,
+            directionOfInvoices("out"),
+          )),
+      ...(party.type === "other_party" || party.type === "client"
         ? await this.invoices.outstanding(
             workspaceId,
             party,
@@ -376,25 +401,35 @@ export class PartyQueries {
     const assigned =
       partyType === "other_party"
         ? await store.otherPartiesOn(db, workspaceId, null)
-        : partyType === "contractor"
+        : partyType === "client"
           ? [
               ...(
-                await directory.contractors(
+                await directory.clients(
                   db,
                   workspaceId,
                   rows.map((row) => row.partyId),
                 )
               ).values(),
             ]
-          : [
-              ...(
-                await directory.suppliers(
-                  db,
-                  workspaceId,
-                  rows.map((row) => row.partyId),
-                )
-              ).values(),
-            ];
+          : partyType === "contractor"
+            ? [
+                ...(
+                  await directory.contractors(
+                    db,
+                    workspaceId,
+                    rows.map((row) => row.partyId),
+                  )
+                ).values(),
+              ]
+            : [
+                ...(
+                  await directory.suppliers(
+                    db,
+                    workspaceId,
+                    rows.map((row) => row.partyId),
+                  )
+                ).values(),
+              ];
     const parties = new Map<
       string,
       { name: string | null; projects: Map<string, bigint> }

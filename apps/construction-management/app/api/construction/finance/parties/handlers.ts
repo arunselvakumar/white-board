@@ -97,7 +97,9 @@ export function requestPlace(
 
 export function requestPartyType(raw: unknown): PartyType {
   const value = (raw ?? {}) as { partyType?: unknown };
-  return value.partyType === "contractor" || value.partyType === "other_party"
+  return value.partyType === "contractor" ||
+    value.partyType === "other_party" ||
+    value.partyType === "client"
     ? value.partyType
     : "supplier";
 }

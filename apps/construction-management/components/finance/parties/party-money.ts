@@ -95,6 +95,8 @@ export const ENTRY_KIND_LABELS = {
   payment: "Payment",
   receipt: "Receipt",
   tds: "TDS",
+  client_tds: "TDS deducted by the Client",
+  gst_tds: "GST-TDS deducted by the Client",
   write_off: "Written off",
 } as const;
 

@@ -13,7 +13,7 @@ import {
 } from "../domain/party";
 import type { FinanceTx, PartyFinanceDeps } from "./party-ports";
 
-/** Contractor, Supplier and Other Party money (ADR CM-0017 §14). */
+/** Contractor, Supplier, Other Party and Client money (ADR CM-0017 §14, CM-1107). */
 export const PARTIES_MENU = "finance.parties" as const;
 
 /**
@@ -66,6 +66,18 @@ export async function loadParty(
       pan: row.pan,
       projectIds: row.projectIds,
       departmentIds: row.departmentIds,
+    };
+  }
+  if (type === "client") {
+    const row = (await deps.directory.clients(db, workspaceId, [id])).get(id);
+    if (row == null) throw partyNotFound(type);
+    return {
+      type,
+      id,
+      name: row.name,
+      pan: row.pan,
+      projectIds: row.projectIds,
+      departmentIds: [],
     };
   }
   if (type === "supplier") {
@@ -127,10 +139,11 @@ export async function partyNames(
       refs.filter((ref) => ref.partyType === type).map((ref) => ref.partyId),
     ),
   ];
-  const [contractors, suppliers, others] = await Promise.all([
+  const [contractors, suppliers, others, clients] = await Promise.all([
     deps.directory.contractors(db, workspaceId, ids("contractor")),
     deps.directory.suppliers(db, workspaceId, ids("supplier")),
     deps.store.otherParties(db, workspaceId, ids("other_party")),
+    deps.directory.clients(db, workspaceId, ids("client")),
   ]);
   const names = new Map<string, string>();
   for (const [id, row] of contractors)
@@ -139,6 +152,7 @@ export async function partyNames(
     names.set(partyKey("supplier", id), row.name);
   for (const [id, row] of others)
     names.set(partyKey("other_party", id), row.name);
+  for (const [id, row] of clients) names.set(partyKey("client", id), row.name);
   return names;
 }
 

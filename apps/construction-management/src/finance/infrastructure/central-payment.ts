@@ -27,7 +27,7 @@ export type CentralPartyDue = {
   overdue: bigint;
   /** Settled amount of payments out not yet allocated to a bill. */
   advance: bigint;
-  /** What is left on bills to the party (Other Parties' sales invoices). */
+  /** What is left on bills to the party (Other Parties' sales invoices, Client Bills). */
   receivable: bigint;
   /** Σ party entries: + the Company owes the party. */
   balance: bigint;
@@ -55,7 +55,7 @@ type Scope = {
 
 /**
  * Central Payment in the Workspace (CM-709, ADR CM-0017 §14, §16): each
- * Contractor's, Supplier's and Other Party's dues across the Projects in
+ * Contractor's, Supplier's, Other Party's and Client's (CM-1107) dues across the Projects in
  * scope, and every company account's balance with what is pending.
  */
 export class CentralPayment {
@@ -63,7 +63,7 @@ export class CentralPayment {
     private readonly db: PrismaClient,
     private readonly directory: Pick<
       FinanceDirectory,
-      "contractors" | "suppliers"
+      "contractors" | "suppliers" | "clients"
     >,
   ) {}
 
@@ -84,7 +84,7 @@ export class CentralPayment {
         { partyType: PartyType; partyId: string; advance: bigint }[]
       >(Prisma.sql`
         SELECT p.party_type::text AS "partyType", p.party_id::text AS "partyId",
-          COALESCE(SUM(p.amount + p.tds_amount - COALESCE((
+          COALESCE(SUM(p.amount + p.tds_amount + p.client_tds_amount + p.gst_tds_amount - COALESCE((
             SELECT SUM(a.amount) FROM construction_finance.payment_allocations a
             WHERE a.payment_id = p.id AND a.deleted_at IS NULL
           ), 0)), 0)::bigint AS advance

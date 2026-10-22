@@ -35,6 +35,20 @@ export type SupplierFacts = {
   projectIds: string[];
 };
 
+/**
+ * A Client (CM-1107, ADR CM-0023 §2): a receivable party. Its Projects are
+ * the live Projects that link it.
+ */
+export type ClientFacts = {
+  id: string;
+  name: string;
+  pan: string | null;
+  gstin: string | null;
+  stateCode: string | null;
+  isActive: boolean;
+  projectIds: string[];
+};
+
 export type NamedFacts = { id: string; name: string };
 
 export type TeamMemberFacts = {
@@ -75,6 +89,12 @@ export type FinanceDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, SupplierFacts>>;
+  /** Clients by id (live ones), from `construction_masters.clients` (CM-1107). */
+  clients(
+    db: Db,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, ClientFacts>>;
   /** Live Projects by id. */
   projects(
     db: Db,
@@ -119,13 +139,20 @@ export type FinanceDirectory = {
   /**
    * Live, active parties of a kind for a picker, by name: on the Project
    * when given (Contractors and Suppliers assigned to it, Labours whose
-   * current Project it is, Vendors assigned to it; Team Members are
-   * Company-wide). Other Parties live in finance and are not read here.
+   * current Project it is, Vendors assigned to it, Clients the Project
+   * links; Team Members are Company-wide). Other Parties live in finance
+   * and are not read here.
    */
   listParties(
     db: Db,
     workspaceId: string,
-    kind: "contractor" | "supplier" | "labour" | "vendor" | "team_member",
+    kind:
+      | "contractor"
+      | "supplier"
+      | "labour"
+      | "vendor"
+      | "team_member"
+      | "client",
     projectId: string | null,
   ): Promise<NamedFacts[]>;
   /** Live GRNs by id (CM-705). */

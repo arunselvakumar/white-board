@@ -108,7 +108,7 @@ export function invoiceActions(
   > & { origin?: InvoiceView["origin"] },
 ): InvoiceActions {
   const settled = view.status === "settled";
-  // A Contractor Bill's invoice is changed by reversing the bill (CM-1106).
+  // An RA bill's invoice is changed by reversing the bill (CM-1106, CM-1107).
   const fromBill = view.origin === "ra_bill";
   return {
     edit: !settled && !fromBill && canOnPlace(access, "update", view.place),
@@ -129,16 +129,20 @@ export function invoiceActions(
 }
 
 /**
- * A Contractor Bill's invoice (origin `ra_bill`, CM-1106) is read-only in
- * finance: 409 `INVOICE_FROM_CONTRACTOR_BILL`. Reversing the bill removes
- * it; payments and settlements still work as on any invoice.
+ * An RA bill's invoice (origin `ra_bill`) is read-only in finance: 409
+ * `INVOICE_FROM_CONTRACTOR_BILL` for a Contractor Bill's (CM-1106),
+ * `INVOICE_FROM_CLIENT_BILL` for a Client Bill's (CM-1107). Reversing the
+ * bill removes it; payments, receipts and settlements still work as on any
+ * invoice.
  */
-function assertNotFromContractorBill(invoice: StoredInvoice): void {
-  if (invoice.origin === "ra_bill")
-    throw conflict(
-      "INVOICE_FROM_CONTRACTOR_BILL",
-      `This invoice comes from Contractor Bill ${invoice.invoiceNumber}. Reverse the bill in Contracts to change it.`,
-    );
+function assertNotFromBill(invoice: StoredInvoice): void {
+  if (invoice.origin !== "ra_bill") return;
+  const client = invoice.partyType === "client";
+  throw conflict(
+    client ? "INVOICE_FROM_CLIENT_BILL" : "INVOICE_FROM_CONTRACTOR_BILL",
+    `This invoice comes from ${client ? "Client" : "Contractor"} Bill ${invoice.invoiceNumber}. Reverse the bill in Contracts to change it.`,
+    { billId: invoice.sourceId },
+  );
 }
 
 function snapshot(invoice: StoredInvoice) {
@@ -406,7 +410,7 @@ export class InvoiceHandlers {
         );
       if (locked.settledAt != null)
         throw conflict("INVOICE_SETTLED", "A settled invoice is not edited.");
-      assertNotFromContractorBill(locked);
+      assertNotFromBill(locked);
       const fromGrn = locked.origin === "goods_receipt";
       const fields = invoiceFields(party.type, locked.direction, {
         ...input,
@@ -539,7 +543,7 @@ export class InvoiceHandlers {
           "Someone changed this invoice. Reload it and try again.",
           { updatedAt: locked.updatedAt.toISOString() },
         );
-      assertNotFromContractorBill(locked);
+      assertNotFromBill(locked);
       await this.assertRemovable(tx, locked);
       check.check("party_invoice", "edit", locked.invoiceDate);
       await this.remove(tx, locked, access.userId, at);

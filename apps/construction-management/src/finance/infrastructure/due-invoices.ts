@@ -131,12 +131,12 @@ export async function loadDueInvoices(
 }
 
 /**
- * Names of Contractors, Suppliers (live, through the directory) and Other
- * Parties (removed ones too), keyed by `partyKey`.
+ * Names of Contractors, Suppliers, Clients (live, through the directory)
+ * and Other Parties (removed ones too), keyed by `partyKey`.
  */
 export async function partyNames(
   db: Db,
-  directory: Pick<FinanceDirectory, "contractors" | "suppliers">,
+  directory: Pick<FinanceDirectory, "contractors" | "suppliers" | "clients">,
   workspaceId: string,
   parties: readonly { partyType: PartyType; partyId: string }[],
 ): Promise<Map<string, string>> {
@@ -148,9 +148,10 @@ export async function partyNames(
     ),
   ];
   const others = idsOf("other_party");
-  const [contractors, suppliers, otherRows] = await Promise.all([
+  const [contractors, suppliers, clients, otherRows] = await Promise.all([
     directory.contractors(db, workspaceId, idsOf("contractor")),
     directory.suppliers(db, workspaceId, idsOf("supplier")),
+    directory.clients(db, workspaceId, idsOf("client")),
     others.length === 0
       ? []
       : db.constructionFinanceOtherParty.findMany({
@@ -165,6 +166,9 @@ export async function partyNames(
     ...[...suppliers.values()].map(
       (row) => [`supplier:${row.id}`, row.name] as const,
     ),
+    ...[...clients.values()].map(
+      (row) => [`client:${row.id}`, row.name] as const,
+    ),
     ...otherRows.map((row) => [`other_party:${row.id}`, row.name] as const),
   ]);
 }
@@ -173,6 +177,7 @@ const REMOVED: Record<PartyType, string> = {
   contractor: "A removed Contractor",
   supplier: "A removed Supplier",
   other_party: "A removed Other Party",
+  client: "A removed Client",
 };
 
 /** A party's name, or what to print for one that was removed. */

@@ -11,7 +11,10 @@ import { GoodsReceiptInvoices } from "../application/goods-receipt-invoices";
 import { InvoiceHandlers } from "../application/invoice-handlers";
 import { PartyOpeningHandlers } from "../application/party-opening-handlers";
 import { PartyPaymentHandlers } from "../application/party-payment-handlers";
-import type { PartyFinanceDeps } from "../application/party-ports";
+import type {
+  ClientRetentionReceivable,
+  PartyFinanceDeps,
+} from "../application/party-ports";
 import { PartyQueries } from "../application/party-queries";
 import type { FinanceDirectory } from "../application/ports";
 import { SettlementHandlers } from "../application/settlement-handlers";
@@ -25,12 +28,15 @@ import { loadTdsRates } from "./tds-rate-store";
 /**
  * The party money engine over Prisma (CM-705, CM-706, CM-708): invoices,
  * payments, openings, settlements, the queries over the party ledger and
- * the GRN → supplier invoice sync, and Contractor Bill invoices (CM-1106).
+ * the GRN → supplier invoice sync, and RA bill invoices (Contractor Bills,
+ * CM-1106; Client Bills, CM-1107).
  * The directory is the composition
  * root's (`src/composition/finance-directory.ts`).
  */
 export function createPartyFinance(deps: {
   directory: FinanceDirectory;
+  /** Retention the Client holds, derived in contracts (CM-1107). */
+  retentionReceivable: ClientRetentionReceivable;
   /** Settlement approval events after commit (CM-904). */
   events?: EventDispatcher;
   prisma?: PrismaClient;
@@ -47,6 +53,7 @@ export function createPartyFinance(deps: {
     accountFacts: (tx, workspaceId, accountId) =>
       lockedAccountFacts(tx, deps.directory, workspaceId, accountId),
     tdsRates: loadTdsRates,
+    retentionReceivable: deps.retentionReceivable,
     clock: deps.clock,
   };
   const invoices = new InvoiceHandlers(base);

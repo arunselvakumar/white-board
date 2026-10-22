@@ -76,6 +76,20 @@ export function centralSummary(
           balance: -5_00_000_00,
         },
       ],
+      client: [
+        {
+          partyId: "0199b000-0000-7000-8000-0000000000c5",
+          name: "Tamil Nadu Housing Board",
+          projectCount: 1,
+          invoiced: 0,
+          paid: 0,
+          due: 0,
+          overdue: 0,
+          advance: 0,
+          receivable: 7_20_460_00,
+          balance: -7_20_460_00,
+        },
+      ],
     },
     accounts: [
       {
@@ -138,7 +152,7 @@ export const MEMBER_SUMMARY = centralSummary({
 /** A new Company: nothing owed, the two seeded accounts at zero. */
 export const EMPTY_SUMMARY = centralSummary({
   projectCount: 0,
-  parties: { contractor: [], supplier: [], other_party: [] },
+  parties: { contractor: [], supplier: [], other_party: [], client: [] },
   accounts: [],
   pettyCash: [],
 });

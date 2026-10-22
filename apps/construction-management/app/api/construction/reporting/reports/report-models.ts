@@ -41,6 +41,7 @@ const COUNTERPARTY_KINDS = [
   "labour",
   "vendor",
   "team_member",
+  "client",
 ] as const;
 
 const APPROVAL_STATUSES = ["pending", "approved", "rejected"] as const;

@@ -136,9 +136,9 @@ export const ConstructionFinanceInvoiceResponseModel = z.object({
   origin: z
     .enum(["manual", "goods_receipt", "ra_bill"])
     .describe(
-      "`ra_bill`: from an approved Contractor Bill (CM-1106); read-only here (409 INVOICE_FROM_CONTRACTOR_BILL).",
+      "`ra_bill`: from an approved Contractor Bill (CM-1106, payable) or Client Bill (CM-1107, receivable to a Client); read-only here (409 INVOICE_FROM_CONTRACTOR_BILL / INVOICE_FROM_CLIENT_BILL).",
     ),
-  /** `ra_bill`: the Contractor Bill's id. */
+  /** `ra_bill`: the Contractor or Client Bill's id (the party type says which). */
   sourceId: z.uuid().nullable(),
   invoiceNumber: z.string(),
   invoiceDate: z.iso.date(),

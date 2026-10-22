@@ -22,7 +22,8 @@ export type CounterpartyKind =
   | "other_party"
   | "labour"
   | "vendor"
-  | "team_member";
+  | "team_member"
+  | "client";
 
 export type AccountEntryKind =
   "opening" | "receipt" | "payment" | "transfer_in" | "transfer_out";
@@ -61,7 +62,7 @@ export type NewAccountEntry = {
 
 export type AccountEntry = Required<NewAccountEntry> & { id: string };
 
-export type PartyType = "contractor" | "supplier" | "other_party";
+export type PartyType = "contractor" | "supplier" | "other_party" | "client";
 
 export type PartyEntryKind =
   | "opening"
@@ -70,7 +71,11 @@ export type PartyEntryKind =
   | "payment"
   | "receipt"
   | "tds"
-  | "write_off";
+  | "write_off"
+  /** Income-tax TDS a Client deducted from a receipt (+, CM-1107). */
+  | "client_tds"
+  /** GST-TDS (s.51) a Client deducted from a receipt (+, CM-1107). */
+  | "gst_tds";
 
 export type PartyEntrySource =
   "party_opening" | "invoice" | "party_payment" | "settlement";
