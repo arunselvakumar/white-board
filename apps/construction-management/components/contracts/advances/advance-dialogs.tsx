@@ -961,8 +961,13 @@ export function ReleaseRetentionDialog({
     stage === "completion"
       ? view.retention.completionSuggestion
       : view.retention.dlpEndSuggestion;
+  // The completion stage comes first while it still has something to
+  // release, even when the DLP has already ended (no DLP months, or a late
+  // release); only then does the DLP-end stage take the rest.
   const [stage, setStage] = useState<(typeof RETENTION_STAGES)[number]>(
-    view.dlp.ended ? "dlp_end" : "completion",
+    (view.retention.completionSuggestion ?? 0) > 0 || !view.dlp.ended
+      ? "completion"
+      : "dlp_end",
   );
   const [amount, setAmount] = useState(paiseToRupees(suggestionOf(stage)));
   const [releasedOn, setReleasedOn] = useState(today);
