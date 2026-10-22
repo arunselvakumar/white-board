@@ -50,7 +50,8 @@ export function paiseToRupees(paise: number | null | undefined): string {
 
 /** `₹1,00,000.00` (Indian grouping) for paise. */
 export function formatPaise(paise: number): string {
-  return formatMinor(paise);
+  // A balance turned round (`-balance`) is −0 when nothing is due; never print "-₹0.00".
+  return formatMinor(paise === 0 ? 0 : paise);
 }
 
 /**
