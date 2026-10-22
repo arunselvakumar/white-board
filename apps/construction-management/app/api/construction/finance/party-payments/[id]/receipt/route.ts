@@ -1,7 +1,7 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { renderPartyPaymentReceiptPdf } from "@/src/finance/infrastructure/party-payment-receipt-pdf";
-import { rupeesInWords } from "@/src/procurement/domain/purchase-order-amount-words";
+import { rupeesInWords } from "@/src/shared-kernel/amount-in-words";
 
 import { finance } from "../../../parties/handlers";
 import { ConstructionFinancePartyIdParamsModel } from "../../../parties/party-shared-models";
