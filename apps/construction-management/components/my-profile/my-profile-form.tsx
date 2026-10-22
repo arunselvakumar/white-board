@@ -280,7 +280,7 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
               <Input
                 id="my-email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="example@example.com"
                 className="h-10"
                 {...form.register("email")}
               />
