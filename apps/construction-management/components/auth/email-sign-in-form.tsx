@@ -102,7 +102,7 @@ export function EmailSignInForm({
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="you@company.in"
+          placeholder="example@example.com"
           className="h-10"
           {...form.register("email")}
         />

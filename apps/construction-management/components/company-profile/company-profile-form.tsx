@@ -275,7 +275,7 @@ export function CompanyProfileForm({
               <Input
                 id="company-email"
                 type="email"
-                placeholder="office@anugrahaengineers.in"
+                placeholder="example@example.com"
                 className="h-10"
                 {...form.register("email")}
               />
