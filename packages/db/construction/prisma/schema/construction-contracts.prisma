@@ -406,41 +406,47 @@ model ConstructionContractsVariation {
 /// A Work Order to a Contractor (CM-0023 §5). The row holds the current
 /// revision's terms; `work_order_revisions` keeps every earlier one.
 model ConstructionContractsWorkOrder {
-  id                         String                               @id @db.Uuid
-  workspaceId                String                               @map("workspace_id")
-  projectId                  String                               @map("project_id") @db.Uuid
-  contractorId               String                               @map("contractor_id") @db.Uuid
-  departmentId               String?                              @map("department_id") @db.Uuid
-  /// Sequence rule `work_order`.
-  number                     String
-  orderDate                  DateTime                             @map("order_date") @db.Date
-  validUntil                 DateTime?                            @map("valid_until") @db.Date
-  scope                      String?
-  status                     ConstructionContractsWorkOrderStatus
+  id                          String                               @id @db.Uuid
+  workspaceId                 String                               @map("workspace_id")
+  projectId                   String                               @map("project_id") @db.Uuid
+  contractorId                String                               @map("contractor_id") @db.Uuid
+  departmentId                String?                              @map("department_id") @db.Uuid
+  /// Sequence rule `work_order`, taken when first submitted; null on a
+  /// draft that was never submitted.
+  number                      String?
+  orderDate                   DateTime                             @map("order_date") @db.Date
+  validUntil                  DateTime?                            @map("valid_until") @db.Date
+  scope                       String?
+  status                      ConstructionContractsWorkOrderStatus
   /// 0 until the first amendment.
-  revision                   Int                                  @default(0)
-  retentionPercent           Decimal                              @default(0) @map("retention_percent") @db.Decimal(5, 2)
-  retentionCapPercent        Decimal?                             @map("retention_cap_percent") @db.Decimal(5, 2)
-  retentionCompletionPercent Decimal                              @default(50) @map("retention_completion_percent") @db.Decimal(5, 2)
-  dlpMonths                  Int?                                 @map("dlp_months")
+  revision                    Int                                  @default(0)
+  retentionPercent            Decimal                              @default(0) @map("retention_percent") @db.Decimal(5, 2)
+  retentionCapPercent         Decimal?                             @map("retention_cap_percent") @db.Decimal(5, 2)
+  retentionCompletionPercent  Decimal                              @default(50) @map("retention_completion_percent") @db.Decimal(5, 2)
+  dlpMonths                   Int?                                 @map("dlp_months")
   /// Finance TDS nature key (CM-0023 §14); null = no TDS.
-  tdsNature                  String?                              @map("tds_nature")
-  sacCode                    String?                              @map("sac_code") @db.VarChar(8)
-  gstRate                    Decimal?                             @map("gst_rate") @db.Decimal(5, 2)
-  reverseCharge              Boolean                              @default(false) @map("reverse_charge")
-  completedOn                DateTime?                            @map("completed_on") @db.Date
-  decidedAt                  DateTime?                            @map("decided_at") @db.Timestamptz(3)
-  decidedBy                  String?                              @map("decided_by")
-  rejectReason               String?                              @map("reject_reason")
-  closedOn                   DateTime?                            @map("closed_on") @db.Date
-  cancelledOn                DateTime?                            @map("cancelled_on") @db.Date
-  cancelReason               String?                              @map("cancel_reason")
-  createdAt                  DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt                  DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy                  String                               @map("created_by")
-  updatedBy                  String                               @map("updated_by")
-  deletedAt                  DateTime?                            @map("deleted_at") @db.Timestamptz(3)
-  deletedBy                  String?                              @map("deleted_by")
+  tdsNature                   String?                              @map("tds_nature")
+  sacCode                     String?                              @map("sac_code") @db.VarChar(8)
+  gstRate                     Decimal?                             @map("gst_rate") @db.Decimal(5, 2)
+  reverseCharge               Boolean                              @default(false) @map("reverse_charge")
+  /// Paise: the mobilisation advance the terms allow (paid in CM-1108).
+  mobilisationAdvance         BigInt?                              @map("mobilisation_advance")
+  /// % of each bill that recovers the mobilisation advance.
+  mobilisationRecoveryPercent Decimal?                             @map("mobilisation_recovery_percent") @db.Decimal(5, 2)
+  completedOn                 DateTime?                            @map("completed_on") @db.Date
+  decidedAt                   DateTime?                            @map("decided_at") @db.Timestamptz(3)
+  decidedBy                   String?                              @map("decided_by")
+  rejectReason                String?                              @map("reject_reason")
+  closedOn                    DateTime?                            @map("closed_on") @db.Date
+  closeReason                 String?                              @map("close_reason")
+  cancelledOn                 DateTime?                            @map("cancelled_on") @db.Date
+  cancelReason                String?                              @map("cancel_reason")
+  createdAt                   DateTime                             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                   DateTime                             @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy                   String                               @map("created_by")
+  updatedBy                   String                               @map("updated_by")
+  deletedAt                   DateTime?                            @map("deleted_at") @db.Timestamptz(3)
+  deletedBy                   String?                              @map("deleted_by")
 
   lines     ConstructionContractsWorkOrderLine[]
   revisions ConstructionContractsWorkOrderRevision[]
