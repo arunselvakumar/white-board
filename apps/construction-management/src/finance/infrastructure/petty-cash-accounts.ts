@@ -9,6 +9,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   PETTY_CASH_MENU,
@@ -58,13 +59,6 @@ type AccountRow = {
   openingDate: Date;
   createdAt: Date;
 };
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 /**
  * Petty-cash accounts (CM-703, ADR CM-0017 §2, §9): one live account per

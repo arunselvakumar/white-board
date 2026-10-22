@@ -8,6 +8,7 @@ import {
 } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { ProcurementDirectory } from "../application/ports";
 import type {
@@ -66,13 +67,6 @@ export function cursorOrder(backwards: boolean) {
 
 function snapshot(draft: StoreDraft) {
   return { ...draft };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 function nameTaken(): DomainError {

@@ -7,6 +7,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { storedLocationRef } from "@/src/shared-kernel/location-ref";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   EquipmentSheetListParams,
@@ -41,13 +42,6 @@ const fixed = (value: Prisma.Decimal | null, scale: number) =>
 
 const decimal = (value: string | null) =>
   value == null ? null : new Prisma.Decimal(value);
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 function toStored(row: Row): StoredEquipmentSheet {
   return {

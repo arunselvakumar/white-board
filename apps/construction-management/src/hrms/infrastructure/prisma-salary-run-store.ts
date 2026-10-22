@@ -12,6 +12,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   AdvanceDueSource,
@@ -32,12 +33,7 @@ import {
   type SalaryAdvanceTerms,
   type SalaryPayment,
 } from "../domain/salary-slip";
-import {
-  companyToday,
-  isUniqueViolation,
-  lockKey,
-  type Tx,
-} from "./prisma-calendar-support";
+import { companyToday, lockKey, type Tx } from "./prisma-calendar-support";
 
 type SlipRow = Prisma.ConstructionHrmsSalarySlipGetPayload<{
   include: { recoveries: true };

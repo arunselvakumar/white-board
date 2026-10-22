@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import {
@@ -11,6 +11,7 @@ import {
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { Project } from "../domain/project";
 import type {
@@ -171,10 +172,7 @@ async function writeFiles(
 }
 
 function nameInUse(error: unknown): unknown {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  )
+  if (isUniqueViolation(error))
     return conflict(
       "PROJECT_NAME_IN_USE",
       "A Project with this name already exists.",

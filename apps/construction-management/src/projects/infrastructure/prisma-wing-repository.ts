@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { Phase } from "../domain/phase";
 import type { WingRepository } from "../domain/structure-repository";
@@ -12,11 +13,7 @@ import {
   type WingRemovals,
 } from "../domain/wing";
 import type { WingConfig } from "../domain/wing-generator";
-import {
-  createPhaseRow,
-  isUniqueViolation,
-  lockPhase,
-} from "./prisma-phase-repository";
+import { createPhaseRow, lockPhase } from "./prisma-phase-repository";
 
 type Tx = Prisma.TransactionClient;
 

@@ -6,6 +6,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { tombstone } from "@/src/shared-kernel/tombstone";
 
 import type { SiteWorkTx } from "../application/ports";
@@ -93,13 +94,6 @@ function rows(content: SiteDiaryContent) {
       })),
     },
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /**

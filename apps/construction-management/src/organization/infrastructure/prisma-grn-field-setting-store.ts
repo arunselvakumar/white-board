@@ -1,6 +1,7 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { GrnFieldSettingStore } from "../application/grn-field-setting-handlers";
 import {
@@ -79,11 +80,7 @@ export class PrismaGrnFieldSettingStore implements GrnFieldSettingStore {
       });
     } catch (error) {
       // Two first saves racing: the loser hits the workspace primary key.
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
-        throw grnFieldSettingChanged();
+      if (isUniqueViolation(error)) throw grnFieldSettingChanged();
       throw error;
     }
   }

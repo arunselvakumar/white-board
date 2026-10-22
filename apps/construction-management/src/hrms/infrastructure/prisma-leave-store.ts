@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -9,6 +9,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   LedgerFilter,
@@ -254,13 +255,6 @@ const requestChanged = () =>
     "LEAVE_REQUEST_CHANGED",
     "Someone else acted on this request after you opened it. Reload to see what changed.",
   );
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 class PrismaLeaveWork implements LeaveWork {
   constructor(

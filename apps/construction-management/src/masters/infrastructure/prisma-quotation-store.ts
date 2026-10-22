@@ -6,6 +6,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   quotationsLimit,
@@ -15,7 +16,6 @@ import {
 } from "../application/party-quotations";
 import type { PartyKind } from "../domain/party";
 import type { Quotation } from "../domain/quotation";
-import { isUniqueViolation } from "./prisma-lookup-store";
 import { pageOf } from "./prisma-paging";
 
 type Row = Prisma.ConstructionMastersQuotationGetPayload<object>;

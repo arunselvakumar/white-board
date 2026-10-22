@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -11,6 +11,7 @@ import {
   notFound,
 } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   LeaveStructureStore,
@@ -41,13 +42,6 @@ const nameInUse = () =>
     "A leave structure with this name already exists.",
     { kind: "conflict", details: { field: "name" } },
   );
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 function fromRow(row: Row): StoredLeaveStructure {
   return {

@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
@@ -15,6 +15,7 @@ import type {
 import type { DocumentFile, DocumentRemark } from "../domain/document-thread";
 import type { ProcurementDocumentType } from "../domain/documents";
 import { lockDocument } from "./document-locator";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { userNamesInCompany } from "@/src/shared-kernel/user-names";
 
 type FileRow = Prisma.ConstructionProcurementDocumentFileGetPayload<object>;
@@ -53,13 +54,6 @@ function toRemark(row: RemarkRow): DocumentRemark {
     createdAt: row.createdAt,
     createdBy: row.createdBy,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const ofDocument = (

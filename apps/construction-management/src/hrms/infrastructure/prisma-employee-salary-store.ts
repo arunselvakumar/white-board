@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -7,6 +7,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   employeeSalaryChanged,
@@ -234,11 +235,7 @@ export class PrismaEmployeeSalaryStore
       });
     } catch (error) {
       // A row at the same start date written meanwhile.
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
-        throw employeeSalaryChanged(memberIds);
+      if (isUniqueViolation(error)) throw employeeSalaryChanged(memberIds);
       throw error;
     }
   }

@@ -1,6 +1,7 @@
 import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   OtherPartyHandlers,
@@ -52,13 +53,6 @@ function snapshot(party: StoredOtherParty) {
     address: party.address,
     projectIds: party.projectIds,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /** The live Other Party with this name (any case), other than `exceptId`. */

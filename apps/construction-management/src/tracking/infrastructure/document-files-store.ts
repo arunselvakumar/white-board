@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
@@ -6,6 +6,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   StoredTrackingDocumentFile,
@@ -39,13 +40,6 @@ export function toStoredTrackingFile(row: FileRow): StoredTrackingDocumentFile {
 export function liveTrackingFile(row: FileRow): TrackingDocumentFile {
   const { deletedAt: _deletedAt, ...file } = toStoredTrackingFile(row);
   return file;
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 export const ofTrackingDocument = (

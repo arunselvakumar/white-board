@@ -1,11 +1,11 @@
 import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { MasterChange, SupervisorStore } from "../application/ports";
 import { masterChanged, masterNameInUse } from "../domain/master-kind";
 import { Supervisor } from "../domain/supervisor";
-import { isUniqueViolation } from "./prisma-lookup-store";
 
 type Row = Prisma.ConstructionMastersSupervisorGetPayload<object>;
 

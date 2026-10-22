@@ -1,10 +1,11 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   SalesDocumentFileStore,
@@ -51,13 +52,6 @@ const of = (
 ) => ({ workspaceId, documentType, documentId });
 
 const OLDEST_FIRST = [{ createdAt: "asc" as const }, { id: "asc" as const }];
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 /**
  * `construction_sales.document_files` (CM-1003). Each write is one

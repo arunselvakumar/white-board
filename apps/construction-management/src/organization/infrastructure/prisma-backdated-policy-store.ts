@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -9,6 +9,7 @@ import { backdatedPolicyFromRow } from "@/src/shared-kernel/backdated-policy-rea
 import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   BackdatedPolicyStore,
@@ -107,11 +108,7 @@ export class PrismaBackdatedPolicyStore implements BackdatedPolicyStore {
       });
     } catch (error) {
       // Two first saves racing: the loser hits the unique workspace index.
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
-        throw policyChanged();
+      if (isUniqueViolation(error)) throw policyChanged();
       throw error;
     }
   }

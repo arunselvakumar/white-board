@@ -1,7 +1,8 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import {
   SEQUENCE_MODULES,
   isSequenceModuleKey,
@@ -138,10 +139,7 @@ export class PrismaSequenceRuleStore implements SequenceRuleStore {
         });
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
+      if (isUniqueViolation(error))
         throw conflict(
           "SEQUENCE_RULE_EXISTS",
           rule.projectId == null

@@ -1,6 +1,7 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { BillingAddressStore } from "../application/billing-address-handlers";
 import {
@@ -37,13 +38,6 @@ function detailColumns(details: BillingAddressDetails) {
     stateCode: details.stateCode,
     gstin: details.gstin,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const ENTITY = "billing_address";

@@ -1,4 +1,4 @@
-import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
+import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -6,6 +6,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
 import type { ProgressReportNumbers } from "../application/ports";
@@ -24,13 +25,6 @@ async function existing(
     select: { number: true },
   });
   return row?.number ?? null;
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /**

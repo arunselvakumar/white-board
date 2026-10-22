@@ -1,8 +1,9 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   salaryStructureNotFound,
@@ -105,13 +106,6 @@ function structureChanged() {
   return conflict(
     "SALARY_STRUCTURE_CHANGED",
     "Someone else changed this salary structure after you opened it. Reload to see their changes.",
-  );
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
   );
 }
 
