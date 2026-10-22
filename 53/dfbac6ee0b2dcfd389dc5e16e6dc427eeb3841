@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/contracts/advances/advances.http.test.ts
+  s_f49615d4431370::t_4339a45eedf326 1-1114
+apps/construction-management/app/api/construction/contracts/advances/client-advances.http.test.ts
+  s_f49615d4431370::t_1fd48f4ae71dd1 1-621
+apps/construction-management/src/messaging/application/maintenance.ts
+  s_f49615d4431370::t_15b6205603ac06 261-262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "53dfbac6ee0b2dcfd389dc5e16e6dc427eeb3841",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
