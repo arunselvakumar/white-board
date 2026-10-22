@@ -1,0 +1,127 @@
+apps/construction-management/src/finance/infrastructure/document-thread-store.ts
+  s_61253ce157c5bb::t_5f4209dc8a1d41 1,9
+apps/construction-management/src/finance/infrastructure/other-party-store.ts
+  s_61253ce157c5bb::t_a0847a48a63352 4
+apps/construction-management/src/finance/infrastructure/payment-categories.ts
+  s_61253ce157c5bb::t_56dce090da8198 5
+apps/construction-management/src/finance/infrastructure/petty-cash-accounts.ts
+  s_61253ce157c5bb::t_73439a1908217b 12
+apps/construction-management/src/hrms/infrastructure/prisma-attendance-store.ts
+  s_61253ce157c5bb::t_53b8e834a98dd0 16
+apps/construction-management/src/hrms/infrastructure/prisma-branch-store.ts
+  s_61253ce157c5bb::t_a10fc13c91178e 6,10
+apps/construction-management/src/hrms/infrastructure/prisma-calendar-support.ts
+  s_61253ce157c5bb::t_70496797c4acdb 1
+apps/construction-management/src/hrms/infrastructure/prisma-employee-salary-store.ts
+  s_61253ce157c5bb::t_914137fdee649a 1,10,238
+apps/construction-management/src/hrms/infrastructure/prisma-holiday-store.ts
+  s_61253ce157c5bb::t_7f47656b1d0f18 19
+apps/construction-management/src/hrms/infrastructure/prisma-hrms-settings-store.ts
+  s_61253ce157c5bb::t_4097c43cdbf934 1,6,140
+apps/construction-management/src/hrms/infrastructure/prisma-leave-store.ts
+  s_61253ce157c5bb::t_8ed373f98b020b 1,12
+apps/construction-management/src/hrms/infrastructure/prisma-leave-structure-store.ts
+  s_61253ce157c5bb::t_eafc7ea307f4f2 1,14
+apps/construction-management/src/hrms/infrastructure/prisma-leave-type-store.ts
+  s_61253ce157c5bb::t_3aae78a6f9d586 1,6
+apps/construction-management/src/hrms/infrastructure/prisma-salary-run-store.ts
+  s_61253ce157c5bb::t_80a94de7dc4e6b 15,36
+apps/construction-management/src/hrms/infrastructure/prisma-salary-structure-store.ts
+  s_61253ce157c5bb::t_2a942685a8b20d 1,6
+apps/construction-management/src/hrms/infrastructure/prisma-shift-assignment-store.ts
+  s_61253ce157c5bb::t_1a59f76f259dec 11,27
+apps/construction-management/src/hrms/infrastructure/prisma-shift-template-store.ts
+  s_61253ce157c5bb::t_da526dea62f549 6,22
+apps/construction-management/src/labour/infrastructure/labour-attendance-store.ts
+  s_61253ce157c5bb::t_ea25a72e511686 1,19,355
+apps/construction-management/src/labour/infrastructure/prisma-labour-repository.ts
+  s_61253ce157c5bb::t_95e261892ca719 1,11-14,78-80
+apps/construction-management/src/labour/infrastructure/vendor-attendance-store.ts
+  s_61253ce157c5bb::t_855b52f907567d 1,19,283
+apps/construction-management/src/masters/infrastructure/prisma-development-store.ts
+  s_61253ce157c5bb::t_08c8b9af4b9cf0 4,17
+apps/construction-management/src/masters/infrastructure/prisma-lookup-store.ts
+  s_61253ce157c5bb::t_94f5963ed8bc0a 1,4
+apps/construction-management/src/masters/infrastructure/prisma-material-master-stores.ts
+  s_61253ce157c5bb::t_6f840b6b82a982 5
+apps/construction-management/src/masters/infrastructure/prisma-party-store.ts
+  s_61253ce157c5bb::t_426cd111b87af1 4
+apps/construction-management/src/masters/infrastructure/prisma-quotation-store.ts
+  s_61253ce157c5bb::t_1612959abc1357 9
+apps/construction-management/src/masters/infrastructure/prisma-supervisor-store.ts
+  s_61253ce157c5bb::t_22a0a542c54dff 4
+apps/construction-management/src/masters/infrastructure/prisma-tracking-master-store.ts
+  s_61253ce157c5bb::t_c4d12db82da037 4
+apps/construction-management/src/masters/infrastructure/prisma-work-type-store.ts
+  s_61253ce157c5bb::t_dd1455cf5aadcb 4
+apps/construction-management/src/organization/infrastructure/prisma-backdated-policy-store.ts
+  s_61253ce157c5bb::t_7bb5fe48889478 1,12,111
+apps/construction-management/src/organization/infrastructure/prisma-billing-address-store.ts
+  s_61253ce157c5bb::t_d4b85234dfbd8d 1,4
+apps/construction-management/src/organization/infrastructure/prisma-designation-repository.ts
+  s_61253ce157c5bb::t_31c97f6febfe20 5,56
+apps/construction-management/src/organization/infrastructure/prisma-grn-field-setting-store.ts
+  s_61253ce157c5bb::t_8f1dedf9ca866a 1,4,83
+apps/construction-management/src/organization/infrastructure/prisma-sequence-rule-store.ts
+  s_61253ce157c5bb::t_673e75f5c888f4 1,5,142
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_61253ce157c5bb::t_21adf24fd40cd3 1,6,28
+apps/construction-management/src/procurement/infrastructure/document-thread-store.ts
+  s_61253ce157c5bb::t_d53b6011ebf7ad 1,18
+apps/construction-management/src/procurement/infrastructure/store-repository.ts
+  s_61253ce157c5bb::t_cf3dcd5377e292 11
+apps/construction-management/src/projects/infrastructure/prisma-drawing-store.ts
+  s_61253ce157c5bb::t_0bde64de713c84 9
+apps/construction-management/src/projects/infrastructure/prisma-location-repository.ts
+  s_61253ce157c5bb::t_64a76c93a831a8 5
+apps/construction-management/src/projects/infrastructure/prisma-phase-repository.ts
+  s_61253ce157c5bb::t_cc65c948be0c92 5
+apps/construction-management/src/projects/infrastructure/prisma-project-document-store.ts
+  s_61253ce157c5bb::t_333873443be616 9
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_61253ce157c5bb::t_c302b7d795c5d3 1,14,175
+apps/construction-management/src/projects/infrastructure/prisma-testing-report-store.ts
+  s_61253ce157c5bb::t_74a5c7b2cc9080 23
+apps/construction-management/src/projects/infrastructure/prisma-wing-repository.ts
+  s_61253ce157c5bb::t_3f1be973778fb2 5,16
+apps/construction-management/src/sales/infrastructure/document-files-store.ts
+  s_61253ce157c5bb::t_0ae1a396cad36f 1,8
+apps/construction-management/src/sales/infrastructure/prisma-booking-store.ts
+  s_61253ce157c5bb::t_b10df75f0ee445 9
+apps/construction-management/src/sales/infrastructure/sales-list-store.ts
+  s_61253ce157c5bb::t_ad5e8218386462 3-4
+apps/construction-management/src/site-work/infrastructure/document-thread-store.ts
+  s_61253ce157c5bb::t_e23a1cc46fffe4 1,9
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-sheet-store.ts
+  s_61253ce157c5bb::t_7bff497dfb6f3f 10
+apps/construction-management/src/site-work/infrastructure/prisma-equipment-store.ts
+  s_61253ce157c5bb::t_ef606d1ae3bb05 8
+apps/construction-management/src/site-work/infrastructure/prisma-progress-report-numbers.ts
+  s_61253ce157c5bb::t_a15630aaa687df 1,9
+apps/construction-management/src/site-work/infrastructure/prisma-site-diary-store.ts
+  s_61253ce157c5bb::t_39af9ea2621f0f 9
+apps/construction-management/src/tracking/infrastructure/document-files-store.ts
+  s_61253ce157c5bb::t_c1326c77259043 1,9
+apps/construction-management/eslint.config.js
+  s_61253ce157c5bb::t_2c8e542680b1f4 109-125,147
+apps/construction-management/src/shared-kernel/prisma-errors.test.ts
+  s_61253ce157c5bb::t_1b5478cd9a7e76 1-58
+apps/construction-management/src/shared-kernel/prisma-errors.ts
+  s_61253ce157c5bb::t_0f968308df4768 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "047d63dcfd33d6567676d86fb5d91da879e687c0",
+  "prompts": {},
+  "sessions": {
+    "s_61253ce157c5bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bcd3895c-10e0-4062-a2ac-b643386fd66f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
