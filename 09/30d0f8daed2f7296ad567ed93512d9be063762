@@ -1,0 +1,39 @@
+apps/construction-management/src/contracts/domain/advance.test.ts
+  s_f49615d4431370::t_c7d2183101fdb1 1-472
+apps/construction-management/src/contracts/domain/advance.ts
+  s_f49615d4431370::t_12ffa2ff0cb98c 1-843
+apps/construction-management/src/contracts/domain/client-bill.test.ts
+  s_f49615d4431370::t_cc1a9361a5b7f6 117,120
+apps/construction-management/src/contracts/domain/client-bill.ts
+  s_f49615d4431370::t_17dcfe781e0136 61-63,68,167
+apps/construction-management/src/contracts/domain/contractor-bill.test.ts
+  s_f49615d4431370::t_6822ab51a5573b 304,307-326
+apps/construction-management/src/contracts/domain/contractor-bill.ts
+  s_f49615d4431370::t_addfde6b2a4f29 85-88,93,252
+apps/construction-management/src/contracts/domain/ra-bill.ts
+  s_f49615d4431370::t_21b965090b87cc 343-344,351,417-421
+packages/db/construction/prisma/migrations/20261023090000_construction_contracts_retention_release_invoice/migration.sql
+  s_f49615d4431370::t_59e8fad9b7cf6f 1-38
+packages/db/construction/prisma/migrations/20261023090100_construction_finance_retention_release_origin/migration.sql
+  s_f49615d4431370::t_0a38e0635ef167 1-35
+packages/db/construction/prisma/schema/construction-contracts.prisma
+  s_f49615d4431370::t_4f89a8f52e1722 797,844-848,856
+packages/db/construction/prisma/schema/construction-finance.prisma
+  s_f49615d4431370::t_c3bb767e57d002 181-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0930d0f8daed2f7296ad567ed93512d9be063762",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
