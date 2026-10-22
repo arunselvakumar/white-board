@@ -504,6 +504,8 @@ describe("Contractor Bills (CM-1106)", () => {
     expect(suggestions).toEqual({
       retention: expect.objectContaining({ suggested: 345_00 }) as unknown,
       mobilisationRecovery: null,
+      // No advance on the Work Order: nothing to recover (CM-1108).
+      recoveries: [],
     });
 
     // Delete frees the rows.
