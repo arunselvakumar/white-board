@@ -1155,19 +1155,19 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 
 ### M11 (1/3) — Contract billing
 
-| ID      | Seq | Title                                                                                                                          | Status | Blocked by                | Area           |
-| ------- | --: | ------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------- | -------------- |
-| CM-1101 |   1 | ADR CM-0023; `construction_contracts` schema; Clients master; Project Client and Role; menus, Contracts modules, access, ports | done   | CM-1008                   | Data+Domain    |
-| CM-1102 |   2 | Item library with rate analysis; Excel import and sample                                                                       | done   | CM-1101                   | Domain+HTTP+UI |
-| CM-1103 |   3 | Project BOQ: sections, items, import; Variations and deviations                                                                | done   | CM-1102                   | Domain+HTTP+UI |
-| CM-1104 |   4 | Work Orders: BOQ and non-BOQ lines, terms, approval, amendments, PDF                                                           | done   | CM-1103                   | Domain+HTTP+UI |
-| CM-1105 |   5 | Measurement Book: sheets, rows, joint measurement (check), locking                                                             | done   | CM-1104                   | Domain+HTTP+UI |
-| CM-1106 |   6 | Contractor bills (inward RA bills): deductions, approval → payable invoice, retention held, reverse, PDF                       | done   | CM-1105                   | Domain+HTTP+UI |
-| CM-1107 |   7 | Client bills (outward RA bills): place of supply, client retention, approval → receivable invoice, receipts with client TDS    | done   | CM-1105                   | Domain+HTTP+UI |
-| CM-1108 |   8 | Advances, bank guarantees, retention release, DLP; expiry notices                                                              | done   | CM-1106, CM-1107          | Domain+HTTP+UI |
-| CM-1109 |   9 | Price indices and escalation bills (10CC / 10CA)                                                                               | todo   | CM-1106, CM-1107          | Domain+HTTP+UI |
-| CM-1110 |  10 | Material reconciliation per work order per bill; recovery on the next bill                                                     | todo   | CM-1106                   | Domain+HTTP+UI |
-| CM-1111 |  11 | Contracts reports, Project Dashboard section, backups                                                                          | todo   | CM-1108, CM-1109, CM-1110 | HTTP+UI        |
+| ID      | Seq | Title                                                                                                                          | Status      | Blocked by                | Area           |
+| ------- | --: | ------------------------------------------------------------------------------------------------------------------------------ | ----------- | ------------------------- | -------------- |
+| CM-1101 |   1 | ADR CM-0023; `construction_contracts` schema; Clients master; Project Client and Role; menus, Contracts modules, access, ports | done        | CM-1008                   | Data+Domain    |
+| CM-1102 |   2 | Item library with rate analysis; Excel import and sample                                                                       | done        | CM-1101                   | Domain+HTTP+UI |
+| CM-1103 |   3 | Project BOQ: sections, items, import; Variations and deviations                                                                | done        | CM-1102                   | Domain+HTTP+UI |
+| CM-1104 |   4 | Work Orders: BOQ and non-BOQ lines, terms, approval, amendments, PDF                                                           | done        | CM-1103                   | Domain+HTTP+UI |
+| CM-1105 |   5 | Measurement Book: sheets, rows, joint measurement (check), locking                                                             | done        | CM-1104                   | Domain+HTTP+UI |
+| CM-1106 |   6 | Contractor bills (inward RA bills): deductions, approval → payable invoice, retention held, reverse, PDF                       | done        | CM-1105                   | Domain+HTTP+UI |
+| CM-1107 |   7 | Client bills (outward RA bills): place of supply, client retention, approval → receivable invoice, receipts with client TDS    | done        | CM-1105                   | Domain+HTTP+UI |
+| CM-1108 |   8 | Advances, bank guarantees, retention release, DLP; expiry notices                                                              | done        | CM-1106, CM-1107          | Domain+HTTP+UI |
+| CM-1109 |   9 | Price indices and escalation bills (10CC / 10CA)                                                                               | in_progress | CM-1106, CM-1107          | Domain+HTTP+UI |
+| CM-1110 |  10 | Material reconciliation per work order per bill; recovery on the next bill                                                     | todo        | CM-1106                   | Domain+HTTP+UI |
+| CM-1111 |  11 | Contracts reports, Project Dashboard section, backups                                                                          | todo        | CM-1108, CM-1109, CM-1110 | HTTP+UI        |
 
 ### M11 (2/3) — GST and TDS
 

@@ -204,6 +204,17 @@ enum ConstructionContractsEscalationComponent {
   @@schema("construction_contracts")
 }
 
+/// How an escalation component is worked out (CM-1109): `weighted` is the
+/// 10CC share of the value of work; `quantity` is 10CA, quantity × base
+/// price × the index change (cement and steel).
+enum ConstructionContractsEscalationBasis {
+  weighted
+  quantity
+
+  @@map("escalation_basis")
+  @@schema("construction_contracts")
+}
+
 /// Company-wide contracts settings (CM-0023 §4).
 model ConstructionContractsSettings {
   workspaceId           String   @id @map("workspace_id")
@@ -755,12 +766,15 @@ model ConstructionContractsBillDeduction {
   amount      BigInt
   /// Recoveries name the advance they recover.
   advanceId   String?                            @map("advance_id") @db.Uuid
+  /// An "other" deduction recovering a negative escalation bill (CM-1109).
+  escalationBillId String?                       @map("escalation_bill_id") @db.Uuid
   position    Int
 
   bill ConstructionContractsBill @relation(fields: [billId], references: [id], onDelete: Cascade)
 
   @@index([billId, position])
   @@index([workspaceId, advanceId])
+  @@index([workspaceId, escalationBillId])
   @@map("bill_deductions")
   @@schema("construction_contracts")
 }
@@ -911,6 +925,10 @@ model ConstructionContractsEscalationClauseComponent {
   component     ConstructionContractsEscalationComponent
   weightPercent Decimal                                  @map("weight_percent") @db.Decimal(5, 2)
   series        String
+  /// 10CC weight (`weighted`, the default) or 10CA quantity × base price (CM-1109).
+  basis         ConstructionContractsEscalationBasis     @default(weighted)
+  /// `quantity` basis: paise per unit at the base month (CM-1109).
+  basePrice     BigInt?                                  @map("base_price")
 
   clause ConstructionContractsEscalationClause @relation(fields: [clauseId], references: [id], onDelete: Cascade)
 
