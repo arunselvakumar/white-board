@@ -108,7 +108,7 @@ Both kinds work the same way:
 
 When a **contractor bill** is approved, it creates a **payable invoice** in finance (origin `ra_bill`). The invoice amount is the bill's net: gross + GST payable (none under reverse charge) − retention − recoveries. **Retention held** is kept in contracts, derived from the retention deductions of approved bills less releases, and shown on the Contractor Bills page and the Work Order. It is not a party-ledger entry: finance sums the party ledger in many places (balances, statements, central payments, dues, reports), and a new entry kind would change all of them. The Contractor's finance balance is therefore what is owed now, and a release (§8, CM-1108) creates the payable for what it releases. (Amended by CM-1106.)
 
-When a **client bill** is approved, it creates a **receivable invoice** to the Client in the same way. Retention the client holds goes to **retention receivable**. The bill carries the place of supply (§11) and can be exported for an e-invoice (§13).
+When a **client bill** is approved, it creates a **receivable invoice** to the Client in the same way, for the net. Retention the client holds is **retention receivable**, derived in contracts from approved client bills less releases like retention held, and shown on the Client Bills page and the Client's balance. The bill carries the place of supply (§11) and can be exported for an e-invoice (§13). (Amended by CM-1107.)
 
 Every bill has a PDF with three parts: an abstract, the measurement detail and the deductions.
 

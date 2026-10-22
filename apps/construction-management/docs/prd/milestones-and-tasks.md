@@ -1259,7 +1259,7 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 
 - The same bill engine on the client side, from the BOQ: place of supply the Project's state, the Company GSTIN for that state (`GSTIN_NOT_IN_STATE` warning), CGST/SGST or IGST.
 - Finance party type `client` (enum value, `PartyType`, API models, balances, statements, reports); the Client appears in Parties.
-- Approval creates the receivable invoice to the Client and posts retention receivable.
+- Approval creates the receivable invoice to the Client for the net; retention receivable is worked out in contracts (approved retention − releases) and shown on the Client Bills page and the Client's balance, like CM-1106's retention held, because finance's balance sums don't filter by entry kind (spec, CM-1107).
 - Receipts from Clients record TDS deducted by the client and GST-TDS 2 %; the Client's balance shows due, retention receivable and TDS receivable.
 - Client Bills list, bill page, tax-invoice PDF (GSTIN, place of supply, SAC, tax split).
 - HTTP tests; stories.

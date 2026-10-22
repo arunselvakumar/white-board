@@ -310,7 +310,7 @@ export const ClientReceivablesAndBillInvoice: Story = {
     await expect(figures.getByText("₹6,89,932.04")).toBeVisible();
     await expect(figures.getByText("₹61,055.93")).toBeVisible();
     await expect(figures.getAllByText("₹13,798.64")).toHaveLength(2);
-    await expect(canvas.getByText("owed by the Client")).toBeVisible();
+    await expect(canvas.getByText(/owed by the Client/)).toBeVisible();
     await expect(
       canvas.queryByRole("button", { name: "New invoice" }),
     ).toBeNull();
