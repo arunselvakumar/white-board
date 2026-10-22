@@ -244,7 +244,7 @@ export function TeamMemberDetailsFields({
           <Input
             id="member-email"
             type="email"
-            placeholder="prabhu@example.in"
+            placeholder="example@example.com"
             className="h-10"
             aria-describedby="member-email-hint"
             {...form.register("email")}

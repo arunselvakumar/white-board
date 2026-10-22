@@ -1,8 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 
-import { BrandMark } from "@/components/app-shell/brand-mark";
-
 import { AUTH_PHOTOS, type AuthPhoto, unsplashUrl } from "./auth-photos";
 
 /** The brand half of the split layout: a site photo under the tagline. */
@@ -30,7 +28,6 @@ export function AuthBrandPanel({
         className="absolute inset-0 bg-linear-to-t from-[#100e22]/90 via-[#100e22]/35 to-[#100e22]/5"
       />
       <div className="relative space-y-4 p-12 pb-16 text-white">
-        <BrandMark className="size-11 rounded-xl" />
         <p className="max-w-md text-3xl leading-tight font-light">
           Every site, every bag of cement, every day&apos;s labour — in one
           place.
