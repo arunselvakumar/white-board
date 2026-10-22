@@ -1,0 +1,73 @@
+apps/construction-management/app/app/projects/[id]/client-bills/[billId]/page.tsx
+  s_f49615d4431370::t_6a4dac28dcc455 1-27
+apps/construction-management/app/app/projects/[id]/client-bills/page.tsx
+  s_f49615d4431370::t_ae3c2b2f6ece3a 3-5,9-21
+apps/construction-management/app/app/projects/[id]/payments/clients/[partyId]/page.tsx
+  s_f49615d4431370::t_2c849a0fecb993 1-23
+apps/construction-management/app/app/projects/[id]/payments/clients/page.tsx
+  s_f49615d4431370::t_780114eef859ff 1-15
+apps/construction-management/app/app/projects/[id]/payments/clients/pay/page.tsx
+  s_f49615d4431370::t_8f885fc4548acf 1-25
+apps/construction-management/app/app/projects/[id]/payments/clients/payments/[paymentId]/page.tsx
+  s_f49615d4431370::t_51633f58617829 1-29
+apps/construction-management/components/contracts/client-bills/client-bill-detail.tsx
+  s_f49615d4431370::t_35df9d964c0362 1-694
+apps/construction-management/components/contracts/client-bills/client-bill-editor.tsx
+  s_f49615d4431370::t_d876261b5e1864 1-335
+apps/construction-management/components/contracts/client-bills/client-bill-form-schema.ts
+  s_f49615d4431370::t_79cb46c6ab011f 1-113
+apps/construction-management/components/contracts/client-bills/client-bill-format.ts
+  s_f49615d4431370::t_323038297bffa7 1-22
+apps/construction-management/components/contracts/client-bills/client-bill-setup.tsx
+  s_f49615d4431370::t_e0ac7b1e76148e 1-84
+apps/construction-management/components/contracts/client-bills/client-bills-list.tsx
+  s_f49615d4431370::t_b6e90b9394487d 1-388
+apps/construction-management/components/contracts/client-bills/client-bills-skeletons.tsx
+  s_f49615d4431370::t_7506cc8c5cd15b 1-54
+apps/construction-management/components/contracts/client-bills/client-contract-terms.tsx
+  s_f49615d4431370::t_df1af9abcde867 1-329
+apps/construction-management/components/contracts/client-bills/new-client-bill-dialog.tsx
+  s_f49615d4431370::t_be0bc5b7382f85 1-183
+apps/construction-management/components/contracts/contracts-coming-soon.tsx
+  s_f49615d4431370::t_1690a1773f500f 14-16
+apps/construction-management/components/finance/parties/client-receivables.tsx
+  s_f49615d4431370::t_0d6f29d5a0cce9 1-64
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_f49615d4431370::t_73a2e4bbaebed0 140-147,158,160
+apps/construction-management/components/finance/parties/party-balances.tsx
+  s_f49615d4431370::t_139d6503608938 66-78,81-92,113-114,125-127,137-140,186,193,196,211,238-240,242,256,264,270,276-279
+apps/construction-management/components/finance/parties/party-money-page.tsx
+  s_f49615d4431370::t_fcbcd09d5b901d 22,78-82,89-105,107-111,125-129
+apps/construction-management/components/finance/parties/party-money-tab.tsx
+  s_f49615d4431370::t_e22af1bf08494e 28-32,84-97,99
+apps/construction-management/components/finance/parties/party-money.ts
+  s_f49615d4431370::t_86fedd605e5c07 14,17-22,32,40,48-56
+apps/construction-management/components/finance/parties/party-payment-detail.tsx
+  s_f49615d4431370::t_26a9ccb32277fe 107-117
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_f49615d4431370::t_a75ecbf86c5f4c 91-93,99-105,168,223,232-238,287-288,305,350-355,411,561-565,678-728
+apps/construction-management/components/finance/payments-hub/payments-tabs.ts
+  s_f49615d4431370::t_8d896016103468 20
+apps/construction-management/src/finance/infrastructure/party-payment-receipt-pdf.ts
+  s_f49615d4431370::t_cc9d97888b4052 335-343,347
+apps/construction-management/src/queries/contracts-client-bills.ts
+  s_f49615d4431370::t_d72d2999f9bf5b 1-198
+apps/construction-management/src/queries/finance-parties.ts
+  s_f49615d4431370::t_af2766ed6a50e6 45-46,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6364515daa3365ab5ae3fcf64c7937a6b0998c22",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
