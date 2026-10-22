@@ -198,3 +198,17 @@ export type InboundWorkOrderIssued = DomainEvent & {
   contractorName: string;
   by: string;
 };
+
+// Contracts (CM-1105, ADR CM-0023 §6).
+export type InboundMeasurementSubmitted = DomainEvent & {
+  type: "MeasurementSubmitted";
+  sheetId: string;
+  projectId: string;
+  side: "client" | "contractor";
+  measuredOn: string;
+  title: string | null;
+  workOrderNumber: string | null;
+  partyName: string | null;
+  rowCount: number;
+  by: string;
+};

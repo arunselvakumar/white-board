@@ -74,6 +74,11 @@ export const NOTIFICATION_KINDS = {
   "inquiry.follow_ups_due": { menu: "sales.inquiries", flag: "read" },
   // Contracts (CM-1104): Work Order Read + Notification holders on the Project.
   "work_order.issued": { menu: "contracts.work_orders", flag: "read" },
+  // Contracts (CM-1105): Measurement Book Approve + Notification holders.
+  "measurement.submitted": {
+    menu: "contracts.measurements",
+    flag: "approve",
+  },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;
@@ -262,6 +267,9 @@ export const LINKS = {
   // Contracts (CM-1104)
   workOrder: (projectId: string, id: string) =>
     `/app/projects/${projectId}/work-orders/${id}`,
+  // Contracts (CM-1105)
+  measurement: (projectId: string, id: string) =>
+    `/app/projects/${projectId}/measurements/${id}`,
 } as const;
 
 // ---------------------------------------------------------------------------

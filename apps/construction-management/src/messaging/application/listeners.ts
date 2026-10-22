@@ -36,7 +36,8 @@ import type {
   // Sales (CM-1004)
   InboundImportedInquiriesAssigned,
   InboundInquiryAssigned,
-  // Contracts (CM-1104)
+  // Contracts (CM-1104, CM-1105)
+  InboundMeasurementSubmitted,
   InboundWorkOrderIssued,
 } from "./inbound-events";
 import type { Notifier } from "./notifier";
@@ -178,6 +179,8 @@ export class NotificationListeners implements DomainEventListener {
       // Contracts (CM-1104)
       case "WorkOrderIssued":
         return this.workOrderIssued(event as InboundWorkOrderIssued);
+      case "MeasurementSubmitted":
+        return this.measurementSubmitted(event as InboundMeasurementSubmitted);
       default:
         return [];
     }
@@ -933,6 +936,46 @@ export class NotificationListeners implements DomainEventListener {
           projectId: event.projectId,
           href: LINKS.workOrder(event.projectId, event.workOrderId),
           sourceKey: key(event, "work_order.issued", event.workOrderId),
+        },
+      },
+    ];
+  }
+
+  /**
+   * `measurement.submitted` (CM-1105): a sheet waits for its joint
+   * measurement. To Measurement Book Approve + N holders on the Project,
+   * never the submitter.
+   */
+  private async measurementSubmitted(
+    event: InboundMeasurementSubmitted,
+  ): Promise<Plan[]> {
+    const project = await this.projectName(event, event.projectId);
+    const at = project == null ? "" : ` in ${project}`;
+    const [year, month, day] = event.measuredOn.split("-");
+    const date = `${day ?? ""}/${month ?? ""}/${year ?? ""}`;
+    const side =
+      event.side === "client"
+        ? "Client"
+        : `Contractor${event.workOrderNumber == null ? "" : ` (${event.workOrderNumber})`}`;
+    const rows = `${String(event.rowCount)} ${event.rowCount === 1 ? "row" : "rows"}`;
+    const party = event.partyName == null ? "" : ` with ${event.partyName}`;
+    return [
+      {
+        audience: {
+          kind: "holders",
+          menu: "contracts.measurements",
+          flag: "approve",
+          projectId: event.projectId,
+        },
+        except: event.by,
+        draft: {
+          type: "measurement.submitted",
+          title: `Measurement sheet of ${date} is ready to check`,
+          body: `${side} side${party}${at}: ${event.title == null ? rows : `${event.title}, ${rows}`}.`,
+          menu: "contracts.measurements",
+          projectId: event.projectId,
+          href: LINKS.measurement(event.projectId, event.sheetId),
+          sourceKey: key(event, "measurement.submitted", event.sheetId),
         },
       },
     ];
