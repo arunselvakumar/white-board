@@ -51,7 +51,7 @@ export const WorkOrderPanels: Story = {
       await canvas.findByRole("region", { name: "Advances given" }),
     );
     await expect(
-      advances.getByText("Mobilisation advance · 1 Sep 2026"),
+      advances.getByText(/^Mobilisation advance · 1 Sept? 2026$/),
     ).toBeVisible();
     await expect(
       advances.getByText("Recovered ₹40,000.00 · Balance ₹60,000.00"),

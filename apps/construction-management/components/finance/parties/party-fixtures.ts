@@ -856,6 +856,7 @@ export function partyMoneyHandler(
         CONTRACTOR_INVOICE,
         SALES_INVOICE,
         CLIENT_INVOICE,
+        CLIENT_RELEASE_INVOICE,
       ].find((item) => item.id === one[1]);
       return found == null
         ? Response.json(

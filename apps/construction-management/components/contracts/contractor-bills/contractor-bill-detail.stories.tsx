@@ -147,7 +147,7 @@ export const DraftWithRecovery: Story = {
       await canvas.findByRole("region", { name: "Advance recoveries" }),
     );
     await expect(
-      panel.getByText("Mobilisation advance of 1 Sep 2026 (₹50,000.00)"),
+      panel.getByText(/^Mobilisation advance of 1 Sept? 2026 \(₹50,000\.00\)$/),
     ).toBeVisible();
     await expect(
       panel.getByText(
@@ -157,7 +157,7 @@ export const DraftWithRecovery: Story = {
     await userEvent.click(panel.getByRole("button", { name: "Use ₹9,460.00" }));
     await expect(
       canvas.getByLabelText("Deduction 2 advance"),
-    ).toHaveTextContent("Mobilisation advance of 1 Sep 2026 (₹50,000.00)");
+    ).toHaveTextContent(/Mobilisation advance of 1 Sept? 2026 \(₹50,000\.00\)/);
     await expect(canvas.getByLabelText("Deduction 2 amount")).toHaveValue(
       "9460",
     );
@@ -345,7 +345,9 @@ export const ApprovedWithInvoice: Story = {
       ),
     ).toBeVisible();
     await expect(
-      canvas.getByText("Mobilisation advance recovery (10 % of the gross)"),
+      canvas.getByText(
+        /^Mobilisation advance recovery — Mobilisation advance of 1 Sept? 2026 \(₹50,000\.00\)$/,
+      ),
     ).toBeVisible();
     await expect(canvas.getByText("₹7,130.00")).toBeVisible();
     await expect(
