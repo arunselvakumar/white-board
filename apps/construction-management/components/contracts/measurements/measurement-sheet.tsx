@@ -134,7 +134,7 @@ export function MeasurementSheetPage({
         }
         actions={
           <>
-            {allowed.submit ? (
+            {allowed.submit && !editing ? (
               <Button
                 type="button"
                 size="sm"
@@ -246,6 +246,10 @@ export function MeasurementSheetPage({
           sheet={sheet}
           today={today}
           onSaved={() => undefined}
+          submitting={command.isPending}
+          onSubmitForChecking={(expectedUpdatedAt) => {
+            run({ kind: "submit", expectedUpdatedAt });
+          }}
         />
       ) : (
         <>

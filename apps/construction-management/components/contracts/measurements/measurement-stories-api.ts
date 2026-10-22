@@ -59,6 +59,18 @@ export function serveMeasurements(
         case `${MEASUREMENTS_API}/form-options`:
           return Response.json(FORM_OPTIONS);
         case `${MEASUREMENTS_API}/quantities`:
+          // As the API answers: the contractor side needs its Work Order.
+          if (
+            url.searchParams.get("side") === "contractor" &&
+            url.searchParams.get("workOrderId") == null
+          )
+            return Response.json(
+              {
+                code: "MEASUREMENT_WORK_ORDER_REQUIRED",
+                message: "Pick the Work Order measured.",
+              },
+              { status: 400 },
+            );
           return Response.json(
             quantitiesOf(
               url.searchParams.get("side") === "contractor"
@@ -119,3 +131,13 @@ export const PHONE_375 = {
   },
   globals: { viewport: { value: "phone375", isRotated: false } },
 } as const;
+
+/** Every request so far to `pathname` (any query). */
+export function requested(
+  api: MeasurementStoryApi | null,
+  pathname: string,
+): string[] {
+  return (api?.calls.mock.calls ?? [])
+    .map(([call]) => call.path)
+    .filter((path) => path.split("?")[0] === pathname);
+}

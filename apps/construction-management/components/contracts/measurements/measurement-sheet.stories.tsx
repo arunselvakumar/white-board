@@ -301,3 +301,95 @@ export const PhoneRows: Story = {
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };
+
+const SAVED_AT = "2026-10-20T07:00:00.000Z";
+
+const saveFirst = serveMeasurements({
+  sheet: sheetOf(),
+  write: (call) =>
+    call.path.endsWith("/update")
+      ? Response.json(sheetOf({ updatedAt: SAVED_AT }))
+      : call.path.endsWith("/submit")
+        ? Response.json(submittedSheet())
+        : undefined,
+});
+
+/**
+ * With unsaved rows, Submit saves them first and then submits the sheet
+ * as saved (its new `updatedAt`), so stale rows are never submitted.
+ */
+export const SubmitSavesFirst: Story = {
+  beforeEach: saveFirst.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Measurement sheet" }),
+    );
+    await expect(
+      form.getByRole("button", { name: "Submit for checking" }),
+    ).toBeVisible();
+    // Only the form offers Submit while the draft is editable.
+    await expect(
+      canvas.getAllByRole("button", { name: /submit for checking/i }),
+    ).toHaveLength(1);
+    const nos = form.getByLabelText("Row 1 nos");
+    await userEvent.clear(nos);
+    await userEvent.type(nos, "5");
+    await userEvent.click(
+      form.getByRole("button", { name: "Save and submit for checking" }),
+    );
+    await waitFor(() =>
+      expect(
+        posted(saveFirst.holder.current, `${MEASUREMENTS_API}/${SHEET}/submit`),
+      ).toEqual({ expectedUpdatedAt: SAVED_AT }),
+    );
+    const posts = (saveFirst.holder.current?.calls.mock.calls ?? [])
+      .map(([call]) => call)
+      .filter((call) => call.method === "POST")
+      .map((call) => call.path);
+    await expect(posts).toEqual([
+      `${MEASUREMENTS_API}/${SHEET}/update`,
+      `${MEASUREMENTS_API}/${SHEET}/submit`,
+    ]);
+    await expect(
+      posted(saveFirst.holder.current, `${MEASUREMENTS_API}/${SHEET}/update`),
+    ).toMatchObject({
+      expectedUpdatedAt: "2026-10-20T06:00:00.000Z",
+      rows: [{ nos: "5" }, {}, {}, {}],
+    });
+  },
+};
+
+const saveFails = serveMeasurements({
+  sheet: sheetOf(),
+  write: (call) =>
+    call.path.endsWith("/update")
+      ? Response.json(
+          {
+            code: "MEASUREMENT_CHANGED",
+            message:
+              "Someone changed this measurement sheet after you opened it. Reload to see the latest.",
+          },
+          { status: 409 },
+        )
+      : undefined,
+});
+
+/** When that save fails, nothing is submitted and the reason is shown. */
+export const SubmitStopsWhenSaveFails: Story = {
+  beforeEach: saveFails.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const form = within(
+      await canvas.findByRole("form", { name: "Measurement sheet" }),
+    );
+    await userEvent.type(form.getByLabelText("Row 2 nos"), "2");
+    await userEvent.click(
+      form.getByRole("button", { name: "Save and submit for checking" }),
+    );
+    await expect(
+      await form.findByText(/Someone changed this measurement sheet/),
+    ).toBeVisible();
+    await expect(
+      posted(saveFails.holder.current, `${MEASUREMENTS_API}/${SHEET}/submit`),
+    ).toBeUndefined();
+  },
+};

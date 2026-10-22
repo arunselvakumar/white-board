@@ -146,12 +146,22 @@ export function MeasurementForm({
   sheet,
   today = localToday(),
   onSaved,
+  onSubmitForChecking,
+  submitting = false,
 }: {
   projectId: string;
   side: Side;
   sheet: MeasurementSheet | null;
   today?: string;
   onSaved?: (saved: MeasurementSheet) => void;
+  /**
+   * A draft's "Submit for checking": called with the `updatedAt` of the
+   * sheet as saved. With unsaved changes the form saves them first and
+   * calls it only when that save succeeds, so stale rows are never
+   * submitted.
+   */
+  onSubmitForChecking?: (expectedUpdatedAt: string) => void;
+  submitting?: boolean;
 }) {
   const router = useRouter();
   const { data: options } = useSuspenseQuery(
@@ -164,7 +174,7 @@ export function MeasurementForm({
     handleSubmit,
     setValue,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<MeasurementValues>({
     resolver: zodResolver(schema),
     defaultValues:
@@ -190,14 +200,16 @@ export function MeasurementForm({
     () => new Map(items.map((item) => [item.id, item])),
     [items],
   );
-  const measured = useQuery(
-    measurementQuantitiesQuery(
+  const enabled = side === "client" || workOrderId !== "";
+  // The contractor side's quantities need the Work Order: no request before.
+  const measured = useQuery({
+    ...measurementQuantitiesQuery(
       projectId,
       side,
-      side === "contractor" ? workOrderId || null : null,
+      side === "contractor" && workOrderId !== "" ? workOrderId : null,
     ),
-  ).data;
-  const enabled = side === "client" || workOrderId !== "";
+    enabled,
+  }).data;
   const planned = new Map(
     items.map((item) => [item.id, measurementNumber(item.quantity) ?? 0n]),
   );
@@ -284,6 +296,31 @@ export function MeasurementForm({
       { ...body, expectedUpdatedAt: sheet.updatedAt },
       { onSuccess: done, onError: failed },
     );
+  };
+
+  /** Saves unsaved changes first (stopping if that fails), then submits. */
+  const submitForChecking = (values: MeasurementValues) => {
+    if (sheet == null || onSubmitForChecking == null) return;
+    setFailure(undefined);
+    if (!isDirty) {
+      onSubmitForChecking(sheet.updatedAt);
+      return;
+    }
+    // `mutateAsync`, not `mutate`'s callbacks: the save reloads the sheet,
+    // which starts this form again, and the submit must still follow.
+    update
+      .mutateAsync({
+        ...measurementBody(side, values),
+        expectedUpdatedAt: sheet.updatedAt,
+      })
+      .then(
+        (saved) => {
+          onSubmitForChecking(saved.updatedAt);
+        },
+        (error: unknown) => {
+          failed(error);
+        },
+      );
   };
 
   const placingRow = placing == null ? null : rows[placing];
@@ -650,6 +687,9 @@ export function MeasurementForm({
 
       <MeasurementCumulative
         side={side}
+        waiting={
+          enabled ? null : "Pick the Work Order to see each line’s total."
+        }
         items={cumulative}
         limit={measured?.deviationLimitPercent ?? null}
         deviationsHref={`/app/projects/${projectId}/boq?tab=deviations`}
@@ -660,6 +700,22 @@ export function MeasurementForm({
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : sheet == null ? "Save draft" : "Save changes"}
         </Button>
+        {sheet != null && onSubmitForChecking != null ? (
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending || submitting || rows.length === 0}
+            onClick={() => {
+              void handleSubmit(submitForChecking)();
+            }}
+          >
+            {submitting
+              ? "Submitting…"
+              : isDirty
+                ? "Save and submit for checking"
+                : "Submit for checking"}
+          </Button>
+        ) : null}
         <Link
           href={
             sheet == null

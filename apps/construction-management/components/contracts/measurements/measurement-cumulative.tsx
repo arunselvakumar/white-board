@@ -34,12 +34,15 @@ export function MeasurementCumulative({
   items,
   limit,
   deviationsHref,
+  waiting = null,
 }: {
   side: Side;
   items: readonly CumulativeItem[];
   /** The Company's deviation limit, `"25.00"` (client side). */
   limit: string | null;
   deviationsHref: string;
+  /** Why nothing can be totalled yet (no Work Order picked). */
+  waiting?: string | null;
 }) {
   const planned = side === "client" ? "BOQ qty" : "WO qty";
   return (
@@ -57,7 +60,9 @@ export function MeasurementCumulative({
             : "Checked sheets plus this one, against each Work Order line. A bill refuses more than the Work Order holds: amend it first."}
         </p>
       </div>
-      {items.length === 0 ? (
+      {waiting != null ? (
+        <p className="text-muted-foreground text-sm">{waiting}</p>
+      ) : items.length === 0 ? (
         <p className="text-muted-foreground text-sm">
           Add a row to see each item’s total.
         </p>
