@@ -168,6 +168,8 @@ enum ConstructionFinanceInvoiceOrigin {
   manual
   /// Created from a GRN posted with an invoice number (CM-0017 §13).
   goods_receipt
+  /// Created by an approved Contractor Bill (CM-1106, CM-0023 §7); read-only.
+  ra_bill
 
   @@map("invoice_origin")
   @@schema("construction_finance")
@@ -521,6 +523,8 @@ model ConstructionFinanceInvoice {
   storeId       String?                             @map("store_id") @db.Uuid
   direction     ConstructionFinanceInvoiceDirection
   origin        ConstructionFinanceInvoiceOrigin    @default(manual)
+  /// `ra_bill`: the Contractor Bill's id (construction_contracts.bills).
+  sourceId      String?                             @map("source_id") @db.Uuid
   /// Typed for a bill from the party; the INV rule for a sales invoice.
   invoiceNumber String                              @map("invoice_number")
   invoiceDate   DateTime                            @map("invoice_date") @db.Date
@@ -549,6 +553,7 @@ model ConstructionFinanceInvoice {
   @@index([workspaceId, partyType, partyId])
   @@index([workspaceId, projectId, invoiceDate])
   @@index([workspaceId, dueDate])
+  @@index([sourceId])
   @@map("invoices")
   @@schema("construction_finance")
 }

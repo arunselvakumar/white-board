@@ -661,10 +661,12 @@ model ConstructionContractsBill {
   workOrderId            String?                         @map("work_order_id") @db.Uuid
   /// Client side: the Project's Client when the bill was drafted.
   clientId               String?                         @map("client_id") @db.Uuid
-  /// Sequence rules `client_bill` / `contractor_bill`.
-  number                 String
-  /// 1 for the first RA bill on its work order or BOQ.
-  ordinal                Int
+  /// Sequence rules `client_bill` / `contractor_bill`, taken when first
+  /// submitted; null on a draft (CM-1106).
+  number                 String?
+  /// 1 for the first RA bill on its work order or BOQ; fixed at the first
+  /// submit, null on a draft (CM-1106).
+  ordinal                Int?
   billDate               DateTime                        @map("bill_date") @db.Date
   measuredUpTo           DateTime?                       @map("measured_up_to") @db.Date
   /// Escalation bills: the period of work the escalation is on.
