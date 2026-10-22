@@ -537,7 +537,7 @@ export function BoqSections({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirm?.kind === "item"
-                ? "It leaves the BOQ. An item that has been measured cannot be deleted."
+                ? "It leaves the BOQ. An item that has been measured, or that a Work Order names, cannot be deleted."
                 : "The section leaves the BOQ. Only an empty section can be deleted."}
             </AlertDialogDescription>
           </AlertDialogHeader>
