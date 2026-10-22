@@ -1,0 +1,19 @@
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_f49615d4431370::t_4a2fc2b27290aa 1251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "43a311e01e2a327864d8a2b182d4edbcc8857dc3",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
