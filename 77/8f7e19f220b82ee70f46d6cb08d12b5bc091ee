@@ -1,0 +1,57 @@
+apps/construction-management/app/app/projects/[id]/contractor-bills/[billId]/page.tsx
+  s_f49615d4431370::t_96e6c8005dbebf 1-29
+apps/construction-management/app/app/projects/[id]/contractor-bills/page.tsx
+  s_f49615d4431370::t_736482dd52b083 3-5,9-32
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-detail.stories.tsx
+  s_f49615d4431370::t_2a085aa538b915 1-410
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-detail.tsx
+  s_f49615d4431370::t_a90a535c29d8e7 1-678
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-editor.tsx
+  s_f49615d4431370::t_15657fcc6a14be 1-329
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-fixtures.ts
+  s_f49615d4431370::t_686aeb676d377c 1-432
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-form-schema.ts
+  s_f49615d4431370::t_641660af1d12bd 1-123
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-format.tsx
+  s_f49615d4431370::t_1d23a8b32a26ee 1-60
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-stories-api.ts
+  s_f49615d4431370::t_33cb129fcf5c29 1-69
+apps/construction-management/components/contracts/contractor-bills/contractor-bills-list.stories.tsx
+  s_f49615d4431370::t_9c8678df29fb37 1-203
+apps/construction-management/components/contracts/contractor-bills/contractor-bills-list.tsx
+  s_f49615d4431370::t_2ec5e4fbb60c1c 1-430
+apps/construction-management/components/contracts/contractor-bills/contractor-bills-skeletons.tsx
+  s_f49615d4431370::t_68b6b5581157ad 1-61
+apps/construction-management/components/contracts/work-orders/work-order-detail.tsx
+  s_f49615d4431370::t_7d715c9109b66c 3,55-58,279-319,566-568
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_f49615d4431370::t_eaee96bfd2426a 149-160
+apps/construction-management/src/queries/contracts-contractor-bills.ts
+  s_f49615d4431370::t_1b12244ad3f05f 1-187
+apps/construction-management/components/contracts/contractor-bills/new-contractor-bill-dialog.tsx
+  s_c4fc4783954cf3::t_f3707e90468c82 1-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "778f7e19f220b82ee70f46d6cb08d12b5bc091ee",
+  "prompts": {},
+  "sessions": {
+    "s_c4fc4783954cf3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af74856b8b4a44869",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
