@@ -1,0 +1,31 @@
+apps/construction-management/components/auth/email-sign-in-form.tsx
+  s_b1c1bfe17dd577::t_a377794831c037 105
+apps/construction-management/components/auth/email-sign-up-form.tsx
+  s_b1c1bfe17dd577::t_9b3d191224be11 106
+apps/construction-management/components/auth/forgot-password-form.tsx
+  s_b1c1bfe17dd577::t_d8dab0737ed03a 141
+apps/construction-management/components/company-profile/company-profile-form.tsx
+  s_b1c1bfe17dd577::t_62c77a9c8e6e3c 278
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_b1c1bfe17dd577::t_44b611ed78bd44 283
+apps/construction-management/components/onboarding/create-company-wizard.tsx
+  s_b1c1bfe17dd577::t_5fad5c0871ac49 234
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_b1c1bfe17dd577::t_456d77dc477dcc 247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d9c3258b44c963c5f553a7b7eda11bf9bc2bdb07",
+  "prompts": {},
+  "sessions": {
+    "s_b1c1bfe17dd577": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6b7f5957-32f4-4619-9a59-8e84df7f30bb",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
