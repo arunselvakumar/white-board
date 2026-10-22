@@ -260,7 +260,7 @@ export const PhoneWidth: Story = {
   globals: { viewport: { value: "mobile1", isRotated: false } },
   play: async ({ canvas, canvasElement }) => {
     await expect(
-      await canvas.findByRole("table", { name: "Lines" }),
+      await canvas.findByRole("table", { name: "Work Order lines" }),
     ).toBeVisible();
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);

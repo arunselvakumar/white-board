@@ -51,7 +51,7 @@ export const List: Story = {
       "href",
       `/app/projects/${PROJECT}/work-orders/0199c0de-1104-7000-8000-000000000103`,
     );
-    await expect(list.getAllByText("₹8,33,255.00").length).toBeGreaterThan(0);
+    await expect(list.getAllByText(/₹8,33,255\.00/).length).toBeGreaterThan(0);
     await expect(canvas.getByText("5 Work Orders")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "New Work Order" }),

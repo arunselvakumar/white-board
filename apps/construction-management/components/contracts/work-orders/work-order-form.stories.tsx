@@ -75,8 +75,12 @@ export const NewWithBoqLines: Story = {
     await expect(
       dialog.getByText("Nothing left after other Work Orders"),
     ).toBeVisible();
-    await userEvent.click(dialog.getByLabelText(/^1\.1 · Excavation/));
-    await userEvent.click(dialog.getByLabelText(/^2\.1 · PCC/));
+    await userEvent.click(
+      dialog.getByRole("checkbox", { name: /^1\.1 · Excavation/ }),
+    );
+    await userEvent.click(
+      dialog.getByRole("checkbox", { name: /^2\.1 · PCC/ }),
+    );
     await userEvent.click(dialog.getByRole("button", { name: "Add 2 items" }));
 
     await expect(canvas.getByLabelText("Line 1 quantity")).toHaveValue("250");
@@ -187,7 +191,9 @@ export const WithoutFinancial: Story = {
       await body.findByRole("dialog", { name: "Add from BOQ" }),
     );
     await expect(dialog.queryByText(/₹/)).toBeNull();
-    await userEvent.click(dialog.getByLabelText(/^3\.1 · 12 mm/));
+    await userEvent.click(
+      dialog.getByRole("checkbox", { name: /^3\.1 · 12 mm/ }),
+    );
     await userEvent.click(dialog.getByRole("button", { name: "Add 1 item" }));
     await expect(canvas.queryByLabelText("Line 1 rate")).toBeNull();
     await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));

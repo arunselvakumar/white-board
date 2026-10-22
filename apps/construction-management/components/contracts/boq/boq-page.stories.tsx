@@ -348,3 +348,48 @@ export const EditMeasuredItem: Story = {
     ).toBeVisible();
   },
 };
+
+const inWorkOrder = serveBoq({
+  write: (call) =>
+    call.path === `${BOQ_API}/items/${PCC.id}/delete`
+      ? Response.json(
+          {
+            code: "BOQ_ITEM_IN_WORK_ORDER",
+            message:
+              "Work Order WO/26-27/00003 names this item, so it cannot be deleted. Remove the line or cancel the Work Order first.",
+            details: { workOrders: ["WO/26-27/00003"] },
+          },
+          { status: 409 },
+        )
+      : undefined,
+});
+
+/** An item a Work Order names (CM-1104): the delete says which Work Order holds it. */
+export const DeleteItemInWorkOrder: Story = {
+  beforeEach: inWorkOrder.beforeEach,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const actions = (
+      await canvas.findAllByRole("button", {
+        name: `Actions for item ${PCC.itemNo}`,
+      })
+    ).find((element) => element.checkVisibility());
+    if (actions == null) throw new Error("No actions shown");
+    await userEvent.click(actions);
+    await userEvent.click(
+      await body.findByRole("menuitem", { name: "Delete" }),
+    );
+    const dialog = within(
+      await body.findByRole("alertdialog", {
+        name: `Delete item ${PCC.itemNo}?`,
+      }),
+    );
+    await expect(
+      dialog.getByText(/or that a Work Order names, cannot be deleted/),
+    ).toBeVisible();
+    await userEvent.click(dialog.getByRole("button", { name: "Delete" }));
+    await expect(
+      await dialog.findByText(/Work Order WO\/26-27\/00003 names this item/),
+    ).toBeVisible();
+  },
+};

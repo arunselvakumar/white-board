@@ -36,7 +36,6 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -45,6 +44,7 @@ import {
 } from "@repo/ui/components/table";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import { ScrollTable } from "@/components/procurement/purchase-requests/scroll-table";
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { fieldForCode } from "@/lib/server-errors";
 import {
@@ -163,56 +163,52 @@ function LinesTable({
     (line) => line.billed != null && line.billed !== "0.0000",
   );
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table aria-label={label} className="min-w-[36rem]">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-20">Item no</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead className="text-right">Qty</TableHead>
+    <ScrollTable label={label} className="[&>table]:min-w-[36rem]">
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-20">Item no</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead className="text-right">Qty</TableHead>
+          {billed ? <TableHead className="text-right">Billed</TableHead> : null}
+          {financial ? (
+            <>
+              <TableHead className="text-right">Rate</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </>
+          ) : null}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {lines.map((line) => (
+          <TableRow key={line.id} className="align-top">
+            <TableCell className="whitespace-nowrap">
+              {line.itemNo ?? "—"}
+            </TableCell>
+            <TableCell className="max-w-96 whitespace-normal">
+              {line.description}
+            </TableCell>
+            <TableCell className="text-right whitespace-nowrap tabular-nums">
+              {quantity(line.quantity)} {line.uomName}
+            </TableCell>
             {billed ? (
-              <TableHead className="text-right">Billed</TableHead>
+              <TableCell className="text-right whitespace-nowrap tabular-nums">
+                {line.billed == null ? "—" : quantity(line.billed)}
+              </TableCell>
             ) : null}
             {financial ? (
               <>
-                <TableHead className="text-right">Rate</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableCell className="text-right whitespace-nowrap tabular-nums">
+                  {moneyOrDash(line.rate)}
+                </TableCell>
+                <TableCell className="text-right whitespace-nowrap tabular-nums">
+                  {moneyOrDash(line.amount)}
+                </TableCell>
               </>
             ) : null}
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {lines.map((line) => (
-            <TableRow key={line.id} className="align-top">
-              <TableCell className="whitespace-nowrap">
-                {line.itemNo ?? "—"}
-              </TableCell>
-              <TableCell className="max-w-96 whitespace-normal">
-                {line.description}
-              </TableCell>
-              <TableCell className="text-right whitespace-nowrap tabular-nums">
-                {quantity(line.quantity)} {line.uomName}
-              </TableCell>
-              {billed ? (
-                <TableCell className="text-right whitespace-nowrap tabular-nums">
-                  {line.billed == null ? "—" : quantity(line.billed)}
-                </TableCell>
-              ) : null}
-              {financial ? (
-                <>
-                  <TableCell className="text-right whitespace-nowrap tabular-nums">
-                    {moneyOrDash(line.rate)}
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap tabular-nums">
-                    {moneyOrDash(line.amount)}
-                  </TableCell>
-                </>
-              ) : null}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        ))}
+      </TableBody>
+    </ScrollTable>
   );
 }
 
@@ -561,7 +557,7 @@ export function WorkOrderDetail({
         <LinesTable
           lines={workOrder.lines}
           financial={financial}
-          label="Lines"
+          label="Work Order lines"
         />
       </section>
 
