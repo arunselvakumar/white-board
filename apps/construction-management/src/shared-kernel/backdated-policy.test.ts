@@ -36,13 +36,13 @@ function errorOf(run: () => void): DomainError {
 }
 
 describe("module catalogue", () => {
-  it("lists the 24 modules of modules/12, M6's two, M7's five and M11's Work Orders, Measurement Book and Contractor Bills in eight groups", () => {
+  it("lists the 24 modules of modules/12, M6's two, M7's five and M11's Work Orders, Measurement Book, Contractor and Client Bills in eight groups", () => {
     // Site Diary and Hindrance joined the Site group in M6 (ADR CM-0016);
     // party payments, party invoices, Other Expenses and the two wage
     // payment modules in M7 (ADR CM-0017 §15); Work Orders in M11
-    // (CM-1104, ADR CM-0023 §5), the Measurement Book (CM-1105, §6) and
-    // Contractor Bills (CM-1106, §7).
-    expect(BACKDATED_MODULES).toHaveLength(34);
+    // (CM-1104, ADR CM-0023 §5), the Measurement Book (CM-1105, §6),
+    // Contractor Bills (CM-1106, §7) and Client Bills (CM-1107, §7).
+    expect(BACKDATED_MODULES).toHaveLength(35);
     const counts = Object.fromEntries(
       BACKDATED_MODULE_GROUPS.map((group) => [
         group.label,
@@ -56,10 +56,10 @@ describe("module catalogue", () => {
       Accounts: 5,
       "Labour & Vendor": 4,
       Sales: 3,
-      Contracts: 3,
+      Contracts: 4,
       HRMS: 3,
     });
-    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(34);
+    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(35);
   });
 });
 

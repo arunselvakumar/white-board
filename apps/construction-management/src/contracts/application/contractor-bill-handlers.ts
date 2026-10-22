@@ -7,10 +7,7 @@ import {
 } from "@/src/shared-kernel/access";
 import { fromMask } from "@/src/shared-kernel/access/flags";
 import { approve, pendingState, reject } from "@/src/shared-kernel/approval";
-import {
-  approvalEvent,
-  type ApprovalOutcome,
-} from "@/src/shared-kernel/approval-events";
+import type { ApprovalOutcome } from "@/src/shared-kernel/approval-events";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
   assertCalendarDate,
@@ -36,7 +33,6 @@ import {
   billNoMeasurements,
   billNotFound,
   billNotLatest,
-  billNotPending,
   billSettled,
   billValues,
   billWorkOrderInvalid,
@@ -56,6 +52,7 @@ import {
   type RetentionSuggestion,
   type UnbilledLine,
 } from "../domain/contractor-bill";
+import { storedBillGst } from "../domain/ra-bill";
 import { workOrderValue } from "../domain/work-order";
 import {
   CONTRACTOR_BILL_DOCUMENT_TYPE,
@@ -75,6 +72,15 @@ import type {
   ContractsProjectFacts,
   ContractsTx,
 } from "./ports";
+import {
+  assertNotStale,
+  dispatchBillApproval,
+  pendingApproval,
+  plannedDeductions,
+  raBillSnapshot,
+  uniqueIds,
+  type DeductionPlan as RaDeductionPlan,
+} from "./ra-bill-common";
 import type { StoredWorkOrder, StoredWorkOrderLine } from "./work-order-ports";
 
 export {
@@ -195,15 +201,7 @@ export type ContractorBillPrint = ContractorBillDetail & {
   contractor: ContractsContractorFacts | null;
 };
 
-/** How a draft's deductions are found when its figures are worked out. */
-type DeductionPlan =
-  | { kind: "suggest" }
-  | { kind: "given"; inputs: readonly BillDeductionInput[] }
-  | {
-      kind: "keep";
-      stored: readonly StoredBillDeduction[];
-      previousGross: bigint;
-    };
+type DeductionPlan = RaDeductionPlan<BillDeductionInput>;
 
 type Measured = {
   rows: BillMeasurementRow[];
@@ -222,29 +220,13 @@ type Priced = {
   contractor: ContractsContractorFacts | null;
 };
 
-const unique = (ids: readonly (string | null)[]): string[] => [
-  ...new Set(ids.filter((id): id is string => id != null && id !== "")),
-];
+const unique = uniqueIds;
 
 function auditSnapshot(bill: StoredBill, lineCount?: number) {
-  return {
-    number: bill.number,
-    ordinal: bill.ordinal,
-    status: bill.status,
+  return raBillSnapshot(bill, {
     workOrderId: bill.workOrderId,
-    billDate: bill.billDate,
-    measuredUpTo: bill.measuredUpTo,
-    isFinal: bill.isFinal,
-    gross: Number(bill.gross),
-    gst: Number(bill.cgst + bill.sgst + bill.igst),
-    reverseCharge: bill.reverseCharge,
-    deductions: Number(bill.deductionsTotal),
-    net: Number(bill.net),
-    invoiceId: bill.invoiceId,
     ...(lineCount == null ? {} : { lineCount }),
-    rejectReason: bill.rejectReason,
-    reverseReason: bill.reverseReason,
-  };
+  });
 }
 
 /**
@@ -705,17 +687,7 @@ export class ContractorBillHandlers {
   // Figures -------------------------------------------------------------------
 
   private storedGst(bill: StoredBill): BillGst {
-    const total = bill.cgst + bill.sgst + bill.igst;
-    return {
-      supplyType: bill.igst > 0n ? "inter_state" : "intra_state",
-      rate: bill.gstRate ?? 0n,
-      cgst: bill.cgst,
-      sgst: bill.sgst,
-      igst: bill.igst,
-      total,
-      reverseCharge: bill.reverseCharge,
-      payable: bill.reverseCharge ? 0n : total,
-    };
+    return storedBillGst(bill);
   }
 
   /**
@@ -812,31 +784,12 @@ export class ContractorBillHandlers {
         heldBefore,
       });
     const retention = suggestionFor(gross);
-    const retentionLine = (amount: bigint): BillDeduction[] =>
-      amount > 0n
-        ? [{ kind: "retention", amount, description: null, advanceId: null }]
-        : [];
-    let deductions: BillDeduction[];
-    if (plan.kind === "suggest")
-      deductions = retentionLine(retention.suggested);
-    else if (plan.kind === "given") deductions = billDeductions(plan.inputs);
-    else {
-      const kept: BillDeduction[] = plan.stored.map((row) => ({
-        kind: row.kind as BillDeduction["kind"],
-        amount: row.amount,
-        description: row.description,
-        advanceId: row.advanceId,
-      }));
-      const others = kept.filter((row) => row.kind !== "retention");
-      const held = retentionTotal(kept);
-      const untouched = held === suggestionFor(plan.previousGross).suggested;
-      // Retention left as suggested follows the new gross; typed retention
-      // stays, cut to what the cap now allows.
-      deductions =
-        untouched || held > retention.suggested
-          ? [...retentionLine(retention.suggested), ...others]
-          : kept;
-    }
+    const deductions: BillDeduction[] = plannedDeductions(
+      plan,
+      retention,
+      suggestionFor,
+      billDeductions,
+    );
     assertDeductions({
       deductions,
       gross,
@@ -937,8 +890,7 @@ export class ContractorBillHandlers {
   }
 
   private checkStale(bill: StoredBill, expected: Date | null) {
-    if (expected != null && bill.updatedAt.getTime() !== expected.getTime())
-      throw billChanged();
+    assertNotStale(bill, expected);
   }
 
   private assertIssued(workOrder: StoredWorkOrder): void {
@@ -971,21 +923,14 @@ export class ContractorBillHandlers {
     by: string,
     at: Date,
   ): Promise<void> {
-    await this.deps.events.dispatch([
-      approvalEvent(
-        {
-          workspaceId: bill.workspaceId,
-          documentType: CONTRACTOR_BILL_DOCUMENT_TYPE,
-          documentId: bill.id,
-          projectId: bill.projectId,
-          number: bill.number,
-          createdBy: bill.createdBy,
-        },
-        outcome,
-        by,
-        at,
-      ),
-    ]);
+    await dispatchBillApproval(
+      this.deps.events,
+      CONTRACTOR_BILL_DOCUMENT_TYPE,
+      bill,
+      outcome,
+      by,
+      at,
+    );
   }
 
   // Commands ------------------------------------------------------------------
@@ -1658,7 +1603,6 @@ export class ContractorBillHandlers {
 
   /** The kernel decides only a pending bill (409 `BILL_NOT_PENDING`). */
   private approvalState(bill: StoredBill) {
-    if (bill.status !== "pending_approval") throw billNotPending(bill.status);
-    return pendingState();
+    return pendingApproval(bill.status);
   }
 }

@@ -337,13 +337,32 @@ export const prismaPartyStore: PartyStore = {
     );
   },
 
-  async payableNumberTaken(db, workspaceId, party, invoiceNumber, exceptId) {
+  payableNumberTaken(db, workspaceId, party, invoiceNumber, exceptId) {
+    return prismaPartyStore.numberTaken(
+      db,
+      workspaceId,
+      party,
+      "payable",
+      invoiceNumber,
+      exceptId,
+    );
+  },
+
+  async numberTaken(
+    db,
+    workspaceId,
+    party,
+    direction,
+    invoiceNumber,
+    exceptId,
+  ) {
     const rows = await db.$queryRaw<{ id: string }[]>(
       Prisma.sql`SELECT id::text FROM construction_finance.invoices
         WHERE workspace_id = ${workspaceId}
           AND party_type = ${partyTypeSql(party.type)}
           AND party_id = ${party.id}::uuid
-          AND direction = 'payable' AND deleted_at IS NULL
+          AND direction = ${direction}::construction_finance.invoice_direction
+          AND deleted_at IS NULL
           AND lower(invoice_number) = lower(${invoiceNumber})
           AND (${exceptId}::uuid IS NULL OR id <> ${exceptId}::uuid)
         LIMIT 1`,

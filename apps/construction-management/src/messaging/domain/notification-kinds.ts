@@ -199,6 +199,12 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
     label: "Contractor Bill",
     ...same(inProject("contractor-bills")),
   },
+  // Contracts (CM-1107): a Client Bill, decided on its page.
+  client_bill: {
+    menu: "contracts.client_bills",
+    label: "Client Bill",
+    ...same(inProject("client-bills")),
+  },
   leave_request: {
     menu: "hrms.leaves",
     label: "Leave request",

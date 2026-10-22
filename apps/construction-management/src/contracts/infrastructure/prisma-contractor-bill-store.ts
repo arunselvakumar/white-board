@@ -4,8 +4,6 @@ import {
   calendarDateFromDb,
   calendarDateToDb,
 } from "@/src/shared-kernel/calendar-date";
-import { storedLocationRef } from "@/src/shared-kernel/location-ref";
-import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { userNamesInCompany } from "@/src/shared-kernel/user-names";
 
 import type {
@@ -17,68 +15,34 @@ import type {
   UnbilledDay,
 } from "../application/contractor-bill-ports";
 import type { ContractsTx } from "../application/ports";
-import { BOQ_QUANTITY_SCALE, quantityText } from "../domain/boq";
+import { quantityText } from "../domain/boq";
 import { billNumberTaken, billOpenExists } from "../domain/contractor-bill";
 import {
-  fixedDecimal,
-  PERCENT_SCALE,
-  scaledDecimal,
-} from "../domain/item-analysis";
+  billColumns,
+  billCore,
+  byDateSheetPosition,
+  COUNTED_STATUSES,
+  deductionRows,
+  freeRows,
+  MEASUREMENT_ROW_SELECT,
+  measurementRowCore,
+  pagedWhere,
+  replaceDeductions,
+  scaled,
+  takeRows,
+  tombstoneBill,
+  uniqueRefusal,
+  updateBill,
+  type SelectedMeasurementRow,
+} from "./prisma-ra-bill-rows";
 
 type BillRow = Prisma.ConstructionContractsBillGetPayload<object>;
 type LineRow = Prisma.ConstructionContractsBillLineGetPayload<object>;
-type DeductionRow = Prisma.ConstructionContractsBillDeductionGetPayload<object>;
 
-type DecimalLike = { toString(): string };
-
-function scaled(value: DecimalLike, scale = BOQ_QUANTITY_SCALE): bigint {
-  return scaledDecimal(value.toString(), scale) ?? 0n;
-}
-
-function optionalScaled(value: DecimalLike | null): bigint | null {
-  return value == null ? null : scaled(value);
-}
+const REFUSALS = { numberTaken: billNumberTaken, openExists: billOpenExists };
 
 function toBill(row: BillRow): StoredBill {
-  return {
-    id: row.id,
-    workspaceId: row.workspaceId,
-    projectId: row.projectId,
-    workOrderId: row.workOrderId ?? "",
-    number: row.number,
-    ordinal: row.ordinal,
-    billDate: calendarDateFromDb(row.billDate),
-    measuredUpTo: calendarDateFromDb(row.measuredUpTo ?? row.billDate),
-    isFinal: row.isFinal,
-    status: row.status,
-    cumulativeValue: row.cumulativeValue,
-    previousValue: row.previousValue,
-    gross: row.gross,
-    sacCode: row.sacCode,
-    gstRate: row.gstRate == null ? null : scaled(row.gstRate, PERCENT_SCALE),
-    placeOfSupplyStateCode: row.placeOfSupplyStateCode,
-    supplierGstin: row.supplierGstin,
-    reverseCharge: row.reverseCharge,
-    cgst: row.cgst,
-    sgst: row.sgst,
-    igst: row.igst,
-    deductionsTotal: row.deductionsTotal,
-    net: row.net,
-    remarks: row.remarks,
-    invoiceId: row.invoiceId,
-    submittedAt: row.submittedAt,
-    submittedBy: row.submittedBy,
-    decidedAt: row.decidedAt,
-    decidedBy: row.decidedBy,
-    rejectReason: row.rejectReason,
-    reversedAt: row.reversedAt,
-    reversedBy: row.reversedBy,
-    reverseReason: row.reverseReason,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    createdBy: row.createdBy,
-    updatedBy: row.updatedBy,
-  };
+  return { ...billCore(row), workOrderId: row.workOrderId ?? "" };
 }
 
 function toLine(row: LineRow): StoredBillLine {
@@ -98,111 +62,15 @@ function toLine(row: LineRow): StoredBillLine {
   };
 }
 
-function toDeduction(row: DeductionRow): StoredBillDeduction {
+function toMeasurementRow(row: SelectedMeasurementRow): BillMeasurementRow {
   return {
-    id: row.id,
-    billId: row.billId,
-    kind: row.kind,
-    description: row.description,
-    amount: row.amount,
-    advanceId: row.advanceId,
-    position: row.position,
-  };
-}
-
-/** The columns a bill's figures and life write. */
-function billData(bill: StoredBill) {
-  return {
-    number: bill.number,
-    ordinal: bill.ordinal,
-    billDate: calendarDateToDb(bill.billDate),
-    measuredUpTo: calendarDateToDb(bill.measuredUpTo),
-    isFinal: bill.isFinal,
-    status: bill.status,
-    cumulativeValue: bill.cumulativeValue,
-    previousValue: bill.previousValue,
-    gross: bill.gross,
-    sacCode: bill.sacCode,
-    gstRate:
-      bill.gstRate == null ? null : fixedDecimal(bill.gstRate, PERCENT_SCALE),
-    placeOfSupplyStateCode: bill.placeOfSupplyStateCode,
-    supplierGstin: bill.supplierGstin,
-    reverseCharge: bill.reverseCharge,
-    cgst: bill.cgst,
-    sgst: bill.sgst,
-    igst: bill.igst,
-    deductionsTotal: bill.deductionsTotal,
-    net: bill.net,
-    remarks: bill.remarks,
-    invoiceId: bill.invoiceId,
-    submittedAt: bill.submittedAt,
-    submittedBy: bill.submittedBy,
-    decidedAt: bill.decidedAt,
-    decidedBy: bill.decidedBy,
-    rejectReason: bill.rejectReason,
-    reversedAt: bill.reversedAt,
-    reversedBy: bill.reversedBy,
-    reverseReason: bill.reverseReason,
-    updatedAt: bill.updatedAt,
-    updatedBy: bill.updatedBy,
-  };
-}
-
-/** The partial unique indexes on `bills` say which rule refused the write. */
-function uniqueRefusal(error: unknown): Error | null {
-  if (!isUniqueViolation(error)) return null;
-  const target = JSON.stringify(error.meta ?? {});
-  return target.includes("number") ? billNumberTaken() : billOpenExists();
-}
-
-const COUNTS = ["draft", "pending_approval", "approved"] as const;
-
-const ROW_SELECT = {
-  id: true,
-  sheetId: true,
-  workOrderLineId: true,
-  description: true,
-  location: true,
-  nos: true,
-  length: true,
-  breadth: true,
-  depth: true,
-  direct: true,
-  quantity: true,
-  position: true,
-  sheet: { select: { measuredOn: true, title: true } },
-} as const;
-
-type SelectedRow = Prisma.ConstructionContractsMeasurementRowGetPayload<{
-  select: typeof ROW_SELECT;
-}>;
-
-function toMeasurementRow(row: SelectedRow): BillMeasurementRow {
-  return {
-    id: row.id,
-    sheetId: row.sheetId,
-    measuredOn: calendarDateFromDb(row.sheet.measuredOn),
-    sheetTitle: row.sheet.title,
+    ...measurementRowCore(row),
     workOrderLineId: row.workOrderLineId ?? "",
-    description: row.description,
-    location: storedLocationRef(row.location),
-    nos: optionalScaled(row.nos),
-    length: optionalScaled(row.length),
-    breadth: optionalScaled(row.breadth),
-    depth: optionalScaled(row.depth),
-    direct: row.direct,
-    quantity: scaled(row.quantity),
-    position: row.position,
   };
 }
 
-function byDateSheetPosition(a: BillMeasurementRow, b: BillMeasurementRow) {
-  return (
-    a.measuredOn.localeCompare(b.measuredOn) ||
-    a.sheetId.localeCompare(b.sheetId) ||
-    a.position - b.position
-  );
-}
+const COUNTS = COUNTED_STATUSES;
+const ROW_SELECT = MEASUREMENT_ROW_SELECT;
 
 /**
  * Contractor Bills, their lines and deductions in `construction_contracts`
@@ -263,29 +131,10 @@ export class PrismaContractorBillStore implements ContractorBillStore {
     params: Parameters<ContractorBillStore["list"]>[1],
   ) {
     const base = await this.filterWhere(db, params);
-    const backwards = params.before != null;
-    const cursor = params.after ?? params.before;
-    const paged: Prisma.ConstructionContractsBillWhereInput[] =
-      cursor == null
-        ? [base]
-        : [
-            base,
-            {
-              OR: backwards
-                ? [
-                    { createdAt: { gt: cursor.createdAt } },
-                    { createdAt: cursor.createdAt, id: { gt: cursor.id } },
-                  ]
-                : [
-                    { createdAt: { lt: cursor.createdAt } },
-                    { createdAt: cursor.createdAt, id: { lt: cursor.id } },
-                  ],
-            },
-          ];
-    const direction = backwards ? ("asc" as const) : ("desc" as const);
+    const { where, direction, backwards } = pagedWhere(base, params);
     const [rows, total] = await Promise.all([
       db.constructionContractsBill.findMany({
-        where: { AND: paged },
+        where,
         orderBy: [{ createdAt: direction }, { id: direction }],
         take: params.limit + 1,
       }),
@@ -352,17 +201,8 @@ export class PrismaContractorBillStore implements ContractorBillStore {
     return rows.map(toLine);
   }
 
-  async deductions(
-    db: ContractsTx,
-    workspaceId: string,
-    billIds: readonly string[],
-  ) {
-    if (billIds.length === 0) return [];
-    const rows = await db.constructionContractsBillDeduction.findMany({
-      where: { workspaceId, billId: { in: [...new Set(billIds)] } },
-      orderBy: [{ billId: "asc" }, { position: "asc" }, { id: "asc" }],
-    });
-    return rows.map(toDeduction);
+  deductions(db: ContractsTx, workspaceId: string, billIds: readonly string[]) {
+    return deductionRows(db, workspaceId, billIds);
   }
 
   async insert(tx: ContractsTx, bill: StoredBill) {
@@ -375,31 +215,18 @@ export class PrismaContractorBillStore implements ContractorBillStore {
           side: "contractor",
           type: "running",
           workOrderId: bill.workOrderId,
-          ...billData(bill),
+          ...billColumns(bill),
           createdAt: bill.createdAt,
           createdBy: bill.createdBy,
         },
       });
     } catch (error) {
-      throw uniqueRefusal(error) ?? error;
+      throw uniqueRefusal(error, REFUSALS) ?? error;
     }
   }
 
-  async update(tx: ContractsTx, after: StoredBill, expectedUpdatedAt: Date) {
-    try {
-      const result = await tx.constructionContractsBill.updateMany({
-        where: {
-          id: after.id,
-          workspaceId: after.workspaceId,
-          deletedAt: null,
-          updatedAt: expectedUpdatedAt,
-        },
-        data: billData(after),
-      });
-      return result.count === 1;
-    } catch (error) {
-      throw uniqueRefusal(error) ?? error;
-    }
+  update(tx: ContractsTx, after: StoredBill, expectedUpdatedAt: Date) {
+    return updateBill(tx, after, expectedUpdatedAt, {}, REFUSALS);
   }
 
   async replaceLines(
@@ -431,51 +258,17 @@ export class PrismaContractorBillStore implements ContractorBillStore {
     });
   }
 
-  async replaceDeductions(
+  replaceDeductions(
     tx: ContractsTx,
     workspaceId: string,
     billId: string,
     deductions: readonly StoredBillDeduction[],
   ) {
-    await tx.constructionContractsBillDeduction.deleteMany({
-      where: { workspaceId, billId },
-    });
-    if (deductions.length === 0) return;
-    await tx.constructionContractsBillDeduction.createMany({
-      data: deductions.map((deduction) => ({
-        id: deduction.id,
-        workspaceId,
-        billId,
-        kind: deduction.kind,
-        description: deduction.description,
-        amount: deduction.amount,
-        advanceId: deduction.advanceId,
-        position: deduction.position,
-      })),
-    });
+    return replaceDeductions(tx, workspaceId, billId, deductions);
   }
 
-  async delete(
-    tx: ContractsTx,
-    input: Parameters<ContractorBillStore["delete"]>[1],
-  ) {
-    const result = await tx.constructionContractsBill.updateMany({
-      where: {
-        id: input.bill.id,
-        workspaceId: input.bill.workspaceId,
-        deletedAt: null,
-        ...(input.expectedUpdatedAt == null
-          ? {}
-          : { updatedAt: input.expectedUpdatedAt }),
-      },
-      data: {
-        deletedAt: input.at,
-        deletedBy: input.by,
-        updatedAt: input.at,
-        updatedBy: input.by,
-      },
-    });
-    return result.count === 1;
+  delete(tx: ContractsTx, input: Parameters<ContractorBillStore["delete"]>[1]) {
+    return tombstoneBill(tx, input);
   }
 
   async billableRows(
@@ -541,25 +334,17 @@ export class PrismaContractorBillStore implements ContractorBillStore {
     return rows.map(toMeasurementRow).sort(byDateSheetPosition);
   }
 
-  async takeRows(
+  takeRows(
     tx: ContractsTx,
     workspaceId: string,
     billId: string,
     rowIds: readonly string[],
   ) {
-    if (rowIds.length === 0) return;
-    await tx.constructionContractsMeasurementRow.updateMany({
-      where: { workspaceId, id: { in: [...rowIds] }, billId: null },
-      data: { billId },
-    });
+    return takeRows(tx, workspaceId, billId, rowIds);
   }
 
-  async freeRows(tx: ContractsTx, workspaceId: string, billId: string) {
-    const result = await tx.constructionContractsMeasurementRow.updateMany({
-      where: { workspaceId, billId },
-      data: { billId: null },
-    });
-    return result.count;
+  freeRows(tx: ContractsTx, workspaceId: string, billId: string) {
+    return freeRows(tx, workspaceId, billId);
   }
 
   async retentionHeld(

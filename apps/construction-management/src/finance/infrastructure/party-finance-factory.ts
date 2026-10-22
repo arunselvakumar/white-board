@@ -6,7 +6,7 @@ import {
   type EventDispatcher,
 } from "@/src/shared-kernel/events";
 
-import { ContractorBillInvoices } from "../application/contractor-bill-invoices";
+import { RaBillInvoices } from "../application/ra-bill-invoices";
 import { GoodsReceiptInvoices } from "../application/goods-receipt-invoices";
 import { InvoiceHandlers } from "../application/invoice-handlers";
 import { PartyOpeningHandlers } from "../application/party-opening-handlers";
@@ -67,7 +67,7 @@ export function createPartyFinance(deps: {
     ),
     queries: new PartyQueries(base, invoices),
     goodsReceipts: new GoodsReceiptInvoices(base),
-    contractorBills: new ContractorBillInvoices(base),
+    raBills: new RaBillInvoices(base),
   };
 }
 

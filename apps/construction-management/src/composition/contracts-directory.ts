@@ -328,6 +328,22 @@ export const contractsDirectory: ContractsDirectory = {
     return byId(rows.map(toClient));
   },
 
+  async billingAddresses(db, workspaceId) {
+    const rows = await db.constructionOrganizationBillingAddress.findMany({
+      where: { workspaceId, deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        stateCode: true,
+        gstin: true,
+        isDefault: true,
+      },
+      orderBy: [{ isDefault: "desc" }, { name: "asc" }, { id: "asc" }],
+    });
+    return rows.map((row) => ({ ...row }));
+  },
+
   async materialOptions(db, workspaceId, query) {
     const search = query.search?.trim();
     const rows = await db.constructionMastersMaterial.findMany({

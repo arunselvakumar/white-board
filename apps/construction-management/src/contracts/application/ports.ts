@@ -69,6 +69,16 @@ export type ContractsClientFacts = {
   active: boolean;
 };
 
+/** A Company billing address with its GSTIN (CM-1107): the supplier on a Client Bill. */
+export type ContractsBillingAddressFacts = {
+  id: string;
+  name: string;
+  address: string;
+  stateCode: string;
+  gstin: string | null;
+  isDefault: boolean;
+};
+
 export type ContractsUomFacts = {
   id: string;
   name: string;
@@ -158,6 +168,12 @@ export type ContractsDirectory = {
     clientIds: readonly string[],
   ): Promise<ReadonlyMap<string, ContractsClientFacts>>;
 
+  /** The Company's live billing addresses, default first (CM-1107). */
+  billingAddresses(
+    db: ContractsTx,
+    workspaceId: string,
+  ): Promise<ContractsBillingAddressFacts[]>;
+
   /** Enabled Materials, optionally matching `search` in the name, at most `limit`. */
   materialOptions(
     db: ContractsTx,
@@ -233,9 +249,9 @@ export type ContractsDirectory = {
 };
 
 // ---------------------------------------------------------------------------
-// PartyInvoicing (CM-1101; implemented for Contractor Bills in CM-1106,
-// Client Bills follow in CM-1107): an approved RA bill becomes a finance
-// invoice, and reversing the bill reverses it (ADR CM-0023 §7).
+// PartyInvoicing (CM-1101; implemented for Contractor Bills in CM-1106 and
+// Client Bills in CM-1107): an approved RA bill becomes a finance invoice,
+// and reversing the bill reverses it (ADR CM-0023 §7).
 // Implemented in `src/composition/contracts-party-invoicing.ts` over
 // finance's own handlers; contracts never writes finance tables.
 // ---------------------------------------------------------------------------
@@ -267,8 +283,9 @@ export type PartyInvoiceDraft = {
   gst: bigint;
   /**
    * Paise: what is owed now, the bill's net (gross + GST payable −
-   * retention − recoveries). Retention held stays in contracts until it is
-   * released (CM-1108).
+   * retention − recoveries). Retention held (Contractor Bills) or
+   * receivable (Client Bills) stays in contracts until it is released
+   * (CM-1108).
    */
   amount: bigint;
   /** The bill's id: the invoice's origin is `ra_bill` with this source. */
@@ -279,7 +296,7 @@ export type PartyInvoicing = {
   /**
    * Creates the invoice and its party-ledger entry; returns the invoice
    * id. 409 `BILL_INVOICE_NUMBER_TAKEN` when the party already has a live
-   * payable invoice with that number.
+   * invoice of that direction with that number.
    */
   create(tx: ContractsTx, draft: PartyInvoiceDraft): Promise<string>;
   /** Anything paid, written off or pending write-off against the invoice. */

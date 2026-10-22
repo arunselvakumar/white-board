@@ -371,6 +371,15 @@ export type PartyStore = {
     db: FinanceTx,
     ids: readonly string[],
   ): Promise<Map<string, InvoiceFiguresRow>>;
+  /** A live invoice of the party in `direction` with this number (ignoring case). */
+  numberTaken(
+    db: FinanceTx,
+    workspaceId: string,
+    party: { type: PartyType; id: string },
+    direction: InvoiceDirection,
+    invoiceNumber: string,
+    exceptId: string | null,
+  ): Promise<boolean>;
   /** A live bill from the party with this number (ignoring case). */
   payableNumberTaken(
     db: FinanceTx,

@@ -235,6 +235,14 @@ export const BACKDATED_MODULES = [
     "billDate",
     "contracts.contractor_bills",
   ),
+  // Contracts (CM-1107, ADR CM-0023 §7).
+  m(
+    "client_bill",
+    "Client Bill",
+    "contracts",
+    "billDate",
+    "contracts.client_bills",
+  ),
   m(
     "hrms_attendance",
     "Attendance",

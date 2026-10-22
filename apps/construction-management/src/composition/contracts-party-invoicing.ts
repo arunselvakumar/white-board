@@ -9,24 +9,27 @@ import { partyFinance } from "./party-finance";
 
 /**
  * How an approved RA bill becomes a finance invoice (ADR CM-0023 §7),
- * through finance's own `ContractorBillInvoices` inside the bill's
- * transaction: contracts never writes finance tables. Contractor Bills
- * (CM-1106) are payable invoices to the Contractor; Client Bills
- * (receivable, party type `client`) arrive with CM-1107.
+ * through finance's own `RaBillInvoices` inside the bill's transaction:
+ * contracts never writes finance tables. Contractor Bills (CM-1106) are
+ * payable invoices from the Contractor; Client Bills (CM-1107) are
+ * receivable invoices to the Client (party type `client`).
  */
 export function contractsPartyInvoicing(
   finance: () => PartyFinance = partyFinance,
 ): PartyInvoicing {
   return {
     async create(tx, draft) {
-      if (draft.partyType !== "contractor" || draft.direction !== "payable")
+      const expected =
+        draft.partyType === "contractor" ? "payable" : "receivable";
+      if (draft.direction !== expected)
         throw new Error(
-          "Client Bill invoices arrive with CM-1107: finance has no `client` party yet.",
+          `A ${draft.partyType === "contractor" ? "Contractor" : "Client"} Bill's invoice is ${expected}.`,
         );
-      return finance().contractorBills.create(tx, {
+      return finance().raBills.create(tx, {
         workspaceId: draft.workspaceId,
         by: draft.by,
-        contractorId: draft.partyId,
+        partyType: draft.partyType,
+        partyId: draft.partyId,
         projectId: draft.projectId,
         departmentId: draft.departmentId,
         number: draft.number,
@@ -38,14 +41,14 @@ export function contractsPartyInvoicing(
       });
     },
     isSettled(tx, input) {
-      return finance().contractorBills.isSettled(
+      return finance().raBills.isSettled(
         tx,
         input.workspaceId,
         input.invoiceId,
       );
     },
     reverse(tx, input) {
-      return finance().contractorBills.reverse(tx, input);
+      return finance().raBills.reverse(tx, input);
     },
   };
 }

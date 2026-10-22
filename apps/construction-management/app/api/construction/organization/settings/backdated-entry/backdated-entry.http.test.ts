@@ -145,7 +145,7 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     expect(body.edit).toEqual({ days: 0, overrideDesignationIds: [] });
     expect(body.financialClosingDate).toBeNull();
     expect(body.updatedAt).toBeNull();
-    expect(body.modules).toHaveLength(34);
+    expect(body.modules).toHaveLength(35);
     expect(body.modules[0]).toMatchObject({
       key: "purchase_request",
       group: "procurement",

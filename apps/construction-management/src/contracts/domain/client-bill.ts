@@ -190,7 +190,7 @@ export type CompanyGstin = {
   isDefault: boolean;
 };
 
-export const GSTIN_NOT_IN_STATE = "GSTIN_NOT_IN_STATE";
+export const GSTIN_NOT_IN_STATE = "GSTIN_NOT_IN_STATE" as const;
 
 export type SupplierChoice = {
   /** The billing address the invoice prints, or null when there is none. */
