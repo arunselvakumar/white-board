@@ -132,7 +132,10 @@ export type StoredInvoice = {
   place: PartyPlace;
   direction: InvoiceDirection;
   origin: InvoiceOrigin;
-  /** `ra_bill`: the Contractor or Client Bill it came from (construction_contracts). */
+  /**
+   * `ra_bill`: the Contractor or Client Bill it came from;
+   * `retention_release`: the retention release (construction_contracts).
+   */
   sourceId: string | null;
   invoiceNumber: string;
   invoiceDate: CalendarDate;
@@ -530,6 +533,14 @@ export type PartyStore = {
   tombstoneAllocations(
     tx: FinanceTx,
     paymentId: string,
+    by: string,
+    at: Date,
+  ): Promise<void>;
+  /** Tombstones one payment's live allocations to one invoice (CM-1108). */
+  tombstoneAllocationsTo(
+    tx: FinanceTx,
+    paymentId: string,
+    invoiceId: string,
     by: string,
     at: Date,
   ): Promise<void>;

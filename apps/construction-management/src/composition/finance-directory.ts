@@ -347,6 +347,67 @@ export const financeDirectory: FinanceDirectory = {
     return rows.map(toGoodsReceipt);
   },
 
+  async contractAdvances(db, workspaceId, paymentIds) {
+    const ids = [...new Set(paymentIds)];
+    if (ids.length === 0) return new Map();
+    const rows = await db.$queryRaw<
+      {
+        paymentId: string;
+        kind: "mobilisation" | "secured";
+        direction: "given" | "received";
+        workOrderNumber: string | null;
+      }[]
+    >(
+      Prisma.sql`SELECT a.payment_id::text AS "paymentId", a.kind::text AS kind,
+          a.direction::text AS direction, w.number AS "workOrderNumber"
+        FROM construction_contracts.advances a
+        LEFT JOIN construction_contracts.work_orders w ON w.id = a.work_order_id
+        WHERE a.workspace_id = ${workspaceId} AND a.deleted_at IS NULL
+          AND a.payment_id = ANY(${ids}::uuid[])`,
+    );
+    return new Map(
+      rows.map((row) => [
+        row.paymentId,
+        {
+          label: `${row.kind === "mobilisation" ? "mobilisation" : "secured"} advance ${
+            row.direction === "given"
+              ? `on Work Order ${row.workOrderNumber ?? "(draft)"}`
+              : "received on the client contract"
+          }`,
+        },
+      ]),
+    );
+  },
+
+  async retentionReleases(db, workspaceId, releaseIds) {
+    const ids = [...new Set(releaseIds)];
+    if (ids.length === 0) return new Map();
+    const rows = await db.$queryRaw<
+      {
+        id: string;
+        side: "contractor" | "client";
+        workOrderId: string | null;
+        workOrderNumber: string | null;
+      }[]
+    >(
+      Prisma.sql`SELECT r.id::text AS id, r.side::text AS side,
+          r.work_order_id::text AS "workOrderId", w.number AS "workOrderNumber"
+        FROM construction_contracts.retention_releases r
+        LEFT JOIN construction_contracts.work_orders w ON w.id = r.work_order_id
+        WHERE r.workspace_id = ${workspaceId} AND r.id = ANY(${ids}::uuid[])`,
+    );
+    return new Map(
+      rows.map((row) => [
+        row.id,
+        {
+          side: row.side,
+          workOrderId: row.workOrderId,
+          workOrderNumber: row.workOrderNumber,
+        },
+      ]),
+    );
+  },
+
   async userNames(db, workspaceId, userIds) {
     if (userIds.length === 0) return new Map();
     const rows = await db.constructionOrganizationTeamMember.findMany({

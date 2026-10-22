@@ -211,6 +211,12 @@ export const ConstructionFinancePartyPaymentResponseModel = z.object({
   allocated: Paise,
   /** The advance left to apply. */
   unallocated: Paise,
+  contractAdvance: z
+    .object({ label: z.string() })
+    .nullable()
+    .describe(
+      "CM-1108: the Contracts advance this payment moved. Bills recover it; it cannot be cancelled or applied here (409 PAYMENT_FROM_ADVANCE).",
+    ),
   paymentCategory: z
     .object({ id: z.uuid(), name: z.string().nullable() })
     .nullable(),
@@ -286,6 +292,7 @@ export function toPartyPaymentResponse(
     settled: money(view.settled),
     allocated: money(view.allocated),
     unallocated: money(view.unallocated),
+    contractAdvance: view.contractAdvance,
     paymentCategory:
       view.paymentCategoryId == null
         ? null

@@ -15,6 +15,7 @@ import {
   invoiceEntry,
   invoiceFields,
   invoiceProgress,
+  isContractsOrigin,
   type InvoiceDirection,
   type InvoiceProgress,
 } from "../domain/invoice";
@@ -92,6 +93,15 @@ export type InvoiceView = StoredInvoice &
     variance: boolean;
     pendingSettlement: StoredSettlement | null;
     settlements: StoredSettlement[];
+    /**
+     * Origin `retention_release` (CM-1108): the side and the Work Order
+     * (with its number) a contractor-side release is on.
+     */
+    retentionRelease: {
+      side: "contractor" | "client";
+      workOrderId: string | null;
+      workOrderNumber: string | null;
+    } | null;
     payments: {
       paymentId: string;
       number: string;
@@ -108,8 +118,9 @@ export function invoiceActions(
   > & { origin?: InvoiceView["origin"] },
 ): InvoiceActions {
   const settled = view.status === "settled";
-  // An RA bill's invoice is changed by reversing the bill (CM-1106, CM-1107).
-  const fromBill = view.origin === "ra_bill";
+  // An RA bill's invoice is changed by reversing the bill (CM-1106,
+  // CM-1107), a retention release's by deleting the release (CM-1108).
+  const fromBill = view.origin != null && isContractsOrigin(view.origin);
   return {
     edit: !settled && !fromBill && canOnPlace(access, "update", view.place),
     delete:
@@ -129,13 +140,34 @@ export function invoiceActions(
 }
 
 /**
- * An RA bill's invoice (origin `ra_bill`) is read-only in finance: 409
- * `INVOICE_FROM_CONTRACTOR_BILL` for a Contractor Bill's (CM-1106),
- * `INVOICE_FROM_CLIENT_BILL` for a Client Bill's (CM-1107). Reversing the
- * bill removes it; payments, receipts and settlements still work as on any
- * invoice.
+ * An invoice Contracts made is read-only in finance: an RA bill's (origin
+ * `ra_bill`) is 409 `INVOICE_FROM_CONTRACTOR_BILL` for a Contractor Bill's
+ * (CM-1106), `INVOICE_FROM_CLIENT_BILL` for a Client Bill's (CM-1107);
+ * a retention release's (origin `retention_release`, CM-1108) is 409
+ * `INVOICE_FROM_RETENTION_RELEASE`. Reversing the bill or deleting the
+ * release removes it; payments, receipts and settlements still work as on
+ * any invoice.
  */
-function assertNotFromBill(invoice: StoredInvoice): void {
+async function assertNotFromContracts(
+  deps: PartyFinanceDeps,
+  tx: FinanceTx,
+  invoice: StoredInvoice,
+): Promise<void> {
+  if (invoice.origin === "retention_release") {
+    const release =
+      invoice.sourceId == null
+        ? undefined
+        : (
+            await deps.directory.retentionReleases(tx, invoice.workspaceId, [
+              invoice.sourceId,
+            ])
+          ).get(invoice.sourceId);
+    throw conflict(
+      "INVOICE_FROM_RETENTION_RELEASE",
+      `This invoice comes from a retention release on ${releasePlace(release)}. Delete the release in Contracts to change it.`,
+      { releaseId: invoice.sourceId },
+    );
+  }
   if (invoice.origin !== "ra_bill") return;
   const client = invoice.partyType === "client";
   throw conflict(
@@ -143,6 +175,17 @@ function assertNotFromBill(invoice: StoredInvoice): void {
     `This invoice comes from ${client ? "Client" : "Contractor"} Bill ${invoice.invoiceNumber}. Reverse the bill in Contracts to change it.`,
     { billId: invoice.sourceId },
   );
+}
+
+/** "WO/26-27/00001" or "the client contract". */
+function releasePlace(
+  release:
+    | { side: "contractor" | "client"; workOrderNumber: string | null }
+    | undefined,
+): string {
+  if (release?.side === "contractor")
+    return release.workOrderNumber ?? "a Work Order";
+  return "the client contract";
 }
 
 function snapshot(invoice: StoredInvoice) {
@@ -410,7 +453,7 @@ export class InvoiceHandlers {
         );
       if (locked.settledAt != null)
         throw conflict("INVOICE_SETTLED", "A settled invoice is not edited.");
-      assertNotFromBill(locked);
+      await assertNotFromContracts(this.deps, tx, locked);
       const fromGrn = locked.origin === "goods_receipt";
       const fields = invoiceFields(party.type, locked.direction, {
         ...input,
@@ -543,7 +586,7 @@ export class InvoiceHandlers {
           "Someone changed this invoice. Reload it and try again.",
           { updatedAt: locked.updatedAt.toISOString() },
         );
-      assertNotFromBill(locked);
+      await assertNotFromContracts(this.deps, tx, locked);
       await this.assertRemovable(tx, locked);
       check.check("party_invoice", "edit", locked.invoiceDate);
       await this.remove(tx, locked, access.userId, at);
@@ -628,7 +671,12 @@ export class InvoiceHandlers {
     const departmentIds = rows.flatMap((row) =>
       row.departmentId == null ? [] : [row.departmentId],
     );
-    const [departments, grns, payments] = await Promise.all([
+    const releaseIds = rows.flatMap((row) =>
+      row.origin === "retention_release" && row.sourceId != null
+        ? [row.sourceId]
+        : [],
+    );
+    const [departments, grns, payments, releases] = await Promise.all([
       directory.departments(db, workspaceId, departmentIds),
       directory.goodsReceipts(
         db,
@@ -640,6 +688,7 @@ export class InvoiceHandlers {
         workspaceId,
         allocations.map((allocation) => allocation.paymentId),
       ),
+      directory.retentionReleases(db, workspaceId, releaseIds),
     ]);
     const paymentById = new Map(payments.map((row) => [row.id, row]));
     return rows.map((row) => {
@@ -674,6 +723,10 @@ export class InvoiceHandlers {
           ownSettlements.find((item) => item.approvalStatus === "pending") ??
           null,
         settlements: ownSettlements,
+        retentionRelease:
+          row.origin === "retention_release" && row.sourceId != null
+            ? (releases.get(row.sourceId) ?? null)
+            : null,
         payments: allocations
           .filter((allocation) => allocation.invoiceId === row.id)
           .flatMap((allocation) => {

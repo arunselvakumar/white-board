@@ -72,6 +72,17 @@ import type { ContractorFacts } from "./ports";
 export const partyPaymentNotFound = () =>
   notFound("PARTY_PAYMENT_NOT_FOUND", "This payment was not found.");
 
+/**
+ * An advance's payment is changed in Contracts (CM-1108): it is applied
+ * only by the bills that recover it, and cancelled by deleting the
+ * advance (409 `PAYMENT_FROM_ADVANCE`).
+ */
+export const paymentFromAdvance = (label: string) =>
+  conflict(
+    "PAYMENT_FROM_ADVANCE",
+    `This payment is the ${label}. Bills recover it in Contracts; delete the advance there to cancel it.`,
+  );
+
 export type AllocationRequest = { invoiceId: string; amount: number };
 
 export type RecordPaymentInput = {
@@ -138,6 +149,8 @@ export type PaymentView = StoredPartyPayment & {
   /** The advance: settled − allocated. */
   unallocated: bigint;
   tdsOverridden: boolean;
+  /** CM-1108: the Contracts advance this payment moved ("mobilisation advance on WO/…"), or null. */
+  contractAdvance: { label: string } | null;
   allocations: {
     id: string;
     invoiceId: string;
@@ -149,12 +162,18 @@ export type PaymentView = StoredPartyPayment & {
 
 export function paymentActions(
   access: MemberAccess,
-  view: Pick<PaymentView, "place" | "unallocated">,
+  view: Pick<PaymentView, "place" | "unallocated"> & {
+    contractAdvance?: PaymentView["contractAdvance"];
+  },
 ): PaymentActions {
+  // An advance's payment is changed in Contracts (CM-1108).
+  const fromAdvance = view.contractAdvance != null;
   return {
-    cancel: canOnPlace(access, "delete", view.place),
+    cancel: !fromAdvance && canOnPlace(access, "delete", view.place),
     applyAdvance:
-      view.unallocated > 0n && canOnPlace(access, "update", view.place),
+      !fromAdvance &&
+      view.unallocated > 0n &&
+      canOnPlace(access, "update", view.place),
     print: canOnPlace(access, "print", view.place),
   };
 }
@@ -365,7 +384,33 @@ export class PartyPaymentHandlers {
     access: MemberAccess,
     input: RecordPaymentInput,
   ): Promise<string> {
-    const { db, store, directory } = this.deps;
+    return (await this.recordWith(access, input, null)).id;
+  }
+
+  /**
+   * Records a payment inside the caller's transaction (CM-1108: an advance
+   * given or received in Contracts is an on-account Payment Out or In,
+   * committed with the advance). Every check `record` makes applies:
+   * Parties Create on the place, the account and mode, the Back-dated Entry
+   * policy, TDS. Returns the id and number.
+   */
+  async recordInside(
+    tx: FinanceTx,
+    access: MemberAccess,
+    input: RecordPaymentInput,
+  ): Promise<{ id: string; number: string }> {
+    return this.recordWith(access, input, tx);
+  }
+
+  private async recordWith(
+    access: MemberAccess,
+    input: RecordPaymentInput,
+    outer: FinanceTx | null,
+  ): Promise<{ id: string; number: string }> {
+    const { store, directory } = this.deps;
+    const db: FinanceTx = outer ?? this.deps.db;
+    const inTransaction = <T>(fn: (tx: FinanceTx) => Promise<T>): Promise<T> =>
+      outer == null ? this.deps.db.$transaction(fn) : fn(outer);
     const workspaceId = access.workspaceId;
     const place = placeFromInput(input.partyType, input);
     assertOnPlace(access, "create", place);
@@ -463,7 +508,8 @@ export class PartyPaymentHandlers {
     };
     const id = newId();
     const at = this.clock();
-    await db.$transaction(async (tx) => {
+    let issued = "";
+    await inTransaction(async (tx) => {
       const account = await this.deps.accountFacts(
         tx,
         workspaceId,
@@ -606,8 +652,9 @@ export class PartyPaymentHandlers {
         },
         occurredAt: at,
       });
+      issued = number;
     });
-    return id;
+    return { id, number: issued };
   }
 
   /**
@@ -621,16 +668,56 @@ export class PartyPaymentHandlers {
     id: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    const { db, store, ledgers } = this.deps;
-    const workspaceId = access.workspaceId;
-    const current = await this.find(workspaceId, id);
+    const current = await this.find(access.workspaceId, id);
     assertOnPlace(access, "delete", current.place);
+    const advance = (
+      await this.deps.directory.contractAdvances(
+        this.deps.db,
+        access.workspaceId,
+        [id],
+      )
+    ).get(id);
+    if (advance != null) throw paymentFromAdvance(advance.label);
+    await this.deps.db.$transaction((tx) =>
+      this.cancelWith(tx, access, id, expectedUpdatedAt),
+    );
+  }
+
+  /**
+   * Cancels an advance's payment inside the caller's transaction, when
+   * Contracts deletes the advance (CM-1108). Parties Delete on the place,
+   * the Back-dated Entry policy and the written-off check apply as in
+   * `cancel`.
+   */
+  async cancelInside(
+    tx: FinanceTx,
+    access: MemberAccess,
+    id: string,
+  ): Promise<void> {
+    const current = await this.deps.store.findPayment(
+      tx,
+      access.workspaceId,
+      id,
+    );
+    if (current == null) throw partyPaymentNotFound();
+    assertOnPlace(access, "delete", current.place);
+    await this.cancelWith(tx, access, id, null);
+  }
+
+  private async cancelWith(
+    tx: FinanceTx,
+    access: MemberAccess,
+    id: string,
+    expectedUpdatedAt: Date | null,
+  ): Promise<void> {
+    const { store, ledgers } = this.deps;
+    const workspaceId = access.workspaceId;
     const check = await this.deps.backdated(access);
     const at = this.clock();
-    await db.$transaction(async (tx) => {
+    {
       const locked = await store.lockPayment(tx, workspaceId, id);
       if (locked == null) throw partyPaymentNotFound();
-      changed(locked, expectedUpdatedAt);
+      if (expectedUpdatedAt != null) changed(locked, expectedUpdatedAt);
       check.check("party_payment", "edit", locked.paymentDate);
       const allocations = await store.allocationsOfPayments(tx, [id]);
       const invoices = await store.lockInvoices(
@@ -677,7 +764,7 @@ export class PartyPaymentHandlers {
         },
         occurredAt: at,
       });
-    });
+    }
   }
 
   /**
@@ -694,6 +781,10 @@ export class PartyPaymentHandlers {
     const workspaceId = access.workspaceId;
     const current = await this.find(workspaceId, id);
     assertOnPlace(access, "update", current.place);
+    const advance = (
+      await this.deps.directory.contractAdvances(db, workspaceId, [id])
+    ).get(id);
+    if (advance != null) throw paymentFromAdvance(advance.label);
     const allocations = allocationsFrom(raw);
     if (allocations.length === 0)
       throw new DomainError(
@@ -752,36 +843,44 @@ export class PartyPaymentHandlers {
     if (rows.length === 0) return [];
     const { db, store, directory } = this.deps;
     const ids = rows.map((row) => row.id);
-    const [allocations, parties, places, accounts, categories, members] =
-      await Promise.all([
-        store.allocationsOfPayments(db, ids),
-        partyNames(this.deps, db, workspaceId, rows),
-        placeNames(
-          this.deps,
-          db,
-          workspaceId,
-          rows.map((row) => row.place),
+    const [
+      allocations,
+      parties,
+      places,
+      accounts,
+      categories,
+      members,
+      advances,
+    ] = await Promise.all([
+      store.allocationsOfPayments(db, ids),
+      partyNames(this.deps, db, workspaceId, rows),
+      placeNames(
+        this.deps,
+        db,
+        workspaceId,
+        rows.map((row) => row.place),
+      ),
+      store.accountNames(
+        db,
+        workspaceId,
+        rows.map((row) => row.accountId),
+      ),
+      store.paymentCategoryNames(
+        db,
+        workspaceId,
+        rows.flatMap((row) =>
+          row.paymentCategoryId == null ? [] : [row.paymentCategoryId],
         ),
-        store.accountNames(
-          db,
-          workspaceId,
-          rows.map((row) => row.accountId),
+      ),
+      directory.teamMembers(
+        db,
+        workspaceId,
+        rows.flatMap((row) =>
+          row.paidByMemberId == null ? [] : [row.paidByMemberId],
         ),
-        store.paymentCategoryNames(
-          db,
-          workspaceId,
-          rows.flatMap((row) =>
-            row.paymentCategoryId == null ? [] : [row.paymentCategoryId],
-          ),
-        ),
-        directory.teamMembers(
-          db,
-          workspaceId,
-          rows.flatMap((row) =>
-            row.paidByMemberId == null ? [] : [row.paidByMemberId],
-          ),
-        ),
-      ]);
+      ),
+      directory.contractAdvances(db, workspaceId, ids),
+    ]);
     const invoices = new Map(
       (
         await store.findInvoices(
@@ -817,6 +916,7 @@ export class PartyPaymentHandlers {
         unallocated: settled - allocated,
         tdsOverridden:
           row.tdsSuggested != null && row.tdsSuggested !== row.tdsAmount,
+        contractAdvance: advances.get(row.id) ?? null,
         allocations: own.map((allocation) => {
           const invoice = invoices.get(allocation.invoiceId);
           return {

@@ -814,6 +814,13 @@ export const prismaPartyStore: PartyStore = {
     });
   },
 
+  async tombstoneAllocationsTo(tx, paymentId, invoiceId, by, at) {
+    await tx.constructionFinancePaymentAllocation.updateMany({
+      where: { paymentId, invoiceId, deletedAt: null },
+      data: { deletedAt: at, deletedBy: by },
+    });
+  },
+
   async duplicateReference(db, workspaceId, accountId, reference) {
     const rows = await db.$queryRaw<{ documentNumber: string | null }[]>(
       Prisma.sql`SELECT e.document_number AS "documentNumber"

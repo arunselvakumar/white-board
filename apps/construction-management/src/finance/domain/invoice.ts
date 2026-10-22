@@ -31,9 +31,17 @@ export type InvoiceDirection = "payable" | "receivable";
 /**
  * `manual`: typed in finance; `goods_receipt`: from a GRN (CM-0017 §13);
  * `ra_bill`: from an approved Contractor Bill (CM-1106) or Client Bill
- * (CM-1107, CM-0023 §7), read-only here.
+ * (CM-1107, CM-0023 §7); `retention_release`: from retention released on a
+ * Work Order or the client contract (CM-1108, CM-0023 §8). The last two
+ * are read-only here.
  */
-export type InvoiceOrigin = "manual" | "goods_receipt" | "ra_bill";
+export type InvoiceOrigin =
+  "manual" | "goods_receipt" | "ra_bill" | "retention_release";
+
+/** Invoices Contracts creates and changes; finance shows them read-only. */
+export function isContractsOrigin(origin: InvoiceOrigin): boolean {
+  return origin === "ra_bill" || origin === "retention_release";
+}
 
 export const INVOICE_STATUSES = [
   "open",

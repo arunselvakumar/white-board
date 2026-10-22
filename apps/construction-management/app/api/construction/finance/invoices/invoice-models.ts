@@ -134,12 +134,22 @@ export const ConstructionFinanceInvoiceResponseModel = z.object({
   place: ConstructionFinancePartyPlaceResponseModel,
   direction: InvoiceDirectionModel,
   origin: z
-    .enum(["manual", "goods_receipt", "ra_bill"])
+    .enum(["manual", "goods_receipt", "ra_bill", "retention_release"])
     .describe(
-      "`ra_bill`: from an approved Contractor Bill (CM-1106, payable) or Client Bill (CM-1107, receivable to a Client); read-only here (409 INVOICE_FROM_CONTRACTOR_BILL / INVOICE_FROM_CLIENT_BILL).",
+      "`ra_bill`: from an approved Contractor Bill (CM-1106, payable) or Client Bill (CM-1107, receivable to a Client); `retention_release`: retention released on a Work Order (payable) or the client contract (receivable), CM-1108. Both read-only here (409 INVOICE_FROM_CONTRACTOR_BILL / INVOICE_FROM_CLIENT_BILL / INVOICE_FROM_RETENTION_RELEASE).",
     ),
-  /** `ra_bill`: the Contractor or Client Bill's id (the party type says which). */
+  /** `ra_bill`: the Contractor or Client Bill's id (the party type says which); `retention_release`: the release's. */
   sourceId: z.uuid().nullable(),
+  retentionRelease: z
+    .object({
+      side: z.enum(["contractor", "client"]),
+      workOrderId: z.uuid().nullable(),
+      workOrderNumber: z.string().nullable(),
+    })
+    .nullable()
+    .describe(
+      "Origin `retention_release`: the Work Order the retention was released on (contractor side), or none (the client contract).",
+    ),
   invoiceNumber: z.string(),
   invoiceDate: z.iso.date(),
   dueDate: z.iso.date().nullable(),
@@ -242,6 +252,7 @@ export function toInvoiceResponse(
     direction: view.direction,
     origin: view.origin,
     sourceId: view.sourceId,
+    retentionRelease: view.retentionRelease,
     invoiceNumber: view.invoiceNumber,
     invoiceDate: view.invoiceDate,
     dueDate: view.dueDate,

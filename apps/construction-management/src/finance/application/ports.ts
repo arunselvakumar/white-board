@@ -172,6 +172,34 @@ export type FinanceDirectory = {
     location: { kind: "project" | "store"; id: string },
     supplierId: string | null,
   ): Promise<GoodsReceiptFacts[]>;
+  /**
+   * Payments that moved a Contracts advance (CM-1108), by payment id, with
+   * a label ("mobilisation advance on WO/26-27/00001"). Finance shows them
+   * and refuses to cancel or apply them: Contracts does.
+   */
+  contractAdvances(
+    db: Db,
+    workspaceId: string,
+    paymentIds: readonly string[],
+  ): Promise<Map<string, { label: string }>>;
+  /**
+   * Retention releases by id (CM-1108): the Work Order a contractor-side
+   * release is on (its number), none for the client contract.
+   */
+  retentionReleases(
+    db: Db,
+    workspaceId: string,
+    releaseIds: readonly string[],
+  ): Promise<
+    Map<
+      string,
+      {
+        side: "contractor" | "client";
+        workOrderId: string | null;
+        workOrderNumber: string | null;
+      }
+    >
+  >;
   /** Names of Users by user id, from their Team Members (CM-705). */
   userNames(
     db: Db,

@@ -70,6 +70,7 @@ function invoice(patch: Partial<Invoice> & Pick<Invoice, "id">): Invoice {
     direction: "payable",
     origin: "manual",
     sourceId: null,
+    retentionRelease: null,
     invoiceNumber: "CC/2026/118",
     invoiceDate: "2026-09-01",
     dueDate: "2026-10-01",
@@ -324,6 +325,7 @@ export const CONTRACTOR_PAYMENT: PartyPayment = {
   reference: "UTR-889912",
   modeDate: "2026-10-10",
   amount: 49_500_00,
+  contractAdvance: null,
   tds: {
     section: "194C",
     base: 50_000_00,
