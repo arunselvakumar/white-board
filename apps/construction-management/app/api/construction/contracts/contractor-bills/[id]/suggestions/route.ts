@@ -6,6 +6,10 @@ import {
   requireContractorBillAccess,
 } from "../../contractor-bill-access";
 import {
+  mobilisationSuggestion,
+  toBillAdvancesResponse,
+} from "../../../advances/bill-advance-models";
+import {
   ConstructionContractsContractorBillParamsModel,
   toRetentionResponse,
   type ConstructionContractsContractorBillSuggestionsResponseModel,
@@ -15,9 +19,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * What the deductions editor suggests (CM-1106): retention at the Work
- * Order's %, within its cap. Mobilisation advance recovery is suggested
- * once advances exist (CM-1108). Money is null without Financial. Needs
- * Contractor Bill read.
+ * Order's %, within its cap, and per advance given on the Work Order
+ * min(its rule on this gross, what is left of it) (CM-1108). Money is null
+ * without Financial. Needs Contractor Bill read.
  */
 export async function GET(
   request: Request,
@@ -41,8 +45,11 @@ export async function GET(
         },
         detail.financial,
       ),
-      // CM-1108: advances recover here (the Work Order's recovery % of the gross, up to what is left).
-      mobilisationRecovery: null,
+      mobilisationRecovery: mobilisationSuggestion(
+        detail.advances,
+        detail.financial,
+      ),
+      recoveries: toBillAdvancesResponse(detail.advances, detail.financial),
     };
     return Response.json(body);
   } catch (error) {

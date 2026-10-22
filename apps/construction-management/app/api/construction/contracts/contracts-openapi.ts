@@ -8,6 +8,10 @@ import {
   contractsAccessOpenApiOperations,
 } from "./access/access-openapi";
 import {
+  contractsAdvancesOpenApiComponents,
+  contractsAdvancesOpenApiOperations,
+} from "./advances/advances-openapi";
+import {
   contractsClientBillsOpenApiComponents,
   contractsClientBillsOpenApiOperations,
 } from "./client-bills/client-bills-openapi";
@@ -41,6 +45,7 @@ export const contractsOpenApiComponents: OpenApiComponents = {
   ...contractsMeasurementsOpenApiComponents,
   ...contractsContractorBillsOpenApiComponents,
   ...contractsClientBillsOpenApiComponents,
+  ...contractsAdvancesOpenApiComponents,
 };
 
 /** Every contracts operation (M11). */
@@ -52,4 +57,5 @@ export const contractsOpenApiOperations: OpenApiOperation[] = [
   ...contractsMeasurementsOpenApiOperations,
   ...contractsContractorBillsOpenApiOperations,
   ...contractsClientBillsOpenApiOperations,
+  ...contractsAdvancesOpenApiOperations,
 ];

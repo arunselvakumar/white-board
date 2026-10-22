@@ -36,6 +36,12 @@ import {
 
 import { ConstructionContractsMeasurementLocationModel } from "../measurements/measurement-models";
 
+import {
+  billDeductionAdvanceId,
+  ConstructionContractsBillAdvanceModel,
+  toBillAdvancesResponse,
+} from "../advances/bill-advance-models";
+
 export const CONTRACTOR_BILLS_PATH =
   "/api/construction/contracts/contractor-bills";
 
@@ -101,6 +107,7 @@ export const ConstructionContractsContractorBillDeductionInputModel = z.object({
     .describe(
       `At most ${String(BILL_DEDUCTION_DESCRIPTION_MAX)} characters; the reason, required for "other" (400 BILL_DEDUCTION_REASON_REQUIRED).`,
     ),
+  advanceId: billDeductionAdvanceId,
 });
 
 const content = {
@@ -318,6 +325,7 @@ export const ConstructionContractsContractorBillDeductionModel = z.object({
   kind: z.enum(DEDUCTION_KINDS),
   description: z.string().nullable(),
   amount: money("Paise."),
+  advanceId: z.uuid().nullable().describe("A recovery's advance (CM-1108)."),
 });
 
 export const ConstructionContractsContractorBillRetentionModel = z.object({
@@ -377,9 +385,14 @@ export const GetConstructionContractsContractorBillResponseModel = z.object({
   ),
   lines: z.array(ConstructionContractsContractorBillLineModel),
   deductionLines: z.array(ConstructionContractsContractorBillDeductionModel),
+  advances: z
+    .array(ConstructionContractsBillAdvanceModel)
+    .describe(
+      "The contract's advances this bill may recover, with what is left and what its gross suggests (CM-1108).",
+    ),
   retention: ConstructionContractsContractorBillRetentionModel,
   retentionHeldOnWorkOrder: money(
-    "Paise: retention held on the Work Order's approved bills.",
+    "Paise: retention held on the Work Order: its approved bills' retention less releases (CM-1108).",
   ),
   tdsEstimate:
     ConstructionContractsContractorBillTdsEstimateModel.nullable().describe(
@@ -408,8 +421,13 @@ export const ConstructionContractsContractorBillSuggestionsResponseModel =
   z.object({
     retention: ConstructionContractsContractorBillRetentionModel,
     mobilisationRecovery: money(
-      "Paise. Advances arrive with CM-1108: always null for now.",
+      "Paise: Σ the suggested mobilisation advance recoveries; null when there is none.",
     ),
+    recoveries: z
+      .array(ConstructionContractsBillAdvanceModel)
+      .describe(
+        "One per advance of the contract with what this bill suggests recovering (CM-1108).",
+      ),
   });
 export type ConstructionContractsContractorBillSuggestionsResponseModel =
   z.infer<typeof ConstructionContractsContractorBillSuggestionsResponseModel>;
@@ -574,7 +592,9 @@ export function toContractorBillResponse(
       kind: deduction.kind,
       description: deduction.description,
       amount: paise(deduction.amount, financial),
+      advanceId: deduction.advanceId,
     })),
+    advances: toBillAdvancesResponse(detail.advances, financial),
     retention: toRetentionResponse(
       detail.retention,
       {

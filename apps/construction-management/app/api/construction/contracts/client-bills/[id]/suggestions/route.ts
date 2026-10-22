@@ -6,6 +6,10 @@ import {
   requireClientBillAccess,
 } from "../../client-bill-access";
 import {
+  mobilisationSuggestion,
+  toBillAdvancesResponse,
+} from "../../../advances/bill-advance-models";
+import {
   ConstructionContractsClientBillParamsModel,
   toClientRetentionResponse,
   type ConstructionContractsClientBillSuggestionsResponseModel,
@@ -42,8 +46,8 @@ export async function GET(
         found.terms,
         financial,
       ),
-      // CM-1108: the Client's advances recover here.
-      mobilisationRecovery: null,
+      mobilisationRecovery: mobilisationSuggestion(found.advances, financial),
+      recoveries: toBillAdvancesResponse(found.advances, financial),
     };
     return Response.json(body);
   } catch (error) {

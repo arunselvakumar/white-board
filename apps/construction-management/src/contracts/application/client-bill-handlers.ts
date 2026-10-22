@@ -708,13 +708,21 @@ export class ClientBillHandlers {
     return { setup, unbilled, openBillId, today };
   }
 
-  /** The retention suggestion for a draft as it stands (read, Financial). */
+  /** The retention and advance recovery suggestions for a draft as it stands (read, Financial). */
   async suggestions(
     access: MemberAccess,
     id: string,
-  ): Promise<{ retention: RetentionSuggestion; terms: ClientContractTerms }> {
+  ): Promise<{
+    retention: RetentionSuggestion;
+    terms: ClientContractTerms;
+    advances: BillAdvanceView[];
+  }> {
     const detail = await this.get(access, id);
-    return { retention: detail.retention, terms: detail.terms };
+    return {
+      retention: detail.retention,
+      terms: detail.terms,
+      advances: detail.advances,
+    };
   }
 
   // Client contract terms ----------------------------------------------------

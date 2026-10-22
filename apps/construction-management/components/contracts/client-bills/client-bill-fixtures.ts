@@ -194,8 +194,10 @@ export function billOf(
         kind: "retention",
         description: null,
         amount: 61_078_41,
+        advanceId: null,
       },
     ],
+    advances: [],
     retention: {
       percent: "10.00",
       capPercent: "5.00",

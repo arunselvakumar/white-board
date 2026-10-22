@@ -39,6 +39,12 @@ import {
 
 import { ConstructionContractsMeasurementLocationModel } from "../measurements/measurement-models";
 
+import {
+  billDeductionAdvanceId,
+  ConstructionContractsBillAdvanceModel,
+  toBillAdvancesResponse,
+} from "../advances/bill-advance-models";
+
 export const CLIENT_BILLS_PATH = "/api/construction/contracts/client-bills";
 
 const optionalExpected = z.iso
@@ -107,6 +113,7 @@ export const ConstructionContractsClientBillDeductionInputModel = z.object({
     .describe(
       `At most ${String(BILL_DEDUCTION_DESCRIPTION_MAX)} characters; the reason, required for "other" (400 BILL_DEDUCTION_REASON_REQUIRED).`,
     ),
+  advanceId: billDeductionAdvanceId,
 });
 
 const content = {
@@ -307,7 +314,7 @@ export const ListConstructionContractsClientBillsResponseModel = z.object({
     "Over the bills the filter matches that count: draft, pending and approved (not rejected or reversed).",
   ),
   retentionReceivable: money(
-    "Paise the Client holds as retention on approved bills, not yet released.",
+    "Paise the Client holds as retention on approved bills, less releases (CM-1108).",
   ),
   setup: ConstructionContractsClientBillSetupModel,
   financial: z.boolean(),
@@ -372,6 +379,7 @@ export const ConstructionContractsClientBillDeductionModel = z.object({
   kind: z.enum(DEDUCTION_KINDS),
   description: z.string().nullable(),
   amount: money("Paise."),
+  advanceId: z.uuid().nullable().describe("A recovery's advance (CM-1108)."),
 });
 
 export const ConstructionContractsClientBillRetentionModel = z.object({
@@ -449,9 +457,14 @@ export const GetConstructionContractsClientBillResponseModel = z.object({
   igst: money("Paise."),
   lines: z.array(ConstructionContractsClientBillLineModel),
   deductionLines: z.array(ConstructionContractsClientBillDeductionModel),
+  advances: z
+    .array(ConstructionContractsBillAdvanceModel)
+    .describe(
+      "The contract's advances this bill may recover, with what is left and what its gross suggests (CM-1108).",
+    ),
   retention: ConstructionContractsClientBillRetentionModel,
   retentionReceivable: money(
-    "Paise: retention the Client holds on the Project's approved bills (derived in contracts).",
+    "Paise: retention the Client holds on the Project's approved bills less releases (derived in contracts, CM-1108).",
   ),
   terms: ConstructionContractsClientContractTermsModel,
   remarks: z.string().nullable(),
@@ -477,8 +490,13 @@ export const ConstructionContractsClientBillSuggestionsResponseModel = z.object(
   {
     retention: ConstructionContractsClientBillRetentionModel,
     mobilisationRecovery: money(
-      "Paise. The Client's advances arrive with CM-1108: always null for now.",
+      "Paise: Σ the suggested mobilisation advance recoveries; null when there is none.",
     ),
+    recoveries: z
+      .array(ConstructionContractsBillAdvanceModel)
+      .describe(
+        "One per advance of the contract with what this bill suggests recovering (CM-1108).",
+      ),
   },
 );
 export type ConstructionContractsClientBillSuggestionsResponseModel = z.infer<
@@ -512,7 +530,9 @@ export const GetConstructionContractsClientContractResponseModel = z.object({
     .nullable()
     .describe("Null before the terms are first saved."),
   boqValue: money("Paise: the BOQ's current value (the retention cap's base)."),
-  retentionReceivable: money("Paise held on approved client bills."),
+  retentionReceivable: money(
+    "Paise held on approved client bills, less releases (CM-1108).",
+  ),
   canEdit: z.boolean().describe("Client Bill update on the Project."),
   financial: z.boolean(),
 });
@@ -715,7 +735,9 @@ export function toClientBillResponse(
       kind: deduction.kind,
       description: deduction.description,
       amount: paise(deduction.amount, financial),
+      advanceId: deduction.advanceId,
     })),
+    advances: toBillAdvancesResponse(detail.advances, financial),
     retention: toClientRetentionResponse(
       detail.retention,
       detail.terms,

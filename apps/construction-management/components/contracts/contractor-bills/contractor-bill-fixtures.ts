@@ -15,6 +15,7 @@ const CUM = "0199c0de-1106-7000-8000-0000000000a1";
 const LINE_1 = "0199c0de-1106-7000-8000-000000000201";
 const LINE_2 = "0199c0de-1106-7000-8000-000000000202";
 const INVOICE = "0199c0de-1106-7000-8000-0000000000f1";
+export const ADVANCE_ID = "0199c0de-1108-7000-8000-0000000000a1";
 
 export const BILL_DRAFT = "0199c0de-1106-7000-8000-000000000101";
 export const BILL_PENDING = "0199c0de-1106-7000-8000-000000000102";
@@ -168,12 +169,29 @@ export function billOf(
         kind: "retention",
         description: null,
         amount: 4_730_00,
+        advanceId: null,
       },
       {
         id: "0199c0de-1106-7000-8000-000000000602",
         kind: "mobilisation_recovery",
-        description: "10 % of the gross",
+        description: null,
         amount: 5_000_00,
+        advanceId: ADVANCE_ID,
+      },
+    ],
+    advances: [
+      {
+        id: ADVANCE_ID,
+        kind: "mobilisation",
+        recoveryKind: "mobilisation_recovery",
+        advanceOn: "2026-09-01",
+        amount: 50_000_00,
+        recoveryMode: "percent",
+        recoveryPercent: "10.00",
+        recoveryAmount: null,
+        recovered: 4_800_00,
+        balance: 45_200_00,
+        suggested: 9_460_00,
       },
     ],
     retention: {
@@ -277,6 +295,7 @@ export const DRAFT = billOf({
       kind: "retention",
       description: null,
       amount: 4_730_00,
+      advanceId: null,
     },
   ],
   deductions: 4_730_00,
@@ -328,6 +347,7 @@ export const RCM = billOf({
       kind: "retention",
       description: null,
       amount: 4_730_00,
+      advanceId: null,
     },
   ],
   deductions: 4_730_00,
