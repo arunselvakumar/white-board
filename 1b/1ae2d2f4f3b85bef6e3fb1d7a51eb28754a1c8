@@ -1,0 +1,105 @@
+apps/construction-management/app/api/construction/finance/accounts/account-models.ts
+  s_f49615d4431370::t_c06de216c86bda 149
+apps/construction-management/app/api/construction/finance/central-payment/central-payment-models.ts
+  s_f49615d4431370::t_ef9d1b680c4926 22,40-41
+apps/construction-management/app/api/construction/finance/central-payment/central-payment.http.test.ts
+  s_f49615d4431370::t_97d03a5bbd2443 256
+apps/construction-management/app/api/construction/finance/central-payment/route.ts
+  s_f49615d4431370::t_a886731679d37f 56-58,81
+apps/construction-management/app/api/construction/finance/invoices/invoice-models.ts
+  s_f49615d4431370::t_c466296a47e202 139,141
+apps/construction-management/app/api/construction/finance/lookup-models.ts
+  s_f49615d4431370::t_fdb8bbdf533c38 11
+apps/construction-management/app/api/construction/finance/parties/handlers.ts
+  s_f49615d4431370::t_ca3522479aa03f 100-102
+apps/construction-management/app/api/construction/finance/parties/party-balance-models.ts
+  s_f49615d4431370::t_a9444288729aa2 22,27-35,78-80
+apps/construction-management/app/api/construction/finance/party-payments/party-payment-models.ts
+  s_f49615d4431370::t_e6ed0024cee052 39-42,73-80,85,197-209,279-285
+apps/construction-management/app/api/construction/finance/party-statements/party-statement-models.ts
+  s_f49615d4431370::t_3f29b2be1920fc 46-47
+apps/construction-management/app/api/construction/reporting/reports/report-models.ts
+  s_f49615d4431370::t_8967c27280390d 44
+apps/construction-management/components/finance/central-payment/central-payment-fixtures.ts
+  s_f49615d4431370::t_5a044b35ea8e71 79-92,155
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_f49615d4431370::t_57b49b689bc1b6 273-275
+apps/construction-management/components/finance/central-payment/central-payment-skeletons.tsx
+  s_f49615d4431370::t_7c53abe2d7304a 18
+apps/construction-management/components/finance/counterparty-field.tsx
+  s_f49615d4431370::t_0c04c654c5946c 42
+apps/construction-management/components/finance/parties/party-fixtures.ts
+  s_f49615d4431370::t_ebfd4273332378 210-212,254-256,334,525-527,541-543
+apps/construction-management/components/finance/parties/party-money.ts
+  s_f49615d4431370::t_43b7e15569946c 98-99
+apps/construction-management/components/finance/transactions/transaction-form.tsx
+  s_f49615d4431370::t_71c2ba191d10fa 73
+apps/construction-management/docs/prd/milestones-and-tasks.md
+  s_f49615d4431370::t_3cbc0d9895fc2e 1158-1170
+apps/construction-management/src/composition/backup-sources.ts
+  s_f49615d4431370::t_11fb8ba13bf003 992,1027,1038-1039
+apps/construction-management/src/composition/contracts-client-retention.ts
+  s_f49615d4431370::t_10dec56bbbe3e0 1-38
+apps/construction-management/src/composition/finance-directory.ts
+  s_f49615d4431370::t_49b8698832fa2c 4,136-160,285-303
+apps/construction-management/src/composition/party-finance.ts
+  s_f49615d4431370::t_227598d4a97681 18,28
+apps/construction-management/src/finance/application/invoice-handlers.ts
+  s_f49615d4431370::t_1b52f9823a863a 111,132-136,138-145,413,546
+apps/construction-management/src/finance/application/party-common.ts
+  s_f49615d4431370::t_8f6c23cff43da1 16,71-82,142,146,155
+apps/construction-management/src/finance/application/party-payment-handlers.ts
+  s_f49615d4431370::t_94c46d7bbf4fd2 27,34,96-99,135,180-181,396-407,491-496,565-566,711,799
+apps/construction-management/src/finance/application/party-ports.ts
+  s_f49615d4431370::t_c308a549daecc3 102-108,112-120,135,200-203
+apps/construction-management/src/finance/application/party-queries.ts
+  s_f49615d4431370::t_a52282a0ba44d4 42-50,155-157,208-215,240-242,343-351,404,407,414-432
+apps/construction-management/src/finance/application/ports.ts
+  s_f49615d4431370::t_8a35c6d193d67f 38-51,92-97,142-144,149-155
+apps/construction-management/src/finance/application/transaction-common.ts
+  s_f49615d4431370::t_ad6eb65189ad60 131-136,191-193
+apps/construction-management/src/finance/domain/dues.ts
+  s_f49615d4431370::t_99f458ce8b8bc4 191-192,196-201,203-209
+apps/construction-management/src/finance/domain/invoice.ts
+  s_f49615d4431370::t_456272c2f111cd 25-26,33-34,84-89
+apps/construction-management/src/finance/domain/ledger.ts
+  s_f49615d4431370::t_3299615608125c 25-26,65,74-78
+apps/construction-management/src/finance/domain/party-payment.test.ts
+  s_f49615d4431370::t_aecad4f54e2778 6,11,154-155,187-242
+apps/construction-management/src/finance/domain/party-payment.ts
+  s_f49615d4431370::t_c45ff8d66ba5e6 21,28-32,37-47,50,201-204,208-226,230-233,254-262,299-323
+apps/construction-management/src/finance/domain/party.ts
+  s_f49615d4431370::t_4e4221422a3b6f 6-9,11-16,22,94-96,100-108
+apps/construction-management/src/finance/infrastructure/central-payment.ts
+  s_f49615d4431370::t_8f19fcdec328c1 30,58,66,87
+apps/construction-management/src/finance/infrastructure/due-invoices.ts
+  s_f49615d4431370::t_38a6bbac8fafc2 134-135,139,151,154,169-171,180
+apps/construction-management/src/finance/infrastructure/party-finance-factory.ts
+  s_f49615d4431370::t_c161022c0d3e1c 14-17,31-32,38-39,56
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_f49615d4431370::t_dc01fbdb771067 88-89,679-680,835-836
+apps/construction-management/src/reporting/domain/finance-reports.ts
+  s_f49615d4431370::t_96f0bf1ec17b4c 74,945,963-964
+apps/construction-management/src/reporting/domain/report-job.ts
+  s_f49615d4431370::t_0d258bda612419 99
+packages/db/construction/prisma/migrations/20261022180000_construction_finance_client_party/migration.sql
+  s_f49615d4431370::t_bc5e929e34fb00 1-65
+packages/db/construction/prisma/schema/construction-finance.prisma
+  s_f49615d4431370::t_441e87614870e0 61-62,69-70,75,126-129,189,534,617-621
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1b1ae2d2f4f3b85bef6e3fb1d7a51eb28754a1c8",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
