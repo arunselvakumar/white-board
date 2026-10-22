@@ -106,7 +106,7 @@ Both kinds work the same way:
 - An approved bill is locked. It can be **reversed** only while it is the latest bill on its work order or BOQ and nothing has been paid or received against it. Reversing posts a reversal and frees its measurements (409 `BILL_NOT_LATEST`, `BILL_SETTLED`).
 - **TDS is not a bill deduction.** Finance deducts TDS at payment, as today (CM-0017). The bill PDF shows the TDS estimate for information.
 
-When a **contractor bill** is approved, it creates a **payable invoice** in finance (origin `ra_bill`). The invoice amount is gross + GST − retention − recoveries. Retention goes to the party ledger as **retention held** (a new entry kind), so the Contractor's balance shows what is owed now and what is held.
+When a **contractor bill** is approved, it creates a **payable invoice** in finance (origin `ra_bill`). The invoice amount is the bill's net: gross + GST payable (none under reverse charge) − retention − recoveries. **Retention held** is kept in contracts, derived from the retention deductions of approved bills less releases, and shown on the Contractor Bills page and the Work Order. It is not a party-ledger entry: finance sums the party ledger in many places (balances, statements, central payments, dues, reports), and a new entry kind would change all of them. The Contractor's finance balance is therefore what is owed now, and a release (§8, CM-1108) creates the payable for what it releases. (Amended by CM-1106.)
 
 When a **client bill** is approved, it creates a **receivable invoice** to the Client in the same way. Retention the client holds goes to **retention receivable**. The bill carries the place of supply (§11) and can be exported for an e-invoice (§13).
 
