@@ -116,8 +116,8 @@ export type ContractorBillLineView = StoredBillLine & {
   uomName: string;
   /** The Work Order line's quantity now; null when the line was removed. */
   workOrderQuantity: bigint | null;
-  /** The measurement rows behind the line. */
-  rows: BillMeasurementRow[];
+  /** The measurement rows behind the line, with their location's label. */
+  rows: (BillMeasurementRow & { locationLabel: string | null })[];
 };
 
 export type ContractorBillAllowed = {
@@ -512,7 +512,7 @@ export class ContractorBillHandlers {
         workOrders.lines(db, ws, [bill.workOrderId]),
       ]);
     if (view == null) throw billNotFound();
-    const [uoms, names, heldBefore, contractors] = await Promise.all([
+    const [uoms, names, heldBefore, contractors, labelOf] = await Promise.all([
       directory.uoms(
         db,
         ws,
@@ -530,6 +530,9 @@ export class ContractorBillHandlers {
       ),
       store.retentionHeld(db, ws, bill.workOrderId, bill.id),
       directory.contractors(db, ws, bill.projectId, [order.contractorId]),
+      rows.some((row) => row.location != null)
+        ? this.deps.locationLabels(ws, bill.projectId)
+        : Promise.resolve(() => null),
     ]);
     const quantities = new Map(woLines.map((line) => [line.id, line.quantity]));
     const retention = retentionSuggestion({
@@ -569,9 +572,9 @@ export class ContractorBillHandlers {
         ...line,
         uomName: uoms.get(line.uomId)?.name ?? "",
         workOrderQuantity: quantities.get(line.workOrderLineId) ?? null,
-        rows: rows.filter(
-          (row) => row.workOrderLineId === line.workOrderLineId,
-        ),
+        rows: rows
+          .filter((row) => row.workOrderLineId === line.workOrderLineId)
+          .map((row) => ({ ...row, locationLabel: labelOf(row.location) })),
       })),
       deductions,
       supplyType:
@@ -621,15 +624,6 @@ export class ContractorBillHandlers {
       project,
       contractor: contractors.get(detail.bill.contractorId) ?? null,
     };
-  }
-
-  /** The retention a draft may hold now (read): the suggestion for its gross. */
-  async suggestions(
-    access: MemberAccess,
-    id: string,
-  ): Promise<{ retention: RetentionSuggestion; financial: boolean }> {
-    const detail = await this.get(access, id);
-    return { retention: detail.retention, financial: detail.financial };
   }
 
   /**

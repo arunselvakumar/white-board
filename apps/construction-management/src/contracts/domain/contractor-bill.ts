@@ -623,6 +623,10 @@ export function reverseReason(raw: string | null | undefined): string {
   return requiredText(raw, "REVERSE_REASON_REQUIRED", "reason");
 }
 
+/** What the bill page and PDF say about the TDS estimate (ADR CM-0023 §7). */
+export const TDS_ESTIMATE_NOTE =
+  "Estimate only: TDS is deducted when the bill is paid, on that payment's figures.";
+
 /** The close reason a Final bill writes on its Work Order. */
 export function finalCloseReason(number: string): string {
   return `Final bill ${number} approved.`;

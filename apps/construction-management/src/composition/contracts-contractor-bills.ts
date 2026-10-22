@@ -10,6 +10,7 @@ import { PrismaWorkOrderStore } from "@/src/contracts/infrastructure/prisma-work
 import { companyToday } from "@/src/shared-kernel/company-today";
 import { loadBackdatedCheck } from "@/src/site-work/infrastructure/site-work-guards";
 
+import { projectLocationLabeller } from "./progress-report-source";
 import {
   contractorTdsEstimate,
   contractsPartyInvoicing,
@@ -31,6 +32,8 @@ export function createContractorBillDeps(): ContractorBillDeps {
     directory: contractsDirectory,
     invoicing: contractsPartyInvoicing(),
     tds: contractorTdsEstimate,
+    locationLabels: (workspaceId, projectId) =>
+      projectLocationLabeller(workspaceId, projectId),
     backdated: (access) => loadBackdatedCheck(prisma, access),
     today: (workspaceId) => companyToday(prisma, workspaceId),
     events: messagingEvents(),

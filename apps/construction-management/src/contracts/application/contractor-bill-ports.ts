@@ -333,6 +333,11 @@ export type ContractorBillDeps = {
   /** The payable invoice in finance (ADR CM-0023 §7). */
   invoicing: PartyInvoicing;
   tds: ContractorTdsEstimator;
+  /** One-line labels for the rows' locations ("Wing A · Floor 1"). */
+  locationLabels: (
+    workspaceId: string,
+    projectId: string,
+  ) => Promise<(location: LocationRef | null) => string | null>;
   backdated: (access: {
     workspaceId: string;
     userId: string;

@@ -162,3 +162,53 @@ export async function addAnalysisMaterial(
     },
   });
 }
+
+/**
+ * A contractor-side measurement sheet on a Work Order (CM-1105), written
+ * straight to its tables: `checked` by default, one direct row per line
+ * given. Contractor Bills (CM-1106) take checked rows.
+ */
+export async function measureWorkOrderLines(
+  workspaceId: string,
+  by: string,
+  input: {
+    projectId: string;
+    workOrderId: string;
+    measuredOn: string;
+    status?: "draft" | "submitted" | "checked";
+    rows: readonly { workOrderLineId: string; quantity: string }[];
+  },
+): Promise<{ sheetId: string; rowIds: string[] }> {
+  const sheetId = randomUUID();
+  const now = new Date();
+  const checked = (input.status ?? "checked") === "checked";
+  await prisma.constructionContractsMeasurementSheet.create({
+    data: {
+      id: sheetId,
+      workspaceId,
+      projectId: input.projectId,
+      side: "contractor",
+      workOrderId: input.workOrderId,
+      measuredOn: new Date(input.measuredOn),
+      status: input.status ?? "checked",
+      checkedAt: checked ? now : null,
+      checkedBy: checked ? by : null,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  const rowIds = input.rows.map(() => randomUUID());
+  await prisma.constructionContractsMeasurementRow.createMany({
+    data: input.rows.map((row, position) => ({
+      id: rowIds[position] ?? randomUUID(),
+      workspaceId,
+      sheetId,
+      workOrderLineId: row.workOrderLineId,
+      description: `Measured ${String(position + 1)}`,
+      direct: true,
+      quantity: row.quantity,
+      position,
+    })),
+  });
+  return { sheetId, rowIds };
+}
