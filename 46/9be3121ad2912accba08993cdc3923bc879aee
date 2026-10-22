@@ -1,0 +1,39 @@
+apps/construction-management/src/composition/contracts-client-retention.ts
+  s_f49615d4431370::t_612664cb3b8793 33
+apps/construction-management/src/contracts/application/client-bill-handlers.ts
+  s_f49615d4431370::t_52185a97ed97db 1029,1106-1108
+apps/construction-management/src/contracts/application/contractor-bill-handlers.ts
+  s_f49615d4431370::t_4b621c355378bb 931,1043-1045
+apps/construction-management/src/contracts/application/contractor-bill-ports.ts
+  s_f49615d4431370::t_380a415d04e221 5-9,38-42,106-107
+apps/construction-management/src/contracts/application/escalation-ports.ts
+  s_f49615d4431370::t_ae9f68bacd8503 1-299
+apps/construction-management/src/contracts/application/ra-bill-common.ts
+  s_f49615d4431370::t_8343eb8c1859c2 123,151
+apps/construction-management/src/contracts/domain/advance.ts
+  s_f49615d4431370::t_da072b8c19b2f5 305
+apps/construction-management/src/contracts/domain/ra-bill.ts
+  s_f49615d4431370::t_dc8eddae0ea862 345-346,355-356,425-428
+apps/construction-management/src/contracts/infrastructure/prisma-advance-store.ts
+  s_f49615d4431370::t_9955c103673936 356
+apps/construction-management/src/contracts/infrastructure/prisma-client-bill-store.ts
+  s_f49615d4431370::t_067cd379a818c8 388
+apps/construction-management/src/contracts/infrastructure/prisma-ra-bill-rows.ts
+  s_f49615d4431370::t_9ac6ef1cc5e702 51-54,135,214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "469be3121ad2912accba08993cdc3923bc879aee",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
