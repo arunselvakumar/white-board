@@ -1,0 +1,77 @@
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/approve/route.ts
+  s_f49615d4431370::t_d321b7091c334c 1-25
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/delete/route.ts
+  s_f49615d4431370::t_487a4801d717f7 1-53
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/pdf/route.ts
+  s_f49615d4431370::t_a136d3fa569fc9 1-56
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/refresh/route.ts
+  s_f49615d4431370::t_9ca96d5db2593e 1-30
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/reject/route.ts
+  s_f49615d4431370::t_d830a1af92d840 1-27
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/reverse/route.ts
+  s_f49615d4431370::t_3e0aac4faac1d5 1-27
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/route.ts
+  s_f49615d4431370::t_dcee1184f2f1c6 1-12
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/submit/route.ts
+  s_f49615d4431370::t_7a7f91114cd48e 1-29
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/suggestions/route.ts
+  s_f49615d4431370::t_380702e7c7636a 1-52
+apps/construction-management/app/api/construction/contracts/client-bills/[id]/update/route.ts
+  s_f49615d4431370::t_811e68cd5f0a08 1-30
+apps/construction-management/app/api/construction/contracts/client-bills/client-bill-access.ts
+  s_f49615d4431370::t_0a650eb33b8b30 1-83
+apps/construction-management/app/api/construction/contracts/client-bills/client-bill-route.ts
+  s_f49615d4431370::t_dbbf0e62efb8d0 1-52
+apps/construction-management/app/api/construction/contracts/client-bills/client-bills-openapi.ts
+  s_f49615d4431370::t_2fbb2cb4b3c2af 1-220
+apps/construction-management/app/api/construction/contracts/client-bills/client-bills.http.test.ts
+  s_f49615d4431370::t_a74b552946980b 1-1009
+apps/construction-management/app/api/construction/contracts/client-bills/contract/route.ts
+  s_f49615d4431370::t_ed5e5678bbf38b 1-37
+apps/construction-management/app/api/construction/contracts/client-bills/contract/update/route.ts
+  s_f49615d4431370::t_8ed7dbb9eec5f1 1-49
+apps/construction-management/app/api/construction/contracts/client-bills/form-options/route.ts
+  s_f49615d4431370::t_f95a75807703ef 1-36
+apps/construction-management/app/api/construction/contracts/client-bills/route.ts
+  s_f49615d4431370::t_c6574ea975ac80 1-117
+apps/construction-management/app/api/construction/contracts/contracts-openapi.ts
+  s_f49615d4431370::t_a1aac86fbb353e 10-13,43,54
+apps/construction-management/src/composition/contracts-client-bills.ts
+  s_f49615d4431370::t_45e25a2c22b342 9,42-59
+apps/construction-management/src/contracts/infrastructure/client-bill-pdf.ts
+  s_f49615d4431370::t_dce592c005e5de 1-197
+apps/construction-management/src/contracts/infrastructure/contractor-bill-pdf.ts
+  s_f49615d4431370::t_7c763722b8c54a 8,10-21,73,114-115,118,125-126,131,136-137,143,148,156-160
+apps/construction-management/test/contracts.ts
+  s_f49615d4431370::t_ab8b29446e3e89 215-298
+apps/construction-management/test/party-finance.ts
+  s_f49615d4431370::t_0640be24f9faa2 125
+packages/db/construction/prisma/migrations/20261022180000_construction_finance_client_party/migration.sql
+  s_f49615d4431370::t_e044f79e55a661 66-77
+apps/construction-management/src/contracts/infrastructure/ra-bill-pdf-parts.ts
+  s_52c9aa80fb1374::t_5ca4a6f290e2b4 1-283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2104d1542d0560340251d5945786b961f6056c48",
+  "prompts": {},
+  "sessions": {
+    "s_52c9aa80fb1374": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5f2d61a3296303f5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
