@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
@@ -6,6 +6,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   SiteWorkDocumentThreadStore,
@@ -54,13 +55,6 @@ function toRemark(row: RemarkRow): SiteWorkRemark {
     createdAt: row.createdAt,
     createdBy: row.createdBy,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const ofDocument = (

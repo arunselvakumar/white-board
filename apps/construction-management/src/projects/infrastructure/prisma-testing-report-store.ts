@@ -20,6 +20,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { ProjectViewer } from "../application/project-handlers";
 import {
@@ -66,13 +67,6 @@ function toReport(row: ReportRow): TestingReport {
     updatedAt: row.updatedAt,
     createdBy: row.createdBy,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const itemNameInUse = () =>

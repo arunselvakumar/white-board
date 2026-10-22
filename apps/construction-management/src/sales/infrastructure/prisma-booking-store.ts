@@ -6,6 +6,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { tombstone } from "@/src/shared-kernel/tombstone";
 
 import type {
@@ -53,13 +54,6 @@ function toStored(row: Row): StoredBooking {
     createdBy: row.createdBy,
     updatedBy: row.updatedBy,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const ACTIVE = { in: [...ACTIVE_BOOKING_STATUSES] };

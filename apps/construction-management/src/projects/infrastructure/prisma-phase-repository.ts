@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { Phase, phaseNotFound } from "../domain/phase";
 import type { PhaseRepository } from "../domain/structure-repository";
@@ -23,13 +24,6 @@ export function toPhase(row: Row): Phase {
     updatedBy: row.updatedBy,
     deletedAt: row.deletedAt,
   });
-}
-
-export function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 export function phaseNameInUse() {

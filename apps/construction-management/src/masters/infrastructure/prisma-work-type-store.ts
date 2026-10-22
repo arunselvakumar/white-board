@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { MasterChange } from "../application/ports";
 import type {
@@ -10,7 +11,6 @@ import type {
 } from "../application/work-type-ports";
 import { masterChanged, masterNameInUse } from "../domain/master-kind";
 import { WorkType } from "../domain/work-type";
-import { isUniqueViolation } from "./prisma-lookup-store";
 
 const INCLUDE = {
   department: { select: { name: true, disabledAt: true } },

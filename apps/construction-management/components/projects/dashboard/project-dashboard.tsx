@@ -3,6 +3,8 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   Building2,
+  ChevronsDownUp,
+  ChevronsUpDown,
   ClipboardCheck,
   FileText,
   FlaskConical,
@@ -30,6 +32,7 @@ import {
   presetDuration,
   type Duration,
 } from "@/lib/dashboard-duration";
+import { isDashboardSectionKey } from "@/src/projects/domain/dashboard-sections";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import {
   dashboardAttendanceQuery,
@@ -53,6 +56,10 @@ import { DurationFilter } from "./duration-filter";
 import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
+import {
+  SectionCollapseProvider,
+  useSectionCollapse,
+} from "./section-collapse";
 // Sales (CM-1008)
 import { BookingSection, InquirySection } from "./sales-sections";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
@@ -424,6 +431,38 @@ function MaterialsSection({
   );
 }
 
+/**
+ * Sections that read the duration: an invalid one leaves them out. Project
+ * summary and Booking (a snapshot as on today) always show.
+ */
+const DURATION_SECTIONS: ReadonlySet<string> = new Set([
+  "attendance",
+  "task",
+  "payments",
+  "daily_work",
+  "equipment_usage",
+  "materials",
+  "issue_snag",
+  "inspection_request",
+  "inquiry",
+]);
+
+/** The sections the member sees on this Project, in their order. */
+function shownSections(layout: { sections: DashboardSection[] }) {
+  // A module hidden on the Project takes its section with it (CM-902).
+  return layout.sections.filter(
+    (section) => section.visible && !section.hiddenOnProject,
+  );
+}
+
+/**
+ * A section the member collapsed: its header only, without the section's
+ * own component, so nothing is fetched until it is opened again.
+ */
+function CollapsedSection({ section }: { section: DashboardSection }) {
+  return <Section id={`dashboard-${section.key}`} title={section.label} />;
+}
+
 /** The member's sections in their order; suspends on the layout read. */
 function DashboardSections({
   projectId,
@@ -433,11 +472,9 @@ function DashboardSections({
   duration: Duration;
 }) {
   const { data: layout } = useSuspenseQuery(dashboardLayoutQuery(projectId));
+  const collapse = useSectionCollapse();
   const problem = durationProblem(duration);
-  // A module hidden on the Project takes its section with it (CM-902).
-  const shown = layout.sections.filter(
-    (section) => section.visible && !section.hiddenOnProject,
-  );
+  const shown = shownSections(layout);
   if (shown.length === 0)
     return (
       <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
@@ -447,87 +484,123 @@ function DashboardSections({
   return (
     <>
       {shown.map((section) => {
+        if (problem != null && DURATION_SECTIONS.has(section.key)) return null;
+        if (
+          isDashboardSectionKey(section.key) &&
+          collapse?.isCollapsed(section.key) === true
+        )
+          return <CollapsedSection key={section.key} section={section} />;
         if (section.key === "summary")
           return <SummarySection key={section.key} projectId={projectId} />;
         if (section.key === "attendance")
-          return problem == null ? (
+          return (
             <AttendanceSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "daily_work")
-          return problem == null ? (
+          return (
             <DailyWorkSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "equipment_usage")
-          return problem == null ? (
+          return (
             <EquipmentUsageSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "payments")
-          return problem == null ? (
+          return (
             <PaymentsSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "task")
-          return problem == null ? (
+          return (
             <TaskSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "issue_snag")
-          return problem == null ? (
+          return (
             <IssueSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "inspection_request")
-          return problem == null ? (
+          return (
             <InspectionSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
+          );
         if (section.key === "materials")
-          return problem == null ? (
+          return (
             <MaterialsSection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
-        // Sales (CM-1008): Booking is a snapshot, so no duration.
+          );
+        // Sales (CM-1008).
         if (section.key === "inquiry")
-          return problem == null ? (
+          return (
             <InquirySection
               key={section.key}
               projectId={projectId}
               duration={duration}
             />
-          ) : null;
-        // A snapshot as on today: a bad duration does not hide it.
+          );
         if (section.key === "booking")
           return <BookingSection key={section.key} projectId={projectId} />;
         return <StubSection key={section.key} section={section} />;
       })}
     </>
+  );
+}
+
+/**
+ * Collapse all, or Expand all once every shown section is collapsed. Hidden
+ * until the layout has loaded.
+ */
+function CollapseAllButton({ projectId }: { projectId: string }) {
+  const { data: layout } = useQuery(dashboardLayoutQuery(projectId));
+  const collapse = useSectionCollapse();
+  if (layout == null || collapse == null) return null;
+  const keys = shownSections(layout)
+    .map((section) => section.key)
+    .filter(isDashboardSectionKey);
+  if (keys.length === 0) return null;
+  const allCollapsed = keys.every((key) => collapse.isCollapsed(key));
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => {
+        collapse.setCollapsed(keys, !allCollapsed);
+      }}
+    >
+      {allCollapsed ? (
+        <ChevronsUpDown aria-hidden="true" />
+      ) : (
+        <ChevronsDownUp aria-hidden="true" />
+      )}
+      {allCollapsed ? "Expand all" : "Collapse all"}
+    </Button>
   );
 }
 
@@ -551,7 +624,8 @@ function ManageDashboard({
  * Request have data (CM-805); Booking and Inquiry name the milestone that
  * fills them. Manage Dashboard shows,
  * hides and reorders sections for the member on every Project; sections
- * whose module is hidden on this Project are left out (CM-902).
+ * whose module is hidden on this Project are left out (CM-902). Each
+ * section collapses to its header, remembered in this browser (CM-0025).
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
   const [duration, setDuration] = useState<Duration>(() =>
@@ -561,50 +635,53 @@ export function ProjectDashboard({ projectId }: { projectId: string }) {
   const problem = durationProblem(duration);
 
   return (
-    <div className="w-full min-w-0 p-6">
-      <div className="w-full max-w-6xl min-w-0 space-y-6">
-        <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-          <div className="min-w-0 space-y-1">
-            <h2 className="text-lg font-semibold">Dashboard</h2>
-            <p className="text-muted-foreground text-sm">
-              {formatCalendarDate(duration.from)} –{" "}
-              {formatCalendarDate(duration.to)}
+    <SectionCollapseProvider>
+      <div className="w-full min-w-0 p-6">
+        <div className="w-full max-w-6xl min-w-0 space-y-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <h2 className="text-lg font-semibold">Dashboard</h2>
+              <p className="text-muted-foreground text-sm">
+                {formatCalendarDate(duration.from)} –{" "}
+                {formatCalendarDate(duration.to)}
+              </p>
+            </div>
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+              <DurationFilter value={duration} onChange={setDuration} />
+              <CollapseAllButton projectId={projectId} />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setManaging(true);
+                }}
+              >
+                <SlidersHorizontal aria-hidden="true" />
+                Manage dashboard
+              </Button>
+            </div>
+          </div>
+          {problem == null ? null : (
+            <p role="alert" className="text-destructive text-sm">
+              {problem}
             </p>
-          </div>
-          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-            <DurationFilter value={duration} onChange={setDuration} />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setManaging(true);
-              }}
-            >
-              <SlidersHorizontal aria-hidden="true" />
-              Manage dashboard
-            </Button>
-          </div>
+          )}
+          <KpiTiles projectId={projectId} duration={duration} />
+          <Suspense fallback={<DashboardSectionsSkeleton />}>
+            <DashboardSections projectId={projectId} duration={duration} />
+          </Suspense>
         </div>
-        {problem == null ? null : (
-          <p role="alert" className="text-destructive text-sm">
-            {problem}
-          </p>
-        )}
-        <KpiTiles projectId={projectId} duration={duration} />
-        <Suspense fallback={<DashboardSectionsSkeleton />}>
-          <DashboardSections projectId={projectId} duration={duration} />
-        </Suspense>
+        {managing ? (
+          <Suspense fallback={null}>
+            <ManageDashboard
+              projectId={projectId}
+              onClose={() => {
+                setManaging(false);
+              }}
+            />
+          </Suspense>
+        ) : null}
       </div>
-      {managing ? (
-        <Suspense fallback={null}>
-          <ManageDashboard
-            projectId={projectId}
-            onClose={() => {
-              setManaging(false);
-            }}
-          />
-        </Suspense>
-      ) : null}
-    </div>
+    </SectionCollapseProvider>
   );
 }

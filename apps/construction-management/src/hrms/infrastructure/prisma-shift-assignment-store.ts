@@ -8,6 +8,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, DomainError } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { ShiftBookSource } from "../application/effective-shift-resolver";
 import type { HrmsSettingsReader } from "../application/ports";
@@ -23,7 +24,7 @@ import {
   type ShiftRule,
 } from "../domain/effective-shift";
 import { slotShiftIds } from "../domain/shift";
-import { isUniqueViolation, lockKey } from "./prisma-calendar-support";
+import { lockKey } from "./prisma-calendar-support";
 import { rotationFromRow, shiftFromRow } from "./prisma-shift-template-store";
 
 const ASSIGNMENT_INCLUDE = {

@@ -107,6 +107,23 @@ const sharedKernelBoundary = {
   },
 };
 
+// Under `next dev --webpack` a Prisma error can come from another copy of
+// the generated client, so `instanceof` is false and a conflict became a 500
+// (#98). Match Prisma errors by name and code with the shared helper.
+const prismaErrorGuard = {
+  rules: {
+    "no-restricted-syntax": [
+      "error",
+      {
+        selector:
+          "BinaryExpression[operator='instanceof'][right.object.name='Prisma'][right.property.name=/^PrismaClient.*Error$/]",
+        message:
+          "Use isPrismaError / isUniqueViolation from @/src/shared-kernel/prisma-errors; instanceof fails across copies of the Prisma client (#98).",
+      },
+    ],
+  },
+};
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   ...nextJsConfig,
@@ -128,6 +145,7 @@ export default [
   ...contextBoundaries,
   sharedKernelBoundary,
   skeletonGuard,
+  prismaErrorGuard,
   ...storybook.configs["flat/recommended"],
   {
     // public/ holds static files served as-is (sw.js is plain browser JS).

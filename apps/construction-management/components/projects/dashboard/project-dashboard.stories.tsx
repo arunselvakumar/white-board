@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, fireEvent, waitFor, within } from "storybook/test";
+import { expect, fireEvent, spyOn, waitFor, within } from "storybook/test";
 
+import { collapsedStorageKey } from "@/lib/dashboard-collapsed";
 import { browserToday, presetDuration } from "@/lib/dashboard-duration";
 import { DASHBOARD_SECTIONS } from "@/src/projects/domain/dashboard-sections";
 import type { ProjectLabourSummary } from "@/src/queries/labour-summary";
@@ -13,6 +14,7 @@ import type { ProjectResponse } from "@/src/queries/projects";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { signInAs, storyUser } from "../../../.storybook/mocks/auth";
 import { KUMARI, project } from "../project-fixtures";
 import {
   emptyFinanceDashboard,
@@ -1047,5 +1049,172 @@ export const Phone: Story = {
     ).findByRole("figure", { name: "Issues by assignee" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+const COLLAPSED_KEY = collapsedStorageKey(storyUser.id);
+
+/** Signs in and puts `raw` in the member's collapsed-sections item. */
+function remember(raw: string | null) {
+  return () => {
+    signInAs("owner");
+    if (raw == null) localStorage.removeItem(COLLAPSED_KEY);
+    else localStorage.setItem(COLLAPSED_KEY, raw);
+    return () => {
+      localStorage.removeItem(COLLAPSED_KEY);
+    };
+  };
+}
+
+function fetched(prefix: string): boolean {
+  return api.calls.mock.calls.some(([call]) => call.path.startsWith(prefix));
+}
+
+/**
+ * − collapses a section to its header and + opens it again (ADR CM-0025);
+ * the choice is stored for the member in this browser, and focus stays on
+ * the toggle.
+ */
+export const CollapseSection: Story = {
+  beforeEach: remember(null),
+  play: async ({ canvas, userEvent }) => {
+    const materials = within(
+      await canvas.findByRole("region", { name: "Materials" }),
+    );
+    await materials.findByText("Purchase order value");
+    const collapse = materials.getByRole("button", {
+      name: "Collapse Materials",
+    });
+    await expect(collapse).toHaveAttribute("aria-expanded", "true");
+    await expect(collapse).toHaveAttribute(
+      "aria-controls",
+      "dashboard-materials-body",
+    );
+    await userEvent.click(collapse);
+
+    const collapsed = within(canvas.getByRole("region", { name: "Materials" }));
+    const expand = collapsed.getByRole("button", { name: "Expand Materials" });
+    await expect(expand).toHaveAttribute("aria-expanded", "false");
+    await expect(expand).toHaveFocus();
+    await expect(collapsed.queryByText("Purchase order value")).toBeNull();
+    await expect(
+      collapsed.queryByRole("link", { name: "Stock Register" }),
+    ).toBeNull();
+    await expect(localStorage.getItem(COLLAPSED_KEY)).toBe('["materials"]');
+
+    await userEvent.keyboard("{Enter}");
+    const opened = within(canvas.getByRole("region", { name: "Materials" }));
+    await expect(
+      opened.getByRole("button", { name: "Collapse Materials" }),
+    ).toHaveFocus();
+    await opened.findByText("Purchase order value");
+    await expect(
+      opened.getByRole("link", { name: "Stock Register" }),
+    ).toBeVisible();
+    await expect(localStorage.getItem(COLLAPSED_KEY)).toBeNull();
+  },
+};
+
+/**
+ * Sections the member collapsed earlier open collapsed, and fetch nothing
+ * until they are opened.
+ */
+export const CollapsedFromStorage: Story = {
+  beforeEach: remember('["summary","booking","inquiry"]'),
+  play: async ({ canvas, userEvent }) => {
+    await within(
+      await canvas.findByRole("region", { name: "Attendance" }),
+    ).findByRole("figure");
+    for (const name of ["Project summary", "Booking", "Inquiry"])
+      await expect(
+        within(canvas.getByRole("region", { name })).getByRole("button", {
+          name: `Expand ${name}`,
+        }),
+      ).toHaveAttribute("aria-expanded", "false");
+    await expect(fetched(SUMMARY_PATH)).toBe(false);
+    await expect(fetched(BOOKING_DASHBOARD_PATH)).toBe(false);
+    await expect(fetched(INQUIRY_DASHBOARD_PATH)).toBe(false);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Booking" }),
+    );
+    await within(canvas.getByRole("region", { name: "Booking" })).findByRole(
+      "list",
+      { name: "Latest bookings" },
+    );
+    await expect(fetched(BOOKING_DASHBOARD_PATH)).toBe(true);
+    await expect(fetched(INQUIRY_DASHBOARD_PATH)).toBe(false);
+  },
+};
+
+/** Junk in storage, or a key that is not a section, opens every section. */
+export const StorageHoldsJunk: Story = {
+  beforeEach: remember('{"materials": true'),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Project summary" });
+    await expect(
+      canvas.getAllByRole("button", { name: /^Collapse (?!all)/ }),
+    ).toHaveLength(DASHBOARD_SECTIONS.length);
+    await expect(canvas.queryByRole("button", { name: /^Expand / })).toBeNull();
+  },
+};
+
+/**
+ * Storage that throws (private mode, blocked site data) opens every
+ * section; collapsing still works for the visit.
+ */
+export const StorageBlocked: Story = {
+  beforeEach: () => {
+    const cleanup = remember('["materials"]')();
+    const read = spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("The operation is insecure.", "SecurityError");
+    });
+    const write = spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("The operation is insecure.", "SecurityError");
+    });
+    return () => {
+      read.mockRestore();
+      write.mockRestore();
+      cleanup();
+    };
+  },
+  play: async ({ canvas, userEvent }) => {
+    const materials = within(
+      await canvas.findByRole("region", { name: "Materials" }),
+    );
+    await userEvent.click(
+      materials.getByRole("button", { name: "Collapse Materials" }),
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Expand Materials" }),
+    ).toBeVisible();
+  },
+};
+
+/** Collapse all folds every shown section; Expand all opens them again. */
+export const CollapseAll: Story = {
+  beforeEach: remember(null),
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("region", { name: "Project summary" });
+    await userEvent.click(canvas.getByRole("button", { name: "Collapse all" }));
+    await expect(
+      canvas.getAllByRole("button", { name: /^Expand (?!all)/ }),
+    ).toHaveLength(DASHBOARD_SECTIONS.length);
+    await expect(
+      JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? "[]"),
+    ).toHaveLength(DASHBOARD_SECTIONS.length);
+    await userEvent.click(canvas.getByRole("button", { name: "Expand all" }));
+    await expect(
+      canvas.getAllByRole("button", { name: /^Collapse (?!all)/ }),
+    ).toHaveLength(DASHBOARD_SECTIONS.length);
+    await expect(localStorage.getItem(COLLAPSED_KEY)).toBeNull();
+  },
+};
+
+/** Dark mode: every section's icon keeps its hue. */
+export const Dark: Story = {
+  globals: { theme: "dark" },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Project summary" });
   },
 };

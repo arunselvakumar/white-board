@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   MasterListParams,
@@ -27,7 +28,6 @@ import {
 import { Material, type MaterialDiscount } from "../domain/material";
 import { MaterialCategory } from "../domain/material-category";
 import { TermsCondition } from "../domain/terms-condition";
-import { isUniqueViolation } from "./prisma-lookup-store";
 import { pageOf, pageQuery, statusFilter } from "./prisma-paging";
 
 type Tx = Prisma.TransactionClient;

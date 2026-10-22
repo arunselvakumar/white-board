@@ -6,6 +6,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { indexMedia, unindexMedia } from "./prisma-media-index";
 import type {
@@ -30,13 +31,6 @@ function toDocument(row: Row): StoredProjectDocument {
     createdBy: row.createdBy,
     deletedAt: row.deletedAt,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /**

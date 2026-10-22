@@ -6,6 +6,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   albumNotFound,
@@ -62,13 +63,6 @@ function toRevision(row: RevisionRow): DrawingRevision {
     createdAt: row.createdAt,
     createdBy: row.createdBy,
   };
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 const albumNameInUse = () =>

@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   AttendanceLabourer,
@@ -351,11 +352,7 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
             });
           } catch (error) {
             // The live-day unique index: someone marked this day meanwhile.
-            if (
-              error instanceof Prisma.PrismaClientKnownRequestError &&
-              error.code === "P2002"
-            )
-              throw changed(day.labourId);
+            if (isUniqueViolation(error)) throw changed(day.labourId);
             throw error;
           }
         } else {
