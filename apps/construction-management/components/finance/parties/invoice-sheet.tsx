@@ -146,6 +146,18 @@ export function InvoiceDetail({
   return (
     <div className="space-y-5">
       <InvoiceStatusChips invoice={invoice} />
+      {invoice.origin === "ra_bill" && invoice.sourceId != null ? (
+        <p className="text-sm">
+          From Contractor Bill{" "}
+          <Link
+            href={`/app/projects/${projectId}/contractor-bills/${invoice.sourceId}`}
+            className="font-medium underline-offset-4 hover:underline"
+          >
+            {invoice.invoiceNumber}
+          </Link>
+          . Reverse the bill in Contracts to change it.
+        </p>
+      ) : null}
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
         {facts.map(([label, value]) => (
           <div key={label} className="min-w-0">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   ChevronDown,
   Download,
@@ -52,6 +52,10 @@ import {
   TDS_NATURE_LABELS,
 } from "@/src/contracts/domain/contract-terms";
 import { workOrderActions } from "@/src/contracts/domain/work-order";
+import {
+  contractorBillsPath,
+  contractorBillsQuery,
+} from "@/src/queries/contracts-contractor-bills";
 import {
   useWorkOrderCommand,
   workOrderPdfUrl,
@@ -269,6 +273,47 @@ function RevisionItem({
         </CollapsibleContent>
       </Collapsible>
     </li>
+  );
+}
+
+/**
+ * The Work Order's Contractor Bills (CM-1106): a link with how many count
+ * (draft, pending and approved), shown only to those who may read bills.
+ */
+function ContractorBillsLink({
+  projectId,
+  workOrderId,
+}: {
+  projectId: string;
+  workOrderId: string;
+}) {
+  const { data } = useQuery({
+    ...contractorBillsQuery(
+      projectId,
+      {
+        status: "",
+        workOrderId,
+        contractorId: "",
+        from: "",
+        to: "",
+        cursor: null,
+      },
+      1,
+    ),
+    retry: false,
+  });
+  if (data == null) return null;
+  return (
+    <Fact label="Contractor bills">
+      <Link
+        href={`${contractorBillsPath(projectId)}?workOrderId=${workOrderId}`}
+        className="underline-offset-4 hover:underline"
+      >
+        {data.totals.count === 0
+          ? "None yet"
+          : `${String(data.totals.count)} ${data.totals.count === 1 ? "bill" : "bills"}`}
+      </Link>
+    </Fact>
   );
 }
 
@@ -517,6 +562,9 @@ export function WorkOrderDetail({
             <Fact label="Approved by">
               {workOrder.decidedByName ?? "—"} · {whenText(workOrder.decidedAt)}
             </Fact>
+          ) : null}
+          {workOrder.status === "issued" || workOrder.status === "closed" ? (
+            <ContractorBillsLink projectId={projectId} workOrderId={id} />
           ) : null}
         </dl>
         {workOrder.scope == null ? null : (
