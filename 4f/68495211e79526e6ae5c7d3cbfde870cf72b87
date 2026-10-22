@@ -1,0 +1,69 @@
+apps/construction-management/app/api/construction/contracts/client-bills/client-bill-models.ts
+  s_f49615d4431370::t_2bd055c0f8330f 1-772
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_f49615d4431370::t_bd24e700b3191d 148
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_f49615d4431370::t_5c441209fa9915 104,125
+apps/construction-management/src/composition/contracts-client-bills.ts
+  s_f49615d4431370::t_3fa67bc2802e83 1-40
+apps/construction-management/src/composition/contracts-directory.ts
+  s_f49615d4431370::t_9fb5cd6c3f45db 331-346
+apps/construction-management/src/composition/contracts-party-invoicing.ts
+  s_f49615d4431370::t_e1390fe19c9135 12-15,22-24,26,28,31-32,44,51
+apps/construction-management/src/contracts/application/client-bill-handlers.ts
+  s_f49615d4431370::t_fbd85656721e9e 1-1562
+apps/construction-management/src/contracts/application/client-bill-ports.ts
+  s_f49615d4431370::t_40e26a806cb410 1-255
+apps/construction-management/src/contracts/application/contractor-bill-handlers.ts
+  s_f49615d4431370::t_4d142cddf6321c 10,55,75-83,204,223,226,229,690,787-792,893,926-933,1606
+apps/construction-management/src/contracts/application/ports.ts
+  s_f49615d4431370::t_24382f201bdd29 72-81,171-176,252-254,286-288,299
+apps/construction-management/src/contracts/domain/client-bill.ts
+  s_f49615d4431370::t_819b88a1394876 193
+apps/construction-management/src/contracts/infrastructure/prisma-client-bill-store.ts
+  s_f49615d4431370::t_9c851c62b19db1 1-485
+apps/construction-management/src/contracts/infrastructure/prisma-contractor-bill-store.ts
+  s_f49615d4431370::t_7aa45173c7dbe8 18,21-37,42,45,65,67,72-73,134,137,204-205,218,224,228-229,261,267,270-271,337,343,346-347
+apps/construction-management/src/contracts/infrastructure/prisma-ra-bill-rows.ts
+  s_f49615d4431370::t_a6afa3b42664fe 1-360
+apps/construction-management/src/finance/application/party-ports.ts
+  s_f49615d4431370::t_16d1cc841d3822 374-382
+apps/construction-management/src/finance/application/ra-bill-invoices.ts
+  s_f49615d4431370::t_3279f3adcd239e 6,10-14,17-19,21,36-53,55-59,61-63,65-71,73-76,78,86,88-89,91,95,102-104,111-112,114,120-121,139,144-145,157,199
+apps/construction-management/src/finance/infrastructure/party-finance-factory.ts
+  s_f49615d4431370::t_d3dc7b909db24f 9,70
+apps/construction-management/src/finance/infrastructure/prisma-party-store.ts
+  s_f49615d4431370::t_29fd98985f9f4e 340-358,364-365
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_f49615d4431370::t_121f8e5dcf7301 202-207
+apps/construction-management/src/shared-kernel/backdated-policy.test.ts
+  s_f49615d4431370::t_04b66fdfeda6e5 39,43-45,59,62
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_f49615d4431370::t_a81c3fe15f5c2d 238-245
+apps/construction-management/src/contracts/application/ra-bill-common.ts
+  s_52c9aa80fb1374::t_c3c64823390b5a 1-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "4f68495211e79526e6ae5c7d3cbfde870cf72b87",
+  "prompts": {},
+  "sessions": {
+    "s_52c9aa80fb1374": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5f2d61a3296303f5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
