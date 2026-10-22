@@ -30,7 +30,7 @@ export const clientRetentionReceivable: ClientRetentionReceivable = async (
         JOIN construction_contracts.bills b ON b.id = d.bill_id
         WHERE d.workspace_id = ${input.workspaceId}
           AND b.workspace_id = ${input.workspaceId}
-          AND b.side = 'client' AND b.type = 'running'
+          AND b.side = 'client'
           AND b.deleted_at IS NULL AND b.status = 'approved'
           AND d.kind = 'retention'
           AND b.client_id = ANY(${clientIds}::uuid[])

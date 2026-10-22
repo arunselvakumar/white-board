@@ -120,6 +120,7 @@ export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
             amount,
             description: null,
             advanceId: null,
+            escalationBillId: null,
           },
         ]
       : [];
@@ -147,6 +148,7 @@ export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
       amount: row.amount,
       description: row.description,
       advanceId: row.advanceId,
+      escalationBillId: row.escalationBillId,
     };
     if (
       recoveries == null ||

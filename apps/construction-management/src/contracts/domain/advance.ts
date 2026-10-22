@@ -302,6 +302,7 @@ export function suggestedRecoveries<K extends DeductionKind>(
               amount,
               description: null,
               advanceId: advance.id,
+              escalationBillId: null,
             },
           ]
         : [];

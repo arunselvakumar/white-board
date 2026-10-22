@@ -353,7 +353,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
         FROM construction_contracts.bill_deductions d
         JOIN construction_contracts.bills b ON b.id = d.bill_id
         WHERE d.workspace_id = ${workspaceId} AND b.workspace_id = ${workspaceId}
-          AND ${scope} AND b.type = 'running'
+          AND ${scope}
           AND b.deleted_at IS NULL AND b.status = 'approved'
           AND d.kind = 'retention'`,
     );

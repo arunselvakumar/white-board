@@ -2,7 +2,11 @@ import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import type { BillStatus, DeductionKind } from "../domain/contract-terms";
+import type {
+  BillStatus,
+  BillType,
+  DeductionKind,
+} from "../domain/contract-terms";
 import type { AdvanceStore } from "./advance-ports";
 import type { BoqDb, BoqStore } from "./boq-ports";
 import type { ContractsDirectory, ContractsTx, PartyInvoicing } from "./ports";
@@ -31,6 +35,11 @@ export type StoredBill = {
   number: string | null;
   /** The running bill's place on its Work Order; null until submitted. */
   ordinal: number | null;
+  /** `running` (an RA bill) or `escalation` (CM-1109); lists show both. */
+  type: BillType;
+  /** Escalation bills: the period of work escalated; null on RA bills. */
+  periodFrom: CalendarDate | null;
+  periodTo: CalendarDate | null;
   billDate: CalendarDate;
   measuredUpTo: CalendarDate;
   isFinal: boolean;
@@ -94,6 +103,8 @@ export type StoredBillDeduction = {
   amount: bigint;
   /** CM-1108: the advance a recovery recovers. */
   advanceId: string | null;
+  /** CM-1109: the negative escalation bill an "other" deduction recovers. */
+  escalationBillId: string | null;
   position: number;
 };
 

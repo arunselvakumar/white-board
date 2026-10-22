@@ -928,6 +928,7 @@ export class ContractorBillHandlers {
         description: deduction.description,
         amount: deduction.amount,
         advanceId: deduction.advanceId,
+        escalationBillId: deduction.escalationBillId,
         position,
       })),
     );
@@ -1039,6 +1040,9 @@ export class ContractorBillHandlers {
         workOrderId: workOrder.id,
         number: null,
         ordinal: null,
+        type: "running",
+        periodFrom: null,
+        periodTo: null,
         ...header,
         status: "draft",
         cumulativeValue: 0n,

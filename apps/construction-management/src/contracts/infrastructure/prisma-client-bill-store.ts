@@ -385,7 +385,7 @@ export class PrismaClientBillStore implements ClientBillStore {
         JOIN construction_contracts.bills b ON b.id = d.bill_id
         WHERE d.workspace_id = ${workspaceId} AND b.workspace_id = ${workspaceId}
           AND b.project_id = ${projectId}::uuid
-          AND b.side = 'client' AND b.type = 'running'
+          AND b.side = 'client'
           AND b.deleted_at IS NULL AND b.status = 'approved'
           AND d.kind = 'retention'
           ${exceptBillId == null ? Prisma.empty : Prisma.sql`AND b.id <> ${exceptBillId}::uuid`}`,

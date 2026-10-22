@@ -342,6 +342,8 @@ export type BillDeductionInput = {
   description?: string | null;
   /** A mobilisation or secured advance recovery: the advance it recovers (CM-1108). */
   advanceId?: string | null;
+  /** An "other" deduction recovering a negative escalation bill (CM-1109). */
+  escalationBillId?: string | null;
 };
 
 export type RaBillDeduction<K extends DeductionKind = DeductionKind> = {
@@ -350,6 +352,8 @@ export type RaBillDeduction<K extends DeductionKind = DeductionKind> = {
   description: string | null;
   /** The advance a recovery recovers (CM-1108); null on other kinds. */
   advanceId: string | null;
+  /** The negative escalation bill an "other" deduction recovers (CM-1109). */
+  escalationBillId: string | null;
 };
 
 /**
@@ -418,7 +422,10 @@ export function raBillDeductions<K extends DeductionKind>(
       kind === "mobilisation_recovery" || kind === "secured_advance_recovery";
     const named = input.advanceId?.trim() ?? "";
     const advanceId = recovery && named !== "" ? named : null;
-    return { kind, amount, description, advanceId };
+    const escalation = input.escalationBillId?.trim() ?? "";
+    const escalationBillId =
+      kind === "other" && escalation !== "" ? escalation : null;
+    return { kind, amount, description, advanceId, escalationBillId };
   });
 }
 

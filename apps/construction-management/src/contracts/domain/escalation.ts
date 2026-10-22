@@ -45,7 +45,6 @@ import {
  */
 
 export const INDEX_SCALE = 4;
-const INDEX_ONE = 10_000n;
 /** `DECIMAL(12, 4)`: at most eight whole digits. */
 export const INDEX_MAX = 10n ** 12n - 1n;
 export const SERIES_MAX = 80;

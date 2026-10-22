@@ -1026,6 +1026,7 @@ export class ClientBillHandlers {
         description: deduction.description,
         amount: deduction.amount,
         advanceId: deduction.advanceId,
+        escalationBillId: deduction.escalationBillId,
         position,
       })),
     );
@@ -1102,6 +1103,9 @@ export class ClientBillHandlers {
         clientId: project.clientId,
         number: null,
         ordinal: null,
+        type: "running",
+        periodFrom: null,
+        periodTo: null,
         ...header,
         status: "draft",
         cumulativeValue: 0n,

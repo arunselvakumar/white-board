@@ -48,6 +48,10 @@ export function billCore(row: BillRow): Omit<StoredBill, "workOrderId"> {
     projectId: row.projectId,
     number: row.number,
     ordinal: row.ordinal,
+    type: row.type,
+    periodFrom:
+      row.periodFrom == null ? null : calendarDateFromDb(row.periodFrom),
+    periodTo: row.periodTo == null ? null : calendarDateFromDb(row.periodTo),
     billDate: calendarDateFromDb(row.billDate),
     measuredUpTo: calendarDateFromDb(row.measuredUpTo ?? row.billDate),
     isFinal: row.isFinal,
@@ -128,6 +132,7 @@ export function toDeduction(row: DeductionRow): StoredBillDeduction {
     description: row.description,
     amount: row.amount,
     advanceId: row.advanceId,
+    escalationBillId: row.escalationBillId,
     position: row.position,
   };
 }
@@ -206,6 +211,7 @@ export async function replaceDeductions(
       description: deduction.description,
       amount: deduction.amount,
       advanceId: deduction.advanceId,
+      escalationBillId: deduction.escalationBillId,
       position: deduction.position,
     })),
   });
