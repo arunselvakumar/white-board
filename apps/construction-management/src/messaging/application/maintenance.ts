@@ -258,7 +258,8 @@ export async function raiseContractDeadlines(
       const onlyClient = workOrderIds.length === 0;
       const href = onlyClient
         ? LINKS.clientBills(due.projectId)
-        : workOrderIds.length === 1 && client.length === 0
+        : workOrderIds.length === 1 &&
+            items.every((item) => item.side === "contractor")
           ? LINKS.workOrder(due.projectId, workOrderIds[0] ?? "")
           : LINKS.workOrders(due.projectId);
       const ids = await deps.notifier.notify(due.workspaceId, users, {
