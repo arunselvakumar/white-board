@@ -17,6 +17,7 @@ export const PAYMENTS_TABS = [
     label: "Other Parties",
     menus: ["finance.parties"],
   },
+  { segment: "clients", label: "Clients", menus: ["finance.parties"] },
   {
     segment: "wages",
     label: "Labour & Vendor",

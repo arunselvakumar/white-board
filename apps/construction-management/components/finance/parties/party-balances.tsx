@@ -63,11 +63,33 @@ export const COLUMNS: Record<PartyType, { key: Figure; label: string }[]> = {
     { key: "balance", label: "Balance" },
     { key: "overdue", label: "Overdue" },
   ],
+  // CM-1107: what the Client owes ("Due", the balance turned round), what
+  // it deducted, and the retention it holds (derived in contracts).
+  client: [
+    { key: "opening", label: "Opening" },
+    { key: "billed", label: "Invoiced" },
+    { key: "received", label: "Received" },
+    { key: "clientTds", label: "TDS receivable" },
+    { key: "gstTds", label: "GST-TDS receivable" },
+    { key: "writtenOff", label: "Written off" },
+    { key: "balance", label: "Due" },
+    { key: "overdue", label: "Overdue" },
+    { key: "retentionReceivable", label: "Retention receivable" },
+  ],
 };
 
-/** Written off is posted signed (− on bills); the table shows its size. */
-function shown(row: Pick<PartyBalance, Figure>, key: Figure): number {
-  return key === "writtenOff" ? Math.abs(row[key]) : row[key];
+/**
+ * Written off is posted signed (− on bills); the table shows its size. A
+ * Client's balance is what it owes the Company, so "Due" turns it round.
+ */
+function shown(
+  row: Pick<PartyBalance, Figure>,
+  key: Figure,
+  partyType: PartyType,
+): number {
+  if (key === "writtenOff") return Math.abs(row[key]);
+  if (key === "balance" && partyType === "client") return -row[key];
+  return row[key];
 }
 
 /**
@@ -88,6 +110,8 @@ export function PartyBalances({
   const screen = PARTY_SCREENS[partyType];
   const paths = partyPaths(projectId, partyType);
   const columns = COLUMNS[partyType];
+  const client = partyType === "client";
+  const action = client ? "Receive" : "Pay";
 
   if (data.items.length === 0)
     return (
@@ -98,9 +122,9 @@ export function PartyBalances({
           </EmptyMedia>
           <EmptyTitle>No {screen.plural} on this Project</EmptyTitle>
           <EmptyDescription>
-            {screen.plural} assigned to the Project, and any with invoices or
-            payments here, show with their balances. Assign them under the
-            Project&apos;s Resources.
+            {client
+              ? "The Project's Client shows here once it is linked on the Project. Its invoices come from approved Client Bills."
+              : `${screen.plural} assigned to the Project, and any with invoices or payments here, show with their balances. Assign them under the Project's Resources.`}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -110,8 +134,10 @@ export function PartyBalances({
     <div className="space-y-3">
       <p className="text-muted-foreground text-sm">
         {data.items.length}{" "}
-        {data.items.length === 1 ? screen.label : screen.plural} · a positive
-        balance is owed to the party
+        {data.items.length === 1 ? screen.label : screen.plural} ·{" "}
+        {client
+          ? "Due is what the Client owes; retention receivable is held back on approved Client Bills"
+          : "a positive balance is owed to the party"}
       </p>
       <div className="hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label={`${screen.label} balances`}>
@@ -157,17 +183,17 @@ export function PartyBalances({
                         "text-destructive",
                     )}
                   >
-                    {money(shown(row, column.key))}
+                    {money(shown(row, column.key, partyType))}
                   </TableCell>
                 ))}
                 {canPay && (
                   <TableCell className="text-right">
                     <Link
                       href={paths.pay(row.party.id)}
-                      aria-label={`Pay ${row.party.name ?? screen.label}`}
+                      aria-label={`${action} ${row.party.name ?? screen.label}`}
                       className={buttonVariants({ size: "sm" })}
                     >
-                      Pay
+                      {action}
                     </Link>
                   </TableCell>
                 )}
@@ -182,7 +208,7 @@ export function PartyBalances({
                   key={column.key}
                   className="text-right font-semibold tabular-nums"
                 >
-                  {money(shown(data.totals, column.key))}
+                  {money(shown(data.totals, column.key, partyType))}
                 </TableCell>
               ))}
               {canPay && <TableCell />}
@@ -209,9 +235,11 @@ export function PartyBalances({
                 )}
               </div>
               <div className="shrink-0 text-right">
-                <p className="text-muted-foreground text-xs">Balance</p>
+                <p className="text-muted-foreground text-xs">
+                  {client ? "Due" : "Balance"}
+                </p>
                 <p className="font-semibold tabular-nums">
-                  {money(row.balance)}
+                  {money(shown(row, "balance", partyType))}
                 </p>
               </div>
             </div>
@@ -225,7 +253,7 @@ export function PartyBalances({
                   >
                     <dt>{column.label}</dt>
                     <dd className="text-foreground tabular-nums">
-                      {money(shown(row, column.key))}
+                      {money(shown(row, column.key, partyType))}
                     </dd>
                   </div>
                 ))}
@@ -233,20 +261,22 @@ export function PartyBalances({
             {canPay && (
               <Link
                 href={paths.pay(row.party.id)}
-                aria-label={`Pay ${row.party.name ?? screen.label}`}
+                aria-label={`${action} ${row.party.name ?? screen.label}`}
                 className={buttonVariants({
                   size: "sm",
                   className: "mt-3 w-full",
                 })}
               >
-                Pay
+                {action}
               </Link>
             )}
           </li>
         ))}
         <li className="bg-muted/40 flex justify-between rounded-lg border p-3 text-sm font-semibold">
-          <span>Total balance</span>
-          <span className="tabular-nums">{money(data.totals.balance)}</span>
+          <span>{client ? "Total due" : "Total balance"}</span>
+          <span className="tabular-nums">
+            {money(shown(data.totals, "balance", partyType))}
+          </span>
         </li>
       </ul>
     </div>

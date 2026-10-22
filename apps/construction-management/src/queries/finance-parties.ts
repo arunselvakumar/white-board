@@ -42,13 +42,14 @@ import { FINANCE_ACCOUNTS_KEY } from "./finance-accounts";
 import { apiJson } from "./http";
 
 /**
- * Contractor, Supplier and Other Party money (CM-705, CM-706, CM-708):
+ * Contractor, Supplier, Other Party and Client (CM-1107) money (CM-705,
+ * CM-706, CM-708):
  * balances, invoices, payments, openings, settlements, statements and the
  * TDS ledger. Every write invalidates `FINANCE_PARTIES_KEY` and the
  * account balances.
  */
 
-export type PartyType = "contractor" | "supplier" | "other_party";
+export type PartyType = "contractor" | "supplier" | "other_party" | "client";
 export type PartyBalances = ListConstructionFinancePartyBalancesResponse;
 export type PartyBalance = PartyBalances["items"][number];
 export type Invoice = ConstructionFinanceInvoiceResponse;

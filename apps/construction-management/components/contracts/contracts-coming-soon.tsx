@@ -11,9 +11,9 @@ import {
 } from "@/src/projects/domain/project-modules";
 
 /** The Contracts modules (ADR CM-0023 §22) and the ticket that builds each. */
-export const CONTRACTS_MODULE_TICKETS = {
-  client_bills: "CM-1107",
-} as const satisfies Partial<Record<ProjectModuleKey, string>>;
+export const CONTRACTS_MODULE_TICKETS = {} as const satisfies Partial<
+  Record<ProjectModuleKey, string>
+>;
 
 export type ContractsModuleKey = keyof typeof CONTRACTS_MODULE_TICKETS;
 

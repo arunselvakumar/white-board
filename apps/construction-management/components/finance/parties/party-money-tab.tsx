@@ -25,10 +25,11 @@ import { PartyBalancesSkeleton } from "./parties-skeletons";
 
 /**
  * A party type's tab of the Project's Payments (CM-705 Suppliers, CM-706
- * Contractors; CM-708 reuses it for Other Parties): balances per party
- * with New invoice and Record payment, and the Settlements waiting for
- * approval (CM-708); Suppliers add the GRNs awaiting an invoice,
- * Contractors the TDS ledger.
+ * Contractors; CM-708 reuses it for Other Parties, CM-1107 for Clients):
+ * balances per party with New invoice and Record payment, and the
+ * Settlements waiting for approval (CM-708); Suppliers add the GRNs
+ * awaiting an invoice, Contractors the TDS ledger. A Client's invoices
+ * come from Client Bills, so its tab only receives payments.
  */
 export function PartyMoneyTab({
   projectId,
@@ -80,17 +81,22 @@ export function PartyMoneyTab({
         <h2 className="text-lg font-semibold">{screen.plural}</h2>
         {canCreate && (
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setInvoiceTarget({ mode: "new" });
-              }}
+            {screen.flow === "in" ? null : (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setInvoiceTarget({ mode: "new" });
+                }}
+              >
+                <Plus aria-hidden="true" />
+                New invoice
+              </Button>
+            )}
+            <Link
+              href={paths.pay(null, screen.flow === "in" ? "in" : undefined)}
+              className={buttonVariants()}
             >
-              <Plus aria-hidden="true" />
-              New invoice
-            </Button>
-            <Link href={paths.pay()} className={buttonVariants()}>
-              Record payment
+              {screen.flow === "in" ? "Receive payment" : "Record payment"}
             </Link>
           </div>
         )}

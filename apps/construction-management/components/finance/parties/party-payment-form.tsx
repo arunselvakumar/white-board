@@ -88,11 +88,21 @@ const paymentFormSchema = z
     tdsAmount: z.string().trim(),
     tdsRate: z.string().trim(),
     tdsReason: z.string().trim().max(500, "Use at most 500 characters"),
+    /** Clients (CM-1107): what the Client deducted. */
+    clientTds: z.string().trim(),
+    gstTds: z.string().trim(),
     paymentCategoryId: z.string(),
     paidByMemberId: z.string(),
     remarks: z.string().max(500, "Use at most 500 characters"),
   })
   .superRefine((values, ctx) => {
+    for (const field of ["clientTds", "gstTds"] as const)
+      if (values[field] !== "" && !isRupees(values[field]))
+        ctx.addIssue({
+          code: "custom",
+          path: [field],
+          message: "Enter an amount in rupees, like 510",
+        });
     if (values.mode === "cheque" && values.chequeNumber === "")
       ctx.addIssue({
         code: "custom",
@@ -155,6 +165,7 @@ const ERROR_FIELDS = {
   PARTY_NOT_FOUND: "partyId",
   PAID_BY_NOT_FOUND: "paidByMemberId",
   PAYMENT_CATEGORY_NOT_FOUND: "paymentCategoryId",
+  CLIENT_TDS_ONLY_FOR_CLIENTS: "clientTds",
 } as const;
 
 function useDebounced<T>(value: T, delay = 300): T {
@@ -209,7 +220,7 @@ export function PartyPaymentScreen({
             href: partyId == null ? paths.tab : paths.party(partyId),
           }}
           title={
-            direction === "in"
+            direction === "in" || partyType === "client"
               ? "Receive payment"
               : `Pay ${screen.label.toLowerCase()}`
           }
@@ -218,7 +229,13 @@ export function PartyPaymentScreen({
           projectId={projectId}
           partyType={partyType}
           fixedPartyId={partyId ?? null}
-          initialDirection={partyType === "other_party" ? direction : "out"}
+          initialDirection={
+            partyType === "other_party"
+              ? direction
+              : partyType === "client"
+                ? "in"
+                : "out"
+          }
           today={today ?? localToday()}
         />
       </div>
@@ -267,6 +284,8 @@ function PaymentForm({
       tdsAmount: "",
       tdsRate: "",
       tdsReason: "",
+      clientTds: "",
+      gstTds: "",
       paymentCategoryId: "",
       paidByMemberId: "",
       remarks: "",
@@ -283,6 +302,7 @@ function PaymentForm({
   const duplicate =
     duplicateWarning?.key === duplicateKey ? duplicateWarning.message : null;
   const contractor = partyType === "contractor";
+  const client = partyType === "client";
   const amountText = values.amount ?? "";
   const entered = isRupees(amountText) ? (rupeesToPaise(amountText) ?? 0) : 0;
 
@@ -327,7 +347,12 @@ function PaymentForm({
     : override
       ? (rupeesToPaise(values.tdsAmount ?? "") ?? 0)
       : (suggested?.amount ?? 0);
-  const settled = entered;
+  const deducted = (text: string | undefined) =>
+    client && text != null && isRupees(text) ? (rupeesToPaise(text) ?? 0) : 0;
+  const clientTds = deducted(values.clientTds);
+  const gstTds = deducted(values.gstTds);
+  // A Client's receipt settles the cash plus what the Client deducted.
+  const settled = client ? entered + clientTds + gstTds : entered;
   const paid = contractor ? settled - tds : entered;
   const advance = settled - allocated;
   // The suggestion must match what is saved, or the server asks for a reason.
@@ -383,6 +408,7 @@ function PaymentForm({
               tdsOverrideReason: override ? input.tdsReason : null,
             }
           : {}),
+        ...(client ? { clientTdsAmount: clientTds, gstTdsAmount: gstTds } : {}),
         paymentCategoryId:
           input.paymentCategoryId === "" ? null : input.paymentCategoryId,
         paidByMemberId:
@@ -532,7 +558,11 @@ function PaymentForm({
           </div>
           <div className="min-w-0 space-y-1.5">
             <Label htmlFor="payment-amount">
-              {contractor ? "Amount settled (paid + TDS)" : "Amount"}
+              {contractor
+                ? "Amount settled (paid + TDS)"
+                : client
+                  ? "Amount received"
+                  : "Amount"}
             </Label>
             <MoneyInput
               id="payment-amount"
@@ -643,6 +673,57 @@ function PaymentForm({
           override={override}
           form={form}
         />
+      )}
+
+      {client && (
+        <section
+          aria-labelledby="payment-client-deductions"
+          className="space-y-4"
+        >
+          <div className="space-y-1">
+            <h2 id="payment-client-deductions" className="font-semibold">
+              Deducted by the Client
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              What the Client held back as TDS (194C, or 393 from 1 April 2026)
+              and, for a government client, GST-TDS (s.51, 2 %). They settle its
+              invoices with the money received; the account moves only by what
+              was received.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor="payment-client-tds">
+                TDS deducted by the Client
+              </Label>
+              <MoneyInput
+                id="payment-client-tds"
+                className="h-10"
+                aria-invalid={errors.clientTds != null}
+                {...form.register("clientTds")}
+              />
+              <FieldError message={errors.clientTds?.message} />
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <Label htmlFor="payment-gst-tds">
+                GST-TDS deducted by the Client
+              </Label>
+              <MoneyInput
+                id="payment-gst-tds"
+                className="h-10"
+                aria-invalid={errors.gstTds != null}
+                {...form.register("gstTds")}
+              />
+              <FieldError message={errors.gstTds?.message} />
+            </div>
+          </div>
+          <p className="text-sm">
+            Settles{" "}
+            <span className="font-semibold tabular-nums">{money(settled)}</span>
+            : received {money(entered)} + TDS {money(clientTds)} + GST-TDS{" "}
+            {money(gstTds)}
+          </p>
+        </section>
       )}
 
       <section aria-labelledby="payment-allocation" className="space-y-3">

@@ -137,7 +137,14 @@ export function InvoiceDetail({
       ? []
       : ([["GST", money(invoice.gstAmount)]] as [string, string][])),
     ["Amount", money(invoice.amount)],
-    ["Paid (with TDS)", money(invoice.allocated)],
+    [
+      invoice.direction === "receivable"
+        ? invoice.party.type === "client"
+          ? "Received (with TDS and GST-TDS)"
+          : "Received"
+        : "Paid (with TDS)",
+      money(invoice.allocated),
+    ],
     ...(invoice.writtenOff > 0
       ? ([["Written off", money(invoice.writtenOff)]] as [string, string][])
       : []),
@@ -148,9 +155,9 @@ export function InvoiceDetail({
       <InvoiceStatusChips invoice={invoice} />
       {invoice.origin === "ra_bill" && invoice.sourceId != null ? (
         <p className="text-sm">
-          From Contractor Bill{" "}
+          From {invoice.party.type === "client" ? "Client" : "Contractor"} Bill{" "}
           <Link
-            href={`/app/projects/${projectId}/contractor-bills/${invoice.sourceId}`}
+            href={`/app/projects/${projectId}/${invoice.party.type === "client" ? "client-bills" : "contractor-bills"}/${invoice.sourceId}`}
             className="font-medium underline-offset-4 hover:underline"
           >
             {invoice.invoiceNumber}

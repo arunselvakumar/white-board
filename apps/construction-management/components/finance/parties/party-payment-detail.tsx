@@ -104,6 +104,17 @@ export function PartyPaymentDetail({
           ],
           ["Settled", money(payment.settled)],
         ] as [string, string][])),
+    ...(payment.clientDeductions == null ||
+    payment.clientDeductions.tds + payment.clientDeductions.gstTds === 0
+      ? []
+      : ([
+          ["TDS deducted by the Client", money(payment.clientDeductions.tds)],
+          [
+            "GST-TDS deducted by the Client",
+            money(payment.clientDeductions.gstTds),
+          ],
+          ["Settled", money(payment.settled)],
+        ] as [string, string][])),
     ["Allocated", money(payment.allocated)],
     ["Advance", money(payment.unallocated)],
     ...(payment.paymentCategory == null

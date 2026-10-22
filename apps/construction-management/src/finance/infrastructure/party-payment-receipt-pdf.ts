@@ -332,10 +332,19 @@ export async function renderPartyPaymentReceiptPdf(
       money(view.tdsAmount),
     ]);
   }
+  const clientDeducted = view.clientTdsAmount + view.gstTdsAmount;
+  if (clientDeducted > 0n) {
+    // A Client's receipt (CM-1107): what it deducted settles with the money.
+    rows.push(["Received", money(view.amount)]);
+    if (view.clientTdsAmount > 0n)
+      rows.push(["TDS deducted by the Client", money(view.clientTdsAmount)]);
+    if (view.gstTdsAmount > 0n)
+      rows.push(["GST-TDS deducted by the Client", money(view.gstTdsAmount)]);
+  }
   if (view.unallocated > 0n) rows.push(["Advance", money(view.unallocated)]);
   writer.totals(
     rows,
-    view.tdsAmount > 0n
+    view.tdsAmount > 0n || clientDeducted > 0n
       ? ["Settled", money(view.settled)]
       : [inbound ? "Received" : "Paid", money(view.amount)],
   );

@@ -11,9 +11,15 @@ export type PartyScreen = {
   type: PartyType;
   label: string;
   plural: string;
-  segment: "contractors" | "suppliers" | "other-parties";
+  segment: "contractors" | "suppliers" | "other-parties" | "clients";
   /** Contractors deduct TDS (CM-706). */
   tds: boolean;
+  /**
+   * Which way money moves: paid out (Contractors, Suppliers), both (Other
+   * Parties), or received only (Clients, CM-1107: their invoices come from
+   * Client Bills).
+   */
+  flow: "out" | "both" | "in";
 };
 
 export const PARTY_SCREENS: Record<PartyType, PartyScreen> = {
@@ -23,6 +29,7 @@ export const PARTY_SCREENS: Record<PartyType, PartyScreen> = {
     plural: "Contractors",
     segment: "contractors",
     tds: true,
+    flow: "out",
   },
   supplier: {
     type: "supplier",
@@ -30,6 +37,7 @@ export const PARTY_SCREENS: Record<PartyType, PartyScreen> = {
     plural: "Suppliers",
     segment: "suppliers",
     tds: false,
+    flow: "out",
   },
   other_party: {
     type: "other_party",
@@ -37,6 +45,15 @@ export const PARTY_SCREENS: Record<PartyType, PartyScreen> = {
     plural: "Other Parties",
     segment: "other-parties",
     tds: false,
+    flow: "both",
+  },
+  client: {
+    type: "client",
+    label: "Client",
+    plural: "Clients",
+    segment: "clients",
+    tds: false,
+    flow: "in",
   },
 };
 

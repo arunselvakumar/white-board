@@ -19,6 +19,7 @@ import {
   type PartyType,
 } from "@/src/queries/finance-parties";
 
+import { ClientReceivables } from "./client-receivables";
 import { InvoiceDialog, type InvoiceDialogTarget } from "./invoice-dialog";
 import { InvoiceSheet } from "./invoice-sheet";
 import { OpeningCard } from "./opening-card";
@@ -74,26 +75,40 @@ export function PartyMoneyPage({
             {balance > 0
               ? "owed to the party"
               : balance < 0
-                ? partyType === "other_party"
-                  ? "owed to the Company or advanced"
-                  : "advance with the party"
+                ? partyType === "client"
+                  ? "owed by the Client"
+                  : partyType === "other_party"
+                    ? "owed to the Company or advanced"
+                    : "advance with the party"
                 : ""}
           </span>
         }
         actions={
           canCreate && (
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setInvoiceTarget({ mode: "new", partyId });
-                }}
+              {screen.flow === "in" ? null : (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setInvoiceTarget({ mode: "new", partyId });
+                  }}
+                >
+                  <Plus aria-hidden="true" />
+                  New invoice
+                </Button>
+              )}
+              <Link
+                href={paths.pay(
+                  partyId,
+                  screen.flow === "in" ? "in" : undefined,
+                )}
+                className={buttonVariants()}
               >
-                <Plus aria-hidden="true" />
-                New invoice
-              </Button>
-              <Link href={paths.pay(partyId)} className={buttonVariants()}>
-                {partyType === "other_party" ? "Record payment" : "Pay"}
+                {screen.flow === "in"
+                  ? "Receive payment"
+                  : partyType === "other_party"
+                    ? "Record payment"
+                    : "Pay"}
               </Link>
               {partyType === "other_party" && (
                 <Link
@@ -107,6 +122,11 @@ export function PartyMoneyPage({
           )
         }
       />
+      {partyType === "client" ? (
+        <Suspense fallback={null}>
+          <ClientReceivables projectId={projectId} partyId={partyId} />
+        </Suspense>
+      ) : null}
       <Suspense fallback={<OpeningCardSkeleton />}>
         <OpeningCard
           projectId={projectId}
