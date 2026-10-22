@@ -7,12 +7,16 @@ import {
   type ApiCall,
 } from "../../../.storybook/mocks/api";
 import {
+  CLIENT_BILL_ID,
+  CLIENT_ID,
+  CLIENT_INVOICE,
   CONTRACTOR_ID,
   CONTRACTOR_INVOICE,
   PARTLY_PAID_INVOICE,
   partyMoneyHandler,
   PROJECT_ID,
   SUPPLIER_ID,
+  SUPPLIER_STATEMENT,
 } from "./party-fixtures";
 import { PartyMoneyPage } from "./party-money-page";
 
@@ -260,5 +264,76 @@ export const InvoiceNumberTaken: Story = {
       "aria-invalid",
       "true",
     );
+  },
+};
+
+function clientHandler(call: ApiCall): Response | undefined {
+  if (call.method !== "GET") return undefined;
+  const path = call.path.split("?")[0] ?? "";
+  if (path === `${FINANCE}/invoices`)
+    return Response.json({
+      items: [CLIENT_INVOICE],
+      nextCursor: null,
+      prevCursor: null,
+      total: 1,
+    });
+  if (path === `${FINANCE}/party-statements`)
+    return Response.json({
+      ...SUPPLIER_STATEMENT,
+      party: {
+        type: "client",
+        id: CLIENT_ID,
+        name: "Tamil Nadu Housing Board",
+      },
+      lines: [],
+      closing: -CLIENT_INVOICE.amount,
+      openInvoices: [CLIENT_INVOICE],
+    });
+  return undefined;
+}
+
+/**
+ * A Client (CM-1107): due, retention, TDS and GST-TDS receivable; its
+ * invoices come from Client Bills (read-only, linked back), so it only
+ * receives payments.
+ */
+export const ClientReceivablesAndBillInvoice: Story = {
+  args: { partyType: "client", partyId: CLIENT_ID },
+  beforeEach: () => {
+    api = mockApi(partyMoneyHandler(clientHandler));
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const figures = within(
+      await canvas.findByRole("region", { name: "Client receivables" }),
+    );
+    await expect(figures.getByText("₹6,89,932.04")).toBeVisible();
+    await expect(figures.getByText("₹61,055.93")).toBeVisible();
+    await expect(figures.getAllByText("₹13,798.64")).toHaveLength(2);
+    await expect(canvas.getByText("owed by the Client")).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "New invoice" }),
+    ).toBeNull();
+    await expect(
+      canvas.getByRole("link", { name: "Receive payment" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${PROJECT_ID}/payments/clients/pay?partyId=${CLIENT_ID}&direction=in`,
+    );
+    await userEvent.click(
+      await canvas.findByRole("button", {
+        name: `${CLIENT_INVOICE.invoiceNumber} (Client Bill)`,
+      }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const sheet = within(await body.findByRole("dialog"));
+    await expect(await sheet.findByText(/From Client Bill/)).toBeVisible();
+    await expect(
+      sheet.getByRole("link", { name: CLIENT_INVOICE.invoiceNumber }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${PROJECT_ID}/client-bills/${CLIENT_BILL_ID}`,
+    );
+    await expect(sheet.queryByRole("button", { name: "Edit" })).toBeNull();
   },
 };

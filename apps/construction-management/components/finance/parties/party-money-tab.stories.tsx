@@ -4,6 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import {
   AWAITING_GRNS,
+  CLIENT_ID,
   OTHER_PARTY_ID,
   OVERDUE_INVOICE,
   partyMoneyHandler,
@@ -248,5 +249,45 @@ export const OtherPartiesSalesInvoice: Story = {
     await expect(
       await canvas.findByRole("list", { name: "Settlements" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * Clients (CM-1107): the Project's Client with what it owes (Due), the TDS
+ * and GST-TDS it deducted and the retention it holds; its invoices come
+ * from Client Bills, so the tab only receives payments.
+ */
+export const ClientsDueAndReceivables: Story = {
+  args: { partyType: "client" },
+  play: async ({ canvas }) => {
+    const balances = within(
+      await canvas.findByRole("list", { name: "Client balances" }),
+    );
+    await expect(
+      balances.getByRole("link", { name: "Tamil Nadu Housing Board" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${PROJECT_ID}/payments/clients/${CLIENT_ID}`,
+    );
+    await expect(balances.getAllByText("₹6,89,932.04")[0]).toBeVisible();
+    await expect(balances.getByText("TDS receivable")).toBeVisible();
+    await expect(balances.getByText("GST-TDS receivable")).toBeVisible();
+    await expect(balances.getAllByText("₹13,798.64")).toHaveLength(2);
+    await expect(balances.getByText("₹61,055.93")).toBeVisible();
+    await expect(
+      balances.getByRole("link", { name: "Receive Tamil Nadu Housing Board" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${PROJECT_ID}/payments/clients/pay?partyId=${CLIENT_ID}`,
+    );
+    await expect(
+      canvas.queryByRole("button", { name: "New invoice" }),
+    ).toBeNull();
+    await expect(
+      canvas.getByRole("link", { name: "Receive payment" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/projects/${PROJECT_ID}/payments/clients/pay?direction=in`,
+    );
   },
 };

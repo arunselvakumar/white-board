@@ -10,6 +10,8 @@ import {
   type ApiCall,
 } from "../../../.storybook/mocks/api";
 import {
+  CLIENT_ID,
+  CLIENT_INVOICE,
   CONTRACTOR_ID,
   OTHER_PARTY_ID,
   CONTRACTOR_PAYMENT,
@@ -285,5 +287,73 @@ export const OtherPartyPaymentIn: Story = {
       amount: 30_000_00,
       allocations: [{ invoiceId: SALES_INVOICE.id, amount: 25_000_00 }],
     });
+  },
+};
+
+/**
+ * A receipt from the Client (CM-1107): Payment In only, with the TDS and
+ * GST-TDS it deducted; they settle its Client Bill invoice with the cash.
+ */
+export const ClientReceiptWithDeductions: Story = {
+  args: {
+    partyType: "client",
+    partyId: CLIENT_ID,
+    direction: "in",
+  },
+  play: async ({ canvas, userEvent }) => {
+    const invoices = within(
+      await canvas.findByRole("list", { name: "Open invoices" }),
+    );
+    await expect(
+      invoices.getByText(CLIENT_INVOICE.invoiceNumber),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { name: "Receive payment" }),
+    ).toBeVisible();
+    // A Client only pays in: no direction toggle.
+    await expect(canvas.queryByText("Payment Out")).toBeNull();
+    await userEvent.type(canvas.getByLabelText("Amount received"), "662334.76");
+    await userEvent.type(
+      canvas.getByLabelText("TDS deducted by the Client"),
+      "13798.64",
+    );
+    await userEvent.type(
+      canvas.getByLabelText("GST-TDS deducted by the Client"),
+      "13798.64",
+    );
+    await expect(canvas.getByText(/^Settles/)).toHaveTextContent(
+      "₹6,89,932.04",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Fill" }));
+    await expect(canvas.getByText(/advance/)).toHaveTextContent("₹0.00");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Record ₹6,62,334.76" }),
+    );
+    await waitFor(() => expect(recorded()).toHaveLength(1));
+    await expect(recorded()[0]).toMatchObject({
+      partyType: "client",
+      direction: "in",
+      amount: 6_62_334_76,
+      clientTdsAmount: 13_798_64,
+      gstTdsAmount: 13_798_64,
+      allocations: [{ invoiceId: CLIENT_INVOICE.id, amount: 6_89_932_04 }],
+    });
+  },
+};
+
+/** At phone width the Client's deductions stack and nothing scrolls sideways. */
+export const ClientReceiptPhoneWidth: Story = {
+  args: {
+    partyType: "client",
+    partyId: CLIENT_ID,
+    direction: "in",
+  },
+  globals: { viewport: { value: "mobile1", isRotated: false } },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(
+      await canvas.findByLabelText("GST-TDS deducted by the Client"),
+    ).toBeVisible();
+    const page = canvasElement.ownerDocument.documentElement;
+    await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };

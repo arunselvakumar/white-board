@@ -21,6 +21,8 @@ export const PROJECT_ID = "0199b000-0000-7000-8000-000000000001";
 export const CONTRACTOR_ID = "0199a000-0000-7000-8000-0000000000d1";
 export const SUPPLIER_ID = "0199a000-0000-7000-8000-0000000000d2";
 export const OTHER_PARTY_ID = "0199a000-0000-7000-8000-0000000000d3";
+export const CLIENT_ID = "0199a000-0000-7000-8000-0000000000d4";
+export const CLIENT_BILL_ID = "0199c0de-1107-7000-8000-000000000103";
 export const OTHER_PROJECT_ID = "0199b000-0000-7000-8000-000000000002";
 const AT = "2026-10-08T06:30:00.000Z";
 export const TODAY = "2026-10-11";
@@ -506,6 +508,71 @@ export const SALES_INVOICE = invoice({
   daysOverdue: 0,
 });
 
+/** A Client Bill's receivable invoice to the Client (CM-1107), read-only here. */
+export const CLIENT_INVOICE = invoice({
+  id: "0199c000-0000-7000-8000-000000000030",
+  party: {
+    type: "client",
+    id: CLIENT_ID,
+    name: "Tamil Nadu Housing Board",
+  },
+  direction: "receivable",
+  origin: "ra_bill",
+  sourceId: CLIENT_BILL_ID,
+  invoiceNumber: "RA/26-27/00002",
+  invoiceDate: "2026-10-05",
+  dueDate: null,
+  taxableAmount: 6_10_559_32,
+  gstAmount: 1_09_900_68,
+  amount: 6_89_932_04,
+  balance: 6_89_932_04,
+  overdue: false,
+  daysOverdue: 0,
+  actions: { edit: false, delete: false, settle: true, pay: true },
+});
+
+export const CLIENT_BALANCES: PartyBalances = {
+  partyType: "client",
+  items: [
+    {
+      party: {
+        type: "client",
+        id: CLIENT_ID,
+        name: "Tamil Nadu Housing Board",
+      },
+      assigned: true,
+      opening: 0,
+      invoiced: 0,
+      billed: 13_79_864_08,
+      paid: 0,
+      received: 6_62_334_76,
+      tds: 0,
+      clientTds: 13_798_64,
+      gstTds: 13_798_64,
+      retentionReceivable: 61_055_93,
+      writtenOff: 0,
+      balance: -6_89_932_04,
+      overdue: 0,
+      advance: 0,
+    },
+  ],
+  totals: {
+    opening: 0,
+    invoiced: 0,
+    billed: 13_79_864_08,
+    paid: 0,
+    received: 6_62_334_76,
+    tds: 0,
+    clientTds: 13_798_64,
+    gstTds: 13_798_64,
+    retentionReceivable: 61_055_93,
+    writtenOff: 0,
+    balance: -6_89_932_04,
+    overdue: 0,
+    advance: 0,
+  },
+};
+
 export const OTHER_PARTY_BALANCES: PartyBalances = {
   partyType: "other_party",
   items: [
@@ -664,6 +731,13 @@ export function partyMoneyHandler(
       return Response.json(options.access ?? FULL_ACCESS);
     if (
       path.startsWith(`${API}/counterparties/options`) &&
+      query.get("kind") === "client"
+    )
+      return Response.json({
+        items: [{ id: CLIENT_ID, name: "Tamil Nadu Housing Board" }],
+      });
+    if (
+      path.startsWith(`${API}/counterparties/options`) &&
       query.get("kind") === "other_party"
     )
       return Response.json({
@@ -700,6 +774,15 @@ export function partyMoneyHandler(
       });
     if (
       path.startsWith(`${API}/parties`) &&
+      query.get("partyType") === "client"
+    )
+      return Response.json(
+        options.empty === true
+          ? { ...CLIENT_BALANCES, items: [] }
+          : CLIENT_BALANCES,
+      );
+    if (
+      path.startsWith(`${API}/parties`) &&
       query.get("partyType") === "other_party"
     )
       return Response.json(
@@ -727,9 +810,11 @@ export function partyMoneyHandler(
             ? []
             : query.get("partyType") === "contractor"
               ? [CONTRACTOR_INVOICE]
-              : query.get("direction") === "receivable"
-                ? [SALES_INVOICE]
-                : [OVERDUE_INVOICE, PARTLY_PAID_INVOICE],
+              : query.get("partyType") === "client"
+                ? [CLIENT_INVOICE]
+                : query.get("direction") === "receivable"
+                  ? [SALES_INVOICE]
+                  : [OVERDUE_INVOICE, PARTLY_PAID_INVOICE],
       });
     const one = /^\/api\/construction\/finance\/invoices\/([^/?]+)$/.exec(
       path.split("?")[0] ?? "",
@@ -739,6 +824,7 @@ export function partyMoneyHandler(
         ...SUPPLIER_INVOICES,
         CONTRACTOR_INVOICE,
         SALES_INVOICE,
+        CLIENT_INVOICE,
       ].find((item) => item.id === one[1]);
       return found == null
         ? Response.json(
