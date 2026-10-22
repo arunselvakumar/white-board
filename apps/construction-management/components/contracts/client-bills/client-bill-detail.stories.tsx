@@ -130,20 +130,9 @@ export const GstinNotInState: Story = {
   },
 };
 
-const pending = serveClientBills({
-  bill: PENDING,
-  write: (call) =>
-    call.path === `${CLIENT_BILLS_API}/${BILL_PENDING}/approve`
-      ? Response.json({
-          ...PENDING,
-          status: "approved",
-          invoiceId: APPROVED.invoiceId,
-          allowed: { ...PENDING.allowed, approve: false, reject: false },
-        })
-      : undefined,
-});
+const pending = serveClientBills({ bill: PENDING });
 
-/** Pending: Approve creates the receivable invoice to the Client. */
+/** Pending: Approve sends the bill's stamp (the invoice shows in ApprovedWithInvoice). */
 export const PendingApprove: Story = {
   args: { id: BILL_PENDING },
   beforeEach: pending.beforeEach,
@@ -159,9 +148,6 @@ export const PendingApprove: Story = {
         ),
       ).toMatchObject({ expectedUpdatedAt: PENDING.updatedAt }),
     );
-    await expect(
-      await canvas.findByText("Invoice RA/26-27/00003 in Payments"),
-    ).toBeVisible();
   },
 };
 

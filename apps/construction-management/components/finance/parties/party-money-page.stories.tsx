@@ -311,15 +311,16 @@ export const ClientReceivablesAndBillInvoice: Story = {
     await expect(figures.getByText("₹61,055.93")).toBeVisible();
     await expect(figures.getAllByText("₹13,798.64")).toHaveLength(2);
     await expect(canvas.getByText(/owed by the Client/)).toBeVisible();
+    // Once access loads: Receive payment, and no New invoice.
     await expect(
-      canvas.queryByRole("button", { name: "New invoice" }),
-    ).toBeNull();
-    await expect(
-      canvas.getByRole("link", { name: "Receive payment" }),
+      await canvas.findByRole("link", { name: "Receive payment" }),
     ).toHaveAttribute(
       "href",
       `/app/projects/${PROJECT_ID}/payments/clients/pay?partyId=${CLIENT_ID}&direction=in`,
     );
+    await expect(
+      canvas.queryByRole("button", { name: "New invoice" }),
+    ).toBeNull();
     await userEvent.click(
       await canvas.findByRole("button", {
         name: `${CLIENT_INVOICE.invoiceNumber} (Client Bill)`,

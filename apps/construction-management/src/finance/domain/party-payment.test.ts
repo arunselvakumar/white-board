@@ -216,28 +216,36 @@ describe("payment entries", () => {
   });
 
   it("refuses Payment Out to a Client and client deductions on other payments", () => {
-    expect(code(() => assertDirection("client", "out"))).toBe(
-      "PAYMENT_OUT_NOT_FOR_CLIENTS",
-    );
-    expect(code(() => assertDirection("client", "in"))).toBeNull();
-    expect(code(() => assertDirection("supplier", "in"))).toBe(
-      "PAYMENT_IN_ONLY_FOR_OTHER_PARTIES",
-    );
     expect(
-      code(() =>
+      code(() => {
+        assertDirection("client", "out");
+      }),
+    ).toBe("PAYMENT_OUT_NOT_FOR_CLIENTS");
+    expect(
+      code(() => {
+        assertDirection("client", "in");
+      }),
+    ).toBeNull();
+    expect(
+      code(() => {
+        assertDirection("supplier", "in");
+      }),
+    ).toBe("PAYMENT_IN_ONLY_FOR_OTHER_PARTIES");
+    expect(
+      code(() => {
         assertClientDeductionsAllowed("other_party", "in", {
           clientTdsAmount: 100n,
           gstTdsAmount: 0n,
-        }),
-      ),
+        });
+      }),
     ).toBe("CLIENT_TDS_ONLY_FOR_CLIENTS");
     expect(
-      code(() =>
+      code(() => {
         assertClientDeductionsAllowed("client", "in", {
           clientTdsAmount: 100n,
           gstTdsAmount: 200n,
-        }),
-      ),
+        });
+      }),
     ).toBeNull();
   });
 });

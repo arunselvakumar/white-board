@@ -154,15 +154,15 @@ describe("the RA bill engine both sides share (CM-1107)", () => {
 
   it("keeps the net from going negative and names the contract in the cap message", () => {
     expect(
-      code(() =>
+      code(() => {
         assertRaDeductions({
           deductions: [{ kind: "other", amount: 1_19_00n }],
           gross: 1_00_00n,
           payableGst: 18_00n,
           retentionMax: 0n,
           contract: "client contract",
-        }),
-      ),
+        });
+      }),
     ).toBe("BILL_DEDUCTIONS_TOO_LARGE");
     try {
       assertRaDeductions({
@@ -205,9 +205,15 @@ describe("the RA bill engine both sides share (CM-1107)", () => {
         ),
       ),
     ).toBe("BILL_DATE_BEFORE_ORDER_DATE");
-    expect(code(() => assertBillAction("approved", "edit"))).toBe(
-      "BILL_STATUS_INVALID",
-    );
-    expect(code(() => assertBillAction("approved", "reverse"))).toBeNull();
+    expect(
+      code(() => {
+        assertBillAction("approved", "edit");
+      }),
+    ).toBe("BILL_STATUS_INVALID");
+    expect(
+      code(() => {
+        assertBillAction("approved", "reverse");
+      }),
+    ).toBeNull();
   });
 });
