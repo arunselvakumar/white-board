@@ -167,9 +167,9 @@ export function lineFigures(input: {
 }
 
 /** Σ a bill's rows per line key (a Work Order line or a BOQ item). */
-export function sumRowsBy<K extends string>(
-  rows: readonly { quantity: bigint }[],
-  key: (row: (typeof rows)[number]) => K,
+export function sumRowsBy<R extends { quantity: bigint }, K extends string>(
+  rows: readonly R[],
+  key: (row: R) => K,
 ): Map<K, bigint> {
   const sums = new Map<K, bigint>();
   for (const row of rows)
