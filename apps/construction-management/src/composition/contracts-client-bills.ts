@@ -6,6 +6,7 @@ import { ClientBillHandlers } from "@/src/contracts/application/client-bill-hand
 import type { ClientBillDeps } from "@/src/contracts/application/client-bill-ports";
 import { PrismaBoqStore } from "@/src/contracts/infrastructure/prisma-boq-store";
 import { PrismaClientBillStore } from "@/src/contracts/infrastructure/prisma-client-bill-store";
+import { readCompanyHeader } from "@/src/procurement/infrastructure/purchase-request-pdf";
 import { companyToday } from "@/src/shared-kernel/company-today";
 import { loadBackdatedCheck } from "@/src/site-work/infrastructure/site-work-guards";
 
@@ -38,3 +39,21 @@ export function createClientBillDeps(): ClientBillDeps {
 export const clientBillHandlers = new ClientBillHandlers(
   createClientBillDeps(),
 );
+
+/** The Company's letterhead and the Project's site address for the tax invoice. */
+export async function readClientBillPrintParties(
+  workspaceId: string,
+  projectId: string,
+): Promise<{
+  company: Awaited<ReturnType<typeof readCompanyHeader>>;
+  projectAddress: string | null;
+}> {
+  const [company, project] = await Promise.all([
+    readCompanyHeader(prisma, workspaceId),
+    prisma.constructionProjectsProject.findFirst({
+      where: { id: projectId, workspaceId },
+      select: { address: true },
+    }),
+  ]);
+  return { company, projectAddress: project?.address ?? null };
+}

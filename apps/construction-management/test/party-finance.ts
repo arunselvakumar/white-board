@@ -122,7 +122,7 @@ export async function closeBooks(
 /** A party's balance on a Project, from the party ledger. */
 export async function partyBalance(
   workspaceId: string,
-  partyType: "contractor" | "supplier" | "other_party",
+  partyType: "contractor" | "supplier" | "other_party" | "client",
   partyId: string,
   projectId: string,
 ): Promise<bigint> {

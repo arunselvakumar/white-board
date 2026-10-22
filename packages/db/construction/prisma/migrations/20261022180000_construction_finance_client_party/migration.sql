@@ -63,3 +63,15 @@ ALTER TABLE "construction_finance"."party_payments" ADD CONSTRAINT "party_paymen
   AND (("client_tds_amount" = 0 AND "gst_tds_amount" = 0)
     OR ("party_type"::text = 'client' AND "direction" = 'in'))
 );
+
+-- A Client's TDS and GST-TDS entries settle like a receipt: positive.
+ALTER TABLE "construction_finance"."party_entries" DROP CONSTRAINT "party_entries_amount_check";
+ALTER TABLE "construction_finance"."party_entries" ADD CONSTRAINT "party_entries_amount_check" CHECK (
+  "amount" <> 0
+  AND (
+    "reverses_entry_id" IS NOT NULL
+    OR "kind" IN ('opening', 'write_off')
+    OR ("kind"::text IN ('invoice', 'receipt', 'client_tds', 'gst_tds') AND "amount" > 0)
+    OR ("kind" IN ('sales_invoice', 'payment', 'tds') AND "amount" < 0)
+  )
+);

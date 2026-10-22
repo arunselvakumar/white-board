@@ -212,3 +212,87 @@ export async function measureWorkOrderLines(
   });
   return { sheetId, rowIds };
 }
+
+/**
+ * A Client of the Company (CM-1101), written straight to its table: a
+ * Tamil Nadu GSTIN by default.
+ */
+export async function addClient(
+  workspaceId: string,
+  by: string,
+  input: {
+    name?: string;
+    gstin?: string | null;
+    stateCode?: string | null;
+    address?: string | null;
+  } = {},
+): Promise<string> {
+  const id = randomUUID();
+  const gstin = input.gstin === undefined ? "33AABCT1332L1ZU" : input.gstin;
+  await prisma.constructionMastersClient.create({
+    data: {
+      id,
+      workspaceId,
+      name: input.name ?? "Tamil Nadu Housing Board",
+      gstin,
+      stateCode:
+        input.stateCode === undefined
+          ? (gstin?.slice(0, 2) ?? null)
+          : input.stateCode,
+      address:
+        input.address === undefined ? "Nandanam, Chennai" : input.address,
+      pinCode: "600035",
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
+}
+
+/**
+ * A client-side measurement sheet on the Project (CM-1105), written
+ * straight to its tables: `checked` by default, one direct row per BOQ
+ * item given. Client Bills (CM-1107) take checked rows.
+ */
+export async function measureClientItems(
+  workspaceId: string,
+  by: string,
+  input: {
+    projectId: string;
+    measuredOn: string;
+    status?: "draft" | "submitted" | "checked";
+    rows: readonly { boqItemId: string; quantity: string }[];
+  },
+): Promise<{ sheetId: string; rowIds: string[] }> {
+  const sheetId = randomUUID();
+  const now = new Date();
+  const checked = (input.status ?? "checked") === "checked";
+  await prisma.constructionContractsMeasurementSheet.create({
+    data: {
+      id: sheetId,
+      workspaceId,
+      projectId: input.projectId,
+      side: "client",
+      measuredOn: new Date(input.measuredOn),
+      status: input.status ?? "checked",
+      checkedAt: checked ? now : null,
+      checkedBy: checked ? by : null,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  const rowIds = input.rows.map(() => randomUUID());
+  await prisma.constructionContractsMeasurementRow.createMany({
+    data: input.rows.map((row, position) => ({
+      id: rowIds[position] ?? randomUUID(),
+      workspaceId,
+      sheetId,
+      boqItemId: row.boqItemId,
+      description: `Measured ${String(position + 1)}`,
+      direct: true,
+      quantity: row.quantity,
+      position,
+    })),
+  });
+  return { sheetId, rowIds };
+}
