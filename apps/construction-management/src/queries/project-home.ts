@@ -27,9 +27,9 @@ function projectUrl(id: string, verb: string): string {
 }
 
 /**
- * The member's modules on a Project in their tile order, the pin, and
- * whether they may hide modules (CM-411). Feeds the Project sidebar
- * (which modules) and the home tiles (which, in what order).
+ * The member's modules on a Project, the pin, and whether they may hide
+ * modules (CM-411). Feeds the Project sidebar (which modules) and where
+ * opening a Project lands.
  */
 export function projectHomeQuery(id: string) {
   return queryOptions({
@@ -49,19 +49,6 @@ export function useHideModules(id: string) {
     onSuccess: (home) => {
       queryClient.setQueryData(projectHomeQuery(id).queryKey, home);
     },
-  });
-}
-
-/** The member's tile order for every Project; `[]` resets it. */
-export function useSaveTileOrder() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (tileOrder: string[]) =>
-      postJson<{ tileOrder: string[] }>(
-        "/api/construction/projects/tile-order/update",
-        { tileOrder },
-      ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: HOME_KEY }),
   });
 }
 

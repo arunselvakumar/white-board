@@ -191,6 +191,53 @@ export const WorkspaceSubmenu: Story = {
   },
 };
 
+/**
+ * The Masters and Workspace fold-out arrows sit on their rows' centre line
+ * (#99), open (Masters, on its page) and folded (Workspace). On a phone
+ * the menu is in the Sidebar sheet.
+ */
+export const SubmenuArrowsCentred: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/app/masters/designations" } },
+  },
+  render: () => (
+    <AppShell>
+      <p>Designations</p>
+    </AppShell>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    let sidebar = canvas;
+    const view = canvasElement.ownerDocument.defaultView;
+    if (view != null && view.innerWidth < 768) {
+      await userEvent.click(
+        await canvas.findByRole("button", { name: "Toggle Sidebar" }),
+      );
+      const body = within(canvasElement.ownerDocument.body);
+      const sheets = await body.findAllByRole("dialog", { name: "Sidebar" });
+      const sheet = sheets[sheets.length - 1];
+      if (sheet == null) throw new Error("The Sidebar sheet did not open");
+      await waitFor(() => expect(sheet).toBeVisible());
+      sidebar = within(sheet);
+    }
+    const nav = within(sidebar.getByRole("navigation", { name: "Main" }));
+    const arrows = [
+      nav.getByRole("button", { name: "Hide Masters list" }),
+      nav.getByRole("button", { name: "Show Workspace list" }),
+    ];
+    for (const arrow of arrows) {
+      const row = arrow.parentElement?.querySelector(
+        "[data-sidebar=menu-button]",
+      );
+      if (row == null) throw new Error(`${arrow.ariaLabel ?? ""} has no row`);
+      const a = arrow.getBoundingClientRect();
+      const r = row.getBoundingClientRect();
+      await expect(
+        Math.abs(a.top + a.height / 2 - (r.top + r.height / 2)),
+      ).toBeLessThan(0.5);
+    }
+  },
+};
+
 export const NoActiveCompany: Story = {
   ...shellAt("/app/projects"),
   beforeEach() {

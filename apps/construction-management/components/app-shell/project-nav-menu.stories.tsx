@@ -51,7 +51,7 @@ function at(pathname: string) {
 const meta = {
   title: "App/ProjectNavMenu",
   beforeEach: serve(),
-  parameters: at(PATH),
+  parameters: at(`${PATH}/dashboard`),
   render: () => (
     <StoryQueries>
       <AppShell>
@@ -103,7 +103,7 @@ function groupsOf(nav: HTMLElement): [string, string[]][] {
   ]);
 }
 
-export const Home: Story = {
+export const Menu: Story = {
   play: async (context) => {
     const { sidebar, nav, menu } = await projectMenu(context);
     await expect(
@@ -115,7 +115,7 @@ export const Home: Story = {
     ).toBeNull();
     await waitFor(() =>
       expect(groupsOf(nav)).toEqual([
-        ["Overview", ["Home", "Dashboard"]],
+        ["Overview", ["Dashboard"]],
         ["Setup", ["Wings", "Amenities", "Resources"]],
         [
           "Site work",
@@ -149,7 +149,9 @@ export const Home: Story = {
     await expect(
       menu.getByRole("link", { name: "Contractor Bills" }),
     ).toHaveAttribute("href", `${PATH}/contractor-bills`);
-    await expect(menu.getByRole("link", { name: "Home" })).toHaveAttribute(
+    // No Home entry (#99): Opening a Project lands on Dashboard.
+    await expect(menu.queryByRole("link", { name: "Home" })).toBeNull();
+    await expect(menu.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -194,7 +196,6 @@ export const MemberModules: Story = {
     // Fixed headings, not the member's tile order; empty headings go.
     await waitFor(() =>
       expect(groupsOf(nav)).toEqual([
-        ["Overview", ["Home"]],
         ["Site work", ["Attendance"]],
         ["Materials & money", ["Payments"]],
         ["Files", ["Documents"]],
@@ -233,9 +234,9 @@ export const PaymentsSubmenu: Story = {
     await expect(
       menu.getByRole("link", { name: "Payments" }),
     ).not.toHaveAttribute("aria-current");
-    await expect(menu.getByRole("link", { name: "Home" })).not.toHaveAttribute(
-      "aria-current",
-    );
+    await expect(
+      menu.getByRole("link", { name: "Dashboard" }),
+    ).not.toHaveAttribute("aria-current");
   },
 };
 
@@ -275,13 +276,48 @@ export const AttendanceSubmenuFolds: Story = {
   },
 };
 
-export const EditBelongsToHome: Story = {
+/** Edit is not a module: nothing in the menu lights up (#99). */
+export const EditHighlightsNothing: Story = {
   parameters: at(`${PATH}/edit`),
   play: async (context) => {
+    const { nav, menu } = await projectMenu(context);
+    await menu.findByRole("link", { name: "Dashboard" });
+    await expect(nav.querySelector("[aria-current=page]")).toBeNull();
+    await expect(nav.querySelector("[data-active]")).toBeNull();
+  },
+};
+
+/**
+ * Every fold-out arrow sits on its row's centre line (#99), folded and
+ * open (Payments is open on its page).
+ */
+export const SubmenuArrowsCentred: Story = {
+  parameters: at(`${PATH}/payments/wages`),
+  play: async (context) => {
     const { menu } = await projectMenu(context);
-    await expect(
-      await menu.findByRole("link", { name: "Home" }),
-    ).toHaveAttribute("aria-current", "page");
+    await menu.findByRole("list", { name: "Payments" });
+    const arrows = menu.getAllByRole("button", {
+      name: /^(Show|Hide) .* list$/,
+    });
+    await expect(arrows.map((arrow) => arrow.ariaLabel)).toEqual([
+      "Show Attendance list",
+      "Show Equipment list",
+      "Show Materials list",
+      "Hide Payments list",
+      "Show Inquiries list",
+      "Show Bookings list",
+    ]);
+    for (const arrow of arrows) {
+      const row = arrow.parentElement?.querySelector(
+        "[data-sidebar=menu-button]",
+      );
+      if (row == null) throw new Error(`${arrow.ariaLabel ?? ""} has no row`);
+      const a = arrow.getBoundingClientRect();
+      const r = row.getBoundingClientRect();
+      await expect(
+        Math.abs(a.top + a.height / 2 - (r.top + r.height / 2)),
+      ).toBeLessThan(0.5);
+    }
   },
 };
 

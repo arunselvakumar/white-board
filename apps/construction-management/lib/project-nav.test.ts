@@ -5,6 +5,7 @@ import { PROJECT_NAV_GROUPS } from "@/src/projects/domain/project-nav-groups";
 
 import {
   activeProjectSegment,
+  firstProjectModulePath,
   projectIdFromPath,
   projectNavGroups,
 } from "./project-nav";
@@ -28,7 +29,7 @@ describe("PROJECT_NAV_GROUPS", () => {
 describe("projectNavGroups", () => {
   it("falls back to every module of the structure until the home loads", () => {
     expect(labels(projectNavGroups(undefined, "wings"))).toEqual([
-      ["Overview", ["Home", "Dashboard"]],
+      ["Overview", ["Dashboard"]],
       ["Setup", ["Wings", "Amenities", "Resources"]],
       [
         "Site work",
@@ -77,11 +78,47 @@ describe("projectNavGroups", () => {
       ],
     };
     expect(labels(projectNavGroups(home, "wings"))).toEqual([
-      ["Overview", ["Home"]],
       ["Site work", ["Attendance"]],
       ["Materials & money", ["Payments"]],
       ["Files", ["Documents"]],
     ]);
+  });
+});
+
+describe("firstProjectModulePath", () => {
+  const base = `/app/projects/${ID}`;
+
+  it("is Dashboard when the member may open it", () => {
+    const groups = projectNavGroups(
+      { modules: [{ key: "dashboard", hidden: false }] },
+      "wings",
+    );
+    expect(firstProjectModulePath(ID, groups)).toBe(`${base}/dashboard`);
+  });
+
+  it("is the first module in the menu when Dashboard is hidden or not allowed", () => {
+    const hidden = projectNavGroups(
+      {
+        modules: [
+          { key: "reports", hidden: false },
+          { key: "dashboard", hidden: true },
+          { key: "attendance", hidden: false },
+        ],
+      },
+      "wings",
+    );
+    expect(firstProjectModulePath(ID, hidden)).toBe(`${base}/attendance`);
+  });
+
+  it("is null when the member can open no module", () => {
+    expect(
+      firstProjectModulePath(ID, projectNavGroups({ modules: [] }, "wings")),
+    ).toBeNull();
+    const allHidden = projectNavGroups(
+      { modules: [{ key: "dashboard", hidden: true }] },
+      "wings",
+    );
+    expect(firstProjectModulePath(ID, allHidden)).toBeNull();
   });
 });
 
@@ -104,7 +141,7 @@ describe("projectIdFromPath", () => {
 });
 
 describe("activeProjectSegment", () => {
-  const segments = ["", "payments", "tasks"];
+  const segments = ["dashboard", "payments", "tasks"];
 
   it("is the module the page is under", () => {
     expect(
@@ -112,10 +149,15 @@ describe("activeProjectSegment", () => {
     ).toBe("payments");
   });
 
-  it("gives Edit and pages outside the menu to Home", () => {
-    expect(activeProjectSegment(`/app/projects/${ID}/edit`, ID, segments)).toBe(
-      "",
-    );
-    expect(activeProjectSegment(`/app/projects/${ID}`, ID, segments)).toBe("");
+  it("is none on Edit, the bare Project path and pages outside the menu", () => {
+    expect(
+      activeProjectSegment(`/app/projects/${ID}/edit`, ID, segments),
+    ).toBeNull();
+    expect(
+      activeProjectSegment(`/app/projects/${ID}`, ID, segments),
+    ).toBeNull();
+    expect(
+      activeProjectSegment(`/app/projects/${ID}/gallery`, ID, segments),
+    ).toBeNull();
   });
 });
