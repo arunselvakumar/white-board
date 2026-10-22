@@ -1248,7 +1248,7 @@ Goal: the statutory and contract paperwork a builder's accountant (CA) and Tally
 **Done when:**
 
 - Bill commands per CM-0023 §7 on the contractor side: draft from checked measurements up to a date, cumulative − previous, deductions (retention with its cap, mobilisation recovery suggestions, material at cost, other), GST from the work order's terms, net; approval and rejection; Final closes the work order; reverse while latest and unsettled.
-- Approval creates the payable invoice through `PartyInvoicing` (origin `ra_bill`) and posts retention held; the Contractor's balance shows payable and held separately.
+- Approval creates the payable invoice through `PartyInvoicing` (origin `ra_bill`) for the net; retention held is worked out in contracts (approved retention − releases) and shown per Contractor and Work Order, because finance's balance sums don't filter by entry kind (spec, CM-1106).
 - `WORK_ORDER_QUANTITY_EXCEEDED` on draft and approval.
 - Contractor Bills list, bill page (abstract, measurements, deductions), PDF.
 - HTTP tests proving the invoice, ledger entries and reversal; stories.
