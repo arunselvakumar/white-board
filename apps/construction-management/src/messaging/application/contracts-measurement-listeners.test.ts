@@ -84,14 +84,15 @@ describe("Measurement Book notifications (CM-1105, CM-0023 §6)", () => {
 
   it("words a client-side sheet without a title", async () => {
     const { listeners, sent } = setup();
-    await listeners.handle({
+    const client: InboundMeasurementSubmitted = {
       ...event,
       side: "client",
       workOrderNumber: null,
       partyName: null,
       title: null,
       rowCount: 1,
-    });
+    };
+    await listeners.handle(client);
     expect(sent[0]?.draft.body).toBe("Client side in Metro Depot: 1 row.");
   });
 
