@@ -4,6 +4,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import type { BillStatus } from "../domain/contract-terms";
 import type { ClientContractTerms } from "../domain/client-bill";
+import type { AdvanceStore } from "./advance-ports";
 import type { BoqDb, BoqStore } from "./boq-ports";
 import type {
   BillCursor,
@@ -237,6 +238,8 @@ export type ClientBillDeps = {
   directory: ContractsDirectory;
   /** The receivable invoice in finance (ADR CM-0023 §7). */
   invoicing: PartyInvoicing;
+  /** The client contract's advances and retention releases (CM-1108). */
+  advances: AdvanceStore;
   /** One-line labels for the rows' locations ("Wing A · Floor 1"). */
   locationLabels: (
     workspaceId: string,

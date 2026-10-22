@@ -422,6 +422,74 @@ export class RaBillInvoices {
     }
   }
 
+  /**
+   * Number, amount, what is paid or received and whether anything settles
+   * them, for Contracts' screens (CM-1108). Reads only; live invoices.
+   */
+  async states(
+    db: FinanceTx,
+    workspaceId: string,
+    invoiceIds: readonly string[],
+  ): Promise<
+    Map<
+      string,
+      {
+        number: string;
+        amount: bigint;
+        allocated: bigint;
+        balance: bigint;
+        settled: boolean;
+      }
+    >
+  > {
+    const ids = [...new Set(invoiceIds)];
+    if (ids.length === 0) return new Map();
+    const { store } = this.deps;
+    const [invoices, figures, settlements] = await Promise.all([
+      store.findInvoices(db, workspaceId, ids),
+      store.invoiceFigures(db, ids),
+      store.settlementsOfInvoices(db, ids),
+    ]);
+    return new Map(
+      invoices.map((invoice) => {
+        const figure = figures.get(invoice.id) ?? {
+          allocated: 0n,
+          writtenOff: 0n,
+        };
+        const pending = settlements.some(
+          (row) =>
+            row.invoiceId === invoice.id && row.approvalStatus !== "rejected",
+        );
+        return [
+          invoice.id,
+          {
+            number: invoice.invoiceNumber,
+            amount: invoice.amount,
+            allocated: figure.allocated,
+            balance: invoice.amount - figure.allocated - figure.writtenOff,
+            settled:
+              invoice.settledAt != null ||
+              figure.allocated > 0n ||
+              figure.writtenOff > 0n ||
+              pending,
+          },
+        ];
+      }),
+    );
+  }
+
+  /** Payment numbers by id (CM-1108: an advance's payment). */
+  async paymentNumbers(
+    db: FinanceTx,
+    workspaceId: string,
+    paymentIds: readonly string[],
+  ): Promise<Map<string, string>> {
+    const rows = await this.deps.store.findPayments(db, workspaceId, [
+      ...new Set(paymentIds),
+    ]);
+    return new Map(rows.map((row) => [row.id, row.number]));
+  }
+
   /** Reverses the invoice's party entry and removes the invoice. */
   async reverse(
     tx: FinanceTx,

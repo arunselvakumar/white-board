@@ -4,6 +4,7 @@ import { contractsDirectory } from "@/src/composition/contracts-directory";
 import { messagingEvents } from "@/src/composition/messaging";
 import { ContractorBillHandlers } from "@/src/contracts/application/contractor-bill-handlers";
 import type { ContractorBillDeps } from "@/src/contracts/application/contractor-bill-ports";
+import { PrismaAdvanceStore } from "@/src/contracts/infrastructure/prisma-advance-store";
 import { PrismaBoqStore } from "@/src/contracts/infrastructure/prisma-boq-store";
 import { PrismaContractorBillStore } from "@/src/contracts/infrastructure/prisma-contractor-bill-store";
 import { PrismaWorkOrderStore } from "@/src/contracts/infrastructure/prisma-work-order-store";
@@ -31,6 +32,7 @@ export function createContractorBillDeps(): ContractorBillDeps {
     workOrders: new PrismaWorkOrderStore(),
     directory: contractsDirectory,
     invoicing: contractsPartyInvoicing(),
+    advances: new PrismaAdvanceStore(),
     tds: contractorTdsEstimate,
     locationLabels: (workspaceId, projectId) =>
       projectLocationLabeller(workspaceId, projectId),

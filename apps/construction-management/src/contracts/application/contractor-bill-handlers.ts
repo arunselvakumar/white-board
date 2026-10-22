@@ -16,6 +16,11 @@ import {
 import { newId } from "@/src/shared-kernel/ids";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
+import {
+  assertRecoveries,
+  suggestedRecoveries,
+  type RecoverableAdvance,
+} from "../domain/advance";
 import { contractsProjectNotFound } from "../domain/contracts-errors";
 import type { BillStatus } from "../domain/contract-terms";
 import {
@@ -72,13 +77,19 @@ import type {
   ContractsProjectFacts,
   ContractsTx,
 } from "./ports";
+import { recoverableAdvances } from "./advance-handlers";
+import type { ContractRef } from "./advance-ports";
 import {
+  allocationsTotal,
   assertNotStale,
+  billAdvanceViews,
   dispatchBillApproval,
   pendingApproval,
   plannedDeductions,
   raBillSnapshot,
+  recoveryAllocations,
   uniqueIds,
+  type BillAdvanceView,
   type DeductionPlan as RaDeductionPlan,
 } from "./ra-bill-common";
 import type { StoredWorkOrder, StoredWorkOrderLine } from "./work-order-ports";
@@ -157,8 +168,16 @@ export type ContractorBillDetail = {
   payableGst: bigint;
   /** What this bill may hold as retention (also the most it may hold). */
   retention: RetentionSuggestion;
-  /** Retention held on the Work Order's approved bills, this one included when approved. */
+  /**
+   * Retention held on the Work Order: its approved bills' retention (this
+   * one included when approved) less what was released (CM-1108).
+   */
   retentionHeldOnWorkOrder: bigint;
+  /**
+   * The Work Order's advances with what other approved bills recovered,
+   * what is left and what this bill's gross suggests (CM-1108).
+   */
+  advances: BillAdvanceView[];
   tdsEstimate: ContractorTdsEstimate | null;
   allowed: ContractorBillAllowed;
   createdByName: string | null;
@@ -215,12 +234,22 @@ type Priced = {
   gst: BillGst;
   retention: RetentionSuggestion;
   deductions: BillDeduction[];
+  advances: RecoverableAdvance[];
   net: bigint;
   project: ContractsProjectFacts;
   contractor: ContractsContractorFacts | null;
 };
 
 const unique = uniqueIds;
+
+const workOrderContract = (bill: {
+  projectId: string;
+  workOrderId: string;
+}): ContractRef => ({
+  side: "contractor",
+  projectId: bill.projectId,
+  workOrderId: bill.workOrderId,
+});
 
 function auditSnapshot(bill: StoredBill, lineCount?: number) {
   return raBillSnapshot(bill, {
@@ -437,7 +466,7 @@ export class ContractorBillHandlers {
       from: params.from,
       to: params.to,
     };
-    const [page, totals, held] = await Promise.all([
+    const [page, totals, deducted, released] = await Promise.all([
       store.list(db, {
         ...filter,
         limit: params.limit,
@@ -446,7 +475,15 @@ export class ContractorBillHandlers {
       }),
       store.totals(db, filter),
       store.retentionHeldByContractor(db, ws, projectId),
+      this.deps.advances.releasedByContractor(db, ws, projectId),
     ]);
+    // Retention held = deducted on approved bills − released (CM-1108).
+    const held = new Map(
+      [...deducted].map(([contractorId, amount]) => [
+        contractorId,
+        amount - (released.get(contractorId) ?? 0n),
+      ]),
+    );
     const names = await directory.contractors(db, ws, projectId, [
       ...held.keys(),
     ]);
@@ -494,28 +531,37 @@ export class ContractorBillHandlers {
         workOrders.lines(db, ws, [bill.workOrderId]),
       ]);
     if (view == null) throw billNotFound();
-    const [uoms, names, heldBefore, contractors, labelOf] = await Promise.all([
-      directory.uoms(
-        db,
-        ws,
-        lines.map((line) => line.uomId),
-      ),
-      store.names(
-        db,
-        ws,
-        unique([
-          bill.createdBy,
-          bill.submittedBy,
-          bill.decidedBy,
-          bill.reversedBy,
-        ]),
-      ),
-      store.retentionHeld(db, ws, bill.workOrderId, bill.id),
-      directory.contractors(db, ws, bill.projectId, [order.contractorId]),
-      rows.some((row) => row.location != null)
-        ? this.deps.locationLabels(ws, bill.projectId)
-        : Promise.resolve(() => null),
-    ]);
+    const [uoms, names, heldBefore, contractors, labelOf, released, advances] =
+      await Promise.all([
+        directory.uoms(
+          db,
+          ws,
+          lines.map((line) => line.uomId),
+        ),
+        store.names(
+          db,
+          ws,
+          unique([
+            bill.createdBy,
+            bill.submittedBy,
+            bill.decidedBy,
+            bill.reversedBy,
+          ]),
+        ),
+        store.retentionHeld(db, ws, bill.workOrderId, bill.id),
+        directory.contractors(db, ws, bill.projectId, [order.contractorId]),
+        rows.some((row) => row.location != null)
+          ? this.deps.locationLabels(ws, bill.projectId)
+          : Promise.resolve(() => null),
+        this.deps.advances.releasedTotal(db, ws, workOrderContract(bill)),
+        recoverableAdvances(
+          this.deps.advances,
+          db,
+          ws,
+          workOrderContract(bill),
+          bill.id,
+        ),
+      ]);
     const quantities = new Map(woLines.map((line) => [line.id, line.quantity]));
     const retention = retentionSuggestion({
       gross: bill.gross,
@@ -575,7 +621,9 @@ export class ContractorBillHandlers {
       retention,
       retentionHeldOnWorkOrder:
         heldBefore +
-        (bill.status === "approved" ? retentionTotal(deductions) : 0n),
+        (bill.status === "approved" ? retentionTotal(deductions) : 0n) -
+        released,
+      advances: billAdvanceViews(advances, bill.gross),
       tdsEstimate,
       allowed: this.allowed(access, bill),
       createdByName: name(bill.createdBy),
@@ -757,14 +805,26 @@ export class ContractorBillHandlers {
     storedGst: BillGst | null,
   ): Promise<Priced> {
     const { directory, store, workOrders } = this.deps;
-    const [project, contractors, woLines, heldBefore] = await Promise.all([
-      this.project(tx, workspaceId, workOrder.projectId),
-      directory.contractors(tx, workspaceId, workOrder.projectId, [
-        workOrder.contractorId,
-      ]),
-      workOrders.lines(tx, workspaceId, [workOrder.id]),
-      store.retentionHeld(tx, workspaceId, workOrder.id, billId),
-    ]);
+    const [project, contractors, woLines, heldBefore, advances] =
+      await Promise.all([
+        this.project(tx, workspaceId, workOrder.projectId),
+        directory.contractors(tx, workspaceId, workOrder.projectId, [
+          workOrder.contractorId,
+        ]),
+        workOrders.lines(tx, workspaceId, [workOrder.id]),
+        store.retentionHeld(tx, workspaceId, workOrder.id, billId),
+        recoverableAdvances(
+          this.deps.advances,
+          tx,
+          workspaceId,
+          {
+            side: "contractor",
+            projectId: workOrder.projectId,
+            workOrderId: workOrder.id,
+          },
+          billId,
+        ),
+      ]);
     const contractor = contractors.get(workOrder.contractorId) ?? null;
     const gst =
       storedGst ??
@@ -789,7 +849,12 @@ export class ContractorBillHandlers {
       retention,
       suggestionFor,
       billDeductions,
+      {
+        gross,
+        suggest: (amount) => suggestedRecoveries(advances, amount),
+      },
     );
+    assertRecoveries(deductions, advances);
     assertDeductions({
       deductions,
       gross,
@@ -800,6 +865,7 @@ export class ContractorBillHandlers {
       gst,
       retention,
       deductions,
+      advances,
       net: billNet({
         gross,
         payableGst: gst.payable,
@@ -1379,8 +1445,24 @@ export class ContractorBillHandlers {
         const short: UnbilledLine[] = unbilledLines(woLines, withThis);
         if (short.length > 0) throw billFinalUnbilled(short);
       }
+      // CM-1108: the advances it recovers are checked again, and the
+      // invoice is the net plus them, settled by them from the advances'
+      // on-account payments.
+      const [deductions, advances] = await Promise.all([
+        store.deductions(tx, ws, [current.id]),
+        recoverableAdvances(
+          this.deps.advances,
+          tx,
+          ws,
+          workOrderContract(current),
+          current.id,
+        ),
+      ]);
+      assertRecoveries(deductions, advances);
+      const recoveries = recoveryAllocations(deductions, advances);
+      const amount = current.net + allocationsTotal(recoveries);
       const invoiceId =
-        current.net > 0n && current.number != null
+        amount > 0n && current.number != null
           ? await invoicing.create(tx, {
               workspaceId: ws,
               by: access.userId,
@@ -1395,10 +1477,17 @@ export class ContractorBillHandlers {
               gst: current.reverseCharge
                 ? 0n
                 : current.cgst + current.sgst + current.igst,
-              amount: current.net,
+              amount,
               sourceId: current.id,
             })
           : null;
+      if (invoiceId != null)
+        await invoicing.applyRecoveries(tx, {
+          workspaceId: ws,
+          by: access.userId,
+          invoiceId,
+          recoveries,
+        });
       const after: StoredBill = {
         ...current,
         status: "approved",
@@ -1530,21 +1619,40 @@ export class ContractorBillHandlers {
       assertBillAction(current.status, "reverse");
       this.checkStale(current, expectedUpdatedAt);
       if ((await store.laterBills(tx, ws, current)) > 0) throw billNotLatest();
+      // CM-1108: the bill's own advance recoveries are not "settled".
+      const recoveries = recoveryAllocations(
+        await store.deductions(tx, ws, [current.id]),
+        await recoverableAdvances(
+          this.deps.advances,
+          tx,
+          ws,
+          workOrderContract(current),
+          current.id,
+        ),
+      );
       if (
         current.invoiceId != null &&
         (await invoicing.isSettled(tx, {
           workspaceId: ws,
           invoiceId: current.invoiceId,
+          ownRecoveries: recoveries,
         }))
       )
         throw billSettled();
-      if (current.invoiceId != null)
+      if (current.invoiceId != null) {
+        await invoicing.undoRecoveries(tx, {
+          workspaceId: ws,
+          by: access.userId,
+          invoiceId: current.invoiceId,
+          paymentIds: recoveries.map((row) => row.paymentId),
+        });
         await invoicing.reverse(tx, {
           workspaceId: ws,
           by: access.userId,
           invoiceId: current.invoiceId,
           reason,
         });
+      }
       const freed = await store.freeRows(tx, ws, id);
       const after: StoredBill = {
         ...current,

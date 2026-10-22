@@ -224,6 +224,11 @@ export function advanceFields(
   };
 }
 
+/** An advance's remarks: trimmed, ≤ 500, empty is null. */
+export function advanceRemarks(raw: string | null | undefined): string | null {
+  return limitedText(raw, "remarks", ADVANCE_REMARKS_MAX);
+}
+
 /** What a bill recovers an advance as. */
 export function recoveryKindOf(kind: AdvanceKind): DeductionKind {
   return kind === "mobilisation"

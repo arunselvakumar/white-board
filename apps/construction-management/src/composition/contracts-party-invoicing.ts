@@ -1,5 +1,8 @@
 import type { ContractorTdsEstimator } from "@/src/contracts/application/contractor-bill-ports";
-import type { PartyInvoicing } from "@/src/contracts/application/ports";
+import type {
+  AdvancePayments,
+  PartyInvoicing,
+} from "@/src/contracts/application/ports";
 import { payeeKindOf, rateInForce, tdsOn } from "@/src/finance/domain/tds";
 import type { PartyFinance } from "@/src/finance/infrastructure/party-finance-factory";
 import { loadTdsRates } from "@/src/finance/infrastructure/tds-rate-store";
@@ -45,10 +48,81 @@ export function contractsPartyInvoicing(
         tx,
         input.workspaceId,
         input.invoiceId,
+        input.ownRecoveries ?? [],
       );
     },
     reverse(tx, input) {
       return finance().raBills.reverse(tx, input);
+    },
+    applyRecoveries(tx, input) {
+      return finance().raBills.applyRecoveries(tx, input);
+    },
+    undoRecoveries(tx, input) {
+      return finance().raBills.undoRecoveries(tx, input);
+    },
+    createRelease(tx, draft) {
+      return finance().raBills.createRelease(tx, {
+        workspaceId: draft.workspaceId,
+        by: draft.by,
+        partyType: draft.partyType,
+        partyId: draft.partyId,
+        projectId: draft.projectId,
+        departmentId: draft.departmentId,
+        number: draft.number,
+        date: draft.date,
+        amount: draft.amount,
+        releaseId: draft.sourceId,
+        remarks: draft.remarks,
+      });
+    },
+    invoiceStates(db, workspaceId, invoiceIds) {
+      return finance().raBills.states(db, workspaceId, invoiceIds);
+    },
+  };
+}
+
+/**
+ * Advances given and received in Contracts (CM-1108, ADR CM-0023 §8) as
+ * finance payments on account, through finance's own payment command
+ * inside the advance's transaction: Payment Out to the Contractor, Payment
+ * In from the Client, with no allocation, so finance shows each as an
+ * advance on the party's balance until bills recover it. The payment
+ * takes no TDS (an override reason says so when finance would suggest
+ * some): TDS is deducted when the bills are paid.
+ */
+export function contractsAdvancePayments(
+  finance: () => PartyFinance = partyFinance,
+): AdvancePayments {
+  return {
+    async record(tx, access, draft) {
+      const recorded = await finance().payments.recordInside(tx, access, {
+        partyType: draft.partyType,
+        partyId: draft.partyId,
+        projectId: draft.projectId,
+        direction: draft.direction,
+        paymentDate: draft.paymentDate,
+        accountId: draft.accountId,
+        mode: draft.mode,
+        chequeNumber: draft.chequeNumber,
+        reference: draft.reference,
+        modeDate: draft.modeDate,
+        amount: Number(draft.amount),
+        tdsAmount: 0,
+        tdsOverrideReason:
+          draft.partyType === "contractor"
+            ? "An advance recorded in Contracts: no TDS on the advance."
+            : null,
+        remarks: draft.remarks,
+        allocations: [],
+        confirmDuplicateReference: draft.confirmDuplicateReference,
+      });
+      return { paymentId: recorded.id, number: recorded.number };
+    },
+    cancel(tx, access, paymentId) {
+      return finance().payments.cancelInside(tx, access, paymentId);
+    },
+    numbers(db, workspaceId, paymentIds) {
+      return finance().raBills.paymentNumbers(db, workspaceId, paymentIds);
     },
   };
 }

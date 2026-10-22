@@ -1,5 +1,6 @@
 import type { Prisma } from "@repo/construction-db";
 
+import type { MemberAccess } from "@/src/shared-kernel/access";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
 /** A transaction or the client: contracts reads and writes inside its commands' transactions. */
@@ -282,10 +283,12 @@ export type PartyInvoiceDraft = {
    */
   gst: bigint;
   /**
-   * Paise: what is owed now, the bill's net (gross + GST payable −
-   * retention − recoveries). Retention held (Contractor Bills) or
-   * receivable (Client Bills) stays in contracts until it is released
-   * (CM-1108).
+   * Paise: the bill's net (gross + GST payable − retention − recoveries)
+   * **plus the advances it recovers** (CM-1108). A recovery is the advance
+   * being applied to the bill, not money withheld, so approval then
+   * allocates it from the advance's payment (`applyRecoveries`) and the
+   * invoice's balance is the net. Retention held (Contractor Bills) or
+   * receivable (Client Bills) stays in contracts until it is released.
    */
   amount: bigint;
   /** The bill's id: the invoice's origin is `ra_bill` with this source. */
@@ -299,11 +302,58 @@ export type PartyInvoicing = {
    * invoice of that direction with that number.
    */
   create(tx: ContractsTx, draft: PartyInvoiceDraft): Promise<string>;
-  /** Anything paid, written off or pending write-off against the invoice. */
+  /**
+   * Anything paid, written off or pending write-off against the invoice.
+   * Allocations from `ownRecoveries` (the bill's own advance recoveries,
+   * CM-1108) do not count, up to their amounts.
+   */
   isSettled(
     tx: ContractsTx,
-    input: { workspaceId: string; invoiceId: string },
+    input: {
+      workspaceId: string;
+      invoiceId: string;
+      ownRecoveries?: readonly RecoveryAllocation[];
+    },
   ): Promise<boolean>;
+  /**
+   * Allocates each recovered advance's on-account payment to the bill's
+   * invoice (CM-1108), without moving money. 409 `ADVANCE_ON_ACCOUNT_SHORT`
+   * when a payment was applied elsewhere in finance meanwhile.
+   */
+  applyRecoveries(
+    tx: ContractsTx,
+    input: {
+      workspaceId: string;
+      by: string;
+      invoiceId: string;
+      recoveries: readonly RecoveryAllocation[];
+    },
+  ): Promise<void>;
+  /** Takes back `applyRecoveries` (a reversed bill). */
+  undoRecoveries(
+    tx: ContractsTx,
+    input: {
+      workspaceId: string;
+      by: string;
+      invoiceId: string;
+      paymentIds: readonly string[];
+    },
+  ): Promise<void>;
+  /**
+   * The invoice for released retention (CM-1108): origin
+   * `retention_release`, payable to the Contractor or receivable from the
+   * Client, no taxable value or GST. A taken number gets "-2", "-3", ….
+   */
+  createRelease(
+    tx: ContractsTx,
+    draft: RetentionReleaseInvoiceDraft,
+  ): Promise<{ id: string; number: string }>;
+  /** Number and state of invoices, for the screens (read-only, no locks). */
+  invoiceStates(
+    db: ContractsTx,
+    workspaceId: string,
+    invoiceIds: readonly string[],
+  ): Promise<Map<string, InvoiceState>>;
   /**
    * Reverses the invoice's party-ledger entry and removes the invoice.
    * Callers ask `isSettled` first (409 `BILL_SETTLED`).
@@ -317,4 +367,84 @@ export type PartyInvoicing = {
       reason: string;
     },
   ): Promise<void>;
+};
+
+/** One advance's recovery on a bill, as finance allocates it. */
+export type RecoveryAllocation = { paymentId: string; amount: bigint };
+
+export type RetentionReleaseInvoiceDraft = {
+  workspaceId: string;
+  by: string;
+  partyType: InvoicePartyType;
+  partyId: string;
+  projectId: string;
+  departmentId: string | null;
+  number: string;
+  date: CalendarDate;
+  amount: bigint;
+  /** The release's id: the invoice's `source_id`. */
+  sourceId: string;
+  /** "Retention released on WO/… (on completion)". */
+  remarks: string;
+};
+
+export type InvoiceState = {
+  number: string;
+  amount: bigint;
+  /** Paid or received, TDS included. */
+  allocated: bigint;
+  balance: bigint;
+  /** Anything paid, written off or pending write-off. */
+  settled: boolean;
+};
+
+// ---------------------------------------------------------------------------
+// AdvancePayments (CM-1108): an advance given to a Contractor is an
+// on-account Payment Out, one received from the Client an on-account
+// Payment In, recorded through finance's own payment command inside the
+// advance's transaction. Implemented in
+// `src/composition/contracts-party-invoicing.ts`.
+// ---------------------------------------------------------------------------
+
+export type AdvancePaymentDraft = {
+  partyType: InvoicePartyType;
+  partyId: string;
+  projectId: string;
+  /** `out` to a Contractor, `in` from a Client. */
+  direction: "out" | "in";
+  paymentDate: CalendarDate;
+  accountId: string;
+  mode: "cash" | "cheque" | "online" | "upi";
+  chequeNumber: string | null;
+  reference: string | null;
+  modeDate: string | null;
+  amount: bigint;
+  /** The payment's remarks: "Mobilisation advance on WO/…". */
+  remarks: string;
+  confirmDuplicateReference: boolean;
+};
+
+export type AdvancePayments = {
+  /**
+   * Records the payment with finance's own checks (Parties Create on the
+   * Project, the account and mode, Back-dated Entry, duplicate reference);
+   * returns its id and number.
+   */
+  record(
+    tx: ContractsTx,
+    access: MemberAccess,
+    draft: AdvancePaymentDraft,
+  ): Promise<{ paymentId: string; number: string }>;
+  /** Cancels it (Parties Delete on the Project, Back-dated Entry). */
+  cancel(
+    tx: ContractsTx,
+    access: MemberAccess,
+    paymentId: string,
+  ): Promise<void>;
+  /** Payment numbers by id, for the screens. */
+  numbers(
+    db: ContractsTx,
+    workspaceId: string,
+    paymentIds: readonly string[],
+  ): Promise<Map<string, string>>;
 };

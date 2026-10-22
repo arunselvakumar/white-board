@@ -3,6 +3,7 @@ import type { EventDispatcher } from "@/src/shared-kernel/events";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import type { BillStatus, DeductionKind } from "../domain/contract-terms";
+import type { AdvanceStore } from "./advance-ports";
 import type { BoqDb, BoqStore } from "./boq-ports";
 import type { ContractsDirectory, ContractsTx, PartyInvoicing } from "./ports";
 import type { WorkOrderStore } from "./work-order-ports";
@@ -332,6 +333,8 @@ export type ContractorBillDeps = {
   directory: ContractsDirectory;
   /** The payable invoice in finance (ADR CM-0023 §7). */
   invoicing: PartyInvoicing;
+  /** The Work Order's advances and retention releases (CM-1108). */
+  advances: AdvanceStore;
   tds: ContractorTdsEstimator;
   /** One-line labels for the rows' locations ("Wing A · Floor 1"). */
   locationLabels: (

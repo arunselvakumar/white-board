@@ -47,6 +47,11 @@ import {
   type LineDeviation,
   type SupplierChoice,
 } from "../domain/client-bill";
+import {
+  assertRecoveries,
+  suggestedRecoveries,
+  type RecoverableAdvance,
+} from "../domain/advance";
 import { contractsProjectNotFound } from "../domain/contracts-errors";
 import type { BillStatus } from "../domain/contract-terms";
 import {
@@ -85,8 +90,14 @@ import type {
   ContractsProjectFacts,
   ContractsTx,
 } from "./ports";
+import { recoverableAdvances } from "./advance-handlers";
+import type { ContractRef } from "./advance-ports";
 import {
+  allocationsTotal,
   assertNotStale,
+  billAdvanceViews,
+  recoveryAllocations,
+  type BillAdvanceView,
   dispatchBillApproval,
   pendingApproval,
   plannedDeductions,
@@ -173,8 +184,13 @@ export type ClientBillDetail = {
   payableGst: bigint;
   /** What this bill may hold as retention (also the most it may hold). */
   retention: RetentionSuggestion;
-  /** Retention receivable on the Project's approved client bills, this one included when approved. */
+  /**
+   * Retention receivable: the Project's approved client bills' retention
+   * (this one included when approved) less what was released (CM-1108).
+   */
   retentionReceivable: bigint;
+  /** The client contract's advances received, as this bill may recover them (CM-1108). */
+  advances: BillAdvanceView[];
   allowed: ClientBillAllowed;
   createdByName: string | null;
   submittedByName: string | null;
@@ -212,7 +228,7 @@ export type ClientContractView = {
   updatedAt: Date | null;
   /** Paise: the BOQ's current value, which the retention cap is a % of. */
   boqValue: bigint;
-  /** Retention receivable on the Project's approved client bills. */
+  /** Retention receivable: approved client bills' retention less releases (CM-1108). */
   retentionReceivable: bigint;
   canEdit: boolean;
   financial: boolean;
@@ -235,6 +251,7 @@ type Priced = {
   gst: BillGst;
   retention: RetentionSuggestion;
   deductions: ClientBillDeduction[];
+  advances: RecoverableAdvance[];
   net: bigint;
   terms: ClientContractTerms;
   supplier: SupplierChoice;
@@ -251,6 +268,11 @@ function auditSnapshot(bill: StoredClientBill, lineCount?: number) {
     ...(lineCount == null ? {} : { lineCount }),
   });
 }
+
+const clientContract = (projectId: string): ContractRef => ({
+  side: "client",
+  projectId,
+});
 
 /** Why a Project cannot take Client Bills, in the order they are fixed. */
 export function clientBillBlockers(
@@ -480,7 +502,7 @@ export class ClientBillHandlers {
       from: params.from,
       to: params.to,
     };
-    const [page, totals, held, setup] = await Promise.all([
+    const [page, totals, deducted, released, setup] = await Promise.all([
       store.list(db, {
         ...filter,
         limit: params.limit,
@@ -489,8 +511,10 @@ export class ClientBillHandlers {
       }),
       store.totals(db, filter),
       store.retentionHeld(db, ws, projectId, null),
+      this.deps.advances.releasedTotal(db, ws, clientContract(projectId)),
       this.setup(db, ws, project),
     ]);
+    const held = deducted - released;
     return {
       items: await this.views(db, ws, page.items),
       total: page.total,
@@ -527,31 +551,48 @@ export class ClientBillHandlers {
         this.boqValue(db, ws, bill.projectId),
       ]);
     if (view == null) throw clientBillNotFound();
-    const [uoms, names, heldBefore, clients, addresses, settings, labelOf] =
-      await Promise.all([
-        directory.uoms(
-          db,
-          ws,
-          lines.map((line) => line.uomId),
-        ),
-        store.names(
-          db,
-          ws,
-          uniqueIds([
-            bill.createdBy,
-            bill.submittedBy,
-            bill.decidedBy,
-            bill.reversedBy,
-          ]),
-        ),
-        store.retentionHeld(db, ws, bill.projectId, bill.id),
-        directory.clients(db, ws, [bill.clientId]),
-        directory.billingAddresses(db, ws),
-        boq.settings(db, ws),
-        rows.some((row) => row.location != null)
-          ? this.deps.locationLabels(ws, bill.projectId)
-          : Promise.resolve(() => null),
-      ]);
+    const [
+      uoms,
+      names,
+      heldBefore,
+      clients,
+      addresses,
+      settings,
+      labelOf,
+      released,
+      advances,
+    ] = await Promise.all([
+      directory.uoms(
+        db,
+        ws,
+        lines.map((line) => line.uomId),
+      ),
+      store.names(
+        db,
+        ws,
+        uniqueIds([
+          bill.createdBy,
+          bill.submittedBy,
+          bill.decidedBy,
+          bill.reversedBy,
+        ]),
+      ),
+      store.retentionHeld(db, ws, bill.projectId, bill.id),
+      directory.clients(db, ws, [bill.clientId]),
+      directory.billingAddresses(db, ws),
+      boq.settings(db, ws),
+      rows.some((row) => row.location != null)
+        ? this.deps.locationLabels(ws, bill.projectId)
+        : Promise.resolve(() => null),
+      this.deps.advances.releasedTotal(db, ws, clientContract(bill.projectId)),
+      recoverableAdvances(
+        this.deps.advances,
+        db,
+        ws,
+        clientContract(bill.projectId),
+        bill.id,
+      ),
+    ]);
     const terms = contract?.terms ?? DEFAULT_CLIENT_CONTRACT_TERMS;
     const quantities = new Map(
       boqNow.items.map((item) => [item.id, item.quantity]),
@@ -620,7 +661,9 @@ export class ClientBillHandlers {
       retention,
       retentionReceivable:
         heldBefore +
-        (bill.status === "approved" ? retentionTotal(deductions) : 0n),
+        (bill.status === "approved" ? retentionTotal(deductions) : 0n) -
+        released,
+      advances: billAdvanceViews(advances, bill.gross),
       allowed: this.allowed(access, bill),
       createdByName: name(bill.createdBy),
       submittedByName: name(bill.submittedBy),
@@ -685,16 +728,17 @@ export class ClientBillHandlers {
     const { db, store } = this.deps;
     const ws = access.workspaceId;
     await this.project(db, ws, projectId);
-    const [row, boqNow, held] = await Promise.all([
+    const [row, boqNow, held, released] = await Promise.all([
       store.contract(db, ws, projectId),
       this.boqValue(db, ws, projectId),
       store.retentionHeld(db, ws, projectId, null),
+      this.deps.advances.releasedTotal(db, ws, clientContract(projectId)),
     ]);
     return {
       terms: row?.terms ?? DEFAULT_CLIENT_CONTRACT_TERMS,
       updatedAt: row?.updatedAt ?? null,
       boqValue: boqNow.value,
-      retentionReceivable: held,
+      retentionReceivable: held - released,
       canEdit: can(access, CLIENT_BILL_MENU, "update", { projectId }),
       financial: this.financial(access, projectId),
     };
@@ -832,13 +876,20 @@ export class ClientBillHandlers {
     storedGst: BillGst | null,
   ): Promise<Priced> {
     const { directory, store } = this.deps;
-    const [contract, boqNow, heldBefore, addresses, clients] =
+    const [contract, boqNow, heldBefore, addresses, clients, advances] =
       await Promise.all([
         store.contract(tx, workspaceId, project.id),
         this.boqValue(tx, workspaceId, project.id),
         store.retentionHeld(tx, workspaceId, project.id, billId),
         directory.billingAddresses(tx, workspaceId),
         directory.clients(tx, workspaceId, [project.clientId]),
+        recoverableAdvances(
+          this.deps.advances,
+          tx,
+          workspaceId,
+          clientContract(project.id),
+          billId,
+        ),
       ]);
     const terms = contract?.terms ?? DEFAULT_CLIENT_CONTRACT_TERMS;
     const supplier = supplierForProject(addresses, project.stateCode);
@@ -864,7 +915,12 @@ export class ClientBillHandlers {
       retention,
       suggestionFor,
       clientBillDeductions,
+      {
+        gross,
+        suggest: (amount) => suggestedRecoveries(advances, amount),
+      },
     );
+    assertRecoveries(deductions, advances);
     assertClientDeductions({
       deductions,
       gross,
@@ -875,6 +931,7 @@ export class ClientBillHandlers {
       gst,
       retention,
       deductions,
+      advances,
       net: billNet({
         gross,
         payableGst: gst.payable,
@@ -1389,8 +1446,24 @@ export class ClientBillHandlers {
         CLIENT_BILL_NAMING,
       );
       assertNotStale(current, expectedUpdatedAt);
+      // CM-1108: the advances it recovers are checked again, and the
+      // receivable is the net plus them, settled by them from the advances'
+      // on-account receipts.
+      const [deductions, advances] = await Promise.all([
+        store.deductions(tx, ws, [current.id]),
+        recoverableAdvances(
+          this.deps.advances,
+          tx,
+          ws,
+          clientContract(current.projectId),
+          current.id,
+        ),
+      ]);
+      assertRecoveries(deductions, advances);
+      const recoveries = recoveryAllocations(deductions, advances);
+      const amount = current.net + allocationsTotal(recoveries);
       const invoiceId =
-        current.net > 0n && current.number != null
+        amount > 0n && current.number != null
           ? await invoicing.create(tx, {
               workspaceId: ws,
               by: access.userId,
@@ -1403,10 +1476,17 @@ export class ClientBillHandlers {
               date: current.billDate,
               taxable: current.gross,
               gst: current.cgst + current.sgst + current.igst,
-              amount: current.net,
+              amount,
               sourceId: current.id,
             })
           : null;
+      if (invoiceId != null)
+        await invoicing.applyRecoveries(tx, {
+          workspaceId: ws,
+          by: access.userId,
+          invoiceId,
+          recoveries,
+        });
       const after: StoredClientBill = {
         ...current,
         status: "approved",
@@ -1511,21 +1591,40 @@ export class ClientBillHandlers {
       assertNotStale(current, expectedUpdatedAt);
       if ((await store.laterBills(tx, ws, current)) > 0)
         throw clientBillNotLatest();
+      // CM-1108: the bill's own advance recoveries are not "received".
+      const recoveries = recoveryAllocations(
+        await store.deductions(tx, ws, [current.id]),
+        await recoverableAdvances(
+          this.deps.advances,
+          tx,
+          ws,
+          clientContract(current.projectId),
+          current.id,
+        ),
+      );
       if (
         current.invoiceId != null &&
         (await invoicing.isSettled(tx, {
           workspaceId: ws,
           invoiceId: current.invoiceId,
+          ownRecoveries: recoveries,
         }))
       )
         throw clientBillSettled();
-      if (current.invoiceId != null)
+      if (current.invoiceId != null) {
+        await invoicing.undoRecoveries(tx, {
+          workspaceId: ws,
+          by: access.userId,
+          invoiceId: current.invoiceId,
+          paymentIds: recoveries.map((row) => row.paymentId),
+        });
         await invoicing.reverse(tx, {
           workspaceId: ws,
           by: access.userId,
           invoiceId: current.invoiceId,
           reason,
         });
+      }
       const freed = await store.freeRows(tx, ws, id);
       const after: StoredClientBill = {
         ...current,
