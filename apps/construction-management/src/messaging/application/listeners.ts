@@ -36,6 +36,8 @@ import type {
   // Sales (CM-1004)
   InboundImportedInquiriesAssigned,
   InboundInquiryAssigned,
+  // Contracts (CM-1104)
+  InboundWorkOrderIssued,
 } from "./inbound-events";
 import type { Notifier } from "./notifier";
 import type { NotificationNames, RecipientDirectory } from "./ports";
@@ -173,6 +175,9 @@ export class NotificationListeners implements DomainEventListener {
         return this.importedInquiriesAssigned(
           event as InboundImportedInquiriesAssigned,
         );
+      // Contracts (CM-1104)
+      case "WorkOrderIssued":
+        return this.workOrderIssued(event as InboundWorkOrderIssued);
       default:
         return [];
     }
@@ -897,6 +902,37 @@ export class NotificationListeners implements DomainEventListener {
             event.projectId,
             event.assigneeMemberId,
           ),
+        },
+      },
+    ];
+  }
+  // -------------------------------------------------------------------------
+  // Contracts (CM-1104, ADR CM-0023 §5)
+  // -------------------------------------------------------------------------
+
+  /** `work_order.issued`: to Work Order Read + N holders on the Project, never the approver. */
+  private async workOrderIssued(
+    event: InboundWorkOrderIssued,
+  ): Promise<Plan[]> {
+    const project = await this.projectName(event, event.projectId);
+    const at = project == null ? "" : ` in ${project}`;
+    return [
+      {
+        audience: {
+          kind: "holders",
+          menu: "contracts.work_orders",
+          flag: "read",
+          projectId: event.projectId,
+        },
+        except: event.by,
+        draft: {
+          type: "work_order.issued",
+          title: `Work Order ${event.number} is issued`,
+          body: `To ${event.contractorName}${at}.`,
+          menu: "contracts.work_orders",
+          projectId: event.projectId,
+          href: LINKS.workOrder(event.projectId, event.workOrderId),
+          sourceKey: key(event, "work_order.issued", event.workOrderId),
         },
       },
     ];

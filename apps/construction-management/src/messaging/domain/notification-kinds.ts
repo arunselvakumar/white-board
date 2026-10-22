@@ -72,6 +72,8 @@ export const NOTIFICATION_KINDS = {
   // Sales (CM-1004, ADR CM-0022 §10).
   "inquiry.assigned": { menu: "sales.inquiries", flag: "read" },
   "inquiry.follow_ups_due": { menu: "sales.inquiries", flag: "read" },
+  // Contracts (CM-1104): Work Order Read + Notification holders on the Project.
+  "work_order.issued": { menu: "contracts.work_orders", flag: "read" },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;
@@ -180,6 +182,12 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
         : `/app/projects/${document.projectId}/boq?tab=variations`,
     ),
   },
+  // Contracts (CM-1104): a Work Order, decided on its detail page.
+  work_order: {
+    menu: "contracts.work_orders",
+    label: "Work Order",
+    ...same(inProject("work-orders")),
+  },
   leave_request: {
     menu: "hrms.leaves",
     label: "Leave request",
@@ -251,6 +259,9 @@ export const LINKS = {
   inquiries: (projectId: string) => `/app/projects/${projectId}/inquiries/list`,
   inquiriesDue: (projectId: string, due: "overdue" | "today") =>
     `/app/projects/${projectId}/inquiries/list?due=${due}`,
+  // Contracts (CM-1104)
+  workOrder: (projectId: string, id: string) =>
+    `/app/projects/${projectId}/work-orders/${id}`,
 } as const;
 
 // ---------------------------------------------------------------------------

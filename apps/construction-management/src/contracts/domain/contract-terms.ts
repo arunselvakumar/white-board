@@ -231,3 +231,41 @@ export const ESCALATION_COMPONENT_LABELS: Record<EscalationComponent, string> =
     pol: "POL (fuel and lubricants)",
     other: "Other",
   };
+
+/**
+ * The TDS nature of a payment (CM-0023 §14). **Provisional:** finance's
+ * natures and their dated section table arrive in CM-1116, which should
+ * take these keys over (or map them) rather than invent new ones. A Work
+ * Order stores the key as text (`work_orders.tds_nature`); null means no
+ * TDS. A Contractor with TDS applicable defaults to `contractor`.
+ */
+export const TDS_NATURES = [
+  "contractor",
+  "professional",
+  "technical",
+  "rent_plant",
+  "rent_land",
+  "goods_purchase",
+] as const;
+export type TdsNature = (typeof TDS_NATURES)[number];
+export const TDS_NATURE_LABELS: Record<TdsNature, string> = {
+  contractor: "Contractor / labour supply",
+  professional: "Professional fee",
+  technical: "Technical fee",
+  rent_plant: "Rent of plant and machinery",
+  rent_land: "Rent of land or building",
+  goods_purchase: "Purchase of goods",
+};
+
+/**
+ * The SAC codes a Work Order usually carries (CM-0023 §5): works contract,
+ * or labour supply. Any other 4–8 digit code may be typed.
+ */
+export const WORK_ORDER_SAC_PRESETS = [
+  { code: "9954", label: "9954 · Works contract" },
+  { code: "9985", label: "9985 · Labour supply (support services)" },
+  { code: "9987", label: "9987 · Repair and maintenance services" },
+] as const;
+
+/** GST % a Work Order may carry: 0 to 28 with two places; these are offered. */
+export const WORK_ORDER_GST_RATES = ["0", "5", "12", "18", "28"] as const;

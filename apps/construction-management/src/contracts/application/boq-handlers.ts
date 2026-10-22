@@ -13,6 +13,7 @@ import {
   boqAmount,
   boqItemChanged,
   boqItemFields,
+  boqItemInWorkOrder,
   boqItemLocationInvalid,
   boqItemMeasured,
   boqItemNotFound,
@@ -843,7 +844,9 @@ export class BoqHandlers {
 
   /**
    * A tombstone. 409 `BOQ_ITEM_MEASURED` once a checked measurement names
-   * it, 409 `VARIATION_PENDING` while a Variation of it waits.
+   * it, 409 `VARIATION_PENDING` while a Variation of it waits, 409
+   * `BOQ_ITEM_IN_WORK_ORDER` while a live line of a non-cancelled Work
+   * Order names it (CM-1104; the import never deletes items).
    */
   async deleteItem(
     access: MemberAccess,
@@ -863,6 +866,8 @@ export class BoqHandlers {
         await store.pendingVariations(tx, ws, item.projectId)
       ).find((variation) => variation.boqItemId === id);
       if (waiting != null) throw variationPending(waiting.number);
+      const workOrders = await store.workOrdersNaming(tx, ws, id);
+      if (workOrders.length > 0) throw boqItemInWorkOrder(workOrders);
       const deleted = await store.deleteItem(tx, {
         item,
         expectedUpdatedAt,

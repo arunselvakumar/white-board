@@ -188,3 +188,13 @@ export type InboundImportedInquiriesAssigned = DomainEvent & {
   count: number;
   by: string;
 };
+
+// Contracts (CM-1104, ADR CM-0023 §5).
+export type InboundWorkOrderIssued = DomainEvent & {
+  type: "WorkOrderIssued";
+  workOrderId: string;
+  projectId: string;
+  number: string;
+  contractorName: string;
+  by: string;
+};

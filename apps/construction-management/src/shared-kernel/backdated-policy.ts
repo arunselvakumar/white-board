@@ -30,6 +30,7 @@ export const BACKDATED_MODULE_GROUPS = [
   { key: "accounts", label: "Accounts" },
   { key: "labour_vendor", label: "Labour & Vendor" },
   { key: "sales", label: "Sales" },
+  { key: "contracts", label: "Contracts" },
   { key: "hrms", label: "HRMS" },
 ] as const;
 
@@ -210,6 +211,14 @@ export const BACKDATED_MODULES = [
     "sales.inquiries",
   ),
   m("booking", "Booking", "sales", "bookingDate", "sales.bookings"),
+  // Contracts (CM-1104, ADR CM-0023 §5).
+  m(
+    "work_order",
+    "Work Order (WO)",
+    "contracts",
+    "orderDate",
+    "contracts.work_orders",
+  ),
   m(
     "hrms_attendance",
     "Attendance",

@@ -426,6 +426,23 @@ export class PrismaBoqStore implements BoqStore {
     return deleted.count > 0;
   }
 
+  async workOrdersNaming(
+    db: ContractsTx,
+    workspaceId: string,
+    boqItemId: string,
+  ) {
+    const rows = await db.$queryRaw<{ number: string | null }[]>(
+      Prisma.sql`SELECT DISTINCT w.number
+        FROM construction_contracts.work_order_lines l
+        JOIN construction_contracts.work_orders w ON w.id = l.work_order_id
+        WHERE l.workspace_id = ${workspaceId} AND w.workspace_id = ${workspaceId}
+          AND l.boq_item_id = ${boqItemId}::uuid AND l.deleted_at IS NULL
+          AND w.deleted_at IS NULL AND w.status <> 'cancelled'
+        ORDER BY w.number NULLS LAST`,
+    );
+    return rows.map((row) => row.number ?? "Draft");
+  }
+
   async measured(db: ContractsTx, workspaceId: string, projectId: string) {
     const rows = await db.$queryRaw<{ id: string; measured: string }[]>(
       Prisma.sql`SELECT r.boq_item_id::text AS id, SUM(r.quantity)::text AS measured

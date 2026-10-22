@@ -51,6 +51,9 @@ import type {
   ImportedInquiriesAssigned,
   InquiryAssigned,
 } from "@/src/sales/domain/inquiry-events";
+// Contracts (CM-1104)
+import type { InboundWorkOrderIssued } from "@/src/messaging/application/inbound-events";
+import type { WorkOrderIssued } from "@/src/contracts/domain/work-order-events";
 
 type Fits<Real extends Inbound, Inbound> = Real;
 
@@ -75,4 +78,6 @@ export type MessagingEventContracts = [
   // Sales (CM-1004)
   Fits<InquiryAssigned, InboundInquiryAssigned>,
   Fits<ImportedInquiriesAssigned, InboundImportedInquiriesAssigned>,
+  // Contracts (CM-1104)
+  Fits<WorkOrderIssued, InboundWorkOrderIssued>,
 ];

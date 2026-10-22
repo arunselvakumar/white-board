@@ -209,6 +209,15 @@ export type BoqStore = {
     },
   ): Promise<boolean>;
   /**
+   * Numbers of the live, non-cancelled Work Orders with a live line naming
+   * the item (CM-1104), "Draft" for one never submitted; in number order.
+   */
+  workOrdersNaming(
+    db: ContractsTx,
+    workspaceId: string,
+    boqItemId: string,
+  ): Promise<string[]>;
+  /**
    * Checked measured quantity by BOQ item (ten-thousandths): the sum of the
    * rows naming it on live sheets with status `checked`. An item in the map
    * is **measured**.

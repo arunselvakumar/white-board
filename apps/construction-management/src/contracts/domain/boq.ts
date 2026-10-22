@@ -340,6 +340,20 @@ export const boqItemMeasured = () =>
     "A checked measurement names this item, so its quantity and rate change only through a Variation, and it cannot be deleted.",
   );
 
+/**
+ * A live line of a non-cancelled Work Order names the item (CM-1104): it
+ * cannot be deleted. `details.workOrders` lists their numbers ("Draft"
+ * for one never submitted).
+ */
+export const boqItemInWorkOrder = (workOrders: readonly string[]) =>
+  conflict(
+    "BOQ_ITEM_IN_WORK_ORDER",
+    workOrders.length === 1
+      ? `Work Order ${workOrders[0] ?? ""} names this item, so it cannot be deleted. Remove the line or cancel the Work Order first.`
+      : `Work Orders ${workOrders.join(", ")} name this item, so it cannot be deleted. Remove the lines or cancel the Work Orders first.`,
+    { workOrders: [...workOrders] },
+  );
+
 export const boqItemUomInvalid = () =>
   field(
     "BOQ_ITEM_UOM_INVALID",
