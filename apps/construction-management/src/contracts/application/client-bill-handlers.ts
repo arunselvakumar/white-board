@@ -579,7 +579,7 @@ export class ClientBillHandlers {
         ? [
             {
               code: GSTIN_NOT_IN_STATE,
-              message: gstinNotInStateMessage(place),
+              message: gstinNotInStateMessage(place, bill.supplierGstin),
             },
           ]
         : [];

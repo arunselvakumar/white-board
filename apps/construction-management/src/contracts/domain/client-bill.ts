@@ -231,9 +231,16 @@ export function supplierForProject(
 }
 
 /** What the bill page and PDF say for `GSTIN_NOT_IN_STATE`. */
-export function gstinNotInStateMessage(projectStateCode: string): string {
+export function gstinNotInStateMessage(
+  projectStateCode: string,
+  supplierGstin: string | null,
+): string {
   const state = gstStateName(projectStateCode) ?? projectStateCode;
-  return `The Company has no GSTIN in ${state} (${projectStateCode}), where this work is supplied. Check whether the Company must register there; this invoice shows the default GSTIN.`;
+  const shown =
+    supplierGstin == null
+      ? "The Company has no GSTIN on any billing address, so this invoice shows none."
+      : `This invoice shows the Company's default GSTIN, ${supplierGstin}.`;
+  return `The Company has no GSTIN in ${state} (${projectStateCode}), where this work is supplied. Check whether the Company must register there. ${shown}`;
 }
 
 /**

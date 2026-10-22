@@ -122,9 +122,12 @@ export async function renderClientBillPdf(
     ["Name", client?.name ?? bill.clientName],
     [
       "Address",
-      [client?.address ?? "", client?.pinCode ?? ""]
+      [
+        client?.address ?? "",
+        client?.pinCode == null ? "" : `PIN ${client.pinCode}`,
+      ]
         .filter((part) => part !== "")
-        .join(" – "),
+        .join(" – ") || "—",
     ],
     ["GSTIN", bill.recipientGstin ?? "Unregistered"],
     ["State", state(client?.stateCode ?? null)],

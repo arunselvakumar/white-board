@@ -81,7 +81,15 @@ describe("Client Bills: a tax invoice (CM-1107)", () => {
         placeOfSupplyStateCode: "32",
       }),
     ).toMatchObject({ supplyType: "inter_state", igst: 18_000_00n, cgst: 0n });
-    expect(gstinNotInStateMessage("32")).toContain("Kerala (32)");
+    expect(gstinNotInStateMessage("32", "33AAACA1234A1Z5")).toContain(
+      "Kerala (32)",
+    );
+    expect(gstinNotInStateMessage("32", "33AAACA1234A1Z5")).toContain(
+      "default GSTIN, 33AAACA1234A1Z5",
+    );
+    expect(gstinNotInStateMessage("32", null)).toContain(
+      "no GSTIN on any billing address",
+    );
     expect(supplierForProject([], "33")).toMatchObject({
       address: null,
       gstin: null,
