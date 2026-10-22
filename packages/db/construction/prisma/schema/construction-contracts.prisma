@@ -794,6 +794,7 @@ model ConstructionContractsAdvance {
 
   @@index([workspaceId, projectId])
   @@index([workspaceId, workOrderId])
+  @@index([workspaceId, paymentId])
   @@map("advances")
   @@schema("construction_contracts")
 }
@@ -840,6 +841,11 @@ model ConstructionContractsRetentionRelease {
   releasedOn      DateTime                            @map("released_on") @db.Date
   reason          String?
   bankGuaranteeId String?                             @map("bank_guarantee_id") @db.Uuid
+  /// The finance invoice the release created (CM-1108): payable to the
+  /// Contractor, or receivable from the Client.
+  invoiceId       String?                             @map("invoice_id") @db.Uuid
+  /// `client` side: the Client the released retention is due from.
+  clientId        String?                             @map("client_id") @db.Uuid
   createdAt       DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
   createdBy       String                              @map("created_by")
   deletedAt       DateTime?                           @map("deleted_at") @db.Timestamptz(3)
@@ -847,6 +853,7 @@ model ConstructionContractsRetentionRelease {
 
   @@index([workspaceId, projectId, side])
   @@index([workspaceId, workOrderId])
+  @@index([workspaceId, invoiceId])
   @@map("retention_releases")
   @@schema("construction_contracts")
 }

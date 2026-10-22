@@ -58,13 +58,14 @@ export const CLIENT_BILL_NAMING: DocumentNaming = {
 };
 
 /**
- * What a Client holds back from a bill in CM-1107: retention, recovery of
- * its mobilisation advance (manual until CM-1108), material it issued at
- * cost, and other (with a reason).
+ * What a Client holds back from a bill: retention, recovery of its
+ * mobilisation or secured advance (each naming the advance, CM-1108),
+ * material it issued at cost, and other (with a reason).
  */
 export const CLIENT_BILL_DEDUCTION_KINDS = [
   "retention",
   "mobilisation_recovery",
+  "secured_advance_recovery",
   "material_at_cost",
   "other",
 ] as const satisfies readonly DeductionKind[];
@@ -163,7 +164,7 @@ export function clientBillDeductions(
   return raBillDeductions(
     inputs,
     CLIENT_BILL_DEDUCTION_KINDS,
-    "Pick retention, mobilisation advance recovery, material issued at cost or other.",
+    "Pick retention, mobilisation or secured advance recovery, material issued at cost or other.",
   );
 }
 

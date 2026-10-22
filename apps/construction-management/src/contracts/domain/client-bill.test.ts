@@ -114,10 +114,10 @@ describe("Client Bills: a tax invoice (CM-1107)", () => {
     ).toMatchObject({ over: false, overBy: null });
   });
 
-  it("takes the four client deductions and checks the terms", () => {
+  it("takes the five client deductions and checks the terms", () => {
     expect(
       code(() =>
-        clientBillDeductions([{ kind: "secured_advance_recovery", amount: 1 }]),
+        clientBillDeductions([{ kind: "material_reconciliation", amount: 1 }]),
       ),
     ).toBe("BILL_DEDUCTION_KIND_INVALID");
     expect(clientBillDeductions([{ kind: "retention", amount: 100 }])).toEqual([

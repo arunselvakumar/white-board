@@ -340,13 +340,15 @@ export type BillDeductionInput = {
   /** Paise, more than 0. */
   amount: number | bigint;
   description?: string | null;
+  /** A mobilisation or secured advance recovery: the advance it recovers (CM-1108). */
+  advanceId?: string | null;
 };
 
 export type RaBillDeduction<K extends DeductionKind = DeductionKind> = {
   kind: K;
   amount: bigint;
   description: string | null;
-  /** The advance a recovery recovers (CM-1108); null until then. */
+  /** The advance a recovery recovers (CM-1108); null on other kinds. */
   advanceId: string | null;
 };
 
@@ -412,7 +414,11 @@ export function raBillDeductions<K extends DeductionKind>(
         index,
         "description",
       );
-    return { kind, amount, description, advanceId: null };
+    const advanceId =
+      kind === "mobilisation_recovery" || kind === "secured_advance_recovery"
+        ? input.advanceId?.trim() || null
+        : null;
+    return { kind, amount, description, advanceId };
   });
 }
 

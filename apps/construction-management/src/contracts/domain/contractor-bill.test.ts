@@ -301,9 +301,29 @@ describe("deductions and net", () => {
     ).toBe("BILL_DEDUCTION_AMOUNT_INVALID");
     expect(
       errorOf(() =>
-        billDeductions([{ kind: "secured_advance_recovery", amount: 1 }]),
+        billDeductions([{ kind: "material_reconciliation", amount: 1 }]),
       ).code,
     ).toBe("BILL_DEDUCTION_KIND_INVALID");
+    // CM-1108: a recovery keeps the advance it names; other kinds drop it.
+    expect(
+      billDeductions([
+        { kind: "secured_advance_recovery", amount: 1, advanceId: " a1 " },
+        { kind: "material_at_cost", amount: 2, advanceId: "a2" },
+      ]),
+    ).toEqual([
+      {
+        kind: "secured_advance_recovery",
+        amount: 1n,
+        description: null,
+        advanceId: "a1",
+      },
+      {
+        kind: "material_at_cost",
+        amount: 2n,
+        description: null,
+        advanceId: null,
+      },
+    ]);
   });
 
   it("refuses deductions above gross + GST payable", () => {

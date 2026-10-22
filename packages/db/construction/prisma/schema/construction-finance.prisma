@@ -178,6 +178,8 @@ enum ConstructionFinanceInvoiceOrigin {
   goods_receipt
   /// Created by an approved Contractor Bill (CM-1106, CM-0023 §7); read-only.
   ra_bill
+  /// Created by a retention release in Contracts (CM-1108, CM-0023 §8); read-only.
+  retention_release
 
   @@map("invoice_origin")
   @@schema("construction_finance")
