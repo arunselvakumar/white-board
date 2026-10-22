@@ -86,9 +86,7 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-async function errorOf(
-  response: Response,
-): Promise<{
+async function errorOf(response: Response): Promise<{
   code: string;
   message: string;
   details?: Record<string, unknown>;
