@@ -1,0 +1,83 @@
+apps/construction-management/CONTEXT.md
+  s_f49615d4431370::t_d427ec23d4bb06 187,192,199
+apps/construction-management/app/app/projects/[id]/edit/page.tsx
+  s_f49615d4431370::t_9c1537aad23018 6
+apps/construction-management/app/app/projects/[id]/page.tsx
+  s_f49615d4431370::t_b8f8f41f1227e0 3,7-8,14
+apps/construction-management/components/app-shell/app-shell.stories.tsx
+  s_f49615d4431370::t_a20bc90d7cb147 194-240
+apps/construction-management/components/app-shell/area-nav-menu.tsx
+  s_f49615d4431370::t_b1f03052f9d79a 3,21,64-75,77-79
+apps/construction-management/components/app-shell/project-nav-menu.stories.tsx
+  s_f49615d4431370::t_5dd966dc32c8a0 54,106,118,152-154,237-239,279-280,282-295,298-320
+apps/construction-management/components/app-shell/project-nav-menu.tsx
+  s_f49615d4431370::t_51710fa15b2d05 4,43,56,294-295,319
+apps/construction-management/components/app-shell/submenu-row.tsx
+  s_f49615d4431370::t_cde6e9d922bb32 1-41
+apps/construction-management/components/projects/dashboard/project-dashboard.stories.tsx
+  s_f49615d4431370::t_93fdc95e1fc7b9 12,16,45-46,154-155,204-205,754-758,765-820
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_f49615d4431370::t_912c08c184394a 59,81-84,163
+apps/construction-management/components/projects/dashboard/summary-details.tsx
+  s_f49615d4431370::t_7aa76b488bcd18 3,12-15,17,21,24-27,29-34,36,52-89,91-92,94-99,128,132-134,136-138,140-155
+apps/construction-management/components/projects/project-edit-screen.tsx
+  s_f49615d4431370::t_dab47edbe4d237 1-23
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_f49615d4431370::t_b40f8a4375d02b 34
+apps/construction-management/components/projects/project-home-dialogs.stories.tsx
+  s_f49615d4431370::t_39e80506502ea0 9,16,51-53,57,60,65-66,68,70-73,75-78
+apps/construction-management/components/projects/project-home-dialogs.tsx
+  s_f49615d4431370::t_e023d290a84999 4,18,25-36,88,128-129,142
+apps/construction-management/components/projects/project-landing.stories.tsx
+  s_f49615d4431370::t_fb7049ac66dd58 2-3,5,9-10,12-13,15-21,25-29,32,35,40-54,59-72,74,76-80,84-91,94-96
+apps/construction-management/components/projects/project-landing.tsx
+  s_f49615d4431370::t_3c5c1ec98d118b 3-13,15-16,20-22,24-33,35-50
+apps/construction-management/components/projects/project-progress.tsx
+  s_f49615d4431370::t_e10ba112f5083b 13-14
+apps/construction-management/components/projects/project-shell.stories.tsx
+  s_f49615d4431370::t_444055812da7c2 6-7,10-14,49,53,62,71-72,74,79-92,106,108-109,113-149,151-155,194
+apps/construction-management/components/projects/project-shell.tsx
+  s_f49615d4431370::t_9ca8564d388a4a 8,10-12,36-37,41,45-46,93,124-156,160-163,174,182-186
+apps/construction-management/components/projects/projects-skeletons.tsx
+  s_f49615d4431370::t_83bfc990c772ce 22
+apps/construction-management/docs/adr/CM-0013-projects-structure-product-decisions.md
+  s_f49615d4431370::t_694c40e09f7433 102-103
+apps/construction-management/docs/adr/CM-0020-project-sidebar-menu.md
+  s_f49615d4431370::t_eaa897a8674fab 3,26,36,48,52-62
+apps/construction-management/docs/adr/CM-0024-new-menus-reach-existing-designations.md
+  s_f49615d4431370::t_e875d12ae5db78 1-33
+apps/construction-management/docs/modules/03-projects-structure-drawings-gallery.md
+  s_f49615d4431370::t_8c88a80bc5f3a7 621,623-624
+apps/construction-management/docs/modules/05-tasks-issues-inspections.md
+  s_f49615d4431370::t_a5ff683763583c 589
+apps/construction-management/lib/project-nav.test.ts
+  s_f49615d4431370::t_a3a950602ac5d2 8,32,88-124,144,152-161
+apps/construction-management/lib/project-nav.ts
+  s_f49615d4431370::t_621b8097c7085b 9-10,47-48,71,75-88,91,97,100-101
+apps/construction-management/src/organization/infrastructure/designation-menu-backfill.http.test.ts
+  s_f49615d4431370::t_4aa3a2543ab8d6 1-2,4-35,38-39,41-47,50-56,60-68,71-76,79-99,101-184
+apps/construction-management/src/organization/infrastructure/designation-menu-backfill.test.ts
+  s_f49615d4431370::t_1f91ced4c46c1d 1-98
+apps/construction-management/src/projects/domain/project-nav-groups.ts
+  s_f49615d4431370::t_e095eb30cbc2f1 5-6
+apps/construction-management/src/queries/project-home.ts
+  s_f49615d4431370::t_0839ed136aa745 30-32
+packages/db/construction/prisma/migrations/20261021120000_construction_organization_menu_backfill/migration.sql
+  s_f49615d4431370::t_9b1e5f74fa9b24 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ef6eb6142f0c56926759aebe09f08a43b237a780",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
