@@ -1,10 +1,24 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { Minus, Plus, type LucideIcon } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Button } from "@repo/ui/components/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@repo/ui/components/collapsible";
+import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
+import {
+  isDashboardSectionKey,
+  type DashboardSectionKey,
+} from "@/src/projects/domain/dashboard-sections";
 import { QueryHttpError } from "@/src/queries/http";
+
+import { SECTION_APPEARANCE } from "./section-appearance";
+import { useSectionCollapse } from "./section-collapse";
 
 /**
  * The Project Dashboard's building blocks (CM-412): a section card, a
@@ -13,6 +27,42 @@ import { QueryHttpError } from "@/src/queries/http";
  * `dashboard-skeletons.tsx`.
  */
 
+/** The section a heading id names: dashboard sections use `dashboard-<key>`. */
+function sectionKeyOf(id: string): DashboardSectionKey | null {
+  const key = id.replace(/^dashboard-/, "");
+  return key !== id && isDashboardSectionKey(key) ? key : null;
+}
+
+/** A section's coloured icon in its rounded chip; decorative. */
+export function SectionIcon({
+  sectionKey,
+  className,
+}: {
+  sectionKey: DashboardSectionKey;
+  className?: string;
+}) {
+  const { icon: Icon, tint } = SECTION_APPEARANCE[sectionKey];
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4",
+        tint,
+        className,
+      )}
+    >
+      <Icon strokeWidth={2} />
+    </span>
+  );
+}
+
+/**
+ * A dashboard section card: its icon and title, then the aside and the
+ * collapse (−) / expand (+) toggle on the right. Collapsed, only the
+ * header shows. On the dashboard the member's choice is stored
+ * (`section-collapse.tsx`) and a collapsed section skips its data; outside
+ * it (stories) the card remembers it while mounted.
+ */
 export function Section({
   id,
   title,
@@ -21,22 +71,57 @@ export function Section({
 }: {
   id: string;
   title: string;
-  children: ReactNode;
+  children?: ReactNode;
   aside?: ReactNode;
 }) {
+  const key = sectionKeyOf(id);
+  const collapse = useSectionCollapse();
+  const [ownOpen, setOwnOpen] = useState(true);
+  const stored = key != null && collapse != null ? { key, collapse } : null;
+  const open =
+    stored == null ? ownOpen : !stored.collapse.isCollapsed(stored.key);
   return (
-    <section
-      aria-labelledby={id}
+    <Collapsible
+      open={open}
+      onOpenChange={(next) => {
+        if (stored == null) setOwnOpen(next);
+        else stored.collapse.setCollapsed([stored.key], !next, stored.key);
+      }}
+      render={<section aria-labelledby={id} />}
       className="bg-card min-w-0 space-y-4 rounded-xl border p-4 sm:p-6"
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id={id} className="font-semibold">
-          {title}
-        </h2>
-        {aside}
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-3">
+          {key == null ? null : <SectionIcon sectionKey={key} />}
+          <h2 id={id} className="min-w-0 font-semibold break-words">
+            {title}
+          </h2>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {open ? aside : null}
+          <CollapsibleTrigger
+            ref={(node: HTMLButtonElement | null) => {
+              if (node != null && stored?.collapse.takeFocus(stored.key))
+                node.focus();
+            }}
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground"
+                aria-label={`${open ? "Collapse" : "Expand"} ${title}`}
+              />
+            }
+          >
+            {open ? <Minus aria-hidden="true" /> : <Plus aria-hidden="true" />}
+          </CollapsibleTrigger>
+        </div>
       </div>
-      {children}
-    </section>
+      <CollapsibleContent id={`${id}-body`} className="space-y-4">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 

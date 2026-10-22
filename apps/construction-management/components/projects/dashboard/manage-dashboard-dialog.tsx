@@ -18,11 +18,16 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { DASHBOARD_SECTION_KEYS } from "@/src/projects/domain/dashboard-sections";
+import {
+  DASHBOARD_SECTION_KEYS,
+  isDashboardSectionKey,
+} from "@/src/projects/domain/dashboard-sections";
 import {
   useSaveDashboardLayout,
   type DashboardSection,
 } from "@/src/queries/project-dashboard";
+
+import { SectionIcon } from "./dashboard-parts";
 
 function byDefault(sections: readonly DashboardSection[]) {
   const index = (key: string) =>
@@ -125,6 +130,15 @@ export function ManageDashboardDialog({
                         );
                       }}
                     />
+                    {isDashboardSectionKey(section.key) ? (
+                      <SectionIcon
+                        sectionKey={section.key}
+                        className={cn(
+                          "size-6 rounded-md [&_svg]:size-3.5",
+                          hiddenHere && "opacity-50",
+                        )}
+                      />
+                    ) : null}
                     <span
                       className={cn(
                         "min-w-0 truncate text-sm font-medium",
