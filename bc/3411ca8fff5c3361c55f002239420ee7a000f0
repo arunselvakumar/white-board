@@ -1,0 +1,77 @@
+apps/construction-management/app/app/projects/[id]/work-orders/[workOrderId]/amend/page.tsx
+  s_f49615d4431370::t_8027bc2eae7d13 1-34
+apps/construction-management/app/app/projects/[id]/work-orders/[workOrderId]/edit/page.tsx
+  s_f49615d4431370::t_032b7e42dceeba 1-34
+apps/construction-management/app/app/projects/[id]/work-orders/[workOrderId]/page.tsx
+  s_f49615d4431370::t_5ad95712f71cf9 1-27
+apps/construction-management/app/app/projects/[id]/work-orders/new/page.tsx
+  s_f49615d4431370::t_b1aa899ad8f8a3 1-31
+apps/construction-management/app/app/projects/[id]/work-orders/page.tsx
+  s_f49615d4431370::t_5f1e4d3e306a84 3-5,9-21
+apps/construction-management/components/contracts/boq/boq-sections.tsx
+  s_f49615d4431370::t_6e1db4c903d177 540
+apps/construction-management/components/contracts/work-orders/boq-items-dialog.tsx
+  s_f49615d4431370::t_637e2b172494ba 1-174
+apps/construction-management/components/contracts/work-orders/work-order-detail.stories.tsx
+  s_f49615d4431370::t_36d807cae5bc84 1-268
+apps/construction-management/components/contracts/work-orders/work-order-detail.tsx
+  s_f49615d4431370::t_aaf193f7b4b890 1-726
+apps/construction-management/components/contracts/work-orders/work-order-fixtures.ts
+  s_f49615d4431370::t_1cecfc6c84bc39 1-393
+apps/construction-management/components/contracts/work-orders/work-order-form-schema.ts
+  s_f49615d4431370::t_dcf16436688ee2 1-378
+apps/construction-management/components/contracts/work-orders/work-order-form.stories.tsx
+  s_f49615d4431370::t_3b97013543c416 1-271
+apps/construction-management/components/contracts/work-orders/work-order-form.tsx
+  s_f49615d4431370::t_4a5a977a4a09c7 1-915
+apps/construction-management/components/contracts/work-orders/work-order-format.tsx
+  s_905651aaaccd6a::t_c3373b29505f2a 1-68
+apps/construction-management/components/contracts/work-orders/work-order-materials.tsx
+  s_905651aaaccd6a::t_0d0cf813a1bb88 1-412
+apps/construction-management/components/contracts/work-orders/work-order-pages.tsx
+  s_905651aaaccd6a::t_2a697e1bda75cb 1-70
+apps/construction-management/components/contracts/work-orders/work-orders-list.stories.tsx
+  s_f49615d4431370::t_306e6ac0172a30 1-117
+apps/construction-management/components/contracts/work-orders/work-orders-list.tsx
+  s_905651aaaccd6a::t_f76fabf3957bf5 1-325
+apps/construction-management/components/contracts/work-orders/work-orders-skeletons.tsx
+  s_905651aaaccd6a::t_5d96ef5689ea50 1-113
+apps/construction-management/src/queries/contracts-work-orders.ts
+  s_f49615d4431370::t_e49c258fef81c1 1-216
+apps/construction-management/components/contracts/work-orders/work-order-dialogs.tsx
+  s_118d4bc7f81d7f::t_f61b853620a139 1-178
+apps/construction-management/components/contracts/work-orders/work-order-stories-api.ts
+  s_118d4bc7f81d7f::t_f9cf89d9e96db6 1-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "bc3411ca8fff5c3361c55f002239420ee7a000f0",
+  "prompts": {},
+  "sessions": {
+    "s_118d4bc7f81d7f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae017d172eee1ba85",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_905651aaaccd6a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d96c2324-2939-4c8d-9816-8571b02df116",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
