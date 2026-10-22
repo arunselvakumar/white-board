@@ -4,6 +4,8 @@ import { retentionCutoffs } from "../domain/notification";
 import { dateLabel, LINKS } from "../domain/notification-kinds";
 import type { Notifier } from "./notifier";
 import type {
+  ContractDeadline,
+  ContractDeadlinesSource,
   DelayedWorkSource,
   // Sales (CM-1004)
   FollowUpsDueSource,
@@ -159,6 +161,132 @@ export function followUpsDueQueueHandler(deps: FollowUpsDueDeps): QueueHandler {
     timeLimitMs: 240_000,
     async run() {
       await raiseFollowUpsDue(deps);
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Contracts (CM-1108, ADR CM-0023 §8)
+// ---------------------------------------------------------------------------
+
+/** Daily: bank guarantees expiring and DLPs ending within 30 days. */
+export const CONTRACT_DEADLINES_QUEUE_TYPE = "messaging.contract_deadlines";
+
+export type ContractDeadlinesDeps = {
+  source: ContractDeadlinesSource;
+  recipients: RecipientDirectory;
+  notifier: Notifier;
+  clock?: () => Date;
+};
+
+function deadlineText(item: ContractDeadline): string {
+  const on = dateLabel(item.date);
+  if (item.kind === "guarantee")
+    return `Bank guarantee ${item.label}${item.workOrderNumber == null ? (item.side === "client" ? " on the client contract" : "") : ` on ${item.workOrderNumber}`} expires ${on}`;
+  return item.side === "client"
+    ? `DLP of the client contract ends ${on}`
+    : `DLP of ${item.label} ends ${on}`;
+}
+
+function deadlineTitle(items: readonly ContractDeadline[]): string {
+  const guarantees = items.filter((item) => item.kind === "guarantee").length;
+  const dlps = items.length - guarantees;
+  const parts = [
+    guarantees > 0
+      ? count(guarantees, "bank guarantee expires", "bank guarantees expire")
+      : null,
+    dlps > 0 ? count(dlps, "DLP ends", "DLPs end") : null,
+  ].filter((part): part is string => part != null);
+  return `${parts.join(" and ")} within 30 days`;
+}
+
+/**
+ * `contracts.deadlines_due`: one notice per member and Project a day,
+ * listing the bank guarantees expiring and DLPs ending within 30 days that
+ * the member may see: a Work Order's to Work Order Read + Notification
+ * holders on the Project, the client contract's to Client Bills Read +
+ * Notification holders. It links the Work Order (one), the Work Orders
+ * (several) or the Client Bills page. The source key is per Project and
+ * date, so a second run that day adds nothing.
+ */
+export async function raiseContractDeadlines(
+  deps: ContractDeadlinesDeps,
+): Promise<number> {
+  const now = (deps.clock ?? (() => new Date()))();
+  let written = 0;
+  for (const due of await deps.source.due(now)) {
+    const contractor = due.items.filter((item) => item.side === "contractor");
+    const client = due.items.filter((item) => item.side === "client");
+    const [workOrderHolders, clientHolders] = await Promise.all([
+      contractor.length === 0
+        ? Promise.resolve([])
+        : deps.recipients.holders({
+            workspaceId: due.workspaceId,
+            menu: "contracts.work_orders",
+            flag: "read",
+            projectId: due.projectId,
+          }),
+      client.length === 0
+        ? Promise.resolve([])
+        : deps.recipients.holders({
+            workspaceId: due.workspaceId,
+            menu: "contracts.client_bills",
+            flag: "read",
+            projectId: due.projectId,
+          }),
+    ]);
+    const seesWorkOrders = new Set(workOrderHolders);
+    const seesClient = new Set(clientHolders);
+    const groups = new Map<string, string[]>();
+    for (const userId of new Set([...workOrderHolders, ...clientHolders])) {
+      const key = `${seesWorkOrders.has(userId) ? "w" : ""}${seesClient.has(userId) ? "c" : ""}`;
+      groups.set(key, [...(groups.get(key) ?? []), userId]);
+    }
+    for (const [key, users] of groups) {
+      const items = [
+        ...(key.includes("w") ? contractor : []),
+        ...(key.includes("c") ? client : []),
+      ].sort((a, b) => a.date.localeCompare(b.date));
+      if (items.length === 0) continue;
+      const workOrderIds = [
+        ...new Set(
+          items.flatMap((item) =>
+            item.workOrderId == null ? [] : [item.workOrderId],
+          ),
+        ),
+      ];
+      const onlyClient = workOrderIds.length === 0;
+      const href = onlyClient
+        ? LINKS.clientBills(due.projectId)
+        : workOrderIds.length === 1 && client.length === 0
+          ? LINKS.workOrder(due.projectId, workOrderIds[0] ?? "")
+          : LINKS.workOrders(due.projectId);
+      const ids = await deps.notifier.notify(due.workspaceId, users, {
+        type: "contracts.deadlines_due",
+        menu: onlyClient ? "contracts.client_bills" : "contracts.work_orders",
+        projectId: due.projectId,
+        title:
+          due.projectName == null
+            ? deadlineTitle(items)
+            : `${deadlineTitle(items)} in ${due.projectName}`,
+        body: `${items.map(deadlineText).join("; ")}.`,
+        href,
+        sourceKey: `contracts.deadlines_due:${due.projectId}:${due.date}`,
+      });
+      written += ids.length;
+    }
+  }
+  return written;
+}
+
+export function contractDeadlinesQueueHandler(
+  deps: ContractDeadlinesDeps,
+): QueueHandler {
+  return {
+    type: CONTRACT_DEADLINES_QUEUE_TYPE,
+    timeLimitMs: 240_000,
+    async run() {
+      await raiseContractDeadlines(deps);
     },
   };
 }

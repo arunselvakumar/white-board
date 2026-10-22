@@ -79,6 +79,12 @@ export const NOTIFICATION_KINDS = {
     menu: "contracts.measurements",
     flag: "approve",
   },
+  // Contracts (CM-1108): daily, bank guarantees expiring and DLPs ending
+  // within 30 days. Work Order Read + Notification holders hear of the
+  // Work Orders', Client Bills Read + Notification holders of the client
+  // contract's; one message per member per Project per day. A message with
+  // only client-contract items carries the Client Bills menu.
+  "contracts.deadlines_due": { menu: "contracts.work_orders", flag: "read" },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;
@@ -282,6 +288,9 @@ export const LINKS = {
   // Contracts (CM-1105)
   measurement: (projectId: string, id: string) =>
     `/app/projects/${projectId}/measurements/${id}`,
+  // Contracts (CM-1108)
+  workOrders: (projectId: string) => `/app/projects/${projectId}/work-orders`,
+  clientBills: (projectId: string) => `/app/projects/${projectId}/client-bills`,
 } as const;
 
 // ---------------------------------------------------------------------------

@@ -470,6 +470,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
         projectId: string;
         side: "contractor" | "client";
         workOrderId: string | null;
+        workOrderNumber: string | null;
         number: string;
         bank: string;
         expiresOn: Date;
@@ -477,7 +478,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
     >(
       Prisma.sql`SELECT g.workspace_id AS "workspaceId", g.project_id::text AS "projectId",
           g.side::text AS side, g.work_order_id::text AS "workOrderId",
-          g.number, g.bank, g.expires_on AS "expiresOn"
+          w.number AS "workOrderNumber", g.number, g.bank, g.expires_on AS "expiresOn"
         FROM construction_contracts.bank_guarantees g
         LEFT JOIN construction_contracts.work_orders w ON w.id = g.work_order_id
         WHERE g.deleted_at IS NULL AND g.released_on IS NULL
@@ -530,6 +531,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
       kind: "guarantee",
       label: `${row.number} (${row.bank})`,
       workOrderId: row.workOrderId,
+      workOrderNumber: row.workOrderNumber,
       date: calendarDateFromDb(row.expiresOn),
     }));
     for (const row of workOrders) {
@@ -545,6 +547,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
           kind: "dlp",
           label: row.number ?? "Work Order",
           workOrderId: row.id,
+          workOrderNumber: row.number,
           date: end,
         });
     }
@@ -561,6 +564,7 @@ export class PrismaAdvanceStore implements AdvanceStore {
           kind: "dlp",
           label: "client contract",
           workOrderId: null,
+          workOrderNumber: null,
           date: end,
         });
     }

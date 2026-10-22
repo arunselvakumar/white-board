@@ -26,6 +26,8 @@ import { BACKUP_RETENTION_JOB_TYPE } from "@/src/reporting/application/backup-qu
 import { backupQueueHandlersFromEnv } from "./backup-jobs";
 import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
 import {
+  // Contracts (CM-1108)
+  createMessagingContractDeadlinesHandler,
   createMessagingDelayedHandler,
   // Sales (CM-1004)
   createMessagingFollowUpsDueHandler,
@@ -56,6 +58,8 @@ export function queueHandlers(): QueueHandler[] {
     createMessagingDelayedHandler(),
     // Sales (CM-1004): the daily follow-ups-due notices.
     createMessagingFollowUpsDueHandler(),
+    // Contracts (CM-1108): bank guarantees expiring and DLPs ending.
+    createMessagingContractDeadlinesHandler(),
     // CM-907: purge Companies whose deletion came due.
     companyPurgeQueueHandler(),
     // CM-906: backup parts, the zip step and the daily 7-day expiry.
@@ -78,6 +82,8 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   "messaging.delayed",
   // Sales (CM-1004)
   "messaging.follow_ups_due",
+  // Contracts (CM-1108)
+  "messaging.contract_deadlines",
   // CM-907
   COMPANY_PURGE_JOB,
   // CM-906

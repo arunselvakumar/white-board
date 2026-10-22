@@ -103,6 +103,7 @@ export type DueSoonItem = {
   /** "BG 123 (State Bank of India)", "WO/26-27/00001". */
   label: string;
   workOrderId: string | null;
+  workOrderNumber: string | null;
   date: CalendarDate;
 };
 

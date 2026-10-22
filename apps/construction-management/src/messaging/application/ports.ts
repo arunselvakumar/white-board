@@ -210,3 +210,35 @@ export type FollowUpsDue = {
 export type FollowUpsDueSource = {
   due(now: Date): Promise<FollowUpsDue[]>;
 };
+
+// ---------------------------------------------------------------------------
+// Contracts (CM-1108): bank guarantees expiring and DLPs ending soon
+// ---------------------------------------------------------------------------
+
+/** One bank guarantee expiring or DLP ending within the notice window. */
+export type ContractDeadline = {
+  /** Work Order (contractor) or client contract (client): who is told. */
+  side: "contractor" | "client";
+  kind: "guarantee" | "dlp";
+  /** "BG/2026/001 (State Bank of India)", "WO/26-27/00001", "client contract". */
+  label: string;
+  /** The Work Order it is on (contractor side). */
+  workOrderId: string | null;
+  workOrderNumber: string | null;
+  date: CalendarDate;
+};
+
+/** A Project's deadlines due within 30 days of its Company's today. */
+export type ContractDeadlinesDue = {
+  workspaceId: string;
+  projectId: string;
+  projectName: string | null;
+  /** The Company's today. */
+  date: CalendarDate;
+  items: ContractDeadline[];
+};
+
+/** Contracts' guarantees and DLPs, read across contexts in composition. */
+export type ContractDeadlinesSource = {
+  due(now: Date): Promise<ContractDeadlinesDue[]>;
+};

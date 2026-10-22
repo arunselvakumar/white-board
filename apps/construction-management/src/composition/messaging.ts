@@ -2,16 +2,22 @@ import { prisma } from "@repo/construction-db";
 import { after } from "next/server";
 
 import {
+  contractDeadlinesQueueHandler,
   delayedQueueHandler,
   // Sales (CM-1004)
   followUpsDueQueueHandler,
   retentionQueueHandler,
 } from "@/src/messaging/application/maintenance";
+import { PrismaAdvanceStore } from "@/src/contracts/infrastructure/prisma-advance-store";
+import { DUE_SOON_DAYS, dueSoon } from "@/src/contracts/domain/advance";
 import { NotificationHandlers } from "@/src/messaging/application/notification-handlers";
 import { NotificationListeners } from "@/src/messaging/application/listeners";
 import { Notifier } from "@/src/messaging/application/notifier";
 import type {
   BecameDelayed,
+  // Contracts (CM-1108)
+  ContractDeadlinesDue,
+  ContractDeadlinesSource,
   DelayedWorkSource,
   // Sales (CM-1004)
   FollowUpsDue,
@@ -431,6 +437,80 @@ export function createMessagingFollowUpsDueHandler(
 ): QueueHandler {
   return followUpsDueQueueHandler({
     source: salesFollowUpsDue,
+    recipients: notificationRecipientDirectory,
+    notifier: createNotifier(),
+    clock,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Contracts (CM-1108, ADR CM-0023 §8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Contracts' live, unreleased bank guarantees expiring and DLPs ending
+ * within 30 days of each Company's today (`dueSoon`), per Project. The
+ * store reads a window wide enough for every time zone; each Company's own
+ * today then decides.
+ */
+export const contractsDeadlinesDue: ContractDeadlinesSource = {
+  async due(now) {
+    const utc = now.toISOString().slice(0, 10);
+    const items = await new PrismaAdvanceStore().dueBetween(prisma, {
+      from: addDays(utc, -1),
+      to: addDays(utc, DUE_SOON_DAYS + 1),
+    });
+    const todays = new Map<string, string>();
+    const found = new Map<string, ContractDeadlinesDue>();
+    for (const item of items) {
+      let today = todays.get(item.workspaceId);
+      if (today == null) {
+        today = await companyToday(prisma, item.workspaceId, now);
+        todays.set(item.workspaceId, today);
+      }
+      if (!dueSoon(item.date, today)) continue;
+      const key = `${item.workspaceId}:${item.projectId}`;
+      const group = found.get(key) ?? {
+        workspaceId: item.workspaceId,
+        projectId: item.projectId,
+        projectName: null,
+        date: today,
+        items: [],
+      };
+      group.items.push({
+        side: item.side,
+        kind: item.kind,
+        label: item.label,
+        workOrderId: item.workOrderId,
+        workOrderNumber: item.workOrderNumber,
+        date: item.date,
+      });
+      found.set(key, group);
+    }
+    if (found.size === 0) return [];
+    const projects = await prisma.constructionProjectsProject.findMany({
+      where: {
+        id: { in: [...found.values()].map((group) => group.projectId) },
+        deletedAt: null,
+      },
+      select: { id: true, workspaceId: true, name: true },
+    });
+    const names = new Map(
+      projects.map((row) => [`${row.workspaceId}:${row.id}`, row.name]),
+    );
+    return [...found.entries()].flatMap(([key, group]) => {
+      const name = names.get(key);
+      return name == null ? [] : [{ ...group, projectName: name }];
+    });
+  },
+};
+
+/** `messaging.contract_deadlines`: the daily bank guarantee and DLP notice. */
+export function createMessagingContractDeadlinesHandler(
+  clock?: () => Date,
+): QueueHandler {
+  return contractDeadlinesQueueHandler({
+    source: contractsDeadlinesDue,
     recipients: notificationRecipientDirectory,
     notifier: createNotifier(),
     clock,
