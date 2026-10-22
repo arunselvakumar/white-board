@@ -1,0 +1,107 @@
+apps/construction-management/app/api/construction/contracts/contracts-openapi.ts
+  s_f49615d4431370::t_9195011f19658c 18-21,28,36
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/amend/route.ts
+  s_f49615d4431370::t_ae1301f6f2e81e 1-29
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/approve/route.ts
+  s_f49615d4431370::t_ea8a60221fa84a 1-24
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/cancel/route.ts
+  s_f49615d4431370::t_c184f92f3bdd9b 1-26
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/close/route.ts
+  s_f49615d4431370::t_76146968236833 1-26
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/delete/route.ts
+  s_f49615d4431370::t_e9ae32a8ebc47d 1-51
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/pdf/route.ts
+  s_f49615d4431370::t_6e44f855718b44 1-54
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/reject/route.ts
+  s_f49615d4431370::t_da0558edeed48f 1-26
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/route.ts
+  s_f49615d4431370::t_dad8b626f10ee6 1-10
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/submit/route.ts
+  s_f49615d4431370::t_44e767ea67f1b1 1-28
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/update/route.ts
+  s_f49615d4431370::t_b8412232be7a90 1-30
+apps/construction-management/app/api/construction/contracts/work-orders/boq-items/route.ts
+  s_f49615d4431370::t_5f07d4c45b8a93 1-47
+apps/construction-management/app/api/construction/contracts/work-orders/form-options/route.ts
+  s_f49615d4431370::t_e2687ffa4a51cc 1-36
+apps/construction-management/app/api/construction/contracts/work-orders/material-options/route.ts
+  s_f49615d4431370::t_627e402628ad30 1-50
+apps/construction-management/app/api/construction/contracts/work-orders/route.ts
+  s_f49615d4431370::t_990728e13e0b77 1-107
+apps/construction-management/app/api/construction/contracts/work-orders/work-order-access.ts
+  s_f49615d4431370::t_90792732edc6cb 1-83
+apps/construction-management/app/api/construction/contracts/work-orders/work-order-models.ts
+  s_f49615d4431370::t_c50beb54be2c49 1-831
+apps/construction-management/app/api/construction/contracts/work-orders/work-order-route.ts
+  s_f49615d4431370::t_41107c49dde01b 1-50
+apps/construction-management/app/api/construction/contracts/work-orders/work-orders-openapi.ts
+  s_f49615d4431370::t_017454f36f7485 1-214
+apps/construction-management/app/api/construction/organization/settings/backdated-entry/backdated-entry.http.test.ts
+  s_f49615d4431370::t_bb51d601fde7fb 148
+apps/construction-management/components/settings/backdated-entry-form.stories.tsx
+  s_f49615d4431370::t_dc0ccf7b9290d6 104,125
+apps/construction-management/src/composition/contracts-work-orders.ts
+  s_f49615d4431370::t_3f7f2d75117da5 1-64
+apps/construction-management/src/composition/messaging-event-contracts.ts
+  s_f49615d4431370::t_da0a82b6dc7f24 54-56,81-82
+apps/construction-management/src/contracts/application/boq-handlers.ts
+  s_f49615d4431370::t_57677f1c04e6b9 16,847-849,869-870
+apps/construction-management/src/contracts/application/boq-ports.ts
+  s_f49615d4431370::t_8bd5378e1f6fb4 211-219
+apps/construction-management/src/contracts/application/work-order-handlers.ts
+  s_f49615d4431370::t_a5ddfc4894a9a0 1-1577
+apps/construction-management/src/contracts/application/work-order-ports.ts
+  s_f49615d4431370::t_1facd0f5a1ca41 1-295
+apps/construction-management/src/contracts/domain/boq.ts
+  s_f49615d4431370::t_58d15118d605ab 343-356
+apps/construction-management/src/contracts/domain/contract-terms.ts
+  s_f49615d4431370::t_260e19cc54e73d 234-271
+apps/construction-management/src/contracts/domain/work-order-events.ts
+  s_f49615d4431370::t_df2b5ccc6d0ab5 1-18
+apps/construction-management/src/contracts/domain/work-order.ts
+  s_61253ce157c5bb::t_4915781c504dfc 1-928
+apps/construction-management/src/contracts/infrastructure/prisma-boq-store.ts
+  s_f49615d4431370::t_4e8d7a959f2077 429-445
+apps/construction-management/src/contracts/infrastructure/prisma-work-order-store.ts
+  s_61253ce157c5bb::t_f6693085793ab0 1-525
+apps/construction-management/src/contracts/infrastructure/work-order-pdf.ts
+  s_f49615d4431370::t_bc3fd1fddded0c 1-282
+apps/construction-management/src/messaging/application/inbound-events.ts
+  s_f49615d4431370::t_86b39dcd2fae97 191-200
+apps/construction-management/src/messaging/application/listeners.ts
+  s_f49615d4431370::t_8bbc528116c382 39-40,178-180,909-939
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_f49615d4431370::t_76f917d06cbc7d 75-76,185-190,262-264
+apps/construction-management/src/procurement/infrastructure/purchase-order-pdf-writer.ts
+  s_f49615d4431370::t_bbf19be2611713 2-4,6
+apps/construction-management/src/shared-kernel/backdated-policy.test.ts
+  s_f49615d4431370::t_2842e57fc1eb3a 39,42-44,58,61
+apps/construction-management/src/shared-kernel/backdated-policy.ts
+  s_f49615d4431370::t_fadcf71e26d776 33,214-221
+apps/construction-management/src/shared-kernel/pdf/document-pdf-writer.ts
+  s_f49615d4431370::t_694627e5cc3769 1-297
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "cfdde72ba73a5649d0cd6de7105add99feb19312",
+  "prompts": {},
+  "sessions": {
+    "s_61253ce157c5bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bcd3895c-10e0-4062-a2ac-b643386fd66f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
