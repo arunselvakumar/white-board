@@ -1,0 +1,43 @@
+apps/construction-management/app/api/construction/finance/party-payments/[id]/receipt/route.ts
+  s_f49615d4431370::t_634fda1a959de8 4
+apps/construction-management/src/contracts/domain/client-bill.test.ts
+  s_f49615d4431370::t_0ba154865efbb1 1-143
+apps/construction-management/src/contracts/domain/contractor-bill.ts
+  s_f49615d4431370::t_6b8d1dea247b6c 1-2,5,9-10,12-51,111-118,140,144,225-228,235,247-251,266
+apps/construction-management/src/contracts/domain/ra-bill.test.ts
+  s_f49615d4431370::t_6426ca2ee9c985 1-213
+apps/construction-management/src/contracts/domain/ra-bill.ts
+  s_f49615d4431370::t_48c45386f65084 1-582
+apps/construction-management/src/procurement/domain/purchase-order-amount-words.ts
+  s_f49615d4431370::t_71e5f69735972c 1-5
+apps/construction-management/src/shared-kernel/amount-in-words.test.ts
+  s_f49615d4431370::t_4a0d3ca030b28f 1-19
+apps/construction-management/src/shared-kernel/amount-in-words.ts
+  s_f49615d4431370::t_1e2caeb3210c74 1-89
+apps/construction-management/src/contracts/domain/client-bill.ts
+  s_52c9aa80fb1374::t_a152375aea65b5 1-418
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1d445d782ec5b4803dee77f058216cca748cd391",
+  "prompts": {},
+  "sessions": {
+    "s_52c9aa80fb1374": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5f2d61a3296303f5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
