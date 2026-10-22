@@ -414,10 +414,10 @@ export function raBillDeductions<K extends DeductionKind>(
         index,
         "description",
       );
-    const advanceId =
-      kind === "mobilisation_recovery" || kind === "secured_advance_recovery"
-        ? input.advanceId?.trim() || null
-        : null;
+    const recovery =
+      kind === "mobilisation_recovery" || kind === "secured_advance_recovery";
+    const named = input.advanceId?.trim() ?? "";
+    const advanceId = recovery && named !== "" ? named : null;
     return { kind, amount, description, advanceId };
   });
 }

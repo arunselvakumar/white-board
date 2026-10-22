@@ -5,6 +5,7 @@ import { StoryQueries } from "../../../.storybook/mocks/api";
 import {
   APPROVED,
   BILL_APPROVED,
+  ADVANCE_ID,
   BILL_DRAFT,
   BILL_PENDING,
   BILL_RCM,
@@ -103,11 +104,17 @@ export const DraftWithSuggestions: Story = {
         isFinal: false,
         remarks: null,
         deductions: [
-          { kind: "retention", amount: 4_730_00, description: null },
+          {
+            kind: "retention",
+            amount: 4_730_00,
+            description: null,
+            advanceId: null,
+          },
           {
             kind: "material_at_cost",
             amount: 1_000_00,
             description: "Water charges",
+            advanceId: null,
           },
         ],
         expectedUpdatedAt: DRAFT.updatedAt,
@@ -123,6 +130,54 @@ export const DraftWithSuggestions: Story = {
           `${CONTRACTOR_BILLS_API}/${BILL_DRAFT}/submit`,
         ),
       ).toEqual({ expectedUpdatedAt: DRAFT.updatedAt }),
+    );
+  },
+};
+
+/**
+ * A draft whose Work Order has a mobilisation advance (CM-1108): the
+ * suggestion names the advance; "Use" adds its recovery line, which keeps
+ * the advance it recovers.
+ */
+export const DraftWithRecovery: Story = {
+  args: { id: BILL_DRAFT },
+  beforeEach: draft.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const panel = within(
+      await canvas.findByRole("region", { name: "Advance recoveries" }),
+    );
+    await expect(
+      panel.getByText("Mobilisation advance of 1 Sep 2026 (₹50,000.00)"),
+    ).toBeVisible();
+    await expect(
+      panel.getByText(
+        /10% of the gross · ₹45,200\.00 left · suggested ₹9,460\.00/,
+      ),
+    ).toBeVisible();
+    await userEvent.click(panel.getByRole("button", { name: "Use ₹9,460.00" }));
+    await expect(
+      canvas.getByLabelText("Deduction 2 advance"),
+    ).toHaveTextContent("Mobilisation advance of 1 Sep 2026 (₹50,000.00)");
+    await expect(canvas.getByLabelText("Deduction 2 amount")).toHaveValue(
+      "9460",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));
+    await waitFor(() =>
+      expect(
+        posted(
+          draft.holder.current,
+          `${CONTRACTOR_BILLS_API}/${BILL_DRAFT}/update`,
+        ),
+      ).toMatchObject({
+        deductions: [
+          { kind: "retention", amount: 4_730_00, advanceId: null },
+          {
+            kind: "mobilisation_recovery",
+            amount: 9_460_00,
+            advanceId: ADVANCE_ID,
+          },
+        ],
+      }),
     );
   },
 };

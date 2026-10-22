@@ -36,6 +36,7 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import { recoveredAdvance } from "@/components/contracts/advances/bill-recoveries";
 import { fieldForCode } from "@/lib/server-errors";
 import { DEDUCTION_KIND_LABELS } from "@/src/contracts/domain/contract-terms";
 import {
@@ -233,7 +234,7 @@ function Summary({ bill }: { bill: ClientBill }) {
     ...bill.deductionLines.map(
       (deduction) =>
         [
-          `${DEDUCTION_KIND_LABELS[deduction.kind]}${deduction.description == null ? "" : ` (${deduction.description})`}`,
+          `${DEDUCTION_KIND_LABELS[deduction.kind]}${recoveredAdvance(bill.advances, deduction.advanceId)}${deduction.description == null ? "" : ` (${deduction.description})`}`,
           `− ${moneyOrDash(deduction.amount)}`,
         ] as [string, string],
     ),

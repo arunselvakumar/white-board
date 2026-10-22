@@ -153,6 +153,27 @@ export function InvoiceDetail({
   return (
     <div className="space-y-5">
       <InvoiceStatusChips invoice={invoice} />
+      {invoice.origin === "retention_release" ? (
+        <p className="text-sm">
+          From retention release on{" "}
+          {invoice.retentionRelease?.workOrderId != null ? (
+            <Link
+              href={`/app/projects/${projectId}/work-orders/${invoice.retentionRelease.workOrderId}`}
+              className="font-medium underline-offset-4 hover:underline"
+            >
+              {invoice.retentionRelease.workOrderNumber ?? "the Work Order"}
+            </Link>
+          ) : (
+            <Link
+              href={`/app/projects/${projectId}/client-bills`}
+              className="font-medium underline-offset-4 hover:underline"
+            >
+              the client contract
+            </Link>
+          )}
+          . Delete the release in Contracts to change it.
+        </p>
+      ) : null}
       {invoice.origin === "ra_bill" && invoice.sourceId != null ? (
         <p className="text-sm">
           From {invoice.party.type === "client" ? "Client" : "Contractor"} Bill{" "}

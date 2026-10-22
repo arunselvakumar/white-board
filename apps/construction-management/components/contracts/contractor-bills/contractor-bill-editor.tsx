@@ -23,6 +23,12 @@ import {
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
+import {
+  AdvanceSelect,
+  isRecoveryKind,
+  RecoverySuggestions,
+  type BillAdvance,
+} from "@/components/contracts/advances/bill-recoveries";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MoneyInput, paiseToRupees } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
@@ -61,7 +67,7 @@ function pathOf(error: unknown): FieldPath<ContractorBillEditorValues> | null {
   const field = typeof details?.field === "string" ? details.field : null;
   if (
     field != null &&
-    /^deductions\.\d+\.(amount|description|kind)$/.test(field)
+    /^deductions\.\d+\.(amount|description|kind|advanceId)$/.test(field)
   )
     return field as FieldPath<ContractorBillEditorValues>;
   return null;
@@ -94,7 +100,29 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
     const amount = paiseToRupees(suggested);
     if (index === -1) {
       if (suggested > 0)
-        deductions.append({ kind: "retention", amount, description: "" });
+        deductions.append({
+          kind: "retention",
+          amount,
+          description: "",
+          advanceId: "",
+        });
+      return;
+    }
+    setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
+  };
+
+  const applyRecovery = (advance: BillAdvance) => {
+    const amount = paiseToRupees(advance.suggested ?? 0);
+    const index = typed.findIndex(
+      (row) => isRecoveryKind(row.kind) && row.advanceId === advance.id,
+    );
+    if (index === -1) {
+      deductions.append({
+        kind: advance.recoveryKind as (typeof typed)[number]["kind"],
+        amount,
+        description: "",
+        advanceId: advance.id,
+      });
       return;
     }
     setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
@@ -243,19 +271,39 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
                       />
                       <FieldError message={rowErrors?.amount?.message} />
                     </div>
-                    <div className="min-w-0 space-y-1">
-                      <Input
-                        aria-label={`Deduction ${n} description`}
-                        placeholder={
-                          typed[index]?.kind === "other"
-                            ? "What it is for"
-                            : "Note (optional)"
-                        }
-                        aria-invalid={rowErrors?.description != null}
-                        {...register(`deductions.${index}.description`)}
-                      />
-                      <FieldError message={rowErrors?.description?.message} />
-                    </div>
+                    {isRecoveryKind(typed[index]?.kind ?? "") ? (
+                      <div className="min-w-0 space-y-1">
+                        <Controller
+                          name={`deductions.${index}.advanceId`}
+                          control={control}
+                          render={({ field }) => (
+                            <AdvanceSelect
+                              advances={bill.advances}
+                              kind={typed[index]?.kind ?? ""}
+                              value={field.value}
+                              onChange={field.onChange}
+                              label={`Deduction ${n} advance`}
+                              invalid={rowErrors?.advanceId != null}
+                            />
+                          )}
+                        />
+                        <FieldError message={rowErrors?.advanceId?.message} />
+                      </div>
+                    ) : (
+                      <div className="min-w-0 space-y-1">
+                        <Input
+                          aria-label={`Deduction ${n} description`}
+                          placeholder={
+                            typed[index]?.kind === "other"
+                              ? "What it is for"
+                              : "Note (optional)"
+                          }
+                          aria-invalid={rowErrors?.description != null}
+                          {...register(`deductions.${index}.description`)}
+                        />
+                        <FieldError message={rowErrors?.description?.message} />
+                      </div>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
@@ -273,6 +321,11 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
             </ul>
           )}
           <FieldError message={errors.deductions?.message} />
+          <RecoverySuggestions
+            advances={bill.advances}
+            typed={typed}
+            onUse={applyRecovery}
+          />
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -283,6 +336,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
                   kind: "other",
                   amount: "",
                   description: "",
+                  advanceId: "",
                 });
               }}
             >
@@ -300,9 +354,9 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
             </Button>
           </div>
           <p className="text-muted-foreground text-xs">
-            Mobilisation advance recovery and material issued at cost are typed
-            by hand. TDS is not a deduction here: it is taken when the bill is
-            paid.
+            An advance recovery names its advance: it applies the advance paid
+            on account to this bill. Material issued at cost is typed by hand.
+            TDS is not a deduction here: it is taken when the bill is paid.
           </p>
           <p className="text-sm font-semibold tabular-nums">
             Net as typed {moneyOrDash(net)}

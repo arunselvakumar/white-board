@@ -163,7 +163,10 @@ describe("advances (CM-1108)", () => {
     const advances = [advance({ recovered: 70_000_00n })];
     const check = (
       deductions: { kind: string; amount: bigint; advanceId: string | null }[],
-    ) => errorOf(() => assertRecoveries(deductions, advances));
+    ) =>
+      errorOf(() => {
+        assertRecoveries(deductions, advances);
+      });
     expect(
       check([{ kind: "mobilisation_recovery", amount: 1n, advanceId: null }])
         .code,

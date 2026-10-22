@@ -533,6 +533,35 @@ export const CLIENT_INVOICE = invoice({
   actions: { edit: false, delete: false, settle: true, pay: true },
 });
 
+/** Retention released on the client contract (CM-1108): a receivable invoice, read-only here. */
+export const CLIENT_RELEASE_INVOICE = invoice({
+  id: "0199c000-0000-7000-8000-000000000031",
+  party: {
+    type: "client",
+    id: CLIENT_ID,
+    name: "Tamil Nadu Housing Board",
+  },
+  direction: "receivable",
+  origin: "retention_release",
+  sourceId: "0199c000-0000-7000-8000-000000000032",
+  retentionRelease: {
+    side: "client",
+    workOrderId: null,
+    workOrderNumber: null,
+  },
+  invoiceNumber: "RET-1",
+  invoiceDate: "2026-10-20",
+  dueDate: null,
+  taxableAmount: null,
+  gstAmount: null,
+  amount: 30_527_96,
+  balance: 30_527_96,
+  remarks: "Retention released on the client contract (on completion)",
+  overdue: false,
+  daysOverdue: 0,
+  actions: { edit: false, delete: false, settle: true, pay: true },
+});
+
 export const CLIENT_BALANCES: PartyBalances = {
   partyType: "client",
   items: [

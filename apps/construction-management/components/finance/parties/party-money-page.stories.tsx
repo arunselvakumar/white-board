@@ -10,6 +10,7 @@ import {
   CLIENT_BILL_ID,
   CLIENT_ID,
   CLIENT_INVOICE,
+  CLIENT_RELEASE_INVOICE,
   CONTRACTOR_ID,
   CONTRACTOR_INVOICE,
   PARTLY_PAID_INVOICE,
@@ -335,6 +336,47 @@ export const ClientReceivablesAndBillInvoice: Story = {
       "href",
       `/app/projects/${PROJECT_ID}/client-bills/${CLIENT_BILL_ID}`,
     );
+    await expect(sheet.queryByRole("button", { name: "Edit" })).toBeNull();
+  },
+};
+
+/**
+ * Retention released on the client contract (CM-1108): its receivable
+ * invoice says where it comes from and links back; it cannot be edited.
+ */
+export const RetentionReleaseInvoice: Story = {
+  args: { partyType: "client", partyId: CLIENT_ID },
+  beforeEach: () => {
+    api = mockApi(
+      partyMoneyHandler((call) => {
+        if (call.method !== "GET") return undefined;
+        const path = call.path.split("?")[0] ?? "";
+        if (path === `${FINANCE}/invoices`)
+          return Response.json({
+            items: [CLIENT_RELEASE_INVOICE],
+            nextCursor: null,
+            prevCursor: null,
+            total: 1,
+          });
+        return clientHandler(call);
+      }),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", {
+        name: "RET-1 (retention release)",
+      }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const sheet = within(await body.findByRole("dialog"));
+    await expect(
+      await sheet.findByText(/From retention release on/),
+    ).toBeVisible();
+    await expect(
+      sheet.getByRole("link", { name: "the client contract" }),
+    ).toHaveAttribute("href", `/app/projects/${PROJECT_ID}/client-bills`);
     await expect(sheet.queryByRole("button", { name: "Edit" })).toBeNull();
   },
 };

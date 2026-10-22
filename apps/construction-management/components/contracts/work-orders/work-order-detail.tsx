@@ -66,6 +66,7 @@ import {
   type WorkOrderRevision,
 } from "@/src/queries/contracts-work-orders";
 
+import { AdvancesRetentionPanels } from "../advances/advances-retention-panels";
 import { CloseWorkOrderDialog, ReasonDialog } from "./work-order-dialogs";
 import { localToday } from "./work-order-form";
 import {
@@ -320,9 +321,10 @@ function ContractorBillsLink({
 /**
  * One Work Order (CM-1104): its status and actions by the viewer's flags
  * (edit, submit, approve, reject, amend, close, cancel, delete, Download
- * PDF), BOQ warnings, the Contractor and dates, the terms, the lines, the
- * materials issued, and the earlier revisions, each opening to its terms
- * and lines.
+ * PDF), BOQ warnings, the Contractor and dates, the terms, the advances,
+ * retention, bank guarantees and DLP of an issued or closed one (CM-1108),
+ * the lines, the materials issued, and the earlier revisions, each opening
+ * to its terms and lines.
  */
 export function WorkOrderDetail({
   projectId,
@@ -586,6 +588,13 @@ export function WorkOrderDetail({
         </h3>
         <TermsFacts terms={workOrder.terms} financial={financial} />
       </section>
+
+      {workOrder.status === "issued" || workOrder.status === "closed" ? (
+        <AdvancesRetentionPanels
+          scope={{ projectId, workOrderId: id }}
+          today={today}
+        />
+      ) : null}
 
       <section aria-labelledby="wo-lines-title" className="min-w-0 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

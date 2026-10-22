@@ -52,6 +52,8 @@ import {
   CLIENT_BILL_COLUMNS,
   ClientBillRowsSkeleton,
 } from "./client-bills-skeletons";
+import { AdvancesRetentionPanels } from "../advances/advances-retention-panels";
+import { localToday } from "../work-orders/work-order-form";
 import { ClientContractTerms } from "./client-contract-terms";
 import { NewClientBillDialog } from "./new-client-bill-dialog";
 
@@ -69,7 +71,9 @@ function plural(n: number, word: string): string {
  * bill date, with the totals of what is shown and the retention
  * receivable; cards at phone width, a table above. When the Project cannot
  * be billed (Own development, no Client, no state) it says so with a link
- * to fix it. The client contract terms sit below.
+ * to fix it. The client contract terms sit below, then the client
+ * contract's advances received, retention receivable and releases, bank
+ * guarantees and DLP (CM-1108).
  */
 export function ClientBillsList({
   projectId,
@@ -188,6 +192,10 @@ export function ClientBillsList({
       >
         <ClientContractTerms projectId={projectId} />
       </Suspense>
+      <AdvancesRetentionPanels
+        scope={{ projectId, workOrderId: null }}
+        today={localToday()}
+      />
       {canCreate ? (
         <NewClientBillDialog
           projectId={projectId}

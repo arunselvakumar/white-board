@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isRecoveryKind } from "@/components/contracts/advances/bill-recoveries";
+
 import {
   isRupees,
   paiseToRupees,
@@ -37,11 +39,18 @@ const DeductionSchema = z
     description: z.string().max(BILL_DEDUCTION_DESCRIPTION_MAX, {
       message: `Use at most ${String(BILL_DEDUCTION_DESCRIPTION_MAX)} characters.`,
     }),
+    /** A recovery's advance (CM-1108); "" for other kinds. */
+    advanceId: z.string(),
   })
   .refine(
     (deduction) =>
       deduction.kind !== "other" || deduction.description.trim() !== "",
     { message: "Write what it is for.", path: ["description"] },
+  )
+  .refine(
+    (deduction) =>
+      !isRecoveryKind(deduction.kind) || deduction.advanceId !== "",
+    { message: "Pick the advance this recovers.", path: ["advanceId"] },
   );
 
 export const ContractorBillEditorSchema = z
@@ -82,6 +91,7 @@ export function editorValuesOf(
         kind: deduction.kind as ContractorBillDeductionKind,
         amount: paiseToRupees(deduction.amount),
         description: deduction.description ?? "",
+        advanceId: deduction.advanceId ?? "",
       })),
   };
 }
@@ -105,6 +115,9 @@ export function toUpdate(
               deduction.description.trim() === ""
                 ? null
                 : deduction.description.trim(),
+            advanceId: isRecoveryKind(deduction.kind)
+              ? deduction.advanceId
+              : null,
           })),
         }
       : {}),

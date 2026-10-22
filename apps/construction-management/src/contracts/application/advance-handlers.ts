@@ -184,6 +184,10 @@ export async function recoverableAdvances(
   }));
 }
 
+function isAdvanceKind(value: string): value is AdvanceKind {
+  return value === "mobilisation" || value === "secured";
+}
+
 const advanceNotFound = () =>
   notFound("ADVANCE_NOT_FOUND", "This advance was not found.");
 const guaranteeNotFound = () =>
@@ -698,8 +702,8 @@ export class AdvanceHandlers {
         throw changed("advance", "ADVANCE_CHANGED");
       const { workOrder } = await this.terms(tx, ws, contract);
       const kindRaw = input.kind?.trim() ?? "";
-      const kind = kindRaw === "" ? current.kind : (kindRaw as AdvanceKind);
-      if (kind !== "mobilisation" && kind !== "secured")
+      const kind = kindRaw === "" ? current.kind : kindRaw;
+      if (!isAdvanceKind(kind))
         throw new DomainError(
           "ADVANCE_KIND_INVALID",
           "Pick mobilisation or secured advance.",
@@ -806,8 +810,7 @@ export class AdvanceHandlers {
       advanceId,
     );
     const own =
-      advance != null &&
-      advance.projectId === contract.projectId &&
+      advance?.projectId === contract.projectId &&
       (contract.side === "contractor"
         ? advance.workOrderId === contract.workOrderId
         : advance.direction === "received");
@@ -1073,8 +1076,7 @@ export class AdvanceHandlers {
           fields.bankGuaranteeId,
         );
         const own =
-          guarantee != null &&
-          guarantee.projectId === contract.projectId &&
+          guarantee?.projectId === contract.projectId &&
           guarantee.side === contract.side &&
           (contract.side === "client" ||
             guarantee.workOrderId === contract.workOrderId);

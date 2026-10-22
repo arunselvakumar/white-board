@@ -126,10 +126,12 @@ export function PartyInvoices({
                   }}
                 >
                   {invoice.invoiceNumber}
-                  {invoice.direction === "receivable" &&
-                    (invoice.origin === "ra_bill"
-                      ? " (Client Bill)"
-                      : " (sales)")}
+                  {invoice.origin === "retention_release"
+                    ? " (retention release)"
+                    : invoice.direction === "receivable" &&
+                      (invoice.origin === "ra_bill"
+                        ? " (Client Bill)"
+                        : " (sales)")}
                 </button>
                 <p className="text-muted-foreground text-xs">
                   {formatDate(invoice.invoiceDate)}
