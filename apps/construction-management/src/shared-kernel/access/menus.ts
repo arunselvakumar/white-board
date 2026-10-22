@@ -163,7 +163,7 @@ const DEFINITIONS = [
   // Contracts & Billing (ADR CM-0023 §3–§7): legacy had no BOQ or RA bills.
   ["contracts.boq", "BOQ", "contracts", "CRUDAJPNOFEI", true],
   ["contracts.work_orders", "Work Order", "contracts", "CRUDAJPNOF", true],
-  ["contracts.measurements", "Measurement Book", "contracts", "CRUDAPO", true],
+  ["contracts.measurements", "Measurement Book", "contracts", "CRUDAPNO", true],
   [
     "contracts.contractor_bills",
     "Contractor Bills",

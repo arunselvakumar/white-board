@@ -66,8 +66,8 @@ describe("the menu catalogue", () => {
       // M7 (ADR CM-0017 §10): Other Expenses (8). M11: GST (2), TDS (5).
       payment_accounting: 45,
       // M11 (ADR CM-0023 §3–§7): BOQ (10), Work Order (10), Measurement Book
-      // (7), Contractor Bills (10), Client Bills (10).
-      contracts: 47,
+      // (8), Contractor Bills (10), Client Bills (10).
+      contracts: 48,
       materials: 46,
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13) + Tags
       // CRUD (ADR CM-0019 §1) + M11 Clients CRUD and Item Library CRUD.

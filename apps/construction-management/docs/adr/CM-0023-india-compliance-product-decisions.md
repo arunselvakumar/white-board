@@ -89,7 +89,7 @@ Parts 2 and 3 depend on part 1's foundation (CM-1101), not on its billing ticket
 - Each row has an item, a description, a location (`LocationRef`), number, length, breadth and depth/height, and the computed quantity. A row can instead give the quantity directly, or be negative for deductions such as openings. Photos can be attached (attachments, not the Gallery).
 - A sheet is **draft**, **submitted** and then **checked**. Checking is the **joint measurement** (JMR). It records our engineer (the checking user), the other party's name and role, and the date, the same way the hindrance register records joint sign-off.
 - A row in an approved bill is **locked**. To correct it, reverse the bill (§7).
-- Menu **`contracts.measurements`** ("Measurement Book", Project, CRUDAPO; Approve = check).
+- Menu **`contracts.measurements`** ("Measurement Book", Project, CRUDAPNO; Approve = check; Notification since CM-1105, for `measurement.submitted`).
 
 ### 7. RA bills, both ways
 

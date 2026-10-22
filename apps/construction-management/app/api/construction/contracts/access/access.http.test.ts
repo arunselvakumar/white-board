@@ -68,7 +68,17 @@ describe("GET /api/construction/contracts/access (CM-1101)", () => {
       "export",
       "import",
     ]);
-    expect(body.menus["contracts.measurements"]).not.toContain("financial");
+    // Measurement Book is CRUDAPNO (CM-0023 §6): no Financial; N since CM-1105.
+    expect(body.menus["contracts.measurements"]).toEqual([
+      "create",
+      "read",
+      "update",
+      "delete",
+      "approve",
+      "print",
+      "report",
+      "notification",
+    ]);
     expect(body.menus["contracts.contractor_bills"]).toContain("notification");
     expect(body.menus["contracts.items"]).toEqual([
       "create",

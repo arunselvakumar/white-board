@@ -23,7 +23,7 @@
 WITH "grants" ("designation", "menu", "flags") AS (VALUES
   ('Admin', 'contracts.boq', 15103),
   ('Admin', 'contracts.work_orders', 2815),
-  ('Admin', 'contracts.measurements', 223),
+  ('Admin', 'contracts.measurements', 735),
   ('Admin', 'contracts.contractor_bills', 2815),
   ('Admin', 'contracts.client_bills', 2815),
   ('Admin', 'contracts.items', 12303),
@@ -49,7 +49,7 @@ WITH "grants" ("designation", "menu", "flags") AS (VALUES
   ('Project Manager', 'contracts.items', 7),
   ('Project Manager', 'contracts.boq', 15095),
   ('Project Manager', 'contracts.work_orders', 2807),
-  ('Project Manager', 'contracts.measurements', 215),
+  ('Project Manager', 'contracts.measurements', 727),
   ('Project Manager', 'contracts.contractor_bills', 2807),
   ('Project Manager', 'contracts.client_bills', 2807),
   ('Project Manager', 'labour.compliance', 130),

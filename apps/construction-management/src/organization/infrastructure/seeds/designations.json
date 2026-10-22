@@ -401,7 +401,8 @@
           "update",
           "approve",
           "print",
-          "report"
+          "report",
+          "notification"
         ],
         "contracts.contractor_bills": [
           "create",
