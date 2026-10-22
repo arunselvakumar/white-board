@@ -1,4 +1,5 @@
 import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { newId } from "@/src/shared-kernel/ids";
@@ -153,14 +154,6 @@ function snapshot(item: ItemSummary, lines?: StoredItemLine[]) {
 
 function json(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
-
-/** The partial unique index `items_workspace_code_live_key`. */
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /** Live Items with one of these codes (any case), other than `exceptId`. */

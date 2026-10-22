@@ -1,4 +1,5 @@
 import { Prisma } from "@repo/construction-db";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { userNamesInCompany } from "@/src/shared-kernel/user-names";
 
@@ -155,11 +156,7 @@ function variationData(variation: StoredVariation) {
 
 /** A partial unique index of `construction_contracts` refused the write. */
 function uniqueTarget(error: unknown): string | null {
-  if (
-    !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-    error.code !== "P2002"
-  )
-    return null;
+  if (!isUniqueViolation(error)) return null;
   return JSON.stringify(error.meta ?? {});
 }
 

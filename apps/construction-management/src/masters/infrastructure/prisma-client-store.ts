@@ -1,4 +1,5 @@
 import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 
@@ -70,14 +71,6 @@ function details(client: StoredClient) {
     stateCode: client.stateCode,
     isActive: client.isActive,
   };
-}
-
-/** The partial unique index `clients_workspace_name_live_key`. */
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /** The live Client with this name (any case), other than `exceptId`. */
