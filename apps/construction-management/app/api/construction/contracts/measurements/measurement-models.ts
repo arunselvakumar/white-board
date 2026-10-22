@@ -245,6 +245,10 @@ export const CreateConstructionContractsMeasurementRequestModel = z.object({
   ...content,
 });
 
+export type CreateConstructionContractsMeasurementRequestModel = z.input<
+  typeof CreateConstructionContractsMeasurementRequestModel
+>;
+
 export const UpdateConstructionContractsMeasurementRequestModel = z.object({
   ...content,
   expectedUpdatedAt: z.iso
@@ -253,6 +257,10 @@ export const UpdateConstructionContractsMeasurementRequestModel = z.object({
       "The sheet's `updatedAt` as loaded (409 MEASUREMENT_CHANGED when stale).",
     ),
 });
+
+export type UpdateConstructionContractsMeasurementRequestModel = z.input<
+  typeof UpdateConstructionContractsMeasurementRequestModel
+>;
 
 export const ConstructionContractsMeasurementStepRequestModel = z.object({
   expectedUpdatedAt: optionalExpected,

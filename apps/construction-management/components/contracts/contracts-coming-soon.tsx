@@ -12,7 +12,6 @@ import {
 
 /** The Contracts modules (ADR CM-0023 §22) and the ticket that builds each. */
 export const CONTRACTS_MODULE_TICKETS = {
-  measurements: "CM-1105",
   contractor_bills: "CM-1106",
   client_bills: "CM-1107",
 } as const satisfies Partial<Record<ProjectModuleKey, string>>;
