@@ -1,16 +1,86 @@
+import type { ContractorTdsEstimator } from "@/src/contracts/application/contractor-bill-ports";
 import type { PartyInvoicing } from "@/src/contracts/application/ports";
+import { payeeKindOf, rateInForce, tdsOn } from "@/src/finance/domain/tds";
+import type { PartyFinance } from "@/src/finance/infrastructure/party-finance-factory";
+import { loadTdsRates } from "@/src/finance/infrastructure/tds-rate-store";
+
+import { financeDirectory } from "./finance-directory";
+import { partyFinance } from "./party-finance";
 
 /**
- * Finance has no `ra_bill` invoice origin, retention-held entry kind or
- * `client` party type yet: they arrive with the bills (CM-1106 for
- * Contractor Bills, CM-1107 for Client Bills, ADR CM-0023 §7). Until then
- * nothing approves a bill, so a call here is a programming error.
+ * How an approved RA bill becomes a finance invoice (ADR CM-0023 §7),
+ * through finance's own `ContractorBillInvoices` inside the bill's
+ * transaction: contracts never writes finance tables. Contractor Bills
+ * (CM-1106) are payable invoices to the Contractor; Client Bills
+ * (receivable, party type `client`) arrive with CM-1107.
  */
-const NOT_YET =
-  "PartyInvoicing arrives with CM-1106: finance cannot invoice an RA bill yet.";
+export function contractsPartyInvoicing(
+  finance: () => PartyFinance = partyFinance,
+): PartyInvoicing {
+  return {
+    async create(tx, draft) {
+      if (draft.partyType !== "contractor" || draft.direction !== "payable")
+        throw new Error(
+          "Client Bill invoices arrive with CM-1107: finance has no `client` party yet.",
+        );
+      return finance().contractorBills.create(tx, {
+        workspaceId: draft.workspaceId,
+        by: draft.by,
+        contractorId: draft.partyId,
+        projectId: draft.projectId,
+        departmentId: draft.departmentId,
+        number: draft.number,
+        date: draft.date,
+        taxable: draft.taxable,
+        gst: draft.gst,
+        amount: draft.amount,
+        billId: draft.sourceId,
+      });
+    },
+    isSettled(tx, input) {
+      return finance().contractorBills.isSettled(
+        tx,
+        input.workspaceId,
+        input.invoiceId,
+      );
+    },
+    reverse(tx, input) {
+      return finance().contractorBills.reverse(tx, input);
+    },
+  };
+}
 
-/** How an approved RA bill becomes a finance invoice (ADR CM-0023 §7). */
-export const contractsPartyInvoicing: PartyInvoicing = {
-  create: () => Promise.reject(new Error(NOT_YET)),
-  reverse: () => Promise.reject(new Error(NOT_YET)),
+/**
+ * The TDS a Contractor Bill's payment would likely suffer, for the bill
+ * page and PDF (ADR CM-0023 §7): the gross × the 194C rate in force on the
+ * bill date for the Contractor's payee kind (or its lower-deduction
+ * certificate's), rounded to the rupee. Thresholds and the year's earlier
+ * payments are left out: finance works out the real figure at payment
+ * (CM-0017 §8). CM-1116 brings the other TDS natures.
+ */
+export const contractorTdsEstimate: ContractorTdsEstimator = async (
+  db,
+  input,
+) => {
+  const contractor = (
+    await financeDirectory.contractors(db, input.workspaceId, [
+      input.contractorId,
+    ])
+  ).get(input.contractorId);
+  if (contractor == null) return null;
+  const rate = rateInForce(
+    await loadTdsRates(db),
+    "194C",
+    payeeKindOf(contractor.pan),
+    input.date,
+  );
+  if (rate == null) return null;
+  const percent = contractor.tdsLowerRate ?? rate.rate;
+  return {
+    label: rate.label,
+    rate: percent,
+    applicable: contractor.tdsApplicable,
+    base: input.base,
+    amount: contractor.tdsApplicable ? tdsOn(input.base, percent) : 0n,
+  };
 };

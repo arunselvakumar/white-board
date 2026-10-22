@@ -101,7 +101,7 @@ export const SavesDefaultLimitsAndClosingDate: Story = {
     // Every module starts on the defaults.
     await expect(
       canvas.getAllByText("Global, Create 0d · Edit 0d"),
-    ).toHaveLength(33);
+    ).toHaveLength(34);
 
     const createDays = canvas.getByLabelText(
       "Restrict creating entries older than",
@@ -122,7 +122,7 @@ export const SavesDefaultLimitsAndClosingDate: Story = {
     // Module rows on Global follow the new default.
     await expect(
       canvas.getAllByText("Global, Create 3d · Edit 0d"),
-    ).toHaveLength(33);
+    ).toHaveLength(34);
 
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
     await expect(await canvas.findByText("Changes saved.")).toBeVisible();

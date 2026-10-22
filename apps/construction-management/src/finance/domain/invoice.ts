@@ -27,7 +27,12 @@ import {
  */
 
 export type InvoiceDirection = "payable" | "receivable";
-export type InvoiceOrigin = "manual" | "goods_receipt";
+/**
+ * `manual`: typed in finance; `goods_receipt`: from a GRN (CM-0017 §13);
+ * `ra_bill`: from an approved Contractor Bill (CM-1106, CM-0023 §7),
+ * read-only here.
+ */
+export type InvoiceOrigin = "manual" | "goods_receipt" | "ra_bill";
 
 export const INVOICE_STATUSES = [
   "open",

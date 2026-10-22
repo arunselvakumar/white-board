@@ -133,7 +133,13 @@ export const ConstructionFinanceInvoiceResponseModel = z.object({
   party: ConstructionFinancePartyRefResponseModel,
   place: ConstructionFinancePartyPlaceResponseModel,
   direction: InvoiceDirectionModel,
-  origin: z.enum(["manual", "goods_receipt"]),
+  origin: z
+    .enum(["manual", "goods_receipt", "ra_bill"])
+    .describe(
+      "`ra_bill`: from an approved Contractor Bill (CM-1106); read-only here (409 INVOICE_FROM_CONTRACTOR_BILL).",
+    ),
+  /** `ra_bill`: the Contractor Bill's id. */
+  sourceId: z.uuid().nullable(),
   invoiceNumber: z.string(),
   invoiceDate: z.iso.date(),
   dueDate: z.iso.date().nullable(),
@@ -235,6 +241,7 @@ export function toInvoiceResponse(
     place: placeResponse(view.place, view.placeName),
     direction: view.direction,
     origin: view.origin,
+    sourceId: view.sourceId,
     invoiceNumber: view.invoiceNumber,
     invoiceDate: view.invoiceDate,
     dueDate: view.dueDate,

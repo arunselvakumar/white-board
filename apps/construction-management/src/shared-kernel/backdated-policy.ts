@@ -227,6 +227,14 @@ export const BACKDATED_MODULES = [
     "measuredOn",
     "contracts.measurements",
   ),
+  // Contracts (CM-1106, ADR CM-0023 §7).
+  m(
+    "contractor_bill",
+    "Contractor Bill",
+    "contracts",
+    "billDate",
+    "contracts.contractor_bills",
+  ),
   m(
     "hrms_attendance",
     "Attendance",

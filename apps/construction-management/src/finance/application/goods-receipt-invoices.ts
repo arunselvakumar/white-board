@@ -164,6 +164,7 @@ export class GoodsReceiptInvoices {
       place,
       direction: "payable",
       origin: "goods_receipt",
+      sourceId: null,
       invoiceNumber: number,
       invoiceDate,
       dueDate,

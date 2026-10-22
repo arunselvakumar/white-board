@@ -6,6 +6,7 @@ import {
   type EventDispatcher,
 } from "@/src/shared-kernel/events";
 
+import { ContractorBillInvoices } from "../application/contractor-bill-invoices";
 import { GoodsReceiptInvoices } from "../application/goods-receipt-invoices";
 import { InvoiceHandlers } from "../application/invoice-handlers";
 import { PartyOpeningHandlers } from "../application/party-opening-handlers";
@@ -24,7 +25,8 @@ import { loadTdsRates } from "./tds-rate-store";
 /**
  * The party money engine over Prisma (CM-705, CM-706, CM-708): invoices,
  * payments, openings, settlements, the queries over the party ledger and
- * the GRN → supplier invoice sync. The directory is the composition
+ * the GRN → supplier invoice sync, and Contractor Bill invoices (CM-1106).
+ * The directory is the composition
  * root's (`src/composition/finance-directory.ts`).
  */
 export function createPartyFinance(deps: {
@@ -58,6 +60,7 @@ export function createPartyFinance(deps: {
     ),
     queries: new PartyQueries(base, invoices),
     goodsReceipts: new GoodsReceiptInvoices(base),
+    contractorBills: new ContractorBillInvoices(base),
   };
 }
 

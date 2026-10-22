@@ -116,6 +116,8 @@ export type StoredInvoice = {
   place: PartyPlace;
   direction: InvoiceDirection;
   origin: InvoiceOrigin;
+  /** `ra_bill`: the Contractor Bill it came from (construction_contracts). */
+  sourceId: string | null;
   invoiceNumber: string;
   invoiceDate: CalendarDate;
   dueDate: CalendarDate | null;

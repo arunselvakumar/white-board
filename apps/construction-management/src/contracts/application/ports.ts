@@ -233,9 +233,11 @@ export type ContractsDirectory = {
 };
 
 // ---------------------------------------------------------------------------
-// PartyInvoicing (CM-1101; used from CM-1106 and CM-1107): an approved RA
-// bill becomes a finance invoice, and reversing the bill reverses it (ADR
-// CM-0023 §7). Implemented in `src/composition/contracts-party-invoicing.ts`.
+// PartyInvoicing (CM-1101; implemented for Contractor Bills in CM-1106,
+// Client Bills follow in CM-1107): an approved RA bill becomes a finance
+// invoice, and reversing the bill reverses it (ADR CM-0023 §7).
+// Implemented in `src/composition/contracts-party-invoicing.ts` over
+// finance's own handlers; contracts never writes finance tables.
 // ---------------------------------------------------------------------------
 
 /** Who the invoice is with: a Contractor (payable) or the Project's Client (receivable). */
@@ -257,29 +259,45 @@ export type PartyInvoiceDraft = {
   date: CalendarDate;
   /** Paise: the bill's gross for the period, before GST. */
   taxable: bigint;
-  cgst: bigint;
-  sgst: bigint;
-  igst: bigint;
   /**
-   * Paise held back as retention: posted to the party ledger as retention
-   * held (payable) or retention receivable, not as owed now.
+   * Paise of GST in `amount`: CGST + SGST + IGST, or 0 under reverse
+   * charge (the Company pays that GST, so it is not owed to the party).
+   * Finance keeps one total until CM-1113 splits invoices' GST.
    */
-  retentionHeld: bigint;
-  /** Paise: gross + GST − retention − recoveries; what is owed now. */
-  net: bigint;
+  gst: bigint;
+  /**
+   * Paise: what is owed now, the bill's net (gross + GST payable −
+   * retention − recoveries). Retention held stays in contracts until it is
+   * released (CM-1108).
+   */
+  amount: bigint;
   /** The bill's id: the invoice's origin is `ra_bill` with this source. */
   sourceId: string;
 };
 
 export type PartyInvoicing = {
-  /** Creates the invoice and its ledger entries; returns the invoice id. */
-  create(tx: ContractsTx, draft: PartyInvoiceDraft): Promise<string>;
   /**
-   * Reverses the invoice the bill created (refused by finance once anything
-   * was paid or received against it: 409 `BILL_SETTLED`).
+   * Creates the invoice and its party-ledger entry; returns the invoice
+   * id. 409 `BILL_INVOICE_NUMBER_TAKEN` when the party already has a live
+   * payable invoice with that number.
+   */
+  create(tx: ContractsTx, draft: PartyInvoiceDraft): Promise<string>;
+  /** Anything paid, written off or pending write-off against the invoice. */
+  isSettled(
+    tx: ContractsTx,
+    input: { workspaceId: string; invoiceId: string },
+  ): Promise<boolean>;
+  /**
+   * Reverses the invoice's party-ledger entry and removes the invoice.
+   * Callers ask `isSettled` first (409 `BILL_SETTLED`).
    */
   reverse(
     tx: ContractsTx,
-    input: { workspaceId: string; by: string; sourceId: string },
+    input: {
+      workspaceId: string;
+      by: string;
+      invoiceId: string;
+      reason: string;
+    },
   ): Promise<void>;
 };

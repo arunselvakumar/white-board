@@ -67,6 +67,7 @@ function invoice(patch: Partial<Invoice> & Pick<Invoice, "id">): Invoice {
     place: PLACE,
     direction: "payable",
     origin: "manual",
+    sourceId: null,
     invoiceNumber: "CC/2026/118",
     invoiceDate: "2026-09-01",
     dueDate: "2026-10-01",
@@ -105,6 +106,7 @@ export const OVERDUE_INVOICE = invoice({
   ],
   grnValue: 47_200_00,
   origin: "goods_receipt",
+  sourceId: null,
 });
 
 export const PARTLY_PAID_INVOICE = invoice({
