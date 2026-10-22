@@ -3,15 +3,11 @@ import type { Prisma, PrismaClient } from "@repo/construction-db";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { BranchStore, StoredBranch } from "../application/branch-handlers";
 import type { BranchDetails, Fence } from "../domain/branch";
-import {
-  isUniqueViolation,
-  lockKey,
-  staleOrMissing,
-  type Tx,
-} from "./prisma-calendar-support";
+import { lockKey, staleOrMissing, type Tx } from "./prisma-calendar-support";
 
 const BRANCH_INCLUDE = {
   members: { select: { memberId: true }, orderBy: { memberId: "asc" } },

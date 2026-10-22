@@ -13,6 +13,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   AttendanceBackdatedGuard,
@@ -29,7 +30,6 @@ import {
 } from "../domain/attendance";
 import {
   companyToday,
-  isUniqueViolation,
   lockKey,
   staleOrMissing,
   type Tx,

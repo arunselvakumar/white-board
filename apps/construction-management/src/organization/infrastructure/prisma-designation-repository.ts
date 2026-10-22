@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { PermissionSet } from "@/src/shared-kernel/access";
 import { conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { Designation } from "../domain/designation";
 import type { DesignationRepository } from "../domain/designation-repository";
@@ -52,10 +53,7 @@ export function designationData(designation: Designation) {
 }
 
 function mapWriteError(error: unknown): unknown {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  )
+  if (isUniqueViolation(error))
     return conflict(
       "DESIGNATION_NAME_IN_USE",
       "A Designation with this name already exists.",

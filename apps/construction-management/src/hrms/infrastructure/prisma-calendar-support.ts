@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { todayIn, type CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
@@ -9,14 +9,6 @@ import { conflict, notFound } from "@/src/shared-kernel/domain-error";
  */
 
 export type Tx = Prisma.TransactionClient;
-
-/** A unique index refused the write (Prisma P2002). */
-export function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 /**
  * Serialises writers on one key inside the current transaction (released

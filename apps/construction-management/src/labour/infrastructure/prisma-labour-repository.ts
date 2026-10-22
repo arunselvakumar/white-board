@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import {
@@ -8,6 +8,10 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import {
+  isPrismaError,
+  isUniqueViolation,
+} from "@/src/shared-kernel/prisma-errors";
 import type { PrivateDataCipher } from "@/src/shared-kernel/private-data";
 
 import {
@@ -71,10 +75,9 @@ export function labourFromRow(
 
 function isCodeClash(error: unknown): boolean {
   return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    (error.code === "P2002" ||
-      // A partial unique index surfaces as a raw unique violation.
-      (error.code === "P2010" && error.message.includes("23505")))
+    isUniqueViolation(error) ||
+    // A partial unique index surfaces as a raw unique violation.
+    (isPrismaError(error, "P2010") && error.message.includes("23505"))
   );
 }
 

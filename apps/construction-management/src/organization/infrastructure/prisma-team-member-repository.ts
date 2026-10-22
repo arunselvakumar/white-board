@@ -1,8 +1,9 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { PermissionSet } from "@/src/shared-kernel/access";
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import type { PrivateDataCipher } from "@/src/shared-kernel/private-data";
 
 import { TeamMember } from "../domain/team-member";
@@ -24,10 +25,7 @@ type Row = Prisma.ConstructionOrganizationTeamMemberGetPayload<{
 type Db = Pick<PrismaClient, "constructionOrganizationTeamMember">;
 
 function mapWriteError(error: unknown): unknown {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
+  if (isUniqueViolation(error)) {
     const target = JSON.stringify(error.meta ?? {});
     if (target.includes("email"))
       return conflict(

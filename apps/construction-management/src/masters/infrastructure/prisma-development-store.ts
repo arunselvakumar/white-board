@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   DevelopmentRow,
@@ -13,7 +14,7 @@ import {
   masterNameInUse,
   type DevelopmentKind,
 } from "../domain/master-kind";
-import { isUniqueViolation, lookupEntryData } from "./prisma-lookup-store";
+import { lookupEntryData } from "./prisma-lookup-store";
 
 type Row = Prisma.ConstructionMastersDevelopmentTypeGetPayload<object>;
 

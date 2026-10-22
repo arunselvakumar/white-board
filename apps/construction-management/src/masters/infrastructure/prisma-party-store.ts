@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   PartyDirectory,
@@ -16,7 +17,6 @@ import {
   partyNameInUse,
   type PartyKind,
 } from "../domain/party";
-import { isUniqueViolation } from "./prisma-lookup-store";
 
 type Tx = Prisma.TransactionClient;
 

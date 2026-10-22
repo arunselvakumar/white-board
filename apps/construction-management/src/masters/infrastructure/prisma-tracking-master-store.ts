@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { MasterChange } from "../application/ports";
 import type { TrackingMasterStore } from "../application/tracking-master-handlers";
@@ -14,7 +15,6 @@ import {
   trackingMasterSnapshot,
   type TrackingMaster,
 } from "../domain/tracking-master";
-import { isUniqueViolation } from "./prisma-lookup-store";
 
 type Tx = Prisma.TransactionClient;
 

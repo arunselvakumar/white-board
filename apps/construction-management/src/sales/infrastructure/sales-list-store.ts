@@ -1,5 +1,7 @@
 import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
+
 import type { SalesTx } from "../application/ports";
 import type {
   SalesListStore,
@@ -80,13 +82,6 @@ function ordered(kind: SalesListKind, rows: Row[]): StoredSalesListItem[] {
         (a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id),
       )
     : items.sort((a, b) => byName.compare(a.name, b.name));
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 /**

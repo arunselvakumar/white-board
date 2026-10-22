@@ -5,6 +5,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import { tombstone } from "@/src/shared-kernel/tombstone";
 
 import type {
@@ -34,13 +35,6 @@ type Row = Prisma.ConstructionSiteWorkEquipmentGetPayload<{
 
 type MaintenanceRow =
   Prisma.ConstructionSiteWorkEquipmentMaintenanceGetPayload<object>;
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 function toMaintenance(row: MaintenanceRow): StoredMaintenance {
   return {

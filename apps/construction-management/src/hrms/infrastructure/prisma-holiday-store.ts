@@ -16,6 +16,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   HolidayBackdatedGuard,
@@ -26,7 +27,6 @@ import type { HrmsHoliday } from "../application/ports";
 import { holidayDateTaken, type HolidayDetails } from "../domain/holiday";
 import {
   companyToday,
-  isUniqueViolation,
   staleOrMissing,
   type Tx,
 } from "./prisma-calendar-support";

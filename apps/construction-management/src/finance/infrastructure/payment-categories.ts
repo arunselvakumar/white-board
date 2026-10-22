@@ -2,6 +2,7 @@ import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   paymentCategoryChanged,
@@ -29,13 +30,6 @@ export type PaymentCategoryView = {
 };
 
 type Target = { workspaceId: string; id: string; by: string };
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
-}
 
 /**
  * The ids among `ids` that a live Transaction, petty-cash voucher, Other

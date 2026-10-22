@@ -2,10 +2,10 @@ import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { Location, locationNotFound } from "../domain/location";
 import type { LocationRepository } from "../domain/structure-repository";
-import { isUniqueViolation } from "./prisma-phase-repository";
 
 type Row = Prisma.ConstructionProjectsLocationGetPayload<object>;
 

@@ -1,6 +1,7 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type { LookupStore, MasterChange } from "../application/ports";
 import { LookupEntry } from "../domain/lookup-entry";
@@ -63,13 +64,6 @@ export function lookupEntryData<K extends NamedMasterKind>(
     deletedAt: entry.deletedAt,
     deletedBy: entry.deletedBy,
   };
-}
-
-export function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  );
 }
 
 function audit(entry: LookupEntry, change: MasterChange) {

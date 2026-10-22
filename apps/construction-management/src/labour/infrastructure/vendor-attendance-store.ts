@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { recordAudit } from "@/src/shared-kernel/audit";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
+import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
   StoredVendorDay,
@@ -279,10 +280,7 @@ export class PrismaVendorAttendanceStore implements VendorAttendanceStore {
         });
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
+      if (isUniqueViolation(error))
         throw conflict(
           "VENDOR_ATTENDANCE_CHANGED",
           "Someone recorded this day after you opened it. Reload to see their entry.",
