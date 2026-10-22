@@ -1,0 +1,57 @@
+apps/construction-management/src/composition/contracts-advances.ts
+  s_f49615d4431370::t_3d01a6ef1b1758 1-38
+apps/construction-management/src/composition/contracts-client-bills.ts
+  s_f49615d4431370::t_2bc3cfcd26e949 7,31
+apps/construction-management/src/composition/contracts-client-retention.ts
+  s_f49615d4431370::t_d77d0d937beef6 7-14,25-54
+apps/construction-management/src/composition/contracts-contractor-bills.ts
+  s_f49615d4431370::t_6656c7aad4cab4 7,35
+apps/construction-management/src/composition/contracts-party-invoicing.ts
+  s_f49615d4431370::t_5e7031e6ee6490 2-5,51,57-126
+apps/construction-management/src/contracts/application/advance-ports.ts
+  s_f49615d4431370::t_110b0f178533ac 1-262
+apps/construction-management/src/contracts/application/client-bill-ports.ts
+  s_f49615d4431370::t_38f0cbf0af5976 7,241-242
+apps/construction-management/src/contracts/application/contractor-bill-ports.ts
+  s_f49615d4431370::t_3e0cbdb7b46d7b 6,336-337
+apps/construction-management/src/contracts/application/ports.ts
+  s_f49615d4431370::t_fa707f56be031d 3,286-291,305-309,312-316,318-356,371-450
+apps/construction-management/src/contracts/application/ra-bill-common.ts
+  s_f49615d4431370::t_8bec0e332d0d40 9-16,25,94-99,101-106,113,126-130,132-159,208-260
+apps/construction-management/src/contracts/domain/advance.ts
+  s_f49615d4431370::t_caea54e66b85e6 227-231
+apps/construction-management/src/finance/application/ra-bill-invoices.ts
+  s_f49615d4431370::t_727f923073f456 425-492
+apps/construction-management/src/contracts/application/advance-handlers.ts
+  s_b9cbeb2f1cae44::t_66ceec74496fb0 1-1317
+apps/construction-management/src/contracts/application/client-bill-handlers.ts
+  s_b9cbeb2f1cae44::t_7a78bd8f7271a2 50-54,93-94,96,98-100,187-190,192-193,231,254,272-276,505,514,517,554-595,664-666,731,735,741,879,886-892,918-921,923,934,1449-1464,1466,1479,1483-1489,1594-1604,1610,1614-1620,1627
+apps/construction-management/src/contracts/application/contractor-bill-handlers.ts
+  s_b9cbeb2f1cae44::t_399339c6e5cc6b 19-23,80-81,83,85,90,92,171-174,176-180,237,245-253,469,478,480-486,534-564,624-626,808-827,852-855,857,868,1448-1463,1465,1480,1484-1490,1622-1632,1638,1642-1648,1655
+apps/construction-management/src/contracts/infrastructure/prisma-advance-store.ts
+  s_b9cbeb2f1cae44::t_2b0c609f7f6278 1-569
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6bde18390197450a9d158af99b0b39e4cf7ba42a",
+  "prompts": {},
+  "sessions": {
+    "s_b9cbeb2f1cae44": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa1fc10bb6957c888",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
