@@ -506,6 +506,8 @@ describe("Contractor Bills (CM-1106)", () => {
       mobilisationRecovery: null,
       // No advance on the Work Order: nothing to recover (CM-1108).
       recoveries: [],
+      // No material issued under it: nothing to reconcile (CM-1110).
+      materials: [],
     });
 
     // Delete frees the rows.
