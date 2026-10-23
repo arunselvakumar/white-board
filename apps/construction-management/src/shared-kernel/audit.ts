@@ -44,3 +44,24 @@ export async function recordAudit(
     },
   });
 }
+
+/** Appends several events in one insert (an import's rows). */
+export async function recordAudits(
+  db: AuditWriter,
+  events: readonly AuditEvent[],
+): Promise<void> {
+  if (events.length === 0) return;
+  await db.constructionOrganizationAuditEvent.createMany({
+    data: events.map((event) => ({
+      id: newId(),
+      workspaceId: event.workspaceId,
+      actorUserId: event.actorUserId,
+      action: event.action,
+      entityType: event.entityType,
+      entityId: event.entityId,
+      before: toJson(event.before),
+      after: toJson(event.after),
+      occurredAt: event.occurredAt ?? new Date(),
+    })),
+  });
+}
