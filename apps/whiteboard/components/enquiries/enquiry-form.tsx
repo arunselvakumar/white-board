@@ -416,13 +416,17 @@ export function EnquiryForm({
       placeholder?: string;
       hint?: string;
       autoComplete?: string;
+      required?: boolean;
     } = {},
   ) {
     return (
       <div className="space-y-1.5">
-        <Label htmlFor={name}>{label}</Label>
+        <Label htmlFor={name} required={extra.required}>
+          {label}
+        </Label>
         <Input
           id={name}
+          aria-required={extra.required}
           className="h-10"
           type={extra.type ?? "text"}
           placeholder={extra.placeholder}
@@ -470,13 +474,17 @@ export function EnquiryForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               {textField("prospectName", "Prospect name", {
+                required: true,
                 placeholder: "e.g. Priya Sharma",
               })}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone" required>
+                Phone
+              </Label>
               <Input
                 id="phone"
+                aria-required
                 className="h-10"
                 type="tel"
                 autoComplete="off"
@@ -518,6 +526,7 @@ export function EnquiryForm({
             />
             {courseChoice === OTHER_SUBJECT ? (
               textField("subject", "Subject", {
+                required: true,
                 placeholder: "e.g. Class 10 Maths",
               })
             ) : (

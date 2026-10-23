@@ -343,11 +343,14 @@ function SettlementDecision({
     <div className="mt-2 space-y-2">
       {rejecting && (
         <div className="space-y-1">
-          <Label htmlFor={`reject-${settlementId}`}>Reason to reject</Label>
+          <Label htmlFor={`reject-${settlementId}`} required>
+            Reason to reject
+          </Label>
           <Textarea
             id={`reject-${settlementId}`}
             rows={2}
             value={reason}
+            aria-required
             onChange={(event) => {
               setReason(event.target.value);
             }}
@@ -423,12 +426,15 @@ export function SettleDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="settle-reason">Reason</Label>
+          <Label htmlFor="settle-reason" required>
+            Reason
+          </Label>
           <Textarea
             id="settle-reason"
             rows={3}
             maxLength={500}
             value={reason}
+            aria-required
             aria-invalid={error != null}
             onChange={(event) => {
               setReason(event.target.value);

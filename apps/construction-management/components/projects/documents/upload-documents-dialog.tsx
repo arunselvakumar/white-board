@@ -176,7 +176,9 @@ export function UploadDocumentsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="upload-document-kind">Paper</Label>
+          <Label htmlFor="upload-document-kind" required>
+            Paper
+          </Label>
           <Select
             items={KIND_ITEMS}
             value={kind}
@@ -188,6 +190,7 @@ export function UploadDocumentsDialog({
               id="upload-document-kind"
               size="lg"
               className="w-full min-w-0"
+              aria-required
             >
               <SelectValue />
             </SelectTrigger>

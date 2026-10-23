@@ -131,10 +131,13 @@ export function InquiryTaskDialog({
             <DialogTitle>{task == null ? "Add task" : "Edit task"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="inquiry-task-title">Task</Label>
+            <Label htmlFor="inquiry-task-title" required>
+              Task
+            </Label>
             <Input
               id="inquiry-task-title"
               autoComplete="off"
+              aria-required
               placeholder="Send the brochure"
               aria-invalid={errors.title != null}
               {...form.register("title")}

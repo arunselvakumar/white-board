@@ -84,10 +84,13 @@ function RenameDrawingForm({
         <DialogTitle>Rename drawing</DialogTitle>
       </DialogHeader>
       <div className="space-y-1.5">
-        <Label htmlFor="rename-drawing-name">Drawing name</Label>
+        <Label htmlFor="rename-drawing-name" required>
+          Drawing name
+        </Label>
         <Input
           id="rename-drawing-name"
           className="h-10"
+          aria-required
           aria-invalid={errors.name != null}
           {...form.register("name")}
         />

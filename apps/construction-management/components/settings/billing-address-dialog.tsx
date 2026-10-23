@@ -173,11 +173,14 @@ export function BillingAddressDialog({
           </DialogHeader>
 
           <div className="space-y-1.5">
-            <Label htmlFor="billing-name">Name</Label>
+            <Label htmlFor="billing-name" required>
+              Name
+            </Label>
             <Input
               id="billing-name"
               placeholder="Head office"
               className="h-10"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />
@@ -185,11 +188,14 @@ export function BillingAddressDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="billing-address">Address</Label>
+            <Label htmlFor="billing-address" required>
+              Address
+            </Label>
             <Textarea
               id="billing-address"
               rows={3}
               placeholder="12, Anna Salai, Chennai 600002"
+              aria-required
               aria-invalid={errors.address != null}
               {...form.register("address")}
             />
@@ -212,7 +218,9 @@ export function BillingAddressDialog({
               <FieldError message={errors.gstin?.message} />
             </div>
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="billing-state">GST state</Label>
+              <Label htmlFor="billing-state" required>
+                GST state
+              </Label>
               <Controller
                 name="stateCode"
                 control={form.control}
@@ -228,6 +236,7 @@ export function BillingAddressDialog({
                       id="billing-state"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={errors.stateCode != null}
                     >
                       <SelectValue placeholder="Choose a state" />

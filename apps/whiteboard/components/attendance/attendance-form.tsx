@@ -186,7 +186,7 @@ export function AttendanceForm({
                 )}
               </div>
               <div className="space-y-1">
-                <Label htmlFor={`attendance-status-${index}`}>
+                <Label htmlFor={`attendance-status-${index}`} required>
                   Attendance for {mark.studentName}
                 </Label>
                 <Controller
@@ -202,6 +202,7 @@ export function AttendanceForm({
                     >
                       <SelectTrigger
                         id={`attendance-status-${index}`}
+                        aria-required
                         className="w-full"
                         aria-describedby={
                           notice ? `attendance-notice-${index}` : undefined

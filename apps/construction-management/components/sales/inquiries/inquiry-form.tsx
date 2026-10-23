@@ -78,6 +78,9 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
+/** The fields `schema` rejects when empty: their labels show the asterisk. */
+const REQUIRED_FIELDS = new Set<keyof Values>(["inquiryDate", "name"]);
+
 /** Server fields (`details.field`) to the form's. */
 const SERVER_FIELDS: Record<string, FieldPath<Values>> = {
   inquiryDate: "inquiryDate",
@@ -284,7 +287,9 @@ export function InquiryForm({
     <div
       className={className == null ? "space-y-1.5" : `space-y-1.5 ${className}`}
     >
-      <Label htmlFor={`inquiry-${name}`}>{label}</Label>
+      <Label htmlFor={`inquiry-${name}`} required={REQUIRED_FIELDS.has(name)}>
+        {label}
+      </Label>
       {control}
       <FieldError message={errors[name]?.message} />
     </div>
@@ -307,6 +312,7 @@ export function InquiryForm({
             id="inquiry-inquiryDate"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.inquiryDate != null}
             {...form.register("inquiryDate")}
           />,
@@ -317,6 +323,7 @@ export function InquiryForm({
           <Input
             id="inquiry-name"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.name != null}
             {...form.register("name")}
           />,

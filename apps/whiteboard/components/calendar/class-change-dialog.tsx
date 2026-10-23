@@ -178,9 +178,12 @@ function MoveForm({
       </p>
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5 sm:col-span-3">
-          <Label htmlFor="move-date">New date</Label>
+          <Label htmlFor="move-date" required>
+            New date
+          </Label>
           <Input
             id="move-date"
+            aria-required
             type="date"
             min={minDate}
             aria-invalid={errors.date != null}
@@ -193,18 +196,24 @@ function MoveForm({
           )}
         </div>
         <div className="space-y-1.5 sm:col-span-1">
-          <Label htmlFor="move-start">Start</Label>
+          <Label htmlFor="move-start" required>
+            Start
+          </Label>
           <Input
             id="move-start"
+            aria-required
             type="time"
             aria-invalid={errors.startTime != null}
             {...register("startTime")}
           />
         </div>
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="move-end">End</Label>
+          <Label htmlFor="move-end" required>
+            End
+          </Label>
           <Input
             id="move-end"
+            aria-required
             type="time"
             aria-invalid={errors.endTime != null}
             {...register("endTime")}

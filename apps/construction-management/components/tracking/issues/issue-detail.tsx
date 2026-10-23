@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import {
   AlertDialog,
@@ -149,6 +149,9 @@ function ProgressComposer({ issue }: { issue: Issue }) {
     defaultValues: { body: "", photos: [] },
   });
   const errors = form.formState.errors;
+  // An update needs a comment unless it has images.
+  const photos = useWatch({ control: form.control, name: "photos" });
+  const bodyRequired = photos.length === 0;
   const submit = form.handleSubmit(async (values) => {
     setError(undefined);
     const body = values.body.trim();
@@ -176,10 +179,13 @@ function ProgressComposer({ issue }: { issue: Issue }) {
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="issue-update-body">Add Update</Label>
+        <Label htmlFor="issue-update-body" required={bodyRequired}>
+          Add Update
+        </Label>
         <Textarea
           id="issue-update-body"
           rows={2}
+          aria-required={bodyRequired}
           placeholder="What was done, or what is still needed"
           aria-invalid={errors.body != null}
           {...form.register("body")}

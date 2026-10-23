@@ -218,7 +218,9 @@ export function BranchDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             {site ? (
               <div className="space-y-1.5">
-                <Label htmlFor="branch-project">Project</Label>
+                <Label htmlFor="branch-project" required>
+                  Project
+                </Label>
                 <Controller
                   name="projectId"
                   control={form.control}
@@ -232,6 +234,7 @@ export function BranchDialog({
                     >
                       <SelectTrigger
                         id="branch-project"
+                        aria-required
                         size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.projectId != null}
@@ -261,11 +264,12 @@ export function BranchDialog({
               </div>
             ) : null}
             <div className="space-y-1.5">
-              <Label htmlFor="branch-name">
+              <Label htmlFor="branch-name" required>
                 {site ? "Site label" : "Branch name"}
               </Label>
               <Input
                 id="branch-name"
+                aria-required
                 className="h-10"
                 autoComplete="off"
                 placeholder={site ? "Main gate" : "Chennai Head Office"}

@@ -167,11 +167,14 @@ export function CreateMaterialDialog({
           </DialogHeader>
 
           <div className="space-y-1.5">
-            <Label htmlFor={`${baseId}-name`}>Material name</Label>
+            <Label htmlFor={`${baseId}-name`} required>
+              Material name
+            </Label>
             <Input
               id={`${baseId}-name`}
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder="Fly Ash Bricks"
               aria-invalid={errors.name != null}
               {...form.register("name")}
@@ -181,7 +184,9 @@ export function CreateMaterialDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor={`${baseId}-unit`}>Measurement Unit</Label>
+              <Label htmlFor={`${baseId}-unit`} required>
+                Measurement Unit
+              </Label>
               <Controller
                 name="uomId"
                 control={form.control}
@@ -199,6 +204,7 @@ export function CreateMaterialDialog({
                       ref={field.ref}
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={errors.uomId != null}
                     >
                       <SelectValue

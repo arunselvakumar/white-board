@@ -139,7 +139,9 @@ function CreateForm({
     >
       <div className="grid min-h-0 gap-4 overflow-y-auto sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="progress-report-type">Report type</Label>
+          <Label htmlFor="progress-report-type" required>
+            Report type
+          </Label>
           <Controller
             name="type"
             control={form.control}
@@ -158,6 +160,7 @@ function CreateForm({
                 <SelectTrigger
                   id="progress-report-type"
                   className="w-full min-w-0"
+                  aria-required
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -185,22 +188,28 @@ function CreateForm({
         {type === "task_progress_report" ? (
           <>
             <div className="space-y-1.5">
-              <Label htmlFor="progress-report-from">From</Label>
+              <Label htmlFor="progress-report-from" required>
+                From
+              </Label>
               <Input
                 id="progress-report-from"
                 type="date"
                 max={options.today}
+                aria-required
                 aria-invalid={errors.from != null}
                 {...form.register("from")}
               />
               <FieldError message={errors.from?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="progress-report-to">To</Label>
+              <Label htmlFor="progress-report-to" required>
+                To
+              </Label>
               <Input
                 id="progress-report-to"
                 type="date"
                 max={options.today}
+                aria-required
                 aria-invalid={errors.to != null}
                 {...form.register("to")}
               />
@@ -215,11 +224,14 @@ function CreateForm({
         ) : (
           <>
             <div className="space-y-1.5">
-              <Label htmlFor="progress-report-date">Date</Label>
+              <Label htmlFor="progress-report-date" required>
+                Date
+              </Label>
               <Input
                 id="progress-report-date"
                 type="date"
                 max={options.today}
+                aria-required
                 aria-invalid={errors.date != null}
                 {...form.register("date")}
               />

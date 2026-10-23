@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -201,7 +201,9 @@ export function InquiryFollowUpDialog({
           </DialogHeader>
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="follow-up-activity">Activity</Label>
+              <Label htmlFor="follow-up-activity" required>
+                Activity
+              </Label>
               <Controller
                 control={form.control}
                 name="activity"
@@ -223,18 +225,21 @@ export function InquiryFollowUpDialog({
             <fieldset className="min-w-0 space-y-1.5 sm:col-span-2">
               <legend className="text-sm leading-none font-medium">
                 Done on
+                <RequiredIndicator />
               </legend>
               <div className="mt-1.5 grid grid-cols-[1fr_7rem] gap-2">
                 <Input
                   type="date"
                   aria-label="Done on date"
                   max={nowLocal(now).date}
+                  aria-required
                   aria-invalid={errors.doneOnDate != null}
                   {...form.register("doneOnDate")}
                 />
                 <Input
                   type="time"
                   aria-label="Done on time"
+                  aria-required
                   aria-invalid={errors.doneOnTime != null}
                   {...form.register("doneOnTime")}
                 />

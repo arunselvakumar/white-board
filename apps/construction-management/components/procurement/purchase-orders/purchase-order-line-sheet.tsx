@@ -124,7 +124,9 @@ export function PurchaseOrderLineSheet({
         </SheetHeader>
         <div className="space-y-4 px-4">
           <div className="space-y-1.5">
-            <Label htmlFor="po-line-material">Material</Label>
+            <Label htmlFor="po-line-material" required>
+              Material
+            </Label>
             <MaterialPicker
               id="po-line-material"
               value={value.materialId === "" ? null : value.materialId}
@@ -159,13 +161,14 @@ export function PurchaseOrderLineSheet({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="po-line-qty">
+              <Label htmlFor="po-line-qty" required>
                 Quantity{value.uomName === "" ? "" : ` (${value.uomName})`}
               </Label>
               <Input
                 id="po-line-qty"
                 inputMode="decimal"
                 value={value.quantity}
+                aria-required
                 aria-invalid={errors.quantity != null}
                 onChange={(event) => {
                   set({ quantity: event.target.value });
@@ -174,10 +177,13 @@ export function PurchaseOrderLineSheet({
               <FieldError message={errors.quantity} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="po-line-rate">Unit Rate (₹)</Label>
+              <Label htmlFor="po-line-rate" required>
+                Unit Rate (₹)
+              </Label>
               <Input
                 id="po-line-rate"
                 inputMode="decimal"
+                aria-required
                 value={value.rate}
                 aria-invalid={errors.rate != null}
                 onChange={(event) => {
@@ -188,7 +194,12 @@ export function PurchaseOrderLineSheet({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="po-line-discount">Discount</Label>
+            <Label
+              htmlFor="po-line-discount"
+              required={value.discountType !== "none"}
+            >
+              Discount
+            </Label>
             <div className="flex gap-2">
               <ToggleGroup
                 aria-label="Discount type"
@@ -214,6 +225,7 @@ export function PurchaseOrderLineSheet({
                 className="min-w-0 flex-1"
                 disabled={value.discountType === "none"}
                 value={value.discountValue}
+                aria-required={value.discountType !== "none"}
                 aria-invalid={errors.discountValue != null}
                 onChange={(event) => {
                   set({ discountValue: event.target.value });

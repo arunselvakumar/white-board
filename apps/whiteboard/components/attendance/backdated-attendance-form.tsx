@@ -49,9 +49,12 @@ export function BackdatedAttendanceForm({
       </p>
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
-          <Label htmlFor="earlier-attendance-date">Earlier date</Label>
+          <Label htmlFor="earlier-attendance-date" required>
+            Earlier date
+          </Label>
           <Input
             id="earlier-attendance-date"
+            aria-required
             type="date"
             {...register("date")}
           />

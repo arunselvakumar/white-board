@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -192,9 +192,12 @@ function StructureForm({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="leave-structure-name">Name</Label>
+        <Label htmlFor="leave-structure-name" required>
+          Name
+        </Label>
         <Input
           id="leave-structure-name"
+          aria-required
           className="h-10"
           aria-invalid={errors.name != null}
           {...form.register("name")}
@@ -211,7 +214,10 @@ function StructureForm({
         <FieldError message={errors.description?.message} />
       </div>
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Leave types</legend>
+        <legend className="text-sm font-medium">
+          Leave types
+          <RequiredIndicator />
+        </legend>
         <ul className="divide-y rounded-lg border">
           {types.map((type, index) => {
             const included = lines[index]?.included === true;

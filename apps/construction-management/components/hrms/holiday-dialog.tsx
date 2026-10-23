@@ -156,9 +156,12 @@ export function HolidayDialog({
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="holiday-name">Holiday name</Label>
+              <Label htmlFor="holiday-name" required>
+                Holiday name
+              </Label>
               <Input
                 id="holiday-name"
+                aria-required
                 className="h-10"
                 autoComplete="off"
                 placeholder="Pongal"
@@ -168,9 +171,12 @@ export function HolidayDialog({
               <FieldError message={errors.name?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="holiday-date">Date</Label>
+              <Label htmlFor="holiday-date" required>
+                Date
+              </Label>
               <Input
                 id="holiday-date"
+                aria-required
                 type="date"
                 className="h-10"
                 aria-invalid={errors.date != null}
@@ -179,7 +185,9 @@ export function HolidayDialog({
               <FieldError message={errors.date?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="holiday-type">Holiday type</Label>
+              <Label htmlFor="holiday-type" required>
+                Holiday type
+              </Label>
               <Controller
                 name="type"
                 control={form.control}
@@ -193,6 +201,7 @@ export function HolidayDialog({
                   >
                     <SelectTrigger
                       id="holiday-type"
+                      aria-required
                       size="lg"
                       className="w-full min-w-0"
                       aria-invalid={errors.type != null}

@@ -156,11 +156,12 @@ export function ReportSettingsContent({
             <legend className="font-semibold">Low attendance</legend>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor="thresholdPercent">
+                <Label htmlFor="thresholdPercent" required>
                   Attendance threshold (%)
                 </Label>
                 <Input
                   id="thresholdPercent"
+                  aria-required
                   inputMode="numeric"
                   className="h-10"
                   aria-invalid={errors.thresholdPercent != null}
@@ -176,9 +177,12 @@ export function ReportSettingsContent({
                 <FieldError message={errors.thresholdPercent?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="absentInARow">Absent in a row</Label>
+                <Label htmlFor="absentInARow" required>
+                  Absent in a row
+                </Label>
                 <Input
                   id="absentInARow"
+                  aria-required
                   inputMode="numeric"
                   className="h-10"
                   aria-invalid={errors.absentInARow != null}
@@ -194,9 +198,12 @@ export function ReportSettingsContent({
                 <FieldError message={errors.absentInARow?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="minimumClasses">Minimum Classes</Label>
+                <Label htmlFor="minimumClasses" required>
+                  Minimum Classes
+                </Label>
                 <Input
                   id="minimumClasses"
+                  aria-required
                   inputMode="numeric"
                   className="h-10"
                   aria-invalid={errors.minimumClasses != null}
@@ -218,7 +225,9 @@ export function ReportSettingsContent({
             <legend className="font-semibold">Academic year</legend>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor="academicYearStartMonth">Starts in</Label>
+                <Label htmlFor="academicYearStartMonth" required>
+                  Starts in
+                </Label>
                 <Controller
                   name="academicYearStartMonth"
                   control={control}
@@ -234,6 +243,7 @@ export function ReportSettingsContent({
                     >
                       <SelectTrigger
                         id="academicYearStartMonth"
+                        aria-required
                         size="lg"
                         className="w-full min-w-0"
                         aria-describedby="academicYearStartMonth-hint"

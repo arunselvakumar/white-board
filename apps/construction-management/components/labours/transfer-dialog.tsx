@@ -142,7 +142,9 @@ export function TransferDialog({
           }}
         >
           <div className="space-y-1.5">
-            <Label htmlFor="transfer-project">To Project</Label>
+            <Label htmlFor="transfer-project" required>
+              To Project
+            </Label>
             <Select
               items={choices}
               value={projectId}
@@ -154,6 +156,7 @@ export function TransferDialog({
                 id="transfer-project"
                 size="lg"
                 className="w-full min-w-0"
+                aria-required
                 aria-invalid={problem?.field === "project"}
               >
                 <SelectValue
@@ -183,12 +186,15 @@ export function TransferDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="transfer-date">Transfer date</Label>
+            <Label htmlFor="transfer-date" required>
+              Transfer date
+            </Label>
             <Input
               id="transfer-date"
               type="date"
               className="h-10"
               value={date}
+              aria-required
               aria-invalid={problem?.field === "date"}
               onChange={(event) => {
                 setDate(event.target.value);

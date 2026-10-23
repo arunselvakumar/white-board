@@ -98,11 +98,14 @@ function AlbumForm({
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-1.5">
-        <Label htmlFor="album-name">Album name</Label>
+        <Label htmlFor="album-name" required>
+          Album name
+        </Label>
         <Input
           id="album-name"
           className="h-10"
           autoComplete="off"
+          aria-required
           aria-invalid={errors.name != null}
           {...form.register("name")}
         />

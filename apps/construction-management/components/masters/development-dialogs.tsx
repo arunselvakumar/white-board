@@ -154,11 +154,14 @@ export function DevelopmentNameDialog({
             <DialogDescription>{config.dialogDescription}</DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId}>{config.singular} name</Label>
+            <Label htmlFor={fieldId} required>
+              {config.singular} name
+            </Label>
             <Input
               id={fieldId}
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder={config.placeholder}
               aria-invalid={errors.name != null}
               {...form.register("name")}

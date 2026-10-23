@@ -284,7 +284,9 @@ function InvitationSignIn({
       >
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="invite-password">Password</Label>
+            <Label htmlFor="invite-password" required>
+              Password
+            </Label>
             <Link
               href="/forgot-password"
               className="text-primary text-xs hover:underline"
@@ -294,6 +296,7 @@ function InvitationSignIn({
           </div>
           <PasswordField
             id="invite-password"
+            aria-required
             autoComplete="current-password"
             // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
             autoFocus
@@ -356,9 +359,12 @@ function InvitationSignUp({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="invite-username">Username</Label>
+        <Label htmlFor="invite-username" required>
+          Username
+        </Label>
         <Input
           id="invite-username"
+          aria-required
           autoComplete="username"
           // eslint-disable-next-line jsx-a11y/no-autofocus -- Creating the account is this page's only task, so focus starts in its first field.
           autoFocus
@@ -373,9 +379,12 @@ function InvitationSignUp({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="invite-password">Password</Label>
+        <Label htmlFor="invite-password" required>
+          Password
+        </Label>
         <PasswordField
           id="invite-password"
+          aria-required
           autoComplete="new-password"
           {...form.register("password")}
         />

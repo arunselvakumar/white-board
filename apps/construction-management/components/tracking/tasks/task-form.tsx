@@ -274,6 +274,13 @@ export function TaskForm({
     control: form.control,
     name: "siteLocation",
   });
+  const [totalWorkQty, totalWorkUnitId] = useWatch({
+    control: form.control,
+    name: ["totalWorkQty", "totalWorkUnitId"],
+  });
+  // Total work and its unit go together: either one needs the other.
+  const workRequired = totalWorkUnitId !== "";
+  const unitRequired = totalWorkQty.trim() !== "";
   const financial = canInTracking(access, "tracking.tasks", "financial");
   const canCreateTags = canInTracking(access, "masters.tags", "create");
   const summary = task?.isSummary === true;
@@ -392,10 +399,13 @@ export function TaskForm({
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="task-name">Task name</Label>
+          <Label htmlFor="task-name" required>
+            Task name
+          </Label>
           <Input
             id="task-name"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.name != null}
             {...form.register("name")}
           />
@@ -586,6 +596,7 @@ export function TaskForm({
                     <LocationPicker
                       projectId={projectId}
                       label={`Other location ${String(index + 1)}`}
+                      required
                       value={field.value}
                       onChange={field.onChange}
                       invalid={errors.extraLocations?.[index]?.ref != null}
@@ -638,11 +649,14 @@ export function TaskForm({
           <legend className="text-sm font-semibold">Work and price</legend>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">
-              <Label htmlFor="task-work">Total work</Label>
+              <Label htmlFor="task-work" required={workRequired}>
+                Total work
+              </Label>
               <Input
                 id="task-work"
                 inputMode="decimal"
                 autoComplete="off"
+                aria-required={workRequired}
                 aria-invalid={errors.totalWorkQty != null}
                 aria-describedby="task-work-hint"
                 {...form.register("totalWorkQty")}
@@ -653,7 +667,9 @@ export function TaskForm({
               <FieldError message={errors.totalWorkQty?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="task-unit">Unit</Label>
+              <Label htmlFor="task-unit" required={unitRequired}>
+                Unit
+              </Label>
               <Controller
                 control={form.control}
                 name="totalWorkUnitId"

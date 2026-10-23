@@ -488,7 +488,9 @@ export function ReportCard({
           {definition.period === "range" ? (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-from`}>From</Label>
+                <Label htmlFor={`${id}-from`} required>
+                  From
+                </Label>
                 <Input
                   id={`${id}-from`}
                   type="date"
@@ -502,7 +504,9 @@ export function ReportCard({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-to`}>To</Label>
+                <Label htmlFor={`${id}-to`} required>
+                  To
+                </Label>
                 <Input
                   id={`${id}-to`}
                   type="date"
@@ -523,7 +527,9 @@ export function ReportCard({
             </div>
           ) : definition.period === "as_on" ? (
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-as-on`}>As on</Label>
+              <Label htmlFor={`${id}-as-on`} required>
+                As on
+              </Label>
               <Input
                 id={`${id}-as-on`}
                 type="date"
@@ -537,7 +543,9 @@ export function ReportCard({
             </div>
           ) : definition.period === "fy" ? (
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-fy`}>Financial year</Label>
+              <Label htmlFor={`${id}-fy`} required>
+                Financial year
+              </Label>
               <Select
                 items={years.map((year) => ({ value: year, label: year }))}
                 value={fy}
@@ -545,7 +553,11 @@ export function ReportCard({
                   if (next != null) setFy(next);
                 }}
               >
-                <SelectTrigger id={`${id}-fy`} className="h-10 w-full sm:w-48">
+                <SelectTrigger
+                  id={`${id}-fy`}
+                  className="h-10 w-full sm:w-48"
+                  aria-required
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>
@@ -559,7 +571,9 @@ export function ReportCard({
             </div>
           ) : (
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-month`}>Month</Label>
+              <Label htmlFor={`${id}-month`} required>
+                Month
+              </Label>
               <Input
                 id={`${id}-month`}
                 type="month"
@@ -575,7 +589,7 @@ export function ReportCard({
 
           {filterItems == null || picker == null ? null : (
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-filter`}>
+              <Label htmlFor={`${id}-filter`} required={required}>
                 {FILTER_LABELS[picker.key]}
               </Label>
               <Select
@@ -585,7 +599,11 @@ export function ReportCard({
                   if (next != null) setFilter(next);
                 }}
               >
-                <SelectTrigger id={`${id}-filter`} className="h-10 w-full">
+                <SelectTrigger
+                  id={`${id}-filter`}
+                  className="h-10 w-full"
+                  aria-required={required}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>

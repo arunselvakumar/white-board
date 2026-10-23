@@ -147,11 +147,14 @@ export function StoreForm({ store }: { store?: Store }) {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="store-name">Store name</Label>
+              <Label htmlFor="store-name" required>
+                Store name
+              </Label>
               <Input
                 id="store-name"
                 className="h-10"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.name != null}
                 {...form.register("name")}
               />
@@ -210,7 +213,9 @@ export function StoreForm({ store }: { store?: Store }) {
           <section className="space-y-4">
             <h2 className="font-semibold">Assignments</h2>
             <div className="space-y-1.5">
-              <Label htmlFor="store-projects">Projects</Label>
+              <Label htmlFor="store-projects" required>
+                Projects
+              </Label>
               <Controller
                 name="projectIds"
                 control={form.control}

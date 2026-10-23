@@ -76,6 +76,7 @@ function ChoiceSelect({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required
         aria-invalid={invalid}
       >
         <SelectValue placeholder="Choose" />
@@ -229,6 +230,7 @@ function InitialiseForm({
         render={({ field }) => (
           <RadioGroup
             aria-label="Initialise"
+            aria-required
             value={field.value}
             onValueChange={(value) => {
               field.onChange(value);
@@ -271,7 +273,9 @@ function InitialiseForm({
         </div>
       ) : (
         <div className="space-y-1.5">
-          <Label htmlFor="leave-init-structure-id">Structure</Label>
+          <Label htmlFor="leave-init-structure-id" required>
+            Structure
+          </Label>
           <Controller
             name="structureId"
             control={form.control}
@@ -436,7 +440,9 @@ function AdjustForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="leave-adjust-member">Team Member</Label>
+          <Label htmlFor="leave-adjust-member" required>
+            Team Member
+          </Label>
           <Controller
             name="memberId"
             control={form.control}
@@ -457,7 +463,9 @@ function AdjustForm({
           <FieldError message={errors.memberId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="leave-adjust-type">Leave type</Label>
+          <Label htmlFor="leave-adjust-type" required>
+            Leave type
+          </Label>
           <Controller
             name="leaveTypeId"
             control={form.control}
@@ -479,9 +487,12 @@ function AdjustForm({
         </div>
       </div>
       <div className="space-y-1.5 sm:w-1/2">
-        <Label htmlFor="leave-adjust-days">Days</Label>
+        <Label htmlFor="leave-adjust-days" required>
+          Days
+        </Label>
         <Input
           id="leave-adjust-days"
+          aria-required
           inputMode="decimal"
           className="h-10"
           aria-describedby="leave-adjust-days-hint"
@@ -497,9 +508,12 @@ function AdjustForm({
         <FieldError message={errors.days?.message} />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="leave-adjust-reason">Reason</Label>
+        <Label htmlFor="leave-adjust-reason" required>
+          Reason
+        </Label>
         <Textarea
           id="leave-adjust-reason"
+          aria-required
           rows={2}
           placeholder="Worked on Sunday 4 Oct"
           aria-invalid={errors.reason != null}

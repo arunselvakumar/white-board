@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -144,7 +144,9 @@ export function EnrollmentSettingsForm({
     >
       <FormAlert message={errors.root?.message} />
       <div className="space-y-1.5">
-        <Label htmlFor="enrollmentClassMode">Class Mode</Label>
+        <Label htmlFor="enrollmentClassMode" required>
+          Class Mode
+        </Label>
         <Controller
           name="classModeOverride"
           control={control}
@@ -159,6 +161,7 @@ export function EnrollmentSettingsForm({
             >
               <SelectTrigger
                 id="enrollmentClassMode"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
               >
@@ -176,7 +179,9 @@ export function EnrollmentSettingsForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="enrollmentTimingSource">Timings</Label>
+        <Label htmlFor="enrollmentTimingSource" required>
+          Timings
+        </Label>
         <Controller
           name="timingSource"
           control={control}
@@ -191,6 +196,7 @@ export function EnrollmentSettingsForm({
             >
               <SelectTrigger
                 id="enrollmentTimingSource"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
               >
@@ -211,7 +217,10 @@ export function EnrollmentSettingsForm({
         ? timings.fields.map((field, index) => (
             <div key={field.id} className="space-y-3 rounded-lg border p-3">
               <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Days of week</legend>
+                <legend className="text-sm font-medium">
+                  Days of week
+                  <RequiredIndicator />
+                </legend>
                 <Controller
                   name={`timings.${index}.daysOfWeek`}
                   control={control}
@@ -256,20 +265,24 @@ export function EnrollmentSettingsForm({
               </fieldset>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor={`edit-timings.${index}.startTime`}>
+                  <Label htmlFor={`edit-timings.${index}.startTime`} required>
                     Start
                   </Label>
                   <Input
                     id={`edit-timings.${index}.startTime`}
+                    aria-required
                     type="time"
                     className="h-10"
                     {...register(`timings.${index}.startTime`)}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor={`edit-timings.${index}.endTime`}>End</Label>
+                  <Label htmlFor={`edit-timings.${index}.endTime`} required>
+                    End
+                  </Label>
                   <Input
                     id={`edit-timings.${index}.endTime`}
+                    aria-required
                     type="time"
                     className="h-10"
                     {...register(`timings.${index}.endTime`)}

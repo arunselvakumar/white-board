@@ -7,7 +7,7 @@ import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
 import { FieldTitle } from "@repo/ui/components/field";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -206,7 +206,9 @@ export function BatchForm({
       <div className="space-y-4">
         {lockCourse ? null : (
           <div className="space-y-1.5">
-            <Label htmlFor="courseId">Course</Label>
+            <Label htmlFor="courseId" required>
+              Course
+            </Label>
             <Controller
               name="courseId"
               control={control}
@@ -221,6 +223,7 @@ export function BatchForm({
                 >
                   <SelectTrigger
                     id="courseId"
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                   >
@@ -240,9 +243,12 @@ export function BatchForm({
           </div>
         )}
         <div className="space-y-1.5">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name" required>
+            Name
+          </Label>
           <Input
             id="name"
+            aria-required
             className="h-10"
             autoComplete="off"
             {...register("name")}
@@ -252,7 +258,9 @@ export function BatchForm({
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="classMode">Class Mode</Label>
+          <Label htmlFor="classMode" required>
+            Class Mode
+          </Label>
           <Controller
             name="classMode"
             control={control}
@@ -267,6 +275,7 @@ export function BatchForm({
               >
                 <SelectTrigger
                   id="classMode"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                 >
@@ -285,9 +294,12 @@ export function BatchForm({
           <FieldError message={errors.classMode?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="capacity">Capacity</Label>
+          <Label htmlFor="capacity" required>
+            Capacity
+          </Label>
           <Input
             id="capacity"
+            aria-required
             className="h-10"
             inputMode="numeric"
             autoComplete="off"
@@ -309,7 +321,9 @@ export function BatchForm({
         </div>
         {classMode !== "offline" && (
           <div className="space-y-1.5">
-            <Label htmlFor="meetingOption">Online meeting</Label>
+            <Label htmlFor="meetingOption" required>
+              Online meeting
+            </Label>
             <Controller
               name="meetingOption"
               control={control}
@@ -326,6 +340,7 @@ export function BatchForm({
                 >
                   <SelectTrigger
                     id="meetingOption"
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                   >
@@ -357,11 +372,15 @@ export function BatchForm({
       <div role="group" aria-labelledby="batch-timings" className="space-y-3">
         <FieldTitle id="batch-timings" className="leading-none">
           Timings
+          <RequiredIndicator className="-ms-1" />
         </FieldTitle>
         {timings.fields.map((field, index) => (
           <div key={field.id} className="space-y-3 rounded-lg border p-3">
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium">Days of week</legend>
+              <legend className="text-sm font-medium">
+                Days of week
+                <RequiredIndicator />
+              </legend>
               <Controller
                 name={`timings.${index}.daysOfWeek`}
                 control={control}
@@ -407,9 +426,12 @@ export function BatchForm({
             </fieldset>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor={`timings.${index}.startTime`}>Start</Label>
+                <Label htmlFor={`timings.${index}.startTime`} required>
+                  Start
+                </Label>
                 <Input
                   id={`timings.${index}.startTime`}
+                  aria-required
                   type="time"
                   className="h-10"
                   {...register(`timings.${index}.startTime`)}
@@ -419,9 +441,12 @@ export function BatchForm({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`timings.${index}.endTime`}>End</Label>
+                <Label htmlFor={`timings.${index}.endTime`} required>
+                  End
+                </Label>
                 <Input
                   id={`timings.${index}.endTime`}
+                  aria-required
                   type="time"
                   className="h-10"
                   {...register(`timings.${index}.endTime`)}

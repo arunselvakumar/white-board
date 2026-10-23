@@ -150,7 +150,7 @@ export function ImportInventoryDialog({
             {file == null ? "Upload filled sheet" : "Upload another sheet"}
           </Button>
           <div className="space-y-1">
-            <Label htmlFor="import-opening-date" className="text-xs">
+            <Label htmlFor="import-opening-date" className="text-xs" required>
               Opening stock date
             </Label>
             <Input
@@ -158,6 +158,7 @@ export function ImportInventoryDialog({
               type="date"
               className="h-8 w-40"
               max={localToday()}
+              aria-required
               value={openingDate}
               onChange={(event) => {
                 setOpeningDate(event.target.value);

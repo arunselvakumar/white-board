@@ -58,9 +58,12 @@ export function EmailCodeForm({
       noValidate
     >
       <div className="space-y-1.5">
-        <Label htmlFor="code">Verification code</Label>
+        <Label htmlFor="code" required>
+          Verification code
+        </Label>
         <Input
           id="code"
+          aria-required
           inputMode="numeric"
           autoComplete="one-time-code"
           // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.

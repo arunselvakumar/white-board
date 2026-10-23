@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -202,11 +202,14 @@ export function TransferDialog({
           <div className="min-h-0 space-y-4 overflow-y-auto px-0.5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-date`}>Date</Label>
+                <Label htmlFor={`${id}-date`} required>
+                  Date
+                </Label>
                 <Input
                   id={`${id}-date`}
                   type="date"
                   className="h-10"
+                  aria-required
                   aria-invalid={errors.transferDate != null}
                   {...form.register("transferDate")}
                 />
@@ -215,6 +218,7 @@ export function TransferDialog({
               <div className="space-y-1.5">
                 <span id={`${id}-mode`} className="text-sm font-medium">
                   Mode
+                  <RequiredIndicator />
                 </span>
                 <Controller
                   control={form.control}
@@ -233,7 +237,9 @@ export function TransferDialog({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor={`${id}-from`}>From account</Label>
+                <Label htmlFor={`${id}-from`} required>
+                  From account
+                </Label>
                 <Controller
                   control={form.control}
                   name="fromAccountId"
@@ -250,7 +256,9 @@ export function TransferDialog({
                 <FieldError message={errors.fromAccountId?.message} />
               </div>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor={`${id}-to`}>To account</Label>
+                <Label htmlFor={`${id}-to`} required>
+                  To account
+                </Label>
                 <Controller
                   control={form.control}
                   name="toAccountId"
@@ -270,13 +278,14 @@ export function TransferDialog({
             <div className="grid gap-4 sm:grid-cols-2">
               {mode !== "cash" ? (
                 <div className="space-y-1.5">
-                  <Label htmlFor={`${id}-reference`}>
+                  <Label htmlFor={`${id}-reference`} required>
                     {mode === "cheque" ? "Cheque number" : "Reference"}
                   </Label>
                   <Input
                     id={`${id}-reference`}
                     className="h-10"
                     autoComplete="off"
+                    aria-required
                     aria-invalid={errors.reference != null}
                     {...form.register("reference")}
                   />
@@ -284,10 +293,13 @@ export function TransferDialog({
                 </div>
               ) : null}
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-amount`}>Amount</Label>
+                <Label htmlFor={`${id}-amount`} required>
+                  Amount
+                </Label>
                 <MoneyInput
                   id={`${id}-amount`}
                   className="h-10"
+                  aria-required
                   aria-invalid={errors.amount != null}
                   {...form.register("amount")}
                 />

@@ -355,7 +355,9 @@ export function PurchaseRequestWizard({
       {step === 0 && (
         <section aria-label="Materials" className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="pr-material-picker">Add a material</Label>
+            <Label htmlFor="pr-material-picker" required>
+              Add a material
+            </Label>
             <MaterialPicker
               id="pr-material-picker"
               aria-label="Add a material"
@@ -461,6 +463,7 @@ export function PurchaseRequestWizard({
                       <Label
                         htmlFor={`pr-qty-${String(index)}`}
                         className="text-xs"
+                        required
                       >
                         Quantity ({field.uomName})
                       </Label>
@@ -468,6 +471,7 @@ export function PurchaseRequestWizard({
                         id={`pr-qty-${String(index)}`}
                         inputMode="decimal"
                         aria-label={`Quantity of ${field.materialName}`}
+                        aria-required
                         aria-invalid={quantityError != null}
                         {...form.register(`items.${index}.quantity`)}
                       />
@@ -531,11 +535,14 @@ export function PurchaseRequestWizard({
       {step === 2 && (
         <section aria-label="Details" className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="pr-request-date">Purchase Request Date</Label>
+            <Label htmlFor="pr-request-date" required>
+              Purchase Request Date
+            </Label>
             <Input
               id="pr-request-date"
               type="date"
               max={today}
+              aria-required
               aria-invalid={errors.requestDate != null}
               {...form.register("requestDate")}
             />

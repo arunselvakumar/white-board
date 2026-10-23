@@ -108,12 +108,15 @@ export function PaymentCategoryDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-name`}>Name</Label>
+            <Label htmlFor={`${id}-name`} required>
+              Name
+            </Label>
             <Input
               id={`${id}-name`}
               className="h-10"
               autoComplete="off"
               placeholder="Diesel"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

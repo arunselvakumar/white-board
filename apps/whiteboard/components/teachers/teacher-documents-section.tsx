@@ -94,7 +94,9 @@ export function TeacherDocumentsSection({
       {!disabled && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="space-y-1.5 sm:w-64">
-            <Label htmlFor="teacher-document-kind">Document type</Label>
+            <Label htmlFor="teacher-document-kind" required>
+              Document type
+            </Label>
             <Controller
               name="kind"
               control={control}
@@ -106,7 +108,11 @@ export function TeacherDocumentsSection({
                     field.onChange(value ?? "certificate");
                   }}
                 >
-                  <SelectTrigger id="teacher-document-kind" className="w-full">
+                  <SelectTrigger
+                    id="teacher-document-kind"
+                    aria-required
+                    className="w-full"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent align="start" alignItemWithTrigger={false}>

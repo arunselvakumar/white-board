@@ -96,6 +96,7 @@ export function BackdatedModuleDialog({
             render={({ field }) => (
               <RadioGroup
                 aria-label="Limits for this module"
+                aria-required
                 value={field.value}
                 onValueChange={(value) => {
                   field.onChange(value);

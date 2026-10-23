@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -351,9 +351,12 @@ function TestForm({
       })}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="test-name">Test name</Label>
+        <Label htmlFor="test-name" required>
+          Test name
+        </Label>
         <Input
           id="test-name"
+          aria-required
           className="h-10"
           maxLength={TEST_NAME_MAX}
           placeholder="e.g. Unit test 1: Excel formulas"
@@ -364,9 +367,12 @@ function TestForm({
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="test-date">Date</Label>
+          <Label htmlFor="test-date" required>
+            Date
+          </Label>
           <Input
             id="test-date"
+            aria-required
             type="date"
             className="h-10"
             min={firstDate}
@@ -385,9 +391,12 @@ function TestForm({
           <FieldError message={errors.heldOn?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="test-max-marks">Maximum marks</Label>
+          <Label htmlFor="test-max-marks" required>
+            Maximum marks
+          </Label>
           <Input
             id="test-max-marks"
+            aria-required
             inputMode="numeric"
             className="h-10"
             placeholder="e.g. 50"
@@ -432,7 +441,10 @@ function TestForm({
       </div>
       {creating ? (
         <fieldset className="space-y-2">
-          <legend className="mb-1.5 text-sm font-medium">Who takes it</legend>
+          <legend className="mb-1.5 text-sm font-medium">
+            Who takes it
+            <RequiredIndicator />
+          </legend>
           <Controller
             name="scope"
             control={control}
@@ -443,6 +455,7 @@ function TestForm({
                 onValueChange={(value) => {
                   if (isScope(value)) field.onChange(value);
                 }}
+                aria-required
                 className="grid gap-2 sm:grid-cols-2"
               >
                 <ScopeChoice
@@ -462,7 +475,9 @@ function TestForm({
           />
           {scope === "student" ? (
             <div className="space-y-1.5 pt-2">
-              <Label htmlFor="test-student">Student</Label>
+              <Label htmlFor="test-student" required>
+                Student
+              </Label>
               {available.length === 0 ? (
                 <p
                   id="test-student"
@@ -484,6 +499,7 @@ function TestForm({
                     >
                       <SelectTrigger
                         id="test-student"
+                        aria-required
                         size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.studentId != null}

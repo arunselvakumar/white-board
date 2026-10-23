@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -286,9 +286,12 @@ function LeaveTypeForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="leave-type-name">Name</Label>
+          <Label htmlFor="leave-type-name" required>
+            Name
+          </Label>
           <Input
             id="leave-type-name"
+            aria-required
             className="h-10"
             aria-invalid={errors.name != null}
             {...form.register("name")}
@@ -296,9 +299,12 @@ function LeaveTypeForm({
           <FieldError message={errors.name?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="leave-type-limit">Days a year</Label>
+          <Label htmlFor="leave-type-limit" required>
+            Days a year
+          </Label>
           <Input
             id="leave-type-limit"
+            aria-required
             inputMode="decimal"
             className="h-10"
             aria-describedby="leave-type-limit-hint"
@@ -358,7 +364,9 @@ function LeaveTypeForm({
         />
         {requiresApproval ? (
           <div className="space-y-1.5 sm:w-1/2">
-            <Label htmlFor="leave-type-levels">Approval levels</Label>
+            <Label htmlFor="leave-type-levels" required>
+              Approval levels
+            </Label>
             <Controller
               name="approvalLevels"
               control={form.control}
@@ -372,6 +380,7 @@ function LeaveTypeForm({
                 >
                   <SelectTrigger
                     id="leave-type-levels"
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                   >
@@ -397,13 +406,17 @@ function LeaveTypeForm({
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-medium">How it is credited</legend>
+        <legend className="text-sm font-medium">
+          How it is credited
+          <RequiredIndicator />
+        </legend>
         <Controller
           name="accrualMode"
           control={form.control}
           render={({ field }) => (
             <RadioGroup
               aria-label="How it is credited"
+              aria-required
               value={field.value}
               onValueChange={(value) => {
                 field.onChange(value);
@@ -440,11 +453,12 @@ function LeaveTypeForm({
         {accrualMode === "periodic" ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="leave-type-credit">
+              <Label htmlFor="leave-type-credit" required>
                 Days credited each month
               </Label>
               <Input
                 id="leave-type-credit"
+                aria-required
                 inputMode="decimal"
                 className="h-10"
                 aria-invalid={errors.creditPerPeriod != null}
@@ -453,7 +467,9 @@ function LeaveTypeForm({
               <FieldError message={errors.creditPerPeriod?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="leave-type-day">Credited on day</Label>
+              <Label htmlFor="leave-type-day" required>
+                Credited on day
+              </Label>
               <Controller
                 name="accrualDay"
                 control={form.control}
@@ -467,6 +483,7 @@ function LeaveTypeForm({
                   >
                     <SelectTrigger
                       id="leave-type-day"
+                      aria-required
                       size="lg"
                       className="w-32"
                       aria-invalid={errors.accrualDay != null}
@@ -509,11 +526,12 @@ function LeaveTypeForm({
         />
         {carryForward ? (
           <div className="space-y-1.5 sm:w-1/2">
-            <Label htmlFor="leave-type-carry-max">
+            <Label htmlFor="leave-type-carry-max" required>
               Most days carried forward
             </Label>
             <Input
               id="leave-type-carry-max"
+              aria-required
               inputMode="decimal"
               className="h-10"
               aria-invalid={errors.maxCarryForward != null}

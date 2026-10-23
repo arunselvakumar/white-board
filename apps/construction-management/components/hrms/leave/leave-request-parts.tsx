@@ -290,9 +290,12 @@ function LeaveOwnActions({
         void submit(event);
       }}
     >
-      <Label htmlFor="leave-cancel-reason">Cancellation reason</Label>
+      <Label htmlFor="leave-cancel-reason" required>
+        Cancellation reason
+      </Label>
       <Textarea
         id="leave-cancel-reason"
+        aria-required
         rows={2}
         aria-invalid={errors.reason != null}
         {...form.register("reason")}
@@ -456,12 +459,13 @@ function DecisionForm({
         </p>
       )}
       <div className="space-y-1.5">
-        <Label htmlFor="leave-decision-note">
+        <Label htmlFor="leave-decision-note" required={text.required}>
           {text.field}
           {text.required ? "" : " (optional)"}
         </Label>
         <Textarea
           id="leave-decision-note"
+          aria-required={text.required}
           rows={3}
           aria-invalid={errors.note != null}
           {...form.register("note")}

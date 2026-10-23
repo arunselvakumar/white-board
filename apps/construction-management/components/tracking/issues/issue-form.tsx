@@ -303,11 +303,14 @@ export function IssueForm({
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="issue-date">Issue Date</Label>
+          <Label htmlFor="issue-date" required>
+            Issue Date
+          </Label>
           <Input
             id="issue-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.issueDate != null}
             {...form.register("issueDate")}
           />
@@ -351,10 +354,13 @@ export function IssueForm({
           <FieldError message={errors.dueDate?.message} />
         </div>
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="issue-details">Details</Label>
+          <Label htmlFor="issue-details" required>
+            Details
+          </Label>
           <Textarea
             id="issue-details"
             rows={3}
+            aria-required
             aria-invalid={errors.details != null}
             {...form.register("details")}
           />

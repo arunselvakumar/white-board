@@ -14,7 +14,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { FieldTitle } from "@repo/ui/components/field";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -67,7 +67,9 @@ function PaidFromField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>Paid from</Label>
+      <Label htmlFor={id} required>
+        Paid from
+      </Label>
       <AccountPicker
         id={id}
         value={value}
@@ -92,6 +94,7 @@ function ModeRadios({
   return (
     <RadioGroup
       aria-label="Paid by"
+      aria-required
       value={value}
       onValueChange={(next) => {
         onChange(next as "cash" | "bank");
@@ -230,7 +233,10 @@ function MarkPaidForm({
       }}
     >
       <div className="space-y-1.5">
-        <FieldTitle className="leading-none">Paid by</FieldTitle>
+        <FieldTitle className="leading-none">
+          Paid by
+          <RequiredIndicator className="-ms-1" />
+        </FieldTitle>
         <Controller
           name="mode"
           control={form.control}
@@ -257,9 +263,12 @@ function MarkPaidForm({
         )}
       />
       <div className="space-y-1.5">
-        <Label htmlFor="salary-paid-date">Paid on</Label>
+        <Label htmlFor="salary-paid-date" required>
+          Paid on
+        </Label>
         <Input
           id="salary-paid-date"
+          aria-required
           type="date"
           max={today}
           aria-invalid={errors.paymentDate != null}
@@ -434,7 +443,9 @@ function AdvanceForm({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="salary-advance-member">Team Member</Label>
+        <Label htmlFor="salary-advance-member" required>
+          Team Member
+        </Label>
         <Controller
           name="memberId"
           control={form.control}
@@ -450,6 +461,7 @@ function AdvanceForm({
                 id="salary-advance-member"
                 size="lg"
                 className="w-full min-w-0"
+                aria-required
                 aria-invalid={errors.memberId != null}
               >
                 <SelectValue placeholder="Choose" />
@@ -472,18 +484,24 @@ function AdvanceForm({
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="salary-advance-amount">Amount</Label>
+          <Label htmlFor="salary-advance-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="salary-advance-amount"
+            aria-required
             aria-invalid={errors.amount != null}
             {...form.register("amount")}
           />
           <FieldError message={errors.amount?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="salary-advance-instalments">Instalments</Label>
+          <Label htmlFor="salary-advance-instalments" required>
+            Instalments
+          </Label>
           <Input
             id="salary-advance-instalments"
+            aria-required
             inputMode="numeric"
             aria-invalid={errors.instalments != null}
             {...form.register("instalments")}
@@ -491,9 +509,12 @@ function AdvanceForm({
           <FieldError message={errors.instalments?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="salary-advance-date">Paid on</Label>
+          <Label htmlFor="salary-advance-date" required>
+            Paid on
+          </Label>
           <Input
             id="salary-advance-date"
+            aria-required
             type="date"
             max={today}
             aria-invalid={errors.advanceDate != null}
@@ -513,7 +534,10 @@ function AdvanceForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <FieldTitle className="leading-none">Paid by</FieldTitle>
+        <FieldTitle className="leading-none">
+          Paid by
+          <RequiredIndicator className="-ms-1" />
+        </FieldTitle>
         <Controller
           name="mode"
           control={form.control}

@@ -143,12 +143,15 @@ export function BookingActionDialog({
         >
           <FormAlert message={error} />
           <div className="space-y-1.5">
-            <Label htmlFor="booking-action-date">{copy.date}</Label>
+            <Label htmlFor="booking-action-date" required>
+              {copy.date}
+            </Label>
             <Input
               id="booking-action-date"
               type="date"
               value={date}
               {...(shown === "extend-hold" ? { min: today } : { max: today })}
+              aria-required
               aria-invalid={problem?.field === "date"}
               onChange={(event) => {
                 setDate(event.target.value);
@@ -160,11 +163,14 @@ export function BookingActionDialog({
           </div>
           {shown === "cancel" && (
             <div className="space-y-1.5">
-              <Label htmlFor="booking-cancel-reason">Reason</Label>
+              <Label htmlFor="booking-cancel-reason" required>
+                Reason
+              </Label>
               <Textarea
                 id="booking-cancel-reason"
                 value={reason}
                 maxLength={SALES_LIMITS.cancelReason}
+                aria-required
                 aria-invalid={problem?.field === "reason"}
                 onChange={(event) => {
                   setReason(event.target.value);

@@ -180,13 +180,14 @@ export function DeleteAccountDialog({
               <FieldError message={errors.reason?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="delete-confirmation">
+              <Label htmlFor="delete-confirmation" required>
                 Type DELETE to confirm
               </Label>
               <Input
                 id="delete-confirmation"
                 autoComplete="off"
                 className="h-10"
+                aria-required
                 aria-invalid={errors.confirmation != null}
                 {...form.register("confirmation")}
               />

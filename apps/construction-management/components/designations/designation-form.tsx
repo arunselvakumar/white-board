@@ -89,11 +89,14 @@ function DesignationForm({
       }}
     >
       <div className="max-w-md space-y-1.5">
-        <Label htmlFor="designation-name">Designation name</Label>
+        <Label htmlFor="designation-name" required>
+          Designation name
+        </Label>
         <Input
           id="designation-name"
           className="h-10"
           autoComplete="off"
+          aria-required
           aria-invalid={errors.name != null}
           {...form.register("name")}
         />

@@ -67,7 +67,9 @@ export function BackdatedLimitFields<Values extends WithLimits>({
         return (
           <div key={action.key} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor={daysId}>{action.daysLabel}</Label>
+              <Label htmlFor={daysId} required>
+                {action.daysLabel}
+              </Label>
               <div className="flex items-center gap-2">
                 <Input
                   id={daysId}
@@ -76,6 +78,7 @@ export function BackdatedLimitFields<Values extends WithLimits>({
                   min={0}
                   max={MAX_BACKDATED_DAYS}
                   className="h-10 w-28"
+                  aria-required
                   {...register(`${action.key}.days` as Path<Values>, {
                     valueAsNumber: true,
                   })}

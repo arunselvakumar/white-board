@@ -115,11 +115,14 @@ function DeliverDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="delivered-on">Delivered On</Label>
+            <Label htmlFor="delivered-on" required>
+              Delivered On
+            </Label>
             <Input
               id="delivered-on"
               type="date"
               className="h-10"
+              aria-required
               min={note.deliveryDate}
               max={today()}
               value={deliveredOn}
