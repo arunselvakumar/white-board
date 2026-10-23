@@ -1,0 +1,19 @@
+apps/construction-management/src/contracts/infrastructure/prisma-escalation-store.ts
+  s_f49615d4431370::t_936c9ed3bdf519 1-731
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "a9180f80409708df2325b18e6ee5cf209ca05d19",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
