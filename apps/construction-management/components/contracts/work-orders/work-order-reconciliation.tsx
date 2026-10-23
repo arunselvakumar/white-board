@@ -15,7 +15,6 @@ import {
 } from "@repo/ui/components/select";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -94,62 +93,60 @@ function MaterialsTable({
 }) {
   return (
     <ScrollTable label="Materials reconciled" className="hidden md:block">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Material</TableHead>
-            <TableHead className="text-right">Theoretical</TableHead>
-            <TableHead className="text-right">Allowed</TableHead>
-            <TableHead className="text-right">Issued</TableHead>
-            <TableHead className="text-right">Excess</TableHead>
-            <TableHead>Under-use</TableHead>
-            <TableHead className="text-right">Penal rate</TableHead>
-            <TableHead className="text-right">Recovery</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {statement.materials.map((row) => {
-            const recovery = recoveryText(row, approved);
-            return (
-              <TableRow key={row.materialId}>
-                <TableCell className="min-w-40">
-                  <p className="font-medium">{row.materialName}</p>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Material</TableHead>
+          <TableHead className="text-right">Theoretical</TableHead>
+          <TableHead className="text-right">Allowed</TableHead>
+          <TableHead className="text-right">Issued</TableHead>
+          <TableHead className="text-right">Excess</TableHead>
+          <TableHead>Under-use</TableHead>
+          <TableHead className="text-right">Penal rate</TableHead>
+          <TableHead className="text-right">Recovery</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {statement.materials.map((row) => {
+          const recovery = recoveryText(row, approved);
+          return (
+            <TableRow key={row.materialId}>
+              <TableCell className="min-w-40">
+                <p className="font-medium">{row.materialName}</p>
+                <p className="text-muted-foreground text-xs">
+                  {row.uomName} · wastage {percentText(row.wastagePercent)}
+                  {row.issueBasis === "at_cost" ? " · at cost" : ""}
+                </p>
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {quantityText(row.theoretical)}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {quantityText(row.allowed)}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {quantityText(row.netIssued)}
+              </TableCell>
+              <TableCell className="text-right font-medium tabular-nums">
+                {quantityText(row.excess)}
+              </TableCell>
+              <TableCell>
+                <UnderUse row={row} />
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {moneyOrDash(row.penalRate)}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                <p className="font-medium">{recovery.text}</p>
+                {recovery.note === "" ? null : (
                   <p className="text-muted-foreground text-xs">
-                    {row.uomName} · wastage {percentText(row.wastagePercent)}
-                    {row.issueBasis === "at_cost" ? " · at cost" : ""}
+                    {recovery.note}
                   </p>
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {quantityText(row.theoretical)}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {quantityText(row.allowed)}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {quantityText(row.netIssued)}
-                </TableCell>
-                <TableCell className="text-right font-medium tabular-nums">
-                  {quantityText(row.excess)}
-                </TableCell>
-                <TableCell>
-                  <UnderUse row={row} />
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {moneyOrDash(row.penalRate)}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  <p className="font-medium">{recovery.text}</p>
-                  {recovery.note === "" ? null : (
-                    <p className="text-muted-foreground text-xs">
-                      {recovery.note}
-                    </p>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                )}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
     </ScrollTable>
   );
 }

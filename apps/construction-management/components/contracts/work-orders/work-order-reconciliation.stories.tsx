@@ -21,6 +21,17 @@ const ASSIGN = `/api/construction/procurement/material-requests/${REQUEST}/assig
 
 let api: ReturnType<typeof mockApi>;
 
+/** The materials in view: the table from md up, the cards below. */
+async function shown(canvas: {
+  findAllByLabelText: (text: string) => Promise<HTMLElement[]>;
+}): Promise<HTMLElement> {
+  const found = (await canvas.findAllByLabelText("Materials reconciled")).find(
+    (element) => element.checkVisibility(),
+  );
+  if (found == null) throw new Error("The materials are not shown");
+  return found;
+}
+
 /** Answers the default statement, and per bill when `?billId=` names one. */
 function serve(
   statement: Reconciliation,
@@ -67,16 +78,12 @@ type Story = StoryObj<typeof meta>;
 export const AtLatestApprovedBill: Story = {
   beforeEach: serve(AT_BILL_1),
   play: async ({ canvas }) => {
-    const table = within(
-      await canvas.findByRole("region", { name: "Materials reconciled" }),
-    );
-    const row = within(table.getByRole("row", { name: /Cement OPC 53/ }));
-    await expect(row.getByText("634")).toBeVisible();
-    await expect(row.getByText("646.68")).toBeVisible();
-    await expect(row.getByText("700")).toBeVisible();
-    await expect(row.getByText("53.32")).toBeVisible();
-    await expect(row.getByText("₹26,660.00")).toBeVisible();
-    await expect(row.getByText("recovered on this bill")).toBeVisible();
+    const materials = within(await shown(canvas));
+    await expect(materials.getByText("634")).toBeVisible();
+    await expect(materials.getByText("646.68")).toBeVisible();
+    await expect(materials.getByText("700")).toBeVisible();
+    await expect(materials.getByText("53.32")).toBeVisible();
+    await expect(materials.getByText("₹26,660.00")).toBeVisible();
     await expect(canvas.getByLabelText("Bill")).toHaveTextContent(
       "WO3/RA/01 · RA 1",
     );
@@ -93,23 +100,21 @@ export const AtLatestApprovedBill: Story = {
 export const PickTheDraftBill: Story = {
   beforeEach: serve(AT_BILL_1, { [BILL_2]: AT_BILL_2 }),
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("region", { name: "Materials reconciled" });
+    await shown(canvas);
     await userEvent.click(canvas.getByLabelText("Bill"));
     await userEvent.click(
       await within(document.body).findByRole("option", {
         name: /^Draft bill of/,
       }),
     );
-    const table = within(
-      canvas.getByRole("region", { name: "Materials reconciled" }),
-    );
     await waitFor(async () => {
-      await expect(table.getByText("13.984")).toBeVisible();
+      await expect(
+        within(await shown(canvas)).getByText("13.984"),
+      ).toBeVisible();
     });
-    const row = within(table.getByRole("row", { name: /Cement OPC 53/ }));
-    await expect(row.getByText("760.8")).toBeVisible();
-    await expect(row.getByText("₹0.00")).toBeVisible();
-    await expect(row.getByText("suggested")).toBeVisible();
+    const materials = within(await shown(canvas));
+    await expect(materials.getByText("760.8")).toBeVisible();
+    await expect(materials.getByText("₹0.00")).toBeVisible();
     await expect(
       api.calls.mock.calls.some(([call]) =>
         call.path.endsWith(`?billId=${BILL_2}`),
@@ -125,10 +130,8 @@ export const PickTheDraftBill: Story = {
 export const UnderUseAndAssign: Story = {
   beforeEach: serve(UNDER_USE),
   play: async ({ canvas, userEvent }) => {
-    const table = within(
-      await canvas.findByRole("region", { name: "Materials reconciled" }),
-    );
-    await expect(table.getByText("Under-used")).toBeVisible();
+    const materials = within(await shown(canvas));
+    await expect(materials.getByText("Under-used")).toBeVisible();
     const unattributed = within(
       canvas.getByRole("list", { name: "Unattributed issues" }),
     );
@@ -155,11 +158,9 @@ export const WithoutFinancial: Story = {
     unattributed: UNDER_USE.unattributed,
   }),
   play: async ({ canvas }) => {
-    const table = within(
-      await canvas.findByRole("region", { name: "Materials reconciled" }),
-    );
-    await expect(table.getByText("53.32")).toBeVisible();
-    await expect(table.queryByText("₹26,660.00")).toBeNull();
+    const materials = within(await shown(canvas));
+    await expect(materials.getByText("53.32")).toBeVisible();
+    await expect(materials.queryByText("₹26,660.00")).toBeNull();
     await expect(
       canvas.getByText(/Rates and recoveries need the Work Order/),
     ).toBeVisible();

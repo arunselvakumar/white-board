@@ -110,6 +110,7 @@ export const DraftWithSuggestions: Story = {
             description: null,
             advanceId: null,
             escalationBillId: null,
+            materialId: null,
           },
           {
             kind: "material_at_cost",
@@ -117,6 +118,7 @@ export const DraftWithSuggestions: Story = {
             description: "Water charges",
             advanceId: null,
             escalationBillId: null,
+            materialId: null,
           },
         ],
         expectedUpdatedAt: DRAFT.updatedAt,
