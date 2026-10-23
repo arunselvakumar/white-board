@@ -5,6 +5,7 @@ import type {
   ProjectContractDetails,
   ProjectCustomField,
 } from "../domain/project-contract";
+import type { ProjectColor } from "../domain/project-color";
 import type { ProjectStructure, ProjectType } from "../domain/project-type";
 
 /**
@@ -27,6 +28,8 @@ export type ProjectReadModel = {
   useLogoInReports: boolean;
   /** GST state code (CM-501), or null when not set. */
   stateCode: string | null;
+  /** Folder colour on the Projects home (ADR CM-0026). */
+  color: ProjectColor;
   customFields: ProjectCustomField[];
   createdAt: Date;
   updatedAt: Date;
@@ -46,6 +49,7 @@ export function toProjectReadModel(project: Project): ProjectReadModel {
     logoKey: project.logoKey,
     useLogoInReports: project.useLogoInReports,
     stateCode: project.stateCode,
+    color: project.color,
     ...project.contract,
     customFields: project.customFields.map(({ label, value }) => ({
       label,

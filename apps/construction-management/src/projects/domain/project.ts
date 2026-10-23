@@ -16,6 +16,11 @@ import {
 } from "./project-contract";
 import { PROJECT_BUDGET_MAX } from "./project-contract-rules";
 import {
+  DEFAULT_PROJECT_COLOR,
+  cleanProjectColor,
+  type ProjectColor,
+} from "./project-color";
+import {
   isProjectType,
   projectStructure,
   type ProjectStructure,
@@ -46,7 +51,8 @@ export function isProjectStatus(value: string): value is ProjectStatus {
  * What a Team Member types on the Project form. The contract details and
  * custom fields (CM-413) are optional; left out of an edit, they keep what
  * is stored. So do the Project Type, Budget and `useLogoInReports` (CM-401),
- * though a new Project must have a type, and the GST State (CM-501).
+ * though a new Project must have a type, the GST State (CM-501) and the
+ * colour (ADR CM-0026).
  */
 export type ProjectDetailsInput = {
   name: string;
@@ -61,6 +67,8 @@ export type ProjectDetailsInput = {
   useLogoInReports?: boolean;
   /** GST state code (`GST_STATES`); blank or null clears it. */
   stateCode?: string | null;
+  /** `PROJECT_COLORS` key; blank or null is Lavender. */
+  color?: string | null;
 } & ProjectContractInput;
 
 /**
@@ -78,6 +86,8 @@ export type ProjectProfile = {
    * `GST_STATES`, or null when not set.
    */
   stateCode: string | null;
+  /** Folder colour on the Projects home (ADR CM-0026). */
+  color: ProjectColor;
 };
 
 export type ProjectDetails = {
@@ -148,8 +158,9 @@ function cleanBudget(raw: number | null | undefined): number | null {
 }
 
 /**
- * The Project Type, Budget, `useLogoInReports` and GST State as saved: a
- * field left out keeps `current`; `null` clears the Budget and the State. The logo is not here: it
+ * The Project Type, Budget, `useLogoInReports`, GST State and colour as
+ * saved: a field left out keeps `current`; `null` clears the Budget and the
+ * State, and sets the colour back to Lavender. The logo is not here: it
  * changes through its own route.
  */
 function projectProfile(
@@ -171,6 +182,10 @@ function projectProfile(
       input.stateCode === undefined
         ? current.stateCode
         : cleanStateCode(input.stateCode),
+    color:
+      input.color === undefined
+        ? current.color
+        : cleanProjectColor(input.color),
   };
 }
 
@@ -262,6 +277,7 @@ export class Project {
           useLogoInReports: false,
           logoKey: null,
           stateCode: null,
+          color: DEFAULT_PROJECT_COLOR,
         },
       ),
       customFields: customFields(input.details.customFields ?? []),
@@ -324,6 +340,10 @@ export class Project {
   get stateCode(): string | null {
     return this.props.stateCode;
   }
+  /** Folder colour on the Projects home (ADR CM-0026). */
+  get color(): ProjectColor {
+    return this.props.color;
+  }
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -379,13 +399,14 @@ export class Project {
       useLogoInReports: this.props.useLogoInReports,
       logoKey: this.props.logoKey,
       stateCode: this.props.stateCode,
+      color: this.props.color,
     };
   }
 
   /**
    * Edit Project: name, status, address and dates at once (the legacy app
    * allows any status change); a contract detail, the custom-field list,
-   * the Project Type, Budget, `useLogoInReports` or GST State left out
+   * the Project Type, Budget, `useLogoInReports`, GST State or colour left out
    * keeps what is stored.
    */
   update(details: ProjectDetailsInput, by: string, now: Date): void {

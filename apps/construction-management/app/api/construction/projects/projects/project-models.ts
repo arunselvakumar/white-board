@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import type { ProjectReadModel } from "@/src/projects/application/project-read-model";
 import { PROJECT_STATUSES } from "@/src/projects/domain/project";
+import { PROJECT_COLOR_KEYS } from "@/src/projects/domain/project-color";
 import {
   PROJECT_TYPE_KEYS,
   PROJECT_TYPES,
@@ -28,6 +29,12 @@ export const projectTypeModel = z
     `What kind of work the Project is (ADR CM-0013 §1): ${PROJECT_TYPES.map(
       (type) => `${type.key} (${type.label}, ${type.structure})`,
     ).join(", ")}.`,
+  );
+
+export const projectColorModel = z
+  .enum(PROJECT_COLOR_KEYS)
+  .describe(
+    `The Project's folder colour on the Projects home (ADR CM-0026): ${PROJECT_COLOR_KEYS.join(", ")}.`,
   );
 
 export const projectStructureModel = z
@@ -140,6 +147,7 @@ export const ConstructionProjectsProjectResponseModel = z.object({
     .string()
     .nullable()
     .describe("The name of `stateCode`, e.g. Tamil Nadu; null when not set."),
+  color: projectColorModel,
   customFields: z
     .array(ConstructionProjectsCustomFieldModel)
     .describe("In the order they were entered."),
@@ -208,6 +216,13 @@ export const projectDetailsFields = {
     .optional()
     .describe(
       "The GST state of the site, a two-digit GST state code (e.g. 33 for Tamil Nadu); 400 PROJECT_STATE_INVALID for any other. Omitted keeps it, blank or null clears it.",
+    ),
+  color: z
+    .string()
+    .nullable()
+    .optional()
+    .describe(
+      `The folder colour (ADR CM-0026): ${PROJECT_COLOR_KEYS.join(", ")}; 400 PROJECT_COLOR_INVALID for any other. Omitted on Add Project, blank or null is lavender; omitted on an edit keeps it.`,
     ),
   address: z
     .string()
@@ -290,6 +305,7 @@ export function toProjectResponse(
     useLogoInReports: item.useLogoInReports,
     stateCode: item.stateCode,
     stateName: item.stateCode == null ? null : gstStateName(item.stateCode),
+    color: item.color,
     customFields: item.customFields.map(({ label, value }) => ({
       label,
       value,

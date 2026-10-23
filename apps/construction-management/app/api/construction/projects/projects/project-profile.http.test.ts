@@ -28,6 +28,7 @@ type Project = {
   useLogoInReports: boolean;
   stateCode: string | null;
   stateName: string | null;
+  color: string;
   updatedAt: string;
 };
 
@@ -669,5 +670,72 @@ describe("Project GST State (CM-501)", () => {
     });
     expect(audit?.before).toMatchObject({ stateCode: "29" });
     expect(audit?.after).toMatchObject({ stateCode: null });
+  });
+});
+
+describe("Project colour (ADR CM-0026)", () => {
+  it("defaults to lavender, is saved, kept when an edit leaves it out and refused off the palette", async () => {
+    const owner = await ownerWithCompany();
+    const plain = await create(owner.cookie, {
+      name: "Anugraha Residency",
+      projectType: "residential",
+    });
+    expect(plain.color).toBe("lavender");
+
+    const kumari = await create(owner.cookie, {
+      name: "Kumari Heights",
+      projectType: "residential",
+      color: "peach",
+    });
+    expect(kumari.color).toBe("peach");
+    expect((await read(owner.cookie, kumari.id)).color).toBe("peach");
+    const listed = await json<{ items: Project[] }>(
+      await listProjects(jsonRequest(BASE, owner.cookie)),
+    );
+    expect(listed.items.find((item) => item.id === kumari.id)?.color).toBe(
+      "peach",
+    );
+
+    const kept = await update(owner.cookie, kumari, { status: "on_hold" });
+    expect(kept.status).toBe(StatusCodes.OK);
+    const afterKeep = await json<Project>(kept);
+    expect(afterKeep.color).toBe("peach");
+
+    const recoloured = await json<Project>(
+      await update(owner.cookie, afterKeep, { color: "mint" }),
+    );
+    expect(recoloured.color).toBe("mint");
+    const row = await prisma.constructionProjectsProject.findUnique({
+      where: { id: kumari.id },
+    });
+    expect(row?.color).toBe("mint");
+    const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
+      where: { entityId: kumari.id, action: "project.updated" },
+      orderBy: { occurredAt: "desc" },
+    });
+    expect(audit?.before).toMatchObject({ color: "peach" });
+    expect(audit?.after).toMatchObject({ color: "mint" });
+
+    const reset = await update(owner.cookie, recoloured, { color: null });
+    expect(reset.status).toBe(StatusCodes.OK);
+    const afterReset = await json<Project>(reset);
+    expect(afterReset.color).toBe("lavender");
+
+    const bad = await update(owner.cookie, afterReset, { color: "purple" });
+    expect(bad.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json<ErrorBody>(bad)).toMatchObject({
+      code: "PROJECT_COLOR_INVALID",
+    });
+    const refused = await createProject(
+      jsonRequest(BASE, owner.cookie, {
+        name: "Nowhere",
+        projectType: "residential",
+        color: "#ff0000",
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json<ErrorBody>(refused)).toMatchObject({
+      code: "PROJECT_COLOR_INVALID",
+    });
   });
 });

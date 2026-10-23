@@ -70,6 +70,7 @@ export function toProject(row: Row): Project {
     useLogoInReports: row.useLogoInReports,
     logoKey: row.logoKey,
     stateCode: row.stateCode,
+    color: row.color,
     customFields: row.customFields.map(({ label, value }) => ({
       label,
       value,
@@ -92,6 +93,7 @@ function detailsData(project: Project) {
     useLogoInReports: profile.useLogoInReports,
     logoKey: profile.logoKey,
     stateCode: profile.stateCode,
+    color: profile.color,
     name: project.name,
     status: project.status,
     address: project.address,

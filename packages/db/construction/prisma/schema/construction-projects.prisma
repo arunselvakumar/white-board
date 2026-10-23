@@ -32,6 +32,21 @@ enum ConstructionProjectsProjectType {
   @@schema("construction_projects")
 }
 
+/// The folder colour on the Projects home (ADR CM-0026): a fixed palette.
+enum ConstructionProjectsProjectColor {
+  lavender
+  peach
+  sky
+  mint
+  lemon
+  rose
+  sand
+  slate
+
+  @@map("project_color")
+  @@schema("construction_projects")
+}
+
 /// A site the Company builds. Names are unique among a Company's live
 /// Projects (partial index in the migration).
 model ConstructionProjectsProject {
@@ -73,6 +88,8 @@ model ConstructionProjectsProject {
   logoKey          String?                           @map("logo_key")
   /// Report headers print the Project logo instead of the Company's (M9).
   useLogoInReports Boolean                           @default(false) @map("use_logo_in_reports")
+  /// Folder colour on the Projects home (ADR CM-0026); Lavender by default.
+  color            ConstructionProjectsProjectColor  @default(lavender)
   createdAt        DateTime                          @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime                          @default(now()) @map("updated_at") @db.Timestamptz(3)
   createdBy        String                            @map("created_by")
