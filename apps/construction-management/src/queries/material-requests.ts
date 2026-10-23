@@ -89,6 +89,8 @@ export type MaterialRequestInput = {
   requestDate: string;
   storeId: string;
   contractorId: string | null;
+  /** CM-1110: the Work Order the material is issued under. */
+  workOrderId: string | null;
   departmentId: string | null;
   siteLocation: LocationRefInput | null;
   receiverName: string | null;
