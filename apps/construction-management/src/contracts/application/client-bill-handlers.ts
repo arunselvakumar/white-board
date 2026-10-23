@@ -540,9 +540,9 @@ export class ClientBillHandlers {
   }
 
   /**
-   * Paise still receivable from the Client on the Project (CM-1111): the finance balances of
-   * the invoices its approved bills and retention releases created, after
-   * payments, TDS and write-offs (read).
+   * Paise still receivable from the Client on the Project (CM-1111):
+   * finance's balances on the invoices its approved bills and retention
+   * releases created, after payments, TDS and write-offs (read).
    */
   async outstanding(access: MemberAccess, projectId: string): Promise<bigint> {
     assertCan(access, CLIENT_BILL_MENU, "read", { projectId });
