@@ -311,6 +311,10 @@ export function StockMovementDialog({
   stock?: StockHints;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(kind);
+  if (kind != null && kind !== last) setLast(kind);
+  const shown = kind ?? last;
   return (
     <Dialog
       open={kind != null}
@@ -319,11 +323,11 @@ export function StockMovementDialog({
       }}
     >
       <DialogContent className="flex max-h-[92vh] flex-col sm:max-w-3xl">
-        {kind == null ? null : (
+        {shown == null ? null : (
           <MovementForm
-            key={`${kind}-${materialIds.join(",")}`}
+            key={`${shown}-${materialIds.join(",")}`}
             location={location}
-            kind={kind}
+            kind={shown}
             materialIds={materialIds}
             stock={stock}
             onClose={onClose}

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -120,6 +121,10 @@ export function RenameDrawingDialog({
   drawing: DrawingSummary | null;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(drawing);
+  if (drawing != null && drawing !== last) setLast(drawing);
+  const shown = drawing ?? last;
   return (
     <Dialog
       open={drawing != null}
@@ -128,11 +133,11 @@ export function RenameDrawingDialog({
       }}
     >
       <DialogContent className="sm:max-w-md">
-        {drawing == null ? null : (
+        {shown == null ? null : (
           <RenameDrawingForm
-            key={drawing.id}
+            key={shown.id}
             projectId={projectId}
-            drawing={drawing}
+            drawing={shown}
             onClose={onClose}
           />
         )}

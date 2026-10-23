@@ -172,6 +172,10 @@ export function AdjustStockDialog({
   row: InventoryRow | null;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(row);
+  if (row != null && row !== last) setLast(row);
+  const shown = row ?? last;
   return (
     <Dialog
       open={row != null}
@@ -180,11 +184,11 @@ export function AdjustStockDialog({
       }}
     >
       <DialogContent className="sm:max-w-lg">
-        {row == null ? null : (
+        {shown == null ? null : (
           <AdjustForm
-            key={row.materialId}
+            key={shown.materialId}
             location={location}
-            row={row}
+            row={shown}
             onClose={onClose}
           />
         )}

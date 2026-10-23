@@ -202,6 +202,10 @@ export function StockSettingsDialog({
   target: { row: InventoryRow; mode: SettingsMode } | null;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(target);
+  if (target != null && target !== last) setLast(target);
+  const shown = target ?? last;
   return (
     <Dialog
       open={target != null}
@@ -210,12 +214,12 @@ export function StockSettingsDialog({
       }}
     >
       <DialogContent className="sm:max-w-md">
-        {target == null ? null : (
+        {shown == null ? null : (
           <SettingsForm
-            key={`${target.row.materialId}-${target.mode}`}
+            key={`${shown.row.materialId}-${shown.mode}`}
             location={location}
-            row={target.row}
-            mode={target.mode}
+            row={shown.row}
+            mode={shown.mode}
             onClose={onClose}
           />
         )}

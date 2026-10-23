@@ -182,6 +182,10 @@ export function EditMovementDialog({
   uomName: string;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(entry);
+  if (entry != null && entry !== last) setLast(entry);
+  const shown = entry ?? last;
   return (
     <Dialog
       open={entry != null}
@@ -190,11 +194,11 @@ export function EditMovementDialog({
       }}
     >
       <DialogContent className="sm:max-w-lg">
-        {entry == null ? null : (
+        {shown == null ? null : (
           <EditForm
-            key={entry.id}
+            key={shown.id}
             location={location}
-            entry={entry}
+            entry={shown}
             uomName={uomName}
             onClose={onClose}
           />

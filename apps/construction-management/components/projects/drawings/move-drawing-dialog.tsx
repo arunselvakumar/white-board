@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -164,6 +164,10 @@ export function MoveDrawingDialog({
   drawing: DrawingSummary | null;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(drawing);
+  if (drawing != null && drawing !== last) setLast(drawing);
+  const shown = drawing ?? last;
   return (
     <Dialog
       open={drawing != null}
@@ -172,14 +176,14 @@ export function MoveDrawingDialog({
       }}
     >
       <DialogContent className="sm:max-w-md">
-        {drawing == null ? null : (
+        {shown == null ? null : (
           <Suspense
             fallback={
               <div className="space-y-4">
                 <DialogHeader className="min-w-0">
                   <DialogTitle>Move to album</DialogTitle>
                   <DialogDescription className="break-words">
-                    {drawing.name} and all its revisions move together.
+                    {shown.name} and all its revisions move together.
                   </DialogDescription>
                 </DialogHeader>
                 <AlbumSelectSkeleton />
@@ -195,9 +199,9 @@ export function MoveDrawingDialog({
             }
           >
             <MoveDrawingForm
-              key={drawing.id}
+              key={shown.id}
               projectId={projectId}
-              drawing={drawing}
+              drawing={shown}
               onClose={onClose}
             />
           </Suspense>
