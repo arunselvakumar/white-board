@@ -7,6 +7,7 @@ import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_SECTIONS } from "@/lib/hrms-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
+import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
 function shellAt(href: AppNavHref, canOpenDashboard = true) {
@@ -114,6 +115,25 @@ export const WithoutDashboard: Story = {
     const nav = await mainMenu(context);
     await expect(nav.queryByRole("link", { name: "Dashboard" })).toBeNull();
     await expect(nav.getAllByRole("link")[0]).toHaveAccessibleName("Projects");
+  },
+};
+
+/**
+ * Hover a nav item, or tab to it: its icon plays a short animation (the
+ * building rises, the briefcase is lifted, the books lean). The motion
+ * lives in `@repo/ui` (sidebar-icon-motion.css, #114); story tests run
+ * without motion, so the play checks that the main menu's and the foot's
+ * icons each have a motion of their own.
+ */
+export const NavIconMotion: Story = {
+  ...shellAt("/app/dashboard"),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const sidebar = nav
+      .getByRole("link", { name: "Dashboard" })
+      .closest<HTMLElement>("[data-sidebar=sidebar]");
+    if (sidebar == null) throw new Error("The sidebar is missing");
+    await expectNavIconMotion(sidebar);
   },
 };
 

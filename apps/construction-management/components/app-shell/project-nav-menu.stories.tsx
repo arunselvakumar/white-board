@@ -9,6 +9,7 @@ import { storyHome } from "@/components/projects/project-home-fixtures";
 import { ProjectShell } from "@/components/projects/project-shell";
 import type { ProjectHome } from "@/src/queries/project-home";
 
+import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import { signInAs } from "../../.storybook/mocks/auth";
 
@@ -152,6 +153,23 @@ export const Menu: Story = {
     await expect(
       sidebar.getByRole("link", { name: "My Profile" }),
     ).toBeInTheDocument();
+  },
+};
+
+/**
+ * Hover a Project section, or tab to it: its icon plays a short animation
+ * (the pin drops, the waves ripple, the compass swings). Story tests run
+ * without motion, so the play checks that Back to projects, every section
+ * and the foot each lead with an icon that has a motion of its own (#114).
+ */
+export const NavIconMotion: Story = {
+  play: async (context) => {
+    const { menu } = await projectMenu(context);
+    const sidebar = (
+      await menu.findByRole("link", { name: "Testing Reports" })
+    ).closest<HTMLElement>("[data-sidebar=sidebar]");
+    if (sidebar == null) throw new Error("The sidebar is missing");
+    await expectNavIconMotion(sidebar);
   },
 };
 
