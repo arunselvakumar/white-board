@@ -53,7 +53,7 @@ export const WithProjects: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Projects" }),
     ).toBeVisible();
-    const cards = within(canvas.getByRole("list", { name: "Projects" }));
+    const cards = within(canvas.getByRole("group", { name: "Projects" }));
     await expect(cards.getAllByRole("link")).toHaveLength(5);
     const kumari = cards.getByRole("link", { name: /Kumari Heights/ });
     await expect(kumari).toHaveAttribute(
@@ -81,7 +81,9 @@ export const WithProjects: Story = {
  */
 export const ProgressOnTheCard: Story = {
   play: async ({ canvas }) => {
-    const cards = within(await canvas.findByRole("list", { name: "Projects" }));
+    const cards = within(
+      await canvas.findByRole("group", { name: "Projects" }),
+    );
     const kumari = within(cards.getByRole("link", { name: /Kumari Heights/ }));
     await expect(
       kumari.getByRole("progressbar", { name: "Project Progress" }),
@@ -100,7 +102,7 @@ export const ProgressOnTheCard: Story = {
 
 export const FiltersByStatus: Story = {
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
     await expect(
       canvas.getByRole("button", { name: "Ongoing 2" }),
     ).toBeVisible();
@@ -109,18 +111,19 @@ export const FiltersByStatus: Story = {
     ).toBeVisible();
 
     await userEvent.click(canvas.getByRole("button", { name: "Completed 1" }));
-    const cards = within(canvas.getByRole("list", { name: "Projects" }));
+    const cards = within(canvas.getByRole("group", { name: "Projects" }));
     await expect(cards.getAllByRole("link")).toHaveLength(1);
     await expect(cards.getByRole("link")).toHaveTextContent("Zen Villas");
 
     await userEvent.click(canvas.getByRole("button", { name: "Ongoing 2" }));
     await expect(
-      within(canvas.getByRole("list", { name: "Projects" }))
+      within(canvas.getByRole("group", { name: "Projects" }))
         .getAllByRole("link")
         .map((link) => link.textContent),
     ).toEqual([
-      expect.stringContaining("Asaripallam Tower"),
+      // Kumari Heights has a client; Asaripallam Tower is Uncategorised.
       expect.stringContaining("Kumari Heights"),
+      expect.stringContaining("Asaripallam Tower"),
     ]);
   },
 };
@@ -130,7 +133,7 @@ export const FilterWithNoMatch: Story = {
     items = STORY_PROJECTS.filter((item) => item.status !== "on_hold");
   },
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
     await userEvent.click(canvas.getByRole("button", { name: "On hold 0" }));
     await expect(
       await canvas.findByText("No Projects are on hold."),
@@ -175,7 +178,7 @@ export const Empty: Story = {
     await expect(
       canvas.queryByRole("link", { name: "New Project" }),
     ).toBeNull();
-    await expect(canvas.queryByRole("list", { name: "Projects" })).toBeNull();
+    await expect(canvas.queryByRole("group", { name: "Projects" })).toBeNull();
 
     // A status chip keeps the empty state, not "No Projects are ongoing."
     await userEvent.click(section.getByRole("button", { name: "Ongoing 0" }));
@@ -186,7 +189,9 @@ export const Empty: Story = {
 
 export const CardsWithAndWithoutLogo: Story = {
   play: async ({ canvas }) => {
-    const cards = within(await canvas.findByRole("list", { name: "Projects" }));
+    const cards = within(
+      await canvas.findByRole("group", { name: "Projects" }),
+    );
     // A Project with a logo shows it…
     const asaripallam = cards.getByRole("link", { name: /Asaripallam Tower/ });
     await expect(asaripallam).toHaveTextContent("Commercial");
@@ -213,7 +218,7 @@ export const CardsWithAndWithoutLogo: Story = {
 export const Phone: Story = {
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvas, canvasElement }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
@@ -223,9 +228,9 @@ const ZEN = "0199c4a0-0000-7000-8000-000000000005";
 const VADASERY = "0199c4a0-0000-7000-8000-000000000003";
 
 function rowNames(canvas: {
-  getByRole: (role: "list", options: { name: string }) => HTMLElement;
+  getByRole: (role: "group", options: { name: string }) => HTMLElement;
 }) {
-  return within(canvas.getByRole("list", { name: "Projects" }))
+  return within(canvas.getByRole("group", { name: "Projects" }))
     .getAllByRole("link")
     .map((link) => link.querySelector("p")?.textContent);
 }
@@ -235,15 +240,16 @@ export const PinnedFirst: Story = {
     pinned = [VADASERY, ZEN];
   },
   play: async ({ canvas }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
+    // Pinned first within each client's group (ADR CM-0027 §1).
     await expect(rowNames(canvas)).toEqual([
+      "Kumari Heights",
       "Vadasery Plots",
       "Zen Villas",
       "Asaripallam Tower",
-      "Kumari Heights",
       "Parvathipuram Row Houses",
     ]);
-    const cards = within(canvas.getByRole("list", { name: "Projects" }));
+    const cards = within(canvas.getByRole("group", { name: "Projects" }));
     await expect(
       within(cards.getByRole("link", { name: /Zen Villas/ })).getByRole("img", {
         name: "Pinned",
@@ -260,7 +266,7 @@ export const PinnedFirst: Story = {
 
 export const CardMenu: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
       canvas.getByRole("button", { name: "Options for Zen Villas" }),
@@ -272,7 +278,8 @@ export const CardMenu: Story = {
       body.getByRole("menuitem", { name: "Hide modules" }),
     ).toBeVisible();
     await userEvent.click(body.getByRole("menuitem", { name: "Pin to top" }));
-    await waitFor(() => expect(rowNames(canvas)[0]).toBe("Zen Villas"));
+    // First in its group, after Kumari Heights' client group.
+    await waitFor(() => expect(rowNames(canvas)[1]).toBe("Zen Villas"));
     await expect(
       api.calls.mock.calls.some(
         ([call]) =>
@@ -320,13 +327,13 @@ export const FolderColours: Story = {
     ];
   },
   play: async ({ canvas }) => {
-    const list = await canvas.findByRole("list", { name: "Projects" });
-    const folders = [...list.querySelectorAll(":scope > li")];
+    const list = await canvas.findByRole("group", { name: "Projects" });
+    const folders = [...list.querySelectorAll("li[data-color]")];
     await expect(
       folders.map((folder) => folder.getAttribute("data-color")),
     ).toEqual([
-      "peach",
       "lavender",
+      "peach",
       "sky",
       "rose",
       "mint",
@@ -355,7 +362,99 @@ export const FoldersOnAPhone: Story = {
   ...FolderColours,
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvas, canvasElement }) => {
-    await canvas.findByRole("list", { name: "Projects" });
+    await canvas.findByRole("group", { name: "Projects" });
+    const page = canvasElement.ownerDocument.documentElement;
+    await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+/** Every client a Project has, case and spacing aside; "SBD" stays apart. */
+const CLIENT_PROJECTS = [
+  project({
+    id: "0199c4a0-0000-7000-8000-000000000011",
+    name: "Kumari Heights",
+    clientName: "Sri Balaji Developers",
+    color: "lavender",
+  }),
+  project({
+    id: "0199c4a0-0000-7000-8000-000000000012",
+    name: "Anugraha Residency",
+    clientName: "sri balaji  developers",
+    color: "peach",
+    status: "on_hold",
+  }),
+  project({
+    id: "0199c4a0-0000-7000-8000-000000000013",
+    name: "NH-44 Culvert Repairs",
+    clientName: "NHAI Madurai",
+    projectType: "infrastructure",
+    color: "slate",
+  }),
+  project({
+    id: "0199c4a0-0000-7000-8000-000000000014",
+    name: "Zen Villas",
+    clientName: null,
+    color: "mint",
+    status: "completed",
+  }),
+  project({
+    id: "0199c4a0-0000-7000-8000-000000000015",
+    name: "Meenakshi Clinic Interiors",
+    clientName: "  ",
+    color: "sand",
+  }),
+];
+
+function groupHeadings(canvas: {
+  getByRole: (role: "group", options: { name: string }) => HTMLElement;
+}) {
+  return within(canvas.getByRole("group", { name: "Projects" }))
+    .getAllByRole("heading", { level: 3 })
+    .map((heading) => heading.textContent);
+}
+
+/**
+ * Folders grouped by client (ADR CM-0027 §1): by name, the same client
+ * whatever its case or spacing, and Uncategorised last for Projects with
+ * no client. A status filter hides groups left empty.
+ */
+export const GroupedByClient: Story = {
+  beforeEach() {
+    items = CLIENT_PROJECTS;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("group", { name: "Projects" });
+    await expect(groupHeadings(canvas)).toEqual([
+      "NHAI Madurai1 Project",
+      "Sri Balaji Developers2 Projects",
+      "Uncategorised2 Projects",
+    ]);
+    const balaji = within(
+      canvas.getByRole("list", { name: "Sri Balaji Developers" }),
+    );
+    await expect(
+      balaji
+        .getAllByRole("link")
+        .map((link) => link.querySelector("p")?.textContent),
+    ).toEqual(["Kumari Heights", "Anugraha Residency"]);
+    const none = within(canvas.getByRole("list", { name: "Uncategorised" }));
+    await expect(none.getAllByRole("link")).toHaveLength(2);
+
+    await userEvent.click(canvas.getByRole("button", { name: "On hold 1" }));
+    await expect(groupHeadings(canvas)).toEqual([
+      "Sri Balaji Developers1 Project",
+    ]);
+  },
+};
+
+/** Grouped on a phone: headings and folders fit, no sideways scroll. */
+export const GroupedOnAPhone: Story = {
+  beforeEach() {
+    items = CLIENT_PROJECTS;
+  },
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole("group", { name: "Projects" });
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },

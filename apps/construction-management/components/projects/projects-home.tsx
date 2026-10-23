@@ -5,14 +5,16 @@ import {
   Building2,
   CircleCheck,
   EllipsisVertical,
+  FolderOpen,
   HardHat,
   PauseCircle,
   Plus,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { MetricCard } from "@repo/ui/components/metric-card";
 import {
@@ -34,6 +36,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { CheckInBanner } from "@/components/hrms/check-in-banner";
+import { groupByClient } from "@/src/projects/domain/client-groups";
 import { usePinProject } from "@/src/queries/project-home";
 import {
   projectsQuery,
@@ -173,15 +176,68 @@ function ProjectFolderMenu({
 }
 
 /**
+ * One client's folders on the Projects home (ADR CM-0027 §1): the client's
+ * name and how many Projects it has, then their folders. Projects with no
+ * client are "Uncategorised".
+ */
+function ClientGroupSection({
+  id,
+  clientName,
+  projects,
+}: {
+  id: string;
+  clientName: string | null;
+  projects: readonly ProjectItem[];
+}) {
+  const name = clientName ?? "Uncategorised";
+  const Icon = clientName == null ? FolderOpen : UserRound;
+  return (
+    <section aria-labelledby={id} className="space-y-1">
+      <h3
+        id={id}
+        className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight"
+      >
+        <span
+          aria-hidden="true"
+          className="bg-secondary text-secondary-foreground flex size-7 shrink-0 items-center justify-center rounded-lg"
+        >
+          <Icon className="size-4" />
+        </span>
+        <span className="truncate">{name}</span>
+        <span className="text-muted-foreground shrink-0 text-xs font-normal tabular-nums">
+          {projects.length === 1
+            ? "1 Project"
+            : `${String(projects.length)} Projects`}
+        </span>
+      </h3>
+      <ul aria-label={name} className={PROJECT_FOLDER_GRID}>
+        {projects.map((project) => (
+          <ProjectFolderCard
+            key={project.id}
+            project={project}
+            href={projectPath(project.id)}
+            menu={(chip) => (
+              <ProjectFolderMenu project={project} className={chip} />
+            )}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
  * Projects home (CM-204, `modules/03`): status totals (each one filters the list), then every Project
- * as a folder in its colour (ADR CM-0026), with status chips to filter them,
- * the member's pinned Projects first (CM-411). The Owner sees every Project; a Member those assigned to
+ * as a folder in its colour (ADR CM-0026), grouped by client (ADR CM-0027),
+ * with status chips to filter them, the member's pinned Projects first in
+ * each group (CM-411). The Owner sees every Project; a Member those assigned to
  * them. A Company with no Projects sees the same page with every figure at 0
  * and the empty state in place of the list (#108).
  */
 export function ProjectsHome() {
   const { data } = useSuspenseQuery(projectsQuery);
   const [filter, setFilter] = useState<Filter>("all");
+  const groupId = useId();
   const items =
     filter === "all"
       ? data.items
@@ -265,21 +321,20 @@ export function ProjectsHome() {
               {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.
             </p>
           ) : (
-            <ul
+            <div
+              role="group"
               aria-label="Projects"
-              className={cn("px-5 pt-1 pb-5", PROJECT_FOLDER_GRID)}
+              className="space-y-7 px-5 pt-1 pb-5"
             >
-              {items.map((project) => (
-                <ProjectFolderCard
-                  key={project.id}
-                  project={project}
-                  href={projectPath(project.id)}
-                  menu={(chip) => (
-                    <ProjectFolderMenu project={project} className={chip} />
-                  )}
+              {groupByClient(items, data.items).map((group, index) => (
+                <ClientGroupSection
+                  key={group.key}
+                  id={`${groupId}-${String(index)}`}
+                  clientName={group.clientName}
+                  projects={group.projects}
                 />
               ))}
-            </ul>
+            </div>
           )}
         </section>
       </div>
