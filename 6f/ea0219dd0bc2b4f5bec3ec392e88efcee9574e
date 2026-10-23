@@ -1,0 +1,57 @@
+apps/construction-management/app/api/construction/procurement/material-requests/[id]/assign-work-order/route.ts
+  s_f49615d4431370::t_17489f8ebfe14a 1-55
+apps/construction-management/app/api/construction/procurement/material-requests/material-request-models.ts
+  s_198a40712dbd5a::t_a48099c3380b7d 43-49,136-137,169-180,190-193,212
+apps/construction-management/app/api/construction/procurement/material-requests/material-requests-openapi.ts
+  s_198a40712dbd5a::t_a2b83677dc92a3 14,36,134-146
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_f49615d4431370::t_90ca2ca527948f 283-285
+apps/construction-management/components/procurement/material-requests/material-request-form.stories.tsx
+  s_f49615d4431370::t_1abd589821687d 120-153
+apps/construction-management/components/procurement/material-requests/material-request-form.tsx
+  s_f49615d4431370::t_9782375c358b2c 58,74-77,180,197-212,236-239,348-351,359-382
+apps/construction-management/components/procurement/stores/central-store-fixtures.ts
+  s_f49615d4431370::t_8779f4300c8e73 108,193-199
+apps/construction-management/src/composition/central-store-options.ts
+  s_f49615d4431370::t_ffc3efa077a8d0 50,66-72,74-82
+apps/construction-management/src/composition/procurement-directory.ts
+  s_f49615d4431370::t_be73cf6c50bc8f 13,115-129
+apps/construction-management/src/procurement/application/material-request-handlers.ts
+  s_f49615d4431370::t_f8ca6e1abd3d6f 54-55,95-96,117-123,127,163-169,217-236
+apps/construction-management/src/procurement/application/ports.ts
+  s_f49615d4431370::t_5133129913bdb6 84-96,123-128
+apps/construction-management/src/procurement/infrastructure/material-request-repository.ts
+  s_5397245072badf::t_62802660b9cddc 131,240,309-315,331,440-531,589,634-652,737-744,757,781-787,872
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "6fea0219dd0bc2b4f5bec3ec392e88efcee9574e",
+  "prompts": {},
+  "sessions": {
+    "s_198a40712dbd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "63d99436-5fe4-4e9c-850f-ae238495c14e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_5397245072badf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99660926-66dd-4ecc-9684-2184f8c55e3a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
