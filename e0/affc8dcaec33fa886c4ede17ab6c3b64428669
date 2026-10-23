@@ -1,0 +1,53 @@
+apps/construction-management/app/app/projects/[id]/work-orders/[workOrderId]/page.tsx
+  s_f49615d4431370::t_d0caacd50bb7d3 14,17-18,21,27-31
+apps/construction-management/components/contracts/contractor-bills/bill-material-recoveries.tsx
+  s_198a40712dbd5a::t_ee446e3690b594 1-185
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-detail.stories.tsx
+  s_f49615d4431370::t_d03f057379f6be 470-542
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-detail.tsx
+  s_f49615d4431370::t_c61010cbf56cc5 46-47,502-511
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-editor.tsx
+  s_f49615d4431370::t_3094cf2d9378d2 37,54-59,81-83,122,143-169,188,362-386,429-434,447,466-467
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-form-schema.ts
+  s_f49615d4431370::t_36a9fb811c403b 46-47,58-63,106,137-142
+apps/construction-management/components/contracts/contractor-bills/reconciliation-link.ts
+  s_f49615d4431370::t_20fb214ab66bfc 1-10
+apps/construction-management/components/contracts/escalation/escalation-clause-panel.stories.tsx
+  s_198a40712dbd5a::t_294da73c6a748b 117-135
+apps/construction-management/components/contracts/work-orders/work-order-detail.tsx
+  s_f49615d4431370::t_aa3809ff0e2982 72,335,340-341,674-682
+apps/construction-management/components/contracts/work-orders/work-order-reconciliation-fixtures.ts
+  s_f49615d4431370::t_6b4e8590f4835c 1-190
+apps/construction-management/components/contracts/work-orders/work-order-reconciliation.stories.tsx
+  s_198a40712dbd5a::t_b330d8c3c0c7b7 1-191
+apps/construction-management/components/contracts/work-orders/work-order-reconciliation.tsx
+  s_198a40712dbd5a::t_e0f6a50edf87b6 1-399
+apps/construction-management/components/contracts/work-orders/work-order-stories-api.ts
+  s_f49615d4431370::t_d15dcd38db8803 13,79-89
+apps/construction-management/src/queries/contracts-reconciliation.ts
+  s_198a40712dbd5a::t_f82fa49bf72f20 1-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e0affc8dcaec33fa886c4ede17ab6c3b64428669",
+  "prompts": {},
+  "sessions": {
+    "s_198a40712dbd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "63d99436-5fe4-4e9c-850f-ae238495c14e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
