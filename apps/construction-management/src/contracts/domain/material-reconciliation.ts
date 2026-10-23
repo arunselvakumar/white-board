@@ -397,6 +397,82 @@ export function cutMaterialRecoveries<
   });
 }
 
+/**
+ * What is left of a bill for one more deduction (CM-1110): gross + GST
+ * payable less every deduction on it except the line `except` names (the
+ * one being suggested), never below 0. All deductions together are at
+ * most gross + GST payable (`BILL_DEDUCTIONS_TOO_LARGE`), so a recovery
+ * due is offered only up to this.
+ */
+export function roomOnBill(input: {
+  gross: bigint;
+  payableGst: bigint;
+  deductions: readonly {
+    kind: string;
+    amount: bigint;
+    materialId: string | null;
+  }[];
+  except?: { kind: string; materialId: string };
+}): bigint {
+  const taken = input.deductions
+    .filter(
+      (row) =>
+        input.except == null ||
+        row.kind !== input.except.kind ||
+        row.materialId !== input.except.materialId,
+    )
+    .reduce((sum, row) => sum + row.amount, 0n);
+  const room = input.gross + input.payableGst - taken;
+  return room > 0n ? room : 0n;
+}
+
+/**
+ * A recovery due, capped to what the bill can take: min(due, room). The
+ * rest stays due and is suggested again on later bills (what earlier
+ * approved bills recovered is subtracted from the cumulative due).
+ */
+export function fitsOnBill(due: bigint, room: bigint): bigint {
+  const left = room > 0n ? room : 0n;
+  return due < left ? due : left;
+}
+
+/**
+ * On a refresh (or an edit that keeps the stored deductions), the bill may
+ * have shrunk: material lines without a reason are trimmed, last first,
+ * until all deductions fit gross + GST payable (dropped at ₹0). Lines with
+ * a reason and other kinds stay, so a typed total above the bill is still
+ * refused with `BILL_DEDUCTIONS_TOO_LARGE`.
+ */
+export function capMaterialLines<
+  D extends {
+    kind: string;
+    amount: bigint;
+    description: string | null;
+    materialId: string | null;
+  },
+>(deductions: readonly D[], max: bigint): D[] {
+  let over =
+    deductions.reduce((sum, row) => sum + row.amount, 0n) -
+    (max > 0n ? max : 0n);
+  if (over <= 0n) return [...deductions];
+  const out = [...deductions];
+  for (let index = out.length - 1; index >= 0 && over > 0n; index -= 1) {
+    const row = out[index];
+    if (
+      row == null ||
+      row.materialId == null ||
+      (row.kind !== "material_reconciliation" &&
+        row.kind !== "material_at_cost") ||
+      (row.description ?? "").trim() !== ""
+    )
+      continue;
+    const cut = row.amount < over ? row.amount : over;
+    over -= cut;
+    out[index] = { ...row, amount: row.amount - cut };
+  }
+  return out.filter((row) => row.amount > 0n);
+}
+
 /** What a material deduction is matched by when a draft is refreshed: kind and material. */
 export function materialDeductionKey(deduction: {
   kind: string;

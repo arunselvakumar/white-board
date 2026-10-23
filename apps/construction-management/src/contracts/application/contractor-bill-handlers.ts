@@ -80,7 +80,10 @@ import type {
 import { recoverableAdvances } from "./advance-handlers";
 import {
   assertMaterialDeductions,
+  capMaterialLines,
   cutMaterialRecoveries,
+  fitsOnBill,
+  roomOnBill,
 } from "../domain/material-reconciliation";
 import {
   reconcileWorkOrder,
@@ -226,11 +229,15 @@ export type BillMaterialView = {
   excess: bigint;
   penalRate: bigint | null;
   recoveredBefore: bigint;
-  /** Paise: the material reconciliation recovery this bill may take. */
+  /** Paise: the material reconciliation recovery due (cumulative, less earlier recoveries). */
   recoverySuggested: bigint;
+  /** Paise: of that, what fits this bill beside its other deductions. */
+  recoveryFits: bigint;
   atCostDeductedBefore: bigint;
   /** Paise: material issued at cost not yet deducted. */
   atCostSuggested: bigint;
+  /** Paise: of that, what fits this bill beside its other deductions. */
+  atCostFits: bigint;
 };
 
 export type ContractorBillListParams = {
@@ -745,8 +752,32 @@ export class ContractorBillHandlers {
               penalRate: row.terms.penalRate,
               recoveredBefore: row.recoveredBefore,
               recoverySuggested: row.recoverySuggested,
+              recoveryFits: fitsOnBill(
+                row.recoverySuggested,
+                roomOnBill({
+                  gross: bill.gross,
+                  payableGst: gst.payable,
+                  deductions,
+                  except: {
+                    kind: "material_reconciliation",
+                    materialId: row.materialId,
+                  },
+                }),
+              ),
               atCostDeductedBefore: row.atCostDeductedBefore,
               atCostSuggested: row.atCostSuggested,
+              atCostFits: fitsOnBill(
+                row.atCostSuggested,
+                roomOnBill({
+                  gross: bill.gross,
+                  payableGst: gst.payable,
+                  deductions,
+                  except: {
+                    kind: "material_at_cost",
+                    materialId: row.materialId,
+                  },
+                }),
+              ),
             }))
           : [],
       tdsEstimate,
@@ -1058,8 +1089,15 @@ export class ContractorBillHandlers {
           : { suggestBefore: suggestAt(reconciledBefore) }),
       },
     );
+    // CM-1110: kept material lines are cut to their suggestion and then to
+    // what the bill can take, so a refresh on a smaller bill still saves.
     const deductions =
-      plan.kind === "keep" ? cutMaterialRecoveries(planned, limits) : planned;
+      plan.kind === "keep"
+        ? capMaterialLines(
+            cutMaterialRecoveries(planned, limits),
+            gross + gst.payable,
+          )
+        : planned;
     assertMaterialDeductions(deductions, limits, {
       mayExceed: material.mayExceed,
       checkLimit: plan.kind === "given",

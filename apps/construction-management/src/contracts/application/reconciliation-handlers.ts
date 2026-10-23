@@ -6,6 +6,7 @@ import type { BillStatus, DeductionKind } from "../domain/contract-terms";
 import {
   attributeIssue,
   consumedQuantity,
+  fitsOnBill,
   reconcileMaterial,
   type MaterialReconciliation,
   type MaterialRecoveryLimit,
@@ -217,9 +218,11 @@ export function recoveryLimits(
 /**
  * The material deductions a running draft suggests (CM-1110), each naming
  * its material, in the Work Order's material order: the reconciliation
- * recovery (excess × penal rate less what earlier approved bills
+ * recovery due (excess × penal rate less what earlier approved bills
  * recovered), then material issued at cost (its value less what earlier
- * approved bills deducted). All together at most `room`.
+ * approved bills deducted). Each is capped to what the bill can still
+ * take (`fitsOnBill`), all together at most `room`; what does not fit
+ * stays due and is suggested again on later bills.
  */
 export function suggestedMaterialDeductions<K extends DeductionKind>(
   reconciliation: WorkOrderReconciliation,
@@ -227,8 +230,8 @@ export function suggestedMaterialDeductions<K extends DeductionKind>(
 ): RaBillDeduction<K>[] {
   let left = room > 0n ? room : 0n;
   const out: RaBillDeduction<K>[] = [];
-  const take = (kind: DeductionKind, materialId: string, want: bigint) => {
-    const amount = want < left ? want : left;
+  const take = (kind: DeductionKind, materialId: string, due: bigint) => {
+    const amount = fitsOnBill(due, left);
     if (amount <= 0n) return;
     left -= amount;
     out.push({

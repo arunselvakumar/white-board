@@ -484,8 +484,10 @@ const withMaterials = serveContractorBills({
         penalRate: 500_00,
         recoveredBefore: 0,
         recoverySuggested: 26_660_00,
+        recoveryFits: 26_660_00,
         atCostDeductedBefore: 0,
         atCostSuggested: 0,
+        atCostFits: 0,
       },
     ],
   },
@@ -540,5 +542,55 @@ export const DraftWithMaterialRecovery: Story = {
         ],
       }),
     );
+  },
+};
+
+const overBill = serveContractorBills({
+  bill: {
+    ...DRAFT,
+    materials: [
+      {
+        materialId: CEMENT,
+        materialName: "Cement OPC 53",
+        uomName: "Bag",
+        issueBasis: "free",
+        excess: "400.000",
+        penalRate: 500_00,
+        recoveredBefore: 0,
+        recoverySuggested: 2_00_000_00,
+        recoveryFits: 1_06_898_00,
+        atCostDeductedBefore: 0,
+        atCostSuggested: 0,
+        atCostFits: 0,
+      },
+    ],
+  },
+});
+
+/**
+ * CM-1110: ₹2,00,000 of cement recovery is due but the bill can take only
+ * ₹1,06,898 beside its retention (gross ₹94,600 + GST ₹17,028 − ₹4,730):
+ * "Use" offers what fits, the rest stays due, and the net stays at ₹0.
+ */
+export const MaterialRecoveryAboveTheBill: Story = {
+  args: { id: BILL_DRAFT },
+  beforeEach: overBill.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const panel = within(
+      await canvas.findByRole("region", { name: /Material recoveries/ }),
+    );
+    await expect(
+      panel.getByText("₹2,00,000.00 due · ₹1,06,898.00 fits this bill"),
+    ).toBeVisible();
+    await userEvent.click(
+      panel.getByRole("button", { name: "Use ₹1,06,898.00" }),
+    );
+    await expect(canvas.getByLabelText("Deduction 2 amount")).toHaveValue(
+      "106898",
+    );
+    await expect(canvas.getByText("Net as typed ₹0.00")).toBeVisible();
+    await expect(
+      panel.getByRole("button", { name: "Use ₹1,06,898.00" }),
+    ).toBeVisible();
   },
 };

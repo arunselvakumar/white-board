@@ -165,7 +165,10 @@ async function setup() {
   const storeId = await addStore(ws, by, [projectId]);
   actAs(owner);
 
-  const issued = async (orderDate = day(-60)) => {
+  const issued = async (
+    orderDate = day(-60),
+    options: { rate?: number; retentionPercent?: string } = {},
+  ) => {
     const created = await createWorkOrderRoute(
       request(`${HOST}/work-orders`, {
         projectId,
@@ -179,7 +182,7 @@ async function setup() {
             description: "PCC 1:4:8",
             uomId: cum,
             quantity: "175",
-            rate: 4_000_00,
+            rate: options.rate ?? 4_000_00,
           },
         ],
         materials: [
@@ -198,7 +201,11 @@ async function setup() {
             coefficients: [{ line: 0, coefficient: null }],
           },
         ],
-        terms: { retentionPercent: "5", sacCode: "9954", gstRate: "18" },
+        terms: {
+          retentionPercent: options.retentionPercent ?? "5",
+          sacCode: "9954",
+          gstRate: "18",
+        },
       }),
     );
     expect(created.status, JSON.stringify(await created.clone().json())).toBe(
@@ -428,6 +435,90 @@ describe("material reconciliation (CM-1110)", () => {
     expect((await pdf.arrayBuffer()).byteLength).toBeGreaterThan(1000);
   });
 
+  it("caps the recovery to what the bill can take; the rest stays due for the next bill (walkthrough RA-3)", async () => {
+    const ctx = await setup();
+    // ₹20 a cum, 7.5 % retention, 18 % GST: 120 cum is a ₹2,400 bill.
+    const order = await ctx.issued(day(-60), {
+      rate: 20_00,
+      retentionPercent: "7.5",
+    });
+    await ctx.issue(ctx.cement, "790", day(-40));
+    await ctx.measure(order.id, order.lineId, "120", day(-30));
+    const bill = await ctx.draftBill(order.id, day(-25), day(-30));
+    expect(bill.gross).toBe(2_400_00);
+    expect(bill.payableGst).toBe(432_00);
+    // ₹6,992 is due; ₹2,832 − ₹180 retention = ₹2,652 fits the new draft.
+    expect(materialDeductions(bill)).toEqual([
+      {
+        kind: "material_reconciliation",
+        amount: 2_652_00,
+        materialId: ctx.cement.id,
+      },
+    ]);
+    expect(bill.net).toBe(0);
+
+    const save = (amount: number) =>
+      api.updateBill(bill.id, {
+        billDate: bill.billDate,
+        measuredUpTo: bill.measuredUpTo,
+        expectedUpdatedAt: bill.updatedAt,
+        deductions: [
+          { kind: "retention", amount: 180_00 },
+          { kind: "other", amount: 240_00, description: "Advance adjusted" },
+          {
+            kind: "material_reconciliation",
+            amount,
+            materialId: ctx.cement.id,
+          },
+        ],
+      });
+    const tooLarge = await save(6_992_00);
+    expect(tooLarge.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await errorOf(tooLarge)).toMatchObject({
+      code: "BILL_DEDUCTIONS_TOO_LARGE",
+      details: { max: 2_832_00 },
+    });
+    const fits = await save(2_412_00);
+    expect(fits.status, JSON.stringify(await fits.clone().json())).toBe(
+      StatusCodes.OK,
+    );
+    const suggestions =
+      await json<ConstructionContractsContractorBillSuggestionsResponseModel>(
+        await api.suggestions(bill.id),
+      );
+    expect(
+      suggestions.materials.find((row) => row.materialId === ctx.cement.id),
+    ).toMatchObject({
+      recoverySuggested: 6_992_00,
+      recoveryFits: 2_412_00,
+    });
+    await ctx.approve(await json<Bill>(fits));
+
+    // Bill 2: 125 cum, 890 bags: ₹40,825 cumulative less ₹2,412 recovered.
+    await ctx.issue(ctx.cement, "100", day(-20));
+    await ctx.measure(order.id, order.lineId, "5", day(-18));
+    const next = await ctx.draftBill(order.id, day(-15), day(-18));
+    const statement = await json<Statement>(
+      await api.statement(order.id, next.id),
+    );
+    expect(
+      statement.materials.find((row) => row.materialId === ctx.cement.id),
+    ).toMatchObject({
+      excess: "81.650",
+      excessValue: 40_825_00,
+      recoveredBefore: 2_412_00,
+      recoverySuggested: 38_413_00,
+    });
+    // ₹100 gross + ₹18 GST − ₹7.50 retention: ₹110.50 fits.
+    expect(materialDeductions(next)).toEqual([
+      {
+        kind: "material_reconciliation",
+        amount: 110_50,
+        materialId: ctx.cement.id,
+      },
+    ]);
+  });
+
   it("flags under-use and keeps a recovery within its suggestion unless a reason and Approve allow more", async () => {
     const ctx = await setup();
     const order = await ctx.issued();
@@ -577,8 +668,11 @@ describe("material reconciliation (CM-1110)", () => {
     const viewer = await json<Statement>(await api.statement(first.id));
     expect(viewer.canAssign).toBe(false);
     expect(viewer.financial).toBe(false);
-    expect(viewer.materials[0]?.penalRate).toBeNull();
-    expect(viewer.materials[0]?.issued).toBe("100.000");
+    const viewed = viewer.materials.find(
+      (row) => row.materialId === ctx.cement.id,
+    );
+    expect(viewed?.penalRate).toBeNull();
+    expect(viewed?.issued).toBe("100.000");
   });
 
   it("names a Work Order on a Material Request: the Contractor's issued ones only", async () => {

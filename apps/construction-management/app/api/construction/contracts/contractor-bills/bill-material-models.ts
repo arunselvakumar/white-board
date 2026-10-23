@@ -33,7 +33,10 @@ export const ConstructionContractsBillMaterialModel = z.object({
   penalRate: money("Paise per UoM charged on the excess."),
   recoveredBefore: money("Paise recovered on earlier approved bills."),
   recoverySuggested: money(
-    "Paise: excess × penal rate less what earlier bills recovered; the most this bill recovers without Approve.",
+    "Paise due: excess × penal rate less what earlier bills recovered; the most this bill recovers without Approve.",
+  ),
+  recoveryFits: money(
+    "Paise: of what is due, what fits this bill — gross + GST payable less its other deductions. The rest stays due for later bills.",
   ),
   atCostDeductedBefore: money(
     "Paise of material issued at cost deducted on earlier approved bills.",
@@ -41,6 +44,7 @@ export const ConstructionContractsBillMaterialModel = z.object({
   atCostSuggested: money(
     "Paise: at-cost issues × issue rate not yet deducted.",
   ),
+  atCostFits: money("Paise: of that, what fits this bill."),
 });
 
 export function toBillMaterialsResponse(
@@ -58,7 +62,9 @@ export function toBillMaterialsResponse(
     penalRate: paise(row.penalRate),
     recoveredBefore: paise(row.recoveredBefore),
     recoverySuggested: paise(row.recoverySuggested),
+    recoveryFits: paise(row.recoveryFits),
     atCostDeductedBefore: paise(row.atCostDeductedBefore),
     atCostSuggested: paise(row.atCostSuggested),
+    atCostFits: paise(row.atCostFits),
   }));
 }

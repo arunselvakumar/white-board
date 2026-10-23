@@ -147,14 +147,32 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
     setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
   };
 
+  /**
+   * CM-1110: what is left of the bill for a material line, as typed:
+   * gross + GST payable less every other deduction on the form.
+   */
+  const roomFor = (
+    kind: "material_reconciliation" | "material_at_cost",
+    materialId: string,
+  ) =>
+    (bill.gross ?? 0) +
+    (bill.payableGst ?? 0) -
+    deductionsPaise(
+      typed.filter(
+        (row) => !(row.kind === kind && row.materialId === materialId),
+      ),
+    );
+
   const applyMaterial = (
     kind: "material_reconciliation" | "material_at_cost",
     material: BillMaterial,
   ) => {
-    const amount = paiseToRupees(
+    const due =
       (kind === "material_reconciliation"
         ? material.recoverySuggested
-        : material.atCostSuggested) ?? 0,
+        : material.atCostSuggested) ?? 0;
+    const amount = paiseToRupees(
+      Math.max(0, Math.min(due, roomFor(kind, material.materialId))),
     );
     const index = typed.findIndex(
       (row) => row.kind === kind && row.materialId === material.materialId,
@@ -430,6 +448,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
             materials={bill.materials}
             typed={typed}
             onUse={applyMaterial}
+            roomFor={roomFor}
             reconciliationHref={reconciliationHref(bill)}
           />
           <div className="flex flex-wrap gap-2">

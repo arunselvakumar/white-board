@@ -5,6 +5,9 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
 import {
   assertMaterialDeductions,
   attributeIssue,
+  capMaterialLines,
+  fitsOnBill,
+  roomOnBill,
   consumedQuantity,
   reconcileMaterial,
   reconciliationQuantityText,
@@ -281,5 +284,70 @@ describe("assertMaterialDeductions", () => {
     expect(check([reasoned])).toBe("BILL_MATERIAL_RECOVERY_OVER_SUGGESTION");
     expect(check([reasoned], true)).toBe(null);
     expect(check([over], false, false)).toBe(null);
+  });
+});
+
+describe("capping material recoveries to what the bill can take", () => {
+  // The walkthrough's RA-3: gross ₹2,400, GST ₹432, retention ₹180, an
+  // advance recovery of ₹240, and ₹6,992 of cement recovery due.
+  const deductions = [
+    { kind: "retention", amount: 180_00n, materialId: null },
+    { kind: "mobilisation_recovery", amount: 240_00n, materialId: null },
+    {
+      kind: "material_reconciliation",
+      amount: 6_992_00n,
+      materialId: "cement",
+    },
+  ];
+
+  it("offers min(due, gross + GST payable − the other deductions)", () => {
+    const room = roomOnBill({
+      gross: 2_400_00n,
+      payableGst: 432_00n,
+      deductions,
+      except: { kind: "material_reconciliation", materialId: "cement" },
+    });
+    expect(room).toBe(2_412_00n);
+    expect(fitsOnBill(6_992_00n, room)).toBe(2_412_00n);
+    expect(fitsOnBill(1_000_00n, room)).toBe(1_000_00n);
+    expect(fitsOnBill(1_000_00n, -5n)).toBe(0n);
+    expect(roomOnBill({ gross: 100n, payableGst: 0n, deductions })).toBe(0n);
+  });
+
+  it("trims reasonless material lines, last first, on a refresh", () => {
+    const rows = [
+      ...deductions.slice(0, 2).map((row) => ({ ...row, description: null })),
+      {
+        kind: "material_reconciliation",
+        amount: 2_000_00n,
+        materialId: "cement",
+        description: null,
+      },
+      {
+        kind: "material_at_cost",
+        amount: 1_000_00n,
+        materialId: "steel",
+        description: null,
+      },
+    ];
+    // Room for ₹2,832 in all: ₹420 other, so ₹2,412 of material; at cost goes first.
+    expect(
+      capMaterialLines(rows, 2_832_00n).map((row) => [row.kind, row.amount]),
+    ).toEqual([
+      ["retention", 180_00n],
+      ["mobilisation_recovery", 240_00n],
+      ["material_reconciliation", 2_000_00n],
+      ["material_at_cost", 412_00n],
+    ]);
+    expect(
+      capMaterialLines(rows, 2_000_00n).map((row) => [row.kind, row.amount]),
+    ).toEqual([
+      ["retention", 180_00n],
+      ["mobilisation_recovery", 240_00n],
+      ["material_reconciliation", 1_580_00n],
+    ]);
+    // A line with a reason is not trimmed: the total stays too large.
+    const reasoned = rows.map((row) => ({ ...row, description: "agreed" }));
+    expect(capMaterialLines(reasoned, 100n)).toHaveLength(4);
   });
 });
