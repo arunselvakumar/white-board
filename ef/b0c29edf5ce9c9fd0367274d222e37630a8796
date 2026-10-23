@@ -1,0 +1,31 @@
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/reconciliation/pdf/route.ts
+  s_f49615d4431370::t_df0ef0cce8d8e9 1-76
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/reconciliation/route.ts
+  s_f49615d4431370::t_05de05341432a5 1-51
+apps/construction-management/app/api/construction/contracts/work-orders/reconciliation-access.ts
+  s_f49615d4431370::t_617887d2c20b39 1-16
+apps/construction-management/app/api/construction/contracts/work-orders/reconciliation-models.ts
+  s_f49615d4431370::t_b14620d83fd360 1-212
+apps/construction-management/app/api/construction/contracts/work-orders/work-orders-openapi.ts
+  s_f49615d4431370::t_fa6c6e69fc92a3 29-32,66,219-244
+apps/construction-management/src/contracts/application/contractor-bill-handlers.ts
+  s_f49615d4431370::t_7293767038abab 777-780,783-796
+apps/construction-management/src/contracts/infrastructure/reconciliation-pdf.ts
+  s_f49615d4431370::t_09f786c31a1b61 1-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "efb0c29edf5ce9c9fd0367274d222e37630a8796",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
