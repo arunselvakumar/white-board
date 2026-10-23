@@ -1,0 +1,31 @@
+apps/construction-management/src/contracts/infrastructure/price-index-workbook.ts
+  s_f49615d4431370::t_4542f51ad18b99 1-171
+apps/construction-management/src/shared-kernel/audit.ts
+  s_f49615d4431370::t_d807712811c846 47-67
+apps/construction-management/src/contracts/application/price-index-handlers.ts
+  s_b66b36b2f0a0ef::t_47ebdab13a8a60 1-450
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "46116273dce70ec005a0fc2a587ba17318926df8",
+  "prompts": {},
+  "sessions": {
+    "s_b66b36b2f0a0ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad39e8e54a0dc4dcf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
