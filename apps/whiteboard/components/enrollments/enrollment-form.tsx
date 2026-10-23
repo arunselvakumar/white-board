@@ -123,7 +123,9 @@ export function EnrollmentForm({
       <FormAlert message={errors.root?.message} />
       {lockStudent ? null : (
         <div className="space-y-1.5">
-          <Label htmlFor="studentId">Student</Label>
+          <Label htmlFor="studentId" required>
+            Student
+          </Label>
           <Controller
             name="studentId"
             control={control}
@@ -138,6 +140,7 @@ export function EnrollmentForm({
               >
                 <SelectTrigger
                   id="studentId"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                 >
@@ -158,7 +161,9 @@ export function EnrollmentForm({
       )}
       {lockBatch ? null : (
         <div className="space-y-1.5">
-          <Label htmlFor="batchId">Batch</Label>
+          <Label htmlFor="batchId" required>
+            Batch
+          </Label>
           <Controller
             name="batchId"
             control={control}
@@ -173,6 +178,7 @@ export function EnrollmentForm({
               >
                 <SelectTrigger
                   id="batchId"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                 >
@@ -192,7 +198,9 @@ export function EnrollmentForm({
         </div>
       )}
       <div className="space-y-1.5">
-        <Label htmlFor="classModeOverride">Class Mode</Label>
+        <Label htmlFor="classModeOverride" required>
+          Class Mode
+        </Label>
         <Controller
           name="classModeOverride"
           control={control}
@@ -207,6 +215,7 @@ export function EnrollmentForm({
             >
               <SelectTrigger
                 id="classModeOverride"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
               >
@@ -224,7 +233,9 @@ export function EnrollmentForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="timingSource">Timings</Label>
+        <Label htmlFor="timingSource" required>
+          Timings
+        </Label>
         <Controller
           name="timingSource"
           control={control}
@@ -239,6 +250,7 @@ export function EnrollmentForm({
             >
               <SelectTrigger
                 id="timingSource"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
               >

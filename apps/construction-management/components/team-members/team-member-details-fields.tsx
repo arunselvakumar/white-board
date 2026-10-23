@@ -2,10 +2,10 @@
 
 import { normalizeMobile } from "@repo/auth/construction/react";
 import Link from "next/link";
-import { Controller, type UseFormReturn } from "react-hook-form";
+import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -135,6 +135,9 @@ export function TeamMemberDetailsFields({
   mobileLocked?: boolean;
 }) {
   const errors = form.formState.errors;
+  // An email or a mobile is needed: Email is marked while Mobile is blank.
+  const mobile = useWatch({ control: form.control, name: "mobile" });
+  const emailRequired = mobile.trim() === "";
   const items = designations.map((item) => ({
     value: item.id,
     label: item.name,
@@ -142,7 +145,10 @@ export function TeamMemberDetailsFields({
   return (
     <div className="space-y-6">
       <fieldset className="space-y-2">
-        <legend className="text-sm font-semibold">Member type</legend>
+        <legend className="text-sm font-semibold">
+          Member type
+          <RequiredIndicator />
+        </legend>
         <Controller
           name="memberType"
           control={form.control}
@@ -153,6 +159,7 @@ export function TeamMemberDetailsFields({
                 field.onChange(value);
               }}
               className="grid gap-3 sm:grid-cols-2"
+              aria-required
             >
               <Label className="has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
                 <RadioGroupItem
@@ -182,17 +189,22 @@ export function TeamMemberDetailsFields({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="member-name">Name</Label>
+          <Label htmlFor="member-name" required>
+            Name
+          </Label>
           <Input
             id="member-name"
             placeholder="Prabhu Saravanan"
             className="h-10"
+            aria-required
             {...form.register("name")}
           />
           <FieldError message={errors.name?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="member-designation">Designation</Label>
+          <Label htmlFor="member-designation" required>
+            Designation
+          </Label>
           <Controller
             name="designationId"
             control={form.control}
@@ -208,6 +220,7 @@ export function TeamMemberDetailsFields({
                   id="member-designation"
                   size="lg"
                   className="w-full min-w-0"
+                  aria-required
                 >
                   <SelectValue placeholder="Choose a Designation" />
                 </SelectTrigger>
@@ -240,12 +253,15 @@ export function TeamMemberDetailsFields({
           <FieldError message={errors.designationId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="member-email">Email</Label>
+          <Label htmlFor="member-email" required={emailRequired}>
+            Email
+          </Label>
           <Input
             id="member-email"
             type="email"
             placeholder="example@example.com"
             className="h-10"
+            aria-required={emailRequired}
             aria-describedby="member-email-hint"
             {...form.register("email")}
           />

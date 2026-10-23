@@ -76,7 +76,9 @@ export function CodeForm({
         </Button>
       </p>
       <div className="space-y-1.5">
-        <Label htmlFor="code">Code</Label>
+        <Label htmlFor="code" required>
+          Code
+        </Label>
         <Controller
           name="code"
           control={form.control}
@@ -122,6 +124,7 @@ export function SixDigitCodeInput({
       // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.
       autoFocus
       aria-label="6-digit code"
+      aria-required
       value={value}
       onChange={onChange}
       onBlur={onBlur}

@@ -55,6 +55,7 @@ export function PaymentCategoryPicker({
         size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
+        aria-required={!optional}
       >
         <SelectValue placeholder="Choose a category" />
       </SelectTrigger>

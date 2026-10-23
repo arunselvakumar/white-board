@@ -104,22 +104,28 @@ function EditForm({
       </DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="edit-date">Date</Label>
+          <Label htmlFor="edit-date" required>
+            Date
+          </Label>
           <Input
             id="edit-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.date != null}
             {...form.register("date")}
           />
           <FieldError message={errors.date?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="edit-quantity">Quantity ({uomName})</Label>
+          <Label htmlFor="edit-quantity" required>
+            Quantity ({uomName})
+          </Label>
           <Input
             id="edit-quantity"
             inputMode="decimal"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.quantity != null}
             {...form.register("quantity")}
           />
@@ -176,6 +182,10 @@ export function EditMovementDialog({
   uomName: string;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(entry);
+  if (entry != null && entry !== last) setLast(entry);
+  const shown = entry ?? last;
   return (
     <Dialog
       open={entry != null}
@@ -184,11 +194,11 @@ export function EditMovementDialog({
       }}
     >
       <DialogContent className="sm:max-w-lg">
-        {entry == null ? null : (
+        {shown == null ? null : (
           <EditForm
-            key={entry.id}
+            key={shown.id}
             location={location}
-            entry={entry}
+            entry={shown}
             uomName={uomName}
             onClose={onClose}
           />

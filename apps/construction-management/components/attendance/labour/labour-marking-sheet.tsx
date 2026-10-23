@@ -237,12 +237,14 @@ function OvertimeLines({
             <Label
               htmlFor={`ot-${row.labourId}-${String(line)}-hours`}
               className="text-xs"
+              required={lines[line]?.fromTimes !== true}
             >
               Hours
             </Label>
             <Input
               id={`ot-${row.labourId}-${String(line)}-hours`}
               aria-label={`${row.name} overtime ${String(line + 1)} hours`}
+              aria-required={lines[line]?.fromTimes !== true}
               inputMode="decimal"
               className="h-11"
               value={lines[line]?.hours ?? ""}

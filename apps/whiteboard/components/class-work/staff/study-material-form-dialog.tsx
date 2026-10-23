@@ -209,9 +209,12 @@ function StudyMaterialForm({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="material-title">Title</Label>
+        <Label htmlFor="material-title" required>
+          Title
+        </Label>
         <Input
           id="material-title"
+          aria-required
           className="h-10"
           maxLength={TITLE_LIMIT}
           placeholder="e.g. Tally shortcut keys"

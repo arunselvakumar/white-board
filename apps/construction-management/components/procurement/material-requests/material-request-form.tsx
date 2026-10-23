@@ -104,6 +104,7 @@ function OptionSelect({
   onChange,
   items,
   invalid,
+  required = false,
 }: {
   id: string;
   label: string;
@@ -111,6 +112,7 @@ function OptionSelect({
   onChange: (value: string) => void;
   items: { value: string; label: string }[];
   invalid?: boolean;
+  required?: boolean;
 }) {
   return (
     <Select
@@ -124,6 +126,7 @@ function OptionSelect({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required={required}
         aria-invalid={invalid}
       >
         <SelectValue />
@@ -271,19 +274,24 @@ export function MaterialRequestForm({
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="mr-date">Request Date</Label>
+              <Label htmlFor="mr-date" required>
+                Request Date
+              </Label>
               <Input
                 id="mr-date"
                 type="date"
                 className="h-10"
                 max={today()}
+                aria-required
                 aria-invalid={errors.requestDate != null}
                 {...form.register("requestDate")}
               />
               <FieldError message={errors.requestDate?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="mr-store">Request To</Label>
+              <Label htmlFor="mr-store" required>
+                Request To
+              </Label>
               <Controller
                 name="storeId"
                 control={form.control}
@@ -294,6 +302,7 @@ export function MaterialRequestForm({
                     value={field.value}
                     onChange={field.onChange}
                     items={storeItems}
+                    required
                     invalid={errors.storeId != null}
                   />
                 )}
@@ -385,7 +394,7 @@ export function MaterialRequestForm({
                     className="grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] sm:items-start"
                   >
                     <div className="min-w-0 space-y-1.5">
-                      <Label htmlFor={`mr-material-${String(index)}`}>
+                      <Label htmlFor={`mr-material-${String(index)}`} required>
                         Material
                       </Label>
                       <Controller
@@ -393,6 +402,7 @@ export function MaterialRequestForm({
                         control={form.control}
                         render={({ field }) => (
                           <MaterialPicker
+                            required
                             id={`mr-material-${String(index)}`}
                             value={field.value === "" ? null : field.value}
                             excludeIds={chosen.filter(
@@ -412,7 +422,7 @@ export function MaterialRequestForm({
                       <FieldError message={lineErrors?.materialId?.message} />
                     </div>
                     <div className="min-w-0 space-y-1.5">
-                      <Label htmlFor={`mr-qty-${String(index)}`}>
+                      <Label htmlFor={`mr-qty-${String(index)}`} required>
                         Ask Qty
                         {(watched[index]?.uomName ?? "") === ""
                           ? ""
@@ -422,6 +432,7 @@ export function MaterialRequestForm({
                         id={`mr-qty-${String(index)}`}
                         inputMode="decimal"
                         className="h-10"
+                        aria-required
                         aria-invalid={lineErrors?.askQty != null}
                         {...form.register(`items.${index}.askQty`)}
                       />

@@ -218,17 +218,21 @@ function Field({
   label,
   error,
   className,
+  required = false,
   children,
 }: {
   id: string;
   label: string;
   error: string | undefined;
   className?: string;
+  required?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className={`space-y-1.5 ${className ?? ""}`}>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {children}
       <FieldError message={error} />
     </div>
@@ -242,6 +246,7 @@ function PickerSelect({
   onChange,
   invalid,
   label,
+  required = false,
 }: {
   id: string;
   items: { value: string; label: string }[];
@@ -249,6 +254,7 @@ function PickerSelect({
   onChange: (value: string) => void;
   invalid: boolean;
   label: string;
+  required?: boolean;
 }) {
   return (
     <Select
@@ -262,6 +268,7 @@ function PickerSelect({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required={required}
         aria-invalid={invalid}
       >
         <SelectValue placeholder="Choose…" />
@@ -358,11 +365,13 @@ export function MaterialForm({
             id="material-name"
             label="Material name"
             error={errors.name?.message}
+            required
           >
             <Input
               id="material-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder="Cement OPC 53"
               aria-invalid={errors.name != null}
               {...form.register("name")}
@@ -372,6 +381,7 @@ export function MaterialForm({
             id="material-item-type"
             label="Item Type"
             error={errors.itemType?.message}
+            required
           >
             <Controller
               name="itemType"
@@ -381,6 +391,7 @@ export function MaterialForm({
                   id="material-item-type"
                   label="Item Types"
                   items={typeItems}
+                  required
                   value={field.value}
                   onChange={field.onChange}
                   invalid={errors.itemType != null}
@@ -392,6 +403,7 @@ export function MaterialForm({
             id="material-unit"
             label="Measurement Unit"
             error={errors.uomId?.message}
+            required
           >
             <Controller
               name="uomId"
@@ -401,6 +413,7 @@ export function MaterialForm({
                   id="material-unit"
                   label="Measurement Units"
                   items={unitItems}
+                  required
                   value={field.value}
                   onChange={field.onChange}
                   invalid={errors.uomId != null}
@@ -467,12 +480,14 @@ export function MaterialForm({
               id="material-min-qty"
               label="Minimum quantity at each location"
               error={errors.minStockQty?.message}
+              required
             >
               <Input
                 id="material-min-qty"
                 className="h-10"
                 inputMode="decimal"
                 autoComplete="off"
+                aria-required
                 placeholder="50"
                 aria-invalid={errors.minStockQty != null}
                 {...form.register("minStockQty")}

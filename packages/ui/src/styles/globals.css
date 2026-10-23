@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./sidebar-icon-motion.css";
 
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
@@ -186,6 +187,62 @@
     }
     to {
       background-position: 20vw 0;
+    }
+  }
+
+  /* Text generate effect: a word fades in and sharpens. Callers stagger
+     words with `animation-delay`. */
+  --animate-text-generate: text-generate 0.5s ease-out both;
+
+  @keyframes text-generate {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+    }
+  }
+
+  /* Select (React Bits' Glide Select): the menu pops out of the trigger's
+     corner (180 ms in, 120 ms out; fades only with reduced motion), and the
+     trigger label settles in after a pointer pick. Keyframes rather than
+     transitions, so story tests' global `animation: none` shows the menu at
+     once. */
+  --ease-glide: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-select-pop-in: select-pop-in 180ms var(--ease-glide);
+  --animate-select-pop-out: select-pop-out 120ms var(--ease-glide) forwards;
+  --animate-select-fade-in: select-fade-in 180ms ease;
+  --animate-select-fade-out: select-fade-out 120ms ease forwards;
+  --animate-select-value-swap: select-value-swap 160ms ease;
+
+  @keyframes select-pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes select-pop-out {
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes select-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes select-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes select-value-swap {
+    from {
+      opacity: 0.6;
+      filter: blur(2px);
     }
   }
 }

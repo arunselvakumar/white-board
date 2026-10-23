@@ -121,11 +121,14 @@ export function LookupNameDialog({
             <DialogDescription>{config.dialogDescription}</DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId}>{config.singular} name</Label>
+            <Label htmlFor={fieldId} required>
+              {config.singular} name
+            </Label>
             <Input
               id={fieldId}
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder={config.placeholder}
               aria-invalid={errors.name != null}
               readOnly={nameLocked}
@@ -144,7 +147,9 @@ export function LookupNameDialog({
           </div>
           {withSkill ? (
             <div className="space-y-1.5">
-              <Label htmlFor={`${fieldId}-skill`}>Skill</Label>
+              <Label htmlFor={`${fieldId}-skill`} required>
+                Skill
+              </Label>
               <Controller
                 control={form.control}
                 name="skill"
@@ -160,6 +165,7 @@ export function LookupNameDialog({
                       id={`${fieldId}-skill`}
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>

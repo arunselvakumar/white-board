@@ -9,7 +9,7 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -476,7 +476,9 @@ function PaymentForm({
         <div className="grid gap-4 sm:grid-cols-2">
           {fixedPartyId == null && (
             <div className="min-w-0 space-y-1.5 sm:col-span-2">
-              <Label htmlFor="payment-party">{screen.label}</Label>
+              <Label htmlFor="payment-party" required>
+                {screen.label}
+              </Label>
               <Controller
                 name="partyId"
                 control={form.control}
@@ -495,6 +497,7 @@ function PaymentForm({
                       id="payment-party"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={errors.partyId != null}
                     >
                       <SelectValue placeholder={`Choose a ${screen.label}`} />
@@ -516,6 +519,7 @@ function PaymentForm({
             <div className="min-w-0 space-y-1.5 sm:col-span-2">
               <span id="payment-direction" className="text-sm font-medium">
                 Direction
+                <RequiredIndicator />
               </span>
               <Controller
                 name="direction"
@@ -546,18 +550,21 @@ function PaymentForm({
             </div>
           )}
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="payment-date">Payment date</Label>
+            <Label htmlFor="payment-date" required>
+              Payment date
+            </Label>
             <Input
               id="payment-date"
               type="date"
               className="h-10"
+              aria-required
               aria-invalid={errors.paymentDate != null}
               {...form.register("paymentDate")}
             />
             <FieldError message={errors.paymentDate?.message} />
           </div>
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="payment-amount">
+            <Label htmlFor="payment-amount" required>
               {contractor
                 ? "Amount settled (paid + TDS)"
                 : client
@@ -567,6 +574,7 @@ function PaymentForm({
             <MoneyInput
               id="payment-amount"
               className="h-10"
+              aria-required
               aria-invalid={errors.amount != null}
               {...form.register("amount")}
             />
@@ -575,6 +583,7 @@ function PaymentForm({
           <div className="min-w-0 space-y-1.5 sm:col-span-2">
             <span id="payment-mode" className="text-sm font-medium">
               Mode
+              <RequiredIndicator />
             </span>
             <Controller
               name="mode"
@@ -601,7 +610,7 @@ function PaymentForm({
             />
           </div>
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="payment-account">
+            <Label htmlFor="payment-account" required>
               {flow === "in" ? "Received into" : "Paid from"}
             </Label>
             <Controller
@@ -609,6 +618,7 @@ function PaymentForm({
               control={form.control}
               render={({ field }) => (
                 <AccountPicker
+                  required
                   id="payment-account"
                   mode={mode}
                   value={field.value}
@@ -621,11 +631,14 @@ function PaymentForm({
           </div>
           {mode === "cheque" ? (
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="payment-cheque">Cheque number</Label>
+              <Label htmlFor="payment-cheque" required>
+                Cheque number
+              </Label>
               <Input
                 id="payment-cheque"
                 className="h-10"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.chequeNumber != null}
                 {...form.register("chequeNumber")}
               />
@@ -633,7 +646,7 @@ function PaymentForm({
             </div>
           ) : (
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="payment-reference">
+              <Label htmlFor="payment-reference" required={mode !== "cash"}>
                 {mode === "cash" ? "Reference (optional)" : "Reference"}
               </Label>
               <Input
@@ -641,6 +654,7 @@ function PaymentForm({
                 className="h-10"
                 autoComplete="off"
                 placeholder={mode === "cash" ? "" : "UTR or UPI reference"}
+                aria-required={mode !== "cash"}
                 aria-invalid={errors.reference != null}
                 {...form.register("reference")}
               />
@@ -971,11 +985,14 @@ function TdsBlock({
             <FieldError message={errors.tdsRate?.message} />
           </div>
           <div className="min-w-0 space-y-1.5 sm:col-span-3">
-            <Label htmlFor="payment-tds-reason">Reason for the change</Label>
+            <Label htmlFor="payment-tds-reason" required>
+              Reason for the change
+            </Label>
             <Textarea
               id="payment-tds-reason"
               rows={2}
               maxLength={500}
+              aria-required
               aria-invalid={errors.tdsReason != null}
               {...form.register("tdsReason")}
             />

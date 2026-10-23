@@ -206,13 +206,16 @@ export function CreateCompanyWizard() {
       >
         {step === 0 && (
           <div className="space-y-1.5">
-            <Label htmlFor="company-name">Company name</Label>
+            <Label htmlFor="company-name" required>
+              Company name
+            </Label>
             <Input
               id="company-name"
               // eslint-disable-next-line jsx-a11y/no-autofocus -- The Company name is the only question on this step.
               autoFocus
               placeholder="Anugraha Engineers"
               className="h-10"
+              aria-required
               {...form.register("name")}
             />
             <FieldError message={errors.name?.message} />
@@ -244,7 +247,9 @@ export function CreateCompanyWizard() {
           <>
             <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
               <div className="space-y-1.5">
-                <Label htmlFor="company-country">Country</Label>
+                <Label htmlFor="company-country" required>
+                  Country
+                </Label>
                 <Controller
                   name="country"
                   control={form.control}
@@ -264,6 +269,7 @@ export function CreateCompanyWizard() {
                         id="company-country"
                         size="lg"
                         className="w-full min-w-0"
+                        aria-required
                       >
                         <SelectValue />
                       </SelectTrigger>
@@ -284,7 +290,9 @@ export function CreateCompanyWizard() {
                 <FieldError message={errors.country?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="company-currency">Currency</Label>
+                <Label htmlFor="company-currency" required>
+                  Currency
+                </Label>
                 <Controller
                   name="currency"
                   control={form.control}
@@ -300,6 +308,7 @@ export function CreateCompanyWizard() {
                         id="company-currency"
                         size="lg"
                         className="w-full min-w-0"
+                        aria-required
                       >
                         <SelectValue />
                       </SelectTrigger>
@@ -370,8 +379,8 @@ export function CreateCompanyWizard() {
           >
             {last
               ? mutation.isPending || created
-                ? "Creating…"
-                : "Create Company"
+                ? "Saving…"
+                : "Save"
               : "Continue"}
           </Button>
         </div>

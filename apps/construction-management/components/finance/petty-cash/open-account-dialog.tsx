@@ -150,7 +150,9 @@ export function OpenAccountDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-holder`}>Team Member</Label>
+            <Label htmlFor={`${id}-holder`} required>
+              Team Member
+            </Label>
             {members.isPending || accounts.isPending ? (
               <SelectControlSkeleton label="Loading Team Members" />
             ) : (
@@ -170,6 +172,7 @@ export function OpenAccountDialog({
                       id={`${id}-holder`}
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={errors.holderMemberId != null}
                     >
                       <SelectValue

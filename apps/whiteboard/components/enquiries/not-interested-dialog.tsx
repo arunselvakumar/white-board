@@ -119,9 +119,12 @@ export function NotInterestedDialog({
             </div>
           </fieldset>
           <div className="space-y-1.5">
-            <Label htmlFor="not-interested-reason">Reason</Label>
+            <Label htmlFor="not-interested-reason" required>
+              Reason
+            </Label>
             <Textarea
               id="not-interested-reason"
+              aria-required
               rows={2}
               maxLength={200}
               placeholder="Pick a reason above or write your own"

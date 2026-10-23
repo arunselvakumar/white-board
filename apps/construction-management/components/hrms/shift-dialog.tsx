@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Switch } from "@repo/ui/components/switch";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
@@ -142,7 +142,10 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      {/* Every field of a shift is required. */}
+      <Label htmlFor={id} required>
+        {label}
+      </Label>
       {children}
       {hint == null ? null : (
         <p id={`${id}-hint`} className="text-muted-foreground text-xs">
@@ -241,6 +244,7 @@ export function ShiftDialog({
           >
             <Input
               id="shift-name"
+              aria-required
               className="h-10"
               autoComplete="off"
               placeholder="General"
@@ -256,6 +260,7 @@ export function ShiftDialog({
             >
               <Input
                 id="shift-start"
+                aria-required
                 type="time"
                 className="h-10"
                 aria-invalid={errors.startTime != null}
@@ -274,6 +279,7 @@ export function ShiftDialog({
             >
               <Input
                 id="shift-end"
+                aria-required
                 type="time"
                 className="h-10"
                 aria-describedby={night ? "shift-end-hint" : undefined}
@@ -283,7 +289,10 @@ export function ShiftDialog({
             </Field>
           </div>
           <fieldset className="space-y-1.5">
-            <legend className="text-sm font-medium">Working days</legend>
+            <legend className="text-sm font-medium">
+              Working days
+              <RequiredIndicator />
+            </legend>
             <Controller
               name="workingDays"
               control={form.control}
@@ -323,6 +332,7 @@ export function ShiftDialog({
             >
               <Input
                 id="shift-hours"
+                aria-required
                 inputMode="decimal"
                 className="h-10"
                 aria-invalid={errors.workingHours != null}
@@ -336,6 +346,7 @@ export function ShiftDialog({
             >
               <Input
                 id="shift-half-day"
+                aria-required
                 inputMode="decimal"
                 className="h-10"
                 aria-invalid={errors.halfDayHours != null}
@@ -349,6 +360,7 @@ export function ShiftDialog({
             >
               <Input
                 id="shift-grace"
+                aria-required
                 inputMode="numeric"
                 className="h-10"
                 aria-invalid={errors.graceMinutes != null}

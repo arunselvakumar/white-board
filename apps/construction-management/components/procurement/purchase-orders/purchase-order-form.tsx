@@ -19,7 +19,7 @@ import {
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -94,10 +94,21 @@ const SERVER_FIELDS: Partial<
   DEDUCTION_TOO_LARGE: "deductionAmount",
 };
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({
+  title,
+  required = false,
+  children,
+}: {
+  title: string;
+  required?: boolean;
+  children: ReactNode;
+}) {
   return (
     <section aria-label={title} className="space-y-4 rounded-lg border p-4">
-      <h3 className="font-semibold">{title}</h3>
+      <h3 className="font-semibold">
+        {title}
+        {required && <RequiredIndicator />}
+      </h3>
       {children}
     </section>
   );
@@ -109,6 +120,7 @@ function SimpleSelect({
   items,
   invalid,
   disabled,
+  required = false,
   onChange,
 }: {
   id: string;
@@ -116,6 +128,7 @@ function SimpleSelect({
   items: { value: string; label: string }[];
   invalid?: boolean;
   disabled?: boolean;
+  required?: boolean;
   onChange: (value: string) => void;
 }) {
   return (
@@ -131,6 +144,7 @@ function SimpleSelect({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required={required}
         aria-invalid={invalid}
       >
         <SelectValue />
@@ -377,11 +391,14 @@ function PurchaseOrderFields({
       <Section title="Order">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="po-date">Purchase Order Date</Label>
+            <Label htmlFor="po-date" required>
+              Purchase Order Date
+            </Label>
             <Input
               id="po-date"
               type="date"
               max={today}
+              aria-required
               aria-invalid={errors.orderDate != null}
               {...form.register("orderDate")}
             />
@@ -408,7 +425,9 @@ function PurchaseOrderFields({
             <FieldError message={errors.purchaseRequestId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="po-supplier">Supplier</Label>
+            <Label htmlFor="po-supplier" required>
+              Supplier
+            </Label>
             <Controller
               name="supplierId"
               control={form.control}
@@ -417,6 +436,7 @@ function PurchaseOrderFields({
                   id="po-supplier"
                   value={field.value}
                   items={supplierItems}
+                  required
                   invalid={errors.supplierId != null}
                   onChange={(next) => {
                     field.onChange(next);
@@ -446,10 +466,13 @@ function PurchaseOrderFields({
             <FieldError message={errors.supplierId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="po-expected">Expected Delivery Date</Label>
+            <Label htmlFor="po-expected" required>
+              Expected Delivery Date
+            </Label>
             <Input
               id="po-expected"
               type="date"
+              aria-required
               aria-invalid={errors.expectedDeliveryDate != null}
               {...form.register("expectedDeliveryDate")}
             />
@@ -473,7 +496,7 @@ function PurchaseOrderFields({
         </div>
       </Section>
 
-      <Section title="Materials">
+      <Section title="Materials" required>
         {fields.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             {loadingPr
@@ -615,7 +638,9 @@ function PurchaseOrderFields({
 
       <Section title="Billing">
         <div className="space-y-1.5">
-          <Label htmlFor="po-billing">Billing Address</Label>
+          <Label htmlFor="po-billing" required>
+            Billing Address
+          </Label>
           <Controller
             name="billingAddressId"
             control={form.control}
@@ -624,6 +649,7 @@ function PurchaseOrderFields({
                 id="po-billing"
                 value={field.value}
                 items={billingItems}
+                required
                 invalid={errors.billingAddressId != null}
                 onChange={field.onChange}
               />
@@ -736,9 +762,12 @@ function PurchaseOrderFields({
         {values.deliveryAddressDiffers === true && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="po-delivery-address">Delivery Address</Label>
+              <Label htmlFor="po-delivery-address" required>
+                Delivery Address
+              </Label>
               <Textarea
                 id="po-delivery-address"
+                aria-required
                 aria-invalid={errors.deliveryAddress != null}
                 {...form.register("deliveryAddress")}
               />
@@ -762,7 +791,9 @@ function PurchaseOrderFields({
           </div>
         )}
         <div className="space-y-1.5">
-          <Label htmlFor="po-supply-type">Supply type</Label>
+          <Label htmlFor="po-supply-type" required>
+            Supply type
+          </Label>
           <Controller
             name="supplyType"
             control={form.control}
@@ -771,6 +802,7 @@ function PurchaseOrderFields({
                 id="po-supply-type"
                 value={field.value}
                 items={supplyItems}
+                required
                 onChange={(next) => {
                   field.onChange(next === "" ? "auto" : next);
                 }}

@@ -143,6 +143,7 @@ export function AssignShiftDialog({
             render={({ field }) => (
               <RadioGroup
                 aria-label="Shift or rotation"
+                aria-required
                 value={field.value}
                 onValueChange={(value) => {
                   field.onChange(value);
@@ -171,7 +172,7 @@ export function AssignShiftDialog({
             )}
           />
           <div className="space-y-1.5">
-            <Label htmlFor="assign-template">
+            <Label htmlFor="assign-template" required>
               {kind === "shift" ? "Shift" : "Rotation"}
             </Label>
             <Controller
@@ -187,6 +188,7 @@ export function AssignShiftDialog({
                 >
                   <SelectTrigger
                     id="assign-template"
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.templateId != null}
@@ -210,9 +212,12 @@ export function AssignShiftDialog({
             <FieldError message={errors.templateId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="assign-from">From</Label>
+            <Label htmlFor="assign-from" required>
+              From
+            </Label>
             <Input
               id="assign-from"
+              aria-required
               type="date"
               className="h-10"
               aria-describedby="assign-from-hint"

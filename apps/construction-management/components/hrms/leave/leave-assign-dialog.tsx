@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -142,7 +142,9 @@ function AssignForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="leave-assign-structure">Structure</Label>
+          <Label htmlFor="leave-assign-structure" required>
+            Structure
+          </Label>
           <Controller
             name="structureId"
             control={form.control}
@@ -156,6 +158,7 @@ function AssignForm({
               >
                 <SelectTrigger
                   id="leave-assign-structure"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                   aria-invalid={errors.structureId != null}
@@ -179,9 +182,12 @@ function AssignForm({
           <FieldError message={errors.structureId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="leave-assign-from">Applies from</Label>
+          <Label htmlFor="leave-assign-from" required>
+            Applies from
+          </Label>
           <Input
             id="leave-assign-from"
+            aria-required
             type="date"
             className="h-10"
             aria-invalid={errors.effectiveFrom != null}
@@ -191,7 +197,10 @@ function AssignForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <span className="text-sm font-medium">Team Members</span>
+        <span className="text-sm font-medium">
+          Team Members
+          <RequiredIndicator />
+        </span>
         <Controller
           name="memberIds"
           control={form.control}

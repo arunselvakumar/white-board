@@ -207,6 +207,10 @@ export function VoucherForm({
   const voucherType = useWatch({ control: form.control, name: "voucherType" });
   const chosenAccount = useWatch({ control: form.control, name: "accountId" });
   const project = useWatch({ control: form.control, name: "project" });
+  const counterpartyKind = useWatch({
+    control: form.control,
+    name: "counterparty.kind",
+  });
   const canApprove = canInFinance(access, "finance.petty_cash", "approve");
   const transfer = voucherType === "transfer";
 
@@ -342,7 +346,9 @@ export function VoucherForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="voucher-account">Petty-cash account</Label>
+          <Label htmlFor="voucher-account" required>
+            Petty-cash account
+          </Label>
           <Controller
             control={form.control}
             name="accountId"
@@ -359,6 +365,7 @@ export function VoucherForm({
                   id="voucher-account"
                   size="lg"
                   className="w-full min-w-0"
+                  aria-required
                   aria-invalid={errors.accountId != null}
                 >
                   <SelectValue placeholder="Choose an account" />
@@ -376,10 +383,13 @@ export function VoucherForm({
           <FieldError message={errors.accountId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="voucher-date">Date</Label>
+          <Label htmlFor="voucher-date" required>
+            Date
+          </Label>
           <Input
             id="voucher-date"
             type="date"
+            aria-required
             aria-invalid={errors.voucherDate != null}
             {...form.register("voucherDate")}
           />
@@ -389,10 +399,13 @@ export function VoucherForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="voucher-amount">Amount</Label>
+          <Label htmlFor="voucher-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="voucher-amount"
             placeholder="0"
+            aria-required
             aria-invalid={errors.amount != null}
             {...form.register("amount")}
           />
@@ -400,7 +413,9 @@ export function VoucherForm({
         </div>
         {transfer ? (
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-to">To account</Label>
+            <Label htmlFor="voucher-to" required>
+              To account
+            </Label>
             <Controller
               control={form.control}
               name="toAccountId"
@@ -416,6 +431,7 @@ export function VoucherForm({
                     id="voucher-to"
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.toAccountId != null}
                   >
                     <SelectValue placeholder="Choose an account" />
@@ -434,7 +450,9 @@ export function VoucherForm({
           </div>
         ) : (
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-category">Payment Category</Label>
+            <Label htmlFor="voucher-category" required>
+              Payment Category
+            </Label>
             <Controller
               control={form.control}
               name="paymentCategoryId"
@@ -488,7 +506,7 @@ export function VoucherForm({
         </div>
         {transfer ? null : (
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-party">
+            <Label htmlFor="voucher-party" required={counterpartyKind != null}>
               {voucherType === "receipt" ? "Received from" : "Paid to"}
             </Label>
             <Controller
@@ -496,6 +514,7 @@ export function VoucherForm({
               name="counterparty"
               render={({ field }) => (
                 <CounterpartyField
+                  required={counterpartyKind != null}
                   id="voucher-party"
                   value={field.value as CounterpartyValue}
                   onChange={field.onChange}

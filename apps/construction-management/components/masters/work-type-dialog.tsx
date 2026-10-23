@@ -173,11 +173,14 @@ export function WorkTypeDialog({
             ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-name`}>Work Type name</Label>
+                <Label htmlFor={`${id}-name`} required>
+                  Work Type name
+                </Label>
                 <Input
                   id={`${id}-name`}
                   className="h-10"
                   autoComplete="off"
+                  aria-required
                   placeholder="Column casting"
                   readOnly={locked}
                   aria-invalid={errors.name != null}
@@ -186,7 +189,9 @@ export function WorkTypeDialog({
                 <FieldError message={errors.name?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-department`}>Department</Label>
+                <Label htmlFor={`${id}-department`} required>
+                  Department
+                </Label>
                 <Controller
                   control={form.control}
                   name="departmentId"
@@ -203,6 +208,7 @@ export function WorkTypeDialog({
                         id={`${id}-department`}
                         size="lg"
                         className="w-full min-w-0"
+                        aria-required
                         aria-invalid={errors.departmentId != null}
                       >
                         <SelectValue placeholder="Choose…" />

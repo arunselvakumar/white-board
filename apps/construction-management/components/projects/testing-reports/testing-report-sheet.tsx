@@ -7,7 +7,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Progress } from "@repo/ui/components/progress";
 import {
   Sheet,
@@ -180,11 +180,14 @@ function ReportForm({
       </SheetHeader>
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 pb-4">
         <div className="space-y-1.5">
-          <Label htmlFor="testing-report-name">Name</Label>
+          <Label htmlFor="testing-report-name" required>
+            Name
+          </Label>
           <Input
             id="testing-report-name"
             className="h-10"
             autoComplete="off"
+            aria-required
             placeholder="Cube test – pour 12"
             aria-invalid={errors.name != null}
             {...form.register("name")}
@@ -192,11 +195,14 @@ function ReportForm({
           <FieldError message={errors.name?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="testing-report-date">Report date</Label>
+          <Label htmlFor="testing-report-date" required>
+            Report date
+          </Label>
           <Input
             id="testing-report-date"
             type="date"
             className="h-10"
+            aria-required
             aria-invalid={errors.reportDate != null}
             {...form.register("reportDate")}
           />
@@ -226,7 +232,13 @@ function ReportForm({
         <div className="space-y-1.5">
           <span id="testing-report-file" className="text-sm font-medium">
             File
+            {adding ? <RequiredIndicator /> : null}
           </span>
+          {adding ? (
+            <span id="testing-report-file-required" className="sr-only">
+              A file is required.
+            </span>
+          ) : null}
           <Controller
             name="file"
             control={form.control}
@@ -279,6 +291,9 @@ function ReportForm({
               variant="outline"
               size="sm"
               disabled={save.isPending}
+              aria-describedby={
+                adding ? "testing-report-file-required" : undefined
+              }
               onClick={() => picker.current?.click()}
             >
               <Paperclip aria-hidden="true" />

@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -226,9 +226,12 @@ export function RotationDialog({
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5 sm:col-span-3">
-              <Label htmlFor="rotation-name">Rotation name</Label>
+              <Label htmlFor="rotation-name" required>
+                Rotation name
+              </Label>
               <Input
                 id="rotation-name"
+                aria-required
                 className="h-10"
                 autoComplete="off"
                 placeholder="Crew A"
@@ -238,7 +241,9 @@ export function RotationDialog({
               <FieldError message={errors.name?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="rotation-type">Rotation type</Label>
+              <Label htmlFor="rotation-type" required>
+                Rotation type
+              </Label>
               <Controller
                 name="type"
                 control={form.control}
@@ -254,6 +259,7 @@ export function RotationDialog({
                   >
                     <SelectTrigger
                       id="rotation-type"
+                      aria-required
                       size="lg"
                       className="w-full min-w-0"
                     >
@@ -276,7 +282,9 @@ export function RotationDialog({
             </div>
             {type === "custom_cycle" ? (
               <div className="space-y-1.5">
-                <Label htmlFor="rotation-days">Days per cycle</Label>
+                <Label htmlFor="rotation-days" required>
+                  Days per cycle
+                </Label>
                 <Controller
                   name="daysPerCycle"
                   control={form.control}
@@ -292,6 +300,7 @@ export function RotationDialog({
                     >
                       <SelectTrigger
                         id="rotation-days"
+                        aria-required
                         size="lg"
                         className="w-full min-w-0"
                       >
@@ -353,6 +362,7 @@ export function RotationDialog({
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">
               Cycle shifts ({slots.length} days)
+              <RequiredIndicator />
             </legend>
             <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {slots.map((_slot, index) => {

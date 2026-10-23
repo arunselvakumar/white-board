@@ -14,7 +14,7 @@ import {
 } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -78,6 +78,7 @@ function ChoiceField({
   choices,
   placeholder,
   error,
+  required = false,
 }: {
   id: string;
   label: string;
@@ -86,10 +87,13 @@ function ChoiceField({
   choices: Choice[];
   placeholder: string;
   error?: string;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       <Controller
         name={name}
         control={control}
@@ -109,6 +113,7 @@ function ChoiceField({
               id={id}
               size="lg"
               className="w-full min-w-0"
+              aria-required={required}
               aria-invalid={error != null}
             >
               <SelectValue placeholder={placeholder} />
@@ -218,12 +223,15 @@ export function LabourForm({
       <Section id="labour-basic" title="Basic">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="labour-name">Labour name</Label>
+            <Label htmlFor="labour-name" required>
+              Labour name
+            </Label>
             <Input
               id="labour-name"
               className="h-10"
               autoComplete="off"
               placeholder="Dhuresh Nawin"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />
@@ -260,11 +268,14 @@ export function LabourForm({
             <FieldError message={errors.fatherName?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="labour-joining-date">Joining date</Label>
+            <Label htmlFor="labour-joining-date" required>
+              Joining date
+            </Label>
             <Input
               id="labour-joining-date"
               type="date"
               className="h-10"
+              aria-required
               aria-invalid={errors.joiningDate != null}
               {...form.register("joiningDate")}
             />
@@ -284,7 +295,10 @@ export function LabourForm({
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <fieldset className="space-y-1.5">
-            <legend className="text-sm font-medium">Wage type</legend>
+            <legend className="text-sm font-medium">
+              Wage type
+              <RequiredIndicator />
+            </legend>
             <Controller
               name="wageType"
               control={form.control}
@@ -309,11 +323,14 @@ export function LabourForm({
           {showAmounts &&
             (wageType === "daily" ? (
               <div className="space-y-1.5">
-                <Label htmlFor="labour-wage-day">Wage per day</Label>
+                <Label htmlFor="labour-wage-day" required>
+                  Wage per day
+                </Label>
                 <MoneyInput
                   id="labour-wage-day"
                   className="h-10"
                   placeholder="700"
+                  aria-required
                   aria-invalid={errors.wagePerDay != null}
                   {...form.register("wagePerDay")}
                 />
@@ -321,11 +338,14 @@ export function LabourForm({
               </div>
             ) : (
               <div className="space-y-1.5">
-                <Label htmlFor="labour-wage-month">Wage per month</Label>
+                <Label htmlFor="labour-wage-month" required>
+                  Wage per month
+                </Label>
                 <MoneyInput
                   id="labour-wage-month"
                   className="h-10"
                   placeholder="18000"
+                  aria-required
                   aria-invalid={errors.wagePerMonth != null}
                   {...form.register("wagePerMonth")}
                 />
@@ -334,11 +354,14 @@ export function LabourForm({
             ))}
           {showAmounts && (
             <div className="space-y-1.5">
-              <Label htmlFor="labour-overtime">Overtime wage per hour</Label>
+              <Label htmlFor="labour-overtime" required>
+                Overtime wage per hour
+              </Label>
               <MoneyInput
                 id="labour-overtime"
                 className="h-10"
                 placeholder="100"
+                aria-required
                 aria-invalid={errors.overtimeWagePerHour != null}
                 {...form.register("overtimeWagePerHour")}
               />
@@ -346,13 +369,16 @@ export function LabourForm({
             </div>
           )}
           <div className="space-y-1.5">
-            <Label htmlFor="labour-working-hours">Working hours per day</Label>
+            <Label htmlFor="labour-working-hours" required>
+              Working hours per day
+            </Label>
             <Input
               id="labour-working-hours"
               inputMode="decimal"
               className="h-10"
               placeholder="8"
               aria-describedby="labour-working-hours-hint"
+              aria-required
               aria-invalid={errors.workingHoursPerDay != null}
               {...form.register("workingHoursPerDay")}
             />
@@ -525,6 +551,7 @@ export function LabourForm({
                 projects.isPending ? "Loading Projects…" : "Select a Project"
               }
               error={errors.currentProjectId?.message}
+              required
             />
           </div>
           {projects.data?.items.length === 0 && (

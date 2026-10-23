@@ -21,7 +21,7 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -552,7 +552,10 @@ function includesText(includes: PlansView["plans"][number]["includes"]) {
 function PlanStep({ form, plans }: StepProps & { plans: PlansView["plans"] }) {
   return (
     <fieldset className="space-y-3">
-      <legend className="mb-3 text-lg font-semibold">Choose a plan</legend>
+      <legend className="mb-3 text-lg font-semibold">
+        Choose a plan
+        <RequiredIndicator />
+      </legend>
       <Controller
         name="planCode"
         control={form.control}
@@ -565,6 +568,7 @@ function PlanStep({ form, plans }: StepProps & { plans: PlansView["plans"] }) {
               form.setValue("months", String(plan?.durations[0]?.months ?? ""));
             }}
             aria-label="Plans"
+            aria-required
             className="grid gap-3 sm:grid-cols-2"
           >
             {plans.map((plan) => (
@@ -596,6 +600,7 @@ function DurationStep({
     <fieldset className="space-y-3">
       <legend className="mb-3 text-lg font-semibold">
         {kind === "extend" ? "Add how long?" : "For how long?"}
+        <RequiredIndicator />
       </legend>
       <Controller
         name="months"
@@ -605,6 +610,7 @@ function DurationStep({
             value={field.value}
             onValueChange={field.onChange}
             aria-label="Durations"
+            aria-required
             className="grid gap-3 sm:grid-cols-2"
           >
             {(plan?.durations ?? []).map((duration) => (
@@ -685,27 +691,35 @@ function BuyerStep({ form }: StepProps) {
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="billing-name">Billing name</Label>
+          <Label htmlFor="billing-name" required>
+            Billing name
+          </Label>
           <Input
             id="billing-name"
             className="h-10"
             placeholder="Anugraha Engineers"
+            aria-required
             {...form.register("name")}
           />
           <FieldError message={errors.name?.message} />
         </div>
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="billing-address">Billing address</Label>
+          <Label htmlFor="billing-address" required>
+            Billing address
+          </Label>
           <Textarea
             id="billing-address"
             rows={3}
             placeholder="Plot 4, Avinashi Road, Coimbatore 641018"
+            aria-required
             {...form.register("address")}
           />
           <FieldError message={errors.address?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="billing-state">State</Label>
+          <Label htmlFor="billing-state" required>
+            State
+          </Label>
           <Controller
             name="stateCode"
             control={form.control}
@@ -721,6 +735,7 @@ function BuyerStep({ form }: StepProps) {
                   id="billing-state"
                   size="lg"
                   className="w-full min-w-0"
+                  aria-required
                 >
                   <SelectValue placeholder="Choose the state" />
                 </SelectTrigger>

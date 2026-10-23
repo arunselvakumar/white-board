@@ -397,12 +397,15 @@ function RejectDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="settlement-reject-reason">Reason</Label>
+          <Label htmlFor="settlement-reject-reason" required>
+            Reason
+          </Label>
           <Textarea
             id="settlement-reject-reason"
             rows={3}
             maxLength={500}
             value={reason}
+            aria-required
             aria-invalid={error != null}
             onChange={(event) => {
               setReason(event.target.value);

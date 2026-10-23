@@ -121,9 +121,12 @@ export function LoginForm({
         noValidate
       >
         <div className="space-y-1.5">
-          <Label htmlFor="identifier">Email or username</Label>
+          <Label htmlFor="identifier" required>
+            Email or username
+          </Label>
           <Input
             id="identifier"
+            aria-required
             autoComplete="username"
             // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
             autoFocus
@@ -136,7 +139,9 @@ export function LoginForm({
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" required>
+              Password
+            </Label>
             <Link
               href="/forgot-password"
               className="text-primary text-xs hover:underline"
@@ -146,6 +151,7 @@ export function LoginForm({
           </div>
           <PasswordField
             id="password"
+            aria-required
             autoComplete="current-password"
             placeholder="Enter your password"
             {...register("password")}

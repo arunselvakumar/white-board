@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -319,7 +319,7 @@ function InvoiceForm({
     >
       {!fixedParty && (
         <div className="space-y-1.5">
-          <Label htmlFor="invoice-party">
+          <Label htmlFor="invoice-party" required>
             {PARTY_SCREENS[partyType].label}
           </Label>
           <Controller
@@ -337,6 +337,7 @@ function InvoiceForm({
                   id="invoice-party"
                   size="lg"
                   className="w-full min-w-0"
+                  aria-required
                   aria-invalid={errors.partyId != null}
                 >
                   <SelectValue
@@ -360,6 +361,7 @@ function InvoiceForm({
         <div className="space-y-1.5">
           <span id="invoice-direction" className="text-sm font-medium">
             Invoice
+            <RequiredIndicator />
           </span>
           <Controller
             name="direction"
@@ -418,12 +420,15 @@ function InvoiceForm({
       <div className="grid gap-4 sm:grid-cols-3">
         {direction === "payable" ? (
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="invoice-number">Invoice number</Label>
+            <Label htmlFor="invoice-number" required>
+              Invoice number
+            </Label>
             <Input
               id="invoice-number"
               className="h-10"
               autoComplete="off"
               disabled={fromGrn}
+              aria-required
               aria-invalid={errors.invoiceNumber != null}
               {...form.register("invoiceNumber")}
             />
@@ -438,12 +443,15 @@ function InvoiceForm({
           </div>
         )}
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="invoice-date">Invoice date</Label>
+          <Label htmlFor="invoice-date" required>
+            Invoice date
+          </Label>
           <Input
             id="invoice-date"
             type="date"
             className="h-10"
             disabled={fromGrn}
+            aria-required
             aria-invalid={errors.invoiceDate != null}
             {...form.register("invoiceDate")}
           />
@@ -521,11 +529,14 @@ function InvoiceForm({
           <FieldError message={errors.gstAmount?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="invoice-amount">Amount</Label>
+          <Label htmlFor="invoice-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="invoice-amount"
             className="h-10"
             disabled={fromGrn}
+            aria-required
             aria-invalid={errors.amount != null}
             {...form.register("amount")}
           />

@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -180,6 +180,7 @@ export function AccountDialog({
             <div className="space-y-1.5">
               <span id={`${id}-kind`} className="text-sm font-medium">
                 Account type
+                <RequiredIndicator />
               </span>
               <Controller
                 control={form.control}
@@ -208,12 +209,15 @@ export function AccountDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-name`}>Account name</Label>
+              <Label htmlFor={`${id}-name`} required>
+                Account name
+              </Label>
               <Input
                 id={`${id}-name`}
                 className="h-10"
                 autoComplete="off"
                 placeholder={kind === "bank" ? "HDFC Current A/c" : "Site cash"}
+                aria-required
                 aria-invalid={errors.name != null}
                 {...form.register("name")}
               />
@@ -282,12 +286,15 @@ export function AccountDialog({
                 <FieldError message={errors.openingBalance?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-opening-date`}>As of</Label>
+                <Label htmlFor={`${id}-opening-date`} required>
+                  As of
+                </Label>
                 <Input
                   id={`${id}-opening-date`}
                   type="date"
                   className="h-10"
                   max={today}
+                  aria-required
                   aria-invalid={errors.openingDate != null}
                   {...form.register("openingDate")}
                 />

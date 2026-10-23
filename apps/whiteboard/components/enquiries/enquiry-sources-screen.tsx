@@ -271,10 +271,13 @@ function AddSourceForm({ onAdded }: { onAdded: () => Promise<void> }) {
         }
       })}
     >
-      <Label htmlFor="new-source-name">New Source</Label>
+      <Label htmlFor="new-source-name" required>
+        New Source
+      </Label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           id="new-source-name"
+          aria-required
           className="h-10 sm:max-w-sm"
           placeholder="e.g. Newspaper ad"
           maxLength={80}

@@ -20,7 +20,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -246,6 +246,7 @@ function BatchSlots({
     <fieldset className="space-y-2">
       <legend className="mb-2 text-sm font-medium">
         Class on {dayDate(date)}
+        <RequiredIndicator />
       </legend>
       <Controller
         name="slotStartTime"
@@ -258,6 +259,7 @@ function BatchSlots({
               if (typeof value === "string") field.onChange(value);
             }}
             aria-invalid={error != null}
+            aria-required
             className="gap-2 sm:grid-cols-2"
           >
             {slots.data.items.map((slot) => {
@@ -294,6 +296,7 @@ function SelectField({
   items,
   placeholder,
   error,
+  required = false,
 }: {
   id: string;
   label: string;
@@ -302,10 +305,13 @@ function SelectField({
   items: { value: string; label: string }[];
   placeholder: string;
   error?: string;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       <Select
         items={items}
         value={value === "" ? null : value}
@@ -316,6 +322,7 @@ function SelectField({
       >
         <SelectTrigger
           id={id}
+          aria-required={required}
           size="lg"
           className="w-full min-w-0"
           aria-invalid={error != null}
@@ -431,7 +438,10 @@ export function BookDemoDialog({
           })}
         >
           <fieldset className="space-y-2">
-            <legend className="mb-2 text-sm font-medium">Kind of demo</legend>
+            <legend className="mb-2 text-sm font-medium">
+              Kind of demo
+              <RequiredIndicator />
+            </legend>
             <Controller
               name="kind"
               control={control}
@@ -443,6 +453,7 @@ export function BookDemoDialog({
                     if (value === "batch" || value === "one_to_one")
                       field.onChange(value);
                   }}
+                  aria-required
                   className="gap-2 sm:grid-cols-2"
                 >
                   <ChoiceRadio
@@ -472,6 +483,7 @@ export function BookDemoDialog({
                     <SelectField
                       id="demo-batch"
                       label="Batch"
+                      required
                       value={field.value}
                       items={batchItems}
                       placeholder={
@@ -488,9 +500,12 @@ export function BookDemoDialog({
                   )}
                 />
                 <div className="space-y-1.5">
-                  <Label htmlFor="demo-date">Date</Label>
+                  <Label htmlFor="demo-date" required>
+                    Date
+                  </Label>
                   <Input
                     id="demo-date"
+                    aria-required
                     type="date"
                     className="h-10"
                     min={today}
@@ -523,6 +538,7 @@ export function BookDemoDialog({
                     <SelectField
                       id="demo-teacher"
                       label="Teacher"
+                      required
                       value={field.value}
                       items={teacherItems}
                       placeholder={
@@ -537,9 +553,12 @@ export function BookDemoDialog({
                 />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="demo-one-date">Date</Label>
+                <Label htmlFor="demo-one-date" required>
+                  Date
+                </Label>
                 <Input
                   id="demo-one-date"
+                  aria-required
                   type="date"
                   className="h-10"
                   min={today}
@@ -549,9 +568,12 @@ export function BookDemoDialog({
                 <FieldError message={errors.date?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="demo-start">Start time</Label>
+                <Label htmlFor="demo-start" required>
+                  Start time
+                </Label>
                 <Input
                   id="demo-start"
+                  aria-required
                   type="time"
                   className="h-10"
                   aria-invalid={errors.startTime != null}
@@ -560,9 +582,12 @@ export function BookDemoDialog({
                 <FieldError message={errors.startTime?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="demo-end">End time</Label>
+                <Label htmlFor="demo-end" required>
+                  End time
+                </Label>
                 <Input
                   id="demo-end"
+                  aria-required
                   type="time"
                   className="h-10"
                   aria-invalid={errors.endTime != null}
@@ -574,7 +599,10 @@ export function BookDemoDialog({
           )}
 
           <fieldset className="space-y-2">
-            <legend className="mb-2 text-sm font-medium">Demo fee</legend>
+            <legend className="mb-2 text-sm font-medium">
+              Demo fee
+              <RequiredIndicator />
+            </legend>
             <Controller
               name="feeKind"
               control={control}
@@ -586,6 +614,7 @@ export function BookDemoDialog({
                     if (value === "free" || value === "paid")
                       field.onChange(value);
                   }}
+                  aria-required
                   className="grid-cols-2 gap-2"
                 >
                   <ChoiceRadio id="demo-fee-free" value="free" label="Free" />
@@ -595,9 +624,12 @@ export function BookDemoDialog({
             />
             {feeKind === "paid" ? (
               <div className="space-y-1.5 pt-2">
-                <Label htmlFor="demo-amount">Amount (₹)</Label>
+                <Label htmlFor="demo-amount" required>
+                  Amount (₹)
+                </Label>
                 <Input
                   id="demo-amount"
+                  aria-required
                   className="h-10"
                   inputMode="decimal"
                   autoComplete="off"

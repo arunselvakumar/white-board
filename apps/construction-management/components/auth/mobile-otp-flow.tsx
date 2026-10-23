@@ -120,23 +120,29 @@ export function MobileOtpFlow({
     >
       {mode === "sign-up" && (
         <div className="space-y-1.5">
-          <Label htmlFor="name">Your name</Label>
+          <Label htmlFor="name" required>
+            Your name
+          </Label>
           <Input
             id="name"
             autoComplete="name"
             placeholder="Arun Selva Kumar"
             className="h-10"
+            aria-required
             {...form.register("name")}
           />
           <FieldError message={form.formState.errors.name?.message} />
         </div>
       )}
       <div className="space-y-1.5">
-        <Label htmlFor="mobile">Mobile number</Label>
+        <Label htmlFor="mobile" required>
+          Mobile number
+        </Label>
         <MobileField
           id="mobile"
           // eslint-disable-next-line jsx-a11y/no-autofocus -- Sign-in is this page's only task, so focus starts in its first field.
           autoFocus={mode === "sign-in"}
+          aria-required
           {...form.register("mobile")}
         />
         <FieldError

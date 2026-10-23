@@ -553,7 +553,9 @@ function MemberRow({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-1.5">
-            <Label htmlFor={`${prefix}-structure`}>Salary structure</Label>
+            <Label htmlFor={`${prefix}-structure`} required>
+              Salary structure
+            </Label>
             <Controller
               name={`rows.${index}.structureId`}
               control={form.control}
@@ -576,6 +578,7 @@ function MemberRow({
                 >
                   <SelectTrigger
                     id={`${prefix}-structure`}
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors?.structureId != null}
@@ -599,11 +602,14 @@ function MemberRow({
             <FieldError message={errors?.structureId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={`${prefix}-base`}>Base salary a month</Label>
+            <Label htmlFor={`${prefix}-base`} required={financial}>
+              Base salary a month
+            </Label>
             {financial ? (
               <div className="flex gap-2">
                 <MoneyInput
                   id={`${prefix}-base`}
+                  aria-required
                   className="min-w-0 flex-1"
                   aria-invalid={errors?.base != null}
                   {...form.register(`rows.${index}.base`)}
@@ -636,9 +642,12 @@ function MemberRow({
             <FieldError message={errors?.base?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={`${prefix}-from`}>Starts on</Label>
+            <Label htmlFor={`${prefix}-from`} required>
+              Starts on
+            </Label>
             <Input
               id={`${prefix}-from`}
+              aria-required
               type="date"
               className="h-10"
               aria-invalid={errors?.effectiveFrom != null}

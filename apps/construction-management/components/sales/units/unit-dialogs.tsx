@@ -180,7 +180,9 @@ export function UnitDetailsDialog({
               <FieldError message={errors.unitType?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="unit-area-unit">Area unit</Label>
+              <Label htmlFor="unit-area-unit" required>
+                Area unit
+              </Label>
               <Controller
                 control={form.control}
                 name="areaUnit"
@@ -195,6 +197,7 @@ export function UnitDetailsDialog({
                     <SelectTrigger
                       id="unit-area-unit"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -330,7 +333,9 @@ export function UnitUnavailableDialog({
         >
           <FormAlert message={error} />
           <div className="space-y-1.5">
-            <Label htmlFor="unit-unavailable-reason">Reason</Label>
+            <Label htmlFor="unit-unavailable-reason" required>
+              Reason
+            </Label>
             <Controller
               control={form.control}
               name="reason"
@@ -345,6 +350,7 @@ export function UnitUnavailableDialog({
                   <SelectTrigger
                     id="unit-unavailable-reason"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.reason != null}
                   >
                     <SelectValue placeholder="Choose a reason" />

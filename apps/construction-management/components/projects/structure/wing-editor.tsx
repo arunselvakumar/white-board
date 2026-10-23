@@ -130,11 +130,14 @@ function AddFloorDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="add-floor-name">Floor name</Label>
+            <Label htmlFor="add-floor-name" required>
+              Floor name
+            </Label>
             <Input
               id="add-floor-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder="Stilt Floor"
               aria-invalid={errors.name != null}
               {...form.register("name")}
@@ -142,7 +145,9 @@ function AddFloorDialog({
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="add-floor-position">Where</Label>
+            <Label htmlFor="add-floor-position" required>
+              Where
+            </Label>
             <Controller
               control={form.control}
               name="position"
@@ -157,6 +162,7 @@ function AddFloorDialog({
                   <SelectTrigger
                     id="add-floor-position"
                     ref={field.ref}
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                   >

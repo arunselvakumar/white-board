@@ -110,18 +110,23 @@ function EditWingForm({
       <section className="bg-card space-y-5 rounded-xl border p-4 sm:p-6">
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="edit-wing-name">Wing Name</Label>
+            <Label htmlFor="edit-wing-name" required>
+              Wing Name
+            </Label>
             <Input
               id="edit-wing-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="edit-wing-phase">Phase</Label>
+            <Label htmlFor="edit-wing-phase" required>
+              Phase
+            </Label>
             <Controller
               control={form.control}
               name="phaseId"
@@ -136,6 +141,7 @@ function EditWingForm({
                   <SelectTrigger
                     id="edit-wing-phase"
                     ref={field.ref}
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                   >

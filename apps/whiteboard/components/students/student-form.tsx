@@ -400,13 +400,16 @@ export function StudentForm({
   function field(
     name: TextFieldName,
     label: string,
-    options: { type?: string; placeholder?: string } = {},
+    options: { type?: string; placeholder?: string; required?: boolean } = {},
   ) {
     return (
       <div className="space-y-1.5">
-        <Label htmlFor={name}>{label}</Label>
+        <Label htmlFor={name} required={options.required}>
+          {label}
+        </Label>
         <Input
           id={name}
+          aria-required={options.required}
           className="h-10"
           type={options.type ?? "text"}
           placeholder={options.placeholder}
@@ -470,14 +473,16 @@ export function StudentForm({
                 options={SALUTATION_OPTIONS}
                 control={control}
               />
-              <div className="sm:col-span-2">{field("name", "Full name")}</div>
+              <div className="sm:col-span-2">
+                {field("name", "Full name", { required: true })}
+              </div>
               <DropdownField
                 name="gender"
                 label="Gender"
                 options={GENDER_OPTIONS}
                 control={control}
               />
-              {field("phone", "Phone number", { type: "tel" })}
+              {field("phone", "Phone number", { type: "tel", required: true })}
               {field("email", "Email address", { type: "email" })}
               {field("dateOfBirth", "Date of birth", { type: "date" })}
               <div className="space-y-1.5 sm:col-span-2">
@@ -620,9 +625,12 @@ export function StudentForm({
                     control={control}
                   />
                   <div className="space-y-1.5">
-                    <Label htmlFor={`guardian-${index}-name`}>Full name</Label>
+                    <Label htmlFor={`guardian-${index}-name`} required>
+                      Full name
+                    </Label>
                     <Input
                       id={`guardian-${index}-name`}
+                      aria-required
                       className="h-10"
                       {...register(`guardians.${index}.name`)}
                     />

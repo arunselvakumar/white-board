@@ -133,13 +133,16 @@ function EmailStep({
       noValidate
     >
       <div className="space-y-1.5">
-        <Label htmlFor="reset-email">Email</Label>
+        <Label htmlFor="reset-email" required>
+          Email
+        </Label>
         <Input
           id="reset-email"
           type="email"
           autoComplete="email"
           placeholder="example@example.com"
           className="h-10"
+          aria-required
           {...form.register("email")}
         />
         <FieldError
@@ -198,7 +201,9 @@ function ResetStep({
         </Button>
       </p>
       <div className="space-y-1.5">
-        <Label htmlFor="reset-code">Code</Label>
+        <Label htmlFor="reset-code" required>
+          Code
+        </Label>
         <Controller
           name="code"
           control={form.control}
@@ -219,11 +224,14 @@ function ResetStep({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="reset-password">New password</Label>
+        <Label htmlFor="reset-password" required>
+          New password
+        </Label>
         <PasswordField
           id="reset-password"
           autoComplete="new-password"
           placeholder="At least 8 characters"
+          aria-required
           {...form.register("password")}
         />
         <FieldError

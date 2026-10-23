@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
@@ -191,6 +191,10 @@ export function TransactionDialog({
   const errors = form.formState.errors;
   const mode = useWatch({ control: form.control, name: "mode" });
   const direction = useWatch({ control: form.control, name: "direction" });
+  const counterpartyKind = useWatch({
+    control: form.control,
+    name: "counterparty.kind",
+  });
   const partyLabel = direction === "payment_in" ? "Received From" : "Paid To";
 
   const save = (approve: boolean, confirm: boolean) =>
@@ -288,6 +292,7 @@ export function TransactionDialog({
               <div className="space-y-1.5">
                 <span id={`${id}-direction`} className="text-sm font-medium">
                   Type
+                  <RequiredIndicator />
                 </span>
                 <Controller
                   control={form.control}
@@ -315,11 +320,14 @@ export function TransactionDialog({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-date`}>Date</Label>
+                <Label htmlFor={`${id}-date`} required>
+                  Date
+                </Label>
                 <Input
                   id={`${id}-date`}
                   type="date"
                   className="h-10"
+                  aria-required
                   aria-invalid={errors.transactionDate != null}
                   {...form.register("transactionDate")}
                 />
@@ -330,6 +338,7 @@ export function TransactionDialog({
               <div className="space-y-1.5">
                 <span id={`${id}-mode`} className="text-sm font-medium">
                   Mode
+                  <RequiredIndicator />
                 </span>
                 <Controller
                   control={form.control}
@@ -346,7 +355,7 @@ export function TransactionDialog({
                 />
               </div>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor={`${id}-account`}>
+                <Label htmlFor={`${id}-account`} required>
                   {direction === "payment_in" ? "Received into" : "Paid from"}
                 </Label>
                 <Controller
@@ -354,6 +363,7 @@ export function TransactionDialog({
                   name="accountId"
                   render={({ field }) => (
                     <AccountPicker
+                      required
                       id={`${id}-account`}
                       mode={mode}
                       value={field.value}
@@ -368,11 +378,14 @@ export function TransactionDialog({
             {mode === "cheque" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor={`${id}-cheque`}>Cheque number</Label>
+                  <Label htmlFor={`${id}-cheque`} required>
+                    Cheque number
+                  </Label>
                   <Input
                     id={`${id}-cheque`}
                     className="h-10"
                     autoComplete="off"
+                    aria-required
                     aria-invalid={errors.chequeNumber != null}
                     {...form.register("chequeNumber")}
                   />
@@ -390,12 +403,15 @@ export function TransactionDialog({
               </div>
             ) : mode === "online" || mode === "upi" ? (
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-reference`}>Reference</Label>
+                <Label htmlFor={`${id}-reference`} required>
+                  Reference
+                </Label>
                 <Input
                   id={`${id}-reference`}
                   className="h-10"
                   autoComplete="off"
                   placeholder="UTR or UPI reference"
+                  aria-required
                   aria-invalid={errors.reference != null}
                   {...form.register("reference")}
                 />
@@ -404,10 +420,13 @@ export function TransactionDialog({
             ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor={`${id}-amount`}>Amount</Label>
+                <Label htmlFor={`${id}-amount`} required>
+                  Amount
+                </Label>
                 <MoneyInput
                   id={`${id}-amount`}
                   className="h-10"
+                  aria-required
                   aria-invalid={errors.amount != null}
                   {...form.register("amount")}
                 />
@@ -432,12 +451,18 @@ export function TransactionDialog({
               </div>
             </div>
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor={`${id}-party`}>{partyLabel}</Label>
+              <Label
+                htmlFor={`${id}-party`}
+                required={counterpartyKind != null}
+              >
+                {partyLabel}
+              </Label>
               <Controller
                 control={form.control}
                 name="counterparty"
                 render={({ field }) => (
                   <CounterpartyField
+                    required={counterpartyKind != null}
                     id={`${id}-party`}
                     projectId={projectId}
                     value={field.value}

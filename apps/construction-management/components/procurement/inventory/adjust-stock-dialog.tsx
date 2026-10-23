@@ -102,24 +102,28 @@ function AdjustForm({
       </DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="adjust-date">Count date</Label>
+          <Label htmlFor="adjust-date" required>
+            Count date
+          </Label>
           <Input
             id="adjust-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.date != null}
             {...form.register("date")}
           />
           <FieldError message={errors.date?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="adjust-counted">
+          <Label htmlFor="adjust-counted" required>
             Counted quantity ({row.uomName})
           </Label>
           <Input
             id="adjust-counted"
             inputMode="decimal"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.countedQty != null}
             {...form.register("countedQty")}
           />
@@ -132,10 +136,13 @@ function AdjustForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="adjust-reason">Reason</Label>
+        <Label htmlFor="adjust-reason" required>
+          Reason
+        </Label>
         <Textarea
           id="adjust-reason"
           rows={2}
+          aria-required
           aria-invalid={errors.reason != null}
           {...form.register("reason")}
         />
@@ -165,6 +172,10 @@ export function AdjustStockDialog({
   row: InventoryRow | null;
   onClose: () => void;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(row);
+  if (row != null && row !== last) setLast(row);
+  const shown = row ?? last;
   return (
     <Dialog
       open={row != null}
@@ -173,11 +184,11 @@ export function AdjustStockDialog({
       }}
     >
       <DialogContent className="sm:max-w-lg">
-        {row == null ? null : (
+        {shown == null ? null : (
           <AdjustForm
-            key={row.materialId}
+            key={shown.materialId}
             location={location}
-            row={row}
+            row={shown}
             onClose={onClose}
           />
         )}

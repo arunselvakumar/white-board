@@ -231,7 +231,9 @@ export function TeacherDetailScreen({ id }: { id: string }) {
               })}
             >
               <div className="min-w-60 space-y-1.5">
-                <Label htmlFor="teacher-batch">Batch</Label>
+                <Label htmlFor="teacher-batch" required>
+                  Batch
+                </Label>
                 <Controller
                   name="batchId"
                   control={form.control}
@@ -246,7 +248,11 @@ export function TeacherDetailScreen({ id }: { id: string }) {
                         if (value) field.onChange(value);
                       }}
                     >
-                      <SelectTrigger id="teacher-batch" className="w-full">
+                      <SelectTrigger
+                        id="teacher-batch"
+                        aria-required
+                        className="w-full"
+                      >
                         <SelectValue placeholder="Choose Batch" />
                       </SelectTrigger>
                       <SelectContent align="start" alignItemWithTrigger={false}>

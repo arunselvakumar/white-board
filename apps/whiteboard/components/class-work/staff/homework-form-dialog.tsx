@@ -219,9 +219,12 @@ function HomeworkForm({
       })}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="homework-title">Title</Label>
+        <Label htmlFor="homework-title" required>
+          Title
+        </Label>
         <Input
           id="homework-title"
+          aria-required
           className="h-10"
           maxLength={TITLE_LIMIT}
           placeholder="e.g. Practice: Excel SUM and AVERAGE"
@@ -232,13 +235,16 @@ function HomeworkForm({
       </div>
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between gap-3">
-          <Label htmlFor="homework-instructions">Instructions</Label>
+          <Label htmlFor="homework-instructions" required>
+            Instructions
+          </Label>
           <span className="text-muted-foreground text-xs tabular-nums">
             {instructions.length}/{INSTRUCTIONS_LIMIT}
           </span>
         </div>
         <Textarea
           id="homework-instructions"
+          aria-required
           rows={5}
           maxLength={INSTRUCTIONS_LIMIT}
           placeholder="What to do, and what to send back"
@@ -249,7 +255,9 @@ function HomeworkForm({
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="homework-class-date">Class date</Label>
+          <Label htmlFor="homework-class-date" required>
+            Class date
+          </Label>
           {noClassDates ? (
             <p
               id="homework-class-date"
@@ -273,6 +281,7 @@ function HomeworkForm({
                 >
                   <SelectTrigger
                     id="homework-class-date"
+                    aria-required
                     size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.classDate != null}
@@ -293,9 +302,12 @@ function HomeworkForm({
           <FieldError message={errors.classDate?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="homework-due-on">Due date</Label>
+          <Label htmlFor="homework-due-on" required>
+            Due date
+          </Label>
           <Input
             id="homework-due-on"
+            aria-required
             type="date"
             className="h-10"
             min={classDate || undefined}

@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -236,7 +236,10 @@ export function BackupDialog({
                   <FieldError message={errors.to?.message} />
                 </fieldset>
                 <fieldset className="min-w-0 space-y-3">
-                  <legend className="text-sm font-medium">Include</legend>
+                  <legend className="text-sm font-medium">
+                    Include
+                    <RequiredIndicator />
+                  </legend>
                   <Controller
                     name="includeData"
                     control={form.control}

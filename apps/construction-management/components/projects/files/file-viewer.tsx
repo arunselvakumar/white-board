@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, ExternalLink } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -53,6 +53,10 @@ export function FileViewer({
   /** Extra footer actions next to Download. */
   actions?: ReactNode;
 }) {
+  // Kept after closing so the title stays while the dialog animates out.
+  const [last, setLast] = useState(file);
+  if (file != null && file !== last) setLast(file);
+  const shown = file ?? last;
   return (
     <Dialog
       open={file != null}
@@ -61,35 +65,35 @@ export function FileViewer({
       }}
     >
       <DialogContent className="max-h-[95dvh] overflow-y-auto sm:max-w-5xl">
-        {file == null ? null : (
+        {shown == null ? null : (
           <>
             <DialogHeader className="min-w-0 pr-8">
-              <DialogTitle className="truncate" title={file.name}>
-                {file.name}
+              <DialogTitle className="truncate" title={shown.name}>
+                {shown.name}
               </DialogTitle>
               {description == null ? null : (
                 <DialogDescription>{description}</DialogDescription>
               )}
             </DialogHeader>
-            {isImageFile(file) ? (
+            {isImageFile(shown) ? (
               // eslint-disable-next-line @next/next/no-img-element -- a private file route: the image optimizer cannot send the Session
               <img
-                src={file.url}
-                alt={file.name}
+                src={shown.url}
+                alt={shown.name}
                 className="bg-muted max-h-[70dvh] w-full rounded-md object-contain"
               />
-            ) : isPdfFile(file) ? (
+            ) : isPdfFile(shown) ? (
               <iframe
-                title={file.name}
-                src={file.url}
+                title={shown.name}
+                src={shown.url}
                 className="h-[70dvh] w-full rounded-md border"
               />
             ) : (
               <div className="bg-muted/50 flex flex-col items-center gap-3 rounded-lg border px-4 py-10 text-center">
                 <span className="bg-background text-muted-foreground flex size-12 items-center justify-center rounded-xl border">
                   <DocumentFileIcon
-                    fileName={file.name}
-                    contentType={file.contentType}
+                    fileName={shown.name}
+                    contentType={shown.contentType}
                     className="size-6"
                   />
                 </span>
@@ -101,8 +105,8 @@ export function FileViewer({
                   Download the file to open it.
                 </p>
                 <a
-                  href={downloadUrl(file)}
-                  download={file.name}
+                  href={downloadUrl(shown)}
+                  download={shown.name}
                   className={buttonVariants()}
                 >
                   <Download aria-hidden="true" />
@@ -112,10 +116,10 @@ export function FileViewer({
             )}
             <DialogFooter className="flex-wrap gap-2">
               {actions}
-              {isImageFile(file) || isPdfFile(file) ? (
+              {isImageFile(shown) || isPdfFile(shown) ? (
                 <>
                   <a
-                    href={file.url}
+                    href={shown.url}
                     target="_blank"
                     rel="noreferrer"
                     className={buttonVariants({ variant: "outline" })}
@@ -124,8 +128,8 @@ export function FileViewer({
                     Open in new tab
                   </a>
                   <a
-                    href={downloadUrl(file)}
-                    download={file.name}
+                    href={downloadUrl(shown)}
+                    download={shown.name}
                     className={buttonVariants({ variant: "outline" })}
                   >
                     <Download aria-hidden="true" />

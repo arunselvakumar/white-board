@@ -116,9 +116,12 @@ export function ForgotPasswordForm() {
           noValidate
         >
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" required>
+              Email
+            </Label>
             <Input
               id="email"
+              aria-required
               type="email"
               autoComplete="email"
               // eslint-disable-next-line jsx-a11y/no-autofocus -- Resetting the password is this page's only task, so focus starts in its first field.
@@ -159,9 +162,12 @@ export function ForgotPasswordForm() {
           noValidate
         >
           <div className="space-y-1.5">
-            <Label htmlFor="code">Reset code</Label>
+            <Label htmlFor="code" required>
+              Reset code
+            </Label>
             <Input
               id="code"
+              aria-required
               inputMode="numeric"
               autoComplete="one-time-code"
               // eslint-disable-next-line jsx-a11y/no-autofocus -- The user just asked for this code; focus goes where they type it.
@@ -179,9 +185,12 @@ export function ForgotPasswordForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password">New password</Label>
+            <Label htmlFor="password" required>
+              New password
+            </Label>
             <PasswordField
               id="password"
+              aria-required
               autoComplete="new-password"
               placeholder="Choose a new password"
               {...resetForm.register("password")}

@@ -241,8 +241,15 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="my-name">Name</Label>
-              <Input id="my-name" className="h-10" {...form.register("name")} />
+              <Label htmlFor="my-name" required>
+                Name
+              </Label>
+              <Input
+                id="my-name"
+                className="h-10"
+                aria-required
+                {...form.register("name")}
+              />
               <FieldError message={errors.name?.message} />
             </div>
             <div className="space-y-1.5">

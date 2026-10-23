@@ -111,7 +111,7 @@ function WingDetailsForm({
     const bounds = FIELD_BOUNDS[field];
     return (
       <div key={field} className="space-y-1.5">
-        <Label htmlFor={id}>
+        <Label htmlFor={id} required={bounds.required}>
           {fieldLabel(field, wingType)}
           {bounds.required ? null : (
             <span className="text-muted-foreground font-normal">
@@ -125,6 +125,7 @@ function WingDetailsForm({
           className="h-10"
           inputMode="numeric"
           autoComplete="off"
+          aria-required={bounds.required}
           aria-invalid={errors[field] != null}
           {...form.register(field)}
         />
@@ -145,7 +146,9 @@ function WingDetailsForm({
         <div className="grid gap-5 sm:grid-cols-2">
           {phaseOptions.length > 0 ? (
             <div className="space-y-1.5">
-              <Label htmlFor="wing-phase">Phase</Label>
+              <Label htmlFor="wing-phase" required>
+                Phase
+              </Label>
               <Controller
                 control={form.control}
                 name="phaseId"
@@ -160,6 +163,7 @@ function WingDetailsForm({
                     <SelectTrigger
                       id="wing-phase"
                       ref={field.ref}
+                      aria-required
                       size="lg"
                       className="w-full min-w-0"
                     >
@@ -186,7 +190,9 @@ function WingDetailsForm({
             </p>
           )}
           <div className="space-y-1.5">
-            <Label htmlFor="wing-type">Wing Type</Label>
+            <Label htmlFor="wing-type" required>
+              Wing Type
+            </Label>
             <Controller
               control={form.control}
               name="type"
@@ -208,6 +214,7 @@ function WingDetailsForm({
                     ref={field.ref}
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.type != null}
                   >
                     <SelectValue placeholder="Choose a Wing Type" />
@@ -229,12 +236,15 @@ function WingDetailsForm({
             <FieldError message={errors.type?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="wing-name">Wing Name</Label>
+            <Label htmlFor="wing-name" required>
+              Wing Name
+            </Label>
             <Input
               id="wing-name"
               className="h-10"
               autoComplete="off"
               placeholder="Wing A"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

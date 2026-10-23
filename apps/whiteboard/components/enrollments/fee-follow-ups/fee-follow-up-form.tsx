@@ -5,7 +5,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import { Textarea } from "@repo/ui/components/textarea";
 
@@ -130,6 +130,7 @@ export function FeeFollowUpForm({
           className="text-sm font-medium"
         >
           Channel
+          <RequiredIndicator />
         </legend>
         <Controller
           name="channel"
@@ -142,6 +143,7 @@ export function FeeFollowUpForm({
                 if (typeof value === "string") field.onChange(value);
               }}
               aria-labelledby={`${idPrefix}-channel-label`}
+              aria-required
               aria-invalid={errors.channel != null}
               className="flex flex-wrap gap-2"
             >

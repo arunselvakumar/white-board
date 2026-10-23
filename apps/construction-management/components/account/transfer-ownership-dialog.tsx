@@ -112,7 +112,9 @@ export function TransferOwnershipDialog({
           </DialogHeader>
 
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="new-owner">New Owner</Label>
+            <Label htmlFor="new-owner" required>
+              New Owner
+            </Label>
             {candidates.isPending ? (
               <CandidateSelectSkeleton />
             ) : items.length === 0 ? (
@@ -136,6 +138,7 @@ export function TransferOwnershipDialog({
                       id="new-owner"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={errors.memberId != null}
                     >
                       <SelectValue placeholder="Choose a Team Member" />

@@ -137,16 +137,49 @@ export const FilterWithNoMatch: Story = {
   },
 };
 
+/**
+ * A Company with no Projects sees the same page as one with Projects, every
+ * figure at 0, and the empty state where the list of Projects would be.
+ */
 export const Empty: Story = {
   beforeEach() {
     items = [];
   },
-  play: async ({ canvas }) => {
+  play: async ({ canvas, userEvent }) => {
     await expect(await canvas.findByText("No Projects yet")).toBeVisible();
+    for (const label of ["All Projects", "Ongoing", "On hold", "Completed"]) {
+      await expect(
+        canvas.getByRole("button", { name: new RegExp(`^${label} 0 `) }),
+      ).toBeVisible();
+    }
+    const yourProjects = canvas
+      .getByRole("heading", { name: "Your Projects" })
+      .closest("section");
+    if (yourProjects == null) throw new Error("Your Projects has no section");
+    const section = within(yourProjects);
+    for (const chip of [
+      "All 0",
+      "Ongoing 0",
+      "Not started 0",
+      "On hold 0",
+      "Completed 0",
+    ]) {
+      await expect(section.getByRole("button", { name: chip })).toBeVisible();
+    }
+    await expect(section.getByText("No Projects yet")).toBeVisible();
     await expect(
-      canvas.getByRole("link", { name: "Add your first Project" }),
+      section.getByRole("link", { name: "Add your first Project" }),
     ).toHaveAttribute("href", "/app/projects/new");
-    await expect(canvas.queryByRole("button", { name: /^All/ })).toBeNull();
+    // The empty state is the only way to add a Project.
+    await expect(
+      canvas.queryByRole("link", { name: "New Project" }),
+    ).toBeNull();
+    await expect(canvas.queryByRole("list", { name: "Projects" })).toBeNull();
+
+    // A status chip keeps the empty state, not "No Projects are ongoing."
+    await userEvent.click(section.getByRole("button", { name: "Ongoing 0" }));
+    await expect(section.getByText("No Projects yet")).toBeVisible();
+    await expect(canvas.queryByText("No Projects are ongoing.")).toBeNull();
   },
 };
 

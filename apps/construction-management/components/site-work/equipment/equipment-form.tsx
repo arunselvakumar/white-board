@@ -298,6 +298,7 @@ function SelectField({
   placeholder,
   invalid,
   disabled,
+  required = false,
 }: {
   control: Control<Values>;
   name: FieldPath<Values>;
@@ -307,10 +308,13 @@ function SelectField({
   placeholder: string;
   invalid: boolean;
   disabled?: boolean;
+  required?: boolean;
 }) {
   return (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       <Controller
         control={control}
         name={name}
@@ -326,6 +330,7 @@ function SelectField({
             <SelectTrigger
               id={id}
               className="w-full min-w-0"
+              aria-required={required}
               aria-invalid={invalid}
             >
               <SelectValue placeholder={placeholder} />
@@ -566,13 +571,14 @@ export function EquipmentForm({
         void form.handleSubmit(submit)(event);
       }}
     >
-      <FormCard icon={<Truck />} title="Equipment type">
+      <FormCard icon={<Truck />} title="Equipment type" required>
         <Controller
           control={form.control}
           name="ownership"
           render={({ field }) => (
             <RadioGroup
               aria-label="Equipment type"
+              aria-required
               value={field.value}
               onValueChange={(value) => {
                 field.onChange(value as EquipmentOwnership);
@@ -605,10 +611,13 @@ export function EquipmentForm({
       <FormCard icon={<IdCard />} title="Identity">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="equipment-name">Equipment Name</Label>
+            <Label htmlFor="equipment-name" required>
+              Equipment Name
+            </Label>
             <Input
               id="equipment-name"
               autoComplete="off"
+              aria-required
               placeholder="JCB 3DX"
               aria-invalid={errors.name != null}
               {...form.register("name")}
@@ -616,10 +625,13 @@ export function EquipmentForm({
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="equipment-number">Equipment Number</Label>
+            <Label htmlFor="equipment-number" required>
+              Equipment Number
+            </Label>
             <Input
               id="equipment-number"
               autoComplete="off"
+              aria-required
               placeholder="TN-09-AB-1234"
               aria-invalid={errors.equipmentNumber != null}
               {...form.register("equipmentNumber")}
@@ -748,6 +760,7 @@ export function EquipmentForm({
               id="equipment-basis"
               label="Utilisation Basis"
               placeholder="Choose"
+              required
               invalid={errors.utilisationBasis != null}
               items={UTILISATION_BASES.map((item) => ({
                 value: item,
@@ -762,6 +775,7 @@ export function EquipmentForm({
               id="equipment-method"
               label="Working Time Method"
               placeholder="Choose"
+              required
               invalid={errors.workingTimeMethod != null}
               items={workingTimeMethodsFor(basis).map((item) => ({
                 value: item,
@@ -793,6 +807,7 @@ export function EquipmentForm({
               id="equipment-target-unit"
               label="Target Unit"
               placeholder="Choose"
+              required={values.targetValue.trim() !== ""}
               invalid={errors.targetUnit != null}
               items={TARGET_UNITS_BY_BASIS[basis].map((unit) => ({
                 value: unit,
@@ -841,6 +856,7 @@ export function EquipmentForm({
                 id="equipment-hire-party"
                 label="Hired from (Contractor)"
                 placeholder="Choose a Contractor"
+                required
                 invalid={errors.hirePartyId != null}
                 items={hireParties}
               />
@@ -853,6 +869,7 @@ export function EquipmentForm({
                 id="equipment-hire-basis"
                 label="Hire Basis"
                 placeholder="Choose"
+                required
                 invalid={errors.hireBasis != null}
                 items={HIRE_BASES.map((item) => ({
                   value: item,
@@ -863,9 +880,12 @@ export function EquipmentForm({
             </div>
             {seeRates && (
               <div className="space-y-1.5">
-                <Label htmlFor="equipment-hire-rate">Rate</Label>
+                <Label htmlFor="equipment-hire-rate" required>
+                  Rate
+                </Label>
                 <MoneyInput
                   id="equipment-hire-rate"
+                  aria-required
                   aria-invalid={errors.hireRate != null}
                   {...form.register("hireRate")}
                 />
@@ -910,6 +930,7 @@ export function EquipmentForm({
                   id="equipment-place"
                   label="Project or Warehouse"
                   placeholder="Choose"
+                  required
                   invalid={errors.place != null}
                   items={placeItems}
                 />

@@ -306,11 +306,14 @@ export function SiteDiaryForm({
     >
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="diary-date">Date</Label>
+          <Label htmlFor="diary-date" required>
+            Date
+          </Label>
           <Input
             id="diary-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.diaryDate != null}
             {...form.register("diaryDate")}
           />
@@ -385,10 +388,13 @@ export function SiteDiaryForm({
                 className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_1fr_7rem_7rem_auto] sm:items-start"
               >
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("name")}>Name</Label>
+                  <Label htmlFor={id("name")} required>
+                    Name
+                  </Label>
                   <Input
                     id={id("name")}
                     autoComplete="off"
+                    aria-required
                     aria-invalid={rowErrors?.name != null}
                     {...form.register(`visitors.${index}.name`)}
                   />
@@ -485,10 +491,13 @@ export function SiteDiaryForm({
                 className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start"
               >
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("by")}>Given by</Label>
+                  <Label htmlFor={id("by")} required>
+                    Given by
+                  </Label>
                   <Input
                     id={id("by")}
                     autoComplete="off"
+                    aria-required
                     aria-invalid={rowErrors?.givenBy != null}
                     {...form.register(`instructions.${index}.givenBy`)}
                   />
@@ -517,10 +526,13 @@ export function SiteDiaryForm({
                   <Trash2 aria-hidden="true" />
                 </Button>
                 <div className="min-w-0 space-y-1.5 sm:col-span-2">
-                  <Label htmlFor={id("text")}>Instruction</Label>
+                  <Label htmlFor={id("text")} required>
+                    Instruction
+                  </Label>
                   <Textarea
                     id={id("text")}
                     rows={2}
+                    aria-required
                     aria-invalid={rowErrors?.instruction != null}
                     {...form.register(`instructions.${index}.instruction`)}
                   />

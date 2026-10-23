@@ -213,11 +213,14 @@ export function DeliveryNoteForm({
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="dn-date">Delivery Date</Label>
+            <Label htmlFor="dn-date" required>
+              Delivery Date
+            </Label>
             <Input
               id="dn-date"
               type="date"
               className="h-10"
+              aria-required
               max={today()}
               aria-invalid={errors.deliveryDate != null}
               {...form.register("deliveryDate")}

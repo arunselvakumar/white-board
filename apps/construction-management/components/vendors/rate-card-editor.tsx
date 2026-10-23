@@ -11,7 +11,7 @@ import {
 } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -66,8 +66,16 @@ function ShiftRates({
             : "minmax(0,1fr) 2.25rem",
         }}
       >
-        <span>Labour Category</span>
-        {showAmounts && <span>Rate/day</span>}
+        <span>
+          Labour Category
+          <RequiredIndicator />
+        </span>
+        {showAmounts && (
+          <span>
+            Rate/day
+            <RequiredIndicator />
+          </span>
+        )}
         {showAmounts && <span>Overtime/hr</span>}
         <span />
       </div>
@@ -105,6 +113,7 @@ function ShiftRates({
                       >
                         <SelectTrigger
                           aria-label={`${label(rateIndex)} Labour Category`}
+                          aria-required
                           aria-invalid={rateErrors?.labourCategoryId != null}
                           className="w-full min-w-0"
                         >
@@ -131,6 +140,7 @@ function ShiftRates({
                     <MoneyInput
                       aria-label={`${label(rateIndex)} rate per day`}
                       placeholder="Rate/day"
+                      aria-required
                       aria-invalid={rateErrors?.ratePerDay != null}
                       {...register(
                         `shifts.${shiftIndex}.rates.${rateIndex}.ratePerDay`,
@@ -230,11 +240,14 @@ export function RateCardEditor(props: EditorProps) {
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_2.25rem] sm:items-end">
               <div className="space-y-1.5">
-                <Label htmlFor={id("name")}>Shift name</Label>
+                <Label htmlFor={id("name")} required>
+                  Shift name
+                </Label>
                 <Input
                   id={id("name")}
                   className="h-10"
                   autoComplete="off"
+                  aria-required
                   aria-invalid={shiftErrors?.name != null}
                   {...register(`shifts.${shiftIndex}.name`)}
                 />

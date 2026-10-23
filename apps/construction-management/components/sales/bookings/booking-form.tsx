@@ -153,16 +153,20 @@ function Field({
   error,
   children,
   className,
+  required = false,
 }: {
   id: string;
   label: string;
   error?: string;
   children: ReactNode;
   className?: string;
+  required?: boolean;
 }) {
   return (
     <div className={`min-w-0 space-y-1.5 ${className ?? ""}`}>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {children}
       <FieldError message={error} />
     </div>
@@ -320,7 +324,7 @@ export function BookingForm({
               </p>
             )}
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field id="booking-wing" label="Wing">
+              <Field id="booking-wing" label="Wing" required>
                 <Controller
                   control={form.control}
                   name="wingId"
@@ -337,6 +341,7 @@ export function BookingForm({
                       <SelectTrigger
                         id="booking-wing"
                         className="w-full min-w-0"
+                        aria-required
                       >
                         <SelectValue
                           placeholder={
@@ -365,6 +370,7 @@ export function BookingForm({
                 id="booking-unit"
                 label="Unit"
                 error={errors.unitId?.message}
+                required
               >
                 <Controller
                   control={form.control}
@@ -380,6 +386,7 @@ export function BookingForm({
                       <SelectTrigger
                         id="booking-unit"
                         className="w-full min-w-0"
+                        aria-required
                         aria-invalid={errors.unitId != null}
                         disabled={wingId === ""}
                       >
@@ -403,6 +410,7 @@ export function BookingForm({
               render={({ field }) => (
                 <RadioGroup
                   aria-label="Booking status"
+                  aria-required
                   value={field.value}
                   onValueChange={(value) => {
                     field.onChange(value as Values["status"]);
@@ -431,11 +439,13 @@ export function BookingForm({
             id="booking-date"
             label="Booking Date"
             error={errors.bookingDate?.message}
+            required
           >
             <Input
               id="booking-date"
               type="date"
               max={localToday()}
+              aria-required
               aria-invalid={errors.bookingDate != null}
               {...form.register("bookingDate")}
             />
@@ -465,10 +475,12 @@ export function BookingForm({
           id="booking-customer"
           label="Customer name"
           error={errors.customerName?.message}
+          required
         >
           <Input
             id="booking-customer"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.customerName != null}
             {...form.register("customerName")}
           />

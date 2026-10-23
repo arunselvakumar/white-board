@@ -127,9 +127,12 @@ export function BackdatedAttendanceDialog({
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="backdated-date">Date</Label>
+              <Label htmlFor="backdated-date" required>
+                Date
+              </Label>
               <Input
                 id="backdated-date"
+                aria-required
                 type="date"
                 className="h-10"
                 max={addDays(today, -1)}
@@ -139,9 +142,12 @@ export function BackdatedAttendanceDialog({
               <FieldError message={errors.date?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="backdated-check-in">Check-in time</Label>
+              <Label htmlFor="backdated-check-in" required>
+                Check-in time
+              </Label>
               <Input
                 id="backdated-check-in"
+                aria-required
                 type="time"
                 className="h-10"
                 aria-invalid={errors.checkInTime != null}
@@ -150,9 +156,12 @@ export function BackdatedAttendanceDialog({
               <FieldError message={errors.checkInTime?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="backdated-check-out">Check-out time</Label>
+              <Label htmlFor="backdated-check-out" required>
+                Check-out time
+              </Label>
               <Input
                 id="backdated-check-out"
+                aria-required
                 type="time"
                 className="h-10"
                 aria-invalid={errors.checkOutTime != null}
@@ -161,9 +170,12 @@ export function BackdatedAttendanceDialog({
               <FieldError message={errors.checkOutTime?.message} />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="backdated-reason">Reason</Label>
+              <Label htmlFor="backdated-reason" required>
+                Reason
+              </Label>
               <Textarea
                 id="backdated-reason"
+                aria-required
                 rows={2}
                 placeholder="At the client's office all day"
                 aria-invalid={errors.reason != null}

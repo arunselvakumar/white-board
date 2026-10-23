@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
 import { DAY_OF_WEEK_ITEMS } from "@/lib/class-mode";
@@ -96,8 +96,20 @@ export function TimingSlotsEditor({
     <>
       {value.map((slot, index) => (
         <div key={index} className="space-y-3 rounded-lg border p-3">
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">Days of week</legend>
+          <fieldset
+            className="space-y-2"
+            aria-describedby={`student-timing-days-${String(index)}-hint`}
+          >
+            <legend className="text-sm font-medium">
+              Days of week
+              <RequiredIndicator />
+            </legend>
+            <span
+              id={`student-timing-days-${String(index)}-hint`}
+              className="sr-only"
+            >
+              Choose at least one day.
+            </span>
             <div className="flex flex-wrap gap-3">
               {DAY_OF_WEEK_ITEMS.map((day) => {
                 const checkboxId = `${idPrefix}-${index}-day-${day.value}`;
@@ -127,9 +139,12 @@ export function TimingSlotsEditor({
           </fieldset>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor={`${idPrefix}-${index}-start`}>Start</Label>
+              <Label htmlFor={`${idPrefix}-${index}-start`} required>
+                Start
+              </Label>
               <Input
                 id={`${idPrefix}-${index}-start`}
+                aria-required
                 type="time"
                 className="h-10"
                 value={slot.startTime}
@@ -139,9 +154,12 @@ export function TimingSlotsEditor({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor={`${idPrefix}-${index}-end`}>End</Label>
+              <Label htmlFor={`${idPrefix}-${index}-end`} required>
+                End
+              </Label>
               <Input
                 id={`${idPrefix}-${index}-end`}
+                aria-required
                 type="time"
                 className="h-10"
                 value={slot.endTime}

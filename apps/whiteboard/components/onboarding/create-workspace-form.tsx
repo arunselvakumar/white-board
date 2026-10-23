@@ -17,7 +17,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Tooltip,
@@ -151,9 +151,12 @@ export function CreateWorkspaceForm({
         noValidate
       >
         <div className="space-y-1.5">
-          <Label htmlFor="name">Workspace name</Label>
+          <Label htmlFor="name" required>
+            Workspace name
+          </Label>
           <Input
             id="name"
+            aria-required
             autoComplete="organization"
             // eslint-disable-next-line jsx-a11y/no-autofocus -- Naming the Workspace is this page's only task.
             autoFocus
@@ -166,6 +169,7 @@ export function CreateWorkspaceForm({
         <fieldset className="space-y-4">
           <legend id="institution-type-label" className="text-sm font-medium">
             What kind of institution is this?
+            <RequiredIndicator />
           </legend>
           <Controller
             name="institutionType"
@@ -186,6 +190,7 @@ export function CreateWorkspaceForm({
                   field.onChange(value);
                 }}
                 aria-labelledby="institution-type-label"
+                aria-required
                 aria-invalid={errors.institutionType != null}
                 className="grid-cols-2 gap-2"
               >
