@@ -774,8 +774,26 @@ export class ContractorBillHandlers {
         detail.bill.contractorId,
       ]),
     ]);
+    // CM-1110: a material deduction prints the Material it recovers.
+    const materialName = new Map(
+      detail.materials.map((row) => [row.materialId, row.materialName]),
+    );
     return {
       ...detail,
+      deductions: detail.deductions.map((deduction) => {
+        const name =
+          deduction.materialId == null
+            ? undefined
+            : materialName.get(deduction.materialId);
+        if (name == null) return deduction;
+        return {
+          ...deduction,
+          description:
+            deduction.description == null
+              ? name
+              : `${name}: ${deduction.description}`,
+        };
+      }),
       project,
       contractor: contractors.get(detail.bill.contractorId) ?? null,
     };

@@ -26,6 +26,10 @@ import {
   UpdateConstructionContractsWorkOrderRequestModel,
   WORK_ORDERS_PATH,
 } from "./work-order-models";
+import {
+  ConstructionContractsWorkOrderReconciliationResponseModel,
+  GetConstructionContractsWorkOrderReconciliationRequestModel,
+} from "./reconciliation-models";
 
 const TAGS = ["Construction · Contracts"];
 
@@ -59,6 +63,7 @@ export const contractsWorkOrdersOpenApiComponents: OpenApiComponents = {
   ConstructionContractsWorkOrderFormOptionsResponseModel,
   ListConstructionContractsWorkOrderBoqItemsResponseModel,
   ListConstructionContractsWorkOrderMaterialOptionsResponseModel,
+  ConstructionContractsWorkOrderReconciliationResponseModel,
 };
 
 function step(
@@ -206,6 +211,32 @@ export const contractsWorkOrdersOpenApiOperations: OpenApiOperation[] = [
       "The Work Order as a PDF with its lines and terms (Print; quantities only without Financial)",
     tags: TAGS,
     params: ConstructionContractsWorkOrderParamsModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The PDF",
+    successBinaryContentTypes: ["application/pdf"],
+    errors: READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${ONE}/reconciliation`,
+    summary:
+      "The Work Order's material reconciliation statement at a running bill: theoretical, allowed, issued, excess, under-use and recoveries per material, the issues counted and the unattributed ones (Read; money needs Financial; BILL_NOT_FOUND 404)",
+    tags: TAGS,
+    params: ConstructionContractsWorkOrderParamsModel,
+    query: GetConstructionContractsWorkOrderReconciliationRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The statement",
+    successSchema: ConstructionContractsWorkOrderReconciliationResponseModel,
+    errors: READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${ONE}/reconciliation/pdf`,
+    summary:
+      "The material reconciliation statement as a PDF (Print; quantities only without Financial)",
+    tags: TAGS,
+    params: ConstructionContractsWorkOrderParamsModel,
+    query: GetConstructionContractsWorkOrderReconciliationRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The PDF",
     successBinaryContentTypes: ["application/pdf"],
