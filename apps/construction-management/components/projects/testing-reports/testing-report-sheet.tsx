@@ -234,6 +234,11 @@ function ReportForm({
             File
             {adding ? <RequiredIndicator /> : null}
           </span>
+          {adding ? (
+            <span id="testing-report-file-required" className="sr-only">
+              A file is required.
+            </span>
+          ) : null}
           <Controller
             name="file"
             control={form.control}
@@ -286,6 +291,9 @@ function ReportForm({
               variant="outline"
               size="sm"
               disabled={save.isPending}
+              aria-describedby={
+                adding ? "testing-report-file-required" : undefined
+              }
               onClick={() => picker.current?.click()}
             >
               <Paperclip aria-hidden="true" />

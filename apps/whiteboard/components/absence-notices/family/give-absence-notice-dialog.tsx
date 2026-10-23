@@ -233,11 +233,17 @@ function GiveAbsenceNoticeForm({
       onSubmit={handleSubmit(submit)}
       aria-label="Give absence notice"
     >
-      <fieldset className="min-w-0 space-y-2">
+      <fieldset
+        className="min-w-0 space-y-2"
+        aria-describedby="absence-classes-hint"
+      >
         <legend className="text-sm font-medium">
           Classes
           <RequiredIndicator />
         </legend>
+        <span id="absence-classes-hint" className="sr-only">
+          Choose at least one Class.
+        </span>
         {classesQuery.isPending ? (
           <div className="space-y-2" aria-busy="true">
             <Skeleton className="h-10 w-full" />

@@ -571,7 +571,7 @@ export function EquipmentForm({
         void form.handleSubmit(submit)(event);
       }}
     >
-      <FormCard icon={<Truck />} title="Equipment type">
+      <FormCard icon={<Truck />} title="Equipment type" required>
         <Controller
           control={form.control}
           name="ownership"

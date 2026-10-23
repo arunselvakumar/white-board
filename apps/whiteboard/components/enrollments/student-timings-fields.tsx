@@ -96,11 +96,20 @@ export function TimingSlotsEditor({
     <>
       {value.map((slot, index) => (
         <div key={index} className="space-y-3 rounded-lg border p-3">
-          <fieldset className="space-y-2">
+          <fieldset
+            className="space-y-2"
+            aria-describedby={`student-timing-days-${String(index)}-hint`}
+          >
             <legend className="text-sm font-medium">
               Days of week
               <RequiredIndicator />
             </legend>
+            <span
+              id={`student-timing-days-${String(index)}-hint`}
+              className="sr-only"
+            >
+              Choose at least one day.
+            </span>
             <div className="flex flex-wrap gap-3">
               {DAY_OF_WEEK_ITEMS.map((day) => {
                 const checkboxId = `${idPrefix}-${index}-day-${day.value}`;

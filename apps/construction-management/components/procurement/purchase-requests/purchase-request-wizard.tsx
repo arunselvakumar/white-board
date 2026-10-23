@@ -355,11 +355,12 @@ export function PurchaseRequestWizard({
       {step === 0 && (
         <section aria-label="Materials" className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="pr-material-picker" required>
+            {/* At least one material: required until the first is added. */}
+            <Label htmlFor="pr-material-picker" required={fields.length === 0}>
               Add a material
             </Label>
             <MaterialPicker
-              required
+              required={fields.length === 0}
               id="pr-material-picker"
               aria-label="Add a material"
               value={null}

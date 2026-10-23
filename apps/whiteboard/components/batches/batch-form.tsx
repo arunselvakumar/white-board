@@ -376,11 +376,17 @@ export function BatchForm({
         </FieldTitle>
         {timings.fields.map((field, index) => (
           <div key={field.id} className="space-y-3 rounded-lg border p-3">
-            <fieldset className="space-y-2">
+            <fieldset
+              className="space-y-2"
+              aria-describedby={`batch-days-${String(index)}-hint`}
+            >
               <legend className="text-sm font-medium">
                 Days of week
                 <RequiredIndicator />
               </legend>
+              <span id={`batch-days-${String(index)}-hint`} className="sr-only">
+                Choose at least one day.
+              </span>
               <Controller
                 name={`timings.${index}.daysOfWeek`}
                 control={control}

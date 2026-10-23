@@ -447,11 +447,17 @@ export function HrmsSettingsForm() {
               </div>
             </div>
 
-            <fieldset className="space-y-1.5">
+            <fieldset
+              className="space-y-1.5"
+              aria-describedby="hrms-working-days-hint"
+            >
               <legend className="text-sm font-medium">
                 Working days
                 <RequiredIndicator />
               </legend>
+              <span id="hrms-working-days-hint" className="sr-only">
+                Choose at least one day.
+              </span>
               <Controller
                 name="workingDays"
                 control={form.control}

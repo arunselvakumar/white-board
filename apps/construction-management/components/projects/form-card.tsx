@@ -3,6 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useId, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
+import { RequiredIndicator } from "@repo/ui/components/label";
 import {
   Collapsible,
   CollapsibleContent,
@@ -27,10 +28,13 @@ const BODY = "px-4 pt-4 pb-5 sm:px-5";
 export function FormCard({
   icon,
   title,
+  required = false,
   children,
 }: {
   icon: ReactNode;
   title: string;
+  /** The section is one required choice: a red asterisk on its title. */
+  required?: boolean;
   children: ReactNode;
 }) {
   const headingId = useId();
@@ -40,6 +44,7 @@ export function FormCard({
         <CardIcon>{icon}</CardIcon>
         <h2 id={headingId} className="text-base font-semibold">
           {title}
+          {required ? <RequiredIndicator /> : null}
         </h2>
       </div>
       <div className={BODY}>{children}</div>
