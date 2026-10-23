@@ -176,6 +176,15 @@ export type ClientBillStore = {
     projectId: string,
     exceptBillId: string | null,
   ): Promise<bigint>;
+  /**
+   * The finance invoices of the Project's approved bills on this side and
+   * of its retention releases (CM-1111): what is receivable or payable.
+   */
+  invoiceIds(
+    db: ContractsTx,
+    workspaceId: string,
+    projectId: string,
+  ): Promise<string[]>;
   /** The highest ordinal among the Project's live client bills that count. */
   maxOrdinal(
     db: ContractsTx,

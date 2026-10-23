@@ -22,6 +22,10 @@ import {
   financeDashboard,
   NO_PAYMENTS,
 } from "./finance-dashboard-fixtures";
+import {
+  CONTRACTS_DASHBOARD_PATH,
+  contractsDashboard,
+} from "./contracts-dashboard-fixtures";
 import { ProjectDashboard } from "./project-dashboard";
 import {
   BOOKING_DASHBOARD_PATH,
@@ -229,6 +233,9 @@ function serve(
         return Response.json(bookingDashboard(KUMARI.id));
       if (method === "GET" && path.startsWith(INQUIRY_DASHBOARD_PATH))
         return Response.json(inquiryDashboard(KUMARI.id));
+      // The Contracts section (CM-1111).
+      if (method === "GET" && path.startsWith(CONTRACTS_DASHBOARD_PATH))
+        return Response.json(contractsDashboard(KUMARI.id));
       if (method === "GET" && path.startsWith(TRACKING_DASHBOARD_PATH)) {
         const tracking = options.tracking ?? "data";
         if (tracking === "forbidden")

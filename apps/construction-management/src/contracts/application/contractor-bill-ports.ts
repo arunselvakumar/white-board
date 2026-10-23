@@ -273,6 +273,15 @@ export type ContractorBillStore = {
     workOrderId: string,
     exceptBillId: string | null,
   ): Promise<bigint>;
+  /**
+   * The finance invoices of the Project's approved bills on this side and
+   * of its retention releases (CM-1111): what is receivable or payable.
+   */
+  invoiceIds(
+    db: ContractsTx,
+    workspaceId: string,
+    projectId: string,
+  ): Promise<string[]>;
   /** Paise of retention held on the Project's approved bills, by Contractor. */
   retentionHeldByContractor(
     db: ContractsTx,

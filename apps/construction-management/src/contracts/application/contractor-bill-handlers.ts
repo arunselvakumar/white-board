@@ -597,6 +597,23 @@ export class ContractorBillHandlers {
     };
   }
 
+  /**
+   * Paise still payable to Contractors on the Project (CM-1111): the finance balances of
+   * the invoices its approved bills and retention releases created, after
+   * payments, TDS and write-offs (read).
+   */
+  async outstanding(access: MemberAccess, projectId: string): Promise<bigint> {
+    assertCan(access, CONTRACTOR_BILL_MENU, "read", { projectId });
+    const { db, store, invoicing } = this.deps;
+    const ws = access.workspaceId;
+    const states = await invoicing.invoiceStates(
+      db,
+      ws,
+      await store.invoiceIds(db, ws, projectId),
+    );
+    return [...states.values()].reduce((sum, state) => sum + state.balance, 0n);
+  }
+
   /** One bill with its lines, the rows behind them, deductions and estimates (read). */
   async get(access: MemberAccess, id: string): Promise<ContractorBillDetail> {
     const bill = await this.find(access.workspaceId, id);

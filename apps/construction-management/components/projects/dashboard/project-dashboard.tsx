@@ -61,6 +61,7 @@ import {
   useSectionCollapse,
 } from "./section-collapse";
 // Sales (CM-1008)
+import { ContractsSection } from "./contracts-sections";
 import { BookingSection, InquirySection } from "./sales-sections";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
 import { SummaryDetails } from "./summary-details";
@@ -433,7 +434,7 @@ function MaterialsSection({
 
 /**
  * Sections that read the duration: an invalid one leaves them out. Project
- * summary and Booking (a snapshot as on today) always show.
+ * summary, Booking and Contracts (snapshots as on today) always show.
  */
 const DURATION_SECTIONS: ReadonlySet<string> = new Set([
   "attendance",
@@ -567,6 +568,8 @@ function DashboardSections({
           );
         if (section.key === "booking")
           return <BookingSection key={section.key} projectId={projectId} />;
+        if (section.key === "contracts")
+          return <ContractsSection key={section.key} projectId={projectId} />;
         return <StubSection key={section.key} section={section} />;
       })}
     </>

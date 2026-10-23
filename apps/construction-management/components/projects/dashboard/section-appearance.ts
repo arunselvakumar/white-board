@@ -1,6 +1,7 @@
 import {
   Building2,
   ClipboardCheck,
+  FileSignature,
   HardHat,
   IndianRupee,
   KeyRound,
@@ -69,5 +70,9 @@ export const SECTION_APPEARANCE: Record<
   inquiry: {
     icon: PhoneCall,
     tint: "bg-fuchsia-500/10 text-fuchsia-600 dark:bg-fuchsia-400/15 dark:text-fuchsia-400",
+  },
+  contracts: {
+    icon: FileSignature,
+    tint: "bg-teal-500/10 text-teal-700 dark:bg-teal-400/15 dark:text-teal-400",
   },
 };

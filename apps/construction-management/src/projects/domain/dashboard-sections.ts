@@ -54,6 +54,9 @@ export const DASHBOARD_SECTIONS = [
   // Sales (M10, ADR CM-0022 §11, CM-1008).
   { key: "booking", label: "Booking", milestone: null, module: "bookings" },
   { key: "inquiry", label: "Inquiry", milestone: null, module: "inquiries" },
+  // Contracts (M11, CM-1111): spans the BOQ, Work Orders and both bill
+  // modules, so it belongs to none; each part needs its own menu.
+  { key: "contracts", label: "Contracts", milestone: null, module: null },
 ] as const satisfies readonly {
   key: string;
   label: string;

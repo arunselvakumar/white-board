@@ -84,7 +84,10 @@ async function zipOf(cookie: string, backup: Backup): Promise<Files> {
 function csvLines(files: Files, path: string): string[] {
   const value = files[path];
   if (typeof value !== "string") throw new Error(`No text file ${path}`);
-  return value.replace(/^\uFEFF/, "").trimEnd().split("\r\n");
+  return value
+    .replace(/^\uFEFF/, "")
+    .trimEnd()
+    .split("\r\n");
 }
 
 function rowsOf(files: Files, module: string): Record<string, number> {

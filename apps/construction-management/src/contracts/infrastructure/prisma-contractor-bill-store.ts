@@ -386,6 +386,23 @@ export class PrismaContractorBillStore implements ContractorBillStore {
     return new Map(rows.map((row) => [row.contractorId, row.amount]));
   }
 
+  async invoiceIds(db: ContractsTx, workspaceId: string, projectId: string) {
+    const rows = await db.$queryRaw<{ id: string }[]>(
+      Prisma.sql`SELECT b.invoice_id::text AS id
+          FROM construction_contracts.bills b
+         WHERE b.workspace_id = ${workspaceId} AND b.project_id = ${projectId}::uuid
+           AND b.side = 'contractor' AND b.deleted_at IS NULL
+           AND b.status = 'approved' AND b.invoice_id IS NOT NULL
+        UNION
+        SELECT r.invoice_id::text AS id
+          FROM construction_contracts.retention_releases r
+         WHERE r.workspace_id = ${workspaceId} AND r.project_id = ${projectId}::uuid
+           AND r.side = 'contractor' AND r.deleted_at IS NULL
+           AND r.invoice_id IS NOT NULL`,
+    );
+    return rows.map((row) => row.id);
+  }
+
   async maxOrdinal(db: ContractsTx, workspaceId: string, workOrderId: string) {
     const found = await db.constructionContractsBill.aggregate({
       where: {
