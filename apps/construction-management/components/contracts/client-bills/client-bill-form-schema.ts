@@ -45,6 +45,8 @@ const DeductionSchema = z
     }),
     /** A recovery's advance (CM-1108); "" for other kinds. */
     advanceId: z.string(),
+    /** The negative escalation bill an "other" deduction recovers (CM-1109); "" for none. */
+    escalationBillId: z.string(),
   })
   .refine(
     (deduction) =>
@@ -92,6 +94,7 @@ export function clientEditorValuesOf(bill: ClientBill): ClientBillEditorValues {
         amount: paiseToRupees(deduction.amount),
         description: deduction.description ?? "",
         advanceId: deduction.advanceId ?? "",
+        escalationBillId: deduction.escalationBillId ?? "",
       })),
   };
 }
@@ -118,6 +121,10 @@ export function toClientUpdate(
             advanceId: isRecoveryKind(deduction.kind)
               ? deduction.advanceId
               : null,
+            escalationBillId:
+              deduction.kind === "other" && deduction.escalationBillId !== ""
+                ? deduction.escalationBillId
+                : null,
           })),
         }
       : {}),

@@ -29,6 +29,10 @@ import {
   RecoverySuggestions,
   type BillAdvance,
 } from "@/components/contracts/advances/bill-recoveries";
+import {
+  EscalationRecoverySuggestions,
+  type BillEscalationRecovery,
+} from "@/components/contracts/escalation/escalation-recoveries";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MoneyInput, paiseToRupees } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
@@ -104,7 +108,28 @@ export function ClientBillEditor({ bill }: { bill: ClientBill }) {
           amount,
           description: "",
           advanceId: "",
+          escalationBillId: "",
         });
+      return;
+    }
+    setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
+  };
+
+  const applyEscalationRecovery = (recovery: BillEscalationRecovery) => {
+    const amount = paiseToRupees(recovery.balance ?? 0);
+    const index = typed.findIndex(
+      (row) =>
+        row.kind === "other" &&
+        row.escalationBillId === recovery.escalationBillId,
+    );
+    if (index === -1) {
+      deductions.append({
+        kind: "other",
+        amount,
+        description: recovery.reason,
+        advanceId: "",
+        escalationBillId: recovery.escalationBillId,
+      });
       return;
     }
     setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
@@ -121,6 +146,7 @@ export function ClientBillEditor({ bill }: { bill: ClientBill }) {
         amount,
         description: "",
         advanceId: advance.id,
+        escalationBillId: "",
       });
       return;
     }
@@ -332,6 +358,11 @@ export function ClientBillEditor({ bill }: { bill: ClientBill }) {
             typed={typed}
             onUse={applyRecovery}
           />
+          <EscalationRecoverySuggestions
+            recoveries={bill.escalationRecoveries}
+            typed={typed}
+            onUse={applyEscalationRecovery}
+          />
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -343,6 +374,7 @@ export function ClientBillEditor({ bill }: { bill: ClientBill }) {
                   amount: "",
                   description: "",
                   advanceId: "",
+                  escalationBillId: "",
                 });
               }}
             >
