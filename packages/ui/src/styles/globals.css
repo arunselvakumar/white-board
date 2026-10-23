@@ -188,6 +188,17 @@
       background-position: 20vw 0;
     }
   }
+
+  /* Text generate effect: a word fades in and sharpens. Callers stagger
+     words with `animation-delay`. */
+  --animate-text-generate: text-generate 0.5s ease-out both;
+
+  @keyframes text-generate {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+    }
+  }
 }
 
 @layer base {

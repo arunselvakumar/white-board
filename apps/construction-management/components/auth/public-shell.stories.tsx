@@ -30,6 +30,13 @@ export const Default: Story = {
       await expect(
         canvas.getByRole("region", { name: "Construction Management" }),
       ).toBeVisible();
+      // The tagline is read once, as a sentence, not word by word.
+      const tagline =
+        "Every site, every bag of cement, every day's labour — in one place.";
+      await expect(canvas.getByText(tagline)).toHaveClass("sr-only");
+      await expect(
+        canvas.getByText("Projects, materials, labour", { exact: false }),
+      ).toBeVisible();
       // The default photo, credited as Unsplash asks.
       await expect(
         canvas.getByRole("link", { name: "Hammilton Ojijo" }),
