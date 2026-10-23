@@ -296,3 +296,49 @@ export async function measureClientItems(
   });
   return { sheetId, rowIds };
 }
+
+/**
+ * A running (RA) bill of either side with a given gross and bill date,
+ * written straight to `bills` (CM-1109 escalation tests take R from it):
+ * approved by default, with no lines or invoice.
+ */
+export async function addRunningBill(
+  workspaceId: string,
+  by: string,
+  input: {
+    projectId: string;
+    side: "contractor" | "client";
+    workOrderId?: string | null;
+    clientId?: string | null;
+    billDate: string;
+    gross: bigint;
+    status?:
+      "draft" | "pending_approval" | "approved" | "rejected" | "reversed";
+    ordinal?: number | null;
+  },
+): Promise<string> {
+  const id = randomUUID();
+  const status = input.status ?? "approved";
+  await prisma.constructionContractsBill.create({
+    data: {
+      id,
+      workspaceId,
+      projectId: input.projectId,
+      side: input.side,
+      type: "running",
+      workOrderId: input.workOrderId ?? null,
+      clientId: input.clientId ?? null,
+      number: status === "draft" ? null : `RA-${randomUUID().slice(0, 8)}`,
+      ordinal: status === "draft" ? null : (input.ordinal ?? null),
+      billDate: new Date(input.billDate),
+      measuredUpTo: new Date(input.billDate),
+      status,
+      gross: input.gross,
+      cumulativeValue: input.gross,
+      net: input.gross,
+      createdBy: by,
+      updatedBy: by,
+    },
+  });
+  return id;
+}

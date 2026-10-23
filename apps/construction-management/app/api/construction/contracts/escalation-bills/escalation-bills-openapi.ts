@@ -138,11 +138,16 @@ export const contractsEscalationBillsOpenApiOperations: OpenApiOperation[] = [
     "Work a draft out again with bills and indices now",
     ConstructionContractsEscalationBillStepRequestModel,
   ),
-  step(
-    "delete",
-    "Delete a draft",
-    ConstructionContractsEscalationBillStepRequestModel,
-  ),
+  {
+    ...step(
+      "delete",
+      "Delete a draft",
+      ConstructionContractsEscalationBillStepRequestModel,
+    ),
+    successStatus: StatusCodes.NO_CONTENT,
+    successDescription: "Deleted",
+    successSchema: undefined,
+  },
   step(
     "submit",
     "Send a draft for approval (409 ESCALATION_WORKING_CHANGED, ESCALATION_GROSS_ZERO)",
