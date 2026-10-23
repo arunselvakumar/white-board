@@ -1,0 +1,51 @@
+apps/construction-management/app/api/construction/contracts/client-bills/route.ts
+  s_f49615d4431370::t_28193c8d465200 47
+apps/construction-management/app/api/construction/contracts/contractor-bills/route.ts
+  s_f49615d4431370::t_507aa2755a9f40 45
+apps/construction-management/src/contracts/application/client-bill-handlers.ts
+  s_f49615d4431370::t_845f340deb2bc0 56,218-219,513
+apps/construction-management/src/contracts/application/client-bill-ports.ts
+  s_f49615d4431370::t_618df846c214e6 5,56-57
+apps/construction-management/src/contracts/application/contractor-bill-handlers.ts
+  s_f49615d4431370::t_275dee5c3da9f2 25,202-203,475,711
+apps/construction-management/src/contracts/application/contractor-bill-ports.ts
+  s_f49615d4431370::t_1f71b25469fef5 139-140
+apps/construction-management/src/contracts/infrastructure/prisma-client-bill-store.ts
+  s_f49615d4431370::t_ba869362928754 136-137
+apps/construction-management/src/contracts/infrastructure/prisma-contractor-bill-store.ts
+  s_f49615d4431370::t_a3e5e759508bda 110
+apps/construction-management/app/api/construction/contracts/client-bills/client-bill-models.ts
+  s_b66b36b2f0a0ef::t_a74f293d49d601 42-49,94,126,276-277,395-400,478-482,586-588,765,768-771
+apps/construction-management/app/api/construction/contracts/contractor-bills/contractor-bill-models.ts
+  s_b66b36b2f0a0ef::t_88f279601bf15c 39-46,86,120,242-243,341-346,406-410,506-508,622,625-628
+apps/construction-management/app/api/construction/contracts/escalation-bills/bill-escalation-models.ts
+  s_b66b36b2f0a0ef::t_4d9c1b7ed48ded 1-83
+apps/construction-management/components/contracts/client-bills/client-bill-fixtures.ts
+  s_b66b36b2f0a0ef::t_66a27241f07fa3 151-153,201,204,355-357
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-fixtures.ts
+  s_b66b36b2f0a0ef::t_1822828a643cc9 133-135,176,184,187,305,358,377-379
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "126f94c215724a0ac313debbcce253ecf047c056",
+  "prompts": {},
+  "sessions": {
+    "s_b66b36b2f0a0ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad39e8e54a0dc4dcf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
