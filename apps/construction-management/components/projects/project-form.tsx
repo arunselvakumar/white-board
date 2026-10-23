@@ -62,6 +62,7 @@ import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import { GST_STATES } from "@/src/shared-kernel/gst-states";
 
 import { ContractPapersField } from "./contract-papers-field";
+import { ProjectColorField } from "./project-color-field";
 import { CustomFieldsField } from "./custom-fields-field";
 import { CollapsibleFormCard, FormCard } from "./form-card";
 import {
@@ -228,7 +229,7 @@ const PROGRESS_LABEL = (done: number, total: number) =>
  * card starts open when it has something in it. A card with an error opens
  * and its field takes focus.
  *
- * The Project card also holds the Project Type, the Budget and the logo
+ * The Project card also holds the colour (ADR CM-0026), the Project Type, the Budget and the logo
  * with "Use Project logo on reports" (CM-401). Budget and Order value show
  * only to a viewer with the Project menu's Financial flag. A picked or
  * removed logo waits until the Project is saved, then goes through its own
@@ -427,6 +428,21 @@ function ProjectForm({
               {...form.register("name")}
             />
             <FieldError message={errors.name?.message} />
+          </div>
+          <div className="sm:col-span-2">
+            <Controller
+              name="color"
+              control={form.control}
+              render={({ field }) => (
+                <ProjectColorField
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={saving}
+                />
+              )}
+            />
+            <FieldError message={errors.color?.message} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="project-type" required={project == null}>

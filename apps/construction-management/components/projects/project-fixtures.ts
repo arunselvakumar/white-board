@@ -20,6 +20,7 @@ export function project(
     useLogoInReports: false,
     stateCode: null,
     stateName: null,
+    color: "lavender",
     address: "Plot 12, Survey No. 45, Vadasery, Nagercoil 629001",
     startDate: "2026-04-01",
     endDate: "2027-03-31",
@@ -94,6 +95,7 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000002",
     name: "Asaripallam Tower",
+    color: "peach",
     projectType: "commercial",
     logoUrl: STORY_LOGO_URL,
     address: null,
@@ -104,6 +106,7 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000003",
     name: "Vadasery Plots",
+    color: "sky",
     projectType: "plotting",
     status: "not_started",
     address: null,
@@ -113,6 +116,7 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000004",
     name: "Parvathipuram Row Houses",
+    color: "rose",
     // Added before M4: no Project Type yet.
     projectType: null,
     status: "on_hold",
@@ -121,6 +125,7 @@ export const STORY_PROJECTS: ProjectResponse[] = [
   project({
     id: "0199c4a0-0000-7000-8000-000000000005",
     name: "Zen Villas",
+    color: "mint",
     projectType: "villas",
     status: "completed",
     startDate: "2024-04-01",

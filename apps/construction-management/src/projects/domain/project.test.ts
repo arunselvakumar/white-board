@@ -466,6 +466,7 @@ describe("Project Type, Budget and logo (CM-401)", () => {
       useLogoInReports: false,
       logoKey: null,
       stateCode: null,
+      color: "lavender",
     });
   });
 
@@ -593,5 +594,32 @@ describe("GST State (CM-501)", () => {
     item.update({ name: "Kumari Heights", stateCode: "33" }, "u", LATER);
     item.update({ name: "Kumari Heights", stateCode: "" }, "u", LATER);
     expect(item.stateCode).toBeNull();
+  });
+});
+
+describe("Project colour (ADR CM-0026)", () => {
+  it("starts as Lavender unless another colour is chosen", () => {
+    expect(project().color).toBe("lavender");
+    expect(project({ color: null }).color).toBe("lavender");
+    expect(project({ color: " " }).color).toBe("lavender");
+    expect(project({ color: "peach" }).color).toBe("peach");
+  });
+
+  it("refuses a colour off the palette", () => {
+    for (const color of ["purple", "#ffcc00", "Lavender"])
+      expect(codeOf(() => project({ color }))).toBe("PROJECT_COLOR_INVALID");
+  });
+
+  it("keeps the colour when an edit leaves it out; null or blank is Lavender again", () => {
+    const item = project({ color: "mint" });
+    item.update({ name: "Kumari Heights" }, "u", LATER);
+    expect(item.color).toBe("mint");
+    item.update({ name: "Kumari Heights", color: "slate" }, "u", LATER);
+    expect(item.profile.color).toBe("slate");
+    item.update({ name: "Kumari Heights", color: null }, "u", LATER);
+    expect(item.color).toBe("lavender");
+    item.update({ name: "Kumari Heights", color: "rose" }, "u", LATER);
+    item.update({ name: "Kumari Heights", color: "" }, "u", LATER);
+    expect(item.color).toBe("lavender");
   });
 });

@@ -22,9 +22,13 @@ const PROJECTS_PATH = "/app/projects";
  * shell's header, Hide / show modules, Amenities. What is known without fetching renders for real.
  */
 
-/** The Projects home list's columns: name, status, dates and progress. */
-export const PROJECT_ROW_GRID =
-  "md:grid md:grid-cols-[minmax(0,2fr)_8rem_minmax(0,1.3fr)] md:items-center md:gap-4";
+/**
+ * The Projects home's folders (ADR CM-0026 §3), by the width of their
+ * section: one column, then two, three and four. The section is the
+ * `@container`.
+ */
+export const PROJECT_FOLDER_GRID =
+  "grid grid-cols-1 gap-x-4 gap-y-5 @xl:grid-cols-2 @4xl:grid-cols-3 @6xl:grid-cols-4";
 
 const PROJECT_STATS = ["All Projects", "Ongoing", "On hold", "Completed"];
 const WIDTHS = ["58%", "44%", "66%", "50%", "62%"];
@@ -60,51 +64,35 @@ export function ProjectsHomeSkeleton() {
               className="grid grid-cols-2 gap-3 sm:gap-4 @4xl:grid-cols-4"
             />
           </div>
-          <section className="bg-card rounded-2xl border shadow-xs">
+          <section className="bg-card @container rounded-2xl border shadow-xs">
             <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
               <h2 className="text-base tracking-tight">Your Projects</h2>
               <Skeleton className="h-8 w-72 max-w-full rounded-md" />
             </header>
-            <div className="px-2 pb-2">
-              <div className="hidden items-center gap-1 border-b md:flex">
-                <div
-                  className={`text-muted-foreground flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${PROJECT_ROW_GRID}`}
-                >
-                  <span>Project</span>
-                  <span>Status</span>
-                  <span>Dates and progress</span>
-                </div>
-                <span className="size-8 shrink-0" />
-              </div>
-              <ul className="divide-border/70 divide-y">
-                {WIDTHS.map((width, row) => (
-                  <li key={row} className="flex items-center gap-1">
-                    <div
-                      className={`flex min-w-0 flex-1 flex-col gap-3 rounded-xl px-3 py-3 ${PROJECT_ROW_GRID}`}
-                    >
-                      <div className="flex min-w-0 items-center gap-3">
-                        <Skeleton className="size-10 shrink-0 rounded-xl" />
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <SkeletonText size="base" width={width} />
-                          <SkeletonText size="xs" width="35%" />
-                          <SkeletonText width="70%" />
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pl-13 md:contents">
-                        <div>
-                          <Skeleton className="h-5 w-16 rounded-full" />
-                        </div>
-                        <div className="min-w-0 space-y-1.5">
-                          <SkeletonText width="9rem" />
-                          <ProgressBarSkeleton />
-                        </div>
+            <ul className={`px-5 pt-1 pb-5 ${PROJECT_FOLDER_GRID}`}>
+              {WIDTHS.slice(0, 4).map((width, index) => (
+                <li key={index} className="relative pt-7">
+                  <Skeleton className="absolute top-0 left-0 h-6 w-2/5 rounded-t-xl" />
+                  <Skeleton className="absolute inset-x-0 top-3 bottom-0 rounded-2xl" />
+                  <div className="bg-card relative flex min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <Skeleton className="size-9 shrink-0 rounded-xl" />
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <SkeletonText size="base" width={width} />
+                        <SkeletonText size="xs" width="35%" />
                       </div>
                     </div>
-                    <Skeleton className="size-9 shrink-0 rounded-md" />
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <div className="mt-auto space-y-1.5">
+                      <SkeletonText width="70%" />
+                      <SkeletonText width="9rem" />
+                      <ProgressBarSkeleton />
+                    </div>
+                    <Skeleton className="absolute top-3 right-3 size-9 rounded-lg" />
+                  </div>
+                </li>
+              ))}
+            </ul>
           </section>
         </SkeletonGroup>
       </div>

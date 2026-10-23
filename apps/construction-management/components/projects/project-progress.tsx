@@ -18,9 +18,12 @@ function percent(value: number): string {
 export function ProjectProgressBar({
   progress,
   className,
+  trackClassName,
 }: {
   progress: Progress;
   className?: string;
+  /** The bar's track; `bg-muted` by default (a folder tints it). */
+  trackClassName?: string;
 }) {
   if (progress == null) return null;
   const weighting =
@@ -39,7 +42,10 @@ export function ProjectProgressBar({
         aria-valuemax={100}
         aria-valuenow={progress.pct}
         aria-valuetext={`${percent(progress.pct)}, ${weighting}`}
-        className="bg-muted h-1.5 w-full max-w-40 min-w-16 overflow-hidden rounded-full"
+        className={cn(
+          "bg-muted h-1.5 w-full max-w-40 min-w-16 overflow-hidden rounded-full",
+          trackClassName,
+        )}
       >
         <div
           className="bg-primary h-full rounded-full"

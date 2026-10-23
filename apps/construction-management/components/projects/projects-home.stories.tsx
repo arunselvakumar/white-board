@@ -3,6 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import {
+  project,
   projectList,
   STORY_LOGO_URL,
   STORY_PROJECTS,
@@ -285,5 +286,77 @@ export const CardMenu: Story = {
     );
     await userEvent.click(await body.findByRole("menuitem", { name: "Unpin" }));
     await waitFor(() => expect(rowNames(canvas).at(-1)).toBe("Zen Villas"));
+  },
+};
+
+/**
+ * Every Project is a folder in its colour (ADR CM-0026 §3); a long name is
+ * cut short on one line, and the kebab sits outside the link.
+ */
+export const FolderColours: Story = {
+  beforeEach() {
+    items = [
+      ...STORY_PROJECTS,
+      project({
+        id: "0199c4a0-0000-7000-8000-000000000007",
+        name: "Anugraha Residency Phase II — Saravanampatti Block C, Coimbatore",
+        projectType: "mixed_use",
+        color: "lemon",
+      }),
+      project({
+        id: "0199c4a0-0000-7000-8000-000000000008",
+        name: "NH-44 Culvert Repairs",
+        projectType: "infrastructure",
+        color: "slate",
+        status: "not_started",
+      }),
+      project({
+        id: "0199c4a0-0000-7000-8000-000000000009",
+        name: "Meenakshi Clinic Interiors",
+        projectType: "interiors",
+        color: "sand",
+        address: null,
+      }),
+    ];
+  },
+  play: async ({ canvas }) => {
+    const list = await canvas.findByRole("list", { name: "Projects" });
+    const folders = [...list.querySelectorAll(":scope > li")];
+    await expect(
+      folders.map((folder) => folder.getAttribute("data-color")),
+    ).toEqual([
+      "peach",
+      "lavender",
+      "sky",
+      "rose",
+      "mint",
+      "lemon",
+      "slate",
+      "sand",
+    ]);
+    const long = within(list).getByRole("link", { name: /Phase II/ });
+    const name = long.querySelector("p span");
+    if (name == null) throw new Error("The folder has no name");
+    await expect(name.scrollWidth).toBeGreaterThan(name.clientWidth);
+    await expect(
+      long.contains(
+        canvas.getByRole("button", { name: /^Options for Anugraha Residency/ }),
+      ),
+    ).toBe(false);
+  },
+};
+
+export const FoldersDark: Story = {
+  ...FolderColours,
+  globals: { theme: "dark" },
+};
+
+export const FoldersOnAPhone: Story = {
+  ...FolderColours,
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole("list", { name: "Projects" });
+    const page = canvasElement.ownerDocument.documentElement;
+    await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };
