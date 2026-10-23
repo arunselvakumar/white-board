@@ -129,6 +129,9 @@ Menus **`contracts.contractor_bills`** ("Contractor Bills") and **`contracts.cli
 - **Price indices** are a Company-level table that the accountant types in each month: WPI, CPI-IW, cement, steel, bitumen and POL, or any named series. We do not fetch them.
 - A work order or client contract can turn on an **escalation clause**. The clause has component weights (labour, material, cement, steel, POL and others, summing to 100), a base month and a non-escalable %.
 - An **escalation bill** is a third bill type for a period. It applies the CPWD 10CC-style formula to the value of work done in that period and approves like an RA bill. Clause 10CA (cement and steel quantities × index change) is the same mechanism with the quantities taken from material reconciliation.
+- Price indices sit under Master records → Contracts and use the Item Library's menu (`contracts.items`); they are typed or imported from Excel. (Amended by CM-1109.)
+- An escalation bill covers **whole months**. Its value of work is the gross of the side's approved running bills dated in the period. Cement and steel on 10CA are taken out of that value before the 10CC part, so they are not escalated twice. Until CM-1110, their quantities are typed on the bill. (Amended by CM-1109.)
+- **Negative escalation** (the indices fell) is approved without an invoice and recovered on the next running bills of the same contract, as an "other" deduction that names the escalation bill. Retention on escalation bills counts towards the retention cap, retention held and retention receivable. Approved escalation periods on one contract cannot overlap. (Amended by CM-1109.)
 
 ### 10. Material reconciliation
 
