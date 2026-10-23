@@ -138,7 +138,8 @@ export async function renderEscalationBillPdf(
       { label: "Component", width: 76 },
       { label: "Weight / qty", width: 44, align: "right" },
       { label: "Series", width: seriesWidth },
-      { label: "I₀", width: 46, align: "right" },
+      // The embedded Noto font has no subscript zero: "I₀" printed a box.
+      { label: "Base", width: 46, align: "right" },
       ...months.map((month) => ({
         label: monthLabel(month),
         width: monthWidth,
@@ -165,7 +166,7 @@ export async function renderEscalationBillPdf(
   );
   w.down(4);
   w.paragraph(
-    "10CC: amount = R × (1 − NE/100) × weight/100 × (Ī − I₀)/I₀. 10CA: amount = quantity × base price × (Ī − I₀)/I₀. Ī is the average of the months' indices; each amount is rounded to the paisa from the exact average.",
+    "10CC: amount = R × (1 − NE/100) × weight/100 × (Ī − I0)/I0. 10CA: amount = quantity × base price × (Ī − I0)/I0. I0 is the base month's index and Ī the average of the period's months; each amount is rounded to the paisa from the exact average.",
     { muted: true },
   );
 
