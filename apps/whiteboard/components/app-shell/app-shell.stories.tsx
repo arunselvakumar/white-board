@@ -5,6 +5,7 @@ import { AppEmptyPage } from "@/components/app-shell/app-empty-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV } from "@/lib/app-nav";
 import { expectAppShell } from "../../.storybook/expect-app-shell";
+import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
@@ -38,6 +39,26 @@ export const Default: Story = {
     await expect(
       canvas.queryByRole("link", { name: "Switch Workspace" }),
     ).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * Hover a nav item, or tab to it: its icon plays a short animation (the
+ * clock hand ticks round, the bars grow, the cap tosses). The motion lives
+ * in `@repo/ui` (sidebar-icon-motion.css, #114); story tests run without
+ * motion, so the play checks every nav icon has a motion of its own.
+ */
+export const NavIconMotion: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    if ((canvasElement.ownerDocument.defaultView?.innerWidth ?? 1280) < 768) {
+      await userEvent.click(
+        body.getByRole("button", { name: "Toggle Sidebar" }),
+      );
+    }
+    const nav = body.getByRole("navigation", { name: "Main" });
+    await expect(within(nav).getAllByRole("link")).toHaveLength(APP_NAV.length);
+    await expectNavIconMotion(nav);
   },
 };
 
@@ -106,8 +127,10 @@ export const StudentNavigation: Story = {
         body.getByRole("button", { name: "Toggle Sidebar" }),
       );
     }
-    const nav = within(body.getByRole("navigation", { name: "Main" }));
+    const mainNav = body.getByRole("navigation", { name: "Main" });
+    const nav = within(mainNav);
     await expect(nav.getAllByRole("link")).toHaveLength(6);
+    await expectNavIconMotion(mainNav);
     await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/student",

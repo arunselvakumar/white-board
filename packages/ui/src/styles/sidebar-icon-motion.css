@@ -1,0 +1,667 @@
+/*
+ * Sidebar nav icon motion (#114).
+ *
+ * Hovering or keyboard-focusing a SidebarMenuButton or SidebarMenuSubButton
+ * plays a short micro-animation on the icon it leads with, once per hover.
+ * Lucide names each icon on its <svg> (`lucide-house`), so the rules below
+ * need nothing from the apps: an icon with a rule plays its own motion, and
+ * any other icon gets the lift.
+ *
+ * - Every motion ends at rest, and all but the draw-ins (a stroke drawing
+ *   itself in) start there, so nothing stays moved afterwards. Nothing
+ *   plays without a hover or focus, the active item included.
+ * - Parts of an icon move in the icon's 24-unit grid and stay inside it, so
+ *   nothing is clipped; a whole icon moves by a few pixels inside its
+ *   button's padding. Transforms only, so nothing shifts the layout.
+ * - Reduced motion plays none of it.
+ * - In `@layer components`, so an `animate-*` class on an icon still wins.
+ */
+
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    :is([data-sidebar="menu-button"], [data-sidebar="menu-sub-button"]):is(
+        :hover,
+        :focus-visible
+      )
+      > svg {
+      animation: sidebar-icon-lift 450ms ease-out;
+
+      /* Parts of an icon: scaled and turned about their own centre unless a
+         rule pins them to a point of the icon's grid. */
+      & > * {
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      /* Whiteboard */
+
+      &.lucide-layout-dashboard {
+        animation: none;
+
+        & > * {
+          animation: sidebar-icon-pop 340ms ease-out;
+        }
+        & > :nth-child(2) {
+          animation-delay: 70ms;
+        }
+        & > :nth-child(3) {
+          animation-delay: 140ms;
+        }
+        & > :nth-child(4) {
+          animation-delay: 210ms;
+        }
+      }
+
+      &.lucide-calendar-clock {
+        animation: none;
+
+        /* The clock hand, about the clock's centre. */
+        & > :nth-child(1) {
+          transform-box: view-box;
+          transform-origin: 16px 16px;
+          animation: sidebar-icon-spin 600ms ease-in-out;
+        }
+      }
+
+      &.lucide-calendar-x-2 {
+        animation: none;
+
+        & > :nth-child(2),
+        & > :nth-child(3) {
+          --sidebar-icon-path: 7.6;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 260ms ease-out backwards;
+        }
+        & > :nth-child(3) {
+          animation-delay: 200ms;
+        }
+      }
+
+      /* The camera moves forward, the lens a little further. */
+      &.lucide-video {
+        --sidebar-icon-x: 1.5px;
+        animation: sidebar-icon-nudge 450ms ease-out;
+
+        & > :nth-child(1) {
+          --sidebar-icon-x: 1px;
+          animation: sidebar-icon-nudge 400ms ease-out 50ms;
+        }
+      }
+
+      &.lucide-graduation-cap {
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-toss 560ms ease-out;
+      }
+
+      &.lucide-inbox {
+        --sidebar-icon-y: 2px;
+        animation: sidebar-icon-nudge 450ms ease-out;
+      }
+
+      &.lucide-book-open,
+      &.lucide-book-open-text {
+        animation: none;
+
+        /* The pages close on the spine and open again. */
+        & > * {
+          transform-box: view-box;
+          transform-origin: 12px 12px;
+          animation: sidebar-icon-flap 550ms ease-in-out;
+        }
+      }
+
+      &.lucide-banknote {
+        --sidebar-icon-x: 2.5px;
+        animation: sidebar-icon-nudge 450ms ease-out;
+      }
+
+      /* Each bar's path starts at the baseline, so drawing it grows the bar. */
+      &.lucide-chart-no-axes-column {
+        animation: none;
+
+        & > * {
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 320ms ease-out backwards;
+        }
+        & > :nth-child(1) {
+          --sidebar-icon-path: 6.5;
+        }
+        & > :nth-child(2) {
+          --sidebar-icon-path: 18.5;
+          animation-delay: 80ms;
+        }
+        & > :nth-child(3) {
+          --sidebar-icon-path: 12.5;
+          animation-delay: 160ms;
+        }
+      }
+
+      &.lucide-house {
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-hop 520ms ease-out;
+      }
+
+      &.lucide-clipboard-list {
+        animation: none;
+
+        /* Each line draws in after its bullet pops, top row first. */
+        & > :nth-child(3),
+        & > :nth-child(4) {
+          --sidebar-icon-path: 4.5;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 280ms ease-out 60ms backwards;
+        }
+        & > :nth-child(5),
+        & > :nth-child(6) {
+          animation: sidebar-icon-pop 280ms ease-out;
+        }
+        & > :nth-child(4) {
+          animation-delay: 220ms;
+        }
+        & > :nth-child(6) {
+          animation-delay: 160ms;
+        }
+      }
+
+      &.lucide-clipboard-check {
+        animation: none;
+
+        /* The tick. */
+        & > :nth-child(3) {
+          --sidebar-icon-path: 9;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 380ms ease-out backwards;
+        }
+      }
+
+      &.lucide-users-round {
+        animation: none;
+
+        /* The front figure, then the one behind. */
+        & > * {
+          --sidebar-icon-y: -1.5px;
+          animation: sidebar-icon-nudge 400ms ease-out;
+        }
+        & > :nth-child(3) {
+          animation-delay: 120ms;
+        }
+      }
+
+      /* Construction Management */
+
+      &.lucide-building-2 {
+        --sidebar-icon-y: -2px;
+        animation: sidebar-icon-nudge 500ms ease-out;
+
+        /* The windows light up. */
+        & > :nth-child(1),
+        & > :nth-child(2) {
+          animation: sidebar-icon-blink 500ms ease-in-out;
+        }
+      }
+
+      &.lucide-briefcase {
+        transform-origin: 50% 15%;
+        animation: sidebar-icon-carry 560ms ease-out;
+      }
+
+      &.lucide-library {
+        animation: none;
+
+        /* The three upright books lean, left to right. */
+        & > :nth-child(2),
+        & > :nth-child(3),
+        & > :nth-child(4) {
+          transform-origin: 50% 100%;
+          animation: sidebar-icon-lean 480ms ease-in-out;
+        }
+        & > :nth-child(3) {
+          animation-delay: 60ms;
+        }
+        & > :nth-child(2) {
+          animation-delay: 120ms;
+        }
+      }
+
+      &.lucide-user-round {
+        animation: none;
+
+        /* The head nods. */
+        & > :nth-child(1) {
+          animation: sidebar-icon-nod 550ms ease-in-out;
+        }
+      }
+
+      &.lucide-credit-card {
+        --sidebar-icon-x: 3px;
+        animation: sidebar-icon-nudge 450ms ease-in-out;
+      }
+
+      &.lucide-arrow-left {
+        --sidebar-icon-x: -2.5px;
+        animation: sidebar-icon-nudge 450ms ease-out;
+      }
+
+      &.lucide-map-pin {
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-hop 520ms ease-out;
+
+        /* The dot pops as the pin lands. */
+        & > :nth-child(2) {
+          animation: sidebar-icon-pop 280ms ease-out 260ms;
+        }
+      }
+
+      /* `Waves` renders `waves-horizontal`. */
+      &.lucide-waves-horizontal {
+        animation: none;
+
+        /* Each wave flows along: top, middle, bottom. */
+        & > * {
+          animation: sidebar-icon-ripple 420ms ease-in-out;
+        }
+        & > :nth-child(1) {
+          animation-delay: 90ms;
+        }
+        & > :nth-child(2) {
+          animation-delay: 180ms;
+        }
+      }
+
+      &.lucide-drafting-compass {
+        --sidebar-icon-turn: 14deg;
+        transform-origin: 50% 21%;
+        animation: sidebar-icon-swing 600ms ease-out;
+      }
+
+      &.lucide-flask-conical {
+        --sidebar-icon-turn: -8deg;
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-swing 560ms ease-out;
+
+        /* The liquid sloshes. */
+        & > :nth-child(2) {
+          animation: sidebar-icon-slosh 560ms ease-in-out;
+        }
+      }
+
+      &.lucide-images {
+        animation: none;
+
+        /* The front photo and the one behind it part. */
+        & > * {
+          --sidebar-icon-x: 0.8px;
+          --sidebar-icon-y: -0.8px;
+          animation: sidebar-icon-nudge 450ms ease-out;
+        }
+        & > :nth-child(2) {
+          --sidebar-icon-x: -0.8px;
+          --sidebar-icon-y: 0.8px;
+        }
+      }
+
+      /* The text lines draw in from the left (their paths run right to left). */
+      &.lucide-file-text {
+        animation: none;
+
+        & > :nth-child(n + 3) {
+          --sidebar-icon-path: 8.5;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw-back 300ms ease-out backwards;
+        }
+        & > :nth-child(3) {
+          --sidebar-icon-path: 2.5;
+        }
+        & > :nth-child(4) {
+          animation-delay: 90ms;
+        }
+        & > :nth-child(5) {
+          animation-delay: 180ms;
+        }
+      }
+
+      &.lucide-users {
+        animation: none;
+
+        /* The front figure, then the one behind. */
+        & > * {
+          --sidebar-icon-y: -1.5px;
+          animation: sidebar-icon-nudge 400ms ease-out;
+        }
+        & > :nth-child(2),
+        & > :nth-child(3) {
+          animation-delay: 120ms;
+        }
+      }
+
+      &.lucide-calendar-check {
+        animation: none;
+
+        /* The tick. */
+        & > :nth-child(5) {
+          --sidebar-icon-path: 9;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 380ms ease-out backwards;
+        }
+      }
+
+      &.lucide-wallet {
+        animation: none;
+
+        /* The flap lifts on its left edge. */
+        & > :nth-child(1) {
+          --sidebar-icon-turn: -8deg;
+          transform-box: view-box;
+          transform-origin: 3px 7px;
+          animation: sidebar-icon-swing 520ms ease-out;
+        }
+      }
+
+      &.lucide-package {
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-hop 520ms ease-out;
+      }
+
+      &.lucide-construction {
+        --sidebar-icon-turn: 7deg;
+        transform-origin: 50% 100%;
+        animation: sidebar-icon-swing 520ms ease-out;
+      }
+
+      &.lucide-octagon-pause {
+        animation: none;
+
+        /* An eighth of a turn leaves the octagon as it was. */
+        & > :nth-child(3) {
+          animation: sidebar-icon-turn-eighth 500ms ease-in-out;
+        }
+        & > :nth-child(1),
+        & > :nth-child(2) {
+          animation: sidebar-icon-pop 320ms ease-out 120ms;
+        }
+      }
+
+      &.lucide-list-todo {
+        animation: none;
+
+        /* The tick, then the three lines. */
+        & > :nth-child(4) {
+          --sidebar-icon-path: 9;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 300ms ease-out backwards;
+        }
+        & > :nth-child(-n + 3) {
+          --sidebar-icon-path: 8.5;
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 260ms ease-out 100ms backwards;
+        }
+        & > :nth-child(2) {
+          animation-delay: 180ms;
+        }
+        & > :nth-child(3) {
+          animation-delay: 260ms;
+        }
+      }
+
+      &.lucide-circle-alert {
+        animation: sidebar-icon-shake 500ms ease-in-out;
+      }
+
+      &.lucide-book-user {
+        animation: none;
+
+        /* The person on the cover. */
+        & > :nth-child(1),
+        & > :nth-child(3) {
+          --sidebar-icon-y: -1.5px;
+          animation: sidebar-icon-nudge 450ms ease-out;
+        }
+      }
+
+      &.lucide-handshake {
+        animation: sidebar-icon-shake-hands 500ms ease-in-out;
+      }
+
+      /* Each bar's path starts at the baseline, so drawing it grows the bar. */
+      &.lucide-file-chart-column,
+      &.lucide-file-chart-column-increasing {
+        animation: none;
+
+        & > :nth-child(n + 3) {
+          stroke-dasharray: var(--sidebar-icon-path) 100;
+          animation: sidebar-icon-draw 300ms ease-out backwards;
+        }
+        & > :nth-child(4) {
+          animation-delay: 80ms;
+        }
+        & > :nth-child(5) {
+          animation-delay: 160ms;
+        }
+      }
+      &.lucide-file-chart-column {
+        & > :nth-child(3) {
+          --sidebar-icon-path: 1.5;
+        }
+        & > :nth-child(4) {
+          --sidebar-icon-path: 6.5;
+        }
+        & > :nth-child(5) {
+          --sidebar-icon-path: 3.5;
+        }
+      }
+      &.lucide-file-chart-column-increasing {
+        & > :nth-child(3) {
+          --sidebar-icon-path: 2.5;
+        }
+        & > :nth-child(4) {
+          --sidebar-icon-path: 4.5;
+        }
+        & > :nth-child(5) {
+          --sidebar-icon-path: 6.5;
+        }
+      }
+    }
+  }
+}
+
+/* The default for an icon without its own motion. */
+@keyframes sidebar-icon-lift {
+  40% {
+    transform: translateY(-1.5px) rotate(-8deg);
+  }
+}
+
+@keyframes sidebar-icon-pop {
+  40% {
+    transform: scale(0.6);
+  }
+  75% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes sidebar-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sidebar-icon-turn-eighth {
+  to {
+    transform: rotate(45deg);
+  }
+}
+
+/* A stroke draws in from its start; `-back` from its end. The element sets
+   `--sidebar-icon-path` a little over its length, with
+   `stroke-dasharray: var(--sidebar-icon-path) 100`. */
+@keyframes sidebar-icon-draw {
+  from {
+    stroke-dashoffset: var(--sidebar-icon-path);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sidebar-icon-draw-back {
+  from {
+    stroke-dashoffset: calc(var(--sidebar-icon-path) * -1);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Out by `--sidebar-icon-x` / `--sidebar-icon-y`, a little past rest, back. */
+@keyframes sidebar-icon-nudge {
+  40% {
+    transform: translate(
+      var(--sidebar-icon-x, 0px),
+      var(--sidebar-icon-y, 0px)
+    );
+  }
+  70% {
+    transform: translate(
+      calc(var(--sidebar-icon-x, 0px) * -0.3),
+      calc(var(--sidebar-icon-y, 0px) * -0.3)
+    );
+  }
+}
+
+/* To `--sidebar-icon-turn`, back past rest, and settle. */
+@keyframes sidebar-icon-swing {
+  30% {
+    transform: rotate(var(--sidebar-icon-turn, 10deg));
+  }
+  60% {
+    transform: rotate(calc(var(--sidebar-icon-turn, 10deg) * -0.6));
+  }
+  85% {
+    transform: rotate(calc(var(--sidebar-icon-turn, 10deg) * 0.25));
+  }
+}
+
+/* Up, land with a squash, settle. Set `transform-origin` to the bottom. */
+@keyframes sidebar-icon-hop {
+  30% {
+    transform: translateY(-2.5px);
+  }
+  55% {
+    transform: translateY(0) scale(1.08, 0.9);
+  }
+  75% {
+    transform: translateY(-0.5px) scale(1);
+  }
+}
+
+@keyframes sidebar-icon-toss {
+  30% {
+    transform: translateY(-3px) rotate(-12deg);
+  }
+  60% {
+    transform: translateY(0) rotate(3deg);
+  }
+  75% {
+    transform: scale(1.06, 0.92);
+  }
+}
+
+@keyframes sidebar-icon-carry {
+  30% {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+  60% {
+    transform: translateY(-1px) rotate(5deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes sidebar-icon-flap {
+  25% {
+    transform: scaleX(0.75);
+  }
+  50% {
+    transform: scaleX(1);
+  }
+  75% {
+    transform: scaleX(0.85);
+  }
+}
+
+@keyframes sidebar-icon-lean {
+  45% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes sidebar-icon-nod {
+  25% {
+    transform: translateY(1.75px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes sidebar-icon-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes sidebar-icon-ripple {
+  30% {
+    transform: translateX(1px);
+  }
+  70% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes sidebar-icon-slosh {
+  30% {
+    transform: translateY(-1.5px) scaleX(0.88);
+  }
+  60% {
+    transform: translateY(0.5px) scaleX(1.03);
+  }
+}
+
+@keyframes sidebar-icon-shake {
+  15% {
+    transform: translateX(-1.5px);
+  }
+  30% {
+    transform: translateX(1.5px);
+  }
+  45% {
+    transform: translateX(-1px);
+  }
+  60% {
+    transform: translateX(1px);
+  }
+  75% {
+    transform: translateX(-0.5px);
+  }
+}
+
+@keyframes sidebar-icon-shake-hands {
+  20% {
+    transform: translateY(-1.5px);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+  60% {
+    transform: translateY(-1px);
+  }
+  80% {
+    transform: translateY(0.5px);
+  }
+}
