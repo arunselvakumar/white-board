@@ -89,6 +89,7 @@ function logoFile(name = "logo.png"): File {
 /** Every contract field blank, as Add Project sends it. */
 const NO_CONTRACT = {
   useLogoInReports: false,
+  color: "lavender",
   clientName: null,
   clientPhone: null,
   tenderRef: null,
@@ -643,6 +644,7 @@ export const EditSaves: Story = {
       status: "on_hold",
       projectType: "residential",
       useLogoInReports: false,
+      color: "lavender",
       budgetValue: 4_20_00_000_00,
       stateCode: "33",
       address: null,
@@ -1184,5 +1186,79 @@ export const NewOnAPhone: Story = {
     // Nothing scrolls sideways.
     const page = canvasElement.ownerDocument.documentElement;
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
+  },
+};
+
+/**
+ * The folder colour (ADR CM-0026 §2): Lavender is chosen on a new Project,
+ * a swatch is picked by click or the arrow keys, and the choice is sent.
+ */
+export const NewPicksAColour: Story = {
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const colours = await canvas.findByRole("radiogroup", { name: "Colour" });
+    const swatches = within(colours).getAllByRole("radio");
+    await expect(
+      swatches.map((swatch) => swatch.getAttribute("aria-label")),
+    ).toEqual([
+      "Lavender",
+      "Peach",
+      "Sky",
+      "Mint",
+      "Lemon",
+      "Rose",
+      "Sand",
+      "Slate",
+    ]);
+    await expect(
+      within(colours).getByRole("radio", { name: "Lavender" }),
+    ).toBeChecked();
+
+    await userEvent.click(
+      within(colours).getByRole("radio", { name: "Peach" }),
+    );
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(
+      within(colours).getByRole("radio", { name: "Sky" }),
+    ).toBeChecked();
+    await expect(
+      within(colours).getByRole("radio", { name: "Peach" }),
+    ).not.toBeChecked();
+
+    await userEvent.type(
+      canvas.getByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(canvas, body, userEvent);
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(getRouter().push).toHaveBeenCalled());
+    await expect(posts()[0]?.body).toMatchObject({ color: "sky" });
+  },
+};
+
+/** Edit Project opens on the saved colour and sends the new one. */
+export const EditChangesColour: Story = {
+  render: editRender(KUMARI.id),
+  beforeEach: () => editApi({ ...KUMARI, color: "mint" }),
+  play: async ({ canvas, userEvent }) => {
+    const colours = await canvas.findByRole("radiogroup", { name: "Colour" });
+    await expect(
+      within(colours).getByRole("radio", { name: "Mint" }),
+    ).toBeChecked();
+    await userEvent.click(within(colours).getByRole("radio", { name: "Rose" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(getRouter().push).toHaveBeenCalled());
+    await expect(posts()[0]?.body).toMatchObject({ color: "rose" });
+  },
+};
+
+export const ColourPickerDark: Story = {
+  globals: { theme: "dark" },
+  beforeEach: () => api(created),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("radiogroup", { name: "Colour" }),
+    ).toBeVisible();
   },
 };

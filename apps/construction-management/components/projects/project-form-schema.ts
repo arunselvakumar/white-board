@@ -19,6 +19,10 @@ import {
   PROJECT_REFERENCE_MAX,
 } from "@/src/projects/domain/project-contract-rules";
 import {
+  DEFAULT_PROJECT_COLOR,
+  PROJECT_COLOR_KEYS,
+} from "@/src/projects/domain/project-color";
+import {
   isProjectType,
   type ProjectType,
 } from "@/src/projects/domain/project-type";
@@ -84,6 +88,8 @@ export const projectFormSchema = z
       message: "Enter the amount in rupees, like 3,20,00,000",
     }),
     useLogoInReports: z.boolean(),
+    /** The folder colour (ADR CM-0026); always one of the palette. */
+    color: z.enum(PROJECT_COLOR_KEYS),
     /** GST state code, or "" for Not set (CM-501). */
     stateCode: z
       .string()
@@ -206,6 +212,7 @@ export function cardOf(field: string): ProjectFormCard {
 /** Fields in the order they appear on screen, for "focus the first error". */
 export const FIELD_ORDER: readonly string[] = [
   "name",
+  "color",
   "projectType",
   "status",
   "startDate",
@@ -238,6 +245,7 @@ export function projectFormValues(
     projectType: project?.projectType ?? "",
     budgetValue: groupRupees(paiseToRupees(project?.budgetValue)),
     useLogoInReports: project?.useLogoInReports ?? false,
+    color: project?.color ?? DEFAULT_PROJECT_COLOR,
     stateCode: project?.stateCode ?? "",
     address: project?.address ?? "",
     startDate: project?.startDate ?? "",
@@ -306,6 +314,7 @@ export function projectFormInput(
       ? {}
       : { projectType: values.projectType as ProjectType }),
     useLogoInReports: values.useLogoInReports,
+    color: values.color,
     ...(sendState
       ? { stateCode: values.stateCode === "" ? null : values.stateCode }
       : {}),
@@ -342,6 +351,7 @@ const SERVER_FIELDS: Record<string, ProjectFormField> = {
   PROJECT_TYPE_INVALID: "projectType",
   PROJECT_BUDGET_INVALID: "budgetValue",
   PROJECT_STATE_INVALID: "stateCode",
+  PROJECT_COLOR_INVALID: "color",
   PROJECT_ADDRESS_TOO_LONG: "address",
   PROJECT_DATE_INVALID: "startDate",
   PROJECT_DATES_INVALID: "endDate",
