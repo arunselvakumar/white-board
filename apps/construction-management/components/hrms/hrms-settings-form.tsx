@@ -449,13 +449,13 @@ export function HrmsSettingsForm() {
 
             <fieldset
               className="space-y-1.5"
-              aria-describedby="hrms-working-days-hint"
+              aria-describedby="hrms-working-days-required"
             >
               <legend className="text-sm font-medium">
                 Working days
                 <RequiredIndicator />
               </legend>
-              <span id="hrms-working-days-hint" className="sr-only">
+              <span id="hrms-working-days-required" className="sr-only">
                 Choose at least one day.
               </span>
               <Controller
@@ -464,7 +464,7 @@ export function HrmsSettingsForm() {
                 render={({ field }) => (
                   <ToggleGroup
                     multiple
-                    aria-describedby="hrms-working-days-hint"
+                    aria-describedby="hrms-working-days-required hrms-working-days-hint"
                     value={field.value.map(String)}
                     onValueChange={(value: string[]) => {
                       field.onChange(value.map(Number).sort((a, b) => a - b));
