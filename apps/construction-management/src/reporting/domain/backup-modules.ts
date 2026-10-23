@@ -332,6 +332,92 @@ const PROJECT_MODULES: readonly BackupModule[] = [
     media: true,
     viewAll: true,
   },
+  // Contracts & Billing (CM-1111, ADR CM-0023): each side's bills with
+  // their abstract, deductions, advances, guarantees, retention releases
+  // and escalation clauses; measurement photos as media.
+  {
+    key: "contracts.boq",
+    label: "BOQ and Variations",
+    group: "Contracts",
+    scope: "project",
+    menu: "contracts.boq",
+    money: { menu: "contracts.boq", flag: "financial" },
+    folder: "boq",
+    entities: [
+      "client_contract_terms",
+      "boq_sections",
+      "boq_items",
+      "variations",
+    ],
+    media: false,
+  },
+  {
+    key: "contracts.work_orders",
+    label: "Work Orders",
+    group: "Contracts",
+    scope: "project",
+    menu: "contracts.work_orders",
+    money: { menu: "contracts.work_orders", flag: "financial" },
+    folder: "work-orders",
+    entities: [
+      "work_orders",
+      "work_order_lines",
+      "work_order_materials",
+      "work_order_revisions",
+    ],
+    media: false,
+  },
+  {
+    key: "contracts.measurements",
+    label: "Measurement Book",
+    group: "Contracts",
+    scope: "project",
+    menu: "contracts.measurements",
+    money: null,
+    folder: "measurement-book",
+    entities: ["measurement_sheets", "measurement_rows"],
+    media: true,
+  },
+  {
+    key: "contracts.contractor_bills",
+    label: "Contractor Bills",
+    group: "Contracts",
+    scope: "project",
+    menu: "contracts.contractor_bills",
+    money: { menu: "contracts.contractor_bills", flag: "financial" },
+    folder: "contractor-bills",
+    entities: [
+      "contractor_bills",
+      "contractor_bill_lines",
+      "contractor_bill_deductions",
+      "contractor_advances",
+      "contractor_bank_guarantees",
+      "contractor_retention_releases",
+      "contractor_escalation_clauses",
+      "contractor_escalation_components",
+    ],
+    media: false,
+  },
+  {
+    key: "contracts.client_bills",
+    label: "Client Bills",
+    group: "Contracts",
+    scope: "project",
+    menu: "contracts.client_bills",
+    money: { menu: "contracts.client_bills", flag: "financial" },
+    folder: "client-bills",
+    entities: [
+      "client_bills",
+      "client_bill_lines",
+      "client_bill_deductions",
+      "client_advances",
+      "client_bank_guarantees",
+      "client_retention_releases",
+      "client_escalation_clauses",
+      "client_escalation_components",
+    ],
+    media: false,
+  },
 ];
 
 function master(
@@ -411,6 +497,15 @@ const MASTER_MODULES: readonly BackupModule[] = [
     "issue_categories",
   ]),
   master("masters.tags", "Tags", "tags", ["tags"]),
+  // The Item Library with its rate analysis, and the price indices it
+  // keeps (CM-1111); the library shows rates to whoever views it.
+  master(
+    "contracts.items",
+    "Item Library",
+    "item-library",
+    ["contract_items", "contract_item_analysis_lines", "price_indices"],
+    { menu: "contracts.items", flag: "read" },
+  ),
 ];
 
 function hrms(
@@ -484,6 +579,7 @@ const COMPANY_MODULES: readonly BackupModule[] = [
       "sequence_rules",
       "backdated_entry_policy",
       "stores",
+      "contracts_settings",
     ],
     media: false,
   },
