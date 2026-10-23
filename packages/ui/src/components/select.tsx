@@ -46,20 +46,17 @@ function Select<Value, Multiple extends boolean | undefined = false>({
   const [instantClose, setInstantClose] = React.useState(false);
   const inputRef = React.useRef<SelectInput>("pointer");
   const triggerRef = React.useRef<HTMLElement | null>(null);
+  // Stable, so the pill's observer is not rebuilt each time the menu closes.
+  const getInput = React.useCallback(() => inputRef.current, []);
+  const setInput = React.useCallback((input: SelectInput) => {
+    inputRef.current = input;
+  }, []);
+  const setTrigger = React.useCallback((trigger: HTMLElement | null) => {
+    triggerRef.current = trigger;
+  }, []);
   const context = React.useMemo(
-    () => ({
-      size,
-      setSize,
-      instantClose,
-      getInput: () => inputRef.current,
-      setInput: (input: SelectInput) => {
-        inputRef.current = input;
-      },
-      setTrigger: (trigger: HTMLElement | null) => {
-        triggerRef.current = trigger;
-      },
-    }),
-    [size, instantClose],
+    () => ({ size, setSize, instantClose, getInput, setInput, setTrigger }),
+    [size, instantClose, getInput, setInput, setTrigger],
   );
 
   return (
@@ -124,7 +121,8 @@ const selectTriggerVariants = cva(
       size: {
         default: "h-8 text-[13px]",
         sm: "h-7 text-[12px]",
-        lg: "h-11 text-[14px]",
+        // 40 px, not Glide's 44, so it lines up with `h-10` Inputs in forms.
+        lg: "h-10 text-[14px]",
       },
     },
     defaultVariants: {

@@ -216,7 +216,7 @@ export const Sizes: Story = {
     const heights = canvas
       .getAllByRole("combobox")
       .map((trigger) => trigger.offsetHeight);
-    await expect(heights).toEqual([28, 32, 44]);
+    await expect(heights).toEqual([28, 32, 40]);
   },
 };
 
