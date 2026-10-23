@@ -101,6 +101,8 @@ export async function addContractorBill(
     status?:
       "draft" | "pending_approval" | "approved" | "rejected" | "reversed";
     ordinal?: number;
+    /** `YYYY-MM-DD`; 2026-10-20 by default. */
+    billDate?: string;
     lines?: readonly {
       workOrderLineId: string;
       uomId: string;
@@ -119,7 +121,7 @@ export async function addContractorBill(
       workOrderId: input.workOrderId,
       number: `RA-${randomUUID().slice(0, 6)}`,
       ordinal: input.ordinal ?? 1,
-      billDate: new Date("2026-10-20"),
+      billDate: new Date(input.billDate ?? "2026-10-20"),
       status: input.status ?? "approved",
       createdBy: by,
       updatedBy: by,
@@ -341,4 +343,90 @@ export async function addRunningBill(
     },
   });
   return id;
+}
+
+/**
+ * Material delivered to a Contractor on a Project (CM-1110), written
+ * straight to procurement's tables: a Material Request for the Contractor
+ * (naming `workOrderId` when given) and one Delivery Note, approved and
+ * delivered on `deliveredOn`, with one line.
+ */
+export async function issueToContractor(
+  workspaceId: string,
+  by: string,
+  input: {
+    projectId: string;
+    storeId: string;
+    contractorId: string;
+    workOrderId?: string | null;
+    material: { id: string; name: string; uomId: string };
+    quantity: string;
+    deliveredOn: string;
+  },
+): Promise<{ requestId: string; noteId: string; noteLineId: string }> {
+  const requestId = randomUUID();
+  const requestItemId = randomUUID();
+  const noteId = randomUUID();
+  const noteLineId = randomUUID();
+  const tag = randomUUID().slice(0, 8);
+  const on = new Date(input.deliveredOn);
+  await prisma.constructionProcurementMaterialRequest.create({
+    data: {
+      id: requestId,
+      workspaceId,
+      projectId: input.projectId,
+      storeId: input.storeId,
+      number: `MR-${tag}`,
+      requestDate: on,
+      contractorId: input.contractorId,
+      workOrderId: input.workOrderId ?? null,
+      status: "delivered",
+      createdBy: by,
+      updatedBy: by,
+      items: {
+        create: {
+          id: requestItemId,
+          position: 0,
+          materialId: input.material.id,
+          materialName: input.material.name,
+          uomId: input.material.uomId,
+          uomName: "Bag",
+          askQty: input.quantity,
+          deliveredQty: input.quantity,
+        },
+      },
+    },
+  });
+  await prisma.constructionProcurementDeliveryNote.create({
+    data: {
+      id: noteId,
+      workspaceId,
+      number: `DN-${tag}`,
+      materialRequestId: requestId,
+      storeId: input.storeId,
+      projectId: input.projectId,
+      deliveryDate: on,
+      approvalStatus: "approved",
+      decidedAt: on,
+      decidedBy: by,
+      deliveredOn: on,
+      deliveredAt: on,
+      deliveredBy: by,
+      createdBy: by,
+      updatedBy: by,
+      items: {
+        create: {
+          id: noteLineId,
+          materialRequestItemId: requestItemId,
+          position: 0,
+          materialId: input.material.id,
+          materialName: input.material.name,
+          uomId: input.material.uomId,
+          uomName: "Bag",
+          quantity: input.quantity,
+        },
+      },
+    },
+  });
+  return { requestId, noteId, noteLineId };
 }

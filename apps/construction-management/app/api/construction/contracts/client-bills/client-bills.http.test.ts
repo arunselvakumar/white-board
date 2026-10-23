@@ -991,6 +991,28 @@ describe("Client Bills (CM-1107)", () => {
     expect((await api.get(again.id)).status).toBe(StatusCodes.NOT_FOUND);
   });
 
+  it("refuses a material reconciliation recovery: the client side issues no material (CM-1110)", async () => {
+    const ctx = await setup();
+    await ctx.measure(day(-5), [
+      { boqItemId: ctx.excavation.id, quantity: "30" },
+    ]);
+    const bill = await ctx.draft();
+    const response = await api.update(bill.id, {
+      billDate: bill.billDate,
+      measuredUpTo: bill.measuredUpTo,
+      expectedUpdatedAt: bill.updatedAt,
+      deductions: [
+        {
+          kind: "material_reconciliation",
+          amount: 100_00,
+          materialId: bill.id,
+        },
+      ],
+    });
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+    expect((await errorOf(response)).code).toBe("VALIDATION_ERROR");
+  });
+
   it("documents every operation in OpenAPI", async () => {
     const document = await json<{ paths: Record<string, unknown> }>(
       getOpenApi(),
