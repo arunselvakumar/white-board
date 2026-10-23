@@ -15,8 +15,9 @@ type ProjectItem = ProjectList["items"][number];
 
 /**
  * The back panel's tab and the paper peeking out above the front: drawn
- * behind the front panel, in the Project's colour (ADR CM-0026 §3). The
- * paper rises a little when the folder is hovered or focused.
+ * behind the front panel, in the Project's colour (ADR CM-0026 §3). When
+ * the folder is hovered or focused the paper slides up out of it; the
+ * front stays put (ADR CM-0027 §2).
  */
 function FolderBack({ back }: { back: string }) {
   return (
@@ -30,7 +31,7 @@ function FolderBack({ back }: { back: string }) {
           back,
         )}
       />
-      <div className="bg-card absolute inset-x-4 top-4 bottom-4 rounded-lg border shadow-xs transition-transform duration-300 ease-out group-focus-within/folder:-translate-y-1 group-hover/folder:-translate-y-1 motion-reduce:transition-none motion-reduce:group-focus-within/folder:translate-y-0 motion-reduce:group-hover/folder:translate-y-0" />
+      <div className="bg-card absolute inset-x-4 top-4 bottom-4 rounded-lg border shadow-xs transition-transform duration-300 ease-out group-focus-within/folder:-translate-y-3 group-hover/folder:-translate-y-3 motion-reduce:transition-none motion-reduce:group-focus-within/folder:translate-y-0 motion-reduce:group-hover/folder:translate-y-0" />
     </div>
   );
 }
@@ -58,7 +59,7 @@ export function ProjectFolderCard({
       <Link
         href={href}
         className={cn(
-          "focus-visible:ring-ring/50 relative flex h-full min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14 shadow-xs transition-[translate,box-shadow] duration-300 ease-out outline-none group-hover/folder:-translate-y-0.5 group-hover/folder:shadow-md focus-visible:ring-3 motion-reduce:transition-none motion-reduce:group-hover/folder:translate-y-0",
+          "focus-visible:ring-ring/50 relative flex h-full min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14 shadow-xs outline-none focus-visible:ring-3",
           tint.body,
         )}
       >
@@ -116,9 +117,7 @@ export function ProjectFolderCard({
         </div>
       </Link>
       {menu == null ? null : (
-        <div className="absolute top-10 right-3 transition-[translate] duration-300 ease-out group-hover/folder:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover/folder:translate-y-0">
-          {menu(tint.chip)}
-        </div>
+        <div className="absolute top-10 right-3">{menu(tint.chip)}</div>
       )}
     </li>
   );
