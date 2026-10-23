@@ -71,6 +71,7 @@ function invoice(patch: Partial<Invoice> & Pick<Invoice, "id">): Invoice {
     origin: "manual",
     sourceId: null,
     retentionRelease: null,
+    raBillType: null,
     invoiceNumber: "CC/2026/118",
     invoiceDate: "2026-09-01",
     dueDate: "2026-10-01",

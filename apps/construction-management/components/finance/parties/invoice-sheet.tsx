@@ -176,9 +176,12 @@ export function InvoiceDetail({
       ) : null}
       {invoice.origin === "ra_bill" && invoice.sourceId != null ? (
         <p className="text-sm">
-          From {invoice.party.type === "client" ? "Client" : "Contractor"} Bill{" "}
+          From{" "}
+          {invoice.raBillType === "escalation"
+            ? "Escalation Bill"
+            : `${invoice.party.type === "client" ? "Client" : "Contractor"} Bill`}{" "}
           <Link
-            href={`/app/projects/${projectId}/${invoice.party.type === "client" ? "client-bills" : "contractor-bills"}/${invoice.sourceId}`}
+            href={`/app/projects/${projectId}/${invoice.party.type === "client" ? "client-bills" : "contractor-bills"}/${invoice.raBillType === "escalation" ? "escalation/" : ""}${invoice.sourceId}`}
             className="font-medium underline-offset-4 hover:underline"
           >
             {invoice.invoiceNumber}

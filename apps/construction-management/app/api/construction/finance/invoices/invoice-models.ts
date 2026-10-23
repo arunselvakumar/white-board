@@ -150,6 +150,12 @@ export const ConstructionFinanceInvoiceResponseModel = z.object({
     .describe(
       "Origin `retention_release`: the Work Order the retention was released on (contractor side), or none (the client contract).",
     ),
+  raBillType: z
+    .enum(["running", "escalation"])
+    .nullable()
+    .describe(
+      "Origin `ra_bill`: a running (RA) bill, or an escalation bill (CM-1109) whose page is under `…/escalation/{id}`.",
+    ),
   invoiceNumber: z.string(),
   invoiceDate: z.iso.date(),
   dueDate: z.iso.date().nullable(),
@@ -253,6 +259,7 @@ export function toInvoiceResponse(
     origin: view.origin,
     sourceId: view.sourceId,
     retentionRelease: view.retentionRelease,
+    raBillType: view.raBillType,
     invoiceNumber: view.invoiceNumber,
     invoiceDate: view.invoiceDate,
     dueDate: view.dueDate,

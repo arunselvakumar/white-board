@@ -102,6 +102,8 @@ export type InvoiceView = StoredInvoice &
       workOrderId: string | null;
       workOrderNumber: string | null;
     } | null;
+    /** Origin `ra_bill`: a running (RA) or escalation bill (CM-1109). */
+    raBillType: "running" | "escalation" | null;
     payments: {
       paymentId: string;
       number: string;
@@ -690,6 +692,13 @@ export class InvoiceHandlers {
       ),
       directory.retentionReleases(db, workspaceId, releaseIds),
     ]);
+    const billTypes = await directory.raBillTypes(
+      db,
+      workspaceId,
+      rows.flatMap((row) =>
+        row.origin === "ra_bill" && row.sourceId != null ? [row.sourceId] : [],
+      ),
+    );
     const paymentById = new Map(payments.map((row) => [row.id, row]));
     return rows.map((row) => {
       const figure = figures.get(row.id) ?? { allocated: 0n, writtenOff: 0n };
@@ -726,6 +735,10 @@ export class InvoiceHandlers {
         retentionRelease:
           row.origin === "retention_release" && row.sourceId != null
             ? (releases.get(row.sourceId) ?? null)
+            : null,
+        raBillType:
+          row.origin === "ra_bill" && row.sourceId != null
+            ? (billTypes.get(row.sourceId) ?? "running")
             : null,
         payments: allocations
           .filter((allocation) => allocation.invoiceId === row.id)

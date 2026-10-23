@@ -379,6 +379,16 @@ export const financeDirectory: FinanceDirectory = {
     );
   },
 
+  async raBillTypes(db, workspaceId, billIds) {
+    const ids = [...new Set(billIds)];
+    if (ids.length === 0) return new Map();
+    const rows = await db.constructionContractsBill.findMany({
+      where: { workspaceId, id: { in: ids } },
+      select: { id: true, type: true },
+    });
+    return new Map(rows.map((row) => [row.id, row.type]));
+  },
+
   async retentionReleases(db, workspaceId, releaseIds) {
     const ids = [...new Set(releaseIds)];
     if (ids.length === 0) return new Map();

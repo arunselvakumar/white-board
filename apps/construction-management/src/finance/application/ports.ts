@@ -186,6 +186,12 @@ export type FinanceDirectory = {
    * Retention releases by id (CM-1108): the Work Order a contractor-side
    * release is on (its number), none for the client contract.
    */
+  /** The type of each contracts bill an `ra_bill` invoice comes from (CM-1109). */
+  raBillTypes(
+    db: Db,
+    workspaceId: string,
+    billIds: readonly string[],
+  ): Promise<Map<string, "running" | "escalation">>;
   retentionReleases(
     db: Db,
     workspaceId: string,
