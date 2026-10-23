@@ -1,0 +1,45 @@
+apps/construction-management/app/api/construction/projects/projects/project-models.ts
+  s_198a40712dbd5a::t_449adea0ea0af8 5,34-39,150,220-226,308
+apps/construction-management/app/api/construction/projects/projects/project-profile.http.test.ts
+  s_198a40712dbd5a::t_d5938f2165e245 31,675-741
+apps/construction-management/components/projects/project-fixtures.ts
+  s_198a40712dbd5a::t_a94b169c09f422 23,98,109,119,128
+apps/construction-management/src/projects/application/project-read-model.ts
+  s_198a40712dbd5a::t_e732c532d39cbb 8,31-32,52
+apps/construction-management/src/projects/domain/project.test.ts
+  s_198a40712dbd5a::t_99aae8974be671 469,599-625
+apps/construction-management/src/projects/domain/project.ts
+  s_198a40712dbd5a::t_25ee53f89674b0 18-22,54-55,70-71,89-90,161-163,185-188,280,343-346,402,409
+apps/construction-management/src/projects/infrastructure/prisma-project-repository.ts
+  s_198a40712dbd5a::t_c70ccc7e847029 73,96
+packages/db/construction/prisma/migrations/20261023090000_construction_projects_color/migration.sql
+  s_5397245072badf::t_41ba31fc7d93bd 1-9
+packages/db/construction/prisma/schema/construction-projects.prisma
+  s_5397245072badf::t_311b78ebb7e8c9 35-49,91-92
+apps/construction-management/src/projects/domain/project-color.ts
+  s_198a40712dbd5a::t_bbc775af839da7 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b93add24abda34d82b3e8ea98f50636f6bece932",
+  "prompts": {},
+  "sessions": {
+    "s_198a40712dbd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "63d99436-5fe4-4e9c-850f-ae238495c14e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_5397245072badf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99660926-66dd-4ecc-9684-2184f8c55e3a",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
