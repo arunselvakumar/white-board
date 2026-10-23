@@ -74,13 +74,13 @@ export const RequiredGroup: Story = {
         <div className="flex items-center gap-2">
           <RadioGroupItem id="type-contractor" value="contractor" />
           <Label htmlFor="type-contractor" className="font-normal">
-            Offline
+            Contractor
           </Label>
         </div>
         <div className="flex items-center gap-2">
           <RadioGroupItem id="type-supplier" value="supplier" />
           <Label htmlFor="type-supplier" className="font-normal">
-            Online
+            Supplier
           </Label>
         </div>
       </RadioGroup>
