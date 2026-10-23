@@ -1,0 +1,31 @@
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-detail.stories.tsx
+  s_f49615d4431370::t_ea13a4bf97b1f1 113,121
+apps/construction-management/components/contracts/work-orders/work-order-reconciliation.stories.tsx
+  s_5397245072badf::t_f4e5227fd989cb 24-34,81-86,103,111-113,115-117,133-134,161-163
+apps/construction-management/components/contracts/work-orders/work-order-reconciliation.tsx
+  s_f49615d4431370::t_9ca047afedbc77 96-140,142,144-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "129573270a94badb83de28f4bd2aff539ddf8a12",
+  "prompts": {},
+  "sessions": {
+    "s_5397245072badf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99660926-66dd-4ecc-9684-2184f8c55e3a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
