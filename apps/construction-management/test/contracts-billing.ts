@@ -76,8 +76,11 @@ const created = async <T>(response: Response): Promise<T> => {
  * Order issues cement free (6.34 bag a cum, 2 % wastage, ₹500 penal):
  * 330 bags against 323.34 allowed is 6.66 bags, ₹3,330 recovered on the bill.
  */
-export async function contractsBilledBothWays() {
-  const company = await newCompany();
+export async function contractsBilledBothWays(
+  /** An existing Company (a walkthrough's); a new one by default. */
+  given?: { workspaceId: string; ownerId: string },
+) {
+  const company = given ?? (await newCompany());
   const ws = company.workspaceId;
   const by = company.ownerId;
   const owner = { userId: by, workspaceId: ws, role: "owner" as const };
