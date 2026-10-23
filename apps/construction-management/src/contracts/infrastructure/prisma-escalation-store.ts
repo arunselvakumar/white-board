@@ -206,8 +206,8 @@ function toClause(row: ClauseRow): StoredEscalationClause {
       nonEscalablePercent: dec(row.nonEscalablePercent, PERCENT_SCALE),
       components: row.components
         .map((component) => ({
-          component: component.component as EscalationComponent,
-          basis: component.basis as EscalationBasis,
+          component: component.component,
+          basis: component.basis,
           weightPercent: dec(component.weightPercent, PERCENT_SCALE),
           series: component.series,
           basePrice: component.basePrice,

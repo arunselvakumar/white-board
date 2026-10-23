@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
 import { DRAFT, FORM_OPTIONS, PREVIEW, PROJECT } from "./escalation-fixtures";
@@ -8,6 +8,14 @@ import { NewEscalationBillDialog } from "./new-escalation-bill-dialog";
 const API = "/api/construction/contracts/escalation-bills";
 
 let api: ReturnType<typeof mockApi>;
+
+/** The body of the last POST to `path`. */
+function posted(path: string): unknown {
+  return api.calls.mock.calls
+    .map(([call]) => call)
+    .filter((call) => call.method === "POST" && call.path === path)
+    .at(-1)?.body;
+}
 
 function serve(preview: () => Response) {
   return () => {
@@ -75,16 +83,12 @@ export const ShowsR: Story = {
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Draft escalation bill" }),
     );
-    await expect(api.calls).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: "POST",
-        path: API,
-        body: expect.objectContaining({
-          fromMonth: "2026-04",
-          toMonth: "2026-06",
-        }),
-      }),
-    );
+    await waitFor(async () => {
+      await expect(posted(API)).toMatchObject({
+        fromMonth: "2026-04",
+        toMonth: "2026-06",
+      });
+    });
   },
 };
 

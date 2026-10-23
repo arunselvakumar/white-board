@@ -1,6 +1,7 @@
 import type {
   EscalationBill,
   EscalationClauseView,
+  EscalationComponentWorking,
   EscalationFormOptions,
   EscalationPreview,
   EscalationWorking,
@@ -19,6 +20,20 @@ export const RA_JUNE = "0199a000-0000-7000-8000-000000000007";
 const MONTHS = ["2026-04-01", "2026-05-01", "2026-06-01"];
 const indices = (values: string[]) =>
   MONTHS.map((month, index) => ({ month, value: values[index] ?? "0" }));
+
+const POL_WORKING: EscalationComponentWorking = {
+  component: "pol",
+  basis: "weighted",
+  weightPercent: "20.00",
+  series: "WPI – HSD (POL)",
+  baseIndex: "120.0000",
+  indices: indices(["113.0000", "114.0000", "115.0000"]),
+  averageIndex: "114.0000",
+  factor: "-0.050000",
+  quantity: null,
+  basePrice: null,
+  amount: -8_500_00,
+};
 
 /** R ₹10,00,000; NE 15 %; labour, material and POL → gross ₹21,250. */
 export const WORKING: EscalationWorking = {
@@ -69,19 +84,7 @@ export const WORKING: EscalationWorking = {
       basePrice: null,
       amount: 17_000_00,
     },
-    {
-      component: "pol",
-      basis: "weighted",
-      weightPercent: "20.00",
-      series: "WPI – HSD (POL)",
-      baseIndex: "120.0000",
-      indices: indices(["113.0000", "114.0000", "115.0000"]),
-      averageIndex: "114.0000",
-      factor: "-0.050000",
-      quantity: null,
-      basePrice: null,
-      amount: -8_500_00,
-    },
+    POL_WORKING,
   ],
   gross: 21_250_00,
 };
@@ -189,7 +192,7 @@ export const NEGATIVE: EscalationBill = {
     ...WORKING,
     components: [
       {
-        ...WORKING.components[2]!,
+        ...POL_WORKING,
         weightPercent: "100.00",
         amount: -42_500_00,
       },

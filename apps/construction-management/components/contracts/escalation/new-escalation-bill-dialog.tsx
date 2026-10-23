@@ -219,7 +219,7 @@ export function NewEscalationBillDialog({
                     <p className="text-destructive text-sm">
                       {preview.error.message}
                     </p>
-                  ) : preview.data != null ? (
+                  ) : (
                     <>
                       <p className="text-sm font-medium">
                         {periodText(
@@ -258,7 +258,7 @@ export function NewEscalationBillDialog({
                         </span>
                       </p>
                     </>
-                  ) : null}
+                  )}
                 </div>
               ) : null}
             </div>

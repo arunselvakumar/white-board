@@ -123,8 +123,8 @@ export const Phone: Story = {
   globals: { viewport: { value: "mobile1", isRotated: false } },
   play: async ({ canvas, canvasElement }) => {
     await canvas.findByRole("region", { name: "CPI-IW" });
-    await waitFor(() => {
-      expect(canvasElement.scrollWidth).toBeLessThanOrEqual(
+    await waitFor(async () => {
+      await expect(canvasElement.scrollWidth).toBeLessThanOrEqual(
         canvasElement.clientWidth + 1,
       );
     });

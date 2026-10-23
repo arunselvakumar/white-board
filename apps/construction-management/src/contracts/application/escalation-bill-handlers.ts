@@ -1125,10 +1125,10 @@ export class EscalationBillHandlers {
         },
         today,
       );
-      const module = SIDES[current.side].module;
-      check(module, "edit", current.billDate);
+      const entryModule = SIDES[current.side].module;
+      check(entryModule, "edit", current.billDate);
       if (header.billDate !== current.billDate)
-        check(module, "edit", header.billDate);
+        check(entryModule, "edit", header.billDate);
       const period = this.period(
         terms,
         {

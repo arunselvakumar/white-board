@@ -16,6 +16,14 @@ const API = "/api/construction/contracts/escalation-bills";
 
 let api: ReturnType<typeof mockApi>;
 
+/** The body of the last POST to `path`. */
+function posted(path: string): unknown {
+  return api.calls.mock.calls
+    .map(([call]) => call)
+    .filter((call) => call.method === "POST" && call.path === path)
+    .at(-1)?.body;
+}
+
 function serve(bill: EscalationBill) {
   return () => {
     api = mockApi((call) => {
@@ -81,14 +89,10 @@ export const Draft: Story = {
     await userEvent.click(
       canvas.getByRole("button", { name: "Submit for approval" }),
     );
-    await waitFor(() => {
-      expect(api.calls).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: "POST",
-          path: `${API}/${BILL_DRAFT}/submit`,
-          body: { expectedUpdatedAt: DRAFT.updatedAt },
-        }),
-      );
+    await waitFor(async () => {
+      await expect(posted(`${API}/${BILL_DRAFT}/submit`)).toEqual({
+        expectedUpdatedAt: DRAFT.updatedAt,
+      });
     });
   },
 };
@@ -113,8 +117,8 @@ export const Phone: Story = {
   play: async ({ canvas, canvasElement }) => {
     const cards = await canvas.findByRole("list", { name: "Components" });
     await expect(within(cards).getAllByRole("listitem")).toHaveLength(3);
-    await waitFor(() => {
-      expect(canvasElement.scrollWidth).toBeLessThanOrEqual(
+    await waitFor(async () => {
+      await expect(canvasElement.scrollWidth).toBeLessThanOrEqual(
         canvasElement.clientWidth + 1,
       );
     });

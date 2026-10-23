@@ -797,14 +797,14 @@ describe("escalation bills, client side (CM-1109)", () => {
       raBillType: "escalation",
       direction: "receivable",
       amount: rs(48_025),
-      party: expect.objectContaining({ type: "client", id: clientId }),
     });
+    expect(invoice.party).toMatchObject({ type: "client", id: clientId });
   });
 
   it("is in the OpenAPI document", async () => {
-    const document = await json<{ paths: Record<string, unknown> }>(
-      await getOpenApi(),
-    );
+    const document = (await getOpenApi().json()) as {
+      paths: Record<string, unknown>;
+    };
     expect(Object.keys(document.paths)).toEqual(
       expect.arrayContaining([
         "/api/construction/contracts/escalation-bills",

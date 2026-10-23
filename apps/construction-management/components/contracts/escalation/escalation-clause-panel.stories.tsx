@@ -14,6 +14,14 @@ import type { EscalationClauseView } from "@/src/queries/contracts-escalation";
 
 let api: ReturnType<typeof mockApi>;
 
+/** The body of the last POST to `path`. */
+function posted(path: string): unknown {
+  return api.calls.mock.calls
+    .map(([call]) => call)
+    .filter((call) => call.method === "POST" && call.path === path)
+    .at(-1)?.body;
+}
+
 function serve(view: EscalationClauseView) {
   return () => {
     api = mockApi((call) => {
@@ -65,9 +73,10 @@ export const AddClause: Story = {
       within(dialog).getByLabelText("Base month"),
       "2026-01",
     );
-    const weights = within(dialog).getAllByLabelText("Weight %");
-    await userEvent.type(weights[0]!, "30");
-    await userEvent.type(weights[1]!, "50");
+    const [labour, material] = within(dialog).getAllByLabelText("Weight %");
+    if (labour == null || material == null) throw new Error("No weights");
+    await userEvent.type(labour, "30");
+    await userEvent.type(material, "50");
     await expect(
       within(dialog).getByText(/Weights add up to 80 %/),
     ).toBeVisible();
@@ -77,15 +86,9 @@ export const AddClause: Story = {
     await expect(
       await within(dialog).findByText(/must add up to 100 %\.$/),
     ).toBeVisible();
-    await expect(api.calls).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: "POST",
-        body: expect.objectContaining({
-          workOrderId: WORK_ORDER,
-          baseMonth: "2026-01",
-        }),
-      }),
-    );
+    await expect(
+      posted("/api/construction/contracts/escalation-clauses"),
+    ).toMatchObject({ workOrderId: WORK_ORDER, baseMonth: "2026-01" });
   },
 };
 

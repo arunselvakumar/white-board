@@ -349,7 +349,7 @@ export function EscalationClauseDialog({
                   className="grid min-w-0 gap-2 rounded-md border p-3 sm:grid-cols-[10rem_minmax(0,1fr)_8rem_auto]"
                 >
                   <div className="min-w-0 space-y-1">
-                    <Label className="text-xs">Component</Label>
+                    <p className="text-xs font-medium">Component</p>
                     <Select
                       items={ESCALATION_COMPONENTS.filter(
                         (component) =>
@@ -361,7 +361,10 @@ export function EscalationClauseDialog({
                       }))}
                       value={row.component}
                       onValueChange={(value) => {
-                        const component = value as EscalationComponent;
+                        const component = ESCALATION_COMPONENTS.find(
+                          (item) => item === value,
+                        );
+                        if (component == null) return;
                         change(index, {
                           component,
                           basis:

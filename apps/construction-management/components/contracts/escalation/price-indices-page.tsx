@@ -244,7 +244,11 @@ export function PriceIndexDialog({
           onSubmit={(event) => {
             event.preventDefault();
             const data = new FormData(event.currentTarget);
-            const value = String(data.get("value") ?? "").trim();
+            const field = (name: string) => {
+              const entry = data.get(name);
+              return typeof entry === "string" ? entry : "";
+            };
+            const value = field("value").trim();
             const done = {
               onSuccess: () => {
                 setError(null);
@@ -277,8 +281,8 @@ export function PriceIndexDialog({
                 {
                   kind: "create",
                   input: {
-                    series: String(data.get("series") ?? ""),
-                    month: String(data.get("month") ?? ""),
+                    series: field("series"),
+                    month: field("month"),
                     value,
                   },
                 },

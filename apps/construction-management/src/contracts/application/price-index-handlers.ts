@@ -328,14 +328,13 @@ export class PriceIndexHandlers {
     const firstRow = new Map<string, number>();
     for (const { row, cells } of rows) {
       let series: string | null = null;
-      let month: CalendarDate | null = null;
       let value: bigint | null = null;
       try {
         series = seriesName(cells.series == null ? "" : String(cells.series));
       } catch (error) {
         fail(row, "series", error);
       }
-      month = sheetMonth(cells.month);
+      const month = sheetMonth(cells.month);
       if (month == null)
         fail(
           row,

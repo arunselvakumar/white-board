@@ -43,7 +43,8 @@ const ix = (value: number) => BigInt(Math.round(value * 10_000));
 const rs = (value: number) => BigInt(Math.round(value * 100));
 
 const TODAY = "2026-10-22";
-const MONTHS = ["2026-04-01", "2026-05-01", "2026-06-01"];
+const [M1, M2, M3] = ["2026-04-01", "2026-05-01", "2026-06-01"] as const;
+const MONTHS = [M1, M2, M3];
 const BASE = "2026-01-01";
 
 /** A lookup over `{ series: { month: value } }`. */
@@ -156,7 +157,10 @@ describe("the escalation clause (CM-1109)", () => {
         escalationClause(
           {
             ...input,
-            components: [...input.components, input.components[0]!],
+            components: [
+              ...input.components,
+              { component: "labour", weightPercent: "10", series: "X" },
+            ],
           },
           today,
         ),
@@ -292,21 +296,21 @@ describe("the 10CC working (CM-1109)", () => {
   const indices = table({
     "CPI-IW": {
       [BASE]: 140,
-      [MONTHS[0]!]: 147,
-      [MONTHS[1]!]: 147,
-      [MONTHS[2]!]: 147,
+      [M1]: 147,
+      [M2]: 147,
+      [M3]: 147,
     },
     WPI: {
       [BASE]: 150,
-      [MONTHS[0]!]: 153,
-      [MONTHS[1]!]: 156,
-      [MONTHS[2]!]: 159,
+      [M1]: 153,
+      [M2]: 156,
+      [M3]: 159,
     },
     "WPI – HSD (POL)": {
       [BASE]: 120,
-      [MONTHS[0]!]: 113,
-      [MONTHS[1]!]: 114,
-      [MONTHS[2]!]: 115,
+      [M1]: 113,
+      [M2]: 114,
+      [M3]: 115,
     },
   });
 
@@ -388,7 +392,7 @@ describe("the 10CC working (CM-1109)", () => {
       bills: [{ id: "b", number: null, billDate: "2026-04-01", gross: 100n }],
       months: MONTHS,
       index: table({
-        S: { [BASE]: 3, [MONTHS[0]!]: 3, [MONTHS[1]!]: 3, [MONTHS[2]!]: 4 },
+        S: { [BASE]: 3, [M1]: 3, [M2]: 3, [M3]: 4 },
       }),
       quantities: new Map(),
     });
@@ -418,15 +422,15 @@ describe("the 10CC working (CM-1109)", () => {
       index: table({
         "CPI-IW": {
           [BASE]: 140,
-          [MONTHS[0]!]: 147,
-          [MONTHS[1]!]: 147,
-          [MONTHS[2]!]: 147,
+          [M1]: 147,
+          [M2]: 147,
+          [M3]: 147,
         },
         "WPI – Cement": {
           [BASE]: 100,
-          [MONTHS[0]!]: 108,
-          [MONTHS[1]!]: 110,
-          [MONTHS[2]!]: 112,
+          [M1]: 108,
+          [M2]: 110,
+          [M3]: 112,
         },
       }),
       quantities: new Map([["cement", 120_0000n]]),
