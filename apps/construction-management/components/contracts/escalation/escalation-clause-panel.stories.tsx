@@ -114,3 +114,22 @@ export const Locked: Story = {
     await expect(canvas.queryByRole("button", { name: "Edit" })).toBeNull();
   },
 };
+
+/**
+ * CM-1110: a 10CA component names the Work Order material whose
+ * reconciled consumption fills the escalation draft's quantity; the
+ * editor offers the Work Order's materials or "Typed on the bill".
+ */
+export const TenCaFromReconciliation: Story = {
+  beforeEach: serve(CLAUSE_VIEW),
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      await canvas.findByText(/quantity from Cement OPC 53 Grade/),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Edit" }));
+    const dialog = within(await within(document.body).findByRole("dialog"));
+    await expect(dialog.getByLabelText("Quantity from")).toHaveTextContent(
+      "Cement OPC 53 Grade",
+    );
+  },
+};

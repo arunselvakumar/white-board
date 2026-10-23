@@ -467,3 +467,76 @@ export const PhoneWidth: Story = {
     await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth);
   },
 };
+
+const CEMENT = "0199c0de-1110-7000-8000-0000000000d1";
+const withMaterials = serveContractorBills({
+  bill: {
+    ...DRAFT,
+    materials: [
+      {
+        materialId: CEMENT,
+        materialName: "Cement OPC 53",
+        uomName: "Bag",
+        issueBasis: "free",
+        excess: "53.320",
+        penalRate: 500_00,
+        recoveredBefore: 0,
+        recoverySuggested: 26_660_00,
+        atCostDeductedBefore: 0,
+        atCostSuggested: 0,
+      },
+    ],
+  },
+});
+
+/**
+ * CM-1110: the Work Order's material reconciliation suggests ₹26,660 for
+ * 53.32 bags of cement over the allowed wastage at ₹500 a bag; "Use" adds
+ * the recovery naming the material, and the bill links to the statement.
+ */
+export const DraftWithMaterialRecovery: Story = {
+  args: { id: BILL_DRAFT },
+  beforeEach: withMaterials.beforeEach,
+  play: async ({ canvas, userEvent }) => {
+    const links = await canvas.findAllByRole("link", {
+      name: "Material reconciliation",
+    });
+    for (const link of links)
+      await expect(link).toHaveAttribute(
+        "href",
+        expect.stringContaining(
+          `?billId=${BILL_DRAFT}#reconciliation`,
+        ) as string,
+      );
+    const panel = within(
+      canvas.getByRole("region", { name: /Material recoveries/ }),
+    );
+    await expect(
+      panel.getByText(/Excess 53\.32 Bag at ₹500\.00/),
+    ).toBeVisible();
+    await userEvent.click(
+      panel.getByRole("button", { name: "Use ₹26,660.00" }),
+    );
+    await expect(
+      canvas.getByLabelText("Deduction 2 material"),
+    ).toHaveTextContent("Cement OPC 53");
+    await userEvent.click(canvas.getByRole("button", { name: "Save draft" }));
+    await waitFor(() =>
+      expect(
+        posted(
+          withMaterials.holder.current,
+          `${CONTRACTOR_BILLS_API}/${BILL_DRAFT}/update`,
+        ),
+      ).toMatchObject({
+        deductions: [
+          { kind: "retention", materialId: null },
+          {
+            kind: "material_reconciliation",
+            amount: 26_660_00,
+            materialId: CEMENT,
+          },
+        ],
+      }),
+    );
+  },
+};

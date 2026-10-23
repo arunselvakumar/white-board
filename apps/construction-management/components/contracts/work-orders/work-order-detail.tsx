@@ -69,6 +69,7 @@ import {
 import { EscalationClausePanel } from "../escalation/escalation-clause-panel";
 import { AdvancesRetentionPanels } from "../advances/advances-retention-panels";
 import { CloseWorkOrderDialog, ReasonDialog } from "./work-order-dialogs";
+import { WorkOrderReconciliation } from "./work-order-reconciliation";
 import { localToday } from "./work-order-form";
 import {
   dateText,
@@ -331,10 +332,13 @@ export function WorkOrderDetail({
   projectId,
   id,
   today = localToday(),
+  reconciliationBillId = null,
 }: {
   projectId: string;
   id: string;
   today?: string;
+  /** CM-1110: the bill the reconciliation opens at (a bill page links here). */
+  reconciliationBillId?: string | null;
 }) {
   const router = useRouter();
   const { data: workOrder } = useSuspenseQuery(workOrderQuery(id));
@@ -665,6 +669,15 @@ export function WorkOrderDetail({
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {workOrder.materials.length > 0 &&
+      (workOrder.status === "issued" || workOrder.status === "closed") ? (
+        <WorkOrderReconciliation
+          workOrderId={id}
+          initialBillId={reconciliationBillId}
+          canPrint={can.print}
+        />
       ) : null}
 
       <section

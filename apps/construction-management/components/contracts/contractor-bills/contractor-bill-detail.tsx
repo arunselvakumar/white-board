@@ -43,6 +43,8 @@ import {
   type ContractorBillLine,
 } from "@/src/queries/contracts-contractor-bills";
 import { workOrdersPath } from "@/src/queries/contracts-work-orders";
+
+import { reconciliationHref } from "./reconciliation-link";
 import { QueryHttpError } from "@/src/queries/http";
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 
@@ -497,6 +499,16 @@ export function ContractorBillDetail({
             </Link>
             {bill.departmentName == null ? "" : ` · ${bill.departmentName}`}
           </Fact>
+          {bill.materials.length > 0 && bill.type === "running" ? (
+            <Fact label="Materials">
+              <Link
+                href={reconciliationHref(bill)}
+                className="underline-offset-4 hover:underline"
+              >
+                Material reconciliation
+              </Link>
+            </Fact>
+          ) : null}
           <Fact label="Bill date">{dateText(bill.billDate)}</Fact>
           <Fact label="Measured up to">{dateText(bill.measuredUpTo)}</Fact>
           <Fact label="Drafted by">

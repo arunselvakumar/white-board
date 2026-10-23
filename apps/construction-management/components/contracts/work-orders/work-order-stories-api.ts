@@ -10,6 +10,7 @@ import {
   pageOf,
   workOrderOf,
 } from "./work-order-fixtures";
+import { AT_BILL_1 } from "./work-order-reconciliation-fixtures";
 
 export const WORK_ORDERS_API = "/api/construction/contracts/work-orders";
 
@@ -75,6 +76,17 @@ export function serveWorkOrders(
             url.pathname === `${WORK_ORDERS_API}/${options.workOrder.id}`
           )
             return Response.json(options.workOrder);
+          // CM-1110: the material reconciliation panel of an issued one.
+          if (
+            options.workOrder != null &&
+            url.pathname ===
+              `${WORK_ORDERS_API}/${options.workOrder.id}/reconciliation`
+          )
+            return Response.json({
+              ...AT_BILL_1,
+              workOrder: { ...AT_BILL_1.workOrder, id: options.workOrder.id },
+              financial,
+            });
           return undefined;
       }
     });

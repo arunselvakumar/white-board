@@ -11,16 +11,24 @@ export const metadata: Metadata = { title: "Work Order" };
 /** One Work Order with its revisions (CM-1104); approval notices link here. */
 export default async function WorkOrderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; workOrderId: string }>;
+  /** `?billId=`: the bill the material reconciliation opens at (CM-1110). */
+  searchParams: Promise<{ billId?: string | string[] }>;
 }) {
   const { id, workOrderId } = await params;
+  const { billId } = await searchParams;
   if (!(await viewerCan("contracts.work_orders", "read", { projectId: id })))
     return <ProjectNoAccess what="Work Orders" />;
   return (
     <div className="w-full p-6">
       <QuerySuspense fallback={<WorkOrderDetailSkeleton projectId={id} />}>
-        <WorkOrderDetail projectId={id} id={workOrderId} />
+        <WorkOrderDetail
+          projectId={id}
+          id={workOrderId}
+          reconciliationBillId={typeof billId === "string" ? billId : null}
+        />
       </QuerySuspense>
     </div>
   );

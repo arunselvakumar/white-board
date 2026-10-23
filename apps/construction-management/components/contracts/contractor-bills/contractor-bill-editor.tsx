@@ -34,6 +34,7 @@ import {
   type BillEscalationRecovery,
 } from "@/components/contracts/escalation/escalation-recoveries";
 import { FormAlert } from "@/components/auth/form-alert";
+import { reconciliationHref } from "@/components/contracts/contractor-bills/reconciliation-link";
 import { MoneyInput, paiseToRupees } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
 import {
@@ -50,6 +51,12 @@ import {
   toUpdate,
   type ContractorBillEditorValues,
 } from "./contractor-bill-form-schema";
+import {
+  isMaterialKind,
+  MaterialRecoverySuggestions,
+  MaterialSelect,
+  type BillMaterial,
+} from "./bill-material-recoveries";
 import { moneyOrDash, percentText } from "./contractor-bill-format";
 
 const FIELD_CODES = {
@@ -71,7 +78,9 @@ function pathOf(error: unknown): FieldPath<ContractorBillEditorValues> | null {
   const field = typeof details?.field === "string" ? details.field : null;
   if (
     field != null &&
-    /^deductions\.\d+\.(amount|description|kind|advanceId)$/.test(field)
+    /^deductions\.\d+\.(amount|description|kind|advanceId|materialId)$/.test(
+      field,
+    )
   )
     return field as FieldPath<ContractorBillEditorValues>;
   return null;
@@ -110,6 +119,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
           description: "",
           advanceId: "",
           escalationBillId: "",
+          materialId: "",
         });
       return;
     }
@@ -130,6 +140,33 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
         description: recovery.reason,
         advanceId: "",
         escalationBillId: recovery.escalationBillId,
+        materialId: "",
+      });
+      return;
+    }
+    setValue(`deductions.${index}.amount`, amount, { shouldDirty: true });
+  };
+
+  const applyMaterial = (
+    kind: "material_reconciliation" | "material_at_cost",
+    material: BillMaterial,
+  ) => {
+    const amount = paiseToRupees(
+      (kind === "material_reconciliation"
+        ? material.recoverySuggested
+        : material.atCostSuggested) ?? 0,
+    );
+    const index = typed.findIndex(
+      (row) => row.kind === kind && row.materialId === material.materialId,
+    );
+    if (index === -1) {
+      deductions.append({
+        kind,
+        amount,
+        description: "",
+        advanceId: "",
+        escalationBillId: "",
+        materialId: material.materialId,
       });
       return;
     }
@@ -148,6 +185,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
         description: "",
         advanceId: advance.id,
         escalationBillId: "",
+        materialId: "",
       });
       return;
     }
@@ -321,6 +359,31 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
                         />
                         <FieldError message={rowErrors?.advanceId?.message} />
                       </div>
+                    ) : isMaterialKind(typed[index]?.kind ?? "") ? (
+                      <div className="min-w-0 space-y-1">
+                        <Controller
+                          name={`deductions.${index}.materialId`}
+                          control={control}
+                          render={({ field }) => (
+                            <MaterialSelect
+                              materials={bill.materials}
+                              kind={typed[index]?.kind ?? ""}
+                              value={field.value}
+                              onChange={field.onChange}
+                              label={`Deduction ${n} material`}
+                              invalid={rowErrors?.materialId != null}
+                            />
+                          )}
+                        />
+                        <FieldError message={rowErrors?.materialId?.message} />
+                        <Input
+                          aria-label={`Deduction ${n} reason`}
+                          placeholder="Reason (needed above the suggestion)"
+                          aria-invalid={rowErrors?.description != null}
+                          {...register(`deductions.${index}.description`)}
+                        />
+                        <FieldError message={rowErrors?.description?.message} />
+                      </div>
                     ) : (
                       <div className="min-w-0 space-y-1">
                         <Input
@@ -363,6 +426,12 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
             typed={typed}
             onUse={applyEscalationRecovery}
           />
+          <MaterialRecoverySuggestions
+            materials={bill.materials}
+            typed={typed}
+            onUse={applyMaterial}
+            reconciliationHref={reconciliationHref(bill)}
+          />
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -375,6 +444,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
                   description: "",
                   advanceId: "",
                   escalationBillId: "",
+                  materialId: "",
                 });
               }}
             >
@@ -393,7 +463,8 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
           </div>
           <p className="text-muted-foreground text-xs">
             An advance recovery names its advance: it applies the advance paid
-            on account to this bill. Material issued at cost is typed by hand.
+            on account to this bill. A material recovery names its material;
+            more than the reconciliation suggests needs a reason and Approve.
             TDS is not a deduction here: it is taken when the bill is paid.
           </p>
           <p className="text-sm font-semibold tabular-nums">

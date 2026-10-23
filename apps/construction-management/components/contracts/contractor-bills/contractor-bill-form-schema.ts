@@ -43,6 +43,8 @@ const DeductionSchema = z
     advanceId: z.string(),
     /** The negative escalation bill an "other" deduction recovers (CM-1109); "" for none. */
     escalationBillId: z.string(),
+    /** The Material a material deduction recovers (CM-1110); "" for none. */
+    materialId: z.string(),
   })
   .refine(
     (deduction) =>
@@ -53,6 +55,12 @@ const DeductionSchema = z
     (deduction) =>
       !isRecoveryKind(deduction.kind) || deduction.advanceId !== "",
     { message: "Pick the advance this recovers.", path: ["advanceId"] },
+  )
+  .refine(
+    (deduction) =>
+      deduction.kind !== "material_reconciliation" ||
+      deduction.materialId !== "",
+    { message: "Pick the material this recovers.", path: ["materialId"] },
   );
 
 export const ContractorBillEditorSchema = z
@@ -95,6 +103,7 @@ export function editorValuesOf(
         description: deduction.description ?? "",
         advanceId: deduction.advanceId ?? "",
         escalationBillId: deduction.escalationBillId ?? "",
+        materialId: deduction.materialId ?? "",
       })),
   };
 }
@@ -124,6 +133,12 @@ export function toUpdate(
             escalationBillId:
               deduction.kind === "other" && deduction.escalationBillId !== ""
                 ? deduction.escalationBillId
+                : null,
+            materialId:
+              (deduction.kind === "material_reconciliation" ||
+                deduction.kind === "material_at_cost") &&
+              deduction.materialId !== ""
+                ? deduction.materialId
                 : null,
           })),
         }
