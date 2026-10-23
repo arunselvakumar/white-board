@@ -10,6 +10,7 @@ import type {
   SupplierFacts,
   TeamMemberFacts,
   TermsFacts,
+  WorkOrderFacts,
 } from "@/src/procurement/application/ports";
 
 type Db = Prisma.TransactionClient;
@@ -109,6 +110,21 @@ export const procurementDirectory: ProcurementDirectory = {
         disabled: row.disabledAt != null,
       })),
     );
+  },
+
+  async workOrders(db, workspaceId, ids) {
+    if (ids.length === 0) return new Map();
+    const rows = await db.constructionContractsWorkOrder.findMany({
+      where: live(workspaceId, ids),
+      select: {
+        id: true,
+        number: true,
+        projectId: true,
+        contractorId: true,
+        status: true,
+      },
+    });
+    return byId(rows.map((row): WorkOrderFacts => ({ ...row })));
   },
 
   async billingAddresses(db, workspaceId, ids) {

@@ -40,6 +40,13 @@ const requestFields = {
   storeId: z.uuid(),
   /** Active and on the Project. */
   contractorId: z.uuid().nullable().optional(),
+  /**
+   * CM-1110: the Work Order the material is issued under — an issued Work
+   * Order of the Contractor on the Project (400 `WORK_ORDER_NOT_FOUND`,
+   * `WORK_ORDER_NOT_FOR_CONTRACTOR`, `WORK_ORDER_NOT_ISSUED`,
+   * `MATERIAL_REQUEST_CONTRACTOR_REQUIRED`).
+   */
+  workOrderId: z.uuid().nullable().optional(),
   /** Enabled. */
   departmentId: z.uuid().nullable().optional(),
   siteLocation: ConstructionProcurementSiteLocationModel.nullable().optional(),
@@ -126,6 +133,8 @@ export const ConstructionProcurementMaterialRequestResponseModel = z.object({
   storeName: z.string().nullable(),
   requestDate: z.iso.date(),
   contractor: NamedModel.nullable(),
+  /** CM-1110: the Work Order the material is issued under; `name` is its number. */
+  workOrder: NamedModel.nullable(),
   department: NamedModel.nullable(),
   siteLocation: ConstructionProcurementSiteLocationModel.nullable(),
   receiverName: z.string().nullable(),
@@ -157,6 +166,18 @@ export const ListConstructionProcurementMaterialRequestsResponseModel =
     prevCursor: z.string().nullable(),
     total: z.int().nonnegative(),
   });
+/**
+ * CM-1110: names the Work Order of a request raised for a Contractor
+ * without one (Material Requests update, on the Project). An issued or
+ * closed Work Order of the request's Contractor on the Project.
+ */
+export const AssignConstructionProcurementMaterialRequestWorkOrderRequestModel =
+  z.object({
+    workOrderId: z.uuid(),
+    /** 409 `MATERIAL_REQUEST_CHANGED` when sent and stale. */
+    expectedUpdatedAt: z.iso.datetime().nullable().optional(),
+  });
+
 export type ListConstructionProcurementMaterialRequestsResponseModel = z.infer<
   typeof ListConstructionProcurementMaterialRequestsResponseModel
 >;
@@ -166,6 +187,10 @@ export const GetConstructionProcurementMaterialRequestFormOptionsResponseModel =
     stores: z.array(ConstructionProcurementStoreOptionResponseModel),
     contractors: z.array(NamedModel),
     departments: z.array(NamedModel),
+    /** CM-1110: the Project's issued Work Orders, with their Contractor. */
+    workOrders: z.array(
+      z.object({ id: z.uuid(), number: z.string(), contractorId: z.uuid() }),
+    ),
   });
 export type GetConstructionProcurementMaterialRequestFormOptionsResponseModel =
   z.infer<
@@ -184,6 +209,7 @@ export function toMaterialRequestResponse(
     storeName: request.storeName,
     requestDate: request.requestDate,
     contractor: request.contractor,
+    workOrder: request.workOrder,
     department: request.department,
     siteLocation:
       request.siteLocation == null

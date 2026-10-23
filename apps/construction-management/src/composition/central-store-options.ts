@@ -47,7 +47,7 @@ export async function materialRequestPartyOptions(
   projectId: string,
   db: PrismaClient = prisma,
 ): Promise<MaterialRequestFormPartyOptions> {
-  const [contractors, departments] = await Promise.all([
+  const [contractors, departments, workOrders] = await Promise.all([
     db.constructionMastersContractor.findMany({
       where: {
         workspaceId,
@@ -63,6 +63,21 @@ export async function materialRequestPartyOptions(
       select: { id: true, name: true },
       orderBy: byName,
     }),
+    // CM-1110: the Project's issued Work Orders; the form offers those of
+    // the picked Contractor.
+    db.constructionContractsWorkOrder.findMany({
+      where: { workspaceId, projectId, deletedAt: null, status: "issued" },
+      select: { id: true, number: true, contractorId: true },
+      orderBy: [{ orderDate: "asc" }, { createdAt: "asc" }],
+    }),
   ]);
-  return { contractors, departments };
+  return {
+    contractors,
+    departments,
+    workOrders: workOrders.map((row) => ({
+      id: row.id,
+      number: row.number ?? "Draft",
+      contractorId: row.contractorId,
+    })),
+  };
 }

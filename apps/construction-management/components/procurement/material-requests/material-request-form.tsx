@@ -55,6 +55,7 @@ const schema = z.object({
   requestDate: z.iso.date("Choose the request date."),
   storeId: z.string().min(1, "Choose the store to ask."),
   contractorId: z.string(),
+  workOrderId: z.string(),
   departmentId: z.string(),
   siteLocation: z.custom<LocationRef | null>(),
   receiverName: z.string().max(200, "Use at most 200 characters."),
@@ -70,6 +71,10 @@ const SERVER_FIELDS = {
   CONTRACTOR_NOT_FOUND: "contractorId",
   CONTRACTOR_INACTIVE: "contractorId",
   CONTRACTOR_NOT_ON_PROJECT: "contractorId",
+  WORK_ORDER_NOT_FOUND: "workOrderId",
+  WORK_ORDER_NOT_FOR_CONTRACTOR: "workOrderId",
+  WORK_ORDER_NOT_ISSUED: "workOrderId",
+  MATERIAL_REQUEST_CONTRACTOR_REQUIRED: "workOrderId",
   DEPARTMENT_NOT_FOUND: "departmentId",
   DEPARTMENT_DISABLED: "departmentId",
   DATE_IN_FUTURE: "requestDate",
@@ -172,6 +177,7 @@ export function MaterialRequestForm({
         request?.storeId ??
         (options.stores.length === 1 ? (options.stores[0]?.id ?? "") : ""),
       contractorId: request?.contractor?.id ?? NONE,
+      workOrderId: request?.workOrder?.id ?? NONE,
       departmentId: request?.department?.id ?? NONE,
       siteLocation: (request?.siteLocation as LocationRef | null) ?? null,
       receiverName: request?.receiverName ?? "",
@@ -188,6 +194,22 @@ export function MaterialRequestForm({
   const errors = form.formState.errors;
   const watched = useWatch({ control: form.control, name: "items" });
   const chosen = watched.map((item) => item.materialId);
+  const contractorId = useWatch({
+    control: form.control,
+    name: "contractorId",
+  });
+  // CM-1110: the picked Contractor's issued Work Orders on the Project.
+  const workOrderItems = [
+    { value: NONE, label: "None" },
+    ...options.workOrders
+      .filter((workOrder) => workOrder.contractorId === contractorId)
+      .map((workOrder) => ({ value: workOrder.id, label: workOrder.number })),
+    ...(request?.workOrder != null &&
+    request.contractor?.id === contractorId &&
+    !options.workOrders.some((option) => option.id === request.workOrder?.id)
+      ? [{ value: request.workOrder.id, label: request.workOrder.name }]
+      : []),
+  ];
 
   const storeItems = [
     ...(options.stores.length === 1
@@ -211,6 +233,10 @@ export function MaterialRequestForm({
       requestDate: values.requestDate,
       storeId: values.storeId,
       contractorId: values.contractorId === NONE ? null : values.contractorId,
+      workOrderId:
+        values.contractorId === NONE || values.workOrderId === NONE
+          ? null
+          : values.workOrderId,
       departmentId: values.departmentId === NONE ? null : values.departmentId,
       siteLocation: values.siteLocation,
       receiverName:
@@ -319,7 +345,10 @@ export function MaterialRequestForm({
                     id="mr-contractor"
                     label="Contractors"
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(next) => {
+                      field.onChange(next);
+                      form.setValue("workOrderId", NONE);
+                    }}
                     items={withNone(options.contractors, request?.contractor)}
                     invalid={errors.contractorId != null}
                   />
@@ -327,6 +356,30 @@ export function MaterialRequestForm({
               />
               <FieldError message={errors.contractorId?.message} />
             </div>
+            {contractorId !== NONE && workOrderItems.length > 1 && (
+              <div className="space-y-1.5">
+                <Label htmlFor="mr-work-order">Work Order</Label>
+                <Controller
+                  name="workOrderId"
+                  control={form.control}
+                  render={({ field }) => (
+                    <OptionSelect
+                      id="mr-work-order"
+                      label="Work Orders"
+                      value={field.value}
+                      onChange={field.onChange}
+                      items={workOrderItems}
+                      invalid={errors.workOrderId != null}
+                    />
+                  )}
+                />
+                <p className="text-muted-foreground text-xs">
+                  The material counts towards this Work Order&apos;s
+                  reconciliation.
+                </p>
+                <FieldError message={errors.workOrderId?.message} />
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="mr-department">Department</Label>
               <Controller

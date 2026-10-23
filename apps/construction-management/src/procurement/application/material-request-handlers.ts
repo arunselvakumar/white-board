@@ -51,6 +51,8 @@ export type MaterialRequestReadModel = {
   storeName: string | null;
   requestDate: CalendarDate;
   contractor: Named | null;
+  /** The Work Order the material is issued under (CM-1110); `name` is its number. */
+  workOrder: Named | null;
   department: Named | null;
   siteLocation: LocationRef | null;
   receiverName: string | null;
@@ -90,6 +92,8 @@ export type MaterialRequestInput = {
   requestDate: CalendarDate;
   storeId: string;
   contractorId?: string | null;
+  /** CM-1110: an issued Work Order of the Contractor on the Project. */
+  workOrderId?: string | null;
   departmentId?: string | null;
   siteLocation?: LocationRefInput | null;
   receiverName?: string | null;
@@ -110,9 +114,17 @@ export type MaterialRequestDraft = Omit<
   items: ReturnType<typeof materialRequestLines>;
 };
 
+/** An issued Work Order the form offers once its Contractor is picked (CM-1110). */
+export type MaterialRequestWorkOrderOption = {
+  id: string;
+  number: string;
+  contractorId: string;
+};
+
 export type MaterialRequestFormPartyOptions = {
   contractors: Named[];
   departments: Named[];
+  workOrders: MaterialRequestWorkOrderOption[];
 };
 
 export type MaterialRequestFormOptions = MaterialRequestFormPartyOptions & {
@@ -147,6 +159,13 @@ export type MaterialRequestRepository = {
     id: string,
     reason: string,
     expectedUpdatedAt: Date,
+  ): Promise<MaterialRequestReadModel>;
+  /** CM-1110: names the Work Order of a request that has none. */
+  assignWorkOrder(
+    actor: ProcurementCommandActor,
+    id: string,
+    workOrderId: string,
+    expectedUpdatedAt: Date | null,
   ): Promise<MaterialRequestReadModel>;
 };
 
@@ -194,5 +213,25 @@ export class MaterialRequestHandlers {
     expectedUpdatedAt: Date,
   ) {
     return this.requests.close(actor, id, reason, expectedUpdatedAt);
+  }
+
+  /**
+   * Material reconciliation (CM-1110): a request raised for a Contractor
+   * without a Work Order is assigned one afterwards, so its delivered
+   * quantities count towards that Work Order. Works whatever the request's
+   * status, because Delivery Notes lock the request's own edit.
+   */
+  assignWorkOrder(
+    actor: ProcurementCommandActor,
+    id: string,
+    workOrderId: string,
+    expectedUpdatedAt: Date | null,
+  ) {
+    return this.requests.assignWorkOrder(
+      actor,
+      id,
+      workOrderId.trim().toLowerCase(),
+      expectedUpdatedAt,
+    );
   }
 }

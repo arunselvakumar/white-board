@@ -11,6 +11,7 @@ import {
   WRITE_ERRORS,
 } from "../stores/stores-openapi";
 import {
+  AssignConstructionProcurementMaterialRequestWorkOrderRequestModel,
   CloseConstructionProcurementMaterialRequestRequestModel,
   ConstructionProcurementMaterialRequestParamsModel,
   ConstructionProcurementMaterialRequestResponseModel,
@@ -32,6 +33,7 @@ export const materialRequestOpenApiComponents: OpenApiComponents = {
   UpdateConstructionProcurementMaterialRequestRequestModel,
   DeleteConstructionProcurementMaterialRequestRequestModel,
   CloseConstructionProcurementMaterialRequestRequestModel,
+  AssignConstructionProcurementMaterialRequestWorkOrderRequestModel,
   ConstructionProcurementMaterialRequestResponseModel,
   ListConstructionProcurementMaterialRequestsResponseModel,
   GetConstructionProcurementMaterialRequestFormOptionsResponseModel,
@@ -126,6 +128,19 @@ export const materialRequestOpenApiOperations: OpenApiOperation[] = [
     body: CloseConstructionProcurementMaterialRequestRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The closed request",
+    successSchema: ConstructionProcurementMaterialRequestResponseModel,
+    errors: WRITE_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${ITEM}/assign-work-order`,
+    summary:
+      "Name the Work Order a Contractor's request was issued under, for material reconciliation (update, on the Project; MATERIAL_REQUEST_WORK_ORDER_SET 409)",
+    tags: PROCUREMENT_TAGS,
+    params: ConstructionProcurementMaterialRequestParamsModel,
+    body: AssignConstructionProcurementMaterialRequestWorkOrderRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The request with its Work Order",
     successSchema: ConstructionProcurementMaterialRequestResponseModel,
     errors: WRITE_ERRORS,
   },

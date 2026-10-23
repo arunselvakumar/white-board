@@ -117,3 +117,37 @@ export const StoreNotOnProject: Story = {
     ).toBeVisible();
   },
 };
+
+/**
+ * CM-1110: once a Contractor is picked, the form offers its issued Work
+ * Orders on the Project; the request names the one the material is issued
+ * under, and changing the Contractor clears it.
+ */
+export const IssuedUnderWorkOrder: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("combobox", { name: "Material" });
+    await expect(canvas.queryByLabelText("Work Order")).toBeNull();
+    await userEvent.click(canvas.getByLabelText("Contractor"));
+    await userEvent.click(
+      await within(document.body).findByRole("option", {
+        name: "Velan Constructions",
+      }),
+    );
+    await userEvent.click(await canvas.findByLabelText("Work Order"));
+    await userEvent.click(
+      await within(document.body).findByRole("option", {
+        name: "WO/26-27/0003",
+      }),
+    );
+    await pickMaterial(canvas, userEvent, "Cement OPC 53 Grade");
+    await userEvent.type(canvas.getByLabelText(/Ask Qty/), "50");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Raise request" }),
+    );
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      contractorId: IDS.contractor,
+      workOrderId: "0199c4a0-0000-7000-8000-0000000001b9",
+    });
+  },
+};

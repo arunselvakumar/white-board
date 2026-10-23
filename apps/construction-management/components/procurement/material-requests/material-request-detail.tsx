@@ -280,6 +280,9 @@ export function MaterialRequestDetail({
         <Fact label="Request To">{request.storeName ?? "—"}</Fact>
         <Fact label="Project">{request.projectName ?? "—"}</Fact>
         <Fact label="Contractor">{request.contractor?.name ?? "—"}</Fact>
+        {request.workOrder != null && (
+          <Fact label="Work Order">{request.workOrder.name}</Fact>
+        )}
         <Fact label="Department">{request.department?.name ?? "—"}</Fact>
         <Fact label="Receiver">{request.receiverName ?? "—"}</Fact>
         {request.siteLocation == null ? null : (

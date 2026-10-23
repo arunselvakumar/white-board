@@ -128,6 +128,7 @@ function snapshot(draft: MaterialRequestDraft) {
     requestDate: draft.requestDate,
     storeId: draft.storeId,
     contractorId: draft.contractorId ?? null,
+    workOrderId: draft.workOrderId ?? null,
     departmentId: draft.departmentId ?? null,
     siteLocation: draft.siteLocation ?? null,
     receiverName: draft.receiverName,
@@ -236,6 +237,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           number,
           requestDate: calendarDateToDb(draft.requestDate),
           contractorId: draft.contractorId ?? null,
+          workOrderId: draft.workOrderId ?? null,
           departmentId: draft.departmentId ?? null,
           siteLocationType: site?.type ?? null,
           siteLocation:
@@ -304,7 +306,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
       if (before.updatedAt.getTime() !== expectedUpdatedAt.getTime())
         throw changed("MATERIAL_REQUEST_CHANGED", DOC.naming.label);
       assertMaterialRequestEditable(before.status, before.deliveryNotes.length);
-      await this.checkParties(tx, actor.workspaceId, before.projectId, draft);
+      await this.checkParties(
+        tx,
+        actor.workspaceId,
+        before.projectId,
+        draft,
+        before.workOrderId,
+      );
       const lines = await this.lines(
         tx,
         actor.workspaceId,
@@ -320,6 +328,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           storeId: draft.storeId,
           requestDate: calendarDateToDb(draft.requestDate),
           contractorId: draft.contractorId ?? null,
+          workOrderId: draft.workOrderId ?? null,
           departmentId: draft.departmentId ?? null,
           siteLocationType: site?.type ?? null,
           siteLocation:
@@ -428,6 +437,98 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     });
   }
 
+  async assignWorkOrder(
+    actor: ProcurementCommandActor,
+    id: string,
+    workOrderId: string,
+    expectedUpdatedAt: Date | null,
+  ): Promise<MaterialRequestReadModel> {
+    const now = new Date();
+    return this.db.$transaction(async (tx) => {
+      const before = await this.lock(tx, actor.workspaceId, id);
+      if (
+        expectedUpdatedAt != null &&
+        before.updatedAt.getTime() !== expectedUpdatedAt.getTime()
+      )
+        throw changed("MATERIAL_REQUEST_CHANGED", DOC.naming.label);
+      if (before.workOrderId != null)
+        throw conflict(
+          "MATERIAL_REQUEST_WORK_ORDER_SET",
+          "This Material Request already names a Work Order.",
+        );
+      if (before.contractorId == null)
+        throw new DomainError(
+          "MATERIAL_REQUEST_CONTRACTOR_REQUIRED",
+          "This Material Request names no Contractor, so it cannot be issued under a Work Order.",
+          { details: { field: "workOrderId" } },
+        );
+      await this.checkWorkOrder(
+        tx,
+        actor.workspaceId,
+        before.projectId,
+        before.contractorId,
+        workOrderId,
+        ["issued", "closed"],
+      );
+      await tx.constructionProcurementMaterialRequest.update({
+        where: { id },
+        data: { workOrderId, updatedAt: now, updatedBy: actor.userId },
+      });
+      await recordAudit(tx, {
+        workspaceId: actor.workspaceId,
+        actorUserId: actor.userId,
+        action: "material_request.work_order_assigned",
+        entityType: "material_request",
+        entityId: id,
+        before: { workOrderId: null },
+        after: { workOrderId },
+        occurredAt: now,
+      });
+      return this.mustLoad(tx, actor.workspaceId, id);
+    });
+  }
+
+  /**
+   * The Work Order a request names (CM-1110): a live one of the Company
+   * (400 `WORK_ORDER_NOT_FOUND`), on the Project and of the request's
+   * Contractor (400 `WORK_ORDER_NOT_FOR_CONTRACTOR`), in one of `statuses`
+   * (400 `WORK_ORDER_NOT_ISSUED`). All name the field `workOrderId`.
+   */
+  private async checkWorkOrder(
+    tx: Tx,
+    workspaceId: string,
+    projectId: string,
+    contractorId: string,
+    workOrderId: string,
+    statuses: readonly string[],
+  ): Promise<void> {
+    const field = { details: { field: "workOrderId" } };
+    const workOrder = (
+      await this.directory.workOrders(tx, workspaceId, [workOrderId])
+    ).get(workOrderId);
+    if (workOrder == null)
+      throw new DomainError(
+        "WORK_ORDER_NOT_FOUND",
+        "This Work Order was not found.",
+        field,
+      );
+    if (
+      workOrder.projectId !== projectId ||
+      workOrder.contractorId !== contractorId
+    )
+      throw new DomainError(
+        "WORK_ORDER_NOT_FOR_CONTRACTOR",
+        "Pick a Work Order of this Contractor on this Project.",
+        field,
+      );
+    if (!statuses.includes(workOrder.status))
+      throw new DomainError(
+        "WORK_ORDER_NOT_ISSUED",
+        `${workOrder.number ?? "This Work Order"} is not issued.`,
+        field,
+      );
+  }
+
   /** The live request row, locked FOR UPDATE; 404 otherwise. */
   async lock(tx: Tx, workspaceId: string, id: string): Promise<Row> {
     const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
@@ -485,6 +586,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     workspaceId: string,
     projectId: string,
     draft: MaterialRequestDraft,
+    keptWorkOrderId: string | null = null,
   ): Promise<void> {
     const store = await tx.$queryRaw<{ serves: boolean }[]>(Prisma.sql`
       SELECT EXISTS (
@@ -528,6 +630,25 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           `${contractor.name} is not assigned to this Project.`,
           { details: { field: "contractorId" } },
         );
+    }
+    if (draft.workOrderId != null) {
+      if (draft.contractorId == null)
+        throw new DomainError(
+          "MATERIAL_REQUEST_CONTRACTOR_REQUIRED",
+          "Pick the Contractor before the Work Order.",
+          { details: { field: "workOrderId" } },
+        );
+      await this.checkWorkOrder(
+        tx,
+        workspaceId,
+        projectId,
+        draft.contractorId,
+        draft.workOrderId,
+        // A Work Order the request already names may stay after it closes.
+        draft.workOrderId === keptWorkOrderId
+          ? ["issued", "closed"]
+          : ["issued"],
+      );
     }
     if (draft.departmentId != null) {
       const department = (
@@ -613,7 +734,14 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         ),
       ),
     ];
-    const [projects, stores, contractors, departments, inFlight] =
+    const workOrderIds = [
+      ...new Set(
+        rows.flatMap((row) =>
+          row.workOrderId == null ? [] : [row.workOrderId],
+        ),
+      ),
+    ];
+    const [projects, stores, contractors, departments, inFlight, workOrders] =
       await Promise.all([
         this.directory.projects(tx, workspaceId, projectIds),
         db.constructionProcurementStore.findMany({
@@ -626,6 +754,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           db,
           rows.map((row) => row.id),
         ),
+        this.directory.workOrders(tx, workspaceId, workOrderIds),
       ]);
     const storeNames = new Map(stores.map((store) => [store.id, store.name]));
     return rows.map((row) => {
@@ -649,6 +778,13 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           contractor == null
             ? null
             : { id: contractor.id, name: contractor.name },
+        workOrder:
+          row.workOrderId == null
+            ? null
+            : {
+                id: row.workOrderId,
+                name: workOrders.get(row.workOrderId)?.number ?? "Work Order",
+              },
         department:
           department == null
             ? null
@@ -733,6 +869,7 @@ function rowSnapshot(row: Row) {
     requestDate: calendarDateFromDb(row.requestDate),
     storeId: row.storeId,
     contractorId: row.contractorId,
+    workOrderId: row.workOrderId,
     departmentId: row.departmentId,
     siteLocation: row.siteLocation,
     receiverName: row.receiverName,

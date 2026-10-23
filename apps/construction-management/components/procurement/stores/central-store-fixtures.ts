@@ -105,6 +105,7 @@ export const REQUEST: MaterialRequest = {
   storeName: "Ambattur Central Store",
   requestDate: "2026-10-08",
   contractor: { id: IDS.contractor, name: "Velan Constructions" },
+  workOrder: null,
   department: null,
   siteLocation: null,
   receiverName: "Prabhu S",
@@ -189,6 +190,13 @@ export const MR_FORM_OPTIONS: MaterialRequestFormOptions = {
   stores: [{ id: IDS.store, name: "Ambattur Central Store", stateCode: "33" }],
   contractors: [{ id: IDS.contractor, name: "Velan Constructions" }],
   departments: [{ id: IDS.department, name: "Civil" }],
+  workOrders: [
+    {
+      id: "0199c4a0-0000-7000-8000-0000000001b9",
+      number: "WO/26-27/0003",
+      contractorId: IDS.contractor,
+    },
+  ],
 };
 
 const position = (

@@ -81,6 +81,19 @@ export type TeamMemberFacts = {
   name: string;
 };
 
+/**
+ * A Work Order a Material Request can name (CM-1110): contracts owns it;
+ * procurement only checks it is the Contractor's, on the Project, and
+ * issued (or closed, for an assignment after the fact).
+ */
+export type WorkOrderFacts = {
+  id: string;
+  number: string | null;
+  projectId: string;
+  contractorId: string;
+  status: string;
+};
+
 /** Names of the Department master (MR "Department"). */
 export type DepartmentFacts = { id: string; name: string; disabled: boolean };
 
@@ -107,6 +120,12 @@ export type ProcurementDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, DepartmentFacts>>;
+  /** Live Work Orders by id (CM-1110). */
+  workOrders(
+    db: Db,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, WorkOrderFacts>>;
   billingAddresses(
     db: Db,
     workspaceId: string,
