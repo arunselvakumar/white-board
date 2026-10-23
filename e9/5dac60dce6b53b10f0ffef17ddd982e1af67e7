@@ -1,0 +1,25 @@
+packages/db/construction/prisma/migrations/20261023150000_construction_procurement_material_request_work_order/migration.sql
+  s_f49615d4431370::t_35716257d5e13f 1-16
+packages/db/construction/prisma/migrations/20261023150100_construction_contracts_material_reconciliation/migration.sql
+  s_f49615d4431370::t_95b5aa9a764ea2 1-27
+packages/db/construction/prisma/schema/construction-contracts.prisma
+  s_f49615d4431370::t_a0f4b3e52ed667 771-773,781,936-938
+packages/db/construction/prisma/schema/construction-procurement.prisma
+  s_f49615d4431370::t_bfd398b1647ebe 646-648,672-673
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e95dac60dce6b53b10f0ffef17ddd982e1af67e7",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
