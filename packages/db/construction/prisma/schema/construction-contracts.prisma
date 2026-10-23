@@ -768,6 +768,9 @@ model ConstructionContractsBillDeduction {
   advanceId   String?                            @map("advance_id") @db.Uuid
   /// An "other" deduction recovering a negative escalation bill (CM-1109).
   escalationBillId String?                       @map("escalation_bill_id") @db.Uuid
+  /// The Material a material reconciliation recovery or a material issued
+  /// at cost recovers (CM-1110).
+  materialId  String?                            @map("material_id") @db.Uuid
   position    Int
 
   bill ConstructionContractsBill @relation(fields: [billId], references: [id], onDelete: Cascade)
@@ -775,6 +778,7 @@ model ConstructionContractsBillDeduction {
   @@index([billId, position])
   @@index([workspaceId, advanceId])
   @@index([workspaceId, escalationBillId])
+  @@index([workspaceId, materialId])
   @@map("bill_deductions")
   @@schema("construction_contracts")
 }
@@ -929,6 +933,9 @@ model ConstructionContractsEscalationClauseComponent {
   basis         ConstructionContractsEscalationBasis     @default(weighted)
   /// `quantity` basis: paise per unit at the base month (CM-1109).
   basePrice     BigInt?                                  @map("base_price")
+  /// `quantity` basis on a Work Order: the Material whose reconciled
+  /// consumption fills the quantity (CM-1110).
+  materialId    String?                                  @map("material_id") @db.Uuid
 
   clause ConstructionContractsEscalationClause @relation(fields: [clauseId], references: [id], onDelete: Cascade)
 

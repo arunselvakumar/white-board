@@ -643,6 +643,9 @@ model ConstructionProcurementMaterialRequest {
   number           String
   requestDate      DateTime                                     @map("request_date") @db.Date
   contractorId     String?                                      @map("contractor_id") @db.Uuid
+  /// The Work Order the material is issued under (CM-1110): an issued Work
+  /// Order of the Contractor on the Project, in construction_contracts.
+  workOrderId      String?                                      @map("work_order_id") @db.Uuid
   departmentId     String?                                      @map("department_id") @db.Uuid
   siteLocationType String?                                      @map("site_location_type")
   siteLocation     Json?                                        @map("site_location")
@@ -666,6 +669,8 @@ model ConstructionProcurementMaterialRequest {
   @@unique([workspaceId, number])
   @@index([workspaceId, projectId, createdAt])
   @@index([workspaceId, storeId, createdAt])
+  @@index([workspaceId, workOrderId])
+  @@index([workspaceId, projectId, contractorId])
   @@map("material_requests")
   @@schema("construction_procurement")
 }
