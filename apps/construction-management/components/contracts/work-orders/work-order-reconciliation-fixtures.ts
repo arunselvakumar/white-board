@@ -56,6 +56,33 @@ const steel: Reconciliation["materials"][number] = {
   atCostOnThisBill: 6_000_00,
 };
 
+const cement: Reconciliation["materials"][number] = {
+  materialId: CEMENT,
+  materialName: "Cement OPC 53",
+  uomName: "Bag",
+  issueBasis: "free",
+  wastagePercent: "2.00",
+  issueRate: null,
+  penalRate: 500_00,
+  theoretical: "634.000",
+  allowed: "646.680",
+  underUseLimit: "621.320",
+  issued: "700.000",
+  returned: "0.000",
+  netIssued: "700.000",
+  excess: "53.320",
+  underUse: false,
+  excessValue: 26_660_00,
+  recoveredBefore: 0,
+  recoverySuggested: 26_660_00,
+  onThisBill: 26_660_00,
+  reason: null,
+  atCostValue: null,
+  atCostDeductedBefore: 0,
+  atCostSuggested: 0,
+  atCostOnThisBill: null,
+};
+
 /** At bill 1 (approved): 100 cum, 700 bags, ₹26,660 recovered. */
 export const AT_BILL_1: Reconciliation = {
   workOrder: {
@@ -68,35 +95,7 @@ export const AT_BILL_1: Reconciliation = {
   },
   bill: bills[1] ?? null,
   bills,
-  materials: [
-    {
-      materialId: CEMENT,
-      materialName: "Cement OPC 53",
-      uomName: "Bag",
-      issueBasis: "free",
-      wastagePercent: "2.00",
-      issueRate: null,
-      penalRate: 500_00,
-      theoretical: "634.000",
-      allowed: "646.680",
-      underUseLimit: "621.320",
-      issued: "700.000",
-      returned: "0.000",
-      netIssued: "700.000",
-      excess: "53.320",
-      underUse: false,
-      excessValue: 26_660_00,
-      recoveredBefore: 0,
-      recoverySuggested: 26_660_00,
-      onThisBill: 26_660_00,
-      reason: null,
-      atCostValue: null,
-      atCostDeductedBefore: 0,
-      atCostSuggested: 0,
-      atCostOnThisBill: null,
-    },
-    steel,
-  ],
+  materials: [cement, steel],
   issues: [
     {
       id: "0199c0de-1110-7000-8000-000000000101",
@@ -122,7 +121,7 @@ export const AT_BILL_2: Reconciliation = {
   bill: bills[0] ?? null,
   materials: [
     {
-      ...(AT_BILL_1.materials[0] as Reconciliation["materials"][number]),
+      ...cement,
       theoretical: "760.800",
       allowed: "776.016",
       underUseLimit: "745.584",
@@ -143,7 +142,7 @@ export const UNDER_USE: Reconciliation = {
   ...AT_BILL_1,
   materials: [
     {
-      ...(AT_BILL_1.materials[0] as Reconciliation["materials"][number]),
+      ...cement,
       issued: "600.000",
       netIssued: "600.000",
       excess: "0.000",

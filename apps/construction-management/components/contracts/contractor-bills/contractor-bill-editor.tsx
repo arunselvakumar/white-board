@@ -180,7 +180,7 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
     );
     if (index === -1) {
       deductions.append({
-        kind: advance.recoveryKind as (typeof typed)[number]["kind"],
+        kind: advance.recoveryKind,
         amount,
         description: "",
         advanceId: advance.id,

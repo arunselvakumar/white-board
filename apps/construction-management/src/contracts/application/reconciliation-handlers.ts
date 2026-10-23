@@ -395,8 +395,7 @@ export class ReconciliationHandlers {
     components: readonly { component: string; materialId: string | null }[],
   ): Promise<Map<string, bigint>> {
     const out = new Map<string, bigint>();
-    if (contract.side !== "contractor" || contract.workOrderId == null)
-      return out;
+    if (contract.side !== "contractor") return out;
     const linked = components.filter((row) => row.materialId != null);
     if (linked.length === 0) return out;
     const [terms, billed] = await Promise.all([

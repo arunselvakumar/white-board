@@ -178,9 +178,9 @@ export const Phone: Story = {
     const cards = await canvas.findByRole("list", {
       name: "Materials reconciled",
     });
-    const card = within(
-      within(cards).getAllByRole("listitem")[0] as HTMLElement,
-    );
+    const [first] = within(cards).getAllByRole("listitem");
+    if (first == null) throw new Error("No material card");
+    const card = within(first);
     await expect(card.getByText("Under-used")).toBeVisible();
     await expect(card.getByText("634")).toBeVisible();
     await waitFor(async () => {

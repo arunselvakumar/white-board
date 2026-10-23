@@ -235,7 +235,7 @@ export function retentionSuggestion(input: {
 // Deductions and net
 // ---------------------------------------------------------------------------
 
-export type BillDeduction = RaBillDeduction<ContractorBillDeductionKind>;
+export type BillDeduction = RaBillDeduction;
 
 /**
  * Checks the deductions as typed: at most 20, each a kind CM-1106 takes

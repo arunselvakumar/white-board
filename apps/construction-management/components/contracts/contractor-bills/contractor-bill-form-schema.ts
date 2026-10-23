@@ -98,7 +98,7 @@ export function editorValuesOf(
     deductions: bill.deductionLines
       .filter((deduction) => editable(deduction.kind))
       .map((deduction) => ({
-        kind: deduction.kind as ContractorBillDeductionKind,
+        kind: deduction.kind,
         amount: paiseToRupees(deduction.amount),
         description: deduction.description ?? "",
         advanceId: deduction.advanceId ?? "",
