@@ -1,0 +1,39 @@
+apps/construction-management/app/app/masters/price-indices/page.tsx
+  s_f49615d4431370::t_e4d057abdfd19d 1-15
+apps/construction-management/components/contracts/escalation/escalation-format.ts
+  s_f49615d4431370::t_9e2801d046ef40 1-62
+apps/construction-management/lib/masters-nav.ts
+  s_f49615d4431370::t_053939943d7ce0 4,264-271
+apps/construction-management/components/contracts/escalation/escalation-clause-panel.tsx
+  s_b66b36b2f0a0ef::t_0c061825caea1a 1-551
+apps/construction-management/components/contracts/escalation/new-escalation-bill-dialog.tsx
+  s_b66b36b2f0a0ef::t_03c27cc0e288d4 1-288
+apps/construction-management/components/contracts/escalation/price-indices-page.tsx
+  s_b66b36b2f0a0ef::t_1f7561e9c296dd 1-471
+apps/construction-management/src/queries/contracts-escalation.ts
+  s_b66b36b2f0a0ef::t_17277dab1fdf84 1-327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d7f3716f98c598fc3be302a709e21d730a05b440",
+  "prompts": {},
+  "sessions": {
+    "s_b66b36b2f0a0ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad39e8e54a0dc4dcf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
