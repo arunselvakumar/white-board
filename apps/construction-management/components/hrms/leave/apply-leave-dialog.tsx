@@ -112,6 +112,7 @@ function ChoiceSelect({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required
         aria-invalid={invalid}
       >
         <SelectValue placeholder="Choose" />
@@ -286,7 +287,9 @@ function ApplyForm({
     >
       {options.permissions.applyForOthers ? (
         <div className="space-y-1.5">
-          <Label htmlFor="apply-leave-member">Team Member</Label>
+          <Label htmlFor="apply-leave-member" required>
+            Team Member
+          </Label>
           <Controller
             name="memberId"
             control={form.control}
@@ -305,7 +308,9 @@ function ApplyForm({
         </div>
       ) : null}
       <div className="space-y-1.5">
-        <Label htmlFor="apply-leave-type">Leave type</Label>
+        <Label htmlFor="apply-leave-type" required>
+          Leave type
+        </Label>
         <Controller
           name="leaveTypeId"
           control={form.control}
@@ -327,9 +332,12 @@ function ApplyForm({
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="apply-leave-from">From</Label>
+          <Label htmlFor="apply-leave-from" required>
+            From
+          </Label>
           <Input
             id="apply-leave-from"
+            aria-required
             type="date"
             className="h-10"
             aria-invalid={errors.fromDate != null}
@@ -343,9 +351,12 @@ function ApplyForm({
           <FieldError message={errors.fromDate?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="apply-leave-to">To</Label>
+          <Label htmlFor="apply-leave-to" required>
+            To
+          </Label>
           <Input
             id="apply-leave-to"
+            aria-required
             type="date"
             className="h-10"
             min={fromDate}
@@ -460,9 +471,12 @@ function ApplyForm({
       ) : null}
 
       <div className="space-y-1.5">
-        <Label htmlFor="apply-leave-reason">Reason</Label>
+        <Label htmlFor="apply-leave-reason" required>
+          Reason
+        </Label>
         <Textarea
           id="apply-leave-reason"
+          aria-required
           rows={3}
           aria-invalid={errors.reason != null}
           {...form.register("reason")}

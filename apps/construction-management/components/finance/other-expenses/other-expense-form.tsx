@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
@@ -130,19 +130,24 @@ export function OtherExpenseForm({
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="expense-date">Date</Label>
+          <Label htmlFor="expense-date" required>
+            Date
+          </Label>
           <Input
             id="expense-date"
             type="date"
             className="h-10"
             max={today}
+            aria-required
             aria-invalid={errors.expenseDate != null}
             {...form.register("expenseDate")}
           />
           <FieldError message={errors.expenseDate?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="expense-category">Payment Category</Label>
+          <Label htmlFor="expense-category" required>
+            Payment Category
+          </Label>
           <Controller
             name="paymentCategoryId"
             control={form.control}
@@ -170,10 +175,13 @@ export function OtherExpenseForm({
           <FieldError message={errors.payeeName?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="expense-amount">Amount</Label>
+          <Label htmlFor="expense-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="expense-amount"
             className="h-10"
+            aria-required
             aria-invalid={errors.amount != null}
             {...form.register("amount")}
           />
@@ -182,6 +190,7 @@ export function OtherExpenseForm({
         <div className="min-w-0 space-y-1.5 sm:col-span-2">
           <span id="expense-mode" className="text-sm font-medium">
             Mode
+            <RequiredIndicator />
           </span>
           <Controller
             name="mode"
@@ -207,12 +216,15 @@ export function OtherExpenseForm({
           />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="expense-account">Paid from</Label>
+          <Label htmlFor="expense-account" required>
+            Paid from
+          </Label>
           <Controller
             name="accountId"
             control={form.control}
             render={({ field }) => (
               <AccountPicker
+                required
                 id="expense-account"
                 value={field.value}
                 onChange={field.onChange}
@@ -224,7 +236,9 @@ export function OtherExpenseForm({
           <FieldError message={errors.accountId?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="expense-reference">{referenceLabel(mode)}</Label>
+          <Label htmlFor="expense-reference" required={mode !== "cash"}>
+            {referenceLabel(mode)}
+          </Label>
           <Input
             id="expense-reference"
             className="h-10"
@@ -232,6 +246,7 @@ export function OtherExpenseForm({
             placeholder={
               mode === "cheque" ? "Cheque number" : "UTR or UPI reference"
             }
+            aria-required={mode !== "cash"}
             aria-invalid={errors.reference != null}
             {...form.register("reference")}
           />

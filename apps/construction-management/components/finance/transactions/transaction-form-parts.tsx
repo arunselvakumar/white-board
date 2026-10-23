@@ -97,12 +97,15 @@ export function ToAccountSelect({
   onChange,
   exclude,
   invalid,
+  required = false,
 }: {
   id: string;
   value: string;
   onChange: (accountId: string) => void;
   exclude: string;
   invalid: boolean;
+  /** Sets `aria-required` on the control; the label shows the asterisk. */
+  required?: boolean;
 }) {
   const query = useQuery(accountOptionsQuery());
   if (query.isPending)
@@ -129,6 +132,7 @@ export function ToAccountSelect({
         size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
+        aria-required={required}
       >
         <SelectValue placeholder="Choose an account" />
       </SelectTrigger>

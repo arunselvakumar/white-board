@@ -227,7 +227,9 @@ export function SequenceRuleDialog({
           </DialogHeader>
 
           <div className="space-y-1.5">
-            <Label htmlFor="sequence-project">Project</Label>
+            <Label htmlFor="sequence-project" required>
+              Project
+            </Label>
             <Controller
               name="projectId"
               control={form.control}
@@ -244,6 +246,7 @@ export function SequenceRuleDialog({
                     id="sequence-project"
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -289,19 +292,24 @@ export function SequenceRuleDialog({
               <FieldError message={errors.projectToken?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="sequence-start">Start number</Label>
+              <Label htmlFor="sequence-start" required>
+                Start number
+              </Label>
               <Input
                 id="sequence-start"
                 type="number"
                 inputMode="numeric"
                 min={1}
                 className="h-10"
+                aria-required
                 {...form.register("startNumber", { valueAsNumber: true })}
               />
               <FieldError message={errors.startNumber?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="sequence-padding">Digits</Label>
+              <Label htmlFor="sequence-padding" required>
+                Digits
+              </Label>
               <Input
                 id="sequence-padding"
                 type="number"
@@ -309,12 +317,15 @@ export function SequenceRuleDialog({
                 min={SEQUENCE_LIMITS.minPadding}
                 max={SEQUENCE_LIMITS.maxPadding}
                 className="h-10"
+                aria-required
                 {...form.register("padding", { valueAsNumber: true })}
               />
               <FieldError message={errors.padding?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="sequence-separator">Separator</Label>
+              <Label htmlFor="sequence-separator" required>
+                Separator
+              </Label>
               <Controller
                 name="separator"
                 control={form.control}
@@ -330,6 +341,7 @@ export function SequenceRuleDialog({
                       id="sequence-separator"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>

@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -210,22 +210,28 @@ function PayForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="pay-date">Payment date</Label>
+          <Label htmlFor="pay-date" required>
+            Payment date
+          </Label>
           <Input
             id="pay-date"
             type="date"
             className="h-10"
             max={today}
+            aria-required
             aria-invalid={errors.paymentDate != null}
             {...form.register("paymentDate")}
           />
           <FieldError message={errors.paymentDate?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="pay-amount">Amount</Label>
+          <Label htmlFor="pay-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="pay-amount"
             className="h-10"
+            aria-required
             aria-invalid={errors.amount != null}
             {...form.register("amount")}
           />
@@ -236,6 +242,7 @@ function PayForm({
         <div className="space-y-1.5">
           <span id="pay-kind" className="text-sm font-medium">
             Type
+            <RequiredIndicator />
           </span>
           <Controller
             name="kind"
@@ -265,6 +272,7 @@ function PayForm({
         <div className="space-y-1.5">
           <span id="pay-mode" className="text-sm font-medium">
             Mode
+            <RequiredIndicator />
           </span>
           <Controller
             name="mode"
@@ -292,12 +300,15 @@ function PayForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="pay-account">Paid from</Label>
+        <Label htmlFor="pay-account" required>
+          Paid from
+        </Label>
         <Controller
           name="accountId"
           control={form.control}
           render={({ field }) => (
             <AccountPicker
+              required
               id="pay-account"
               value={field.value}
               onChange={field.onChange}
@@ -310,11 +321,14 @@ function PayForm({
       </div>
       {mode === "bank" && (
         <div className="space-y-1.5">
-          <Label htmlFor="pay-reference">Reference</Label>
+          <Label htmlFor="pay-reference" required>
+            Reference
+          </Label>
           <Input
             id="pay-reference"
             className="h-10"
             placeholder="Cheque or UTR number"
+            aria-required
             aria-invalid={errors.reference != null}
             {...form.register("reference")}
           />

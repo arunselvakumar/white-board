@@ -104,22 +104,28 @@ function EditForm({
       </DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="edit-date">Date</Label>
+          <Label htmlFor="edit-date" required>
+            Date
+          </Label>
           <Input
             id="edit-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.date != null}
             {...form.register("date")}
           />
           <FieldError message={errors.date?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="edit-quantity">Quantity ({uomName})</Label>
+          <Label htmlFor="edit-quantity" required>
+            Quantity ({uomName})
+          </Label>
           <Input
             id="edit-quantity"
             inputMode="decimal"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.quantity != null}
             {...form.register("quantity")}
           />

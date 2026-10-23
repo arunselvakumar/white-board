@@ -428,10 +428,13 @@ export function InspectionForm({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="inspection-date">Inspection Date</Label>
+          <Label htmlFor="inspection-date" required>
+            Inspection Date
+          </Label>
           <Input
             id="inspection-date"
             type="date"
+            aria-required
             aria-invalid={errors.inspectionDate != null}
             {...form.register("inspectionDate")}
           />
@@ -502,10 +505,13 @@ export function InspectionForm({
           <FieldError message={errors.contractorId?.message} />
         </div>
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="inspection-work">Description of work</Label>
+          <Label htmlFor="inspection-work" required>
+            Description of work
+          </Label>
           <Textarea
             id="inspection-work"
             rows={3}
+            aria-required
             aria-invalid={errors.workDescription != null}
             {...form.register("workDescription")}
           />

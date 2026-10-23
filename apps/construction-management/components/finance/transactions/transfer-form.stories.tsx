@@ -51,6 +51,12 @@ export const Validation: Story = {
     const page = within(canvasElement.ownerDocument.body);
     await page.findByRole("dialog", { name: "Transfer" });
     await userEvent.click(page.getByRole("button", { name: "UPI" }));
+    // Required account pickers tell screen readers so, past their wrappers.
+    for (const name of ["From account", "To account"])
+      await expect(page.getByRole("combobox", { name })).toHaveAttribute(
+        "aria-required",
+        "true",
+      );
     await userEvent.click(page.getByRole("button", { name: "Save" }));
     await expect(
       await page.findByText("Enter the transaction reference"),

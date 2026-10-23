@@ -117,9 +117,12 @@ export function MissedCheckoutDialog({
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="missed-checkout-date">Checkout date</Label>
+              <Label htmlFor="missed-checkout-date" required>
+                Checkout date
+              </Label>
               <Input
                 id="missed-checkout-date"
+                aria-required
                 type="date"
                 className="h-10"
                 min={entry.date}
@@ -130,9 +133,12 @@ export function MissedCheckoutDialog({
               <FieldError message={errors.checkOutDate?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="missed-checkout-time">Checkout time</Label>
+              <Label htmlFor="missed-checkout-time" required>
+                Checkout time
+              </Label>
               <Input
                 id="missed-checkout-time"
+                aria-required
                 type="time"
                 className="h-10"
                 aria-invalid={errors.checkOutTime != null}
@@ -141,9 +147,12 @@ export function MissedCheckoutDialog({
               <FieldError message={errors.checkOutTime?.message} />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="missed-checkout-reason">Reason</Label>
+              <Label htmlFor="missed-checkout-reason" required>
+                Reason
+              </Label>
               <Textarea
                 id="missed-checkout-reason"
+                aria-required
                 rows={2}
                 placeholder="Phone switched off at the site"
                 aria-invalid={errors.reason != null}

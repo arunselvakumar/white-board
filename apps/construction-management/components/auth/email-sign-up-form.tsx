@@ -87,24 +87,30 @@ export function EmailSignUpForm({
       noValidate
     >
       <div className="space-y-1.5">
-        <Label htmlFor="sign-up-name">Your name</Label>
+        <Label htmlFor="sign-up-name" required>
+          Your name
+        </Label>
         <Input
           id="sign-up-name"
           autoComplete="name"
           placeholder="Arun Selva Kumar"
           className="h-10"
+          aria-required
           {...form.register("name")}
         />
         <FieldError message={form.formState.errors.name?.message} />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="sign-up-email">Email</Label>
+        <Label htmlFor="sign-up-email" required>
+          Email
+        </Label>
         <Input
           id="sign-up-email"
           type="email"
           autoComplete="email"
           placeholder="example@example.com"
           className="h-10"
+          aria-required
           {...form.register("email")}
         />
         <FieldError
@@ -115,11 +121,14 @@ export function EmailSignUpForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="sign-up-password">Password</Label>
+        <Label htmlFor="sign-up-password" required>
+          Password
+        </Label>
         <PasswordField
           id="sign-up-password"
           autoComplete="new-password"
           placeholder="At least 8 characters"
+          aria-required
           {...form.register("password")}
         />
         <FieldError

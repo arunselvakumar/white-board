@@ -110,7 +110,7 @@ export function DeleteCompanyDialog({
           </p>
 
           <div className="space-y-1.5">
-            <Label htmlFor="delete-company-name">
+            <Label htmlFor="delete-company-name" required>
               Type <span className="font-semibold">{companyName}</span> to
               confirm
             </Label>
@@ -118,6 +118,7 @@ export function DeleteCompanyDialog({
               id="delete-company-name"
               autoComplete="off"
               className="h-10"
+              aria-required
               aria-invalid={errors.companyName != null}
               {...form.register("companyName")}
             />

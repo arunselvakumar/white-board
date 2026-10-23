@@ -104,9 +104,12 @@ export function SignupForm() {
         noValidate
       >
         <div className="space-y-1.5">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username" required>
+            Username
+          </Label>
           <Input
             id="username"
+            aria-required
             autoComplete="username"
             placeholder="Choose a username"
             className="h-10"
@@ -121,9 +124,12 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" required>
+            Email
+          </Label>
           <Input
             id="email"
+            aria-required
             type="email"
             autoComplete="email"
             placeholder="Enter your email"
@@ -139,9 +145,12 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" required>
+            Password
+          </Label>
           <PasswordField
             id="password"
+            aria-required
             autoComplete="new-password"
             placeholder="Create a password"
             {...detailsForm.register("password")}

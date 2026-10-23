@@ -145,7 +145,9 @@ export function FeePlanForm({
     >
       <FormAlert message={errors.root?.message} />
       <div className="space-y-1.5">
-        <Label htmlFor="feePlanType">Type</Label>
+        <Label htmlFor="feePlanType" required>
+          Type
+        </Label>
         <Controller
           name="type"
           control={control}
@@ -160,6 +162,7 @@ export function FeePlanForm({
             >
               <SelectTrigger
                 id="feePlanType"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
               >
@@ -177,9 +180,12 @@ export function FeePlanForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="feePlanAmount">Amount (₹)</Label>
+        <Label htmlFor="feePlanAmount" required>
+          Amount (₹)
+        </Label>
         <Input
           id="feePlanAmount"
+          aria-required
           className="h-10"
           inputMode="decimal"
           autoComplete="off"
@@ -200,11 +206,12 @@ export function FeePlanForm({
       </div>
       {type === "one_time" ? null : (
         <div className="space-y-1.5">
-          <Label htmlFor="feePlanCount">
+          <Label htmlFor="feePlanCount" required>
             {type === "installments" ? "Number of installments" : "Months"}
           </Label>
           <Input
             id="feePlanCount"
+            aria-required
             className="h-10"
             inputMode="numeric"
             autoComplete="off"

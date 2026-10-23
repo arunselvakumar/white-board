@@ -100,11 +100,14 @@ function ItemForm({
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-1.5">
-        <Label htmlFor="testing-item-name">Name</Label>
+        <Label htmlFor="testing-item-name" required>
+          Name
+        </Label>
         <Input
           id="testing-item-name"
           className="h-10"
           autoComplete="off"
+          aria-required
           maxLength={NAME_MAX}
           aria-invalid={errors.name != null}
           {...form.register("name")}

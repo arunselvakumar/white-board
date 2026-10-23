@@ -99,22 +99,28 @@ export function ExportReceiptsDialog({
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-from`}>From</Label>
+            <Label htmlFor={`${id}-from`} required>
+              From
+            </Label>
             <Input
               id={`${id}-from`}
               type="date"
               value={from}
+              aria-required
               onChange={(event) => {
                 setFrom(event.target.value);
               }}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-to`}>To</Label>
+            <Label htmlFor={`${id}-to`} required>
+              To
+            </Label>
             <Input
               id={`${id}-to`}
               type="date"
               value={to}
+              aria-required
               aria-invalid={problem != null}
               onChange={(event) => {
                 setTo(event.target.value);

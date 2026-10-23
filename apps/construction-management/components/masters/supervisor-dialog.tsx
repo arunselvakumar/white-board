@@ -157,11 +157,14 @@ export function SupervisorDialog({
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="supervisor-name">Supervisor name</Label>
+              <Label htmlFor="supervisor-name" required>
+                Supervisor name
+              </Label>
               <Input
                 id="supervisor-name"
                 className="h-10"
                 autoComplete="off"
+                aria-required
                 placeholder="Rakesh Mirtha"
                 aria-invalid={errors.name != null}
                 {...form.register("name")}

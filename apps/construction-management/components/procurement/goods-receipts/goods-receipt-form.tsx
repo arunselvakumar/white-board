@@ -17,7 +17,7 @@ import {
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Table,
   TableBody,
@@ -155,11 +155,13 @@ function Section({
   id,
   title,
   description,
+  required = false,
   children,
 }: {
   id: string;
   title: string;
   description?: string;
+  required?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -167,6 +169,7 @@ function Section({
       <div className="space-y-1">
         <h2 id={id} className="font-semibold">
           {title}
+          {required && <RequiredIndicator />}
         </h2>
         {description == null ? null : (
           <p className="text-muted-foreground text-sm">{description}</p>
@@ -317,12 +320,15 @@ function ManualLines({
               className="grid gap-3 rounded-lg border p-3 sm:grid-cols-12 sm:items-start"
             >
               <div className="space-y-1.5 sm:col-span-4">
-                <Label htmlFor={`grn-line-${n}-material`}>Material</Label>
+                <Label htmlFor={`grn-line-${n}-material`} required>
+                  Material
+                </Label>
                 <Controller
                   name={`manualLines.${index}.materialId`}
                   control={form.control}
                   render={({ field: picker }) => (
                     <MaterialPicker
+                      required
                       id={`grn-line-${n}-material`}
                       aria-label={`Material, line ${n}`}
                       value={picker.value === "" ? null : picker.value}
@@ -358,13 +364,14 @@ function ManualLines({
                 <FieldError message={lineErrors?.materialId?.message} />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor={`grn-line-${n}-qty`}>
+                <Label htmlFor={`grn-line-${n}-qty`} required>
                   Quantity{line.uomName === "" ? "" : ` (${line.uomName})`}
                 </Label>
                 <Input
                   id={`grn-line-${n}-qty`}
                   inputMode="decimal"
                   className="h-10"
+                  aria-required
                   aria-invalid={lineErrors?.quantity != null}
                   {...form.register(`manualLines.${index}.quantity`)}
                 />
@@ -645,7 +652,9 @@ function GoodsReceiptForm({
             hint="The date the stock is added."
           />
           <div className="space-y-1.5">
-            <Label htmlFor="grn-supplier">Supplier</Label>
+            <Label htmlFor="grn-supplier" required>
+              Supplier
+            </Label>
             {options.suppliers.length === 0 ? (
               <p className="text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
                 No Suppliers on this Project. Add one under the Project&apos;s
@@ -657,6 +666,7 @@ function GoodsReceiptForm({
                 control={form.control}
                 render={({ field }) => (
                   <ChoiceSelect
+                    required
                     id="grn-supplier"
                     label="Supplier"
                     value={field.value === "" ? "" : field.value}
@@ -713,12 +723,15 @@ function GoodsReceiptForm({
             <FieldError message={errors.purchaseOrderId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="grn-supply-type">GST</Label>
+            <Label htmlFor="grn-supply-type" required>
+              GST
+            </Label>
             <Controller
               name="supplyType"
               control={form.control}
               render={({ field }) => (
                 <ChoiceSelect
+                  required
                   id="grn-supply-type"
                   label="GST"
                   value={field.value}
@@ -743,6 +756,7 @@ function GoodsReceiptForm({
       <Section
         id="grn-lines"
         title="Materials received"
+        required
         description={
           purchaseOrderId === ""
             ? "Each material arrived, with its quantity."
@@ -872,12 +886,15 @@ function TextFieldDate({
   const error = form.formState.errors[name]?.message;
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required>
+        {label}
+      </Label>
       <Input
         id={id}
         type="date"
         max={max}
         className="h-10"
+        aria-required
         aria-invalid={error != null}
         {...form.register(name)}
       />

@@ -158,22 +158,28 @@ function VendorForm({
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="vendor-name">Vendor name</Label>
+            <Label htmlFor="vendor-name" required>
+              Vendor name
+            </Label>
             <Input
               id="vendor-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="vendor-joining-date">Joining date</Label>
+            <Label htmlFor="vendor-joining-date" required>
+              Joining date
+            </Label>
             <Input
               id="vendor-joining-date"
               type="date"
               className="h-10"
+              aria-required
               aria-invalid={errors.joiningDate != null}
               {...form.register("joiningDate")}
             />

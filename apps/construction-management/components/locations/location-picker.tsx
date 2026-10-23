@@ -25,7 +25,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -185,18 +185,15 @@ function LocationFields({
       {heading ? (
         <p id={groupId} className="text-sm font-medium">
           {label}
-          {required ? (
-            <span className="text-muted-foreground font-normal">
-              {" "}
-              (required)
-            </span>
-          ) : null}
+          {required ? <RequiredIndicator /> : null}
         </p>
       ) : null}
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         {showType ? (
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor={firstId}>Location Type</Label>
+            <Label htmlFor={firstId} required={required}>
+              Location Type
+            </Label>
             <Select
               items={types.map((key) => ({
                 value: key,
@@ -216,6 +213,7 @@ function LocationFields({
                 size="lg"
                 className="w-full min-w-0"
                 aria-invalid={invalid}
+                aria-required={required}
               >
                 <SelectValue placeholder="Choose a Location Type" />
               </SelectTrigger>
@@ -241,6 +239,7 @@ function LocationFields({
             wings={options.wings}
             value={value?.type === "wing" ? value : null}
             onChange={onChange}
+            required={required}
             disabled={disabled}
             invalid={invalid && !showType}
           />
@@ -252,6 +251,7 @@ function LocationFields({
             rows={options[PLACE_FIELDS[type].list]}
             value={value}
             onChange={onChange}
+            required={required}
             disabled={disabled}
             invalid={invalid && !showType}
           />
@@ -304,6 +304,7 @@ function PlaceField({
   rows,
   value,
   onChange,
+  required,
   disabled,
   invalid,
 }: {
@@ -313,6 +314,7 @@ function PlaceField({
   rows: Named[];
   value: LocationRef | null;
   onChange: (value: LocationRef | null) => void;
+  required: boolean;
   disabled: boolean;
   invalid: boolean;
 }) {
@@ -330,7 +332,9 @@ function PlaceField({
       : [...rows, { id: current, name: "No longer available" }];
   return (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={id}>{field.label}</Label>
+      <Label htmlFor={id} required={required}>
+        {field.label}
+      </Label>
       <Select
         items={items.map((row) => ({ value: row.id, label: row.name }))}
         value={current}
@@ -350,6 +354,7 @@ function PlaceField({
           size="lg"
           className="w-full min-w-0"
           aria-invalid={invalid}
+          aria-required={required}
         >
           <SelectValue placeholder={field.placeholder} />
         </SelectTrigger>
@@ -377,6 +382,7 @@ function WingFields({
   wings,
   value,
   onChange,
+  required,
   disabled,
   invalid,
 }: {
@@ -386,6 +392,7 @@ function WingFields({
   wings: LocationOptionWing[];
   value: Extract<LocationRef, { type: "wing" }> | null;
   onChange: (value: LocationRef | null) => void;
+  required: boolean;
   disabled: boolean;
   invalid: boolean;
 }) {
@@ -420,7 +427,9 @@ function WingFields({
   return (
     <>
       <div className="min-w-0 space-y-1.5">
-        <Label htmlFor={placeId}>Wing</Label>
+        <Label htmlFor={placeId} required={required}>
+          Wing
+        </Label>
         <Select
           items={items}
           value={value?.wingId ?? null}
@@ -436,6 +445,7 @@ function WingFields({
             size="lg"
             className="w-full min-w-0"
             aria-invalid={invalid}
+            aria-required={required}
           >
             <SelectValue placeholder="Choose a Wing" />
           </SelectTrigger>

@@ -296,11 +296,14 @@ function PartyForm({
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor={id("name")}>{screen.label} name</Label>
+            <Label htmlFor={id("name")} required>
+              {screen.label} name
+            </Label>
             <Input
               id={id("name")}
               className="h-10"
               autoComplete="off"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

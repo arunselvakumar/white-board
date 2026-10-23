@@ -145,11 +145,14 @@ export function ProgressDialog({
         </DialogHeader>
         <div className="grid min-w-0 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="progress-date">Date</Label>
+            <Label htmlFor="progress-date" required>
+              Date
+            </Label>
             <Input
               id="progress-date"
               type="date"
               max={today}
+              aria-required
               value={date}
               aria-invalid={errors.progressDate != null}
               onChange={(event) => {
@@ -159,7 +162,7 @@ export function ProgressDialog({
             <FieldError message={errors.progressDate} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="progress-amount">
+            <Label htmlFor="progress-amount" required>
               {quantityTask
                 ? `Work done (${task.unit?.name ?? "quantity"})`
                 : "Progress (%)"}
@@ -168,6 +171,7 @@ export function ProgressDialog({
               id="progress-amount"
               inputMode="decimal"
               autoComplete="off"
+              aria-required
               value={amount}
               aria-invalid={errors.amount != null}
               onChange={(event) => {
@@ -257,11 +261,14 @@ export function CompleteDialog({
         </DialogHeader>
         <div className="grid min-w-0 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="complete-date">Completed on</Label>
+            <Label htmlFor="complete-date" required>
+              Completed on
+            </Label>
             <Input
               id="complete-date"
               type="date"
               max={today}
+              aria-required
               value={date}
               aria-invalid={errors.progressDate != null}
               onChange={(event) => {
@@ -365,10 +372,13 @@ export function RebaselineDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="rebaseline-reason">Reason</Label>
+          <Label htmlFor="rebaseline-reason" required>
+            Reason
+          </Label>
           <Textarea
             id="rebaseline-reason"
             rows={3}
+            aria-required
             value={reason}
             aria-invalid={errors.reason != null}
             onChange={(event) => {

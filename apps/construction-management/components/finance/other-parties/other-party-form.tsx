@@ -136,11 +136,14 @@ export function OtherPartyForm({
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="other-party-name">Party name</Label>
+            <Label htmlFor="other-party-name" required>
+              Party name
+            </Label>
             <Input
               id="other-party-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

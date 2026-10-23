@@ -7,7 +7,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { FieldTitle } from "@repo/ui/components/field";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -165,6 +165,13 @@ export function TeacherForm({
     keyof TeacherFormValues,
     "availability" | "documentKind"
   >;
+  /** The email can't change after the Teacher is added, so it's only required on create. */
+  const isRequired = (name: keyof TeacherFormValues) =>
+    name === "name" ||
+    (name === "email" && teacher == null) ||
+    name === "kind" ||
+    name === "backgroundCheckStatus" ||
+    name === "documentKind";
   const textField = (
     name: TextName,
     label: string,
@@ -172,9 +179,12 @@ export function TeacherForm({
     placeholder?: string,
   ) => (
     <div className="space-y-1.5" key={name}>
-      <Label htmlFor={`teacher-${name}`}>{label}</Label>
+      <Label htmlFor={`teacher-${name}`} required={isRequired(name)}>
+        {label}
+      </Label>
       <Input
         id={`teacher-${name}`}
+        aria-required={isRequired(name)}
         type={type}
         placeholder={placeholder}
         readOnly={name === "email" && teacher != null}
@@ -210,7 +220,9 @@ export function TeacherForm({
     options: { value: string; label: string }[],
   ) => (
     <div className="space-y-1.5" key={name}>
-      <Label htmlFor={`teacher-${name}`}>{label}</Label>
+      <Label htmlFor={`teacher-${name}`} required={isRequired(name)}>
+        {label}
+      </Label>
       <Controller
         name={name}
         control={control}
@@ -222,7 +234,11 @@ export function TeacherForm({
               field.onChange(value ?? "");
             }}
           >
-            <SelectTrigger id={`teacher-${name}`} className="w-full">
+            <SelectTrigger
+              id={`teacher-${name}`}
+              aria-required={isRequired(name)}
+              className="w-full"
+            >
               <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
             </SelectTrigger>
             <SelectContent align="start" alignItemWithTrigger={false}>
@@ -344,6 +360,7 @@ export function TeacherForm({
           >
             <FieldTitle id="teacher-photo" className="leading-none">
               Teacher photo
+              {teacher == null ? <RequiredIndicator className="-ms-1" /> : null}
             </FieldTitle>
             <div className="bg-muted/40 flex h-36 items-center justify-center rounded-xl border border-dashed">
               <TeacherAvatar
@@ -456,7 +473,9 @@ export function TeacherForm({
               className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_auto]"
             >
               <div className="space-y-1.5">
-                <Label htmlFor={`availability-day-${index}`}>Day</Label>
+                <Label htmlFor={`availability-day-${index}`} required>
+                  Day
+                </Label>
                 <Controller
                   name={`availability.${index}.dayOfWeek`}
                   control={control}
@@ -470,6 +489,7 @@ export function TeacherForm({
                     >
                       <SelectTrigger
                         id={`availability-day-${index}`}
+                        aria-required
                         className="w-full"
                       >
                         <SelectValue placeholder="Choose day" />
@@ -486,17 +506,23 @@ export function TeacherForm({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`availability-start-${index}`}>From</Label>
+                <Label htmlFor={`availability-start-${index}`} required>
+                  From
+                </Label>
                 <Input
                   id={`availability-start-${index}`}
+                  aria-required
                   type="time"
                   {...register(`availability.${index}.startTime`)}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`availability-end-${index}`}>To</Label>
+                <Label htmlFor={`availability-end-${index}`} required>
+                  To
+                </Label>
                 <Input
                   id={`availability-end-${index}`}
+                  aria-required
                   type="time"
                   {...register(`availability.${index}.endTime`)}
                 />

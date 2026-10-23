@@ -92,6 +92,7 @@ export function ChoiceSelect({
   items,
   onChange,
   invalid,
+  required = false,
   disabled,
   className,
 }: {
@@ -101,6 +102,8 @@ export function ChoiceSelect({
   items: readonly { value: string; label: string }[];
   onChange: (value: string) => void;
   invalid?: boolean;
+  /** Sets `aria-required` on the control; the label shows the asterisk. */
+  required?: boolean;
   disabled?: boolean;
   className?: string;
 }) {
@@ -118,6 +121,7 @@ export function ChoiceSelect({
         size="lg"
         aria-label={label}
         aria-invalid={invalid}
+        aria-required={required}
         className={className ?? "w-full min-w-0"}
       >
         <SelectValue />

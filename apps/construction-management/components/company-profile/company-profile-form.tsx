@@ -246,10 +246,13 @@ export function CompanyProfileForm({
         <fieldset disabled={readOnly} className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="company-name">Company name</Label>
+              <Label htmlFor="company-name" required>
+                Company name
+              </Label>
               <Input
                 id="company-name"
                 className="h-10"
+                aria-required
                 {...form.register("name")}
               />
               <FieldError message={errors.name?.message} />
@@ -340,7 +343,9 @@ export function CompanyProfileForm({
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="company-currency">Currency</Label>
+              <Label htmlFor="company-currency" required>
+                Currency
+              </Label>
               <Controller
                 name="currency"
                 control={form.control}
@@ -357,6 +362,7 @@ export function CompanyProfileForm({
                       id="company-currency"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -377,7 +383,9 @@ export function CompanyProfileForm({
               <FieldError message={errors.currency?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="company-timezone">Time zone</Label>
+              <Label htmlFor="company-timezone" required>
+                Time zone
+              </Label>
               <Controller
                 name="timezone"
                 control={form.control}
@@ -394,6 +402,7 @@ export function CompanyProfileForm({
                       id="company-timezone"
                       size="lg"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>

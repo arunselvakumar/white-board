@@ -97,13 +97,16 @@ export function EmailSignInForm({
       noValidate
     >
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" required>
+          Email
+        </Label>
         <Input
           id="email"
           type="email"
           autoComplete="email"
           placeholder="example@example.com"
           className="h-10"
+          aria-required
           {...form.register("email")}
         />
         <FieldError
@@ -115,7 +118,9 @@ export function EmailSignInForm({
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" required>
+            Password
+          </Label>
           <Link
             href="/forgot-password"
             className="text-primary text-sm underline-offset-4 hover:underline"
@@ -127,6 +132,7 @@ export function EmailSignInForm({
           id="password"
           autoComplete="current-password"
           placeholder="Your password"
+          aria-required
           {...form.register("password")}
         />
         <FieldError message={form.formState.errors.password?.message} />

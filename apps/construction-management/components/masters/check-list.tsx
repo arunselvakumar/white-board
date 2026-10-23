@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Checkbox } from "@repo/ui/components/checkbox";
+import { RequiredIndicator } from "@repo/ui/components/label";
 import { cn } from "@repo/ui/lib/utils";
 
 export type CheckListOption = {
@@ -18,6 +19,7 @@ export type CheckListOption = {
 export function CheckList({
   legend,
   legendHidden = false,
+  required = false,
   idPrefix,
   options,
   value,
@@ -27,6 +29,8 @@ export function CheckList({
   legend: string;
   /** The legend names the group for screen readers only. */
   legendHidden?: boolean;
+  /** At least one must be ticked: a red asterisk after the legend. */
+  required?: boolean;
   /** Makes the checkbox ids unique on the page. */
   idPrefix: string;
   options: readonly CheckListOption[];
@@ -52,6 +56,7 @@ export function CheckList({
         className={cn("text-sm font-medium", legendHidden ? "sr-only" : "mb-2")}
       >
         {legend}
+        {required ? <RequiredIndicator /> : null}
       </legend>
       <ul className="bg-card divide-y rounded-xl border">
         {options.map((option) => {

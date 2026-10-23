@@ -97,11 +97,14 @@ function RejectDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="reject-reason">Reason</Label>
+          <Label htmlFor="reject-reason" required>
+            Reason
+          </Label>
           <Textarea
             id="reject-reason"
             rows={3}
             value={reason}
+            aria-required
             aria-invalid={error != null}
             onChange={(event) => {
               setReason(event.target.value);
@@ -173,10 +176,13 @@ function DeliverDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-1.5">
-          <Label htmlFor="delivered-on">Delivered on</Label>
+          <Label htmlFor="delivered-on" required>
+            Delivered on
+          </Label>
           <Input
             id="delivered-on"
             type="date"
+            aria-required
             min={transfer.transferDate}
             max={localToday()}
             value={deliveredOn}

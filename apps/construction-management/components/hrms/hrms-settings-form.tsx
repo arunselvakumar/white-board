@@ -11,7 +11,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -336,13 +336,17 @@ export function HrmsSettingsForm() {
             hint="How check-in works and what counts as a full day."
           >
             <fieldset className="space-y-3">
-              <legend className="text-sm font-medium">GPS check-in</legend>
+              <legend className="text-sm font-medium">
+                GPS check-in
+                <RequiredIndicator />
+              </legend>
               <Controller
                 name="gpsRequirement"
                 control={form.control}
                 render={({ field }) => (
                   <RadioGroup
                     aria-label="GPS check-in"
+                    aria-required
                     value={field.value}
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -378,10 +382,13 @@ export function HrmsSettingsForm() {
 
             <div className="grid gap-6 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor="hrms-grace-minutes">Grace period</Label>
+                <Label htmlFor="hrms-grace-minutes" required>
+                  Grace period
+                </Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="hrms-grace-minutes"
+                    aria-required
                     inputMode="numeric"
                     className="h-10 w-24"
                     aria-describedby="hrms-grace-minutes-hint"
@@ -397,12 +404,13 @@ export function HrmsSettingsForm() {
                 <FieldError message={errors.graceMinutes?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="hrms-working-hours">
+                <Label htmlFor="hrms-working-hours" required>
                   Working hours per day
                 </Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="hrms-working-hours"
+                    aria-required
                     inputMode="decimal"
                     className="h-10 w-24"
                     aria-describedby="hrms-working-hours-hint"
@@ -417,10 +425,13 @@ export function HrmsSettingsForm() {
                 <FieldError message={errors.workingHoursPerDay?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="hrms-half-day-hours">Half-day hours</Label>
+                <Label htmlFor="hrms-half-day-hours" required>
+                  Half-day hours
+                </Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="hrms-half-day-hours"
+                    aria-required
                     inputMode="decimal"
                     className="h-10 w-24"
                     aria-describedby="hrms-half-day-hours-hint"
@@ -436,15 +447,24 @@ export function HrmsSettingsForm() {
               </div>
             </div>
 
-            <fieldset className="space-y-1.5">
-              <legend className="text-sm font-medium">Working days</legend>
+            <fieldset
+              className="space-y-1.5"
+              aria-describedby="hrms-working-days-required"
+            >
+              <legend className="text-sm font-medium">
+                Working days
+                <RequiredIndicator />
+              </legend>
+              <span id="hrms-working-days-required" className="sr-only">
+                Choose at least one day.
+              </span>
               <Controller
                 name="workingDays"
                 control={form.control}
                 render={({ field }) => (
                   <ToggleGroup
                     multiple
-                    aria-describedby="hrms-working-days-hint"
+                    aria-describedby="hrms-working-days-required hrms-working-days-hint"
                     value={field.value.map(String)}
                     onValueChange={(value: string[]) => {
                       field.onChange(value.map(Number).sort((a, b) => a - b));
@@ -480,7 +500,9 @@ export function HrmsSettingsForm() {
           >
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="hrms-approval-levels">Approval levels</Label>
+                <Label htmlFor="hrms-approval-levels" required>
+                  Approval levels
+                </Label>
                 <Controller
                   name="leaveApprovalLevels"
                   control={form.control}
@@ -494,6 +516,7 @@ export function HrmsSettingsForm() {
                     >
                       <SelectTrigger
                         id="hrms-approval-levels"
+                        aria-required
                         size="lg"
                         className="w-full min-w-0"
                         aria-describedby="hrms-approval-levels-hint"
@@ -522,13 +545,17 @@ export function HrmsSettingsForm() {
               </div>
 
               <fieldset className="space-y-1.5">
-                <legend className="text-sm font-medium">Leave year</legend>
+                <legend className="text-sm font-medium">
+                  Leave year
+                  <RequiredIndicator />
+                </legend>
                 <Controller
                   name="leaveYear"
                   control={form.control}
                   render={({ field }) => (
                     <RadioGroup
                       aria-label="Leave year"
+                      aria-required
                       value={field.value}
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -576,12 +603,13 @@ export function HrmsSettingsForm() {
               />
               {carryForwardEnabled && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="hrms-carry-forward-max">
+                  <Label htmlFor="hrms-carry-forward-max" required>
                     Most days carried forward
                   </Label>
                   <div className="flex items-center gap-2">
                     <Input
                       id="hrms-carry-forward-max"
+                      aria-required
                       inputMode="decimal"
                       className="h-10 w-24"
                       aria-describedby="hrms-carry-forward-max-hint"
@@ -635,7 +663,9 @@ export function HrmsSettingsForm() {
               />
               {autoSalaryCalculation && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="hrms-salary-day">Day of the month</Label>
+                  <Label htmlFor="hrms-salary-day" required>
+                    Day of the month
+                  </Label>
                   <Controller
                     name="salaryCalculationDay"
                     control={form.control}
@@ -649,6 +679,7 @@ export function HrmsSettingsForm() {
                       >
                         <SelectTrigger
                           id="hrms-salary-day"
+                          aria-required
                           size="lg"
                           className="w-32"
                           aria-describedby="hrms-salary-day-hint"

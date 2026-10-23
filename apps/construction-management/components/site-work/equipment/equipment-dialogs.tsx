@@ -197,6 +197,7 @@ export function TransferDialog({
             render={({ field }) => (
               <RadioGroup
                 aria-label="Transfer to"
+                aria-required
                 value={field.value}
                 onValueChange={(value) => {
                   field.onChange(value as TransferValues["kind"]);
@@ -224,10 +225,13 @@ export function TransferDialog({
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="transfer-date">Transfer Date</Label>
+              <Label htmlFor="transfer-date" required>
+                Transfer Date
+              </Label>
               <Input
                 id="transfer-date"
                 type="date"
+                aria-required
                 min={lastMovement}
                 max={localToday()}
                 aria-invalid={errors.movementDate != null}
@@ -237,7 +241,9 @@ export function TransferDialog({
             </div>
             {kind === "to_project" && (
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor="transfer-project">Destination Project</Label>
+                <Label htmlFor="transfer-project" required>
+                  Destination Project
+                </Label>
                 <Controller
                   control={form.control}
                   name="toProjectId"
@@ -252,6 +258,7 @@ export function TransferDialog({
                       <SelectTrigger
                         id="transfer-project"
                         className="w-full min-w-0"
+                        aria-required
                         aria-invalid={errors.toProjectId != null}
                       >
                         <SelectValue placeholder="Choose a Project" />
@@ -270,10 +277,13 @@ export function TransferDialog({
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="transfer-location">Location Name</Label>
+              <Label htmlFor="transfer-location" required>
+                Location Name
+              </Label>
               <Input
                 id="transfer-location"
                 autoComplete="off"
+                aria-required
                 placeholder={
                   kind === "to_project" ? "Block C yard" : "Ambattur godown"
                 }
@@ -443,7 +453,9 @@ export function MaintenanceDialog({
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="maintenance-kind">Kind</Label>
+              <Label htmlFor="maintenance-kind" required>
+                Kind
+              </Label>
               <Controller
                 control={form.control}
                 name="kind"
@@ -458,6 +470,7 @@ export function MaintenanceDialog({
                     <SelectTrigger
                       id="maintenance-kind"
                       className="w-full min-w-0"
+                      aria-required
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -473,10 +486,13 @@ export function MaintenanceDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="maintenance-start">Start Date</Label>
+              <Label htmlFor="maintenance-start" required>
+                Start Date
+              </Label>
               <Input
                 id="maintenance-start"
                 type="date"
+                aria-required
                 max={localToday()}
                 aria-invalid={errors.startDate != null}
                 {...form.register("startDate")}
@@ -485,10 +501,13 @@ export function MaintenanceDialog({
             </div>
             {closed && (
               <div className="space-y-1.5">
-                <Label htmlFor="maintenance-end">Returned on</Label>
+                <Label htmlFor="maintenance-end" required>
+                  Returned on
+                </Label>
                 <Input
                   id="maintenance-end"
                   type="date"
+                  aria-required
                   max={localToday()}
                   aria-invalid={errors.endDate != null}
                   {...form.register("endDate")}
@@ -637,10 +656,13 @@ export function ReturnToServiceDialog({
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="return-date">Returned on</Label>
+              <Label htmlFor="return-date" required>
+                Returned on
+              </Label>
               <Input
                 id="return-date"
                 type="date"
+                aria-required
                 min={entry.startDate}
                 max={localToday()}
                 aria-invalid={errors.endDate != null}

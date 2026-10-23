@@ -146,11 +146,14 @@ export function MeasurementUnitDialog({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="unit-name">Unit name</Label>
+        <Label htmlFor="unit-name" required>
+          Unit name
+        </Label>
         <Input
           id="unit-name"
           className="h-10"
           autoComplete="off"
+          aria-required
           placeholder="Running metre"
           aria-invalid={errors.name != null}
           {...form.register("name")}
@@ -249,11 +252,14 @@ export function MaterialCategoryDialog({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="category-name">Category name</Label>
+        <Label htmlFor="category-name" required>
+          Category name
+        </Label>
         <Input
           id="category-name"
           className="h-10"
           autoComplete="off"
+          aria-required
           placeholder="Cement"
           aria-invalid={errors.name != null}
           {...form.register("name")}
@@ -371,11 +377,14 @@ export function TermsConditionDialog({
       }}
     >
       <div className="space-y-1.5">
-        <Label htmlFor="terms-title">Title</Label>
+        <Label htmlFor="terms-title" required>
+          Title
+        </Label>
         <Input
           id="terms-title"
           className="h-10"
           autoComplete="off"
+          aria-required
           placeholder="Delivery"
           aria-invalid={errors.title != null}
           {...form.register("title")}
@@ -383,10 +392,13 @@ export function TermsConditionDialog({
         <FieldError message={errors.title?.message} />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="terms-body">Terms</Label>
+        <Label htmlFor="terms-body" required>
+          Terms
+        </Label>
         <Textarea
           id="terms-body"
           rows={6}
+          aria-required
           placeholder="Material to be delivered at site between 9 am and 6 pm. Unloading at the supplier's cost."
           aria-invalid={errors.body != null}
           {...form.register("body")}

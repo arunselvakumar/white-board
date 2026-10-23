@@ -414,11 +414,14 @@ function ProjectForm({
             />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="project-name">Project name</Label>
+            <Label htmlFor="project-name" required>
+              Project name
+            </Label>
             <Input
               id="project-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder="Anugraha Residency"
               aria-invalid={errors.name != null}
               {...form.register("name")}
@@ -426,7 +429,9 @@ function ProjectForm({
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="project-type">Project Type</Label>
+            <Label htmlFor="project-type" required={project == null}>
+              Project Type
+            </Label>
             <Controller
               name="projectType"
               control={form.control}
@@ -443,6 +448,7 @@ function ProjectForm({
                     ref={field.ref}
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required={project == null}
                     aria-invalid={errors.projectType != null}
                     aria-describedby="project-type-hint"
                   >
@@ -472,7 +478,9 @@ function ProjectForm({
             <FieldError message={errors.projectType?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="project-status">Status</Label>
+            <Label htmlFor="project-status" required>
+              Status
+            </Label>
             <Controller
               name="status"
               control={form.control}
@@ -489,6 +497,7 @@ function ProjectForm({
                     ref={field.ref}
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.status != null}
                   >
                     <SelectValue />

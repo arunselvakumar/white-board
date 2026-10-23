@@ -108,11 +108,14 @@ export function NameDialog({
             )}
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="structure-name">{label}</Label>
+            <Label htmlFor="structure-name" required>
+              {label}
+            </Label>
             <Input
               id="structure-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder={placeholder}
               aria-invalid={errors.name != null}
               {...form.register("name")}

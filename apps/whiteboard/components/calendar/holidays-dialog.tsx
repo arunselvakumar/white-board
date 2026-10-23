@@ -172,9 +172,12 @@ export function HolidaysDialog({
           <h3 className="font-medium">Declare a Holiday</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="holiday-start">First day</Label>
+              <Label htmlFor="holiday-start" required>
+                First day
+              </Label>
               <Input
                 id="holiday-start"
+                aria-required
                 type="date"
                 min={today}
                 aria-invalid={errors.startDate != null}
@@ -187,9 +190,12 @@ export function HolidaysDialog({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="holiday-end">Last day</Label>
+              <Label htmlFor="holiday-end" required>
+                Last day
+              </Label>
               <Input
                 id="holiday-end"
+                aria-required
                 type="date"
                 min={today}
                 aria-invalid={errors.endDate != null}

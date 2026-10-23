@@ -120,6 +120,8 @@ export function RowTimes({
     const message = issues[field];
     return message == null ? [] : [{ field, message }];
   });
+  // A check-out needs a check-in (ADR CM-0011).
+  const checkInRequired = draft.checkOut.trim() !== "";
   const described = (field: TimesField) =>
     issues[field] == null ? undefined : `${id(field)}-error`;
 
@@ -130,13 +132,18 @@ export function RowTimes({
       className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4.5rem] gap-x-2 gap-y-1.5 lg:flex lg:flex-wrap lg:items-end lg:gap-x-3"
     >
       <div className="min-w-0 space-y-1">
-        <Label htmlFor={id("checkIn")} className="text-xs">
+        <Label
+          htmlFor={id("checkIn")}
+          className="text-xs"
+          required={checkInRequired}
+        >
           In
         </Label>
         <Input
           id={id("checkIn")}
           type="time"
           aria-label={`${row.name} check-in`}
+          aria-required={checkInRequired}
           aria-invalid={issues.checkIn != null}
           aria-describedby={described("checkIn")}
           className={TIME_INPUT}

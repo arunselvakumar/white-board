@@ -327,7 +327,9 @@ function ConvertEnquiryForm({
     >
       <FormAlert message={errors.root?.message} />
       <div className="space-y-1.5">
-        <Label htmlFor="convert-batch">Batch</Label>
+        <Label htmlFor="convert-batch" required>
+          Batch
+        </Label>
         <Controller
           name="batchId"
           control={control}
@@ -351,6 +353,7 @@ function ConvertEnquiryForm({
             >
               <SelectTrigger
                 id="convert-batch"
+                aria-required
                 size="lg"
                 className="w-full min-w-0"
                 aria-invalid={errors.batchId != null}
@@ -394,7 +397,9 @@ function ConvertEnquiryForm({
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="convert-timing-source">Timings</Label>
+          <Label htmlFor="convert-timing-source" required>
+            Timings
+          </Label>
           <Controller
             name="timingSource"
             control={control}
@@ -409,6 +414,7 @@ function ConvertEnquiryForm({
               >
                 <SelectTrigger
                   id="convert-timing-source"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                 >
@@ -426,7 +432,9 @@ function ConvertEnquiryForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="convert-class-mode">Class Mode</Label>
+          <Label htmlFor="convert-class-mode" required>
+            Class Mode
+          </Label>
           <Controller
             name="classModeOverride"
             control={control}
@@ -441,6 +449,7 @@ function ConvertEnquiryForm({
               >
                 <SelectTrigger
                   id="convert-class-mode"
+                  aria-required
                   size="lg"
                   className="w-full min-w-0"
                 >

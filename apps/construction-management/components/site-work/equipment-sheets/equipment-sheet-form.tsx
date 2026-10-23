@@ -19,7 +19,7 @@ import {
 } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup } from "@repo/ui/components/radio-group";
 import {
   Select,
@@ -402,6 +402,7 @@ function SelectField({
   placeholder,
   error,
   disabled,
+  required = false,
   onChange,
 }: {
   id: string;
@@ -411,11 +412,14 @@ function SelectField({
   placeholder: string;
   error: string | undefined;
   disabled?: boolean;
+  required?: boolean;
   onChange: (value: string) => void;
 }) {
   return (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       <Select
         items={options}
         value={value === "" ? null : value}
@@ -427,6 +431,7 @@ function SelectField({
         <SelectTrigger
           id={id}
           className="w-full min-w-0"
+          aria-required={required}
           aria-invalid={error != null}
         >
           <SelectValue placeholder={placeholder} />
@@ -447,11 +452,14 @@ function SelectField({
 function Section({
   id,
   title,
+  required = false,
   children,
   aside,
 }: {
   id: string;
   title: string;
+  /** The section is one required choice (the Equipment picker). */
+  required?: boolean;
   children: ReactNode;
   aside?: ReactNode;
 }) {
@@ -460,6 +468,7 @@ function Section({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 id={id} className="text-sm font-semibold">
           {title}
+          {required ? <RequiredIndicator /> : null}
         </h3>
         {aside}
       </div>
@@ -826,7 +835,7 @@ export function EquipmentSheetForm({
   );
 
   const picker = !editing && (
-    <Section id={id("equipment-heading")} title="Equipment">
+    <Section id={id("equipment-heading")} title="Equipment" required>
       {sheetOptions == null ? (
         <p className="text-muted-foreground text-sm" aria-busy="true">
           Finding the equipment free on this date…
@@ -843,6 +852,7 @@ export function EquipmentSheetForm({
           render={({ field }) => (
             <RadioGroup
               aria-label="Equipment"
+              aria-required
               value={field.value === "" ? null : field.value}
               onValueChange={(value) => {
                 field.onChange(value as string);
@@ -963,25 +973,31 @@ export function EquipmentSheetForm({
                     className="grid grid-cols-[1fr_1fr_auto] items-end gap-2 sm:grid-cols-[8rem_8rem_6rem_auto]"
                   >
                     <div className="space-y-1.5">
-                      <Label htmlFor={rowId("start")}>Start</Label>
+                      <Label htmlFor={rowId("start")} required>
+                        Start
+                      </Label>
                       <Input
                         id={rowId("start")}
                         placeholder="08:00"
                         inputMode="numeric"
                         autoComplete="off"
                         maxLength={5}
+                        aria-required
                         aria-invalid={rowError != null}
                         {...form.register(`timeShifts.${index}.startTime`)}
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor={rowId("end")}>End</Label>
+                      <Label htmlFor={rowId("end")} required>
+                        End
+                      </Label>
                       <Input
                         id={rowId("end")}
                         placeholder="17:30"
                         inputMode="numeric"
                         autoComplete="off"
                         maxLength={5}
+                        aria-required
                         aria-invalid={rowError != null}
                         {...form.register(`timeShifts.${index}.endTime`)}
                       />
@@ -1037,22 +1053,28 @@ export function EquipmentSheetForm({
           <div className="space-y-2">
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor={id("opening")}>Opening reading</Label>
+                <Label htmlFor={id("opening")} required>
+                  Opening reading
+                </Label>
                 <Input
                   id={id("opening")}
                   inputMode="decimal"
                   autoComplete="off"
+                  aria-required
                   aria-invalid={errors.openingReading != null}
                   {...form.register("openingReading")}
                 />
                 <FieldError message={errors.openingReading?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={id("closing")}>Closing reading</Label>
+                <Label htmlFor={id("closing")} required>
+                  Closing reading
+                </Label>
                 <Input
                   id={id("closing")}
                   inputMode="decimal"
                   autoComplete="off"
+                  aria-required
                   aria-invalid={errors.closingReading != null}
                   {...form.register("closingReading")}
                 />
@@ -1094,11 +1116,14 @@ export function EquipmentSheetForm({
         <div className="grid gap-4 sm:grid-cols-3">
           {typesHours(machine, settings) && (
             <div className="space-y-1.5">
-              <Label htmlFor={id("usage-hours")}>Usage hours</Label>
+              <Label htmlFor={id("usage-hours")} required>
+                Usage hours
+              </Label>
               <Input
                 id={id("usage-hours")}
                 inputMode="decimal"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.usageHours != null}
                 {...form.register("usageHours")}
               />
@@ -1107,11 +1132,14 @@ export function EquipmentSheetForm({
           )}
           {typesDistance(machine, settings) && (
             <div className="space-y-1.5">
-              <Label htmlFor={id("distance")}>Distance (km)</Label>
+              <Label htmlFor={id("distance")} required>
+                Distance (km)
+              </Label>
               <Input
                 id={id("distance")}
                 inputMode="decimal"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.distanceKm != null}
                 {...form.register("distanceKm")}
               />
@@ -1120,11 +1148,14 @@ export function EquipmentSheetForm({
           )}
           {machine.utilisationBasis === "trip" && (
             <div className="space-y-1.5">
-              <Label htmlFor={id("trips")}>Trips</Label>
+              <Label htmlFor={id("trips")} required>
+                Trips
+              </Label>
               <Input
                 id={id("trips")}
                 inputMode="numeric"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.trips != null}
                 {...form.register("trips")}
               />
@@ -1286,6 +1317,7 @@ export function EquipmentSheetForm({
               id={id("approx-unit")}
               label="Unit"
               placeholder="Choose a unit"
+              required={values.approxWorkQty.trim() !== ""}
               value={values.approxWorkUnitId}
               options={unitOptions}
               error={errors.approxWorkUnitId?.message}
@@ -1320,6 +1352,7 @@ export function EquipmentSheetForm({
               id={id("fuel-borne-by")}
               label="Borne by"
               placeholder="Who pays for the fuel"
+              required={values.fuelQty.trim() !== ""}
               value={values.fuelBorneBy}
               options={FUEL_BORNE_BY.map((value) => ({
                 value,
@@ -1450,12 +1483,15 @@ export function EquipmentSheetForm({
                   className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
                 >
                   <div className="min-w-0 space-y-1.5">
-                    <Label htmlFor={lineId("material")}>Material</Label>
+                    <Label htmlFor={lineId("material")} required>
+                      Material
+                    </Label>
                     <Controller
                       control={form.control}
                       name={`materials.${index}.materialId`}
                       render={({ field: control }) => (
                         <MaterialPicker
+                          required
                           id={lineId("material")}
                           value={control.value === "" ? null : control.value}
                           excludeIds={chosen.filter(
@@ -1484,13 +1520,14 @@ export function EquipmentSheetForm({
                     )}
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor={lineId("quantity")}>
+                    <Label htmlFor={lineId("quantity")} required>
                       Used Qty{unit == null ? "" : ` (${unit})`}
                     </Label>
                     <Input
                       id={lineId("quantity")}
                       inputMode="decimal"
                       autoComplete="off"
+                      aria-required
                       aria-invalid={lineErrors?.quantity != null}
                       {...form.register(`materials.${index}.quantity`)}
                     />
@@ -1594,7 +1631,9 @@ export function EquipmentSheetForm({
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor={id("date")}>Sheet Date</Label>
+          <Label htmlFor={id("date")} required>
+            Sheet Date
+          </Label>
           <div className="flex items-center gap-2">
             <Button
               type="button"
@@ -1615,6 +1654,7 @@ export function EquipmentSheetForm({
               type="date"
               max={today}
               className="min-w-0 flex-1"
+              aria-required
               aria-invalid={errors.sheetDate != null}
               {...form.register("sheetDate")}
             />
@@ -1639,6 +1679,7 @@ export function EquipmentSheetForm({
           id={id("shift")}
           label="Work Shift"
           placeholder="Choose the shift"
+          required
           value={values.shift}
           options={WORK_SHIFTS.map((shift) => ({
             value: shift,

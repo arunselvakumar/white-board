@@ -119,10 +119,13 @@ function CloseDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="close-end-date">End date</Label>
+            <Label htmlFor="close-end-date" required>
+              End date
+            </Label>
             <Input
               id="close-end-date"
               type="date"
+              aria-required
               min={hindrance.startDate}
               max={today}
               value={endDate}

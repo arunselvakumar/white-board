@@ -126,6 +126,7 @@ function UnitPicker({
       <SelectTrigger
         id="close-unit"
         className="w-full min-w-0"
+        aria-required
         aria-invalid={invalid}
       >
         <SelectValue placeholder="Choose a unit" />
@@ -259,6 +260,7 @@ export function InquiryCloseDialog({
             render={({ field }) => (
               <RadioGroup
                 aria-label="Outcome"
+                aria-required
                 value={field.value}
                 onValueChange={(value) => {
                   field.onChange(value);
@@ -291,7 +293,9 @@ export function InquiryCloseDialog({
           {outcome === "converted" ? (
             <div className="grid min-w-0 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="close-unit">Unit</Label>
+                <Label htmlFor="close-unit" required>
+                  Unit
+                </Label>
                 <Suspense
                   fallback={
                     <SelectControlSkeleton
@@ -316,11 +320,14 @@ export function InquiryCloseDialog({
                 <FieldError message={errors.unitId?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="close-booking-date">Booking Date</Label>
+                <Label htmlFor="close-booking-date" required>
+                  Booking Date
+                </Label>
                 <Input
                   id="close-booking-date"
                   type="date"
                   max={today}
+                  aria-required
                   aria-invalid={errors.bookingDate != null}
                   {...form.register("bookingDate")}
                 />
@@ -330,12 +337,15 @@ export function InquiryCloseDialog({
           ) : (
             <div className="grid min-w-0 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="close-lost-reason">Lost Reason</Label>
+                <Label htmlFor="close-lost-reason" required>
+                  Lost Reason
+                </Label>
                 <Controller
                   control={form.control}
                   name="lostReasonId"
                   render={({ field }) => (
                     <InquirySelect
+                      required
                       id="close-lost-reason"
                       value={field.value}
                       onChange={field.onChange}

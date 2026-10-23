@@ -314,6 +314,7 @@ function SelectField({
   invalid,
   error,
   disabled,
+  required = false,
   onChange,
 }: {
   id: string;
@@ -324,11 +325,14 @@ function SelectField({
   invalid: boolean;
   error: string | undefined;
   disabled?: boolean;
+  required?: boolean;
   onChange: (value: string) => void;
 }) {
   return (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       <Select
         items={options}
         value={value === "" ? null : value}
@@ -340,6 +344,7 @@ function SelectField({
         <SelectTrigger
           id={id}
           className="w-full min-w-0"
+          aria-required={required}
           aria-invalid={invalid}
         >
           <SelectValue placeholder={placeholder} />
@@ -570,6 +575,13 @@ export function WorksheetForm({
 
   const busy = form.formState.isSubmitting;
   const id = (name: string) => `worksheet-${name}`;
+  // One of the headcounts must be more than 0: Skilled is marked while
+  // Unskilled has none.
+  const hasHeadcount = (raw: string) =>
+    COUNT_PATTERN.test(raw.trim()) && Number(raw.trim()) > 0;
+  const labourRequired = !hasHeadcount(values.unskilledCount);
+  // A quantity of work done needs its unit.
+  const approxUnitRequired = values.approxWorkQty.trim() !== "";
 
   const sections: Record<WorksheetSection, ReactNode> = {
     location: settings.showLocation ? (
@@ -621,6 +633,7 @@ export function WorksheetForm({
             id={id("contractor")}
             label="Contractor"
             placeholder="Choose a Contractor"
+            required
             value={values.contractorId}
             options={contractors.map((row) => ({
               value: row.id,
@@ -642,6 +655,7 @@ export function WorksheetForm({
           <SelectField
             id={id("department")}
             label="Department"
+            required
             placeholder={
               values.contractorId === ""
                 ? "Choose the Contractor first"
@@ -694,6 +708,7 @@ export function WorksheetForm({
             id={id("shift")}
             label="Work Shift"
             placeholder="Choose the shift"
+            required
             value={values.shift}
             options={WORK_SHIFTS.map((shift) => ({
               value: shift,
@@ -710,11 +725,14 @@ export function WorksheetForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid grid-cols-2 gap-3 self-start">
               <div className="space-y-1.5">
-                <Label htmlFor={id("skilled")}>Skilled Labours</Label>
+                <Label htmlFor={id("skilled")} required={labourRequired}>
+                  Skilled Labours
+                </Label>
                 <Input
                   id={id("skilled")}
                   inputMode="numeric"
                   autoComplete="off"
+                  aria-required={labourRequired}
                   aria-invalid={errors.skilledCount != null}
                   {...form.register("skilledCount")}
                 />
@@ -772,6 +790,7 @@ export function WorksheetForm({
               id={id("approx-unit")}
               label="Unit"
               placeholder="Choose a unit"
+              required={approxUnitRequired}
               value={values.approxWorkUnitId}
               options={units.map((row) => ({ value: row.id, label: row.name }))}
               invalid={errors.approxWorkUnitId != null}
@@ -855,12 +874,15 @@ export function WorksheetForm({
                   className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
                 >
                   <div className="min-w-0 space-y-1.5">
-                    <Label htmlFor={lineId("material")}>Material</Label>
+                    <Label htmlFor={lineId("material")} required>
+                      Material
+                    </Label>
                     <Controller
                       control={form.control}
                       name={`materials.${index}.materialId`}
                       render={({ field: control }) => (
                         <MaterialPicker
+                          required
                           id={lineId("material")}
                           value={control.value === "" ? null : control.value}
                           excludeIds={chosen.filter(
@@ -889,13 +911,14 @@ export function WorksheetForm({
                     )}
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor={lineId("quantity")}>
+                    <Label htmlFor={lineId("quantity")} required>
                       Used Qty{unit == null ? "" : ` (${unit})`}
                     </Label>
                     <Input
                       id={lineId("quantity")}
                       inputMode="decimal"
                       autoComplete="off"
+                      aria-required
                       aria-invalid={lineErrors?.quantity != null}
                       {...form.register(`materials.${index}.quantity`)}
                     />
@@ -1030,7 +1053,9 @@ export function WorksheetForm({
         </p>
       )}
       <div className="max-w-sm space-y-1.5">
-        <Label htmlFor={id("date")}>Sheet Date</Label>
+        <Label htmlFor={id("date")} required>
+          Sheet Date
+        </Label>
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -1051,6 +1076,7 @@ export function WorksheetForm({
             type="date"
             max={today}
             className="min-w-0 flex-1"
+            aria-required
             aria-invalid={errors.sheetDate != null}
             {...form.register("sheetDate")}
           />

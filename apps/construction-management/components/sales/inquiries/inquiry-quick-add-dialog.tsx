@@ -202,10 +202,13 @@ export function InquiryQuickAddDialog({
           </DialogHeader>
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="quick-name">Name</Label>
+              <Label htmlFor="quick-name" required>
+                Name
+              </Label>
               <Input
                 id="quick-name"
                 autoComplete="off"
+                aria-required
                 aria-invalid={errors.name != null}
                 {...form.register("name")}
               />

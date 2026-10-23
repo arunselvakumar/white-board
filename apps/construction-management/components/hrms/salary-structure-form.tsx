@@ -460,9 +460,12 @@ function SalaryStructureForm({
           hint="What this structure is for. Members get it on the Employees screen."
         >
           <div className="space-y-1.5">
-            <Label htmlFor="salary-structure-name">Name</Label>
+            <Label htmlFor="salary-structure-name" required>
+              Name
+            </Label>
             <Input
               id="salary-structure-name"
+              aria-required
               className="h-10"
               placeholder="Site staff"
               aria-invalid={errors.name != null}
@@ -584,12 +587,14 @@ function SalaryStructureForm({
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`deduction-${String(index)}-name`}
+                        required
                         className="sm:sr-only"
                       >
                         Deduction {index + 1} name
                       </Label>
                       <Input
                         id={`deduction-${String(index)}-name`}
+                        aria-required
                         className="h-10"
                         placeholder="Canteen"
                         aria-invalid={
@@ -604,12 +609,14 @@ function SalaryStructureForm({
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`deduction-${String(index)}-amount`}
+                        required
                         className="sm:sr-only"
                       >
                         Deduction {index + 1} amount
                       </Label>
                       <MoneyInput
                         id={`deduction-${String(index)}-amount`}
+                        aria-required
                         aria-invalid={
                           errors.otherDeductions?.[index]?.amount != null
                         }
@@ -703,9 +710,12 @@ function ComponentRow({
     <li className="space-y-3 rounded-lg border p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor={`${prefix}-name`}>Component name</Label>
+          <Label htmlFor={`${prefix}-name`} required>
+            Component name
+          </Label>
           <Input
             id={`${prefix}-name`}
+            aria-required
             className="h-10"
             placeholder="Basic"
             aria-invalid={errors?.name != null}
@@ -723,7 +733,9 @@ function ComponentRow({
         ) : (
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor={`${prefix}-basis`}>Worked out as</Label>
+              <Label htmlFor={`${prefix}-basis`} required>
+                Worked out as
+              </Label>
               <Controller
                 name={`components.${index}.basis`}
                 control={form.control}
@@ -737,6 +749,7 @@ function ComponentRow({
                   >
                     <SelectTrigger
                       id={`${prefix}-basis`}
+                      aria-required
                       size="lg"
                       className="w-full min-w-0"
                     >
@@ -759,9 +772,12 @@ function ComponentRow({
             </div>
             {basis === "fixed" ? (
               <div className="space-y-1.5">
-                <Label htmlFor={`${prefix}-amount`}>Amount</Label>
+                <Label htmlFor={`${prefix}-amount`} required>
+                  Amount
+                </Label>
                 <MoneyInput
                   id={`${prefix}-amount`}
+                  aria-required
                   aria-invalid={errors?.amount != null}
                   {...form.register(`components.${index}.amount`)}
                 />
@@ -769,9 +785,12 @@ function ComponentRow({
               </div>
             ) : (
               <div className="space-y-1.5">
-                <Label htmlFor={`${prefix}-percent`}>Percent</Label>
+                <Label htmlFor={`${prefix}-percent`} required>
+                  Percent
+                </Label>
                 <PercentInput
                   id={`${prefix}-percent`}
+                  aria-required
                   invalid={errors?.percent != null}
                   {...form.register(`components.${index}.percent`)}
                 />

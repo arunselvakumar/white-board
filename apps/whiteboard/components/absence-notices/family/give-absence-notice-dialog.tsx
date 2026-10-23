@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import { Label } from "@repo/ui/components/label";
+import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -233,8 +233,17 @@ function GiveAbsenceNoticeForm({
       onSubmit={handleSubmit(submit)}
       aria-label="Give absence notice"
     >
-      <fieldset className="min-w-0 space-y-2">
-        <legend className="text-sm font-medium">Classes</legend>
+      <fieldset
+        className="min-w-0 space-y-2"
+        aria-describedby="absence-classes-hint"
+      >
+        <legend className="text-sm font-medium">
+          Classes
+          <RequiredIndicator />
+        </legend>
+        <span id="absence-classes-hint" className="sr-only">
+          Choose at least one Class.
+        </span>
         {classesQuery.isPending ? (
           <div className="space-y-2" aria-busy="true">
             <Skeleton className="h-10 w-full" />
@@ -278,7 +287,9 @@ function GiveAbsenceNoticeForm({
       </fieldset>
 
       <div className="space-y-1.5">
-        <Label htmlFor={`absence-reason-${student.id}`}>Reason</Label>
+        <Label htmlFor={`absence-reason-${student.id}`} required>
+          Reason
+        </Label>
         <Controller
           name="reason"
           control={control}
@@ -292,6 +303,7 @@ function GiveAbsenceNoticeForm({
             >
               <SelectTrigger
                 id={`absence-reason-${student.id}`}
+                aria-required
                 className="w-full"
                 aria-invalid={errors.reason != null}
               >

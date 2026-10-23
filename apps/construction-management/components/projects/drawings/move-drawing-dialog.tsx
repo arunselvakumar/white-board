@@ -97,7 +97,9 @@ function MoveDrawingForm({
         </p>
       ) : (
         <div className="space-y-1.5">
-          <Label htmlFor="move-drawing-album">Album</Label>
+          <Label htmlFor="move-drawing-album" required>
+            Album
+          </Label>
           <Controller
             name="albumId"
             control={form.control}
@@ -113,6 +115,7 @@ function MoveDrawingForm({
                   id="move-drawing-album"
                   size="lg"
                   className="w-full min-w-0"
+                  aria-required
                   aria-invalid={errors.albumId != null}
                 >
                   <SelectValue placeholder="Choose an album" />

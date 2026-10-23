@@ -56,6 +56,7 @@ function PartySelect({
   value,
   onChange,
   invalid,
+  required,
 }: {
   id: string;
   kind: CounterpartyKindModel;
@@ -63,6 +64,7 @@ function PartySelect({
   value: CounterpartyValue;
   onChange: (value: CounterpartyValue) => void;
   invalid: boolean;
+  required: boolean;
 }) {
   const query = useQuery(counterpartyOptionsQuery(kind, projectId));
   if (query.isPending) return <SelectControlSkeleton label="Loading parties" />;
@@ -86,6 +88,7 @@ function PartySelect({
         size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
+        aria-required={required}
       >
         <SelectValue
           placeholder={
@@ -121,6 +124,7 @@ export function CounterpartyField({
   onChange,
   projectId,
   invalid = false,
+  required = false,
   kinds,
 }: {
   id: string;
@@ -128,6 +132,8 @@ export function CounterpartyField({
   onChange: (value: CounterpartyValue) => void;
   projectId: string | null;
   invalid?: boolean;
+  /** Sets `aria-required` on the name or party control. */
+  required?: boolean;
   /** Limit the kinds offered (all by default). */
   kinds?: readonly CounterpartyKindModel[];
 }) {
@@ -182,6 +188,7 @@ export function CounterpartyField({
           maxLength={200}
           placeholder="Name"
           aria-invalid={invalid}
+          aria-required={required}
           onChange={(event) => {
             onChange({ kind: null, id: null, name: event.target.value });
           }}
@@ -194,6 +201,7 @@ export function CounterpartyField({
           value={value}
           onChange={onChange}
           invalid={invalid}
+          required={required}
         />
       )}
     </div>

@@ -105,9 +105,12 @@ function RejectDialog({ item, onClose }: { item: Item; onClose: () => void }) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="attendance-reject-reason">Reason</Label>
+            <Label htmlFor="attendance-reject-reason" required>
+              Reason
+            </Label>
             <Textarea
               id="attendance-reject-reason"
+              aria-required
               rows={3}
               aria-invalid={errors.reason != null}
               {...form.register("reason")}

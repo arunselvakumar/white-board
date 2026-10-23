@@ -120,9 +120,12 @@ export function FenceMapPicker({
       </p>
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="fence-latitude">Latitude</Label>
+          <Label htmlFor="fence-latitude" required>
+            Latitude
+          </Label>
           <Input
             id="fence-latitude"
+            aria-required
             inputMode="decimal"
             className="h-10"
             placeholder="13.082700"
@@ -135,9 +138,12 @@ export function FenceMapPicker({
           <FieldError message={errors.latitude} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="fence-longitude">Longitude</Label>
+          <Label htmlFor="fence-longitude" required>
+            Longitude
+          </Label>
           <Input
             id="fence-longitude"
+            aria-required
             inputMode="decimal"
             className="h-10"
             placeholder="80.270700"
@@ -150,10 +156,13 @@ export function FenceMapPicker({
           <FieldError message={errors.longitude} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="fence-radius">Radius</Label>
+          <Label htmlFor="fence-radius" required>
+            Radius
+          </Label>
           <div className="flex items-center gap-2">
             <Input
               id="fence-radius"
+              aria-required
               inputMode="numeric"
               className="h-10"
               value={value.radiusMetres}

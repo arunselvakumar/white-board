@@ -220,9 +220,12 @@ export function CourseForm({
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Course details</h2>
         <div className="space-y-1.5">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name" required>
+            Name
+          </Label>
           <Input
             id="name"
+            aria-required
             className="h-10"
             autoComplete="off"
             {...register("name")}
@@ -254,7 +257,9 @@ export function CourseForm({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="durationKind">Duration type</Label>
+          <Label htmlFor="durationKind" required>
+            Duration type
+          </Label>
           <Controller
             name="durationKind"
             control={control}
@@ -266,7 +271,12 @@ export function CourseForm({
                   if (value) field.onChange(value);
                 }}
               >
-                <SelectTrigger id="durationKind" size="lg" className="w-full">
+                <SelectTrigger
+                  id="durationKind"
+                  aria-required
+                  size="lg"
+                  className="w-full"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="start" alignItemWithTrigger={false}>
@@ -283,9 +293,12 @@ export function CourseForm({
         {durationKind === "fixed" ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="durationValue">Expected duration</Label>
+              <Label htmlFor="durationValue" required>
+                Expected duration
+              </Label>
               <Input
                 id="durationValue"
+                aria-required
                 className="h-10"
                 inputMode="numeric"
                 placeholder="3"
@@ -294,7 +307,9 @@ export function CourseForm({
               <FieldError message={errors.durationValue?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="durationUnit">Duration unit</Label>
+              <Label htmlFor="durationUnit" required>
+                Duration unit
+              </Label>
               <Controller
                 name="durationUnit"
                 control={control}
@@ -308,6 +323,7 @@ export function CourseForm({
                   >
                     <SelectTrigger
                       id="durationUnit"
+                      aria-required
                       size="lg"
                       className="w-full"
                     >
@@ -382,9 +398,12 @@ export function CourseForm({
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Fee</h2>
         <div className="space-y-1.5">
-          <Label htmlFor="defaultFeeRupees">Default fee (₹)</Label>
+          <Label htmlFor="defaultFeeRupees" required>
+            Default fee (₹)
+          </Label>
           <Input
             id="defaultFeeRupees"
+            aria-required
             className="h-10"
             inputMode="decimal"
             autoComplete="off"

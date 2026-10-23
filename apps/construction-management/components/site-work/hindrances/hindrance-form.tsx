@@ -160,6 +160,7 @@ function OptionSelect({
   items,
   placeholder,
   invalid,
+  required,
   label,
 }: {
   id: string;
@@ -168,6 +169,7 @@ function OptionSelect({
   items: readonly { value: string; label: string }[];
   placeholder: string;
   invalid?: boolean;
+  required?: boolean;
   label?: string;
 }) {
   return (
@@ -183,6 +185,7 @@ function OptionSelect({
         id={id}
         aria-label={label}
         className="w-full min-w-0"
+        aria-required={required}
         aria-invalid={invalid}
       >
         <SelectValue placeholder={placeholder} />
@@ -285,6 +288,23 @@ export function HindranceForm({
     control: form.control,
     name: "equipmentUsageSheetId",
   });
+  const [signOffUserId, signOffPartyName, signOffPartyRole, signedOn] =
+    useWatch({
+      control: form.control,
+      name: [
+        "signOffUserId",
+        "signOffPartyName",
+        "signOffPartyRole",
+        "signedOn",
+      ],
+    });
+  // Any sign-off field filled makes the other party's name and the date
+  // required, as the schema checks.
+  const signingOff =
+    signOffPartyName.trim() !== "" ||
+    signedOn !== "" ||
+    signOffUserId !== "" ||
+    signOffPartyRole.trim() !== "";
 
   const contractors = options.contractors.map((c) => ({
     value: c.id,
@@ -392,11 +412,14 @@ export function HindranceForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="hindrance-start">Start date</Label>
+          <Label htmlFor="hindrance-start" required>
+            Start date
+          </Label>
           <Input
             id="hindrance-start"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.startDate != null}
             {...form.register("startDate")}
           />
@@ -429,7 +452,9 @@ export function HindranceForm({
           <FieldError message={errors.hoursLost?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="hindrance-cause">Cause</Label>
+          <Label htmlFor="hindrance-cause" required>
+            Cause
+          </Label>
           <Controller
             control={form.control}
             name="cause"
@@ -440,6 +465,7 @@ export function HindranceForm({
                 onChange={field.onChange}
                 placeholder="Choose the cause"
                 invalid={errors.cause != null}
+                required
                 items={HINDRANCE_CAUSES.map((value) => ({
                   value,
                   label: HINDRANCE_CAUSE_LABELS[value],
@@ -450,17 +476,22 @@ export function HindranceForm({
           <FieldError message={errors.cause?.message} />
         </div>
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="hindrance-activity">Affected activity</Label>
+          <Label htmlFor="hindrance-activity" required>
+            Affected activity
+          </Label>
           <Input
             id="hindrance-activity"
             autoComplete="off"
+            aria-required
             aria-invalid={errors.affectedActivity != null}
             {...form.register("affectedActivity")}
           />
           <FieldError message={errors.affectedActivity?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="hindrance-party">Responsible party</Label>
+          <Label htmlFor="hindrance-party" required>
+            Responsible party
+          </Label>
           <Controller
             control={form.control}
             name="responsibleParty"
@@ -471,6 +502,7 @@ export function HindranceForm({
                 onChange={field.onChange}
                 placeholder="Choose the party"
                 invalid={errors.responsibleParty != null}
+                required
                 items={RESPONSIBLE_PARTIES.map((value) => ({
                   value,
                   label: RESPONSIBLE_PARTY_LABELS[value],
@@ -482,7 +514,9 @@ export function HindranceForm({
         </div>
         {party === "contractor" && (
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="hindrance-contractor">Contractor</Label>
+            <Label htmlFor="hindrance-contractor" required>
+              Contractor
+            </Label>
             <Controller
               control={form.control}
               name="contractorId"
@@ -497,6 +531,7 @@ export function HindranceForm({
                       : "Choose a Contractor"
                   }
                   invalid={errors.contractorId != null}
+                  required
                   items={contractors}
                 />
               )}
@@ -558,23 +593,27 @@ export function HindranceForm({
             <FieldError message={errors.signOffUserId?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="hindrance-signed-on">Signed on</Label>
+            <Label htmlFor="hindrance-signed-on" required={signingOff}>
+              Signed on
+            </Label>
             <Input
               id="hindrance-signed-on"
               type="date"
               max={localToday()}
+              aria-required={signingOff}
               aria-invalid={errors.signedOn != null}
               {...form.register("signedOn")}
             />
             <FieldError message={errors.signedOn?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="hindrance-party-name">
+            <Label htmlFor="hindrance-party-name" required={signingOff}>
               Other party&apos;s name
             </Label>
             <Input
               id="hindrance-party-name"
               autoComplete="off"
+              aria-required={signingOff}
               aria-invalid={errors.signOffPartyName != null}
               {...form.register("signOffPartyName")}
             />

@@ -143,11 +143,14 @@ export function LocationDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="location-name">Location name</Label>
+            <Label htmlFor="location-name" required>
+              Location name
+            </Label>
             <Input
               id="location-name"
               className="h-10"
               autoComplete="off"
+              aria-required
               placeholder="Chainage 0+000 – 2+500"
               aria-invalid={errors.name != null}
               {...form.register("name")}

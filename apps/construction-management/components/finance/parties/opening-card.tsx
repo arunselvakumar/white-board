@@ -232,12 +232,15 @@ function OpeningForm({
       </ToggleGroup>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="opening-date">As of</Label>
+          <Label htmlFor="opening-date" required>
+            As of
+          </Label>
           <Input
             id="opening-date"
             type="date"
             className="h-10"
             value={asOfDate}
+            aria-required
             aria-invalid={errors.asOfDate != null}
             onChange={(event) => {
               setAsOfDate(event.target.value);
@@ -246,11 +249,14 @@ function OpeningForm({
           <FieldError message={errors.asOfDate} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="opening-amount">Amount</Label>
+          <Label htmlFor="opening-amount" required>
+            Amount
+          </Label>
           <MoneyInput
             id="opening-amount"
             className="h-10"
             value={amount}
+            aria-required
             aria-invalid={errors.amount != null}
             onChange={(event) => {
               setAmount(event.target.value);

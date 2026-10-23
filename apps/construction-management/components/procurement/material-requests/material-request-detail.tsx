@@ -132,11 +132,14 @@ function CloseDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="close-reason">Reason</Label>
+            <Label htmlFor="close-reason" required>
+              Reason
+            </Label>
             <Textarea
               id="close-reason"
               rows={3}
               value={reason}
+              aria-required
               aria-invalid={error != null}
               onChange={(event) => {
                 setReason(event.target.value);

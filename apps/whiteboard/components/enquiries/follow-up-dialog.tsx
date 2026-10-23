@@ -106,13 +106,16 @@ export function FollowUpDialog({
         >
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between gap-3">
-              <Label htmlFor="follow-up-note">Note</Label>
+              <Label htmlFor="follow-up-note" required>
+                Note
+              </Label>
               <span className="text-muted-foreground text-xs tabular-nums">
                 {note.length}/{NOTE_LIMIT}
               </span>
             </div>
             <Textarea
               id="follow-up-note"
+              aria-required
               rows={4}
               maxLength={NOTE_LIMIT}
               placeholder="e.g. Father wants weekend timings. Call after salary day."

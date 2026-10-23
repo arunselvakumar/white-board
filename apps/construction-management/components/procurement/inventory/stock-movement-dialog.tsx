@@ -161,12 +161,15 @@ function MovementForm({
             >
               <div className="grid gap-3 sm:grid-cols-[1fr_10rem_9rem]">
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("material")}>Material</Label>
+                  <Label htmlFor={id("material")} required>
+                    Material
+                  </Label>
                   <Controller
                     control={form.control}
                     name={`lines.${index}.materialId`}
                     render={({ field: control }) => (
                       <MaterialPicker
+                        required
                         id={id("material")}
                         value={control.value === "" ? null : control.value}
                         excludeIds={values
@@ -187,22 +190,28 @@ function MovementForm({
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor={id("date")}>{copy.date}</Label>
+                  <Label htmlFor={id("date")} required>
+                    {copy.date}
+                  </Label>
                   <Input
                     id={id("date")}
                     type="date"
                     max={localToday()}
+                    aria-required
                     aria-invalid={errors?.date != null}
                     {...form.register(`lines.${index}.date`)}
                   />
                   <FieldError message={errors?.date?.message} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor={id("quantity")}>Quantity</Label>
+                  <Label htmlFor={id("quantity")} required>
+                    Quantity
+                  </Label>
                   <Input
                     id={id("quantity")}
                     inputMode="decimal"
                     autoComplete="off"
+                    aria-required
                     aria-invalid={errors?.quantity != null}
                     {...form.register(`lines.${index}.quantity`)}
                   />

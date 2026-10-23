@@ -162,10 +162,16 @@ function ObservationsBody({
           }}
         >
           <div className="space-y-1.5">
-            <Label htmlFor="inspection-observation">Observation</Label>
+            <Label
+              htmlFor="inspection-observation"
+              required={files.length === 0}
+            >
+              Observation
+            </Label>
             <Textarea
               id="inspection-observation"
               rows={3}
+              aria-required={files.length === 0}
               value={body}
               maxLength={INSPECTION_LIMITS.observation}
               aria-invalid={problem != null}
@@ -276,10 +282,13 @@ function RemarksBody({
           }}
         >
           <div className="space-y-1.5">
-            <Label htmlFor="inspection-remark">Remark</Label>
+            <Label htmlFor="inspection-remark" required>
+              Remark
+            </Label>
             <Textarea
               id="inspection-remark"
               rows={2}
+              aria-required
               value={body}
               maxLength={INSPECTION_LIMITS.remark}
               aria-invalid={problem != null}

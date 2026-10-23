@@ -97,12 +97,15 @@ export function ReasonDialog({
         >
           <FormAlert message={error} />
           <div className="space-y-1.5">
-            <Label htmlFor="decision-reason">Reason</Label>
+            <Label htmlFor="decision-reason" required>
+              Reason
+            </Label>
             <Textarea
               id="decision-reason"
               value={reason}
               maxLength={MAX}
               aria-invalid={problem != null}
+              aria-required
               onChange={(event) => {
                 setReason(event.target.value);
                 setProblem(undefined);

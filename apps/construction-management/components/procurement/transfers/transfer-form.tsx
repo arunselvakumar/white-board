@@ -247,7 +247,9 @@ export function TransferForm({
     exclude: string | null,
   ) => (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={`transfer-${name}`}>{label}</Label>
+      <Label htmlFor={`transfer-${name}`} required>
+        {label}
+      </Label>
       <Controller
         control={form.control}
         name={name}
@@ -262,6 +264,7 @@ export function TransferForm({
             <SelectTrigger
               id={`transfer-${name}`}
               className="w-full min-w-0"
+              aria-required
               aria-invalid={errors[name] != null}
             >
               <SelectValue placeholder="Choose a Project or Store" />
@@ -303,11 +306,14 @@ export function TransferForm({
     >
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="transfer-date">Transfer Date</Label>
+          <Label htmlFor="transfer-date" required>
+            Transfer Date
+          </Label>
           <Input
             id="transfer-date"
             type="date"
             max={localToday()}
+            aria-required
             aria-invalid={errors.transferDate != null}
             {...form.register("transferDate")}
           />
@@ -343,12 +349,15 @@ export function TransferForm({
                 className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_9rem_1fr_auto] sm:items-start"
               >
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("material")}>Material</Label>
+                  <Label htmlFor={id("material")} required>
+                    Material
+                  </Label>
                   <Controller
                     control={form.control}
                     name={`lines.${index}.materialId`}
                     render={({ field: control }) => (
                       <MaterialPicker
+                        required
                         id={id("material")}
                         value={control.value === "" ? null : control.value}
                         excludeIds={chosen.filter(
@@ -377,13 +386,14 @@ export function TransferForm({
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor={id("quantity")}>
+                  <Label htmlFor={id("quantity")} required>
                     Quantity{unit == null ? "" : ` (${unit})`}
                   </Label>
                   <Input
                     id={id("quantity")}
                     inputMode="decimal"
                     autoComplete="off"
+                    aria-required
                     aria-invalid={lineErrors?.quantity != null}
                     {...form.register(`lines.${index}.quantity`)}
                   />

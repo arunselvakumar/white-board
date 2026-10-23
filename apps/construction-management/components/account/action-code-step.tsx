@@ -82,7 +82,9 @@ export function ActionCodeStep({
 
   return (
     <div className="min-w-0 space-y-2">
-      <Label htmlFor={id}>Enter the code we sent</Label>
+      <Label htmlFor={id} required>
+        Enter the code we sent
+      </Label>
       <p className="text-muted-foreground text-sm">
         It works for 10 minutes. Never share it with anyone.
       </p>

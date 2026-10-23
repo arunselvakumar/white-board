@@ -168,9 +168,12 @@ export function InspectionRejectDialog({
         >
           <FormAlert message={error} />
           <div className="space-y-1.5">
-            <Label htmlFor="inspection-reject-reason">Reason</Label>
+            <Label htmlFor="inspection-reject-reason" required>
+              Reason
+            </Label>
             <Textarea
               id="inspection-reject-reason"
+              aria-required
               value={reason}
               maxLength={MAX}
               rows={3}

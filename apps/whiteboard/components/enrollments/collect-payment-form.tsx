@@ -87,9 +87,12 @@ export function CollectPaymentForm({
     >
       <FormAlert message={errors.root?.message} />
       <div className="space-y-1.5">
-        <Label htmlFor="amountRupees">Amount (₹)</Label>
+        <Label htmlFor="amountRupees" required>
+          Amount (₹)
+        </Label>
         <Input
           id="amountRupees"
+          aria-required
           className="h-10"
           inputMode="decimal"
           autoComplete="off"
@@ -98,7 +101,9 @@ export function CollectPaymentForm({
         <FieldError message={errors.amountRupees?.message} />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="method">Method</Label>
+        <Label htmlFor="method" required>
+          Method
+        </Label>
         <Controller
           name="method"
           control={control}
@@ -111,7 +116,12 @@ export function CollectPaymentForm({
                 field.onChange(value);
               }}
             >
-              <SelectTrigger id="method" size="lg" className="w-full min-w-0">
+              <SelectTrigger
+                id="method"
+                aria-required
+                size="lg"
+                className="w-full min-w-0"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
