@@ -3,13 +3,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   Building2,
-  CalendarDays,
   CircleCheck,
   EllipsisVertical,
   HardHat,
-  MapPin,
   PauseCircle,
-  Pin,
   Plus,
   type LucideIcon,
 } from "lucide-react";
@@ -33,10 +30,10 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { CheckInBanner } from "@/components/hrms/check-in-banner";
-import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { usePinProject } from "@/src/queries/project-home";
 import {
   projectsQuery,
@@ -44,16 +41,10 @@ import {
   type ProjectStatus,
 } from "@/src/queries/projects";
 
-import { ProjectAvatar } from "./project-avatar";
-import { ProjectProgressBar } from "./project-progress";
 import { HideModulesDialog } from "./project-home-dialogs";
-import { PROJECT_ROW_GRID } from "./projects-skeletons";
-import {
-  PROJECT_STATUS_LABELS,
-  PROJECT_STATUS_ORDER,
-  ProjectStatusBadge,
-  projectDates,
-} from "./project-status";
+import { ProjectFolderCard } from "./project-folder-card";
+import { PROJECT_FOLDER_GRID } from "./projects-skeletons";
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_ORDER } from "./project-status";
 
 export const PROJECTS_PATH = "/app/projects";
 
@@ -112,15 +103,19 @@ const STATS: readonly {
   },
 ];
 
-const ROW_GRID = PROJECT_ROW_GRID;
-
 type ProjectItem = ProjectList["items"][number];
 
 /**
  * A Project's kebab on the Projects home (CM-411): Pin / Unpin, Edit and
- * Hide modules.
+ * Hide modules, in a square tinted with the folder's colour.
  */
-function ProjectRowMenu({ project }: { project: ProjectItem }) {
+function ProjectFolderMenu({
+  project,
+  className,
+}: {
+  project: ProjectItem;
+  className: string;
+}) {
   const router = useRouter();
   const pin = usePinProject();
   const [hiding, setHiding] = useState(false);
@@ -133,7 +128,7 @@ function ProjectRowMenu({ project }: { project: ProjectItem }) {
               type="button"
               variant="ghost"
               size="icon"
-              className="shrink-0"
+              className={cn("shrink-0 rounded-lg", className)}
               aria-label={`Options for ${project.name}`}
             />
           }
@@ -177,78 +172,10 @@ function ProjectRowMenu({ project }: { project: ProjectItem }) {
   );
 }
 
-function ProjectRow({ project }: { project: ProjectItem }) {
-  const dates = projectDates(project);
-  return (
-    <li className="flex items-center gap-1">
-      <Link
-        href={projectPath(project.id)}
-        className={`hover:bg-secondary/60 focus-visible:ring-ring/50 flex min-w-0 flex-1 flex-col gap-3 rounded-xl px-3 py-3 transition-colors outline-none focus-visible:ring-3 ${ROW_GRID}`}
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          <ProjectAvatar name={project.name} logoUrl={project.logoUrl} />
-          <div className="min-w-0 space-y-0.5">
-            <p className="flex min-w-0 items-center gap-1.5 font-semibold">
-              <span className="truncate">{project.name}</span>
-              {project.pinned ? (
-                <Pin
-                  aria-label="Pinned"
-                  role="img"
-                  className="text-primary size-3.5 shrink-0"
-                />
-              ) : null}
-            </p>
-            <p className="text-muted-foreground truncate text-xs">
-              {project.projectType == null
-                ? "Project Type not set"
-                : projectTypeLabel(project.projectType)}
-            </p>
-            {project.address == null ? (
-              dates == null ? (
-                <p className="text-muted-foreground text-sm">
-                  No address or dates yet.
-                </p>
-              ) : null
-            ) : (
-              <p className="text-muted-foreground flex gap-1.5 text-sm">
-                <MapPin
-                  aria-hidden="true"
-                  className="mt-0.5 size-3.5 shrink-0"
-                />
-                <span className="truncate">{project.address}</span>
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pl-13 md:contents">
-          <div>
-            <ProjectStatusBadge status={project.status} />
-          </div>
-          <div className="min-w-0 space-y-1.5">
-            <p className="text-muted-foreground flex gap-1.5 text-sm">
-              {dates == null ? null : (
-                <>
-                  <CalendarDays
-                    aria-hidden="true"
-                    className="mt-0.5 size-3.5 shrink-0 md:hidden"
-                  />
-                  <span>{dates}</span>
-                </>
-              )}
-            </p>
-            <ProjectProgressBar progress={project.progress} />
-          </div>
-        </div>
-      </Link>
-      <ProjectRowMenu project={project} />
-    </li>
-  );
-}
-
 /**
  * Projects home (CM-204, `modules/03`): status totals (each one filters the list), then every Project
- * in one list with status chips to filter it, the member's pinned Projects
- * first (CM-411). The Owner sees every Project; a Member those assigned to
+ * as a folder in its colour (ADR CM-0026), with status chips to filter them,
+ * the member's pinned Projects first (CM-411). The Owner sees every Project; a Member those assigned to
  * them. A Company with no Projects sees the same page with every figure at 0
  * and the empty state in place of the list (#108).
  */
@@ -287,7 +214,7 @@ export function ProjectsHome() {
             ))}
           </div>
         </div>
-        <section className="bg-card rounded-2xl border shadow-xs">
+        <section className="bg-card @container rounded-2xl border shadow-xs">
           <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
             <h2 className="text-base tracking-tight">Your Projects</h2>
             <div className="-mx-5 max-w-full overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
@@ -338,26 +265,21 @@ export function ProjectsHome() {
               {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.
             </p>
           ) : (
-            <div className="px-2 pb-2">
-              <div
-                aria-hidden="true"
-                className="hidden items-center gap-1 border-b md:flex"
-              >
-                <div
-                  className={`text-muted-foreground flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${ROW_GRID}`}
-                >
-                  <span>Project</span>
-                  <span>Status</span>
-                  <span>Dates and progress</span>
-                </div>
-                <span className="size-8 shrink-0" />
-              </div>
-              <ul aria-label="Projects" className="divide-border/70 divide-y">
-                {items.map((project) => (
-                  <ProjectRow key={project.id} project={project} />
-                ))}
-              </ul>
-            </div>
+            <ul
+              aria-label="Projects"
+              className={cn("px-5 pt-1 pb-5", PROJECT_FOLDER_GRID)}
+            >
+              {items.map((project) => (
+                <ProjectFolderCard
+                  key={project.id}
+                  project={project}
+                  href={projectPath(project.id)}
+                  menu={(chip) => (
+                    <ProjectFolderMenu project={project} className={chip} />
+                  )}
+                />
+              ))}
+            </ul>
           )}
         </section>
       </div>
