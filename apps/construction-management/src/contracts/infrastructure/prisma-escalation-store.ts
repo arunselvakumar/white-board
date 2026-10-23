@@ -211,6 +211,7 @@ function toClause(row: ClauseRow): StoredEscalationClause {
           weightPercent: dec(component.weightPercent, PERCENT_SCALE),
           series: component.series,
           basePrice: component.basePrice,
+          materialId: component.materialId,
         }))
         .sort(
           (a, b) => ORDER.indexOf(a.component) - ORDER.indexOf(b.component),
@@ -243,6 +244,7 @@ function componentRows(clause: StoredEscalationClause) {
     weightPercent: fixedDecimal(row.weightPercent, PERCENT_SCALE),
     series: row.series,
     basePrice: row.basePrice,
+    materialId: row.materialId,
   }));
 }
 

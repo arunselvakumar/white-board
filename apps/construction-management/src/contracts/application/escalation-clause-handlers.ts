@@ -1,6 +1,6 @@
 import { assertCan, can, type MemberAccess } from "@/src/shared-kernel/access";
 import { recordAudit } from "@/src/shared-kernel/audit";
-import { forbidden } from "@/src/shared-kernel/domain-error";
+import { DomainError, forbidden } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
 import { projectNotContractWork } from "../domain/client-bill";
@@ -44,6 +44,12 @@ export type EscalationClauseView = {
   financial: boolean;
   /** Update + Financial, and not locked. */
   canEdit: boolean;
+  /**
+   * CM-1110: the Work Order's issued materials a 10CA component can name,
+   * so its quantity comes from material reconciliation (none on the
+   * client side).
+   */
+  materialOptions: { id: string; name: string; uomName: string }[];
 };
 
 export function contractOf(input: ContractInput): ContractRef {
@@ -76,8 +82,32 @@ export function clauseSnapshot(clause: StoredEscalationClause) {
       weightPercent: fixedDecimal(row.weightPercent, PERCENT_SCALE),
       series: row.series,
       basePrice: row.basePrice == null ? null : Number(row.basePrice),
+      materialId: row.materialId,
     })),
   };
+}
+
+/**
+ * A 10CA component's Material (CM-1110) is one the Work Order issues (400
+ * `ESCALATION_MATERIAL_INVALID`); the client contract issues none.
+ */
+function assertClauseMaterials(
+  components: readonly { materialId: string | null }[],
+  materialIds: ReadonlySet<string>,
+): void {
+  components.forEach((row, index) => {
+    if (row.materialId == null || materialIds.has(row.materialId)) return;
+    throw new DomainError(
+      "ESCALATION_MATERIAL_INVALID",
+      "Pick a material the Work Order issues.",
+      {
+        details: {
+          component: index,
+          field: `components.${String(index)}.materialId`,
+        },
+      },
+    );
+  });
 }
 
 export class EscalationClauseHandlers {
@@ -159,10 +189,18 @@ export class EscalationClauseHandlers {
   ): Promise<EscalationClauseView> {
     const ws = access.workspaceId;
     const { workOrder } = await this.resolve(db, ws, contract);
-    const [clause, approvedBills] = await Promise.all([
+    const [clause, approvedBills, materials] = await Promise.all([
       this.deps.clauses.forContract(db, ws, contract),
       this.deps.bills.approvedCount(db, ws, contract),
+      workOrder == null
+        ? Promise.resolve([])
+        : this.deps.workOrders.materials(db, ws, workOrder.id),
     ]);
+    const facts = await this.deps.directory.materials(
+      db,
+      ws,
+      materials.map((row) => row.materialId),
+    );
     const financial = this.financial(access, contract);
     return {
       side: contract.side,
@@ -179,7 +217,34 @@ export class EscalationClauseHandlers {
           projectId: contract.projectId,
         }) &&
         workOrder?.status !== "cancelled",
+      materialOptions: materials.map((row) => ({
+        id: row.materialId,
+        name: facts.get(row.materialId)?.name ?? "Material",
+        uomName: facts.get(row.materialId)?.uomName ?? "",
+      })),
     };
+  }
+
+  /** The materials a contract's 10CA components may name (CM-1110). */
+  private async assertMaterials(
+    db: ContractsTx,
+    workspaceId: string,
+    contract: ContractRef,
+    components: readonly { materialId: string | null }[],
+  ): Promise<void> {
+    if (components.every((row) => row.materialId == null)) return;
+    const issued =
+      contract.side === "contractor"
+        ? await this.deps.workOrders.materials(
+            db,
+            workspaceId,
+            contract.workOrderId,
+          )
+        : [];
+    assertClauseMaterials(
+      components,
+      new Set(issued.map((row) => row.materialId)),
+    );
   }
 
   /** Adds the contract's clause (409 `ESCALATION_CLAUSE_EXISTS`). */
@@ -196,6 +261,7 @@ export class EscalationClauseHandlers {
     return this.deps.db.$transaction(async (tx) => {
       await this.deps.boq.lock(tx, ws, contract.projectId);
       await this.resolve(tx, ws, contract);
+      await this.assertMaterials(tx, ws, contract, terms.components);
       const clause: StoredEscalationClause = {
         id: newId(at.getTime()),
         workspaceId: ws,
@@ -244,6 +310,7 @@ export class EscalationClauseHandlers {
         throw escalationClauseChanged();
       const used = await this.deps.bills.approvedCount(tx, ws, contract);
       if (used > 0) throw escalationClauseUsed(used);
+      await this.assertMaterials(tx, ws, contract, terms.components);
       const after: StoredEscalationClause = {
         ...current,
         terms,

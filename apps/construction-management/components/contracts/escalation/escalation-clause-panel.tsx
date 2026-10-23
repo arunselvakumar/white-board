@@ -142,6 +142,13 @@ export function EscalationClausePanel({ scope }: { scope: EscalationScope }) {
               </p>
               <p className="text-muted-foreground text-xs break-words">
                 {row.series}
+                {row.materialId != null
+                  ? ` · quantity from ${
+                      view.materialOptions.find(
+                        (option) => option.id === row.materialId,
+                      )?.name ?? "material reconciliation"
+                    }`
+                  : ""}
               </p>
             </li>
           ))}
@@ -172,6 +179,8 @@ type Row = {
   weight: string;
   basePrice: string;
   series: string;
+  /** CM-1110: the Work Order material filling the 10CA quantity ("" for none). */
+  materialId: string;
 };
 
 function rowsOf(view: EscalationClauseView): Row[] {
@@ -182,6 +191,7 @@ function rowsOf(view: EscalationClauseView): Row[] {
       weight: row.weightPercent?.replace(/\.?0+$/, "") ?? "",
       basePrice: row.basePrice == null ? "" : paiseToRupees(row.basePrice),
       series: row.series,
+      materialId: row.materialId ?? "",
     })) ?? [
       {
         component: "labour",
@@ -189,6 +199,7 @@ function rowsOf(view: EscalationClauseView): Row[] {
         weight: "",
         basePrice: "",
         series: "CPI-IW",
+        materialId: "",
       },
       {
         component: "material",
@@ -196,6 +207,7 @@ function rowsOf(view: EscalationClauseView): Row[] {
         weight: "",
         basePrice: "",
         series: "WPI – All commodities",
+        materialId: "",
       },
     ]
   );
@@ -268,6 +280,10 @@ export function EscalationClauseDialog({
               basePrice:
                 row.basis === "quantity" ? rupeesToPaise(row.basePrice) : null,
               series: row.series,
+              materialId:
+                row.basis === "quantity" && row.materialId !== ""
+                  ? row.materialId
+                  : null,
             }));
             const terms = {
               baseMonth,
@@ -454,6 +470,59 @@ export function EscalationClauseDialog({
                           aria-invalid={errors[`${prefix}.basePrice`] != null}
                         />
                         <FieldError message={errors[`${prefix}.basePrice`]} />
+                        {view.materialOptions.length > 0 ? (
+                          <>
+                            <Label
+                              className="text-xs"
+                              htmlFor={`${prefix}.materialId`}
+                            >
+                              Quantity from
+                            </Label>
+                            <Select
+                              items={[
+                                { value: "none", label: "Typed on the bill" },
+                                ...view.materialOptions.map((option) => ({
+                                  value: option.id,
+                                  label: option.name,
+                                })),
+                              ]}
+                              value={
+                                row.materialId === "" ? "none" : row.materialId
+                              }
+                              onValueChange={(value) => {
+                                change(index, {
+                                  materialId:
+                                    value == null || value === "none"
+                                      ? ""
+                                      : value,
+                                });
+                              }}
+                            >
+                              <SelectTrigger
+                                id={`${prefix}.materialId`}
+                                className="w-full"
+                                aria-invalid={
+                                  errors[`${prefix}.materialId`] != null
+                                }
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">
+                                  Typed on the bill
+                                </SelectItem>
+                                {view.materialOptions.map((option) => (
+                                  <SelectItem key={option.id} value={option.id}>
+                                    {option.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FieldError
+                              message={errors[`${prefix}.materialId`]}
+                            />
+                          </>
+                        ) : null}
                       </>
                     ) : (
                       <>
@@ -525,6 +594,7 @@ export function EscalationClauseDialog({
                     weight: "",
                     basePrice: "",
                     series: "",
+                    materialId: "",
                   },
                 ]);
               }}

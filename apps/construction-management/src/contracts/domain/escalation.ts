@@ -245,6 +245,8 @@ export type EscalationComponentInput = {
   series: string;
   /** `quantity` basis: paise per unit at the base month. */
   basePrice?: number | bigint | null;
+  /** `quantity` basis on a Work Order: the Material whose reconciled consumption fills the quantity (CM-1110). */
+  materialId?: string | null;
 };
 
 export type EscalationClauseInput = {
@@ -261,6 +263,8 @@ export type ClauseComponent = {
   series: string;
   /** Paise per unit; null on the weighted basis. */
   basePrice: bigint | null;
+  /** The Work Order Material filling a 10CA quantity (CM-1110); null otherwise. */
+  materialId: string | null;
 };
 
 export type EscalationClauseTerms = {
@@ -399,7 +403,15 @@ export function escalationClause(
           index,
           "basePrice",
         );
-      return { component, basis, weightPercent: 0n, series, basePrice };
+      const material = row.materialId?.trim().toLowerCase() ?? "";
+      return {
+        component,
+        basis,
+        weightPercent: 0n,
+        series,
+        basePrice,
+        materialId: material === "" ? null : material,
+      };
     }
     const weight = percentOf(row.weightPercent);
     if (weight == null || weight <= 0n || weight > 100n * 100n)
@@ -409,7 +421,14 @@ export function escalationClause(
         index,
         "weightPercent",
       );
-    return { component, basis, weightPercent: weight, series, basePrice: null };
+    return {
+      component,
+      basis,
+      weightPercent: weight,
+      series,
+      basePrice: null,
+      materialId: null,
+    };
   });
   const total = components.reduce((sum, row) => sum + row.weightPercent, 0n);
   if (total !== 100n * 100n)

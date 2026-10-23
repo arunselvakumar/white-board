@@ -42,6 +42,13 @@ const ComponentInput = z.object({
     .describe(
       "Quantity basis: paise per unit at the base month (400 ESCALATION_BASE_PRICE_INVALID).",
     ),
+  materialId: z
+    .uuid()
+    .nullable()
+    .optional()
+    .describe(
+      "Quantity basis on a Work Order: a Material it issues, whose reconciled consumption in the period fills the escalation draft's quantity (CM-1110; 400 ESCALATION_MATERIAL_INVALID). Ignored on the weighted basis.",
+    ),
 });
 
 const terms = {
@@ -119,6 +126,12 @@ export const ConstructionContractsEscalationClauseResponseModel = z.object({
             .int()
             .nullable()
             .describe("Quantity only, paise per unit; null without Financial."),
+          materialId: z
+            .uuid()
+            .nullable()
+            .describe(
+              "Quantity only: the Material filling the 10CA quantity (CM-1110).",
+            ),
         }),
       ),
       updatedAt: z.iso.datetime(),
@@ -132,6 +145,11 @@ export const ConstructionContractsEscalationClauseResponseModel = z.object({
     ),
   financial: z.boolean(),
   canEdit: z.boolean(),
+  materialOptions: z
+    .array(z.object({ id: z.uuid(), name: z.string(), uomName: z.string() }))
+    .describe(
+      "The Work Order's issued materials a 10CA component can name (CM-1110); none on the client side.",
+    ),
 });
 export type ConstructionContractsEscalationClauseResponseModel = z.infer<
   typeof ConstructionContractsEscalationClauseResponseModel
@@ -169,11 +187,13 @@ export function toEscalationClauseResponse(
                 financial && row.basePrice != null
                   ? Number(row.basePrice)
                   : null,
+              materialId: row.materialId,
             })),
             updatedAt: clause.updatedAt.toISOString(),
           },
     approvedBills: view.approvedBills,
     financial,
     canEdit: view.canEdit,
+    materialOptions: view.materialOptions,
   };
 }

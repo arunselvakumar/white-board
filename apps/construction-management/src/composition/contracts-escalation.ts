@@ -15,10 +15,12 @@ import {
   PrismaPriceIndexStore,
 } from "@/src/contracts/infrastructure/prisma-escalation-store";
 import { PrismaWorkOrderStore } from "@/src/contracts/infrastructure/prisma-work-order-store";
+import type { EscalationComponent } from "@/src/contracts/domain/contract-terms";
 import { companyToday } from "@/src/shared-kernel/company-today";
 import { loadBackdatedCheck } from "@/src/site-work/infrastructure/site-work-guards";
 
 import { contractsPartyInvoicing } from "./contracts-party-invoicing";
+import { reconciliationHandlers } from "./contracts-reconciliation";
 
 /**
  * Price indices, escalation clauses and escalation bills (CM-1109) wired
@@ -28,10 +30,11 @@ import { contractsPartyInvoicing } from "./contracts-party-invoicing";
  * messaging (`document.*` with the escalation approval types).
  */
 export function createEscalationDeps(): EscalationDeps {
+  const clauses = new PrismaEscalationClauseStore();
   return {
     db: prisma,
     indices: new PrismaPriceIndexStore(),
-    clauses: new PrismaEscalationClauseStore(),
+    clauses,
     bills: new PrismaEscalationBillStore(),
     boq: new PrismaBoqStore(),
     workOrders: new PrismaWorkOrderStore(),
@@ -39,9 +42,26 @@ export function createEscalationDeps(): EscalationDeps {
     clientBills: new PrismaClientBillStore(),
     directory: contractsDirectory,
     invoicing: contractsPartyInvoicing(),
-    // CM-1110 hook: cement and steel quantities from material
-    // reconciliation. Until then the draft's typed quantities are used.
-    materialQuantities: () => Promise.resolve(new Map()),
+    // CM-1110: the 10CA quantities from material reconciliation — the
+    // theoretical consumption of each quantity component's Material by
+    // work billed in the period. Typed quantities on the draft override.
+    materialQuantities: async (db, { workspaceId, contract, period }) => {
+      const clause = await clauses.forContract(db, workspaceId, contract);
+      if (clause == null) return new Map();
+      const quantities = await reconciliationHandlers.periodQuantities(
+        db,
+        workspaceId,
+        contract,
+        period,
+        clause.terms.components.filter((row) => row.basis === "quantity"),
+      );
+      return new Map(
+        [...quantities].map(
+          ([component, quantity]) =>
+            [component as EscalationComponent, quantity] as const,
+        ),
+      );
+    },
     backdated: (access) => loadBackdatedCheck(prisma, access),
     today: (workspaceId) => companyToday(prisma, workspaceId),
     events: messagingEvents(),

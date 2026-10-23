@@ -72,6 +72,7 @@ const weighted = (
   weightPercent: BigInt(weight * 100),
   series,
   basePrice: null,
+  materialId: null,
 });
 
 const R = [
@@ -231,6 +232,7 @@ describe("the escalation clause (CM-1109)", () => {
       weightPercent: 0n,
       series: "WPI – Cement",
       basePrice: 7_000_00n,
+      materialId: null,
     });
     expect(
       code(() =>
@@ -415,6 +417,7 @@ describe("the 10CC working (CM-1109)", () => {
           weightPercent: 0n,
           series: "WPI – Cement",
           basePrice: rs(7_000),
+          materialId: null,
         },
       ]),
       bills: R,

@@ -261,6 +261,9 @@ export const PRICE_INDICES: PriceIndexList = {
   viewerFlags: ["read", "create", "update", "delete", "import", "export"],
 };
 
+/** CM-1110: the Work Order's cement, filling the 10CA quantity. */
+export const CEMENT_MATERIAL = "0199c4a0-0000-7000-8000-00000000c3e1";
+
 export const NO_CLAUSE: EscalationClauseView = {
   side: "contractor",
   projectId: PROJECT,
@@ -270,6 +273,9 @@ export const NO_CLAUSE: EscalationClauseView = {
   approvedBills: 0,
   financial: true,
   canEdit: true,
+  materialOptions: [
+    { id: CEMENT_MATERIAL, name: "Cement OPC 53 Grade", uomName: "Bag" },
+  ],
 };
 
 export const CLAUSE_VIEW: EscalationClauseView = {
@@ -285,6 +291,7 @@ export const CLAUSE_VIEW: EscalationClauseView = {
         weightPercent: "30.00",
         series: "CPI-IW",
         basePrice: null,
+        materialId: null,
       },
       {
         component: "material",
@@ -292,6 +299,7 @@ export const CLAUSE_VIEW: EscalationClauseView = {
         weightPercent: "70.00",
         series: "WPI – All commodities",
         basePrice: null,
+        materialId: null,
       },
       {
         component: "cement",
@@ -299,6 +307,7 @@ export const CLAUSE_VIEW: EscalationClauseView = {
         weightPercent: null,
         series: "WPI – Cement",
         basePrice: 7_000_00,
+        materialId: CEMENT_MATERIAL,
       },
     ],
     updatedAt: "2026-02-01T00:00:00.000Z",
