@@ -1,0 +1,19 @@
+apps/construction-management/components/projects/project-folder-card.tsx
+  s_198a40712dbd5a::t_485ed5dd457f84 18-20,34,62,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "555e315688abb0b9c3c4426cad974ae73de74551",
+  "prompts": {},
+  "sessions": {
+    "s_198a40712dbd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "63d99436-5fe4-4e9c-850f-ae238495c14e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
