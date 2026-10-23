@@ -42,6 +42,7 @@ export async function GET(request: Request): Promise<Response> {
     );
     const page = await contractorBillHandlers.list(session.access, projectId, {
       status: model.status,
+      type: model.type,
       workOrderId: model.workOrderId,
       contractorId: model.contractorId,
       from: model.from,

@@ -133,7 +133,8 @@ export class PrismaClientBillStore implements ClientBillStore {
     return {
       workspaceId: filter.workspaceId,
       projectId: filter.projectId,
-      ...RUNNING_CLIENT,
+      side: "client",
+      ...(filter.type == null ? {} : { type: filter.type }),
       deletedAt: null,
       ...(filter.status == null ? {} : { status: filter.status }),
       ...(filter.from == null && filter.to == null

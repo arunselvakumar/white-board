@@ -2,7 +2,7 @@ import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import type { BillStatus } from "../domain/contract-terms";
+import type { BillStatus, BillType } from "../domain/contract-terms";
 import type { ClientContractTerms } from "../domain/client-bill";
 import type { AdvanceStore } from "./advance-ports";
 import type { EscalationBillStore } from "./escalation-ports";
@@ -53,6 +53,8 @@ export type ClientBillFilter = {
   workspaceId: string;
   projectId: string;
   status?: BillStatus;
+  /** Running (RA) or escalation bills; both when left out (CM-1109). */
+  type?: BillType;
   /** Bill date on or after. */
   from?: CalendarDate;
   /** Bill date on or before. */

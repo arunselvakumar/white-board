@@ -136,6 +136,8 @@ export type BillFilter = {
   workspaceId: string;
   projectId: string;
   status?: BillStatus;
+  /** Running (RA) or escalation bills; both when left out (CM-1109). */
+  type?: BillType;
   workOrderId?: string;
   contractorId?: string;
   /** Bill date on or after. */

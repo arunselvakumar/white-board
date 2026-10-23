@@ -44,6 +44,7 @@ export async function GET(request: Request): Promise<Response> {
     );
     const page = await clientBillHandlers.list(session.access, projectId, {
       status: model.status,
+      type: model.type,
       from: model.from,
       to: model.to,
       limit: model.limit,

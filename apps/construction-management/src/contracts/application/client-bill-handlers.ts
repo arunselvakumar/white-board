@@ -53,7 +53,7 @@ import {
   type RecoverableAdvance,
 } from "../domain/advance";
 import { contractsProjectNotFound } from "../domain/contracts-errors";
-import type { BillStatus } from "../domain/contract-terms";
+import type { BillStatus, BillType } from "../domain/contract-terms";
 import {
   assertBillAction,
   billChanged,
@@ -215,6 +215,8 @@ export type ClientBillPrint = ClientBillDetail & {
 
 export type ClientBillListParams = {
   status?: BillStatus;
+  /** Running (RA) or escalation bills; both when left out (CM-1109). */
+  type?: BillType;
   from?: CalendarDate;
   to?: CalendarDate;
   limit: number;
@@ -508,6 +510,7 @@ export class ClientBillHandlers {
       workspaceId: ws,
       projectId,
       status: params.status,
+      type: params.type,
       from: params.from,
       to: params.to,
     };

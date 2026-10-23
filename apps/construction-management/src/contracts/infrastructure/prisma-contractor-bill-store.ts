@@ -107,7 +107,7 @@ export class PrismaContractorBillStore implements ContractorBillStore {
       workspaceId: filter.workspaceId,
       projectId: filter.projectId,
       side: "contractor",
-      type: "running",
+      ...(filter.type == null ? {} : { type: filter.type }),
       deletedAt: null,
       ...(filter.status == null ? {} : { status: filter.status }),
       ...workOrderFilter,

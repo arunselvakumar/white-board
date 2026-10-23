@@ -22,7 +22,7 @@ import {
   type RecoverableAdvance,
 } from "../domain/advance";
 import { contractsProjectNotFound } from "../domain/contracts-errors";
-import type { BillStatus } from "../domain/contract-terms";
+import type { BillStatus, BillType } from "../domain/contract-terms";
 import {
   assertBillAction,
   assertDeductions,
@@ -199,6 +199,8 @@ export type ContractorBillDetail = {
 
 export type ContractorBillListParams = {
   status?: BillStatus;
+  /** Running (RA) or escalation bills; both when left out (CM-1109). */
+  type?: BillType;
   workOrderId?: string;
   contractorId?: string;
   from?: CalendarDate;
@@ -470,6 +472,7 @@ export class ContractorBillHandlers {
       workspaceId: ws,
       projectId,
       status: params.status,
+      type: params.type,
       workOrderId: params.workOrderId,
       contractorId: params.contractorId,
       from: params.from,
@@ -705,6 +708,7 @@ export class ContractorBillHandlers {
             workspaceId: ws,
             projectId,
             workOrderId,
+            type: "running",
             limit: 1,
           });
           // No bill can be drafted on a Work Order while one is open, so

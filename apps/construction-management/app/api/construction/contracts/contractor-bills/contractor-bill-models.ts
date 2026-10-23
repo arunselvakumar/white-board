@@ -37,6 +37,14 @@ import {
 import { ConstructionContractsMeasurementLocationModel } from "../measurements/measurement-models";
 
 import {
+  billDeductionEscalationBillId,
+  billPeriodFields,
+  billTypeField,
+  billTypeFilter,
+  ConstructionContractsBillEscalationRecoveryModel,
+  toBillEscalationRecoveriesResponse,
+} from "../escalation-bills/bill-escalation-models";
+import {
   billDeductionAdvanceId,
   ConstructionContractsBillAdvanceModel,
   toBillAdvancesResponse,
@@ -75,6 +83,7 @@ export const ListConstructionContractsContractorBillsRequestModel = z
   .object({
     projectId: z.uuid(),
     status: z.enum(BILL_STATUSES).optional(),
+    type: billTypeFilter,
     workOrderId: z.uuid().optional(),
     contractorId: z.uuid().optional(),
     from: z.iso.date().optional().describe("Bill date on or after."),
@@ -108,6 +117,7 @@ export const ConstructionContractsContractorBillDeductionInputModel = z.object({
       `At most ${String(BILL_DEDUCTION_DESCRIPTION_MAX)} characters; the reason, required for "other" (400 BILL_DEDUCTION_REASON_REQUIRED).`,
     ),
   advanceId: billDeductionAdvanceId,
+  escalationBillId: billDeductionEscalationBillId,
 });
 
 const content = {
@@ -229,6 +239,8 @@ const summary = {
   measuredUpTo: z.string(),
   isFinal: z.boolean(),
   status: z.enum(BILL_STATUSES),
+  type: billTypeField,
+  ...billPeriodFields,
   gross: money("Paise: cumulative value − previous value."),
   gst: money("Paise: CGST + SGST + IGST."),
   reverseCharge: z.boolean(),
@@ -326,6 +338,12 @@ export const ConstructionContractsContractorBillDeductionModel = z.object({
   description: z.string().nullable(),
   amount: money("Paise."),
   advanceId: z.uuid().nullable().describe("A recovery's advance (CM-1108)."),
+  escalationBillId: z
+    .uuid()
+    .nullable()
+    .describe(
+      "The negative escalation bill an `other` deduction recovers (CM-1109).",
+    ),
 });
 
 export const ConstructionContractsContractorBillRetentionModel = z.object({
@@ -385,6 +403,11 @@ export const GetConstructionContractsContractorBillResponseModel = z.object({
   ),
   lines: z.array(ConstructionContractsContractorBillLineModel),
   deductionLines: z.array(ConstructionContractsContractorBillDeductionModel),
+  escalationRecoveries: z
+    .array(ConstructionContractsBillEscalationRecoveryModel)
+    .describe(
+      "Approved negative escalation bills of the contract still to recover on running bills (CM-1109).",
+    ),
   advances: z
     .array(ConstructionContractsBillAdvanceModel)
     .describe(
@@ -480,6 +503,9 @@ function summaryOf(view: ContractorBillView, financial: boolean) {
     departmentName: view.departmentName,
     number: view.number,
     ordinal: view.ordinal,
+    type: view.type,
+    periodFrom: view.periodFrom,
+    periodTo: view.periodTo,
     billDate: view.billDate,
     measuredUpTo: view.measuredUpTo,
     isFinal: view.isFinal,
@@ -593,8 +619,13 @@ export function toContractorBillResponse(
       description: deduction.description,
       amount: paise(deduction.amount, financial),
       advanceId: deduction.advanceId,
+      escalationBillId: deduction.escalationBillId,
     })),
     advances: toBillAdvancesResponse(detail.advances, financial),
+    escalationRecoveries: toBillEscalationRecoveriesResponse(
+      detail.escalationRecoveries,
+      financial,
+    ),
     retention: toRetentionResponse(
       detail.retention,
       {
