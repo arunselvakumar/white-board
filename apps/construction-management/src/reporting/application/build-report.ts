@@ -35,7 +35,13 @@ import {
 import { buildCentralLabourAttendanceReport } from "../domain/central-labour-attendance-report";
 // Sales reports (CM-1008).
 import { salesReportBody, SALES_TABLE_KINDS } from "./build-sales-report";
+// Contracts reports (CM-1111).
+import {
+  CONTRACTS_TABLE_KINDS,
+  contractsReportBody,
+} from "./build-contracts-report";
 import type {
+  ContractsReportSource,
   FinanceReportSource,
   HeaderFacts,
   ProcurementReportSource,
@@ -59,6 +65,9 @@ export function periodLabel(job: Pick<ReportJob, "params">): string {
     case "tds_194c":
       return `FY ${params.fy} (${rangeLabel(financialYearRange(params.fy))})`;
     case "due_payments":
+    case "boq_vs_executed":
+    case "material_reconciliation":
+    case "retention_register":
       return `As on ${rangeLabel({ from: params.asOn, to: params.asOn })}`;
     default:
       return rangeLabel(params);
@@ -73,6 +82,7 @@ async function bodyFor(
   tracking: TrackingReportSource | undefined,
   procurement: ProcurementReportSource | undefined,
   sales: SalesReportSource | undefined,
+  contracts: ContractsReportSource | undefined,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -173,6 +183,16 @@ async function bodyFor(
     case "inquiry_report":
     case "booking_report":
       return salesReportBody(job, params, sales, today);
+    // Contracts reports (CM-1111).
+    case "boq_vs_executed":
+    case "work_order_register":
+    case "contractor_bill_register":
+    case "client_bill_register":
+    case "deductions_register":
+    case "retention_register":
+    case "material_reconciliation":
+    case "variations_register":
+      return contractsReportBody(job, params, contracts);
     case "daily_progress_report":
     case "task_progress_report":
       // PDFs of their own, not table reports (`createReportExecutor`).
@@ -202,6 +222,8 @@ export async function buildReportDocument(
   procurement?: ProcurementReportSource,
   /** The sales reports' read model (CM-1008). */
   sales?: SalesReportSource,
+  /** The contracts reports' read model (CM-1111). */
+  contracts?: ContractsReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
@@ -216,6 +238,7 @@ export async function buildReportDocument(
     tracking,
     procurement,
     sales,
+    contracts,
   );
   return {
     header: {
@@ -236,7 +259,8 @@ export async function buildReportDocument(
       FINANCE_A3_KINDS.includes(job.kind) ||
       TRACKING_A3_KINDS.includes(job.kind) ||
       PROCUREMENT_A3_KINDS.includes(job.kind) ||
-      SALES_TABLE_KINDS.includes(job.kind)
+      SALES_TABLE_KINDS.includes(job.kind) ||
+      CONTRACTS_TABLE_KINDS.includes(job.kind)
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),
@@ -246,6 +270,8 @@ export async function buildReportDocument(
     ...(TRACKING_TABLE_KINDS.includes(job.kind) ||
     PROCUREMENT_A3_KINDS.includes(job.kind) ||
     SALES_TABLE_KINDS.includes(job.kind) ||
+    // And the contracts reports: Contractor, Client and item names (CM-1111).
+    CONTRACTS_TABLE_KINDS.includes(job.kind) ||
     job.kind === "labour_attendance_central"
       ? { fonts: "noto" as const }
       : {}),

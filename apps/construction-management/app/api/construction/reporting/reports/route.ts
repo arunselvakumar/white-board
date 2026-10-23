@@ -8,6 +8,7 @@ import {
 } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { reportNotAvailable } from "@/src/reporting/application/report-handlers";
+import { catalogueEntry } from "@/src/reporting/domain/report-catalogue";
 import {
   isMoneyReport,
   isReportAvailable,
@@ -71,6 +72,8 @@ function paramsOf(
   scope: Scope,
   pettyCashAccounts: string[] | null,
   own: ReportOwnScope | null,
+  /** Retention register: Client Bills Financial on the Project (CM-1111). */
+  withClient: boolean,
 ): ReportParams {
   const { projectIds } = scope;
   const places = {
@@ -242,6 +245,22 @@ function paramsOf(
         status: model.params.status ?? null,
         wingId: model.params.wingId ?? null,
       };
+    // Contracts reports (CM-1111).
+    case "boq_vs_executed":
+    case "material_reconciliation":
+      return { kind: model.kind, asOn: model.params.asOn };
+    case "retention_register":
+      return { kind: model.kind, asOn: model.params.asOn, withClient };
+    case "work_order_register":
+    case "contractor_bill_register":
+    case "client_bill_register":
+    case "deductions_register":
+    case "variations_register":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+      };
   }
 }
 
@@ -383,7 +402,7 @@ export async function POST(request: Request): Promise<Response> {
     const financial = canSeeMoney(session.access, model.kind, model.projectId);
     if (isMoneyReport(model.kind) && !financial)
       return permissionDenied(
-        "This report is about amounts: it needs Financial on Labour. Ask the Owner to change your Permission Matrix.",
+        `This report is about amounts. ${catalogueEntry(model.kind).needs} Ask the Owner to change your Permission Matrix.`,
       );
     // A central report covers the Projects the requester may see now.
     const scope = scopeOf(session, model);
@@ -415,7 +434,16 @@ export async function POST(request: Request): Promise<Response> {
       workspaceId: session.workspaceId,
       userId: session.userId,
       projectId: model.projectId,
-      params: paramsOf(model, scope, pettyCashAccounts, own),
+      params: paramsOf(
+        model,
+        scope,
+        pettyCashAccounts,
+        own,
+        model.projectId != null &&
+          can(session.access, "contracts.client_bills", "financial", {
+            projectId: model.projectId,
+          }),
+      ),
       includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {

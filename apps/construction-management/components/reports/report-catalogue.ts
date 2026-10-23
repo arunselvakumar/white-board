@@ -198,6 +198,11 @@ export const REPORT_GROUP_COPY: Record<
     description:
       "Inquiries and bookings on this Project, as an Excel workbook and a PDF.",
   },
+  contracts: {
+    title: "Contracts",
+    description:
+      "BOQ against work done, Work Orders, RA bills both ways, deductions, retention, material reconciliation and Variations, as an Excel workbook and a PDF.",
+  },
   progress: {
     title: "Progress Reports",
     description:

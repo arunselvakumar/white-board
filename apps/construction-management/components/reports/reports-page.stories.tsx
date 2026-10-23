@@ -298,7 +298,7 @@ export const FailedAndRefused: Story = {
           {
             code: "PERMISSION_DENIED",
             message:
-              "This report is about amounts: it needs Financial on Labour. Ask the Owner to change your Permission Matrix.",
+              "This report is about amounts. Needs Labour Report and Financial. Ask the Owner to change your Permission Matrix.",
           },
           { status: 403 },
         );
@@ -325,7 +325,7 @@ export const FailedAndRefused: Story = {
     await userEvent.click(payment.getByRole("button", { name: "Generate" }));
     await expect(await payment.findByText("Could not generate")).toBeVisible();
     await expect(
-      payment.getByText(/it needs Financial on Labour/),
+      payment.getByText(/This report is about amounts/),
     ).toBeVisible();
   },
 };
@@ -942,6 +942,81 @@ export const MaterialsReports: Story = {
       kind: "purchase_requests",
       projectId: PROJECT_ID,
       params: { from: "2026-10-01", to: TODAY, createdBy: "user-1" },
+    });
+  },
+};
+
+/**
+ * Contracts (CM-1111): BOQ vs Executed, the Work Order and RA bill
+ * registers, deductions, retention, material reconciliation and
+ * Variations. Registers take a period; the others are as on a day.
+ */
+export const ContractsReports: Story = {
+  beforeEach: () => {
+    api = mockApi(
+      withCatalogue(
+        (call) => {
+          if (call.method === "GET" && call.path === LIST_PATH) return list([]);
+          if (call.method === "POST" && call.path === API)
+            return Response.json(
+              job({
+                id: "0190a000-0000-7000-8000-0000000000c1",
+                kind: (call.body as { kind: ReportJob["kind"] }).kind,
+                title: "Retention Register",
+                includesMoney: true,
+              }),
+              { status: 201 },
+            );
+          return undefined;
+        },
+        [
+          "boq_vs_executed",
+          "work_order_register",
+          "contractor_bill_register",
+          "client_bill_register",
+          "deductions_register",
+          "retention_register",
+          "material_reconciliation",
+          "variations_register",
+        ],
+      ),
+    );
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const group = within(
+      await canvas.findByRole("region", { name: "Contracts" }),
+    );
+    for (const name of [
+      "BOQ vs Executed",
+      "Work Order Register",
+      "RA Bill Register (Contractors)",
+      "RA Bill Register (Client)",
+      "Deductions Register",
+      "Retention Register",
+      "Material Reconciliation",
+      "Variations Register",
+    ])
+      await expect(group.getByRole("form", { name })).toBeVisible();
+    const retention = within(
+      group.getByRole("form", { name: "Retention Register" }),
+    );
+    await userEvent.click(retention.getByRole("button", { name: "Generate" }));
+    await waitFor(() => expect(posted()).toHaveLength(1));
+    await expect(posted()[0]?.body).toEqual({
+      kind: "retention_register",
+      projectId: PROJECT_ID,
+      params: { asOn: TODAY },
+    });
+    const bills = within(
+      group.getByRole("form", { name: "RA Bill Register (Client)" }),
+    );
+    await userEvent.click(bills.getByRole("button", { name: "Generate" }));
+    await waitFor(() => expect(posted()).toHaveLength(2));
+    await expect(posted()[1]?.body).toEqual({
+      kind: "client_bill_register",
+      projectId: PROJECT_ID,
+      params: { from: "2026-10-01", to: TODAY },
     });
   },
 };

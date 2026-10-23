@@ -8,6 +8,7 @@ import type {
   FinanceReportSource,
   ProcurementReportSource,
   SalesReportSource,
+  ContractsReportSource,
   ReportRenderer,
   ReportRunner,
   ReportStorage,
@@ -49,6 +50,8 @@ type ReportingOptions = {
   procurement?: ProcurementReportSource;
   /** The sales reports' read model (CM-1008). */
   sales?: SalesReportSource;
+  /** The contracts reports' read model (CM-1111). */
+  contracts?: ContractsReportSource;
   /** The tracking reports' and Task Progress Report's read models (CM-805). */
   tracking?: {
     source: TrackingReportSource;
@@ -83,6 +86,7 @@ export function createReportingExecutor(
     finance: options.finance,
     procurement: options.procurement,
     sales: options.sales,
+    contracts: options.contracts,
     tracking:
       options.tracking == null
         ? undefined

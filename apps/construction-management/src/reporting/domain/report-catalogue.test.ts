@@ -94,6 +94,9 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
         "labour_payment",
         "muster_roll",
         "purchase_orders",
+        // The contracts money registers (CM-1111).
+        "deductions_register",
+        "retention_register",
         ...FINANCE_REPORT_KINDS,
       ].sort(),
     );

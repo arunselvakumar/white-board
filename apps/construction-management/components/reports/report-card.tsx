@@ -366,6 +366,21 @@ function requestFor(
           }),
         },
       };
+    // Contracts reports (CM-1111).
+    case "boq_vs_executed":
+    case "material_reconciliation":
+    case "retention_register":
+      return {
+        kind: definition.kind,
+        projectId,
+        params: { asOn: period.asOn },
+      };
+    case "work_order_register":
+    case "contractor_bill_register":
+    case "client_bill_register":
+    case "deductions_register":
+    case "variations_register":
+      return { kind: definition.kind, projectId, params: range };
     case "booking_report":
       return {
         kind: definition.kind,

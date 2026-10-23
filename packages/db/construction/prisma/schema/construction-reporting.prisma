@@ -40,6 +40,15 @@ enum ConstructionReportingReportKind {
   /// Sales (CM-0022 §11).
   inquiry_report
   booking_report
+  /// Contracts (CM-0023, CM-1111).
+  boq_vs_executed
+  work_order_register
+  contractor_bill_register
+  client_bill_register
+  deductions_register
+  retention_register
+  material_reconciliation
+  variations_register
 
   @@map("report_kind")
   @@schema("construction_reporting")

@@ -47,6 +47,15 @@ export const REPORT_KINDS = [
   // Sales reports (CM-1008).
   "inquiry_report",
   "booking_report",
+  // Contracts reports (CM-1111).
+  "boq_vs_executed",
+  "work_order_register",
+  "contractor_bill_register",
+  "client_bill_register",
+  "deductions_register",
+  "retention_register",
+  "material_reconciliation",
+  "variations_register",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -364,6 +373,32 @@ export type ReportParams =
       /** Hold expired is On Hold past Hold until on the Company's today. */
       status: BookingStatusFilter | null;
       wingId: string | null;
+    }
+  // Contracts reports (CM-1111, ADR CM-0023).
+  | {
+      /** BOQ items against checked client measurements up to the date. */
+      kind: "boq_vs_executed" | "material_reconciliation";
+      asOn: string;
+    }
+  | {
+      /** Dated in the range: Work Orders by Order Date, bills by Bill Date, Variations by when raised. */
+      kind:
+        | "work_order_register"
+        | "contractor_bill_register"
+        | "client_bill_register"
+        | "deductions_register"
+        | "variations_register";
+      from: string;
+      to: string;
+    }
+  | {
+      kind: "retention_register";
+      asOn: string;
+      /**
+       * The client side too: the requester had Client Bills Financial on
+       * the Project when they asked (fixed with the job).
+       */
+      withClient: boolean;
     };
 
 /** `expired`: retention deleted its files after 30 days (CM-0021 §3). */
@@ -437,6 +472,18 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "inquiry_report":
     case "booking_report":
       return { ...params, ...checkRange(params) };
+    // Contracts reports (CM-1111).
+    case "work_order_register":
+    case "contractor_bill_register":
+    case "client_bill_register":
+    case "deductions_register":
+    case "variations_register":
+      return { ...params, ...checkRange(params) };
+    case "boq_vs_executed":
+    case "material_reconciliation":
+    case "retention_register":
+      assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
+      return params;
     case "due_payments":
       assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
       return params;
@@ -511,6 +558,9 @@ export function reportFileName(params: ReportParams): string {
     case "tds_194c":
       return `${slug}-fy-${params.fy}`;
     case "due_payments":
+    case "boq_vs_executed":
+    case "material_reconciliation":
+    case "retention_register":
       return `${slug}-${params.asOn}`;
     default:
       return params.from === params.to

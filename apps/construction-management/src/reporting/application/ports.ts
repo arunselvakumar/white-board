@@ -4,6 +4,15 @@ import type {
   DprDocument,
   DprReadModel,
 } from "../domain/daily-progress-report";
+import type {
+  BillRegisterRow,
+  BoqExecutedRow,
+  DeductionRegisterRow,
+  MaterialReconciliationRow,
+  RetentionRegisterRow,
+  VariationRegisterRow,
+  WorkOrderRegisterRow,
+} from "../domain/contracts-reports";
 import type { ReportLabour, ReportLabourDay } from "../domain/labour-days";
 import type { ReportLedgerEntry } from "../domain/ledger-summary";
 import type { ReportDocument, ReportImageRef } from "../domain/report-document";
@@ -551,4 +560,59 @@ export type SalesReportSource = {
       own: ReportOwnScope | null;
     },
   ): Promise<{ rows: InquiryReportRow[]; filterNames: string[] }>;
+};
+
+/**
+ * The contracts reports' read model (CM-1111, ADR CM-0023): one Project's
+ * BOQ, Work Orders, bills, deductions, retention, material reconciliation
+ * and Variations, as printable rows. Implemented in the composition root
+ * (`src/composition/contracts-report-source.ts`).
+ */
+export type ContractsReportSource = {
+  /** Live BOQ items in section order, with checked and billed quantities up to `asOn`. */
+  boqExecuted(
+    workspaceId: string,
+    projectId: string,
+    asOn: CalendarDate,
+  ): Promise<BoqExecutedRow[]>;
+  /** Live Work Orders with an Order Date in the range, oldest first. */
+  workOrders(
+    workspaceId: string,
+    projectId: string,
+    range: DateRange,
+  ): Promise<WorkOrderRegisterRow[]>;
+  /** Live bills of the side with a Bill Date in the range, oldest first. */
+  bills(
+    workspaceId: string,
+    projectId: string,
+    side: "contractor" | "client",
+    range: DateRange,
+  ): Promise<BillRegisterRow[]>;
+  /** Deductions on approved Contractor Bills with a Bill Date in the range. */
+  deductions(
+    workspaceId: string,
+    projectId: string,
+    range: DateRange,
+  ): Promise<DeductionRegisterRow[]>;
+  /** Retention held and released per Work Order, and on the client contract, as on `asOn`. */
+  retention(
+    workspaceId: string,
+    projectId: string,
+    asOn: CalendarDate,
+  ): Promise<{
+    contractor: RetentionRegisterRow[];
+    client: RetentionRegisterRow[];
+  }>;
+  /** Issued and closed Work Orders' materials, reconciled as on `asOn`. */
+  materialReconciliation(
+    workspaceId: string,
+    projectId: string,
+    asOn: CalendarDate,
+  ): Promise<MaterialReconciliationRow[]>;
+  /** Live Variations raised in the range, oldest first. */
+  variations(
+    workspaceId: string,
+    projectId: string,
+    range: DateRange,
+  ): Promise<VariationRegisterRow[]>;
 };

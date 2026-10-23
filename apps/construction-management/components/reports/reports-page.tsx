@@ -176,6 +176,8 @@ const PAGE_GROUPS = [
   "procurement",
   // Sales (CM-1008).
   "sales",
+  // Contracts (CM-1111).
+  "contracts",
 ] as const satisfies readonly ReportDefinition["group"][];
 
 /**

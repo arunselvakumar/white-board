@@ -295,6 +295,29 @@ export const RequestConstructionReportingReportRequestModel =
         assigneeMemberId: z.uuid().optional(),
       }),
     }),
+    // Contracts reports (CM-1111, ADR CM-0023).
+    z.object({
+      kind: z.enum([
+        "boq_vs_executed",
+        "material_reconciliation",
+        "retention_register",
+      ]),
+      projectId: z.uuid(),
+      /** The day the figures are as on. */
+      params: z.object({ asOn: z.iso.date() }),
+    }),
+    z.object({
+      kind: z.enum([
+        "work_order_register",
+        "contractor_bill_register",
+        "client_bill_register",
+        "deductions_register",
+        "variations_register",
+      ]),
+      projectId: z.uuid(),
+      /** Work Orders by Order Date, bills by Bill Date, Variations by when raised. */
+      params: DateRangeParams,
+    }),
     z.object({
       kind: z.literal("booking_report"),
       projectId: z.uuid(),
@@ -463,6 +486,9 @@ function responseParams(
     case "tds_194c":
       return { fy: params.fy, contractorId: params.contractorId };
     case "due_payments":
+    case "boq_vs_executed":
+    case "material_reconciliation":
+    case "retention_register":
       return { asOn: params.asOn };
     // Procurement and central labour reports (CM-903).
     case "purchase_requests":
