@@ -136,7 +136,7 @@ export function EscalationClausePanel({ scope }: { scope: EscalationScope }) {
                 {ESCALATION_COMPONENT_LABELS[row.component]}{" "}
                 <span className="text-muted-foreground font-normal">
                   {row.basis === "quantity"
-                    ? `· 10CA at ₹${moneyOrDash(row.basePrice)} a unit`
+                    ? `· 10CA at ${moneyOrDash(row.basePrice)} a unit`
                     : `· ${percentText(row.weightPercent)}`}
                 </span>
               </p>

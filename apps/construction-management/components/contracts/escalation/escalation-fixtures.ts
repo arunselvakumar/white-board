@@ -24,8 +24,18 @@ const indices = (values: string[]) =>
 export const WORKING: EscalationWorking = {
   valueOfWork: 1_000_000_00,
   bills: [
-    { id: RA_APRIL, number: "CB/26-27/00002", billDate: "2026-04-30", gross: 400_000_00 },
-    { id: RA_JUNE, number: "CB/26-27/00004", billDate: "2026-06-15", gross: 600_000_00 },
+    {
+      id: RA_APRIL,
+      number: "CB/26-27/00002",
+      billDate: "2026-04-30",
+      gross: 400_000_00,
+    },
+    {
+      id: RA_JUNE,
+      number: "CB/26-27/00004",
+      billDate: "2026-06-15",
+      gross: 600_000_00,
+    },
   ],
   quantityValue: 0,
   escalableValue: 1_000_000_00,
@@ -93,7 +103,11 @@ export const DRAFT: EscalationBill = {
   projectName: "Metro Depot",
   side: "contractor",
   type: "escalation",
-  workOrder: { id: WORK_ORDER, number: "WO/26-27/00003", orderDate: "2026-01-10" },
+  workOrder: {
+    id: WORK_ORDER,
+    number: "WO/26-27/00003",
+    orderDate: "2026-01-10",
+  },
   partyId: "0199a000-0000-7000-8000-000000000009",
   partyName: "Velan Constructions",
   number: null,
@@ -117,7 +131,12 @@ export const DRAFT: EscalationBill = {
   gst: 3_825_00,
   payableGst: 3_825_00,
   deductionLines: [
-    { id: "0199a000-0000-7000-8000-00000000000a", kind: "retention", description: null, amount: 1_062_50 },
+    {
+      id: "0199a000-0000-7000-8000-00000000000a",
+      kind: "retention",
+      description: null,
+      amount: 1_062_50,
+    },
   ],
   deductions: 1_062_50,
   net: 24_012_50,
@@ -147,7 +166,16 @@ export const DRAFT: EscalationBill = {
   updatedAt: "2026-07-05T05:30:00.000Z",
   allowed: ALLOWED_DRAFT,
   financial: true,
-  viewerFlags: ["read", "create", "update", "delete", "approve", "reject", "print", "financial"],
+  viewerFlags: [
+    "read",
+    "create",
+    "update",
+    "delete",
+    "approve",
+    "reject",
+    "print",
+    "financial",
+  ],
 };
 
 /** Indices fell: −₹42,500, approved without an invoice, ₹10,000 recovered. */
@@ -177,7 +205,14 @@ export const NEGATIVE: EscalationBill = {
   deductions: 0,
   net: -42_500_00,
   recovery: { amount: 42_500_00, recovered: 10_000_00, outstanding: 32_500_00 },
-  allowed: { ...ALLOWED_DRAFT, edit: false, refresh: false, delete: false, submit: false, reverse: true },
+  allowed: {
+    ...ALLOWED_DRAFT,
+    edit: false,
+    refresh: false,
+    delete: false,
+    submit: false,
+    reverse: true,
+  },
 };
 
 export const PRICE_INDICES: PriceIndexList = {
@@ -185,18 +220,41 @@ export const PRICE_INDICES: PriceIndexList = {
     {
       name: "CPI-IW",
       indices: [
-        { id: "0199a000-0000-7000-8000-0000000000b1", series: "CPI-IW", month: "2026-01-01", value: "140.0000", updatedAt: "2026-02-01T00:00:00.000Z" },
-        { id: "0199a000-0000-7000-8000-0000000000b2", series: "CPI-IW", month: "2026-04-01", value: "147.0000", updatedAt: "2026-05-01T00:00:00.000Z" },
+        {
+          id: "0199a000-0000-7000-8000-0000000000b1",
+          series: "CPI-IW",
+          month: "2026-01-01",
+          value: "140.0000",
+          updatedAt: "2026-02-01T00:00:00.000Z",
+        },
+        {
+          id: "0199a000-0000-7000-8000-0000000000b2",
+          series: "CPI-IW",
+          month: "2026-04-01",
+          value: "147.0000",
+          updatedAt: "2026-05-01T00:00:00.000Z",
+        },
       ],
     },
     {
       name: "WPI – Cement",
       indices: [
-        { id: "0199a000-0000-7000-8000-0000000000b3", series: "WPI – Cement", month: "2026-01-01", value: "100.2500", updatedAt: "2026-02-01T00:00:00.000Z" },
+        {
+          id: "0199a000-0000-7000-8000-0000000000b3",
+          series: "WPI – Cement",
+          month: "2026-01-01",
+          value: "100.2500",
+          updatedAt: "2026-02-01T00:00:00.000Z",
+        },
       ],
     },
   ],
-  suggestions: ["WPI – All commodities", "WPI – Steel", "WPI – Bitumen", "WPI – HSD (POL)"],
+  suggestions: [
+    "WPI – All commodities",
+    "WPI – Steel",
+    "WPI – Bitumen",
+    "WPI – HSD (POL)",
+  ],
   viewerFlags: ["read", "create", "update", "delete", "import", "export"],
 };
 
@@ -218,9 +276,27 @@ export const CLAUSE_VIEW: EscalationClauseView = {
     baseMonth: "2026-01-01",
     nonEscalablePercent: "15.00",
     components: [
-      { component: "labour", basis: "weighted", weightPercent: "30.00", series: "CPI-IW", basePrice: null },
-      { component: "material", basis: "weighted", weightPercent: "70.00", series: "WPI – All commodities", basePrice: null },
-      { component: "cement", basis: "quantity", weightPercent: null, series: "WPI – Cement", basePrice: 7_000_00 },
+      {
+        component: "labour",
+        basis: "weighted",
+        weightPercent: "30.00",
+        series: "CPI-IW",
+        basePrice: null,
+      },
+      {
+        component: "material",
+        basis: "weighted",
+        weightPercent: "70.00",
+        series: "WPI – All commodities",
+        basePrice: null,
+      },
+      {
+        component: "cement",
+        basis: "quantity",
+        weightPercent: null,
+        series: "WPI – Cement",
+        basePrice: 7_000_00,
+      },
     ],
     updatedAt: "2026-02-01T00:00:00.000Z",
   },

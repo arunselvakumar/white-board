@@ -58,5 +58,5 @@ export function signedMoney(
   format: (value: number) => string,
 ): string {
   if (paise == null) return "—";
-  return paise < 0 ? `−₹${format(-paise)}` : `₹${format(paise)}`;
+  return paise < 0 ? `−${format(-paise)}` : format(paise);
 }

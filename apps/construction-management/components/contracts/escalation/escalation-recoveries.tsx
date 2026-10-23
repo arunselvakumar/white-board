@@ -17,7 +17,7 @@ export type BillEscalationRecovery = {
 };
 
 const money = (paise: number | null) =>
-  paise == null ? "—" : `₹${formatPaise(paise)}`;
+  paise == null ? "—" : formatPaise(paise);
 
 /**
  * The contract's negative escalation bills still to recover (CM-1109):
