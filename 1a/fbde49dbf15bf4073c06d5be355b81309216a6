@@ -1,0 +1,43 @@
+apps/construction-management/app/api/construction/contracts/escalation-bills/escalation-bills.http.test.ts
+  s_f49615d4431370::t_09e923710cce96 801,805-807
+apps/construction-management/components/contracts/escalation/escalation-bill-detail.stories.tsx
+  s_f49615d4431370::t_74dcdee568ecb0 19-26,92-95,120-121
+apps/construction-management/components/contracts/escalation/escalation-clause-panel.stories.tsx
+  s_f49615d4431370::t_ac8275aceeaa46 17-24,76-79,89-91
+apps/construction-management/components/contracts/escalation/escalation-clause-panel.tsx
+  s_f49615d4431370::t_fcbd4c4018ac2a 352,364-367
+apps/construction-management/components/contracts/escalation/escalation-fixtures.ts
+  s_f49615d4431370::t_9d414694273f13 4,24-37,87,195
+apps/construction-management/components/contracts/escalation/new-escalation-bill-dialog.stories.tsx
+  s_f49615d4431370::t_64cb7b57f38834 2,12-19,86-91
+apps/construction-management/components/contracts/escalation/new-escalation-bill-dialog.tsx
+  s_f49615d4431370::t_7ae2247314c4f5 222,261
+apps/construction-management/components/contracts/escalation/price-indices-page.stories.tsx
+  s_f49615d4431370::t_38969af19b9b37 126-127
+apps/construction-management/components/contracts/escalation/price-indices-page.tsx
+  s_f49615d4431370::t_f86794d0e08933 247-251,284-285
+apps/construction-management/src/contracts/application/escalation-bill-handlers.ts
+  s_f49615d4431370::t_a6d2c6514be614 1128-1129,1131
+apps/construction-management/src/contracts/application/price-index-handlers.ts
+  s_f49615d4431370::t_ea3365b8546a1a 337
+apps/construction-management/src/contracts/domain/escalation.test.ts
+  s_f49615d4431370::t_5b2a34082e3638 46-47,160-163,299-301,305-307,311-313,395,425-427,431-433
+apps/construction-management/src/contracts/infrastructure/prisma-escalation-store.ts
+  s_f49615d4431370::t_0b296d3f5b3535 209-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1afbde49dbf15bf4073c06d5be355b81309216a6",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
