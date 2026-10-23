@@ -6,6 +6,7 @@ import { ContractorBillHandlers } from "@/src/contracts/application/contractor-b
 import type { ContractorBillDeps } from "@/src/contracts/application/contractor-bill-ports";
 import { PrismaAdvanceStore } from "@/src/contracts/infrastructure/prisma-advance-store";
 import { PrismaBoqStore } from "@/src/contracts/infrastructure/prisma-boq-store";
+import { PrismaEscalationBillStore } from "@/src/contracts/infrastructure/prisma-escalation-store";
 import { PrismaContractorBillStore } from "@/src/contracts/infrastructure/prisma-contractor-bill-store";
 import { PrismaWorkOrderStore } from "@/src/contracts/infrastructure/prisma-work-order-store";
 import { companyToday } from "@/src/shared-kernel/company-today";
@@ -33,6 +34,7 @@ export function createContractorBillDeps(): ContractorBillDeps {
     directory: contractsDirectory,
     invoicing: contractsPartyInvoicing(),
     advances: new PrismaAdvanceStore(),
+    escalationBills: new PrismaEscalationBillStore(),
     tds: contractorTdsEstimate,
     locationLabels: (workspaceId, projectId) =>
       projectLocationLabeller(workspaceId, projectId),

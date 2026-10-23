@@ -91,6 +91,13 @@ import type {
   ContractsTx,
 } from "./ports";
 import { recoverableAdvances } from "./advance-handlers";
+import {
+  assertEscalationRecoveries,
+  outstandingEscalations,
+  suggestedEscalationRecoveries,
+  type OutstandingEscalation,
+} from "./escalation-recoveries";
+import { billInEscalation } from "../domain/escalation";
 import type { ContractRef } from "./advance-ports";
 import {
   allocationsTotal,
@@ -191,6 +198,8 @@ export type ClientBillDetail = {
   retentionReceivable: bigint;
   /** The client contract's advances received, as this bill may recover them (CM-1108). */
   advances: BillAdvanceView[];
+  /** CM-1109: approved negative escalation bills of the contract still to recover. */
+  escalationRecoveries: OutstandingEscalation[];
   allowed: ClientBillAllowed;
   createdByName: string | null;
   submittedByName: string | null;
@@ -664,6 +673,13 @@ export class ClientBillHandlers {
         (bill.status === "approved" ? retentionTotal(deductions) : 0n) -
         released,
       advances: billAdvanceViews(advances, bill.gross),
+      escalationRecoveries: await outstandingEscalations(
+        this.deps.escalationBills,
+        db,
+        ws,
+        clientContract(bill.projectId),
+        bill.id,
+      ),
       allowed: this.allowed(access, bill),
       createdByName: name(bill.createdBy),
       submittedByName: name(bill.submittedBy),
@@ -918,6 +934,14 @@ export class ClientBillHandlers {
         heldBefore,
       });
     const retention = suggestionFor(gross);
+    // CM-1109: negative escalation bills of the contract still to recover.
+    const outstanding = await outstandingEscalations(
+      this.deps.escalationBills,
+      tx,
+      workspaceId,
+      clientContract(project.id),
+      billId,
+    );
     const deductions = plannedDeductions(
       plan,
       retention,
@@ -925,10 +949,26 @@ export class ClientBillHandlers {
       clientBillDeductions,
       {
         gross,
-        suggest: (amount) => suggestedRecoveries(advances, amount),
+        suggest: (amount) => {
+          const fromAdvances = suggestedRecoveries<ClientBillDeduction["kind"]>(
+            advances,
+            amount,
+          );
+          return [
+            ...fromAdvances,
+            ...suggestedEscalationRecoveries<ClientBillDeduction["kind"]>(
+              outstanding,
+              amount +
+                gst.payable -
+                suggestionFor(amount).suggested -
+                deductionsTotal(fromAdvances),
+            ),
+          ];
+        },
       },
     );
     assertRecoveries(deductions, advances);
+    assertEscalationRecoveries(deductions, outstanding);
     assertClientDeductions({
       deductions,
       gross,
@@ -1472,6 +1512,16 @@ export class ClientBillHandlers {
         ),
       ]);
       assertRecoveries(deductions, advances);
+      assertEscalationRecoveries(
+        deductions,
+        await outstandingEscalations(
+          this.deps.escalationBills,
+          tx,
+          ws,
+          clientContract(current.projectId),
+          current.id,
+        ),
+      );
       const recoveries = recoveryAllocations(deductions, advances);
       const amount = current.net + allocationsTotal(recoveries);
       const invoiceId =
@@ -1601,6 +1651,13 @@ export class ClientBillHandlers {
       const current = await this.locked(tx, ws, id);
       assertBillAction(current.status, "reverse");
       assertNotStale(current, expectedUpdatedAt);
+      // CM-1109: an escalation bill that takes this bill's value goes first.
+      const taking = await this.deps.escalationBills.takingBill(
+        tx,
+        ws,
+        current.id,
+      );
+      if (taking.length > 0) throw billInEscalation(taking[0]?.number ?? null);
       if ((await store.laterBills(tx, ws, current)) > 0)
         throw clientBillNotLatest();
       // CM-1108: the bill's own advance recoveries are not "received".

@@ -8,6 +8,7 @@ import type {
   DeductionKind,
 } from "../domain/contract-terms";
 import type { AdvanceStore } from "./advance-ports";
+import type { EscalationBillStore } from "./escalation-ports";
 import type { BoqDb, BoqStore } from "./boq-ports";
 import type { ContractsDirectory, ContractsTx, PartyInvoicing } from "./ports";
 import type { WorkOrderStore } from "./work-order-ports";
@@ -346,6 +347,8 @@ export type ContractorBillDeps = {
   invoicing: PartyInvoicing;
   /** The Work Order's advances and retention releases (CM-1108). */
   advances: AdvanceStore;
+  /** Negative escalation bills recovered on running bills, and the bills escalation takes (CM-1109). */
+  escalationBills: EscalationBillStore;
   tds: ContractorTdsEstimator;
   /** One-line labels for the rows' locations ("Wing A · Floor 1"). */
   locationLabels: (

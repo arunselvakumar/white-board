@@ -78,6 +78,13 @@ import type {
   ContractsTx,
 } from "./ports";
 import { recoverableAdvances } from "./advance-handlers";
+import {
+  assertEscalationRecoveries,
+  outstandingEscalations,
+  suggestedEscalationRecoveries,
+  type OutstandingEscalation,
+} from "./escalation-recoveries";
+import { billInEscalation } from "../domain/escalation";
 import type { ContractRef } from "./advance-ports";
 import {
   allocationsTotal,
@@ -178,6 +185,8 @@ export type ContractorBillDetail = {
    * what is left and what this bill's gross suggests (CM-1108).
    */
   advances: BillAdvanceView[];
+  /** CM-1109: approved negative escalation bills of the contract still to recover. */
+  escalationRecoveries: OutstandingEscalation[];
   tdsEstimate: ContractorTdsEstimate | null;
   allowed: ContractorBillAllowed;
   createdByName: string | null;
@@ -624,6 +633,13 @@ export class ContractorBillHandlers {
         (bill.status === "approved" ? retentionTotal(deductions) : 0n) -
         released,
       advances: billAdvanceViews(advances, bill.gross),
+      escalationRecoveries: await outstandingEscalations(
+        this.deps.escalationBills,
+        db,
+        ws,
+        workOrderContract(bill),
+        bill.id,
+      ),
       tdsEstimate,
       allowed: this.allowed(access, bill),
       createdByName: name(bill.createdBy),
@@ -844,6 +860,18 @@ export class ContractorBillHandlers {
         heldBefore,
       });
     const retention = suggestionFor(gross);
+    // CM-1109: negative escalation bills of the contract still to recover.
+    const outstanding = await outstandingEscalations(
+      this.deps.escalationBills,
+      tx,
+      workspaceId,
+      {
+        side: "contractor",
+        projectId: workOrder.projectId,
+        workOrderId: workOrder.id,
+      },
+      billId,
+    );
     const deductions: BillDeduction[] = plannedDeductions(
       plan,
       retention,
@@ -851,10 +879,26 @@ export class ContractorBillHandlers {
       billDeductions,
       {
         gross,
-        suggest: (amount) => suggestedRecoveries(advances, amount),
+        suggest: (amount) => {
+          const fromAdvances = suggestedRecoveries<BillDeduction["kind"]>(
+            advances,
+            amount,
+          );
+          return [
+            ...fromAdvances,
+            ...suggestedEscalationRecoveries<BillDeduction["kind"]>(
+              outstanding,
+              amount +
+                gst.payable -
+                suggestionFor(amount).suggested -
+                deductionsTotal(fromAdvances),
+            ),
+          ];
+        },
       },
     );
     assertRecoveries(deductions, advances);
+    assertEscalationRecoveries(deductions, outstanding);
     assertDeductions({
       deductions,
       gross,
@@ -1463,6 +1507,16 @@ export class ContractorBillHandlers {
         ),
       ]);
       assertRecoveries(deductions, advances);
+      assertEscalationRecoveries(
+        deductions,
+        await outstandingEscalations(
+          this.deps.escalationBills,
+          tx,
+          ws,
+          workOrderContract(current),
+          current.id,
+        ),
+      );
       const recoveries = recoveryAllocations(deductions, advances);
       const amount = current.net + allocationsTotal(recoveries);
       const invoiceId =
@@ -1622,6 +1676,13 @@ export class ContractorBillHandlers {
       const current = await this.locked(tx, ws, id);
       assertBillAction(current.status, "reverse");
       this.checkStale(current, expectedUpdatedAt);
+      // CM-1109: an escalation bill that takes this bill's value goes first.
+      const taking = await this.deps.escalationBills.takingBill(
+        tx,
+        ws,
+        current.id,
+      );
+      if (taking.length > 0) throw billInEscalation(taking[0]?.number ?? null);
       if ((await store.laterBills(tx, ws, current)) > 0) throw billNotLatest();
       // CM-1108: the bill's own advance recoveries are not "settled".
       const recoveries = recoveryAllocations(

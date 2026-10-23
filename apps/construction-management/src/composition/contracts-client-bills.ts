@@ -6,6 +6,7 @@ import { ClientBillHandlers } from "@/src/contracts/application/client-bill-hand
 import type { ClientBillDeps } from "@/src/contracts/application/client-bill-ports";
 import { PrismaAdvanceStore } from "@/src/contracts/infrastructure/prisma-advance-store";
 import { PrismaBoqStore } from "@/src/contracts/infrastructure/prisma-boq-store";
+import { PrismaEscalationBillStore } from "@/src/contracts/infrastructure/prisma-escalation-store";
 import { PrismaClientBillStore } from "@/src/contracts/infrastructure/prisma-client-bill-store";
 import { readCompanyHeader } from "@/src/procurement/infrastructure/purchase-request-pdf";
 import { companyToday } from "@/src/shared-kernel/company-today";
@@ -29,6 +30,7 @@ export function createClientBillDeps(): ClientBillDeps {
     directory: contractsDirectory,
     invoicing: contractsPartyInvoicing(),
     advances: new PrismaAdvanceStore(),
+    escalationBills: new PrismaEscalationBillStore(),
     locationLabels: (workspaceId, projectId) =>
       projectLocationLabeller(workspaceId, projectId),
     backdated: (access) => loadBackdatedCheck(prisma, access),

@@ -5,6 +5,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import type { BillStatus } from "../domain/contract-terms";
 import type { ClientContractTerms } from "../domain/client-bill";
 import type { AdvanceStore } from "./advance-ports";
+import type { EscalationBillStore } from "./escalation-ports";
 import type { BoqDb, BoqStore } from "./boq-ports";
 import type {
   BillCursor,
@@ -240,6 +241,8 @@ export type ClientBillDeps = {
   invoicing: PartyInvoicing;
   /** The client contract's advances and retention releases (CM-1108). */
   advances: AdvanceStore;
+  /** Negative escalation bills recovered on running bills, and the bills escalation takes (CM-1109). */
+  escalationBills: EscalationBillStore;
   /** One-line labels for the rows' locations ("Wing A · Floor 1"). */
   locationLabels: (
     workspaceId: string,
