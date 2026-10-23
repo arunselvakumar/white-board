@@ -435,6 +435,7 @@ function ProjectForm({
               control={form.control}
               render={({ field }) => (
                 <ProjectColorField
+                  ref={field.ref}
                   value={field.value}
                   onChange={field.onChange}
                   disabled={saving}

@@ -33,7 +33,7 @@ The keys and labels live in the domain (`src/projects/domain/project-color.ts`),
 
 ### 2. The owner picks it on New Project and Edit Project
 
-The Project card of the form has a **Colour** row of eight round swatches (a radio group), next to the Project Type. Lavender is preselected on New Project, and the saved colour on Edit Project. The field is not marked required, because one swatch is always selected.
+The Project card of the form has a **Colour** row of eight round swatches (a radio group), full width under the Project name. Lavender is preselected on New Project, and the saved colour on Edit Project. The field is not marked required, because one swatch is always selected.
 
 ### 3. The Projects home shows folders, not rows
 

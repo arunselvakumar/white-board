@@ -28,10 +28,6 @@ export function isProjectColor(value: string): value is ProjectColor {
   return (PROJECT_COLOR_KEYS as readonly string[]).includes(value);
 }
 
-export function projectColorLabel(color: ProjectColor): string {
-  return PROJECT_COLORS.find((item) => item.key === color)?.label ?? color;
-}
-
 /** Blank or null is the default, since a Project always has a colour. */
 export function cleanProjectColor(
   raw: string | null | undefined,

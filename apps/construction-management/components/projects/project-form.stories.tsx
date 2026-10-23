@@ -1253,6 +1253,43 @@ export const EditChangesColour: Story = {
   },
 };
 
+/**
+ * A colour the server refuses (an older palette, say) shows under the
+ * Colour row and moves focus to the chosen swatch.
+ */
+export const NewShowsAColourRefusal: Story = {
+  beforeEach: () =>
+    api((call) =>
+      call.method === "POST"
+        ? Response.json(
+            {
+              code: "PROJECT_COLOR_INVALID",
+              message: "Choose a colour from the palette.",
+            },
+            { status: 400 },
+          )
+        : undefined,
+    ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Anugraha Residency",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await expect(
+      await canvas.findByText("Choose a colour from the palette."),
+    ).toBeVisible();
+    await waitFor(() =>
+      expect(canvas.getByRole("radio", { name: "Lavender" })).toHaveFocus(),
+    );
+  },
+};
+
 export const ColourPickerDark: Story = {
   globals: { theme: "dark" },
   beforeEach: () => api(created),

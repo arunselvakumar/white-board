@@ -1,5 +1,6 @@
 "use client";
 
+import type { Ref } from "react";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -14,13 +15,16 @@ import { PROJECT_FOLDER_TINTS } from "./project-folder-colors";
  * The Project's folder colour on the Project form (ADR CM-0026 §2): eight
  * round swatches in a radio group, so one is always chosen and the arrow
  * keys move between them. Each swatch is named ("Lavender"); the chosen
- * one has a ring and a dot.
+ * one has a ring and a dot. `ref` lands on the chosen swatch, so the form
+ * can focus the field when the server refuses the colour.
  */
 export function ProjectColorField({
+  ref,
   value,
   onChange,
   disabled,
 }: {
+  ref?: Ref<HTMLElement>;
   value: ProjectColor;
   onChange: (color: ProjectColor) => void;
   disabled?: boolean;
@@ -45,6 +49,7 @@ export function ProjectColorField({
           return (
             <RadioGroupItem
               key={color.key}
+              ref={color.key === value ? ref : undefined}
               value={color.key}
               aria-label={color.label}
               title={color.label}
