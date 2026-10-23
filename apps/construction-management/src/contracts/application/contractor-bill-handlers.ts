@@ -79,6 +79,16 @@ import type {
 } from "./ports";
 import { recoverableAdvances } from "./advance-handlers";
 import {
+  assertMaterialDeductions,
+  cutMaterialRecoveries,
+} from "../domain/material-reconciliation";
+import {
+  reconcileWorkOrder,
+  recoveryLimits,
+  suggestedMaterialDeductions,
+  type WorkOrderReconciliation,
+} from "./reconciliation-handlers";
+import {
   assertEscalationRecoveries,
   outstandingEscalations,
   suggestedEscalationRecoveries,
@@ -99,7 +109,11 @@ import {
   type BillAdvanceView,
   type DeductionPlan as RaDeductionPlan,
 } from "./ra-bill-common";
-import type { StoredWorkOrder, StoredWorkOrderLine } from "./work-order-ports";
+import type {
+  StoredWorkOrder,
+  StoredWorkOrderLine,
+  StoredWorkOrderMaterial,
+} from "./work-order-ports";
 
 export {
   CONTRACTOR_BILL_DOCUMENT_TYPE,
@@ -187,6 +201,11 @@ export type ContractorBillDetail = {
   advances: BillAdvanceView[];
   /** CM-1109: approved negative escalation bills of the contract still to recover. */
   escalationRecoveries: OutstandingEscalation[];
+  /**
+   * CM-1110: the Work Order's materials reconciled at this bill — what it
+   * suggests recovering per material, and at cost.
+   */
+  materials: BillMaterialView[];
   tdsEstimate: ContractorTdsEstimate | null;
   allowed: ContractorBillAllowed;
   createdByName: string | null;
@@ -195,6 +214,23 @@ export type ContractorBillDetail = {
   reversedByName: string | null;
   financial: boolean;
   viewerFlags: Flag[];
+};
+
+/** A Work Order material as a bill's deductions editor offers it (CM-1110). */
+export type BillMaterialView = {
+  materialId: string;
+  materialName: string;
+  uomName: string;
+  issueBasis: StoredWorkOrderMaterial["issueBasis"];
+  /** Exact excess (10⁻¹² of the UoM) at this bill. */
+  excess: bigint;
+  penalRate: bigint | null;
+  recoveredBefore: bigint;
+  /** Paise: the material reconciliation recovery this bill may take. */
+  recoverySuggested: bigint;
+  atCostDeductedBefore: bigint;
+  /** Paise: material issued at cost not yet deducted. */
+  atCostSuggested: bigint;
 };
 
 export type ContractorBillListParams = {
@@ -240,6 +276,38 @@ type Measured = {
   cumulativeValue: bigint;
   previousValue: bigint;
 };
+
+/** Where the bill's material reconciliation is worked out (CM-1110). */
+type MaterialPoint = {
+  ordinal: number | null;
+  upTo: CalendarDate;
+  /** The bill's own line quantities. */
+  own: ReadonlyMap<string, bigint>;
+};
+
+type MaterialPlan = {
+  now: MaterialPoint;
+  /** The stored draft, for a refresh or an edit that keeps its deductions. */
+  before: MaterialPoint | null;
+  /** Contractor Bills Approve: a recovery may pass its suggestion, with a reason. */
+  mayExceed: boolean;
+  /** The stored deductions: sent back unchanged, they are not checked again. */
+  stored: readonly StoredBillDeduction[];
+};
+
+/** Ten-thousandths per Work Order line, from bill lines. */
+function ownQuantities(
+  lines: readonly { workOrderLineId: string | null; quantity: bigint }[],
+): Map<string, bigint> {
+  const out = new Map<string, bigint>();
+  for (const line of lines)
+    if (line.workOrderLineId != null)
+      out.set(
+        line.workOrderLineId,
+        (out.get(line.workOrderLineId) ?? 0n) + line.quantity,
+      );
+  return out;
+}
 
 type Priced = {
   gst: BillGst;
@@ -336,6 +404,11 @@ export class ContractorBillHandlers {
 
   financial(access: MemberAccess, projectId: string): boolean {
     return can(access, CONTRACTOR_BILL_MENU, "financial", { projectId });
+  }
+
+  /** CM-1110: a material recovery above its suggestion needs Approve. */
+  private mayExceed(access: MemberAccess, projectId: string): boolean {
+    return can(access, CONTRACTOR_BILL_MENU, "approve", { projectId });
   }
 
   /** A draft is changed by its creator (with Create) or a holder of `flag`. */
@@ -643,6 +716,39 @@ export class ContractorBillHandlers {
         workOrderContract(bill),
         bill.id,
       ),
+      materials:
+        bill.type === "running"
+          ? (
+              await reconcileWorkOrder(
+                {
+                  store: this.deps.reconciliation,
+                  workOrders,
+                  issues: this.deps.materialIssues,
+                  directory,
+                },
+                db,
+                ws,
+                order,
+                {
+                  billId: bill.id,
+                  ordinal: bill.ordinal,
+                  upTo: bill.measuredUpTo,
+                  own: ownQuantities(lines),
+                },
+              )
+            ).materials.map((row) => ({
+              materialId: row.materialId,
+              materialName: row.materialName,
+              uomName: row.uomName,
+              issueBasis: row.terms.issueBasis,
+              excess: row.excess,
+              penalRate: row.terms.penalRate,
+              recoveredBefore: row.recoveredBefore,
+              recoverySuggested: row.recoverySuggested,
+              atCostDeductedBefore: row.atCostDeductedBefore,
+              atCostSuggested: row.atCostSuggested,
+            }))
+          : [],
       tdsEstimate,
       allowed: this.allowed(access, bill),
       createdByName: name(bill.createdBy),
@@ -823,6 +929,7 @@ export class ContractorBillHandlers {
     gross: bigint,
     plan: DeductionPlan,
     storedGst: BillGst | null,
+    material: MaterialPlan,
   ): Promise<Priced> {
     const { directory, store, workOrders } = this.deps;
     const [project, contractors, woLines, heldBefore, advances] =
@@ -876,31 +983,77 @@ export class ContractorBillHandlers {
       },
       billId,
     );
-    const deductions: BillDeduction[] = plannedDeductions(
+    // CM-1110: the Work Order's material reconciliation at this bill (and
+    // at the stored draft, so material recoveries left as suggested follow).
+    const reconcile = (point: MaterialPoint) =>
+      reconcileWorkOrder(
+        {
+          store: this.deps.reconciliation,
+          workOrders,
+          issues: this.deps.materialIssues,
+          directory,
+        },
+        tx,
+        workspaceId,
+        workOrder,
+        { billId, ...point },
+      );
+    const [reconciled, reconciledBefore] = await Promise.all([
+      reconcile(material.now),
+      material.before == null ? null : reconcile(material.before),
+    ]);
+    const suggestAt =
+      (at: WorkOrderReconciliation) =>
+      (amount: bigint): BillDeduction[] => {
+        const fromAdvances = suggestedRecoveries<BillDeduction["kind"]>(
+          advances,
+          amount,
+        );
+        const room =
+          amount +
+          gst.payable -
+          suggestionFor(amount).suggested -
+          deductionsTotal(fromAdvances);
+        const fromMaterials = suggestedMaterialDeductions<
+          BillDeduction["kind"]
+        >(at, room);
+        return [
+          ...fromAdvances,
+          ...fromMaterials,
+          ...suggestedEscalationRecoveries<BillDeduction["kind"]>(
+            outstanding,
+            room - deductionsTotal(fromMaterials),
+          ),
+        ];
+      };
+    const limits = recoveryLimits(reconciled);
+    const planned: BillDeduction[] = plannedDeductions(
       plan,
       retention,
       suggestionFor,
       billDeductions,
       {
         gross,
-        suggest: (amount) => {
-          const fromAdvances = suggestedRecoveries<BillDeduction["kind"]>(
-            advances,
-            amount,
-          );
-          return [
-            ...fromAdvances,
-            ...suggestedEscalationRecoveries<BillDeduction["kind"]>(
-              outstanding,
-              amount +
-                gst.payable -
-                suggestionFor(amount).suggested -
-                deductionsTotal(fromAdvances),
-            ),
-          ];
-        },
+        suggest: suggestAt(reconciled),
+        ...(reconciledBefore == null
+          ? {}
+          : { suggestBefore: suggestAt(reconciledBefore) }),
       },
     );
+    const deductions =
+      plan.kind === "keep" ? cutMaterialRecoveries(planned, limits) : planned;
+    assertMaterialDeductions(deductions, limits, {
+      mayExceed: material.mayExceed,
+      checkLimit: plan.kind === "given",
+      unchanged: (row) =>
+        material.stored.some(
+          (stored) =>
+            stored.kind === row.kind &&
+            stored.materialId === row.materialId &&
+            stored.amount === row.amount &&
+            stored.description === row.description,
+        ),
+    });
     assertRecoveries(deductions, advances);
     assertEscalationRecoveries(deductions, outstanding);
     assertDeductions({
@@ -977,6 +1130,7 @@ export class ContractorBillHandlers {
         amount: deduction.amount,
         advanceId: deduction.advanceId,
         escalationBillId: deduction.escalationBillId,
+        materialId: deduction.materialId,
         position,
       })),
     );
@@ -1138,6 +1292,16 @@ export class ContractorBillHandlers {
           ? { kind: "given", inputs: input.deductions }
           : { kind: "suggest" },
         null,
+        {
+          now: {
+            ordinal: null,
+            upTo: header.measuredUpTo,
+            own: ownQuantities(measured.lines),
+          },
+          before: null,
+          mayExceed: this.mayExceed(access, projectId),
+          stored: [],
+        },
       );
       const after: StoredBill = {
         ...draft,
@@ -1202,6 +1366,7 @@ export class ContractorBillHandlers {
         measured = await this.measure(tx, ws, workOrder, header.measuredUpTo);
       }
       const gross = measured?.gross ?? current.gross;
+      const storedOwn = ownQuantities(await store.lines(tx, ws, [id]));
       const priced = await this.price(
         tx,
         ws,
@@ -1212,6 +1377,20 @@ export class ContractorBillHandlers {
           ? { kind: "given", inputs: input.deductions }
           : { kind: "keep", stored, previousGross: current.gross },
         measured == null ? this.storedGst(current) : null,
+        {
+          now: {
+            ordinal: current.ordinal,
+            upTo: header.measuredUpTo,
+            own: measured == null ? storedOwn : ownQuantities(measured.lines),
+          },
+          before: {
+            ordinal: current.ordinal,
+            upTo: current.measuredUpTo,
+            own: storedOwn,
+          },
+          mayExceed: this.mayExceed(access, current.projectId),
+          stored,
+        },
       );
       const after: StoredBill = {
         ...current,
@@ -1284,6 +1463,7 @@ export class ContractorBillHandlers {
         { today, orderDate: workOrder.orderDate },
       );
       const stored = await store.deductions(tx, ws, [id]);
+      const storedOwn = ownQuantities(await store.lines(tx, ws, [id]));
       await store.freeRows(tx, ws, id);
       const measured = await this.measure(
         tx,
@@ -1299,6 +1479,20 @@ export class ContractorBillHandlers {
         measured.gross,
         { kind: "keep", stored, previousGross: current.gross },
         null,
+        {
+          now: {
+            ordinal: current.ordinal,
+            upTo: header.measuredUpTo,
+            own: ownQuantities(measured.lines),
+          },
+          before: {
+            ordinal: current.ordinal,
+            upTo: current.measuredUpTo,
+            own: storedOwn,
+          },
+          mayExceed: this.mayExceed(access, current.projectId),
+          stored,
+        },
       );
       const after: StoredBill = {
         ...current,

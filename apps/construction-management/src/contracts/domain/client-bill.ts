@@ -161,11 +161,13 @@ export function clientRetentionSuggestion(input: {
 export function clientBillDeductions(
   inputs: readonly BillDeductionInput[],
 ): ClientBillDeduction[] {
+  // The client side issues no material (CM-1110): a material reconciliation
+  // recovery is refused by kind, and no deduction names a Material.
   return raBillDeductions(
     inputs,
     CLIENT_BILL_DEDUCTION_KINDS,
     "Pick retention, mobilisation or secured advance recovery, material issued at cost or other.",
-  );
+  ).map((row) => ({ ...row, materialId: null }));
 }
 
 export function assertClientDeductions(input: {

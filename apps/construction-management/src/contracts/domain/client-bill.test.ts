@@ -127,6 +127,7 @@ describe("Client Bills: a tax invoice (CM-1107)", () => {
         description: null,
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
       },
     ]);
     expect(

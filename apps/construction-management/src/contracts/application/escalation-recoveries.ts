@@ -95,6 +95,7 @@ export function suggestedEscalationRecoveries<K extends DeductionKind>(
       description: row.reason,
       advanceId: null,
       escalationBillId: row.id,
+      materialId: null,
     });
   }
   return out;

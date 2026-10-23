@@ -1070,6 +1070,7 @@ export class ClientBillHandlers {
         amount: deduction.amount,
         advanceId: deduction.advanceId,
         escalationBillId: deduction.escalationBillId,
+        materialId: deduction.materialId,
         position,
       })),
     );

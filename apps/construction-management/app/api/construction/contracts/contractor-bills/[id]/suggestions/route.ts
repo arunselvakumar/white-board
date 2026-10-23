@@ -9,6 +9,7 @@ import {
   mobilisationSuggestion,
   toBillAdvancesResponse,
 } from "../../../advances/bill-advance-models";
+import { toBillMaterialsResponse } from "../../bill-material-models";
 import {
   ConstructionContractsContractorBillParamsModel,
   toRetentionResponse,
@@ -20,7 +21,9 @@ export const dynamic = "force-dynamic";
 /**
  * What the deductions editor suggests (CM-1106): retention at the Work
  * Order's %, within its cap, and per advance given on the Work Order
- * min(its rule on this gross, what is left of it) (CM-1108). Money is null
+ * min(its rule on this gross, what is left of it) (CM-1108), and per Work
+ * Order material the reconciliation recovery and material at cost
+ * (CM-1110). Money is null
  * without Financial. Needs Contractor Bill read.
  */
 export async function GET(
@@ -50,6 +53,7 @@ export async function GET(
         detail.financial,
       ),
       recoveries: toBillAdvancesResponse(detail.advances, detail.financial),
+      materials: toBillMaterialsResponse(detail.materials, detail.financial),
     };
     return Response.json(body);
   } catch (error) {

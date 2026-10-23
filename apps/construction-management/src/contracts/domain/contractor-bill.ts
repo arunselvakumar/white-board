@@ -84,14 +84,15 @@ export const CONTRACTOR_BILL_NAMING: DocumentNaming = {
 /**
  * The deductions a Contractor Bill takes: retention, mobilisation and
  * secured advance recoveries (each naming its advance, CM-1108), material
- * issued at cost and other. Material reconciliation recovery arrives with
- * reconciliation (CM-1110).
+ * issued at cost, material reconciliation recovery (each naming its
+ * Material, CM-1110) and other.
  */
 export const CONTRACTOR_BILL_DEDUCTION_KINDS = [
   "retention",
   "mobilisation_recovery",
   "secured_advance_recovery",
   "material_at_cost",
+  "material_reconciliation",
   "other",
 ] as const satisfies readonly DeductionKind[];
 export type ContractorBillDeductionKind =
@@ -249,7 +250,7 @@ export function billDeductions(
   return raBillDeductions(
     inputs,
     CONTRACTOR_BILL_DEDUCTION_KINDS,
-    "Pick retention, mobilisation or secured advance recovery, material issued at cost or other.",
+    "Pick retention, mobilisation or secured advance recovery, material issued at cost, material reconciliation recovery or other.",
   );
 }
 

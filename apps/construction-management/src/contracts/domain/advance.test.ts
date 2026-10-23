@@ -150,6 +150,7 @@ describe("advances (CM-1108)", () => {
         description: null,
         advanceId: "early",
         escalationBillId: null,
+        materialId: null,
       },
       {
         kind: "secured_advance_recovery",
@@ -157,6 +158,7 @@ describe("advances (CM-1108)", () => {
         description: null,
         advanceId: "late",
         escalationBillId: null,
+        materialId: null,
       },
     ]);
   });

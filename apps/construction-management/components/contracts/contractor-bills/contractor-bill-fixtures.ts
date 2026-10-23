@@ -174,6 +174,7 @@ export function billOf(
         amount: 4_730_00,
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
       },
       {
         id: "0199c0de-1106-7000-8000-000000000602",
@@ -182,9 +183,11 @@ export function billOf(
         amount: 5_000_00,
         advanceId: ADVANCE_ID,
         escalationBillId: null,
+        materialId: null,
       },
     ],
     escalationRecoveries: [],
+    materials: [],
     advances: [
       {
         id: ADVANCE_ID,
@@ -303,6 +306,7 @@ export const DRAFT = billOf({
       amount: 4_730_00,
       advanceId: null,
       escalationBillId: null,
+      materialId: null,
     },
   ],
   deductions: 4_730_00,
@@ -356,6 +360,7 @@ export const RCM = billOf({
       amount: 4_730_00,
       advanceId: null,
       escalationBillId: null,
+      materialId: null,
     },
   ],
   deductions: 4_730_00,

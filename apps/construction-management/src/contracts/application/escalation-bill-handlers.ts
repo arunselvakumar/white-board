@@ -635,7 +635,7 @@ export class EscalationBillHandlers {
           inputs,
           ESCALATION_DEDUCTION_KINDS,
           "An escalation bill takes retention or other deductions; advances are recovered on running bills.",
-        ).map((row) => ({ ...row, escalationBillId: null })),
+        ).map((row) => ({ ...row, escalationBillId: null, materialId: null })),
     );
     assertRaDeductions({
       deductions,
@@ -703,6 +703,7 @@ export class EscalationBillHandlers {
         amount: deduction.amount,
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
         position,
       })),
     );

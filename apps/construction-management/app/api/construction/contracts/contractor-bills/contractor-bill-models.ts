@@ -35,6 +35,11 @@ import {
 } from "@/src/shared-kernel/list-cursor";
 
 import { ConstructionContractsMeasurementLocationModel } from "../measurements/measurement-models";
+import {
+  billDeductionMaterialId,
+  ConstructionContractsBillMaterialModel,
+  toBillMaterialsResponse,
+} from "./bill-material-models";
 
 import {
   billDeductionEscalationBillId,
@@ -100,9 +105,7 @@ export const ListConstructionContractsContractorBillsRequestModel = z
 export const ConstructionContractsContractorBillDeductionInputModel = z.object({
   kind: z
     .enum(CONTRACTOR_BILL_DEDUCTION_KINDS)
-    .describe(
-      "Secured advance and material reconciliation recoveries arrive with CM-1108 and CM-1110.",
-    ),
+    .describe("Material reconciliation recovery names its Material (CM-1110)."),
   amount: z
     .int()
     .describe(
@@ -118,6 +121,7 @@ export const ConstructionContractsContractorBillDeductionInputModel = z.object({
     ),
   advanceId: billDeductionAdvanceId,
   escalationBillId: billDeductionEscalationBillId,
+  materialId: billDeductionMaterialId,
 });
 
 const content = {
@@ -344,6 +348,10 @@ export const ConstructionContractsContractorBillDeductionModel = z.object({
     .describe(
       "The negative escalation bill an `other` deduction recovers (CM-1109).",
     ),
+  materialId: z
+    .uuid()
+    .nullable()
+    .describe("The Material a material deduction recovers (CM-1110)."),
 });
 
 export const ConstructionContractsContractorBillRetentionModel = z.object({
@@ -413,6 +421,11 @@ export const GetConstructionContractsContractorBillResponseModel = z.object({
     .describe(
       "The contract's advances this bill may recover, with what is left and what its gross suggests (CM-1108).",
     ),
+  materials: z
+    .array(ConstructionContractsBillMaterialModel)
+    .describe(
+      "The Work Order's materials reconciled at this bill, with the recoveries it suggests (CM-1110).",
+    ),
   retention: ConstructionContractsContractorBillRetentionModel,
   retentionHeldOnWorkOrder: money(
     "Paise: retention held on the Work Order: its approved bills' retention less releases (CM-1108).",
@@ -450,6 +463,11 @@ export const ConstructionContractsContractorBillSuggestionsResponseModel =
       .array(ConstructionContractsBillAdvanceModel)
       .describe(
         "One per advance of the contract with what this bill suggests recovering (CM-1108).",
+      ),
+    materials: z
+      .array(ConstructionContractsBillMaterialModel)
+      .describe(
+        "Per Work Order material: the material reconciliation recovery and material at cost this bill suggests (CM-1110).",
       ),
   });
 export type ConstructionContractsContractorBillSuggestionsResponseModel =
@@ -620,8 +638,10 @@ export function toContractorBillResponse(
       amount: paise(deduction.amount, financial),
       advanceId: deduction.advanceId,
       escalationBillId: deduction.escalationBillId,
+      materialId: deduction.materialId,
     })),
     advances: toBillAdvancesResponse(detail.advances, financial),
+    materials: toBillMaterialsResponse(detail.materials, financial),
     escalationRecoveries: toBillEscalationRecoveriesResponse(
       detail.escalationRecoveries,
       financial,

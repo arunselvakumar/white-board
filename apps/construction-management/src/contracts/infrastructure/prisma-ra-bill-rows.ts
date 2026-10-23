@@ -133,6 +133,7 @@ export function toDeduction(row: DeductionRow): StoredBillDeduction {
     amount: row.amount,
     advanceId: row.advanceId,
     escalationBillId: row.escalationBillId,
+    materialId: row.materialId,
     position: row.position,
   };
 }
@@ -212,6 +213,7 @@ export async function replaceDeductions(
       amount: deduction.amount,
       advanceId: deduction.advanceId,
       escalationBillId: deduction.escalationBillId,
+      materialId: deduction.materialId,
       position: deduction.position,
     })),
   });

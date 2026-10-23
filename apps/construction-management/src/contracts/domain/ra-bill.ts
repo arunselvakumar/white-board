@@ -344,6 +344,8 @@ export type BillDeductionInput = {
   advanceId?: string | null;
   /** An "other" deduction recovering a negative escalation bill (CM-1109). */
   escalationBillId?: string | null;
+  /** A material reconciliation recovery or material at cost: its Material (CM-1110). */
+  materialId?: string | null;
 };
 
 export type RaBillDeduction<K extends DeductionKind = DeductionKind> = {
@@ -354,6 +356,8 @@ export type RaBillDeduction<K extends DeductionKind = DeductionKind> = {
   advanceId: string | null;
   /** The negative escalation bill an "other" deduction recovers (CM-1109). */
   escalationBillId: string | null;
+  /** The Material a material deduction recovers (CM-1110); null on other kinds. */
+  materialId: string | null;
 };
 
 /**
@@ -425,7 +429,20 @@ export function raBillDeductions<K extends DeductionKind>(
     const escalation = input.escalationBillId?.trim() ?? "";
     const escalationBillId =
       kind === "other" && escalation !== "" ? escalation : null;
-    return { kind, amount, description, advanceId, escalationBillId };
+    const material = input.materialId?.trim().toLowerCase() ?? "";
+    const materialId =
+      (kind === "material_reconciliation" || kind === "material_at_cost") &&
+      material !== ""
+        ? material
+        : null;
+    return {
+      kind,
+      amount,
+      description,
+      advanceId,
+      escalationBillId,
+      materialId,
+    };
   });
 }
 

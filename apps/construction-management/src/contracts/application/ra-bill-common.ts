@@ -95,7 +95,38 @@ export type DeductionPlan<I> =
 export type RecoveryPlan<K extends RaBillDeduction["kind"]> = {
   gross: bigint;
   suggest: (gross: bigint) => RaBillDeduction<K>[];
+  /**
+   * What was suggested when the stored draft was last worked out, when it
+   * depends on more than the gross (CM-1110: the material recoveries
+   * follow the bill's lines and date). Defaults to `suggest(previousGross)`.
+   */
+  suggestBefore?: (previousGross: bigint) => RaBillDeduction<K>[];
 };
+
+/**
+ * What a suggested line is matched by on a refresh: its advance (CM-1108)
+ * or its kind and Material (CM-1110); null for lines nothing suggests.
+ */
+function suggestionKey(row: {
+  kind: string;
+  advanceId: string | null;
+  materialId: string | null;
+}): string | null {
+  if (row.advanceId != null) return `advance:${row.advanceId}`;
+  if (row.materialId != null) return `${row.kind}:${row.materialId}`;
+  return null;
+}
+
+function keyed<K extends RaBillDeduction["kind"]>(
+  rows: readonly RaBillDeduction<K>[],
+): Map<string, RaBillDeduction<K>> {
+  const out = new Map<string, RaBillDeduction<K>>();
+  for (const row of rows) {
+    const key = suggestionKey(row);
+    if (key != null) out.set(key, row);
+  }
+  return out;
+}
 
 /**
  * A draft's deductions by `plan`: the suggested retention and advance
@@ -103,7 +134,8 @@ export type RecoveryPlan<K extends RaBillDeduction["kind"]> = {
  * `check`); or the stored ones, where retention left at the old suggestion
  * follows the new gross and typed retention stays, cut to what the cap now
  * allows, and a recovery left at its old suggestion follows the new one
- * (gone when nothing is left to recover).
+ * (gone when nothing is left to recover). A material deduction (CM-1110)
+ * newly suggested where nothing was suggested before is added.
  */
 export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
   plan: DeductionPlan<I>,
@@ -121,6 +153,7 @@ export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
             description: null,
             advanceId: null,
             escalationBillId: null,
+            materialId: null,
           },
         ]
       : [];
@@ -130,18 +163,12 @@ export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
       ...(recoveries?.suggest(recoveries.gross) ?? []),
     ];
   if (plan.kind === "given") return check(plan.inputs);
-  const before = new Map(
-    (recoveries?.suggest(plan.previousGross) ?? []).map((row) => [
-      row.advanceId,
-      row.amount,
-    ]),
+  const before = keyed(
+    recoveries == null
+      ? []
+      : (recoveries.suggestBefore ?? recoveries.suggest)(plan.previousGross),
   );
-  const now = new Map(
-    (recoveries?.suggest(recoveries.gross) ?? []).map((row) => [
-      row.advanceId,
-      row.amount,
-    ]),
-  );
+  const now = keyed(recoveries?.suggest(recoveries.gross) ?? []);
   const kept: RaBillDeduction<K>[] = plan.stored.flatMap((row) => {
     const line = {
       kind: row.kind as K,
@@ -149,22 +176,33 @@ export function plannedDeductions<K extends RaBillDeduction["kind"], I>(
       description: row.description,
       advanceId: row.advanceId,
       escalationBillId: row.escalationBillId,
+      materialId: row.materialId,
     };
+    const key = suggestionKey(line);
     if (
       recoveries == null ||
-      row.advanceId == null ||
-      before.get(row.advanceId) !== row.amount
+      key == null ||
+      before.get(key)?.amount !== row.amount
     )
       return [line];
-    const next = now.get(row.advanceId) ?? 0n;
+    const next = now.get(key)?.amount ?? 0n;
     return next > 0n ? [{ ...line, amount: next }] : [];
   });
-  const others = kept.filter((row) => row.kind !== "retention");
+  const storedKeys = new Set(
+    plan.stored.map((row) => suggestionKey(row)).filter((key) => key != null),
+  );
+  const added = [...now.entries()]
+    .filter(
+      ([key, row]) =>
+        row.materialId != null && !storedKeys.has(key) && !before.has(key),
+    )
+    .map(([, row]) => row);
+  const others = [...kept.filter((row) => row.kind !== "retention"), ...added];
   const held = retentionTotal(kept);
   const untouched = held === suggestionFor(plan.previousGross).suggested;
   return untouched || held > retention.suggested
     ? [...retentionLine(retention.suggested), ...others]
-    : kept;
+    : [...kept, ...added];
 }
 
 /** What an audit entry keeps of any RA bill. */

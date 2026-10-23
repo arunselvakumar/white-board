@@ -302,7 +302,17 @@ export function assertMaterialDeductions(
     materialId: string | null;
   }[],
   limits: readonly MaterialRecoveryLimit[],
-  options: { mayExceed: boolean; checkLimit: boolean },
+  options: {
+    mayExceed: boolean;
+    checkLimit: boolean;
+    /** Rows kept as they were stored, checked when first typed. */
+    unchanged?: (deduction: {
+      kind: string;
+      amount: bigint;
+      description: string | null;
+      materialId: string | null;
+    }) => boolean;
+  },
 ): void {
   const byId = new Map(limits.map((limit) => [limit.materialId, limit]));
   const seen = new Set<string>();
@@ -340,6 +350,7 @@ export function assertMaterialDeductions(
       );
     seen.add(key);
     if (!recovery || !options.checkLimit) return;
+    if (options.unchanged?.(deduction) === true) return;
     if (deduction.amount <= limit.recoverySuggested) return;
     const max = Number(limit.recoverySuggested);
     if ((deduction.description ?? "").trim() === "")
@@ -355,6 +366,34 @@ export function assertMaterialDeductions(
         "BILL_MATERIAL_RECOVERY_OVER_SUGGESTION",
         `Recovering more than the suggested ₹${rupees(limit.recoverySuggested)} for ${limit.materialName} needs Approve on Contractor Bills.`,
       );
+  });
+}
+
+/**
+ * On a refresh or an edit that keeps the stored deductions, a recovery
+ * typed without a reason that is now above its suggestion is cut to it
+ * (dropped at ₹0), like retention above its cap. One with a reason (an
+ * Approve holder's) stays.
+ */
+export function cutMaterialRecoveries<
+  D extends {
+    kind: string;
+    amount: bigint;
+    description: string | null;
+    materialId: string | null;
+  },
+>(deductions: readonly D[], limits: readonly MaterialRecoveryLimit[]): D[] {
+  const byId = new Map(limits.map((limit) => [limit.materialId, limit]));
+  return deductions.flatMap((deduction) => {
+    if (
+      deduction.kind !== "material_reconciliation" ||
+      deduction.materialId == null ||
+      (deduction.description ?? "").trim() !== ""
+    )
+      return [deduction];
+    const max = byId.get(deduction.materialId)?.recoverySuggested ?? 0n;
+    if (deduction.amount <= max) return [deduction];
+    return max > 0n ? [{ ...deduction, amount: max }] : [];
   });
 }
 

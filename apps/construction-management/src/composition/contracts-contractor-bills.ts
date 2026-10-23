@@ -8,10 +8,12 @@ import { PrismaAdvanceStore } from "@/src/contracts/infrastructure/prisma-advanc
 import { PrismaBoqStore } from "@/src/contracts/infrastructure/prisma-boq-store";
 import { PrismaEscalationBillStore } from "@/src/contracts/infrastructure/prisma-escalation-store";
 import { PrismaContractorBillStore } from "@/src/contracts/infrastructure/prisma-contractor-bill-store";
+import { PrismaReconciliationStore } from "@/src/contracts/infrastructure/prisma-reconciliation-store";
 import { PrismaWorkOrderStore } from "@/src/contracts/infrastructure/prisma-work-order-store";
 import { companyToday } from "@/src/shared-kernel/company-today";
 import { loadBackdatedCheck } from "@/src/site-work/infrastructure/site-work-guards";
 
+import { contractsMaterialIssues } from "./contracts-material-issues";
 import { projectLocationLabeller } from "./progress-report-source";
 import {
   contractorTdsEstimate,
@@ -21,7 +23,8 @@ import {
 /**
  * Contractor Bills (CM-1106) wired to Prisma, the BOQ lock, the Work Order
  * store, the contracts directory, finance (the payable invoice and the
- * TDS estimate), the Back-dated Entry policy and messaging
+ * TDS estimate), material reconciliation (procurement's issues through
+ * `contractsMaterialIssues`, CM-1110), the Back-dated Entry policy and messaging
  * (`document.submitted|approved|rejected`, approval type
  * `contractor_bill`).
  */
@@ -36,6 +39,8 @@ export function createContractorBillDeps(): ContractorBillDeps {
     advances: new PrismaAdvanceStore(),
     escalationBills: new PrismaEscalationBillStore(),
     tds: contractorTdsEstimate,
+    reconciliation: new PrismaReconciliationStore(),
+    materialIssues: contractsMaterialIssues,
     locationLabels: (workspaceId, projectId) =>
       projectLocationLabeller(workspaceId, projectId),
     backdated: (access) => loadBackdatedCheck(prisma, access),

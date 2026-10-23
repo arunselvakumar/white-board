@@ -286,6 +286,7 @@ describe("deductions and net", () => {
         description: null,
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
       },
       {
         kind: "other",
@@ -293,6 +294,7 @@ describe("deductions and net", () => {
         description: "Water charges",
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
       },
     ]);
     expect(
@@ -302,10 +304,15 @@ describe("deductions and net", () => {
       errorOf(() => billDeductions([{ kind: "retention", amount: 0 }])).code,
     ).toBe("BILL_DEDUCTION_AMOUNT_INVALID");
     expect(
-      errorOf(() =>
-        billDeductions([{ kind: "material_reconciliation", amount: 1 }]),
-      ).code,
+      errorOf(() => billDeductions([{ kind: "escalation", amount: 1 }])).code,
     ).toBe("BILL_DEDUCTION_KIND_INVALID");
+    // CM-1110: material deductions keep the Material they name; others drop it.
+    expect(
+      billDeductions([
+        { kind: "material_reconciliation", amount: 1, materialId: " M1 " },
+        { kind: "other", amount: 2, description: "x", materialId: "m2" },
+      ]).map((row) => row.materialId),
+    ).toEqual(["m1", null]);
     // CM-1108: a recovery keeps the advance it names; other kinds drop it.
     expect(
       billDeductions([
@@ -319,6 +326,7 @@ describe("deductions and net", () => {
         description: null,
         advanceId: "a1",
         escalationBillId: null,
+        materialId: null,
       },
       {
         kind: "material_at_cost",
@@ -326,6 +334,7 @@ describe("deductions and net", () => {
         description: null,
         advanceId: null,
         escalationBillId: null,
+        materialId: null,
       },
     ]);
   });
