@@ -1,6 +1,7 @@
 import {
   BadgeCheck,
   BookOpenText,
+  LineChart,
   Briefcase,
   CircleAlert,
   Tag,
@@ -259,6 +260,14 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Items you quote and bill, with adopted rates, rate analysis and Excel import.",
         icon: BookOpenText,
+      },
+      {
+        href: "/app/masters/price-indices",
+        label: "Price indices",
+        title: "Price indices",
+        description:
+          "WPI, CPI-IW and material indices by month, typed or imported, for escalation bills.",
+        icon: LineChart,
       },
     ],
   },
