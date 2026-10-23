@@ -71,7 +71,7 @@ Empty titled pages use `PagePlaceholder` (`Empty` from `@repo/ui`). Page reads u
 />
 ```
 
-Select `size` matches Input height: `sm` is `h-7`, `default` is `h-8`, `lg` is `h-10`. Use `size="lg"` next to auth/onboarding inputs. Height lives on the size variant so `className="h-10"` cannot lose to `data-[size=default]:h-8`.
+Select follows React Bits' Glide Select (issue #113): `sm` is 28 px, `default` 32 px, `lg` 44 px, with rows of 26 / 30 / 40 px in the menu. Use `size="lg"` next to auth/onboarding inputs. Height lives on the size variant so `className="h-10"` cannot lose to `data-[size=default]:h-8`. The menu drops 6 px below the trigger from its corner (`align="start"`, `alignItemWithTrigger={false}` are the defaults now) and is 176 px wide, never narrower than the trigger. `SelectItem` takes an optional `tag` for secondary text (`<SelectItem value="dca" tag="6 months">DCA</SelectItem>`).
 
 Compact prefix selects (country code) use a fixed trigger width (`w-[7.5rem] shrink-0`) and `aria-label` when the visible label belongs to a sibling field.
 
