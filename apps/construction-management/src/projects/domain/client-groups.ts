@@ -1,7 +1,8 @@
 /**
  * Projects grouped by their client on the Projects home (ADR CM-0027 §1).
- * The client name is free text, so names that differ only in case or
- * spacing ("Sri Balaji Developers", "sri balaji  developers") are one
+ * The client name is free text, so names that differ only in case,
+ * spacing or accents ("Sri Balaji Developers", "sri balaji  developers",
+ * "Café" / "Cafe") are one
  * client, shown as the first Project in `all` spells it (the unfiltered
  * list, so a status filter never changes a heading). Groups go by
  * name; Projects with no client come last, in one group with a null
@@ -15,31 +16,41 @@ export type ClientGroup<T> = {
 };
 
 const byName = new Intl.Collator("en", { sensitivity: "base", numeric: true });
+/**
+ * One client: case and accents ignored, like `byName`. A collator, not
+ * stripping marks, so Tamil and other Indic vowel signs still tell names
+ * apart; and not numeric, so "Block 01" and "Block 1" stay two clients.
+ */
+const sameClient = new Intl.Collator("en", { sensitivity: "base" });
 
 function tidy(name: string | null): string | null {
   const text = name?.trim().replace(/\s+/g, " ") ?? "";
   return text === "" ? null : text;
 }
 
-function keyOf(clientName: string | null): string {
-  return clientName?.toLocaleLowerCase("en-IN") ?? "";
-}
-
 export function groupByClient<T extends { clientName: string | null }>(
   projects: readonly T[],
   all: readonly { clientName: string | null }[] = projects,
 ): ClientGroup<T>[] {
-  const spelling = new Map<string, string>();
+  // The first spelling of each client in the unfiltered list.
+  const spellings: string[] = [];
+  const spellingOf = (clientName: string): string => {
+    const known = spellings.find(
+      (spelling) => sameClient.compare(spelling, clientName) === 0,
+    );
+    if (known != null) return known;
+    spellings.push(clientName);
+    return clientName;
+  };
   for (const item of all) {
     const clientName = tidy(item.clientName);
-    if (clientName != null && !spelling.has(keyOf(clientName)))
-      spelling.set(keyOf(clientName), clientName);
+    if (clientName != null) spellingOf(clientName);
   }
   const groups = new Map<string, ClientGroup<T>>();
   for (const project of projects) {
     const tidied = tidy(project.clientName);
-    const key = keyOf(tidied);
-    const clientName = tidied == null ? null : (spelling.get(key) ?? tidied);
+    const clientName = tidied == null ? null : spellingOf(tidied);
+    const key = clientName?.toLocaleLowerCase("en-IN") ?? "";
     const group = groups.get(key);
     if (group == null)
       groups.set(key, { key, clientName, projects: [project] });

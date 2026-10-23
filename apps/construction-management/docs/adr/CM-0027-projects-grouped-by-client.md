@@ -13,10 +13,10 @@ Once the Projects home showed folders (CM-0026), the owner asked for two follow-
 
 The "Your Projects" section shows one group per client: the client's name, how many Projects it has ("1 Project", "5 Projects"), then that client's folders in the usual grid. Projects with no client name sit in a last group called **Uncategorised**. The client name is optional (CM-413), so there is always somewhere for them.
 
-- **Which client:** the Project's `clientName` from its contract details. It is free text, so names that differ only in case or spacing are one client ("Sri Balaji Developers" and "sri balaji developers"). A blank name counts as no client. The group shows the name as the first Project in the list spells it.
+- **Which client:** the Project's `clientName` from its contract details. It is free text, so names that differ only in case, spacing or accents are one client ("Sri Balaji Developers" and "sri balaji developers"). A blank name counts as no client. The group shows the name as the first Project in the list spells it.
 - **Order:** groups are sorted by client name (case-insensitive, numbers in order), with Uncategorised last. Within a group the Projects keep the home's order: the member's pinned Projects first, then by status and name. A pin does not move a whole group to the top.
 - **Filters:** the status chips and totals filter the Projects first, then they are grouped. A group with nothing left is not shown, and "No Projects are on hold." still shows when nothing matches.
-- **Uncategorised** shows even when no Project has a client, so the layout does not change as clients are added.
+- **Uncategorised** appears only when at least one Project shown has no client; there is never an empty "Uncategorised, 0 Projects" heading. When no Project has a client, every folder sits in one Uncategorised group with its heading, so the page looks the same as clients get added. When every Project has a client, there is no Uncategorised group.
 - Grouping happens in the browser (`src/projects/domain/client-groups.ts`). There is no API or database change: the Projects list already returns `clientName`.
 
 ### 2. Hovering a folder lifts the paper, not the folder
@@ -27,6 +27,7 @@ On hover or keyboard focus, the sheet of paper behind the front slides up out of
 
 - Two spellings of a client that differ by more than case or spacing ("Sri Balaji Developers" and "Sri Balaji Devs") are two groups until someone edits one. Clients are not a master record yet. If they become one, the group should key on its id.
 - A Company with one client sees a single group header. That costs little and keeps the layout the same for every Company.
+- Client names that differ only in accents ("Café Builders", "Cafe Builders") are one client too, the same rule the sort uses.
 
 ## Considered options
 

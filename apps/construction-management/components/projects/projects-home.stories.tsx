@@ -425,24 +425,26 @@ export const GroupedByClient: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("group", { name: "Projects" });
     await expect(groupHeadings(canvas)).toEqual([
-      "NHAI Madurai1 Project",
-      "Sri Balaji Developers2 Projects",
-      "Uncategorised2 Projects",
+      "NHAI Madurai, 1 Project",
+      "Sri Balaji Developers, 2 Projects",
+      "Uncategorised, 2 Projects",
     ]);
     const balaji = within(
-      canvas.getByRole("list", { name: "Sri Balaji Developers" }),
+      canvas.getByRole("region", { name: /^Sri Balaji Developers\b/ }),
     );
     await expect(
       balaji
         .getAllByRole("link")
         .map((link) => link.querySelector("p")?.textContent),
     ).toEqual(["Kumari Heights", "Anugraha Residency"]);
-    const none = within(canvas.getByRole("list", { name: "Uncategorised" }));
+    const none = within(
+      canvas.getByRole("region", { name: /^Uncategorised\b/ }),
+    );
     await expect(none.getAllByRole("link")).toHaveLength(2);
 
     await userEvent.click(canvas.getByRole("button", { name: "On hold 1" }));
     await expect(groupHeadings(canvas)).toEqual([
-      "Sri Balaji Developers1 Project",
+      "Sri Balaji Developers, 1 Project",
     ]);
   },
 };

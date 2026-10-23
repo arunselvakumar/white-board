@@ -37,6 +37,29 @@ describe("groupByClient (ADR CM-0027 §1)", () => {
     });
   });
 
+  it("treats accents as the same client, as the sort does", () => {
+    const groups = groupByClient([
+      p("A", "Café Builders"),
+      p("B", "Cafe Builders"),
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.clientName).toBe("Café Builders");
+  });
+
+  it("keeps Tamil names apart that differ by a vowel sign", () => {
+    const groups = groupByClient([
+      p("A", "கா கட்டுமானம்"),
+      p("B", "க கட்டுமானம்"),
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+
+  it("keeps numbered clients apart", () => {
+    expect(groupByClient([p("A", "Block 01"), p("B", "Block 1")])).toHaveLength(
+      2,
+    );
+  });
+
   it("spells a client as the full list does, whatever is filtered out", () => {
     const shown = p("B", "sri balaji developers");
     const all = [p("A", "Sri Balaji Developers"), shown];

@@ -178,7 +178,8 @@ function ProjectFolderMenu({
 /**
  * One client's folders on the Projects home (ADR CM-0027 §1): the client's
  * name and how many Projects it has, then their folders. Projects with no
- * client are "Uncategorised".
+ * client are "Uncategorised". The heading names the section once, so the
+ * list inside it has no label of its own.
  */
 function ClientGroupSection({
   id,
@@ -204,13 +205,14 @@ function ClientGroupSection({
           <Icon className="size-4" />
         </span>
         <span className="truncate">{name}</span>
+        <span className="sr-only">, </span>
         <span className="text-muted-foreground shrink-0 text-xs font-normal tabular-nums">
           {projects.length === 1
             ? "1 Project"
             : `${String(projects.length)} Projects`}
         </span>
       </h3>
-      <ul aria-label={name} className={PROJECT_FOLDER_GRID}>
+      <ul className={PROJECT_FOLDER_GRID}>
         {projects.map((project) => (
           <ProjectFolderCard
             key={project.id}
