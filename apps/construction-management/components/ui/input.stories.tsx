@@ -117,3 +117,20 @@ export const InGroup: Story = {
     ).toBeNull();
   },
 };
+
+/** A `peer` input stays a sibling, so `peer-disabled:` on the label works. */
+export const Peer: Story = {
+  render: () => (
+    <div className="flex items-center gap-2 p-6">
+      <Input id="peer-input" className="peer w-40" disabled />
+      <Label htmlFor="peer-input">Disabled</Label>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const input = canvas.getByLabelText("Disabled");
+    await expect(input.nextElementSibling).toHaveTextContent("Disabled");
+    await expect(
+      canvasElement.querySelector("[data-slot=input-glow]"),
+    ).toBeNull();
+  },
+};

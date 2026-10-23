@@ -25,6 +25,7 @@ function baseUtility(token: string) {
   return token.slice(start).replace(/^!|!$/g, "");
 }
 
+/** Sorts `className` into wrapper (layout) and `<input>` (appearance) classes. */
 function splitLayoutClasses(className: string | undefined) {
   const layout: string[] = [];
   const control: string[] = [];
@@ -34,6 +35,13 @@ function splitLayoutClasses(className: string | undefined) {
   }
   return { layout: layout.join(" "), control: control.join(" ") };
 }
+
+/**
+ * `sr-only` inputs are invisible, and a `peer` input must stay a sibling of
+ * the elements that read its state (`peer-disabled:` on `Label`), so neither
+ * gets the wrapper.
+ */
+const UNWRAPPED_CLASS = /(?:^|\s)(?:sr-only|peer(?:\/\S+)?)(?=\s|$)/;
 
 const NO_GLOW_TYPES = new Set([
   "hidden",
@@ -58,7 +66,7 @@ const inputClassName =
  *
  * Pass `glow={false}` when the input sits inside a box that draws its own
  * border (`InputGroupInput`). Hidden, file and other non-text inputs, and
- * `sr-only` inputs, never get the wrapper.
+ * `sr-only` and `peer` inputs, never get the wrapper.
  */
 function Input({
   className,
@@ -78,7 +86,7 @@ function Input({
     !glow ||
     props.hidden ||
     (type != null && NO_GLOW_TYPES.has(type)) ||
-    /(?:^|\s)sr-only(?:\s|$)/.test(className ?? "")
+    UNWRAPPED_CLASS.test(className ?? "")
   ) {
     return control;
   }
