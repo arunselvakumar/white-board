@@ -417,8 +417,7 @@ export function roomOnBill(input: {
   const taken = input.deductions
     .filter(
       (row) =>
-        input.except == null ||
-        row.kind !== input.except.kind ||
+        row.kind !== input.except?.kind ||
         row.materialId !== input.except.materialId,
     )
     .reduce((sum, row) => sum + row.amount, 0n);
@@ -459,8 +458,7 @@ export function capMaterialLines<
   for (let index = out.length - 1; index >= 0 && over > 0n; index -= 1) {
     const row = out[index];
     if (
-      row == null ||
-      row.materialId == null ||
+      row?.materialId == null ||
       (row.kind !== "material_reconciliation" &&
         row.kind !== "material_at_cost") ||
       (row.description ?? "").trim() !== ""
