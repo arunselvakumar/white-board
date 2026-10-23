@@ -1,0 +1,27 @@
+apps/construction-management/components/projects/project-color-field.tsx
+  s_198a40712dbd5a::t_16b6e3a40219f5 1-64
+apps/construction-management/components/projects/project-folder-colors.ts
+  s_198a40712dbd5a::t_3ec6ae26049a91 1-83
+apps/construction-management/components/projects/project-form-schema.ts
+  s_198a40712dbd5a::t_c2051ae72bcadf 21-24,91-92,215,248,317,354
+apps/construction-management/components/projects/project-form.stories.tsx
+  s_198a40712dbd5a::t_7fe67fb3e954f7 92,647,1191-1264
+apps/construction-management/components/projects/project-form.tsx
+  s_198a40712dbd5a::t_f115ad34c86b5d 65,232,432-445
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "2f17c6af5558ee65426226816a5a1450be2635c8",
+  "prompts": {},
+  "sessions": {
+    "s_198a40712dbd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "63d99436-5fe4-4e9c-850f-ae238495c14e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
