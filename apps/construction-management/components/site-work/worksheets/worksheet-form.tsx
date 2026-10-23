@@ -575,11 +575,11 @@ export function WorksheetForm({
 
   const busy = form.formState.isSubmitting;
   const id = (name: string) => `worksheet-${name}`;
-  // One of the headcounts must be more than 0; both are marked until one is.
+  // One of the headcounts must be more than 0: Skilled is marked while
+  // Unskilled has none.
   const hasHeadcount = (raw: string) =>
     COUNT_PATTERN.test(raw.trim()) && Number(raw.trim()) > 0;
-  const labourRequired =
-    !hasHeadcount(values.skilledCount) && !hasHeadcount(values.unskilledCount);
+  const labourRequired = !hasHeadcount(values.unskilledCount);
   // A quantity of work done needs its unit.
   const approxUnitRequired = values.approxWorkQty.trim() !== "";
 
@@ -738,14 +738,11 @@ export function WorksheetForm({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={id("unskilled")} required={labourRequired}>
-                  Unskilled Labours
-                </Label>
+                <Label htmlFor={id("unskilled")}>Unskilled Labours</Label>
                 <Input
                   id={id("unskilled")}
                   inputMode="numeric"
                   autoComplete="off"
-                  aria-required={labourRequired}
                   aria-invalid={errors.unskilledCount != null}
                   {...form.register("unskilledCount")}
                 />

@@ -135,13 +135,9 @@ export function TeamMemberDetailsFields({
   mobileLocked?: boolean;
 }) {
   const errors = form.formState.errors;
-  // An email or a mobile is needed: each is required while the other is blank.
-  const [email, mobile] = useWatch({
-    control: form.control,
-    name: ["email", "mobile"],
-  });
+  // An email or a mobile is needed: Email is marked while Mobile is blank.
+  const mobile = useWatch({ control: form.control, name: "mobile" });
   const emailRequired = mobile.trim() === "";
-  const mobileRequired = email.trim() === "";
   const items = designations.map((item) => ({
     value: item.id,
     label: item.name,
@@ -275,13 +271,10 @@ export function TeamMemberDetailsFields({
           <FieldError message={errors.email?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="member-mobile" required={mobileRequired}>
-            Mobile
-          </Label>
+          <Label htmlFor="member-mobile">Mobile</Label>
           <MobileField
             id="member-mobile"
             readOnly={mobileLocked}
-            aria-required={mobileRequired}
             aria-describedby="member-mobile-hint"
             {...form.register("mobile")}
           />
