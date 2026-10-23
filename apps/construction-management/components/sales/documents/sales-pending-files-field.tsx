@@ -30,6 +30,8 @@ export type SalesPendingFilesFieldProps = {
   value: readonly File[];
   onChange: (files: File[]) => void;
   label: string;
+  /** Marks the field required: a red asterisk on the label. */
+  required?: boolean;
   disabled?: boolean;
   error?: string;
 };
@@ -109,6 +111,7 @@ export function SalesPendingFilesField({
   value,
   onChange,
   label,
+  required = false,
   disabled = false,
   error,
 }: SalesPendingFilesFieldProps) {
@@ -141,7 +144,9 @@ export function SalesPendingFilesField({
 
   return (
     <div className="min-w-0 space-y-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {value.length > 0 ? (
         <ul
           aria-label={`${label} to upload`}
@@ -166,6 +171,7 @@ export function SalesPendingFilesField({
           id={id}
           type="file"
           multiple={!single}
+          aria-required={required}
           accept={salesFileInputAccept(role)}
           aria-label={`Choose files for ${label}`}
           className="sr-only top-0 left-0"

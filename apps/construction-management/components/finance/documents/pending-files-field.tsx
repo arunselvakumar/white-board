@@ -27,6 +27,8 @@ export type FinancePendingFilesFieldProps = {
   onChange: (files: File[]) => void;
   /** "Photos & receipts" on a voucher, "Files" elsewhere, unless given. */
   label?: string;
+  /** Marks the field required: a red asterisk on the label. */
+  required?: boolean;
   disabled?: boolean;
   /** A form error to show under the field. */
   error?: string;
@@ -121,6 +123,7 @@ export function FinancePendingFilesField({
   value,
   onChange,
   label = financeFilesHeading(documentType),
+  required = false,
   disabled = false,
   error,
 }: FinancePendingFilesFieldProps) {
@@ -147,7 +150,9 @@ export function FinancePendingFilesField({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {value.length > 0 ? (
         <ul
           aria-label={`${label} to upload`}
@@ -173,6 +178,7 @@ export function FinancePendingFilesField({
           id={id}
           type="file"
           multiple
+          aria-required={required}
           accept={FINANCE_FILE_INPUT_ACCEPT}
           aria-label={`Choose files for ${label}`}
           className="sr-only top-0 left-0"

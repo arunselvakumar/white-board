@@ -28,6 +28,8 @@ export type PendingFilesFieldProps = {
   onChange: (files: File[]) => void;
   /** "Work Photos", "Photos" or "Files" by type unless given. */
   label?: string;
+  /** Marks the field required: a red asterisk on the label. */
+  required?: boolean;
   disabled?: boolean;
   /** A form error to show under the field. */
   error?: string;
@@ -122,6 +124,7 @@ export function PendingFilesField({
   value,
   onChange,
   label = siteWorkFilesHeading(documentType),
+  required = false,
   disabled = false,
   error,
 }: PendingFilesFieldProps) {
@@ -150,7 +153,9 @@ export function PendingFilesField({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {value.length > 0 ? (
         <ul
           aria-label={`${label} to upload`}
@@ -176,6 +181,7 @@ export function PendingFilesField({
           id={id}
           type="file"
           multiple
+          aria-required={required}
           accept={siteWorkFileInputAccept(documentType)}
           aria-label={`Choose ${noun}s for ${label}`}
           className="sr-only top-0 left-0"

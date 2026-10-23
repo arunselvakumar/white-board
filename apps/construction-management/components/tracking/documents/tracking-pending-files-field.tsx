@@ -30,6 +30,8 @@ export type TrackingPendingFilesFieldProps = {
   photosOnly?: boolean;
   /** "Photos" or "Files" unless given. */
   label?: string;
+  /** Marks the field required: a red asterisk on the label. */
+  required?: boolean;
   disabled?: boolean;
   /** A form error to show under the field. */
   error?: string;
@@ -122,6 +124,7 @@ export function TrackingPendingFilesField({
   onChange,
   photosOnly = false,
   label,
+  required = false,
   disabled = false,
   error,
 }: TrackingPendingFilesFieldProps) {
@@ -152,7 +155,9 @@ export function TrackingPendingFilesField({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id}>{title}</Label>
+      <Label htmlFor={id} required={required}>
+        {title}
+      </Label>
       {value.length > 0 ? (
         <ul
           aria-label={`${title} to upload`}
@@ -177,6 +182,7 @@ export function TrackingPendingFilesField({
           id={id}
           type="file"
           multiple
+          aria-required={required}
           accept={trackingFileInputAccept(accept)}
           aria-label={`Choose ${noun}s for ${title}`}
           className="sr-only top-0 left-0"
