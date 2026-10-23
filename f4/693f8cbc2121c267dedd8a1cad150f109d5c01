@@ -1,0 +1,105 @@
+apps/construction-management/app/api/construction/contracts/client-bills/contract/escalation-clause/route.ts
+  s_f49615d4431370::t_3224586cdfdea3 1-34
+apps/construction-management/app/api/construction/contracts/contracts-openapi.ts
+  s_f49615d4431370::t_d2d4d9dee0e630 26-37,61-63,76-78
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/pdf/route.ts
+  s_f49615d4431370::t_52edfbe9ab5c5d 1-54
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/route.ts
+  s_f49615d4431370::t_766607b74a0273 1-11
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/update/route.ts
+  s_f49615d4431370::t_e0e0a3b05cca94 1-33
+apps/construction-management/app/api/construction/contracts/escalation-bills/escalation-bill-access.ts
+  s_f49615d4431370::t_ccda5e9b6c0674 1-117
+apps/construction-management/app/api/construction/contracts/escalation-bills/escalation-bills-openapi.ts
+  s_f49615d4431370::t_47f6d7e0fd4b3e 1-166
+apps/construction-management/app/api/construction/contracts/escalation-bills/form-options/route.ts
+  s_f49615d4431370::t_026b6b2c86cf71 1-46
+apps/construction-management/app/api/construction/contracts/escalation-bills/preview/route.ts
+  s_f49615d4431370::t_f44666cd1edaed 1-54
+apps/construction-management/app/api/construction/contracts/escalation-bills/route.ts
+  s_f49615d4431370::t_10ada68d2c28e0 1-50
+apps/construction-management/app/api/construction/contracts/escalation-clauses/[id]/delete/route.ts
+  s_f49615d4431370::t_0585203428869f 1-27
+apps/construction-management/app/api/construction/contracts/escalation-clauses/[id]/update/route.ts
+  s_f49615d4431370::t_4f0b48ba9d42a0 1-26
+apps/construction-management/app/api/construction/contracts/escalation-clauses/escalation-clause-access.ts
+  s_f49615d4431370::t_7ee93b7c4aea5f 1-78
+apps/construction-management/app/api/construction/contracts/escalation-clauses/route.ts
+  s_f49615d4431370::t_6e245c7eb39e87 1-44
+apps/construction-management/app/api/construction/contracts/price-indices/[id]/delete/route.ts
+  s_f49615d4431370::t_c887887fd4196a 1-35
+apps/construction-management/app/api/construction/contracts/price-indices/[id]/update/route.ts
+  s_f49615d4431370::t_47f94f810e419d 1-47
+apps/construction-management/app/api/construction/contracts/price-indices/export/route.ts
+  s_f49615d4431370::t_89c008301a1ad0 1-34
+apps/construction-management/app/api/construction/contracts/price-indices/import/route.ts
+  s_f49615d4431370::t_2fcd2b3254848e 1-34
+apps/construction-management/app/api/construction/contracts/price-indices/price-indices-openapi.ts
+  s_f49615d4431370::t_d20e661d5f0b7d 1-119
+apps/construction-management/app/api/construction/contracts/price-indices/route.ts
+  s_f49615d4431370::t_73be86836b3815 1-55
+apps/construction-management/app/api/construction/contracts/price-indices/sample/route.ts
+  s_f49615d4431370::t_40c35e31a16521 1-29
+apps/construction-management/app/api/construction/contracts/work-orders/[id]/escalation-clause/route.ts
+  s_f49615d4431370::t_bcaca7b2840bcb 1-37
+apps/construction-management/app/api/construction/finance/invoices/invoice-models.ts
+  s_f49615d4431370::t_c2bb83b8adbf9e 153-158,262
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_f49615d4431370::t_acb6293c2e1f05 179-182,184
+apps/construction-management/src/composition/finance-directory.ts
+  s_f49615d4431370::t_c98be9b945aaf2 382-391
+apps/construction-management/src/finance/application/invoice-handlers.ts
+  s_f49615d4431370::t_fcb7aa75757501 105-106,695-701,739-742
+apps/construction-management/src/finance/application/ports.ts
+  s_f49615d4431370::t_1b48ed43bda2aa 189-194
+apps/construction-management/src/messaging/domain/notification-kinds.ts
+  s_f49615d4431370::t_5bc95ee22df585 214-224
+apps/construction-management/app/api/construction/contracts/escalation-clauses/escalation-clause-models.ts
+  s_b66b36b2f0a0ef::t_8ad299f83de7c0 1-179
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/approve/route.ts
+  s_f49615d4431370::t_5fa7827b3276e6 1-27
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/delete/route.ts
+  s_f49615d4431370::t_2e1a0c8387f50b 1-27
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/refresh/route.ts
+  s_f49615d4431370::t_56abf406f8c0ce 1-27
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/reject/route.ts
+  s_f49615d4431370::t_34b42d46408272 1-28
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/reverse/route.ts
+  s_f49615d4431370::t_5cc051787805ff 1-28
+apps/construction-management/app/api/construction/contracts/escalation-bills/[id]/submit/route.ts
+  s_f49615d4431370::t_c303a18dea584e 1-27
+apps/construction-management/app/api/construction/contracts/escalation-bills/escalation-bill-models.ts
+  s_f49615d4431370::t_0391808760a5ea 1-497
+apps/construction-management/app/api/construction/contracts/escalation-clauses/escalation-clauses-openapi.ts
+  s_f49615d4431370::t_f88351fc0b5c3b 1-98
+apps/construction-management/app/api/construction/contracts/price-indices/price-index-models.ts
+  s_f49615d4431370::t_7614da82e47e00 1-112
+apps/construction-management/components/finance/parties/party-fixtures.ts
+  s_f49615d4431370::t_8826ba2e99dcb0 74
+apps/construction-management/src/contracts/infrastructure/escalation-bill-pdf.ts
+  s_f49615d4431370::t_ae5edd7212729b 1-214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f4693f8cbc2121c267dedd8a1cad150f109d5c01",
+  "prompts": {},
+  "sessions": {
+    "s_b66b36b2f0a0ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad39e8e54a0dc4dcf",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
