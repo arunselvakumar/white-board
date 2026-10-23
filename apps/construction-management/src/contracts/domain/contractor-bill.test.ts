@@ -285,12 +285,14 @@ describe("deductions and net", () => {
         amount: 5_000_00n,
         description: null,
         advanceId: null,
+        escalationBillId: null,
       },
       {
         kind: "other",
         amount: 100_00n,
         description: "Water charges",
         advanceId: null,
+        escalationBillId: null,
       },
     ]);
     expect(
@@ -316,12 +318,14 @@ describe("deductions and net", () => {
         amount: 1n,
         description: null,
         advanceId: "a1",
+        escalationBillId: null,
       },
       {
         kind: "material_at_cost",
         amount: 2n,
         description: null,
         advanceId: null,
+        escalationBillId: null,
       },
     ]);
   });

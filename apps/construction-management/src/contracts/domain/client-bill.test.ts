@@ -121,7 +121,13 @@ describe("Client Bills: a tax invoice (CM-1107)", () => {
       ),
     ).toBe("BILL_DEDUCTION_KIND_INVALID");
     expect(clientBillDeductions([{ kind: "retention", amount: 100 }])).toEqual([
-      { kind: "retention", amount: 100n, description: null, advanceId: null },
+      {
+        kind: "retention",
+        amount: 100n,
+        description: null,
+        advanceId: null,
+        escalationBillId: null,
+      },
     ]);
     expect(
       clientContractTerms({

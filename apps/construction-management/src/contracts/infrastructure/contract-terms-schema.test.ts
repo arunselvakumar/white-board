@@ -22,6 +22,7 @@ import {
   WORK_ORDER_LINE_KINDS,
   WORK_ORDER_STATUSES,
 } from "../domain/contract-terms";
+import { ESCALATION_BASES } from "../domain/escalation";
 
 const SCHEMA = join(
   __dirname,
@@ -62,11 +63,12 @@ describe("contracts words match the construction_contracts enums (CM-1101)", () 
     ["ConstructionContractsGuaranteePurpose", GUARANTEE_PURPOSES],
     ["ConstructionContractsRetentionStage", RETENTION_STAGES],
     ["ConstructionContractsEscalationComponent", ESCALATION_COMPONENTS],
+    ["ConstructionContractsEscalationBasis", ESCALATION_BASES],
   ])("%s", (name, values) => {
     expect(enums[name]).toEqual([...values]);
   });
 
   it("covers every enum in the schema", () => {
-    expect(Object.keys(enums)).toHaveLength(17);
+    expect(Object.keys(enums)).toHaveLength(18);
   });
 });
