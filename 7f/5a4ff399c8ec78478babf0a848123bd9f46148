@@ -1,0 +1,19 @@
+apps/construction-management/src/contracts/application/escalation-clause-handlers.ts
+  s_f49615d4431370::t_6ba60847aacfa6 1-303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7f5a4ff399c8ec78478babf0a848123bd9f46148",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
