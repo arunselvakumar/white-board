@@ -370,8 +370,8 @@ export function CreateCompanyWizard() {
           >
             {last
               ? mutation.isPending || created
-                ? "Creating…"
-                : "Create Company"
+                ? "Saving…"
+                : "Save"
               : "Continue"}
           </Button>
         </div>

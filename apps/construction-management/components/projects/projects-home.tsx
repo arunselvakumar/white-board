@@ -249,7 +249,8 @@ function ProjectRow({ project }: { project: ProjectItem }) {
  * Projects home (CM-204, `modules/03`): status totals (each one filters the list), then every Project
  * in one list with status chips to filter it, the member's pinned Projects
  * first (CM-411). The Owner sees every Project; a Member those assigned to
- * them.
+ * them. A Company with no Projects sees the same page with every figure at 0
+ * and the empty state in place of the list (#108).
  */
 export function ProjectsHome() {
   const { data } = useSuspenseQuery(projectsQuery);
@@ -268,105 +269,97 @@ export function ProjectsHome() {
           actions={data.counts.all > 0 ? newProjectLink() : undefined}
         />
         <CheckInBanner />
-        {data.counts.all === 0 ? (
-          <Empty className="border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Building2 />
-              </EmptyMedia>
-              <EmptyTitle>No Projects yet</EmptyTitle>
-              <EmptyDescription>
-                Add your first Project to start recording labour, attendance and
-                payments on site.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-              {newProjectLink("Add your first Project")}
-            </EmptyContent>
-          </Empty>
-        ) : (
-          <>
-            <div className="@container">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 @4xl:grid-cols-4">
-                {STATS.map((stat) => (
-                  <MetricCard
-                    key={stat.key}
-                    label={stat.label}
-                    icon={stat.icon}
-                    value={data.counts[stat.key]}
-                    caption={stat.caption}
-                    active={filter === stat.key}
-                    aria-pressed={filter === stat.key}
-                    onClick={() => {
-                      setFilter(stat.key);
-                    }}
-                  />
+        <div className="@container">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 @4xl:grid-cols-4">
+            {STATS.map((stat) => (
+              <MetricCard
+                key={stat.key}
+                label={stat.label}
+                icon={stat.icon}
+                value={data.counts[stat.key]}
+                caption={stat.caption}
+                active={filter === stat.key}
+                aria-pressed={filter === stat.key}
+                onClick={() => {
+                  setFilter(stat.key);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        <section className="bg-card rounded-2xl border shadow-xs">
+          <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
+            <h2 className="text-base tracking-tight">Your Projects</h2>
+            <div className="-mx-5 max-w-full overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
+              <ToggleGroup
+                aria-label="Status"
+                value={[filter]}
+                onValueChange={(value: string[]) => {
+                  const next = value[0] as Filter | undefined;
+                  if (next != null) setFilter(next);
+                }}
+                variant="outline"
+                size="sm"
+              >
+                {FILTERS.map((item) => (
+                  <ToggleGroupItem
+                    key={item.value}
+                    value={item.value}
+                    className="whitespace-nowrap"
+                  >
+                    {item.label}{" "}
+                    <span className="text-muted-foreground tabular-nums">
+                      {data.counts[item.value]}
+                    </span>
+                  </ToggleGroupItem>
                 ))}
-              </div>
+              </ToggleGroup>
             </div>
-            <section className="bg-card rounded-2xl border shadow-xs">
-              <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
-                <h2 className="text-base tracking-tight">Your Projects</h2>
-                <div className="-mx-5 max-w-full overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
-                  <ToggleGroup
-                    aria-label="Status"
-                    value={[filter]}
-                    onValueChange={(value: string[]) => {
-                      const next = value[0] as Filter | undefined;
-                      if (next != null) setFilter(next);
-                    }}
-                    variant="outline"
-                    size="sm"
-                  >
-                    {FILTERS.map((item) => (
-                      <ToggleGroupItem
-                        key={item.value}
-                        value={item.value}
-                        className="whitespace-nowrap"
-                      >
-                        {item.label}{" "}
-                        <span className="text-muted-foreground tabular-nums">
-                          {data.counts[item.value]}
-                        </span>
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
+          </header>
+          {data.counts.all === 0 ? (
+            <Empty className="mx-5 mb-5 w-auto border">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Building2 />
+                </EmptyMedia>
+                <EmptyTitle>No Projects yet</EmptyTitle>
+                <EmptyDescription>
+                  Add your first Project to start recording labour, attendance
+                  and payments on site.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                {newProjectLink("Add your first Project")}
+              </EmptyContent>
+            </Empty>
+          ) : items.length === 0 ? (
+            <p className="text-muted-foreground mx-5 mb-5 rounded-xl border border-dashed p-6 text-center text-sm">
+              No Projects are{" "}
+              {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.
+            </p>
+          ) : (
+            <div className="px-2 pb-2">
+              <div
+                aria-hidden="true"
+                className="hidden items-center gap-1 border-b md:flex"
+              >
+                <div
+                  className={`text-muted-foreground flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${ROW_GRID}`}
+                >
+                  <span>Project</span>
+                  <span>Status</span>
+                  <span>Dates and progress</span>
                 </div>
-              </header>
-              {items.length === 0 ? (
-                <p className="text-muted-foreground mx-5 mb-5 rounded-xl border border-dashed p-6 text-center text-sm">
-                  No Projects are{" "}
-                  {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}
-                  .
-                </p>
-              ) : (
-                <div className="px-2 pb-2">
-                  <div
-                    aria-hidden="true"
-                    className="hidden items-center gap-1 border-b md:flex"
-                  >
-                    <div
-                      className={`text-muted-foreground flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase ${ROW_GRID}`}
-                    >
-                      <span>Project</span>
-                      <span>Status</span>
-                      <span>Dates and progress</span>
-                    </div>
-                    <span className="size-8 shrink-0" />
-                  </div>
-                  <ul
-                    aria-label="Projects"
-                    className="divide-border/70 divide-y"
-                  >
-                    {items.map((project) => (
-                      <ProjectRow key={project.id} project={project} />
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </section>
-          </>
-        )}
+                <span className="size-8 shrink-0" />
+              </div>
+              <ul aria-label="Projects" className="divide-border/70 divide-y">
+                {items.map((project) => (
+                  <ProjectRow key={project.id} project={project} />
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

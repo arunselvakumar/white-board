@@ -76,24 +76,20 @@ export const CreatesACompany: Story = {
 
       await expect(await canvas.findByText("Step 3 of 3")).toBeVisible();
       await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZW");
-      await userEvent.click(
-        canvas.getByRole("button", { name: "Create Company" }),
-      );
+      await userEvent.click(canvas.getByRole("button", { name: "Save" }));
       await expect(
         await canvas.findByText("Enter a valid 15-character GSTIN"),
       ).toBeVisible();
       await userEvent.clear(canvas.getByLabelText("GSTIN"));
       await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZM");
-      await userEvent.click(
-        canvas.getByRole("button", { name: "Create Company" }),
-      );
+      await userEvent.click(canvas.getByRole("button", { name: "Save" }));
 
       // The new Owner goes straight to Projects; no "is ready" screen.
       await waitFor(() =>
         expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
       );
       await expect(
-        canvas.getByRole("button", { name: "Creating…" }),
+        canvas.getByRole("button", { name: "Saving…" }),
       ).toBeDisabled();
       const sent = spy.mock.calls[0]?.[1]?.body;
       const body = JSON.parse(typeof sent === "string" ? sent : "{}") as Record<
@@ -152,7 +148,7 @@ export const ServerErrorReturnsToTheField: Story = {
         await canvas.findByRole("button", { name: "Continue" }),
       );
       await userEvent.click(
-        await canvas.findByRole("button", { name: "Create Company" }),
+        await canvas.findByRole("button", { name: "Save" }),
       );
       await expect(
         await canvas.findByText("Company name is too long."),
