@@ -66,6 +66,7 @@ import {
   type WorkOrderRevision,
 } from "@/src/queries/contracts-work-orders";
 
+import { EscalationClausePanel } from "../escalation/escalation-clause-panel";
 import { AdvancesRetentionPanels } from "../advances/advances-retention-panels";
 import { CloseWorkOrderDialog, ReasonDialog } from "./work-order-dialogs";
 import { localToday } from "./work-order-form";
@@ -595,6 +596,7 @@ export function WorkOrderDetail({
           today={today}
         />
       ) : null}
+      <EscalationClausePanel scope={{ projectId, workOrderId: id }} />
 
       <section aria-labelledby="wo-lines-title" className="min-w-0 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

@@ -52,6 +52,9 @@ import {
   ContractorBillRowsSkeleton,
 } from "./contractor-bills-skeletons";
 import { NewContractorBillDialog } from "./new-contractor-bill-dialog";
+import { NewEscalationBillDialog } from "../escalation/new-escalation-bill-dialog";
+import { periodText } from "../escalation/escalation-format";
+import { escalationBillPath } from "@/src/queries/contracts-escalation";
 
 type Filters = Omit<ContractorBillFilters, "cursor">;
 
@@ -89,6 +92,7 @@ export function ContractorBillsList({
   });
   const [cursor, setCursor] = useState<ContractorBillFilters["cursor"]>(null);
   const [creating, setCreating] = useState(false);
+  const [escalating, setEscalating] = useState(false);
   const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
@@ -122,6 +126,19 @@ export function ContractorBillsList({
           >
             <Plus aria-hidden="true" />
             New bill
+          </Button>
+        )}
+        {canCreate && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setEscalating(true);
+            }}
+          >
+            <Plus aria-hidden="true" />
+            New escalation bill
           </Button>
         )}
       </div>
@@ -210,6 +227,14 @@ export function ContractorBillsList({
           onOpenChange={setCreating}
         />
       ) : null}
+      {canCreate ? (
+        <NewEscalationBillDialog
+          projectId={projectId}
+          side="contractor"
+          open={escalating}
+          onOpenChange={setEscalating}
+        />
+      ) : null}
     </div>
   );
 }
@@ -292,8 +317,12 @@ function ContractorBillRows({
   );
   const filtered = JSON.stringify(filters) !== JSON.stringify(NO_FILTERS);
   const href = (bill: ContractorBillSummary) =>
-    contractorBillsPath(projectId, bill.id);
+    bill.type === "escalation"
+      ? escalationBillPath(projectId, "contractor", bill.id)
+      : contractorBillsPath(projectId, bill.id);
   const number = (bill: ContractorBillSummary) => {
+    if (bill.type === "escalation")
+      return `${billNumber(bill.number)} · Escalation${bill.periodFrom == null || bill.periodTo == null ? "" : ` · ${periodText(bill.periodFrom, bill.periodTo)}`}`;
     const ra = raLabel(bill);
     return `${billNumber(bill.number)}${ra === "" ? "" : ` · ${ra}`}`;
   };

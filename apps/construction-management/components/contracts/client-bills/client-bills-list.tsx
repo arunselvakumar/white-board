@@ -52,10 +52,14 @@ import {
   CLIENT_BILL_COLUMNS,
   ClientBillRowsSkeleton,
 } from "./client-bills-skeletons";
+import { EscalationClausePanel } from "../escalation/escalation-clause-panel";
 import { AdvancesRetentionPanels } from "../advances/advances-retention-panels";
 import { localToday } from "../work-orders/work-order-form";
 import { ClientContractTerms } from "./client-contract-terms";
 import { NewClientBillDialog } from "./new-client-bill-dialog";
+import { NewEscalationBillDialog } from "../escalation/new-escalation-bill-dialog";
+import { periodText } from "../escalation/escalation-format";
+import { escalationBillPath } from "@/src/queries/contracts-escalation";
 
 type Filters = Omit<ClientBillFilters, "cursor">;
 
@@ -85,6 +89,7 @@ export function ClientBillsList({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [cursor, setCursor] = useState<ClientBillFilters["cursor"]>(null);
   const [creating, setCreating] = useState(false);
+  const [escalating, setEscalating] = useState(false);
   const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
@@ -112,6 +117,19 @@ export function ClientBillsList({
           >
             <Plus aria-hidden="true" />
             New bill
+          </Button>
+        )}
+        {canCreate && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setEscalating(true);
+            }}
+          >
+            <Plus aria-hidden="true" />
+            New escalation bill
           </Button>
         )}
       </div>
@@ -192,6 +210,7 @@ export function ClientBillsList({
       >
         <ClientContractTerms projectId={projectId} />
       </Suspense>
+      <EscalationClausePanel scope={{ projectId, workOrderId: null }} />
       <AdvancesRetentionPanels
         scope={{ projectId, workOrderId: null }}
         today={localToday()}
@@ -201,6 +220,14 @@ export function ClientBillsList({
           projectId={projectId}
           open={creating}
           onOpenChange={setCreating}
+        />
+      ) : null}
+      {canCreate ? (
+        <NewEscalationBillDialog
+          projectId={projectId}
+          side="client"
+          open={escalating}
+          onOpenChange={setEscalating}
         />
       ) : null}
     </div>
@@ -257,8 +284,13 @@ function ClientBillRows({
     clientBillsQuery(projectId, { ...filters, cursor }),
   );
   const filtered = JSON.stringify(filters) !== JSON.stringify(NO_FILTERS);
-  const href = (bill: ClientBillSummary) => clientBillsPath(projectId, bill.id);
+  const href = (bill: ClientBillSummary) =>
+    bill.type === "escalation"
+      ? escalationBillPath(projectId, "client", bill.id)
+      : clientBillsPath(projectId, bill.id);
   const number = (bill: ClientBillSummary) => {
+    if (bill.type === "escalation")
+      return `${billNumber(bill.number)} · Escalation${bill.periodFrom == null || bill.periodTo == null ? "" : ` · ${periodText(bill.periodFrom, bill.periodTo)}`}`;
     const ra = raLabel(bill);
     return `${billNumber(bill.number)}${ra === "" ? "" : ` · ${ra}`}`;
   };
