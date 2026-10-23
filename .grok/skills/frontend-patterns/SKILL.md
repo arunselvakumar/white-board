@@ -80,6 +80,7 @@ Compact prefix selects (country code) use a fixed trigger width (`w-[7.5rem] shr
 - `react-hook-form` + `zod` + `zodResolver`
 - Field chrome: `Label` + control + `FieldError` in `space-y-4` / `space-y-1.5`
 - `htmlFor` matches control `id`
+- A field the Zod schema requires gets `<Label required>` (red asterisk) and `aria-required` on its control; a conditional one gets `required={…}` from the watched value. Groups put `<RequiredIndicator />` (or `FieldLegend required`) after the legend. The asterisk is CSS on an empty `aria-hidden` span, so `getByLabelText("Name")` still matches. For an either/or pair, mark only the primary field, while the other is blank. Leave existing "(optional)" labels as they are.
 - `noValidate` on `<form>`; Zod owns messages
 - Submit is `Button type="submit"`
 
