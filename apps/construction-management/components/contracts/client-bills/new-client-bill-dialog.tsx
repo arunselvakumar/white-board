@@ -121,21 +121,27 @@ export function NewClientBillDialog({
           <div className="space-y-4">
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor="new-client-bill-date">Bill date</Label>
+                <Label htmlFor="new-client-bill-date" required>
+                  Bill date
+                </Label>
                 <Input
                   id="new-client-bill-date"
                   type="date"
                   max={today === "" ? undefined : today}
+                  aria-required
                   aria-invalid={formState.errors.billDate != null}
                   {...register("billDate")}
                 />
                 <FieldError message={formState.errors.billDate?.message} />
               </div>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor="new-client-bill-up-to">Measured up to</Label>
+                <Label htmlFor="new-client-bill-up-to" required>
+                  Measured up to
+                </Label>
                 <Input
                   id="new-client-bill-up-to"
                   type="date"
+                  aria-required
                   aria-invalid={formState.errors.measuredUpTo != null}
                   {...register("measuredUpTo")}
                 />

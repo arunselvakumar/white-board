@@ -177,20 +177,26 @@ export function ContractorBillEditor({ bill }: { bill: ContractorBill }) {
       <h3 className="font-semibold">Bill details</h3>
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="bill-date">Bill date</Label>
+          <Label htmlFor="bill-date" required>
+            Bill date
+          </Label>
           <Input
             id="bill-date"
             type="date"
+            aria-required
             aria-invalid={errors.billDate != null}
             {...register("billDate")}
           />
           <FieldError message={errors.billDate?.message} />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="bill-up-to">Measured up to</Label>
+          <Label htmlFor="bill-up-to" required>
+            Measured up to
+          </Label>
           <Input
             id="bill-up-to"
             type="date"
+            aria-required
             aria-invalid={errors.measuredUpTo != null}
             {...register("measuredUpTo")}
           />

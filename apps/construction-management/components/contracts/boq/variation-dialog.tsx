@@ -233,7 +233,9 @@ export function VariationDialog({
     disabled = false,
   ) => (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={`${id}-${name}`}>{label}</Label>
+      <Label htmlFor={`${id}-${name}`} required>
+        {label}
+      </Label>
       <Controller
         name={name}
         control={form.control}
@@ -251,6 +253,7 @@ export function VariationDialog({
               id={`${id}-${name}`}
               size="lg"
               className="w-full min-w-0"
+              aria-required
               aria-invalid={errors[name] != null}
             >
               <SelectValue placeholder="Select…" />
@@ -271,12 +274,15 @@ export function VariationDialog({
 
   const quantityField = (label: string) => (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={`${id}-newQuantity`}>{label}</Label>
+      <Label htmlFor={`${id}-newQuantity`} required>
+        {label}
+      </Label>
       <Input
         id={`${id}-newQuantity`}
         className="h-10"
         inputMode="decimal"
         autoComplete="off"
+        aria-required
         aria-invalid={errors.newQuantity != null}
         {...form.register("newQuantity")}
       />
@@ -285,11 +291,14 @@ export function VariationDialog({
   );
   const rateField = (label: string) => (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={`${id}-newRate`}>{label}</Label>
+      <Label htmlFor={`${id}-newRate`} required>
+        {label}
+      </Label>
       <MoneyInput
         id={`${id}-newRate`}
         className="h-10"
         suffix="per UoM"
+        aria-required
         aria-invalid={errors.newRate != null}
         {...form.register("newRate")}
       />
@@ -336,11 +345,14 @@ export function VariationDialog({
                   })),
                 )}
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={`${id}-itemNo`}>Item no</Label>
+                  <Label htmlFor={`${id}-itemNo`} required>
+                    Item no
+                  </Label>
                   <Input
                     id={`${id}-itemNo`}
                     className="h-10"
                     autoComplete="off"
+                    aria-required
                     aria-invalid={errors.itemNo != null}
                     {...form.register("itemNo")}
                   />
@@ -348,10 +360,13 @@ export function VariationDialog({
                 </div>
               </div>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor={`${id}-description`}>Description</Label>
+                <Label htmlFor={`${id}-description`} required>
+                  Description
+                </Label>
                 <Textarea
                   id={`${id}-description`}
                   rows={2}
+                  aria-required
                   aria-invalid={errors.description != null}
                   {...form.register("description")}
                 />
@@ -387,7 +402,9 @@ export function VariationDialog({
           ) : (
             <>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor={`${id}-item`}>BOQ item</Label>
+                <Label htmlFor={`${id}-item`} required>
+                  BOQ item
+                </Label>
                 <Controller
                   name="boqItemId"
                   control={form.control}
@@ -404,6 +421,7 @@ export function VariationDialog({
                       onChange={(next) => {
                         field.onChange(next?.id ?? "");
                       }}
+                      required
                       invalid={errors.boqItemId != null}
                     />
                   )}
@@ -433,11 +451,14 @@ export function VariationDialog({
             </>
           )}
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor={`${id}-reason`}>Reason</Label>
+            <Label htmlFor={`${id}-reason`} required>
+              Reason
+            </Label>
             <Textarea
               id={`${id}-reason`}
               rows={2}
               placeholder="Client's letter of 12 Oct asked for a deeper footing"
+              aria-required
               aria-invalid={errors.reason != null}
               {...form.register("reason")}
             />

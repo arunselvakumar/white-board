@@ -70,6 +70,7 @@ function MaterialPicker({
   label,
   value,
   invalid,
+  required = false,
   onChange,
 }: {
   projectId: string;
@@ -77,6 +78,7 @@ function MaterialPicker({
   label: string;
   value: { id: string; name: string } | null;
   invalid: boolean;
+  required?: boolean;
   onChange: (pick: MaterialPick | null) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -119,6 +121,7 @@ function MaterialPicker({
       onQueryChange={setQuery}
       loading={results.isPending}
       invalid={invalid}
+      required={required}
     />
   );
 }
@@ -215,7 +218,9 @@ export function WorkOrderMaterials({
             >
               <div className="grid min-w-0 gap-3 sm:grid-cols-2">
                 <div className="min-w-0 space-y-1.5 sm:col-span-2">
-                  <Label htmlFor={`${prefix}-material`}>Material</Label>
+                  <Label htmlFor={`${prefix}-material`} required>
+                    Material
+                  </Label>
                   <MaterialPicker
                     projectId={projectId}
                     id={`${prefix}-material`}
@@ -225,6 +230,7 @@ export function WorkOrderMaterials({
                         ? null
                         : { id: row.materialId, name: row.materialName }
                     }
+                    required
                     invalid={rowErrors?.materialId != null}
                     onChange={(pick) => {
                       setValue(
@@ -262,7 +268,9 @@ export function WorkOrderMaterials({
                   <FieldError message={rowErrors?.materialId?.message} />
                 </div>
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={`${prefix}-basis`}>Issue basis</Label>
+                  <Label htmlFor={`${prefix}-basis`} required>
+                    Issue basis
+                  </Label>
                   <Controller
                     control={control}
                     name={`materials.${index}.issueBasis`}
@@ -277,6 +285,7 @@ export function WorkOrderMaterials({
                         <SelectTrigger
                           id={`${prefix}-basis`}
                           className="w-full"
+                          aria-required
                         >
                           <SelectValue />
                         </SelectTrigger>
@@ -306,12 +315,13 @@ export function WorkOrderMaterials({
                 </div>
                 {financial && row?.issueBasis === "at_cost" ? (
                   <div className="min-w-0 space-y-1.5">
-                    <Label htmlFor={`${prefix}-issue-rate`}>
+                    <Label htmlFor={`${prefix}-issue-rate`} required>
                       Issue rate (per{" "}
                       {row.uomName === "" ? "unit" : row.uomName})
                     </Label>
                     <MoneyInput
                       id={`${prefix}-issue-rate`}
+                      aria-required
                       aria-invalid={rowErrors?.issueRate != null}
                       {...register(`materials.${index}.issueRate`)}
                     />

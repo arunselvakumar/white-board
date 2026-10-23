@@ -106,12 +106,15 @@ export function SectionDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-title`}>Title</Label>
+            <Label htmlFor={`${id}-title`} required>
+              Title
+            </Label>
             <Input
               id={`${id}-title`}
               className="h-10"
               autoComplete="off"
               placeholder="Earthwork"
+              aria-required
               aria-invalid={errors.title != null}
               {...form.register("title")}
             />

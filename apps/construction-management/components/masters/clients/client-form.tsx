@@ -105,12 +105,15 @@ export function ClientForm({
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="min-w-0 space-y-1.5 sm:col-span-2">
-            <Label htmlFor="client-name">Client name</Label>
+            <Label htmlFor="client-name" required>
+              Client name
+            </Label>
             <Input
               id="client-name"
               className="h-10"
               autoComplete="off"
               placeholder="Sri Balaji Developers"
+              aria-required
               aria-invalid={errors.name != null}
               {...form.register("name")}
             />

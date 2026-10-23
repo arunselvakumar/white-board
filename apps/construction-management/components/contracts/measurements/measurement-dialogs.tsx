@@ -116,10 +116,13 @@ export function CheckMeasurementDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-party-name`}>Their name</Label>
+            <Label htmlFor={`${id}-party-name`} required>
+              Their name
+            </Label>
             <Input
               id={`${id}-party-name`}
               value={values.partyName}
+              aria-required
               aria-invalid={problems.partyName != null}
               onChange={(event) => {
                 set("partyName")(event.target.value);
@@ -128,7 +131,9 @@ export function CheckMeasurementDialog({
             <FieldError message={problems.partyName} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-party-role`}>Their role</Label>
+            <Label htmlFor={`${id}-party-role`} required>
+              Their role
+            </Label>
             <Input
               id={`${id}-party-role`}
               placeholder={
@@ -137,6 +142,7 @@ export function CheckMeasurementDialog({
                   : "Contractor's supervisor"
               }
               value={values.partyRole}
+              aria-required
               aria-invalid={problems.partyRole != null}
               onChange={(event) => {
                 set("partyRole")(event.target.value);
@@ -145,13 +151,16 @@ export function CheckMeasurementDialog({
             <FieldError message={problems.partyRole} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-joint-on`}>Joint measurement date</Label>
+            <Label htmlFor={`${id}-joint-on`} required>
+              Joint measurement date
+            </Label>
             <Input
               id={`${id}-joint-on`}
               type="date"
               min={measuredOn}
               max={today}
               value={values.jointOn}
+              aria-required
               aria-invalid={problems.jointOn != null}
               onChange={(event) => {
                 set("jointOn")(event.target.value);

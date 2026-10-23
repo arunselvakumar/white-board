@@ -119,9 +119,12 @@ function RejectDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-reason`}>Reason</Label>
+            <Label htmlFor={`${id}-reason`} required>
+              Reason
+            </Label>
             <Textarea
               id={`${id}-reason`}
+              aria-required
               rows={3}
               value={reason}
               onChange={(event) => {

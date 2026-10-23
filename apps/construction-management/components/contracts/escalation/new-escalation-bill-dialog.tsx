@@ -138,7 +138,9 @@ export function NewEscalationBillDialog({
             <div className="grid min-w-0 gap-4">
               {side === "contractor" && fixedWorkOrderId == null ? (
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="escalation-work-order">Work Order</Label>
+                  <Label htmlFor="escalation-work-order" required>
+                    Work Order
+                  </Label>
                   <Select
                     items={withClause.map((row) => ({
                       value: row.id,
@@ -151,6 +153,7 @@ export function NewEscalationBillDialog({
                   >
                     <SelectTrigger
                       id="escalation-work-order"
+                      aria-required
                       className="w-full"
                     >
                       <SelectValue placeholder="Pick a Work Order" />
@@ -172,9 +175,12 @@ export function NewEscalationBillDialog({
               ) : null}
               <div className="grid min-w-0 gap-4 sm:grid-cols-3">
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="escalation-from">From month</Label>
+                  <Label htmlFor="escalation-from" required>
+                    From month
+                  </Label>
                   <Input
                     id="escalation-from"
+                    aria-required
                     type="month"
                     value={fromMonth}
                     onChange={(event) => {
@@ -183,9 +189,12 @@ export function NewEscalationBillDialog({
                   />
                 </div>
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="escalation-to">To month</Label>
+                  <Label htmlFor="escalation-to" required>
+                    To month
+                  </Label>
                   <Input
                     id="escalation-to"
+                    aria-required
                     type="month"
                     value={toMonth}
                     onChange={(event) => {
@@ -194,9 +203,12 @@ export function NewEscalationBillDialog({
                   />
                 </div>
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="escalation-bill-date">Bill date</Label>
+                  <Label htmlFor="escalation-bill-date" required>
+                    Bill date
+                  </Label>
                   <Input
                     id="escalation-bill-date"
+                    aria-required
                     type="date"
                     max={today === "" ? undefined : today}
                     value={date}

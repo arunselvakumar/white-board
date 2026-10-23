@@ -59,6 +59,8 @@ type PickerProps<T extends PickerOption> = {
   onQueryChange?: (query: string) => void;
   loading?: boolean;
   invalid?: boolean;
+  /** Sets `aria-required` on the search box; the label shows the asterisk. */
+  required?: boolean;
   describedBy?: string;
   /** The input, for react-hook-form to focus. */
   inputRef?: Ref<HTMLInputElement>;
@@ -80,6 +82,7 @@ export function ResourcePicker<T extends PickerOption>({
   onQueryChange,
   loading = false,
   invalid = false,
+  required = false,
   describedBy,
   inputRef,
 }: PickerProps<T>) {
@@ -130,6 +133,7 @@ export function ResourcePicker<T extends PickerOption>({
         id={id}
         aria-label={label}
         aria-invalid={invalid || undefined}
+        aria-required={required}
         aria-describedby={describedBy}
         placeholder={placeholder}
         autoComplete="off"
@@ -218,6 +222,7 @@ export function MaterialLinePicker({
   value,
   onChange,
   invalid,
+  required = false,
   inputRef,
 }: {
   id: string;
@@ -225,6 +230,8 @@ export function MaterialLinePicker({
   value: { id: string; name: string } | null;
   onChange: (material: MaterialPick | null) => void;
   invalid?: boolean;
+  /** Sets `aria-required` on the search box; the label shows the asterisk. */
+  required?: boolean;
   inputRef?: Ref<HTMLInputElement>;
 }) {
   const [query, setQuery] = useState("");
@@ -261,6 +268,7 @@ export function MaterialLinePicker({
       onQueryChange={setQuery}
       loading={results.isPending}
       invalid={invalid}
+      required={required}
       inputRef={inputRef}
     />
   );

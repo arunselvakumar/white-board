@@ -151,6 +151,7 @@ export function RateAnalysisTable({
                   <div className="col-span-2 min-w-0 space-y-1 sm:col-span-1">
                     <Label
                       htmlFor={id("resource")}
+                      required
                       className="text-muted-foreground text-xs sm:sr-only"
                     >
                       {line.kind === "lump_sum"
@@ -167,6 +168,7 @@ export function RateAnalysisTable({
                         aria-label={`${name} description`}
                         placeholder="Water, sundries…"
                         autoComplete="off"
+                        aria-required
                         aria-invalid={lineErrors?.description != null}
                         {...register(`lines.${index}.description`)}
                       />
@@ -195,6 +197,7 @@ export function RateAnalysisTable({
                               <MaterialLinePicker
                                 id={id("resource")}
                                 label={label}
+                                required
                                 invalid={invalid}
                                 inputRef={picker.ref}
                                 value={
@@ -251,6 +254,7 @@ export function RateAnalysisTable({
                               }
                               options={options}
                               value={known}
+                              required
                               invalid={invalid}
                               inputRef={picker.ref}
                               onChange={pick}
@@ -270,6 +274,7 @@ export function RateAnalysisTable({
                   <div className="min-w-0 space-y-1">
                     <Label
                       htmlFor={id("coefficient")}
+                      required={line.kind !== "lump_sum"}
                       className="text-muted-foreground text-xs sm:sr-only"
                     >
                       Qty per unit
@@ -290,6 +295,7 @@ export function RateAnalysisTable({
                         autoComplete="off"
                         placeholder="0.45"
                         className="tabular-nums"
+                        aria-required
                         aria-invalid={lineErrors?.coefficient != null}
                         {...register(`lines.${index}.coefficient`)}
                       />
@@ -365,6 +371,7 @@ export function RateAnalysisTable({
                   <div className="min-w-0 space-y-1">
                     <Label
                       htmlFor={id("rate")}
+                      required
                       className="text-muted-foreground text-xs sm:sr-only"
                     >
                       Rate
@@ -374,6 +381,7 @@ export function RateAnalysisTable({
                       aria-label={`${name} rate`}
                       placeholder="0.00"
                       className="h-8"
+                      aria-required
                       aria-invalid={lineErrors?.rate != null}
                       {...register(`lines.${index}.rate`)}
                     />

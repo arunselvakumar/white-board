@@ -312,7 +312,9 @@ export function EscalationClauseDialog({
           </DialogHeader>
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="clause-base-month">Base month</Label>
+              <Label htmlFor="clause-base-month" required>
+                Base month
+              </Label>
               <Input
                 id="clause-base-month"
                 type="month"
@@ -320,6 +322,7 @@ export function EscalationClauseDialog({
                 onChange={(event) => {
                   setBaseMonth(event.currentTarget.value);
                 }}
+                aria-required
                 aria-invalid={errors["baseMonth"] != null}
               />
               <FieldError message={errors["baseMonth"]} />
@@ -410,7 +413,11 @@ export function EscalationClauseDialog({
                     ) : null}
                   </div>
                   <div className="min-w-0 space-y-1">
-                    <Label className="text-xs" htmlFor={`${prefix}.series`}>
+                    <Label
+                      className="text-xs"
+                      htmlFor={`${prefix}.series`}
+                      required
+                    >
                       Index series
                     </Label>
                     <Input
@@ -420,6 +427,7 @@ export function EscalationClauseDialog({
                       onChange={(event) => {
                         change(index, { series: event.currentTarget.value });
                       }}
+                      aria-required
                       aria-invalid={errors[`${prefix}.series`] != null}
                     />
                     <FieldError message={errors[`${prefix}.series`]} />
@@ -430,6 +438,7 @@ export function EscalationClauseDialog({
                         <Label
                           className="text-xs"
                           htmlFor={`${prefix}.basePrice`}
+                          required
                         >
                           Base price (₹ a unit)
                         </Label>
@@ -441,13 +450,18 @@ export function EscalationClauseDialog({
                               basePrice: event.currentTarget.value,
                             });
                           }}
+                          aria-required
                           aria-invalid={errors[`${prefix}.basePrice`] != null}
                         />
                         <FieldError message={errors[`${prefix}.basePrice`]} />
                       </>
                     ) : (
                       <>
-                        <Label className="text-xs" htmlFor={`${prefix}.weight`}>
+                        <Label
+                          className="text-xs"
+                          htmlFor={`${prefix}.weight`}
+                          required
+                        >
                           Weight %
                         </Label>
                         <Input
@@ -459,6 +473,7 @@ export function EscalationClauseDialog({
                               weight: event.currentTarget.value,
                             });
                           }}
+                          aria-required
                           aria-invalid={
                             errors[`${prefix}.weightPercent`] != null
                           }

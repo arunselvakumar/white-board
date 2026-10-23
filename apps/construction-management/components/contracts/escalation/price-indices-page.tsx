@@ -304,12 +304,15 @@ export function PriceIndexDialog({
             {editIndex == null ? (
               <>
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="price-index-series">Series</Label>
+                  <Label htmlFor="price-index-series" required>
+                    Series
+                  </Label>
                   <Input
                     id="price-index-series"
                     name="series"
                     list="price-index-series-options"
                     defaultValue={editing?.kind === "add" ? editing.series : ""}
+                    aria-required
                     aria-invalid={error?.field === "series"}
                   />
                   <datalist id="price-index-series-options">
@@ -324,11 +327,14 @@ export function PriceIndexDialog({
                   />
                 </div>
                 <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor="price-index-month">Month</Label>
+                  <Label htmlFor="price-index-month" required>
+                    Month
+                  </Label>
                   <Input
                     id="price-index-month"
                     name="month"
                     type="month"
+                    aria-required
                     aria-invalid={error?.field === "month"}
                   />
                   <FieldError
@@ -340,7 +346,9 @@ export function PriceIndexDialog({
               </>
             ) : null}
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor="price-index-value">Index value</Label>
+              <Label htmlFor="price-index-value" required>
+                Index value
+              </Label>
               <Input
                 id="price-index-value"
                 name="value"
@@ -348,6 +356,7 @@ export function PriceIndexDialog({
                 defaultValue={
                   editIndex == null ? "" : indexText(editIndex.value)
                 }
+                aria-required
                 aria-invalid={error?.field === "value"}
               />
               <FieldError
@@ -418,9 +427,12 @@ export function ImportPriceIndicesDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="min-w-0 space-y-3">
-          <Label htmlFor="price-index-file">Excel file (.xlsx)</Label>
+          <Label htmlFor="price-index-file" required>
+            Excel file (.xlsx)
+          </Label>
           <Input
             id="price-index-file"
+            aria-required
             type="file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(event) => {

@@ -266,9 +266,12 @@ function DraftEditor({
       <h2 className="font-semibold">Bill details</h2>
       <div className="grid min-w-0 gap-4 sm:grid-cols-3">
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="escalation-edit-from">From month</Label>
+          <Label htmlFor="escalation-edit-from" required>
+            From month
+          </Label>
           <Input
             id="escalation-edit-from"
+            aria-required
             type="month"
             value={fromMonth}
             onChange={(event) => {
@@ -277,9 +280,12 @@ function DraftEditor({
           />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="escalation-edit-to">To month</Label>
+          <Label htmlFor="escalation-edit-to" required>
+            To month
+          </Label>
           <Input
             id="escalation-edit-to"
+            aria-required
             type="month"
             value={toMonth}
             onChange={(event) => {
@@ -288,9 +294,12 @@ function DraftEditor({
           />
         </div>
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="escalation-edit-date">Bill date</Label>
+          <Label htmlFor="escalation-edit-date" required>
+            Bill date
+          </Label>
           <Input
             id="escalation-edit-date"
+            aria-required
             type="date"
             value={billDate}
             onChange={(event) => {
@@ -303,12 +312,13 @@ function DraftEditor({
         <div className="grid min-w-0 gap-4 sm:grid-cols-2">
           {quantityRows.map((row) => (
             <div key={row.component} className="min-w-0 space-y-1.5">
-              <Label htmlFor={`escalation-quantity-${row.component}`}>
+              <Label htmlFor={`escalation-quantity-${row.component}`} required>
                 {ESCALATION_COMPONENT_LABELS[row.component]} used in the period
                 (10CA)
               </Label>
               <Input
                 id={`escalation-quantity-${row.component}`}
+                aria-required
                 inputMode="decimal"
                 value={quantities[row.component] ?? ""}
                 onChange={(event) => {

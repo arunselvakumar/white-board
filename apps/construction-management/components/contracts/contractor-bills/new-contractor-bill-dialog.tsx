@@ -145,7 +145,9 @@ export function NewContractorBillDialog({
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="new-bill-work-order">Work Order</Label>
+              <Label htmlFor="new-bill-work-order" required>
+                Work Order
+              </Label>
               <Controller
                 name="workOrderId"
                 control={control}
@@ -161,6 +163,7 @@ export function NewContractorBillDialog({
                     <SelectTrigger
                       id="new-bill-work-order"
                       className="w-full min-w-0"
+                      aria-required
                       aria-invalid={formState.errors.workOrderId != null}
                     >
                       <SelectValue
@@ -198,21 +201,27 @@ export function NewContractorBillDialog({
             </div>
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor="new-bill-date">Bill date</Label>
+                <Label htmlFor="new-bill-date" required>
+                  Bill date
+                </Label>
                 <Input
                   id="new-bill-date"
                   type="date"
                   max={today === "" ? undefined : today}
+                  aria-required
                   aria-invalid={formState.errors.billDate != null}
                   {...register("billDate")}
                 />
                 <FieldError message={formState.errors.billDate?.message} />
               </div>
               <div className="min-w-0 space-y-1.5">
-                <Label htmlFor="new-bill-up-to">Measured up to</Label>
+                <Label htmlFor="new-bill-up-to" required>
+                  Measured up to
+                </Label>
                 <Input
                   id="new-bill-up-to"
                   type="date"
+                  aria-required
                   aria-invalid={formState.errors.measuredUpTo != null}
                   {...register("measuredUpTo")}
                 />

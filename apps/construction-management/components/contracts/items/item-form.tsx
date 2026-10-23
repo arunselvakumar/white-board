@@ -135,24 +135,30 @@ export function ItemForm({
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="item-code">Code</Label>
+            <Label htmlFor="item-code" required>
+              Code
+            </Label>
             <Input
               id="item-code"
               className="h-10"
               autoComplete="off"
               placeholder="5.1.1"
+              aria-required
               aria-invalid={errors.code != null}
               {...form.register("code")}
             />
             <FieldError message={errors.code?.message} />
           </div>
           <div className="min-w-0 space-y-1.5 sm:col-span-1 lg:col-span-3">
-            <Label htmlFor="item-short">Short description</Label>
+            <Label htmlFor="item-short" required>
+              Short description
+            </Label>
             <Input
               id="item-short"
               className="h-10"
               autoComplete="off"
               placeholder="PCC 1:4:8 in foundations"
+              aria-required
               aria-invalid={errors.shortDescription != null}
               {...form.register("shortDescription")}
             />
@@ -170,7 +176,9 @@ export function ItemForm({
             <FieldError message={errors.description?.message} />
           </div>
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="item-uom">UoM</Label>
+            <Label htmlFor="item-uom" required>
+              UoM
+            </Label>
             <Controller
               name="uomId"
               control={form.control}
@@ -187,6 +195,7 @@ export function ItemForm({
                     ref={field.ref}
                     size="lg"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.uomId != null}
                   >
                     <SelectValue placeholder="Choose a UoM" />
@@ -234,11 +243,14 @@ export function ItemForm({
             <FieldError message={errors.schedule?.message} />
           </div>
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="item-rate">Adopted rate</Label>
+            <Label htmlFor="item-rate" required>
+              Adopted rate
+            </Label>
             <MoneyInput
               id="item-rate"
               className="h-10"
               placeholder="0.00"
+              aria-required
               aria-invalid={errors.adoptedRate != null}
               aria-describedby="item-rate-hint"
               {...form.register("adoptedRate")}

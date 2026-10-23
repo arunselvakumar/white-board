@@ -351,7 +351,9 @@ export function MeasurementForm({
         ) : null}
         {side === "contractor" ? (
           <div className="min-w-0 space-y-1.5 sm:col-span-2">
-            <Label htmlFor="measurement-work-order">Work Order</Label>
+            <Label htmlFor="measurement-work-order" required>
+              Work Order
+            </Label>
             <Controller
               control={control}
               name="workOrderId"
@@ -370,6 +372,7 @@ export function MeasurementForm({
                   <SelectTrigger
                     id="measurement-work-order"
                     className="w-full min-w-0"
+                    aria-required
                     aria-invalid={errors.workOrderId != null}
                   >
                     <SelectValue placeholder="Pick an issued Work Order" />
@@ -394,11 +397,14 @@ export function MeasurementForm({
           </div>
         ) : null}
         <div className="min-w-0 space-y-1.5">
-          <Label htmlFor="measurement-measured-on">Measured on</Label>
+          <Label htmlFor="measurement-measured-on" required>
+            Measured on
+          </Label>
           <Input
             id="measurement-measured-on"
             type="date"
             max={today}
+            aria-required
             aria-invalid={errors.measuredOn != null}
             {...register("measuredOn")}
           />
@@ -490,6 +496,7 @@ export function MeasurementForm({
                 <div className="min-w-0 space-y-1">
                   <Label
                     htmlFor={`measurement-row-${n}-item`}
+                    required
                     className="text-xs md:sr-only"
                   >
                     {side === "client" ? "BOQ item" : "Work Order line"}
@@ -511,6 +518,7 @@ export function MeasurementForm({
                         }
                         options={items}
                         value={itemById.get(itemField.value) ?? null}
+                        required
                         invalid={rowErrors?.itemId != null}
                         inputRef={itemField.ref}
                         onChange={(option) => {
@@ -561,6 +569,7 @@ export function MeasurementForm({
                   <div className="min-w-0 space-y-1 md:col-span-4">
                     <Label
                       htmlFor={`measurement-row-${n}-quantity`}
+                      required
                       className="text-xs"
                     >
                       Direct quantity
@@ -570,6 +579,7 @@ export function MeasurementForm({
                       aria-label={`Row ${n} direct quantity`}
                       inputMode="decimal"
                       className="text-right tabular-nums"
+                      aria-required
                       aria-invalid={rowErrors?.quantity != null}
                       {...register(`rows.${index}.quantity`)}
                     />

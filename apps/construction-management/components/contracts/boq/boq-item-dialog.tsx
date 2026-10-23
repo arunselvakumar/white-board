@@ -316,9 +316,12 @@ export function BoqItemDialog({
     label: string,
     items: { value: string; label: string }[],
     placeholder: string,
+    required: boolean,
   ) => (
     <div className="min-w-0 space-y-1.5">
-      <Label htmlFor={`${id}-${name}`}>{label}</Label>
+      <Label htmlFor={`${id}-${name}`} required={required}>
+        {label}
+      </Label>
       <Controller
         name={name}
         control={form.control}
@@ -335,6 +338,7 @@ export function BoqItemDialog({
               id={`${id}-${name}`}
               size="lg"
               className="w-full min-w-0"
+              aria-required={required}
               aria-invalid={errors[name] != null}
             >
               <SelectValue placeholder={placeholder} />
@@ -395,14 +399,17 @@ export function BoqItemDialog({
             </div>
           ) : null}
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-            {select("sectionId", "Section", sectionItems, "Select…")}
+            {select("sectionId", "Section", sectionItems, "Select…", true)}
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor={`${id}-itemNo`}>Item no</Label>
+              <Label htmlFor={`${id}-itemNo`} required>
+                Item no
+              </Label>
               <Input
                 id={`${id}-itemNo`}
                 className="h-10"
                 autoComplete="off"
                 placeholder="2.1.3"
+                aria-required
                 aria-invalid={errors.itemNo != null}
                 {...form.register("itemNo")}
               />
@@ -410,17 +417,20 @@ export function BoqItemDialog({
             </div>
           </div>
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor={`${id}-description`}>Description</Label>
+            <Label htmlFor={`${id}-description`} required>
+              Description
+            </Label>
             <Textarea
               id={`${id}-description`}
               rows={3}
+              aria-required
               aria-invalid={errors.description != null}
               {...form.register("description")}
             />
             <FieldError message={errors.description?.message} />
           </div>
           <div className="grid min-w-0 gap-4 sm:grid-cols-3">
-            {select("uomId", "UoM", uomItems, "Select…")}
+            {select("uomId", "UoM", uomItems, "Select…", true)}
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor={`${id}-sacHsn`}>SAC/HSN</Label>
               <Input
@@ -434,17 +444,20 @@ export function BoqItemDialog({
               />
               <FieldError message={errors.sacHsn?.message} />
             </div>
-            {select("place", placeWord, placeItems, `No ${placeWord}`)}
+            {select("place", placeWord, placeItems, `No ${placeWord}`, false)}
           </div>
           <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div className="min-w-0 space-y-1.5">
-              <Label htmlFor={`${id}-quantity`}>Quantity</Label>
+              <Label htmlFor={`${id}-quantity`} required>
+                Quantity
+              </Label>
               <Input
                 id={`${id}-quantity`}
                 className="h-10"
                 inputMode="decimal"
                 autoComplete="off"
                 readOnly={measured}
+                aria-required
                 aria-invalid={errors.quantity != null}
                 {...form.register("quantity")}
               />

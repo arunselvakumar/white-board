@@ -158,16 +158,21 @@ function Field({
   error,
   children,
   className,
+  required = false,
 }: {
   id: string;
   label: string;
   error?: string;
   children: ReactNode;
   className?: string;
+  /** Shows the asterisk; set `aria-required` on the control too. */
+  required?: boolean;
 }) {
   return (
     <div className={`min-w-0 space-y-1.5 ${className ?? ""}`}>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {children}
       <FieldError message={error} />
     </div>
@@ -180,6 +185,7 @@ function PlainSelect<T extends string>({
   value,
   onChange,
   invalid,
+  required = false,
   placeholder,
 }: {
   id: string;
@@ -187,6 +193,7 @@ function PlainSelect<T extends string>({
   value: string;
   onChange: (value: T) => void;
   invalid?: boolean;
+  required?: boolean;
   placeholder?: string;
 }) {
   return (
@@ -202,6 +209,7 @@ function PlainSelect<T extends string>({
         id={id}
         size="lg"
         className="w-full min-w-0"
+        aria-required={required}
         aria-invalid={invalid}
       >
         <SelectValue placeholder={placeholder ?? "Choose…"} />
@@ -367,13 +375,19 @@ export function RecordAdvanceDialog({
       }}
     >
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-        <Field id={`${id}-kind`} label="Kind" error={errors.kind?.message}>
+        <Field
+          id={`${id}-kind`}
+          label="Kind"
+          error={errors.kind?.message}
+          required
+        >
           <Controller
             name="kind"
             control={control}
             render={({ field }) => (
               <PlainSelect
                 id={`${id}-kind`}
+                required
                 items={options(ADVANCE_KINDS, ADVANCE_KIND_LABELS)}
                 value={field.value}
                 onChange={field.onChange}
@@ -385,9 +399,11 @@ export function RecordAdvanceDialog({
           id={`${id}-amount`}
           label="Amount"
           error={errors.amount?.message}
+          required
         >
           <MoneyInput
             id={`${id}-amount`}
+            aria-required
             className="h-10"
             aria-invalid={errors.amount != null}
             {...register("amount")}
@@ -397,22 +413,25 @@ export function RecordAdvanceDialog({
           id={`${id}-date`}
           label={given ? "Paid on" : "Received on"}
           error={errors.advanceOn?.message}
+          required
         >
           <Input
             id={`${id}-date`}
+            aria-required
             type="date"
             className="h-10"
             max={today}
             {...register("advanceOn")}
           />
         </Field>
-        <Field id={`${id}-recovery-mode`} label="Recovered as">
+        <Field id={`${id}-recovery-mode`} label="Recovered as" required>
           <Controller
             name="recoveryMode"
             control={control}
             render={({ field }) => (
               <PlainSelect
                 id={`${id}-recovery-mode`}
+                required
                 items={options(RECOVERY_MODES, RECOVERY_MODE_LABELS)}
                 value={field.value}
                 onChange={field.onChange}
@@ -439,22 +458,25 @@ export function RecordAdvanceDialog({
             id={`${id}-recovery-amount`}
             label="Recovered per bill"
             error={errors.recoveryAmount?.message}
+            required
           >
             <MoneyInput
               id={`${id}-recovery-amount`}
+              aria-required
               className="h-10"
               aria-invalid={errors.recoveryAmount != null}
               {...register("recoveryAmount")}
             />
           </Field>
         )}
-        <Field id={`${id}-mode`} label="Mode">
+        <Field id={`${id}-mode`} label="Mode" required>
           <Controller
             name="mode"
             control={control}
             render={({ field }) => (
               <PlainSelect
                 id={`${id}-mode`}
+                required
                 items={options(MODES, MODE_LABELS)}
                 value={field.value}
                 onChange={field.onChange}
@@ -466,6 +488,7 @@ export function RecordAdvanceDialog({
           id={`${id}-account`}
           label={given ? "Paid from" : "Received into"}
           error={errors.accountId?.message}
+          required
         >
           <Controller
             name="accountId"
@@ -473,6 +496,7 @@ export function RecordAdvanceDialog({
             render={({ field }) => (
               <AccountPicker
                 id={`${id}-account`}
+                required
                 mode={mode}
                 value={field.value}
                 onChange={field.onChange}
@@ -486,9 +510,11 @@ export function RecordAdvanceDialog({
             id={`${id}-cheque`}
             label="Cheque number"
             error={errors.chequeNumber?.message}
+            required
           >
             <Input
               id={`${id}-cheque`}
+              aria-required
               className="h-10"
               autoComplete="off"
               {...register("chequeNumber")}
@@ -499,9 +525,11 @@ export function RecordAdvanceDialog({
             id={`${id}-reference`}
             label={mode === "cash" ? "Reference (optional)" : "Reference"}
             error={errors.reference?.message}
+            required={mode !== "cash"}
           >
             <Input
               id={`${id}-reference`}
+              aria-required={mode !== "cash"}
               className="h-10"
               autoComplete="off"
               placeholder={mode === "cash" ? "" : "UTR or UPI reference"}
@@ -600,13 +628,14 @@ export function EditRecoveryDialog({
       }}
     >
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-        <Field id={`${id}-mode`} label="Recovered as">
+        <Field id={`${id}-mode`} label="Recovered as" required>
           <Controller
             name="recoveryMode"
             control={control}
             render={({ field }) => (
               <PlainSelect
                 id={`${id}-mode`}
+                required
                 items={options(RECOVERY_MODES, RECOVERY_MODE_LABELS)}
                 value={field.value}
                 onChange={field.onChange}
@@ -632,9 +661,11 @@ export function EditRecoveryDialog({
             id={`${id}-amount`}
             label="Recovered per bill"
             error={errors.recoveryAmount?.message}
+            required
           >
             <MoneyInput
               id={`${id}-amount`}
+              aria-required
               className="h-10"
               {...register("recoveryAmount")}
             />
@@ -754,13 +785,14 @@ export function GuaranteeDialog({
       }}
     >
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-        <Field id={`${id}-purpose`} label="Secures">
+        <Field id={`${id}-purpose`} label="Secures" required>
           <Controller
             name="purpose"
             control={control}
             render={({ field }) => (
               <PlainSelect
                 id={`${id}-purpose`}
+                required
                 items={options(GUARANTEE_PURPOSES, GUARANTEE_PURPOSE_LABELS)}
                 value={field.value}
                 onChange={field.onChange}
@@ -773,6 +805,7 @@ export function GuaranteeDialog({
             id={`${id}-advance`}
             label="Advance"
             error={errors.advanceId?.message}
+            required
           >
             <Controller
               name="advanceId"
@@ -780,6 +813,7 @@ export function GuaranteeDialog({
               render={({ field }) => (
                 <PlainSelect
                   id={`${id}-advance`}
+                  required
                   items={advances}
                   value={field.value}
                   onChange={field.onChange}
@@ -798,17 +832,25 @@ export function GuaranteeDialog({
           id={`${id}-number`}
           label="Guarantee number"
           error={errors.number?.message}
+          required
         >
           <Input
             id={`${id}-number`}
+            aria-required
             className="h-10"
             autoComplete="off"
             {...register("number")}
           />
         </Field>
-        <Field id={`${id}-bank`} label="Bank" error={errors.bank?.message}>
+        <Field
+          id={`${id}-bank`}
+          label="Bank"
+          error={errors.bank?.message}
+          required
+        >
           <Input
             id={`${id}-bank`}
+            aria-required
             className="h-10"
             autoComplete="off"
             {...register("bank")}
@@ -818,9 +860,11 @@ export function GuaranteeDialog({
           id={`${id}-amount`}
           label="Amount"
           error={errors.amount?.message}
+          required
         >
           <MoneyInput
             id={`${id}-amount`}
+            aria-required
             className="h-10"
             {...register("amount")}
           />
@@ -829,9 +873,11 @@ export function GuaranteeDialog({
           id={`${id}-issued`}
           label="Issued on"
           error={errors.issuedOn?.message}
+          required
         >
           <Input
             id={`${id}-issued`}
+            aria-required
             type="date"
             className="h-10"
             max={today}
@@ -842,9 +888,11 @@ export function GuaranteeDialog({
           id={`${id}-expires`}
           label="Expires on"
           error={errors.expiresOn?.message}
+          required
         >
           <Input
             id={`${id}-expires`}
+            aria-required
             type="date"
             className="h-10"
             {...register("expiresOn")}
@@ -909,9 +957,10 @@ export function DateDialog({
         onConfirm(date);
       }}
     >
-      <Field id={`${id}-date`} label={label} error={problem}>
+      <Field id={`${id}-date`} label={label} error={problem} required>
         <Input
           id={`${id}-date`}
+          aria-required
           type="date"
           className="h-10"
           min={min}
@@ -1019,9 +1068,10 @@ export function ReleaseRetentionDialog({
       }}
     >
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-        <Field id={`${id}-stage`} label="Stage">
+        <Field id={`${id}-stage`} label="Stage" required>
           <PlainSelect
             id={`${id}-stage`}
+            required
             items={options(RETENTION_STAGES, RETENTION_STAGE_LABELS)}
             value={stage}
             onChange={(next) => {
@@ -1030,9 +1080,15 @@ export function ReleaseRetentionDialog({
             }}
           />
         </Field>
-        <Field id={`${id}-amount`} label="Amount" error={problems.amount}>
+        <Field
+          id={`${id}-amount`}
+          label="Amount"
+          error={problems.amount}
+          required
+        >
           <MoneyInput
             id={`${id}-amount`}
+            aria-required
             className="h-10"
             value={amount}
             aria-invalid={problems.amount != null}
@@ -1045,9 +1101,11 @@ export function ReleaseRetentionDialog({
           id={`${id}-date`}
           label="Released on"
           error={problems.releasedOn}
+          required
         >
           <Input
             id={`${id}-date`}
+            aria-required
             type="date"
             className="h-10"
             max={today}
@@ -1062,9 +1120,11 @@ export function ReleaseRetentionDialog({
             id={`${id}-guarantee`}
             label="Against bank guarantee"
             error={problems.guarantee}
+            required
           >
             <PlainSelect
               id={`${id}-guarantee`}
+              required
               items={guarantees}
               value={guaranteeId}
               onChange={setGuaranteeId}
@@ -1082,9 +1142,11 @@ export function ReleaseRetentionDialog({
           label={needsReason ? "Reason" : "Reason (optional)"}
           error={problems.reason}
           className="sm:col-span-2"
+          required={needsReason}
         >
           <Textarea
             id={`${id}-reason`}
+            aria-required={needsReason}
             rows={2}
             value={reason}
             aria-invalid={problems.reason != null}

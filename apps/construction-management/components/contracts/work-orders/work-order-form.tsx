@@ -99,16 +99,21 @@ function TextField({
   error,
   children,
   className,
+  required = false,
 }: {
   id: string;
   label: string;
   error?: string;
   children: React.ReactNode;
   className?: string;
+  /** Shows the asterisk; set `aria-required` on the control too. */
+  required?: boolean;
 }) {
   return (
     <div className={`min-w-0 space-y-1.5 ${className ?? ""}`}>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} required={required}>
+        {label}
+      </Label>
       {children}
       <FieldError message={error} />
     </div>
@@ -332,6 +337,7 @@ export function WorkOrderForm({
         <TextField
           id="wo-contractor"
           label="Contractor"
+          required
           error={errors.contractorId?.message}
         >
           <Controller
@@ -356,6 +362,7 @@ export function WorkOrderForm({
                 <SelectTrigger
                   id="wo-contractor"
                   className="w-full min-w-0"
+                  aria-required
                   aria-invalid={errors.contractorId != null}
                 >
                   <SelectValue placeholder="Pick a Contractor on this Project" />
@@ -410,11 +417,13 @@ export function WorkOrderForm({
         <TextField
           id="wo-order-date"
           label="Order date"
+          required
           error={errors.orderDate?.message}
         >
           <Input
             id="wo-order-date"
             type="date"
+            aria-required
             aria-invalid={errors.orderDate != null}
             {...register("orderDate")}
           />

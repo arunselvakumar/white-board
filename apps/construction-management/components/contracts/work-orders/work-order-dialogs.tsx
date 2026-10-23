@@ -88,11 +88,14 @@ export function ReasonDialog({
           </DialogHeader>
           {children}
           <div className="space-y-1.5">
-            <Label htmlFor={`${id}-reason`}>{label}</Label>
+            <Label htmlFor={`${id}-reason`} required>
+              {label}
+            </Label>
             <Textarea
               id={`${id}-reason`}
               rows={3}
               value={reason}
+              aria-required
               aria-invalid={problem != null}
               onChange={(event) => {
                 setReason(event.target.value);
@@ -160,12 +163,15 @@ export function CloseWorkOrderDialog({
       onClose={onClose}
     >
       <div className="space-y-1.5">
-        <Label htmlFor={`${id}-closed-on`}>Close date</Label>
+        <Label htmlFor={`${id}-closed-on`} required>
+          Close date
+        </Label>
         <Input
           id={`${id}-closed-on`}
           type="date"
           min={orderDate}
           value={closedOn}
+          aria-required
           aria-invalid={dateProblem != null}
           onChange={(event) => {
             setClosedOn(event.target.value);
