@@ -69,30 +69,36 @@ export function ProjectsHomeSkeleton() {
               <h2 className="text-base tracking-tight">Your Projects</h2>
               <Skeleton className="h-8 w-72 max-w-full rounded-md" />
             </header>
-            <ul className={`px-5 pt-1 pb-5 ${PROJECT_FOLDER_GRID}`}>
-              {WIDTHS.slice(0, 4).map((width, index) => (
-                <li key={index} className="relative pt-7">
-                  <Skeleton className="absolute top-0 left-0 h-6 w-2/5 rounded-t-xl" />
-                  <Skeleton className="absolute inset-x-0 top-3 bottom-0 rounded-2xl" />
-                  <div className="bg-card relative flex min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <Skeleton className="size-9 shrink-0 rounded-xl" />
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <SkeletonText size="base" width={width} />
-                        <SkeletonText size="xs" width="35%" />
+            <div className="space-y-1 px-5 pt-1 pb-5">
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-7 rounded-lg" />
+                <SkeletonText width="10rem" />
+              </div>
+              <ul className={PROJECT_FOLDER_GRID}>
+                {WIDTHS.slice(0, 4).map((width, index) => (
+                  <li key={index} className="relative pt-7">
+                    <Skeleton className="absolute top-0 left-0 h-6 w-2/5 rounded-t-xl" />
+                    <Skeleton className="absolute inset-x-0 top-3 bottom-0 rounded-2xl" />
+                    <div className="bg-card relative flex min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <Skeleton className="size-9 shrink-0 rounded-xl" />
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <SkeletonText size="base" width={width} />
+                          <SkeletonText size="xs" width="35%" />
+                        </div>
                       </div>
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                      <div className="mt-auto space-y-1.5">
+                        <SkeletonText width="70%" />
+                        <SkeletonText width="9rem" />
+                        <ProgressBarSkeleton />
+                      </div>
+                      <Skeleton className="absolute top-3 right-3 size-9 rounded-lg" />
                     </div>
-                    <Skeleton className="h-5 w-16 rounded-full" />
-                    <div className="mt-auto space-y-1.5">
-                      <SkeletonText width="70%" />
-                      <SkeletonText width="9rem" />
-                      <ProgressBarSkeleton />
-                    </div>
-                    <Skeleton className="absolute top-3 right-3 size-9 rounded-lg" />
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
         </SkeletonGroup>
       </div>
