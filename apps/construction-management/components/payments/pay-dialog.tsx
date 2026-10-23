@@ -308,6 +308,7 @@ function PayForm({
           control={form.control}
           render={({ field }) => (
             <AccountPicker
+              required
               id="pay-account"
               value={field.value}
               onChange={field.onChange}

@@ -357,6 +357,7 @@ export function TransferForm({
                     name={`lines.${index}.materialId`}
                     render={({ field: control }) => (
                       <MaterialPicker
+                        required
                         id={id("material")}
                         value={control.value === "" ? null : control.value}
                         excludeIds={chosen.filter(

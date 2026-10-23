@@ -141,6 +141,7 @@ export function NamedMultiSelect({
   onChange,
   placeholder,
   invalid = false,
+  required = false,
 }: {
   id: string;
   label: string;
@@ -149,6 +150,8 @@ export function NamedMultiSelect({
   onChange: (ids: string[]) => void;
   placeholder: string;
   invalid?: boolean;
+  /** Sets `aria-required` on the control; the label shows the asterisk. */
+  required?: boolean;
 }) {
   const anchor = useComboboxAnchor();
   const selected = useMemo(
@@ -186,6 +189,7 @@ export function NamedMultiSelect({
               <ComboboxChipsInput
                 id={id}
                 aria-invalid={invalid}
+                aria-required={required}
                 placeholder={chosen.length > 0 ? "" : placeholder}
               />
             </>

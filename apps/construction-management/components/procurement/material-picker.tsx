@@ -40,6 +40,8 @@ export type MaterialPickerProps = {
   id?: string;
   "aria-label"?: string;
   invalid?: boolean;
+  /** Sets `aria-required` on the search box; the label shows the asterisk. */
+  required?: boolean;
   disabled?: boolean;
 };
 
@@ -117,6 +119,7 @@ export function MaterialPicker({
   id,
   "aria-label": ariaLabel = "Material",
   invalid = false,
+  required = false,
   disabled = false,
 }: MaterialPickerProps) {
   const [open, setOpen] = useState(false);
@@ -212,6 +215,7 @@ export function MaterialPicker({
           id={id}
           aria-label={ariaLabel}
           aria-invalid={invalid || undefined}
+          aria-required={required}
           disabled={disabled}
           placeholder="Search materials"
           autoComplete="off"

@@ -328,6 +328,7 @@ function ManualLines({
                   control={form.control}
                   render={({ field: picker }) => (
                     <MaterialPicker
+                      required
                       id={`grn-line-${n}-material`}
                       aria-label={`Material, line ${n}`}
                       value={picker.value === "" ? null : picker.value}
@@ -665,6 +666,7 @@ function GoodsReceiptForm({
                 control={form.control}
                 render={({ field }) => (
                   <ChoiceSelect
+                    required
                     id="grn-supplier"
                     label="Supplier"
                     value={field.value === "" ? "" : field.value}
@@ -729,6 +731,7 @@ function GoodsReceiptForm({
               control={form.control}
               render={({ field }) => (
                 <ChoiceSelect
+                  required
                   id="grn-supply-type"
                   label="GST"
                   value={field.value}

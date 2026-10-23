@@ -245,6 +245,7 @@ export function TransferDialog({
                   name="fromAccountId"
                   render={({ field }) => (
                     <AccountPicker
+                      required
                       id={`${id}-from`}
                       mode={mode}
                       value={field.value}
@@ -264,6 +265,7 @@ export function TransferDialog({
                   name="toAccountId"
                   render={({ field }) => (
                     <ToAccountSelect
+                      required
                       id={`${id}-to`}
                       value={field.value}
                       exclude={from}

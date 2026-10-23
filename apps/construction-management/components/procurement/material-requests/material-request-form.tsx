@@ -402,6 +402,7 @@ export function MaterialRequestForm({
                         control={form.control}
                         render={({ field }) => (
                           <MaterialPicker
+                            required
                             id={`mr-material-${String(index)}`}
                             value={field.value === "" ? null : field.value}
                             excludeIds={chosen.filter(

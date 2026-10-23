@@ -191,6 +191,7 @@ function OptionSelect({
   items,
   placeholder,
   invalid,
+  required = false,
 }: {
   id: string;
   value: string;
@@ -198,6 +199,8 @@ function OptionSelect({
   items: readonly { value: string; label: string }[];
   placeholder: string;
   invalid?: boolean;
+  /** Sets `aria-required` on the control; the label shows the asterisk. */
+  required?: boolean;
 }) {
   const all = [{ value: NONE, label: placeholder }, ...items];
   return (
@@ -209,7 +212,12 @@ function OptionSelect({
         onChange(next === NONE ? "" : next);
       }}
     >
-      <SelectTrigger id={id} className="w-full min-w-0" aria-invalid={invalid}>
+      <SelectTrigger
+        id={id}
+        className="w-full min-w-0"
+        aria-invalid={invalid}
+        aria-required={required}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="start" alignItemWithTrigger={false}>
@@ -675,6 +683,7 @@ export function TaskForm({
                 name="totalWorkUnitId"
                 render={({ field }) => (
                   <OptionSelect
+                    required={unitRequired}
                     id="task-unit"
                     value={field.value}
                     onChange={field.onChange}

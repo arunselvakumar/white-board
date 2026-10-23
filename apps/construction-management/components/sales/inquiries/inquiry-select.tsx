@@ -20,6 +20,7 @@ export function InquirySelect({
   items,
   noneLabel,
   invalid,
+  required = false,
   disabled,
 }: {
   id: string;
@@ -29,6 +30,8 @@ export function InquirySelect({
   /** The first item; omit for a required pick (no none). */
   noneLabel?: string;
   invalid?: boolean;
+  /** Sets `aria-required` on the trigger; the label shows the asterisk. */
+  required?: boolean;
   disabled?: boolean;
 }) {
   const all: InquiryOption[] =
@@ -45,7 +48,12 @@ export function InquirySelect({
         onChange(next === NONE ? "" : next);
       }}
     >
-      <SelectTrigger id={id} className="w-full min-w-0" aria-invalid={invalid}>
+      <SelectTrigger
+        id={id}
+        className="w-full min-w-0"
+        aria-invalid={invalid}
+        aria-required={required}
+      >
         <SelectValue placeholder={noneLabel ?? "Choose…"} />
       </SelectTrigger>
       <SelectContent align="start" alignItemWithTrigger={false}>

@@ -362,6 +362,7 @@ export function TransactionDialog({
                   name="accountId"
                   render={({ field }) => (
                     <AccountPicker
+                      required
                       id={`${id}-account`}
                       mode={mode}
                       value={field.value}
@@ -460,6 +461,7 @@ export function TransactionDialog({
                 name="counterparty"
                 render={({ field }) => (
                   <CounterpartyField
+                    required={counterpartyKind != null}
                     id={`${id}-party`}
                     projectId={projectId}
                     value={field.value}

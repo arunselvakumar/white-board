@@ -359,6 +359,7 @@ export function PurchaseRequestWizard({
               Add a material
             </Label>
             <MaterialPicker
+              required
               id="pr-material-picker"
               aria-label="Add a material"
               value={null}

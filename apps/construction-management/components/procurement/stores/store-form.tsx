@@ -221,6 +221,7 @@ export function StoreForm({ store }: { store?: Store }) {
                 control={form.control}
                 render={({ field }) => (
                   <NamedMultiSelect
+                    required
                     id="store-projects"
                     label="Projects"
                     items={withKept(options.projects, store?.projects)}

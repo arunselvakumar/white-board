@@ -1491,6 +1491,7 @@ export function EquipmentSheetForm({
                       name={`materials.${index}.materialId`}
                       render={({ field: control }) => (
                         <MaterialPicker
+                          required
                           id={lineId("material")}
                           value={control.value === "" ? null : control.value}
                           excludeIds={chosen.filter(

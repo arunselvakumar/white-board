@@ -128,6 +128,7 @@ export function PurchaseOrderLineSheet({
               Material
             </Label>
             <MaterialPicker
+              required
               id="po-line-material"
               value={value.materialId === "" ? null : value.materialId}
               excludeIds={usedMaterialIds.filter(

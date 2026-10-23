@@ -345,6 +345,7 @@ export function InquiryCloseDialog({
                   name="lostReasonId"
                   render={({ field }) => (
                     <InquirySelect
+                      required
                       id="close-lost-reason"
                       value={field.value}
                       onChange={field.onChange}

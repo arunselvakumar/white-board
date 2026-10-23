@@ -224,6 +224,7 @@ export function OtherExpenseForm({
             control={form.control}
             render={({ field }) => (
               <AccountPicker
+                required
                 id="expense-account"
                 value={field.value}
                 onChange={field.onChange}

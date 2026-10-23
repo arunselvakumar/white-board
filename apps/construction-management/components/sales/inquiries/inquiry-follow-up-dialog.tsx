@@ -209,6 +209,7 @@ export function InquiryFollowUpDialog({
                 name="activity"
                 render={({ field }) => (
                   <InquirySelect
+                    required
                     id="follow-up-activity"
                     value={field.value}
                     onChange={field.onChange}

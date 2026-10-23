@@ -71,6 +71,7 @@ function PaidFromField({
         Paid from
       </Label>
       <AccountPicker
+        required
         id={id}
         value={value}
         onChange={onChange}

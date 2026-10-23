@@ -588,6 +588,7 @@ function PaymentForm({
               control={form.control}
               render={({ field }) => (
                 <AccountPicker
+                  required
                   id="payment-account"
                   mode={mode}
                   value={field.value}

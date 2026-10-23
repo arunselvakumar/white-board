@@ -514,6 +514,7 @@ export function VoucherForm({
               name="counterparty"
               render={({ field }) => (
                 <CounterpartyField
+                  required={counterpartyKind != null}
                   id="voucher-party"
                   value={field.value as CounterpartyValue}
                   onChange={field.onChange}

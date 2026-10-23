@@ -62,6 +62,7 @@ export function AccountPicker({
   onChange,
   mode,
   invalid = false,
+  required = false,
   disabled = false,
   exclude,
 }: {
@@ -70,6 +71,8 @@ export function AccountPicker({
   onChange: (accountId: string) => void;
   mode: AccountPickerMode;
   invalid?: boolean;
+  /** Sets `aria-required` on the trigger; the label shows the asterisk. */
+  required?: boolean;
   disabled?: boolean;
   /** An account to leave out, e.g. the "from" account of a transfer. */
   exclude?: string;
@@ -114,6 +117,7 @@ export function AccountPicker({
         size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
+        aria-required={required}
       >
         <SelectValue
           placeholder={
