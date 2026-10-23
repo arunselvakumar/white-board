@@ -1,0 +1,61 @@
+apps/construction-management/components/contracts/advances/advance-dialogs.tsx
+  s_f49615d4431370::t_71ee49a2889590 161,168-169,173-175,188,196,212,378-383,390,402,406,416,420,427,434,461,465,472,479,491,499,513,517,528,532,631,638,664,668,788,795,808,816,835,839,845-850,853,863,867,876,880,891,895,960,963,1071,1074,1083-1088,1091,1104,1108,1123,1127,1145,1149
+apps/construction-management/components/contracts/boq/boq-item-dialog.tsx
+  s_f49615d4431370::t_40c3554ce04f9f 319,322-324,341,402,404-406,412,420-422,426,433,447,451-453,460
+apps/construction-management/components/contracts/boq/section-dialog.tsx
+  s_f49615d4431370::t_03159bc9666b49 109-111,117
+apps/construction-management/components/contracts/boq/variation-dialog.tsx
+  s_f49615d4431370::t_2fe406c8dd2d4c 236-238,256,277-279,285,294-296,301,348-350,355,363-365,369,405-407,424,454-456,461
+apps/construction-management/components/contracts/boq/variations-tab.tsx
+  s_f49615d4431370::t_3c469be2d92647 122-124,127
+apps/construction-management/components/contracts/client-bills/client-bill-editor.tsx
+  s_f49615d4431370::t_4c17fcb9cec20e 179-181,185,192-194,198
+apps/construction-management/components/contracts/client-bills/new-client-bill-dialog.tsx
+  s_f49615d4431370::t_dea931ca6c02c8 124-126,131,138-140,144
+apps/construction-management/components/contracts/contractor-bills/contractor-bill-editor.tsx
+  s_f49615d4431370::t_c2b21c49382059 180-182,186,193-195,199
+apps/construction-management/components/contracts/contractor-bills/new-contractor-bill-dialog.tsx
+  s_f49615d4431370::t_f62dbed94e90dc 148-150,166,204-206,211,218-220,224
+apps/construction-management/components/contracts/escalation/escalation-bill-detail.tsx
+  s_f49615d4431370::t_96c3b04917bf98 269-271,274,283-285,288,297-299,302,315,321
+apps/construction-management/components/contracts/escalation/escalation-clause-panel.tsx
+  s_f49615d4431370::t_1607e46b8f2ab2 315-317,325,416-420,430,441,453,460-464,476
+apps/construction-management/components/contracts/escalation/new-escalation-bill-dialog.tsx
+  s_f49615d4431370::t_3f91bd9ac996b7 141-143,156,178-180,183,192-194,197,206-208,211
+apps/construction-management/components/contracts/escalation/price-indices-page.tsx
+  s_f49615d4431370::t_fc3733939a5bff 307-309,315,330-332,337,349-351,359,430-432,435
+apps/construction-management/components/contracts/items/item-form.tsx
+  s_f49615d4431370::t_4449c61b3538e3 138-140,146,153-155,161,179-181,198,246-248,253
+apps/construction-management/components/contracts/items/rate-analysis-table.tsx
+  s_f49615d4431370::t_3b736a97d1e6c9 154,171,200,257,277,298,374,384
+apps/construction-management/components/contracts/items/resource-picker.tsx
+  s_f49615d4431370::t_4429a7b4b7fd5d 62-63,85,136,225,233-234,271
+apps/construction-management/components/contracts/measurements/measurement-dialogs.tsx
+  s_f49615d4431370::t_d1e13e4d727499 119-121,125,134-136,145,154-156,163
+apps/construction-management/components/contracts/measurements/measurement-form.tsx
+  s_f49615d4431370::t_8bd9c17e062c0e 354-356,375,400-402,407,499,521,572,582
+apps/construction-management/components/contracts/work-orders/work-order-dialogs.tsx
+  s_f49615d4431370::t_5e6f18c40de430 91-93,98,166-168,174
+apps/construction-management/components/contracts/work-orders/work-order-form.tsx
+  s_f49615d4431370::t_48b7913fd3e9fd 102,109-110,114-116,340,365,420,426
+apps/construction-management/components/contracts/work-orders/work-order-materials.tsx
+  s_f49615d4431370::t_47f5420a02de06 73,81,124,221-223,233,271-273,288,318,324
+apps/construction-management/components/masters/clients/client-form.tsx
+  s_f49615d4431370::t_b6444ea1c62a89 108-110,116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ddd3f577b7e8a4a3b4c9dd5cddad9e0dddc331d2",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
