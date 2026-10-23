@@ -130,7 +130,7 @@ Menus **`contracts.contractor_bills`** ("Contractor Bills") and **`contracts.cli
 - A work order or client contract can turn on an **escalation clause**. The clause has component weights (labour, material, cement, steel, POL and others, summing to 100), a base month and a non-escalable %.
 - An **escalation bill** is a third bill type for a period. It applies the CPWD 10CC-style formula to the value of work done in that period and approves like an RA bill. Clause 10CA (cement and steel quantities × index change) is the same mechanism with the quantities taken from material reconciliation.
 - Price indices sit under Master records → Contracts and use the Item Library's menu (`contracts.items`); they are typed or imported from Excel. (Amended by CM-1109.)
-- An escalation bill covers **whole months**. Its value of work is the gross of the side's approved running bills dated in the period. Cement and steel on 10CA are taken out of that value before the 10CC part, so they are not escalated twice. Until CM-1110, their quantities are typed on the bill. (Amended by CM-1109.)
+- An escalation bill covers **whole months**. Its value of work is the gross of the side's approved running bills dated in the period. Cement and steel on 10CA are taken out of that value before the 10CC part, so they are not escalated twice. Their quantities come from material reconciliation when the clause names the Work Order's material, else they are typed on the bill. (Amended by CM-1109 and CM-1110.)
 - **Negative escalation** (the indices fell) is approved without an invoice and recovered on the next running bills of the same contract, as an "other" deduction that names the escalation bill. Retention on escalation bills counts towards the retention cap, retention held and retention receivable. Approved escalation periods on one contract cannot overlap. (Amended by CM-1109.)
 
 ### 10. Material reconciliation
@@ -142,6 +142,7 @@ Menus **`contracts.contractor_bills`** ("Contractor Bills") and **`contracts.cli
   - **excess** = issued − theoretical × (1 + wastage).
 - The excess becomes a suggested **material reconciliation recovery** at the penal rate on the next contractor bill, editable with a reason. Under-use beyond the wastage limit is flagged, because the work may be short of material.
 - Material issued at cost is recovered through its own deduction line.
+- **Issued** is what Delivery Notes delivered to the Contractor on the Project, counted towards a Work Order when the Material Request names it, or when exactly one of the Contractor's open Work Orders lists the material; anything else is unattributed until procurement assigns the request a Work Order. Procurement has no return flow yet, so returns are none. The statement is cumulative to a running bill, with issues up to its "measured up to", and the bill being drafted carries its own recovery: the excess × penal rate less what earlier approved bills recovered, editable down, above only with a reason and Approve. Cement and steel 10CA quantities on escalation bills come from the same coefficients over the period's approved bills. (Amended by CM-1110.)
 
 ### 11. GST engine
 
