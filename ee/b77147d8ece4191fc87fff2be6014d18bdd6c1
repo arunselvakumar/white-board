@@ -1,0 +1,23 @@
+apps/construction-management/app/api/construction/contracts/client-bills/client-bills.http.test.ts
+  s_f49615d4431370::t_7c1ccc26fcb7a1 994-1015
+apps/construction-management/app/api/construction/contracts/work-orders/reconciliation.http.test.ts
+  s_f49615d4431370::t_96f4e5cabfa563 1-746
+apps/construction-management/test/contracts.ts
+  s_f49615d4431370::t_d2b96cbec1fdfb 104-105,124,347-432
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "eeb77147d8ece4191fc87fff2be6014d18bdd6c1",
+  "prompts": {},
+  "sessions": {
+    "s_f49615d4431370": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "130ae72a-5cf2-46b8-aa9b-d1e28d7ad3e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
