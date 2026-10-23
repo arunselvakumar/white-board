@@ -70,7 +70,11 @@ export const RequiredGroup: Story = {
       <FieldLegend variant="label" required>
         Party type
       </FieldLegend>
-      <RadioGroup aria-label="Party type" aria-required defaultValue="contractor">
+      <RadioGroup
+        aria-label="Party type"
+        aria-required
+        defaultValue="contractor"
+      >
         <div className="flex items-center gap-2">
           <RadioGroupItem id="type-contractor" value="contractor" />
           <Label htmlFor="type-contractor" className="font-normal">
