@@ -2,7 +2,13 @@ import type { AuthError } from "@repo/auth/construction/react";
 
 /** Which form field an auth error belongs to; `global` shows above the button. */
 export type AuthErrorField =
-  "mobile" | "name" | "email" | "password" | "code" | "global";
+  | "mobile"
+  | "name"
+  | "email"
+  | "password"
+  | "currentPassword"
+  | "code"
+  | "global";
 
 type Mapping = { field: AuthErrorField; message: string };
 
@@ -34,6 +40,23 @@ const BY_CODE: Record<string, Mapping> = {
   INVALID_EMAIL_OR_PASSWORD: {
     field: "global",
     message: "Incorrect email or password.",
+  },
+  INVALID_PHONE_NUMBER_OR_PASSWORD: {
+    field: "global",
+    message: "Incorrect mobile number or password.",
+  },
+  PHONE_NUMBER_NOT_VERIFIED: {
+    field: "global",
+    message:
+      "This mobile number cannot sign in with a password yet. Ask your Company admin.",
+  },
+  INVALID_PASSWORD: {
+    field: "currentPassword",
+    message: "That is not your current password.",
+  },
+  PASSWORD_ALREADY_USED: {
+    field: "password",
+    message: "Choose a password different from the current one.",
   },
   EMAIL_NOT_VERIFIED: {
     field: "global",
