@@ -59,10 +59,14 @@ export class JoinRequestHandlers {
     private readonly mobileSignIn: () => boolean = () => true,
   ) {}
 
-  /** What the joiner may be matched by right now. */
+  /**
+   * The joiner's verified email and verified mobile. A mobile is verified
+   * by OTP while SMS is on, or by the admin who set the User's first
+   * password (ADR CM-0029 §6), so it matches whatever the SMS switch.
+   */
   private pendingMatching(joiner: Joiner): Promise<TeamMember[]> {
     return this.members.findPendingFor({
-      mobile: this.mobileSignIn() ? joiner.mobile : null,
+      mobile: joiner.mobile,
       email: joiner.email,
     });
   }

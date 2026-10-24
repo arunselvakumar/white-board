@@ -51,7 +51,7 @@ The **Sign-in** section of the details step offers three outcomes, chosen by the
 - **Set a password** (needs a mobile or an email, at least 8 characters): we create the account and the `member` membership at once. The Team Member is **Active** straight away, with no Join Request, and **must change the password the first time they sign in**. Invite them is not offered then.
 - **Neither**: the Team Member is a record (Joining Pending, no invitation sent) and can be invited later from Edit User, as before.
 
-Mobile or email is still required, but neither is required on its own. A User created with only a mobile gets the placeholder email `<digits>@mobile.invalid` (CM-0002), which is never shown or mailed. The admin-entered mobile is stored as verified, because the admin vouches for it; that also lets Join Requests from other Companies match it.
+Mobile or email is still required, but neither is required on its own. A User created with only a mobile gets the placeholder email `<digits>@mobile.invalid` (CM-0002), which is never shown or mailed. The admin-entered mobile is stored as verified, because the admin vouches for it. Join Requests now match a verified mobile whatever the SMS switch (amending CM-0009, which matched mobiles only while SMS was on), so a mobile-only User whose password another Company tried to set still sees that Company's Join Request.
 
 ### 7. Sign in with mobile and password, whatever the SMS switch
 

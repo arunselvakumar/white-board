@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { GET as authGet } from "@/app/api/auth/[...all]/route";
 import { GET as myCompanies } from "@/app/api/construction/organization/companies/me/route";
+import { GET as joinRequests } from "@/app/api/construction/organization/join-requests/route";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import {
   TEST_ORIGIN,
@@ -219,6 +220,48 @@ describe("Add User: invite, set a password, or a record (ADR CM-0029 §6)", () =
         where: { id: existing.userId },
       }),
     ).resolves.toMatchObject({ mustChangePassword: false });
+  });
+
+  it("sends a mobile-only existing User a Join Request they can see", async () => {
+    // Company A sets their first password, so their mobile is verified.
+    const first = await ownerWithCompany();
+    const mobile = newMobile();
+    await addUser(first, { mobile, password: FIRST_PASSWORD });
+    const signedIn = await postAuth("/sign-in/phone-number", {
+      phoneNumber: mobile,
+      password: FIRST_PASSWORD,
+    });
+    const cookie = sessionCookie(signedIn);
+    const changed = await postAuth(
+      "/change-password",
+      {
+        currentPassword: FIRST_PASSWORD,
+        newPassword: TEST_PASSWORD,
+        revokeOtherSessions: false,
+      },
+      cookie,
+    );
+    expect(changed.status).toBe(StatusCodes.OK);
+
+    // Company B tries to set a password too: a Join Request instead.
+    const second = await ownerWithCompany("Kaveri Builders");
+    const added = await json<Member>(
+      await addUser(second, { mobile, password: FIRST_PASSWORD }),
+    );
+    expect(added.passwordIgnored).toBe("existing_account");
+
+    // With no email, the verified mobile is what matches, SMS on or off.
+    const requests = await json<{ items: { companyName: string }[] }>(
+      await joinRequests(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/organization/join-requests`,
+          cookie,
+        ),
+      ),
+    );
+    expect(requests.items.map((item) => item.companyName)).toEqual([
+      "Kaveri Builders",
+    ]);
   });
 
   it("invites by email, or keeps a record to invite later", async () => {
