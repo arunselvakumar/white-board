@@ -1,0 +1,195 @@
+apps/construction-management/docs/README.md
+  s_dc3d48bbd479da::t_f596599a3d8fd4 39-44
+apps/construction-management/docs/e2e-tests.md
+  s_dc3d48bbd479da::t_3640911d528813 1-176
+apps/construction-management/e2e/api/hrms.ts
+  s_dc3d48bbd479da::t_25e32e73ae37a6 1-156
+apps/construction-management/e2e/api/labour.ts
+  s_dc3d48bbd479da::t_cc27c4f9fbc0f8 1-53
+apps/construction-management/e2e/api/masters.ts
+  s_dc3d48bbd479da::t_e67ea62e57af54 1-92
+apps/construction-management/e2e/api/procurement.ts
+  s_dc3d48bbd479da::t_521b80ea0f0f3d 1-41
+apps/construction-management/e2e/api/tracking.ts
+  s_dc3d48bbd479da::t_630222c29aecf4 1-59
+apps/construction-management/e2e/helpers/addLabourPageTest.ts
+  s_dc3d48bbd479da::t_4da9249a1191db 1-10
+apps/construction-management/e2e/helpers/addUserPageTest.ts
+  s_dc3d48bbd479da::t_d47db7b3bdf17a 1-10
+apps/construction-management/e2e/helpers/addWingPageTest.ts
+  s_dc3d48bbd479da::t_9d916f1cef26e4 1-10
+apps/construction-management/e2e/helpers/amenitiesPageTest.ts
+  s_dc3d48bbd479da::t_1ad29fbf073181 1-10
+apps/construction-management/e2e/helpers/backdatedEntryPageTest.ts
+  s_dc3d48bbd479da::t_506c0500c69219 1-10
+apps/construction-management/e2e/helpers/changePasswordPageTest.ts
+  s_dc3d48bbd479da::t_544c2588d9dab0 1-10
+apps/construction-management/e2e/helpers/createCompanyPageTest.ts
+  s_dc3d48bbd479da::t_ebbecb8e6d070d 1-10
+apps/construction-management/e2e/helpers/documentsPageTest.ts
+  s_dc3d48bbd479da::t_e3e912633500d3 1-10
+apps/construction-management/e2e/helpers/drawingsPageTest.ts
+  s_dc3d48bbd479da::t_22437183de941d 1-10
+apps/construction-management/e2e/helpers/galleryPageTest.ts
+  s_dc3d48bbd479da::t_92cbdcfb6577e5 1-10
+apps/construction-management/e2e/helpers/labourAttendancePageTest.ts
+  s_dc3d48bbd479da::t_81a22df8eda5b5 1-10
+apps/construction-management/e2e/helpers/laboursPageTest.ts
+  s_dc3d48bbd479da::t_3399f22f60ae64 1-10
+apps/construction-management/e2e/helpers/projectDashboardPageTest.ts
+  s_dc3d48bbd479da::t_7ad24eb407e5a5 1-10
+apps/construction-management/e2e/helpers/resourcesPageTest.ts
+  s_dc3d48bbd479da::t_a93807c9331d4a 1-10
+apps/construction-management/e2e/helpers/sequenceIdsPageTest.ts
+  s_dc3d48bbd479da::t_8bf7bb355439b1 1-10
+apps/construction-management/e2e/helpers/subscriptionPageTest.ts
+  s_dc3d48bbd479da::t_28e5fac27d19f3 1-10
+apps/construction-management/e2e/helpers/testingReportsPageTest.ts
+  s_dc3d48bbd479da::t_c552a65971e97e 1-10
+apps/construction-management/e2e/helpers/wagesPageTest.ts
+  s_dc3d48bbd479da::t_59fc6676a5adc5 1-8
+apps/construction-management/e2e/pages/AddLabourPage.ts
+  s_dc3d48bbd479da::t_9de1ac09e0d2af 1-27
+apps/construction-management/e2e/pages/AddVendorPage.ts
+  s_dc3d48bbd479da::t_21d16b41bbefcd 1-23
+apps/construction-management/e2e/pages/AmenitiesPage.ts
+  s_dc3d48bbd479da::t_f76b4d08ef410e 1-15
+apps/construction-management/e2e/pages/BankAccountsPage.ts
+  s_dc3d48bbd479da::t_e46b7a808de672 1-15
+apps/construction-management/e2e/pages/CompanyDashboardPage.ts
+  s_dc3d48bbd479da::t_300577afbec940 1-15
+apps/construction-management/e2e/pages/DocumentsPage.ts
+  s_dc3d48bbd479da::t_ba31cb735e4eff 1-40
+apps/construction-management/e2e/pages/DrawingsPage.ts
+  s_dc3d48bbd479da::t_fdf59200e75f11 1-36
+apps/construction-management/e2e/pages/GalleryPage.ts
+  s_dc3d48bbd479da::t_6660842a90a7ac 1-15
+apps/construction-management/e2e/pages/GoodsReceiptPage.ts
+  s_dc3d48bbd479da::t_f8a8a5187b584b 1-28
+apps/construction-management/e2e/pages/HindrancesPage.ts
+  s_dc3d48bbd479da::t_f4040baae1e1bf 1-12
+apps/construction-management/e2e/pages/HrmsPage.ts
+  s_dc3d48bbd479da::t_530cb92f27b788 1-21
+apps/construction-management/e2e/pages/InquiryPage.ts
+  s_dc3d48bbd479da::t_6e7c66e57f78d0 1-62
+apps/construction-management/e2e/pages/InspectionPage.ts
+  s_dc3d48bbd479da::t_78ce702507d568 1-16
+apps/construction-management/e2e/pages/InventoryPage.ts
+  s_dc3d48bbd479da::t_959eb187753732 1-12
+apps/construction-management/e2e/pages/IssuePage.ts
+  s_dc3d48bbd479da::t_9a1f55b0deda99 1-43
+apps/construction-management/e2e/pages/LabourAttendancePage.ts
+  s_dc3d48bbd479da::t_f41692bc05e499 1-33
+apps/construction-management/e2e/pages/LaboursPage.ts
+  s_dc3d48bbd479da::t_03f40b2603482b 1-23
+apps/construction-management/e2e/pages/LeaveApprovalsPage.ts
+  s_dc3d48bbd479da::t_8e972d00d54afb 1-32
+apps/construction-management/e2e/pages/LocationsPage.ts
+  s_dc3d48bbd479da::t_ba6d89613b3d65 1-22
+apps/construction-management/e2e/pages/MasterListPage.ts
+  s_dc3d48bbd479da::t_f93845d2806af0 1-32
+apps/construction-management/e2e/pages/MyAttendancePage.ts
+  s_dc3d48bbd479da::t_1e3e118e864d5a 1-21
+apps/construction-management/e2e/pages/MyLeavesPage.ts
+  s_dc3d48bbd479da::t_a2915266361830 1-45
+apps/construction-management/e2e/pages/PartyPaymentsPage.ts
+  s_dc3d48bbd479da::t_dd6ff7f532818d 1-47
+apps/construction-management/e2e/pages/ProgressReportsPage.ts
+  s_dc3d48bbd479da::t_cd6b10707fd75e 1-30
+apps/construction-management/e2e/pages/PurchaseOrderPage.ts
+  s_dc3d48bbd479da::t_e69ad575c13638 1-41
+apps/construction-management/e2e/pages/PurchaseRequestPage.ts
+  s_dc3d48bbd479da::t_c8056225e3b90a 1-42
+apps/construction-management/e2e/pages/ResourcesPage.ts
+  s_dc3d48bbd479da::t_9c50d0ada7b2cc 1-19
+apps/construction-management/e2e/pages/TaskPage.ts
+  s_dc3d48bbd479da::t_174a46446d971c 1-37
+apps/construction-management/e2e/pages/TeamSalaryPage.ts
+  s_dc3d48bbd479da::t_ac4ffe087385f2 1-40
+apps/construction-management/e2e/pages/TestingReportsPage.ts
+  s_dc3d48bbd479da::t_ca3b1fa600cc5d 1-13
+apps/construction-management/e2e/pages/TransactionsPage.ts
+  s_dc3d48bbd479da::t_cb3760c6156373 1-31
+apps/construction-management/e2e/pages/TransfersPage.ts
+  s_dc3d48bbd479da::t_fe5a333f123ee1 1-8
+apps/construction-management/e2e/pages/VendorAttendancePage.ts
+  s_dc3d48bbd479da::t_85cca7861baa45 1-29
+apps/construction-management/e2e/pages/WagesPage.ts
+  s_dc3d48bbd479da::t_a0293f0f9f127c 1-72
+apps/construction-management/e2e/pages/WorksheetPage.ts
+  s_dc3d48bbd479da::t_40c3aca784be01 1-31
+apps/construction-management/e2e/specs/central-reports.spec.ts
+  s_dc3d48bbd479da::t_f9f8cca7d6d1e2 1-46
+apps/construction-management/e2e/specs/company-account.spec.ts
+  s_dc3d48bbd479da::t_cdb4e16f6b3404 1-78
+apps/construction-management/e2e/specs/dashboard.spec.ts
+  s_dc3d48bbd479da::t_05a424ed21941f 1-73
+apps/construction-management/e2e/specs/finance-accounts.spec.ts
+  s_dc3d48bbd479da::t_5d8c158fe5bcce 1-92
+apps/construction-management/e2e/specs/finance.spec.ts
+  s_dc3d48bbd479da::t_135430b7049710 1-81
+apps/construction-management/e2e/specs/hindrances.spec.ts
+  s_dc3d48bbd479da::t_79b02a2ac4db26 1-45
+apps/construction-management/e2e/specs/hrms-attendance.spec.ts
+  s_dc3d48bbd479da::t_e3dccf2380343a 1-77
+apps/construction-management/e2e/specs/hrms-calendar.spec.ts
+  s_dc3d48bbd479da::t_3c1927004c8472 1-66
+apps/construction-management/e2e/specs/hrms-leave.spec.ts
+  s_dc3d48bbd479da::t_1e6ed62e6db8b0 1-86
+apps/construction-management/e2e/specs/hrms-salary.spec.ts
+  s_dc3d48bbd479da::t_32274089c6eb28 1-53
+apps/construction-management/e2e/specs/inspections.spec.ts
+  s_dc3d48bbd479da::t_5f9ef47f3931e6 1-76
+apps/construction-management/e2e/specs/inventory.spec.ts
+  s_dc3d48bbd479da::t_e5a1234cbab23a 1-114
+apps/construction-management/e2e/specs/labour-records.spec.ts
+  s_dc3d48bbd479da::t_0450478485d5b7 1-113
+apps/construction-management/e2e/specs/labour.spec.ts
+  s_dc3d48bbd479da::t_f397f9efd4d2b7 1-99
+apps/construction-management/e2e/specs/master-lists.spec.ts
+  s_dc3d48bbd479da::t_d492f161eea687 1-63
+apps/construction-management/e2e/specs/masters.spec.ts
+  s_dc3d48bbd479da::t_ed4a4ebdebf65c 1-82
+apps/construction-management/e2e/specs/notifications.spec.ts
+  s_dc3d48bbd479da::t_93a0c648f9d11b 1-68
+apps/construction-management/e2e/specs/procurement-settings.spec.ts
+  s_dc3d48bbd479da::t_a9b9116a94dc51 1-56
+apps/construction-management/e2e/specs/procurement.spec.ts
+  s_dc3d48bbd479da::t_80c2bfcaf5aa17 1-64
+apps/construction-management/e2e/specs/project-files.spec.ts
+  s_dc3d48bbd479da::t_03a15e9ba9a0ea 1-79
+apps/construction-management/e2e/specs/project-setup.spec.ts
+  s_dc3d48bbd479da::t_e8bafdd6b55fd7 1-94
+apps/construction-management/e2e/specs/purchase-orders.spec.ts
+  s_dc3d48bbd479da::t_0c8e3143e221a8 1-66
+apps/construction-management/e2e/specs/resources.spec.ts
+  s_dc3d48bbd479da::t_18d34a78614e86 1-48
+apps/construction-management/e2e/specs/sales.spec.ts
+  s_dc3d48bbd479da::t_a6df5089c07bd7 1-132
+apps/construction-management/e2e/specs/site-diary.spec.ts
+  s_dc3d48bbd479da::t_cd9ac54bc8cfa1 1-47
+apps/construction-management/e2e/specs/theme.spec.ts
+  s_dc3d48bbd479da::t_19ed7315decb76 1-24
+apps/construction-management/e2e/specs/tracking.spec.ts
+  s_dc3d48bbd479da::t_024ef44c29c941 1-139
+apps/construction-management/e2e/specs/vendors.spec.ts
+  s_dc3d48bbd479da::t_9333dae9f122a1 1-37
+apps/construction-management/e2e/specs/worksheets.spec.ts
+  s_dc3d48bbd479da::t_f199389b4e278e 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9a95aae1777ab58bf36f618344233ecc624dbe0a",
+  "prompts": {},
+  "sessions": {
+    "s_dc3d48bbd479da": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42aea6d8-890a-4303-99f6-66e2f8ab5369",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
