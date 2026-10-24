@@ -114,13 +114,10 @@ export const OwnerMustHandOver: Story = {
     ).toBeVisible();
     await expect(
       dialog.getByRole("link", { name: "Transfer ownership" }),
-    ).toHaveAttribute(
-      "href",
-      "/app/masters/settings/company#transfer-ownership",
-    );
+    ).toHaveAttribute("href", "/app/settings/company#transfer-ownership");
     await expect(
       dialog.getByRole("link", { name: "Delete Company" }),
-    ).toHaveAttribute("href", "/app/masters/settings/company#delete-company");
+    ).toHaveAttribute("href", "/app/settings/company#delete-company");
     await expect(
       dialog.queryByRole("button", { name: "Delete my account" }),
     ).toBeNull();

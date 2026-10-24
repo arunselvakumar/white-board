@@ -29,7 +29,7 @@ import { QueryHttpError } from "@/src/queries/http";
 import { ActionCodeStep } from "./action-code-step";
 
 /** Where an Owner hands over or deletes their Company. */
-export const COMPANY_SETTINGS_HREF = "/app/masters/settings/company";
+export const COMPANY_SETTINGS_HREF = "/app/settings/company";
 
 const schema = z.object({
   reason: z.string().trim().max(500, "Keep the reason under 500 characters"),

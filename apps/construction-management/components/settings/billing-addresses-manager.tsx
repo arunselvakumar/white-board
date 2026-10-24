@@ -85,7 +85,7 @@ export function BillingAddressesManager() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="Billing addresses"
           meta="The addresses and GSTINs your Purchase Orders bill from. New orders start with the default."
           actions={data.items.length > 0 ? addButton : undefined}

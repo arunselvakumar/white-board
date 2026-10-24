@@ -72,7 +72,7 @@ export function GrnFieldsForm() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="GRN fields"
           meta="Choose which optional fields a Goods Receipt shows. Hidden fields are neither shown on the form nor printed."
         />

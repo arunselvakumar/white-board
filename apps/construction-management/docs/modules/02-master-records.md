@@ -738,7 +738,7 @@ Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projec
 - In use, so not deletable: a Unit on a Material, a Category on a Material or child, a Material with any stock entry or a line on a live PR, PO, GRN, transfer, MR or DN, a Supplier on a live PO or GRN, a Contractor on a live MR. Terms & Conditions are never in use (POs copy the text).
 - Parties: GST state from the GSTIN's first two digits (a different pick is 400 `GSTIN_STATE_MISMATCH`), else picked; Contractors have a second contact. Quotations: PDF or image, ≤ 10 MB, ≤ 50 per party, uploaded with Update on the party menu, listed on the party and on View Quotations.
 - Material picker (`GET materials/options`): Materials Read or Read on any procurement menu; a parent category also returns its sub-categories' Materials; loading by ids returns disabled Materials so a form can reopen its lines.
-- Billing addresses (Masters → Settings, `organization.settings`): the first becomes the default; deleting the default promotes the oldest remaining one. GRN fields: which optional GRN fields are hidden; an unknown key is 400.
+- Billing addresses (Settings → Advanced Settings, `organization.settings`): the first becomes the default; deleting the default promotes the oldest remaining one. GRN fields: which optional GRN fields are hidden; an unknown key is 400.
 - Project GST state: optional on the Project form; left out keeps what is stored, `null` clears it.
 - Retired GST state codes (25, 28) are refused on billing addresses and Projects; a party with a GSTIN keeps the GSTIN's state even if retired. A member with only View Quotations may open quotation files; quotations are not in a Project Gallery.
 

@@ -172,7 +172,7 @@ export function CompanyOwnershipScreen() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="Company"
           meta="Who owns the Company, and deleting it."
         />

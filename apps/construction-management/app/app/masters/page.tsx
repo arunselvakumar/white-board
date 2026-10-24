@@ -23,7 +23,7 @@ export default function MastersPage() {
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
           title="Masters"
-          meta="Your Company's lists and settings."
+          meta="Your Company's lists."
           actions={<MastersBackupButton />}
         />
         {MASTERS_GROUPS.map((group) => (

@@ -4,9 +4,9 @@ import { CompanyProfileScreen } from "@/components/company-profile/company-profi
 import { CompanyProfileSkeleton } from "@/components/company-profile/company-profile-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
-export const metadata: Metadata = { title: "Company profile" };
+export const metadata: Metadata = { title: "Settings" };
 
-export default function CompanyProfilePage() {
+export default function SettingsPage() {
   return (
     <QuerySuspense fallback={<CompanyProfileSkeleton />}>
       <CompanyProfileScreen />

@@ -115,7 +115,11 @@ export const LabourWithPeriodSwitch: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Next month" }));
     await expect(await canvas.findByText("October 2026")).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Custom" }));
-    await expect(canvas.getByLabelText("From")).toHaveValue("2026-10-01");
+    // The range fields render once the page takes the new period, which
+    // can land a moment after the click on a busy CI runner.
+    await expect(await canvas.findByLabelText("From")).toHaveValue(
+      "2026-10-01",
+    );
     await expect(canvas.getByLabelText("To")).toHaveValue("2026-10-31");
   },
 };

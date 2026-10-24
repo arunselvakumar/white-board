@@ -100,10 +100,7 @@ export function DeleteCompanyDialog({
           </DialogHeader>
           <p className="bg-muted rounded-md p-3 text-sm">
             Take a full Company backup first (
-            <Link
-              href="/app/masters/settings/backup"
-              className="font-medium underline"
-            >
+            <Link href="/app/settings/backup" className="font-medium underline">
               Settings → Backup &amp; export
             </Link>
             ) so you keep a copy of your records.

@@ -19,11 +19,11 @@ import {
 } from "@/src/shared-kernel/grn-fields";
 
 /*
- * Masters → Settings pages while they load (ADR-0047): the real header
+ * Settings → Advanced Settings pages while they load (ADR-0047): the real header
  * and section headings; bars only where the saved values appear.
  */
 
-const BACK = { label: "Settings", href: "/app/masters/settings" };
+const BACK = { label: "Settings", href: "/app/settings" };
 
 function SettingsPage({
   title,

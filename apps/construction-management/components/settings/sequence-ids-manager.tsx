@@ -113,7 +113,7 @@ export function SequenceIdsManager({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="Sequence IDs"
           meta="How document numbers look. Numbers restart every 1 April when the fiscal year is part of them."
         />

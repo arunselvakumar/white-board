@@ -3,6 +3,7 @@ import {
   Building2,
   LayoutDashboard,
   Library,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -15,4 +16,5 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/app/projects": Building2,
   "/app/workspace": Briefcase,
   "/app/masters": Library,
+  "/app/settings": Settings,
 };
