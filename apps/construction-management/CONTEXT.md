@@ -15,26 +15,26 @@ The Company the current Session is working in. Every API call is scoped to it; i
 _Avoid_: current org, selected tenant
 
 **User**:
-A person who can sign in: by email and password, and by mobile OTP once SMS is on (ADR CM-0009). A User exists once, across all their Companies.
+A person who can sign in: by email and password, by mobile and password, and by mobile OTP once SMS is on (ADR CM-0009, CM-0029). A User exists once, across all their Companies. The **Users** page (Users & Roles → Users) lists the Company's Team Members, including records that cannot sign in yet.
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, Member Type, projects, and the Permission Matrix.
-_Avoid_: user, employee, staff (in UI copy)
+A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, Member Type, projects, and their Role. Screens call it a **User** (Add User, Edit User); code, APIs and audit events say Team Member (ADR CM-0029).
+_Avoid_: employee, staff (in UI copy)
 
 **Owner**:
 The Team Member who created the Company. Buys and renews the plan, can do everything, cannot be removed. Role `owner` in `@repo/auth`.
 _Avoid_: admin, super admin
 
 **Member**:
-Every other Team Member. Role `member` in `@repo/auth`; what a Member may do comes from their Permission Matrix, not from the role.
+Every other Team Member. Role `member` in `@repo/auth`; what a Member may do comes from their Role's Permission Matrix, not from the `@repo/auth` role.
 
 **Member Type**:
 **Normal** (works on projects) or **HRMS** (attendance, leave and salary only; no projects).
 _Avoid_: user type, employee type
 
 **Designation**:
-A job title in a Company (Site Engineer, Store Keeper, Accountant…). Some carry a Permission Template.
+A job title in a Company (Site Engineer, Store Keeper, Accountant…). Carries no access since ADR CM-0029; that is the Role.
 _Avoid_: role, position
 
 **Join Request**:
@@ -43,9 +43,13 @@ _Avoid_: invite request
 
 ### Access
 
+**Role**:
+A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Users & Roles → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0029).
+_Avoid_: designation, permission template, group
+
 **Permission Matrix**:
-Per Team Member, per Menu, a set of Flags. Decides what the Team Member sees and does.
-_Avoid_: role permissions, ACL, RBAC
+Per Role, per Menu, a set of Flags. Decides what the Team Members on that Role see and do.
+_Avoid_: ACL, RBAC
 
 **Menu**:
 One screen family the matrix controls (`organization.team_members`, `labour.attendance`, `hrms.leave_management`…).
@@ -53,8 +57,9 @@ One screen family the matrix controls (`organization.team_members`, `labour.atte
 **Flag**:
 One right on a Menu: `create read update delete approve reject print report view_all notification transfer financial export import`. **View All** off means "only entries I created". **Financial** off means amounts are hidden.
 
-**Permission Template**:
-A Designation's starting Permission Matrix, copied to a Team Member when that Designation is chosen.
+**Temporary Password**:
+A password a Company admin sets on Add User or Edit User. The User must replace it the first time they sign in (ADR CM-0029).
+_Avoid_: default password
 
 ### Masters and parties
 
