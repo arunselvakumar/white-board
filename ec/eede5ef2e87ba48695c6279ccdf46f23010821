@@ -1,0 +1,25 @@
+apps/construction-management/components/onboarding/company-setup-loader.stories.tsx
+  s_671c524a37398f::t_ca989a031912b0 1-40
+apps/construction-management/components/onboarding/company-setup-loader.tsx
+  s_671c524a37398f::t_94a63939c88f0f 1-96
+apps/construction-management/components/onboarding/create-company-wizard.stories.tsx
+  s_671c524a37398f::t_d9d0d6ffc5fc31 39-41,43,52,89-93,97-99,104-107,145,165-169
+apps/construction-management/components/onboarding/create-company-wizard.tsx
+  s_671c524a37398f::t_9e52c3e1b2cc3a 10,28,111-120,125-127,147-151,159,172-173,192,407-414
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "eceede5ef2e87ba48695c6279ccdf46f23010821",
+  "prompts": {},
+  "sessions": {
+    "s_671c524a37398f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2966b146-6626-4778-9b47-c0e58fd98615",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
