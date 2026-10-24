@@ -1,0 +1,85 @@
+apps/construction-management/app/app/masters/page.tsx
+  s_251b45eacc5ca9::t_5017d233d584e3 26
+apps/construction-management/app/app/settings/page.tsx
+  s_251b45eacc5ca9::t_7dcca4ce783bd6 7,9
+apps/construction-management/components/account/company-ownership-screen.stories.tsx
+  s_251b45eacc5ca9::t_3e00f37c52ded2 72,142
+apps/construction-management/components/account/company-ownership-screen.tsx
+  s_251b45eacc5ca9::t_575c4f122b3cc9 175
+apps/construction-management/components/account/delete-account-dialog.tsx
+  s_251b45eacc5ca9::t_ec280b8f6d81fc 32
+apps/construction-management/components/account/delete-company-dialog.tsx
+  s_251b45eacc5ca9::t_ec78d6ffd6111d 103
+apps/construction-management/components/app-shell/app-nav-icons.ts
+  s_251b45eacc5ca9::t_53c783796fcee6 6,19
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_251b45eacc5ca9::t_39bc0da9b0a8dd 51,153-154
+apps/construction-management/components/backups/company-backup-screen.stories.tsx
+  s_251b45eacc5ca9::t_318a35cb1e86a4 65
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_251b45eacc5ca9::t_4ac6a1fbe9128f 298
+apps/construction-management/components/company-profile/company-profile-form.stories.tsx
+  s_5397245072badf::t_707d6ec81758b0 5,77,80,95-114
+apps/construction-management/components/company-profile/company-profile-screen.tsx
+  s_251b45eacc5ca9::t_e01782ce8f59a9 14,19,27,45-46
+apps/construction-management/components/company-profile/company-profile-skeletons.tsx
+  s_251b45eacc5ca9::t_a63a2f6b7c160b 9,11-14,20,60-61
+apps/construction-management/components/profile/privacy-section.stories.tsx
+  s_251b45eacc5ca9::t_fc5a7f3c5676e6 117,120
+apps/construction-management/components/settings/advanced-settings.tsx
+  s_5397245072badf::t_480f701d2a239a 15-16,18-25,27-49
+apps/construction-management/components/settings/backdated-entry-form.tsx
+  s_251b45eacc5ca9::t_227465ffb65b72 128
+apps/construction-management/components/settings/billing-addresses-manager.tsx
+  s_251b45eacc5ca9::t_8e0e036e676b20 88
+apps/construction-management/components/settings/grn-fields-form.tsx
+  s_251b45eacc5ca9::t_15caac45a5693f 75
+apps/construction-management/components/settings/sequence-ids-manager.tsx
+  s_251b45eacc5ca9::t_7bffc108ea334a 116
+apps/construction-management/components/settings/settings-skeletons.tsx
+  s_251b45eacc5ca9::t_6e9bdbce94c8c5 22,26
+apps/construction-management/docs/modules/02-master-records.md
+  s_251b45eacc5ca9::t_05b6c225c7544c 741
+apps/construction-management/docs/modules/12-settings-configuration.md
+  s_251b45eacc5ca9::t_3c9277b905ec5c 16-17
+apps/construction-management/lib/app-nav.test.ts
+  s_251b45eacc5ca9::t_cc7de01f5a2f6c 6,12
+apps/construction-management/lib/app-nav.ts
+  s_251b45eacc5ca9::t_4db542cafb5ada 2-5,37-43
+apps/construction-management/lib/masters-nav.test.ts
+  s_251b45eacc5ca9::t_fff2b9ef78b417 26
+apps/construction-management/lib/masters-nav.ts
+  s_251b45eacc5ca9::t_4a8226e8e393cc 43
+apps/construction-management/lib/settings-nav.ts
+  s_251b45eacc5ca9::t_d9aab0a444e195 11,19,26,33,40,47,54
+apps/construction-management/next.config.ts
+  s_251b45eacc5ca9::t_2766478e34d6fa 29-43
+packages/ui/src/styles/sidebar-icon-motion.css
+  s_251b45eacc5ca9::t_fd7bbebb747621 226-230
+apps/construction-management/docs/adr/CM-0028-settings-main-menu.md
+  s_251b45eacc5ca9::t_4da2d66d6b18bc 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7bc9cc3a3bb0df8233d3032394a3daa30e715b15",
+  "prompts": {},
+  "sessions": {
+    "s_251b45eacc5ca9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c94021cd-fa59-4ca2-8c54-2b5a34d47bb2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_5397245072badf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99660926-66dd-4ecc-9684-2184f8c55e3a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
