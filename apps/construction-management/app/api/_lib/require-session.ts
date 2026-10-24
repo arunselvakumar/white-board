@@ -20,7 +20,7 @@ export type CompanySession = {
 
 /**
  * 403 `PASSWORD_CHANGE_REQUIRED` while an admin-set password waits to be
- * changed (ADR CM-0029 §8). Only the auth routes (change password, sign
+ * changed (ADR CM-0030 §8). Only the auth routes (change password, sign
  * out, the session) stay open; they do not come through these guards.
  */
 export function passwordChangeRequired(user: CompanyAuthUser): Response | null {

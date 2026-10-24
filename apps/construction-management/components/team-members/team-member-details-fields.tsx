@@ -60,7 +60,7 @@ export const teamMemberDetailsObject = z.object({
   emergencyContact: z.string().trim().max(120, "Too long"),
 });
 
-/** A mobile or an email; either one is enough (ADR CM-0029 §6). */
+/** A mobile or an email; either one is enough (ADR CM-0030 §6). */
 export function hasMobileOrEmail(values: {
   mobile: string;
   email: string;

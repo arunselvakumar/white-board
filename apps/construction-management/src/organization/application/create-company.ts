@@ -30,7 +30,7 @@ export type SeedDesignations = (input: {
   now: Date;
 }) => Designation[];
 
-/** Copies the seed Roles for a new Company (ADR CM-0029 §5). */
+/** Copies the seed Roles for a new Company (ADR CM-0030 §5). */
 export type SeedRoles = (input: {
   workspaceId: string;
   by: string;

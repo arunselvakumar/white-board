@@ -17,7 +17,7 @@ export type TeamMemberList =
 
 /**
  * Setting a password never touches an account someone already has: the
- * person got a Join Request instead (ADR CM-0029 §3).
+ * person got a Join Request instead (ADR CM-0030 §3).
  */
 export type PasswordOutcome = Pick<
   ConstructionOrganizationTeamMemberWithPasswordResponseModel,
@@ -75,7 +75,7 @@ function post<T>(path: string, body?: unknown): Promise<T> {
 }
 
 /**
- * Add User (ADR CM-0029 §6): `password` set signs them up at once (`invite`
+ * Add User (ADR CM-0030 §6): `password` set signs them up at once (`invite`
  * is ignored then); otherwise `invite` emails them the Join Request.
  */
 export function createTeamMember(
@@ -93,7 +93,7 @@ export function updateTeamMember(id: string, input: TeamMemberDetailsInput) {
   return post<TeamMember>(`/${encodeURIComponent(id)}/update`, input);
 }
 
-/** Puts the Team Member on another Role (ADR CM-0029 §1). */
+/** Puts the Team Member on another Role (ADR CM-0030 §1). */
 export function setTeamMemberRole(id: string, roleId: string) {
   return apiJson<TeamMember>(`${BASE}/${encodeURIComponent(id)}/role`, {
     method: "PUT",

@@ -18,7 +18,7 @@ import type { TeamMemberRepository } from "../domain/team-member-repository";
 /** Checks and uses a code the User was sent (`src/shared-kernel/action-codes`). */
 export type ActionCodeCheck = (input: VerifyActionCodeInput) => Promise<void>;
 
-/** The Designation, and the Role, the old Owner gets (ADR CM-0029). */
+/** The Designation, and the Role, the old Owner gets (ADR CM-0030). */
 export const ADMIN_DESIGNATION = "Admin";
 export const ADMIN_ROLE = "Admin";
 
@@ -52,7 +52,7 @@ function byName(name: string) {
 
 /**
  * "<name>'s access", as the Roles migration names a Role made for one
- * person (ADR CM-0029 §4), numbered when the name is taken.
+ * person (ADR CM-0030 §4), numbered when the name is taken.
  */
 function accessRoleName(name: string, taken: ReadonlySet<string>): string {
   const base = `${name.slice(0, 80)}'s access`;
@@ -106,7 +106,7 @@ export class OwnershipHandlers {
    * Owner Designation and every right; the old Owner becomes a member
    * with the Admin Designation and the Admin Role — or, when the Company
    * has deleted that Role, a Role made for them with every right (ADR
-   * CM-0029). Refusals: 404
+   * CM-0030). Refusals: 404
    * `TEAM_MEMBER_NOT_FOUND`, 409 `NEW_OWNER_NOT_ACTIVE` / `OWNER_IS_NORMAL`
    * / `ALREADY_OWNER`, and the code's own refusals.
    */

@@ -56,7 +56,7 @@ export type RoleProps = {
 };
 
 /**
- * A named Permission Matrix given to Team Members (ADR CM-0029). Every
+ * A named Permission Matrix given to Team Members (ADR CM-0030). Every
  * Team Member but the Owner has one Role, and their access is read through
  * it on every request, so editing a Role changes access for everyone on
  * it. Seeded Roles can be renamed, edited and deleted like any other.
@@ -173,7 +173,7 @@ export class Role {
   }
 }
 
-/** The cells two matrices differ in: added or removed (ADR CM-0029). */
+/** The cells two matrices differ in: added or removed (ADR CM-0030). */
 export function changedCells(
   before: PermissionSet,
   after: PermissionSet,

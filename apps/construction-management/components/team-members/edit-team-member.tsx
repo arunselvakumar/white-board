@@ -78,7 +78,7 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 }
 
 /**
- * Edit User (CM-111, ADR CM-0029): Details, Projects and Role tabs, and
+ * Edit User (CM-111, ADR CM-0030): Details, Projects and Role tabs, and
  * from the header Set a new password and the invitation.
  */
 export function EditTeamMember({ id }: { id: string }) {

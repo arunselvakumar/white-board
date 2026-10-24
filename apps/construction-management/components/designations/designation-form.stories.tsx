@@ -61,7 +61,7 @@ export const AddValidatesAndSaves: Story = {
       canvas.getByLabelText("Designation name"),
       "Billing Engineer",
     );
-    // A job title only: no Permission Matrix here (ADR CM-0029).
+    // A job title only: no Permission Matrix here (ADR CM-0030).
     await expect(canvas.queryByRole("checkbox")).toBeNull();
     await expect(canvas.queryByText("Permission Template")).toBeNull();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));

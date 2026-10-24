@@ -39,7 +39,7 @@ const schema = z
 type Values = z.infer<typeof schema>;
 
 /**
- * The first sign-in after an admin set the password (ADR CM-0029 §8): the
+ * The first sign-in after an admin set the password (ADR CM-0030 §8): the
  * Temporary Password, then one of their own. Other devices are signed out;
  * then on to the app.
  */

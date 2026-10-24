@@ -40,7 +40,7 @@ export async function ownerWithCompany(name = "Anugraha Engineers") {
     return found.id;
   };
   const roles = await createRoleHandlers().list(workspaceId);
-  /** A seed Role's id (ADR CM-0029 §5). */
+  /** A seed Role's id (ADR CM-0030 §5). */
   const roleId = (roleName: string) => {
     const found = roles.find((item) => item.name === roleName);
     if (found == null) throw new Error(`No Role ${roleName}`);
@@ -51,7 +51,7 @@ export async function ownerWithCompany(name = "Anugraha Engineers") {
 
 /**
  * A Role of the Company with exactly these grants, named uniquely (ADR
- * CM-0029): what "a member with these grants" is on.
+ * CM-0030): what "a member with these grants" is on.
  */
 export async function roleWith(
   workspaceId: string,

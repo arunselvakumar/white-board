@@ -15,7 +15,7 @@ model IdentityUser {
   phoneNumber         String?  @unique @map("phone_number")
   phoneNumberVerified Boolean? @map("phone_number_verified")
   /// Set when a Company admin set this User's password; cleared once they
-  /// choose their own (ADR CM-0029).
+  /// choose their own (ADR CM-0030).
   mustChangePassword  Boolean  @default(false) @map("must_change_password")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @default(now()) @map("updated_at")

@@ -62,7 +62,7 @@ export class JoinRequestHandlers {
   /**
    * The joiner's verified email and verified mobile. A mobile is verified
    * by OTP while SMS is on, or by the admin who set the User's first
-   * password (ADR CM-0029 §6), so it matches whatever the SMS switch.
+   * password (ADR CM-0030 §6), so it matches whatever the SMS switch.
    */
   private pendingMatching(joiner: Joiner): Promise<TeamMember[]> {
     return this.members.findPendingFor({

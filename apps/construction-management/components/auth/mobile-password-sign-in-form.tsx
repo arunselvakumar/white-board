@@ -34,7 +34,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 /**
- * Mobile and password (ADR CM-0029 §7): for site staff whose admin set
+ * Mobile and password (ADR CM-0030 §7): for site staff whose admin set
  * their password. Works whether SMS is on or off. A forgotten password is
  * reset by the Company admin, not by a code.
  */

@@ -10,7 +10,7 @@ import type { PermissionGrants } from "@/src/shared-kernel/access";
 import { apiJson } from "./http";
 import { TEAM_MEMBERS_KEY } from "./team-members";
 
-/** A Role: a named Permission Matrix given to Team Members (ADR CM-0029 §1). */
+/** A Role: a named Permission Matrix given to Team Members (ADR CM-0030 §1). */
 export type Role = ConstructionOrganizationRoleResponseModel;
 
 export type RoleInput = {

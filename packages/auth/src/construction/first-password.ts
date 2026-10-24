@@ -19,7 +19,7 @@ function userIdOf(returned: unknown): string | null {
 }
 
 /**
- * The first sign-in after an admin set the password (ADR CM-0029 §8):
+ * The first sign-in after an admin set the password (ADR CM-0030 §8):
  * `/change-password` must choose a different one, and clears
  * `mustChangePassword` once it succeeds.
  */

@@ -48,7 +48,7 @@ export const PASSWORD_MAX = 128;
 /**
  * Why a password the admin typed was not used: someone already signs in
  * with that mobile or email, so they get a Join Request instead (ADR
- * CM-0029 §3).
+ * CM-0030 §3).
  */
 export type PasswordIgnored = "existing_account" | null;
 
@@ -86,7 +86,7 @@ export type TeamMemberInvited = {
 
 /**
  * Team Member commands and queries (CM-108); screens call them Users (ADR
- * CM-0029). Routes check the Permission Matrix (`organization.team_members`)
+ * CM-0030). Routes check the Permission Matrix (`organization.team_members`)
  * before calling these.
  */
 export class TeamMemberHandlers {
@@ -228,7 +228,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * Add User (ADR CM-0029 §6). Joining Pending with an invite link; then
+   * Add User (ADR CM-0030 §6). Joining Pending with an invite link; then
    * one of three outcomes:
    *
    * - `password`: the sign-in account is made and the member is Active at
@@ -308,7 +308,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * A member without a User gets one with `password` (ADR CM-0029 §3, §6):
+   * A member without a User gets one with `password` (ADR CM-0030 §3, §6):
    * made, added to the Company and linked, so they are Active. When a User
    * already has their mobile or email, the password is ignored and the
    * member stays (or is again) a Join Request, invited when there is an
@@ -361,7 +361,7 @@ export class TeamMemberHandlers {
     return { ...(await this.view(member)), passwordIgnored: null };
   }
 
-  /** Edit details and Member Type; the Role stays (ADR CM-0029). */
+  /** Edit details and Member Type; the Role stays (ADR CM-0030). */
   async update(input: {
     workspaceId: string;
     id: string;
@@ -403,7 +403,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * Gives the member another Role (ADR CM-0029). 409 `OWNER_HAS_NO_ROLE`
+   * Gives the member another Role (ADR CM-0030). 409 `OWNER_HAS_NO_ROLE`
    * for the Owner; 403 `OWN_ROLE` for the grantor's own record and
    * `CANNOT_GRANT` for a cell of the Role the grantor lacks.
    */
@@ -430,7 +430,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * Set a new password (ADR CM-0029 §7). Without a User yet, as Add User
+   * Set a new password (ADR CM-0030 §7). Without a User yet, as Add User
    * with a password. With one: only when that User belongs to no other
    * Company (409 `USER_IN_OTHER_COMPANY`), never the Owner's (409
    * `OWNER_PASSWORD`); they must change it at their next sign-in and every

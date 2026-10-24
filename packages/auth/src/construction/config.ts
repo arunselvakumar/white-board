@@ -46,7 +46,7 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-out",
   "/sign-up/email",
   "/sign-in/email",
-  // Mobile and password (ADR CM-0029 §7): whatever the SMS switch.
+  // Mobile and password (ADR CM-0030 §7): whatever the SMS switch.
   "/sign-in/phone-number",
   "/change-password",
   "/update-user",
@@ -122,7 +122,7 @@ export function createConstructionAuthOptions(
       modelName: "identityUser",
       additionalFields: {
         // An admin set the password; until they choose their own, every
-        // page asks for it (ADR CM-0029 §8). Never writable by the client.
+        // page asks for it (ADR CM-0030 §8). Never writable by the client.
         mustChangePassword: {
           type: "boolean",
           required: false,
@@ -145,7 +145,7 @@ export function createConstructionAuthOptions(
       minPasswordLength: 8,
       maxPasswordLength: 128,
       revokeSessionsOnPasswordReset: true,
-      // A reset by email code is a password they chose (ADR CM-0029 §8).
+      // A reset by email code is a password they chose (ADR CM-0030 §8).
       onPasswordReset: ({ user }) => clearMustChangePassword(user.id),
     },
     emailVerification: {

@@ -32,7 +32,7 @@ export type TeamMemberReadModel = {
   /** The Role's matrix, read-only here; the Owner's is everything. */
   permissions: PermissionGrants;
   /**
-   * Edit User may set a new password (ADR CM-0029 §7): not the Owner, and
+   * Edit User may set a new password (ADR CM-0030 §7): not the Owner, and
    * either no User yet or a User who belongs to no other Company.
    */
   canSetPassword: boolean;

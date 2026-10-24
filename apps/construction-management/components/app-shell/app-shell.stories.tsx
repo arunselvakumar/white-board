@@ -128,7 +128,7 @@ export const WithoutDashboard: Story = {
 
 /**
  * Without Team Members or Role Management Read (a Site Supervisor, say),
- * Users & Roles is not in the main menu (ADR CM-0029).
+ * Users & Roles is not in the main menu (ADR CM-0030).
  */
 export const WithoutUsersRoles: Story = {
   ...shellAt("/app/projects", true, false),
@@ -203,7 +203,7 @@ export const MastersSubmenu: Story = {
 };
 
 /**
- * Users & Roles (ADR CM-0029 §2) folds out like Masters: Users and Role
+ * Users & Roles (ADR CM-0030 §2) folds out like Masters: Users and Role
  * Management. On Role Management the area is open and that entry is
  * current; the area link itself opens Users.
  */

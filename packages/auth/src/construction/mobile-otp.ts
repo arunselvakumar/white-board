@@ -164,7 +164,7 @@ export function mobileOtp(sms: SmsSender) {
     allowedAttempts: MOBILE_OTP_ALLOWED_ATTEMPTS,
     phoneNumberValidator: (value) => isValidMobile(value),
     // Mobile and password sign-in only for a mobile someone vouched for:
-    // a code, or the admin who set the password (ADR CM-0029 §7).
+    // a code, or the admin who set the password (ADR CM-0030 §7).
     requireVerification: true,
     async sendOTP({ phoneNumber: to, code }) {
       await sms.send({

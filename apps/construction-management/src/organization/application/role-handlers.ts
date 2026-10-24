@@ -23,7 +23,7 @@ function snapshot(role: Role) {
 }
 
 /**
- * Role Management (ADR CM-0029). Routes check `organization.roles` before
+ * Role Management (ADR CM-0030). Routes check `organization.roles` before
  * calling these; `grantor` is who acts, and the Owner when omitted (seeds,
  * tests). A Member saves only cells they hold themselves and never the
  * Role they are on.

@@ -9,7 +9,7 @@ import type { DuplicateConstructionOrganizationDesignationRequestModel } from "@
 
 import { apiJson } from "./http";
 
-/** A Designation: a job title only; the Role carries access (ADR CM-0029). */
+/** A Designation: a job title only; the Role carries access (ADR CM-0030). */
 export type DesignationResponse =
   ConstructionOrganizationDesignationResponseModel;
 

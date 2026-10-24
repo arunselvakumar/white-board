@@ -33,7 +33,7 @@ export type NotificationRecipientsQuery = {
  * `flag`, and — when the menu is Project-scoped and a Project is given —
  * are assigned to that Project, never `exceptUserId`. The Owner passes the
  * matrix and the assignment check, as in `can()`. The matrix is the
- * member's Role's (ADR CM-0029). Reads the organization context's grant
+ * member's Role's (ADR CM-0030). Reads the organization context's grant
  * tables directly, like `loadMemberAccess`.
  */
 export async function notificationRecipients(

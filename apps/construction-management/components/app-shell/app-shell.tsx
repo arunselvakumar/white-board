@@ -54,7 +54,7 @@ const FOOTER_LINKS = [
  * Project the areas give way to the Project's own menu (ADR CM-0020).
  * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
  * the Dashboard is not in the menu. `canOpenUsersRoles` is Team Members or
- * Role Management Read (ADR CM-0029): without either, Users & Roles is not.
+ * Role Management Read (ADR CM-0030): without either, Users & Roles is not.
  */
 export function AppShell({
   children,

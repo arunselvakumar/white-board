@@ -21,7 +21,7 @@ export const authSessionDirectory: SessionDirectory = {
   revokeOthers: (userId, keep) => accounts.revokeOtherSessions(userId, keep),
 };
 
-/** Admin-made sign-in accounts in `@repo/auth` (ADR CM-0029). */
+/** Admin-made sign-in accounts in `@repo/auth` (ADR CM-0030). */
 export const authSignInAccounts: SignInAccounts = {
   createPasswordAccount: (input) => accounts.createPasswordAccount(input),
   setTemporaryPassword: (userId, password) =>

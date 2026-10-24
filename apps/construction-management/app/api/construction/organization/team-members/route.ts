@@ -62,7 +62,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Add User (CM-110, ADR CM-0029 §6): invited, given a password (Active at
+ * Add User (CM-110, ADR CM-0030 §6): invited, given a password (Active at
  * once), or a record only.
  */
 export async function POST(request: Request): Promise<Response> {

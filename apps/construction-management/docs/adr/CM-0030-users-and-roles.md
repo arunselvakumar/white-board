@@ -1,9 +1,10 @@
-# CM-0029 — Users & Roles: access comes from a Role, and an admin can set a first password
+# CM-0030 — Users & Roles: access comes from a Role, and an admin can set a first password
 
 - Status: accepted
 - Date: 2026-10-24
 - Amends: [CM-0003](CM-0003-permission-matrix.md) (per-member matrix, Designation templates copied), [CM-0002](CM-0002-company-workspace-and-mobile-otp.md) and [CM-0009](CM-0009-email-sign-in-while-sms-is-off.md) (who can sign in, and how), [CM-0024](CM-0024-new-menus-reach-existing-designations.md) (grant migrations now target seeded Roles)
 - Relates to: [CM-0028](CM-0028-settings-main-menu.md) (main-menu items)
+- Numbering: written as CM-0029 and renumbered after [CM-0029](CM-0029-sign-in-as-a-customer.md) (sign in as a customer) reached `main` first. The two migrations' comments still say CM-0029; migrations are not edited once they may have run.
 
 Team Members sat under Masters → Company, and the last step of Add Team Member was a full Permission Matrix for that one person. The owner wants a **Users & Roles** main-menu item with two pages, **Users** and **Role Management**. What a person may do should be a **Role** that is defined once and given to many Users. A User is the Team Member who can sign in. Email must not be required: site staff without an email sign in with their mobile and a password the admin sets, and must change it the first time they sign in.
 
@@ -70,6 +71,7 @@ Mobile or email is still required, but neither is required on its own. A User cr
 - `loadMemberAccess` and the notification-recipient query read the matrix through the Role (`team_members → roles → role_menu_permissions`). The UI hides actions from the same matrix, as before.
 - `PUT /team-members/{id}/permissions` is replaced by `PUT /team-members/{id}/role`. Ownership transfer gives the old Owner the **Admin** Role (or every right in a Role made for them, if the Company deleted Admin).
 - Test helpers that made a member "with exactly these grants" now make a Role with those grants and put the member on it.
+- Staff signed in as a customer (CM-0029) whose Temporary Password is still set land on Change password like the customer would; they cannot change it without the current password, so they use Sign out on that page.
 - The audit events for the dropped tables are the record of what was there. Nothing is lost: every member's access is in a Role.
 
 ## Considered options

@@ -27,7 +27,7 @@ function permissionsOf(seed: SeedFile["roles"][number]): PermissionSet {
     : PermissionSet.fromGrants(seed.permissions);
 }
 
-/** A fresh copy of the seed Roles for one Company (ADR CM-0029 §5). */
+/** A fresh copy of the seed Roles for one Company (ADR CM-0030 §5). */
 export function seedRoles(input: {
   workspaceId: string;
   by: string;

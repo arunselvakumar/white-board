@@ -44,7 +44,7 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
     .object({ id: z.uuid(), name: z.string() })
     .nullable()
     .describe(
-      "What they may do (ADR CM-0029); null for the Owner, who can do everything",
+      "What they may do (ADR CM-0030); null for the Owner, who can do everything",
     ),
   mobile: z.string().nullable(),
   email: z.string().nullable(),
@@ -67,7 +67,7 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   canSetPassword: z
     .boolean()
     .describe(
-      "Edit User may set a new password: not the Owner, and no User yet or a User in no other Company (ADR CM-0029 §7)",
+      "Edit User may set a new password: not the Owner, and no User yet or a User in no other Company (ADR CM-0030 §7)",
     ),
   invitePath: z.string().nullable(),
   invitedAt: z.iso.datetime().nullable(),
@@ -98,7 +98,7 @@ export function toTeamMemberResponse(
   };
 }
 
-/** A first password the admin types (ADR CM-0029 §6). */
+/** A first password the admin types (ADR CM-0030 §6). */
 export const TeamMemberPasswordModel = z
   .string()
   .min(PASSWORD_MIN)
@@ -107,7 +107,7 @@ export const TeamMemberPasswordModel = z
 /**
  * Add User and Set a new password answer with the Team Member and whether
  * the password was ignored because someone already signs in with that
- * mobile or email (ADR CM-0029 §3).
+ * mobile or email (ADR CM-0030 §3).
  */
 export const ConstructionOrganizationTeamMemberWithPasswordResponseModel =
   ConstructionOrganizationTeamMemberResponseModel.extend({

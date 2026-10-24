@@ -13,7 +13,7 @@ export const USERS_PATH = "/app/users";
 export const ROLES_PATH = "/app/roles";
 
 /**
- * Users & Roles in the main menu (ADR CM-0029 §2): the people who work in
+ * Users & Roles in the main menu (ADR CM-0030 §2): the people who work in
  * the Company, and the Roles that decide what they may do.
  */
 export const USERS_ROLES_SECTIONS: readonly UsersRolesSection[] = [

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** A job title only; access comes from Roles (ADR CM-0029). */
+/** A job title only; access comes from Roles (ADR CM-0030). */
 export const CreateConstructionOrganizationDesignationRequestModel = z.object({
   name: z.string(),
 });

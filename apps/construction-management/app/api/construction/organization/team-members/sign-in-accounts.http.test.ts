@@ -73,7 +73,7 @@ function companiesAs(cookie: string) {
   );
 }
 
-describe("Add User: invite, set a password, or a record (ADR CM-0029 §6)", () => {
+describe("Add User: invite, set a password, or a record (ADR CM-0030 §6)", () => {
   it("makes the account at once, and asks for a new password at first sign-in", async () => {
     const owner = await ownerWithCompany();
     const mobile = newMobile();
@@ -282,7 +282,7 @@ describe("Add User: invite, set a password, or a record (ADR CM-0029 §6)", () =
   });
 });
 
-describe("Set a new password (ADR CM-0029 §7)", () => {
+describe("Set a new password (ADR CM-0030 §7)", () => {
   function setPasswordOf(cookie: string, id: string, password: string) {
     return setPassword(
       jsonRequest(`${BASE}/${id}/password`, cookie, { password }),

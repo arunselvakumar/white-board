@@ -11,7 +11,7 @@ import { SetConstructionOrganizationTeamMemberRoleRequestModel } from "./set-rol
 
 export const dynamic = "force-dynamic";
 
-/** Gives a Team Member another Role (ADR CM-0029). */
+/** Gives a Team Member another Role (ADR CM-0030). */
 export async function PUT(
   request: Request,
   context: { params: Promise<{ id: string }> },

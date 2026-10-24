@@ -10,7 +10,7 @@ export type CompanyAuthUser = {
   image: string | null;
   /**
    * An admin set their password; until they choose their own, pages send
-   * them to Change password and the API answers 403 (ADR CM-0029 §8).
+   * them to Change password and the API answers 403 (ADR CM-0030 §8).
    */
   mustChangePassword: boolean;
 };

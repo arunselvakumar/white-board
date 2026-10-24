@@ -14,7 +14,7 @@ export function useCompanyAuth(): {
   userId: string | null;
   workspaceId: string | null;
   role: CompanyRole | null;
-  /** Change password comes first (ADR CM-0029 §8). */
+  /** Change password comes first (ADR CM-0030 §8). */
   mustChangePassword: boolean;
   /** The White Board staff email signed in as this User (ADR CM-0029). */
   impersonatedBy: string | null;
@@ -118,7 +118,7 @@ export function useCompanyEmailSignIn() {
 }
 
 /**
- * Mobile and password sign-in (ADR CM-0029 §7), whatever the SMS switch.
+ * Mobile and password sign-in (ADR CM-0030 §7), whatever the SMS switch.
  * Only a verified mobile works; errors are Better Auth's
  * (`INVALID_PHONE_NUMBER_OR_PASSWORD`).
  */
@@ -138,7 +138,7 @@ export function useCompanyMobilePasswordSignIn() {
 }
 
 /**
- * Change password (ADR CM-0029 §8): the current one, then a different new
+ * Change password (ADR CM-0030 §8): the current one, then a different new
  * one (400 `PASSWORD_UNCHANGED` otherwise). Other sessions end; on success
  * `mustChangePassword` is cleared, so reload to refresh the snapshot.
  */

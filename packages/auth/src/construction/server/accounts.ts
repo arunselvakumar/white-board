@@ -106,7 +106,7 @@ export const accounts = {
 
   /**
    * Makes a User who signs in with `password` and must change it first
-   * (ADR CM-0029 §6): an admin set it. Never touches an existing account:
+   * (ADR CM-0030 §6): an admin set it. Never touches an existing account:
    * when a User already has this email or mobile, returns `created: false`
    * with their id. Hashed like sign-up (`better-auth/crypto`); a mobile-only
    * User gets the placeholder email. The mobile is stored verified, because
@@ -169,7 +169,7 @@ export const accounts = {
 
   /**
    * A password an admin set for a User only their Company relies on (ADR
-   * CM-0029 §7): replaces or adds their password, makes them change it at
+   * CM-0030 §7): replaces or adds their password, makes them change it at
    * the next sign-in and ends every session.
    */
   async setTemporaryPassword(userId: string, password: string): Promise<void> {
@@ -308,7 +308,7 @@ export const accounts = {
   },
 };
 
-/** `accounts.createPasswordAccount`, by name (ADR CM-0029 §6). */
+/** `accounts.createPasswordAccount`, by name (ADR CM-0030 §6). */
 export function createPasswordAccount(
   input: PasswordAccountInput,
 ): Promise<{ created: boolean; userId: string }> {

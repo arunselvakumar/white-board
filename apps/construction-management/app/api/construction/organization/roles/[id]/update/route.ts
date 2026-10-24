@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edit Role (ADR CM-0029): everyone on it has the new access from their
+ * Edit Role (ADR CM-0030): everyone on it has the new access from their
  * next request. 409 `STALE_ROLE`; 403 `OWN_ROLE` and `CANNOT_GRANT`.
  */
 export async function POST(

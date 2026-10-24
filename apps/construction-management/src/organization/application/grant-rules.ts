@@ -6,7 +6,7 @@ import {
 import { forbidden } from "@/src/shared-kernel/domain-error";
 
 /**
- * Who may hand out which rights (ADR CM-0003, CM-0029). The Owner may grant
+ * Who may hand out which rights (ADR CM-0003, CM-0030). The Owner may grant
  * anything. A Member may give someone a Role, or save a Role, only when
  * they hold every cell in `cells` themselves — otherwise "edit Team
  * Members" or "edit Roles" would be "do anything". For a Role edit,
@@ -31,7 +31,7 @@ export function assertCanGrant(
 
 /**
  * Nobody but the Owner changes their own access: not the Role they are on,
- * and not which Role they have (ADR CM-0029).
+ * and not which Role they have (ADR CM-0030).
  */
 export function assertNotOwnRole(
   grantor: MemberAccess,

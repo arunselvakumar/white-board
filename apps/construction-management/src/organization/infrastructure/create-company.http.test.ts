@@ -61,7 +61,7 @@ describe("createCompany on Postgres (CM-104)", () => {
     ).resolves.toBe(1);
   });
 
-  it("gives the Company its own copy of the nine seed Roles (ADR CM-0029 §5)", async () => {
+  it("gives the Company its own copy of the nine seed Roles (ADR CM-0030 §5)", async () => {
     const userId = await newUser();
     const { workspaceId } = await createCompanyHandlers().create.execute({
       name: "Anugraha Engineers",

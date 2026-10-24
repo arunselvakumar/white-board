@@ -77,7 +77,7 @@ model ConstructionOrganizationSubscription {
   @@schema("construction_organization")
 }
 
-/// A job title in a Company (CM-106). Since ADR CM-0029 it carries no
+/// A job title in a Company (CM-106). Since ADR CM-0030 it carries no
 /// access: that is the Team Member's Role. Each Company gets its own copy of
 /// the seed set. Names are unique among live rows (partial index,
 /// hand-written in the migration).
@@ -97,7 +97,7 @@ model ConstructionOrganizationDesignation {
   @@schema("construction_organization")
 }
 
-/// A named Permission Matrix given to Team Members (ADR CM-0029). Editing
+/// A named Permission Matrix given to Team Members (ADR CM-0030). Editing
 /// it changes access for everyone on it. Names are unique among live rows
 /// (partial index, hand-written in the migration). Each Company gets its own
 /// copy of the seed set (`seeds/roles.json`).
@@ -121,7 +121,7 @@ model ConstructionOrganizationRole {
   @@schema("construction_organization")
 }
 
-/// One Permission Matrix row per Role per menu (ADR CM-0003, CM-0029).
+/// One Permission Matrix row per Role per menu (ADR CM-0003, CM-0030).
 /// `flags` is a bitmask over the kernel's flag list; cells a menu does not
 /// support are never written.
 model ConstructionOrganizationRoleMenuPermission {
@@ -170,7 +170,7 @@ model ConstructionOrganizationTeamMember {
   userId           String?                                  @map("user_id")
   name             String
   designationId    String                                   @map("designation_id") @db.Uuid
-  /// What they may do (ADR CM-0029). Null for the Owner, who can do
+  /// What they may do (ADR CM-0030). Null for the Owner, who can do
   /// everything; a Member without a Role can do nothing.
   roleId           String?                                  @map("role_id") @db.Uuid
   mobile           String?

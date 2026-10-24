@@ -352,7 +352,7 @@ export const openApiOperations: OpenApiOperation[] = [
     method: "post",
     path: DESIGNATIONS,
     summary:
-      "Add a Designation (a job title; access comes from Roles, ADR CM-0029)",
+      "Add a Designation (a job title; access comes from Roles, ADR CM-0030)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationDesignationRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -498,7 +498,7 @@ openApiOperations.push(
     method: "post",
     path: TEAM_MEMBERS,
     summary:
-      "Add User: with a Role, then invited (needs an email), given a first password (Active at once; ignored when someone already signs in with that mobile or email), or a record only (ADR CM-0029 §6)",
+      "Add User: with a Role, then invited (needs an email), given a first password (Active at once; ignored when someone already signs in with that mobile or email), or a record only (ADR CM-0030 §6)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationTeamMemberRequestModel,
     successStatus: StatusCodes.CREATED,

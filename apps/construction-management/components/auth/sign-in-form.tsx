@@ -17,7 +17,7 @@ import { MobileOtpFlow } from "./mobile-otp-flow";
 import { MobilePasswordSignInForm } from "./mobile-password-sign-in-form";
 
 /**
- * Email | Mobile (ADR CM-0029 §7). Email and password as before (ADR
+ * Email | Mobile (ADR CM-0030 §7). Email and password as before (ADR
  * CM-0009); Mobile signs in with mobile and password whatever the SMS
  * switch, and with `mobileOtp` (SMS on) also offers the texted code
  * (ADR CM-0002), the tab it opens on then.

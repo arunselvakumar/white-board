@@ -38,7 +38,7 @@ async function hrmsMember(owner: Awaited<ReturnType<typeof ownerWithCompany>>) {
       designationId: owner.designationId("Site Engineer"),
       email,
     },
-    // Add User preselects HRMS Staff for an HRMS member (ADR CM-0029).
+    // Add User preselects HRMS Staff for an HRMS member (ADR CM-0030).
     roleId: owner.roleId("HRMS Staff"),
   });
   const session = await signInByEmail(email, "Chitra");

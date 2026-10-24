@@ -17,7 +17,7 @@ export default async function AppLayout({
   children: ReactNode;
 }>) {
   const auth = await protectCompany();
-  // A Temporary Password is replaced before anything else (ADR CM-0029 §8).
+  // A Temporary Password is replaced before anything else (ADR CM-0030 §8).
   if (mustChangePassword(auth)) redirect(CHANGE_PASSWORD_PATH);
   if (auth.workspaceId == null) redirect("/continue");
   // The main menu's Dashboard needs the Dashboard menu's Read (CM-902).
@@ -26,7 +26,7 @@ export default async function AppLayout({
     "read",
   );
 
-  // Users & Roles needs Team Members or Role Management Read (ADR CM-0029).
+  // Users & Roles needs Team Members or Role Management Read (ADR CM-0030).
   const canOpenUsersRoles =
     (await viewerCan("organization.team_members", "read")) ||
     (await viewerCan("organization.roles", "read"));

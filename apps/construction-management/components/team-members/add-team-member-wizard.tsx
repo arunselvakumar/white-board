@@ -69,7 +69,7 @@ type Created = TeamMember &
   PasswordOutcome & { passwordSet: boolean; invited: boolean };
 
 /**
- * Add User (CM-111, ADR CM-0029 §6): details with how they sign in →
+ * Add User (CM-111, ADR CM-0030 §6): details with how they sign in →
  * Projects → Role. HRMS members skip Projects and start on HRMS Staff.
  */
 export function AddTeamMemberWizard() {

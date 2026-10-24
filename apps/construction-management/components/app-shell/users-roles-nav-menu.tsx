@@ -10,7 +10,7 @@ import { AreaNavMenu } from "./area-nav-menu";
 
 const GROUPS = [{ sections: USERS_ROLES_SECTIONS }];
 
-/** Users & Roles in the sidebar (ADR CM-0029 §2): Users and Role Management. */
+/** Users & Roles in the sidebar (ADR CM-0030 §2): Users and Role Management. */
 export function UsersRolesNavMenu({
   pathname,
   buttonClassName,

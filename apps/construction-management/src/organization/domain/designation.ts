@@ -32,7 +32,7 @@ export type DesignationProps = {
 
 /**
  * A job title in a Company (`modules/01` Designations, CM-106). It carries
- * no access: that is the Team Member's Role (ADR CM-0029). Every Company
+ * no access: that is the Team Member's Role (ADR CM-0030). Every Company
  * holds its own copy of the seed set and may edit it.
  */
 export class Designation {

@@ -13,7 +13,7 @@ export type MemberAccess = {
   role: "owner" | "member";
   permissions: PermissionSet;
   /**
-   * The Role the permissions come from (ADR CM-0029); null for the Owner
+   * The Role the permissions come from (ADR CM-0030); null for the Owner
    * and a member without one. Absent where a caller builds access by hand.
    */
   roleId?: string | null;

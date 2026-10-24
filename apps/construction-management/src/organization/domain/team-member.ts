@@ -123,7 +123,7 @@ export type TeamMemberProps = {
   status: TeamMemberStatus;
   projectIds: readonly string[];
   /**
-   * What they may do (ADR CM-0029): read through the Role on every
+   * What they may do (ADR CM-0030): read through the Role on every
    * request. Null for the Owner, who can do everything; a Member without a
    * Role can do nothing.
    */
@@ -312,7 +312,7 @@ export class TeamMember {
     this.touch(by, now);
   }
 
-  /** Gives them another Role (ADR CM-0029). The Owner has none. */
+  /** Gives them another Role (ADR CM-0030). The Owner has none. */
   setRole(roleId: string, by: string, now: Date): void {
     if (this.props.isOwner)
       throw conflict(
@@ -357,7 +357,7 @@ export class TeamMember {
 
   /**
    * The admin set a first password and the sign-in account was made for
-   * them (ADR CM-0029 §6): Active at once, with no Join Request.
+   * them (ADR CM-0030 §6): Active at once, with no Join Request.
    */
   linkAccount(userId: string, by: string, now: Date): void {
     if (this.props.status === "active" || this.props.userId != null)

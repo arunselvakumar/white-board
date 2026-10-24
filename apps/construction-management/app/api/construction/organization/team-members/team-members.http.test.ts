@@ -133,7 +133,7 @@ describe("Team Members HTTP (CM-110)", () => {
         params(prabhu.id),
       ),
     );
-    // Changing Member Type keeps the Role (ADR CM-0029).
+    // Changing Member Type keeps the Role (ADR CM-0030).
     expect(hrms).toMatchObject({
       name: "Prabhu K.",
       memberType: "hrms",

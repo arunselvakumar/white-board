@@ -222,7 +222,7 @@ const DEFINITIONS = [
     "CRUD",
     false,
   ],
-  // Role Management (ADR CM-0029): the Roles Team Members are given.
+  // Role Management (ADR CM-0030): the Roles Team Members are given.
   ["organization.roles", "Role Management", "master_records", "CRUD", false],
   ["masters.quotations", "View Quotations", "master_records", "R", false],
   ["masters.amenities", "Amenities", "master_records", "CRUD", false],

@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a Designation (CM-112): a job title, no access (ADR CM-0029). */
+/** Adds a Designation (CM-112): a job title, no access (ADR CM-0030). */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

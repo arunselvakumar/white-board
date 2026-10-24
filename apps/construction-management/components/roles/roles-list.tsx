@@ -180,7 +180,7 @@ function RoleRow({
   );
 }
 
-/** Users & Roles → Role Management (ADR CM-0029): the Company's Roles. */
+/** Users & Roles → Role Management (ADR CM-0030): the Company's Roles. */
 export function RolesList({ actions }: { actions: RoleActions }) {
   return (
     <Suspense

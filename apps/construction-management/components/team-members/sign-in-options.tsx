@@ -62,7 +62,7 @@ export function inviteAvailable(values: {
 }
 
 /**
- * Add User's three outcomes (ADR CM-0029 §6): Invite them (needs an email;
+ * Add User's three outcomes (ADR CM-0030 §6): Invite them (needs an email;
  * ticked by default once one is typed), Set a password (they sign in at
  * once and change it the first time), or neither (a record until invited).
  */

@@ -53,7 +53,7 @@ function update(cookie: string, role: Role, changes: Partial<Role>) {
   );
 }
 
-describe("Role Management HTTP (ADR CM-0029)", () => {
+describe("Role Management HTTP (ADR CM-0030)", () => {
   it("is 401 without a Session", async () => {
     const response = await listRoles(new Request(BASE));
     expect(response.status).toBe(StatusCodes.UNAUTHORIZED);

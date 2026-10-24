@@ -12,7 +12,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Copies a Role as "<name> (copy)", with nobody on it (ADR CM-0029). */
+/** Copies a Role as "<name> (copy)", with nobody on it (ADR CM-0030). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

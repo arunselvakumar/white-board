@@ -6,7 +6,7 @@ import { PermissionSet } from "./permission-set";
 /**
  * Loads one Team Member's access for a request (ADR CM-0003): the matrix of
  * their Role, read on every request, so editing a Role changes access from
- * the next one (ADR CM-0029). Reads the organization context's grant tables
+ * the next one (ADR CM-0030). Reads the organization context's grant tables
  * directly, like `recordAudit` writes its audit table: the matrix is part
  * of the kernel's contract.
  */

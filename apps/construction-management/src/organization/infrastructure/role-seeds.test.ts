@@ -9,7 +9,7 @@ import {
 
 import { seedRoleGrants, seedRoles } from "./role-seeds";
 
-describe("role seed set (ADR CM-0029 §5)", () => {
+describe("role seed set (ADR CM-0030 §5)", () => {
   const seeded = seedRoles({
     workspaceId: "company-1",
     by: "user-1",

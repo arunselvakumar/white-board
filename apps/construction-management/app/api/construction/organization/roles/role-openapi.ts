@@ -20,7 +20,7 @@ const SESSION_ERRORS = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN];
 
 const ITEM = `${ROLES_PATH}/{id}`;
 
-/** Role Management (ADR CM-0029), under `organization.roles`. */
+/** Role Management (ADR CM-0030), under `organization.roles`. */
 export const roleOpenApiComponents: OpenApiComponents = {
   ConstructionOrganizationRoleResponseModel,
   ListConstructionOrganizationRolesResponseModel,

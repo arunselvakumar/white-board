@@ -1,6 +1,6 @@
 /**
  * Sign-in accounts in `@repo/auth` that an admin makes or resets for a Team
- * Member (ADR CM-0029 §3, §6, §7). Never touches the password of a User
+ * Member (ADR CM-0030 §3, §6, §7). Never touches the password of a User
  * who already had an account before the admin acted.
  */
 export type SignInAccounts = {

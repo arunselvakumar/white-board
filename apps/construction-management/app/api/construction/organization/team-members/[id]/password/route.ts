@@ -12,7 +12,7 @@ import { SetConstructionOrganizationTeamMemberPasswordRequestModel } from "./set
 export const dynamic = "force-dynamic";
 
 /**
- * Set a new password (ADR CM-0029 §7): makes the sign-in account for a
+ * Set a new password (ADR CM-0030 §7): makes the sign-in account for a
  * member without a User, or replaces the password of a User no other
  * Company relies on. They change it at their next sign-in.
  */

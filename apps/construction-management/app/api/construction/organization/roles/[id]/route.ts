@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** One Role with its matrix (ADR CM-0029); 404 `ROLE_NOT_FOUND`. */
+/** One Role with its matrix (ADR CM-0030); 404 `ROLE_NOT_FOUND`. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

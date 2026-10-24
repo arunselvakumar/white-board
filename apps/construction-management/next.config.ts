@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   },
   // Settings moved out of Masters to its own menu item: the Company profile
   // and the Advanced Settings now live under /app/settings. Team Members
-  // left Masters for Users & Roles → Users (ADR CM-0029 §2).
+  // left Masters for Users & Roles → Users (ADR CM-0030 §2).
   redirects: () =>
     Promise.resolve([
       {

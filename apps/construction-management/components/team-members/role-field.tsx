@@ -16,7 +16,7 @@ import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { ROLES_PATH } from "@/lib/users-roles-nav";
 import type { Role } from "@/src/queries/roles";
 
-/** The seeded Role HRMS Team Members start on (ADR CM-0029 §1). */
+/** The seeded Role HRMS Team Members start on (ADR CM-0030 §1). */
 export const HRMS_STAFF_ROLE_NAME = "HRMS Staff";
 
 export function hrmsStaffRoleId(roles: readonly Role[]): string | null {

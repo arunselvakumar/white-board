@@ -17,7 +17,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Every live Role of the Active Company, by name (ADR CM-0029). Role
+ * Every live Role of the Active Company, by name (ADR CM-0030). Role
  * Management reads it, and so does Add User to offer the Roles.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -37,7 +37,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Add Role (ADR CM-0029): only with cells the caller holds themselves. */
+/** Add Role (ADR CM-0030): only with cells the caller holds themselves. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

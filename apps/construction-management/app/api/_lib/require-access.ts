@@ -81,7 +81,7 @@ export async function requireAnyAccess(
 
 /**
  * A read several menus allow, e.g. the Role list, which Role Management and
- * Add User both need (ADR CM-0029): 403 `PERMISSION_DENIED` unless the
+ * Add User both need (ADR CM-0030): 403 `PERMISSION_DENIED` unless the
  * member holds at least one `[menu, flag]`. Only reads: no plan check.
  */
 export async function requireAnyMenuRead(

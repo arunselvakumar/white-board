@@ -40,7 +40,7 @@ export class NewCompany {
     owner: CompanyOwner;
     /** The Company's own copy of the seed Designations (CM-106). */
     designations: readonly Designation[];
-    /** The Company's own copy of the seed Roles (ADR CM-0029 §5). */
+    /** The Company's own copy of the seed Roles (ADR CM-0030 §5). */
     roles: readonly Role[];
     now: Date;
   }): NewCompany {

@@ -71,7 +71,7 @@ function migrationGrants(
 
 describe("M5–M8 menu backfill migration", () => {
   // The templates this migration topped up moved to the seed Roles of the
-  // same names (ADR CM-0029); HRMS Staff never held these menus.
+  // same names (ADR CM-0030); HRMS Staff never held these menus.
   it("granted existing Companies' seeded Designations the same new cells as new ones", () => {
     const seeded = seedRoles({
       workspaceId: "company-1",

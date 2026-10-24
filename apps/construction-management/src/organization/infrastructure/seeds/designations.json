@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Default Designations every new Company starts with (modules/01 seed list, 38 names). Job titles only: access comes from Roles (roles.json, ADR CM-0029).",
+  "source": "Default Designations every new Company starts with (modules/01 seed list, 38 names). Job titles only: access comes from Roles (roles.json, ADR CM-0030).",
   "designations": [
     {
       "name": "Accountant"

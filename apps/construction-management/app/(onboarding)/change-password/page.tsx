@@ -11,7 +11,7 @@ import { continuePath } from "@/lib/safe-redirect";
 export const metadata: Metadata = { title: "Choose your own password" };
 
 /**
- * The first stop after signing in with a Temporary Password (ADR CM-0029
+ * The first stop after signing in with a Temporary Password (ADR CM-0030
  * §8); `/app`, Choose Company and Create Company send the User here until
  * it is replaced.
  */
