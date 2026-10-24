@@ -1,0 +1,19 @@
+apps/construction-management/components/payments/payments-page.stories.tsx
+  s_468db2742e94c8::t_9400a5f158a0f8 118-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "05e7c318abfed38f1fc2666ef9598ec6a9037abe",
+  "prompts": {},
+  "sessions": {
+    "s_468db2742e94c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a50eb349-6c14-471e-82c3-846b73cf576f",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
