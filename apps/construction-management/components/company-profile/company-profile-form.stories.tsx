@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { QuerySuspense } from "@/components/query-suspense";
+import { SETTINGS_SECTIONS } from "@/lib/settings-nav";
 import type { CompanyProfileModel } from "@/src/queries/company-profile";
 
 import { signInAs } from "../../.storybook/mocks/auth";
@@ -73,10 +74,10 @@ function server(start: CompanyProfileModel, override?: ApiHandler) {
 }
 
 const meta = {
-  title: "Masters/CompanyProfileForm",
+  title: "Settings/CompanyProfileForm",
   component: CompanyProfileScreen,
   parameters: {
-    nextjs: { navigation: { pathname: "/app/masters/company" } },
+    nextjs: { navigation: { pathname: "/app/settings" } },
   },
   render: () => (
     <QuerySuspense>
@@ -90,6 +91,26 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const AdvancedSettingsBelow: Story = {
+  beforeEach() {
+    return server(profile()).restore;
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("heading", { level: 1, name: "Settings" }),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("link", { name: /Back to/ })).toBeNull();
+    await canvas.findByLabelText("Company name");
+    const advanced = within(
+      canvas.getByRole("region", { name: "Advanced Settings" }),
+    );
+    for (const section of SETTINGS_SECTIONS)
+      await expect(
+        advanced.getByRole("link", { name: new RegExp(section.title) }),
+      ).toHaveAttribute("href", section.href);
+  },
+};
 
 export const EditAndSave: Story = {
   beforeEach() {

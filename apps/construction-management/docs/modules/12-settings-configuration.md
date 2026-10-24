@@ -13,6 +13,8 @@ Company-wide and per-project configuration that changes how other modules behave
 
 Who uses it: company owner and admins (Setting #86 [CRUD]); project managers for per-project module visibility and form settings (inferred); each user for their own timezone and tile order.
 
+In our app Settings is its own main-menu item (`/app/settings`), not part of Masters: the Company profile with its own Save changes, then **Advanced Settings**, a card per rule (Sequence IDs, Back-dated Entry, billing addresses, GRN fields, Company ownership, Backup & export), each saved on its own page under `/app/settings/…`.
+
 ---
 
 ## Legacy behaviour

@@ -48,7 +48,7 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Authenticated chrome: the Company Dashboard and the three areas, the
+ * Authenticated chrome: the Company Dashboard, the three areas and Settings, the
  * Active Company, the account menu. Inside a Project the areas give way to
  * the Project's own menu (ADR CM-0020). `canOpenDashboard` is the
  * Dashboard menu's Read flag (CM-902): without it the Dashboard is not in
@@ -150,8 +150,8 @@ export function AppShell({
 }
 
 /**
- * The Company Dashboard (with Dashboard Read), then the three areas:
- * Projects, Workspace (with its submenu) and Masters.
+ * The Company Dashboard (with Dashboard Read), the three areas: Projects,
+ * Workspace (with its submenu) and Masters, then Settings.
  */
 function MainMenu({
   pathname,

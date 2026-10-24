@@ -23,9 +23,7 @@ describe("MASTERS_GROUPS", () => {
     expect(activeMastersSection("/app/masters/designations/d1")?.label).toBe(
       "Designations",
     );
-    expect(
-      activeMastersSection("/app/masters/settings/sequence-ids")?.label,
-    ).toBe("Settings");
+    expect(activeMastersSection("/app/settings")).toBeUndefined();
     expect(activeMastersSection("/app/masters")).toBeUndefined();
     expect(activeMastersSection("/app/masters/designationsx")).toBeUndefined();
   });

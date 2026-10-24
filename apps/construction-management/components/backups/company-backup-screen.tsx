@@ -295,7 +295,7 @@ export function CompanyBackupScreen() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="Backup & export"
           meta={
             <>

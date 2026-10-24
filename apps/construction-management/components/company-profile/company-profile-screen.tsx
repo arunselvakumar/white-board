@@ -11,11 +11,12 @@ import {
 } from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { AdvancedSettings } from "@/components/settings/advanced-settings";
 import { companyProfileQuery } from "@/src/queries/company-profile";
 
 import { CompanyProfileForm } from "./company-profile-form";
 
-/** Masters → Company profile (CM-115). */
+/** Settings: the Company profile (CM-115), then the Advanced Settings. */
 export function CompanyProfileScreen() {
   const { data: profile } = useSuspenseQuery(companyProfileQuery);
 
@@ -23,8 +24,7 @@ export function CompanyProfileScreen() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
-          title="Company profile"
+          title="Settings"
           meta="How your Company appears on documents and to your team."
         />
         {profile == null ? (
@@ -42,6 +42,8 @@ export function CompanyProfileScreen() {
         ) : (
           <CompanyProfileForm profile={profile} />
         )}
+        <div className="bg-border h-px w-full" />
+        <AdvancedSettings />
       </div>
     </div>
   );

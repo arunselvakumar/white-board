@@ -1,7 +1,8 @@
 /**
- * The main menu: the Company Dashboard (CM-902), then the three top-level
- * areas (`docs/00-overview.md`, "The shape of the product"). Each area
- * grows its own screens in later milestones. The Dashboard shows only
+ * The main menu: the Company Dashboard (CM-902), the three top-level areas
+ * (`docs/00-overview.md`, "The shape of the product"), then Settings: the
+ * Company profile and the Advanced Settings. Each area grows its own
+ * screens in later milestones. The Dashboard shows only
  * with the Dashboard menu's Read flag (`AppShell`'s `canOpenDashboard`).
  */
 export const APP_NAV = [
@@ -32,6 +33,13 @@ export const APP_NAV = [
     title: "Masters",
     description:
       "Your Company's lists: Team Members, Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
+  },
+  {
+    href: "/app/settings",
+    label: "Settings",
+    title: "Settings",
+    description:
+      "How your Company appears on documents, and the Advanced Settings: Sequence IDs, Back-dated Entry, billing addresses, GRN fields, ownership and backup.",
   },
 ] as const;
 

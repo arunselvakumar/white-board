@@ -62,7 +62,7 @@ const meta = {
   title: "Backups/CompanyBackupScreen",
   component: CompanyBackupScreen,
   parameters: {
-    nextjs: { navigation: { pathname: "/app/masters/settings/backup" } },
+    nextjs: { navigation: { pathname: "/app/settings/backup" } },
   },
   render: () => (
     <StoryQueries>

@@ -223,6 +223,11 @@
         }
       }
 
+      /* The gear turns once. */
+      &.lucide-settings {
+        animation: sidebar-icon-spin 600ms ease-in-out;
+      }
+
       &.lucide-user-round {
         animation: none;
 

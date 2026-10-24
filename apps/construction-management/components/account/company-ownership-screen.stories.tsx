@@ -69,7 +69,7 @@ const meta = {
   title: "Settings/CompanyOwnership",
   component: CompanyOwnershipScreen,
   parameters: {
-    nextjs: { navigation: { pathname: "/app/masters/settings/company" } },
+    nextjs: { navigation: { pathname: "/app/settings/company" } },
   },
   render: () => (
     <StoryQueries>
@@ -139,7 +139,7 @@ export const DeleteCompany: Story = {
     // CM-906: the backup is a link to Settings → Backup & export.
     await expect(
       dialog.getByRole("link", { name: "Settings → Backup & export" }),
-    ).toHaveAttribute("href", "/app/masters/settings/backup");
+    ).toHaveAttribute("href", "/app/settings/backup");
     await userEvent.type(
       dialog.getByLabelText("Type Anugraha Engineers to confirm"),
       "Anugraha",

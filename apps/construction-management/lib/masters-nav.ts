@@ -5,7 +5,6 @@ import {
   Landmark,
   Tags,
   UserRoundPlus,
-  Building,
   FileText,
   Files,
   FolderTree,
@@ -16,7 +15,6 @@ import {
   Handshake,
   HardHat,
   Layers,
-  Settings2,
   Shovel,
   Tractor,
   Truck,
@@ -42,7 +40,7 @@ export type MastersGroup = {
 };
 
 /**
- * The Company's lists and settings under Masters, grouped the way the sidebar
+ * The Company's lists under Masters, grouped the way the sidebar
  * submenu and the Masters page show them. Each milestone adds its masters to
  * a group (or a new group) here; nothing else needs to change.
  */
@@ -50,13 +48,6 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
   {
     label: "Company",
     sections: [
-      {
-        href: "/app/masters/company",
-        label: "Company profile",
-        title: "Company profile",
-        description: "Name, logo, GSTIN, PAN, address, currency and time zone.",
-        icon: Building,
-      },
       {
         href: "/app/masters/team-members",
         label: "Team Members",
@@ -72,14 +63,6 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Job titles and the Permission Template each one starts with.",
         icon: BadgeCheck,
-      },
-      {
-        href: "/app/masters/settings",
-        label: "Settings",
-        title: "Settings",
-        description:
-          "Sequence IDs, Back-dated Entry, billing addresses and GRN fields.",
-        icon: Settings2,
       },
     ],
   },

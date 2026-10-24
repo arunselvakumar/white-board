@@ -6,15 +6,18 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { AdvancedSettings } from "@/components/settings/advanced-settings";
 
-/** Masters → Company profile while it loads (ADR-0047). */
+/**
+ * Settings while the Company profile loads (ADR-0047). The Advanced
+ * Settings are links that need no data, so they show as they are.
+ */
 export function CompanyProfileSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
-          title="Company profile"
+          title="Settings"
           meta="How your Company appears on documents and to your team."
         />
         <SkeletonGroup
@@ -54,6 +57,8 @@ export function CompanyProfileSkeleton() {
             ]}
           />
         </SkeletonGroup>
+        <div className="bg-border h-px w-full" />
+        <AdvancedSettings />
       </div>
     </div>
   );

@@ -26,6 +26,21 @@ const nextConfig: NextConfig = {
     // than stored truncated.
     proxyClientMaxBodySize: "26mb",
   },
+  // Settings moved out of Masters to its own menu item: the Company profile
+  // and the Advanced Settings now live under /app/settings.
+  redirects: () =>
+    Promise.resolve([
+      {
+        source: "/app/masters/company",
+        destination: "/app/settings",
+        permanent: true,
+      },
+      {
+        source: "/app/masters/settings/:path*",
+        destination: "/app/settings/:path*",
+        permanent: true,
+      },
+    ]),
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   // Payslip and procurement PDFs embed Noto fonts read from node_modules at
   // run time (`src/shared-kernel/pdf/noto-text.ts`), which tracing cannot see.

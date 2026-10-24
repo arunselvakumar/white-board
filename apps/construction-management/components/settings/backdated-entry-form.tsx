@@ -125,7 +125,7 @@ export function BackdatedEntryForm() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader
-          back={{ label: "Settings", href: "/app/masters/settings" }}
+          back={{ label: "Settings", href: "/app/settings" }}
           title="Back-dated Entry"
           meta="How far back your team may date new entries and edit old ones. 0 days means no limit; the Owner is never limited by days."
         />
