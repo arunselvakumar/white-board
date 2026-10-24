@@ -1,0 +1,73 @@
+apps/construction-management/.storybook/mocks/auth.tsx
+  s_93811a7c64e94c::t_abfe6c50fc0766 40,57-62,99,116-119,168,179,240-243,394-416
+apps/construction-management/app/(public)/sign-in/as/page.tsx
+  s_93811a7c64e94c::t_c65418844e0e1f 1-13
+apps/construction-management/app/api/auth/impersonation.http.test.ts
+  s_93811a7c64e94c::t_a5233811d076ca 1-247
+apps/construction-management/app/globals.css
+  s_93811a7c64e94c::t_e669d1cc6cd58b 2-33
+apps/construction-management/app/layout.tsx
+  s_93811a7c64e94c::t_48f8cb2b88d8d5 11,38,50
+apps/construction-management/components/app-shell/app-shell.tsx
+  s_93811a7c64e94c::t_bbda4602c91519 135
+apps/construction-management/components/auth/impersonation-banner.stories.tsx
+  s_93811a7c64e94c::t_6d4d2ed2326bc6 1-48
+apps/construction-management/components/auth/impersonation-banner.tsx
+  s_93811a7c64e94c::t_e8d5577b649390 1-51
+apps/construction-management/components/auth/sign-in-as-form.stories.tsx
+  s_93811a7c64e94c::t_f9c59bbf25efcf 1-108
+apps/construction-management/components/auth/sign-in-as-form.tsx
+  s_93811a7c64e94c::t_2f67fe537a3faf 1-174
+apps/construction-management/components/ui/select.stories.tsx
+  s_93811a7c64e94c::t_1612a2fd569c40 98-114,181,186-191,193
+apps/construction-management/docs/adr/CM-0029-sign-in-as-a-customer.md
+  s_93811a7c64e94c::t_5d29111e93afb3 1-32
+apps/construction-management/lib/auth-errors.ts
+  s_93811a7c64e94c::t_0f94888f1c9e16 40-43
+apps/construction-management/proxy.ts
+  s_93811a7c64e94c::t_bb3c2e40917041 7
+bun.lock
+  s_93811a7c64e94c::t_00fdfb038f0698 175
+packages/auth/package.json
+  s_93811a7c64e94c::t_9ed2c5e5c86835 18-19,30-31
+packages/auth/src/construction/client.ts
+  s_93811a7c64e94c::t_29840387538725 6,10-17,22-27
+packages/auth/src/construction/config.ts
+  s_93811a7c64e94c::t_44eb21b6a9ec50 17-21,60-62,172-173,183
+packages/auth/src/construction/impersonation-email.ts
+  s_93811a7c64e94c::t_7b22107a62b53a 1-15
+packages/auth/src/construction/impersonation.ts
+  s_93811a7c64e94c::t_2f1aa337ddb7ff 1-231
+packages/auth/src/construction/react/hooks.ts
+  s_93811a7c64e94c::t_bb4c19bf133c10 19-20,29,243-275
+packages/auth/src/construction/react/index.ts
+  s_93811a7c64e94c::t_876c1339381cf0 8,19-22
+packages/auth/src/construction/server/get-auth.ts
+  s_93811a7c64e94c::t_230fe2b3204227 22,71,95
+packages/auth/src/construction/server/index.ts
+  s_93811a7c64e94c::t_2a08977d817b17 45-48
+packages/auth/src/construction/testing.ts
+  s_93811a7c64e94c::t_b28ba8ea82960b 30,48
+packages/auth/src/construction/types.ts
+  s_93811a7c64e94c::t_1232596d1e8722 26-27,37,56
+packages/db/construction/prisma/migrations/20261024120000_identity_impersonations/migration.sql
+  s_93811a7c64e94c::t_745905a454b9ab 1-26
+packages/db/construction/prisma/schema/identity.prisma
+  s_93811a7c64e94c::t_326ae2b8db6206 41-42,145-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3dd4308dc798d48eeaf2cb930f8924c169c620ad",
+  "prompts": {},
+  "sessions": {
+    "s_93811a7c64e94c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e5e6c54-f8ff-4847-8569-72e57b8628e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
