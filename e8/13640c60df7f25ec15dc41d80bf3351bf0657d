@@ -1,0 +1,199 @@
+.github/workflows/e2e.yml
+  s_dc3d48bbd479da::t_af6c85bfed8ab9 1-126
+.prettierignore
+  s_dc3d48bbd479da::t_18ed517b8e5adb 15-19
+apps/construction-management/.gitignore
+  s_dc3d48bbd479da::t_6800c0a391ac2a 44-49
+apps/construction-management/README.md
+  s_dc3d48bbd479da::t_80fbf21a6b1ea3 25-27,30-31
+apps/construction-management/docs/adr/CM-0031-end-to-end-tests.md
+  s_dc3d48bbd479da::t_ce0e41fd69bcb0 1-36
+apps/construction-management/e2e/api/ApiClient.ts
+  s_dc3d48bbd479da::t_165fbc61363ee1 1-49
+apps/construction-management/e2e/api/database.ts
+  s_dc3d48bbd479da::t_3c61efd8367f75 1-34
+apps/construction-management/e2e/api/dates.ts
+  s_dc3d48bbd479da::t_dc248c187e1671 1-22
+apps/construction-management/e2e/api/mailpit.ts
+  s_dc3d48bbd479da::t_e8ddf53b5dfe3f 1-68
+apps/construction-management/e2e/api/organization.ts
+  s_dc3d48bbd479da::t_07d1fb80dcfd45 1-158
+apps/construction-management/e2e/api/owner.ts
+  s_dc3d48bbd479da::t_8f37d014059c2b 1-37
+apps/construction-management/e2e/api/projects.ts
+  s_dc3d48bbd479da::t_584936ced695ab 1-35
+apps/construction-management/e2e/api/razorpay.ts
+  s_dc3d48bbd479da::t_61a32040a5c10c 1-39
+apps/construction-management/e2e/api/session.ts
+  s_dc3d48bbd479da::t_60982ccfc79fda 1-119
+apps/construction-management/e2e/api/subscription.ts
+  s_dc3d48bbd479da::t_ec2c02dbdf0ae5 1-60
+apps/construction-management/e2e/build.ts
+  s_dc3d48bbd479da::t_b6688f6e9ee503 1-19
+apps/construction-management/e2e/check-pr-budget.ts
+  s_dc3d48bbd479da::t_5bf353eaf731b3 1-25
+apps/construction-management/e2e/e2e.env
+  s_dc3d48bbd479da::t_b2581d167de23f 1-34
+apps/construction-management/e2e/fixtures/drawing.pdf
+  s_dc3d48bbd479da::t_db316c2b6e401b 1-10
+apps/construction-management/e2e/fixtures/index.ts
+  s_dc3d48bbd479da::t_c09580723f413b 1-18
+apps/construction-management/e2e/global-setup.ts
+  s_dc3d48bbd479da::t_6f8fcadf9c3a38 1-38
+apps/construction-management/e2e/helpers/checkoutPageTest.ts
+  s_dc3d48bbd479da::t_d48f75914dd936 1-10
+apps/construction-management/e2e/helpers/chooseCompanyPageTest.ts
+  s_dc3d48bbd479da::t_04b1c143b22443 1-10
+apps/construction-management/e2e/helpers/companyTest.ts
+  s_dc3d48bbd479da::t_82739cb329a9e2 1-130
+apps/construction-management/e2e/helpers/designationsPageTest.ts
+  s_dc3d48bbd479da::t_88eca10e7c7315 1-10
+apps/construction-management/e2e/helpers/forgotPasswordPageTest.ts
+  s_dc3d48bbd479da::t_98b5e764bc0055 1-10
+apps/construction-management/e2e/helpers/guestTest.ts
+  s_dc3d48bbd479da::t_648e9c1d8b5acc 1-15
+apps/construction-management/e2e/helpers/profilePageTest.ts
+  s_dc3d48bbd479da::t_8cf62473e2067d 1-10
+apps/construction-management/e2e/helpers/projectFormPageTest.ts
+  s_dc3d48bbd479da::t_1e420b3792a3f1 1-10
+apps/construction-management/e2e/helpers/projectTest.ts
+  s_dc3d48bbd479da::t_aa2fe863a3a95b 1-11
+apps/construction-management/e2e/helpers/projectsPageTest.ts
+  s_dc3d48bbd479da::t_c962b1e95a018c 1-10
+apps/construction-management/e2e/helpers/rolesPageTest.ts
+  s_dc3d48bbd479da::t_e99e614bd62fb2 1-8
+apps/construction-management/e2e/helpers/settingsPageTest.ts
+  s_dc3d48bbd479da::t_b258afd3ef4d46 1-10
+apps/construction-management/e2e/helpers/signInAsPageTest.ts
+  s_dc3d48bbd479da::t_0d682e00a1c5a8 1-10
+apps/construction-management/e2e/helpers/signInPageTest.ts
+  s_dc3d48bbd479da::t_ff5818891c1202 1-8
+apps/construction-management/e2e/helpers/signUpPageTest.ts
+  s_dc3d48bbd479da::t_62b0440f6806cd 1-8
+apps/construction-management/e2e/helpers/usersPageTest.ts
+  s_dc3d48bbd479da::t_dfbd35142d83c9 1-8
+apps/construction-management/e2e/helpers/wingsPageTest.ts
+  s_dc3d48bbd479da::t_ed98f1c04dfea1 1-8
+apps/construction-management/e2e/pages/AddUserPage.ts
+  s_dc3d48bbd479da::t_91149558cf3ac0 1-57
+apps/construction-management/e2e/pages/AddWingPage.ts
+  s_dc3d48bbd479da::t_2e23f571e66fce 1-32
+apps/construction-management/e2e/pages/AppShellPage.ts
+  s_dc3d48bbd479da::t_3ba488dd7444f3 1-28
+apps/construction-management/e2e/pages/BackdatedEntryPage.ts
+  s_dc3d48bbd479da::t_383de121ca9638 1-17
+apps/construction-management/e2e/pages/BasePage.ts
+  s_dc3d48bbd479da::t_f4ee39f8c8b638 1-128
+apps/construction-management/e2e/pages/ChangePasswordPage.ts
+  s_dc3d48bbd479da::t_2faf912ba1bd55 1-37
+apps/construction-management/e2e/pages/CheckoutPage.ts
+  s_dc3d48bbd479da::t_196629e9e526a2 1-37
+apps/construction-management/e2e/pages/ChooseCompanyPage.ts
+  s_dc3d48bbd479da::t_50647eadbaa78a 1-19
+apps/construction-management/e2e/pages/CreateCompanyPage.ts
+  s_dc3d48bbd479da::t_9a89e81f64bd48 1-41
+apps/construction-management/e2e/pages/DesignationsPage.ts
+  s_dc3d48bbd479da::t_240d363dfd8d87 1-13
+apps/construction-management/e2e/pages/EditUserPage.ts
+  s_dc3d48bbd479da::t_09816149194e45 1-32
+apps/construction-management/e2e/pages/ForgotPasswordPage.ts
+  s_dc3d48bbd479da::t_98fc8209325744 1-42
+apps/construction-management/e2e/pages/JoinPage.ts
+  s_dc3d48bbd479da::t_bb46334d87c8a5 1-29
+apps/construction-management/e2e/pages/ProfilePage.ts
+  s_dc3d48bbd479da::t_06276338adbfc2 1-35
+apps/construction-management/e2e/pages/ProjectDashboardPage.ts
+  s_dc3d48bbd479da::t_749212be2efff0 1-19
+apps/construction-management/e2e/pages/ProjectFormPage.ts
+  s_dc3d48bbd479da::t_9f0b8f2b90c00b 1-58
+apps/construction-management/e2e/pages/ProjectPage.ts
+  s_dc3d48bbd479da::t_ace8ee37261092 1-41
+apps/construction-management/e2e/pages/ProjectsPage.ts
+  s_dc3d48bbd479da::t_1774b458e4955c 1-40
+apps/construction-management/e2e/pages/RoleFormPage.ts
+  s_dc3d48bbd479da::t_604f8a9a2e1fe1 1-45
+apps/construction-management/e2e/pages/RolesPage.ts
+  s_dc3d48bbd479da::t_e22edb038c5015 1-25
+apps/construction-management/e2e/pages/SequenceIdsPage.ts
+  s_dc3d48bbd479da::t_ec03dece4d0789 1-15
+apps/construction-management/e2e/pages/SettingsPage.ts
+  s_dc3d48bbd479da::t_92842105e430d5 1-50
+apps/construction-management/e2e/pages/SignInAsPage.ts
+  s_dc3d48bbd479da::t_c2e52865c459aa 1-41
+apps/construction-management/e2e/pages/SignInPage.ts
+  s_dc3d48bbd479da::t_7f787f5086f05f 1-61
+apps/construction-management/e2e/pages/SignUpPage.ts
+  s_dc3d48bbd479da::t_22467ea25d0c6f 1-55
+apps/construction-management/e2e/pages/SiteDiaryPage.ts
+  s_dc3d48bbd479da::t_c915b406112881 1-27
+apps/construction-management/e2e/pages/SubscriptionPage.ts
+  s_dc3d48bbd479da::t_00397b79349282 1-26
+apps/construction-management/e2e/pages/UsersPage.ts
+  s_dc3d48bbd479da::t_779926bc18e339 1-33
+apps/construction-management/e2e/pages/WingsPage.ts
+  s_dc3d48bbd479da::t_23709f9059186c 1-19
+apps/construction-management/e2e/specs/choose-company.spec.ts
+  s_dc3d48bbd479da::t_c539c23a5a59d0 1-39
+apps/construction-management/e2e/specs/designations.spec.ts
+  s_dc3d48bbd479da::t_228c55a4f0af45 1-28
+apps/construction-management/e2e/specs/forgot-password.spec.ts
+  s_dc3d48bbd479da::t_ec3b9270fd0568 1-33
+apps/construction-management/e2e/specs/plan-limits.spec.ts
+  s_dc3d48bbd479da::t_68dd58d7372a21 1-28
+apps/construction-management/e2e/specs/profile.spec.ts
+  s_dc3d48bbd479da::t_c1706cb9408d50 1-58
+apps/construction-management/e2e/specs/projects.spec.ts
+  s_dc3d48bbd479da::t_4916c7bcde0760 1-60
+apps/construction-management/e2e/specs/roles.spec.ts
+  s_dc3d48bbd479da::t_d0c02d2fa80df6 1-100
+apps/construction-management/e2e/specs/settings.spec.ts
+  s_dc3d48bbd479da::t_d1df97dcb1fb5d 1-112
+apps/construction-management/e2e/specs/sign-in-as.spec.ts
+  s_dc3d48bbd479da::t_aa302ff105398e 1-46
+apps/construction-management/e2e/specs/sign-in.spec.ts
+  s_dc3d48bbd479da::t_855bda8fb32686 1-94
+apps/construction-management/e2e/specs/sign-out.spec.ts
+  s_dc3d48bbd479da::t_161004829a61ba 1-23
+apps/construction-management/e2e/specs/sign-up.spec.ts
+  s_dc3d48bbd479da::t_62d21ad4e20839 1-66
+apps/construction-management/e2e/specs/subscription.spec.ts
+  s_dc3d48bbd479da::t_ce06872310f1c8 1-35
+apps/construction-management/e2e/specs/users.spec.ts
+  s_dc3d48bbd479da::t_59db0e65e28a6a 1-224
+apps/construction-management/e2e/specs/wings.spec.ts
+  s_dc3d48bbd479da::t_295c26a16fc429 1-49
+apps/construction-management/eslint.config.js
+  s_dc3d48bbd479da::t_218e62e3e0f219 149-158,161-168
+apps/construction-management/package.json
+  s_dc3d48bbd479da::t_d7f8a9a26a2ea2 16-20,58
+apps/construction-management/playwright.config.ts
+  s_dc3d48bbd479da::t_10b6a03c54b11c 1-78
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.test.ts
+  s_dc3d48bbd479da::t_3e205e782663a9 1-38
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.ts
+  s_dc3d48bbd479da::t_4ff050f971ab02 5,8-10,14-15,21-28
+apps/construction-management/src/shared-kernel/files/storage-from-env.ts
+  s_dc3d48bbd479da::t_fa2e0c80d41ca1 16-19,25-28
+apps/construction-management/src/shared-kernel/files/storage.test.ts
+  s_dc3d48bbd479da::t_bbf4e7ff46122b 287-297
+apps/construction-management/tsconfig.json
+  s_dc3d48bbd479da::t_4963c0990a00b8 25
+bun.lock
+  s_dc3d48bbd479da::t_1298f8128db4f3 55,725-726
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "e813640c60df7f25ec15dc41d80bf3351bf0657d",
+  "prompts": {},
+  "sessions": {
+    "s_dc3d48bbd479da": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42aea6d8-890a-4303-99f6-66e2f8ab5369",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
