@@ -21,7 +21,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Team Member",
     description:
       "Team Members on a Project see it and work on it. The Owner is on every Project.",
-    addPath: "/app/masters/team-members/new",
+    addPath: "/app/users/new",
     icon: Users,
   },
   {

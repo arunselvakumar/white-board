@@ -27,7 +27,8 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "26mb",
   },
   // Settings moved out of Masters to its own menu item: the Company profile
-  // and the Advanced Settings now live under /app/settings.
+  // and the Advanced Settings now live under /app/settings. Team Members
+  // left Masters for Users & Roles → Users (ADR CM-0030 §2).
   redirects: () =>
     Promise.resolve([
       {
@@ -38,6 +39,11 @@ const nextConfig: NextConfig = {
       {
         source: "/app/masters/settings/:path*",
         destination: "/app/settings/:path*",
+        permanent: true,
+      },
+      {
+        source: "/app/masters/team-members/:path*",
+        destination: "/app/users/:path*",
         permanent: true,
       },
     ]),

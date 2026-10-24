@@ -2,11 +2,13 @@ export { CompanyAuthProvider, useCompanyAuthSnapshot } from "./provider";
 export {
   useActiveCompany,
   useCompanyAuth,
+  useCompanyChangePassword,
   useCompanyEmailSignIn,
   useCompanyEmailSignUp,
   useCompanyImpersonation,
   useCompanyList,
   useCompanyMobileOtp,
+  useCompanyMobilePasswordSignIn,
   useCompanyPasswordReset,
   useCompanySignOut,
   useCompanyUser,

@@ -6,6 +6,10 @@ import { ChooseCompanyForm } from "@/components/onboarding/choose-company-form";
 import { JoinRequestsList } from "@/components/onboarding/join-requests-list";
 import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
 import { QuerySuspense } from "@/components/query-suspense";
+import {
+  CHANGE_PASSWORD_PATH,
+  mustChangePassword,
+} from "@/lib/must-change-password";
 
 export const metadata: Metadata = { title: "Choose a Company" };
 
@@ -15,6 +19,7 @@ export default async function ChooseCompanyPage({
   searchParams: Promise<{ redirect_url?: string }>;
 }) {
   const auth = await protectCompany();
+  if (mustChangePassword(auth)) redirect(CHANGE_PASSWORD_PATH);
   // Nothing to choose yet: a new User creates their Company first.
   const mine = await companies.listForUser(auth.userId);
   if (mine.length === 0) redirect("/create-company");

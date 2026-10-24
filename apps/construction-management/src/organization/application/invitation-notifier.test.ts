@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
-
 import type { DesignationRepository } from "../domain/designation-repository";
 import { TeamMember, teamMemberDetails } from "../domain/team-member";
 import type { TeamMemberRepository } from "../domain/team-member-repository";
@@ -24,7 +22,7 @@ function setup(contact: { mobile?: string; email?: string }) {
       ...contact,
     }),
     memberType: "normal",
-    permissions: PermissionSet.empty(),
+    roleId: null,
     by: "owner",
     now: NOW,
   });

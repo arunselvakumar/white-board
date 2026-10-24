@@ -65,8 +65,8 @@ describe("the menu catalogue", () => {
       payment_accounting: 38,
       materials: 46,
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13) + Tags
-      // CRUD (ADR CM-0019 §1).
-      master_records: 100,
+      // CRUD (ADR CM-0019 §1) + Role Management CRUD (ADR CM-0030).
+      master_records: 104,
       central_store: 20,
       hrms: 57,
       others: 1,

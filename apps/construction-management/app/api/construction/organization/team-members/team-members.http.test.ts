@@ -9,14 +9,15 @@ import {
   jsonRequest,
   memberWith,
   ownerWithCompany,
+  roleWith,
 } from "@/test/companies";
 import { newEmail, newMobile, TEST_ORIGIN, withSms } from "@/test/sessions";
 
-import { POST as setPermissions } from "./[id]/permissions/route";
 import { POST as assignProjects } from "./[id]/projects/route";
 import { POST as remove } from "./[id]/remove/route";
 import { POST as resend } from "./[id]/resend-invite/route";
 import { POST as reveal } from "./[id]/reveal/route";
+import { PUT as setRole } from "./[id]/role/route";
 import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
 import { GET as list, POST as create } from "./route";
@@ -32,7 +33,10 @@ type Member = {
   status: string;
   memberType: string;
   projectIds: string[];
+  role: { id: string; name: string } | null;
   permissions: Record<string, string[]>;
+  canSetPassword: boolean;
+  passwordIgnored?: string | null;
   aadhaarMasked: string | null;
   invitePath: string | null;
   designation: { name: string | null };
@@ -65,6 +69,7 @@ describe("Team Members HTTP (CM-110)", () => {
         aadhaar: "2341 2341 2346",
         memberType: "normal",
         projectIds: [projectA],
+        roleId: owner.roleId("Site Engineer"),
       }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
@@ -73,6 +78,9 @@ describe("Team Members HTTP (CM-110)", () => {
       status: "joining_pending",
       aadhaarMasked: "XXXXXXXX2346",
       designation: { name: "Site Engineer" },
+      role: { id: owner.roleId("Site Engineer"), name: "Site Engineer" },
+      canSetPassword: true,
+      passwordIgnored: null,
     });
     expect(prabhu.permissions["labour.attendance"]).toEqual([
       "create",
@@ -80,21 +88,24 @@ describe("Team Members HTTP (CM-110)", () => {
       "update",
     ]);
 
-    const permitted = await json<Member>(
-      await setPermissions(
-        jsonRequest(`${BASE}/${prabhu.id}/permissions`, owner.cookie, {
-          permissions: {
-            "procurement.purchase_requests": ["create", "read", "delete"],
-          },
-        }),
-        params(prabhu.id),
+    const moved = await setRole(
+      jsonRequest(
+        `${BASE}/${prabhu.id}/role`,
+        owner.cookie,
+        { roleId: owner.roleId("Store Keeper") },
+        "PUT",
       ),
+      params(prabhu.id),
     );
-    expect(permitted.permissions).toEqual({
-      "procurement.purchase_requests": ["create", "read", "delete"],
+    expect(moved.status).toBe(StatusCodes.OK);
+    const storeKeeper = await json<Member>(moved);
+    expect(storeKeeper.role).toEqual({
+      id: owner.roleId("Store Keeper"),
+      name: "Store Keeper",
     });
+    expect(storeKeeper.permissions["labour.attendance"]).toBeUndefined();
 
-    const moved = await json<Member>(
+    const assigned = await json<Member>(
       await assignProjects(
         jsonRequest(`${BASE}/${prabhu.id}/projects`, owner.cookie, {
           projectIds: [projectB],
@@ -102,7 +113,7 @@ describe("Team Members HTTP (CM-110)", () => {
         params(prabhu.id),
       ),
     );
-    expect(moved.projectIds).toEqual([projectB]);
+    expect(assigned.projectIds).toEqual([projectB]);
 
     const hrms = await json<Member>(
       await update(
@@ -122,12 +133,13 @@ describe("Team Members HTTP (CM-110)", () => {
         params(prabhu.id),
       ),
     );
+    // Changing Member Type keeps the Role (ADR CM-0030).
     expect(hrms).toMatchObject({
       name: "Prabhu K.",
       memberType: "hrms",
       projectIds: [],
+      role: { name: "Store Keeper" },
     });
-    expect(Object.keys(hrms.permissions)).toContain("hrms.leaves");
 
     const resent = await json<Member>(
       await resend(
@@ -168,6 +180,7 @@ describe("Team Members HTTP (CM-110)", () => {
           designationId: owner.designationId("Site Supervisor"),
           email: newEmail(),
           memberType: "normal",
+          roleId: owner.roleId("Site Supervisor"),
         }),
       );
     const first = await json<Page>(
@@ -219,50 +232,88 @@ describe("Team Members HTTP (CM-110)", () => {
         designationId: owner.designationId("Admin"),
         email: newEmail(),
         memberType: "normal",
+        roleId: owner.roleId("Accountant"),
       }),
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(refused)).toMatchObject({ code: "PERMISSION_DENIED" });
   });
 
-  it("lets a Member grant only what they hold, never to themselves", async () => {
+  it("lets a Member give only a Role they hold every cell of, never to themselves", async () => {
     const owner = await ownerWithCompany();
     const hr = await memberWith(owner, {
       "organization.team_members": ["create", "read", "update"],
       "labour.attendance": ["create", "read"],
     });
-    const body = (permissions: unknown) => ({
+    const body = (roleId: string) => ({
       name: "New",
       designationId: owner.designationId("Site Supervisor"),
       email: newEmail(),
       memberType: "normal",
-      permissions,
+      roleId,
     });
     const subset = await create(
-      jsonRequest(BASE, hr.cookie, body({ "labour.attendance": ["read"] })),
+      jsonRequest(
+        BASE,
+        hr.cookie,
+        body(
+          await roleWith(owner.workspaceId, owner.userId, {
+            "labour.attendance": ["read"],
+          }),
+        ),
+      ),
     );
     expect(subset.status).toBe(StatusCodes.CREATED);
     const superset = await create(
-      jsonRequest(BASE, hr.cookie, body({ "labour.attendance": ["delete"] })),
+      jsonRequest(BASE, hr.cookie, body(owner.roleId("Site Engineer"))),
     );
     expect(superset.status).toBe(StatusCodes.FORBIDDEN);
-    expect(await json(superset)).toMatchObject({
-      code: "CANNOT_GRANT_MORE_THAN_YOU_HAVE",
-    });
-    const self = await setPermissions(
-      jsonRequest(`${BASE}/${hr.memberId}/permissions`, hr.cookie, {
-        permissions: { "labour.attendance": ["read"] },
-      }),
+    expect(await json(superset)).toMatchObject({ code: "CANNOT_GRANT" });
+    const created = await json<Member>(subset);
+    const widened = await setRole(
+      jsonRequest(
+        `${BASE}/${created.id}/role`,
+        hr.cookie,
+        { roleId: owner.roleId("Admin") },
+        "PUT",
+      ),
+      params(created.id),
+    );
+    expect(await json(widened)).toMatchObject({ code: "CANNOT_GRANT" });
+    const self = await setRole(
+      jsonRequest(
+        `${BASE}/${hr.memberId}/role`,
+        hr.cookie,
+        { roleId: owner.roleId("Admin") },
+        "PUT",
+      ),
       params(hr.memberId),
     );
-    expect(await json(self)).toMatchObject({
-      code: "CANNOT_CHANGE_OWN_PERMISSIONS",
-    });
+    expect(self.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await json(self)).toMatchObject({ code: "OWN_ROLE" });
     const revealRefused = await reveal(
       jsonRequest(`${BASE}/${hr.memberId}/reveal`, hr.cookie, {}),
       params(hr.memberId),
     );
     expect(revealRefused.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("gives the Owner no Role", async () => {
+    const owner = await ownerWithCompany();
+    const page = await json<Page>(await list(jsonRequest(BASE, owner.cookie)));
+    const self = page.items[0];
+    expect(self).toMatchObject({ role: null, canSetPassword: false });
+    const refused = await setRole(
+      jsonRequest(
+        `${BASE}/${self?.id ?? ""}/role`,
+        owner.cookie,
+        { roleId: owner.roleId("Admin") },
+        "PUT",
+      ),
+      params(self?.id ?? ""),
+    );
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({ code: "OWNER_HAS_NO_ROLE" });
   });
 
   it("ends a removed Member's access", async () => {
@@ -280,7 +331,7 @@ describe("Team Members HTTP (CM-110)", () => {
     expect(await json(after)).toMatchObject({ code: "NO_ACTIVE_COMPANY" });
   });
 
-  it("never shows another Company's Team Member, and validates menus", async () => {
+  it("never shows another Company's Team Member or Role", async () => {
     const owner = await ownerWithCompany();
     const other = await ownerWithCompany("Sri Infra");
     const theirs = await json<Member>(
@@ -290,6 +341,7 @@ describe("Team Members HTTP (CM-110)", () => {
           designationId: other.designationId("Admin"),
           email: newEmail(),
           memberType: "normal",
+          roleId: other.roleId("Accountant"),
         }),
       ),
     );
@@ -298,16 +350,27 @@ describe("Team Members HTTP (CM-110)", () => {
       params(theirs.id),
     );
     expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    const unknown = await create(
+    const theirRole = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "X",
         designationId: owner.designationId("Admin"),
         email: newEmail(),
         memberType: "normal",
-        permissions: { "nope.menu": ["read"] },
+        roleId: other.roleId("Accountant"),
       }),
     );
-    expect(unknown.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(theirRole.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(theirRole)).toMatchObject({ code: "ROLE_NOT_FOUND" });
+    const noRole = await create(
+      jsonRequest(BASE, owner.cookie, {
+        name: "X",
+        designationId: owner.designationId("Admin"),
+        email: newEmail(),
+        memberType: "normal",
+      }),
+    );
+    expect(noRole.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(noRole)).toMatchObject({ code: "VALIDATION_ERROR" });
   });
 
   it("lets a joined Member's mobile change while SMS is off", async () => {
@@ -338,17 +401,22 @@ describe("Team Members HTTP (CM-110)", () => {
     });
   });
 
-  it("will not invite again a Team Member without an email while SMS is off", async () => {
+  it("will not invite a Team Member without an email while SMS is off", async () => {
     const owner = await ownerWithCompany();
+    const body = {
+      name: "Mobile Only",
+      designationId: owner.designationId("Site Supervisor"),
+      mobile: newMobile(),
+      memberType: "normal",
+      roleId: owner.roleId("Site Supervisor"),
+    };
+    const invited = await create(jsonRequest(BASE, owner.cookie, body));
+    expect(invited.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(invited)).toMatchObject({
+      code: "MEMBER_EMAIL_REQUIRED",
+    });
     const created = await json<Member>(
-      await create(
-        jsonRequest(BASE, owner.cookie, {
-          name: "Mobile Only",
-          designationId: owner.designationId("Site Supervisor"),
-          mobile: newMobile(),
-          memberType: "normal",
-        }),
-      ),
+      await create(jsonRequest(BASE, owner.cookie, { ...body, invite: false })),
     );
     expect(created).toMatchObject({ status: "joining_pending", email: null });
     const refused = await resend(
@@ -366,7 +434,8 @@ describe("Team Members HTTP (CM-110)", () => {
     expect(Object.keys(spec.paths)).toEqual(
       expect.arrayContaining([
         "/api/construction/organization/team-members",
-        "/api/construction/organization/team-members/{id}/permissions",
+        "/api/construction/organization/team-members/{id}/role",
+        "/api/construction/organization/team-members/{id}/password",
         "/api/construction/organization/team-members/{id}/remove",
       ]),
     );
@@ -411,6 +480,7 @@ describe("Team Members HTTP, SMS on (ADR CM-0009)", () => {
           designationId: owner.designationId("Site Supervisor"),
           mobile: newMobile(),
           memberType: "normal",
+          roleId: owner.roleId("Site Supervisor"),
         }),
       ),
     );

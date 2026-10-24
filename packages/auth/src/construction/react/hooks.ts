@@ -14,6 +14,8 @@ export function useCompanyAuth(): {
   userId: string | null;
   workspaceId: string | null;
   role: CompanyRole | null;
+  /** Change password comes first (ADR CM-0030 §8). */
+  mustChangePassword: boolean;
   /** The White Board staff email signed in as this User (ADR CM-0029). */
   impersonatedBy: string | null;
 } {
@@ -23,6 +25,7 @@ export function useCompanyAuth(): {
     userId: snapshot.userId,
     workspaceId: snapshot.workspaceId,
     role: snapshot.role,
+    mustChangePassword: snapshot.user?.mustChangePassword === true,
     impersonatedBy: snapshot.impersonatedBy,
   };
 }
@@ -112,6 +115,47 @@ export function useCompanyEmailSignIn() {
     [run],
   );
   return { signIn, fetchStatus, error, clearError };
+}
+
+/**
+ * Mobile and password sign-in (ADR CM-0030 §7), whatever the SMS switch.
+ * Only a verified mobile works; errors are Better Auth's
+ * (`INVALID_PHONE_NUMBER_OR_PASSWORD`).
+ */
+export function useCompanyMobilePasswordSignIn() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+  const signIn = useCallback(
+    (input: { mobile: string; password: string }) =>
+      run(() =>
+        constructionAuthClient().signIn.phoneNumber({
+          phoneNumber: input.mobile,
+          password: input.password,
+        }),
+      ),
+    [run],
+  );
+  return { signIn, fetchStatus, error, clearError };
+}
+
+/**
+ * Change password (ADR CM-0030 §8): the current one, then a different new
+ * one (400 `PASSWORD_UNCHANGED` otherwise). Other sessions end; on success
+ * `mustChangePassword` is cleared, so reload to refresh the snapshot.
+ */
+export function useCompanyChangePassword() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+  const changePassword = useCallback(
+    (input: { currentPassword: string; newPassword: string }) =>
+      run(() =>
+        constructionAuthClient().changePassword({
+          currentPassword: input.currentPassword,
+          newPassword: input.newPassword,
+          revokeOtherSessions: true,
+        }),
+      ),
+    [run],
+  );
+  return { changePassword, fetchStatus, error, clearError };
 }
 
 /** Email sign-up: details, then the emailed 6-digit code. */

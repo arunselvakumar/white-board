@@ -21,6 +21,7 @@ import { PrismaCompanyDeletionStore } from "./prisma-company-deletion-store";
 import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
 import { PrismaDesignationRepository } from "./prisma-designation-repository";
 import { PrismaOwnershipTransferStore } from "./prisma-ownership-transfer-store";
+import { PrismaRoleRepository } from "./prisma-role-repository";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
 
@@ -33,10 +34,12 @@ export function createDeviceHandlers(deps: { push: PushSessions }) {
 export function createOwnershipHandlers(deps?: { prisma?: PrismaClient }) {
   const db = deps?.prisma ?? prisma;
   const members = new PrismaTeamMemberRepository(db, privateDataCipher);
+  const roles = new PrismaRoleRepository(db);
   return new OwnershipHandlers(
     members,
     new PrismaDesignationRepository(db),
-    new PrismaOwnershipTransferStore(db, members),
+    roles,
+    new PrismaOwnershipTransferStore(db, members, roles),
     verifyActionCode,
   );
 }

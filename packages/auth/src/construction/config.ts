@@ -20,6 +20,7 @@ import {
   impersonation,
 } from "./impersonation";
 import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
+import { clearMustChangePassword, firstPassword } from "./first-password";
 import { createSmsSender, type SmsSender } from "./sms";
 import {
   COMPANY_WORKSPACE_KIND,
@@ -45,6 +46,9 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/sign-out",
   "/sign-up/email",
   "/sign-in/email",
+  // Mobile and password (ADR CM-0030 §7): whatever the SMS switch.
+  "/sign-in/phone-number",
+  "/change-password",
   "/update-user",
   "/email-otp/send-verification-otp",
   "/email-otp/verify-email",
@@ -114,7 +118,19 @@ export function createConstructionAuthOptions(
     database: prismaAdapter(prisma, { provider: "postgresql" }),
     telemetry: { enabled: false },
     advanced: { cookiePrefix: CONSTRUCTION_COOKIE_PREFIX },
-    user: { modelName: "identityUser" },
+    user: {
+      modelName: "identityUser",
+      additionalFields: {
+        // An admin set the password; until they choose their own, every
+        // page asks for it (ADR CM-0030 §8). Never writable by the client.
+        mustChangePassword: {
+          type: "boolean",
+          required: false,
+          defaultValue: false,
+          input: false,
+        },
+      },
+    },
     session: {
       modelName: "identitySession",
       expiresIn: 60 * 60 * 24 * 30,
@@ -129,6 +145,8 @@ export function createConstructionAuthOptions(
       minPasswordLength: 8,
       maxPasswordLength: 128,
       revokeSessionsOnPasswordReset: true,
+      // A reset by email code is a password they chose (ADR CM-0030 §8).
+      onPasswordReset: ({ user }) => clearMustChangePassword(user.id),
     },
     emailVerification: {
       autoSignInAfterVerification: true,
@@ -142,6 +160,8 @@ export function createConstructionAuthOptions(
       max: 100,
       customRules: {
         "/sign-in/email": { window: 60, max: 10 },
+        "/sign-in/phone-number": { window: 60, max: 10 },
+        "/change-password": { window: 60, max: 10 },
         "/sign-up/email": { window: 60, max: 5 },
         "/email-otp/send-verification-otp": { window: 60, max: 3 },
         "/email-otp/verify-email": { window: 60, max: 10 },
@@ -158,6 +178,7 @@ export function createConstructionAuthOptions(
       // answer 404 while SMS is off.
       allowedPaths("construction-allowed-paths", constructionAuthPaths),
       perMobileOtpLimit(),
+      firstPassword(),
       mobileOtp(sms),
       impersonation(email),
       emailOTP({

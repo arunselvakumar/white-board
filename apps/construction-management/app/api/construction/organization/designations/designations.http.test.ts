@@ -8,6 +8,7 @@ import { POST as createCompany } from "@/app/api/construction/organization/compa
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag } from "@/src/shared-kernel/access";
+import { roleWith } from "@/test/companies";
 import { signInByEmail, TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteDesignation } from "./[id]/delete/route";
@@ -22,7 +23,6 @@ type Designation = {
   id: string;
   name: string;
   isSeed: boolean;
-  template: Record<string, Flag[]> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -100,7 +100,7 @@ async function member(
       designationId: designations[0]?.id ?? "",
       email,
     },
-    permissions: grants,
+    roleId: await roleWith(company.workspaceId, company.userId, grants),
   });
   await prisma.constructionOrganizationTeamMember.update({
     where: { id: invited.id },
@@ -123,7 +123,7 @@ describe("Designations HTTP (CM-112)", () => {
     expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
-  it("lists the Company's seeds by name with their templates", async () => {
+  it("lists the Company's seeds by name, job titles only", async () => {
     const { cookie } = await owner();
     const items = await list(cookie);
     expect(items).toHaveLength(38);
@@ -132,31 +132,19 @@ describe("Designations HTTP (CM-112)", () => {
     expect(names).toEqual([...names].sort());
     const engineer = items.find((item) => item.name === "Site Engineer");
     expect(engineer).toMatchObject({ isSeed: true });
-    expect(engineer?.template?.["labour.attendance"]).toEqual([
-      "create",
-      "read",
-      "update",
-    ]);
+    expect(engineer).not.toHaveProperty("template");
   });
 
   it("creates, reads, updates, duplicates and deletes", async () => {
     const { cookie } = await owner();
     const created = await createDesignation(
-      post(BASE, cookie, {
-        name: "  Billing   Engineer ",
-        template: {
-          "projects.project": ["read", "approve"],
-          "finance.petty_cash": [],
-        },
-      }),
+      post(BASE, cookie, { name: "  Billing   Engineer " }),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
     const designation = await json<Designation>(created);
-    // Unsupported cells ("approve" on Project) and empty rows are dropped.
     expect(designation).toMatchObject({
       name: "Billing Engineer",
       isSeed: false,
-      template: { "projects.project": ["read"] },
     });
 
     const read = await getDesignation(
@@ -169,15 +157,11 @@ describe("Designations HTTP (CM-112)", () => {
     const updated = await updateDesignation(
       post(`${BASE}/${designation.id}/update`, cookie, {
         name: "Billing Engineer II",
-        template: { "projects.project": ["create", "read"] },
       }),
       params(designation.id),
     );
     expect(updated.status).toBe(StatusCodes.OK);
-    expect(await json(updated)).toMatchObject({
-      name: "Billing Engineer II",
-      template: { "projects.project": ["create", "read"] },
-    });
+    expect(await json(updated)).toMatchObject({ name: "Billing Engineer II" });
 
     const copied = await duplicateDesignation(
       post(`${BASE}/${designation.id}/duplicate`, cookie),
@@ -185,10 +169,7 @@ describe("Designations HTTP (CM-112)", () => {
     );
     expect(copied.status).toBe(StatusCodes.CREATED);
     const copy = await json<Designation>(copied);
-    expect(copy).toMatchObject({
-      name: "Billing Engineer II (copy)",
-      template: { "projects.project": ["create", "read"] },
-    });
+    expect(copy).toMatchObject({ name: "Billing Engineer II (copy)" });
     const named = await duplicateDesignation(
       post(`${BASE}/${designation.id}/duplicate`, cookie, {
         name: "Junior Billing Engineer",
@@ -198,15 +179,6 @@ describe("Designations HTTP (CM-112)", () => {
     expect(await json(named)).toMatchObject({
       name: "Junior Billing Engineer",
     });
-
-    const cleared = await updateDesignation(
-      post(`${BASE}/${copy.id}/update`, cookie, {
-        name: copy.name,
-        template: {},
-      }),
-      params(copy.id),
-    );
-    expect(await json(cleared)).toMatchObject({ template: null });
 
     const deleted = await deleteDesignation(
       post(`${BASE}/${copy.id}/delete`, cookie),
@@ -227,18 +199,8 @@ describe("Designations HTTP (CM-112)", () => {
     );
   });
 
-  it("rejects unknown menus and flags, and blank names", async () => {
+  it("rejects blank names", async () => {
     const { cookie } = await owner();
-    for (const template of [
-      { "projects.nope": ["read"] },
-      { "projects.project": ["fly"] },
-    ]) {
-      const response = await createDesignation(
-        post(BASE, cookie, { name: "Surveyor", template }),
-      );
-      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(await json(response)).toMatchObject({ code: "VALIDATION_ERROR" });
-    }
     const blank = await createDesignation(post(BASE, cookie, { name: "  " }));
     expect(blank.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(blank)).toMatchObject({
@@ -266,7 +228,6 @@ describe("Designations HTTP (CM-112)", () => {
     const renamed = await updateDesignation(
       post(`${BASE}/${accountant?.id ?? ""}/update`, cookie, {
         name: "Admin",
-        template: null,
       }),
       params(accountant?.id ?? ""),
     );
@@ -305,7 +266,7 @@ describe("Designations HTTP (CM-112)", () => {
     );
     expect(read.status).toBe(StatusCodes.NOT_FOUND);
     const updated = await updateDesignation(
-      post(`${BASE}/${id}/update`, mine.cookie, { name: "X", template: null }),
+      post(`${BASE}/${id}/update`, mine.cookie, { name: "X" }),
       params(id),
     );
     expect(updated.status).toBe(StatusCodes.NOT_FOUND);

@@ -5,7 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -14,7 +14,6 @@ import { Label } from "@repo/ui/components/label";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   designationQuery,
@@ -22,7 +21,6 @@ import {
   useUpdateDesignation,
   type DesignationResponse,
 } from "@/src/queries/designations";
-import type { PermissionGrants } from "@/src/shared-kernel/access";
 
 export const DESIGNATIONS_PATH = "/app/masters/designations";
 
@@ -32,7 +30,6 @@ const schema = z.object({
     .trim()
     .min(1, "Enter the Designation name")
     .max(80, "Use at most 80 characters"),
-  template: z.custom<PermissionGrants>(),
 });
 
 type Values = z.infer<typeof schema>;
@@ -43,36 +40,29 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   DESIGNATION_NAME_IN_USE: "name",
 };
 
-/** Name plus Permission Template; Save adds or updates (CM-112). */
+/**
+ * A Designation is a job title only (ADR CM-0030): its name. Save adds or
+ * updates (CM-112). What a person may do is their Role.
+ */
 function DesignationForm({
   designation,
   onSave,
   saving,
 }: {
   designation: DesignationResponse | null;
-  onSave: (values: {
-    name: string;
-    template: PermissionGrants | null;
-  }) => Promise<unknown>;
+  onSave: (values: { name: string }) => Promise<unknown>;
   saving: boolean;
 }) {
   const router = useRouter();
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: designation?.name ?? "",
-      template: designation?.template ?? {},
-    },
+    defaultValues: { name: designation?.name ?? "" },
   });
   const errors = form.formState.errors;
 
   const submit = form.handleSubmit(async (values) => {
     try {
-      await onSave({
-        name: values.name,
-        template:
-          Object.keys(values.template).length === 0 ? null : values.template,
-      });
+      await onSave({ name: values.name });
       router.push(DESIGNATIONS_PATH);
     } catch (error) {
       const { field, message } = fieldForCode(error, SERVER_FIELDS);
@@ -98,28 +88,15 @@ function DesignationForm({
           autoComplete="off"
           aria-required
           aria-invalid={errors.name != null}
+          aria-describedby="designation-name-hint"
           {...form.register("name")}
         />
+        <p id="designation-name-hint" className="text-muted-foreground text-xs">
+          A job title, like Site Engineer or Store Keeper. What a person may do
+          comes from their Role.
+        </p>
         <FieldError message={errors.name?.message} />
       </div>
-      <section aria-labelledby="designation-template" className="space-y-2">
-        <div className="space-y-1">
-          <h2 id="designation-template" className="font-semibold">
-            Permission Template
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            A new Team Member with this Designation starts with these
-            permissions. Leave it empty for no template.
-          </p>
-        </div>
-        <Controller
-          name="template"
-          control={form.control}
-          render={({ field }) => (
-            <PermissionMatrix value={field.value} onChange={field.onChange} />
-          )}
-        />
-      </section>
       <FormAlert message={errors.root?.message} />
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={saving}>

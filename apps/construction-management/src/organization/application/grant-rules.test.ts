@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { PermissionSet, type MemberAccess } from "@/src/shared-kernel/access";
 
-import { assertCanGrant } from "./grant-rules";
+import { assertCanGrant, assertNotOwnRole } from "./grant-rules";
 
 const hr: MemberAccess = {
   workspaceId: "c1",
   userId: "hr",
   role: "member",
+  roleId: "role-hr",
   permissions: PermissionSet.fromGrants({
     "organization.team_members": ["create", "read", "update"],
     "labour.attendance": ["create", "read"],
@@ -18,9 +19,7 @@ const hr: MemberAccess = {
 describe("assertCanGrant", () => {
   it("lets the Owner grant anything", () => {
     expect(() => {
-      assertCanGrant({ ...hr, role: "owner" }, PermissionSet.everything(), {
-        userId: "x",
-      });
+      assertCanGrant({ ...hr, role: "owner" }, PermissionSet.everything());
     }).not.toThrow();
   });
 
@@ -29,7 +28,6 @@ describe("assertCanGrant", () => {
       assertCanGrant(
         hr,
         PermissionSet.fromGrants({ "labour.attendance": ["read"] }),
-        { userId: null },
       );
     }).not.toThrow();
   });
@@ -39,22 +37,23 @@ describe("assertCanGrant", () => {
       assertCanGrant(
         hr,
         PermissionSet.fromGrants({ "labour.attendance": ["delete"] }),
-        { userId: null },
       );
-    }).toThrow(
-      expect.objectContaining({
-        code: "CANNOT_GRANT_MORE_THAN_YOU_HAVE",
-      }) as Error,
-    );
+    }).toThrow(expect.objectContaining({ code: "CANNOT_GRANT" }) as Error);
+  });
+});
+
+describe("assertNotOwnRole", () => {
+  it("refuses the Role the Member is on, and their own Team Member", () => {
+    for (const target of [{ roleId: "role-hr" }, { userId: "hr" }])
+      expect(() => {
+        assertNotOwnRole(hr, target);
+      }).toThrow(expect.objectContaining({ code: "OWN_ROLE" }) as Error);
   });
 
-  it("refuses a Member's own matrix", () => {
+  it("allows another Role, and the Owner anything", () => {
     expect(() => {
-      assertCanGrant(hr, PermissionSet.empty(), { userId: "hr" });
-    }).toThrow(
-      expect.objectContaining({
-        code: "CANNOT_CHANGE_OWN_PERMISSIONS",
-      }) as Error,
-    );
+      assertNotOwnRole(hr, { roleId: "role-site", userId: "someone" });
+      assertNotOwnRole({ ...hr, role: "owner" }, { roleId: "role-hr" });
+    }).not.toThrow();
   });
 });

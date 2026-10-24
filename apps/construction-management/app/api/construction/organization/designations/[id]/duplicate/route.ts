@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createDesignationHandlers();
 
-/** Copies a Designation with its template as a new one (CM-112). */
+/** Copies a Designation as a new one (CM-112). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

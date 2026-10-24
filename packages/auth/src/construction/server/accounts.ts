@@ -1,4 +1,10 @@
-import { prisma, type Prisma } from "@repo/construction-db";
+import { randomUUID } from "node:crypto";
+
+import { Prisma, prisma } from "@repo/construction-db";
+import { hashPassword } from "better-auth/crypto";
+
+import { placeholderEmailFor } from "../mobile";
+import { COMPANY_WORKSPACE_KIND } from "../roles";
 
 /** What screens show for a User who deleted their account (CM-907). */
 export const DELETED_USER_NAME = "Deleted user";
@@ -20,6 +26,35 @@ export type DeviceSession = {
 };
 
 type Db = Prisma.TransactionClient;
+
+/** What `createPasswordAccount` needs: a name and a mobile or an email. */
+export type PasswordAccountInput = {
+  name: string;
+  email: string | null;
+  /** E.164. */
+  phoneNumber: string | null;
+  password: string;
+};
+
+async function findUserByContact(
+  db: Db,
+  input: { email: string | null; phoneNumber: string | null },
+): Promise<string | null> {
+  const or: Prisma.IdentityUserWhereInput[] = [];
+  if (input.email != null)
+    or.push({ email: { equals: input.email, mode: "insensitive" } });
+  if (input.phoneNumber != null) {
+    or.push({ phoneNumber: input.phoneNumber });
+    or.push({ email: placeholderEmailFor(input.phoneNumber) });
+  }
+  if (or.length === 0) return null;
+  const found = await db.identityUser.findFirst({
+    where: { OR: or },
+    select: { id: true },
+    orderBy: { createdAt: "asc" },
+  });
+  return found?.id ?? null;
+}
 
 /**
  * A User's sessions and the erasure of their identity (CM-907). Sessions
@@ -67,6 +102,124 @@ export const accounts = {
       },
       orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     });
+  },
+
+  /**
+   * Makes a User who signs in with `password` and must change it first
+   * (ADR CM-0030 §6): an admin set it. Never touches an existing account:
+   * when a User already has this email or mobile, returns `created: false`
+   * with their id. Hashed like sign-up (`better-auth/crypto`); a mobile-only
+   * User gets the placeholder email. The mobile is stored verified, because
+   * the admin vouches for it; the email is not (nobody proved it).
+   */
+  async createPasswordAccount(
+    input: PasswordAccountInput,
+  ): Promise<{ created: boolean; userId: string }> {
+    const email = input.email?.trim().toLowerCase() ?? null;
+    const phoneNumber = input.phoneNumber;
+    const userEmail =
+      email ?? (phoneNumber == null ? null : placeholderEmailFor(phoneNumber));
+    if (userEmail == null)
+      throw new Error("A password account needs an email or a mobile.");
+    const existing = await findUserByContact(prisma, { email, phoneNumber });
+    if (existing != null) return { created: false, userId: existing };
+    const userId = randomUUID();
+    const now = new Date();
+    const hash = await hashPassword(input.password);
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.identityUser.create({
+          data: {
+            id: userId,
+            name: input.name,
+            email: userEmail,
+            emailVerified: false,
+            phoneNumber,
+            phoneNumberVerified: phoneNumber != null,
+            mustChangePassword: true,
+            createdAt: now,
+            updatedAt: now,
+          },
+        });
+        await tx.identityAccount.create({
+          data: {
+            id: randomUUID(),
+            userId,
+            accountId: userId,
+            providerId: "credential",
+            password: hash,
+            createdAt: now,
+            updatedAt: now,
+          },
+        });
+      });
+    } catch (error) {
+      // Someone signed up with the same email or mobile meanwhile.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const raced = await findUserByContact(prisma, { email, phoneNumber });
+        if (raced != null) return { created: false, userId: raced };
+      }
+      throw error;
+    }
+    return { created: true, userId };
+  },
+
+  /**
+   * A password an admin set for a User only their Company relies on (ADR
+   * CM-0030 §7): replaces or adds their password, makes them change it at
+   * the next sign-in and ends every session.
+   */
+  async setTemporaryPassword(userId: string, password: string): Promise<void> {
+    const hash = await hashPassword(password);
+    const now = new Date();
+    await prisma.$transaction(async (tx) => {
+      const credential = await tx.identityAccount.findFirst({
+        where: { userId, providerId: "credential" },
+        select: { id: true },
+      });
+      if (credential == null)
+        await tx.identityAccount.create({
+          data: {
+            id: randomUUID(),
+            userId,
+            accountId: userId,
+            providerId: "credential",
+            password: hash,
+            createdAt: now,
+            updatedAt: now,
+          },
+        });
+      else
+        await tx.identityAccount.update({
+          where: { id: credential.id },
+          data: { password: hash, updatedAt: now },
+        });
+      await tx.identityUser.update({
+        where: { id: userId },
+        data: { mustChangePassword: true, updatedAt: now },
+      });
+      await tx.identitySession.deleteMany({ where: { userId } });
+    });
+  },
+
+  /** The Users among `userIds` who belong to a Company other than this one. */
+  async inOtherCompanies(
+    workspaceId: string,
+    userIds: readonly string[],
+  ): Promise<Set<string>> {
+    if (userIds.length === 0) return new Set();
+    const rows = await prisma.identityWorkspaceMember.findMany({
+      where: {
+        userId: { in: [...new Set(userIds)] },
+        organizationId: { not: workspaceId },
+        workspace: { institutionType: COMPANY_WORKSPACE_KIND },
+      },
+      select: { userId: true },
+    });
+    return new Set(rows.map((row) => row.userId));
   },
 
   /** Ends these sessions of the User; returns the ids that were live. */
@@ -154,3 +307,10 @@ export const accounts = {
     });
   },
 };
+
+/** `accounts.createPasswordAccount`, by name (ADR CM-0030 §6). */
+export function createPasswordAccount(
+  input: PasswordAccountInput,
+): Promise<{ created: boolean; userId: string }> {
+  return accounts.createPasswordAccount(input);
+}

@@ -61,25 +61,16 @@ export const AddValidatesAndSaves: Story = {
       canvas.getByLabelText("Designation name"),
       "Billing Engineer",
     );
-    await userEvent.click(
-      canvas.getByRole("checkbox", { name: "View — Project" }),
-    );
-    await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Add — Purchase Request" }),
-    );
+    // A job title only: no Permission Matrix here (ADR CM-0030).
+    await expect(canvas.queryByRole("checkbox")).toBeNull();
+    await expect(canvas.queryByText("Permission Template")).toBeNull();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
         "/app/masters/designations",
       ),
     );
-    await expect(sentTo(api.spy, BASE)).toEqual({
-      name: "Billing Engineer",
-      template: {
-        "projects.project": ["read"],
-        "procurement.purchase_requests": ["create"],
-      },
-    });
+    await expect(sentTo(api.spy, BASE)).toEqual({ name: "Billing Engineer" });
   },
 };
 
@@ -108,10 +99,7 @@ export const AddShowsNameInUse: Story = {
       "aria-invalid",
       "true",
     );
-    await expect(sentTo(api.spy, BASE)).toEqual({
-      name: "Admin",
-      template: null,
-    });
+    await expect(sentTo(api.spy, BASE)).toEqual({ name: "Admin" });
     await expect(getRouter().push).not.toHaveBeenCalled();
   },
 };
@@ -133,24 +121,11 @@ export const EditSaves: Story = {
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
-    // The full Permission Matrix renders here; slow CI runners need longer
-    // than the default 1 s.
     await expect(
-      await canvas.findByRole(
-        "heading",
-        { name: "Edit Site Engineer" },
-        { timeout: 5000 },
-      ),
+      await canvas.findByRole("heading", { name: "Edit Site Engineer" }),
     ).toBeVisible();
     const name = canvas.getByLabelText("Designation name");
     await expect(name).toHaveValue("Site Engineer");
-    const attendance = canvas.getByRole("checkbox", {
-      name: "Add — Attendance",
-    });
-    await expect(attendance).toBeChecked();
-    await expect(canvas.getByText("6 permissions granted")).toBeVisible();
-
-    await userEvent.click(attendance);
     await userEvent.clear(name);
     await userEvent.type(name, "Senior Site Engineer");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
@@ -161,10 +136,6 @@ export const EditSaves: Story = {
     );
     await expect(sentTo(api.spy, `${SITE_ENGINEER.id}/update`)).toEqual({
       name: "Senior Site Engineer",
-      template: {
-        "labour.attendance": ["read", "update"],
-        "site_work.daily_worksheet": ["create", "read", "update"],
-      },
     });
     await expect(canvas.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",

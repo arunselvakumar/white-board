@@ -78,3 +78,24 @@ export async function requireAnyAccess(
   }
   return { ...session, access };
 }
+
+/**
+ * A read several menus allow, e.g. the Role list, which Role Management and
+ * Add User both need (ADR CM-0030): 403 `PERMISSION_DENIED` unless the
+ * member holds at least one `[menu, flag]`. Only reads: no plan check.
+ */
+export async function requireAnyMenuRead(
+  request: Request,
+  menus: readonly [MenuKey, ...MenuKey[]],
+): Promise<AccessSession | Response> {
+  const session = await requireCompanySession(request);
+  if (isResponse(session)) return session;
+  const access = await loadMemberAccess(prisma, session);
+  if (!menus.some((menu) => can(access, menu, "read")))
+    return jsonError(
+      StatusCodes.FORBIDDEN,
+      "PERMISSION_DENIED",
+      "You do not have permission to do this. Ask the Owner to change your Permission Matrix.",
+    );
+  return { ...session, access };
+}

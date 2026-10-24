@@ -38,6 +38,8 @@ async function hrmsMember(owner: Awaited<ReturnType<typeof ownerWithCompany>>) {
       designationId: owner.designationId("Site Engineer"),
       email,
     },
+    // Add User preselects HRMS Staff for an HRMS member (ADR CM-0030).
+    roleId: owner.roleId("HRMS Staff"),
   });
   const session = await signInByEmail(email, "Chitra");
   await prisma.identityWorkspaceMember.create({
@@ -106,7 +108,7 @@ const SETTINGS = {
 };
 
 describe("HRMS Team Members (CM-318)", () => {
-  it("start with exactly the HRMS default permission set and no Projects", async () => {
+  it("on HRMS Staff have exactly the HRMS default permission set and no Projects", async () => {
     const owner = await ownerWithCompany();
     const { member } = await hrmsMember(owner);
     expect(member.memberType).toBe("hrms");

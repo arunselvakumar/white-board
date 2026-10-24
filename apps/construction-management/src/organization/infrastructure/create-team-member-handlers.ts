@@ -15,12 +15,15 @@ import {
 } from "../application/invitation-notifier";
 import { JoinRequestHandlers } from "../application/join-requests";
 import type { PlanGate } from "../application/plan-gate";
+import type { SignInAccounts } from "../application/sign-in-accounts";
 import { TeamMemberHandlers } from "../application/team-member-handlers";
+import { authSignInAccounts } from "./auth-account-directories";
 import { authCompanyMemberships } from "./auth-company-memberships";
 import { createPlanGate } from "./create-subscription-handlers";
 import { invitationChannels } from "./invitation-channels";
 import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
 import { PrismaDesignationRepository } from "./prisma-designation-repository";
+import { PrismaRoleRepository } from "./prisma-role-repository";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
 
@@ -29,6 +32,7 @@ export function createTeamMemberHandlers(deps?: {
   plan?: PlanGate;
   events?: EventDispatcher;
   channels?: InvitationChannels;
+  accounts?: SignInAccounts;
 }) {
   const db = deps?.prisma ?? prisma;
   const members = new PrismaTeamMemberRepository(db, privateDataCipher);
@@ -49,10 +53,13 @@ export function createTeamMemberHandlers(deps?: {
   return new TeamMemberHandlers(
     members,
     designations,
+    new PrismaRoleRepository(db),
     deps?.plan ?? createPlanGate({ prisma: db }),
     events,
     undefined,
     isConstructionSmsEnabled,
+    deps?.accounts ?? authSignInAccounts,
+    authCompanyMemberships,
   );
 }
 

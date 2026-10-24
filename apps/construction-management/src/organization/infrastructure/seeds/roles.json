@@ -1,0 +1,531 @@
+{
+  "version": 1,
+  "source": "Default Roles every new Company starts with (ADR CM-0030). The first eight are the Permission Templates the Designation seeds carried before Roles; Admin holds every supported cell (\"ALL\"); HRMS Staff is the HRMS default set. Companies edit their own copy.",
+  "roles": [
+    {
+      "name": "Admin",
+      "description": "Every menu and every right, except what only the Owner can do (buy the plan, transfer or delete the Company).",
+      "permissions": "ALL"
+    },
+    {
+      "name": "Project Manager",
+      "description": "Runs Projects end to end: site work, materials, approvals, tasks and reports, with amounts.",
+      "permissions": {
+        "projects.project": ["read", "update", "financial"],
+        "projects.wings": ["create", "read", "update", "delete"],
+        "projects.locations": ["create", "read", "update", "delete"],
+        "site_work.daily_worksheet": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.drawings": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "notification"
+        ],
+        "projects.testing_reports": ["create", "read", "update", "delete"],
+        "tracking.tasks": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification",
+          "financial"
+        ],
+        "tracking.issues": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "tracking.inspection_requests": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "reporting.project_reports": ["read", "print"],
+        "labour.attendance": ["create", "read", "update", "print", "report"],
+        "labour.labour": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "transfer",
+          "financial"
+        ],
+        "labour.vendor": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "financial"
+        ],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "site_work.progress_reports": [
+          "create",
+          "read",
+          "notification",
+          "financial"
+        ],
+        "site_work.equipment_usage": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification",
+          "financial"
+        ],
+        "site_work.site_diary": ["create", "read", "update", "delete", "print"],
+        "site_work.hindrances": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "print",
+          "report"
+        ],
+        "procurement.manage_materials": ["read"],
+        "procurement.current_inventory": ["read", "print", "report"],
+        "procurement.purchase_requests": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.purchase_orders": [
+          "read",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.material_received": [
+          "read",
+          "print",
+          "report",
+          "view_all"
+        ],
+        "procurement.material_transfers": [
+          "create",
+          "read",
+          "approve",
+          "reject",
+          "notification"
+        ],
+        "finance.payments": ["read"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.suppliers": ["read"],
+        "masters.materials": ["read"],
+        "masters.labours": ["read"],
+        "masters.work_types": ["read"],
+        "masters.units": ["read"],
+        "masters.issue_categories": ["create", "read", "update", "delete"],
+        "masters.tags": ["create", "read", "update", "delete"],
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": [
+          "create",
+          "read",
+          "approve",
+          "reject",
+          "view_all",
+          "notification"
+        ],
+        "hrms.leaves": [
+          "create",
+          "read",
+          "approve",
+          "reject",
+          "view_all",
+          "notification"
+        ],
+        "hrms.salaries": ["read"],
+        "finance.other_expenses": ["read"]
+      }
+    },
+    {
+      "name": "Site Engineer",
+      "description": "Daily worksheets, labour and attendance, tasks, issues and inspections on their Projects.",
+      "permissions": {
+        "projects.project": ["read"],
+        "site_work.daily_worksheet": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.drawings": ["read"],
+        "projects.testing_reports": ["create", "read", "update"],
+        "tracking.tasks": ["create", "read", "update", "notification"],
+        "tracking.issues": ["create", "read", "update", "notification"],
+        "tracking.inspection_requests": [
+          "create",
+          "read",
+          "update",
+          "notification"
+        ],
+        "labour.attendance": ["create", "read", "update"],
+        "labour.labour": ["create", "read", "update"],
+        "labour.vendor": ["create", "read", "update"],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "site_work.progress_reports": ["create", "read"],
+        "site_work.equipment_usage": [
+          "create",
+          "read",
+          "update",
+          "notification"
+        ],
+        "site_work.site_diary": ["create", "read", "update", "print"],
+        "site_work.hindrances": ["create", "read", "update", "print"],
+        "procurement.manage_materials": ["read"],
+        "procurement.current_inventory": ["read"],
+        "procurement.purchase_requests": [
+          "create",
+          "read",
+          "update",
+          "notification"
+        ],
+        "procurement.material_received": [
+          "create",
+          "read",
+          "update",
+          "notification"
+        ],
+        "procurement.material_transfers": ["create", "read", "notification"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.materials": ["read"],
+        "masters.labours": ["read"],
+        "masters.work_types": ["read"],
+        "masters.units": ["read"],
+        "masters.issue_categories": ["read"],
+        "masters.tags": ["create", "read"],
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": ["create", "read", "notification"],
+        "hrms.leaves": ["create", "read", "notification"],
+        "hrms.salaries": ["read"],
+        "finance.payments": ["read"],
+        "finance.petty_cash": ["create", "read", "update"],
+        "finance.other_expenses": ["create", "read", "update"]
+      }
+    },
+    {
+      "name": "Site Supervisor",
+      "description": "Day-to-day site entries: worksheets, labour attendance and site diary on their Projects.",
+      "permissions": {
+        "projects.project": ["read"],
+        "site_work.daily_worksheet": ["create", "read", "update"],
+        "tracking.tasks": ["create", "read", "update", "notification"],
+        "tracking.issues": ["create", "read", "update", "notification"],
+        "tracking.inspection_requests": ["create", "read", "update"],
+        "labour.attendance": ["create", "read", "update"],
+        "labour.labour": ["create", "read", "update"],
+        "labour.vendor": ["create", "read", "update"],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "site_work.equipment_usage": ["create", "read", "update"],
+        "site_work.site_diary": ["create", "read", "update"],
+        "site_work.hindrances": ["create", "read"],
+        "masters.master_records": ["read"],
+        "masters.issue_categories": ["read"],
+        "masters.tags": ["read"],
+        "masters.labours": ["read"],
+        "masters.labour_categories": ["read"],
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": ["create", "read", "notification"],
+        "hrms.leaves": ["create", "read", "notification"],
+        "hrms.salaries": ["read"],
+        "finance.payments": ["read"],
+        "finance.petty_cash": ["create", "read", "update"],
+        "finance.other_expenses": ["create", "read"]
+      }
+    },
+    {
+      "name": "Store Keeper",
+      "description": "Material receipts, issues, transfers and stock on their Projects.",
+      "permissions": {
+        "projects.project": ["read"],
+        "procurement.manage_materials": ["read"],
+        "procurement.current_inventory": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.purchase_requests": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.purchase_orders": ["read", "print"],
+        "procurement.material_received": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "print",
+          "report",
+          "view_all",
+          "notification",
+          "financial"
+        ],
+        "procurement.material_transfers": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.central_inventory": ["read", "print"],
+        "procurement.central_store": ["create", "read", "update", "delete"],
+        "procurement.material_requests": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "notification"
+        ],
+        "procurement.delivery_notes": [
+          "create",
+          "read",
+          "update",
+          "print",
+          "report",
+          "notification"
+        ],
+        "masters.master_records": ["read"],
+        "masters.materials": ["read"],
+        "masters.material_categories": ["read"],
+        "masters.units": ["read"],
+        "masters.suppliers": ["read"],
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": ["create", "read", "notification"],
+        "hrms.leaves": ["create", "read", "notification"],
+        "hrms.salaries": ["read"]
+      }
+    },
+    {
+      "name": "Accountant",
+      "description": "Payments, expenses, bills and finance reports, with amounts.",
+      "permissions": {
+        "projects.project": ["read", "financial"],
+        "finance.central_payment": ["read"],
+        "finance.payments": ["read"],
+        "finance.transactions": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "finance.parties": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification",
+          "export"
+        ],
+        "finance.petty_cash": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "labour.labour": ["read", "print", "report", "financial"],
+        "labour.vendor": ["read", "print", "report", "financial"],
+        "procurement.purchase_orders": ["read", "print", "report"],
+        "procurement.material_received": [
+          "read",
+          "print",
+          "report",
+          "view_all",
+          "financial"
+        ],
+        "masters.master_records": ["read"],
+        "masters.bank_accounts": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "print",
+          "report"
+        ],
+        "masters.payment_categories": ["create", "read", "update", "delete"],
+        "masters.other_parties": ["create", "read", "update", "delete"],
+        "masters.contractors": ["read"],
+        "masters.suppliers": ["read"],
+        "masters.vendors": ["read", "financial"],
+        "masters.labours": ["read", "financial"],
+        "masters.materials": ["read", "financial"],
+        "reporting.central_reports": ["read"],
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": ["create", "read", "notification"],
+        "hrms.leaves": ["create", "read", "notification"],
+        "hrms.salaries": ["read", "report", "view_all", "financial"],
+        "finance.other_expenses": [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "approve",
+          "reject",
+          "print",
+          "report"
+        ]
+      }
+    },
+    {
+      "name": "Quality Control",
+      "description": "Inspections, testing reports, issues and snags on their Projects.",
+      "permissions": {
+        "projects.project": ["read"],
+        "projects.drawings": ["read"],
+        "projects.testing_reports": ["create", "read", "update"],
+        "tracking.tasks": ["read"],
+        "tracking.issues": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "tracking.inspection_requests": [
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.issue_categories": ["read"]
+      }
+    },
+    {
+      "name": "Structural Engineer",
+      "description": "Drawings, structure, testing reports and inspections on their Projects.",
+      "permissions": {
+        "projects.project": ["read"],
+        "projects.drawings": ["read", "notification"],
+        "projects.testing_reports": ["create", "read", "update"],
+        "tracking.tasks": ["read"],
+        "tracking.issues": [
+          "create",
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "view_all",
+          "notification"
+        ],
+        "tracking.inspection_requests": [
+          "read",
+          "update",
+          "approve",
+          "reject",
+          "print",
+          "report",
+          "notification"
+        ],
+        "projects.gallery": ["read"],
+        "reporting.project_dashboard": ["read"],
+        "masters.master_records": ["read"],
+        "masters.departments": ["read"],
+        "masters.contractors": ["read"],
+        "masters.issue_categories": ["read"]
+      }
+    },
+    {
+      "name": "HRMS Staff",
+      "description": "Attendance on their own phone, leave and their salary slips. No Projects.",
+      "permissions": {
+        "hrms.hrms": ["read"],
+        "hrms.holidays": ["read"],
+        "hrms.attendance": ["create", "read", "notification"],
+        "hrms.leaves": ["create", "read", "notification"],
+        "hrms.salaries": ["read"]
+      }
+    }
+  ]
+}

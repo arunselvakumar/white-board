@@ -40,7 +40,8 @@ import {
   JoinLinkTokenParamsModel,
 } from "@/app/api/construction/organization/join-links/[token]/join-link-models";
 import { AssignConstructionOrganizationTeamMemberProjectsRequestModel } from "@/app/api/construction/organization/team-members/[id]/projects/assign-projects-request-model";
-import { SetConstructionOrganizationTeamMemberPermissionsRequestModel } from "@/app/api/construction/organization/team-members/[id]/permissions/set-permissions-request-model";
+import { SetConstructionOrganizationTeamMemberPasswordRequestModel } from "@/app/api/construction/organization/team-members/[id]/password/set-password-request-model";
+import { SetConstructionOrganizationTeamMemberRoleRequestModel } from "@/app/api/construction/organization/team-members/[id]/role/set-role-request-model";
 import { RevealConstructionOrganizationTeamMemberIdsResponseModel } from "@/app/api/construction/organization/team-members/[id]/reveal/reveal-response-model";
 import { UpdateConstructionOrganizationTeamMemberRequestModel } from "@/app/api/construction/organization/team-members/[id]/update/update-team-member-request-model";
 import { CreateConstructionOrganizationTeamMemberRequestModel } from "@/app/api/construction/organization/team-members/create-team-member-request-model";
@@ -48,8 +49,13 @@ import { ListConstructionOrganizationTeamMembersRequestModel } from "@/app/api/c
 import { ListConstructionOrganizationTeamMembersResponseModel } from "@/app/api/construction/organization/team-members/list-team-members-response-model";
 import {
   ConstructionOrganizationTeamMemberResponseModel,
+  ConstructionOrganizationTeamMemberWithPasswordResponseModel,
   TeamMemberIdParamsModel,
 } from "@/app/api/construction/organization/team-members/team-member-models";
+import {
+  roleOpenApiComponents,
+  roleOpenApiOperations,
+} from "@/app/api/construction/organization/roles/role-openapi";
 import {
   AcceptConstructionOrganizationJoinRequestResponseModel,
   JoinRequestIdParamsModel,
@@ -238,10 +244,12 @@ export const openApiComponents: OpenApiComponents = {
   AcceptConstructionOrganizationJoinRequestResponseModel,
   GetConstructionOrganizationJoinLinkResponseModel,
   ConstructionOrganizationTeamMemberResponseModel,
+  ConstructionOrganizationTeamMemberWithPasswordResponseModel,
   ListConstructionOrganizationTeamMembersResponseModel,
   CreateConstructionOrganizationTeamMemberRequestModel,
   UpdateConstructionOrganizationTeamMemberRequestModel,
-  SetConstructionOrganizationTeamMemberPermissionsRequestModel,
+  SetConstructionOrganizationTeamMemberRoleRequestModel,
+  SetConstructionOrganizationTeamMemberPasswordRequestModel,
   AssignConstructionOrganizationTeamMemberProjectsRequestModel,
   RevealConstructionOrganizationTeamMemberIdsResponseModel,
   ListConstructionOrganizationDesignationsResponseModel,
@@ -336,7 +344,7 @@ export const openApiOperations: OpenApiOperation[] = [
       "Every live Designation of the Active Company, by name (a few dozen, so not paged)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
-    successDescription: "Designations and their Permission Templates",
+    successDescription: "Designations (job titles; access comes from Roles)",
     successSchema: ListConstructionOrganizationDesignationsResponseModel,
     errors: [...SESSION_ERRORS],
   },
@@ -344,7 +352,7 @@ export const openApiOperations: OpenApiOperation[] = [
     method: "post",
     path: DESIGNATIONS,
     summary:
-      "Add a Designation, optionally with a Permission Template (unsupported cells are dropped)",
+      "Add a Designation (a job title; access comes from Roles, ADR CM-0030)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationDesignationRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -355,7 +363,7 @@ export const openApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: `${DESIGNATIONS}/{id}`,
-    summary: "One Designation with its Permission Template",
+    summary: "One Designation",
     tags: ORGANIZATION,
     params: ConstructionOrganizationDesignationParamsModel,
     successStatus: StatusCodes.OK,
@@ -366,8 +374,7 @@ export const openApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${DESIGNATIONS}/{id}/update`,
-    summary:
-      "Rename a Designation and replace its Permission Template (null or {} removes it)",
+    summary: "Rename a Designation",
     tags: ORGANIZATION,
     params: ConstructionOrganizationDesignationParamsModel,
     body: UpdateConstructionOrganizationDesignationRequestModel,
@@ -384,8 +391,7 @@ export const openApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${DESIGNATIONS}/{id}/duplicate`,
-    summary:
-      'Copy a Designation with its Permission Template (name defaults to "<name> (copy)")',
+    summary: 'Copy a Designation (name defaults to "<name> (copy)")',
     tags: ORGANIZATION,
     params: ConstructionOrganizationDesignationParamsModel,
     body: DuplicateConstructionOrganizationDesignationRequestModel,
@@ -492,12 +498,13 @@ openApiOperations.push(
     method: "post",
     path: TEAM_MEMBERS,
     summary:
-      "Add a Team Member: Joining Pending, invited by email (and SMS while SMS is on)",
+      "Add User: with a Role, then invited (needs an email), given a first password (Active at once; ignored when someone already signs in with that mobile or email), or a record only (ADR CM-0030 §6)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationTeamMemberRequestModel,
     successStatus: StatusCodes.CREATED,
-    successDescription: "The new Team Member",
-    successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    successDescription:
+      "The new Team Member, and whether the password was ignored",
+    successSchema: ConstructionOrganizationTeamMemberWithPasswordResponseModel,
     errors: [...MEMBER_ERRORS, StatusCodes.PAYMENT_REQUIRED],
   },
   {
@@ -524,15 +531,29 @@ openApiOperations.push(
     errors: [...MEMBER_ERRORS, StatusCodes.PAYMENT_REQUIRED],
   },
   {
-    method: "post",
-    path: `${TEAM_MEMBERS}/{id}/permissions`,
-    summary: "Replace a Team Member's Permission Matrix",
+    method: "put",
+    path: `${TEAM_MEMBERS}/{id}/role`,
+    summary:
+      "Give a Team Member another Role (409 OWNER_HAS_NO_ROLE; 403 OWN_ROLE, CANNOT_GRANT)",
     tags: ORGANIZATION,
     params: TeamMemberIdParamsModel,
-    body: SetConstructionOrganizationTeamMemberPermissionsRequestModel,
+    body: SetConstructionOrganizationTeamMemberRoleRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The Team Member",
     successSchema: ConstructionOrganizationTeamMemberResponseModel,
+    errors: MEMBER_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${TEAM_MEMBERS}/{id}/password`,
+    summary:
+      "Set a new password, to be changed at next sign-in: makes the account for a member without a User, or resets one no other Company relies on (409 USER_IN_OTHER_COMPANY, OWNER_PASSWORD)",
+    tags: ORGANIZATION,
+    params: TeamMemberIdParamsModel,
+    body: SetConstructionOrganizationTeamMemberPasswordRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Team Member, and whether the password was ignored",
+    successSchema: ConstructionOrganizationTeamMemberWithPasswordResponseModel,
     errors: MEMBER_ERRORS,
   },
   {
@@ -1001,6 +1022,8 @@ openApiOperations.push(...messagingOpenApiOperations);
 // Billing addresses and GRN fields (CM-501) are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
+Object.assign(openApiComponents, roleOpenApiComponents);
+openApiOperations.push(...roleOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
 

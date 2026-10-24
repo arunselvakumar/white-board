@@ -1,6 +1,5 @@
-import { Prisma, type PrismaClient } from "@repo/construction-db";
+import type { Prisma, PrismaClient } from "@repo/construction-db";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
@@ -12,20 +11,11 @@ type Row = Prisma.ConstructionOrganizationDesignationGetPayload<object>;
 type Writer = Pick<PrismaClient, "constructionOrganizationDesignation">;
 
 export function toDesignation(row: Row): Designation {
-  const template =
-    row.permissionTemplate != null &&
-    typeof row.permissionTemplate === "object" &&
-    !Array.isArray(row.permissionTemplate)
-      ? PermissionSet.fromMasks(
-          row.permissionTemplate as Record<string, number>,
-        )
-      : null;
   return Designation.reconstitute({
     id: row.id,
     workspaceId: row.workspaceId,
     name: row.name,
     isSeed: row.isSeed,
-    template,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     createdBy: row.createdBy,
@@ -40,10 +30,6 @@ export function designationData(designation: Designation) {
     workspaceId: designation.workspaceId,
     name: designation.name,
     isSeed: designation.isSeed,
-    permissionTemplate:
-      designation.template == null
-        ? Prisma.DbNull
-        : (designation.template.toMasks() as Prisma.InputJsonObject),
     createdAt: designation.createdAt,
     updatedAt: designation.updatedAt,
     createdBy: designation.createdBy,
@@ -83,7 +69,6 @@ export class PrismaDesignationRepository implements DesignationRepository {
         create: data,
         update: {
           name: data.name,
-          permissionTemplate: data.permissionTemplate,
           updatedAt: data.updatedAt,
           updatedBy: data.updatedBy,
           deletedAt: data.deletedAt,

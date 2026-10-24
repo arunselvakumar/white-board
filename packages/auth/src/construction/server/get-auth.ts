@@ -66,6 +66,7 @@ export async function getCompanyAuthFromHeaders(
       phoneNumber:
         user.phoneNumberVerified === true ? (user.phoneNumber ?? null) : null,
       image: user.image ?? null,
+      mustChangePassword: user.mustChangePassword === true,
     },
     impersonatedBy: session.impersonatedBy ?? null,
   };

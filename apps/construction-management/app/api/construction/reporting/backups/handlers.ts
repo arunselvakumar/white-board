@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { jsonError } from "@/app/api/_lib/json-error";
 import { requireCompanyNotBeingDeleted } from "@/app/api/_lib/company-deletion-guard";
+import { passwordChangeRequired } from "@/app/api/_lib/require-session";
 import {
   backupDownloadPath,
   createBackupJobs,
@@ -53,6 +54,8 @@ export async function requireBackupUser(
       "UNAUTHENTICATED",
       "Authentication required.",
     );
+  const changePassword = passwordChangeRequired(state.user);
+  if (changePassword != null) return changePassword;
   if (state.workspaceId != null) {
     const deleting = await requireCompanyNotBeingDeleted(
       request,

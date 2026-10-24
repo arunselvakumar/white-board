@@ -29,7 +29,9 @@ function member(overrides: Partial<TeamMember>): TeamMember {
     status: "joining_pending",
     mobileLocked: false,
     projectIds: [],
+    role: { id: "0199c3a0-0000-7000-8000-000000000301", name: "Site Engineer" },
     permissions: {},
+    canSetPassword: true,
     invitePath: "/join/Zt0kenZt0kenZt0kenZt0kenZt0ken12",
     invitedAt: "2026-10-08T06:30:00.000Z",
     joinedAt: null,
@@ -47,6 +49,8 @@ const OWNER = member({
   status: "active",
   userId: "user_owner",
   invitePath: null,
+  role: null,
+  canSetPassword: false,
 });
 const PENDING = member({});
 const HRMS = member({
@@ -61,6 +65,7 @@ const HRMS = member({
   mobile: null,
   email: "anitha@anugraha.in",
   invitePath: null,
+  role: { id: "0199c3a0-0000-7000-8000-000000000303", name: "HRMS Staff" },
 });
 
 /** No email: a record that cannot sign in or be invited (ADR CM-0009). */
@@ -99,7 +104,7 @@ function page(items: TeamMember[]) {
 }
 
 const meta = {
-  title: "Masters/TeamMembersPage",
+  title: "Users & Roles/Users/List",
   component: TeamMembersPage,
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
@@ -130,10 +135,15 @@ export const WithMembers: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByText("3 Team Members")).toBeVisible();
-    const rows = within(canvas.getByRole("list"));
+    await expect(await canvas.findByText("3 Users")).toBeVisible();
+    await expect(canvas.getByRole("heading", { name: "Users" })).toBeVisible();
+    const rows = within(canvas.getByRole("list", { name: "Users" }));
     await expect(rows.getByText("Joining Pending")).toBeVisible();
     await expect(rows.getByText("HRMS")).toBeVisible();
+    // Each row names its Role; the Owner has none.
+    await expect(rows.getAllByText("HRMS Staff")[0]).toBeInTheDocument();
+    await expect(rows.getAllByText("Site Engineer").length).toBeGreaterThan(1);
+    await expect(rows.getAllByText("Owner")[0]).toBeInTheDocument();
     // The Owner has no row actions.
     await expect(
       canvas.queryByRole("button", { name: "Actions for Arun Selva Kumar" }),
@@ -184,7 +194,7 @@ export const InviteNeedsAnEmail: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByText("3 Team Members")).toBeVisible();
+    await expect(await canvas.findByText("3 Users")).toBeVisible();
     // Menus animate in; their items are there before they are fully opaque.
 
     await userEvent.click(
@@ -235,7 +245,7 @@ export const FiltersByStatus: Story = {
     return fetchMock.restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByText("1 Team Member");
+    await canvas.findByText("1 User");
     await userEvent.click(
       canvas.getByRole("button", { name: "Joining Pending" }),
     );
@@ -245,7 +255,7 @@ export const FiltersByStatus: Story = {
         expect.anything(),
       ),
     );
-    await userEvent.type(canvas.getByLabelText("Search Team Members"), "sur");
+    await userEvent.type(canvas.getByLabelText("Search Users"), "sur");
     await waitFor(() =>
       expect(fetchMock?.spy).toHaveBeenCalledWith(
         `${LIST}?limit=25&search=sur&status=joining_pending`,
@@ -261,11 +271,30 @@ export const Empty: Story = {
     return fetchMock.restore;
   },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No Team Members yet")).toBeVisible();
-    const add = canvas.getAllByRole("link", { name: "Add Team Member" });
-    await expect(add.at(-1)).toHaveAttribute(
-      "href",
-      "/app/masters/team-members/new",
-    );
+    await expect(await canvas.findByText("No Users yet")).toBeVisible();
+    const add = canvas.getAllByRole("link", { name: "Add User" });
+    await expect(add.at(-1)).toHaveAttribute("href", "/app/users/new");
+  },
+};
+
+/** At phone width the Role moves under the details; nothing scrolls sideways. */
+export const Phone: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  beforeEach() {
+    fetchMock = mockFetch([
+      { path: LIST, respond: () => page([HRMS, PENDING, OWNER]) },
+    ]);
+    return fetchMock.restore;
+  },
+  render: () => (
+    <div data-testid="phone" style={{ width: 375 }}>
+      <TeamMembersPage />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await canvas.findByText("3 Users");
+    await expect(canvas.getAllByText("Role:")[0]).toBeVisible();
+    const phone = canvas.getByTestId("phone");
+    await expect(phone.scrollWidth).toBeLessThanOrEqual(375);
   },
 };

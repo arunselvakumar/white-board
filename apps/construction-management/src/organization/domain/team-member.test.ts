@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
-
-import { hrmsDefaultPermissions } from "@/src/shared-kernel/access";
 import { TeamMember, teamMemberDetails } from "./team-member";
 
 const NOW = new Date("2026-10-08T00:00:00Z");
@@ -21,8 +18,7 @@ function invite(memberType: "normal" | "hrms" = "normal") {
     workspaceId: "company-1",
     details,
     memberType,
-    permissions:
-      memberType === "hrms" ? hrmsDefaultPermissions() : PermissionSet.empty(),
+    roleId: memberType === "hrms" ? "role-hrms" : "role-site",
     by: "owner",
     now: NOW,
   });
@@ -113,11 +109,12 @@ describe("TeamMember", () => {
     const normal = invite();
     normal.assignToProjects(["p1", "p1", " p2 "], "owner", NOW);
     expect(normal.projectIds).toEqual(["p1", "p2"]);
-    normal.changeType("hrms", hrmsDefaultPermissions(), "owner", NOW);
+    normal.changeType("hrms", "owner", NOW);
     expect(normal.projectIds).toEqual([]);
+    expect(normal.roleId).toBe("role-site");
   });
 
-  it("never removes the Owner or edits their matrix", () => {
+  it("never removes the Owner or gives them a Role", () => {
     const owner = TeamMember.owner({
       id: "member-0",
       workspaceId: "company-1",
@@ -131,10 +128,8 @@ describe("TeamMember", () => {
       expect.objectContaining({ code: "OWNER_CANNOT_BE_REMOVED" }) as Error,
     );
     expect(() => {
-      owner.setPermissions(PermissionSet.empty(), "user-1", NOW);
-    }).toThrow(
-      expect.objectContaining({ code: "OWNER_PERMISSIONS_FIXED" }) as Error,
-    );
+      owner.setRole("role-site", "user-1", NOW);
+    }).toThrow(expect.objectContaining({ code: "OWNER_HAS_NO_ROLE" }) as Error);
   });
 
   it("locks a joined member's mobile while it is a way to sign in", () => {
@@ -191,9 +186,12 @@ describe("ownership and leaving (CM-907)", () => {
     const member = joined();
     member.assignToProjects(["project-1"], "owner", NOW);
     member.becomeOwner("designation-owner", "owner", NOW);
-    expect(member).toMatchObject({ isOwner: true, projectIds: [] });
+    expect(member).toMatchObject({
+      isOwner: true,
+      projectIds: [],
+      roleId: null,
+    });
     expect(member.details.designationId).toBe("designation-owner");
-    expect(member.permissions.size).toBe(PermissionSet.everything().size);
   });
 
   it("refuses a member who has not joined, an HRMS member and the Owner", () => {
@@ -210,16 +208,33 @@ describe("ownership and leaving (CM-907)", () => {
     }).toThrow(expect.objectContaining({ code: "ALREADY_OWNER" }) as Error);
   });
 
-  it("makes the old Owner a member with the given matrix, keeping the Designation when none is given", () => {
+  it("makes the old Owner a member on the given Role, keeping the Designation when none is given", () => {
     const old = owner();
-    const admin = hrmsDefaultPermissions();
-    old.stepDownAsOwner(null, admin, "owner", NOW);
+    old.stepDownAsOwner(null, "role-admin", "owner", NOW);
     expect(old.isOwner).toBe(false);
     expect(old.details.designationId).toBe("designation-1");
-    expect(old.permissions.toGrants()).toEqual(admin.toGrants());
+    expect(old.roleId).toBe("role-admin");
     expect(() => {
-      old.stepDownAsOwner(null, admin, "owner", NOW);
+      old.stepDownAsOwner(null, "role-admin", "owner", NOW);
     }).toThrow(expect.objectContaining({ code: "NOT_OWNER" }) as Error);
+  });
+
+  it("goes Active with the account an admin made, once", () => {
+    const member = invite();
+    member.setRole("role-store", "owner", NOW);
+    member.linkAccount("user-9", "owner", NOW);
+    expect(member).toMatchObject({
+      status: "active",
+      userId: "user-9",
+      inviteToken: null,
+      joinedAt: NOW,
+      roleId: "role-store",
+    });
+    expect(() => {
+      member.linkAccount("user-10", "owner", NOW);
+    }).toThrow(
+      expect.objectContaining({ code: "MEMBER_ALREADY_JOINED" }) as Error,
+    );
   });
 
   it("leaves: the record stays, Left and unlinked; the Owner cannot", () => {

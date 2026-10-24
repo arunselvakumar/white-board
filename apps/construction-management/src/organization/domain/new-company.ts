@@ -3,6 +3,7 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { CompanyDetails } from "./company-details";
 import type { Designation } from "./designation";
 import type { CompanyCreated } from "./events";
+import type { Role } from "./role";
 import { TeamMember, teamMemberDetails } from "./team-member";
 
 /** The seed Designation the creator's own Team Member gets. */
@@ -28,6 +29,7 @@ export class NewCompany {
     readonly details: CompanyDetails,
     readonly owner: CompanyOwner,
     readonly designations: readonly Designation[],
+    readonly roles: readonly Role[],
     readonly ownerMember: TeamMember,
     readonly createdAt: Date,
   ) {}
@@ -38,6 +40,8 @@ export class NewCompany {
     owner: CompanyOwner;
     /** The Company's own copy of the seed Designations (CM-106). */
     designations: readonly Designation[];
+    /** The Company's own copy of the seed Roles (ADR CM-0030 §5). */
+    roles: readonly Role[];
     now: Date;
   }): NewCompany {
     const ownerDesignation =
@@ -63,6 +67,7 @@ export class NewCompany {
       input.details,
       input.owner,
       input.designations,
+      input.roles,
       ownerMember,
       input.now,
     );

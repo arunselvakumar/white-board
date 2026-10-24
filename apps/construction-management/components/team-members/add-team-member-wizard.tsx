@@ -5,9 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useMutation,
   useQueryClient,
-  useSuspenseQuery,
+  useSuspenseQueries,
 } from "@tanstack/react-query";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Info, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -15,87 +15,103 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
+import { USERS_PATH } from "@/lib/users-roles-nav";
+import { QueryHttpError } from "@/src/queries/http";
+import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
   createTeamMember,
   designationOptionsQuery,
+  type PasswordOutcome,
   type TeamMember,
 } from "@/src/queries/team-members";
-import {
-  hrmsDefaultPermissions,
-  type PermissionGrants,
-} from "@/src/shared-kernel/access";
-
-const HRMS_GRANTS = hrmsDefaultPermissions().toGrants();
 
 import { ProjectsStep } from "./projects-step";
+import { RoleField, hrmsStaffRoleId } from "./role-field";
 import { ShareInviteDialog } from "./share-invite-dialog";
+import {
+  SignInOptions,
+  addUserSchema,
+  inviteAvailable,
+  signInWays,
+  type AddUserValues,
+} from "./sign-in-options";
 import {
   DETAIL_ERROR_FIELDS,
   EMPTY_DETAILS,
   TeamMemberDetailsFields,
   detailsInput,
-  teamMemberDetailsSchema,
-  type TeamMemberDetailsValues,
 } from "./team-member-details-fields";
 
-type Step = "details" | "projects" | "permissions";
+type Step = "details" | "projects" | "role";
 
 const STEP_LABELS: Record<Step, string> = {
   details: "Details",
   projects: "Select Projects",
-  permissions: "Permission Matrix",
+  role: "Role",
 };
 
+const EMPTY: AddUserValues = { ...EMPTY_DETAILS, invite: true, password: "" };
+
+/** Server codes the Sign-in section owns, beyond the detail fields'. */
+const ERROR_FIELDS: Record<string, keyof AddUserValues> = {
+  ...DETAIL_ERROR_FIELDS,
+  MEMBER_EMAIL_REQUIRED: "email",
+  PASSWORD_TOO_SHORT: "password",
+  PASSWORD_TOO_LONG: "password",
+};
+
+/** Server codes about the Role, shown on the Role step. */
+const ROLE_ERRORS = new Set(["ROLE_NOT_FOUND", "ROLE_REQUIRED"]);
+
+type Created = TeamMember &
+  PasswordOutcome & { passwordSet: boolean; invited: boolean };
+
 /**
- * Add Team Member (CM-111): details → Projects → Permission Matrix, then the
- * invite link. HRMS members skip Projects and get the HRMS default set.
+ * Add User (CM-111, ADR CM-0030 §6): details with how they sign in →
+ * Projects → Role. HRMS members skip Projects and start on HRMS Staff.
  */
 export function AddTeamMemberWizard() {
-  const { data: designations } = useSuspenseQuery(designationOptionsQuery);
-  const { company } = useActiveCompany();
-  const queryClient = useQueryClient();
-  const form = useForm<TeamMemberDetailsValues>({
-    resolver: zodResolver(teamMemberDetailsSchema),
-    defaultValues: EMPTY_DETAILS,
+  const [{ data: designations }, { data: roles }] = useSuspenseQueries({
+    queries: [designationOptionsQuery, rolesQuery],
   });
-  const memberType = useWatch({ control: form.control, name: "memberType" });
-  const designationId = useWatch({
+  const { company } = useActiveCompany();
+  const companyName = company?.name ?? "your Company";
+  const queryClient = useQueryClient();
+  const form = useForm<AddUserValues>({
+    resolver: zodResolver(addUserSchema),
+    defaultValues: EMPTY,
+  });
+  const [memberType, email, password, invite] = useWatch({
     control: form.control,
-    name: "designationId",
+    name: ["memberType", "email", "password", "invite"],
   });
   const [step, setStep] = useState<Step>("details");
-  // The matrix the Owner edited, and the Designation it started from.
-  const [matrix, setMatrix] = useState<{
-    designationId: string;
-    grants: PermissionGrants;
-  } | null>(null);
-  const [created, setCreated] = useState<TeamMember | null>(null);
-  const [sharing, setSharing] = useState(false);
+  const [chosenRoleId, setChosenRoleId] = useState<string | null>(null);
+  const [roleError, setRoleError] = useState<string | undefined>();
+  const [created, setCreated] = useState<Created | null>(null);
   const [projectIds, setProjectIds] = useState<string[]>([]);
 
-  const template =
-    designations.find((item) => item.id === designationId)?.template ?? {};
-  const grants: PermissionGrants =
-    memberType === "hrms"
-      ? HRMS_GRANTS
-      : matrix?.designationId === designationId
-        ? matrix.grants
-        : template;
+  // HRMS Team Members start on HRMS Staff until another Role is picked.
+  const roleId =
+    chosenRoleId ?? (memberType === "hrms" ? hrmsStaffRoleId(roles) : null);
+  const inviting = inviteAvailable({ email, password }) && invite;
 
   const steps: Step[] =
     memberType === "hrms"
-      ? ["details", "permissions"]
-      : ["details", "projects", "permissions"];
-  const index = steps.indexOf(step);
+      ? ["details", "role"]
+      : ["details", "projects", "role"];
+  const index = Math.max(0, steps.indexOf(step));
 
   const mutation = useMutation({
     mutationFn: createTeamMember,
-    onSuccess: async (member) => {
-      await queryClient.invalidateQueries({ queryKey: TEAM_MEMBERS_KEY });
-      setCreated(member);
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: TEAM_MEMBERS_KEY }),
+        // The Role's Users count changed.
+        queryClient.invalidateQueries({ queryKey: ROLES_KEY }),
+      ]);
     },
   });
 
@@ -106,14 +122,32 @@ export function AddTeamMemberWizard() {
   };
 
   const submit = form.handleSubmit(async (values) => {
+    if (roleId == null) {
+      setRoleError("Choose a Role");
+      return;
+    }
+    setRoleError(undefined);
+    const temporary = values.password === "" ? null : values.password;
+    const sendInvite = inviteAvailable(values) && values.invite;
     try {
-      await mutation.mutateAsync({
+      const member = await mutation.mutateAsync({
         ...detailsInput(values, { keepIdentifiersWhenBlank: false }),
         projectIds: memberType === "hrms" ? [] : projectIds,
-        permissions: memberType === "hrms" ? undefined : grants,
+        roleId,
+        invite: sendInvite,
+        password: temporary,
+      });
+      setCreated({
+        ...member,
+        passwordSet: temporary != null,
+        invited: sendInvite,
       });
     } catch (error) {
-      const { field, message } = fieldForCode(error, DETAIL_ERROR_FIELDS);
+      if (error instanceof QueryHttpError && ROLE_ERRORS.has(error.code)) {
+        setRoleError(error.message);
+        return;
+      }
+      const { field, message } = fieldForCode(error, ERROR_FIELDS);
       if (field == null) {
         form.setError("root", { message });
         return;
@@ -124,55 +158,7 @@ export function AddTeamMemberWizard() {
   });
 
   if (created != null)
-    return (
-      <div className="w-full p-6">
-        <div className="w-full max-w-4xl space-y-6">
-          <div className="space-y-4 rounded-lg border p-8 text-center">
-            <CheckCircle2
-              aria-hidden="true"
-              className="text-primary mx-auto size-10"
-            />
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {created.email == null
-                ? `${created.name} is added`
-                : `${created.name} is invited`}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {created.email == null
-                ? "They have no email, so they cannot sign in yet. Add one to invite them."
-                : `They show as Joining Pending until they sign in with ${created.email} and accept.`}
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {created.invitePath != null && created.email != null && (
-                <Button
-                  onClick={() => {
-                    setSharing(true);
-                  }}
-                >
-                  Share invite link
-                </Button>
-              )}
-              <Link
-                href="/app/masters/team-members"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                Back to Team Members
-              </Link>
-            </div>
-          </div>
-          {created.invitePath != null && created.email != null && (
-            <ShareInviteDialog
-              open={sharing}
-              onOpenChange={setSharing}
-              memberName={created.name}
-              companyName={company?.name ?? "our Company"}
-              email={created.email}
-              invitePath={created.invitePath}
-            />
-          )}
-        </div>
-      </div>
-    );
+    return <AddedUser created={created} companyName={companyName} />;
 
   const last = index === steps.length - 1;
 
@@ -180,8 +166,8 @@ export function AddTeamMemberWizard() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Team Members", href: "/app/masters/team-members" }}
-          title="Add Team Member"
+          back={{ label: "Users", href: USERS_PATH }}
+          title="Add User"
           meta={`Step ${String(index + 1)} of ${String(steps.length)}: ${STEP_LABELS[step]}`}
         />
         <ol className="flex gap-1.5" aria-label="Steps">
@@ -206,28 +192,26 @@ export function AddTeamMemberWizard() {
           }}
         >
           {step === "details" && (
-            <TeamMemberDetailsFields form={form} designations={designations} />
+            <TeamMemberDetailsFields
+              form={form}
+              designations={designations}
+              signIn={<SignInOptions form={form} companyName={companyName} />}
+            />
           )}
           {step === "projects" && (
             <ProjectsStep value={projectIds} onChange={setProjectIds} />
           )}
-          {step === "permissions" && (
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-sm">
-                {memberType === "hrms"
-                  ? "HRMS Team Members get the HRMS default set: their own attendance, leave and salary."
-                  : Object.keys(template).length > 0
-                    ? "Started from the Designation's template. Changes here apply to this Team Member only."
-                    : "This Designation has no template. Tick what this Team Member may do."}
-              </p>
-              <PermissionMatrix
-                value={grants}
-                readOnly={memberType === "hrms"}
-                onChange={(next) => {
-                  setMatrix({ designationId, grants: next });
-                }}
-              />
-            </div>
+          {step === "role" && (
+            <RoleField
+              id="member-role"
+              roles={roles}
+              value={roleId}
+              onChange={(value) => {
+                setChosenRoleId(value);
+                setRoleError(undefined);
+              }}
+              error={roleError}
+            />
           )}
 
           <FormAlert message={form.formState.errors.root?.message} />
@@ -248,14 +232,95 @@ export function AddTeamMemberWizard() {
               <span />
             )}
             <Button type="submit" disabled={mutation.isPending}>
-              {last
-                ? mutation.isPending
-                  ? "Inviting…"
-                  : "Add and invite"
-                : "Continue"}
+              {!last
+                ? "Continue"
+                : mutation.isPending
+                  ? "Adding…"
+                  : inviting
+                    ? "Add and invite"
+                    : "Add User"}
             </Button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+/** What happened, in plain words: signed up, invited, or a record. */
+function AddedUser({
+  created,
+  companyName,
+}: {
+  created: Created;
+  companyName: string;
+}) {
+  const [sharing, setSharing] = useState(false);
+  const canShare = created.invitePath != null && created.email != null;
+
+  let icon: LucideIcon = CheckCircle2;
+  let title: string;
+  let text: string;
+  let share = false;
+  if (created.passwordIgnored === "existing_account") {
+    icon = Info;
+    title = `${created.name} already has an account`;
+    text =
+      created.email == null
+        ? "So we did not set the password. They got a Join Request instead: they sign in with their own password and accept it."
+        : `So we did not set the password. They got a Join Request instead, and an invitation at ${created.email}. They show as Joining Pending until they accept.`;
+    share = canShare;
+  } else if (created.passwordSet) {
+    title = `${created.name} can sign in now`;
+    text = `They sign in with ${signInWays(created)} and the password you set, and must change it the first time they sign in.`;
+  } else if (created.invited && created.email != null) {
+    title = `${created.name} is invited`;
+    text = `They show as Joining Pending until they sign in with ${created.email} and accept.`;
+    share = canShare;
+  } else {
+    title = `${created.name} is added`;
+    text =
+      "They are a record until you invite them or set a password. You can do either from Edit User.";
+  }
+  const Icon = icon;
+
+  return (
+    <div className="w-full p-6">
+      <div className="w-full max-w-4xl space-y-6">
+        <div className="bg-card space-y-4 rounded-lg border p-8 text-center">
+          <Icon aria-hidden="true" className="text-primary mx-auto size-10" />
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <p className="text-muted-foreground mx-auto max-w-prose text-sm">
+            {text}
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {share && (
+              <Button
+                onClick={() => {
+                  setSharing(true);
+                }}
+              >
+                Share invite link
+              </Button>
+            )}
+            <Link
+              href={USERS_PATH}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Back to Users
+            </Link>
+          </div>
+        </div>
+        {share && created.invitePath != null && created.email != null && (
+          <ShareInviteDialog
+            open={sharing}
+            onOpenChange={setSharing}
+            memberName={created.name}
+            companyName={companyName}
+            email={created.email}
+            invitePath={created.invitePath}
+          />
+        )}
       </div>
     </div>
   );

@@ -77,16 +77,15 @@ model ConstructionOrganizationSubscription {
   @@schema("construction_organization")
 }
 
-/// A job title in a Company, optionally with a Permission Template (CM-106).
-/// Each Company gets its own copy of the seed set. Names are unique among
-/// live rows (partial index, hand-written in the migration).
+/// A job title in a Company (CM-106). Since ADR CM-0030 it carries no
+/// access: that is the Team Member's Role. Each Company gets its own copy of
+/// the seed set. Names are unique among live rows (partial index,
+/// hand-written in the migration).
 model ConstructionOrganizationDesignation {
   id                 String    @id @db.Uuid
   workspaceId        String    @map("workspace_id")
   name               String
   isSeed             Boolean   @default(false) @map("is_seed")
-  /// `{ "<menu key>": <flags bitmask> }` (ADR CM-0003); null = no template.
-  permissionTemplate Json?     @map("permission_template")
   createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
   createdBy          String    @map("created_by")
@@ -98,23 +97,46 @@ model ConstructionOrganizationDesignation {
   @@schema("construction_organization")
 }
 
-/// One Permission Matrix row per Team Member per menu (ADR CM-0003). `flags`
-/// is a bitmask over the kernel's flag list; cells a menu does not support
-/// are never written. Keyed by the Team Member so a Joining Pending member's
-/// matrix exists before they have a User.
-model ConstructionOrganizationMemberMenuPermission {
+/// A named Permission Matrix given to Team Members (ADR CM-0030). Editing
+/// it changes access for everyone on it. Names are unique among live rows
+/// (partial index, hand-written in the migration). Each Company gets its own
+/// copy of the seed set (`seeds/roles.json`).
+model ConstructionOrganizationRole {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  description String?
+  isSeed      Boolean   @default(false) @map("is_seed")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  permissions ConstructionOrganizationRoleMenuPermission[]
+  members     ConstructionOrganizationTeamMember[]
+
+  @@index([workspaceId])
+  @@map("roles")
+  @@schema("construction_organization")
+}
+
+/// One Permission Matrix row per Role per menu (ADR CM-0003, CM-0030).
+/// `flags` is a bitmask over the kernel's flag list; cells a menu does not
+/// support are never written.
+model ConstructionOrganizationRoleMenuPermission {
   workspaceId String   @map("workspace_id")
-  memberId    String   @map("member_id") @db.Uuid
+  roleId      String   @map("role_id") @db.Uuid
   menu        String
   flags       Int
   updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
   updatedBy   String   @map("updated_by")
 
-  member ConstructionOrganizationTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  role ConstructionOrganizationRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([memberId, menu])
+  @@id([roleId, menu])
   @@index([workspaceId, menu])
-  @@map("member_menu_permissions")
+  @@map("role_menu_permissions")
   @@schema("construction_organization")
 }
 
@@ -148,6 +170,9 @@ model ConstructionOrganizationTeamMember {
   userId           String?                                  @map("user_id")
   name             String
   designationId    String                                   @map("designation_id") @db.Uuid
+  /// What they may do (ADR CM-0030). Null for the Owner, who can do
+  /// everything; a Member without a Role can do nothing.
+  roleId           String?                                  @map("role_id") @db.Uuid
   mobile           String?
   email            String?
   address          String?
@@ -170,11 +195,12 @@ model ConstructionOrganizationTeamMember {
   updatedBy        String                                   @map("updated_by")
   deletedAt        DateTime?                                @map("deleted_at") @db.Timestamptz(3)
 
-  permissions ConstructionOrganizationMemberMenuPermission[]
-  projects    ConstructionOrganizationTeamMemberProject[]
+  role     ConstructionOrganizationRole?              @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  projects ConstructionOrganizationTeamMemberProject[]
 
   @@index([workspaceId, createdAt])
   @@index([userId])
+  @@index([roleId])
   @@index([mobile])
   @@map("team_members")
   @@schema("construction_organization")

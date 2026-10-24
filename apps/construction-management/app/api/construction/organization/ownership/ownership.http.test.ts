@@ -2,7 +2,8 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
+import { createRoleHandlers } from "@/src/organization/infrastructure/create-role-handlers";
+import { MENUS } from "@/src/shared-kernel/access";
 import { codeFor } from "@/test/accounts";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -26,7 +27,7 @@ async function role(workspaceId: string, userId: string) {
 async function memberRow(workspaceId: string, userId: string) {
   const row = await prisma.constructionOrganizationTeamMember.findFirstOrThrow({
     where: { workspaceId, userId, deletedAt: null },
-    include: { permissions: true },
+    include: { role: true },
   });
   const designation =
     await prisma.constructionOrganizationDesignation.findUniqueOrThrow({
@@ -95,18 +96,11 @@ describe("Transfer ownership (CM-907)", () => {
     const newOwner = await memberRow(owner.workspaceId, member.userId);
     expect(newOwner).toMatchObject({ isOwner: true });
     expect(newOwner.designation.name).toBe("Owner");
-    expect(newOwner.permissions).toEqual([]);
+    expect(newOwner.roleId).toBeNull();
     const oldOwner = await memberRow(owner.workspaceId, owner.userId);
     expect(oldOwner.isOwner).toBe(false);
     expect(oldOwner.designation.name).toBe("Admin");
-    const template = PermissionSet.fromMasks(
-      oldOwner.designation.permissionTemplate as Record<string, number>,
-    );
-    const masks = Object.fromEntries(
-      oldOwner.permissions.map((row) => [row.menu, row.flags]),
-    );
-    expect(template.size).toBeGreaterThan(0);
-    expect(masks).toEqual(template.toMasks());
+    expect(oldOwner.role).toMatchObject({ name: "Admin", isSeed: true });
 
     const audit =
       await prisma.constructionOrganizationAuditEvent.findFirstOrThrow({
@@ -129,6 +123,30 @@ describe("Transfer ownership (CM-907)", () => {
       (await candidates(jsonRequest(`${BASE}/candidates`, member.cookie)))
         .status,
     ).toBe(StatusCodes.OK);
+  });
+
+  it("makes a Role with every right for the old Owner when the Company deleted Admin", async () => {
+    const owner = await ownerWithCompany();
+    const member = await memberWith(owner, {});
+    const roles = createRoleHandlers();
+    const admin = (await roles.list(owner.workspaceId)).find(
+      (item) => item.name === "Admin",
+    );
+    await roles.delete({
+      workspaceId: owner.workspaceId,
+      id: admin?.id ?? "",
+      by: owner.userId,
+    });
+    const code = await codeFor(owner, "transfer_ownership");
+    const response = await transferTo(owner.cookie, member.memberId, code);
+    expect(response.status).toBe(StatusCodes.OK);
+    const oldOwner = await memberRow(owner.workspaceId, owner.userId);
+    const made = (await roles.list(owner.workspaceId)).find(
+      (item) => item.id === oldOwner.roleId,
+    );
+    expect(made?.name).toMatch(/'s access$/);
+    expect(made?.userCount).toBe(1);
+    expect(Object.keys(made?.permissions ?? {})).toHaveLength(MENUS.length);
   });
 
   it("refuses a Team Member who has not joined", async () => {

@@ -32,8 +32,9 @@ export type NotificationRecipientsQuery = {
  * Team Members with a User who hold the menu's Notification flag and
  * `flag`, and — when the menu is Project-scoped and a Project is given —
  * are assigned to that Project, never `exceptUserId`. The Owner passes the
- * matrix and the assignment check, as in `can()`. Reads the organization
- * context's grant tables directly, like `loadMemberAccess`.
+ * matrix and the assignment check, as in `can()`. The matrix is the
+ * member's Role's (ADR CM-0030). Reads the organization context's grant
+ * tables directly, like `loadMemberAccess`.
  */
 export async function notificationRecipients(
   db: Db,
@@ -55,7 +56,14 @@ export async function notificationRecipients(
     select: {
       userId: true,
       isOwner: true,
-      permissions: { where: { menu: query.menu }, select: { flags: true } },
+      role: {
+        select: {
+          permissions: {
+            where: { menu: query.menu },
+            select: { flags: true },
+          },
+        },
+      },
       projects: {
         where: { projectId: query.projectId ?? "" },
         select: { projectId: true },
@@ -68,7 +76,7 @@ export async function notificationRecipients(
     if (member.userId == null || member.userId === query.exceptUserId) continue;
     if (query.ownerOnly === true && !member.isOwner) continue;
     if (!member.isOwner) {
-      const mask = member.permissions[0]?.flags ?? 0;
+      const mask = member.role?.permissions[0]?.flags ?? 0;
       if ((mask & needed) !== needed) continue;
       if (needsProject && member.projects.length === 0) continue;
     }

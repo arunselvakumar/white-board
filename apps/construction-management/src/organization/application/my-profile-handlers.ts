@@ -84,9 +84,16 @@ export class MyProfileHandlers {
       this.designations.listAll(member.workspaceId),
       this.photos.photoKey(member.workspaceId, member.id),
     ]);
-    const names = new Map(designations.map((item) => [item.id, item.name]));
+    const designationNames = new Map(
+      designations.map((item) => [item.id, item.name]),
+    );
+    // My Profile shows neither the Role nor the password controls.
     return {
-      ...toTeamMemberReadModel(member, names),
+      ...toTeamMemberReadModel(member, {
+        designationNames,
+        roles: new Map(),
+        usersInOtherCompanies: new Set(),
+      }),
       photoKey,
       mobileEditable: !this.mobileSignIn(),
     };

@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createDesignationHandlers();
 
-/** One Designation of the Active Company, with its template (CM-112). */
+/** One Designation of the Active Company (CM-112). */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

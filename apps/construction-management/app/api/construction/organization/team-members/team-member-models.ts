@@ -6,6 +6,11 @@ import {
   MENUS,
   type PermissionGrants,
 } from "@/src/shared-kernel/access";
+import {
+  PASSWORD_MAX,
+  PASSWORD_MIN,
+  type TeamMemberWithPassword,
+} from "@/src/organization/application/team-member-handlers";
 import type { TeamMemberReadModel } from "@/src/organization/application/team-member-read-model";
 
 const MENU_KEYS = MENUS.map((menu) => menu.key) as [string, ...string[]];
@@ -35,6 +40,12 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   userId: z.string().nullable(),
   name: z.string(),
   designation: z.object({ id: z.uuid(), name: z.string().nullable() }),
+  role: z
+    .object({ id: z.uuid(), name: z.string() })
+    .nullable()
+    .describe(
+      "What they may do (ADR CM-0030); null for the Owner, who can do everything",
+    ),
   mobile: z.string().nullable(),
   email: z.string().nullable(),
   address: z.string().nullable(),
@@ -50,7 +61,14 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
       "The mobile is a joined member's sign-in (SMS on, ADR CM-0009), so `update` rejects a change with MOBILE_LOCKED",
     ),
   projectIds: z.array(z.string()),
-  permissions: PermissionGrantsModel,
+  permissions: PermissionGrantsModel.describe(
+    "The Role's matrix, read-only here (the Owner's is everything); change it in Role Management",
+  ),
+  canSetPassword: z
+    .boolean()
+    .describe(
+      "Edit User may set a new password: not the Owner, and no User yet or a User in no other Company (ADR CM-0030 §7)",
+    ),
   invitePath: z.string().nullable(),
   invitedAt: z.iso.datetime().nullable(),
   joinedAt: z.iso.datetime().nullable(),
@@ -77,5 +95,38 @@ export function toTeamMemberResponse(
     joinedAt: member.joinedAt?.toISOString() ?? null,
     createdAt: member.createdAt.toISOString(),
     updatedAt: member.updatedAt.toISOString(),
+  };
+}
+
+/** A first password the admin types (ADR CM-0030 §6). */
+export const TeamMemberPasswordModel = z
+  .string()
+  .min(PASSWORD_MIN)
+  .max(PASSWORD_MAX);
+
+/**
+ * Add User and Set a new password answer with the Team Member and whether
+ * the password was ignored because someone already signs in with that
+ * mobile or email (ADR CM-0030 §3).
+ */
+export const ConstructionOrganizationTeamMemberWithPasswordResponseModel =
+  ConstructionOrganizationTeamMemberResponseModel.extend({
+    passwordIgnored: z
+      .enum(["existing_account"])
+      .nullable()
+      .describe(
+        "`existing_account`: a User already has this mobile or email, so their password was left alone and they got a Join Request instead",
+      ),
+  });
+
+export type ConstructionOrganizationTeamMemberWithPasswordResponseModel =
+  z.infer<typeof ConstructionOrganizationTeamMemberWithPasswordResponseModel>;
+
+export function toTeamMemberWithPasswordResponse(
+  member: TeamMemberWithPassword,
+): ConstructionOrganizationTeamMemberWithPasswordResponseModel {
+  return {
+    ...toTeamMemberResponse(member),
+    passwordIgnored: member.passwordIgnored,
   };
 }

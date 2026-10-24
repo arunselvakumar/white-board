@@ -3,8 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import type { DomainEvent } from "@/src/shared-kernel/events";
 
+import { PermissionSet } from "@/src/shared-kernel/access";
+
 import { Designation } from "../domain/designation";
 import type { NewCompany } from "../domain/new-company";
+import { Role } from "../domain/role";
 import {
   CreateCompanyHandler,
   type CreateCompanyCommand,
@@ -44,7 +47,17 @@ function setup(storeFails = false) {
         id: "d1",
         workspaceId,
         name: "Owner",
-        template: null,
+        isSeed: true,
+        by,
+        now,
+      }),
+    ],
+    ({ workspaceId, by, now }) => [
+      Role.create({
+        id: "r1",
+        workspaceId,
+        name: "Admin",
+        permissions: PermissionSet.everything(),
         isSeed: true,
         by,
         now,
@@ -84,6 +97,7 @@ describe("CreateCompanyHandler", () => {
     expect(created[0]?.designations.map((item) => item.name)).toEqual([
       "Owner",
     ]);
+    expect(created[0]?.roles.map((item) => item.name)).toEqual(["Admin"]);
     expect(created[0]?.ownerMember).toMatchObject({
       isOwner: true,
       status: "active",

@@ -21,14 +21,17 @@ import { APP_NAV_ICONS } from "./app-nav-icons";
 import { SubmenuRow } from "./submenu-row";
 
 export type AreaNavGroup = {
-  label: string;
+  /** Shown above the group; an area with one group can leave it out. */
+  label?: string;
   sections: readonly { href: string; label: string; icon: LucideIcon }[];
 };
 
 /**
  * A top-level area in the sidebar with a submenu of its screens, grouped
- * (Masters, Workspace). The submenu opens by itself on any page of the area
- * and can be folded away elsewhere.
+ * (Masters, Workspace, Users & Roles). The submenu opens by itself on any
+ * page of the area and can be folded away elsewhere. A page of the area is
+ * one under its link or one a submenu entry owns (`currentHref`): Users &
+ * Roles links to Users, and Role Management sits beside it.
  */
 export function AreaNavMenu({
   href,
@@ -46,7 +49,7 @@ export function AreaNavMenu({
   pathname: string;
   buttonClassName: string;
 }) {
-  const inArea = isAppNavActive(pathname, href);
+  const inArea = isAppNavActive(pathname, href) || currentHref != null;
   const [open, setOpen] = useState(inArea);
   // Arriving on a page of the area opens the submenu (state adjusted in render).
   const [wasInArea, setWasInArea] = useState(inArea);
@@ -56,7 +59,8 @@ export function AreaNavMenu({
   }
 
   const Icon = APP_NAV_ICONS[href];
-  const onIndex = pathname === href;
+  // The area's own page, unless a submenu entry is that page too.
+  const onIndex = pathname === href && currentHref == null;
 
   return (
     <SidebarMenuItem>
@@ -80,15 +84,21 @@ export function AreaNavMenu({
         <CollapsibleContent>
           <SidebarMenuSub aria-label={label} className="mt-1">
             {groups.map((group) => (
-              <li key={group.label} className="mt-2 first:mt-1">
-                <p
-                  id={groupLabelId(label, group.label)}
-                  className="text-sidebar-foreground/55 px-2 pb-1 text-[0.7rem] font-semibold tracking-wide uppercase"
-                >
-                  {group.label}
-                </p>
+              <li key={group.label ?? label} className="mt-2 first:mt-1">
+                {group.label != null && (
+                  <p
+                    id={groupLabelId(label, group.label)}
+                    className="text-sidebar-foreground/55 px-2 pb-1 text-[0.7rem] font-semibold tracking-wide uppercase"
+                  >
+                    {group.label}
+                  </p>
+                )}
                 <ul
-                  aria-labelledby={groupLabelId(label, group.label)}
+                  aria-labelledby={
+                    group.label == null
+                      ? undefined
+                      : groupLabelId(label, group.label)
+                  }
                   className="flex flex-col gap-0.5"
                 >
                   {group.sections.map((section) => {

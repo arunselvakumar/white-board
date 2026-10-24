@@ -35,7 +35,6 @@ export async function POST(
       workspaceId: session.workspaceId,
       id,
       by: session.userId,
-      grantor: session.access,
       details,
       memberType,
     });

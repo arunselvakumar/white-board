@@ -51,7 +51,7 @@ const LEAVE_APPROVALS = `${HRMS_PATH}/leave/approvals`;
 const TEAM_LEAVES = `${HRMS_PATH}/leave/team`;
 const HOLIDAYS = `${HRMS_PATH}/configuration/holidays`;
 const CONFIGURATION = `${HRMS_PATH}/configuration`;
-const TEAM_MEMBERS = "/app/masters/team-members";
+const USERS = "/app/users";
 
 /**
  * The breakdown's rows and the trend's series, in stacking order (bottom
@@ -781,8 +781,8 @@ function NoTeamYet() {
       description="Invite your staff from Team Members. Then set working hours, holidays, shifts and leave in Configuration, and their attendance shows here."
       action={
         <div className="flex flex-wrap justify-center gap-2">
-          <Link href={TEAM_MEMBERS} className={buttonVariants()}>
-            Add Team Members
+          <Link href={USERS} className={buttonVariants()}>
+            Add Users
           </Link>
           <Link
             href={CONFIGURATION}

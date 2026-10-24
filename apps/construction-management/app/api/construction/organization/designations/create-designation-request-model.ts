@@ -1,10 +1,8 @@
 import { z } from "zod";
 
-import { designationTemplateModel } from "./designation-template";
-
+/** A job title only; access comes from Roles (ADR CM-0030). */
 export const CreateConstructionOrganizationDesignationRequestModel = z.object({
   name: z.string(),
-  template: designationTemplateModel.nullable().optional(),
 });
 
 export type CreateConstructionOrganizationDesignationRequestModel = z.infer<
