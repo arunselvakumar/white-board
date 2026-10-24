@@ -5,6 +5,7 @@
  * resolves `{ error }`.
  */
 import { useState, type ReactNode } from "react";
+import { constructionAuthClient } from "@repo/auth/construction/client";
 import { fn } from "storybook/test";
 
 import type {
@@ -325,4 +326,50 @@ export function useCompanySignOut() {
     },
     fetchStatus,
   };
+}
+
+/**
+ * The real Better Auth client, so stories answer these with `mockApi`
+ * (`/api/auth/sign-in/phone-number`, `/api/auth/change-password`).
+ */
+async function viaClient(
+  call: () => Promise<{ error: unknown }>,
+): Promise<AuthResult> {
+  const result = await call();
+  if (result.error == null) return { error: null };
+  const failure = result.error as Partial<AuthError>;
+  return {
+    error: {
+      code: failure.code ?? "UNKNOWN",
+      message: failure.message ?? "",
+      status: failure.status ?? 0,
+    },
+  };
+}
+
+export function useCompanyMobilePasswordSignIn() {
+  const { run, fetchStatus, error, clearError } = useMockAction(
+    (input: { mobile: string; password: string }) =>
+      viaClient(() =>
+        constructionAuthClient().signIn.phoneNumber({
+          phoneNumber: input.mobile,
+          password: input.password,
+        }),
+      ),
+  );
+  return { signIn: run, fetchStatus, error, clearError };
+}
+
+export function useCompanyChangePassword() {
+  const { run, fetchStatus, error, clearError } = useMockAction(
+    (input: { currentPassword: string; newPassword: string }) =>
+      viaClient(() =>
+        constructionAuthClient().changePassword({
+          currentPassword: input.currentPassword,
+          newPassword: input.newPassword,
+          revokeOtherSessions: true,
+        }),
+      ),
+  );
+  return { changePassword: run, fetchStatus, error, clearError };
 }

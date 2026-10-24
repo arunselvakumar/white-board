@@ -1,6 +1,10 @@
 "use client";
 
-import { navigateInApp, normalizeMobile } from "@repo/auth/construction/react";
+import {
+  navigateInApp,
+  normalizeMobile,
+  useCompanyMobilePasswordSignIn,
+} from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +19,6 @@ import { FieldError } from "./field-error";
 import { FormAlert } from "./form-alert";
 import { MobileField } from "./mobile-field";
 import { PasswordField } from "./password-field";
-import { useMobilePasswordSignIn } from "./use-password-auth";
 
 const schema = z.object({
   mobile: z
@@ -40,7 +43,7 @@ export function MobilePasswordSignInForm({
 }: {
   redirectUrl: string | null;
 }) {
-  const signIn = useMobilePasswordSignIn();
+  const signIn = useCompanyMobilePasswordSignIn();
   const [forgot, setForgot] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
@@ -49,10 +52,10 @@ export function MobilePasswordSignInForm({
   const busy = form.formState.isSubmitting || signIn.fetchStatus === "fetching";
 
   const onSubmit = async (values: Values) => {
-    const phoneNumber = normalizeMobile(values.mobile);
-    if (phoneNumber == null) return;
+    const mobile = normalizeMobile(values.mobile);
+    if (mobile == null) return;
     const { error } = await signIn.signIn({
-      phoneNumber,
+      mobile,
       password: values.password,
     });
     if (error == null) navigateInApp(continuePath(redirectUrl));

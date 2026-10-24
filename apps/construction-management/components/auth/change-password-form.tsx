@@ -1,6 +1,9 @@
 "use client";
 
-import { navigateInApp } from "@repo/auth/construction/react";
+import {
+  navigateInApp,
+  useCompanyChangePassword,
+} from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,7 +17,6 @@ import { AuthHeading } from "./auth-heading";
 import { FieldError } from "./field-error";
 import { FormAlert } from "./form-alert";
 import { PasswordField } from "./password-field";
-import { useChangePassword } from "./use-password-auth";
 
 const schema = z
   .object({
@@ -46,7 +48,7 @@ export function ChangePasswordForm({
 }: {
   redirectUrl: string | null;
 }) {
-  const change = useChangePassword();
+  const change = useCompanyChangePassword();
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { currentPassword: "", newPassword: "", confirm: "" },

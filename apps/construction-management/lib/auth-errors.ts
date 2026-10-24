@@ -54,7 +54,7 @@ const BY_CODE: Record<string, Mapping> = {
     field: "currentPassword",
     message: "That is not your current password.",
   },
-  PASSWORD_ALREADY_USED: {
+  PASSWORD_UNCHANGED: {
     field: "password",
     message: "Choose a password different from the current one.",
   },

@@ -1,36 +1,28 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import type { ConstructionOrganizationTeamMemberResponseModel } from "@/app/api/construction/organization/team-members/team-member-models";
+import type {
+  ConstructionOrganizationTeamMemberResponseModel,
+  ConstructionOrganizationTeamMemberWithPasswordResponseModel,
+} from "@/app/api/construction/organization/team-members/team-member-models";
 import type { ListConstructionOrganizationTeamMembersResponseModel } from "@/app/api/construction/organization/team-members/list-team-members-response-model";
 
 import { apiJson } from "./http";
 
 const BASE = "/api/construction/organization/team-members";
 
-/**
- * What ADR CM-0029 adds to a Team Member: their Role (null for the Owner),
- * `permissions` read from it, and whether Edit User may set a password.
- */
-type TeamMemberAccessFields = {
-  role: { id: string; name: string } | null;
-  canSetPassword: boolean;
-};
-
-export type TeamMember = ConstructionOrganizationTeamMemberResponseModel &
-  TeamMemberAccessFields;
+export type TeamMember = ConstructionOrganizationTeamMemberResponseModel;
 export type TeamMemberStatus = TeamMember["status"];
-export type TeamMemberList = Omit<
-  ListConstructionOrganizationTeamMembersResponseModel,
-  "items"
-> & { items: TeamMember[] };
+export type TeamMemberList =
+  ListConstructionOrganizationTeamMembersResponseModel;
 
 /**
  * Setting a password never touches an account someone already has: the
  * person got a Join Request instead (ADR CM-0029 §3).
  */
-export type PasswordOutcome = {
-  passwordIgnored: "existing_account" | null;
-};
+export type PasswordOutcome = Pick<
+  ConstructionOrganizationTeamMemberWithPasswordResponseModel,
+  "passwordIgnored"
+>;
 
 export type TeamMemberListFilter = {
   search: string;

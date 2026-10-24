@@ -4,22 +4,14 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import type { ConstructionOrganizationDesignationResponseModel } from "@/app/api/construction/organization/designations/designation-response-model";
 import type { DuplicateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/[id]/duplicate/duplicate-designation-request-model";
 
 import { apiJson } from "./http";
 
-/**
- * A Designation: a job title only, with no access since ADR CM-0029 (the
- * Role carries that). The fields the screens read.
- */
-export type DesignationResponse = {
-  id: string;
-  name: string;
-  /** Copied from the seed set when the Company was created ("Default"). */
-  isSeed: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+/** A Designation: a job title only; the Role carries access (ADR CM-0029). */
+export type DesignationResponse =
+  ConstructionOrganizationDesignationResponseModel;
 
 export type DesignationInput = { name: string };
 

@@ -4,24 +4,14 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import type { ConstructionOrganizationRoleResponseModel } from "@/app/api/construction/organization/roles/role-models";
 import type { PermissionGrants } from "@/src/shared-kernel/access";
 
 import { apiJson } from "./http";
 import { TEAM_MEMBERS_KEY } from "./team-members";
 
 /** A Role: a named Permission Matrix given to Team Members (ADR CM-0029 §1). */
-export type Role = {
-  id: string;
-  name: string;
-  description: string | null;
-  /** Copied from the seed set when the Company was created ("Default"). */
-  isSeed: boolean;
-  permissions: PermissionGrants;
-  /** Live Team Members on it, the Owner left out. */
-  userCount: number;
-  createdAt: string;
-  updatedAt: string;
-};
+export type Role = ConstructionOrganizationRoleResponseModel;
 
 export type RoleInput = {
   name: string;
