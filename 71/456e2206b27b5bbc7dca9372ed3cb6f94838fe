@@ -1,0 +1,43 @@
+apps/construction-management/.storybook/mocks/auth.tsx
+  s_93811a7c64e94c::t_4ebd5a39e95f67 78
+apps/construction-management/app/api/_lib/require-session.ts
+  s_93811a7c64e94c::t_38258b4a41d5e0 21-34,37-38,53-54,83-84,96-97
+apps/construction-management/app/api/construction/reporting/backups/handlers.ts
+  s_93811a7c64e94c::t_9e6b8942efff4e 10,57-58
+packages/auth/src/construction/config.ts
+  s_93811a7c64e94c::t_37f51ab2803077 18,44-46,113-125,140-141,155-156,171
+packages/auth/src/construction/first-password.ts
+  s_93811a7c64e94c::t_6080cd831caf39 1-3,5-9,11,13-19,21-61
+packages/auth/src/construction/mobile-otp.ts
+  s_93811a7c64e94c::t_2184b4b567eb0b 166-168
+packages/auth/src/construction/react/hooks.ts
+  s_93811a7c64e94c::t_a54418168cc07a 17-18,26,117-157
+packages/auth/src/construction/react/index.ts
+  s_93811a7c64e94c::t_fc5c8834086ba2 5,10
+packages/auth/src/construction/server/accounts.ts
+  s_93811a7c64e94c::t_75add4034eb483 1-7,30-58,107-224,310-316
+packages/auth/src/construction/server/get-auth.ts
+  s_93811a7c64e94c::t_c9a89538a11e8f 68
+packages/auth/src/construction/server/index.ts
+  s_93811a7c64e94c::t_bcac402e8f2bfb 9,12
+packages/auth/src/construction/testing.ts
+  s_93811a7c64e94c::t_3e5882f22a5afa 20,45
+packages/auth/src/construction/types.ts
+  s_93811a7c64e94c::t_43e21dbe25cbc7 11-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "71456e2206b27b5bbc7dca9372ed3cb6f94838fe",
+  "prompts": {},
+  "sessions": {
+    "s_93811a7c64e94c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e5e6c54-f8ff-4847-8569-72e57b8628e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
