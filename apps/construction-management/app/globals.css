@@ -1,1 +1,33 @@
 @import "@repo/ui/globals.css";
+
+/*
+ * The impersonation banner (ADR CM-0029) is fixed to the top of the
+ * viewport. While it shows, the page, the desktop sidebar and the sticky
+ * shell header start below it.
+ */
+:root {
+  --impersonation-bar: 0px;
+}
+
+html[data-impersonating] {
+  --impersonation-bar: 2.25rem;
+}
+
+html[data-impersonating] body {
+  padding-top: var(--impersonation-bar);
+}
+
+html[data-impersonating] [data-slot="sidebar-wrapper"] {
+  min-height: calc(100svh - var(--impersonation-bar));
+}
+
+html[data-impersonating] [data-slot="sidebar-container"] {
+  top: var(--impersonation-bar);
+  height: calc(100svh - var(--impersonation-bar));
+}
+
+@media print {
+  html[data-impersonating] {
+    --impersonation-bar: 0px;
+  }
+}

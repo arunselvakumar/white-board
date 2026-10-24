@@ -23,6 +23,8 @@ export type SignedInCompanyAuthState = {
   workspaceId: string | null;
   role: CompanyRole | null;
   user: CompanyAuthUser;
+  /** The White Board staff email signed in as this User (ADR CM-0029). */
+  impersonatedBy: string | null;
 };
 
 export type SignedOutCompanyAuthState = {
@@ -32,6 +34,7 @@ export type SignedOutCompanyAuthState = {
   workspaceId: null;
   role: null;
   user: null;
+  impersonatedBy: null;
 };
 
 export type CompanyAuthState =
@@ -50,5 +53,6 @@ export type CompanyAuthSnapshot = {
   workspaceId: string | null;
   role: CompanyRole | null;
   user: CompanyAuthUser | null;
+  impersonatedBy: string | null;
   companies: CompanySummary[];
 };

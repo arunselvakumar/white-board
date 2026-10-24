@@ -27,6 +27,7 @@ export function companyAuthStateFor(session: {
       workspaceId: null,
       role: null,
       user: null,
+      impersonatedBy: null,
     };
   const role = session.workspaceId == null ? null : (session.role ?? "owner");
   return {
@@ -44,6 +45,7 @@ export function companyAuthStateFor(session: {
       image: null,
       mustChangePassword: session.mustChangePassword ?? false,
     },
+    impersonatedBy: null,
   };
 }
 
