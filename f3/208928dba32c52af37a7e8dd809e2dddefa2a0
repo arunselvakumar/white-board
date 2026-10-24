@@ -1,0 +1,131 @@
+apps/construction-management/app/api/_lib/openapi-document.ts
+  s_93811a7c64e94c::t_8145c33cfa0036 43-44,52,55-58,247,251-252,347,355,366,377,394,501,505-507,534-537,540,546-558,1025-1026
+apps/construction-management/app/api/_lib/require-access.ts
+  s_93811a7c64e94c::t_8fdef62e7cd1c4 81-101
+apps/construction-management/app/api/construction/organization/designations/[id]/duplicate/route.ts
+  s_93811a7c64e94c::t_74c5d371c91a22 16
+apps/construction-management/app/api/construction/organization/designations/[id]/route.ts
+  s_93811a7c64e94c::t_8f5ac42f60cc11 13
+apps/construction-management/app/api/construction/organization/designations/[id]/update/route.ts
+  s_93811a7c64e94c::t_b4067468bc1158 14
+apps/construction-management/app/api/construction/organization/designations/create-designation-request-model.ts
+  s_93811a7c64e94c::t_e8986cf6752d9b 3
+apps/construction-management/app/api/construction/organization/designations/route.ts
+  s_93811a7c64e94c::t_23d9db77e0e266 39
+apps/construction-management/app/api/construction/organization/roles/[id]/delete/route.ts
+  s_93811a7c64e94c::t_ff0e342041540f 1-39
+apps/construction-management/app/api/construction/organization/roles/[id]/duplicate/route.ts
+  s_93811a7c64e94c::t_5954ee250ec05e 1-42
+apps/construction-management/app/api/construction/organization/roles/[id]/route.ts
+  s_93811a7c64e94c::t_44517350912106 1-33
+apps/construction-management/app/api/construction/organization/roles/[id]/update/route.ts
+  s_93811a7c64e94c::t_8ae2a0d43ae4f7 1-51
+apps/construction-management/app/api/construction/organization/roles/handlers.ts
+  s_93811a7c64e94c::t_1d1be8f50addc2 1-4
+apps/construction-management/app/api/construction/organization/roles/role-models.ts
+  s_93811a7c64e94c::t_89c49d4bda1a4c 1-75
+apps/construction-management/app/api/construction/organization/roles/role-openapi.ts
+  s_93811a7c64e94c::t_9236287d928805 1-116
+apps/construction-management/app/api/construction/organization/roles/route.ts
+  s_93811a7c64e94c::t_f167d17f778c63 1-68
+apps/construction-management/app/api/construction/organization/team-members/[id]/password/route.ts
+  s_93811a7c64e94c::t_ecd100a1ec404b 1-48
+apps/construction-management/app/api/construction/organization/team-members/[id]/password/set-password-request-model.ts
+  s_93811a7c64e94c::t_a13fa606f84a11 1-7
+apps/construction-management/app/api/construction/organization/team-members/[id]/role/route.ts
+  s_93811a7c64e94c::t_a9b8b0f3614770 1-45
+apps/construction-management/app/api/construction/organization/team-members/[id]/role/set-role-request-model.ts
+  s_93811a7c64e94c::t_f0385d21f51022 1-6
+apps/construction-management/app/api/construction/organization/team-members/create-team-member-request-model.ts
+  s_93811a7c64e94c::t_1382efada29e0a 4,8-13,17-19
+apps/construction-management/app/api/construction/organization/team-members/route.ts
+  s_93811a7c64e94c::t_5318d622b2cbb7 16-19,64-67,81-82,96-98,100
+apps/construction-management/app/api/construction/organization/team-members/team-member-models.ts
+  s_93811a7c64e94c::t_51dc3fc66007c0 9-13,43-48,64-71,100-132
+apps/construction-management/src/organization/application/create-company.ts
+  s_93811a7c64e94c::t_d13d4c0fbddce1 6,33-39,56,76
+apps/construction-management/src/organization/application/my-profile-handlers.ts
+  s_93811a7c64e94c::t_c14eca029235b4 87-90,92-96
+apps/construction-management/src/organization/application/ownership-handlers.ts
+  s_93811a7c64e94c::t_5b5fe69dd24846 9,13-14,21,23,26-28,35,53-65,76,107-109,132-135,138-151,157,161,173,188
+apps/construction-management/src/organization/application/role-handlers.ts
+  s_93811a7c64e94c::t_495ed89335ed98 1-204
+apps/construction-management/src/organization/application/role-read-model.ts
+  s_93811a7c64e94c::t_23ea1596e6841e 1-28
+apps/construction-management/src/organization/application/sign-in-accounts.ts
+  s_93811a7c64e94c::t_4f04f571866c17 1-28
+apps/construction-management/src/organization/application/team-member-handlers.ts
+  s_93811a7c64e94c::t_c5d7fd99c5a874 1,12-18,23-24,26,29,44-65,88-90,96,100,102-104,127-133,139-159,161-164,186,206-207,209,219-246,250,255-258,261-270,275-276,283,287-291,296-307,310-364,388,396,405-410,415,418-424,427,432-470
+apps/construction-management/src/organization/application/team-member-read-model.ts
+  s_93811a7c64e94c::t_3c0c047ef4fc64 1-4,7-12,19-20,32,34-38,47-55,58,61-65,72,74,86-91
+apps/construction-management/src/organization/domain/designation.ts
+  s_93811a7c64e94c::t_c7644f7126c0ef 34-36,103
+apps/construction-management/src/organization/domain/new-company.ts
+  s_93811a7c64e94c::t_2f99accd589eba 6,32,43-44,70
+apps/construction-management/src/organization/domain/role-repository.ts
+  s_93811a7c64e94c::t_8f090338aac1d8 1-20
+apps/construction-management/src/organization/domain/role.ts
+  s_93811a7c64e94c::t_c6b1a1589d72c5 1-187
+apps/construction-management/src/organization/domain/team-member-repository.ts
+  s_93811a7c64e94c::t_758c98096a24c3 22
+apps/construction-management/src/organization/domain/team-member.ts
+  s_93811a7c64e94c::t_5532cbab296186 10-11,125-130,156,169,200,240-241,300-301,315-316,319-320,322,358-377,408-409,431,443,447,456
+apps/construction-management/src/organization/infrastructure/auth-account-directories.ts
+  s_93811a7c64e94c::t_46001d237e0ee7 5,23-31
+apps/construction-management/src/organization/infrastructure/create-account-handlers.ts
+  s_93811a7c64e94c::t_c6f524578ce6b9 24,37,41-42
+apps/construction-management/src/organization/infrastructure/create-company-handlers.ts
+  s_93811a7c64e94c::t_98f4a6e7fba558 19,35
+apps/construction-management/src/organization/infrastructure/create-role-handlers.ts
+  s_93811a7c64e94c::t_84bd24d2cda7d9 1-8
+apps/construction-management/src/organization/infrastructure/create-team-member-handlers.ts
+  s_93811a7c64e94c::t_1fe85de8732906 18,20,26,35,56,61-62
+apps/construction-management/src/organization/infrastructure/designation-seeds.ts
+  s_93811a7c64e94c::t_dba5bda0bfb3bb 8
+apps/construction-management/src/organization/infrastructure/prisma-designation-repository.ts
+  s_93811a7c64e94c::t_be39a3b63b7afe 1
+apps/construction-management/src/organization/infrastructure/prisma-new-company-store.ts
+  s_93811a7c64e94c::t_68039918e58c21 8,42
+apps/construction-management/src/organization/infrastructure/prisma-ownership-transfer-store.ts
+  s_93811a7c64e94c::t_b96b06b905e7d3 7,12,19,30
+apps/construction-management/src/organization/infrastructure/prisma-team-member-repository.ts
+  s_93811a7c64e94c::t_7779454ce00696 77,97,120
+apps/construction-management/src/organization/infrastructure/role-seeds.ts
+  s_93811a7c64e94c::t_bb5d42cef92f69 1-60
+apps/construction-management/src/shared-kernel/access/can.ts
+  s_93811a7c64e94c::t_f6659c729b6cf4 15-19
+apps/construction-management/src/shared-kernel/access/menus.ts
+  s_93811a7c64e94c::t_50d5c11004a8a1 225-226
+apps/construction-management/src/shared-kernel/access/notification-recipients.ts
+  s_93811a7c64e94c::t_2b05e9a62d9f56 35-37,59-66,79
+apps/construction-management/src/shared-kernel/access/prisma-access-reader.ts
+  s_93811a7c64e94c::t_a1e8033a99d22c 7-11,21,32-35,40,45
+apps/construction-management/src/organization/application/grant-rules.ts
+  s_7fe8e7b9a7bd23::t_0f12e38bb23f1e 9-14,18,21-23,26,31-51
+apps/construction-management/src/organization/infrastructure/prisma-role-repository.ts
+  s_7fe8e7b9a7bd23::t_a01d73cb58ac7b 1-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "f3208928dba32c52af37a7e8dd809e2dddefa2a0",
+  "prompts": {},
+  "sessions": {
+    "s_7fe8e7b9a7bd23": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a9c9dcbecffe5a4a2",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_93811a7c64e94c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e5e6c54-f8ff-4847-8569-72e57b8628e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
