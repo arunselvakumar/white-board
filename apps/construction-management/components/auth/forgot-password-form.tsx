@@ -123,6 +123,7 @@ function EmailStep({
 
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           const result = await reset.requestCode(values.email);
@@ -179,6 +180,7 @@ function ResetStep({
 
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           const result = await reset.resetPassword({ email, ...values });

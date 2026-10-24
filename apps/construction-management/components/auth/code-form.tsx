@@ -55,6 +55,7 @@ export function CodeForm({
   });
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           await onSubmit(values.code);

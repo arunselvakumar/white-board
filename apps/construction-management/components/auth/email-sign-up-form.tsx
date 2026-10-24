@@ -77,6 +77,7 @@ export function EmailSignUpForm({
 
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           const result = await signUp.create(values);
