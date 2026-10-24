@@ -92,12 +92,18 @@ export function MasterListPageSkeleton({
   meta?: ReactNode;
   actions?: ReactNode;
   details?: boolean;
-  back?: PageHeaderBack;
+  /** Null for a page with no back link (a main-menu page). */
+  back?: PageHeaderBack | null;
 }) {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeader back={back} title={title} meta={meta} actions={actions} />
+        <PageHeader
+          back={back ?? undefined}
+          title={title}
+          meta={meta}
+          actions={actions}
+        />
         <MasterRowsSkeleton
           search
           details={details}
