@@ -33,7 +33,9 @@ export const Default: Story = {
       // The tagline is read once, as a sentence, not word by word.
       const tagline =
         "Every site, every bag of cement, every day's labour — in one place.";
-      await expect(canvas.getByText(tagline)).toHaveClass("sr-only");
+      await expect(
+        canvas.getByText(tagline, { ignore: '[aria-hidden="true"]' }),
+      ).toHaveClass("sr-only");
       await expect(
         canvas.getByText("Projects, materials, labour", { exact: false }),
       ).toBeVisible();

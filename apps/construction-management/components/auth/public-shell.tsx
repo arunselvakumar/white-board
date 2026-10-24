@@ -1,21 +1,18 @@
 import Image from "next/image";
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { AUTH_PHOTOS, type AuthPhoto, unsplashUrl } from "./auth-photos";
+import { ScrambledText } from "./scrambled-text";
 
 const TAGLINE =
   "Every site, every bag of cement, every day's labour — in one place.";
-const TAGLINE_WORDS = TAGLINE.split(" ");
-/** Seconds between one tagline word starting to appear and the next. */
-const WORD_STAGGER_S = 0.2;
-/** Matches `--animate-text-generate` in `@repo/ui/globals.css`. */
-const WORD_DURATION_S = 0.5;
+/** Seconds the tagline takes to decode; the sub-line follows. */
+const TAGLINE_DECODE_S = 1.2;
 
 /**
  * The brand half of the split layout: a site photo under the tagline. On load
- * the tagline's words fade in and sharpen one after another (Aceternity's Text
- * Generate Effect, in CSS), then the sub-line follows. Screen readers get the
- * sentence once from a visually hidden copy.
+ * the tagline decodes out of scrambled characters (React Bits' Scrambled
+ * Text), and scrambles again under the pointer; then the sub-line fades in.
  */
 export function AuthBrandPanel({
   photo = AUTH_PHOTOS[0],
@@ -41,26 +38,16 @@ export function AuthBrandPanel({
         className="absolute inset-0 bg-linear-to-t from-[#100e22]/90 via-[#100e22]/35 to-[#100e22]/5"
       />
       <div className="relative space-y-5 p-12 pb-16 text-white">
-        <p className="max-w-xl text-4xl leading-tight font-light text-balance xl:max-w-2xl xl:text-5xl">
-          <span className="sr-only">{TAGLINE}</span>
-          <span aria-hidden="true">
-            {TAGLINE_WORDS.map((word, index) => (
-              <Fragment key={index}>
-                {index > 0 && " "}
-                <span
-                  className="animate-text-generate motion-reduce:animate-none"
-                  style={{ animationDelay: `${index * WORD_STAGGER_S}s` }}
-                >
-                  {word}
-                </span>
-              </Fragment>
-            ))}
-          </span>
-        </p>
+        <ScrambledText
+          duration={TAGLINE_DECODE_S}
+          className="max-w-xl text-3xl leading-tight font-light text-balance xl:max-w-2xl xl:text-4xl"
+        >
+          {TAGLINE}
+        </ScrambledText>
         <p
           className="animate-text-generate text-base text-white/70 motion-reduce:animate-none"
           style={{
-            animationDelay: `${(TAGLINE_WORDS.length - 1) * WORD_STAGGER_S + WORD_DURATION_S}s`,
+            animationDelay: `${TAGLINE_DECODE_S}s`,
           }}
         >
           Projects, materials, labour and payments for builders and contractors.
