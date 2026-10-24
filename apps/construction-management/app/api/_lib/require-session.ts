@@ -19,8 +19,23 @@ export type CompanySession = {
 };
 
 /**
+ * 403 `PASSWORD_CHANGE_REQUIRED` while an admin-set password waits to be
+ * changed (ADR CM-0029 §8). Only the auth routes (change password, sign
+ * out, the session) stay open; they do not come through these guards.
+ */
+export function passwordChangeRequired(user: CompanyAuthUser): Response | null {
+  if (!user.mustChangePassword) return null;
+  return jsonError(
+    StatusCodes.FORBIDDEN,
+    "PASSWORD_CHANGE_REQUIRED",
+    "Change the password you were given before you continue.",
+  );
+}
+
+/**
  * The API gate (root ADR-0013, ADR-0014): no Session → 401
- * `UNAUTHENTICATED`, no Active Company → 403 `NO_ACTIVE_COMPANY`. The role
+ * `UNAUTHENTICATED`, an admin-set password not yet changed → 403
+ * `PASSWORD_CHANGE_REQUIRED`, no Active Company → 403 `NO_ACTIVE_COMPANY`. The role
  * is read from the member row on every request. A write to a Company that
  * waits to be deleted answers 409 `COMPANY_DELETION_SCHEDULED` unless it
  * is one of the writes left open (CM-907, `company-deletion-guard.ts`).
@@ -35,6 +50,8 @@ export async function requireCompanySession(
       "UNAUTHENTICATED",
       "Authentication required.",
     );
+  const changePassword = passwordChangeRequired(state.user);
+  if (changePassword != null) return changePassword;
   if (state.workspaceId == null || state.role == null)
     return jsonError(
       StatusCodes.FORBIDDEN,
@@ -63,7 +80,8 @@ export type UserSession = {
 
 /**
  * A signed-in User, with or without an Active Company: creating, listing
- * and switching Companies. 401 `UNAUTHENTICATED` otherwise.
+ * and switching Companies. 401 `UNAUTHENTICATED` otherwise, and 403
+ * `PASSWORD_CHANGE_REQUIRED` as `requireCompanySession`.
  */
 export async function requireUserSession(
   request: Request,
@@ -75,6 +93,8 @@ export async function requireUserSession(
       "UNAUTHENTICATED",
       "Authentication required.",
     );
+  const changePassword = passwordChangeRequired(state.user);
+  if (changePassword != null) return changePassword;
   return {
     userId: state.userId,
     sessionId: state.sessionId,

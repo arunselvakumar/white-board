@@ -6,8 +6,10 @@ export {
 export {
   DELETED_USER_NAME,
   accounts,
+  createPasswordAccount,
   erasedEmailFor,
   type DeviceSession,
+  type PasswordAccountInput,
 } from "./accounts";
 export { companies } from "./companies";
 export { constructionMessaging } from "./messaging";

@@ -17,6 +17,7 @@ export function companyAuthStateFor(session: {
   email?: string;
   name?: string;
   phoneNumber?: string | null;
+  mustChangePassword?: boolean;
 }): CompanyAuthState {
   if (session.userId == null)
     return {
@@ -41,6 +42,7 @@ export function companyAuthStateFor(session: {
       emailVerified: true,
       phoneNumber: session.phoneNumber ?? null,
       image: null,
+      mustChangePassword: session.mustChangePassword ?? false,
     },
   };
 }

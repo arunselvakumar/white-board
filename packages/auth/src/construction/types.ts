@@ -8,6 +8,11 @@ export type CompanyAuthUser = {
   /** E.164, when the User signed in by mobile (ADR CM-0002). */
   phoneNumber: string | null;
   image: string | null;
+  /**
+   * An admin set their password; until they choose their own, pages send
+   * them to Change password and the API answers 403 (ADR CM-0029 §8).
+   */
+  mustChangePassword: boolean;
 };
 
 export type SignedInCompanyAuthState = {

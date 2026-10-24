@@ -75,6 +75,7 @@ export const storyUser: CompanyAuthUser = {
   emailVerified: true,
   phoneNumber: "+917708165767",
   image: null,
+  mustChangePassword: false,
 };
 
 function action<Args extends unknown[]>(name: string): Action<Args> {
