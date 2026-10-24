@@ -36,9 +36,11 @@ const meta = {
     authMocks.workspaceId = null;
     authMocks.companies = [];
   },
-  render: () => (
+  // Setup steps flash by, so the tests don't wait seven seconds.
+  args: { setupStepMs: 20 },
+  render: (args) => (
     <OnboardingSplitShell>
-      <CreateCompanyWizard />
+      <CreateCompanyWizard {...args} />
     </OnboardingSplitShell>
   ),
 } satisfies Meta<typeof CreateCompanyWizard>;
@@ -47,7 +49,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const CreatesACompany: Story = {
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const { spy, restore } = mockFetch(() =>
       Response.json(
         {
@@ -84,19 +86,25 @@ export const CreatesACompany: Story = {
       await userEvent.type(canvas.getByLabelText("GSTIN"), "33AAPFA0939F1ZM");
       await userEvent.click(canvas.getByRole("button", { name: "Save" }));
 
-      // The new Owner goes straight to Projects; no "is ready" screen.
+      // The setup loader plays, then the new Owner goes to Projects.
+      const body = within(canvasElement.ownerDocument.body);
+      await expect(await body.findByRole("status")).toHaveTextContent(
+        "Setting up your Company",
+      );
       await waitFor(() =>
         expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
+      );
+      await expect(body.getByRole("status")).toHaveTextContent(
+        "Getting your Projects ready",
       );
       await expect(
         canvas.getByRole("button", { name: "Saving…" }),
       ).toBeDisabled();
       const sent = spy.mock.calls[0]?.[1]?.body;
-      const body = JSON.parse(typeof sent === "string" ? sent : "{}") as Record<
-        string,
-        unknown
-      >;
-      await expect(body).toMatchObject({
+      const sentBody = JSON.parse(
+        typeof sent === "string" ? sent : "{}",
+      ) as Record<string, unknown>;
+      await expect(sentBody).toMatchObject({
         name: "Anugraha Engineers",
         mobile: "+917708165767",
         country: "IN",
@@ -134,7 +142,7 @@ export const OutsideIndiaHidesGstin: Story = {
 };
 
 export const ServerErrorReturnsToTheField: Story = {
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const { restore } = mockFetch(() =>
       Response.json(
         { code: "COMPANY_NAME_TOO_LONG", message: "Company name is too long." },
@@ -154,6 +162,11 @@ export const ServerErrorReturnsToTheField: Story = {
         await canvas.findByText("Company name is too long."),
       ).toBeVisible();
       await expect(canvas.getByText("Step 1 of 3")).toBeVisible();
+      // A failed save closes the setup loader, and the app does not open.
+      await expect(
+        within(canvasElement.ownerDocument.body).queryByRole("status"),
+      ).not.toBeInTheDocument();
+      await expect(authMocks.navigateInApp).not.toHaveBeenCalled();
     } finally {
       restore();
     }
