@@ -8,13 +8,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
-import { toMask, type Flag } from "@/src/shared-kernel/access";
+import type { Flag } from "@/src/shared-kernel/access";
 import { assertCanCreate } from "@/src/shared-kernel/backdated-policy";
 import {
   loadBackdatedActor,
   loadBackdatedPolicy,
 } from "@/src/shared-kernel/backdated-policy-reader";
 import { DomainError } from "@/src/shared-kernel/domain-error";
+import { roleWith } from "@/test/companies";
 
 import { GET as getPolicy } from "./route";
 import { POST as updatePolicy } from "./update/route";
@@ -89,7 +90,7 @@ async function newCompany() {
   };
 }
 
-/** An active Member holding `flags` on Settings. */
+/** An active Member holding `flags` on Settings, through their Role. */
 async function newMember(
   workspaceId: string,
   designationId: string,
@@ -97,6 +98,9 @@ async function newMember(
 ): Promise<string> {
   const userId = randomUUID();
   const memberId = randomUUID();
+  const roleId = await roleWith(workspaceId, "test", {
+    "organization.settings": flags,
+  });
   await prisma.constructionOrganizationTeamMember.create({
     data: {
       id: memberId,
@@ -104,22 +108,13 @@ async function newMember(
       userId,
       name: "Ravi",
       designationId,
+      roleId,
       mobile: `+9198${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       status: "active",
       createdBy: "test",
       updatedBy: "test",
     },
   });
-  if (flags.length > 0)
-    await prisma.constructionOrganizationMemberMenuPermission.create({
-      data: {
-        workspaceId,
-        memberId,
-        menu: "organization.settings",
-        flags: toMask(flags),
-        updatedBy: "test",
-      },
-    });
   return userId;
 }
 

@@ -5,6 +5,8 @@ import { prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
 import { createCompanyHandlers } from "./create-company-handlers";
+import { createRoleHandlers } from "./create-role-handlers";
+import { seedRoles } from "./role-seeds";
 
 async function newUser(): Promise<string> {
   const id = randomUUID();
@@ -57,6 +59,37 @@ describe("createCompany on Postgres (CM-104)", () => {
         where: { workspaceId: created.workspaceId, action: "company.created" },
       }),
     ).resolves.toBe(1);
+  });
+
+  it("gives the Company its own copy of the nine seed Roles (ADR CM-0029 §5)", async () => {
+    const userId = await newUser();
+    const { workspaceId } = await createCompanyHandlers().create.execute({
+      name: "Anugraha Engineers",
+      country: "IN",
+      userId,
+      userName: "Arun Selva Kumar",
+      userMobile: null,
+      userEmail: `${userId}@example.test`,
+    });
+    const stored = await createRoleHandlers().list(workspaceId);
+    const seeds = seedRoles({ workspaceId, by: userId, now: new Date() });
+    expect(stored).toHaveLength(9);
+    for (const seed of seeds)
+      expect(
+        stored.find((role) => role.name === seed.name),
+        seed.name,
+      ).toMatchObject({
+        isSeed: true,
+        description: seed.description,
+        permissions: seed.permissions.toGrants(),
+        userCount: 0,
+      });
+    // The Owner has no Role: they can do everything.
+    await expect(
+      prisma.constructionOrganizationTeamMember.findFirstOrThrow({
+        where: { workspaceId, isOwner: true },
+      }),
+    ).resolves.toMatchObject({ roleId: null });
   });
 
   it("lets one User own several Companies", async () => {

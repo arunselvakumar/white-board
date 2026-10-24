@@ -9,6 +9,7 @@ import { POST as createCompanyRoute } from "@/app/api/construction/organization/
 import { addMonths } from "@/src/organization/domain/subscription";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
 import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
+import { createRoleHandlers } from "@/src/organization/infrastructure/create-role-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag, PermissionGrants } from "@/src/shared-kernel/access";
 
@@ -38,12 +39,39 @@ export async function ownerWithCompany(name = "Anugraha Engineers") {
     if (found == null) throw new Error(`No Designation ${designationName}`);
     return found.id;
   };
-  return { ...owner, workspaceId, designationId };
+  const roles = await createRoleHandlers().list(workspaceId);
+  /** A seed Role's id (ADR CM-0029 §5). */
+  const roleId = (roleName: string) => {
+    const found = roles.find((item) => item.name === roleName);
+    if (found == null) throw new Error(`No Role ${roleName}`);
+    return found.id;
+  };
+  return { ...owner, workspaceId, designationId, roleId };
 }
 
 /**
- * A second User who joined the Company as an active `member` with exactly
- * `permissions`. Their session has the Company active.
+ * A Role of the Company with exactly these grants, named uniquely (ADR
+ * CM-0029): what "a member with these grants" is on.
+ */
+export async function roleWith(
+  workspaceId: string,
+  ownerId: string,
+  permissions: Readonly<Partial<Record<string, readonly Flag[]>>>,
+  name = `Access ${randomUUID().slice(0, 8)}`,
+): Promise<string> {
+  const role = await createRoleHandlers().create({
+    workspaceId,
+    by: ownerId,
+    name,
+    permissions,
+  });
+  return role.id;
+}
+
+/**
+ * A second User who joined the Company as an active `member` on a Role of
+ * their own with exactly `permissions`. Their session has the Company
+ * active.
  */
 export async function memberWith(
   company: {
@@ -63,7 +91,7 @@ export async function memberWith(
       designationId: company.designationId("Site Engineer"),
       email,
     },
-    permissions,
+    roleId: await roleWith(company.workspaceId, company.userId, permissions),
   });
   const session = await signInByEmail(email, "Member");
   await prisma.identityWorkspaceMember.create({
@@ -153,8 +181,8 @@ export async function newCompany(name = "Anugraha Engineers"): Promise<{
 }
 
 /**
- * An active Member of the Company with exactly these grants, as if they
- * had accepted their Join Request.
+ * An active Member of the Company on a Role of their own with exactly these
+ * grants, as if they had accepted their Join Request.
  */
 export async function addMember(
   workspaceId: string,
@@ -175,7 +203,7 @@ export async function addMember(
       mobile: `+9197${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       ...details,
     },
-    permissions,
+    roleId: await roleWith(workspaceId, ownerId, permissions),
   });
   const userId = randomUUID();
   await prisma.constructionOrganizationTeamMember.update({

@@ -32,27 +32,20 @@ describe("Designations on Postgres (CM-106)", () => {
     expect(mine).toHaveLength(38);
     const engineer = mine.find((item) => item.name === "Site Engineer");
     expect(engineer?.isSeed).toBe(true);
-    expect(engineer?.template?.["labour.attendance"]).toEqual([
-      "create",
-      "read",
-      "update",
-    ]);
+    expect(engineer).not.toHaveProperty("template");
 
     // Editing one Company's copy leaves the other's alone.
     await handlers.update({
       workspaceId: first.workspaceId,
       id: engineer?.id ?? "",
-      name: "Site Engineer",
-      template: null,
+      name: "Site Engineer (Civil)",
       by: first.userId,
     });
     const theirs = await handlers.list(second.workspaceId);
-    expect(
-      theirs.find((item) => item.name === "Site Engineer")?.template,
-    ).not.toBeNull();
+    expect(theirs.some((item) => item.name === "Site Engineer")).toBe(true);
   });
 
-  it("duplicates with the template and keeps names unique among live rows", async () => {
+  it("duplicates and keeps names unique among live rows", async () => {
     const { workspaceId, userId } = await newCompany();
     const admin = (await handlers.list(workspaceId)).find(
       (item) => item.name === "Admin",
@@ -63,7 +56,6 @@ describe("Designations on Postgres (CM-106)", () => {
       by: userId,
     });
     expect(copy).toMatchObject({ name: "Admin (copy)", isSeed: false });
-    expect(copy.template).toEqual(admin?.template);
 
     await expect(
       handlers.create({ workspaceId, name: "admin", by: userId }),

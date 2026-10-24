@@ -8,6 +8,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
 import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
+import { createRoleHandlers } from "@/src/organization/infrastructure/create-role-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { can } from "@/src/shared-kernel/access";
@@ -50,7 +51,14 @@ async function ownerCompany() {
   });
   const designations = await createDesignationHandlers().list(workspaceId);
   const engineer = designations.find((item) => item.name === "Site Engineer");
-  return { workspaceId, ownerId, engineerId: engineer?.id ?? "" };
+  const roles = await createRoleHandlers().list(workspaceId);
+  const engineerRole = roles.find((item) => item.name === "Site Engineer");
+  return {
+    workspaceId,
+    ownerId,
+    engineerId: engineer?.id ?? "",
+    engineerRoleId: engineerRole?.id ?? "",
+  };
 }
 
 type Requests = {
@@ -100,7 +108,8 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
   });
 
   it("invite → the invitee sees it, accepts, and works in the Company", async () => {
-    const { workspaceId, ownerId, engineerId } = await ownerCompany();
+    const { workspaceId, ownerId, engineerId, engineerRoleId } =
+      await ownerCompany();
     const email = newEmail();
     const invited = await members.invite({
       workspaceId,
@@ -113,6 +122,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
         email,
       },
       projectIds: ["project-a"],
+      roleId: engineerRoleId,
     });
 
     // The invitation went out by email with the join link; no SMS, even

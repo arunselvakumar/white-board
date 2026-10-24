@@ -21,17 +21,27 @@ export function newEmail(): string {
   return `user-${randomUUID().slice(0, 12)}@example.test`;
 }
 
-function postAuth(path: string, body: unknown): Promise<Response> {
+/** Calls a Better Auth route as a browser would, with an optional cookie. */
+export function postAuth(
+  path: string,
+  body: unknown,
+  cookie?: string,
+): Promise<Response> {
   return authPost(
     new Request(`${TEST_ORIGIN}/api/auth${path}`, {
       method: "POST",
-      headers: { "content-type": "application/json", origin: TEST_ORIGIN },
+      headers: {
+        "content-type": "application/json",
+        origin: TEST_ORIGIN,
+        ...(cookie == null ? {} : { cookie }),
+      },
       body: JSON.stringify(body),
     }),
   );
 }
 
-function sessionCookie(response: Response): string {
+/** The session cookie header a sign-in response set. */
+export function sessionCookie(response: Response): string {
   return response.headers
     .getSetCookie()
     .map((value) => value.split(";")[0])

@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MENUS, PermissionSet } from "@/src/shared-kernel/access";
-
-import { seedDesignations, seedTemplates } from "./designation-seeds";
+import { seedDesignations } from "./designation-seeds";
 
 describe("designation seed set (CM-106)", () => {
   const seeded = seedDesignations({
@@ -11,35 +9,9 @@ describe("designation seed set (CM-106)", () => {
     now: new Date("2026-10-08T00:00:00Z"),
   });
 
-  it("holds the 38 default names, eight with templates", () => {
+  it("holds the 38 default names, job titles only", () => {
     expect(seeded).toHaveLength(38);
     expect(new Set(seeded.map((item) => item.name)).size).toBe(38);
-    expect(
-      seeded.filter((item) => item.template != null).map((item) => item.name),
-    ).toEqual([
-      "Accountant",
-      "Admin",
-      "Project Manager",
-      // Inspection approve / reject and issue verify (ADR CM-0019).
-      "Quality Control",
-      "Site Engineer",
-      "Site Supervisor",
-      "Store Keeper",
-      "Structural Engineer",
-    ]);
     expect(seeded.every((item) => item.isSeed)).toBe(true);
-  });
-
-  it("grants only cells the menus support", () => {
-    for (const { name, grants } of seedTemplates()) {
-      const sanitized = PermissionSet.fromGrants(grants).toGrants();
-      expect(sanitized, name).toEqual(grants);
-    }
-  });
-
-  it("gives Admin every supported cell", () => {
-    const admin = seeded.find((item) => item.name === "Admin");
-    for (const menu of MENUS)
-      expect(admin?.template?.mask(menu.key)).toBe(menu.supported);
   });
 });

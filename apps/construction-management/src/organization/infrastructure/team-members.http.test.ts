@@ -8,6 +8,7 @@ import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reade
 
 import { createCompanyHandlers } from "./create-company-handlers";
 import { createDesignationHandlers } from "./create-designation-handlers";
+import { createRoleHandlers } from "./create-role-handlers";
 import { createTeamMemberHandlers } from "./create-team-member-handlers";
 
 async function newCompany() {
@@ -28,9 +29,12 @@ async function newCompany() {
     userEmail: null,
   });
   const designations = await createDesignationHandlers().list(workspaceId);
+  const roles = await createRoleHandlers().list(workspaceId);
   const byName = (name: string) =>
     designations.find((item) => item.name === name)?.id ?? "";
-  return { workspaceId, userId, byName };
+  const roleId = (name: string) =>
+    roles.find((item) => item.name === name)?.id ?? "";
+  return { workspaceId, userId, byName, roleId };
 }
 
 describe("Team Members on Postgres (CM-108)", () => {
@@ -50,8 +54,8 @@ describe("Team Members on Postgres (CM-108)", () => {
     ]);
   });
 
-  it("invites with the Designation's template and stores Aadhaar and PAN encrypted", async () => {
-    const { workspaceId, userId, byName } = await newCompany();
+  it("invites on a Role and stores Aadhaar and PAN encrypted", async () => {
+    const { workspaceId, userId, byName, roleId } = await newCompany();
     const invited = await handlers.invite({
       workspaceId,
       by: userId,
@@ -64,8 +68,11 @@ describe("Team Members on Postgres (CM-108)", () => {
         pan: "ABCPE1234F",
       },
       projectIds: ["project-a"],
+      roleId: roleId("Site Engineer"),
     });
     expect(invited).toMatchObject({
+      role: { id: roleId("Site Engineer"), name: "Site Engineer" },
+      passwordIgnored: null,
       status: "joining_pending",
       aadhaarMasked: "XXXXXXXX2346",
       panMasked: "XXXXXX234F",
@@ -97,8 +104,8 @@ describe("Team Members on Postgres (CM-108)", () => {
     ).resolves.toBe(1);
   });
 
-  it("gives an HRMS member the HRMS default set and no projects", async () => {
-    const { workspaceId, userId, byName } = await newCompany();
+  it("puts an HRMS member on HRMS Staff with no projects", async () => {
+    const { workspaceId, userId, byName, roleId } = await newCompany();
     const hrms = await handlers.invite({
       workspaceId,
       by: userId,
@@ -109,7 +116,7 @@ describe("Team Members on Postgres (CM-108)", () => {
         email: "anitha@p.in",
       },
       projectIds: ["project-a"],
-      permissions: { "finance.petty_cash": ["approve"] },
+      roleId: roleId("HRMS Staff"),
     });
     expect(hrms.projectIds).toEqual([]);
     expect(Object.keys(hrms.permissions).sort()).toEqual([
@@ -199,8 +206,8 @@ describe("Team Members on Postgres (CM-108)", () => {
     expect(found.items.map((item) => item.name)).toEqual(["Bhavesh"]);
   });
 
-  it("loads an active member's matrix and projects for can()", async () => {
-    const { workspaceId, userId, byName } = await newCompany();
+  it("loads an active member's Role matrix and projects for can()", async () => {
+    const { workspaceId, userId, byName, roleId } = await newCompany();
     const invited = await handlers.invite({
       workspaceId,
       by: userId,
@@ -211,6 +218,7 @@ describe("Team Members on Postgres (CM-108)", () => {
         email: "prabhu@sakthi.in",
       },
       projectIds: ["project-a"],
+      roleId: roleId("Site Engineer"),
     });
     const memberUser = randomUUID();
     await prisma.constructionOrganizationTeamMember.update({
@@ -222,6 +230,7 @@ describe("Team Members on Postgres (CM-108)", () => {
       userId: memberUser,
       role: "member",
     });
+    expect(access.roleId).toBe(roleId("Site Engineer"));
     expect(
       can(access, "site_work.daily_worksheet", "create", {
         projectId: "project-a",

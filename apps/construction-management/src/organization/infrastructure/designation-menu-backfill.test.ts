@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { menuByKey, type MenuKey } from "@/src/shared-kernel/access";
 import { maskFromLetters } from "@/src/shared-kernel/access/flags";
 
-import { seedDesignations } from "./designation-seeds";
+import { seedRoles } from "./role-seeds";
 
 const BACKFILL_MIGRATION = join(
   __dirname,
@@ -70,19 +70,19 @@ function migrationGrants(
 }
 
 describe("M5–M8 menu backfill migration", () => {
-  it("grants existing Companies' seeded Designations the same new cells as new ones", () => {
-    const seeded = seedDesignations({
+  // The templates this migration topped up moved to the seed Roles of the
+  // same names (ADR CM-0029); HRMS Staff never held these menus.
+  it("granted existing Companies' seeded Designations the same new cells as new ones", () => {
+    const seeded = seedRoles({
       workspaceId: "company-1",
       by: "user-1",
       now: new Date("2026-10-21T00:00:00Z"),
     });
     const fromSeeds: Record<string, Record<string, [number, string]>> = {};
-    for (const designation of seeded)
+    for (const role of seeded)
       for (const { menu, letters, since } of NEW_CELLS) {
-        const mask =
-          (designation.template?.mask(menu) ?? 0) & maskFromLetters(letters);
-        if (mask !== 0)
-          (fromSeeds[designation.name] ??= {})[menu] = [mask, since];
+        const mask = role.permissions.mask(menu) & maskFromLetters(letters);
+        if (mask !== 0) (fromSeeds[role.name] ??= {})[menu] = [mask, since];
       }
     expect(migrationGrants(readFileSync(BACKFILL_MIGRATION, "utf8"))).toEqual(
       fromSeeds,

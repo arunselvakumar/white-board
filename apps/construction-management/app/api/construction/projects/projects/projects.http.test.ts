@@ -516,6 +516,7 @@ describe("Projects HTTP (CM-204)", () => {
           email: `prabhu-${newId()}@example.test`,
           memberType: "normal",
           projectIds,
+          roleId: owner.roleId("Site Engineer"),
         }),
       );
     const refused = await add([foreign.id]);
