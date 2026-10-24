@@ -7,7 +7,7 @@ import {
 } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -25,6 +25,7 @@ import { AuthHeading } from "@/components/auth/auth-heading";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
+import { CompanySetupLoader } from "@/components/onboarding/company-setup-loader";
 import { fieldForCode } from "@/lib/server-errors";
 import { createCompany } from "@/src/queries/companies";
 import {
@@ -107,12 +108,23 @@ const CURRENCY_ITEMS = CURRENCIES.map((currency) => ({
   label: currency,
 }));
 
-/** The first-run wizard (CM-105): name → contact → country and tax → Projects. */
-export function CreateCompanyWizard() {
+/**
+ * The first-run wizard (CM-105): name → contact → country and tax → the
+ * setup loader → Projects.
+ */
+export function CreateCompanyWizard({
+  setupStepMs,
+}: {
+  /** How long each setup step shows; stories shorten it. */
+  setupStepMs?: number;
+}) {
   const { user } = useCompanyUser();
   const [step, setStep] = useState(0);
   // Set once the Company exists, so the button stays disabled while the page leaves.
   const [created, setCreated] = useState(false);
+  // The setup loader runs from Save until the app opens, or the save fails.
+  const [settingUp, setSettingUp] = useState(false);
+  const [setupPlayed, setSetupPlayed] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -132,6 +144,11 @@ export function CreateCompanyWizard() {
   const country = useWatch({ control: form.control, name: "country" });
   const isIndia = country === "IN";
 
+  // The app opens once the Company exists and every setup step has shown.
+  useEffect(() => {
+    if (created && setupPlayed) navigateInApp("/app/projects");
+  }, [created, setupPlayed]);
+
   const next = async () => {
     const current = STEPS[step];
     if (current == null) return;
@@ -139,6 +156,7 @@ export function CreateCompanyWizard() {
   };
 
   const submit = async (values: Values) => {
+    setSettingUp(true);
     try {
       await mutation.mutateAsync({
         name: values.name,
@@ -150,8 +168,9 @@ export function CreateCompanyWizard() {
         pan: isIndia && values.pan !== "" ? values.pan : null,
       });
       setCreated(true);
-      navigateInApp("/app/projects");
     } catch (error) {
+      setSettingUp(false);
+      setSetupPlayed(false);
       const { field, message } = fieldForCode(error, SERVER_FIELDS);
       if (field == null) {
         form.setError("root", { message });
@@ -170,7 +189,7 @@ export function CreateCompanyWizard() {
   const last = step === STEPS.length - 1;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" inert={settingUp}>
       <div className="space-y-3">
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.12em] uppercase">
           Step {step + 1} of {STEPS.length}
@@ -385,6 +404,14 @@ export function CreateCompanyWizard() {
           </Button>
         </div>
       </form>
+      {settingUp && (
+        <CompanySetupLoader
+          stepMs={setupStepMs}
+          onPlayed={() => {
+            setSetupPlayed(true);
+          }}
+        />
+      )}
     </div>
   );
 }
