@@ -53,14 +53,17 @@ const FOOTER_LINKS = [
  * Roles and Settings, the Active Company, the account menu. Inside a
  * Project the areas give way to the Project's own menu (ADR CM-0020).
  * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
- * the Dashboard is not in the menu.
+ * the Dashboard is not in the menu. `canOpenUsersRoles` is Team Members or
+ * Role Management Read (ADR CM-0029): without either, Users & Roles is not.
  */
 export function AppShell({
   children,
   canOpenDashboard = false,
+  canOpenUsersRoles = true,
 }: {
   children: ReactNode;
   canOpenDashboard?: boolean;
+  canOpenUsersRoles?: boolean;
 }) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
@@ -90,7 +93,11 @@ export function AppShell({
         </SidebarHeader>
         <SidebarContent>
           {projectId == null ? (
-            <MainMenu pathname={pathname} canOpenDashboard={canOpenDashboard} />
+            <MainMenu
+              pathname={pathname}
+              canOpenDashboard={canOpenDashboard}
+              canOpenUsersRoles={canOpenUsersRoles}
+            />
           ) : (
             <ProjectNavMenu
               projectId={projectId}
@@ -158,9 +165,11 @@ export function AppShell({
 function MainMenu({
   pathname,
   canOpenDashboard,
+  canOpenUsersRoles,
 }: {
   pathname: string;
   canOpenDashboard: boolean;
+  canOpenUsersRoles: boolean;
 }) {
   return (
     <SidebarGroup className="px-3 pt-4">
@@ -181,6 +190,7 @@ function MainMenu({
                     buttonClassName={NAV_BUTTON_CLASS}
                   />
                 );
+              if (item.href === "/app/users" && !canOpenUsersRoles) return null;
               if (item.href === "/app/users")
                 return (
                   <UsersRolesNavMenu

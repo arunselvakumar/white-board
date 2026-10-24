@@ -220,7 +220,9 @@ export const DeleteRefusedInUse: Story = {
 
 /** Read only: no Add Role, no Duplicate or Delete; Edit becomes View. */
 export const ReadOnlyViewer: Story = {
-  args: { actions: { create: false, update: false, delete: false } },
+  args: {
+    actions: { read: true, create: false, update: false, delete: false },
+  },
   beforeEach: serve(ROLES),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);

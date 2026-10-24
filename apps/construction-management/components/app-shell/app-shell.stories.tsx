@@ -11,11 +11,18 @@ import { USERS_ROLES_SECTIONS } from "@/lib/users-roles-nav";
 import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
-function shellAt(href: AppNavHref, canOpenDashboard = true) {
+function shellAt(
+  href: AppNavHref,
+  canOpenDashboard = true,
+  canOpenUsersRoles = true,
+) {
   return {
     parameters: { nextjs: { navigation: { pathname: href } } },
     render: () => (
-      <AppShell canOpenDashboard={canOpenDashboard}>
+      <AppShell
+        canOpenDashboard={canOpenDashboard}
+        canOpenUsersRoles={canOpenUsersRoles}
+      >
         <AppAreaPage href={href} />
       </AppShell>
     ),
@@ -116,6 +123,19 @@ export const WithoutDashboard: Story = {
     const nav = await mainMenu(context);
     await expect(nav.queryByRole("link", { name: "Dashboard" })).toBeNull();
     await expect(nav.getAllByRole("link")[0]).toHaveAccessibleName("Projects");
+  },
+};
+
+/**
+ * Without Team Members or Role Management Read (a Site Supervisor, say),
+ * Users & Roles is not in the main menu (ADR CM-0029).
+ */
+export const WithoutUsersRoles: Story = {
+  ...shellAt("/app/projects", true, false),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    await expect(nav.queryByRole("link", { name: "Users & Roles" })).toBeNull();
+    await expect(nav.getByRole("link", { name: "Settings" })).toBeVisible();
   },
 };
 

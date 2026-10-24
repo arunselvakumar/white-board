@@ -64,7 +64,12 @@ import { TeamMemberRowsSkeleton } from "./team-members-skeletons";
  * Users & Roles → Users (CM-111, ADR CM-0029): the Company's Team Members,
  * with search, status chips, their Role and row actions.
  */
-export function TeamMembersPage() {
+export function TeamMembersPage({
+  canAdd = true,
+}: {
+  /** Team Members Create; without it there is no Add User. */
+  canAdd?: boolean;
+}) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<TeamMemberListFilter["status"]>("all");
   const [cursor, setCursor] = useState<TeamMemberListFilter["cursor"]>(null);
@@ -79,10 +84,12 @@ export function TeamMembersPage() {
           title="Users"
           meta="Your team, how they sign in, and the Role that decides what each one may do."
           actions={
-            <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
-              <Plus />
-              Add User
-            </Link>
+            canAdd ? (
+              <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
+                <Plus />
+                Add User
+              </Link>
+            ) : undefined
           }
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

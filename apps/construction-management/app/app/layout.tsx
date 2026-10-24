@@ -26,8 +26,16 @@ export default async function AppLayout({
     "read",
   );
 
+  // Users & Roles needs Team Members or Role Management Read (ADR CM-0029).
+  const canOpenUsersRoles =
+    (await viewerCan("organization.team_members", "read")) ||
+    (await viewerCan("organization.roles", "read"));
+
   return (
-    <AppShell canOpenDashboard={canOpenDashboard}>
+    <AppShell
+      canOpenDashboard={canOpenDashboard}
+      canOpenUsersRoles={canOpenUsersRoles}
+    >
       <QuerySuspense>{children}</QuerySuspense>
     </AppShell>
   );
