@@ -1,6 +1,5 @@
 import { randomBytes } from "node:crypto";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 import {
   isValidAadhaar,
@@ -8,7 +7,8 @@ import {
   normalizeAadhaar,
 } from "@/src/shared-kernel/tax-ids";
 
-import type { MemberType } from "./starting-permissions";
+/** Normal Team Members work on Projects; HRMS ones only use HRMS (ADR CM-0002). */
+export type MemberType = "normal" | "hrms";
 
 /** `left`: the User deleted their account; the record stays (CM-907). */
 export type TeamMemberStatus =
@@ -122,7 +122,12 @@ export type TeamMemberProps = {
   isOwner: boolean;
   status: TeamMemberStatus;
   projectIds: readonly string[];
-  permissions: PermissionSet;
+  /**
+   * What they may do (ADR CM-0029): read through the Role on every
+   * request. Null for the Owner, who can do everything; a Member without a
+   * Role can do nothing.
+   */
+  roleId: string | null;
   inviteToken: string | null;
   invitedAt: Date | null;
   joinedAt: Date | null;
@@ -148,7 +153,7 @@ export class TeamMember {
     details: TeamMemberDetails;
     memberType: MemberType;
     projectIds?: readonly string[];
-    permissions: PermissionSet;
+    roleId: string | null;
     by: string;
     now: Date;
   }): TeamMember {
@@ -161,7 +166,7 @@ export class TeamMember {
       isOwner: false,
       status: "joining_pending",
       projectIds: [],
-      permissions: input.permissions,
+      roleId: input.roleId,
       inviteToken: newInviteToken(),
       invitedAt: input.now,
       joinedAt: null,
@@ -192,7 +197,7 @@ export class TeamMember {
       isOwner: true,
       status: "active",
       projectIds: [],
-      permissions: PermissionSet.everything(),
+      roleId: null,
       inviteToken: null,
       invitedAt: null,
       joinedAt: input.now,
@@ -232,8 +237,8 @@ export class TeamMember {
   get projectIds(): readonly string[] {
     return this.props.projectIds;
   }
-  get permissions(): PermissionSet {
-    return this.props.permissions;
+  get roleId(): string | null {
+    return this.props.roleId;
   }
   get inviteToken(): string | null {
     return this.props.inviteToken;
@@ -292,13 +297,8 @@ export class TeamMember {
     this.touch(by, now);
   }
 
-  /** Normal ↔ HRMS. HRMS members have no projects. */
-  changeType(
-    memberType: MemberType,
-    permissions: PermissionSet,
-    by: string,
-    now: Date,
-  ): void {
+  /** Normal ↔ HRMS. HRMS members have no projects; the Role stays. */
+  changeType(memberType: MemberType, by: string, now: Date): void {
     if (this.props.isOwner && memberType === "hrms")
       throw conflict(
         "OWNER_IS_NORMAL",
@@ -307,19 +307,19 @@ export class TeamMember {
     this.props = {
       ...this.props,
       memberType,
-      permissions,
       projectIds: memberType === "hrms" ? [] : this.props.projectIds,
     };
     this.touch(by, now);
   }
 
-  setPermissions(permissions: PermissionSet, by: string, now: Date): void {
+  /** Gives them another Role (ADR CM-0029). The Owner has none. */
+  setRole(roleId: string, by: string, now: Date): void {
     if (this.props.isOwner)
       throw conflict(
-        "OWNER_PERMISSIONS_FIXED",
-        "The Owner can do everything; their Permission Matrix cannot be changed.",
+        "OWNER_HAS_NO_ROLE",
+        "The Owner can do everything and has no Role.",
       );
-    this.props = { ...this.props, permissions };
+    this.props = { ...this.props, roleId };
     this.touch(by, now);
   }
 
@@ -355,6 +355,26 @@ export class TeamMember {
     };
   }
 
+  /**
+   * The admin set a first password and the sign-in account was made for
+   * them (ADR CM-0029 §6): Active at once, with no Join Request.
+   */
+  linkAccount(userId: string, by: string, now: Date): void {
+    if (this.props.status === "active" || this.props.userId != null)
+      throw conflict(
+        "MEMBER_ALREADY_JOINED",
+        "This Team Member has already joined.",
+      );
+    this.props = {
+      ...this.props,
+      userId,
+      status: "active",
+      joinedAt: now,
+      inviteToken: null,
+    };
+    this.touch(by, now);
+  }
+
   /** The invitee declined (CM-109). */
   reject(by: string, now: Date): void {
     if (this.props.status !== "joining_pending")
@@ -385,8 +405,8 @@ export class TeamMember {
   /**
    * Transfer ownership (CM-907): this joined, active, Normal Team Member
    * becomes the Owner, with the Owner Designation (kept when the Company
-   * has none) and every right. The Owner is on every Project, so the
-   * assignments go.
+   * has none) and every right, so no Role. The Owner is on every Project,
+   * so the assignments go.
    */
   becomeOwner(ownerDesignationId: string | null, by: string, now: Date): void {
     if (this.props.isOwner)
@@ -408,7 +428,7 @@ export class TeamMember {
     this.props = {
       ...this.props,
       isOwner: true,
-      permissions: PermissionSet.everything(),
+      roleId: null,
       projectIds: [],
       details: {
         ...this.props.details,
@@ -420,11 +440,11 @@ export class TeamMember {
 
   /**
    * The Owner after handing the Company over (CM-907): a member with the
-   * Admin Designation (kept when the Company has none) and its matrix.
+   * Admin Designation (kept when the Company has none) and `roleId`.
    */
   stepDownAsOwner(
     designationId: string | null,
-    permissions: PermissionSet,
+    roleId: string,
     by: string,
     now: Date,
   ): void {
@@ -433,7 +453,7 @@ export class TeamMember {
     this.props = {
       ...this.props,
       isOwner: false,
-      permissions,
+      roleId,
       details: {
         ...this.props.details,
         designationId: designationId ?? this.props.details.designationId,

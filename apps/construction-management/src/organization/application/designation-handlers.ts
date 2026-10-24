@@ -1,4 +1,3 @@
-import { PermissionSet, type Flag } from "@/src/shared-kernel/access";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
@@ -8,13 +7,6 @@ import {
   toDesignationReadModel,
   type DesignationReadModel,
 } from "./designation-read-model";
-
-type Template =
-  Readonly<Partial<Record<string, readonly Flag[]>>> | null | undefined;
-
-function templateOf(template: Template): PermissionSet | null {
-  return template == null ? null : PermissionSet.fromGrants(template);
-}
 
 /** Whether any live Team Member of the Company holds the Designation. */
 export type DesignationInUse = (
@@ -54,7 +46,6 @@ export class DesignationHandlers {
   async create(input: {
     workspaceId: string;
     name: string;
-    template?: Template;
     by: string;
   }): Promise<DesignationReadModel> {
     const now = this.clock();
@@ -62,7 +53,6 @@ export class DesignationHandlers {
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       name: input.name,
-      template: templateOf(input.template),
       by: input.by,
       now,
     });
@@ -74,13 +64,11 @@ export class DesignationHandlers {
     workspaceId: string;
     id: string;
     name: string;
-    template: Template;
     by: string;
   }): Promise<DesignationReadModel> {
     const now = this.clock();
     const designation = await this.load(input.workspaceId, input.id);
     designation.rename(input.name, input.by, now);
-    designation.setTemplate(templateOf(input.template), input.by, now);
     await this.designations.save(designation);
     return toDesignationReadModel(designation);
   }

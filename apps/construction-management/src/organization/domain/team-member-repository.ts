@@ -19,7 +19,7 @@ export type TeamMemberListPage = {
 };
 
 export type TeamMemberRepository = {
-  /** Writes the member, its projects, its matrix and the audit event atomically. */
+  /** Writes the member, its projects and the audit event atomically. */
   save(member: TeamMember, audit?: AuditEvent): Promise<void>;
   /** Several `save`s in one transaction (a Project's Resources, CM-406). */
   saveMany(

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createDesignationHandlers();
 
-/** Renames a Designation and replaces its Permission Template (CM-112). */
+/** Renames a Designation (CM-112). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -37,7 +37,6 @@ export async function POST(
       workspaceId: session.workspaceId,
       id,
       name: model.name,
-      template: model.template,
       by: session.userId,
     });
     return Response.json(toDesignationResponse(updated));

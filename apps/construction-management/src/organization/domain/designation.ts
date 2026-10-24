@@ -1,5 +1,4 @@
 import { DomainError } from "@/src/shared-kernel/domain-error";
-import type { PermissionSet } from "@/src/shared-kernel/access";
 
 export const DESIGNATION_NAME_MAX = 80;
 
@@ -24,8 +23,6 @@ export type DesignationProps = {
   name: string;
   /** Copied from the seed set when the Company was created. */
   isSeed: boolean;
-  /** The Permission Template a new Team Member with this Designation starts from. */
-  template: PermissionSet | null;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
@@ -34,9 +31,9 @@ export type DesignationProps = {
 };
 
 /**
- * A job title in a Company, optionally carrying a Permission Template
- * (`modules/01` Designations, CM-106). Every Company holds its own copy of
- * the seed set and may edit it.
+ * A job title in a Company (`modules/01` Designations, CM-106). It carries
+ * no access: that is the Team Member's Role (ADR CM-0029). Every Company
+ * holds its own copy of the seed set and may edit it.
  */
 export class Designation {
   private constructor(private props: DesignationProps) {}
@@ -45,7 +42,6 @@ export class Designation {
     id: string;
     workspaceId: string;
     name: string;
-    template: PermissionSet | null;
     isSeed?: boolean;
     by: string;
     now: Date;
@@ -55,10 +51,6 @@ export class Designation {
       workspaceId: input.workspaceId,
       name: cleanName(input.name),
       isSeed: input.isSeed ?? false,
-      template:
-        input.template != null && input.template.size > 0
-          ? input.template
-          : null,
       createdAt: input.now,
       updatedAt: input.now,
       createdBy: input.by,
@@ -82,9 +74,6 @@ export class Designation {
   }
   get isSeed(): boolean {
     return this.props.isSeed;
-  }
-  get template(): PermissionSet | null {
-    return this.props.template;
   }
   get createdAt(): Date {
     return this.props.createdAt;
@@ -111,17 +100,7 @@ export class Designation {
     };
   }
 
-  /** Replaces the template; an empty matrix removes it. */
-  setTemplate(template: PermissionSet | null, by: string, now: Date): void {
-    this.props = {
-      ...this.props,
-      template: template != null && template.size > 0 ? template : null,
-      updatedAt: now,
-      updatedBy: by,
-    };
-  }
-
-  /** A Company-made copy with the same template (`Designation/Duplicate`). */
+  /** A Company-made copy (`Designation/Duplicate`). */
   duplicate(input: {
     id: string;
     name?: string;
@@ -132,7 +111,6 @@ export class Designation {
       id: input.id,
       workspaceId: this.props.workspaceId,
       name: input.name ?? `${this.props.name} (copy)`,
-      template: this.props.template,
       by: input.by,
       now: input.now,
     });

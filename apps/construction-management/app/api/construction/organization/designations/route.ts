@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a Designation, optionally with a Permission Template (CM-112). */
+/** Adds a Designation (CM-112): a job title, no access (ADR CM-0029). */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -53,7 +53,6 @@ export async function POST(request: Request): Promise<Response> {
     const created = await handlers.create({
       workspaceId: session.workspaceId,
       name: model.name,
-      template: model.template,
       by: session.userId,
     });
     return Response.json(toDesignationResponse(created), {

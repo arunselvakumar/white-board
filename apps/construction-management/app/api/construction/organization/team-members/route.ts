@@ -13,7 +13,10 @@ import { CreateConstructionOrganizationTeamMemberRequestModel } from "./create-t
 import { teamMemberHandlers as handlers, projectDirectory } from "./handlers";
 import { ListConstructionOrganizationTeamMembersRequestModel } from "./list-team-members-request-model";
 import type { ListConstructionOrganizationTeamMembersResponseModel } from "./list-team-members-response-model";
-import { toTeamMemberResponse } from "./team-member-models";
+import {
+  toTeamMemberResponse,
+  toTeamMemberWithPasswordResponse,
+} from "./team-member-models";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +61,10 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Add Team Member: Joining Pending with an invite (CM-110). */
+/**
+ * Add User (CM-110, ADR CM-0029 §6): invited, given a password (Active at
+ * once), or a record only.
+ */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -72,7 +78,8 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
-    const { memberType, projectIds, permissions, ...details } = model;
+    const { memberType, projectIds, roleId, invite, password, ...details } =
+      model;
     if (memberType === "normal")
       await assertKnownProjects(
         projectDirectory,
@@ -86,9 +93,11 @@ export async function POST(request: Request): Promise<Response> {
       memberType,
       details,
       projectIds,
-      permissions,
+      roleId,
+      invite,
+      password,
     });
-    return Response.json(toTeamMemberResponse(member), {
+    return Response.json(toTeamMemberWithPasswordResponse(member), {
       status: StatusCodes.CREATED,
     });
   } catch (error) {

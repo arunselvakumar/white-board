@@ -12,6 +12,11 @@ export type MemberAccess = {
   userId: string;
   role: "owner" | "member";
   permissions: PermissionSet;
+  /**
+   * The Role the permissions come from (ADR CM-0029); null for the Owner
+   * and a member without one. Absent where a caller builds access by hand.
+   */
+  roleId?: string | null;
   /** Projects the Team Member is assigned to (`modules/03`). */
   projectIds: ReadonlySet<string>;
 };

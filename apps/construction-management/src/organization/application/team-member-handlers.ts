@@ -1,8 +1,4 @@
-import {
-  PermissionSet,
-  type Flag,
-  type MemberAccess,
-} from "@/src/shared-kernel/access";
+import type { MemberAccess } from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import {
   DomainError,
@@ -13,16 +9,24 @@ import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { DesignationRepository } from "../domain/designation-repository";
-import { applyTemplate, type MemberType } from "../domain/starting-permissions";
-import { TeamMember, teamMemberDetails } from "../domain/team-member";
+import type { Role } from "../domain/role";
+import type { RoleRepository } from "../domain/role-repository";
+import {
+  TeamMember,
+  teamMemberDetails,
+  type MemberType,
+} from "../domain/team-member";
 import type {
   TeamMemberListParams,
   TeamMemberRepository,
 } from "../domain/team-member-repository";
-import { assertCanGrant } from "./grant-rules";
+import type { CompanyMemberships } from "./company-memberships";
+import { assertCanGrant, assertNotOwnRole } from "./grant-rules";
 import type { PlanGate } from "./plan-gate";
+import type { SignInAccounts } from "./sign-in-accounts";
 import {
   toTeamMemberReadModel,
+  type TeamMemberLookups,
   type TeamMemberReadModel,
 } from "./team-member-read-model";
 
@@ -37,7 +41,28 @@ export type TeamMemberDetailsInput = {
   emergencyContact?: string | null;
 };
 
-type Grants = Readonly<Partial<Record<string, readonly Flag[]>>>;
+/** A first password is 8–128 characters, as Better Auth's own rule. */
+export const PASSWORD_MIN = 8;
+export const PASSWORD_MAX = 128;
+
+/**
+ * Why a password the admin typed was not used: someone already signs in
+ * with that mobile or email, so they get a Join Request instead (ADR
+ * CM-0029 §3).
+ */
+export type PasswordIgnored = "existing_account" | null;
+
+export type TeamMemberWithPassword = TeamMemberReadModel & {
+  passwordIgnored: PasswordIgnored;
+};
+
+function assertPassword(password: string): void {
+  if (password.length < PASSWORD_MIN || password.length > PASSWORD_MAX)
+    throw new DomainError(
+      "PASSWORD_INVALID",
+      `The password must be ${String(PASSWORD_MIN)} to ${String(PASSWORD_MAX)} characters.`,
+    );
+}
 
 /** One line of a Project's Resources (CM-406). */
 export type ProjectTeamMemberReadModel = {
@@ -60,18 +85,23 @@ export type TeamMemberInvited = {
 };
 
 /**
- * Team Member commands and queries (CM-108). Routes check the Permission
- * Matrix (`organization.team_members`) before calling these.
+ * Team Member commands and queries (CM-108); screens call them Users (ADR
+ * CM-0029). Routes check the Permission Matrix (`organization.team_members`)
+ * before calling these.
  */
 export class TeamMemberHandlers {
   constructor(
     private readonly members: TeamMemberRepository,
     private readonly designations: DesignationRepository,
+    private readonly roles: RoleRepository,
     private readonly plan: PlanGate,
     private readonly events: EventDispatcher,
     private readonly clock: () => Date = () => new Date(),
-    /** Whether a mobile is a way to sign in (SMS on, ADR CM-0009). */
+    /** Whether a mobile is a way to sign in by code (SMS on, ADR CM-0009). */
     private readonly mobileSignIn: () => boolean = () => true,
+    /** Without them, setting a password is refused (unit tests). */
+    private readonly accounts?: SignInAccounts,
+    private readonly memberships?: CompanyMemberships,
   ) {}
 
   private async load(workspaceId: string, id: string): Promise<TeamMember> {
@@ -94,13 +124,44 @@ export class TeamMemberHandlers {
     return designation;
   }
 
+  private async role(workspaceId: string, id: string): Promise<Role> {
+    const role = await this.roles.findById(workspaceId, id);
+    if (role == null)
+      throw new DomainError("ROLE_NOT_FOUND", "Choose a Role from the list.");
+    return role;
+  }
+
   private async names(workspaceId: string): Promise<Map<string, string>> {
     const all = await this.designations.listAll(workspaceId);
     return new Map(all.map((item) => [item.id, item.name]));
   }
 
+  private async lookups(
+    workspaceId: string,
+    members: readonly TeamMember[],
+  ): Promise<TeamMemberLookups> {
+    const userIds = members.flatMap((member) =>
+      member.userId == null || member.isOwner ? [] : [member.userId],
+    );
+    const [designationNames, roles, usersInOtherCompanies] = await Promise.all([
+      this.names(workspaceId),
+      this.roles.listAll(workspaceId),
+      userIds.length === 0 || this.accounts == null
+        ? new Set<string>()
+        : this.accounts.inOtherCompanies(workspaceId, userIds),
+    ]);
+    return {
+      designationNames,
+      roles: new Map(roles.map((role) => [role.id, role])),
+      usersInOtherCompanies,
+    };
+  }
+
   private async view(member: TeamMember): Promise<TeamMemberReadModel> {
-    return toTeamMemberReadModel(member, await this.names(member.workspaceId));
+    return toTeamMemberReadModel(
+      member,
+      await this.lookups(member.workspaceId, [member]),
+    );
   }
 
   private audit(
@@ -122,7 +183,7 @@ export class TeamMemberHandlers {
         memberType: member.memberType,
         status: member.status,
         projectIds: member.projectIds,
-        permissions: member.permissions.toGrants(),
+        roleId: member.roleId,
       },
     };
   }
@@ -142,12 +203,10 @@ export class TeamMemberHandlers {
     total: number;
     hasMore: boolean;
   }> {
-    const [page, names] = await Promise.all([
-      this.members.list(params),
-      this.names(params.workspaceId),
-    ]);
+    const page = await this.members.list(params);
+    const lookups = await this.lookups(params.workspaceId, page.items);
     return {
-      items: page.items.map((member) => toTeamMemberReadModel(member, names)),
+      items: page.items.map((member) => toTeamMemberReadModel(member, lookups)),
       total: page.total,
       hasMore: page.hasMore,
     };
@@ -157,58 +216,156 @@ export class TeamMemberHandlers {
     return this.view(await this.load(workspaceId, id));
   }
 
-  /** Add Team Member: Joining Pending with an invite link (wizard steps 1–3). */
+  /**
+   * Whether an invitation can reach them: an email, or a mobile while SMS
+   * is on (ADR CM-0009).
+   */
+  private reachable(member: TeamMember): boolean {
+    return (
+      member.details.email != null ||
+      (member.details.mobile != null && this.mobileSignIn())
+    );
+  }
+
+  /**
+   * Add User (ADR CM-0029 §6). Joining Pending with an invite link; then
+   * one of three outcomes:
+   *
+   * - `password`: the sign-in account is made and the member is Active at
+   *   once, to change it at first sign-in — unless a User already has that
+   *   mobile or email: the password is ignored (`passwordIgnored:
+   *   "existing_account"`) and they get an ordinary Join Request, invited
+   *   when there is an email.
+   * - `invite` true: the invitation goes out; 400 `MEMBER_EMAIL_REQUIRED`
+   *   when nothing can carry it (an email, or a mobile while SMS is on).
+   * - `invite` false: a record only, to invite later.
+   *
+   * Omitting `invite` invites when an invitation can reach them (seeds,
+   * tests). The grantor must hold every cell of the Role (403
+   * `CANNOT_GRANT`); without a Role the member can do nothing.
+   */
   async invite(input: {
     workspaceId: string;
     by: string;
-    /** Who is granting the matrix; the Owner when omitted (tests, seeds). */
+    /** Who is giving the Role; the Owner when omitted (tests, seeds). */
     grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
     memberType: MemberType;
     projectIds?: readonly string[];
-    /** The matrix from step 3; the Designation's template when omitted. */
-    permissions?: Grants;
-  }): Promise<TeamMemberReadModel> {
+    roleId?: string | null;
+    invite?: boolean;
+    password?: string | null;
+  }): Promise<TeamMemberWithPassword> {
     const now = this.clock();
     const details = teamMemberDetails(input.details);
-    const designation = await this.designation(
-      input.workspaceId,
-      details.designationId,
-    );
+    await this.designation(input.workspaceId, details.designationId);
+    const role =
+      input.roleId == null
+        ? null
+        : await this.role(input.workspaceId, input.roleId);
+    const password = input.password ?? null;
+    if (password != null) {
+      assertPassword(password);
+      this.passwordAccounts();
+    }
     await this.plan.assertCanAdd(
       input.workspaceId,
       input.memberType === "hrms" ? "hrms_member" : "team_member",
     );
-    const permissions =
-      input.memberType === "hrms" || input.permissions == null
-        ? applyTemplate(designation, input.memberType)
-        : PermissionSet.fromGrants(input.permissions);
-    if (input.grantor != null)
-      assertCanGrant(input.grantor, permissions, { userId: null });
+    if (input.grantor != null && role != null)
+      assertCanGrant(input.grantor, role.permissions);
     const member = TeamMember.invite({
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details,
       memberType: input.memberType,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
-      permissions,
+      roleId: role?.id ?? null,
       by: input.by,
       now,
     });
+    if (password == null && input.invite === true && !this.reachable(member))
+      throw new DomainError(
+        "MEMBER_EMAIL_REQUIRED",
+        "Enter an email to invite them, or set a password for them.",
+      );
     await this.members.save(
       member,
       this.audit(member, input.by, "team_member.invited"),
     );
-    await this.invited(member);
-    return this.view(member);
+    if (password != null) return this.giveAccount(member, password, input.by);
+    if (input.invite ?? this.reachable(member)) await this.invited(member);
+    return { ...(await this.view(member)), passwordIgnored: null };
   }
 
-  /** Edit details; changing Member Type restarts the matrix from its default. */
+  private passwordAccounts(): {
+    accounts: SignInAccounts;
+    memberships: CompanyMemberships;
+  } {
+    if (this.accounts == null || this.memberships == null)
+      throw new Error("Setting a password needs the sign-in accounts.");
+    return { accounts: this.accounts, memberships: this.memberships };
+  }
+
+  /**
+   * A member without a User gets one with `password` (ADR CM-0029 §3, §6):
+   * made, added to the Company and linked, so they are Active. When a User
+   * already has their mobile or email, the password is ignored and the
+   * member stays (or is again) a Join Request, invited when there is an
+   * email.
+   */
+  private async giveAccount(
+    member: TeamMember,
+    password: string,
+    by: string,
+  ): Promise<TeamMemberWithPassword> {
+    const { accounts, memberships } = this.passwordAccounts();
+    const { details } = member;
+    const account = await accounts.createPasswordAccount({
+      name: details.name,
+      email: details.email,
+      phoneNumber: details.mobile,
+      password,
+    });
+    if (!account.created) {
+      if (member.status !== "joining_pending") {
+        member.resendInvite(by, this.clock());
+        await this.members.save(
+          member,
+          this.audit(member, by, "team_member.invite_resent"),
+        );
+      }
+      if (details.email != null) await this.invited(member);
+      return {
+        ...(await this.view(member)),
+        passwordIgnored: "existing_account",
+      };
+    }
+    await memberships.addMember({
+      workspaceId: member.workspaceId,
+      userId: account.userId,
+    });
+    member.linkAccount(account.userId, by, this.clock());
+    try {
+      await this.members.save(
+        member,
+        this.audit(member, by, "team_member.account_created"),
+      );
+    } catch (error) {
+      await memberships.removeMember({
+        workspaceId: member.workspaceId,
+        userId: account.userId,
+      });
+      throw error;
+    }
+    return { ...(await this.view(member)), passwordIgnored: null };
+  }
+
+  /** Edit details and Member Type; the Role stays (ADR CM-0029). */
   async update(input: {
     workspaceId: string;
     id: string;
     by: string;
-    grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
     memberType: MemberType;
   }): Promise<TeamMemberReadModel> {
@@ -228,10 +385,7 @@ export class TeamMemberHandlers {
           ? member.details.pan
           : input.details.pan,
     });
-    const designation = await this.designation(
-      input.workspaceId,
-      details.designationId,
-    );
+    await this.designation(input.workspaceId, details.designationId);
     member.updateDetails(details, input.by, now, {
       mobileIsSignIn: this.mobileSignIn(),
     });
@@ -239,10 +393,7 @@ export class TeamMemberHandlers {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");
       else await this.plan.assertCanAdd(input.workspaceId, "team_member");
-      const restarted = applyTemplate(designation, input.memberType);
-      if (input.grantor != null)
-        assertCanGrant(input.grantor, restarted, member);
-      member.changeType(input.memberType, restarted, input.by, now);
+      member.changeType(input.memberType, input.by, now);
     }
     await this.members.save(
       member,
@@ -251,26 +402,70 @@ export class TeamMemberHandlers {
     return this.view(member);
   }
 
-  async setPermissions(input: {
+  /**
+   * Gives the member another Role (ADR CM-0029). 409 `OWNER_HAS_NO_ROLE`
+   * for the Owner; 403 `OWN_ROLE` for the grantor's own record and
+   * `CANNOT_GRANT` for a cell of the Role the grantor lacks.
+   */
+  async setRole(input: {
     workspaceId: string;
     id: string;
     by: string;
     grantor?: MemberAccess;
-    permissions: Grants;
+    roleId: string;
   }): Promise<TeamMemberReadModel> {
     const member = await this.load(input.workspaceId, input.id);
-    const before = member.permissions.toGrants();
-    const permissions = PermissionSet.fromGrants(input.permissions);
-    if (input.grantor != null)
-      assertCanGrant(input.grantor, permissions, member);
-    member.setPermissions(permissions, input.by, this.clock());
+    const role = await this.role(input.workspaceId, input.roleId);
+    if (input.grantor != null && !member.isOwner) {
+      assertNotOwnRole(input.grantor, { userId: member.userId });
+      assertCanGrant(input.grantor, role.permissions);
+    }
+    const before = { roleId: member.roleId };
+    member.setRole(role.id, input.by, this.clock());
     await this.members.save(
       member,
-      this.audit(member, input.by, "team_member.permissions_changed", {
-        permissions: before,
-      }),
+      this.audit(member, input.by, "team_member.role_changed", before),
     );
     return this.view(member);
+  }
+
+  /**
+   * Set a new password (ADR CM-0029 §7). Without a User yet, as Add User
+   * with a password. With one: only when that User belongs to no other
+   * Company (409 `USER_IN_OTHER_COMPANY`), never the Owner's (409
+   * `OWNER_PASSWORD`); they must change it at their next sign-in and every
+   * session of theirs ends.
+   */
+  async setPassword(input: {
+    workspaceId: string;
+    id: string;
+    by: string;
+    password: string;
+  }): Promise<TeamMemberWithPassword> {
+    const member = await this.load(input.workspaceId, input.id);
+    if (member.isOwner)
+      throw conflict("OWNER_PASSWORD", "The Owner changes their own password.");
+    assertPassword(input.password);
+    const { accounts } = this.passwordAccounts();
+    if (member.userId == null)
+      return this.giveAccount(member, input.password, input.by);
+    const others = await accounts.inOtherCompanies(input.workspaceId, [
+      member.userId,
+    ]);
+    if (others.has(member.userId))
+      throw conflict(
+        "USER_IN_OTHER_COMPANY",
+        "This User also works with another Company, so only they can change their password.",
+      );
+    await accounts.setTemporaryPassword(member.userId, input.password);
+    await this.members.save(member, {
+      workspaceId: member.workspaceId,
+      actorUserId: input.by,
+      action: "team_member.password_set",
+      entityType: "team_member",
+      entityId: member.id,
+    });
+    return { ...(await this.view(member)), passwordIgnored: null };
   }
 
   async assignProjects(input: {

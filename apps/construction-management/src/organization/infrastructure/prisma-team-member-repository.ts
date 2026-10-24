@@ -1,6 +1,5 @@
 import type { Prisma, PrismaClient } from "@repo/construction-db";
 
-import { PermissionSet } from "@/src/shared-kernel/access";
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
@@ -14,7 +13,6 @@ import type {
 } from "../domain/team-member-repository";
 
 const INCLUDE = {
-  permissions: true,
   projects: true,
 } satisfies Prisma.ConstructionOrganizationTeamMemberInclude;
 
@@ -52,8 +50,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
   ) {}
 
   private toDomain(row: Row): TeamMember {
-    const masks: Record<string, number> = {};
-    for (const grant of row.permissions) masks[grant.menu] = grant.flags;
     return TeamMember.reconstitute({
       id: row.id,
       workspaceId: row.workspaceId,
@@ -78,9 +74,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       isOwner: row.isOwner,
       status: row.status,
       projectIds: row.projects.map((project) => project.projectId).sort(),
-      permissions: row.isOwner
-        ? PermissionSet.everything()
-        : PermissionSet.fromMasks(masks),
+      roleId: row.isOwner ? null : row.roleId,
       inviteToken: row.inviteToken,
       invitedAt: row.invitedAt,
       joinedAt: row.joinedAt,
@@ -100,6 +94,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       userId: member.userId,
       name: details.name,
       designationId: details.designationId,
+      roleId: member.roleId,
       mobile: details.mobile,
       email: details.email,
       address: details.address,
@@ -122,7 +117,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
     };
   }
 
-  /** Writes the member, its projects and its matrix inside `tx`. */
+  /** Writes the member and its projects inside `tx`. */
   async write(tx: Prisma.TransactionClient, member: TeamMember): Promise<void> {
     const data = this.columns(member);
     try {
@@ -149,25 +144,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
           projectId,
         })),
       });
-    await tx.constructionOrganizationMemberMenuPermission.deleteMany({
-      where: { memberId: member.id },
-    });
-    // The Owner's rights are implied, never stored (ADR CM-0003).
-    if (!member.isOwner) {
-      const masks = member.permissions.toMasks();
-      const rows = Object.entries(masks).map(([menu, flags]) => ({
-        workspaceId: member.workspaceId,
-        memberId: member.id,
-        menu,
-        flags,
-        updatedAt: member.updatedAt,
-        updatedBy: member.updatedBy,
-      }));
-      if (rows.length > 0)
-        await tx.constructionOrganizationMemberMenuPermission.createMany({
-          data: rows,
-        });
-    }
   }
 
   async save(member: TeamMember, audit?: AuditEvent): Promise<void> {
