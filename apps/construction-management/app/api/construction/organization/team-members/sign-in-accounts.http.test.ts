@@ -341,6 +341,39 @@ describe("Set a new password (ADR CM-0029 §7)", () => {
     expect(signedIn.status).toBe(StatusCodes.OK);
   });
 
+  it("lets a Member set a password only for someone whose access they hold", async () => {
+    const owner = await ownerWithCompany();
+    const manager = await memberWith(owner, {
+      "organization.team_members": ["read", "update"],
+    });
+    const stronger = await memberWith(owner, {
+      "finance.petty_cash": ["approve"],
+    });
+    const refused = await setPasswordOf(
+      manager.cookie,
+      stronger.memberId,
+      FIRST_PASSWORD,
+    );
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await json(refused)).toMatchObject({ code: "CANNOT_GRANT" });
+
+    const own = await setPasswordOf(
+      manager.cookie,
+      manager.memberId,
+      FIRST_PASSWORD,
+    );
+    expect(own.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await json(own)).toMatchObject({ code: "OWN_ROLE" });
+
+    const weaker = await memberWith(owner, {});
+    const allowed = await setPasswordOf(
+      manager.cookie,
+      weaker.memberId,
+      FIRST_PASSWORD,
+    );
+    expect(allowed.status).toBe(StatusCodes.OK);
+  });
+
   it("refuses a User another Company relies on, and the Owner", async () => {
     const owner = await ownerWithCompany();
     const other = await ownerWithCompany("Sri Infra");

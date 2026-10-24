@@ -56,7 +56,7 @@ Mobile or email is still required, but neither is required on its own. A User cr
 ### 7. Sign in with mobile and password, whatever the SMS switch
 
 - The sign-in screen gets **Email** and **Mobile** tabs. Mobile signs in with mobile number and password through Better Auth's `POST /api/auth/sign-in/phone-number` (`requireVerification: true`, so only a verified mobile works). That endpoint is reachable whether SMS is on or off. While SMS is on, the Mobile tab still offers the OTP code as today.
-- A mobile-only User who forgets their password asks the admin. **Set a new password** on Edit User is allowed only when that User belongs to no other Company, so one Company's admin can never reset an account another Company relies on. It also makes them change it on their next sign-in.
+- A mobile-only User who forgets their password asks the admin. **Set a new password** on Edit User is allowed only when that User belongs to no other Company, so one Company's admin can never reset an account another Company relies on. Whoever sets a password can then sign in as that person, so a Member may set one only for someone whose Role they fully hold (`CANNOT_GRANT`), and never for themselves (`OWN_ROLE`). It also makes them change it on their next sign-in.
 
 ### 8. First sign-in forces a new password
 

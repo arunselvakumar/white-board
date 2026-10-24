@@ -440,11 +440,24 @@ export class TeamMemberHandlers {
     workspaceId: string;
     id: string;
     by: string;
+    /** Who is setting it; the Owner when omitted (tests, seeds). */
+    grantor?: MemberAccess;
     password: string;
   }): Promise<TeamMemberWithPassword> {
     const member = await this.load(input.workspaceId, input.id);
     if (member.isOwner)
       throw conflict("OWNER_PASSWORD", "The Owner changes their own password.");
+    if (input.grantor != null) {
+      // Whoever sets a password can sign in as that person, so they must
+      // already hold everything that person can do, and it is never their
+      // own (they use Change password).
+      assertNotOwnRole(input.grantor, { userId: member.userId });
+      if (member.roleId != null)
+        assertCanGrant(
+          input.grantor,
+          (await this.role(input.workspaceId, member.roleId)).permissions,
+        );
+    }
     assertPassword(input.password);
     const { accounts } = this.passwordAccounts();
     if (member.userId == null)
