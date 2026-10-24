@@ -180,11 +180,13 @@ jobs:
             exit 1
           fi
 
+      # One archive, not one upload per file, as in deploy.yml: previews share
+      # the Hobby plan's 5000 file uploads a day with production deploys.
       - name: Deploy the prebuilt output
         id: deploy
         if: steps.affected.outputs.build == 'true'
         run: |
-          url=$(bunx vercel@63.1.2 deploy --prebuilt --token="$VERCEL_TOKEN")
+          url=$(bunx vercel@63.1.2 deploy --prebuilt --archive=tgz --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
 

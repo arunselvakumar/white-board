@@ -144,10 +144,13 @@ jobs:
       - name: Leave the build trace behind
         run: find . -path '*/.vercel/output/diagnostics' -type d -prune -exec rm -rf {} +
 
+      # One archive, not one upload per file: the Hobby plan allows 5000 file
+      # uploads a day ("api-upload-free"), and a few Construction Management
+      # deploys and previews use that up, failing every deploy after them.
       - name: Deploy the prebuilt output
         id: deploy
         run: |
-          url=$(bunx vercel@63.1.2 deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          url=$(bunx vercel@63.1.2 deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       # A green build is not a working app: a client built for the runner's
