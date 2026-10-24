@@ -63,6 +63,7 @@ export function MobilePasswordSignInForm({
 
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(onSubmit)(event);
       }}

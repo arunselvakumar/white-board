@@ -90,6 +90,7 @@ export function EmailSignInForm({
 
   return (
     <form
+      method="post"
       onSubmit={(event) => {
         void form.handleSubmit(onSubmit)(event);
       }}

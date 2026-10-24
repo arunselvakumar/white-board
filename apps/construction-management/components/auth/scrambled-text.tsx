@@ -181,13 +181,17 @@ export function ScrambledText({
       return [event.clientX - rect.left, event.clientY - rect.top];
     };
 
-    const pointer = { x: 0, y: 0 };
+    // Plain variables, not a `{ x, y }` object written by destructuring: the
+    // production minifier folded `[pointer.x, pointer.y] = …` into `[0, 0] = …`,
+    // a SyntaxError that took down every public page.
+    let pointerX = 0;
+    let pointerY = 0;
     let moveFrame = 0;
     const scrambleNearPointer = () => {
       moveFrame = 0;
       if (!measured) measure();
       points.forEach((point, index) => {
-        const distance = Math.hypot(pointer.x - point.x, pointer.y - point.y);
+        const distance = Math.hypot(pointerX - point.x, pointerY - point.y);
         if (distance < radius) {
           gsap.to(
             glyphs[index] ?? null,
@@ -235,7 +239,9 @@ export function ScrambledText({
       measured = false;
     };
     const handleMove = (event: PointerEvent) => {
-      [pointer.x, pointer.y] = toLocal(event);
+      const [x, y] = toLocal(event);
+      pointerX = x;
+      pointerY = y;
       if (moveFrame === 0)
         moveFrame = requestAnimationFrame(scrambleNearPointer);
     };

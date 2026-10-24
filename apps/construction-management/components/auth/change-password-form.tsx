@@ -71,6 +71,7 @@ export function ChangePasswordForm({
         description="Your Company admin set the password you signed in with. Replace it with one only you know."
       />
       <form
+        method="post"
         onSubmit={(event) => {
           void form.handleSubmit(onSubmit)(event);
         }}
