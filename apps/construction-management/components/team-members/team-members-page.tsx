@@ -45,6 +45,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
+import { USERS_PATH, userPath } from "@/lib/users-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   TEAM_MEMBERS_KEY,
@@ -59,7 +60,10 @@ import { MemberStatusBadge, STATUS_FILTERS } from "./member-status-badge";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import { TeamMemberRowsSkeleton } from "./team-members-skeletons";
 
-/** Team Members under Masters (CM-111): search, status chips, row actions. */
+/**
+ * Users & Roles → Users (CM-111, ADR CM-0029): the Company's Team Members,
+ * with search, status chips, their Role and row actions.
+ */
 export function TeamMembersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<TeamMemberListFilter["status"]>("all");
@@ -72,15 +76,12 @@ export function TeamMembersPage() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          title="Team Members"
-          meta="Invite your team and decide what each one may do."
+          title="Users"
+          meta="Your team, how they sign in, and the Role that decides what each one may do."
           actions={
-            <Link
-              href="/app/masters/team-members/new"
-              className={buttonVariants()}
-            >
+            <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
               <Plus />
-              Add Team Member
+              Add User
             </Link>
           }
         />
@@ -91,7 +92,7 @@ export function TeamMembersPage() {
             </InputGroupAddon>
             <InputGroupInput
               type="search"
-              aria-label="Search Team Members"
+              aria-label="Search Users"
               placeholder="Search name, mobile or email"
               value={search}
               onChange={(event) => {
@@ -140,6 +141,11 @@ export function TeamMembersPage() {
   );
 }
 
+function roleLabel(member: TeamMember): string {
+  if (member.isOwner) return "Owner";
+  return member.role?.name ?? "No Role";
+}
+
 function contactLine(member: TeamMember): string {
   return [member.mobile, member.email].filter(Boolean).join(" · ");
 }
@@ -185,22 +191,19 @@ function TeamMemberRows({
             <Users />
           </EmptyMedia>
           <EmptyTitle>
-            {filtered ? "No Team Members match" : "No Team Members yet"}
+            {filtered ? "No Users match" : "No Users yet"}
           </EmptyTitle>
           <EmptyDescription>
             {filtered
               ? "Try another name or status."
-              : "Add your site engineers, supervisors and accountants. They join by signing in with their email."}
+              : "Add your site engineers, supervisors and accountants. Invite them by email, or set a password so they sign in with their mobile."}
           </EmptyDescription>
         </EmptyHeader>
         {!filtered && (
           <EmptyContent>
-            <Link
-              href="/app/masters/team-members/new"
-              className={buttonVariants()}
-            >
+            <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
               <Plus />
-              Add Team Member
+              Add User
             </Link>
           </EmptyContent>
         )}
@@ -210,85 +213,104 @@ function TeamMemberRows({
   return (
     <div className={cn("space-y-3", className)}>
       <p className="text-muted-foreground text-sm">
-        {data.total} {data.total === 1 ? "Team Member" : "Team Members"}
+        {data.total} {data.total === 1 ? "User" : "Users"}
       </p>
-      <ul className="divide-border divide-y rounded-lg border">
-        {data.items.map((member) => (
-          <li key={member.id} className="flex items-center gap-4 px-4 py-3">
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href={`/app/masters/team-members/${member.id}`}
-                  className="truncate font-semibold hover:underline"
-                >
-                  {member.name}
-                </Link>
-                <MemberStatusBadge status={member.status} />
-                {member.memberType === "hrms" && (
-                  <Badge variant="outline">HRMS</Badge>
-                )}
-                {member.isOwner && <Badge variant="outline">Owner</Badge>}
-              </div>
-              <p className="text-muted-foreground truncate text-sm">
-                {member.designation.name ?? "No Designation"}
-                {contactLine(member).length > 0 && ` · ${contactLine(member)}`}
-              </p>
-            </div>
-            {!member.isOwner && (
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={`Actions for ${member.name}`}
-                    />
-                  }
-                >
-                  <MoreHorizontal />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {member.status === "joining_pending" &&
-                    member.invitePath != null &&
-                    member.email != null && (
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSharing(member);
-                        }}
-                      >
-                        Share invite link
-                      </DropdownMenuItem>
-                    )}
-                  {member.status === "rejected" && member.email != null && (
-                    <DropdownMenuItem
-                      onClick={() => {
-                        resend.mutate(member.id);
-                      }}
-                    >
-                      Invite again
-                    </DropdownMenuItem>
+      <div className="rounded-lg border">
+        <div
+          aria-hidden="true"
+          className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex"
+        >
+          <span className="flex-1">User</span>
+          <span className="w-40">Role</span>
+          <span className="w-8" />
+        </div>
+        <ul aria-label="Users" className="divide-border divide-y">
+          {data.items.map((member) => (
+            <li key={member.id} className="flex items-center gap-4 px-4 py-3">
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href={userPath(member.id)}
+                    className="truncate font-semibold hover:underline"
+                  >
+                    {member.name}
+                  </Link>
+                  <MemberStatusBadge status={member.status} />
+                  {member.memberType === "hrms" && (
+                    <Badge variant="outline">HRMS</Badge>
                   )}
-                  <DropdownMenuItem
+                  {member.isOwner && <Badge variant="outline">Owner</Badge>}
+                </div>
+                <p className="text-muted-foreground truncate text-sm">
+                  {member.designation.name ?? "No Designation"}
+                  {contactLine(member).length > 0 &&
+                    ` · ${contactLine(member)}`}
+                </p>
+                {/* On a phone the Role sits under the details. */}
+                <p className="truncate text-sm sm:hidden">
+                  <span className="text-muted-foreground">Role: </span>
+                  {roleLabel(member)}
+                </p>
+              </div>
+              <p className="hidden w-40 shrink-0 truncate text-sm sm:block">
+                {roleLabel(member)}
+              </p>
+              {member.isOwner ? (
+                <span aria-hidden="true" className="size-8 shrink-0" />
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
                     render={
-                      <Link href={`/app/masters/team-members/${member.id}`} />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Actions for ${member.name}`}
+                      />
                     }
                   >
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => {
-                      setRemoving(member);
-                    }}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </li>
-        ))}
-      </ul>
+                    <MoreHorizontal />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {member.status === "joining_pending" &&
+                      member.invitePath != null &&
+                      member.email != null && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSharing(member);
+                          }}
+                        >
+                          Share invite link
+                        </DropdownMenuItem>
+                      )}
+                    {member.status === "rejected" && member.email != null && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          resend.mutate(member.id);
+                        }}
+                      >
+                        Invite again
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      render={<Link href={userPath(member.id)} />}
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => {
+                        setRemoving(member);
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
       <FormAlert
         message={
           failure instanceof QueryHttpError

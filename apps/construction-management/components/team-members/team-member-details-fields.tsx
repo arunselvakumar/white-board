@@ -2,7 +2,13 @@
 
 import { normalizeMobile } from "@repo/auth/construction/react";
 import Link from "next/link";
-import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
+import type { ReactNode } from "react";
+import {
+  Controller,
+  useWatch,
+  type FieldValues,
+  type UseFormReturn,
+} from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@repo/ui/components/input";
 import { Label, RequiredIndicator } from "@repo/ui/components/label";
@@ -20,48 +26,54 @@ import { MobileField } from "@/components/auth/mobile-field";
 import type { DesignationOption } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 
-/** Shared by Add Team Member (step 1) and Edit (CM-111). */
-export const teamMemberDetailsSchema = z
-  .object({
-    memberType: z.enum(["normal", "hrms"]),
-    name: z
-      .string()
-      .trim()
-      .min(1, "Enter the name")
-      .max(100, "Name is too long"),
-    designationId: z.string().min(1, "Choose a Designation"),
-    mobile: z
-      .string()
-      .trim()
-      .refine((value) => value === "" || normalizeMobile(value) != null, {
-        message: "Enter a valid 10-digit mobile number",
-      }),
-    email: z
-      .string()
-      .trim()
-      .refine((value) => value === "" || z.email().safeParse(value).success, {
-        message: "Enter a valid email address",
-      }),
-    address: z.string().trim().max(500, "Address is too long"),
-    aadhaar: z
-      .string()
-      .trim()
-      .refine((value) => value === "" || isValidAadhaar(value), {
-        message: "Enter a valid 12-digit Aadhaar number",
-      }),
-    pan: z
-      .string()
-      .trim()
-      .toUpperCase()
-      .refine((value) => value === "" || isValidPan(value), {
-        message: "Enter a valid 10-character PAN",
-      }),
-    emergencyContact: z.string().trim().max(120, "Too long"),
-  })
-  .refine((values) => values.mobile !== "" || values.email !== "", {
-    path: ["email"],
-    message: "Enter an email (to invite them) or a mobile number",
-  });
+/** The detail fields Add User (step 1) and Edit User share (CM-111). */
+export const teamMemberDetailsObject = z.object({
+  memberType: z.enum(["normal", "hrms"]),
+  name: z.string().trim().min(1, "Enter the name").max(100, "Name is too long"),
+  designationId: z.string().min(1, "Choose a Designation"),
+  mobile: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || normalizeMobile(value) != null, {
+      message: "Enter a valid 10-digit mobile number",
+    }),
+  email: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || z.email().safeParse(value).success, {
+      message: "Enter a valid email address",
+    }),
+  address: z.string().trim().max(500, "Address is too long"),
+  aadhaar: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || isValidAadhaar(value), {
+      message: "Enter a valid 12-digit Aadhaar number",
+    }),
+  pan: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .refine((value) => value === "" || isValidPan(value), {
+      message: "Enter a valid 10-character PAN",
+    }),
+  emergencyContact: z.string().trim().max(120, "Too long"),
+});
+
+/** A mobile or an email; either one is enough (ADR CM-0029 §6). */
+export function hasMobileOrEmail(values: {
+  mobile: string;
+  email: string;
+}): boolean {
+  return values.mobile !== "" || values.email !== "";
+}
+
+export const MOBILE_OR_EMAIL_MESSAGE = "Enter a mobile number or an email";
+
+export const teamMemberDetailsSchema = teamMemberDetailsObject.refine(
+  hasMobileOrEmail,
+  { path: ["mobile"], message: MOBILE_OR_EMAIL_MESSAGE },
+);
 
 export type TeamMemberDetailsValues = z.infer<typeof teamMemberDetailsSchema>;
 
@@ -87,7 +99,7 @@ export const DETAIL_ERROR_FIELDS: Record<
   DESIGNATION_REQUIRED: "designationId",
   DESIGNATION_NOT_FOUND: "designationId",
   MOBILE_INVALID: "mobile",
-  MOBILE_OR_EMAIL_REQUIRED: "email",
+  MOBILE_OR_EMAIL_REQUIRED: "mobile",
   MEMBER_MOBILE_IN_USE: "mobile",
   MOBILE_LOCKED: "mobile",
   EMAIL_INVALID: "email",
@@ -122,22 +134,29 @@ export function detailsInput(
   };
 }
 
-export function TeamMemberDetailsFields({
-  form,
+export function TeamMemberDetailsFields<
+  Values extends TeamMemberDetailsValues & FieldValues,
+>({
+  form: wide,
   designations,
   masked,
   mobileLocked = false,
+  signIn,
 }: {
-  form: UseFormReturn<TeamMemberDetailsValues>;
+  form: UseFormReturn<Values>;
   designations: DesignationOption[];
   /** Stored identifiers, shown as placeholders when editing. */
   masked?: { aadhaar: string | null; pan: string | null };
   mobileLocked?: boolean;
+  /** Add User's Invite them and Set a password, under mobile and email. */
+  signIn?: ReactNode;
 }) {
+  // Only the detail fields are read here; Add User's form has more.
+  const form = wide as unknown as UseFormReturn<TeamMemberDetailsValues>;
   const errors = form.formState.errors;
-  // An email or a mobile is needed: Email is marked while Mobile is blank.
-  const mobile = useWatch({ control: form.control, name: "mobile" });
-  const emailRequired = mobile.trim() === "";
+  // A mobile or an email is needed: Mobile is marked while Email is blank.
+  const email = useWatch({ control: form.control, name: "email" });
+  const mobileRequired = email.trim() === "";
   const items = designations.map((item) => ({
     value: item.id,
     label: item.name,
@@ -169,7 +188,7 @@ export function TeamMemberDetailsFields({
                 <span className="space-y-0.5">
                   <span className="block font-semibold">Normal</span>
                   <span className="text-muted-foreground block text-xs">
-                    Works on Projects with a Permission Matrix.
+                    Works on Projects. Their Role decides what they may do.
                   </span>
                 </span>
               </Label>
@@ -253,39 +272,6 @@ export function TeamMemberDetailsFields({
           <FieldError message={errors.designationId?.message} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="member-email" required={emailRequired}>
-            Email
-          </Label>
-          <Input
-            id="member-email"
-            type="email"
-            placeholder="example@example.com"
-            className="h-10"
-            aria-required={emailRequired}
-            aria-describedby="member-email-hint"
-            {...form.register("email")}
-          />
-          <p id="member-email-hint" className="text-muted-foreground text-xs">
-            They sign in with this email to join.
-          </p>
-          <FieldError message={errors.email?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="member-mobile">Mobile</Label>
-          <MobileField
-            id="member-mobile"
-            readOnly={mobileLocked}
-            aria-describedby="member-mobile-hint"
-            {...form.register("mobile")}
-          />
-          <p id="member-mobile-hint" className="text-muted-foreground text-xs">
-            {mobileLocked
-              ? "They sign in with this number; they change it in My Profile."
-              : "A contact number. Without an email they stay a record and cannot sign in."}
-          </p>
-          <FieldError message={errors.mobile?.message} />
-        </div>
-        <div className="space-y-1.5">
           <Label htmlFor="member-aadhaar">Aadhaar</Label>
           <Input
             id="member-aadhaar"
@@ -338,6 +324,55 @@ export function TeamMemberDetailsFields({
           <FieldError message={errors.emergencyContact?.message} />
         </div>
       </div>
+
+      <fieldset className="space-y-2" aria-describedby="member-sign-in-hint">
+        <legend className="text-sm font-semibold">
+          Sign-in
+          <RequiredIndicator />
+        </legend>
+        <p id="member-sign-in-hint" className="text-muted-foreground text-xs">
+          A mobile number or an email. Either one is enough.
+        </p>
+        <div className="grid gap-4 pt-2 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="member-mobile" required={mobileRequired}>
+              Mobile
+            </Label>
+            <MobileField
+              id="member-mobile"
+              readOnly={mobileLocked}
+              aria-required={mobileRequired}
+              aria-describedby="member-mobile-hint"
+              {...form.register("mobile")}
+            />
+            <p
+              id="member-mobile-hint"
+              className="text-muted-foreground text-xs"
+            >
+              {mobileLocked
+                ? "They sign in with this number; they change it in My Profile."
+                : "They can sign in with it and a password."}
+            </p>
+            <FieldError message={errors.mobile?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="member-email">Email</Label>
+            <Input
+              id="member-email"
+              type="email"
+              placeholder="example@example.com"
+              className="h-10"
+              aria-describedby="member-email-hint"
+              {...form.register("email")}
+            />
+            <p id="member-email-hint" className="text-muted-foreground text-xs">
+              Where the invitation goes. They can sign in with it too.
+            </p>
+            <FieldError message={errors.email?.message} />
+          </div>
+        </div>
+        {signIn == null ? null : <div className="pt-2">{signIn}</div>}
+      </fieldset>
     </div>
   );
 }

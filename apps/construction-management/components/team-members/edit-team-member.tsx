@@ -1,11 +1,13 @@
 "use client";
 
+import { useActiveCompany } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useMutation,
   useQueryClient,
-  useSuspenseQuery,
+  useSuspenseQueries,
 } from "@tanstack/react-query";
+import { KeyRound, Send } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
@@ -18,21 +20,26 @@ import {
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
-import { QueryHttpError } from "@/src/queries/http";
+import { USERS_PATH } from "@/lib/users-roles-nav";
+import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
   designationOptionsQuery,
-  setTeamMemberPermissions,
+  resendTeamMemberInvite,
+  setTeamMemberRole,
   teamMemberQuery,
   updateTeamMember,
+  type PasswordOutcome,
   type TeamMember,
 } from "@/src/queries/team-members";
-import type { PermissionGrants } from "@/src/shared-kernel/access";
 
 import { MemberStatusBadge } from "./member-status-badge";
 import { TeamMemberProjectsTab } from "./projects-step";
+import { RoleField } from "./role-field";
+import { SetPasswordDialog } from "./set-password-dialog";
+import { ShareInviteDialog } from "./share-invite-dialog";
+import { signInWays } from "./sign-in-options";
 import {
   DETAIL_ERROR_FIELDS,
   TeamMemberDetailsFields,
@@ -55,17 +62,31 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   };
 }
 
-function errorMessage(error: unknown): string | undefined {
-  if (error == null) return undefined;
-  return error instanceof QueryHttpError
-    ? error.message
-    : "Something went wrong. Please try again.";
+/** What the last sign-in action did, for the line under the header. */
+type Notice = { tone: "status" | "alert"; text: string };
+
+function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
+  if (outcome.passwordIgnored === "existing_account")
+    return {
+      tone: "alert",
+      text: `${outcome.name} already has an account, so we did not set the password. They got a Join Request instead.`,
+    };
+  return {
+    tone: "status",
+    text: `Password set. ${outcome.name} signs in with ${signInWays(outcome)} and that password, and must change it the next time they sign in.`,
+  };
 }
 
-/** Edit a Team Member (CM-111): Details, Projects and Permission Matrix tabs. */
+/**
+ * Edit User (CM-111, ADR CM-0029): Details, Projects and Role tabs, and
+ * from the header Set a new password and the invitation.
+ */
 export function EditTeamMember({ id }: { id: string }) {
-  const { data: member } = useSuspenseQuery(teamMemberQuery(id));
-  const { data: designations } = useSuspenseQuery(designationOptionsQuery);
+  const [{ data: member }, { data: designations }, { data: roles }] =
+    useSuspenseQueries({
+      queries: [teamMemberQuery(id), designationOptionsQuery, rolesQuery],
+    });
+  const { company } = useActiveCompany();
   const queryClient = useQueryClient();
   const saved = async (updated: TeamMember) => {
     queryClient.setQueryData(teamMemberQuery(id).queryKey, updated);
@@ -88,23 +109,105 @@ export function EditTeamMember({ id }: { id: string }) {
     },
   });
 
-  const [grants, setGrants] = useState<PermissionGrants>(member.permissions);
-  const permissions = useMutation({
-    mutationFn: () => setTeamMemberPermissions(id, grants),
-    onSuccess: saved,
+  const [roleId, setRoleId] = useState<string | null>(member.role?.id ?? null);
+  const role = useMutation({
+    mutationFn: (next: string) => setTeamMemberRole(id, next),
+    onSuccess: async (updated) => {
+      await saved(updated);
+      // Both Roles' Users counts changed.
+      await queryClient.invalidateQueries({ queryKey: ROLES_KEY });
+    },
   });
+
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const [settingPassword, setSettingPassword] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const invite = useMutation({
+    mutationFn: () => resendTeamMemberInvite(id),
+    onSuccess: async (updated) => {
+      await saved(updated);
+      setNotice(null);
+      setSharing(true);
+    },
+  });
+
+  const canInvite =
+    !member.isOwner && member.status !== "active" && member.email != null;
+  const roleChanged = roleId != null && roleId !== member.role?.id;
 
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Team Members", href: "/app/masters/team-members" }}
+          back={{ label: "Users", href: USERS_PATH }}
           title={member.name}
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">
-              {member.designation.name}
+              {[
+                member.designation.name,
+                member.role == null ? null : `Role: ${member.role.name}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
               <MemberStatusBadge status={member.status} />
             </span>
+          }
+          actions={
+            member.canSetPassword || canInvite ? (
+              <>
+                {canInvite && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={invite.isPending}
+                    onClick={() => {
+                      invite.mutate();
+                    }}
+                  >
+                    <Send aria-hidden="true" />
+                    {member.status === "rejected"
+                      ? "Invite again"
+                      : "Send invitation"}
+                  </Button>
+                )}
+                {member.canSetPassword && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setNotice(null);
+                      setSettingPassword(true);
+                    }}
+                  >
+                    <KeyRound aria-hidden="true" />
+                    Set a new password
+                  </Button>
+                )}
+              </>
+            ) : null
+          }
+        />
+        {notice != null &&
+          (notice.tone === "alert" ? (
+            <p
+              role="alert"
+              className="bg-card rounded-lg border px-4 py-3 text-sm"
+            >
+              {notice.text}
+            </p>
+          ) : (
+            <p
+              role="status"
+              className="bg-card text-muted-foreground rounded-lg border px-4 py-3 text-sm"
+            >
+              {notice.text}
+            </p>
+          ))}
+        <FormAlert
+          message={
+            invite.error == null
+              ? undefined
+              : fieldForCode(invite.error, {}).message
           }
         />
         <Tabs defaultValue="details" className="gap-6">
@@ -113,7 +216,7 @@ export function EditTeamMember({ id }: { id: string }) {
             {member.memberType === "normal" && (
               <TabsTrigger value="projects">Projects</TabsTrigger>
             )}
-            <TabsTrigger value="permissions">Permission Matrix</TabsTrigger>
+            <TabsTrigger value="role">Role</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">
@@ -164,31 +267,43 @@ export function EditTeamMember({ id }: { id: string }) {
             </TabsContent>
           )}
 
-          <TabsContent value="permissions" className="space-y-4">
+          <TabsContent value="role" className="space-y-4">
             {member.isOwner ? (
               <p className="text-muted-foreground text-sm">
-                The Owner can do everything; their Permission Matrix cannot be
-                changed.
+                The Owner can do everything, so they have no Role.
               </p>
             ) : (
               <>
-                <PermissionMatrix value={grants} onChange={setGrants} />
-                <FormAlert message={errorMessage(permissions.error)} />
-                {permissions.isSuccess && (
+                <RoleField
+                  id="member-role"
+                  roles={roles}
+                  value={roleId}
+                  onChange={(next) => {
+                    setRoleId(next);
+                    role.reset();
+                  }}
+                />
+                <FormAlert
+                  message={
+                    role.error == null
+                      ? undefined
+                      : fieldForCode(role.error, {}).message
+                  }
+                />
+                {role.isSuccess && (
                   <p role="status" className="text-muted-foreground text-sm">
-                    Permission Matrix saved.
+                    Role saved. It applies from their next request.
                   </p>
                 )}
                 <div className="flex justify-end">
                   <Button
-                    disabled={permissions.isPending}
+                    type="button"
+                    disabled={!roleChanged || role.isPending}
                     onClick={() => {
-                      permissions.mutate();
+                      if (roleId != null) role.mutate(roleId);
                     }}
                   >
-                    {permissions.isPending
-                      ? "Saving…"
-                      : "Save Permission Matrix"}
+                    {role.isPending ? "Saving…" : "Save Role"}
                   </Button>
                 </div>
               </>
@@ -196,6 +311,27 @@ export function EditTeamMember({ id }: { id: string }) {
           </TabsContent>
         </Tabs>
       </div>
+      {member.canSetPassword && (
+        <SetPasswordDialog
+          member={member}
+          open={settingPassword}
+          onOpenChange={setSettingPassword}
+          onDone={(outcome) => {
+            setSettingPassword(false);
+            setNotice(passwordNotice(outcome));
+          }}
+        />
+      )}
+      {member.invitePath != null && member.email != null && (
+        <ShareInviteDialog
+          open={sharing}
+          onOpenChange={setSharing}
+          memberName={member.name}
+          companyName={company?.name ?? "our Company"}
+          email={member.email}
+          invitePath={member.invitePath}
+        />
+      )}
     </div>
   );
 }

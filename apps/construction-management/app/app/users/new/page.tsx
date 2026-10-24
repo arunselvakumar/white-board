@@ -4,7 +4,7 @@ import { AddTeamMemberWizard } from "@/components/team-members/add-team-member-w
 import { AddTeamMemberSkeleton } from "@/components/team-members/team-members-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
-export const metadata: Metadata = { title: "Add Team Member" };
+export const metadata: Metadata = { title: "Add User" };
 
 export default function Page() {
   return (

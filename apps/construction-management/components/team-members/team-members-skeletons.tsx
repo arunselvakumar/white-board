@@ -8,31 +8,45 @@ import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+import { USERS_PATH } from "@/lib/users-roles-nav";
 
-/** Masters → Team Members while it loads (ADR-0047). */
+/** Users & Roles → Users while it loads (ADR-0047). */
 
 const NAME_WIDTHS = ["9rem", "12rem", "7.5rem", "10.5rem", "8rem"];
 const LINE_WIDTHS = ["55%", "40%", "62%", "48%", "36%"];
 
-/** Rows shaped like the list: name and status badge, Designation · contact, menu. */
+/**
+ * Rows shaped like the list: name and status badge, Designation · contact,
+ * the Role, menu.
+ */
 export function TeamMemberRowsSkeleton() {
   return (
-    <SkeletonGroup label="Loading Team Members" className="block space-y-3">
+    <SkeletonGroup label="Loading Users" className="block space-y-3">
       <SkeletonText width="7rem" />
-      <ul className="divide-border divide-y rounded-lg border">
-        {NAME_WIDTHS.map((width, row) => (
-          <li key={width} className="flex items-center gap-4 px-4 py-3">
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <SkeletonText size="base" width={width} />
-                <Skeleton className="h-5 w-16 rounded-full" />
+      <div className="rounded-lg border">
+        <div className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex">
+          <span className="flex-1">User</span>
+          <span className="w-40">Role</span>
+          <span className="w-8" />
+        </div>
+        <ul className="divide-border divide-y">
+          {NAME_WIDTHS.map((width, row) => (
+            <li key={width} className="flex items-center gap-4 px-4 py-3">
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <SkeletonText size="base" width={width} />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <SkeletonText width={LINE_WIDTHS[row]} />
               </div>
-              <SkeletonText width={LINE_WIDTHS[row]} />
-            </div>
-            <Skeleton className="size-8 shrink-0 rounded-lg" />
-          </li>
-        ))}
-      </ul>
+              <span className="hidden w-40 shrink-0 sm:block">
+                <SkeletonText width="6rem" />
+              </span>
+              <Skeleton className="size-8 shrink-0 rounded-lg" />
+            </li>
+          ))}
+        </ul>
+      </div>
     </SkeletonGroup>
   );
 }
@@ -54,26 +68,26 @@ export function ProjectChecklistSkeleton() {
   );
 }
 
-/** Edit Team Member while the member loads: header, the tabs, the details form. */
+/** Edit User while the member loads: header, the tabs, the details form. */
 const DETAIL_FIELDS = [
   { label: "Name" },
   { label: "Designation", control: "select" },
-  { label: "Email" },
-  { label: "Mobile" },
   { label: "Aadhaar" },
   { label: "PAN" },
-  { label: "Address", control: "textarea" },
+  { label: "Address" },
   { label: "Emergency contact" },
+  { label: "Mobile" },
+  { label: "Email" },
 ] as const;
 
-/** Add Team Member while the Designations load: step 1, the details form. */
+/** Add User while the Designations and Roles load: step 1, the details form. */
 export function AddTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Team Members", href: "/app/masters/team-members" }}
-          title="Add Team Member"
+          back={{ label: "Users", href: USERS_PATH }}
+          title="Add User"
           meta="Step 1 of 3: Details"
         />
         <ol className="flex gap-1.5" aria-hidden="true">
@@ -104,22 +118,20 @@ export function EditTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeaderSkeleton
-          back={{ label: "Team Members", href: "/app/masters/team-members" }}
-        />
+        <PageHeaderSkeleton back={{ label: "Users", href: USERS_PATH }} />
         <Tabs defaultValue="details" className="gap-6">
           <TabsList>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="projects" disabled>
               Projects
             </TabsTrigger>
-            <TabsTrigger value="permissions" disabled>
-              Permission Matrix
+            <TabsTrigger value="role" disabled>
+              Role
             </TabsTrigger>
           </TabsList>
           <FormSkeleton
             columns={2}
-            label="Loading Team Member"
+            label="Loading User"
             fields={[...DETAIL_FIELDS]}
           />
         </Tabs>

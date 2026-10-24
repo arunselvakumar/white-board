@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { QuerySuspense } from "@/components/query-suspense";
+import {
+  ACCOUNTANT_ROLE,
+  ROLES,
+  ROLES_URL,
+} from "@/components/roles/role-fixtures";
+import type { TeamMember } from "@/src/queries/team-members";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
+import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
 import { signInAs } from "../../.storybook/mocks/auth";
 import { EditTeamMember } from "./edit-team-member";
 import { DESIGNATION_LIST, teamMember } from "./team-member-fixtures";
@@ -22,30 +28,29 @@ function bodyOf(path: string): Record<string, unknown> {
   >;
 }
 
-const meta = {
-  title: "Masters/EditTeamMember",
-  component: EditTeamMember,
-  args: { id: MEMBER.id },
-  beforeEach() {
-    signInAs("owner");
+/** The member, the Designations and Roles, plus `extra` routes. */
+function serve(member: TeamMember, extra: MockRoute[] = []) {
+  return () => {
+    fetchMock?.restore();
     fetchMock = mockFetch([
       {
         path: "/api/construction/organization/designations",
         respond: () => Response.json(DESIGNATION_LIST),
       },
-      { path: ONE, respond: () => Response.json(MEMBER) },
-      {
-        method: "POST",
-        path: `${ONE}/update`,
-        respond: () => Response.json({ ...MEMBER, name: "Prabhu K." }),
-      },
-      {
-        method: "POST",
-        path: `${ONE}/permissions`,
-        respond: () => Response.json(MEMBER),
-      },
+      { path: ROLES_URL, respond: () => Response.json({ items: ROLES }) },
+      ...extra,
+      { path: ONE, respond: () => Response.json(member) },
     ]);
     return fetchMock.restore;
+  };
+}
+
+const meta = {
+  title: "Users & Roles/Users/EditUser",
+  component: EditTeamMember,
+  args: { id: MEMBER.id },
+  beforeEach() {
+    signInAs("owner", { name: "Anugraha Engineers" });
   },
   render: (args) => (
     <QuerySuspense>
@@ -58,8 +63,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const EditDetailsKeepsAadhaar: Story = {
+  beforeEach: serve(MEMBER, [
+    {
+      method: "POST",
+      path: `${ONE}/update`,
+      respond: () => Response.json({ ...MEMBER, name: "Prabhu K." }),
+    },
+  ]),
   play: async ({ canvas, userEvent }) => {
     const name = await canvas.findByLabelText("Name");
+    await expect(
+      canvas.getByText("Site Engineer · Role: Site Engineer"),
+    ).toBeVisible();
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();
@@ -79,20 +94,7 @@ export const EditDetailsKeepsAadhaar: Story = {
 };
 
 export const MobileLockedWhileSmsIsOn: Story = {
-  beforeEach() {
-    fetchMock?.restore();
-    fetchMock = mockFetch([
-      {
-        path: "/api/construction/organization/designations",
-        respond: () => Response.json(DESIGNATION_LIST),
-      },
-      {
-        path: ONE,
-        respond: () => Response.json({ ...MEMBER, mobileLocked: true }),
-      },
-    ]);
-    return fetchMock.restore;
-  },
+  beforeEach: serve({ ...MEMBER, mobileLocked: true }),
   play: async ({ canvas }) => {
     // A joined member's mobile is their sign-in while SMS is on.
     await expect(await canvas.findByLabelText("Mobile")).toHaveAttribute(
@@ -106,50 +108,229 @@ export const MobileLockedWhileSmsIsOn: Story = {
   },
 };
 
-export const EditPermissionMatrix: Story = {
-  play: async ({ canvas, userEvent }) => {
+/** Change the Role: pick another, see its matrix, save. */
+export const ChangeRole: Story = {
+  beforeEach() {
+    let current: TeamMember = MEMBER;
+    return serve(MEMBER, [
+      // The detail read answers the latest save.
+      { path: ONE, respond: () => Response.json(current) },
+      {
+        method: "PUT",
+        path: `${ONE}/role`,
+        respond: () => {
+          current = {
+            ...MEMBER,
+            role: { id: ACCOUNTANT_ROLE.id, name: ACCOUNTANT_ROLE.name },
+            permissions: ACCOUNTANT_ROLE.permissions,
+          };
+          return Response.json(current);
+        },
+      },
+    ])();
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(await canvas.findByRole("tab", { name: "Role" }));
+    await expect(
+      canvas.getByRole("combobox", { name: "Role" }),
+    ).toHaveTextContent("Site Engineer");
+    await expect(
+      canvas.getByRole("button", { name: "Save Role" }),
+    ).toBeDisabled();
+    // The matrix is the Role's, read-only: no per-person editing.
+    await expect(
+      canvas.getByRole("checkbox", { name: "Add — Attendance" }),
+    ).toBeChecked();
+    await expect(
+      canvas.queryByRole("button", { name: "Clear all" }),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("combobox", { name: "Role" }));
     await userEvent.click(
-      await canvas.findByRole("tab", { name: "Permission Matrix" }),
-    );
-    await userEvent.click(
-      await canvas.findByRole("checkbox", { name: "Delete — Attendance" }),
-    );
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Save Permission Matrix" }),
+      await body.findByRole("option", { name: /^Accountant/ }),
     );
     await expect(
-      await canvas.findByText("Permission Matrix saved."),
+      canvas.getByRole("checkbox", { name: "Add — Attendance" }),
+    ).not.toBeChecked();
+    await userEvent.click(canvas.getByRole("button", { name: "Save Role" }));
+    await expect(
+      await canvas.findByText(
+        "Role saved. It applies from their next request.",
+      ),
     ).toBeVisible();
-    await expect(bodyOf(`${ONE}/permissions`)).toEqual({
-      permissions: {
-        "labour.attendance": ["create", "read", "update", "delete"],
-      },
+    await expect(bodyOf(`${ONE}/role`)).toEqual({
+      roleId: ACCOUNTANT_ROLE.id,
     });
   },
 };
 
-export const OwnerMatrixIsFixed: Story = {
-  beforeEach() {
-    fetchMock?.restore();
-    fetchMock = mockFetch([
-      {
-        path: "/api/construction/organization/designations",
-        respond: () => Response.json(DESIGNATION_LIST),
-      },
-      {
-        path: ONE,
-        respond: () =>
-          Response.json({ ...MEMBER, isOwner: true, name: "Arun Selva Kumar" }),
-      },
-    ]);
-    return fetchMock.restore;
+/** Changing your own Role is refused: 403 OWN_ROLE, said plainly. */
+export const OwnRoleRefused: Story = {
+  beforeEach: serve(MEMBER, [
+    {
+      method: "PUT",
+      path: `${ONE}/role`,
+      respond: () =>
+        Response.json(
+          { code: "OWN_ROLE", message: "You cannot change your own Role." },
+          { status: 403 },
+        ),
+    },
+  ]),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(await canvas.findByRole("tab", { name: "Role" }));
+    await userEvent.click(canvas.getByRole("combobox", { name: "Role" }));
+    await userEvent.click(await body.findByRole("option", { name: /^Admin/ }));
+    await userEvent.click(canvas.getByRole("button", { name: "Save Role" }));
+    await expect(
+      await canvas.findByText("You cannot change your own Role."),
+    ).toBeVisible();
   },
+};
+
+export const OwnerHasNoRole: Story = {
+  beforeEach: serve({
+    ...MEMBER,
+    isOwner: true,
+    name: "Arun Selva Kumar",
+    role: null,
+    canSetPassword: false,
+  }),
   play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole("tab", { name: "Role" }));
+    await expect(
+      await canvas.findByText(
+        "The Owner can do everything, so they have no Role.",
+      ),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Set a new password" }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+/** Set a new password: a Temporary Password they change on next sign-in. */
+export const SetNewPassword: Story = {
+  beforeEach: serve(MEMBER, [
+    {
+      method: "POST",
+      path: `${ONE}/password`,
+      respond: () => Response.json({ ...MEMBER, passwordIgnored: null }),
+    },
+  ]),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("tab", { name: "Permission Matrix" }),
+      await canvas.findByRole("button", { name: "Set a new password" }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await waitFor(() =>
+      expect(
+        dialog.getByText(/must change it the next time they sign in/),
+      ).toBeVisible(),
     );
     await expect(
-      await canvas.findByText(/The Owner can do everything/),
+      dialog.getByText(/They are signed out of every device now/),
     ).toBeVisible();
+    await userEvent.type(dialog.getByLabelText("New password"), "short");
+    await userEvent.click(dialog.getByRole("button", { name: "Set password" }));
+    await expect(
+      await dialog.findByText("Use at least 8 characters"),
+    ).toBeVisible();
+    await userEvent.type(dialog.getByLabelText("New password"), "-site-26");
+    await userEvent.click(dialog.getByRole("button", { name: "Set password" }));
+    await expect(
+      await canvas.findByText(
+        "Password set. Prabhu Saravanan signs in with their mobile or email and that password, and must change it the next time they sign in.",
+      ),
+    ).toBeVisible();
+    await expect(bodyOf(`${ONE}/password`)).toEqual({
+      password: "short-site-26",
+    });
+  },
+};
+
+/** The account belongs to another Company too: refused, said plainly. */
+export const PasswordRefusedOtherCompany: Story = {
+  beforeEach: serve(MEMBER, [
+    {
+      method: "POST",
+      path: `${ONE}/password`,
+      respond: () =>
+        Response.json(
+          {
+            code: "USER_IN_OTHER_COMPANY",
+            message:
+              "They also work in another Company, so only they can change their password.",
+          },
+          { status: 409 },
+        ),
+    },
+  ]),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Set a new password" }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await userEvent.type(dialog.getByLabelText("New password"), "site-pass-26");
+    await userEvent.click(dialog.getByRole("button", { name: "Set password" }));
+    await expect(
+      await dialog.findByText(/only they can change their password/),
+    ).toBeVisible();
+  },
+};
+
+/** No `canSetPassword` (another Company's account): the button is not offered. */
+export const CannotSetPassword: Story = {
+  beforeEach: serve({ ...MEMBER, canSetPassword: false }),
+  play: async ({ canvas }) => {
+    await canvas.findByLabelText("Name");
+    await expect(
+      canvas.queryByRole("button", { name: "Set a new password" }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+/** Joining Pending with an email: send the invitation, then share it. */
+export const SendInvitation: Story = {
+  beforeEach: serve(
+    teamMember({ status: "joining_pending", canSetPassword: true }),
+    [
+      {
+        method: "POST",
+        path: `${ONE}/resend-invite`,
+        respond: () => Response.json(teamMember()),
+      },
+    ],
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Send invitation" }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await waitFor(() =>
+      expect(dialog.getByLabelText("Invite link")).toBeVisible(),
+    );
+  },
+};
+
+export const Phone: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  beforeEach: serve(teamMember({ status: "joining_pending" })),
+  render: (args) => (
+    <div data-testid="phone" style={{ width: 375 }}>
+      <QuerySuspense>
+        <EditTeamMember {...args} />
+      </QuerySuspense>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("button", { name: "Set a new password" });
+    const phone = canvas.getByTestId("phone");
+    await expect(phone.scrollWidth).toBeLessThanOrEqual(375);
   },
 };

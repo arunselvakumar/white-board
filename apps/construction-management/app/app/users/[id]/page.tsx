@@ -4,7 +4,7 @@ import { EditTeamMember } from "@/components/team-members/edit-team-member";
 import { EditTeamMemberSkeleton } from "@/components/team-members/team-members-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
-export const metadata: Metadata = { title: "Edit Team Member" };
+export const metadata: Metadata = { title: "Edit User" };
 
 export default async function Page({
   params,
