@@ -4,7 +4,7 @@ import type { RoleActions } from "@/components/roles/role-actions";
 import { viewerFlags } from "../../_lib/viewer-can";
 
 /** Role Management's menu (ADR CM-0029 §1); its catalogue entry is code. */
-const ROLES_MENU: string = "organization.roles";
+const ROLES_MENU = "organization.roles" as string;
 
 /** What the viewer may do on Role Management, for the pages to hide the rest. */
 export async function viewerRoleActions(): Promise<RoleActions> {

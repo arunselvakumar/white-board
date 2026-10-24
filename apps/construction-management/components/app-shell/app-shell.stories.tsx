@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_SECTIONS } from "@/lib/hrms-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
+import { USERS_ROLES_SECTIONS } from "@/lib/users-roles-nav";
 
 import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
@@ -178,6 +179,72 @@ export const MastersSubmenu: Story = {
     await expect(
       await nav.findByRole("list", { name: "Masters" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * Users & Roles (ADR CM-0029 §2) folds out like Masters: Users and Role
+ * Management. On Role Management the area is open and that entry is
+ * current; the area link itself opens Users.
+ */
+export const UsersRolesSubmenu: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/app/roles/r1" } },
+  },
+  render: () => (
+    <AppShell>
+      <p>Edit Role</p>
+    </AppShell>
+  ),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const links = nav.getAllByRole("link").map((link) => link.textContent);
+    // After Masters, before Settings.
+    await expect(links.indexOf("Users & Roles")).toBeGreaterThan(
+      links.indexOf("Masters"),
+    );
+    await expect(links.indexOf("Users & Roles")).toBeLessThan(
+      links.indexOf("Settings"),
+    );
+    await expect(
+      nav.getByRole("link", { name: "Users & Roles" }),
+    ).toHaveAttribute("href", "/app/users");
+    const submenu = within(nav.getByRole("list", { name: "Users & Roles" }));
+    for (const section of USERS_ROLES_SECTIONS)
+      await expect(
+        submenu.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
+    await expect(
+      submenu.getByRole("link", { name: "Role Management" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      nav.getByRole("link", { name: "Users & Roles" }),
+    ).not.toHaveAttribute("aria-current");
+    // Masters → Company keeps only Designations.
+    await expect(nav.queryByRole("link", { name: "Team Members" })).toBeNull();
+  },
+};
+
+/** On Users the submenu entry is current, not the area link too. */
+export const UsersPage: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/app/users" } },
+  },
+  render: () => (
+    <AppShell>
+      <p>Users</p>
+    </AppShell>
+  ),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const submenu = within(nav.getByRole("list", { name: "Users & Roles" }));
+    await expect(submenu.getByRole("link", { name: "Users" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(
+      nav.getByRole("link", { name: "Users & Roles" }),
+    ).not.toHaveAttribute("aria-current");
   },
 };
 

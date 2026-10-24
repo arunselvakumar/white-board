@@ -238,7 +238,7 @@ function CategorySection({
 /**
  * The Permission Matrix (ADR CM-0003): menus grouped by category, one column
  * per flag, a checkbox only where the menu supports the flag. Controlled;
- * used by the Team Member wizard and the Designation template editor.
+ * edited on Role Management, shown read-only on Add User and Edit User.
  */
 export function PermissionMatrix({
   value,
