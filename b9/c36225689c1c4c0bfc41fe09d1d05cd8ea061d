@@ -1,0 +1,35 @@
+packages/ui/src/components/combobox.tsx
+  s_b3acde8ccbffdf::t_e2440f2e72f407 227
+packages/ui/src/components/input-group.tsx
+  s_b3acde8ccbffdf::t_cf76bad53963d9 17
+packages/ui/src/components/input-otp.tsx
+  s_b3acde8ccbffdf::t_5ed7883af34506 57
+packages/ui/src/components/input.tsx
+  s_b3acde8ccbffdf::t_87a8c99c2281f4 60
+packages/ui/src/components/native-select.tsx
+  s_b3acde8ccbffdf::t_b2db75300b0399 7
+packages/ui/src/components/questionnaire.tsx
+  s_b3acde8ccbffdf::t_f4587ba8fb1050 172
+packages/ui/src/components/select.tsx
+  s_b3acde8ccbffdf::t_97e19cd8a6a9d9 118
+packages/ui/src/components/textarea.tsx
+  s_b3acde8ccbffdf::t_cc886a66e6e017 9
+packages/ui/src/styles/globals.css
+  s_b3acde8ccbffdf::t_81d3a301b776a2 60-61,100,137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b9c36225689c1c4c0bfc41fe09d1d05cd8ea061d",
+  "prompts": {},
+  "sessions": {
+    "s_b3acde8ccbffdf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e3a7ac6d-d063-4897-94c6-3a106458ce45",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
