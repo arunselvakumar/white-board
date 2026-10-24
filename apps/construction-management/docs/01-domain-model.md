@@ -12,8 +12,8 @@ erDiagram
     User ||--o{ Membership : holds
     Membership ||--|| TeamMember : "is the employee profile of"
     TeamMember }o--|| Designation : "has"
-    Designation ||--o| PermissionTemplate : "may carry"
-    TeamMember ||--o{ MenuPermission : "per menu"
+    TeamMember }o--o| Role : "is on (not the Owner)"
+    Role ||--o{ MenuPermission : "per menu"
     Menu ||--o{ MenuPermission : "flags on"
     MenuCategory ||--o{ Menu : groups
     TeamMember }o--o{ Project : "assigned to"
@@ -25,15 +25,16 @@ erDiagram
     TeamMember ||--o{ JoinRequest : "invited via"
 ```
 
-| Entity                                   | Notes                                                                                                                                                                         |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Company** (Organization)               | Tenant. Name, logo, mobile, email, GSTIN, PAN, address, country, currency, `isNonIndianCompany`, timezone.                                                                    |
-| **User**                                 | Phone (OTP login) + email; can belong to many companies (`companiesList`, switch).                                                                                            |
-| **TeamMember** (Employee)                | Per-company employee profile: name, designation, mobile, email, address, Aadhaar, PAN, emergency contact; `memberType` Normal \| HRMS; `isCompanyOwner`; `joinRequest` state. |
-| **Designation**                          | Global seed (37) + company-specific; `hasPermission` = has a default permission template; duplicate.                                                                          |
-| **Menu / MenuCategory / MenuPermission** | The permission matrix: 60+ menus in 6 categories; 12 flags; plus per-user `backdatedCreateDays`, `backdatedEditDays`, `financialClosingDate`.                                 |
-| **Subscription / Plan / AddOn**          | Plan includes (projects, team members, storage GB, HRMS seats); add-ons per unit per month; usage counters enforced.                                                          |
-| **Device**                               | Logged-in devices; web login by QR.                                                                                                                                           |
+| Entity                                   | Notes                                                                                                                                                                                                                                                                                      |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Company** (Organization)               | Tenant. Name, logo, mobile, email, GSTIN, PAN, address, country, currency, `isNonIndianCompany`, timezone.                                                                                                                                                                                 |
+| **User**                                 | Phone (OTP login) + email; can belong to many companies (`companiesList`, switch).                                                                                                                                                                                                         |
+| **TeamMember** (Employee)                | Per-company employee profile: name, designation, Role, mobile, email, address, Aadhaar, PAN, emergency contact; `memberType` Normal \| HRMS; `isCompanyOwner`; `joinRequest` state. Screens call the ones who sign in **Users**.                                                           |
+| **Designation**                          | Global seed (38) + company-specific; a job title only (ADR CM-0029); duplicate.                                                                                                                                                                                                            |
+| **Role**                                 | A named Permission Matrix given to many Team Members (ADR CM-0029); the Owner has none and can do everything. Nine seeds per Company (Admin, … , HRMS Staff); duplicate; cannot be deleted while anyone is on it. Legacy only had a `Roles/Combo` (Administrator, Builder, Site Engineer). |
+| **Menu / MenuCategory / MenuPermission** | The permission matrix: 60+ menus in 6 categories; 12 flags, stored per Role; plus per-user `backdatedCreateDays`, `backdatedEditDays`, `financialClosingDate`.                                                                                                                             |
+| **Subscription / Plan / AddOn**          | Plan includes (projects, team members, storage GB, HRMS seats); add-ons per unit per month; usage counters enforced.                                                                                                                                                                       |
+| **Device**                               | Logged-in devices; web login by QR.                                                                                                                                                                                                                                                        |
 
 ## 2. Master records
 
