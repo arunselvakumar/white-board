@@ -12,3 +12,8 @@ storybook-static
 
 # Prisma clients, generated into each database package (ADR-0040)
 packages/db/*/generated
+
+# End-to-end test output (ADR CM-0031)
+.blob-e2e
+playwright-report
+test-results

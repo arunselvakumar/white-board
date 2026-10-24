@@ -1,0 +1,126 @@
+name: End-to-end
+
+# Construction Management's Playwright tests against a production build
+# (ADR CM-0031). Pull requests and merges run the `@pr` tests (at most 40);
+# the nightly run takes every test. Only changes that can reach the app
+# start a run.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/construction-management/**"
+      - "packages/auth/**"
+      - "packages/db/construction/**"
+      - "packages/email-templates/**"
+      - "packages/ui/**"
+      - "bun.lock"
+      - ".github/workflows/e2e.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/construction-management/**"
+      - "packages/auth/**"
+      - "packages/db/construction/**"
+      - "packages/email-templates/**"
+      - "packages/ui/**"
+      - "bun.lock"
+      - ".github/workflows/e2e.yml"
+  schedule:
+    # 02:00 IST every night.
+    - cron: "30 20 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: End-to-end (${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'nightly' || '@pr' }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: whiteboard
+          POSTGRES_PASSWORD: whiteboard
+          POSTGRES_DB: whiteboard
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U whiteboard -d whiteboard"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 20
+      # Catches sign-up codes, invitations and confirmation codes.
+      mailpit:
+        image: axllent/mailpit:v1.27
+        ports:
+          - 1025:1025
+          - 8025:8025
+    env:
+      NIGHTLY: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    defaults:
+      run:
+        working-directory: apps/construction-management
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      # Nothing merged in the last day: the nightly run would test the same code again.
+      - name: Skip a nightly run with nothing new
+        id: fresh
+        run: |
+          age=$(( $(date +%s) - $(git log -1 --format=%ct) ))
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$age" -gt 90000 ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No commits on main in the last 25 hours; skipping."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        if: steps.fresh.outputs.run == 'true'
+        with:
+          bun-version: 1.3.13
+
+      - if: steps.fresh.outputs.run == 'true'
+        run: bun install --frozen-lockfile
+
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        if: steps.fresh.outputs.run == 'true'
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lock') }}
+
+      - name: Install Playwright Chromium
+        if: steps.fresh.outputs.run == 'true'
+        run: bunx playwright install --with-deps chromium
+
+      - name: At most 40 @pr tests
+        if: steps.fresh.outputs.run == 'true'
+        run: bun run test:e2e:budget
+
+      - name: Build for end-to-end tests
+        if: steps.fresh.outputs.run == 'true'
+        run: bun run test:e2e:build
+
+      - name: "@pr tests"
+        if: steps.fresh.outputs.run == 'true' && env.NIGHTLY != 'true'
+        run: bun run test:e2e:pr
+
+      - name: Every test (nightly)
+        if: steps.fresh.outputs.run == 'true' && env.NIGHTLY == 'true'
+        run: bun run test:e2e
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            apps/construction-management/playwright-report
+            apps/construction-management/test-results
+          retention-days: 7

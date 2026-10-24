@@ -284,4 +284,15 @@ describe("storageFromEnv", () => {
     vi.stubEnv("NODE_ENV", "production");
     expect(() => storageFromEnv()).toThrow("Connect a Vercel Blob store");
   });
+
+  it("keeps files on disk for a preview build off Vercel, never on Vercel", () => {
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "");
+    vi.stubEnv("BLOB_STORE_ID", "");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL", "");
+    expect(storageFromEnv()).toBeInstanceOf(LocalFileStorage);
+    vi.stubEnv("VERCEL", "1");
+    expect(() => storageFromEnv()).toThrow("Connect a Vercel Blob store");
+  });
 });
