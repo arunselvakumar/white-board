@@ -36,6 +36,7 @@ import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { UserMenu } from "./user-menu";
+import { UsersRolesNavMenu } from "./users-roles-nav-menu";
 import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 const NAV_BUTTON_CLASS =
@@ -48,11 +49,11 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Authenticated chrome: the Company Dashboard, the three areas and Settings, the
- * Active Company, the account menu. Inside a Project the areas give way to
- * the Project's own menu (ADR CM-0020). `canOpenDashboard` is the
- * Dashboard menu's Read flag (CM-902): without it the Dashboard is not in
- * the menu.
+ * Authenticated chrome: the Company Dashboard, the three areas, Users &
+ * Roles and Settings, the Active Company, the account menu. Inside a
+ * Project the areas give way to the Project's own menu (ADR CM-0020).
+ * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
+ * the Dashboard is not in the menu.
  */
 export function AppShell({
   children,
@@ -151,7 +152,8 @@ export function AppShell({
 
 /**
  * The Company Dashboard (with Dashboard Read), the three areas: Projects,
- * Workspace (with its submenu) and Masters, then Settings.
+ * Workspace and Masters (each with its submenu), Users & Roles, then
+ * Settings.
  */
 function MainMenu({
   pathname,
@@ -174,6 +176,14 @@ function MainMenu({
               if (item.href === "/app/masters")
                 return (
                   <MastersNavMenu
+                    key={item.href}
+                    pathname={pathname}
+                    buttonClassName={NAV_BUTTON_CLASS}
+                  />
+                );
+              if (item.href === "/app/users")
+                return (
+                  <UsersRolesNavMenu
                     key={item.href}
                     pathname={pathname}
                     buttonClassName={NAV_BUTTON_CLASS}

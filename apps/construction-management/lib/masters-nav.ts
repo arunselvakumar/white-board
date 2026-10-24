@@ -19,7 +19,6 @@ import {
   Tractor,
   Truck,
   UserCheck,
-  Users,
   Waves,
   Wrench,
   type LucideIcon,
@@ -49,19 +48,11 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
     label: "Company",
     sections: [
       {
-        href: "/app/masters/team-members",
-        label: "Team Members",
-        title: "Team Members",
-        description:
-          "Invite your team, choose their Projects and what each one may do.",
-        icon: Users,
-      },
-      {
         href: "/app/masters/designations",
         label: "Designations",
         title: "Designations",
         description:
-          "Job titles and the Permission Template each one starts with.",
+          "Job titles your team hold: Site Engineer, Store Keeper, Accountant…",
         icon: BadgeCheck,
       },
     ],
