@@ -3,9 +3,25 @@
 import { gsap } from "gsap";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import { SplitText } from "gsap/SplitText";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => {
+    query.removeEventListener("change", onChange);
+  };
+}
 
 /** A click's ripple: it scrambles each character once as it passes. */
 type Wave = {
@@ -23,7 +39,8 @@ type Wave = {
  * roughly left to right; the pointer re-scrambles the characters near it, and
  * a click sends a scrambling ripple through the text. A hidden copy of each
  * character holds its width, so the lines never reflow while it scrambles.
- * Reduced motion shows the text still. Screen readers get the sentence once
+ * Reduced motion shows the text still, even when it is turned on while the
+ * text is on screen. Screen readers get the sentence once
  * from a visually hidden copy.
  */
 export function ScrambledText({
@@ -46,6 +63,11 @@ export function ScrambledText({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false,
+  );
   // Splitting before the web font lands would measure the fallback font.
   const [fontsReady, setFontsReady] = useState(
     () => typeof document === "undefined" || document.fonts.status === "loaded",
@@ -66,8 +88,9 @@ export function ScrambledText({
   useLayoutEffect(() => {
     const root = rootRef.current;
     const textEl = textRef.current;
-    if (root == null || textEl == null || !fontsReady) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Turning reduced motion on re-runs this effect: the cleanup stops every
+    // tween and reverts the split, and this early return leaves it still.
+    if (root == null || textEl == null || !fontsReady || reducedMotion) return;
 
     const split = SplitText.create(textEl, {
       type: "chars",
@@ -257,7 +280,15 @@ export function ScrambledText({
       split.revert();
       delete textEl.dataset["split"];
     };
-  }, [children, duration, fontsReady, radius, scrambleChars, speed]);
+  }, [
+    children,
+    duration,
+    fontsReady,
+    radius,
+    reducedMotion,
+    scrambleChars,
+    speed,
+  ]);
 
   return (
     <div ref={rootRef} className={className}>
