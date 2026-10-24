@@ -19,6 +19,7 @@ export const SIGNED_OUT_OF_COMPANY: CompanyAuthState = {
   workspaceId: null,
   role: null,
   user: null,
+  impersonatedBy: null,
 };
 
 /**
@@ -66,6 +67,7 @@ export async function getCompanyAuthFromHeaders(
         user.phoneNumberVerified === true ? (user.phoneNumber ?? null) : null,
       image: user.image ?? null,
     },
+    impersonatedBy: session.impersonatedBy ?? null,
   };
 }
 
@@ -89,6 +91,7 @@ export async function getCompanyAuthSnapshot(): Promise<CompanyAuthSnapshot> {
     workspaceId: state.workspaceId,
     role: state.role,
     user: state.user,
+    impersonatedBy: state.impersonatedBy,
     companies:
       state.userId == null ? [] : await companies.listForUser(state.userId),
   };

@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 /** Screens a signed-out visitor may open. */
 const PUBLIC_PATHS = new Set([
   "/sign-in",
+  "/sign-in/as",
   "/sign-up",
   "/forgot-password",
   "/continue",

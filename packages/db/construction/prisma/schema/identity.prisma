@@ -35,6 +35,8 @@ model IdentitySession {
   userAgent            String?  @map("user_agent")
   /// The Active Workspace. Access is still checked against the member row.
   activeOrganizationId String?  @map("active_workspace_id")
+  /// The White Board staff email signed in as this User (ADR CM-0029).
+  impersonatedBy       String?  @map("impersonated_by")
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @map("updated_at")
 
@@ -134,6 +136,24 @@ model IdentityWorkspaceInvitation {
   @@index([organizationId])
   @@index([email])
   @@map("workspace_invitations")
+  @@schema("identity")
+}
+
+/// One "sign in as" by White Board staff (ADR CM-0029). Kept after the
+/// Session ends; ids are plain strings so the record outlives both.
+model IdentityImpersonation {
+  id            String   @id
+  adminEmail    String   @map("admin_email")
+  userId        String   @map("user_id")
+  customerEmail String   @map("customer_email")
+  sessionId     String   @map("session_id")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([adminEmail])
+  @@map("impersonations")
   @@schema("identity")
 }
 

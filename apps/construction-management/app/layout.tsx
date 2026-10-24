@@ -8,6 +8,7 @@ import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import { TooltipProvider } from "@repo/ui/components/tooltip";
 
 import "./globals.css";
+import { ImpersonationBanner } from "@/components/auth/impersonation-banner";
 import { QueryProvider } from "@/components/query-provider";
 
 const fontMono = Geist_Mono({
@@ -34,6 +35,7 @@ export default async function RootLayout({
     <html
       lang="en-IN"
       suppressHydrationWarning
+      data-impersonating={snapshot.impersonatedBy == null ? undefined : ""}
       className={`typeface-satoshi ${fontMono.variable} font-sans antialiased`}
     >
       <body className="bg-background text-foreground">
@@ -45,6 +47,7 @@ export default async function RootLayout({
             storageKey="construction-theme"
           >
             <TooltipProvider>
+              <ImpersonationBanner />
               <QueryProvider>{children}</QueryProvider>
             </TooltipProvider>
           </ThemeProvider>

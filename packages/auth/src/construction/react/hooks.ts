@@ -14,6 +14,8 @@ export function useCompanyAuth(): {
   userId: string | null;
   workspaceId: string | null;
   role: CompanyRole | null;
+  /** The White Board staff email signed in as this User (ADR CM-0029). */
+  impersonatedBy: string | null;
 } {
   const snapshot = useCompanyAuthSnapshot();
   return {
@@ -21,6 +23,7 @@ export function useCompanyAuth(): {
     userId: snapshot.userId,
     workspaceId: snapshot.workspaceId,
     role: snapshot.role,
+    impersonatedBy: snapshot.impersonatedBy,
   };
 }
 
@@ -191,6 +194,39 @@ export function useCompanyPasswordReset() {
   );
 
   return { requestCode, resetPassword, fetchStatus, error, clearError };
+}
+
+/**
+ * Sign in as a customer (ADR CM-0029): email a code to a `@white-board.io`
+ * mailbox, then verify it to open a Session as the customer.
+ */
+export function useCompanyImpersonation() {
+  const { run, fetchStatus, error, clearError } = useAuthAction();
+
+  const sendCode = useCallback(
+    (input: { customerEmail: string; adminEmail: string }) =>
+      run(() =>
+        constructionAuthClient().impersonation.sendCode({
+          customerEmail: input.customerEmail.trim(),
+          adminEmail: input.adminEmail.trim(),
+        }),
+      ),
+    [run],
+  );
+
+  const verifyCode = useCallback(
+    (input: { customerEmail: string; adminEmail: string; code: string }) =>
+      run(() =>
+        constructionAuthClient().impersonation.verify({
+          customerEmail: input.customerEmail.trim(),
+          adminEmail: input.adminEmail.trim(),
+          code: input.code.trim(),
+        }),
+      ),
+    [run],
+  );
+
+  return { sendCode, verifyCode, fetchStatus, error, clearError };
 }
 
 export function useCompanySignOut() {
