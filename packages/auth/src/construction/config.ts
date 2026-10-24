@@ -14,6 +14,11 @@ import {
   CONSTRUCTION_LOCAL_ORIGIN,
 } from "./constants";
 import { isConstructionSmsEnabled } from "./features";
+import {
+  IMPERSONATION_SEND_CODE_PATH,
+  IMPERSONATION_VERIFY_PATH,
+  impersonation,
+} from "./impersonation";
 import { mobileOtp, perMobileOtpLimit } from "./mobile-otp";
 import { createSmsSender, type SmsSender } from "./sms";
 import {
@@ -48,6 +53,9 @@ export const CONSTRUCTION_AUTH_PATHS: readonly string[] = [
   "/organization/list",
   "/organization/set-active",
   "/organization/get-active-member",
+  // Sign in as a customer (ADR CM-0029).
+  IMPERSONATION_SEND_CODE_PATH,
+  IMPERSONATION_VERIFY_PATH,
 ];
 
 /** Mobile OTP sign-in; reachable only while SMS is on (ADR CM-0009). */
@@ -141,6 +149,8 @@ export function createConstructionAuthOptions(
         "/email-otp/reset-password": { window: 60, max: 10 },
         "/phone-number/send-otp": { window: 60, max: 5 },
         "/phone-number/verify": { window: 60, max: 10 },
+        [IMPERSONATION_SEND_CODE_PATH]: { window: 60, max: 3 },
+        [IMPERSONATION_VERIFY_PATH]: { window: 60, max: 10 },
       },
     },
     plugins: [
@@ -149,6 +159,7 @@ export function createConstructionAuthOptions(
       allowedPaths("construction-allowed-paths", constructionAuthPaths),
       perMobileOtpLimit(),
       mobileOtp(sms),
+      impersonation(email),
       emailOTP({
         overrideDefaultEmailVerification: true,
         sendVerificationOnSignUp: true,

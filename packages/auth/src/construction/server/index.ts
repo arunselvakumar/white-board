@@ -40,3 +40,7 @@ export {
 export { constructionOrigin } from "../config";
 export { isConstructionSmsEnabled } from "../features";
 export { otpTestCode } from "../mobile-otp";
+export {
+  IMPERSONATION_ADMIN_DOMAIN,
+  isImpersonationAdminEmail,
+} from "../impersonation-email";

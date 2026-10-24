@@ -15,7 +15,8 @@
     "./construction/client": "./src/construction/client.ts",
     "./construction/react": "./src/construction/react/index.ts",
     "./construction/testing": "./src/construction/testing.ts",
-    "./construction/mobile": "./src/construction/mobile.ts"
+    "./construction/mobile": "./src/construction/mobile.ts",
+    "./construction/impersonation-email": "./src/construction/impersonation-email.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -26,7 +27,8 @@
     "@repo/email-templates": "*",
     "@repo/whiteboard-db": "*",
     "better-auth": "1.7.7",
-    "resend": "^6.11.1"
+    "resend": "^6.11.1",
+    "zod": "^4.5.4"
   },
   "peerDependencies": {
     "next": "16.3.4",

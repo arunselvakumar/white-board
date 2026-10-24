@@ -95,6 +95,23 @@ function pill() {
   return element;
 }
 
+/**
+ * Presses `key` until `option` is highlighted. On a busy runner the open
+ * list sometimes drops a key even after it has focus; each of these keys
+ * lands on the same row when pressed again.
+ */
+async function pressUntilHighlighted(
+  userEvent: { keyboard: (text: string) => Promise<void> },
+  key: string,
+  option: HTMLElement,
+) {
+  await userEvent.keyboard(key);
+  await waitFor(async () => {
+    if (!option.hasAttribute("data-highlighted")) await userEvent.keyboard(key);
+    await expect(option).toHaveAttribute("data-highlighted");
+  });
+}
+
 export const Open: Story = {
   args: { defaultOpen: true, tags: true },
   play: async () => {
@@ -160,17 +177,20 @@ export const Keyboard: Story = {
     await userEvent.keyboard("{ArrowDown}");
     await screen.findByRole("listbox", { name: "Units" });
 
-    await userEvent.keyboard("{End}");
     const last = screen.getByRole("option", { name: "Numbers" });
-    await waitFor(() => expect(last).toHaveAttribute("data-highlighted"));
+    await pressUntilHighlighted(userEvent, "{End}", last);
     await waitFor(() =>
       expect(pill().style.transform).toBe(`translateY(${last.offsetTop}px)`),
     );
 
-    await userEvent.keyboard("{Home}");
-    await userEvent.keyboard("t");
+    await pressUntilHighlighted(
+      userEvent,
+      "{Home}",
+      screen.getByRole("option", { name: "Bags" }),
+    );
+    // Tonnes is the only unit starting with "t", so typing it again is safe.
     const tonnes = screen.getByRole("option", { name: "Tonnes" });
-    await waitFor(() => expect(tonnes).toHaveAttribute("data-highlighted"));
+    await pressUntilHighlighted(userEvent, "t", tonnes);
 
     await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());

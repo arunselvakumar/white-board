@@ -31,6 +31,10 @@ const BY_CODE: Record<string, Mapping> = {
     field: "code",
     message: "Too many wrong codes. Ask for a new one.",
   },
+  IMPERSONATION_USER_NOT_FOUND: {
+    field: "global",
+    message: "No User has this customer email. Change emails and try again.",
+  },
   INVALID_EMAIL_OR_PASSWORD: {
     field: "global",
     message: "Incorrect email or password.",

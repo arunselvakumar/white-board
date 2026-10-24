@@ -4,6 +4,7 @@ export {
   useCompanyAuth,
   useCompanyEmailSignIn,
   useCompanyEmailSignUp,
+  useCompanyImpersonation,
   useCompanyList,
   useCompanyMobileOtp,
   useCompanyPasswordReset,
@@ -13,6 +14,10 @@ export {
 export { navigateInApp, type FetchStatus } from "../../react/hooks";
 export type { AuthError, AuthResult } from "../../client";
 export type { CompanyRole } from "../roles";
+export {
+  IMPERSONATION_ADMIN_DOMAIN,
+  isImpersonationAdminEmail,
+} from "../impersonation-email";
 export {
   formatMobile,
   isPlaceholderEmail,

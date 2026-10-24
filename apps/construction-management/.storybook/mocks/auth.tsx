@@ -36,6 +36,7 @@ export type AuthMockState = {
   workspaceId: string | null;
   role: CompanyRole | null;
   user: CompanyAuthUser | null;
+  impersonatedBy: string | null;
   companies: CompanySummary[];
   mobileOtp: {
     sendCode: Action<[string]>;
@@ -51,6 +52,12 @@ export type AuthMockState = {
   passwordReset: {
     requestCode: Action<[string]>;
     resetPassword: Action<[{ email: string; code: string; password: string }]>;
+  };
+  impersonation: {
+    sendCode: Action<[{ customerEmail: string; adminEmail: string }]>;
+    verifyCode: Action<
+      [{ customerEmail: string; adminEmail: string; code: string }]
+    >;
   };
   setActive: Action<[string, string]>;
   signOut: Action<[string]>;
@@ -87,6 +94,7 @@ function createState(): AuthMockState {
     workspaceId: null,
     role: null,
     user: null,
+    impersonatedBy: null,
     companies: [],
     mobileOtp: {
       sendCode: action("mobileOtp.sendCode"),
@@ -102,6 +110,10 @@ function createState(): AuthMockState {
     passwordReset: {
       requestCode: action("passwordReset.requestCode"),
       resetPassword: action("passwordReset.resetPassword"),
+    },
+    impersonation: {
+      sendCode: action("impersonation.sendCode"),
+      verifyCode: action("impersonation.verifyCode"),
     },
     setActive: action("setActive"),
     signOut: action("signOut"),
@@ -151,6 +163,7 @@ export function useCompanyAuthSnapshot(): CompanyAuthSnapshot {
     workspaceId: authMocks.workspaceId,
     role: authMocks.role,
     user: authMocks.user,
+    impersonatedBy: authMocks.impersonatedBy,
     companies: authMocks.companies,
   };
 }
@@ -161,6 +174,7 @@ export function useCompanyAuth() {
     userId: authMocks.userId,
     workspaceId: authMocks.workspaceId,
     role: authMocks.role,
+    impersonatedBy: authMocks.impersonatedBy,
   };
 }
 
@@ -221,6 +235,10 @@ export {
   isValidMobile,
   normalizeMobile,
 } from "@repo/auth/construction/mobile";
+export {
+  IMPERSONATION_ADMIN_DOMAIN,
+  isImpersonationAdminEmail,
+} from "@repo/auth/construction/impersonation-email";
 
 export function useCompanyMobileOtp() {
   const send = useMockAction((mobile: string) =>
@@ -323,5 +341,28 @@ export function useCompanySignOut() {
       await run(redirectTo);
     },
     fetchStatus,
+  };
+}
+
+export function useCompanyImpersonation() {
+  const send = useMockAction(
+    (input: { customerEmail: string; adminEmail: string }) =>
+      authMocks.impersonation.sendCode(input),
+  );
+  const verify = useMockAction(
+    (input: { customerEmail: string; adminEmail: string; code: string }) =>
+      authMocks.impersonation.verifyCode(input),
+  );
+  return {
+    sendCode: send.run,
+    verifyCode: verify.run,
+    fetchStatus: [send, verify].some((hook) => hook.fetchStatus === "fetching")
+      ? ("fetching" as const)
+      : ("idle" as const),
+    error: verify.error ?? send.error,
+    clearError: () => {
+      send.clearError();
+      verify.clearError();
+    },
   };
 }
