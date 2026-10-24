@@ -83,9 +83,9 @@ export const WithDesignations: Story = {
     const [, billing, , engineer] = rows;
     if (billing == null || engineer == null) throw new Error("Rows missing");
     await expect(within(engineer).getByText("Default")).toBeVisible();
-    await expect(within(engineer).getByText("Has template")).toBeVisible();
     await expect(within(billing).queryByText("Default")).toBeNull();
-    await expect(within(billing).queryByText("Has template")).toBeNull();
+    // A job title only: no Permission Template any more (ADR CM-0029).
+    await expect(canvas.queryByText(/template/i)).toBeNull();
     await expect(
       canvas.getByRole("link", { name: "Add Designation" }),
     ).toHaveAttribute("href", "/app/masters/designations/new");

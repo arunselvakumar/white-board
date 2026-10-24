@@ -5,15 +5,25 @@ import {
 } from "@tanstack/react-query";
 
 import type { DuplicateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/[id]/duplicate/duplicate-designation-request-model";
-import type { UpdateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/[id]/update/update-designation-request-model";
-import type { CreateConstructionOrganizationDesignationRequestModel } from "@/app/api/construction/organization/designations/create-designation-request-model";
-import type { ConstructionOrganizationDesignationResponseModel } from "@/app/api/construction/organization/designations/designation-response-model";
-import type { ListConstructionOrganizationDesignationsResponseModel } from "@/app/api/construction/organization/designations/list-designations-response-model";
 
 import { apiJson } from "./http";
 
-export type DesignationResponse =
-  ConstructionOrganizationDesignationResponseModel;
+/**
+ * A Designation: a job title only, with no access since ADR CM-0029 (the
+ * Role carries that). The fields the screens read.
+ */
+export type DesignationResponse = {
+  id: string;
+  name: string;
+  /** Copied from the seed set when the Company was created ("Default"). */
+  isSeed: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DesignationInput = { name: string };
+
+type DesignationList = { items: DesignationResponse[]; total: number };
 
 const BASE = "/api/construction/organization/designations";
 
@@ -22,8 +32,7 @@ const DESIGNATIONS_KEY = ["organization", "designations"] as const;
 
 export const designationsQuery = queryOptions({
   queryKey: [...DESIGNATIONS_KEY, "list"],
-  queryFn: () =>
-    apiJson<ListConstructionOrganizationDesignationsResponseModel>(BASE),
+  queryFn: () => apiJson<DesignationList>(BASE),
 });
 
 export function designationQuery(id: string) {
@@ -43,14 +52,14 @@ function postJson<T>(url: string, body?: unknown): Promise<T> {
 }
 
 export function createDesignation(
-  input: CreateConstructionOrganizationDesignationRequestModel,
+  input: DesignationInput,
 ): Promise<DesignationResponse> {
   return postJson(BASE, input);
 }
 
 export function updateDesignation(
   id: string,
-  input: UpdateConstructionOrganizationDesignationRequestModel,
+  input: DesignationInput,
 ): Promise<DesignationResponse> {
   return postJson(`${BASE}/${encodeURIComponent(id)}/update`, input);
 }
@@ -79,9 +88,7 @@ export function useCreateDesignation() {
 export function useUpdateDesignation(id: string) {
   const invalidate = useInvalidateDesignations();
   return useMutation({
-    mutationFn: (
-      input: UpdateConstructionOrganizationDesignationRequestModel,
-    ) => updateDesignation(id, input),
+    mutationFn: (input: DesignationInput) => updateDesignation(id, input),
     onSuccess: invalidate,
   });
 }

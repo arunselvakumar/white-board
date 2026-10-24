@@ -81,14 +81,9 @@ function DesignationRow({
         >
           {designation.name}
         </Link>
-        {designation.isSeed || designation.template != null ? (
+        {designation.isSeed ? (
           <div className="flex flex-wrap gap-1.5">
-            {designation.isSeed ? (
-              <Badge variant="secondary">Default</Badge>
-            ) : null}
-            {designation.template != null ? (
-              <Badge variant="outline">Has template</Badge>
-            ) : null}
+            <Badge variant="secondary">Default</Badge>
           </div>
         ) : null}
       </div>
@@ -143,7 +138,7 @@ export function DesignationsList() {
 }
 
 const DESIGNATIONS_META =
-  "Job titles and the Permission Template each one starts with.";
+  "Job titles your team hold. What each person may do is their Role.";
 
 function AddDesignationLink() {
   return (
@@ -190,8 +185,8 @@ function DesignationsListContent() {
               </EmptyMedia>
               <EmptyTitle>No Designations yet</EmptyTitle>
               <EmptyDescription>
-                Add the job titles your Team Members hold, like Site Engineer or
-                Store Keeper.
+                Add the job titles your Users hold, like Site Engineer or Store
+                Keeper.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>{addLink}</EmptyContent>
@@ -261,8 +256,8 @@ function DesignationsListContent() {
               Delete {pendingDelete?.name ?? "this Designation"}?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              It will no longer be offered for new Team Members. A Designation a
-              Team Member holds cannot be deleted.
+              It will no longer be offered on Add User. A Designation a User
+              holds cannot be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <FormAlert message={deleteError} />
