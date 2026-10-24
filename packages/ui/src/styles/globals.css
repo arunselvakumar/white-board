@@ -57,6 +57,8 @@
   --destructive: #dc4a3a;
   --border: #e2e4ef;
   --input: #e2e4ef;
+  /* Text box, Select and Combobox fill: opaque, so a field never takes the colour of the page behind it. */
+  --field: #ffffff;
   --ring: #595fae;
   --chart-1: #595fae;
   --chart-2: #2a7dbf;
@@ -95,6 +97,7 @@
   --destructive: #e25f4a;
   --border: #2a2d3e;
   --input: #2a2d3e;
+  --field: #1f212f;
   --ring: #7b82c4;
   --chart-1: #7b82c4;
   --chart-2: #4fa0da;
@@ -131,6 +134,7 @@
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-field: var(--field);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
